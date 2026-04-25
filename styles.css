@@ -1,0 +1,177 @@
+html,body{height:100%;margin:0}body{min-height:100dvh;background:#0b0b0b;color:#fff;font-family:system-ui}
+
+/* =========================================
+   HX MODULE -- FINAL PRODUCTION UI
+========================================= */
+
+#tab-hx {
+  display: none;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* .hx-layout removed — tab uses standard flex layout */
+
+/* Desktop Layout */
+
+@media (min-width: 1100px) {
+  /* .hx-layout removed — unused */
+
+  .hx-diagram-card {
+    grid-column: 2;
+    grid-row: 1 / span 5;
+    min-height: 780px;
+  }
+}
+
+/* Cards */
+
+.hx-card {
+  background:
+    radial-gradient(circle at top left,
+      rgba(30,60,120,0.22),
+      rgba(0,0,0,0.92));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 22px;
+  padding: 22px;
+  backdrop-filter: blur(14px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    0 20px 50px rgba(0,0,0,0.35);
+}
+
+.hx-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.72);
+  margin-bottom: 18px;
+}
+
+/* Toggle */
+
+.hx-mode-switch {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.hx-mode {
+  flex: 1;
+  height: 52px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  color: rgba(255,255,255,0.72);
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.hx-mode.active {
+  background: linear-gradient(
+    135deg,
+    #5b52ff,
+    #746cff
+  );
+  color: white;
+  border-color: transparent;
+  box-shadow:
+    0 10px 30px rgba(90,82,255,0.22);
+}
+
+/* Inputs */
+
+.hx-input-group {
+  margin-bottom: 14px;
+}
+
+.hx-input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.62);
+}
+
+.hx-input,
+select.hx-input {
+  width: 100%;
+  height: 58px;
+  padding: 0 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,0.03),
+      rgba(255,255,255,0.01)
+    );
+  color: white;
+  font-size: 16px;
+  outline: none;
+}
+
+.hx-input::placeholder {
+  color: rgba(255,255,255,0.28);
+}
+
+/* Main Button */
+
+.hx-main-btn {
+  width: 100%;
+  height: 62px;
+  border: none;
+  border-radius: 18px;
+  background: linear-gradient(
+    135deg,
+    #5b52ff,
+    #746cff
+  );
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  box-shadow:
+    0 18px 40px rgba(90,82,255,0.22);
+}
+
+/* State + Result */
+
+.hx-state-box {
+  margin-top: 16px;
+  padding: 18px;
+  border-radius: 16px;
+  background:
+    rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.84);
+  min-height: 72px;
+  line-height: 1.5;
+}
+
+/* Diagram */
+
+.hx-diagram-card {
+  min-height: 620px;
+}
+
+.hx-cvs-wrap {
+  height: 100%;
+  min-height: 560px;
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    rgba(0,0,0,0.28);
+}
+
+#hxCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
