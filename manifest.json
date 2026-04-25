@@ -1,6 +1,6 @@
 {
-  "name": "ThermoCalc Pro",
-  "short_name": "ThermoCalc",
+  "name": "TechCalc Pro",
+  "short_name": "TechCalc",
   "description": "HLK-Rechner für Heizung, Lüftung und Klimatisierung",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -85,5 +85,5 @@
     "standalone",
     "minimal-ui"
   ],
-  "id": "./thermocalc-pro/"
+  "id": "./techcalc-pro/"
 }
