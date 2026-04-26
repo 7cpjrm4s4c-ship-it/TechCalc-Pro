@@ -424,14 +424,14 @@ function _buildFlowPage(meta) {
         <td>${modeLabel[hMode] || hMode}</td>
         <td>${modeLabel[kMode] || kMode}</td></tr>
       <tr><td>Leistung Q</td>
-        <td class="num">${hMode !== 'ms' ? _fmt(hQ) + ' ' + hQUnit : '–'}</td>
-        <td class="num">${kMode !== 'ms' ? _fmt(kQ) + ' ' + kQUnit : '–'}</td></tr>
+        <td class="num">${hMode !== 'ms' ? _pdfFmt(hQ) + ' ' + hQUnit : '–'}</td>
+        <td class="num">${kMode !== 'ms' ? _pdfFmt(kQ) + ' ' + kQUnit : '–'}</td></tr>
       <tr><td>Massenstrom ṁ</td>
-        <td class="num">${hMode !== 'q'  ? _fmt(hMs) + ' kg/h' : '–'}</td>
-        <td class="num">${kMode !== 'q'  ? _fmt(kMs) + ' kg/h' : '–'}</td></tr>
+        <td class="num">${hMode !== 'q'  ? _pdfFmt(hMs) + ' kg/h' : '–'}</td>
+        <td class="num">${kMode !== 'q'  ? _pdfFmt(kMs) + ' kg/h' : '–'}</td></tr>
       <tr><td>Temperaturdifferenz ΔT</td>
-        <td class="num">${hMode !== 'dt' ? _fmt(hDt) + ' K' : '–'}</td>
-        <td class="num">${kMode !== 'dt' ? _fmt(kDt) + ' K' : '–'}</td></tr>
+        <td class="num">${hMode !== 'dt' ? _pdfFmt(hDt) + ' K' : '–'}</td>
+        <td class="num">${kMode !== 'dt' ? _pdfFmt(kDt) + ' K' : '–'}</td></tr>
     </tbody>
   </table>
 
@@ -548,15 +548,15 @@ function _buildLuftPage(meta) {
     <tbody>
       <tr>
         <td><span style="color:#c44000;font-weight:700">▲ Heizen</span></td>
-        <td class="num">${_fmt(tzlH)}</td>
-        <td class="num">${_fmt(trH)}</td>
-        <td class="num">${_fmtDiff(tzlH, trH)}</td>
+        <td class="num">${_pdfFmt(tzlH)}</td>
+        <td class="num">${_pdfFmt(trH)}</td>
+        <td class="num">${_pdfFmtDiff(tzlH, trH)}</td>
       </tr>
       <tr>
         <td><span style="color:#006a88;font-weight:700">▼ Kühlen</span></td>
-        <td class="num">${_fmt(tzlK)}</td>
-        <td class="num">${_fmt(trK)}</td>
-        <td class="num">${_fmtDiff(trK, tzlK)}</td>
+        <td class="num">${_pdfFmt(tzlK)}</td>
+        <td class="num">${_pdfFmt(trK)}</td>
+        <td class="num">${_pdfFmtDiff(trK, tzlK)}</td>
       </tr>
     </tbody>
   </table>
@@ -628,8 +628,8 @@ function _buildPipePage(meta) {
 
   <div class="sec">Parameter</div>
   <table>
-    <tr><td>Volumenstrom V̇</td><td class="num">${_fmt(vol)} m³/h</td></tr>
-    <tr><td>Max. Druckverlust</td><td class="num">${_fmt(dp)} Pa/m</td></tr>
+    <tr><td>Volumenstrom V̇</td><td class="num">${_pdfFmt(vol)} m³/h</td></tr>
+    <tr><td>Max. Druckverlust</td><td class="num">${_pdfFmt(dp)} Pa/m</td></tr>
   </table>
 
   <div class="sec">Rohre — Stahl &amp; Mapress Edelstahl</div>
@@ -680,9 +680,9 @@ function _buildWrgPage(meta) {
   <table>
     <thead><tr><th>Größe</th><th>Abluft (LS1)</th><th>Außenluft (LS2)</th></tr></thead>
     <tbody>
-      <tr><td>Temperatur T</td><td class="num">${_fmt(T_ab)} °C</td><td class="num">${_fmt(T_au)} °C</td></tr>
-      <tr><td>Rel. Feuchte φ</td><td class="num">${_fmt(ph_ab)} %</td><td class="num">${_fmt(ph_au)} %</td></tr>
-      <tr><td>Temperaturwirkungsgrad η</td><td colspan="2" class="num">${_fmt(eta)} %</td></tr>
+      <tr><td>Temperatur T</td><td class="num">${_pdfFmt(T_ab)} °C</td><td class="num">${_pdfFmt(T_au)} °C</td></tr>
+      <tr><td>Rel. Feuchte φ</td><td class="num">${_pdfFmt(ph_ab)} %</td><td class="num">${_pdfFmt(ph_au)} %</td></tr>
+      <tr><td>Temperaturwirkungsgrad η</td><td colspan="2" class="num">${_pdfFmt(eta)} %</td></tr>
     </tbody>
   </table>
 
@@ -693,9 +693,9 @@ function _buildWrgPage(meta) {
   <table>
     <thead><tr><th>Größe</th><th>Luftstrom 1 (LS1)</th><th>Luftstrom 2 (LS2)</th></tr></thead>
     <tbody>
-      <tr><td>Temperatur T</td><td class="num">${_fmt(T1)} °C</td><td class="num">${_fmt(T2)} °C</td></tr>
-      <tr><td>Rel. Feuchte φ</td><td class="num">${_fmt(ph1)} %</td><td class="num">${_fmt(ph2)} %</td></tr>
-      <tr><td>Volumenstrom V̇</td><td class="num">${_fmt(vol1)} m³/h</td><td class="num">${_fmt(vol2)} m³/h</td></tr>
+      <tr><td>Temperatur T</td><td class="num">${_pdfFmt(T1)} °C</td><td class="num">${_pdfFmt(T2)} °C</td></tr>
+      <tr><td>Rel. Feuchte φ</td><td class="num">${_pdfFmt(ph1)} %</td><td class="num">${_pdfFmt(ph2)} %</td></tr>
+      <tr><td>Volumenstrom V̇</td><td class="num">${_pdfFmt(vol1)} m³/h</td><td class="num">${_pdfFmt(vol2)} m³/h</td></tr>
     </tbody>
   </table>
 
@@ -833,13 +833,13 @@ function _txt(id) {
 }
 
 /** Zahl formatieren oder '–' zurückgeben */
-function _fmt(v) {
+function _pdfFmt(v) {
   const n = parseFloat(String(v).replace(',', '.'));
   return isNaN(n) ? (v || '–') : v;
 }
 
 /** Temperaturdifferenz berechnen */
-function _fmtDiff(a, b) {
+function _pdfFmtDiff(a, b) {
   const na = parseFloat(String(a).replace(',', '.'));
   const nb = parseFloat(String(b).replace(',', '.'));
   if (isNaN(na) || isNaN(nb)) return '–';

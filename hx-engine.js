@@ -814,15 +814,7 @@ function _drawProcessOnChart(steps) {
 
 /* ─── PDF EXPORT WRAPPER ─── */
 function hxOpenPdf() {
-  try {
-    if (typeof openPdfSheet === 'function') {
-      openPdfSheet();
-    } else {
-      console.error('[TechCalc] openPdfSheet not found — pdf-export.js not loaded?');
-    }
-  } catch(e) {
-    console.error('[TechCalc] hxOpenPdf crash:', e.message, e.stack);
-  }
+  openPdfSheet();
 }
 
 /* ─── MODUS φ ↔ x ─── */

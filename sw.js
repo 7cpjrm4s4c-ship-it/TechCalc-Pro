@@ -5,7 +5,7 @@
 'use strict';
 
 const BUILD_TS   = '20260426-1440';
-const CACHE_NAME = `techcalc-20260426-1538`;
+const CACHE_NAME = `techcalc-20260426-1629`;
 
 const PRECACHE = [
   './', './index.html',
