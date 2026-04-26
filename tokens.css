@@ -1,0 +1,65 @@
+/* ═══════════════════════════════════════════════════════
+   TechCalc Pro — Design Tokens
+   Einzige Quelle aller CSS-Variablen
+═══════════════════════════════════════════════════════ */
+:root {
+  /* True black base */
+  --bg: #000000;
+
+  /* Glass layers */
+  --glass-low:   rgba(255,255,255,0.07);
+  --glass-mid:   rgba(255,255,255,0.11);
+  --glass-high:  rgba(255,255,255,0.16);
+  --glass-raise: rgba(255,255,255,0.22);
+
+  /* Glass borders */
+  --gb-soft:   rgba(255,255,255,0.10);
+  --gb-mid:    rgba(255,255,255,0.18);
+  --gb-strong: rgba(255,255,255,0.30);
+  --gb-accent: rgba(255,255,255,0.45);
+
+  /* Specular shimmer */
+  --shimmer: linear-gradient(90deg,
+    rgba(255,255,255,0)    0%,
+    rgba(255,255,255,0.22) 30%,
+    rgba(255,255,255,0.32) 50%,
+    rgba(255,255,255,0.22) 70%,
+    rgba(255,255,255,0)    100%);
+
+  /* Colour accents */
+  --heat:   #ff6b35;  --heat-t: #ffaa7a;
+  --cold:   #00c4e8;  --cold-t: #66dfff;
+  --blue:   #4fa8ff;  --blue-t: rgba(79,168,255,0.14); --blue-b: rgba(79,168,255,0.36);
+  --grn:    #34d399;  --grn-t:  rgba(52,211,153,0.14); --grn-b:  rgba(52,211,153,0.36);
+  --air:    #a78bfa;  --air-t:  #c4b5fd;               --air-d:  rgba(167,139,250,0.12);
+                      --air-b:  rgba(167,139,250,0.35);
+  --ok:     #30d158;  --warn:   #ffd60a;  --danger: #ff453a;
+  --out-h:  #ffb87a;  --out-c:  #7ddfff;
+
+  /* Typography */
+  --t1: rgba(255,255,255,0.95);
+  --t2: rgba(255,255,255,0.60);
+  --t3: rgba(255,255,255,0.35);
+  --t4: rgba(255,255,255,0.16);
+  --f:  Arial, Helvetica, sans-serif;
+  --fm: "Courier New", Courier, monospace;
+
+  /* Spacing */
+  --gap:   14px;
+  --gap-s: 10px;
+  --gap-l: 20px;
+  --pad:   18px;
+  --pad-s: 14px;
+
+  /* Radii */
+  --r-s: 10px;  --r-m: 14px;  --r-l: 20px;  --r-xl: 26px;
+
+  /* Safe areas */
+  --sat: env(safe-area-inset-top,    0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left,   0px);
+  --sar: env(safe-area-inset-right,  0px);
+
+  /* Fixed header height */
+  --hdr: 88px;
+}
