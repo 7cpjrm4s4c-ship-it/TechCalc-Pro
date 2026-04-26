@@ -2007,7 +2007,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
   </div>
 
   <!-- PDF Export -->
-  <button onclick="hxOpenPdf()"
+  <button onclick="(function(){try{if(typeof openPdfSheet==='function'){openPdfSheet();}else{alert('pdf-export.js not loaded');}}catch(e){alert('Error: '+e.message);}})()"
     style="width:100%;height:52px;border:none;border-radius:var(--r-m);
            background:var(--grn-t);border:1px solid var(--grn-b);
            color:var(--grn);font-family:var(--f);font-size:15px;font-weight:700;

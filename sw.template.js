@@ -1,95 +1,40 @@
 /* ═══════════════════════════════════════════════════════
    sw.js  —  TechCalc Pro Service Worker
-   Strategie: Cache-First + Stale-While-Revalidate
-   Cache-Version: AUTO-GENERATED via build timestamp
-   → Kein manuelles Hochzählen mehr nötig
+   DEPLOYMENT: bash deploy.sh (stampt __BUILD_TS__ automatisch)
 ═══════════════════════════════════════════════════════ */
 'use strict';
 
-/* Auto-version: wird bei jedem Deployment neu generiert */
-const BUILD_TS   = '20260426-1118';          // Platzhalter für deploy-script
-const CACHE_NAME = `techcalc-${BUILD_TS}`;  // z.B. techcalc-20250426-1430
+const BUILD_TS   = '__BUILD_TS__';
+const CACHE_NAME = `techcalc-${BUILD_TS}`;
 
 const PRECACHE = [
-  './',
-  './index.html',
-  './app.js',
-  './heating-cooling.js',
-  './ventilation.js',
-  './wrg-mischluft.js',
-  './pdf-export.js',
-  './hx-engine.js',
-  './styles.css',
-  './manifest.json',
-  './favicon.ico',
-  /* Icons — nur produktionsrelevante Größen */
-  './icon-192.png',
-  './icon-512.png',
-  './icon-180.png',   /* iOS Apple Touch */
-  './icon-167.png',   /* iOS iPad Pro */
-  './icon-152.png',   /* iOS iPad */
+  './', './index.html', './app.js', './heating-cooling.js',
+  './ventilation.js', './wrg-mischluft.js', './pdf-export.js',
+  './hx-engine.js', './styles.css', './manifest.json', './favicon.ico',
+  './icon-192.png', './icon-512.png', './icon-180.png', './icon-167.png', './icon-152.png',
 ];
+const BYPASS = ['workers.dev','analytics','cloudflare'];
 
-const BYPASS = [
-  'workers.dev',
-  'analytics',
-  'cloudflare',
-];
-
-/* ─── INSTALL ─── */
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(PRECACHE).catch(() => {}))
-      .then(() => self.skipWaiting())
-  );
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(PRECACHE).catch(()=>{})).then(() => self.skipWaiting()));
 });
-
-/* ─── ACTIVATE — alten Cache löschen ─── */
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-      ))
-      .then(() => self.clients.claim())
-  );
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
 });
-
-/* ─── FETCH — Cache-First mit Background-Update ─── */
-self.addEventListener('fetch', event => {
-  const { request } = event;
-  if (request.method !== 'GET') return;
-
-  const url = new URL(request.url);
-  if (BYPASS.some(b => url.hostname.includes(b))) return;
-  if (!url.protocol.startsWith('http')) return;
-  if (url.origin !== self.location.origin) return;
-
-  event.respondWith(cacheFirst(request));
+self.addEventListener('fetch', e => {
+  const {request:r} = e;
+  if (r.method!=='GET') return;
+  const u = new URL(r.url);
+  if (BYPASS.some(b=>u.hostname.includes(b))) return;
+  if (!u.protocol.startsWith('http')) return;
+  if (u.origin!==self.location.origin) return;
+  e.respondWith((async()=>{
+    const cache=await caches.open(CACHE_NAME), cached=await cache.match(r);
+    const net=fetch(r).then(resp=>{if(resp&&resp.status===200&&resp.type!=='opaque')cache.put(r,resp.clone());return resp;}).catch(()=>null);
+    if(cached) return cached;
+    const n=await net; if(n) return n;
+    if(r.mode==='navigate') return cache.match('./index.html');
+    return new Response('',{status:408});
+  })());
 });
-
-async function cacheFirst(request) {
-  const cache  = await caches.open(CACHE_NAME);
-  const cached = await cache.match(request);
-
-  const fetchP = fetch(request)
-    .then(r => {
-      if (r && r.status === 200 && r.type !== 'opaque') {
-        cache.put(request, r.clone());
-      }
-      return r;
-    })
-    .catch(() => null);
-
-  if (cached) return cached;
-  const net = await fetchP;
-  if (net)   return net;
-  if (request.mode === 'navigate') return cache.match('./index.html');
-  return new Response('', { status: 408 });
-}
-
-/* ─── MESSAGE ─── */
-self.addEventListener('message', event => {
-  if (event.data === 'SKIP_WAITING') self.skipWaiting();
-});
+self.addEventListener('message', e => { if(e.data==='SKIP_WAITING') self.skipWaiting(); });

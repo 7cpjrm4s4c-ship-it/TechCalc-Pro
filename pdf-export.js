@@ -111,9 +111,23 @@ function openPdfSheet() {
     .sh-body{}
   `;
 
-  document.head.appendChild(style);
-  document.body.appendChild(modal);
-  setTimeout(() => document.getElementById('pdf-sb')?.focus(), 100);
+  try {
+    document.head.appendChild(style);
+  } catch(e) { console.warn('[PDF] head.appendChild failed:', e.message); }
+
+  try {
+    document.body.appendChild(modal);
+  } catch(e) {
+    console.error('[PDF] body.appendChild failed:', e.message);
+    // Fallback: insert before body end
+    document.documentElement.appendChild(modal);
+  }
+
+  setTimeout(() => {
+    const sb = document.getElementById('pdf-sb');
+    if (sb) sb.focus();
+    else console.warn('[PDF] pdf-sb input not found after modal insert');
+  }, 150);
 }
 
 function closePdfSheet() {

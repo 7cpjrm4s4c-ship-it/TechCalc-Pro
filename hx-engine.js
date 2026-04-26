@@ -814,13 +814,14 @@ function _drawProcessOnChart(steps) {
 
 /* ─── PDF EXPORT WRAPPER ─── */
 function hxOpenPdf() {
-  if (typeof openPdfSheet === 'function') {
-    openPdfSheet();
-  } else {
-    // pdf-export.js noch nicht geladen — kurz warten
-    setTimeout(() => {
-      if (typeof openPdfSheet === 'function') openPdfSheet();
-    }, 200);
+  try {
+    if (typeof openPdfSheet === 'function') {
+      openPdfSheet();
+    } else {
+      console.error('[TechCalc] openPdfSheet not found — pdf-export.js not loaded?');
+    }
+  } catch(e) {
+    console.error('[TechCalc] hxOpenPdf crash:', e.message, e.stack);
   }
 }
 

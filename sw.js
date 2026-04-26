@@ -1,10 +1,10 @@
 /* ═══════════════════════════════════════════════════════
    sw.js  —  TechCalc Pro Service Worker
-   DEPLOYMENT: bash deploy.sh (stampt __BUILD_TS__ automatisch)
+   DEPLOYMENT: bash deploy.sh (stampt 20260426-1440 automatisch)
 ═══════════════════════════════════════════════════════ */
 'use strict';
 
-const BUILD_TS   = '__BUILD_TS__';
+const BUILD_TS   = '20260426-1440';
 const CACHE_NAME = `techcalc-${BUILD_TS}`;
 
 const PRECACHE = [
