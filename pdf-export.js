@@ -1,9 +1,9 @@
 /* ═══════════════════════════════════════════════════════
-   pdf-export.js  —  Massenstromrechner PWA
+   pdf-export.js  —  TechCalc Pro PWA
    A4-PDF-Export via separatem Print-DOM + window.print()
 
    Unterstützte Tabs:
-   · Heizung/Kälte  (Massenstrom, Leistung, Δt + Rohrempfehlung)
+   · Heizung/Kälte  (Leistung, Δt + Rohrempfehlung)
    · Lüftung        (Volumenstrom, Leistung, Δt)
    · Rohrdimensionierung
    · h,x-Diagramm   (Canvas-PNG + Zustandstabelle)
@@ -278,7 +278,7 @@ html,body{
   display:flex;justify-content:space-between;align-items:flex-end;
   border-bottom:2px solid #1a3a5c;padding-bottom:7px;margin-bottom:10px;
 }
-.ph-l h1{font-size:13pt;color:#1a3a5c;font-weight:700;letter-spacing:-.2px}
+.ph-l{display:flex;align-items:center}.ph-l h1{font-size:13pt;color:#1a3a5c;font-weight:700;letter-spacing:-.2px}
 .ph-l p {font-size:7.5pt;color:#777;margin-top:1px}
 .ph-r   {font-size:7.5pt;color:#555;text-align:right;line-height:1.6}
 .ph-r strong{color:#1a3a5c;font-size:9pt}
@@ -352,8 +352,12 @@ function _header(meta, subtitle) {
   return `
   <div class="ph">
     <div class="ph-l">
-      <h1>ṁ Massenstromrechner</h1>
-      <p>${subtitle}</p>
+      <img src="data:image/png;base64,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" width="32" height="32"
+           style="border-radius:7px;margin-right:10px;vertical-align:middle;flex-shrink:0"/>
+      <div>
+        <h1>TechCalc <span style="font-weight:400;color:#4fa8ff;font-size:9pt">PRO</span></h1>
+        <p>${subtitle}</p>
+      </div>
     </div>
     <div class="ph-r">
       <strong>${meta.nr}</strong><br>
@@ -403,7 +407,7 @@ function _buildFlowPage(meta) {
   const modeLabel = { ms:'Massenstrom berechnen', q:'Leistung berechnen', dt:'ΔT berechnen' };
 
   return `
-  ${_header(meta, 'Heizung · Kälte — Massenstromberechnung')}
+  ${_header(meta, 'Heizung · Kälte — Berechnung')}
 
   <div class="sec">Wärmeträger</div>
   <table>
