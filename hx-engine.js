@@ -442,7 +442,6 @@ function toggleTempSign(inputId) {
   inp.dispatchEvent(new Event('change', { bubbles: true }));
 }
 // Alias for WRG module — both point to same function
-const wrgToggleSign = toggleTempSign;
 
 /* ─── ZUSTAND SETZEN ─── */
 function setHxState() {
