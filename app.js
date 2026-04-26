@@ -21,37 +21,6 @@ const loc  = (v, d) => v.toLocaleString('de-DE', {
 ─────────────────────────────────────── */
 const TABS = ['flow', 'luft', 'pipe', 'unit', 'hx', 'wrg'];
 
-/* ─── TAB WECHSELN ─── */
-function switchTab(t) {
-  // Desktop: Tab-Bar-Buttons
-  document.querySelectorAll('.tab-btn[data-tab]').forEach(b =>
-    b.classList.toggle('active', b.dataset.tab === t)
-  );
-  // Panel anzeigen
-  TABS.forEach(id => {
-    const el = $('tab-' + id);
-    if (!el) return;
-    el.style.display = (id === t) ? (id === 'hx' ? 'block' : '') : 'none';
-  });
-  // h,x redraw
-  if (t === 'hx' && typeof drawHxChart === 'function') {
-    requestAnimationFrame(() => drawHxChart(window._hxState || null));
-  }
-  // Pill: Haupt-Buttons updaten
-  _updatePill(t);
-}
-
-function _updatePill(activeTab) {
-  /* Haupt-Pill-Buttons (flow, luft, hx, unit) */
-  ['flow','luft','hx','unit'].forEach(id =>
-    $('pill-' + id)?.classList.toggle('active', id === activeTab)
-  );
-  /* Plus-Sheet-Items */
-  ['pipe','unit','wrg'].forEach(id =>
-    $('plus-' + id)?.classList.toggle('active-tab', id === activeTab)
-  );
-}
-
 /* ─── NAVIGATION STATE MACHINE ─── */
 const NAV = {
   activeTab:   'flow',
@@ -102,7 +71,6 @@ function switchTab(t) {
   NAV.activeTab = t;
   NAV.sheetOpen = false;  /* Sheet schließt immer beim Tab-Wechsel */
   NAV._apply();
-  _updatePill(t);
 }
 
 function togglePlusSheet() {
@@ -117,7 +85,6 @@ function _switchFromPlus(tab) {
   NAV.activeTab = tab;
   NAV.sheetOpen = false;
   NAV._apply();
-  _updatePill(tab);
 }
 
 /* ─── PILL SICHTBARKEIT ─── */
