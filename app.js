@@ -42,45 +42,82 @@ function switchTab(t) {
 }
 
 function _updatePill(activeTab) {
-  // Haupt-Pill-Buttons (flow, luft, hx, unit)
-  ['flow','luft','hx','unit'].forEach(id => {
-    const btn = $('pill-' + id);
-    if (btn) btn.classList.toggle('active', id === activeTab);
-  });
-  // Plus-Sheet-Items (pipe, unit, wrg) — active-tab Markierung
-  // Plus sheet items active state
-  ['pipe','unit','wrg'].forEach(id => {
-    const btn = $('plus-' + id);
-    if (btn) btn.classList.toggle('active-tab', id === activeTab);
-  });
+  /* Haupt-Pill-Buttons (flow, luft, hx, unit) */
+  ['flow','luft','hx','unit'].forEach(id =>
+    $('pill-' + id)?.classList.toggle('active', id === activeTab)
+  );
+  /* Plus-Sheet-Items */
+  ['pipe','unit','wrg'].forEach(id =>
+    $('plus-' + id)?.classList.toggle('active-tab', id === activeTab)
+  );
 }
 
-/* ─── PLUS SHEET ─── */
-let _plusOpen = false;
+/* ─── NAVIGATION STATE MACHINE ─── */
+const NAV = {
+  activeTab:   'flow',
+  sheetOpen:   false,
+
+  /* Einzige Wahrheitsquelle für alle Navigation-Zustände */
+  _apply() {
+    /* Tabs */
+    TABS.forEach(id => {
+      const el = $('tab-' + id);
+      if (!el) return;
+      if (id === NAV.activeTab) {
+        el.style.display = (id === 'hx') ? 'block' : 'flex';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+
+    /* Desktop Tab-Bar */
+    document.querySelectorAll('.tab-btn[data-tab]').forEach(b =>
+      b.classList.toggle('active', b.dataset.tab === NAV.activeTab)
+    );
+
+    /* Pill Haupt-Buttons */
+    ['flow','luft','hx','unit'].forEach(id =>
+      $('pill-' + id)?.classList.toggle('active', id === NAV.activeTab)
+    );
+
+    /* Plus-Sheet-Items Markierung */
+    ['pipe','unit','wrg'].forEach(id =>
+      $('plus-' + id)?.classList.toggle('active-tab', id === NAV.activeTab)
+    );
+
+    /* Plus-Sheet */
+    $('plus-sheet')?.classList.toggle('open', NAV.sheetOpen);
+    $('plus-overlay')?.classList.toggle('open', NAV.sheetOpen);
+    $('pill-plus')?.classList.toggle('open', NAV.sheetOpen);
+    $('pill-plus')?.setAttribute('aria-expanded', String(NAV.sheetOpen));
+
+    /* h,x Canvas: bei Tab-Wechsel neu zeichnen */
+    if (NAV.activeTab === 'hx' && typeof drawHxChart === 'function') {
+      setTimeout(() => drawHxChart(window._hxState || null), 80);
+    }
+  },
+};
+
+function switchTab(t) {
+  NAV.activeTab = t;
+  NAV.sheetOpen = false;  /* Sheet schließt immer beim Tab-Wechsel */
+  NAV._apply();
+  _updatePill(t);
+}
 
 function togglePlusSheet() {
-  _plusOpen ? closePlusSheet() : openPlusSheet();
+  NAV.sheetOpen = !NAV.sheetOpen;
+  NAV._apply();
 }
 
-function openPlusSheet() {
-  _plusOpen = true;
-  $('plus-sheet')?.classList.add('open');
-  $('plus-overlay')?.classList.add('open');
-  $('pill-plus')?.classList.add('open');
-  $('pill-plus')?.setAttribute('aria-expanded', 'true');
-}
-
-function closePlusSheet() {
-  _plusOpen = false;
-  $('plus-sheet')?.classList.remove('open');
-  $('plus-overlay')?.classList.remove('open');
-  $('pill-plus')?.classList.remove('open');
-  $('pill-plus')?.setAttribute('aria-expanded', 'false');
-}
+function openPlusSheet()  { NAV.sheetOpen = true;  NAV._apply(); }
+function closePlusSheet() { NAV.sheetOpen = false; NAV._apply(); }
 
 function _switchFromPlus(tab) {
-  closePlusSheet();
-  switchTab(tab);
+  NAV.activeTab = tab;
+  NAV.sheetOpen = false;
+  NAV._apply();
+  _updatePill(tab);
 }
 
 /* ─── PILL SICHTBARKEIT ─── */

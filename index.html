@@ -38,6 +38,7 @@
 <link rel="mask-icon" href="icon-512.png" color="#4fa8ff"/>
 <title>TechCalc Pro</title>
 <style>
+
 /* ═══════════════════════════════════════════════════════
    APPLE LIQUID GLASS — Token System
 ═══════════════════════════════════════════════════════ */
@@ -206,25 +207,10 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
    LAYOUT
 ═══════════════════════════════════════════════════════ */
 /* Mobile: single scrollable column */
-#tab-flow {
-  padding-top: var(--gap); /* = 14px innerer Abstand unter dem header-gap */
-  padding-left:calc(var(--pad-s) + var(--sal));
-  padding-right:calc(var(--pad-s) + var(--sar));
-  padding-bottom:calc(96px + var(--sab));
-  display:flex; flex-direction:column; gap:var(--gap);
-}
 
 /* Desktop: 2-col fixed viewport */
 @media (min-width:900px) {
-  #tab-flow {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:0;
-    padding:0;
-    height:calc(100vh - var(--hdr) - var(--sat));
-    overflow:hidden;
-  }
-  .col-L {
+    .col-L {
     display:flex; flex-direction:column; gap:var(--gap);
     overflow-y:auto; padding:var(--gap-l);
     border-right:1px solid var(--gb-soft);
@@ -246,15 +232,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 .twin { display:flex; flex-direction:column; gap:var(--gap); }
 
 /* Pipe tab */
-#tab-pipe {
-  padding-top: var(--gap);
-  padding-left:calc(var(--pad-s) + var(--sal));
-  padding-right:calc(var(--pad-s) + var(--sar));
-  padding-bottom:calc(96px + var(--sab));
-  display:flex; flex-direction:column; gap:var(--gap);
-}
 @media (min-width:900px) {
-  #tab-pipe { padding-left:var(--gap-l); padding-right:var(--gap-l); padding-bottom:var(--gap-l); max-width:900px; margin:0 auto; }
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -598,30 +576,27 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 @media (max-width:899px) {
   .tab-bar { display:none !important; }
   /* Inhalt nicht hinter Pill versteckt */
-  #tab-flow,#tab-luft,#tab-pipe,#tab-unit,#tab-hx,#tab-wrg {
-    padding-bottom:calc(96px + env(safe-area-inset-bottom)) !important;
-    min-height:calc(100vh - var(--hdr) - var(--sat));
-  }
-  .col-L { padding-bottom:0 !important; }
+  .tab-panel, .col-L { padding-bottom: 0 !important; }
 }
 
 /* ── Pill Container ── */
 .bottom-pill {
-  display:none; /* per JS angezeigt wenn <900px */
-  position:fixed;
+  display: none;                    /* JS setzt flex wenn <900px */
+  position: fixed;
   bottom: max(16px, env(safe-area-inset-bottom));
-  left:50%; transform:translate3d(-50%, 0, 0);
-  z-index:500;
-  isolation:isolate;
-  will-change:transform;
-  align-items:center;
-  gap:2px;
-  background:rgba(14,14,22,0.92);
-  backdrop-filter:saturate(180%) blur(32px);
-  -webkit-backdrop-filter:saturate(180%) blur(32px);
-  border:1px solid rgba(255,255,255,0.16);
-  border-radius:100px;
-  padding:5px 5px 5px 6px;
+  left: 50%;
+  transform: translate3d(-50%, 0, 0);
+  z-index: 500;                     /* Unter Plus-Sheet(900), über Content */
+  isolation: isolate;               /* Eigener Compositor-Layer — iOS safe */
+  will-change: transform;
+  align-items: center;
+  gap: 2px;
+  background: rgba(14,14,22,0.92);
+  backdrop-filter: saturate(180%) blur(32px);
+  -webkit-backdrop-filter: saturate(180%) blur(32px);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 100px;
+  padding: 5px 5px 5px 6px;
   box-shadow:
     0 16px 56px rgba(0,0,0,0.75),
     0 4px 12px rgba(0,0,0,0.50),
@@ -754,9 +729,6 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 /* Prevent grid blowout on iOS */
 * { min-width: 0; }
 .gc, .out-card, .gc-h, .gc-c, .gc-a { overflow: hidden; }
-#tab-flow, #tab-luft, #tab-pipe, #tab-unit { overflow-x: hidden; max-width: 100%; }
-#tab-hx { display: none; }
-
 /* Unit converter */
 /* Category select styled like gl-sel but green accent */
 .cat-sel {
@@ -932,15 +904,6 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 
 @media (max-width: 768px) {
 
-  #tab-hx {
-    background: linear-gradient(
-        180deg,
-        #05070d 0%,
-        #07101c 100%
-    );
-
-    padding: 12px;
-    }
 
 /* ========================================
    HX PREMIUM CARD SYSTEM
@@ -1278,28 +1241,88 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 }
 
 /* All tab panels: only side + bottom padding, NEVER top */
-#tab-flow, #tab-luft, #tab-pipe, #tab-unit, #tab-hx, #tab-wrg {
-  /* padding-top: handled by #app-shell */
-  padding-bottom: calc(96px + env(safe-area-inset-bottom));
-  overflow-x: hidden;
-  /* NO overflow-y — iOS Safari: position:fixed bricht in overflow-Containern */
-}
 
 /* Inner content wrappers: no extra top padding */
-#tab-luft > div,
-#tab-unit > div,
-#tab-hx > div,
-#tab-wrg > div {
-  padding-top: 0 !important;
-}
 
 /* Desktop: tab-flow uses own grid, override bottom padding */
 @media (min-width: 900px) {
   /* #app-shell: same padding-top as mobile — header is fixed on all viewports */
-  #tab-flow {
-    padding-bottom: 0;
-    height: calc(100vh - var(--hdr) - var(--sat) - 14px);
   }
+
+
+/* ═══════════════════════════════════════════════════════
+   CENTRAL LAYOUT SYSTEM — Tab Panels
+   Alle Tabs via .tab-panel — keine per-ID Ausnahmen
+═══════════════════════════════════════════════════════ */
+
+/* Base shell: sitzt unter dem fixed Header */
+#app-shell {
+  padding-top: calc(var(--hdr) + var(--sat) + var(--gap));
+}
+
+/* Alle Tab-Panels: identisches Verhalten */
+.tab-panel {
+  display: none;                /* JS zeigt aktiven Tab via el.style.display */
+  padding-left:  calc(var(--pad-s) + var(--sal));
+  padding-right: calc(var(--pad-s) + var(--sar));
+  padding-top:   0;             /* app-shell übernimmt den Header-Abstand */
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  overflow-x: hidden;
+  /* KEIN overflow-y — iOS Safari: position:fixed bricht in overflow-Containern */
+}
+
+/* flow + pipe: column-flex layout */
+#tab-flow, #tab-pipe {
+  display: none;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+/* Desktop: 2-col grid für flow */
+@media (min-width: 900px) {
+  #app-shell {
+    /* Header bleibt fixed auf allen Viewports */
+    padding-top: calc(var(--hdr) + var(--sat) + var(--gap));
+  }
+  #tab-flow {
+    display: none;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    height: calc(100vh - var(--hdr) - var(--sat) - var(--gap));
+    overflow: hidden;
+    padding: 0;
+  }
+  .tab-panel { padding-bottom: 0; }
+  .tab-panel, .col-L { padding-bottom: 0 !important; }
+  #tab-pipe {
+    max-width: 900px;
+    margin: 0 auto;
+    padding-left: var(--gap-l);
+    padding-right: var(--gap-l);
+  }
+}
+
+/* Mobile: Pill-Abstand */
+@media (max-width: 899px) {
+  .tab-bar { display: none !important; }
+  /* tab-flow padding auf Mobile: Inhalts-Gap */
+}
+
+/* Inner scroll-wrapper für luft/unit/hx/wrg */
+.tab-panel > .tab-inner {
+  padding-top: 0;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding-left:  calc(12px + var(--sal));
+  padding-right: calc(12px + var(--sar));
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+}
+@media (min-width: 900px) {
+  .tab-panel > .tab-inner { padding-bottom: var(--gap-l); }
 }
 
 </style>
@@ -1336,7 +1359,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 ══════════════════════════════════════════════════════ -->
 <main id="app-shell">
 
-<div id="tab-flow">
+<div id="tab-flow" class="tab-panel">
 
   <!-- LEFT column -->
   <div class="col-L">
@@ -1536,8 +1559,8 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 ══════════════════════════════════════════════════════ -->
 
 <!-- ══ TAB: LUFT ══ -->
-<div id="tab-luft" style="display:none">
-  <div style="padding:var(--gap) 12px;padding-left:calc(12px + var(--sal));padding-right:calc(12px + var(--sar));padding-bottom:calc(96px + var(--sab));display:flex;flex-direction:column;gap:var(--gap);max-width:640px;width:100%;margin:0 auto">
+<div id="tab-luft" class="tab-panel" style="display:none">
+  <div class="tab-inner">
 
     <!-- ① Zulufttemperatur + Raumtemperatur pill — Heizen & Kühlen getrennt -->
     <div class="gc" style="padding:0;overflow:hidden">
@@ -1687,7 +1710,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
   </div>
 </div>
 
-<div id="tab-pipe" style="display:none">
+<div id="tab-pipe" class="tab-panel" style="display:none">
 
   <div class="pipe-params">
     <div class="igrp" style="margin-bottom:0">
@@ -1731,8 +1754,8 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 <!-- ══════════════════════════════════════════════════════
      TAB: EINHEITENRECHNER
 ══════════════════════════════════════════════════════ -->
-<div id="tab-unit" style="display:none">
-  <div style="padding:var(--gap) 12px;padding-left:calc(12px + var(--sal));padding-right:calc(12px + var(--sar));padding-bottom:calc(32px + var(--sab));display:flex;flex-direction:column;gap:var(--gap);max-width:640px;width:100%;margin:0 auto">
+<div id="tab-unit" class="tab-panel" style="display:none">
+  <div class="tab-inner">
 
     <!-- Category grid -->
     <div class="gc">
@@ -1809,8 +1832,8 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 <!-- ═══════════════════════════════════════════════════════
    TAB: H,X-DIAGRAMM
 ═══════════════════════════════════════════════════════ -->
-<div id="tab-hx" style="display:none">
-<div style="padding:var(--gap) 12px;padding-left:calc(12px + var(--sal));padding-right:calc(12px + var(--sar));padding-bottom:calc(96px + var(--sab));display:flex;flex-direction:column;gap:var(--gap);max-width:640px;width:100%;margin:0 auto">
+<div id="tab-hx" class="tab-panel" style="display:none">
+<div class="tab-inner">
 
   <!-- 1. Ausgangszustand -->
   <div class="gc">
@@ -1846,7 +1869,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
     <div class="igrp" id="wrap-rh" style="margin-bottom:0">
       <div class="ilbl">Relative Feuchte &phi;</div>
       <div class="iwrap">
-        <input class="inp" id="hx-rh" type="number" min="1" max="100" step="1"
+        <input class="inp" id="hx-rh" type="text"
                inputmode="decimal" placeholder="z.B. 50"/>
         <span class="iunit">%</span>
       </div>
@@ -1856,7 +1879,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
     <div class="igrp" id="wrap-x" style="display:none;margin-bottom:0">
       <div class="ilbl">Feuchtegehalt x</div>
       <div class="iwrap">
-        <input class="inp" id="hx-x" type="number" min="0" max="30" step="0.01"
+        <input class="inp" id="hx-x" type="text"
                inputmode="decimal" placeholder="z.B. 7.50"/>
         <span class="iunit">g/kg</span>
       </div>
@@ -1939,7 +1962,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
     <div class="igrp" style="margin-bottom:0">
       <div class="ilbl">Zielfeuchte &phi;</div>
       <div class="iwrap">
-        <input class="inp" id="hx-target-rh" type="number" min="1" max="100" step="1"
+        <input class="inp" id="hx-target-rh" type="text"
                inputmode="decimal" placeholder="z.B. 50"/>
         <span class="iunit">%</span>
       </div>
@@ -2003,10 +2026,8 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 </div><!-- /tab-hx -->
 
 <!-- ══ TAB: WRG / MISCHLUFT ══ -->
-<div id="tab-wrg" style="display:none">
-<div style="padding:var(--gap) 12px;padding-left:calc(12px + var(--sal));padding-right:calc(12px + var(--sar));
-            padding-bottom:calc(32px + var(--sab));display:flex;flex-direction:column;
-            gap:var(--gap);max-width:640px;width:100%;margin:0 auto">
+<div id="tab-wrg" class="tab-panel" style="display:none">
+<div class="tab-inner">
 
   <!-- ── WRG ── -->
   <div class="gc">

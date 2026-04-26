@@ -140,7 +140,7 @@ function triggerPdfPrint() {
   // Check which tab panel is visible
   ['flow','luft','pipe','unit','hx','wrg'].forEach(id => {
     const el = document.getElementById('tab-' + id);
-    if (el && el.style.display !== 'none' && el.style.display !== '') activeTab = id;
+    if (el && getComputedStyle(el).display !== 'none') activeTab = id;
     if (el && !el.style.display && id === 'flow') activeTab = 'flow';
   });
   // Fallback: check pill active button
