@@ -207,7 +207,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 ═══════════════════════════════════════════════════════ */
 /* Mobile: single scrollable column */
 #tab-flow {
-  padding:var(--gap) var(--pad-s);
+  padding-top: var(--gap); /* = 14px innerer Abstand unter dem header-gap */
   padding-left:calc(var(--pad-s) + var(--sal));
   padding-right:calc(var(--pad-s) + var(--sar));
   padding-bottom:calc(96px + var(--sab));
@@ -247,7 +247,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 
 /* Pipe tab */
 #tab-pipe {
-  padding:var(--gap) var(--pad-s);
+  padding-top: var(--gap);
   padding-left:calc(var(--pad-s) + var(--sal));
   padding-right:calc(var(--pad-s) + var(--sar));
   padding-bottom:calc(96px + var(--sab));
@@ -611,7 +611,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
   position:fixed;
   bottom: max(16px, env(safe-area-inset-bottom));
   left:50%; transform:translate3d(-50%, 0, 0);
-  z-index:9999;
+  z-index:500;
   isolation:isolate;
   will-change:transform;
   align-items:center;
@@ -686,12 +686,12 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 
 /* ── Plus-Sheet ── */
 .plus-sheet {
-  position:fixed; bottom:0; left:0; right:0; z-index:260;
+  position:fixed; bottom:0; left:0; right:0; z-index:900;
   background:rgba(11,11,19,0.98);
   backdrop-filter:blur(32px); -webkit-backdrop-filter:blur(32px);
   border-radius:28px 28px 0 0;
   border-top:1px solid rgba(255,255,255,0.14);
-  padding:14px 18px calc(24px + env(safe-area-inset-bottom));
+  padding:14px 18px calc(32px + env(safe-area-inset-bottom));
   transform:translateY(102%);
   transition:transform .30s cubic-bezier(0.32,0.72,0,1);
   box-shadow:0 -12px 60px rgba(0,0,0,0.65);
@@ -1537,7 +1537,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 
 <!-- ══ TAB: LUFT ══ -->
 <div id="tab-luft" style="display:none">
-  <div style="padding:0 12px;padding-left:calc(12px + var(--sal));padding-right:calc(12px + var(--sar));padding-bottom:calc(96px + var(--sab));display:flex;flex-direction:column;gap:var(--gap);max-width:640px;width:100%;margin:0 auto">
+  <div style="padding:var(--gap) 12px;padding-left:calc(12px + var(--sal));padding-right:calc(12px + var(--sar));padding-bottom:calc(96px + var(--sab));display:flex;flex-direction:column;gap:var(--gap);max-width:640px;width:100%;margin:0 auto">
 
     <!-- ① Zulufttemperatur + Raumtemperatur pill — Heizen & Kühlen getrennt -->
     <div class="gc" style="padding:0;overflow:hidden">
@@ -1732,7 +1732,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
      TAB: EINHEITENRECHNER
 ══════════════════════════════════════════════════════ -->
 <div id="tab-unit" style="display:none">
-  <div style="padding:0 12px;padding-left:calc(12px + var(--sal));padding-right:calc(12px + var(--sar));padding-bottom:calc(32px + var(--sab));display:flex;flex-direction:column;gap:var(--gap);max-width:640px;width:100%;margin:0 auto">
+  <div style="padding:var(--gap) 12px;padding-left:calc(12px + var(--sal));padding-right:calc(12px + var(--sar));padding-bottom:calc(32px + var(--sab));display:flex;flex-direction:column;gap:var(--gap);max-width:640px;width:100%;margin:0 auto">
 
     <!-- Category grid -->
     <div class="gc">
@@ -1810,7 +1810,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
    TAB: H,X-DIAGRAMM
 ═══════════════════════════════════════════════════════ -->
 <div id="tab-hx" style="display:none">
-<div style="padding:0 12px;padding-left:calc(12px + var(--sal));padding-right:calc(12px + var(--sar));padding-bottom:calc(96px + var(--sab));display:flex;flex-direction:column;gap:var(--gap);max-width:640px;width:100%;margin:0 auto">
+<div style="padding:var(--gap) 12px;padding-left:calc(12px + var(--sal));padding-right:calc(12px + var(--sar));padding-bottom:calc(96px + var(--sab));display:flex;flex-direction:column;gap:var(--gap);max-width:640px;width:100%;margin:0 auto">
 
   <!-- 1. Ausgangszustand -->
   <div class="gc">
@@ -1827,10 +1827,12 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
       <div class="ilbl">Temperatur T</div>
       <div style="display:flex;gap:8px;align-items:stretch">
         <button onclick="toggleTempSign('hx-temp')"
-          style="width:48px;flex-shrink:0;background:var(--glass-mid);border:1px solid var(--gb-strong);
-                 border-radius:var(--r-m);color:var(--t2);font-size:20px;font-weight:700;cursor:pointer;
+          style="width:52px;height:52px;flex-shrink:0;background:var(--glass-mid);border:1px solid var(--gb-strong);
+                 border-radius:var(--r-m);color:var(--t2);font-size:22px;font-weight:300;cursor:pointer;
                  display:flex;align-items:center;justify-content:center;
-                 box-shadow:inset 0 1px 0 rgba(255,255,255,.08);font-family:var(--fm)">
+                 box-shadow:inset 0 1px 0 rgba(255,255,255,.08);font-family:var(--fm);
+                 touch-action:manipulation;-webkit-tap-highlight-color:transparent"
+          aria-label="Vorzeichen wechseln">
           ±
         </button>
         <div class="iwrap" style="flex:1">
@@ -1929,7 +1931,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
           ±
         </button>
         <div class="iwrap" style="flex:1">
-          <input class="inp" id="hx-target-temp" type="text" inputmode="decimal" placeholder="z.B. 22"/>
+          <input class="inp" id="hx-target-temp" type="text" inputmode="decimal" placeholder="22 oder -5"/>
           <span class="iunit">&deg;C</span>
         </div>
       </div>
@@ -2002,7 +2004,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 
 <!-- ══ TAB: WRG / MISCHLUFT ══ -->
 <div id="tab-wrg" style="display:none">
-<div style="padding:12px;padding-left:calc(12px + var(--sal));padding-right:calc(12px + var(--sar));
+<div style="padding:var(--gap) 12px;padding-left:calc(12px + var(--sal));padding-right:calc(12px + var(--sar));
             padding-bottom:calc(32px + var(--sab));display:flex;flex-direction:column;
             gap:var(--gap);max-width:640px;width:100%;margin:0 auto">
 
@@ -2020,7 +2022,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
         <div class="igrp">
           <div class="ilbl">Temperatur T</div>
           <div class="iwrap">
-            <input class="inp-sm" id="wrg-ab-t" type="number" step="0.5" placeholder="z.B. 22" inputmode="decimal" oninput="calcWRG()"/>
+            <input class="inp-sm" id="wrg-ab-t" type="number" step="0.5" placeholder="22 oder -5" inputmode="decimal" oninput="calcWRG()"/>
             <span class="iunit">&deg;C</span>
           </div>
         </div>

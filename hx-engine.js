@@ -105,6 +105,12 @@ function drawHxChart(state) {
 
   const dpr  = window.devicePixelRatio || 1;
   const rect  = canvas.getBoundingClientRect();
+
+  // Wenn Tab gerade erst eingeblendet: Größe noch 0 → retry
+  if (rect.width === 0 || rect.height === 0) {
+    setTimeout(() => drawHxChart(state), 80);
+    return;
+  }
   const W = Math.round(rect.width)  || 340;
   const H = Math.round(rect.height) || 400;
   if (W < 10 || H < 10) return;
@@ -877,12 +883,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('mode-rh') ?.addEventListener('click', () => _hxModeSwitch('rh'));
   document.getElementById('mode-x')  ?.addEventListener('click', () => _hxModeSwitch('x'));
   document.getElementById('hx-calc') ?.addEventListener('click', calcHxProcess);
+  document.getElementById('hx-set')  ?.addEventListener('click', setHxState);
 
   // Bug 2: Zustand automatisch setzen bei Eingabe (debounced)
   let _debTimer;
   function _autoState() {
     clearTimeout(_debTimer);
-    _debTimer = setTimeout(() => { setHxState(); _filterProcessOptions(); }, 450);
+    _debTimer = setTimeout(() => { setHxState(); _filterProcessOptions(); }, 200);
   }
 
   ['hx-temp','hx-rh','hx-x'].forEach(id => {
