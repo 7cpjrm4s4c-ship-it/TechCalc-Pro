@@ -86,11 +86,11 @@ function openPdfSheet() {
   style.id = 'pdf-modal-style';
   style.textContent = `
     #pdf-overlay {
-      position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;
+      position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:800;
       backdrop-filter:blur(6px);
     }
     #pdf-sheet {
-      position:fixed;bottom:0;left:0;right:0;z-index:501;
+      position:fixed;bottom:0;left:0;right:0;z-index:850;
       background:#111;
       border-radius:22px 22px 0 0;
       border-top:1px solid rgba(255,255,255,.12);
@@ -708,7 +708,8 @@ function _buildHxPage(meta) {
       const srcH = srcCanvas.height / dpr;
       // Create hi-res offscreen canvas
       const offscreen = document.createElement('canvas');
-      const scale = Math.max(2, 900 / srcW);
+      if (!srcW || !srcH) { imgSrc = null; throw new Error('canvas not ready'); }
+      const scale = Math.max(2, Math.min(4, 900 / srcW));
       offscreen.width  = Math.round(srcW * scale);
       offscreen.height = Math.round(srcH * scale);
       const octx = offscreen.getContext('2d');
