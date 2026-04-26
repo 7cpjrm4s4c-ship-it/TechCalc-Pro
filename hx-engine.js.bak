@@ -422,14 +422,8 @@ function toggleTempSign(inputId) {
   const raw = String(inp.value).replace(',', '.').trim();
   const v   = parseFloat(raw);
   if (isNaN(v) || v === 0) {
-    if (raw.startsWith('-')) {
-      inp.value = raw.slice(1); // Remove existing minus
-    } else {
-      inp.value = '-'; // Prefix minus for next digit
-    }
-    inp.focus();
-    inp.dispatchEvent(new Event('input', { bubbles: true }));
-    return;
+    if (!raw.startsWith('-')) inp.value = '-';
+    inp.focus(); return;
   }
   inp.value = String(-v).replace('.', ',');
   inp.dispatchEvent(new Event('input',  { bubbles: true }));
@@ -445,7 +439,7 @@ function setHxState() {
   const xIn = numHx(document.getElementById('hx-x')?.value);
   const modeRH = document.getElementById('mode-rh')?.classList.contains('active');
 
-  if (isNaN(T)) { return; } // Stille Rückkehr bei unvollständiger Eingabe
+  if (isNaN(T)) { _showHxError('Bitte Temperatur eingeben.'); return; }
   if (T < -30 || T > 60) { _showHxError('T: -30 bis +60 \u00b0C'); return; }
 
   let state;

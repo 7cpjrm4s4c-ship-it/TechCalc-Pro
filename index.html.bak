@@ -208,6 +208,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 /* Mobile: single scrollable column */
 #tab-flow {
   padding:var(--gap) var(--pad-s);
+  padding-top:0; /* overridden by unified rule */
   padding-left:calc(var(--pad-s) + var(--sal));
   padding-right:calc(var(--pad-s) + var(--sar));
   padding-bottom:calc(96px + var(--sab));
@@ -248,13 +249,14 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 /* Pipe tab */
 #tab-pipe {
   padding:var(--gap) var(--pad-s);
+  padding-top:0; /* overridden by unified rule */
   padding-left:calc(var(--pad-s) + var(--sal));
   padding-right:calc(var(--pad-s) + var(--sar));
   padding-bottom:calc(96px + var(--sab));
   display:flex; flex-direction:column; gap:var(--gap);
 }
 @media (min-width:900px) {
-  #tab-pipe { padding-left:var(--gap-l); padding-right:var(--gap-l); padding-bottom:var(--gap-l); max-width:900px; margin:0 auto; }
+  #tab-pipe { padding:var(--gap-l); max-width:900px; margin:0 auto; }
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -590,9 +592,19 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
   .bottom-pill, .plus-overlay, .plus-sheet { display:none !important; }
 }
 
-
+/* ─── UNIFIED TAB TOP PADDING — alle Tabs gleicher Abstand zum Header ─── */
+#tab-flow, #tab-luft, #tab-pipe, #tab-unit, #tab-hx, #tab-wrg {
+  padding-top: calc(var(--hdr) + 36px) !important;
+  /* NO overflow-y here — iOS Safari breaks position:fixed inside overflow containers */
+  overflow-x: hidden;
+}
 /* Inner wrappers: kein zusätzliches padding-top mehr */
-
+#tab-luft > div,
+#tab-unit > div,
+#tab-hx > div,
+#tab-wrg > div {
+  padding-top: 0 !important;
+}
 
 /* Mobile: Top-Tab-Bar ausblenden */
 @media (max-width:899px) {
@@ -609,10 +621,9 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 .bottom-pill {
   display:none; /* per JS angezeigt wenn <900px */
   position:fixed;
-  bottom: max(16px, env(safe-area-inset-bottom));
-  left:50%; transform:translate3d(-50%, 0, 0);
-  z-index:9999;
-  isolation:isolate;
+  bottom:calc(16px + env(safe-area-inset-bottom));
+  left:50%; transform:translateX(-50%) translateZ(0);
+  z-index:200;
   will-change:transform;
   align-items:center;
   gap:2px;
@@ -755,7 +766,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 * { min-width: 0; }
 .gc, .out-card, .gc-h, .gc-c, .gc-a { overflow: hidden; }
 #tab-flow, #tab-luft, #tab-pipe, #tab-unit { overflow-x: hidden; max-width: 100%; }
-#tab-hx { display: none; }
+#tab-hx { display: none; flex: 1; min-height: 0; padding: 0; }
 
 /* Unit converter */
 /* Category select styled like gl-sel but green accent */
@@ -940,7 +951,8 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
     );
 
     padding: 12px;
-    }
+    overflow-y: auto;
+  }
 
 /* ========================================
    HX PREMIUM CARD SYSTEM
@@ -1266,42 +1278,6 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
     color: rgba(255,255,255,.92);
 }
 
-
-/* ═══════════════════════════════════════════════════════
-   CENTRAL LAYOUT — Header-aware shell (Bug 1+2 fix)
-═══════════════════════════════════════════════════════ */
-
-/* app-shell holds ALL tabs and sits below the fixed header */
-#app-shell {
-  padding-top: calc(var(--hdr) + var(--sat) + 14px);
-  /* NO overflow, NO transform — Pill muss fixed zum Viewport bleiben */
-}
-
-/* All tab panels: only side + bottom padding, NEVER top */
-#tab-flow, #tab-luft, #tab-pipe, #tab-unit, #tab-hx, #tab-wrg {
-  /* padding-top: handled by #app-shell */
-  padding-bottom: calc(96px + env(safe-area-inset-bottom));
-  overflow-x: hidden;
-  /* NO overflow-y — iOS Safari: position:fixed bricht in overflow-Containern */
-}
-
-/* Inner content wrappers: no extra top padding */
-#tab-luft > div,
-#tab-unit > div,
-#tab-hx > div,
-#tab-wrg > div {
-  padding-top: 0 !important;
-}
-
-/* Desktop: tab-flow uses own grid, override bottom padding */
-@media (min-width: 900px) {
-  /* #app-shell: same padding-top as mobile — header is fixed on all viewports */
-  #tab-flow {
-    padding-bottom: 0;
-    height: calc(100vh - var(--hdr) - var(--sat) - 14px);
-  }
-}
-
 </style>
 </head>
 <body>
@@ -1334,8 +1310,6 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 <!-- ══════════════════════════════════════════════════════
      TAB: MASSENSTROM
 ══════════════════════════════════════════════════════ -->
-<main id="app-shell">
-
 <div id="tab-flow">
 
   <!-- LEFT column -->
@@ -1834,7 +1808,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
           ±
         </button>
         <div class="iwrap" style="flex:1">
-          <input class="inp" id="hx-temp" type="text" inputmode="decimal" placeholder="z.B. -10 oder 22"/>
+          <input class="inp" id="hx-temp" type="text" inputmode="decimal" placeholder="z.B. 22"/>
           <span class="iunit">&deg;C</span>
         </div>
       </div>
@@ -2163,10 +2137,6 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 
 </div>
 </div><!-- /tab-wrg -->
-
-</main><!-- /app-shell -->
-
-
 
 <!-- ══════════════════════════════════════════════════════
      BOTTOM PILL NAVIGATION (Mobile)
