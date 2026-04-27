@@ -68,6 +68,7 @@ const NAV = {
 };
 
 function switchTab(t) {
+  if (!TABS.includes(t)) return;
   NAV.activeTab = t;
   NAV.sheetOpen = false;  /* Sheet schließt immer beim Tab-Wechsel */
   NAV._apply();
@@ -82,6 +83,7 @@ function openPlusSheet()  { NAV.sheetOpen = true;  NAV._apply(); }
 function closePlusSheet() { NAV.sheetOpen = false; NAV._apply(); }
 
 function _switchFromPlus(tab) {
+  if (!TABS.includes(tab)) return;
   NAV.activeTab = tab;
   NAV.sheetOpen = false;
   NAV._apply();

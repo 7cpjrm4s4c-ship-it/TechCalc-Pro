@@ -54,7 +54,7 @@
         <span class="hdr-title-main">TechCalc</span>
         <span class="hdr-title-pro">PRO</span>
       </div>
-      <div class="hdr-sub">HLK-Anlagen &middot; Heizung &middot; L&uuml;ftung &middot; Klimatisierung</div>
+      <div class="hdr-sub">HLSK-Quick Tools &middot; Heizung &middot; L&uuml;ftung &middot; Sanit&auml;r &middot; Klima</div>
     </div>
   </div>
   <nav class="tab-bar">
@@ -1112,7 +1112,9 @@
   function getUid() {
     let id = localStorage.getItem('msr_uid');
     if (!id) {
-      id = crypto.randomUUID();
+      id = (window.crypto && typeof window.crypto.randomUUID === 'function')
+        ? window.crypto.randomUUID()
+        : 'uid-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
       localStorage.setItem('msr_uid', id);
     }
     return id;
