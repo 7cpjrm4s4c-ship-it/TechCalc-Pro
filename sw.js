@@ -11,7 +11,7 @@ const PRECACHE = [
   './', './index.html',
   './tokens.css', './layout.css', './components.css', './styles.css',
   './app.js', './heating-cooling.js', './ventilation.js',
-  './wrg-mischluft.js', './pdf-export.js', './hx-engine.js',
+  './wrg-mischluft.js', '/trinkwasser.js', './pdf-export.js', './hx-engine.js',
   './manifest.json', './favicon.ico',
   './icon-192.png', './icon-512.png', './icon-180.png',
   './icon-167.png', './icon-152.png',

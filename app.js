@@ -19,7 +19,8 @@ const loc  = (v, d) => v.toLocaleString('de-DE', {
 /* ───────────────────────────────────────
    TAB-STEUERUNG
 ─────────────────────────────────────── */
-const TABS = ['flow', 'luft', 'pipe', 'unit', 'hx', 'wrg'];
+const TABS = ['flow','luft','pipe','unit','hx','wrg','trinkwasser'];
+
 
 /* ─── NAVIGATION STATE MACHINE ─── */
 const NAV = {

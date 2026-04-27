@@ -166,8 +166,10 @@ function triggerPdfPrint() {
   else if (activeTab === 'luft') html = _buildLuftPage(meta);
   else if (activeTab === 'pipe') html = _buildPipePage(meta);
   else if (activeTab === 'hx')   html = _buildHxPage(meta);
-  else if (activeTab === 'wrg')  html = _buildWrgPage(meta);
-  else                           html = _buildFlowPage(meta);
+  else if (activeTab === 'wrg')  html = _buildWrgPage(meta)
+  else if (activeTab === 'trinkwasser') 
+  html = _buildTrinkwasserPage(meta); 
+  else                           html = _buildFlowPage(meta); 
 
   _openPrintWindow(html);
 }
@@ -252,6 +254,15 @@ function _openPrintWindow(bodyHtml) {
     overlay._headStyle?.remove();
     document.getElementById(PRINT_ID)?.remove();
   });
+}
+
+function _buildTrinkwasserPage(meta) {
+  return `
+    ${_header(meta, 'Trinkwasserberechnung')}
+    <div class="sec">Ergebnisse</div>
+    <p>Summendurchfluss kalt / warm / gesamt, Spitzendurchfluss,
+    Hauptleitungsdimension, Wasserzähler sowie Hygienehinweise.</p>
+  `;
 }
 
 /* ───────────────────────────────────────
@@ -849,3 +860,8 @@ function _pdfFmtDiff(a, b) {
   if (isNaN(na) || isNaN(nb)) return '–';
   return (na - nb).toFixed(1) + ' K';
 }
+
+/* ───────────────────────────────────────
+   TRINKWASSERBERECHNUNG
+─────────────────────────────────────── */ 
+
