@@ -274,3 +274,10 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
   padding:6px 14px; border-radius:9px; cursor:pointer;
 }
 #ib .n { background:none; border:none; color:var(--t3); font-size:18px; cursor:pointer; line-height:1; }
+
+/* ─── Mobile Keyboard Guard ─── */
+body.keyboard-open .bottom-pill,
+body.keyboard-open .plus-overlay,
+body.keyboard-open .plus-sheet {
+  display:none !important;
+}

@@ -833,7 +833,7 @@ function _buildHxPage(meta) {
 ─────────────────────────────────────── */
 function _buildTrinkwasserPage(meta) {
   const r = window.TW_LAST || {};
-  const rows = (r.rows || []).map(x => `<tr><td>${x.label}</td><td class="num">${x.n}</td><td class="num">${x.vr.toFixed(2)} l/s</td><td class="num">${x.sum.toFixed(2)} l/s</td></tr>`).join('');
+  const rows = (r.rows || []).map(x => `<tr><td>${x.group || '–'}</td><td>${x.label}</td><td class="num">${x.n}</td><td class="num">${x.vr.toFixed(2)} l/s</td><td class="num">${x.sum.toFixed(2)} l/s</td></tr>`).join('');
   const ww = r.wwMode === 'dezentral' ? 'dezentral / Durchlauferhitzer' : 'zentral';
   const hints = r.wwMode === 'dezentral'
     ? 'Dezentrale Warmwasserbereitung: DLE-Leistung, Elektroanschluss und Mindestfließdruck separat prüfen. Probeentnahmestellen und Spüleinrichtungen objektspezifisch berücksichtigen.'
@@ -851,26 +851,20 @@ function _buildTrinkwasserPage(meta) {
   </table>
 
   <div class="sec">Entnahmestellen</div>
-  <table>
-    <thead><tr><th>Entnahmestelle</th><th>Anzahl</th><th>V<sub>R</sub></th><th>Summe</th></tr></thead>
-    <tbody>${rows || '<tr><td colspan="4" style="text-align:center;color:#aaa">Keine Entnahmestellen eingetragen</td></tr>'}</tbody>
+  <table style="font-size:7.4pt">
+    <thead><tr><th>Zuordnung</th><th>Entnahmestelle</th><th>Anzahl</th><th>V<sub>R</sub></th><th>Summe</th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="5" style="text-align:center;color:#aaa">Keine Entnahmestellen eingetragen</td></tr>'}</tbody>
   </table>
 
   <div class="sec">Ergebnisse</div>
-  <div class="res-grid">
-    <div class="res-box"><div class="res-title">Durchflüsse</div>
-      <div class="res-row"><span class="res-key">ΣV<sub>R</sub> kalt</span><span class="res-val">${_twPdfNum(r.cold)} l/s</span></div>
-      <div class="res-row"><span class="res-key">ΣV<sub>R</sub> warm</span><span class="res-val">${_twPdfNum(r.warm)} l/s</span></div>
-      <div class="res-row"><span class="res-key">ΣV<sub>R</sub> gesamt</span><span class="res-val">${_twPdfNum(r.total)} l/s</span></div>
-      <div class="res-row"><span class="res-key">V<sub>S</sub></span><span class="res-val">${_twPdfNum(r.peak)} l/s</span></div>
-    </div>
-    <div class="res-box"><div class="res-title">Auslegung</div>
-      <div class="res-row"><span class="res-key">V<sub>S</sub></span><span class="res-val">${_twPdfNum(r.peakM3h)} m³/h</span></div>
-      <div class="res-row"><span class="res-key">Hauptleitung</span><span class="res-val">${r.dn || '–'}</span></div>
-      <div class="res-row"><span class="res-key">Hauswasserzähler</span><span class="res-val">${r.meter || '–'}</span></div>
-      <div class="res-row"><span class="res-key">Zirkulation</span><span class="res-val">${r.circ || '–'}</span></div>
-    </div>
-  </div>
+  <table>
+    <tbody>
+      <tr><td>ΣV<sub>R</sub> kalt</td><td class="num">${_twPdfNum(r.cold)} l/s</td><td>Spitzendurchfluss V<sub>S</sub></td><td class="num">${_twPdfNum(r.peak)} l/s</td></tr>
+      <tr><td>ΣV<sub>R</sub> warm</td><td class="num">${_twPdfNum(r.warm)} l/s</td><td>V<sub>S</sub></td><td class="num">${_twPdfNum(r.peakM3h)} m³/h</td></tr>
+      <tr><td>ΣV<sub>R</sub> gesamt</td><td class="num">${_twPdfNum(r.total)} l/s</td><td>Hauptleitung</td><td class="num">${r.dn || '–'}</td></tr>
+      <tr><td>Hauswasserzähler</td><td class="num">${r.meter || '–'}</td><td>Zirkulation</td><td style="font-size:7.2pt;line-height:1.25">${r.circ || '–'}</td></tr>
+    </tbody>
+  </table>
 
   <div class="sec">Hinweise</div>
   <p style="font-size:8pt;color:#444;line-height:1.55;background:#f5f7fa;border:1px solid #e0e6ef;border-radius:5px;padding:7px 9px">${hints}</p>

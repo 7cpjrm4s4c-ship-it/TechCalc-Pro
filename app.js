@@ -88,6 +88,35 @@ function _switchFromPlus(tab) {
 }
 
 /* ─── PILL SICHTBARKEIT ─── */
+
+/* ─── MOBILE KEYBOARD GUARD — Pill nie über iOS Tastatur ─── */
+function _setKeyboardOpen(on) {
+  document.body.classList.toggle('keyboard-open', !!on);
+  if (on) closePlusSheet();
+}
+
+function _setupKeyboardGuard() {
+  let baseH = window.visualViewport?.height || window.innerHeight;
+  const isFormEl = el => el && ['INPUT','TEXTAREA','SELECT'].includes(el.tagName);
+
+  document.addEventListener('focusin', e => {
+    if (isFormEl(e.target)) _setKeyboardOpen(true);
+  });
+  document.addEventListener('focusout', () => {
+    setTimeout(() => {
+      if (!isFormEl(document.activeElement)) _setKeyboardOpen(false);
+    }, 120);
+  });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      const h = window.visualViewport.height;
+      if (h > baseH) baseH = h;
+      _setKeyboardOpen(baseH - h > 120 || isFormEl(document.activeElement));
+    });
+  }
+}
+
 function _updatePillVisibility() {
   const pill = $('bottom-pill');
   if (!pill) return;
@@ -134,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Pill Sichtbarkeit
   _updatePillVisibility();
   window.addEventListener('resize', _updatePillVisibility);
+  _setupKeyboardGuard();
 
   // Initial Tab
   switchTab('flow');
