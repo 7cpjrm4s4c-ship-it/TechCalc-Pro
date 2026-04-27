@@ -833,7 +833,12 @@ function _buildHxPage(meta) {
 ─────────────────────────────────────── */
 function _buildTrinkwasserPage(meta) {
   const r = window.TW_LAST || {};
-  const rows = (r.rows || []).map(x => `<tr><td>${x.group || '–'}</td><td>${x.label}</td><td class="num">${x.n}</td><td class="num">${x.vr.toFixed(2)} l/s</td><td class="num">${x.sum.toFixed(2)} l/s</td></tr>`).join('');
+  const neBlocks = (r.neSummary || []).map(ne => {
+    const rows = (ne.rows || []).map(x => `<tr><td>${x.label}</td><td class="num">${x.n}</td><td class="num">${x.vr.toFixed(2)} l/s</td><td class="num">${x.sum.toFixed(2)} l/s</td></tr>`).join('');
+    const mode = ne.mode === 'top2' ? '2 größte Entnahmen' : `GL ${_twPdfNum(ne.gl)}`;
+    return `<tr><td colspan="4" style="background:#f0f4fa;font-weight:700;color:#1a3a5c">NE ${ne.index}: ${ne.title} · ${mode} · ΣVR ${_twPdfNum(ne.raw)} l/s · VS,NE ${_twPdfNum(ne.peak)} l/s</td></tr>${rows}`;
+  }).join('');
+  const freeRows = (r.freeRows || []).map(x => `<tr><td>${x.label}</td><td class="num">${x.n}</td><td class="num">${x.vr.toFixed(2)} l/s</td><td class="num">${x.sum.toFixed(2)} l/s</td></tr>`).join('');
   const ww = r.wwMode === 'dezentral' ? 'dezentral / Durchlauferhitzer' : 'zentral';
   const hints = r.wwMode === 'dezentral'
     ? 'Dezentrale Warmwasserbereitung: DLE-Leistung, Elektroanschluss und Mindestfließdruck separat prüfen. Probeentnahmestellen und Spüleinrichtungen objektspezifisch berücksichtigen.'
@@ -844,31 +849,35 @@ function _buildTrinkwasserPage(meta) {
 
   <div class="sec">Basisdaten</div>
   <table>
-    <tr><td>Gebäudetyp</td><td class="num">${r.building || '–'}</td></tr>
-    <tr><td>Warmwasserbereitung</td><td class="num">${ww}</td></tr>
-    <tr><td>Nutzungseinheiten</td><td class="num">${r.neInfo || '–'}</td></tr>
-    <tr><td>PWH-Leitungsvolumen</td><td class="num">${r.lineVol != null ? r.lineVol + ' l' : '–'}</td></tr>
+    <tr><td>Gebäudetyp</td><td class="num">${r.building || '–'}</td><td>Warmwasserbereitung</td><td class="num">${ww}</td></tr>
+    <tr><td>PWH-Leitungsvolumen</td><td class="num">${r.lineVol != null ? r.lineVol + ' l' : '–'}</td><td>Zirkulation</td><td class="num" style="font-size:7pt;line-height:1.2">${r.circ || '–'}</td></tr>
   </table>
 
-  <div class="sec">Entnahmestellen</div>
-  <table style="font-size:7.4pt">
-    <thead><tr><th>Zuordnung</th><th>Entnahmestelle</th><th>Anzahl</th><th>V<sub>R</sub></th><th>Summe</th></tr></thead>
-    <tbody>${rows || '<tr><td colspan="5" style="text-align:center;color:#aaa">Keine Entnahmestellen eingetragen</td></tr>'}</tbody>
+  <div class="sec">Nutzungseinheiten</div>
+  <table style="font-size:7.1pt">
+    <thead><tr><th>Entnahmestelle</th><th>Anzahl</th><th>V<sub>R</sub></th><th>Summe</th></tr></thead>
+    <tbody>${neBlocks || '<tr><td colspan="4" style="text-align:center;color:#aaa">Keine Nutzungseinheiten eingetragen</td></tr>'}</tbody>
+  </table>
+
+  <div class="sec">Frei im Gebäude verteilte Entnahmestellen</div>
+  <table style="font-size:7.1pt">
+    <thead><tr><th>Entnahmestelle</th><th>Anzahl</th><th>V<sub>R</sub></th><th>Summe</th></tr></thead>
+    <tbody>${freeRows || '<tr><td colspan="4" style="text-align:center;color:#aaa">Keine freien Entnahmestellen eingetragen</td></tr>'}</tbody>
   </table>
 
   <div class="sec">Ergebnisse</div>
   <table>
     <tbody>
-      <tr><td>ΣV<sub>R</sub> kalt</td><td class="num">${_twPdfNum(r.cold)} l/s</td><td>Spitzendurchfluss V<sub>S</sub></td><td class="num">${_twPdfNum(r.peak)} l/s</td></tr>
-      <tr><td>ΣV<sub>R</sub> warm</td><td class="num">${_twPdfNum(r.warm)} l/s</td><td>V<sub>S</sub></td><td class="num">${_twPdfNum(r.peakM3h)} m³/h</td></tr>
-      <tr><td>ΣV<sub>R</sub> gesamt</td><td class="num">${_twPdfNum(r.total)} l/s</td><td>Hauptleitung</td><td class="num">${r.dn || '–'}</td></tr>
-      <tr><td>Hauswasserzähler</td><td class="num">${r.meter || '–'}</td><td>Zirkulation</td><td style="font-size:7.2pt;line-height:1.25">${r.circ || '–'}</td></tr>
+      <tr><td>ΣV<sub>R</sub> kalt</td><td class="num">${_twPdfNum(r.cold)} l/s</td><td>V<sub>S</sub> Gebäude</td><td class="num">${_twPdfNum(r.formulaPeak)} l/s</td></tr>
+      <tr><td>ΣV<sub>R</sub> warm</td><td class="num">${_twPdfNum(r.warm)} l/s</td><td>V<sub>S</sub> NE-Ansatz</td><td class="num">${r.neSummary?.length ? _twPdfNum(r.neBasedPeak) + ' l/s' : '–'}</td></tr>
+      <tr><td>ΣV<sub>R</sub> gesamt</td><td class="num">${_twPdfNum(r.total)} l/s</td><td>V<sub>S</sub> maßgebend</td><td class="num">${_twPdfNum(r.peak)} l/s / ${_twPdfNum(r.peakM3h)} m³/h</td></tr>
+      <tr><td>Hauptleitung</td><td class="num">${r.dn || '–'}</td><td>Hauswasserzähler</td><td class="num">${r.meter || '–'}</td></tr>
     </tbody>
   </table>
 
   <div class="sec">Hinweise</div>
-  <p style="font-size:8pt;color:#444;line-height:1.55;background:#f5f7fa;border:1px solid #e0e6ef;border-radius:5px;padding:7px 9px">${hints}</p>
-  <p style="font-size:7pt;color:#aaa;margin-top:5px">DIN 1988-300 orientierte Schnellberechnung. Keine vollständige Rohrnetz- oder Druckverlustberechnung.</p>`;
+  <p style="font-size:7.5pt;color:#444;line-height:1.35;background:#f5f7fa;border:1px solid #e0e6ef;border-radius:5px;padding:6px 8px">${hints}</p>
+  <p style="font-size:6.8pt;color:#aaa;margin-top:4px">DIN 1988-300 orientierte Schnellberechnung. Keine vollständige Rohrnetz- oder Druckverlustberechnung.</p>`;
 }
 
 function _twPdfNum(v) {

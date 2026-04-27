@@ -1,22 +1,23 @@
 /* ═══════════════════════════════════════════════════════
    trinkwasser.js — TechCalc Pro
-   Trinkwasser Schnellberechnung · V1.1 Feintuning
+   Trinkwasser Schnellberechnung · V1.2
+   Nutzungseinheiten · freie Verbraucher · PDF Export
    Abhängigkeit: app.js muss zuerst geladen sein ($, show, loc)
 ═══════════════════════════════════════════════════════ */
 'use strict';
 
 const TW_FIXTURES = [
-  { id:'wt',  label:'Waschtisch',              vr:0.07, cold:1, warm:1 },
-  { id:'ks',  label:'Küchenspüle',             vr:0.07, cold:1, warm:1 },
-  { id:'gs',  label:'Geschirrspüler',          vr:0.07, cold:1, warm:0 },
-  { id:'wc',  label:'WC-Spülkasten',           vr:0.13, cold:1, warm:0 },
-  { id:'du',  label:'Dusche',                  vr:0.15, cold:1, warm:1 },
-  { id:'bw',  label:'Badewanne',               vr:0.15, cold:1, warm:1 },
-  { id:'wm',  label:'Waschmaschine',           vr:0.15, cold:1, warm:0 },
-  { id:'az',  label:'Außenzapfstelle',         vr:0.15, cold:1, warm:0, dauer:true },
-  { id:'ur',  label:'Urinal-Druckspüler',      vr:0.30, cold:1, warm:0 },
-  { id:'av15',label:'Auslaufventil DN15 o. SR',vr:0.30, cold:1, warm:0 },
-  { id:'av20',label:'Auslaufventil DN20 o. SR',vr:0.50, cold:1, warm:0 },
+  { id:'wt',  label:'Waschtisch',              vr:0.07, cold:true, warm:true },
+  { id:'ks',  label:'Küchenspüle',             vr:0.07, cold:true, warm:true },
+  { id:'gs',  label:'Geschirrspüler',          vr:0.07, cold:true, warm:false },
+  { id:'wc',  label:'WC-Spülkasten',           vr:0.13, cold:true, warm:false },
+  { id:'du',  label:'Dusche',                  vr:0.15, cold:true, warm:true },
+  { id:'bw',  label:'Badewanne',               vr:0.15, cold:true, warm:true },
+  { id:'wm',  label:'Waschmaschine',           vr:0.15, cold:true, warm:false },
+  { id:'az',  label:'Außenzapfstelle',         vr:0.15, cold:true, warm:false, dauer:true },
+  { id:'ur',  label:'Urinal-Druckspüler',      vr:0.30, cold:true, warm:false },
+  { id:'av15',label:'Auslaufventil DN15 o. SR',vr:0.30, cold:true, warm:false },
+  { id:'av20',label:'Auslaufventil DN20 o. SR',vr:0.50, cold:true, warm:false },
 ];
 
 const TW_BUILDINGS = {
@@ -27,6 +28,20 @@ const TW_BUILDINGS = {
   pflege:{ label:'Pflege / Krankenhaus', a:0.75, b:0.44, c:0.18 },
 };
 
+const TW_NE_TYPES = {
+  bad:      { label:'Bad / Badezimmer',       mode:'top2',   gl:null, editable:false, hint:'Normnaher NE-Ansatz: die zwei größten Entnahmestellen.' },
+  gaeste:   { label:'Gäste-WC',               mode:'top2',   gl:null, editable:false, hint:'Normnaher NE-Ansatz: die zwei größten Entnahmestellen.' },
+  kueche:   { label:'Küche',                  mode:'top2',   gl:null, editable:false, hint:'Normnaher NE-Ansatz: die zwei größten Entnahmestellen.' },
+  hwr:      { label:'Hauswirtschaftsraum',    mode:'top2',   gl:null, editable:false, hint:'Normnaher NE-Ansatz: die zwei größten Entnahmestellen.' },
+  oeffwc:   { label:'Öffentliches WC',        mode:'factor', gl:0.35, editable:true,  hint:'Praxisansatz über GL-Faktor. Bei Objektvorgaben anpassen.' },
+  dusch:    { label:'Großraumdusche',         mode:'factor', gl:0.65, editable:true,  hint:'Praxisansatz über GL-Faktor. Bei Objektvorgaben anpassen.' },
+  teekueche:{ label:'Teeküche',               mode:'factor', gl:0.50, editable:true,  hint:'Praxisansatz über GL-Faktor. Bei Objektvorgaben anpassen.' },
+  manuell:  { label:'Sonderbereich / manuell',mode:'factor', gl:1.00, editable:true,  hint:'Manueller Gleichzeitigkeitsansatz.' },
+};
+
+const TW_STATE = { nes: [] };
+window.TW_STATE = TW_STATE;
+
 function twNum(id) {
   const el = $(id);
   if (!el) return 0;
@@ -35,6 +50,7 @@ function twNum(id) {
 }
 function twFmt(v, d=2) { return isNaN(v) ? '–' : loc(v, d); }
 function twSet(id, txt) { const e=$(id); if(e) e.textContent = txt; }
+function twEsc(s) { return String(s || '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
 
 function twPeak(sum, buildingKey) {
   if (!sum || sum <= 0) return 0;
@@ -70,109 +86,232 @@ function twFixtureInput(id, value='0') {
   </div>`;
 }
 
-function buildTwFixtureRows() {
-  const wrap = $('tw-fixtures');
-  if (!wrap) return;
-  wrap.innerHTML = TW_FIXTURES.map(f => `
+function twFixtureRows(prefix, counts={}) {
+  return TW_FIXTURES.map(f => `
     <div class="tw-row" style="display:grid;grid-template-columns:1fr 86px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--gb-soft)">
       <div>
         <div style="font-family:var(--f);font-size:13px;font-weight:700;color:var(--t2)">${f.label}</div>
         <div style="font-family:var(--fm);font-size:11px;color:var(--t3)">V<sub>R</sub> ${twFmt(f.vr,2)} l/s ${f.dauer?'· Dauerverbraucher':''}</div>
       </div>
-      ${twFixtureInput('tw-' + f.id)}
+      ${twFixtureInput(`${prefix}-${f.id}`, counts[f.id] || 0)}
     </div>`).join('');
 }
 
-function buildTwNeDetail() {
-  const wrap = $('tw-ne-detail');
+function buildTwFreeFixtures() {
+  const wrap = $('tw-free-fixtures');
   if (!wrap) return;
-  const count = Math.max(0, Math.min(6, Math.round(twNum('tw-ne-count'))));
-  if (!$('tw-ne-mode')?.checked || count <= 0) {
-    wrap.innerHTML = '<div class="info-txt">Nutzungseinheiten aktivieren und Anzahl NE setzen, um Entnahmestellen gezielt zuzuordnen.</div>';
-    return;
-  }
-  wrap.innerHTML = Array.from({length:count}, (_, i) => {
-    const ne = i + 1;
-    return `<div class="gc" style="padding:12px 14px;margin-top:10px;background:rgba(255,255,255,.025)">
-      <div class="slbl">NE ${ne} &mdash; Entnahmestellen zuordnen</div>
-      ${TW_FIXTURES.map(f => `
-        <div style="display:grid;grid-template-columns:1fr 82px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--gb-soft)">
-          <div>
-            <div style="font-family:var(--f);font-size:12px;font-weight:700;color:var(--t2)">${f.label}</div>
-            <div style="font-family:var(--fm);font-size:10px;color:var(--t3)">V<sub>R</sub> ${twFmt(f.vr,2)} l/s</div>
-          </div>
-          ${twFixtureInput(`tw-ne${ne}-${f.id}`)}
-        </div>`).join('')}
-    </div>`;
-  }).join('');
+  const counts = {};
+  TW_FIXTURES.forEach(f => counts[f.id] = twNum('tw-free-' + f.id));
+  wrap.innerHTML = twFixtureRows('tw-free', counts);
+  wrap.querySelectorAll('input').forEach(el => el.addEventListener('input', calcTrinkwasser));
 }
 
-function twNePeakContribution(neIndex) {
-  const values = [];
-  let raw = 0, cold = 0, warm = 0;
+function twAddNe() {
+  const type = $('tw-new-ne-type')?.value || 'bad';
+  const def = TW_NE_TYPES[type] || TW_NE_TYPES.bad;
+  TW_STATE.nes.push({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,5),
+    type,
+    name: '',
+    gl: def.gl == null ? 1 : def.gl,
+    open: true,
+    counts: {},
+  });
+  renderTwNes();
+  calcTrinkwasser();
+}
+
+function twRemoveNe(id) {
+  const idx = TW_STATE.nes.findIndex(n => n.id === id);
+  if (idx >= 0) TW_STATE.nes.splice(idx, 1);
+  renderTwNes();
+  calcTrinkwasser();
+}
+
+function twToggleNe(id) {
+  const ne = TW_STATE.nes.find(n => n.id === id);
+  if (ne) ne.open = !ne.open;
+  renderTwNes();
+  calcTrinkwasser();
+}
+
+function twUpdateNeMeta(id, field, val) {
+  const ne = TW_STATE.nes.find(n => n.id === id);
+  if (!ne) return;
+  if (field === 'type') {
+    ne.type = val;
+    const def = TW_NE_TYPES[val] || TW_NE_TYPES.bad;
+    if (def.gl != null) ne.gl = def.gl;
+  } else if (field === 'name') {
+    ne.name = val;
+  } else if (field === 'gl') {
+    const n = parseFloat(String(val).replace(',', '.'));
+    ne.gl = isNaN(n) ? 1 : Math.max(0, n);
+  }
+  renderTwNes();
+  calcTrinkwasser();
+}
+
+function twUpdateNeCount(id, fixtureId, val) {
+  const ne = TW_STATE.nes.find(n => n.id === id);
+  if (!ne) return;
+  const n = parseInt(String(val).replace(',', '.'), 10);
+  ne.counts[fixtureId] = isNaN(n) || n < 0 ? 0 : n;
+  renderTwNes(false);
+  calcTrinkwasser();
+}
+
+function twNeCalc(ne) {
   const wwMode = $('tw-ww-mode')?.value || 'zentral';
+  const def = TW_NE_TYPES[ne.type] || TW_NE_TYPES.bad;
+  let raw = 0, cold = 0, warm = 0;
+  const values = [];
+  const rows = [];
   TW_FIXTURES.forEach(f => {
-    const n = twNum(`tw-ne${neIndex}-${f.id}`);
-    if (!n) return;
-    raw += n * f.vr;
-    if (f.cold) cold += n * f.vr;
-    if (f.warm && wwMode === 'zentral') warm += n * f.vr;
-    for (let i = 0; i < n; i++) values.push(f.vr);
+    const count = Math.max(0, Number(ne.counts[f.id] || 0));
+    if (!count) return;
+    const sum = count * f.vr;
+    raw += sum;
+    if (f.cold) cold += sum;
+    if (f.warm && wwMode === 'zentral') warm += sum;
+    for (let i = 0; i < count; i++) values.push(f.vr);
+    rows.push({ group: twNeTitle(ne), neId: ne.id, label:f.label, n:count, vr:f.vr, sum });
   });
   values.sort((a,b)=>b-a);
-  const peak = values.slice(0,2).reduce((s,v)=>s+v,0);
-  return { raw, cold, warm, peak };
+  const top2 = values.slice(0,2).reduce((s,v)=>s+v,0);
+  const peak = def.mode === 'top2' ? top2 : raw * Math.max(0, Number(ne.gl || 0));
+  return { raw, cold, warm, peak, top2, rows, mode:def.mode, gl:ne.gl, typeLabel:def.label, hint:def.hint };
+}
+
+function twNeTitle(ne) {
+  const def = TW_NE_TYPES[ne.type] || TW_NE_TYPES.bad;
+  return ne.name ? `${twEsc(ne.name)} (${def.label})` : def.label;
+}
+
+function twNeSummary(ne) {
+  const c = twNeCalc(ne);
+  const approach = c.mode === 'top2' ? '2 größte Entnahmen' : `GL ${twFmt(Number(ne.gl || 0),2)}`;
+  return `ΣV<sub>R</sub> ${twFmt(c.raw,2)} l/s · V<sub>S,NE</sub> ${twFmt(c.peak,2)} l/s · ${approach}`;
+}
+
+function renderTwNes(preserveFocus=true) {
+  const wrap = $('tw-ne-list');
+  if (!wrap) return;
+  const active = preserveFocus ? document.activeElement?.id : null;
+  wrap.innerHTML = TW_STATE.nes.length ? TW_STATE.nes.map((ne, idx) => {
+    const def = TW_NE_TYPES[ne.type] || TW_NE_TYPES.bad;
+    const open = ne.open;
+    const typeOpts = Object.entries(TW_NE_TYPES).map(([k, v]) => `<option value="${k}"${k===ne.type?' selected':''}>${v.label}</option>`).join('');
+    const rows = TW_FIXTURES.map(f => `
+      <div style="display:grid;grid-template-columns:1fr 82px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--gb-soft)">
+        <div>
+          <div style="font-family:var(--f);font-size:12px;font-weight:700;color:var(--t2)">${f.label}</div>
+          <div style="font-family:var(--fm);font-size:10px;color:var(--t3)">V<sub>R</sub> ${twFmt(f.vr,2)} l/s</div>
+        </div>
+        ${twFixtureInput(`tw-ne-${ne.id}-${f.id}`, ne.counts[f.id] || 0)}
+      </div>`).join('');
+    return `<div class="gc tw-ne-card" data-ne-id="${ne.id}" style="padding:0;margin-top:10px;overflow:hidden;background:rgba(255,255,255,.025)">
+      <button type="button" class="tw-ne-head" data-act="toggle" data-id="${ne.id}" style="width:100%;border:0;background:transparent;color:var(--t1);text-align:left;padding:13px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;cursor:pointer">
+        <span style="font-size:17px;color:var(--blue)">${open?'▼':'▶'}</span>
+        <span>
+          <span style="display:block;font-family:var(--f);font-size:13px;font-weight:800;color:var(--t1)">NE ${idx+1} · ${twNeTitle(ne)}</span>
+          <span style="display:block;font-family:var(--fm);font-size:11px;color:var(--t3);margin-top:3px">${twNeSummary(ne)}</span>
+        </span>
+        <span type="button" class="tw-ne-del" data-act="remove" data-id="${ne.id}" style="font-family:var(--f);font-size:12px;color:var(--danger);padding:6px 8px">Löschen</span>
+      </button>
+      <div style="display:${open?'block':'none'};padding:0 14px 14px;border-top:1px solid var(--gb-soft)">
+        <div class="igrp" style="margin-top:12px">
+          <div class="ilbl">Nutzungseinheit</div>
+          <select class="gl-sel tw-ne-type" id="tw-ne-type-${ne.id}" data-id="${ne.id}">${typeOpts}</select>
+        </div>
+        <div class="igrp">
+          <div class="ilbl">Bezeichnung optional</div>
+          <div class="iwrap"><input class="inp tw-ne-name" id="tw-ne-name-${ne.id}" data-id="${ne.id}" type="text" value="${twEsc(ne.name)}" placeholder="z. B. WC Damen EG" style="font-size:15px;padding:11px 14px"/></div>
+        </div>
+        <div class="igrp">
+          <div class="ilbl">Gleichzeitigkeitsansatz</div>
+          <div style="display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center">
+            <div class="info-txt" style="margin:0">${def.hint}</div>
+            <div class="iwrap"><input class="inp-sm tw-ne-gl" id="tw-ne-gl-${ne.id}" data-id="${ne.id}" type="number" min="0" step="0.05" value="${Number(ne.gl || 0).toFixed(2)}" ${def.editable?'':'disabled'} style="font-size:15px;padding:10px 12px"/><span class="iunit">GL</span></div>
+          </div>
+        </div>
+        <div class="slbl" style="margin-top:8px">Verbraucher dieser NE</div>
+        ${rows}
+      </div>
+    </div>`;
+  }).join('') : '<div class="info-txt">Noch keine Nutzungseinheit angelegt. Wähle oben einen Typ und tippe auf „NE hinzufügen“.</div>';
+
+  wrap.querySelectorAll('[data-act="toggle"]').forEach(b => b.addEventListener('click', e => {
+    if (e.target?.dataset?.act === 'remove') return;
+    twToggleNe(b.dataset.id);
+  }));
+  wrap.querySelectorAll('[data-act="remove"]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); twRemoveNe(b.dataset.id); }));
+  wrap.querySelectorAll('.tw-ne-type').forEach(el => el.addEventListener('change', () => twUpdateNeMeta(el.dataset.id, 'type', el.value)));
+  wrap.querySelectorAll('.tw-ne-name').forEach(el => el.addEventListener('input', () => { const ne=TW_STATE.nes.find(n=>n.id===el.dataset.id); if(ne){ne.name=el.value; calcTrinkwasser();} }));
+  wrap.querySelectorAll('.tw-ne-name').forEach(el => el.addEventListener('change', () => twUpdateNeMeta(el.dataset.id, 'name', el.value)));
+  wrap.querySelectorAll('.tw-ne-gl').forEach(el => el.addEventListener('input', () => twUpdateNeMeta(el.dataset.id, 'gl', el.value)));
+  wrap.querySelectorAll('.tw-in').forEach(el => {
+    const parts = el.id.match(/^tw-ne-(.+)-([^-]+)$/);
+    if (!parts) return;
+    el.addEventListener('input', () => twUpdateNeCount(parts[1], parts[2], el.value));
+  });
+  if (active) {
+    const el = document.getElementById(active);
+    if (el) {
+      try { el.focus({ preventScroll:true }); } catch(e) { el.focus(); }
+    }
+  }
 }
 
 function calcTrinkwasser() {
   const buildingKey = $('tw-building')?.value || 'wohn';
   const wwMode = $('tw-ww-mode')?.value || 'zentral';
-  const neActive = !!$('tw-ne-mode')?.checked;
-  const neCount = Math.max(0, Math.min(6, Math.round(twNum('tw-ne-count'))));
   const lineVol = Math.max(0, twNum('tw-line-vol'));
 
   let cold = 0, warm = 0, total = 0, dauer = 0, freeNonDauer = 0;
   const rows = [];
+  const freeRows = [];
 
   TW_FIXTURES.forEach(f => {
-    const n = twNum('tw-' + f.id);
+    const n = twNum('tw-free-' + f.id);
     if (!n) return;
     const vrTot = n * f.vr;
     total += vrTot;
     if (f.cold) cold += vrTot;
     if (f.warm && wwMode === 'zentral') warm += vrTot;
     if (f.dauer) dauer += vrTot; else freeNonDauer += vrTot;
-    rows.push({ group:'Gebäude / frei', label:f.label, n, vr:f.vr, sum:vrTot });
+    const row = { group:'frei im Gebäude', label:f.label, n, vr:f.vr, sum:vrTot };
+    rows.push(row); freeRows.push(row);
   });
 
   let neRaw = 0, nePeakSum = 0;
   const neRows = [];
-  if (neActive && neCount > 0) {
-    for (let i=1; i<=neCount; i++) {
-      const ne = twNePeakContribution(i);
-      neRaw += ne.raw;
-      nePeakSum += ne.peak;
-      cold += ne.cold; warm += ne.warm; total += ne.raw;
-      TW_FIXTURES.forEach(f => {
-        const n = twNum(`tw-ne${i}-${f.id}`);
-        if (!n) return;
-        const row = { group:`NE ${i}`, label:f.label, n, vr:f.vr, sum:n*f.vr };
-        rows.push(row); neRows.push(row);
-      });
-    }
-  }
+  const neSummary = [];
+  TW_STATE.nes.forEach((ne, idx) => {
+    const c = twNeCalc(ne);
+    neRaw += c.raw;
+    nePeakSum += c.peak;
+    cold += c.cold;
+    warm += c.warm;
+    total += c.raw;
+    rows.push(...c.rows);
+    neRows.push(...c.rows);
+    neSummary.push({ index:idx+1, title:twNeTitle(ne), type:c.typeLabel, raw:c.raw, peak:c.peak, mode:c.mode, gl:ne.gl, rows:c.rows });
+  });
 
   const curveInput = freeNonDauer + neRaw;
   const formulaPeak = twPeak(curveInput, buildingKey);
-  const neLimitedPeak = freeNonDauer + nePeakSum;
-  const useNeLimit = neActive && neCount > 0 && nePeakSum > 0;
-  const peak = (useNeLimit ? Math.min(formulaPeak, neLimitedPeak) : formulaPeak) + dauer;
+  const freePeak = twPeak(freeNonDauer, buildingKey);
+  const neBasedPeak = (TW_STATE.nes.length ? (nePeakSum + freePeak) : formulaPeak);
+  const useNeLimit = TW_STATE.nes.length > 0 && nePeakSum > 0;
+  const peakBase = useNeLimit ? Math.min(formulaPeak, neBasedPeak) : formulaPeak;
+  const peak = peakBase + dauer;
   const peakM3h = peak * 3.6;
   const dn = twRecommendDN(peak);
   const meter = twRecommendMeter(peak);
   const neInfo = useNeLimit
-    ? `${neCount} NE · Spitzenansatz: Summe der 2 größten Entnahmen je NE`
-    : 'nicht aktiv';
+    ? `${TW_STATE.nes.length} NE · Vₛ Gebäude ${twFmt(formulaPeak,2)} l/s · Vₛ NE ${twFmt(neBasedPeak,2)} l/s · maßgebend ${twFmt(peakBase,2)} l/s`
+    : 'keine Nutzungseinheiten angelegt';
   const circ = wwMode === 'zentral'
     ? (lineVol > 3 ? 'Zirkulation/Begleitheizung prüfen (> 3 l)' : '3-Liter-Regel prüfen')
     : 'nicht relevant bei dezentraler WW-Bereitung';
@@ -185,6 +324,9 @@ function calcTrinkwasser() {
   twSet('tw-dn',        dn);
   twSet('tw-meter',     meter);
   twSet('tw-ne-info',   neInfo);
+  twSet('tw-vs-building', twFmt(formulaPeak,2) + ' l/s');
+  twSet('tw-vs-ne',       useNeLimit ? twFmt(neBasedPeak,2) + ' l/s' : '–');
+  twSet('tw-vs-final',    twFmt(peak,2) + ' l/s');
   twSet('tw-circ',      circ);
 
   const hint = $('tw-hints');
@@ -198,24 +340,18 @@ function calcTrinkwasser() {
       <p>Diese Schnellberechnung ersetzt keine vollständige Fachplanung.</p>`;
   }
 
-  window.TW_LAST = { buildingKey, building:TW_BUILDINGS[buildingKey]?.label || 'Wohngebäude', wwMode, neActive, neCount, neInfo, cold, warm, total, curveInput, formulaPeak, nePeakSum, peak, peakM3h, dn, meter, circ, rows, neRows, lineVol };
-}
-
-function twRebuildNeAndCalc() {
-  buildTwNeDetail();
-  document.querySelectorAll('#tw-ne-detail input').forEach(el => el.addEventListener('input', calcTrinkwasser));
-  calcTrinkwasser();
+  window.TW_LAST = { buildingKey, building:TW_BUILDINGS[buildingKey]?.label || 'Wohngebäude', wwMode, neInfo, cold, warm, total, curveInput, formulaPeak, freePeak, nePeakSum, neBasedPeak, peakBase, peak, peakM3h, dn, meter, circ, rows, neRows, freeRows, neSummary, lineVol };
 }
 
 function twBind() {
-  buildTwFixtureRows();
-  buildTwNeDetail();
-  document.querySelectorAll('#tab-trinkwasser input, #tab-trinkwasser select').forEach(el => {
+  buildTwFreeFixtures();
+  renderTwNes();
+  $('tw-add-ne')?.addEventListener('click', twAddNe);
+  document.querySelectorAll('#tab-trinkwasser select, #tab-trinkwasser input').forEach(el => {
+    if (el.closest('#tw-ne-list') || el.closest('#tw-free-fixtures')) return;
     el.addEventListener('input', calcTrinkwasser);
     el.addEventListener('change', calcTrinkwasser);
   });
-  $('tw-ne-mode')?.addEventListener('change', twRebuildNeAndCalc);
-  $('tw-ne-count')?.addEventListener('input', twRebuildNeAndCalc);
   calcTrinkwasser();
 }
 

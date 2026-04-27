@@ -931,38 +931,57 @@
     </div>
 
     <div class="gc">
-      <div class="slbl">Entnahmestellen</div>
-      <div id="tw-fixtures"></div>
+      <div class="slbl">1. Nutzungseinheiten</div>
+      <div class="info-txt" style="margin-bottom:12px">
+        Nutzungseinheiten zuerst erfassen. Standard-NE verwenden automatisch den Ansatz „zwei größte Entnahmestellen“. Sonderbereiche können über GL-Faktor angesetzt werden.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
+        <div class="igrp" style="margin-bottom:0">
+          <div class="ilbl">Neue Nutzungseinheit</div>
+          <select class="gl-sel" id="tw-new-ne-type">
+            <option value="bad">Bad / Badezimmer</option>
+            <option value="gaeste">Gäste-WC</option>
+            <option value="kueche">Küche</option>
+            <option value="hwr">Hauswirtschaftsraum</option>
+            <option value="oeffwc">Öffentliches WC</option>
+            <option value="dusch">Großraumdusche</option>
+            <option value="teekueche">Teeküche</option>
+            <option value="manuell">Sonderbereich / manuell</option>
+          </select>
+        </div>
+        <button id="tw-add-ne" type="button" style="height:48px;border:none;border-radius:var(--r-m);background:var(--blue-t);border:1px solid var(--blue-b);color:var(--blue);font-family:var(--f);font-size:14px;font-weight:800;padding:0 14px;cursor:pointer;white-space:nowrap">+ NE</button>
+      </div>
+      <div id="tw-ne-list" style="margin-top:10px"></div>
     </div>
 
     <div class="gc">
-      <div class="slbl">Nutzungseinheiten / Gleichzeitigkeitsansatz</div>
-      <label style="display:flex;gap:10px;align-items:center;margin-bottom:12px;color:var(--t2);font-family:var(--f);font-size:13px">
-        <input id="tw-ne-mode" type="checkbox"/> Nutzungseinheiten berücksichtigen
-      </label>
-      <div class="igrp" style="margin-bottom:0;max-width:220px">
-        <div class="ilbl">Anzahl NE</div>
-        <div class="iwrap"><input class="inp-sm" id="tw-ne-count" type="number" min="0" max="6" step="1" value="0"/><span class="iunit">NE</span></div>
+      <div class="slbl">2. Frei im Gebäude verteilte Entnahmestellen</div>
+      <div class="info-txt" style="margin-bottom:8px">
+        Hier nur Verbraucher eintragen, die keiner Nutzungseinheit zugeordnet sind.
       </div>
-      <div class="info-txt" style="margin-top:10px">Entnahmestellen können einzelnen Nutzungseinheiten zugeordnet werden. Für den NE-Spitzenansatz werden die zwei größten Einzelberechnungsdurchflüsse je NE angesetzt.</div>
-      <div id="tw-ne-detail" style="margin-top:10px"></div>
+      <div id="tw-free-fixtures"></div>
     </div>
 
     <div class="out-card">
-      <div class="slbl">Ergebnis &mdash; Trinkwasser</div>
+      <div class="slbl">3. Ergebnis &mdash; Trinkwasser</div>
       <div class="out-grid" style="grid-template-columns:1fr;gap:8px">
         <div class="ob" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px"><div class="ob-title" style="margin:0">Summendurchfluss kalt</div><div class="out-val has" id="tw-sum-cold" style="white-space:nowrap">–</div></div>
         <div class="ob" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px"><div class="ob-title" style="margin:0">Summendurchfluss warm</div><div class="out-val has" id="tw-sum-warm" style="white-space:nowrap">–</div></div>
         <div class="ob" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px"><div class="ob-title" style="margin:0">Summendurchfluss gesamt</div><div class="out-val has" id="tw-sum-total" style="white-space:nowrap">–</div></div>
-        <div class="ob" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px"><div><div class="ob-title" style="margin:0">Spitzendurchfluss</div><div style="font-family:var(--fm);font-size:12px;color:var(--t3);margin-top:4px" id="tw-peak-m3h">–</div></div><div class="out-val has" id="tw-peak" style="white-space:nowrap">–</div></div>
+        <div class="ob" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px"><div><div class="ob-title" style="margin:0">Spitzendurchfluss maßgebend</div><div style="font-family:var(--fm);font-size:12px;color:var(--t3);margin-top:4px" id="tw-peak-m3h">–</div></div><div class="out-val has" id="tw-peak" style="white-space:nowrap">–</div></div>
         <div class="ob" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px"><div class="ob-title" style="margin:0">Hauptleitungsdimension</div><div class="out-val has" id="tw-dn" style="white-space:nowrap">–</div></div>
         <div class="ob" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px"><div class="ob-title" style="margin:0">Hauswasserzähler</div><div class="out-val has" id="tw-meter" style="white-space:nowrap">–</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
+        <div class="chip">V<sub>S</sub> Gebäude <strong id="tw-vs-building">–</strong></div>
+        <div class="chip">V<sub>S</sub> NE <strong id="tw-vs-ne">–</strong></div>
+        <div class="chip">V<sub>S</sub> final <strong id="tw-vs-final">–</strong></div>
       </div>
       <button onclick="openPdfSheet()" style="width:100%;height:52px;border:none;border-radius:var(--r-m);background:var(--grn-t);border:1px solid var(--grn-b);color:var(--grn);font-family:var(--f);font-size:15px;font-weight:700;cursor:pointer;margin-top:14px">PDF Export</button>
     </div>
 
     <div class="gc">
-      <div class="slbl">Hygiene / Hinweise</div>
+      <div class="slbl">4. Hygiene / Hinweise</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
         <div><div class="ilbl">Nutzungseinheiten</div><div class="chip"><strong id="tw-ne-info">–</strong></div></div>
         <div><div class="ilbl">PWH-Leitungsvolumen</div><div class="iwrap"><input class="inp-sm" id="tw-line-vol" type="number" min="0" step="0.1" value="0"/><span class="iunit">l</span></div></div>

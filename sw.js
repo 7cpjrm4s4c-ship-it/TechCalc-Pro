@@ -5,7 +5,7 @@
 'use strict';
 
 const BUILD_TS   = '20260426-1440';
-const CACHE_NAME = `techcalc-20260427-trinkwasser`;
+const CACHE_NAME = `techcalc-20260427-trinkwasser-v12`;
 
 const PRECACHE = [
   './', './index.html',
