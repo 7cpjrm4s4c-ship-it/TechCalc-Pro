@@ -837,7 +837,7 @@ function _buildTrinkwasserPage(meta) {
   const neBlocks = (r.neSummary || []).map(ne => {
     const rows = (ne.rows || []).map(x => `<tr><td>${esc(x.label)}</td><td class="num">${x.n}</td><td class="num">${x.vr.toFixed(2)} l/s</td><td class="num">${x.sum.toFixed(2)} l/s</td></tr>`).join('');
     const mode = ne.mode === 'top2' ? '2 größte Entnahmen' : `GL ${_twPdfNum(ne.gl)}`;
-    return `<tr><td colspan="4" class="tw-ne-title">NE ${ne.index}: ${esc(ne.title)}<br><span>${mode} · ΣVR ${_twPdfNum(ne.raw)} l/s · VS,NE ${_twPdfNum(ne.peak)} l/s</span></td></tr>${rows}`;
+    return `<tr><td colspan="4" class="tw-ne-title">NE ${ne.index}: ${esc(ne.title)}<br><span>${mode} · V<sub>R</sub> angesetzt ${_twPdfNum(ne.used ?? ne.peak)} l/s</span></td></tr>${rows}`;
   }).join('');
   const freeRows = (r.freeRows || []).map(x => `<tr><td>${esc(x.label)}</td><td class="num">${x.n}</td><td class="num">${x.vr.toFixed(2)} l/s</td><td class="num">${x.sum.toFixed(2)} l/s</td></tr>`).join('');
   const ww = r.wwMode === 'dezentral' ? 'dezentral / DLE' : 'zentral';
@@ -871,22 +871,21 @@ function _buildTrinkwasserPage(meta) {
     <tbody>${neBlocks || '<tr><td colspan="4" style="text-align:center;color:#aaa">Keine Nutzungseinheiten eingetragen</td></tr>'}</tbody>
   </table>
 
-  <div class="sec">Frei verteilte Entnahmestellen</div>
+  <div class="sec">Gebäude-Verbraucher außerhalb der NE</div>
   <table>
     <colgroup><col style="width:48%"><col style="width:14%"><col style="width:19%"><col style="width:19%"></colgroup>
     <thead><tr><th>Entnahmestelle</th><th>Anz.</th><th>V<sub>R</sub></th><th>Summe</th></tr></thead>
-    <tbody>${freeRows || '<tr><td colspan="4" style="text-align:center;color:#aaa">Keine freien Entnahmestellen eingetragen</td></tr>'}</tbody>
+    <tbody>${freeRows || '<tr><td colspan="4" style="text-align:center;color:#aaa">Keine Gebäude-Verbraucher eingetragen</td></tr>'}</tbody>
   </table>
 
   <div class="sec">Ergebnisse</div>
   <table>
     <colgroup><col style="width:30%"><col style="width:20%"><col style="width:30%"><col style="width:20%"></colgroup>
     <tbody>
-      <tr><td>ΣV<sub>R</sub> kalt</td><td class="num">${_twPdfNum(r.cold)} l/s</td><td>V<sub>S</sub> Gebäude</td><td class="num">${_twPdfNum(r.formulaPeak)} l/s</td></tr>
-      <tr><td>ΣV<sub>R</sub> warm</td><td class="num">${_twPdfNum(r.warm)} l/s</td><td>V<sub>S</sub> NE-Summe</td><td class="num">${r.neSummary?.length ? _twPdfNum(r.nePeakSum) + ' l/s' : '–'}</td></tr>
-      <tr><td>ΣV<sub>R</sub> gesamt</td><td class="num">${_twPdfNum(r.total)} l/s</td><td>V<sub>S</sub> NE + frei</td><td class="num">${r.neSummary?.length ? _twPdfNum(r.neBasedPeak) + ' l/s' : '–'}</td></tr>
-      <tr><td>V<sub>S</sub> maßgebend</td><td class="num">${_twPdfNum(r.peak)} l/s<br>${_twPdfNum(r.peakM3h)} m³/h</td><td>Hauptleitung</td><td class="num">${esc(r.dn || '–')}</td></tr>
-      <tr><td>Hauswasserzähler</td><td class="num">${esc(r.meter || '–')}</td><td>Ansatz</td><td class="num">kleinerer Wert aus Gebäude / NE+frei</td></tr>
+      <tr><td>ΣV<sub>R</sub> kalt</td><td class="num">${_twPdfNum(r.cold)} l/s</td><td>V<sub>R</sub> Nutzungseinheiten</td><td class="num">${_twPdfNum(r.vrNe)} l/s</td></tr>
+      <tr><td>ΣV<sub>R</sub> warm</td><td class="num">${_twPdfNum(r.warm)} l/s</td><td>V<sub>R</sub> Gebäude</td><td class="num">${_twPdfNum(r.vrBuilding)} l/s</td></tr>
+      <tr><td>V<sub>R</sub> Gesamt</td><td class="num">${_twPdfNum(r.vrTotal ?? r.total)} l/s</td><td>V<sub>S</sub> maßgebend</td><td class="num">${_twPdfNum(r.peak)} l/s<br>${_twPdfNum(r.peakM3h)} m³/h</td></tr>
+      <tr><td>Hauptleitung</td><td class="num">${esc(r.dn || '–')}</td><td>Hauswasserzähler</td><td class="num">${esc(r.meter || '–')}</td></tr>
     </tbody>
   </table>
 
@@ -895,6 +894,7 @@ function _buildTrinkwasserPage(meta) {
   <p style="font-size:6.6pt;color:#aaa;margin-top:4px">DIN 1988-300 orientierte Schnellberechnung. Keine vollständige Rohrnetz- oder Druckverlustberechnung.</p>
   </div>`;
 }
+
 function _twPdfNum(v) {
   return (v == null || isNaN(v)) ? '–' : Number(v).toFixed(2).replace('.', ',');
 }

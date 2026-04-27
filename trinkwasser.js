@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════
    trinkwasser.js — TechCalc Pro
-   Trinkwasser Schnellberechnung · V1.4
+   Trinkwasser Schnellberechnung · V1.5
    Nutzungseinheiten · freie Verbraucher · PDF Export
    Abhängigkeit: app.js muss zuerst geladen sein ($, show, loc)
 ═══════════════════════════════════════════════════════ */
@@ -142,16 +142,37 @@ function twUpdateNeMeta(id, field, val) {
     ne.type = val;
     const def = TW_NE_TYPES[val] || TW_NE_TYPES.bad;
     if (def.gl != null) ne.gl = def.gl;
-  } else if (field === 'name') {
+
+    // Kein komplettes Re-Rendern nach Dropdown-Auswahl: verhindert erneutes
+    // Öffnen des nativen Auswahl-Pickers auf iOS/Android.
+    const title = $('tw-ne-title-' + id);
+    if (title) title.textContent = twNeTitleText(ne);
+    const hint = $('tw-ne-hint-' + id);
+    if (hint) hint.textContent = def.hint;
+    const gl = $('tw-ne-gl-' + id);
+    if (gl) {
+      gl.disabled = !def.editable;
+      gl.value = String(Number(ne.gl || 0).toFixed(2)).replace('.', ',');
+    }
+    twRefreshNeSummary(id);
+    calcTrinkwasser();
+    return;
+  }
+  if (field === 'name') {
     ne.name = val;
-  } else if (field === 'gl') {
+    const title = $('tw-ne-title-' + id);
+    if (title) title.textContent = twNeTitleText(ne);
+    twRefreshNeSummary(id);
+    calcTrinkwasser();
+    return;
+  }
+  if (field === 'gl') {
     const n = parseFloat(String(val).replace(',', '.'));
     ne.gl = isNaN(n) ? 1 : Math.max(0, n);
     twRefreshNeSummary(id);
     calcTrinkwasser();
     return;
   }
-  renderTwNes();
   calcTrinkwasser();
 }
 
@@ -186,15 +207,19 @@ function twNeCalc(ne) {
   return { raw, cold, warm, peak, top2, rows, mode:def.mode, gl:ne.gl, typeLabel:def.label, hint:def.hint };
 }
 
-function twNeTitle(ne) {
+function twNeTitleText(ne) {
   const def = TW_NE_TYPES[ne.type] || TW_NE_TYPES.bad;
-  return ne.name ? `${twEsc(ne.name)} (${def.label})` : def.label;
+  return ne.name ? `${ne.name} (${def.label})` : def.label;
+}
+
+function twNeTitle(ne) {
+  return twEsc(twNeTitleText(ne));
 }
 
 function twNeSummary(ne) {
   const c = twNeCalc(ne);
   const approach = c.mode === 'top2' ? '2 größte Entnahmen' : `GL ${twFmt(Number(ne.gl || 0),2)}`;
-  return `ΣV<sub>R</sub> ${twFmt(c.raw,2)} l/s · V<sub>S,NE</sub> ${twFmt(c.peak,2)} l/s · ${approach}`;
+  return `V<sub>R</sub> angesetzt ${twFmt(c.peak,2)} l/s · ${approach}`;
 }
 
 function twRefreshNeSummary(id) {
@@ -232,7 +257,7 @@ function renderTwNes(preserveFocus=true) {
       <button type="button" class="tw-ne-head" data-act="toggle" data-id="${ne.id}" style="width:100%;border:0;background:transparent;color:var(--t1);text-align:left;padding:13px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;cursor:pointer">
         <span style="font-size:17px;color:var(--blue)">${open?'▼':'▶'}</span>
         <span>
-          <span style="display:block;font-family:var(--f);font-size:13px;font-weight:800;color:var(--t1)">NE ${idx+1} · ${twNeTitle(ne)}</span>
+          <span style="display:block;font-family:var(--f);font-size:13px;font-weight:800;color:var(--t1)">NE ${idx+1} · <span id="tw-ne-title-${ne.id}">${twNeTitle(ne)}</span></span>
           <span id="tw-ne-summary-${ne.id}" style="display:block;font-family:var(--fm);font-size:11px;color:var(--t3);margin-top:3px">${twNeSummary(ne)}</span>
         </span>
         <span type="button" class="tw-ne-del" data-act="remove" data-id="${ne.id}" style="font-family:var(--f);font-size:12px;color:var(--danger);padding:6px 8px">Löschen</span>
@@ -249,7 +274,7 @@ function renderTwNes(preserveFocus=true) {
         <div class="igrp">
           <div class="ilbl">Gleichzeitigkeitsansatz</div>
           <div style="display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center">
-            <div class="info-txt" style="margin:0">${def.hint}</div>
+            <div class="info-txt" id="tw-ne-hint-${ne.id}" style="margin:0">${def.hint}</div>
             <div class="iwrap"><input class="inp-sm tw-ne-gl" id="tw-ne-gl-${ne.id}" data-id="${ne.id}" type="text" inputmode="decimal" lang="de-DE" pattern="[0-9]*[,.]?[0-9]*" autocomplete="off" value="${String(Number(ne.gl || 0).toFixed(2)).replace('.', ',')}" ${def.editable?'':'disabled'} style="font-size:15px;padding:10px 12px"/><span class="iunit">GL</span></div>
           </div>
         </div>
@@ -286,49 +311,47 @@ function calcTrinkwasser() {
   const wwMode = $('tw-ww-mode')?.value || 'zentral';
   const lineVol = Math.max(0, twNum('tw-line-vol'));
 
-  let cold = 0, warm = 0, total = 0, dauer = 0, freeNonDauer = 0;
+  let cold = 0, warm = 0;
+  let vrBuilding = 0, dauer = 0, freeNonDauer = 0;
   const rows = [];
   const freeRows = [];
 
+  // Gebäude-Verbraucher: alle frei im Gebäude verteilten Entnahmestellen außerhalb der NE.
   TW_FIXTURES.forEach(f => {
     const n = twNum('tw-free-' + f.id);
     if (!n) return;
     const vrTot = n * f.vr;
-    total += vrTot;
+    vrBuilding += vrTot;
     if (f.cold) cold += vrTot;
     if (f.warm && wwMode === 'zentral') warm += vrTot;
     if (f.dauer) dauer += vrTot; else freeNonDauer += vrTot;
-    const row = { group:'frei im Gebäude', label:f.label, n, vr:f.vr, sum:vrTot };
+    const row = { group:'Gebäude', label:f.label, n, vr:f.vr, sum:vrTot };
     rows.push(row); freeRows.push(row);
   });
 
-  let neRaw = 0, nePeakSum = 0;
+  let vrNe = 0;
   const neRows = [];
   const neSummary = [];
   TW_STATE.nes.forEach((ne, idx) => {
     const c = twNeCalc(ne);
-    neRaw += c.raw;
-    nePeakSum += c.peak;
+    // Nur der für die Berechnung angesetzte NE-Wert wird übernommen,
+    // nicht die Rohsumme aller Verbraucher innerhalb der NE.
+    vrNe += c.peak;
     cold += c.cold;
     warm += c.warm;
-    total += c.raw;
     rows.push(...c.rows);
     neRows.push(...c.rows);
-    neSummary.push({ index:idx+1, title:twNeTitle(ne), type:c.typeLabel, raw:c.raw, peak:c.peak, mode:c.mode, gl:ne.gl, rows:c.rows });
+    neSummary.push({ index:idx+1, title:twNeTitleText(ne), type:c.typeLabel, raw:c.raw, used:c.peak, peak:c.peak, mode:c.mode, gl:ne.gl, rows:c.rows });
   });
 
-  const curveInput = freeNonDauer + neRaw;
-  const formulaPeak = twPeak(curveInput, buildingKey);
-  const freePeak = twPeak(freeNonDauer, buildingKey);
-  const neBasedPeak = (TW_STATE.nes.length ? (nePeakSum + freePeak) : formulaPeak);
-  const useNeLimit = TW_STATE.nes.length > 0 && nePeakSum > 0;
-  const peakBase = useNeLimit ? Math.min(formulaPeak, neBasedPeak) : formulaPeak;
+  const vrTotal = vrNe + vrBuilding;
+  const peakBase = twPeak(vrNe + freeNonDauer, buildingKey);
   const peak = peakBase + dauer;
   const peakM3h = peak * 3.6;
   const dn = twRecommendDN(peak);
   const meter = twRecommendMeter(peak);
-  const neInfo = useNeLimit
-    ? `${TW_STATE.nes.length} NE · Vₛ Gebäude ${twFmt(formulaPeak,2)} l/s · Vₛ NE-Summe ${twFmt(nePeakSum,2)} l/s · Vₛ NE+frei ${twFmt(neBasedPeak,2)} l/s · maßgebend ${twFmt(peakBase,2)} l/s`
+  const neInfo = TW_STATE.nes.length
+    ? `${TW_STATE.nes.length} NE · VR angesetzt ${twFmt(vrNe,2)} l/s`
     : 'keine Nutzungseinheiten angelegt';
   const circ = wwMode === 'zentral'
     ? (lineVol > 3 ? 'Zirkulation/Begleitheizung prüfen (> 3 l)' : '3-Liter-Regel prüfen')
@@ -336,16 +359,16 @@ function calcTrinkwasser() {
 
   twSet('tw-sum-cold',  twFmt(cold,2) + ' l/s');
   twSet('tw-sum-warm',  twFmt(warm,2) + ' l/s');
-  twSet('tw-sum-total', twFmt(total,2) + ' l/s');
+  twSet('tw-sum-total', twFmt(vrTotal,2) + ' l/s');
   twSet('tw-peak',      twFmt(peak,2) + ' l/s');
   twSet('tw-peak-m3h',  twFmt(peakM3h,2) + ' m³/h');
   twSet('tw-dn',        dn);
   twSet('tw-meter',     meter);
   twSet('tw-ne-info',   neInfo);
-  twSet('tw-vs-building', twFmt(formulaPeak,2) + ' l/s');
-  twSet('tw-vs-ne',       useNeLimit ? twFmt(nePeakSum,2) + ' l/s' : '–');
-  twSet('tw-vs-ne-combined', useNeLimit ? twFmt(neBasedPeak,2) + ' l/s' : '–');
-  twSet('tw-vs-final',    twFmt(peakBase,2) + ' l/s');
+  twSet('tw-vr-ne',       twFmt(vrNe,2) + ' l/s');
+  twSet('tw-vr-building', twFmt(vrBuilding,2) + ' l/s');
+  twSet('tw-vr-total',    twFmt(vrTotal,2) + ' l/s');
+  twSet('tw-vs-final',    twFmt(peak,2) + ' l/s');
   twSet('tw-circ',      circ);
 
   const hint = $('tw-hints');
@@ -359,7 +382,7 @@ function calcTrinkwasser() {
       <p>Diese Schnellberechnung ersetzt keine vollständige Fachplanung.</p>`;
   }
 
-  window.TW_LAST = { buildingKey, building:TW_BUILDINGS[buildingKey]?.label || 'Wohngebäude', wwMode, neInfo, cold, warm, total, curveInput, formulaPeak, freePeak, nePeakSum, neBasedPeak, peakBase, peak, peakM3h, dn, meter, circ, rows, neRows, freeRows, neSummary, lineVol };
+  window.TW_LAST = { buildingKey, building:TW_BUILDINGS[buildingKey]?.label || 'Wohngebäude', wwMode, neInfo, cold, warm, vrNe, vrBuilding, vrTotal, total:vrTotal, curveInput:vrNe + freeNonDauer, dauer, peakBase, peak, peakM3h, dn, meter, circ, rows, neRows, freeRows, neSummary, lineVol };
 }
 
 function twBind() {
