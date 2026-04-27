@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════
    trinkwasser.js — TechCalc Pro
-   Trinkwasser Schnellberechnung · V1.2
+   Trinkwasser Schnellberechnung · V1.4
    Nutzungseinheiten · freie Verbraucher · PDF Export
    Abhängigkeit: app.js muss zuerst geladen sein ($, show, loc)
 ═══════════════════════════════════════════════════════ */
@@ -250,7 +250,7 @@ function renderTwNes(preserveFocus=true) {
           <div class="ilbl">Gleichzeitigkeitsansatz</div>
           <div style="display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center">
             <div class="info-txt" style="margin:0">${def.hint}</div>
-            <div class="iwrap"><input class="inp-sm tw-ne-gl" id="tw-ne-gl-${ne.id}" data-id="${ne.id}" type="number" min="0" step="0.05" value="${Number(ne.gl || 0).toFixed(2)}" ${def.editable?'':'disabled'} style="font-size:15px;padding:10px 12px"/><span class="iunit">GL</span></div>
+            <div class="iwrap"><input class="inp-sm tw-ne-gl" id="tw-ne-gl-${ne.id}" data-id="${ne.id}" type="text" inputmode="decimal" lang="de-DE" pattern="[0-9]*[,.]?[0-9]*" autocomplete="off" value="${String(Number(ne.gl || 0).toFixed(2)).replace('.', ',')}" ${def.editable?'':'disabled'} style="font-size:15px;padding:10px 12px"/><span class="iunit">GL</span></div>
           </div>
         </div>
         <div class="slbl" style="margin-top:8px">Verbraucher dieser NE</div>
@@ -328,7 +328,7 @@ function calcTrinkwasser() {
   const dn = twRecommendDN(peak);
   const meter = twRecommendMeter(peak);
   const neInfo = useNeLimit
-    ? `${TW_STATE.nes.length} NE · Vₛ Gebäude ${twFmt(formulaPeak,2)} l/s · Vₛ NE ${twFmt(neBasedPeak,2)} l/s · maßgebend ${twFmt(peakBase,2)} l/s`
+    ? `${TW_STATE.nes.length} NE · Vₛ Gebäude ${twFmt(formulaPeak,2)} l/s · Vₛ NE-Summe ${twFmt(nePeakSum,2)} l/s · Vₛ NE+frei ${twFmt(neBasedPeak,2)} l/s · maßgebend ${twFmt(peakBase,2)} l/s`
     : 'keine Nutzungseinheiten angelegt';
   const circ = wwMode === 'zentral'
     ? (lineVol > 3 ? 'Zirkulation/Begleitheizung prüfen (> 3 l)' : '3-Liter-Regel prüfen')
@@ -343,8 +343,9 @@ function calcTrinkwasser() {
   twSet('tw-meter',     meter);
   twSet('tw-ne-info',   neInfo);
   twSet('tw-vs-building', twFmt(formulaPeak,2) + ' l/s');
-  twSet('tw-vs-ne',       useNeLimit ? twFmt(neBasedPeak,2) + ' l/s' : '–');
-  twSet('tw-vs-final',    twFmt(peak,2) + ' l/s');
+  twSet('tw-vs-ne',       useNeLimit ? twFmt(nePeakSum,2) + ' l/s' : '–');
+  twSet('tw-vs-ne-combined', useNeLimit ? twFmt(neBasedPeak,2) + ' l/s' : '–');
+  twSet('tw-vs-final',    twFmt(peakBase,2) + ' l/s');
   twSet('tw-circ',      circ);
 
   const hint = $('tw-hints');

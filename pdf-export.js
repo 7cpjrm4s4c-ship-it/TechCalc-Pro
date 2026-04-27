@@ -833,13 +833,14 @@ function _buildHxPage(meta) {
 ─────────────────────────────────────── */
 function _buildTrinkwasserPage(meta) {
   const r = window.TW_LAST || {};
+  const esc = v => String(v ?? '–').replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
   const neBlocks = (r.neSummary || []).map(ne => {
-    const rows = (ne.rows || []).map(x => `<tr><td>${x.label}</td><td class="num">${x.n}</td><td class="num">${x.vr.toFixed(2)} l/s</td><td class="num">${x.sum.toFixed(2)} l/s</td></tr>`).join('');
+    const rows = (ne.rows || []).map(x => `<tr><td>${esc(x.label)}</td><td class="num">${x.n}</td><td class="num">${x.vr.toFixed(2)} l/s</td><td class="num">${x.sum.toFixed(2)} l/s</td></tr>`).join('');
     const mode = ne.mode === 'top2' ? '2 größte Entnahmen' : `GL ${_twPdfNum(ne.gl)}`;
-    return `<tr><td colspan="4" style="background:#f0f4fa;font-weight:700;color:#1a3a5c">NE ${ne.index}: ${ne.title} · ${mode} · ΣVR ${_twPdfNum(ne.raw)} l/s · VS,NE ${_twPdfNum(ne.peak)} l/s</td></tr>${rows}`;
+    return `<tr><td colspan="4" class="tw-ne-title">NE ${ne.index}: ${esc(ne.title)}<br><span>${mode} · ΣVR ${_twPdfNum(ne.raw)} l/s · VS,NE ${_twPdfNum(ne.peak)} l/s</span></td></tr>${rows}`;
   }).join('');
-  const freeRows = (r.freeRows || []).map(x => `<tr><td>${x.label}</td><td class="num">${x.n}</td><td class="num">${x.vr.toFixed(2)} l/s</td><td class="num">${x.sum.toFixed(2)} l/s</td></tr>`).join('');
-  const ww = r.wwMode === 'dezentral' ? 'dezentral / Durchlauferhitzer' : 'zentral';
+  const freeRows = (r.freeRows || []).map(x => `<tr><td>${esc(x.label)}</td><td class="num">${x.n}</td><td class="num">${x.vr.toFixed(2)} l/s</td><td class="num">${x.sum.toFixed(2)} l/s</td></tr>`).join('');
+  const ww = r.wwMode === 'dezentral' ? 'dezentral / DLE' : 'zentral';
   const hints = r.wwMode === 'dezentral'
     ? 'Dezentrale Warmwasserbereitung: DLE-Leistung, Elektroanschluss und Mindestfließdruck separat prüfen. Probeentnahmestellen und Spüleinrichtungen objektspezifisch berücksichtigen.'
     : 'Zentrale Warmwasserbereitung: 3-Liter-Regel, Zirkulation/Begleitheizung, Probeentnahmestellen und Spüleinrichtungen objektspezifisch prüfen.';
@@ -847,39 +848,53 @@ function _buildTrinkwasserPage(meta) {
   return `
   ${_header(meta, 'Trinkwasserberechnung')}
 
+  <style>
+    .twpdf table{table-layout:fixed;width:100%;font-size:7.2pt}
+    .twpdf th,.twpdf td{overflow-wrap:anywhere;word-break:normal;white-space:normal;line-height:1.22;padding:3px 5px}
+    .twpdf .num{white-space:normal;text-align:right}
+    .twpdf .tw-ne-title{background:#f0f4fa!important;color:#1a3a5c;font-weight:700;text-align:left;line-height:1.25}
+    .twpdf .tw-ne-title span{font-size:6.8pt;color:#4d5c70;font-weight:700}
+  </style>
+  <div class="twpdf">
+
   <div class="sec">Basisdaten</div>
   <table>
-    <tr><td>Gebäudetyp</td><td class="num">${r.building || '–'}</td><td>Warmwasserbereitung</td><td class="num">${ww}</td></tr>
-    <tr><td>PWH-Leitungsvolumen</td><td class="num">${r.lineVol != null ? r.lineVol + ' l' : '–'}</td><td>Zirkulation</td><td class="num" style="font-size:7pt;line-height:1.2">${r.circ || '–'}</td></tr>
+    <colgroup><col style="width:24%"><col style="width:26%"><col style="width:24%"><col style="width:26%"></colgroup>
+    <tr><td>Gebäudetyp</td><td class="num">${esc(r.building || '–')}</td><td>Warmwasser</td><td class="num">${ww}</td></tr>
+    <tr><td>PWH-Volumen</td><td class="num">${r.lineVol != null ? r.lineVol + ' l' : '–'}</td><td>Zirkulation</td><td class="num">${esc(r.circ || '–')}</td></tr>
   </table>
 
   <div class="sec">Nutzungseinheiten</div>
-  <table style="font-size:7.1pt">
-    <thead><tr><th>Entnahmestelle</th><th>Anzahl</th><th>V<sub>R</sub></th><th>Summe</th></tr></thead>
+  <table>
+    <colgroup><col style="width:48%"><col style="width:14%"><col style="width:19%"><col style="width:19%"></colgroup>
+    <thead><tr><th>Entnahmestelle</th><th>Anz.</th><th>V<sub>R</sub></th><th>Summe</th></tr></thead>
     <tbody>${neBlocks || '<tr><td colspan="4" style="text-align:center;color:#aaa">Keine Nutzungseinheiten eingetragen</td></tr>'}</tbody>
   </table>
 
-  <div class="sec">Frei im Gebäude verteilte Entnahmestellen</div>
-  <table style="font-size:7.1pt">
-    <thead><tr><th>Entnahmestelle</th><th>Anzahl</th><th>V<sub>R</sub></th><th>Summe</th></tr></thead>
+  <div class="sec">Frei verteilte Entnahmestellen</div>
+  <table>
+    <colgroup><col style="width:48%"><col style="width:14%"><col style="width:19%"><col style="width:19%"></colgroup>
+    <thead><tr><th>Entnahmestelle</th><th>Anz.</th><th>V<sub>R</sub></th><th>Summe</th></tr></thead>
     <tbody>${freeRows || '<tr><td colspan="4" style="text-align:center;color:#aaa">Keine freien Entnahmestellen eingetragen</td></tr>'}</tbody>
   </table>
 
   <div class="sec">Ergebnisse</div>
   <table>
+    <colgroup><col style="width:30%"><col style="width:20%"><col style="width:30%"><col style="width:20%"></colgroup>
     <tbody>
       <tr><td>ΣV<sub>R</sub> kalt</td><td class="num">${_twPdfNum(r.cold)} l/s</td><td>V<sub>S</sub> Gebäude</td><td class="num">${_twPdfNum(r.formulaPeak)} l/s</td></tr>
-      <tr><td>ΣV<sub>R</sub> warm</td><td class="num">${_twPdfNum(r.warm)} l/s</td><td>V<sub>S</sub> NE-Ansatz</td><td class="num">${r.neSummary?.length ? _twPdfNum(r.neBasedPeak) + ' l/s' : '–'}</td></tr>
-      <tr><td>ΣV<sub>R</sub> gesamt</td><td class="num">${_twPdfNum(r.total)} l/s</td><td>V<sub>S</sub> maßgebend</td><td class="num">${_twPdfNum(r.peak)} l/s / ${_twPdfNum(r.peakM3h)} m³/h</td></tr>
-      <tr><td>Hauptleitung</td><td class="num">${r.dn || '–'}</td><td>Hauswasserzähler</td><td class="num">${r.meter || '–'}</td></tr>
+      <tr><td>ΣV<sub>R</sub> warm</td><td class="num">${_twPdfNum(r.warm)} l/s</td><td>V<sub>S</sub> NE-Summe</td><td class="num">${r.neSummary?.length ? _twPdfNum(r.nePeakSum) + ' l/s' : '–'}</td></tr>
+      <tr><td>ΣV<sub>R</sub> gesamt</td><td class="num">${_twPdfNum(r.total)} l/s</td><td>V<sub>S</sub> NE + frei</td><td class="num">${r.neSummary?.length ? _twPdfNum(r.neBasedPeak) + ' l/s' : '–'}</td></tr>
+      <tr><td>V<sub>S</sub> maßgebend</td><td class="num">${_twPdfNum(r.peak)} l/s<br>${_twPdfNum(r.peakM3h)} m³/h</td><td>Hauptleitung</td><td class="num">${esc(r.dn || '–')}</td></tr>
+      <tr><td>Hauswasserzähler</td><td class="num">${esc(r.meter || '–')}</td><td>Ansatz</td><td class="num">kleinerer Wert aus Gebäude / NE+frei</td></tr>
     </tbody>
   </table>
 
   <div class="sec">Hinweise</div>
-  <p style="font-size:7.5pt;color:#444;line-height:1.35;background:#f5f7fa;border:1px solid #e0e6ef;border-radius:5px;padding:6px 8px">${hints}</p>
-  <p style="font-size:6.8pt;color:#aaa;margin-top:4px">DIN 1988-300 orientierte Schnellberechnung. Keine vollständige Rohrnetz- oder Druckverlustberechnung.</p>`;
+  <p style="font-size:7.2pt;color:#444;line-height:1.32;background:#f5f7fa;border:1px solid #e0e6ef;border-radius:5px;padding:6px 8px;overflow-wrap:anywhere">${esc(hints)}</p>
+  <p style="font-size:6.6pt;color:#aaa;margin-top:4px">DIN 1988-300 orientierte Schnellberechnung. Keine vollständige Rohrnetz- oder Druckverlustberechnung.</p>
+  </div>`;
 }
-
 function _twPdfNum(v) {
   return (v == null || isNaN(v)) ? '–' : Number(v).toFixed(2).replace('.', ',');
 }
