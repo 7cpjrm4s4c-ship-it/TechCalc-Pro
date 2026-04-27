@@ -67,10 +67,78 @@ const NAV = {
   },
 };
 
+/* ─── HEADER MENU ─── */
+const MENU = {
+  open: false,
+  _apply() {
+    document.body.classList.toggle('menu-open', MENU.open);
+    $('app-menu-overlay')?.classList.toggle('open', MENU.open);
+    $('app-menu-sheet')?.classList.toggle('open', MENU.open);
+    $('hdr-menu-btn')?.classList.toggle('open', MENU.open);
+    $('hdr-menu-btn')?.setAttribute('aria-expanded', String(MENU.open));
+  },
+};
+
+function openAppMenu()  { MENU.open = true;  closePlusSheet(); MENU._apply(); }
+function closeAppMenu() { MENU.open = false; MENU._apply(); }
+function toggleAppMenu(){ MENU.open = !MENU.open; if (MENU.open) closePlusSheet(); MENU._apply(); }
+
+function _setMenuMessage(title, body) {
+  alert(title + (body ? '\n\n' + body : ''));
+}
+
+function _handleMenuAction(action) {
+  if (action === 'pdf') {
+    closeAppMenu();
+    if (typeof openPdfSheet === 'function') openPdfSheet();
+    return;
+  }
+  if (action === 'nav-config') {
+    _setMenuMessage('Schnellzugriffe', 'Die frei konfigurierbare Navigation Pill ist für Phase 2 vorbereitet.');
+    return;
+  }
+  if (action === 'favorites') {
+    _setMenuMessage('Favoriten', 'Favoriten werden in einer späteren Ausbaustufe aktiviert.');
+    return;
+  }
+  if (action === 'projects') {
+    _setMenuMessage('Projekte', 'Projektverwaltung wird in einer späteren Ausbaustufe aktiviert.');
+    return;
+  }
+  if (action === 'help') {
+    _setMenuMessage('Hinweis', 'TechCalc Pro ist als HLSK Quick Tool für schnelle Prüfung, Nachrechnung und Dokumentation gedacht. Keine vollständige Fachplanung oder Rohrnetzberechnung.');
+    return;
+  }
+  if (action === 'legal') {
+    _setMenuMessage('Impressum / Datenschutz', 'Platzhalter für die rechtlichen Angaben.');
+  }
+}
+
+function _setupThemeMenu() {
+  const saved = localStorage.getItem('tcp_theme') || 'dark';
+  document.documentElement.dataset.theme = saved;
+  document.querySelectorAll('[data-theme]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === saved);
+    btn.addEventListener('click', () => {
+      localStorage.setItem('tcp_theme', btn.dataset.theme);
+      document.documentElement.dataset.theme = btn.dataset.theme;
+      document.querySelectorAll('[data-theme]').forEach(b => b.classList.toggle('active', b === btn));
+    });
+  });
+}
+
+function _setBuildLabel() {
+  const el = $('app-build-label');
+  if (!el) return;
+  const build = window.TECHCALC_BUILD || document.querySelector('meta[name="techcalc-build"]')?.content || 'local';
+  el.textContent = build;
+}
+
 function switchTab(t) {
   if (!TABS.includes(t)) return;
   NAV.activeTab = t;
   NAV.sheetOpen = false;  /* Sheet schließt immer beim Tab-Wechsel */
+  closeAppMenu();
   NAV._apply();
 }
 
@@ -131,6 +199,17 @@ function _updatePillVisibility() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Header Menü
+  $('hdr-menu-btn')?.addEventListener('click', toggleAppMenu);
+  $('app-menu-close')?.addEventListener('click', closeAppMenu);
+  $('app-menu-overlay')?.addEventListener('click', closeAppMenu);
+  document.querySelectorAll('[data-menu-action]').forEach(btn => {
+    btn.addEventListener('click', () => _handleMenuAction(btn.dataset.menuAction));
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAppMenu(); });
+  _setupThemeMenu();
+  _setBuildLabel();
+
   // Desktop Tab-Bar
   document.querySelectorAll('.tab-btn[data-tab]').forEach(b => {
     b.addEventListener('click', () => switchTab(b.dataset.tab));

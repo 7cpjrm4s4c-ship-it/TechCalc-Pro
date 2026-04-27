@@ -36,25 +36,37 @@
 
 <!-- macOS Safari Pinned Tab -->
 <link rel="mask-icon" href="icon-512.png" color="#4fa8ff"/>
+<meta name="techcalc-build" content="20260427-2015"/>
 <title>TechCalc Pro</title>
 <link rel="stylesheet" href="tokens.css"/>
 <link rel="stylesheet" href="layout.css"/>
 <link rel="stylesheet" href="components.css"/>
+<link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
 
 <!-- ══ HEADER ══ -->
 <header class="hdr">
-  <div class="hdr-top">
-    <div class="hdr-icon">
-      <img src="icon-180.png" alt="TechCalc Pro Icon" onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=44 height=44 viewBox=\'0 0 44 44\'><rect width=44 height=44 rx=10 fill=\'#111\'/><text x=22 y=30 text-anchor=\'middle\'  font-size=22 fill=\'url(%23g)\'>&#x25b3;</text></svg>'"/>
-    </div>
-    <div>
-      <div class="hdr-title">
-        <span class="hdr-title-main">TechCalc</span>
-        <span class="hdr-title-pro">PRO</span>
+  <div class="hdr-top hdr-top-premium">
+    <div class="hdr-slot hdr-slot-left" aria-hidden="true"></div>
+
+    <div class="hdr-brand" aria-label="TechCalc Pro">
+      <div class="hdr-icon hdr-icon-center">
+        <img src="icon-180.png" alt="TechCalc Pro Icon" onerror="this.style.display='none';this.parentElement.innerHTML='△'"/>
       </div>
-      <div class="hdr-sub">HLSK-Quick Tools &middot; Heizung &middot; L&uuml;ftung &middot; Sanit&auml;r &middot; Klima</div>
+      <div class="hdr-brand-text">
+        <div class="hdr-title">
+          <span class="hdr-title-main">TechCalc</span>
+          <span class="hdr-title-pro">PRO</span>
+        </div>
+        <div class="hdr-sub">HLSK Quick Tools</div>
+      </div>
+    </div>
+
+    <div class="hdr-slot hdr-slot-right">
+      <button class="hdr-menu-btn" id="hdr-menu-btn" type="button" aria-label="Menü öffnen" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
   <nav class="tab-bar">
@@ -65,9 +77,48 @@
     <button class="tab-btn"        data-tab="hx">h,x-Diagramm</button>
     <button class="tab-btn"        data-tab="wrg">WRG / Mischluft</button>
     <button class="tab-btn"        data-tab="trinkwasser">Trinkwasser</button>
-    <button class="tab-btn" onclick="hxOpenPdf()" style="color:var(--blue);flex-shrink:0">⬇ PDF</button>
+    <button class="tab-btn" onclick="openPdfSheet()" style="color:var(--blue);flex-shrink:0">⬇ PDF</button>
   </nav>
 </header>
+
+<!-- ══ HEADER MENU ══ -->
+<div class="app-menu-overlay" id="app-menu-overlay" aria-hidden="true"></div>
+<aside class="app-menu-sheet" id="app-menu-sheet" role="dialog" aria-label="TechCalc Pro Menü" aria-modal="true">
+  <div class="app-menu-head">
+    <div>
+      <div class="app-menu-title">TechCalc Pro</div>
+      <div class="app-menu-sub">HLSK Quick Tools</div>
+    </div>
+    <button class="app-menu-close" id="app-menu-close" type="button" aria-label="Menü schließen">×</button>
+  </div>
+
+  <div class="app-menu-section">
+    <div class="app-menu-section-title">Aktionen</div>
+    <button class="app-menu-item" type="button" data-menu-action="pdf"><span>PDF Export</span><small>Aktuellen Tab dokumentieren</small></button>
+    <button class="app-menu-item" type="button" data-menu-action="nav-config"><span>Schnellzugriffe bearbeiten</span><small>Navigation Pill vorbereiten</small></button>
+    <button class="app-menu-item" type="button" data-menu-action="favorites"><span>Favoriten</span><small>Vorbereitet</small></button>
+    <button class="app-menu-item" type="button" data-menu-action="projects"><span>Projekte</span><small>Vorbereitet</small></button>
+  </div>
+
+  <div class="app-menu-section">
+    <div class="app-menu-section-title">Einstellungen</div>
+    <div class="app-menu-item app-menu-setting">
+      <span>Theme</span>
+      <div class="seg" role="group" aria-label="Theme">
+        <button type="button" data-theme="dark" class="active">Dark</button>
+        <button type="button" data-theme="light">Light</button>
+        <button type="button" data-theme="system">System</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-menu-section">
+    <div class="app-menu-section-title">Info</div>
+    <button class="app-menu-item" type="button" data-menu-action="help"><span>Hilfe / Hinweise</span><small>Schnellprüfung, keine Vollplanung</small></button>
+    <div class="app-menu-version"><span>Version</span><strong id="app-build-label">Build wird geladen…</strong></div>
+    <button class="app-menu-item" type="button" data-menu-action="legal"><span>Impressum / Datenschutz</span><small>Vorbereitet</small></button>
+  </div>
+</aside>
 
 <!-- ══════════════════════════════════════════════════════
      TAB: MASSENSTROM
@@ -1097,6 +1148,7 @@
   </div>
 </div>
 
+<script>window.TECHCALC_BUILD = "20260427-2015";</script>
 <script src="./app.js"></script>
 <script src="./heating-cooling.js"></script>
 <script src="./ventilation.js"></script>
