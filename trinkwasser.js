@@ -147,6 +147,9 @@ function twUpdateNeMeta(id, field, val) {
   } else if (field === 'gl') {
     const n = parseFloat(String(val).replace(',', '.'));
     ne.gl = isNaN(n) ? 1 : Math.max(0, n);
+    twRefreshNeSummary(id);
+    calcTrinkwasser();
+    return;
   }
   renderTwNes();
   calcTrinkwasser();
@@ -157,7 +160,7 @@ function twUpdateNeCount(id, fixtureId, val) {
   if (!ne) return;
   const n = parseInt(String(val).replace(',', '.'), 10);
   ne.counts[fixtureId] = isNaN(n) || n < 0 ? 0 : n;
-  renderTwNes(false);
+  twRefreshNeSummary(id);
   calcTrinkwasser();
 }
 
@@ -194,6 +197,21 @@ function twNeSummary(ne) {
   return `ΣV<sub>R</sub> ${twFmt(c.raw,2)} l/s · V<sub>S,NE</sub> ${twFmt(c.peak,2)} l/s · ${approach}`;
 }
 
+function twRefreshNeSummary(id) {
+  const ne = TW_STATE.nes.find(n => n.id === id);
+  const el = document.getElementById('tw-ne-summary-' + id);
+  if (ne && el) el.innerHTML = twNeSummary(ne);
+}
+
+function twToggleFree() {
+  const body = $('tw-free-fixtures');
+  const icon = $('tw-free-toggle-icon');
+  if (!body) return;
+  const open = body.style.display === 'none';
+  body.style.display = open ? '' : 'none';
+  if (icon) icon.textContent = open ? '▼' : '▶';
+}
+
 function renderTwNes(preserveFocus=true) {
   const wrap = $('tw-ne-list');
   if (!wrap) return;
@@ -215,7 +233,7 @@ function renderTwNes(preserveFocus=true) {
         <span style="font-size:17px;color:var(--blue)">${open?'▼':'▶'}</span>
         <span>
           <span style="display:block;font-family:var(--f);font-size:13px;font-weight:800;color:var(--t1)">NE ${idx+1} · ${twNeTitle(ne)}</span>
-          <span style="display:block;font-family:var(--fm);font-size:11px;color:var(--t3);margin-top:3px">${twNeSummary(ne)}</span>
+          <span id="tw-ne-summary-${ne.id}" style="display:block;font-family:var(--fm);font-size:11px;color:var(--t3);margin-top:3px">${twNeSummary(ne)}</span>
         </span>
         <span type="button" class="tw-ne-del" data-act="remove" data-id="${ne.id}" style="font-family:var(--f);font-size:12px;color:var(--danger);padding:6px 8px">Löschen</span>
       </button>
@@ -347,6 +365,9 @@ function twBind() {
   buildTwFreeFixtures();
   renderTwNes();
   $('tw-add-ne')?.addEventListener('click', twAddNe);
+  $('tw-free-toggle')?.addEventListener('click', twToggleFree);
+  const freeBody = $('tw-free-fixtures');
+  if (freeBody && !freeBody.dataset.init) { freeBody.style.display = 'none'; freeBody.dataset.init = '1'; }
   document.querySelectorAll('#tab-trinkwasser select, #tab-trinkwasser input').forEach(el => {
     if (el.closest('#tw-ne-list') || el.closest('#tw-free-fixtures')) return;
     el.addEventListener('input', calcTrinkwasser);
