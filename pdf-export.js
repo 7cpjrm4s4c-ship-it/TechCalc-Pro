@@ -152,7 +152,7 @@ function triggerPdfPrint() {
   // Aktiven Tab ermitteln — aus DOM oder URL
   let activeTab = 'flow';
   // Check which tab panel is visible
-  ['flow','luft','pipe','unit','hx','wrg'].forEach(id => {
+  ['flow','luft','pipe','unit','hx','wrg','trinkwasser'].forEach(id => {
     const el = document.getElementById('tab-' + id);
     if (el && getComputedStyle(el).display !== 'none') activeTab = id;
     if (el && !el.style.display && id === 'flow') activeTab = 'flow';
@@ -166,10 +166,9 @@ function triggerPdfPrint() {
   else if (activeTab === 'luft') html = _buildLuftPage(meta);
   else if (activeTab === 'pipe') html = _buildPipePage(meta);
   else if (activeTab === 'hx')   html = _buildHxPage(meta);
-  else if (activeTab === 'wrg')  html = _buildWrgPage(meta)
-  else if (activeTab === 'trinkwasser') 
-  html = _buildTrinkwasserPage(meta); 
-  else                           html = _buildFlowPage(meta); 
+  else if (activeTab === 'wrg')  html = _buildWrgPage(meta);
+  else if (activeTab === 'trinkwasser') html = _buildTrinkwasserPage(meta);
+  else                           html = _buildFlowPage(meta);
 
   _openPrintWindow(html);
 }
@@ -254,15 +253,6 @@ function _openPrintWindow(bodyHtml) {
     overlay._headStyle?.remove();
     document.getElementById(PRINT_ID)?.remove();
   });
-}
-
-function _buildTrinkwasserPage(meta) {
-  return `
-    ${_header(meta, 'Trinkwasserberechnung')}
-    <div class="sec">Ergebnisse</div>
-    <p>Summendurchfluss kalt / warm / gesamt, Spitzendurchfluss,
-    Hauptleitungsdimension, Wasserzähler sowie Hygienehinweise.</p>
-  `;
 }
 
 /* ───────────────────────────────────────
@@ -836,6 +826,61 @@ function _buildHxPage(meta) {
   </p>`;
 }
 
+
+
+/* ───────────────────────────────────────
+   TAB: TRINKWASSER
+─────────────────────────────────────── */
+function _buildTrinkwasserPage(meta) {
+  const r = window.TW_LAST || {};
+  const rows = (r.rows || []).map(x => `<tr><td>${x.label}</td><td class="num">${x.n}</td><td class="num">${x.vr.toFixed(2)} l/s</td><td class="num">${x.sum.toFixed(2)} l/s</td></tr>`).join('');
+  const ww = r.wwMode === 'dezentral' ? 'dezentral / Durchlauferhitzer' : 'zentral';
+  const hints = r.wwMode === 'dezentral'
+    ? 'Dezentrale Warmwasserbereitung: DLE-Leistung, Elektroanschluss und Mindestfließdruck separat prüfen. Probeentnahmestellen und Spüleinrichtungen objektspezifisch berücksichtigen.'
+    : 'Zentrale Warmwasserbereitung: 3-Liter-Regel, Zirkulation/Begleitheizung, Probeentnahmestellen und Spüleinrichtungen objektspezifisch prüfen.';
+
+  return `
+  ${_header(meta, 'Trinkwasserberechnung')}
+
+  <div class="sec">Basisdaten</div>
+  <table>
+    <tr><td>Gebäudetyp</td><td class="num">${r.building || '–'}</td></tr>
+    <tr><td>Warmwasserbereitung</td><td class="num">${ww}</td></tr>
+    <tr><td>Nutzungseinheiten</td><td class="num">${r.neInfo || '–'}</td></tr>
+    <tr><td>PWH-Leitungsvolumen</td><td class="num">${r.lineVol != null ? r.lineVol + ' l' : '–'}</td></tr>
+  </table>
+
+  <div class="sec">Entnahmestellen</div>
+  <table>
+    <thead><tr><th>Entnahmestelle</th><th>Anzahl</th><th>V<sub>R</sub></th><th>Summe</th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="4" style="text-align:center;color:#aaa">Keine Entnahmestellen eingetragen</td></tr>'}</tbody>
+  </table>
+
+  <div class="sec">Ergebnisse</div>
+  <div class="res-grid">
+    <div class="res-box"><div class="res-title">Durchflüsse</div>
+      <div class="res-row"><span class="res-key">ΣV<sub>R</sub> kalt</span><span class="res-val">${_twPdfNum(r.cold)} l/s</span></div>
+      <div class="res-row"><span class="res-key">ΣV<sub>R</sub> warm</span><span class="res-val">${_twPdfNum(r.warm)} l/s</span></div>
+      <div class="res-row"><span class="res-key">ΣV<sub>R</sub> gesamt</span><span class="res-val">${_twPdfNum(r.total)} l/s</span></div>
+      <div class="res-row"><span class="res-key">V<sub>S</sub></span><span class="res-val">${_twPdfNum(r.peak)} l/s</span></div>
+    </div>
+    <div class="res-box"><div class="res-title">Auslegung</div>
+      <div class="res-row"><span class="res-key">V<sub>S</sub></span><span class="res-val">${_twPdfNum(r.peakM3h)} m³/h</span></div>
+      <div class="res-row"><span class="res-key">Hauptleitung</span><span class="res-val">${r.dn || '–'}</span></div>
+      <div class="res-row"><span class="res-key">Hauswasserzähler</span><span class="res-val">${r.meter || '–'}</span></div>
+      <div class="res-row"><span class="res-key">Zirkulation</span><span class="res-val">${r.circ || '–'}</span></div>
+    </div>
+  </div>
+
+  <div class="sec">Hinweise</div>
+  <p style="font-size:8pt;color:#444;line-height:1.55;background:#f5f7fa;border:1px solid #e0e6ef;border-radius:5px;padding:7px 9px">${hints}</p>
+  <p style="font-size:7pt;color:#aaa;margin-top:5px">DIN 1988-300 orientierte Schnellberechnung. Keine vollständige Rohrnetz- oder Druckverlustberechnung.</p>`;
+}
+
+function _twPdfNum(v) {
+  return (v == null || isNaN(v)) ? '–' : Number(v).toFixed(2).replace('.', ',');
+}
+
 /* ───────────────────────────────────────
    HILFSFUNKTIONEN
 ─────────────────────────────────────── */
@@ -860,8 +905,3 @@ function _pdfFmtDiff(a, b) {
   if (isNaN(na) || isNaN(nb)) return '–';
   return (na - nb).toFixed(1) + ' K';
 }
-
-/* ───────────────────────────────────────
-   TRINKWASSERBERECHNUNG
-─────────────────────────────────────── */ 
-

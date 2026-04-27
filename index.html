@@ -64,6 +64,7 @@
     <button class="tab-btn"        data-tab="unit">Einheiten</button>
     <button class="tab-btn"        data-tab="hx">h,x-Diagramm</button>
     <button class="tab-btn"        data-tab="wrg">WRG / Mischluft</button>
+    <button class="tab-btn"        data-tab="trinkwasser">Trinkwasser</button>
     <button class="tab-btn" onclick="hxOpenPdf()" style="color:var(--blue);flex-shrink:0">⬇ PDF</button>
   </nav>
 </header>
@@ -901,20 +902,88 @@
 </div>
 </div><!-- /tab-wrg -->
 
-</main><!-- /app-shell -->
 
-<!-- ===============================================
-     TAB TRINKWASSER
-=============================================== -->  
-
+<!-- ══════════════════════════════════════════════════════
+     TAB: TRINKWASSER
+══════════════════════════════════════════════════════ -->
 <div id="tab-trinkwasser" class="tab-panel" style="display:none">
   <div class="tab-inner">
+
     <div class="gc">
-      <div class="slbl">Trinkwasserberechnung – DIN 1988-300</div>
-      <div id="tw-results"></div>
+      <div class="slbl">Trinkwasser &mdash; Basisdaten</div>
+      <div class="igrp">
+        <div class="ilbl">Gebäudetyp / Nutzungsart</div>
+        <select class="gl-sel" id="tw-building">
+          <option value="wohn">Wohngebäude</option>
+          <option value="hotel">Hotel / Beherbergung</option>
+          <option value="verw">Verwaltung / Büro</option>
+          <option value="schule">Schule / Sportstätte</option>
+          <option value="pflege">Pflege / Krankenhaus</option>
+        </select>
+      </div>
+      <div class="igrp" style="margin-bottom:0">
+        <div class="ilbl">Warmwasserbereitung</div>
+        <select class="gl-sel" id="tw-ww-mode">
+          <option value="zentral">zentral</option>
+          <option value="dezentral">dezentral / Durchlauferhitzer</option>
+        </select>
+      </div>
     </div>
+
+    <div class="gc">
+      <div class="slbl">Entnahmestellen</div>
+      <div id="tw-fixtures"></div>
+    </div>
+
+    <div class="gc">
+      <div class="slbl">Nutzungseinheiten / Gleichzeitigkeitsansatz</div>
+      <label style="display:flex;gap:10px;align-items:center;margin-bottom:12px;color:var(--t2);font-family:var(--f);font-size:13px">
+        <input id="tw-ne-mode" type="checkbox"/> Nutzungseinheiten berücksichtigen
+      </label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="igrp" style="margin-bottom:0">
+          <div class="ilbl">Anzahl NE</div>
+          <div class="iwrap"><input class="inp-sm" id="tw-ne-count" type="number" min="0" step="1" value="0"/><span class="iunit">NE</span></div>
+        </div>
+        <div class="igrp" style="margin-bottom:0">
+          <div class="ilbl">Ansatz je NE</div>
+          <div class="iwrap"><input class="inp-sm" id="tw-ne-vs" type="number" min="0" step="0.01" value="0.20"/><span class="iunit">l/s</span></div>
+        </div>
+      </div>
+      <div class="info-txt" style="margin-top:10px">Für WC-Räume oder Nutzungseinheiten kann hier ein praxisorientierter Gleichzeitigkeitsansatz gesetzt werden.</div>
+    </div>
+
+    <div class="out-card">
+      <div class="slbl">Ergebnis &mdash; Trinkwasser</div>
+      <div class="out-grid" style="grid-template-columns:1fr 1fr">
+        <div class="ob"><div class="ob-title">Summendurchfluss kalt</div><div class="out-val has" id="tw-sum-cold">–</div></div>
+        <div class="ob"><div class="ob-title">Summendurchfluss warm</div><div class="out-val has" id="tw-sum-warm">–</div></div>
+        <div class="ob"><div class="ob-title">Summendurchfluss gesamt</div><div class="out-val has" id="tw-sum-total">–</div></div>
+        <div class="ob"><div class="ob-title">Spitzendurchfluss</div><div class="out-val has" id="tw-peak">–</div><div style="font-family:var(--fm);font-size:12px;color:var(--t3)" id="tw-peak-m3h">–</div></div>
+        <div class="ob"><div class="ob-title">Hauptleitungsdimension</div><div class="out-val has" id="tw-dn">–</div></div>
+        <div class="ob"><div class="ob-title">Hauswasserzähler</div><div class="out-val has" id="tw-meter">–</div></div>
+      </div>
+      <button onclick="openPdfSheet()" style="width:100%;height:52px;border:none;border-radius:var(--r-m);background:var(--grn-t);border:1px solid var(--grn-b);color:var(--grn);font-family:var(--f);font-size:15px;font-weight:700;cursor:pointer;margin-top:14px">PDF Export</button>
+    </div>
+
+    <div class="gc">
+      <div class="slbl">Hygiene / Hinweise</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div><div class="ilbl">Nutzungseinheiten</div><div class="chip"><strong id="tw-ne-info">–</strong></div></div>
+        <div><div class="ilbl">PWH-Leitungsvolumen</div><div class="iwrap"><input class="inp-sm" id="tw-line-vol" type="number" min="0" step="0.1" value="0"/><span class="iunit">l</span></div></div>
+      </div>
+      <div class="chip" style="margin-bottom:10px">Zirkulation: <strong id="tw-circ">–</strong></div>
+      <div class="info-txt" id="tw-hints"></div>
+    </div>
+
+    <div class="fml">V<sub>S</sub> = a · (ΣV<sub>R</sub>)<sup>b</sup> − c &ensp;·&ensp; DIN 1988-300 orientierte Schnellberechnung</div>
+
   </div>
 </div>
+
+</main><!-- /app-shell -->
+
+
 
 <!-- ══════════════════════════════════════════════════════
      BOTTOM PILL NAVIGATION (Mobile)
@@ -997,6 +1066,16 @@
       WRG &amp; Mischluft
     </button>
 
+    <!-- Trinkwasser -->
+    <button class="plus-item" id="plus-trinkwasser" data-tab="trinkwasser">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2C8 7 6 10 6 14a6 6 0 0 0 12 0c0-4-2-7-6-12z"/>
+        <path d="M9 14h6"/>
+      </svg>
+      Trinkwasser
+    </button>
+
+
   </div>
 </div>
 
@@ -1004,6 +1083,7 @@
 <script src="./heating-cooling.js"></script>
 <script src="./ventilation.js"></script>
 <script src="./wrg-mischluft.js"></script>
+<script src="./trinkwasser.js"></script>
 
 <script>
 /* ── Cloudflare Worker Analytics ── */
@@ -1059,7 +1139,6 @@
 
 <script src="./pdf-export.js"></script>
 <script src="./hx-engine.js"></script>
-<script src="trinkwasser.js"></script>
    
 </body>
 </html>

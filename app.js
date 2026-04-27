@@ -19,8 +19,7 @@ const loc  = (v, d) => v.toLocaleString('de-DE', {
 /* ───────────────────────────────────────
    TAB-STEUERUNG
 ─────────────────────────────────────── */
-const TABS = ['flow','luft','pipe','unit','hx','wrg','trinkwasser'];
-
+const TABS = ['flow', 'luft', 'pipe', 'unit', 'hx', 'wrg', 'trinkwasser'];
 
 /* ─── NAVIGATION STATE MACHINE ─── */
 const NAV = {
@@ -51,7 +50,7 @@ const NAV = {
     );
 
     /* Plus-Sheet-Items Markierung */
-    ['pipe','unit','wrg'].forEach(id =>
+    ['pipe','unit','wrg','trinkwasser'].forEach(id =>
       $('plus-' + id)?.classList.toggle('active-tab', id === NAV.activeTab)
     );
 
@@ -118,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
   $('plus-overlay')?.addEventListener('click', closePlusSheet);
 
   // Plus Sheet Items
-  ['pipe','unit','wrg'].forEach(id => {
+  ['pipe','unit','wrg','trinkwasser'].forEach(id => {
     $('plus-' + id)?.addEventListener('click', () => _switchFromPlus(id));
   });
   // Note: plus-hx removed — h,x is now in main pill
