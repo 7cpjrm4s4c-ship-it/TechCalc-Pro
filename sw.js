@@ -4,7 +4,7 @@
 ═══════════════════════════════════════════════════════ */
 'use strict';
 
-const BUILD_TS = '20260428-Phase8Entwaesserung';
+const BUILD_TS = '20260428-Phase8-1-strangfix';
 const CACHE_NAME = `techcalc-${BUILD_TS}`;
 
 const PRECACHE = [

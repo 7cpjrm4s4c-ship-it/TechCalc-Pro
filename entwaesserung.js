@@ -27,7 +27,7 @@ const EW_K = {
   gewerb: { label:'Gewerbe / hohe Gleichzeitigkeit', k:1.0 },
 };
 
-const EW_STATE = { result:null };
+const EW_STATE = { result:null, straenge: JSON.parse(localStorage.getItem('ew_straenge') || '[]')};
 window.EW_STATE = EW_STATE;
 
 function ewNum(v) {
@@ -80,7 +80,8 @@ function initEntwaesserung() {
     el.addEventListener('input', calcEntwaesserung);
     el.addEventListener('change', calcEntwaesserung);
   });
-  ewGet('ew-calc-btn')?.addEventListener('click', calcEntwaesserung);
+  ewGet('ew-calc-btn')?.addEventListener('click', addEntwaesserungStrang);
+  renderStrangListe();
   calcEntwaesserung();
 }
 
