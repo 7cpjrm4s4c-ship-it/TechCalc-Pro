@@ -160,7 +160,7 @@ function triggerPdfPrint() {
   // Aktiven Tab ermitteln — aus DOM oder URL
   let activeTab = 'flow';
   // Check which tab panel is visible
-  ['flow','luft','pipe','unit','hx','wrg','trinkwasser','mag'].forEach(id => {
+  ['flow','luft','pipe','unit','hx','wrg','trinkwasser','mag','entwaesserung'].forEach(id => {
     const el = document.getElementById('tab-' + id);
     if (el && getComputedStyle(el).display !== 'none') activeTab = id;
     if (el && !el.style.display && id === 'flow') activeTab = 'flow';
@@ -177,6 +177,7 @@ function triggerPdfPrint() {
   else if (activeTab === 'wrg')  html = _buildWrgPage(meta);
   else if (activeTab === 'trinkwasser') html = _buildTrinkwasserPage(meta);
   else if (activeTab === 'mag') html = _buildMagPage(meta);
+  else if (activeTab === 'entwaesserung') html = _buildEntwaesserungPage(meta);
   else                           html = _buildFlowPage(meta);
 
   _openPrintWindow(html);
@@ -941,6 +942,41 @@ function _buildMagPage(meta) {
   <div class="sec">Hinweise</div>
   <p style="font-size:8pt;color:#444;line-height:1.55;white-space:pre-line">${hints}</p>
   <p style="font-size:7pt;color:#888;margin-top:6px">Quick-Check zur Vorauslegung. Vollständige Auslegung nach Herstellerangaben und objektspezifischen Randbedingungen prüfen.</p>`;
+}
+
+
+/* ───────────────────────────────────────
+   TAB: ENTWÄSSERUNG
+─────────────────────────────────────── */
+function _buildEntwaesserungPage(meta) {
+  const r = (typeof getEntwaesserungPdfData === 'function') ? getEntwaesserungPdfData() : null;
+  const esc = v => String(v ?? '–').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const fmt = (v,d=2) => (v == null || isNaN(v)) ? '–' : Number(v).toFixed(d).replace('.', ',');
+  const rows = r?.rows?.length ? r.rows.map(row => `<tr><td>${esc(row.label)}</td><td class="num">${row.count}</td><td class="num">${fmt(row.du,1)} DU</td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center;color:#aaa">Keine Verbraucher angesetzt</td></tr>';
+  const hints = r ? (typeof ewHints === 'function' ? ewHints(r) : []).map(h => `• ${esc(h)}`).join('<br>') : '–';
+  return `
+  ${_header(meta, 'Entwässerung — Quick Check')}
+  <div class="sec">Basisdaten</div>
+  <table><tbody>
+    <tr><td>Gebäude / Nutzung</td><td class="num">${esc(r?.useLabel)}</td></tr>
+    <tr><td>Gleichzeitigkeitsbeiwert K</td><td class="num">${fmt(r?.k,2)}</td></tr>
+    <tr><td>Sonderabfluss</td><td class="num">${fmt(r?.specialQ,2)} l/s</td></tr>
+  </tbody></table>
+  <div class="sec">Entwässerungsgegenstände</div>
+  <table><thead><tr><th>Verbraucher</th><th>Anzahl</th><th>DU</th></tr></thead><tbody>${rows}</tbody></table>
+  <div class="sec">Ergebnisse</div>
+  <table><tbody>
+    <tr><td>DU gesamt</td><td class="num">${fmt(r?.duTotal,1)} DU</td></tr>
+    <tr><td>Schmutzwasserabfluss Qww</td><td class="num">${fmt(r?.qww,2)} l/s</td></tr>
+    <tr><td>Anschlussleitung</td><td class="num">${esc(r?.dims?.anschluss)}</td></tr>
+    <tr><td>Sammelleitung</td><td class="num">${esc(r?.dims?.sammel)}</td></tr>
+    <tr><td>Fallleitung</td><td class="num">${esc(r?.dims?.fall)}</td></tr>
+    <tr><td>Grundleitung</td><td class="num">${esc(r?.dims?.grund)}</td></tr>
+  </tbody></table>
+  <div class="fml">Qww = K × √ΣDU</div>
+  <div class="sec">Hinweise</div>
+  <p style="font-size:7.5pt;color:#444;line-height:1.45;background:#f5f7fa;border:1px solid #e0e6ef;border-radius:5px;padding:7px 9px;overflow-wrap:anywhere">${hints}</p>
+  <p style="font-size:6.8pt;color:#888;margin-top:5px">Quick-Check zur überschlägigen Plausibilitätsprüfung. Keine vollständige Entwässerungsplanung.</p>`;
 }
 
 /* ───────────────────────────────────────

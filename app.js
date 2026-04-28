@@ -19,7 +19,7 @@ const loc  = (v, d) => v.toLocaleString('de-DE', {
 /* ───────────────────────────────────────
    TAB-STEUERUNG
 ─────────────────────────────────────── */
-const TABS = ['flow', 'luft', 'pipe', 'unit', 'hx', 'wrg', 'trinkwasser', 'mag'];
+const TABS = ['flow', 'luft', 'pipe', 'unit', 'hx', 'wrg', 'trinkwasser', 'mag', 'entwaesserung'];
 
 const MODULES = {
   flow: { label:'Heizung', fullLabel:'Heizung/Kälte', shortLabel:'Heizung', aria:'Heizung und Kälte', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-1 2.5-2.5 4.5-2 7.5a4 4 0 108 0c0-1.5-.8-3-2-4 0 1.5-1 3-2.5 3S10 7 10 5"/><circle cx="12" cy="17" r="1.2" fill="currentColor" stroke="none"/></svg>' },
@@ -30,6 +30,7 @@ const MODULES = {
   wrg: { label:'WRG', fullLabel:'WRG / Mischluft', shortLabel:'WRG', aria:'WRG und Mischluft', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h12M4 8l3-3M4 8l3 3"/><path d="M20 16H8M20 16l-3-3M20 16l-3 3"/><line x1="12" y1="8" x2="12" y2="16"/></svg>' },
   trinkwasser: { label:'Trinkwasser', fullLabel:'Trinkwasser', shortLabel:'Wasser', aria:'Trinkwasser', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 7 6 10 6 14a6 6 0 0 0 12 0c0-4-2-7-6-12z"/><path d="M9 14h6"/></svg>' },
   mag: { label:'MAG', fullLabel:'MAG / Druckhaltung', shortLabel:'MAG', aria:'MAG und Druckhaltung', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><path d="M12 5v4"/><path d="M8 15c2.4 1.6 5.6 1.6 8 0"/><path d="M12 12h.01"/></svg>' },
+  entwaesserung: { label:'Entwässerung', fullLabel:'Entwässerung', shortLabel:'Abwasser', aria:'Entwässerung', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16"/><path d="M6 5v4a6 6 0 0 0 12 0V5"/><path d="M12 15v6"/><path d="M8 21h8"/></svg>' },
 };
 
 const NAV_STORAGE_KEY = 'tcp_nav_favorites_v1';
@@ -384,6 +385,9 @@ function captureProjectSnapshot() {
   if (window.MAG_STATE) {
     try { snapshot.modules.mag = JSON.parse(JSON.stringify(window.MAG_STATE)); } catch (_) {}
   }
+  if (window.EW_STATE) {
+    try { snapshot.modules.entwaesserung = JSON.parse(JSON.stringify(window.EW_STATE)); } catch (_) {}
+  }
   return snapshot;
 }
 
@@ -426,6 +430,7 @@ function applyProjectSnapshot(snapshot) {
     if (typeof luftCalc === 'function') luftCalc();
     if (typeof calcTrinkwasser === 'function') calcTrinkwasser();
     if (typeof calcMAG === 'function') calcMAG();
+    if (typeof calcEntwaesserung === 'function') calcEntwaesserung();
     if (typeof unitCalc === 'function') unitCalc();
     if (snapshot.activeTab && TABS.includes(snapshot.activeTab)) switchTab(snapshot.activeTab);
     else NAV._apply();

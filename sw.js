@@ -4,14 +4,14 @@
 ═══════════════════════════════════════════════════════ */
 'use strict';
 
-const BUILD_TS = '20260428-Phase7MAG';
+const BUILD_TS = '20260428-Phase8Entwaesserung';
 const CACHE_NAME = `techcalc-${BUILD_TS}`;
 
 const PRECACHE = [
   './', './index.html',
   './tokens.css', './layout.css', './components.css',
   './app.js', './heating-cooling.js', './ventilation.js',
-  './wrg-mischluft.js', './trinkwasser.js', './mag.js', './pdf-export.js', './hx-engine.js',
+  './wrg-mischluft.js', './trinkwasser.js', './mag.js', './entwaesserung.js', './pdf-export.js', './hx-engine.js',
   './manifest.json', './favicon.ico',
   './icon-192.png', './icon-512.png', './icon-180.png',
   './icon-167.png', './icon-152.png'

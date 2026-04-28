@@ -1,0 +1,136 @@
+/* ═══════════════════════════════════════════════════════
+   entwaesserung.js — TechCalc Pro
+   Entwässerung Quick Tool · DU · Schmutzwasserabfluss
+   Quick-Check, keine vollständige Entwässerungsplanung
+═══════════════════════════════════════════════════════ */
+'use strict';
+
+const EW_FIXTURES = [
+  { key:'wc_6',       label:'WC 6 l',                    du:2.0,  pipe:'DN 90 / DN 100' },
+  { key:'wc_9',       label:'WC 9 l / Bestand',          du:2.5,  pipe:'DN 100' },
+  { key:'washbasin',  label:'Waschtisch',                du:0.5,  pipe:'DN 40 / DN 50' },
+  { key:'shower',     label:'Dusche',                    du:0.8,  pipe:'DN 50' },
+  { key:'bath',       label:'Badewanne',                 du:0.8,  pipe:'DN 50' },
+  { key:'urinal',     label:'Urinal',                    du:0.5,  pipe:'DN 50' },
+  { key:'sink',       label:'Küchenspüle',               du:0.8,  pipe:'DN 50' },
+  { key:'dishwasher', label:'Geschirrspüler',            du:0.8,  pipe:'DN 50' },
+  { key:'washer',     label:'Waschmaschine',             du:0.8,  pipe:'DN 50' },
+  { key:'floor',      label:'Bodenablauf',               du:0.8,  pipe:'DN 50 / DN 70' },
+  { key:'special',    label:'Sonderverbraucher',         du:1.0,  pipe:'objektbezogen' },
+];
+
+const EW_K = {
+  wohn:   { label:'Wohngebäude / wohnähnlich', k:0.5 },
+  buero:  { label:'Büro / Verwaltung',         k:0.5 },
+  hotel:  { label:'Hotel / Beherbergung',      k:0.7 },
+  schule: { label:'Schule / Sport / öffentlich', k:0.7 },
+  gewerb: { label:'Gewerbe / hohe Gleichzeitigkeit', k:1.0 },
+};
+
+const EW_STATE = { result:null };
+window.EW_STATE = EW_STATE;
+
+function ewNum(v) {
+  if (v == null) return 0;
+  const n = parseFloat(String(v).replace(',', '.').trim());
+  return isNaN(n) ? 0 : n;
+}
+function ewFmt(v, d=2) { return (isNaN(v) || v == null) ? '–' : Number(v).toFixed(d).replace('.', ','); }
+function ewGet(id) { return document.getElementById(id); }
+
+function ewRecommendedPipe(qww, du) {
+  if (du <= 2.5 && qww <= 1.0) return { anschluss:'DN 50', sammel:'DN 70', fall:'DN 70 / DN 80', grund:'DN 100' };
+  if (du <= 8 && qww <= 2.0)   return { anschluss:'DN 70', sammel:'DN 80 / DN 100', fall:'DN 100', grund:'DN 100' };
+  if (du <= 20 && qww <= 3.5)  return { anschluss:'DN 100', sammel:'DN 100', fall:'DN 100', grund:'DN 125' };
+  if (du <= 50 && qww <= 6.0)  return { anschluss:'DN 100', sammel:'DN 125', fall:'DN 125', grund:'DN 150' };
+  return { anschluss:'objektbezogen', sammel:'DN 150+', fall:'DN 150+', grund:'DN 150+' };
+}
+
+function ewHints(result) {
+  const hints = [];
+  hints.push('Lüftung der Entwässerungsanlage prüfen: Hauptlüftung / Nebenlüftung nach Anlagenaufbau berücksichtigen.');
+  hints.push('Rückstauebene und ggf. Rückstausicherung/Hebeanlage objektbezogen prüfen.');
+  hints.push('Gefälle, Füllungsgrad, Leitungslängen, Richtungsänderungen und örtliche Satzungen bleiben separat zu prüfen.');
+  if (result.duTotal > 20) hints.push('Hohe DU-Summe: Dimensionierung und Lüftung fachplanerisch vertiefen.');
+  if (result.floorCount > 0) hints.push('Bodenabläufe nur mit geeigneter Geruchsverschluss-/Sperrwasserlösung und Nutzungskonzept ansetzen.');
+  return hints;
+}
+
+function ewRowsHtml() {
+  return EW_FIXTURES.map(f => `
+    <div class="ew-row" data-ew-key="${f.key}">
+      <div class="ew-fixture">
+        <strong>${f.label}</strong>
+        <span>DU ${ewFmt(f.du,1)} · ${f.pipe}</span>
+      </div>
+      <div class="iwrap ew-count-wrap">
+        <input class="inp-sm ew-count" id="ew-${f.key}" type="number" min="0" step="1" value="0" inputmode="numeric" aria-label="${f.label} Anzahl">
+        <span class="iunit">Stk.</span>
+      </div>
+    </div>`).join('');
+}
+
+function initEntwaesserung() {
+  const list = ewGet('ew-fixture-list');
+  if (list && !list.dataset.ready) {
+    list.innerHTML = ewRowsHtml();
+    list.dataset.ready = '1';
+  }
+  document.querySelectorAll('#tab-entwaesserung input, #tab-entwaesserung select').forEach(el => {
+    el.addEventListener('input', calcEntwaesserung);
+    el.addEventListener('change', calcEntwaesserung);
+  });
+  ewGet('ew-calc-btn')?.addEventListener('click', calcEntwaesserung);
+  calcEntwaesserung();
+}
+
+function calcEntwaesserung() {
+  const use = ewGet('ew-use')?.value || 'wohn';
+  const kData = EW_K[use] || EW_K.wohn;
+  let duTotal = 0;
+  let floorCount = 0;
+  const rows = [];
+
+  EW_FIXTURES.forEach(f => {
+    const n = Math.max(0, Math.round(ewNum(ewGet('ew-' + f.key)?.value)));
+    const du = n * f.du;
+    if (n > 0) rows.push({ ...f, count:n, du });
+    duTotal += du;
+    if (f.key === 'floor') floorCount += n;
+  });
+
+  const specialQ = ewNum(ewGet('ew-special-q')?.value); // l/s Zuschlag
+  const qww = duTotal > 0 ? kData.k * Math.sqrt(duTotal) + specialQ : specialQ;
+  const dims = ewRecommendedPipe(qww, duTotal);
+  const result = { use, useLabel:kData.label, k:kData.k, duTotal, specialQ, qww, dims, rows, floorCount };
+  EW_STATE.result = result;
+  renderEntwaesserung(result);
+  return result;
+}
+
+function renderEntwaesserung(r) {
+  const set = (id, txt) => { const el = ewGet(id); if (el) el.textContent = txt; };
+  set('ew-du-total', ewFmt(r.duTotal, 1));
+  set('ew-qww', ewFmt(r.qww, 2));
+  set('ew-dim-anschluss', r.dims.anschluss);
+  set('ew-dim-sammel', r.dims.sammel);
+  set('ew-dim-fall', r.dims.fall);
+  set('ew-dim-grund', r.dims.grund);
+  set('ew-k-label', `K = ${ewFmt(r.k, 2)} · ${r.useLabel}`);
+
+  const detail = ewGet('ew-detail');
+  if (detail) {
+    detail.innerHTML = r.rows.length ? r.rows.map(row => `
+      <div class="ew-detail-row"><span>${row.count}× ${row.label}</span><strong>${ewFmt(row.du,1)} DU</strong></div>`).join('')
+      : '<p style="color:var(--t3);font-size:12px;text-align:center;padding:8px 0">Entwässerungsgegenstände eingeben →</p>';
+  }
+  const hints = ewGet('ew-hints');
+  if (hints) hints.innerHTML = ewHints(r).map(h => `<div>• ${h}</div>`).join('');
+}
+
+function getEntwaesserungPdfData() {
+  return EW_STATE.result || calcEntwaesserung();
+}
+window.getEntwaesserungPdfData = getEntwaesserungPdfData;
+
+document.addEventListener('DOMContentLoaded', initEntwaesserung);
