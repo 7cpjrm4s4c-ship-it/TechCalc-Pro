@@ -77,6 +77,7 @@
     <button class="tab-btn"        data-tab="hx">h,x-Diagramm</button>
     <button class="tab-btn"        data-tab="wrg">WRG / Mischluft</button>
     <button class="tab-btn"        data-tab="trinkwasser">Trinkwasser</button>
+    <button class="tab-btn"        data-tab="mag">MAG / Druckhaltung</button>
   </nav>
 </header>
 
@@ -1087,6 +1088,48 @@
   </div>
 </div>
 
+
+<!-- ══════════════════════════════════════════════════════
+     TAB: MAG / DRUCKHALTUNG
+══════════════════════════════════════════════════════ -->
+<div id="tab-mag" class="tab-panel" style="display:none">
+  <div class="tab-inner">
+    <div class="mag-desktop-left">
+      <div class="gc gc-mag">
+        <div class="slbl">MAG / Druckhaltung — Basisdaten</div>
+        <div class="igrp"><div class="ilbl">Anlagentyp</div><select class="gl-sel" id="mag-system"><option value="heizung">Heizungsanlage</option><option value="kaelte">Kühlanlage</option><option value="solar">Solaranlage</option><option value="technik">Technische Anlage</option></select></div>
+        <div class="igrp"><div class="ilbl">Medium</div><select class="gl-sel" id="mag-medium"><option value="water">Wasser</option><option value="glycol25">Wasser / Glykol 25 %</option><option value="glycol35">Wasser / Glykol 35 %</option></select></div>
+        <div class="igrp"><div class="ilbl">Anlagenvolumen</div><div class="iwrap"><input class="inp" id="mag-volume" type="number" min="0" step="10" placeholder="z.B. 850" inputmode="decimal"><span class="iunit">l</span></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap-s)">
+          <div class="igrp"><div class="ilbl">Min. Temperatur</div><div class="iwrap"><input class="inp-sm" id="mag-tmin" type="number" step="1" value="10" inputmode="decimal"><span class="iunit">°C</span></div></div>
+          <div class="igrp"><div class="ilbl">Max. Temperatur</div><div class="iwrap"><input class="inp-sm" id="mag-tmax" type="number" step="1" value="70" inputmode="decimal"><span class="iunit">°C</span></div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap-s)">
+          <div class="igrp"><div class="ilbl">Statische Höhe</div><div class="iwrap"><input class="inp-sm" id="mag-height" type="number" min="0" step="0.5" placeholder="z.B. 12" inputmode="decimal"><span class="iunit">m</span></div></div>
+          <div class="igrp"><div class="ilbl">Sicherheitsventil</div><div class="iwrap"><input class="inp-sm" id="mag-sv" type="number" min="1" step="0.5" value="3" inputmode="decimal"><span class="iunit">bar</span></div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap-s)">
+          <div class="igrp"><div class="ilbl">Vordruck manuell</div><div class="iwrap"><input class="inp-sm" id="mag-p0" type="number" min="0" step="0.1" placeholder="auto" inputmode="decimal"><span class="iunit">bar</span></div></div>
+          <div class="igrp"><div class="ilbl">Enddruck manuell</div><div class="iwrap"><input class="inp-sm" id="mag-pe" type="number" min="0" step="0.1" placeholder="auto" inputmode="decimal"><span class="iunit">bar</span></div></div>
+        </div>
+        <button id="mag-calc-btn" type="button" class="mag-calc-btn">MAG berechnen</button>
+      </div>
+    </div>
+    <div class="mag-desktop-right">
+      <div class="out-card mag-result-card"><div class="slbl">Ergebnis — MAG / Druckhaltung</div><div class="out-grid" style="grid-template-columns:1fr;gap:8px">
+        <div class="ob mag-ob"><div class="ob-title">Ausdehnungsvolumen</div><div class="out-val has" id="mag-ve">–</div></div>
+        <div class="ob mag-ob"><div class="ob-title">Wasservorlage / Reserve</div><div class="out-val has" id="mag-reserve">–</div></div>
+        <div class="ob mag-ob"><div class="ob-title">Mindest-MAG Volumen</div><div class="out-val has" id="mag-vn-min">–</div></div>
+        <div class="ob mag-ob"><div class="ob-title">Empfohlene MAG-Größe</div><div class="out-val has" id="mag-vn-rec">–</div></div>
+        <div class="ob mag-ob"><div class="ob-title">Vordruck / Fülldruck</div><div class="out-val has" id="mag-pressures">–</div></div>
+        <div class="ob mag-ob"><div class="ob-title">Enddruck</div><div class="out-val has" id="mag-pe-out">–</div></div>
+      </div></div>
+      <div class="fml">V<sub>e</sub> = V<sub>A</sub> · e &ensp;·&ensp; V<sub>N</sub> = (V<sub>e</sub> + V<sub>WV</sub>) · (p<sub>e</sub> + 1) / (p<sub>e</sub> − p<sub>0</sub>)</div>
+      <div class="gc"><div class="slbl">Hinweise</div><div class="info-txt" id="mag-hints">Anlagenvolumen eingeben und Berechnung starten.</div></div>
+    </div>
+  </div>
+</div>
+
 </main><!-- /app-shell -->
 
 
@@ -1106,12 +1149,13 @@
   <div class="plus-grid"></div>
 </div>
 
-<script>window.TECHCALC_BUILD = "20260428-Phase3_1DesktopSpacing";</script>
+<script>window.TECHCALC_BUILD = "20260428-Phase7MAG";</script>
 <script src="./app.js"></script>
 <script src="./heating-cooling.js"></script>
 <script src="./ventilation.js"></script>
 <script src="./wrg-mischluft.js"></script>
 <script src="./trinkwasser.js"></script>
+<script src="./mag.js"></script>
 
 <script>
 /* ── Cloudflare Worker Analytics ── */

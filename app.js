@@ -19,7 +19,7 @@ const loc  = (v, d) => v.toLocaleString('de-DE', {
 /* ───────────────────────────────────────
    TAB-STEUERUNG
 ─────────────────────────────────────── */
-const TABS = ['flow', 'luft', 'pipe', 'unit', 'hx', 'wrg', 'trinkwasser'];
+const TABS = ['flow', 'luft', 'pipe', 'unit', 'hx', 'wrg', 'trinkwasser', 'mag'];
 
 const MODULES = {
   flow: { label:'Heizung', fullLabel:'Heizung/Kälte', shortLabel:'Heizung', aria:'Heizung und Kälte', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-1 2.5-2.5 4.5-2 7.5a4 4 0 108 0c0-1.5-.8-3-2-4 0 1.5-1 3-2.5 3S10 7 10 5"/><circle cx="12" cy="17" r="1.2" fill="currentColor" stroke="none"/></svg>' },
@@ -29,6 +29,7 @@ const MODULES = {
   hx: { label:'h,x', fullLabel:'h,x-Diagramm', shortLabel:'h,x', aria:'h,x-Diagramm', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 20 7 10 11 14 15 6 21 6"/><path d="M3 20h18M3 20V4"/></svg>' },
   wrg: { label:'WRG', fullLabel:'WRG / Mischluft', shortLabel:'WRG', aria:'WRG und Mischluft', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h12M4 8l3-3M4 8l3 3"/><path d="M20 16H8M20 16l-3-3M20 16l-3 3"/><line x1="12" y1="8" x2="12" y2="16"/></svg>' },
   trinkwasser: { label:'Trinkwasser', fullLabel:'Trinkwasser', shortLabel:'Wasser', aria:'Trinkwasser', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 7 6 10 6 14a6 6 0 0 0 12 0c0-4-2-7-6-12z"/><path d="M9 14h6"/></svg>' },
+  mag: { label:'MAG', fullLabel:'MAG / Druckhaltung', shortLabel:'MAG', aria:'MAG und Druckhaltung', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><path d="M12 5v4"/><path d="M8 15c2.4 1.6 5.6 1.6 8 0"/><path d="M12 12h.01"/></svg>' },
 };
 
 const NAV_STORAGE_KEY = 'tcp_nav_favorites_v1';
@@ -380,6 +381,9 @@ function captureProjectSnapshot() {
   if (window._hxState) {
     try { snapshot.modules.hx = JSON.parse(JSON.stringify(window._hxState)); } catch (_) {}
   }
+  if (window.MAG_STATE) {
+    try { snapshot.modules.mag = JSON.parse(JSON.stringify(window.MAG_STATE)); } catch (_) {}
+  }
   return snapshot;
 }
 
@@ -413,11 +417,15 @@ function applyProjectSnapshot(snapshot) {
     window._hxState = snapshot.modules.hx;
     if (typeof drawHxChart === 'function') setTimeout(() => drawHxChart(window._hxState), 120);
   }
+  if (snapshot.modules?.mag && window.MAG_STATE) {
+    Object.assign(window.MAG_STATE, JSON.parse(JSON.stringify(snapshot.modules.mag)));
+  }
 
   setTimeout(() => {
     if (typeof calcAll === 'function') calcAll();
     if (typeof luftCalc === 'function') luftCalc();
     if (typeof calcTrinkwasser === 'function') calcTrinkwasser();
+    if (typeof calcMAG === 'function') calcMAG();
     if (typeof unitCalc === 'function') unitCalc();
     if (snapshot.activeTab && TABS.includes(snapshot.activeTab)) switchTab(snapshot.activeTab);
     else NAV._apply();

@@ -160,7 +160,7 @@ function triggerPdfPrint() {
   // Aktiven Tab ermitteln — aus DOM oder URL
   let activeTab = 'flow';
   // Check which tab panel is visible
-  ['flow','luft','pipe','unit','hx','wrg','trinkwasser'].forEach(id => {
+  ['flow','luft','pipe','unit','hx','wrg','trinkwasser','mag'].forEach(id => {
     const el = document.getElementById('tab-' + id);
     if (el && getComputedStyle(el).display !== 'none') activeTab = id;
     if (el && !el.style.display && id === 'flow') activeTab = 'flow';
@@ -176,6 +176,7 @@ function triggerPdfPrint() {
   else if (activeTab === 'hx')   html = _buildHxPage(meta);
   else if (activeTab === 'wrg')  html = _buildWrgPage(meta);
   else if (activeTab === 'trinkwasser') html = _buildTrinkwasserPage(meta);
+  else if (activeTab === 'mag') html = _buildMagPage(meta);
   else                           html = _buildFlowPage(meta);
 
   _openPrintWindow(html);
@@ -905,6 +906,41 @@ function _buildTrinkwasserPage(meta) {
 
 function _twPdfNum(v) {
   return (v == null || isNaN(v)) ? '–' : Number(v).toFixed(2).replace('.', ',');
+}
+
+
+
+/* ───────────────────────────────────────
+   TAB: MAG / DRUCKHALTUNG
+─────────────────────────────────────── */
+function _buildMagPage(meta) {
+  const val = id => document.getElementById(id)?.textContent?.trim() || '–';
+  const input = id => document.getElementById(id)?.value?.trim() || '–';
+  const selText = id => { const el = document.getElementById(id); return el?.options?.[el.selectedIndex]?.text || '–'; };
+  const hints = document.getElementById('mag-hints')?.innerText?.trim() || '–';
+  return `
+  ${_header(meta, 'MAG / Druckhaltung — Quick Check')}
+  <div class="sec">Basisdaten</div>
+  <table><tbody>
+    <tr><td>Anlagentyp</td><td class="num">${selText('mag-system')}</td></tr>
+    <tr><td>Medium</td><td class="num">${selText('mag-medium')}</td></tr>
+    <tr><td>Anlagenvolumen</td><td class="num">${_pdfFmt(input('mag-volume'))} l</td></tr>
+    <tr><td>Temperaturen</td><td class="num">${_pdfFmt(input('mag-tmin'))} / ${_pdfFmt(input('mag-tmax'))} °C</td></tr>
+    <tr><td>Statische Höhe</td><td class="num">${_pdfFmt(input('mag-height'))} m</td></tr>
+    <tr><td>Sicherheitsventil</td><td class="num">${_pdfFmt(input('mag-sv'))} bar</td></tr>
+  </tbody></table>
+  <div class="sec">Ergebnisse</div>
+  <table><tbody>
+    <tr><td>Ausdehnungsvolumen</td><td class="num">${val('mag-ve')}</td></tr>
+    <tr><td>Wasservorlage / Reserve</td><td class="num">${val('mag-reserve')}</td></tr>
+    <tr><td>Mindest-MAG Volumen</td><td class="num">${val('mag-vn-min')}</td></tr>
+    <tr><td>Empfohlene MAG-Größe</td><td class="num">${val('mag-vn-rec')}</td></tr>
+    <tr><td>Vordruck / Fülldruck</td><td class="num">${val('mag-pressures')}</td></tr>
+    <tr><td>Enddruck</td><td class="num">${val('mag-pe-out')}</td></tr>
+  </tbody></table>
+  <div class="sec">Hinweise</div>
+  <p style="font-size:8pt;color:#444;line-height:1.55;white-space:pre-line">${hints}</p>
+  <p style="font-size:7pt;color:#888;margin-top:6px">Quick-Check zur Vorauslegung. Vollständige Auslegung nach Herstellerangaben und objektspezifischen Randbedingungen prüfen.</p>`;
 }
 
 /* ───────────────────────────────────────
