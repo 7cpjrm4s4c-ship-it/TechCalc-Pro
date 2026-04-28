@@ -94,7 +94,7 @@
   <div class="app-menu-section">
     <div class="app-menu-section-title">Aktionen</div>
     <button class="app-menu-item" type="button" data-menu-action="pdf"><span>PDF Export</span><small>Aktuellen Tab dokumentieren</small></button>
-    <button class="app-menu-item" type="button" data-menu-action="nav-config"><span>Schnellzugriffe bearbeiten</span><small>Navigation Pill vorbereiten</small></button>
+    <button class="app-menu-item" type="button" data-menu-action="nav-config"><span>Schnellzugriffe bearbeiten</span><small>4 Module auswählen</small></button>
     <button class="app-menu-item" type="button" data-menu-action="favorites"><span>Favoriten</span><small>Vorbereitet</small></button>
     <button class="app-menu-item" type="button" data-menu-action="projects"><span>Projekte</span><small>Vorbereitet</small></button>
   </div>
@@ -118,6 +118,27 @@
     <button class="app-menu-item" type="button" data-menu-action="legal"><span>Impressum / Datenschutz</span><small>Vorbereitet</small></button>
   </div>
 </aside>
+<!-- ══ SCHNELLZUGRIFFE KONFIGURATION ══ -->
+<div class="nav-config-overlay" id="nav-config-overlay" aria-hidden="true"></div>
+<aside class="nav-config-sheet" id="nav-config-sheet" role="dialog" aria-label="Schnellzugriffe bearbeiten" aria-modal="true">
+  <div class="nav-config-head">
+    <div>
+      <div class="nav-config-title">Schnellzugriffe bearbeiten</div>
+      <div class="nav-config-sub">Wähle genau 4 Module für die Navigation Pill.</div>
+    </div>
+    <button class="app-menu-close" id="nav-config-close" type="button" aria-label="Schnellzugriffe schließen">×</button>
+  </div>
+  <div class="nav-config-status" id="nav-config-count">4/4 Schnellzugriffe</div>
+  <div class="nav-config-section-title">Aktive Navigation Pill</div>
+  <div class="nav-config-selected" id="nav-config-selected"></div>
+  <div class="nav-config-section-title">Alle Module</div>
+  <div class="nav-config-list" id="nav-config-list"></div>
+  <div class="nav-config-actions">
+    <button type="button" id="nav-config-reset" class="nav-config-secondary">Standard</button>
+    <button type="button" id="nav-config-save" class="nav-config-primary">Speichern</button>
+  </div>
+</aside>
+
 
 <!-- ══════════════════════════════════════════════════════
      TAB: MASSENSTROM
@@ -1052,7 +1073,7 @@
   <div class="plus-grid"></div>
 </div>
 
-<script>window.TECHCALC_BUILD = "20260428-Phase2Nav";</script>
+<script>window.TECHCALC_BUILD = "20260428-Phase3NavConfig";</script>
 <script src="./app.js"></script>
 <script src="./heating-cooling.js"></script>
 <script src="./ventilation.js"></script>

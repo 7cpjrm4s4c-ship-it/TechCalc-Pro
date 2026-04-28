@@ -160,6 +160,96 @@ function openAppMenu()  { MENU.open = true;  closePlusSheet(); MENU._apply(); }
 function closeAppMenu() { MENU.open = false; MENU._apply(); }
 function toggleAppMenu(){ MENU.open = !MENU.open; if (MENU.open) closePlusSheet(); MENU._apply(); }
 
+/* ─── NAV FAVORITES CONFIG SHEET ─── */
+const NAV_CONFIG = {
+  open: false,
+  draft: [],
+  _apply() {
+    document.body.classList.toggle('nav-config-open', NAV_CONFIG.open);
+    $('nav-config-overlay')?.classList.toggle('open', NAV_CONFIG.open);
+    $('nav-config-sheet')?.classList.toggle('open', NAV_CONFIG.open);
+    if (NAV_CONFIG.open) renderNavConfig();
+  },
+};
+
+function openNavConfig() {
+  NAV_CONFIG.draft = NAV_FAVORITES.slice(0, 4);
+  NAV_CONFIG.open = true;
+  closeAppMenu();
+  closePlusSheet();
+  NAV_CONFIG._apply();
+}
+function closeNavConfig() { NAV_CONFIG.open = false; NAV_CONFIG._apply(); }
+function toggleNavConfig() { NAV_CONFIG.open ? closeNavConfig() : openNavConfig(); }
+
+function _navConfigToggle(id) {
+  if (!TABS.includes(id)) return;
+  const i = NAV_CONFIG.draft.indexOf(id);
+  if (i >= 0) NAV_CONFIG.draft.splice(i, 1);
+  else {
+    if (NAV_CONFIG.draft.length >= 4) return;
+    NAV_CONFIG.draft.push(id);
+  }
+  renderNavConfig();
+}
+function _navConfigMove(id, dir) {
+  const i = NAV_CONFIG.draft.indexOf(id);
+  if (i < 0) return;
+  const j = i + dir;
+  if (j < 0 || j >= NAV_CONFIG.draft.length) return;
+  [NAV_CONFIG.draft[i], NAV_CONFIG.draft[j]] = [NAV_CONFIG.draft[j], NAV_CONFIG.draft[i]];
+  renderNavConfig();
+}
+function saveNavConfig() {
+  setNavFavorites(NAV_CONFIG.draft);
+  closeNavConfig();
+}
+function resetNavConfig() {
+  NAV_CONFIG.draft = NAV_DEFAULT_FAVORITES.slice(0, 4);
+  renderNavConfig();
+}
+function renderNavConfig() {
+  const selectedEl = $('nav-config-selected');
+  const listEl = $('nav-config-list');
+  const saveBtn = $('nav-config-save');
+  const countEl = $('nav-config-count');
+  if (!selectedEl || !listEl) return;
+
+  const draft = NAV_CONFIG.draft.filter(id => TABS.includes(id)).slice(0, 4);
+  NAV_CONFIG.draft = draft;
+  if (countEl) countEl.textContent = `${draft.length}/4 Schnellzugriffe`;
+  if (saveBtn) saveBtn.disabled = draft.length !== 4;
+
+  selectedEl.innerHTML = draft.map((id, idx) => {
+    const m = MODULES[id];
+    return `<div class="nav-slot" data-id="${id}">
+      <div class="nav-slot-rank">${idx + 1}</div>
+      <div class="nav-slot-icon">${m.icon}</div>
+      <div class="nav-slot-main"><strong>${m.fullLabel}</strong><small>${idx === 0 ? 'Links' : idx === 3 ? 'Rechts' : 'Position ' + (idx + 1)}</small></div>
+      <button type="button" class="nav-move" data-move="up" data-id="${id}" ${idx === 0 ? 'disabled' : ''}>↑</button>
+      <button type="button" class="nav-move" data-move="down" data-id="${id}" ${idx === draft.length - 1 ? 'disabled' : ''}>↓</button>
+      <button type="button" class="nav-remove" data-remove="${id}" aria-label="Entfernen">×</button>
+    </div>`;
+  }).join('') || '<div class="nav-config-empty">Noch keine Schnellzugriffe ausgewählt.</div>';
+
+  listEl.innerHTML = TABS.map(id => {
+    const m = MODULES[id];
+    const on = draft.includes(id);
+    const disabled = !on && draft.length >= 4;
+    return `<button type="button" class="nav-module ${on ? 'selected' : ''}" data-nav-module="${id}" ${disabled ? 'disabled' : ''}>
+      <span class="nav-module-icon">${m.icon}</span>
+      <span><strong>${m.fullLabel}</strong><small>${on ? 'Auf Navigation Pill' : disabled ? 'Max. 4 erreicht' : 'Zum Schnellzugriff hinzufügen'}</small></span>
+      <b>${on ? '✓' : '+'}</b>
+    </button>`;
+  }).join('');
+
+  selectedEl.querySelectorAll('[data-move]').forEach(btn => {
+    btn.addEventListener('click', () => _navConfigMove(btn.dataset.id, btn.dataset.move === 'up' ? -1 : 1));
+  });
+  selectedEl.querySelectorAll('[data-remove]').forEach(btn => btn.addEventListener('click', () => _navConfigToggle(btn.dataset.remove)));
+  listEl.querySelectorAll('[data-nav-module]').forEach(btn => btn.addEventListener('click', () => _navConfigToggle(btn.dataset.navModule)));
+}
+
 function _setMenuMessage(title, body) {
   alert(title + (body ? '\n\n' + body : ''));
 }
@@ -171,7 +261,7 @@ function _handleMenuAction(action) {
     return;
   }
   if (action === 'nav-config') {
-    _setMenuMessage('Schnellzugriffe', 'Die Navigation Pill ist jetzt dynamisch. Die Bearbeitungsoberfläche mit Drag & Drop folgt in Phase 3.');
+    openNavConfig();
     return;
   }
   if (action === 'favorites') {
@@ -280,10 +370,14 @@ document.addEventListener('DOMContentLoaded', () => {
   $('hdr-menu-btn')?.addEventListener('click', toggleAppMenu);
   $('app-menu-close')?.addEventListener('click', closeAppMenu);
   $('app-menu-overlay')?.addEventListener('click', closeAppMenu);
+  $('nav-config-close')?.addEventListener('click', closeNavConfig);
+  $('nav-config-overlay')?.addEventListener('click', closeNavConfig);
+  $('nav-config-save')?.addEventListener('click', saveNavConfig);
+  $('nav-config-reset')?.addEventListener('click', resetNavConfig);
   document.querySelectorAll('[data-menu-action]').forEach(btn => {
     btn.addEventListener('click', () => _handleMenuAction(btn.dataset.menuAction));
   });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAppMenu(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeAppMenu(); closeNavConfig(); } });
   _setupThemeMenu();
   _setBuildLabel();
 
