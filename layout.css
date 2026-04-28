@@ -886,3 +886,169 @@ body.keyboard-open .plus-sheet {
 :root[data-theme-effective="light"] .fml sub,
 :root[data-theme="light"] .fml sup,
 :root[data-theme-effective="light"] .fml sup { color: #0f62bd !important; }
+
+/* ═══════════════════════════════════════════════════════
+   Phase 5.2 — Light Mode readability + card borders
+═══════════════════════════════════════════════════════ */
+:root[data-theme="light"] .hdr-title,
+:root[data-theme-effective="light"] .hdr-title {
+  color:#0f172a !important;
+  text-shadow:none !important;
+}
+:root[data-theme="light"] .hdr-sub,
+:root[data-theme-effective="light"] .hdr-sub {
+  color:#475569 !important;
+}
+:root[data-theme="light"] .hdr-title-pro,
+:root[data-theme-effective="light"] .hdr-title-pro {
+  color:#1677d2 !important;
+}
+
+/* Formeln liegen mobil oft auf dunklem Hintergrund: deshalb hell genug setzen */
+:root[data-theme="light"] .fml,
+:root[data-theme-effective="light"] .fml {
+  color:#d7e4f5 !important;
+  opacity:1 !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.35);
+}
+:root[data-theme="light"] .fml em,
+:root[data-theme-effective="light"] .fml em,
+:root[data-theme="light"] .fml sub,
+:root[data-theme-effective="light"] .fml sub,
+:root[data-theme="light"] .fml sup,
+:root[data-theme-effective="light"] .fml sup {
+  color:#63b3ff !important;
+}
+
+/* Card-Kanten wieder klar wahrnehmbar, inkl. Top-Right Glow */
+.gc, .out-card, .ob, .pm {
+  border-color:var(--gb-strong) !important;
+}
+.gc-h, .ob-h { border-color:rgba(255,107,53,.52) !important; }
+.gc-c, .ob-c { border-color:rgba(0,196,232,.50) !important; }
+.gc-a { border-color:rgba(167,139,250,.48) !important; }
+.gc-h, .ob-h { box-shadow:inset 0 1px 0 rgba(255,255,255,.09), 0 8px 32px rgba(0,0,0,.52), 0 0 18px rgba(255,107,53,.08) !important; }
+.gc-c, .ob-c { box-shadow:inset 0 1px 0 rgba(255,255,255,.09), 0 8px 32px rgba(0,0,0,.52), 0 0 18px rgba(0,196,232,.08) !important; }
+
+.gc::after, .out-card::after, .ob::after, .pm::after {
+  content:'';
+  position:absolute;
+  top:0;
+  right:0;
+  width:34%;
+  height:36%;
+  max-width:150px;
+  max-height:96px;
+  pointer-events:none;
+  border-top:1px solid rgba(79,168,255,.34);
+  border-right:1px solid rgba(79,168,255,.28);
+  border-radius:inherit;
+  opacity:.95;
+  filter:drop-shadow(0 0 14px rgba(79,168,255,.22));
+}
+.gc-h::after, .ob-h::after {
+  border-top-color:rgba(255,107,53,.48);
+  border-right-color:rgba(255,107,53,.38);
+  filter:drop-shadow(0 0 14px rgba(255,107,53,.24));
+}
+.gc-c::after, .ob-c::after {
+  border-top-color:rgba(0,196,232,.46);
+  border-right-color:rgba(0,196,232,.36);
+  filter:drop-shadow(0 0 14px rgba(0,196,232,.24));
+}
+:root[data-theme="light"] .gc,
+:root[data-theme-effective="light"] .gc,
+:root[data-theme="light"] .out-card,
+:root[data-theme-effective="light"] .out-card,
+:root[data-theme="light"] .ob,
+:root[data-theme-effective="light"] .ob,
+:root[data-theme="light"] .pm,
+:root[data-theme-effective="light"] .pm {
+  border-color:rgba(15,23,42,.34) !important;
+  box-shadow:0 14px 38px rgba(15,23,42,.14), inset 0 1px 0 rgba(255,255,255,.98), inset -1px 1px 0 rgba(22,119,210,.15) !important;
+}
+:root[data-theme="light"] .gc-h,
+:root[data-theme-effective="light"] .gc-h,
+:root[data-theme="light"] .ob-h,
+:root[data-theme-effective="light"] .ob-h {
+  border-color:rgba(224,90,32,.52) !important;
+  box-shadow:0 14px 38px rgba(15,23,42,.14), inset 0 1px 0 rgba(255,255,255,.98), 0 0 0 1px rgba(224,90,32,.08), 0 0 20px rgba(224,90,32,.08) !important;
+}
+:root[data-theme="light"] .gc-c,
+:root[data-theme-effective="light"] .gc-c,
+:root[data-theme="light"] .ob-c,
+:root[data-theme-effective="light"] .ob-c {
+  border-color:rgba(0,141,176,.50) !important;
+  box-shadow:0 14px 38px rgba(15,23,42,.14), inset 0 1px 0 rgba(255,255,255,.98), 0 0 0 1px rgba(0,141,176,.08), 0 0 20px rgba(0,141,176,.08) !important;
+}
+:root[data-theme="light"] .gc::after,
+:root[data-theme-effective="light"] .gc::after,
+:root[data-theme="light"] .out-card::after,
+:root[data-theme-effective="light"] .out-card::after,
+:root[data-theme="light"] .ob::after,
+:root[data-theme-effective="light"] .ob::after,
+:root[data-theme="light"] .pm::after,
+:root[data-theme-effective="light"] .pm::after {
+  border-top-color:rgba(22,119,210,.42);
+  border-right-color:rgba(22,119,210,.34);
+  filter:drop-shadow(0 0 14px rgba(22,119,210,.20));
+}
+
+/* Trinkwasser Ergebnisfelder: lesbar, kompakter und typografisch konsistent */
+#tab-trinkwasser .out-card .out-grid {
+  gap:8px !important;
+}
+#tab-trinkwasser .out-card .ob {
+  min-height:46px !important;
+  padding:10px 13px !important;
+  border-radius:18px !important;
+}
+#tab-trinkwasser .out-card .ob-title {
+  font-family:var(--f) !important;
+  font-size:13px !important;
+  font-weight:700 !important;
+  line-height:1.2 !important;
+  letter-spacing:0 !important;
+  color:var(--t2) !important;
+}
+#tab-trinkwasser .out-card .out-val {
+  font-family:var(--fm) !important;
+  font-size:clamp(19px,5.2vw,24px) !important;
+  line-height:1 !important;
+  font-weight:800 !important;
+  color:var(--blue) !important;
+  letter-spacing:.01em !important;
+}
+#tab-trinkwasser #tw-peak-m3h {
+  font-family:var(--fm) !important;
+  font-size:11px !important;
+  line-height:1.1 !important;
+  margin-top:3px !important;
+  color:var(--t3) !important;
+}
+#tab-trinkwasser .out-card .chip {
+  min-height:26px !important;
+  padding:5px 9px !important;
+  font-size:12px !important;
+  color:var(--t2) !important;
+  border-color:var(--gb-mid) !important;
+}
+#tab-trinkwasser .out-card .chip strong {
+  color:var(--blue) !important;
+}
+:root[data-theme="light"] #tab-trinkwasser .out-card .ob-title,
+:root[data-theme-effective="light"] #tab-trinkwasser .out-card .ob-title {
+  color:#334155 !important;
+}
+:root[data-theme="light"] #tab-trinkwasser .out-card .out-val,
+:root[data-theme-effective="light"] #tab-trinkwasser .out-card .out-val,
+:root[data-theme="light"] #tab-trinkwasser .out-card .chip strong,
+:root[data-theme-effective="light"] #tab-trinkwasser .out-card .chip strong {
+  color:#1677d2 !important;
+}
+:root[data-theme="light"] #tab-trinkwasser #tw-peak-m3h,
+:root[data-theme-effective="light"] #tab-trinkwasser #tw-peak-m3h,
+:root[data-theme="light"] #tab-trinkwasser .out-card .chip,
+:root[data-theme-effective="light"] #tab-trinkwasser .out-card .chip {
+  color:#475569 !important;
+}
