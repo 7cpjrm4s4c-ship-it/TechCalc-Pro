@@ -281,6 +281,14 @@ function _handleMenuAction(action) {
     _setMenuMessage('Projekte', 'Projektverwaltung wird in einer späteren Ausbaustufe aktiviert.');
     return;
   }
+  if (action === 'units') {
+    _setMenuMessage('Standardeinheiten', 'Standardeinheiten werden später zentral für Druck, Leistung, Volumenstrom und Rohrnormen vorbereitet.');
+    return;
+  }
+  if (action === 'pdf-settings') {
+    _setMenuMessage('PDF-Vorlagen', 'PDF-Vorlagen, Firmenlogo und Report-Layout werden in einer späteren Ausbaustufe aktiviert.');
+    return;
+  }
   if (action === 'help') {
     _setMenuMessage('Hinweis', 'TechCalc Pro ist als HLSK Quick Tool für schnelle Prüfung, Nachrechnung und Dokumentation gedacht. Keine vollständige Fachplanung oder Rohrnetzberechnung.');
     return;
@@ -291,17 +299,45 @@ function _handleMenuAction(action) {
 }
 
 function _setupThemeMenu() {
-  const saved = localStorage.getItem('tcp_theme') || 'dark';
-  document.documentElement.dataset.theme = saved;
-  document.querySelectorAll('[data-theme]').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.theme === saved);
-    btn.addEventListener('click', () => {
-      localStorage.setItem('tcp_theme', btn.dataset.theme);
-      document.documentElement.dataset.theme = btn.dataset.theme;
-      document.querySelectorAll('[data-theme]').forEach(b => b.classList.toggle('active', b === btn));
+  const root = document.documentElement;
+  const mq = window.matchMedia ? window.matchMedia("(prefers-color-scheme: light)") : null;
+
+  function effectiveTheme(mode) {
+    if (mode === "system") return mq?.matches ? "light" : "dark";
+    return mode === "light" ? "light" : "dark";
+  }
+
+  function applyTheme(mode) {
+    const safeMode = ["dark", "light", "system"].includes(mode) ? mode : "dark";
+    const effective = effectiveTheme(safeMode);
+    root.dataset.theme = safeMode;
+    root.dataset.themeEffective = effective;
+
+    const meta = document.querySelector("meta[name=\"theme-color\"]");
+    if (meta) meta.setAttribute("content", effective === "light" ? "#f3f6fb" : "#000000");
+
+    document.querySelectorAll("[data-theme]").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.theme === safeMode);
+      btn.setAttribute("aria-pressed", String(btn.dataset.theme === safeMode));
+    });
+  }
+
+  const saved = localStorage.getItem("tcp_theme") || "dark";
+  applyTheme(saved);
+
+  document.querySelectorAll("[data-theme]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const mode = btn.dataset.theme || "dark";
+      localStorage.setItem("tcp_theme", mode);
+      applyTheme(mode);
     });
   });
+
+  mq?.addEventListener?.("change", () => {
+    if ((localStorage.getItem("tcp_theme") || "dark") === "system") applyTheme("system");
+  });
 }
+
 
 function _setBuildLabel() {
   const el = $('app-build-label');

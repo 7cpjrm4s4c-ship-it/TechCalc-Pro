@@ -684,3 +684,38 @@ body.keyboard-open .plus-sheet {
     grid-row: auto !important;
   }
 }
+
+/* Phase 4 - Theme polish / Light Mode compatibility */
+:root[data-theme="light"] body,
+:root[data-theme-effective="light"] body { background-image: radial-gradient(ellipse 45% 35% at 85% 90%, rgba(79,168,255,.10) 0%, transparent 70%); }
+:root[data-theme="light"] .hdr,
+:root[data-theme-effective="light"] .hdr { background:rgba(246,248,252,.88); border-bottom-color:rgba(30,42,56,.12); }
+:root[data-theme="light"] .app-menu-overlay,
+:root[data-theme-effective="light"] .app-menu-overlay,
+:root[data-theme="light"] .nav-config-overlay,
+:root[data-theme-effective="light"] .nav-config-overlay,
+:root[data-theme="light"] .plus-overlay,
+:root[data-theme-effective="light"] .plus-overlay { background:rgba(14,24,38,.34); }
+:root[data-theme="light"] .app-menu-sheet,
+:root[data-theme-effective="light"] .app-menu-sheet,
+:root[data-theme="light"] .nav-config-sheet,
+:root[data-theme-effective="light"] .nav-config-sheet,
+:root[data-theme="light"] .plus-sheet,
+:root[data-theme-effective="light"] .plus-sheet { background:rgba(248,250,253,.97); border-color:rgba(30,42,56,.14); box-shadow:0 18px 60px rgba(30,42,56,.20), inset 0 1px 0 rgba(255,255,255,.76); }
+:root[data-theme="light"] .tab-btn.active,
+:root[data-theme-effective="light"] .tab-btn.active { background:rgba(22,119,210,.08); }
+:root[data-theme="light"] .tab-btn:hover:not(.active),
+:root[data-theme-effective="light"] .tab-btn:hover:not(.active) { background:rgba(30,42,56,.04); }
+:root[data-theme="light"] .seg,
+:root[data-theme-effective="light"] .seg { background:rgba(30,42,56,.05); }
+:root[data-theme="light"] .hdr-menu-btn,
+:root[data-theme-effective="light"] .hdr-menu-btn,
+:root[data-theme="light"] .app-menu-close,
+:root[data-theme-effective="light"] .app-menu-close { box-shadow:inset 0 1px 0 rgba(255,255,255,.7), 0 6px 18px rgba(30,42,56,.08); }
+@media (prefers-color-scheme: light) {
+  :root[data-theme="system"] body { background-image:radial-gradient(ellipse 45% 35% at 85% 90%, rgba(79,168,255,.10) 0%, transparent 70%); }
+  :root[data-theme="system"] .hdr { background:rgba(246,248,252,.88); border-bottom-color:rgba(30,42,56,.12); }
+  :root[data-theme="system"] .app-menu-sheet,
+  :root[data-theme="system"] .nav-config-sheet,
+  :root[data-theme="system"] .plus-sheet { background:rgba(248,250,253,.97); border-color:rgba(30,42,56,.14); box-shadow:0 18px 60px rgba(30,42,56,.20), inset 0 1px 0 rgba(255,255,255,.76); }
+}

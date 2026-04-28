@@ -102,13 +102,15 @@
   <div class="app-menu-section">
     <div class="app-menu-section-title">Einstellungen</div>
     <div class="app-menu-item app-menu-setting">
-      <span>Theme</span>
+      <span>Darstellung</span>
       <div class="seg" role="group" aria-label="Theme">
-        <button type="button" data-theme="dark" class="active">Dark</button>
-        <button type="button" data-theme="light">Light</button>
-        <button type="button" data-theme="system">System</button>
+        <button type="button" data-theme="dark" class="active" aria-pressed="true">Dark</button>
+        <button type="button" data-theme="light" aria-pressed="false">Light</button>
+        <button type="button" data-theme="system" aria-pressed="false">System</button>
       </div>
     </div>
+    <button class="app-menu-item" type="button" data-menu-action="units"><span>Standardeinheiten</span><small>Vorbereitet</small></button>
+    <button class="app-menu-item" type="button" data-menu-action="pdf-settings"><span>PDF-Vorlagen</span><small>Vorbereitet</small></button>
   </div>
 
   <div class="app-menu-section">
