@@ -156,7 +156,7 @@ const MENU = {
   },
 };
 
-function openAppMenu()  { MENU.open = true;  closePlusSheet(); MENU._apply(); }
+function openAppMenu()  { MENU.open = true;  closePlusSheet(); closeProjects(); MENU._apply(); }
 function closeAppMenu() { MENU.open = false; MENU._apply(); }
 function toggleAppMenu(){ MENU.open = !MENU.open; if (MENU.open) closePlusSheet(); MENU._apply(); }
 
@@ -177,6 +177,7 @@ function openNavConfig() {
   NAV_CONFIG.open = true;
   closeAppMenu();
   closePlusSheet();
+  closeProjects();
   NAV_CONFIG._apply();
 }
 function closeNavConfig() { NAV_CONFIG.open = false; NAV_CONFIG._apply(); }
@@ -259,6 +260,285 @@ function renderNavConfig() {
   listEl.querySelectorAll('[data-nav-module]').forEach(btn => btn.addEventListener('click', () => _navConfigToggle(btn.dataset.navModule)));
 }
 
+
+/* ─── PROJECTS — LOCAL STORAGE V1 ─── */
+const PROJECT_STORAGE_KEY = 'tcp_saved_projects_v1';
+const PROJECT_ACTIVE_KEY = 'tcp_active_project_v1';
+
+const PROJECTS = {
+  open: false,
+  activeId: null,
+  _apply() {
+    document.body.classList.toggle('project-open', PROJECTS.open);
+    $('project-overlay')?.classList.toggle('open', PROJECTS.open);
+    $('project-sheet')?.classList.toggle('open', PROJECTS.open);
+    if (PROJECTS.open) renderProjectList();
+    updateProjectActiveLabel();
+  },
+};
+
+function _projectNow() {
+  return new Date().toISOString();
+}
+
+function _projectId() {
+  return 'prj-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+}
+
+function getProjects() {
+  try {
+    const raw = localStorage.getItem(PROJECT_STORAGE_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function saveProjects(arr) {
+  try { localStorage.setItem(PROJECT_STORAGE_KEY, JSON.stringify(arr || [])); } catch (err) {
+    alert('Projekt konnte nicht gespeichert werden.\n\n' + (err?.message || err));
+  }
+}
+
+function getActiveProject() {
+  const id = PROJECTS.activeId || localStorage.getItem(PROJECT_ACTIVE_KEY);
+  return getProjects().find(p => p.id === id) || null;
+}
+
+function getActiveProjectMeta() {
+  const p = getActiveProject();
+  if (!p) return null;
+  return {
+    sb: p.owner || '',
+    proj: p.name || '',
+    nr: p.number || '',
+    client: p.client || '',
+  };
+}
+window.getActiveProjectMeta = getActiveProjectMeta;
+
+function openProjects() {
+  PROJECTS.open = true;
+  closeAppMenu();
+  closePlusSheet();
+  closeNavConfig();
+  PROJECTS.activeId = localStorage.getItem(PROJECT_ACTIVE_KEY) || PROJECTS.activeId;
+  const active = getActiveProject();
+  if (active) _fillProjectForm(active);
+  PROJECTS._apply();
+}
+function closeProjects() { PROJECTS.open = false; PROJECTS._apply(); }
+function newProjectForm() {
+  PROJECTS.activeId = null;
+  try { localStorage.removeItem(PROJECT_ACTIVE_KEY); } catch (_) {}
+  ['project-name','project-number','project-owner','project-client'].forEach(id => { const el=$(id); if(el) el.value=''; });
+  updateProjectActiveLabel();
+  renderProjectList();
+}
+
+function _fillProjectForm(project) {
+  if (!project) return;
+  const set = (id, v) => { const el=$(id); if (el) el.value = v || ''; };
+  set('project-name', project.name);
+  set('project-number', project.number);
+  set('project-owner', project.owner);
+  set('project-client', project.client);
+}
+
+function _projectFormMeta() {
+  return {
+    name: $('project-name')?.value.trim() || 'Unbenanntes Projekt',
+    number: $('project-number')?.value.trim() || '',
+    owner: $('project-owner')?.value.trim() || '',
+    client: $('project-client')?.value.trim() || '',
+  };
+}
+
+function captureProjectSnapshot() {
+  const fields = {};
+  document.querySelectorAll('#app-shell input[id], #app-shell select[id], #app-shell textarea[id]').forEach(el => {
+    fields[el.id] = {
+      value: el.value,
+      checked: !!el.checked,
+      type: el.type || el.tagName.toLowerCase(),
+    };
+  });
+
+  const snapshot = {
+    version: 1,
+    activeTab: NAV.activeTab,
+    fields,
+    navFavorites: NAV_FAVORITES.slice(),
+    theme: localStorage.getItem('tcp_theme') || 'dark',
+    modules: {},
+  };
+
+  if (window.TW_STATE) {
+    try { snapshot.modules.trinkwasser = JSON.parse(JSON.stringify(window.TW_STATE)); } catch (_) {}
+  }
+  if (window._hxState) {
+    try { snapshot.modules.hx = JSON.parse(JSON.stringify(window._hxState)); } catch (_) {}
+  }
+  return snapshot;
+}
+
+function applyProjectSnapshot(snapshot) {
+  if (!snapshot) return;
+
+  if (snapshot.navFavorites) setNavFavorites(snapshot.navFavorites);
+  if (snapshot.theme && ['dark','light','system'].includes(snapshot.theme)) {
+    localStorage.setItem('tcp_theme', snapshot.theme);
+    document.querySelector(`[data-theme="${snapshot.theme}"]`)?.click();
+  }
+
+  if (snapshot.modules?.trinkwasser && window.TW_STATE) {
+    window.TW_STATE.nes = Array.isArray(snapshot.modules.trinkwasser.nes)
+      ? JSON.parse(JSON.stringify(snapshot.modules.trinkwasser.nes))
+      : [];
+    if (typeof renderNeList === 'function') renderNeList();
+  }
+
+  const fields = snapshot.fields || {};
+  Object.entries(fields).forEach(([id, data]) => {
+    const el = $(id);
+    if (!el) return;
+    if (el.type === 'checkbox' || el.type === 'radio') el.checked = !!data.checked;
+    else el.value = data.value ?? '';
+    el.dispatchEvent(new Event('input', { bubbles:true }));
+    el.dispatchEvent(new Event('change', { bubbles:true }));
+  });
+
+  if (snapshot.modules?.hx) {
+    window._hxState = snapshot.modules.hx;
+    if (typeof drawHxChart === 'function') setTimeout(() => drawHxChart(window._hxState), 120);
+  }
+
+  setTimeout(() => {
+    if (typeof calcAll === 'function') calcAll();
+    if (typeof luftCalc === 'function') luftCalc();
+    if (typeof calcTrinkwasser === 'function') calcTrinkwasser();
+    if (typeof unitCalc === 'function') unitCalc();
+    if (snapshot.activeTab && TABS.includes(snapshot.activeTab)) switchTab(snapshot.activeTab);
+    else NAV._apply();
+  }, 80);
+}
+
+function saveCurrentProject() {
+  const meta = _projectFormMeta();
+  const list = getProjects();
+  const now = _projectNow();
+  let id = PROJECTS.activeId || localStorage.getItem(PROJECT_ACTIVE_KEY);
+  let idx = list.findIndex(p => p.id === id);
+
+  const project = {
+    id: idx >= 0 ? list[idx].id : _projectId(),
+    ...meta,
+    updatedAt: now,
+    createdAt: idx >= 0 ? list[idx].createdAt : now,
+    snapshot: captureProjectSnapshot(),
+  };
+
+  if (idx >= 0) list[idx] = project;
+  else list.unshift(project);
+
+  saveProjects(list);
+  PROJECTS.activeId = project.id;
+  try { localStorage.setItem(PROJECT_ACTIVE_KEY, project.id); } catch (_) {}
+  renderProjectList();
+  updateProjectActiveLabel();
+}
+
+function loadProject(id) {
+  const project = getProjects().find(p => p.id === id);
+  if (!project) return;
+  PROJECTS.activeId = project.id;
+  try { localStorage.setItem(PROJECT_ACTIVE_KEY, project.id); } catch (_) {}
+  _fillProjectForm(project);
+  applyProjectSnapshot(project.snapshot);
+  closeProjects();
+}
+
+function deleteProject(id) {
+  const project = getProjects().find(p => p.id === id);
+  if (!project) return;
+  if (!confirm(`Projekt „${project.name || 'Unbenannt'}“ löschen?`)) return;
+  const list = getProjects().filter(p => p.id !== id);
+  saveProjects(list);
+  if (PROJECTS.activeId === id || localStorage.getItem(PROJECT_ACTIVE_KEY) === id) newProjectForm();
+  renderProjectList();
+}
+
+function duplicateProject(id) {
+  const project = getProjects().find(p => p.id === id);
+  if (!project) return;
+  const list = getProjects();
+  const copy = {
+    ...project,
+    id: _projectId(),
+    name: (project.name || 'Projekt') + ' Kopie',
+    createdAt: _projectNow(),
+    updatedAt: _projectNow(),
+  };
+  list.unshift(copy);
+  saveProjects(list);
+  renderProjectList();
+}
+
+function updateProjectActiveLabel() {
+  const el = $('project-active-label');
+  const active = getActiveProject();
+  if (el) el.textContent = active ? `${active.name || 'Unbenannt'}${active.number ? ' · ' + active.number : ''}` : 'Kein Projekt geladen';
+}
+
+function _projectDate(s) {
+  if (!s) return '–';
+  try { return new Date(s).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' }); }
+  catch (_) { return '–'; }
+}
+
+function renderProjectList() {
+  const el = $('project-list');
+  if (!el) return;
+  const list = getProjects().sort((a,b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+  if (!list.length) {
+    el.innerHTML = '<div class="project-empty">Noch keine Projekte gespeichert.</div>';
+    return;
+  }
+  const activeId = PROJECTS.activeId || localStorage.getItem(PROJECT_ACTIVE_KEY);
+  el.innerHTML = list.map(p => `
+    <div class="project-card ${p.id === activeId ? 'active' : ''}" data-project-id="${p.id}">
+      <div>
+        <h4>${_escProject(p.name || 'Unbenanntes Projekt')}</h4>
+        <p>${_escProject(p.number || 'ohne Nummer')} · ${_escProject(p.client || 'kein Objekt')}<br>Aktualisiert: ${_projectDate(p.updatedAt)}</p>
+      </div>
+      <div class="project-card-actions">
+        <button type="button" class="project-mini-btn load" data-project-load="${p.id}">Laden</button>
+        <button type="button" class="project-mini-btn" data-project-copy="${p.id}">Kopie</button>
+        <button type="button" class="project-mini-btn delete" data-project-delete="${p.id}">Löschen</button>
+      </div>
+    </div>
+  `).join('');
+  el.querySelectorAll('[data-project-load]').forEach(btn => btn.addEventListener('click', () => loadProject(btn.dataset.projectLoad)));
+  el.querySelectorAll('[data-project-copy]').forEach(btn => btn.addEventListener('click', () => duplicateProject(btn.dataset.projectCopy)));
+  el.querySelectorAll('[data-project-delete]').forEach(btn => btn.addEventListener('click', () => deleteProject(btn.dataset.projectDelete)));
+}
+
+function _escProject(s) {
+  return String(s || '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+}
+
+function setupProjects() {
+  PROJECTS.activeId = localStorage.getItem(PROJECT_ACTIVE_KEY);
+  $('project-close')?.addEventListener('click', closeProjects);
+  $('project-overlay')?.addEventListener('click', closeProjects);
+  $('project-new')?.addEventListener('click', newProjectForm);
+  $('project-save')?.addEventListener('click', saveCurrentProject);
+  const active = getActiveProject();
+  if (active) _fillProjectForm(active);
+  updateProjectActiveLabel();
+}
+
 function _setMenuMessage(title, body) {
   alert(title + (body ? '\n\n' + body : ''));
 }
@@ -278,7 +558,7 @@ function _handleMenuAction(action) {
     return;
   }
   if (action === 'projects') {
-    _setMenuMessage('Projekte', 'Projektverwaltung wird in einer späteren Ausbaustufe aktiviert.');
+    openProjects();
     return;
   }
   if (action === 'units') {
@@ -351,6 +631,7 @@ function switchTab(t) {
   NAV.activeTab = t;
   NAV.sheetOpen = false;  /* Sheet schließt immer beim Tab-Wechsel */
   closeAppMenu();
+  closeProjects();
   NAV._apply();
 }
 
@@ -419,10 +700,11 @@ document.addEventListener('DOMContentLoaded', () => {
   $('nav-config-overlay')?.addEventListener('click', closeNavConfig);
   $('nav-config-save')?.addEventListener('click', saveNavConfig);
   $('nav-config-reset')?.addEventListener('click', resetNavConfig);
+  setupProjects();
   document.querySelectorAll('[data-menu-action]').forEach(btn => {
     btn.addEventListener('click', () => _handleMenuAction(btn.dataset.menuAction));
   });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeAppMenu(); closeNavConfig(); } });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeAppMenu(); closeNavConfig(); closeProjects(); } });
   _setupThemeMenu();
   _setBuildLabel();
 

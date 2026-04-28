@@ -20,6 +20,9 @@ function openPdfSheet() {
   const today = new Date().toLocaleDateString('de-DE', {
     day: '2-digit', month: '2-digit', year: 'numeric'
   });
+  const activeProjectMeta = typeof window.getActiveProjectMeta === 'function'
+    ? (window.getActiveProjectMeta() || {})
+    : {};
 
   const modal = document.createElement('div');
   modal.id = 'pdf-modal';
@@ -34,7 +37,7 @@ function openPdfSheet() {
         <div class="igrp">
           <div class="ilbl">Sachbearbeiter</div>
           <div class="iwrap">
-            <input class="inp" id="pdf-sb" type="text" placeholder="Name"
+            <input class="inp" id="pdf-sb" type="text" placeholder="Name" value="${_pdfAttr(activeProjectMeta.sb || '')}"
               style="font-size:16px;padding:12px 14px"/>
           </div>
         </div>
@@ -42,7 +45,7 @@ function openPdfSheet() {
         <div class="igrp">
           <div class="ilbl">Projekt</div>
           <div class="iwrap">
-            <input class="inp" id="pdf-pj" type="text" placeholder="Projektbezeichnung"
+            <input class="inp" id="pdf-pj" type="text" placeholder="Projektbezeichnung" value="${_pdfAttr(activeProjectMeta.proj || '')}"
               style="font-size:16px;padding:12px 14px"/>
           </div>
         </div>
@@ -51,7 +54,7 @@ function openPdfSheet() {
           <div>
             <div class="ilbl">Projektnummer</div>
             <div class="iwrap">
-              <input class="inp" id="pdf-nr" type="text" placeholder="z.B. 2024-001"
+              <input class="inp" id="pdf-nr" type="text" placeholder="z.B. 2024-001" value="${_pdfAttr(activeProjectMeta.nr || '')}"
                 style="font-size:15px;padding:12px 14px"/>
             </div>
           </div>
@@ -128,6 +131,11 @@ function openPdfSheet() {
     if (sb) sb.focus();
     else console.warn('[PDF] pdf-sb input not found after modal insert');
   }, 150);
+}
+
+
+function _pdfAttr(v) {
+  return String(v || '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 }
 
 function closePdfSheet() {

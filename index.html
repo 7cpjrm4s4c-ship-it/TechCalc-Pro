@@ -96,7 +96,7 @@
     <button class="app-menu-item" type="button" data-menu-action="pdf"><span>PDF Export</span><small>Aktuellen Tab dokumentieren</small></button>
     <button class="app-menu-item" type="button" data-menu-action="nav-config"><span>Schnellzugriffe bearbeiten</span><small>4 Module auswählen</small></button>
     <button class="app-menu-item" type="button" data-menu-action="favorites"><span>Favoriten</span><small>Vorbereitet</small></button>
-    <button class="app-menu-item" type="button" data-menu-action="projects"><span>Projekte</span><small>Vorbereitet</small></button>
+    <button class="app-menu-item" type="button" data-menu-action="projects"><span>Projekte</span><small>Speichern · Laden · Löschen</small></button>
   </div>
 
   <div class="app-menu-section">
@@ -139,6 +139,30 @@
     <button type="button" id="nav-config-reset" class="nav-config-secondary">Standard</button>
     <button type="button" id="nav-config-save" class="nav-config-primary">Speichern</button>
   </div>
+</aside>
+
+<!-- ══ PROJEKTVERWALTUNG ══ -->
+<div class="project-overlay" id="project-overlay" aria-hidden="true"></div>
+<aside class="project-sheet" id="project-sheet" role="dialog" aria-label="Projekte" aria-modal="true">
+  <div class="project-head">
+    <div>
+      <div class="project-title">Projekte</div>
+      <div class="project-sub">Berechnungen lokal speichern und wieder laden.</div>
+    </div>
+    <button class="app-menu-close" id="project-close" type="button" aria-label="Projekte schließen">×</button>
+  </div>
+  <div class="project-active" id="project-active-box"><span>Aktives Projekt</span><strong id="project-active-label">Kein Projekt geladen</strong></div>
+  <div class="project-form">
+    <div class="igrp"><div class="ilbl">Projektname</div><div class="iwrap"><input class="inp" id="project-name" type="text" placeholder="z. B. Sanierung Müller"/></div></div>
+    <div class="project-form-grid">
+      <div class="igrp"><div class="ilbl">Projektnummer</div><div class="iwrap"><input class="inp" id="project-number" type="text" placeholder="2026-001"/></div></div>
+      <div class="igrp"><div class="ilbl">Bearbeiter</div><div class="iwrap"><input class="inp" id="project-owner" type="text" placeholder="Name"/></div></div>
+    </div>
+    <div class="igrp"><div class="ilbl">Kunde / Objekt</div><div class="iwrap"><input class="inp" id="project-client" type="text" placeholder="Kunde oder Objektadresse"/></div></div>
+    <div class="project-actions"><button type="button" class="project-secondary" id="project-new">Neu</button><button type="button" class="project-primary" id="project-save">Aktuellen Stand speichern</button></div>
+  </div>
+  <div class="project-section-title">Gespeicherte Projekte</div>
+  <div class="project-list" id="project-list"></div>
 </aside>
 
 
