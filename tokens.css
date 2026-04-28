@@ -63,3 +63,31 @@
   /* Fixed header height */
   --hdr: 88px;
 }
+
+
+/* Theme Layer - Phase 4 */
+:root[data-theme="light"], :root[data-theme-effective="light"] {
+  --bg:#f3f6fb;
+  --glass-low:rgba(255,255,255,.76); --glass-mid:rgba(255,255,255,.88); --glass-high:rgba(255,255,255,.96); --glass-raise:rgba(230,238,248,.92);
+  --gb-soft:rgba(30,42,56,.10); --gb-mid:rgba(30,42,56,.16); --gb-strong:rgba(30,42,56,.25); --gb-accent:rgba(30,42,56,.36);
+  --shimmer:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.65) 30%,rgba(255,255,255,.88) 50%,rgba(255,255,255,.65) 70%,rgba(255,255,255,0) 100%);
+  --heat:#e05a20; --heat-t:#b84a1c; --cold:#008db0; --cold-t:#007796;
+  --blue:#1677d2; --blue-t:rgba(22,119,210,.12); --blue-b:rgba(22,119,210,.34);
+  --grn:#0b9f6a; --grn-t:rgba(11,159,106,.12); --grn-b:rgba(11,159,106,.32);
+  --air:#7457d8; --air-t:#6750c8; --air-d:rgba(116,87,216,.10); --air-b:rgba(116,87,216,.30);
+  --ok:#138a3d; --warn:#b58400; --danger:#cf2f29; --out-h:#c65a24; --out-c:#007e99;
+  --t1:rgba(15,23,34,.96); --t2:rgba(15,23,34,.68); --t3:rgba(15,23,34,.46); --t4:rgba(15,23,34,.22);
+}
+@media (prefers-color-scheme: light) {
+  :root[data-theme="system"] {
+    --bg:#f3f6fb;
+    --glass-low:rgba(255,255,255,.76); --glass-mid:rgba(255,255,255,.88); --glass-high:rgba(255,255,255,.96); --glass-raise:rgba(230,238,248,.92);
+    --gb-soft:rgba(30,42,56,.10); --gb-mid:rgba(30,42,56,.16); --gb-strong:rgba(30,42,56,.25); --gb-accent:rgba(30,42,56,.36);
+    --heat:#e05a20; --heat-t:#b84a1c; --cold:#008db0; --cold-t:#007796;
+    --blue:#1677d2; --blue-t:rgba(22,119,210,.12); --blue-b:rgba(22,119,210,.34);
+    --grn:#0b9f6a; --grn-t:rgba(11,159,106,.12); --grn-b:rgba(11,159,106,.32);
+    --air:#7457d8; --air-t:#6750c8; --air-d:rgba(116,87,216,.10); --air-b:rgba(116,87,216,.30);
+    --ok:#138a3d; --warn:#b58400; --danger:#cf2f29; --out-h:#c65a24; --out-c:#007e99;
+    --t1:rgba(15,23,34,.96); --t2:rgba(15,23,34,.68); --t3:rgba(15,23,34,.46); --t4:rgba(15,23,34,.22);
+  }
+}

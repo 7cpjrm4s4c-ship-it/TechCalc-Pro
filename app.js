@@ -19,7 +19,79 @@ const loc  = (v, d) => v.toLocaleString('de-DE', {
 /* ───────────────────────────────────────
    TAB-STEUERUNG
 ─────────────────────────────────────── */
-const TABS = ['flow', 'luft', 'pipe', 'unit', 'hx', 'wrg'];
+const TABS = ['flow', 'luft', 'pipe', 'unit', 'hx', 'wrg', 'trinkwasser'];
+
+const MODULES = {
+  flow: { label:'Heizung', fullLabel:'Heizung/Kälte', shortLabel:'Heizung', aria:'Heizung und Kälte', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-1 2.5-2.5 4.5-2 7.5a4 4 0 108 0c0-1.5-.8-3-2-4 0 1.5-1 3-2.5 3S10 7 10 5"/><circle cx="12" cy="17" r="1.2" fill="currentColor" stroke="none"/></svg>' },
+  luft: { label:'Lüftung', fullLabel:'Lüftung', shortLabel:'Lüftung', aria:'Lüftung', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.8"/><path d="M12 10.2C12 7 10 5 8 6s-2 4.5 1.5 5.5"/><path d="M13.8 12C17 12 19 10 18 8s-4.5-2-5.5 1.5"/><path d="M12 13.8C12 17 14 19 16 18s2-4.5-1.5-5.5"/><path d="M10.2 12C7 12 5 14 6 16s4.5 2 5.5-1.5"/></svg>' },
+  pipe: { label:'Rohr', fullLabel:'Rohrdimensionierung', shortLabel:'Rohr', aria:'Rohrdimensionierung', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="5" height="8" rx="1.5"/><rect x="17" y="8" width="5" height="8" rx="1.5"/><line x1="7" y1="10.5" x2="17" y2="10.5"/><line x1="7" y1="13.5" x2="17" y2="13.5"/></svg>' },
+  unit: { label:'Einheiten', fullLabel:'Einheiten', shortLabel:'Einheiten', aria:'Einheitenrechner', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h2v16H4M8 4l8 16M16 4h4M16 12h3"/><circle cx="18" cy="20" r="2"/></svg>' },
+  hx: { label:'h,x', fullLabel:'h,x-Diagramm', shortLabel:'h,x', aria:'h,x-Diagramm', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 20 7 10 11 14 15 6 21 6"/><path d="M3 20h18M3 20V4"/></svg>' },
+  wrg: { label:'WRG', fullLabel:'WRG / Mischluft', shortLabel:'WRG', aria:'WRG und Mischluft', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h12M4 8l3-3M4 8l3 3"/><path d="M20 16H8M20 16l-3-3M20 16l-3 3"/><line x1="12" y1="8" x2="12" y2="16"/></svg>' },
+  trinkwasser: { label:'Trinkwasser', fullLabel:'Trinkwasser', shortLabel:'Wasser', aria:'Trinkwasser', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 7 6 10 6 14a6 6 0 0 0 12 0c0-4-2-7-6-12z"/><path d="M9 14h6"/></svg>' },
+};
+
+const NAV_STORAGE_KEY = 'tcp_nav_favorites_v1';
+const NAV_DEFAULT_FAVORITES = ['pipe', 'trinkwasser', 'unit', 'flow'];
+let NAV_FAVORITES = _loadNavFavorites();
+
+function _loadNavFavorites() {
+  try {
+    const raw = localStorage.getItem(NAV_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (Array.isArray(parsed)) {
+      const valid = parsed.filter(id => TABS.includes(id)).filter((id, i, a) => a.indexOf(id) === i).slice(0, 4);
+      if (valid.length === 4) return valid;
+    }
+  } catch (_) {}
+  return NAV_DEFAULT_FAVORITES.filter(id => TABS.includes(id)).slice(0, 4);
+}
+
+function setNavFavorites(ids) {
+  const valid = (Array.isArray(ids) ? ids : [])
+    .filter(id => TABS.includes(id))
+    .filter((id, i, a) => a.indexOf(id) === i)
+    .slice(0, 4);
+  while (valid.length < 4) {
+    const next = TABS.find(id => !valid.includes(id));
+    if (!next) break;
+    valid.push(next);
+  }
+  NAV_FAVORITES = valid;
+  try { localStorage.setItem(NAV_STORAGE_KEY, JSON.stringify(NAV_FAVORITES)); } catch (_) {}
+  renderBottomNav();
+  NAV._apply();
+}
+
+function resetNavFavorites() {
+  try { localStorage.removeItem(NAV_STORAGE_KEY); } catch (_) {}
+  NAV_FAVORITES = _loadNavFavorites();
+  renderBottomNav();
+  NAV._apply();
+}
+
+function _moduleButtonHtml(id, mode) {
+  const m = MODULES[id];
+  if (!m) return '';
+  if (mode === 'pill') return `<button class="pill-btn" id="pill-${id}" data-tab="${id}" aria-label="${m.aria}">${m.icon}${m.shortLabel}</button>`;
+  return `<button class="plus-item" id="plus-${id}" data-tab="${id}" aria-label="${m.aria}">${m.icon}${m.fullLabel}</button>`;
+}
+
+function renderBottomNav() {
+  const pill = $('bottom-pill');
+  const grid = document.querySelector('#plus-sheet .plus-grid');
+  if (!pill || !grid) return;
+  const visible = NAV_FAVORITES.filter(id => TABS.includes(id)).slice(0, 4);
+  const overflow = TABS.filter(id => !visible.includes(id));
+  pill.innerHTML = visible.map(id => _moduleButtonHtml(id, 'pill')).join('') + `
+    <button class="pill-plus" id="pill-plus" aria-label="Weitere Module" aria-expanded="false">
+      <span class="pill-plus-icon">+</span>
+    </button>`;
+  grid.innerHTML = overflow.map(id => _moduleButtonHtml(id, 'plus')).join('') || '<div class="plus-empty">Alle Module liegen bereits auf der Navigation Pill.</div>';
+  pill.querySelectorAll('.pill-btn[data-tab]').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+  $('pill-plus')?.addEventListener('click', togglePlusSheet);
+  grid.querySelectorAll('.plus-item[data-tab]').forEach(btn => btn.addEventListener('click', () => _switchFromPlus(btn.dataset.tab)));
+}
 
 /* ─── NAVIGATION STATE MACHINE ─── */
 const NAV = {
@@ -33,7 +105,14 @@ const NAV = {
       const el = $('tab-' + id);
       if (!el) return;
       if (id === NAV.activeTab) {
-        el.style.display = (id === 'hx') ? 'block' : 'flex';
+        const isDesktop = window.matchMedia('(min-width: 900px)').matches;
+        if (isDesktop && id === 'flow') {
+          el.style.display = 'grid';
+        } else if (id === 'hx') {
+          el.style.display = 'block';
+        } else {
+          el.style.display = 'flex';
+        }
       } else {
         el.style.display = 'none';
       }
@@ -44,14 +123,12 @@ const NAV = {
       b.classList.toggle('active', b.dataset.tab === NAV.activeTab)
     );
 
-    /* Pill Haupt-Buttons */
-    ['flow','luft','hx','unit'].forEach(id =>
-      $('pill-' + id)?.classList.toggle('active', id === NAV.activeTab)
+    /* Mobile Pill + Plus-Sheet Markierung (dynamisch gerendert) */
+    document.querySelectorAll('.pill-btn[data-tab]').forEach(btn =>
+      btn.classList.toggle('active', btn.dataset.tab === NAV.activeTab)
     );
-
-    /* Plus-Sheet-Items Markierung */
-    ['pipe','unit','wrg'].forEach(id =>
-      $('plus-' + id)?.classList.toggle('active-tab', id === NAV.activeTab)
+    document.querySelectorAll('.plus-item[data-tab]').forEach(btn =>
+      btn.classList.toggle('active-tab', btn.dataset.tab === NAV.activeTab)
     );
 
     /* Plus-Sheet */
@@ -67,9 +144,213 @@ const NAV = {
   },
 };
 
+/* ─── HEADER MENU ─── */
+const MENU = {
+  open: false,
+  _apply() {
+    document.body.classList.toggle('menu-open', MENU.open);
+    $('app-menu-overlay')?.classList.toggle('open', MENU.open);
+    $('app-menu-sheet')?.classList.toggle('open', MENU.open);
+    $('hdr-menu-btn')?.classList.toggle('open', MENU.open);
+    $('hdr-menu-btn')?.setAttribute('aria-expanded', String(MENU.open));
+  },
+};
+
+function openAppMenu()  { MENU.open = true;  closePlusSheet(); MENU._apply(); }
+function closeAppMenu() { MENU.open = false; MENU._apply(); }
+function toggleAppMenu(){ MENU.open = !MENU.open; if (MENU.open) closePlusSheet(); MENU._apply(); }
+
+/* ─── NAV FAVORITES CONFIG SHEET ─── */
+const NAV_CONFIG = {
+  open: false,
+  draft: [],
+  _apply() {
+    document.body.classList.toggle('nav-config-open', NAV_CONFIG.open);
+    $('nav-config-overlay')?.classList.toggle('open', NAV_CONFIG.open);
+    $('nav-config-sheet')?.classList.toggle('open', NAV_CONFIG.open);
+    if (NAV_CONFIG.open) renderNavConfig();
+  },
+};
+
+function openNavConfig() {
+  NAV_CONFIG.draft = NAV_FAVORITES.slice(0, 4);
+  NAV_CONFIG.open = true;
+  closeAppMenu();
+  closePlusSheet();
+  NAV_CONFIG._apply();
+}
+function closeNavConfig() { NAV_CONFIG.open = false; NAV_CONFIG._apply(); }
+function toggleNavConfig() { NAV_CONFIG.open ? closeNavConfig() : openNavConfig(); }
+
+function _navConfigToggle(id) {
+  if (!TABS.includes(id)) return;
+  const i = NAV_CONFIG.draft.indexOf(id);
+  if (i >= 0) NAV_CONFIG.draft.splice(i, 1);
+  else {
+    if (NAV_CONFIG.draft.length >= 4) return;
+    NAV_CONFIG.draft.push(id);
+  }
+  renderNavConfig();
+}
+let _navMoveLock = false;
+function _navConfigMove(id, dir) {
+  if (_navMoveLock) return;
+  const i = NAV_CONFIG.draft.indexOf(id);
+  if (i < 0) return;
+  const j = i + dir;
+  if (j < 0 || j >= NAV_CONFIG.draft.length) return;
+  _navMoveLock = true;
+  [NAV_CONFIG.draft[i], NAV_CONFIG.draft[j]] = [NAV_CONFIG.draft[j], NAV_CONFIG.draft[i]];
+  renderNavConfig();
+  setTimeout(() => { _navMoveLock = false; }, 180);
+}
+function saveNavConfig() {
+  setNavFavorites(NAV_CONFIG.draft);
+  closeNavConfig();
+}
+function resetNavConfig() {
+  NAV_CONFIG.draft = NAV_DEFAULT_FAVORITES.slice(0, 4);
+  renderNavConfig();
+}
+function renderNavConfig() {
+  const selectedEl = $('nav-config-selected');
+  const listEl = $('nav-config-list');
+  const saveBtn = $('nav-config-save');
+  const countEl = $('nav-config-count');
+  if (!selectedEl || !listEl) return;
+
+  const draft = NAV_CONFIG.draft.filter(id => TABS.includes(id)).slice(0, 4);
+  NAV_CONFIG.draft = draft;
+  if (countEl) countEl.textContent = `${draft.length}/4 Schnellzugriffe`;
+  if (saveBtn) saveBtn.disabled = draft.length !== 4;
+
+  selectedEl.innerHTML = draft.map((id, idx) => {
+    const m = MODULES[id];
+    return `<div class="nav-slot" data-id="${id}">
+      <div class="nav-slot-rank">${idx + 1}</div>
+      <div class="nav-slot-icon">${m.icon}</div>
+      <div class="nav-slot-main"><strong>${m.fullLabel}</strong><small>${idx === 0 ? 'Links' : idx === 3 ? 'Rechts' : 'Position ' + (idx + 1)}</small></div>
+      <button type="button" class="nav-move" data-move="up" data-id="${id}" ${idx === 0 ? 'disabled' : ''}>↑</button>
+      <button type="button" class="nav-move" data-move="down" data-id="${id}" ${idx === draft.length - 1 ? 'disabled' : ''}>↓</button>
+      <button type="button" class="nav-remove" data-remove="${id}" aria-label="Entfernen">×</button>
+    </div>`;
+  }).join('') || '<div class="nav-config-empty">Noch keine Schnellzugriffe ausgewählt.</div>';
+
+  listEl.innerHTML = TABS.map(id => {
+    const m = MODULES[id];
+    const on = draft.includes(id);
+    const disabled = !on && draft.length >= 4;
+    return `<button type="button" class="nav-module ${on ? 'selected' : ''}" data-nav-module="${id}" ${disabled ? 'disabled' : ''}>
+      <span class="nav-module-icon">${m.icon}</span>
+      <span><strong>${m.fullLabel}</strong><small>${on ? 'Auf Navigation Pill' : disabled ? 'Max. 4 erreicht' : 'Zum Schnellzugriff hinzufügen'}</small></span>
+      <b>${on ? '✓' : '+'}</b>
+    </button>`;
+  }).join('');
+
+  selectedEl.querySelectorAll('[data-move]').forEach(btn => {
+    btn.addEventListener('click', ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      btn.blur();
+      _navConfigMove(btn.dataset.id, btn.dataset.move === 'up' ? -1 : 1);
+    });
+  });
+  selectedEl.querySelectorAll('[data-remove]').forEach(btn => btn.addEventListener('click', () => _navConfigToggle(btn.dataset.remove)));
+  listEl.querySelectorAll('[data-nav-module]').forEach(btn => btn.addEventListener('click', () => _navConfigToggle(btn.dataset.navModule)));
+}
+
+function _setMenuMessage(title, body) {
+  alert(title + (body ? '\n\n' + body : ''));
+}
+
+function _handleMenuAction(action) {
+  if (action === 'pdf') {
+    closeAppMenu();
+    if (typeof openPdfSheet === 'function') openPdfSheet();
+    return;
+  }
+  if (action === 'nav-config') {
+    openNavConfig();
+    return;
+  }
+  if (action === 'favorites') {
+    _setMenuMessage('Favoriten', 'Favoriten werden in einer späteren Ausbaustufe aktiviert.');
+    return;
+  }
+  if (action === 'projects') {
+    _setMenuMessage('Projekte', 'Projektverwaltung wird in einer späteren Ausbaustufe aktiviert.');
+    return;
+  }
+  if (action === 'units') {
+    _setMenuMessage('Standardeinheiten', 'Standardeinheiten werden später zentral für Druck, Leistung, Volumenstrom und Rohrnormen vorbereitet.');
+    return;
+  }
+  if (action === 'pdf-settings') {
+    _setMenuMessage('PDF-Vorlagen', 'PDF-Vorlagen, Firmenlogo und Report-Layout werden in einer späteren Ausbaustufe aktiviert.');
+    return;
+  }
+  if (action === 'help') {
+    _setMenuMessage('Hinweis', 'TechCalc Pro ist als HLSK Quick Tool für schnelle Prüfung, Nachrechnung und Dokumentation gedacht. Keine vollständige Fachplanung oder Rohrnetzberechnung.');
+    return;
+  }
+  if (action === 'legal') {
+    _setMenuMessage('Impressum / Datenschutz', 'Platzhalter für die rechtlichen Angaben.');
+  }
+}
+
+function _setupThemeMenu() {
+  const root = document.documentElement;
+  const mq = window.matchMedia ? window.matchMedia("(prefers-color-scheme: light)") : null;
+
+  function effectiveTheme(mode) {
+    if (mode === "system") return mq?.matches ? "light" : "dark";
+    return mode === "light" ? "light" : "dark";
+  }
+
+  function applyTheme(mode) {
+    const safeMode = ["dark", "light", "system"].includes(mode) ? mode : "dark";
+    const effective = effectiveTheme(safeMode);
+    root.dataset.theme = safeMode;
+    root.dataset.themeEffective = effective;
+
+    const meta = document.querySelector("meta[name=\"theme-color\"]");
+    if (meta) meta.setAttribute("content", effective === "light" ? "#f3f6fb" : "#000000");
+
+    document.querySelectorAll("[data-theme]").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.theme === safeMode);
+      btn.setAttribute("aria-pressed", String(btn.dataset.theme === safeMode));
+    });
+  }
+
+  const saved = localStorage.getItem("tcp_theme") || "dark";
+  applyTheme(saved);
+
+  document.querySelectorAll("[data-theme]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const mode = btn.dataset.theme || "dark";
+      localStorage.setItem("tcp_theme", mode);
+      applyTheme(mode);
+    });
+  });
+
+  mq?.addEventListener?.("change", () => {
+    if ((localStorage.getItem("tcp_theme") || "dark") === "system") applyTheme("system");
+  });
+}
+
+
+function _setBuildLabel() {
+  const el = $('app-build-label');
+  if (!el) return;
+  const build = window.TECHCALC_BUILD || document.querySelector('meta[name="techcalc-build"]')?.content || 'local';
+  el.textContent = build;
+}
+
 function switchTab(t) {
+  if (!TABS.includes(t)) return;
   NAV.activeTab = t;
   NAV.sheetOpen = false;  /* Sheet schließt immer beim Tab-Wechsel */
+  closeAppMenu();
   NAV._apply();
 }
 
@@ -82,12 +363,42 @@ function openPlusSheet()  { NAV.sheetOpen = true;  NAV._apply(); }
 function closePlusSheet() { NAV.sheetOpen = false; NAV._apply(); }
 
 function _switchFromPlus(tab) {
+  if (!TABS.includes(tab)) return;
   NAV.activeTab = tab;
   NAV.sheetOpen = false;
   NAV._apply();
 }
 
 /* ─── PILL SICHTBARKEIT ─── */
+
+/* ─── MOBILE KEYBOARD GUARD — Pill nie über iOS Tastatur ─── */
+function _setKeyboardOpen(on) {
+  document.body.classList.toggle('keyboard-open', !!on);
+  if (on) closePlusSheet();
+}
+
+function _setupKeyboardGuard() {
+  let baseH = window.visualViewport?.height || window.innerHeight;
+  const isFormEl = el => el && ['INPUT','TEXTAREA','SELECT'].includes(el.tagName);
+
+  document.addEventListener('focusin', e => {
+    if (isFormEl(e.target)) _setKeyboardOpen(true);
+  });
+  document.addEventListener('focusout', () => {
+    setTimeout(() => {
+      if (!isFormEl(document.activeElement)) _setKeyboardOpen(false);
+    }, 120);
+  });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      const h = window.visualViewport.height;
+      if (h > baseH) baseH = h;
+      _setKeyboardOpen(baseH - h > 120 || isFormEl(document.activeElement));
+    });
+  }
+}
+
 function _updatePillVisibility() {
   const pill = $('bottom-pill');
   if (!pill) return;
@@ -100,27 +411,31 @@ function _updatePillVisibility() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Header Menü
+  $('hdr-menu-btn')?.addEventListener('click', toggleAppMenu);
+  $('app-menu-close')?.addEventListener('click', closeAppMenu);
+  $('app-menu-overlay')?.addEventListener('click', closeAppMenu);
+  $('nav-config-close')?.addEventListener('click', closeNavConfig);
+  $('nav-config-overlay')?.addEventListener('click', closeNavConfig);
+  $('nav-config-save')?.addEventListener('click', saveNavConfig);
+  $('nav-config-reset')?.addEventListener('click', resetNavConfig);
+  document.querySelectorAll('[data-menu-action]').forEach(btn => {
+    btn.addEventListener('click', () => _handleMenuAction(btn.dataset.menuAction));
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeAppMenu(); closeNavConfig(); } });
+  _setupThemeMenu();
+  _setBuildLabel();
+
   // Desktop Tab-Bar
   document.querySelectorAll('.tab-btn[data-tab]').forEach(b => {
     b.addEventListener('click', () => switchTab(b.dataset.tab));
   });
 
-  // Pill Haupt-Buttons
-  ['flow','luft','hx','unit'].forEach(id => {
-    $('pill-' + id)?.addEventListener('click', () => switchTab(id));
-  });
-
-  // Plus Button
-  $('pill-plus')?.addEventListener('click', togglePlusSheet);
+  // Mobile Bottom Navigation dynamisch rendern
+  renderBottomNav();
 
   // Plus Overlay schließt Sheet
   $('plus-overlay')?.addEventListener('click', closePlusSheet);
-
-  // Plus Sheet Items
-  ['pipe','unit','wrg'].forEach(id => {
-    $('plus-' + id)?.addEventListener('click', () => _switchFromPlus(id));
-  });
-  // Note: plus-hx removed — h,x is now in main pill
 
   // Swipe-Down schließt Sheet
   let _touchStartY = 0;
@@ -133,7 +448,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Pill Sichtbarkeit
   _updatePillVisibility();
-  window.addEventListener('resize', _updatePillVisibility);
+  window.addEventListener('resize', () => { _updatePillVisibility(); NAV._apply(); });
+  _setupKeyboardGuard();
 
   // Initial Tab
   switchTab('flow');

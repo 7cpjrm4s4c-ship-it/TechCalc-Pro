@@ -40,15 +40,100 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
   border-bottom:1px solid var(--gb-soft);
 }
 .hdr-top { display:flex; align-items:center; gap:10px; padding:12px 18px 10px; }
+.hdr-top-premium {
+  display:grid;
+  grid-template-columns:48px 1fr 48px;
+  align-items:center;
+  gap:8px;
+  min-height:58px;
+  padding:10px 14px 8px;
+}
+.hdr-slot { display:flex; align-items:center; min-width:0; }
+.hdr-slot-left { justify-content:flex-start; }
+.hdr-slot-right { justify-content:flex-end; }
+.hdr-brand {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  min-width:0;
+  text-align:left;
+}
+.hdr-brand-text { min-width:0; }
 .hdr-icon {
   width:32px; height:32px; border-radius:8px; flex-shrink:0;
   background:var(--glass-mid); border:1px solid var(--gb-mid);
   display:flex; align-items:center; justify-content:center;
   font-size:16px; font-family:var(--fm);
   box-shadow:inset 0 1px 0 rgba(255,255,255,0.15);
+  overflow:hidden;
 }
-.hdr-title { font-size:15px; font-weight:700; letter-spacing:-.25px; }
-.hdr-sub   { font-size:12px; color:var(--t3); margin-top:1px; }
+.hdr-icon img { width:100%; height:100%; object-fit:cover; display:block; }
+.hdr-icon-center { width:34px; height:34px; border-radius:10px; }
+.hdr-title { font-size:15px; font-weight:700; letter-spacing:-.25px; line-height:1.05; white-space:nowrap; }
+.hdr-title-pro { color:var(--blue); font-weight:800; font-size:11px; letter-spacing:.03em; margin-left:2px; }
+.hdr-sub { font-size:12px; color:var(--t3); margin-top:2px; white-space:nowrap; }
+.hdr-menu-btn {
+  width:42px; height:42px; border-radius:14px;
+  border:1px solid var(--gb-soft);
+  background:var(--glass-mid);
+  color:var(--t1);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:4px; cursor:pointer; touch-action:manipulation;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+  -webkit-tap-highlight-color:transparent;
+}
+.hdr-menu-btn span {
+  width:18px; height:2px; border-radius:2px;
+  background:currentColor; display:block; opacity:.86;
+}
+.hdr-menu-btn.open { background:rgba(79,168,255,.18); border-color:rgba(79,168,255,.45); color:var(--blue); }
+
+/* Header Menu */
+.app-menu-overlay {
+  display:none; position:fixed; inset:0; z-index:760;
+  background:rgba(0,0,0,.52);
+  backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px);
+}
+.app-menu-overlay.open { display:block; }
+.app-menu-sheet {
+  position:fixed; top:0; right:0; bottom:0; z-index:820;
+  width:min(390px, calc(100vw - 28px));
+  padding:calc(14px + var(--sat)) 16px calc(20px + var(--sab));
+  background:rgba(12,12,20,.98);
+  border-left:1px solid rgba(255,255,255,.13);
+  box-shadow:-18px 0 70px rgba(0,0,0,.65);
+  transform:translateX(104%);
+  transition:transform .28s cubic-bezier(.32,.72,0,1);
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.app-menu-sheet.open { transform:translateX(0); }
+.app-menu-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:14px; border-bottom:1px solid var(--gb-soft); }
+.app-menu-title { font-size:18px; font-weight:800; letter-spacing:-.3px; }
+.app-menu-sub { font-size:12px; color:var(--t3); margin-top:2px; }
+.app-menu-close {
+  width:38px; height:38px; border-radius:13px; border:1px solid var(--gb-soft);
+  background:var(--glass-mid); color:var(--t2); font-size:26px; line-height:1; cursor:pointer;
+}
+.app-menu-section { margin-top:16px; }
+.app-menu-section-title { font-size:11px; font-weight:800; color:var(--t3); letter-spacing:.14em; text-transform:uppercase; margin:0 0 8px 2px; }
+.app-menu-item, .app-menu-version {
+  width:100%; border:1px solid var(--gb-soft); background:var(--glass-mid);
+  border-radius:var(--r-m); padding:12px 13px; color:var(--t1);
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  font-family:var(--f); text-align:left; margin-bottom:8px;
+}
+.app-menu-item { cursor:pointer; }
+.app-menu-item span, .app-menu-version span { font-size:14px; font-weight:800; }
+.app-menu-item small { font-size:11px; color:var(--t3); text-align:right; line-height:1.25; max-width:150px; }
+.app-menu-item:active { transform:scale(.99); }
+.app-menu-setting { align-items:flex-start; flex-direction:column; }
+.seg { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; width:100%; background:rgba(0,0,0,.25); border:1px solid var(--gb-soft); border-radius:12px; padding:4px; }
+.seg button { border:0; border-radius:9px; background:transparent; color:var(--t3); font:700 12px var(--f); padding:9px 6px; cursor:pointer; }
+.seg button.active { background:var(--glass-raise); color:var(--blue); }
+.app-menu-version strong { font-size:12px; color:var(--blue); font-family:var(--fm); }
+body.menu-open { overflow:hidden; }
 
 /* Desktop Tab-Bar */
 .tab-bar {
@@ -69,7 +154,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
 /* ─── APP SHELL ─── */
 /* Einzige Padding-Top Regel — Header-Abstand zentral */
 #app-shell {
-  padding-top: calc(var(--hdr) + var(--sat) + var(--gap));
+  padding-top: calc(var(--hdr) + var(--sat) + var(--gap-l));
 }
 
 /* ─── TAB PANELS — Zentrale Klasse für alle 6 Tabs ─── */
@@ -274,3 +359,363 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
   padding:6px 14px; border-radius:9px; cursor:pointer;
 }
 #ib .n { background:none; border:none; color:var(--t3); font-size:18px; cursor:pointer; line-height:1; }
+
+/* ─── Mobile Keyboard Guard ─── */
+body.keyboard-open .bottom-pill,
+body.keyboard-open .plus-overlay,
+body.keyboard-open .plus-sheet {
+  display:none !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DESKTOP OPTIMIZATION V2
+   Ziel: breite Desktop-Flächen nutzen, Eingabe links, Ergebnis/Diagramm rechts.
+═══════════════════════════════════════════════════════ */
+@media (min-width: 1200px) {
+  #app-shell {
+    padding-top: calc(var(--hdr) + var(--sat) + 28px);
+  }
+
+  .tab-panel {
+    padding-left: max(24px, calc(var(--sal) + 24px));
+    padding-right: max(24px, calc(var(--sar) + 24px));
+    padding-bottom: 24px;
+  }
+
+  /* Global desktop inner width */
+  .tab-inner {
+    max-width: 1320px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 24px;
+    margin: 0 auto;
+  }
+
+  /* Flow: echte 2-Spalten-Ansicht */
+  #tab-flow {
+    width: 100%;
+    max-width: 1680px;
+    margin: 0 auto;
+    grid-template-columns: minmax(420px, 0.95fr) minmax(520px, 1.05fr);
+    align-items: start;
+    gap: 22px;
+    min-height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+  #tab-flow .col-L,
+  #tab-flow .col-R {
+    display:flex;
+    flex-direction:column;
+    gap:var(--gap);
+    overflow: visible;
+    padding: 0;
+    border-right: 0;
+    background: transparent;
+  }
+  #tab-flow .col-L > .gc:first-child,
+  #tab-flow .col-L > .twin,
+  #tab-flow .col-L > .out-card,
+  #tab-flow .col-R > .gc,
+  #tab-flow .col-R > #pi-card,
+  #tab-flow .col-R > #pi-placeholder {
+    width: 100%;
+  }
+  #tab-flow .col-R {
+    position: sticky;
+    top: calc(var(--hdr) + var(--sat) + 16px);
+    max-height: calc(100dvh - var(--hdr) - var(--sat) - 32px);
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+  #tab-flow .rcol-hdr { margin-top: 0; }
+
+  /* Lüftung/Einheiten/Rohr bleiben zentriert, aber nicht unnötig schmal */
+  #tab-luft .tab-inner,
+  #tab-unit .tab-inner,
+  #tab-pipe {
+    max-width: 1040px;
+  }
+
+  /* h,x: Eingabe links, Diagramm rechts */
+  #tab-hx .tab-inner {
+    display:grid;
+    grid-template-columns: minmax(380px, 520px) minmax(560px, 1fr);
+    gap: 22px;
+    align-items:start;
+    max-width: 1380px;
+  }
+  #tab-hx .tab-inner > .gc,
+  #tab-hx .tab-inner > .fml {
+    grid-column: 1;
+  }
+  #tab-hx .tab-inner > .gc:nth-of-type(2) {
+    grid-column: 2;
+    grid-row: 1 / span 8;
+    position: sticky;
+    top: calc(var(--hdr) + var(--sat) + 16px);
+  }
+  #tab-hx #hxCanvas {
+    min-height: 520px !important;
+  }
+
+  /* WRG / Mischluft: WRG links, Mischluft rechts */
+  #tab-wrg .tab-inner {
+    display:grid;
+    grid-template-columns: minmax(420px, 1fr) minmax(520px, 1fr);
+    gap: 22px;
+    align-items:start;
+    max-width: 1380px;
+  }
+  #tab-wrg .tab-inner > .gc:nth-of-type(1),
+  #tab-wrg .tab-inner > .out-card:nth-of-type(1),
+  #tab-wrg .tab-inner > .fml:nth-of-type(1) {
+    grid-column:1;
+  }
+  #tab-wrg .tab-inner > .gc:nth-of-type(2),
+  #tab-wrg .tab-inner > .out-card:nth-of-type(2),
+  #tab-wrg .tab-inner > .fml:nth-of-type(2) {
+    grid-column:2;
+  }
+
+  /* Trinkwasser: Eingaben links, Ergebnisse/Hinweise rechts */
+  #tab-trinkwasser .tab-inner {
+    display:grid;
+    grid-template-columns: minmax(420px, 0.95fr) minmax(460px, 1.05fr);
+    gap: 22px;
+    align-items:start;
+    max-width: 1380px;
+  }
+  #tab-trinkwasser .tab-inner > .gc:nth-of-type(1),
+  #tab-trinkwasser .tab-inner > .gc:nth-of-type(2),
+  #tab-trinkwasser .tab-inner > .gc:nth-of-type(3) {
+    grid-column:1;
+  }
+  #tab-trinkwasser .tab-inner > .out-card,
+  #tab-trinkwasser .tab-inner > .gc:nth-of-type(4),
+  #tab-trinkwasser .tab-inner > .fml {
+    grid-column:2;
+  }
+  #tab-trinkwasser .tab-inner > .out-card {
+    position: sticky;
+    top: calc(var(--hdr) + var(--sat) + 16px);
+  }
+}
+
+@media (min-width: 1600px) {
+  #tab-flow { max-width: 1760px; }
+  .tab-inner { max-width: 1480px; }
+  #tab-hx .tab-inner,
+  #tab-wrg .tab-inner,
+  #tab-trinkwasser .tab-inner { max-width: 1540px; }
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   DESKTOP UI POLISH V3
+   Header-Abstand, Flow-Komplettansicht, gleich breite Desktop-Spalten.
+═══════════════════════════════════════════════════════ */
+@media (min-width: 1200px) {
+  /* 1) Mehr Luft unter dem fixen Header in allen Tabs */
+  #app-shell { padding-top: calc(var(--hdr) + var(--sat) + 32px) !important; }
+  .tab-panel { padding-top: 0 !important; }
+
+  /* 2) Heizung/Kälte: Desktop ohne Umschalter, beide Eingabekarten sichtbar */
+  #tab-flow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    column-gap: 28px !important;
+  }
+  #tab-flow .col-L > div:nth-child(2) { display:none !important; }
+  #tab-flow #flow-panel-h,
+  #tab-flow #flow-panel-k { display:block !important; }
+  #tab-flow .twin { grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important; }
+  #tab-flow .col-R { top: calc(var(--hdr) + var(--sat) + 32px) !important; }
+
+  /* 3) h,x: links/rechts exakt gleich breit */
+  #tab-hx .tab-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    max-width: 1500px !important;
+    column-gap: 28px !important;
+  }
+  #tab-hx .tab-inner > .gc:nth-of-type(2) {
+    top: calc(var(--hdr) + var(--sat) + 32px) !important;
+  }
+
+  /* 4) WRG/Mischluft ebenfalls symmetrisch halten */
+  #tab-wrg .tab-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    max-width: 1500px !important;
+    column-gap: 28px !important;
+  }
+
+  /* 5) Trinkwasser: rechte Ergebnis-Spalte startet oben bündig mit links */
+  #tab-trinkwasser .tab-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    max-width: 1500px !important;
+    column-gap: 28px !important;
+  }
+  #tab-trinkwasser .tab-inner > .out-card {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: start !important;
+    top: calc(var(--hdr) + var(--sat) + 32px) !important;
+  }
+  #tab-trinkwasser .tab-inner > .gc:nth-of-type(4) { grid-column: 2 !important; grid-row: 2 !important; }
+  #tab-trinkwasser .tab-inner > .fml { grid-column: 2 !important; grid-row: 3 !important; }
+}
+
+/* Phase 2 — Dynamic Bottom Navigation */
+.plus-empty{
+  grid-column:1/-1;
+  padding:14px 10px;
+  color:var(--t3);
+  font-family:var(--f);
+  font-size:12px;
+  text-align:center;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PHASE 3 — Navigation Pill konfigurieren
+═══════════════════════════════════════════════════════ */
+.plus-item.active-tab { border-color: var(--blue) !important; box-shadow: inset 0 1px 0 rgba(79,168,255,.18), 0 0 0 2px rgba(79,168,255,.24), 0 12px 28px rgba(0,0,0,.28); color: var(--t1) !important; }
+.plus-item.active-tab svg { color: var(--blue); }
+.nav-config-overlay { display:none; position:fixed; inset:0; z-index:910; background:rgba(0,0,0,.64); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+.nav-config-overlay.open { display:block; }
+.nav-config-sheet { position:fixed; right:14px; top:calc(var(--sat) + 72px); bottom:14px; width:min(440px, calc(100vw - 28px)); z-index:920; background:rgba(18,18,20,.96); border:1px solid var(--gb-strong); border-radius:24px; padding:18px; box-shadow:0 22px 70px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.08); transform:translateX(calc(100% + 30px)); transition:transform .24s ease; overflow:auto; }
+.nav-config-sheet.open { transform:translateX(0); }
+.nav-config-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:14px; border-bottom:1px solid var(--gb-soft); }
+.nav-config-title { font-family:var(--f); font-size:18px; font-weight:850; color:var(--t1); letter-spacing:-.25px; }
+.nav-config-sub { font-family:var(--f); font-size:12px; color:var(--t3); margin-top:3px; line-height:1.35; }
+.nav-config-status { margin:14px 0 12px; display:inline-flex; align-items:center; padding:6px 10px; border-radius:999px; border:1px solid var(--blue-b); background:var(--blue-t); color:var(--blue); font-family:var(--fm); font-size:12px; font-weight:800; }
+.nav-config-section-title { margin:14px 0 8px; font-family:var(--f); font-size:11px; font-weight:850; text-transform:uppercase; letter-spacing:.14em; color:var(--t3); }
+.nav-config-selected, .nav-config-list { display:flex; flex-direction:column; gap:8px; }
+.nav-slot, .nav-module { width:100%; display:grid; align-items:center; gap:10px; background:var(--glass-mid); border:1px solid var(--gb-soft); border-radius:16px; padding:10px 10px; color:var(--t1); font-family:var(--f); box-shadow:inset 0 1px 0 rgba(255,255,255,.07); }
+.nav-slot { grid-template-columns:28px 30px 1fr 34px 34px 34px; }
+.nav-slot-rank { width:26px; height:26px; display:flex; align-items:center; justify-content:center; border-radius:9px; background:rgba(79,168,255,.15); border:1px solid rgba(79,168,255,.28); color:var(--blue); font-family:var(--fm); font-weight:850; }
+.nav-slot-icon svg, .nav-module-icon svg { width:24px; height:24px; color:var(--blue); display:block; }
+.nav-slot-main strong, .nav-module strong { display:block; font-size:13px; font-weight:850; }
+.nav-slot-main small, .nav-module small { display:block; margin-top:2px; font-size:10px; color:var(--t3); }
+.nav-move, .nav-remove { height:34px; border-radius:11px; border:1px solid var(--gb-soft); background:rgba(255,255,255,.06); color:var(--t2); font-family:var(--f); font-size:15px; font-weight:850; }
+.nav-remove { color:#ff6b5f; }
+.nav-move:disabled { opacity:.25; }
+.nav-module { grid-template-columns:30px 1fr 30px; text-align:left; cursor:pointer; }
+.nav-module.selected { border-color:var(--blue); background:rgba(79,168,255,.10); }
+.nav-module:disabled { opacity:.42; cursor:not-allowed; }
+.nav-module b { color:var(--blue); font-size:18px; text-align:center; }
+.nav-config-empty { padding:14px; border-radius:14px; background:rgba(255,255,255,.04); color:var(--t3); font-size:12px; }
+.nav-config-actions { position:sticky; bottom:-18px; margin:16px -18px -18px; padding:14px 18px calc(14px + var(--sab)); display:grid; grid-template-columns:1fr 1.5fr; gap:10px; background:linear-gradient(180deg, rgba(18,18,20,.72), rgba(18,18,20,.98) 35%); border-top:1px solid var(--gb-soft); }
+.nav-config-secondary, .nav-config-primary { height:48px; border-radius:15px; font-family:var(--f); font-weight:850; font-size:14px; cursor:pointer; }
+.nav-config-secondary { background:rgba(255,255,255,.06); border:1px solid var(--gb-soft); color:var(--t2); }
+.nav-config-primary { background:linear-gradient(135deg,var(--blue),#2e80d8); border:1px solid rgba(255,255,255,.14); color:#fff; }
+.nav-config-primary:disabled { opacity:.45; cursor:not-allowed; }
+@media (max-width: 899px) { .nav-config-sheet { left:0; right:0; top:auto; bottom:0; width:100%; max-height:82dvh; border-radius:24px 24px 0 0; transform:translateY(105%); padding-bottom:calc(18px + var(--sab)); } .nav-config-sheet.open { transform:translateY(0); } }
+@media (min-width: 1200px) { #tab-trinkwasser .tab-inner { align-items:start !important; } #tab-trinkwasser .tab-inner > .gc:nth-of-type(1) { margin-bottom:0 !important; } #tab-trinkwasser .tab-inner > .gc:nth-of-type(2) { margin-top:0 !important; } #tab-trinkwasser .tab-inner > .fml { grid-column:2 !important; grid-row:2 !important; align-self:start !important; margin-top:10px !important; text-align:left; padding:10px 12px; border:1px solid var(--gb-soft); border-radius:var(--r-m); background:rgba(255,255,255,.035); } #tab-trinkwasser .tab-inner > .gc:nth-of-type(4) { grid-column:2 !important; grid-row:3 !important; } #tab-trinkwasser .tab-inner > .out-card { top:auto !important; position:relative !important; } }
+
+/* ═══════════════════════════════════════════════════════
+   PHASE 3.1 — Desktop spacing and Trinkwasser column cleanup
+   - unabhängige linke/rechte Spalte im Trinkwasser-Tab
+   - gleiche Oberkante rechts/links
+   - konsistente Grid-Abstände
+═══════════════════════════════════════════════════════ */
+.tw-desktop-left,
+.tw-desktop-right { display: contents; }
+
+@media (min-width: 1200px) {
+  :root { --desktop-grid-gap: 22px; }
+
+  #app-shell { padding-top: calc(var(--hdr) + var(--sat) + 36px) !important; }
+
+  /* Einheitlicher oberer Startpunkt für rechte Desktop-Spalten */
+  #tab-flow .col-R,
+  #tab-hx .tab-inner > .gc:nth-of-type(2),
+  #tab-trinkwasser .tw-desktop-right {
+    margin-top: 0 !important;
+  }
+
+  /* Trinkwasser: echte unabhängige Spalten statt geteilter Grid-Zeilen */
+  #tab-trinkwasser .tab-inner {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    column-gap: 28px !important;
+    row-gap: 0 !important;
+    align-items: start !important;
+    max-width: 1500px !important;
+  }
+
+  #tab-trinkwasser .tw-desktop-left,
+  #tab-trinkwasser .tw-desktop-right {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--desktop-grid-gap) !important;
+    min-width: 0 !important;
+    align-self: start !important;
+  }
+
+  #tab-trinkwasser .tw-desktop-left { grid-column: 1 !important; grid-row: 1 !important; }
+  #tab-trinkwasser .tw-desktop-right { grid-column: 2 !important; grid-row: 1 !important; }
+
+  #tab-trinkwasser .tw-desktop-left > *,
+  #tab-trinkwasser .tw-desktop-right > * {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    width: 100% !important;
+  }
+
+  #tab-trinkwasser .tw-desktop-right > .out-card {
+    position: relative !important;
+    top: auto !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+
+  #tab-trinkwasser .tw-desktop-right > .fml {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    align-self: stretch !important;
+    text-align: left !important;
+    padding: 10px 12px !important;
+    border: 1px solid var(--gb-soft) !important;
+    border-radius: var(--r-m) !important;
+    background: rgba(255,255,255,.035) !important;
+  }
+
+  #tab-trinkwasser .tw-desktop-right > .gc {
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+}
+
+/* Phase 4 - Theme polish / Light Mode compatibility */
+:root[data-theme="light"] body,
+:root[data-theme-effective="light"] body { background-image: radial-gradient(ellipse 45% 35% at 85% 90%, rgba(79,168,255,.10) 0%, transparent 70%); }
+:root[data-theme="light"] .hdr,
+:root[data-theme-effective="light"] .hdr { background:rgba(246,248,252,.88); border-bottom-color:rgba(30,42,56,.12); }
+:root[data-theme="light"] .app-menu-overlay,
+:root[data-theme-effective="light"] .app-menu-overlay,
+:root[data-theme="light"] .nav-config-overlay,
+:root[data-theme-effective="light"] .nav-config-overlay,
+:root[data-theme="light"] .plus-overlay,
+:root[data-theme-effective="light"] .plus-overlay { background:rgba(14,24,38,.34); }
+:root[data-theme="light"] .app-menu-sheet,
+:root[data-theme-effective="light"] .app-menu-sheet,
+:root[data-theme="light"] .nav-config-sheet,
+:root[data-theme-effective="light"] .nav-config-sheet,
+:root[data-theme="light"] .plus-sheet,
+:root[data-theme-effective="light"] .plus-sheet { background:rgba(248,250,253,.97); border-color:rgba(30,42,56,.14); box-shadow:0 18px 60px rgba(30,42,56,.20), inset 0 1px 0 rgba(255,255,255,.76); }
+:root[data-theme="light"] .tab-btn.active,
+:root[data-theme-effective="light"] .tab-btn.active { background:rgba(22,119,210,.08); }
+:root[data-theme="light"] .tab-btn:hover:not(.active),
+:root[data-theme-effective="light"] .tab-btn:hover:not(.active) { background:rgba(30,42,56,.04); }
+:root[data-theme="light"] .seg,
+:root[data-theme-effective="light"] .seg { background:rgba(30,42,56,.05); }
+:root[data-theme="light"] .hdr-menu-btn,
+:root[data-theme-effective="light"] .hdr-menu-btn,
+:root[data-theme="light"] .app-menu-close,
+:root[data-theme-effective="light"] .app-menu-close { box-shadow:inset 0 1px 0 rgba(255,255,255,.7), 0 6px 18px rgba(30,42,56,.08); }
+@media (prefers-color-scheme: light) {
+  :root[data-theme="system"] body { background-image:radial-gradient(ellipse 45% 35% at 85% 90%, rgba(79,168,255,.10) 0%, transparent 70%); }
+  :root[data-theme="system"] .hdr { background:rgba(246,248,252,.88); border-bottom-color:rgba(30,42,56,.12); }
+  :root[data-theme="system"] .app-menu-sheet,
+  :root[data-theme="system"] .nav-config-sheet,
+  :root[data-theme="system"] .plus-sheet { background:rgba(248,250,253,.97); border-color:rgba(30,42,56,.14); box-shadow:0 18px 60px rgba(30,42,56,.20), inset 0 1px 0 rgba(255,255,255,.76); }
+}
