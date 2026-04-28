@@ -563,3 +563,13 @@ body.keyboard-open .plus-sheet {
   #tab-trinkwasser .tab-inner > .gc:nth-of-type(4) { grid-column: 2 !important; grid-row: 2 !important; }
   #tab-trinkwasser .tab-inner > .fml { grid-column: 2 !important; grid-row: 3 !important; }
 }
+
+/* Phase 2 — Dynamic Bottom Navigation */
+.plus-empty{
+  grid-column:1/-1;
+  padding:14px 10px;
+  color:var(--t3);
+  font-family:var(--f);
+  font-size:12px;
+  text-align:center;
+}

@@ -21,6 +21,78 @@ const loc  = (v, d) => v.toLocaleString('de-DE', {
 ─────────────────────────────────────── */
 const TABS = ['flow', 'luft', 'pipe', 'unit', 'hx', 'wrg', 'trinkwasser'];
 
+const MODULES = {
+  flow: { label:'Heizung', fullLabel:'Heizung/Kälte', shortLabel:'Heizung', aria:'Heizung und Kälte', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-1 2.5-2.5 4.5-2 7.5a4 4 0 108 0c0-1.5-.8-3-2-4 0 1.5-1 3-2.5 3S10 7 10 5"/><circle cx="12" cy="17" r="1.2" fill="currentColor" stroke="none"/></svg>' },
+  luft: { label:'Lüftung', fullLabel:'Lüftung', shortLabel:'Lüftung', aria:'Lüftung', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.8"/><path d="M12 10.2C12 7 10 5 8 6s-2 4.5 1.5 5.5"/><path d="M13.8 12C17 12 19 10 18 8s-4.5-2-5.5 1.5"/><path d="M12 13.8C12 17 14 19 16 18s2-4.5-1.5-5.5"/><path d="M10.2 12C7 12 5 14 6 16s4.5 2 5.5-1.5"/></svg>' },
+  pipe: { label:'Rohr', fullLabel:'Rohrdimensionierung', shortLabel:'Rohr', aria:'Rohrdimensionierung', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="5" height="8" rx="1.5"/><rect x="17" y="8" width="5" height="8" rx="1.5"/><line x1="7" y1="10.5" x2="17" y2="10.5"/><line x1="7" y1="13.5" x2="17" y2="13.5"/></svg>' },
+  unit: { label:'Einheiten', fullLabel:'Einheiten', shortLabel:'Einheiten', aria:'Einheitenrechner', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h2v16H4M8 4l8 16M16 4h4M16 12h3"/><circle cx="18" cy="20" r="2"/></svg>' },
+  hx: { label:'h,x', fullLabel:'h,x-Diagramm', shortLabel:'h,x', aria:'h,x-Diagramm', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 20 7 10 11 14 15 6 21 6"/><path d="M3 20h18M3 20V4"/></svg>' },
+  wrg: { label:'WRG', fullLabel:'WRG / Mischluft', shortLabel:'WRG', aria:'WRG und Mischluft', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h12M4 8l3-3M4 8l3 3"/><path d="M20 16H8M20 16l-3-3M20 16l-3 3"/><line x1="12" y1="8" x2="12" y2="16"/></svg>' },
+  trinkwasser: { label:'Trinkwasser', fullLabel:'Trinkwasser', shortLabel:'Wasser', aria:'Trinkwasser', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 7 6 10 6 14a6 6 0 0 0 12 0c0-4-2-7-6-12z"/><path d="M9 14h6"/></svg>' },
+};
+
+const NAV_STORAGE_KEY = 'tcp_nav_favorites_v1';
+const NAV_DEFAULT_FAVORITES = ['pipe', 'trinkwasser', 'unit', 'flow'];
+let NAV_FAVORITES = _loadNavFavorites();
+
+function _loadNavFavorites() {
+  try {
+    const raw = localStorage.getItem(NAV_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (Array.isArray(parsed)) {
+      const valid = parsed.filter(id => TABS.includes(id)).filter((id, i, a) => a.indexOf(id) === i).slice(0, 4);
+      if (valid.length === 4) return valid;
+    }
+  } catch (_) {}
+  return NAV_DEFAULT_FAVORITES.filter(id => TABS.includes(id)).slice(0, 4);
+}
+
+function setNavFavorites(ids) {
+  const valid = (Array.isArray(ids) ? ids : [])
+    .filter(id => TABS.includes(id))
+    .filter((id, i, a) => a.indexOf(id) === i)
+    .slice(0, 4);
+  while (valid.length < 4) {
+    const next = TABS.find(id => !valid.includes(id));
+    if (!next) break;
+    valid.push(next);
+  }
+  NAV_FAVORITES = valid;
+  try { localStorage.setItem(NAV_STORAGE_KEY, JSON.stringify(NAV_FAVORITES)); } catch (_) {}
+  renderBottomNav();
+  NAV._apply();
+}
+
+function resetNavFavorites() {
+  try { localStorage.removeItem(NAV_STORAGE_KEY); } catch (_) {}
+  NAV_FAVORITES = _loadNavFavorites();
+  renderBottomNav();
+  NAV._apply();
+}
+
+function _moduleButtonHtml(id, mode) {
+  const m = MODULES[id];
+  if (!m) return '';
+  if (mode === 'pill') return `<button class="pill-btn" id="pill-${id}" data-tab="${id}" aria-label="${m.aria}">${m.icon}${m.shortLabel}</button>`;
+  return `<button class="plus-item" id="plus-${id}" data-tab="${id}" aria-label="${m.aria}">${m.icon}${m.fullLabel}</button>`;
+}
+
+function renderBottomNav() {
+  const pill = $('bottom-pill');
+  const grid = document.querySelector('#plus-sheet .plus-grid');
+  if (!pill || !grid) return;
+  const visible = NAV_FAVORITES.filter(id => TABS.includes(id)).slice(0, 4);
+  const overflow = TABS.filter(id => !visible.includes(id));
+  pill.innerHTML = visible.map(id => _moduleButtonHtml(id, 'pill')).join('') + `
+    <button class="pill-plus" id="pill-plus" aria-label="Weitere Module" aria-expanded="false">
+      <span class="pill-plus-icon">+</span>
+    </button>`;
+  grid.innerHTML = overflow.map(id => _moduleButtonHtml(id, 'plus')).join('') || '<div class="plus-empty">Alle Module liegen bereits auf der Navigation Pill.</div>';
+  pill.querySelectorAll('.pill-btn[data-tab]').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+  $('pill-plus')?.addEventListener('click', togglePlusSheet);
+  grid.querySelectorAll('.plus-item[data-tab]').forEach(btn => btn.addEventListener('click', () => _switchFromPlus(btn.dataset.tab)));
+}
+
 /* ─── NAVIGATION STATE MACHINE ─── */
 const NAV = {
   activeTab:   'flow',
@@ -51,14 +123,12 @@ const NAV = {
       b.classList.toggle('active', b.dataset.tab === NAV.activeTab)
     );
 
-    /* Pill Haupt-Buttons */
-    ['flow','luft','hx','unit'].forEach(id =>
-      $('pill-' + id)?.classList.toggle('active', id === NAV.activeTab)
+    /* Mobile Pill + Plus-Sheet Markierung (dynamisch gerendert) */
+    document.querySelectorAll('.pill-btn[data-tab]').forEach(btn =>
+      btn.classList.toggle('active', btn.dataset.tab === NAV.activeTab)
     );
-
-    /* Plus-Sheet-Items Markierung */
-    ['pipe','unit','wrg','trinkwasser'].forEach(id =>
-      $('plus-' + id)?.classList.toggle('active-tab', id === NAV.activeTab)
+    document.querySelectorAll('.plus-item[data-tab]').forEach(btn =>
+      btn.classList.toggle('active-tab', btn.dataset.tab === NAV.activeTab)
     );
 
     /* Plus-Sheet */
@@ -101,7 +171,7 @@ function _handleMenuAction(action) {
     return;
   }
   if (action === 'nav-config') {
-    _setMenuMessage('Schnellzugriffe', 'Die frei konfigurierbare Navigation Pill ist für Phase 2 vorbereitet.');
+    _setMenuMessage('Schnellzugriffe', 'Die Navigation Pill ist jetzt dynamisch. Die Bearbeitungsoberfläche mit Drag & Drop folgt in Phase 3.');
     return;
   }
   if (action === 'favorites') {
@@ -222,22 +292,11 @@ document.addEventListener('DOMContentLoaded', () => {
     b.addEventListener('click', () => switchTab(b.dataset.tab));
   });
 
-  // Pill Haupt-Buttons
-  ['flow','luft','hx','unit'].forEach(id => {
-    $('pill-' + id)?.addEventListener('click', () => switchTab(id));
-  });
-
-  // Plus Button
-  $('pill-plus')?.addEventListener('click', togglePlusSheet);
+  // Mobile Bottom Navigation dynamisch rendern
+  renderBottomNav();
 
   // Plus Overlay schließt Sheet
   $('plus-overlay')?.addEventListener('click', closePlusSheet);
-
-  // Plus Sheet Items
-  ['pipe','unit','wrg','trinkwasser'].forEach(id => {
-    $('plus-' + id)?.addEventListener('click', () => _switchFromPlus(id));
-  });
-  // Note: plus-hx removed — h,x is now in main pill
 
   // Swipe-Down schließt Sheet
   let _touchStartY = 0;
