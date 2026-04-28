@@ -192,13 +192,17 @@ function _navConfigToggle(id) {
   }
   renderNavConfig();
 }
+let _navMoveLock = false;
 function _navConfigMove(id, dir) {
+  if (_navMoveLock) return;
   const i = NAV_CONFIG.draft.indexOf(id);
   if (i < 0) return;
   const j = i + dir;
   if (j < 0 || j >= NAV_CONFIG.draft.length) return;
+  _navMoveLock = true;
   [NAV_CONFIG.draft[i], NAV_CONFIG.draft[j]] = [NAV_CONFIG.draft[j], NAV_CONFIG.draft[i]];
   renderNavConfig();
+  setTimeout(() => { _navMoveLock = false; }, 180);
 }
 function saveNavConfig() {
   setNavFavorites(NAV_CONFIG.draft);
@@ -244,7 +248,12 @@ function renderNavConfig() {
   }).join('');
 
   selectedEl.querySelectorAll('[data-move]').forEach(btn => {
-    btn.addEventListener('click', () => _navConfigMove(btn.dataset.id, btn.dataset.move === 'up' ? -1 : 1));
+    btn.addEventListener('click', ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      btn.blur();
+      _navConfigMove(btn.dataset.id, btn.dataset.move === 'up' ? -1 : 1);
+    });
   });
   selectedEl.querySelectorAll('[data-remove]').forEach(btn => btn.addEventListener('click', () => _navConfigToggle(btn.dataset.remove)));
   listEl.querySelectorAll('[data-nav-module]').forEach(btn => btn.addEventListener('click', () => _navConfigToggle(btn.dataset.navModule)));

@@ -4,7 +4,7 @@
 ═══════════════════════════════════════════════════════ */
 'use strict';
 
-const BUILD_TS   = '20260428-Phase3NavConfig';
+const BUILD_TS   = '20260428-Phase3_1DesktopSpacing';
 const CACHE_NAME = `techcalc-${BUILD_TS}`;
 
 const PRECACHE = [

@@ -610,3 +610,77 @@ body.keyboard-open .plus-sheet {
 .nav-config-primary:disabled { opacity:.45; cursor:not-allowed; }
 @media (max-width: 899px) { .nav-config-sheet { left:0; right:0; top:auto; bottom:0; width:100%; max-height:82dvh; border-radius:24px 24px 0 0; transform:translateY(105%); padding-bottom:calc(18px + var(--sab)); } .nav-config-sheet.open { transform:translateY(0); } }
 @media (min-width: 1200px) { #tab-trinkwasser .tab-inner { align-items:start !important; } #tab-trinkwasser .tab-inner > .gc:nth-of-type(1) { margin-bottom:0 !important; } #tab-trinkwasser .tab-inner > .gc:nth-of-type(2) { margin-top:0 !important; } #tab-trinkwasser .tab-inner > .fml { grid-column:2 !important; grid-row:2 !important; align-self:start !important; margin-top:10px !important; text-align:left; padding:10px 12px; border:1px solid var(--gb-soft); border-radius:var(--r-m); background:rgba(255,255,255,.035); } #tab-trinkwasser .tab-inner > .gc:nth-of-type(4) { grid-column:2 !important; grid-row:3 !important; } #tab-trinkwasser .tab-inner > .out-card { top:auto !important; position:relative !important; } }
+
+/* ═══════════════════════════════════════════════════════
+   PHASE 3.1 — Desktop spacing and Trinkwasser column cleanup
+   - unabhängige linke/rechte Spalte im Trinkwasser-Tab
+   - gleiche Oberkante rechts/links
+   - konsistente Grid-Abstände
+═══════════════════════════════════════════════════════ */
+.tw-desktop-left,
+.tw-desktop-right { display: contents; }
+
+@media (min-width: 1200px) {
+  :root { --desktop-grid-gap: 22px; }
+
+  #app-shell { padding-top: calc(var(--hdr) + var(--sat) + 36px) !important; }
+
+  /* Einheitlicher oberer Startpunkt für rechte Desktop-Spalten */
+  #tab-flow .col-R,
+  #tab-hx .tab-inner > .gc:nth-of-type(2),
+  #tab-trinkwasser .tw-desktop-right {
+    margin-top: 0 !important;
+  }
+
+  /* Trinkwasser: echte unabhängige Spalten statt geteilter Grid-Zeilen */
+  #tab-trinkwasser .tab-inner {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    column-gap: 28px !important;
+    row-gap: 0 !important;
+    align-items: start !important;
+    max-width: 1500px !important;
+  }
+
+  #tab-trinkwasser .tw-desktop-left,
+  #tab-trinkwasser .tw-desktop-right {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--desktop-grid-gap) !important;
+    min-width: 0 !important;
+    align-self: start !important;
+  }
+
+  #tab-trinkwasser .tw-desktop-left { grid-column: 1 !important; grid-row: 1 !important; }
+  #tab-trinkwasser .tw-desktop-right { grid-column: 2 !important; grid-row: 1 !important; }
+
+  #tab-trinkwasser .tw-desktop-left > *,
+  #tab-trinkwasser .tw-desktop-right > * {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    width: 100% !important;
+  }
+
+  #tab-trinkwasser .tw-desktop-right > .out-card {
+    position: relative !important;
+    top: auto !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+
+  #tab-trinkwasser .tw-desktop-right > .fml {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    align-self: stretch !important;
+    text-align: left !important;
+    padding: 10px 12px !important;
+    border: 1px solid var(--gb-soft) !important;
+    border-radius: var(--r-m) !important;
+    background: rgba(255,255,255,.035) !important;
+  }
+
+  #tab-trinkwasser .tw-desktop-right > .gc {
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+}
