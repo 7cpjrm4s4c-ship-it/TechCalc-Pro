@@ -4,7 +4,7 @@
 ═══════════════════════════════════════════════════════ */
 'use strict';
 
-const BUILD_TS   = '20260428-Phase5UiPolishLueftung';
+const BUILD_TS = '20260428-Phase53';
 const CACHE_NAME = `techcalc-${BUILD_TS}`;
 
 const PRECACHE = [

@@ -1052,3 +1052,61 @@ body.keyboard-open .plus-sheet {
 :root[data-theme-effective="light"] #tab-trinkwasser .out-card .chip {
   color:#475569 !important;
 }
+
+/* ═══════════════════════════════════════════════════════
+   Phase 5.3 — Final readability/corner polish
+═══════════════════════════════════════════════════════ */
+#tab-trinkwasser .out-card .out-val {
+  font-size:clamp(17px,4.7vw,22px) !important;
+  line-height:1 !important;
+}
+#tab-trinkwasser .out-card .ob {
+  min-height:42px !important;
+  padding:9px 12px !important;
+}
+.gc::after,
+.out-card::after,
+.ob::after,
+.pm::after {
+  border:0 !important;
+  width:96px !important;
+  height:96px !important;
+  max-width:none !important;
+  max-height:none !important;
+  top:0 !important;
+  right:0 !important;
+  border-radius:inherit !important;
+  background:radial-gradient(circle at 100% 0%, rgba(79,168,255,.20) 0%, rgba(79,168,255,.09) 28%, transparent 64%) !important;
+  filter:none !important;
+  opacity:.9 !important;
+}
+.gc-h::after,
+.ob-h::after {
+  background:radial-gradient(circle at 100% 0%, rgba(255,107,53,.24) 0%, rgba(255,107,53,.10) 30%, transparent 66%) !important;
+}
+.gc-c::after,
+.ob-c::after {
+  background:radial-gradient(circle at 100% 0%, rgba(0,196,232,.24) 0%, rgba(0,196,232,.10) 30%, transparent 66%) !important;
+}
+:root[data-theme="light"] .gc::after,
+:root[data-theme-effective="light"] .gc::after,
+:root[data-theme="light"] .out-card::after,
+:root[data-theme-effective="light"] .out-card::after,
+:root[data-theme="light"] .ob::after,
+:root[data-theme-effective="light"] .ob::after,
+:root[data-theme="light"] .pm::after,
+:root[data-theme-effective="light"] .pm::after {
+  background:radial-gradient(circle at 100% 0%, rgba(22,119,210,.18) 0%, rgba(22,119,210,.075) 30%, transparent 66%) !important;
+}
+:root[data-theme="light"] .gc-h::after,
+:root[data-theme-effective="light"] .gc-h::after,
+:root[data-theme="light"] .ob-h::after,
+:root[data-theme-effective="light"] .ob-h::after {
+  background:radial-gradient(circle at 100% 0%, rgba(224,90,32,.22) 0%, rgba(224,90,32,.08) 30%, transparent 66%) !important;
+}
+:root[data-theme="light"] .gc-c::after,
+:root[data-theme-effective="light"] .gc-c::after,
+:root[data-theme="light"] .ob-c::after,
+:root[data-theme-effective="light"] .ob-c::after {
+  background:radial-gradient(circle at 100% 0%, rgba(0,141,176,.22) 0%, rgba(0,141,176,.08) 30%, transparent 66%) !important;
+}

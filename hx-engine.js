@@ -345,15 +345,7 @@ function _drawAxes(ctx, W, H) {
     ctx.stroke();
     ctx.restore();
   });
-  // Y-Achsen-Titel
-  ctx.save();
-  ctx.translate(12, p.top + ch / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.textAlign = 'center';
-  ctx.fillStyle = 'rgba(255,255,255,0.62)';
-  ctx.font = 'bold 11px Arial,sans-serif';
-  ctx.fillText('T  [\u00b0C]', 0, 0);
-  ctx.restore();
+  // Y-Achsen-Titel entfernt (Phase 5.3): Tick-Werte bleiben erhalten, keine doppelte Temperaturanzeige.
   ctx.restore();
 
   // X-Achse: Feuchtegehalt-Ticks
