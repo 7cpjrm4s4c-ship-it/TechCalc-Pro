@@ -366,3 +366,146 @@ body.keyboard-open .plus-overlay,
 body.keyboard-open .plus-sheet {
   display:none !important;
 }
+
+/* ═══════════════════════════════════════════════════════
+   DESKTOP OPTIMIZATION V2
+   Ziel: breite Desktop-Flächen nutzen, Eingabe links, Ergebnis/Diagramm rechts.
+═══════════════════════════════════════════════════════ */
+@media (min-width: 1200px) {
+  #app-shell {
+    padding-top: calc(var(--hdr) + var(--sat) + 10px);
+  }
+
+  .tab-panel {
+    padding-left: max(24px, calc(var(--sal) + 24px));
+    padding-right: max(24px, calc(var(--sar) + 24px));
+    padding-bottom: 24px;
+  }
+
+  /* Global desktop inner width */
+  .tab-inner {
+    max-width: 1320px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 24px;
+    margin: 0 auto;
+  }
+
+  /* Flow: echte 2-Spalten-Ansicht */
+  #tab-flow {
+    width: 100%;
+    max-width: 1680px;
+    margin: 0 auto;
+    grid-template-columns: minmax(420px, 0.95fr) minmax(520px, 1.05fr);
+    align-items: start;
+    gap: 22px;
+    min-height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+  #tab-flow .col-L,
+  #tab-flow .col-R {
+    display:flex;
+    flex-direction:column;
+    gap:var(--gap);
+    overflow: visible;
+    padding: 0;
+    border-right: 0;
+    background: transparent;
+  }
+  #tab-flow .col-L > .gc:first-child,
+  #tab-flow .col-L > .twin,
+  #tab-flow .col-L > .out-card,
+  #tab-flow .col-R > .gc,
+  #tab-flow .col-R > #pi-card,
+  #tab-flow .col-R > #pi-placeholder {
+    width: 100%;
+  }
+  #tab-flow .col-R {
+    position: sticky;
+    top: calc(var(--hdr) + var(--sat) + 16px);
+    max-height: calc(100dvh - var(--hdr) - var(--sat) - 32px);
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+  #tab-flow .rcol-hdr { margin-top: 0; }
+
+  /* Lüftung/Einheiten/Rohr bleiben zentriert, aber nicht unnötig schmal */
+  #tab-luft .tab-inner,
+  #tab-unit .tab-inner,
+  #tab-pipe {
+    max-width: 1040px;
+  }
+
+  /* h,x: Eingabe links, Diagramm rechts */
+  #tab-hx .tab-inner {
+    display:grid;
+    grid-template-columns: minmax(380px, 520px) minmax(560px, 1fr);
+    gap: 22px;
+    align-items:start;
+    max-width: 1380px;
+  }
+  #tab-hx .tab-inner > .gc,
+  #tab-hx .tab-inner > .fml {
+    grid-column: 1;
+  }
+  #tab-hx .tab-inner > .gc:nth-of-type(2) {
+    grid-column: 2;
+    grid-row: 1 / span 8;
+    position: sticky;
+    top: calc(var(--hdr) + var(--sat) + 16px);
+  }
+  #tab-hx #hxCanvas {
+    min-height: 520px !important;
+  }
+
+  /* WRG / Mischluft: WRG links, Mischluft rechts */
+  #tab-wrg .tab-inner {
+    display:grid;
+    grid-template-columns: minmax(420px, 1fr) minmax(520px, 1fr);
+    gap: 22px;
+    align-items:start;
+    max-width: 1380px;
+  }
+  #tab-wrg .tab-inner > .gc:nth-of-type(1),
+  #tab-wrg .tab-inner > .out-card:nth-of-type(1),
+  #tab-wrg .tab-inner > .fml:nth-of-type(1) {
+    grid-column:1;
+  }
+  #tab-wrg .tab-inner > .gc:nth-of-type(2),
+  #tab-wrg .tab-inner > .out-card:nth-of-type(2),
+  #tab-wrg .tab-inner > .fml:nth-of-type(2) {
+    grid-column:2;
+  }
+
+  /* Trinkwasser: Eingaben links, Ergebnisse/Hinweise rechts */
+  #tab-trinkwasser .tab-inner {
+    display:grid;
+    grid-template-columns: minmax(420px, 0.95fr) minmax(460px, 1.05fr);
+    gap: 22px;
+    align-items:start;
+    max-width: 1380px;
+  }
+  #tab-trinkwasser .tab-inner > .gc:nth-of-type(1),
+  #tab-trinkwasser .tab-inner > .gc:nth-of-type(2),
+  #tab-trinkwasser .tab-inner > .gc:nth-of-type(3) {
+    grid-column:1;
+  }
+  #tab-trinkwasser .tab-inner > .out-card,
+  #tab-trinkwasser .tab-inner > .gc:nth-of-type(4),
+  #tab-trinkwasser .tab-inner > .fml {
+    grid-column:2;
+  }
+  #tab-trinkwasser .tab-inner > .out-card {
+    position: sticky;
+    top: calc(var(--hdr) + var(--sat) + 16px);
+  }
+}
+
+@media (min-width: 1600px) {
+  #tab-flow { max-width: 1760px; }
+  .tab-inner { max-width: 1480px; }
+  #tab-hx .tab-inner,
+  #tab-wrg .tab-inner,
+  #tab-trinkwasser .tab-inner { max-width: 1540px; }
+}

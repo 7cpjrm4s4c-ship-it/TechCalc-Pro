@@ -33,7 +33,14 @@ const NAV = {
       const el = $('tab-' + id);
       if (!el) return;
       if (id === NAV.activeTab) {
-        el.style.display = (id === 'hx') ? 'block' : 'flex';
+        const isDesktop = window.matchMedia('(min-width: 900px)').matches;
+        if (isDesktop && id === 'flow') {
+          el.style.display = 'grid';
+        } else if (id === 'hx') {
+          el.style.display = 'block';
+        } else {
+          el.style.display = 'flex';
+        }
       } else {
         el.style.display = 'none';
       }
