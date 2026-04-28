@@ -36,37 +36,25 @@
 
 <!-- macOS Safari Pinned Tab -->
 <link rel="mask-icon" href="icon-512.png" color="#4fa8ff"/>
-<meta name="techcalc-build" content="20260427-2015"/>
 <title>TechCalc Pro</title>
 <link rel="stylesheet" href="tokens.css"/>
 <link rel="stylesheet" href="layout.css"/>
 <link rel="stylesheet" href="components.css"/>
-<link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
 
 <!-- ══ HEADER ══ -->
 <header class="hdr">
-  <div class="hdr-top hdr-top-premium">
-    <div class="hdr-slot hdr-slot-left" aria-hidden="true"></div>
-
-    <div class="hdr-brand" aria-label="TechCalc Pro">
-      <div class="hdr-icon hdr-icon-center">
-        <img src="icon-180.png" alt="TechCalc Pro Icon" onerror="this.style.display='none';this.parentElement.innerHTML='△'"/>
-      </div>
-      <div class="hdr-brand-text">
-        <div class="hdr-title">
-          <span class="hdr-title-main">TechCalc</span>
-          <span class="hdr-title-pro">PRO</span>
-        </div>
-        <div class="hdr-sub">HLSK Quick Tools</div>
-      </div>
+  <div class="hdr-top">
+    <div class="hdr-icon">
+      <img src="icon-180.png" alt="TechCalc Pro Icon" onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=44 height=44 viewBox=\'0 0 44 44\'><rect width=44 height=44 rx=10 fill=\'#111\'/><text x=22 y=30 text-anchor=\'middle\'  font-size=22 fill=\'url(%23g)\'>&#x25b3;</text></svg>'"/>
     </div>
-
-    <div class="hdr-slot hdr-slot-right">
-      <button class="hdr-menu-btn" id="hdr-menu-btn" type="button" aria-label="Menü öffnen" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+    <div>
+      <div class="hdr-title">
+        <span class="hdr-title-main">TechCalc</span>
+        <span class="hdr-title-pro">PRO</span>
+      </div>
+      <div class="hdr-sub">HLK-Anlagen &middot; Heizung &middot; L&uuml;ftung &middot; Klimatisierung</div>
     </div>
   </div>
   <nav class="tab-bar">
@@ -76,71 +64,9 @@
     <button class="tab-btn"        data-tab="unit">Einheiten</button>
     <button class="tab-btn"        data-tab="hx">h,x-Diagramm</button>
     <button class="tab-btn"        data-tab="wrg">WRG / Mischluft</button>
-    <button class="tab-btn"        data-tab="trinkwasser">Trinkwasser</button>
+    <button class="tab-btn" onclick="hxOpenPdf()" style="color:var(--blue);flex-shrink:0">⬇ PDF</button>
   </nav>
 </header>
-
-<!-- ══ HEADER MENU ══ -->
-<div class="app-menu-overlay" id="app-menu-overlay" aria-hidden="true"></div>
-<aside class="app-menu-sheet" id="app-menu-sheet" role="dialog" aria-label="TechCalc Pro Menü" aria-modal="true">
-  <div class="app-menu-head">
-    <div>
-      <div class="app-menu-title">TechCalc Pro</div>
-      <div class="app-menu-sub">HLSK Quick Tools</div>
-    </div>
-    <button class="app-menu-close" id="app-menu-close" type="button" aria-label="Menü schließen">×</button>
-  </div>
-
-  <div class="app-menu-section">
-    <div class="app-menu-section-title">Aktionen</div>
-    <button class="app-menu-item" type="button" data-menu-action="pdf"><span>PDF Export</span><small>Aktuellen Tab dokumentieren</small></button>
-    <button class="app-menu-item" type="button" data-menu-action="nav-config"><span>Schnellzugriffe bearbeiten</span><small>4 Module auswählen</small></button>
-    <button class="app-menu-item" type="button" data-menu-action="favorites"><span>Favoriten</span><small>Vorbereitet</small></button>
-    <button class="app-menu-item" type="button" data-menu-action="projects"><span>Projekte</span><small>Vorbereitet</small></button>
-  </div>
-
-  <div class="app-menu-section">
-    <div class="app-menu-section-title">Einstellungen</div>
-    <div class="app-menu-item app-menu-setting">
-      <span>Darstellung</span>
-      <div class="seg" role="group" aria-label="Theme">
-        <button type="button" data-theme="dark" class="active" aria-pressed="true">Dark</button>
-        <button type="button" data-theme="light" aria-pressed="false">Light</button>
-        <button type="button" data-theme="system" aria-pressed="false">System</button>
-      </div>
-    </div>
-    <button class="app-menu-item" type="button" data-menu-action="units"><span>Standardeinheiten</span><small>Vorbereitet</small></button>
-    <button class="app-menu-item" type="button" data-menu-action="pdf-settings"><span>PDF-Vorlagen</span><small>Vorbereitet</small></button>
-  </div>
-
-  <div class="app-menu-section">
-    <div class="app-menu-section-title">Info</div>
-    <button class="app-menu-item" type="button" data-menu-action="help"><span>Hilfe / Hinweise</span><small>Schnellprüfung, keine Vollplanung</small></button>
-    <div class="app-menu-version"><span>Version</span><strong id="app-build-label">Build wird geladen…</strong></div>
-    <button class="app-menu-item" type="button" data-menu-action="legal"><span>Impressum / Datenschutz</span><small>Vorbereitet</small></button>
-  </div>
-</aside>
-<!-- ══ SCHNELLZUGRIFFE KONFIGURATION ══ -->
-<div class="nav-config-overlay" id="nav-config-overlay" aria-hidden="true"></div>
-<aside class="nav-config-sheet" id="nav-config-sheet" role="dialog" aria-label="Schnellzugriffe bearbeiten" aria-modal="true">
-  <div class="nav-config-head">
-    <div>
-      <div class="nav-config-title">Schnellzugriffe bearbeiten</div>
-      <div class="nav-config-sub">Wähle genau 4 Module für die Navigation Pill.</div>
-    </div>
-    <button class="app-menu-close" id="nav-config-close" type="button" aria-label="Schnellzugriffe schließen">×</button>
-  </div>
-  <div class="nav-config-status" id="nav-config-count">4/4 Schnellzugriffe</div>
-  <div class="nav-config-section-title">Aktive Navigation Pill</div>
-  <div class="nav-config-selected" id="nav-config-selected"></div>
-  <div class="nav-config-section-title">Alle Module</div>
-  <div class="nav-config-list" id="nav-config-list"></div>
-  <div class="nav-config-actions">
-    <button type="button" id="nav-config-reset" class="nav-config-secondary">Standard</button>
-    <button type="button" id="nav-config-save" class="nav-config-primary">Speichern</button>
-  </div>
-</aside>
-
 
 <!-- ══════════════════════════════════════════════════════
      TAB: MASSENSTROM
@@ -794,6 +720,21 @@
     </div>
   </div>
 
+  <!-- PDF Export -->
+  <button onclick="openPdfSheet()"
+    style="width:100%;height:52px;border:none;border-radius:var(--r-m);
+           background:var(--grn-t);border:1px solid var(--grn-b);
+           color:var(--grn);font-family:var(--f);font-size:15px;font-weight:700;
+           cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+           box-shadow:0 8px 24px rgba(52,211,153,.12)">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V9z"/>
+      <polyline points="14 3 14 9 20 9"/>
+      <line x1="12" y1="13" x2="12" y2="17"/>
+      <polyline points="9 16 12 19 15 16"/>
+    </svg>
+    Als PDF exportieren
+  </button>
 
 </div>
 </div><!-- /tab-hx -->
@@ -960,110 +901,6 @@
 </div>
 </div><!-- /tab-wrg -->
 
-
-<!-- ══════════════════════════════════════════════════════
-     TAB: TRINKWASSER
-══════════════════════════════════════════════════════ -->
-<div id="tab-trinkwasser" class="tab-panel" style="display:none">
-  <div class="tab-inner">
-
-    <div class="tw-desktop-left">
-
-    <div class="gc">
-      <div class="slbl">Trinkwasser &mdash; Basisdaten</div>
-      <div class="igrp">
-        <div class="ilbl">Gebäudetyp / Nutzungsart</div>
-        <select class="gl-sel" id="tw-building">
-          <option value="wohn">Wohngebäude</option>
-          <option value="hotel">Hotel / Beherbergung</option>
-          <option value="verw">Verwaltung / Büro</option>
-          <option value="schule">Schule / Sportstätte</option>
-          <option value="pflege">Pflege / Krankenhaus</option>
-        </select>
-      </div>
-      <div class="igrp" style="margin-bottom:0">
-        <div class="ilbl">Warmwasserbereitung</div>
-        <select class="gl-sel" id="tw-ww-mode">
-          <option value="zentral">zentral</option>
-          <option value="dezentral">dezentral / Durchlauferhitzer</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="gc">
-      <div class="slbl">1. Nutzungseinheiten</div>
-      <div class="info-txt" style="margin-bottom:12px">
-        Nutzungseinheiten zuerst erfassen. Standard-NE verwenden automatisch den Ansatz „zwei größte Entnahmestellen“. Sonderbereiche können über GL-Faktor angesetzt werden.
-      </div>
-      <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
-        <div class="igrp" style="margin-bottom:0">
-          <div class="ilbl">Neue Nutzungseinheit</div>
-          <select class="gl-sel" id="tw-new-ne-type">
-            <option value="bad">Bad / Badezimmer</option>
-            <option value="gaeste">Gäste-WC</option>
-            <option value="kueche">Küche</option>
-            <option value="hwr">Hauswirtschaftsraum</option>
-            <option value="oeffwc">Öffentliches WC</option>
-            <option value="dusch">Großraumdusche</option>
-            <option value="teekueche">Teeküche</option>
-            <option value="manuell">Sonderbereich / manuell</option>
-          </select>
-        </div>
-        <button id="tw-add-ne" type="button" style="height:48px;border:none;border-radius:var(--r-m);background:var(--blue-t);border:1px solid var(--blue-b);color:var(--blue);font-family:var(--f);font-size:14px;font-weight:800;padding:0 14px;cursor:pointer;white-space:nowrap">+ NE</button>
-      </div>
-      <div id="tw-ne-list" style="margin-top:10px"></div>
-    </div>
-
-    <div class="gc">
-      <button id="tw-free-toggle" type="button" style="width:100%;border:0;background:transparent;color:var(--t1);text-align:left;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;padding:0;cursor:pointer">
-        <span id="tw-free-toggle-icon" style="font-size:17px;color:var(--blue)">▶</span>
-        <span class="slbl" style="margin:0">2. Frei im Gebäude verteilte Entnahmestellen</span>
-      </button>
-      <div class="info-txt" style="margin:12px 0 8px">
-        Hier nur Verbraucher eintragen, die keiner Nutzungseinheit zugeordnet sind. Bei Bedarf aufklappen.
-      </div>
-      <div id="tw-free-fixtures" style="display:none"></div>
-    </div>
-
-    </div><!-- /.tw-desktop-left -->
-
-    <div class="tw-desktop-right">
-
-    <div class="out-card">
-      <div class="slbl">3. Ergebnis &mdash; Trinkwasser</div>
-      <div class="out-grid" style="grid-template-columns:1fr;gap:8px">
-        <div class="ob" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px"><div class="ob-title" style="margin:0">Summendurchfluss kalt</div><div class="out-val has" id="tw-sum-cold" style="white-space:nowrap">–</div></div>
-        <div class="ob" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px"><div class="ob-title" style="margin:0">Summendurchfluss warm</div><div class="out-val has" id="tw-sum-warm" style="white-space:nowrap">–</div></div>
-        <div class="ob" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px"><div class="ob-title" style="margin:0">Summendurchfluss gesamt</div><div class="out-val has" id="tw-sum-total" style="white-space:nowrap">–</div></div>
-        <div class="ob" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px"><div><div class="ob-title" style="margin:0">Spitzendurchfluss maßgebend</div><div style="font-family:var(--fm);font-size:12px;color:var(--t3);margin-top:4px" id="tw-peak-m3h">–</div></div><div class="out-val has" id="tw-peak" style="white-space:nowrap">–</div></div>
-        <div class="ob" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px"><div class="ob-title" style="margin:0">Hauptleitungsdimension</div><div class="out-val has" id="tw-dn" style="white-space:nowrap">–</div></div>
-        <div class="ob" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px"><div class="ob-title" style="margin:0">Hauswasserzähler</div><div class="out-val has" id="tw-meter" style="white-space:nowrap">–</div></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px">
-        <div class="chip">V<sub>R</sub> Nutzungseinheiten <strong id="tw-vr-ne">–</strong></div>
-        <div class="chip">V<sub>R</sub> Gebäude <strong id="tw-vr-building">–</strong></div>
-        <div class="chip">V<sub>R</sub> Gesamt <strong id="tw-vr-total">–</strong></div>
-        <div class="chip">V<sub>S</sub> maßgebend <strong id="tw-vs-final">–</strong></div>
-      </div>
-    </div>
-
-    <div class="fml">V<sub>S</sub> = a · (ΣV<sub>R</sub>)<sup>b</sup> − c &ensp;·&ensp; DIN 1988-300 orientierte Schnellberechnung</div>
-
-    <div class="gc">
-      <div class="slbl">4. Hygiene / Hinweise</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-        <div><div class="ilbl">Nutzungseinheiten</div><div class="chip"><strong id="tw-ne-info">–</strong></div></div>
-        <div><div class="ilbl">PWH-Leitungsvolumen</div><div class="iwrap"><input class="inp-sm" id="tw-line-vol" type="number" min="0" step="0.1" value="0"/><span class="iunit">l</span></div></div>
-      </div>
-      <div class="chip" style="margin-bottom:10px">Zirkulation: <strong id="tw-circ">–</strong></div>
-      <div class="info-txt" id="tw-hints"></div>
-    </div>
-
-    </div><!-- /.tw-desktop-right -->
-
-  </div>
-</div>
-
 </main><!-- /app-shell -->
 
 
@@ -1071,7 +908,53 @@
 <!-- ══════════════════════════════════════════════════════
      BOTTOM PILL NAVIGATION (Mobile)
 ══════════════════════════════════════════════════════ -->
-<nav class="bottom-pill" id="bottom-pill" role="navigation" aria-label="Hauptnavigation"></nav>
+<nav class="bottom-pill" id="bottom-pill" role="navigation" aria-label="Hauptnavigation">
+
+  <!-- Heizung / Kälte -->
+  <button class="pill-btn active" id="pill-flow" data-tab="flow" aria-label="Heizung und Kälte">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2c-1 2.5-2.5 4.5-2 7.5a4 4 0 108 0c0-1.5-.8-3-2-4 0 1.5-1 3-2.5 3S10 7 10 5"/>
+      <circle cx="12" cy="17" r="1.2" fill="currentColor" stroke="none"/>
+    </svg>
+    Heizung
+  </button>
+
+  <!-- Lüftung -->
+  <button class="pill-btn" id="pill-luft" data-tab="luft" aria-label="Lüftung">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="1.8"/>
+      <path d="M12 10.2C12 7 10 5 8 6s-2 4.5 1.5 5.5"/>
+      <path d="M13.8 12C17 12 19 10 18 8s-4.5-2-5.5 1.5"/>
+      <path d="M12 13.8C12 17 14 19 16 18s2-4.5-1.5-5.5"/>
+      <path d="M10.2 12C7 12 5 14 6 16s4.5 2 5.5-1.5"/>
+    </svg>
+    L&uuml;ftung
+  </button>
+
+  <!-- h,x-Diagramm -->
+  <button class="pill-btn" id="pill-hx" data-tab="hx" aria-label="hx-Diagramm">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="3 20 7 10 11 14 15 6 21 6"/>
+      <path d="M3 20h18M3 20V4"/>
+    </svg>
+    h,x
+  </button>
+
+  <!-- Einheiten -->
+  <button class="pill-btn" id="pill-unit" data-tab="unit" aria-label="Einheitenrechner">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 4h2v16H4M8 4l8 16M16 4h4M16 12h3"/>
+      <circle cx="18" cy="20" r="2"/>
+    </svg>
+    Einheiten
+  </button>
+
+  <!-- Plus — grauer Hintergrund, blauer Rand (wie Kälte-Ergebnis-Grid) -->
+  <button class="pill-plus" id="pill-plus" aria-label="Weitere Module" aria-expanded="false">
+    <span class="pill-plus-icon">+</span>
+  </button>
+
+</nav>
 
 <!-- ── Plus Overlay ── -->
 <div class="plus-overlay" id="plus-overlay"></div>
@@ -1080,15 +963,36 @@
 <div class="plus-sheet" id="plus-sheet" role="dialog" aria-label="Weitere Module">
   <div class="plus-handle"></div>
   <div class="plus-title">Weitere Module</div>
-  <div class="plus-grid"></div>
+  <div class="plus-grid">
+
+    <!-- Rohr -->
+    <button class="plus-item" id="plus-pipe" data-tab="pipe">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="8" width="5" height="8" rx="1.5"/>
+        <rect x="17" y="8" width="5" height="8" rx="1.5"/>
+        <line x1="7" y1="10.5" x2="17" y2="10.5"/>
+        <line x1="7" y1="13.5" x2="17" y2="13.5"/>
+      </svg>
+      Rohr
+    </button>
+
+    <!-- WRG & Mischluft -->
+    <button class="plus-item" id="plus-wrg" data-tab="wrg">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 8h12M4 8l3-3M4 8l3 3"/>
+        <path d="M20 16H8M20 16l-3-3M20 16l-3 3"/>
+        <line x1="12" y1="8" x2="12" y2="16"/>
+      </svg>
+      WRG &amp; Mischluft
+    </button>
+
+  </div>
 </div>
 
-<script>window.TECHCALC_BUILD = "20260428-Phase3_1DesktopSpacing";</script>
 <script src="./app.js"></script>
 <script src="./heating-cooling.js"></script>
 <script src="./ventilation.js"></script>
 <script src="./wrg-mischluft.js"></script>
-<script src="./trinkwasser.js"></script>
 
 <script>
 /* ── Cloudflare Worker Analytics ── */
@@ -1099,9 +1003,7 @@
   function getUid() {
     let id = localStorage.getItem('msr_uid');
     if (!id) {
-      id = (window.crypto && typeof window.crypto.randomUUID === 'function')
-        ? window.crypto.randomUUID()
-        : 'uid-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+      id = crypto.randomUUID();
       localStorage.setItem('msr_uid', id);
     }
     return id;

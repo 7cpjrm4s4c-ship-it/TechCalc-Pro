@@ -1,15 +1,22 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════
 # deploy.sh — TechCalc Pro Deployment Script
-# Versioniert sw.js automatisch über BUILD_TS
+# Setzt automatisch die Build-Version in sw.js
 # Verwendung: bash deploy.sh
 # ═══════════════════════════════════════════════════════
-set -euo pipefail
+set -e
+
+# Build-Timestamp: YYYYMMDD-HHMM
 TS=$(date +"%Y%m%d-%H%M")
+
 echo "🚀 TechCalc Pro Deploy — Build: $TS"
-perl -0pi -e "s/const BUILD_TS\s*=\s*'[^']*';/const BUILD_TS   = '$TS';/" sw.js
+
+# Service Worker: Platzhalter durch aktuellen Timestamp ersetzen
+sed "s/__BUILD_TS__/$TS/g" sw.js > sw_deploy.js
+mv sw_deploy.js sw.js
+
 echo "✓ sw.js versioniert: techcalc-$TS"
-echo "✓ Bereit für Upload / GitHub Pages"
+echo "✓ Bereit für GitHub Pages Upload"
 echo ""
 echo "Nächste Schritte:"
 echo "  git add -A && git commit -m 'Deploy $TS' && git push"
