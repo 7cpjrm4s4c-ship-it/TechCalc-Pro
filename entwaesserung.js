@@ -128,6 +128,62 @@ function renderEntwaesserung(r) {
   if (hints) hints.innerHTML = ewHints(r).map(h => `<div>• ${h}</div>`).join('');
 }
 
+
+function resetEntwaesserungInputs() {
+  EW_FIXTURES.forEach(f => {
+    const el = ewGet('ew-' + f.key);
+    if (el) el.value = 0;
+  });
+  const sq = ewGet('ew-special-q');
+  if (sq) sq.value = '';
+}
+
+function saveStraenge() {
+  localStorage.setItem('ew_straenge', JSON.stringify(EW_STATE.straenge || []));
+}
+
+function addEntwaesserungStrang() {
+  const r = calcEntwaesserung();
+  if (!r || r.duTotal <= 0) return;
+  const strang = {
+    id: Date.now(),
+    name: `Strang ${ (EW_STATE.straenge?.length || 0) + 1 }`,
+    duTotal: r.duTotal,
+    qww: r.qww,
+    dims: r.dims,
+    rows: r.rows
+  };
+  EW_STATE.straenge = EW_STATE.straenge || [];
+  EW_STATE.straenge.push(strang);
+  saveStraenge();
+  renderStrangListe();
+  resetEntwaesserungInputs();
+  calcEntwaesserung();
+}
+
+function deleteStrang(id) {
+  EW_STATE.straenge = (EW_STATE.straenge || []).filter(s => s.id !== id);
+  saveStraenge();
+  renderStrangListe();
+}
+window.deleteStrang = deleteStrang;
+
+function renderStrangListe() {
+  const host = ewGet('ew-strang-list');
+  if (!host) return;
+  const list = EW_STATE.straenge || [];
+  if (!list.length) {
+    host.innerHTML = '<p style="color:var(--t3);font-size:12px">Noch keine Stränge angelegt.</p>';
+    return;
+  }
+  host.innerHTML = list.map(s => `
+    <div class="ew-detail-row">
+      <span>${s.name} · ${ewFmt(s.duTotal,1)} DU · Qww ${ewFmt(s.qww,2)} l/s</span>
+      <button class="btn ghost" onclick="deleteStrang(${s.id})">Löschen</button>
+    </div>
+  `).join('');
+}
+
 function getEntwaesserungPdfData() {
   return EW_STATE.result || calcEntwaesserung();
 }
