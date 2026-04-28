@@ -719,3 +719,81 @@ body.keyboard-open .plus-sheet {
   :root[data-theme="system"] .nav-config-sheet,
   :root[data-theme="system"] .plus-sheet { background:rgba(248,250,253,.97); border-color:rgba(30,42,56,.14); box-shadow:0 18px 60px rgba(30,42,56,.20), inset 0 1px 0 rgba(255,255,255,.76); }
 }
+
+/* ═══════════════════════════════════════════════════════
+   PHASE 5 — Light Mode Contrast + Lüftung Desktop Rework
+   Basis: Phase 4 Theme Settings
+═══════════════════════════════════════════════════════ */
+:root[data-theme="light"] .gc,
+:root[data-theme-effective="light"] .gc,
+:root[data-theme="light"] .out-card,
+:root[data-theme-effective="light"] .out-card,
+:root[data-theme="light"] .ob,
+:root[data-theme-effective="light"] .ob,
+:root[data-theme="light"] .pm,
+:root[data-theme-effective="light"] .pm {
+  background: #ffffff !important;
+  border-color: rgba(15,23,42,.18) !important;
+  box-shadow: 0 12px 32px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.85) !important;
+}
+:root[data-theme="light"] .slbl,
+:root[data-theme-effective="light"] .slbl,
+:root[data-theme="light"] .ilbl,
+:root[data-theme-effective="light"] .ilbl,
+:root[data-theme="light"] .out-key,
+:root[data-theme-effective="light"] .out-key,
+:root[data-theme="light"] .tzl-lbl,
+:root[data-theme-effective="light"] .tzl-lbl {
+  color: #475569 !important;
+}
+:root[data-theme="light"] .inp,
+:root[data-theme-effective="light"] .inp,
+:root[data-theme="light"] .inp-sm,
+:root[data-theme-effective="light"] .inp-sm,
+:root[data-theme="light"] .tzl-inp,
+:root[data-theme-effective="light"] .tzl-inp,
+:root[data-theme="light"] .gl-sel,
+:root[data-theme-effective="light"] .gl-sel,
+:root[data-theme="light"] .cat-sel,
+:root[data-theme-effective="light"] .cat-sel {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: rgba(15,23,42,.24) !important;
+}
+:root[data-theme="light"] input::placeholder,
+:root[data-theme-effective="light"] input::placeholder { color:#64748b !important; opacity:1; }
+:root[data-theme="light"] .inp-ro,
+:root[data-theme-effective="light"] .inp-ro,
+:root[data-theme="light"] .unit-ro,
+:root[data-theme-effective="light"] .unit-ro { color:#111827 !important; background:#f8fafc !important; border-color:rgba(15,23,42,.20) !important; }
+:root[data-theme="light"] .bottom-pill,
+:root[data-theme-effective="light"] .bottom-pill { background:rgba(255,255,255,.96); border-color:rgba(15,23,42,.16); box-shadow:0 14px 42px rgba(15,23,42,.18); }
+:root[data-theme="light"] .fml,
+:root[data-theme-effective="light"] .fml,
+:root[data-theme="light"] .info-txt,
+:root[data-theme-effective="light"] .info-txt { color:#475569 !important; }
+
+@media (min-width: 1200px) {
+  #tab-luft .tab-inner {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    column-gap: 28px !important;
+    row-gap: 22px !important;
+    align-items: start !important;
+    max-width: 1500px !important;
+  }
+  #tab-luft .tab-inner > .gc:nth-of-type(1),
+  #tab-luft .tab-inner > .gc:nth-of-type(2) { grid-column: 1 !important; }
+  #tab-luft .tab-inner > .out-card { grid-column: 2 !important; grid-row: 1 !important; margin:0 !important; align-self:start !important; position:relative !important; top:auto !important; }
+  #tab-luft .tab-inner > .fml { grid-column: 2 !important; grid-row: 2 !important; margin:0 !important; text-align:left !important; padding:10px 12px !important; border:1px solid var(--gb-soft) !important; border-radius:var(--r-m) !important; background:rgba(255,255,255,.035) !important; }
+  #tab-luft .tab-inner > .gc:nth-of-type(3) { grid-column: 2 !important; grid-row: 3 !important; margin:0 !important; }
+  #tab-luft .tab-inner > div:nth-child(2) { display:none !important; }
+  #tab-luft .tab-inner > * { width:100% !important; }
+
+  #tab-flow .col-L,
+  #tab-flow .col-R,
+  #tab-hx .tab-inner,
+  #tab-wrg .tab-inner,
+  #tab-trinkwasser .tab-inner,
+  #tab-luft .tab-inner { margin-top:0 !important; }
+}
