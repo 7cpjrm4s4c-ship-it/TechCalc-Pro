@@ -797,3 +797,92 @@ body.keyboard-open .plus-sheet {
   #tab-trinkwasser .tab-inner,
   #tab-luft .tab-inner { margin-top:0 !important; }
 }
+
+/* ═══════════════════════════════════════════════════════
+   Phase 5.1 — readability, card contrast, glow polish
+═══════════════════════════════════════════════════════ */
+.gc,
+.out-card,
+.ob,
+.pm {
+  position: relative;
+  border-color: rgba(255,255,255,.20) !important;
+  box-shadow: 0 14px 38px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.10), inset -1px 1px 0 rgba(79,168,255,.08) !important;
+}
+.gc::after,
+.out-card::after,
+.ob::after,
+.pm::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 34%;
+  height: 34%;
+  max-width: 150px;
+  max-height: 92px;
+  pointer-events: none;
+  border-top: 1px solid rgba(79,168,255,.22);
+  border-right: 1px solid rgba(79,168,255,.18);
+  border-radius: inherit;
+  opacity: .78;
+  filter: drop-shadow(0 0 12px rgba(79,168,255,.12));
+}
+.fml { color: var(--t2) !important; opacity: 1 !important; }
+.fml em, .fml sub, .fml sup { color: var(--blue) !important; }
+
+#tab-trinkwasser .out-card .ob {
+  padding: 12px 14px !important;
+  min-height: 54px;
+}
+#tab-trinkwasser .out-card .ob-title {
+  font-size: 12px !important;
+  line-height: 1.25 !important;
+  letter-spacing: .04em !important;
+}
+#tab-trinkwasser .out-card .out-val {
+  font-size: 21px !important;
+  line-height: 1.05 !important;
+  letter-spacing: .02em !important;
+}
+#tab-trinkwasser #tw-peak-m3h {
+  font-size: 10px !important;
+  margin-top: 2px !important;
+}
+#tab-trinkwasser .out-card .chip {
+  font-size: 11px !important;
+  min-height: 24px;
+  align-items: center;
+}
+
+:root[data-theme="light"] .gc,
+:root[data-theme-effective="light"] .gc,
+:root[data-theme="light"] .out-card,
+:root[data-theme-effective="light"] .out-card,
+:root[data-theme="light"] .ob,
+:root[data-theme-effective="light"] .ob,
+:root[data-theme="light"] .pm,
+:root[data-theme-effective="light"] .pm {
+  border-color: rgba(15,23,42,.26) !important;
+  box-shadow: 0 14px 38px rgba(15,23,42,.12), inset 0 1px 0 rgba(255,255,255,.95), inset -1px 1px 0 rgba(37,99,235,.10) !important;
+}
+:root[data-theme="light"] .gc::after,
+:root[data-theme-effective="light"] .gc::after,
+:root[data-theme="light"] .out-card::after,
+:root[data-theme-effective="light"] .out-card::after,
+:root[data-theme="light"] .ob::after,
+:root[data-theme-effective="light"] .ob::after,
+:root[data-theme="light"] .pm::after,
+:root[data-theme-effective="light"] .pm::after {
+  border-top-color: rgba(37,99,235,.30);
+  border-right-color: rgba(37,99,235,.24);
+  filter: drop-shadow(0 0 12px rgba(37,99,235,.15));
+}
+:root[data-theme="light"] .fml,
+:root[data-theme-effective="light"] .fml { color: #334155 !important; }
+:root[data-theme="light"] .fml em,
+:root[data-theme-effective="light"] .fml em,
+:root[data-theme="light"] .fml sub,
+:root[data-theme-effective="light"] .fml sub,
+:root[data-theme="light"] .fml sup,
+:root[data-theme-effective="light"] .fml sup { color: #0f62bd !important; }
