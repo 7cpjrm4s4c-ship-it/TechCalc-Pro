@@ -154,7 +154,7 @@ body.menu-open { overflow:hidden; }
 /* ─── APP SHELL ─── */
 /* Einzige Padding-Top Regel — Header-Abstand zentral */
 #app-shell {
-  padding-top: calc(var(--hdr) + var(--sat) + var(--gap));
+  padding-top: calc(var(--hdr) + var(--sat) + var(--gap-l));
 }
 
 /* ─── TAB PANELS — Zentrale Klasse für alle 6 Tabs ─── */
@@ -373,7 +373,7 @@ body.keyboard-open .plus-sheet {
 ═══════════════════════════════════════════════════════ */
 @media (min-width: 1200px) {
   #app-shell {
-    padding-top: calc(var(--hdr) + var(--sat) + 10px);
+    padding-top: calc(var(--hdr) + var(--sat) + 28px);
   }
 
   .tab-panel {
@@ -508,4 +508,58 @@ body.keyboard-open .plus-sheet {
   #tab-hx .tab-inner,
   #tab-wrg .tab-inner,
   #tab-trinkwasser .tab-inner { max-width: 1540px; }
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   DESKTOP UI POLISH V3
+   Header-Abstand, Flow-Komplettansicht, gleich breite Desktop-Spalten.
+═══════════════════════════════════════════════════════ */
+@media (min-width: 1200px) {
+  /* 1) Mehr Luft unter dem fixen Header in allen Tabs */
+  #app-shell { padding-top: calc(var(--hdr) + var(--sat) + 32px) !important; }
+  .tab-panel { padding-top: 0 !important; }
+
+  /* 2) Heizung/Kälte: Desktop ohne Umschalter, beide Eingabekarten sichtbar */
+  #tab-flow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    column-gap: 28px !important;
+  }
+  #tab-flow .col-L > div:nth-child(2) { display:none !important; }
+  #tab-flow #flow-panel-h,
+  #tab-flow #flow-panel-k { display:block !important; }
+  #tab-flow .twin { grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important; }
+  #tab-flow .col-R { top: calc(var(--hdr) + var(--sat) + 32px) !important; }
+
+  /* 3) h,x: links/rechts exakt gleich breit */
+  #tab-hx .tab-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    max-width: 1500px !important;
+    column-gap: 28px !important;
+  }
+  #tab-hx .tab-inner > .gc:nth-of-type(2) {
+    top: calc(var(--hdr) + var(--sat) + 32px) !important;
+  }
+
+  /* 4) WRG/Mischluft ebenfalls symmetrisch halten */
+  #tab-wrg .tab-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    max-width: 1500px !important;
+    column-gap: 28px !important;
+  }
+
+  /* 5) Trinkwasser: rechte Ergebnis-Spalte startet oben bündig mit links */
+  #tab-trinkwasser .tab-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    max-width: 1500px !important;
+    column-gap: 28px !important;
+  }
+  #tab-trinkwasser .tab-inner > .out-card {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: start !important;
+    top: calc(var(--hdr) + var(--sat) + 32px) !important;
+  }
+  #tab-trinkwasser .tab-inner > .gc:nth-of-type(4) { grid-column: 2 !important; grid-row: 2 !important; }
+  #tab-trinkwasser .tab-inner > .fml { grid-column: 2 !important; grid-row: 3 !important; }
 }

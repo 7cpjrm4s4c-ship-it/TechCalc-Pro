@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Pill Sichtbarkeit
   _updatePillVisibility();
-  window.addEventListener('resize', _updatePillVisibility);
+  window.addEventListener('resize', () => { _updatePillVisibility(); NAV._apply(); });
   _setupKeyboardGuard();
 
   // Initial Tab
