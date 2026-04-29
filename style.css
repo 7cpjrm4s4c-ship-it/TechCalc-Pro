@@ -970,3 +970,105 @@ body.tc-app #tab-entwaesserung .ew-result-card .out-val .u{
   body.tc-app #tab-mag .mag-result-card .out-val,
   body.tc-app #tab-entwaesserung .ew-result-card .out-val{font-size:24px!important}
 }
+
+/* ========================================================================
+   Phase 14 Bugfix 3 — merged mobile/layout fixes 1–5
+   Purpose: restore Bugfix 1 changes that were lost because style.css was
+   missing in an intermediate clean package.
+   ======================================================================== */
+
+/* 1) Bottom navigation pill: centered, not stretched asymmetrically. */
+@media (max-width:899px){
+  body.tc-app :is(.bottom-pill,.bottom-nav,.nav-pill,.tabbar){
+    position:fixed!important;
+    left:50%!important;
+    right:auto!important;
+    bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;
+    transform:translateX(-50%)!important;
+    width:min(calc(100vw - 24px), 430px)!important;
+    max-width:calc(100vw - 24px)!important;
+    margin-inline:0!important;
+    z-index:3000!important;
+    box-sizing:border-box!important;
+  }
+}
+
+/* 2) Heating/cooling output grids: align visual weight with Lüftung results. */
+body.tc-app #tab-flow :is(.out-val,.ui-result-value,.tcp-result-number,.result-value,.metric-value),
+body.tc-app #tab-heat :is(.out-val,.ui-result-value,.tcp-result-number,.result-value,.metric-value),
+body.tc-app #tab-heating :is(.out-val,.ui-result-value,.tcp-result-number,.result-value,.metric-value){
+  font-size:clamp(24px,2.05vw,30px)!important;
+  line-height:1.05!important;
+  font-weight:760!important;
+  letter-spacing:-.02em!important;
+}
+body.tc-app #tab-flow :is(.out-title,.ui-result-title,.tcp-result-label,.result-label,.metric-label),
+body.tc-app #tab-heat :is(.out-title,.ui-result-title,.tcp-result-label,.result-label,.metric-label),
+body.tc-app #tab-heating :is(.out-title,.ui-result-title,.tcp-result-label,.result-label,.metric-label){
+  font-size:12px!important;
+  line-height:1.15!important;
+  font-weight:750!important;
+}
+@media (max-width:899px){
+  body.tc-app #tab-flow :is(.out-val,.ui-result-value,.tcp-result-number,.result-value,.metric-value),
+  body.tc-app #tab-heat :is(.out-val,.ui-result-value,.tcp-result-number,.result-value,.metric-value),
+  body.tc-app #tab-heating :is(.out-val,.ui-result-value,.tcp-result-number,.result-value,.metric-value){
+    font-size:28px!important;
+  }
+}
+
+/* 3) All module grids must clear the fixed bottom pill on mobile. */
+@media (max-width:899px){
+  body.tc-app :is(.tab-panel.is-active,.tab-content.is-active,#app-shell,.app-shell,main,.app-main){
+    padding-bottom:calc(136px + env(safe-area-inset-bottom,0px))!important;
+  }
+  body.tc-app :is(.tcp-module,.tab-inner,.module-wrap,.flow-wrap,.vent-wrap,.tw-wrap,.mag-wrap,.entw-wrap,.wrg-wrap,.hx-wrap){
+    margin-bottom:calc(28px + env(safe-area-inset-bottom,0px))!important;
+  }
+  body.tc-app :is(.tcp-layout,.tcp-grid,.module-grid,.calc-grid,.input-grid,.result-grid,.cards-grid,.controls-grid){
+    position:relative!important;
+    z-index:1!important;
+  }
+}
+
+/* 4) Numeric inputs and outputs left-aligned across modules. */
+body.tc-app :is(input[type='number'],input[inputmode='decimal'],input[inputmode='numeric'],.inp,.inp-sm,.num-input){
+  text-align:left!important;
+  font-variant-numeric:tabular-nums!important;
+}
+body.tc-app :is(.out-val,.unit-ro,.ui-result-value,.tcp-result-number,.result-value,.metric-value,.kv-value){
+  text-align:left!important;
+  justify-self:start!important;
+  font-variant-numeric:tabular-nums!important;
+}
+body.tc-app :is(.tcp-result-row,.result-row,.out-row,.res-row,.result-line,.kv-row,.metric-row){
+  grid-template-columns:minmax(0,1fr) minmax(7ch,auto)!important;
+}
+body.tc-app :is(.tcp-result-row,.result-row,.out-row,.res-row,.result-line,.kv-row,.metric-row)>:last-child{
+  justify-self:start!important;
+  text-align:left!important;
+}
+
+/* 5) Edit/delete buttons: pill-sized, readable, visually consistent. */
+body.tc-app :is(.ew-mini-btn,.project-mini-btn,.tw-ne-del,button[data-project-delete],button[class*='delete'],button[class*='edit']){
+  min-height:34px!important;
+  padding:8px 13px!important;
+  border-radius:999px!important;
+  font-family:var(--f,system-ui)!important;
+  font-size:13px!important;
+  line-height:1!important;
+  font-weight:750!important;
+  letter-spacing:-.01em!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  white-space:nowrap!important;
+  box-sizing:border-box!important;
+}
+body.tc-app :is(.ew-mini-btn.danger,.project-mini-btn.delete,button[data-project-delete],button[class*='delete']){
+  min-width:74px!important;
+}
+body.tc-app :is(.ew-mini-btn:not(.danger),.project-mini-btn:not(.delete),button[class*='edit']){
+  min-width:96px!important;
+}
