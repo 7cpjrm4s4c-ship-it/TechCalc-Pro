@@ -376,7 +376,8 @@
 <div id="tab-luft" class="tab-panel" style="display:none">
   <div class="tab-inner">
 
-    <!-- ① Zulufttemperatur + Raumtemperatur pill — Heizen & Kühlen getrennt -->
+    <div class="luft-desktop-left">
+<!-- ① Zulufttemperatur + Raumtemperatur pill — Heizen & Kühlen getrennt -->
     <div class="gc" style="padding:0;overflow:hidden">
       <div style="padding:12px 16px 6px;font-family:var(--f);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--t3)">Temperaturen</div>
       <!-- Header row -->
@@ -485,7 +486,9 @@
       </div>
     </div>
 
-    <!-- ④ Ergebnis-Karte -->
+    </div>
+<div class="luft-desktop-right">
+<!-- ④ Ergebnis-Karte -->
     <div class="out-card">
       <div class="slbl" id="luft-out-title">Ergebnis &mdash; Heizleistung Luft</div>
       <div style="margin-bottom:14px">
@@ -522,6 +525,7 @@
     </div>
 
   </div>
+</div>
 </div>
 
 <div id="tab-pipe" class="tab-panel" style="display:none">
@@ -1187,6 +1191,12 @@
       <div class="fml">Q<sub>ww</sub> = K × √ΣDU · Quick-Check zur Plausibilitätsprüfung</div>
 
       <div class="gc"><div class="slbl">Angesetzte Verbraucher</div><div id="ew-detail" class="ew-detail"></div></div>
+      <div class="gc ew-total-card">
+        <div class="slbl">Gesamtsumme — alle Stränge</div>
+        <div id="ew-total-fixtures" class="ew-total-grid">
+          <p style="color:var(--t3);font-size:12px">Noch keine Stränge angelegt.</p>
+        </div>
+      </div>
       <div class="gc"><div class="slbl">Hinweise</div><div class="info-txt" id="ew-hints">Entwässerungsgegenstände eingeben.</div></div>
     </div>
   </div>

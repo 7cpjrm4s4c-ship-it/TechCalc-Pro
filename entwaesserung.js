@@ -39,7 +39,8 @@ function ewFmt(v, d=2) { return (isNaN(v) || v == null) ? '–' : Number(v).toFi
 function ewGet(id) { return document.getElementById(id); }
 
 function ewRecommendedPipe(qww, du) {
-  if (du <= 2.5 && qww <= 1.0) return { anschluss:'DN 50', sammel:'DN 70', fall:'DN 70 / DN 80', grund:'DN 100' };
+  if (du <= 2.5 && qww <= 1.0) return {
+    aggregate: ewAggregateStraenge(), anschluss:'DN 50', sammel:'DN 70', fall:'DN 70 / DN 80', grund:'DN 100' };
   if (du <= 8 && qww <= 2.0)   return { anschluss:'DN 70', sammel:'DN 80 / DN 100', fall:'DN 100', grund:'DN 100' };
   if (du <= 20 && qww <= 3.5)  return { anschluss:'DN 100', sammel:'DN 100', fall:'DN 100', grund:'DN 125' };
   if (du <= 50 && qww <= 6.0)  return { anschluss:'DN 100', sammel:'DN 125', fall:'DN 125', grund:'DN 150' };
@@ -82,6 +83,7 @@ function initEntwaesserung() {
   });
   ewGet('ew-calc-btn')?.addEventListener('click', addEntwaesserungStrang);
   renderStrangListe();
+  renderEntwaesserungTotals();
   calcEntwaesserung();
 }
 
@@ -158,6 +160,7 @@ function addEntwaesserungStrang() {
   EW_STATE.straenge.push(strang);
   saveStraenge();
   renderStrangListe();
+  renderEntwaesserungTotals();
   resetEntwaesserungInputs();
   calcEntwaesserung();
 }
@@ -168,6 +171,61 @@ function deleteStrang(id) {
   renderStrangListe();
 }
 window.deleteStrang = deleteStrang;
+
+
+function ewAggregateStraenge() {
+  const list = EW_STATE.straenge || [];
+  const totals = {};
+  let duTotal = 0;
+  let qwwTotal = 0;
+
+  list.forEach(s => {
+    duTotal += Number(s.duTotal) || 0;
+    qwwTotal += Number(s.qww) || 0;
+
+    (s.rows || []).forEach(r => {
+      const key = r.key || r.label || 'unknown';
+      if (!totals[key]) totals[key] = { key, label: r.label || key, count: 0, du: 0 };
+      totals[key].count += Number(r.count) || 0;
+      totals[key].du += Number(r.sum) || Number(r.du) || 0;
+    });
+  });
+
+  return {
+    list,
+    duTotal,
+    qwwTotal,
+    fixtures: Object.values(totals).filter(x => x.count > 0)
+  };
+}
+
+function renderEntwaesserungTotals() {
+  const host = ewGet('ew-total-fixtures');
+  if (!host) return;
+
+  const agg = ewAggregateStraenge();
+  if (!agg.list.length) {
+    host.innerHTML = '<p style="color:var(--t3);font-size:12px">Noch keine Stränge angelegt.</p>';
+    return;
+  }
+
+  const rows = agg.fixtures.map(f => `
+    <div class="ew-fixture-total-row">
+      <strong>${f.label}</strong>
+      <span>${f.count} Stk.</span>
+      <span>${ewFmt(f.du,1)} DU</span>
+    </div>
+  `).join('');
+
+  host.innerHTML = `
+    <div class="ew-total-head">
+      <span>Stränge: <strong>${agg.list.length}</strong></span>
+      <span>ΣDU: <strong>${ewFmt(agg.duTotal,1)}</strong></span>
+      <span>ΣQww: <strong>${ewFmt(agg.qwwTotal,2)} l/s</strong></span>
+    </div>
+    <div class="ew-strang-summary">${rows || '<p style="color:var(--t3);font-size:12px">Keine Gegenstände gespeichert.</p>'}</div>
+  `;
+}
 
 function renderStrangListe() {
   const host = ewGet('ew-strang-list');
