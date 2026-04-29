@@ -407,3 +407,84 @@ body.tc-app .tcp-module .tcp-card-title:first-child {
     margin-top:0!important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════
+   Refactoring Phase 5: Utility-Abbau und UI-Contract-Härtung
+   Ziel: wiederkehrende Inline-Styles werden zu benannten UI-Primitiven.
+═══════════════════════════════════════════════════════ */
+:root {
+  --tcp-switch-pad: 4px;
+  --tcp-switch-gap: 4px;
+  --tcp-header-pad-x: 18px;
+  --tcp-header-pad-y: 16px;
+  --tcp-kicker-pad-x: 16px;
+  --tcp-kicker-pad-top: 12px;
+  --tcp-kicker-pad-bottom: 6px;
+}
+
+body.tc-app .tcp-card-head {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  padding:var(--tcp-header-pad-y) var(--tcp-header-pad-x)!important;
+}
+body.tc-app .tcp-grid-2-sm {
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:var(--gap-s,10px)!important;
+}
+body.tc-app .tcp-segmented {
+  display:grid!important;
+  gap:var(--tcp-switch-gap)!important;
+  background:rgba(0,0,0,.40)!important;
+  border:1px solid var(--gb-soft)!important;
+  border-radius:var(--r-l)!important;
+  padding:var(--tcp-switch-pad)!important;
+}
+body.tc-app .tcp-segmented--2 { grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important; }
+body.tc-app .tcp-section-kicker,
+body.tc-app .tcp-col-kicker {
+  font-family:var(--f,system-ui)!important;
+  font-size:11px!important;
+  font-weight:700!important;
+  letter-spacing:.13em!important;
+  text-transform:uppercase!important;
+}
+body.tc-app .tcp-section-kicker {
+  padding:var(--tcp-kicker-pad-top) var(--tcp-kicker-pad-x) var(--tcp-kicker-pad-bottom)!important;
+  color:var(--t3)!important;
+}
+body.tc-app .tcp-col-kicker--heat { color:var(--heat-t)!important; }
+body.tc-app .tcp-col-kicker--cold { color:var(--cold-t)!important; }
+body.tc-app .tcp-pad-x { padding-left:var(--tcp-kicker-pad-x)!important; padding-right:var(--tcp-kicker-pad-x)!important; }
+body.tc-app .tcp-pad-b-sm { padding-bottom:var(--tcp-kicker-pad-bottom)!important; }
+body.tc-app .tcp-divider-top { border-top:1px solid var(--gb-soft)!important; }
+body.tc-app .tcp-flex-1 { flex:1 1 0!important; min-width:0!important; }
+body.tc-app .tcp-line { flex:1 1 auto!important; height:1px!important; background:var(--gb-soft)!important; }
+body.tc-app .tcp-nowrap { white-space:nowrap!important; }
+body.tc-app .tcp-m-0 { margin:0!important; }
+body.tc-app .tcp-mb-2 { margin-bottom:10px!important; }
+body.tc-app .tcp-mb-3 { margin-bottom:12px!important; }
+body.tc-app .tcp-mt-2 { margin-top:10px!important; }
+body.tc-app .tcp-muted { color:var(--t2)!important; }
+body.tc-app .tcp-note { font-size:12px!important; color:var(--t2)!important; }
+body.tc-app .tcp-empty-note { color:var(--t3)!important; font-size:12px!important; text-align:center!important; padding:12px 0!important; }
+body.tc-app .tcp-mono-strong { font-family:var(--fm,monospace)!important; font-size:14px!important; font-weight:700!important; color:var(--t4)!important; }
+body.tc-app .tcp-mono-small { font-family:var(--fm,monospace)!important; font-size:11px!important; font-weight:600!important; color:var(--t1)!important; }
+body.tc-app .tcp-action-row--stretch { align-items:stretch!important; }
+
+/* App-UI gewinnt bewusst gegen alte Einzelregeln. PDF bleibt in layout.css isoliert. */
+@media screen {
+  body.tc-app .pdf-only,
+  body.tc-app [data-pdf-only="true"] { display:none!important; }
+}
+@media print {
+  body.tc-app .hdr,
+  body.tc-app .tab-bar,
+  body.tc-app .mobile-bottom-pill,
+  body.tc-app .hdr-menu,
+  body.tc-app .floating-action,
+  body.tc-app .no-print { display:none!important; }
+  body.tc-app #app-shell { padding-top:0!important; }
+}
