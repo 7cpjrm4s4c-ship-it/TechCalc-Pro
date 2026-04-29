@@ -191,3 +191,23 @@ Aktive App-Klammer: `body.tc-app.tc-ui-v8.tc-ui-v9`. `tc-ui-v9` ist die führend
 ## Phase 11 Ergänzung
 
 Neue Module verwenden ausschließlich `tcp-module`, `tcp-layout`, `tcp-card`, `tcp-result-row` und eine Modul-Akzentklasse. Abweichende Abstände, Feldhöhen oder Desktop/Mobile-Raster sind nicht im Modul zu definieren.
+
+## Phase 12 Ergänzung
+
+Ab Phase 12 gilt `tc-ui-v12` als aktive UI-Kaskade. Neue Module dürfen keine eigenen Desktop-/Mobile-Raster definieren. Erlaubt sind ausschließlich Modul-Akzentwerte über `--module-accent` und fachliche Sonderzustände, nicht aber globale Abstände, Header-Offsets oder Bottom-Navigation-Positionen.
+
+## Phase 13 Ergänzung
+Aktive UI-Klammer: `body.tc-app.tc-ui-v13`.
+
+Neue Module müssen weiterhin diese Struktur verwenden:
+
+```html
+<section class="tcp-module tcp-module--air">
+  <div class="tcp-layout tcp-layout--2col">
+    <div class="tcp-col tcp-col--input">...</div>
+    <div class="tcp-col tcp-col--result">...</div>
+  </div>
+</section>
+```
+
+Modulbezogene CSS-Regeln dürfen nur Akzentfarben oder fachliche Sonderfälle definieren. Raster, Abstände, Card-Styling, Eingabefelder, Ergebniszeilen und Mobile-Verhalten gehören ausschließlich in die zentrale UI-Schicht.

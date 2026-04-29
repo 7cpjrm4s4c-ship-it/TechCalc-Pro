@@ -833,3 +833,110 @@ body.tc-app.tc-ui-v11 .tcp-module :is(.tcp-primary-btn,.primary-btn,#hx-calc,.hx
 @media (min-width:900px){body.tc-app.tc-ui-v11 :is(.tcp-layout--2col,.module-grid,.calc-grid){display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:start!important}body.tc-app.tc-ui-v11 :is(.tcp-layout--3col){display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important}}
 @media (max-width:899px){body.tc-app.tc-ui-v11 :is(.tcp-layout,.tcp-layout--2col,.tcp-layout--3col,.module-grid,.calc-grid,.input-grid,.result-grid){display:flex!important;flex-direction:column!important;align-items:stretch!important}body.tc-app.tc-ui-v11 :is(.bottom-pill,.bottom-nav,.nav-pill,.tabbar){position:fixed!important;left:max(12px,env(safe-area-inset-left))!important;right:max(12px,env(safe-area-inset-right))!important;bottom:max(12px,env(safe-area-inset-bottom))!important;z-index:1000!important}}
 @media print{body.tc-app.tc-ui-v11 :is(.bottom-pill,.bottom-nav,.nav-pill,.tabbar,.app-header,.app-menu-sheet,.app-menu-overlay,.plus-sheet,.plus-overlay,.project-sheet,.project-overlay,.toast){display:none!important}}
+
+/* =========================================================
+   TechCalc Pro UI Refactor – Phase 12
+   Zentrale Härtung des UI-Vertrags für neue Module.
+   ========================================================= */
+body.tc-app.tc-ui-v12{
+  --tcp-shell-top:clamp(84px,9vh,118px);
+  --tcp-shell-x:clamp(12px,2.2vw,32px);
+  --tcp-shell-bottom:calc(92px + env(safe-area-inset-bottom,0px));
+  --tcp-app-max:1560px;
+  --tcp-grid-gap-x:clamp(16px,2vw,32px);
+  --tcp-grid-gap-y:clamp(14px,1.65vw,26px);
+  --tcp-card-pad:clamp(14px,1.45vw,24px);
+  --tcp-card-radius:24px;
+  --tcp-field-h:48px;
+  --tcp-result-row-h:44px;
+  --tcp-focus-ring:0 0 0 3px color-mix(in srgb,var(--module-accent,#4fa8ff) 26%,transparent);
+}
+body.tc-app.tc-ui-v12 :is(#app-shell,.app-shell,main,.app-main){padding-inline:var(--tcp-shell-x);padding-top:var(--tcp-shell-top);padding-bottom:var(--tcp-shell-bottom)}
+body.tc-app.tc-ui-v12 :is(.tab-panel,.tab-content,.tcp-module,.module-wrap,.flow-wrap,.vent-wrap,.tw-wrap,.mag-wrap,.entw-wrap,.hx-wrap){width:min(100%,var(--tcp-app-max));margin-inline:auto;min-width:0}
+body.tc-app.tc-ui-v12 :is(.tcp-layout,.tcp-grid,.module-grid,.calc-grid,.input-grid,.result-grid,.cards-grid){gap:var(--tcp-grid-gap-y) var(--tcp-grid-gap-x);min-width:0}
+body.tc-app.tc-ui-v12 :is(.tcp-card,.gc,.out-card,.panel,.card,.result-card,.input-card){padding:var(--tcp-card-pad);border-radius:var(--tcp-card-radius);min-width:0;box-sizing:border-box}
+body.tc-app.tc-ui-v12 :is(.tcp-card,.gc,.out-card,.panel,.card,.result-card,.input-card)>:first-child{margin-top:0}
+body.tc-app.tc-ui-v12 :is(.tcp-card,.gc,.out-card,.panel,.card,.result-card,.input-card)>:last-child{margin-bottom:0}
+body.tc-app.tc-ui-v12 :is(.inp,.inp-sm,.gl-sel,.tcp-input,.hx-input,.tzl-inp,input[type=number],input[type=text],select,textarea){min-height:var(--tcp-field-h);box-sizing:border-box}
+body.tc-app.tc-ui-v12 :is(.inp,.inp-sm,.gl-sel,.tcp-input,.hx-input,.tzl-inp,input[type=number],input[type=text],select,textarea):focus{outline:none;box-shadow:var(--tcp-focus-ring)}
+body.tc-app.tc-ui-v12 :is(.tcp-result-row,.result-row,.out-row,.res-row,.result-line,.kv-row,.metric-row){min-height:var(--tcp-result-row-h);display:grid;grid-template-columns:minmax(0,1fr) max-content;align-items:center;gap:10px}
+body.tc-app.tc-ui-v12 :is(.tcp-result-row,.result-row,.out-row,.res-row,.result-line,.kv-row,.metric-row)>:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis}
+body.tc-app.tc-ui-v12 :is(.tcp-result-row,.result-row,.out-row,.res-row,.result-line,.kv-row,.metric-row)>:last-child{justify-self:end;text-align:right;white-space:nowrap}
+body.tc-app.tc-ui-v12 :is(.tcp-module--heatcold,#tab-flow,#tab-heating,#tab-cooling){--module-accent:var(--heat,#ff6b35)}
+body.tc-app.tc-ui-v12 :is(.tcp-module--air,#tab-luft,#tab-ventilation,#tab-wrg){--module-accent:var(--air,#a78bfa)}
+body.tc-app.tc-ui-v12 :is(.tcp-module--unit,#tab-unit,#tab-units,#tab-einheiten){--module-accent:var(--grn,#34d399)}
+body.tc-app.tc-ui-v12 :is(.tcp-module--hx,#tab-hx){--module-accent:#746cff}
+body.tc-app.tc-ui-v12 :is(.tcp-module--water,#tab-tw,#tab-trinkwasser){--module-accent:var(--blue,#4fa8ff)}
+body.tc-app.tc-ui-v12 :is(.tcp-module--pressure,#tab-mag){--module-accent:#fb7185}
+body.tc-app.tc-ui-v12 :is(.tcp-module--drain,#tab-entw,#tab-entwaesserung){--module-accent:#f59e0b}
+body.tc-app.tc-ui-v12 .tcp-module :is(.tcp-primary-btn,.primary-btn,#hx-calc,.hx-main-btn,.calc-btn){background:linear-gradient(135deg,var(--module-accent),color-mix(in srgb,var(--module-accent) 66%,#111827))}
+@media (min-width:900px){body.tc-app.tc-ui-v12 :is(.tcp-layout--2col,.module-grid,.calc-grid,.two-col-grid){display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:start!important}body.tc-app.tc-ui-v12 :is(.tcp-layout--3col,.three-col-grid){display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;align-items:start!important}body.tc-app.tc-ui-v12 :is(.tcp-sticky-col,.sticky-col){position:sticky;top:var(--tcp-shell-top)}}
+@media (max-width:899px){body.tc-app.tc-ui-v12 :is(#app-shell,.app-shell,main,.app-main){padding-inline:max(12px,env(safe-area-inset-left));padding-top:clamp(74px,10vh,96px);padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}body.tc-app.tc-ui-v12 :is(.tcp-layout,.tcp-layout--2col,.tcp-layout--3col,.module-grid,.calc-grid,.input-grid,.result-grid,.cards-grid){display:flex!important;flex-direction:column!important;align-items:stretch!important}body.tc-app.tc-ui-v12 :is(.bottom-pill,.bottom-nav,.nav-pill,.tabbar){position:fixed!important;left:max(12px,env(safe-area-inset-left))!important;right:max(12px,env(safe-area-inset-right))!important;bottom:max(12px,env(safe-area-inset-bottom))!important;z-index:1000!important;transform:none!important}}
+@media print{body.tc-app.tc-ui-v12 :is(#app-shell,.app-shell,main,.app-main){padding:0!important}body.tc-app.tc-ui-v12 :is(.bottom-pill,.bottom-nav,.nav-pill,.tabbar,.app-header,.app-menu-sheet,.app-menu-overlay,.plus-sheet,.plus-overlay,.project-sheet,.project-overlay,.toast){display:none!important}}
+
+/* =========================================================
+   TechCalc Pro UI Refactor – Phase 13
+   Finale Bereinigung vor Production Hardening.
+   Zweck: App-UI eindeutig über tc-ui-v13 führen, PDF/Print
+   entkoppeln und neue Module ohne Layout-Sonderregeln absichern.
+   ========================================================= */
+body.tc-app.tc-ui-v13{
+  --tcp-shell-top:clamp(86px,9vh,120px);
+  --tcp-shell-x:clamp(12px,2.25vw,34px);
+  --tcp-shell-bottom:calc(104px + env(safe-area-inset-bottom,0px));
+  --tcp-app-max:1560px;
+  --tcp-grid-gap-x:clamp(16px,2vw,32px);
+  --tcp-grid-gap-y:clamp(14px,1.65vw,26px);
+  --tcp-card-pad:clamp(14px,1.45vw,24px);
+  --tcp-card-radius:24px;
+  --tcp-field-h:48px;
+  --tcp-result-row-h:44px;
+  --tcp-focus-ring:0 0 0 3px color-mix(in srgb,var(--module-accent,#4fa8ff) 24%,transparent);
+}
+body.tc-app.tc-ui-v13 :is(#app-shell,.app-shell,main,.app-main){padding-inline:var(--tcp-shell-x);padding-top:var(--tcp-shell-top);padding-bottom:var(--tcp-shell-bottom)}
+body.tc-app.tc-ui-v13 :is(.tab-panel,.tab-content,.tcp-module,.module-wrap,.flow-wrap,.vent-wrap,.tw-wrap,.mag-wrap,.entw-wrap,.hx-wrap,.unit-wrap){width:min(100%,var(--tcp-app-max));margin-inline:auto;min-width:0;box-sizing:border-box}
+body.tc-app.tc-ui-v13 :is(.tcp-layout,.tcp-grid,.module-grid,.calc-grid,.input-grid,.result-grid,.cards-grid,.controls-grid){gap:var(--tcp-grid-gap-y) var(--tcp-grid-gap-x);min-width:0;box-sizing:border-box}
+body.tc-app.tc-ui-v13 :is(.tcp-col,.input-col,.result-col,.left-col,.right-col){min-width:0;box-sizing:border-box}
+body.tc-app.tc-ui-v13 :is(.tcp-card,.gc,.out-card,.panel,.card,.result-card,.input-card){padding:var(--tcp-card-pad);border-radius:var(--tcp-card-radius);min-width:0;box-sizing:border-box;overflow:clip}
+body.tc-app.tc-ui-v13 :is(.tcp-card,.gc,.out-card,.panel,.card,.result-card,.input-card)>:first-child{margin-top:0}
+body.tc-app.tc-ui-v13 :is(.tcp-card,.gc,.out-card,.panel,.card,.result-card,.input-card)>:last-child{margin-bottom:0}
+body.tc-app.tc-ui-v13 :is(input,select,textarea,button){font:inherit;max-width:100%}
+body.tc-app.tc-ui-v13 :is(.inp,.inp-sm,.gl-sel,.tcp-input,.hx-input,.tzl-inp,input[type=number],input[type=text],select,textarea){width:100%;min-width:0;min-height:var(--tcp-field-h);box-sizing:border-box}
+body.tc-app.tc-ui-v13 :is(.inp,.inp-sm,.gl-sel,.tcp-input,.hx-input,.tzl-inp,input[type=number],input[type=text],select,textarea):focus{outline:none;box-shadow:var(--tcp-focus-ring);border-color:color-mix(in srgb,var(--module-accent,#4fa8ff) 46%,transparent)}
+body.tc-app.tc-ui-v13 :is(.tcp-result-row,.result-row,.out-row,.res-row,.result-line,.kv-row,.metric-row){min-height:var(--tcp-result-row-h);display:grid;grid-template-columns:minmax(0,1fr) max-content;align-items:center;gap:10px;min-width:0;box-sizing:border-box}
+body.tc-app.tc-ui-v13 :is(.tcp-result-row,.result-row,.out-row,.res-row,.result-line,.kv-row,.metric-row)>:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.tc-app.tc-ui-v13 :is(.tcp-result-row,.result-row,.out-row,.res-row,.result-line,.kv-row,.metric-row)>:last-child{justify-self:end;text-align:right;white-space:nowrap}
+body.tc-app.tc-ui-v13 :is(.tcp-module--heatcold,#tab-flow,#tab-heating,#tab-cooling){--module-accent:var(--heat,#ff6b35)}
+body.tc-app.tc-ui-v13 :is(.tcp-module--air,#tab-luft,#tab-ventilation,#tab-wrg){--module-accent:var(--air,#a78bfa)}
+body.tc-app.tc-ui-v13 :is(.tcp-module--unit,#tab-unit,#tab-units,#tab-einheiten){--module-accent:var(--grn,#34d399)}
+body.tc-app.tc-ui-v13 :is(.tcp-module--hx,#tab-hx){--module-accent:#746cff}
+body.tc-app.tc-ui-v13 :is(.tcp-module--water,#tab-tw,#tab-trinkwasser){--module-accent:var(--blue,#4fa8ff)}
+body.tc-app.tc-ui-v13 :is(.tcp-module--pressure,#tab-mag){--module-accent:#fb7185}
+body.tc-app.tc-ui-v13 :is(.tcp-module--drain,#tab-entw,#tab-entwaesserung){--module-accent:#f59e0b}
+body.tc-app.tc-ui-v13 .tcp-module :is(.tcp-primary-btn,.primary-btn,#hx-calc,.hx-main-btn,.calc-btn){background:linear-gradient(135deg,var(--module-accent),color-mix(in srgb,var(--module-accent) 66%,#111827))}
+body.tc-app.tc-ui-v13 :is(.tab-panel,.tab-content)[hidden]{display:none!important}
+@media (min-width:900px){
+  body.tc-app.tc-ui-v13 :is(.tcp-layout--2col,.module-grid,.calc-grid,.two-col-grid){display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:start!important}
+  body.tc-app.tc-ui-v13 :is(.tcp-layout--3col,.three-col-grid){display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;align-items:start!important}
+  body.tc-app.tc-ui-v13 :is(.tcp-sticky-col,.sticky-col){position:sticky;top:var(--tcp-shell-top)}
+}
+@media (max-width:899px){
+  body.tc-app.tc-ui-v13 :is(#app-shell,.app-shell,main,.app-main){padding-inline:max(12px,env(safe-area-inset-left));padding-top:clamp(74px,10vh,96px);padding-bottom:calc(108px + env(safe-area-inset-bottom,0px))}
+  body.tc-app.tc-ui-v13 :is(.tcp-layout,.tcp-layout--2col,.tcp-layout--3col,.module-grid,.calc-grid,.input-grid,.result-grid,.cards-grid,.controls-grid){display:flex!important;flex-direction:column!important;align-items:stretch!important}
+  body.tc-app.tc-ui-v13 :is(.bottom-pill,.bottom-nav,.nav-pill,.tabbar){position:fixed!important;left:max(12px,env(safe-area-inset-left))!important;right:max(12px,env(safe-area-inset-right))!important;bottom:max(12px,env(safe-area-inset-bottom))!important;z-index:1000!important;transform:none!important;max-width:calc(100vw - 24px)!important;margin-inline:auto!important}
+}
+@media print{
+  body.tc-app.tc-ui-v13 :is(#app-shell,.app-shell,main,.app-main){padding:0!important}
+  body.tc-app.tc-ui-v13 :is(.bottom-pill,.bottom-nav,.nav-pill,.tabbar,.app-header,.app-menu-sheet,.app-menu-overlay,.plus-sheet,.plus-overlay,.project-sheet,.project-overlay,.toast){display:none!important}
+}
+
+/* Phase 14 – Production Hardening */
+body.tc-app.tc-ui-v14{--tcp-shell-top:clamp(82px,9vh,112px);--tcp-shell-bottom:clamp(24px,4vh,48px);--tcp-grid-gap-x:clamp(16px,2vw,28px);--tcp-grid-gap-y:clamp(14px,1.8vw,24px);--tcp-card-pad:clamp(14px,1.7vw,22px);--tcp-field-h:44px;--tcp-result-row-h:42px}
+body.tc-app.tc-ui-v14,body.tc-app.tc-ui-v14 *{box-sizing:border-box}
+body.tc-app.tc-ui-v14 :is(#app-shell,.app-shell,main,.app-main){padding-top:var(--tcp-shell-top);padding-bottom:var(--tcp-shell-bottom)}
+body.tc-app.tc-ui-v14 :is(.tcp-card,.gc,.out-card,.panel,.card,.result-card,.input-card){padding:var(--tcp-card-pad);min-width:0;overflow:clip}
+body.tc-app.tc-ui-v14 :is(.tcp-layout,.tcp-grid,.module-grid,.calc-grid,.input-grid,.result-grid,.cards-grid,.controls-grid){gap:var(--tcp-grid-gap-y) var(--tcp-grid-gap-x);min-width:0}
+body.tc-app.tc-ui-v14 :is(.tcp-result-row,.result-row,.out-row,.res-row,.result-line,.kv-row,.metric-row){min-height:var(--tcp-result-row-h);display:grid;grid-template-columns:minmax(0,1fr) max-content;align-items:center;gap:10px}
+@media (min-width:900px){body.tc-app.tc-ui-v14 :is(.tcp-layout--2col,.module-grid,.calc-grid,.two-col-grid){display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:start!important}}
+@media (max-width:899px){body.tc-app.tc-ui-v14{--tcp-shell-top:clamp(74px,10vh,96px);--tcp-shell-bottom:calc(112px + env(safe-area-inset-bottom,0px))}body.tc-app.tc-ui-v14 :is(.tcp-layout,.tcp-layout--2col,.tcp-layout--3col,.module-grid,.calc-grid,.input-grid,.result-grid,.cards-grid,.controls-grid){display:flex!important;flex-direction:column!important;align-items:stretch!important}body.tc-app.tc-ui-v14 :is(.bottom-pill,.bottom-nav,.nav-pill,.tabbar){position:fixed!important;left:max(12px,env(safe-area-inset-left))!important;right:max(12px,env(safe-area-inset-right))!important;bottom:max(12px,env(safe-area-inset-bottom))!important;z-index:1000!important;transform:none!important;max-width:calc(100vw - 24px)!important;margin-inline:auto!important}}
+@media print{body.tc-app.tc-ui-v14 :is(.bottom-pill,.bottom-nav,.nav-pill,.tabbar,.app-header,.app-menu-sheet,.app-menu-overlay,.plus-sheet,.plus-overlay,.project-sheet,.project-overlay,.toast){display:none!important}}
