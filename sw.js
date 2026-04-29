@@ -4,7 +4,7 @@
 ═══════════════════════════════════════════════════════ */
 'use strict';
 
-const BUILD_TS = '20260429-phase8-4-final-fix';
+const BUILD_TS = '20260429-phase8-5-ui-stability';
 const CACHE_NAME = `techcalc-${BUILD_TS}`;
 
 const PRECACHE = [

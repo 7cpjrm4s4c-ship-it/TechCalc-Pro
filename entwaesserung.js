@@ -228,24 +228,48 @@ function renderEntwaesserungTotals() {
   `;
 }
 
+
+function editEntwaesserungStrang(id) {
+  const list = EW_STATE.straenge || [];
+  const s = list.find(x => Number(x.id) === Number(id));
+  if (!s) return;
+
+  resetEntwaesserungInputs();
+
+  (s.rows || []).forEach(r => {
+    const el = ewGet('ew-' + r.key);
+    if (el) el.value = Number(r.count) || 0;
+  });
+
+  EW_STATE.straenge = list.filter(x => Number(x.id) !== Number(id));
+  saveStraenge();
+  renderStrangListe();
+  renderEntwaesserungTotals();
+  calcEntwaesserung();
+}
+window.editEntwaesserungStrang = editEntwaesserungStrang;
+
 function renderStrangListe() {
   const host = ewGet('ew-strang-list');
   if (!host) return;
+
   const list = EW_STATE.straenge || [];
   if (!list.length) {
     host.innerHTML = '<p style="color:var(--t3);font-size:12px">Noch keine Stränge angelegt.</p>';
     renderEntwaesserungTotals();
     return;
   }
+
   host.innerHTML = list.map(s => `
     <div class="ew-detail-row">
       <span>${s.name} · ${ewFmt(s.duTotal,1)} DU · Qww ${ewFmt(s.qww,2)} l/s</span>
-      <div style="display:flex;gap:6px">
-        <button class="btn ghost" type="button" onclick="editEntwaesserungStrang(${s.id})">Bearbeiten</button>
-        <button class="btn ghost" type="button" onclick="deleteStrang(${s.id})">Löschen</button>
+      <div class="ui-action-row">
+        <button class="ew-mini-btn" type="button" onclick="editEntwaesserungStrang(${s.id})">Bearbeiten</button>
+        <button class="ew-mini-btn danger" type="button" onclick="deleteEntwaesserungStrang(${s.id})">Löschen</button>
       </div>
     </div>
   `).join('');
+
   renderEntwaesserungTotals();
 }
 

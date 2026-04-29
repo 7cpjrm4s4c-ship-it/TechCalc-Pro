@@ -955,10 +955,6 @@ function _buildEntwaesserungPage(meta) {
   const esc = v => String(v ?? '–').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
   const fmt = (v,d=2) => (v == null || isNaN(v)) ? '–' : Number(v).toFixed(d).replace('.', ',');
 
-  const currentRows = r?.rows?.length
-    ? r.rows.map(row => `<tr><td>${esc(row.label)}</td><td class="num">${row.count}</td><td class="num">${fmt(row.du,1)} DU</td></tr>`).join('')
-    : '<tr><td colspan="3" style="text-align:center;color:#aaa">Keine aktuellen Verbraucher angesetzt</td></tr>';
-
   const fixtureRows = agg?.fixtures?.length
     ? agg.fixtures.map(f => `<tr><td>${esc(f.label)}</td><td class="num">${f.count} Stk.</td><td class="num">${fmt(f.du,1)} DU</td></tr>`).join('')
     : '<tr><td colspan="3" style="text-align:center;color:#aaa">Keine gespeicherten Stränge</td></tr>';
@@ -966,6 +962,10 @@ function _buildEntwaesserungPage(meta) {
   const strangRows = agg?.list?.length
     ? agg.list.map(s => `<tr><td>${esc(s.name)}</td><td class="num">${fmt(s.duTotal,1)} DU</td><td class="num">${fmt(s.qww,2)} l/s</td></tr>`).join('')
     : '<tr><td colspan="3" style="text-align:center;color:#aaa">Keine gespeicherten Stränge</td></tr>';
+
+  const currentRows = r?.rows?.length
+    ? r.rows.map(row => `<tr><td>${esc(row.label)}</td><td class="num">${row.count}</td><td class="num">${fmt(row.du,1)} DU</td></tr>`).join('')
+    : '<tr><td colspan="3" style="text-align:center;color:#aaa">Keine aktuelle Eingabe angesetzt</td></tr>';
 
   const hints = r ? (typeof ewHints === 'function' ? ewHints(r) : []).map(h => `• ${esc(h)}`).join('<br>') : '–';
 

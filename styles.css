@@ -175,3 +175,142 @@ select.hx-input {
   height: 100%;
   display: block;
 }
+
+/* ==========================================================================
+   Phase 8.5 — UI Foundation / Result Rows / Action Buttons
+   Zentrale Darstellungsschicht für Module
+   ========================================================================== */
+:root {
+  --ui-result-row-h: 52px;
+  --ui-result-row-pad-y: 9px;
+  --ui-result-row-pad-x: 16px;
+  --ui-result-title-size: 15px;
+  --ui-result-value-size: 21px;
+  --ui-action-h: 32px;
+  --ui-action-radius: 999px;
+}
+
+.ui-result-row,
+.result-standard .ob,
+.mag-result-card .ob,
+.ew-result-card .ob,
+.tw-result-card .ob {
+  min-height: var(--ui-result-row-h) !important;
+  padding: var(--ui-result-row-pad-y) var(--ui-result-row-pad-x) !important;
+  border-radius: 18px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.ui-result-title,
+.result-standard .ob-title,
+.mag-result-card .ob-title,
+.ew-result-card .ob-title {
+  font-size: var(--ui-result-title-size) !important;
+  line-height: 1.18 !important;
+  font-weight: 650 !important;
+}
+
+.ui-result-value,
+.result-standard .out-val,
+.mag-result-card .out-val,
+.ew-result-card .out-val {
+  font-size: var(--ui-result-value-size) !important;
+  line-height: 1.05 !important;
+  font-weight: 750 !important;
+  white-space: nowrap !important;
+}
+
+.ui-action-row {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+}
+
+.ui-mini-btn,
+.ew-mini-btn {
+  height: var(--ui-action-h) !important;
+  padding: 0 13px !important;
+  border-radius: var(--ui-action-radius) !important;
+  border: 1px solid rgba(96,165,250,.45) !important;
+  background: linear-gradient(180deg, rgba(96,165,250,.20), rgba(96,165,250,.09)) !important;
+  color: var(--blue, #60a5fa) !important;
+  font-family: var(--f, system-ui) !important;
+  font-size: 12px !important;
+  font-weight: 750 !important;
+  letter-spacing: .01em !important;
+  cursor: pointer !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 8px 18px rgba(0,0,0,.18) !important;
+}
+
+.ui-mini-btn.danger,
+.ew-mini-btn.danger {
+  border-color: rgba(255,107,107,.45) !important;
+  background: linear-gradient(180deg, rgba(255,107,107,.18), rgba(255,107,107,.08)) !important;
+  color: #ff6b6b !important;
+}
+
+.ui-mini-btn:active,
+.ew-mini-btn:active {
+  transform: translateY(1px);
+}
+
+/* Entwässerung Strangliste: keine nativen Browser-Buttons */
+#ew-strang-list .ew-detail-row {
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) auto !important;
+  gap: 10px !important;
+  align-items: center !important;
+}
+
+/* Desktop-Spalten: zentrale Oberkante */
+@media (min-width: 900px) {
+  #tab-hx .tab-inner,
+  #tab-luft .tab-inner,
+  #tab-mag .tab-inner,
+  #tab-entwaesserung .tab-inner {
+    align-items: start !important;
+  }
+
+  #tab-hx .hx-desktop-left,
+  #tab-hx .hx-desktop-right,
+  #tab-luft .luft-desktop-left,
+  #tab-luft .luft-desktop-right {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    align-self: start !important;
+  }
+
+  #tab-hx .hx-desktop-right {
+    transform: translateY(0) !important;
+  }
+
+  #tab-luft .luft-desktop-right {
+    min-height: 1px !important;
+    display: grid !important;
+    gap: var(--gap, 18px) !important;
+  }
+}
+
+
+/* Phase 8.5 final guard: Lüftungsausgabe Desktop */
+@media (min-width: 900px) {
+  #tab-luft .luft-desktop-right,
+  #tab-luft .luft-desktop-right > *,
+  #tab-luft .luft-desktop-right .out-card {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  #tab-luft .luft-desktop-right {
+    display: grid !important;
+    grid-column: 2 !important;
+    gap: var(--gap, 18px) !important;
+  }
+  #tab-luft .luft-desktop-left {
+    grid-column: 1 !important;
+  }
+}
