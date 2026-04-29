@@ -102,22 +102,14 @@ const NAV = {
 
   /* Einzige Wahrheitsquelle für alle Navigation-Zustände */
   _apply() {
-    /* Tabs */
+    /* Tabs: zentrale UI-Sprache steuert Layout ausschließlich über Klassen. */
+    document.body.dataset.activeTab = NAV.activeTab;
     TABS.forEach(id => {
       const el = $('tab-' + id);
       if (!el) return;
-      if (id === NAV.activeTab) {
-        const isDesktop = window.matchMedia('(min-width: 900px)').matches;
-        if (isDesktop && id === 'flow') {
-          el.style.display = 'grid';
-        } else if (id === 'hx') {
-          el.style.display = 'block';
-        } else {
-          el.style.display = 'flex';
-        }
-      } else {
-        el.style.display = 'none';
-      }
+      const active = id === NAV.activeTab;
+      el.classList.toggle('is-active', active);
+      el.setAttribute('aria-hidden', String(!active));
     });
 
     /* Desktop Tab-Bar */
