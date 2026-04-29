@@ -140,7 +140,10 @@ function calcMAG() {
   warnings.push('Quick-Check zur Vorauslegung. Vollständige Auslegung nach Herstellerangaben, DIN EN 12828 und objektspezifischer Druckhaltung prüfen.');
 
   if (hintEl) {
-    hintEl.innerHTML = warnings.map(w => '• ' + w).join('<br>');
+    hintEl.innerHTML = warnings.map(w => {
+      if (String(w).includes('mag-safety-warning')) return '<div class="mag-safety-line">' + w + '</div>';
+      return '• ' + w;
+    }).join('<br>');
   }
 
   const result = {

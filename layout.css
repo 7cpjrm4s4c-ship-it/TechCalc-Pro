@@ -1393,3 +1393,78 @@ body.keyboard-open .plus-sheet {
     font-size: var(--tcp-result-value-mobile) !important;
   }
 }
+
+
+/* ==========================================================================
+   Phase 8.4 — gezielte Korrekturen
+   ========================================================================== */
+
+/* h,x: gleiche obere Startkante beider Desktop-Spalten */
+@media (min-width: 900px) {
+  #tab-hx .tab-inner {
+    align-items: start !important;
+  }
+  #tab-hx .hx-desktop-left,
+  #tab-hx .hx-desktop-right {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    align-self: start !important;
+  }
+  #tab-hx .hx-desktop-right > .gc,
+  #tab-hx .hx-desktop-right > .out-card {
+    margin-top: 0 !important;
+  }
+
+  /* Lüftung rechte Ausgabe erzwingen */
+  #tab-luft .luft-desktop-right {
+    display: grid !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Entwässerung Gesamtleistung im Ergebnisblock kompakt */
+  .ew-total-performance {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--gb-soft);
+    border-radius: 12px;
+    background: rgba(255,255,255,.06);
+    color: var(--blue);
+    font-family: var(--fm);
+    font-size: 12px;
+    font-weight: 700;
+  }
+}
+
+/* Safety warning darf keinen Aufzählungspunkt optisch haben */
+.mag-safety-line {
+  list-style: none !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+.mag-safety-line::marker { content: "" !important; }
+
+
+/* Phase 8.4 final guards */
+@media (min-width: 900px) {
+  #tab-luft .luft-desktop-right,
+  #tab-luft .luft-desktop-right .out-card {
+    display: grid !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  #tab-luft .luft-desktop-right .out-card {
+    display: block !important;
+  }
+
+  #tab-hx .tab-inner {
+    align-items: start !important;
+  }
+  #tab-hx .hx-desktop-left,
+  #tab-hx .hx-desktop-right,
+  #tab-hx .hx-desktop-left > :first-child,
+  #tab-hx .hx-desktop-right > :first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+}

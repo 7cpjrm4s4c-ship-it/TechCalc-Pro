@@ -949,11 +949,26 @@ function _buildMagPage(meta) {
    TAB: ENTWÄSSERUNG
 ─────────────────────────────────────── */
 function _buildEntwaesserungPage(meta) {
-  const r = (typeof getEntwaesserungPdfData === 'function') ? getEntwaesserungPdfData() : null;
+  const data = (typeof getEntwaesserungPdfData === 'function') ? getEntwaesserungPdfData() : null;
+  const r = data?.current || data || null;
+  const agg = data?.aggregate || null;
   const esc = v => String(v ?? '–').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
   const fmt = (v,d=2) => (v == null || isNaN(v)) ? '–' : Number(v).toFixed(d).replace('.', ',');
-  const rows = r?.rows?.length ? r.rows.map(row => `<tr><td>${esc(row.label)}</td><td class="num">${row.count}</td><td class="num">${fmt(row.du,1)} DU</td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center;color:#aaa">Keine Verbraucher angesetzt</td></tr>';
+
+  const currentRows = r?.rows?.length
+    ? r.rows.map(row => `<tr><td>${esc(row.label)}</td><td class="num">${row.count}</td><td class="num">${fmt(row.du,1)} DU</td></tr>`).join('')
+    : '<tr><td colspan="3" style="text-align:center;color:#aaa">Keine aktuellen Verbraucher angesetzt</td></tr>';
+
+  const fixtureRows = agg?.fixtures?.length
+    ? agg.fixtures.map(f => `<tr><td>${esc(f.label)}</td><td class="num">${f.count} Stk.</td><td class="num">${fmt(f.du,1)} DU</td></tr>`).join('')
+    : '<tr><td colspan="3" style="text-align:center;color:#aaa">Keine gespeicherten Stränge</td></tr>';
+
+  const strangRows = agg?.list?.length
+    ? agg.list.map(s => `<tr><td>${esc(s.name)}</td><td class="num">${fmt(s.duTotal,1)} DU</td><td class="num">${fmt(s.qww,2)} l/s</td></tr>`).join('')
+    : '<tr><td colspan="3" style="text-align:center;color:#aaa">Keine gespeicherten Stränge</td></tr>';
+
   const hints = r ? (typeof ewHints === 'function' ? ewHints(r) : []).map(h => `• ${esc(h)}`).join('<br>') : '–';
+
   return `
   ${_header(meta, 'Entwässerung — Quick Check')}
   <div class="sec">Basisdaten</div>
@@ -962,9 +977,24 @@ function _buildEntwaesserungPage(meta) {
     <tr><td>Gleichzeitigkeitsbeiwert K</td><td class="num">${fmt(r?.k,2)}</td></tr>
     <tr><td>Sonderabfluss</td><td class="num">${fmt(r?.specialQ,2)} l/s</td></tr>
   </tbody></table>
-  <div class="sec">Entwässerungsgegenstände</div>
-  <table><thead><tr><th>Verbraucher</th><th>Anzahl</th><th>DU</th></tr></thead><tbody>${rows}</tbody></table>
-  <div class="sec">Ergebnisse</div>
+
+  <div class="sec">Gesamtsumme — alle Stränge</div>
+  <table><tbody>
+    <tr><td>Anzahl Stränge</td><td class="num">${agg?.list?.length || 0}</td></tr>
+    <tr><td>ΣDU gesamt</td><td class="num">${fmt(agg?.duTotal,1)} DU</td></tr>
+    <tr><td>ΣQww gesamt</td><td class="num">${fmt(agg?.qwwTotal,2)} l/s</td></tr>
+  </tbody></table>
+
+  <div class="sec">Einrichtungsgegenstände gesamt</div>
+  <table><thead><tr><th>Verbraucher</th><th>Anzahl</th><th>DU</th></tr></thead><tbody>${fixtureRows}</tbody></table>
+
+  <div class="sec">Einzelstränge</div>
+  <table><thead><tr><th>Strang</th><th>DU</th><th>Qww</th></tr></thead><tbody>${strangRows}</tbody></table>
+
+  <div class="sec">Aktuelle Eingabe</div>
+  <table><thead><tr><th>Verbraucher</th><th>Anzahl</th><th>DU</th></tr></thead><tbody>${currentRows}</tbody></table>
+
+  <div class="sec">Ergebnisse aktuelle Eingabe</div>
   <table><tbody>
     <tr><td>DU gesamt</td><td class="num">${fmt(r?.duTotal,1)} DU</td></tr>
     <tr><td>Schmutzwasserabfluss Qww</td><td class="num">${fmt(r?.qww,2)} l/s</td></tr>
