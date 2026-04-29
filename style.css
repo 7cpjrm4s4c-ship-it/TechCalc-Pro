@@ -326,3 +326,84 @@ body.tc-app .ew-desktop-left, body.tc-app .ew-desktop-right {
   body.tc-app .bottom-pill { bottom:calc(var(--tcp-pill-bottom) + var(--sab,0px))!important; }
 }
 body.tc-app .tab-panel.is-active > .tcp-layout { margin-top:0!important; }
+
+/* ═══════════════════════════════════════════════════════
+   Refactoring Phase 4: UI-Vertrag und Legacy-Abbau
+   Diese Schicht macht die tcp-* Klassen zur verbindlichen Sprache.
+═══════════════════════════════════════════════════════ */
+:root {
+  --tcp-card-pad-compact: 14px 16px;
+  --tcp-card-flush-pad: 0;
+  --tcp-section-gap: var(--tcp-stack-gap);
+  --tcp-section-gap-sm: 12px;
+  --tcp-result-gap: 10px;
+  --tcp-grid-min-card: 0;
+}
+
+body.tc-app .tcp-card--compact { padding:var(--tcp-card-pad-compact)!important; }
+body.tc-app .tcp-card--flush { padding:var(--tcp-card-flush-pad)!important; overflow:hidden!important; }
+body.tc-app .tcp-card--spaced { margin-top:var(--tcp-section-gap)!important; }
+body.tc-app .tcp-card--spaced-sm { margin-top:var(--tcp-section-gap-sm)!important; }
+body.tc-app .tcp-input-group--compact { margin-bottom:0!important; }
+body.tc-app .tcp-input-group--spaced { margin-top:var(--tcp-section-gap)!important; }
+body.tc-app .tcp-result-card { width:100%; }
+body.tc-app .tcp-result-grid { display:flex!important; flex-direction:column!important; gap:8px!important; grid-template-columns:none!important; }
+
+body.tc-app .tcp-layout > .tcp-col,
+body.tc-app .tcp-col > .tcp-card,
+body.tc-app .tcp-col > .gc,
+body.tc-app .tcp-col > .out-card,
+body.tc-app .tcp-col > .hx-card {
+  width:100%!important;
+  min-width:0!important;
+}
+
+body.tc-app .tcp-module .tcp-card + .tcp-card,
+body.tc-app .tcp-module .gc + .gc,
+body.tc-app .tcp-module .out-card + .gc,
+body.tc-app .tcp-module .gc + .out-card {
+  margin-top:0!important;
+}
+
+body.tc-app .tcp-module .slbl:first-child,
+body.tc-app .tcp-module .tcp-card-title:first-child {
+  margin-top:0!important;
+}
+
+@media (min-width:900px) {
+  body.tc-app .tcp-layout {
+    --tcp-stack-gap: var(--tcp-panel-gap);
+  }
+  body.tc-app .tcp-layout > .tcp-col {
+    align-self:start!important;
+  }
+  body.tc-app .tcp-layout > .tcp-col--left,
+  body.tc-app .tcp-layout > .tcp-col--right {
+    display:flex!important;
+    flex-direction:column!important;
+    gap:var(--tcp-stack-gap)!important;
+  }
+  body.tc-app #tab-luft .tcp-layout,
+  body.tc-app #tab-hx .tcp-layout,
+  body.tc-app #tab-wrg .tcp-layout,
+  body.tc-app #tab-trinkwasser .tcp-layout,
+  body.tc-app #tab-mag .tcp-layout,
+  body.tc-app #tab-entwaesserung .tcp-layout {
+    column-gap:var(--tcp-stack-gap-lg)!important;
+    row-gap:var(--tcp-stack-gap)!important;
+  }
+}
+
+@media (max-width:899px) {
+  body.tc-app .tcp-layout,
+  body.tc-app .tcp-col {
+    display:flex!important;
+    flex-direction:column!important;
+    gap:var(--tcp-stack-gap)!important;
+  }
+  body.tc-app .tcp-card--spaced,
+  body.tc-app .tcp-card--spaced-sm,
+  body.tc-app .tcp-input-group--spaced {
+    margin-top:0!important;
+  }
+}
