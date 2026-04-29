@@ -774,3 +774,41 @@ body.tc-app.tc-ui-v8 #tab-units { --module-accent: var(--grn, #22c55e); }
   body.tc-app.tc-ui-v8 .tabbar,
   body.tc-app.tc-ui-v8 .app-header { display: none !important; }
 }
+
+/* TechCalc Pro UI Refactor – Phase 9 hardening */
+body.tc-app.tc-ui-v9{--tcp-page-max:1540px;--tcp-module-max:1540px;--tcp-header-gap-desktop:clamp(18px,2.1vh,30px);--tcp-header-gap-mobile:clamp(12px,1.6vh,20px);--tcp-column-gap:clamp(16px,2vw,28px);--tcp-row-gap:clamp(14px,1.5vw,22px);--tcp-card-pad:clamp(14px,1.4vw,20px);--tcp-control-h:48px;--tcp-result-h:44px}
+body.tc-app.tc-ui-v9 :is(#app-shell,main,.app-main,.tab-panel,.tab-content,.tcp-module,.tcp-layout,.tcp-grid,.module-grid,.calc-grid,.tcp-col,.tcp-card,.gc,.out-card,.panel,.card){box-sizing:border-box;min-width:0}
+body.tc-app.tc-ui-v9 .tab-panel:not(.is-active),body.tc-app.tc-ui-v9 .tab-content:not(.is-active){display:none!important}
+body.tc-app.tc-ui-v9 .tab-panel.is-active,body.tc-app.tc-ui-v9 .tab-content.is-active{display:block!important}
+body.tc-app.tc-ui-v9 .tcp-module{width:min(100%,var(--tcp-module-max));margin-inline:auto}
+body.tc-app.tc-ui-v9 :is(.tcp-layout,.tcp-grid,.module-grid,.calc-grid){width:100%;gap:var(--tcp-row-gap) var(--tcp-column-gap);align-items:start}
+body.tc-app.tc-ui-v9 :is(.tcp-card,.gc,.out-card,.panel,.card){padding:var(--tcp-card-pad)}
+body.tc-app.tc-ui-v9 :is(.inp,.inp-sm,.gl-sel,.tcp-input,.hx-input,.tzl-inp,input[type=number],input[type=text],select,textarea){box-sizing:border-box;min-width:0;font:inherit}
+body.tc-app.tc-ui-v9 :is(.inp,.gl-sel,.tcp-input,input[type=number],input[type=text],select){min-height:var(--tcp-control-h)}
+body.tc-app.tc-ui-v9 :is(.tcp-result-row,.result-row,.out-row,.res-row,.result-line){box-sizing:border-box;min-height:var(--tcp-result-h);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+body.tc-app.tc-ui-v9 .tcp-module :is(.tcp-primary-btn,#hx-calc,.hx-main-btn){background:linear-gradient(135deg,var(--module-accent),color-mix(in srgb,var(--module-accent) 68%,#111827))}
+body.tc-app.tc-ui-v9 .tcp-module :is(.inp,.inp-sm,.gl-sel,.tcp-input,.hx-input,.tzl-inp):focus{border-color:var(--module-accent-b,color-mix(in srgb,var(--module-accent) 42%,transparent));box-shadow:0 0 0 3px color-mix(in srgb,var(--module-accent) 18%,transparent)}
+body.tc-app.tc-ui-v9 :is(.tcp-module--heatcold,#tab-flow){--module-accent:var(--heat,#ff6b35);--module-accent-t:var(--heat-t,#ffb199);--module-accent-b:rgba(255,107,53,.35)}
+body.tc-app.tc-ui-v9 :is(.tcp-module--air,#tab-luft){--module-accent:var(--air,#a78bfa);--module-accent-t:var(--air-t,#c4b5fd);--module-accent-b:rgba(167,139,250,.30)}
+body.tc-app.tc-ui-v9 :is(.tcp-module--unit,#tab-unit){--module-accent:var(--grn,#34d399);--module-accent-t:var(--grn-t,#86efac);--module-accent-b:rgba(52,211,153,.35)}
+body.tc-app.tc-ui-v9 :is(.tcp-module--hx,#tab-hx){--module-accent:#746cff;--module-accent-t:#b7b3ff;--module-accent-b:rgba(116,108,255,.35)}
+body.tc-app.tc-ui-v9 :is(.tcp-module--water,#tab-tw,.tcp-module--pressure,#tab-mag,.tcp-module--drain,#tab-entw){--module-accent:var(--blue,#4fa8ff);--module-accent-t:var(--blue-t,#9dccff);--module-accent-b:rgba(79,168,255,.35)}
+@media (min-width:900px){body.tc-app.tc-ui-v9 :is(#app-shell,main,.app-main){padding-top:calc(var(--hdr,118px) + var(--sat,0px) + var(--tcp-header-gap-desktop))!important}body.tc-app.tc-ui-v9 :is(.tcp-layout--2col,.module-grid,.calc-grid){display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}body.tc-app.tc-ui-v9 .tcp-layout--3col{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media (max-width:899px){body.tc-app.tc-ui-v9 :is(#app-shell,main,.app-main){padding-top:calc(var(--hdr,118px) + var(--sat,0px) + var(--tcp-header-gap-mobile))!important;padding-bottom:calc(96px + var(--sab,0px))!important}body.tc-app.tc-ui-v9 :is(.tcp-layout,.tcp-layout--2col,.tcp-layout--3col,.module-grid,.calc-grid){display:flex!important;flex-direction:column!important}body.tc-app.tc-ui-v9 :is(.bottom-pill,.bottom-nav,.nav-pill,.tabbar){position:fixed!important;left:max(12px,env(safe-area-inset-left))!important;right:max(12px,env(safe-area-inset-right))!important;bottom:max(12px,env(safe-area-inset-bottom))!important;z-index:1000!important}}
+@media print{body.tc-app.tc-ui-v9 :is(.bottom-pill,.bottom-nav,.nav-pill,.tabbar,.app-header,.plus-sheet,.plus-overlay,.app-menu-sheet,.app-menu-overlay,.project-sheet,.project-overlay,.toast){display:none!important}}
+
+/* TechCalc Pro UI Refactor – Phase 10 integrity + production hardening */
+body.tc-app.tc-ui-v10{--tcp-page-max:1540px;--tcp-edge-gap:clamp(14px,2vw,28px);--tcp-section-gap:clamp(16px,1.8vw,26px);--tcp-header-offset-desktop:calc(var(--hdr,118px) + var(--sat,0px) + clamp(18px,2vh,30px));--tcp-header-offset-mobile:calc(var(--hdr,118px) + var(--sat,0px) + clamp(12px,1.5vh,20px));--tcp-mobile-nav-clearance:calc(104px + var(--sab,0px))}
+body.tc-app.tc-ui-v10 :is(#app-shell,main,.app-main,.tab-panel,.tab-content,.tcp-module,.module-wrap,.flow-wrap,.vent-wrap,.tw-wrap,.mag-wrap,.entw-wrap,.tcp-layout,.tcp-grid,.module-grid,.calc-grid,.input-grid,.result-grid,.tcp-col,.tcp-card,.gc,.out-card,.panel,.card){box-sizing:border-box;min-width:0}
+body.tc-app.tc-ui-v10 :is(.tcp-module,.module-wrap,.flow-wrap,.vent-wrap,.tw-wrap,.mag-wrap,.entw-wrap){width:min(100%,var(--tcp-page-max));margin-inline:auto}
+body.tc-app.tc-ui-v10 :is(.tcp-layout,.tcp-grid,.module-grid,.calc-grid,.input-grid,.result-grid){gap:var(--tcp-section-gap)}
+body.tc-app.tc-ui-v10 :is(.tcp-card,.gc,.out-card,.panel,.card){border-radius:var(--tcp-card-radius,var(--radius-card,24px));overflow:clip}
+body.tc-app.tc-ui-v10 :is(.tcp-result-row,.result-row,.out-row,.res-row,.result-line,.kv-row){grid-template-columns:minmax(0,1fr) minmax(max-content,auto);column-gap:12px;min-width:0}
+body.tc-app.tc-ui-v10 :is(.tcp-result-row,.result-row,.out-row,.res-row,.result-line,.kv-row)>:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.tc-app.tc-ui-v10 :is(.tcp-result-row,.result-row,.out-row,.res-row,.result-line,.kv-row)>:last-child{text-align:right;white-space:nowrap}
+body.tc-app.tc-ui-v10 :is(input,select,textarea,button){font:inherit;max-width:100%}
+body.tc-app.tc-ui-v10 :is(.inp,.inp-sm,.gl-sel,.tcp-input,.hx-input,.tzl-inp,input[type=number],input[type=text],select,textarea){width:100%;min-width:0;box-sizing:border-box}
+body.tc-app.tc-ui-v10 :is(.tcp-module,.tab-panel,.tab-content)[hidden]{display:none!important}
+@media (min-width:900px){body.tc-app.tc-ui-v10 :is(#app-shell,main,.app-main){padding:var(--tcp-header-offset-desktop) var(--tcp-edge-gap) var(--tcp-edge-gap)!important}body.tc-app.tc-ui-v10 :is(.tcp-layout--2col,.module-grid,.calc-grid){display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:start!important}body.tc-app.tc-ui-v10 :is(.tcp-layout--3col){display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;align-items:start!important}body.tc-app.tc-ui-v10 :is(.bottom-pill,.bottom-nav,.nav-pill,.tabbar){position:fixed!important}}
+@media (max-width:899px){body.tc-app.tc-ui-v10 :is(#app-shell,main,.app-main){padding:var(--tcp-header-offset-mobile) var(--tcp-edge-gap) var(--tcp-mobile-nav-clearance)!important}body.tc-app.tc-ui-v10 :is(.tcp-layout,.tcp-layout--2col,.tcp-layout--3col,.module-grid,.calc-grid,.input-grid,.result-grid){display:flex!important;flex-direction:column!important;align-items:stretch!important}body.tc-app.tc-ui-v10 :is(.tcp-card,.gc,.out-card,.panel,.card){width:100%}body.tc-app.tc-ui-v10 :is(.bottom-pill,.bottom-nav,.nav-pill,.tabbar){position:fixed!important;inset-inline:max(12px,env(safe-area-inset-left)) max(12px,env(safe-area-inset-right))!important;bottom:max(12px,env(safe-area-inset-bottom))!important;z-index:1000!important;max-width:calc(100vw - 24px)!important;margin-inline:auto!important}}
+@media print{body.tc-app.tc-ui-v10 :is(#app-shell,main,.app-main){padding:0!important}body.tc-app.tc-ui-v10 :is(.bottom-pill,.bottom-nav,.nav-pill,.tabbar,.app-header,.app-menu-sheet,.app-menu-overlay,.plus-sheet,.plus-overlay,.project-sheet,.project-overlay,.toast){display:none!important}}

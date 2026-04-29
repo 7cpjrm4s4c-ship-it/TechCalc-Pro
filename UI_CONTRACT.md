@@ -176,3 +176,14 @@ Nicht erlaubt in Modul-CSS:
 
 ## Phase 8 Ergänzung
 Aktuelle App-Klammer: `body.tc-app.tc-ui-v8`. Alle zentralen App-Regeln müssen darunter gekapselt werden. `layout.css` bleibt PDF/Print vorbehalten; neue Modul-Layouts verwenden keine eigenen Media Queries für Desktop/Mobile, sondern `tcp-layout` und `tcp-card`/`tcp-result-row`.
+
+## Phase 9 Ergänzung – stabiler UI-Vertrag
+
+Aktive App-Klammer: `body.tc-app.tc-ui-v8.tc-ui-v9`. `tc-ui-v9` ist die führende Kaskadenschicht. Neue Module nutzen nur `tcp-module`, `tcp-layout`, `tcp-col`, `tcp-card` und `tcp-result-row`. Modulbezogene Abweichungen erfolgen ausschließlich über `--module-accent`, `--module-accent-t` und `--module-accent-b`.
+
+## Phase 10 Ergänzung
+
+- `body.tc-app.tc-ui-v10` ist die aktuelle harte Kaskadenklammer. Frühere `tc-ui-v*` Klassen bleiben nur zur Rückwärtskompatibilität erhalten.
+- Neue Module verwenden ausschließlich `.tcp-module`, `.tcp-layout--2col` oder `.tcp-layout--3col`, `.tcp-card`, `.tcp-result-row` und eine Akzentklasse.
+- App-UI-Regeln gehören in `style.css`; PDF-Regeln bleiben in `layout.css`/PDF-spezifischen Exportpfaden.
+- Mobile Navigation darf nicht vom Inhaltsgrid abhängig sein; sie ist immer fixed und über die App-Klammer geschützt.
