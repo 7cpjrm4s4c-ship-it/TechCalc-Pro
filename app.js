@@ -102,14 +102,22 @@ const NAV = {
 
   /* Einzige Wahrheitsquelle für alle Navigation-Zustände */
   _apply() {
-    /* Tabs: zentrale UI-Sprache steuert Layout ausschließlich über Klassen. */
-    document.body.dataset.activeTab = NAV.activeTab;
+    /* Tabs */
     TABS.forEach(id => {
       const el = $('tab-' + id);
       if (!el) return;
-      const active = id === NAV.activeTab;
-      el.classList.toggle('is-active', active);
-      el.setAttribute('aria-hidden', String(!active));
+      if (id === NAV.activeTab) {
+        const isDesktop = window.matchMedia('(min-width: 900px)').matches;
+        if (isDesktop && id === 'flow') {
+          el.style.display = 'grid';
+        } else if (id === 'hx') {
+          el.style.display = 'block';
+        } else {
+          el.style.display = 'flex';
+        }
+      } else {
+        el.style.display = 'none';
+      }
     });
 
     /* Desktop Tab-Bar */
@@ -696,15 +704,7 @@ function _updatePillVisibility() {
   }
 }
 
-function _normalizeUiPrimitives() {
-  document.body.classList.add('tc-app');
-  document.querySelectorAll('.gc,.out-card,.hx-card').forEach(el => el.classList.add('tcp-card'));
-  document.querySelectorAll('.igrp').forEach(el => el.classList.add('tcp-input-group'));
-  document.querySelectorAll('.ob,.out-row').forEach(el => el.classList.add('tcp-result-row'));
-}
-
 document.addEventListener('DOMContentLoaded', () => {
-  _normalizeUiPrimitives();
   // Header Menü
   $('hdr-menu-btn')?.addEventListener('click', toggleAppMenu);
   $('app-menu-close')?.addEventListener('click', closeAppMenu);
