@@ -1072,3 +1072,40 @@ body.tc-app :is(.ew-mini-btn.danger,.project-mini-btn.delete,button[data-project
 body.tc-app :is(.ew-mini-btn:not(.danger),.project-mini-btn:not(.delete),button[class*='edit']){
   min-width:96px!important;
 }
+
+/* ========================================================================
+   UI Design Decision A+B — Function-first Contract
+   ======================================================================== */
+body.tc-app{
+  --tcp-ui-page-max:1540px;
+  --tcp-ui-gutter:clamp(12px,1.7vw,24px);
+  --tcp-ui-gap:clamp(12px,1.35vw,20px);
+  --tcp-ui-gap-lg:clamp(16px,1.8vw,28px);
+  --tcp-ui-card-pad:clamp(13px,1.45vw,20px);
+  --tcp-ui-radius:22px;
+  --tcp-ui-field-h:42px;
+  --tcp-ui-result-h:42px;
+  --tcp-ui-nav-h:62px;
+  --tcp-ui-nav-w:min(calc(100vw - 24px),430px);
+  --tcp-ui-shadow:0 14px 36px rgba(15,23,42,.12);
+  --tcp-ui-border:1px solid rgba(15,23,42,.10);
+}
+body.tc-app .tab-panel{display:none!important;}
+body.tc-app .tab-panel.is-active{display:block!important;}
+body.tc-app :is(#app-shell,.app-shell,main,.app-main){max-width:var(--tcp-ui-page-max);margin-inline:auto;padding-inline:var(--tcp-ui-gutter)!important;}
+body.tc-app :is(.tab-inner,.tcp-layout,.module-grid,.calc-grid,.cards-grid,.controls-grid){gap:var(--tcp-ui-gap-lg)!important;}
+body.tc-app :is(.tcp-card,.gc,.out-card,.panel,.card,.input-card,.result-card,.tw-result-card,.mag-result-card,.ew-result-card){border-radius:var(--tcp-ui-radius)!important;padding:var(--tcp-ui-card-pad)!important;border:var(--tcp-ui-border)!important;box-sizing:border-box!important;}
+body.tc-app :is(input,select,textarea,.inp,.inp-sm,.unit-ro,.num-input){min-height:var(--tcp-ui-field-h)!important;text-align:left!important;font-variant-numeric:tabular-nums!important;box-sizing:border-box!important;}
+body.tc-app :is(.out-val,.unit-ro,.ui-result-value,.tcp-result-number,.result-value,.metric-value,.kv-value){text-align:left!important;justify-self:start!important;font-variant-numeric:tabular-nums!important;}
+body.tc-app :is(.tcp-result-row,.result-row,.out-row,.res-row,.result-line,.kv-row,.metric-row){min-height:var(--tcp-ui-result-h)!important;align-items:center!important;gap:10px!important;grid-template-columns:minmax(0,1fr) minmax(7ch,auto)!important;}
+body.tc-app :is(.tcp-result-row,.result-row,.out-row,.res-row,.result-line,.kv-row,.metric-row)>:last-child{justify-self:start!important;text-align:left!important;}
+body.tc-app .tab-btn{border-radius:999px!important;min-height:36px!important;padding:8px 13px!important;font-weight:760!important;line-height:1!important;}
+body.tc-app .bottom-pill{position:relative;min-height:var(--tcp-ui-nav-h)!important;padding:6px!important;gap:4px!important;border-radius:999px!important;border:1px solid rgba(15,23,42,.10)!important;background:rgba(255,255,255,.92)!important;box-shadow:var(--tcp-ui-shadow)!important;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);overflow:hidden!important;isolation:isolate!important;}
+body.tc-app .bottom-pill .pill-indicator{position:absolute;top:6px;left:6px;height:calc(100% - 12px);width:var(--pill-indicator-w,0px);transform:translate3d(var(--pill-indicator-x,0px),0,0);border-radius:999px;background:linear-gradient(180deg,color-mix(in srgb,var(--module-accent,#2563eb) 18%,#fff),rgba(255,255,255,.82));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--module-accent,#2563eb) 24%,transparent),0 6px 18px rgba(15,23,42,.10);transition:transform .28s cubic-bezier(.2,.8,.2,1),width .28s cubic-bezier(.2,.8,.2,1),background-color .2s ease;pointer-events:none;z-index:0;}
+body.tc-app .bottom-pill :is(.pill-btn,.pill-plus){position:relative;z-index:1;min-height:50px!important;border-radius:999px!important;padding:7px 10px!important;font-size:12px!important;line-height:1!important;font-weight:760!important;white-space:nowrap!important;transition:color .18s ease,transform .18s ease;}
+body.tc-app .bottom-pill .pill-btn.active{background:transparent!important;box-shadow:none!important;color:var(--module-accent,#2563eb)!important;}
+body.tc-app .bottom-pill :is(.pill-btn,.pill-plus) svg{width:20px!important;height:20px!important;flex:0 0 20px!important;}
+body.tc-app :is(.ew-mini-btn,.project-mini-btn,.tw-ne-del,button[data-project-delete],button[class*='delete'],button[class*='edit']){min-height:34px!important;padding:8px 13px!important;border-radius:999px!important;font-size:13px!important;line-height:1!important;font-weight:760!important;white-space:nowrap!important;}
+@media (min-width:900px){body.tc-app :is(#app-shell,.app-shell,main,.app-main){padding-top:clamp(86px,9vh,112px)!important;padding-bottom:clamp(22px,4vh,44px)!important;}body.tc-app :is(.tab-inner,.tcp-layout--2col,.module-grid,.calc-grid){display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:start!important;}}
+@media (max-width:899px){body.tc-app :is(#app-shell,.app-shell,main,.app-main){padding-top:clamp(74px,10vh,96px)!important;padding-bottom:calc(var(--tcp-ui-nav-h) + 56px + env(safe-area-inset-bottom,0px))!important;}body.tc-app :is(.tab-panel.is-active,.tab-content.is-active){padding-bottom:calc(var(--tcp-ui-nav-h) + 54px + env(safe-area-inset-bottom,0px))!important;}body.tc-app :is(.tab-inner,.tcp-layout,.tcp-layout--2col,.tcp-layout--3col,.module-grid,.calc-grid,.input-grid,.result-grid,.cards-grid,.controls-grid){display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:var(--tcp-ui-gap)!important;}body.tc-app :is(.tcp-module,.tab-inner,.module-wrap,.flow-wrap,.vent-wrap,.tw-wrap,.mag-wrap,.entw-wrap,.wrg-wrap,.hx-wrap){margin-bottom:calc(22px + env(safe-area-inset-bottom,0px))!important;}body.tc-app .bottom-pill{position:fixed!important;left:50%!important;right:auto!important;bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;transform:translateX(-50%)!important;width:var(--tcp-ui-nav-w)!important;max-width:calc(100vw - 24px)!important;z-index:3000!important;margin:0!important;}body.tc-app .bottom-pill :is(.pill-btn,.pill-plus){flex:1 1 0!important;min-width:0!important;}}
+@media print{body.tc-app .bottom-pill .pill-indicator{display:none!important;}}

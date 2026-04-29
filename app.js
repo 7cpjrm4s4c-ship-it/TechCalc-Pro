@@ -85,7 +85,7 @@ function renderBottomNav() {
   if (!pill || !grid) return;
   const visible = NAV_FAVORITES.filter(id => TABS.includes(id)).slice(0, 4);
   const overflow = TABS.filter(id => !visible.includes(id));
-  pill.innerHTML = visible.map(id => _moduleButtonHtml(id, 'pill')).join('') + `
+  pill.innerHTML = '<span class="pill-indicator" aria-hidden="true"></span>' + visible.map(id => _moduleButtonHtml(id, 'pill')).join('') + `
     <button class="pill-plus" id="pill-plus" aria-label="Weitere Module" aria-expanded="false">
       <span class="pill-plus-icon">+</span>
     </button>`;
@@ -93,8 +93,24 @@ function renderBottomNav() {
   pill.querySelectorAll('.pill-btn[data-tab]').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
   $('pill-plus')?.addEventListener('click', togglePlusSheet);
   grid.querySelectorAll('.plus-item[data-tab]').forEach(btn => btn.addEventListener('click', () => _switchFromPlus(btn.dataset.tab)));
+  updateBottomPillIndicator();
 }
 
+function updateBottomPillIndicator() {
+  const pill = $('bottom-pill');
+  if (!pill) return;
+  const indicator = pill.querySelector('.pill-indicator');
+  const activeBtn = pill.querySelector(`.pill-btn[data-tab="${NAV.activeTab}"]`);
+  if (!indicator || !activeBtn) {
+    if (indicator) indicator.style.setProperty('--pill-indicator-w', '0px');
+    return;
+  }
+  const pillRect = pill.getBoundingClientRect();
+  const btnRect = activeBtn.getBoundingClientRect();
+  const x = Math.max(0, btnRect.left - pillRect.left - 6);
+  indicator.style.setProperty('--pill-indicator-x', `${Math.round(x)}px`);
+  indicator.style.setProperty('--pill-indicator-w', `${Math.round(btnRect.width)}px`);
+}
 /* ─── NAVIGATION STATE MACHINE ─── */
 const NAV = {
   activeTab:   'flow',
@@ -121,9 +137,8 @@ const NAV = {
     document.querySelectorAll('.pill-btn[data-tab]').forEach(btn =>
       btn.classList.toggle('active', btn.dataset.tab === NAV.activeTab)
     );
-    document.querySelectorAll('.plus-item[data-tab]').forEach(btn =>
-      btn.classList.toggle('active-tab', btn.dataset.tab === NAV.activeTab)
-    );
+    
+    updateBottomPillIndicator();
 
     /* Plus-Sheet */
     $('plus-sheet')?.classList.toggle('open', NAV.sheetOpen);
@@ -137,6 +152,9 @@ const NAV = {
     }
   },
 };
+
+window.addEventListener('resize', () => requestAnimationFrame(updateBottomPillIndicator));
+window.addEventListener('orientationchange', () => setTimeout(updateBottomPillIndicator, 120));
 
 /* ─── HEADER MENU ─── */
 const MENU = {
