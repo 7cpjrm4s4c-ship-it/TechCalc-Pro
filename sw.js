@@ -4,7 +4,7 @@
 ═══════════════════════════════════════════════════════ */
 'use strict';
 
-const BUILD_TS = '20260428-asset-cleanup';
+const BUILD_TS = '20260429-mag-v11';
 const CACHE_NAME = `techcalc-${BUILD_TS}`;
 
 const PRECACHE = [
@@ -13,9 +13,8 @@ const PRECACHE = [
   './app.js', './heating-cooling.js', './ventilation.js',
   './wrg-mischluft.js', './trinkwasser.js', './mag.js', './entwaesserung.js', './pdf-export.js', './hx-engine.js',
   './manifest.json', './favicon.ico',
-  './icon-192.png',
-  './icon-512.png',
-  './apple-touch-icon.png',
+  './icon-192.png', './icon-512.png', './icon-180.png',
+  './icon-167.png', './icon-152.png'
 ];
 
 const BYPASS = ['workers.dev', 'analytics', 'cloudflare'];

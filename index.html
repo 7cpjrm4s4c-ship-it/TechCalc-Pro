@@ -11,11 +11,17 @@
 
 <!-- Favicon — alle Browser -->
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
-
+<link rel="icon" type="image/png" sizes="16x16"  href="icon-16.png"/>
 <link rel="icon" type="image/png" sizes="32x32"  href="icon-32.png"/>
+<link rel="icon" type="image/png" sizes="48x48"  href="icon-48.png"/>
+<link rel="icon" type="image/png" sizes="96x96"  href="icon-96.png"/>
 
 <!-- iOS Safari (Apple Touch Icon — KRITISCH für Homescreen) -->
-<link rel="apple-touch-icon"                   href="apple-touch-icon.png"/>
+<link rel="apple-touch-icon"                   href="icon-180.png"/>
+<link rel="apple-touch-icon" sizes="120x120"   href="icon-120.png"/>
+<link rel="apple-touch-icon" sizes="152x152"   href="icon-152.png"/>
+<link rel="apple-touch-icon" sizes="167x167"   href="icon-167.png"/>
+<link rel="apple-touch-icon" sizes="180x180"   href="icon-180.png"/>
 
 <!-- iOS Splash / Status Bar -->
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -1107,8 +1113,7 @@
           <div class="igrp"><div class="ilbl">Vordruck manuell</div><div class="iwrap"><input class="inp-sm" id="mag-p0" type="number" min="0" step="0.1" placeholder="auto" inputmode="decimal"><span class="iunit">bar</span></div></div>
           <div class="igrp"><div class="ilbl">Enddruck manuell</div><div class="iwrap"><input class="inp-sm" id="mag-pe" type="number" min="0" step="0.1" placeholder="auto" inputmode="decimal"><span class="iunit">bar</span></div></div>
         </div>
-        <button id="mag-calc-btn" type="button" class="mag-calc-btn">MAG berechnen</button>
-      </div>
+</div>
     </div>
     <div class="mag-desktop-right">
       <div class="out-card mag-result-card"><div class="slbl">Ergebnis — MAG / Druckhaltung</div><div class="out-grid" style="grid-template-columns:1fr;gap:8px">
@@ -1118,6 +1123,7 @@
         <div class="ob mag-ob"><div class="ob-title">Empfohlene MAG-Größe</div><div class="out-val has" id="mag-vn-rec">–</div></div>
         <div class="ob mag-ob"><div class="ob-title">Vordruck / Fülldruck</div><div class="out-val has" id="mag-pressures">–</div></div>
         <div class="ob mag-ob"><div class="ob-title">Enddruck</div><div class="out-val has" id="mag-pe-out">–</div></div>
+        <div class="ob mag-ob"><div class="ob-title">Systemdruck aus Höhe</div><div class="out-val has" id="mag-psys-out">–</div></div>
       </div></div>
       <div class="fml">V<sub>e</sub> = V<sub>A</sub> · e &ensp;·&ensp; V<sub>N</sub> = (V<sub>e</sub> + V<sub>WV</sub>) · (p<sub>e</sub> + 1) / (p<sub>e</sub> − p<sub>0</sub>)</div>
       <div class="gc"><div class="slbl">Hinweise</div><div class="info-txt" id="mag-hints">Anlagenvolumen eingeben und Berechnung starten.</div></div>
