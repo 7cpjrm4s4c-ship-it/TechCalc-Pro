@@ -696,7 +696,15 @@ function _updatePillVisibility() {
   }
 }
 
+function _normalizeUiPrimitives() {
+  document.body.classList.add('tc-app');
+  document.querySelectorAll('.gc,.out-card,.hx-card').forEach(el => el.classList.add('tcp-card'));
+  document.querySelectorAll('.igrp').forEach(el => el.classList.add('tcp-input-group'));
+  document.querySelectorAll('.ob,.out-row').forEach(el => el.classList.add('tcp-result-row'));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  _normalizeUiPrimitives();
   // Header Menü
   $('hdr-menu-btn')?.addEventListener('click', toggleAppMenu);
   $('app-menu-close')?.addEventListener('click', closeAppMenu);

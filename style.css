@@ -66,3 +66,181 @@
 .hx-title { font-family:var(--f,system-ui); font-size:11px!important; letter-spacing:.13em!important; color:var(--t3)!important; }
 .hx-mode.active,.hx-main-btn { background:linear-gradient(135deg,var(--module-accent),#5b52ff)!important; }
 .hx-input,select.hx-input { background:var(--glass-mid,rgba(255,255,255,.06))!important; border-color:var(--gb-strong,rgba(255,255,255,.18))!important; }
+
+/* ═══════════════════════════════════════════════════════
+   TechCalc Pro — Central UX/UI Layer
+   Refactoring Phase 2: Komponenten-Normalisierung.
+   Ziel: App-UI wird über zentrale Primitive gesteuert; Legacy-Regeln
+   aus layout.css werden per klarer Kaskade überstimmt, bis sie in Phase 3
+   vollständig entfernt werden können.
+═══════════════════════════════════════════════════════ */
+:root {
+  --tcp-space-1: 6px;
+  --tcp-space-2: 10px;
+  --tcp-space-3: 14px;
+  --tcp-space-4: 18px;
+  --tcp-space-5: 24px;
+  --tcp-grid-gap: var(--tcp-panel-gap);
+  --tcp-grid-gap-desktop: var(--tcp-panel-gap-lg);
+  --tcp-card-min-h: 0;
+  --tcp-control-h: 46px;
+  --tcp-control-radius: 14px;
+  --tcp-card-bg: var(--glass-mid, rgba(255,255,255,.06));
+  --tcp-card-border: var(--gb-soft, rgba(255,255,255,.12));
+}
+
+body.tc-app { min-height:100dvh; overflow-x:hidden; }
+body.tc-app #app-shell { width:100%; min-width:0; }
+body.tc-app .tab-panel,
+body.tc-app .tab-inner,
+body.tc-app .tcp-card,
+body.tc-app .gc,
+body.tc-app .out-card,
+body.tc-app .hx-card { box-sizing:border-box; min-width:0; }
+
+/* Einheitliche Cards */
+body.tc-app .tcp-card,
+body.tc-app .gc,
+body.tc-app .out-card,
+body.tc-app .hx-card {
+  border-radius:var(--r-l,18px)!important;
+  border:1px solid var(--tcp-card-border)!important;
+  background:var(--tcp-card-bg)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 10px 30px rgba(0,0,0,.24)!important;
+}
+body.tc-app .gc,
+body.tc-app .out-card { padding:var(--tcp-card-pad)!important; }
+body.tc-app .gc[style*="padding:0"] { padding:0!important; }
+
+/* Einheitliche Eingabegruppen */
+body.tc-app .tcp-input-group,
+body.tc-app .igrp {
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  min-width:0;
+}
+body.tc-app .iwrap,
+body.tc-app .iw { min-width:0; }
+body.tc-app .inp,
+body.tc-app .inp-sm,
+body.tc-app .gl-sel,
+body.tc-app .hx-input,
+body.tc-app select.hx-input,
+body.tc-app .tzl-inp {
+  min-height:var(--tcp-control-h)!important;
+  border-radius:var(--tcp-control-radius)!important;
+  box-sizing:border-box!important;
+}
+body.tc-app .inp:focus,
+body.tc-app .inp-sm:focus,
+body.tc-app .gl-sel:focus,
+body.tc-app .hx-input:focus,
+body.tc-app .tzl-inp:focus {
+  outline:none!important;
+  border-color:var(--module-accent-b)!important;
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--module-accent) 22%, transparent)!important;
+}
+
+/* Einheitliche Ergebniszeilen — auch Einheiten-Tab */
+body.tc-app .tcp-result-row,
+body.tc-app .ob,
+body.tc-app .out-row {
+  min-height:var(--tcp-result-row-h)!important;
+  padding:var(--tcp-result-pad-y) var(--tcp-result-pad-x)!important;
+  border-radius:18px!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:12px!important;
+  box-sizing:border-box!important;
+}
+body.tc-app .out-key,
+body.tc-app .ob-title,
+body.tc-app .ob-title-lbl,
+body.tc-app .ui-result-title {
+  min-width:0!important;
+  overflow-wrap:anywhere;
+}
+body.tc-app .out-val,
+body.tc-app .unit-ro,
+body.tc-app .ui-result-value {
+  justify-self:end!important;
+  text-align:right!important;
+  white-space:nowrap!important;
+}
+body.tc-app .out-grid { display:flex!important; flex-direction:column!important; gap:10px!important; }
+
+/* Einheitliche Desktop-Grids: explizite Wrapper gewinnen gegen alte nth-of-type-Regeln. */
+@media (min-width:900px) {
+  body.tc-app .tab-inner { gap:var(--tcp-grid-gap-desktop)!important; }
+  body.tc-app #tab-luft .tab-inner,
+  body.tc-app #tab-hx .tab-inner,
+  body.tc-app #tab-wrg .tab-inner,
+  body.tc-app #tab-trinkwasser .tab-inner,
+  body.tc-app #tab-mag .tab-inner,
+  body.tc-app #tab-entwaesserung .tab-inner {
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    grid-auto-flow:row!important;
+    align-items:start!important;
+  }
+  body.tc-app .luft-desktop-left,
+  body.tc-app .luft-desktop-right,
+  body.tc-app .hx-desktop-left,
+  body.tc-app .hx-desktop-right,
+  body.tc-app .wrg-desktop-left,
+  body.tc-app .wrg-desktop-right,
+  body.tc-app .tw-desktop-left,
+  body.tc-app .tw-desktop-right,
+  body.tc-app .mag-desktop-left,
+  body.tc-app .mag-desktop-right,
+  body.tc-app .ew-desktop-left,
+  body.tc-app .ew-desktop-right {
+    gap:var(--tcp-grid-gap)!important;
+    height:auto!important;
+    min-height:0!important;
+  }
+  body.tc-app .luft-desktop-left > *,
+  body.tc-app .luft-desktop-right > *,
+  body.tc-app .hx-desktop-left > *,
+  body.tc-app .hx-desktop-right > *,
+  body.tc-app .wrg-desktop-left > *,
+  body.tc-app .wrg-desktop-right > *,
+  body.tc-app .tw-desktop-left > *,
+  body.tc-app .tw-desktop-right > *,
+  body.tc-app .mag-desktop-left > *,
+  body.tc-app .mag-desktop-right > *,
+  body.tc-app .ew-desktop-left > *,
+  body.tc-app .ew-desktop-right > * {
+    width:100%!important;
+    margin-top:0!important;
+    margin-bottom:0!important;
+    top:auto!important;
+    transform:none!important;
+  }
+}
+
+/* Mobile: Header-Abstand und Bottom-Pill werden ausschließlich hier geführt. */
+@media (max-width:899px) {
+  body.tc-app #app-shell { padding-top:calc(var(--hdr,118px) + var(--sat,0px) + var(--tcp-header-gap-mobile))!important; }
+  body.tc-app .tab-panel.is-active { padding-bottom:calc(104px + var(--sab,0px))!important; }
+  body.tc-app .tab-inner { gap:var(--tcp-grid-gap)!important; }
+  body.tc-app .bottom-pill {
+    position:fixed!important;
+    left:calc(12px + var(--sal,0px))!important;
+    right:calc(12px + var(--sar,0px))!important;
+    bottom:calc(12px + var(--sab,0px))!important;
+    z-index:80!important;
+  }
+}
+
+/* Print/PDF-Schutz: App-Pill und Overlays nie in PDF/Print. */
+@media print {
+  .bottom-pill,
+  .plus-sheet,
+  .plus-overlay,
+  .app-menu-sheet,
+  .app-menu-overlay,
+  .project-sheet,
+  .project-overlay { display:none!important; }
+}
