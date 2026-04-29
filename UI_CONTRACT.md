@@ -187,3 +187,7 @@ Aktive App-Klammer: `body.tc-app.tc-ui-v8.tc-ui-v9`. `tc-ui-v9` ist die führend
 - Neue Module verwenden ausschließlich `.tcp-module`, `.tcp-layout--2col` oder `.tcp-layout--3col`, `.tcp-card`, `.tcp-result-row` und eine Akzentklasse.
 - App-UI-Regeln gehören in `style.css`; PDF-Regeln bleiben in `layout.css`/PDF-spezifischen Exportpfaden.
 - Mobile Navigation darf nicht vom Inhaltsgrid abhängig sein; sie ist immer fixed und über die App-Klammer geschützt.
+
+## Phase 11 Ergänzung
+
+Neue Module verwenden ausschließlich `tcp-module`, `tcp-layout`, `tcp-card`, `tcp-result-row` und eine Modul-Akzentklasse. Abweichende Abstände, Feldhöhen oder Desktop/Mobile-Raster sind nicht im Modul zu definieren.
