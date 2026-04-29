@@ -1254,3 +1254,142 @@ body.keyboard-open .plus-sheet {
   #tab-luft .luft-desktop-right,
   #tab-luft .lueftung-desktop-right { grid-column:2 !important; }
 }
+
+
+/* ==========================================================================
+   Phase 8.3 — zentrale Layout- und Ergebnisstandards
+   ========================================================================== */
+:root {
+  --tcp-desktop-max: 1480px;
+  --tcp-desktop-gap: 28px;
+  --tcp-panel-gap: 18px;
+  --tcp-result-row-h: 54px;
+  --tcp-result-title: 15px;
+  --tcp-result-value: 22px;
+  --tcp-result-value-mobile: 21px;
+  --tcp-warning-bg: #ffe680;
+  --tcp-warning-text: #9d1800;
+  --tcp-warning-border: #ffb000;
+}
+
+@media (min-width: 900px) {
+  #tab-hx .tab-inner,
+  #tab-wrg .tab-inner,
+  #tab-trinkwasser .tab-inner,
+  #tab-mag .tab-inner,
+  #tab-entwaesserung .tab-inner,
+  #tab-luft .tab-inner {
+    display: grid !important;
+    grid-template-columns: minmax(420px, 1fr) minmax(420px, 1fr) !important;
+    gap: var(--tcp-desktop-gap) !important;
+    align-items: start !important;
+    max-width: var(--tcp-desktop-max) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-top: var(--desktop-top-gap, 26px) !important;
+  }
+
+  .hx-desktop-left, .wrg-desktop-left, .tw-desktop-left, .mag-desktop-left, .ew-desktop-left, .luft-desktop-left {
+    grid-column: 1 !important;
+    display: grid !important;
+    gap: var(--tcp-panel-gap) !important;
+    align-content: start !important;
+  }
+
+  .hx-desktop-right, .wrg-desktop-right, .tw-desktop-right, .mag-desktop-right, .ew-desktop-right, .luft-desktop-right {
+    grid-column: 2 !important;
+    display: grid !important;
+    gap: var(--tcp-panel-gap) !important;
+    align-content: start !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+}
+
+.result-standard .ob,
+.mag-result-card .ob,
+.ew-result-card .ob,
+#tab-mag .mag-result-card .ob,
+#tab-entwaesserung .ew-result-card .ob {
+  min-height: var(--tcp-result-row-h) !important;
+  padding: 10px 16px !important;
+  border-radius: 18px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.result-standard .ob-title,
+.mag-result-card .ob-title,
+.ew-result-card .ob-title,
+#tab-mag .mag-result-card .ob-title,
+#tab-entwaesserung .ew-result-card .ob-title {
+  font-family: var(--f) !important;
+  font-size: var(--tcp-result-title) !important;
+  line-height: 1.2 !important;
+  font-weight: 650 !important;
+  color: var(--t1) !important;
+}
+
+.result-standard .out-val,
+.mag-result-card .out-val,
+.ew-result-card .out-val,
+#tab-mag .mag-result-card .out-val,
+#tab-entwaesserung .ew-result-card .out-val {
+  font-family: var(--fm) !important;
+  font-size: var(--tcp-result-value) !important;
+  line-height: 1.05 !important;
+  font-weight: 700 !important;
+  letter-spacing: .015em !important;
+  color: var(--blue) !important;
+  white-space: nowrap !important;
+}
+
+.mag-result-card,
+.ew-result-card {
+  width: 100% !important;
+}
+
+.mag-result-card .out-grid,
+.ew-result-card .out-grid {
+  grid-template-columns: 1fr !important;
+  gap: 10px !important;
+}
+
+.safety-warning,
+.mag-safety-warning {
+  display: block;
+  color: var(--tcp-warning-text) !important;
+  background: var(--tcp-warning-bg) !important;
+  border: 2px solid var(--tcp-warning-border) !important;
+  border-radius: 12px !important;
+  padding: 10px 12px !important;
+  font-weight: 800 !important;
+  line-height: 1.35 !important;
+  box-shadow: 0 0 0 1px rgba(255,176,0,.25), 0 10px 26px rgba(255,176,0,.16) !important;
+  margin: 6px 0 !important;
+}
+
+.ew-total-grid { display:grid; gap:6px; }
+.ew-total-head {
+  display:flex; justify-content:space-between; gap:12px;
+  padding:8px 10px; border:1px solid var(--gb-soft); border-radius:12px;
+  background:rgba(255,255,255,.06); color:var(--t1); font-family:var(--fm); font-size:12px;
+}
+.ew-fixture-total-row {
+  display:grid; grid-template-columns:1fr auto auto; gap:10px; align-items:center;
+  padding:7px 10px; border-bottom:1px solid var(--gb-soft); color:var(--t2); font-size:12px;
+}
+.ew-fixture-total-row strong { color:var(--t1); }
+.ew-strang-summary { margin-top:10px; padding-top:8px; border-top:1px solid var(--gb-soft); }
+
+@media (max-width: 899px) {
+  .result-standard .out-val,
+  .mag-result-card .out-val,
+  .ew-result-card .out-val,
+  #tab-mag .mag-result-card .out-val,
+  #tab-entwaesserung .ew-result-card .out-val {
+    font-size: var(--tcp-result-value-mobile) !important;
+  }
+}

@@ -112,9 +112,9 @@ function calcMAG() {
   const warnings = [];
 
   if (pSV <= pSys) {
-    warnings.push('<strong>Sicherheitsventil zu klein dimensioniert:</strong> Systemdruck aus geodätischer Höhe liegt am oder über dem Ansprechdruck des Sicherheitsventils.');
+    warnings.push('<span class="mag-safety-warning">Sicherheitsventil zu klein dimensioniert: Systemdruck aus geodätischer Höhe liegt am oder über dem Ansprechdruck des Sicherheitsventils.</span>');
   } else if (pSV <= pSys + 0.3) {
-    warnings.push('<strong>Sicherheitsventil kritisch:</strong> Sicherheitsventil liegt nur knapp über dem berechneten Systemdruck. Reserve prüfen.');
+    warnings.push('<span class="mag-safety-warning">Sicherheitsventil kritisch: Sicherheitsventil liegt nur knapp über dem berechneten Systemdruck. Reserve prüfen.</span>');
   }
 
   if (!pressureSpreadOk) {
