@@ -295,3 +295,13 @@ function getEntwaesserungPdfData() {
 window.getEntwaesserungPdfData = getEntwaesserungPdfData;
 
 document.addEventListener('DOMContentLoaded', initEntwaesserung);
+
+/* Phase 17: PDF-Snapshot Provider */
+window.TCP_PDF_SNAPSHOTS = window.TCP_PDF_SNAPSHOTS || {};
+window.TCP_PDF_SNAPSHOTS.entwaesserung = function getEntwaesserungPdfSnapshot() {
+  return (typeof getEntwaesserungPdfData === 'function') ? getEntwaesserungPdfData() : {
+    current: window.EW_STATE?.result || null,
+    aggregate: null,
+    generatedAt: new Date().toISOString()
+  };
+};
