@@ -101,10 +101,19 @@ function updateBottomPillIndicator() {
   if (!pill) return;
   const indicator = pill.querySelector('.pill-indicator');
   const activeBtn = pill.querySelector(`.pill-btn[data-tab="${NAV.activeTab}"]`);
+  const plusBtn = $('pill-plus');
+  const overflowActive = !NAV_FAVORITES.includes(NAV.activeTab);
+  plusBtn?.classList.toggle('active-overflow', overflowActive);
+  plusBtn?.classList.toggle('active', overflowActive);
   if (!indicator || !activeBtn) {
-    if (indicator) indicator.style.setProperty('--pill-indicator-w', '0px');
+    if (indicator) {
+      indicator.style.setProperty('--pill-indicator-w', '0px');
+      indicator.style.setProperty('--pill-indicator-x', '0px');
+      indicator.style.opacity = '0';
+    }
     return;
   }
+  indicator.style.opacity = '1';
   const pillRect = pill.getBoundingClientRect();
   const btnRect = activeBtn.getBoundingClientRect();
   const x = Math.max(0, btnRect.left - pillRect.left - 6);
@@ -668,6 +677,7 @@ function closePlusSheet() { NAV.sheetOpen = false; NAV._apply(); }
 
 function _switchFromPlus(tab) {
   if (!TABS.includes(tab)) return;
+  // Zusatzmodule bleiben im Plus-Menü. Die Plus-Taste zeigt den aktiven Zustand.
   NAV.activeTab = tab;
   NAV.sheetOpen = false;
   NAV._apply();

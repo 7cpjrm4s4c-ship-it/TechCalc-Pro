@@ -5,6 +5,12 @@
 ═══════════════════════════════════════════════════════ */
 'use strict';
 
+/* RC5: lokale Utilities, da app.js $/show/loc als const nicht global exportiert. */
+const hc$ = id => document.getElementById(id);
+const hcShow = (e, v) => { if (e) e.style.display = v ? '' : 'none'; };
+const hcLoc = (v, d) => Number(v).toLocaleString('de-DE', { minimumFractionDigits:d, maximumFractionDigits:d });
+
+
 /* ───────────────────────────────────────
    FLÜSSIGKEITSDATEN
 ─────────────────────────────────────── */
@@ -39,11 +45,11 @@ const ST = {
 
 function updateLayout(p) {
   const m = ST[p].mode;
-  show($(p + '-ig-q'),  m !== 'q');
-  show($(p + '-ig-ms'), m !== 'ms');
-  show($(p + '-ig-dt'), m !== 'dt');
+  hcShow(hc$(p + '-ig-q'),  m !== 'q');
+  hcShow(hc$(p + '-ig-ms'), m !== 'ms');
+  hcShow(hc$(p + '-ig-dt'), m !== 'dt');
 
-  const dtLbl = $(p + '-dt-lbl');
+  const dtLbl = hc$(p + '-dt-lbl');
   if (dtLbl) {
     const heatWord = p === 'h' ? 'Heizlast' : 'K\u00fchllast';
     if      (m === 'ms') dtLbl.textContent = '\u0394T \u2014 ' + heatWord + ' [K]';
@@ -54,10 +60,10 @@ function updateLayout(p) {
 
 function setQUnit(p, unit) {
   ST[p].qUnit = unit;
-  const inp     = $(p + '-q');
-  const unitSpan = $(p + '-q-unit');
-  const wBtn    = $(p + '-wu');
-  const kwBtn   = $(p + '-kwu');
+  const inp     = hc$(p + '-q');
+  const unitSpan = hc$(p + '-q-unit');
+  const wBtn    = hc$(p + '-wu');
+  const kwBtn   = hc$(p + '-kwu');
   if (unit === 'kW') {
     if (inp)      { inp.step = '0.1'; inp.placeholder = '0.00'; }
     if (unitSpan)   unitSpan.textContent = 'kW';
@@ -76,16 +82,16 @@ function setQUnit(p, unit) {
    BERECHNUNG — Einzelpanel
 ─────────────────────────────────────── */
 function calcPanel(p) {
-  const f   = FL[$('medium').value];
+  const f   = FL[hc$('medium').value];
   const cp  = f.cp * 1e3;   // J/(kg·K)
   const rho = f.rho;
   const m   = ST[p].mode;
 
-  const qRaw  = parseFloat($(p + '-q')?.value)     || 0;
+  const qRaw  = parseFloat(hc$(p + '-q')?.value)     || 0;
   const qv    = ST[p].qUnit === 'kW' ? qRaw * 1000 : qRaw;
-  const msh   = parseFloat($(p + '-ms-in')?.value) || 0;
+  const msh   = parseFloat(hc$(p + '-ms-in')?.value) || 0;
   const ms_in = msh / 3600;
-  const dtv   = parseFloat($(p + '-dt')?.value)    || 0;
+  const dtv   = parseFloat(hc$(p + '-dt')?.value)    || 0;
 
   let ms = 0, q = 0, dt = 0, ok = false;
   if (m === 'ms' && qv > 0    && dtv > 0)   { ms = qv / (cp * dtv);    q = qv;   dt = dtv; ok = true; }
@@ -98,7 +104,7 @@ function calcPanel(p) {
 }
 
 function setOut(id, on, txt) {
-  const el = $(id); if (!el) return;
+  const el = hc$(id); if (!el) return;
   let tn = el.firstChild;
   if (!tn || tn.nodeType !== 3) {
     tn = document.createTextNode('');
@@ -110,19 +116,19 @@ function setOut(id, on, txt) {
 
 function setOutFull(valId, unitId, on, numTxt, unitTxt) {
   setOut(valId, on, numTxt);
-  const uel = $(unitId); if (uel) uel.textContent = unitTxt;
+  const uel = hc$(unitId); if (uel) uel.textContent = unitTxt;
 }
 
 function updateOutBlock(p, res) {
   const m  = ST[p].mode;
-  const k1 = $(p + '-out-key1');
-  const k2 = $(p + '-out-key2');
+  const k1 = hc$(p + '-out-key1');
+  const k2 = hc$(p + '-out-key2');
 
   if (m === 'ms') {
     if (k1) k1.textContent = 'kg/h';
     if (k2) k2.textContent = 'm\u00b3/h';
-    setOutFull(p + '-out-v1', p + '-out-u1', res.ok, loc(res.mh,  1), 'kg/h');
-    setOutFull(p + '-out-v2', p + '-out-u2', res.ok, loc(res.m3h, 3), 'm\u00b3/h');
+    setOutFull(p + '-out-v1', p + '-out-u1', res.ok, hcLoc(res.mh,  1), 'kg/h');
+    setOutFull(p + '-out-v2', p + '-out-u2', res.ok, hcLoc(res.m3h, 3), 'm\u00b3/h');
   } else if (m === 'q') {
     const isKw  = ST[p].qUnit === 'kW';
     const qDisp = isKw ? res.q / 1000 : res.q;
@@ -130,13 +136,13 @@ function updateOutBlock(p, res) {
     const uLbl  = ST[p].qUnit;
     if (k1) k1.textContent = uLbl;
     if (k2) k2.textContent = 'kg/h';
-    setOutFull(p + '-out-v1', p + '-out-u1', res.ok, loc(qDisp, qDec), uLbl);
-    setOutFull(p + '-out-v2', p + '-out-u2', res.ok, loc(res.mh, 1), 'kg/h');
+    setOutFull(p + '-out-v1', p + '-out-u1', res.ok, hcLoc(qDisp, qDec), uLbl);
+    setOutFull(p + '-out-v2', p + '-out-u2', res.ok, hcLoc(res.mh, 1), 'kg/h');
   } else {
     if (k1) k1.textContent = '\u0394T';
     if (k2) k2.textContent = 'kg/h';
-    setOutFull(p + '-out-v1', p + '-out-u1', res.ok, loc(res.dt, 2), 'K');
-    setOutFull(p + '-out-v2', p + '-out-u2', res.ok, loc(res.mh, 1), 'kg/h');
+    setOutFull(p + '-out-v1', p + '-out-u1', res.ok, hcLoc(res.dt, 2), 'K');
+    setOutFull(p + '-out-v2', p + '-out-u2', res.ok, hcLoc(res.mh, 1), 'kg/h');
   }
 }
 
@@ -144,12 +150,12 @@ function updateOutBlock(p, res) {
    BERECHNUNG — Alle Panels
 ─────────────────────────────────────── */
 function calcAll() {
-  const f = FL[$('medium').value];
-  $('cp-val').textContent  = f.cp.toFixed(3);
-  $('rho-val').textContent = f.rho;
+  const f = FL[hc$('medium').value];
+  hc$('cp-val').textContent  = f.cp.toFixed(3);
+  hc$('rho-val').textContent = f.rho;
 
-  const fc = $('frost-chip');
-  if (f.frost) { if (fc) fc.style.display = ''; $('frost-val').textContent = f.frost; }
+  const fc = hc$('frost-chip');
+  if (f.frost) { if (fc) fc.style.display = ''; hc$('frost-val').textContent = f.frost; }
   else          { if (fc) fc.style.display = 'none'; }
 
   const rH = calcPanel('h');
@@ -158,7 +164,7 @@ function calcAll() {
   updateOutBlock('k', rK);
 
   // Ergebnis-Label
-  const slbl = $('out-card-slbl');
+  const slbl = hc$('out-card-slbl');
   if (slbl) {
     const mH = ST.h.mode, mK = ST.k.mode;
     slbl.textContent = mH === mK
@@ -167,20 +173,20 @@ function calcAll() {
   }
 
   const any = rH.ok || rK.ok;
-  show($('pi-card'),        any);
-  show($('pi-placeholder'), !any);
+  hcShow(hc$('pi-card'),        any);
+  hcShow(hc$('pi-placeholder'), !any);
 
   if (rH.ok) {
-    show($('pi-h'), true);
-    $('pi-h-vol').textContent = '(' + loc(rH.m3h, 3) + '\u202fm\u00b3/h)';
+    hcShow(hc$('pi-h'), true);
+    hc$('pi-h-vol').textContent = '(' + hcLoc(rH.m3h, 3) + '\u202fm\u00b3/h)';
     window.TCP_PIPE?.renderPair('pi-h-pair', rH.m3h, DP0, 'best-h');
-  } else { show($('pi-h'), false); }
+  } else { hcShow(hc$('pi-h'), false); }
 
   if (rK.ok) {
-    show($('pi-k'), true);
-    $('pi-k-vol').textContent = '(' + loc(rK.m3h, 3) + '\u202fm\u00b3/h)';
+    hcShow(hc$('pi-k'), true);
+    hc$('pi-k-vol').textContent = '(' + hcLoc(rK.m3h, 3) + '\u202fm\u00b3/h)';
     window.TCP_PIPE?.renderPair('pi-k-pair', rK.m3h, DP0, 'best-k');
-  } else { show($('pi-k'), false); }
+  } else { hcShow(hc$('pi-k'), false); }
 }
 
 
@@ -189,10 +195,10 @@ function calcAll() {
    HK-SWITCH (Heizung ↔ Kälte)
 ─────────────────────────────────────── */
 function flowSwitch(hk) {
-  show($('flow-panel-h'), hk === 'h');
-  show($('flow-panel-k'), hk === 'k');
-  $('flow-btn-h').className = 'hk-btn' + (hk === 'h' ? ' on-h' : '');
-  $('flow-btn-k').className = 'hk-btn' + (hk === 'k' ? ' on-k' : '');
+  hcShow(hc$('flow-panel-h'), hk === 'h');
+  hcShow(hc$('flow-panel-k'), hk === 'k');
+  hc$('flow-btn-h').className = 'hk-btn' + (hk === 'h' ? ' on-h' : '');
+  hc$('flow-btn-k').className = 'hk-btn' + (hk === 'k' ? ' on-k' : '');
 }
 
 /* Globale Brücke für bestehendes index.html ohne Inline-onclick-Bruch. */
@@ -219,9 +225,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Eingabefelder + Selects
   ['h-q', 'h-ms-in', 'h-dt', 'k-q', 'k-ms-in', 'k-dt']
-    .forEach(id => $(id)?.addEventListener('input', calcAll));
+    .forEach(id => hc$(id)?.addEventListener('input', calcAll));
 
-  const mediumSel = $('medium');
+  const mediumSel = hc$('medium');
   if (mediumSel) {
     mediumSel.addEventListener('input', calcAll);
     mediumSel.addEventListener('change', calcAll);

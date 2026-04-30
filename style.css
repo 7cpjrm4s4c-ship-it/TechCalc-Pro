@@ -1553,3 +1553,22 @@ body.tc-app #tab-flow .out-card .out-row{display:grid!important;grid-template-co
 body.tc-app #tab-flow .out-card .out-val{font-size:clamp(28px,8vw,46px)!important;font-weight:780!important;letter-spacing:.035em!important;text-align:left!important;justify-self:start!important;max-width:none!important;}
 body.tc-app #tab-flow .out-card .out-val .u{font-size:clamp(12px,3vw,16px)!important;opacity:.58!important;}
 body.tc-app #tab-entwaesserung .ew-result-card .out-val{font-variant-numeric:tabular-nums!important;}
+
+
+/* ═══════════════════════════════════════════════════════
+   RC5 — gezielte Stabilisierung ohne erneute Phasenschicht
+═══════════════════════════════════════════════════════ */
+body.tc-app .bottom-pill .pill-indicator{opacity:1;min-width:0!important;overflow:hidden!important;}
+body.tc-app .bottom-pill .pill-plus{font-size:22px!important;font-weight:800!important;color:rgba(255,255,255,.70)!important;}
+body.tc-app .bottom-pill .pill-plus .pill-plus-icon{font-size:24px!important;line-height:1!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;}
+body.tc-app .bottom-pill .pill-plus.active-overflow,body.tc-app .bottom-pill .pill-plus.active{color:var(--accent,#60a5fa)!important;background:rgba(96,165,250,.14)!important;box-shadow:inset 0 0 0 2px rgba(96,165,250,.74),0 0 18px rgba(96,165,250,.16)!important;}
+body.tc-app .plus-overlay.open{z-index:3400!important;pointer-events:auto!important;}
+body.tc-app .plus-sheet.open{z-index:3500!important;pointer-events:auto!important;}
+body.tc-app #tab-mag .mag-result-card .ob,body.tc-app #tab-entwaesserung .ew-result-card .ob{grid-template-columns:minmax(0,1.45fr) minmax(0,.88fr)!important;gap:8px!important;min-height:56px!important;}
+body.tc-app #tab-mag .mag-result-card .ob-title,body.tc-app #tab-entwaesserung .ew-result-card .ob-title{font-size:clamp(13px,3.25vw,16px)!important;line-height:1.08!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;letter-spacing:-.015em!important;}
+body.tc-app #tab-mag .mag-result-card .out-val,body.tc-app #tab-entwaesserung .ew-result-card .out-val{font-size:clamp(18px,4.35vw,23px)!important;line-height:1!important;max-width:100%!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;text-align:right!important;justify-self:end!important;}
+body.tc-app #tab-entwaesserung .ew-result-card .out-val .u{font-size:clamp(10px,2.6vw,13px)!important;margin-left:2px!important;}
+body.tc-app #tab-entwaesserung .ew-strang-dims{display:flex!important;flex-direction:column!important;gap:8px!important;margin:10px 0!important;}
+body.tc-app #tab-entwaesserung .ew-strang-dim-row{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:4px 10px!important;padding:9px 10px!important;border:1px solid rgba(255,255,255,.10)!important;border-radius:14px!important;background:rgba(255,255,255,.045)!important;font-size:12px!important;color:var(--t2)!important;}
+body.tc-app #tab-entwaesserung .ew-strang-dim-row strong{grid-column:1/-1!important;color:var(--t4)!important;font-size:13px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;}
+@media(max-width:380px){body.tc-app #tab-mag .mag-result-card .ob,body.tc-app #tab-entwaesserung .ew-result-card .ob{grid-template-columns:minmax(0,1.6fr) minmax(0,.8fr)!important;}body.tc-app #tab-mag .mag-result-card .out-val,body.tc-app #tab-entwaesserung .ew-result-card .out-val{font-size:18px!important;}}

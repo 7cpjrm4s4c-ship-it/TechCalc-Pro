@@ -223,12 +223,23 @@ function renderEntwaesserungTotals() {
     </div>
   `).join('');
 
+  const dims = agg.list.map(s => `
+    <div class="ew-strang-dim-row">
+      <strong>${s.name || 'Strang'}</strong>
+      <span>Anschluss: ${s.dims?.anschluss || '–'}</span>
+      <span>Sammel: ${s.dims?.sammel || '–'}</span>
+      <span>Fall: ${s.dims?.fall || '–'}</span>
+      <span>Grund: ${s.dims?.grund || '–'}</span>
+    </div>
+  `).join('');
+
   host.innerHTML = `
     <div class="ew-total-head">
       <span>Stränge: <strong>${agg.list.length}</strong></span>
       <span>ΣDU: <strong>${ewFmt(agg.duTotal,1)}</strong></span>
       <span>ΣQww: <strong>${ewFmt(agg.qwwTotal,2)} l/s</strong></span>
     </div>
+    <div class="ew-strang-dims">${dims}</div>
     <div class="ew-strang-summary">${rows || '<p style="color:var(--t3);font-size:12px">Keine Gegenstände gespeichert.</p>'}</div>
   `;
 }
