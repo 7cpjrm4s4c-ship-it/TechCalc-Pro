@@ -668,14 +668,6 @@ function closePlusSheet() { NAV.sheetOpen = false; NAV._apply(); }
 
 function _switchFromPlus(tab) {
   if (!TABS.includes(tab)) return;
-
-  // Gewähltes Zusatzmodul in die sichtbare Pill übernehmen.
-  if (!NAV_FAVORITES.includes(tab)) {
-    const next = NAV_FAVORITES.slice(0, 4);
-    next[next.length - 1] = tab;
-    setNavFavorites(next);
-  }
-
   NAV.activeTab = tab;
   NAV.sheetOpen = false;
   NAV._apply();
