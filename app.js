@@ -920,21 +920,12 @@ const UNITS = {
 let UCurrent = 'pressure';
 
 function ufmt(v, decimals) {
-  if (v === 0) return '0';
-  if (decimals !== undefined) {
-    return v.toLocaleString('de-DE', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: decimals,
-    });
-  }
-  const abs = Math.abs(v);
-  if (abs >= 1e9) return v.toLocaleString('de-DE', { maximumFractionDigits: 0 });
-  if (abs >= 1)   return v.toLocaleString('de-DE', {
-    maximumFractionDigits: 6,
-    maximumSignificantDigits: 8,
+  if (v == null || isNaN(v)) return '–';
+  const d = Math.min(2, Math.max(0, decimals ?? 2));
+  return Number(v).toLocaleString('de-DE', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: d,
   });
-  return parseFloat(v.toPrecision(8))
-    .toLocaleString('de-DE', { maximumFractionDigits: 10 });
 }
 
 function buildSelects(cat) {

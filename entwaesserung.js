@@ -27,7 +27,7 @@ const EW_K = {
   gewerb: { label:'Gewerbe / hohe Gleichzeitigkeit', k:1.0 },
 };
 
-const EW_STATE = { result:null, straenge: JSON.parse(localStorage.getItem('ew_straenge') || '[]')};
+const EW_STATE = { result:null, editingName:null, straenge: JSON.parse(localStorage.getItem('ew_straenge') || '[]')};
 window.EW_STATE = EW_STATE;
 
 function ewNum(v) {
@@ -150,7 +150,7 @@ function addEntwaesserungStrang() {
   if (!r || r.duTotal <= 0) return;
   const strang = {
     id: Date.now(),
-    name: `Strang ${ (EW_STATE.straenge?.length || 0) + 1 }`,
+    name: (ewGet('ew-strang-name')?.value?.trim() || EW_STATE.editingName || `Strang ${ (EW_STATE.straenge?.length || 0) + 1 }`),
     duTotal: r.duTotal,
     qww: r.qww,
     dims: r.dims,
@@ -162,6 +162,8 @@ function addEntwaesserungStrang() {
   renderStrangListe();
   renderEntwaesserungTotals();
   resetEntwaesserungInputs();
+  const nameEl = ewGet('ew-strang-name'); if (nameEl) nameEl.value = '';
+  EW_STATE.editingName = null;
   calcEntwaesserung();
 }
 
@@ -172,6 +174,7 @@ function deleteStrang(id) {
   renderEntwaesserungTotals();
 }
 window.deleteStrang = deleteStrang;
+window.deleteEntwaesserungStrang = deleteStrang;
 
 
 function ewAggregateStraenge() {
@@ -235,6 +238,8 @@ function editEntwaesserungStrang(id) {
   if (!s) return;
 
   resetEntwaesserungInputs();
+  EW_STATE.editingName = s.name || null;
+  const nameEl = ewGet('ew-strang-name'); if (nameEl) nameEl.value = s.name || '';
 
   (s.rows || []).forEach(r => {
     const el = ewGet('ew-' + r.key);
@@ -261,8 +266,8 @@ function renderStrangListe() {
   }
 
   host.innerHTML = list.map(s => `
-    <div class="ew-detail-row">
-      <span>${s.name} · ${ewFmt(s.duTotal,1)} DU · Qww ${ewFmt(s.qww,2)} l/s</span>
+    <div class="ew-strang-row">
+      <div class="ew-strang-main"><strong>${s.name}</strong><span>${ewFmt(s.duTotal,1)} DU · Qww ${ewFmt(s.qww,2)} l/s</span></div>
       <div class="ui-action-row">
         <button class="ew-mini-btn" type="button" onclick="editEntwaesserungStrang(${s.id})">Bearbeiten</button>
         <button class="ew-mini-btn danger" type="button" onclick="deleteEntwaesserungStrang(${s.id})">Löschen</button>

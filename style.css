@@ -1109,3 +1109,212 @@ body.tc-app :is(.ew-mini-btn,.project-mini-btn,.tw-ne-del,button[data-project-de
 @media (min-width:900px){body.tc-app :is(#app-shell,.app-shell,main,.app-main){padding-top:clamp(86px,9vh,112px)!important;padding-bottom:clamp(22px,4vh,44px)!important;}body.tc-app :is(.tab-inner,.tcp-layout--2col,.module-grid,.calc-grid){display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:start!important;}}
 @media (max-width:899px){body.tc-app :is(#app-shell,.app-shell,main,.app-main){padding-top:clamp(74px,10vh,96px)!important;padding-bottom:calc(var(--tcp-ui-nav-h) + 56px + env(safe-area-inset-bottom,0px))!important;}body.tc-app :is(.tab-panel.is-active,.tab-content.is-active){padding-bottom:calc(var(--tcp-ui-nav-h) + 54px + env(safe-area-inset-bottom,0px))!important;}body.tc-app :is(.tab-inner,.tcp-layout,.tcp-layout--2col,.tcp-layout--3col,.module-grid,.calc-grid,.input-grid,.result-grid,.cards-grid,.controls-grid){display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:var(--tcp-ui-gap)!important;}body.tc-app :is(.tcp-module,.tab-inner,.module-wrap,.flow-wrap,.vent-wrap,.tw-wrap,.mag-wrap,.entw-wrap,.wrg-wrap,.hx-wrap){margin-bottom:calc(22px + env(safe-area-inset-bottom,0px))!important;}body.tc-app .bottom-pill{position:fixed!important;left:50%!important;right:auto!important;bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;transform:translateX(-50%)!important;width:var(--tcp-ui-nav-w)!important;max-width:calc(100vw - 24px)!important;z-index:3000!important;margin:0!important;}body.tc-app .bottom-pill :is(.pill-btn,.pill-plus){flex:1 1 0!important;min-width:0!important;}}
 @media print{body.tc-app .bottom-pill .pill-indicator{display:none!important;}}
+
+/* ═══════════════════════════════════════════════════════
+   BUGFIX ROUND 4 — central UI contract corrections
+   Basis: Phase 14 + A/B design decision
+═══════════════════════════════════════════════════════ */
+body.tc-app.tc-ui-bugfix4{
+  --tcp-ui-gap:14px;
+  --tcp-ui-gap-lg:18px;
+  --tcp-ui-nav-h:74px;
+  --tcp-ui-nav-w:min(92vw, 680px);
+  --tcp-ui-nav-bg:rgba(13,13,20,.82);
+  --tcp-ui-nav-border:rgba(255,255,255,.16);
+  --tcp-ui-nav-text:rgba(255,255,255,.58);
+  --tcp-ui-nav-active-bg:rgba(255,255,255,.12);
+  --tcp-result-value-size:clamp(28px,7.5vw,40px);
+  --tcp-result-value-size-sm:clamp(24px,6.4vw,34px);
+}
+
+/* 1) Navigation pill must remain dark/translucent, centered and never white. */
+body.tc-app.tc-ui-bugfix4 .bottom-pill{
+  position:fixed!important;
+  left:50%!important;
+  right:auto!important;
+  bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;
+  transform:translateX(-50%)!important;
+  width:var(--tcp-ui-nav-w)!important;
+  max-width:calc(100vw - 24px)!important;
+  min-height:var(--tcp-ui-nav-h)!important;
+  padding:6px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:4px!important;
+  border-radius:999px!important;
+  border:1px solid var(--tcp-ui-nav-border)!important;
+  background:linear-gradient(180deg,rgba(22,22,32,.88),rgba(11,11,18,.82))!important;
+  color:var(--tcp-ui-nav-text)!important;
+  box-shadow:0 18px 48px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.08)!important;
+  backdrop-filter:blur(22px) saturate(1.12)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(1.12)!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+  z-index:3000!important;
+}
+body.tc-app.tc-ui-bugfix4 .bottom-pill .pill-indicator{
+  position:absolute!important;
+  top:6px!important;
+  left:6px!important;
+  height:calc(100% - 12px)!important;
+  width:var(--pill-indicator-w,0px)!important;
+  transform:translate3d(var(--pill-indicator-x,0px),0,0)!important;
+  border-radius:999px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.08))!important;
+  border:1px solid color-mix(in srgb,var(--module-accent,#60a5fa) 70%,rgba(255,255,255,.22))!important;
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--module-accent,#60a5fa) 24%,transparent),0 10px 28px color-mix(in srgb,var(--module-accent,#60a5fa) 18%,transparent)!important;
+  transition:transform .32s cubic-bezier(.18,.82,.22,1),width .32s cubic-bezier(.18,.82,.22,1)!important;
+  pointer-events:none!important;
+  z-index:0!important;
+}
+body.tc-app.tc-ui-bugfix4 .bottom-pill :is(.pill-btn,.pill-plus){
+  position:relative!important;
+  z-index:1!important;
+  flex:1 1 0!important;
+  min-width:0!important;
+  min-height:58px!important;
+  color:var(--tcp-ui-nav-text)!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+body.tc-app.tc-ui-bugfix4 .bottom-pill .pill-btn.active{color:var(--module-accent,#60a5fa)!important;background:transparent!important;}
+body.tc-app.tc-ui-bugfix4 .bottom-pill :is(.pill-btn,.pill-plus) svg{width:20px!important;height:20px!important;}
+
+/* 2) Heizung/Kälte result cards: visual weight aligned to Lüftung result cards. */
+body.tc-app.tc-ui-bugfix4 #tab-flow .out-card{padding:var(--tcp-ui-gap-lg)!important;}
+body.tc-app.tc-ui-bugfix4 #tab-flow .out-grid{display:flex!important;flex-direction:column!important;gap:var(--tcp-ui-gap)!important;}
+body.tc-app.tc-ui-bugfix4 #tab-flow .ob{
+  min-height:138px!important;
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  align-content:start!important;
+  gap:12px!important;
+  padding:18px 18px!important;
+  border-radius:22px!important;
+}
+body.tc-app.tc-ui-bugfix4 #tab-flow .out-row{
+  display:flex!important;
+  justify-content:flex-start!important;
+  align-items:baseline!important;
+  gap:10px!important;
+  min-height:auto!important;
+}
+body.tc-app.tc-ui-bugfix4 #tab-flow .out-key{min-width:58px!important;text-align:left!important;color:var(--t2)!important;font-weight:750!important;}
+body.tc-app.tc-ui-bugfix4 #tab-flow .out-val{
+  font-size:var(--tcp-result-value-size)!important;
+  line-height:1!important;
+  text-align:left!important;
+  justify-self:start!important;
+  font-weight:780!important;
+  letter-spacing:.03em!important;
+}
+body.tc-app.tc-ui-bugfix4 #tab-flow .out-val .u{font-size:clamp(13px,3.6vw,18px)!important;margin-left:6px!important;opacity:.64!important;}
+body.tc-app.tc-ui-bugfix4 #tab-flow .ob-title{font-size:14px!important;letter-spacing:.13em!important;}
+
+/* 3 + 6) Central vertical rhythm for h,x and Entwässerung grids. */
+body.tc-app.tc-ui-bugfix4 #tab-hx .gc + .gc,
+body.tc-app.tc-ui-bugfix4 #tab-hx .tcp-card + .tcp-card,
+body.tc-app.tc-ui-bugfix4 #tab-entwaesserung .ew-calc-btn + .ew-strang-card,
+body.tc-app.tc-ui-bugfix4 #tab-entwaesserung .ew-name-group + .ew-calc-btn{margin-top:var(--tcp-ui-gap)!important;}
+body.tc-app.tc-ui-bugfix4 #tab-hx .hx-chart-card{margin-top:var(--tcp-ui-gap)!important;}
+
+/* 4) Weitere Module as floating window above navigation pill. */
+body.tc-app.tc-ui-bugfix4 .plus-sheet{
+  position:fixed!important;
+  left:50%!important;
+  right:auto!important;
+  bottom:calc(var(--tcp-ui-nav-h) + 30px + env(safe-area-inset-bottom,0px))!important;
+  transform:translate(-50%, 18px) scale(.985)!important;
+  width:min(92vw, 640px)!important;
+  max-height:calc(100dvh - var(--tcp-ui-nav-h) - 160px)!important;
+  overflow:hidden!important;
+  border-radius:28px!important;
+  border:1px solid rgba(255,255,255,.14)!important;
+  background:linear-gradient(180deg,rgba(16,16,26,.96),rgba(10,10,18,.94))!important;
+  box-shadow:0 26px 70px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.08)!important;
+  backdrop-filter:blur(26px) saturate(1.12)!important;
+  -webkit-backdrop-filter:blur(26px) saturate(1.12)!important;
+  z-index:2990!important;
+  padding:18px!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+body.tc-app.tc-ui-bugfix4 .plus-sheet.open{opacity:1!important;pointer-events:auto!important;transform:translate(-50%,0) scale(1)!important;}
+body.tc-app.tc-ui-bugfix4 .plus-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;max-height:calc(100dvh - var(--tcp-ui-nav-h) - 240px)!important;overflow:auto!important;padding-bottom:2px!important;}
+body.tc-app.tc-ui-bugfix4 .plus-item{min-height:96px!important;border-radius:20px!important;}
+body.tc-app.tc-ui-bugfix4 .plus-overlay{z-index:2980!important;}
+
+/* 4) Numbers, inputs and result values are left-aligned globally. */
+body.tc-app.tc-ui-bugfix4 :is(input.inp,input.inp-sm,.out-val,.unit-v,.unit-ro,.ui-result-value,.tcp-result-number,.result-value,.metric-value,.kv-value){text-align:left!important;}
+body.tc-app.tc-ui-bugfix4 :is(.tcp-result-row,.result-row,.out-row,.res-row,.result-line,.kv-row,.metric-row)>:last-child{justify-self:start!important;text-align:left!important;}
+
+/* 7 + 9 + 10 + 11) Entwässerung overview: no overlaps, editable names, totals directly below Strangübersicht. */
+body.tc-app.tc-ui-bugfix4 #tab-entwaesserung .ew-strang-card{display:flex!important;flex-direction:column!important;gap:12px!important;}
+body.tc-app.tc-ui-bugfix4 #tab-entwaesserung #ew-strang-list{display:flex!important;flex-direction:column!important;gap:10px!important;}
+body.tc-app.tc-ui-bugfix4 #tab-entwaesserung .ew-strang-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:10px!important;
+  padding:10px!important;
+  border-radius:16px!important;
+  border:1px solid rgba(255,255,255,.13)!important;
+  background:rgba(255,255,255,.07)!important;
+}
+body.tc-app.tc-ui-bugfix4 #tab-entwaesserung .ew-strang-main{min-width:0!important;display:flex!important;flex-direction:column!important;gap:3px!important;}
+body.tc-app.tc-ui-bugfix4 #tab-entwaesserung .ew-strang-main strong{font-size:15px!important;line-height:1.15!important;color:var(--t4)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+body.tc-app.tc-ui-bugfix4 #tab-entwaesserung .ew-strang-main span{font-size:12px!important;line-height:1.2!important;color:var(--t2)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+body.tc-app.tc-ui-bugfix4 #tab-entwaesserung .ui-action-row{display:flex!important;gap:8px!important;align-items:center!important;justify-content:flex-end!important;}
+body.tc-app.tc-ui-bugfix4 #tab-entwaesserung .ew-mini-btn{
+  min-width:92px!important;
+  height:40px!important;
+  padding:0 14px!important;
+  border-radius:999px!important;
+  font-size:13px!important;
+  font-weight:760!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+}
+body.tc-app.tc-ui-bugfix4 #tab-entwaesserung .ew-total-card{margin-top:var(--tcp-ui-gap)!important;padding:12px!important;}
+body.tc-app.tc-ui-bugfix4 #tab-entwaesserung .ew-total-head{display:flex!important;flex-wrap:wrap!important;gap:8px 12px!important;font-size:13px!important;}
+body.tc-app.tc-ui-bugfix4 #tab-entwaesserung .ew-fixture-total-row{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;gap:10px!important;align-items:center!important;min-height:34px!important;}
+
+/* 8) Angesetzte Verbraucher removed from the active UI contract. */
+body.tc-app.tc-ui-bugfix4 #ew-detail:empty,
+body.tc-app.tc-ui-bugfix4 #ew-detail{display:none!important;}
+
+/* 12) Result row labels/values: no clipped labels; values slightly smaller where needed. */
+body.tc-app.tc-ui-bugfix4 :is(.tw-result-card,.mag-result-card,.ew-result-card) .ob{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.15fr) minmax(8ch,.85fr)!important;
+  gap:10px!important;
+  align-items:center!important;
+  min-height:56px!important;
+  padding:12px 14px!important;
+}
+body.tc-app.tc-ui-bugfix4 :is(.tw-result-card,.mag-result-card,.ew-result-card) .ob-title{
+  min-width:0!important;
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  font-size:clamp(13px,3.4vw,16px)!important;
+  line-height:1.18!important;
+}
+body.tc-app.tc-ui-bugfix4 :is(.tw-result-card,.mag-result-card,.ew-result-card) .out-val{
+  font-size:var(--tcp-result-value-size-sm)!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  justify-self:start!important;
+  text-align:left!important;
+}
+body.tc-app.tc-ui-bugfix4 :is(.tw-result-card,.mag-result-card,.ew-result-card) .out-val .u{font-size:clamp(12px,3.2vw,15px)!important;margin-left:4px!important;opacity:.62!important;}
+
+@media (max-width:420px){
+  body.tc-app.tc-ui-bugfix4{--tcp-result-value-size:32px;--tcp-result-value-size-sm:27px;}
+  body.tc-app.tc-ui-bugfix4 #tab-entwaesserung .ew-strang-row{grid-template-columns:1fr!important;}
+  body.tc-app.tc-ui-bugfix4 #tab-entwaesserung .ui-action-row{justify-content:flex-start!important;}
+  body.tc-app.tc-ui-bugfix4 #tab-entwaesserung .ew-mini-btn{min-width:0!important;flex:1 1 0!important;}
+  body.tc-app.tc-ui-bugfix4 :is(.tw-result-card,.mag-result-card,.ew-result-card) .ob{grid-template-columns:minmax(0,1fr) minmax(7ch,auto)!important;}
+}

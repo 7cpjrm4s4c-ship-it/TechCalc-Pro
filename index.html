@@ -33,7 +33,7 @@
 <link rel="stylesheet" href="components.css"/>
 <link rel="stylesheet" href="style.css"/>
 </head>
-<body class="tc-app tc-ui-v8 tc-ui-v9 tc-ui-v10 tc-ui-v11 tc-ui-v12 tc-ui-v13 tc-ui-v14">
+<body class="tc-app tc-ui-v8 tc-ui-v9 tc-ui-v10 tc-ui-v11 tc-ui-v12 tc-ui-v13 tc-ui-v14 tc-ui-bugfix4">
 
 <!-- ══ HEADER ══ -->
 <header class="hdr">
@@ -1156,10 +1156,20 @@
       <div class="gc gc-ew tcp-card">
         <div class="slbl">Entwässerungsgegenstände</div>
         <div id="ew-fixture-list" class="ew-list"></div>
+        <div class="igrp tcp-input-group ew-name-group">
+          <div class="ilbl">Strangbezeichnung</div>
+          <div class="iwrap"><input class="inp-sm" id="ew-strang-name" type="text" placeholder="z.B. Strang 1" autocomplete="off"></div>
+        </div>
         <button id="ew-calc-btn" type="button" class="ew-calc-btn">+ Strang anlegen</button>
         <div class="gc ew-strang-card tcp-card tcp-card--spaced">
           <div class="slbl">Strangübersicht</div>
           <div id="ew-strang-list"></div>
+          <div class="gc ew-total-card tcp-card">
+            <div class="slbl">Gesamtsumme — alle Stränge</div>
+            <div id="ew-total-fixtures" class="ew-total-grid">
+              <p style="color:var(--t3);font-size:12px">Noch keine Stränge angelegt.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1181,13 +1191,6 @@
 
       <div class="fml">Q<sub>ww</sub> = K × √ΣDU · Quick-Check zur Plausibilitätsprüfung</div>
 
-      <div class="gc tcp-card"><div class="slbl">Angesetzte Verbraucher</div><div id="ew-detail" class="ew-detail"></div></div>
-      <div class="gc ew-total-card tcp-card">
-        <div class="slbl">Gesamtsumme — alle Stränge</div>
-        <div id="ew-total-fixtures" class="ew-total-grid">
-          <p style="color:var(--t3);font-size:12px">Noch keine Stränge angelegt.</p>
-        </div>
-      </div>
       <div class="gc tcp-card"><div class="slbl">Hinweise</div><div class="info-txt" id="ew-hints">Entwässerungsgegenstände eingeben.</div></div>
     </div>
   </div>
