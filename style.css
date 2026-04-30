@@ -1504,3 +1504,52 @@ body.tc-app :is(.ob,.out-row,.tcp-result-row,.result-row,.result-line,.kv-row)>:
   body.tc-app :is(.plus-sheet,.modules-sheet,.more-modules-sheet){z-index:1300!important;}
 }
 @media print{body.tc-app :is(.app-header,.bottom-pill,.bottom-nav,.nav-pill,.tabbar,.plus-sheet,.plus-overlay,.modules-sheet,.more-modules-sheet){display:none!important;}}
+
+
+/* ═══════════════════════════════════════════════════════
+   RC4 ACTUAL FIXES — gezielte Korrekturen auf Phase 17
+   Keine Platzhalterdateien. Diese Regeln liegen bewusst am Ende.
+═══════════════════════════════════════════════════════ */
+body.tc-app{
+  --tcp-rc-shell-gap-mobile:16px;
+  --tcp-rc-grid-gap:18px;
+  --tcp-rc-result-title:clamp(13px,3.15vw,16px);
+  --tcp-rc-result-value:clamp(22px,5.4vw,30px);
+}
+@media (max-width:899px){
+  body.tc-app :is(#app-shell,.app-shell,main,.app-main){
+    padding-top:calc(var(--hdr,118px) + var(--sat,0px) + var(--tcp-rc-shell-gap-mobile))!important;
+    padding-bottom:calc(var(--tcp-ui-nav-h,74px) + 58px + env(safe-area-inset-bottom,0px))!important;
+  }
+}
+body.tc-app .tab-panel.is-active{gap:var(--tcp-rc-grid-gap)!important;}
+body.tc-app :is(.gc,.tcp-card,.out-card,.hx-card) + :is(.gc,.tcp-card,.out-card,.hx-card),
+body.tc-app :is(.tcp-stack,.out-grid,.result-standard,.tcp-result-grid,.module-grid,.calc-grid){gap:var(--tcp-rc-grid-gap)!important;}
+
+body.tc-app .plus-overlay.open{position:fixed!important;inset:0!important;z-index:5200!important;pointer-events:auto!important;}
+body.tc-app .plus-sheet{z-index:5300!important;pointer-events:none!important;}
+body.tc-app .plus-sheet.open{opacity:1!important;pointer-events:auto!important;transform:translate(-50%,0) scale(1)!important;}
+body.tc-app .plus-sheet.open :is(.plus-grid,.plus-item){pointer-events:auto!important;}
+
+body.tc-app.menu-open .bottom-pill,
+body.tc-app.nav-config-open .bottom-pill,
+body.tc-app.project-open .bottom-pill{opacity:0!important;pointer-events:none!important;transform:translateX(-50%) translateY(18px)!important;}
+body.tc-app .nav-config-sheet,body.tc-app .app-menu-sheet,body.tc-app .project-sheet{z-index:5400!important;padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))!important;}
+body.tc-app .nav-config-actions{position:sticky!important;bottom:0!important;z-index:2!important;padding-bottom:env(safe-area-inset-bottom,0px)!important;background:linear-gradient(180deg,rgba(12,12,18,.74),rgba(12,12,18,.98))!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important;}
+
+body.tc-app #tab-unit .unit-convert-row,body.tc-app #tab-unit .unit-input-row,body.tc-app #tab-unit .unit-result-row,body.tc-app #tab-unit .irow{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(92px,112px)!important;gap:10px!important;align-items:stretch!important;}
+body.tc-app #tab-unit :is(#unit-from-sel,#unit-to-sel){width:100%!important;min-width:0!important;max-width:112px!important;padding-inline:10px 24px!important;font-size:14px!important;}
+body.tc-app #tab-unit :is(#unit-from-val,#unit-to-val){min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+
+body.tc-app :is(.tw-result-card,.mag-result-card,.ew-result-card,.result-standard) .ob{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,max-content)!important;gap:10px!important;align-items:center!important;min-height:54px!important;padding:12px 14px!important;}
+body.tc-app :is(.tw-result-card,.mag-result-card,.ew-result-card,.result-standard) .ob-title{font-size:var(--tcp-rc-result-title)!important;line-height:1.12!important;letter-spacing:-.02em!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;}
+body.tc-app :is(.tw-result-card,.mag-result-card,.ew-result-card,.result-standard) .out-val{font-size:var(--tcp-rc-result-value)!important;line-height:1!important;letter-spacing:.015em!important;min-width:0!important;max-width:44vw!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;text-align:right!important;justify-self:end!important;}
+body.tc-app :is(.mag-result-card,.ew-result-card) .out-val{font-size:clamp(20px,5vw,26px)!important;}
+body.tc-app #tab-trinkwasser .tw-result-card .out-val{font-size:clamp(21px,5.1vw,28px)!important;}
+body.tc-app #tab-entwaesserung .ew-result-card .ob-title,body.tc-app #tab-trinkwasser .tw-result-card .ob-title{font-size:clamp(12px,2.95vw,15px)!important;}
+body.tc-app :is(.tw-result-card,.mag-result-card,.ew-result-card) .out-val .u{font-size:clamp(11px,2.8vw,14px)!important;margin-left:3px!important;}
+
+body.tc-app #tab-flow .out-card .out-row{display:grid!important;grid-template-columns:minmax(5ch,auto) minmax(0,1fr)!important;align-items:baseline!important;gap:12px!important;}
+body.tc-app #tab-flow .out-card .out-val{font-size:clamp(28px,8vw,46px)!important;font-weight:780!important;letter-spacing:.035em!important;text-align:left!important;justify-self:start!important;max-width:none!important;}
+body.tc-app #tab-flow .out-card .out-val .u{font-size:clamp(12px,3vw,16px)!important;opacity:.58!important;}
+body.tc-app #tab-entwaesserung .ew-result-card .out-val{font-variant-numeric:tabular-nums!important;}

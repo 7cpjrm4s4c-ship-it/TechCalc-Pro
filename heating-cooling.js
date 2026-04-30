@@ -195,6 +195,11 @@ function flowSwitch(hk) {
   $('flow-btn-k').className = 'hk-btn' + (hk === 'k' ? ' on-k' : '');
 }
 
+/* Globale Brücke für bestehendes index.html ohne Inline-onclick-Bruch. */
+window.calcAll = calcAll;
+window.flowSwitch = flowSwitch;
+window.setQUnit = setQUnit;
+
 /* ───────────────────────────────────────
    EVENTS + INIT
 ─────────────────────────────────────── */
@@ -212,9 +217,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Eingabefelder
-  ['medium', 'h-q', 'h-ms-in', 'h-dt', 'k-q', 'k-ms-in', 'k-dt']
+  // Eingabefelder + Selects
+  ['h-q', 'h-ms-in', 'h-dt', 'k-q', 'k-ms-in', 'k-dt']
     .forEach(id => $(id)?.addEventListener('input', calcAll));
+
+  const mediumSel = $('medium');
+  if (mediumSel) {
+    mediumSel.addEventListener('input', calcAll);
+    mediumSel.addEventListener('change', calcAll);
+  }
 
   // Init
   updateLayout('h');
