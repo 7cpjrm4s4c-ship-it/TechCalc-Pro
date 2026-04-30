@@ -1318,3 +1318,163 @@ body.tc-app.tc-ui-bugfix4 :is(.tw-result-card,.mag-result-card,.ew-result-card) 
   body.tc-app.tc-ui-bugfix4 #tab-entwaesserung .ew-mini-btn{min-width:0!important;flex:1 1 0!important;}
   body.tc-app.tc-ui-bugfix4 :is(.tw-result-card,.mag-result-card,.ew-result-card) .ob{grid-template-columns:minmax(0,1fr) minmax(7ch,auto)!important;}
 }
+
+/* ═══════════════════════════════════════════════════════
+   BUGFIX ROUND 5 — unresolved corrections
+   Basis: Phase 14 Bugfix 4
+═══════════════════════════════════════════════════════ */
+body.tc-app.tc-ui-bugfix5{
+  --tcp-ui-gap:14px;
+  --tcp-ui-gap-lg:18px;
+  --tcp-hk-primary-size:clamp(36px,9vw,48px);
+  --tcp-hk-secondary-size:clamp(18px,5vw,24px);
+  --tcp-result-title-fit:clamp(13px,3.25vw,16px);
+  --tcp-result-value-fit:clamp(22px,5.9vw,30px);
+}
+
+/* 2) Heizung/Kälte Ergebnisdarstellung: primärer Wert groß, zweiter Wert sekundär — analog Lüftung. */
+body.tc-app.tc-ui-bugfix5 #tab-flow .out-card{
+  padding:18px!important;
+}
+body.tc-app.tc-ui-bugfix5 #tab-flow .out-grid{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:14px!important;
+}
+body.tc-app.tc-ui-bugfix5 #tab-flow .ob{
+  min-height:150px!important;
+  padding:18px 18px 16px!important;
+  display:grid!important;
+  grid-template-rows:auto 1fr auto!important;
+  grid-template-columns:1fr!important;
+  align-items:start!important;
+  gap:10px!important;
+  overflow:hidden!important;
+}
+body.tc-app.tc-ui-bugfix5 #tab-flow .ob-title{
+  display:flex!important;
+  align-items:center!important;
+  gap:9px!important;
+  font-size:13px!important;
+  font-weight:820!important;
+  letter-spacing:.14em!important;
+  text-transform:uppercase!important;
+  min-width:0!important;
+}
+body.tc-app.tc-ui-bugfix5 #tab-flow .out-row{
+  display:flex!important;
+  align-items:baseline!important;
+  justify-content:flex-start!important;
+  gap:10px!important;
+  min-width:0!important;
+  min-height:0!important;
+}
+body.tc-app.tc-ui-bugfix5 #tab-flow .out-row:first-of-type{
+  align-self:center!important;
+}
+body.tc-app.tc-ui-bugfix5 #tab-flow .out-row:first-of-type .out-key{
+  order:2!important;
+  min-width:0!important;
+  font-size:14px!important;
+  font-weight:780!important;
+  color:var(--t3)!important;
+}
+body.tc-app.tc-ui-bugfix5 #tab-flow .out-row:first-of-type .out-val{
+  order:1!important;
+  font-size:var(--tcp-hk-primary-size)!important;
+  line-height:.96!important;
+  font-weight:820!important;
+  letter-spacing:.045em!important;
+  white-space:nowrap!important;
+}
+body.tc-app.tc-ui-bugfix5 #tab-flow .out-row:first-of-type .out-val .u{
+  font-size:16px!important;
+  font-weight:500!important;
+  opacity:.58!important;
+  margin-left:7px!important;
+}
+body.tc-app.tc-ui-bugfix5 #tab-flow .out-row:nth-of-type(2){
+  align-self:start!important;
+  opacity:.92!important;
+}
+body.tc-app.tc-ui-bugfix5 #tab-flow .out-row:nth-of-type(2) .out-key{
+  display:none!important;
+}
+body.tc-app.tc-ui-bugfix5 #tab-flow .out-row:nth-of-type(2) .out-val{
+  font-size:var(--tcp-hk-secondary-size)!important;
+  line-height:1!important;
+  font-weight:780!important;
+  letter-spacing:.035em!important;
+  white-space:nowrap!important;
+}
+body.tc-app.tc-ui-bugfix5 #tab-flow .out-row:nth-of-type(2) .out-val .u{
+  font-size:13px!important;
+  opacity:.52!important;
+  margin-left:5px!important;
+}
+@media (min-width:900px){
+  body.tc-app.tc-ui-bugfix5 #tab-flow .out-grid{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+  }
+}
+
+/* 3) h,x: Abstand zwischen Eingabe Relative Feuchte/Feuchtegehalt und Ergebnis immer Standardrhythmus. */
+body.tc-app.tc-ui-bugfix5 #tab-hx :is(#wrap-rh,#wrap-x){
+  margin-bottom:var(--tcp-ui-gap)!important;
+}
+body.tc-app.tc-ui-bugfix5 #tab-hx :is(#wrap-rh,#wrap-x) + #hx-state-result,
+body.tc-app.tc-ui-bugfix5 #tab-hx #hx-state-result{
+  margin-top:var(--tcp-ui-gap)!important;
+}
+
+/* 12) Ergebniszeilen: Bezeichnung und Wert dürfen sich nicht verdrängen. Zentral für TW/MAG/EW. */
+body.tc-app.tc-ui-bugfix5 :is(.tw-result-card,.mag-result-card,.ew-result-card,.result-standard) .ob{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.15fr) minmax(8ch,auto)!important;
+  align-items:center!important;
+  gap:10px!important;
+  min-width:0!important;
+  overflow:hidden!important;
+}
+body.tc-app.tc-ui-bugfix5 :is(.tw-result-card,.mag-result-card,.ew-result-card,.result-standard) .ob-title{
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  font-size:var(--tcp-result-title-fit)!important;
+  line-height:1.08!important;
+  letter-spacing:-.015em!important;
+}
+body.tc-app.tc-ui-bugfix5 :is(.tw-result-card,.mag-result-card,.ew-result-card,.result-standard) .out-val{
+  justify-self:end!important;
+  text-align:right!important;
+  white-space:nowrap!important;
+  min-width:0!important;
+  font-size:var(--tcp-result-value-fit)!important;
+  line-height:1!important;
+  letter-spacing:.025em!important;
+}
+body.tc-app.tc-ui-bugfix5 :is(.tw-result-card,.mag-result-card,.ew-result-card,.result-standard) .out-val .u{
+  font-size:clamp(12px,3.2vw,15px)!important;
+  margin-left:4px!important;
+  opacity:.58!important;
+}
+body.tc-app.tc-ui-bugfix5 #tab-trinkwasser .tw-result-card .ob{
+  grid-template-columns:minmax(0,1fr) minmax(7.5ch,auto)!important;
+  padding:14px 16px!important;
+}
+body.tc-app.tc-ui-bugfix5 #tab-trinkwasser .tw-result-card .ob-title{
+  font-size:clamp(12px,3.05vw,15px)!important;
+}
+body.tc-app.tc-ui-bugfix5 #tab-trinkwasser .tw-result-card .out-val{
+  font-size:clamp(21px,5.35vw,28px)!important;
+}
+@media (max-width:380px){
+  body.tc-app.tc-ui-bugfix5 :is(.tw-result-card,.mag-result-card,.ew-result-card,.result-standard) .ob{
+    grid-template-columns:minmax(0,.95fr) minmax(6.8ch,auto)!important;
+    gap:8px!important;
+  }
+  body.tc-app.tc-ui-bugfix5 :is(.tw-result-card,.mag-result-card,.ew-result-card,.result-standard) .out-val{font-size:21px!important;}
+  body.tc-app.tc-ui-bugfix5 :is(.tw-result-card,.mag-result-card,.ew-result-card,.result-standard) .ob-title{font-size:12px!important;}
+}

@@ -113,12 +113,18 @@ function calcEntwaesserung() {
 
 function renderEntwaesserung(r) {
   const set = (id, txt) => { const el = ewGet(id); if (el) el.textContent = txt; };
-  set('ew-du-total', ewFmt(r.duTotal, 1));
-  set('ew-qww', ewFmt(r.qww, 2));
-  set('ew-dim-anschluss', r.dims.anschluss);
-  set('ew-dim-sammel', r.dims.sammel);
-  set('ew-dim-fall', r.dims.fall);
-  set('ew-dim-grund', r.dims.grund);
+  const agg = ewAggregateStraenge();
+  const totalDu = (Number(agg.duTotal) || 0) + (Number(r.duTotal) || 0);
+  const totalQww = (Number(agg.qwwTotal) || 0) + (Number(r.qww) || 0);
+  const displayDims = ewRecommendedPipe(totalQww, totalDu);
+  const display = totalDu > 0 ? { duTotal: totalDu, qww: totalQww, dims: displayDims } : r;
+
+  set('ew-du-total', ewFmt(display.duTotal, 1));
+  set('ew-qww', ewFmt(display.qww, 2));
+  set('ew-dim-anschluss', display.dims.anschluss);
+  set('ew-dim-sammel', display.dims.sammel);
+  set('ew-dim-fall', display.dims.fall);
+  set('ew-dim-grund', display.dims.grund);
   set('ew-k-label', `K = ${ewFmt(r.k, 2)} · ${r.useLabel}`);
 
   const detail = ewGet('ew-detail');
