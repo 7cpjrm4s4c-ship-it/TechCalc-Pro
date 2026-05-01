@@ -1640,3 +1640,39 @@ body.tc-app #tab-flow .result--heat{border:1px solid rgba(var(--heat-rgb),.58)!i
 body.tc-app #tab-flow .result--heat .out-val{color:#ffb28d!important}body.tc-app #tab-flow .result--cool .out-val{color:#8ee8ff!important}
 body.tc-app #tab-flow .out-row:first-of-type .out-val{font-size:var(--ui-result-main-size)!important;font-weight:820!important;letter-spacing:.035em!important;line-height:.96!important}body.tc-app #tab-flow .out-row:nth-of-type(2) .out-val{font-size:var(--ui-result-sub-size)!important;font-weight:780!important;opacity:.92!important}body.tc-app #tab-flow .out-val .u{font-size:var(--ui-result-meta-size)!important;font-weight:520!important;opacity:.54!important}
 @media(min-width:900px){body.tc-app #tab-flow .out-grid{display:grid!important;grid-template-columns:1fr 1fr!important}}
+
+/* UI SYSTEM V2 — UI-2 targeted refinements */
+body.tc-app .tcp-fluid-card .gl-sel{font-size:calc(var(--ui-input-size) - 2px)!important;}
+body.tc-app .tcp-fluid-card .slbl{font-size:calc(var(--ui-label-size) - 2px)!important;}
+
+body.tc-app #tab-flow .hc-result-luft-style .hc-result-list{display:flex!important;flex-direction:column!important;gap:var(--ui-grid-gap)!important;}
+body.tc-app #tab-flow .hc-result-air{position:relative!important;min-height:0!important;padding:18px!important;border-radius:24px!important;display:block!important;overflow:hidden!important;}
+body.tc-app #tab-flow .hc-result-head{display:flex!important;align-items:center!important;gap:10px!important;margin-bottom:20px!important;font-family:var(--ui-font)!important;font-size:12px!important;font-weight:840!important;letter-spacing:.16em!important;text-transform:uppercase!important;color:rgba(255,255,255,.52)!important;}
+body.tc-app #tab-flow .hc-result-main-label{font-family:var(--ui-font)!important;font-size:12px!important;font-weight:820!important;letter-spacing:.13em!important;text-transform:uppercase!important;color:rgba(255,255,255,.48)!important;margin-bottom:8px!important;}
+body.tc-app #tab-flow .hc-result-main-value{font-family:var(--fm,ui-monospace,SFMono-Regular,Menlo,monospace)!important;font-size:clamp(34px,8.8vw,50px)!important;font-weight:780!important;line-height:1!important;letter-spacing:.02em!important;}
+body.tc-app #tab-flow .hc-result-main-value span{font-size:clamp(13px,3.4vw,17px)!important;font-weight:500!important;color:rgba(255,255,255,.42)!important;margin-left:4px!important;}
+body.tc-app #tab-flow .result--heat .hc-result-main-value,body.tc-app #tab-flow .result--heat .hc-result-sub,body.tc-app #tab-flow .result--heat .hc-result-metrics strong{color:#ffb28d!important;}
+body.tc-app #tab-flow .result--cool .hc-result-main-value,body.tc-app #tab-flow .result--cool .hc-result-sub,body.tc-app #tab-flow .result--cool .hc-result-metrics strong{color:#8ee8ff!important;}
+body.tc-app #tab-flow .hc-result-sub{font-family:var(--fm,ui-monospace,SFMono-Regular,Menlo,monospace)!important;font-size:14px!important;margin-top:6px!important;opacity:.78!important;}
+body.tc-app #tab-flow .hc-result-metrics{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important;margin-top:18px!important;padding-top:14px!important;border-top:1px solid rgba(255,255,255,.10)!important;}
+body.tc-app #tab-flow .hc-result-metrics span{display:block!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-family:var(--ui-font)!important;font-size:11px!important;font-weight:800!important;letter-spacing:.06em!important;color:rgba(255,255,255,.42)!important;margin-bottom:4px!important;}
+body.tc-app #tab-flow .hc-result-metrics strong{display:block!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-family:var(--fm,ui-monospace,SFMono-Regular,Menlo,monospace)!important;font-size:14px!important;font-weight:780!important;}
+body.tc-app #tab-flow .hc-legacy-out{display:none!important;}
+@media(min-width:900px){body.tc-app #tab-flow .hc-result-luft-style .hc-result-list{display:grid!important;grid-template-columns:1fr 1fr!important;}}
+
+body.tc-app .pipe-material-card,body.tc-app .pipe-design-card,body.tc-app .pipe-recommendation-card{width:100%!important;}
+body.tc-app .pipe-material-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;margin-top:12px!important;}
+body.tc-app .pipe-material-btn{min-height:44px!important;border-radius:16px!important;border:1px solid rgba(255,255,255,.12)!important;background:rgba(255,255,255,.055)!important;color:rgba(255,255,255,.62)!important;font-family:var(--ui-font)!important;font-size:13px!important;font-weight:780!important;letter-spacing:.01em!important;}
+body.tc-app .pipe-material-btn.active{color:#d8ecff!important;border-color:rgba(99,169,255,.62)!important;background:rgba(99,169,255,.14)!important;box-shadow:0 0 22px rgba(99,169,255,.12),inset 0 1px 0 rgba(255,255,255,.08)!important;}
+body.tc-app .pipe-design-card .info-txt strong{color:var(--t2)!important;}
+body.tc-app .pipe-recommendation-card{display:flex!important;flex-direction:column!important;gap:var(--ui-grid-gap)!important;}
+body.tc-app .pipe-section{margin:0!important;}
+body.tc-app .pipe-section .psec{margin-bottom:10px!important;}
+body.tc-app .pipe-section--heat .psec-lbl{color:var(--heat-t,var(--heat))!important;}
+body.tc-app .pipe-section--cool .psec-lbl{color:var(--cold-t,var(--cool))!important;}
+body.tc-app .pipe-pair{width:100%!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;}
+body.tc-app .pipe-pair.pipe-pair--single{grid-template-columns:1fr!important;}
+body.tc-app .pipe-pair.pipe-pair--single .pm{width:100%!important;}
+body.tc-app .pipe-dn-block{margin-bottom:14px!important;}
+body.tc-app .pipe-dn-title{font-family:var(--ui-font)!important;font-size:11px!important;font-weight:820!important;letter-spacing:.13em!important;text-transform:uppercase!important;color:var(--t3)!important;margin-bottom:7px!important;}
+@media(max-width:480px){body.tc-app .pipe-material-grid{grid-template-columns:1fr!important;}body.tc-app .pipe-pair{grid-template-columns:1fr!important;}}

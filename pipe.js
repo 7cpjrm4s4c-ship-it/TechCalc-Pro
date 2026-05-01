@@ -34,6 +34,20 @@ const ES  = 0.046e-3;    // m      Rauheit Stahl
 const EM  = 0.015e-3;    // m      Rauheit Mapress Edelstahl
 const DP0 = 100;         // Pa/m   Standard-Auslegungsgrenzwert
 const MAPRESS_MAX_DN = 100;
+let PIPE_MATERIAL = 'all';
+
+function currentPipeMaterial() {
+  return PIPE_MATERIAL || 'all';
+}
+
+function setPipeMaterial(value) {
+  PIPE_MATERIAL = ['all', 'steel', 'mapress'].includes(value) ? value : 'all';
+  document.querySelectorAll('[data-pipe-material]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.pipeMaterial === PIPE_MATERIAL);
+  });
+  calcPipeTab();
+  window.TCP_HC?.calcAll?.();
+}
 
 /* ───────────────────────────────────────
    HYDRAULIK — Darcy-Weisbach + Colebrook-White
@@ -114,6 +128,7 @@ function renderPair(cid, vol, mx, bestCls) {
   const el = $(cid); if (!el) return;
   if (!vol) { el.innerHTML = ''; return; }
 
+  const material = currentPipeMaterial();
   const bS = PIPES.findIndex(p => pdrop(vol, p[1], ES).dp <= mx);
   const bM = PIPES.findIndex(p => p[5] !== null && pdrop(vol, p[5], EM).dp <= mx);
   const iS = bS < 0 ? PIPES.length - 1 : bS;
@@ -121,8 +136,12 @@ function renderPair(cid, vol, mx, bestCls) {
     ? PIPES.findIndex(p => p[0] === MAPRESS_MAX_DN)
     : bM;
 
-  el.innerHTML = pCardSteel(PIPES[iS], vol, mx, bS >= 0, bestCls)
-               + pCardMapress(PIPES[iM], vol, mx, bM >= 0, bestCls);
+  const cards = [];
+  if (material === 'all' || material === 'steel') cards.push(pCardSteel(PIPES[iS], vol, mx, bS >= 0, bestCls));
+  if (material === 'all' || material === 'mapress') cards.push(pCardMapress(PIPES[iM], vol, mx, bM >= 0, bestCls));
+
+  el.classList.toggle('pipe-pair--single', cards.length === 1);
+  el.innerHTML = cards.join('');
 }
 
 /* ───────────────────────────────────────
@@ -146,18 +165,17 @@ function calcPipeTab() {
                                   bM < 0 ? PIPES.length - 1 : bM) - 1);
   const hi = Math.min(PIPES.length - 1, Math.max(bS < 0 ? PIPES.length - 1 : bS,
                                                   bM < 0 ? PIPES.length - 1 : bM) + 1);
+  const material = currentPipeMaterial();
   let h = '';
   for (let i = lo; i <= hi; i++) {
     const p = PIPES[i];
-    h += `<div style="margin-bottom:12px">
-      <div style="font-family:Arial,sans-serif;font-size:11px;font-weight:700;
-                  letter-spacing:.13em;text-transform:uppercase;color:var(--t3);margin-bottom:7px">
-        DN ${p[0]}
-      </div>
-      <div class="pipe-pair">
-        ${pCardSteel(p, vol, mx, i === bS)}
-        ${pCardMapress(p, vol, mx, i === bM)}
-      </div>
+    const cards = [];
+    if (material === 'all' || material === 'steel') cards.push(pCardSteel(p, vol, mx, i === bS));
+    if (material === 'all' || material === 'mapress') cards.push(pCardMapress(p, vol, mx, i === bM));
+
+    h += `<div class="pipe-dn-block">
+      <div class="pipe-dn-title">DN ${p[0]}</div>
+      <div class="pipe-pair ${cards.length === 1 ? 'pipe-pair--single' : ''}">${cards.join('')}</div>
     </div>`;
   }
   el.innerHTML = h;
@@ -170,9 +188,18 @@ window.TCP_PIPE = {
   pdrop,
   renderPair,
   calcPipeTab,
+  currentPipeMaterial,
+  setPipeMaterial,
 };
 
 document.addEventListener('DOMContentLoaded', () => {
   ['p-vol', 'p-dp'].forEach(id => $(id)?.addEventListener('input', calcPipeTab));
+  document.addEventListener('click', ev => {
+    const btn = ev.target?.closest?.('[data-pipe-material]');
+    if (!btn) return;
+    ev.preventDefault();
+    setPipeMaterial(btn.dataset.pipeMaterial);
+  });
+  setPipeMaterial('all');
   calcPipeTab();
 });

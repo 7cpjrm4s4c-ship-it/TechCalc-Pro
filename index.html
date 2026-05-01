@@ -169,7 +169,7 @@
   <div class="col-L">
 
     <!-- Medium -->
-    <div class="gc tcp-card">
+    <div class="gc tcp-card tcp-fluid-card">
       <div class="slbl">W&auml;rmetr&auml;ger</div>
       <select class="gl-sel" id="medium">
         <option value="water">Wasser</option>
@@ -288,19 +288,35 @@
     </div>
 
     <!-- Output -->
-    <div class="out-card tcp-card tcp-result-card tcp-result-card--thermal">
+    <div class="out-card tcp-card tcp-result-card tcp-result-card--thermal hc-result-luft-style">
       <div class="slbl" id="out-card-slbl">Ergebnis &mdash; Massenstrom</div>
-      <div class="out-grid">
-        <div class="ob ob-h result--heat">
-          <div class="ob-title"><div class="dot dot-h"></div><span class="ob-title-lbl">Heizung</span></div>
-          <div class="out-row"><div class="out-key" id="h-out-key1">kg/h</div><div class="out-val" id="h-out-v1">&ndash;<span class="u" id="h-out-u1">kg/h</span></div></div>
-          <div class="out-row"><div class="out-key" id="h-out-key2">m&sup3;/h</div><div class="out-val" id="h-out-v2">&ndash;<span class="u" id="h-out-u2">m&sup3;/h</span></div></div>
-        </div>
-        <div class="ob ob-c result--cool">
-          <div class="ob-title"><div class="dot dot-c"></div><span class="ob-title-lbl">K&auml;lte</span></div>
-          <div class="out-row"><div class="out-key" id="k-out-key1">kg/h</div><div class="out-val" id="k-out-v1">&ndash;<span class="u" id="k-out-u1">kg/h</span></div></div>
-          <div class="out-row"><div class="out-key" id="k-out-key2">m&sup3;/h</div><div class="out-val" id="k-out-v2">&ndash;<span class="u" id="k-out-u2">m&sup3;/h</span></div></div>
-        </div>
+      <div class="hc-result-list">
+        <section class="hc-result-air result--heat" id="h-result-card">
+          <div class="hc-result-head"><div class="dot dot-h"></div><span>Heizung</span></div>
+          <div class="hc-result-main-label" id="h-main-lbl">Volumenstrom V&#x307;</div>
+          <div class="hc-result-main-value" id="h-main-val">&ndash;<span id="h-main-unit"> m&sup3;/h</span></div>
+          <div class="hc-result-sub" id="h-main-sub"></div>
+          <div class="hc-result-metrics">
+            <div><span>kW</span><strong id="h-metric-kw">&ndash;</strong></div>
+            <div><span>V&#x307; m&sup3;/h</span><strong id="h-metric-v">&ndash;</strong></div>
+            <div><span>&Delta;t K</span><strong id="h-metric-dt">&ndash;</strong></div>
+            <div><span>m&#775; kg/h</span><strong id="h-metric-mh">&ndash;</strong></div>
+          </div>
+          <div class="hc-legacy-out" aria-hidden="true"><span id="h-out-key1"></span><span id="h-out-v1"><span class="u" id="h-out-u1"></span></span><span id="h-out-key2"></span><span id="h-out-v2"><span class="u" id="h-out-u2"></span></span></div>
+        </section>
+        <section class="hc-result-air result--cool" id="k-result-card">
+          <div class="hc-result-head"><div class="dot dot-c"></div><span>K&auml;lte</span></div>
+          <div class="hc-result-main-label" id="k-main-lbl">Volumenstrom V&#x307;</div>
+          <div class="hc-result-main-value" id="k-main-val">&ndash;<span id="k-main-unit"> m&sup3;/h</span></div>
+          <div class="hc-result-sub" id="k-main-sub"></div>
+          <div class="hc-result-metrics">
+            <div><span>kW</span><strong id="k-metric-kw">&ndash;</strong></div>
+            <div><span>V&#x307; m&sup3;/h</span><strong id="k-metric-v">&ndash;</strong></div>
+            <div><span>&Delta;t K</span><strong id="k-metric-dt">&ndash;</strong></div>
+            <div><span>m&#775; kg/h</span><strong id="k-metric-mh">&ndash;</strong></div>
+          </div>
+          <div class="hc-legacy-out" aria-hidden="true"><span id="k-out-key1"></span><span id="k-out-v1"><span class="u" id="k-out-u1"></span></span><span id="k-out-key2"></span><span id="k-out-v2"><span class="u" id="k-out-u2"></span></span></div>
+        </section>
       </div>
     </div>
 
@@ -317,32 +333,41 @@
   <!-- RIGHT column — pipe recommendation -->
   <div class="col-R">
 
-    <div class="rcol-hdr">Rohrdimensionsempfehlung</div>
+    <div class="rcol-hdr">Rohrdimensionierung</div>
 
-    <div class="gc tcp-card tcp-card--compact">
-      <div class="slbl">Auslegung &mdash; max. 100 Pa/m</div>
+    <div class="gc tcp-card pipe-material-card">
+      <div class="slbl">Rohmaterial</div>
+      <div class="pipe-material-grid" role="group" aria-label="Rohmaterial ausw&auml;hlen">
+        <button type="button" class="pipe-material-btn active" data-pipe-material="all">Alle</button>
+        <button type="button" class="pipe-material-btn" data-pipe-material="steel">Stahl</button>
+        <button type="button" class="pipe-material-btn" data-pipe-material="mapress">Mapress Edelstahl</button>
+      </div>
+    </div>
+
+    <div class="gc tcp-card tcp-card--compact pipe-design-card">
+      <div class="slbl">Empfehlung &mdash; max. 100 Pa/m</div>
       <div class="info-txt">
         Darcy-Weisbach &middot; Colebrook-White &middot; Wasser 60&thinsp;&deg;C<br/>
         &epsilon; Stahl 0,046&thinsp;mm &middot; &epsilon; Mapress 0,015&thinsp;mm<br/>
         &le;&thinsp;DN50: DIN EN 10255 Reihe M &middot; &ge;&thinsp;DN65: DIN EN 10220<br/>
-        Mapress Edelstahl 1.4401 (DIN EN 10312): <strong style="color:var(--t2)">bis max. DN 100</strong>
+        Mapress Edelstahl 1.4401 (DIN EN 10312): <strong>bis max. DN 100</strong>
       </div>
     </div>
 
     <!-- Dynamic pipe results -->
-    <div id="pi-card" style="display:none; flex-shrink:0">
-      <div id="pi-h" style="display:none; margin-bottom:14px">
+    <div id="pi-card" class="pipe-recommendation-card">
+      <div id="pi-h" class="pipe-section pipe-section--heat">
         <div class="psec">
           <div class="dot dot-h"></div>
-          <span class="psec-lbl" style="color:var(--heat-t)">Heizung</span>
+          <span class="psec-lbl">Heizung</span>
           <span class="psec-vol" id="pi-h-vol"></span>
         </div>
         <div class="pipe-pair" id="pi-h-pair"></div>
       </div>
-      <div id="pi-k" style="display:none">
+      <div id="pi-k" class="pipe-section pipe-section--cool">
         <div class="psec">
           <div class="dot dot-c"></div>
-          <span class="psec-lbl" style="color:var(--cold-t)">K&auml;lte</span>
+          <span class="psec-lbl">K&auml;lte</span>
           <span class="psec-vol" id="pi-k-vol"></span>
         </div>
         <div class="pipe-pair" id="pi-k-pair"></div>
@@ -1217,15 +1242,15 @@
 </div>
 
 <script>window.TECHCALC_BUILD = "20260430-UI-System-V2-UI1";</script>
-<script src="./app.js?v=phase17-rc7"></script>
-<script src="./units.js?v=phase17-rc7"></script>
-<script src="./pipe.js?v=phase17-rc7"></script>
-<script src="./heating-cooling.js?v=phase17-rc7"></script>
-<script src="./ventilation.js?v=phase17-rc7"></script>
-<script src="./wrg-mischluft.js?v=phase17-rc7"></script>
-<script src="./trinkwasser.js?v=phase17-rc7"></script>
-<script src="./mag.js?v=phase17-rc7"></script>
-<script src="./entwaesserung.js?v=phase17-rc7"></script>
+<script src="./app.js?v=ui-system-v2-ui2"></script>
+<script src="./units.js?v=ui-system-v2-ui2"></script>
+<script src="./pipe.js?v=ui-system-v2-ui2"></script>
+<script src="./heating-cooling.js?v=ui-system-v2-ui2"></script>
+<script src="./ventilation.js?v=ui-system-v2-ui2"></script>
+<script src="./wrg-mischluft.js?v=ui-system-v2-ui2"></script>
+<script src="./trinkwasser.js?v=ui-system-v2-ui2"></script>
+<script src="./mag.js?v=ui-system-v2-ui2"></script>
+<script src="./entwaesserung.js?v=ui-system-v2-ui2"></script>
 
 <script>
 /* ── Cloudflare Worker Analytics ── */
@@ -1281,8 +1306,8 @@
 })();
 </script>
 
-<script src="./pdf-export.js?v=phase17-rc7"></script>
-<script src="./hx-engine.js?v=phase17-rc7"></script>
+<script src="./pdf-export.js?v=ui-system-v2-ui2"></script>
+<script src="./hx-engine.js?v=ui-system-v2-ui2"></script>
    
 </body>
 </html>
