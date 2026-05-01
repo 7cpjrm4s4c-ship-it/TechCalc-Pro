@@ -77,49 +77,67 @@ function dpCol(dp, mx) {
   return dp <= mx * 0.75 ? 'var(--ok)' : dp <= mx ? 'var(--warn)' : 'var(--danger)';
 }
 
+function dpState(dp, mx) {
+  return dp <= mx * 0.75 ? 'ok' : dp <= mx ? 'warn' : 'bad';
+}
+
+function pipeModeClass(bestCls) {
+  if (bestCls === 'best-h') return 'pipe-card--heat';
+  if (bestCls === 'best-k') return 'pipe-card--cool';
+  return 'pipe-card--neutral';
+}
+
 /* ───────────────────────────────────────
    ROHR-KARTEN HTML
 ─────────────────────────────────────── */
 function pCardSteel(p, vol, mx, isBest, bestCls) {
   bestCls = bestCls || 'best';
   const { dp, v } = pdrop(vol, p[1], ES);
-  const col   = dpCol(dp, mx);
+  const state = dpState(dp, mx);
   const pct   = Math.min(100, dp / mx * 100).toFixed(1);
-  const cls   = isBest ? bestCls : dp > mx ? 'over' : '';
-  const star  = isBest ? '<span class="star">\u2605</span>' : '';
+  const cls   = [
+    'pm', 'pipe-card', pipeModeClass(bestCls),
+    isBest ? 'is-recommended' : '', isBest ? bestCls : '',
+    dp > mx ? 'over' : '', `pipe-card--${state}`
+  ].filter(Boolean).join(' ');
+  const star  = isBest ? '<span class="star" aria-label="Empfohlen">★</span>' : '';
   const dpTxt = dp < 10 ? dp.toFixed(1) : Math.round(dp);
-  return `<div class="pm ${cls}">
+  return `<div class="${cls}">
     <div class="pm-std">${p[4]} ${star}</div>
-    <div class="pm-dn">DN\u2009${p[0]}</div>
-    <div class="pm-dim">\u00d8\u2009${p[2]}\u202f\u00d7\u202f${p[3]}\u202fmm<br>d\u1d62\u2009${p[1].toFixed(1)}\u202fmm</div>
-    <div class="pm-r"><span class="pm-k">\u0394p/m</span><span class="pm-v" style="color:${col}">${dpTxt}<span style="font-size:11px;color:var(--t3)"> Pa/m</span></span></div>
-    <div class="pm-r"><span class="pm-k">v</span><span class="pm-v" style="font-size:11px;color:var(--t2)">${v.toFixed(2)}\u202fm/s</span></div>
-    <div class="dpbar"><div class="dpfill" style="width:${pct}%;background:${col}"></div></div>
+    <div class="pm-dn">DN ${p[0]}</div>
+    <div class="pm-dim">Ø ${p[2]} × ${p[3]} mm<br>dᵢ ${p[1].toFixed(1)} mm</div>
+    <div class="pm-r"><span class="pm-k">Δp/m</span><span class="pm-v pipe-dp pipe-dp--${state}">${dpTxt}<span class="pm-unit"> Pa/m</span></span></div>
+    <div class="pm-r"><span class="pm-k">v</span><span class="pm-v pipe-velocity">${v.toFixed(2)} m/s</span></div>
+    <div class="dpbar pipe-bar"><div class="dpfill pipe-bar-fill pipe-bar-fill--${state}" style="width:${pct}%"></div></div>
   </div>`;
 }
 
 function pCardMapress(p, vol, mx, isBest, bestCls) {
   bestCls = bestCls || 'best';
   if (p[0] > MAPRESS_MAX_DN || p[5] === null) {
-    return `<div class="pm na">
+    return `<div class="pm pipe-card pipe-card--neutral na">
       <div class="pm-std mp">Mapress Edelstahl</div>
-      <div class="pm-dn">DN\u2009${p[0]}</div>
-      <div class="pm-na-txt">Nicht verf\u00fcgbar<br/>(max. DN\u2009${MAPRESS_MAX_DN})</div>
+      <div class="pm-dn">DN ${p[0]}</div>
+      <div class="pm-na-txt">Nicht verfügbar<br/>(max. DN ${MAPRESS_MAX_DN})</div>
     </div>`;
   }
   const { dp, v } = pdrop(vol, p[5], EM);
-  const col   = dpCol(dp, mx);
+  const state = dpState(dp, mx);
   const pct   = Math.min(100, dp / mx * 100).toFixed(1);
-  const cls   = isBest ? bestCls : dp > mx ? 'over' : '';
-  const star  = isBest ? '<span class="star">\u2605</span>' : '';
+  const cls   = [
+    'pm', 'pipe-card', pipeModeClass(bestCls),
+    isBest ? 'is-recommended' : '', isBest ? bestCls : '',
+    dp > mx ? 'over' : '', `pipe-card--${state}`
+  ].filter(Boolean).join(' ');
+  const star  = isBest ? '<span class="star" aria-label="Empfohlen">★</span>' : '';
   const dpTxt = dp < 10 ? dp.toFixed(1) : Math.round(dp);
-  return `<div class="pm ${cls}">
+  return `<div class="${cls}">
     <div class="pm-std mp">Mapress Edelstahl ${star}</div>
-    <div class="pm-dn">DN\u2009${p[0]}</div>
-    <div class="pm-dim">\u00d8\u2009${p[6]}\u202f\u00d7\u202f${p[7]}\u202fmm<br>d\u1d62\u2009${p[5].toFixed(1)}\u202fmm</div>
-    <div class="pm-r"><span class="pm-k">\u0394p/m</span><span class="pm-v" style="color:${col}">${dpTxt}<span style="font-size:11px;color:var(--t3)"> Pa/m</span></span></div>
-    <div class="pm-r"><span class="pm-k">v</span><span class="pm-v" style="font-size:11px;color:var(--t2)">${v.toFixed(2)}\u202fm/s</span></div>
-    <div class="dpbar"><div class="dpfill" style="width:${pct}%;background:${col}"></div></div>
+    <div class="pm-dn">DN ${p[0]}</div>
+    <div class="pm-dim">Ø ${p[6]} × ${p[7]} mm<br>dᵢ ${p[5].toFixed(1)} mm</div>
+    <div class="pm-r"><span class="pm-k">Δp/m</span><span class="pm-v pipe-dp pipe-dp--${state}">${dpTxt}<span class="pm-unit"> Pa/m</span></span></div>
+    <div class="pm-r"><span class="pm-k">v</span><span class="pm-v pipe-velocity">${v.toFixed(2)} m/s</span></div>
+    <div class="dpbar pipe-bar"><div class="dpfill pipe-bar-fill pipe-bar-fill--${state}" style="width:${pct}%"></div></div>
   </div>`;
 }
 
@@ -200,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ev.preventDefault();
     setPipeMaterial(btn.dataset.pipeMaterial);
   });
-  0 0'pipe-material')?.addEventListener('change', ev => setPipeMaterial(ev.target.value));
-  setPipeMaterial(0 0'pipe-material')?.value || 'all');
+  $('pipe-material')?.addEventListener('change', ev => setPipeMaterial(ev.target.value));
+  setPipeMaterial($('pipe-material')?.value || 'all');
   calcPipeTab();
 });
