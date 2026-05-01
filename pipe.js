@@ -200,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ev.preventDefault();
     setPipeMaterial(btn.dataset.pipeMaterial);
   });
-  setPipeMaterial('all');
+  0 0'pipe-material')?.addEventListener('change', ev => setPipeMaterial(ev.target.value));
+  setPipeMaterial(0 0'pipe-material')?.value || 'all');
   calcPipeTab();
 });

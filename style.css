@@ -1676,3 +1676,47 @@ body.tc-app .pipe-pair.pipe-pair--single .pm{width:100%!important;}
 body.tc-app .pipe-dn-block{margin-bottom:14px!important;}
 body.tc-app .pipe-dn-title{font-family:var(--ui-font)!important;font-size:11px!important;font-weight:820!important;letter-spacing:.13em!important;text-transform:uppercase!important;color:var(--t3)!important;margin-bottom:7px!important;}
 @media(max-width:480px){body.tc-app .pipe-material-grid{grid-template-columns:1fr!important;}body.tc-app .pipe-pair{grid-template-columns:1fr!important;}}
+
+/* ═══════════════════════════════════════════════════════
+   UI SYSTEM V2 — UI3 Feinabstimmung Heizung/Kälte + Rohrmaterial
+═══════════════════════════════════════════════════════ */
+body.tc-app{
+  --ui-grid-gap:8px;
+  --ui-control-h:48px;
+  --ui-input-size:28px;
+  --ui-label-size:10px;
+  --ui-card-pad:14px;
+  --ui-field-radius:15px;
+  --ui-field-border:1px solid rgba(255,255,255,.18);
+}
+body.tc-app #tab-flow .tcp-fluid-card{padding:14px!important;}
+body.tc-app #tab-flow .tcp-fluid-card .slbl{font-size:calc(var(--ui-label-size) - 2px)!important;margin-bottom:8px!important;}
+body.tc-app #tab-flow .tcp-fluid-card .gl-sel,
+body.tc-app #tab-flow :is(.inp,.inp-sm){min-height:var(--ui-control-h)!important;font-size:calc(var(--ui-input-size) - 4px)!important;line-height:1.05!important;border-radius:var(--ui-field-radius)!important;border:var(--ui-field-border)!important;padding-block:8px!important;}
+body.tc-app #tab-flow .tcp-fluid-card .chips{gap:8px!important;margin-top:8px!important;}
+body.tc-app #tab-flow .tcp-fluid-card .chip{min-height:30px!important;padding:6px 10px!important;border-radius:10px!important;font-size:11px!important;}
+body.tc-app #tab-flow :is(.gc,.out-card,.pipe-section,.pipe-material-card,.pipe-design-card){padding:var(--ui-card-pad)!important;}
+body.tc-app #tab-flow :is(.twin,.hc-result-list,.pipe-recommendation-card,.col-L,.col-R){gap:var(--ui-grid-gap)!important;}
+body.tc-app #tab-flow .tcp-card--thermal{padding:14px!important;border-radius:22px!important;}
+body.tc-app #tab-flow .ptitle{display:flex!important;align-items:center!important;gap:10px!important;line-height:1!important;}
+body.tc-app #tab-flow .ptitle .dot{flex:0 0 auto!important;}
+body.tc-app #tab-flow .ptitle-lbl{display:inline-flex!important;align-items:center!important;line-height:1!important;transform:translateY(0)!important;}
+body.tc-app #tab-flow .modes{margin-top:8px!important;margin-bottom:8px!important;}
+body.tc-app #tab-flow .igrp{margin-top:8px!important;margin-bottom:0!important;}
+body.tc-app #tab-flow .iwrap{min-height:var(--ui-control-h)!important;}
+body.tc-app #tab-flow .hc-result-luft-style{padding:14px!important;}
+body.tc-app #tab-flow .hc-result-luft-style .slbl{margin-bottom:12px!important;}
+body.tc-app #tab-flow .hc-result-air{padding:14px!important;border-radius:20px!important;min-height:0!important;}
+body.tc-app #tab-flow .hc-result-head{margin-bottom:14px!important;font-size:11px!important;line-height:1.1!important;letter-spacing:.13em!important;}
+body.tc-app #tab-flow .hc-result-main-label{font-size:11px!important;line-height:1.1!important;letter-spacing:.11em!important;margin-bottom:4px!important;}
+body.tc-app #tab-flow .hc-result-main-value{font-size:34px!important;line-height:1!important;font-weight:760!important;letter-spacing:.01em!important;}
+body.tc-app #tab-flow .hc-result-main-value span{font-size:16px!important;font-weight:400!important;}
+body.tc-app #tab-flow .hc-result-sub{font-size:14px!important;margin-top:3px!important;}
+body.tc-app #tab-flow .hc-result-metrics{margin-top:14px!important;padding-top:12px!important;gap:8px!important;}
+body.tc-app #tab-flow .hc-result-metrics span{font-size:11px!important;margin-bottom:3px!important;}
+body.tc-app #tab-flow .hc-result-metrics strong{font-size:14px!important;}
+body.tc-app #tab-flow .pipe-material-card{width:100%!important;}
+body.tc-app #tab-flow .pipe-material-card .slbl{margin-bottom:8px!important;}
+body.tc-app #tab-flow .pipe-material-select{width:100%!important;min-height:var(--ui-control-h)!important;font-size:16px!important;border-radius:var(--ui-field-radius)!important;border:var(--ui-field-border)!important;padding:8px 40px 8px 12px!important;}
+body.tc-app #tab-flow .pipe-material-grid{display:none!important;}
+@media(min-width:900px){body.tc-app #tab-flow .hc-result-luft-style .hc-result-list{grid-template-columns:1fr 1fr!important;}}
