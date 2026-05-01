@@ -1974,3 +1974,124 @@ body.tc-app .pill-btn.active{color:#8fbeff!important;}
   body.tc-app .tab-inner{padding-inline:calc(14px + var(--sal,0px)) calc(14px + var(--sar,0px))!important;}
   body.tc-app :is(.tcp-card,.gc,.out-card,.hx-card){border-radius:24px!important;}
 }
+
+/* ═══════════════════════════════════════════════════════
+   UI SYSTEM V2 — UI6 Fine Tuning
+   Ziel: kleinere Inputs, konsistente Ergebnisgrößen, gleiche Card-Höhen.
+═══════════════════════════════════════════════════════ */
+body.tc-app{
+  --ui2-input:15px;
+  --ui2-control-h:42px;
+  --ui2-control-r:14px;
+  --ui2-field-pad-x:12px;
+  --ui2-grid-gap:8px;
+  --ui2-result-value:22px;
+  --ui2-result-label:14px;
+}
+
+/* 1–3: Inputs auf Switch-Schriftgröße, schmalere Controls/Rahmen */
+body.tc-app :is(.inp,.inp-sm,.gl-sel,.hx-input,.tzl-inp,select,input[type="number"],input[type="text"],textarea){
+  min-height:var(--ui2-control-h)!important;
+  border-radius:var(--ui2-control-r)!important;
+  padding-inline:var(--ui2-field-pad-x)!important;
+  font-size:var(--ui2-input)!important;
+  line-height:1.12!important;
+  border-width:1px!important;
+}
+body.tc-app :is(.iwrap,.iw){
+  min-height:var(--ui2-control-h)!important;
+  border-radius:var(--ui2-control-r)!important;
+}
+body.tc-app select:is(.gl-sel,.hx-input){
+  min-height:var(--ui2-control-h)!important;
+  font-size:var(--ui2-input)!important;
+  padding-inline:var(--ui2-field-pad-x) 34px!important;
+}
+body.tc-app .iunit{
+  font-size:var(--ui2-input)!important;
+  line-height:1.12!important;
+}
+body.tc-app :is(.tcp-switch-btn,.modes button,.seg button,.modebar button){
+  font-size:var(--ui2-input)!important;
+}
+
+/* 2: Trinkwasser-Ausgaben an MAG/Entwässerung angleichen */
+body.tc-app #tab-trinkwasser :is(.out-val,.unit-ro,.ui-result-value){
+  font-size:var(--ui2-result-value)!important;
+  line-height:1!important;
+  letter-spacing:.015em!important;
+  max-width:42vw!important;
+}
+body.tc-app #tab-trinkwasser :is(.ob-title,.out-key,.ui-result-title){
+  font-size:var(--ui2-result-label)!important;
+  line-height:1.12!important;
+}
+body.tc-app #tab-trinkwasser :is(.ob,.out-row,.tcp-result-row,.ui-result-row){
+  min-height:54px!important;
+  grid-template-columns:minmax(0,1fr) minmax(108px,max-content)!important;
+}
+
+/* 3: MAG-Eingabecards/Resultcards auf gleiche Höhe und sauberes Grid */
+body.tc-app #tab-mag :is(.tcp-layout,.module-grid,.calc-grid,.input-grid,.result-grid){
+  gap:8px!important;
+}
+body.tc-app #tab-mag :is(.tcp-card,.gc,.out-card){
+  align-self:stretch!important;
+}
+body.tc-app #tab-mag :is(.input-grid,.mag-grid,.form-grid){
+  align-items:stretch!important;
+}
+body.tc-app #tab-mag :is(.input-grid,.mag-grid,.form-grid) > *{
+  height:100%!important;
+}
+body.tc-app #tab-mag :is(.ob,.out-row,.tcp-result-row,.ui-result-row){
+  min-height:54px!important;
+}
+body.tc-app #tab-mag :is(.out-val,.unit-ro,.ui-result-value){
+  font-size:var(--ui2-result-value)!important;
+}
+
+/* 4: Rohrdimensionierungscards innerhalb einer Reihe gleich hoch */
+body.tc-app :is(.pipe-grid,.pipe-cards,.pipe-row,.pipe-section .cards-grid){
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  align-items:stretch!important;
+  gap:12px!important;
+}
+body.tc-app :is(.pipe-card,.pipe-card-v2){
+  height:100%!important;
+  min-height:150px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:space-between!important;
+}
+body.tc-app :is(.pipe-card,.pipe-card-v2) .pipe-bar{
+  margin-top:auto!important;
+}
+@media(max-width:520px){
+  body.tc-app :is(.pipe-grid,.pipe-cards,.pipe-row,.pipe-section .cards-grid){
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+  body.tc-app :is(.pipe-card,.pipe-card-v2){
+    min-height:142px!important;
+  }
+}
+
+/* 5: Einheiten-Ausgabe besser lesbar */
+body.tc-app #tab-unit :is(.unit-ro,.ui-result-value,.out-val,#unitResult){
+  color:#7ff0b9!important;
+  opacity:1!important;
+  text-shadow:0 0 14px rgba(87,235,169,.24)!important;
+  font-weight:820!important;
+}
+body.tc-app #tab-unit :is(.unit-ro[aria-disabled="true"],.ui-result-value[aria-disabled="true"]){
+  opacity:.72!important;
+}
+body.tc-app #tab-unit :is(.ob,.out-row,.tcp-result-row,.ui-result-row,.unit-row){
+  border-color:rgba(94,234,172,.22)!important;
+  background:linear-gradient(180deg,rgba(24,110,78,.14),rgba(255,255,255,.032))!important;
+}
+body.tc-app #tab-unit :is(.ob-title,.out-key,.ui-result-title,.unit-label){
+  color:rgba(255,255,255,.76)!important;
+}
