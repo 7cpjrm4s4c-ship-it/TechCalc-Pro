@@ -836,3 +836,21 @@ window.addEventListener('appinstalled', () => {
 });
 
 /* Einheitenrechner ausgelagert nach units.js (Phase 16). */
+
+
+/* Phase 18: body state sync for layered UI */
+(function tcpSyncBodyOverlayState(){
+  function sync(){
+    const body = document.body;
+    if (!body) return;
+    const plusOpen = !!document.querySelector('.plus-sheet.open,.plus-overlay.open');
+    const menuOpen = !!document.querySelector('.menu-sheet.open,.nav-sheet.open,.fav-editor.open,.favorites-editor.open');
+    body.classList.toggle('plus-open', plusOpen);
+    body.classList.toggle('sheet-open', plusOpen || menuOpen);
+    body.classList.toggle('menu-open', menuOpen);
+  }
+  document.addEventListener('click', () => setTimeout(sync, 0), true);
+  document.addEventListener('change', () => setTimeout(sync, 0), true);
+  document.addEventListener('DOMContentLoaded', sync);
+  setInterval(sync, 500);
+})();
