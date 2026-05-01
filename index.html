@@ -192,11 +192,11 @@
     </div>
 
     <!-- Heiz/Kühl Switch -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;background:rgba(0,0,0,.40);border:1px solid var(--gb-soft);border-radius:var(--r-l);padding:4px">
-      <button class="hk-btn on-h" id="flow-btn-h" onclick="flowSwitch('h')">
+    <div class="tcp-switch tcp-switch--heatcool" data-ui="heatcool-switch">
+      <button class="hk-btn tcp-switch-btn tcp-switch-btn--heat on-h" id="flow-btn-h" type="button">
         <div class="dot dot-h"></div>Heizung
       </button>
-      <button class="hk-btn" id="flow-btn-k" onclick="flowSwitch('k')">
+      <button class="hk-btn tcp-switch-btn tcp-switch-btn--cool" id="flow-btn-k" type="button">
         <div class="dot dot-c"></div>K&auml;lte
       </button>
     </div>
@@ -206,7 +206,7 @@
 
       <!-- ── Heizung ── -->
       <div id="flow-panel-h">
-      <div class="gc gc-h">
+      <div class="gc gc-h tcp-card--thermal tcp-card--heat">
         <div class="ptitle"><div class="dot dot-h"></div><span class="ptitle-lbl">Heizung</span></div>
         <div class="modes">
           <button class="mbtn active" data-p="h" data-v="ms">&#7745;&nbsp;Massenstrom</button>
@@ -218,8 +218,8 @@
           <div class="ilbl ilbl-row">
             <span>Heizlast</span>
             <div class="unit-pill">
-              <button class="up-btn active" id="h-wu"  onclick="setQUnit('h','W')">W</button>
-              <button class="up-btn"        id="h-kwu" onclick="setQUnit('h','kW')">kW</button>
+              <button class="up-btn active" id="h-wu"  type="button">W</button>
+              <button class="up-btn"        id="h-kwu" type="button">kW</button>
             </div>
           </div>
           <div class="iwrap">
@@ -248,7 +248,7 @@
       </div><!-- /flow-panel-h -->
       <!-- ── Kälte ── -->
       <div id="flow-panel-k" style="display:none">
-      <div class="gc gc-c">
+      <div class="gc gc-c tcp-card--thermal tcp-card--cool">
         <div class="ptitle"><div class="dot dot-c"></div><span class="ptitle-lbl">K&auml;lte</span></div>
         <div class="modes">
           <button class="mbtn active" data-p="k" data-v="ms">&#7745;&nbsp;Massenstrom</button>
@@ -259,8 +259,8 @@
           <div class="ilbl ilbl-row">
             <span>Kühllast</span>
             <div class="unit-pill">
-              <button class="up-btn active" id="k-wu"  onclick="setQUnit('k','W')">W</button>
-              <button class="up-btn"        id="k-kwu" onclick="setQUnit('k','kW')">kW</button>
+              <button class="up-btn active" id="k-wu"  type="button">W</button>
+              <button class="up-btn"        id="k-kwu" type="button">kW</button>
             </div>
           </div>
           <div class="iwrap">
@@ -288,15 +288,15 @@
     </div>
 
     <!-- Output -->
-    <div class="out-card tcp-card tcp-result-card">
+    <div class="out-card tcp-card tcp-result-card tcp-result-card--thermal">
       <div class="slbl" id="out-card-slbl">Ergebnis &mdash; Massenstrom</div>
       <div class="out-grid">
-        <div class="ob ob-h">
+        <div class="ob ob-h result--heat">
           <div class="ob-title"><div class="dot dot-h"></div><span class="ob-title-lbl">Heizung</span></div>
           <div class="out-row"><div class="out-key" id="h-out-key1">kg/h</div><div class="out-val" id="h-out-v1">&ndash;<span class="u" id="h-out-u1">kg/h</span></div></div>
           <div class="out-row"><div class="out-key" id="h-out-key2">m&sup3;/h</div><div class="out-val" id="h-out-v2">&ndash;<span class="u" id="h-out-u2">m&sup3;/h</span></div></div>
         </div>
-        <div class="ob ob-c">
+        <div class="ob ob-c result--cool">
           <div class="ob-title"><div class="dot dot-c"></div><span class="ob-title-lbl">K&auml;lte</span></div>
           <div class="out-row"><div class="out-key" id="k-out-key1">kg/h</div><div class="out-val" id="k-out-v1">&ndash;<span class="u" id="k-out-u1">kg/h</span></div></div>
           <div class="out-row"><div class="out-key" id="k-out-key2">m&sup3;/h</div><div class="out-val" id="k-out-v2">&ndash;<span class="u" id="k-out-u2">m&sup3;/h</span></div></div>
@@ -937,7 +937,7 @@
     </div>
 
     <!-- LS2 -->
-    <div class="gc gc-c">
+    <div class="gc gc-c tcp-card--thermal tcp-card--cool">
       <div class="ptitle"><div class="dot dot-c"></div><span class="ptitle-lbl">Luftstrom 2 (LS2)</span></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap-s)">
         <div class="igrp tcp-input-group tcp-input-group--compact">
@@ -1216,7 +1216,7 @@
   <div class="plus-grid"></div>
 </div>
 
-<script>window.TECHCALC_BUILD = "20260430-Phase17-RC7";</script>
+<script>window.TECHCALC_BUILD = "20260430-UI-System-V2-UI1";</script>
 <script src="./app.js?v=phase17-rc7"></script>
 <script src="./units.js?v=phase17-rc7"></script>
 <script src="./pipe.js?v=phase17-rc7"></script>
