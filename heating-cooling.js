@@ -81,8 +81,13 @@ function setQUnit(p, unit) {
 /* ───────────────────────────────────────
    BERECHNUNG — Einzelpanel
 ─────────────────────────────────────── */
+function hcFluid() {
+  const key = hc$('medium')?.value || 'water';
+  return FL[key] || FL.water;
+}
+
 function calcPanel(p) {
-  const f   = FL[hc$('medium').value];
+  const f   = hcFluid();
   const cp  = f.cp * 1e3;   // J/(kg·K)
   const rho = f.rho;
   const m   = ST[p].mode;
@@ -150,9 +155,11 @@ function updateOutBlock(p, res) {
    BERECHNUNG — Alle Panels
 ─────────────────────────────────────── */
 function calcAll() {
-  const f = FL[hc$('medium').value];
-  hc$('cp-val').textContent  = f.cp.toFixed(3);
-  hc$('rho-val').textContent = f.rho;
+  const f = hcFluid();
+  const cpEl = hc$('cp-val');
+  const rhoEl = hc$('rho-val');
+  if (cpEl) cpEl.textContent  = f.cp.toFixed(3);
+  if (rhoEl) rhoEl.textContent = f.rho;
 
   const fc = hc$('frost-chip');
   if (f.frost) { if (fc) fc.style.display = ''; hc$('frost-val').textContent = f.frost; }
@@ -207,23 +214,41 @@ window.flowSwitch = flowSwitch;
 window.setQUnit = setQUnit;
 
 /* ───────────────────────────────────────
-   EVENTS + INIT
+   EVENTS + INIT — RC6 robust, idempotent
 ─────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
-  // Mode-Buttons Heizung/Kälte
-  document.querySelectorAll('.mbtn[data-p]').forEach(b => {
-    b.addEventListener('click', () => {
-      const p = b.dataset.p, v = b.dataset.v;
-      ST[p].mode = v;
-      document.querySelectorAll(`.mbtn[data-p="${p}"]`)
-        .forEach(x => x.classList.remove('active'));
-      b.classList.add('active');
-      updateLayout(p);
-      calcAll();
-    });
-  });
+let HC_INIT_DONE = false;
 
-  // Eingabefelder + Selects
+function hcSetMode(p, v) {
+  if (!ST[p] || !['ms','q','dt'].includes(v)) return;
+  ST[p].mode = v;
+  document.querySelectorAll(`.mbtn[data-p="${p}"]`).forEach(x => x.classList.toggle('active', x.dataset.v === v));
+  updateLayout(p);
+  calcAll();
+}
+
+function initHeatingCooling() {
+  if (HC_INIT_DONE) return;
+  HC_INIT_DONE = true;
+
+  document.addEventListener('click', ev => {
+    const btn = ev.target.closest?.('button');
+    if (!btn) return;
+
+    if (btn.id === 'flow-btn-h') { ev.preventDefault(); flowSwitch('h'); calcAll(); return; }
+    if (btn.id === 'flow-btn-k') { ev.preventDefault(); flowSwitch('k'); calcAll(); return; }
+
+    if (btn.classList.contains('mbtn') && btn.dataset.p && btn.dataset.v) {
+      ev.preventDefault();
+      hcSetMode(btn.dataset.p, btn.dataset.v);
+      return;
+    }
+
+    if (btn.id === 'h-wu')  { ev.preventDefault(); setQUnit('h','W');  return; }
+    if (btn.id === 'h-kwu') { ev.preventDefault(); setQUnit('h','kW'); return; }
+    if (btn.id === 'k-wu')  { ev.preventDefault(); setQUnit('k','W');  return; }
+    if (btn.id === 'k-kwu') { ev.preventDefault(); setQUnit('k','kW'); return; }
+  }, true);
+
   ['h-q', 'h-ms-in', 'h-dt', 'k-q', 'k-ms-in', 'k-dt']
     .forEach(id => hc$(id)?.addEventListener('input', calcAll));
 
@@ -233,9 +258,17 @@ document.addEventListener('DOMContentLoaded', () => {
     mediumSel.addEventListener('change', calcAll);
   }
 
-  // Init
   updateLayout('h');
   updateLayout('k');
   flowSwitch('h');
+  setQUnit('h', ST.h.qUnit || 'W');
+  setQUnit('k', ST.k.qUnit || 'W');
   calcAll();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initHeatingCooling, { once:true });
+} else {
+  initHeatingCooling();
+}
+window.initHeatingCooling = initHeatingCooling;

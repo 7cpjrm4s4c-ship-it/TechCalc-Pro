@@ -223,13 +223,11 @@ function renderEntwaesserungTotals() {
     </div>
   `).join('');
 
-  const dims = agg.list.map(s => `
-    <div class="ew-strang-dim-row">
-      <strong>${s.name || 'Strang'}</strong>
-      <span>Anschluss: ${s.dims?.anschluss || '–'}</span>
-      <span>Sammel: ${s.dims?.sammel || '–'}</span>
-      <span>Fall: ${s.dims?.fall || '–'}</span>
-      <span>Grund: ${s.dims?.grund || '–'}</span>
+  const dims = agg.list.map((s, idx) => `
+    <div class="ew-strang-dim-row ew-strang-fall-row">
+      <strong>${s.name || ('Strang ' + (idx + 1))}</strong>
+      <span>Fallleitung</span>
+      <span>${s.dims?.fall || '–'}</span>
     </div>
   `).join('');
 
