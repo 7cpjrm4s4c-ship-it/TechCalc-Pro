@@ -2152,3 +2152,30 @@ body.tc-app .result--cool .hc-result-main-value,body.tc-app .result--cool .hc-re
 body.tc-app #tab-flow .pipe-pair{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:stretch!important;}
 body.tc-app #tab-flow .pipe-card{height:100%!important;min-height:142px!important;}
 @media(max-width:520px){body.tc-app #tab-flow .pipe-pair{grid-template-columns:repeat(2,minmax(0,1fr))!important;}}
+
+
+/* ===== UI8 FINAL ADJUSTMENTS ===== */
+
+/* Wärmeträger = Input */
+#tab-flow .tcp-fluid-card select{
+  font-size:15px!important;
+}
+
+/* Rohrempfehlung volle Breite */
+#tab-flow .pipe-pair{
+  width:100%!important;
+  max-width:none!important;
+}
+
+/* Trinkwasser kleiner */
+#tab-trinkwasser .ob .v{
+  font-size:22px!important;
+}
+
+/* Material nur im Rohrtab */
+#tab-flow #pipe-material{
+  display:none!important;
+}
+#tab-pipe #pipe-material{
+  display:block!important;
+}
