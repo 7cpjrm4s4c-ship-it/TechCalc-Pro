@@ -1779,3 +1779,198 @@ body.tc-app .pipe-bar-fill{height:100%!important;border-radius:999px!important;t
 body.tc-app .pipe-bar-fill--ok{background:var(--ok,#63dd7c)!important;box-shadow:0 0 10px rgba(99,221,124,.28)!important;}
 body.tc-app .pipe-bar-fill--warn{background:var(--warn,#ffd84d)!important;box-shadow:0 0 10px rgba(255,216,77,.28)!important;}
 body.tc-app .pipe-bar-fill--bad{background:var(--danger,#ff5c5c)!important;box-shadow:0 0 10px rgba(255,92,92,.28)!important;}
+
+/* ═══════════════════════════════════════════════════════
+   UI SYSTEM V2 — UI5 Rollout auf alle Module
+   Freigegebene Heizung/Kälte-Sprache wird globaler Standard.
+   Modul-Ausnahmen nur über --module-accent / Heat-Cool-Zustände.
+═══════════════════════════════════════════════════════ */
+body.tc-app{
+  --ui2-font: var(--f, Inter, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif);
+  --ui2-mono: var(--fm, ui-monospace, SFMono-Regular, Menlo, monospace);
+  --ui2-gap: 8px;
+  --ui2-grid-gap: 16px;
+  --ui2-card-pad: 14px;
+  --ui2-card-r: 24px;
+  --ui2-control-h: 48px;
+  --ui2-control-r: 16px;
+  --ui2-title: 11px;
+  --ui2-label: 10px;
+  --ui2-input: 24px;
+  --ui2-result: 34px;
+  --ui2-result-sub: 14px;
+  --ui2-line: rgba(255,255,255,.115);
+  --ui2-card-bg: radial-gradient(circle at 88% 0%, color-mix(in srgb, var(--module-accent) 13%, transparent), transparent 42%), linear-gradient(180deg, rgba(255,255,255,.058), rgba(255,255,255,.028));
+  --ui2-card-border: color-mix(in srgb, var(--module-accent) 30%, rgba(255,255,255,.14));
+  --ui2-card-glow: color-mix(in srgb, var(--module-accent) 16%, transparent);
+}
+
+/* Einheitlicher Modulrhythmus */
+body.tc-app .tab-inner,
+body.tc-app .tcp-col,
+body.tc-app :is(.luft-desktop-left,.luft-desktop-right,.hx-desktop-left,.hx-desktop-right,.wrg-desktop-left,.wrg-desktop-right,.tw-desktop-left,.tw-desktop-right,.mag-desktop-left,.mag-desktop-right,.ew-desktop-left,.ew-desktop-right){
+  gap:var(--ui2-grid-gap)!important;
+}
+body.tc-app .tab-panel.is-active{gap:var(--ui2-grid-gap)!important;}
+
+/* Globale Card-Sprache */
+body.tc-app :is(.tcp-card,.gc,.out-card,.hx-card){
+  border-radius:var(--ui2-card-r)!important;
+  padding:var(--ui2-card-pad)!important;
+  border:1px solid var(--ui2-card-border)!important;
+  background:var(--ui2-card-bg)!important;
+  box-shadow:0 0 0 1px rgba(255,255,255,.02), 0 14px 34px rgba(0,0,0,.30), 0 0 24px var(--ui2-card-glow), inset 0 1px 0 rgba(255,255,255,.075)!important;
+}
+body.tc-app #tab-flow :is(.tcp-card--heat,.result--heat,.pipe-section--heat .pipe-card.is-recommended){
+  --module-accent: var(--heat,#ff784c);
+  --module-accent-t: var(--heat-t,#ffb28d);
+  --ui2-card-bg: radial-gradient(circle at 88% 0%, rgba(255,120,76,.22), transparent 42%), linear-gradient(180deg, rgba(255,120,76,.105), rgba(255,255,255,.028));
+  --ui2-card-border: rgba(255,120,76,.62);
+  --ui2-card-glow: rgba(255,120,76,.18);
+}
+body.tc-app #tab-flow :is(.tcp-card--cool,.result--cool,.pipe-section--cool .pipe-card.is-recommended){
+  --module-accent: var(--cold,#63d5ff);
+  --module-accent-t: var(--cold-t,#9fe8ff);
+  --ui2-card-bg: radial-gradient(circle at 88% 0%, rgba(99,213,255,.22), transparent 42%), linear-gradient(180deg, rgba(99,213,255,.105), rgba(255,255,255,.028));
+  --ui2-card-border: rgba(99,213,255,.62);
+  --ui2-card-glow: rgba(99,213,255,.18);
+}
+
+/* Einheitliche Überschriften / Labels */
+body.tc-app :is(.slbl,.ilbl,.ptitle-lbl,.ob-title-lbl,.hx-title){
+  font-family:var(--ui2-font)!important;
+  text-transform:uppercase!important;
+  letter-spacing:.145em!important;
+  font-size:var(--ui2-title)!important;
+  font-weight:820!important;
+  line-height:1.15!important;
+  color:rgba(255,255,255,.48)!important;
+}
+body.tc-app .ilbl{font-size:var(--ui2-label)!important;margin-bottom:6px!important;}
+body.tc-app .ptitle{display:flex!important;align-items:center!important;gap:10px!important;}
+body.tc-app .dot{flex:0 0 auto!important;}
+
+/* Eingaben / Selects / Buttons einheitlich */
+body.tc-app :is(.inp,.inp-sm,.gl-sel,.hx-input,.tzl-inp,select,input[type="number"],input[type="text"]){
+  min-height:var(--ui2-control-h)!important;
+  border-radius:var(--ui2-control-r)!important;
+  border:1px solid rgba(255,255,255,.18)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.055))!important;
+  color:var(--t1,#f5f7fb)!important;
+  font-family:var(--ui2-font)!important;
+  font-size:var(--ui2-input)!important;
+  line-height:1.05!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+body.tc-app select:is(.gl-sel,.hx-input){font-size:18px!important;padding-inline:14px 40px!important;}
+body.tc-app :is(.inp,.inp-sm,.hx-input,.tzl-inp)::placeholder{color:rgba(255,255,255,.24)!important;}
+body.tc-app :is(.iwrap,.iw){min-height:var(--ui2-control-h)!important;border-radius:var(--ui2-control-r)!important;}
+body.tc-app .iunit{font-size:18px!important;font-weight:760!important;color:rgba(255,255,255,.44)!important;}
+body.tc-app .igrp{gap:6px!important;margin:0!important;}
+body.tc-app .igrp + .igrp{margin-top:var(--ui2-gap)!important;}
+
+/* Switches / Pills */
+body.tc-app :is(.tcp-switch,.modes,.seg,.modebar){
+  border-radius:999px!important;
+  padding:4px!important;
+  background:rgba(0,0,0,.34)!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  gap:4px!important;
+}
+body.tc-app :is(.tcp-switch-btn,.modes button,.seg button,.modebar button){
+  min-height:44px!important;
+  border-radius:999px!important;
+  font-family:var(--ui2-font)!important;
+  font-size:15px!important;
+  font-weight:800!important;
+}
+body.tc-app :is(.tcp-switch-btn.active,.tcp-switch-btn.on-h,.tcp-switch-btn.on-k,.modes button.active,.seg button.active,.modebar button.active){
+  border-color:color-mix(in srgb, var(--module-accent) 60%, rgba(255,255,255,.18))!important;
+  background:color-mix(in srgb, var(--module-accent) 14%, rgba(255,255,255,.055))!important;
+  box-shadow:0 0 24px color-mix(in srgb, var(--module-accent) 18%, transparent), inset 0 1px 0 rgba(255,255,255,.08)!important;
+  color:var(--module-accent-t,var(--module-accent))!important;
+}
+
+/* Ergebnis-Layout global: Lüftung als Referenz */
+body.tc-app :is(.tcp-result-card,.out-card){
+  --ui2-card-pad:14px;
+}
+body.tc-app :is(.out-grid,.tcp-result-grid,.result-standard){display:flex!important;flex-direction:column!important;gap:8px!important;}
+body.tc-app :is(.ob,.out-row,.tcp-result-row,.ui-result-row){
+  min-height:54px!important;
+  border-radius:18px!important;
+  padding:12px 14px!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035))!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,max-content)!important;
+  gap:10px!important;
+  align-items:center!important;
+}
+body.tc-app :is(.ob-title,.out-key,.ui-result-title){
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  font-family:var(--ui2-font)!important;
+  font-size:clamp(12px,2.9vw,15px)!important;
+  line-height:1.12!important;
+  font-weight:760!important;
+  color:rgba(255,255,255,.72)!important;
+  letter-spacing:-.015em!important;
+  text-transform:none!important;
+}
+body.tc-app :is(.out-val,.unit-ro,.ui-result-value){
+  justify-self:end!important;
+  max-width:44vw!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  text-align:right!important;
+  font-family:var(--ui2-mono)!important;
+  font-size:clamp(20px,5vw,28px)!important;
+  line-height:1!important;
+  font-weight:780!important;
+  letter-spacing:.02em!important;
+  color:var(--module-accent-t,var(--blue-t,#9dccff))!important;
+}
+body.tc-app :is(.out-val,.unit-ro,.ui-result-value) :is(.u,span){font-size:clamp(12px,3vw,16px)!important;font-weight:500!important;color:rgba(255,255,255,.42)!important;}
+
+/* Lüftung / WRG: bestehende Spezial-Ausgaben an neue Cardsprache anlehnen */
+body.tc-app #tab-luft :is(.out-card,.gc),
+body.tc-app #tab-wrg :is(.out-card,.gc){
+  --module-accent: var(--air,#a78bfa);
+  --module-accent-t: var(--air-t,#c4b5fd);
+}
+body.tc-app #tab-unit :is(.out-card,.gc),
+body.tc-app #tab-trinkwasser :is(.out-card,.gc),
+body.tc-app #tab-mag :is(.out-card,.gc),
+body.tc-app #tab-entwaesserung :is(.out-card,.gc){
+  --module-accent: var(--blue,#60a5fa);
+  --module-accent-t: var(--blue-t,#9dccff);
+}
+body.tc-app #tab-hx :is(.out-card,.gc,.hx-card){
+  --module-accent:#746cff;
+  --module-accent-t:#b7b3ff;
+}
+
+/* Kompakte Info-/Formelblöcke */
+body.tc-app :is(.info-txt,.fml,.chip,p){font-family:var(--ui2-font);line-height:1.5;}
+body.tc-app .chip{border-radius:14px!important;border:1px solid rgba(255,255,255,.10)!important;background:rgba(255,255,255,.045)!important;}
+body.tc-app .fml{margin-block:8px 16px!important;color:rgba(255,255,255,.42)!important;}
+
+/* Mobile Bottom Navigation bleibt optisch V2, nicht weiß */
+body.tc-app .bottom-pill{
+  border-radius:34px!important;
+  background:linear-gradient(180deg,rgba(21,23,33,.94),rgba(9,10,17,.94))!important;
+  border:1px solid rgba(255,255,255,.14)!important;
+  box-shadow:0 10px 34px rgba(0,0,0,.46), inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+body.tc-app .pill-btn{font-family:var(--ui2-font)!important;font-weight:780!important;}
+body.tc-app .pill-btn.active{color:#8fbeff!important;}
+
+@media(max-width:899px){
+  body.tc-app #app-shell{padding-top:calc(var(--hdr,118px) + var(--sat,0px) + 16px)!important;}
+  body.tc-app .tab-inner{padding-inline:calc(14px + var(--sal,0px)) calc(14px + var(--sar,0px))!important;}
+  body.tc-app :is(.tcp-card,.gc,.out-card,.hx-card){border-radius:24px!important;}
+}
