@@ -236,3 +236,41 @@ document.addEventListener('change', (ev) => {
     if (typeof window.renderPipeTab === 'function') window.renderPipeTab();
   }
 });
+
+
+/* Pipe UI Component Fix */
+(function tcpPipeUiComponentFix(){
+  function getMaterial(){
+    const el = document.querySelector('#tab-pipe #pipe-material');
+    return el ? el.value : 'all';
+  }
+  function setMaterial(v){
+    const el = document.querySelector('#tab-pipe #pipe-material');
+    if (el) el.value = v;
+    document.querySelectorAll('#tab-pipe .tcp-material-chip').forEach(b => {
+      b.classList.toggle('is-active', b.dataset.pipeMaterial === v);
+    });
+  }
+  function recalc(){
+    if (typeof window.calcPipeTab === 'function') window.calcPipeTab();
+    if (typeof window.renderPipeTab === 'function') window.renderPipeTab();
+    requestAnimationFrame(normalize);
+  }
+  function normalize(){
+    document.querySelectorAll('#tab-flow .pipe-card,#tab-pipe .pipe-card').forEach(c => c.classList.add('tcp-pipe-card'));
+  }
+  document.addEventListener('click', e => {
+    const b = e.target.closest('#tab-pipe .tcp-material-chip');
+    if (!b) return;
+    setMaterial(b.dataset.pipeMaterial || 'all');
+    recalc();
+  }, true);
+  document.addEventListener('change', e => {
+    if (!e.target.matches('#tab-pipe #pipe-material')) return;
+    setMaterial(e.target.value || 'all');
+    recalc();
+  }, true);
+  document.addEventListener('DOMContentLoaded', () => { setMaterial(getMaterial()); normalize(); });
+  document.addEventListener('click', () => requestAnimationFrame(normalize), true);
+  window.tcpGetPipeMaterial = getMaterial;
+})();

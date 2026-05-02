@@ -2457,3 +2457,71 @@ body.tc-app #tab-flow :is(.tcp-fluid-card .gl-sel,.tcp-fluid-card select,.fluid-
 body.tc-app #tab-flow .tcp-fluid-card :is(.chip,.fluid-chip,.cp-chip){
   font-size:calc(var(--tcp-v2-input-font,15px) - 4px)!important;
 }
+
+
+/* PIPE COMPONENT FIX */
+body.tc-app{
+  --tcp-pipe-card-min-h:236px;
+  --tcp-pipe-card-pad:16px;
+  --tcp-pipe-card-radius:22px;
+  --tcp-pipe-card-gap:14px;
+}
+body.tc-app #tab-pipe .tcp-pipe-material,
+body.tc-app #tab-pipe .pipe-material-card,
+body.tc-app #tab-pipe [data-pipe-material-card]{
+  display:block!important;width:100%!important;max-width:none!important;
+  margin:0 0 var(--tcp-v2-gap,14px)!important;
+  padding:var(--tcp-v2-card-pad-y,14px) var(--tcp-v2-card-pad-x,14px)!important;
+  border-radius:var(--tcp-v2-radius,22px)!important;
+}
+body.tc-app #tab-flow .tcp-pipe-material,
+body.tc-app #tab-flow .pipe-material-card,
+body.tc-app #tab-flow [data-pipe-material-card],
+body.tc-app #tab-flow #pipe-material{display:none!important;}
+body.tc-app #tab-pipe .tcp-material-select{display:flex!important;gap:8px!important;flex-wrap:wrap!important;width:100%!important;margin-top:8px!important;}
+body.tc-app #tab-pipe .tcp-material-chip{
+  border:1px solid rgba(106,168,255,.38)!important;background:rgba(106,168,255,.08)!important;
+  color:rgba(236,248,255,.86)!important;border-radius:999px!important;min-height:36px!important;
+  padding:8px 12px!important;font:700 13px/1 var(--ui-font,system-ui)!important;
+}
+body.tc-app #tab-pipe .tcp-material-chip.is-active{
+  border-color:rgba(106,168,255,.75)!important;background:rgba(106,168,255,.22)!important;
+  color:#8fbeff!important;box-shadow:0 0 22px rgba(106,168,255,.18)!important;
+}
+body.tc-app #tab-pipe #pipe-material,
+body.tc-app #tab-pipe .pipe-material-select{
+  display:block!important;width:100%!important;max-width:none!important;margin-top:8px!important;
+  min-height:var(--tcp-v2-control-h,42px)!important;border-radius:var(--tcp-v2-control-radius,14px)!important;
+  font-size:var(--tcp-v2-input-font,15px)!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;
+}
+body.tc-app :is(#tab-flow,#tab-pipe) :is(.pipe-recommendation-card,.pipe-section,.pipe-section--heat,.pipe-section--cool){width:100%!important;max-width:none!important;}
+body.tc-app :is(#tab-flow,#tab-pipe) :is(.pipe-pair,.pipe-recommendation-card .pipe-pair){
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:var(--tcp-pipe-card-gap)!important;align-items:stretch!important;width:100%!important;max-width:none!important;
+}
+@media(max-width:430px){
+  body.tc-app :is(#tab-flow,#tab-pipe) :is(.pipe-pair,.pipe-recommendation-card .pipe-pair){grid-template-columns:1fr!important;}
+}
+body.tc-app :is(#tab-flow,#tab-pipe) .pipe-card,
+body.tc-app :is(#tab-flow,#tab-pipe) .tcp-pipe-card{
+  box-sizing:border-box!important;width:100%!important;max-width:none!important;
+  min-height:var(--tcp-pipe-card-min-h)!important;height:100%!important;
+  border-radius:var(--tcp-pipe-card-radius)!important;padding:var(--tcp-pipe-card-pad)!important;
+  display:grid!important;grid-template-rows:auto 1fr auto!important;gap:12px!important;overflow:hidden!important;
+}
+body.tc-app :is(#tab-flow,#tab-pipe) .pipe-card :is(.pipe-metric,.pipe-row,.pipe-values-row,.pstat,.pv,.dpv){
+  display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:baseline!important;column-gap:12px!important;width:100%!important;
+}
+body.tc-app :is(#tab-flow,#tab-pipe) .pipe-card :is(.pipe-metric-value,.pipe-value,.metric-value,.pstat strong,.pv strong,.dpv strong){
+  justify-self:end!important;text-align:right!important;
+}
+body.tc-app :is(#tab-flow,#tab-pipe) .pipe-card :is(.pipe-bar,.bar,.pbar){margin-top:auto!important;width:100%!important;}
+body.tc-app #tab-flow :is(.tcp-fluid-card .gl-sel,.tcp-fluid-card select,.fluid-select,.fluid-name,[data-fluid-label]){
+  font-size:var(--tcp-v2-input-font,15px)!important;line-height:1.12!important;
+  font-weight:620!important;color:rgba(255,255,255,.92)!important;opacity:1!important;
+}
+body.tc-app #tab-flow .tcp-fluid-card :is(.chip,.fluid-chip,.cp-chip){
+  font-size:var(--tcp-v2-input-font,15px)!important;line-height:1.12!important;font-weight:620!important;
+  color:rgba(236,248,255,.86)!important;opacity:1!important;
+}
