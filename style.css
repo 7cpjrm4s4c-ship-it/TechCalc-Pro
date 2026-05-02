@@ -2882,3 +2882,138 @@ body.tc-app #tab-pipe .pipe-dn-title{
   font-size:11px!important;
   line-height:1.1!important;
 }
+
+
+/* ═══════════════════════════════════════════════════════
+   UI POLISH PATCH — Alignment / Theme Switch / Trinkwasser
+═══════════════════════════════════════════════════════ */
+
+/* 1. Rohrwerte: ΔP/M und V rechtsbündig wie im Rohrdimensionierungs-Tab */
+body.tc-app #tab-flow .hc-pipe-grid,
+body.tc-app #tab-flow .pipe-card .hc-pipe-grid,
+body.tc-app #tab-flow .pipe-card :is(.pipe-matrix,.pipe-card__matrix),
+body.tc-app #tab-pipe .hc-pipe-grid,
+body.tc-app #tab-pipe .pipe-card .hc-pipe-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(92px,max-content)!important;
+  column-gap:14px!important;
+  row-gap:5px!important;
+  align-items:baseline!important;
+  width:100%!important;
+}
+
+body.tc-app #tab-flow :is(.hc-pipe-value,.pipe-card__value,.pipe-dp,.pipe-velocity),
+body.tc-app #tab-pipe :is(.hc-pipe-value,.pipe-card__value,.pipe-dp,.pipe-velocity){
+  justify-self:end!important;
+  text-align:right!important;
+  white-space:nowrap!important;
+  min-width:92px!important;
+  display:inline-flex!important;
+  justify-content:flex-end!important;
+  align-items:baseline!important;
+  gap:4px!important;
+}
+
+body.tc-app #tab-flow :is(.hc-pipe-label,.pipe-card__label),
+body.tc-app #tab-pipe :is(.hc-pipe-label,.pipe-card__label){
+  justify-self:start!important;
+  text-align:left!important;
+  min-width:0!important;
+}
+
+body.tc-app :is(#tab-flow,#tab-pipe) .pipe-card :is(.pm-r,.pstat,.pv,.dpv,.pipe-row,.pipe-metric){
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(92px,max-content)!important;
+  column-gap:14px!important;
+  align-items:baseline!important;
+  width:100%!important;
+}
+body.tc-app :is(#tab-flow,#tab-pipe) .pipe-card :is(.pm-k,.pipe-metric-label,.metric-label){
+  justify-self:start!important;
+  text-align:left!important;
+}
+body.tc-app :is(#tab-flow,#tab-pipe) .pipe-card :is(.pm-v,.pipe-metric-value,.metric-value){
+  justify-self:end!important;
+  text-align:right!important;
+  min-width:92px!important;
+}
+
+/* 2. Header-Menü: Dark/Light/System Switcher sichtbar und eindeutig */
+body.tc-app :is(.menu-sheet,.nav-sheet,.app-menu,.settings-sheet) :is(.theme-switch,.theme-seg,.mode-switch,.appearance-switch,.seg){
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:6px!important;
+  width:100%!important;
+  min-height:54px!important;
+  padding:5px!important;
+  border-radius:999px!important;
+  background:rgba(0,0,0,.28)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+}
+
+body.tc-app :is(.menu-sheet,.nav-sheet,.app-menu,.settings-sheet) :is(.theme-switch,.theme-seg,.mode-switch,.appearance-switch,.seg) button{
+  flex:1 1 0!important;
+  display:grid!important;
+  place-items:center!important;
+  min-height:44px!important;
+  border-radius:999px!important;
+  border:0!important;
+  background:transparent!important;
+  color:rgba(255,255,255,.54)!important;
+  font-size:15px!important;
+  font-weight:780!important;
+}
+
+body.tc-app :is(.menu-sheet,.nav-sheet,.app-menu,.settings-sheet) :is(.theme-switch,.theme-seg,.mode-switch,.appearance-switch,.seg) button.active,
+body.tc-app :is(.menu-sheet,.nav-sheet,.app-menu,.settings-sheet) :is(.theme-switch,.theme-seg,.mode-switch,.appearance-switch,.seg) button.is-active,
+body.tc-app :is(.menu-sheet,.nav-sheet,.app-menu,.settings-sheet) :is(.theme-switch,.theme-seg,.mode-switch,.appearance-switch,.seg) button[aria-pressed="true"]{
+  background:rgba(255,255,255,.08)!important;
+  color:rgba(255,255,255,.94)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+
+/* 3. Trinkwasser Ergebnisse: gleiche Größe wie MAG/Druckhaltung */
+body.tc-app #tab-trinkwasser{
+  --tw-result-label-font:14px;
+  --tw-result-value-font:20px;
+  --tw-result-unit-font:11px;
+}
+
+body.tc-app #tab-trinkwasser :is(.ob,.tcp-result-row,.out-row){
+  min-height:52px!important;
+  padding:9px 13px!important;
+  gap:8px!important;
+}
+
+body.tc-app #tab-trinkwasser :is(.ob .k,.tcp-result-row .k,.out-row .k,.result-label){
+  font-size:var(--tw-result-label-font)!important;
+  line-height:1.1!important;
+  font-weight:760!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+
+body.tc-app #tab-trinkwasser :is(.ob .v,.tcp-result-row .v,.out-row .v,.result-value){
+  font-size:var(--tw-result-value-font)!important;
+  line-height:1!important;
+  font-weight:760!important;
+  letter-spacing:.01em!important;
+  white-space:nowrap!important;
+  text-align:right!important;
+  max-width:46%!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+body.tc-app #tab-trinkwasser :is(.ob small,.tcp-result-row small,.out-row small,.result-unit,.result-sub){
+  font-size:var(--tw-result-unit-font)!important;
+  line-height:1!important;
+  opacity:.62!important;
+}
+
+body.tc-app #tab-trinkwasser .result-standard{
+  overflow:hidden!important;
+}

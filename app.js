@@ -869,3 +869,29 @@ window.addEventListener('appinstalled', () => {
   document.addEventListener('change', () => requestAnimationFrame(apply), true);
   document.addEventListener('click', () => requestAnimationFrame(apply), true);
 })();
+
+
+/* UI Polish: Theme switcher bridge for header menu */
+(function tcpThemeSwitcherVisibilityBridge(){
+  function currentTheme(){
+    return localStorage.getItem('tcp-theme') || localStorage.getItem('theme') || document.documentElement.dataset.theme || 'dark';
+  }
+  function apply(){
+    const theme = currentTheme();
+    document.querySelectorAll('button,[role="button"]').forEach(btn => {
+      const txt = (btn.textContent || '').trim().toLowerCase();
+      const val = (btn.dataset.theme || btn.dataset.mode || btn.value || '').toLowerCase();
+      const key = val || (txt === 'dark' || txt === 'light' || txt === 'system' ? txt : '');
+      if (!key || !['dark','light','system'].includes(key)) return;
+      btn.classList.toggle('is-active', key === theme);
+      btn.setAttribute('aria-pressed', String(key === theme));
+    });
+    document.querySelectorAll('.theme-switch,.theme-seg,.mode-switch,.appearance-switch,.seg').forEach(sw => {
+      const text = (sw.textContent || '').toLowerCase();
+      if (text.includes('dark') && text.includes('light') && text.includes('system')) sw.classList.add('theme-seg');
+    });
+  }
+  document.addEventListener('DOMContentLoaded', apply);
+  document.addEventListener('click', () => setTimeout(apply, 0), true);
+  document.addEventListener('change', () => setTimeout(apply, 0), true);
+})();
