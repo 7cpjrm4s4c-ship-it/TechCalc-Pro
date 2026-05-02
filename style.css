@@ -2525,3 +2525,203 @@ body.tc-app #tab-flow .tcp-fluid-card :is(.chip,.fluid-chip,.cp-chip){
   font-size:var(--tcp-v2-input-font,15px)!important;line-height:1.12!important;font-weight:620!important;
   color:rgba(236,248,255,.86)!important;opacity:1!important;
 }
+
+
+/* ═══════════════════════════════════════════════════════
+   HC PIPE LOCAL PATCH — compact, content-driven Pipe Cards
+   Heizung/Kälte nutzt lokale Rohrberechnung, kein pipe.js-Rendering.
+═══════════════════════════════════════════════════════ */
+
+body.tc-app #tab-flow{
+  --hc-pipe-card-pad:12px;
+  --hc-pipe-card-radius:20px;
+  --hc-pipe-card-gap:8px;
+  --hc-pipe-value-col:88px;
+}
+
+/* alte Flow-Materialauswahl bleibt verborgen; Heizung/Kälte bekommt eigene Chips je Sektion */
+body.tc-app #tab-flow > .pipe-material-card,
+body.tc-app #tab-flow #pipe-material,
+body.tc-app #tab-flow #pipe-material-legacy{
+  display:none!important;
+}
+
+body.tc-app #tab-flow .pipe-section{
+  padding:12px!important;
+  border-radius:22px!important;
+}
+
+body.tc-app #tab-flow .pipe-pair{
+  display:block!important;
+  width:100%!important;
+}
+
+body.tc-app #tab-flow .hc-pipe-material{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:6px!important;
+  margin:8px 0 10px!important;
+  width:100%!important;
+}
+
+body.tc-app #tab-flow .hc-pipe-chip{
+  appearance:none!important;
+  min-height:32px!important;
+  border-radius:999px!important;
+  padding:7px 10px!important;
+  border:1px solid rgba(255,255,255,.14)!important;
+  background:rgba(255,255,255,.045)!important;
+  color:rgba(255,255,255,.70)!important;
+  font:760 12px/1 var(--ui-font,system-ui)!important;
+}
+
+body.tc-app #tab-flow .pipe-section--heat .hc-pipe-chip.is-active{
+  border-color:rgba(var(--heat-rgb),.72)!important;
+  background:rgba(var(--heat-rgb),.18)!important;
+  color:#ffb28d!important;
+  box-shadow:0 0 18px rgba(var(--heat-rgb),.14)!important;
+}
+
+body.tc-app #tab-flow .pipe-section--cool .hc-pipe-chip.is-active{
+  border-color:rgba(var(--cool-rgb),.72)!important;
+  background:rgba(var(--cool-rgb),.18)!important;
+  color:#8ee8ff!important;
+  box-shadow:0 0 18px rgba(var(--cool-rgb),.14)!important;
+}
+
+body.tc-app #tab-flow .hc-pipe-card-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+  align-items:stretch!important;
+  width:100%!important;
+}
+
+@media(max-width:430px){
+  body.tc-app #tab-flow .hc-pipe-card-grid{
+    grid-template-columns:1fr!important;
+  }
+}
+
+/* neue kompakte Card: keine Bottom-Anker, keine Progressbar */
+body.tc-app #tab-flow .hc-pipe-card{
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-height:0!important;
+  height:auto!important;
+  padding:var(--hc-pipe-card-pad)!important;
+  border-radius:var(--hc-pipe-card-radius)!important;
+  display:grid!important;
+  grid-template-rows:auto auto auto!important;
+  gap:var(--hc-pipe-card-gap)!important;
+  align-content:start!important;
+  overflow:hidden!important;
+}
+
+body.tc-app #tab-flow .hc-pipe-head{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:8px!important;
+}
+
+body.tc-app #tab-flow .hc-pipe-system{
+  min-width:0!important;
+  font:820 11px/1.1 var(--ui-font,system-ui)!important;
+  letter-spacing:.14em!important;
+  text-transform:uppercase!important;
+  color:rgba(255,255,255,.58)!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+
+body.tc-app #tab-flow .hc-pipe-star{
+  flex:0 0 28px!important;
+  width:28px!important;
+  height:28px!important;
+  border-radius:9px!important;
+  display:grid!important;
+  place-items:center!important;
+  border:1px solid currentColor!important;
+  background:rgba(255,255,255,.075)!important;
+}
+
+body.tc-app #tab-flow .hc-pipe-dn{
+  font-family:var(--fm,ui-monospace,SFMono-Regular,Menlo,monospace)!important;
+  font-size:22px!important;
+  line-height:1!important;
+  font-weight:820!important;
+  letter-spacing:.07em!important;
+  color:rgba(255,255,255,.94)!important;
+}
+
+body.tc-app #tab-flow .hc-pipe-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(var(--hc-pipe-value-col),auto)!important;
+  column-gap:12px!important;
+  row-gap:5px!important;
+  align-items:baseline!important;
+  width:100%!important;
+}
+
+body.tc-app #tab-flow .hc-pipe-label{
+  min-width:0!important;
+  font-family:var(--fm,ui-monospace,SFMono-Regular,Menlo,monospace)!important;
+  font-size:13px!important;
+  line-height:1.1!important;
+  color:rgba(255,255,255,.42)!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+body.tc-app #tab-flow .hc-pipe-value{
+  justify-self:end!important;
+  text-align:right!important;
+  white-space:nowrap!important;
+  font-family:var(--fm,ui-monospace,SFMono-Regular,Menlo,monospace)!important;
+  font-size:15px!important;
+  line-height:1.1!important;
+  font-weight:820!important;
+}
+
+body.tc-app #tab-flow .hc-pipe-value span{
+  font-size:12px!important;
+  font-weight:520!important;
+  color:rgba(255,255,255,.58)!important;
+}
+
+body.tc-app #tab-flow .pipe-section--heat .hc-pipe-value{ color:#65db72!important; }
+body.tc-app #tab-flow .pipe-section--cool .hc-pipe-value{ color:#65db72!important; }
+
+body.tc-app #tab-flow .pipe-section--heat .hc-pipe-card{
+  border:1px solid rgba(var(--heat-rgb),.62)!important;
+  background:
+    radial-gradient(130% 110% at 100% 0%,rgba(var(--heat-rgb),.16),transparent 44%),
+    linear-gradient(180deg,rgba(255,255,255,.052),rgba(255,255,255,.024))!important;
+  box-shadow:0 0 0 1px rgba(var(--heat-rgb),.08),0 0 24px rgba(var(--heat-rgb),.13)!important;
+}
+
+body.tc-app #tab-flow .pipe-section--cool .hc-pipe-card{
+  border:1px solid rgba(var(--cool-rgb),.62)!important;
+  background:
+    radial-gradient(130% 110% at 100% 0%,rgba(var(--cool-rgb),.16),transparent 44%),
+    linear-gradient(180deg,rgba(255,255,255,.052),rgba(255,255,255,.024))!important;
+  box-shadow:0 0 0 1px rgba(var(--cool-rgb),.08),0 0 24px rgba(var(--cool-rgb),.13)!important;
+}
+
+/* alte Pipe-Balken/Bottom-Layout aus früheren Phasen für Flow neutralisieren */
+body.tc-app #tab-flow .hc-pipe-card :is(.pipe-bar,.bar,.pbar,.dpbar,.dpfill){
+  display:none!important;
+}
+
+/* Wärmeträger-Hinweis exakt wie Inputs */
+body.tc-app #tab-flow :is(.tcp-fluid-card .gl-sel,.tcp-fluid-card select,.fluid-select,.fluid-name,[data-fluid-label]),
+body.tc-app #tab-flow .tcp-fluid-card :is(.chip,.fluid-chip,.cp-chip){
+  font-size:var(--tcp-v2-input-font,15px)!important;
+  line-height:1.12!important;
+  font-weight:620!important;
+  color:rgba(255,255,255,.92)!important;
+  opacity:1!important;
+}
