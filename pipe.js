@@ -99,50 +99,61 @@ function pCardSteel(p, vol, mx, isBest, bestCls) {
   bestCls = bestCls || 'best';
   const { dp, v } = pdrop(vol, p[1], ES);
   const state = dpState(dp, mx);
-  const pct   = Math.min(100, dp / mx * 100).toFixed(1);
-  const cls   = [
-    'pm', 'pipe-card', pipeModeClass(bestCls),
+  const cls = [
+    'pm', 'pipe-card', 'hc-pipe-card', pipeModeClass(bestCls),
     isBest ? 'is-recommended' : '', isBest ? bestCls : '',
     dp > mx ? 'over' : '', `pipe-card--${state}`
   ].filter(Boolean).join(' ');
-  const star  = isBest ? '<span class="star" aria-label="Empfohlen">★</span>' : '';
+  const star = isBest ? '<span class="hc-pipe-star" aria-label="Empfohlen">★</span>' : '';
   const dpTxt = dp < 10 ? dp.toFixed(1) : Math.round(dp);
   return `<div class="${cls}">
-    <div class="pm-std">${p[4]} ${star}</div>
-    <div class="pm-dn">DN ${p[0]}</div>
-    <div class="pm-dim">Ø ${p[2]} × ${p[3]} mm<br>dᵢ ${p[1].toFixed(1)} mm</div>
-    <div class="pm-r"><span class="pm-k">Δp/m</span><span class="pm-v pipe-dp pipe-dp--${state}">${dpTxt}<span class="pm-unit"> Pa/m</span></span></div>
-    <div class="pm-r"><span class="pm-k">v</span><span class="pm-v pipe-velocity">${v.toFixed(2)} m/s</span></div>
-    <div class="dpbar pipe-bar"><div class="dpfill pipe-bar-fill pipe-bar-fill--${state}" style="width:${pct}%"></div></div>
+    <div class="hc-pipe-head">
+      <span class="hc-pipe-system">${p[4]}</span>
+      ${star}
+    </div>
+    <div class="hc-pipe-dn">DN ${p[0]}</div>
+    <div class="hc-pipe-grid">
+      <div class="hc-pipe-label">Ø ${p[2]} × ${p[3]} mm</div>
+      <div class="hc-pipe-value pipe-dp pipe-dp--${state}">${dpTxt}<span> Pa/m</span></div>
+      <div class="hc-pipe-label">dᵢ ${p[1].toFixed(1)} mm</div>
+      <div class="hc-pipe-value pipe-velocity">${v.toFixed(2)}<span> m/s</span></div>
+    </div>
   </div>`;
 }
 
 function pCardMapress(p, vol, mx, isBest, bestCls) {
   bestCls = bestCls || 'best';
   if (p[0] > MAPRESS_MAX_DN || p[5] === null) {
-    return `<div class="pm pipe-card pipe-card--neutral na">
-      <div class="pm-std mp">Mapress Edelstahl</div>
-      <div class="pm-dn">DN ${p[0]}</div>
-      <div class="pm-na-txt">Nicht verfügbar<br/>(max. DN ${MAPRESS_MAX_DN})</div>
+    return `<div class="pm pipe-card hc-pipe-card pipe-card--neutral na">
+      <div class="hc-pipe-head"><span class="hc-pipe-system">Mapress Edelstahl</span></div>
+      <div class="hc-pipe-dn">DN ${p[0]}</div>
+      <div class="hc-pipe-grid">
+        <div class="hc-pipe-label">Nicht verfügbar</div>
+        <div class="hc-pipe-value"><span>max. DN ${MAPRESS_MAX_DN}</span></div>
+      </div>
     </div>`;
   }
   const { dp, v } = pdrop(vol, p[5], EM);
   const state = dpState(dp, mx);
-  const pct   = Math.min(100, dp / mx * 100).toFixed(1);
-  const cls   = [
-    'pm', 'pipe-card', pipeModeClass(bestCls),
+  const cls = [
+    'pm', 'pipe-card', 'hc-pipe-card', pipeModeClass(bestCls),
     isBest ? 'is-recommended' : '', isBest ? bestCls : '',
     dp > mx ? 'over' : '', `pipe-card--${state}`
   ].filter(Boolean).join(' ');
-  const star  = isBest ? '<span class="star" aria-label="Empfohlen">★</span>' : '';
+  const star = isBest ? '<span class="hc-pipe-star" aria-label="Empfohlen">★</span>' : '';
   const dpTxt = dp < 10 ? dp.toFixed(1) : Math.round(dp);
   return `<div class="${cls}">
-    <div class="pm-std mp">Mapress Edelstahl ${star}</div>
-    <div class="pm-dn">DN ${p[0]}</div>
-    <div class="pm-dim">Ø ${p[6]} × ${p[7]} mm<br>dᵢ ${p[5].toFixed(1)} mm</div>
-    <div class="pm-r"><span class="pm-k">Δp/m</span><span class="pm-v pipe-dp pipe-dp--${state}">${dpTxt}<span class="pm-unit"> Pa/m</span></span></div>
-    <div class="pm-r"><span class="pm-k">v</span><span class="pm-v pipe-velocity">${v.toFixed(2)} m/s</span></div>
-    <div class="dpbar pipe-bar"><div class="dpfill pipe-bar-fill pipe-bar-fill--${state}" style="width:${pct}%"></div></div>
+    <div class="hc-pipe-head">
+      <span class="hc-pipe-system">Mapress Edelstahl</span>
+      ${star}
+    </div>
+    <div class="hc-pipe-dn">DN ${p[0]}</div>
+    <div class="hc-pipe-grid">
+      <div class="hc-pipe-label">Ø ${p[6]} × ${p[7]} mm</div>
+      <div class="hc-pipe-value pipe-dp pipe-dp--${state}">${dpTxt}<span> Pa/m</span></div>
+      <div class="hc-pipe-label">dᵢ ${p[5].toFixed(1)} mm</div>
+      <div class="hc-pipe-value pipe-velocity">${v.toFixed(2)}<span> m/s</span></div>
+    </div>
   </div>`;
 }
 

@@ -2725,3 +2725,160 @@ body.tc-app #tab-flow .tcp-fluid-card :is(.chip,.fluid-chip,.cp-chip){
   color:rgba(255,255,255,.92)!important;
   opacity:1!important;
 }
+
+
+/* ═══════════════════════════════════════════════════════
+   PIPE TAB MATCHES HEIZUNG/KÄLTE PIPE CARD DESIGN
+   Rohrdimensionierung nutzt dieselbe kompakte Card-Komponente.
+═══════════════════════════════════════════════════════ */
+
+body.tc-app #tab-pipe{
+  --hc-pipe-card-pad:12px;
+  --hc-pipe-card-radius:20px;
+  --hc-pipe-card-gap:8px;
+  --hc-pipe-value-col:88px;
+}
+
+/* Rohrtab: gleiche kompakte Card wie Heizung/Kälte */
+body.tc-app #tab-pipe .pipe-card.hc-pipe-card,
+body.tc-app #tab-pipe .hc-pipe-card{
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-height:0!important;
+  height:auto!important;
+  padding:var(--hc-pipe-card-pad)!important;
+  border-radius:var(--hc-pipe-card-radius)!important;
+  display:grid!important;
+  grid-template-rows:auto auto auto!important;
+  gap:var(--hc-pipe-card-gap)!important;
+  align-content:start!important;
+  justify-content:stretch!important;
+  overflow:hidden!important;
+}
+
+body.tc-app #tab-pipe .pipe-pair{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+  align-items:start!important;
+  width:100%!important;
+  max-width:none!important;
+}
+
+body.tc-app #tab-pipe .pipe-pair.pipe-pair--single{
+  grid-template-columns:1fr!important;
+}
+
+@media(max-width:430px){
+  body.tc-app #tab-pipe .pipe-pair{
+    grid-template-columns:1fr!important;
+  }
+}
+
+/* Header / System */
+body.tc-app #tab-pipe .hc-pipe-head{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:8px!important;
+}
+
+body.tc-app #tab-pipe .hc-pipe-system{
+  min-width:0!important;
+  font:820 11px/1.1 var(--ui-font,system-ui)!important;
+  letter-spacing:.14em!important;
+  text-transform:uppercase!important;
+  color:rgba(255,255,255,.58)!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+
+body.tc-app #tab-pipe .hc-pipe-star{
+  flex:0 0 28px!important;
+  width:28px!important;
+  height:28px!important;
+  border-radius:9px!important;
+  display:grid!important;
+  place-items:center!important;
+  border:1px solid currentColor!important;
+  background:rgba(255,255,255,.075)!important;
+  color:#8fbeff!important;
+}
+
+/* DN */
+body.tc-app #tab-pipe .hc-pipe-dn{
+  font-family:var(--fm,ui-monospace,SFMono-Regular,Menlo,monospace)!important;
+  font-size:22px!important;
+  line-height:1!important;
+  font-weight:820!important;
+  letter-spacing:.07em!important;
+  color:rgba(255,255,255,.94)!important;
+}
+
+/* Matrix: links Ø/di, rechts ΔP/M/V auf derselben Achse */
+body.tc-app #tab-pipe .hc-pipe-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(var(--hc-pipe-value-col),auto)!important;
+  column-gap:12px!important;
+  row-gap:5px!important;
+  align-items:baseline!important;
+  width:100%!important;
+}
+
+body.tc-app #tab-pipe .hc-pipe-label{
+  min-width:0!important;
+  font-family:var(--fm,ui-monospace,SFMono-Regular,Menlo,monospace)!important;
+  font-size:13px!important;
+  line-height:1.1!important;
+  color:rgba(255,255,255,.42)!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+body.tc-app #tab-pipe .hc-pipe-value{
+  justify-self:end!important;
+  text-align:right!important;
+  white-space:nowrap!important;
+  font-family:var(--fm,ui-monospace,SFMono-Regular,Menlo,monospace)!important;
+  font-size:15px!important;
+  line-height:1.1!important;
+  font-weight:820!important;
+  color:#65db72!important;
+}
+
+body.tc-app #tab-pipe .hc-pipe-value span{
+  font-size:12px!important;
+  font-weight:520!important;
+  color:rgba(255,255,255,.58)!important;
+}
+
+/* Statusfarben bleiben erhalten */
+body.tc-app #tab-pipe .hc-pipe-card.pipe-card--bad .hc-pipe-value.pipe-dp{color:#ff5c5c!important;}
+body.tc-app #tab-pipe .hc-pipe-card.pipe-card--warn .hc-pipe-value.pipe-dp{color:#ffd24d!important;}
+body.tc-app #tab-pipe .hc-pipe-card.pipe-card--ok .hc-pipe-value.pipe-dp{color:#65db72!important;}
+
+/* Keine alten Fortschrittsbalken / kein Bottom-Anker im Rohrtab */
+body.tc-app #tab-pipe .hc-pipe-card :is(.pipe-bar,.bar,.pbar,.dpbar,.dpfill){
+  display:none!important;
+}
+
+/* Empfehlungsrahmen im Rohrtab neutral-blau wie bestehendes Rohrmodul */
+body.tc-app #tab-pipe .hc-pipe-card.is-recommended{
+  border-color:rgba(106,168,255,.72)!important;
+  box-shadow:0 0 0 1px rgba(106,168,255,.12),0 0 24px rgba(106,168,255,.16)!important;
+}
+
+/* DN-Gruppen dichter, weil Cards jetzt content-driven sind */
+body.tc-app #tab-pipe .pipe-dn-block{
+  display:grid!important;
+  gap:8px!important;
+  margin-bottom:14px!important;
+}
+
+body.tc-app #tab-pipe .pipe-dn-title{
+  margin:0!important;
+  font-size:11px!important;
+  line-height:1.1!important;
+}
