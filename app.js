@@ -854,3 +854,18 @@ window.addEventListener('appinstalled', () => {
   document.addEventListener('DOMContentLoaded', sync);
   setInterval(sync, 500);
 })();
+
+
+/* Phase 19: maps generated legacy markup into the central UI contract. */
+(function tcpPhase19StyleAdoptionBridge(){
+  function apply(){
+    document.querySelectorAll('.tab-panel.tcp-module').forEach(tab => tab.classList.add('tcp-module--v2'));
+    document.querySelectorAll('.gc,.out-card,.hx-card,.state-box,.section-box,.unit-card,.pipe-section,.pipe-card').forEach(el => el.classList.add('tcp-card'));
+    document.querySelectorAll('.ob,.out-row,.unit-row').forEach(el => el.classList.add('tcp-result-row'));
+    document.querySelectorAll('.inp,.inp-sm,.gl-sel').forEach(el => el.classList.add('tcp-input'));
+  }
+  document.addEventListener('DOMContentLoaded', apply);
+  document.addEventListener('input', () => requestAnimationFrame(apply), true);
+  document.addEventListener('change', () => requestAnimationFrame(apply), true);
+  document.addEventListener('click', () => requestAnimationFrame(apply), true);
+})();
