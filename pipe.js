@@ -227,3 +227,12 @@ document.addEventListener('DOMContentLoaded', () => {
   setPipeMaterial($('pipe-material')?.value || 'all');
   calcPipeTab();
 });
+
+document.addEventListener('change', (ev) => {
+  if (ev.target && ev.target.matches('#tab-pipe #pipe-material')) {
+    if (typeof calcPipeTab === 'function') calcPipeTab();
+    if (typeof renderPipeTab === 'function') renderPipeTab();
+    if (typeof window.calcPipeTab === 'function') window.calcPipeTab();
+    if (typeof window.renderPipeTab === 'function') window.renderPipeTab();
+  }
+});

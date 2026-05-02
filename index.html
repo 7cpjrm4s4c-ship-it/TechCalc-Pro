@@ -337,7 +337,7 @@
 
     <div class="gc tcp-card pipe-material-card">
       <div class="slbl">Rohmaterial</div>
-      <select class="gl-sel pipe-material-select" id="pipe-material" aria-label="Rohmaterial ausw&auml;hlen">
+      <select class="gl-sel pipe-material-select" id="pipe-material-legacy" aria-label="Rohmaterial ausw&auml;hlen">
         <option value="all">Alle verf&uuml;gbaren Materialien</option>
         <option value="steel">Stahl</option>
         <option value="mapress">Mapress Edelstahl</option>
@@ -544,6 +544,16 @@
 </div>
 
 <div id="tab-pipe" class="tab-panel tcp-module tcp-module--pipe tcp-module--v2">
+
+        <section class="gc tcp-card pipe-material-card" data-pipe-material-card>
+          <div class="slbl">ROHRLEITUNGSMATERIAL</div>
+          <select id="pipe-material" class="gl-sel pipe-material-select" aria-label="Rohrleitungsmaterial">
+            <option value="all">Alle Materialien</option>
+            <option value="steel">Stahl</option>
+            <option value="mapress">Mapress Edelstahl</option>
+          </select>
+        </section>
+
 
   <div class="pipe-params">
     <div class="igrp tcp-input-group tcp-input-group--compact">

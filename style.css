@@ -2387,3 +2387,73 @@ body.tc-app .bottom-pill{z-index:3000!important;}
 body.tc-app.menu-open .bottom-pill,body.tc-app.sheet-open .bottom-pill,body.tc-app.plus-open .bottom-pill{opacity:.12!important;pointer-events:none!important;}
 body.tc-app .plus-overlay.open{z-index:3400!important;pointer-events:auto!important;}
 body.tc-app .plus-sheet.open{z-index:3500!important;pointer-events:auto!important;}
+
+
+/* ═══════════════════════════════════════════════════════
+   PHASE 20 — PIPE UI FIXES
+═══════════════════════════════════════════════════════ */
+body.tc-app #tab-pipe .pipe-material-card,
+body.tc-app #tab-pipe [data-pipe-material-card]{
+  display:block!important;
+  width:100%!important;
+  margin:0 0 var(--tcp-v2-gap,14px) 0!important;
+  padding:var(--tcp-v2-card-pad-y,14px) var(--tcp-v2-card-pad-x,14px)!important;
+}
+body.tc-app #tab-pipe #pipe-material,
+body.tc-app #tab-pipe .pipe-material-select{
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  min-height:var(--tcp-v2-control-h,42px)!important;
+  font-size:var(--tcp-v2-input-font,15px)!important;
+  border-radius:var(--tcp-v2-control-radius,14px)!important;
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+body.tc-app #tab-flow #pipe-material,
+body.tc-app #tab-flow .pipe-material-card,
+body.tc-app #tab-flow [data-pipe-material-card]{
+  display:none!important;
+}
+body.tc-app :is(#tab-flow,#tab-pipe) :is(.pipe-pair,.pipe-recommendation-card .pipe-pair){
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:var(--tcp-v2-gap,14px)!important;
+  align-items:stretch!important;
+  width:100%!important;
+  max-width:none!important;
+}
+body.tc-app :is(#tab-flow,#tab-pipe) .pipe-card{
+  width:100%!important;
+  max-width:none!important;
+  min-height:236px!important;
+  height:100%!important;
+  display:grid!important;
+  grid-template-rows:auto auto 1fr auto!important;
+  align-content:stretch!important;
+}
+@media(max-width:430px){
+  body.tc-app :is(#tab-flow,#tab-pipe) :is(.pipe-pair,.pipe-recommendation-card .pipe-pair){
+    grid-template-columns:1fr!important;
+  }
+}
+body.tc-app :is(#tab-flow,#tab-pipe) .pipe-card :is(.pipe-metric,.pipe-row,.pipe-values-row,.pstat,.pv,.dpv){
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:baseline!important;
+  column-gap:12px!important;
+  width:100%!important;
+}
+body.tc-app :is(#tab-flow,#tab-pipe) .pipe-card :is(.pipe-metric-value,.pipe-value,.metric-value,.pstat strong,.pv strong,.dpv strong){
+  text-align:right!important;
+  justify-self:end!important;
+}
+body.tc-app #tab-flow :is(.tcp-fluid-card .gl-sel,.tcp-fluid-card select,.fluid-select,.fluid-name,[data-fluid-label]){
+  font-size:var(--tcp-v2-input-font,15px)!important;
+  line-height:1.12!important;
+  font-weight:620!important;
+}
+body.tc-app #tab-flow .tcp-fluid-card :is(.chip,.fluid-chip,.cp-chip){
+  font-size:calc(var(--tcp-v2-input-font,15px) - 4px)!important;
+}
