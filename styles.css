@@ -1,0 +1,316 @@
+html,body{height:100%;margin:0}body{min-height:100dvh;background:#0b0b0b;color:#fff;font-family:system-ui}
+
+/* =========================================
+   HX MODULE -- FINAL PRODUCTION UI
+========================================= */
+
+#tab-hx {
+  display: none;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* .hx-layout removed — tab uses standard flex layout */
+
+/* Desktop Layout */
+
+@media (min-width: 1100px) {
+  /* .hx-layout removed — unused */
+
+  .hx-diagram-card {
+    grid-column: 2;
+    grid-row: 1 / span 5;
+    min-height: 780px;
+  }
+}
+
+/* Cards */
+
+.hx-card {
+  background:
+    radial-gradient(circle at top left,
+      rgba(30,60,120,0.22),
+      rgba(0,0,0,0.92));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 22px;
+  padding: 22px;
+  backdrop-filter: blur(14px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    0 20px 50px rgba(0,0,0,0.35);
+}
+
+.hx-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.72);
+  margin-bottom: 18px;
+}
+
+/* Toggle */
+
+.hx-mode-switch {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.hx-mode {
+  flex: 1;
+  height: 52px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  color: rgba(255,255,255,0.72);
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.hx-mode.active {
+  background: linear-gradient(
+    135deg,
+    #5b52ff,
+    #746cff
+  );
+  color: white;
+  border-color: transparent;
+  box-shadow:
+    0 10px 30px rgba(90,82,255,0.22);
+}
+
+/* Inputs */
+
+.hx-input-group {
+  margin-bottom: 14px;
+}
+
+.hx-input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.62);
+}
+
+.hx-input,
+select.hx-input {
+  width: 100%;
+  height: 58px;
+  padding: 0 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,0.03),
+      rgba(255,255,255,0.01)
+    );
+  color: white;
+  font-size: 16px;
+  outline: none;
+}
+
+.hx-input::placeholder {
+  color: rgba(255,255,255,0.28);
+}
+
+/* Main Button */
+
+.hx-main-btn {
+  width: 100%;
+  height: 62px;
+  border: none;
+  border-radius: 18px;
+  background: linear-gradient(
+    135deg,
+    #5b52ff,
+    #746cff
+  );
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  box-shadow:
+    0 18px 40px rgba(90,82,255,0.22);
+}
+
+/* State + Result */
+
+.hx-state-box {
+  margin-top: 16px;
+  padding: 18px;
+  border-radius: 16px;
+  background:
+    rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.84);
+  min-height: 72px;
+  line-height: 1.5;
+}
+
+/* Diagram */
+
+.hx-diagram-card {
+  min-height: 620px;
+}
+
+.hx-cvs-wrap {
+  height: 100%;
+  min-height: 560px;
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    rgba(0,0,0,0.28);
+}
+
+#hxCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ==========================================================================
+   Phase 8.5 — UI Foundation / Result Rows / Action Buttons
+   Zentrale Darstellungsschicht für Module
+   ========================================================================== */
+:root {
+  --ui-result-row-h: 52px;
+  --ui-result-row-pad-y: 9px;
+  --ui-result-row-pad-x: 16px;
+  --ui-result-title-size: 15px;
+  --ui-result-value-size: 21px;
+  --ui-action-h: 32px;
+  --ui-action-radius: 999px;
+}
+
+.ui-result-row,
+.result-standard .ob,
+.mag-result-card .ob,
+.ew-result-card .ob,
+.tw-result-card .ob {
+  min-height: var(--ui-result-row-h) !important;
+  padding: var(--ui-result-row-pad-y) var(--ui-result-row-pad-x) !important;
+  border-radius: 18px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.ui-result-title,
+.result-standard .ob-title,
+.mag-result-card .ob-title,
+.ew-result-card .ob-title {
+  font-size: var(--ui-result-title-size) !important;
+  line-height: 1.18 !important;
+  font-weight: 650 !important;
+}
+
+.ui-result-value,
+.result-standard .out-val,
+.mag-result-card .out-val,
+.ew-result-card .out-val {
+  font-size: var(--ui-result-value-size) !important;
+  line-height: 1.05 !important;
+  font-weight: 750 !important;
+  white-space: nowrap !important;
+}
+
+.ui-action-row {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+}
+
+.ui-mini-btn,
+.ew-mini-btn {
+  height: var(--ui-action-h) !important;
+  padding: 0 13px !important;
+  border-radius: var(--ui-action-radius) !important;
+  border: 1px solid rgba(96,165,250,.45) !important;
+  background: linear-gradient(180deg, rgba(96,165,250,.20), rgba(96,165,250,.09)) !important;
+  color: var(--blue, #60a5fa) !important;
+  font-family: var(--f, system-ui) !important;
+  font-size: 12px !important;
+  font-weight: 750 !important;
+  letter-spacing: .01em !important;
+  cursor: pointer !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 8px 18px rgba(0,0,0,.18) !important;
+}
+
+.ui-mini-btn.danger,
+.ew-mini-btn.danger {
+  border-color: rgba(255,107,107,.45) !important;
+  background: linear-gradient(180deg, rgba(255,107,107,.18), rgba(255,107,107,.08)) !important;
+  color: #ff6b6b !important;
+}
+
+.ui-mini-btn:active,
+.ew-mini-btn:active {
+  transform: translateY(1px);
+}
+
+/* Entwässerung Strangliste: keine nativen Browser-Buttons */
+#ew-strang-list .ew-detail-row {
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) auto !important;
+  gap: 10px !important;
+  align-items: center !important;
+}
+
+/* Desktop-Spalten: zentrale Oberkante */
+@media (min-width: 900px) {
+  #tab-hx .tab-inner,
+  #tab-luft .tab-inner,
+  #tab-mag .tab-inner,
+  #tab-entwaesserung .tab-inner {
+    align-items: start !important;
+  }
+
+  #tab-hx .hx-desktop-left,
+  #tab-hx .hx-desktop-right,
+  #tab-luft .luft-desktop-left,
+  #tab-luft .luft-desktop-right {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    align-self: start !important;
+  }
+
+  #tab-hx .hx-desktop-right {
+    transform: translateY(0) !important;
+  }
+
+  #tab-luft .luft-desktop-right {
+    min-height: 1px !important;
+    display: grid !important;
+    gap: var(--gap, 18px) !important;
+  }
+}
+
+
+/* Phase 8.5 final guard: Lüftungsausgabe Desktop */
+@media (min-width: 900px) {
+  #tab-luft .luft-desktop-right,
+  #tab-luft .luft-desktop-right > *,
+  #tab-luft .luft-desktop-right .out-card {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  #tab-luft .luft-desktop-right {
+    display: grid !important;
+    grid-column: 2 !important;
+    gap: var(--gap, 18px) !important;
+  }
+  #tab-luft .luft-desktop-left {
+    grid-column: 1 !important;
+  }
+}

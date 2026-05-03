@@ -1,0 +1,93 @@
+/* ═══════════════════════════════════════════════════════
+   TechCalc Pro — Design Tokens
+   Einzige Quelle aller CSS-Variablen
+═══════════════════════════════════════════════════════ */
+:root {
+  /* True black base */
+  --bg: #000000;
+
+  /* Glass layers */
+  --glass-low:   rgba(255,255,255,0.07);
+  --glass-mid:   rgba(255,255,255,0.11);
+  --glass-high:  rgba(255,255,255,0.16);
+  --glass-raise: rgba(255,255,255,0.22);
+
+  /* Glass borders */
+  --gb-soft:   rgba(255,255,255,0.10);
+  --gb-mid:    rgba(255,255,255,0.18);
+  --gb-strong: rgba(255,255,255,0.30);
+  --gb-accent: rgba(255,255,255,0.45);
+
+  /* Specular shimmer */
+  --shimmer: linear-gradient(90deg,
+    rgba(255,255,255,0)    0%,
+    rgba(255,255,255,0.22) 30%,
+    rgba(255,255,255,0.32) 50%,
+    rgba(255,255,255,0.22) 70%,
+    rgba(255,255,255,0)    100%);
+
+  /* Colour accents */
+  --heat:   #ff6b35;  --heat-t: #ffaa7a;
+  --cold:   #00c4e8;  --cold-t: #66dfff;
+  --blue:   #4fa8ff;  --blue-t: rgba(79,168,255,0.14); --blue-b: rgba(79,168,255,0.36);
+  --grn:    #34d399;  --grn-t:  rgba(52,211,153,0.14); --grn-b:  rgba(52,211,153,0.36);
+  --air:    #a78bfa;  --air-t:  #c4b5fd;               --air-d:  rgba(167,139,250,0.12);
+                      --air-b:  rgba(167,139,250,0.35);
+  --ok:     #30d158;  --warn:   #ffd60a;  --danger: #ff453a;
+  --out-h:  #ffb87a;  --out-c:  #7ddfff;
+
+  /* Typography */
+  --t1: rgba(255,255,255,0.95);
+  --t2: rgba(255,255,255,0.60);
+  --t3: rgba(255,255,255,0.35);
+  --t4: rgba(255,255,255,0.16);
+  --f:  Arial, Helvetica, sans-serif;
+  --fm: "Courier New", Courier, monospace;
+
+  /* Spacing */
+  --gap:   14px;
+  --gap-s: 10px;
+  --gap-l: 20px;
+  --pad:   18px;
+  --pad-s: 14px;
+
+  /* Radii */
+  --r-s: 10px;  --r-m: 14px;  --r-l: 20px;  --r-xl: 26px;
+
+  /* Safe areas */
+  --sat: env(safe-area-inset-top,    0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left,   0px);
+  --sar: env(safe-area-inset-right,  0px);
+
+  /* Fixed header height */
+  --hdr: 88px;
+}
+
+
+/* Theme Layer - Phase 4 */
+:root[data-theme="light"], :root[data-theme-effective="light"] {
+  --bg:#eef3f8;
+  --glass-low:#f8fafc; --glass-mid:#ffffff; --glass-high:#ffffff; --glass-raise:#eef4fb;
+  --gb-soft:rgba(15,23,42,.18); --gb-mid:rgba(15,23,42,.26); --gb-strong:rgba(15,23,42,.38); --gb-accent:rgba(15,23,42,.52);
+  --shimmer:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.65) 30%,rgba(255,255,255,.88) 50%,rgba(255,255,255,.65) 70%,rgba(255,255,255,0) 100%);
+  --heat:#e05a20; --heat-t:#b84a1c; --cold:#008db0; --cold-t:#007796;
+  --blue:#1677d2; --blue-t:rgba(22,119,210,.12); --blue-b:rgba(22,119,210,.34);
+  --grn:#0b9f6a; --grn-t:rgba(11,159,106,.12); --grn-b:rgba(11,159,106,.32);
+  --air:#7457d8; --air-t:#6750c8; --air-d:rgba(116,87,216,.10); --air-b:rgba(116,87,216,.30);
+  --ok:#138a3d; --warn:#b58400; --danger:#cf2f29; --out-h:#c65a24; --out-c:#007e99;
+  --t1:#111827; --t2:#334155; --t3:#64748b; --t4:#94a3b8;
+}
+@media (prefers-color-scheme: light) {
+  :root[data-theme="system"] {
+    --bg:#eef3f8;
+    --glass-low:#f8fafc; --glass-mid:#ffffff; --glass-high:#ffffff; --glass-raise:#eef4fb;
+    --gb-soft:rgba(15,23,42,.18); --gb-mid:rgba(15,23,42,.26); --gb-strong:rgba(15,23,42,.38); --gb-accent:rgba(15,23,42,.52);
+    --heat:#e05a20; --heat-t:#b84a1c; --cold:#008db0; --cold-t:#007796;
+    --blue:#1677d2; --blue-t:rgba(22,119,210,.12); --blue-b:rgba(22,119,210,.34);
+    --grn:#0b9f6a; --grn-t:rgba(11,159,106,.12); --grn-b:rgba(11,159,106,.32);
+    --air:#7457d8; --air-t:#6750c8; --air-d:rgba(116,87,216,.10); --air-b:rgba(116,87,216,.30);
+    --ok:#138a3d; --warn:#b58400; --danger:#cf2f29; --out-h:#c65a24; --out-c:#007e99;
+    --t1:#111827; --t2:#334155; --t3:#64748b; --t4:#94a3b8;
+  }
+}
