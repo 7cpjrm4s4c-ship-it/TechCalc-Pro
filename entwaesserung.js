@@ -44,7 +44,7 @@ function ewRecommendedPipe(qww, du) {
   if (du <= 8 && qww <= 2.0)   return { anschluss:'DN 70', sammel:'DN 80 / DN 100', fall:'DN 100', grund:'DN 100' };
   if (du <= 20 && qww <= 3.5)  return { anschluss:'DN 100', sammel:'DN 100', fall:'DN 100', grund:'DN 125' };
   if (du <= 50 && qww <= 6.0)  return { anschluss:'DN 100', sammel:'DN 125', fall:'DN 125', grund:'DN 150' };
-  return { anschluss:'objektbezogen', sammel:'objektbezogen', fall:'objektbezogen', grund:'objektbezogen' };
+  return { anschluss:'objektbezogen', sammel:'DN 150+', fall:'DN 150+', grund:'DN 150+' };
 }
 
 function ewHints(result) {
@@ -113,14 +113,18 @@ function calcEntwaesserung() {
 
 function renderEntwaesserung(r) {
   const set = (id, txt) => { const el = ewGet(id); if (el) el.textContent = txt; };
-  // Ergebnis-Grid zeigt ausschließlich den aktuell eingegebenen / bearbeiteten Strang.
-  // Die Summe aller gespeicherten Stränge steht separat in der Strangübersicht.
-  set('ew-du-total', ewFmt(r.duTotal, 1));
-  set('ew-qww', ewFmt(r.qww, 2));
-  set('ew-dim-anschluss', r.dims.anschluss);
-  set('ew-dim-sammel', r.dims.sammel);
-  set('ew-dim-fall', r.dims.fall);
-  set('ew-dim-grund', r.dims.grund);
+  const agg = ewAggregateStraenge();
+  const totalDu = (Number(agg.duTotal) || 0) + (Number(r.duTotal) || 0);
+  const totalQww = (Number(agg.qwwTotal) || 0) + (Number(r.qww) || 0);
+  const displayDims = ewRecommendedPipe(totalQww, totalDu);
+  const display = totalDu > 0 ? { duTotal: totalDu, qww: totalQww, dims: displayDims } : r;
+
+  set('ew-du-total', ewFmt(display.duTotal, 1));
+  set('ew-qww', ewFmt(display.qww, 2));
+  set('ew-dim-anschluss', display.dims.anschluss);
+  set('ew-dim-sammel', display.dims.sammel);
+  set('ew-dim-fall', display.dims.fall);
+  set('ew-dim-grund', display.dims.grund);
   set('ew-k-label', `K = ${ewFmt(r.k, 2)} · ${r.useLabel}`);
 
   const detail = ewGet('ew-detail');
@@ -223,21 +227,12 @@ function renderEntwaesserungTotals() {
     </div>
   `).join('');
 
-  const dims = agg.list.map((s, idx) => `
-    <div class="ew-strang-dim-row ew-strang-fall-row">
-      <strong>${s.name || ('Strang ' + (idx + 1))}</strong>
-      <span>Fallleitung</span>
-      <span>${s.dims?.fall || '–'}</span>
-    </div>
-  `).join('');
-
   host.innerHTML = `
     <div class="ew-total-head">
       <span>Stränge: <strong>${agg.list.length}</strong></span>
       <span>ΣDU: <strong>${ewFmt(agg.duTotal,1)}</strong></span>
       <span>ΣQww: <strong>${ewFmt(agg.qwwTotal,2)} l/s</strong></span>
     </div>
-    <div class="ew-strang-dims">${dims}</div>
     <div class="ew-strang-summary">${rows || '<p style="color:var(--t3);font-size:12px">Keine Gegenstände gespeichert.</p>'}</div>
   `;
 }
@@ -300,13 +295,3 @@ function getEntwaesserungPdfData() {
 window.getEntwaesserungPdfData = getEntwaesserungPdfData;
 
 document.addEventListener('DOMContentLoaded', initEntwaesserung);
-
-/* Phase 17: PDF-Snapshot Provider */
-window.TCP_PDF_SNAPSHOTS = window.TCP_PDF_SNAPSHOTS || {};
-window.TCP_PDF_SNAPSHOTS.entwaesserung = function getEntwaesserungPdfSnapshot() {
-  return (typeof getEntwaesserungPdfData === 'function') ? getEntwaesserungPdfData() : {
-    current: window.EW_STATE?.result || null,
-    aggregate: null,
-    generatedAt: new Date().toISOString()
-  };
-};

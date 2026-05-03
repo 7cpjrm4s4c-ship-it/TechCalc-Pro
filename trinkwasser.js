@@ -401,16 +401,3 @@ function twBind() {
 }
 
 document.addEventListener('DOMContentLoaded', twBind);
-
-/* Phase 17: PDF-Snapshot Provider */
-window.TCP_PDF_SNAPSHOTS = window.TCP_PDF_SNAPSHOTS || {};
-window.TCP_PDF_SNAPSHOTS.trinkwasser = function getTrinkwasserPdfSnapshot() {
-  try {
-    if (typeof calcTrinkwasser === 'function') calcTrinkwasser();
-  } catch (_) {}
-  return {
-    module: 'trinkwasser',
-    result: window.TW_LAST || null,
-    generatedAt: new Date().toISOString()
-  };
-};

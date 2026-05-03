@@ -72,7 +72,7 @@ function calcMAG() {
   };
 
   if ([VA, tMin, tMax, h, pSV].some(isNaN) || VA <= 0 || pSV <= 0 || tMax <= tMin) {
-    ['mag-ve','mag-reserve','mag-vn-min','mag-vn-rec','mag-pressures','mag-p0-out','mag-pfill-out','mag-pe-out','mag-psys-out']
+    ['mag-ve','mag-reserve','mag-vn-min','mag-vn-rec','mag-pressures','mag-pe-out','mag-psys-out']
       .forEach(id => set(id, '–'));
     if (hintEl) hintEl.innerHTML = 'Anlagenvolumen, Temperaturen, statische Höhe und Sicherheitsventil eingeben.';
     window.MAG_STATE.last = null;
@@ -106,8 +106,6 @@ function calcMAG() {
   set('mag-vn-min', _magFmt(VNmin, 1, 'l'));
   set('mag-vn-rec', isNaN(rec) ? 'Druck prüfen' : rec + ' l');
   set('mag-pressures', _magFmt(p0, 1, 'bar') + ' / ' + _magFmt(pFill, 1, 'bar'));
-  set('mag-p0-out', _magFmt(p0, 1, 'bar'));
-  set('mag-pfill-out', _magFmt(pFill, 1, 'bar'));
   set('mag-pe-out', _magFmt(pe, 1, 'bar'));
   set('mag-psys-out', _magFmt(pSys, 1, 'bar'));
 
@@ -169,42 +167,3 @@ function initMAG() {
 }
 
 document.addEventListener('DOMContentLoaded', initMAG);
-
-/* Phase 17: PDF-Snapshot Provider */
-window.TCP_PDF_SNAPSHOTS = window.TCP_PDF_SNAPSHOTS || {};
-window.TCP_PDF_SNAPSHOTS.mag = function getMagPdfSnapshot() {
-  try { if (typeof calcMAG === 'function') calcMAG(); } catch (_) {}
-  const text = id => document.getElementById(id)?.textContent?.trim() || '–';
-  const input = id => document.getElementById(id)?.value?.trim() || '–';
-  const selectText = id => {
-    const el = document.getElementById(id);
-    return el?.options?.[el.selectedIndex]?.text || '–';
-  };
-  return {
-    module: 'mag',
-    inputs: {
-      'mag-volume': input('mag-volume'),
-      'mag-tmin': input('mag-tmin'),
-      'mag-tmax': input('mag-tmax'),
-      'mag-height': input('mag-height'),
-      'mag-sv': input('mag-sv')
-    },
-    selects: {
-      'mag-system': selectText('mag-system'),
-      'mag-medium': selectText('mag-medium')
-    },
-    outputs: {
-      'mag-ve': text('mag-ve'),
-      'mag-reserve': text('mag-reserve'),
-      'mag-vn-min': text('mag-vn-min'),
-      'mag-vn-rec': text('mag-vn-rec'),
-      'mag-pressures': text('mag-pressures'),
-      'mag-p0-out': text('mag-p0-out'),
-      'mag-pfill-out': text('mag-pfill-out'),
-      'mag-pe-out': text('mag-pe-out')
-    },
-    hints: document.getElementById('mag-hints')?.innerText?.trim() || '–',
-    raw: window.MAG_STATE || null,
-    generatedAt: new Date().toISOString()
-  };
-};

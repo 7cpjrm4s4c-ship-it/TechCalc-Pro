@@ -592,7 +592,7 @@
               style="font-size:22px;padding:12px 14px;border-radius:var(--r-m)"
               oninput="unitCalc()"/>
           </div>
-          <select class="gl-sel unit-select-compact" id="unit-from-sel" onchange="unitCalc()"></select>
+          <select class="gl-sel" id="unit-from-sel" style="width:auto;flex-shrink:0;min-width:100px;padding:11px 32px 11px 12px;font-size:13px" onchange="unitCalc()"></select>
         </div>
       </div>
 
@@ -615,7 +615,7 @@
               style="width:100%;background:rgba(52,211,153,.08);border:1.5px solid rgba(52,211,153,.38);color:var(--grn);font-family:var(--fm);font-size:22px;font-weight:700;padding:12px 14px;border-radius:var(--r-m);min-height:52px;transition:color .2s"
               class="unit-ro">&ndash;</div>
           </div>
-          <select class="gl-sel unit-select-compact" id="unit-to-sel" onchange="unitCalc()"></select>
+          <select class="gl-sel" id="unit-to-sel" style="width:auto;flex-shrink:0;min-width:100px;padding:11px 32px 11px 12px;font-size:13px;border-color:rgba(52,211,153,.35)" onchange="unitCalc()"></select>
         </div>
       </div>
     </div>
@@ -1115,8 +1115,7 @@
         <div class="ob mag-ob"><div class="ob-title">Wasservorlage / Reserve</div><div class="out-val has" id="mag-reserve">–</div></div>
         <div class="ob mag-ob"><div class="ob-title">Mindest-MAG Volumen</div><div class="out-val has" id="mag-vn-min">–</div></div>
         <div class="ob mag-ob"><div class="ob-title">Empfohlene MAG-Größe</div><div class="out-val has" id="mag-vn-rec">–</div></div>
-        <div class="ob mag-ob mag-pressure-row"><div class="ob-title">Vordruck</div><div class="out-val has" id="mag-p0-out">–</div></div>
-        <div class="ob mag-ob mag-pressure-row"><div class="ob-title">Fülldruck</div><div class="out-val has" id="mag-pfill-out">–</div></div>
+        <div class="ob mag-ob"><div class="ob-title">Vordruck / Fülldruck</div><div class="out-val has" id="mag-pressures">–</div></div>
         <div class="ob mag-ob"><div class="ob-title">Enddruck</div><div class="out-val has" id="mag-pe-out">–</div></div>
         <div class="ob mag-ob"><div class="ob-title">Systemdruck aus Höhe</div><div class="out-val has" id="mag-psys-out">–</div></div>
       </div></div>
@@ -1216,10 +1215,8 @@
   <div class="plus-grid"></div>
 </div>
 
-<script>window.TECHCALC_BUILD = "20260430-Phase17-RC6";</script>
+<script>window.TECHCALC_BUILD = "20260429-Phase8-5";</script>
 <script src="./app.js"></script>
-<script src="./units.js"></script>
-<script src="./pipe.js"></script>
 <script src="./heating-cooling.js"></script>
 <script src="./ventilation.js"></script>
 <script src="./wrg-mischluft.js"></script>

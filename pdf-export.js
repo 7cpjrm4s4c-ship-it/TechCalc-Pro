@@ -10,26 +10,6 @@
 ═══════════════════════════════════════════════════════ */
 'use strict';
 
-/* PHASE 17 PDF SNAPSHOT REGISTRY */
-window.TCP_PDF_SNAPSHOTS = window.TCP_PDF_SNAPSHOTS || {};
-function _pdfSnapshot(moduleName) {
-  try {
-    const provider = window.TCP_PDF_SNAPSHOTS && window.TCP_PDF_SNAPSHOTS[moduleName];
-    return (typeof provider === 'function') ? provider() : null;
-  } catch (e) {
-    console.warn('[PDF] Snapshot failed:', moduleName, e);
-    return null;
-  }
-}
-function _pdfActiveTab() {
-  if (window.NAV && typeof window.NAV.activeTab === 'string' && window.NAV.activeTab) return window.NAV.activeTab;
-  const pillActive = document.querySelector('.pill-btn.active');
-  if (pillActive?.dataset?.tab) return pillActive.dataset.tab;
-  const activePanel = document.querySelector('.tab-panel.is-active[id^="tab-"]');
-  if (activePanel) return activePanel.id.replace(/^tab-/, '');
-  return 'flow';
-}
-
 /* ───────────────────────────────────────
    MODAL — Projektdaten erfassen
 ─────────────────────────────────────── */
@@ -175,8 +155,19 @@ function triggerPdfPrint() {
   };
 
   closePdfSheet();
-  // Aktiven Tab zentral ermitteln: NAV → aktive Pill → aktives Panel → flow
-  const activeTab = _pdfActiveTab();
+
+  // Aktiven Tab ermitteln
+  // Aktiven Tab ermitteln — aus DOM oder URL
+  let activeTab = 'flow';
+  // Check which tab panel is visible
+  ['flow','luft','pipe','unit','hx','wrg','trinkwasser','mag','entwaesserung'].forEach(id => {
+    const el = document.getElementById('tab-' + id);
+    if (el && getComputedStyle(el).display !== 'none') activeTab = id;
+    if (el && !el.style.display && id === 'flow') activeTab = 'flow';
+  });
+  // Fallback: check pill active button
+  const pillActive = document.querySelector('.pill-btn.active');
+  if (pillActive?.dataset?.tab) activeTab = pillActive.dataset.tab;
 
   let html = '';
   if      (activeTab === 'flow') html = _buildFlowPage(meta);
@@ -734,12 +725,11 @@ function _buildWrgPage(meta) {
    TAB: H,X-DIAGRAMM
 ─────────────────────────────────────── */
 function _buildHxPage(meta) {
-  const hxSnap = _pdfSnapshot("hx") || {};
   // Capture existing canvas AS-IS (includes process lines already drawn)
   // Do NOT re-render — that would erase the process visualization
   const srcCanvas = document.getElementById('hxCanvas');
-  let imgSrc = hxSnap.image || null;
-  if (!imgSrc && typeof window._hxBuildPdfSnapshot === 'function') {
+  let imgSrc = null;
+  if (typeof window._hxBuildPdfSnapshot === 'function') {
     imgSrc = window._hxBuildPdfSnapshot();
   }
   if (!imgSrc && srcCanvas) {
@@ -855,8 +845,7 @@ function _buildHxPage(meta) {
    TAB: TRINKWASSER
 ─────────────────────────────────────── */
 function _buildTrinkwasserPage(meta) {
-  const snap = _pdfSnapshot("trinkwasser");
-  const r = snap?.result || window.TW_LAST || {};
+  const r = window.TW_LAST || {};
   const esc = v => String(v ?? '–').replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
   const neBlocks = (r.neSummary || []).map(ne => {
     const rows = (ne.rows || []).map(x => `<tr><td>${esc(x.label)}</td><td class="num">${x.n}</td><td class="num">${x.vr.toFixed(2)} l/s</td><td class="num">${x.sum.toFixed(2)} l/s</td></tr>`).join('');
@@ -963,7 +952,7 @@ function _buildMagPage(meta) {
    TAB: ENTWÄSSERUNG
 ─────────────────────────────────────── */
 function _buildEntwaesserungPage(meta) {
-  const data = _pdfSnapshot("entwaesserung") || ((typeof getEntwaesserungPdfData === "function") ? getEntwaesserungPdfData() : null);
+  const data = (typeof getEntwaesserungPdfData === 'function') ? getEntwaesserungPdfData() : null;
   const r = data?.current || data || null;
   const agg = data?.aggregate || null;
   const esc = v => String(v ?? '–').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
