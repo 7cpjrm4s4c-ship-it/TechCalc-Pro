@@ -4,16 +4,14 @@
 ═══════════════════════════════════════════════════════ */
 'use strict';
 
-const BUILD_TS   = '20260503-1142';
+const BUILD_TS = '20260501-phase17-rc7-hc-fix';
 const CACHE_NAME = `techcalc-${BUILD_TS}`;
 
 const PRECACHE = [
   './', './index.html',
-  './tokens.css', './layout.css', './components.css', './hc.css',
-  './style.css',
+  './tokens.css', './layout.css', './components.css',
   './app.js', './units.js', './pipe.js', './heating-cooling.js', './ventilation.js',
   './wrg-mischluft.js', './trinkwasser.js', './mag.js', './entwaesserung.js', './pdf-export.js', './hx-engine.js',
-  './css-lazy-loader.js',
   './manifest.json', './favicon.ico', './apple-touch-icon.png',
 ];
 
