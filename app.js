@@ -907,3 +907,21 @@ window.addEventListener('appinstalled', () => {
     setTheme(b.dataset.theme);
   });
 })();
+
+
+/* Architecture Contract: former inline onclick bridge.
+   Temporary compatibility layer; next step is replacing data-tcp-click with explicit data-action handlers. */
+(function tcpCentralClickBridge(){
+  document.addEventListener('click', function(ev){
+    const el = ev.target.closest('[data-tcp-click]');
+    if (!el) return;
+    const code = el.getAttribute('data-tcp-click');
+    if (!code) return;
+    ev.preventDefault();
+    try {
+      Function('event', code).call(el, ev);
+    } catch (err) {
+      console.error('tcpCentralClickBridge failed:', err, code);
+    }
+  }, true);
+})();

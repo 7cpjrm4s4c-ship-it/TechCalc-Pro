@@ -127,7 +127,7 @@ function renderEntwaesserung(r) {
   if (detail) {
     detail.innerHTML = r.rows.length ? r.rows.map(row => `
       <div class="ew-detail-row"><span>${row.count}× ${row.label}</span><strong>${ewFmt(row.du,1)} DU</strong></div>`).join('')
-      : '<p style="color:var(--t3);font-size:12px;text-align:center;padding:8px 0">Entwässerungsgegenstände eingeben →</p>';
+      : '<p class="tcp-u-e453b193a3">Entwässerungsgegenstände eingeben →</p>';
   }
   const hints = ewGet('ew-hints');
   if (hints) hints.innerHTML = ewHints(r).map(h => `<div>• ${h}</div>`).join('');
@@ -211,7 +211,7 @@ function renderEntwaesserungTotals() {
 
   const agg = ewAggregateStraenge();
   if (!agg.list.length) {
-    host.innerHTML = '<p style="color:var(--t3);font-size:12px">Noch keine Stränge angelegt.</p>';
+    host.innerHTML = '<p class="tcp-u-ae0c91f32a">Noch keine Stränge angelegt.</p>';
     return;
   }
 
@@ -238,7 +238,7 @@ function renderEntwaesserungTotals() {
       <span>ΣQww: <strong>${ewFmt(agg.qwwTotal,2)} l/s</strong></span>
     </div>
     <div class="ew-strang-dims">${dims}</div>
-    <div class="ew-strang-summary">${rows || '<p style="color:var(--t3);font-size:12px">Keine Gegenstände gespeichert.</p>'}</div>
+    <div class="ew-strang-summary">${rows || '<p class="tcp-u-ae0c91f32a">Keine Gegenstände gespeichert.</p>'}</div>
   `;
 }
 
@@ -271,7 +271,7 @@ function renderStrangListe() {
 
   const list = EW_STATE.straenge || [];
   if (!list.length) {
-    host.innerHTML = '<p style="color:var(--t3);font-size:12px">Noch keine Stränge angelegt.</p>';
+    host.innerHTML = '<p class="tcp-u-ae0c91f32a">Noch keine Stränge angelegt.</p>';
     renderEntwaesserungTotals();
     return;
   }
@@ -280,8 +280,8 @@ function renderStrangListe() {
     <div class="ew-strang-row">
       <div class="ew-strang-main"><strong>${s.name}</strong><span>${ewFmt(s.duTotal,1)} DU · Qww ${ewFmt(s.qww,2)} l/s</span></div>
       <div class="ui-action-row">
-        <button class="ew-mini-btn" type="button" onclick="editEntwaesserungStrang(${s.id})">Bearbeiten</button>
-        <button class="ew-mini-btn danger" type="button" onclick="deleteEntwaesserungStrang(${s.id})">Löschen</button>
+        <button class="ew-mini-btn" type="button" data-tcp-click="editEntwaesserungStrang(${s.id})">Bearbeiten</button>
+        <button class="ew-mini-btn danger" type="button" data-tcp-click="deleteEntwaesserungStrang(${s.id})">Löschen</button>
       </div>
     </div>
   `).join('');

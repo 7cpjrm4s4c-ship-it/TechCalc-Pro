@@ -80,18 +80,18 @@ function twRecommendMeter(vsLs) {
 }
 
 function twFixtureInput(id, value='0') {
-  return `<div class="iwrap" style="min-width:0">
-    <input class="inp-sm tw-in" id="${id}" type="number" min="0" step="1" value="${value}" inputmode="numeric" style="padding:10px 12px;font-size:16px"/>
+  return `<div class="iwrap tcp-u-3922d32600">
+    <input class="inp-sm tw-in tcp-u-949c644d53" id="${id}" type="number" min="0" step="1" value="${value}" inputmode="numeric"/>
     <span class="iunit">St.</span>
   </div>`;
 }
 
 function twFixtureRows(prefix, counts={}) {
   return TW_FIXTURES.map(f => `
-    <div class="tw-row" style="display:grid;grid-template-columns:1fr 86px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--gb-soft)">
+    <div class="tw-row tcp-u-3060a616fd">
       <div>
-        <div style="font-family:var(--f);font-size:13px;font-weight:700;color:var(--t2)">${f.label}</div>
-        <div style="font-family:var(--fm);font-size:11px;color:var(--t3)">V<sub>R</sub> ${twFmt(f.vr,2)} l/s ${f.dauer?'· Dauerverbraucher':''}</div>
+        <div class="tcp-u-d01607e3a1">${f.label}</div>
+        <div class="tcp-u-fe5da01803">V<sub>R</sub> ${twFmt(f.vr,2)} l/s ${f.dauer?'· Dauerverbraucher':''}</div>
       </div>
       ${twFixtureInput(`${prefix}-${f.id}`, counts[f.id] || 0)}
     </div>`).join('');
@@ -246,39 +246,39 @@ function renderTwNes(preserveFocus=true) {
     const open = ne.open;
     const typeOpts = Object.entries(TW_NE_TYPES).map(([k, v]) => `<option value="${k}"${k===ne.type?' selected':''}>${v.label}</option>`).join('');
     const rows = TW_FIXTURES.map(f => `
-      <div style="display:grid;grid-template-columns:1fr 82px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--gb-soft)">
+      <div class="tcp-u-8f7485cdbb">
         <div>
-          <div style="font-family:var(--f);font-size:12px;font-weight:700;color:var(--t2)">${f.label}</div>
-          <div style="font-family:var(--fm);font-size:10px;color:var(--t3)">V<sub>R</sub> ${twFmt(f.vr,2)} l/s</div>
+          <div class="tcp-u-9995da14d9">${f.label}</div>
+          <div class="tcp-u-a6f2869ad2">V<sub>R</sub> ${twFmt(f.vr,2)} l/s</div>
         </div>
         ${twFixtureInput(`tw-ne-${ne.id}-${f.id}`, ne.counts[f.id] || 0)}
       </div>`).join('');
-    return `<div class="gc tw-ne-card" data-ne-id="${ne.id}" style="padding:0;margin-top:10px;overflow:hidden;background:rgba(255,255,255,.025)">
-      <button type="button" class="tw-ne-head" data-act="toggle" data-id="${ne.id}" style="width:100%;border:0;background:transparent;color:var(--t1);text-align:left;padding:13px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;cursor:pointer">
-        <span style="font-size:17px;color:var(--blue)">${open?'▼':'▶'}</span>
+    return `<div class="gc tw-ne-card tcp-u-64ff55138d" data-ne-id="${ne.id}">
+      <button type="button" class="tw-ne-head tcp-u-4cacd66cf0" data-act="toggle" data-id="${ne.id}">
+        <span class="tcp-u-50ed38927f">${open?'▼':'▶'}</span>
         <span>
-          <span style="display:block;font-family:var(--f);font-size:13px;font-weight:800;color:var(--t1)">NE ${idx+1} · <span id="tw-ne-title-${ne.id}">${twNeTitle(ne)}</span></span>
-          <span id="tw-ne-summary-${ne.id}" style="display:block;font-family:var(--fm);font-size:11px;color:var(--t3);margin-top:3px">${twNeSummary(ne)}</span>
+          <span class="tcp-u-c94492db98">NE ${idx+1} · <span id="tw-ne-title-${ne.id}">${twNeTitle(ne)}</span></span>
+          <span id="tw-ne-summary-${ne.id}" class="tcp-u-cca3c08464">${twNeSummary(ne)}</span>
         </span>
-        <span type="button" class="tw-ne-del" data-act="remove" data-id="${ne.id}" style="font-family:var(--f);font-size:12px;color:var(--danger);padding:6px 8px">Löschen</span>
+        <span type="button" class="tw-ne-del tcp-u-b7e6c066c4" data-act="remove" data-id="${ne.id}">Löschen</span>
       </button>
-      <div style="display:${open?'block':'none'};padding:0 14px 14px;border-top:1px solid var(--gb-soft)">
-        <div class="igrp" style="margin-top:12px">
+      <div class="tcp-u-b89880ccf9">
+        <div class="igrp tcp-u-56f4356299">
           <div class="ilbl">Nutzungseinheit</div>
           <select class="gl-sel tw-ne-type" id="tw-ne-type-${ne.id}" data-id="${ne.id}">${typeOpts}</select>
         </div>
         <div class="igrp">
           <div class="ilbl">Bezeichnung optional</div>
-          <div class="iwrap"><input class="inp tw-ne-name" id="tw-ne-name-${ne.id}" data-id="${ne.id}" type="text" value="${twEsc(ne.name)}" placeholder="z. B. WC Damen EG" style="font-size:15px;padding:11px 14px"/></div>
+          <div class="iwrap"><input class="inp tw-ne-name tcp-u-ca2b21d2ac" id="tw-ne-name-${ne.id}" data-id="${ne.id}" type="text" value="${twEsc(ne.name)}" placeholder="z. B. WC Damen EG"/></div>
         </div>
         <div class="igrp">
           <div class="ilbl">Gleichzeitigkeitsansatz</div>
-          <div style="display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center">
-            <div class="info-txt" id="tw-ne-hint-${ne.id}" style="margin:0">${def.hint}</div>
-            <div class="iwrap"><input class="inp-sm tw-ne-gl" id="tw-ne-gl-${ne.id}" data-id="${ne.id}" type="text" inputmode="decimal" lang="de-DE" pattern="[0-9]*[,.]?[0-9]*" autocomplete="off" value="${String(Number(ne.gl || 0).toFixed(2)).replace('.', ',')}" ${def.editable?'':'disabled'} style="font-size:15px;padding:10px 12px"/><span class="iunit">GL</span></div>
+          <div class="tcp-u-11ff178e59">
+            <div class="info-txt tcp-u-1169661891" id="tw-ne-hint-${ne.id}">${def.hint}</div>
+            <div class="iwrap"><input class="inp-sm tw-ne-gl tcp-u-ae4126c076" id="tw-ne-gl-${ne.id}" data-id="${ne.id}" type="text" inputmode="decimal" lang="de-DE" pattern="[0-9]*[,.]?[0-9]*" autocomplete="off" value="${String(Number(ne.gl || 0).toFixed(2)).replace('.', ',')}" ${def.editable?'':'disabled'}/><span class="iunit">GL</span></div>
           </div>
         </div>
-        <div class="slbl" style="margin-top:8px">Verbraucher dieser NE</div>
+        <div class="slbl tcp-u-8a77e5a311">Verbraucher dieser NE</div>
         ${rows}
       </div>
     </div>`;

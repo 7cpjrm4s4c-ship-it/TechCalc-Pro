@@ -91,3 +91,15 @@
     --t1:#111827; --t2:#334155; --t3:#64748b; --t4:#94a3b8;
   }
 }
+
+
+/* Architecture Contract Tokens */
+:root{
+  --tcp-arch-spacing-card:14px;
+  --tcp-arch-spacing-grid:14px;
+  --tcp-arch-radius-card:22px;
+  --tcp-arch-control-h:42px;
+  --tcp-arch-font-input:15px;
+  --tcp-arch-font-label:11px;
+  --tcp-arch-font-result:18px;
+}

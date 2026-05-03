@@ -188,7 +188,7 @@ function calcPipeTab() {
   const leg = $('pipe-legend');
 
   if (!vol) {
-    el.innerHTML = '<p style="font-family:Arial,sans-serif;color:var(--t3);font-size:12px;text-align:center;padding:18px 0">Volumenstrom eingeben \u2192</p>';
+    el.innerHTML = '<p class="tcp-u-b1b85b9a55">Volumenstrom eingeben \u2192</p>';
     if (leg) leg.style.display = 'none';
     return;
   }
