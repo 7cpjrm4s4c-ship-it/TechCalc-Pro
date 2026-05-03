@@ -9,15 +9,25 @@
 <meta name="apple-mobile-web-app-title" content="TechCalc Pro"/>
 <link rel="manifest" href="manifest.json"/>
 
-<!-- App Icon — reduzierte Asset-Struktur -->
-<link rel="icon" type="image/png" href="apple-touch-icon.png"/>
-<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+<!-- Favicon — alle Browser -->
+<link rel="icon" type="image/x-icon" href="favicon.ico"/>
+<link rel="icon" type="image/png" sizes="16x16"  href="icon-16.png"/>
+<link rel="icon" type="image/png" sizes="32x32"  href="icon-32.png"/>
+<link rel="icon" type="image/png" sizes="48x48"  href="icon-48.png"/>
+<link rel="icon" type="image/png" sizes="96x96"  href="icon-96.png"/>
+
+<!-- iOS Safari (Apple Touch Icon — KRITISCH für Homescreen) -->
+<link rel="apple-touch-icon"                   href="icon-180.png"/>
+<link rel="apple-touch-icon" sizes="120x120"   href="icon-120.png"/>
+<link rel="apple-touch-icon" sizes="152x152"   href="icon-152.png"/>
+<link rel="apple-touch-icon" sizes="167x167"   href="icon-167.png"/>
+<link rel="apple-touch-icon" sizes="180x180"   href="icon-180.png"/>
 
 <!-- iOS Splash / Status Bar -->
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 
 <!-- Windows Tile (IE/Edge legacy + modern Windows) -->
-<meta name="msapplication-TileImage"   content="apple-touch-icon.png"/>
+<meta name="msapplication-TileImage"   content="icon-144.png"/>
 <meta name="msapplication-TileColor"   content="#000000"/>
 <meta name="msapplication-config"      content="none"/>
 
@@ -25,7 +35,7 @@
 <meta name="theme-color" content="#000000"/>
 
 <!-- macOS Safari Pinned Tab -->
-
+<link rel="mask-icon" href="icon-512.png" color="#4fa8ff"/>
 <meta name="techcalc-build" content="20260427-2015"/>
 <title>TechCalc Pro</title>
 <link rel="stylesheet" href="tokens.css"/>
@@ -33,7 +43,7 @@
 <link rel="stylesheet" href="components.css"/>
 <link rel="stylesheet" href="style.css"/>
 </head>
-<body class="tc-app tc-ui-v8 tc-ui-v9 tc-ui-v10 tc-ui-v11 tc-ui-v12 tc-ui-v13 tc-ui-v14">
+<body class="tc-app tc-ui-v8 tc-ui-v9 tc-ui-v10 tc-ui-v11">
 
 <!-- ══ HEADER ══ -->
 <header class="hdr">
@@ -42,7 +52,7 @@
 
     <div class="hdr-brand" aria-label="TechCalc Pro">
       <div class="hdr-icon hdr-icon-center">
-        <img src="apple-touch-icon.png" alt="TechCalc Pro Icon" loading="eager" decoding="sync" onerror="this.style.display='none';this.parentElement.classList.add('hdr-icon-fallback')"/>
+        <img src="icon-180.png" alt="TechCalc Pro Icon" onerror="this.style.display='none';this.parentElement.innerHTML='△'"/>
       </div>
       <div class="hdr-brand-text">
         <div class="hdr-title">
