@@ -1,0 +1,74 @@
+/* Phase 19 module CSS: mag.css */
+
+body.tc-app :is(.tcp-module--water,#tab-tw,.tcp-module--pressure,#tab-mag,.tcp-module--drain,#tab-entw){--module-accent:var(--blue,#4fa8ff);--module-accent-t:var(--blue-t,#9dccff);--module-accent-b:rgba(79,168,255,.35)}
+
+
+body.tc-app :is(.tcp-module--pressure,#tab-mag){--module-accent:#fb7185}
+
+
+body.tc-app :is(.tcp-module--pressure,#tab-mag){--module-accent:#fb7185}
+
+
+body.tc-app :is(.tcp-module--pressure,#tab-mag){--module-accent:#fb7185}
+
+
+body.tc-app :is(.mag-result-card,.ew-result-card) .out-val{font-size:clamp(20px,5vw,26px)!important;}
+
+
+body.tc-app #tab-mag .mag-result-card .ob,body.tc-app #tab-entwaesserung .ew-result-card .ob{grid-template-columns:minmax(0,1.45fr) minmax(0,.88fr)!important;gap:8px!important;min-height:56px!important;}
+
+
+body.tc-app #tab-mag .mag-result-card .ob-title,body.tc-app #tab-entwaesserung .ew-result-card .ob-title{font-size:clamp(13px,3.25vw,16px)!important;line-height:1.08!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;letter-spacing:-.015em!important;}
+
+
+body.tc-app #tab-mag .mag-result-card .out-val,body.tc-app #tab-entwaesserung .ew-result-card .out-val{font-size:clamp(18px,4.35vw,23px)!important;line-height:1!important;max-width:100%!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;text-align:right!important;justify-self:end!important;}
+
+
+@media(max-width:380px){body.tc-app #tab-mag .mag-result-card .ob,body.tc-app #tab-entwaesserung .ew-result-card .ob{grid-template-columns:minmax(0,1.6fr) minmax(0,.8fr)!important;}body.tc-app #tab-mag .mag-result-card .out-val,body.tc-app #tab-entwaesserung .ew-result-card .out-val{font-size:18px!important;}}
+
+
+
+/* RC6 — gezielte Fixes Heizung/MAG/Entwässerung/Pill */
+body.tc-app .mag-pressure-row .ob-title{
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+
+
+body.tc-app .mag-pressure-row .out-val{
+  font-size:clamp(22px,5.4vw,30px)!important;
+  letter-spacing:.02em!important;
+}
+
+
+
+/* 3: MAG-Eingabecards/Resultcards auf gleiche Höhe und sauberes Grid */
+body.tc-app #tab-mag :is(.tcp-layout,.module-grid,.calc-grid,.input-grid,.result-grid){
+  gap:8px!important;
+}
+
+
+body.tc-app #tab-mag :is(.tcp-card,.gc,.out-card){
+  align-self:stretch!important;
+}
+
+
+body.tc-app #tab-mag :is(.input-grid,.mag-grid,.form-grid){
+  align-items:stretch!important;
+}
+
+
+body.tc-app #tab-mag :is(.input-grid,.mag-grid,.form-grid) > *{
+  height:100%!important;
+}
+
+
+body.tc-app #tab-mag :is(.ob,.out-row,.tcp-result-row,.ui-result-row){
+  min-height:54px!important;
+}
+
+
+body.tc-app #tab-mag :is(.out-val,.unit-ro,.ui-result-value){
+  font-size:var(--ui2-result-value)!important;
+}

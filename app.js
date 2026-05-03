@@ -1,3 +1,11 @@
+
+function tcpPhase19CssLoad(tabKey){
+  try {
+    if (typeof window.LOAD_CSS === 'function') window.LOAD_CSS(tabKey);
+    document.dispatchEvent(new CustomEvent('tab-change', { detail: { tab: tabKey }, bubbles: true }));
+  } catch (_) {}
+}
+
 /* ═══════════════════════════════════════════════════════
    app.js  —  Massenstromrechner PWA
    Gemeinsame Utilities · Tab-Steuerung · PWA · Einheitenrechner
@@ -677,6 +685,7 @@ function _setBuildLabel() {
 }
 
 function switchTab(t) {
+  tcpPhase19CssLoad(t);
   if (!TABS.includes(t)) return;
   NAV.activeTab = t;
   NAV.sheetOpen = false;  /* Sheet schließt immer beim Tab-Wechsel */
@@ -697,6 +706,7 @@ function _switchFromPlus(tab) {
   if (!TABS.includes(tab)) return;
   // Zusatzmodule bleiben im Plus-Menü. Die Plus-Taste zeigt den aktiven Zustand.
   NAV.activeTab = tab;
+    tcpPhase19CssLoad(tab);
   NAV.sheetOpen = false;
   NAV._apply();
 }
