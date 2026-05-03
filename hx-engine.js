@@ -489,7 +489,7 @@ function _showHxError(msg) {
   const el = document.getElementById('hx-state-result');
   if (!el) return;
   const prev = el.innerHTML;
-  el.innerHTML = `<span class="tcp-u-83766344ce">\u26a0 ${msg}</span>`;
+  el.innerHTML = `<span style="color:rgba(255,100,80,.9);font-size:13px">\u26a0 ${msg}</span>`;
   setTimeout(() => { el.innerHTML = prev; }, 2200);
 }
 
@@ -647,11 +647,11 @@ function calcHxProcess() {
   if (!res) return;
 
   if (!proc) {
-    res.innerHTML = '<span class="tcp-u-5258c7a065">Prozessart wählen (Schritt 3).</span>';
+    res.innerHTML = '<span style="color:var(--t3)">Prozessart wählen (Schritt 3).</span>';
     return;
   }
   if (isNaN(T2)) {
-    res.innerHTML = '<span class="tcp-u-5258c7a065">Zieltemperatur eingeben.</span>';
+    res.innerHTML = '<span style="color:var(--t3)">Zieltemperatur eingeben.</span>';
     return;
   }
 
@@ -686,7 +686,7 @@ function _renderProcessSteps(steps, el) {
   const sign = v => v >= 0 ? '+' : '';
   const fmt  = (v, d) => isNaN(v) ? '--' : (sign(v) + (+v).toFixed(d));
 
-  let html = '<div class="tcp-u-4596ee2a34">';
+  let html = '<div style="font-family:var(--f);font-size:12px">';
 
   // Schritte
   steps.forEach((step, i) => {
@@ -694,17 +694,19 @@ function _renderProcessSteps(steps, el) {
     const dx = step.to.x - step.from.x;
     const dh = step.to.h - step.from.h;
     html += `
-      <div class="tcp-u-c02a960075">
-        <div class="tcp-u-59eddc679e">
-          <div class="tcp-u-ac94bf51d9">
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;
+                  padding:8px 10px;background:rgba(255,255,255,.04);
+                  border-radius:10px;border-left:3px solid ${step.color}">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:12px;color:var(--t1);margin-bottom:3px">
             ${i + 1}.&nbsp;${step.name}
           </div>
-          <div class="tcp-u-607e56706c">
+          <div style="font-family:var(--fm);font-size:11px;color:var(--t3);line-height:1.7">
             ΔT ${fmt(dT,1)} K&emsp;
             Δx ${fmt(dx,2)} g/kg&emsp;
             Δh ${fmt(dh,1)} kJ/kg
           </div>
-          <div class="tcp-u-a2d2f33f04">
+          <div style="font-size:10px;color:var(--t3);margin-top:2px">
             ${step.from.T.toFixed(1)}°C / ${step.from.phi.toFixed(0)}% / ${step.from.x.toFixed(2)} g/kg
             →
             ${step.to.T.toFixed(1)}°C / ${step.to.phi.toFixed(0)}% / ${step.to.x.toFixed(2)} g/kg
@@ -718,14 +720,15 @@ function _renderProcessSteps(steps, el) {
   const dx_tot = sEnd.x - s0.x;
   const dh_tot = sEnd.h - s0.h;
   html += `
-    <div class="tcp-u-46538defc3">
-      <div class="tcp-u-a40cf533ae">Gesamtbilanz</div>
-      <div class="tcp-u-c8a5fb8d53">
+    <div style="margin-top:6px;padding:8px 10px;background:rgba(79,168,255,.08);
+                border:1px solid rgba(79,168,255,.20);border-radius:10px">
+      <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:3px">Gesamtbilanz</div>
+      <div style="font-family:var(--fm);font-size:11px;color:var(--t2);line-height:1.7">
         ΔT ${fmt(dT_tot,1)} K&emsp;
         Δx ${fmt(dx_tot,2)} g/kg&emsp;
         Δh ${fmt(dh_tot,1)} kJ/kg
       </div>
-      <div class="tcp-u-a2d2f33f04">
+      <div style="font-size:10px;color:var(--t3);margin-top:2px">
         Endzustand: ${sEnd.T.toFixed(1)}°C • φ ${sEnd.phi.toFixed(0)}% • x ${sEnd.x.toFixed(2)} g/kg
       </div>
     </div>`;

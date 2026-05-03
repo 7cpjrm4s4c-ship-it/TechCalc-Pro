@@ -49,27 +49,30 @@ const _$   = id => document.getElementById(id);
 /* ─── ZUSTANDSBOX HTML ─── */
 function _stateBox(title, s, color, sub) {
   return `
-  <div class="tcp-u-27fb32174c">
-    <div class="tcp-u-c801a13623">${title}</div>
-    <div class="tcp-u-55884be066">
+  <div style="background:var(--glass-mid);border:1px solid var(--gb-soft);
+              border-radius:var(--r-m);padding:12px">
+    <div style="font-family:var(--f);font-size:10px;font-weight:700;
+                letter-spacing:.13em;text-transform:uppercase;
+                color:${color};margin-bottom:8px">${title}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
       <div>
-        <div class="tcp-u-2f22bb28f0">T [°C]</div>
-        <div class="tcp-u-c311f15cb7">${_wrgFmt(s.T,1)}</div>
+        <div style="font-size:10px;color:var(--t3);font-family:var(--f)">T [°C]</div>
+        <div style="font-family:var(--fm);font-size:15px;font-weight:700;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_wrgFmt(s.T,1)}</div>
       </div>
       <div>
-        <div class="tcp-u-2f22bb28f0">φ [%]</div>
-        <div class="tcp-u-156342ee7d">${_wrgFmt(s.phi,1)}</div>
+        <div style="font-size:10px;color:var(--t3);font-family:var(--f)">φ [%]</div>
+        <div style="font-family:var(--fm);font-size:16px;font-weight:700;color:var(--t1)">${_wrgFmt(s.phi,1)}</div>
       </div>
       <div>
-        <div class="tcp-u-2f22bb28f0">x [g/kg]</div>
-        <div class="tcp-u-ce8d34db41">${_wrgFmt(s.x,2)}</div>
+        <div style="font-size:10px;color:var(--t3);font-family:var(--f)">x [g/kg]</div>
+        <div style="font-family:var(--fm);font-size:14px;font-weight:700;color:var(--blue)">${_wrgFmt(s.x,2)}</div>
       </div>
       <div>
-        <div class="tcp-u-2f22bb28f0">h [kJ/kg]</div>
-        <div class="tcp-u-ce8d34db41">${_wrgFmt(s.h,1)}</div>
+        <div style="font-size:10px;color:var(--t3);font-family:var(--f)">h [kJ/kg]</div>
+        <div style="font-family:var(--fm);font-size:14px;font-weight:700;color:var(--blue)">${_wrgFmt(s.h,1)}</div>
       </div>
     </div>
-    ${sub ? `<div class="tcp-u-ae5b2fbadb">${sub}</div>` : ''}
+    ${sub ? `<div style="font-size:10px;color:var(--t3);margin-top:7px;font-family:var(--f)">${sub}</div>` : ''}
   </div>`;
 }
 
@@ -91,11 +94,11 @@ function calcWRG() {
   if (!el) return;
 
   if ([T_ab, ph_ab, T_au, ph_au, eta].some(isNaN)) {
-    el.innerHTML = '<p class="tcp-u-acdb0d58e9">Alle Felder ausfüllen →</p>';
+    el.innerHTML = '<p style="color:var(--t3);font-size:12px;text-align:center;padding:12px">Alle Felder ausfüllen →</p>';
     return;
   }
   if (eta < 0 || eta > 1) {
-    el.innerHTML = '<p class="tcp-u-e58db81062">⚠ Wirkungsgrad: 0–100 %</p>';
+    el.innerHTML = '<p style="color:rgba(255,100,80,.9);font-size:12px;text-align:center;padding:12px">⚠ Wirkungsgrad: 0–100 %</p>';
     return;
   }
 
@@ -129,12 +132,15 @@ function calcWRG() {
   const delta_x_kond = kondensiert ? +(x_ab - x_sat_fl).toFixed(2) : 0;
   // Kondensatmasse (bei bekanntem Massenstrom — hier pro kg Luft: g/kg → g/kg·h bei 1 kg/h)
   const kondText = kondensiert
-    ? `<div class="tcp-u-ae2b902749">
-         <div class="tcp-u-dc1cfcd22e">&#128167; Kondensat (Fortluft)</div>
-         <div class="tcp-u-2cdbc20b67">
+    ? `<div style="margin-top:8px;padding:8px 10px;background:rgba(0,196,232,.09);
+         border:1px solid rgba(0,196,232,.30);border-radius:var(--r-s)">
+         <div style="font-family:var(--f);font-size:10px;font-weight:700;
+                     letter-spacing:.10em;text-transform:uppercase;
+                     color:var(--cold-t);margin-bottom:3px">&#128167; Kondensat (Fortluft)</div>
+         <div style="font-family:var(--fm);font-size:14px;font-weight:700;color:var(--cold-t)">
            Δx = ${_wrgFmt(delta_x_kond, 2)} g/kg
          </div>
-         <div class="tcp-u-ba004f58f6">
+         <div style="font-size:10px;color:var(--t3);margin-top:2px;font-family:var(--f)">
            Fortluft wird gesättigt (φ=100%) · Restfeuchte kondensiert aus<br>
            Entwässerung im Tauscher erforderlich
          </div>
@@ -142,19 +148,19 @@ function calcWRG() {
     : '';
 
   el.innerHTML = `
-    <div class="tcp-u-c04cd4bef5">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap-s);margin-bottom:var(--gap-s)">
       ${_stateBox('LS3 — Zuluft', s_zl, 'var(--heat-t)', 'Außenluft vorgewärmt')}
       ${_stateBox('LS4 — Fortluft', s_fl, 'var(--cold-t)', kondensiert ? '⚠ Kondensation!' : 'Abluft abgekühlt')}
     </div>
     ${kondText}
-    <div class="tcp-u-47a9c51eb1">
-      <div class="tcp-u-4b7625ce8b">Bilanz WRG</div>
-      <div class="tcp-u-1839262f52">
+    <div style="background:var(--blue-t);border:1px solid var(--blue-b);border-radius:var(--r-m);padding:10px 12px;margin-top:${kondensiert?'8':'0'}px">
+      <div style="font-family:var(--f);font-size:11px;font-weight:700;color:var(--blue);margin-bottom:4px">Bilanz WRG</div>
+      <div style="font-family:var(--fm);font-size:12px;color:var(--t2);line-height:1.7">
         η<sub>t</sub> = ${_wrgFmt(eta*100,0)} %
         &emsp;ΔT<sub>ZL</sub> = +${_wrgFmt(dT_zl,1)} K
         &emsp;Δh<sub>ZL</sub> = +${_wrgFmt(dQ_zl,1)} kJ/kg
       </div>
-      <div class="tcp-u-3cbb0a43f6">
+      <div style="font-size:10px;color:var(--t3);margin-top:4px;font-family:var(--f)">
         Plattenwärmetauscher (sensibel) · kein Feuchtigkeitstransfer
       </div>
     </div>`;
@@ -178,7 +184,7 @@ function calcMix() {
   if (!el) return;
 
   if ([T1, ph1, vol1, T2, ph2, vol2].some(isNaN)) {
-    el.innerHTML = '<p class="tcp-u-acdb0d58e9">Alle Felder ausfüllen →</p>';
+    el.innerHTML = '<p style="color:var(--t3);font-size:12px;text-align:center;padding:12px">Alle Felder ausfüllen →</p>';
     return;
   }
 
@@ -210,23 +216,27 @@ function calcMix() {
   const a2 = (vol2 / volM * 100).toFixed(0);
 
   el.innerHTML = `
-    <div class="tcp-u-4a98b82987">
-      <div class="tcp-u-9a95220000">Gesamtvolumenstrom</div>
-      <div class="tcp-u-82b9411816">
-        ${_wrgFmt(volM,0)}<span class="tcp-u-22509a150a">m³/h</span>
+    <div style="margin-bottom:10px;padding:12px 14px;
+                background:rgba(52,211,153,.10);border:1px solid rgba(52,211,153,.28);
+                border-radius:var(--r-m)">
+      <div style="font-family:var(--f);font-size:10px;font-weight:700;letter-spacing:.12em;
+                  text-transform:uppercase;color:var(--grn);margin-bottom:4px">Gesamtvolumenstrom</div>
+      <div style="font-family:var(--fm);font-size:28px;font-weight:700;color:var(--t1);line-height:1">
+        ${_wrgFmt(volM,0)}<span style="font-size:14px;font-weight:400;color:var(--t3);margin-left:4px">m³/h</span>
       </div>
-      <div class="tcp-u-f9a66af62d">
+      <div style="font-size:11px;color:var(--t3);margin-top:3px;font-family:var(--f)">
         ṁ = ${_wrgFmt(mM,0)} kg/h &nbsp;·&nbsp; LS1: ${a1}% &nbsp;/&nbsp; LS2: ${a2}%
       </div>
     </div>
     ${_stateBox('LS3 — Mischluft', sM, 'var(--grn)', '')}
-    <div class="tcp-u-d73b77ec36">
-      <div class="tcp-u-1e7146e489">Mischungsbilanz</div>
-      <div class="tcp-u-88c55e3857">
-        ṁ₁ = ${_wrgFmt(m1,0)} kg/h + ṁ₂ = ${_wrgFmt(m2,0)} kg/h = <strong class="tcp-u-a192177ada">${_wrgFmt(mM,0)} kg/h</strong>
+    <div style="background:var(--grn-t);border:1px solid var(--grn-b);border-radius:var(--r-m);
+                padding:10px 12px;margin-top:8px">
+      <div style="font-family:var(--f);font-size:11px;font-weight:700;color:var(--grn);margin-bottom:4px">Mischungsbilanz</div>
+      <div style="font-family:var(--fm);font-size:12px;color:var(--t2);line-height:1.8">
+        ṁ₁ = ${_wrgFmt(m1,0)} kg/h + ṁ₂ = ${_wrgFmt(m2,0)} kg/h = <strong style="color:var(--grn)">${_wrgFmt(mM,0)} kg/h</strong>
       </div>
-      <div class="tcp-u-78eb4a057c">
-        V̇₁ = ${_wrgFmt(vol1,0)} m³/h + V̇₂ = ${_wrgFmt(vol2,0)} m³/h = <strong class="tcp-u-a192177ada">${_wrgFmt(volM,0)} m³/h</strong>
+      <div style="font-size:11px;color:var(--t2);margin-top:3px;font-family:var(--fm)">
+        V̇₁ = ${_wrgFmt(vol1,0)} m³/h + V̇₂ = ${_wrgFmt(vol2,0)} m³/h = <strong style="color:var(--grn)">${_wrgFmt(volM,0)} m³/h</strong>
       </div>
     </div>`;
 }

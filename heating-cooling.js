@@ -27,141 +27,12 @@
     pg25:  { cp: 3.870, rho: 1024, frost: 'bis −10 °C',    label: 'Propylenglykol 25 %' },
     pg30:  { cp: 3.740, rho: 1030, frost: 'bis −13 °C',    label: 'Propylenglykol 30 %' },
     pg35:  { cp: 3.610, rho: 1037, frost: 'bis −18 °C',    label: 'Propylenglykol 35 %' }
-
   });
-
-  /* ───────────────────────────────────────
-     Lokale Rohrdimensionierung Heizung/Kälte
-     Keine Abhängigkeit zum Rohr-Tab / pipe.js.
-  ─────────────────────────────────────── */
-  const HC_PIPES = [
-    [ 15,  16.1, 21.3, 2.60, 'DIN EN 10255',  16.0,  18.0, 1.0],
-    [ 20,  21.6, 26.9, 2.65, 'DIN EN 10255',  19.6,  22.0, 1.2],
-    [ 25,  27.2, 33.7, 3.25, 'DIN EN 10255',  25.6,  28.0, 1.2],
-    [ 32,  35.9, 42.4, 3.25, 'DIN EN 10255',  32.0,  35.0, 1.5],
-    [ 40,  41.8, 48.3, 3.25, 'DIN EN 10255',  39.0,  42.0, 1.5],
-    [ 50,  53.0, 60.3, 3.65, 'DIN EN 10255',  51.0,  54.0, 1.5],
-    [ 65,  69.6, 76.1, 3.25, 'DIN EN 10220',  72.1,  76.1, 2.0],
-    [ 80,  82.5, 88.9, 3.20, 'DIN EN 10220',  84.9,  88.9, 2.0],
-    [100, 107.1,114.3, 3.60, 'DIN EN 10220', 104.0, 108.0, 2.0],
-    [125, 131.7,139.7, 4.00, 'DIN EN 10220',  null,  null, null],
-    [150, 155.8,168.3, 4.50, 'DIN EN 10220',  null,  null, null],
-    [200, 203.1,219.1, 8.00, 'DIN EN 10220',  null,  null, null],
-    [250, 254.5,273.0, 8.80, 'DIN EN 10220',  null,  null, null],
-    [300, 303.1,323.9, 9.50, 'DIN EN 10220',  null,  null, null],
-  ];
-  const HC_PIPE_RHO = 983.2;
-  const HC_PIPE_NU  = 0.474e-6;
-  const HC_PIPE_ES  = 0.046e-3;
-  const HC_PIPE_EM  = 0.015e-3;
-  const HC_PIPE_DP0 = 100;
-  const HC_MAPRESS_MAX_DN = 100;
-
-  function hcLambdaCW(Re, eps, D) {
-    if (Re < 1e-9) return 0;
-    if (Re < 2300) return 64 / Re;
-    let l = 0.25 / Math.pow(Math.log10(eps / (3.7 * D) + 5.74 / Math.pow(Re, 0.9)), 2);
-    for (let i = 0; i < 40; i++) {
-      const n = Math.pow(-2 * Math.log10(eps / (3.71 * D) + 2.51 / (Re * Math.sqrt(l))), -2);
-      if (Math.abs(n - l) < 1e-11) { l = n; break; }
-      l = n;
-    }
-    return l;
-  }
-
-  function hcPdrop(vol, diMm, eps) {
-    if (!vol || !diMm) return { dp: 0, v: 0 };
-    const D = diMm / 1000;
-    const A = Math.PI * D * D / 4;
-    const v = (vol / 3600) / A;
-    const Re = v * D / HC_PIPE_NU;
-    return { dp: hcLambdaCW(Re, eps, D) * HC_PIPE_RHO * v * v / (2 * D), v };
-  }
-
-  function hcPipeState(dp, mx) {
-    return dp <= mx * 0.75 ? 'ok' : dp <= mx ? 'warn' : 'bad';
-  }
-
-  function hcPipePick(vol, mx, system) {
-    if (system === 'mapress') {
-      const idx = HC_PIPES.findIndex(p => p[5] !== null && hcPdrop(vol, p[5], HC_PIPE_EM).dp <= mx);
-      const fallback = HC_PIPES.findIndex(p => p[0] === HC_MAPRESS_MAX_DN);
-      return { pipe: HC_PIPES[idx < 0 ? fallback : idx], recommended: idx >= 0, system };
-    }
-    const idx = HC_PIPES.findIndex(p => hcPdrop(vol, p[1], HC_PIPE_ES).dp <= mx);
-    return { pipe: HC_PIPES[idx < 0 ? HC_PIPES.length - 1 : idx], recommended: idx >= 0, system: 'steel' };
-  }
-
-  function hcPipeCard(data, vol, mx, variant) {
-    const p = data.pipe;
-    const isMapress = data.system === 'mapress';
-    const di = isMapress ? p[5] : p[1];
-    const da = isMapress ? p[6] : p[2];
-    const wall = isMapress ? p[7] : p[3];
-    const norm = isMapress ? 'Mapress Edelstahl' : p[4];
-
-    if (isMapress && (p[0] > HC_MAPRESS_MAX_DN || di === null)) {
-      return `<div class="pipe-card hc-pipe-card pipe-card--${variant} is-unavailable">
-        <div class="hc-pipe-head"><span class="hc-pipe-system">Mapress Edelstahl</span></div>
-        <div class="hc-pipe-dn">DN ${p[0]}</div>
-        <div class="hc-pipe-grid"><div class="hc-pipe-muted">Nicht verfügbar</div><div class="hc-pipe-muted">max. DN ${HC_MAPRESS_MAX_DN}</div></div>
-      </div>`;
-    }
-
-    const r = hcPdrop(vol, di, isMapress ? HC_PIPE_EM : HC_PIPE_ES);
-    const stateName = hcPipeState(r.dp, mx);
-    const dpTxt = r.dp < 10 ? r.dp.toFixed(1) : String(Math.round(r.dp));
-    const cls = [
-      'pipe-card','hc-pipe-card',`pipe-card--${variant}`,`pipe-card--${stateName}`,
-      data.recommended ? 'is-recommended' : ''
-    ].filter(Boolean).join(' ');
-    const star = data.recommended ? '<span class="hc-pipe-star" aria-label="Empfohlen">★</span>' : '';
-
-    return `<div class="${cls}">
-      <div class="hc-pipe-head">
-        <span class="hc-pipe-system">${norm}</span>
-        ${star}
-      </div>
-      <div class="hc-pipe-dn">DN ${p[0]}</div>
-      <div class="hc-pipe-grid">
-        <div class="hc-pipe-label">Ø ${da} × ${wall} mm</div>
-        <div class="hc-pipe-value">${dpTxt}<span> Pa/m</span></div>
-        <div class="hc-pipe-label">dᵢ ${Number(di).toFixed(1)} mm</div>
-        <div class="hc-pipe-value">${r.v.toFixed(2)}<span> m/s</span></div>
-      </div>
-    </div>`;
-  }
-
-  function hcPipeMaterialControls(prefix) {
-    const cur = state[prefix]?.pipeMaterial || 'all';
-    const items = [
-      ['all', 'Alle'],
-      ['steel', 'DIN EN 10220'],
-      ['mapress', 'Mapress Edelstahl']
-    ];
-    return `<div class="hc-pipe-material" data-pipe-owner="${prefix}">
-      ${items.map(([key, label]) => `<button type="button" class="hc-pipe-chip ${cur === key ? 'is-active' : ''}" data-hc-pipe-material="${key}" data-p="${prefix}">${label}</button>`).join('')}
-    </div>`;
-  }
-
-  function renderHcPipePair(containerId, prefix, vol, mx, variant) {
-    const el = $(containerId);
-    if (!el) return;
-    if (!vol) { el.innerHTML = ''; return; }
-
-    const material = state[prefix]?.pipeMaterial || 'all';
-    const cards = [];
-    if (material === 'all' || material === 'steel') cards.push(hcPipeCard(hcPipePick(vol, mx, 'steel'), vol, mx, variant));
-    if (material === 'all' || material === 'mapress') cards.push(hcPipeCard(hcPipePick(vol, mx, 'mapress'), vol, mx, variant));
-
-    el.classList.toggle('pipe-pair--single', cards.length === 1);
-    el.innerHTML = hcPipeMaterialControls(prefix) + `<div class="hc-pipe-card-grid">${cards.join('')}</div>`;
-  }
 
   const state = {
     activePanel: 'h',
-    h: { mode: 'ms', qUnit: 'W', pipeMaterial: 'all' },
-    k: { mode: 'ms', qUnit: 'W', pipeMaterial: 'all' }
+    h: { mode: 'ms', qUnit: 'W' },
+    k: { mode: 'ms', qUnit: 'W' }
   };
 
   function fluid() {
@@ -396,12 +267,12 @@
     show($('pi-card'), any);
     show($('pi-placeholder'), !any);
 
-    const dp0 = HC_PIPE_DP0;
+    const dp0 = window.TCP_PIPE?.DP0 || 100;
     if (h.ok) {
       show($('pi-h'), true);
       const vol = $('pi-h-vol');
       if (vol) vol.textContent = `(${loc(h.m3h, 3)} m³/h)`;
-      renderHcPipePair('pi-h-pair', 'h', h.m3h, dp0, 'heat');
+      window.TCP_PIPE?.renderPair?.('pi-h-pair', h.m3h, dp0, 'best-h');
     } else {
       show($('pi-h'), false);
     }
@@ -410,7 +281,7 @@
       show($('pi-k'), true);
       const vol = $('pi-k-vol');
       if (vol) vol.textContent = `(${loc(k.m3h, 3)} m³/h)`;
-      renderHcPipePair('pi-k-pair', 'k', k.m3h, dp0, 'cool');
+      window.TCP_PIPE?.renderPair?.('pi-k-pair', k.m3h, dp0, 'best-k');
     } else {
       show($('pi-k'), false);
     }
@@ -421,16 +292,6 @@
   function handleClick(ev) {
     const btn = ev.target?.closest?.('button');
     if (!btn) return;
-
-    if (btn.dataset.hcPipeMaterial && btn.dataset.p) {
-      ev.preventDefault();
-      const p = btn.dataset.p;
-      if (state[p]) {
-        state[p].pipeMaterial = btn.dataset.hcPipeMaterial;
-        calcAll();
-      }
-      return;
-    }
 
     if (btn.id === 'flow-btn-h') { ev.preventDefault(); flowSwitch('h'); return; }
     if (btn.id === 'flow-btn-k') { ev.preventDefault(); flowSwitch('k'); return; }
@@ -469,7 +330,7 @@
     calcAll();
   }
 
-  window.TCP_HC = { state, fluid, calcAll, flowSwitch, setQUnit, setMode, init: initHeatingCooling, renderHcPipePair };
+  window.TCP_HC = { state, fluid, calcAll, flowSwitch, setQUnit, setMode, init: initHeatingCooling };
   window.calcAll = calcAll;
   window.flowSwitch = flowSwitch;
   window.setQUnit = setQUnit;

@@ -66,7 +66,7 @@ function luftSwitch(hk) {
   const ptitle = $('luft-ptitle');
   if (ptitle) ptitle.innerHTML = hk === 'h'
     ? '<div class="dot dot-h"></div><span class="ptitle-lbl">Heizleistung \u2014 Eingaben</span>'
-    : '<div class="dot dot-c"></div><span class="ptitle-lbl tcp-u-8d1522670a">K\u00fchlleistung \u2014 Eingaben</span>';
+    : '<div class="dot dot-c"></div><span class="ptitle-lbl" style="color:var(--cold-t)">K\u00fchlleistung \u2014 Eingaben</span>';
 
   const dtl = $('luft-dt-auto-lbl');
   if (dtl) dtl.innerHTML = hk === 'h'
@@ -162,7 +162,7 @@ function calcLuft() {
   const mv   = $('luft-main-val');
   if (mv) {
     mv.style.color = ok ? col : 'var(--t4)';
-    mv.innerHTML   = val + `<span class="tcp-u-72defb9446"> ${unit}</span>`;
+    mv.innerHTML   = val + `<span style="font-size:16px;font-weight:400;color:var(--t3)"> ${unit}</span>`;
   }
   const ms2 = $('luft-main-sub');
   if (ms2) { ms2.style.color = sub2; ms2.textContent = sub; }

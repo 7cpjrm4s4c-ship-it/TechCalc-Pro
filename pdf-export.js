@@ -47,52 +47,57 @@ function openPdfSheet() {
   const modal = document.createElement('div');
   modal.id = 'pdf-modal';
   modal.innerHTML = `
-    <div id="pdf-overlay" data-tcp-click="closePdfSheet()"></div>
+    <div id="pdf-overlay" onclick="closePdfSheet()"></div>
     <div id="pdf-sheet">
       <div class="sh-handle"></div>
       <div class="sh-title">PDF exportieren</div>
       <div class="sh-sub">Projektdaten für die Dokumentation</div>
-      <div class="sh-body tcp-u-c1ffdbde0e">
+      <div class="sh-body" style="padding-top:12px">
 
         <div class="igrp">
           <div class="ilbl">Sachbearbeiter</div>
           <div class="iwrap">
-            <input class="inp tcp-u-4bd530d53e" id="pdf-sb" type="text" placeholder="Name" value="${_pdfAttr(activeProjectMeta.sb || '')}"
-             />
+            <input class="inp" id="pdf-sb" type="text" placeholder="Name" value="${_pdfAttr(activeProjectMeta.sb || '')}"
+              style="font-size:16px;padding:12px 14px"/>
           </div>
         </div>
 
         <div class="igrp">
           <div class="ilbl">Projekt</div>
           <div class="iwrap">
-            <input class="inp tcp-u-4bd530d53e" id="pdf-pj" type="text" placeholder="Projektbezeichnung" value="${_pdfAttr(activeProjectMeta.proj || '')}"
-             />
+            <input class="inp" id="pdf-pj" type="text" placeholder="Projektbezeichnung" value="${_pdfAttr(activeProjectMeta.proj || '')}"
+              style="font-size:16px;padding:12px 14px"/>
           </div>
         </div>
 
-        <div class="igrp tcp-u-4e330d89c1">
+        <div class="igrp" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           <div>
             <div class="ilbl">Projektnummer</div>
             <div class="iwrap">
-              <input class="inp tcp-u-86794c8f7b" id="pdf-nr" type="text" placeholder="z.B. 2024-001" value="${_pdfAttr(activeProjectMeta.nr || '')}"
-               />
+              <input class="inp" id="pdf-nr" type="text" placeholder="z.B. 2024-001" value="${_pdfAttr(activeProjectMeta.nr || '')}"
+                style="font-size:15px;padding:12px 14px"/>
             </div>
           </div>
           <div>
             <div class="ilbl">Datum</div>
             <div class="iwrap">
-              <input class="inp tcp-u-86794c8f7b" id="pdf-dt" type="text" value="${today}"
-               />
+              <input class="inp" id="pdf-dt" type="text" value="${today}"
+                style="font-size:15px;padding:12px 14px"/>
             </div>
           </div>
         </div>
 
-        <button data-tcp-click="triggerPdfPrint()"
-          class="tcp-u-1823261612">
+        <button onclick="triggerPdfPrint()"
+          style="width:100%;height:54px;border:none;border-radius:14px;
+                 background:linear-gradient(135deg,#4fa8ff,#2e80d8);
+                 color:#fff;font-size:16px;font-weight:700;cursor:pointer;
+                 margin-top:8px;box-shadow:0 10px 30px rgba(79,168,255,.25)">
           Als PDF speichern
         </button>
-        <button data-tcp-click="closePdfSheet()"
-          class="tcp-u-426f264578">
+        <button onclick="closePdfSheet()"
+          style="width:100%;height:44px;border:none;border-radius:12px;
+                 background:rgba(255,255,255,.07);color:rgba(255,255,255,.55);
+                 font-size:14px;cursor:pointer;margin-top:8px">
           Abbrechen
         </button>
       </div>
@@ -212,7 +217,7 @@ function _openPrintWindow(bodyHtml) {
   overlay.innerHTML = `
     <div class="msr-pbar">
       <button class="msr-pbtn-close" id="msr-close-pdf">&#10005; Schlie&szlig;en</button>
-      <button class="msr-pbtn-print" data-tcp-click="window.print()">
+      <button class="msr-pbtn-print" onclick="window.print()">
         &#128438;&nbsp;Drucken&nbsp;/&nbsp;PDF
       </button>
     </div>
@@ -368,9 +373,9 @@ function _header(meta, subtitle) {
   <div class="ph">
     <div class="ph-l">
       <img src="data:image/png;base64,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" width="32" height="32"
-           class="tcp-u-3ace431cc8"/>
+           style="border-radius:7px;margin-right:10px;vertical-align:middle;flex-shrink:0"/>
       <div>
-        <h1>TechCalc <span class="tcp-u-c34dfef3bb">PRO</span></h1>
+        <h1>TechCalc <span style="font-weight:400;color:#4fa8ff;font-size:9pt">PRO</span></h1>
         <p>${subtitle}</p>
       </div>
     </div>
@@ -487,13 +492,13 @@ function _pipeSection() {
   let rows = '';
   if (hasH) {
     const vol = document.getElementById('pi-h-vol')?.textContent || '';
-    rows += `<tr><td colspan="5" class="tcp-u-b84223add1">
+    rows += `<tr><td colspan="5" style="background:#fff0e8;font-weight:700;font-size:7.5pt;color:#c44000">
       ▲ Heizung ${vol}</td></tr>`;
     rows += _pipeRows('pi-h-pair', 'h');
   }
   if (hasK) {
     const vol = document.getElementById('pi-k-vol')?.textContent || '';
-    rows += `<tr><td colspan="5" class="tcp-u-8a583d8c0a">
+    rows += `<tr><td colspan="5" style="background:#e5f8ff;font-weight:700;font-size:7.5pt;color:#006a88">
       ▼ Kälte ${vol}</td></tr>`;
     rows += _pipeRows('pi-k-pair', 'k');
   }
@@ -507,7 +512,7 @@ function _pipeSection() {
     </tr></thead>
     <tbody>${rows}</tbody>
   </table>
-  <p class="tcp-u-247b6292b5">
+  <p style="font-size:7pt;color:#aaa;margin-top:4px">
     Darcy-Weisbach · Colebrook-White · Wasser 60 °C · ε Stahl 0,046 mm · ε Mapress 0,015 mm
   </p>`;
 }
@@ -566,13 +571,13 @@ function _buildLuftPage(meta) {
     <thead><tr><th></th><th>Zuluft t&#x2c6;&#x1d61;&#x1d38; [°C]</th><th>Raum t&#x1d63; [°C]</th><th>Δt [K]</th></tr></thead>
     <tbody>
       <tr>
-        <td><span class="tcp-u-723970c154">▲ Heizen</span></td>
+        <td><span style="color:#c44000;font-weight:700">▲ Heizen</span></td>
         <td class="num">${_pdfFmt(tzlH)}</td>
         <td class="num">${_pdfFmt(trH)}</td>
         <td class="num">${_pdfFmtDiff(tzlH, trH)}</td>
       </tr>
       <tr>
-        <td><span class="tcp-u-744ea9cded">▼ Kühlen</span></td>
+        <td><span style="color:#006a88;font-weight:700">▼ Kühlen</span></td>
         <td class="num">${_pdfFmt(tzlK)}</td>
         <td class="num">${_pdfFmt(trK)}</td>
         <td class="num">${_pdfFmtDiff(trK, tzlK)}</td>
@@ -633,7 +638,7 @@ function _buildPipePage(meta) {
       const vTxt  = c.querySelectorAll('.pm-r')[1]?.querySelector('.pm-v')?.textContent.trim() || '–';
       const best  = c.classList.contains('best');
       rows += `<tr>
-        <td>${dn}${best ? '<span class="badge tcp-u-290830f851">★ empf.</span>' : ''}</td>
+        <td>${dn}${best ? '<span class="badge" style="background:#e8f0fe;color:#1a3a8c;border:1px solid #aac0f5">★ empf.</span>' : ''}</td>
         <td>${norm}</td>
         <td class="num">${diDim}</td>
         <td class="num">${dpTxt}</td>
@@ -657,9 +662,9 @@ function _buildPipePage(meta) {
       <th>DN</th><th>Norm</th><th>Abmessung</th>
       <th>Δp/m [Pa/m]</th><th>v [m/s]</th>
     </tr></thead>
-    <tbody>${rows || '<tr><td colspan="5" class="tcp-u-c718f88188">Keine Daten</td></tr>'}</tbody>
+    <tbody>${rows || '<tr><td colspan="5" style="text-align:center;color:#aaa">Keine Daten</td></tr>'}</tbody>
   </table>
-  <p class="tcp-u-247b6292b5">
+  <p style="font-size:7pt;color:#aaa;margin-top:4px">
     Stahl ≤ DN50: DIN EN 10255 Reihe M · ≥ DN65: DIN EN 10220 ·
     Mapress Edelstahl 1.4401: DIN EN 10312 · max. DN 100 ·
     Darcy-Weisbach · Colebrook-White
@@ -706,9 +711,9 @@ function _buildWrgPage(meta) {
   </table>
 
   <div class="sec">WRG — Ergebnis</div>
-  <p class="tcp-u-8f9e447f41">${wrgResult}</p>
+  <p style="font-size:8pt;color:#444;line-height:1.6">${wrgResult}</p>
 
-  <div class="sec tcp-u-56f4356299">Luftmischung (Mischluft) — Eingaben</div>
+  <div class="sec" style="margin-top:12px">Luftmischung (Mischluft) — Eingaben</div>
   <table>
     <thead><tr><th>Größe</th><th>Luftstrom 1 (LS1)</th><th>Luftstrom 2 (LS2)</th></tr></thead>
     <tbody>
@@ -719,8 +724,8 @@ function _buildWrgPage(meta) {
   </table>
 
   <div class="sec">Mischluft — Ergebnis</div>
-  <p class="tcp-u-8f9e447f41">${mixResult}</p>
-  <p class="tcp-u-247b6292b5">
+  <p style="font-size:8pt;color:#444;line-height:1.6">${mixResult}</p>
+  <p style="font-size:7pt;color:#aaa;margin-top:4px">
     Plattenwärmetauscher (sensibel) · massengewichtete Mischung
   </p>`;
 }
@@ -806,13 +811,17 @@ function _buildHxPage(meta) {
   // Prozessbilanz
   const bilanzBlock = resultTxt && resultTxt !== 'Noch keine Berechnung durchgeführt'
     ? `<div class="sec">3. Prozessbilanz</div>
-       <div class="tcp-u-5792dbb1fd">${resultTxt}</div>`
+       <div style="font-size:8pt;color:#2a3a4a;line-height:1.7;
+                   background:#f5f7fa;border:1px solid #e0e6ef;
+                   border-radius:5px;padding:8px 10px;
+                   white-space:pre-line">${resultTxt}</div>`
     : '';
 
   const imgBlock = imgSrc
     ? `<div class="diag"><img src="${imgSrc}" alt="h,x-Diagramm"
-         class="tcp-u-978ceab86a"/></div>`
-    : `<div class="diag tcp-u-edfcc32ab8">
+         style="width:100%;height:auto;display:block;margin:0 auto;max-height:130mm;object-fit:contain"/></div>`
+    : `<div class="diag" style="height:50mm;display:flex;align-items:center;
+         justify-content:center;color:#bbb;font-size:9pt">
          Kein Diagramm — Zustand setzen und erneut exportieren</div>`;
 
   return `
@@ -820,7 +829,7 @@ function _buildHxPage(meta) {
 
   ${imgBlock}
 
-  <div class="sec tcp-u-8a77e5a311">1. Ausgangszustand</div>
+  <div class="sec" style="margin-top:8px">1. Ausgangszustand</div>
   <table>
     <thead><tr><th>Größe</th><th>Symbol</th><th class="num">Wert</th></tr></thead>
     <tbody>
@@ -835,7 +844,7 @@ function _buildHxPage(meta) {
   ${targetRows}
   ${bilanzBlock}
 
-  <p class="tcp-u-4959766bed">
+  <p style="font-size:7pt;color:#aaa;margin-top:8px">
     Luftdruck 1013,25 hPa · Magnus-Formel · h = 1,006·t + x·(2501 + 1,86·t) kJ/kg
   </p>`;
 }
@@ -874,28 +883,28 @@ function _buildTrinkwasserPage(meta) {
 
   <div class="sec">Basisdaten</div>
   <table>
-    <colgroup><col class="tcp-u-e3bda251e8"><col class="tcp-u-b60a1ffa2b"><col class="tcp-u-e3bda251e8"><col class="tcp-u-b60a1ffa2b"></colgroup>
+    <colgroup><col style="width:24%"><col style="width:26%"><col style="width:24%"><col style="width:26%"></colgroup>
     <tr><td>Gebäudetyp</td><td class="num">${esc(r.building || '–')}</td><td>Warmwasser</td><td class="num">${ww}</td></tr>
     <tr><td>PWH-Volumen</td><td class="num">${r.lineVol != null ? r.lineVol + ' l' : '–'}</td><td>Zirkulation</td><td class="num">${esc(r.circ || '–')}</td></tr>
   </table>
 
   <div class="sec">Nutzungseinheiten</div>
   <table>
-    <colgroup><col class="tcp-u-8c8cd3a2f6"><col class="tcp-u-fd14ca83c7"><col class="tcp-u-5461ab2228"><col class="tcp-u-5461ab2228"></colgroup>
+    <colgroup><col style="width:48%"><col style="width:14%"><col style="width:19%"><col style="width:19%"></colgroup>
     <thead><tr><th>Entnahmestelle</th><th>Anz.</th><th>V<sub>R</sub></th><th>Summe</th></tr></thead>
-    <tbody>${neBlocks || '<tr><td colspan="4" class="tcp-u-c718f88188">Keine Nutzungseinheiten eingetragen</td></tr>'}</tbody>
+    <tbody>${neBlocks || '<tr><td colspan="4" style="text-align:center;color:#aaa">Keine Nutzungseinheiten eingetragen</td></tr>'}</tbody>
   </table>
 
   <div class="sec">Gebäude-Verbraucher außerhalb der NE</div>
   <table>
-    <colgroup><col class="tcp-u-8c8cd3a2f6"><col class="tcp-u-fd14ca83c7"><col class="tcp-u-5461ab2228"><col class="tcp-u-5461ab2228"></colgroup>
+    <colgroup><col style="width:48%"><col style="width:14%"><col style="width:19%"><col style="width:19%"></colgroup>
     <thead><tr><th>Entnahmestelle</th><th>Anz.</th><th>V<sub>R</sub></th><th>Summe</th></tr></thead>
-    <tbody>${freeRows || '<tr><td colspan="4" class="tcp-u-c718f88188">Keine Gebäude-Verbraucher eingetragen</td></tr>'}</tbody>
+    <tbody>${freeRows || '<tr><td colspan="4" style="text-align:center;color:#aaa">Keine Gebäude-Verbraucher eingetragen</td></tr>'}</tbody>
   </table>
 
   <div class="sec">Ergebnisse</div>
   <table>
-    <colgroup><col class="tcp-u-c66ff2c048"><col class="tcp-u-44b21af70c"><col class="tcp-u-c66ff2c048"><col class="tcp-u-44b21af70c"></colgroup>
+    <colgroup><col style="width:30%"><col style="width:20%"><col style="width:30%"><col style="width:20%"></colgroup>
     <tbody>
       <tr><td>ΣV<sub>R</sub> kalt</td><td class="num">${_twPdfNum(r.cold)} l/s</td><td>V<sub>R</sub> Nutzungseinheiten</td><td class="num">${_twPdfNum(r.vrNe)} l/s</td></tr>
       <tr><td>ΣV<sub>R</sub> warm</td><td class="num">${_twPdfNum(r.warm)} l/s</td><td>V<sub>R</sub> Gebäude</td><td class="num">${_twPdfNum(r.vrBuilding)} l/s</td></tr>
@@ -905,8 +914,8 @@ function _buildTrinkwasserPage(meta) {
   </table>
 
   <div class="sec">Hinweise</div>
-  <p class="tcp-u-afb8e8e893">${esc(hints)}</p>
-  <p class="tcp-u-34e4cce9a7">DIN 1988-300 orientierte Schnellberechnung. Keine vollständige Rohrnetz- oder Druckverlustberechnung.</p>
+  <p style="font-size:7.2pt;color:#444;line-height:1.32;background:#f5f7fa;border:1px solid #e0e6ef;border-radius:5px;padding:6px 8px;overflow-wrap:anywhere">${esc(hints)}</p>
+  <p style="font-size:6.6pt;color:#aaa;margin-top:4px">DIN 1988-300 orientierte Schnellberechnung. Keine vollständige Rohrnetz- oder Druckverlustberechnung.</p>
   </div>`;
 }
 
@@ -945,8 +954,8 @@ function _buildMagPage(meta) {
     <tr><td>Enddruck</td><td class="num">${val('mag-pe-out')}</td></tr>
   </tbody></table>
   <div class="sec">Hinweise</div>
-  <p class="tcp-u-205e4a04df">${hints}</p>
-  <p class="tcp-u-14a195a96b">Quick-Check zur Vorauslegung. Vollständige Auslegung nach Herstellerangaben und objektspezifischen Randbedingungen prüfen.</p>`;
+  <p style="font-size:8pt;color:#444;line-height:1.55;white-space:pre-line">${hints}</p>
+  <p style="font-size:7pt;color:#888;margin-top:6px">Quick-Check zur Vorauslegung. Vollständige Auslegung nach Herstellerangaben und objektspezifischen Randbedingungen prüfen.</p>`;
 }
 
 
@@ -962,15 +971,15 @@ function _buildEntwaesserungPage(meta) {
 
   const fixtureRows = agg?.fixtures?.length
     ? agg.fixtures.map(f => `<tr><td>${esc(f.label)}</td><td class="num">${f.count} Stk.</td><td class="num">${fmt(f.du,1)} DU</td></tr>`).join('')
-    : '<tr><td colspan="3" class="tcp-u-c718f88188">Keine gespeicherten Stränge</td></tr>';
+    : '<tr><td colspan="3" style="text-align:center;color:#aaa">Keine gespeicherten Stränge</td></tr>';
 
   const strangRows = agg?.list?.length
     ? agg.list.map(s => `<tr><td>${esc(s.name)}</td><td class="num">${fmt(s.duTotal,1)} DU</td><td class="num">${fmt(s.qww,2)} l/s</td></tr>`).join('')
-    : '<tr><td colspan="3" class="tcp-u-c718f88188">Keine gespeicherten Stränge</td></tr>';
+    : '<tr><td colspan="3" style="text-align:center;color:#aaa">Keine gespeicherten Stränge</td></tr>';
 
   const currentRows = r?.rows?.length
     ? r.rows.map(row => `<tr><td>${esc(row.label)}</td><td class="num">${row.count}</td><td class="num">${fmt(row.du,1)} DU</td></tr>`).join('')
-    : '<tr><td colspan="3" class="tcp-u-c718f88188">Keine aktuelle Eingabe angesetzt</td></tr>';
+    : '<tr><td colspan="3" style="text-align:center;color:#aaa">Keine aktuelle Eingabe angesetzt</td></tr>';
 
   const hints = r ? (typeof ewHints === 'function' ? ewHints(r) : []).map(h => `• ${esc(h)}`).join('<br>') : '–';
 
@@ -1010,8 +1019,8 @@ function _buildEntwaesserungPage(meta) {
   </tbody></table>
   <div class="fml">Qww = K × √ΣDU</div>
   <div class="sec">Hinweise</div>
-  <p class="tcp-u-9a16617af7">${hints}</p>
-  <p class="tcp-u-1d1a2ec937">Quick-Check zur überschlägigen Plausibilitätsprüfung. Keine vollständige Entwässerungsplanung.</p>`;
+  <p style="font-size:7.5pt;color:#444;line-height:1.45;background:#f5f7fa;border:1px solid #e0e6ef;border-radius:5px;padding:7px 9px;overflow-wrap:anywhere">${hints}</p>
+  <p style="font-size:6.8pt;color:#888;margin-top:5px">Quick-Check zur überschlägigen Plausibilitätsprüfung. Keine vollständige Entwässerungsplanung.</p>`;
 }
 
 /* ───────────────────────────────────────
