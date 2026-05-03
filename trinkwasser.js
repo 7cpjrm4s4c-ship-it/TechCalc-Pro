@@ -414,3 +414,18 @@ window.TCP_PDF_SNAPSHOTS.trinkwasser = function getTrinkwasserPdfSnapshot() {
     generatedAt: new Date().toISOString()
   };
 };
+
+
+/* Final UI Polish: compact result bridge */
+(function tcpFinalTrinkwasserCompactBridge(){
+  function apply(){
+    const tab = document.getElementById('tab-trinkwasser');
+    if (!tab) return;
+    tab.classList.add('tw-result-compact');
+    tab.querySelectorAll('.ob,.tcp-result-row,.out-row').forEach(row => row.classList.add('tw-ob-compact'));
+  }
+  document.addEventListener('DOMContentLoaded', apply);
+  document.addEventListener('input', () => requestAnimationFrame(apply), true);
+  document.addEventListener('change', () => requestAnimationFrame(apply), true);
+  document.addEventListener('click', () => requestAnimationFrame(apply), true);
+})();

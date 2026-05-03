@@ -925,3 +925,43 @@ window.addEventListener('appinstalled', () => {
     }
   }, true);
 })();
+
+
+/* Final UI Polish: robust Dark/Light/System menu switcher */
+(function tcpFinalThemeSwitcherFix(){
+  function key(){
+    return localStorage.getItem('tcp_theme') || localStorage.getItem('tcp-theme') || localStorage.getItem('theme') || 'dark';
+  }
+  function applyTheme(mode){
+    if (!['dark','light','system'].includes(mode)) mode = 'dark';
+    localStorage.setItem('tcp_theme', mode);
+    localStorage.setItem('tcp-theme', mode);
+    localStorage.setItem('theme', mode);
+    document.documentElement.dataset.theme = mode;
+    if (document.body) document.body.dataset.theme = mode;
+
+    document.querySelectorAll('[data-theme]').forEach(btn => {
+      const active = btn.dataset.theme === mode;
+      btn.classList.toggle('active', active);
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-pressed', String(active));
+    });
+  }
+  function sync(){
+    applyTheme(key());
+    document.querySelectorAll('.app-menu-setting .seg').forEach(seg => {
+      const text = (seg.textContent || '').toLowerCase();
+      if (text.includes('dark') && text.includes('light') && text.includes('system')) {
+        seg.classList.add('tcp-theme-switch');
+      }
+    });
+  }
+  document.addEventListener('click', ev => {
+    const btn = ev.target.closest('[data-theme]');
+    if (!btn) return;
+    ev.preventDefault();
+    applyTheme(btn.dataset.theme || 'dark');
+  }, true);
+  document.addEventListener('DOMContentLoaded', sync);
+  setTimeout(sync, 0);
+})();
