@@ -232,8 +232,8 @@ function twToggleFree() {
   const body = $('tw-free-fixtures');
   const icon = $('tw-free-toggle-icon');
   if (!body) return;
-  const open = body.classList.contains('hidden');
-  body.classList.toggle('hidden', !open);
+  const open = body.style.display === 'none';
+  body.style.display = open ? '' : 'none';
   if (icon) icon.textContent = open ? '▼' : '▶';
 }
 
@@ -391,7 +391,7 @@ function twBind() {
   $('tw-add-ne')?.addEventListener('click', twAddNe);
   $('tw-free-toggle')?.addEventListener('click', twToggleFree);
   const freeBody = $('tw-free-fixtures');
-  if (freeBody && !freeBody.dataset.init) { freeBody.classList.add('hidden'); freeBody.dataset.init = '1'; }
+  if (freeBody && !freeBody.dataset.init) { freeBody.style.display = 'none'; freeBody.dataset.init = '1'; }
   document.querySelectorAll('#tab-trinkwasser select, #tab-trinkwasser input').forEach(el => {
     if (el.closest('#tw-ne-list') || el.closest('#tw-free-fixtures')) return;
     el.addEventListener('input', calcTrinkwasser);
@@ -414,18 +414,3 @@ window.TCP_PDF_SNAPSHOTS.trinkwasser = function getTrinkwasserPdfSnapshot() {
     generatedAt: new Date().toISOString()
   };
 };
-
-
-/* Final UI Polish: compact result bridge */
-(function tcpFinalTrinkwasserCompactBridge(){
-  function apply(){
-    const tab = document.getElementById('tab-trinkwasser');
-    if (!tab) return;
-    tab.classList.add('tw-result-compact');
-    tab.querySelectorAll('.ob,.tcp-result-row,.out-row').forEach(row => row.classList.add('tw-ob-compact'));
-  }
-  document.addEventListener('DOMContentLoaded', apply);
-  document.addEventListener('input', () => requestAnimationFrame(apply), true);
-  document.addEventListener('change', () => requestAnimationFrame(apply), true);
-  document.addEventListener('click', () => requestAnimationFrame(apply), true);
-})();

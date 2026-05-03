@@ -10,7 +10,7 @@
     und pdf-export.js verwendet)
 ─────────────────────────────────────── */
 const $ = id => document.getElementById(id);
-const show = (e, v) => { if (e) e.classList.toggle('hidden', !v); };
+const show = (e, v) => { if (e) e.style.display = v ? '' : 'none'; };
 const loc  = (v, d) => v.toLocaleString('de-DE', {
   minimumFractionDigits: d,
   maximumFractionDigits: d,
@@ -79,25 +79,6 @@ function _moduleButtonHtml(id, mode) {
   return `<button class="plus-item" id="plus-${id}" data-tab="${id}" aria-label="${m.aria}">${m.icon}${m.fullLabel}</button>`;
 }
 
-
-function tcpSetPillIndicatorGeometry(x, w, visible) {
-  let node = document.getElementById('tcp-pill-indicator-runtime');
-  if (!node) {
-    node = document.createElement('style');
-    node.id = 'tcp-pill-indicator-runtime';
-    document.head.appendChild(node);
-  }
-  const tx = Math.round(Number(x) || 0);
-  const ww = Math.round(Number(w) || 0);
-  node.textContent = `.bottom-pill .pill-indicator{transform:translateX(${tx}px);width:${ww}px;}`;
-  const indicator = document.querySelector('.bottom-pill .pill-indicator');
-  if (indicator) {
-    indicator.classList.add('tcp-fade');
-    indicator.classList.toggle('tcp-fade-out', !visible);
-    indicator.classList.toggle('tcp-fade-in', !!visible);
-  }
-}
-
 function renderBottomNav() {
   const pill = $('bottom-pill');
   const grid = document.querySelector('#plus-sheet .plus-grid');
@@ -126,17 +107,18 @@ function updateBottomPillIndicator() {
   plusBtn?.classList.toggle('active', overflowActive);
   if (!indicator || !activeBtn) {
     if (indicator) {
-      tcpSetPillIndicatorGeometry(0, 0, false);
-      
-      indicator.classList.add('tcp-fade','tcp-fade-out'); indicator.classList.remove('tcp-fade-in');
+      indicator.style.setProperty('--pill-indicator-w', '0px');
+      indicator.style.setProperty('--pill-indicator-x', '0px');
+      indicator.style.opacity = '0';
     }
     return;
   }
-  indicator.classList.add('tcp-fade','tcp-fade-in'); indicator.classList.remove('tcp-fade-out');
+  indicator.style.opacity = '1';
   const pillRect = pill.getBoundingClientRect();
   const btnRect = activeBtn.getBoundingClientRect();
   const x = Math.max(0, btnRect.left - pillRect.left - 6);
-  tcpSetPillIndicatorGeometry(x, btnRect.width, true);
+  indicator.style.setProperty('--pill-indicator-x', `${Math.round(x)}px`);
+  indicator.style.setProperty('--pill-indicator-w', `${Math.round(btnRect.width)}px`);
 }
 /* ─── NAVIGATION STATE MACHINE ─── */
 const NAV = {
@@ -735,9 +717,9 @@ function _updatePillVisibility() {
   const pill = $('bottom-pill');
   if (!pill) return;
   if (window.innerWidth < 900) {
-    pill.classList.remove('hidden'); pill.classList.add('tcp-visible-flex');
+    pill.style.display = 'flex';
   } else {
-    pill.classList.add('hidden'); pill.classList.remove('tcp-visible-flex');
+    pill.style.display = 'none';
     closePlusSheet();
   }
 }
@@ -836,21 +818,21 @@ window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   _installPrompt = e;
   const ib = $('ib');
-  if (ib) { ib.classList.remove('hidden'); ib.classList.add('tcp-visible-flex'); }
+  if (ib) ib.style.display = 'flex';
 });
 
 document.addEventListener('DOMContentLoaded', () => {
   $('ib-y')?.addEventListener('click', () => {
     _installPrompt?.prompt();
-    const ib = $('ib'); if (ib) { ib.classList.add('hidden'); ib.classList.remove('tcp-visible-flex'); }
+    const ib = $('ib'); if (ib) ib.style.display = 'none';
   });
   $('ib-n')?.addEventListener('click', () => {
-    const ib = $('ib'); if (ib) { ib.classList.add('hidden'); ib.classList.remove('tcp-visible-flex'); }
+    const ib = $('ib'); if (ib) ib.style.display = 'none';
   });
 });
 
 window.addEventListener('appinstalled', () => {
-  const ib = $('ib'); if (ib) { ib.classList.add('hidden'); ib.classList.remove('tcp-visible-flex'); }
+  const ib = $('ib'); if (ib) ib.style.display = 'none';
 });
 
 /* Einheitenrechner ausgelagert nach units.js (Phase 16). */
@@ -942,44 +924,4 @@ window.addEventListener('appinstalled', () => {
       console.error('tcpCentralClickBridge failed:', err, code);
     }
   }, true);
-})();
-
-
-/* Final UI Polish: robust Dark/Light/System menu switcher */
-(function tcpFinalThemeSwitcherFix(){
-  function key(){
-    return localStorage.getItem('tcp_theme') || localStorage.getItem('tcp-theme') || localStorage.getItem('theme') || 'dark';
-  }
-  function applyTheme(mode){
-    if (!['dark','light','system'].includes(mode)) mode = 'dark';
-    localStorage.setItem('tcp_theme', mode);
-    localStorage.setItem('tcp-theme', mode);
-    localStorage.setItem('theme', mode);
-    document.documentElement.dataset.theme = mode;
-    if (document.body) document.body.dataset.theme = mode;
-
-    document.querySelectorAll('[data-theme]').forEach(btn => {
-      const active = btn.dataset.theme === mode;
-      btn.classList.toggle('active', active);
-      btn.classList.toggle('is-active', active);
-      btn.setAttribute('aria-pressed', String(active));
-    });
-  }
-  function sync(){
-    applyTheme(key());
-    document.querySelectorAll('.app-menu-setting .seg').forEach(seg => {
-      const text = (seg.textContent || '').toLowerCase();
-      if (text.includes('dark') && text.includes('light') && text.includes('system')) {
-        seg.classList.add('tcp-theme-switch');
-      }
-    });
-  }
-  document.addEventListener('click', ev => {
-    const btn = ev.target.closest('[data-theme]');
-    if (!btn) return;
-    ev.preventDefault();
-    applyTheme(btn.dataset.theme || 'dark');
-  }, true);
-  document.addEventListener('DOMContentLoaded', sync);
-  setTimeout(sync, 0);
 })();
