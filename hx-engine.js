@@ -119,8 +119,8 @@ function drawHxChart(state) {
 
   canvas.width  = W * dpr;
   canvas.height = H * dpr;
-  canvas.style.width  = W + 'px';
-  canvas.style.height = H + 'px';
+  canvas.dataset.width = String(W);
+  canvas.dataset.height = String(H); canvas.classList.add('canvas-active');
 
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
@@ -471,7 +471,7 @@ function _renderState(state) {
   const mv = se('state-temp');
   if (mv) {
     mv.textContent = fmt(state.T, 1);
-    mv.style.color = state.T < 0 ? 'var(--cold-t)' : 'var(--heat-t)';
+    mv.classList.toggle('tcp-text-cold', state.T < 0); mv.classList.toggle('tcp-text-heat', state.T >= 0);
   }
   // Sekundärwerte
   const vals = [
@@ -745,8 +745,8 @@ function _drawProcessOnChart(steps) {
 
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
-  const W   = parseInt(canvas.style.width)  || canvas.width  / dpr;
-  const H   = parseInt(canvas.style.height) || canvas.height / dpr;
+  const W   = parseInt(canvas.dataset.width || '')  || canvas.width  / dpr;
+  const H   = parseInt(canvas.dataset.height || '') || canvas.height / dpr;
 
   steps.forEach((step, idx) => {
     const p1 = toCanvas(step.from.x, step.from.T, W, H);
@@ -833,8 +833,8 @@ function _hxModeSwitch(mode) {
   document.getElementById('mode-x') ?.classList.toggle('active', !isRH);
   const wr = document.getElementById('wrap-rh');
   const wx = document.getElementById('wrap-x');
-  if (wr) wr.style.display = isRH ? '' : 'none';
-  if (wx) wx.style.display = isRH ? 'none' : '';
+  if (wr) wr.classList.toggle('hidden', !isRH);
+  if (wx) wx.classList.toggle('hidden', isRH);
 }
 
 /* ─── INIT ─── */
@@ -871,8 +871,8 @@ function _filterProcessOptions() {
     if (!opt.value) return;
     const visible = show.hasOwnProperty(opt.value) ? show[opt.value] : true;
     opt.disabled = !visible;
-    opt.style.display = visible ? '' : 'none'; // Chrome/Firefox
-    opt.style.color = visible ? '' : 'transparent'; // iOS fallback
+    opt.hidden = !visible; // Chrome/Firefox
+    opt.classList.toggle('tcp-invisible', !visible); // iOS fallback
     if (visible) anyVisible = true;
   });
   // Reset if selected option is now hidden

@@ -10,7 +10,7 @@
     und pdf-export.js verwendet)
 ─────────────────────────────────────── */
 const $ = id => document.getElementById(id);
-const show = (e, v) => { if (e) e.style.display = v ? '' : 'none'; };
+const show = (e, v) => { if (e) e.classList.toggle('hidden', !v); };
 const loc  = (v, d) => v.toLocaleString('de-DE', {
   minimumFractionDigits: d,
   maximumFractionDigits: d,
@@ -79,6 +79,25 @@ function _moduleButtonHtml(id, mode) {
   return `<button class="plus-item" id="plus-${id}" data-tab="${id}" aria-label="${m.aria}">${m.icon}${m.fullLabel}</button>`;
 }
 
+
+function tcpSetPillIndicatorGeometry(x, w, visible) {
+  let node = document.getElementById('tcp-pill-indicator-runtime');
+  if (!node) {
+    node = document.createElement('style');
+    node.id = 'tcp-pill-indicator-runtime';
+    document.head.appendChild(node);
+  }
+  const tx = Math.round(Number(x) || 0);
+  const ww = Math.round(Number(w) || 0);
+  node.textContent = `.bottom-pill .pill-indicator{transform:translateX(${tx}px);width:${ww}px;}`;
+  const indicator = document.querySelector('.bottom-pill .pill-indicator');
+  if (indicator) {
+    indicator.classList.add('tcp-fade');
+    indicator.classList.toggle('tcp-fade-out', !visible);
+    indicator.classList.toggle('tcp-fade-in', !!visible);
+  }
+}
+
 function renderBottomNav() {
   const pill = $('bottom-pill');
   const grid = document.querySelector('#plus-sheet .plus-grid');
@@ -107,18 +126,17 @@ function updateBottomPillIndicator() {
   plusBtn?.classList.toggle('active', overflowActive);
   if (!indicator || !activeBtn) {
     if (indicator) {
-      indicator.style.setProperty('--pill-indicator-w', '0px');
-      indicator.style.setProperty('--pill-indicator-x', '0px');
-      indicator.style.opacity = '0';
+      tcpSetPillIndicatorGeometry(0, 0, false);
+      
+      indicator.classList.add('tcp-fade','tcp-fade-out'); indicator.classList.remove('tcp-fade-in');
     }
     return;
   }
-  indicator.style.opacity = '1';
+  indicator.classList.add('tcp-fade','tcp-fade-in'); indicator.classList.remove('tcp-fade-out');
   const pillRect = pill.getBoundingClientRect();
   const btnRect = activeBtn.getBoundingClientRect();
   const x = Math.max(0, btnRect.left - pillRect.left - 6);
-  indicator.style.setProperty('--pill-indicator-x', `${Math.round(x)}px`);
-  indicator.style.setProperty('--pill-indicator-w', `${Math.round(btnRect.width)}px`);
+  tcpSetPillIndicatorGeometry(x, btnRect.width, true);
 }
 /* ─── NAVIGATION STATE MACHINE ─── */
 const NAV = {
@@ -717,9 +735,9 @@ function _updatePillVisibility() {
   const pill = $('bottom-pill');
   if (!pill) return;
   if (window.innerWidth < 900) {
-    pill.style.display = 'flex';
+    pill.classList.remove('hidden'); pill.classList.add('tcp-visible-flex');
   } else {
-    pill.style.display = 'none';
+    pill.classList.add('hidden'); pill.classList.remove('tcp-visible-flex');
     closePlusSheet();
   }
 }
@@ -818,21 +836,21 @@ window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   _installPrompt = e;
   const ib = $('ib');
-  if (ib) ib.style.display = 'flex';
+  if (ib) { ib.classList.remove('hidden'); ib.classList.add('tcp-visible-flex'); }
 });
 
 document.addEventListener('DOMContentLoaded', () => {
   $('ib-y')?.addEventListener('click', () => {
     _installPrompt?.prompt();
-    const ib = $('ib'); if (ib) ib.style.display = 'none';
+    const ib = $('ib'); if (ib) { ib.classList.add('hidden'); ib.classList.remove('tcp-visible-flex'); }
   });
   $('ib-n')?.addEventListener('click', () => {
-    const ib = $('ib'); if (ib) ib.style.display = 'none';
+    const ib = $('ib'); if (ib) { ib.classList.add('hidden'); ib.classList.remove('tcp-visible-flex'); }
   });
 });
 
 window.addEventListener('appinstalled', () => {
-  const ib = $('ib'); if (ib) ib.style.display = 'none';
+  const ib = $('ib'); if (ib) { ib.classList.add('hidden'); ib.classList.remove('tcp-visible-flex'); }
 });
 
 /* Einheitenrechner ausgelagert nach units.js (Phase 16). */
