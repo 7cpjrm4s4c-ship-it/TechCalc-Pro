@@ -1,8 +1,3 @@
-
-function tcpGetPipeMaterial(){
-  const el = document.querySelector('#tab-pipe #pipe-material');
-  return el ? el.value : 'steel';
-}
 /* ═══════════════════════════════════════════════════════
    pipe.js — Rohrdimensionierung / Hydraulik
    Aus Phase 16 aus heating-cooling.js ausgelagert.

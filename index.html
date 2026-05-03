@@ -163,7 +163,7 @@
 ══════════════════════════════════════════════════════ -->
 <main id="app-shell">
 
-<div id="tab-flow" class="tab-panel tcp-module tcp-module--heatcold tcp-module--standard">
+<div id="tab-flow" class="tab-panel tcp-module tcp-module--heatcold">
 
   <!-- LEFT column -->
   <div class="col-L">
@@ -206,7 +206,7 @@
 
       <!-- ── Heizung ── -->
       <div id="flow-panel-h">
-      <div class="gc tcp-card tcp-card--thermal tcp-card--heat">
+      <div class="gc gc-h tcp-card--thermal tcp-card--heat">
         <div class="ptitle"><div class="dot dot-h"></div><span class="ptitle-lbl">Heizung</span></div>
         <div class="modes">
           <button class="mbtn active" data-p="h" data-v="ms">&#7745;&nbsp;Massenstrom</button>
@@ -248,7 +248,7 @@
       </div><!-- /flow-panel-h -->
       <!-- ── Kälte ── -->
       <div id="flow-panel-k" style="display:none">
-      <div class="gc tcp-card tcp-card--thermal tcp-card--cool">
+      <div class="gc gc-c tcp-card--thermal tcp-card--cool">
         <div class="ptitle"><div class="dot dot-c"></div><span class="ptitle-lbl">K&auml;lte</span></div>
         <div class="modes">
           <button class="mbtn active" data-p="k" data-v="ms">&#7745;&nbsp;Massenstrom</button>
@@ -962,7 +962,7 @@
     </div>
 
     <!-- LS2 -->
-    <div class="gc tcp-card tcp-card--thermal tcp-card--cool">
+    <div class="gc gc-c tcp-card--thermal tcp-card--cool">
       <div class="ptitle"><div class="dot dot-c"></div><span class="ptitle-lbl">Luftstrom 2 (LS2)</span></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap-s)">
         <div class="igrp tcp-input-group tcp-input-group--compact">
