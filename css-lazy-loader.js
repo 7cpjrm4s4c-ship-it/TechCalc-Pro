@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════
    css-lazy-loader.js — TechCalc Pro Phase 19
-   Lazy-load module CSS without duplicate preload requests.
+   Lazy-load module CSS ohne Duplikate.
 ═══════════════════════════════════════════════════════ */
 'use strict';
 
