@@ -2095,3 +2095,60 @@ body.tc-app #tab-unit :is(.ob,.out-row,.tcp-result-row,.ui-result-row,.unit-row)
 body.tc-app #tab-unit :is(.ob-title,.out-key,.ui-result-title,.unit-label){
   color:rgba(255,255,255,.76)!important;
 }
+
+
+/* ═══════════════════════════════════════════════════════
+   UI SYSTEM V2 — UI7
+   Heizung/Kälte zurück in den Standardvertrag
+═══════════════════════════════════════════════════════ */
+body.tc-app{
+  --tcp-std-gap:8px;
+  --tcp-std-card-pad:14px;
+  --tcp-std-control-h:var(--ui2-control-h,42px);
+  --tcp-std-control-r:var(--ui2-control-r,14px);
+  --tcp-std-input-fs:var(--ui2-input,15px);
+  --tcp-std-label-fs:11px;
+  --tcp-std-result-main:34px;
+  --tcp-std-result-sub:14px;
+}
+
+body.tc-app .tcp-module :is(.gc,.tcp-card,.out-card){padding:var(--tcp-std-card-pad)!important;}
+body.tc-app .tcp-module :is(.col-L,.col-R,.twin,.hc-result-list,.pipe-recommendation-card,.tcp-layout,.module-grid){gap:var(--tcp-std-gap)!important;}
+body.tc-app .tcp-module :is(.igrp,.tcp-input-group,.modes,.tcp-switch,.chips){margin-top:var(--tcp-std-gap)!important;margin-bottom:var(--tcp-std-gap)!important;gap:var(--tcp-std-gap)!important;}
+body.tc-app .tcp-module :is(.inp,.inp-sm,.gl-sel,select,input[type="number"],input[type="text"]){min-height:var(--tcp-std-control-h)!important;border-radius:var(--tcp-std-control-r)!important;font-size:var(--tcp-std-input-fs)!important;line-height:1.12!important;border-width:1px!important;padding-block:8px!important;}
+body.tc-app .tcp-module :is(.iwrap,.iw){min-height:var(--tcp-std-control-h)!important;border-radius:var(--tcp-std-control-r)!important;}
+body.tc-app .tcp-module :is(.slbl,.ilbl,.pipe-dn-title,.hc-result-main-label){font-size:var(--tcp-std-label-fs)!important;line-height:1.12!important;}
+body.tc-app .tcp-module :is(.tcp-switch-btn,.modes button,.seg button,.modebar button){font-size:var(--tcp-std-input-fs)!important;}
+
+/* Flow ist Standardmodul: Größen/Abstände folgen den zentralen Tokens. */
+body.tc-app #tab-flow :is(.inp,.inp-sm,.gl-sel,.pipe-material-select){min-height:var(--tcp-std-control-h)!important;font-size:var(--tcp-std-input-fs)!important;border-radius:var(--tcp-std-control-r)!important;padding-block:8px!important;}
+body.tc-app #tab-flow :is(.gc,.tcp-card,.out-card,.pipe-section,.pipe-material-card,.pipe-design-card,.tcp-card--thermal,.hc-result-luft-style){padding:var(--tcp-std-card-pad)!important;}
+body.tc-app #tab-flow :is(.twin,.hc-result-list,.pipe-recommendation-card,.col-L,.col-R,.pipe-pair){gap:var(--tcp-std-gap)!important;}
+body.tc-app #tab-flow .tcp-fluid-card .slbl,body.tc-app #tab-flow .pipe-material-card .slbl{font-size:var(--tcp-std-label-fs)!important;margin-bottom:var(--tcp-std-gap)!important;}
+body.tc-app #tab-flow .tcp-fluid-card .chips{gap:var(--tcp-std-gap)!important;margin-top:var(--tcp-std-gap)!important;}
+body.tc-app #tab-flow .tcp-fluid-card .chip{min-height:28px!important;padding:5px 9px!important;font-size:11px!important;}
+body.tc-app #tab-flow .ptitle{display:flex!important;align-items:center!important;gap:10px!important;line-height:1!important;margin-bottom:var(--tcp-std-gap)!important;}
+body.tc-app #tab-flow .ptitle .dot{flex:0 0 auto!important;}
+body.tc-app #tab-flow .ptitle-lbl{display:inline-flex!important;align-items:center!important;line-height:1!important;}
+body.tc-app #tab-flow .modes{margin-block:var(--tcp-std-gap)!important;}
+
+/* Ergebnis Heizung/Kälte: gleiche luftartige Standardkomponente, nur Akzentfarbe variiert. */
+body.tc-app #tab-flow .hc-result-air{min-height:0!important;padding:var(--tcp-std-card-pad)!important;border-radius:20px!important;display:block!important;overflow:hidden!important;}
+body.tc-app #tab-flow .hc-result-head{display:flex!important;align-items:center!important;gap:10px!important;margin-bottom:14px!important;font-family:var(--ui-font)!important;font-size:11px!important;font-weight:840!important;letter-spacing:.13em!important;line-height:1.1!important;text-transform:uppercase!important;color:rgba(255,255,255,.52)!important;}
+body.tc-app #tab-flow .hc-result-main-label{font-size:11px!important;line-height:1.1!important;letter-spacing:.11em!important;margin-bottom:4px!important;}
+body.tc-app #tab-flow .hc-result-main-value{font-family:var(--fm,ui-monospace,SFMono-Regular,Menlo,monospace)!important;font-size:var(--tcp-std-result-main)!important;line-height:1!important;font-weight:760!important;letter-spacing:.01em!important;}
+body.tc-app #tab-flow .hc-result-main-value span{font-size:16px!important;font-weight:400!important;}
+body.tc-app #tab-flow .hc-result-sub{font-size:var(--tcp-std-result-sub)!important;margin-top:3px!important;}
+body.tc-app #tab-flow .hc-result-metrics{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:var(--tcp-std-gap)!important;margin-top:14px!important;padding-top:12px!important;border-top:1px solid rgba(255,255,255,.10)!important;}
+body.tc-app #tab-flow .hc-result-metrics span{font-size:11px!important;margin-bottom:3px!important;}
+body.tc-app #tab-flow .hc-result-metrics strong{font-size:14px!important;}
+
+/* Heat/Cool bleiben Akzentzustände, nicht Größenlogik. */
+body.tc-app .tcp-card--heat,body.tc-app .result--heat,body.tc-app .pipe-section--heat .pipe-card.is-recommended{border-color:rgba(var(--heat-rgb),.62)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(var(--heat-rgb),.08),0 20px 54px rgba(0,0,0,.40),0 0 34px rgba(var(--heat-rgb),.13)!important;}
+body.tc-app .tcp-card--cool,body.tc-app .result--cool,body.tc-app .pipe-section--cool .pipe-card.is-recommended{border-color:rgba(var(--cool-rgb),.62)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(var(--cool-rgb),.08),0 20px 54px rgba(0,0,0,.40),0 0 34px rgba(var(--cool-rgb),.13)!important;}
+body.tc-app .result--heat .hc-result-main-value,body.tc-app .result--heat .hc-result-sub,body.tc-app .result--heat .hc-result-metrics strong{color:#ffb28d!important;}
+body.tc-app .result--cool .hc-result-main-value,body.tc-app .result--cool .hc-result-sub,body.tc-app .result--cool .hc-result-metrics strong{color:#8ee8ff!important;}
+
+body.tc-app #tab-flow .pipe-pair{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:stretch!important;}
+body.tc-app #tab-flow .pipe-card{height:100%!important;min-height:142px!important;}
+@media(max-width:520px){body.tc-app #tab-flow .pipe-pair{grid-template-columns:repeat(2,minmax(0,1fr))!important;}}
