@@ -895,3 +895,15 @@ window.addEventListener('appinstalled', () => {
   document.addEventListener('click', () => setTimeout(apply, 0), true);
   document.addEventListener('change', () => setTimeout(apply, 0), true);
 })();
+
+(function(){
+  function setTheme(t){
+    document.documentElement.dataset.theme=t;
+    localStorage.setItem("theme",t);
+  }
+  document.addEventListener("click",e=>{
+    const b=e.target.closest("[data-theme]");
+    if(!b) return;
+    setTheme(b.dataset.theme);
+  });
+})();

@@ -3017,3 +3017,25 @@ body.tc-app #tab-trinkwasser :is(.ob small,.tcp-result-row small,.out-row small,
 body.tc-app #tab-trinkwasser .result-standard{
   overflow:hidden!important;
 }
+
+#tab-flow .hc-pipe-grid,
+#tab-pipe .hc-pipe-grid{
+  display:grid!important;
+  grid-template-columns:1fr 110px!important;
+  align-items:center!important;
+}
+#tab-flow .hc-pipe-value,
+#tab-pipe .hc-pipe-value{
+  text-align:right!important;
+  justify-self:end!important;
+}
+
+#tab-trinkwasser .ob{
+  padding:8px 12px!important;
+}
+#tab-trinkwasser .ob .k{
+  font-size:14px!important;
+}
+#tab-trinkwasser .ob .v{
+  font-size:18px!important;
+}
