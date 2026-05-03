@@ -9,7 +9,7 @@
   'use strict';
 
   const $ = id => document.getElementById(id);
-  const show = (el, visible) => { if (el) el.classList.toggle('hidden', !visible); };
+  const show = (el, visible) => { if (el) el.style.display = visible ? '' : 'none'; };
   const num = value => {
     const n = Number(String(value ?? '').replace(',', '.'));
     return Number.isFinite(n) ? n : 0;
@@ -177,7 +177,7 @@
 
     if (cp) cp.textContent = f.cp.toFixed(3);
     if (rho) rho.textContent = String(f.rho);
-    if (frostChip) frostChip.classList.toggle('hidden', !f.frost);
+    if (frostChip) frostChip.style.display = f.frost ? '' : 'none';
     if (frostVal) frostVal.textContent = f.frost || '';
   }
 
