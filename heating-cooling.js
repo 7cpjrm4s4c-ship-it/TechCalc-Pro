@@ -179,42 +179,6 @@
     if (unit) unit.textContent = unitText;
   }
 
-  function setText(id, value) { const el = $(id); if (el) el.textContent = value; }
-
-  function setMainValue(prefix, on, value, unit) {
-    const el = $(prefix + '-main-val');
-    if (!el) return;
-    el.innerHTML = (on ? value : '–') + '<span id="' + prefix + '-main-unit"> ' + unit + '</span>';
-    el.classList.toggle('has', !!on);
-  }
-
-  function renderLuftStyleResult(prefix, result) {
-    const mode = state[prefix].mode;
-    const qKw = result.ok ? result.q / 1000 : 0;
-    setText(prefix + '-metric-kw', result.ok ? loc(qKw, 2) : '–');
-    setText(prefix + '-metric-v', result.ok ? loc(result.m3h, 1) : '–');
-    setText(prefix + '-metric-dt', result.ok ? loc(result.dt, 2) : '–');
-    setText(prefix + '-metric-mh', result.ok ? loc(result.mh, 1) : '–');
-
-    if (mode === 'ms') {
-      setText(prefix + '-main-lbl', 'Volumenstrom V̇');
-      setMainValue(prefix, result.ok, loc(result.m3h, 1), 'm³/h');
-      setText(prefix + '-main-sub', result.ok ? loc(result.mh, 1) + ' kg/h' : '');
-      return;
-    }
-    if (mode === 'q') {
-      const unit = state[prefix].qUnit;
-      const shownQ = unit === 'kW' ? result.q / 1000 : result.q;
-      setText(prefix + '-main-lbl', 'Leistung Q');
-      setMainValue(prefix, result.ok, loc(shownQ, unit === 'kW' ? 2 : 0), unit);
-      setText(prefix + '-main-sub', result.ok ? loc(result.m3h, 1) + ' m³/h · ' + loc(result.mh, 1) + ' kg/h' : '');
-      return;
-    }
-    setText(prefix + '-main-lbl', 'Temperaturdifferenz Δt');
-    setMainValue(prefix, result.ok, loc(result.dt, 2), 'K');
-    setText(prefix + '-main-sub', result.ok ? loc(qKw, 2) + ' kW · ' + loc(result.mh, 1) + ' kg/h' : '');
-  }
-
   function renderResult(prefix, result) {
     const mode = state[prefix].mode;
     const key1 = $(prefix + '-out-key1');
@@ -224,8 +188,7 @@
       if (key1) key1.textContent = 'kg/h';
       if (key2) key2.textContent = 'm³/h';
       setOutWithUnit(prefix + '-out-v1', prefix + '-out-u1', result.ok, loc(result.mh, 1), 'kg/h');
-      setOutWithUnit(prefix + '-out-v2', prefix + '-out-u2', result.ok, loc(result.m3h, 1), 'm³/h');
-      renderLuftStyleResult(prefix, result);
+      setOutWithUnit(prefix + '-out-v2', prefix + '-out-u2', result.ok, loc(result.m3h, 3), 'm³/h');
       return;
     }
 
@@ -234,9 +197,8 @@
       const shownQ = unit === 'kW' ? result.q / 1000 : result.q;
       if (key1) key1.textContent = unit;
       if (key2) key2.textContent = 'kg/h';
-      setOutWithUnit(prefix + '-out-v1', prefix + '-out-u1', result.ok, loc(shownQ, unit === 'kW' ? 2 : 0), unit);
+      setOutWithUnit(prefix + '-out-v1', prefix + '-out-u1', result.ok, loc(shownQ, unit === 'kW' ? 3 : 0), unit);
       setOutWithUnit(prefix + '-out-v2', prefix + '-out-u2', result.ok, loc(result.mh, 1), 'kg/h');
-      renderLuftStyleResult(prefix, result);
       return;
     }
 
@@ -244,7 +206,6 @@
     if (key2) key2.textContent = 'kg/h';
     setOutWithUnit(prefix + '-out-v1', prefix + '-out-u1', result.ok, loc(result.dt, 2), 'K');
     setOutWithUnit(prefix + '-out-v2', prefix + '-out-u2', result.ok, loc(result.mh, 1), 'kg/h');
-    renderLuftStyleResult(prefix, result);
   }
 
   function calcAll() {
