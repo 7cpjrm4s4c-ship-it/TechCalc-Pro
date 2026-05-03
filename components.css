@@ -495,3 +495,101 @@
 .tcp-u-88c55e3857{font-family:var(--fm);font-size:12px;color:var(--t2);line-height:1.8}
 .tcp-u-a192177ada{color:var(--grn)}
 .tcp-u-78eb4a057c{font-size:11px;color:var(--t2);margin-top:3px;font-family:var(--fm)}
+
+
+/* ═══════════════════════════════════════════════════════
+   PHASE 18 COMPLETE — visibility and state utilities
+   Keine Inline-Display-/Opacity-/Color-Zuweisungen in Modulen.
+═══════════════════════════════════════════════════════ */
+.hidden,
+.is-hidden,
+.tcp-hidden {
+  display: none !important;
+}
+
+.tcp-invisible {
+  visibility: hidden !important;
+}
+
+.tcp-visible-flex {
+  display: flex !important;
+}
+
+.tcp-visible-block {
+  display: block !important;
+}
+
+.tcp-fade {
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.tcp-fade-in {
+  opacity: 1;
+}
+
+.tcp-fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tcp-text-default {
+  color: var(--t1) !important;
+}
+
+.tcp-text-muted {
+  color: var(--t4) !important;
+}
+
+.tcp-text-heat {
+  color: var(--heat-t, var(--heat)) !important;
+}
+
+.tcp-text-cold {
+  color: var(--cold-t, var(--cold)) !important;
+}
+
+.tcp-text-air {
+  color: var(--air-t, var(--blue)) !important;
+}
+
+.dt-auto {
+  font-size: 18px;
+  padding: 11px 52px 11px 14px;
+  border-radius: var(--r-m);
+}
+
+.dt-auto.empty,
+.dt-auto:not(.is-valid) {
+  background: var(--glass-low);
+  border: 1px solid var(--gb-soft);
+  color: var(--t4);
+}
+
+.dt-auto.is-valid.dt-auto-heat {
+  background: rgba(var(--heat-rgb), 0.10);
+  border: 1.5px solid rgba(var(--heat-rgb), 0.40);
+  color: var(--heat-t, var(--heat));
+}
+
+.dt-auto.is-valid.dt-auto-cold {
+  background: rgba(var(--cold-rgb), 0.10);
+  border: 1.5px solid rgba(var(--cold-rgb), 0.40);
+  color: var(--cold-t, var(--cold));
+}
+
+.canvas-active {
+  width: 100%;
+  height: auto;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--blue, #4fa8ff);
+  outline-offset: 2px;
+}
+
+.pill-indicator {
+  transition: opacity 180ms ease, transform 220ms cubic-bezier(.2,.8,.2,1), width 220ms cubic-bezier(.2,.8,.2,1);
+}

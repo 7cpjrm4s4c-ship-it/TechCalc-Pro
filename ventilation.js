@@ -122,12 +122,7 @@ function calcLuft() {
   if (dtAutoEl) {
     const valid = !isNaN(dtAuto) && dtAuto > 0;
     dtAutoEl.textContent = valid ? loc(dtAuto, 1) : '\u2013';
-    dtAutoEl.className   = 'inp-ro' + (valid ? '' : ' empty');
-    const bc  = hk === 'h' ? 'rgba(255,107,53,.10)' : 'rgba(0,196,232,.10)';
-    const bc2 = hk === 'h' ? 'rgba(255,107,53,.40)' : 'rgba(0,196,232,.40)';
-    const tc  = hk === 'h' ? 'var(--heat-t)' : 'var(--cold-t)';
-    dtAutoEl.style.cssText = 'font-size:18px;padding:11px 52px 11px 14px;' +
-      (valid ? `background:${bc};border:1.5px solid ${bc2};color:${tc}` : '');
+    dtAutoEl.className = 'inp-ro dt-auto ' + (hk === 'h' ? 'dt-auto-heat' : 'dt-auto-cold') + (valid ? ' is-valid' : ' empty');
   }
 
   const dt   = m !== 'dt' ? (!isNaN(dtAuto) && dtAuto > 0 ? dtAuto : 0) : 0;
@@ -161,16 +156,16 @@ function calcLuft() {
   const llbl = $('luft-main-lbl'); if (llbl) llbl.textContent = lbl;
   const mv   = $('luft-main-val');
   if (mv) {
-    mv.style.color = ok ? col : 'var(--t4)';
+    mv.classList.toggle('tcp-text-muted', !ok); mv.classList.toggle('tcp-text-default', ok);
     mv.innerHTML   = val + `<span class="tcp-u-72defb9446"> ${unit}</span>`;
   }
   const ms2 = $('luft-main-sub');
-  if (ms2) { ms2.style.color = sub2; ms2.textContent = sub; }
+  if (ms2) { ms2.classList.toggle('tcp-text-muted', !ok); ms2.classList.toggle('tcp-text-default', ok); ms2.textContent = sub; }
 
   // Detail-Grid
   const sv = (id, on, v) => {
     const e = $(id);
-    if (e) { e.textContent = on ? v : '\u2013'; e.style.color = on ? 'var(--t1)' : 'var(--t4)'; }
+    if (e) { e.textContent = on ? v : '\u2013'; e.classList.toggle('tcp-text-default', on); e.classList.toggle('tcp-text-muted', !on); }
   };
   sv('luft-kw',     ok && m !== 'dt', loc(Q / 1000, 2) + '\u202fkW');
   sv('luft-v-out',  ok,               loc(V, 1));
@@ -179,7 +174,7 @@ function calcLuft() {
   const msel = $('luft-ms');
   if (msel) {
     msel.textContent = ok ? loc(ms, 1) : '\u2013';
-    msel.style.color = ok ? 'var(--air-t)' : 'var(--t4)';
+    msel.classList.toggle('tcp-text-air', ok); msel.classList.toggle('tcp-text-muted', !ok);
   }
 }
 

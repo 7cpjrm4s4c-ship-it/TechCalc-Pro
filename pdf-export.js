@@ -396,7 +396,7 @@ function _buildFlowPage(meta) {
   const medText  = medium?.options[medium.selectedIndex]?.text || 'Wasser';
   const cpVal    = document.getElementById('cp-val')?.textContent  || '–';
   const rhoVal   = document.getElementById('rho-val')?.textContent || '–';
-  const frost    = document.getElementById('frost-chip')?.style.display !== 'none'
+  const frost    = !document.getElementById('frost-chip')?.classList.contains('hidden')
                    ? document.getElementById('frost-val')?.textContent || '' : '';
 
   // Heizung-Eingaben
@@ -480,8 +480,8 @@ function _buildFlowPage(meta) {
 function _pipeSection() {
   const piH = document.getElementById('pi-h');
   const piK = document.getElementById('pi-k');
-  const hasH = piH && piH.style.display !== 'none';
-  const hasK = piK && piK.style.display !== 'none';
+  const hasH = piH && !piH.classList.contains('hidden');
+  const hasK = piK && !piK.classList.contains('hidden');
   if (!hasH && !hasK) return '';
 
   let rows = '';
