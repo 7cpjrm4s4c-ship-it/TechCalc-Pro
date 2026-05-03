@@ -729,10 +729,7 @@ function _buildHxPage(meta) {
   // Do NOT re-render — that would erase the process visualization
   const srcCanvas = document.getElementById('hxCanvas');
   let imgSrc = null;
-  if (typeof window._hxBuildPdfSnapshot === 'function') {
-    imgSrc = window._hxBuildPdfSnapshot();
-  }
-  if (!imgSrc && srcCanvas) {
+  if (srcCanvas) {
     try {
       // Scale up by drawing current canvas content into a larger offscreen canvas
       const dpr = window.devicePixelRatio || 1;

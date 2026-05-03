@@ -85,7 +85,7 @@ function renderBottomNav() {
   if (!pill || !grid) return;
   const visible = NAV_FAVORITES.filter(id => TABS.includes(id)).slice(0, 4);
   const overflow = TABS.filter(id => !visible.includes(id));
-  pill.innerHTML = '<span class="pill-indicator" aria-hidden="true"></span>' + visible.map(id => _moduleButtonHtml(id, 'pill')).join('') + `
+  pill.innerHTML = visible.map(id => _moduleButtonHtml(id, 'pill')).join('') + `
     <button class="pill-plus" id="pill-plus" aria-label="Weitere Module" aria-expanded="false">
       <span class="pill-plus-icon">+</span>
     </button>`;
@@ -93,24 +93,8 @@ function renderBottomNav() {
   pill.querySelectorAll('.pill-btn[data-tab]').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
   $('pill-plus')?.addEventListener('click', togglePlusSheet);
   grid.querySelectorAll('.plus-item[data-tab]').forEach(btn => btn.addEventListener('click', () => _switchFromPlus(btn.dataset.tab)));
-  updateBottomPillIndicator();
 }
 
-function updateBottomPillIndicator() {
-  const pill = $('bottom-pill');
-  if (!pill) return;
-  const indicator = pill.querySelector('.pill-indicator');
-  const activeBtn = pill.querySelector(`.pill-btn[data-tab="${NAV.activeTab}"]`);
-  if (!indicator || !activeBtn) {
-    if (indicator) indicator.style.setProperty('--pill-indicator-w', '0px');
-    return;
-  }
-  const pillRect = pill.getBoundingClientRect();
-  const btnRect = activeBtn.getBoundingClientRect();
-  const x = Math.max(0, btnRect.left - pillRect.left - 6);
-  indicator.style.setProperty('--pill-indicator-x', `${Math.round(x)}px`);
-  indicator.style.setProperty('--pill-indicator-w', `${Math.round(btnRect.width)}px`);
-}
 /* ─── NAVIGATION STATE MACHINE ─── */
 const NAV = {
   activeTab:   'flow',
@@ -118,14 +102,22 @@ const NAV = {
 
   /* Einzige Wahrheitsquelle für alle Navigation-Zustände */
   _apply() {
-    /* Tabs: zentrale UI-Sprache steuert Layout ausschließlich über Klassen. */
-    document.body.dataset.activeTab = NAV.activeTab;
+    /* Tabs */
     TABS.forEach(id => {
       const el = $('tab-' + id);
       if (!el) return;
-      const active = id === NAV.activeTab;
-      el.classList.toggle('is-active', active);
-      el.setAttribute('aria-hidden', String(!active));
+      if (id === NAV.activeTab) {
+        const isDesktop = window.matchMedia('(min-width: 900px)').matches;
+        if (isDesktop && id === 'flow') {
+          el.style.display = 'grid';
+        } else if (id === 'hx') {
+          el.style.display = 'block';
+        } else {
+          el.style.display = 'flex';
+        }
+      } else {
+        el.style.display = 'none';
+      }
     });
 
     /* Desktop Tab-Bar */
@@ -137,8 +129,9 @@ const NAV = {
     document.querySelectorAll('.pill-btn[data-tab]').forEach(btn =>
       btn.classList.toggle('active', btn.dataset.tab === NAV.activeTab)
     );
-    
-    updateBottomPillIndicator();
+    document.querySelectorAll('.plus-item[data-tab]').forEach(btn =>
+      btn.classList.toggle('active-tab', btn.dataset.tab === NAV.activeTab)
+    );
 
     /* Plus-Sheet */
     $('plus-sheet')?.classList.toggle('open', NAV.sheetOpen);
@@ -152,9 +145,6 @@ const NAV = {
     }
   },
 };
-
-window.addEventListener('resize', () => requestAnimationFrame(updateBottomPillIndicator));
-window.addEventListener('orientationchange', () => setTimeout(updateBottomPillIndicator, 120));
 
 /* ─── HEADER MENU ─── */
 const MENU = {
@@ -714,15 +704,7 @@ function _updatePillVisibility() {
   }
 }
 
-function _normalizeUiPrimitives() {
-  document.body.classList.add('tc-app');
-  document.querySelectorAll('.gc,.out-card,.hx-card').forEach(el => el.classList.add('tcp-card'));
-  document.querySelectorAll('.igrp').forEach(el => el.classList.add('tcp-input-group'));
-  document.querySelectorAll('.ob,.out-row').forEach(el => el.classList.add('tcp-result-row'));
-}
-
 document.addEventListener('DOMContentLoaded', () => {
-  _normalizeUiPrimitives();
   // Header Menü
   $('hdr-menu-btn')?.addEventListener('click', toggleAppMenu);
   $('app-menu-close')?.addEventListener('click', closeAppMenu);
@@ -920,12 +902,21 @@ const UNITS = {
 let UCurrent = 'pressure';
 
 function ufmt(v, decimals) {
-  if (v == null || isNaN(v)) return '–';
-  const d = Math.min(2, Math.max(0, decimals ?? 2));
-  return Number(v).toLocaleString('de-DE', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: d,
+  if (v === 0) return '0';
+  if (decimals !== undefined) {
+    return v.toLocaleString('de-DE', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: decimals,
+    });
+  }
+  const abs = Math.abs(v);
+  if (abs >= 1e9) return v.toLocaleString('de-DE', { maximumFractionDigits: 0 });
+  if (abs >= 1)   return v.toLocaleString('de-DE', {
+    maximumFractionDigits: 6,
+    maximumSignificantDigits: 8,
   });
+  return parseFloat(v.toPrecision(8))
+    .toLocaleString('de-DE', { maximumFractionDigits: 10 });
 }
 
 function buildSelects(cat) {

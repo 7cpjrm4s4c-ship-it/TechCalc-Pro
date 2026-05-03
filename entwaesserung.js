@@ -27,7 +27,7 @@ const EW_K = {
   gewerb: { label:'Gewerbe / hohe Gleichzeitigkeit', k:1.0 },
 };
 
-const EW_STATE = { result:null, editingName:null, straenge: JSON.parse(localStorage.getItem('ew_straenge') || '[]')};
+const EW_STATE = { result:null, straenge: JSON.parse(localStorage.getItem('ew_straenge') || '[]')};
 window.EW_STATE = EW_STATE;
 
 function ewNum(v) {
@@ -113,18 +113,12 @@ function calcEntwaesserung() {
 
 function renderEntwaesserung(r) {
   const set = (id, txt) => { const el = ewGet(id); if (el) el.textContent = txt; };
-  const agg = ewAggregateStraenge();
-  const totalDu = (Number(agg.duTotal) || 0) + (Number(r.duTotal) || 0);
-  const totalQww = (Number(agg.qwwTotal) || 0) + (Number(r.qww) || 0);
-  const displayDims = ewRecommendedPipe(totalQww, totalDu);
-  const display = totalDu > 0 ? { duTotal: totalDu, qww: totalQww, dims: displayDims } : r;
-
-  set('ew-du-total', ewFmt(display.duTotal, 1));
-  set('ew-qww', ewFmt(display.qww, 2));
-  set('ew-dim-anschluss', display.dims.anschluss);
-  set('ew-dim-sammel', display.dims.sammel);
-  set('ew-dim-fall', display.dims.fall);
-  set('ew-dim-grund', display.dims.grund);
+  set('ew-du-total', ewFmt(r.duTotal, 1));
+  set('ew-qww', ewFmt(r.qww, 2));
+  set('ew-dim-anschluss', r.dims.anschluss);
+  set('ew-dim-sammel', r.dims.sammel);
+  set('ew-dim-fall', r.dims.fall);
+  set('ew-dim-grund', r.dims.grund);
   set('ew-k-label', `K = ${ewFmt(r.k, 2)} · ${r.useLabel}`);
 
   const detail = ewGet('ew-detail');
@@ -156,7 +150,7 @@ function addEntwaesserungStrang() {
   if (!r || r.duTotal <= 0) return;
   const strang = {
     id: Date.now(),
-    name: (ewGet('ew-strang-name')?.value?.trim() || EW_STATE.editingName || `Strang ${ (EW_STATE.straenge?.length || 0) + 1 }`),
+    name: `Strang ${ (EW_STATE.straenge?.length || 0) + 1 }`,
     duTotal: r.duTotal,
     qww: r.qww,
     dims: r.dims,
@@ -168,8 +162,6 @@ function addEntwaesserungStrang() {
   renderStrangListe();
   renderEntwaesserungTotals();
   resetEntwaesserungInputs();
-  const nameEl = ewGet('ew-strang-name'); if (nameEl) nameEl.value = '';
-  EW_STATE.editingName = null;
   calcEntwaesserung();
 }
 
@@ -180,7 +172,6 @@ function deleteStrang(id) {
   renderEntwaesserungTotals();
 }
 window.deleteStrang = deleteStrang;
-window.deleteEntwaesserungStrang = deleteStrang;
 
 
 function ewAggregateStraenge() {
@@ -244,8 +235,6 @@ function editEntwaesserungStrang(id) {
   if (!s) return;
 
   resetEntwaesserungInputs();
-  EW_STATE.editingName = s.name || null;
-  const nameEl = ewGet('ew-strang-name'); if (nameEl) nameEl.value = s.name || '';
 
   (s.rows || []).forEach(r => {
     const el = ewGet('ew-' + r.key);
@@ -272,8 +261,8 @@ function renderStrangListe() {
   }
 
   host.innerHTML = list.map(s => `
-    <div class="ew-strang-row">
-      <div class="ew-strang-main"><strong>${s.name}</strong><span>${ewFmt(s.duTotal,1)} DU · Qww ${ewFmt(s.qww,2)} l/s</span></div>
+    <div class="ew-detail-row">
+      <span>${s.name} · ${ewFmt(s.duTotal,1)} DU · Qww ${ewFmt(s.qww,2)} l/s</span>
       <div class="ui-action-row">
         <button class="ew-mini-btn" type="button" onclick="editEntwaesserungStrang(${s.id})">Bearbeiten</button>
         <button class="ew-mini-btn danger" type="button" onclick="deleteEntwaesserungStrang(${s.id})">Löschen</button>

@@ -9,15 +9,25 @@
 <meta name="apple-mobile-web-app-title" content="TechCalc Pro"/>
 <link rel="manifest" href="manifest.json"/>
 
-<!-- App Icon — reduzierte Asset-Struktur -->
-<link rel="icon" type="image/png" href="apple-touch-icon.png"/>
-<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+<!-- Favicon — alle Browser -->
+<link rel="icon" type="image/x-icon" href="favicon.ico"/>
+<link rel="icon" type="image/png" sizes="16x16"  href="icon-16.png"/>
+<link rel="icon" type="image/png" sizes="32x32"  href="icon-32.png"/>
+<link rel="icon" type="image/png" sizes="48x48"  href="icon-48.png"/>
+<link rel="icon" type="image/png" sizes="96x96"  href="icon-96.png"/>
+
+<!-- iOS Safari (Apple Touch Icon — KRITISCH für Homescreen) -->
+<link rel="apple-touch-icon"                   href="icon-180.png"/>
+<link rel="apple-touch-icon" sizes="120x120"   href="icon-120.png"/>
+<link rel="apple-touch-icon" sizes="152x152"   href="icon-152.png"/>
+<link rel="apple-touch-icon" sizes="167x167"   href="icon-167.png"/>
+<link rel="apple-touch-icon" sizes="180x180"   href="icon-180.png"/>
 
 <!-- iOS Splash / Status Bar -->
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 
 <!-- Windows Tile (IE/Edge legacy + modern Windows) -->
-<meta name="msapplication-TileImage"   content="apple-touch-icon.png"/>
+<meta name="msapplication-TileImage"   content="icon-144.png"/>
 <meta name="msapplication-TileColor"   content="#000000"/>
 <meta name="msapplication-config"      content="none"/>
 
@@ -25,15 +35,15 @@
 <meta name="theme-color" content="#000000"/>
 
 <!-- macOS Safari Pinned Tab -->
-
+<link rel="mask-icon" href="icon-512.png" color="#4fa8ff"/>
 <meta name="techcalc-build" content="20260427-2015"/>
 <title>TechCalc Pro</title>
 <link rel="stylesheet" href="tokens.css"/>
 <link rel="stylesheet" href="layout.css"/>
 <link rel="stylesheet" href="components.css"/>
-<link rel="stylesheet" href="style.css"/>
+<link rel="stylesheet" href="styles.css"/>
 </head>
-<body class="tc-app tc-ui-v8 tc-ui-v9 tc-ui-v10 tc-ui-v11 tc-ui-v12 tc-ui-v13 tc-ui-v14 tc-ui-bugfix4 tc-ui-bugfix5">
+<body>
 
 <!-- ══ HEADER ══ -->
 <header class="hdr">
@@ -42,7 +52,7 @@
 
     <div class="hdr-brand" aria-label="TechCalc Pro">
       <div class="hdr-icon hdr-icon-center">
-        <img src="apple-touch-icon.png" alt="TechCalc Pro Icon" loading="eager" decoding="sync" onerror="this.style.display='none';this.parentElement.classList.add('hdr-icon-fallback')"/>
+        <img src="icon-180.png" alt="TechCalc Pro Icon" onerror="this.style.display='none';this.parentElement.innerHTML='△'"/>
       </div>
       <div class="hdr-brand-text">
         <div class="hdr-title">
@@ -145,12 +155,12 @@
   </div>
   <div class="project-active" id="project-active-box"><span>Aktives Projekt</span><strong id="project-active-label">Kein Projekt geladen</strong></div>
   <div class="project-form">
-    <div class="igrp tcp-input-group"><div class="ilbl">Projektname</div><div class="iwrap"><input class="inp" id="project-name" type="text" placeholder="z. B. Sanierung Müller"/></div></div>
+    <div class="igrp"><div class="ilbl">Projektname</div><div class="iwrap"><input class="inp" id="project-name" type="text" placeholder="z. B. Sanierung Müller"/></div></div>
     <div class="project-form-grid">
-      <div class="igrp tcp-input-group"><div class="ilbl">Projektnummer</div><div class="iwrap"><input class="inp" id="project-number" type="text" placeholder="2026-001"/></div></div>
-      <div class="igrp tcp-input-group"><div class="ilbl">Bearbeiter</div><div class="iwrap"><input class="inp" id="project-owner" type="text" placeholder="Name"/></div></div>
+      <div class="igrp"><div class="ilbl">Projektnummer</div><div class="iwrap"><input class="inp" id="project-number" type="text" placeholder="2026-001"/></div></div>
+      <div class="igrp"><div class="ilbl">Bearbeiter</div><div class="iwrap"><input class="inp" id="project-owner" type="text" placeholder="Name"/></div></div>
     </div>
-    <div class="igrp tcp-input-group"><div class="ilbl">Kunde / Objekt</div><div class="iwrap"><input class="inp" id="project-client" type="text" placeholder="Kunde oder Objektadresse"/></div></div>
+    <div class="igrp"><div class="ilbl">Kunde / Objekt</div><div class="iwrap"><input class="inp" id="project-client" type="text" placeholder="Kunde oder Objektadresse"/></div></div>
     <div class="project-actions"><button type="button" class="project-secondary" id="project-new">Neu</button><button type="button" class="project-primary" id="project-save">Aktuellen Stand speichern</button></div>
   </div>
   <div class="project-section-title">Gespeicherte Projekte</div>
@@ -163,13 +173,13 @@
 ══════════════════════════════════════════════════════ -->
 <main id="app-shell">
 
-<div id="tab-flow" class="tab-panel tcp-module tcp-module--heatcold">
+<div id="tab-flow" class="tab-panel">
 
   <!-- LEFT column -->
   <div class="col-L">
 
     <!-- Medium -->
-    <div class="gc tcp-card">
+    <div class="gc">
       <div class="slbl">W&auml;rmetr&auml;ger</div>
       <select class="gl-sel" id="medium">
         <option value="water">Wasser</option>
@@ -214,7 +224,7 @@
           <button class="mbtn"        data-p="h" data-v="dt">&Delta;T&nbsp;Temperatur</button>
         </div>
         <!-- Q input -->
-        <div class="igrp tcp-input-group" id="h-ig-q">
+        <div class="igrp" id="h-ig-q">
           <div class="ilbl ilbl-row">
             <span>Heizlast</span>
             <div class="unit-pill">
@@ -228,7 +238,7 @@
           </div>
         </div>
         <!-- ṁ input [kg/h] -->
-        <div class="igrp tcp-input-group" id="h-ig-ms" style="display:none">
+        <div class="igrp" id="h-ig-ms" style="display:none">
           <div class="ilbl">Massenstrom [kg/h]</div>
           <div class="iwrap">
             <input class="inp" id="h-ms-in" type="number" min="0" step="1" placeholder="0" inputmode="decimal"/>
@@ -236,7 +246,7 @@
           </div>
         </div>
         <!-- ΔT input -->
-        <div class="igrp tcp-input-group" id="h-ig-dt">
+        <div class="igrp" id="h-ig-dt">
           <div class="ilbl" id="h-dt-lbl">&Delta;T [K]</div>
           <div class="iwrap">
             <input class="inp-sm" id="h-dt" type="number" min="0.5" step="0.5" value="10" inputmode="decimal"/>
@@ -255,7 +265,7 @@
           <button class="mbtn"        data-p="k" data-v="q"> Q&nbsp;Leistung</button>
           <button class="mbtn"        data-p="k" data-v="dt">&Delta;T&nbsp;Temperatur</button>
         </div>
-        <div class="igrp tcp-input-group" id="k-ig-q">
+        <div class="igrp" id="k-ig-q">
           <div class="ilbl ilbl-row">
             <span>Kühllast</span>
             <div class="unit-pill">
@@ -268,14 +278,14 @@
             <span class="iunit" id="k-q-unit">W</span>
           </div>
         </div>
-        <div class="igrp tcp-input-group" id="k-ig-ms" style="display:none">
+        <div class="igrp" id="k-ig-ms" style="display:none">
           <div class="ilbl">Massenstrom [kg/h]</div>
           <div class="iwrap">
             <input class="inp" id="k-ms-in" type="number" min="0" step="1" placeholder="0" inputmode="decimal"/>
             <span class="iunit">kg/h</span>
           </div>
         </div>
-        <div class="igrp tcp-input-group" id="k-ig-dt">
+        <div class="igrp" id="k-ig-dt">
           <div class="ilbl" id="k-dt-lbl">&Delta;T [K]</div>
           <div class="iwrap">
             <input class="inp-sm" id="k-dt" type="number" min="0.5" step="0.5" value="6" inputmode="decimal"/>
@@ -288,7 +298,7 @@
     </div>
 
     <!-- Output -->
-    <div class="out-card tcp-card tcp-result-card">
+    <div class="out-card">
       <div class="slbl" id="out-card-slbl">Ergebnis &mdash; Massenstrom</div>
       <div class="out-grid">
         <div class="ob ob-h">
@@ -319,7 +329,7 @@
 
     <div class="rcol-hdr">Rohrdimensionsempfehlung</div>
 
-    <div class="gc tcp-card tcp-card--compact">
+    <div class="gc" style="padding:14px 16px">
       <div class="slbl">Auslegung &mdash; max. 100 Pa/m</div>
       <div class="info-txt">
         Darcy-Weisbach &middot; Colebrook-White &middot; Wasser 60&thinsp;&deg;C<br/>
@@ -363,12 +373,12 @@
 ══════════════════════════════════════════════════════ -->
 
 <!-- ══ TAB: LUFT ══ -->
-<div id="tab-luft" class="tab-panel tcp-module tcp-module--air">
-  <div class="tab-inner tcp-layout">
+<div id="tab-luft" class="tab-panel" style="display:none">
+  <div class="tab-inner">
 
-    <div class="luft-desktop-left tcp-col tcp-col--left">
+    <div class="luft-desktop-left">
 <!-- ① Zulufttemperatur + Raumtemperatur pill — Heizen & Kühlen getrennt -->
-    <div class="gc tcp-card tcp-card--flush">
+    <div class="gc" style="padding:0;overflow:hidden">
       <div style="padding:12px 16px 6px;font-family:var(--f);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--t3)">Temperaturen</div>
       <!-- Header row -->
       <div class="tzl-grid" style="padding:0 16px 6px">
@@ -432,7 +442,7 @@
       </div>
 
       <!-- Q-Eingabe — getrennt für Heizen (h) und Kühlen (k) -->
-      <div class="igrp tcp-input-group" id="luft-ig-q">
+      <div class="igrp" id="luft-ig-q">
         <div class="ilbl ilbl-row">
           <span>Leistung Q</span>
           <div class="unit-pill">
@@ -451,7 +461,7 @@
       </div>
 
       <!-- V̇-Eingabe (ausgeblendet wenn mode=v) -->
-      <div class="igrp tcp-input-group" id="luft-ig-v" style="display:none">
+      <div class="igrp" id="luft-ig-v" style="display:none">
         <div class="ilbl">Luftvolumenstrom V&#x307;</div>
         <div class="iwrap">
           <input class="inp" id="luft-v" type="number" min="0" step="100" placeholder="0" inputmode="decimal"/>
@@ -466,7 +476,7 @@
           <span style="font-size:11px;color:var(--t3);font-family:var(--f)">Temperaturdifferenz</span>
           <div style="flex:1;height:1px;background:var(--gb-soft)"></div>
         </div>
-        <div class="igrp tcp-input-group tcp-input-group--compact">
+        <div class="igrp" style="margin-bottom:0">
           <div class="ilbl" id="luft-dt-auto-lbl">&Delta;t = t<sub>ZL,H</sub> &minus; t<sub>R,H</sub></div>
           <div class="iwrap">
             <div class="inp-ro empty" id="luft-dt-auto-val" style="font-size:18px;padding:11px 52px 11px 14px">&ndash;</div>
@@ -477,9 +487,9 @@
     </div>
 
     </div>
-<div class="luft-desktop-right tcp-col tcp-col--right">
+<div class="luft-desktop-right">
 <!-- ④ Ergebnis-Karte -->
-    <div class="out-card tcp-card tcp-result-card">
+    <div class="out-card">
       <div class="slbl" id="luft-out-title">Ergebnis &mdash; Heizleistung Luft</div>
       <div style="margin-bottom:14px">
         <div style="font-family:var(--f);font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--t3);margin-bottom:4px" id="luft-main-lbl">Leistung Q</div>
@@ -518,17 +528,17 @@
 </div>
 </div>
 
-<div id="tab-pipe" class="tab-panel tcp-module tcp-module--pipe">
+<div id="tab-pipe" class="tab-panel" style="display:none">
 
   <div class="pipe-params">
-    <div class="igrp tcp-input-group tcp-input-group--compact">
+    <div class="igrp" style="margin-bottom:0">
       <div class="ilbl">Volumenstrom</div>
       <div class="iwrap">
         <input class="inp" id="p-vol" type="number" min="0" step="0.01" placeholder="0.00" inputmode="decimal" style="font-size:18px;padding:12px 52px 12px 14px"/>
         <span class="iunit">m&sup3;/h</span>
       </div>
     </div>
-    <div class="igrp tcp-input-group tcp-input-group--compact">
+    <div class="igrp" style="margin-bottom:0">
       <div class="ilbl">max. Druckverlust</div>
       <div class="iwrap">
         <input class="inp-sm" id="p-dp" type="number" min="10" step="10" value="100" inputmode="decimal"/>
@@ -537,7 +547,7 @@
     </div>
   </div>
 
-  <div class="gc tcp-card">
+  <div class="gc">
     <div class="slbl">Ergebnis &mdash; Stahl &middot; Mapress Edelstahl</div>
     <div id="pipe-results">
       <p style="color:var(--t3);font-family:Arial,sans-serif;font-size:12px;text-align:center;padding:18px 0">Volumenstrom eingeben &rarr;</p>
@@ -562,11 +572,11 @@
 <!-- ══════════════════════════════════════════════════════
      TAB: EINHEITENRECHNER
 ══════════════════════════════════════════════════════ -->
-<div id="tab-unit" class="tab-panel tcp-module tcp-module--unit">
-  <div class="tab-inner tcp-layout">
+<div id="tab-unit" class="tab-panel" style="display:none">
+  <div class="tab-inner">
 
     <!-- Category grid -->
-    <div class="gc tcp-card">
+    <div class="gc">
       <div class="slbl">Kategorie w&auml;hlen</div>
       <select class="cat-sel" id="unit-cat-sel" onchange="unitCat(this.value)">
         <option value="pressure">&#x1F535;&#xFE0F;&ensp;Druck</option>
@@ -580,11 +590,11 @@
     </div>
 
     <!-- Converter card -->
-    <div class="gc tcp-card" id="unit-conv-card">
+    <div class="gc" id="unit-conv-card">
       <div class="slbl" id="unit-card-title">Druck &mdash; Umrechnung</div>
 
       <!-- From -->
-      <div class="igrp tcp-input-group">
+      <div class="igrp">
         <div class="ilbl">Eingabe</div>
         <div style="display:flex;gap:8px;align-items:stretch">
           <div class="iw" style="flex:1">
@@ -607,7 +617,7 @@
       </div>
 
       <!-- To -->
-      <div class="igrp tcp-input-group tcp-input-group--compact">
+      <div class="igrp" style="margin-bottom:0">
         <div class="ilbl">Ergebnis</div>
         <div style="display:flex;gap:8px;align-items:stretch">
           <div class="iw" style="flex:1">
@@ -621,7 +631,7 @@
     </div>
 
     <!-- All values list -->
-    <div class="gc tcp-card" id="unit-all-card">
+    <div class="gc" id="unit-all-card">
       <div class="slbl">Alle Werte</div>
       <div id="unit-all-list" style="display:flex;flex-direction:column;gap:5px">
         <p style="color:var(--t3);font-size:12px;text-align:center;padding:12px 0">Wert eingeben &rarr;</p>
@@ -640,11 +650,11 @@
 <!-- ═══════════════════════════════════════════════════════
    TAB: H,X-DIAGRAMM
 ═══════════════════════════════════════════════════════ -->
-<div id="tab-hx" class="tab-panel tcp-module tcp-module--hx">
-<div class="tab-inner tcp-layout">
+<div id="tab-hx" class="tab-panel" style="display:none">
+<div class="tab-inner">
 
   <!-- 1. Ausgangszustand -->
-  <div class="gc tcp-card">
+  <div class="gc">
     <div class="slbl">1. Ausgangszustand</div>
 
     <!-- φ / x Modus -->
@@ -654,7 +664,7 @@
     </div>
 
     <!-- Temperatur mit ± Button -->
-    <div class="igrp tcp-input-group">
+    <div class="igrp">
       <div class="ilbl">Temperatur T</div>
       <div style="display:flex;gap:8px;align-items:stretch">
         <button onclick="toggleTempSign('hx-temp')"
@@ -674,7 +684,7 @@
     </div>
 
     <!-- Relative Feuchte -->
-    <div class="igrp tcp-input-group" id="wrap-rh" style="margin-bottom:0">
+    <div class="igrp" id="wrap-rh" style="margin-bottom:0">
       <div class="ilbl">Relative Feuchte &phi;</div>
       <div class="iwrap">
         <input class="inp" id="hx-rh" type="text"
@@ -684,7 +694,7 @@
     </div>
 
     <!-- Feuchtegehalt x -->
-    <div class="igrp tcp-input-group" id="wrap-x" style="display:none;margin-bottom:0">
+    <div class="igrp" id="wrap-x" style="display:none;margin-bottom:0">
       <div class="ilbl">Feuchtegehalt x</div>
       <div class="iwrap">
         <input class="inp" id="hx-x" type="text"
@@ -696,7 +706,7 @@
     <!-- Zustand wird automatisch gesetzt bei Eingabe -->
 
     <!-- Zustand — wie Lüftung Ergebnisfeld -->
-    <div class="out-card tcp-card tcp-result-card tcp-card--spaced-sm" id="hx-state-result">
+    <div class="out-card" id="hx-state-result" style="margin-top:12px">
       <div style="margin-bottom:12px">
         <div style="font-family:var(--f);font-size:11px;font-weight:700;letter-spacing:.11em;
                     text-transform:uppercase;color:var(--t3);margin-bottom:4px">Temperatur</div>
@@ -737,7 +747,7 @@
   </div>
 
   <!-- Diagramm -->
-  <div class="gc tcp-card tcp-card--compact">
+  <div class="gc" style="padding:14px 16px">
     <div class="slbl" style="margin-bottom:10px">h,x-Diagramm nach Mollier</div>
     <div style="border-radius:var(--r-l);overflow:hidden;background:rgba(0,0,0,.45);
                 border:1px solid var(--gb-soft);position:relative">
@@ -750,9 +760,9 @@
   </div>
 
   <!-- 2. Zielzustand -->
-  <div class="gc tcp-card">
+  <div class="gc">
     <div class="slbl">2. Zielzustand</div>
-    <div class="igrp tcp-input-group">
+    <div class="igrp">
       <div class="ilbl">Zieltemperatur</div>
       <div style="display:flex;gap:8px;align-items:stretch">
         <button onclick="toggleTempSign('hx-target-temp')"
@@ -767,7 +777,7 @@
         </div>
       </div>
     </div>
-    <div class="igrp tcp-input-group tcp-input-group--compact">
+    <div class="igrp" style="margin-bottom:0">
       <div class="ilbl">Zielfeuchte &phi;</div>
       <div class="iwrap">
         <input class="inp" id="hx-target-rh" type="text"
@@ -778,7 +788,7 @@
   </div>
 
   <!-- 3. Luftbehandlung -->
-  <div class="gc tcp-card">
+  <div class="gc">
     <div class="slbl">3. Luftbehandlung</div>
     <select id="hx-process" class="gl-sel">
       <option value="">Prozess w&auml;hlen&hellip;</option>
@@ -792,7 +802,7 @@
   </div>
 
   <!-- 4. Berechnung -->
-  <div class="gc tcp-card">
+  <div class="gc">
     <div class="slbl">4. Berechnung</div>
     <button id="hx-calc"
       style="width:100%;height:52px;border:none;border-radius:var(--r-m);
@@ -804,7 +814,7 @@
   </div>
 
   <!-- 5. Ergebnis -->
-  <div class="gc tcp-card">
+  <div class="gc">
     <div class="slbl">5. Ergebnis</div>
     <div id="hx-result"
       style="font-family:var(--f);font-size:13px;color:var(--t3);
@@ -819,11 +829,11 @@
 </div><!-- /tab-hx -->
 
 <!-- ══ TAB: WRG / MISCHLUFT ══ -->
-<div id="tab-wrg" class="tab-panel tcp-module tcp-module--air">
-<div class="tab-inner tcp-layout">
+<div id="tab-wrg" class="tab-panel" style="display:none">
+<div class="tab-inner">
 
   <!-- ── WRG ── -->
-  <div class="gc tcp-card">
+  <div class="gc">
     <div class="slbl">Wärmerückgewinnung (WRG)</div>
     <div style="font-family:var(--f);font-size:11px;color:var(--t3);margin-bottom:var(--gap);line-height:1.55">
       Plattenwärmetauscher &middot; sensibler Wärmetransfer &middot; kein Feuchtetransfer
@@ -833,14 +843,14 @@
       <!-- Abluft -->
       <div>
         <div class="ilbl" style="color:var(--heat-t);margin-bottom:var(--gap-s)">&#8593; Abluft (LS1)</div>
-        <div class="igrp tcp-input-group">
+        <div class="igrp">
           <div class="ilbl">Temperatur T</div>
           <div class="iwrap">
             <input class="inp-sm" id="wrg-ab-t" type="number" step="0.5" placeholder="22 oder -5" inputmode="decimal" oninput="calcWRG()"/>
             <span class="iunit">&deg;C</span>
           </div>
         </div>
-        <div class="igrp tcp-input-group tcp-input-group--compact">
+        <div class="igrp" style="margin-bottom:0">
           <div class="ilbl">Rel. Feuchte &phi;</div>
           <div class="iwrap">
             <input class="inp-sm" id="wrg-ab-phi" type="number" min="1" max="100" step="1" placeholder="z.B. 40" inputmode="decimal" oninput="calcWRG()"/>
@@ -851,7 +861,7 @@
       <!-- Außenluft -->
       <div>
         <div class="ilbl" style="color:var(--cold-t);margin-bottom:var(--gap-s)">&#8595; Außenluft (LS2)</div>
-        <div class="igrp tcp-input-group">
+        <div class="igrp">
           <div class="ilbl">Temperatur T</div>
           <div style="display:flex;gap:6px;align-items:center">
             <button onclick="wrgToggleSign('wrg-au-t')"
@@ -866,7 +876,7 @@
             </div>
           </div>
         </div>
-        <div class="igrp tcp-input-group tcp-input-group--compact">
+        <div class="igrp" style="margin-bottom:0">
           <div class="ilbl">Rel. Feuchte &phi;</div>
           <div class="iwrap">
             <input class="inp-sm" id="wrg-au-phi" type="number" min="1" max="100" step="1" placeholder="z.B. 90" inputmode="decimal" oninput="calcWRG()"/>
@@ -877,7 +887,7 @@
     </div>
 
     <!-- Wirkungsgrad -->
-    <div class="igrp tcp-input-group tcp-input-group--spaced">
+    <div class="igrp" style="margin-top:var(--gap)">
       <div class="ilbl">Temperaturwirkungsgrad &eta;<sub>t</sub></div>
       <div class="iwrap">
         <input class="inp" id="wrg-eta" type="number" min="0" max="100" step="5" value="70" inputmode="decimal" oninput="calcWRG()"/>
@@ -887,7 +897,7 @@
   </div>
 
   <!-- WRG Ergebnis -->
-  <div class="out-card tcp-card tcp-result-card">
+  <div class="out-card">
     <div class="slbl">Ergebnis — WRG</div>
     <div id="wrg-result">
       <p style="color:var(--t3);font-size:12px;text-align:center;padding:12px 0">Werte eingeben &rarr;</p>
@@ -905,7 +915,7 @@
   <div style="height:1px;background:var(--gb-soft)"></div>
 
   <!-- ── MISCHLUFT ── -->
-  <div class="gc tcp-card">
+  <div class="gc">
     <div class="slbl">Luftmischung (Mischluft)</div>
     <div style="font-family:var(--f);font-size:11px;color:var(--t3);margin-bottom:var(--gap);line-height:1.55">
       Massengewichtete Mischung zweier Luftstr&ouml;me
@@ -915,19 +925,19 @@
     <div class="gc gc-h" style="margin-bottom:var(--gap)">
       <div class="ptitle"><div class="dot dot-h"></div><span class="ptitle-lbl">Luftstrom 1 (LS1)</span></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap-s)">
-        <div class="igrp tcp-input-group tcp-input-group--compact">
+        <div class="igrp" style="margin-bottom:0">
           <div class="ilbl">T [&deg;C]</div>
           <div class="iwrap">
             <input class="inp-sm" id="mix-ls1-t" type="number" step="0.5" placeholder="22" inputmode="decimal" oninput="calcMix()"/>
           </div>
         </div>
-        <div class="igrp tcp-input-group tcp-input-group--compact">
+        <div class="igrp" style="margin-bottom:0">
           <div class="ilbl">&phi; [%]</div>
           <div class="iwrap">
             <input class="inp-sm" id="mix-ls1-phi" type="number" min="1" max="100" step="1" placeholder="40" inputmode="decimal" oninput="calcMix()"/>
           </div>
         </div>
-        <div class="igrp tcp-input-group tcp-input-group--compact">
+        <div class="igrp" style="margin-bottom:0">
           <div class="ilbl">V&#x307; [m&sup3;/h]</div>
           <div class="iwrap">
             <input class="inp-sm" id="mix-ls1-vol" type="number" style="font-size:15px" min="0" step="100" placeholder="2000" inputmode="decimal" oninput="calcMix()"/>
@@ -940,19 +950,19 @@
     <div class="gc gc-c">
       <div class="ptitle"><div class="dot dot-c"></div><span class="ptitle-lbl">Luftstrom 2 (LS2)</span></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap-s)">
-        <div class="igrp tcp-input-group tcp-input-group--compact">
+        <div class="igrp" style="margin-bottom:0">
           <div class="ilbl">T [&deg;C]</div>
           <div class="iwrap">
             <input class="inp-sm" id="mix-ls2-t" type="number" step="0.5" placeholder="18" inputmode="decimal" oninput="calcMix()"/>
           </div>
         </div>
-        <div class="igrp tcp-input-group tcp-input-group--compact">
+        <div class="igrp" style="margin-bottom:0">
           <div class="ilbl">&phi; [%]</div>
           <div class="iwrap">
             <input class="inp-sm" id="mix-ls2-phi" type="number" min="1" max="100" step="1" placeholder="60" inputmode="decimal" oninput="calcMix()"/>
           </div>
         </div>
-        <div class="igrp tcp-input-group tcp-input-group--compact">
+        <div class="igrp" style="margin-bottom:0">
           <div class="ilbl">V&#x307; [m&sup3;/h]</div>
           <div class="iwrap">
             <input class="inp-sm" id="mix-ls2-vol" type="number" style="font-size:15px" min="0" step="100" placeholder="6000" inputmode="decimal" oninput="calcMix()"/>
@@ -963,7 +973,7 @@
   </div>
 
   <!-- Mischluft Ergebnis -->
-  <div class="out-card tcp-card tcp-result-card">
+  <div class="out-card">
     <div class="slbl">Ergebnis — Mischluft</div>
     <div id="mix-result">
       <p style="color:var(--t3);font-size:12px;text-align:center;padding:12px 0">Werte eingeben &rarr;</p>
@@ -984,14 +994,14 @@
 <!-- ══════════════════════════════════════════════════════
      TAB: TRINKWASSER
 ══════════════════════════════════════════════════════ -->
-<div id="tab-trinkwasser" class="tab-panel tcp-module tcp-module--water">
-  <div class="tab-inner tcp-layout">
+<div id="tab-trinkwasser" class="tab-panel" style="display:none">
+  <div class="tab-inner">
 
-    <div class="tw-desktop-left tcp-col tcp-col--left">
+    <div class="tw-desktop-left">
 
-    <div class="gc tcp-card">
+    <div class="gc">
       <div class="slbl">Trinkwasser &mdash; Basisdaten</div>
-      <div class="igrp tcp-input-group">
+      <div class="igrp">
         <div class="ilbl">Gebäudetyp / Nutzungsart</div>
         <select class="gl-sel" id="tw-building">
           <option value="wohn">Wohngebäude</option>
@@ -1001,7 +1011,7 @@
           <option value="pflege">Pflege / Krankenhaus</option>
         </select>
       </div>
-      <div class="igrp tcp-input-group tcp-input-group--compact">
+      <div class="igrp" style="margin-bottom:0">
         <div class="ilbl">Warmwasserbereitung</div>
         <select class="gl-sel" id="tw-ww-mode">
           <option value="zentral">zentral</option>
@@ -1010,13 +1020,13 @@
       </div>
     </div>
 
-    <div class="gc tcp-card">
+    <div class="gc">
       <div class="slbl">1. Nutzungseinheiten</div>
       <div class="info-txt" style="margin-bottom:12px">
         Nutzungseinheiten zuerst erfassen. Standard-NE verwenden automatisch den Ansatz „zwei größte Entnahmestellen“. Sonderbereiche können über GL-Faktor angesetzt werden.
       </div>
       <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
-        <div class="igrp tcp-input-group tcp-input-group--compact">
+        <div class="igrp" style="margin-bottom:0">
           <div class="ilbl">Neue Nutzungseinheit</div>
           <select class="gl-sel" id="tw-new-ne-type">
             <option value="bad">Bad / Badezimmer</option>
@@ -1034,7 +1044,7 @@
       <div id="tw-ne-list" style="margin-top:10px"></div>
     </div>
 
-    <div class="gc tcp-card">
+    <div class="gc">
       <button id="tw-free-toggle" type="button" style="width:100%;border:0;background:transparent;color:var(--t1);text-align:left;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;padding:0;cursor:pointer">
         <span id="tw-free-toggle-icon" style="font-size:17px;color:var(--blue)">▶</span>
         <span class="slbl" style="margin:0">2. Frei im Gebäude verteilte Entnahmestellen</span>
@@ -1047,11 +1057,11 @@
 
     </div><!-- /.tw-desktop-left -->
 
-    <div class="tw-desktop-right tcp-col tcp-col--right">
+    <div class="tw-desktop-right">
 
-    <div class="out-card tcp-card tcp-result-card">
+    <div class="out-card">
       <div class="slbl">3. Ergebnis &mdash; Trinkwasser</div>
-      <div class="out-grid tcp-result-grid">
+      <div class="out-grid" style="grid-template-columns:1fr;gap:8px">
         <div class="ob" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px"><div class="ob-title" style="margin:0">Summendurchfluss kalt</div><div class="out-val has" id="tw-sum-cold" style="white-space:nowrap">–</div></div>
         <div class="ob" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px"><div class="ob-title" style="margin:0">Summendurchfluss warm</div><div class="out-val has" id="tw-sum-warm" style="white-space:nowrap">–</div></div>
         <div class="ob" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px"><div class="ob-title" style="margin:0">Summendurchfluss gesamt</div><div class="out-val has" id="tw-sum-total" style="white-space:nowrap">–</div></div>
@@ -1069,7 +1079,7 @@
 
     <div class="fml">V<sub>S</sub> = a · (ΣV<sub>R</sub>)<sup>b</sup> − c &ensp;·&ensp; DIN 1988-300 orientierte Schnellberechnung</div>
 
-    <div class="gc tcp-card">
+    <div class="gc">
       <div class="slbl">4. Hygiene / Hinweise</div>
       <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:10px">
         <div><div class="ilbl">PWH-Leitungsvolumen</div><div class="iwrap"><input class="inp-sm" id="tw-line-vol" type="number" min="0" step="0.1" value="0"/><span class="iunit">l</span></div></div>
@@ -1087,30 +1097,30 @@
 <!-- ══════════════════════════════════════════════════════
      TAB: MAG / DRUCKHALTUNG
 ══════════════════════════════════════════════════════ -->
-<div id="tab-mag" class="tab-panel tcp-module tcp-module--pressure">
-  <div class="tab-inner tcp-layout">
-    <div class="mag-desktop-left tcp-col tcp-col--left">
-      <div class="gc gc-mag tcp-card">
+<div id="tab-mag" class="tab-panel" style="display:none">
+  <div class="tab-inner">
+    <div class="mag-desktop-left">
+      <div class="gc gc-mag">
         <div class="slbl">MAG / Druckhaltung — Basisdaten</div>
-        <div class="igrp tcp-input-group"><div class="ilbl">Anlagentyp</div><select class="gl-sel" id="mag-system"><option value="heizung">Heizungsanlage</option><option value="kaelte">Kühlanlage</option><option value="solar">Solaranlage</option><option value="technik">Technische Anlage</option></select></div>
-        <div class="igrp tcp-input-group"><div class="ilbl">Medium</div><select class="gl-sel" id="mag-medium"><option value="water">Wasser</option><option value="glycol25">Wasser / Glykol 25 %</option><option value="glycol35">Wasser / Glykol 35 %</option></select></div>
-        <div class="igrp tcp-input-group"><div class="ilbl">Anlagenvolumen</div><div class="iwrap"><input class="inp" id="mag-volume" type="number" min="0" step="10" placeholder="z.B. 850" inputmode="decimal"><span class="iunit">l</span></div></div>
+        <div class="igrp"><div class="ilbl">Anlagentyp</div><select class="gl-sel" id="mag-system"><option value="heizung">Heizungsanlage</option><option value="kaelte">Kühlanlage</option><option value="solar">Solaranlage</option><option value="technik">Technische Anlage</option></select></div>
+        <div class="igrp"><div class="ilbl">Medium</div><select class="gl-sel" id="mag-medium"><option value="water">Wasser</option><option value="glycol25">Wasser / Glykol 25 %</option><option value="glycol35">Wasser / Glykol 35 %</option></select></div>
+        <div class="igrp"><div class="ilbl">Anlagenvolumen</div><div class="iwrap"><input class="inp" id="mag-volume" type="number" min="0" step="10" placeholder="z.B. 850" inputmode="decimal"><span class="iunit">l</span></div></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap-s)">
-          <div class="igrp tcp-input-group"><div class="ilbl">Min. Temperatur</div><div class="iwrap"><input class="inp-sm" id="mag-tmin" type="number" step="1" value="10" inputmode="decimal"><span class="iunit">°C</span></div></div>
-          <div class="igrp tcp-input-group"><div class="ilbl">Max. Temperatur</div><div class="iwrap"><input class="inp-sm" id="mag-tmax" type="number" step="1" value="70" inputmode="decimal"><span class="iunit">°C</span></div></div>
+          <div class="igrp"><div class="ilbl">Min. Temperatur</div><div class="iwrap"><input class="inp-sm" id="mag-tmin" type="number" step="1" value="10" inputmode="decimal"><span class="iunit">°C</span></div></div>
+          <div class="igrp"><div class="ilbl">Max. Temperatur</div><div class="iwrap"><input class="inp-sm" id="mag-tmax" type="number" step="1" value="70" inputmode="decimal"><span class="iunit">°C</span></div></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap-s)">
-          <div class="igrp tcp-input-group"><div class="ilbl">Statische Höhe</div><div class="iwrap"><input class="inp-sm" id="mag-height" type="number" min="0" step="0.5" placeholder="z.B. 12" inputmode="decimal"><span class="iunit">m</span></div></div>
-          <div class="igrp tcp-input-group"><div class="ilbl">Sicherheitsventil</div><div class="iwrap"><input class="inp-sm" id="mag-sv" type="number" min="1" step="0.5" value="3" inputmode="decimal"><span class="iunit">bar</span></div></div>
+          <div class="igrp"><div class="ilbl">Statische Höhe</div><div class="iwrap"><input class="inp-sm" id="mag-height" type="number" min="0" step="0.5" placeholder="z.B. 12" inputmode="decimal"><span class="iunit">m</span></div></div>
+          <div class="igrp"><div class="ilbl">Sicherheitsventil</div><div class="iwrap"><input class="inp-sm" id="mag-sv" type="number" min="1" step="0.5" value="3" inputmode="decimal"><span class="iunit">bar</span></div></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap-s)">
-          <div class="igrp tcp-input-group"><div class="ilbl">Vordruck manuell</div><div class="iwrap"><input class="inp-sm" id="mag-p0" type="number" min="0" step="0.1" placeholder="auto" inputmode="decimal"><span class="iunit">bar</span></div></div>
-          <div class="igrp tcp-input-group"><div class="ilbl">Enddruck manuell</div><div class="iwrap"><input class="inp-sm" id="mag-pe" type="number" min="0" step="0.1" placeholder="auto" inputmode="decimal"><span class="iunit">bar</span></div></div>
+          <div class="igrp"><div class="ilbl">Vordruck manuell</div><div class="iwrap"><input class="inp-sm" id="mag-p0" type="number" min="0" step="0.1" placeholder="auto" inputmode="decimal"><span class="iunit">bar</span></div></div>
+          <div class="igrp"><div class="ilbl">Enddruck manuell</div><div class="iwrap"><input class="inp-sm" id="mag-pe" type="number" min="0" step="0.1" placeholder="auto" inputmode="decimal"><span class="iunit">bar</span></div></div>
         </div>
 </div>
     </div>
-    <div class="mag-desktop-right tcp-col tcp-col--right">
-      <div class="out-card mag-result-card result-standard tcp-card tcp-result-card"><div class="slbl">Ergebnis — MAG / Druckhaltung</div><div class="out-grid tcp-result-grid">
+    <div class="mag-desktop-right">
+      <div class="out-card mag-result-card result-standard"><div class="slbl">Ergebnis — MAG / Druckhaltung</div><div class="out-grid" style="grid-template-columns:1fr;gap:8px">
         <div class="ob mag-ob"><div class="ob-title">Ausdehnungsvolumen</div><div class="out-val has" id="mag-ve">–</div></div>
         <div class="ob mag-ob"><div class="ob-title">Wasservorlage / Reserve</div><div class="out-val has" id="mag-reserve">–</div></div>
         <div class="ob mag-ob"><div class="ob-title">Mindest-MAG Volumen</div><div class="out-val has" id="mag-vn-min">–</div></div>
@@ -1120,7 +1130,7 @@
         <div class="ob mag-ob"><div class="ob-title">Systemdruck aus Höhe</div><div class="out-val has" id="mag-psys-out">–</div></div>
       </div></div>
       <div class="fml">V<sub>e</sub> = V<sub>A</sub> · e &ensp;·&ensp; V<sub>N</sub> = (V<sub>e</sub> + V<sub>WV</sub>) · (p<sub>e</sub> + 1) / (p<sub>e</sub> − p<sub>0</sub>)</div>
-      <div class="gc tcp-card"><div class="slbl">Hinweise</div><div class="info-txt" id="mag-hints">Anlagenvolumen eingeben und Berechnung starten.</div></div>
+      <div class="gc"><div class="slbl">Hinweise</div><div class="info-txt" id="mag-hints">Anlagenvolumen eingeben und Berechnung starten.</div></div>
     </div>
   </div>
 </div>
@@ -1129,12 +1139,12 @@
 <!-- ══════════════════════════════════════════════════════
      TAB: ENTWÄSSERUNG
 ══════════════════════════════════════════════════════ -->
-<div id="tab-entwaesserung" class="tab-panel tcp-module tcp-module--drain">
-  <div class="tab-inner tcp-layout">
-    <div class="ew-desktop-left tcp-col tcp-col--left">
-      <div class="gc gc-ew tcp-card">
+<div id="tab-entwaesserung" class="tab-panel" style="display:none">
+  <div class="tab-inner">
+    <div class="ew-desktop-left">
+      <div class="gc gc-ew">
         <div class="slbl">Basisdaten — Entwässerung</div>
-        <div class="igrp tcp-input-group">
+        <div class="igrp">
           <div class="ilbl">Gebäude / Nutzung</div>
           <select class="gl-sel" id="ew-use">
             <option value="wohn">Wohngebäude / wohnähnlich</option>
@@ -1144,7 +1154,7 @@
             <option value="gewerb">Gewerbe / hohe Gleichzeitigkeit</option>
           </select>
         </div>
-        <div class="igrp tcp-input-group tcp-input-group--compact">
+        <div class="igrp" style="margin-bottom:0">
           <div class="ilbl">Sonderabfluss optional</div>
           <div class="iwrap">
             <input class="inp-sm" id="ew-special-q" type="number" min="0" step="0.1" value="0" inputmode="decimal">
@@ -1153,31 +1163,21 @@
         </div>
       </div>
 
-      <div class="gc gc-ew tcp-card">
+      <div class="gc gc-ew">
         <div class="slbl">Entwässerungsgegenstände</div>
         <div id="ew-fixture-list" class="ew-list"></div>
-        <div class="igrp tcp-input-group ew-name-group">
-          <div class="ilbl">Strangbezeichnung</div>
-          <div class="iwrap"><input class="inp-sm" id="ew-strang-name" type="text" placeholder="z.B. Strang 1" autocomplete="off"></div>
-        </div>
         <button id="ew-calc-btn" type="button" class="ew-calc-btn">+ Strang anlegen</button>
-        <div class="gc ew-strang-card tcp-card tcp-card--spaced">
+        <div class="gc ew-strang-card" style="margin-top:var(--gap)">
           <div class="slbl">Strangübersicht</div>
           <div id="ew-strang-list"></div>
-          <div class="gc ew-total-card tcp-card">
-            <div class="slbl">Gesamtsumme — alle Stränge</div>
-            <div id="ew-total-fixtures" class="ew-total-grid">
-              <p style="color:var(--t3);font-size:12px">Noch keine Stränge angelegt.</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
 
-    <div class="ew-desktop-right tcp-col tcp-col--right">
-      <div class="out-card ew-result-card result-standard tcp-card tcp-result-card">
+    <div class="ew-desktop-right">
+      <div class="out-card ew-result-card result-standard">
         <div class="slbl">Ergebnis — Entwässerung</div>
-        <div class="out-grid tcp-result-grid">
+        <div class="out-grid" style="grid-template-columns:1fr;gap:8px">
           <div class="ob ew-ob"><div class="ob-title">DU gesamt</div><div class="out-val has"><span id="ew-du-total">–</span><span class="u"> DU</span></div></div>
           <div class="ob ew-ob"><div class="ob-title">Schmutzwasserabfluss</div><div class="out-val has"><span id="ew-qww">–</span><span class="u"> l/s</span></div></div>
           <div class="ob ew-ob"><div class="ob-title">Anschlussleitung</div><div class="out-val has" id="ew-dim-anschluss">–</div></div>
@@ -1191,7 +1191,14 @@
 
       <div class="fml">Q<sub>ww</sub> = K × √ΣDU · Quick-Check zur Plausibilitätsprüfung</div>
 
-      <div class="gc tcp-card"><div class="slbl">Hinweise</div><div class="info-txt" id="ew-hints">Entwässerungsgegenstände eingeben.</div></div>
+      <div class="gc"><div class="slbl">Angesetzte Verbraucher</div><div id="ew-detail" class="ew-detail"></div></div>
+      <div class="gc ew-total-card">
+        <div class="slbl">Gesamtsumme — alle Stränge</div>
+        <div id="ew-total-fixtures" class="ew-total-grid">
+          <p style="color:var(--t3);font-size:12px">Noch keine Stränge angelegt.</p>
+        </div>
+      </div>
+      <div class="gc"><div class="slbl">Hinweise</div><div class="info-txt" id="ew-hints">Entwässerungsgegenstände eingeben.</div></div>
     </div>
   </div>
 </div>

@@ -96,9 +96,7 @@ function fromCanvas(px, py, W, H) {
 
 /* ─── GLOBALER ZUSTAND ─── */
 let _state = null;
-let _processSteps = null;
 window._hxState = null;
-window._hxProcessSteps = null;
 
 /* ─── HAUPT-DRAW ─── */
 function drawHxChart(state) {
@@ -459,7 +457,6 @@ function setHxState() {
   }
 
   _state = state; window._hxState = state;
-  _processSteps = null; window._hxProcessSteps = null;
   _renderState(state);
 }
 
@@ -672,8 +669,6 @@ function calcHxProcess() {
     default:            steps = _procHeat(s1, T2);
   }
 
-  _processSteps = steps;
-  window._hxProcessSteps = steps;
   _renderProcessSteps(steps, res);
   _drawProcessOnChart(steps);
 }
@@ -807,21 +802,6 @@ function _drawProcessOnChart(steps) {
     }
   });
 }
-
-/* ─── PDF SNAPSHOT: Zustand + Prozesslinien zuverlässig exportieren ─── */
-window._hxBuildPdfSnapshot = function _hxBuildPdfSnapshot() {
-  const canvas = document.getElementById('hxCanvas');
-  if (!canvas) return null;
-  try {
-    if (_state) {
-      drawHxChart(_state);
-      if (_processSteps && _processSteps.length) _drawProcessOnChart(_processSteps);
-    }
-    return canvas.toDataURL('image/png');
-  } catch (e) {
-    try { return canvas.toDataURL('image/png'); } catch (_) { return null; }
-  }
-};
 
 
 /* ─── PDF EXPORT WRAPPER ─── */
