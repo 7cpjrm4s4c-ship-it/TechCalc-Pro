@@ -28,12 +28,24 @@
 
 <meta name="techcalc-build" content="20260427-2015"/>
 <title>TechCalc Pro</title>
+<!-- Critical Path CSS (always loaded) -->
 <link rel="stylesheet" href="tokens.css"/>
 <link rel="stylesheet" href="layout.css"/>
 <link rel="stylesheet" href="components.css"/>
-<link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet" href="hc.css"/>
-  <script defer src="css-lazy-loader.js"></script>
+
+<!-- Primary tab CSS (Heizung/Kälte) -->
+<link rel="stylesheet" href="hc.css"/>
+
+<!-- Lazy module CSS: preloaded, promoted by css-lazy-loader.js on demand -->
+<link rel="preload" href="pipe.css" as="style"/>
+<link rel="preload" href="ventilation.css" as="style"/>
+<link rel="preload" href="hx.css" as="style"/>
+<link rel="preload" href="wrg.css" as="style"/>
+<link rel="preload" href="trinkwasser.css" as="style"/>
+<link rel="preload" href="mag.css" as="style"/>
+<link rel="preload" href="entwaesserung.css" as="style"/>
+
+<script defer src="css-lazy-loader.js"></script>
 </head>
 <body class="tc-app">
 

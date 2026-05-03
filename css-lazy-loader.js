@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════
    css-lazy-loader.js — TechCalc Pro Phase 19
-   Lazy-load module CSS ohne Duplikate.
+   Lazy-load module CSS without duplicate stylesheet requests.
 ═══════════════════════════════════════════════════════ */
 'use strict';
 
@@ -17,27 +17,61 @@
   };
 
   const LOADED = new Set();
+  const PENDING = new Map();
+
+  function fileName(href){
+    return (href || '').split('?')[0].split('#')[0].split('/').pop();
+  }
 
   function markExisting(){
     document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
-      const href = (link.getAttribute('href') || '').split('/').pop();
+      const href = fileName(link.getAttribute('href'));
       if (href) LOADED.add(href);
+    });
+    document.documentElement.dataset.cssLoaded = Array.from(LOADED).join(',');
+  }
+
+  function findLink(css){
+    return Array.from(document.querySelectorAll('link[rel="stylesheet"],link[rel="preload"]'))
+      .find(link => fileName(link.getAttribute('href')) === css);
+  }
+
+  function promotePreload(link, css){
+    return new Promise(resolve => {
+      const done = () => {
+        LOADED.add(css);
+        document.documentElement.dataset.cssLoaded = Array.from(LOADED).join(',');
+        resolve(css);
+      };
+
+      if (link.rel === 'stylesheet') return done();
+
+      link.onload = done;
+      link.onerror = () => done();
+      link.rel = 'stylesheet';
+      link.removeAttribute('as');
+      link.media = 'all';
+
+      // If the preload has already completed, rel promotion applies synchronously in modern browsers.
+      requestAnimationFrame(() => {
+        if (!LOADED.has(css) && link.sheet) done();
+      });
     });
   }
 
   function loadModuleCSS(moduleKey){
     const css = CSS_MODULES[moduleKey];
-    if (!css || LOADED.has(css)) return Promise.resolve(css);
+    if (!css || LOADED.has(css)) return Promise.resolve(css || moduleKey);
+    if (PENDING.has(css)) return PENDING.get(css);
 
-    const existing = Array.from(document.querySelectorAll('link[rel="stylesheet"],link[rel="preload"]'))
-      .find(link => (link.getAttribute('href') || '').endsWith(css));
-
-    if (existing && existing.rel === 'stylesheet') {
-      LOADED.add(css);
-      return Promise.resolve(css);
+    const existing = findLink(css);
+    if (existing) {
+      const pending = promotePreload(existing, css).finally(() => PENDING.delete(css));
+      PENDING.set(css, pending);
+      return pending;
     }
 
-    return new Promise((resolve, reject) => {
+    const pending = new Promise((resolve, reject) => {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = css;
@@ -58,7 +92,10 @@
       };
 
       document.head.appendChild(link);
-    });
+    }).finally(() => PENDING.delete(css));
+
+    PENDING.set(css, pending);
+    return pending;
   }
 
   function preloadAllModules(){
