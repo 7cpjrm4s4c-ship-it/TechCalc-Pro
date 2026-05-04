@@ -1,13 +1,10 @@
 /**
- * TechCalc Pro - Heating-Cooling Module v2 (FIXED)
- * Phase 3: Refactored with correct Phase 1 UI-Components interface
- * 
- * Berechnung: Rohrdimensionierung, Druckverlust, Leistung
- * UI: Phase 1 UI.* Components (korrekter Format)
+ * TechCalc Pro - Heating-Cooling Module v2 (ULTRA ROBUST)
+ * Strategie: Alle Inputs im Container finden, nicht nach festen IDs suchen
  */
 
 // ════════════════════════════════════════════════════════════════
-// BERECHNUNGEN (100% unverändert von Original)
+// BERECHNUNGEN (100% unverändert)
 // ════════════════════════════════════════════════════════════════
 
 function lambdaCW(Re, rr) {
@@ -21,40 +18,64 @@ function pdrop(lam, l, d, rho, v) {
   return lam * (l / d) * (rho * v * v) / 2 / 100000;
 }
 
-function hcCalc() {
-  // Input values
-  let q = window.parseNum(window.$('hc-q')?.value) || 0;
-  let dt = window.parseNum(window.$('hc-dt')?.value) || 1;
-  let m = window.parseNum(window.$('hc-m')?.value) || 0;
+// ════════════════════════════════════════════════════════════════
+// ULTRA-ROBUSTER RECHNER (findet alle Inputs im Container)
+// ════════════════════════════════════════════════════════════════
 
-  // Nullcheck
-  if (q <= 0 || dt <= 0 || m <= 0) {
-    window.$('hc-pdrop')?.innerHTML || (window.$('hc-pdrop').innerHTML = '–');
-    window.$('hc-v')?.innerHTML || (window.$('hc-v').innerHTML = '–');
-    window.$('hc-d')?.innerHTML || (window.$('hc-d').innerHTML = '–');
+function hcCalcUltra(container) {
+  if (!container) return;
+
+  // Finde alle Input-Felder im Container
+  const inputs = container.querySelectorAll('input[type="number"]');
+  if (inputs.length < 3) {
+    console.warn('⚠️  Heating-Cooling: Nicht alle Input-Felder gefunden');
     return;
   }
 
-  // Leistungsberechnung
-  let qCheck = (m * 4.187 * dt) / 3600;
-  
-  // Rohrdimensionierung (Richtwert: 0.5 - 1.5 m/s)
+  // Lese Werte aus den Inputs (erste 3)
+  let q = window.parseNum(inputs[0]?.value) || 0;
+  let dt = window.parseNum(inputs[1]?.value) || 1;
+  let m = window.parseNum(inputs[2]?.value) || 0;
+
+  console.log('HC Calc:', { q, dt, m });
+
+  if (q <= 0 || dt <= 0 || m <= 0) {
+    // Setze placeholder "–"
+    const resultDivs = container.querySelectorAll('[class*="result"]');
+    resultDivs.forEach(div => div.innerHTML = '–');
+    return;
+  }
+
+  // Berechnungen
   let d = Math.sqrt((4 * m) / (1000 * 3.14159 * 1.0)) * 1000;
   let v = (m / 1000) / (3.14159 * Math.pow(d / 1000, 2) / 4);
-
-  // Druckverlust (L=10m, rho=1000 kg/m³)
   let Re = (v * (d / 1000)) / 0.001;
   let lam = lambdaCW(Re, 0.045 / d);
   let pv = pdrop(lam, 10, d / 1000, 1000, v);
 
-  // Output
-  window.$('hc-pdrop').innerHTML = window.loc(pv, 3);
-  window.$('hc-v').innerHTML = window.loc(v, 2);
-  window.$('hc-d').innerHTML = window.loc(d, 1);
+  // Schreibe Ergebnisse: Suche nach divs die mit "–" gefüllt sind
+  const resultElements = container.querySelectorAll('[class*="result"], [class*="Result"]');
+  if (resultElements.length >= 3) {
+    resultElements[0].innerHTML = window.loc(pv, 3);
+    resultElements[1].innerHTML = window.loc(v, 2);
+    resultElements[2].innerHTML = window.loc(d, 1);
+  } else {
+    // Fallback: Suche nach span/div die nur "–" enthalten
+    const allDivs = container.querySelectorAll('div, span');
+    let resultCount = 0;
+    allDivs.forEach(el => {
+      if (el.textContent.trim() === '–' && resultCount < 3) {
+        if (resultCount === 0) el.innerHTML = window.loc(pv, 3);
+        else if (resultCount === 1) el.innerHTML = window.loc(v, 2);
+        else if (resultCount === 2) el.innerHTML = window.loc(d, 1);
+        resultCount++;
+      }
+    });
+  }
 }
 
 // ════════════════════════════════════════════════════════════════
-// UI AUFBAU (mit korrektem Phase 1 UI-Components Interface)
+// UI AUFBAU
 // ════════════════════════════════════════════════════════════════
 
 function buildHeatingCoolingUI() {
@@ -64,10 +85,8 @@ function buildHeatingCoolingUI() {
     return;
   }
 
-  // Title
   const title = UI.SectionTitle('Heizung / Kälte');
 
-  // Input Group: Leistung
   const inputQ = UI.InputGroup('Leistung (kW)', 'hc-q', {
     value: 100,
     min: 1,
@@ -76,7 +95,6 @@ function buildHeatingCoolingUI() {
     unit: 'kW'
   });
 
-  // Input Group: Temperaturdifferenz
   const inputDT = UI.InputGroup('Temperaturdifferenz (K)', 'hc-dt', {
     value: 10,
     min: 1,
@@ -85,7 +103,6 @@ function buildHeatingCoolingUI() {
     unit: 'K'
   });
 
-  // Input Group: Massenstrom
   const inputM = UI.InputGroup('Massenstrom (kg/h)', 'hc-m', {
     value: 1000,
     min: 10,
@@ -94,50 +111,56 @@ function buildHeatingCoolingUI() {
     unit: 'kg/h'
   });
 
-  // Result Card: Druckverlust
   const resultPDrop = UI.ResultCard('Druckverlust (10m)', 'hc-pdrop', {
     value: '–',
     unit: 'bar',
     color: 'blue'
   });
 
-  // Result Card: Strömungsgeschwindigkeit
   const resultV = UI.ResultCard('Strömungsgeschwindigkeit', 'hc-v', {
     value: '–',
     unit: 'm/s',
     color: 'blue'
   });
 
-  // Result Card: Rohrdurchmesser
-  const resultD = UI.ResultCard('Rohrdurchmesser (Richtwert)', 'hc-d', {
+  const resultD = UI.ResultCard('Rohrdurchmesser', 'hc-d', {
     value: '–',
     unit: 'mm',
     color: 'blue'
   });
 
-  // Combine all into container
   container.innerHTML = 
     title +
     UI.Card('Eingaben', inputQ + inputDT + inputM) +
     UI.Card('Ergebnisse', resultPDrop + resultV + resultD);
 
+  // WICHTIG: Speichere container-Referenz für Event Listeners
+  container.hcContainer = container;
+
   console.log('✅ Heating-Cooling v2 initialized');
 }
 
 // ════════════════════════════════════════════════════════════════
-// EVENT LISTENERS
+// EVENT LISTENER (ULTRA-ROBUST)
 // ════════════════════════════════════════════════════════════════
 
 function initHeatingCooling() {
   buildHeatingCoolingUI();
 
-  // Input Listener
-  window.$('hc-q')?.addEventListener('input', hcCalc);
-  window.$('hc-dt')?.addEventListener('input', hcCalc);
-  window.$('hc-m')?.addEventListener('input', hcCalc);
+  const container = window.$('hc-section');
+  if (!container) return;
+
+  // Finde ALLE Input-Felder und bind Event Listener
+  const inputs = container.querySelectorAll('input');
+  console.log(`Found ${inputs.length} inputs in hc-section`);
+
+  inputs.forEach(input => {
+    input.addEventListener('input', () => hcCalcUltra(container));
+    input.addEventListener('change', () => hcCalcUltra(container));
+  });
 
   // Initial calculation
-  hcCalc();
+  hcCalcUltra(container);
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -146,7 +169,7 @@ function initHeatingCooling() {
 
 document.addEventListener('DOMContentLoaded', initHeatingCooling);
 
-// Export for testing
-window.hcCalc = hcCalc;
+// Export
+window.hcCalcUltra = hcCalcUltra;
 window.lambdaCW = lambdaCW;
 window.pdrop = pdrop;
