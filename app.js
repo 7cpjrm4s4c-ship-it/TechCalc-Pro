@@ -806,8 +806,3 @@ document.addEventListener('DOMContentLoaded', () => {
 window.addEventListener('appinstalled', () => {
   const ib = $('ib'); if (ib) ib.style.display = 'none';
 });
-
-// Init
-document.addEventListener('DOMContentLoaded', () => {
-  unitCat('pressure');
-});
