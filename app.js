@@ -1,3 +1,28 @@
+// ← Ganz oben in app.js einfügen!
+
+window.$ = (id) => {
+  const el = document.getElementById(id);
+  if (!el) console.warn(`Element with ID "${id}" not found`);
+  return el;
+};
+
+window.loc = (num, decimals = 2) => {
+  if (num === null || num === undefined || isNaN(num)) return '–';
+  const factor = Math.pow(10, decimals);
+  const rounded = Math.round(num * factor) / factor;
+  return new Intl.NumberFormat('de-DE', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  }).format(rounded);
+};
+
+window.parseNum = (str) => {
+  if (!str) return 0;
+  str = String(str).trim().replace(',', '.');
+  const num = parseFloat(str);
+  return isNaN(num) ? 0 : num;
+};
+
 /**
  * TechCalc Pro - Clean App.js (Phase 3)
  * Only essential utilities - NO old modules!
