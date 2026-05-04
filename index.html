@@ -46,6 +46,14 @@
 </head>
 <body>
 
+✅ <div id="hc-section"></div>
+✅ <div id="vent-section"></div>
+✅ <div id="wrg-section"></div>
+✅ <div id="mag-section"></div>
+✅ <div id="ew-section"></div>
+✅ <div id="tw-section"></div>
+✅ <div id="hx-section"></div>
+
 <!-- ══ HEADER ══ -->
 <header class="hdr">
   <div class="hdr-top hdr-top-premium">
@@ -1287,14 +1295,22 @@
   }
 })();
 </script> 
-
-✅ <div id="hc-section"></div>
-✅ <div id="vent-section"></div>
-✅ <div id="wrg-section"></div>
-✅ <div id="mag-section"></div>
-✅ <div id="ew-section"></div>
-✅ <div id="tw-section"></div>
-✅ <div id="hx-section"></div>
    
 </body>
 </html>
+
+<script>
+setTimeout(() => {
+  console.log('=== FINAL DEBUG ===');
+  console.log('hc-section innerHTML length:', document.getElementById('hc-section')?.innerHTML.length || 0);
+  console.log('hc-section display:', window.getComputedStyle(document.getElementById('hc-section')).display);
+  console.log('hc-section visibility:', window.getComputedStyle(document.getElementById('hc-section')).visibility);
+  console.log('hc-section children:', document.getElementById('hc-section')?.children.length || 0);
+  
+  // Force show
+  document.getElementById('hc-section').style.display = 'block';
+  document.getElementById('hc-section').style.visibility = 'visible';
+  
+  console.log('=== FORCED VISIBLE ===');
+}, 500);
+</script>
