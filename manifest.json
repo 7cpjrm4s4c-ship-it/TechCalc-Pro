@@ -2,7 +2,7 @@
   "name": "TechCalc Pro",
   "short_name": "TechCalc",
   "description": "Modulare HLSK Quick Tools für Sanitär, Heizung, Lüftung und Klimatechnik.",
-  "start_url": "./index.html",
+  "start_url": "./#/heating-cooling",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",

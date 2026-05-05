@@ -1,5 +1,5 @@
 import { modules } from './registry.js';
-import { initRouter } from './router.js';
+import { initRouter, currentRoute } from './router.js';
 import { renderNavigation, renderQuickAccessSettings } from './navigation.js';
 import heatingCooling from '../modules/heating-cooling/index.js';
 import ventilation from '../modules/ventilation/index.js';
@@ -9,10 +9,16 @@ import unitConverter from '../modules/unit-converter/index.js';
 [heatingCooling, ventilation, pipeSizing, unitConverter].forEach(module => modules.register(module.config.id, module));
 
 const app = document.getElementById('app');
-function render(id){ const module = modules.get(id); renderNavigation(id); module.mount(app); app.focus({ preventScroll:true }); }
+function render(id){
+  const module = modules.get(id);
+  if (!module) return;
+  renderNavigation(id);
+  module.mount(app);
+  app.focus({ preventScroll:true });
+}
 initRouter(render);
 renderQuickAccessSettings();
-window.addEventListener('resize', () => renderNavigation(location.hash.replace('#','')));
+window.addEventListener('resize', () => renderNavigation(currentRoute()));
 
 const settingsButton = document.getElementById('settingsButton');
 const settingsPanel = document.getElementById('settingsPanel');
