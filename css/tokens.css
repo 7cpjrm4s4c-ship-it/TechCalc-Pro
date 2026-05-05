@@ -1,6 +1,7 @@
 :root {
   color-scheme: dark;
   --font-sans: Arial, Helvetica, sans-serif;
+
   --color-bg-0: #020509;
   --color-bg-1: #050a11;
   --color-surface: rgba(22, 27, 33, .78);
@@ -11,33 +12,54 @@
   --color-text: #eef4fb;
   --color-muted: #8b929c;
   --color-dim: #5f6670;
+
   --accent-blue: #35aaff;
   --accent-cyan: #35e5ff;
   --accent-orange: #ff7a2e;
   --accent-green: #2de0a1;
   --accent-purple: #a98cff;
   --gradient-brand: linear-gradient(90deg, #35e5ff 0%, #2c8cff 45%, #ff8a24 100%);
-  --space-1: 8px;
-  --space-2: 16px;
-  --space-3: 24px;
-  --space-4: 32px;
-  --space-5: 40px;
-  --space-6: 48px;
+
+  /* 8px spacing system */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 40px;
+  --space-7: 48px;
+
+  --ui-gap: var(--space-2);
+  --card-gap: var(--space-2);
+  --card-padding: var(--space-3);
+  --field-gap: var(--space-2);
+  --section-gap: var(--space-2);
+
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 22px;
   --radius-xl: 30px;
+
   --shadow-glass: 0 20px 70px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08);
   --shadow-active: 0 0 0 1px rgba(53,170,255,.45), 0 0 28px rgba(53,170,255,.2);
+
   --header-h: 64px;
   --nav-h: 46px;
   --bottom-nav-h: 72px;
   --ease: cubic-bezier(.2,.8,.2,1);
 }
+
 * { box-sizing: border-box; }
 html { min-height: 100%; background: var(--color-bg-0); }
 body {
-  min-height: 100%; margin: 0; font-family: var(--font-sans); color: var(--color-text);
-  background: radial-gradient(circle at 18% 8%, rgba(31,130,255,.14), transparent 34%), radial-gradient(circle at 84% 22%, rgba(255,122,46,.08), transparent 30%), linear-gradient(135deg, #020407, #07101a 52%, #020509);
+  min-height: 100%;
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background:
+    radial-gradient(circle at 18% 8%, rgba(31,130,255,.14), transparent 34%),
+    radial-gradient(circle at 84% 22%, rgba(255,122,46,.08), transparent 30%),
+    linear-gradient(135deg, #020407, #07101a 52%, #020509);
 }
 button, input, select { font: inherit; }

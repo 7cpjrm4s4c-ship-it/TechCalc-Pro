@@ -1,19 +1,100 @@
 .app-shell { min-height: 100vh; padding-bottom: var(--space-3); }
-.app-header { height: var(--header-h); display: grid; grid-template-columns: 64px 1fr 64px; align-items: center; padding: 0 var(--space-2); border-bottom: 1px solid rgba(255,255,255,.08); position: sticky; top: 0; z-index: 40; }
-.app-main { width: min(1880px, 100%); margin: 0 auto; padding: var(--space-3) var(--space-2); }
-.grid-12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--space-2); }
-.span-12 { grid-column: span 12; } .span-8 { grid-column: span 8; } .span-6 { grid-column: span 6; } .span-4 { grid-column: span 4; }
-.module-nav { height: var(--nav-h); position: sticky; top: var(--header-h); z-index: 35; background: rgba(2,5,9,.9); border-bottom: 1px solid rgba(255,255,255,.1); }
-.module-nav__track { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(160px, 1fr); max-width: 100%; height: 100%; }
-.two-column { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, .9fr); gap: var(--space-2); align-items: start; }
-.card-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: var(--space-2); }
-.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: var(--space-2); }
-@media (max-width: 1023px) { .two-column { grid-template-columns: 1fr; } .span-8,.span-6,.span-4 { grid-column: span 12; } }
+
+.app-header {
+  height: var(--header-h);
+  display: grid;
+  grid-template-columns: 64px 1fr 64px;
+  align-items: center;
+  padding: 0 var(--space-2);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.app-main {
+  width: min(1880px, 100%);
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-3);
+}
+
+.grid-12,
+.module-view,
+.tc-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--ui-gap);
+}
+
+.span-12 { grid-column: span 12; }
+.span-8 { grid-column: span 8; }
+.span-6 { grid-column: span 6; }
+.span-4 { grid-column: span 4; }
+
+.tc-stack { display: flex; flex-direction: column; gap: var(--ui-gap); }
+.tc-stack--section { gap: var(--section-gap); }
+
+.tc-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-gap);
+}
+.tc-fields--1 { grid-template-columns: 1fr; }
+.tc-fields--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.module-nav {
+  height: var(--nav-h);
+  position: sticky;
+  top: var(--header-h);
+  z-index: 35;
+  background: rgba(2,5,9,.9);
+  border-bottom: 1px solid rgba(255,255,255,.1);
+}
+.module-nav__track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(160px, 1fr);
+  max-width: 100%;
+  height: 100%;
+}
+
+.two-column,
+.tc-two-column {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, .9fr);
+  gap: var(--ui-gap);
+  align-items: start;
+}
+
+.card-grid,
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: var(--ui-gap);
+}
+
+@media (max-width: 1023px) {
+  .two-column, .tc-two-column { grid-template-columns: 1fr; }
+  .span-8, .span-6, .span-4 { grid-column: span 12; }
+}
+
 @media (max-width: 767px) {
   .app-shell { padding-bottom: calc(var(--bottom-nav-h) + var(--space-2)); }
   .app-header { grid-template-columns: 48px 1fr 48px; }
-  .module-nav { position: fixed; top: auto; bottom: 10px; left: 10px; right: 10px; height: var(--bottom-nav-h); border: 1px solid rgba(255,255,255,.12); border-radius: 999px; background: rgba(8,12,18,.82); backdrop-filter: blur(22px); overflow: visible; }
+  .module-nav {
+    position: fixed;
+    top: auto;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    height: var(--bottom-nav-h);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 999px;
+    background: rgba(8,12,18,.82);
+    backdrop-filter: blur(22px);
+    overflow: visible;
+  }
   .module-nav__track { grid-auto-columns: 1fr; border-radius: inherit; overflow: hidden; }
   .app-main { padding: var(--space-2); }
-  .card-grid,.form-grid { grid-template-columns: 1fr; }
+  .card-grid, .form-grid, .tc-fields, .tc-fields--3 { grid-template-columns: 1fr; }
 }
