@@ -1,0 +1,1 @@
+export default { id:'unit-converter', title:'Einheitenrechner', shortTitle:'Einheiten', group:'Utilities', accent:'green', order:40, defaultVisible:true, description:'Kategorie-basierte Umrechnung technischer Einheiten.' };

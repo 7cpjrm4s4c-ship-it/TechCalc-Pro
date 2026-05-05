@@ -1,0 +1,1 @@
+export default { id:'pipe-sizing', title:'Rohrdimensionierung', shortTitle:'Rohrdimensionierung', group:'Sanitär / Heizung', accent:'blue', order:30, defaultVisible:true, description:'Empfehlung der DN anhand Volumenstrom oder Massenstrom und maximalem Druckverlust.' };
