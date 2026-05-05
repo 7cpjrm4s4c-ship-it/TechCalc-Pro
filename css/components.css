@@ -264,3 +264,50 @@
 @media (max-width:767px){
   .control .unit-select { height: 48px; flex-basis: 72px; width: 72px; min-width: 72px; }
 }
+
+/* Mobile navigation: floating oval active marker instead of a rectangular tab fill. */
+@media (max-width:767px){
+  .module-nav {
+    padding: 6px;
+    overflow: visible;
+  }
+  .module-nav__track {
+    gap: 4px;
+    padding: 0;
+    overflow: visible;
+  }
+  .module-tab {
+    position: relative;
+    z-index: 1;
+    border-right: 0;
+    border-radius: 999px;
+    background: transparent;
+    box-shadow: none;
+    min-width: 0;
+    isolation: isolate;
+  }
+  .module-tab::before {
+    content: "";
+    position: absolute;
+    inset: 5px 2px;
+    border-radius: 999px;
+    z-index: -1;
+    opacity: 0;
+    transform: scale(.92);
+    transition: opacity .2s var(--ease), transform .2s var(--ease), box-shadow .2s var(--ease);
+  }
+  .module-tab.is-active,
+  .module-tab.is-overflow-active {
+    color: var(--accent-blue);
+    background: transparent;
+    box-shadow: none;
+  }
+  .module-tab.is-active::before,
+  .module-tab.is-overflow-active::before {
+    opacity: 1;
+    transform: scale(1);
+    background: linear-gradient(135deg, rgba(53,170,255,.22), rgba(53,170,255,.08));
+    border: 1px solid rgba(53,170,255,.42);
+    box-shadow: 0 8px 22px rgba(0,0,0,.22), 0 0 22px rgba(53,170,255,.18), inset 0 -3px 0 var(--accent-blue);
+  }
+}

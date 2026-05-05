@@ -1,11 +1,19 @@
 import { createModuleState } from '../../core/state.js';
+
 export const state = createModuleState({
   mode: 'heating',
-  calcTarget: 'power',
   mediumId: 'water',
   pipeSystemId: 'steel',
-  powerW: '',
-  powerUnit: 'W',
-  massFlowKgh: '',
-  deltaT: '10'
+
+  heatingCalcTarget: 'power',
+  heatingPowerW: '',
+  heatingPowerUnit: 'W',
+  heatingMassFlowKgh: '',
+  heatingDeltaT: '10',
+
+  coolingCalcTarget: 'power',
+  coolingPowerW: '',
+  coolingPowerUnit: 'W',
+  coolingMassFlowKgh: '',
+  coolingDeltaT: '10'
 });

@@ -157,3 +157,31 @@
     grid-column: 1 / -1;
   }
 }
+
+/* Fixed header: pinned to the viewport, no pull-down displacement while scrolling. */
+.app-shell {
+  padding-top: var(--header-h);
+  overscroll-behavior-y: none;
+}
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+}
+.module-nav {
+  top: var(--header-h);
+}
+
+@media (max-width: 767px) {
+  .app-shell {
+    padding-top: calc(var(--header-h) + env(safe-area-inset-top, 0px) + var(--space-2));
+  }
+  .app-header {
+    top: 0;
+  }
+}
+@media (max-width: 767px) {
+  .module-nav { top: auto; }
+}

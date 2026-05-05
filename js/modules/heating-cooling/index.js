@@ -3,38 +3,69 @@ import { state } from './state.js';
 import { calculate } from './logic.js';
 import { MEDIA, fmt, fmtInput } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
-import { card, field, selectField, segmented, resultRows, renderModuleShell, bindCommonInputs, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, bindCommonInputs, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
+
+const MODE_PREFIX = {
+  heating: 'heating',
+  cooling: 'cooling'
+};
+
+function prefixFor(s) {
+  return MODE_PREFIX[s.mode] || 'heating';
+}
+
+function key(s, name) {
+  return `${prefixFor(s)}${name}`;
+}
+
+function activeValue(s, name) {
+  return s[key(s, name)];
+}
+
+function activeCalculationState(s) {
+  return {
+    mode: s.mode,
+    mediumId: s.mediumId,
+    pipeSystemId: s.pipeSystemId,
+    calcTarget: activeValue(s, 'CalcTarget') || 'power',
+    powerW: activeValue(s, 'PowerW') || '',
+    powerUnit: activeValue(s, 'PowerUnit') || 'W',
+    massFlowKgh: activeValue(s, 'MassFlowKgh') || '',
+    deltaT: activeValue(s, 'DeltaT') || ''
+  };
+}
 
 function powerField(s) {
+  const unit = activeValue(s, 'PowerUnit') || 'W';
   return field({
-    id: 'powerW',
+    id: key(s, 'PowerW'),
     label: 'Leistung Q',
-    unit: s.powerUnit || 'W',
-    unitField: 'powerUnit',
+    unit,
+    unitField: key(s, 'PowerUnit'),
     unitOptions: [
       { value: 'W', label: 'W' },
       { value: 'kW', label: 'kW' }
     ],
-    value: fmtInput(s.powerW, 2)
+    value: fmtInput(activeValue(s, 'PowerW'), 2)
   });
 }
 
-function inputFields(s) {
-  if (s.calcTarget === 'power') {
+function inputFields(s, active) {
+  if (active.calcTarget === 'power') {
     return [
-      field({ id: 'massFlowKgh', label: 'Massenstrom ṁ', unit: 'kg/h', value: fmtInput(s.massFlowKgh, 2) }),
-      field({ id: 'deltaT', label: 'ΔT Temperatur', unit: 'K', value: fmtInput(s.deltaT, 2) })
+      field({ id: key(s, 'MassFlowKgh'), label: 'Massenstrom ṁ', unit: 'kg/h', value: fmtInput(active.massFlowKgh, 2) }),
+      field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(active.deltaT, 2) })
     ];
   }
-  if (s.calcTarget === 'massFlow') {
+  if (active.calcTarget === 'massFlow') {
     return [
       powerField(s),
-      field({ id: 'deltaT', label: 'ΔT Temperatur', unit: 'K', value: fmtInput(s.deltaT, 2) })
+      field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(active.deltaT, 2) })
     ];
   }
   return [
     powerField(s),
-    field({ id: 'massFlowKgh', label: 'Massenstrom ṁ', unit: 'kg/h', value: fmtInput(s.massFlowKgh, 2) })
+    field({ id: key(s, 'MassFlowKgh'), label: 'Massenstrom ṁ', unit: 'kg/h', value: fmtInput(active.massFlowKgh, 2) })
   ];
 }
 
@@ -60,7 +91,8 @@ function mediumStats(medium) {
 }
 
 function view(s) {
-  const r = calculate(s);
+  const active = activeCalculationState(s);
+  const r = calculate(active);
   const accent = s.mode === 'cooling' ? 'cyan' : 'orange';
   const modeLabel = s.mode === 'cooling' ? 'Kälte' : 'Heizung';
 
@@ -76,7 +108,7 @@ function view(s) {
     { label: 'ΔT', value: fmt(r.deltaT), unit: 'K' },
     { label: 'Medium', value: r.medium.label },
     { label: 'Dichte', value: fmt(r.medium.density, 0), unit: 'kg/m³' }
-  ].filter(item => item.label !== targetLabel(s.calcTarget));
+  ].filter(item => item.label !== targetLabel(active.calcTarget));
 
   const inputColumn = stack([
     mediumCard,
@@ -85,14 +117,14 @@ function view(s) {
       { value: 'cooling', label: '● Kälte' }
     ], s.mode, { accent }), accent, { compact: true }),
     card(`${modeLabel} — Eingaben`, stack([
-      segmented('calcTarget', [
+      segmented(key(s, 'CalcTarget'), [
         { value: 'power', label: 'Q Leistung' },
         { value: 'massFlow', label: 'ṁ Massenstrom' },
         { value: 'deltaT', label: 'ΔT Temperatur' }
-      ], s.calcTarget, { accent }),
-      grid(inputFields(s).join(''), 2)
+      ], active.calcTarget, { accent }),
+      grid(inputFields(s, active).join(''), 2)
     ].join('')), accent),
-    mainResult(`Ergebnis — ${targetLabel(s.calcTarget)}`, targetMain(s.calcTarget, r), resultDetails, accent),
+    mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent),
     `<div class="formula">Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)</div>`
   ].join(''));
 
