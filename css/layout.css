@@ -31,8 +31,19 @@
 .span-6 { grid-column: span 6; }
 .span-4 { grid-column: span 4; }
 
-.tc-stack { display: flex; flex-direction: column; gap: var(--ui-gap); }
-.tc-stack--section { gap: var(--section-gap); }
+.tc-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.tc-stack > * + * {
+  margin-top: var(--ui-gap);
+}
+
+.tc-stack--section > * + * {
+  margin-top: var(--section-gap);
+}
 
 .tc-fields {
   display: grid;

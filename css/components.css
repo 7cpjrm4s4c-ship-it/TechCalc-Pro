@@ -40,6 +40,14 @@
 .overflow-menu__item small { color: var(--color-muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
 .overflow-menu__item.is-active { color: var(--accent-blue); background: rgba(45, 168, 255, .12); }
 
+
+/* Exact vertical rhythm: adjacent rendered blocks/cards are separated by the 8px token. */
+.card,
+.formula,
+.empty-state {
+  margin: 0;
+}
+
 .card {
   border-radius: var(--radius-xl);
   padding: var(--card-padding);
