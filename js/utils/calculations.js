@@ -16,27 +16,25 @@ export function heatingCooling({ powerW, powerUnit = 'W', massFlowKgh, deltaT, m
   const medium = getMedium(mediumId);
   const cp = medium.cpWhKgK;
   const inputPowerW = num(powerW) * (powerUnit === 'kW' ? 1000 : 1);
-  const qKwInput = inputPowerW / 1000;
+  const qKwInput = inputPowerW ? inputPowerW / 1000 : null;
   const m = num(massFlowKgh);
   const dt = num(deltaT);
 
-  let powerKw = qKwInput || null;
+  let powerKw = qKwInput;
   let mass = m || null;
   let spread = dt || null;
 
-  if (calcTarget === 'power' && m && dt) {
-    powerKw = (m * cp * dt) / 1000;
+  // Keine automatische Rückwärtsberechnung außerhalb der gewählten Methode.
+  // Dadurch erscheinen keine scheinbaren Ergebnisse, solange Pflichtwerte fehlen.
+  if (calcTarget === 'power') {
+    powerKw = m && dt ? (m * cp * dt) / 1000 : null;
   }
-  if (calcTarget === 'massFlow' && qKwInput && dt) {
-    mass = (qKwInput * 1000) / (cp * dt);
+  if (calcTarget === 'massFlow') {
+    mass = inputPowerW && dt ? inputPowerW / (cp * dt) : null;
   }
-  if (calcTarget === 'deltaT' && qKwInput && m) {
-    spread = (qKwInput * 1000) / (m * cp);
+  if (calcTarget === 'deltaT') {
+    spread = inputPowerW && m ? inputPowerW / (m * cp) : null;
   }
-
-  if (!powerKw && m && dt) powerKw = (m * cp * dt) / 1000;
-  if (!mass && qKwInput && dt) mass = (qKwInput * 1000) / (cp * dt);
-  if (!spread && qKwInput && m) spread = (qKwInput * 1000) / (m * cp);
 
   const volumeFlowM3h = mass ? mass / medium.density : null;
 

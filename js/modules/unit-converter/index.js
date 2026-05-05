@@ -37,8 +37,9 @@ export default {
   mount(root) {
     const render = () => {
       root.innerHTML = view(state.get());
-      bindCommonInputs(root, state, render);
+      bindCommonInputs(root, state);
     };
+    state.subscribe(render);
     render();
   }
 };

@@ -238,3 +238,29 @@
   .inline-stat strong { font-size: 12px; white-space: normal; }
   .main-result strong { text-align: left; }
 }
+
+/* Fix: Eingabe bleibt links editierbar, Einheitenumschalter sichtbar rechts. */
+.control input {
+  flex: 1 1 auto;
+  width: auto;
+}
+.control .unit-select {
+  flex: 0 0 76px;
+  width: 76px;
+  min-width: 76px;
+  height: 52px;
+  padding: 0 8px;
+  text-align: center;
+  text-align-last: center;
+  border-left: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.065);
+  color: var(--color-text);
+  font-weight: 900;
+  border-radius: 0;
+}
+.control .unit-select:focus {
+  outline: 0;
+}
+@media (max-width:767px){
+  .control .unit-select { height: 48px; flex-basis: 72px; width: 72px; min-width: 72px; }
+}

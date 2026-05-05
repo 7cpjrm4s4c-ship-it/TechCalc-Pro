@@ -23,9 +23,9 @@ export function card(title, body, accent = 'blue', options = {}) {
 
 export function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', disabled = false, unitField = '', unitOptions = [] }) {
   const unitHtml = unitOptions.length
-    ? `<select class="unit unit-select" data-field="${esc(unitField)}">${unitOptions.map(o => `<option value="${esc(o.value)}" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`
+    ? `<select class="unit unit-select" aria-label="Einheit" data-field="${esc(unitField)}">${unitOptions.map(o => `<option value="${esc(o.value)}" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`
     : unit ? `<span class="unit">${esc(unit)}</span>` : '';
-  return `<div class="field"><label for="${esc(id)}">${esc(label)}</label><div class="control"><input id="${esc(id)}" data-field="${esc(id)}" type="${esc(type)}" inputmode="decimal" value="${esc(value ?? '')}" placeholder="${esc(placeholder)}" ${disabled ? 'disabled' : ''}>${unitHtml}</div></div>`;
+  return `<div class="field"><label for="${esc(id)}">${esc(label)}</label><div class="control"><input id="${esc(id)}" data-field="${esc(id)}" type="${esc(type)}" inputmode="decimal" value="${esc(value ?? '')}" placeholder="${esc(placeholder)}" ${disabled ? 'disabled' : ''} autocomplete="off">${unitHtml}</div></div>`;
 }
 
 export function selectField({ id, label, value, options }) {
@@ -68,10 +68,11 @@ export function renderModuleShell(module, inner) {
   </section>`;
 }
 
-export function bindCommonInputs(root, state, calculateAndRender) {
+export function bindCommonInputs(root, state) {
   root.querySelectorAll('[data-field]').forEach(el => {
     const apply = () => state.set({ [el.dataset.field]: el.value });
     if (el.matches('input')) {
+      // Während der Eingabe kein Re-Render: mobile Tastatur bleibt offen.
       el.addEventListener('input', () => state.set({ [el.dataset.field]: el.value }, { notify: false }));
       el.addEventListener('change', apply);
       el.addEventListener('blur', apply);
@@ -82,5 +83,4 @@ export function bindCommonInputs(root, state, calculateAndRender) {
   root.querySelectorAll('[data-segment]').forEach(btn => {
     btn.addEventListener('click', () => state.set({ [btn.dataset.segment]: btn.dataset.value }));
   });
-  state.subscribe(calculateAndRender);
 }
