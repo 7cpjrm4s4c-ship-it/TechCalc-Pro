@@ -6,7 +6,7 @@ import ventilation from '../modules/ventilation/index.js';
 import pipeSizing from '../modules/pipe-sizing/index.js';
 import unitConverter from '../modules/unit-converter/index.js';
 
-[heatingCooling, ventilation, pipeSizing, unitConverter].forEach(module => modules.register(module.config.id, module));
+[heatingCooling, ventilation, pipeSizing, unitConverter].forEach(module => modules.register(module));
 
 const app = document.getElementById('app');
 function render(id){

@@ -36,3 +36,14 @@
 .mini-button { border:1px solid var(--color-border); background: rgba(255,255,255,.06); color: var(--color-text); border-radius: 999px; padding: 8px 12px; cursor:pointer; }
 .settings-list { display:grid; gap:8px; } .settings-list label { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border:1px solid rgba(255,255,255,.1); border-radius:12px; }
 @media (max-width:767px){ .brand__title{font-size:18px}.brand__subtitle{font-size:10px}.module-tab{font-size:11px;padding:0 4px}.overflow-menu{top:auto;bottom:calc(100% + 10px);right:0;left:auto}.card{border-radius:22px}.card__title{font-size:11px}.control{min-height:50px}.control input,.control select{height:48px} }
+
+/* Registry/navigation refinement */
+.overflow-menu__item { display:grid; gap:2px; }
+.overflow-menu__item small { color: var(--color-muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.overflow-menu__item.is-active { color: var(--color-accent-blue); background: rgba(45, 168, 255, .12); }
+.quick-access-list, .quick-access-pool { display:grid; gap:8px; }
+.quick-access-pool { margin-top: var(--space-2); }
+.settings-row, .settings-check { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 12px; border:1px solid rgba(255,255,255,.1); border-radius:12px; background: rgba(255,255,255,.03); }
+.settings-row__actions { display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+.settings-check input { accent-color: var(--color-accent-blue); }
+.mini-button:disabled { opacity:.35; cursor:not-allowed; }
