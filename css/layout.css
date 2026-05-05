@@ -185,3 +185,35 @@
 @media (max-width: 767px) {
   .module-nav { top: auto; }
 }
+
+
+/* Mobile width lock and clipping guards. */
+.app-main,
+.grid-12,
+.module-view,
+.tc-grid,
+.module-content,
+.two-column,
+.tc-two-column,
+.card-grid,
+.form-grid,
+.tc-fields {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.module-nav {
+  max-width: 100vw;
+  contain: layout paint;
+}
+
+@media (max-width: 767px) {
+  .app-main {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: clip;
+  }
+  .module-nav {
+    max-width: calc(100vw - 20px);
+  }
+}

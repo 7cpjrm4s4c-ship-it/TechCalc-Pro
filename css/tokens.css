@@ -51,9 +51,13 @@
 }
 
 * { box-sizing: border-box; }
-html { min-height: 100%; background: var(--color-bg-0); }
+html { min-height: 100%; background: var(--color-bg-0); width: 100%; max-width: 100%; overflow-x: hidden; overscroll-behavior-x: none; }
 body {
   min-height: 100%;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
   margin: 0;
   font-family: var(--font-sans);
   color: var(--color-text);
@@ -63,3 +67,30 @@ body {
     linear-gradient(135deg, #020407, #07101a 52%, #020509);
 }
 button, input, select { font: inherit; }
+
+
+/* Hard viewport width lock: prevents mobile layouts and wide content from pushing the page sideways. */
+body,
+.app-shell,
+.app-header,
+.module-nav,
+.app-main,
+.module-content,
+.card,
+.control,
+.formula {
+  max-width: 100%;
+}
+
+.app-shell {
+  width: 100%;
+  overflow-x: clip;
+  touch-action: pan-y;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
