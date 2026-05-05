@@ -29,8 +29,9 @@ export function selectField({ id, label, value, options }) {
   return `<div class="field"><label for="${esc(id)}">${esc(label)}</label><div class="control"><select id="${esc(id)}" data-field="${esc(id)}">${options.map(o => `<option value="${esc(o.value)}" ${o.value === value ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select></div></div>`;
 }
 
-export function segmented(name, options, value) {
-  return `<div class="segmented" role="tablist">${options.map(o => `<button type="button" data-segment="${esc(name)}" data-value="${esc(o.value)}" class="${o.value === value ? 'is-active' : ''}">${esc(o.label)}</button>`).join('')}</div>`;
+export function segmented(name, options, value, settings = {}) {
+  const accent = settings.accent ? ` segmented--${esc(settings.accent)}` : '';
+  return `<div class="segmented${accent}" role="tablist">${options.map(o => `<button type="button" data-segment="${esc(name)}" data-value="${esc(o.value)}" class="${o.value === value ? 'is-active' : ''}">${esc(o.label)}</button>`).join('')}</div>`;
 }
 
 export function resultRows(rows) {

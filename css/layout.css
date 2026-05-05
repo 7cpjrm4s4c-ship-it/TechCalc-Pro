@@ -136,3 +136,24 @@
   .app-main { padding: var(--space-2); }
   .card-grid, .form-grid, .tc-fields, .tc-fields--3 { grid-template-columns: 1fr; }
 }
+
+/* Renderer layout: module-content owns the 12-column grid; all direct module blocks use the central 8px gap. */
+.module-content {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--ui-gap);
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .module-content {
+    grid-template-columns: 1fr;
+  }
+  .module-content > .span-12,
+  .module-content > .span-8,
+  .module-content > .span-6,
+  .module-content > .span-4 {
+    grid-column: 1 / -1;
+  }
+}

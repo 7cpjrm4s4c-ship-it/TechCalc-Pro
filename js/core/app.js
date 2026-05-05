@@ -26,4 +26,13 @@ const closeSettings = document.getElementById('closeSettings');
 settingsButton.addEventListener('click', () => { settingsPanel.hidden = !settingsPanel.hidden; settingsButton.setAttribute('aria-expanded', String(!settingsPanel.hidden)); });
 closeSettings.addEventListener('click', () => { settingsPanel.hidden = true; settingsButton.setAttribute('aria-expanded','false'); });
 
+
+const header = document.querySelector('.app-header');
+function updateHeaderTransparency(){
+  if (!header) return;
+  header.classList.toggle('is-scrolled', window.scrollY > 8);
+}
+window.addEventListener('scroll', updateHeaderTransparency, { passive: true });
+updateHeaderTransparency();
+
 if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js'));

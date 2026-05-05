@@ -1,13 +1,48 @@
-export const WATER_C = 1.163;
-export function heatingCooling({ powerW, massFlowKgh, deltaT }) {
-  const q = num(powerW) / 1000;
+export const MEDIA = [
+  { id:'water', label:'Wasser', density:998, cpWhKgK:1.163, cpKjKgK:4.187 },
+  { id:'eg25', label:'Ethylenglykol 25%', density:1038, cpWhKgK:1.045, cpKjKgK:3.762 },
+  { id:'eg30', label:'Ethylenglykol 30%', density:1046, cpWhKgK:1.020, cpKjKgK:3.672 },
+  { id:'eg35', label:'Ethylenglykol 35%', density:1054, cpWhKgK:0.995, cpKjKgK:3.582 },
+  { id:'pg25', label:'Propylenglykol 25%', density:1020, cpWhKgK:1.055, cpKjKgK:3.798 },
+  { id:'pg30', label:'Propylenglykol 30%', density:1027, cpWhKgK:1.030, cpKjKgK:3.708 },
+  { id:'pg35', label:'Propylenglykol 35%', density:1034, cpWhKgK:1.005, cpKjKgK:3.618 }
+];
+
+export function getMedium(id = 'water') {
+  return MEDIA.find(m => m.id === id) || MEDIA[0];
+}
+
+export function heatingCooling({ powerW, massFlowKgh, deltaT, mediumId = 'water', calcTarget = 'power' }) {
+  const medium = getMedium(mediumId);
+  const cp = medium.cpWhKgK;
+  const qKwInput = num(powerW) / 1000;
   const m = num(massFlowKgh);
   const dt = num(deltaT);
-  if (!q && m && dt) return { powerKw: m * WATER_C * dt / 1000, massFlowKgh: m, deltaT: dt };
-  if (q && !m && dt) return { powerKw: q, massFlowKgh: q * 1000 / (WATER_C * dt), deltaT: dt };
-  if (q && m && !dt) return { powerKw: q, massFlowKgh: m, deltaT: q * 1000 / (m * WATER_C) };
-  return { powerKw: q || null, massFlowKgh: m || null, deltaT: dt || null };
+
+  let powerKw = qKwInput || null;
+  let mass = m || null;
+  let spread = dt || null;
+
+  if (calcTarget === 'power' && m && dt) {
+    powerKw = (m * cp * dt) / 1000;
+  }
+  if (calcTarget === 'massFlow' && qKwInput && dt) {
+    mass = (qKwInput * 1000) / (cp * dt);
+  }
+  if (calcTarget === 'deltaT' && qKwInput && m) {
+    spread = (qKwInput * 1000) / (m * cp);
+  }
+
+  // Fallback for partially filled forms.
+  if (!powerKw && m && dt) powerKw = (m * cp * dt) / 1000;
+  if (!mass && qKwInput && dt) mass = (qKwInput * 1000) / (cp * dt);
+  if (!spread && qKwInput && m) spread = (qKwInput * 1000) / (m * cp);
+
+  const volumeFlowM3h = mass ? mass / medium.density : null;
+
+  return { powerKw, massFlowKgh: mass, deltaT: spread, volumeFlowM3h, medium };
 }
+
 export function airDensity(tempC = 20) { return 353.05 / (Number(tempC) + 273.15); }
 export function ventilation({ volumeFlowM3h, powerW, deltaT, tempC = 20 }) {
   const rho = airDensity(tempC); const cp = 1.005; const factor = rho * cp / 3600;

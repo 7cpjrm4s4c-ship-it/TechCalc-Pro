@@ -6,11 +6,12 @@ export const pipeSystems = [
 export const dnTable = [
   {dn:15, di:16}, {dn:20, di:21.6}, {dn:25, di:27.2}, {dn:32, di:35.9}, {dn:40, di:41.8}, {dn:50, di:53}, {dn:65, di:70.3}, {dn:80, di:82.5}, {dn:100, di:107.1}, {dn:125, di:131.7}, {dn:150, di:159.3}, {dn:200, di:207.3}, {dn:250, di:260.4}, {dn:300, di:309.7}
 ];
-export function recommendPipe({ massFlowKgh, volumeFlowM3h, maxPressurePam = 100, systemId = 'steel' }) {
+export function recommendPipe({ massFlowKgh, volumeFlowM3h, maxPressurePam = 100, systemId = 'steel', density = 998 }) {
   const system = pipeSystems.find(p=>p.id===systemId) || pipeSystems[0];
-  const flowM3s = volumeFlowM3h ? Number(volumeFlowM3h)/3600 : Number(massFlowKgh || 0)/998/3600;
+  const rho = Number(density) || 998;
+  const flowM3s = volumeFlowM3h ? Number(volumeFlowM3h)/3600 : Number(massFlowKgh || 0)/rho/3600;
   if (!flowM3s) return null;
-  const rho = 998, mu = 0.001;
+  const mu = 0.001;
   for (const p of dnTable.filter(x=>x.dn <= system.maxDn)) {
     const d = p.di/1000; const area = Math.PI*d*d/4; const v = flowM3s/area;
     const re = rho*v*d/mu; const f = re < 2300 ? 64/re : 0.3164/Math.pow(re, .25);

@@ -112,3 +112,50 @@
   .control{min-height:50px}
   .control input,.control select{height:48px}
 }
+
+/* Header becomes glass-clear while content scrolls underneath. */
+.app-header {
+  background: rgba(18, 25, 34, .92);
+  backdrop-filter: blur(22px) saturate(130%);
+  transition: background-color .2s var(--ease), backdrop-filter .2s var(--ease), box-shadow .2s var(--ease);
+}
+.app-header.is-scrolled {
+  background: rgba(18, 25, 34, .42);
+  backdrop-filter: blur(18px) saturate(120%);
+  box-shadow: 0 12px 40px rgba(0,0,0,.18);
+}
+
+/* Context-colored segmented controls. */
+.segmented--orange button.is-active {
+  color: #fff4ee;
+  background: linear-gradient(135deg, rgba(255,122,46,.35), rgba(255,122,46,.12));
+  border-color: rgba(255,122,46,.62);
+  box-shadow: 0 0 22px rgba(255,122,46,.16), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.segmented--cyan button.is-active {
+  color: #eaffff;
+  background: linear-gradient(135deg, rgba(53,229,255,.32), rgba(53,170,255,.12));
+  border-color: rgba(53,229,255,.58);
+  box-shadow: 0 0 22px rgba(53,229,255,.16), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.segmented--blue button.is-active {
+  color: #eef8ff;
+  background: linear-gradient(135deg, rgba(53,170,255,.32), rgba(53,170,255,.10));
+  border-color: rgba(53,170,255,.58);
+}
+
+/* Central 8px vertical rhythm for every rendered card stack. */
+.module-view,
+.module-content,
+.tc-stack,
+.card__body,
+.tc-fields,
+.result-list {
+  gap: var(--ui-gap) !important;
+}
+
+@media (max-width:767px){
+  .app-header.is-scrolled {
+    background: rgba(18,25,34,.32);
+  }
+}
