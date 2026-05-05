@@ -5,6 +5,7 @@ export const state = createModuleState({
   mediumId: 'water',
   pipeSystemId: 'steel',
   powerW: '',
+  powerUnit: 'W',
   massFlowKgh: '',
   deltaT: '10'
 });

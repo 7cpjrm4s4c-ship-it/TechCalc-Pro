@@ -21,8 +21,11 @@ export function card(title, body, accent = 'blue', options = {}) {
   return `<section class="card card--accent-${esc(accent)}${compact}"><h2 class="card__title">${esc(title)}</h2><div class="card__body">${body}</div></section>`;
 }
 
-export function field({ id, label, unit = '', value = '', placeholder = '0', type = 'number', disabled = false }) {
-  return `<div class="field"><label for="${esc(id)}">${esc(label)}</label><div class="control"><input id="${esc(id)}" data-field="${esc(id)}" type="${esc(type)}" value="${esc(value ?? '')}" placeholder="${esc(placeholder)}" ${disabled ? 'disabled' : ''}>${unit ? `<span class="unit">${esc(unit)}</span>` : ''}</div></div>`;
+export function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', disabled = false, unitField = '', unitOptions = [] }) {
+  const unitHtml = unitOptions.length
+    ? `<select class="unit unit-select" data-field="${esc(unitField)}">${unitOptions.map(o => `<option value="${esc(o.value)}" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`
+    : unit ? `<span class="unit">${esc(unit)}</span>` : '';
+  return `<div class="field"><label for="${esc(id)}">${esc(label)}</label><div class="control"><input id="${esc(id)}" data-field="${esc(id)}" type="${esc(type)}" inputmode="decimal" value="${esc(value ?? '')}" placeholder="${esc(placeholder)}" ${disabled ? 'disabled' : ''}>${unitHtml}</div></div>`;
 }
 
 export function selectField({ id, label, value, options }) {
@@ -32,6 +35,15 @@ export function selectField({ id, label, value, options }) {
 export function segmented(name, options, value, settings = {}) {
   const accent = settings.accent ? ` segmented--${esc(settings.accent)}` : '';
   return `<div class="segmented${accent}" role="tablist">${options.map(o => `<button type="button" data-segment="${esc(name)}" data-value="${esc(o.value)}" class="${o.value === value ? 'is-active' : ''}">${esc(o.label)}</button>`).join('')}</div>`;
+}
+
+
+export function inlineStats(items) {
+  return `<div class="inline-stats">${items.map(item => `<div class="inline-stat"><span>${esc(item.label)}</span><strong>${esc(item.value ?? '—')}${item.unit ? ` <small>${esc(item.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;
+}
+
+export function mainResult(title, main, details = [], accent = 'blue') {
+  return card(title, `<div class="main-result"><span>${esc(main.label)}</span><strong>${esc(main.value ?? '—')}${main.unit ? ` <small>${esc(main.unit)}</small>` : ''}</strong></div>${inlineStats(details)}`, accent);
 }
 
 export function resultRows(rows) {
@@ -58,8 +70,14 @@ export function renderModuleShell(module, inner) {
 
 export function bindCommonInputs(root, state, calculateAndRender) {
   root.querySelectorAll('[data-field]').forEach(el => {
-    el.addEventListener('input', () => state.set({ [el.dataset.field]: el.value }));
-    el.addEventListener('change', () => state.set({ [el.dataset.field]: el.value }));
+    const apply = () => state.set({ [el.dataset.field]: el.value });
+    if (el.matches('input')) {
+      el.addEventListener('input', () => state.set({ [el.dataset.field]: el.value }, { notify: false }));
+      el.addEventListener('change', apply);
+      el.addEventListener('blur', apply);
+    } else {
+      el.addEventListener('change', apply);
+    }
   });
   root.querySelectorAll('[data-segment]').forEach(btn => {
     btn.addEventListener('click', () => state.set({ [btn.dataset.segment]: btn.dataset.value }));

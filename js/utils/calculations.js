@@ -1,21 +1,22 @@
 export const MEDIA = [
-  { id:'water', label:'Wasser', density:998, cpWhKgK:1.163, cpKjKgK:4.187 },
-  { id:'eg25', label:'Ethylenglykol 25%', density:1038, cpWhKgK:1.045, cpKjKgK:3.762 },
-  { id:'eg30', label:'Ethylenglykol 30%', density:1046, cpWhKgK:1.020, cpKjKgK:3.672 },
-  { id:'eg35', label:'Ethylenglykol 35%', density:1054, cpWhKgK:0.995, cpKjKgK:3.582 },
-  { id:'pg25', label:'Propylenglykol 25%', density:1020, cpWhKgK:1.055, cpKjKgK:3.798 },
-  { id:'pg30', label:'Propylenglykol 30%', density:1027, cpWhKgK:1.030, cpKjKgK:3.708 },
-  { id:'pg35', label:'Propylenglykol 35%', density:1034, cpWhKgK:1.005, cpKjKgK:3.618 }
+  { id:'water', label:'Wasser', density:998, cpWhKgK:1.163, cpKjKgK:4.187, frostC:null },
+  { id:'eg25', label:'Ethylenglykol 25%', density:1038, cpWhKgK:1.045, cpKjKgK:3.762, frostC:-12 },
+  { id:'eg30', label:'Ethylenglykol 30%', density:1046, cpWhKgK:1.020, cpKjKgK:3.672, frostC:-15 },
+  { id:'eg35', label:'Ethylenglykol 35%', density:1054, cpWhKgK:0.995, cpKjKgK:3.582, frostC:-20 },
+  { id:'pg25', label:'Propylenglykol 25%', density:1020, cpWhKgK:1.055, cpKjKgK:3.798, frostC:-10 },
+  { id:'pg30', label:'Propylenglykol 30%', density:1027, cpWhKgK:1.030, cpKjKgK:3.708, frostC:-14 },
+  { id:'pg35', label:'Propylenglykol 35%', density:1034, cpWhKgK:1.005, cpKjKgK:3.618, frostC:-18 }
 ];
 
 export function getMedium(id = 'water') {
   return MEDIA.find(m => m.id === id) || MEDIA[0];
 }
 
-export function heatingCooling({ powerW, massFlowKgh, deltaT, mediumId = 'water', calcTarget = 'power' }) {
+export function heatingCooling({ powerW, powerUnit = 'W', massFlowKgh, deltaT, mediumId = 'water', calcTarget = 'power' }) {
   const medium = getMedium(mediumId);
   const cp = medium.cpWhKgK;
-  const qKwInput = num(powerW) / 1000;
+  const inputPowerW = num(powerW) * (powerUnit === 'kW' ? 1000 : 1);
+  const qKwInput = inputPowerW / 1000;
   const m = num(massFlowKgh);
   const dt = num(deltaT);
 
@@ -33,7 +34,6 @@ export function heatingCooling({ powerW, massFlowKgh, deltaT, mediumId = 'water'
     spread = (qKwInput * 1000) / (m * cp);
   }
 
-  // Fallback for partially filled forms.
   if (!powerKw && m && dt) powerKw = (m * cp * dt) / 1000;
   if (!mass && qKwInput && dt) mass = (qKwInput * 1000) / (cp * dt);
   if (!spread && qKwInput && m) spread = (qKwInput * 1000) / (m * cp);
@@ -53,5 +53,21 @@ export function ventilation({ volumeFlowM3h, powerW, deltaT, tempC = 20 }) {
   if (q && v && !dt) spread = q / (v * factor);
   return { powerKw: powerKw || null, volumeFlowM3h: volume || null, deltaT: spread || null, massFlowKgh: volume ? volume * rho : null, rho, cp, factor };
 }
-function num(v){ const n = Number(String(v ?? '').replace(',','.')); return Number.isFinite(n) ? n : 0; }
+
+export function num(v){
+  if (v === null || v === undefined) return 0;
+  const normalized = String(v)
+    .trim()
+    .replace(/\s/g, '')
+    .replace(/\./g, '')
+    .replace(',', '.');
+  const n = Number(normalized);
+  return Number.isFinite(n) ? n : 0;
+}
 export function fmt(v, digits = 2){ return v === null || v === undefined || Number.isNaN(v) ? '—' : Number(v).toLocaleString('de-DE', { maximumFractionDigits: digits }); }
+export function fmtInput(v, digits = 2){
+  if (v === '' || v === null || v === undefined) return '';
+  const n = num(v);
+  if (!n) return String(v);
+  return n.toLocaleString('de-DE', { maximumFractionDigits: digits });
+}
