@@ -4,3 +4,8 @@
 .module-head h1 { margin:0; font-size: 22px; letter-spacing:.3px; }
 .module-head p { margin: 5px 0 0; color:var(--color-muted); }
 .module-content { grid-column: span 12; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--ui-gap); }
+
+/* Module titles/descriptions are intentionally hidden: active navigation tab identifies the selected tool. */
+.module-head { display: none !important; }
+.module-content { gap: var(--ui-gap) !important; }
+.module-content > * { margin-block: 0 !important; }

@@ -51,10 +51,6 @@ export function emptyCard(title, message, accent = 'blue') {
 
 export function renderModuleShell(module, inner) {
   return `<section class="module-view" data-module="${esc(module.id)}">
-    <div class="module-head">
-      <div><h1>${esc(module.title)}</h1><p>${esc(module.description ?? '')}</p></div>
-      <span class="badge">${esc(module.group ?? 'HLSK')}</span>
-    </div>
     <div class="module-content">${inner}</div>
   </section>`;
 }

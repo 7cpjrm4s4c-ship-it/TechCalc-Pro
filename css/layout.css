@@ -1,7 +1,7 @@
 .app-shell { min-height: 100vh; padding-bottom: var(--space-3); }
 
 .app-header {
-  height: var(--header-h);
+  min-height: var(--header-h);
   display: grid;
   grid-template-columns: 64px 1fr 64px;
   align-items: center;
@@ -26,6 +26,23 @@
   gap: var(--ui-gap);
 }
 
+.module-view,
+.module-content,
+.tc-grid,
+.tc-fields,
+.card-grid,
+.form-grid {
+  row-gap: var(--ui-gap);
+  column-gap: var(--ui-gap);
+}
+
+.module-content > .span-12,
+.module-content > .span-8,
+.module-content > .span-6,
+.module-content > .span-4 {
+  min-width: 0;
+}
+
 .span-12 { grid-column: span 12; }
 .span-8 { grid-column: span 8; }
 .span-6 { grid-column: span 6; }
@@ -34,16 +51,21 @@
 .tc-stack {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: var(--ui-gap);
+}
+
+.tc-stack > * {
+  margin-block: 0;
 }
 
 .tc-stack > * + * {
-  margin-top: var(--ui-gap);
+  margin-top: 0;
 }
 
-.tc-stack--section > * + * {
-  margin-top: var(--section-gap);
+.tc-stack--section {
+  gap: var(--section-gap);
 }
+
 
 .tc-fields {
   display: grid;
@@ -90,12 +112,17 @@
 }
 
 @media (max-width: 767px) {
-  .app-shell { padding-bottom: calc(var(--bottom-nav-h) + var(--space-2)); }
-  .app-header { grid-template-columns: 48px 1fr 48px; }
+  .app-shell { padding-bottom: calc(var(--bottom-nav-h) + var(--space-2) + env(safe-area-inset-bottom, 0px)); }
+  .app-header {
+    grid-template-columns: 48px 1fr 48px;
+    min-height: calc(var(--header-h) + env(safe-area-inset-top, 0px));
+    padding-top: max(env(safe-area-inset-top, 0px), var(--space-2));
+    padding-bottom: var(--space-2);
+  }
   .module-nav {
     position: fixed;
     top: auto;
-    bottom: 10px;
+    bottom: max(10px, env(safe-area-inset-bottom, 0px));
     left: 10px;
     right: 10px;
     height: var(--bottom-nav-h);
