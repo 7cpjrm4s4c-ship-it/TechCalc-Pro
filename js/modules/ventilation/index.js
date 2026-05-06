@@ -50,11 +50,11 @@ function inputFields(s, active) {
   if (active.calcTarget === 'power') {
     return [
       field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) }),
-      field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(dtValue, 2) })
+      field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(dtValue, 2), disabled: true })
     ];
   }
   if (active.calcTarget === 'volumeFlow') {
-    return [powerField(s), field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(dtValue, 2) })];
+    return [powerField(s), field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(dtValue, 2), disabled: true })];
   }
   return [powerField(s), field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) })];
 }

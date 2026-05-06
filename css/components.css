@@ -579,38 +579,3 @@ select { border-radius: var(--radius-md); }
   border-color: rgba(53,170,255,.25);
   border-radius: var(--radius-lg);
 }
-
-/* Final dropdown polish: dark readable native option lists where supported. */
-select,
-.unit-select,
-.control select {
-  color-scheme: dark;
-  background-color: rgba(18, 24, 32, .98) !important;
-  border-radius: var(--radius-md) !important;
-}
-select option,
-.unit-select option,
-.control select option {
-  background-color: #121820 !important;
-  color: #eef4ff !important;
-  border-radius: 10px;
-}
-select option:checked,
-.unit-select option:checked,
-.control select option:checked {
-  background-color: #1f3347 !important;
-  color: #ffffff !important;
-}
-
-.pipe-dimension-list {
-  align-items: stretch;
-}
-.pipe-dimension-card--red .pipe-bar span {
-  background: #ff3b49;
-}
-.pipe-dimension-card--yellow .pipe-bar span {
-  background: #ffd34d;
-}
-.pipe-dimension-card--green .pipe-bar span {
-  background: #25d96a;
-}

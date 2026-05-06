@@ -108,6 +108,7 @@ function lineSectionsCard(r) {
     ? `<div class="line-section-list">${items.map((item, index) => `<article class="line-section-card">
         <div class="line-section-card__head"><strong>${item.name || 'Abschnitt ' + (index + 1)}</strong><button type="button" data-line-delete="${item.id}" aria-label="Abschnitt löschen">×</button></div>
         ${inlineStats([
+          { label: 'Bezeichnung', value: item.name || 'Abschnitt ' + (index + 1) },
           { label: 'Leistung', value: item.powerKw || '—', unit: 'kW' },
           { label: 'Massenstrom', value: item.massFlowKgh || '—', unit: 'kg/h' },
           { label: 'Volumenstrom', value: item.volumeFlowM3h || '—', unit: 'm³/h' },
@@ -117,7 +118,7 @@ function lineSectionsCard(r) {
       </article>`).join('')}</div>`
     : '<div class="empty-state empty-state--compact">Noch keine Leitungsabschnitte angelegt</div>';
   return card('Leitungsabschnitte', stack([
-    `<div class="field"><label for="lineSectionName">Bezeichnung</label><div class="control"><input id="lineSectionName" type="text" placeholder="z. B. Verteilerabgang Nord" autocomplete="off"></div></div>`,
+    field({ id: 'lineSectionName', label: 'Bezeichnung', unit: '', placeholder: 'z. B. Verteilerabgang Nord' }),
     '<button type="button" class="action-button" data-line-add>Abschnitt speichern</button>',
     rows
   ].join('')), 'blue');
@@ -126,9 +127,8 @@ function lineSectionsCard(r) {
 function bindLineSections(root, r, rerender) {
   const btn = root.querySelector('[data-line-add]');
   if (btn) {
-    btn.addEventListener('click', (event) => {
-      event.preventDefault();
-      const name = root.querySelector('#lineSectionName')?.value?.trim() || '';
+    btn.addEventListener('click', () => {
+      const name = root.querySelector('[data-field="lineSectionName"]')?.value?.trim() || '';
       const items = readLineSections();
       items.push({
         id: Date.now(),
@@ -167,6 +167,25 @@ function pipeDetails(r) {
   ];
 }
 
+function pipeDimensionCards(r) {
+  if (!r?.pipe) return '';
+  const pipe = r.pipe;
+  const list = [pipe.smaller, pipe, pipe.larger].filter(Boolean);
+  const max = Number(pipe.maxPressurePam || 100);
+  return `<div class="pipe-dimension-list">${list.map(item => {
+    const ratio = max ? item.pressureLoss / max : 0;
+    const percent = Math.max(0, Math.min(ratio * 100, 100));
+    const key = item.rating?.key || (ratio < .75 ? 'green' : ratio <= 1 ? 'yellow' : 'red');
+    const isRecommended = item.dn === pipe.dn;
+    const label = isRecommended ? 'Empfohlen' : (item.dn < pipe.dn ? 'Eine DN kleiner' : 'Eine DN größer');
+    return `<div class="pipe-dimension-card pipe-dimension-card--${key}${isRecommended ? ' is-recommended' : ''}">
+      <div class="pipe-dimension-card__head"><span>${label}</span>${isRecommended ? '<small>★</small>' : ''}</div>
+      <strong>DN ${item.dn}</strong>
+      <div class="pipe-dimension-card__meta"><span>di ${fmt(item.di, 1)} mm</span><span>${fmt(item.velocity)} m/s</span><span>${fmt(item.pressureLoss)} Pa/m</span></div>
+      <div class="pipe-bar"><span style="width:${percent}%"></span></div>
+    </div>`;
+  }).join('')}</div>`;
+}
 
 function view(s) {
   const active = activeCalculationState(s);
@@ -208,9 +227,9 @@ function view(s) {
 
   const recommendationBody = !r.pipe
     ? '<div class="empty-state">Massenstrom berechnen oder eingeben →<br>Rohrdimensionierung</div>'
-    : r.pipe.noDimension
+    : r.pipe.oversized
       ? '<div class="empty-state">Keine Dimensionierung möglich!</div>'
-      : `<div class="main-result"><span>Empfohlene Dimension</span><strong>DN ${r.pipe.dn}</strong></div>${inlineStats(pipeDetails(r))}`;
+      : mainResult('', { label: 'Empfohlene Dimension', value: 'DN ' + r.pipe.dn }, pipeDetails(r), 'blue');
 
   const recommendation = stack([
     selectField({ id: 'pipeSystemId', label: 'Rohrmaterial', value: s.pipeSystemId, options: pipeSystems.map(p => ({ value: p.id, label: p.label })) }),
