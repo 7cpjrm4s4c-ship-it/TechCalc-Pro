@@ -56,15 +56,21 @@ function view(s) {
     })
   ].join('')), 'blue');
 
-  const outputCard = card(`Ergebnis — ${r?.system?.label ?? 'Rohrsystem'}`, r ? stack([
-    `<div class="pipe-result-head"><span>Empfohlene DN</span><strong>DN ${r.dn}</strong>${pressureBadge(r)}</div>`,
-    resultRows([
-      { label: 'Geschwindigkeit', value: fmt(r.velocity), unit: 'm/s' },
-      { label: 'Druckverlust', value: fmt(r.pressureLoss), unit: 'Pa/m' },
-      { label: 'Norm', value: r.norm }
-    ]),
-    pipeDimensionCards(r)
-  ].join('')) : '<div class="empty-state">Volumenstrom oder Massenstrom eingeben →</div>', 'blue');
+  const outputBody = !r
+    ? '<div class="empty-state">Volumenstrom oder Massenstrom eingeben →</div>'
+    : r.oversized
+      ? '<div class="empty-state">Keine Dimensionierung möglich!</div>'
+      : stack([
+          `<div class="pipe-result-head"><span>Empfohlene DN</span><strong>DN ${r.dn}</strong>${pressureBadge(r)}</div>`,
+          resultRows([
+            { label: 'Geschwindigkeit', value: fmt(r.velocity), unit: 'm/s' },
+            { label: 'Druckverlust', value: fmt(r.pressureLoss), unit: 'Pa/m' },
+            { label: 'Norm', value: r.norm }
+          ]),
+          pipeDimensionCards(r)
+        ].join(''));
+
+  const outputCard = card(`Ergebnis — ${r?.system?.label ?? 'Rohrsystem'}`, outputBody, 'blue');
 
   return renderModuleShell(config, `
     <div class="span-6">${inputCard}<div class="formula">≤ DN50: DIN EN 10255 · ≥ DN65: DIN EN 10220</div></div>
