@@ -204,7 +204,7 @@
 
 .module-nav {
   max-width: 100vw;
-  contain: layout paint;
+  contain: layout;
 }
 
 @media (max-width: 767px) {
