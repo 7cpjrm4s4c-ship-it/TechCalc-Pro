@@ -102,14 +102,24 @@ function writeLineSections(items) {
   localStorage.setItem(LINE_STORAGE_KEY, JSON.stringify(items));
 }
 
-function lineSectionsCard() {
+function lineSectionsCard(r) {
   const items = readLineSections();
   const rows = items.length
-    ? `<div class="result-list">${items.map((item, index) => `<div class="result-row"><span>${item.name || 'Abschnitt ' + (index + 1)}</span><strong>${item.length || '—'} <small>m</small></strong></div>`).join('')}</div>`
+    ? `<div class="line-section-list">${items.map((item, index) => `<article class="line-section-card">
+        <div class="line-section-card__head"><strong>${item.name || 'Abschnitt ' + (index + 1)}</strong><button type="button" data-line-delete="${item.id}" aria-label="Abschnitt löschen">×</button></div>
+        ${inlineStats([
+          { label: 'Länge', value: item.length || '—', unit: 'm' },
+          { label: 'Leistung', value: item.powerKw || '—', unit: 'kW' },
+          { label: 'Massenstrom', value: item.massFlowKgh || '—', unit: 'kg/h' },
+          { label: 'Volumenstrom', value: item.volumeFlowM3h || '—', unit: 'm³/h' },
+          { label: 'ΔT', value: item.deltaT || '—', unit: 'K' },
+          { label: 'Wärmeträger', value: item.medium || '—' }
+        ])}
+      </article>`).join('')}</div>`
     : '<div class="empty-state empty-state--compact">Noch keine Leitungsabschnitte angelegt</div>';
   return card('Leitungsabschnitte', stack([
     grid([
-      field({ id: 'lineSectionName', label: 'Bezeichnung', unit: '', placeholder: 'z. B. Strang A' }),
+      field({ id: 'lineSectionName', label: 'Bezeichnung', unit: '', placeholder: 'z. B. Verteilerabgang Nord' }),
       field({ id: 'lineSectionLength', label: 'Länge', unit: 'm', placeholder: '0' })
     ].join(''), 2),
     '<button type="button" class="action-button" data-line-add>Abschnitt speichern</button>',
@@ -117,17 +127,35 @@ function lineSectionsCard() {
   ].join('')), 'blue');
 }
 
-function bindLineSections(root) {
+function bindLineSections(root, r) {
   const btn = root.querySelector('[data-line-add]');
-  if (!btn) return;
-  btn.addEventListener('click', () => {
-    const name = root.querySelector('[data-field="lineSectionName"]')?.value?.trim() || '';
-    const length = root.querySelector('[data-field="lineSectionLength"]')?.value?.trim() || '';
-    if (!name && !length) return;
-    const items = readLineSections();
-    items.push({ id: Date.now(), name, length, createdAt: new Date().toISOString() });
-    writeLineSections(items);
-    btn.dispatchEvent(new CustomEvent('tc-lines-changed', { bubbles: true }));
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const name = root.querySelector('[data-field="lineSectionName"]')?.value?.trim() || '';
+      const length = root.querySelector('[data-field="lineSectionLength"]')?.value?.trim() || '';
+      if (!name && !length) return;
+      const items = readLineSections();
+      items.push({
+        id: Date.now(),
+        name,
+        length,
+        powerKw: fmt(r.powerKw),
+        massFlowKgh: fmt(r.massFlowKgh),
+        volumeFlowM3h: fmt(r.volumeFlowM3h, 3),
+        deltaT: fmt(r.deltaT),
+        medium: r.medium?.label || '—',
+        createdAt: new Date().toISOString()
+      });
+      writeLineSections(items);
+      btn.dispatchEvent(new CustomEvent('tc-lines-changed', { bubbles: true }));
+    });
+  }
+  root.querySelectorAll('[data-line-delete]').forEach(del => {
+    del.addEventListener('click', () => {
+      const id = Number(del.dataset.lineDelete);
+      writeLineSections(readLineSections().filter(item => item.id !== id));
+      del.dispatchEvent(new CustomEvent('tc-lines-changed', { bubbles: true }));
+    });
   });
 }
 
@@ -147,6 +175,27 @@ function pipeDetails(r) {
   if (r.pipe.smaller) details.push({ label: 'Eine DN kleiner', value: `DN ${r.pipe.smaller.dn}`, unit: `${fmt(r.pipe.smaller.pressureLoss)} Pa/m` });
   if (r.pipe.larger) details.push({ label: 'Eine DN größer', value: `DN ${r.pipe.larger.dn}`, unit: `${fmt(r.pipe.larger.pressureLoss)} Pa/m` });
   return details;
+}
+
+
+function pipeDimensionCards(r) {
+  if (!r?.pipe) return '';
+  const pipe = r.pipe;
+  const list = [pipe.smaller, pipe, pipe.larger].filter(Boolean);
+  const max = Number(pipe.maxPressurePam || 100);
+  return `<div class="pipe-dimension-list">${list.map(item => {
+    const ratio = max ? item.pressureLoss / max : 0;
+    const percent = Math.max(0, Math.min(ratio * 100, 100));
+    const key = item.rating?.key || (ratio < .75 ? 'green' : ratio <= 1 ? 'yellow' : 'red');
+    const isRecommended = item.dn === pipe.dn;
+    const label = isRecommended ? 'Empfohlen' : (item.dn < pipe.dn ? 'Eine DN kleiner' : 'Eine DN größer');
+    return `<div class="pipe-dimension-card pipe-dimension-card--${key}${isRecommended ? ' is-recommended' : ''}">
+      <div class="pipe-dimension-card__head"><span>${label}</span>${isRecommended ? '<small>★</small>' : ''}</div>
+      <strong>DN ${item.dn}</strong>
+      <div class="pipe-dimension-card__meta"><span>di ${fmt(item.di, 1)} mm</span><span>${fmt(item.velocity)} m/s</span><span>${fmt(item.pressureLoss)} Pa/m</span></div>
+      <div class="pipe-bar"><span style="width:${percent}%"></span></div>
+    </div>`;
+  }).join('')}</div>`;
 }
 
 function view(s) {
@@ -190,13 +239,16 @@ function view(s) {
   const recommendation = stack([
     selectField({ id: 'pipeSystemId', label: 'Rohrmaterial', value: s.pipeSystemId, options: pipeSystems.map(p => ({ value: p.id, label: p.label })) }),
     r.pipe
-      ? mainResult('', { label: 'Empfohlene Dimension', value: 'DN ' + r.pipe.dn }, pipeDetails(r), 'blue')
+      ? stack([
+          mainResult('', { label: 'Empfohlene Dimension', value: 'DN ' + r.pipe.dn }, pipeDetails(r), 'blue'),
+          pipeDimensionCards(r)
+        ].join(''))
       : '<div class="empty-state">Massenstrom berechnen oder eingeben →<br>Rohrdimensionierung</div>'
   ].join(''));
 
   return renderModuleShell(config, `
     <div class="span-6">${inputColumn}</div>
-    <div class="span-6">${stack([card('Rohrdimensionsempfehlung', recommendation, 'blue'), lineSectionsCard()].join(''))}</div>
+    <div class="span-6">${stack([card('Rohrdimensionsempfehlung', recommendation, 'blue'), lineSectionsCard(r)].join(''))}</div>
   `);
 }
 
@@ -207,7 +259,7 @@ export default {
     const render = () => {
       root.innerHTML = view(state.get());
       bindCommonInputs(root, state);
-      bindLineSections(root);
+      bindLineSections(root, calculate(activeCalculationState(state.get())));
       root.addEventListener('tc-lines-changed', render, { once: true });
     };
     state.subscribe(render);
