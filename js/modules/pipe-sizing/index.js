@@ -21,7 +21,7 @@ function adjacentStats(r) {
 
 function pipeDimensionCards(r) {
   if (!r) return '';
-  const list = [r.smaller, r, r.larger].filter(Boolean);
+  const list = (r.candidates && r.candidates.length ? r.candidates : [r.smaller, r, r.larger]).filter(Boolean);
   const max = Number(r.maxPressurePam || 100);
   return `<div class="pipe-dimension-list">${list.map(item => {
     const ratio = max ? item.pressureLoss / max : 0;
@@ -58,8 +58,11 @@ function view(s) {
 
   const outputBody = !r
     ? '<div class="empty-state">Volumenstrom oder Massenstrom eingeben →</div>'
-    : r.oversized
-      ? '<div class="empty-state">Keine Dimensionierung möglich!</div>'
+    : r.noDimension
+      ? stack([
+          '<div class="empty-state">Keine Dimensionierung möglich!</div>',
+          pipeDimensionCards(r)
+        ].join(''))
       : stack([
           `<div class="pipe-result-head"><span>Empfohlene DN</span><strong>DN ${r.dn}</strong>${pressureBadge(r)}</div>`,
           resultRows([

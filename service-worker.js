@@ -1,9 +1,7 @@
 const CACHE_NAME = 'techcalc-pro-pipe-data-lines-v1';
->>>>>>>+main
-= [
-  '.const CACHE_NAME = 'techcalc-pro-line-dimension-fixes-v1';
->>>>>>>+origin/main
-/css/components.css','./css/modules.css',
+const ASSETS = [
+  './','./index.html','./manifest.json',
+  './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',
   './js/core/app.js','./js/core/registry.js','./js/core/router.js','./js/core/renderer.js','./js/core/preferences.js','./js/core/state.js','./js/core/navigation.js',
   './js/utils/calculations.js','./js/utils/units.js','./js/utils/pipes.js',
   './js/modules/heating-cooling/index.js','./js/modules/heating-cooling/config.js','./js/modules/heating-cooling/logic.js','./js/modules/heating-cooling/state.js',
