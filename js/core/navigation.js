@@ -22,11 +22,11 @@ export function renderNavigation(activeId = currentRoute()) {
 
   nav.innerHTML = [
     ...visibleModules.map(module => renderTab(module, activeId)),
-    renderOverflowButton(activeInOverflow, overflow.hidden === false),
+    renderOverflowButton(activeInOverflow, !overflow.hidden),
   ].join('');
 
+  renderOverflowMenu(overflow, overflowModules, activeId, visibleIds, isMobile);
   bindPrimaryNav(nav, overflow);
-  renderOverflowMenu(overflow, overflowModules, activeId);
 }
 
 export function renderQuickAccessSettings() {
@@ -60,9 +60,6 @@ export function renderQuickAccessSettings() {
       let next;
 
       if (input.checked) {
-        // If four quick slots are already used, selecting an additional module
-        // replaces the last slot instead of disabling the option. This keeps
-        // the +/settings menu usable on mobile without a prior remove step.
         next = selectedIds.includes(id)
           ? [...selectedIds]
           : [...selectedIds.slice(0, 3), id];
@@ -98,25 +95,59 @@ function bindPrimaryNav(nav, overflow) {
   });
 
   nav.querySelector('[data-overflow]')?.addEventListener('click', event => {
+    event.preventDefault();
     event.stopPropagation();
-    overflow.hidden = !overflow.hidden;
-    event.currentTarget.setAttribute('aria-expanded', String(!overflow.hidden));
+    const willOpen = overflow.hidden;
+    overflow.hidden = !willOpen;
+    event.currentTarget.setAttribute('aria-expanded', String(willOpen));
   });
 
-  document.addEventListener('click', event => {
-    if (!event.target.closest('.module-nav')) overflow.hidden = true;
-  }, { once: true });
+  document.removeEventListener('click', closeOverflowOnOutsideClick);
+  document.addEventListener('click', closeOverflowOnOutsideClick);
 }
 
-function renderOverflowMenu(overflow, overflowModules, activeId) {
-  overflow.innerHTML = overflowModules.length
-    ? overflowModules.map(module => renderOverflowItem(module, activeId)).join('')
-    : '<button type="button" disabled>Keine weiteren Module</button>';
+function closeOverflowOnOutsideClick(event) {
+  const overflow = document.getElementById('overflowMenu');
+  if (!overflow || overflow.hidden) return;
+  if (!event.target.closest('.module-nav')) overflow.hidden = true;
+}
+
+function renderOverflowMenu(overflow, overflowModules, activeId, visibleIds, isMobile) {
+  const content = overflowModules.length
+    ? overflowModules.map(module => renderOverflowItem(module, activeId, isMobile)).join('')
+    : '<div class="overflow-menu__empty">Alle Module sind in der Navigation sichtbar.</div>';
+
+  overflow.innerHTML = `
+    <div class="overflow-menu__card">
+      <div class="overflow-menu__head">
+        <strong>Weitere Module</strong>
+        <small>${isMobile ? 'Nicht ausgewählte Schnellzugriffe' : 'Weitere Werkzeuge'}</small>
+      </div>
+      <div class="overflow-menu__list">
+        ${content}
+      </div>
+    </div>
+  `;
 
   overflow.querySelectorAll('[data-module-id]').forEach(button => {
     button.addEventListener('click', () => {
       overflow.hidden = true;
       navigate(button.dataset.moduleId);
+    });
+  });
+
+  overflow.querySelectorAll('[data-set-quick]').forEach(button => {
+    button.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      const id = button.dataset.setQuick;
+      const next = [...visibleIds.filter(item => item !== id)];
+      if (next.length >= 4) next[3] = id;
+      else next.push(id);
+      setMobileQuickAccess(normalizeMobileQuickAccess(next, modules.all()));
+      overflow.hidden = true;
+      renderNavigation(currentRoute());
+      renderQuickAccessSettings();
     });
   });
 }
@@ -161,12 +192,15 @@ function renderOverflowButton(activeInOverflow, expanded) {
   `;
 }
 
-function renderOverflowItem(module, activeId) {
+function renderOverflowItem(module, activeId, isMobile) {
   return `
-    <button type="button" data-module-id="${escapeAttr(module.id)}" data-accent="${escapeAttr(module.accent)}" class="overflow-menu__item ${module.id === activeId ? 'is-active' : ''}">
-      <span>${escapeHtml(module.title)}</span>
-      <small>${escapeHtml(module.group)}</small>
-    </button>
+    <div class="overflow-menu__row ${module.id === activeId ? 'is-active' : ''}">
+      <button type="button" data-module-id="${escapeAttr(module.id)}" data-accent="${escapeAttr(module.accent)}" class="overflow-menu__item">
+        <span>${escapeHtml(module.shortTitle)}</span>
+        <small>${escapeHtml(module.title)} · ${escapeHtml(module.group)}</small>
+      </button>
+      ${isMobile ? `<button type="button" class="overflow-menu__quick" data-set-quick="${escapeAttr(module.id)}" aria-label="${escapeAttr(module.title)} als Schnellzugriff setzen">Fixieren</button>` : ''}
+    </div>
   `;
 }
 

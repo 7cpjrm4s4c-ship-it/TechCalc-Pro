@@ -642,3 +642,100 @@ button,
     -webkit-overflow-scrolling: touch;
   }
 }
+
+
+/* + menu: module selection card for all modules outside the four quick slots. */
+.overflow-menu {
+  min-width: min(360px, calc(100vw - 24px));
+  padding: 0;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+.overflow-menu__card {
+  display: grid;
+  gap: var(--ui-gap);
+  padding: var(--space-2);
+}
+.overflow-menu__head {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px 4px;
+}
+.overflow-menu__head strong {
+  font-size: 16px;
+  letter-spacing: .04em;
+}
+.overflow-menu__head small {
+  color: var(--color-muted);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.overflow-menu__list {
+  display: grid;
+  gap: var(--ui-gap);
+}
+.overflow-menu__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ui-gap);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 16px;
+  background: rgba(255,255,255,.035);
+  overflow: hidden;
+}
+.overflow-menu__row.is-active {
+  border-color: rgba(53,170,255,.5);
+  box-shadow: 0 0 22px rgba(53,170,255,.12), inset 0 0 0 1px rgba(53,170,255,.12);
+}
+.overflow-menu .overflow-menu__item {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: transparent;
+}
+.overflow-menu__item span {
+  font-weight: 800;
+}
+.overflow-menu__quick {
+  margin-right: 8px;
+  padding: 8px 12px;
+  border: 1px solid rgba(53,170,255,.35);
+  border-radius: 999px;
+  background: rgba(53,170,255,.12);
+  color: #9ad6ff;
+  font-weight: 800;
+  cursor: pointer;
+}
+.overflow-menu__quick:hover {
+  background: rgba(53,170,255,.2);
+}
+.overflow-menu__empty {
+  padding: 14px;
+  color: var(--color-muted);
+  font-weight: 700;
+  text-align: center;
+}
+@media (max-width: 767px) {
+  .overflow-menu {
+    left: 0;
+    right: 0;
+    bottom: calc(100% + 12px);
+    width: auto;
+    min-width: 0;
+    max-height: min(62vh, 460px);
+    border-radius: 26px;
+  }
+  .overflow-menu__card {
+    padding: 12px;
+  }
+  .overflow-menu__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .overflow-menu__quick {
+    justify-self: stretch;
+    margin: 0 12px 12px;
+  }
+}
