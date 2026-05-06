@@ -42,14 +42,42 @@ export function heatingCooling({ powerW, powerUnit = 'W', massFlowKgh, deltaT, m
 }
 
 export function airDensity(tempC = 20) { return 353.05 / (Number(tempC) + 273.15); }
-export function ventilation({ volumeFlowM3h, powerW, deltaT, tempC = 20 }) {
-  const rho = airDensity(tempC); const cp = 1.005; const factor = rho * cp / 3600;
-  const q = num(powerW) / 1000; const v = num(volumeFlowM3h); const dt = num(deltaT);
-  let volume = v, powerKw = q, spread = dt;
-  if (!q && v && dt) powerKw = v * factor * dt;
-  if (q && !v && dt) volume = q / (factor * dt);
-  if (q && v && !dt) spread = q / (v * factor);
-  return { powerKw: powerKw || null, volumeFlowM3h: volume || null, deltaT: spread || null, massFlowKgh: volume ? volume * rho : null, rho, cp, factor };
+export function ventilation({ volumeFlowM3h, powerW, powerUnit = 'W', deltaT, supplyTemp, roomTemp, tempC = 20, calcTarget = 'power' }) {
+  const referenceTemp = supplyTemp !== undefined && supplyTemp !== '' ? supplyTemp : tempC;
+  const rho = airDensity(referenceTemp);
+  const cp = 1.005;
+  const factor = rho * cp / 3600;
+  const inputPowerW = num(powerW) * (powerUnit === 'kW' ? 1000 : 1);
+  const qKwInput = inputPowerW ? inputPowerW / 1000 : null;
+  const v = num(volumeFlowM3h);
+  const derivedDt = deltaT !== '' && deltaT !== null && deltaT !== undefined
+    ? num(deltaT)
+    : Math.abs(num(supplyTemp) - num(roomTemp)) || 0;
+  const dt = derivedDt;
+
+  let volume = v || null;
+  let powerKw = qKwInput;
+  let spread = dt || null;
+
+  if (calcTarget === 'power') {
+    powerKw = v && dt ? v * factor * dt : null;
+  }
+  if (calcTarget === 'volumeFlow') {
+    volume = inputPowerW && dt ? (inputPowerW / 1000) / (factor * dt) : null;
+  }
+  if (calcTarget === 'deltaT') {
+    spread = inputPowerW && v ? (inputPowerW / 1000) / (v * factor) : null;
+  }
+
+  return {
+    powerKw,
+    volumeFlowM3h: volume,
+    deltaT: spread,
+    massFlowKgh: volume ? volume * rho : null,
+    rho,
+    cp,
+    factor
+  };
 }
 
 export function num(v){

@@ -341,3 +341,16 @@
     inset: 5px 3px;
   }
 }
+
+/* Remove browser focus rails/blue grid lines around the focused app mount. */
+.app-main:focus,
+.app-main:focus-visible {
+  outline: 0;
+}
+
+@media (max-width:767px){
+  .module-tab.is-active::before,
+  .module-tab.is-overflow-active::before {
+    box-shadow: 0 8px 22px rgba(0,0,0,.22), 0 0 22px rgba(53,170,255,.18);
+  }
+}
