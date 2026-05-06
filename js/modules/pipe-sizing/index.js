@@ -18,6 +18,26 @@ function adjacentStats(r) {
   ]);
 }
 
+
+function pipeDimensionCards(r) {
+  if (!r) return '';
+  const list = [r.smaller, r, r.larger].filter(Boolean);
+  const max = Number(r.maxPressurePam || 100);
+  return `<div class="pipe-dimension-list">${list.map(item => {
+    const ratio = max ? item.pressureLoss / max : 0;
+    const percent = Math.max(0, Math.min(ratio * 100, 100));
+    const key = item.rating?.key || (ratio < .75 ? 'green' : ratio <= 1 ? 'yellow' : 'red');
+    const isRecommended = item.dn === r.dn;
+    const label = isRecommended ? 'Empfohlen' : (item.dn < r.dn ? 'Eine DN kleiner' : 'Eine DN größer');
+    return `<div class="pipe-dimension-card pipe-dimension-card--${key}${isRecommended ? ' is-recommended' : ''}">
+      <div class="pipe-dimension-card__head"><span>${label}</span>${isRecommended ? '<small>★</small>' : ''}</div>
+      <strong>DN ${item.dn}</strong>
+      <div class="pipe-dimension-card__meta"><span>di ${fmt(item.di, 1)} mm</span><span>${fmt(item.velocity)} m/s</span><span>${fmt(item.pressureLoss)} Pa/m</span></div>
+      <div class="pipe-bar"><span style="width:${percent}%"></span></div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
 function view(s) {
   const r = calculate(s);
   const inputCard = card('Basisdaten', stack([
@@ -43,7 +63,7 @@ function view(s) {
       { label: 'Druckverlust', value: fmt(r.pressureLoss), unit: 'Pa/m' },
       { label: 'Norm', value: r.norm }
     ]),
-    adjacentStats(r)
+    pipeDimensionCards(r)
   ].join('')) : '<div class="empty-state">Volumenstrom oder Massenstrom eingeben →</div>', 'blue');
 
   return renderModuleShell(config, `
