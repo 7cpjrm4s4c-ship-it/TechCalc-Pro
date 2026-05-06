@@ -5,8 +5,9 @@ import heatingCooling from '../modules/heating-cooling/index.js';
 import ventilation from '../modules/ventilation/index.js';
 import pipeSizing from '../modules/pipe-sizing/index.js';
 import unitConverter from '../modules/unit-converter/index.js';
+import heatRecovery from '../modules/heat-recovery/index.js';
 
-[heatingCooling, ventilation, pipeSizing, unitConverter].forEach(module => modules.register(module));
+[heatingCooling, ventilation, heatRecovery, pipeSizing, unitConverter].forEach(module => modules.register(module));
 
 const app = document.getElementById('app');
 function render(id){
