@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-pipe-data-lines-v1';
+const CACHE_NAME = 'techcalc-pro-pipe-adjacent-lines-v1';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',

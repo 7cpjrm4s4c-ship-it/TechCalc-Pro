@@ -4,13 +4,23 @@ function parseNumber(value) {
 }
 
 const steelDimensions = [
-  {dn:15, di:16}, {dn:20, di:21.6}, {dn:25, di:27.2}, {dn:32, di:35.9}, {dn:40, di:41.8}, {dn:50, di:53},
-  {dn:65, di:70.3}, {dn:80, di:82.5}, {dn:100, di:107.1}, {dn:125, di:131.7}, {dn:150, di:159.3},
-  {dn:200, di:207.3}, {dn:250, di:260.4}, {dn:300, di:309.7}
+  {dn:15, dimension:'21,3 × 2,65', di:16},
+  {dn:20, dimension:'26,9 × 2,65', di:21.6},
+  {dn:25, dimension:'33,7 × 3,25', di:27.2},
+  {dn:32, dimension:'42,4 × 3,25', di:35.9},
+  {dn:40, dimension:'48,3 × 3,25', di:41.8},
+  {dn:50, dimension:'60,3 × 3,65', di:53},
+  {dn:65, dimension:'76,1 × 2,9', di:70.3},
+  {dn:80, dimension:'88,9 × 3,2', di:82.5},
+  {dn:100, dimension:'114,3 × 3,6', di:107.1},
+  {dn:125, dimension:'139,7 × 4,0', di:131.7},
+  {dn:150, dimension:'168,3 × 4,5', di:159.3},
+  {dn:200, dimension:'219,1 × 5,9', di:207.3},
+  {dn:250, dimension:'273,0 × 6,3', di:260.4},
+  {dn:300, dimension:'323,9 × 7,1', di:309.7}
 ];
 
 const mapressDimensions = [
-  {dn:10, dimension:'12 × 1,0', di:10},
   {dn:12, dimension:'15 × 1,0', di:13},
   {dn:15, dimension:'18 × 1,0', di:16},
   {dn:20, dimension:'22 × 1,2', di:19.6},

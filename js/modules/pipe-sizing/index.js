@@ -20,8 +20,8 @@ function adjacentStats(r) {
 
 
 function pipeDimensionCards(r) {
-  if (!r) return '';
-  const list = (r.candidates && r.candidates.length ? r.candidates : [r.smaller, r, r.larger]).filter(Boolean);
+  if (!r || r.noDimension) return '';
+  const list = [r.smaller, r, r.larger].filter(Boolean);
   const max = Number(r.maxPressurePam || 100);
   return `<div class="pipe-dimension-list">${list.map(item => {
     const ratio = max ? item.pressureLoss / max : 0;
@@ -29,10 +29,11 @@ function pipeDimensionCards(r) {
     const key = item.rating?.key || (ratio < .75 ? 'green' : ratio <= 1 ? 'yellow' : 'red');
     const isRecommended = item.dn === r.dn;
     const label = isRecommended ? 'Empfohlen' : (item.dn < r.dn ? 'Eine DN kleiner' : 'Eine DN größer');
+    const dimension = item.dimension ? `Ø ${item.dimension} mm` : `di ${fmt(item.di, 1)} mm`;
     return `<div class="pipe-dimension-card pipe-dimension-card--${key}${isRecommended ? ' is-recommended' : ''}">
       <div class="pipe-dimension-card__head"><span>${label}</span>${isRecommended ? '<small>★</small>' : ''}</div>
       <strong>DN ${item.dn}</strong>
-      <div class="pipe-dimension-card__meta"><span>di ${fmt(item.di, 1)} mm</span><span>${fmt(item.velocity)} m/s</span><span>${fmt(item.pressureLoss)} Pa/m</span></div>
+      <div class="pipe-dimension-card__meta"><span>${dimension}</span><span>di ${fmt(item.di, 1)} mm</span><span>${fmt(item.velocity)} m/s</span><span>${fmt(item.pressureLoss)} Pa/m</span></div>
       <div class="pipe-bar"><span style="width:${percent}%"></span></div>
     </div>`;
   }).join('')}</div>`;
@@ -59,10 +60,7 @@ function view(s) {
   const outputBody = !r
     ? '<div class="empty-state">Volumenstrom oder Massenstrom eingeben →</div>'
     : r.noDimension
-      ? stack([
-          '<div class="empty-state">Keine Dimensionierung möglich!</div>',
-          pipeDimensionCards(r)
-        ].join(''))
+      ? '<div class="empty-state">Keine Dimensionierung möglich!</div>'
       : stack([
           `<div class="pipe-result-head"><span>Empfohlene DN</span><strong>DN ${r.dn}</strong>${pressureBadge(r)}</div>`,
           resultRows([

@@ -112,7 +112,13 @@ function lineSectionsCard(r) {
           { label: 'Massenstrom', value: item.massFlowKgh || '—', unit: 'kg/h' },
           { label: 'Volumenstrom', value: item.volumeFlowM3h || '—', unit: 'm³/h' },
           { label: 'Temperaturdifferenz', value: item.deltaT || '—', unit: 'K' },
-          { label: 'Wärmeträger', value: item.medium || '—' }
+          { label: 'Wärmeträger', value: item.medium || '—' },
+          { label: 'Rohrdimension', value: item.pipeDn || '—' },
+          { label: 'Rohrabmessung', value: item.pipeDimension || '—' },
+          { label: 'Werkstoff', value: item.pipeMaterial || '—' },
+          { label: 'Geschwindigkeit', value: item.pipeVelocity || '—', unit: item.pipeVelocity && item.pipeVelocity !== '—' ? 'm/s' : '' },
+          { label: 'Druckverlust', value: item.pipePressureLoss || '—', unit: item.pipePressureLoss && item.pipePressureLoss !== '—' ? 'Pa/m' : '' },
+          { label: 'Norm', value: item.pipeNorm || '—' }
         ])}
       </article>`).join('')}</div>`
     : '<div class="empty-state empty-state--compact">Noch keine Leitungsabschnitte angelegt</div>';
@@ -138,6 +144,12 @@ function bindLineSections(root, r, rerender) {
         volumeFlowM3h: fmt(r.volumeFlowM3h, 3),
         deltaT: fmt(r.deltaT),
         medium: r.medium?.label || '—',
+        pipeDn: r.pipe && !r.pipe.noDimension ? `DN ${r.pipe.dn}` : '—',
+        pipeDimension: r.pipe && !r.pipe.noDimension ? (r.pipe.dimension ? `Ø ${r.pipe.dimension} mm` : `di ${fmt(r.pipe.di, 1)} mm`) : '—',
+        pipeMaterial: r.pipe && !r.pipe.noDimension ? r.pipe.system.label : '—',
+        pipeVelocity: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.velocity) : '—',
+        pipePressureLoss: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.pressureLoss) : '—',
+        pipeNorm: r.pipe && !r.pipe.noDimension ? r.pipe.norm : '—',
         createdAt: new Date().toISOString()
       });
       writeLineSections(items);
