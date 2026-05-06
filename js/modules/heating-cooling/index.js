@@ -102,32 +102,54 @@ function writeLineSections(items) {
   localStorage.setItem(LINE_STORAGE_KEY, JSON.stringify(items));
 }
 
-function lineSectionsCard() {
+function lineSectionsCard(r) {
   const items = readLineSections();
   const rows = items.length
-    ? `<div class="result-list">${items.map((item, index) => `<div class="result-row"><span>${item.name || 'Abschnitt ' + (index + 1)}</span><strong>${item.length || '—'} <small>m</small></strong></div>`).join('')}</div>`
+    ? `<div class="line-section-list">${items.map((item, index) => `<article class="line-section-card">
+        <div class="line-section-card__head"><strong>${item.name || 'Abschnitt ' + (index + 1)}</strong><button type="button" data-line-delete="${item.id}" aria-label="Abschnitt löschen">×</button></div>
+        ${inlineStats([
+          { label: 'Leistung', value: item.powerKw || '—', unit: 'kW' },
+          { label: 'Massenstrom', value: item.massFlowKgh || '—', unit: 'kg/h' },
+          { label: 'Volumenstrom', value: item.volumeFlowM3h || '—', unit: 'm³/h' },
+          { label: 'Temperaturdifferenz', value: item.deltaT || '—', unit: 'K' },
+          { label: 'Wärmeträger', value: item.medium || '—' }
+        ])}
+      </article>`).join('')}</div>`
     : '<div class="empty-state empty-state--compact">Noch keine Leitungsabschnitte angelegt</div>';
   return card('Leitungsabschnitte', stack([
-    grid([
-      field({ id: 'lineSectionName', label: 'Bezeichnung', unit: '', placeholder: 'z. B. Strang A' }),
-      field({ id: 'lineSectionLength', label: 'Länge', unit: 'm', placeholder: '0' })
-    ].join(''), 2),
+    `<div class="field"><label for="lineSectionName">Bezeichnung</label><div class="control"><input id="lineSectionName" type="text" placeholder="z. B. Verteilerabgang Nord" autocomplete="off"></div></div>`,
     '<button type="button" class="action-button" data-line-add>Abschnitt speichern</button>',
     rows
   ].join('')), 'blue');
 }
 
-function bindLineSections(root) {
+function bindLineSections(root, r, rerender) {
   const btn = root.querySelector('[data-line-add]');
-  if (!btn) return;
-  btn.addEventListener('click', () => {
-    const name = root.querySelector('[data-field="lineSectionName"]')?.value?.trim() || '';
-    const length = root.querySelector('[data-field="lineSectionLength"]')?.value?.trim() || '';
-    if (!name && !length) return;
-    const items = readLineSections();
-    items.push({ id: Date.now(), name, length, createdAt: new Date().toISOString() });
-    writeLineSections(items);
-    btn.dispatchEvent(new CustomEvent('tc-lines-changed', { bubbles: true }));
+  if (btn) {
+    btn.addEventListener('click', (event) => {
+      event.preventDefault();
+      const name = root.querySelector('#lineSectionName')?.value?.trim() || '';
+      const items = readLineSections();
+      items.push({
+        id: Date.now(),
+        name: name || `Abschnitt ${items.length + 1}`,
+        powerKw: fmt(r.powerKw),
+        massFlowKgh: fmt(r.massFlowKgh),
+        volumeFlowM3h: fmt(r.volumeFlowM3h, 3),
+        deltaT: fmt(r.deltaT),
+        medium: r.medium?.label || '—',
+        createdAt: new Date().toISOString()
+      });
+      writeLineSections(items);
+      if (typeof rerender === 'function') rerender();
+    });
+  }
+  root.querySelectorAll('[data-line-delete]').forEach(del => {
+    del.addEventListener('click', () => {
+      const id = Number(del.dataset.lineDelete);
+      writeLineSections(readLineSections().filter(item => item.id !== id));
+      if (typeof rerender === 'function') rerender();
+    });
   });
 }
 
@@ -137,17 +159,14 @@ function pressureBadge(r) {
 }
 
 function pipeDetails(r) {
-  const details = [
+  return [
     { label: 'Material', value: r.pipe.system.label },
     { label: 'Geschwindigkeit', value: fmt(r.pipe.velocity), unit: 'm/s' },
     { label: 'Druckverlust', value: fmt(r.pipe.pressureLoss), unit: 'Pa/m' },
-    { label: 'Norm', value: r.pipe.norm },
-    { label: 'Ampel', value: r.pipe.rating?.label || '—' }
+    { label: 'Norm', value: r.pipe.norm }
   ];
-  if (r.pipe.smaller) details.push({ label: 'Eine DN kleiner', value: `DN ${r.pipe.smaller.dn}`, unit: `${fmt(r.pipe.smaller.pressureLoss)} Pa/m` });
-  if (r.pipe.larger) details.push({ label: 'Eine DN größer', value: `DN ${r.pipe.larger.dn}`, unit: `${fmt(r.pipe.larger.pressureLoss)} Pa/m` });
-  return details;
 }
+
 
 function view(s) {
   const active = activeCalculationState(s);
@@ -187,16 +206,20 @@ function view(s) {
     `<div class="formula">Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)</div>`
   ].join(''));
 
+  const recommendationBody = !r.pipe
+    ? '<div class="empty-state">Massenstrom berechnen oder eingeben →<br>Rohrdimensionierung</div>'
+    : r.pipe.noDimension
+      ? '<div class="empty-state">Keine Dimensionierung möglich!</div>'
+      : `<div class="main-result"><span>Empfohlene Dimension</span><strong>DN ${r.pipe.dn}</strong></div>${inlineStats(pipeDetails(r))}`;
+
   const recommendation = stack([
     selectField({ id: 'pipeSystemId', label: 'Rohrmaterial', value: s.pipeSystemId, options: pipeSystems.map(p => ({ value: p.id, label: p.label })) }),
-    r.pipe
-      ? mainResult('', { label: 'Empfohlene Dimension', value: 'DN ' + r.pipe.dn }, pipeDetails(r), 'blue')
-      : '<div class="empty-state">Massenstrom berechnen oder eingeben →<br>Rohrdimensionierung</div>'
+    recommendationBody
   ].join(''));
 
   return renderModuleShell(config, `
     <div class="span-6">${inputColumn}</div>
-    <div class="span-6">${stack([card('Rohrdimensionsempfehlung', recommendation, 'blue'), lineSectionsCard()].join(''))}</div>
+    <div class="span-6">${stack([card('Rohrdimensionsempfehlung', recommendation, 'blue'), lineSectionsCard(r)].join(''))}</div>
   `);
 }
 
@@ -207,8 +230,7 @@ export default {
     const render = () => {
       root.innerHTML = view(state.get());
       bindCommonInputs(root, state);
-      bindLineSections(root);
-      root.addEventListener('tc-lines-changed', render, { once: true });
+      bindLineSections(root, calculate(activeCalculationState(state.get())), render);
     };
     state.subscribe(render);
     render();
