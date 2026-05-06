@@ -117,8 +117,7 @@ function lineSectionsCard(r) {
           { label: 'Rohrabmessung', value: item.pipeDimension || '—' },
           { label: 'Werkstoff', value: item.pipeMaterial || '—' },
           { label: 'Geschwindigkeit', value: item.pipeVelocity || '—', unit: item.pipeVelocity && item.pipeVelocity !== '—' ? 'm/s' : '' },
-          { label: 'Druckverlust', value: item.pipePressureLoss || '—', unit: item.pipePressureLoss && item.pipePressureLoss !== '—' ? 'Pa/m' : '' },
-          { label: 'Norm', value: item.pipeNorm || '—' }
+          { label: 'Druckverlust', value: item.pipePressureLoss || '—', unit: item.pipePressureLoss && item.pipePressureLoss !== '—' ? 'Pa/m' : '' }
         ])}
       </article>`).join('')}</div>`
     : '<div class="empty-state empty-state--compact">Noch keine Leitungsabschnitte angelegt</div>';
@@ -149,7 +148,6 @@ function bindLineSections(root, r, rerender) {
         pipeMaterial: r.pipe && !r.pipe.noDimension ? r.pipe.system.label : '—',
         pipeVelocity: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.velocity) : '—',
         pipePressureLoss: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.pressureLoss) : '—',
-        pipeNorm: r.pipe && !r.pipe.noDimension ? r.pipe.norm : '—',
         createdAt: new Date().toISOString()
       });
       writeLineSections(items);
