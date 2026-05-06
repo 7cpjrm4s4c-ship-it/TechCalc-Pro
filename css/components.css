@@ -563,3 +563,19 @@ select option:checked {
 @media (max-width: 767px) {
   .pipe-dimension-card__meta { grid-template-columns: 1fr; }
 }
+
+/* Dark native select dropdowns where supported by the browser/platform. */
+select,
+select option,
+.unit-select option {
+  background-color: #121820;
+  color: #eef4ff;
+  border-radius: 12px;
+}
+select { border-radius: var(--radius-md); }
+
+/* Updated line-section cards for later PDF export data. */
+.line-section-card {
+  border-color: rgba(53,170,255,.25);
+  border-radius: var(--radius-lg);
+}
