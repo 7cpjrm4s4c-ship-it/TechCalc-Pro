@@ -739,3 +739,112 @@ button,
     margin: 0 12px 12px;
   }
 }
+
+/* Opaque overflow picker: no transparent overlay over module content. */
+.overflow-menu {
+  background: #141b24 !important;
+  border: 1px solid rgba(120, 140, 160, .32) !important;
+  box-shadow: 0 26px 80px rgba(0,0,0,.72), inset 0 1px 0 rgba(255,255,255,.08) !important;
+  backdrop-filter: none !important;
+}
+.overflow-menu__card {
+  background: #141b24;
+  border-radius: calc(var(--radius-lg) - 4px);
+  padding: var(--space-2);
+}
+.overflow-menu__head {
+  display: grid;
+  gap: 4px;
+  padding: 4px 6px 10px;
+}
+.overflow-menu__head strong { font-size: 18px; }
+.overflow-menu__head small { color: var(--color-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800; }
+.overflow-menu__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--ui-gap);
+  align-items: stretch;
+  margin-top: var(--ui-gap);
+}
+.overflow-menu__quick {
+  width: auto !important;
+  min-width: 104px;
+  text-align: center !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  background: rgba(255,255,255,.055) !important;
+}
+.overflow-menu__empty {
+  padding: 14px;
+  color: var(--color-muted);
+  font-weight: 800;
+}
+
+/* WRG / Mischluft: two fixed process columns: source air above result air. */
+.wrg-flow-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-gap);
+  align-items: start;
+}
+.wrg-flow-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-gap);
+  min-width: 0;
+}
+.wrg-flow-layout .card {
+  min-height: 0;
+}
+
+@media (max-width: 767px) {
+  .overflow-menu {
+    position: fixed;
+    left: 18px !important;
+    right: 18px !important;
+    bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 22px) !important;
+    top: auto !important;
+    min-width: 0;
+    max-height: min(55vh, 420px);
+    overflow: auto;
+    border-radius: 26px;
+    background: #151c25 !important;
+  }
+  .overflow-menu__card {
+    background: #151c25;
+    border-radius: 20px;
+  }
+  .wrg-flow-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .wrg-flow-layout .card {
+    padding: 14px;
+    border-radius: 20px;
+  }
+  .wrg-flow-layout .card__title {
+    font-size: 10px;
+    letter-spacing: 1.6px;
+  }
+  .wrg-flow-layout .tc-fields {
+    grid-template-columns: 1fr;
+  }
+  .wrg-flow-layout .control {
+    min-height: 46px;
+    border-radius: 16px;
+  }
+  .wrg-flow-layout .control input,
+  .wrg-flow-layout .control select {
+    height: 44px;
+    padding: 0 10px;
+    font-size: 16px;
+  }
+  .wrg-flow-layout .unit {
+    padding: 0 10px;
+    font-size: 14px;
+  }
+  .wrg-flow-layout .inline-stats {
+    grid-template-columns: 1fr;
+  }
+  .wrg-flow-layout .inline-stat strong {
+    white-space: normal;
+  }
+}

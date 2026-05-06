@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-wrg-grid-condensation-ls';
+const CACHE_NAME = 'techcalc-pro-wrg-layout-picker-opaque-v1';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',
