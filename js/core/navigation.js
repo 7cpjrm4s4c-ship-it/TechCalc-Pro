@@ -57,9 +57,19 @@ export function renderQuickAccessSettings() {
   host.querySelectorAll('[data-quick-add]').forEach(input => {
     input.addEventListener('change', () => {
       const id = input.dataset.quickAdd;
-      const next = input.checked
-        ? [...selectedIds, id].slice(0, 4)
-        : selectedIds.filter(item => item !== id);
+      let next;
+
+      if (input.checked) {
+        // If four quick slots are already used, selecting an additional module
+        // replaces the last slot instead of disabling the option. This keeps
+        // the +/settings menu usable on mobile without a prior remove step.
+        next = selectedIds.includes(id)
+          ? [...selectedIds]
+          : [...selectedIds.slice(0, 3), id];
+      } else {
+        next = selectedIds.filter(item => item !== id);
+      }
+
       setMobileQuickAccess(fillToFour(next, allModules));
       rerenderNavigationSettings();
     });
@@ -176,10 +186,9 @@ function renderQuickAccessRow(module, index, length) {
 
 function renderQuickAccessToggle(module, selectedIds) {
   const selected = selectedIds.includes(module.id);
-  const disabled = !selected && selectedIds.length >= 4;
   return `
     <label class="settings-check">
-      <input type="checkbox" data-quick-add="${escapeAttr(module.id)}" ${selected ? 'checked' : ''} ${disabled ? 'disabled' : ''}>
+      <input type="checkbox" data-quick-add="${escapeAttr(module.id)}" ${selected ? 'checked' : ''}>
       <span>${escapeHtml(module.title)}</span>
     </label>
   `;

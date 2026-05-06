@@ -67,6 +67,7 @@ body {
     linear-gradient(135deg, #020407, #07101a 52%, #020509);
 }
 button, input, select { font: inherit; }
+button, select, input[type="checkbox"], label { touch-action: manipulation; }
 
 
 /* Hard viewport width lock: prevents mobile layouts and wide content from pushing the page sideways. */
