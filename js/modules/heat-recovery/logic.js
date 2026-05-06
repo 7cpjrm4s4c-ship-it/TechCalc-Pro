@@ -107,6 +107,7 @@ function calculateWrg(s) {
     recoveredPowerKw,
     condensateKgh,
     condensationPowerKw,
+    condensateLs: condensateKgh / 3600,
     hasCondensation: condensateKgh > 0.001,
     factor,
     cp: CP_AIR_KJ_KG_K
@@ -144,6 +145,7 @@ function calculateMixing(s) {
     recircShare,
     condensateKgh,
     condensationPowerKw,
+    condensateLs: condensateKgh / 3600,
     hasCondensation: condensateKgh > 0.001,
     cp: CP_AIR_KJ_KG_K,
     factor: mixed.densityKgm3 * CP_AIR_KJ_KG_K / 3.6

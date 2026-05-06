@@ -23,6 +23,10 @@ function airInputCard(title, fields, accent = 'cyan') {
   ].join('')), accent);
 }
 
+function airOutputCard(title, point, accent = 'cyan') {
+  return card(title, pointStats(point), accent);
+}
+
 function modeCard(s) {
   return card('Berechnungsart', segmented('mode', [
     { value: 'wrg', label: 'WRG' },
@@ -30,21 +34,25 @@ function modeCard(s) {
   ], s.mode, { accent: 'cyan' }), 'cyan', { compact: true });
 }
 
+function wrgInputColumns(s) {
+  return grid([
+    airInputCard('Außenluft', {
+      volume: { id: 'outdoorVolumeFlowM3h', label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(s.outdoorVolumeFlowM3h, 2) },
+      temp: { id: 'outdoorTemp', label: 'Temperatur', unit: '°C', value: fmtInput(s.outdoorTemp, 2) },
+      rh: { id: 'outdoorRh', label: 'rel. Feuchte', unit: '%', value: fmtInput(s.outdoorRh, 2) }
+    }),
+    airInputCard('Abluft', {
+      volume: { id: 'extractVolumeFlowM3h', label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(s.extractVolumeFlowM3h, 2) },
+      temp: { id: 'extractTemp', label: 'Temperatur', unit: '°C', value: fmtInput(s.extractTemp, 2) },
+      rh: { id: 'extractRh', label: 'rel. Feuchte', unit: '%', value: fmtInput(s.extractRh, 2) }
+    })
+  ].join(''), 2);
+}
+
 function wrgInputs(s) {
   return stack([
     modeCard(s),
-    grid([
-      airInputCard('Außenluft', {
-        volume: { id: 'outdoorVolumeFlowM3h', label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(s.outdoorVolumeFlowM3h, 2) },
-        temp: { id: 'outdoorTemp', label: 'Temperatur', unit: '°C', value: fmtInput(s.outdoorTemp, 2) },
-        rh: { id: 'outdoorRh', label: 'rel. Feuchte', unit: '%', value: fmtInput(s.outdoorRh, 2) }
-      }),
-      airInputCard('Abluft', {
-        volume: { id: 'extractVolumeFlowM3h', label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(s.extractVolumeFlowM3h, 2) },
-        temp: { id: 'extractTemp', label: 'Temperatur', unit: '°C', value: fmtInput(s.extractTemp, 2) },
-        rh: { id: 'extractRh', label: 'rel. Feuchte', unit: '%', value: fmtInput(s.extractRh, 2) }
-      })
-    ].join(''), 2),
+    wrgInputColumns(s),
     card('Wärmerückgewinnung', field({ id: 'efficiency', label: 'WRG-Wirkungsgrad', unit: '%', value: fmtInput(s.efficiency, 2) }), 'cyan')
   ].join(''));
 }
@@ -67,45 +75,57 @@ function mixingInputs(s) {
   ].join(''));
 }
 
-function wrgOutputs(r) {
-  const condensation = r.hasCondensation
-    ? mainResult('Kondensation', { label: 'Kondensationsleistung', value: fmt(r.condensationPowerKw, 2), unit: 'kW' }, [
-        { label: 'Kondensat', value: fmt(r.condensateKgh, 2), unit: 'kg/h' },
-        { label: 'Hinweis', value: '100%-Linie überschritten', unit: '' }
-      ], 'cyan')
-    : '';
+function condensationCard(r) {
+  if (!r.hasCondensation) return '';
+  return mainResult('Kondensation', { label: 'Kondensationsleistung', value: fmt(r.condensateLs, 4), unit: 'l/s' }, [
+    { label: 'Kondensat', value: fmt(r.condensateKgh, 2), unit: 'kg/h' },
+    { label: 'Latente Leistung', value: fmt(r.condensationPowerKw, 2), unit: 'kW' },
+    { label: 'Hinweis', value: '100%-Enthalpielinie überschritten', unit: '' }
+  ], 'cyan');
+}
 
+function wrgFlowGrid(r) {
+  return grid([
+    stack([
+      airInputCard('Außenluft', {
+        volume: { id: 'outdoorVolumeFlowM3h', label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(r.outdoor.volumeFlowM3h, 2) },
+        temp: { id: 'outdoorTemp', label: 'Temperatur', unit: '°C', value: fmtInput(r.outdoor.tempC, 2) },
+        rh: { id: 'outdoorRh', label: 'rel. Feuchte', unit: '%', value: fmtInput(r.outdoor.rhPercent, 2) }
+      }),
+      airOutputCard('Zuluft', r.supply)
+    ].join('')),
+    stack([
+      airInputCard('Abluft', {
+        volume: { id: 'extractVolumeFlowM3h', label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(r.extract.volumeFlowM3h, 2) },
+        temp: { id: 'extractTemp', label: 'Temperatur', unit: '°C', value: fmtInput(r.extract.tempC, 2) },
+        rh: { id: 'extractRh', label: 'rel. Feuchte', unit: '%', value: fmtInput(r.extract.rhPercent, 2) }
+      }),
+      airOutputCard('Fortluft', r.exhaust)
+    ].join(''))
+  ].join(''), 2);
+}
+
+function wrgOutputs(r) {
   return stack([
-    grid([
-      card('Zuluft', pointStats(r.supply), 'cyan'),
-      card('Fortluft', pointStats(r.exhaust), 'cyan')
-    ].join(''), 2),
     mainResult('WRG-Leistung', { label: 'Rückgewonnene Leistung', value: fmt(r.recoveredPowerKw, 2), unit: 'kW' }, [
       { label: 'Wirkungsgrad', value: fmt(r.efficiency, 0), unit: '%' },
       { label: 'ρ × cₚ / 3,6', value: fmt(r.factor, 3), unit: 'Wh/(m³·K)' }
     ], 'cyan'),
-    condensation
+    condensationCard(r)
   ].join(''));
 }
 
 function mixingOutputs(r) {
-  const condensation = r.hasCondensation
-    ? mainResult('Kondensation', { label: 'Kondensationsleistung', value: fmt(r.condensationPowerKw, 2), unit: 'kW' }, [
-        { label: 'Kondensat', value: fmt(r.condensateKgh, 2), unit: 'kg/h' },
-        { label: 'Hinweis', value: '100%-Linie überschritten', unit: '' }
-      ], 'cyan')
-    : '';
-
   return stack([
     grid([
-      card('Mischluft / Zuluft', pointStats(r.mixed), 'cyan'),
+      airOutputCard('Mischluft / Zuluft', r.mixed),
       card('Mischungsverhältnis', inlineStats([
         { label: 'Außenluftanteil', value: fmt(r.outdoorShare, 0), unit: '%' },
         { label: 'Umluftanteil', value: fmt(r.recircShare, 0), unit: '%' },
         { label: 'Gesamtvolumenstrom', value: fmt(r.mixed.volumeFlowM3h, 0), unit: 'm³/h' }
       ]), 'cyan')
     ].join(''), 2),
-    condensation
+    condensationCard(r)
   ].join(''));
 }
 
@@ -116,9 +136,15 @@ function view(s) {
     ? 'Mischluft: x und h aus Außenluft + Umluft über Massenstromanteile'
     : 'WRG: tZuluft = tAußen + ηWRG × (tAbluft − tAußen)';
 
+  if (!isMixing) {
+    return renderModuleShell(config, `
+      <div class="span-12">${stack([modeCard(s), wrgFlowGrid(r), card('Wärmerückgewinnung', field({ id: 'efficiency', label: 'WRG-Wirkungsgrad', unit: '%', value: fmtInput(s.efficiency, 2) }), 'cyan'), `<div class="formula">${formula}</div>`, wrgOutputs(r)].join(''))}</div>
+    `);
+  }
+
   return renderModuleShell(config, `
-    <div class="span-6">${stack([isMixing ? mixingInputs(s) : wrgInputs(s), `<div class="formula">${formula}</div>`].join(''))}</div>
-    <div class="span-6">${isMixing ? mixingOutputs(r) : wrgOutputs(r)}</div>
+    <div class="span-6">${stack([mixingInputs(s), `<div class="formula">${formula}</div>`].join(''))}</div>
+    <div class="span-6">${mixingOutputs(r)}</div>
   `);
 }
 
