@@ -49,17 +49,26 @@ function powerField(s) {
   });
 }
 
+function derivedDeltaT(active) {
+  if (active.deltaT !== '' && active.deltaT !== null && active.deltaT !== undefined) return active.deltaT;
+  const supply = Number(String(active.supplyTemp || '').replace(',', '.'));
+  const room = Number(String(active.roomTemp || '').replace(',', '.'));
+  if (Number.isFinite(supply) && Number.isFinite(room)) return Math.abs(supply - room);
+  return '';
+}
+
 function inputFields(s, active) {
+  const dtValue = derivedDeltaT(active);
   if (active.calcTarget === 'power') {
     return [
       field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) }),
-      field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(active.deltaT, 2), placeholder: 'auto' })
+      field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(dtValue, 2) })
     ];
   }
   if (active.calcTarget === 'volumeFlow') {
     return [
       powerField(s),
-      field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(active.deltaT, 2), placeholder: 'auto' })
+      field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(dtValue, 2) })
     ];
   }
   return [
@@ -87,10 +96,7 @@ function view(s) {
   const resultDetails = [
     { label: 'Leistung', value: fmt(r.powerKw), unit: 'kW' },
     { label: 'Volumenstrom', value: fmt(r.volumeFlowM3h), unit: 'm³/h' },
-    { label: 'ΔT', value: fmt(r.deltaT), unit: 'K' },
-    { label: 'Massenstrom', value: fmt(r.massFlowKgh), unit: 'kg/h' },
-    { label: 'ρL', value: fmt(r.rho, 3), unit: 'kg/m³' },
-    { label: 'cₚ,L', value: fmt(r.cp, 3), unit: 'kJ/(kg·K)' }
+    { label: 'Massenstrom', value: fmt(r.massFlowKgh), unit: 'kg/h' }
   ].filter(item => item.label !== targetLabel(active.calcTarget));
 
   const inputColumn = stack([
@@ -111,18 +117,18 @@ function view(s) {
       grid(inputFields(s, active).join(''), 2)
     ].join('')), accent),
     mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent),
-    `<div class="formula">Q = V̇ × ρL(t) × cₚ,L × ΔT · ρL = ${fmt(r.rho, 3)} kg/m³ · cₚ,L = ${fmt(r.cp, 3)} kJ/(kg·K)</div>`
+    `<div class="formula">Q = V̇ × (ρ × cₚ / 3,6) × ΔT / 1000 · Wärmewert = ${fmt(r.factor, 3)} Wh/(m³·K)</div>`
   ].join(''));
 
   const airStats = card('Luftkennwerte aktuell', inlineStats([
     { label: 'ρL', value: fmt(r.rho, 3), unit: 'kg/m³' },
     { label: 'cₚ,L', value: fmt(r.cp, 3), unit: 'kJ/(kg·K)' },
-    { label: 'ρ × cₚ / 3600', value: fmt(r.factor, 4), unit: 'Wh/(m³·K)' }
+    { label: 'ρ × cₚ / 3,6', value: fmt(r.factor, 3), unit: 'Wh/(m³·K)' }
   ]), 'cyan', { compact: true });
 
   return renderModuleShell(config, `
-    <div class="span-8">${inputColumn}</div>
-    <div class="span-4">${airStats}</div>
+    <div class="span-6">${inputColumn}</div>
+    <div class="span-6">${airStats}</div>
   `);
 }
 

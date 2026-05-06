@@ -46,7 +46,8 @@ export function ventilation({ volumeFlowM3h, powerW, powerUnit = 'W', deltaT, su
   const referenceTemp = supplyTemp !== undefined && supplyTemp !== '' ? supplyTemp : tempC;
   const rho = airDensity(referenceTemp);
   const cp = 1.005;
-  const factor = rho * cp / 3600;
+  // Wärmewert Luft in Wh/(m³·K): ρ × cₚ / 3,6
+  const factor = rho * cp / 3.6;
   const inputPowerW = num(powerW) * (powerUnit === 'kW' ? 1000 : 1);
   const qKwInput = inputPowerW ? inputPowerW / 1000 : null;
   const v = num(volumeFlowM3h);
@@ -60,13 +61,13 @@ export function ventilation({ volumeFlowM3h, powerW, powerUnit = 'W', deltaT, su
   let spread = dt || null;
 
   if (calcTarget === 'power') {
-    powerKw = v && dt ? v * factor * dt : null;
+    powerKw = v && dt ? (v * factor * dt) / 1000 : null;
   }
   if (calcTarget === 'volumeFlow') {
-    volume = inputPowerW && dt ? (inputPowerW / 1000) / (factor * dt) : null;
+    volume = inputPowerW && dt ? inputPowerW / (factor * dt) : null;
   }
   if (calcTarget === 'deltaT') {
-    spread = inputPowerW && v ? (inputPowerW / 1000) / (v * factor) : null;
+    spread = inputPowerW && v ? inputPowerW / (v * factor) : null;
   }
 
   return {

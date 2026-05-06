@@ -7,25 +7,25 @@ import { pipeSystems } from '../../utils/pipes.js';
 
 function view(s) {
   const r = calculate(s);
-  const body = stack([
-    card('Basisdaten', grid([
-      selectField({ id: 'systemId', label: 'Rohrsystem', value: s.systemId, options: pipeSystems.map(p => ({ value: p.id, label: p.label })) }),
-      field({ id: 'maxPressurePam', label: 'Max. Druckverlust', unit: 'Pa/m', value: s.maxPressurePam }),
-      field({ id: 'massFlowKgh', label: 'Massenstrom', unit: 'kg/h', value: s.massFlowKgh }),
-      field({ id: 'volumeFlowM3h', label: 'Volumenstrom', unit: 'm³/h', value: s.volumeFlowM3h })
-    ].join(''), 2), 'blue'),
-    card(`Ergebnis — ${r?.system?.label ?? 'Rohrsystem'}`, r ? resultRows([
-      { label: 'Empfohlene DN', value: 'DN ' + r.dn },
-      { label: 'Geschwindigkeit', value: fmt(r.velocity), unit: 'm/s' },
-      { label: 'Druckverlust', value: fmt(r.pressureLoss), unit: 'Pa/m' },
-      { label: 'Norm', value: r.norm }
-    ]) : '<div class="empty-state">Volumenstrom oder Massenstrom eingeben →</div>', 'blue'),
-    `<div class="formula">≤ DN50: DIN EN 10255 · ≥ DN65: DIN EN 10220 · Auslegung nach Druckverlustgrenze</div>`
-  ].join(''));
+  const inputCard = card('Basisdaten', grid([
+    selectField({ id: 'systemId', label: 'Rohrsystem', value: s.systemId, options: pipeSystems.map(p => ({ value: p.id, label: p.label })) }),
+    field({ id: 'maxPressurePam', label: 'Max. Druckverlust', unit: 'Pa/m', value: s.maxPressurePam }),
+    field({ id: 'massFlowKgh', label: 'Massenstrom', unit: 'kg/h', value: s.massFlowKgh }),
+    field({ id: 'volumeFlowM3h', label: 'Volumenstrom', unit: 'm³/h', value: s.volumeFlowM3h })
+  ].join(''), 2), 'blue');
 
-  return renderModuleShell(config, `<div class="span-12">${body}</div>`);
+  const outputCard = card(`Ergebnis — ${r?.system?.label ?? 'Rohrsystem'}`, r ? resultRows([
+    { label: 'Empfohlene DN', value: 'DN ' + r.dn },
+    { label: 'Geschwindigkeit', value: fmt(r.velocity), unit: 'm/s' },
+    { label: 'Druckverlust', value: fmt(r.pressureLoss), unit: 'Pa/m' },
+    { label: 'Norm', value: r.norm }
+  ]) : '<div class="empty-state">Volumenstrom oder Massenstrom eingeben →</div>', 'blue');
+
+  return renderModuleShell(config, `
+    <div class="span-6">${inputCard}<div class="formula">≤ DN50: DIN EN 10255 · ≥ DN65: DIN EN 10220</div></div>
+    <div class="span-6">${outputCard}<div class="formula">Auslegung nach Druckverlustgrenze</div></div>
+  `);
 }
-
 export default {
   config,
   state,

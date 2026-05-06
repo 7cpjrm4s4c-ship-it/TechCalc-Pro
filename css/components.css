@@ -354,3 +354,15 @@
     box-shadow: 0 8px 22px rgba(0,0,0,.22), 0 0 22px rgba(53,170,255,.18);
   }
 }
+
+
+/* Desktop result values left aligned; output reads as a technical result block, not a right-justified table. */
+.main-result strong { text-align: left !important; }
+.result-list--left .result-row { justify-content: flex-start; }
+
+/* Equal, robust module columns on desktop. */
+@media (min-width: 1024px) {
+  .module-content > .span-6 { grid-column: span 6; }
+  .module-content > .span-8 { grid-column: span 6; }
+  .module-content > .span-4 { grid-column: span 6; }
+}
