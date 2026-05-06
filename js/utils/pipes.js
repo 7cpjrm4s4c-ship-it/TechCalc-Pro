@@ -1,3 +1,8 @@
+function parseNumber(value) {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  return Number(String(value || '').replace(/\./g,'').replace(',','.')) || 0;
+}
+
 export const pipeSystems = [
   { id:'steel', label:'Stahl', normSmall:'DIN EN 10255 Reihe M', normLarge:'DIN EN 10220', roughness:0.045, maxDn:300 },
   { id:'mapress', label:'Mapress Edelstahl', normSmall:'DIN EN 10312', normLarge:'DIN EN 10312', roughness:0.015, maxDn:100 },
@@ -29,9 +34,9 @@ function rating(pressureLoss, maxPressurePam) {
 export function recommendPipe({ massFlowKgh, volumeFlowM3h, flowValue, flowUnit = 'kg/h', maxPressurePam = 100, systemId = 'steel', density = 998 }) {
   const system = pipeSystems.find(p=>p.id===systemId) || pipeSystems[0];
   const rho = Number(density) || 998;
-  let mass = Number(String(massFlowKgh || '').replace(/\./g,'').replace(',','.'));
-  let volume = Number(String(volumeFlowM3h || '').replace(/\./g,'').replace(',','.'));
-  const combined = Number(String(flowValue || '').replace(/\./g,'').replace(',','.'));
+  let mass = parseNumber(massFlowKgh);
+  let volume = parseNumber(volumeFlowM3h);
+  const combined = parseNumber(flowValue);
   if (combined && flowUnit === 'kg/h') mass = combined;
   if (combined && flowUnit === 'm³/h') volume = combined;
   const flowM3s = volume ? volume/3600 : mass ? mass/rho/3600 : 0;
@@ -48,5 +53,5 @@ export function recommendPipe({ massFlowKgh, volumeFlowM3h, flowValue, flowUnit 
   }
   const smaller = candidates[current.index - 1] || null;
   const larger = candidates[current.index + 1] || null;
-  return { ...current, smaller, larger };
+  return { ...current, smaller, larger, candidates, maxPressurePam: Number(maxPressurePam) || 100 };
 }
