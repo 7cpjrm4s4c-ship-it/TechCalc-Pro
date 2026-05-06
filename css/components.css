@@ -366,3 +366,71 @@
   .module-content > .span-8 { grid-column: span 6; }
   .module-content > .span-4 { grid-column: span 6; }
 }
+
+/* Native select popups and option lists use the same dark engineering palette. */
+select,
+select option,
+select optgroup {
+  background-color: #1b222b;
+  color: var(--color-text);
+}
+select option:checked,
+select option:hover {
+  background-color: #263442;
+  color: var(--color-text);
+}
+
+/* Traffic-light pressure-loss status for pipe sizing. */
+.traffic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  color: transparent;
+  vertical-align: middle;
+  box-shadow: 0 0 16px currentColor;
+}
+.traffic--green { background: #26d76f; color: #26d76f; }
+.traffic--yellow { background: #ffd34d; color: #ffd34d; }
+.traffic--red { background: #ff4b4b; color: #ff4b4b; }
+.traffic--none { background: var(--color-dim); color: var(--color-dim); }
+
+.pipe-result-head {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-gap);
+  padding-bottom: var(--space-1);
+  border-bottom: 1px solid rgba(255,255,255,.10);
+}
+.pipe-result-head span {
+  color: var(--color-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  font-weight: 800;
+}
+.pipe-result-head strong {
+  color: var(--color-text);
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1;
+  font-weight: 900;
+}
+
+.action-button {
+  min-height: 42px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(53,170,255,.45);
+  background: linear-gradient(135deg, rgba(53,170,255,.22), rgba(53,170,255,.08));
+  color: var(--color-text);
+  font-weight: 900;
+  cursor: pointer;
+}
+.action-button:hover { border-color: rgba(53,170,255,.7); }
+.empty-state--compact { min-height: 54px; }
+
+/* Keep technical result blocks left-oriented on all breakpoints. */
+.main-result strong,
+.result-row strong { text-align: left; }

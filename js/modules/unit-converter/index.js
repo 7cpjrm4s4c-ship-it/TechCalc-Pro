@@ -27,7 +27,7 @@ function view(s) {
       unit: to,
       unitField: 'to',
       unitOptions: units.map(u => ({ value: u, label: u })),
-      value: fmt(result, 4),
+      value: fmt(result, 2),
       disabled: true,
       placeholder: '—'
     })
@@ -35,7 +35,7 @@ function view(s) {
 
   const allValuesCard = card('Alle Werte', s.value ? resultRows(units.map(u => ({
     label: u,
-    value: fmt(calculate({ ...s, from, to: u }), 4),
+    value: fmt(calculate({ ...s, from, to: u }), 2),
     unit: u
   }))) : '<div class="empty-state">Wert eingeben →</div>', 'blue');
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-v18';
+const CACHE_NAME = 'techcalc-pro-v2026-05-06-pipe-units-lines';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',

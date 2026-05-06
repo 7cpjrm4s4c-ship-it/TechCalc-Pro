@@ -4,22 +4,10 @@ import { calculate } from './logic.js';
 import { card, field, segmented, renderModuleShell, bindCommonInputs, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 
-const MODE_PREFIX = {
-  heating: 'heating',
-  cooling: 'cooling'
-};
-
-function prefixFor(s) {
-  return MODE_PREFIX[s.mode] || 'heating';
-}
-
-function key(s, name) {
-  return `${prefixFor(s)}${name}`;
-}
-
-function activeValue(s, name) {
-  return s[key(s, name)];
-}
+const MODE_PREFIX = { heating: 'heating', cooling: 'cooling' };
+function prefixFor(s) { return MODE_PREFIX[s.mode] || 'heating'; }
+function key(s, name) { return `${prefixFor(s)}${name}`; }
+function activeValue(s, name) { return s[key(s, name)]; }
 
 function activeCalculationState(s) {
   return {
@@ -66,21 +54,12 @@ function inputFields(s, active) {
     ];
   }
   if (active.calcTarget === 'volumeFlow') {
-    return [
-      powerField(s),
-      field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(dtValue, 2) })
-    ];
+    return [powerField(s), field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(dtValue, 2) })];
   }
-  return [
-    powerField(s),
-    field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) })
-  ];
+  return [powerField(s), field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) })];
 }
 
-function targetLabel(target) {
-  return target === 'power' ? 'Leistung' : target === 'volumeFlow' ? 'Volumenstrom' : 'Temperaturspreizung';
-}
-
+function targetLabel(target) { return target === 'power' ? 'Leistung' : target === 'volumeFlow' ? 'Volumenstrom' : 'Temperaturspreizung'; }
 function targetMain(target, r) {
   if (target === 'power') return { label: 'Berechnete Luftleistung', value: fmt(r.powerKw), unit: 'kW' };
   if (target === 'volumeFlow') return { label: 'Berechneter Volumenstrom', value: fmt(r.volumeFlowM3h), unit: 'm³/h' };
@@ -116,7 +95,6 @@ function view(s) {
       ], active.calcTarget, { accent }),
       grid(inputFields(s, active).join(''), 2)
     ].join('')), accent),
-    mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent),
     `<div class="formula">Q = V̇ × (ρ × cₚ / 3,6) × ΔT / 1000 · Wärmewert = ${fmt(r.factor, 3)} Wh/(m³·K)</div>`
   ].join(''));
 
@@ -126,9 +104,14 @@ function view(s) {
     { label: 'ρ × cₚ / 3,6', value: fmt(r.factor, 3), unit: 'Wh/(m³·K)' }
   ]), 'cyan', { compact: true });
 
+  const outputColumn = stack([
+    mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent),
+    airStats
+  ].join(''));
+
   return renderModuleShell(config, `
     <div class="span-6">${inputColumn}</div>
-    <div class="span-6">${airStats}</div>
+    <div class="span-6">${outputColumn}</div>
   `);
 }
 

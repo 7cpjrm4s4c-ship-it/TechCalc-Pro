@@ -90,6 +90,65 @@ function mediumStats(medium) {
   return stats;
 }
 
+
+const LINE_STORAGE_KEY = 'techcalcPro.heatingCooling.lineSections';
+
+function readLineSections() {
+  try { return JSON.parse(localStorage.getItem(LINE_STORAGE_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function writeLineSections(items) {
+  localStorage.setItem(LINE_STORAGE_KEY, JSON.stringify(items));
+}
+
+function lineSectionsCard() {
+  const items = readLineSections();
+  const rows = items.length
+    ? `<div class="result-list">${items.map((item, index) => `<div class="result-row"><span>${item.name || 'Abschnitt ' + (index + 1)}</span><strong>${item.length || '—'} <small>m</small></strong></div>`).join('')}</div>`
+    : '<div class="empty-state empty-state--compact">Noch keine Leitungsabschnitte angelegt</div>';
+  return card('Leitungsabschnitte', stack([
+    grid([
+      field({ id: 'lineSectionName', label: 'Bezeichnung', unit: '', placeholder: 'z. B. Strang A' }),
+      field({ id: 'lineSectionLength', label: 'Länge', unit: 'm', placeholder: '0' })
+    ].join(''), 2),
+    '<button type="button" class="action-button" data-line-add>Abschnitt speichern</button>',
+    rows
+  ].join('')), 'blue');
+}
+
+function bindLineSections(root) {
+  const btn = root.querySelector('[data-line-add]');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    const name = root.querySelector('[data-field="lineSectionName"]')?.value?.trim() || '';
+    const length = root.querySelector('[data-field="lineSectionLength"]')?.value?.trim() || '';
+    if (!name && !length) return;
+    const items = readLineSections();
+    items.push({ id: Date.now(), name, length, createdAt: new Date().toISOString() });
+    writeLineSections(items);
+    btn.dispatchEvent(new CustomEvent('tc-lines-changed', { bubbles: true }));
+  });
+}
+
+function pressureBadge(r) {
+  if (!r?.rating) return '';
+  return `<span class="traffic traffic--${r.rating.key}">${r.rating.label}</span>`;
+}
+
+function pipeDetails(r) {
+  const details = [
+    { label: 'Material', value: r.pipe.system.label },
+    { label: 'Geschwindigkeit', value: fmt(r.pipe.velocity), unit: 'm/s' },
+    { label: 'Druckverlust', value: fmt(r.pipe.pressureLoss), unit: 'Pa/m' },
+    { label: 'Norm', value: r.pipe.norm },
+    { label: 'Ampel', value: r.pipe.rating?.label || '—' }
+  ];
+  if (r.pipe.smaller) details.push({ label: 'Eine DN kleiner', value: `DN ${r.pipe.smaller.dn}`, unit: `${fmt(r.pipe.smaller.pressureLoss)} Pa/m` });
+  if (r.pipe.larger) details.push({ label: 'Eine DN größer', value: `DN ${r.pipe.larger.dn}`, unit: `${fmt(r.pipe.larger.pressureLoss)} Pa/m` });
+  return details;
+}
+
 function view(s) {
   const active = activeCalculationState(s);
   const r = calculate(active);
@@ -131,18 +190,13 @@ function view(s) {
   const recommendation = stack([
     selectField({ id: 'pipeSystemId', label: 'Rohrmaterial', value: s.pipeSystemId, options: pipeSystems.map(p => ({ value: p.id, label: p.label })) }),
     r.pipe
-      ? mainResult('', { label: 'Empfohlene Dimension', value: 'DN ' + r.pipe.dn }, [
-          { label: 'Material', value: r.pipe.system.label },
-          { label: 'Geschwindigkeit', value: fmt(r.pipe.velocity), unit: 'm/s' },
-          { label: 'Druckverlust', value: fmt(r.pipe.pressureLoss), unit: 'Pa/m' },
-          { label: 'Norm', value: r.pipe.norm }
-        ], 'blue')
+      ? mainResult('', { label: 'Empfohlene Dimension', value: 'DN ' + r.pipe.dn }, pipeDetails(r), 'blue')
       : '<div class="empty-state">Massenstrom berechnen oder eingeben →<br>Rohrdimensionierung</div>'
   ].join(''));
 
   return renderModuleShell(config, `
-    <div class="span-8">${inputColumn}</div>
-    <div class="span-4">${card('Rohrdimensionsempfehlung', recommendation, 'blue')}</div>
+    <div class="span-6">${inputColumn}</div>
+    <div class="span-6">${stack([card('Rohrdimensionsempfehlung', recommendation, 'blue'), lineSectionsCard()].join(''))}</div>
   `);
 }
 
@@ -153,6 +207,8 @@ export default {
     const render = () => {
       root.innerHTML = view(state.get());
       bindCommonInputs(root, state);
+      bindLineSections(root);
+      root.addEventListener('tc-lines-changed', render, { once: true });
     };
     state.subscribe(render);
     render();

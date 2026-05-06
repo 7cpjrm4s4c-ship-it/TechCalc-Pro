@@ -1,2 +1,2 @@
 import { createModuleState } from '../../core/state.js';
-export const state = createModuleState({ systemId:'steel', massFlowKgh:'', volumeFlowM3h:'', maxPressurePam:'100' });
+export const state = createModuleState({ systemId:'steel', flowValue:'', flowUnit:'kg/h', massFlowKgh:'', volumeFlowM3h:'', maxPressurePam:'100' });
