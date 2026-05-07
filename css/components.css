@@ -922,3 +922,25 @@ button,
     gap: var(--ui-gap);
   }
 }
+
+/* WRG/Mischluft output cards mirror the input-card rhythm: volume full width, T/RH below. */
+.wrg-air-readout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-gap);
+}
+.wrg-air-readout__wide {
+  grid-column: 1 / -1;
+}
+.wrg-air-readout .inline-stat {
+  min-height: 46px;
+  align-content: center;
+}
+@media (max-width: 767px) {
+  .wrg-air-readout {
+    grid-template-columns: 1fr;
+  }
+  .wrg-air-readout__wide {
+    grid-column: auto;
+  }
+}
