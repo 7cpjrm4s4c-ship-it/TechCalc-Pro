@@ -10,6 +10,7 @@ export const state = createModuleState({
   extractTemp: '22',
   extractRh: '50',
   efficiency: '78',
+  bypassPercent: '0',
   // Mischluft
   mixingOutdoorVolumeFlowM3h: '1500',
   mixingOutdoorTemp: '-16',

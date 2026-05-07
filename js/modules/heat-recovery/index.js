@@ -65,7 +65,10 @@ function wrgInputCard(s) {
       rh: { id: 'extractRh', label: 'rel. Feuchte', unit: '%', value: fmtInput(s.extractRh, 2) }
     })}
     <div class="wrg-group-grid__full">
-      ${card('Wärmerückgewinnung', field({ id: 'efficiency', label: 'WRG-Wirkungsgrad', unit: '%', value: fmtInput(s.efficiency, 2) }), 'cyan', { compact: true })}
+      ${card('Wärmerückgewinnung', grid([
+        field({ id: 'efficiency', label: 'WRG-Wirkungsgrad', unit: '%', value: fmtInput(s.efficiency, 2) }),
+        field({ id: 'bypassPercent', label: 'Bypass-Anteil β', unit: '%', value: fmtInput(s.bypassPercent, 2) })
+      ].join(''), 2), 'cyan', { compact: true })}
     </div>
   </div>`, 'cyan');
 }
@@ -109,7 +112,8 @@ function wrgOutputs(r) {
     wrgOutputCard(r),
     mainResult('WRG-Leistung', { label: 'Rückgewonnene Leistung', value: fmt(r.recoveredPowerKw, 2), unit: 'kW' }, [
       { label: 'Wirkungsgrad', value: fmt(r.efficiency, 0), unit: '%' },
-      { label: 'wirksamer Volumenstrom', value: fmt(r.effectiveVolumeFlowM3h, 0), unit: 'm³/h' },
+      { label: 'Bypass', value: fmt(r.bypassPercent, 0), unit: '%' },
+      { label: 'WTX-Volumenstrom', value: fmt(r.effectiveVolumeFlowM3h, 0), unit: 'm³/h' },
       { label: 'ρ × cₚ / 3,6', value: fmt(r.factor, 3), unit: 'Wh/(m³·K)' }
     ], 'cyan'),
     condensationCard(r)
@@ -128,7 +132,7 @@ function view(s) {
   const isMixing = s.mode === 'mixing';
   const formula = isMixing
     ? 'Mischluft: x und h aus Außenluft + Umluft über Massenstromanteile'
-    : 'WRG: tZuluft = tAußen + ηWRG × V̇eff/V̇Zuluft × (tAbluft − tAußen)';
+    : 'WRG: tZuluft = (1−β) × [tAußen + ηWRG × (tAbluft − tAußen)] + β × tAußen';
 
   const input = isMixing ? mixingInputCard(s) : wrgInputCard(s);
   const output = isMixing ? mixingOutputs(r) : wrgOutputs(r);

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-wrg-bypass-mix-fix';
+const CACHE_NAME = 'techcalc-pro-wrg-explicit-bypass-formula';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',

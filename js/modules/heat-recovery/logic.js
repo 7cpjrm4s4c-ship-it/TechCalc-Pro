@@ -79,23 +79,23 @@ function calculateWrg(s) {
   const extract = airPoint(s.extractVolumeFlowM3h, s.extractTemp, s.extractRh);
   const efficiency = clamp(num(s.efficiency), 0, 100);
   const eta = efficiency / 100;
+  const bypassPercent = clamp(num(s.bypassPercent), 0, 100);
+  const beta = bypassPercent / 100;
 
-  // WRG mit Luftmengenverschiebung / Bypass:
-  // - Der eingegebene Außenluftvolumenstrom ist der Volumenstrom durch den WT.
-  // - Ist V̇Außen kleiner als V̇Abluft, wird die Differenz als unbeheizter
-  //   Außenluft-Bypass zugemischt. Zuluftvolumenstrom = Abluftvolumenstrom.
-  // - Ist V̇Außen größer/gleich V̇Abluft, bleibt der Fortluftzustand vom
-  //   Außenluftüberschuss unabhängig; nur die Zulufttemperatur sinkt durch
-  //   den größeren Zuluftstrom.
+  // WRG mit explizitem Bypass-Anteil β:
+  // t_ZU,WTX = t_Außen + η × (t_Abluft − t_Außen)
+  // t_ZU     = (1 − β) × t_ZU,WTX + β × t_Außen
+  // t_Fort   = t_Abluft − η × (t_Abluft − t_Außen)
+  // Der Bypass beeinflusst nur die Zuluftmischung, nicht die Fortluft.
   const deltaT = extract.tempC - outdoor.tempC;
-  const effectiveVolumeFlowM3h = Math.min(outdoor.volumeFlowM3h, extract.volumeFlowM3h);
-  const supplyVolumeFlowM3h = Math.max(outdoor.volumeFlowM3h, extract.volumeFlowM3h);
+  const wtxVolumeFlowM3h = outdoor.volumeFlowM3h * (1 - beta);
+  const bypassVolumeFlowM3h = outdoor.volumeFlowM3h * beta;
+  const supplyVolumeFlowM3h = outdoor.volumeFlowM3h;
   const exhaustVolumeFlowM3h = extract.volumeFlowM3h;
-  const supplyRatio = supplyVolumeFlowM3h ? effectiveVolumeFlowM3h / supplyVolumeFlowM3h : 0;
-  const exhaustRatio = extract.volumeFlowM3h ? effectiveVolumeFlowM3h / extract.volumeFlowM3h : 0;
 
-  const supplyTemp = outdoor.tempC + eta * supplyRatio * deltaT;
-  const exhaustTempRaw = extract.tempC - eta * exhaustRatio * deltaT;
+  const supplyWtxTemp = outdoor.tempC + eta * deltaT;
+  const supplyTemp = ((1 - beta) * supplyWtxTemp) + (beta * outdoor.tempC);
+  const exhaustTempRaw = extract.tempC - eta * deltaT;
 
   const supplyDryMassFlowKgh = dryAirMassFlowKgh(supplyVolumeFlowM3h, supplyTemp);
   const exhaustDryMassFlowKgh = dryAirMassFlowKgh(exhaustVolumeFlowM3h, exhaustTempRaw);
@@ -110,13 +110,15 @@ function calculateWrg(s) {
 
   const avgRho = airDensity((outdoor.tempC + extract.tempC) / 2 || 20);
   const factor = avgRho * CP_AIR_KJ_KG_K / 3.6;
-  const recoveredPowerKw = effectiveVolumeFlowM3h * factor * eta * deltaT / 1000;
+  const recoveredPowerKw = wtxVolumeFlowM3h * factor * eta * deltaT / 1000;
   const condensationPowerKw = condensateKgh * H_VAP_KJ_KG / 3600;
-  const effectiveDryMassFlowKgh = dryAirMassFlowKgh(effectiveVolumeFlowM3h, (outdoor.tempC + extract.tempC) / 2);
+  const effectiveDryMassFlowKgh = dryAirMassFlowKgh(wtxVolumeFlowM3h, (outdoor.tempC + extract.tempC) / 2);
 
   return {
     mode: 'wrg',
     efficiency,
+    bypassPercent,
+    beta,
     outdoor,
     extract,
     supply,
@@ -125,9 +127,9 @@ function calculateWrg(s) {
     condensateKgh,
     condensationPowerKw,
     condensateLs: condensateKgh / 3600,
-    effectiveVolumeFlowM3h,
+    effectiveVolumeFlowM3h: wtxVolumeFlowM3h,
     effectiveDryMassFlowKgh,
-    bypassVolumeFlowM3h: Math.max(0, supplyVolumeFlowM3h - effectiveVolumeFlowM3h),
+    bypassVolumeFlowM3h,
     hasCondensation: condensateKgh > 0.001,
     factor,
     cp: CP_AIR_KJ_KG_K
