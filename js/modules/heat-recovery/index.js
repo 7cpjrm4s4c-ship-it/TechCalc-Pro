@@ -120,9 +120,16 @@ function view(s) {
     ? 'Mischluft: x und h aus Außenluft + Umluft über Massenstromanteile'
     : 'WRG: tZuluft = tAußen + ηWRG × (tAbluft − tAußen)';
 
-  const body = isMixing
-    ? stack([modeCard(s), mixingInputCard(s), `<div class="formula">${formula}</div>`, mixingOutputs(r)].join(''))
-    : stack([modeCard(s), wrgInputCard(s), `<div class="formula">${formula}</div>`, wrgOutputs(r)].join(''));
+  const input = isMixing ? mixingInputCard(s) : wrgInputCard(s);
+  const output = isMixing ? mixingOutputs(r) : wrgOutputs(r);
+
+  const body = stack([
+    modeCard(s),
+    `<div class="wrg-desktop-split">
+      <div class="wrg-desktop-split__input">${input}<div class="formula">${formula}</div></div>
+      <div class="wrg-desktop-split__output">${output}</div>
+    </div>`
+  ].join(''));
 
   return renderModuleShell(config, `<div class="span-12">${body}</div>`);
 }

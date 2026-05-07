@@ -898,3 +898,27 @@ button,
     white-space: normal;
   }
 }
+
+
+/* WRG / Mischluft desktop workspace: inputs left, outputs right */
+.wrg-desktop-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ui-gap);
+  align-items: start;
+}
+.wrg-desktop-split__input,
+.wrg-desktop-split__output {
+  min-width: 0;
+}
+@media (min-width: 1024px) {
+  .wrg-desktop-split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .wrg-desktop-split__input,
+  .wrg-desktop-split__output {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-gap);
+  }
+}
