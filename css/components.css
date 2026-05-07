@@ -922,3 +922,30 @@ button,
     gap: var(--ui-gap);
   }
 }
+
+/* Read-only output fields used by WRG/Mischluft result cards */
+.field--readonly .control--readonly {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--control-height, 48px);
+  padding-left: 14px;
+}
+.field--readonly .control--readonly strong {
+  color: var(--color-text);
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1;
+}
+.field--readonly .control--readonly .unit {
+  margin-left: auto;
+}
+@media (max-width: 767px) {
+  .field--readonly .control--readonly {
+    min-height: 44px;
+    padding-left: 10px;
+  }
+  .field--readonly .control--readonly strong {
+    font-size: 15px;
+  }
+}

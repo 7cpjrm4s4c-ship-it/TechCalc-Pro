@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-wrg-desktop-split-v4';
+const CACHE_NAME = 'techcalc-pro-wrg-output-mobile-sync-v1';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',
