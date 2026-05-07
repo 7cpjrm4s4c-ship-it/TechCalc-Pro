@@ -848,3 +848,53 @@ button,
     white-space: normal;
   }
 }
+
+/* WRG / Mischluft grouped input/output cards */
+.wrg-group-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-gap);
+  align-items: start;
+}
+.wrg-group-grid__full {
+  grid-column: 1 / -1;
+}
+.wrg-group-grid .card {
+  min-height: 0;
+}
+@media (max-width: 767px) {
+  .wrg-group-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .wrg-group-grid .card {
+    padding: 14px;
+    border-radius: 20px;
+  }
+  .wrg-group-grid .card__title {
+    font-size: 10px;
+    letter-spacing: 1.6px;
+  }
+  .wrg-group-grid .tc-fields {
+    grid-template-columns: 1fr;
+  }
+  .wrg-group-grid .control {
+    min-height: 46px;
+    border-radius: 16px;
+  }
+  .wrg-group-grid .control input,
+  .wrg-group-grid .control select {
+    height: 44px;
+    padding: 0 10px;
+    font-size: 16px;
+  }
+  .wrg-group-grid .unit {
+    padding: 0 10px;
+    font-size: 14px;
+  }
+  .wrg-group-grid .inline-stats {
+    grid-template-columns: 1fr;
+  }
+  .wrg-group-grid .inline-stat strong {
+    white-space: normal;
+  }
+}
