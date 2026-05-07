@@ -50,7 +50,6 @@ export function dewPointC(tempC, rhPercent) {
 }
 
 export function wetBulbApproxC(tempC, rhPercent) {
-  // Stull approximation, adequate for UI indication in normal HVAC range.
   const t = num(tempC);
   const rh = clamp(num(rhPercent), 1, 100);
   return t * Math.atan(0.151977 * Math.sqrt(rh + 8.313659))
@@ -63,7 +62,6 @@ export function wetBulbApproxC(tempC, rhPercent) {
 export function calculatePoint(input) {
   const tempC = num(input.tempC);
   const rhPercent = clamp(num(input.rhPercent), 0, 100);
-  const volumeFlowM3h = Math.max(0, num(input.volumeFlowM3h));
   const w = humidityRatioKgKg(tempC, rhPercent);
   const density = airDensityKgm3(tempC, w);
   return {
@@ -71,19 +69,52 @@ export function calculatePoint(input) {
     label: String(input.label || 'Zustand'),
     tempC,
     rhPercent,
-    volumeFlowM3h,
     humidityRatioGkg: w * 1000,
     humidityRatio: w,
     enthalpyKjKg: enthalpyKjKg(tempC, w),
     densityKgm3: density,
-    massFlowKgh: volumeFlowM3h * density,
     dewPointC: dewPointC(tempC, rhPercent),
     wetBulbC: wetBulbApproxC(tempC, rhPercent)
   };
 }
 
+export function classifyChange(start, target) {
+  const dt = target.tempC - start.tempC;
+  const dx = target.humidityRatioGkg - start.humidityRatioGkg;
+  const dh = target.enthalpyKjKg - start.enthalpyKjKg;
+  const epsT = 0.25;
+  const epsX = 0.15;
+  const epsH = 2.0;
+
+  if (Math.abs(dt) <= epsT && Math.abs(dx) <= epsX) return 'Keine relevante Zustandsänderung';
+  if (dx < -epsX && dt < -epsT) return 'Kühlen und Entfeuchten';
+  if (dx > epsX && Math.abs(dh) <= epsH) return 'Erhitzen und adiabat befeuchten';
+  if (dx > epsX && dh > epsH) return 'Erhitzen und dampfbefeuchten';
+  if (Math.abs(dx) <= epsX && dt > epsT) return 'Erhitzen';
+  if (Math.abs(dx) <= epsX && dt < -epsT) return 'Kühlen';
+  if (dx < -epsX) return 'Entfeuchten';
+  if (dx > epsX) return 'Befeuchten';
+  return dt > 0 ? 'Erhitzen' : 'Kühlen';
+}
+
 export function calculate(input) {
-  const current = calculatePoint(input);
+  const current = calculatePoint({
+    label: input.label,
+    tempC: input.tempC,
+    rhPercent: input.rhPercent
+  });
+  const target = calculatePoint({
+    label: `${input.label || 'Zustand'} Ziel`,
+    tempC: input.targetTempC,
+    rhPercent: input.targetRhPercent
+  });
+  const changeType = classifyChange(current, target);
+  const delta = {
+    tempK: target.tempC - current.tempC,
+    humidityGkg: target.humidityRatioGkg - current.humidityRatioGkg,
+    enthalpyKjKg: target.enthalpyKjKg - current.enthalpyKjKg,
+    rhPercent: target.rhPercent - current.rhPercent
+  };
   const points = (input.points ?? []).map(point => calculatePoint(point));
-  return { current, points };
+  return { current, target, changeType, delta, points };
 }

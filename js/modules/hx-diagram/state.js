@@ -20,6 +20,7 @@ export const state = createModuleState({
   label: 'Zustand 1',
   tempC: '22',
   rhPercent: '50',
-  volumeFlowM3h: '1000',
+  targetTempC: '26',
+  targetRhPercent: '45',
   points: loadPoints()
 });

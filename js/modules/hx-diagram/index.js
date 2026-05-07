@@ -17,28 +17,53 @@ function actionButton(label, attr, variant = '') {
   return `<button type="button" class="tc-action ${variant}" ${attr}>${esc(label)}</button>`;
 }
 
+function signedTempField(id, label, value) {
+  return `<div class="field field--signed-temp">
+    <label for="${esc(id)}">${esc(label)}</label>
+    <div class="control control--with-sign">
+      <button type="button" class="sign-toggle" data-hx-sign="${esc(id)}" aria-label="Vorzeichen umschalten">±</button>
+      <input id="${esc(id)}" data-field="${esc(id)}" type="text" inputmode="decimal" value="${esc(value ?? '')}" placeholder="0" autocomplete="off">
+      <span class="unit">°C</span>
+    </div>
+  </div>`;
+}
+
 function inputCard(s) {
   return card('Luftzustand erfassen', stack([
-    field({ id: 'label', label: 'Bezeichnung', value: s.label, placeholder: 'z. B. Außenluft Winter', type: 'text' }),
-    grid([
-      field({ id: 'tempC', label: 'Trockenkugeltemperatur θt', unit: '°C', value: fmtInput(s.tempC, 2) }),
-      field({ id: 'rhPercent', label: 'Relative Feuchte φ', unit: '%', value: fmtInput(s.rhPercent, 2) }),
-      field({ id: 'volumeFlowM3h', label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(s.volumeFlowM3h, 2) })
-    ].join(''), 3),
-    `<div class="tc-actions">${actionButton('Zustand hinzufügen', 'data-hx-add')} ${actionButton('Verlauf löschen', 'data-hx-clear', 'tc-action--ghost')}</div>`
+    field({ id: 'label', label: 'Bezeichnung', value: s.label, placeholder: 'z. B. Außenluft Winter', type: 'text', inputmode: 'text' }),
+    card('Ausgangszustand', grid([
+      signedTempField('tempC', 'Trockenkugeltemperatur θt', fmtInput(s.tempC, 2)),
+      field({ id: 'rhPercent', label: 'Relative Feuchte φ', unit: '%', value: fmtInput(s.rhPercent, 2) })
+    ].join(''), 2), 'cyan', { compact: true }),
+    card('Zielzustand', grid([
+      signedTempField('targetTempC', 'Zieltemperatur θt', fmtInput(s.targetTempC, 2)),
+      field({ id: 'targetRhPercent', label: 'Relative Zielfeuchte φ', unit: '%', value: fmtInput(s.targetRhPercent, 2) })
+    ].join(''), 2), 'cyan', { compact: true }),
+    `<div class="tc-actions">${actionButton('Zustandsänderung hinzufügen', 'data-hx-add')} ${actionButton('Verlauf löschen', 'data-hx-clear', 'tc-action--ghost')}</div>`
   ].join('')), 'cyan');
 }
 
-function resultCard(current) {
-  return mainResult('Aktueller Zustand', { label: 'Enthalpie h', value: fmt(current.enthalpyKjKg, 2), unit: 'kJ/kg tr. Luft' }, [
-    { label: 'Feuchtegehalt x', value: fmt(current.humidityRatioGkg, 2), unit: 'g/kg' },
-    { label: 'Temperatur θt', value: fmt(current.tempC, 2), unit: '°C' },
-    { label: 'rel. Feuchte φ', value: fmt(current.rhPercent, 0), unit: '%' },
-    { label: 'Dichte ρ', value: fmt(current.densityKgm3, 3), unit: 'kg/m³' },
-    { label: 'Taupunkt θp', value: fmt(current.dewPointC, 2), unit: '°C' },
-    { label: 'Feuchtkugel θf', value: fmt(current.wetBulbC, 2), unit: '°C' },
-    { label: 'Massenstrom ṁ', value: fmt(current.massFlowKgh, 2), unit: 'kg/h' }
-  ], 'cyan');
+function readonlyStateCard(title, point) {
+  return card(title, inlineStats([
+    { label: 'Temperatur θt', value: fmt(point.tempC, 2), unit: '°C' },
+    { label: 'rel. Feuchte φ', value: fmt(point.rhPercent, 0), unit: '%' },
+    { label: 'Feuchtegehalt x', value: fmt(point.humidityRatioGkg, 2), unit: 'g/kg' },
+    { label: 'Enthalpie h', value: fmt(point.enthalpyKjKg, 2), unit: 'kJ/kg' },
+    { label: 'Dichte ρ', value: fmt(point.densityKgm3, 3), unit: 'kg/m³' },
+    { label: 'Taupunkt θp', value: fmt(point.dewPointC, 2), unit: '°C' }
+  ]), 'cyan');
+}
+
+function resultCard(r) {
+  return stack([
+    mainResult('Automatische Zustandsänderung', { label: 'Prozess', value: r.changeType, unit: '' }, [
+      { label: 'Δθ', value: fmt(r.delta.tempK, 2), unit: 'K' },
+      { label: 'Δx', value: fmt(r.delta.humidityGkg, 2), unit: 'g/kg' },
+      { label: 'Δh', value: fmt(r.delta.enthalpyKjKg, 2), unit: 'kJ/kg' },
+      { label: 'Δφ', value: fmt(r.delta.rhPercent, 0), unit: '%' }
+    ], 'cyan'),
+    `<div class="hx-state-grid">${readonlyStateCard('Ausgang', r.current)}${readonlyStateCard('Ziel', r.target)}</div>`
+  ].join(''));
 }
 
 function historyCard(points) {
@@ -52,8 +77,8 @@ function historyCard(points) {
   return card('Zustandsverlauf', body, 'cyan');
 }
 
-function chartCard(points, current) {
-  const chartPoints = points.length ? points : [current];
+function chartCard(points, current, target) {
+  const chartPoints = points.length ? points : [current, target];
   return card('h,x-Diagramm', `<div class="hx-chart-wrap">${renderHxSvg(chartPoints)}</div><div class="formula">Näherung bei Luftdruck 1.013 hPa · x horizontal · θt vertikal</div>`, 'cyan');
 }
 
@@ -109,10 +134,16 @@ function renderHxSvg(points) {
 function view(s) {
   const r = calculate(s);
   const body = `<div class="hx-layout">
-    <div class="hx-layout__left">${stack([inputCard(s), resultCard(r.current), historyCard(r.points)].join(''))}</div>
-    <div class="hx-layout__right">${chartCard(r.points, r.current)}</div>
+    <div class="hx-layout__left">${stack([inputCard(s), resultCard(r), historyCard(r.points)].join(''))}</div>
+    <div class="hx-layout__right">${chartCard(r.points, r.current, r.target)}</div>
   </div>`;
   return renderModuleShell(config, `<div class="span-12">${body}</div>`);
+}
+
+function toggleNumericSign(value) {
+  const raw = String(value ?? '').trim();
+  if (!raw || raw === '0') return '-';
+  return raw.startsWith('-') ? raw.slice(1) : `-${raw}`;
 }
 
 export default {
@@ -126,17 +157,30 @@ export default {
     };
 
     const bindActions = rootEl => {
+      rootEl.querySelectorAll('[data-hx-sign]').forEach(button => {
+        button.addEventListener('click', () => {
+          const id = button.dataset.hxSign;
+          const input = rootEl.querySelector(`[data-field="${id}"]`);
+          const next = toggleNumericSign(input?.value);
+          state.set({ [id]: next });
+        });
+      });
+
       rootEl.querySelector('[data-hx-add]')?.addEventListener('click', () => {
         const s = state.get();
-        const point = calculatePoint({
-          label: s.label,
+        const start = calculatePoint({
+          label: `${s.label || 'Zustand'} Start`,
           tempC: s.tempC,
-          rhPercent: s.rhPercent,
-          volumeFlowM3h: s.volumeFlowM3h
+          rhPercent: s.rhPercent
         });
-        const points = [...(s.points ?? []), point];
+        const target = calculatePoint({
+          label: `${s.label || 'Zustand'} Ziel`,
+          tempC: s.targetTempC,
+          rhPercent: s.targetRhPercent
+        });
+        const points = [...(s.points ?? []), start, target];
         savePoints(points);
-        state.set({ points, label: `Zustand ${points.length + 1}` });
+        state.set({ points, label: `Zustand ${Math.floor(points.length / 2) + 1}` });
       });
 
       rootEl.querySelector('[data-hx-clear]')?.addEventListener('click', () => {

@@ -9,3 +9,48 @@
 .module-head { display: none !important; }
 .module-content { gap: var(--ui-gap) !important; }
 .module-content > * { margin-block: 0 !important; }
+
+/* h,x-Diagramm refinements */
+.hx-state-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.control--with-sign {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+}
+
+.control--with-sign input {
+  min-width: 0;
+}
+
+.sign-toggle {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-right: 1px solid var(--line-soft);
+  background: rgba(255,255,255,0.05);
+  color: var(--text-primary);
+  font-weight: 900;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.sign-toggle:hover,
+.sign-toggle:focus-visible {
+  background: rgba(45, 176, 255, 0.16);
+  outline: none;
+}
+
+@media (max-width: 767px) {
+  .hx-state-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .control--with-sign {
+    grid-template-columns: 48px 1fr auto;
+  }
+}
