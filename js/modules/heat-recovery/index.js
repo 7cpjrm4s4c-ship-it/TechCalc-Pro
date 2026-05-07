@@ -4,30 +4,26 @@ import { calculate } from './logic.js';
 import { card, field, segmented, renderModuleShell, bindCommonInputs, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 
-function pointStats(point, includeHumidityRatio = true) {
-  const items = [
-    { label: 'Volumenstrom', value: fmt(point.volumeFlowM3h, 0), unit: 'm³/h' },
-    { label: 'Temperatur', value: fmt(point.tempC, 2), unit: '°C' },
-    { label: 'rel. Feuchte', value: fmt(point.rhPercent, 0), unit: '%' }
-  ];
-  if (includeHumidityRatio) {
-    items.push({ label: 'x', value: fmt(point.humidityRatioGkg, 2), unit: 'g/kg' });
-  }
-  return inlineStats(items);
-}
-
 function readonlyValue({ label, value, unit = '' }) {
   return `<div class="field field--readonly"><label>${label}</label><div class="control control--readonly"><strong>${value}</strong>${unit ? `<span class="unit">${unit}</span>` : ''}</div></div>`;
 }
 
-function readonlyAirCard(title, point, accent = 'cyan') {
-  return card(title, stack([
-    readonlyValue({ label: 'Volumenstrom V̇', value: fmt(point.volumeFlowM3h, 0), unit: 'm³/h' }),
-    grid([
-      readonlyValue({ label: 'Temperatur', value: fmt(point.tempC, 2), unit: '°C' }),
-      readonlyValue({ label: 'rel. Feuchte', value: fmt(point.rhPercent, 0), unit: '%' })
-    ].join(''), 2)
-  ].join('')), accent);
+function readonlyAirCard(title, point, accent = 'cyan', options = {}) {
+  const includeMass = options.includeMass !== false;
+  const rows = [
+    readonlyValue({ label: 'Volumenstrom V̇', value: fmt(point.volumeFlowM3h, 0), unit: 'm³/h' })
+  ];
+
+  if (includeMass) {
+    rows.push(readonlyValue({ label: 'Massenstrom ṁ', value: fmt(point.massFlowKgh, 2), unit: 'kg/h' }));
+  }
+
+  rows.push(grid([
+    readonlyValue({ label: 'Temperatur', value: fmt(point.tempC, 2), unit: '°C' }),
+    readonlyValue({ label: 'rel. Feuchte', value: fmt(point.rhPercent, 0), unit: '%' })
+  ].join(''), 2));
+
+  return card(title, stack(rows.join('')), accent);
 }
 
 function airInputCard(title, fields, accent = 'cyan') {
@@ -40,17 +36,12 @@ function airInputCard(title, fields, accent = 'cyan') {
   ].join('')), accent);
 }
 
-function airOutputCard(title, point, accent = 'cyan', settings = {}) {
-  return settings.fullCard ? readonlyAirCard(title, point, accent) : card(title, pointStats(point, settings.includeHumidityRatio !== false), accent);
-}
-
 function modeCard(s) {
   return card('Berechnungsart', segmented('mode', [
     { value: 'wrg', label: 'WRG' },
     { value: 'mixing', label: 'Mischluft' }
   ], s.mode, { accent: 'cyan' }), 'cyan', { compact: true });
 }
-
 
 function condensationCard(r) {
   if (!r.hasCondensation) return '';
@@ -81,8 +72,8 @@ function wrgInputCard(s) {
 
 function wrgOutputCard(r) {
   return card('WRG — Ausgabe', `<div class="wrg-group-grid">
-    ${airOutputCard('Zuluft', r.supply, 'cyan', { fullCard: true })}
-    ${airOutputCard('Fortluft', r.exhaust, 'cyan', { fullCard: true })}
+    ${readonlyAirCard('Zuluft', r.supply, 'cyan', { includeMass: true })}
+    ${readonlyAirCard('Fortluft', r.exhaust, 'cyan', { includeMass: true })}
   </div>`, 'cyan');
 }
 
@@ -103,10 +94,11 @@ function mixingInputCard(s) {
 
 function mixingOutputCard(r) {
   return card('Mischluft — Ausgabe', `<div class="wrg-group-grid">
-    ${airOutputCard('Mischluft / Zuluft', r.mixed, 'cyan', { fullCard: true })}
+    ${readonlyAirCard('Mischluft / Zuluft', r.mixed, 'cyan', { includeMass: true })}
     ${card('Mischungsverhältnis', inlineStats([
       { label: 'Außenluftanteil', value: fmt(r.outdoorShare, 0), unit: '%' },
       { label: 'Umluftanteil', value: fmt(r.recircShare, 0), unit: '%' },
+      { label: 'Massenstrom', value: fmt(r.mixed.massFlowKgh, 2), unit: 'kg/h' },
       { label: 'x', value: fmt(r.mixed.humidityRatioGkg, 2), unit: 'g/kg' }
     ]), 'cyan')}
   </div>`, 'cyan');
@@ -117,6 +109,7 @@ function wrgOutputs(r) {
     wrgOutputCard(r),
     mainResult('WRG-Leistung', { label: 'Rückgewonnene Leistung', value: fmt(r.recoveredPowerKw, 2), unit: 'kW' }, [
       { label: 'Wirkungsgrad', value: fmt(r.efficiency, 0), unit: '%' },
+      { label: 'wirksamer Volumenstrom', value: fmt(r.effectiveVolumeFlowM3h, 0), unit: 'm³/h' },
       { label: 'ρ × cₚ / 3,6', value: fmt(r.factor, 3), unit: 'Wh/(m³·K)' }
     ], 'cyan'),
     condensationCard(r)
@@ -135,7 +128,7 @@ function view(s) {
   const isMixing = s.mode === 'mixing';
   const formula = isMixing
     ? 'Mischluft: x und h aus Außenluft + Umluft über Massenstromanteile'
-    : 'WRG: tZuluft = tAußen + ηWRG × (tAbluft − tAußen)';
+    : 'WRG: tZuluft = tAußen + ηWRG × ṁeff/ṁAußen × (tAbluft − tAußen)';
 
   const input = isMixing ? mixingInputCard(s) : wrgInputCard(s);
   const output = isMixing ? mixingOutputs(r) : wrgOutputs(r);

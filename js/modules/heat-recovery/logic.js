@@ -80,8 +80,15 @@ function calculateWrg(s) {
   const efficiency = clamp(num(s.efficiency), 0, 100);
   const eta = efficiency / 100;
 
-  const supplyTemp = outdoor.tempC + eta * (extract.tempC - outdoor.tempC);
-  const exhaustTempRaw = extract.tempC - eta * (extract.tempC - outdoor.tempC);
+  // Bei unterschiedlichen Luftmengen wirkt im Wärmetauscher nur der kleinere
+  // Massenstrom vollständig. Der Rest wird als thermischer Bypass behandelt.
+  const effectiveDryMassFlowKgh = Math.min(outdoor.dryMassFlowKgh, extract.dryMassFlowKgh);
+  const outdoorRatio = outdoor.dryMassFlowKgh ? effectiveDryMassFlowKgh / outdoor.dryMassFlowKgh : 0;
+  const extractRatio = extract.dryMassFlowKgh ? effectiveDryMassFlowKgh / extract.dryMassFlowKgh : 0;
+
+  const deltaT = extract.tempC - outdoor.tempC;
+  const supplyTemp = outdoor.tempC + eta * outdoorRatio * deltaT;
+  const exhaustTempRaw = extract.tempC - eta * extractRatio * deltaT;
 
   const supply = pointFromTempHumidity(outdoor.volumeFlowM3h, supplyTemp, outdoor.humidityRatio, outdoor.massFlowKgh);
 
@@ -94,7 +101,8 @@ function calculateWrg(s) {
 
   const avgRho = airDensity((outdoor.tempC + extract.tempC) / 2 || 20);
   const factor = avgRho * CP_AIR_KJ_KG_K / 3.6;
-  const recoveredPowerKw = outdoor.volumeFlowM3h * factor * (supplyTemp - outdoor.tempC) / 1000;
+  const effectiveVolumeFlowM3h = outdoor.densityKgm3 ? effectiveDryMassFlowKgh / outdoor.densityKgm3 : 0;
+  const recoveredPowerKw = effectiveVolumeFlowM3h * factor * eta * deltaT / 1000;
   const condensationPowerKw = condensateKgh * H_VAP_KJ_KG / 3600;
 
   return {
@@ -108,6 +116,8 @@ function calculateWrg(s) {
     condensateKgh,
     condensationPowerKw,
     condensateLs: condensateKgh / 3600,
+    effectiveVolumeFlowM3h,
+    effectiveDryMassFlowKgh,
     hasCondensation: condensateKgh > 0.001,
     factor,
     cp: CP_AIR_KJ_KG_K
