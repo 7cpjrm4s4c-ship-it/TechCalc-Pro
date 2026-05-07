@@ -87,10 +87,16 @@ function calculateWrg(s) {
   const extractRatio = extract.dryMassFlowKgh ? effectiveDryMassFlowKgh / extract.dryMassFlowKgh : 0;
 
   const deltaT = extract.tempC - outdoor.tempC;
-  const supplyTemp = outdoor.tempC + eta * outdoorRatio * deltaT;
+  const heatedSupplyTemp = outdoor.tempC + eta * deltaT;
+  const supplyTotalDryMassKgh = Math.max(outdoor.dryMassFlowKgh, extract.dryMassFlowKgh);
+  const supplyBypassDryMassKgh = Math.max(0, supplyTotalDryMassKgh - effectiveDryMassFlowKgh);
+  const supplyTemp = supplyTotalDryMassKgh
+    ? ((heatedSupplyTemp * effectiveDryMassFlowKgh) + (outdoor.tempC * supplyBypassDryMassKgh)) / supplyTotalDryMassKgh
+    : outdoor.tempC;
+  const supplyVolumeFlowM3h = outdoor.densityKgm3 ? supplyTotalDryMassKgh / outdoor.densityKgm3 : outdoor.volumeFlowM3h;
   const exhaustTempRaw = extract.tempC - eta * extractRatio * deltaT;
 
-  const supply = pointFromTempHumidity(outdoor.volumeFlowM3h, supplyTemp, outdoor.humidityRatio, outdoor.massFlowKgh);
+  const supply = pointFromTempHumidity(supplyVolumeFlowM3h, supplyTemp, outdoor.humidityRatio, supplyTotalDryMassKgh);
 
   const extractWSatAtExhaust = humidityRatioKgKg(exhaustTempRaw, 100);
   const condensateKgh = Math.max(0, extract.dryMassFlowKgh * (extract.humidityRatio - extractWSatAtExhaust));

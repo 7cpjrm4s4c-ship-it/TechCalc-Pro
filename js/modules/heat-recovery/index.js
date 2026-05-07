@@ -94,7 +94,7 @@ function mixingInputCard(s) {
 
 function mixingOutputCard(r) {
   return card('Mischluft — Ausgabe', `<div class="wrg-group-grid">
-    ${readonlyAirCard('Mischluft / Zuluft', r.mixed, 'cyan', { includeMass: true })}
+    ${readonlyAirCard('Mischluft / Zuluft', r.mixed, 'cyan', { includeMass: false })}
     ${card('Mischungsverhältnis', inlineStats([
       { label: 'Außenluftanteil', value: fmt(r.outdoorShare, 0), unit: '%' },
       { label: 'Umluftanteil', value: fmt(r.recircShare, 0), unit: '%' },
