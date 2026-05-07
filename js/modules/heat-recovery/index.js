@@ -4,13 +4,28 @@ import { calculate } from './logic.js';
 import { card, field, segmented, renderModuleShell, bindCommonInputs, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 
-function pointStats(point) {
-  return inlineStats([
+function pointStats(point, { includeX = false } = {}) {
+  const items = [
     { label: 'Volumenstrom', value: fmt(point.volumeFlowM3h, 0), unit: 'm³/h' },
     { label: 'Temperatur', value: fmt(point.tempC, 2), unit: '°C' },
-    { label: 'rel. Feuchte', value: fmt(point.rhPercent, 0), unit: '%' },
-    { label: 'x', value: fmt(point.humidityRatioGkg, 2), unit: 'g/kg' }
-  ]);
+    { label: 'rel. Feuchte', value: fmt(point.rhPercent, 0), unit: '%' }
+  ];
+  if (includeX) {
+    items.push({ label: 'x', value: fmt(point.humidityRatioGkg, 2), unit: 'g/kg' });
+  }
+  return inlineStats(items);
+}
+
+function airReadoutCard(title, point, accent = 'cyan', { includeX = false } = {}) {
+  const xHtml = includeX
+    ? `<div class="inline-stat"><span>x</span><strong>${fmt(point.humidityRatioGkg, 2)} <small>g/kg</small></strong></div>`
+    : '';
+  return card(title, `<div class="wrg-air-readout">
+    <div class="inline-stat wrg-air-readout__wide"><span>Volumenstrom</span><strong>${fmt(point.volumeFlowM3h, 0)} <small>m³/h</small></strong></div>
+    <div class="inline-stat"><span>Temperatur</span><strong>${fmt(point.tempC, 2)} <small>°C</small></strong></div>
+    <div class="inline-stat"><span>rel. Feuchte</span><strong>${fmt(point.rhPercent, 0)} <small>%</small></strong></div>
+    ${xHtml}
+  </div>`, accent);
 }
 
 function airInputCard(title, fields, accent = 'cyan') {
@@ -23,8 +38,8 @@ function airInputCard(title, fields, accent = 'cyan') {
   ].join('')), accent);
 }
 
-function airOutputCard(title, point, accent = 'cyan') {
-  return card(title, pointStats(point), accent);
+function airOutputCard(title, point, accent = 'cyan', options = {}) {
+  return airReadoutCard(title, point, accent, options);
 }
 
 function modeCard(s) {
@@ -90,7 +105,7 @@ function mixingOutputCard(r) {
     ${card('Mischungsverhältnis', inlineStats([
       { label: 'Außenluftanteil', value: fmt(r.outdoorShare, 0), unit: '%' },
       { label: 'Umluftanteil', value: fmt(r.recircShare, 0), unit: '%' },
-      { label: 'Gesamtvolumenstrom', value: fmt(r.mixed.volumeFlowM3h, 0), unit: 'm³/h' }
+      { label: 'x', value: fmt(r.mixed.humidityRatioGkg, 2), unit: 'g/kg' }
     ]), 'cyan')}
   </div>`, 'cyan');
 }
