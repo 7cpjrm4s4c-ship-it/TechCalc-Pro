@@ -128,7 +128,7 @@ function view(s) {
   const isMixing = s.mode === 'mixing';
   const formula = isMixing
     ? 'Mischluft: x und h aus Außenluft + Umluft über Massenstromanteile'
-    : 'WRG: tZuluft = tAußen + ηWRG × ṁeff/ṁAußen × (tAbluft − tAußen)';
+    : 'WRG: tZuluft = tAußen + ηWRG × V̇eff/V̇Zuluft × (tAbluft − tAußen)';
 
   const input = isMixing ? mixingInputCard(s) : wrgInputCard(s);
   const output = isMixing ? mixingOutputs(r) : wrgOutputs(r);

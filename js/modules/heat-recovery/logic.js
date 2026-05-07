@@ -80,36 +80,39 @@ function calculateWrg(s) {
   const efficiency = clamp(num(s.efficiency), 0, 100);
   const eta = efficiency / 100;
 
-  // Bei unterschiedlichen Luftmengen wirkt im Wärmetauscher nur der kleinere
-  // Massenstrom vollständig. Der Rest wird als thermischer Bypass behandelt.
-  const effectiveDryMassFlowKgh = Math.min(outdoor.dryMassFlowKgh, extract.dryMassFlowKgh);
-  const outdoorRatio = outdoor.dryMassFlowKgh ? effectiveDryMassFlowKgh / outdoor.dryMassFlowKgh : 0;
-  const extractRatio = extract.dryMassFlowKgh ? effectiveDryMassFlowKgh / extract.dryMassFlowKgh : 0;
-
+  // WRG mit Luftmengenverschiebung / Bypass:
+  // - Der eingegebene Außenluftvolumenstrom ist der Volumenstrom durch den WT.
+  // - Ist V̇Außen kleiner als V̇Abluft, wird die Differenz als unbeheizter
+  //   Außenluft-Bypass zugemischt. Zuluftvolumenstrom = Abluftvolumenstrom.
+  // - Ist V̇Außen größer/gleich V̇Abluft, bleibt der Fortluftzustand vom
+  //   Außenluftüberschuss unabhängig; nur die Zulufttemperatur sinkt durch
+  //   den größeren Zuluftstrom.
   const deltaT = extract.tempC - outdoor.tempC;
-  const heatedSupplyTemp = outdoor.tempC + eta * deltaT;
-  const supplyTotalDryMassKgh = Math.max(outdoor.dryMassFlowKgh, extract.dryMassFlowKgh);
-  const supplyBypassDryMassKgh = Math.max(0, supplyTotalDryMassKgh - effectiveDryMassFlowKgh);
-  const supplyTemp = supplyTotalDryMassKgh
-    ? ((heatedSupplyTemp * effectiveDryMassFlowKgh) + (outdoor.tempC * supplyBypassDryMassKgh)) / supplyTotalDryMassKgh
-    : outdoor.tempC;
-  const supplyVolumeFlowM3h = outdoor.densityKgm3 ? supplyTotalDryMassKgh / outdoor.densityKgm3 : outdoor.volumeFlowM3h;
-  const exhaustTempRaw = extract.tempC - eta * extractRatio * deltaT;
+  const effectiveVolumeFlowM3h = Math.min(outdoor.volumeFlowM3h, extract.volumeFlowM3h);
+  const supplyVolumeFlowM3h = Math.max(outdoor.volumeFlowM3h, extract.volumeFlowM3h);
+  const exhaustVolumeFlowM3h = extract.volumeFlowM3h;
+  const supplyRatio = supplyVolumeFlowM3h ? effectiveVolumeFlowM3h / supplyVolumeFlowM3h : 0;
+  const exhaustRatio = extract.volumeFlowM3h ? effectiveVolumeFlowM3h / extract.volumeFlowM3h : 0;
 
-  const supply = pointFromTempHumidity(supplyVolumeFlowM3h, supplyTemp, outdoor.humidityRatio, supplyTotalDryMassKgh);
+  const supplyTemp = outdoor.tempC + eta * supplyRatio * deltaT;
+  const exhaustTempRaw = extract.tempC - eta * exhaustRatio * deltaT;
+
+  const supplyDryMassFlowKgh = dryAirMassFlowKgh(supplyVolumeFlowM3h, supplyTemp);
+  const exhaustDryMassFlowKgh = dryAirMassFlowKgh(exhaustVolumeFlowM3h, exhaustTempRaw);
+  const supply = pointFromTempHumidity(supplyVolumeFlowM3h, supplyTemp, outdoor.humidityRatio, supplyDryMassFlowKgh);
 
   const extractWSatAtExhaust = humidityRatioKgKg(exhaustTempRaw, 100);
   const condensateKgh = Math.max(0, extract.dryMassFlowKgh * (extract.humidityRatio - extractWSatAtExhaust));
   const exhaustHumidity = condensateKgh > 0 ? extractWSatAtExhaust : extract.humidityRatio;
   const exhaustRh = relativeHumidityPercent(exhaustTempRaw, exhaustHumidity);
-  const exhaust = pointFromTempHumidity(extract.volumeFlowM3h, exhaustTempRaw, exhaustHumidity, extract.massFlowKgh);
+  const exhaust = pointFromTempHumidity(exhaustVolumeFlowM3h, exhaustTempRaw, exhaustHumidity, exhaustDryMassFlowKgh);
   exhaust.rhPercent = exhaustRh;
 
   const avgRho = airDensity((outdoor.tempC + extract.tempC) / 2 || 20);
   const factor = avgRho * CP_AIR_KJ_KG_K / 3.6;
-  const effectiveVolumeFlowM3h = outdoor.densityKgm3 ? effectiveDryMassFlowKgh / outdoor.densityKgm3 : 0;
   const recoveredPowerKw = effectiveVolumeFlowM3h * factor * eta * deltaT / 1000;
   const condensationPowerKw = condensateKgh * H_VAP_KJ_KG / 3600;
+  const effectiveDryMassFlowKgh = dryAirMassFlowKgh(effectiveVolumeFlowM3h, (outdoor.tempC + extract.tempC) / 2);
 
   return {
     mode: 'wrg',
@@ -124,6 +127,7 @@ function calculateWrg(s) {
     condensateLs: condensateKgh / 3600,
     effectiveVolumeFlowM3h,
     effectiveDryMassFlowKgh,
+    bypassVolumeFlowM3h: Math.max(0, supplyVolumeFlowM3h - effectiveVolumeFlowM3h),
     hasCondensation: condensateKgh > 0.001,
     factor,
     cp: CP_AIR_KJ_KG_K
