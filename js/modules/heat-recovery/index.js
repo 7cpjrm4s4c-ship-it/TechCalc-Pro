@@ -10,9 +10,12 @@ function readonlyValue({ label, value, unit = '' }) {
 
 function readonlyAirCard(title, point, accent = 'cyan', options = {}) {
   const includeMass = options.includeMass !== false;
-  const rows = [
-    readonlyValue({ label: 'Volumenstrom V̇', value: fmt(point.volumeFlowM3h, 0), unit: 'm³/h' })
-  ];
+  const includeVolume = options.includeVolume === true;
+  const rows = [];
+
+  if (includeVolume) {
+    rows.push(readonlyValue({ label: 'Volumenstrom V̇', value: fmt(point.volumeFlowM3h, 0), unit: 'm³/h' }));
+  }
 
   if (includeMass) {
     rows.push(readonlyValue({ label: 'Massenstrom ṁ', value: fmt(point.massFlowKgh, 2), unit: 'kg/h' }));
@@ -27,13 +30,13 @@ function readonlyAirCard(title, point, accent = 'cyan', options = {}) {
 }
 
 function airInputCard(title, fields, accent = 'cyan') {
-  return card(title, stack([
-    field(fields.volume),
-    grid([
-      field(fields.temp),
-      field(fields.rh)
-    ].join(''), 2)
-  ].join('')), accent);
+  const rows = [];
+  if (fields.volume) rows.push(field(fields.volume));
+  rows.push(grid([
+    field(fields.temp),
+    field(fields.rh)
+  ].join(''), 2));
+  return card(title, stack(rows.join('')), accent);
 }
 
 function modeCard(s) {
@@ -55,20 +58,19 @@ function condensationCard(r) {
 function wrgInputCard(s) {
   return card('WRG — Eingaben', `<div class="wrg-group-grid">
     ${airInputCard('Außenluft', {
-      volume: { id: 'outdoorVolumeFlowM3h', label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(s.outdoorVolumeFlowM3h, 2) },
       temp: { id: 'outdoorTemp', label: 'Temperatur', unit: '°C', value: fmtInput(s.outdoorTemp, 2) },
       rh: { id: 'outdoorRh', label: 'rel. Feuchte', unit: '%', value: fmtInput(s.outdoorRh, 2) }
     })}
     ${airInputCard('Abluft', {
-      volume: { id: 'extractVolumeFlowM3h', label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(s.extractVolumeFlowM3h, 2) },
       temp: { id: 'extractTemp', label: 'Temperatur', unit: '°C', value: fmtInput(s.extractTemp, 2) },
       rh: { id: 'extractRh', label: 'rel. Feuchte', unit: '%', value: fmtInput(s.extractRh, 2) }
     })}
     <div class="wrg-group-grid__full">
       ${card('Wärmerückgewinnung', grid([
+        field({ id: 'wrgVolumeFlowM3h', label: 'Anlagenvolumenstrom V̇', unit: 'm³/h', value: fmtInput(s.wrgVolumeFlowM3h, 2) }),
         field({ id: 'efficiency', label: 'WRG-Wirkungsgrad', unit: '%', value: fmtInput(s.efficiency, 2) }),
         field({ id: 'bypassPercent', label: 'Bypass-Anteil β', unit: '%', value: fmtInput(s.bypassPercent, 2) })
-      ].join(''), 2), 'cyan', { compact: true })}
+      ].join(''), 3), 'cyan', { compact: true })}
     </div>
   </div>`, 'cyan');
 }
@@ -113,7 +115,7 @@ function wrgOutputs(r) {
     mainResult('WRG-Leistung', { label: 'Rückgewonnene Leistung', value: fmt(r.recoveredPowerKw, 2), unit: 'kW' }, [
       { label: 'Wirkungsgrad', value: fmt(r.efficiency, 0), unit: '%' },
       { label: 'Bypass', value: fmt(r.bypassPercent, 0), unit: '%' },
-      { label: 'WTX-Volumenstrom', value: fmt(r.effectiveVolumeFlowM3h, 0), unit: 'm³/h' },
+      { label: 'WTX-Wirksam', value: fmt(r.effectiveVolumeFlowM3h, 0), unit: 'm³/h' },
       { label: 'ρ × cₚ / 3,6', value: fmt(r.factor, 3), unit: 'Wh/(m³·K)' }
     ], 'cyan'),
     condensationCard(r)
@@ -132,7 +134,7 @@ function view(s) {
   const isMixing = s.mode === 'mixing';
   const formula = isMixing
     ? 'Mischluft: x und h aus Außenluft + Umluft über Massenstromanteile'
-    : 'WRG: tZuluft = (1−β) × [tAußen + ηWRG × (tAbluft − tAußen)] + β × tAußen';
+    : 'WRG: tZuluft = (1−β) × [tAußen + ηWRG × (tAbluft − tAußen)] + β × tAußen · tFort = tAbluft − (1−β) × ηWRG × (tAbluft − tAußen)';
 
   const input = isMixing ? mixingInputCard(s) : wrgInputCard(s);
   const output = isMixing ? mixingOutputs(r) : wrgOutputs(r);

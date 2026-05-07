@@ -3,10 +3,9 @@ import { createModuleState } from '../../core/state.js';
 export const state = createModuleState({
   mode: 'wrg',
   // WRG
-  outdoorVolumeFlowM3h: '5000',
+  wrgVolumeFlowM3h: '5000',
   outdoorTemp: '-16',
   outdoorRh: '80',
-  extractVolumeFlowM3h: '5000',
   extractTemp: '22',
   extractRh: '50',
   efficiency: '78',

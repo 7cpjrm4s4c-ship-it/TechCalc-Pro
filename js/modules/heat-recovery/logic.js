@@ -75,8 +75,9 @@ function pointFromTempHumidity(volumeFlowM3h, tempC, wKgKg, referenceMassFlowKgh
 }
 
 function calculateWrg(s) {
-  const outdoor = airPoint(s.outdoorVolumeFlowM3h, s.outdoorTemp, s.outdoorRh);
-  const extract = airPoint(s.extractVolumeFlowM3h, s.extractTemp, s.extractRh);
+  const systemVolumeFlowM3h = Math.max(0, num(s.wrgVolumeFlowM3h));
+  const outdoor = airPoint(systemVolumeFlowM3h, s.outdoorTemp, s.outdoorRh);
+  const extract = airPoint(systemVolumeFlowM3h, s.extractTemp, s.extractRh);
   const efficiency = clamp(num(s.efficiency), 0, 100);
   const eta = efficiency / 100;
   const bypassPercent = clamp(num(s.bypassPercent), 0, 100);
@@ -85,17 +86,17 @@ function calculateWrg(s) {
   // WRG mit explizitem Bypass-Anteil β:
   // t_ZU,WTX = t_Außen + η × (t_Abluft − t_Außen)
   // t_ZU     = (1 − β) × t_ZU,WTX + β × t_Außen
-  // t_Fort   = t_Abluft − η × (t_Abluft − t_Außen)
-  // Der Bypass beeinflusst nur die Zuluftmischung, nicht die Fortluft.
+  // t_Fort   = t_Abluft − (1 − β) × η × (t_Abluft − t_Außen)
+  // Mehr Bypass senkt die Zulufttemperatur und erhöht die Fortlufttemperatur.
   const deltaT = extract.tempC - outdoor.tempC;
-  const wtxVolumeFlowM3h = outdoor.volumeFlowM3h * (1 - beta);
-  const bypassVolumeFlowM3h = outdoor.volumeFlowM3h * beta;
-  const supplyVolumeFlowM3h = outdoor.volumeFlowM3h;
-  const exhaustVolumeFlowM3h = extract.volumeFlowM3h;
+  const wtxVolumeFlowM3h = systemVolumeFlowM3h * (1 - beta);
+  const bypassVolumeFlowM3h = systemVolumeFlowM3h * beta;
+  const supplyVolumeFlowM3h = systemVolumeFlowM3h;
+  const exhaustVolumeFlowM3h = systemVolumeFlowM3h;
 
   const supplyWtxTemp = outdoor.tempC + eta * deltaT;
   const supplyTemp = ((1 - beta) * supplyWtxTemp) + (beta * outdoor.tempC);
-  const exhaustTempRaw = extract.tempC - eta * deltaT;
+  const exhaustTempRaw = extract.tempC - ((1 - beta) * eta * deltaT);
 
   const supplyDryMassFlowKgh = dryAirMassFlowKgh(supplyVolumeFlowM3h, supplyTemp);
   const exhaustDryMassFlowKgh = dryAirMassFlowKgh(exhaustVolumeFlowM3h, exhaustTempRaw);
