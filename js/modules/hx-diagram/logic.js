@@ -33,6 +33,10 @@ export function enthalpyKjKg(tempC, wKgKg) {
   return 1.006 * t + wKgKg * (2501 + 1.86 * t);
 }
 
+function tempFromEnthalpyAndW(enthalpy, wKgKg) {
+  return (enthalpy - wKgKg * 2501) / (1.006 + 1.86 * wKgKg);
+}
+
 export function airDensityKgm3(tempC, wKgKg) {
   const tK = num(tempC) + 273.15;
   const pv = (wKgKg * P_ATM_PA) / (0.62198 + wKgKg);
@@ -63,7 +67,18 @@ export function calculatePoint(input) {
   const tempC = num(input.tempC);
   const rhPercent = clamp(num(input.rhPercent), 0, 100);
   const w = humidityRatioKgKg(tempC, rhPercent);
-  const density = airDensityKgm3(tempC, w);
+  return pointFromW({
+    id: input.id,
+    label: input.label,
+    tempC,
+    wKgKg: w
+  });
+}
+
+export function pointFromW(input) {
+  const tempC = num(input.tempC);
+  const w = Math.max(0, num(input.wKgKg));
+  const rhPercent = relativeHumidityPercent(tempC, w);
   return {
     id: input.id ?? crypto.randomUUID(),
     label: String(input.label || 'Zustand'),
@@ -72,10 +87,108 @@ export function calculatePoint(input) {
     humidityRatioGkg: w * 1000,
     humidityRatio: w,
     enthalpyKjKg: enthalpyKjKg(tempC, w),
-    densityKgm3: density,
-    dewPointC: dewPointC(tempC, rhPercent),
+    densityKgm3: airDensityKgm3(tempC, w),
+    dewPointC: dewPointFromW(w),
     wetBulbC: wetBulbApproxC(tempC, rhPercent)
   };
+}
+
+function dewPointFromW(wKgKg) {
+  let low = -50;
+  let high = 80;
+  for (let i = 0; i < 60; i += 1) {
+    const mid = (low + high) / 2;
+    const ws = humidityRatioKgKg(mid, 100);
+    if (ws < wKgKg) low = mid;
+    else high = mid;
+  }
+  return (low + high) / 2;
+}
+
+function saturationPointAtW(wKgKg, label) {
+  return pointFromW({ label, tempC: dewPointFromW(wKgKg), wKgKg });
+}
+
+function uniqueByClose(points) {
+  const out = [];
+  points.forEach(point => {
+    const previous = out[out.length - 1];
+    if (!previous || Math.abs(previous.tempC - point.tempC) > 0.05 || Math.abs(previous.humidityRatioGkg - point.humidityRatioGkg) > 0.05) {
+      out.push(point);
+    }
+  });
+  return out;
+}
+
+export const PROCESS_OPTIONS = [
+  { value: 'heat', label: 'Erhitzen' },
+  { value: 'cool', label: 'Kühlen' },
+  { value: 'adiabatic', label: 'Erhitzen + adiabat befeuchten' },
+  { value: 'steam', label: 'Erhitzen + dampfbefeuchten' },
+  { value: 'cool-dehumidify', label: 'Kühlen + entfeuchten' }
+];
+
+export function processLabel(value) {
+  return PROCESS_OPTIONS.find(option => option.value === value)?.label ?? 'Automatisch';
+}
+
+function buildHeat(start, target) {
+  return uniqueByClose([
+    { ...start, label: '1 Ausgang' },
+    pointFromW({ label: '2 Erwärmen', tempC: target.tempC, wKgKg: start.humidityRatio }),
+    { ...target, label: '3 Ziel' }
+  ]);
+}
+
+function buildCool(start, target) {
+  const targetAtStartX = pointFromW({ label: '2 Kühlen', tempC: target.tempC, wKgKg: start.humidityRatio });
+  const saturated = saturationPointAtW(start.humidityRatio, '2 Taupunkt / Sättigung');
+  const points = [{ ...start, label: '1 Ausgang' }];
+  if (target.tempC < saturated.tempC) points.push(saturated);
+  points.push(targetAtStartX);
+  points.push({ ...target, label: `${points.length + 1} Ziel` });
+  return uniqueByClose(points);
+}
+
+function buildAdiabatic(start, target) {
+  const saturationForTargetX = saturationPointAtW(target.humidityRatio, '3 Sättigung nach adiabater Befeuchtung');
+  const hSaturation = saturationForTargetX.enthalpyKjKg;
+  const preheatT = tempFromEnthalpyAndW(hSaturation, start.humidityRatio);
+  return uniqueByClose([
+    { ...start, label: '1 Ausgang' },
+    pointFromW({ label: '2 Vorerwärmen', tempC: preheatT, wKgKg: start.humidityRatio }),
+    saturationForTargetX,
+    { ...target, label: '4 Nacherwärmen / Ziel' }
+  ]);
+}
+
+function buildSteam(start, target) {
+  return uniqueByClose([
+    { ...start, label: '1 Ausgang' },
+    pointFromW({ label: '2 Erwärmen', tempC: target.tempC, wKgKg: start.humidityRatio }),
+    { ...target, label: '3 Dampfbefeuchten / Ziel' }
+  ]);
+}
+
+function buildCoolDehumidify(start, target) {
+  const startSaturation = saturationPointAtW(start.humidityRatio, '2 Taupunkt / 100 % r.F.');
+  const targetSaturation = saturationPointAtW(target.humidityRatio, '3 Kühlen und entfeuchten');
+  const points = [{ ...start, label: '1 Ausgang' }];
+  if (start.tempC > startSaturation.tempC) points.push(startSaturation);
+  points.push(targetSaturation);
+  points.push({ ...target, label: '4 Nacherwärmen / Ziel' });
+  return uniqueByClose(points);
+}
+
+export function buildProcessPath(start, target, process) {
+  switch (process) {
+    case 'heat': return buildHeat(start, target);
+    case 'cool': return buildCool(start, target);
+    case 'adiabatic': return buildAdiabatic(start, target);
+    case 'steam': return buildSteam(start, target);
+    case 'cool-dehumidify': return buildCoolDehumidify(start, target);
+    default: return buildHeat(start, target);
+  }
 }
 
 export function classifyChange(start, target) {
@@ -99,16 +212,18 @@ export function classifyChange(start, target) {
 
 export function calculate(input) {
   const current = calculatePoint({
-    label: input.label,
+    label: 'Ausgangszustand',
     tempC: input.tempC,
     rhPercent: input.rhPercent
   });
   const target = calculatePoint({
-    label: `${input.label || 'Zustand'} Ziel`,
+    label: 'Zielzustand',
     tempC: input.targetTempC,
     rhPercent: input.targetRhPercent
   });
-  const changeType = classifyChange(current, target);
+  const selectedProcess = input.process || 'adiabatic';
+  const processPath = buildProcessPath(current, target, selectedProcess);
+  const changeType = processLabel(selectedProcess);
   const delta = {
     tempK: target.tempC - current.tempC,
     humidityGkg: target.humidityRatioGkg - current.humidityRatioGkg,
@@ -116,5 +231,5 @@ export function calculate(input) {
     rhPercent: target.rhPercent - current.rhPercent
   };
   const points = (input.points ?? []).map(point => calculatePoint(point));
-  return { current, target, changeType, delta, points };
+  return { current, target, changeType, selectedProcess, processPath, delta, points };
 }

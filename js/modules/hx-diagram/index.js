@@ -1,7 +1,7 @@
 import config from './config.js';
 import { state, savePoints } from './state.js';
-import { calculate, calculatePoint, humidityRatioKgKg } from './logic.js';
-import { card, field, renderModuleShell, bindCommonInputs, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
+import { calculate, calculatePoint, humidityRatioKgKg, PROCESS_OPTIONS } from './logic.js';
+import { card, field, renderModuleShell, bindCommonInputs, stack, grid, inlineStats, mainResult, segmented } from '../../core/renderer.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 
 function esc(value) {
@@ -28,6 +28,12 @@ function signedTempField(id, label, value) {
   </div>`;
 }
 
+function processCard(s) {
+  return card('Luftbehandlung wählen', `<div class="hx-process-grid">
+    ${PROCESS_OPTIONS.map(option => `<button type="button" data-segment="process" data-value="${esc(option.value)}" class="hx-process ${option.value === s.process ? 'is-active' : ''}">${esc(option.label)}</button>`).join('')}
+  </div>`, 'cyan', { compact: true });
+}
+
 function inputCard(s) {
   return card('Luftzustand erfassen', stack([
     field({ id: 'label', label: 'Bezeichnung', value: s.label, placeholder: 'z. B. Außenluft Winter', type: 'text', inputmode: 'text' }),
@@ -39,7 +45,8 @@ function inputCard(s) {
       signedTempField('targetTempC', 'Zieltemperatur θt', fmtInput(s.targetTempC, 2)),
       field({ id: 'targetRhPercent', label: 'Relative Zielfeuchte φ', unit: '%', value: fmtInput(s.targetRhPercent, 2) })
     ].join(''), 2), 'cyan', { compact: true }),
-    `<div class="tc-actions">${actionButton('Zustandsänderung hinzufügen', 'data-hx-add')} ${actionButton('Verlauf löschen', 'data-hx-clear', 'tc-action--ghost')}</div>`
+    processCard(s),
+    `<div class="tc-actions">${actionButton('Verlauf übernehmen', 'data-hx-add')} ${actionButton('Verlauf löschen', 'data-hx-clear', 'tc-action--ghost')}</div>`
   ].join('')), 'cyan');
 }
 
@@ -54,6 +61,17 @@ function readonlyStateCard(title, point) {
   ]), 'cyan');
 }
 
+function processPathCard(r) {
+  const rows = r.processPath.map((point, index) => `<div class="hx-process-step">
+    <strong>${esc(point.label || `Punkt ${index + 1}`)}</strong>
+    <span>${fmt(point.tempC, 2)} °C</span>
+    <span>${fmt(point.rhPercent, 0)} % r.F.</span>
+    <span>x ${fmt(point.humidityRatioGkg, 2)} g/kg</span>
+    <span>h ${fmt(point.enthalpyKjKg, 2)} kJ/kg</span>
+  </div>`).join('');
+  return card('Berechnete Zustandspunkte', `<div class="hx-process-path">${rows}</div>`, 'cyan');
+}
+
 function resultCard(r) {
   return stack([
     mainResult('Automatische Zustandsänderung', { label: 'Prozess', value: r.changeType, unit: '' }, [
@@ -62,6 +80,7 @@ function resultCard(r) {
       { label: 'Δh', value: fmt(r.delta.enthalpyKjKg, 2), unit: 'kJ/kg' },
       { label: 'Δφ', value: fmt(r.delta.rhPercent, 0), unit: '%' }
     ], 'cyan'),
+    processPathCard(r),
     `<div class="hx-state-grid">${readonlyStateCard('Ausgang', r.current)}${readonlyStateCard('Ziel', r.target)}</div>`
   ].join(''));
 }
@@ -77,8 +96,8 @@ function historyCard(points) {
   return card('Zustandsverlauf', body, 'cyan');
 }
 
-function chartCard(points, current, target) {
-  const chartPoints = points.length ? points : [current, target];
+function chartCard(points, current, target, processPath = []) {
+  const chartPoints = points.length ? points : (processPath.length ? processPath : [current, target]);
   return card('h,x-Diagramm', `<div class="hx-chart-wrap">${renderHxSvg(chartPoints)}</div><div class="formula">Näherung bei Luftdruck 1.013 hPa · x horizontal · θt vertikal</div>`, 'cyan');
 }
 
@@ -135,7 +154,7 @@ function view(s) {
   const r = calculate(s);
   const body = `<div class="hx-layout">
     <div class="hx-layout__left">${stack([inputCard(s), resultCard(r), historyCard(r.points)].join(''))}</div>
-    <div class="hx-layout__right">${chartCard(r.points, r.current, r.target)}</div>
+    <div class="hx-layout__right">${chartCard(r.points, r.current, r.target, r.processPath)}</div>
   </div>`;
   return renderModuleShell(config, `<div class="span-12">${body}</div>`);
 }
@@ -168,19 +187,15 @@ export default {
 
       rootEl.querySelector('[data-hx-add]')?.addEventListener('click', () => {
         const s = state.get();
-        const start = calculatePoint({
-          label: `${s.label || 'Zustand'} Start`,
-          tempC: s.tempC,
-          rhPercent: s.rhPercent
-        });
-        const target = calculatePoint({
-          label: `${s.label || 'Zustand'} Ziel`,
-          tempC: s.targetTempC,
-          rhPercent: s.targetRhPercent
-        });
-        const points = [...(s.points ?? []), start, target];
+        const result = calculate(s);
+        const labelled = result.processPath.map((point, index) => ({
+          label: `${s.label || 'Zustand'} · ${index + 1} ${point.label.replace(/^\d+\s*/, '')}`,
+          tempC: String(point.tempC),
+          rhPercent: String(point.rhPercent)
+        }));
+        const points = [...(s.points ?? []), ...labelled];
         savePoints(points);
-        state.set({ points, label: `Zustand ${Math.floor(points.length / 2) + 1}` });
+        state.set({ points, label: `Zustand ${points.length + 1}` });
       });
 
       rootEl.querySelector('[data-hx-clear]')?.addEventListener('click', () => {

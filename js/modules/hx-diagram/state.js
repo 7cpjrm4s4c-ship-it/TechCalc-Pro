@@ -18,9 +18,10 @@ export function savePoints(points) {
 
 export const state = createModuleState({
   label: 'Zustand 1',
-  tempC: '22',
-  rhPercent: '50',
-  targetTempC: '26',
-  targetRhPercent: '45',
+  tempC: '-10',
+  rhPercent: '90',
+  targetTempC: '21',
+  targetRhPercent: '50',
+  process: 'adiabatic',
   points: loadPoints()
 });

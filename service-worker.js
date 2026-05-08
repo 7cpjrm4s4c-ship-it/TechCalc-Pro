@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-hx-statechange-v1';
+const CACHE_NAME = 'techcalc-pro-hx-process-functions-v1';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',
