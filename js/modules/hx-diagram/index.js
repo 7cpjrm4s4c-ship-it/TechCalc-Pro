@@ -61,15 +61,17 @@ function readonlyStateCard(title, point) {
   ]), 'cyan');
 }
 
-function processPathCard(r) {
-  const rows = r.processPath.map((point, index) => `<div class="hx-process-step">
+function processPathCard(points) {
+  const safePoints = Array.isArray(points) ? points : [];
+  const rows = safePoints.map((point, index) => `<div class="hx-process-step">
     <strong>${esc(point.label || `Punkt ${index + 1}`)}</strong>
     <span><b>θt</b>${fmt(point.tempC, 2)} °C</span>
     <span><b>φ</b>${fmt(point.rhPercent, 0)} %</span>
     <span><b>x</b>${fmt(point.humidityRatioGkg, 2)} g/kg</span>
     <span><b>h</b>${fmt(point.enthalpyKjKg, 2)} kJ/kg</span>
   </div>`).join('');
-  return card('Berechnete Zustandspunkte', `<div class="hx-process-path">${rows}</div>`, 'cyan');
+  const body = rows || '<div class="empty-state">Kein Prozess ausgewählt</div>';
+  return card('Berechnete Zustandspunkte', `<div class="hx-process-path">${body}</div>`, 'cyan');
 }
 
 function resultCard(r) {
@@ -213,7 +215,7 @@ function view(s) {
   const r = calculate(s);
   const points = chartPointsFor(s, r);
   const body = `<div class="hx-layout">
-    <div class="hx-layout__left">${stack([inputCard(s, r), resultCard(r), historyCard(r.processes, s.activeProcessId), processPathCard(r)].join(''))}</div>
+    <div class="hx-layout__left">${stack([inputCard(s, r), resultCard(r), historyCard(r.processes, s.activeProcessId), processPathCard(points)].join(''))}</div>
     <div class="hx-layout__right">${chartCard(points)}</div>
   </div>`;
   return renderModuleShell(config, `<div class="span-12">${body}</div>`);
@@ -302,7 +304,7 @@ export default {
           const s = state.get();
           const processes = (s.processes ?? []).filter(process => process.id !== button.dataset.hxRemoveProcess);
           saveProcesses(processes);
-          state.set({ processes, activeProcessId: s.activeProcessId === button.dataset.hxRemoveProcess ? '' : s.activeProcessId });
+          state.set({ processes, activeProcessId: s.activeProcessId === button.dataset.hxRemoveProcess ? '' : s.activeProcessId, previewSuppressed: s.activeProcessId === button.dataset.hxRemoveProcess ? true : s.previewSuppressed });
         });
       });
     };

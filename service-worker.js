@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-v-pdf-hx-wrg-1';
+const CACHE_NAME = 'techcalc-pro-hx-empty-points-pdf-layout-20260508';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',

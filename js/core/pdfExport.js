@@ -5,23 +5,25 @@ function sanitizeText(value) {
   return String(value ?? '')
     .replace(/[\u2010-\u2015]/g, '-')
     .replace(/[·×]/g, 'x')
-    .replace(/[ϑθφΦρΔηṁν]/g, match => ({
-      'ϑ': 'Theta',
-      'θ': 'Theta',
+    .replace(/[ₚₜ₀₁₂₃₄₅₆₇₈₉]/g, '')
+    .replace(/[θϑφΦρΔηβṁṽ]/g, match => ({
+      'θ': 'theta',
+      'ϑ': 'theta',
       'φ': 'phi',
       'Φ': 'phi',
       'ρ': 'rho',
       'Δ': 'Delta',
       'η': 'eta',
+      'β': 'beta',
       'ṁ': 'm',
-      'ν': 'v'
+      'ṽ': 'V'
     }[match] || ''))
     .replace(/[°³²]/g, match => ({
-      '°': 'deg',
+      '°': ' deg',
       '³': '3',
       '²': '2'
     }[match] || ''))
-    .replace(/[^\x20-\x7E]/g, ' ')
+    .replace(/[^\x20-\x7EäöüÄÖÜß]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
