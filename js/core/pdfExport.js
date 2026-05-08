@@ -4,12 +4,25 @@ import { currentRoute } from './router.js';
 function sanitizeText(value) {
   return String(value ?? '')
     .replace(/[\u2010-\u2015]/g, '-')
-    .replace(/[·×]/g, '-').replace(/[ₚₜ₀₁₂₃₄₅₆₇₈₉]/g, '')
-    .replace(/[θϑφΦρΔηβṁṽ]/g, match => ({'θ':'theta','ϑ':'theta','φ':'phi','Φ':'phi','ρ':'rho','Δ':'Delta','η':'eta','β':'beta','ṁ':'m','ṽ':'V'}[match] || ''))
-    .replace(/[°³²]/g, match => ({'°':' deg','³':'3','²':'2'}[match] || ''))
-    .replace(/[^	
--äöüÄÖÜß]/g, ' ')
-    .replace(/[ \t]+/g, ' ')
+    .replace(/[·×]/g, 'x')
+    .replace(/[ϑθφΦρΔηṁν]/g, match => ({
+      'ϑ': 'Theta',
+      'θ': 'Theta',
+      'φ': 'phi',
+      'Φ': 'phi',
+      'ρ': 'rho',
+      'Δ': 'Delta',
+      'η': 'eta',
+      'ṁ': 'm',
+      'ν': 'v'
+    }[match] || ''))
+    .replace(/[°³²]/g, match => ({
+      '°': 'deg',
+      '³': '3',
+      '²': '2'
+    }[match] || ''))
+    .replace(/[^\x20-\x7E]/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
