@@ -80,7 +80,6 @@ function resultCard(r) {
       { label: 'Δh', value: fmt(r.delta.enthalpyKjKg, 2), unit: 'kJ/kg' },
       { label: 'Δφ', value: fmt(r.delta.rhPercent, 0), unit: '%' }
     ], 'cyan'),
-    processPathCard(r),
     `<div class="hx-state-grid">${readonlyStateCard('Ausgang', r.current)}${readonlyStateCard('Ziel', r.target)}</div>`
   ].join(''));
 }
@@ -185,15 +184,30 @@ function renderHxSvg(points = []) {
 }
 
 function chartPointsFor(s, r) {
-  if (r.activeProcess?.points?.length) return r.activeProcess.points.map(p => calculatePoint(p));
   return s.previewSuppressed ? [] : r.processPath;
+}
+
+function processInputPatch(process) {
+  const points = Array.isArray(process?.points) ? process.points : [];
+  const first = points[0] ?? {};
+  const last = points[points.length - 1] ?? first;
+  return {
+    activeProcessId: process?.id || '',
+    previewSuppressed: false,
+    label: process?.label || 'Zustand',
+    tempC: String(first.tempC ?? ''),
+    rhPercent: String(first.rhPercent ?? ''),
+    targetTempC: String(last.tempC ?? ''),
+    targetRhPercent: String(last.rhPercent ?? ''),
+    process: process?.process || 'heat'
+  };
 }
 
 function view(s) {
   const r = calculate(s);
   const points = chartPointsFor(s, r);
   const body = `<div class="hx-layout">
-    <div class="hx-layout__left">${stack([inputCard(s, r), resultCard(r), historyCard(r.processes, s.activeProcessId)].join(''))}</div>
+    <div class="hx-layout__left">${stack([inputCard(s, r), resultCard(r), historyCard(r.processes, s.activeProcessId), processPathCard(r)].join(''))}</div>
     <div class="hx-layout__right">${chartCard(points)}</div>
   </div>`;
   return renderModuleShell(config, `<div class="span-12">${body}</div>`);
@@ -207,9 +221,9 @@ function toggleNumericSign(value) {
 
 function bindHxInputs(rootEl, renderState) {
   rootEl.querySelectorAll('[data-field]').forEach(el => {
-    const apply = () => renderState.set({ [el.dataset.field]: el.value, previewSuppressed: false, activeProcessId: '' });
+    const apply = () => renderState.set({ [el.dataset.field]: el.value, previewSuppressed: false });
     if (el.matches('input')) {
-      el.addEventListener('input', () => renderState.set({ [el.dataset.field]: el.value, previewSuppressed: false, activeProcessId: '' }, { notify: false }));
+      el.addEventListener('input', () => renderState.set({ [el.dataset.field]: el.value, previewSuppressed: false }, { notify: false }));
       el.addEventListener('change', apply);
       el.addEventListener('blur', apply);
     } else {
@@ -217,7 +231,7 @@ function bindHxInputs(rootEl, renderState) {
     }
   });
   rootEl.querySelectorAll('[data-segment]').forEach(btn => {
-    btn.addEventListener('click', () => renderState.set({ [btn.dataset.segment]: btn.dataset.value, previewSuppressed: false, activeProcessId: '' }));
+    btn.addEventListener('click', () => renderState.set({ [btn.dataset.segment]: btn.dataset.value, previewSuppressed: false }));
   });
 }
 
@@ -236,15 +250,17 @@ export default {
         button.addEventListener('click', () => {
           const id = button.dataset.hxSign;
           const input = rootEl.querySelector(`[data-field="${id}"]`);
-          state.set({ [id]: toggleNumericSign(input?.value), previewSuppressed: false, activeProcessId: '' });
+          state.set({ [id]: toggleNumericSign(input?.value), previewSuppressed: false });
         });
       });
 
       rootEl.querySelector('[data-hx-add]')?.addEventListener('click', () => {
         const s = state.get();
         const result = calculate(s);
+        const existingId = s.activeProcessId || '';
+        const nextId = existingId || crypto.randomUUID();
         const process = {
-          id: crypto.randomUUID(),
+          id: nextId,
           label: s.label || `Prozess ${(s.processes ?? []).length + 1}`,
           process: result.selectedProcess,
           processLabel: result.changeType,
@@ -254,9 +270,12 @@ export default {
             rhPercent: String(point.rhPercent)
           }))
         };
-        const processes = [...(s.processes ?? []), process];
+        const list = Array.isArray(s.processes) ? s.processes : [];
+        const processes = existingId && list.some(item => item.id === existingId)
+          ? list.map(item => (item.id === existingId ? process : item))
+          : [...list, process];
         saveProcesses(processes);
-        state.set({ processes, activeProcessId: '', previewSuppressed: true, label: `Zustand ${processes.length + 1}` });
+        state.set({ processes, ...processInputPatch(process) });
       });
 
       rootEl.querySelector('[data-hx-clear-active]')?.addEventListener('click', () => {
@@ -266,7 +285,9 @@ export default {
       rootEl.querySelectorAll('[data-hx-select-process]').forEach(row => {
         row.addEventListener('click', event => {
           if (event.target.closest('[data-hx-remove-process]')) return;
-          state.set({ activeProcessId: row.dataset.hxSelectProcess, previewSuppressed: false });
+          const s = state.get();
+          const process = (s.processes ?? []).find(item => item.id === row.dataset.hxSelectProcess);
+          if (process) state.set(processInputPatch(process));
         });
       });
 
