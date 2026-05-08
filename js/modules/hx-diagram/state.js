@@ -1,19 +1,38 @@
 import { createModuleState } from '../../core/state.js';
 
-const STORAGE_KEY = 'techcalc:hx-diagram:points';
+const STORAGE_KEY = 'techcalc:hx-diagram:processes';
+const LEGACY_POINTS_KEY = 'techcalc:hx-diagram:points';
 
-function loadPoints() {
+function loadProcesses() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
+    if (Array.isArray(parsed)) return parsed;
   } catch {
-    return [];
+    // continue with legacy fallback
   }
+
+  try {
+    const legacyRaw = localStorage.getItem(LEGACY_POINTS_KEY);
+    const legacy = legacyRaw ? JSON.parse(legacyRaw) : [];
+    if (Array.isArray(legacy) && legacy.length) {
+      return [{
+        id: crypto.randomUUID(),
+        label: 'Importierter Zustandsverlauf',
+        process: 'legacy',
+        processLabel: 'Importiert',
+        points: legacy
+      }];
+    }
+  } catch {
+    // ignore legacy errors
+  }
+
+  return [];
 }
 
-export function savePoints(points) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(points ?? []));
+export function saveProcesses(processes) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(processes ?? []));
 }
 
 export const state = createModuleState({
@@ -23,5 +42,7 @@ export const state = createModuleState({
   targetTempC: '21',
   targetRhPercent: '50',
   process: 'adiabatic',
-  points: loadPoints()
+  processes: loadProcesses(),
+  activeProcessId: '',
+  previewSuppressed: false
 });

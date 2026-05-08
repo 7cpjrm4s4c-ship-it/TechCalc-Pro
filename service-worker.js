@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-hx-display-runtime-fix-v1';
+const CACHE_NAME = 'techcalc-pro-v-hx-process-history-1';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',
@@ -12,37 +12,19 @@ const ASSETS = [
   './js/modules/unit-converter/index.js','./js/modules/unit-converter/config.js','./js/modules/unit-converter/logic.js','./js/modules/unit-converter/state.js',
   './assets/icons/icon-16.png','./assets/icons/icon-32.png','./assets/icons/icon-192.png','./assets/icons/icon-512.png','./assets/icons/apple-touch-icon.png','./assets/icons/favicon.ico'
 ];
-
 self.addEventListener('install', event => {
-  self.skipWaiting();
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+  self.skipWaiting();
 });
-
 self.addEventListener('activate', event => {
-  event.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(keys.map(key => key === CACHE_NAME ? null : caches.delete(key)));
-    await self.clients.claim();
-    const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    clients.forEach(client => client.postMessage({ type: 'TECHCALC_CACHE_UPDATED', cache: CACHE_NAME }));
-  })());
+  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))));
+  self.clients.claim();
 });
-
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
-  const requestUrl = new URL(event.request.url);
-  if (requestUrl.origin !== self.location.origin) return;
-
-  event.respondWith((async () => {
-    const cache = await caches.open(CACHE_NAME);
-    try {
-      const response = await fetch(event.request, { cache: 'no-store' });
-      if (response && response.ok) await cache.put(event.request, response.clone());
-      return response;
-    } catch (error) {
-      const cached = await cache.match(event.request);
-      if (cached) return cached;
-      return cache.match('./index.html');
-    }
-  })());
+  event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
+    const copy = response.clone();
+    caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+    return response;
+  }).catch(() => caches.match('./index.html'))));
 });
