@@ -4,6 +4,16 @@ import { calculate, calculatePoint, humidityRatioKgKg, PROCESS_OPTIONS } from '.
 import { card, field, renderModuleShell, bindCommonInputs, stack, grid, inlineStats, mainResult, segmented } from '../../core/renderer.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 
+
+function hxFmt(value, digits = 2) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return '—';
+  return n.toLocaleString('de-DE', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: digits
+  });
+}
+
 function esc(value) {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
