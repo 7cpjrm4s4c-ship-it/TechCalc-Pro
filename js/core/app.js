@@ -37,4 +37,18 @@ function updateHeaderTransparency(){
 window.addEventListener('scroll', updateHeaderTransparency, { passive: true });
 updateHeaderTransparency();
 
-if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js'));
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event.data?.type !== 'TECHCALC_CACHE_UPDATED') return;
+    const cacheName = event.data.cache || 'updated';
+    const stored = sessionStorage.getItem('techcalc-active-cache');
+    if (stored !== cacheName) {
+      sessionStorage.setItem('techcalc-active-cache', cacheName);
+      window.location.reload();
+    }
+  });
+
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').then(registration => registration.update());
+  });
+}

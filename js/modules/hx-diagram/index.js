@@ -28,9 +28,18 @@ function signedTempField(id, label, value) {
   </div>`;
 }
 
+function availableProcesses(s) {
+  const t0 = Number(String(s.tempC ?? 0).replace(',', '.')) || 0;
+  const t1 = Number(String(s.targetTempC ?? 0).replace(',', '.')) || 0;
+  if (t0 < t1) return PROCESS_OPTIONS.filter(option => !['cool', 'cool-dehumidify'].includes(option.value));
+  if (t0 > t1) return PROCESS_OPTIONS.filter(option => ['cool', 'cool-dehumidify'].includes(option.value));
+  return PROCESS_OPTIONS;
+}
+
 function processCard(s) {
+  const options = availableProcesses(s);
   return card('Luftbehandlung wählen', `<div class="hx-process-grid">
-    ${PROCESS_OPTIONS.map(option => `<button type="button" data-segment="process" data-value="${esc(option.value)}" class="hx-process ${option.value === s.process ? 'is-active' : ''}">${esc(option.label)}</button>`).join('')}
+    ${options.map(option => `<button type="button" data-segment="process" data-value="${esc(option.value)}" class="hx-process ${option.value === s.process ? 'is-active' : ''}">${esc(option.label)}</button>`).join('')}
   </div>`, 'cyan', { compact: true });
 }
 
@@ -52,22 +61,22 @@ function inputCard(s) {
 
 function readonlyStateCard(title, point) {
   return card(title, inlineStats([
-    { label: 'Temperatur θt', value: fmt(point.tempC, 2), unit: '°C' },
-    { label: 'rel. Feuchte φ', value: fmt(point.rhPercent, 0), unit: '%' },
-    { label: 'Feuchtegehalt x', value: fmt(point.humidityRatioGkg, 2), unit: 'g/kg' },
-    { label: 'Enthalpie h', value: fmt(point.enthalpyKjKg, 2), unit: 'kJ/kg' },
-    { label: 'Dichte ρ', value: fmt(point.densityKgm3, 3), unit: 'kg/m³' },
-    { label: 'Taupunkt θp', value: fmt(point.dewPointC, 2), unit: '°C' }
+    { label: 'Temperatur θt', value: hxFmt(point.tempC, 2), unit: '°C' },
+    { label: 'rel. Feuchte φ', value: hxFmt(point.rhPercent, 0), unit: '%' },
+    { label: 'Feuchtegehalt x', value: hxFmt(point.humidityRatioGkg, 2), unit: 'g/kg' },
+    { label: 'Enthalpie h', value: hxFmt(point.enthalpyKjKg, 2), unit: 'kJ/kg' },
+    { label: 'Dichte ρ', value: hxFmt(point.densityKgm3, 3), unit: 'kg/m³' },
+    { label: 'Taupunkt θp', value: hxFmt(point.dewPointC, 2), unit: '°C' }
   ]), 'cyan');
 }
 
 function processPathCard(r) {
   const rows = r.processPath.map((point, index) => `<div class="hx-process-step">
     <strong>${esc(point.label || `Punkt ${index + 1}`)}</strong>
-    <span><b>θt</b>${fmt(point.tempC, 2)} °C</span>
-    <span><b>φ</b>${fmt(point.rhPercent, 0)} %</span>
-    <span><b>x</b>${fmt(point.humidityRatioGkg, 2)} g/kg</span>
-    <span><b>h</b>${fmt(point.enthalpyKjKg, 2)} kJ/kg</span>
+    <span><b>θt</b>${hxFmt(point.tempC, 2)} °C</span>
+    <span><b>φ</b>${hxFmt(point.rhPercent, 0)} %</span>
+    <span><b>x</b>${hxFmt(point.humidityRatioGkg, 2)} g/kg</span>
+    <span><b>h</b>${hxFmt(point.enthalpyKjKg, 2)} kJ/kg</span>
   </div>`).join('');
   return card('Berechnete Zustandspunkte', `<div class="hx-process-path">${rows}</div>`, 'cyan');
 }
@@ -75,10 +84,10 @@ function processPathCard(r) {
 function resultCard(r) {
   return stack([
     mainResult('Automatische Zustandsänderung', { label: 'Prozess', value: r.changeType, unit: '' }, [
-      { label: 'Δθ', value: fmt(r.delta.tempK, 2), unit: 'K' },
-      { label: 'Δx', value: fmt(r.delta.humidityGkg, 2), unit: 'g/kg' },
-      { label: 'Δh', value: fmt(r.delta.enthalpyKjKg, 2), unit: 'kJ/kg' },
-      { label: 'Δφ', value: fmt(r.delta.rhPercent, 0), unit: '%' }
+      { label: 'Δθ', value: hxFmt(r.delta.tempK, 2), unit: 'K' },
+      { label: 'Δx', value: hxFmt(r.delta.humidityGkg, 2), unit: 'g/kg' },
+      { label: 'Δh', value: hxFmt(r.delta.enthalpyKjKg, 2), unit: 'kJ/kg' },
+      { label: 'Δφ', value: hxFmt(r.delta.rhPercent, 0), unit: '%' }
     ], 'cyan'),
     processPathCard(r),
     `<div class="hx-state-grid">${readonlyStateCard('Ausgang', r.current)}${readonlyStateCard('Ziel', r.target)}</div>`
@@ -88,8 +97,8 @@ function resultCard(r) {
 function historyCard(points) {
   const body = points.length ? `<div class="hx-history">
     ${points.map((point, index) => `<div class="hx-history__row">
-      <div><strong>${esc(index + 1)}. ${esc(point.label)}</strong><small>${fmt(point.tempC, 2)} °C · ${fmt(point.rhPercent, 0)} % r.F.</small></div>
-      <div class="hx-history__values"><span>x ${fmt(point.humidityRatioGkg, 2)} g/kg</span><span>h ${fmt(point.enthalpyKjKg, 2)} kJ/kg</span></div>
+      <div><strong>${esc(index + 1)}. ${esc(point.label)}</strong><small>${hxFmt(point.tempC, 2)} °C · ${hxFmt(point.rhPercent, 0)} % r.F.</small></div>
+      <div class="hx-history__values"><span>x ${hxFmt(point.humidityRatioGkg, 2)} g/kg</span><span>h ${hxFmt(point.enthalpyKjKg, 2)} kJ/kg</span></div>
       <button type="button" class="mini-button" data-hx-remove="${esc(point.id)}" aria-label="Zustand entfernen">×</button>
     </div>`).join('')}
   </div>` : '<div class="empty-state">Noch keine Luftzustände gespeichert</div>';
@@ -99,6 +108,28 @@ function historyCard(points) {
 function chartCard(points, current, target, processPath = []) {
   const chartPoints = points.length ? points : (processPath.length ? processPath : [current, target]);
   return card('h,x-Diagramm', `<div class="hx-chart-wrap">${renderHxSvg(chartPoints)}</div><div class="formula">Näherung bei Luftdruck 1.013 hPa · x horizontal · θt vertikal</div>`, 'cyan');
+}
+
+
+function buildStatePath(points, px, py) {
+  if (!points.length) return '';
+  const parts = [`M${px(points[0].humidityRatioGkg).toFixed(1)},${py(points[0].tempC).toFixed(1)}`];
+  for (let i = 1; i < points.length; i += 1) {
+    const a = points[i - 1];
+    const b = points[i];
+    const bothSaturated = a.rhPercent >= 99 && b.rhPercent >= 99 && Math.abs(a.tempC - b.tempC) > 0.2;
+    if (bothSaturated) {
+      const steps = Math.max(8, Math.ceil(Math.abs(b.tempC - a.tempC) / 1.5));
+      for (let j = 1; j <= steps; j += 1) {
+        const t = a.tempC + (b.tempC - a.tempC) * (j / steps);
+        const x = humidityRatioKgKg(t, 100) * 1000;
+        parts.push(`L${px(x).toFixed(1)},${py(t).toFixed(1)}`);
+      }
+    } else {
+      parts.push(`L${px(b.humidityRatioGkg).toFixed(1)},${py(b.tempC).toFixed(1)}`);
+    }
+  }
+  return parts.join(' ');
 }
 
 function renderHxSvg(points) {
@@ -124,16 +155,18 @@ function renderHxSvg(points) {
     xLines.push(`<line x1="${px(x)}" y1="${padT}" x2="${px(x)}" y2="${h - padB}" class="hx-grid-line"/><text x="${px(x)}" y="${h - padB + 20}" class="hx-axis-label" text-anchor="middle">${x}</text>`);
   }
 
-  const rhCurves = [10, 20, 40, 60, 80, 100].map(rh => {
+  const rhCurves = [10, 20, 30, 40, 50, 60, 80, 100].map((rh, idx) => {
     const d = [];
     for (let t = tMin; t <= tMax; t += 1) {
       const x = humidityRatioKgKg(t, rh) * 1000;
       if (x <= xMax) d.push(`${d.length ? 'L' : 'M'}${px(x).toFixed(1)},${py(t).toFixed(1)}`);
     }
-    return `<path d="${d.join(' ')}" class="hx-rh hx-rh-${rh}"/><text x="${px(Math.min(xMax, humidityRatioKgKg(Math.min(44, tMax), rh) * 1000))}" y="${py(Math.min(44, tMax)) - 4}" class="hx-rh-label">${rh}%</text>`;
+    const labelT = Math.min(46, 18 + idx * 4);
+    const labelX = Math.min(xMax - 0.8, humidityRatioKgKg(labelT, rh) * 1000);
+    return `<path d="${d.join(' ')}" class="hx-rh hx-rh-${rh}"/><text x="${px(labelX)}" y="${py(labelT) - 4}" class="hx-rh-label">${rh}%</text>`;
   }).join('');
 
-  const path = points.map((point, index) => `${index ? 'L' : 'M'}${px(point.humidityRatioGkg).toFixed(1)},${py(point.tempC).toFixed(1)}`).join(' ');
+  const path = buildStatePath(points, px, py);
   const markers = points.map((point, index) => {
     const cx = px(point.humidityRatioGkg);
     const cy = py(point.tempC);

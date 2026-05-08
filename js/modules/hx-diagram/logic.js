@@ -228,6 +228,14 @@ export function classifyChange(start, target) {
   return dt > 0 ? 'Erhitzen' : 'Kühlen';
 }
 
+function normalizeSelectedProcess(process, current, target) {
+  const t0 = current.tempC;
+  const t1 = target.tempC;
+  if (t0 < t1 && ['cool', 'cool-dehumidify'].includes(process)) return 'heat';
+  if (t0 > t1 && ['heat', 'adiabatic', 'steam'].includes(process)) return 'cool-dehumidify';
+  return process || 'heat';
+}
+
 export function calculate(input) {
   const current = calculatePoint({
     label: 'Ausgangszustand',
@@ -239,7 +247,7 @@ export function calculate(input) {
     tempC: input.targetTempC,
     rhPercent: input.targetRhPercent
   });
-  const selectedProcess = input.process || 'adiabatic';
+  const selectedProcess = normalizeSelectedProcess(input.process || 'adiabatic', current, target);
   const processPath = buildProcessPath(current, target, selectedProcess);
   const changeType = processLabel(selectedProcess);
   const delta = {
