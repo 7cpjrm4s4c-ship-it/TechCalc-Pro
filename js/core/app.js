@@ -1,6 +1,7 @@
 import { modules } from './registry.js';
 import { initRouter, currentRoute } from './router.js';
 import { renderNavigation, renderQuickAccessSettings } from './navigation.js';
+import { exportCurrentModulePdf } from './pdfExport.js';
 import heatingCooling from '../modules/heating-cooling/index.js';
 import ventilation from '../modules/ventilation/index.js';
 import pipeSizing from '../modules/pipe-sizing/index.js';
@@ -27,6 +28,7 @@ const settingsPanel = document.getElementById('settingsPanel');
 const closeSettings = document.getElementById('closeSettings');
 settingsButton.addEventListener('click', () => { settingsPanel.hidden = !settingsPanel.hidden; settingsButton.setAttribute('aria-expanded', String(!settingsPanel.hidden)); });
 closeSettings.addEventListener('click', () => { settingsPanel.hidden = true; settingsButton.setAttribute('aria-expanded','false'); });
+document.getElementById('pdfExportButton')?.addEventListener('click', () => exportCurrentModulePdf());
 
 
 const header = document.querySelector('.app-header');
@@ -37,18 +39,20 @@ function updateHeaderTransparency(){
 window.addEventListener('scroll', updateHeaderTransparency, { passive: true });
 updateHeaderTransparency();
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener('message', event => {
-    if (event.data?.type !== 'TECHCALC_CACHE_UPDATED') return;
-    const cacheName = event.data.cache || 'updated';
-    const stored = sessionStorage.getItem('techcalc-active-cache');
-    if (stored !== cacheName) {
-      sessionStorage.setItem('techcalc-active-cache', cacheName);
-      window.location.reload();
-    }
+if ('serviceWorker' in navigator) window.addEventListener('load', () => {
+  navigator.serviceWorker.register('./service-worker.js').then(reg => {
+    reg.update();
+    reg.addEventListener('updatefound', () => {
+      const sw = reg.installing;
+      sw?.addEventListener('statechange', () => {
+        if (sw.state === 'installed' && navigator.serviceWorker.controller) window.location.reload();
+      });
+    });
   });
+});
 
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js').then(registration => registration.update());
-  });
-}
+if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', event => {
+  if (event.data?.type === 'TECHCALC_SW_UPDATED') {
+    console.info('TechCalc Pro cache updated');
+  }
+});

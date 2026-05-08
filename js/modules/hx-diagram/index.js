@@ -187,6 +187,12 @@ function chartPointsFor(s, r) {
   return s.previewSuppressed ? [] : r.processPath;
 }
 
+function clampRh(value) {
+  const n = Number(String(value ?? '').replace(',', '.'));
+  if (!Number.isFinite(n)) return '';
+  return String(Math.min(100, Math.max(0, Math.round(n * 100) / 100)));
+}
+
 function processInputPatch(process) {
   const points = Array.isArray(process?.points) ? process.points : [];
   const first = points[0] ?? {};
@@ -196,9 +202,9 @@ function processInputPatch(process) {
     previewSuppressed: false,
     label: process?.label || 'Zustand',
     tempC: String(first.tempC ?? ''),
-    rhPercent: String(first.rhPercent ?? ''),
+    rhPercent: clampRh(first.rhPercent),
     targetTempC: String(last.tempC ?? ''),
-    targetRhPercent: String(last.rhPercent ?? ''),
+    targetRhPercent: clampRh(last.rhPercent),
     process: process?.process || 'heat'
   };
 }
@@ -267,7 +273,7 @@ export default {
           points: result.processPath.map(point => ({
             label: point.label,
             tempC: String(point.tempC),
-            rhPercent: String(point.rhPercent)
+            rhPercent: clampRh(point.rhPercent)
           }))
         };
         const list = Array.isArray(s.processes) ? s.processes : [];

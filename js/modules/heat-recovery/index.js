@@ -99,11 +99,10 @@ function mixingInputCard(s) {
 
 function mixingOutputCard(r) {
   return card('Mischluft — Ausgabe', `<div class="wrg-group-grid">
-    ${readonlyAirCard('Mischluft / Zuluft', r.mixed, 'cyan', { includeMass: false })}
+    ${readonlyAirCard('Mischluft / Zuluft', r.mixed, 'cyan', { includeMass: false, includeVolume: true })}
     ${card('Mischungsverhältnis', inlineStats([
       { label: 'Außenluftanteil', value: fmt(r.outdoorShare, 0), unit: '%' },
       { label: 'Umluftanteil', value: fmt(r.recircShare, 0), unit: '%' },
-      { label: 'Gesamtvolumenstrom', value: fmt(r.mixed.volumeFlowM3h, 0), unit: 'm³/h' },
       { label: 'Massenstrom', value: fmt(r.mixed.massFlowKgh, 2), unit: 'kg/h' },
       { label: 'x', value: fmt(r.mixed.humidityRatioGkg, 2), unit: 'g/kg' }
     ]), 'cyan')}
