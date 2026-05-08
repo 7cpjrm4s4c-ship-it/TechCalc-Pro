@@ -953,7 +953,7 @@ button,
 /* h,x Diagramm module */
 .hx-layout {
   display: grid;
-  grid-template-columns: minmax(360px, .72fr) minmax(0, 1.28fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--ui-gap);
   align-items: start;
 }
@@ -995,7 +995,7 @@ button,
   display: block;
   width: 100%;
   height: auto;
-  min-height: 420px;
+  min-height: 460px;
 }
 .hx-chart-bg {
   fill: rgba(8, 14, 22, .72);
@@ -1036,7 +1036,7 @@ button,
 }
 .hx-point text {
   fill: var(--color-text);
-  font: 800 11px Arial, Helvetica, sans-serif;
+  font: 900 12px Arial, Helvetica, sans-serif;
 }
 .hx-history {
   display: flex;
@@ -1145,6 +1145,71 @@ button,
   }
   .hx-process-step {
     grid-template-columns: 1fr 1fr;
+  }
+  .hx-process-step strong {
+    grid-column: 1 / -1;
+  }
+}
+
+
+/* h,x equalized desktop layout + readable state-point output */
+.hx-layout {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+}
+.hx-layout__right {
+  display: flex;
+  flex-direction: column;
+}
+.hx-layout__right > .card {
+  flex: 1;
+}
+.hx-chart-wrap {
+  min-height: 0;
+}
+.hx-chart {
+  min-height: clamp(420px, 48vh, 640px);
+}
+.hx-process-step {
+  grid-template-columns: minmax(130px, 1.15fr) repeat(4, minmax(0, 1fr));
+  overflow: hidden;
+}
+.hx-process-step strong,
+.hx-process-step span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hx-process-step span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--color-text);
+}
+.hx-process-step span b {
+  color: var(--color-muted);
+  font-size: 10px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.hx-point text {
+  paint-order: stroke;
+  stroke: rgba(4,10,16,.95);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+@media (max-width: 1023px) {
+  .hx-layout {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 767px) {
+  .hx-chart {
+    min-height: 360px;
+  }
+  .hx-process-step {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .hx-process-step strong {
     grid-column: 1 / -1;

@@ -64,10 +64,10 @@ function readonlyStateCard(title, point) {
 function processPathCard(r) {
   const rows = r.processPath.map((point, index) => `<div class="hx-process-step">
     <strong>${esc(point.label || `Punkt ${index + 1}`)}</strong>
-    <span>${fmt(point.tempC, 2)} °C</span>
-    <span>${fmt(point.rhPercent, 0)} % r.F.</span>
-    <span>x ${fmt(point.humidityRatioGkg, 2)} g/kg</span>
-    <span>h ${fmt(point.enthalpyKjKg, 2)} kJ/kg</span>
+    <span><b>θt</b>${fmt(point.tempC, 2)} °C</span>
+    <span><b>φ</b>${fmt(point.rhPercent, 0)} %</span>
+    <span><b>x</b>${fmt(point.humidityRatioGkg, 2)} g/kg</span>
+    <span><b>h</b>${fmt(point.enthalpyKjKg, 2)} kJ/kg</span>
   </div>`).join('');
   return card('Berechnete Zustandspunkte', `<div class="hx-process-path">${rows}</div>`, 'cyan');
 }
@@ -134,10 +134,17 @@ function renderHxSvg(points) {
   }).join('');
 
   const path = points.map((point, index) => `${index ? 'L' : 'M'}${px(point.humidityRatioGkg).toFixed(1)},${py(point.tempC).toFixed(1)}`).join(' ');
-  const markers = points.map((point, index) => `<g class="hx-point">
-    <circle cx="${px(point.humidityRatioGkg)}" cy="${py(point.tempC)}" r="5"/>
-    <text x="${px(point.humidityRatioGkg) + 8}" y="${py(point.tempC) - 8}">${esc(index + 1)} ${esc(point.label)}</text>
-  </g>`).join('');
+  const markers = points.map((point, index) => {
+    const cx = px(point.humidityRatioGkg);
+    const cy = py(point.tempC);
+    const nearRight = cx > w - 150;
+    const labelX = nearRight ? cx - 10 : cx + 10;
+    const anchor = nearRight ? 'end' : 'start';
+    return `<g class="hx-point">
+      <circle cx="${cx}" cy="${cy}" r="5"/>
+      <text x="${labelX}" y="${cy - 8}" text-anchor="${anchor}">${esc(index + 1)}</text>
+    </g>`;
+  }).join('');
 
   return `<svg class="hx-chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="h,x-Diagramm">
     <rect x="0" y="0" width="${w}" height="${h}" rx="18" class="hx-chart-bg"/>
