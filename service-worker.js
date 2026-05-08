@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-hx-empty-points-pdf-layout-20260508';
+const CACHE_NAME = 'techcalc-pro-final-pdf-export-v1';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',
@@ -14,34 +14,36 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
   self.skipWaiting();
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)));
+    await Promise.all(keys.map(key => key === CACHE_NAME ? null : caches.delete(key)));
     await self.clients.claim();
-    const clients = await self.clients.matchAll({ type: 'window' });
-    clients.forEach(client => client.postMessage({ type: 'TECHCALC_SW_UPDATED' }));
+    const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    clients.forEach(client => client.postMessage({ type: 'TECHCALC_CACHE_UPDATED', cache: CACHE_NAME }));
   })());
 });
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
-  const url = new URL(event.request.url);
-  if (url.origin !== location.origin) return;
+  if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
+  const requestUrl = new URL(event.request.url);
+  if (requestUrl.origin !== self.location.origin) return;
 
   event.respondWith((async () => {
+    const cache = await caches.open(CACHE_NAME);
     try {
-      const networkResponse = await fetch(event.request, { cache: 'no-store' });
-      const cache = await caches.open(CACHE_NAME);
-      cache.put(event.request, networkResponse.clone());
-      return networkResponse;
-    } catch {
-      const cached = await caches.match(event.request);
-      return cached || caches.match('./index.html');
+      const response = await fetch(event.request, { cache: 'reload' });
+      if (response && response.ok && event.request.url.startsWith(self.location.origin)) await cache.put(event.request, response.clone());
+      return response;
+    } catch (error) {
+      const cached = await cache.match(event.request);
+      if (cached) return cached;
+      return cache.match('./index.html');
     }
   })());
 });

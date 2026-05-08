@@ -44,10 +44,21 @@
         <strong>Einstellungen</strong>
         <button class="mini-button" id="closeSettings" type="button">Schließen</button>
       </div>
-      <section class="settings-export">
-        <h3>PDF Export</h3>
-        <p>Exportiert die sichtbaren Ergebnisse des aktuellen Moduls als PDF.</p>
-        <button class="action-button" id="pdfExportButton" type="button">Aktuelles Modul als PDF exportieren</button>
+      <section>
+        <h3>PDF-Export</h3>
+        <p>Projektdaten für technische Berechnungsprotokolle. Die Daten werden lokal im Browser gespeichert.</p>
+        <div class="settings-form" id="projectPdfSettings">
+          <label>Auftraggeber<input id="pdfClient" type="text" autocomplete="organization" placeholder="z. B. Muster GmbH"></label>
+          <label>Projektbezeichnung<input id="pdfProject" type="text" placeholder="z. B. Neubau Bürogebäude Nord"></label>
+          <label>Projektnummer<input id="pdfProjectNo" type="text" placeholder="z. B. 2025-041"></label>
+          <label>Sachbearbeiter<input id="pdfEngineer" type="text" placeholder="z. B. Max Mustermann"></label>
+          <label>Firmenlogo<input id="pdfLogo" type="file" accept="image/png,image/jpeg,image/svg+xml"></label>
+          <div class="settings-actions">
+            <button class="mini-button" id="clearPdfLogo" type="button">Logo entfernen</button>
+            <button class="mini-button mini-button--primary" id="exportPdfButton" type="button">PDF exportieren</button>
+          </div>
+          <div id="pdfLogoPreview" class="logo-preview" aria-live="polite"></div>
+        </div>
       </section>
       <section>
         <h3>Mobile Schnellzugriffe</h3>
