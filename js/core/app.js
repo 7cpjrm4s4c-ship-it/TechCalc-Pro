@@ -27,8 +27,48 @@ window.addEventListener('resize', () => renderNavigation(currentRoute()));
 const settingsButton = document.getElementById('settingsButton');
 const settingsPanel = document.getElementById('settingsPanel');
 const closeSettings = document.getElementById('closeSettings');
-settingsButton.addEventListener('click', () => { settingsPanel.hidden = !settingsPanel.hidden; settingsButton.setAttribute('aria-expanded', String(!settingsPanel.hidden)); });
-closeSettings.addEventListener('click', () => { settingsPanel.hidden = true; settingsButton.setAttribute('aria-expanded','false'); });
+
+function setSettingsOpen(open) {
+  if (!settingsPanel || !settingsButton) return;
+  settingsPanel.hidden = !open;
+  settingsButton.setAttribute('aria-expanded', String(open));
+  document.body.classList.toggle('settings-open', open);
+}
+
+setSettingsOpen(false);
+
+settingsButton?.addEventListener('click', event => {
+  event.preventDefault();
+  event.stopPropagation();
+  setSettingsOpen(settingsPanel.hidden);
+});
+
+closeSettings?.addEventListener('click', event => {
+  event.preventDefault();
+  setSettingsOpen(false);
+});
+
+settingsPanel?.addEventListener('click', event => {
+  event.stopPropagation();
+});
+
+document.addEventListener('click', event => {
+  if (settingsPanel?.hidden) return;
+  if (event.target.closest('#settingsButton') || event.target.closest('#settingsPanel')) return;
+  setSettingsOpen(false);
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') setSettingsOpen(false);
+});
+
+// Während das Einstellungsmenü offen ist, darf auf Mobilgeräten nur der
+// Menüinhalt scrollen. Der App-Hintergrund bleibt fixiert.
+document.addEventListener('touchmove', event => {
+  if (!document.body.classList.contains('settings-open')) return;
+  if (event.target.closest('.settings-panel__body')) return;
+  event.preventDefault();
+}, { passive: false });
 
 
 const header = document.querySelector('.app-header');

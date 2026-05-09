@@ -1355,3 +1355,40 @@ button,
     max-height: calc(100dvh - max(112px, calc(env(safe-area-inset-top) + 88px)) - max(10px, env(safe-area-inset-bottom)));
   }
 }
+
+/* Settings drawer fixes: hidden state, compact closed rows and internal scrolling. */
+.settings-panel[hidden] {
+  display: none !important;
+}
+body.settings-open {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+.settings-panel__body {
+  align-content: start;
+}
+.settings-submenu {
+  min-height: 0;
+}
+.settings-submenu:not([open]) {
+  flex: 0 0 auto;
+}
+.settings-submenu:not([open]) > summary {
+  min-height: 56px;
+}
+.settings-submenu:not([open]) > .settings-submenu__content {
+  display: none !important;
+}
+@media (max-width: 767px) {
+  .settings-panel {
+    display: flex;
+  }
+  .settings-panel[hidden] {
+    display: none !important;
+  }
+  .settings-submenu > summary {
+    min-height: 54px;
+    padding: 12px 14px;
+  }
+}
+

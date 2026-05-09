@@ -258,6 +258,7 @@ function buildPrintableHtml(project, moduleData) {
   }).join('');
 
   return `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>TechCalc Pro - ${esc(moduleData.shortTitle)}</title>${printStyle()}</head><body>
+    <button class="tcp-close" type="button" onclick="try{window.close()}catch(e){}; setTimeout(function(){ if (window.opener) { try { window.opener.focus(); } catch(e) {} } if (history.length > 1) history.back(); }, 80);">Zurück zur App</button>
     <main class="tcp-page">
       <header class="tcp-header">
         <div class="tcp-project-lines">${firstLine || '<div></div>'}</div>
@@ -277,6 +278,7 @@ function buildPrintableHtml(project, moduleData) {
 
 function printStyle() {
   return `<style>
+    .tcp-close { display: none; }
     @page { size: A4; margin: 16mm 18mm 16mm 18mm; }
     * { box-sizing: border-box; }
     body { margin: 0; background: #fff; color: #111827; font-family: Arial, Helvetica, sans-serif; font-size: 9.5pt; line-height: 1.35; }
@@ -313,7 +315,8 @@ function printStyle() {
     .tcp-diagram .hx-point circle { fill: #fff !important; stroke: #F97316 !important; stroke-width: 2.5 !important; }
     .tcp-diagram .hx-point text { fill: #111827 !important; font-weight: 700 !important; font-family: Arial, Helvetica, sans-serif !important; }
     .tcp-footer { position: fixed; bottom: 7mm; left: 18mm; right: 18mm; display: flex; justify-content: space-between; border-top: 1px solid #D1D5DB; padding-top: 2mm; color: #6B7280; font-size: 8pt; }
-    @media screen { body { background: #e5e7eb; padding: 18px; } .tcp-page { max-width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 18mm; box-shadow: 0 18px 70px rgba(0,0,0,.18); } .tcp-footer { display: none; } }
+    @media screen { body { background: #e5e7eb; padding: 18px; } .tcp-close { position: fixed; z-index: 9999; top: max(14px, env(safe-area-inset-top)); left: 14px; display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 999px; background: #fff; color: #111827; font: 700 14px Arial, Helvetica, sans-serif; box-shadow: 0 10px 34px rgba(15,23,42,.18); } .tcp-page { max-width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 18mm; box-shadow: 0 18px 70px rgba(0,0,0,.18); } .tcp-footer { display: none; } }
+    @media print { .tcp-close { display: none !important; } }
   </style>`;
 }
 
