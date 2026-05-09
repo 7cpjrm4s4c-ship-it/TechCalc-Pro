@@ -27,9 +27,14 @@ window.addEventListener('resize', () => renderNavigation(currentRoute()));
 const settingsButton = document.getElementById('settingsButton');
 const settingsPanel = document.getElementById('settingsPanel');
 const closeSettings = document.getElementById('closeSettings');
+const settingsBody = settingsPanel?.querySelector('.settings-panel__body');
 
 let settingsScrollY = 0;
 let lastFocusedElement = null;
+
+function isSettingsOpen() {
+  return Boolean(settingsPanel?.classList.contains('is-open'));
+}
 
 function lockPageScroll() {
   settingsScrollY = window.scrollY || document.documentElement.scrollTop || 0;
@@ -66,16 +71,18 @@ function setSettingsOpen(open) {
     lastFocusedElement = document.activeElement;
     settingsPanel.hidden = false;
     settingsPanel.removeAttribute('hidden');
+    settingsPanel.classList.add('is-open');
     settingsButton.setAttribute('aria-expanded', 'true');
     settingsPanel.setAttribute('aria-modal', 'true');
     lockPageScroll();
     requestAnimationFrame(() => {
-      settingsPanel.querySelector('.settings-panel__body')?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      settingsBody?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       closeSettings?.focus?.({ preventScroll: true });
     });
     return;
   }
 
+  settingsPanel.classList.remove('is-open');
   settingsPanel.hidden = true;
   settingsPanel.setAttribute('hidden', '');
   settingsButton.setAttribute('aria-expanded', 'false');
@@ -88,13 +95,14 @@ function setSettingsOpen(open) {
 }
 
 // Defensive cleanup in case an older cached build left the app locked.
+settingsPanel?.classList.remove('is-open');
 unlockPageScroll();
 setSettingsOpen(false);
 
 settingsButton?.addEventListener('click', event => {
   event.preventDefault();
   event.stopPropagation();
-  setSettingsOpen(settingsPanel?.hidden !== false);
+  setSettingsOpen(!isSettingsOpen());
 });
 
 closeSettings?.addEventListener('click', event => {
@@ -112,18 +120,20 @@ settingsPanel?.querySelectorAll('.settings-submenu').forEach(details => {
     if (!details.open) return;
     closeAllSubmenus(details);
     requestAnimationFrame(() => {
-      const body = settingsPanel.querySelector('.settings-panel__body');
+      const body = settingsBody;
       if (!body) return;
-      const panelRect = body.getBoundingClientRect();
+      const bodyRect = body.getBoundingClientRect();
       const detailsRect = details.getBoundingClientRect();
-      const delta = detailsRect.top - panelRect.top - 6;
-      body.scrollTo({ top: body.scrollTop + delta, behavior: 'smooth' });
+      const bottomOverflow = detailsRect.bottom - bodyRect.bottom + 12;
+      const topOverflow = bodyRect.top - detailsRect.top + 12;
+      if (topOverflow > 0) body.scrollBy({ top: -topOverflow, behavior: 'smooth' });
+      else if (bottomOverflow > 0) body.scrollBy({ top: bottomOverflow, behavior: 'smooth' });
     });
   });
 });
 
 document.addEventListener('click', event => {
-  if (settingsPanel?.hidden) return;
+  if (!isSettingsOpen()) return;
   if (event.target.closest('#settingsButton') || event.target.closest('#settingsPanel')) return;
   setSettingsOpen(false);
 });
@@ -132,9 +142,9 @@ document.addEventListener('keydown', event => {
   if (event.key === 'Escape') setSettingsOpen(false);
 });
 
-// iOS/Safari: background remains locked; only the settings drawer body may scroll.
+// iOS/Safari: lock the app background; only the drawer body is scrollable.
 document.addEventListener('touchmove', event => {
-  if (!document.body.classList.contains('settings-open')) return;
+  if (!isSettingsOpen()) return;
   const scrollHost = event.target.closest('.settings-panel__body');
   if (scrollHost) {
     const canScroll = scrollHost.scrollHeight > scrollHost.clientHeight;

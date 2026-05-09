@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-menu-projects-v3';
+const CACHE_NAME = 'techcalc-pro-menu-button-v5';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',

@@ -1588,3 +1588,96 @@ body.settings-open .settings-panel * { pointer-events: auto !important; }
   }
   .settings-panel__body { padding-right: 0 !important; }
 }
+
+/* Settings drawer v5: robust hamburger toggle, one-line closed rows, drawer-only scroll. */
+#settingsButton {
+  position: relative !important;
+  z-index: 1201 !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+}
+.settings-panel {
+  z-index: 1200 !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  pointer-events: none !important;
+  transition: opacity .16s ease, transform .16s ease, visibility .16s ease;
+}
+.settings-panel[hidden]:not(.is-open) {
+  display: none !important;
+}
+.settings-panel.is-open {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+html.settings-open,
+body.settings-open {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+body.settings-open .app-shell {
+  pointer-events: auto !important;
+}
+body.settings-open .app-header,
+body.settings-open .module-nav,
+body.settings-open .app-main,
+body.settings-open .overflow-menu {
+  pointer-events: none !important;
+}
+body.settings-open .settings-panel,
+body.settings-open .settings-panel * {
+  pointer-events: auto !important;
+}
+.settings-panel__head {
+  flex: 0 0 auto !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 3 !important;
+}
+.settings-panel__body {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  align-content: start !important;
+}
+.settings-submenu {
+  display: block !important;
+  min-height: 0 !important;
+  height: auto !important;
+}
+.settings-submenu:not([open]) > summary,
+.settings-submenu > summary {
+  min-height: 58px !important;
+  height: 58px !important;
+  padding: 0 14px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+.settings-submenu:not([open]) > .settings-submenu__content {
+  display: none !important;
+}
+.settings-submenu[open] > .settings-submenu__content {
+  display: grid !important;
+}
+@media (max-width: 767px) {
+  .settings-panel {
+    position: fixed !important;
+    left: 10px !important;
+    right: 10px !important;
+    top: max(88px, calc(env(safe-area-inset-top) + 76px)) !important;
+    bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-height: none !important;
+    padding: 14px !important;
+  }
+}
