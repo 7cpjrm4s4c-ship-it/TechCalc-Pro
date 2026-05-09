@@ -257,8 +257,11 @@ function buildPrintableHtml(project, moduleData) {
     return `<section class="tcp-section"><h2>${esc(title)}</h2><div class="tcp-rule"></div>${tableHtml(rows, mode)}</section>`;
   }).join('');
 
-  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>TechCalc Pro - ${esc(moduleData.shortTitle)}</title>${printStyle()}</head><body>
-    <button class="tcp-close" type="button" onclick="try{window.close()}catch(e){}; setTimeout(function(){ if (window.opener) { try { window.opener.focus(); } catch(e) {} } if (history.length > 1) history.back(); }, 80);">Zurück zur App</button>
+  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>TechCalc Pro - ${esc(moduleData.shortTitle)}</title>${printStyle()}</head><body>
+    <div class="tcp-toolbar">
+      <button class="tcp-close" type="button" onclick="try{ if (window.opener) { window.opener.focus(); window.close(); return; } }catch(e){} window.location.href='./';">Zurück zur App</button>
+      <button class="tcp-print" type="button" onclick="window.print()">PDF speichern / drucken</button>
+    </div>
     <main class="tcp-page">
       <header class="tcp-header">
         <div class="tcp-project-lines">${firstLine || '<div></div>'}</div>
@@ -278,7 +281,7 @@ function buildPrintableHtml(project, moduleData) {
 
 function printStyle() {
   return `<style>
-    .tcp-close { display: none; }
+    .tcp-toolbar, .tcp-close, .tcp-print { display: none; }
     @page { size: A4; margin: 16mm 18mm 16mm 18mm; }
     * { box-sizing: border-box; }
     body { margin: 0; background: #fff; color: #111827; font-family: Arial, Helvetica, sans-serif; font-size: 9.5pt; line-height: 1.35; }
@@ -315,20 +318,24 @@ function printStyle() {
     .tcp-diagram .hx-point circle { fill: #fff !important; stroke: #F97316 !important; stroke-width: 2.5 !important; }
     .tcp-diagram .hx-point text { fill: #111827 !important; font-weight: 700 !important; font-family: Arial, Helvetica, sans-serif !important; }
     .tcp-footer { position: fixed; bottom: 7mm; left: 18mm; right: 18mm; display: flex; justify-content: space-between; border-top: 1px solid #D1D5DB; padding-top: 2mm; color: #6B7280; font-size: 8pt; }
-    @media screen { body { background: #e5e7eb; padding: 18px; } .tcp-close { position: fixed; z-index: 9999; top: max(14px, env(safe-area-inset-top)); left: 14px; display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 999px; background: #fff; color: #111827; font: 700 14px Arial, Helvetica, sans-serif; box-shadow: 0 10px 34px rgba(15,23,42,.18); } .tcp-page { max-width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 18mm; box-shadow: 0 18px 70px rgba(0,0,0,.18); } .tcp-footer { display: none; } }
-    @media print { .tcp-close { display: none !important; } }
+    @media screen { body { background: #e5e7eb; padding: calc(66px + env(safe-area-inset-top)) 18px 18px; } .tcp-toolbar { position: fixed; z-index: 9999; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: calc(10px + env(safe-area-inset-top)) 14px 10px; background: rgba(255,255,255,.94); border-bottom: 1px solid #CBD5E1; box-shadow: 0 10px 34px rgba(15,23,42,.14); } .tcp-close, .tcp-print { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 999px; background: #fff; color: #111827; font: 700 14px Arial, Helvetica, sans-serif; } .tcp-print { background: #007EA7; border-color: #007EA7; color: #fff; } .tcp-page { max-width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 18mm; box-shadow: 0 18px 70px rgba(0,0,0,.18); } .tcp-footer { display: none; } }
+    @media print { .tcp-toolbar, .tcp-close, .tcp-print { display: none !important; } }
   </style>`;
 }
 
 function openPrintWindow(project, moduleData) {
   const html = buildPrintableHtml(project, moduleData);
-
-  // iOS/Safari öffnet bei noopener/noreferrer häufig nur about:blank und blockiert
-  // anschließend den Zugriff auf win.document. Deshalb bewusst ohne noopener öffnen
-  // und den Inhalt synchron aus dem Nutzer-Klick heraus schreiben.
   const win = window.open('about:blank', '_blank');
+
   if (!win) {
-    alert('PDF-Export konnte nicht geöffnet werden. Bitte Pop-up-Blocker prüfen.');
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 15000);
     return;
   }
 
@@ -336,21 +343,10 @@ function openPrintWindow(project, moduleData) {
     win.document.open('text/html', 'replace');
     win.document.write(html);
     win.document.close();
-
-    const printDocument = () => {
-      try {
-        win.focus();
-        win.print();
-      } catch (error) {
-        console.error('PDF-Druckdialog konnte nicht geöffnet werden.', error);
-      }
-    };
-
-    win.addEventListener?.('load', () => setTimeout(printDocument, 250), { once: true });
-    setTimeout(printDocument, 900);
+    win.focus();
   } catch (error) {
     console.error('PDF-Export fehlgeschlagen.', error);
-    win.close();
+    try { win.close(); } catch {}
     alert('PDF-Export konnte nicht erstellt werden. Bitte Browser-Konsole prüfen.');
   }
 }
