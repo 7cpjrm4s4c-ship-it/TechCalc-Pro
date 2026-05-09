@@ -1,8 +1,11 @@
 import { currentRoute } from './router.js';
 
-const STORAGE_KEY = 'techcalc-pdf-project-v1';
+const LEGACY_STORAGE_KEY = 'techcalc-pdf-project-v1';
+const PROJECTS_STORAGE_KEY = 'techcalc-projects-v1';
+const ACTIVE_PROJECT_KEY = 'techcalc-active-project-id';
 
 const DEFAULT_PROJECT = {
+  id: '',
   client: '',
   project: '',
   projectNo: '',
@@ -10,47 +13,73 @@ const DEFAULT_PROJECT = {
   logoDataUrl: ''
 };
 
-function sanitizeText(value) {
-  return String(value ?? '')
-    .replace(/[\u2010-\u2015]/g, '-')
-    .replace(/[·×]/g, 'x')
-    .replace(/[ϑθφΦρΔηṁν]/g, match => ({
-      'ϑ': 'Theta',
-      'θ': 'Theta',
-      'φ': 'phi',
-      'Φ': 'phi',
-      'ρ': 'rho',
-      'Δ': 'Delta',
-      'η': 'eta',
-      'ṁ': 'm',
-      'ν': 'v'
-    }[match] || ''))
-    .replace(/[\u00A0]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+function createProject(seed = {}) {
+  return {
+    ...DEFAULT_PROJECT,
+    ...seed,
+    id: seed.id || `project-${Date.now()}-${Math.random().toString(16).slice(2)}`
+  };
 }
 
-function esc(value) {
-  return String(value ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
+function readProjects() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(PROJECTS_STORAGE_KEY));
+    if (Array.isArray(stored) && stored.length) return stored.map(item => createProject(item));
+  } catch {}
+
+  try {
+    const legacy = JSON.parse(localStorage.getItem(LEGACY_STORAGE_KEY));
+    if (legacy && Object.keys(legacy).length) {
+      const migrated = createProject(legacy);
+      localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify([migrated]));
+      localStorage.setItem(ACTIVE_PROJECT_KEY, migrated.id);
+      return [migrated];
+    }
+  } catch {}
+
+  const first = createProject({ project: 'Projekt 1' });
+  localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify([first]));
+  localStorage.setItem(ACTIVE_PROJECT_KEY, first.id);
+  return [first];
+}
+
+function writeProjects(projects) {
+  localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects));
+}
+
+function readActiveProjectId(projects = readProjects()) {
+  const stored = localStorage.getItem(ACTIVE_PROJECT_KEY);
+  return projects.some(project => project.id === stored) ? stored : projects[0]?.id;
 }
 
 function readProject() {
-  try {
-    return { ...DEFAULT_PROJECT, ...(JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}) };
-  } catch {
-    return { ...DEFAULT_PROJECT };
-  }
+  const projects = readProjects();
+  const activeId = readActiveProjectId(projects);
+  const active = projects.find(project => project.id === activeId) || projects[0];
+  return createProject(active || {});
 }
 
 function saveProject(next) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...readProject(), ...next }));
+  const projects = readProjects();
+  const activeId = readActiveProjectId(projects);
+  const index = Math.max(0, projects.findIndex(project => project.id === activeId));
+  projects[index] = createProject({ ...projects[index], ...next, id: projects[index]?.id || activeId });
+  writeProjects(projects);
+  localStorage.setItem(ACTIVE_PROJECT_KEY, projects[index].id);
+  renderProjectSelect(projects[index].id);
 }
 
+function projectLabel(project) {
+  return project.project || project.client || project.projectNo || 'Unbenanntes Projekt';
+}
+
+function renderProjectSelect(activeId = readActiveProjectId()) {
+  const select = document.getElementById('projectSelect');
+  if (!select) return;
+  const projects = readProjects();
+  select.innerHTML = projects.map(project => `<option value="${esc(project.id)}">${esc(projectLabel(project))}</option>`).join('');
+  select.value = activeId;
+}
 function setInputValue(id, value) {
   const el = document.getElementById(id);
   if (el) el.value = value ?? '';
@@ -73,11 +102,37 @@ function updateLogoPreview() {
 }
 
 function initProjectSettings() {
-  const data = readProject();
-  setInputValue('pdfClient', data.client);
-  setInputValue('pdfProject', data.project);
-  setInputValue('pdfProjectNo', data.projectNo);
-  setInputValue('pdfEngineer', data.engineer);
+  renderProjectSelect();
+  hydrateProjectForm(readProject());
+
+  document.getElementById('projectSelect')?.addEventListener('change', event => {
+    localStorage.setItem(ACTIVE_PROJECT_KEY, event.target.value);
+    hydrateProjectForm(readProject());
+  });
+
+  document.getElementById('newProjectButton')?.addEventListener('click', () => {
+    const projects = readProjects();
+    const next = createProject({ project: `Projekt ${projects.length + 1}` });
+    projects.push(next);
+    writeProjects(projects);
+    localStorage.setItem(ACTIVE_PROJECT_KEY, next.id);
+    renderProjectSelect(next.id);
+    hydrateProjectForm(next);
+  });
+
+  document.getElementById('deleteProjectButton')?.addEventListener('click', () => {
+    let projects = readProjects();
+    if (projects.length <= 1) {
+      projects = [createProject({ project: 'Projekt 1' })];
+    } else {
+      const activeId = readActiveProjectId(projects);
+      projects = projects.filter(project => project.id !== activeId);
+    }
+    writeProjects(projects);
+    localStorage.setItem(ACTIVE_PROJECT_KEY, projects[0].id);
+    renderProjectSelect(projects[0].id);
+    hydrateProjectForm(projects[0]);
+  });
 
   bindProjectInput('pdfClient', 'client');
   bindProjectInput('pdfProject', 'project');
@@ -102,6 +157,16 @@ function initProjectSettings() {
     updateLogoPreview();
   });
 
+  updateLogoPreview();
+}
+
+function hydrateProjectForm(data) {
+  setInputValue('pdfClient', data.client);
+  setInputValue('pdfProject', data.project);
+  setInputValue('pdfProjectNo', data.projectNo);
+  setInputValue('pdfEngineer', data.engineer);
+  const file = document.getElementById('pdfLogo');
+  if (file) file.value = '';
   updateLogoPreview();
 }
 

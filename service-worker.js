@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-pdf-hx-export-picker-fix-v1';
+const CACHE_NAME = 'techcalc-pro-menu-projects-v2';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',

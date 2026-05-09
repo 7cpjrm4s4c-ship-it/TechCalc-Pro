@@ -28,12 +28,38 @@ const settingsButton = document.getElementById('settingsButton');
 const settingsPanel = document.getElementById('settingsPanel');
 const closeSettings = document.getElementById('closeSettings');
 
+let settingsScrollY = 0;
+
+function lockPageScroll() {
+  settingsScrollY = window.scrollY || 0;
+  document.documentElement.classList.add('settings-open');
+  document.body.classList.add('settings-open');
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${settingsScrollY}px`;
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.style.width = '100%';
+}
+
+function unlockPageScroll() {
+  document.documentElement.classList.remove('settings-open');
+  document.body.classList.remove('settings-open');
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.left = '';
+  document.body.style.right = '';
+  document.body.style.width = '';
+  window.scrollTo(0, settingsScrollY);
+}
+
 function setSettingsOpen(open) {
   if (!settingsPanel || !settingsButton) return;
   settingsPanel.hidden = !open;
   settingsButton.setAttribute('aria-expanded', String(open));
-  document.body.classList.toggle('settings-open', open);
+  if (open) lockPageScroll();
+  else unlockPageScroll();
 }
+
 
 setSettingsOpen(false);
 
@@ -50,6 +76,15 @@ closeSettings?.addEventListener('click', event => {
 
 settingsPanel?.addEventListener('click', event => {
   event.stopPropagation();
+});
+
+settingsPanel?.querySelectorAll('.settings-submenu').forEach(details => {
+  details.addEventListener('toggle', () => {
+    if (!details.open) return;
+    requestAnimationFrame(() => {
+      details.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    });
+  });
 });
 
 document.addEventListener('click', event => {

@@ -1420,3 +1420,101 @@ body.settings-open {
     min-width: 122px !important;
   }
 }
+
+/* Settings drawer v2: compact closed rows, reliable internal scroll, locked app background. */
+html.settings-open,
+body.settings-open {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  touch-action: none;
+}
+body.settings-open .app-shell {
+  pointer-events: none;
+}
+body.settings-open .settings-panel {
+  pointer-events: auto;
+  touch-action: pan-y;
+}
+.settings-panel {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden !important;
+}
+.settings-panel[hidden] {
+  display: none !important;
+}
+.settings-panel__head {
+  flex: 0 0 auto;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding-bottom: var(--space-2);
+  background: linear-gradient(135deg, rgba(32,39,49,.96), rgba(18,22,28,.92));
+}
+.settings-panel__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: max(18px, env(safe-area-inset-bottom));
+}
+.settings-submenu {
+  display: block;
+  min-height: 0 !important;
+}
+.settings-submenu:not([open]) {
+  height: auto !important;
+}
+.settings-submenu:not([open]) > summary {
+  min-height: 58px !important;
+  padding-block: 0 !important;
+}
+.settings-submenu[open] > summary {
+  min-height: 58px !important;
+}
+.settings-submenu__content {
+  min-height: 0;
+}
+.settings-form select,
+.settings-form input[type="text"],
+.settings-form input[type="file"] {
+  min-height: 52px;
+}
+.settings-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--ui-gap);
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  background: rgba(255,255,255,.035);
+}
+.settings-actions--split {
+  justify-content: space-between;
+}
+@media (max-width: 767px) {
+  .settings-panel {
+    position: fixed !important;
+    left: 10px !important;
+    right: 10px !important;
+    top: max(92px, calc(env(safe-area-inset-top) + 78px)) !important;
+    bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-height: none !important;
+    padding: 16px !important;
+  }
+  .settings-panel__body {
+    padding-right: 0;
+  }
+}
+body.settings-open .app-header,
+body.settings-open .module-nav,
+body.settings-open .app-main {
+  pointer-events: none;
+}
+body.settings-open .app-shell { pointer-events: auto; }

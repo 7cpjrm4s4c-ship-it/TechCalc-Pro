@@ -59,7 +59,12 @@
         <details class="settings-submenu">
           <summary>Projekteinstellungen</summary>
           <div class="settings-submenu__content settings-form" id="projectPdfSettings">
-            <p>Diese Daten werden lokal im Browser gespeichert und in der PDF-Kopfzeile verwendet.</p>
+            <p>Projekte werden lokal im Browser gespeichert und in der PDF-Kopfzeile verwendet.</p>
+            <label>Projekt auswählen<select id="projectSelect"></select></label>
+            <div class="settings-actions settings-actions--split">
+              <button class="mini-button mini-button--primary" id="newProjectButton" type="button">Neues Projekt</button>
+              <button class="mini-button" id="deleteProjectButton" type="button">Projekt löschen</button>
+            </div>
             <label>Auftraggeber<input id="pdfClient" type="text" autocomplete="organization" placeholder="z. B. Muster GmbH"></label>
             <label>Projektbezeichnung<input id="pdfProject" type="text" placeholder="z. B. Neubau Bürogebäude Nord"></label>
             <label>Projektnummer<input id="pdfProjectNo" type="text" placeholder="z. B. 2025-041"></label>
@@ -78,6 +83,23 @@
             <h3>Mobile Schnellzugriffe</h3>
             <p>Wähle bis zu vier Module für die mobile Navigation. Reihenfolge wird gespeichert.</p>
             <div id="quickAccessSettings" class="settings-list"></div>
+          </div>
+        </details>
+
+        <details class="settings-submenu">
+          <summary>Darstellung</summary>
+          <div class="settings-submenu__content settings-form">
+            <p>Vorbereitung für Dark, Light und System-Farbschema.</p>
+            <label>Farbschema<select id="themeMode" disabled><option>System</option><option>Dark</option><option>Light</option></select></label>
+          </div>
+        </details>
+
+        <details class="settings-submenu">
+          <summary>Rechtliches & App</summary>
+          <div class="settings-submenu__content settings-form">
+            <div class="settings-info-row"><span>Version</span><strong id="appVersion">0.1.0</strong></div>
+            <button class="mini-button" type="button" disabled>Impressum vorbereiten</button>
+            <button class="mini-button" type="button" disabled>AGB vorbereiten</button>
           </div>
         </details>
       </div>
