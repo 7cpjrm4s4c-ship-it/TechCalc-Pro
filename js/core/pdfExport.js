@@ -319,16 +319,37 @@ function printStyle() {
 
 function openPrintWindow(project, moduleData) {
   const html = buildPrintableHtml(project, moduleData);
-  const win = window.open('', '_blank', 'noopener,noreferrer,width=980,height=1200');
+
+  // iOS/Safari öffnet bei noopener/noreferrer häufig nur about:blank und blockiert
+  // anschließend den Zugriff auf win.document. Deshalb bewusst ohne noopener öffnen
+  // und den Inhalt synchron aus dem Nutzer-Klick heraus schreiben.
+  const win = window.open('about:blank', '_blank');
   if (!win) {
     alert('PDF-Export konnte nicht geöffnet werden. Bitte Pop-up-Blocker prüfen.');
     return;
   }
-  win.document.open();
-  win.document.write(html);
-  win.document.close();
-  win.focus();
-  setTimeout(() => win.print(), 350);
+
+  try {
+    win.document.open('text/html', 'replace');
+    win.document.write(html);
+    win.document.close();
+
+    const printDocument = () => {
+      try {
+        win.focus();
+        win.print();
+      } catch (error) {
+        console.error('PDF-Druckdialog konnte nicht geöffnet werden.', error);
+      }
+    };
+
+    win.addEventListener?.('load', () => setTimeout(printDocument, 250), { once: true });
+    setTimeout(printDocument, 900);
+  } catch (error) {
+    console.error('PDF-Export fehlgeschlagen.', error);
+    win.close();
+    alert('PDF-Export konnte nicht erstellt werden. Bitte Browser-Konsole prüfen.');
+  }
 }
 
 export function initPdfExport({ modules, currentRoute: routeGetter } = {}) {

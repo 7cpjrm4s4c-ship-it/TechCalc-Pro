@@ -44,27 +44,43 @@
         <strong>Einstellungen</strong>
         <button class="mini-button" id="closeSettings" type="button">Schließen</button>
       </div>
-      <section>
-        <h3>PDF-Export</h3>
-        <p>Projektdaten für technische Berechnungsprotokolle. Die Daten werden lokal im Browser gespeichert.</p>
-        <div class="settings-form" id="projectPdfSettings">
-          <label>Auftraggeber<input id="pdfClient" type="text" autocomplete="organization" placeholder="z. B. Muster GmbH"></label>
-          <label>Projektbezeichnung<input id="pdfProject" type="text" placeholder="z. B. Neubau Bürogebäude Nord"></label>
-          <label>Projektnummer<input id="pdfProjectNo" type="text" placeholder="z. B. 2025-041"></label>
-          <label>Sachbearbeiter<input id="pdfEngineer" type="text" placeholder="z. B. Max Mustermann"></label>
-          <label>Firmenlogo<input id="pdfLogo" type="file" accept="image/png,image/jpeg,image/svg+xml"></label>
-          <div class="settings-actions">
-            <button class="mini-button" id="clearPdfLogo" type="button">Logo entfernen</button>
-            <button class="mini-button mini-button--primary" id="exportPdfButton" type="button">PDF exportieren</button>
+
+      <div class="settings-panel__body">
+        <details class="settings-submenu" open>
+          <summary>PDF-Export</summary>
+          <div class="settings-submenu__content">
+            <p>Exportiert das aktuell geöffnete Modul als technisches Berechnungsprotokoll.</p>
+            <div class="settings-actions">
+              <button class="mini-button mini-button--primary" id="exportPdfButton" type="button">Aktuelles Modul exportieren</button>
+            </div>
           </div>
-          <div id="pdfLogoPreview" class="logo-preview" aria-live="polite"></div>
-        </div>
-      </section>
-      <section>
-        <h3>Mobile Schnellzugriffe</h3>
-        <p>Wähle bis zu vier Module für die mobile Navigation. Reihenfolge wird gespeichert.</p>
-        <div id="quickAccessSettings" class="settings-list"></div>
-      </section>
+        </details>
+
+        <details class="settings-submenu">
+          <summary>Projekteinstellungen</summary>
+          <div class="settings-submenu__content settings-form" id="projectPdfSettings">
+            <p>Diese Daten werden lokal im Browser gespeichert und in der PDF-Kopfzeile verwendet.</p>
+            <label>Auftraggeber<input id="pdfClient" type="text" autocomplete="organization" placeholder="z. B. Muster GmbH"></label>
+            <label>Projektbezeichnung<input id="pdfProject" type="text" placeholder="z. B. Neubau Bürogebäude Nord"></label>
+            <label>Projektnummer<input id="pdfProjectNo" type="text" placeholder="z. B. 2025-041"></label>
+            <label>Sachbearbeiter<input id="pdfEngineer" type="text" placeholder="z. B. Max Mustermann"></label>
+            <label>Firmenlogo<input id="pdfLogo" type="file" accept="image/png,image/jpeg,image/svg+xml"></label>
+            <div class="settings-actions">
+              <button class="mini-button" id="clearPdfLogo" type="button">Logo entfernen</button>
+            </div>
+            <div id="pdfLogoPreview" class="logo-preview" aria-live="polite"></div>
+          </div>
+        </details>
+
+        <details class="settings-submenu">
+          <summary>Moduleinstellungen</summary>
+          <div class="settings-submenu__content">
+            <h3>Mobile Schnellzugriffe</h3>
+            <p>Wähle bis zu vier Module für die mobile Navigation. Reihenfolge wird gespeichert.</p>
+            <div id="quickAccessSettings" class="settings-list"></div>
+          </div>
+        </details>
+      </div>
     </aside>
   </div>
   <script type="module" src="./js/core/app.js"></script>
