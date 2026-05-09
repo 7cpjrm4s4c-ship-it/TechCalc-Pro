@@ -29,9 +29,10 @@ const settingsPanel = document.getElementById('settingsPanel');
 const closeSettings = document.getElementById('closeSettings');
 
 let settingsScrollY = 0;
+let lastFocusedElement = null;
 
 function lockPageScroll() {
-  settingsScrollY = window.scrollY || 0;
+  settingsScrollY = window.scrollY || document.documentElement.scrollTop || 0;
   document.documentElement.classList.add('settings-open');
   document.body.classList.add('settings-open');
   document.body.style.position = 'fixed';
@@ -49,28 +50,56 @@ function unlockPageScroll() {
   document.body.style.left = '';
   document.body.style.right = '';
   document.body.style.width = '';
-  window.scrollTo(0, settingsScrollY);
+  window.scrollTo(0, settingsScrollY || 0);
+}
+
+function closeAllSubmenus(except = null) {
+  settingsPanel?.querySelectorAll('.settings-submenu[open]').forEach(details => {
+    if (details !== except) details.open = false;
+  });
 }
 
 function setSettingsOpen(open) {
   if (!settingsPanel || !settingsButton) return;
-  settingsPanel.hidden = !open;
-  settingsButton.setAttribute('aria-expanded', String(open));
-  if (open) lockPageScroll();
-  else unlockPageScroll();
+
+  if (open) {
+    lastFocusedElement = document.activeElement;
+    settingsPanel.hidden = false;
+    settingsPanel.removeAttribute('hidden');
+    settingsButton.setAttribute('aria-expanded', 'true');
+    settingsPanel.setAttribute('aria-modal', 'true');
+    lockPageScroll();
+    requestAnimationFrame(() => {
+      settingsPanel.querySelector('.settings-panel__body')?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      closeSettings?.focus?.({ preventScroll: true });
+    });
+    return;
+  }
+
+  settingsPanel.hidden = true;
+  settingsPanel.setAttribute('hidden', '');
+  settingsButton.setAttribute('aria-expanded', 'false');
+  settingsPanel.removeAttribute('aria-modal');
+  closeAllSubmenus();
+  unlockPageScroll();
+  if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+    lastFocusedElement.focus({ preventScroll: true });
+  }
 }
 
-
+// Defensive cleanup in case an older cached build left the app locked.
+unlockPageScroll();
 setSettingsOpen(false);
 
 settingsButton?.addEventListener('click', event => {
   event.preventDefault();
   event.stopPropagation();
-  setSettingsOpen(settingsPanel.hidden);
+  setSettingsOpen(settingsPanel?.hidden !== false);
 });
 
 closeSettings?.addEventListener('click', event => {
   event.preventDefault();
+  event.stopPropagation();
   setSettingsOpen(false);
 });
 
@@ -81,8 +110,14 @@ settingsPanel?.addEventListener('click', event => {
 settingsPanel?.querySelectorAll('.settings-submenu').forEach(details => {
   details.addEventListener('toggle', () => {
     if (!details.open) return;
+    closeAllSubmenus(details);
     requestAnimationFrame(() => {
-      details.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      const body = settingsPanel.querySelector('.settings-panel__body');
+      if (!body) return;
+      const panelRect = body.getBoundingClientRect();
+      const detailsRect = details.getBoundingClientRect();
+      const delta = detailsRect.top - panelRect.top - 6;
+      body.scrollTo({ top: body.scrollTop + delta, behavior: 'smooth' });
     });
   });
 });
@@ -97,14 +132,16 @@ document.addEventListener('keydown', event => {
   if (event.key === 'Escape') setSettingsOpen(false);
 });
 
-// Während das Einstellungsmenü offen ist, darf auf Mobilgeräten nur der
-// Menüinhalt scrollen. Der App-Hintergrund bleibt fixiert.
+// iOS/Safari: background remains locked; only the settings drawer body may scroll.
 document.addEventListener('touchmove', event => {
   if (!document.body.classList.contains('settings-open')) return;
-  if (event.target.closest('.settings-panel__body')) return;
+  const scrollHost = event.target.closest('.settings-panel__body');
+  if (scrollHost) {
+    const canScroll = scrollHost.scrollHeight > scrollHost.clientHeight;
+    if (canScroll) return;
+  }
   event.preventDefault();
 }, { passive: false });
-
 
 const header = document.querySelector('.app-header');
 function updateHeaderTransparency(){
