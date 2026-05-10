@@ -1,8 +1,8 @@
-const CACHE_NAME = 'techcalc-pro-settings-drawer-v9';
+const CACHE_NAME = 'techcalc-pro-performance-v10';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',
-  './js/core/app.js','./js/core/registry.js','./js/core/router.js','./js/core/renderer.js','./js/core/preferences.js','./js/core/state.js','./js/core/navigation.js','./js/core/pdfExport.js',
+  './js/core/app.js','./js/core/menuFallback.js','./js/core/registry.js','./js/core/router.js','./js/core/renderer.js','./js/core/preferences.js','./js/core/state.js','./js/core/navigation.js','./js/core/pdfExport.js',
   './js/utils/calculations.js','./js/utils/units.js','./js/utils/pipes.js',
   './js/modules/heating-cooling/index.js','./js/modules/heating-cooling/config.js','./js/modules/heating-cooling/logic.js','./js/modules/heating-cooling/state.js',
   './js/modules/ventilation/index.js','./js/modules/ventilation/config.js','./js/modules/ventilation/logic.js','./js/modules/ventilation/state.js',
@@ -28,6 +28,19 @@ self.addEventListener('activate', event => {
   })());
 });
 
+async function updateCache(request) {
+  try {
+    const response = await fetch(request, { cache: 'no-cache' });
+    if (response?.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.put(request, response.clone());
+    }
+    return response;
+  } catch {
+    return null;
+  }
+}
+
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
@@ -35,15 +48,14 @@ self.addEventListener('fetch', event => {
   if (requestUrl.origin !== self.location.origin) return;
 
   event.respondWith((async () => {
-    const cache = await caches.open(CACHE_NAME);
-    try {
-      const response = await fetch(event.request, { cache: 'reload' });
-      if (response && response.ok && event.request.url.startsWith(self.location.origin)) await cache.put(event.request, response.clone());
-      return response;
-    } catch (error) {
-      const cached = await cache.match(event.request);
-      if (cached) return cached;
-      return cache.match('./index.html');
+    const cached = await caches.match(event.request);
+    if (cached) {
+      event.waitUntil(updateCache(event.request));
+      return cached;
     }
+
+    const response = await updateCache(event.request);
+    if (response) return response;
+    return caches.match('./index.html');
   })());
 });

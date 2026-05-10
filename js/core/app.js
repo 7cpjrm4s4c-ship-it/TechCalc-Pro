@@ -1,32 +1,84 @@
 import { modules } from './registry.js';
 import { initRouter, currentRoute } from './router.js';
 import { renderNavigation, renderQuickAccessSettings } from './navigation.js';
-import { initPdfExport } from './pdfExport.js';
-import heatingCooling from '../modules/heating-cooling/index.js';
-import ventilation from '../modules/ventilation/index.js';
-import pipeSizing from '../modules/pipe-sizing/index.js';
-import unitConverter from '../modules/unit-converter/index.js';
-import heatRecovery from '../modules/heat-recovery/index.js';
-import hxDiagram from '../modules/hx-diagram/index.js';
+import heatingCoolingConfig from '../modules/heating-cooling/config.js';
+import ventilationConfig from '../modules/ventilation/config.js';
+import pipeSizingConfig from '../modules/pipe-sizing/config.js';
+import unitConverterConfig from '../modules/unit-converter/config.js';
+import heatRecoveryConfig from '../modules/heat-recovery/config.js';
+import hxDiagramConfig from '../modules/hx-diagram/config.js';
 
-[heatingCooling, ventilation, heatRecovery, hxDiagram, pipeSizing, unitConverter].forEach(module => modules.register(module));
+const lazyModules = [
+  { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
+  { config: ventilationConfig, path: '../modules/ventilation/index.js' },
+  { config: heatRecoveryConfig, path: '../modules/heat-recovery/index.js' },
+  { config: hxDiagramConfig, path: '../modules/hx-diagram/index.js' },
+  { config: pipeSizingConfig, path: '../modules/pipe-sizing/index.js' },
+  { config: unitConverterConfig, path: '../modules/unit-converter/index.js' },
+];
+
+const moduleCache = new Map();
+function registerLazyModule({ config, path }) {
+  modules.register({
+    config,
+    async mount(root) {
+      let loaded = moduleCache.get(config.id);
+      if (!loaded) {
+        loaded = import(path).then(mod => mod.default || mod);
+        moduleCache.set(config.id, loaded);
+      }
+      const module = await loaded;
+      return module.mount(root);
+    }
+  });
+}
+
+lazyModules.forEach(registerLazyModule);
 
 const app = document.getElementById('app');
-function render(id){
+let renderToken = 0;
+async function render(id){
   const module = modules.get(id);
   if (!module) return;
+  const token = ++renderToken;
   renderNavigation(id);
-  module.mount(app);
-  app.focus({ preventScroll:true });
+  app.setAttribute('aria-busy', 'true');
+  try {
+    await module.mount(app);
+  } catch (error) {
+    console.error(`Modul konnte nicht geladen werden: ${id}`, error);
+    app.innerHTML = '<div class="module-error card">Modul konnte nicht geladen werden.</div>';
+  } finally {
+    if (token === renderToken) {
+      app.removeAttribute('aria-busy');
+      app.focus({ preventScroll:true });
+    }
+  }
 }
 initRouter(render);
 renderQuickAccessSettings();
-try {
-  initPdfExport({ modules, currentRoute });
-} catch (error) {
-  console.error('PDF export initialization failed:', error);
+
+let pdfExportReady;
+function ensurePdfExport() {
+  if (!pdfExportReady) {
+    pdfExportReady = import('./pdfExport.js')
+      .then(({ initPdfExport }) => initPdfExport({ modules, currentRoute }))
+      .catch(error => {
+        pdfExportReady = null;
+        console.error('PDF export initialization failed:', error);
+      });
+  }
+  return pdfExportReady;
 }
-window.addEventListener('resize', () => renderNavigation(currentRoute()));
+
+let resizeRaf = 0;
+window.addEventListener('resize', () => {
+  if (resizeRaf) return;
+  resizeRaf = requestAnimationFrame(() => {
+    resizeRaf = 0;
+    renderNavigation(currentRoute());
+  });
+}, { passive: true });
 
 const settingsButton = document.getElementById('settingsButton');
 const settingsPanel = document.getElementById('settingsPanel');
@@ -98,6 +150,7 @@ function setSettingsOpen(open) {
     settingsButton.setAttribute('aria-expanded', 'true');
     settingsPanel.setAttribute('aria-modal', 'true');
     lockPageScroll();
+    ensurePdfExport();
     requestAnimationFrame(() => {
       settingsBody?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       closeSettings?.focus?.({ preventScroll: true });
