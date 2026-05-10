@@ -21,7 +21,11 @@ function render(id){
 }
 initRouter(render);
 renderQuickAccessSettings();
-initPdfExport({ modules, currentRoute });
+try {
+  initPdfExport({ modules, currentRoute });
+} catch (error) {
+  console.error('PDF export initialization failed:', error);
+}
 window.addEventListener('resize', () => renderNavigation(currentRoute()));
 
 const settingsButton = document.getElementById('settingsButton');

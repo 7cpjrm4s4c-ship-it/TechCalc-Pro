@@ -1681,3 +1681,62 @@ body.settings-open .settings-panel * {
     padding: 14px !important;
   }
 }
+
+/* Menu fallback v6: render drawer reliably and keep scroll inside the drawer. */
+#settingsPanel.settings-panel.is-open {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+#settingsPanel.settings-panel[hidden]:not(.is-open) {
+  display: none !important;
+}
+#settingsButton {
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+}
+html.settings-open,
+body.settings-open {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+body.settings-open .app-main,
+body.settings-open .module-nav,
+body.settings-open .overflow-menu {
+  pointer-events: none !important;
+}
+body.settings-open #settingsButton,
+body.settings-open #settingsPanel,
+body.settings-open #settingsPanel * {
+  pointer-events: auto !important;
+}
+#settingsPanel .settings-panel__body {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain !important;
+}
+#settingsPanel .settings-submenu:not([open]) > .settings-submenu__content {
+  display: none !important;
+}
+#settingsPanel .settings-submenu:not([open]) > summary,
+#settingsPanel .settings-submenu > summary {
+  height: 58px !important;
+  min-height: 58px !important;
+  padding: 0 14px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+@media (max-width: 767px) {
+  #settingsPanel.settings-panel {
+    position: fixed !important;
+    left: 10px !important;
+    right: 10px !important;
+    top: max(88px, calc(env(safe-area-inset-top) + 76px)) !important;
+    bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-height: none !important;
+  }
+}
