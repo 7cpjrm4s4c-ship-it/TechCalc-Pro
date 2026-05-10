@@ -70,7 +70,7 @@ function saveProject(next) {
 }
 
 function projectLabel(project) {
-  return project.project || project.client || project.projectNo || 'Unbenanntes Projekt';
+  return [project.project, project.client, project.projectNo].filter(Boolean).join(' · ') || 'Unbenanntes Projekt';
 }
 
 function renderProjectSelect(activeId = readActiveProjectId()) {
@@ -102,6 +102,8 @@ function updateLogoPreview() {
 }
 
 function initProjectSettings() {
+  if (window.__techCalcProjectSettingsBound) { renderProjectSelect(); hydrateProjectForm(readProject()); return; }
+  window.__techCalcProjectSettingsBound = true;
   renderProjectSelect();
   hydrateProjectForm(readProject());
 
@@ -133,6 +135,34 @@ function initProjectSettings() {
     renderProjectSelect(projects[0].id);
     hydrateProjectForm(projects[0]);
   });
+
+  document.addEventListener('click', event => {
+    const newButton = event.target.closest?.('#newProjectButton');
+    const deleteButton = event.target.closest?.('#deleteProjectButton');
+    if (!newButton && !deleteButton) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (newButton) {
+      const projects = readProjects();
+      const next = createProject({ project: `Projekt ${projects.length + 1}` });
+      projects.push(next);
+      writeProjects(projects);
+      localStorage.setItem(ACTIVE_PROJECT_KEY, next.id);
+      renderProjectSelect(next.id);
+      hydrateProjectForm(next);
+      return;
+    }
+    let projects = readProjects();
+    if (projects.length <= 1) projects = [createProject({ project: 'Projekt 1' })];
+    else {
+      const activeId = readActiveProjectId(projects);
+      projects = projects.filter(project => project.id !== activeId);
+    }
+    writeProjects(projects);
+    localStorage.setItem(ACTIVE_PROJECT_KEY, projects[0].id);
+    renderProjectSelect(projects[0].id);
+    hydrateProjectForm(projects[0]);
+  }, true);
 
   bindProjectInput('pdfClient', 'client');
   bindProjectInput('pdfProject', 'project');

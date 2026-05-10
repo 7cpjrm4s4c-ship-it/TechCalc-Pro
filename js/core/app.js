@@ -32,6 +32,24 @@ const settingsButton = document.getElementById('settingsButton');
 const settingsPanel = document.getElementById('settingsPanel');
 const closeSettings = document.getElementById('closeSettings');
 const settingsBody = settingsPanel?.querySelector('.settings-panel__body');
+const THEME_STORAGE_KEY = 'techcalc-theme-mode';
+
+function applyThemeMode(mode = localStorage.getItem(THEME_STORAGE_KEY) || 'system') {
+  const value = ['dark', 'light', 'system'].includes(mode) ? mode : 'system';
+  if (value === 'system') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', value);
+  }
+  localStorage.setItem(THEME_STORAGE_KEY, value);
+  document.querySelectorAll('.theme-switch__option').forEach(item => {
+    const active = item.dataset.theme === value;
+    item.classList.toggle('is-active', active);
+    item.setAttribute('aria-pressed', String(active));
+  });
+}
+
+applyThemeMode();
 
 let settingsScrollY = 0;
 let lastFocusedElement = null;
@@ -130,22 +148,18 @@ settingsPanel?.querySelectorAll('.settings-submenu').forEach(details => {
       const bodyRect = body.getBoundingClientRect();
       const detailsRect = details.getBoundingClientRect();
       const summaryRect = summary?.getBoundingClientRect() || detailsRect;
-      const bottomOverflow = detailsRect.bottom - bodyRect.bottom + 14;
+      const bottomOverflow = detailsRect.bottom - bodyRect.bottom + 24;
       const topOverflow = bodyRect.top - summaryRect.top + 10;
       if (topOverflow > 0) body.scrollBy({ top: -topOverflow, behavior: 'smooth' });
       else if (bottomOverflow > 0) body.scrollBy({ top: bottomOverflow, behavior: 'smooth' });
+      if (details.offsetHeight > body.clientHeight) summary?.scrollIntoView({ block: 'start', behavior: 'smooth' });
     });
   });
 });
 
 settingsPanel?.querySelectorAll('.theme-switch__option').forEach(button => {
   button.addEventListener('click', () => {
-    const group = button.closest('.theme-switch');
-    group?.querySelectorAll('.theme-switch__option').forEach(item => {
-      const active = item === button;
-      item.classList.toggle('is-active', active);
-      item.setAttribute('aria-pressed', String(active));
-    });
+    applyThemeMode(button.dataset.theme || 'system');
   });
 });
 
