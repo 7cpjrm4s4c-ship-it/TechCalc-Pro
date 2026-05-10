@@ -1,12 +1,9 @@
 import config from './config.js';
 import { state } from './state.js';
 import { calculate, CONSUMERS, BUILDING_TYPES, createConsumer, createUsageUnit, readUsageUnits, writeUsageUnits, readSingleConsumers, writeSingleConsumers } from './logic.js';
-import { card, field, selectField, segmented, renderModuleShell, bindCommonInputs, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, esc } from '../../core/renderer.js';
+import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-
-function esc(value) {
-  return String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
-}
 
 function consumerOptions() {
   return CONSUMERS.map(c => ({ value: c.id, label: `${c.label} · ${fmt(c.vr, 2)} l/s` }));
@@ -215,13 +212,8 @@ export default {
   config,
   state,
   mount(root) {
-    const render = () => {
-      const s = state.get();
-      root.innerHTML = view(s);
-      bindCommonInputs(root, state);
-      bindDrinkingWater(root, s, render);
-    };
-    state.subscribe(render);
-    render();
+    mountModule(root, state, view, (rootEl, snapshot, render) => {
+      bindDrinkingWater(rootEl, snapshot, render);
+    });
   }
 };

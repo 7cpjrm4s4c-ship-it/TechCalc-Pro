@@ -1,7 +1,8 @@
 import config from './config.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, selectField, resultRows, renderModuleShell, bindCommonInputs, stack, grid, inlineStats } from '../../core/renderer.js';
+import { card, field, selectField, resultRows, renderModuleShell, stack, grid, inlineStats } from '../../core/renderer.js';
+import { mountModule } from '../../core/mount.js';
 import { fmt } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
 
@@ -82,11 +83,6 @@ export default {
   config,
   state,
   mount(root) {
-    const render = () => {
-      root.innerHTML = view(state.get());
-      bindCommonInputs(root, state);
-    };
-    state.subscribe(render);
-    render();
+    mountModule(root, state, view);
   }
 };

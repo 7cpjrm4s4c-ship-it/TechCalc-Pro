@@ -1,4 +1,4 @@
-function esc(value) {
+export function esc(value) {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')

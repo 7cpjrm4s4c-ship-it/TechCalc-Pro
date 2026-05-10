@@ -1,7 +1,8 @@
 import config from './config.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, segmented, renderModuleShell, bindCommonInputs, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
+import { card, field, segmented, renderModuleShell, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
+import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 
 function readonlyValue({ label, value, unit = '' }) {
@@ -99,10 +100,11 @@ function mixingInputCard(s) {
 
 function mixingOutputCard(r) {
   return card('Mischluft — Ausgabe', `<div class="wrg-group-grid">
-    ${readonlyAirCard('Mischluft / Zuluft', r.mixed, 'cyan', { includeMass: false, includeVolume: true })}
+    ${readonlyAirCard('Mischluft / Zuluft', r.mixed, 'cyan', { includeMass: false })}
     ${card('Mischungsverhältnis', inlineStats([
       { label: 'Außenluftanteil', value: fmt(r.outdoorShare, 0), unit: '%' },
       { label: 'Umluftanteil', value: fmt(r.recircShare, 0), unit: '%' },
+      { label: 'Gesamtvolumenstrom', value: fmt(r.mixed.volumeFlowM3h, 0), unit: 'm³/h' },
       { label: 'Massenstrom', value: fmt(r.mixed.massFlowKgh, 2), unit: 'kg/h' },
       { label: 'x', value: fmt(r.mixed.humidityRatioGkg, 2), unit: 'g/kg' }
     ]), 'cyan')}
@@ -154,11 +156,6 @@ export default {
   config,
   state,
   mount(root) {
-    const render = () => {
-      root.innerHTML = view(state.get());
-      bindCommonInputs(root, state);
-    };
-    state.subscribe(render);
-    render();
+    mountModule(root, state, view);
   }
 };

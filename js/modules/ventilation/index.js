@@ -1,7 +1,8 @@
 import config from './config.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, segmented, renderModuleShell, bindCommonInputs, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
+import { card, field, segmented, renderModuleShell, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
+import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 
 const MODE_PREFIX = { heating: 'heating', cooling: 'cooling' };
@@ -50,11 +51,11 @@ function inputFields(s, active) {
   if (active.calcTarget === 'power') {
     return [
       field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) }),
-      field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(dtValue, 2), disabled: true })
+      field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(dtValue, 2) })
     ];
   }
   if (active.calcTarget === 'volumeFlow') {
-    return [powerField(s), field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(dtValue, 2), disabled: true })];
+    return [powerField(s), field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(dtValue, 2) })];
   }
   return [powerField(s), field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) })];
 }
@@ -119,11 +120,6 @@ export default {
   config,
   state,
   mount(root) {
-    const render = () => {
-      root.innerHTML = view(state.get());
-      bindCommonInputs(root, state);
-    };
-    state.subscribe(render);
-    render();
+    mountModule(root, state, view);
   }
 };

@@ -3,7 +3,8 @@ import { state } from './state.js';
 import { calculate } from './logic.js';
 import { MEDIA, fmt, fmtInput } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
-import { card, field, selectField, segmented, renderModuleShell, bindCommonInputs, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
+import { mountModule } from '../../core/mount.js';
 
 const MODE_PREFIX = {
   heating: 'heating',
@@ -237,12 +238,8 @@ export default {
   config,
   state,
   mount(root) {
-    const render = () => {
-      root.innerHTML = view(state.get());
-      bindCommonInputs(root, state);
-      bindLineSections(root, calculate(activeCalculationState(state.get())), render);
-    };
-    state.subscribe(render);
-    render();
+    mountModule(root, state, view, (rootEl, snapshot, render) => {
+      bindLineSections(rootEl, calculate(activeCalculationState(snapshot)), render);
+    });
   }
 };
