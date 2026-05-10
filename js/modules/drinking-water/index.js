@@ -39,11 +39,7 @@ function unitRows(units) {
         { label:'DIN-Ansatz', value:'2 größte wirksame Entnahmestellen' }
       ])}
       <div class="dw-consumer-list">${(unit.consumers||[]).map(c => `<div class="dw-consumer-row"><div><strong>${esc(c.count)} × ${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s · ${fmt(c.vr,2)} l/s je Verbraucher</span></div></div>`).join('')}</div>
-      <div class="dw-add-row">
-        <select data-dw-unit-consumer="${esc(unit.id)}">${consumerSelectOptions()}</select>
-        <input data-dw-unit-count="${esc(unit.id)}" type="text" inputmode="numeric" value="1" aria-label="Anzahl">
-        <button type="button" class="mini-button" data-dw-unit-add-consumer="${esc(unit.id)}">Hinzufügen</button>
-      </div>
+
     </div>
   </details>`).join('')}</div>`;
 }
@@ -65,6 +61,22 @@ function singleRows(singles) {
     </div>
   </details>`).join('')}</div>`;
 }
+
+function selectedFixturesList(r) {
+  const aggregate = new Map();
+  const add = (consumer) => {
+    const key = `${consumer.label}|${consumer.vr}|${consumer.permanent ? '1' : '0'}`;
+    const current = aggregate.get(key) || { label: consumer.label, vr: Number(consumer.vr || 0), count: 0, permanent: Boolean(consumer.permanent) };
+    current.count += Number(consumer.count) || 1;
+    aggregate.set(key, current);
+  };
+  (r.usageUnits || []).forEach(unit => (unit.consumers || []).forEach(add));
+  (r.singles || []).forEach(add);
+  const rows = [...aggregate.values()];
+  if (!rows.length) return '<div class="empty-state empty-state--compact">Noch keine Einrichtungsgegenstände ausgewählt</div>';
+  return `<div class="dw-fixture-list">${rows.map(item => `<div class="dw-fixture-row"><strong>${esc(item.count)} × ${esc(item.label)}</strong><span>${fmt(item.vr * item.count, 2)} l/s</span>${item.permanent ? '<em>Dauerverbraucher</em>' : ''}</div>`).join('')}</div>`;
+}
+
 
 function inputCard(s, r) {
   return stack([
@@ -124,10 +136,7 @@ function resultCard(r) {
       { label:'Q3 Wasserzähler', value:fmt(r.house.q3, 0), unit:'m³/h' },
       { label:'Auslegung', value:'Vorläufig über Spitzendurchfluss' }
     ]), 'blue'),
-    card('Zusammenstellung Einrichtungsgegenstände', stack([
-      `<details class="dw-accordion" open><summary><span><strong>Nutzungseinheiten</strong><small>${r.usageUnits.length} NE</small></span></summary><div class="dw-accordion__body">${unitRows(r.usageUnits)}</div></details>`,
-      `<details class="dw-accordion"><summary><span><strong>Freie Einzelverbraucher</strong><small>${r.singles.length} Einträge</small></span></summary><div class="dw-accordion__body">${singleRows(r.singles)}</div></details>`
-    ].join('')), 'blue'),
+    card('Zusammenstellung Einrichtungsgegenstände', selectedFixturesList(r), 'blue'),
     card('Hinweis', `<div class="formula">Dauerverbraucher werden zum nach Gleichzeitigkeit ermittelten Spitzendurchfluss addiert. Die endgültige Dimensionierung der Rohrnetze erfolgt mit Druckverlust, Fließgeschwindigkeit und hydraulisch ungünstigstem Fließweg.</div>`, 'blue', { compact:true })
   ].join(''));
 }

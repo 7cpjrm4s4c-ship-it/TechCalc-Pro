@@ -84,18 +84,20 @@ function unitEffectiveConsumers(unit) {
 
 export function summarizeUsageUnit(unit) {
   const effective = unitEffectiveConsumers(unit);
-  const sumFlow = effective.reduce((sum, c) => sum + Number(c.vr || 0), 0);
-  const peakFlow = effective
+  const topTwoFlow = effective
     .map(c => Number(c.vr || 0))
     .sort((a,b) => b-a)
     .slice(0, 2)
     .reduce((sum, v) => sum + v, 0);
+  const rawFlow = (unit.consumers || []).reduce((sum, c) => sum + Number(c.vr || 0) * (Number(c.count) || 1), 0);
   return {
     ...unit,
     effectiveConsumers: effective,
     consumerCount: (unit.consumers || []).reduce((sum, c) => sum + (Number(c.count)||1), 0),
-    sumFlow,
-    peakFlow
+    rawFlow,
+    // DIN-NE-Ansatz für die weitere Gesamtberechnung: zwei größte wirksame Entnahmestellen.
+    sumFlow: topTwoFlow,
+    peakFlow: topTwoFlow
   };
 }
 
@@ -107,14 +109,17 @@ function simultaneity(building, sumVr) {
 
 function recommendHouseConnection(peakLs) {
   const flowM3h = peakLs * 3.6;
+  // Vorbemessung nach Q3-Auswahl: der Wasserzähler muss den Spitzendurchfluss abdecken.
+  // DN bleibt bewusst konservativ, aber kleine Wohnanlagen mit ca. 1 m³/h fallen nicht mehr auf DN 32 / Q3 10.
   const rows = [
-    { limit:1.0, dn:'DN 25', meter:'Q3 4', q3:4 },
-    { limit:2.0, dn:'DN 32', meter:'Q3 10', q3:10 },
-    { limit:4.4, dn:'DN 40', meter:'Q3 16', q3:16 },
-    { limit:7.0, dn:'DN 50', meter:'Q3 25', q3:25 },
-    { limit:11.0, dn:'DN 65', meter:'Q3 40', q3:40 },
-    { limit:17.5, dn:'DN 80', meter:'Q3 63', q3:63 },
-    { limit:28.0, dn:'DN 100', meter:'Q3 100', q3:100 }
+    { limit:2.5, dn:'DN 25', meter:'Q3 4', q3:4 },
+    { limit:4.0, dn:'DN 32', meter:'Q3 4', q3:4 },
+    { limit:6.3, dn:'DN 32', meter:'Q3 10', q3:10 },
+    { limit:10.0, dn:'DN 40', meter:'Q3 16', q3:16 },
+    { limit:16.0, dn:'DN 50', meter:'Q3 25', q3:25 },
+    { limit:25.0, dn:'DN 65', meter:'Q3 40', q3:40 },
+    { limit:40.0, dn:'DN 80', meter:'Q3 63', q3:63 },
+    { limit:63.0, dn:'DN 100', meter:'Q3 100', q3:100 }
   ];
   const match = rows.find(r => flowM3h <= r.limit) || rows[rows.length - 1];
   return { ...match, flowM3h };

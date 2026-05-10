@@ -2263,3 +2263,118 @@ body.settings-open {
   .dw-accordion__body { padding: 12px; }
   .dw-consumer-row { align-items: flex-start; }
 }
+
+/* Drinking water v13: align with global spacing and mobile width rules. */
+.module-view[data-module='drinking-water'] .card__body,
+.module-view[data-module='drinking-water'] .tc-stack,
+.module-view[data-module='drinking-water'] .dw-list,
+.module-view[data-module='drinking-water'] .dw-consumer-list {
+  gap: var(--card-gap);
+}
+.module-view[data-module='drinking-water'] .dw-accordion {
+  width: 100%;
+  max-width: 100%;
+  border-radius: var(--radius-lg);
+  background: rgba(255,255,255,.032);
+}
+.module-view[data-module='drinking-water'] .dw-accordion + .dw-accordion { margin-top: var(--card-gap); }
+.module-view[data-module='drinking-water'] .dw-accordion > summary {
+  min-height: 56px;
+  padding: 12px 14px;
+  gap: 10px;
+}
+.module-view[data-module='drinking-water'] .dw-accordion > summary span {
+  overflow: hidden;
+}
+.module-view[data-module='drinking-water'] .dw-accordion > summary strong,
+.module-view[data-module='drinking-water'] .dw-accordion > summary small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.module-view[data-module='drinking-water'] .dw-accordion > summary small {
+  white-space: normal;
+}
+.module-view[data-module='drinking-water'] .dw-accordion__body {
+  padding: 12px 14px 14px;
+  display: grid;
+  gap: var(--card-gap);
+}
+.module-view[data-module='drinking-water'] .dw-consumer-row {
+  min-height: 48px;
+  padding: 9px 10px;
+  border-radius: 14px;
+}
+.module-view[data-module='drinking-water'] .dw-consumer-row strong,
+.module-view[data-module='drinking-water'] .dw-consumer-row span {
+  overflow-wrap: anywhere;
+}
+.module-view[data-module='drinking-water'] .action-button,
+.module-view[data-module='drinking-water'] .mini-button {
+  max-width: 100%;
+  white-space: normal;
+  line-height: 1.2;
+}
+.module-view[data-module='drinking-water'] .dw-fixture-list {
+  display: grid;
+  gap: var(--card-gap);
+}
+.module-view[data-module='drinking-water'] .dw-fixture-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: rgba(255,255,255,.04);
+}
+.module-view[data-module='drinking-water'] .dw-fixture-row strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text);
+}
+.module-view[data-module='drinking-water'] .dw-fixture-row span {
+  color: var(--color-muted);
+  font-weight: 800;
+  white-space: nowrap;
+}
+.module-view[data-module='drinking-water'] .dw-fixture-row em {
+  grid-column: 1 / -1;
+  color: var(--accent-blue);
+  font-style: normal;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+@media (max-width: 767px) {
+  .module-view[data-module='drinking-water'] .tc-fields,
+  .module-view[data-module='drinking-water'] .tc-fields--3 {
+    grid-template-columns: 1fr;
+  }
+  .module-view[data-module='drinking-water'] .card {
+    padding: 14px;
+    min-height: 0;
+  }
+  .module-view[data-module='drinking-water'] .dw-accordion > summary {
+    min-height: 54px;
+    padding: 11px 12px;
+  }
+  .module-view[data-module='drinking-water'] .dw-accordion__body {
+    padding: 11px 12px 12px;
+  }
+  .module-view[data-module='drinking-water'] .dw-fixture-row {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .module-view[data-module='drinking-water'] .dw-fixture-row span {
+    white-space: normal;
+  }
+}
+:root[data-theme='light'] .module-view[data-module='drinking-water'] .dw-fixture-row {
+  background: #fff !important;
+  border-color: rgba(15,23,42,.18) !important;
+}
