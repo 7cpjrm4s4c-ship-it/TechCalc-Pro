@@ -2090,3 +2090,58 @@ body.settings-open {
   max-height: none !important;
   overflow: visible !important;
 }
+
+/* Drinking water module */
+.dw-list {
+  display: grid;
+  gap: 10px;
+}
+.dw-item .inline-stats {
+  margin-top: 8px;
+}
+.dw-consumers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.dw-consumers span {
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 12px;
+  color: var(--color-muted);
+  background: rgba(255,255,255,.04);
+}
+.dw-consumers small {
+  opacity: .72;
+}
+.dw-add-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 78px auto;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+}
+.dw-add-row select,
+.dw-add-row input {
+  min-height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  background: rgba(255,255,255,.06);
+  color: var(--color-text);
+  padding: 0 12px;
+  font-weight: 700;
+}
+@media (max-width: 767px) {
+  .dw-add-row {
+    grid-template-columns: 1fr;
+  }
+}
+:root[data-theme='light'] .dw-consumers span,
+:root[data-theme='light'] .dw-add-row select,
+:root[data-theme='light'] .dw-add-row input {
+  background: #fff !important;
+  color: #0f172a !important;
+  border-color: rgba(15,23,42,.24) !important;
+}

@@ -7,6 +7,7 @@ import pipeSizingConfig from '../modules/pipe-sizing/config.js';
 import unitConverterConfig from '../modules/unit-converter/config.js';
 import heatRecoveryConfig from '../modules/heat-recovery/config.js';
 import hxDiagramConfig from '../modules/hx-diagram/config.js';
+import drinkingWaterConfig from '../modules/drinking-water/config.js';
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
@@ -15,6 +16,7 @@ const lazyModules = [
   { config: hxDiagramConfig, path: '../modules/hx-diagram/index.js' },
   { config: pipeSizingConfig, path: '../modules/pipe-sizing/index.js' },
   { config: unitConverterConfig, path: '../modules/unit-converter/index.js' },
+  { config: drinkingWaterConfig, path: '../modules/drinking-water/index.js' },
 ];
 
 const moduleCache = new Map();
