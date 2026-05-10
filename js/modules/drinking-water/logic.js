@@ -56,11 +56,12 @@ export function createConsumer({ typeId, count = 1, name = '', permanent = false
   };
 }
 
-export function createUsageUnit({ name, consumer }) {
+export function createUsageUnit({ name, consumer, consumers }) {
+  const list = Array.isArray(consumers) && consumers.length ? consumers : consumer ? [consumer] : [];
   return {
     id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     name: name || 'Nutzungseinheit',
-    consumers: [consumer],
+    consumers: list,
     createdAt: new Date().toISOString()
   };
 }

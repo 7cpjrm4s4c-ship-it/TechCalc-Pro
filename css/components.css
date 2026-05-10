@@ -2145,3 +2145,121 @@ body.settings-open {
   color: #0f172a !important;
   border-color: rgba(15,23,42,.24) !important;
 }
+
+/* Drinking water expandable composition UI */
+.dw-accordion {
+  border: 1px solid var(--color-border);
+  border-radius: 22px;
+  background: rgba(255,255,255,.035);
+  overflow: hidden;
+}
+.dw-accordion + .dw-accordion { margin-top: 10px; }
+.dw-accordion > summary {
+  list-style: none;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  font-weight: 800;
+  color: var(--color-text);
+}
+.dw-accordion > summary::-webkit-details-marker { display: none; }
+.dw-accordion > summary::after {
+  content: '›';
+  color: var(--accent-blue);
+  font-size: 28px;
+  transform: rotate(90deg);
+  transition: transform .18s ease;
+  flex: 0 0 auto;
+}
+.dw-accordion[open] > summary::after { transform: rotate(-90deg); }
+.dw-accordion > summary span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.dw-accordion > summary small {
+  color: var(--color-muted);
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1.25;
+}
+.dw-accordion > summary button {
+  position: relative;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: rgba(255,255,255,.05);
+  color: var(--color-muted);
+  font-size: 20px;
+}
+.dw-accordion__body {
+  border-top: 1px solid rgba(255,255,255,.08);
+  padding: 14px;
+}
+.dw-accordion--form > summary,
+.dw-accordion--saved > summary {
+  background: rgba(255,255,255,.025);
+}
+.dw-consumer-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+.dw-consumer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 52px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,.04);
+}
+.dw-consumer-row div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.dw-consumer-row strong {
+  color: var(--color-text);
+  font-size: 14px;
+}
+.dw-consumer-row span {
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.dw-consumer-row button {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: rgba(255,255,255,.06);
+  color: var(--color-muted);
+  font-size: 20px;
+}
+.action-button--secondary {
+  background: rgba(255,255,255,.04);
+  color: var(--color-text);
+}
+:root[data-theme='light'] .dw-accordion,
+:root[data-theme='light'] .dw-consumer-row {
+  background: #fff !important;
+  border-color: rgba(15,23,42,.18) !important;
+}
+:root[data-theme='light'] .dw-accordion__body {
+  border-top-color: rgba(15,23,42,.12) !important;
+}
+@media (max-width: 767px) {
+  .dw-accordion > summary { padding: 13px 14px; }
+  .dw-accordion__body { padding: 12px; }
+  .dw-consumer-row { align-items: flex-start; }
+}
