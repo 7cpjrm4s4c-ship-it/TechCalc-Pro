@@ -60,7 +60,12 @@
           <summary>Projekteinstellungen</summary>
           <div class="settings-submenu__content settings-form" id="projectPdfSettings">
             <p>Projekte werden lokal im Browser gespeichert und in der PDF-Kopfzeile verwendet.</p>
-            <label>Projekt auswählen<select id="projectSelect"></select></label>
+            <div class="settings-field settings-field--project">
+              <span class="settings-field__label">Projekt auswählen</span>
+              <label class="project-select-card" aria-label="Projekt auswählen">
+                <select id="projectSelect"></select>
+              </label>
+            </div>
             <div class="settings-actions settings-actions--split">
               <button class="mini-button mini-button--primary" id="newProjectButton" type="button">Neues Projekt</button>
               <button class="mini-button" id="deleteProjectButton" type="button">Projekt löschen</button>
@@ -90,7 +95,14 @@
           <summary>Darstellung</summary>
           <div class="settings-submenu__content settings-form">
             <p>Vorbereitung für Dark, Light und System-Farbschema.</p>
-            <label>Farbschema<select id="themeMode" disabled><option>System</option><option>Dark</option><option>Light</option></select></label>
+            <div class="settings-field">
+              <span class="settings-field__label">Farbschema</span>
+              <div class="theme-switch" id="themeMode" role="radiogroup" aria-label="Farbschema">
+                <button type="button" class="theme-switch__option" data-theme="dark" aria-pressed="false">Dark</button>
+                <button type="button" class="theme-switch__option" data-theme="light" aria-pressed="false">Light</button>
+                <button type="button" class="theme-switch__option is-active" data-theme="system" aria-pressed="true">System</button>
+              </div>
+            </div>
           </div>
         </details>
 

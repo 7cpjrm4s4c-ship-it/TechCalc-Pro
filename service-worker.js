@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-menu-fallback-v6';
+const CACHE_NAME = 'techcalc-pro-settings-drawer-v7';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',

@@ -126,12 +126,25 @@ settingsPanel?.querySelectorAll('.settings-submenu').forEach(details => {
     requestAnimationFrame(() => {
       const body = settingsBody;
       if (!body) return;
+      const summary = details.querySelector('summary');
       const bodyRect = body.getBoundingClientRect();
       const detailsRect = details.getBoundingClientRect();
-      const bottomOverflow = detailsRect.bottom - bodyRect.bottom + 12;
-      const topOverflow = bodyRect.top - detailsRect.top + 12;
+      const summaryRect = summary?.getBoundingClientRect() || detailsRect;
+      const bottomOverflow = detailsRect.bottom - bodyRect.bottom + 14;
+      const topOverflow = bodyRect.top - summaryRect.top + 10;
       if (topOverflow > 0) body.scrollBy({ top: -topOverflow, behavior: 'smooth' });
       else if (bottomOverflow > 0) body.scrollBy({ top: bottomOverflow, behavior: 'smooth' });
+    });
+  });
+});
+
+settingsPanel?.querySelectorAll('.theme-switch__option').forEach(button => {
+  button.addEventListener('click', () => {
+    const group = button.closest('.theme-switch');
+    group?.querySelectorAll('.theme-switch__option').forEach(item => {
+      const active = item === button;
+      item.classList.toggle('is-active', active);
+      item.setAttribute('aria-pressed', String(active));
     });
   });
 });
@@ -149,11 +162,9 @@ document.addEventListener('keydown', event => {
 // iOS/Safari: lock the app background; only the drawer body is scrollable.
 document.addEventListener('touchmove', event => {
   if (!isSettingsOpen()) return;
+  const panel = event.target.closest('#settingsPanel');
   const scrollHost = event.target.closest('.settings-panel__body');
-  if (scrollHost) {
-    const canScroll = scrollHost.scrollHeight > scrollHost.clientHeight;
-    if (canScroll) return;
-  }
+  if (panel && scrollHost && scrollHost.scrollHeight > scrollHost.clientHeight) return;
   event.preventDefault();
 }, { passive: false });
 

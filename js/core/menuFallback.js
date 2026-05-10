@@ -94,8 +94,9 @@
 
   function touchMoveHandler(event) {
     if (!isOpen()) return;
+    var panel = event.target.closest && event.target.closest('#settingsPanel');
     var body = event.target.closest && event.target.closest('.settings-panel__body');
-    if (body && body.scrollHeight > body.clientHeight) return;
+    if (panel && body && body.scrollHeight > body.clientHeight) return;
     event.preventDefault();
   }
 
