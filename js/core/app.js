@@ -81,7 +81,7 @@ function unlockPageScroll() {
 }
 
 function closeAllSubmenus(except = null) {
-  settingsPanel?.querySelectorAll('.settings-submenu[open]').forEach(details => {
+  settingsPanel?.querySelectorAll('.settings-submenu').forEach(details => {
     if (details !== except) details.open = false;
   });
 }
@@ -90,6 +90,7 @@ function setSettingsOpen(open) {
   if (!settingsPanel || !settingsButton) return;
 
   if (open) {
+    closeAllSubmenus();
     lastFocusedElement = document.activeElement;
     settingsPanel.hidden = false;
     settingsPanel.removeAttribute('hidden');
@@ -104,6 +105,7 @@ function setSettingsOpen(open) {
     return;
   }
 
+  closeAllSubmenus();
   settingsPanel.classList.remove('is-open');
   settingsPanel.hidden = true;
   settingsPanel.setAttribute('hidden', '');

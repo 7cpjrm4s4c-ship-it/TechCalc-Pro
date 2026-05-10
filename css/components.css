@@ -2007,3 +2007,86 @@ body.settings-open {
     max-height: none !important;
   }
 }
+
+/* Final settings/project/export fixes */
+:root[data-theme='light'] .glass-surface,
+:root[data-theme='light'] .card,
+:root[data-theme='light'] #settingsPanel.settings-panel,
+:root[data-theme='light'] #settingsPanel .settings-submenu,
+:root[data-theme='light'] #settingsPanel .settings-submenu__content,
+:root[data-theme='light'] .project-select-card,
+:root[data-theme='light'] .inline-stat,
+:root[data-theme='light'] .settings-row,
+:root[data-theme='light'] .settings-check {
+  background: rgba(255,255,255,.96) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+  box-shadow: 0 14px 42px rgba(15,23,42,.10), inset 0 1px 0 rgba(255,255,255,.9) !important;
+}
+:root[data-theme='light'] .app-header {
+  background: rgba(255,255,255,.94) !important;
+  border-color: rgba(15,23,42,.12) !important;
+}
+:root[data-theme='light'] .module-tab {
+  background: rgba(255,255,255,.84) !important;
+  border-color: rgba(15,23,42,.10) !important;
+  color: #475569 !important;
+}
+:root[data-theme='light'] .module-tab.is-active,
+:root[data-theme='light'] .module-tab.is-overflow-active {
+  background: #eaf6ff !important;
+  color: #0369a1 !important;
+}
+:root[data-theme='light'] .control,
+:root[data-theme='light'] #settingsPanel input,
+:root[data-theme='light'] #settingsPanel select,
+:root[data-theme='light'] .project-select-card select {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(15,23,42,.24) !important;
+}
+:root[data-theme='light'] .control input,
+:root[data-theme='light'] .control select {
+  color: #0f172a !important;
+}
+:root[data-theme='light'] .control input::placeholder,
+:root[data-theme='light'] #settingsPanel input::placeholder {
+  color: #64748b !important;
+  opacity: 1 !important;
+}
+:root[data-theme='light'] .mini-button,
+:root[data-theme='light'] .theme-switch {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: rgba(15,23,42,.22) !important;
+}
+:root[data-theme='light'] .theme-switch__option {
+  color: #475569 !important;
+}
+:root[data-theme='light'] .theme-switch__option.is-active {
+  color: #0f172a !important;
+  background: #dff2ff !important;
+  box-shadow: inset 0 0 0 2px rgba(2,132,199,.48) !important;
+}
+:root[data-theme='light'] .project-select-card select option {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+#saveProjectButton.is-saved {
+  border-color: rgba(45,224,161,.75) !important;
+  background: linear-gradient(135deg, rgba(45,224,161,.35), rgba(45,224,161,.12)) !important;
+}
+/* Keep the settings drawer as the only scroll container and close rows compact. */
+#settingsPanel .settings-submenu:not([open]) > summary {
+  min-height: 64px !important;
+  height: 64px !important;
+}
+#settingsPanel .settings-submenu:not([open]) {
+  min-height: 64px !important;
+  max-height: 64px !important;
+  overflow: hidden !important;
+}
+#settingsPanel .settings-submenu[open] {
+  max-height: none !important;
+  overflow: visible !important;
+}

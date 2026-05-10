@@ -4,6 +4,27 @@ const LEGACY_STORAGE_KEY = 'techcalc-pdf-project-v1';
 const PROJECTS_STORAGE_KEY = 'techcalc-projects-v1';
 const ACTIVE_PROJECT_KEY = 'techcalc-active-project-id';
 
+
+function sanitizeText(value = '') {
+  return String(value ?? '')
+    .replace(/[‐-―]/g, '-')
+    .replace(/[×·]/g, '-')
+    .replace(/[ΘϑΦφρΔηṁṽ]/g, match => ({'Θ':'Theta','ϑ':'Theta','Φ':'Phi','φ':'phi','ρ':'rho','Δ':'Delta','η':'eta','ṁ':'m','ṽ':'V'}[match] || ''))
+    .replace(/[°³²]/g, match => ({'°':'°','³':'3','²':'2'}[match] || ''))
+    .replace(/[\u0000-\u001F\u007F]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function esc(value = '') {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 const DEFAULT_PROJECT = {
   id: '',
   client: '',
@@ -62,11 +83,36 @@ function readProject() {
 function saveProject(next) {
   const projects = readProjects();
   const activeId = readActiveProjectId(projects);
-  const index = Math.max(0, projects.findIndex(project => project.id === activeId));
-  projects[index] = createProject({ ...projects[index], ...next, id: projects[index]?.id || activeId });
+  let index = projects.findIndex(project => project.id === activeId);
+  if (index < 0) index = 0;
+  const base = projects[index] || createProject({ project: 'Projekt 1' });
+  projects[index] = createProject({ ...base, ...next, id: base.id });
   writeProjects(projects);
   localStorage.setItem(ACTIVE_PROJECT_KEY, projects[index].id);
   renderProjectSelect(projects[index].id);
+  return projects[index];
+}
+
+function collectProjectFormValues() {
+  return {
+    client: document.getElementById('pdfClient')?.value || '',
+    project: document.getElementById('pdfProject')?.value || '',
+    projectNo: document.getElementById('pdfProjectNo')?.value || '',
+    engineer: document.getElementById('pdfEngineer')?.value || '',
+    logoDataUrl: readProject().logoDataUrl || ''
+  };
+}
+
+function flashProjectSaved() {
+  const button = document.getElementById('saveProjectButton');
+  if (!button) return;
+  const original = button.textContent;
+  button.textContent = 'Projekt gespeichert';
+  button.classList.add('is-saved');
+  window.setTimeout(() => {
+    button.textContent = original || 'Projekt speichern';
+    button.classList.remove('is-saved');
+  }, 1200);
 }
 
 function projectLabel(project) {
@@ -136,33 +182,7 @@ function initProjectSettings() {
     hydrateProjectForm(projects[0]);
   });
 
-  document.addEventListener('click', event => {
-    const newButton = event.target.closest?.('#newProjectButton');
-    const deleteButton = event.target.closest?.('#deleteProjectButton');
-    if (!newButton && !deleteButton) return;
-    event.preventDefault();
-    event.stopPropagation();
-    if (newButton) {
-      const projects = readProjects();
-      const next = createProject({ project: `Projekt ${projects.length + 1}` });
-      projects.push(next);
-      writeProjects(projects);
-      localStorage.setItem(ACTIVE_PROJECT_KEY, next.id);
-      renderProjectSelect(next.id);
-      hydrateProjectForm(next);
-      return;
-    }
-    let projects = readProjects();
-    if (projects.length <= 1) projects = [createProject({ project: 'Projekt 1' })];
-    else {
-      const activeId = readActiveProjectId(projects);
-      projects = projects.filter(project => project.id !== activeId);
-    }
-    writeProjects(projects);
-    localStorage.setItem(ACTIVE_PROJECT_KEY, projects[0].id);
-    renderProjectSelect(projects[0].id);
-    hydrateProjectForm(projects[0]);
-  }, true);
+
 
   bindProjectInput('pdfClient', 'client');
   bindProjectInput('pdfProject', 'project');
@@ -185,6 +205,13 @@ function initProjectSettings() {
     const file = document.getElementById('pdfLogo');
     if (file) file.value = '';
     updateLogoPreview();
+  });
+
+  document.getElementById('saveProjectButton')?.addEventListener('click', event => {
+    event.preventDefault();
+    const saved = saveProject(collectProjectFormValues());
+    hydrateProjectForm(saved);
+    flashProjectSaved();
   });
 
   updateLogoPreview();
@@ -448,9 +475,19 @@ function openPrintWindow(project, moduleData) {
 
 export function initPdfExport({ modules, currentRoute: routeGetter } = {}) {
   initProjectSettings();
-  document.getElementById('exportPdfButton')?.addEventListener('click', () => {
-    const project = readProject();
-    const moduleData = collectCurrentModule(modules, routeGetter);
-    openPrintWindow(project, moduleData);
+  const exportButton = document.getElementById('exportPdfButton');
+  if (!exportButton || exportButton.dataset.bound === 'true') return;
+  exportButton.dataset.bound = 'true';
+  exportButton.addEventListener('click', event => {
+    event.preventDefault();
+    try {
+      saveProject(collectProjectFormValues());
+      const project = readProject();
+      const moduleData = collectCurrentModule(modules, routeGetter);
+      openPrintWindow(project, moduleData);
+    } catch (error) {
+      console.error('PDF-Export fehlgeschlagen.', error);
+      alert('PDF-Export konnte nicht erstellt werden. Bitte Browser-Konsole prüfen.');
+    }
   });
 }
