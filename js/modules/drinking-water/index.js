@@ -16,7 +16,7 @@ function consumerSelectOptions(selected = '') {
 function draftConsumerList(items, type) {
   if (!items?.length) return '<div class="empty-state empty-state--compact">Noch keine Verbraucher ausgewählt</div>';
   return `<div class="dw-consumer-list">${items.map((c, index) => `<div class="dw-consumer-row">
-    <div><strong>${esc(c.count)} × ${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s · ${fmt(c.vr, 2)} l/s je Verbraucher</span></div>
+    <div><strong>${esc(c.count)} × ${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr, 2)} l/s je Verbraucher</span></div>
     <button type="button" data-dw-remove-draft="${esc(type)}" data-index="${index}" aria-label="Verbraucher entfernen">×</button>
   </div>`).join('')}</div>`;
 }
@@ -30,12 +30,12 @@ function unitRows(units) {
     </summary>
     <div class="dw-accordion__body">
       ${inlineStats([
-        { label:'Verbraucher gesamt', value: unit.consumerCount },
-        { label:'Summendurchfluss NE', value: fmt(unit.sumFlow, 2), unit:'l/s' },
-        { label:'Spitzendurchfluss NE', value: fmt(unit.peakFlow, 2), unit:'l/s' },
-        { label:'DIN-Ansatz', value:'2 größte wirksame Entnahmestellen' }
+        { label:'Verbraucher', value: unit.consumerCount },
+        { label:'Σ NE', value: fmt(unit.sumFlow, 2), unit:'l/s' },
+        { label:'Spitze NE', value: fmt(unit.peakFlow, 2), unit:'l/s' },
+        { label:'Ansatz', value:'2 größte Entnahmestellen' }
       ])}
-      <div class="dw-consumer-list">${(unit.consumers||[]).map(c => `<div class="dw-consumer-row"><div><strong>${esc(c.count)} × ${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s · ${fmt(c.vr,2)} l/s je Verbraucher</span></div></div>`).join('')}</div>
+      <div class="dw-consumer-list">${(unit.consumers||[]).map(c => `<div class="dw-consumer-row"><div><strong>${esc(c.count)} × ${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr,2)} l/s je Verbraucher</span></div></div>`).join('')}</div>
 
     </div>
   </details>`).join('')}</div>`;
@@ -68,10 +68,10 @@ function selectedFixturesList(r) {
     aggregate.set(key, current);
   };
   (r.usageUnits || []).forEach(unit => (unit.consumers || []).forEach(add));
-  (r.singles || []).forEach(add);
+  (r.rawSingles || r.singles || []).forEach(add);
   const rows = [...aggregate.values()];
   if (!rows.length) return '<div class="empty-state empty-state--compact">Noch keine Einrichtungsgegenstände ausgewählt</div>';
-  return `<div class="dw-fixture-list">${rows.map(item => `<div class="dw-fixture-row"><strong>${esc(item.count)} × ${esc(item.label)}</strong><span>${fmt(item.vr * item.count, 2)} l/s</span>${item.permanent ? '<em>Dauerverbraucher</em>' : ''}</div>`).join('')}</div>`;
+  return `<div class="dw-fixture-list dw-fixture-list--plain">${rows.map(item => `<div class="dw-fixture-row"><strong>${esc(item.count)} × ${esc(item.label.replace(' TWW',''))}</strong>${item.permanent ? '<em>Dauerverbraucher</em>' : ''}</div>`).join('')}</div>`;
 }
 
 
@@ -79,9 +79,14 @@ function inputCard(s, r) {
   return stack([
     card('Berechnungsgrundlage', stack([
       selectField({ id:'buildingType', label:'Gebäude-/Nutzungsart', value:s.buildingType, options:BUILDING_TYPES.map(t => ({ value:t.id, label:t.label })) }),
+      segmented('waterHeatingMode', [
+        { value:'central', label:'Zentrale Warmwasserbereitung' },
+        { value:'decentral', label:'Dezentral' }
+      ], s.waterHeatingMode, { accent:'blue' }),
       inlineStats([
         { label:'Gleichzeitigkeitsformel', value:r.formulaText },
-        { label:'Normlogik', value:'NE: maximal zwei größte Entnahmestellen' }
+        { label:'NE-Ansatz', value:'2 größte Entnahmestellen' },
+        { label:'Warmwasser', value:r.centralWarmWater ? 'TWW-Zapfstellen werden mitgerechnet' : 'Dezentral, ohne zentrale TWW-Last' }
       ])
     ].join('')), 'blue'),
     card('Nutzungseinheiten', stack([
@@ -120,12 +125,12 @@ function inputCard(s, r) {
 function resultCard(r) {
   return stack([
     mainResult('Ergebnis — Trinkwasser', { label:'Spitzendurchfluss', value:fmt(r.peakFlow, 2), unit:'l/s' }, [
-      { label:'Summendurchfluss Nutzungseinheiten', value:fmt(r.neSumFlow, 2), unit:'l/s' },
-      { label:'NE-Spitzen addiert', value:fmt(r.nePeakSum, 2), unit:'l/s' },
-      { label:'Einzelverbraucher', value:fmt(r.singleSumFlow, 2), unit:'l/s' },
-      { label:'Gesamt-Summendurchfluss', value:fmt(r.totalSumFlow, 2), unit:'l/s' },
-      { label:'Spitzendurchfluss', value:fmt(r.peakFlow, 2), unit:'l/s' },
-      { label:'Spitzendurchfluss', value:fmt(r.house.flowM3h, 2), unit:'m³/h' }
+      { label:'Σ NE', value:fmt(r.neSumFlow, 2), unit:'l/s' },
+      { label:'NE-Spitzen', value:fmt(r.nePeakSum, 2), unit:'l/s' },
+      { label:'Einzel', value:fmt(r.singleSumFlow, 2), unit:'l/s' },
+      { label:'Gesamt Σ', value:fmt(r.totalSumFlow, 2), unit:'l/s' },
+      { label:'Spitze', value:fmt(r.peakFlow, 2), unit:'l/s' },
+      { label:'Spitze', value:fmt(r.house.flowM3h, 2), unit:'m³/h' }
     ], 'blue'),
     card('Dimensionierung — Hauseinführung / Wasserzähler', inlineStats([
       { label:'Hauseinführung', value:r.house.dn },
@@ -134,7 +139,7 @@ function resultCard(r) {
       { label:'Auslegung', value:'Vorläufig über Spitzendurchfluss' }
     ]), 'blue'),
     card('Zusammenstellung Einrichtungsgegenstände', selectedFixturesList(r), 'blue'),
-    card('Hinweis', `<div class="formula">Dauerverbraucher werden zum nach Gleichzeitigkeit ermittelten Spitzendurchfluss addiert. Die endgültige Dimensionierung der Rohrnetze erfolgt mit Druckverlust, Fließgeschwindigkeit und hydraulisch ungünstigstem Fließweg.</div>`, 'blue', { compact:true })
+    card('Hinweis', `<div class="dw-note">Dauerverbraucher werden zum nach Gleichzeitigkeit ermittelten Spitzendurchfluss addiert. Bei zentraler Warmwasserbereitung werden TWW-Zapfstellen zusätzlich berücksichtigt. 3-Liter-Regel, Probenahmestellen und hygienische Anforderungen sind in der weiteren Planung separat zu prüfen. Die endgültige Rohrnetzdimensionierung erfolgt mit Druckverlust, Fließgeschwindigkeit und hydraulisch ungünstigstem Fließweg.</div>`, 'blue', { compact:true })
   ].join(''));
 }
 

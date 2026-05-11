@@ -2768,3 +2768,118 @@ body.settings-open {
   background: #fff !important;
   border-color: rgba(15,23,42,.18) !important;
 }
+
+/* Drinking water module: compact, non-overlapping cards */
+.module-view[data-module='drinking-water'] .module-content {
+  gap: var(--card-gap);
+}
+
+.module-view[data-module='drinking-water'] .card {
+  overflow: hidden;
+}
+
+.module-view[data-module='drinking-water'] .card__body {
+  min-width: 0;
+}
+
+.module-view[data-module='drinking-water'] .inline-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+  gap: 8px;
+}
+
+.module-view[data-module='drinking-water'] .inline-stat {
+  min-width: 0;
+  padding: 10px 11px;
+  border-radius: 14px;
+  display: grid;
+  align-content: center;
+  gap: 4px;
+}
+
+.module-view[data-module='drinking-water'] .inline-stat span {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+  line-height: 1.05;
+  font-size: clamp(9px, .76vw, 11px);
+  letter-spacing: .11em;
+}
+
+.module-view[data-module='drinking-water'] .inline-stat strong {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.12;
+  font-size: clamp(13px, 1.05vw, 16px);
+}
+
+.module-view[data-module='drinking-water'] .main-result + .inline-stats {
+  margin-top: 10px;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion > summary {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion > summary > span {
+  min-width: 0;
+}
+
+.module-view[data-module='drinking-water'] .dw-consumer-row {
+  min-width: 0;
+  width: 100%;
+}
+
+.module-view[data-module='drinking-water'] .dw-consumer-row strong {
+  font-size: clamp(14px, 1.2vw, 16px);
+  line-height: 1.15;
+}
+
+.module-view[data-module='drinking-water'] .dw-consumer-row span {
+  line-height: 1.2;
+}
+
+.module-view[data-module='drinking-water'] .dw-fixture-list--plain {
+  gap: 8px;
+}
+
+.module-view[data-module='drinking-water'] .dw-fixture-list--plain .dw-fixture-row {
+  grid-template-columns: 1fr;
+  min-height: 42px;
+  padding: 9px 12px;
+}
+
+.module-view[data-module='drinking-water'] .dw-fixture-list--plain .dw-fixture-row strong {
+  font-size: clamp(13px, 1vw, 15px);
+  font-weight: 800;
+  overflow: visible;
+  white-space: normal;
+}
+
+.module-view[data-module='drinking-water'] .dw-note {
+  font-size: clamp(11px, .9vw, 13px);
+  line-height: 1.35;
+  color: var(--color-muted);
+  font-weight: 700;
+  text-align: center;
+}
+
+.module-view[data-module='drinking-water'] .segmented {
+  margin-bottom: 8px;
+}
+
+@media (max-width: 767px) {
+  .module-view[data-module='drinking-water'] .inline-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .module-view[data-module='drinking-water'] .inline-stat {
+    padding: 9px 10px;
+  }
+  .module-view[data-module='drinking-water'] .segmented {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+}

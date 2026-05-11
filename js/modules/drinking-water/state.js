@@ -2,6 +2,7 @@ import { createModuleState } from '../../core/state.js';
 
 export const state = createModuleState({
   buildingType: 'residential',
+  waterHeatingMode: 'central',
   unitName: 'Bad 1',
   unitConsumerType: 'shower',
   unitCount: '1',
