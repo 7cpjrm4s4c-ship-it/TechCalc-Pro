@@ -2883,3 +2883,95 @@ body.settings-open {
     display: grid;
   }
 }
+
+/* Drinking water mobile width fix: keep single-consumer form controls inside the card */
+.module-view[data-module='drinking-water'] .dw-accordion,
+.module-view[data-module='drinking-water'] .dw-accordion__body,
+.module-view[data-module='drinking-water'] .dw-accordion__body > *,
+.module-view[data-module='drinking-water'] .tc-stack,
+.module-view[data-module='drinking-water'] .tc-fields,
+.module-view[data-module='drinking-water'] .field,
+.module-view[data-module='drinking-water'] .control,
+.module-view[data-module='drinking-water'] .segmented,
+.module-view[data-module='drinking-water'] .action-button,
+.module-view[data-module='drinking-water'] .dw-fixture-list,
+.module-view[data-module='drinking-water'] .dw-consumer-row {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion__body {
+  width: 100%;
+  overflow: hidden;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .tc-fields {
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr) minmax(92px, .38fr);
+  gap: 10px;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .field {
+  width: 100%;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .control {
+  width: 100%;
+  overflow: hidden;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form input,
+.module-view[data-module='drinking-water'] .dw-accordion--form select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form select {
+  padding-right: 44px;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .segmented {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .segmented button {
+  min-width: 0;
+  max-width: 100%;
+  padding-inline: 10px;
+  line-height: 1.15;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .action-button {
+  width: 100%;
+  justify-self: stretch;
+}
+
+@media (max-width: 767px) {
+  .module-view[data-module='drinking-water'] .dw-accordion__body {
+    padding-inline: 12px;
+  }
+
+  .module-view[data-module='drinking-water'] .dw-accordion--form .tc-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .module-view[data-module='drinking-water'] .dw-accordion--form .segmented {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .module-view[data-module='drinking-water'] .dw-accordion--form .segmented button {
+    font-size: clamp(13px, 3.6vw, 16px);
+  }
+}
