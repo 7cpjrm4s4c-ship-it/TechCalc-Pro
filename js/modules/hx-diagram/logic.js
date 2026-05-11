@@ -1,19 +1,52 @@
 const P_ATM_PA = 101325;
 
 function num(value, fallback = 0) {
-  if (typeof value === 'number') return Number.isFinite(value) ? value : fallback;
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : fallback;
+  }
+
   const raw = String(value ?? '').trim();
   if (!raw) return fallback;
+
+  // Accept German input notation (1.234,56), plain decimal values (0.0012),
+  // and already calculated numeric strings without destroying decimal points.
   let normalized = raw.replace(/\s/g, '');
   const hasComma = normalized.includes(',');
   const hasDot = normalized.includes('.');
-  if (hasComma && hasDot) normalized = normalized.replace(/\./g, '').replace(',', '.');
-  else if (hasComma) normalized = normalized.replace(',', '.');
+
+  if (hasComma && hasDot) {
+    normalized = normalized.replace(/\./g, '').replace(',', '.');
+  } else if (hasComma) {
+    normalized = normalized.replace(',', '.');
+  }
+
   const n = Number(normalized);
   return Number.isFinite(n) ? n : fallback;
 }
 
-function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function createId() {
+  try {
+    if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
+      return globalThis.crypto.randomUUID();
+    }
+    if (globalThis.crypto && typeof globalThis.crypto.getRandomValues === 'function') {
+      const bytes = new Uint8Array(16);
+      globalThis.crypto.getRandomValues(bytes);
+      bytes[6] = (bytes[6] & 0x0f) | 0x40;
+      bytes[8] = (bytes[8] & 0x3f) | 0x80;
+      const hex = [...bytes].map(b => b.toString(16).padStart(2, '0'));
+      return `${hex.slice(0,4).join('')}-${hex.slice(4,6).join('')}-${hex.slice(6,8).join('')}-${hex.slice(8,10).join('')}-${hex.slice(10,16).join('')}`;
+    }
+  } catch {
+    // Fallback below.
+  }
+  return `hx-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 
 export function saturationPressurePa(tempC) {
   const t = Number(tempC) || 0;
@@ -72,7 +105,12 @@ export function calculatePoint(input) {
   const tempC = num(input.tempC);
   const rhPercent = clamp(num(input.rhPercent), 0, 100);
   const w = humidityRatioKgKg(tempC, rhPercent);
-  return pointFromW({ id: input.id, label: input.label, tempC, wKgKg: w });
+  return pointFromW({
+    id: input.id,
+    label: input.label,
+    tempC,
+    wKgKg: w
+  });
 }
 
 export function pointFromW(input) {
@@ -80,7 +118,7 @@ export function pointFromW(input) {
   const w = Math.max(0, num(input.wKgKg));
   const rhPercent = relativeHumidityPercent(tempC, w);
   return {
-    id: input.id ?? crypto.randomUUID(),
+    id: input.id ?? createId(),
     label: String(input.label || 'Zustand'),
     tempC,
     rhPercent,
@@ -98,7 +136,8 @@ function dewPointFromW(wKgKg) {
   let high = 80;
   for (let i = 0; i < 60; i += 1) {
     const mid = (low + high) / 2;
-    if (humidityRatioKgKg(mid, 100) < wKgKg) low = mid;
+    const ws = humidityRatioKgKg(mid, 100);
+    if (ws < wKgKg) low = mid;
     else high = mid;
   }
   return (low + high) / 2;
@@ -108,41 +147,45 @@ function saturationPointAtW(wKgKg, label) {
   return pointFromW({ label, tempC: dewPointFromW(wKgKg), wKgKg });
 }
 
-function pointOnConstantH(label, h, wKgKg) {
-  return pointFromW({ label, tempC: tempFromEnthalpyAndW(h, wKgKg), wKgKg });
-}
-
 function uniqueByClose(points) {
   const out = [];
   points.forEach(point => {
     const previous = out[out.length - 1];
-    if (!previous || Math.abs(previous.tempC - point.tempC) > 0.05 || Math.abs(previous.humidityRatioGkg - point.humidityRatioGkg) > 0.05) out.push(point);
+    if (!previous || Math.abs(previous.tempC - point.tempC) > 0.05 || Math.abs(previous.humidityRatioGkg - point.humidityRatioGkg) > 0.05) {
+      out.push(point);
+    }
   });
   return out;
 }
 
 export const PROCESS_OPTIONS = [
-  { value: 'heat', label: 'Erhitzen', mode: 'heat' },
-  { value: 'cool', label: 'Kühlen', mode: 'cool' },
-  { value: 'adiabatic', label: 'Erhitzen + adiabat befeuchten', mode: 'heat' },
-  { value: 'steam', label: 'Erhitzen + dampfbefeuchten', mode: 'heat' },
-  { value: 'cool-dehumidify', label: 'Kühlen + entfeuchten', mode: 'cool' }
+  { value: 'heat', label: 'Erhitzen' },
+  { value: 'cool', label: 'Kühlen' },
+  { value: 'adiabatic', label: 'Erhitzen + adiabat befeuchten' },
+  { value: 'steam', label: 'Erhitzen + dampfbefeuchten' },
+  { value: 'cool-dehumidify', label: 'Kühlen + entfeuchten' }
 ];
 
-export function availableProcesses(start, target) {
-  if (target.tempC > start.tempC + 0.05) return PROCESS_OPTIONS.filter(o => o.mode === 'heat');
-  if (target.tempC < start.tempC - 0.05) return PROCESS_OPTIONS.filter(o => o.mode === 'cool');
-  return PROCESS_OPTIONS;
+export function processLabel(value) {
+  return PROCESS_OPTIONS.find(option => option.value === value)?.label ?? 'Automatisch';
 }
 
-export function processLabel(value) { return PROCESS_OPTIONS.find(option => option.value === value)?.label ?? 'Automatisch'; }
-
 function buildHeat(start, target) {
-  return uniqueByClose([{ ...start, label: '1 Ausgang' }, pointFromW({ label: '2 Erwärmen / Endzustand', tempC: target.tempC, wKgKg: start.humidityRatio })]);
+  return uniqueByClose([
+    { ...start, label: '1 Ausgang' },
+    pointFromW({ label: '2 Erwärmen', tempC: target.tempC, wKgKg: start.humidityRatio }),
+    { ...target, label: '3 Ziel' }
+  ]);
 }
 
 function buildCool(start, target) {
-  return uniqueByClose([{ ...start, label: '1 Ausgang' }, pointFromW({ label: '2 Kühlen / Endzustand', tempC: target.tempC, wKgKg: start.humidityRatio })]);
+  const targetAtStartX = pointFromW({ label: '2 Kühlen', tempC: target.tempC, wKgKg: start.humidityRatio });
+  const saturated = saturationPointAtW(start.humidityRatio, '2 Taupunkt / Sättigung');
+  const points = [{ ...start, label: '1 Ausgang' }];
+  if (target.tempC < saturated.tempC) points.push(saturated);
+  points.push(targetAtStartX);
+  points.push({ ...target, label: `${points.length + 1} Ziel` });
+  return uniqueByClose(points);
 }
 
 function buildAdiabatic(start, target) {
@@ -166,12 +209,12 @@ function buildSteam(start, target) {
 }
 
 function buildCoolDehumidify(start, target) {
-  const dewStart = saturationPointAtW(start.humidityRatio, '2 Taupunkt / 100 % r.F.');
-  const targetSat = saturationPointAtW(target.humidityRatio, '3 Kühlen und entfeuchten');
+  const startSaturation = saturationPointAtW(start.humidityRatio, '2 Taupunkt / 100 % r.F.');
+  const targetSaturation = saturationPointAtW(target.humidityRatio, '3 Kühlen und entfeuchten');
   const points = [{ ...start, label: '1 Ausgang' }];
-  if (start.tempC > dewStart.tempC + 0.05) points.push(dewStart);
-  points.push(targetSat);
-  if (Math.abs(target.tempC - targetSat.tempC) > 0.05) points.push({ ...target, label: '4 Nacherwärmen / Ziel' });
+  if (start.tempC > startSaturation.tempC) points.push(startSaturation);
+  points.push(targetSaturation);
+  points.push({ ...target, label: '4 Nacherwärmen / Ziel' });
   return uniqueByClose(points);
 }
 
@@ -193,6 +236,7 @@ export function classifyChange(start, target) {
   const epsT = 0.25;
   const epsX = 0.15;
   const epsH = 2.0;
+
   if (Math.abs(dt) <= epsT && Math.abs(dx) <= epsX) return 'Keine relevante Zustandsänderung';
   if (dx < -epsX && dt < -epsT) return 'Kühlen und Entfeuchten';
   if (dx > epsX && Math.abs(dh) <= epsH) return 'Erhitzen und adiabat befeuchten';
@@ -204,21 +248,34 @@ export function classifyChange(start, target) {
   return dt > 0 ? 'Erhitzen' : 'Kühlen';
 }
 
+function normalizeSelectedProcess(process, current, target) {
+  const t0 = current.tempC;
+  const t1 = target.tempC;
+  if (t0 < t1 && ['cool', 'cool-dehumidify'].includes(process)) return 'heat';
+  if (t0 > t1 && ['heat', 'adiabatic', 'steam'].includes(process)) return 'cool-dehumidify';
+  return process || 'heat';
+}
+
 export function calculate(input) {
-  const current = calculatePoint({ label: 'Ausgangszustand', tempC: input.tempC, rhPercent: input.rhPercent });
-  const target = calculatePoint({ label: 'Zielzustand', tempC: input.targetTempC, rhPercent: input.targetRhPercent });
-  const options = availableProcesses(current, target);
-  const selectedProcess = options.some(option => option.value === input.process) ? input.process : options[0]?.value ?? 'heat';
+  const current = calculatePoint({
+    label: 'Ausgangszustand',
+    tempC: input.tempC,
+    rhPercent: input.rhPercent
+  });
+  const target = calculatePoint({
+    label: 'Zielzustand',
+    tempC: input.targetTempC,
+    rhPercent: input.targetRhPercent
+  });
+  const selectedProcess = normalizeSelectedProcess(input.process || 'adiabatic', current, target);
   const processPath = buildProcessPath(current, target, selectedProcess);
   const changeType = processLabel(selectedProcess);
-  const last = processPath[processPath.length - 1] ?? target;
   const delta = {
-    tempK: last.tempC - current.tempC,
-    humidityGkg: last.humidityRatioGkg - current.humidityRatioGkg,
-    enthalpyKjKg: last.enthalpyKjKg - current.enthalpyKjKg,
-    rhPercent: last.rhPercent - current.rhPercent
+    tempK: target.tempC - current.tempC,
+    humidityGkg: target.humidityRatioGkg - current.humidityRatioGkg,
+    enthalpyKjKg: target.enthalpyKjKg - current.enthalpyKjKg,
+    rhPercent: target.rhPercent - current.rhPercent
   };
-  const processes = Array.isArray(input.processes) ? input.processes : [];
-  const activeProcess = processes.find(process => process.id === input.activeProcessId) ?? null;
-  return { current, target, changeType, selectedProcess, processPath, delta, options, processes, activeProcess };
+  const points = (input.points ?? []).map(point => calculatePoint(point));
+  return { current, target, changeType, selectedProcess, processPath, delta, points };
 }
