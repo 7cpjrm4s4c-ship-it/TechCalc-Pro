@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-ui-actions-v18';
+const CACHE_NAME = 'techcalc-pro-hx-eager-v20';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',

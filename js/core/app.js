@@ -7,20 +7,26 @@ import pipeSizingConfig from '../modules/pipe-sizing/config.js';
 import unitConverterConfig from '../modules/unit-converter/config.js';
 import heatRecoveryConfig from '../modules/heat-recovery/config.js';
 import hxDiagramConfig from '../modules/hx-diagram/config.js';
+import hxDiagramModule from '../modules/hx-diagram/index.js';
 import drinkingWaterConfig from '../modules/drinking-water/config.js';
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
   { config: ventilationConfig, path: '../modules/ventilation/index.js' },
   { config: heatRecoveryConfig, path: '../modules/heat-recovery/index.js' },
-  { config: hxDiagramConfig, path: '../modules/hx-diagram/index.js' },
+  { config: hxDiagramConfig, module: hxDiagramModule },
   { config: pipeSizingConfig, path: '../modules/pipe-sizing/index.js' },
   { config: unitConverterConfig, path: '../modules/unit-converter/index.js' },
   { config: drinkingWaterConfig, path: '../modules/drinking-water/index.js' },
 ];
 
 const moduleCache = new Map();
-function registerLazyModule({ config, path }) {
+function registerLazyModule({ config, path, module: eagerModule }) {
+  if (eagerModule) {
+    modules.register({ config, mount: eagerModule.mount });
+    return;
+  }
+
   modules.register({
     config,
     async mount(root) {
@@ -30,6 +36,9 @@ function registerLazyModule({ config, path }) {
         moduleCache.set(config.id, loaded);
       }
       const module = await loaded;
+      if (!module || typeof module.mount !== 'function') {
+        throw new Error(`Modul ${config.id} konnte nicht initialisiert werden.`);
+      }
       return module.mount(root);
     }
   });

@@ -1,14 +1,19 @@
+function cloneState(value) {
+  if (typeof structuredClone === 'function') return structuredClone(value);
+  return JSON.parse(JSON.stringify(value));
+}
+
 export function createModuleState(initial = {}) {
-  let state = structuredClone(initial);
+  let state = cloneState(initial);
   const listeners = new Set();
-  const notify = () => listeners.forEach(fn => fn(structuredClone(state)));
+  const notify = () => listeners.forEach(fn => fn(cloneState(state)));
   return {
-    get: () => structuredClone(state),
+    get: () => cloneState(state),
     set: (patch, options = {}) => {
       state = { ...state, ...patch };
       if (options.notify !== false) notify();
     },
-    reset: () => { state = structuredClone(initial); notify(); },
+    reset: () => { state = cloneState(initial); notify(); },
     subscribe: fn => { listeners.add(fn); return () => listeners.delete(fn); }
   };
 }
