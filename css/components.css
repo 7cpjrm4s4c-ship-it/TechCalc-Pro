@@ -2884,94 +2884,174 @@ body.settings-open {
   }
 }
 
-/* Drinking water mobile width fix: keep single-consumer form controls inside the card */
-.module-view[data-module='drinking-water'] .dw-accordion,
-.module-view[data-module='drinking-water'] .dw-accordion__body,
-.module-view[data-module='drinking-water'] .dw-accordion__body > *,
-.module-view[data-module='drinking-water'] .tc-stack,
-.module-view[data-module='drinking-water'] .tc-fields,
-.module-view[data-module='drinking-water'] .field,
-.module-view[data-module='drinking-water'] .control,
-.module-view[data-module='drinking-water'] .segmented,
-.module-view[data-module='drinking-water'] .action-button,
-.module-view[data-module='drinking-water'] .dw-fixture-list,
-.module-view[data-module='drinking-water'] .dw-consumer-row {
-  max-width: 100%;
-  min-width: 0;
+
+/* v17 Trinkwasser: Einzelverbraucher-Card width constraints
+   Hält alle Formular-Elemente innerhalb der Card und verhindert horizontales Überlaufen auf Mobile. */
+.module-view[data-module='drinking-water'] .dw-accordion--form,
+.module-view[data-module='drinking-water'] .dw-accordion--form * {
   box-sizing: border-box;
 }
 
-.module-view[data-module='drinking-water'] .dw-accordion__body {
-  width: 100%;
+.module-view[data-module='drinking-water'] .dw-accordion--form {
   overflow: hidden;
 }
 
-.module-view[data-module='drinking-water'] .dw-accordion--form .tc-fields {
+.module-view[data-module='drinking-water'] .dw-accordion--form .dw-accordion__body {
   width: 100%;
-  grid-template-columns: minmax(0, 1fr) minmax(92px, .38fr);
-  gap: 10px;
-}
-
-.module-view[data-module='drinking-water'] .dw-accordion--form .field {
-  width: 100%;
-}
-
-.module-view[data-module='drinking-water'] .dw-accordion--form .control {
-  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   overflow: hidden;
+  padding-inline: clamp(12px, 2.8vw, 18px);
 }
 
+.module-view[data-module='drinking-water'] .dw-accordion--form .field,
+.module-view[data-module='drinking-water'] .dw-accordion--form .tc-fields,
+.module-view[data-module='drinking-water'] .dw-accordion--form .segmented,
+.module-view[data-module='drinking-water'] .dw-accordion--form .action-button,
+.module-view[data-module='drinking-water'] .dw-accordion--form .mini-button,
+.module-view[data-module='drinking-water'] .dw-accordion--form .dw-consumer-list,
+.module-view[data-module='drinking-water'] .dw-accordion--form .dw-list,
+.module-view[data-module='drinking-water'] .dw-accordion--form .empty-state {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .control,
+.module-view[data-module='drinking-water'] .dw-accordion--form .control input,
+.module-view[data-module='drinking-water'] .dw-accordion--form .control select,
 .module-view[data-module='drinking-water'] .dw-accordion--form input,
-.module-view[data-module='drinking-water'] .dw-accordion--form select {
-  width: 100%;
+.module-view[data-module='drinking-water'] .dw-accordion--form select,
+.module-view[data-module='drinking-water'] .dw-accordion--form button {
   max-width: 100%;
   min-width: 0;
-  box-sizing: border-box;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .control select,
+.module-view[data-module='drinking-water'] .dw-accordion--form select {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.module-view[data-module='drinking-water'] .dw-accordion--form select {
-  padding-right: 44px;
-}
-
 .module-view[data-module='drinking-water'] .dw-accordion--form .segmented {
-  width: 100%;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: stretch;
+  grid-auto-flow: initial;
+  grid-auto-columns: initial;
   overflow: hidden;
 }
 
 .module-view[data-module='drinking-water'] .dw-accordion--form .segmented button {
+  width: 100%;
   min-width: 0;
-  max-width: 100%;
-  padding-inline: 10px;
-  line-height: 1.15;
+  padding-inline: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: normal;
-  overflow-wrap: anywhere;
+  line-height: 1.15;
 }
 
 .module-view[data-module='drinking-water'] .dw-accordion--form .action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-inline: 12px;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .dw-consumer-row {
   width: 100%;
-  justify-self: stretch;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .dw-consumer-row strong,
+.module-view[data-module='drinking-water'] .dw-accordion--form .dw-consumer-row span {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 767px) {
-  .module-view[data-module='drinking-water'] .dw-accordion__body {
-    padding-inline: 12px;
+  .module-view[data-module='drinking-water'] .dw-accordion--form .dw-accordion__body {
+    padding-inline: 10px;
   }
 
-  .module-view[data-module='drinking-water'] .dw-accordion--form .tc-fields {
-    grid-template-columns: 1fr;
+  .module-view[data-module='drinking-water'] .dw-accordion--form .tc-fields,
+  .module-view[data-module='drinking-water'] .dw-accordion--form .tc-fields--3 {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .module-view[data-module='drinking-water'] .dw-accordion--form .segmented {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .module-view[data-module='drinking-water'] .dw-accordion--form .field label {
+    overflow-wrap: anywhere;
   }
+}
 
-  .module-view[data-module='drinking-water'] .dw-accordion--form .segmented button {
-    font-size: clamp(13px, 3.6vw, 16px);
-  }
+/* v18: softer beige/grey light mode with readable contrast */
+:root[data-theme='light'] .app-shell,
+:root[data-theme='light'] body {
+  background:
+    radial-gradient(circle at 20% 10%, rgba(120, 126, 135, .10), transparent 34%),
+    radial-gradient(circle at 85% 18%, rgba(190, 158, 122, .14), transparent 32%),
+    linear-gradient(135deg, #f4f1eb 0%, #ece8df 52%, #e3e6e8 100%) !important;
+  color: #1f2933 !important;
+}
+:root[data-theme='light'] .card,
+:root[data-theme='light'] .glass-surface,
+:root[data-theme='light'] #settingsPanel.settings-panel,
+:root[data-theme='light'] #settingsPanel .settings-submenu,
+:root[data-theme='light'] #settingsPanel .settings-submenu__content,
+:root[data-theme='light'] .inline-stat,
+:root[data-theme='light'] .dw-accordion,
+:root[data-theme='light'] .dw-consumer-row,
+:root[data-theme='light'] .dw-fixture-row {
+  background: linear-gradient(145deg, rgba(250,248,243,.96), rgba(232,230,224,.94)) !important;
+  color: #1f2933 !important;
+  border-color: rgba(82, 82, 91, .24) !important;
+  box-shadow: 0 18px 44px rgba(54, 48, 40, .12), inset 0 1px 0 rgba(255,255,255,.72) !important;
+}
+:root[data-theme='light'] .app-header {
+  background: rgba(242,239,232,.96) !important;
+  border-color: rgba(82,82,91,.18) !important;
+}
+:root[data-theme='light'] .module-nav,
+:root[data-theme='light'] .bottom-nav {
+  background: rgba(230,227,220,.92) !important;
+  border-color: rgba(82,82,91,.20) !important;
+}
+:root[data-theme='light'] .control,
+:root[data-theme='light'] .control input,
+:root[data-theme='light'] .control select,
+:root[data-theme='light'] #settingsPanel input,
+:root[data-theme='light'] #settingsPanel select,
+:root[data-theme='light'] .project-select-card select {
+  background: #f8f6f1 !important;
+  color: #1f2933 !important;
+  border-color: rgba(82,82,91,.34) !important;
+}
+:root[data-theme='light'] label,
+:root[data-theme='light'] .field label,
+:root[data-theme='light'] .card__title,
+:root[data-theme='light'] .settings-field__label,
+:root[data-theme='light'] .inline-stat span {
+  color: #52606d !important;
+}
+:root[data-theme='light'] strong,
+:root[data-theme='light'] .inline-stat strong,
+:root[data-theme='light'] .result-row strong,
+:root[data-theme='light'] .main-result strong {
+  color: #111827 !important;
+}
+:root[data-theme='light'] .theme-switch {
+  background: #e5e0d6 !important;
+  border-color: rgba(82,82,91,.26) !important;
+}
+:root[data-theme='light'] .theme-switch__option.is-active,
+:root[data-theme='light'] .module-tab.is-active,
+:root[data-theme='light'] .module-tab.is-overflow-active {
+  background: linear-gradient(145deg, #d8d0c2, #ece7dc) !important;
+  color: #111827 !important;
+  box-shadow: inset 0 0 0 2px rgba(92,111,128,.34) !important;
 }

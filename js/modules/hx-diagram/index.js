@@ -4,6 +4,12 @@ import { calculate, calculatePoint, humidityRatioKgKg, PROCESS_OPTIONS } from '.
 import { card, field, renderModuleShell, bindCommonInputs, stack, grid, inlineStats, mainResult, segmented, esc } from '../../core/renderer.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 
+function hxFmt(value, decimals = 2) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return '—';
+  return n.toLocaleString('de-DE', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
 function actionButton(label, attr, variant = '') {
   return `<button type="button" class="tc-action ${variant}" ${attr}>${esc(label)}</button>`;
 }

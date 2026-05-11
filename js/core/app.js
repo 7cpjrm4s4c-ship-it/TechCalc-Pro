@@ -105,6 +105,14 @@ function applyThemeMode(mode = localStorage.getItem(THEME_STORAGE_KEY) || 'syste
 
 applyThemeMode();
 
+// Bind PDF export and project actions as soon as the app is ready.
+// The menu may be opened and a button tapped before lazy initialization has finished.
+if ('requestIdleCallback' in window) {
+  requestIdleCallback(() => ensurePdfExport());
+} else {
+  setTimeout(() => ensurePdfExport(), 0);
+}
+
 let settingsScrollY = 0;
 let lastFocusedElement = null;
 
