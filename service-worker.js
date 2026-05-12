@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-wrg-hx-process-v22';
+const CACHE_NAME = 'techcalc-pro-module-load-fix-v23';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',

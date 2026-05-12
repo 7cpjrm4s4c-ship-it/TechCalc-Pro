@@ -101,6 +101,15 @@ export function wetBulbApproxC(tempC, rhPercent) {
     - 4.686035;
 }
 
+export function calculatePoint(input = {}) {
+  return pointFromW({
+    id: input.id,
+    label: input.label || 'Zustand',
+    tempC: input.tempC,
+    wKgKg: input.wKgKg ?? humidityRatioKgKg(input.tempC, input.rhPercent)
+  });
+}
+
 export function pointFromW(input) {
   const tempC = num(input.tempC);
   const w = Math.max(0, num(input.wKgKg));
