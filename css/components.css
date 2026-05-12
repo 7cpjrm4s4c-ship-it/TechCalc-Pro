@@ -3117,3 +3117,17 @@ body.settings-open {
     min-width: 0;
   }
 }
+
+.hx-target-warning {
+  margin: 14px auto 6px;
+  padding: 10px 14px;
+  width: fit-content;
+  max-width: 100%;
+  border: 1px solid rgba(245, 158, 11, .55);
+  border-radius: 999px;
+  background: rgba(245, 158, 11, .10);
+  color: #fbbf24;
+  font-weight: 900;
+  letter-spacing: .02em;
+  text-align: center;
+}

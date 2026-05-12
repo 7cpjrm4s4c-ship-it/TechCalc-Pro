@@ -1,12 +1,29 @@
 import config from './config.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, segmented, renderModuleShell, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
+import { card, field, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 
 function readonlyValue({ label, value, unit = '' }) {
   return `<div class="field field--readonly"><label>${label}</label><div class="control control--readonly"><strong>${value}</strong>${unit ? `<span class="unit">${unit}</span>` : ''}</div></div>`;
+}
+
+function signedTempField(id, label, value) {
+  return `<div class="field field--signed-temp">
+    <label for="${esc(id)}">${esc(label)}</label>
+    <div class="control control--with-sign">
+      <button type="button" class="sign-toggle" data-wrg-sign="${esc(id)}" aria-label="Vorzeichen umschalten">±</button>
+      <input id="${esc(id)}" data-field="${esc(id)}" type="text" inputmode="decimal" value="${esc(value ?? '')}" placeholder="0" autocomplete="off">
+      <span class="unit">°C</span>
+    </div>
+  </div>`;
+}
+
+function toggleNumericSign(value) {
+  const raw = String(value ?? '').trim();
+  if (!raw || raw === '0') return '-';
+  return raw.startsWith('-') ? raw.slice(1) : `-${raw}`;
 }
 
 function readonlyAirCard(title, point, accent = 'cyan', options = {}) {
@@ -34,7 +51,7 @@ function airInputCard(title, fields, accent = 'cyan') {
   const rows = [];
   if (fields.volume) rows.push(field(fields.volume));
   rows.push(grid([
-    field(fields.temp),
+    fields.temp?.signed ? signedTempField(fields.temp.id, fields.temp.label, fields.temp.value) : field(fields.temp),
     field(fields.rh)
   ].join(''), 2));
   return card(title, stack(rows.join('')), accent);
@@ -59,7 +76,7 @@ function condensationCard(r) {
 function wrgInputCard(s) {
   return card('WRG — Eingaben', `<div class="wrg-group-grid">
     ${airInputCard('Außenluft', {
-      temp: { id: 'outdoorTemp', label: 'Temperatur', unit: '°C', value: fmtInput(s.outdoorTemp, 2) },
+      temp: { id: 'outdoorTemp', label: 'Temperatur', unit: '°C', value: fmtInput(s.outdoorTemp, 2), signed: true },
       rh: { id: 'outdoorRh', label: 'rel. Feuchte', unit: '%', value: fmtInput(s.outdoorRh, 2) }
     })}
     ${airInputCard('Abluft', {
@@ -87,7 +104,7 @@ function mixingInputCard(s) {
   return card('Mischluft — Eingaben', `<div class="wrg-group-grid">
     ${airInputCard('Außenluft', {
       volume: { id: 'mixingOutdoorVolumeFlowM3h', label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(s.mixingOutdoorVolumeFlowM3h, 2) },
-      temp: { id: 'mixingOutdoorTemp', label: 'Temperatur', unit: '°C', value: fmtInput(s.mixingOutdoorTemp, 2) },
+      temp: { id: 'mixingOutdoorTemp', label: 'Temperatur', unit: '°C', value: fmtInput(s.mixingOutdoorTemp, 2), signed: true },
       rh: { id: 'mixingOutdoorRh', label: 'rel. Feuchte', unit: '%', value: fmtInput(s.mixingOutdoorRh, 2) }
     })}
     ${airInputCard('Umluft / Raumluft', {
@@ -100,11 +117,10 @@ function mixingInputCard(s) {
 
 function mixingOutputCard(r) {
   return card('Mischluft — Ausgabe', `<div class="wrg-group-grid">
-    ${readonlyAirCard('Mischluft / Zuluft', r.mixed, 'cyan', { includeMass: false })}
+    ${readonlyAirCard('Mischluft / Zuluft', r.mixed, 'cyan', { includeMass: false, includeVolume: true })}
     ${card('Mischungsverhältnis', inlineStats([
       { label: 'Außenluftanteil', value: fmt(r.outdoorShare, 0), unit: '%' },
       { label: 'Umluftanteil', value: fmt(r.recircShare, 0), unit: '%' },
-      { label: 'Gesamtvolumenstrom', value: fmt(r.mixed.volumeFlowM3h, 0), unit: 'm³/h' },
       { label: 'Massenstrom', value: fmt(r.mixed.massFlowKgh, 2), unit: 'kg/h' },
       { label: 'x', value: fmt(r.mixed.humidityRatioGkg, 2), unit: 'g/kg' }
     ]), 'cyan')}
@@ -156,6 +172,14 @@ export default {
   config,
   state,
   mount(root) {
-    mountModule(root, state, view);
+    mountModule(root, state, view, rootEl => {
+      rootEl.querySelectorAll('[data-wrg-sign]').forEach(button => {
+        button.addEventListener('click', () => {
+          const id = button.dataset.wrgSign;
+          const input = rootEl.querySelector(`[data-field="${id}"]`);
+          state.set({ [id]: toggleNumericSign(input?.value) });
+        });
+      });
+    });
   }
 };

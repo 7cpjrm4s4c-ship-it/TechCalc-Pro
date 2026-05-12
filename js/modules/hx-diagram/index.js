@@ -109,8 +109,9 @@ function historyCard(processes, activeProcessId) {
   return card('Gespeicherte Prozesse', body, 'cyan');
 }
 
-function chartCard(activePath) {
-  return card('h,x-Diagramm', `<div class="hx-chart-wrap">${renderHxSvg(activePath)}</div><div class="formula">Näherung bei Luftdruck 1.013 hPa · x horizontal · θt vertikal</div>`, 'cyan');
+function chartCard(activePath, targetReached = true) {
+  const warning = targetReached ? '' : '<div class="hx-target-warning">Zielzustand wird nicht erreicht!</div>';
+  return card('h,x-Diagramm', `<div class="hx-chart-wrap">${renderHxSvg(activePath)}</div>${warning}<div class="formula">Näherung bei Luftdruck 1.013 hPa · x horizontal · θt vertikal</div>`, 'cyan');
 }
 
 
@@ -225,7 +226,7 @@ function view(s) {
   const activePath = (s.activePath?.length ? s.activePath : (hasCompleteInput(s) ? r.processPath : []));
   const body = `<div class="hx-layout">
     <div class="hx-layout__left">${stack([inputCard(s), resultCard(r, activePath), historyCard(s.processes ?? [], s.activeProcessId)].join(''))}</div>
-    <div class="hx-layout__right">${chartCard(activePath)}</div>
+    <div class="hx-layout__right">${chartCard(activePath, !activePath.length || r.targetReached)}</div>
   </div>`;
   return renderModuleShell(config, `<div class="span-12">${body}</div>`);
 }
@@ -247,12 +248,27 @@ export default {
     };
 
     const bindActions = rootEl => {
+      rootEl.querySelectorAll('[data-field]').forEach(el => {
+        el.addEventListener('change', () => {
+          state.set({ activeProcessId: null, activePath: [], points: [] });
+        });
+        el.addEventListener('blur', () => {
+          state.set({ activeProcessId: null, activePath: [], points: [] });
+        });
+      });
+
+      rootEl.querySelectorAll('[data-segment="process"]').forEach(button => {
+        button.addEventListener('click', () => {
+          state.set({ process: button.dataset.value, activeProcessId: null, activePath: [], points: [] });
+        });
+      });
+
       rootEl.querySelectorAll('[data-hx-sign]').forEach(button => {
         button.addEventListener('click', () => {
           const id = button.dataset.hxSign;
           const input = rootEl.querySelector(`[data-field="${id}"]`);
           const next = toggleNumericSign(input?.value);
-          state.set({ [id]: next });
+          state.set({ [id]: next, activeProcessId: null, activePath: [], points: [] });
         });
       });
 

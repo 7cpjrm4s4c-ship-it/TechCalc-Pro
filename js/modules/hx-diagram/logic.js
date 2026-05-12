@@ -101,18 +101,6 @@ export function wetBulbApproxC(tempC, rhPercent) {
     - 4.686035;
 }
 
-export function calculatePoint(input) {
-  const tempC = num(input.tempC);
-  const rhPercent = clamp(num(input.rhPercent), 0, 100);
-  const w = humidityRatioKgKg(tempC, rhPercent);
-  return pointFromW({
-    id: input.id,
-    label: input.label,
-    tempC,
-    wKgKg: w
-  });
-}
-
 export function pointFromW(input) {
   const tempC = num(input.tempC);
   const w = Math.max(0, num(input.wKgKg));
@@ -170,26 +158,27 @@ export function processLabel(value) {
   return PROCESS_OPTIONS.find(option => option.value === value)?.label ?? 'Automatisch';
 }
 
+
+function pointReached(a, b) {
+  return Math.abs(a.tempC - b.tempC) <= 0.1 && Math.abs(a.humidityRatioGkg - b.humidityRatioGkg) <= 0.1;
+}
+
 function buildHeat(start, target) {
-  return uniqueByClose([
-    { ...start, label: '1 Ausgang' },
-    pointFromW({ label: '2 Erwärmen', tempC: target.tempC, wKgKg: start.humidityRatio }),
-    { ...target, label: '3 Ziel' }
-  ]);
+  // Reines Erwärmen: x bleibt konstant. Es wird keine Befeuchtung ergänzt.
+  const heated = pointFromW({ label: '2 Erwärmen', tempC: target.tempC, wKgKg: start.humidityRatio });
+  return uniqueByClose([{ ...start, label: '1 Ausgang' }, heated]);
 }
 
 function buildCool(start, target) {
-  const targetAtStartX = pointFromW({ label: '2 Kühlen', tempC: target.tempC, wKgKg: start.humidityRatio });
-  const saturated = saturationPointAtW(start.humidityRatio, '2 Taupunkt / Sättigung');
-  const points = [{ ...start, label: '1 Ausgang' }];
-  if (target.tempC < saturated.tempC) points.push(saturated);
-  points.push(targetAtStartX);
-  points.push({ ...target, label: `${points.length + 1} Ziel` });
-  return uniqueByClose(points);
+  // Reines Kühlen: x bleibt konstant bis maximal zum Taupunkt. Keine Entfeuchtung ergänzen.
+  const saturated = saturationPointAtW(start.humidityRatio, '2 Taupunkt / 100 % r.F.');
+  const endTemp = target.tempC < saturated.tempC ? saturated.tempC : target.tempC;
+  const cooled = pointFromW({ label: target.tempC < saturated.tempC ? '2 Taupunkt / 100 % r.F.' : '2 Kühlen', tempC: endTemp, wKgKg: start.humidityRatio });
+  return uniqueByClose([{ ...start, label: '1 Ausgang' }, cooled]);
 }
 
 function buildAdiabatic(start, target) {
-  const saturationForTargetX = saturationPointAtW(target.humidityRatio, '3 Sättigung nach adiabater Befeuchtung');
+  const saturationForTargetX = saturationPointAtW(target.humidityRatio, '3 adiabate Befeuchtung');
   const hSaturation = saturationForTargetX.enthalpyKjKg;
   const preheatT = tempFromEnthalpyAndW(hSaturation, start.humidityRatio);
   return uniqueByClose([
@@ -201,9 +190,10 @@ function buildAdiabatic(start, target) {
 }
 
 function buildSteam(start, target) {
+  const heated = pointFromW({ label: '2 Erwärmen', tempC: target.tempC, wKgKg: start.humidityRatio });
   return uniqueByClose([
     { ...start, label: '1 Ausgang' },
-    pointFromW({ label: '2 Erwärmen', tempC: target.tempC, wKgKg: start.humidityRatio }),
+    heated,
     { ...target, label: '3 Dampfbefeuchten / Ziel' }
   ]);
 }
@@ -214,7 +204,9 @@ function buildCoolDehumidify(start, target) {
   const points = [{ ...start, label: '1 Ausgang' }];
   if (start.tempC > startSaturation.tempC) points.push(startSaturation);
   points.push(targetSaturation);
-  points.push({ ...target, label: '4 Nacherwärmen / Ziel' });
+  if (!pointReached(targetSaturation, target)) {
+    points.push({ ...target, label: '4 Nacherwärmen / Ziel' });
+  }
   return uniqueByClose(points);
 }
 
@@ -247,15 +239,6 @@ export function classifyChange(start, target) {
   if (dx > epsX) return 'Befeuchten';
   return dt > 0 ? 'Erhitzen' : 'Kühlen';
 }
-
-function normalizeSelectedProcess(process, current, target) {
-  const t0 = current.tempC;
-  const t1 = target.tempC;
-  if (t0 < t1 && ['cool', 'cool-dehumidify'].includes(process)) return 'heat';
-  if (t0 > t1 && ['heat', 'adiabatic', 'steam'].includes(process)) return 'cool-dehumidify';
-  return process || 'heat';
-}
-
 export function calculate(input) {
   const current = calculatePoint({
     label: 'Ausgangszustand',
@@ -267,15 +250,17 @@ export function calculate(input) {
     tempC: input.targetTempC,
     rhPercent: input.targetRhPercent
   });
-  const selectedProcess = normalizeSelectedProcess(input.process || 'adiabatic', current, target);
+  const selectedProcess = input.process || 'heat';
   const processPath = buildProcessPath(current, target, selectedProcess);
+  const processEnd = processPath[processPath.length - 1] || current;
+  const targetReached = pointReached(processEnd, target);
   const changeType = processLabel(selectedProcess);
   const delta = {
-    tempK: target.tempC - current.tempC,
-    humidityGkg: target.humidityRatioGkg - current.humidityRatioGkg,
-    enthalpyKjKg: target.enthalpyKjKg - current.enthalpyKjKg,
-    rhPercent: target.rhPercent - current.rhPercent
+    tempK: processEnd.tempC - current.tempC,
+    humidityGkg: processEnd.humidityRatioGkg - current.humidityRatioGkg,
+    enthalpyKjKg: processEnd.enthalpyKjKg - current.enthalpyKjKg,
+    rhPercent: processEnd.rhPercent - current.rhPercent
   };
   const points = (input.points ?? []).map(point => calculatePoint(point));
-  return { current, target, changeType, selectedProcess, processPath, delta, points };
+  return { current, target, processEnd, targetReached, changeType, selectedProcess, processPath, delta, points };
 }
