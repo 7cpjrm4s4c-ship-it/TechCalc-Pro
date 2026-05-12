@@ -18,7 +18,7 @@ function signedTempField(id, label, value) {
   return `<div class="field field--signed-temp">
     <label for="${esc(id)}">${esc(label)}</label>
     <div class="control control--with-sign">
-      <button type="button" class="sign-toggle" data-hx-sign="${esc(id)}" aria-label="Vorzeichen umschalten">±</button>
+      <button type="button" tabindex="-1" class="sign-toggle" data-hx-sign="${esc(id)}" aria-label="Vorzeichen umschalten">±</button>
       <input id="${esc(id)}" data-field="${esc(id)}" type="text" inputmode="decimal" value="${esc(value ?? '')}" placeholder="0" autocomplete="off">
       <span class="unit">°C</span>
     </div>
@@ -249,11 +249,11 @@ export default {
 
     const bindActions = rootEl => {
       rootEl.querySelectorAll('[data-field]').forEach(el => {
-        el.addEventListener('change', () => {
-          state.set({ activeProcessId: null, activePath: [], points: [] });
+        el.addEventListener('input', () => {
+          state.set({ activeProcessId: null, activePath: [], points: [] }, { notify: false });
         });
-        el.addEventListener('blur', () => {
-          state.set({ activeProcessId: null, activePath: [], points: [] });
+        el.addEventListener('change', () => {
+          state.set({ activeProcessId: null, activePath: [], points: [] }, { notify: false });
         });
       });
 

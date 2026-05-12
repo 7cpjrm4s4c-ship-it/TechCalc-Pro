@@ -3158,3 +3158,221 @@ body.settings-open {
     border-radius: 16px;
   }
 }
+
+/* v25: Light-mode accessibility pass + hx/mixing keyboard UX */
+:root[data-theme='light'] {
+  --color-bg-0: #f2eee5;
+  --color-bg-1: #fbfaf6;
+  --color-surface: rgba(250,248,242,.98);
+  --color-surface-strong: #fffdf8;
+  --color-surface-soft: #f5f1e8;
+  --color-border: rgba(68, 76, 88, .24);
+  --color-border-strong: rgba(45, 55, 72, .42);
+  --color-text: #17202c;
+  --color-muted: #435164;
+  --color-dim: #667284;
+  --shadow-glass: 0 12px 32px rgba(75, 64, 47, .10), inset 0 1px 0 rgba(255,255,255,.86);
+  --shadow-active: 0 0 0 2px rgba(2,132,199,.58), 0 0 0 5px rgba(2,132,199,.12);
+}
+
+:root[data-theme='light'] html,
+:root[data-theme='light'] body,
+:root[data-theme='light'] .app-shell {
+  background:
+    radial-gradient(circle at 16% 8%, rgba(115, 136, 158, .08), transparent 28%),
+    radial-gradient(circle at 82% 18%, rgba(184, 154, 114, .12), transparent 28%),
+    linear-gradient(135deg, #f7f3ea 0%, #ede8dd 52%, #e5e0d5 100%) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme='light'] .app-header,
+:root[data-theme='light'] .app-header.is-scrolled {
+  background: rgba(247, 243, 234, .98) !important;
+  border-color: rgba(45,55,72,.16) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+:root[data-theme='light'] .icon-button {
+  background: #d7d2c7 !important;
+  color: #17202c !important;
+  border-color: rgba(45,55,72,.32) !important;
+  box-shadow: none !important;
+}
+:root[data-theme='light'] .icon-button span { background: #17202c !important; }
+
+:root[data-theme='light'] .card,
+:root[data-theme='light'] .glass-surface,
+:root[data-theme='light'] #settingsPanel.settings-panel,
+:root[data-theme='light'] #settingsPanel .settings-submenu,
+:root[data-theme='light'] #settingsPanel .settings-submenu__content,
+:root[data-theme='light'] .inline-stat,
+:root[data-theme='light'] .field--readonly .control--readonly,
+:root[data-theme='light'] .dw-accordion,
+:root[data-theme='light'] .dw-consumer-row,
+:root[data-theme='light'] .dw-fixture-row {
+  background: linear-gradient(145deg, rgba(255,253,248,.98), rgba(241,237,228,.96)) !important;
+  color: #17202c !important;
+  border-color: rgba(68,76,88,.28) !important;
+  box-shadow: 0 12px 32px rgba(75,64,47,.10), inset 0 1px 0 rgba(255,255,255,.86) !important;
+}
+
+:root[data-theme='light'] #settingsPanel.settings-panel {
+  box-shadow: 0 18px 46px rgba(75,64,47,.14) !important;
+}
+
+:root[data-theme='light'] .module-nav,
+:root[data-theme='light'] .bottom-nav {
+  background: rgba(243,239,230,.96) !important;
+  border-color: rgba(68,76,88,.20) !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme='light'] .module-tab {
+  background: rgba(250,248,242,.84) !important;
+  color: #344256 !important;
+  border-color: rgba(68,76,88,.16) !important;
+}
+
+:root[data-theme='light'] .module-tab.is-active,
+:root[data-theme='light'] .module-tab.is-overflow-active {
+  background: linear-gradient(180deg, #e5dece, #d8d0c1) !important;
+  color: #101827 !important;
+  box-shadow: inset 0 0 0 2px rgba(68,76,88,.28), inset 0 -3px 0 var(--accent-blue) !important;
+}
+
+:root[data-theme='light'] .segmented {
+  background: transparent !important;
+  border-color: rgba(68,76,88,.30) !important;
+  box-shadow: none !important;
+}
+:root[data-theme='light'] .segmented button,
+:root[data-theme='light'] .hx-process {
+  background: rgba(255,253,248,.70) !important;
+  color: #344256 !important;
+  border: 1px solid rgba(68,76,88,.30) !important;
+  box-shadow: none !important;
+}
+:root[data-theme='light'] .segmented--orange button.is-active {
+  background: linear-gradient(135deg, #ec9c75, #f3c0a7) !important;
+  color: #101827 !important;
+  border-color: #e46f35 !important;
+  box-shadow: inset 0 0 0 2px rgba(255,122,46,.42) !important;
+}
+:root[data-theme='light'] .segmented--cyan button.is-active,
+:root[data-theme='light'] .segmented--blue button.is-active,
+:root[data-theme='light'] .hx-process.is-active,
+:root[data-theme='light'] .theme-switch__option.is-active {
+  background: linear-gradient(135deg, #c8eef6, #e4f7fb) !important;
+  color: #0e2434 !important;
+  border-color: #22b8d6 !important;
+  box-shadow: inset 0 0 0 2px rgba(34,184,214,.46) !important;
+}
+
+:root[data-theme='light'] .control,
+:root[data-theme='light'] .control input,
+:root[data-theme='light'] .control select,
+:root[data-theme='light'] #settingsPanel input,
+:root[data-theme='light'] #settingsPanel select,
+:root[data-theme='light'] .project-select-card select,
+:root[data-theme='light'] .unit-select {
+  background: #fffdf8 !important;
+  color: #17202c !important;
+  border-color: rgba(68,76,88,.38) !important;
+}
+
+:root[data-theme='light'] select option,
+:root[data-theme='light'] .control select option,
+:root[data-theme='light'] #settingsPanel select option {
+  background-color: #fbf8ef !important;
+  color: #17202c !important;
+}
+:root[data-theme='light'] select option:checked,
+:root[data-theme='light'] .control select option:checked,
+:root[data-theme='light'] #settingsPanel select option:checked {
+  background-color: #d7d0c1 !important;
+  color: #101827 !important;
+}
+
+:root[data-theme='light'] .unit {
+  color: #344256 !important;
+  border-color: rgba(68,76,88,.22) !important;
+}
+
+:root[data-theme='light'] label,
+:root[data-theme='light'] .field label,
+:root[data-theme='light'] .card__title,
+:root[data-theme='light'] .formula,
+:root[data-theme='light'] .settings-field__label,
+:root[data-theme='light'] .inline-stat span {
+  color: #435164 !important;
+}
+:root[data-theme='light'] strong,
+:root[data-theme='light'] .inline-stat strong,
+:root[data-theme='light'] .main-result strong,
+:root[data-theme='light'] .result-row strong {
+  color: #101827 !important;
+}
+
+:root[data-theme='light'] .overflow-menu {
+  background: #f5f1e8 !important;
+  border-color: rgba(68,76,88,.30) !important;
+  box-shadow: 0 18px 42px rgba(75,64,47,.16) !important;
+}
+:root[data-theme='light'] .overflow-menu__card,
+:root[data-theme='light'] .overflow-menu__row {
+  background: #fffdf8 !important;
+  border-color: rgba(68,76,88,.24) !important;
+}
+:root[data-theme='light'] .overflow-menu__item span,
+:root[data-theme='light'] .overflow-menu__item strong,
+:root[data-theme='light'] .overflow-menu button {
+  color: #17202c !important;
+}
+:root[data-theme='light'] .overflow-menu__item small { color: #52606d !important; }
+
+/* h,x chart readability in all themes */
+.hx-axis-label,
+.hx-rh-label,
+.hx-title,
+.hx-point text {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, Helvetica, sans-serif !important;
+  font-weight: 850 !important;
+  letter-spacing: .01em;
+}
+.hx-axis-label,
+.hx-rh-label,
+.hx-title {
+  fill: rgba(238, 244, 251, .82) !important;
+}
+.hx-point text {
+  fill: #f8fbff !important;
+  stroke: rgba(3, 7, 12, .92) !important;
+  stroke-width: 4px !important;
+}
+:root[data-theme='light'] .hx-chart-bg {
+  fill: #3f464d !important;
+  stroke: rgba(34, 184, 214, .42) !important;
+}
+:root[data-theme='light'] .hx-grid-line { stroke: rgba(255,255,255,.16) !important; }
+:root[data-theme='light'] .hx-axis-label,
+:root[data-theme='light'] .hx-rh-label,
+:root[data-theme='light'] .hx-title {
+  fill: rgba(245, 248, 252, .88) !important;
+}
+
+:root[data-theme='light'] .tc-action {
+  background: linear-gradient(135deg, #cbeeff, #e6f7ff) !important;
+  color: #101827 !important;
+  border-color: #35aaff !important;
+}
+:root[data-theme='light'] .tc-action--ghost {
+  background: #f1ede4 !important;
+  color: #344256 !important;
+  border-color: rgba(68,76,88,.30) !important;
+}
+
+/* Keep sign toggles out of tab sequence visually stable */
+.sign-toggle[tabindex='-1'] {
+  user-select: none;
+}
