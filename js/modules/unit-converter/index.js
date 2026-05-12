@@ -34,11 +34,14 @@ function view(s) {
     })
   ].join('')), 'green');
 
-  const allValuesCard = card('Alle Werte', s.value ? resultRows(units.map(u => ({
-    label: u,
-    value: fmt(calculate({ ...s, from, to: u }), 2),
-    unit: u
-  }))) : '<div class="empty-state">Wert eingeben →</div>', 'blue');
+  const allValuesBody = s.value
+    ? `<div class="unit-all-values">${resultRows(units.map(u => ({
+        label: u,
+        value: fmt(calculate({ ...s, from, to: u }), 2),
+        unit: u
+      })))}</div>`
+    : '<div class="empty-state">Wert eingeben →</div>';
+  const allValuesCard = card('Alle Werte', allValuesBody, 'blue');
 
   return renderModuleShell(config, `
     <div class="span-6">${conversionCard}</div>

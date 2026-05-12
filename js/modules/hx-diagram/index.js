@@ -184,12 +184,28 @@ function renderHxSvg(points) {
 
   const rhCurves = [10, 20, 30, 40, 50, 60, 80, 100].map((rh, idx) => {
     const d = [];
+    const curvePoints = [];
     for (let t = tMin; t <= tMax; t += 1) {
       const x = humidityRatioKgKg(t, rh) * 1000;
-      if (x <= xMax) d.push(`${d.length ? 'L' : 'M'}${px(x).toFixed(1)},${py(t).toFixed(1)}`);
+      if (x <= xMax) {
+        curvePoints.push({ x, t });
+        d.push(`${d.length ? 'L' : 'M'}${px(x).toFixed(1)},${py(t).toFixed(1)}`);
+      }
     }
-    const labelT = Math.min(46, 18 + idx * 4);
-    const labelX = Math.min(xMax - 0.8, humidityRatioKgKg(labelT, rh) * 1000);
+
+    // Beschriftung immer direkt auf der jeweiligen r.F.-Kurve platzieren.
+    // Vorher wurden 80 % und 100 % bei abgeschnittenen Kurven nach rechts
+    // geschoben, aber mit einer zu hohen y-Position dargestellt.
+    const preferredT = { 10: 18, 20: 23, 30: 27, 40: 31, 50: 34, 60: 38, 80: 43, 100: 47 }[rh] ?? (18 + idx * 4);
+    const safeRight = xMax - 0.9;
+    let labelPoint = curvePoints.reduce((best, point) => {
+      const inRange = point.x <= safeRight;
+      const distance = Math.abs(point.t - preferredT) + (inRange ? 0 : 100);
+      return !best || distance < best.distance ? { ...point, distance } : best;
+    }, null);
+    if (!labelPoint && curvePoints.length) labelPoint = curvePoints[curvePoints.length - 1];
+    const labelX = labelPoint?.x ?? 0;
+    const labelT = labelPoint?.t ?? preferredT;
     return `<path d="${d.join(' ')}" class="hx-rh hx-rh-${rh}"/><text x="${px(labelX)}" y="${py(labelT) - 4}" class="hx-rh-label">${rh}%</text>`;
   }).join('');
 
