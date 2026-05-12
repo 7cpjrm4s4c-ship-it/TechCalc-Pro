@@ -3454,3 +3454,79 @@ body.settings-open {
 :root[data-theme='light'] .hx-rh-100 {
   stroke: rgba(255,255,255,.92) !important;
 }
+
+/* v27 unit converter hierarchy correction */
+#convertedValue,
+#convertedValue:disabled,
+.field:has(#convertedValue) input,
+.field:has(#convertedValue) input:disabled {
+  color: var(--color-text) !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+  font-weight: 800 !important;
+}
+
+:root[data-theme='light'] #convertedValue,
+:root[data-theme='light'] #convertedValue:disabled,
+:root[data-theme='light'] .field:has(#convertedValue) input,
+:root[data-theme='light'] .field:has(#convertedValue) input:disabled {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+
+.unit-all-values .result-list {
+  gap: 2px;
+}
+
+.unit-all-values .result-row {
+  min-height: 34px;
+  padding-block: 4px;
+}
+
+.unit-all-values .result-row span {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.unit-all-values .result-row strong {
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--color-muted);
+}
+
+.unit-all-values .result-row small {
+  font-size: .86em;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+:root[data-theme='light'] .unit-all-values .result-row span {
+  color: #6b7280 !important;
+  font-weight: 500 !important;
+}
+
+:root[data-theme='light'] .unit-all-values .result-row strong {
+  color: #4b5563 !important;
+  font-size: 16px !important;
+  font-weight: 650 !important;
+}
+
+:root[data-theme='light'] .unit-all-values .result-row small {
+  color: #6b7280 !important;
+  font-weight: 600 !important;
+}
+
+@media (max-width: 767px) {
+  .unit-all-values .result-row {
+    min-height: 38px;
+  }
+
+  .unit-all-values .result-row span {
+    font-size: 18px;
+  }
+
+  .unit-all-values .result-row strong {
+    font-size: 18px;
+  }
+}
