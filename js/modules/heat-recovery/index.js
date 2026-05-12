@@ -94,7 +94,7 @@ function wrgInputCard(s) {
 }
 
 function wrgOutputCard(r) {
-  return card('WRG — Ausgabe', `<div class="wrg-group-grid">
+  return card('WRG — Ausgabe', `<div class="wrg-group-grid wrg-group-grid--output">
     ${readonlyAirCard('Zuluft', r.supply, 'cyan', { includeMass: true })}
     ${readonlyAirCard('Fortluft', r.exhaust, 'cyan', { includeMass: true })}
   </div>`, 'cyan');
@@ -116,7 +116,7 @@ function mixingInputCard(s) {
 }
 
 function mixingOutputCard(r) {
-  return card('Mischluft — Ausgabe', `<div class="wrg-group-grid">
+  return card('Mischluft — Ausgabe', `<div class="wrg-group-grid wrg-group-grid--output">
     ${readonlyAirCard('Mischluft / Zuluft', r.mixed, 'cyan', { includeMass: false, includeVolume: true })}
     ${card('Mischungsverhältnis', inlineStats([
       { label: 'Außenluftanteil', value: fmt(r.outdoorShare, 0), unit: '%' },

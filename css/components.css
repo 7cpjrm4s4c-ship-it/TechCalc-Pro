@@ -3131,3 +3131,30 @@ body.settings-open {
   letter-spacing: .02em;
   text-align: center;
 }
+
+/* v24: WRG/Mischluft Ausgabe-Cards optisch an Eingabe-Cards angleichen */
+.module-view[data-module='heat-recovery'] .wrg-group-grid--output > .card {
+  height: 100%;
+  align-self: stretch;
+}
+
+.module-view[data-module='heat-recovery'] .wrg-group-grid--output .field--readonly .control--readonly {
+  min-height: 54px;
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+}
+
+.module-view[data-module='heat-recovery'] .wrg-group-grid--output .field--readonly .control--readonly strong {
+  font-size: 16px;
+}
+
+.module-view[data-module='heat-recovery'] .wrg-group-grid--output .inline-stats {
+  align-content: start;
+}
+
+@media (max-width: 767px) {
+  .module-view[data-module='heat-recovery'] .wrg-group-grid--output .field--readonly .control--readonly {
+    min-height: 46px;
+    border-radius: 16px;
+  }
+}

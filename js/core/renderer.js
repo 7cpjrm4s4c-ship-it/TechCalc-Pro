@@ -69,15 +69,38 @@ export function renderModuleShell(module, inner) {
 }
 
 export function bindCommonInputs(root, state) {
+  let pendingRender = null;
+
+  const commitField = (el, options = {}) => {
+    if (!el?.dataset?.field) return;
+    state.set({ [el.dataset.field]: el.value }, options);
+  };
+
+  const scheduleRenderAfterEditing = () => {
+    if (pendingRender) clearTimeout(pendingRender);
+    pendingRender = setTimeout(() => {
+      const active = document.activeElement;
+      // Beim Wechsel per Klick oder Tab in das nächste Eingabefeld nicht sofort neu rendern.
+      // Dadurch bleibt der Fokus stabil und die Desktop-UX wirkt nicht ruckelig.
+      if (active && root.contains(active) && active.matches('[data-field]')) return;
+      state.set({}, { notify: true });
+    }, 0);
+  };
+
   root.querySelectorAll('[data-field]').forEach(el => {
-    const apply = () => state.set({ [el.dataset.field]: el.value });
     if (el.matches('input')) {
-      // Während der Eingabe kein Re-Render: mobile Tastatur bleibt offen.
-      el.addEventListener('input', () => state.set({ [el.dataset.field]: el.value }, { notify: false }));
-      el.addEventListener('change', apply);
-      el.addEventListener('blur', apply);
+      // Während der Eingabe kein Re-Render: mobile Tastatur bleibt offen und Tab-Wechsel bleibt stabil.
+      el.addEventListener('input', () => commitField(el, { notify: false }));
+      el.addEventListener('change', () => {
+        commitField(el, { notify: false });
+        scheduleRenderAfterEditing();
+      });
+      el.addEventListener('blur', () => {
+        commitField(el, { notify: false });
+        scheduleRenderAfterEditing();
+      });
     } else {
-      el.addEventListener('change', apply);
+      el.addEventListener('change', () => commitField(el));
     }
   });
   root.querySelectorAll('[data-segment]').forEach(btn => {
