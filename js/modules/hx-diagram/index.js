@@ -1,5 +1,5 @@
 import config from './config.js';
-import { state, savePoints } from './state.js';
+import { state, saveProcesses, makeProcessRecord, clearLegacyPoints } from './state.js';
 import { calculate, calculatePoint, humidityRatioKgKg, PROCESS_OPTIONS } from './logic.js';
 import { card, field, renderModuleShell, bindCommonInputs, stack, grid, inlineStats, mainResult, segmented, esc } from '../../core/renderer.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
@@ -52,7 +52,7 @@ function inputCard(s) {
       field({ id: 'targetRhPercent', label: 'Relative Zielfeuchte φ', unit: '%', value: fmtInput(s.targetRhPercent, 2) })
     ].join(''), 2), 'cyan', { compact: true }),
     processCard(s),
-    `<div class="tc-actions">${actionButton('Verlauf übernehmen', 'data-hx-add')} ${actionButton('Verlauf löschen', 'data-hx-clear', 'tc-action--ghost')}</div>`
+    `<div class="tc-actions">${actionButton('Prozess speichern', 'data-hx-add')} ${actionButton('Diagramm leeren', 'data-hx-clear', 'tc-action--ghost')}</div>`
   ].join('')), 'cyan');
 }
 
@@ -78,7 +78,10 @@ function processPathCard(r) {
   return card('Berechnete Zustandspunkte', `<div class="hx-process-path">${rows}</div>`, 'cyan');
 }
 
-function resultCard(r) {
+function resultCard(r, activePath) {
+  if (!activePath.length) {
+    return card('Automatische Zustandsänderung', '<div class="empty-state">Zustandsänderung wählen oder gespeicherten Prozess auswählen</div>', 'cyan');
+  }
   return stack([
     mainResult('Automatische Zustandsänderung', { label: 'Prozess', value: r.changeType, unit: '' }, [
       { label: 'Δθ', value: hxFmt(r.delta.tempK, 2), unit: 'K' },
@@ -86,25 +89,28 @@ function resultCard(r) {
       { label: 'Δh', value: hxFmt(r.delta.enthalpyKjKg, 2), unit: 'kJ/kg' },
       { label: 'Δφ', value: hxFmt(r.delta.rhPercent, 0), unit: '%' }
     ], 'cyan'),
-    processPathCard(r),
-    `<div class="hx-state-grid">${readonlyStateCard('Ausgang', r.current)}${readonlyStateCard('Ziel', r.target)}</div>`
+    processPathCard({ processPath: activePath }),
+    `<div class="hx-state-grid">${readonlyStateCard('Ausgang', activePath[0])}${readonlyStateCard('Ziel', activePath[activePath.length - 1])}</div>`
   ].join(''));
 }
 
-function historyCard(points) {
-  const body = points.length ? `<div class="hx-history">
-    ${points.map((point, index) => `<div class="hx-history__row">
-      <div><strong>${esc(index + 1)}. ${esc(point.label)}</strong><small>${hxFmt(point.tempC, 2)} °C · ${hxFmt(point.rhPercent, 0)} % r.F.</small></div>
-      <div class="hx-history__values"><span>x ${hxFmt(point.humidityRatioGkg, 2)} g/kg</span><span>h ${hxFmt(point.enthalpyKjKg, 2)} kJ/kg</span></div>
-      <button type="button" class="mini-button" data-hx-remove="${esc(point.id)}" aria-label="Zustand entfernen">×</button>
-    </div>`).join('')}
-  </div>` : '<div class="empty-state">Noch keine Luftzustände gespeichert</div>';
-  return card('Zustandsverlauf', body, 'cyan');
+function historyCard(processes, activeProcessId) {
+  const body = processes.length ? `<div class="hx-history">
+    ${processes.map((process, index) => {
+      const last = process.path?.[process.path.length - 1];
+      const selected = process.id === activeProcessId;
+      return `<div class="hx-history__row hx-history__row--process ${selected ? 'is-active' : ''}" data-hx-select-process="${esc(process.id)}">
+        <div><strong>${esc(index + 1)}. ${esc(process.label)}</strong><small>${esc(process.processLabel || process.process)} · ${process.path?.length || 0} Punkte</small></div>
+        <div class="hx-history__values"><span>θt ${hxFmt(last?.tempC, 2)} °C</span><span>φ ${hxFmt(last?.rhPercent, 0)} % r.F.</span></div>
+        <button type="button" class="mini-button mini-button--text" data-hx-remove-process="${esc(process.id)}" aria-label="Prozess entfernen">Entfernen</button>
+      </div>`;
+    }).join('')}
+  </div>` : '<div class="empty-state">Noch keine Prozesse gespeichert</div>';
+  return card('Gespeicherte Prozesse', body, 'cyan');
 }
 
-function chartCard(points, current, target, processPath = []) {
-  const chartPoints = points.length ? points : (processPath.length ? processPath : [current, target]);
-  return card('h,x-Diagramm', `<div class="hx-chart-wrap">${renderHxSvg(chartPoints)}</div><div class="formula">Näherung bei Luftdruck 1.013 hPa · x horizontal · θt vertikal</div>`, 'cyan');
+function chartCard(activePath) {
+  return card('h,x-Diagramm', `<div class="hx-chart-wrap">${renderHxSvg(activePath)}</div><div class="formula">Näherung bei Luftdruck 1.013 hPa · x horizontal · θt vertikal</div>`, 'cyan');
 }
 
 
@@ -127,6 +133,29 @@ function buildStatePath(points, px, py) {
     }
   }
   return parts.join(' ');
+}
+
+
+function buildSegmentPath(a, b, px, py) {
+  if (!a || !b) return '';
+  const parts = [`M${px(a.humidityRatioGkg).toFixed(1)},${py(a.tempC).toFixed(1)}`];
+  const bothSaturated = a.rhPercent >= 99 && b.rhPercent >= 99 && Math.abs(a.tempC - b.tempC) > 0.2;
+  if (bothSaturated) {
+    const steps = Math.max(8, Math.ceil(Math.abs(b.tempC - a.tempC) / 1.5));
+    for (let j = 1; j <= steps; j += 1) {
+      const t = a.tempC + (b.tempC - a.tempC) * (j / steps);
+      const x = humidityRatioKgKg(t, 100) * 1000;
+      parts.push(`L${px(x).toFixed(1)},${py(t).toFixed(1)}`);
+    }
+  } else {
+    parts.push(`L${px(b.humidityRatioGkg).toFixed(1)},${py(b.tempC).toFixed(1)}`);
+  }
+  return parts.join(' ');
+}
+
+function buildStateSegments(points, px, py) {
+  if (points.length < 2) return '';
+  return points.slice(1).map((point, index) => `<path d="${buildSegmentPath(points[index], point, px, py)}" class="hx-state-path hx-state-path--${index % 5}"/>`).join('');
 }
 
 function renderHxSvg(points) {
@@ -163,7 +192,7 @@ function renderHxSvg(points) {
     return `<path d="${d.join(' ')}" class="hx-rh hx-rh-${rh}"/><text x="${px(labelX)}" y="${py(labelT) - 4}" class="hx-rh-label">${rh}%</text>`;
   }).join('');
 
-  const path = buildStatePath(points, px, py);
+  const segments = buildStateSegments(points, px, py);
   const markers = points.map((point, index) => {
     const cx = px(point.humidityRatioGkg);
     const cy = py(point.tempC);
@@ -180,18 +209,23 @@ function renderHxSvg(points) {
     <rect x="0" y="0" width="${w}" height="${h}" rx="18" class="hx-chart-bg"/>
     <g>${tempLines.join('')}${xLines.join('')}</g>
     <g>${rhCurves}</g>
-    <path d="${path}" class="hx-state-path"/>
+    <g>${segments}</g>
     <g>${markers}</g>
     <text x="${w / 2}" y="${h - 12}" class="hx-title" text-anchor="middle">Feuchtegehalt x [g H₂O/kg tr. Luft]</text>
     <text x="16" y="${h / 2}" class="hx-title" transform="rotate(-90 16 ${h / 2})" text-anchor="middle">Trockenkugeltemperatur θt [°C]</text>
   </svg>`;
 }
 
+function hasCompleteInput(s) {
+  return [s.tempC, s.rhPercent, s.targetTempC, s.targetRhPercent].every(value => String(value ?? '').trim() !== '');
+}
+
 function view(s) {
   const r = calculate(s);
+  const activePath = (s.activePath?.length ? s.activePath : (hasCompleteInput(s) ? r.processPath : []));
   const body = `<div class="hx-layout">
-    <div class="hx-layout__left">${stack([inputCard(s), resultCard(r), historyCard(r.points)].join(''))}</div>
-    <div class="hx-layout__right">${chartCard(r.points, r.current, r.target, r.processPath)}</div>
+    <div class="hx-layout__left">${stack([inputCard(s), resultCard(r, activePath), historyCard(s.processes ?? [], s.activeProcessId)].join(''))}</div>
+    <div class="hx-layout__right">${chartCard(activePath)}</div>
   </div>`;
   return renderModuleShell(config, `<div class="span-12">${body}</div>`);
 }
@@ -225,26 +259,58 @@ export default {
       rootEl.querySelector('[data-hx-add]')?.addEventListener('click', () => {
         const s = state.get();
         const result = calculate(s);
-        const labelled = result.processPath.map((point, index) => ({
-          label: `${s.label || 'Zustand'} · ${index + 1} ${point.label.replace(/^\d+\s*/, '')}`,
-          tempC: String(point.tempC),
-          rhPercent: String(point.rhPercent)
-        }));
-        const points = [...(s.points ?? []), ...labelled];
-        savePoints(points);
-        state.set({ points, label: `Zustand ${points.length + 1}` });
+        const record = makeProcessRecord({ input: s, result });
+        const processes = [...(s.processes ?? []).filter(item => item.id !== record.id), record];
+        saveProcesses(processes);
+        clearLegacyPoints();
+        state.set({
+          processes,
+          activeProcessId: record.id,
+          activePath: record.path,
+          points: []
+        });
       });
 
       rootEl.querySelector('[data-hx-clear]')?.addEventListener('click', () => {
-        savePoints([]);
-        state.set({ points: [] });
+        clearLegacyPoints();
+        state.set({
+          label: '',
+          tempC: '',
+          rhPercent: '',
+          targetTempC: '',
+          targetRhPercent: '',
+          activeProcessId: null,
+          activePath: [],
+          points: []
+        });
       });
 
-      rootEl.querySelectorAll('[data-hx-remove]').forEach(button => {
-        button.addEventListener('click', () => {
-          const points = (state.get().points ?? []).filter(point => point.id !== button.dataset.hxRemove);
-          savePoints(points);
-          state.set({ points });
+      rootEl.querySelectorAll('[data-hx-select-process]').forEach(row => {
+        row.addEventListener('click', event => {
+          if (event.target.closest('[data-hx-remove-process]')) return;
+          const process = (state.get().processes ?? []).find(item => item.id === row.dataset.hxSelectProcess);
+          if (!process) return;
+          state.set({
+            ...(process.input ?? {}),
+            process: process.process || process.input?.process || 'heat',
+            activeProcessId: process.id,
+            activePath: process.path ?? []
+          });
+        });
+      });
+
+      rootEl.querySelectorAll('[data-hx-remove-process]').forEach(button => {
+        button.addEventListener('click', event => {
+          event.stopPropagation();
+          const current = state.get();
+          const processes = (current.processes ?? []).filter(process => process.id !== button.dataset.hxRemoveProcess);
+          saveProcesses(processes);
+          const wasActive = current.activeProcessId === button.dataset.hxRemoveProcess;
+          state.set({
+            processes,
+            activeProcessId: wasActive ? null : current.activeProcessId,
+            activePath: wasActive ? [] : current.activePath
+          });
         });
       });
     };
