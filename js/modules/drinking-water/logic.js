@@ -68,42 +68,49 @@ export function createUsageUnit({ name, consumer, consumers }) {
 }
 
 function unitEffectiveConsumers(unit, includeHotWater = false) {
-  const expanded = [];
-  (unit.consumers || []).forEach(consumer => {
-    for (let i = 0; i < Math.max(1, Number(consumer.count) || 1); i++) {
-      expanded.push(consumer);
-      if (includeHotWater && consumer.hotWater) {
-        expanded.push({ ...consumer, id: `${consumer.id}-tww-${i}`, label: `${consumer.label} TWW`, neGroup: `${consumer.neGroup || consumer.typeId}-tww` });
-      }
-    }
-  });
-
-  // Innerhalb einer NE werden mehrfach vorhandene gleichartige Entnahmestellen nur einmal angesetzt.
+  // Für den NE-Ansatz werden zuerst die zwei größten wirksamen Entnahmestellen gewählt.
+  // Bei zentraler Warmwasserbereitung zählt die Warmwasserseite derselben Entnahmestelle
+  // zusätzlich, statt die Warm-/Kaltwasseranteile als zwei unabhängige Entnahmestellen zu wählen.
   const byGroup = new Map();
-  for (const consumer of expanded) {
+  (unit.consumers || []).forEach(consumer => {
     const key = consumer.neGroup || consumer.typeId;
     const existing = byGroup.get(key);
     if (!existing || Number(consumer.vr) > Number(existing.vr)) byGroup.set(key, consumer);
-  }
-  return [...byGroup.values()];
+  });
+
+  const topFixtures = [...byGroup.values()]
+    .sort((a, b) => Number(b.vr || 0) - Number(a.vr || 0))
+    .slice(0, 2);
+
+  const effective = [];
+  topFixtures.forEach((consumer, index) => {
+    effective.push({ ...consumer, effectiveRole: 'PWC', effectiveIndex: index });
+    if (includeHotWater && consumer.hotWater) {
+      effective.push({
+        ...consumer,
+        id: `${consumer.id}-tww-${index}`,
+        label: `${consumer.label} TWW`,
+        neGroup: `${consumer.neGroup || consumer.typeId}-tww`,
+        effectiveRole: 'PWH',
+        effectiveIndex: index
+      });
+    }
+  });
+  return effective;
 }
 
 export function summarizeUsageUnit(unit, includeHotWater = false) {
   const effective = unitEffectiveConsumers(unit, includeHotWater);
-  const topTwoFlow = effective
-    .map(c => Number(c.vr || 0))
-    .sort((a,b) => b-a)
-    .slice(0, 2)
-    .reduce((sum, v) => sum + v, 0);
+  const effectiveFlow = effective.reduce((sum, c) => sum + Number(c.vr || 0), 0);
   const rawFlow = (unit.consumers || []).reduce((sum, c) => sum + Number(c.vr || 0) * (Number(c.count) || 1), 0);
   return {
     ...unit,
     effectiveConsumers: effective,
     consumerCount: (unit.consumers || []).reduce((sum, c) => sum + (Number(c.count)||1), 0),
     rawFlow,
-    // DIN-NE-Ansatz für die weitere Gesamtberechnung: zwei größte wirksame Entnahmestellen.
-    sumFlow: topTwoFlow,
-    peakFlow: topTwoFlow
+    // DIN-NE-Ansatz: zwei größte wirksame Entnahmestellen; bei zentraler TWW zusätzlich PWH-Anteil der gewählten Zapfstellen.
+    sumFlow: effectiveFlow,
+    peakFlow: effectiveFlow
   };
 }
 

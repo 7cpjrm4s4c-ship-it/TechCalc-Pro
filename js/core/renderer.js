@@ -99,6 +99,12 @@ export function bindCommonInputs(root, state) {
         commitField(el, { notify: false });
         scheduleRenderAfterEditing();
       });
+      el.addEventListener('keydown', event => {
+        if (event.key !== 'Enter') return;
+        event.preventDefault();
+        commitField(el, { notify: false });
+        state.set({}, { notify: true });
+      });
     } else {
       el.addEventListener('change', () => commitField(el));
     }
