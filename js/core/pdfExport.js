@@ -304,15 +304,17 @@ function printableChart(svg) {
 
 function buildPrintableHtml(project, moduleData) {
   const date = sanitizeText(project.date) || new Date().toLocaleDateString('de-DE');
-  const firstLine = [project.client, project.project, project.projectNo]
-    .map(value => sanitizeText(value))
-    .filter(Boolean)
-    .map(value => `<div>${esc(value)}</div>`)
+  const printDate = new Date().toLocaleDateString('de-DE');
+  const appIconUrl = new URL('./assets/icons/icon-192.png', window.location.href).href;
+  const projectLines = [
+    ['Auftraggeber', project.client],
+    ['Projektbezeichnung', project.project],
+    ['Projektnummer', project.projectNo]
+  ]
+    .map(([label, value]) => [label, sanitizeText(value)])
+    .filter(([, value]) => Boolean(value))
+    .map(([label, value]) => `<div><span>${esc(label)}:</span> ${esc(value)}</div>`)
     .join('');
-
-  const logo = project.logoDataUrl
-    ? `<img class="tcp-logo" src="${esc(project.logoDataUrl)}" alt="Firmenlogo">`
-    : '';
 
   const sections = moduleData.sections.map(section => {
     const title = sectionTitle(section.title);
@@ -328,12 +330,20 @@ function buildPrintableHtml(project, moduleData) {
     </div>
     <main class="tcp-page">
       <header class="tcp-header">
-        <div class="tcp-project-lines">${firstLine || '<div></div>'}</div>
-        <div class="tcp-logo-wrap">${logo}</div>
+        <div class="tcp-brand">
+          <img class="tcp-brand-icon" src="${esc(appIconUrl)}" alt="">
+          <div class="tcp-brand-text">
+            <strong>TechCalc Pro</strong>
+            <span>HLSK Quick Tools</span>
+          </div>
+        </div>
+        <div class="tcp-module-name">${esc(sanitizeText(moduleData.title))}</div>
+        <div class="tcp-print-date"><span>Druckdatum</span><strong>${esc(printDate)}</strong></div>
       </header>
       <div class="tcp-meta-row"><span>Sachbearbeiter: ${esc(sanitizeText(project.engineer) || '-')}</span><span>Datum: ${esc(date)}</span></div>
+      ${projectLines ? `<section class="tcp-project-data">${projectLines}</section>` : ''}
       <section class="tcp-title-block">
-        <h1>TechCalc Pro - Berechnungsprotokoll</h1>
+        <h1>Berechnungsprotokoll</h1>
         <p>Modul: ${esc(sanitizeText(moduleData.title))}</p>
       </section>
       ${sections}
@@ -350,12 +360,20 @@ function printStyle() {
     * { box-sizing: border-box; }
     body { margin: 0; background: #fff; color: #111827; font-family: Arial, Helvetica, sans-serif; font-size: 9.5pt; line-height: 1.35; }
     .tcp-page { width: 100%; }
-    .tcp-header { display: grid; grid-template-columns: 1fr 42mm; gap: 12mm; align-items: start; min-height: 25mm; padding-bottom: 5mm; border-bottom: 1px solid #D1D5DB; }
-    .tcp-project-lines { font-size: 10pt; color: #111827; line-height: 1.5; font-weight: 500; min-height: 18mm; }
-    .tcp-logo-wrap { height: 22mm; display: flex; align-items: center; justify-content: flex-end; }
-    .tcp-logo { max-width: 42mm; max-height: 22mm; object-fit: contain; }
+    .tcp-header { display: grid; grid-template-columns: minmax(48mm, 1fr) minmax(42mm, 1fr) minmax(34mm, 1fr); gap: 8mm; align-items: center; min-height: 22mm; padding-bottom: 5mm; border-bottom: 1px solid #D1D5DB; }
+    .tcp-brand { display: inline-flex; align-items: center; gap: 3mm; min-width: 0; }
+    .tcp-brand-icon { width: 12mm; height: 12mm; border-radius: 2.4mm; object-fit: contain; flex: 0 0 auto; }
+    .tcp-brand-text { display: grid; gap: .5mm; min-width: 0; }
+    .tcp-brand-text strong { color: #111827; font-size: 14pt; line-height: 1; font-weight: 800; letter-spacing: -0.02em; }
+    .tcp-brand-text span { color: #4B5563; font-size: 7.8pt; line-height: 1; text-transform: uppercase; letter-spacing: .18em; font-weight: 600; }
+    .tcp-module-name { color: #111827; font-size: 12pt; line-height: 1.15; font-weight: 800; text-align: center; text-transform: uppercase; letter-spacing: .04em; }
+    .tcp-print-date { display: grid; gap: .8mm; justify-items: end; color: #111827; text-align: right; }
+    .tcp-print-date span { color: #6B7280; font-size: 7.8pt; text-transform: uppercase; letter-spacing: .12em; font-weight: 700; }
+    .tcp-print-date strong { font-size: 10pt; font-weight: 800; }
     .tcp-meta-row { display: flex; justify-content: space-between; gap: 8mm; color: #4B5563; font-size: 9pt; margin-top: 5mm; }
-    .tcp-title-block { margin: 9mm 0 7mm; }
+    .tcp-project-data { margin-top: 3mm; padding: 3mm 4mm; background: #F9FAFB; border: 0.5px solid #D1D5DB; color: #111827; font-size: 9pt; line-height: 1.45; }
+    .tcp-project-data span { color: #4B5563; font-weight: 700; }
+    .tcp-title-block { margin: 7mm 0 7mm; }
     .tcp-title-block h1 { margin: 0; font-size: 20pt; line-height: 1.05; font-weight: 700; color: #111827; letter-spacing: -0.02em; }
     .tcp-title-block p { margin: 2mm 0 0; color: #4B5563; font-size: 11pt; font-weight: 600; }
     .tcp-section { margin: 0 0 7mm; break-inside: avoid; }
