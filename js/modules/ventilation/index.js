@@ -10,6 +10,81 @@ function prefixFor(s) { return MODE_PREFIX[s.mode] || 'heating'; }
 function key(s, name) { return `${prefixFor(s)}${name}`; }
 function activeValue(s, name) { return s[key(s, name)]; }
 
+
+let ventilationLineSectionsMemory = [];
+export function readVentilationLineSections() {
+  return Array.isArray(ventilationLineSectionsMemory) ? [...ventilationLineSectionsMemory] : [];
+}
+export function writeVentilationLineSections(items) {
+  ventilationLineSectionsMemory = Array.isArray(items) ? [...items] : [];
+}
+
+function renderVentilationLineSection(item, index) {
+  return `<article class="line-section-card is-collapsed" data-line-card>
+    <div class="line-section-card__head">
+      <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false"><strong>${item.name || 'Abschnitt ' + (index + 1)}</strong><span>▾</span></button>
+      <button type="button" class="line-section-card__delete" data-line-delete="${item.id}" aria-label="Abschnitt löschen">×</button>
+    </div>
+    <div class="line-section-card__body">${inlineStats([
+      { label: 'Leistung', value: item.powerKw || '—', unit: 'kW' },
+      { label: 'Volumenstrom', value: item.volumeFlowM3h || '—', unit: 'm³/h' },
+      { label: 'Massenstrom', value: item.massFlowKgh || '—', unit: 'kg/h' },
+      { label: 'Temperaturdifferenz', value: item.deltaT || '—', unit: 'K' },
+      { label: 'Zuluft', value: item.supplyTemp || '—', unit: '°C' },
+      { label: 'Raum', value: item.roomTemp || '—', unit: '°C' },
+      { label: 'Betriebsart', value: item.modeLabel || '—' }
+    ])}</div>
+  </article>`;
+}
+
+function ventilationLineSectionsCard(r, active, modeLabel) {
+  const items = readVentilationLineSections();
+  const rows = items.length
+    ? `<div class="line-section-list">${items.map(renderVentilationLineSection).join('')}</div>`
+    : '<div class="empty-state empty-state--compact">Noch keine Leitungsabschnitte angelegt</div>';
+  return card('Leitungsabschnitte', stack([
+    `<div class="field"><label for="ventLineSectionName">Bezeichnung</label><div class="control"><input id="ventLineSectionName" type="text" placeholder="z. B. Zuluft Büro Nord" autocomplete="off"></div></div>`,
+    '<button type="button" class="action-button" data-vent-line-add>Abschnitt speichern</button>',
+    rows
+  ].join('')), 'cyan');
+}
+
+function bindVentilationLineSections(root, r, active, modeLabel, rerender) {
+  root.querySelector('[data-vent-line-add]')?.addEventListener('click', event => {
+    event.preventDefault();
+    const name = root.querySelector('#ventLineSectionName')?.value?.trim() || '';
+    const items = readVentilationLineSections();
+    items.push({
+      id: Date.now(),
+      name: name || `Abschnitt ${items.length + 1}`,
+      powerKw: fmt(r.powerKw),
+      volumeFlowM3h: fmt(r.volumeFlowM3h),
+      massFlowKgh: fmt(r.massFlowKgh),
+      deltaT: fmt(r.deltaT),
+      supplyTemp: fmt(active.supplyTemp),
+      roomTemp: fmt(active.roomTemp),
+      modeLabel,
+      createdAt: new Date().toISOString()
+    });
+    writeVentilationLineSections(items);
+    if (typeof rerender === 'function') rerender();
+  });
+  root.querySelectorAll('[data-line-toggle]').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const card = toggle.closest('[data-line-card]');
+      const collapsed = card?.classList.toggle('is-collapsed');
+      toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    });
+  });
+  root.querySelectorAll('[data-line-delete]').forEach(del => {
+    del.addEventListener('click', () => {
+      const id = Number(del.dataset.lineDelete);
+      writeVentilationLineSections(readVentilationLineSections().filter(item => item.id !== id));
+      if (typeof rerender === 'function') rerender();
+    });
+  });
+}
+
 function activeCalculationState(s) {
   return {
     mode: s.mode,
@@ -107,7 +182,8 @@ function view(s) {
 
   const outputColumn = stack([
     mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent),
-    airStats
+    airStats,
+    ventilationLineSectionsCard(r, active, modeLabel)
   ].join(''));
 
   return renderModuleShell(config, `
@@ -120,6 +196,11 @@ export default {
   config,
   state,
   mount(root) {
-    mountModule(root, state, view);
+    mountModule(root, state, view, (rootEl, snapshot, render) => {
+      const active = activeCalculationState(snapshot);
+      const r = calculate(active);
+      const modeLabel = snapshot.mode === 'cooling' ? 'Kälte' : 'Heizung';
+      bindVentilationLineSections(rootEl, r, active, modeLabel, render);
+    });
   }
 };

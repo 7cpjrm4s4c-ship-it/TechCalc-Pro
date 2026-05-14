@@ -26,6 +26,80 @@ function toggleNumericSign(value) {
   return raw.startsWith('-') ? raw.slice(1) : `-${raw}`;
 }
 
+
+let rltDevicesMemory = [];
+export function readRltDevices() {
+  return Array.isArray(rltDevicesMemory) ? [...rltDevicesMemory] : [];
+}
+export function writeRltDevices(items) {
+  rltDevicesMemory = Array.isArray(items) ? [...items] : [];
+}
+
+function rltDeviceCard(r, s) {
+  const items = readRltDevices();
+  const rows = items.length
+    ? `<div class="line-section-list">${items.map((item, index) => `<article class="line-section-card is-collapsed" data-line-card>
+        <div class="line-section-card__head">
+          <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false"><strong>${esc(item.name || 'RLT-Gerät ' + (index + 1))}</strong><span>▾</span></button>
+          <button type="button" class="line-section-card__delete" data-rlt-delete="${esc(item.id)}" aria-label="RLT-Gerät löschen">×</button>
+        </div>
+        <div class="line-section-card__body">${inlineStats([
+          { label: 'Berechnung', value: item.mode || '—' },
+          { label: 'Volumenstrom', value: item.volumeFlowM3h || '—', unit: 'm³/h' },
+          { label: 'Außenluft', value: item.outdoor || '—' },
+          { label: 'Abluft/Umluft', value: item.extract || '—' },
+          { label: 'Zuluft/Mischluft', value: item.supply || '—' },
+          { label: 'Fortluft', value: item.exhaust || '—' },
+          { label: 'Leistung', value: item.power || '—', unit: item.power && item.power !== '—' ? 'kW' : '' },
+          { label: 'Kondensation', value: item.condensation || '—' }
+        ])}</div>
+      </article>`).join('')}</div>`
+    : '<div class="empty-state empty-state--compact">Noch keine RLT-Geräte angelegt</div>';
+  return card('RLT-Geräte', stack([
+    `<div class="field"><label for="rltDeviceName">Bezeichnung</label><div class="control"><input id="rltDeviceName" type="text" placeholder="z. B. RLT Büro EG" autocomplete="off"></div></div>`,
+    '<button type="button" class="action-button" data-rlt-add>RLT-Gerät speichern</button>',
+    rows
+  ].join('')), 'cyan');
+}
+
+function bindRltDevices(root, r, s, rerender) {
+  root.querySelector('[data-rlt-add]')?.addEventListener('click', event => {
+    event.preventDefault();
+    const name = root.querySelector('#rltDeviceName')?.value?.trim() || '';
+    const isMixing = s.mode === 'mixing';
+    const items = readRltDevices();
+    items.push({
+      id: Date.now(),
+      name: name || `RLT-Gerät ${items.length + 1}`,
+      mode: isMixing ? 'Mischluft' : 'WRG',
+      volumeFlowM3h: isMixing ? fmt(r.mixed?.volumeFlowM3h, 0) : fmt(s.wrgVolumeFlowM3h, 0),
+      outdoor: `${fmt(isMixing ? s.mixingOutdoorTemp : s.outdoorTemp, 2)} °C / ${fmt(isMixing ? s.mixingOutdoorRh : s.outdoorRh, 0)} %`,
+      extract: `${fmt(isMixing ? s.mixingRecircTemp : s.extractTemp, 2)} °C / ${fmt(isMixing ? s.mixingRecircRh : s.extractRh, 0)} %`,
+      supply: isMixing ? `${fmt(r.mixed?.tempC, 2)} °C / ${fmt(r.mixed?.rhPercent, 0)} %` : `${fmt(r.supply?.tempC, 2)} °C / ${fmt(r.supply?.rhPercent, 0)} %`,
+      exhaust: isMixing ? '—' : `${fmt(r.exhaust?.tempC, 2)} °C / ${fmt(r.exhaust?.rhPercent, 0)} %`,
+      power: isMixing ? '—' : fmt(r.recoveredPowerKw, 2),
+      condensation: r.hasCondensation ? `${fmt(r.condensateLs, 4)} l/s` : '—',
+      createdAt: new Date().toISOString()
+    });
+    writeRltDevices(items);
+    if (typeof rerender === 'function') rerender();
+  });
+  root.querySelectorAll('[data-line-toggle]').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const card = toggle.closest('[data-line-card]');
+      const collapsed = card?.classList.toggle('is-collapsed');
+      toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    });
+  });
+  root.querySelectorAll('[data-rlt-delete]').forEach(del => {
+    del.addEventListener('click', () => {
+      const id = Number(del.dataset.rltDelete);
+      writeRltDevices(readRltDevices().filter(item => Number(item.id) !== id));
+      if (typeof rerender === 'function') rerender();
+    });
+  });
+}
+
 function readonlyAirCard(title, point, accent = 'cyan', options = {}) {
   const includeMass = options.includeMass !== false;
   const includeVolume = options.includeVolume === true;
@@ -155,7 +229,7 @@ function view(s) {
     : 'WRG: tZuluft = (1−β) × [tAußen + ηWRG × (tAbluft − tAußen)] + β × tAußen · tFort = tAbluft − (1−β) × ηWRG × (tAbluft − tAußen)';
 
   const input = isMixing ? mixingInputCard(s) : wrgInputCard(s);
-  const output = isMixing ? mixingOutputs(r) : wrgOutputs(r);
+  const output = stack([(isMixing ? mixingOutputs(r) : wrgOutputs(r)), rltDeviceCard(r, s)].join(''));
 
   const body = stack([
     modeCard(s),
@@ -180,6 +254,7 @@ export default {
           state.set({ [id]: toggleNumericSign(input?.value) });
         });
       });
+      bindRltDevices(rootEl, calculate(snapshot), snapshot, render);
     });
   }
 };

@@ -3610,3 +3610,75 @@ body.settings-open {
   border-radius: 16px;
   background: var(--surface-soft);
 }
+
+/* v31: collapsible saved sections and RLT devices */
+.line-section-card__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ui-gap);
+}
+
+.line-section-card__toggle {
+  display: flex !important;
+  width: 100% !important;
+  height: auto !important;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-gap);
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--color-text) !important;
+  text-align: left;
+  cursor: pointer;
+}
+
+.line-section-card__toggle strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.line-section-card__toggle span {
+  color: var(--accent-blue);
+  font-weight: 800;
+  line-height: 1;
+  transition: transform .16s ease;
+}
+
+.line-section-card:not(.is-collapsed) .line-section-card__toggle span {
+  transform: rotate(180deg);
+}
+
+.line-section-card__delete {
+  flex: 0 0 auto;
+}
+
+.line-section-card__body {
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .line-section-card.is-collapsed .line-section-card__body {
+    display: none;
+  }
+
+  .line-section-card__head {
+    min-height: 44px;
+  }
+
+  .line-section-card__toggle strong {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 768px) {
+  .line-section-card.is-collapsed .line-section-card__body {
+    display: block;
+  }
+
+  .line-section-card .inline-stats {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}

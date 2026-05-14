@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-external-project-v29';
+const CACHE_NAME = 'techcalc-pro-lines-wrg-v31';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',

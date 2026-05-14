@@ -325,7 +325,7 @@ function buildPrintableHtml(project, moduleData) {
 
   return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>TechCalc Pro - ${esc(moduleData.shortTitle)}</title>${printStyle()}</head><body>
     <div class="tcp-toolbar">
-      <button class="tcp-close" type="button" onclick="try{ if (window.opener) { window.opener.focus(); window.close(); return; } }catch(e){} window.location.href='./';">Zurück zur App</button>
+      <button class="tcp-close" type="button" onclick="try{ if (window.opener) { window.opener.focus(); window.close(); return; } }catch(e){} if (history.length > 1) { history.back(); } else { window.close(); }">Zurück zur App</button>
       <button class="tcp-print" type="button" onclick="window.print()">PDF speichern / drucken</button>
     </div>
     <main class="tcp-page">

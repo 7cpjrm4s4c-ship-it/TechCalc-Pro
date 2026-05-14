@@ -102,24 +102,35 @@ export function writeLineSections(items) {
   lineSectionsMemory = Array.isArray(items) ? [...items] : [];
 }
 
+function renderLineSectionCard(item, index) {
+  const stats = [
+    { label: 'Leistung', value: item.powerKw || '—', unit: 'kW' },
+    { label: 'Massenstrom', value: item.massFlowKgh || '—', unit: 'kg/h' },
+    { label: 'Volumenstrom', value: item.volumeFlowM3h || '—', unit: 'm³/h' },
+    { label: 'Temperaturdifferenz', value: item.deltaT || '—', unit: 'K' },
+    { label: 'Wärmeträger', value: item.medium || '—' },
+    { label: 'Rohrdimension', value: item.pipeDn || '—' },
+    { label: 'Rohrabmessung', value: item.pipeDimension || '—' },
+    { label: 'Werkstoff', value: item.pipeMaterial || '—' },
+    { label: 'Geschwindigkeit', value: item.pipeVelocity || '—', unit: item.pipeVelocity && item.pipeVelocity !== '—' ? 'm/s' : '' },
+    { label: 'Druckverlust', value: item.pipePressureLoss || '—', unit: item.pipePressureLoss && item.pipePressureLoss !== '—' ? 'Pa/m' : '' }
+  ];
+  return `<article class="line-section-card is-collapsed" data-line-card>
+    <div class="line-section-card__head">
+      <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false">
+        <strong>${item.name || 'Abschnitt ' + (index + 1)}</strong>
+        <span>▾</span>
+      </button>
+      <button type="button" class="line-section-card__delete" data-line-delete="${item.id}" aria-label="Abschnitt löschen">×</button>
+    </div>
+    <div class="line-section-card__body">${inlineStats(stats)}</div>
+  </article>`;
+}
+
 function lineSectionsCard(r) {
   const items = readLineSections();
   const rows = items.length
-    ? `<div class="line-section-list">${items.map((item, index) => `<article class="line-section-card">
-        <div class="line-section-card__head"><strong>${item.name || 'Abschnitt ' + (index + 1)}</strong><button type="button" data-line-delete="${item.id}" aria-label="Abschnitt löschen">×</button></div>
-        ${inlineStats([
-          { label: 'Leistung', value: item.powerKw || '—', unit: 'kW' },
-          { label: 'Massenstrom', value: item.massFlowKgh || '—', unit: 'kg/h' },
-          { label: 'Volumenstrom', value: item.volumeFlowM3h || '—', unit: 'm³/h' },
-          { label: 'Temperaturdifferenz', value: item.deltaT || '—', unit: 'K' },
-          { label: 'Wärmeträger', value: item.medium || '—' },
-          { label: 'Rohrdimension', value: item.pipeDn || '—' },
-          { label: 'Rohrabmessung', value: item.pipeDimension || '—' },
-          { label: 'Werkstoff', value: item.pipeMaterial || '—' },
-          { label: 'Geschwindigkeit', value: item.pipeVelocity || '—', unit: item.pipeVelocity && item.pipeVelocity !== '—' ? 'm/s' : '' },
-          { label: 'Druckverlust', value: item.pipePressureLoss || '—', unit: item.pipePressureLoss && item.pipePressureLoss !== '—' ? 'Pa/m' : '' }
-        ])}
-      </article>`).join('')}</div>`
+    ? `<div class="line-section-list">${items.map(renderLineSectionCard).join('')}</div>`
     : '<div class="empty-state empty-state--compact">Noch keine Leitungsabschnitte angelegt</div>';
   return card('Leitungsabschnitte', stack([
     `<div class="field"><label for="lineSectionName">Bezeichnung</label><div class="control"><input id="lineSectionName" type="text" placeholder="z. B. Verteilerabgang Nord" autocomplete="off"></div></div>`,
@@ -154,6 +165,14 @@ function bindLineSections(root, r, rerender) {
       if (typeof rerender === 'function') rerender();
     });
   }
+  root.querySelectorAll('[data-line-toggle]').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const card = toggle.closest('[data-line-card]');
+      const collapsed = card?.classList.toggle('is-collapsed');
+      toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    });
+  });
+
   root.querySelectorAll('[data-line-delete]').forEach(del => {
     del.addEventListener('click', () => {
       const id = Number(del.dataset.lineDelete);
