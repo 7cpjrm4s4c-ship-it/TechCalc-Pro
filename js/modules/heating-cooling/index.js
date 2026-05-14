@@ -92,15 +92,14 @@ function mediumStats(medium) {
 }
 
 
-const LINE_STORAGE_KEY = 'techcalcPro.heatingCooling.lineSections';
+let lineSectionsMemory = [];
 
-function readLineSections() {
-  try { return JSON.parse(localStorage.getItem(LINE_STORAGE_KEY) || '[]'); }
-  catch { return []; }
+export function readLineSections() {
+  return Array.isArray(lineSectionsMemory) ? [...lineSectionsMemory] : [];
 }
 
-function writeLineSections(items) {
-  localStorage.setItem(LINE_STORAGE_KEY, JSON.stringify(items));
+export function writeLineSections(items) {
+  lineSectionsMemory = Array.isArray(items) ? [...items] : [];
 }
 
 function lineSectionsCard(r) {

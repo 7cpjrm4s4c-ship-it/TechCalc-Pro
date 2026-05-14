@@ -69,6 +69,10 @@ async function render(id){
 initRouter(render);
 renderQuickAccessSettings();
 
+document.addEventListener('techcalc-project-loaded', () => {
+  render(currentRoute());
+});
+
 let pdfExportReady;
 function ensurePdfExport() {
   if (!pdfExportReady) {
@@ -97,14 +101,14 @@ const closeSettings = document.getElementById('closeSettings');
 const settingsBody = settingsPanel?.querySelector('.settings-panel__body');
 const THEME_STORAGE_KEY = 'techcalc-theme-mode';
 
-function applyThemeMode(mode = localStorage.getItem(THEME_STORAGE_KEY) || 'system') {
+function applyThemeMode(mode = sessionStorage.getItem(THEME_STORAGE_KEY) || 'system') {
   const value = ['dark', 'light', 'system'].includes(mode) ? mode : 'system';
   if (value === 'system') {
     document.documentElement.removeAttribute('data-theme');
   } else {
     document.documentElement.setAttribute('data-theme', value);
   }
-  localStorage.setItem(THEME_STORAGE_KEY, value);
+  sessionStorage.setItem(THEME_STORAGE_KEY, value);
   document.querySelectorAll('.theme-switch__option').forEach(item => {
     const active = item.dataset.theme === value;
     item.classList.toggle('is-active', active);
@@ -113,6 +117,20 @@ function applyThemeMode(mode = localStorage.getItem(THEME_STORAGE_KEY) || 'syste
 }
 
 applyThemeMode();
+
+[
+  'techcalc-pdf-project-v1',
+  'techcalc-projects-v1',
+  'techcalc-active-project-id',
+  'techcalcPro.heatingCooling.lineSections',
+  'techcalc:hx-diagram:processes',
+  'techcalc:hx-diagram:points',
+  'techcalcPro.drinkingWater.usageUnits',
+  'techcalcPro.drinkingWater.singleConsumers'
+].forEach(key => {
+  try { localStorage.removeItem(key); } catch { /* ignore */ }
+});
+
 
 // Bind PDF export and project actions as soon as the app is ready.
 // The menu may be opened and a button tapped before lazy initialization has finished.

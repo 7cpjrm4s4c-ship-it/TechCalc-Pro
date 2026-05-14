@@ -23,19 +23,17 @@ export const BUILDING_TYPES = [
   { id:'senior', label:'Wohnheim / Seniorenheim', a:0.91, b:0.31, c:0.38 }
 ];
 
-const UNIT_STORAGE_KEY = 'techcalcPro.drinkingWater.usageUnits';
-const SINGLE_STORAGE_KEY = 'techcalcPro.drinkingWater.singleConsumers';
+let usageUnitsMemory = [];
+let singleConsumersMemory = [];
 
 export function readUsageUnits() {
-  try { return JSON.parse(localStorage.getItem(UNIT_STORAGE_KEY) || '[]'); }
-  catch { return []; }
+  return Array.isArray(usageUnitsMemory) ? [...usageUnitsMemory] : [];
 }
-export function writeUsageUnits(items) { localStorage.setItem(UNIT_STORAGE_KEY, JSON.stringify(items)); }
+export function writeUsageUnits(items) { usageUnitsMemory = Array.isArray(items) ? [...items] : []; }
 export function readSingleConsumers() {
-  try { return JSON.parse(localStorage.getItem(SINGLE_STORAGE_KEY) || '[]'); }
-  catch { return []; }
+  return Array.isArray(singleConsumersMemory) ? [...singleConsumersMemory] : [];
 }
-export function writeSingleConsumers(items) { localStorage.setItem(SINGLE_STORAGE_KEY, JSON.stringify(items)); }
+export function writeSingleConsumers(items) { singleConsumersMemory = Array.isArray(items) ? [...items] : []; }
 
 export function consumerById(id) { return CONSUMERS.find(c => c.id === id) || CONSUMERS[0]; }
 export function buildingById(id) { return BUILDING_TYPES.find(b => b.id === id) || BUILDING_TYPES[0]; }

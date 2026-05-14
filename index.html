@@ -59,25 +59,21 @@
         <details class="settings-submenu">
           <summary>Projekteinstellungen</summary>
           <div class="settings-submenu__content settings-form" id="projectPdfSettings">
-            <p>Projekte werden lokal im Browser gespeichert und in der PDF-Kopfzeile verwendet.</p>
-            <div class="settings-field settings-field--project">
-              <span class="settings-field__label">Projekt auswählen</span>
-              <label class="project-select-card" aria-label="Projekt auswählen">
-                <select id="projectSelect"></select>
-              </label>
-            </div>
+            <p>Die App bleibt ohne Projektdatei vollständig bedienbar. Projektdaten gelten nur für die aktuelle Sitzung. Externe Projektdateien können geöffnet, weiterbearbeitet und wieder gespeichert werden.</p>
             <div class="settings-actions settings-actions--split">
-              <button class="mini-button mini-button--primary" id="newProjectButton" type="button">Neues Projekt</button>
-              <button class="mini-button" id="deleteProjectButton" type="button">Projekt löschen</button>
+              <button class="mini-button mini-button--primary" id="saveProjectButton" type="button">Projekt speichern</button>
+              <button class="mini-button" id="openProjectButton" type="button">Projekt öffnen</button>
+              <input id="openProjectFile" class="visually-hidden" type="file" accept="application/json,.json,.techcalc">
             </div>
+            <div id="projectFileLabel" class="settings-hint" aria-live="polite">Kein externes Projekt geöffnet</div>
             <label>Auftraggeber<input id="pdfClient" type="text" autocomplete="organization" placeholder="z. B. Muster GmbH"></label>
             <label>Projektbezeichnung<input id="pdfProject" type="text" placeholder="z. B. Neubau Bürogebäude Nord"></label>
             <label>Projektnummer<input id="pdfProjectNo" type="text" placeholder="z. B. 2025-041"></label>
             <label>Sachbearbeiter<input id="pdfEngineer" type="text" placeholder="z. B. Max Mustermann"></label>
+            <label>Datum<input id="pdfDate" type="date"></label>
             <label>Firmenlogo<input id="pdfLogo" type="file" accept="image/png,image/jpeg,image/svg+xml"></label>
             <div class="settings-actions settings-actions--split">
               <button class="mini-button" id="clearPdfLogo" type="button">Logo entfernen</button>
-              <button class="mini-button mini-button--primary" id="saveProjectButton" type="button">Projekt speichern</button>
             </div>
             <div id="pdfLogoPreview" class="logo-preview" aria-live="polite"></div>
           </div>

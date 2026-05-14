@@ -14,6 +14,7 @@ export function createModuleState(initial = {}) {
       if (options.notify !== false) notify();
     },
     reset: () => { state = cloneState(initial); notify(); },
+    replace: (next = {}, options = {}) => { state = { ...cloneState(initial), ...cloneState(next) }; if (options.notify !== false) notify(); },
     subscribe: fn => { listeners.add(fn); return () => listeners.delete(fn); }
   };
 }

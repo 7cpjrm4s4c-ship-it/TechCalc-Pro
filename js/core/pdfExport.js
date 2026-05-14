@@ -1,8 +1,5 @@
 import { currentRoute } from './router.js';
-
-const LEGACY_STORAGE_KEY = 'techcalc-pdf-project-v1';
-const PROJECTS_STORAGE_KEY = 'techcalc-projects-v1';
-const ACTIVE_PROJECT_KEY = 'techcalc-active-project-id';
+import { getProjectMeta, setProjectMeta, downloadProjectFile, readProjectFile, applyProjectData, getOpenedFileName } from './projectStorage.js';
 
 
 function sanitizeText(value = '') {
@@ -26,71 +23,22 @@ function esc(value = '') {
 }
 
 const DEFAULT_PROJECT = {
-  id: '',
   client: '',
   project: '',
   projectNo: '',
   engineer: '',
+  date: '',
   logoDataUrl: ''
 };
 
-function createProject(seed = {}) {
-  return {
-    ...DEFAULT_PROJECT,
-    ...seed,
-    id: seed.id || `project-${Date.now()}-${Math.random().toString(16).slice(2)}`
-  };
-}
-
-function readProjects() {
-  try {
-    const stored = JSON.parse(localStorage.getItem(PROJECTS_STORAGE_KEY));
-    if (Array.isArray(stored) && stored.length) return stored.map(item => createProject(item));
-  } catch {}
-
-  try {
-    const legacy = JSON.parse(localStorage.getItem(LEGACY_STORAGE_KEY));
-    if (legacy && Object.keys(legacy).length) {
-      const migrated = createProject(legacy);
-      localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify([migrated]));
-      localStorage.setItem(ACTIVE_PROJECT_KEY, migrated.id);
-      return [migrated];
-    }
-  } catch {}
-
-  const first = createProject({ project: 'Projekt 1' });
-  localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify([first]));
-  localStorage.setItem(ACTIVE_PROJECT_KEY, first.id);
-  return [first];
-}
-
-function writeProjects(projects) {
-  localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects));
-}
-
-function readActiveProjectId(projects = readProjects()) {
-  const stored = localStorage.getItem(ACTIVE_PROJECT_KEY);
-  return projects.some(project => project.id === stored) ? stored : projects[0]?.id;
-}
-
 function readProject() {
-  const projects = readProjects();
-  const activeId = readActiveProjectId(projects);
-  const active = projects.find(project => project.id === activeId) || projects[0];
-  return createProject(active || {});
+  return { ...DEFAULT_PROJECT, ...getProjectMeta() };
 }
 
-function saveProject(next) {
-  const projects = readProjects();
-  const activeId = readActiveProjectId(projects);
-  let index = projects.findIndex(project => project.id === activeId);
-  if (index < 0) index = 0;
-  const base = projects[index] || createProject({ project: 'Projekt 1' });
-  projects[index] = createProject({ ...base, ...next, id: base.id });
-  writeProjects(projects);
-  localStorage.setItem(ACTIVE_PROJECT_KEY, projects[index].id);
-  renderProjectSelect(projects[index].id);
-  return projects[index];
+function saveProject(next = {}) {
+  const saved = setProjectMeta({ ...collectProjectFormValues(), ...next });
+  hydrateProjectForm(saved);
+  return saved;
 }
 
 function collectProjectFormValues() {
@@ -99,33 +47,23 @@ function collectProjectFormValues() {
     project: document.getElementById('pdfProject')?.value || '',
     projectNo: document.getElementById('pdfProjectNo')?.value || '',
     engineer: document.getElementById('pdfEngineer')?.value || '',
+    date: document.getElementById('pdfDate')?.value || '',
     logoDataUrl: readProject().logoDataUrl || ''
   };
 }
 
-function flashProjectSaved() {
+function flashProjectSaved(text = 'Projektdatei erstellt') {
   const button = document.getElementById('saveProjectButton');
   if (!button) return;
   const original = button.textContent;
-  button.textContent = 'Projekt gespeichert';
+  button.textContent = text;
   button.classList.add('is-saved');
   window.setTimeout(() => {
     button.textContent = original || 'Projekt speichern';
     button.classList.remove('is-saved');
-  }, 1200);
+  }, 1400);
 }
 
-function projectLabel(project) {
-  return [project.project, project.client, project.projectNo].filter(Boolean).join(' · ') || 'Unbenanntes Projekt';
-}
-
-function renderProjectSelect(activeId = readActiveProjectId()) {
-  const select = document.getElementById('projectSelect');
-  if (!select) return;
-  const projects = readProjects();
-  select.innerHTML = projects.map(project => `<option value="${esc(project.id)}">${esc(projectLabel(project))}</option>`).join('');
-  select.value = activeId;
-}
 function setInputValue(id, value) {
   const el = document.getElementById(id);
   if (el) el.value = value ?? '';
@@ -134,8 +72,8 @@ function setInputValue(id, value) {
 function bindProjectInput(id, key) {
   const el = document.getElementById(id);
   if (!el) return;
-  el.addEventListener('input', () => saveProject({ [key]: el.value }));
-  el.addEventListener('change', () => saveProject({ [key]: el.value }));
+  el.addEventListener('input', () => setProjectMeta({ [key]: el.value }));
+  el.addEventListener('change', () => setProjectMeta({ [key]: el.value }));
 }
 
 function updateLogoPreview() {
@@ -143,65 +81,41 @@ function updateLogoPreview() {
   if (!preview) return;
   const { logoDataUrl } = readProject();
   preview.innerHTML = logoDataUrl
-    ? `<img src="${esc(logoDataUrl)}" alt="Gespeichertes Firmenlogo">`
-    : '<span>Kein Logo gespeichert</span>';
+    ? `<img src="${esc(logoDataUrl)}" alt="Firmenlogo für diese Sitzung">`
+    : '<span>Kein Logo ausgewählt</span>';
+}
+
+function updateOpenedProjectLabel() {
+  const label = document.getElementById('projectFileLabel');
+  if (!label) return;
+  const name = getOpenedFileName();
+  label.textContent = name ? `Geöffnet: ${name}` : 'Kein externes Projekt geöffnet';
 }
 
 function initProjectSettings() {
-  if (window.__techCalcProjectSettingsBound) { renderProjectSelect(); hydrateProjectForm(readProject()); return; }
+  if (window.__techCalcProjectSettingsBound) { hydrateProjectForm(readProject()); updateOpenedProjectLabel(); return; }
   window.__techCalcProjectSettingsBound = true;
-  renderProjectSelect();
   hydrateProjectForm(readProject());
-
-  document.getElementById('projectSelect')?.addEventListener('change', event => {
-    localStorage.setItem(ACTIVE_PROJECT_KEY, event.target.value);
-    hydrateProjectForm(readProject());
-  });
-
-  document.getElementById('newProjectButton')?.addEventListener('click', () => {
-    const projects = readProjects();
-    const next = createProject({ project: `Projekt ${projects.length + 1}` });
-    projects.push(next);
-    writeProjects(projects);
-    localStorage.setItem(ACTIVE_PROJECT_KEY, next.id);
-    renderProjectSelect(next.id);
-    hydrateProjectForm(next);
-  });
-
-  document.getElementById('deleteProjectButton')?.addEventListener('click', () => {
-    let projects = readProjects();
-    if (projects.length <= 1) {
-      projects = [createProject({ project: 'Projekt 1' })];
-    } else {
-      const activeId = readActiveProjectId(projects);
-      projects = projects.filter(project => project.id !== activeId);
-    }
-    writeProjects(projects);
-    localStorage.setItem(ACTIVE_PROJECT_KEY, projects[0].id);
-    renderProjectSelect(projects[0].id);
-    hydrateProjectForm(projects[0]);
-  });
-
-
 
   bindProjectInput('pdfClient', 'client');
   bindProjectInput('pdfProject', 'project');
   bindProjectInput('pdfProjectNo', 'projectNo');
   bindProjectInput('pdfEngineer', 'engineer');
+  bindProjectInput('pdfDate', 'date');
 
   document.getElementById('pdfLogo')?.addEventListener('change', event => {
     const file = event.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.addEventListener('load', () => {
-      saveProject({ logoDataUrl: String(reader.result || '') });
+      setProjectMeta({ logoDataUrl: String(reader.result || '') });
       updateLogoPreview();
     });
     reader.readAsDataURL(file);
   });
 
   document.getElementById('clearPdfLogo')?.addEventListener('click', () => {
-    saveProject({ logoDataUrl: '' });
+    setProjectMeta({ logoDataUrl: '' });
     const file = document.getElementById('pdfLogo');
     if (file) file.value = '';
     updateLogoPreview();
@@ -209,19 +123,47 @@ function initProjectSettings() {
 
   document.getElementById('saveProjectButton')?.addEventListener('click', event => {
     event.preventDefault();
-    const saved = saveProject(collectProjectFormValues());
-    hydrateProjectForm(saved);
+    setProjectMeta(collectProjectFormValues());
+    downloadProjectFile();
     flashProjectSaved();
   });
 
+  document.getElementById('openProjectButton')?.addEventListener('click', event => {
+    event.preventDefault();
+    document.getElementById('openProjectFile')?.click();
+  });
+
+  document.getElementById('openProjectFile')?.addEventListener('change', async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const data = await readProjectFile(file);
+      applyProjectData(data, { fileName: file.name });
+      hydrateProjectForm(readProject());
+      updateOpenedProjectLabel();
+    } catch (error) {
+      console.error('Projekt konnte nicht geöffnet werden.', error);
+      alert(error.message || 'Projekt konnte nicht geöffnet werden.');
+    } finally {
+      event.target.value = '';
+    }
+  });
+
+  document.addEventListener('techcalc-project-loaded', () => {
+    hydrateProjectForm(readProject());
+    updateOpenedProjectLabel();
+  });
+
   updateLogoPreview();
+  updateOpenedProjectLabel();
 }
 
-function hydrateProjectForm(data) {
+function hydrateProjectForm(data = {}) {
   setInputValue('pdfClient', data.client);
   setInputValue('pdfProject', data.project);
   setInputValue('pdfProjectNo', data.projectNo);
   setInputValue('pdfEngineer', data.engineer);
+  setInputValue('pdfDate', data.date);
   const file = document.getElementById('pdfLogo');
   if (file) file.value = '';
   updateLogoPreview();
@@ -361,7 +303,7 @@ function printableChart(svg) {
 }
 
 function buildPrintableHtml(project, moduleData) {
-  const date = new Date().toLocaleDateString('de-DE');
+  const date = sanitizeText(project.date) || new Date().toLocaleDateString('de-DE');
   const firstLine = [project.client, project.project, project.projectNo]
     .map(value => sanitizeText(value))
     .filter(Boolean)
@@ -481,8 +423,7 @@ export function initPdfExport({ modules, currentRoute: routeGetter } = {}) {
   exportButton.addEventListener('click', event => {
     event.preventDefault();
     try {
-      saveProject(collectProjectFormValues());
-      const project = readProject();
+      const project = saveProject(collectProjectFormValues());
       const moduleData = collectCurrentModule(modules, routeGetter);
       openPrintWindow(project, moduleData);
     } catch (error) {

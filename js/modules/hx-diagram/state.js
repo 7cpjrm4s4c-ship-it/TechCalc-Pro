@@ -1,8 +1,5 @@
 import { createModuleState } from '../../core/state.js';
 
-const STORAGE_KEY = 'techcalc:hx-diagram:processes';
-const LEGACY_POINTS_KEY = 'techcalc:hx-diagram:points';
-
 function createId() {
   try {
     if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') return globalThis.crypto.randomUUID();
@@ -11,17 +8,11 @@ function createId() {
 }
 
 function loadProcesses() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed.filter(item => item && typeof item === 'object') : [];
-  } catch {
-    return [];
-  }
+  return [];
 }
 
 export function saveProcesses(processes) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(processes ?? [])); } catch { /* localStorage may be unavailable */ }
+  state.set({ processes: Array.isArray(processes) ? processes : [] }, { notify: false });
 }
 
 export function makeProcessRecord({ input, result }) {
@@ -43,9 +34,7 @@ export function makeProcessRecord({ input, result }) {
   };
 }
 
-export function clearLegacyPoints() {
-  try { localStorage.removeItem(LEGACY_POINTS_KEY); } catch { /* ignore */ }
-}
+export function clearLegacyPoints() { /* no persistent legacy data */ }
 
 export const state = createModuleState({
   label: 'Zustand 1',
