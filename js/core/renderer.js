@@ -7,6 +7,28 @@ export function esc(value) {
     .replaceAll("'", '&#039;');
 }
 
+export function pressureBadge(r) {
+  if (!r?.rating) return '';
+  return `<span class="traffic traffic--${esc(r.rating.key)}" aria-label="${esc(r.rating.label || '')}"></span>`;
+}
+
+export function toggleNumericSign(value) {
+  const raw = String(value ?? '').trim();
+  if (!raw || raw === '0') return '-';
+  return raw.startsWith('-') ? raw.slice(1) : `-${raw}`;
+}
+
+export function signedTempField(id, label, value, signAttribute = 'data-sign') {
+  return `<div class="field field--signed-temp">
+    <label for="${esc(id)}">${esc(label)}</label>
+    <div class="control control--with-sign">
+      <button type="button" tabindex="-1" class="sign-toggle" ${signAttribute}="${esc(id)}" aria-label="Vorzeichen umschalten">±</button>
+      <input id="${esc(id)}" data-field="${esc(id)}" type="text" inputmode="decimal" value="${esc(value ?? '')}" placeholder="0" autocomplete="off">
+      <span class="unit">°C</span>
+    </div>
+  </div>`;
+}
+
 export function stack(content, modifier = '') {
   return `<div class="tc-stack ${modifier}">${content}</div>`;
 }

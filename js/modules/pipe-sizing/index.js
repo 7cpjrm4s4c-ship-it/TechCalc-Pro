@@ -1,23 +1,10 @@
 import config from './config.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, selectField, resultRows, renderModuleShell, stack, grid, inlineStats } from '../../core/renderer.js';
+import { card, field, selectField, resultRows, renderModuleShell, stack, grid, inlineStats, pressureBadge } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
-
-function pressureBadge(r) {
-  if (!r?.rating) return '';
-  return `<span class="traffic traffic--${r.rating.key}">${r.rating.label}</span>`;
-}
-
-function adjacentStats(r) {
-  return inlineStats([
-    { label: 'Eine DN kleiner', value: r.smaller ? `DN ${r.smaller.dn}` : '—', unit: r.smaller ? `${fmt(r.smaller.pressureLoss)} Pa/m` : '' },
-    { label: 'Empfohlen', value: `DN ${r.dn}`, unit: `${fmt(r.pressureLoss)} Pa/m` },
-    { label: 'Eine DN größer', value: r.larger ? `DN ${r.larger.dn}` : '—', unit: r.larger ? `${fmt(r.larger.pressureLoss)} Pa/m` : '' }
-  ]);
-}
 
 
 function pipeDimensionCards(r) {

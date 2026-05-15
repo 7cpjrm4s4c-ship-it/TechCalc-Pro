@@ -1,4 +1,5 @@
 import { currentRoute } from './router.js';
+import { esc } from './renderer.js';
 import { getProjectMeta, setProjectMeta, downloadProjectFile, readProjectFile, applyProjectData, getOpenedFileName } from './projectStorage.js';
 
 
@@ -13,14 +14,6 @@ function sanitizeText(value = '') {
     .trim();
 }
 
-function esc(value = '') {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
 
 const DEFAULT_PROJECT = {
   client: '',
@@ -323,7 +316,7 @@ function buildPrintableHtml(project, moduleData) {
     return `<section class="tcp-section"><h2>${esc(title)}</h2><div class="tcp-rule"></div>${tableHtml(rows, mode)}</section>`;
   }).join('');
 
-  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>TechCalc Pro - ${esc(moduleData.shortTitle)}</title>${printStyle()}</head><body>
+  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>TechCalc Pro - ${esc(moduleData.shortTitle)}</title>${PRINT_STYLE}</head><body>
     <div class="tcp-toolbar">
       <button class="tcp-close" type="button" onclick="try{ if (window.opener) { window.opener.focus(); window.close(); return; } }catch(e){} if (history.length > 1) { history.back(); } else { window.close(); }">Zurück zur App</button>
       <button class="tcp-print" type="button" onclick="window.print()">PDF speichern / drucken</button>
@@ -353,8 +346,7 @@ function buildPrintableHtml(project, moduleData) {
   </body></html>`;
 }
 
-function printStyle() {
-  return `<style>
+const PRINT_STYLE = `<style>
     .tcp-toolbar, .tcp-close, .tcp-print { display: none; }
     @page { size: A4; margin: 16mm 18mm 16mm 18mm; }
     * { box-sizing: border-box; }
@@ -403,7 +395,6 @@ function printStyle() {
     @media screen { body { background: #e5e7eb; padding: calc(66px + env(safe-area-inset-top)) 18px 18px; } .tcp-toolbar { position: fixed; z-index: 9999; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: calc(10px + env(safe-area-inset-top)) 14px 10px; background: rgba(255,255,255,.94); border-bottom: 1px solid #CBD5E1; box-shadow: 0 10px 34px rgba(15,23,42,.14); } .tcp-close, .tcp-print { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 999px; background: #fff; color: #111827; font: 700 14px Arial, Helvetica, sans-serif; } .tcp-print { background: #007EA7; border-color: #007EA7; color: #fff; } .tcp-page { max-width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 18mm; box-shadow: 0 18px 70px rgba(0,0,0,.18); } .tcp-footer { display: none; } }
     @media print { .tcp-toolbar, .tcp-close, .tcp-print { display: none !important; } }
   </style>`;
-}
 
 function openPrintWindow(project, moduleData) {
   const html = buildPrintableHtml(project, moduleData);

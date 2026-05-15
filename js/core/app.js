@@ -7,14 +7,13 @@ import pipeSizingConfig from '../modules/pipe-sizing/config.js';
 import unitConverterConfig from '../modules/unit-converter/config.js';
 import heatRecoveryConfig from '../modules/heat-recovery/config.js';
 import hxDiagramConfig from '../modules/hx-diagram/config.js';
-import hxDiagramModule from '../modules/hx-diagram/index.js';
 import drinkingWaterConfig from '../modules/drinking-water/config.js';
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
   { config: ventilationConfig, path: '../modules/ventilation/index.js' },
   { config: heatRecoveryConfig, path: '../modules/heat-recovery/index.js' },
-  { config: hxDiagramConfig, module: hxDiagramModule },
+  { config: hxDiagramConfig, path: '../modules/hx-diagram/index.js' },
   { config: pipeSizingConfig, path: '../modules/pipe-sizing/index.js' },
   { config: unitConverterConfig, path: '../modules/unit-converter/index.js' },
   { config: drinkingWaterConfig, path: '../modules/drinking-water/index.js' },
@@ -118,19 +117,6 @@ function applyThemeMode(mode = sessionStorage.getItem(THEME_STORAGE_KEY) || 'sys
 
 applyThemeMode();
 
-[
-  'techcalc-pdf-project-v1',
-  'techcalc-projects-v1',
-  'techcalc-active-project-id',
-  'techcalcPro.heatingCooling.lineSections',
-  'techcalc:hx-diagram:processes',
-  'techcalc:hx-diagram:points',
-  'techcalcPro.drinkingWater.usageUnits',
-  'techcalcPro.drinkingWater.singleConsumers'
-].forEach(key => {
-  try { localStorage.removeItem(key); } catch { /* ignore */ }
-});
-
 
 // Bind PDF export and project actions as soon as the app is ready.
 // The menu may be opened and a button tapped before lazy initialization has finished.
@@ -201,7 +187,6 @@ function setSettingsOpen(open) {
   settingsPanel.setAttribute('hidden', '');
   settingsButton.setAttribute('aria-expanded', 'false');
   settingsPanel.removeAttribute('aria-modal');
-  closeAllSubmenus();
   unlockPageScroll();
   if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
     lastFocusedElement.focus({ preventScroll: true });

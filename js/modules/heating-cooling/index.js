@@ -3,7 +3,7 @@ import { state } from './state.js';
 import { calculate } from './logic.js';
 import { MEDIA, fmt, fmtInput } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
-import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, pressureBadge } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 
 const MODE_PREFIX = {
@@ -182,10 +182,6 @@ function bindLineSections(root, r, rerender) {
   });
 }
 
-function pressureBadge(r) {
-  if (!r?.rating) return '';
-  return `<span class="traffic traffic--${r.rating.key}">${r.rating.label}</span>`;
-}
 
 function pipeDetails(r) {
   return [

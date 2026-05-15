@@ -1,8 +1,8 @@
-const CACHE_NAME = 'techcalc-pro-session-collapse-v32';
+const CACHE_NAME = 'techcalc-pro-review-cleanup-v33';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',
-  './js/core/app.js','./js/core/menuFallback.js','./js/core/registry.js','./js/core/router.js','./js/core/renderer.js','./js/core/preferences.js','./js/core/state.js','./js/core/navigation.js','./js/core/projectStorage.js','./js/core/pdfExport.js',
+  './js/core/app.js','./js/core/registry.js','./js/core/router.js','./js/core/renderer.js','./js/core/preferences.js','./js/core/state.js','./js/core/navigation.js','./js/core/projectStorage.js','./js/core/pdfExport.js',
   './js/utils/calculations.js','./js/utils/units.js','./js/utils/pipes.js',
   './js/modules/heating-cooling/index.js','./js/modules/heating-cooling/config.js','./js/modules/heating-cooling/logic.js','./js/modules/heating-cooling/state.js',
   './js/modules/ventilation/index.js','./js/modules/ventilation/config.js','./js/modules/ventilation/logic.js','./js/modules/ventilation/state.js',

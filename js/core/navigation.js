@@ -1,6 +1,7 @@
 import { modules } from './registry.js';
 import { currentRoute, navigate } from './router.js';
 import { loadPreferences, setMobileQuickAccess } from './preferences.js';
+import { esc } from './renderer.js';
 
 const MOBILE_QUERY = '(max-width: 767px)';
 
@@ -178,8 +179,8 @@ function fillToFour(ids, allModules) {
 
 function renderTab(module, activeId) {
   return `
-    <button class="module-tab ${module.id === activeId ? 'is-active' : ''}" data-module-id="${escapeAttr(module.id)}" data-accent="${escapeAttr(module.accent)}" type="button">
-      ${escapeHtml(module.shortTitle)}
+    <button class="module-tab ${module.id === activeId ? 'is-active' : ''}" data-module-id="${esc(module.id)}" data-accent="${esc(module.accent)}" type="button">
+      ${esc(module.shortTitle)}
     </button>
   `;
 }
@@ -195,11 +196,11 @@ function renderOverflowButton(activeInOverflow, expanded) {
 function renderOverflowItem(module, activeId, isMobile) {
   return `
     <div class="overflow-menu__row ${module.id === activeId ? 'is-active' : ''}">
-      <button type="button" data-module-id="${escapeAttr(module.id)}" data-accent="${escapeAttr(module.accent)}" class="overflow-menu__item">
-        <span>${escapeHtml(module.shortTitle)}</span>
-        <small>${escapeHtml(module.title)} · ${escapeHtml(module.group)}</small>
+      <button type="button" data-module-id="${esc(module.id)}" data-accent="${esc(module.accent)}" class="overflow-menu__item">
+        <span>${esc(module.shortTitle)}</span>
+        <small>${esc(module.title)} · ${esc(module.group)}</small>
       </button>
-      ${isMobile ? `<button type="button" class="overflow-menu__quick" data-set-quick="${escapeAttr(module.id)}" aria-label="${escapeAttr(module.title)} als Schnellzugriff setzen">Fixieren</button>` : ''}
+      ${isMobile ? `<button type="button" class="overflow-menu__quick" data-set-quick="${esc(module.id)}" aria-label="${esc(module.title)} als Schnellzugriff setzen">Fixieren</button>` : ''}
     </div>
   `;
 }
@@ -207,12 +208,12 @@ function renderOverflowItem(module, activeId, isMobile) {
 function renderQuickAccessRow(module, index, length) {
   if (!module) return '';
   return `
-    <div class="settings-row" data-module-id="${escapeAttr(module.id)}">
-      <span>${escapeHtml(module.shortTitle)}</span>
+    <div class="settings-row" data-module-id="${esc(module.id)}">
+      <span>${esc(module.shortTitle)}</span>
       <span class="settings-row__actions">
         <button class="mini-button" type="button" data-quick-move="up" data-index="${index}" ${index === 0 ? 'disabled' : ''}>↑</button>
         <button class="mini-button" type="button" data-quick-move="down" data-index="${index}" ${index === length - 1 ? 'disabled' : ''}>↓</button>
-        <button class="mini-button" type="button" data-quick-remove="${escapeAttr(module.id)}">Entfernen</button>
+        <button class="mini-button" type="button" data-quick-remove="${esc(module.id)}">Entfernen</button>
       </span>
     </div>
   `;
@@ -222,8 +223,8 @@ function renderQuickAccessToggle(module, selectedIds) {
   const selected = selectedIds.includes(module.id);
   return `
     <label class="settings-check">
-      <input type="checkbox" data-quick-add="${escapeAttr(module.id)}" ${selected ? 'checked' : ''}>
-      <span>${escapeHtml(module.title)}</span>
+      <input type="checkbox" data-quick-add="${esc(module.id)}" ${selected ? 'checked' : ''}>
+      <span>${esc(module.title)}</span>
     </label>
   `;
 }
@@ -237,12 +238,3 @@ function calcDesktopSlots() {
   return Math.max(5, Math.floor(window.innerWidth / 340));
 }
 
-function escapeHtml(value) {
-  return String(value).replace(/[&<>'"]/g, char => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;',
-  }[char]));
-}
-
-function escapeAttr(value) {
-  return escapeHtml(value);
-}
