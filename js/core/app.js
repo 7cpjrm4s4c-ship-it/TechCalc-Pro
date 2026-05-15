@@ -286,11 +286,9 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', event => {
     if (event.data?.type !== 'TECHCALC_CACHE_UPDATED') return;
     const cacheName = event.data.cache || 'updated';
-    const stored = sessionStorage.getItem('techcalc-active-cache');
-    if (stored !== cacheName) {
-      sessionStorage.setItem('techcalc-active-cache', cacheName);
-      window.location.reload();
-    }
+    sessionStorage.setItem('techcalc-active-cache', cacheName);
+    // Kein automatischer Reload: Beim Zurückwechseln aus dem PDF-Export dürfen
+    // aktuelle Berechnungsergebnisse in der Session nicht verloren gehen.
   });
 
   window.addEventListener('load', () => {

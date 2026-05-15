@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-lines-wrg-v31';
+const CACHE_NAME = 'techcalc-pro-session-collapse-v32';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',

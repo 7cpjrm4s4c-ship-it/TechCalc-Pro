@@ -23,7 +23,7 @@ function draftConsumerList(items, type) {
 
 function unitRows(units) {
   if (!units.length) return '<div class="empty-state empty-state--compact">Noch keine Nutzungseinheit angelegt</div>';
-  return `<div class="dw-list">${units.map((unit, index) => `<details class="dw-accordion" ${index === 0 ? 'open' : ''}>
+  return `<div class="dw-list">${units.map((unit, index) => `<details class="dw-accordion">
     <summary>
       <span><strong>${esc(unit.name)}</strong><small>${unit.consumerCount} Verbraucher · Σ ${fmt(unit.sumFlow, 2)} l/s · Spitze ${fmt(unit.peakFlow, 2)} l/s</small></span>
       <button type="button" data-dw-unit-delete="${esc(unit.id)}" aria-label="Nutzungseinheit löschen">×</button>
@@ -43,7 +43,7 @@ function unitRows(units) {
 
 function singleRows(singles) {
   if (!singles.length) return '<div class="empty-state empty-state--compact">Noch keine Einzelverbraucher angelegt</div>';
-  return `<div class="dw-list">${singles.map((item, index) => `<details class="dw-accordion" ${index === 0 ? 'open' : ''}>
+  return `<div class="dw-list">${singles.map((item, index) => `<details class="dw-accordion">
     <summary>
       <span><strong>${esc(item.name)}</strong><small>${item.count} × ${esc(item.label)} · ${fmt(item.vr * item.count,2)} l/s</small></span>
       <button type="button" data-dw-single-delete="${esc(item.id)}" aria-label="Einzelverbraucher löschen">×</button>
@@ -90,7 +90,7 @@ function inputCard(s, r) {
       ])
     ].join('')), 'blue'),
     card('Nutzungseinheiten', stack([
-      `<details class="dw-accordion dw-accordion--form" open><summary><span><strong>Nutzungseinheit zusammenstellen</strong><small>Mehrere Verbraucher auswählen und anschließend als NE speichern</small></span></summary><div class="dw-accordion__body">`,
+      `<details class="dw-accordion dw-accordion--form"><summary><span><strong>Nutzungseinheit zusammenstellen</strong><small>Mehrere Verbraucher auswählen und anschließend als NE speichern</small></span></summary><div class="dw-accordion__body">`,
       field({ id:'unitName', label:'Bezeichnung', value:s.unitName, placeholder:'z. B. Bad Wohnung 1', inputmode:'text' }),
       grid([
         selectField({ id:'unitConsumerType', label:'Verbraucher hinzufügen', value:s.unitConsumerType, options:consumerOptions() }),
@@ -100,10 +100,10 @@ function inputCard(s, r) {
       draftConsumerList(s.unitDraftConsumers || [], 'unit'),
       '<button type="button" class="action-button" data-dw-add-unit>Nutzungseinheit speichern</button>',
       '</div></details>',
-      `<details class="dw-accordion dw-accordion--saved" ${r.usageUnits.length ? 'open' : ''}><summary><span><strong>Gespeicherte Nutzungseinheiten</strong><small>${r.usageUnits.length} Nutzungseinheiten angelegt</small></span></summary><div class="dw-accordion__body">${unitRows(r.usageUnits)}</div></details>`
+      `<details class="dw-accordion dw-accordion--saved"><summary><span><strong>Gespeicherte Nutzungseinheiten</strong><small>${r.usageUnits.length} Nutzungseinheiten angelegt</small></span></summary><div class="dw-accordion__body">${unitRows(r.usageUnits)}</div></details>`
     ].join('')), 'blue'),
     card('Einzelverbraucher außerhalb NE', stack([
-      `<details class="dw-accordion dw-accordion--form" open><summary><span><strong>Freie Einrichtungsgegenstände zusammenstellen</strong><small>Mehrere Verbraucher außerhalb einer Nutzungseinheit anlegen</small></span></summary><div class="dw-accordion__body">`,
+      `<details class="dw-accordion dw-accordion--form"><summary><span><strong>Freie Einrichtungsgegenstände zusammenstellen</strong><small>Mehrere Verbraucher außerhalb einer Nutzungseinheit anlegen</small></span></summary><div class="dw-accordion__body">`,
       field({ id:'singleName', label:'Bezeichnung / Gruppe', value:s.singleName, placeholder:'z. B. Außenanlagen / Technikraum', inputmode:'text' }),
       grid([
         selectField({ id:'singleConsumerType', label:'Verbraucher hinzufügen', value:s.singleConsumerType, options:consumerOptions() }),
@@ -117,7 +117,7 @@ function inputCard(s, r) {
       draftConsumerList(s.singleDraftConsumers || [], 'single'),
       '<button type="button" class="action-button" data-dw-add-single>Einzelverbraucher speichern</button>',
       '</div></details>',
-      `<details class="dw-accordion dw-accordion--saved" ${r.singles.length ? 'open' : ''}><summary><span><strong>Gespeicherte Einzelverbraucher</strong><small>${r.singles.length} Einträge außerhalb NE</small></span></summary><div class="dw-accordion__body">${singleRows(r.singles)}</div></details>`
+      `<details class="dw-accordion dw-accordion--saved"><summary><span><strong>Gespeicherte Einzelverbraucher</strong><small>${r.singles.length} Einträge außerhalb NE</small></span></summary><div class="dw-accordion__body">${singleRows(r.singles)}</div></details>`
     ].join('')), 'blue')
   ].join(''));
 }

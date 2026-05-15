@@ -37,12 +37,12 @@ export function makeProcessRecord({ input, result }) {
 export function clearLegacyPoints() { /* no persistent legacy data */ }
 
 export const state = createModuleState({
-  label: 'Zustand 1',
-  tempC: '-10',
-  rhPercent: '90',
-  targetTempC: '21',
-  targetRhPercent: '50',
-  process: 'adiabatic',
+  label: '',
+  tempC: '',
+  rhPercent: '',
+  targetTempC: '',
+  targetRhPercent: '',
+  process: 'heat',
   activeProcessId: null,
   activePath: [],
   processes: loadProcesses(),
