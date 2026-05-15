@@ -3682,3 +3682,19 @@ body.settings-open {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
+
+
+/* v33-fix2: Mobile overflow menu uses direct module selection; quick-pin buttons removed. */
+@media (max-width: 767px) {
+  .overflow-menu__row {
+    grid-template-columns: minmax(0, 1fr) !important;
+    padding: 8px 10px !important;
+  }
+  .overflow-menu .overflow-menu__item {
+    width: 100% !important;
+    padding: 14px 16px !important;
+  }
+  .overflow-menu__quick {
+    display: none !important;
+  }
+}

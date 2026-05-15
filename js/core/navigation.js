@@ -200,7 +200,6 @@ function renderOverflowItem(module, activeId, isMobile) {
         <span>${esc(module.shortTitle)}</span>
         <small>${esc(module.title)} · ${esc(module.group)}</small>
       </button>
-      ${isMobile ? `<button type="button" class="overflow-menu__quick" data-set-quick="${esc(module.id)}" aria-label="${esc(module.title)} als Schnellzugriff setzen">Fixieren</button>` : ''}
     </div>
   `;
 }
