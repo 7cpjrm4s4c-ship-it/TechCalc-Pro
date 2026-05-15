@@ -83,6 +83,7 @@ export function ventilation({ volumeFlowM3h, powerW, powerUnit = 'W', deltaT, su
 
 export function num(v){
   if (v === null || v === undefined) return 0;
+  if (typeof v === 'number') return Number.isFinite(v) ? v : 0;
   const normalized = String(v)
     .trim()
     .replace(/\s/g, '')

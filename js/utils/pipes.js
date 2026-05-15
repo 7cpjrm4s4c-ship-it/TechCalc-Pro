@@ -21,6 +21,7 @@ const steelDimensions = [
 ];
 
 const mapressDimensions = [
+  {dn:10, dimension:'12 × 1,0', di:10},
   {dn:12, dimension:'15 × 1,0', di:13},
   {dn:15, dimension:'18 × 1,0', di:16},
   {dn:20, dimension:'22 × 1,2', di:19.6},

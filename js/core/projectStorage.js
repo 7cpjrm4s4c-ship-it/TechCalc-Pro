@@ -22,6 +22,31 @@ const DEFAULT_META = {
 let projectMeta = { ...DEFAULT_META };
 let openedFileName = '';
 
+const SESSION_SNAPSHOT_KEY = 'techcalc-session-snapshot';
+
+export function saveSessionSnapshot() {
+  try {
+    sessionStorage.setItem(SESSION_SNAPSHOT_KEY, JSON.stringify(collectProjectData()));
+    return true;
+  } catch (error) {
+    console.warn('Session-Sicherung konnte nicht geschrieben werden.', error);
+    return false;
+  }
+}
+
+export function restoreSessionSnapshot(options = {}) {
+  try {
+    const raw = sessionStorage.getItem(SESSION_SNAPSHOT_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    applyProjectData(data, { fileName: options.fileName || openedFileName });
+    return true;
+  } catch (error) {
+    console.warn('Session-Sicherung konnte nicht wiederhergestellt werden.', error);
+    return false;
+  }
+}
+
 function clone(value) {
   if (typeof structuredClone === 'function') return structuredClone(value);
   return JSON.parse(JSON.stringify(value));

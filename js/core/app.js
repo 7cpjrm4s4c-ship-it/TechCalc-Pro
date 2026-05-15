@@ -8,6 +8,7 @@ import unitConverterConfig from '../modules/unit-converter/config.js';
 import heatRecoveryConfig from '../modules/heat-recovery/config.js';
 import hxDiagramConfig from '../modules/hx-diagram/config.js';
 import drinkingWaterConfig from '../modules/drinking-water/config.js';
+import { restoreSessionSnapshot } from './projectStorage.js';
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
@@ -44,6 +45,11 @@ function registerLazyModule({ config, path, module: eagerModule }) {
 }
 
 lazyModules.forEach(registerLazyModule);
+
+restoreSessionSnapshot();
+window.addEventListener('pageshow', event => {
+  if (event.persisted) restoreSessionSnapshot();
+});
 
 const app = document.getElementById('app');
 let renderToken = 0;

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-review-cleanup-v33';
+const CACHE_NAME = 'techcalc-pro-review-cleanup-v33-fix1';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',

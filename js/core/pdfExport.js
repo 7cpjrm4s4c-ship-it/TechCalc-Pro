@@ -1,6 +1,6 @@
 import { currentRoute } from './router.js';
 import { esc } from './renderer.js';
-import { getProjectMeta, setProjectMeta, downloadProjectFile, readProjectFile, applyProjectData, getOpenedFileName } from './projectStorage.js';
+import { getProjectMeta, setProjectMeta, downloadProjectFile, readProjectFile, applyProjectData, getOpenedFileName, saveSessionSnapshot } from './projectStorage.js';
 
 
 function sanitizeText(value = '') {
@@ -433,6 +433,7 @@ export function initPdfExport({ modules, currentRoute: routeGetter } = {}) {
     event.preventDefault();
     try {
       const project = saveProject(collectProjectFormValues());
+      saveSessionSnapshot();
       const moduleData = collectCurrentModule(modules, routeGetter);
       openPrintWindow(project, moduleData);
     } catch (error) {
