@@ -4,6 +4,7 @@ const WATER = [
 const GLYCOL20 = [[0,0.07,0,1039],[10,0.26,0,1037],[20,0.54,0,1035],[30,0.90,0,1031],[40,1.33,0,1026],[50,1.83,0,1022],[60,2.37,0,1016],[70,2.95,0,1010],[80,3.57,0,1004],[90,4.23,0,998],[100,4.92,0,991],[110,5.64,0.33,985],[120,6.40,0.85,978],[130,7.19,1.52,970],[140,8.02,2.38,963],[150,8.89,3.47,955],[160,9.79,4.38,947]];
 const GLYCOL34 = [[0,0.35,0,1066],[10,0.66,0,1063],[20,1.04,0,1059],[30,1.49,0,1054],[40,1.99,0,1049],[50,2.53,0,1043],[60,3.11,0,1037],[70,3.71,0,1031],[80,4.35,0,1025],[90,5.01,0,1019],[100,5.68,0,1012],[110,6.39,0.23,1005],[120,7.11,0.70,999],[130,7.85,1.33,992],[140,8.62,2.13,985],[150,9.41,3.15,978],[160,10.20,4.41,970]];
 const STANDARD_VOLUMES = [8,12,18,25,35,50,80,100,140,200,250,300,400,500,600,800,1000,1500,2000,3000,4000,5000];
+const REFLEX_N_VOLUMES = [8,12,18,25,35,50,80,100,140,200,250,300,400,500,600,800,1000];
 
 function num(v){ const n = Number(String(v ?? '').replace(',', '.')); return Number.isFinite(n) ? n : 0; }
 function tableFor(mode){ return mode === 'glycol20' ? GLYCOL20 : mode === 'glycol34' ? GLYCOL34 : WATER; }
@@ -19,6 +20,16 @@ function interp(table, t, col){
 }
 function round(v, d=2){ return Number.isFinite(v) ? Math.round(v * 10**d) / 10**d : 0; }
 function nextVolume(v){ return STANDARD_VOLUMES.find(x => x >= v) || Math.ceil(v / 500) * 500; }
+function reflexNLabel(volume){
+  if(!volume || volume <= 0) return '—';
+  const n = REFLEX_N_VOLUMES.find(x => x >= volume);
+  return n ? `Reflex N ${n}` : `Reflex G/SL ${nextVolume(volume)}`;
+}
+function dynamicLabel(type, volume){
+  const v = nextVolume(volume);
+  if(!volume || volume <= 0) return type === 'variomat' ? 'Variomat —' : 'Reflexomat —';
+  return type === 'variomat' ? `Variomat, VG Grundgefäß ${v} l` : `Reflexomat, RG Grundgefäß ${v} l`;
+}
 
 export function calculate(s){
   const table = tableFor(s.frostMode);
@@ -26,7 +37,8 @@ export function calculate(s){
   const nMin = interp(table, s.tMinC, 1);
   const expansionPct = Math.max(0, nMax - nMin);
   const vaporPressure = interp(table, s.tMaxC, 2);
-  const staticPressure = num(s.staticPressureBar) || num(s.staticHeightM) / 10;
+  const heightPressure = num(s.staticHeightM) / 10;
+  const staticPressure = num(s.staticHeightM) > 0 ? heightPressure : num(s.staticPressureBar);
   const pumpPressure = s.connectionType === 'pressure' ? num(s.pumpPressureBar) : 0;
   const baseVolume = s.waterContentMode === 'estimated'
     ? num(s.heatPowerKw) * num(s.specificWaterContent)
@@ -51,8 +63,11 @@ export function calculate(s){
   const warnings = [];
   if(systemVolume <= 0) warnings.push('Anlagenvolumen fehlt.');
   if(psv <= 0) warnings.push('Sicherheitsventil-Ansprechdruck fehlt.');
-  if(s.holdingType === 'mag' && denominator <= 0) warnings.push('Enddruck pe muss größer als Mindestbetriebsdruck p0 sein. Sicherheitsventil/Vordruck prüfen.');
-  if(s.holdingType === 'dynamic' && pe < peDynamicMin) warnings.push('Enddruck pe liegt unter p0 + 0,3 bar + Arbeitsbereich AD.');
+  if(psv > 0 && pe <= p0) warnings.push('Sicherheitsventil pSV zu klein: Enddruck pe muss größer als Mindestbetriebsdruck p0 sein.');
+  if(s.holdingType === 'mag' && denominator <= 0) warnings.push('MAG-Nennvolumen kann erst berechnet werden, wenn pe > p0 ist. Sicherheitsventil größer wählen oder statischen Druck prüfen.');
+  if(s.holdingType === 'dynamic' && pe < peDynamicMin) warnings.push('Enddruck pe liegt unter p0 + 0,3 bar + Arbeitsbereich AD. Sicherheitsventil/Station prüfen.');
   if(num(s.tMaxC) > 70) warnings.push('Bei dauerhafter Temperatur > 70 °C am MAG/Vordruckgefäß Vorschaltgefäß prüfen.');
-  return { nMax, nMin, expansionPct, vaporPressure, staticPressure, pumpPressure, systemVolume, p0, p0Raw, psv, asv, pe, ve, vv, servitecAdd, factor, vnMag, ad, paMin, peDynamicMin, vnDynamic, selectedVolume: selected, selectedStandardVolume: nextVolume(selected), warnings };
+  const standard = selected > 0 ? nextVolume(selected) : 0;
+  const productLabel = s.holdingType === 'dynamic' ? dynamicLabel(s.dynamicType, selected) : reflexNLabel(selected);
+  return { nMax, nMin, expansionPct, vaporPressure, staticPressure, pumpPressure, systemVolume, p0, p0Raw, psv, asv, pe, ve, vv, servitecAdd, factor, vnMag, ad, paMin, peDynamicMin, vnDynamic, selectedVolume: selected, selectedStandardVolume: standard, productLabel, warnings };
 }
