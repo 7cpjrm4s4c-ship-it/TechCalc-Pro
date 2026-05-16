@@ -171,6 +171,10 @@
   border-color: rgba(45,224,161,.34);
 }
 
+.card--accent-purple {
+  border-color: rgba(169,140,255,.36);
+}
+
 .field {
   display: grid;
   gap: var(--field-gap);
@@ -444,6 +448,11 @@
   background: linear-gradient(135deg, rgba(53,229,255,.32), rgba(53,170,255,.12));
   border-color: rgba(53,229,255,.58);
   box-shadow: 0 0 22px rgba(53,229,255,.16), inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+.segmented--purple button.is-active {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 0 1px rgba(169,140,255,.32), 0 0 20px rgba(169,140,255,.18), inset 0 -3px 0 var(--accent-purple);
 }
 
 .segmented--blue button.is-active {

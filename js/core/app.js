@@ -8,11 +8,13 @@ import unitConverterConfig from '../modules/unit-converter/config.js';
 import heatRecoveryConfig from '../modules/heat-recovery/config.js';
 import hxDiagramConfig from '../modules/hx-diagram/config.js';
 import drinkingWaterConfig from '../modules/drinking-water/config.js';
+import pressureHoldingConfig from '../modules/pressure-holding/config.js';
 import { restoreSessionSnapshot } from './projectStorage.js';
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
   { config: ventilationConfig, path: '../modules/ventilation/index.js' },
+  { config: pressureHoldingConfig, path: '../modules/pressure-holding/index.js' },
   { config: heatRecoveryConfig, path: '../modules/heat-recovery/index.js' },
   { config: hxDiagramConfig, path: '../modules/hx-diagram/index.js' },
   { config: pipeSizingConfig, path: '../modules/pipe-sizing/index.js' },

@@ -8,6 +8,7 @@ import { state as heatRecoveryState } from '../modules/heat-recovery/state.js';
 import { readRltDevices, writeRltDevices } from '../modules/heat-recovery/index.js';
 import { state as hxDiagramState } from '../modules/hx-diagram/state.js';
 import { state as drinkingWaterState } from '../modules/drinking-water/state.js';
+import { state as pressureHoldingState } from '../modules/pressure-holding/state.js';
 import { readUsageUnits, writeUsageUnits, readSingleConsumers, writeSingleConsumers } from '../modules/drinking-water/logic.js';
 
 const DEFAULT_META = {
@@ -78,6 +79,7 @@ export function collectProjectData() {
     savedAt: new Date().toISOString(),
     meta: getProjectMeta(),
     modules: {
+      'pressure-holding': { state: pressureHoldingState.get() },
       'heating-cooling': {
         state: heatingCoolingState.get(),
         lineSections: readLineSections()
@@ -101,6 +103,7 @@ export function applyProjectData(data = {}, { fileName = '' } = {}) {
   setProjectMeta(data.meta || {});
   openedFileName = fileName || openedFileName;
 
+  if (modules['pressure-holding']?.state) pressureHoldingState.replace(modules['pressure-holding'].state, { notify: false });
   if (modules['heating-cooling']?.state) heatingCoolingState.replace(modules['heating-cooling'].state, { notify: false });
   writeLineSections(modules['heating-cooling']?.lineSections || []);
 
@@ -120,6 +123,7 @@ export function applyProjectData(data = {}, { fileName = '' } = {}) {
 
 export function resetAllSessionData() {
   resetProjectMeta();
+  pressureHoldingState.reset();
   heatingCoolingState.reset();
   writeLineSections([]);
   ventilationState.reset();
