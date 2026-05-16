@@ -18,5 +18,7 @@ export const state = createModuleState({
   pumpPressureBar: '',
   safetyValveBar: '3',
   safetyValveType: 'heating',
-  dynamicType: 'reflexomat'
+  dynamicType: 'reflexomat',
+  plantName: '',
+  savedPlants: []
 });

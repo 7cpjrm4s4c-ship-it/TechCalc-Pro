@@ -1,7 +1,7 @@
 import config from './config.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 
@@ -10,6 +10,52 @@ const opts = (items) => items.map(([value,label]) => ({ value, label }));
 function warnList(items){
   if(!items.length) return '<div class="empty-state empty-state--compact ph-note">Keine Plausibilitätswarnungen.</div>';
   return `<div class="ph-warnings">${items.map(w => `<div class="ph-warning"><span>Hinweis</span><strong>${w}</strong></div>`).join('')}</div>`;
+}
+
+
+function savedPlantSnapshot(s, r){
+  const saved = Array.isArray(s.savedPlants) ? s.savedPlants : [];
+  const baseName = s.plantName?.trim() || `${s.holdingType === 'dynamic' ? (s.dynamicType === 'variomat' ? 'Variomat' : 'Reflexomat') : 'MAG'} ${saved.length + 1}`;
+  const copy = { ...s };
+  delete copy.savedPlants;
+  return {
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    name: baseName,
+    createdAt: new Date().toISOString(),
+    state: copy,
+    result: {
+      productLabel: r.productLabel,
+      selectedVolume: r.selectedVolume,
+      selectedStandardVolume: r.selectedStandardVolume,
+      p0: r.p0,
+      paMin: r.paMin,
+      pe: r.pe,
+      systemVolume: r.systemVolume
+    }
+  };
+}
+
+function savedPlantRows(items = []){
+  if(!items.length) return '<div class="empty-state empty-state--compact ph-note">Noch keine Anlagen gespeichert.</div>';
+  return `<div class="ph-saved-list">${items.map(item => {
+    const res = item.result || {};
+    const subtitle = [res.productLabel, res.selectedStandardVolume ? `${fmt(res.selectedStandardVolume,0)} l` : '', res.systemVolume ? `VA ${fmt(res.systemVolume,0)} l` : ''].filter(Boolean).join(' · ');
+    return `<article class="ph-saved-item">
+      <div><strong>${esc(item.name || 'Anlage')}</strong><small>${esc(subtitle || 'gespeicherte Druckhaltung')}</small></div>
+      <div class="ph-saved-actions">
+        <button type="button" class="mini-button" data-ph-load="${esc(item.id)}">Laden</button>
+        <button type="button" class="mini-button mini-button--danger" data-ph-delete="${esc(item.id)}">Löschen</button>
+      </div>
+    </article>`;
+  }).join('')}</div>`;
+}
+
+function savedPlantsCard(s){
+  return card('Anlagen speichern', stack([
+    field({ id:'plantName', label:'Anlagenbezeichnung', value:s.plantName || '', placeholder:'z. B. Heizzentrale BT A', inputmode:'text' }),
+    '<div class="tc-actions"><button type="button" class="action-button" data-ph-save>Anlage speichern</button></div>',
+    savedPlantRows(Array.isArray(s.savedPlants) ? s.savedPlants : [])
+  ].join('')), 'purple');
 }
 
 function explain(s){
@@ -67,6 +113,7 @@ function view(s){
       field({ id:'tMaxC', label:'höchste Temperatur tTR/tmax', value:fmtInput(s.tMaxC,1), unit:'°C' })
     ].join(''), 2), 'purple'),
     card('Druckdaten', `${grid(pressureFields.join(''), 2)}<p class="ph-help">Ist die statische Höhe eingetragen, wird pₛₜ automatisch mit H/10 berechnet. Der manuelle pₛₜ-Wert gilt nur ohne Höhenangabe.</p>`, 'purple'),
+    savedPlantsCard(s),
     s.holdingType === 'mag' ? card('MAG-Optionen', `${segmented('includeServitec', opts([['false','ohne Servitec'],['true','mit Servitec +5 l']]), s.includeServitec, { accent:'purple' })}<p class="ph-help">Servitec steht für Entgasung/Nachspeisung. Bei „mit Servitec“ wird das Zusatzvolumen des Entgasungsrohres berücksichtigt.</p>`, 'purple') : card('Dynamisches System', `${selectField({ id:'dynamicType', label:'Druckhaltestation', value:s.dynamicType, options:opts([['reflexomat','Reflexomat · kompressorgesteuert · AD 0,2 bar'],['variomat','Variomat · pumpengesteuert · AD 0,4 bar']]) })}<p class="ph-help">Die Auswahl bestimmt Arbeitsbereich AD und die Ergebnisbezeichnung der Station.</p>`, 'purple')
   ].join(''));
 
@@ -94,4 +141,27 @@ function view(s){
   return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6">${resultColumn}</div>`);
 }
 
-export default { config, state, mount(root){ mountModule(root, state, view); } };
+function bindPressureHoldingActions(root, snapshot){
+  root.querySelector('[data-ph-save]')?.addEventListener('click', () => {
+    const current = state.get();
+    const result = calculate(current);
+    const saved = Array.isArray(current.savedPlants) ? current.savedPlants : [];
+    state.set({ savedPlants: [savedPlantSnapshot(current, result), ...saved] });
+  });
+  root.querySelectorAll('[data-ph-load]').forEach(button => {
+    button.addEventListener('click', () => {
+      const current = state.get();
+      const item = (current.savedPlants || []).find(entry => entry.id === button.dataset.phLoad);
+      if(!item?.state) return;
+      state.set({ ...item.state, savedPlants: current.savedPlants || [] });
+    });
+  });
+  root.querySelectorAll('[data-ph-delete]').forEach(button => {
+    button.addEventListener('click', () => {
+      const current = state.get();
+      state.set({ savedPlants: (current.savedPlants || []).filter(entry => entry.id !== button.dataset.phDelete) });
+    });
+  });
+}
+
+export default { config, state, mount(root){ mountModule(root, state, view, bindPressureHoldingActions); } };
