@@ -76,7 +76,7 @@ const peDimensions = [
   {dn:300, dimension:'355 × 32,2', di:290.6},
   {dn:325, dimension:'400 × 36,3', di:327.4},
   {dn:350, dimension:'450 × 40,9', di:368.2},
-  {dn:400, dimension:'500 × 45,4', di:409.2},
+  {dn:400, dimension:'500 × 45,4', di:409.2}
 ];
 
 export const pipeSystems = [
