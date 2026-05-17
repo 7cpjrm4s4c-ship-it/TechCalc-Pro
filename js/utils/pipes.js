@@ -34,6 +34,21 @@ const mapressDimensions = [
   {dn:100, dimension:'108 × 2,0', di:104}
 ];
 
+
+const copperDimensions = [
+  {dn:10, dimension:'12 × 1,0', di:10},
+  {dn:12, dimension:'15 × 1,0', di:13},
+  {dn:15, dimension:'18 × 1,0', di:16},
+  {dn:20, dimension:'22 × 1,0', di:20},
+  {dn:25, dimension:'28 × 1,5', di:25},
+  {dn:32, dimension:'35 × 1,5', di:32},
+  {dn:40, dimension:'42 × 1,5', di:39},
+  {dn:50, dimension:'54 × 2,0', di:50},
+  {dn:65, dimension:'64 × 2,0', di:60},
+  {dn:80, dimension:'76,1 × 2,0', di:72.1},
+  {dn:100, dimension:'108 × 2,5', di:103}
+];
+
 const meplaDimensions = [
   {dn:12, dimension:'16 × 2,25', di:11.5},
   {dn:15, dimension:'20 × 2,5', di:15},
@@ -47,6 +62,7 @@ const meplaDimensions = [
 
 export const pipeSystems = [
   { id:'steel', label:'Stahl', normSmall:'DIN EN 10255 Reihe M', normLarge:'DIN EN 10220', roughness:0.045, maxDn:300, dimensions: steelDimensions },
+  { id:'copper', label:'Kupferrohr', normSmall:'DIN EN 1507', normLarge:'DIN EN 1507', roughness:0.045, maxDn:100, dimensions: copperDimensions },
   { id:'mapress', label:'Mapress Edelstahl', normSmall:'DIN EN 10312', normLarge:'DIN EN 10312', roughness:0.0015, maxDn:100, dimensions: mapressDimensions },
   { id:'mepla', label:'Geberit Mepla', normSmall:'Geberit Mepla Systemrohr ML', normLarge:'Geberit Mepla Systemrohr ML', roughness:0.007, maxDn:65, dimensions: meplaDimensions },
   { id:'plastic', label:'Kunststoff', normSmall:'Systemabhängig', normLarge:'Systemabhängig', roughness:0.007, maxDn:160, dimensions: steelDimensions.filter(p => p.dn <= 150) }

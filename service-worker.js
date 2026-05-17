@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-v33-druckhaltung-save1';
+const CACHE_NAME = 'techcalc-v34';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',
