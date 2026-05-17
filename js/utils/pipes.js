@@ -70,7 +70,7 @@ const peDimensions = [
   {dn:125, dimension:'160 × 14,6', di:130.8},
   {dn:150, dimension:'180 × 16,4', di:147.2},
   {dn:185, dimension:'225 × 20,5', di:184.0},
-  {dn:200, dimension:'250 × 22,7', di:204.6}
+  {dn:200, dimension:'250 × 22,7', di:204.6},
   {dn:230, dimension:'280 × 25,4', di:229.2},
   {dn:250, dimension:'315 × 28,6', di:257.8},
   {dn:300, dimension:'355 × 32,2', di:290.6},
