@@ -286,11 +286,11 @@ function isNumericText(value) {
   return normalized !== '' && /^[-+]?\d+(?:[.,]\d+)?(?:%|°C|K|l\/s|m3\/h|kg\/h|kg\/m3|Pa\/m|m\/s|kW)?$/i.test(normalized);
 }
 
-function cellClass(value, columnIndex) {
+function cellClass(value, columnIndex, isTextValue = false) {
   if (columnIndex === 0) return ' class="tcp-label-cell"';
-  if (columnIndex === 1 && !isNumericText(value)) return ' class="tcp-value-cell tcp-value-text"';
+  if (columnIndex === 1 && isTextValue) return ' class="tcp-value-cell tcp-value-text"';
   if (columnIndex === 1) return ' class="tcp-value-cell"';
-  return '';
+  return ' class="tcp-unit-cell"';
 }
 
 function tableHtml(rows, mode = 'standard') {
@@ -312,7 +312,9 @@ function tableHtml(rows, mode = 'standard') {
       ? '<colgroup><col class="tcp-col-num"><col class="tcp-col-value"><col class="tcp-col-unit"></colgroup>'
       : '<colgroup><col class="tcp-col-label"><col class="tcp-col-value"><col class="tcp-col-unit"></colgroup>';
 
-  return `<table class="${tableClass}">${colgroup}<thead><tr>${header.map((h, index) => `<th${cellClass(h, index)}>${esc(h)}</th>`).join('')}</tr></thead><tbody>${finalRows.map(row => `<tr>${row.map((cell, index) => `<td${cellClass(cell, index)}>${esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  const head = `<thead><tr>${header.map((h, index) => `<th${cellClass(h, index, false)}>${esc(h)}</th>`).join('')}</tr></thead>`;
+  const body = `<tbody>${finalRows.map(row => `<tr>${row.map((cell, index) => `<td${cellClass(cell, index, index === 1 && !isNumericText(cell))}>${esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  return `<table class="${tableClass}">${colgroup}${head}${body}</table>`;
 }
 
 function printableChart(svg) {
@@ -366,53 +368,53 @@ function buildPrintableHtml(project, moduleData) {
 
 const PRINT_STYLE = `<style>
     .tcp-toolbar, .tcp-close, .tcp-print { display: none; }
-    @page { size: A4; margin: 13mm 14mm 14mm 14mm; }
+    @page { size: A4; margin: 12mm 12mm 13mm 12mm; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: #fff; color: #111827; font-family: Arial, Helvetica, sans-serif; font-size: 8.6pt; line-height: 1.28; }
+    body { margin: 0; background: #fff; color: #111827; font-family: Arial, Helvetica, sans-serif; font-size: 8.3pt; line-height: 1.22; }
     .tcp-page { width: 100%; }
-    .tcp-header { display: grid; grid-template-columns: minmax(46mm, 1fr) minmax(42mm, 1fr) minmax(30mm, 1fr); gap: 6mm; align-items: center; min-height: 18mm; padding-bottom: 4mm; border-bottom: 1px solid #D1D5DB; }
+    .tcp-header { display: grid; grid-template-columns: minmax(45mm, 1fr) minmax(42mm, 1fr) minmax(28mm, 1fr); gap: 5mm; align-items: center; min-height: 16mm; padding-bottom: 3.5mm; border-bottom: 1px solid #D1D5DB; }
     .tcp-brand { display: inline-flex; align-items: center; gap: 3mm; min-width: 0; }
     .tcp-brand-icon { width: 10mm; height: 10mm; border-radius: 2.2mm; object-fit: contain; flex: 0 0 auto; }
     .tcp-brand-text { display: grid; gap: .5mm; min-width: 0; }
     .tcp-brand-text strong { color: #111827; font-size: 12.5pt; line-height: 1; font-weight: 800; letter-spacing: -0.02em; }
-    .tcp-brand-text span { color: #4B5563; font-size: 7.8pt; line-height: 1; text-transform: uppercase; letter-spacing: .18em; font-weight: 600; }
-    .tcp-module-name { color: #111827; font-size: 10.5pt; line-height: 1.15; font-weight: 800; text-align: center; text-transform: uppercase; letter-spacing: .04em; }
-    .tcp-print-date { display: grid; gap: .8mm; justify-items: end; color: #111827; text-align: right; }
-    .tcp-print-date span { color: #6B7280; font-size: 7.8pt; text-transform: uppercase; letter-spacing: .12em; font-weight: 700; }
-    .tcp-print-date strong { font-size: 10pt; font-weight: 800; }
-    .tcp-project-data { margin-top: 4mm; padding: 2.4mm 3mm; background: #F9FAFB; border: 0.5px solid #D1D5DB; color: #111827; font-size: 8.5pt; line-height: 1.35; }
-    .tcp-project-row { display: grid; grid-template-columns: 29mm 1fr 34mm 1fr; gap: 2mm 3mm; align-items: baseline; }
-    .tcp-project-row + .tcp-project-row { margin-top: 1.5mm; }
-    .tcp-project-data span { color: #4B5563; font-weight: 700; text-align: right; }
-    .tcp-project-data strong { color: #111827; font-weight: 600; min-width: 0; }
-    .tcp-title-block { margin: 5mm 0 5mm; }
-    .tcp-title-block h1 { margin: 0; font-size: 16pt; line-height: 1.05; font-weight: 700; color: #111827; letter-spacing: -0.02em; }
-    .tcp-title-block p { margin: 1.5mm 0 0; color: #4B5563; font-size: 9.5pt; font-weight: 600; }
-    .tcp-section { margin: 0 0 5mm; break-inside: avoid; }
-    .tcp-section h2 { margin: 0 0 1.4mm; font-size: 10.2pt; line-height: 1.1; font-weight: 700; color: #007EA7; text-transform: uppercase; letter-spacing: .04em; }
-    .tcp-rule { height: 1px; background: #D1D5DB; margin-bottom: 2.5mm; }
-    .tcp-table { width: 100%; border-collapse: collapse; table-layout: auto; font-size: 8.2pt; }
-    .tcp-table col.tcp-col-label { width: 28%; }
-    .tcp-table col.tcp-col-num { width: 9%; }
-    .tcp-table col.tcp-col-value { width: 60%; }
-    .tcp-table col.tcp-col-unit { width: 12%; }
-    .tcp-table col.tcp-col-process { width: 24%; }
-    .tcp-table col.tcp-col-description { width: 67%; }
-    .tcp-table th, .tcp-table td { border: 0.5px solid #D1D5DB; padding: 2.2px 4px; vertical-align: top; overflow-wrap: anywhere; }
+    .tcp-brand-text span { color: #4B5563; font-size: 7.5pt; line-height: 1; text-transform: uppercase; letter-spacing: .17em; font-weight: 600; }
+    .tcp-module-name { color: #111827; font-size: 10.2pt; line-height: 1.12; font-weight: 800; text-align: center; text-transform: uppercase; letter-spacing: .035em; }
+    .tcp-print-date { display: grid; gap: .7mm; justify-items: end; color: #111827; text-align: right; }
+    .tcp-print-date span { color: #6B7280; font-size: 7.5pt; text-transform: uppercase; letter-spacing: .11em; font-weight: 700; }
+    .tcp-print-date strong { font-size: 9.6pt; font-weight: 800; }
+    .tcp-project-data { margin-top: 3.6mm; padding: 2.2mm 2.8mm; background: #F9FAFB; border: 0.5px solid #D1D5DB; color: #111827; font-size: 8.2pt; line-height: 1.32; }
+    .tcp-project-row { display: grid; grid-template-columns: 27mm minmax(38mm, 1fr) 33mm minmax(38mm, 1fr); gap: 2mm 3mm; align-items: baseline; }
+    .tcp-project-row + .tcp-project-row { margin-top: 1.25mm; }
+    .tcp-project-data span { color: #4B5563; font-weight: 700; text-align: right; white-space: nowrap; }
+    .tcp-project-data strong { color: #111827; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+    .tcp-title-block { margin: 4.5mm 0 4.2mm; }
+    .tcp-title-block h1 { margin: 0; font-size: 15pt; line-height: 1.04; font-weight: 700; color: #111827; letter-spacing: -0.02em; }
+    .tcp-title-block p { margin: 1.3mm 0 0; color: #4B5563; font-size: 9pt; font-weight: 600; }
+    .tcp-section { margin: 0 0 4.2mm; break-inside: avoid; }
+    .tcp-section h2 { margin: 0 0 1.15mm; font-size: 9.6pt; line-height: 1.08; font-weight: 700; color: #007EA7; text-transform: uppercase; letter-spacing: .035em; }
+    .tcp-rule { height: 1px; background: #D1D5DB; margin-bottom: 2.1mm; }
+    .tcp-table { width: 100%; border-collapse: collapse; table-layout: auto; font-size: 7.9pt; }
+    .tcp-table col.tcp-col-label { width: 1%; }
+    .tcp-table col.tcp-col-num { width: 1%; }
+    .tcp-table col.tcp-col-value { width: auto; }
+    .tcp-table col.tcp-col-unit { width: 1%; }
+    .tcp-table col.tcp-col-process { width: 25%; }
+    .tcp-table col.tcp-col-description { width: auto; }
+    .tcp-table th, .tcp-table td { border: 0.5px solid #D1D5DB; padding: 1.8px 3.4px; vertical-align: top; }
     .tcp-table th { background: #F3F4F6; color: #111827; font-weight: 700; }
     .tcp-table td { color: #111827; }
-    .tcp-table .tcp-label-cell { text-align: left; white-space: nowrap; }
-    .tcp-table--numbered .tcp-label-cell { text-align: right; white-space: nowrap; }
-    .tcp-table--process .tcp-label-cell { text-align: right; white-space: nowrap; }
-    .tcp-table .tcp-value-cell { text-align: right; }
-    .tcp-table .tcp-value-text { text-align: left; }
+    .tcp-table .tcp-label-cell { text-align: left; white-space: nowrap; width: 1%; }
+    .tcp-table .tcp-value-cell { text-align: right; width: auto; min-width: 70mm; overflow-wrap: anywhere; }
+    .tcp-table .tcp-value-text { text-align: left; white-space: normal; }
+    .tcp-table .tcp-unit-cell { text-align: right; white-space: nowrap; width: 1%; }
     .tcp-table th:nth-child(1), .tcp-table td:nth-child(1) { text-align: left; }
-    .tcp-table--numbered th:nth-child(1), .tcp-table--numbered td:nth-child(1), .tcp-table--process th:nth-child(1), .tcp-table--process td:nth-child(1) { text-align: right; }
-    .tcp-table th:nth-child(2), .tcp-table td:nth-child(2) { min-width: 58mm; }
-    .tcp-table th:nth-child(3), .tcp-table td:nth-child(3) { text-align: right; white-space: nowrap; }
-    .tcp-table--process th:nth-child(2), .tcp-table--process td:nth-child(2), .tcp-table--process th:nth-child(3), .tcp-table--process td:nth-child(3) { text-align: left; white-space: normal; }
+    .tcp-table th:nth-child(2), .tcp-table td:nth-child(2) { width: auto; min-width: 70mm; }
+    .tcp-table th:nth-child(3), .tcp-table td:nth-child(3) { text-align: right; white-space: nowrap; width: 1%; }
+    .tcp-table--numbered th:nth-child(1), .tcp-table--numbered td:nth-child(1), .tcp-table--process th:nth-child(1), .tcp-table--process td:nth-child(1) { text-align: right; white-space: nowrap; width: 1%; }
+    .tcp-table--process th:nth-child(2), .tcp-table--process td:nth-child(2) { text-align: left; white-space: nowrap; min-width: 30mm; }
+    .tcp-table--process th:nth-child(3), .tcp-table--process td:nth-child(3) { text-align: left; white-space: normal; min-width: 95mm; width: auto; }
     .tcp-diagram-section { break-inside: avoid; }
-    .tcp-diagram { width: 100%; border: 0.5px solid #D1D5DB; padding: 4mm; background: #fff; overflow: hidden; }
+    .tcp-diagram { width: 100%; border: 0.5px solid #D1D5DB; padding: 3.5mm; background: #fff; overflow: hidden; }
     .tcp-diagram svg { width: 100%; height: auto; display: block; background: #fff; }
     .tcp-diagram .hx-chart-bg { fill: #fff !important; stroke: #D1D5DB !important; }
     .tcp-diagram .hx-grid-line { stroke: #E5E7EB !important; stroke-width: 1 !important; }
@@ -422,8 +424,8 @@ const PRINT_STYLE = `<style>
     .tcp-diagram .hx-state-path { fill: none !important; stroke: #F97316 !important; stroke-width: 3 !important; }
     .tcp-diagram .hx-point circle { fill: #fff !important; stroke: #F97316 !important; stroke-width: 2.5 !important; }
     .tcp-diagram .hx-point text { fill: #111827 !important; font-weight: 700 !important; font-family: Arial, Helvetica, sans-serif !important; }
-    .tcp-footer { position: fixed; bottom: 6mm; left: 14mm; right: 14mm; display: flex; justify-content: space-between; border-top: 1px solid #D1D5DB; padding-top: 2mm; color: #6B7280; font-size: 8pt; }
-    @media screen { body { background: #e5e7eb; padding: calc(66px + env(safe-area-inset-top)) 18px 18px; } .tcp-toolbar { position: fixed; z-index: 9999; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: calc(10px + env(safe-area-inset-top)) 14px 10px; background: rgba(255,255,255,.94); border-bottom: 1px solid #CBD5E1; box-shadow: 0 10px 34px rgba(15,23,42,.14); } .tcp-close, .tcp-print { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 999px; background: #fff; color: #111827; font: 700 14px Arial, Helvetica, sans-serif; } .tcp-print { background: #007EA7; border-color: #007EA7; color: #fff; } .tcp-page { max-width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 14mm; box-shadow: 0 18px 70px rgba(0,0,0,.18); } .tcp-footer { display: none; } }
+    .tcp-footer { position: fixed; bottom: 5.5mm; left: 12mm; right: 12mm; display: flex; justify-content: space-between; border-top: 1px solid #D1D5DB; padding-top: 1.8mm; color: #6B7280; font-size: 7.6pt; }
+    @media screen { body { background: #e5e7eb; padding: calc(66px + env(safe-area-inset-top)) 18px 18px; } .tcp-toolbar { position: fixed; z-index: 9999; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: calc(10px + env(safe-area-inset-top)) 14px 10px; background: rgba(255,255,255,.94); border-bottom: 1px solid #CBD5E1; box-shadow: 0 10px 34px rgba(15,23,42,.14); } .tcp-close, .tcp-print { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 999px; background: #fff; color: #111827; font: 700 14px Arial, Helvetica, sans-serif; } .tcp-print { background: #007EA7; border-color: #007EA7; color: #fff; } .tcp-page { max-width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 12mm; box-shadow: 0 18px 70px rgba(0,0,0,.18); } .tcp-footer { display: none; } }
     @media print { .tcp-toolbar, .tcp-close, .tcp-print { display: none !important; } }
   </style>`;
 

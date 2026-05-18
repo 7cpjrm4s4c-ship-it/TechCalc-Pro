@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-v34-pdf-layout-all-modules';
+const CACHE_NAME = 'techcalc-v34-pdf-layout-all-modules-fix1';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',
