@@ -4,6 +4,16 @@ import { calculate, CONSUMERS, BUILDING_TYPES, createConsumer, createUsageUnit, 
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, esc } from '../../core/renderer.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 
+function fieldSelector(key) {
+  const safe = String(key || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  return `[data-field="${safe}"]`;
+}
+
+function segmentSelector(key) {
+  const safe = String(key || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  return `[data-segment="${safe}"]`;
+}
+
 function consumerOptions() {
   return CONSUMERS.map(c => ({ value: c.id, label: `${c.label} · ${fmt(c.vr, 2)} l/s${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}` }));
 }
@@ -178,8 +188,8 @@ function refresh(root) {
 
 function syncFieldValues(root, patch) {
   Object.entries(patch).forEach(([key, value]) => {
-    root.querySelectorAll(`[data-field="${CSS.escape(key)}"]`).forEach(el => { el.value = value ?? ''; });
-    root.querySelectorAll(`[data-segment="${CSS.escape(key)}"]`).forEach(btn => btn.classList.toggle('is-active', btn.dataset.value === String(value)));
+    root.querySelectorAll(fieldSelector(key)).forEach(el => { el.value = value ?? ''; });
+    root.querySelectorAll(segmentSelector(key)).forEach(btn => btn.classList.toggle('is-active', btn.dataset.value === String(value)));
   });
 }
 
@@ -198,7 +208,7 @@ function bindDrinkingWater(root) {
   });
 
   root.addEventListener('toggle', event => {
-    const details = event.target.closest?.('[data-dw-accordion]');
+    const details = event.target && typeof event.target.closest === 'function' ? event.target.closest('[data-dw-accordion]') : null;
     if (!details || !root.contains(details)) return;
     state.set({ [details.dataset.dwAccordion]: details.open }, { notify:false });
   }, true);

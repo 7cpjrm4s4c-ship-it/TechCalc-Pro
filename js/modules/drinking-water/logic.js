@@ -152,7 +152,12 @@ function normalizeSingleGroups(items = []) {
 }
 
 function expandConsumersForWarmWater(consumers, warmWaterMode) {
-  return consumers.flatMap((consumer, index) => [consumer, ...hotWaterAddon(consumer, warmWaterMode, index)]);
+  const expanded = [];
+  (consumers || []).forEach((consumer, index) => {
+    expanded.push(consumer);
+    hotWaterAddon(consumer, warmWaterMode, index).forEach(addon => expanded.push(addon));
+  });
+  return expanded;
 }
 
 function simultaneity(building, sumVr) {
@@ -182,7 +187,10 @@ export function calculate(s = {}) {
   const centralWarmWater = warmWaterMode === 'central';
   const units = readUsageUnits().map(unit => summarizeUsageUnit(unit, warmWaterMode));
   const singleGroupsRaw = normalizeSingleGroups(readSingleConsumers());
-  const singlesRaw = singleGroupsRaw.flatMap(group => (group.consumers || []).map(c => ({ ...c, groupId: group.id, groupName: group.name })));
+  const singlesRaw = [];
+  singleGroupsRaw.forEach(group => {
+    (group.consumers || []).forEach(c => singlesRaw.push({ ...c, groupId: group.id, groupName: group.name }));
+  });
   const singles = expandConsumersForWarmWater(singlesRaw, warmWaterMode);
   const building = buildingById(s.buildingType);
 
