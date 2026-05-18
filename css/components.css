@@ -3773,4 +3773,62 @@ body.settings-open {
   }
 }
 
+
+/* Pufferspeicher: uses Druckhaltung-compatible note/list components */
+.module-view[data-module='buffer-storage'] .ph-help,
+.module-view[data-module='buffer-storage'] .ph-note {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: clamp(0.78rem, 2.5vw, 0.92rem);
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+  overflow-wrap: anywhere;
+}
+
+.module-view[data-module='buffer-storage'] .ph-formula {
+  font-size: clamp(0.82rem, 3vw, 1rem);
+  line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.module-view[data-module='buffer-storage'] .ph-warnings {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+
+.module-view[data-module='buffer-storage'] .ph-warning {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(255,255,255,.08);
+  min-width: 0;
+}
+
+.module-view[data-module='buffer-storage'] .ph-warning span {
+  color: var(--text);
+  font-size: clamp(0.82rem, 2.8vw, 0.95rem);
+}
+
+.module-view[data-module='buffer-storage'] .ph-warning strong {
+  color: var(--text);
+  font-size: clamp(0.82rem, 2.8vw, 0.95rem);
+  line-height: 1.4;
+  font-weight: 700;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  .module-view[data-module='buffer-storage'] .result-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .module-view[data-module='buffer-storage'] .inline-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Release v34 / App Version 1.0.0 */

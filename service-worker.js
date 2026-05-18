@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-v34-pdf-layout-all-modules-fix1';
+const CACHE_NAME = 'techcalc-v34-buffer-storage1';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',
@@ -7,6 +7,7 @@ const ASSETS = [
   './js/modules/heating-cooling/index.js','./js/modules/heating-cooling/config.js','./js/modules/heating-cooling/logic.js','./js/modules/heating-cooling/state.js',
   './js/modules/ventilation/index.js','./js/modules/ventilation/config.js','./js/modules/ventilation/logic.js','./js/modules/ventilation/state.js',
   './js/modules/pressure-holding/index.js','./js/modules/pressure-holding/config.js','./js/modules/pressure-holding/logic.js','./js/modules/pressure-holding/state.js',
+  './js/modules/buffer-storage/index.js','./js/modules/buffer-storage/config.js','./js/modules/buffer-storage/logic.js','./js/modules/buffer-storage/state.js',
   './js/modules/heat-recovery/index.js','./js/modules/heat-recovery/config.js','./js/modules/heat-recovery/logic.js','./js/modules/heat-recovery/state.js',
   './js/modules/hx-diagram/index.js','./js/modules/hx-diagram/config.js','./js/modules/hx-diagram/logic.js','./js/modules/hx-diagram/state.js',
   './js/modules/pipe-sizing/index.js','./js/modules/pipe-sizing/config.js','./js/modules/pipe-sizing/logic.js','./js/modules/pipe-sizing/state.js',
