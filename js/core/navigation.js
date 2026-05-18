@@ -14,8 +14,8 @@ export function renderNavigation(activeId = currentRoute()) {
   const isMobile = matchMedia(MOBILE_QUERY).matches;
   const preferences = loadPreferences();
   const visibleIds = isMobile
-    ? normalizeMobileQuickAccess(preferences.mobileQuickAccess, allModules)
-    : getDesktopVisibleIds(allModules);
+    ? normalizeQuickAccess(preferences.mobileQuickAccess, allModules, 4)
+    : normalizeQuickAccess(preferences.mobileQuickAccess, allModules, Math.max(1, calcDesktopSlots() - 1));
 
   const visibleModules = visibleIds.map(id => modules.get(id)).filter(Boolean);
   const overflowModules = allModules.filter(module => !visibleIds.includes(module.id));
@@ -35,7 +35,7 @@ export function renderQuickAccessSettings() {
   if (!host) return;
 
   const allModules = modules.all();
-  const selectedIds = normalizeMobileQuickAccess(loadPreferences().mobileQuickAccess, allModules);
+  const selectedIds = normalizeQuickAccess(loadPreferences().mobileQuickAccess, allModules, 4);
 
   host.innerHTML = `
     <div class="quick-access-list">
@@ -145,7 +145,7 @@ function renderOverflowMenu(overflow, overflowModules, activeId, visibleIds, isM
       const next = [...visibleIds.filter(item => item !== id)];
       if (next.length >= 4) next[3] = id;
       else next.push(id);
-      setMobileQuickAccess(normalizeMobileQuickAccess(next, modules.all()));
+      setMobileQuickAccess(normalizeQuickAccess(next, modules.all(), 4));
       overflow.hidden = true;
       renderNavigation(currentRoute());
       renderQuickAccessSettings();
@@ -153,28 +153,20 @@ function renderOverflowMenu(overflow, overflowModules, activeId, visibleIds, isM
   });
 }
 
-function getDesktopVisibleIds(allModules) {
-  const slots = Math.max(2, calcDesktopSlots() - 1); // one slot is reserved for +
-  return allModules
-    .filter(module => module.defaultVisible)
-    .slice(0, slots)
-    .map(module => module.id);
-}
-
-function normalizeMobileQuickAccess(preferredIds, allModules) {
+function normalizeQuickAccess(preferredIds, allModules, limit = 4) {
   const availableIds = allModules.map(module => module.id);
   const selected = [...new Set((preferredIds ?? []).filter(id => availableIds.includes(id)))];
 
   for (const id of availableIds) {
-    if (selected.length >= 4) break;
+    if (selected.length >= limit) break;
     if (!selected.includes(id)) selected.push(id);
   }
 
-  return selected.slice(0, 4);
+  return selected.slice(0, limit);
 }
 
 function fillToFour(ids, allModules) {
-  return normalizeMobileQuickAccess(ids, allModules);
+  return normalizeQuickAccess(ids, allModules, 4);
 }
 
 function renderTab(module, activeId) {

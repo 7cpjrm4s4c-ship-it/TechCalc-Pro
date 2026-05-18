@@ -3268,6 +3268,14 @@ body.settings-open {
   border-color: #e46f35 !important;
   box-shadow: inset 0 0 0 2px rgba(255,122,46,.42) !important;
 }
+
+:root[data-theme='light'] .segmented--purple button.is-active {
+  background: linear-gradient(135deg, #ded4ff, #f0ebff) !important;
+  color: #21173f !important;
+  border-color: #8f6cff !important;
+  box-shadow: inset 0 0 0 2px rgba(143,108,255,.46), inset 0 -3px 0 #8f6cff !important;
+}
+
 :root[data-theme='light'] .segmented--cyan button.is-active,
 :root[data-theme='light'] .segmented--blue button.is-active,
 :root[data-theme='light'] .hx-process.is-active,
