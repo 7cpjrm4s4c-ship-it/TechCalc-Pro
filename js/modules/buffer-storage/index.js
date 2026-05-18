@@ -60,8 +60,9 @@ function glycolFields(s){
 function runtimeInputs(s){
   return card('Mindestlaufzeit Verdichter', grid([
     field({ id:'qMaxKw', label:'max. Geräte-/Kälte- bzw. Heizleistung Qmax', value:fmtInput(s.qMaxKw,2), unit:'kW' }),
-    field({ id:'partLoadFactor', label:'kleinste Teillaststufe f', value:fmtInput(s.partLoadFactor,3) }),
+    field({ id:'partLoadFactor', label:'kleinste Teillaststufe f', value:fmtInput(s.partLoadFactor,3), unit:'%' }),
     field({ id:'qLoadKw', label:'konstante Lastabnahme QLast', value:fmtInput(s.qLoadKw,2), unit:'kW' }),
+    '<p class="ph-help ph-help--inline span-2"><strong>Kleinste Teillaststufe f:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große Verdichter ⇒ 25 %. Die Berechnung nutzt intern 0,25.</p>',
     field({ id:'compressorRunTimeMin', label:'Mindestlaufzeit Verdichter', value:fmtInput(s.compressorRunTimeMin,2), unit:'min' }),
     field({ id:'controllerDeltaT', label:'Schaltdifferenz Regler ΔT', value:fmtInput(s.controllerDeltaT,2), unit:'K' }),
     field({ id:'existingSystemVolumeL', label:'vorhandener Systeminhalt abziehen', value:fmtInput(s.existingSystemVolumeL,1), unit:'Liter' })
@@ -101,7 +102,7 @@ function view(s){
 
   const inputColumn = stack([
     card('Berechnungsart', stack([
-      segmented('calculationMode', opts([['runtime','Mindestlaufzeit'],['defrost','Abtauung'],['reserve','Wasservorlage'],['compare','Vergleich']]), s.calculationMode, { accent:'cyan' }),
+      `<div class="buffer-mode-tabs">${segmented('calculationMode', opts([['runtime','Mindestlaufzeit'],['defrost','Abtauung'],['reserve','Wasservorlage'],['compare','Vergleich']]), s.calculationMode, { accent:'cyan' })}</div>`,
       '<p class="ph-help">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'
     ].join('')), 'cyan'),
     card('Medium / Faktor', stack([

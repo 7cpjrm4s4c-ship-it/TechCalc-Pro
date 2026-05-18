@@ -3832,3 +3832,32 @@ body.settings-open {
 }
 
 /* Release v34 / App Version 1.0.0 */
+
+
+/* Buffer storage module: keep four mode tabs usable on narrow mobile screens */
+.module-view[data-module='buffer-storage'] .buffer-mode-tabs .segmented {
+  gap: 4px;
+  padding: 5px;
+}
+.module-view[data-module='buffer-storage'] .buffer-mode-tabs .segmented button {
+  min-height: 34px;
+  padding: 0 8px;
+  font-size: clamp(11px, 2.7vw, 14px);
+  letter-spacing: -.02em;
+  white-space: nowrap;
+}
+.module-view[data-module='buffer-storage'] .ph-help--inline {
+  margin-top: -4px;
+  font-size: .82rem;
+  line-height: 1.35;
+  color: var(--color-muted);
+}
+.module-view[data-module='buffer-storage'] .ph-help--inline strong {
+  color: var(--color-text);
+}
+@media (max-width: 420px) {
+  .module-view[data-module='buffer-storage'] .buffer-mode-tabs .segmented button {
+    padding: 0 5px;
+    font-size: clamp(10px, 2.55vw, 12px);
+  }
+}

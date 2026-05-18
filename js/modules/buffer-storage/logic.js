@@ -44,7 +44,8 @@ export function calculate(s){
   const existing = Math.max(0, num(s.existingSystemVolumeL));
 
   const qMax = num(s.qMaxKw);
-  const partLoad = Math.max(0, num(s.partLoadFactor));
+  const partLoadRaw = Math.max(0, num(s.partLoadFactor));
+  const partLoad = partLoadRaw > 1 ? partLoadRaw / 100 : partLoadRaw;
   const qLoad = Math.max(0, num(s.qLoadKw));
   const runTime = Math.max(0, num(s.compressorRunTimeMin));
   const dtReg = Math.max(0, num(s.controllerDeltaT));
@@ -73,6 +74,7 @@ export function calculate(s){
   if(s.calculationMode === 'runtime' || s.calculationMode === 'compare'){
     if(qMax <= 0) warnings.push('Maximale Geräte-/Kälte- bzw. Heizleistung fehlt.');
     if(partLoad <= 0) warnings.push('Teillastfaktor der kleinsten Leistungsstufe fehlt.');
+    if(partLoadRaw > 100) warnings.push('Teillastfaktor f ist größer als 100 %. Eingabe prüfen.');
     if(dtReg <= 0) warnings.push('Schaltdifferenz ΔT Regler fehlt.');
     if(runtimePower <= 0 && qMax > 0) warnings.push('Konstante Lastabnahme ist größer/gleich der kleinsten Teillaststufe; Puffervolumen für Mindestlaufzeit wird 0 l.');
   }
