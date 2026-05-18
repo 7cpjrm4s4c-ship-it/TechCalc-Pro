@@ -305,10 +305,12 @@ function tableHtml(rows, mode = 'standard') {
   const header = mode === 'process'
     ? [firstHeader, 'Prozessschritt', 'Beschreibung']
     : [firstHeader, 'Wert', 'Einheit'];
-  const tableClass = `tcp-table ${mode === 'process' || isNumericFirstColumn ? 'tcp-table--numbered' : 'tcp-table--standard'}`;
-  const colgroup = mode === 'process' || isNumericFirstColumn
-    ? '<colgroup><col class="tcp-col-num"><col class="tcp-col-value"><col class="tcp-col-unit"></colgroup>'
-    : '<colgroup><col class="tcp-col-label"><col class="tcp-col-value"><col class="tcp-col-unit"></colgroup>';
+  const tableClass = `tcp-table ${mode === 'process' ? 'tcp-table--process' : isNumericFirstColumn ? 'tcp-table--numbered' : 'tcp-table--standard'}`;
+  const colgroup = mode === 'process'
+    ? '<colgroup><col class="tcp-col-num"><col class="tcp-col-process"><col class="tcp-col-description"></colgroup>'
+    : isNumericFirstColumn
+      ? '<colgroup><col class="tcp-col-num"><col class="tcp-col-value"><col class="tcp-col-unit"></colgroup>'
+      : '<colgroup><col class="tcp-col-label"><col class="tcp-col-value"><col class="tcp-col-unit"></colgroup>';
 
   return `<table class="${tableClass}">${colgroup}<thead><tr>${header.map((h, index) => `<th${cellClass(h, index)}>${esc(h)}</th>`).join('')}</tr></thead><tbody>${finalRows.map(row => `<tr>${row.map((cell, index) => `<td${cellClass(cell, index)}>${esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
 }
@@ -390,18 +392,25 @@ const PRINT_STYLE = `<style>
     .tcp-section h2 { margin: 0 0 1.4mm; font-size: 10.2pt; line-height: 1.1; font-weight: 700; color: #007EA7; text-transform: uppercase; letter-spacing: .04em; }
     .tcp-rule { height: 1px; background: #D1D5DB; margin-bottom: 2.5mm; }
     .tcp-table { width: 100%; border-collapse: collapse; table-layout: auto; font-size: 8.2pt; }
-    .tcp-table col.tcp-col-label { width: 32%; }
-    .tcp-table col.tcp-col-num { width: 12%; }
-    .tcp-table col.tcp-col-value { width: 52%; }
-    .tcp-table col.tcp-col-unit { width: 16%; }
+    .tcp-table col.tcp-col-label { width: 28%; }
+    .tcp-table col.tcp-col-num { width: 9%; }
+    .tcp-table col.tcp-col-value { width: 60%; }
+    .tcp-table col.tcp-col-unit { width: 12%; }
+    .tcp-table col.tcp-col-process { width: 24%; }
+    .tcp-table col.tcp-col-description { width: 67%; }
     .tcp-table th, .tcp-table td { border: 0.5px solid #D1D5DB; padding: 2.2px 4px; vertical-align: top; overflow-wrap: anywhere; }
     .tcp-table th { background: #F3F4F6; color: #111827; font-weight: 700; }
     .tcp-table td { color: #111827; }
     .tcp-table .tcp-label-cell { text-align: left; white-space: nowrap; }
     .tcp-table--numbered .tcp-label-cell { text-align: right; white-space: nowrap; }
+    .tcp-table--process .tcp-label-cell { text-align: right; white-space: nowrap; }
     .tcp-table .tcp-value-cell { text-align: right; }
     .tcp-table .tcp-value-text { text-align: left; }
+    .tcp-table th:nth-child(1), .tcp-table td:nth-child(1) { text-align: left; }
+    .tcp-table--numbered th:nth-child(1), .tcp-table--numbered td:nth-child(1), .tcp-table--process th:nth-child(1), .tcp-table--process td:nth-child(1) { text-align: right; }
+    .tcp-table th:nth-child(2), .tcp-table td:nth-child(2) { min-width: 58mm; }
     .tcp-table th:nth-child(3), .tcp-table td:nth-child(3) { text-align: right; white-space: nowrap; }
+    .tcp-table--process th:nth-child(2), .tcp-table--process td:nth-child(2), .tcp-table--process th:nth-child(3), .tcp-table--process td:nth-child(3) { text-align: left; white-space: normal; }
     .tcp-diagram-section { break-inside: avoid; }
     .tcp-diagram { width: 100%; border: 0.5px solid #D1D5DB; padding: 4mm; background: #fff; overflow: hidden; }
     .tcp-diagram svg { width: 100%; height: auto; display: block; background: #fff; }
