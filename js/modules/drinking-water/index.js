@@ -90,7 +90,7 @@ function inputCard(s, r) {
       ])
     ].join('')), 'blue'),
     card('Nutzungseinheiten', stack([
-      `<details class="dw-accordion dw-accordion--form"><summary><span><strong>Nutzungseinheit zusammenstellen</strong><small>Mehrere Verbraucher auswählen und anschließend als NE speichern</small></span></summary><div class="dw-accordion__body">`,
+      `<details class="dw-accordion dw-accordion--form" data-dw-accordion="uiUnitFormOpen" ${s.uiUnitFormOpen ? 'open' : ''}><summary><span><strong>Nutzungseinheit zusammenstellen</strong><small>Mehrere Verbraucher auswählen und anschließend als NE speichern</small></span></summary><div class="dw-accordion__body">`,
       field({ id:'unitName', label:'Bezeichnung', value:s.unitName, placeholder:'z. B. Bad Wohnung 1', inputmode:'text' }),
       grid([
         selectField({ id:'unitConsumerType', label:'Verbraucher hinzufügen', value:s.unitConsumerType, options:consumerOptions() }),
@@ -100,10 +100,10 @@ function inputCard(s, r) {
       draftConsumerList(s.unitDraftConsumers || [], 'unit'),
       '<button type="button" class="action-button" data-dw-add-unit>Nutzungseinheit speichern</button>',
       '</div></details>',
-      `<details class="dw-accordion dw-accordion--saved"><summary><span><strong>Gespeicherte Nutzungseinheiten</strong><small>${r.usageUnits.length} Nutzungseinheiten angelegt</small></span></summary><div class="dw-accordion__body">${unitRows(r.usageUnits)}</div></details>`
+      `<details class="dw-accordion dw-accordion--saved" data-dw-accordion="uiUnitSavedOpen" ${s.uiUnitSavedOpen ? 'open' : ''}><summary><span><strong>Gespeicherte Nutzungseinheiten</strong><small>${r.usageUnits.length} Nutzungseinheiten angelegt</small></span></summary><div class="dw-accordion__body">${unitRows(r.usageUnits)}</div></details>`
     ].join('')), 'blue'),
     card('Einzelverbraucher außerhalb NE', stack([
-      `<details class="dw-accordion dw-accordion--form"><summary><span><strong>Freie Einrichtungsgegenstände zusammenstellen</strong><small>Mehrere Verbraucher außerhalb einer Nutzungseinheit anlegen</small></span></summary><div class="dw-accordion__body">`,
+      `<details class="dw-accordion dw-accordion--form" data-dw-accordion="uiSingleFormOpen" ${s.uiSingleFormOpen ? 'open' : ''}><summary><span><strong>Freie Einrichtungsgegenstände zusammenstellen</strong><small>Mehrere Verbraucher außerhalb einer Nutzungseinheit anlegen</small></span></summary><div class="dw-accordion__body">`,
       field({ id:'singleName', label:'Bezeichnung / Gruppe', value:s.singleName, placeholder:'z. B. Außenanlagen / Technikraum', inputmode:'text' }),
       grid([
         selectField({ id:'singleConsumerType', label:'Verbraucher hinzufügen', value:s.singleConsumerType, options:consumerOptions() }),
@@ -117,7 +117,7 @@ function inputCard(s, r) {
       draftConsumerList(s.singleDraftConsumers || [], 'single'),
       '<button type="button" class="action-button" data-dw-add-single>Einzelverbraucher speichern</button>',
       '</div></details>',
-      `<details class="dw-accordion dw-accordion--saved"><summary><span><strong>Gespeicherte Einzelverbraucher</strong><small>${r.singles.length} Einträge außerhalb NE</small></span></summary><div class="dw-accordion__body">${singleRows(r.singles)}</div></details>`
+      `<details class="dw-accordion dw-accordion--saved" data-dw-accordion="uiSingleSavedOpen" ${s.uiSingleSavedOpen ? 'open' : ''}><summary><span><strong>Gespeicherte Einzelverbraucher</strong><small>${r.singles.length} Einträge außerhalb NE</small></span></summary><div class="dw-accordion__body">${singleRows(r.singles)}</div></details>`
     ].join('')), 'blue')
   ].join(''));
 }
@@ -144,6 +144,11 @@ function resultCard(r) {
 }
 
 function bindDrinkingWater(root, s, rerender) {
+  root.querySelectorAll('[data-dw-accordion]').forEach(details => details.addEventListener('toggle', () => {
+    const key = details.dataset.dwAccordion;
+    if (key && Boolean(s[key]) !== details.open) state.set({ [key]: details.open });
+  }));
+
   root.querySelectorAll('[data-dw-draft-add]').forEach(btn => btn.addEventListener('click', () => {
     const target = btn.dataset.dwDraftAdd;
     const isUnit = target === 'unit';

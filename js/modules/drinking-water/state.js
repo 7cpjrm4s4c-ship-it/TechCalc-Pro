@@ -11,5 +11,9 @@ export const state = createModuleState({
   singleConsumerType: 'tapDn15',
   singleCount: '1',
   singlePermanent: 'false',
-  singleDraftConsumers: []
+  singleDraftConsumers: [],
+  uiUnitFormOpen: false,
+  uiUnitSavedOpen: false,
+  uiSingleFormOpen: false,
+  uiSingleSavedOpen: false
 });
