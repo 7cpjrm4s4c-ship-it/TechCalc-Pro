@@ -1,18 +1,19 @@
 import { num } from '../../utils/calculations.js';
 
 export const CONSUMERS = [
-  { id:'basin', label:'Waschtisch / Bidet / Küchenspüle', short:'Waschtisch', vr:0.07, pmin:0.10, neGroup:'basin', hotWater:true },
-  { id:'kitchenSink', label:'Küchenspüle', short:'Küchenspüle', vr:0.07, pmin:0.10, neGroup:'basin', hotWater:true },
-  { id:'dishwasher', label:'Geschirrspülmaschine', short:'Geschirrspüler', vr:0.07, pmin:0.05, neGroup:'dishwasher' },
-  { id:'wcCistern', label:'WC-Spülkasten', short:'Spülkasten', vr:0.13, pmin:0.05, neGroup:'wc' },
+  { id:'basin', label:'Waschtisch / Bidet', short:'Waschtisch / Bidet', vr:0.07, pmin:0.10, neGroup:'basin', hotWater:true },
+  { id:'kitchenSink', label:'Küchenspüle', short:'Küchenspüle', vr:0.07, pmin:0.10, neGroup:'kitchenSink', hotWater:true },
+  { id:'utilitySinkMixer', label:'Ausgussbecken mit Mischbatterie', short:'Ausgussbecken MB', vr:0.15, pmin:0.10, neGroup:'utilitySink', hotWater:true },
+  { id:'dishwasher', label:'Geschirrspülmaschine', short:'Geschirrspüler', vr:0.07, pmin:0.05, neGroup:'dishwasher', hotWater:false },
+  { id:'wcCistern', label:'WC-Spülkasten', short:'Spülkasten', vr:0.13, pmin:0.05, neGroup:'wc', hotWater:false },
   { id:'bathShower', label:'Mischarmatur Bade-/Duschwanne', short:'Bad/Dusche', vr:0.15, pmin:0.10, neGroup:'bath', hotWater:true },
-  { id:'shower', label:'Dusche', short:'Dusche', vr:0.15, pmin:0.10, neGroup:'bath', hotWater:true },
-  { id:'washingMachine', label:'Waschmaschine', short:'Waschmaschine', vr:0.15, pmin:0.05, neGroup:'washing' },
-  { id:'urinalFlush', label:'Druckspüler Urinal', short:'Urinal-Druckspüler', vr:0.30, pmin:0.10, neGroup:'urinal' },
-  { id:'tapRegDn10', label:'Auslaufventil mit Strahlregler DN 10', short:'Auslauf DN10', vr:0.15, pmin:0.10, neGroup:'tap', hotWater:true },
-  { id:'tapDn15', label:'Auslaufventil ohne Strahlregler DN 15', short:'Auslauf DN15', vr:0.30, pmin:0.05, neGroup:'tap', hotWater:true },
-  { id:'tapDn20', label:'Auslaufventil ohne Strahlregler DN 20', short:'Auslauf DN20', vr:0.50, pmin:0.05, neGroup:'tap', hotWater:true },
-  { id:'tapDn25', label:'Auslaufventil ohne Strahlregler DN 25', short:'Auslauf DN25', vr:1.00, pmin:0.05, neGroup:'tap', hotWater:true }
+  { id:'shower', label:'Dusche', short:'Dusche', vr:0.15, pmin:0.10, neGroup:'shower', hotWater:true },
+  { id:'washingMachine', label:'Waschmaschine', short:'Waschmaschine', vr:0.15, pmin:0.05, neGroup:'washing', hotWater:false },
+  { id:'urinalFlush', label:'Druckspüler Urinal', short:'Urinal-Druckspüler', vr:0.30, pmin:0.10, neGroup:'urinal', hotWater:false },
+  { id:'tapRegDn10', label:'Auslaufventil mit Strahlregler DN 10', short:'Auslauf DN10', vr:0.15, pmin:0.10, neGroup:'tapRegDn10', hotWater:false },
+  { id:'tapDn15', label:'Auslaufventil ohne Strahlregler DN 15', short:'Auslauf DN15', vr:0.30, pmin:0.05, neGroup:'tapDn15', hotWater:false },
+  { id:'tapDn20', label:'Auslaufventil ohne Strahlregler DN 20', short:'Auslauf DN20', vr:0.50, pmin:0.05, neGroup:'tapDn20', hotWater:false },
+  { id:'tapDn25', label:'Auslaufventil ohne Strahlregler DN 25', short:'Auslauf DN25', vr:1.00, pmin:0.05, neGroup:'tapDn25', hotWater:false }
 ];
 
 export const BUILDING_TYPES = [
@@ -26,14 +27,19 @@ export const BUILDING_TYPES = [
 let usageUnitsMemory = [];
 let singleConsumersMemory = [];
 
+function clone(value) {
+  if (typeof structuredClone === 'function') return structuredClone(value);
+  return JSON.parse(JSON.stringify(value));
+}
+
 export function readUsageUnits() {
-  return Array.isArray(usageUnitsMemory) ? [...usageUnitsMemory] : [];
+  return Array.isArray(usageUnitsMemory) ? clone(usageUnitsMemory) : [];
 }
-export function writeUsageUnits(items) { usageUnitsMemory = Array.isArray(items) ? [...items] : []; }
+export function writeUsageUnits(items) { usageUnitsMemory = Array.isArray(items) ? clone(items) : []; }
 export function readSingleConsumers() {
-  return Array.isArray(singleConsumersMemory) ? [...singleConsumersMemory] : [];
+  return Array.isArray(singleConsumersMemory) ? clone(singleConsumersMemory) : [];
 }
-export function writeSingleConsumers(items) { singleConsumersMemory = Array.isArray(items) ? [...items] : []; }
+export function writeSingleConsumers(items) { singleConsumersMemory = Array.isArray(items) ? clone(items) : []; }
 
 export function consumerById(id) { return CONSUMERS.find(c => c.id === id) || CONSUMERS[0]; }
 export function buildingById(id) { return BUILDING_TYPES.find(b => b.id === id) || BUILDING_TYPES[0]; }
@@ -65,10 +71,41 @@ export function createUsageUnit({ name, consumer, consumers }) {
   };
 }
 
-function unitEffectiveConsumers(unit, includeHotWater = false) {
-  // Für den NE-Ansatz werden zuerst die zwei größten wirksamen Entnahmestellen gewählt.
-  // Bei zentraler Warmwasserbereitung zählt die Warmwasserseite derselben Entnahmestelle
-  // zusätzlich, statt die Warm-/Kaltwasseranteile als zwei unabhängige Entnahmestellen zu wählen.
+export function createSingleGroup({ name, consumers }) {
+  const list = Array.isArray(consumers) && consumers.length ? consumers : [];
+  return {
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    name: name || 'Einzelverbraucher',
+    consumers: list,
+    createdAt: new Date().toISOString()
+  };
+}
+
+function hotWaterAddon(consumer, mode, index = 0) {
+  if (!consumer.hotWater) return [];
+  if (mode === 'central') {
+    return [{
+      ...consumer,
+      id: `${consumer.id}-tww-${index}`,
+      label: `${consumer.label} TWW`,
+      neGroup: `${consumer.neGroup || consumer.typeId}-tww`,
+      effectiveRole: 'PWH',
+      hotWaterClone:true
+    }];
+  }
+  return [{
+    ...consumer,
+    id: `${consumer.id}-dezentral-ww-${index}`,
+    label: `${consumer.label} WW-Bereitung`,
+    vr: 0.05,
+    neGroup: `${consumer.neGroup || consumer.typeId}-wwb`,
+    effectiveRole: 'WWB',
+    hotWaterClone:true,
+    decentralizedAddon:true
+  }];
+}
+
+function unitEffectiveConsumers(unit, mode = 'central') {
   const byGroup = new Map();
   (unit.consumers || []).forEach(consumer => {
     const key = consumer.neGroup || consumer.typeId;
@@ -83,22 +120,13 @@ function unitEffectiveConsumers(unit, includeHotWater = false) {
   const effective = [];
   topFixtures.forEach((consumer, index) => {
     effective.push({ ...consumer, effectiveRole: 'PWC', effectiveIndex: index });
-    if (includeHotWater && consumer.hotWater) {
-      effective.push({
-        ...consumer,
-        id: `${consumer.id}-tww-${index}`,
-        label: `${consumer.label} TWW`,
-        neGroup: `${consumer.neGroup || consumer.typeId}-tww`,
-        effectiveRole: 'PWH',
-        effectiveIndex: index
-      });
-    }
+    effective.push(...hotWaterAddon(consumer, mode, index));
   });
   return effective;
 }
 
-export function summarizeUsageUnit(unit, includeHotWater = false) {
-  const effective = unitEffectiveConsumers(unit, includeHotWater);
+export function summarizeUsageUnit(unit, warmWaterMode = 'central') {
+  const effective = unitEffectiveConsumers(unit, warmWaterMode);
   const effectiveFlow = effective.reduce((sum, c) => sum + Number(c.vr || 0), 0);
   const rawFlow = (unit.consumers || []).reduce((sum, c) => sum + Number(c.vr || 0) * (Number(c.count) || 1), 0);
   return {
@@ -106,10 +134,25 @@ export function summarizeUsageUnit(unit, includeHotWater = false) {
     effectiveConsumers: effective,
     consumerCount: (unit.consumers || []).reduce((sum, c) => sum + (Number(c.count)||1), 0),
     rawFlow,
-    // DIN-NE-Ansatz: zwei größte wirksame Entnahmestellen; bei zentraler TWW zusätzlich PWH-Anteil der gewählten Zapfstellen.
     sumFlow: effectiveFlow,
     peakFlow: effectiveFlow
   };
+}
+
+function normalizeSingleGroups(items = []) {
+  return items.map(item => {
+    if (Array.isArray(item.consumers)) return item;
+    return {
+      id: item.id || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      name: item.name || item.label || 'Einzelverbraucher',
+      consumers: [item],
+      createdAt: item.createdAt || new Date().toISOString()
+    };
+  });
+}
+
+function expandConsumersForWarmWater(consumers, warmWaterMode) {
+  return consumers.flatMap((consumer, index) => [consumer, ...hotWaterAddon(consumer, warmWaterMode, index)]);
 }
 
 function simultaneity(building, sumVr) {
@@ -120,8 +163,6 @@ function simultaneity(building, sumVr) {
 
 function recommendHouseConnection(peakLs) {
   const flowM3h = peakLs * 3.6;
-  // Vorbemessung nach Q3-Auswahl: der Wasserzähler muss den Spitzendurchfluss abdecken.
-  // DN bleibt bewusst konservativ, aber kleine Wohnanlagen mit ca. 1 m³/h fallen nicht mehr auf DN 32 / Q3 10.
   const rows = [
     { limit:2.5, dn:'DN 25', meter:'Q3 4', q3:4 },
     { limit:4.0, dn:'DN 32', meter:'Q3 4', q3:4 },
@@ -137,12 +178,12 @@ function recommendHouseConnection(peakLs) {
 }
 
 export function calculate(s = {}) {
-  const centralWarmWater = s.waterHeatingMode !== 'decentral';
-  const units = readUsageUnits().map(unit => summarizeUsageUnit(unit, centralWarmWater));
-  const singlesRaw = readSingleConsumers();
-  const singles = centralWarmWater
-    ? singlesRaw.flatMap(consumer => consumer.hotWater ? [consumer, { ...consumer, id: `${consumer.id}-tww`, name: `${consumer.name || consumer.label} TWW`, label: `${consumer.label} TWW`, hotWaterClone:true }] : [consumer])
-    : singlesRaw;
+  const warmWaterMode = s.waterHeatingMode === 'decentral' ? 'decentral' : 'central';
+  const centralWarmWater = warmWaterMode === 'central';
+  const units = readUsageUnits().map(unit => summarizeUsageUnit(unit, warmWaterMode));
+  const singleGroupsRaw = normalizeSingleGroups(readSingleConsumers());
+  const singlesRaw = singleGroupsRaw.flatMap(group => (group.consumers || []).map(c => ({ ...c, groupId: group.id, groupName: group.name })));
+  const singles = expandConsumersForWarmWater(singlesRaw, warmWaterMode);
   const building = buildingById(s.buildingType);
 
   const nePeakSum = units.reduce((sum, unit) => sum + unit.peakFlow, 0);
@@ -159,6 +200,7 @@ export function calculate(s = {}) {
   return {
     building,
     usageUnits: units,
+    singleGroups: singleGroupsRaw,
     singles,
     rawSingles: singlesRaw,
     neSumFlow,
@@ -167,6 +209,7 @@ export function calculate(s = {}) {
     totalSumFlow,
     permanentFlow,
     centralWarmWater,
+    warmWaterMode,
     peakFlow,
     house,
     formulaText: `Vs = ${building.a.toLocaleString('de-DE')} × (ΣVR)^${building.b.toLocaleString('de-DE')} − ${building.c.toLocaleString('de-DE')}`
