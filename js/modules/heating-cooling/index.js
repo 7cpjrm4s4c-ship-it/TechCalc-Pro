@@ -103,6 +103,7 @@ export function writeLineSections(items) {
 }
 
 function renderLineSectionCard(item, index) {
+  const active = state.get().activeLineSectionId === item.id;
   const stats = [
     { label: 'Leistung', value: item.powerKw || '—', unit: 'kW' },
     { label: 'Massenstrom', value: item.massFlowKgh || '—', unit: 'kg/h' },
@@ -115,7 +116,7 @@ function renderLineSectionCard(item, index) {
     { label: 'Geschwindigkeit', value: item.pipeVelocity || '—', unit: item.pipeVelocity && item.pipeVelocity !== '—' ? 'm/s' : '' },
     { label: 'Druckverlust', value: item.pipePressureLoss || '—', unit: item.pipePressureLoss && item.pipePressureLoss !== '—' ? 'Pa/m' : '' }
   ];
-  return `<article class="line-section-card is-collapsed" data-line-card>
+  return `<article class="line-section-card is-collapsed ${active ? 'is-active' : ''}" data-line-card data-line-select="${item.id}">
     <div class="line-section-card__head">
       <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false">
         <strong>${item.name || 'Abschnitt ' + (index + 1)}</strong>
@@ -133,7 +134,7 @@ function lineSectionsCard(r) {
     ? `<div class="line-section-list">${items.map(renderLineSectionCard).join('')}</div>`
     : '<div class="empty-state empty-state--compact">Noch keine Leitungsabschnitte angelegt</div>';
   return card('Leitungsabschnitte', stack([
-    `<div class="field"><label for="lineSectionName">Bezeichnung</label><div class="control"><input id="lineSectionName" type="text" placeholder="z. B. Verteilerabgang Nord" autocomplete="off"></div></div>`,
+    `<div class="field"><label for="lineSectionName">Bezeichnung</label><div class="control"><input id="lineSectionName" type="text" placeholder="z. B. Verteilerabgang Nord" autocomplete="off" value="${(state.get().activeLineSectionName || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></div></div>`,
     '<button type="button" class="action-button" data-line-add>Abschnitt speichern</button>',
     rows
   ].join('')), 'blue');
@@ -145,10 +146,12 @@ function bindLineSections(root, r, rerender) {
     btn.addEventListener('click', (event) => {
       event.preventDefault();
       const name = root.querySelector('#lineSectionName')?.value?.trim() || '';
+      const currentState = state.get();
       const items = readLineSections();
-      items.push({
-        id: Date.now(),
-        name: name || `Abschnitt ${items.length + 1}`,
+      const id = currentState.activeLineSectionId || Date.now();
+      const item = {
+        id,
+        name: name || currentState.activeLineSectionName || `Abschnitt ${items.length + 1}`,
         powerKw: fmt(r.powerKw),
         massFlowKgh: fmt(r.massFlowKgh),
         volumeFlowM3h: fmt(r.volumeFlowM3h, 3),
@@ -159,9 +162,14 @@ function bindLineSections(root, r, rerender) {
         pipeMaterial: r.pipe && !r.pipe.noDimension ? r.pipe.system.label : '—',
         pipeVelocity: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.velocity) : '—',
         pipePressureLoss: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.pressureLoss) : '—',
-        createdAt: new Date().toISOString()
-      });
-      writeLineSections(items);
+        inputState: activeCalculationState(currentState),
+        uiState: { mode: currentState.mode, mediumId: currentState.mediumId, pipeSystemId: currentState.pipeSystemId },
+        createdAt: currentState.activeLineSectionId ? (items.find(x => x.id === id)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      const next = currentState.activeLineSectionId ? items.map(existing => existing.id === id ? item : existing) : [item, ...items];
+      writeLineSections(next);
+      state.set({ activeLineSectionId: id, activeLineSectionName: item.name }, { notify:false });
       if (typeof rerender === 'function') rerender();
     });
   }
@@ -173,10 +181,35 @@ function bindLineSections(root, r, rerender) {
     });
   });
 
+  root.querySelectorAll('[data-line-select]').forEach(row => {
+    row.addEventListener('click', event => {
+      if (event.target.closest('[data-line-delete]') || event.target.closest('[data-line-toggle]')) return;
+      const id = Number(row.dataset.lineSelect);
+      const item = readLineSections().find(entry => Number(entry.id) === id);
+      if (!item) return;
+      const input = item.inputState || {};
+      const prefix = (input.mode === 'cooling') ? 'cooling' : 'heating';
+      state.set({
+        ...(item.uiState || {}),
+        mode: input.mode || item.uiState?.mode || state.get().mode,
+        mediumId: item.uiState?.mediumId || state.get().mediumId,
+        pipeSystemId: item.uiState?.pipeSystemId || state.get().pipeSystemId,
+        [`${prefix}CalcTarget`]: input.calcTarget || 'power',
+        [`${prefix}PowerW`]: input.powerW || '',
+        [`${prefix}PowerUnit`]: input.powerUnit || 'W',
+        [`${prefix}MassFlowKgh`]: input.massFlowKgh || '',
+        [`${prefix}DeltaT`]: input.deltaT || '',
+        activeLineSectionId: item.id,
+        activeLineSectionName: item.name || ''
+      });
+    });
+  });
+
   root.querySelectorAll('[data-line-delete]').forEach(del => {
     del.addEventListener('click', () => {
       const id = Number(del.dataset.lineDelete);
       writeLineSections(readLineSections().filter(item => item.id !== id));
+      if (state.get().activeLineSectionId === id) state.set({ activeLineSectionId:null, activeLineSectionName:'' }, { notify:false });
       if (typeof rerender === 'function') rerender();
     });
   });

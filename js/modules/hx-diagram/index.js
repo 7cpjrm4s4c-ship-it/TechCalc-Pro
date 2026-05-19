@@ -219,10 +219,10 @@ export default {
     const bindActions = rootEl => {
       rootEl.querySelectorAll('[data-field]').forEach(el => {
         el.addEventListener('input', () => {
-          state.set({ activeProcessId: null, activePath: [], points: [] }, { notify: false });
+          state.set({ activePath: [], points: [] }, { notify: false });
         });
         el.addEventListener('change', () => {
-          state.set({ activeProcessId: null, activePath: [], points: [] }, { notify: false });
+          state.set({ activePath: [], points: [] }, { notify: false });
         });
       });
 

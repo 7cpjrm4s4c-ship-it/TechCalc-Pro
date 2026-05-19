@@ -18,10 +18,12 @@ function savedPlantSnapshot(s, r){
   const baseName = s.plantName?.trim() || `${s.holdingType === 'dynamic' ? (s.dynamicType === 'variomat' ? 'Variomat' : 'Reflexomat') : 'MAG'} ${saved.length + 1}`;
   const copy = { ...s };
   delete copy.savedPlants;
+  delete copy.activePlantId;
   return {
-    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    id: s.activePlantId || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     name: baseName,
-    createdAt: new Date().toISOString(),
+    createdAt: s.activePlantId ? (saved.find(x => x.id === s.activePlantId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     state: copy,
     result: {
       productLabel: r.productLabel,
@@ -43,7 +45,7 @@ function savedPlantRows(items = []){
     return `<article class="ph-saved-item">
       <div><strong>${esc(item.name || 'Anlage')}</strong><small>${esc(subtitle || 'gespeicherte Druckhaltung')}</small></div>
       <div class="ph-saved-actions">
-        <button type="button" class="mini-button" data-ph-load="${esc(item.id)}">Laden</button>
+        <button type="button" class="mini-button" data-ph-load="${esc(item.id)}">Bearbeiten</button>
         <button type="button" class="mini-button mini-button--danger" data-ph-delete="${esc(item.id)}">Löschen</button>
       </div>
     </article>`;
@@ -146,20 +148,23 @@ function bindPressureHoldingActions(root, snapshot){
     const current = state.get();
     const result = calculate(current);
     const saved = Array.isArray(current.savedPlants) ? current.savedPlants : [];
-    state.set({ savedPlants: [savedPlantSnapshot(current, result), ...saved] });
+    const record = savedPlantSnapshot(current, result);
+    const next = current.activePlantId ? saved.map(item => item.id === record.id ? record : item) : [record, ...saved];
+    state.set({ savedPlants: next, activePlantId: record.id, plantName: record.name });
   });
   root.querySelectorAll('[data-ph-load]').forEach(button => {
     button.addEventListener('click', () => {
       const current = state.get();
       const item = (current.savedPlants || []).find(entry => entry.id === button.dataset.phLoad);
       if(!item?.state) return;
-      state.set({ ...item.state, savedPlants: current.savedPlants || [] });
+      state.set({ ...item.state, savedPlants: current.savedPlants || [], activePlantId: item.id, plantName: item.name || item.state?.plantName || '' });
     });
   });
   root.querySelectorAll('[data-ph-delete]').forEach(button => {
     button.addEventListener('click', () => {
       const current = state.get();
-      state.set({ savedPlants: (current.savedPlants || []).filter(entry => entry.id !== button.dataset.phDelete) });
+      const next = (current.savedPlants || []).filter(entry => entry.id !== button.dataset.phDelete);
+      state.set({ savedPlants: next, activePlantId: current.activePlantId === button.dataset.phDelete ? null : current.activePlantId });
     });
   });
 }

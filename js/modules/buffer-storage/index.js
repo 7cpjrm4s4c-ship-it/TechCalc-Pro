@@ -26,10 +26,12 @@ function savedSnapshot(s, r){
   const saved = Array.isArray(s.savedCalculations) ? s.savedCalculations : [];
   const copy = { ...s };
   delete copy.savedCalculations;
+  delete copy.activeCalculationId;
   return {
-    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    id: s.activeCalculationId || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     name: s.plantName?.trim() || `Pufferspeicher ${saved.length + 1}`,
-    createdAt: new Date().toISOString(),
+    createdAt: s.activeCalculationId ? (saved.find(x => x.id === s.activeCalculationId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     state: copy,
     result: { mode: s.calculationMode, volume: r.decisiveVolume, standard: r.nextStandardVolume, medium: mediumLabel(s) }
   };
@@ -39,7 +41,7 @@ function savedRows(items = []){
   return `<div class="ph-saved-list">${items.map(item => {
     const res = item.result || {};
     const subtitle = [modeLabel(res.mode), res.standard ? `${fmt(res.standard,0)} l` : '', res.medium].filter(Boolean).join(' · ');
-    return `<article class="ph-saved-item"><div><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle)}</small></div><div class="ph-saved-actions"><button type="button" class="mini-button" data-buffer-load="${esc(item.id)}">Laden</button><button type="button" class="mini-button mini-button--danger" data-buffer-delete="${esc(item.id)}">Löschen</button></div></article>`;
+    return `<article class="ph-saved-item"><div><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle)}</small></div><div class="ph-saved-actions"><button type="button" class="mini-button" data-buffer-load="${esc(item.id)}">Bearbeiten</button><button type="button" class="mini-button mini-button--danger" data-buffer-delete="${esc(item.id)}">Löschen</button></div></article>`;
   }).join('')}</div>`;
 }
 function savedCard(s){
@@ -145,20 +147,23 @@ function bindActions(root){
     const current = state.get();
     const result = calculate(current);
     const saved = Array.isArray(current.savedCalculations) ? current.savedCalculations : [];
-    state.set({ savedCalculations: [savedSnapshot(current, result), ...saved] });
+    const record = savedSnapshot(current, result);
+    const next = current.activeCalculationId ? saved.map(item => item.id === record.id ? record : item) : [record, ...saved];
+    state.set({ savedCalculations: next, activeCalculationId: record.id, plantName: record.name });
   });
   root.querySelectorAll('[data-buffer-load]').forEach(button => {
     button.addEventListener('click', () => {
       const current = state.get();
       const item = (current.savedCalculations || []).find(entry => entry.id === button.dataset.bufferLoad);
       if(!item?.state) return;
-      state.set({ ...item.state, savedCalculations: current.savedCalculations || [] });
+      state.set({ ...item.state, savedCalculations: current.savedCalculations || [], activeCalculationId: item.id, plantName: item.name || item.state?.plantName || '' });
     });
   });
   root.querySelectorAll('[data-buffer-delete]').forEach(button => {
     button.addEventListener('click', () => {
       const current = state.get();
-      state.set({ savedCalculations: (current.savedCalculations || []).filter(entry => entry.id !== button.dataset.bufferDelete) });
+      const next = (current.savedCalculations || []).filter(entry => entry.id !== button.dataset.bufferDelete);
+      state.set({ savedCalculations: next, activeCalculationId: current.activeCalculationId === button.dataset.bufferDelete ? null : current.activeCalculationId });
     });
   });
 }
