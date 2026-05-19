@@ -3841,9 +3841,10 @@ body.settings-open {
 }
 .module-view[data-module='buffer-storage'] .buffer-mode-tabs .segmented button {
   min-height: 34px;
-  padding: 0 8px;
-  font-size: clamp(11px, 2.7vw, 14px);
-  letter-spacing: -.02em;
+  padding: 0 6px;
+  font-size: clamp(10px, 2.45vw, 13px);
+  letter-spacing: -.035em;
+  line-height: 1.05;
   white-space: nowrap;
 }
 .module-view[data-module='buffer-storage'] .ph-help--inline {
@@ -3857,7 +3858,7 @@ body.settings-open {
 }
 @media (max-width: 420px) {
   .module-view[data-module='buffer-storage'] .buffer-mode-tabs .segmented button {
-    padding: 0 5px;
-    font-size: clamp(10px, 2.55vw, 12px);
+    padding: 0 3px;
+    font-size: clamp(9px, 2.35vw, 11px);
   }
 }

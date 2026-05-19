@@ -75,7 +75,7 @@ export function calculate(s){
     if(qMax <= 0) warnings.push('Maximale Geräte-/Kälte- bzw. Heizleistung fehlt.');
     if(partLoad <= 0) warnings.push('Teillastfaktor der kleinsten Leistungsstufe fehlt.');
     if(partLoadRaw > 100) warnings.push('Teillastfaktor f ist größer als 100 %. Eingabe prüfen.');
-    if(dtReg <= 0) warnings.push('Schaltdifferenz ΔT Regler fehlt.');
+    if(dtReg <= 0) warnings.push('ΔT Hydraulikkreislauf fehlt.');
     if(runtimePower <= 0 && qMax > 0) warnings.push('Konstante Lastabnahme ist größer/gleich der kleinsten Teillaststufe; Puffervolumen für Mindestlaufzeit wird 0 l.');
   }
   if(s.calculationMode === 'defrost' || s.calculationMode === 'compare'){

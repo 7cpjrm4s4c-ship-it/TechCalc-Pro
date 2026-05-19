@@ -59,22 +59,23 @@ function glycolFields(s){
 }
 function runtimeInputs(s){
   return card('Mindestlaufzeit Verdichter', grid([
-    field({ id:'qMaxKw', label:'max. Geräte-/Kälte- bzw. Heizleistung Qmax', value:fmtInput(s.qMaxKw,2), unit:'kW' }),
-    field({ id:'partLoadFactor', label:'kleinste Teillaststufe f', value:fmtInput(s.partLoadFactor,3), unit:'%' }),
-    field({ id:'qLoadKw', label:'konstante Lastabnahme QLast', value:fmtInput(s.qLoadKw,2), unit:'kW' }),
-    '<p class="ph-help ph-help--inline span-2"><strong>Kleinste Teillaststufe f:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große Verdichter ⇒ 25 %. Die Berechnung nutzt intern 0,25.</p>',
-    field({ id:'compressorRunTimeMin', label:'Mindestlaufzeit Verdichter', value:fmtInput(s.compressorRunTimeMin,2), unit:'min' }),
-    field({ id:'controllerDeltaT', label:'Schaltdifferenz Regler ΔT', value:fmtInput(s.controllerDeltaT,2), unit:'K' }),
+    field({ id:'qMaxKw', label:'QMax · max. Geräte-/Kälte-/Heizleistung', value:fmtInput(s.qMaxKw,2), unit:'kW' }),
+    field({ id:'partLoadFactor', label:'fTeillast · kleinste Teillaststufe', value:fmtInput(s.partLoadFactor,3), unit:'%' }),
+    field({ id:'qLoadKw', label:'QLast · konstante Lastabnahme', value:fmtInput(s.qLoadKw,2), unit:'kW' }),
+    '<p class="ph-help ph-help--inline span-2"><strong>fTeillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große Verdichter ⇒ 25 %. Die Berechnung nutzt intern 0,25.</p>',
+    '<p class="ph-help ph-help--inline span-2"><strong>QLast:</strong> konstant durch aktive Verbraucher abgenommene Leistung. Falls keine konstante Last vorhanden oder bekannt ist, 0 kW eintragen.</p>',
+    field({ id:'compressorRunTimeMin', label:'TLaufzeit · Mindestlaufzeit Verdichter', value:fmtInput(s.compressorRunTimeMin,2), unit:'min' }),
+    field({ id:'controllerDeltaT', label:'ΔT Hydraulikkreislauf', value:fmtInput(s.controllerDeltaT,2), unit:'K' }),
     field({ id:'existingSystemVolumeL', label:'vorhandener Systeminhalt abziehen', value:fmtInput(s.existingSystemVolumeL,1), unit:'Liter' })
   ].join(''), 2), 'cyan');
 }
 function defrostInputs(s){
   return card('Abtaubetrieb Wärmepumpe', grid([
-    field({ id:'qConsumerKw', label:'Heizleistung aktive Verbraucher QVerbraucher', value:fmtInput(s.qConsumerKw,2), unit:'kW' }),
-    field({ id:'qDefrostKw', label:'Kälteleistung bei Abtauung QKälte', value:fmtInput(s.qDefrostKw,2), unit:'kW' }),
-    field({ id:'qHeatingCircuitKw', label:'Heizleistung verbleibender Kreis QHeiz', value:fmtInput(s.qHeatingCircuitKw,2), unit:'kW' }),
-    field({ id:'maxDefrostTimeMin', label:'maximale Abtauzeit', value:fmtInput(s.maxDefrostTimeMin,2), unit:'min' }),
-    field({ id:'hydraulicDeltaT', label:'zul. ΔT Hydraulikkreis', value:fmtInput(s.hydraulicDeltaT,2), unit:'K' }),
+    field({ id:'qConsumerKw', label:'QVerbraucher · Heizleistung aktive Verbraucher', value:fmtInput(s.qConsumerKw,2), unit:'kW' }),
+    field({ id:'qDefrostKw', label:'QKälte · Kälteleistung bei Abtauung', value:fmtInput(s.qDefrostKw,2), unit:'kW' }),
+    field({ id:'qHeatingCircuitKw', label:'QHeiz · Heizleistung verbleibender Kreis', value:fmtInput(s.qHeatingCircuitKw,2), unit:'kW' }),
+    field({ id:'maxDefrostTimeMin', label:'TMaxAbtauung · maximale Abtauzeit', value:fmtInput(s.maxDefrostTimeMin,2), unit:'min' }),
+    field({ id:'hydraulicDeltaT', label:'ΔT Hydraulikkreislauf', value:fmtInput(s.hydraulicDeltaT,2), unit:'K' }),
     field({ id:'existingSystemVolumeL', label:'vorhandener Systeminhalt abziehen', value:fmtInput(s.existingSystemVolumeL,1), unit:'Liter' })
   ].join(''), 2), 'cyan');
 }
@@ -127,8 +128,8 @@ function view(s){
       { label:'abgezogener Systeminhalt', value:fmt(r.existingSystemVolume,1), unit:'Liter' }
     ], 'cyan'),
     card('Formeln / Plausibilität', stack([
-      '<div class="formula ph-formula">V = ((Qmax × fTeillast − QLast) × Faktor × TLaufzeit) / ΔTRegler</div>',
-      '<div class="formula ph-formula">VAbtau = ((QVerbraucher + QKälte − QHeiz) × Faktor × TAbtauung) / ΔTHydraulik</div>',
+      '<div class="formula ph-formula">V = ((QMax × fTeillast − QLast) × Faktor × TLaufzeit) / ΔTHydraulik</div>',
+      '<div class="formula ph-formula">VAbtau = ((QVerbraucher + QKälte − QHeiz) × Faktor × TMaxAbtauung) / ΔTHydraulik</div>',
       '<div class="formula ph-formula">VWasservorlage = V̇Verbraucher × tÜberbrückung × 1000 / 60</div>',
       warnList(r.warnings)
     ].join('')), 'cyan')
