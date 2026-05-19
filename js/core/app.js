@@ -11,6 +11,9 @@ import drinkingWaterConfig from '../modules/drinking-water/config.js';
 import pressureHoldingConfig from '../modules/pressure-holding/config.js';
 import bufferStorageConfig from '../modules/buffer-storage/config.js';
 import { restoreSessionSnapshot } from './projectStorage.js';
+import { APP_VERSION } from './version.js';
+import { initReleaseNotes } from './releaseNotes.js';
+import { initFeedbackForm } from './feedbackModal.js';
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
@@ -127,6 +130,10 @@ function applyThemeMode(mode = sessionStorage.getItem(THEME_STORAGE_KEY) || 'sys
 
 applyThemeMode();
 
+const appVersionLabel = document.getElementById('appVersion');
+if (appVersionLabel) appVersionLabel.textContent = APP_VERSION;
+initReleaseNotes();
+initFeedbackForm();
 
 // Bind PDF export and project actions as soon as the app is ready.
 // The menu may be opened and a button tapped before lazy initialization has finished.

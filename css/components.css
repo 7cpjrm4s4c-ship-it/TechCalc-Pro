@@ -3906,3 +3906,77 @@ body.settings-open {
     grid-template-columns: 1fr;
   }
 }
+
+/* Release 1.0.1: settings release notes and feedback */
+.release-notes {
+  display: grid;
+  gap: 14px;
+}
+.release-notes__intro,
+.release-notes__policy,
+.release-note-card {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: var(--color-surface-soft);
+}
+.release-notes__policy h3 {
+  margin: 0 0 2px;
+  font-size: .78rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.release-notes__policy p,
+.release-notes__intro p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: .9rem;
+  line-height: 1.35;
+}
+.release-notes__list {
+  display: grid;
+  gap: 10px;
+  max-height: min(44vh, 420px);
+  overflow: auto;
+  padding-right: 4px;
+}
+.release-note-card header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+.release-note-card header span {
+  color: var(--color-muted);
+  font-size: .85rem;
+  white-space: nowrap;
+}
+.release-note-card ul {
+  margin: 0;
+  padding-left: 1.15rem;
+  display: grid;
+  gap: 5px;
+}
+.release-note-card li {
+  color: var(--color-text);
+  font-size: .9rem;
+  line-height: 1.35;
+}
+.feedback-form {
+  display: grid;
+  gap: 12px;
+}
+.feedback-form textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+.feedback-form .optional {
+  color: var(--color-muted);
+  font-size: .78em;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}

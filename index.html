@@ -103,10 +103,34 @@
           </div>
         </details>
 
+
+        <details class="settings-submenu">
+          <summary>Release Notes</summary>
+          <div class="settings-submenu__content settings-form release-notes" id="releaseNotesPanel">
+            <div id="releaseNotesList" aria-live="polite"></div>
+          </div>
+        </details>
+
+        <details class="settings-submenu">
+          <summary>Feedback senden</summary>
+          <div class="settings-submenu__content settings-form">
+            <p>Feedback wird über dein E-Mail-Programm an <strong>stefan.filly@proton.me</strong> vorbereitet.</p>
+            <form id="feedbackForm" class="feedback-form">
+              <label>Name <span class="optional">optional</span><input name="name" type="text" autocomplete="name" placeholder="z. B. Max Mustermann"></label>
+              <label>E-Mail <span class="optional">optional</span><input name="email" type="email" autocomplete="email" placeholder="z. B. max@example.com"></label>
+              <label>Betreff<input name="subject" type="text" value="TechCalc Pro Feedback"></label>
+              <label>Nachricht<textarea name="message" rows="5" placeholder="Feedback, Fehlerbeschreibung oder Verbesserungsvorschlag" required></textarea></label>
+              <div class="settings-actions">
+                <button class="mini-button mini-button--primary" type="submit">Feedback senden</button>
+              </div>
+              <div id="feedbackHint" class="settings-hint" aria-live="polite"></div>
+            </form>
+          </div>
+        </details>
         <details class="settings-submenu">
           <summary>Rechtliches & App</summary>
           <div class="settings-submenu__content settings-form">
-            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.0.0</strong></div>
+            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.0.1</strong></div>
             <button class="mini-button" type="button" disabled>Impressum vorbereiten</button>
             <button class="mini-button" type="button" disabled>AGB vorbereiten</button>
           </div>

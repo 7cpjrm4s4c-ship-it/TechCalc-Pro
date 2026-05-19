@@ -10,6 +10,7 @@ import { state as hxDiagramState } from '../modules/hx-diagram/state.js';
 import { state as drinkingWaterState } from '../modules/drinking-water/state.js';
 import { state as pressureHoldingState } from '../modules/pressure-holding/state.js';
 import { readUsageUnits, writeUsageUnits, readSingleConsumers, writeSingleConsumers } from '../modules/drinking-water/logic.js';
+import { APP_VERSION } from './version.js';
 
 const DEFAULT_META = {
   client: '',
@@ -76,6 +77,7 @@ export function collectProjectData() {
     app: 'TechCalc Pro',
     format: 'techcalc-project',
     version: 1,
+    appVersion: APP_VERSION,
     savedAt: new Date().toISOString(),
     meta: getProjectMeta(),
     modules: {
