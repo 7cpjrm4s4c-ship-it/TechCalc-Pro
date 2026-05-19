@@ -57,33 +57,36 @@ function glycolFields(s){
     selectField({ id:'glycolConcentration', label:'Konzentration', value:s.glycolConcentration, options:concentrations.map(v => ({ value:v, label:`${v} %` })) })
   ].join(''), 2);
 }
+function bufferInputGrid(content, modifier = ''){
+  return `<div class="buffer-input-grid ${modifier}">${content}</div>`;
+}
 function runtimeInputs(s){
-  return card('Mindestlaufzeit Verdichter', grid([
+  return card('Mindestlaufzeit Verdichter', bufferInputGrid([
     field({ id:'qMaxKw', label:'QMax · max. Geräte-/Kälte-/Heizleistung', value:fmtInput(s.qMaxKw,2), unit:'kW' }),
     field({ id:'compressorRunTimeMin', label:'TLaufzeit · Mindestlaufzeit Verdichter', value:fmtInput(s.compressorRunTimeMin,2), unit:'min' }),
     field({ id:'qLoadKw', label:'QLast · konstante Lastabnahme', value:fmtInput(s.qLoadKw,2), unit:'kW' }),
     field({ id:'partLoadFactor', label:'Teillast · kleinste Teillaststufe', value:fmtInput(s.partLoadFactor,3), unit:'%' }),
-    '<p class="ph-help ph-help--inline span-2"><strong>Teillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große Verdichter ⇒ 25 %. Die Berechnung nutzt intern 0,25.</p>',
-    '<p class="ph-help ph-help--inline span-2"><strong>QLast:</strong> konstant durch aktive Verbraucher abgenommene Leistung. Falls keine konstante Last vorhanden oder bekannt ist, 0 kW eintragen.</p>',
     field({ id:'controllerDeltaT', label:'ΔT Hydraulikkreislauf', value:fmtInput(s.controllerDeltaT,2), unit:'K' }),
-    field({ id:'existingSystemVolumeL', label:'vorhandener Systeminhalt abziehen', value:fmtInput(s.existingSystemVolumeL,1), unit:'Liter' })
-  ].join(''), 2), 'cyan');
+    field({ id:'existingSystemVolumeL', label:'vorhandener Systeminhalt abziehen', value:fmtInput(s.existingSystemVolumeL,1), unit:'Liter' }),
+    '<p class="ph-help ph-help--inline buffer-help"><strong>Teillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große Verdichter ⇒ 25 %. Die Berechnung nutzt intern 0,25.</p>',
+    '<p class="ph-help ph-help--inline buffer-help"><strong>QLast:</strong> konstant durch aktive Verbraucher abgenommene Leistung. Falls keine konstante Last vorhanden oder bekannt ist, 0 kW eintragen.</p>'
+  ].join(''), 'buffer-input-grid--runtime'), 'cyan');
 }
 function defrostInputs(s){
-  return card('Abtaubetrieb Wärmepumpe', grid([
+  return card('Abtaubetrieb Wärmepumpe', bufferInputGrid([
     field({ id:'qConsumerKw', label:'QVerbraucher · Heizleistung aktive Verbraucher', value:fmtInput(s.qConsumerKw,2), unit:'kW' }),
     field({ id:'qDefrostKw', label:'QKälte · Kälteleistung bei Abtauung', value:fmtInput(s.qDefrostKw,2), unit:'kW' }),
     field({ id:'qHeatingCircuitKw', label:'QHeiz · Heizleistung verbleibender Kreis', value:fmtInput(s.qHeatingCircuitKw,2), unit:'kW' }),
     field({ id:'maxDefrostTimeMin', label:'TMaxAbtauung · maximale Abtauzeit', value:fmtInput(s.maxDefrostTimeMin,2), unit:'min' }),
     field({ id:'hydraulicDeltaT', label:'ΔT Hydraulikkreislauf', value:fmtInput(s.hydraulicDeltaT,2), unit:'K' }),
     field({ id:'existingSystemVolumeL', label:'vorhandener Systeminhalt abziehen', value:fmtInput(s.existingSystemVolumeL,1), unit:'Liter' })
-  ].join(''), 2), 'cyan');
+  ].join(''), 'buffer-input-grid--defrost'), 'cyan');
 }
 function reserveInputs(s){
-  return card('Wasservorlage als Kälte- / Wärmespeicher', grid([
+  return card('Wasservorlage als Kälte- / Wärmespeicher', bufferInputGrid([
     field({ id:'consumerFlowM3h', label:'Volumenstrom Verbraucher', value:fmtInput(s.consumerFlowM3h,3), unit:'m³/h' }),
     field({ id:'bridgeTimeMin', label:'Überbrückungszeit', value:fmtInput(s.bridgeTimeMin,2), unit:'min' })
-  ].join(''), 2), 'cyan');
+  ].join(''), 'buffer-input-grid--reserve'), 'cyan');
 }
 function inputBlocks(s){
   if(s.calculationMode === 'compare') return [runtimeInputs(s), defrostInputs(s), reserveInputs(s)].join('');
