@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-v34-buffer-storage3';
+const CACHE_NAME = 'techcalc-pro-v34-puffer-layout-fix3';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',

@@ -60,11 +60,11 @@ function glycolFields(s){
 function runtimeInputs(s){
   return card('Mindestlaufzeit Verdichter', grid([
     field({ id:'qMaxKw', label:'QMax · max. Geräte-/Kälte-/Heizleistung', value:fmtInput(s.qMaxKw,2), unit:'kW' }),
-    field({ id:'partLoadFactor', label:'fTeillast · kleinste Teillaststufe', value:fmtInput(s.partLoadFactor,3), unit:'%' }),
-    field({ id:'qLoadKw', label:'QLast · konstante Lastabnahme', value:fmtInput(s.qLoadKw,2), unit:'kW' }),
-    '<p class="ph-help ph-help--inline span-2"><strong>fTeillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große Verdichter ⇒ 25 %. Die Berechnung nutzt intern 0,25.</p>',
-    '<p class="ph-help ph-help--inline span-2"><strong>QLast:</strong> konstant durch aktive Verbraucher abgenommene Leistung. Falls keine konstante Last vorhanden oder bekannt ist, 0 kW eintragen.</p>',
     field({ id:'compressorRunTimeMin', label:'TLaufzeit · Mindestlaufzeit Verdichter', value:fmtInput(s.compressorRunTimeMin,2), unit:'min' }),
+    field({ id:'qLoadKw', label:'QLast · konstante Lastabnahme', value:fmtInput(s.qLoadKw,2), unit:'kW' }),
+    field({ id:'partLoadFactor', label:'Teillast · kleinste Teillaststufe', value:fmtInput(s.partLoadFactor,3), unit:'%' }),
+    '<p class="ph-help ph-help--inline span-2"><strong>Teillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große Verdichter ⇒ 25 %. Die Berechnung nutzt intern 0,25.</p>',
+    '<p class="ph-help ph-help--inline span-2"><strong>QLast:</strong> konstant durch aktive Verbraucher abgenommene Leistung. Falls keine konstante Last vorhanden oder bekannt ist, 0 kW eintragen.</p>',
     field({ id:'controllerDeltaT', label:'ΔT Hydraulikkreislauf', value:fmtInput(s.controllerDeltaT,2), unit:'K' }),
     field({ id:'existingSystemVolumeL', label:'vorhandener Systeminhalt abziehen', value:fmtInput(s.existingSystemVolumeL,1), unit:'Liter' })
   ].join(''), 2), 'cyan');
@@ -128,7 +128,7 @@ function view(s){
       { label:'abgezogener Systeminhalt', value:fmt(r.existingSystemVolume,1), unit:'Liter' }
     ], 'cyan'),
     card('Formeln / Plausibilität', stack([
-      '<div class="formula ph-formula">V = ((QMax × fTeillast − QLast) × Faktor × TLaufzeit) / ΔTHydraulik</div>',
+      '<div class="formula ph-formula">V = ((QMax × Teillast − QLast) × Faktor × TLaufzeit) / ΔTHydraulik</div>',
       '<div class="formula ph-formula">VAbtau = ((QVerbraucher + QKälte − QHeiz) × Faktor × TMaxAbtauung) / ΔTHydraulik</div>',
       '<div class="formula ph-formula">VWasservorlage = V̇Verbraucher × tÜberbrückung × 1000 / 60</div>',
       warnList(r.warnings)

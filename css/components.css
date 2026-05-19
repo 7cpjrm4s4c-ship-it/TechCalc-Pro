@@ -3862,3 +3862,46 @@ body.settings-open {
     font-size: clamp(9px, 2.35vw, 11px);
   }
 }
+
+/* Buffer storage responsive input layout fixes */
+.module-view[data-module='buffer-storage'] .tc-fields {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  align-items: start;
+}
+.module-view[data-module='buffer-storage'] .tc-fields > * {
+  min-width: 0;
+}
+.module-view[data-module='buffer-storage'] .span-2 {
+  grid-column: 1 / -1;
+}
+.module-view[data-module='buffer-storage'] .field label {
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+.module-view[data-module='buffer-storage'] .control {
+  min-height: 50px;
+}
+.module-view[data-module='buffer-storage'] .control input,
+.module-view[data-module='buffer-storage'] .control select {
+  height: 48px;
+}
+@media (max-width: 1280px) {
+  .module-view[data-module='buffer-storage'] .tc-fields {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  }
+  .module-view[data-module='buffer-storage'] .field label {
+    font-size: 11px;
+    letter-spacing: 1.2px;
+  }
+}
+@media (max-width: 1100px) {
+  .module-view[data-module='buffer-storage'] .tc-fields {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 767px) {
+  .module-view[data-module='buffer-storage'] .tc-fields {
+    grid-template-columns: 1fr;
+  }
+}
