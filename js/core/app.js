@@ -11,9 +11,6 @@ import drinkingWaterConfig from '../modules/drinking-water/config.js';
 import pressureHoldingConfig from '../modules/pressure-holding/config.js';
 import bufferStorageConfig from '../modules/buffer-storage/config.js';
 import { restoreSessionSnapshot } from './projectStorage.js';
-import { APP_VERSION } from './version.js';
-import { initReleaseNotes } from './releaseNotes.js';
-import { initFeedbackForm } from './feedbackModal.js';
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
@@ -130,9 +127,82 @@ function applyThemeMode(mode = sessionStorage.getItem(THEME_STORAGE_KEY) || 'sys
 
 applyThemeMode();
 
-const appVersionLabel = document.getElementById('appVersion');
-if (appVersionLabel) appVersionLabel.textContent = APP_VERSION;
-initReleaseNotes();
+const APP_VERSION = '1.0.2';
+const FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
+const FEEDBACK_RECIPIENT = 'stefan.filly@proton.me';
+
+function initFeedbackForm() {
+  const form = document.getElementById('feedbackForm');
+  if (!form) return;
+  const status = document.getElementById('feedbackStatus');
+  const submit = document.getElementById('feedbackSubmit');
+  const mailto = document.getElementById('feedbackMailto');
+
+  function setStatus(message, type = '') {
+    if (!status) return;
+    status.textContent = message;
+    status.dataset.type = type;
+  }
+
+  function buildPayload() {
+    const data = new FormData(form);
+    data.set('version', APP_VERSION);
+    data.set('route', currentRoute());
+    data.set('userAgent', navigator.userAgent || '');
+    data.set('timestamp', new Date().toISOString());
+    return data;
+  }
+
+  function openMailFallback() {
+    const data = buildPayload();
+    const subject = data.get('subject') || 'TechCalc Pro Feedback';
+    const lines = [
+      data.get('message') || '',
+      '',
+      '---',
+      `Name: ${data.get('name') || '-'}`,
+      `E-Mail: ${data.get('email') || '-'}`,
+      `Version: ${APP_VERSION}`,
+      `Modul: ${currentRoute()}`,
+      `Zeitpunkt: ${new Date().toLocaleString('de-DE')}`
+    ];
+    const href = `mailto:${FEEDBACK_RECIPIENT}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
+    window.location.href = href;
+  }
+
+  mailto?.addEventListener('click', openMailFallback);
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    setStatus('', '');
+    if (!form.reportValidity()) return;
+
+    submit.disabled = true;
+    submit.textContent = 'Sende …';
+    setStatus('Feedback wird gesendet …', 'pending');
+
+    try {
+      const response = await fetch(FEEDBACK_ENDPOINT, {
+        method: 'POST',
+        body: buildPayload(),
+        headers: { Accept: 'application/json' }
+      });
+
+      if (!response.ok) throw new Error(`Formspree HTTP ${response.status}`);
+      form.reset();
+      const subject = document.getElementById('feedbackSubject');
+      if (subject) subject.value = 'TechCalc Pro Feedback';
+      setStatus('Feedback wurde gesendet. Danke!', 'success');
+    } catch (error) {
+      console.error('Feedback konnte nicht gesendet werden:', error);
+      setStatus('Feedback konnte nicht direkt gesendet werden. Bitte E-Mail-Fallback nutzen.', 'error');
+    } finally {
+      submit.disabled = false;
+      submit.textContent = 'Feedback senden';
+    }
+  });
+}
+
 initFeedbackForm();
 
 // Bind PDF export and project actions as soon as the app is ready.
