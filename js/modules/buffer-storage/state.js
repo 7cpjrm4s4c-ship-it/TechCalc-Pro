@@ -10,7 +10,7 @@ export const state = createModuleState({
   partLoadFactor: '0.25',
   qLoadKw: '0',
   compressorRunTimeMin: '1',
-  controllerDeltaT: '1.25',
+  controllerDeltaT: '5',
   existingSystemVolumeL: '0',
   qConsumerKw: '',
   qDefrostKw: '',
