@@ -5,7 +5,7 @@ import { MEDIA, fmt, fmtInput } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, pressureBadge } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
-import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindSavedRecordList } from '../../core/savedRecords.js';
+import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
 
 const MODE_PREFIX = {
   heating: 'heating',
@@ -158,6 +158,7 @@ function buildLineSectionRecord(currentState, r, items, id, name, existing = nul
 }
 
 function bindLineSections(root, r, rerender) {
+  bindEditModeClear(root, { state, activeIdKey: 'activeLineSectionId', nameKey: 'activeLineSectionName' });
   const saveBtn = root.querySelector('[data-line-save]');
   const updateBtn = root.querySelector('[data-line-update]');
   saveBtn?.addEventListener('click', (event) => {

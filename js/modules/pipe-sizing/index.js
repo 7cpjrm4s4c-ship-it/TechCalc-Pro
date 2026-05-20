@@ -5,7 +5,7 @@ import { card, field, selectField, resultRows, renderModuleShell, stack, grid, i
 import { mountModule } from '../../core/mount.js';
 import { fmt } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
-import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindSavedRecordList } from '../../core/savedRecords.js';
+import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
 
 
 function pipeSnapshot(s, r){
@@ -18,7 +18,7 @@ function pipeSnapshot(s, r){
     state: copy,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    result: r && !r.noDimension ? { system: r.system?.label, dn: r.dn, velocity: r.velocity, pressureLoss: r.pressureLoss } : {}
+    result: r && !r.noDimension ? { system: r.system?.label, dn: r.dn, velocity: r.velocity, pressureLoss: r.pressureLoss, massFlowKgh: s.flowUnit === 'kg/h' ? s.flowValue : s.massFlowKgh, volumeFlowM3h: s.flowUnit === 'm³/h' ? s.flowValue : s.volumeFlowM3h } : { massFlowKgh: s.flowUnit === 'kg/h' ? s.flowValue : s.massFlowKgh, volumeFlowM3h: s.flowUnit === 'm³/h' ? s.flowValue : s.volumeFlowM3h }
   };
 }
 function savedPipeRows(s){
@@ -33,7 +33,9 @@ function savedPipeRows(s){
     stats: item => [
       {label:'System', value:item.result?.system || '—'},
       {label:'Dimension', value:item.result?.dn ? `DN ${item.result.dn}` : '—'},
-      {label:'Druckverlust', value:item.result?.pressureLoss ? fmt(item.result.pressureLoss) : '—', unit:item.result?.pressureLoss ? 'Pa/m' : ''}
+      {label:'Druckverlust', value:item.result?.pressureLoss ? fmt(item.result.pressureLoss) : '—', unit:item.result?.pressureLoss ? 'Pa/m' : ''},
+      {label:'Massenstrom', value:item.result?.massFlowKgh || '—', unit:item.result?.massFlowKgh ? 'kg/h' : ''},
+      {label:'Volumenstrom', value:item.result?.volumeFlowM3h || '—', unit:item.result?.volumeFlowM3h ? 'm³/h' : ''}
     ]
   });
 }

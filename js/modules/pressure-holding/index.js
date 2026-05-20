@@ -4,6 +4,7 @@ import { calculate } from './logic.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, resultRows, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
+import { bindEditModeClear } from '../../core/savedRecords.js';
 
 const opts = (items) => items.map(([value,label]) => ({ value, label }));
 
@@ -150,6 +151,7 @@ function view(s){
 }
 
 function bindPressureHoldingActions(root, snapshot){
+  bindEditModeClear(root, { state, activeIdKey: 'activePlantId', nameKey: 'plantName' });
   root.querySelector('[data-ph-save]')?.addEventListener('click', () => {
     const current = state.get();
     const result = calculate(current);

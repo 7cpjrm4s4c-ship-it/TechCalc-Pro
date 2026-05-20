@@ -81,3 +81,22 @@ export function bindSavedRecordList(root, {
     });
   });
 }
+
+
+export function bindEditModeClear(root, {
+  state,
+  activeIdKey,
+  nameKey,
+  clearPatch = {},
+  ignoreSelector = ''
+} = {}) {
+  if (!root || !state || !activeIdKey) return;
+  root.addEventListener('click', event => {
+    const current = state.get ? state.get() : {};
+    if (!current?.[activeIdKey]) return;
+    const baseIgnore = '[data-line-card], .saved-record-card, .line-section-card, .tc-save-actions, input, select, textarea, button, label, .segmented, .segmented button';
+    const selector = ignoreSelector ? `${baseIgnore}, ${ignoreSelector}` : baseIgnore;
+    if (event.target.closest(selector)) return;
+    state.set({ [activeIdKey]: null, ...(nameKey ? { [nameKey]: '' } : {}), ...clearPatch });
+  });
+}

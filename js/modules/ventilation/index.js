@@ -4,7 +4,7 @@ import { calculate } from './logic.js';
 import { card, field, segmented, renderModuleShell, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindSavedRecordList } from '../../core/savedRecords.js';
+import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
 
 const MODE_PREFIX = { heating: 'heating', cooling: 'cooling' };
 function prefixFor(s) { return MODE_PREFIX[s.mode] || 'heating'; }
@@ -68,6 +68,7 @@ function buildVentilationLineSectionRecord(currentState, r, active, modeLabel, i
 }
 
 function bindVentilationLineSections(root, r, active, modeLabel, rerender) {
+  bindEditModeClear(root, { state, activeIdKey: 'activeVentLineSectionId', nameKey: 'activeVentLineSectionName' });
   root.querySelector('[data-vent-line-save]')?.addEventListener('click', event => {
     event.preventDefault();
     const name = root.querySelector('#ventLineSectionName')?.value?.trim() || '';

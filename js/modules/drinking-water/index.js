@@ -348,6 +348,14 @@ function bindDrinkingWater(root) {
         root.innerHTML = view(state.get());
       }
     }
+
+
+    const current = state.get();
+    const ignored = event.target.closest('[data-dw-unit-edit], [data-dw-single-edit], [data-dw-unit-delete], [data-dw-single-delete], [data-dw-add-unit], [data-dw-update-unit], [data-dw-add-single], [data-dw-update-single], [data-dw-draft-add], [data-dw-remove-draft], details, summary, input, select, textarea, button, label, .segmented');
+    if (!ignored && (current.activeUnitId || current.activeSingleId)) {
+      state.set({ activeUnitId:null, activeSingleId:null, unitName:'', singleName:'', unitDraftConsumers:[], singleDraftConsumers:[] }, { notify:false });
+      root.innerHTML = view(state.get());
+    }
   });
 }
 
