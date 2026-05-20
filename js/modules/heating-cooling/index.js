@@ -135,44 +135,60 @@ function lineSectionsCard(r) {
     : '<div class="empty-state empty-state--compact">Noch keine Leitungsabschnitte angelegt</div>';
   return card('Leitungsabschnitte', stack([
     `<div class="field"><label for="lineSectionName">Bezeichnung</label><div class="control"><input id="lineSectionName" type="text" placeholder="z. B. Verteilerabgang Nord" autocomplete="off" value="${(state.get().activeLineSectionName || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></div></div>`,
-    `<button type="button" class="action-button" data-line-add>${state.get().activeLineSectionId ? 'Abschnitt aktualisieren' : 'Abschnitt speichern'}</button>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-line-save ${state.get().activeLineSectionId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-line-update ${state.get().activeLineSectionId ? '' : 'disabled'}>Aktualisieren</button></div>`,
     rows
   ].join('')), 'blue');
 }
 
+function buildLineSectionRecord(currentState, r, items, id, name, existing = null) {
+  return {
+    id,
+    name: name || currentState.activeLineSectionName || existing?.name || `Abschnitt ${items.length + 1}`,
+    powerKw: fmt(r.powerKw),
+    massFlowKgh: fmt(r.massFlowKgh),
+    volumeFlowM3h: fmt(r.volumeFlowM3h, 3),
+    deltaT: fmt(r.deltaT),
+    medium: r.medium?.label || '—',
+    pipeDn: r.pipe && !r.pipe.noDimension ? `DN ${r.pipe.dn}` : '—',
+    pipeDimension: r.pipe && !r.pipe.noDimension ? (r.pipe.dimension ? `Ø ${r.pipe.dimension} mm` : `di ${fmt(r.pipe.di, 1)} mm`) : '—',
+    pipeMaterial: r.pipe && !r.pipe.noDimension ? r.pipe.system.label : '—',
+    pipeVelocity: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.velocity) : '—',
+    pipePressureLoss: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.pressureLoss) : '—',
+    inputState: activeCalculationState(currentState),
+    uiState: { mode: currentState.mode, mediumId: currentState.mediumId, pipeSystemId: currentState.pipeSystemId },
+    createdAt: existing?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+}
+
 function bindLineSections(root, r, rerender) {
-  const btn = root.querySelector('[data-line-add]');
-  if (btn) {
-    btn.addEventListener('click', (event) => {
-      event.preventDefault();
-      const name = root.querySelector('#lineSectionName')?.value?.trim() || '';
-      const currentState = state.get();
-      const items = readLineSections();
-      const id = currentState.activeLineSectionId || Date.now();
-      const item = {
-        id,
-        name: name || currentState.activeLineSectionName || `Abschnitt ${items.length + 1}`,
-        powerKw: fmt(r.powerKw),
-        massFlowKgh: fmt(r.massFlowKgh),
-        volumeFlowM3h: fmt(r.volumeFlowM3h, 3),
-        deltaT: fmt(r.deltaT),
-        medium: r.medium?.label || '—',
-        pipeDn: r.pipe && !r.pipe.noDimension ? `DN ${r.pipe.dn}` : '—',
-        pipeDimension: r.pipe && !r.pipe.noDimension ? (r.pipe.dimension ? `Ø ${r.pipe.dimension} mm` : `di ${fmt(r.pipe.di, 1)} mm`) : '—',
-        pipeMaterial: r.pipe && !r.pipe.noDimension ? r.pipe.system.label : '—',
-        pipeVelocity: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.velocity) : '—',
-        pipePressureLoss: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.pressureLoss) : '—',
-        inputState: activeCalculationState(currentState),
-        uiState: { mode: currentState.mode, mediumId: currentState.mediumId, pipeSystemId: currentState.pipeSystemId },
-        createdAt: currentState.activeLineSectionId ? (items.find(x => x.id === id)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      const next = currentState.activeLineSectionId ? items.map(existing => existing.id === id ? item : existing) : [item, ...items];
-      writeLineSections(next);
-      state.set({ activeLineSectionId: id, activeLineSectionName: item.name }, { notify:false });
-      if (typeof rerender === 'function') rerender();
-    });
-  }
+  const saveBtn = root.querySelector('[data-line-save]');
+  const updateBtn = root.querySelector('[data-line-update]');
+  saveBtn?.addEventListener('click', (event) => {
+    event.preventDefault();
+    const name = root.querySelector('#lineSectionName')?.value?.trim() || '';
+    const currentState = state.get();
+    const items = readLineSections();
+    const id = (globalThis.crypto?.randomUUID?.() || `line-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    const item = buildLineSectionRecord({ ...currentState, activeLineSectionId: null, activeLineSectionName: name }, r, items, id, name);
+    writeLineSections([item, ...items]);
+    state.set({ activeLineSectionId: null, activeLineSectionName: '' }, { notify:false });
+    if (typeof rerender === 'function') rerender();
+  });
+  updateBtn?.addEventListener('click', (event) => {
+    event.preventDefault();
+    const currentState = state.get();
+    const id = currentState.activeLineSectionId;
+    if (!id) return;
+    const name = root.querySelector('#lineSectionName')?.value?.trim() || '';
+    const items = readLineSections();
+    const existing = items.find(x => String(x.id) === String(id));
+    if (!existing) return;
+    const item = buildLineSectionRecord(currentState, r, items, id, name, existing);
+    writeLineSections(items.map(entry => String(entry.id) === String(id) ? item : entry));
+    state.set({ activeLineSectionId: id, activeLineSectionName: item.name }, { notify:false });
+    if (typeof rerender === 'function') rerender();
+  });
   root.querySelectorAll('[data-line-toggle]').forEach(toggle => {
     toggle.addEventListener('click', () => {
       const card = toggle.closest('[data-line-card]');

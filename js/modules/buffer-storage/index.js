@@ -41,13 +41,13 @@ function savedRows(items = []){
   return `<div class="ph-saved-list">${items.map(item => {
     const res = item.result || {};
     const subtitle = [modeLabel(res.mode), res.standard ? `${fmt(res.standard,0)} l` : '', res.medium].filter(Boolean).join(' · ');
-    return `<article class="ph-saved-item"><div><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle)}</small></div><div class="ph-saved-actions"><button type="button" class="mini-button" data-buffer-load="${esc(item.id)}">Bearbeiten</button><button type="button" class="mini-button mini-button--danger" data-buffer-delete="${esc(item.id)}">Löschen</button></div></article>`;
+    return `<article class="ph-saved-item ${state.get().activeCalculationId === item.id ? 'is-active' : ''}" data-buffer-load="${esc(item.id)}"><div><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle)}</small></div><div class="ph-saved-actions"><button type="button" class="mini-button mini-button--danger" data-buffer-delete="${esc(item.id)}">Löschen</button></div></article>`;
   }).join('')}</div>`;
 }
 function savedCard(s){
   return card('Berechnung speichern', stack([
     field({ id:'plantName', label:'Bezeichnung', value:s.plantName || '', placeholder:'z. B. Kaltwassersatz BT A', inputmode:'text' }),
-    `<div class="tc-actions"><button type="button" class="action-button" data-buffer-save>${s.activeCalculationId ? 'Berechnung aktualisieren' : 'Berechnung speichern'}</button></div>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-buffer-save ${s.activeCalculationId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-buffer-update ${s.activeCalculationId ? '' : 'disabled'}>Aktualisieren</button></div>`,
     savedRows(Array.isArray(s.savedCalculations) ? s.savedCalculations : [])
   ].join('')), 'cyan');
 }
@@ -142,17 +142,28 @@ function view(s){
 
   return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6">${resultColumn}</div>`);
 }
-function bindActions(root){
+function bindActions(root, snapshot){
   root.querySelector('[data-buffer-save]')?.addEventListener('click', () => {
     const current = state.get();
     const result = calculate(current);
     const saved = Array.isArray(current.savedCalculations) ? current.savedCalculations : [];
-    const record = savedSnapshot(current, result);
-    const next = current.activeCalculationId ? saved.map(item => String(item.id) === String(record.id) ? record : item) : [record, ...saved];
-    state.set({ savedCalculations: next, activeCalculationId: record.id, plantName: record.name });
+    const record = savedSnapshot({ ...current, activeCalculationId: null }, result);
+    state.set({ savedCalculations: [record, ...saved], activeCalculationId: null, plantName: '' });
+  });
+  root.querySelector('[data-buffer-update]')?.addEventListener('click', () => {
+    const current = state.get();
+    const id = current.activeCalculationId;
+    if(!id) return;
+    const result = calculate(current);
+    const saved = Array.isArray(current.savedCalculations) ? current.savedCalculations : [];
+    const existing = saved.find(entry => String(entry.id) === String(id));
+    if(!existing) return;
+    const record = { ...savedSnapshot(current, result), id, createdAt: existing.createdAt || new Date().toISOString() };
+    state.set({ savedCalculations: saved.map(item => String(item.id) === String(id) ? record : item), activeCalculationId: id, plantName: record.name });
   });
   root.querySelectorAll('[data-buffer-load]').forEach(button => {
-    button.addEventListener('click', () => {
+    button.addEventListener('click', event => {
+      if (event.target.closest('[data-buffer-delete]')) return;
       const current = state.get();
       const item = (current.savedCalculations || []).find(entry => String(entry.id) === String(button.dataset.bufferLoad));
       if(!item?.state) return;

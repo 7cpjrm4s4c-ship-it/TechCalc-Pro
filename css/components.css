@@ -3960,3 +3960,34 @@ body.settings-open {
 #feedbackStatus[data-type="success"] { color: var(--accent-green, #63d471); }
 #feedbackStatus[data-type="error"] { color: var(--accent-red, #ff6b6b); }
 #feedbackStatus[data-type="pending"] { color: var(--accent-blue, #35aaff); }
+
+/* v1.0.5: unified saved-record CRUD actions */
+.tc-save-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-gap);
+}
+.tc-save-actions .action-button[disabled],
+.tc-action[disabled] {
+  opacity: .45;
+  cursor: not-allowed;
+  filter: grayscale(.35);
+}
+.line-section-card.is-active,
+.ph-saved-item.is-active,
+.hx-history__row.is-active,
+.dw-saved-row.is-active {
+  border-color: color-mix(in srgb, var(--accent-blue) 72%, transparent) !important;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-blue) 30%, transparent), 0 0 18px color-mix(in srgb, var(--accent-blue) 12%, transparent);
+}
+.line-section-card__delete,
+.mini-button--danger,
+.dw-delete-button,
+[data-hx-remove-process] {
+  border-color: rgba(255, 82, 82, .55) !important;
+  color: #ffb3b3 !important;
+  background: rgba(255, 82, 82, .10) !important;
+}
+@media (max-width: 560px) {
+  .tc-save-actions { grid-template-columns: 1fr; }
+}

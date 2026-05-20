@@ -41,7 +41,7 @@ function inputCard(s) {
       field({ id: 'targetRhPercent', label: 'Relative Zielfeuchte φ', unit: '%', value: fmtInput(s.targetRhPercent, 2) })
     ].join(''), 2), 'cyan', { compact: true }),
     processCard(s),
-    `<div class="tc-actions">${actionButton(s.activeProcessId ? 'Prozess aktualisieren' : 'Prozess speichern', 'data-hx-add')} ${actionButton('Diagramm leeren', 'data-hx-clear', 'tc-action--ghost')}</div>`
+    `<div class="tc-save-actions">${actionButton('Speichern', s.activeProcessId ? 'data-hx-add disabled' : 'data-hx-add')} ${actionButton('Aktualisieren', s.activeProcessId ? 'data-hx-update' : 'data-hx-update disabled')}</div><div class="tc-actions">${actionButton('Diagramm leeren', 'data-hx-clear', 'tc-action--ghost')}</div>`
   ].join('')), 'cyan');
 }
 
@@ -91,7 +91,7 @@ function historyCard(processes, activeProcessId) {
       return `<div class="hx-history__row hx-history__row--process ${selected ? 'is-active' : ''}" data-hx-select-process="${esc(process.id)}">
         <div><strong>${esc(index + 1)}. ${esc(process.label)}</strong><small>${esc(process.processLabel || process.process)} · ${process.path?.length || 0} Punkte</small></div>
         <div class="hx-history__values"><span>θt ${hxFmt(last?.tempC, 2)} °C</span><span>φ ${hxFmt(last?.rhPercent, 0)} % r.F.</span></div>
-        <button type="button" class="mini-button mini-button--text" data-hx-remove-process="${esc(process.id)}" aria-label="Prozess entfernen">Entfernen</button>
+        <button type="button" class="mini-button mini-button--danger" data-hx-remove-process="${esc(process.id)}" aria-label="Prozess löschen">Löschen</button>
       </div>`;
     }).join('')}
   </div>` : '<div class="empty-state">Noch keine Prozesse gespeichert</div>';
@@ -228,7 +228,7 @@ export default {
 
       rootEl.querySelectorAll('[data-segment="process"]').forEach(button => {
         button.addEventListener('click', () => {
-          state.set({ process: button.dataset.value, activePath: [], points: [] });
+          state.set({ process: button.dataset.value, activeProcessId: null, activePath: [], points: [] });
         });
       });
 
@@ -237,16 +237,31 @@ export default {
           const id = button.dataset.hxSign;
           const input = rootEl.querySelector(`[data-field="${id}"]`);
           const next = toggleNumericSign(input?.value);
-          state.set({ [id]: next, activePath: [], points: [] });
+          state.set({ [id]: next, activeProcessId: null, activePath: [], points: [] });
         });
       });
 
       rootEl.querySelector('[data-hx-add]')?.addEventListener('click', () => {
-        const s = state.get();
+        const s = { ...state.get(), activeProcessId: null };
         const result = calculate(s);
         const record = makeProcessRecord({ input: s, result });
-        const existingIndex = (s.processes ?? []).findIndex(item => item.id === record.id);
-        const processes = existingIndex >= 0 ? (s.processes ?? []).map(item => item.id === record.id ? record : item) : [record, ...(s.processes ?? [])];
+        const processes = [record, ...(s.processes ?? [])];
+        saveProcesses(processes);
+        clearLegacyPoints();
+        state.set({
+          processes,
+          activeProcessId: null,
+          activePath: [],
+          points: []
+        });
+      });
+
+      rootEl.querySelector('[data-hx-update]')?.addEventListener('click', () => {
+        const s = state.get();
+        if (!s.activeProcessId) return;
+        const result = calculate(s);
+        const record = makeProcessRecord({ input: s, result });
+        const processes = (s.processes ?? []).map(item => item.id === s.activeProcessId ? record : item);
         saveProcesses(processes);
         clearLegacyPoints();
         state.set({

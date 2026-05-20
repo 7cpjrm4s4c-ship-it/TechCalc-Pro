@@ -65,6 +65,7 @@ function bindProjectInput(id, key) {
   el.addEventListener('change', () => setProjectMeta({ [key]: el.value }));
 }
 
+
 function updateOpenedProjectLabel() {
   const label = document.getElementById('projectFileLabel');
   if (!label) return;
@@ -81,6 +82,7 @@ function initProjectSettings() {
   bindProjectInput('pdfProject', 'project');
   bindProjectInput('pdfProjectNo', 'projectNo');
   bindProjectInput('pdfEngineer', 'engineer');
+
 
   document.getElementById('saveProjectButton')?.addEventListener('click', event => {
     event.preventDefault();
@@ -123,6 +125,9 @@ function hydrateProjectForm(data = {}) {
   setInputValue('pdfProject', data.project);
   setInputValue('pdfProjectNo', data.projectNo);
   setInputValue('pdfEngineer', data.engineer);
+  setInputValue('pdfDate', data.date);
+  const file = document.getElementById('pdfLogo');
+  if (file) file.value = '';
 }
 
 function textOf(node) {

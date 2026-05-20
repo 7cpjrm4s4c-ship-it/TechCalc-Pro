@@ -40,38 +40,55 @@ function rltDeviceCard(r, s) {
     : '<div class="empty-state empty-state--compact">Noch keine RLT-Geräte angelegt</div>';
   return card('RLT-Geräte', stack([
     `<div class="field"><label for="rltDeviceName">Bezeichnung</label><div class="control"><input id="rltDeviceName" type="text" placeholder="z. B. RLT Büro EG" autocomplete="off" value="${esc(state.get().activeRltDeviceName || '')}"></div></div>`,
-    `<button type="button" class="action-button" data-rlt-add>${state.get().activeRltDeviceId ? 'RLT-Gerät aktualisieren' : 'RLT-Gerät speichern'}</button>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-rlt-save ${state.get().activeRltDeviceId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-rlt-update ${state.get().activeRltDeviceId ? '' : 'disabled'}>Aktualisieren</button></div>`,
     rows
   ].join('')), 'cyan');
 }
 
+function buildRltDeviceRecord(r, s, items, id, name, existing = null) {
+  const isMixing = s.mode === 'mixing';
+  const inputState = { ...s };
+  delete inputState.activeRltDeviceId;
+  delete inputState.activeRltDeviceName;
+  return {
+    id,
+    name: name || s.activeRltDeviceName || existing?.name || `RLT-Gerät ${items.length + 1}`,
+    mode: isMixing ? 'Mischluft' : 'WRG',
+    volumeFlowM3h: isMixing ? fmt(r.mixed?.volumeFlowM3h, 0) : fmt(s.wrgVolumeFlowM3h, 0),
+    outdoor: `${fmt(isMixing ? s.mixingOutdoorTemp : s.outdoorTemp, 2)} °C / ${fmt(isMixing ? s.mixingOutdoorRh : s.outdoorRh, 0)} %`,
+    extract: `${fmt(isMixing ? s.mixingRecircTemp : s.extractTemp, 2)} °C / ${fmt(isMixing ? s.mixingRecircRh : s.extractRh, 0)} %`,
+    supply: isMixing ? `${fmt(r.mixed?.tempC, 2)} °C / ${fmt(r.mixed?.rhPercent, 0)} %` : `${fmt(r.supply?.tempC, 2)} °C / ${fmt(r.supply?.rhPercent, 0)} %`,
+    exhaust: isMixing ? '—' : `${fmt(r.exhaust?.tempC, 2)} °C / ${fmt(r.exhaust?.rhPercent, 0)} %`,
+    power: isMixing ? '—' : fmt(r.recoveredPowerKw, 2),
+    condensation: r.hasCondensation ? `${fmt(r.condensateLs, 4)} l/s` : '—',
+    inputState,
+    createdAt: existing?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+}
+
 function bindRltDevices(root, r, s, rerender) {
-  root.querySelector('[data-rlt-add]')?.addEventListener('click', event => {
+  root.querySelector('[data-rlt-save]')?.addEventListener('click', event => {
     event.preventDefault();
     const name = root.querySelector('#rltDeviceName')?.value?.trim() || '';
-    const isMixing = s.mode === 'mixing';
     const items = readRltDevices();
-    const id = s.activeRltDeviceId || Date.now();
-    const inputState = { ...s };
-    delete inputState.activeRltDeviceId;
-    delete inputState.activeRltDeviceName;
-    const item = {
-      id,
-      name: name || s.activeRltDeviceName || `RLT-Gerät ${items.length + 1}`,
-      mode: isMixing ? 'Mischluft' : 'WRG',
-      volumeFlowM3h: isMixing ? fmt(r.mixed?.volumeFlowM3h, 0) : fmt(s.wrgVolumeFlowM3h, 0),
-      outdoor: `${fmt(isMixing ? s.mixingOutdoorTemp : s.outdoorTemp, 2)} °C / ${fmt(isMixing ? s.mixingOutdoorRh : s.outdoorRh, 0)} %`,
-      extract: `${fmt(isMixing ? s.mixingRecircTemp : s.extractTemp, 2)} °C / ${fmt(isMixing ? s.mixingRecircRh : s.extractRh, 0)} %`,
-      supply: isMixing ? `${fmt(r.mixed?.tempC, 2)} °C / ${fmt(r.mixed?.rhPercent, 0)} %` : `${fmt(r.supply?.tempC, 2)} °C / ${fmt(r.supply?.rhPercent, 0)} %`,
-      exhaust: isMixing ? '—' : `${fmt(r.exhaust?.tempC, 2)} °C / ${fmt(r.exhaust?.rhPercent, 0)} %`,
-      power: isMixing ? '—' : fmt(r.recoveredPowerKw, 2),
-      condensation: r.hasCondensation ? `${fmt(r.condensateLs, 4)} l/s` : '—',
-      inputState,
-      createdAt: s.activeRltDeviceId ? (items.find(x => x.id === id)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    const next = s.activeRltDeviceId ? items.map(existing => String(existing.id) === String(id) ? item : existing) : [item, ...items];
-    writeRltDevices(next);
+    const id = (globalThis.crypto?.randomUUID?.() || `rlt-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    const item = buildRltDeviceRecord(r, { ...s, activeRltDeviceId: null, activeRltDeviceName: name }, items, id, name);
+    writeRltDevices([item, ...items]);
+    state.set({ activeRltDeviceId: null, activeRltDeviceName: '' }, { notify:false });
+    if (typeof rerender === 'function') rerender();
+  });
+  root.querySelector('[data-rlt-update]')?.addEventListener('click', event => {
+    event.preventDefault();
+    const current = state.get();
+    const id = current.activeRltDeviceId;
+    if (!id) return;
+    const name = root.querySelector('#rltDeviceName')?.value?.trim() || '';
+    const items = readRltDevices();
+    const existing = items.find(entry => String(entry.id) === String(id));
+    if (!existing) return;
+    const item = buildRltDeviceRecord(r, current, items, id, name, existing);
+    writeRltDevices(items.map(entry => String(entry.id) === String(id) ? item : entry));
     state.set({ activeRltDeviceId: id, activeRltDeviceName: item.name }, { notify:false });
     if (typeof rerender === 'function') rerender();
   });
@@ -93,8 +110,8 @@ function bindRltDevices(root, r, s, rerender) {
 
   root.querySelectorAll('[data-rlt-delete]').forEach(del => {
     del.addEventListener('click', () => {
-      const id = Number(del.dataset.rltDelete);
-      writeRltDevices(readRltDevices().filter(item => String(item.id) !== String(id))); 
+      const id = del.dataset.rltDelete;
+      writeRltDevices(readRltDevices().filter(item => String(item.id) !== String(id)));
       if (String(state.get().activeRltDeviceId) === String(id)) state.set({ activeRltDeviceId:null, activeRltDeviceName:'' }, { notify:false });
       if (typeof rerender === 'function') rerender();
     });

@@ -42,10 +42,9 @@ function savedPlantRows(items = []){
   return `<div class="ph-saved-list">${items.map(item => {
     const res = item.result || {};
     const subtitle = [res.productLabel, res.selectedStandardVolume ? `${fmt(res.selectedStandardVolume,0)} l` : '', res.systemVolume ? `VA ${fmt(res.systemVolume,0)} l` : ''].filter(Boolean).join(' · ');
-    return `<article class="ph-saved-item">
+    return `<article class="ph-saved-item ${state.get().activePlantId === item.id ? 'is-active' : ''}" data-ph-load="${esc(item.id)}">
       <div><strong>${esc(item.name || 'Anlage')}</strong><small>${esc(subtitle || 'gespeicherte Druckhaltung')}</small></div>
       <div class="ph-saved-actions">
-        <button type="button" class="mini-button" data-ph-load="${esc(item.id)}">Bearbeiten</button>
         <button type="button" class="mini-button mini-button--danger" data-ph-delete="${esc(item.id)}">Löschen</button>
       </div>
     </article>`;
@@ -55,7 +54,7 @@ function savedPlantRows(items = []){
 function savedPlantsCard(s){
   return card('Anlagen speichern', stack([
     field({ id:'plantName', label:'Anlagenbezeichnung', value:s.plantName || '', placeholder:'z. B. Heizzentrale BT A', inputmode:'text' }),
-    `<div class="tc-actions"><button type="button" class="action-button" data-ph-save>${s.activePlantId ? 'Anlage aktualisieren' : 'Anlage speichern'}</button></div>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-ph-save ${s.activePlantId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-ph-update ${s.activePlantId ? '' : 'disabled'}>Aktualisieren</button></div>`,
     savedPlantRows(Array.isArray(s.savedPlants) ? s.savedPlants : [])
   ].join('')), 'purple');
 }
@@ -148,12 +147,23 @@ function bindPressureHoldingActions(root, snapshot){
     const current = state.get();
     const result = calculate(current);
     const saved = Array.isArray(current.savedPlants) ? current.savedPlants : [];
-    const record = savedPlantSnapshot(current, result);
-    const next = current.activePlantId ? saved.map(item => String(item.id) === String(record.id) ? record : item) : [record, ...saved];
-    state.set({ savedPlants: next, activePlantId: record.id, plantName: record.name });
+    const record = savedPlantSnapshot({ ...current, activePlantId: null }, result);
+    state.set({ savedPlants: [record, ...saved], activePlantId: null, plantName: '' });
+  });
+  root.querySelector('[data-ph-update]')?.addEventListener('click', () => {
+    const current = state.get();
+    const id = current.activePlantId;
+    if(!id) return;
+    const result = calculate(current);
+    const saved = Array.isArray(current.savedPlants) ? current.savedPlants : [];
+    const existing = saved.find(entry => String(entry.id) === String(id));
+    if(!existing) return;
+    const record = { ...savedPlantSnapshot(current, result), id, createdAt: existing.createdAt || new Date().toISOString() };
+    state.set({ savedPlants: saved.map(item => String(item.id) === String(id) ? record : item), activePlantId: id, plantName: record.name });
   });
   root.querySelectorAll('[data-ph-load]').forEach(button => {
-    button.addEventListener('click', () => {
+    button.addEventListener('click', event => {
+      if (event.target.closest('[data-ph-delete]')) return;
       const current = state.get();
       const item = (current.savedPlants || []).find(entry => String(entry.id) === String(button.dataset.phLoad));
       if(!item?.state) return;

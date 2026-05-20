@@ -45,34 +45,51 @@ function ventilationLineSectionsCard(r, active, modeLabel) {
     : '<div class="empty-state empty-state--compact">Noch keine Leitungsabschnitte angelegt</div>';
   return card('Leitungsabschnitte', stack([
     `<div class="field"><label for="ventLineSectionName">Bezeichnung</label><div class="control"><input id="ventLineSectionName" type="text" placeholder="z. B. Zuluft Büro Nord" autocomplete="off" value="${(state.get().activeVentLineSectionName || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></div></div>`,
-    `<button type="button" class="action-button" data-vent-line-add>${state.get().activeVentLineSectionId ? 'Abschnitt aktualisieren' : 'Abschnitt speichern'}</button>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-vent-line-save ${state.get().activeVentLineSectionId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-vent-line-update ${state.get().activeVentLineSectionId ? '' : 'disabled'}>Aktualisieren</button></div>`,
     rows
   ].join('')), 'cyan');
 }
 
+function buildVentilationLineSectionRecord(currentState, r, active, modeLabel, items, id, name, existing = null) {
+  return {
+    id,
+    name: name || currentState.activeVentLineSectionName || existing?.name || `Abschnitt ${items.length + 1}`,
+    powerKw: fmt(r.powerKw),
+    volumeFlowM3h: fmt(r.volumeFlowM3h),
+    massFlowKgh: fmt(r.massFlowKgh),
+    deltaT: fmt(r.deltaT),
+    supplyTemp: fmt(active.supplyTemp),
+    roomTemp: fmt(active.roomTemp),
+    modeLabel,
+    inputState: activeCalculationState(currentState),
+    createdAt: existing?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+}
+
 function bindVentilationLineSections(root, r, active, modeLabel, rerender) {
-  root.querySelector('[data-vent-line-add]')?.addEventListener('click', event => {
+  root.querySelector('[data-vent-line-save]')?.addEventListener('click', event => {
     event.preventDefault();
     const name = root.querySelector('#ventLineSectionName')?.value?.trim() || '';
     const currentState = state.get();
     const items = readVentilationLineSections();
-    const id = currentState.activeVentLineSectionId || Date.now();
-    const item = {
-      id,
-      name: name || currentState.activeVentLineSectionName || `Abschnitt ${items.length + 1}`,
-      powerKw: fmt(r.powerKw),
-      volumeFlowM3h: fmt(r.volumeFlowM3h),
-      massFlowKgh: fmt(r.massFlowKgh),
-      deltaT: fmt(r.deltaT),
-      supplyTemp: fmt(active.supplyTemp),
-      roomTemp: fmt(active.roomTemp),
-      modeLabel,
-      inputState: activeCalculationState(currentState),
-      createdAt: currentState.activeVentLineSectionId ? (items.find(x => x.id === id)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    const next = currentState.activeVentLineSectionId ? items.map(existing => existing.id === id ? item : existing) : [item, ...items];
-    writeVentilationLineSections(next);
+    const id = (globalThis.crypto?.randomUUID?.() || `vent-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    const item = buildVentilationLineSectionRecord({ ...currentState, activeVentLineSectionId: null, activeVentLineSectionName: name }, r, active, modeLabel, items, id, name);
+    writeVentilationLineSections([item, ...items]);
+    state.set({ activeVentLineSectionId: null, activeVentLineSectionName: '' }, { notify:false });
+    if (typeof rerender === 'function') rerender();
+  });
+  root.querySelector('[data-vent-line-update]')?.addEventListener('click', event => {
+    event.preventDefault();
+    const currentState = state.get();
+    const id = currentState.activeVentLineSectionId;
+    if (!id) return;
+    const name = root.querySelector('#ventLineSectionName')?.value?.trim() || '';
+    const items = readVentilationLineSections();
+    const existing = items.find(entry => String(entry.id) === String(id));
+    if (!existing) return;
+    const item = buildVentilationLineSectionRecord(currentState, r, active, modeLabel, items, id, name, existing);
+    writeVentilationLineSections(items.map(entry => String(entry.id) === String(id) ? item : entry));
     state.set({ activeVentLineSectionId: id, activeVentLineSectionName: item.name }, { notify:false });
     if (typeof rerender === 'function') rerender();
   });
@@ -86,8 +103,8 @@ function bindVentilationLineSections(root, r, active, modeLabel, rerender) {
   root.querySelectorAll('[data-vent-line-select]').forEach(row => {
     row.addEventListener('click', event => {
       if (event.target.closest('[data-line-delete]') || event.target.closest('[data-line-toggle]')) return;
-      const id = Number(row.dataset.ventLineSelect);
-      const item = readVentilationLineSections().find(entry => Number(entry.id) === id);
+      const id = row.dataset.ventLineSelect;
+      const item = readVentilationLineSections().find(entry => String(entry.id) === String(id));
       if (!item?.inputState) return;
       const input = item.inputState;
       const prefix = (input.mode === 'cooling') ? 'cooling' : 'heating';
@@ -108,9 +125,9 @@ function bindVentilationLineSections(root, r, active, modeLabel, rerender) {
 
   root.querySelectorAll('[data-line-delete]').forEach(del => {
     del.addEventListener('click', () => {
-      const id = Number(del.dataset.lineDelete);
-      writeVentilationLineSections(readVentilationLineSections().filter(item => item.id !== id));
-      if (state.get().activeVentLineSectionId === id) state.set({ activeVentLineSectionId:null, activeVentLineSectionName:'' }, { notify:false });
+      const id = del.dataset.lineDelete;
+      writeVentilationLineSections(readVentilationLineSections().filter(item => String(item.id) !== String(id)));
+      if (String(state.get().activeVentLineSectionId) === String(id)) state.set({ activeVentLineSectionId:null, activeVentLineSectionName:'' }, { notify:false });
       if (typeof rerender === 'function') rerender();
     });
   });
