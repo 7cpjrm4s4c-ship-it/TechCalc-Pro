@@ -16,7 +16,5 @@ export const state = createModuleState({
   mixingOutdoorRh: '',
   mixingRecircVolumeFlowM3h: '',
   mixingRecircTemp: '',
-  mixingRecircRh: '',
-  activeRltDeviceId: null,
-  activeRltDeviceName: ''
+  mixingRecircRh: ''
 });

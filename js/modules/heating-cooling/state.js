@@ -15,7 +15,5 @@ export const state = createModuleState({
   coolingPowerW: '',
   coolingPowerUnit: 'W',
   coolingMassFlowKgh: '',
-  coolingDeltaT: '10',
-  activeLineSectionId: null,
-  activeLineSectionName: ''
+  coolingDeltaT: '10'
 });
