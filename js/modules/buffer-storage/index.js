@@ -60,7 +60,7 @@ function savedRows(items = []){
 function savedCard(s){
   return card('Berechnung speichern', stack([
     field({ id:'plantName', label:'Bezeichnung', value:s.plantName || '', placeholder:'z. B. Kaltwassersatz BT A', inputmode:'text' }),
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-buffer-save>Speichern</button><button type="button" class="action-button" data-buffer-update ${s.activeCalculationId ? '' : 'disabled'}>Aktualisieren</button></div>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-buffer-save ${s.activeCalculationId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-buffer-update ${s.activeCalculationId ? '' : 'disabled disabled'}>Aktualisieren</button></div>`,
     savedRows(Array.isArray(s.savedCalculations) ? s.savedCalculations : [])
   ].join('')), 'cyan');
 }

@@ -4,7 +4,7 @@ import { calculate } from './logic.js';
 import { card, field, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, esc, signedTempField, toggleNumericSign } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindSavedRecordList } from '../../core/savedRecords.js';
+import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
 
 function readonlyValue({ label, value, unit = '' }) {
   return `<div class="field field--readonly"><label>${label}</label><div class="control control--readonly"><strong>${value}</strong>${unit ? `<span class="unit">${unit}</span>` : ''}</div></div>`;
@@ -42,7 +42,7 @@ function rltDeviceCard(r, s) {
   });
   return card('RLT-Geräte', stack([
     `<div class="field"><label for="rltDeviceName">Bezeichnung</label><div class="control"><input id="rltDeviceName" type="text" placeholder="z. B. RLT Büro EG" autocomplete="off" value="${esc(state.get().activeRltDeviceName || '')}"></div></div>`,
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-rlt-save>Speichern</button><button type="button" class="action-button" data-rlt-update ${state.get().activeRltDeviceId ? '' : 'disabled'}>Aktualisieren</button></div>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-rlt-save ${state.get().activeRltDeviceId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-rlt-update ${state.get().activeRltDeviceId ? '' : 'disabled disabled'}>Aktualisieren</button></div>`,
     rows
   ].join('')), 'cyan');
 }
@@ -70,8 +70,10 @@ function buildRltDeviceRecord(r, s, items, id, name, existing = null) {
 }
 
 function bindRltDevices(root, r, s, rerender) {
+  bindEditModeClear(root, { state, activeIdKey: 'activeRltDeviceId', nameKey: 'activeRltDeviceName' });
   root.querySelector('[data-rlt-save]')?.addEventListener('click', event => {
     event.preventDefault();
+    if (state.get().activeRltDeviceId) return;
     const name = root.querySelector('#rltDeviceName')?.value?.trim() || '';
     const items = readRltDevices();
     const id = createRecordId('rlt');
@@ -101,7 +103,8 @@ function bindRltDevices(root, r, s, rerender) {
     onLoad(id) {
       const item = readRltDevices().find(entry => isSameId(entry.id, id));
       if (!item?.inputState) return;
-      state.set({ ...item.inputState, activeRltDeviceId: item.id, activeRltDeviceName: item.name || '' });
+      state.set({ ...item.inputState, activeRltDeviceId: item.id, activeRltDeviceName: item.name || '' }, { notify:false });
+      if (typeof rerender === 'function') rerender();
     },
     onDelete(id) {
       writeRltDevices(removeRecord(readRltDevices(), id));

@@ -41,7 +41,7 @@ function inputCard(s) {
       field({ id: 'targetRhPercent', label: 'Relative Zielfeuchte φ', unit: '%', value: fmtInput(s.targetRhPercent, 2) })
     ].join(''), 2), 'cyan', { compact: true }),
     processCard(s),
-    `<div class="tc-save-actions">${actionButton('Speichern', 'data-hx-add')} ${actionButton('Aktualisieren', s.activeProcessId ? 'data-hx-update' : 'data-hx-update disabled')}</div><div class="tc-actions">${actionButton('Diagramm leeren', 'data-hx-clear', 'tc-action--ghost')}</div>`
+    `<div class="tc-save-actions">${actionButton('Speichern', s.activeProcessId ? 'data-hx-add disabled' : 'data-hx-add')} ${actionButton('Aktualisieren', s.activeProcessId ? 'data-hx-update' : 'data-hx-update disabled')}</div><div class="tc-actions">${actionButton('Diagramm leeren', 'data-hx-clear', 'tc-action--ghost')}</div>`
   ].join('')), 'cyan');
 }
 
@@ -242,7 +242,9 @@ export default {
       });
 
       rootEl.querySelector('[data-hx-add]')?.addEventListener('click', () => {
-        const s = { ...state.get(), activeProcessId: null };
+        const currentHx = state.get();
+        if (currentHx.activeProcessId) return;
+        const s = { ...currentHx, activeProcessId: null };
         const result = calculate(s);
         const record = makeProcessRecord({ input: s, result });
         const processes = [record, ...(s.processes ?? [])];

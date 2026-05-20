@@ -118,7 +118,7 @@ function inputCard(s, r) {
       ].join(''), 2),
       '<button type="button" class="action-button action-button--secondary" data-dw-draft-add="unit">Verbraucher zur Nutzungseinheit hinzufügen</button>',
       `<div data-dw-unit-draft>${draftConsumerList(s.unitDraftConsumers || [], 'unit')}</div>`,
-      `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-unit>Speichern</button><button type="button" class="action-button" data-dw-update-unit ${s.activeUnitId ? '' : 'disabled'}>Aktualisieren</button></div>`,
+      `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-unit ${s.activeUnitId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-dw-update-unit ${s.activeUnitId ? '' : 'disabled disabled'}>Aktualisieren</button></div>`,
       '</div></details>',
       `<details class="dw-accordion dw-accordion--saved" data-dw-accordion="uiUnitSavedOpen" ${s.uiUnitSavedOpen ? 'open' : ''}><summary><span><strong>Gespeicherte Nutzungseinheiten</strong><small data-dw-unit-summary>${r.usageUnits.length} Nutzungseinheiten angelegt</small></span></summary><div class="dw-accordion__body" data-dw-unit-saved>${unitRows(r.usageUnits)}</div></details>`
     ].join('')), 'blue'),
@@ -135,7 +135,7 @@ function inputCard(s, r) {
       ], String(s.singlePermanent), { accent:'blue' }),
       '<button type="button" class="action-button action-button--secondary" data-dw-draft-add="single">Verbraucher zur Gruppe hinzufügen</button>',
       `<div data-dw-single-draft>${draftConsumerList(s.singleDraftConsumers || [], 'single')}</div>`,
-      `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-single>Speichern</button><button type="button" class="action-button" data-dw-update-single ${s.activeSingleId ? '' : 'disabled'}>Aktualisieren</button></div>`,
+      `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-single ${s.activeSingleId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-dw-update-single ${s.activeSingleId ? '' : 'disabled disabled'}>Aktualisieren</button></div>`,
       '</div></details>',
       `<details class="dw-accordion dw-accordion--saved" data-dw-accordion="uiSingleSavedOpen" ${s.uiSingleSavedOpen ? 'open' : ''}><summary><span><strong>Gespeicherte Einzelverbraucher</strong><small data-dw-single-summary>${r.singleGroups.length} Gruppen außerhalb NE</small></span></summary><div class="dw-accordion__body" data-dw-single-saved>${singleRows(r.singleGroups)}</div></details>`
     ].join('')), 'blue')
@@ -255,6 +255,7 @@ function bindDrinkingWater(root) {
 
     if (event.target.closest('[data-dw-add-unit]')) {
       const s = state.get();
+      if (s.activeUnitId) return;
       const consumers = [...(s.unitDraftConsumers || [])];
       if (!consumers.length) consumers.push(createConsumer({ typeId:s.unitConsumerType, count:s.unitCount }));
       const units = readUsageUnits();
@@ -281,6 +282,7 @@ function bindDrinkingWater(root) {
 
     if (event.target.closest('[data-dw-add-single]')) {
       const s = state.get();
+      if (s.activeSingleId) return;
       const draft = [...(s.singleDraftConsumers || [])];
       if (!draft.length) draft.push(createConsumer({ typeId:s.singleConsumerType, count:s.singleCount, permanent:String(s.singlePermanent)==='true' }));
       const groups = readSingleConsumers();
