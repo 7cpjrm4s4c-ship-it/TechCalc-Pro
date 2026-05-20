@@ -256,7 +256,11 @@ export default {
         });
       });
 
-      rootEl.querySelector('[data-hx-update]')?.addEventListener('click', () => {
+      const updateProcess = event => {
+        event?.preventDefault?.();
+        rootEl.querySelectorAll('[data-field]').forEach(el => {
+          if (el?.dataset?.field) state.set({ [el.dataset.field]: el.value }, { notify: false });
+        });
         const s = state.get();
         if (!s.activeProcessId) return;
         const existing = (s.processes ?? []).find(item => item.id === s.activeProcessId);
@@ -266,13 +270,17 @@ export default {
         const processes = (s.processes ?? []).map(item => item.id === existing.id ? record : item);
         saveProcesses(processes);
         clearLegacyPoints();
+        document.activeElement?.blur?.();
         state.set({
           processes,
           activeProcessId: record.id,
           activePath: record.path,
           points: []
         });
-      });
+      };
+      const updateButton = rootEl.querySelector('[data-hx-update]');
+      updateButton?.addEventListener('pointerdown', updateProcess);
+      updateButton?.addEventListener('click', event => event.preventDefault());
 
       rootEl.querySelector('[data-hx-clear]')?.addEventListener('click', () => {
         clearLegacyPoints();

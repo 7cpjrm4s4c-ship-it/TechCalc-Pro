@@ -5,6 +5,7 @@ import { MEDIA, fmt, fmtInput } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, pressureBadge } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
+import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindSavedRecordList } from '../../core/savedRecords.js';
 
 const MODE_PREFIX = {
   heating: 'heating',
@@ -102,13 +103,12 @@ export function writeLineSections(items) {
   lineSectionsMemory = Array.isArray(items) ? [...items] : [];
 }
 
-function renderLineSectionCard(item, index) {
-  const active = state.get().activeLineSectionId === item.id;
-  const stats = [
-    { label: 'Leistung', value: item.powerKw || '—', unit: 'kW' },
-    { label: 'Massenstrom', value: item.massFlowKgh || '—', unit: 'kg/h' },
-    { label: 'Volumenstrom', value: item.volumeFlowM3h || '—', unit: 'm³/h' },
-    { label: 'Temperaturdifferenz', value: item.deltaT || '—', unit: 'K' },
+function lineSectionStats(item) {
+  return [
+    { label: 'Leistung', value: item.powerKw || '—', unit: item.powerKw && item.powerKw !== '—' ? 'kW' : '' },
+    { label: 'Massenstrom', value: item.massFlowKgh || '—', unit: item.massFlowKgh && item.massFlowKgh !== '—' ? 'kg/h' : '' },
+    { label: 'Volumenstrom', value: item.volumeFlowM3h || '—', unit: item.volumeFlowM3h && item.volumeFlowM3h !== '—' ? 'm³/h' : '' },
+    { label: 'Temperaturdifferenz', value: item.deltaT || '—', unit: item.deltaT && item.deltaT !== '—' ? 'K' : '' },
     { label: 'Wärmeträger', value: item.medium || '—' },
     { label: 'Rohrdimension', value: item.pipeDn || '—' },
     { label: 'Rohrabmessung', value: item.pipeDimension || '—' },
@@ -116,21 +116,19 @@ function renderLineSectionCard(item, index) {
     { label: 'Geschwindigkeit', value: item.pipeVelocity || '—', unit: item.pipeVelocity && item.pipeVelocity !== '—' ? 'm/s' : '' },
     { label: 'Druckverlust', value: item.pipePressureLoss || '—', unit: item.pipePressureLoss && item.pipePressureLoss !== '—' ? 'Pa/m' : '' }
   ];
-  return `<article class="line-section-card is-collapsed ${active ? 'is-active' : ''}" data-line-card data-line-select="${item.id}">
-    <div class="line-section-card__head">
-      <div class="line-section-card__title"><strong>${item.name || 'Abschnitt ' + (index + 1)}</strong></div>
-      <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Abschnitt aufklappen"><span>▾</span></button>
-      <button type="button" class="line-section-card__delete" data-line-delete="${item.id}" aria-label="Abschnitt löschen">×</button>
-    </div>
-    <div class="line-section-card__body">${inlineStats(stats)}</div>
-  </article>`;
 }
 
 function lineSectionsCard(r) {
   const items = readLineSections();
-  const rows = items.length
-    ? `<div class="line-section-list">${items.map(renderLineSectionCard).join('')}</div>`
-    : '<div class="empty-state empty-state--compact">Noch keine Leitungsabschnitte angelegt</div>';
+  const rows = renderSavedRecordList(items, {
+    activeId: state.get().activeLineSectionId,
+    emptyText: 'Noch keine Leitungsabschnitte angelegt',
+    loadAttr: 'data-line-select',
+    toggleAttr: 'data-line-toggle',
+    deleteAttr: 'data-line-delete',
+    title: item => item.name || 'Abschnitt',
+    stats: item => lineSectionStats(item)
+  });
   return card('Leitungsabschnitte', stack([
     `<div class="field"><label for="lineSectionName">Bezeichnung</label><div class="control"><input id="lineSectionName" type="text" placeholder="z. B. Verteilerabgang Nord" autocomplete="off" value="${(state.get().activeLineSectionName || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></div></div>`,
     `<div class="tc-save-actions"><button type="button" class="action-button" data-line-save ${state.get().activeLineSectionId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-line-update ${state.get().activeLineSectionId ? '' : 'disabled'}>Aktualisieren</button></div>`,
@@ -167,7 +165,7 @@ function bindLineSections(root, r, rerender) {
     const name = root.querySelector('#lineSectionName')?.value?.trim() || '';
     const currentState = state.get();
     const items = readLineSections();
-    const id = (globalThis.crypto?.randomUUID?.() || `line-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    const id = createRecordId('line');
     const item = buildLineSectionRecord({ ...currentState, activeLineSectionId: null, activeLineSectionName: name }, r, items, id, name);
     writeLineSections([item, ...items]);
     state.set({ activeLineSectionId: null, activeLineSectionName: '' }, { notify:false });
@@ -183,24 +181,16 @@ function bindLineSections(root, r, rerender) {
     const existing = items.find(x => String(x.id) === String(id));
     if (!existing) return;
     const item = buildLineSectionRecord(currentState, r, items, id, name, existing);
-    writeLineSections(items.map(entry => String(entry.id) === String(id) ? item : entry));
+    writeLineSections(replaceRecord(items, id, item));
     state.set({ activeLineSectionId: id, activeLineSectionName: item.name }, { notify:false });
     if (typeof rerender === 'function') rerender();
   });
-  root.querySelectorAll('[data-line-toggle]').forEach(toggle => {
-    toggle.addEventListener('click', event => {
-      event.stopPropagation();
-      const card = toggle.closest('[data-line-card]');
-      const collapsed = card?.classList.toggle('is-collapsed');
-      toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-    });
-  });
-
-  root.querySelectorAll('[data-line-select]').forEach(row => {
-    row.addEventListener('click', event => {
-      if (event.target.closest('[data-line-delete]') || event.target.closest('[data-line-toggle]')) return;
-      const id = Number(row.dataset.lineSelect);
-      const item = readLineSections().find(entry => Number(entry.id) === id);
+  bindSavedRecordList(root, {
+    loadAttr: 'data-line-select',
+    toggleAttr: 'data-line-toggle',
+    deleteAttr: 'data-line-delete',
+    onLoad(id) {
+      const item = readLineSections().find(entry => isSameId(entry.id, id));
       if (!item) return;
       const input = item.inputState || {};
       const prefix = (input.mode === 'cooling') ? 'cooling' : 'heating';
@@ -217,17 +207,12 @@ function bindLineSections(root, r, rerender) {
         activeLineSectionId: item.id,
         activeLineSectionName: item.name || ''
       });
-    });
-  });
-
-  root.querySelectorAll('[data-line-delete]').forEach(del => {
-    del.addEventListener('click', event => {
-      event.stopPropagation();
-      const id = Number(del.dataset.lineDelete);
-      writeLineSections(readLineSections().filter(item => item.id !== id));
-      if (state.get().activeLineSectionId === id) state.set({ activeLineSectionId:null, activeLineSectionName:'' }, { notify:false });
+    },
+    onDelete(id) {
+      writeLineSections(removeRecord(readLineSections(), id));
+      if (isSameId(state.get().activeLineSectionId, id)) state.set({ activeLineSectionId:null, activeLineSectionName:'' }, { notify:false });
       if (typeof rerender === 'function') rerender();
-    });
+    }
   });
 }
 
