@@ -114,7 +114,7 @@ function inputCard(s, r) {
       ].join(''), 2),
       '<button type="button" class="action-button action-button--secondary" data-dw-draft-add="unit">Verbraucher zur Nutzungseinheit hinzufügen</button>',
       `<div data-dw-unit-draft>${draftConsumerList(s.unitDraftConsumers || [], 'unit')}</div>`,
-      '<button type="button" class="action-button" data-dw-add-unit>Nutzungseinheit speichern</button>',
+      `<button type="button" class="action-button" data-dw-add-unit>${s.activeUnitId ? 'Nutzungseinheit aktualisieren' : 'Nutzungseinheit speichern'}</button>`,
       '</div></details>',
       `<details class="dw-accordion dw-accordion--saved" data-dw-accordion="uiUnitSavedOpen" ${s.uiUnitSavedOpen ? 'open' : ''}><summary><span><strong>Gespeicherte Nutzungseinheiten</strong><small data-dw-unit-summary>${r.usageUnits.length} Nutzungseinheiten angelegt</small></span></summary><div class="dw-accordion__body" data-dw-unit-saved>${unitRows(r.usageUnits)}</div></details>`
     ].join('')), 'blue'),
@@ -131,7 +131,7 @@ function inputCard(s, r) {
       ], String(s.singlePermanent), { accent:'blue' }),
       '<button type="button" class="action-button action-button--secondary" data-dw-draft-add="single">Verbraucher zur Gruppe hinzufügen</button>',
       `<div data-dw-single-draft>${draftConsumerList(s.singleDraftConsumers || [], 'single')}</div>`,
-      '<button type="button" class="action-button" data-dw-add-single>Einzelverbraucher-Gruppe speichern</button>',
+      `<button type="button" class="action-button" data-dw-add-single>${s.activeSingleId ? 'Einzelverbraucher-Gruppe aktualisieren' : 'Einzelverbraucher-Gruppe speichern'}</button>`,
       '</div></details>',
       `<details class="dw-accordion dw-accordion--saved" data-dw-accordion="uiSingleSavedOpen" ${s.uiSingleSavedOpen ? 'open' : ''}><summary><span><strong>Gespeicherte Einzelverbraucher</strong><small data-dw-single-summary>${r.singleGroups.length} Gruppen außerhalb NE</small></span></summary><div class="dw-accordion__body" data-dw-single-saved>${singleRows(r.singleGroups)}</div></details>`
     ].join('')), 'blue')
@@ -258,7 +258,7 @@ function bindDrinkingWater(root) {
       if (s.activeUnitId) record.id = s.activeUnitId;
       const nextUnits = s.activeUnitId ? units.map(item => item.id === s.activeUnitId ? record : item) : [...units, record];
       writeUsageUnits(nextUnits);
-      state.set({ unitDraftConsumers: [], activeUnitId:null, uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
+      state.set({ activeUnitId: record.id, unitName: record.name, unitDraftConsumers: record.consumers || consumers, uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
       refresh(root);
       return;
     }
@@ -272,7 +272,7 @@ function bindDrinkingWater(root) {
       if (s.activeSingleId) record.id = s.activeSingleId;
       const nextGroups = s.activeSingleId ? groups.map(item => item.id === s.activeSingleId ? record : item) : [...groups, record];
       writeSingleConsumers(nextGroups);
-      state.set({ singleDraftConsumers: [], activeSingleId:null, uiSingleFormOpen:true, uiSingleSavedOpen:true }, { notify:false });
+      state.set({ activeSingleId: record.id, singleName: record.name, singleDraftConsumers: record.consumers || draft, uiSingleFormOpen:true, uiSingleSavedOpen:true }, { notify:false });
       refresh(root);
       return;
     }

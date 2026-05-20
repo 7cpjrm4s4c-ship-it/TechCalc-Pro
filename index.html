@@ -70,12 +70,6 @@
             <label>Projektbezeichnung<input id="pdfProject" type="text" placeholder="z. B. Neubau Bürogebäude Nord"></label>
             <label>Projektnummer<input id="pdfProjectNo" type="text" placeholder="z. B. 2025-041"></label>
             <label>Sachbearbeiter<input id="pdfEngineer" type="text" placeholder="z. B. Max Mustermann"></label>
-            <label>Datum<input id="pdfDate" type="date"></label>
-            <label>Firmenlogo<input id="pdfLogo" type="file" accept="image/png,image/jpeg,image/svg+xml"></label>
-            <div class="settings-actions settings-actions--split">
-              <button class="mini-button" id="clearPdfLogo" type="button">Logo entfernen</button>
-            </div>
-            <div id="pdfLogoPreview" class="logo-preview" aria-live="polite"></div>
           </div>
         </details>
 
@@ -107,9 +101,17 @@
         <details class="settings-submenu">
           <summary>Release Notes</summary>
           <div class="settings-submenu__content settings-form release-notes-panel">
-            <div class="settings-info-row"><span>Aktuelle Version</span><strong>1.0.3</strong></div>
+            <div class="settings-info-row"><span>Aktuelle Version</span><strong>1.0.4</strong></div>
+            <div class="release-note">
+              <strong>1.0.4</strong>
+              <small>Bearbeiten und Überschreiben gespeicherter Anlagenteile vereinheitlicht. Nicht genutzte Projektfelder Datum und Logo entfernt.</small>
+            </div>
             <div class="release-note">
               <strong>1.0.3</strong>
+              <small>Bearbeitungslogik für gespeicherte Anlagenteile vorbereitet.</small>
+            </div>
+            <div class="release-note">
+              <strong>1.0.2</strong>
               <small>Feedback-Versand über Formspree direkt aus der App ergänzt.</small>
             </div>
             <div class="release-note">
@@ -134,7 +136,7 @@
               <label>Betreff<input id="feedbackSubject" name="subject" type="text" required value="TechCalc Pro Feedback"></label>
               <label>Nachricht<textarea id="feedbackMessage" name="message" required rows="6" placeholder="Feedback, Fehlerbeschreibung oder Verbesserungsvorschlag"></textarea></label>
               <input type="hidden" name="app" value="TechCalc Pro">
-              <input type="hidden" name="version" value="1.0.3">
+              <input type="hidden" name="version" value="1.0.4">
               <div class="settings-actions settings-actions--split">
                 <button class="mini-button" id="feedbackMailto" type="button">E-Mail-Fallback</button>
                 <button class="mini-button mini-button--primary" id="feedbackSubmit" type="submit">Feedback senden</button>
@@ -148,7 +150,7 @@
         <details class="settings-submenu">
           <summary>Rechtliches & App</summary>
           <div class="settings-submenu__content settings-form">
-            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.0.3</strong></div>
+            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.0.4</strong></div>
             <button class="mini-button" type="button" disabled>Impressum vorbereiten</button>
             <button class="mini-button" type="button" disabled>AGB vorbereiten</button>
           </div>

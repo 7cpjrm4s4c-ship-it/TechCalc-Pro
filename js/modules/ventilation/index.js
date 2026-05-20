@@ -45,7 +45,7 @@ function ventilationLineSectionsCard(r, active, modeLabel) {
     : '<div class="empty-state empty-state--compact">Noch keine Leitungsabschnitte angelegt</div>';
   return card('Leitungsabschnitte', stack([
     `<div class="field"><label for="ventLineSectionName">Bezeichnung</label><div class="control"><input id="ventLineSectionName" type="text" placeholder="z. B. Zuluft Büro Nord" autocomplete="off" value="${(state.get().activeVentLineSectionName || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></div></div>`,
-    '<button type="button" class="action-button" data-vent-line-add>Abschnitt speichern</button>',
+    `<button type="button" class="action-button" data-vent-line-add>${state.get().activeVentLineSectionId ? 'Abschnitt aktualisieren' : 'Abschnitt speichern'}</button>`,
     rows
   ].join('')), 'cyan');
 }

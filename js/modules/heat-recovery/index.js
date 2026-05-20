@@ -40,7 +40,7 @@ function rltDeviceCard(r, s) {
     : '<div class="empty-state empty-state--compact">Noch keine RLT-Geräte angelegt</div>';
   return card('RLT-Geräte', stack([
     `<div class="field"><label for="rltDeviceName">Bezeichnung</label><div class="control"><input id="rltDeviceName" type="text" placeholder="z. B. RLT Büro EG" autocomplete="off" value="${esc(state.get().activeRltDeviceName || '')}"></div></div>`,
-    '<button type="button" class="action-button" data-rlt-add>RLT-Gerät speichern</button>',
+    `<button type="button" class="action-button" data-rlt-add>${state.get().activeRltDeviceId ? 'RLT-Gerät aktualisieren' : 'RLT-Gerät speichern'}</button>`,
     rows
   ].join('')), 'cyan');
 }
@@ -70,7 +70,7 @@ function bindRltDevices(root, r, s, rerender) {
       createdAt: s.activeRltDeviceId ? (items.find(x => x.id === id)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
-    const next = s.activeRltDeviceId ? items.map(existing => existing.id === id ? item : existing) : [item, ...items];
+    const next = s.activeRltDeviceId ? items.map(existing => String(existing.id) === String(id) ? item : existing) : [item, ...items];
     writeRltDevices(next);
     state.set({ activeRltDeviceId: id, activeRltDeviceName: item.name }, { notify:false });
     if (typeof rerender === 'function') rerender();
@@ -94,7 +94,7 @@ function bindRltDevices(root, r, s, rerender) {
   root.querySelectorAll('[data-rlt-delete]').forEach(del => {
     del.addEventListener('click', () => {
       const id = Number(del.dataset.rltDelete);
-      writeRltDevices(readRltDevices().filter(item => Number(item.id) !== id));
+      writeRltDevices(readRltDevices().filter(item => String(item.id) !== String(id))); 
       if (String(state.get().activeRltDeviceId) === String(id)) state.set({ activeRltDeviceId:null, activeRltDeviceName:'' }, { notify:false });
       if (typeof rerender === 'function') rerender();
     });

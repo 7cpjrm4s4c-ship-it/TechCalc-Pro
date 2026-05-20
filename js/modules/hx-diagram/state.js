@@ -16,6 +16,7 @@ export function saveProcesses(processes) {
 }
 
 export function makeProcessRecord({ input, result }) {
+  const existing = (input.processes || []).find(item => item.id === input.activeProcessId);
   return {
     id: input.activeProcessId || createId(),
     label: String(input.label || 'Zustand'),
@@ -30,7 +31,8 @@ export function makeProcessRecord({ input, result }) {
       process: result.selectedProcess || input.process || 'heat'
     },
     path: result.processPath,
-    createdAt: new Date().toISOString()
+    createdAt: existing?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   };
 }
 

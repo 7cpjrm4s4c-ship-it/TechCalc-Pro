@@ -55,7 +55,7 @@ function savedPlantRows(items = []){
 function savedPlantsCard(s){
   return card('Anlagen speichern', stack([
     field({ id:'plantName', label:'Anlagenbezeichnung', value:s.plantName || '', placeholder:'z. B. Heizzentrale BT A', inputmode:'text' }),
-    '<div class="tc-actions"><button type="button" class="action-button" data-ph-save>Anlage speichern</button></div>',
+    `<div class="tc-actions"><button type="button" class="action-button" data-ph-save>${s.activePlantId ? 'Anlage aktualisieren' : 'Anlage speichern'}</button></div>`,
     savedPlantRows(Array.isArray(s.savedPlants) ? s.savedPlants : [])
   ].join('')), 'purple');
 }
@@ -149,13 +149,13 @@ function bindPressureHoldingActions(root, snapshot){
     const result = calculate(current);
     const saved = Array.isArray(current.savedPlants) ? current.savedPlants : [];
     const record = savedPlantSnapshot(current, result);
-    const next = current.activePlantId ? saved.map(item => item.id === record.id ? record : item) : [record, ...saved];
+    const next = current.activePlantId ? saved.map(item => String(item.id) === String(record.id) ? record : item) : [record, ...saved];
     state.set({ savedPlants: next, activePlantId: record.id, plantName: record.name });
   });
   root.querySelectorAll('[data-ph-load]').forEach(button => {
     button.addEventListener('click', () => {
       const current = state.get();
-      const item = (current.savedPlants || []).find(entry => entry.id === button.dataset.phLoad);
+      const item = (current.savedPlants || []).find(entry => String(entry.id) === String(button.dataset.phLoad));
       if(!item?.state) return;
       state.set({ ...item.state, savedPlants: current.savedPlants || [], activePlantId: item.id, plantName: item.name || item.state?.plantName || '' });
     });
@@ -163,8 +163,8 @@ function bindPressureHoldingActions(root, snapshot){
   root.querySelectorAll('[data-ph-delete]').forEach(button => {
     button.addEventListener('click', () => {
       const current = state.get();
-      const next = (current.savedPlants || []).filter(entry => entry.id !== button.dataset.phDelete);
-      state.set({ savedPlants: next, activePlantId: current.activePlantId === button.dataset.phDelete ? null : current.activePlantId });
+      const next = (current.savedPlants || []).filter(entry => String(entry.id) !== String(button.dataset.phDelete));
+      state.set({ savedPlants: next, activePlantId: String(current.activePlantId) === String(button.dataset.phDelete) ? null : current.activePlantId });
     });
   });
 }

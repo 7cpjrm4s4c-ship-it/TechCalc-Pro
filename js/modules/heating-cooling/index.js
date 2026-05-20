@@ -135,7 +135,7 @@ function lineSectionsCard(r) {
     : '<div class="empty-state empty-state--compact">Noch keine Leitungsabschnitte angelegt</div>';
   return card('Leitungsabschnitte', stack([
     `<div class="field"><label for="lineSectionName">Bezeichnung</label><div class="control"><input id="lineSectionName" type="text" placeholder="z. B. Verteilerabgang Nord" autocomplete="off" value="${(state.get().activeLineSectionName || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></div></div>`,
-    '<button type="button" class="action-button" data-line-add>Abschnitt speichern</button>',
+    `<button type="button" class="action-button" data-line-add>${state.get().activeLineSectionId ? 'Abschnitt aktualisieren' : 'Abschnitt speichern'}</button>`,
     rows
   ].join('')), 'blue');
 }

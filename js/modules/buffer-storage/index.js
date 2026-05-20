@@ -47,7 +47,7 @@ function savedRows(items = []){
 function savedCard(s){
   return card('Berechnung speichern', stack([
     field({ id:'plantName', label:'Bezeichnung', value:s.plantName || '', placeholder:'z. B. Kaltwassersatz BT A', inputmode:'text' }),
-    '<div class="tc-actions"><button type="button" class="action-button" data-buffer-save>Berechnung speichern</button></div>',
+    `<div class="tc-actions"><button type="button" class="action-button" data-buffer-save>${s.activeCalculationId ? 'Berechnung aktualisieren' : 'Berechnung speichern'}</button></div>`,
     savedRows(Array.isArray(s.savedCalculations) ? s.savedCalculations : [])
   ].join('')), 'cyan');
 }
@@ -148,13 +148,13 @@ function bindActions(root){
     const result = calculate(current);
     const saved = Array.isArray(current.savedCalculations) ? current.savedCalculations : [];
     const record = savedSnapshot(current, result);
-    const next = current.activeCalculationId ? saved.map(item => item.id === record.id ? record : item) : [record, ...saved];
+    const next = current.activeCalculationId ? saved.map(item => String(item.id) === String(record.id) ? record : item) : [record, ...saved];
     state.set({ savedCalculations: next, activeCalculationId: record.id, plantName: record.name });
   });
   root.querySelectorAll('[data-buffer-load]').forEach(button => {
     button.addEventListener('click', () => {
       const current = state.get();
-      const item = (current.savedCalculations || []).find(entry => entry.id === button.dataset.bufferLoad);
+      const item = (current.savedCalculations || []).find(entry => String(entry.id) === String(button.dataset.bufferLoad));
       if(!item?.state) return;
       state.set({ ...item.state, savedCalculations: current.savedCalculations || [], activeCalculationId: item.id, plantName: item.name || item.state?.plantName || '' });
     });
@@ -162,8 +162,8 @@ function bindActions(root){
   root.querySelectorAll('[data-buffer-delete]').forEach(button => {
     button.addEventListener('click', () => {
       const current = state.get();
-      const next = (current.savedCalculations || []).filter(entry => entry.id !== button.dataset.bufferDelete);
-      state.set({ savedCalculations: next, activeCalculationId: current.activeCalculationId === button.dataset.bufferDelete ? null : current.activeCalculationId });
+      const next = (current.savedCalculations || []).filter(entry => String(entry.id) !== String(button.dataset.bufferDelete));
+      state.set({ savedCalculations: next, activeCalculationId: String(current.activeCalculationId) === String(button.dataset.bufferDelete) ? null : current.activeCalculationId });
     });
   });
 }

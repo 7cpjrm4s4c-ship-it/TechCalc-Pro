@@ -41,7 +41,7 @@ function inputCard(s) {
       field({ id: 'targetRhPercent', label: 'Relative Zielfeuchte φ', unit: '%', value: fmtInput(s.targetRhPercent, 2) })
     ].join(''), 2), 'cyan', { compact: true }),
     processCard(s),
-    `<div class="tc-actions">${actionButton('Prozess speichern', 'data-hx-add')} ${actionButton('Diagramm leeren', 'data-hx-clear', 'tc-action--ghost')}</div>`
+    `<div class="tc-actions">${actionButton(s.activeProcessId ? 'Prozess aktualisieren' : 'Prozess speichern', 'data-hx-add')} ${actionButton('Diagramm leeren', 'data-hx-clear', 'tc-action--ghost')}</div>`
   ].join('')), 'cyan');
 }
 
@@ -228,7 +228,7 @@ export default {
 
       rootEl.querySelectorAll('[data-segment="process"]').forEach(button => {
         button.addEventListener('click', () => {
-          state.set({ process: button.dataset.value, activeProcessId: null, activePath: [], points: [] });
+          state.set({ process: button.dataset.value, activePath: [], points: [] });
         });
       });
 
@@ -237,7 +237,7 @@ export default {
           const id = button.dataset.hxSign;
           const input = rootEl.querySelector(`[data-field="${id}"]`);
           const next = toggleNumericSign(input?.value);
-          state.set({ [id]: next, activeProcessId: null, activePath: [], points: [] });
+          state.set({ [id]: next, activePath: [], points: [] });
         });
       });
 
@@ -245,7 +245,8 @@ export default {
         const s = state.get();
         const result = calculate(s);
         const record = makeProcessRecord({ input: s, result });
-        const processes = [...(s.processes ?? []).filter(item => item.id !== record.id), record];
+        const existingIndex = (s.processes ?? []).findIndex(item => item.id === record.id);
+        const processes = existingIndex >= 0 ? (s.processes ?? []).map(item => item.id === record.id ? record : item) : [record, ...(s.processes ?? [])];
         saveProcesses(processes);
         clearLegacyPoints();
         state.set({

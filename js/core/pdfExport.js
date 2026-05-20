@@ -19,9 +19,7 @@ const DEFAULT_PROJECT = {
   client: '',
   project: '',
   projectNo: '',
-  engineer: '',
-  date: '',
-  logoDataUrl: ''
+  engineer: ''
 };
 
 function readProject() {
@@ -39,9 +37,7 @@ function collectProjectFormValues() {
     client: document.getElementById('pdfClient')?.value || '',
     project: document.getElementById('pdfProject')?.value || '',
     projectNo: document.getElementById('pdfProjectNo')?.value || '',
-    engineer: document.getElementById('pdfEngineer')?.value || '',
-    date: document.getElementById('pdfDate')?.value || '',
-    logoDataUrl: readProject().logoDataUrl || ''
+    engineer: document.getElementById('pdfEngineer')?.value || ''
   };
 }
 
@@ -69,15 +65,6 @@ function bindProjectInput(id, key) {
   el.addEventListener('change', () => setProjectMeta({ [key]: el.value }));
 }
 
-function updateLogoPreview() {
-  const preview = document.getElementById('pdfLogoPreview');
-  if (!preview) return;
-  const { logoDataUrl } = readProject();
-  preview.innerHTML = logoDataUrl
-    ? `<img src="${esc(logoDataUrl)}" alt="Firmenlogo für diese Sitzung">`
-    : '<span>Kein Logo ausgewählt</span>';
-}
-
 function updateOpenedProjectLabel() {
   const label = document.getElementById('projectFileLabel');
   if (!label) return;
@@ -94,25 +81,6 @@ function initProjectSettings() {
   bindProjectInput('pdfProject', 'project');
   bindProjectInput('pdfProjectNo', 'projectNo');
   bindProjectInput('pdfEngineer', 'engineer');
-  bindProjectInput('pdfDate', 'date');
-
-  document.getElementById('pdfLogo')?.addEventListener('change', event => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.addEventListener('load', () => {
-      setProjectMeta({ logoDataUrl: String(reader.result || '') });
-      updateLogoPreview();
-    });
-    reader.readAsDataURL(file);
-  });
-
-  document.getElementById('clearPdfLogo')?.addEventListener('click', () => {
-    setProjectMeta({ logoDataUrl: '' });
-    const file = document.getElementById('pdfLogo');
-    if (file) file.value = '';
-    updateLogoPreview();
-  });
 
   document.getElementById('saveProjectButton')?.addEventListener('click', event => {
     event.preventDefault();
@@ -147,7 +115,6 @@ function initProjectSettings() {
     updateOpenedProjectLabel();
   });
 
-  updateLogoPreview();
   updateOpenedProjectLabel();
 }
 
@@ -156,10 +123,6 @@ function hydrateProjectForm(data = {}) {
   setInputValue('pdfProject', data.project);
   setInputValue('pdfProjectNo', data.projectNo);
   setInputValue('pdfEngineer', data.engineer);
-  setInputValue('pdfDate', data.date);
-  const file = document.getElementById('pdfLogo');
-  if (file) file.value = '';
-  updateLogoPreview();
 }
 
 function textOf(node) {

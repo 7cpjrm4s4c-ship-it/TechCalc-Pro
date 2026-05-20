@@ -9,16 +9,14 @@ import { readRltDevices, writeRltDevices } from '../modules/heat-recovery/index.
 import { state as hxDiagramState } from '../modules/hx-diagram/state.js';
 import { state as drinkingWaterState } from '../modules/drinking-water/state.js';
 import { state as pressureHoldingState } from '../modules/pressure-holding/state.js';
+import { state as bufferStorageState } from '../modules/buffer-storage/state.js';
 import { readUsageUnits, writeUsageUnits, readSingleConsumers, writeSingleConsumers } from '../modules/drinking-water/logic.js';
-import { APP_VERSION } from './version.js';
 
 const DEFAULT_META = {
   client: '',
   project: '',
   projectNo: '',
-  engineer: '',
-  date: '',
-  logoDataUrl: ''
+  engineer: ''
 };
 
 let projectMeta = { ...DEFAULT_META };
@@ -77,11 +75,11 @@ export function collectProjectData() {
     app: 'TechCalc Pro',
     format: 'techcalc-project',
     version: 1,
-    appVersion: APP_VERSION,
     savedAt: new Date().toISOString(),
     meta: getProjectMeta(),
     modules: {
       'pressure-holding': { state: pressureHoldingState.get() },
+      'buffer-storage': { state: bufferStorageState.get() },
       'heating-cooling': {
         state: heatingCoolingState.get(),
         lineSections: readLineSections()
@@ -106,6 +104,7 @@ export function applyProjectData(data = {}, { fileName = '' } = {}) {
   openedFileName = fileName || openedFileName;
 
   if (modules['pressure-holding']?.state) pressureHoldingState.replace(modules['pressure-holding'].state, { notify: false });
+  if (modules['buffer-storage']?.state) bufferStorageState.replace(modules['buffer-storage'].state, { notify: false });
   if (modules['heating-cooling']?.state) heatingCoolingState.replace(modules['heating-cooling'].state, { notify: false });
   writeLineSections(modules['heating-cooling']?.lineSections || []);
 
@@ -126,6 +125,7 @@ export function applyProjectData(data = {}, { fileName = '' } = {}) {
 export function resetAllSessionData() {
   resetProjectMeta();
   pressureHoldingState.reset();
+  bufferStorageState.reset();
   heatingCoolingState.reset();
   writeLineSections([]);
   ventilationState.reset();
