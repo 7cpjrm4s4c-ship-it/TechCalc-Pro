@@ -42,7 +42,7 @@ function savedPipeRows(s){
 function pipeSaveCard(s){
   return card('Rohrauslegung speichern', stack([
     field({ id:'pipeName', label:'Bezeichnung', value:s.pipeName || '', placeholder:'z. B. Hauptleitung Technik', inputmode:'text' }),
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-pipe-save ${s.activePipeId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-pipe-update ${s.activePipeId ? '' : 'disabled disabled'}>Aktualisieren</button></div>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-pipe-save ${s.activePipeId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-pipe-update ${s.activePipeId ? '' : 'disabled'}>Aktualisieren</button></div>`,
     savedPipeRows(s)
   ].join('')), 'blue');
 }
@@ -92,8 +92,6 @@ function view(s) {
       : stack([
           `<div class="pipe-result-head"><span>Empfohlene DN</span><strong>DN ${r.dn}</strong>${pressureBadge(r)}</div>`,
           resultRows([
-            { label: 'Massenstrom', value: s.flowUnit === 'kg/h' ? (s.flowValue || s.massFlowKgh || '—') : (s.massFlowKgh || '—'), unit: (s.flowUnit === 'kg/h' ? (s.flowValue || s.massFlowKgh) : s.massFlowKgh) ? 'kg/h' : '' },
-            { label: 'Volumenstrom', value: s.flowUnit === 'm³/h' ? (s.flowValue || s.volumeFlowM3h || '—') : (s.volumeFlowM3h || '—'), unit: (s.flowUnit === 'm³/h' ? (s.flowValue || s.volumeFlowM3h) : s.volumeFlowM3h) ? 'm³/h' : '' },
             { label: 'Geschwindigkeit', value: fmt(r.velocity), unit: 'm/s' },
             { label: 'Druckverlust', value: fmt(r.pressureLoss), unit: 'Pa/m' },
             { label: 'Norm', value: r.norm }
@@ -115,7 +113,6 @@ export default {
     mountModule(root, state, view, (rootEl, snapshot) => {
       rootEl.querySelector('[data-pipe-save]')?.addEventListener('click', () => {
         const current = state.get();
-        if (current.activePipeId) return;
         const result = calculate(current);
         const saved = Array.isArray(current.savedPipes) ? current.savedPipes : [];
         const record = pipeSnapshot({ ...current, activePipeId:null }, result);

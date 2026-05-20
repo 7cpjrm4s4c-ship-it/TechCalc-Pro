@@ -45,7 +45,7 @@ function ventilationLineSectionsCard(r, active, modeLabel) {
   });
   return card('Leitungsabschnitte', stack([
     `<div class="field"><label for="ventLineSectionName">Bezeichnung</label><div class="control"><input id="ventLineSectionName" type="text" placeholder="z. B. Zuluft Büro Nord" autocomplete="off" value="${(state.get().activeVentLineSectionName || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></div></div>`,
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-vent-line-save ${state.get().activeVentLineSectionId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-vent-line-update ${state.get().activeVentLineSectionId ? '' : 'disabled disabled'}>Aktualisieren</button></div>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-vent-line-save ${state.get().activeVentLineSectionId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-vent-line-update ${state.get().activeVentLineSectionId ? '' : 'disabled'}>Aktualisieren</button></div>`,
     rows
   ].join('')), 'cyan');
 }
@@ -71,9 +71,8 @@ function bindVentilationLineSections(root, r, active, modeLabel, rerender) {
   bindEditModeClear(root, { state, activeIdKey: 'activeVentLineSectionId', nameKey: 'activeVentLineSectionName' });
   root.querySelector('[data-vent-line-save]')?.addEventListener('click', event => {
     event.preventDefault();
-    const currentState = state.get();
-    if (currentState.activeVentLineSectionId) return;
     const name = root.querySelector('#ventLineSectionName')?.value?.trim() || '';
+    const currentState = state.get();
     const items = readVentilationLineSections();
     const id = createRecordId('vent');
     const item = buildVentilationLineSectionRecord({ ...currentState, activeVentLineSectionId: null, activeVentLineSectionName: name }, r, active, modeLabel, items, id, name);
@@ -115,8 +114,7 @@ function bindVentilationLineSections(root, r, active, modeLabel, rerender) {
         [`${prefix}RoomTemp`]: input.roomTemp || '',
         activeVentLineSectionId: item.id,
         activeVentLineSectionName: item.name || ''
-      }, { notify:false });
-      if (typeof rerender === 'function') rerender();
+      });
     },
     onDelete(id) {
       writeVentilationLineSections(removeRecord(readVentilationLineSections(), id));

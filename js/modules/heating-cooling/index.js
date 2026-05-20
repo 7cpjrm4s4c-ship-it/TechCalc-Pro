@@ -131,7 +131,7 @@ function lineSectionsCard(r) {
   });
   return card('Leitungsabschnitte', stack([
     `<div class="field"><label for="lineSectionName">Bezeichnung</label><div class="control"><input id="lineSectionName" type="text" placeholder="z. B. Verteilerabgang Nord" autocomplete="off" value="${(state.get().activeLineSectionName || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></div></div>`,
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-line-save ${state.get().activeLineSectionId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-line-update ${state.get().activeLineSectionId ? '' : 'disabled disabled'}>Aktualisieren</button></div>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-line-save ${state.get().activeLineSectionId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-line-update ${state.get().activeLineSectionId ? '' : 'disabled'}>Aktualisieren</button></div>`,
     rows
   ].join('')), 'blue');
 }
@@ -163,9 +163,8 @@ function bindLineSections(root, r, rerender) {
   const updateBtn = root.querySelector('[data-line-update]');
   saveBtn?.addEventListener('click', (event) => {
     event.preventDefault();
-    const currentState = state.get();
-    if (currentState.activeLineSectionId) return;
     const name = root.querySelector('#lineSectionName')?.value?.trim() || '';
+    const currentState = state.get();
     const items = readLineSections();
     const id = createRecordId('line');
     const item = buildLineSectionRecord({ ...currentState, activeLineSectionId: null, activeLineSectionName: name }, r, items, id, name);
@@ -208,8 +207,7 @@ function bindLineSections(root, r, rerender) {
         [`${prefix}DeltaT`]: input.deltaT || '',
         activeLineSectionId: item.id,
         activeLineSectionName: item.name || ''
-      }, { notify:false });
-      if (typeof rerender === 'function') rerender();
+      });
     },
     onDelete(id) {
       writeLineSections(removeRecord(readLineSections(), id));
