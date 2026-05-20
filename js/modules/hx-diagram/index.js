@@ -259,9 +259,11 @@ export default {
       rootEl.querySelector('[data-hx-update]')?.addEventListener('click', () => {
         const s = state.get();
         if (!s.activeProcessId) return;
+        const existing = (s.processes ?? []).find(item => item.id === s.activeProcessId);
+        if (!existing) return;
         const result = calculate(s);
-        const record = makeProcessRecord({ input: s, result });
-        const processes = (s.processes ?? []).map(item => item.id === s.activeProcessId ? record : item);
+        const record = makeProcessRecord({ input: { ...s, activeProcessId: existing.id }, result, id: existing.id, existing });
+        const processes = (s.processes ?? []).map(item => item.id === existing.id ? record : item);
         saveProcesses(processes);
         clearLegacyPoints();
         state.set({

@@ -23,7 +23,8 @@ function renderVentilationLineSection(item, index) {
   const active = state.get().activeVentLineSectionId === item.id;
   return `<article class="line-section-card is-collapsed ${active ? 'is-active' : ''}" data-line-card data-vent-line-select="${item.id}">
     <div class="line-section-card__head">
-      <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false"><strong>${item.name || 'Abschnitt ' + (index + 1)}</strong><span>▾</span></button>
+      <div class="line-section-card__title"><strong>${item.name || 'Abschnitt ' + (index + 1)}</strong></div>
+      <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Abschnitt aufklappen"><span>▾</span></button>
       <button type="button" class="line-section-card__delete" data-line-delete="${item.id}" aria-label="Abschnitt löschen">×</button>
     </div>
     <div class="line-section-card__body">${inlineStats([
@@ -94,7 +95,8 @@ function bindVentilationLineSections(root, r, active, modeLabel, rerender) {
     if (typeof rerender === 'function') rerender();
   });
   root.querySelectorAll('[data-line-toggle]').forEach(toggle => {
-    toggle.addEventListener('click', () => {
+    toggle.addEventListener('click', event => {
+      event.stopPropagation();
       const card = toggle.closest('[data-line-card]');
       const collapsed = card?.classList.toggle('is-collapsed');
       toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
@@ -124,7 +126,8 @@ function bindVentilationLineSections(root, r, active, modeLabel, rerender) {
   });
 
   root.querySelectorAll('[data-line-delete]').forEach(del => {
-    del.addEventListener('click', () => {
+    del.addEventListener('click', event => {
+      event.stopPropagation();
       const id = del.dataset.lineDelete;
       writeVentilationLineSections(readVentilationLineSections().filter(item => String(item.id) !== String(id)));
       if (String(state.get().activeVentLineSectionId) === String(id)) state.set({ activeVentLineSectionId:null, activeVentLineSectionName:'' }, { notify:false });

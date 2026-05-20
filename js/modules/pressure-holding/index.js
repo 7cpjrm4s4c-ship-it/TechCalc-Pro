@@ -1,7 +1,7 @@
 import config from './config.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, esc } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, resultRows, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 
@@ -42,11 +42,18 @@ function savedPlantRows(items = []){
   return `<div class="ph-saved-list">${items.map(item => {
     const res = item.result || {};
     const subtitle = [res.productLabel, res.selectedStandardVolume ? `${fmt(res.selectedStandardVolume,0)} l` : '', res.systemVolume ? `VA ${fmt(res.systemVolume,0)} l` : ''].filter(Boolean).join(' · ');
-    return `<article class="ph-saved-item ${state.get().activePlantId === item.id ? 'is-active' : ''}" data-ph-load="${esc(item.id)}">
-      <div><strong>${esc(item.name || 'Anlage')}</strong><small>${esc(subtitle || 'gespeicherte Druckhaltung')}</small></div>
-      <div class="ph-saved-actions">
-        <button type="button" class="mini-button mini-button--danger" data-ph-delete="${esc(item.id)}">Löschen</button>
+    return `<article class="ph-saved-item line-section-card is-collapsed ${state.get().activePlantId === item.id ? 'is-active' : ''}" data-line-card data-ph-load="${esc(item.id)}">
+      <div class="line-section-card__head">
+        <div class="line-section-card__title" data-ph-select="${esc(item.id)}"><strong>${esc(item.name || 'Anlage')}</strong><small>${esc(subtitle || 'gespeicherte Druckhaltung')}</small></div>
+        <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Gespeicherte Anlage aufklappen"><span>▾</span></button>
+        <button type="button" class="line-section-card__delete" data-ph-delete="${esc(item.id)}" aria-label="Anlage löschen">×</button>
       </div>
+      <div class="line-section-card__body">${resultRows([
+        { label:'Auswahl', value:res.productLabel || '—' },
+        { label:'Normvolumen', value:res.selectedStandardVolume ? fmt(res.selectedStandardVolume,0) : '—', unit:res.selectedStandardVolume ? 'Liter' : '' },
+        { label:'Mindestbetriebsdruck p₀', value:res.p0 !== undefined ? fmt(res.p0,2) : '—', unit:res.p0 !== undefined ? 'bar' : '' },
+        { label:'Enddruck pₑ', value:res.pe !== undefined ? fmt(res.pe,2) : '—', unit:res.pe !== undefined ? 'bar' : '' }
+      ])}</div>
     </article>`;
   }).join('')}</div>`;
 }
@@ -161,17 +168,26 @@ function bindPressureHoldingActions(root, snapshot){
     const record = { ...savedPlantSnapshot(current, result), id, createdAt: existing.createdAt || new Date().toISOString() };
     state.set({ savedPlants: saved.map(item => String(item.id) === String(id) ? record : item), activePlantId: id, plantName: record.name });
   });
-  root.querySelectorAll('[data-ph-load]').forEach(button => {
+  root.querySelectorAll('[data-line-toggle]').forEach(toggle => {
+    toggle.addEventListener('click', event => {
+      event.stopPropagation();
+      const itemCard = toggle.closest('[data-line-card]');
+      const collapsed = itemCard?.classList.toggle('is-collapsed');
+      toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    });
+  });
+  root.querySelectorAll('[data-ph-select]').forEach(button => {
     button.addEventListener('click', event => {
-      if (event.target.closest('[data-ph-delete]')) return;
+      if (event.target.closest('[data-ph-delete]') || event.target.closest('[data-line-toggle]')) return;
       const current = state.get();
-      const item = (current.savedPlants || []).find(entry => String(entry.id) === String(button.dataset.phLoad));
+      const item = (current.savedPlants || []).find(entry => String(entry.id) === String(button.dataset.phSelect));
       if(!item?.state) return;
       state.set({ ...item.state, savedPlants: current.savedPlants || [], activePlantId: item.id, plantName: item.name || item.state?.plantName || '' });
     });
   });
   root.querySelectorAll('[data-ph-delete]').forEach(button => {
-    button.addEventListener('click', () => {
+    button.addEventListener('click', event => {
+      event.stopPropagation();
       const current = state.get();
       const next = (current.savedPlants || []).filter(entry => String(entry.id) !== String(button.dataset.phDelete));
       state.set({ savedPlants: next, activePlantId: String(current.activePlantId) === String(button.dataset.phDelete) ? null : current.activePlantId });

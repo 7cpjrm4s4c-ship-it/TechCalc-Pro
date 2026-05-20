@@ -54,3 +54,58 @@
     grid-template-columns: 48px 1fr auto;
   }
 }
+
+/* Pressure holding: saved plant list */
+.ph-saved-list {
+  display: grid;
+  gap: 10px;
+}
+.ph-saved-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,.035);
+}
+.ph-saved-item strong {
+  display: block;
+  color: var(--color-text);
+  font-size: 15px;
+  line-height: 1.2;
+}
+.ph-saved-item small {
+  display: block;
+  margin-top: 3px;
+  color: var(--color-muted);
+  font-size: 11px;
+  line-height: 1.25;
+}
+.ph-saved-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.mini-button--danger {
+  border-color: rgba(255,95,95,.45);
+  color: #ffd5d5;
+}
+@media (max-width: 640px) {
+  .ph-saved-item {
+    grid-template-columns: 1fr;
+  }
+  .ph-saved-actions {
+    justify-content: stretch;
+  }
+  .ph-saved-actions .mini-button {
+    flex: 1 1 auto;
+  }
+}
+
+/* v1.0.6 pressure/buffer saved cards use unified layout */
+.ph-saved-list { gap: 12px; }
+.ph-saved-item { grid-template-columns: 1fr; align-items: stretch; }
+.ph-saved-actions { display: contents; }

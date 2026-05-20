@@ -23,7 +23,7 @@ function pipeSnapshot(s, r){
 function savedPipeRows(s){
   const items = Array.isArray(s.savedPipes) ? s.savedPipes : [];
   if(!items.length) return '<div class="empty-state empty-state--compact">Noch keine Rohrauslegungen gespeichert.</div>';
-  return `<div class="line-section-list">${items.map(item => `<article class="line-section-card is-collapsed ${s.activePipeId === item.id ? 'is-active' : ''}" data-line-card data-pipe-load="${esc(item.id)}"><div class="line-section-card__head"><button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false"><strong>${esc(item.name || 'Rohrauslegung')}</strong><span>▾</span></button><button type="button" class="line-section-card__delete" data-pipe-delete="${esc(item.id)}" aria-label="Rohrauslegung löschen">×</button></div><div class="line-section-card__body">${inlineStats([{label:'System', value:item.result?.system || '—'}, {label:'Dimension', value:item.result?.dn ? `DN ${item.result.dn}` : '—'}, {label:'Druckverlust', value:item.result?.pressureLoss ? fmt(item.result.pressureLoss) : '—', unit:item.result?.pressureLoss ? 'Pa/m' : ''}])}</div></article>`).join('')}</div>`;
+  return `<div class="line-section-list">${items.map(item => `<article class="line-section-card is-collapsed ${s.activePipeId === item.id ? 'is-active' : ''}" data-line-card data-pipe-load="${esc(item.id)}"><div class="line-section-card__head"><div class="line-section-card__title"><strong>${esc(item.name || 'Rohrauslegung')}</strong></div><button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Rohrauslegung aufklappen"><span>▾</span></button><button type="button" class="line-section-card__delete" data-pipe-delete="${esc(item.id)}" aria-label="Rohrauslegung löschen">×</button></div><div class="line-section-card__body">${inlineStats([{label:'System', value:item.result?.system || '—'}, {label:'Dimension', value:item.result?.dn ? `DN ${item.result.dn}` : '—'}, {label:'Druckverlust', value:item.result?.pressureLoss ? fmt(item.result.pressureLoss) : '—', unit:item.result?.pressureLoss ? 'Pa/m' : ''}])}</div></article>`).join('')}</div>`;
 }
 function pipeSaveCard(s){
   return card('Rohrauslegung speichern', stack([
@@ -114,7 +114,8 @@ export default {
         const record = { ...pipeSnapshot(current, calculate(current)), id, createdAt: existing.createdAt || new Date().toISOString() };
         state.set({ savedPipes:saved.map(item => String(item.id) === String(id) ? record : item), activePipeId:id, pipeName:record.name });
       });
-      rootEl.querySelectorAll('[data-line-toggle]').forEach(toggle => toggle.addEventListener('click', () => {
+      rootEl.querySelectorAll('[data-line-toggle]').forEach(toggle => toggle.addEventListener('click', event => {
+        event.stopPropagation();
         const card = toggle.closest('[data-line-card]');
         const collapsed = card?.classList.toggle('is-collapsed');
         toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
@@ -126,7 +127,8 @@ export default {
         if(!item?.state) return;
         state.set({ ...item.state, savedPipes:current.savedPipes || [], activePipeId:item.id, pipeName:item.name || item.state?.pipeName || '' });
       }));
-      rootEl.querySelectorAll('[data-pipe-delete]').forEach(button => button.addEventListener('click', () => {
+      rootEl.querySelectorAll('[data-pipe-delete]').forEach(button => button.addEventListener('click', event => {
+        event.stopPropagation();
         const current = state.get();
         const next = (current.savedPipes || []).filter(item => String(item.id) !== String(button.dataset.pipeDelete));
         state.set({ savedPipes:next, activePipeId:String(current.activePipeId) === String(button.dataset.pipeDelete) ? null : current.activePipeId });

@@ -3991,3 +3991,79 @@ body.settings-open {
 @media (max-width: 560px) {
   .tc-save-actions { grid-template-columns: 1fr; }
 }
+
+/* v1.0.6: unified saved-record cards */
+.line-section-card,
+.ph-saved-item {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: var(--radius-lg);
+  background: rgba(255,255,255,.035);
+}
+.line-section-card.is-collapsed .line-section-card__body,
+.ph-saved-item.is-collapsed .line-section-card__body {
+  display: none !important;
+}
+.line-section-card__head {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto auto !important;
+  align-items: center;
+  gap: 10px;
+}
+.line-section-card__title {
+  min-width: 0;
+  color: var(--color-text);
+  font-weight: 800;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.line-section-card__title small {
+  display: block;
+  margin-top: 4px;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.line-section-card__toggle,
+.line-section-card__delete {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  cursor: pointer;
+}
+.line-section-card__toggle {
+  border: 1px solid color-mix(in srgb, var(--accent-blue) 55%, transparent) !important;
+  background: color-mix(in srgb, var(--accent-blue) 13%, transparent) !important;
+  color: var(--accent-blue) !important;
+}
+.line-section-card__toggle span {
+  width: auto !important;
+  height: auto !important;
+  color: inherit !important;
+  transform: none !important;
+}
+.line-section-card:not(.is-collapsed) .line-section-card__toggle span,
+.ph-saved-item:not(.is-collapsed) .line-section-card__toggle span {
+  transform: rotate(180deg) !important;
+}
+.line-section-card__delete {
+  font-weight: 900;
+}
+.line-section-card__body {
+  min-width: 0;
+  padding-top: 6px;
+}
+@media (max-width: 640px) {
+  .line-section-card__head { gap: 8px; }
+  .line-section-card__title { font-size: 18px; }
+}

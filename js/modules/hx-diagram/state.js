@@ -15,20 +15,20 @@ export function saveProcesses(processes) {
   state.set({ processes: Array.isArray(processes) ? processes : [] }, { notify: false });
 }
 
-export function makeProcessRecord({ input, result }) {
-  const existing = (input.processes || []).find(item => item.id === input.activeProcessId);
+export function makeProcessRecord({ input, result, id = null, existing = null }) {
+  const recordId = id || input.activeProcessId || existing?.id || createId();
   return {
-    id: input.activeProcessId || createId(),
-    label: String(input.label || 'Zustand'),
-    process: result.selectedProcess || input.process || 'heat',
+    id: recordId,
+    label: String(input.label || existing?.label || 'Zustand'),
+    process: result.selectedProcess || input.process || existing?.process || 'heat',
     processLabel: result.changeType,
     input: {
-      label: String(input.label || 'Zustand'),
+      label: String(input.label || existing?.input?.label || 'Zustand'),
       tempC: String(input.tempC ?? ''),
       rhPercent: String(input.rhPercent ?? ''),
       targetTempC: String(input.targetTempC ?? ''),
       targetRhPercent: String(input.targetRhPercent ?? ''),
-      process: result.selectedProcess || input.process || 'heat'
+      process: result.selectedProcess || input.process || existing?.input?.process || 'heat'
     },
     path: result.processPath,
     createdAt: existing?.createdAt || new Date().toISOString(),

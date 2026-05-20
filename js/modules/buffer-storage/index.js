@@ -1,7 +1,7 @@
 import config from './config.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, inlineStats, esc } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, resultRows, inlineStats, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 
@@ -41,7 +41,19 @@ function savedRows(items = []){
   return `<div class="ph-saved-list">${items.map(item => {
     const res = item.result || {};
     const subtitle = [modeLabel(res.mode), res.standard ? `${fmt(res.standard,0)} l` : '', res.medium].filter(Boolean).join(' · ');
-    return `<article class="ph-saved-item ${state.get().activeCalculationId === item.id ? 'is-active' : ''}" data-buffer-load="${esc(item.id)}"><div><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle)}</small></div><div class="ph-saved-actions"><button type="button" class="mini-button mini-button--danger" data-buffer-delete="${esc(item.id)}">Löschen</button></div></article>`;
+    return `<article class="ph-saved-item line-section-card is-collapsed ${state.get().activeCalculationId === item.id ? 'is-active' : ''}" data-line-card data-buffer-load="${esc(item.id)}">
+      <div class="line-section-card__head">
+        <div class="line-section-card__title" data-buffer-select="${esc(item.id)}"><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle || 'gespeicherte Berechnung')}</small></div>
+        <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Gespeicherte Berechnung aufklappen"><span>▾</span></button>
+        <button type="button" class="line-section-card__delete" data-buffer-delete="${esc(item.id)}" aria-label="Berechnung löschen">×</button>
+      </div>
+      <div class="line-section-card__body">${resultRows([
+        { label:'Berechnungsart', value:modeLabel(res.mode) },
+        { label:'Normvolumen', value:res.standard ? fmt(res.standard,0) : '—', unit:res.standard ? 'Liter' : '' },
+        { label:'Volumen', value:res.volume ? fmt(res.volume,1) : '—', unit:res.volume ? 'Liter' : '' },
+        { label:'Medium', value:res.medium || '—' }
+      ])}</div>
+    </article>`;
   }).join('')}</div>`;
 }
 function savedCard(s){
@@ -161,17 +173,26 @@ function bindActions(root, snapshot){
     const record = { ...savedSnapshot(current, result), id, createdAt: existing.createdAt || new Date().toISOString() };
     state.set({ savedCalculations: saved.map(item => String(item.id) === String(id) ? record : item), activeCalculationId: id, plantName: record.name });
   });
-  root.querySelectorAll('[data-buffer-load]').forEach(button => {
+  root.querySelectorAll('[data-line-toggle]').forEach(toggle => {
+    toggle.addEventListener('click', event => {
+      event.stopPropagation();
+      const itemCard = toggle.closest('[data-line-card]');
+      const collapsed = itemCard?.classList.toggle('is-collapsed');
+      toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    });
+  });
+  root.querySelectorAll('[data-buffer-select]').forEach(button => {
     button.addEventListener('click', event => {
-      if (event.target.closest('[data-buffer-delete]')) return;
+      if (event.target.closest('[data-buffer-delete]') || event.target.closest('[data-line-toggle]')) return;
       const current = state.get();
-      const item = (current.savedCalculations || []).find(entry => String(entry.id) === String(button.dataset.bufferLoad));
+      const item = (current.savedCalculations || []).find(entry => String(entry.id) === String(button.dataset.bufferSelect));
       if(!item?.state) return;
       state.set({ ...item.state, savedCalculations: current.savedCalculations || [], activeCalculationId: item.id, plantName: item.name || item.state?.plantName || '' });
     });
   });
   root.querySelectorAll('[data-buffer-delete]').forEach(button => {
-    button.addEventListener('click', () => {
+    button.addEventListener('click', event => {
+      event.stopPropagation();
       const current = state.get();
       const next = (current.savedCalculations || []).filter(entry => String(entry.id) !== String(button.dataset.bufferDelete));
       state.set({ savedCalculations: next, activeCalculationId: String(current.activeCalculationId) === String(button.dataset.bufferDelete) ? null : current.activeCalculationId });

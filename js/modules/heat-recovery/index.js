@@ -23,7 +23,8 @@ function rltDeviceCard(r, s) {
   const rows = items.length
     ? `<div class="line-section-list">${items.map((item, index) => { const active = state.get().activeRltDeviceId === item.id; return `<article class="line-section-card is-collapsed ${active ? 'is-active' : ''}" data-line-card data-rlt-select="${esc(item.id)}">
         <div class="line-section-card__head">
-          <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false"><strong>${esc(item.name || 'RLT-Gerät ' + (index + 1))}</strong><span>▾</span></button>
+          <div class="line-section-card__title"><strong>${esc(item.name || 'RLT-Gerät ' + (index + 1))}</strong></div>
+          <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="RLT-Gerät aufklappen"><span>▾</span></button>
           <button type="button" class="line-section-card__delete" data-rlt-delete="${esc(item.id)}" aria-label="RLT-Gerät löschen">×</button>
         </div>
         <div class="line-section-card__body">${inlineStats([
@@ -93,7 +94,8 @@ function bindRltDevices(root, r, s, rerender) {
     if (typeof rerender === 'function') rerender();
   });
   root.querySelectorAll('[data-line-toggle]').forEach(toggle => {
-    toggle.addEventListener('click', () => {
+    toggle.addEventListener('click', event => {
+      event.stopPropagation();
       const card = toggle.closest('[data-line-card]');
       const collapsed = card?.classList.toggle('is-collapsed');
       toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
@@ -109,7 +111,8 @@ function bindRltDevices(root, r, s, rerender) {
   });
 
   root.querySelectorAll('[data-rlt-delete]').forEach(del => {
-    del.addEventListener('click', () => {
+    del.addEventListener('click', event => {
+      event.stopPropagation();
       const id = del.dataset.rltDelete;
       writeRltDevices(readRltDevices().filter(item => String(item.id) !== String(id)));
       if (String(state.get().activeRltDeviceId) === String(id)) state.set({ activeRltDeviceId:null, activeRltDeviceName:'' }, { notify:false });
