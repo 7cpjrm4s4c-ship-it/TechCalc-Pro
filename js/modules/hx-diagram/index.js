@@ -41,7 +41,7 @@ function inputCard(s) {
       field({ id: 'targetRhPercent', label: 'Relative Zielfeuchte φ', unit: '%', value: fmtInput(s.targetRhPercent, 2) })
     ].join(''), 2), 'cyan', { compact: true }),
     processCard(s),
-    `<div class="tc-save-actions">${actionButton('Speichern', s.activeProcessId ? 'data-hx-add disabled' : 'data-hx-add')} ${actionButton('Aktualisieren', s.activeProcessId ? 'data-hx-update' : 'data-hx-update disabled')}</div><div class="tc-actions">${actionButton('Diagramm leeren', 'data-hx-clear', 'tc-action--ghost')}</div>`
+    `<div class="tc-save-actions">${actionButton('Speichern', 'data-hx-add')} ${actionButton('Aktualisieren', s.activeProcessId ? 'data-hx-update' : 'data-hx-update disabled')}</div><div class="tc-actions">${actionButton('Diagramm leeren', 'data-hx-clear', 'tc-action--ghost')}</div>`
   ].join('')), 'cyan');
 }
 
@@ -256,8 +256,12 @@ export default {
         });
       });
 
+      let lastHxUpdate = 0;
       const updateProcess = event => {
         event?.preventDefault?.();
+        const now = Date.now();
+        if (now - lastHxUpdate < 250) return;
+        lastHxUpdate = now;
         rootEl.querySelectorAll('[data-field]').forEach(el => {
           if (el?.dataset?.field) state.set({ [el.dataset.field]: el.value }, { notify: false });
         });
@@ -280,7 +284,8 @@ export default {
       };
       const updateButton = rootEl.querySelector('[data-hx-update]');
       updateButton?.addEventListener('pointerdown', updateProcess);
-      updateButton?.addEventListener('click', event => event.preventDefault());
+      updateButton?.addEventListener('touchstart', updateProcess, { passive:false });
+      updateButton?.addEventListener('click', updateProcess);
 
       rootEl.querySelector('[data-hx-clear]')?.addEventListener('click', () => {
         clearLegacyPoints();

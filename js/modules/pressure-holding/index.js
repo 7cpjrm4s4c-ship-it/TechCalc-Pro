@@ -62,7 +62,7 @@ function savedPlantRows(items = []){
 function savedPlantsCard(s){
   return card('Anlagen speichern', stack([
     field({ id:'plantName', label:'Anlagenbezeichnung', value:s.plantName || '', placeholder:'z. B. Heizzentrale BT A', inputmode:'text' }),
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-ph-save ${s.activePlantId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-ph-update ${s.activePlantId ? '' : 'disabled'}>Aktualisieren</button></div>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-ph-save>Speichern</button><button type="button" class="action-button" data-ph-update ${s.activePlantId ? '' : 'disabled'}>Aktualisieren</button></div>`,
     savedPlantRows(Array.isArray(s.savedPlants) ? s.savedPlants : [])
   ].join('')), 'purple');
 }

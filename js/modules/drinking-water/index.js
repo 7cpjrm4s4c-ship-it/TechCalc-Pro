@@ -2,6 +2,7 @@ import config from './config.js';
 import { state } from './state.js';
 import { calculate, CONSUMERS, BUILDING_TYPES, createConsumer, createUsageUnit, createSingleGroup, readUsageUnits, writeUsageUnits, readSingleConsumers, writeSingleConsumers } from './logic.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, esc } from '../../core/renderer.js';
+import { renderSavedRecordList, bindSavedRecordList, isSameId, removeRecord } from '../../core/savedRecords.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 
 function fieldSelector(key) {
@@ -31,48 +32,51 @@ function consumerRows(consumers = []) {
 }
 
 function unitRows(units) {
-  if (!units.length) return '<div class="empty-state empty-state--compact">Noch keine Nutzungseinheit angelegt</div>';
-  return `<div class="dw-list">${units.map(unit => `<details class="dw-accordion">
-    <summary>
-      <span><strong>${esc(unit.name)}</strong><small>${unit.consumerCount} Verbraucher · Σ ${fmt(unit.sumFlow, 2)} l/s · Spitze ${fmt(unit.peakFlow, 2)} l/s</small></span>
-      <button type="button" class="mini-button" data-dw-unit-edit="${esc(unit.id)}" aria-label="Nutzungseinheit laden">Laden</button>
-      <button type="button" data-dw-unit-delete="${esc(unit.id)}" aria-label="Nutzungseinheit löschen">×</button>
-    </summary>
-    <div class="dw-accordion__body">
-      ${inlineStats([
-        { label:'Verbraucher', value: unit.consumerCount },
-        { label:'Σ NE', value: fmt(unit.sumFlow, 2), unit:'l/s' },
-        { label:'Spitze NE', value: fmt(unit.peakFlow, 2), unit:'l/s' },
-        { label:'Ansatz', value:'2 größte Entnahmestellen' }
-      ])}
-      ${consumerRows(unit.consumers || [])}
-    </div>
-  </details>`).join('')}</div>`;
+  return renderSavedRecordList(units, {
+    activeId: state.get().activeUnitId,
+    emptyText: 'Noch keine Nutzungseinheit angelegt',
+    loadAttr: 'data-dw-unit-edit',
+    toggleAttr: 'data-dw-unit-toggle',
+    deleteAttr: 'data-dw-unit-delete',
+    title: unit => unit.name || 'Nutzungseinheit',
+    subtitle: unit => `${unit.consumerCount} Verbraucher · Σ ${fmt(unit.sumFlow, 2)} l/s · Spitze ${fmt(unit.peakFlow, 2)} l/s`,
+    stats: unit => [
+      { label:'Verbraucher', value: unit.consumerCount },
+      { label:'Σ NE', value: fmt(unit.sumFlow, 2), unit:'l/s' },
+      { label:'Spitze NE', value: fmt(unit.peakFlow, 2), unit:'l/s' },
+      { label:'Ansatz', value:'2 größte Entnahmestellen' },
+      ...((unit.consumers || []).map(c => ({ label:`${c.count} × ${c.label}`, value:`${fmt(c.vr * c.count, 2)} l/s${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}${c.permanent ? ' · Dauerverbraucher' : ''}` })))
+    ]
+  });
 }
 
 function singleRows(groups) {
-  if (!groups.length) return '<div class="empty-state empty-state--compact">Noch keine Einzelverbraucher angelegt</div>';
-  return `<div class="dw-list">${groups.map(group => {
-    const consumers = group.consumers || [];
-    const count = consumers.reduce((sum, c) => sum + (Number(c.count) || 1), 0);
-    const sumFlow = consumers.reduce((sum, c) => sum + Number(c.vr || 0) * (Number(c.count) || 1), 0);
-    return `<details class="dw-accordion">
-      <summary>
-        <span><strong>${esc(group.name)}</strong><small>${count} Verbraucher · ${fmt(sumFlow, 2)} l/s</small></span>
-        <button type="button" class="mini-button" data-dw-single-edit="${esc(group.id)}" aria-label="Einzelverbraucher laden">Laden</button>
-        <button type="button" data-dw-single-delete="${esc(group.id)}" aria-label="Einzelverbraucher löschen">×</button>
-      </summary>
-      <div class="dw-accordion__body">
-        ${inlineStats([
-          { label:'Gruppe', value: group.name },
-          { label:'Verbraucher', value: count },
-          { label:'Summendurchfluss', value: fmt(sumFlow, 2), unit:'l/s' },
-          { label:'Dauerverbraucher', value: consumers.some(c => c.permanent) ? 'Ja' : 'Nein' }
-        ])}
-        ${consumerRows(consumers)}
-      </div>
-    </details>`;
-  }).join('')}</div>`;
+  return renderSavedRecordList(groups, {
+    activeId: state.get().activeSingleId,
+    emptyText: 'Noch keine Einzelverbraucher angelegt',
+    loadAttr: 'data-dw-single-edit',
+    toggleAttr: 'data-dw-single-toggle',
+    deleteAttr: 'data-dw-single-delete',
+    title: group => group.name || 'Einzelverbraucher',
+    subtitle: group => {
+      const consumers = group.consumers || [];
+      const count = consumers.reduce((sum, c) => sum + (Number(c.count) || 1), 0);
+      const sumFlow = consumers.reduce((sum, c) => sum + Number(c.vr || 0) * (Number(c.count) || 1), 0);
+      return `${count} Verbraucher · ${fmt(sumFlow, 2)} l/s`;
+    },
+    stats: group => {
+      const consumers = group.consumers || [];
+      const count = consumers.reduce((sum, c) => sum + (Number(c.count) || 1), 0);
+      const sumFlow = consumers.reduce((sum, c) => sum + Number(c.vr || 0) * (Number(c.count) || 1), 0);
+      return [
+        { label:'Gruppe', value: group.name || '—' },
+        { label:'Verbraucher', value: count },
+        { label:'Summendurchfluss', value: fmt(sumFlow, 2), unit:'l/s' },
+        { label:'Dauerverbraucher', value: consumers.some(c => c.permanent) ? 'Ja' : 'Nein' },
+        ...consumers.map(c => ({ label:`${c.count} × ${c.label}`, value:`${fmt(c.vr * c.count, 2)} l/s${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}${c.permanent ? ' · Dauerverbraucher' : ''}` }))
+      ];
+    }
+  });
 }
 
 function selectedFixturesList(r) {
@@ -114,7 +118,7 @@ function inputCard(s, r) {
       ].join(''), 2),
       '<button type="button" class="action-button action-button--secondary" data-dw-draft-add="unit">Verbraucher zur Nutzungseinheit hinzufügen</button>',
       `<div data-dw-unit-draft>${draftConsumerList(s.unitDraftConsumers || [], 'unit')}</div>`,
-      `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-unit ${s.activeUnitId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-dw-update-unit ${s.activeUnitId ? '' : 'disabled'}>Aktualisieren</button></div>`,
+      `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-unit>Speichern</button><button type="button" class="action-button" data-dw-update-unit ${s.activeUnitId ? '' : 'disabled'}>Aktualisieren</button></div>`,
       '</div></details>',
       `<details class="dw-accordion dw-accordion--saved" data-dw-accordion="uiUnitSavedOpen" ${s.uiUnitSavedOpen ? 'open' : ''}><summary><span><strong>Gespeicherte Nutzungseinheiten</strong><small data-dw-unit-summary>${r.usageUnits.length} Nutzungseinheiten angelegt</small></span></summary><div class="dw-accordion__body" data-dw-unit-saved>${unitRows(r.usageUnits)}</div></details>`
     ].join('')), 'blue'),
@@ -131,7 +135,7 @@ function inputCard(s, r) {
       ], String(s.singlePermanent), { accent:'blue' }),
       '<button type="button" class="action-button action-button--secondary" data-dw-draft-add="single">Verbraucher zur Gruppe hinzufügen</button>',
       `<div data-dw-single-draft>${draftConsumerList(s.singleDraftConsumers || [], 'single')}</div>`,
-      `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-single ${s.activeSingleId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-dw-update-single ${s.activeSingleId ? '' : 'disabled'}>Aktualisieren</button></div>`,
+      `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-single>Speichern</button><button type="button" class="action-button" data-dw-update-single ${s.activeSingleId ? '' : 'disabled'}>Aktualisieren</button></div>`,
       '</div></details>',
       `<details class="dw-accordion dw-accordion--saved" data-dw-accordion="uiSingleSavedOpen" ${s.uiSingleSavedOpen ? 'open' : ''}><summary><span><strong>Gespeicherte Einzelverbraucher</strong><small data-dw-single-summary>${r.singleGroups.length} Gruppen außerhalb NE</small></span></summary><div class="dw-accordion__body" data-dw-single-saved>${singleRows(r.singleGroups)}</div></details>`
     ].join('')), 'blue')
@@ -301,6 +305,15 @@ function bindDrinkingWater(root) {
       return;
     }
 
+    const dwToggle = event.target.closest('[data-dw-unit-toggle], [data-dw-single-toggle]');
+    if (dwToggle && root.contains(dwToggle)) {
+      event.preventDefault(); event.stopPropagation();
+      const card = dwToggle.closest('[data-line-card]');
+      const collapsed = card?.classList.toggle('is-collapsed');
+      dwToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      return;
+    }
+
     const unitDelete = event.target.closest('[data-dw-unit-delete]');
     if (unitDelete && root.contains(unitDelete)) {
       event.preventDefault(); event.stopPropagation();
@@ -319,6 +332,7 @@ function bindDrinkingWater(root) {
 
     const unitEdit = event.target.closest('[data-dw-unit-edit]');
     if (unitEdit && root.contains(unitEdit)) {
+      if (event.target.closest('[data-dw-unit-toggle], [data-dw-unit-delete]')) return;
       event.preventDefault(); event.stopPropagation();
       const units = readUsageUnits();
       const unit = units.find(item => item.id === unitEdit.dataset.dwUnitEdit);
@@ -335,6 +349,7 @@ function bindDrinkingWater(root) {
 
     const singleEdit = event.target.closest('[data-dw-single-edit]');
     if (singleEdit && root.contains(singleEdit)) {
+      if (event.target.closest('[data-dw-single-toggle], [data-dw-single-delete]')) return;
       event.preventDefault(); event.stopPropagation();
       const groups = readSingleConsumers();
       const group = groups.find(item => item.id === singleEdit.dataset.dwSingleEdit);

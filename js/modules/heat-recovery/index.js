@@ -4,6 +4,7 @@ import { calculate } from './logic.js';
 import { card, field, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, esc, signedTempField, toggleNumericSign } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
+import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindSavedRecordList } from '../../core/savedRecords.js';
 
 function readonlyValue({ label, value, unit = '' }) {
   return `<div class="field field--readonly"><label>${label}</label><div class="control control--readonly"><strong>${value}</strong>${unit ? `<span class="unit">${unit}</span>` : ''}</div></div>`;
@@ -20,28 +21,28 @@ export function writeRltDevices(items) {
 
 function rltDeviceCard(r, s) {
   const items = readRltDevices();
-  const rows = items.length
-    ? `<div class="line-section-list">${items.map((item, index) => { const active = state.get().activeRltDeviceId === item.id; return `<article class="line-section-card is-collapsed ${active ? 'is-active' : ''}" data-line-card data-rlt-select="${esc(item.id)}">
-        <div class="line-section-card__head">
-          <div class="line-section-card__title"><strong>${esc(item.name || 'RLT-Gerät ' + (index + 1))}</strong></div>
-          <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="RLT-Gerät aufklappen"><span>▾</span></button>
-          <button type="button" class="line-section-card__delete" data-rlt-delete="${esc(item.id)}" aria-label="RLT-Gerät löschen">×</button>
-        </div>
-        <div class="line-section-card__body">${inlineStats([
-          { label: 'Berechnung', value: item.mode || '—' },
-          { label: 'Volumenstrom', value: item.volumeFlowM3h || '—', unit: 'm³/h' },
-          { label: 'Außenluft', value: item.outdoor || '—' },
-          { label: 'Abluft/Umluft', value: item.extract || '—' },
-          { label: 'Zuluft/Mischluft', value: item.supply || '—' },
-          { label: 'Fortluft', value: item.exhaust || '—' },
-          { label: 'Leistung', value: item.power || '—', unit: item.power && item.power !== '—' ? 'kW' : '' },
-          { label: 'Kondensation', value: item.condensation || '—' }
-        ])}</div>
-      </article>`; }).join('')}</div>`
-    : '<div class="empty-state empty-state--compact">Noch keine RLT-Geräte angelegt</div>';
+  const rows = renderSavedRecordList(items, {
+    activeId: state.get().activeRltDeviceId,
+    emptyText: 'Noch keine RLT-Geräte angelegt',
+    loadAttr: 'data-rlt-select',
+    toggleAttr: 'data-rlt-toggle',
+    deleteAttr: 'data-rlt-delete',
+    title: item => item.name || 'RLT-Gerät',
+    subtitle: item => `${item.mode || '—'} · ${item.volumeFlowM3h || '—'} m³/h`,
+    stats: item => [
+      { label: 'Berechnung', value: item.mode || '—' },
+      { label: 'Volumenstrom', value: item.volumeFlowM3h || '—', unit: item.volumeFlowM3h && item.volumeFlowM3h !== '—' ? 'm³/h' : '' },
+      { label: 'Außenluft', value: item.outdoor || '—' },
+      { label: 'Abluft/Umluft', value: item.extract || '—' },
+      { label: 'Zuluft/Mischluft', value: item.supply || '—' },
+      { label: 'Fortluft', value: item.exhaust || '—' },
+      { label: 'Leistung', value: item.power || '—', unit: item.power && item.power !== '—' ? 'kW' : '' },
+      { label: 'Kondensation', value: item.condensation || '—' }
+    ]
+  });
   return card('RLT-Geräte', stack([
     `<div class="field"><label for="rltDeviceName">Bezeichnung</label><div class="control"><input id="rltDeviceName" type="text" placeholder="z. B. RLT Büro EG" autocomplete="off" value="${esc(state.get().activeRltDeviceName || '')}"></div></div>`,
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-rlt-save ${state.get().activeRltDeviceId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-rlt-update ${state.get().activeRltDeviceId ? '' : 'disabled'}>Aktualisieren</button></div>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-rlt-save>Speichern</button><button type="button" class="action-button" data-rlt-update ${state.get().activeRltDeviceId ? '' : 'disabled'}>Aktualisieren</button></div>`,
     rows
   ].join('')), 'cyan');
 }
@@ -73,7 +74,7 @@ function bindRltDevices(root, r, s, rerender) {
     event.preventDefault();
     const name = root.querySelector('#rltDeviceName')?.value?.trim() || '';
     const items = readRltDevices();
-    const id = (globalThis.crypto?.randomUUID?.() || `rlt-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    const id = createRecordId('rlt');
     const item = buildRltDeviceRecord(r, { ...s, activeRltDeviceId: null, activeRltDeviceName: name }, items, id, name);
     writeRltDevices([item, ...items]);
     state.set({ activeRltDeviceId: null, activeRltDeviceName: '' }, { notify:false });
@@ -89,36 +90,27 @@ function bindRltDevices(root, r, s, rerender) {
     const existing = items.find(entry => String(entry.id) === String(id));
     if (!existing) return;
     const item = buildRltDeviceRecord(r, current, items, id, name, existing);
-    writeRltDevices(items.map(entry => String(entry.id) === String(id) ? item : entry));
+    writeRltDevices(replaceRecord(items, id, item));
     state.set({ activeRltDeviceId: id, activeRltDeviceName: item.name }, { notify:false });
     if (typeof rerender === 'function') rerender();
   });
-  root.querySelectorAll('[data-line-toggle]').forEach(toggle => {
-    toggle.addEventListener('click', event => {
-      event.stopPropagation();
-      const card = toggle.closest('[data-line-card]');
-      const collapsed = card?.classList.toggle('is-collapsed');
-      toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-    });
-  });
-  root.querySelectorAll('[data-rlt-select]').forEach(row => {
-    row.addEventListener('click', event => {
-      if (event.target.closest('[data-rlt-delete]') || event.target.closest('[data-line-toggle]')) return;
-      const item = readRltDevices().find(entry => String(entry.id) === row.dataset.rltSelect);
+  bindSavedRecordList(root, {
+    loadAttr: 'data-rlt-select',
+    toggleAttr: 'data-rlt-toggle',
+    deleteAttr: 'data-rlt-delete',
+    onLoad(id) {
+      const item = readRltDevices().find(entry => isSameId(entry.id, id));
       if (!item?.inputState) return;
       state.set({ ...item.inputState, activeRltDeviceId: item.id, activeRltDeviceName: item.name || '' });
-    });
-  });
-
-  root.querySelectorAll('[data-rlt-delete]').forEach(del => {
-    del.addEventListener('click', event => {
-      event.stopPropagation();
-      const id = del.dataset.rltDelete;
-      writeRltDevices(readRltDevices().filter(item => String(item.id) !== String(id)));
-      if (String(state.get().activeRltDeviceId) === String(id)) state.set({ activeRltDeviceId:null, activeRltDeviceName:'' }, { notify:false });
+    },
+    onDelete(id) {
+      writeRltDevices(removeRecord(readRltDevices(), id));
+      if (isSameId(state.get().activeRltDeviceId, id)) state.set({ activeRltDeviceId:null, activeRltDeviceName:'' }, { notify:false });
       if (typeof rerender === 'function') rerender();
-    });
+    }
   });
+}
+
 }
 
 function readonlyAirCard(title, point, accent = 'cyan', options = {}) {

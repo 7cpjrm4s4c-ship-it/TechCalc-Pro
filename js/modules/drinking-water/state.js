@@ -12,6 +12,8 @@ export const state = createModuleState({
   singleCount: '1',
   singlePermanent: 'false',
   singleDraftConsumers: [],
+  activeUnitId: null,
+  activeSingleId: null,
   uiUnitFormOpen: false,
   uiUnitSavedOpen: false,
   uiSingleFormOpen: false,
