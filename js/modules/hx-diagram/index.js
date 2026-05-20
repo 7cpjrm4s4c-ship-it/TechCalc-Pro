@@ -242,9 +242,7 @@ export default {
       });
 
       rootEl.querySelector('[data-hx-add]')?.addEventListener('click', () => {
-        const currentHx = state.get();
-        if (currentHx.activeProcessId) return;
-        const s = { ...currentHx, activeProcessId: null };
+        const s = { ...state.get(), activeProcessId: null };
         const result = calculate(s);
         const record = makeProcessRecord({ input: s, result });
         const processes = [record, ...(s.processes ?? [])];
@@ -258,12 +256,8 @@ export default {
         });
       });
 
-      let lastHxUpdate = 0;
       const updateProcess = event => {
         event?.preventDefault?.();
-        const now = Date.now();
-        if (now - lastHxUpdate < 250) return;
-        lastHxUpdate = now;
         rootEl.querySelectorAll('[data-field]').forEach(el => {
           if (el?.dataset?.field) state.set({ [el.dataset.field]: el.value }, { notify: false });
         });
@@ -286,8 +280,7 @@ export default {
       };
       const updateButton = rootEl.querySelector('[data-hx-update]');
       updateButton?.addEventListener('pointerdown', updateProcess);
-      updateButton?.addEventListener('touchstart', updateProcess, { passive:false });
-      updateButton?.addEventListener('click', updateProcess);
+      updateButton?.addEventListener('click', event => event.preventDefault());
 
       rootEl.querySelector('[data-hx-clear]')?.addEventListener('click', () => {
         clearLegacyPoints();
