@@ -3,6 +3,7 @@ import { state } from './state.js';
 import { calculate, CONSUMERS, BUILDING_TYPES, createConsumer, createUsageUnit, createSingleGroup, readUsageUnits, writeUsageUnits, readSingleConsumers, writeSingleConsumers } from './logic.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, esc } from '../../core/renderer.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
+import { isSameId } from '../../core/savedRecords.js';
 
 function fieldSelector(key) {
   const safe = String(key || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
@@ -32,13 +33,14 @@ function consumerRows(consumers = []) {
 
 function unitRows(units) {
   if (!units.length) return '<div class="empty-state empty-state--compact">Noch keine Nutzungseinheit angelegt</div>';
-  return `<div class="dw-list">${units.map(unit => `<details class="dw-accordion">
-    <summary>
-      <span><strong>${esc(unit.name)}</strong><small>${unit.consumerCount} Verbraucher · Σ ${fmt(unit.sumFlow, 2)} l/s · Spitze ${fmt(unit.peakFlow, 2)} l/s</small></span>
-      <button type="button" class="mini-button" data-dw-unit-edit="${esc(unit.id)}" aria-label="Nutzungseinheit laden">Laden</button>
-      <button type="button" data-dw-unit-delete="${esc(unit.id)}" aria-label="Nutzungseinheit löschen">×</button>
-    </summary>
-    <div class="dw-accordion__body">
+  const activeId = state.get().activeUnitId;
+  return `<div class="line-section-list saved-record-list dw-list">${units.map((unit, index) => `<article class="line-section-card saved-record-card is-collapsed ${isSameId(activeId, unit.id) ? 'is-active' : ''}" data-line-card data-dw-unit-edit="${esc(unit.id)}">
+    <div class="line-section-card__head saved-record-card__head">
+      <div class="line-section-card__title saved-record-card__title"><strong>${esc(unit.name || 'Nutzungseinheit ' + (index + 1))}</strong><small>${unit.consumerCount} Verbraucher · Σ ${fmt(unit.sumFlow, 2)} l/s · Spitze ${fmt(unit.peakFlow, 2)} l/s</small></div>
+      <button type="button" class="line-section-card__toggle saved-record-card__toggle" data-line-toggle aria-expanded="false" aria-label="Details aufklappen"><span>▾</span></button>
+      <button type="button" class="line-section-card__delete saved-record-card__delete" data-dw-unit-delete="${esc(unit.id)}" aria-label="Nutzungseinheit löschen">×</button>
+    </div>
+    <div class="line-section-card__body saved-record-card__body">
       ${inlineStats([
         { label:'Verbraucher', value: unit.consumerCount },
         { label:'Σ NE', value: fmt(unit.sumFlow, 2), unit:'l/s' },
@@ -47,22 +49,23 @@ function unitRows(units) {
       ])}
       ${consumerRows(unit.consumers || [])}
     </div>
-  </details>`).join('')}</div>`;
+  </article>`).join('')}</div>`;
 }
 
 function singleRows(groups) {
   if (!groups.length) return '<div class="empty-state empty-state--compact">Noch keine Einzelverbraucher angelegt</div>';
-  return `<div class="dw-list">${groups.map(group => {
+  const activeId = state.get().activeSingleId;
+  return `<div class="line-section-list saved-record-list dw-list">${groups.map((group, index) => {
     const consumers = group.consumers || [];
     const count = consumers.reduce((sum, c) => sum + (Number(c.count) || 1), 0);
     const sumFlow = consumers.reduce((sum, c) => sum + Number(c.vr || 0) * (Number(c.count) || 1), 0);
-    return `<details class="dw-accordion">
-      <summary>
-        <span><strong>${esc(group.name)}</strong><small>${count} Verbraucher · ${fmt(sumFlow, 2)} l/s</small></span>
-        <button type="button" class="mini-button" data-dw-single-edit="${esc(group.id)}" aria-label="Einzelverbraucher laden">Laden</button>
-        <button type="button" data-dw-single-delete="${esc(group.id)}" aria-label="Einzelverbraucher löschen">×</button>
-      </summary>
-      <div class="dw-accordion__body">
+    return `<article class="line-section-card saved-record-card is-collapsed ${isSameId(activeId, group.id) ? 'is-active' : ''}" data-line-card data-dw-single-edit="${esc(group.id)}">
+      <div class="line-section-card__head saved-record-card__head">
+        <div class="line-section-card__title saved-record-card__title"><strong>${esc(group.name || 'Einzelverbraucher ' + (index + 1))}</strong><small>${count} Verbraucher · ${fmt(sumFlow, 2)} l/s</small></div>
+        <button type="button" class="line-section-card__toggle saved-record-card__toggle" data-line-toggle aria-expanded="false" aria-label="Details aufklappen"><span>▾</span></button>
+        <button type="button" class="line-section-card__delete saved-record-card__delete" data-dw-single-delete="${esc(group.id)}" aria-label="Einzelverbraucher löschen">×</button>
+      </div>
+      <div class="line-section-card__body saved-record-card__body">
         ${inlineStats([
           { label:'Gruppe', value: group.name },
           { label:'Verbraucher', value: count },
@@ -71,7 +74,7 @@ function singleRows(groups) {
         ])}
         ${consumerRows(consumers)}
       </div>
-    </details>`;
+    </article>`;
   }).join('')}</div>`;
 }
 
@@ -214,6 +217,15 @@ function bindDrinkingWater(root) {
   }, true);
 
   root.addEventListener('click', event => {
+    const lineToggle = event.target.closest('[data-line-toggle]');
+    if (lineToggle && root.contains(lineToggle)) {
+      event.preventDefault(); event.stopPropagation();
+      const itemCard = lineToggle.closest('[data-line-card]');
+      const collapsed = itemCard?.classList.toggle('is-collapsed');
+      lineToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      return;
+    }
+
     const segment = event.target.closest('[data-segment]');
     if (segment && root.contains(segment)) {
       const patch = { [segment.dataset.segment]: segment.dataset.value };
@@ -305,6 +317,7 @@ function bindDrinkingWater(root) {
     if (unitDelete && root.contains(unitDelete)) {
       event.preventDefault(); event.stopPropagation();
       writeUsageUnits(readUsageUnits().filter(item => item.id !== unitDelete.dataset.dwUnitDelete));
+      if (isSameId(state.get().activeUnitId, unitDelete.dataset.dwUnitDelete)) state.set({ activeUnitId:null, unitName:'', unitDraftConsumers:[] }, { notify:false });
       root.innerHTML = view(state.get());
       return;
     }
@@ -313,6 +326,7 @@ function bindDrinkingWater(root) {
     if (singleDelete && root.contains(singleDelete)) {
       event.preventDefault(); event.stopPropagation();
       writeSingleConsumers(readSingleConsumers().filter(item => item.id !== singleDelete.dataset.dwSingleDelete));
+      if (isSameId(state.get().activeSingleId, singleDelete.dataset.dwSingleDelete)) state.set({ activeSingleId:null, singleName:'', singleDraftConsumers:[] }, { notify:false });
       root.innerHTML = view(state.get());
       return;
     }

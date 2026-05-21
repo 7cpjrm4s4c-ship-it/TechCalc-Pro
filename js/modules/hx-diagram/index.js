@@ -218,17 +218,18 @@ export default {
 
     const bindActions = rootEl => {
       rootEl.querySelectorAll('[data-field]').forEach(el => {
-        el.addEventListener('input', () => {
+        const clearGeneratedPath = () => {
+          // Beim Bearbeiten gespeicherter Prozesse muss die aktive ID erhalten bleiben,
+          // sonst wird aus einer Änderung anschließend ein neuer Prozess statt eines Updates.
           state.set({ activePath: [], points: [] }, { notify: false });
-        });
-        el.addEventListener('change', () => {
-          state.set({ activePath: [], points: [] }, { notify: false });
-        });
+        };
+        el.addEventListener('input', clearGeneratedPath);
+        el.addEventListener('change', clearGeneratedPath);
       });
 
       rootEl.querySelectorAll('[data-segment="process"]').forEach(button => {
         button.addEventListener('click', () => {
-          state.set({ process: button.dataset.value, activeProcessId: null, activePath: [], points: [] });
+          state.set({ process: button.dataset.value, activePath: [], points: [] });
         });
       });
 
@@ -237,7 +238,7 @@ export default {
           const id = button.dataset.hxSign;
           const input = rootEl.querySelector(`[data-field="${id}"]`);
           const next = toggleNumericSign(input?.value);
-          state.set({ [id]: next, activeProcessId: null, activePath: [], points: [] });
+          state.set({ [id]: next, activePath: [], points: [] });
         });
       });
 
