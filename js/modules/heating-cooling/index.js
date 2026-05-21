@@ -197,18 +197,19 @@ function bindLineSections(root, r, rerender) {
         state.set({ activeLineSectionId: null, activeLineSectionName: '' });
         return;
       }
-      const input = item.inputState || {};
-      const prefix = (input.mode === 'cooling') ? 'cooling' : 'heating';
+      const input = item.inputState || item.state || {};
+      const nextMode = input.mode || item.uiState?.mode || state.get().mode || 'heating';
+      const prefix = (nextMode === 'cooling') ? 'cooling' : 'heating';
       state.set({
         ...(item.uiState || {}),
-        mode: input.mode || item.uiState?.mode || state.get().mode,
+        mode: nextMode,
         mediumId: input.mediumId || item.uiState?.mediumId || state.get().mediumId,
         pipeSystemId: input.pipeSystemId || item.uiState?.pipeSystemId || state.get().pipeSystemId,
-        [`${prefix}CalcTarget`]: input.calcTarget || 'power',
-        [`${prefix}PowerW`]: input.powerW ?? '',
-        [`${prefix}PowerUnit`]: input.powerUnit || 'W',
-        [`${prefix}MassFlowKgh`]: input.massFlowKgh ?? '',
-        [`${prefix}DeltaT`]: input.deltaT ?? '',
+        [`${prefix}CalcTarget`]: input.calcTarget || input[`${prefix}CalcTarget`] || 'power',
+        [`${prefix}PowerW`]: input.powerW ?? input[`${prefix}PowerW`] ?? '',
+        [`${prefix}PowerUnit`]: input.powerUnit || input[`${prefix}PowerUnit`] || 'W',
+        [`${prefix}MassFlowKgh`]: input.massFlowKgh ?? input[`${prefix}MassFlowKgh`] ?? '',
+        [`${prefix}DeltaT`]: input.deltaT ?? input[`${prefix}DeltaT`] ?? '',
         activeLineSectionId: item.id,
         activeLineSectionName: item.name || ''
       });

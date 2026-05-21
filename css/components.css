@@ -4086,7 +4086,7 @@ body.settings-open {
   .saved-record-card__delete { width: 2rem; height: 2rem; min-width: 2rem; }
 }
 
-/* v1.0.11: prevent pressure-holding result labels/values from overflowing compact cards. */
+/* v1.0.12: prevent pressure-holding result labels/values from overflowing compact cards. */
 .module-view[data-module='pressure-holding'] .main-result .inline-stat,
 .module-view[data-module='pressure-holding'] .inline-stat {
   min-width: 0;
@@ -4108,4 +4108,17 @@ body.settings-open {
 .module-view[data-module='pressure-holding'] .inline-stat strong {
   font-size: clamp(.8rem, .95vw, .95rem);
   line-height: 1.12;
+}
+
+
+/* v1.0.12: pressure-holding desktop result cards need long labels to wrap inside compact fields. */
+.module-view[data-module='pressure-holding'] .main-result .inline-stat span {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.15;
+  max-width: 100%;
+}
+.module-view[data-module='pressure-holding'] .main-result .inline-stat strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }

@@ -104,13 +104,16 @@ function bindRltDevices(root, r, s, rerender) {
   root.querySelectorAll('[data-rlt-select]').forEach(row => {
     row.addEventListener('click', event => {
       if (event.target.closest('[data-rlt-delete]') || event.target.closest('[data-line-toggle]')) return;
-      const item = readRltDevices().find(entry => String(entry.id) === row.dataset.rltSelect);
-      if (!item?.inputState) return;
-      if (String(state.get().activeRltDeviceId || '') === String(row.dataset.rltSelect || '')) {
+      event.preventDefault();
+      event.stopPropagation();
+      const selectedId = row.getAttribute('data-rlt-select');
+      const item = readRltDevices().find(entry => String(entry.id) === String(selectedId));
+      if (!item) return;
+      if (String(state.get().activeRltDeviceId || '') === String(selectedId || '')) {
         state.set({ activeRltDeviceId: null, activeRltDeviceName: '' });
         return;
       }
-      state.set({ ...item.inputState, activeRltDeviceId: item.id, activeRltDeviceName: item.name || '' });
+      state.set({ ...(item.inputState || item.state || {}), activeRltDeviceId: item.id, activeRltDeviceName: item.name || '' });
     });
   });
 

@@ -1,5 +1,13 @@
 # Release Notes
 
+## 1.0.12 - Debug Hotfix
+- Heizung: Laden gespeicherter Abschnitte robust gegen ältere Record-Strukturen gemacht.
+- Lüftung: Auswahl gespeicherter Objekte stabilisiert und Fallback für ältere Datensätze ergänzt.
+- WRG: Auswahl gespeicherter RLT-Geräte stabilisiert und Event-Zuordnung gehärtet.
+- h,x: Aktiven Prozess durch Klick außerhalb der Prozess-/Eingabebereiche abwählbar gemacht.
+- Druck: Desktop-Overflow der Beschriftung „Auswahl Station / Gefäß“ in Ergebnis-Kacheln korrigiert.
+- Trinkwasser: Auswahl gespeicherter Einzelverbraucher mit robuster ID-Zuordnung und direkter Übernahme in die Zusammenstellung abgesichert.
+
 ## 1.0.11 - Debug Hotfix
 
 - Heizung: Auswahl gespeicherter Leitungsabschnitte lädt die gespeicherten Eingaben robuster und erlaubt erneutes Abwählen.

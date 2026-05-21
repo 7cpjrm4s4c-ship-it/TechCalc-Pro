@@ -69,6 +69,7 @@ export function bindSavedRecordList(root, {
     card.addEventListener('click', event => {
       if (event.target.closest(`[${deleteAttr}]`) || event.target.closest(`[${toggleAttr}]`)) return;
       event.preventDefault();
+      event.stopPropagation();
       onLoad?.(card.getAttribute(loadAttr), card, event);
     });
   });

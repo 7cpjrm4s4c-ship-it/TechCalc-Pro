@@ -100,22 +100,23 @@ function bindVentilationLineSections(root, r, active, modeLabel, rerender) {
     deleteAttr: 'data-line-delete',
     onLoad(id) {
       const item = readVentilationLineSections().find(entry => isSameId(entry.id, id));
-      if (!item?.inputState) return;
+      if (!item) return;
       if (isSameId(state.get().activeVentLineSectionId, id)) {
         state.set({ activeVentLineSectionId: null, activeVentLineSectionName: '' });
         return;
       }
-      const input = item.inputState;
-      const prefix = (input.mode === 'cooling') ? 'cooling' : 'heating';
+      const input = item.inputState || item.state || {};
+      const nextMode = input.mode || state.get().mode || 'heating';
+      const prefix = (nextMode === 'cooling') ? 'cooling' : 'heating';
       state.set({
-        mode: input.mode || state.get().mode,
-        [`${prefix}CalcTarget`]: input.calcTarget || 'power',
-        [`${prefix}PowerW`]: input.powerW ?? '',
-        [`${prefix}PowerUnit`]: input.powerUnit || 'W',
-        [`${prefix}VolumeFlowM3h`]: input.volumeFlowM3h ?? '',
-        [`${prefix}DeltaT`]: input.deltaT ?? '',
-        [`${prefix}SupplyTemp`]: input.supplyTemp ?? '',
-        [`${prefix}RoomTemp`]: input.roomTemp ?? '',
+        mode: nextMode,
+        [`${prefix}CalcTarget`]: input.calcTarget || input[`${prefix}CalcTarget`] || 'power',
+        [`${prefix}PowerW`]: input.powerW ?? input[`${prefix}PowerW`] ?? '',
+        [`${prefix}PowerUnit`]: input.powerUnit || input[`${prefix}PowerUnit`] || 'W',
+        [`${prefix}VolumeFlowM3h`]: input.volumeFlowM3h ?? input[`${prefix}VolumeFlowM3h`] ?? '',
+        [`${prefix}DeltaT`]: input.deltaT ?? input[`${prefix}DeltaT`] ?? '',
+        [`${prefix}SupplyTemp`]: input.supplyTemp ?? input[`${prefix}SupplyTemp`] ?? '',
+        [`${prefix}RoomTemp`]: input.roomTemp ?? input[`${prefix}RoomTemp`] ?? '',
         activeVentLineSectionId: item.id,
         activeVentLineSectionName: item.name || ''
       });

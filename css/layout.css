@@ -218,7 +218,7 @@
   }
 }
 
-/* v1.0.11: keep module selector fixed below the header on desktop/tablet. Content scrolls underneath. */
+/* v1.0.12: keep module selector fixed below the header on desktop/tablet. Content scrolls underneath. */
 @media (min-width: 768px) {
   .module-nav {
     position: fixed;
