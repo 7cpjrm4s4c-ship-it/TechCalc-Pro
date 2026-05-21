@@ -34,12 +34,16 @@ function registerLazyModule({ config, path, module: eagerModule }) {
   modules.register({
     config,
     async mount(root) {
+      const renderToken = root?.dataset?.renderToken || '';
       let loaded = moduleCache.get(config.id);
       if (!loaded) {
         loaded = import(path).then(mod => mod.default || mod);
         moduleCache.set(config.id, loaded);
       }
       const module = await loaded;
+      if (renderToken && root?.dataset?.renderToken !== renderToken) {
+        return () => {};
+      }
       if (!module || typeof module.mount !== 'function') {
         throw new Error(`Modul ${config.id} konnte nicht initialisiert werden.`);
       }
@@ -57,15 +61,25 @@ window.addEventListener('pageshow', event => {
 
 const app = document.getElementById('app');
 let renderToken = 0;
+let cleanupCurrentModule = () => {};
 async function render(id){
   const module = modules.get(id);
   if (!module) return;
   const token = ++renderToken;
+  app.dataset.renderToken = String(token);
+  cleanupCurrentModule();
+  cleanupCurrentModule = () => {};
   renderNavigation(id);
   app.setAttribute('aria-busy', 'true');
   try {
-    await module.mount(app);
+    const cleanup = await module.mount(app);
+    if (token !== renderToken) {
+      if (typeof cleanup === 'function') cleanup();
+      return;
+    }
+    cleanupCurrentModule = typeof cleanup === 'function' ? cleanup : () => {};
   } catch (error) {
+    if (token !== renderToken) return;
     console.error(`Modul konnte nicht geladen werden: ${id}`, error);
     app.innerHTML = '<div class="module-error card">Modul konnte nicht geladen werden.</div>';
   } finally {

@@ -43,9 +43,9 @@ function savedPlantRows(items = []){
   return `<div class="ph-saved-list">${items.map(item => {
     const res = item.result || {};
     const subtitle = [res.productLabel, res.selectedStandardVolume ? `${fmt(res.selectedStandardVolume,0)} l` : '', res.systemVolume ? `VA ${fmt(res.systemVolume,0)} l` : ''].filter(Boolean).join(' · ');
-    return `<article class="ph-saved-item line-section-card is-collapsed ${state.get().activePlantId === item.id ? 'is-active' : ''}" data-line-card data-ph-load="${esc(item.id)}">
+    return `<article class="ph-saved-item line-section-card is-collapsed ${state.get().activePlantId === item.id ? 'is-active' : ''}" data-line-card data-ph-select="${esc(item.id)}">
       <div class="line-section-card__head">
-        <div class="line-section-card__title" data-ph-select="${esc(item.id)}"><strong>${esc(item.name || 'Anlage')}</strong><small>${esc(subtitle || 'gespeicherte Druckhaltung')}</small></div>
+        <div class="line-section-card__title" ><strong>${esc(item.name || 'Anlage')}</strong><small>${esc(subtitle || 'gespeicherte Druckhaltung')}</small></div>
         <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Gespeicherte Anlage aufklappen"><span>▾</span></button>
         <button type="button" class="line-section-card__delete" data-ph-delete="${esc(item.id)}" aria-label="Anlage löschen">×</button>
       </div>
@@ -181,6 +181,8 @@ function bindPressureHoldingActions(root, snapshot){
   root.querySelectorAll('[data-ph-select]').forEach(button => {
     button.addEventListener('click', event => {
       if (event.target.closest('[data-ph-delete]') || event.target.closest('[data-line-toggle]')) return;
+      event.preventDefault();
+      event.stopPropagation();
       const current = state.get();
       const item = (current.savedPlants || []).find(entry => String(entry.id) === String(button.dataset.phSelect));
       if(!item?.state) return;

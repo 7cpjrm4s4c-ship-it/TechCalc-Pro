@@ -42,9 +42,9 @@ function savedRows(items = []){
   return `<div class="ph-saved-list">${items.map(item => {
     const res = item.result || {};
     const subtitle = [modeLabel(res.mode), res.standard ? `${fmt(res.standard,0)} l` : '', res.medium].filter(Boolean).join(' · ');
-    return `<article class="ph-saved-item line-section-card is-collapsed ${state.get().activeCalculationId === item.id ? 'is-active' : ''}" data-line-card data-buffer-load="${esc(item.id)}">
+    return `<article class="ph-saved-item line-section-card is-collapsed ${state.get().activeCalculationId === item.id ? 'is-active' : ''}" data-line-card data-buffer-select="${esc(item.id)}">
       <div class="line-section-card__head">
-        <div class="line-section-card__title" data-buffer-select="${esc(item.id)}"><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle || 'gespeicherte Berechnung')}</small></div>
+        <div class="line-section-card__title" ><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle || 'gespeicherte Berechnung')}</small></div>
         <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Gespeicherte Berechnung aufklappen"><span>▾</span></button>
         <button type="button" class="line-section-card__delete" data-buffer-delete="${esc(item.id)}" aria-label="Berechnung löschen">×</button>
       </div>
@@ -186,6 +186,8 @@ function bindActions(root, snapshot){
   root.querySelectorAll('[data-buffer-select]').forEach(button => {
     button.addEventListener('click', event => {
       if (event.target.closest('[data-buffer-delete]') || event.target.closest('[data-line-toggle]')) return;
+      event.preventDefault();
+      event.stopPropagation();
       const current = state.get();
       const item = (current.savedCalculations || []).find(entry => String(entry.id) === String(button.dataset.bufferSelect));
       if(!item?.state) return;

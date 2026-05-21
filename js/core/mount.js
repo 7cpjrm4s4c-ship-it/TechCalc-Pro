@@ -8,6 +8,7 @@ export function mountModule(root, state, view, afterRender) {
     if (afterRender) afterRender(root, snapshot, render);
   };
 
-  state.subscribe(render);
+  const unsubscribe = state.subscribe(render);
   render();
+  return unsubscribe;
 }

@@ -326,7 +326,8 @@ export default {
       });
     };
 
-    state.subscribe(render);
+    const unsubscribe = state.subscribe(render);
     render();
+    return unsubscribe;
   }
 };
