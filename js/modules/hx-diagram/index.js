@@ -210,7 +210,10 @@ export default {
   config,
   state,
   mount(root) {
+    const mountToken = root?.dataset?.renderToken || '';
+    const isCurrentMount = () => !mountToken || root?.dataset?.renderToken === mountToken;
     const render = () => {
+      if (!isCurrentMount()) return;
       root.innerHTML = view(state.get());
       bindCommonInputs(root, state);
       bindActions(root);
@@ -329,6 +332,8 @@ export default {
 
     const unsubscribe = state.subscribe(render);
     render();
-    return unsubscribe;
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
   }
 };

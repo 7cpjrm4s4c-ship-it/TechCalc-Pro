@@ -287,7 +287,7 @@ export default {
   config,
   state,
   mount(root) {
-    mountModule(root, state, view, (rootEl, snapshot, render) => {
+    return mountModule(root, state, view, (rootEl, snapshot, render) => {
       bindLineSections(rootEl, calculate(activeCalculationState(snapshot)), render);
     });
   }

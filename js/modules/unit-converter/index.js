@@ -52,6 +52,6 @@ export default {
   config,
   state,
   mount(root) {
-    mountModule(root, state, view);
+    return mountModule(root, state, view);
   }
 };

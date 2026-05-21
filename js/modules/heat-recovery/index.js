@@ -267,7 +267,7 @@ export default {
   config,
   state,
   mount(root) {
-    mountModule(root, state, view, (rootEl, snapshot, render) => {
+    return mountModule(root, state, view, (rootEl, snapshot, render) => {
       rootEl.querySelectorAll('[data-wrg-sign]').forEach(button => {
         button.addEventListener('click', () => {
           const id = button.dataset.wrgSign;

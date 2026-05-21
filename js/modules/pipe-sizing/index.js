@@ -110,7 +110,7 @@ export default {
   config,
   state,
   mount(root) {
-    mountModule(root, state, view, (rootEl, snapshot) => {
+    return mountModule(root, state, view, (rootEl, snapshot) => {
       rootEl.querySelector('[data-pipe-save]')?.addEventListener('click', () => {
         const current = state.get();
         const result = calculate(current);

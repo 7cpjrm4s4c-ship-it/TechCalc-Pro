@@ -196,25 +196,25 @@ function syncFieldValues(root, patch) {
   });
 }
 
-function bindDrinkingWater(root) {
+function bindDrinkingWater(root, signal) {
   root.addEventListener('input', event => {
     const el = event.target.closest('[data-field]');
     if (!el || !root.contains(el)) return;
     state.set({ [el.dataset.field]: el.value }, { notify:false });
-  });
+  }, { signal });
 
   root.addEventListener('change', event => {
     const el = event.target.closest('[data-field]');
     if (!el || !root.contains(el)) return;
     state.set({ [el.dataset.field]: el.value }, { notify:false });
     refresh(root);
-  });
+  }, { signal });
 
   root.addEventListener('toggle', event => {
     const details = event.target && typeof event.target.closest === 'function' ? event.target.closest('[data-dw-accordion]') : null;
     if (!details || !root.contains(details)) return;
     state.set({ [details.dataset.dwAccordion]: details.open }, { notify:false });
-  }, true);
+  }, { capture: true, signal });
 
   root.addEventListener('click', event => {
     const lineToggle = event.target.closest('[data-line-toggle]');
@@ -370,14 +370,16 @@ function bindDrinkingWater(root) {
       state.set({ activeUnitId:null, activeSingleId:null, unitName:'', singleName:'', unitDraftConsumers:[], singleDraftConsumers:[] }, { notify:false });
       root.innerHTML = view(state.get());
     }
-  });
+  }, { signal });
 }
 
 export default {
   config,
   state,
   mount(root) {
+    const controller = new AbortController();
     root.innerHTML = view(state.get());
-    bindDrinkingWater(root);
+    bindDrinkingWater(root, controller.signal);
+    return () => controller.abort();
   }
 };

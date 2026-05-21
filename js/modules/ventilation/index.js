@@ -235,7 +235,7 @@ export default {
   config,
   state,
   mount(root) {
-    mountModule(root, state, view, (rootEl, snapshot, render) => {
+    return mountModule(root, state, view, (rootEl, snapshot, render) => {
       const active = activeCalculationState(snapshot);
       const r = calculate(active);
       const modeLabel = snapshot.mode === 'cooling' ? 'Kälte' : 'Heizung';

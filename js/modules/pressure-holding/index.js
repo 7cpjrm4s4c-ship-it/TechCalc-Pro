@@ -199,4 +199,4 @@ function bindPressureHoldingActions(root, snapshot){
   });
 }
 
-export default { config, state, mount(root){ mountModule(root, state, view, bindPressureHoldingActions); } };
+export default { config, state, mount(root){ return mountModule(root, state, view, bindPressureHoldingActions); } };
