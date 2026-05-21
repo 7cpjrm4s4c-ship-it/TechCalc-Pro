@@ -68,6 +68,16 @@ function buildRltDeviceRecord(r, s, items, id, name, existing = null) {
   };
 }
 
+
+function inferRltInputState(item) {
+  const input = { ...(item.inputState || item.state || {}) };
+  const modeLabel = String(item.mode || input.mode || '').toLowerCase();
+  if (input.mode !== 'wrg' && input.mode !== 'mixing') {
+    input.mode = modeLabel.includes('misch') || modeLabel.includes('mix') ? 'mixing' : 'wrg';
+  }
+  return input;
+}
+
 function bindRltDevices(root, r, s, rerender) {
   root.querySelector('[data-rlt-save]')?.addEventListener('click', event => {
     event.preventDefault();
@@ -113,7 +123,7 @@ function bindRltDevices(root, r, s, rerender) {
         state.set({ activeRltDeviceId: null, activeRltDeviceName: '' });
         return;
       }
-      state.set({ ...(item.inputState || item.state || {}), activeRltDeviceId: item.id, activeRltDeviceName: item.name || '' });
+      state.set({ ...inferRltInputState(item), activeRltDeviceId: item.id, activeRltDeviceName: item.name || '' });
     });
   });
 

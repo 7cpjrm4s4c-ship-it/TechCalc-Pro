@@ -78,6 +78,33 @@ function singleRows(groups) {
   }).join('')}</div>`;
 }
 
+
+function normalizeSingleGroupForEdit(group) {
+  if (!group) return null;
+  if (Array.isArray(group.consumers)) return { ...group, consumers: group.consumers.map(c => ({ ...c })) };
+  const typeId = group.typeId || group.consumerType || group.id;
+  const fallback = createConsumer({ typeId, count: group.count || 1, permanent: Boolean(group.permanent) });
+  const consumer = {
+    ...fallback,
+    ...group,
+    id: group.consumerId || group.id || fallback.id,
+    typeId: fallback.typeId,
+    label: group.label || group.name || fallback.label,
+    count: Math.max(1, Math.round(Number(group.count) || 1)),
+    vr: Number(group.vr ?? fallback.vr),
+    pmin: Number(group.pmin ?? fallback.pmin),
+    neGroup: group.neGroup || fallback.neGroup,
+    hotWater: group.hotWater ?? fallback.hotWater,
+    permanent: Boolean(group.permanent)
+  };
+  return {
+    id: group.groupId || group.id || fallback.id,
+    name: group.groupName || group.name || group.label || 'Einzelverbraucher',
+    consumers: [consumer],
+    createdAt: group.createdAt || new Date().toISOString()
+  };
+}
+
 function selectedFixturesList(r) {
   const aggregate = new Map();
   const add = (consumer) => {
@@ -356,11 +383,18 @@ function bindDrinkingWater(root, signal) {
     const singleEdit = event.target.closest('[data-dw-single-edit]');
     if (singleEdit && root.contains(singleEdit)) {
       event.preventDefault(); event.stopPropagation();
-      const groups = readSingleConsumers();
+      const groups = readSingleConsumers().map(normalizeSingleGroupForEdit).filter(Boolean);
       const group = groups.find(item => isSameId(item.id, singleEdit.dataset.dwSingleEdit));
       if (group) {
-        const consumers = group.consumers || [];
-        const patch = { activeSingleId: group.id, singleName: group.name, singleDraftConsumers: consumers, singlePermanent: String(consumers.some(c => c.permanent)), uiSingleFormOpen:true, uiSingleSavedOpen:true };
+        const consumers = (group.consumers || []).map(c => ({ ...c }));
+        const patch = {
+          activeSingleId: group.id,
+          singleName: group.name,
+          singleDraftConsumers: consumers,
+          singlePermanent: String(consumers.some(c => c.permanent)),
+          uiSingleFormOpen:true,
+          uiSingleSavedOpen:true
+        };
         state.set(patch, { notify:false });
         syncFieldValues(root, patch);
         const details = root.querySelector('[data-dw-accordion="uiSingleFormOpen"]');

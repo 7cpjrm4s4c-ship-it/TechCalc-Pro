@@ -1,5 +1,12 @@
 # Release Notes
 
+## 1.0.13 - Debug Hotfix
+
+- Heizung: Laden gespeicherter Leitungsabschnitte übernimmt Eingabewerte nun robust aus normalisierten und älteren gespeicherten Datensätzen.
+- Lüftung: Laden gespeicherter Leitungsabschnitte befüllt die Eingaben wieder zuverlässig, inklusive Betriebsart und Temperaturen.
+- WRG: Beim Laden gespeicherter RLT-Geräte wird die gespeicherte Berechnungsart WRG/Mischluft wieder auf den Switch übertragen.
+- Trinkwasser: Gespeicherte Einzelverbraucher werden bei Auswahl auch aus älteren Datenstrukturen in den aktiven Entwurf und die Zusammenstellung übernommen.
+
 ## 1.0.12 - Debug Hotfix
 - Heizung: Laden gespeicherter Abschnitte robust gegen ältere Record-Strukturen gemacht.
 - Lüftung: Auswahl gespeicherter Objekte stabilisiert und Fallback für ältere Datensätze ergänzt.
