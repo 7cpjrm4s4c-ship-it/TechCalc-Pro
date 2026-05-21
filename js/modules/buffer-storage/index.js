@@ -57,6 +57,27 @@ function savedRows(items = []){
     </article>`;
   }).join('')}</div>`;
 }
+
+function clearedBufferInputs() {
+  return {
+    plantName: '',
+    activeCalculationId: null,
+    qMaxKw: '',
+    partLoadFactor: '',
+    qLoadKw: '',
+    compressorRunTimeMin: '',
+    controllerDeltaT: '',
+    existingSystemVolumeL: '',
+    qConsumerKw: '',
+    qDefrostKw: '',
+    qHeatingCircuitKw: '',
+    maxDefrostTimeMin: '',
+    hydraulicDeltaT: '',
+    consumerFlowM3h: '',
+    bridgeTimeMin: ''
+  };
+}
+
 function savedCard(s){
   return card('Berechnung speichern', stack([
     field({ id:'plantName', label:'Bezeichnung', value:s.plantName || '', placeholder:'z. B. Kaltwassersatz BT A', inputmode:'text' }),
@@ -156,7 +177,7 @@ function view(s){
   return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6">${resultColumn}</div>`);
 }
 function bindActions(root, snapshot){
-  bindEditModeClear(root, { state, activeIdKey: 'activeCalculationId', nameKey: 'plantName' });
+  bindEditModeClear(root, { state, activeIdKey: 'activeCalculationId', nameKey: 'plantName', onClear: () => state.set(clearedBufferInputs()) });
   root.querySelector('[data-buffer-save]')?.addEventListener('click', () => {
     const current = state.get();
     const result = calculate(current);
@@ -191,6 +212,10 @@ function bindActions(root, snapshot){
       const current = state.get();
       const item = (current.savedCalculations || []).find(entry => String(entry.id) === String(button.dataset.bufferSelect));
       if(!item?.state) return;
+      if (String(current.activeCalculationId || '') === String(button.dataset.bufferSelect || '')) {
+        state.set({ ...clearedBufferInputs(current), savedCalculations: current.savedCalculations || [] });
+        return;
+      }
       state.set({ ...item.state, savedCalculations: current.savedCalculations || [], activeCalculationId: item.id, plantName: item.name || item.state?.plantName || '' });
     });
   });

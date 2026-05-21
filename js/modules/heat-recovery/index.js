@@ -106,6 +106,10 @@ function bindRltDevices(root, r, s, rerender) {
       if (event.target.closest('[data-rlt-delete]') || event.target.closest('[data-line-toggle]')) return;
       const item = readRltDevices().find(entry => String(entry.id) === row.dataset.rltSelect);
       if (!item?.inputState) return;
+      if (String(state.get().activeRltDeviceId || '') === String(row.dataset.rltSelect || '')) {
+        state.set({ activeRltDeviceId: null, activeRltDeviceName: '' });
+        return;
+      }
       state.set({ ...item.inputState, activeRltDeviceId: item.id, activeRltDeviceName: item.name || '' });
     });
   });

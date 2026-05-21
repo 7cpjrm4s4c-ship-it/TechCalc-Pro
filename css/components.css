@@ -4085,3 +4085,27 @@ body.settings-open {
   .saved-record-card__toggle,
   .saved-record-card__delete { width: 2rem; height: 2rem; min-width: 2rem; }
 }
+
+/* v1.0.11: prevent pressure-holding result labels/values from overflowing compact cards. */
+.module-view[data-module='pressure-holding'] .main-result .inline-stat,
+.module-view[data-module='pressure-holding'] .inline-stat {
+  min-width: 0;
+  overflow: hidden;
+}
+.module-view[data-module='pressure-holding'] .inline-stat span,
+.module-view[data-module='pressure-holding'] .inline-stat strong,
+.module-view[data-module='pressure-holding'] .result-row span,
+.module-view[data-module='pressure-holding'] .result-row strong {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.module-view[data-module='pressure-holding'] .inline-stat span {
+  font-size: clamp(.62rem, .72vw, .72rem);
+  letter-spacing: .08em;
+}
+.module-view[data-module='pressure-holding'] .inline-stat strong {
+  font-size: clamp(.8rem, .95vw, .95rem);
+  line-height: 1.12;
+}

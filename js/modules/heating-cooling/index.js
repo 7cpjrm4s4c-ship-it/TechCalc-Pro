@@ -193,18 +193,22 @@ function bindLineSections(root, r, rerender) {
     onLoad(id) {
       const item = readLineSections().find(entry => isSameId(entry.id, id));
       if (!item) return;
+      if (isSameId(state.get().activeLineSectionId, id)) {
+        state.set({ activeLineSectionId: null, activeLineSectionName: '' });
+        return;
+      }
       const input = item.inputState || {};
       const prefix = (input.mode === 'cooling') ? 'cooling' : 'heating';
       state.set({
         ...(item.uiState || {}),
         mode: input.mode || item.uiState?.mode || state.get().mode,
-        mediumId: item.uiState?.mediumId || state.get().mediumId,
-        pipeSystemId: item.uiState?.pipeSystemId || state.get().pipeSystemId,
+        mediumId: input.mediumId || item.uiState?.mediumId || state.get().mediumId,
+        pipeSystemId: input.pipeSystemId || item.uiState?.pipeSystemId || state.get().pipeSystemId,
         [`${prefix}CalcTarget`]: input.calcTarget || 'power',
-        [`${prefix}PowerW`]: input.powerW || '',
+        [`${prefix}PowerW`]: input.powerW ?? '',
         [`${prefix}PowerUnit`]: input.powerUnit || 'W',
-        [`${prefix}MassFlowKgh`]: input.massFlowKgh || '',
-        [`${prefix}DeltaT`]: input.deltaT || '',
+        [`${prefix}MassFlowKgh`]: input.massFlowKgh ?? '',
+        [`${prefix}DeltaT`]: input.deltaT ?? '',
         activeLineSectionId: item.id,
         activeLineSectionName: item.name || ''
       });

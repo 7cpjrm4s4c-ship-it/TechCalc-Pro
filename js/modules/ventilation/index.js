@@ -101,17 +101,21 @@ function bindVentilationLineSections(root, r, active, modeLabel, rerender) {
     onLoad(id) {
       const item = readVentilationLineSections().find(entry => isSameId(entry.id, id));
       if (!item?.inputState) return;
+      if (isSameId(state.get().activeVentLineSectionId, id)) {
+        state.set({ activeVentLineSectionId: null, activeVentLineSectionName: '' });
+        return;
+      }
       const input = item.inputState;
       const prefix = (input.mode === 'cooling') ? 'cooling' : 'heating';
       state.set({
         mode: input.mode || state.get().mode,
         [`${prefix}CalcTarget`]: input.calcTarget || 'power',
-        [`${prefix}PowerW`]: input.powerW || '',
+        [`${prefix}PowerW`]: input.powerW ?? '',
         [`${prefix}PowerUnit`]: input.powerUnit || 'W',
-        [`${prefix}VolumeFlowM3h`]: input.volumeFlowM3h || '',
-        [`${prefix}DeltaT`]: input.deltaT || '',
-        [`${prefix}SupplyTemp`]: input.supplyTemp || '',
-        [`${prefix}RoomTemp`]: input.roomTemp || '',
+        [`${prefix}VolumeFlowM3h`]: input.volumeFlowM3h ?? '',
+        [`${prefix}DeltaT`]: input.deltaT ?? '',
+        [`${prefix}SupplyTemp`]: input.supplyTemp ?? '',
+        [`${prefix}RoomTemp`]: input.roomTemp ?? '',
         activeVentLineSectionId: item.id,
         activeVentLineSectionName: item.name || ''
       });

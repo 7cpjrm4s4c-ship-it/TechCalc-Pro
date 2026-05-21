@@ -88,7 +88,8 @@ export function bindEditModeClear(root, {
   activeIdKey,
   nameKey,
   clearPatch = {},
-  ignoreSelector = ''
+  ignoreSelector = '',
+  onClear = null
 } = {}) {
   if (!root || !state || !activeIdKey) return;
   root.addEventListener('click', event => {
@@ -97,6 +98,8 @@ export function bindEditModeClear(root, {
     const baseIgnore = '[data-line-card], .saved-record-card, .line-section-card, .tc-save-actions, input, select, textarea, button, label, .segmented, .segmented button';
     const selector = ignoreSelector ? `${baseIgnore}, ${ignoreSelector}` : baseIgnore;
     if (event.target.closest(selector)) return;
-    state.set({ [activeIdKey]: null, ...(nameKey ? { [nameKey]: '' } : {}), ...clearPatch });
+    const patch = { [activeIdKey]: null, ...(nameKey ? { [nameKey]: '' } : {}), ...clearPatch };
+    if (typeof onClear === 'function') onClear(patch, event);
+    else state.set(patch);
   });
 }

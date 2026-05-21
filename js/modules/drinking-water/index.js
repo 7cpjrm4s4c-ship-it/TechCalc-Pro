@@ -88,7 +88,7 @@ function selectedFixturesList(r) {
     aggregate.set(key, current);
   };
   (r.usageUnits || []).forEach(unit => (unit.consumers || []).forEach(add));
-  (r.rawSingles || []).forEach(add);
+  ((r.rawSingles && r.rawSingles.length) ? r.rawSingles : (r.singleGroups || []).flatMap(group => group.consumers || [])).forEach(add);
   const rows = [...aggregate.values()];
   if (!rows.length) return '<div class="empty-state empty-state--compact">Noch keine Einrichtungsgegenstände ausgewählt</div>';
   return `<div class="dw-fixture-list dw-fixture-list--plain">${rows.map(item => `<div class="dw-fixture-row"><strong>${esc(item.count)} × ${esc(item.label)}</strong>${item.permanent ? '<em>Dauerverbraucher</em>' : ''}</div>`).join('')}</div>`;
@@ -361,6 +361,7 @@ function bindDrinkingWater(root, signal) {
         if (details) details.open = true;
         root.innerHTML = view(state.get());
       }
+      return;
     }
 
 
