@@ -50,7 +50,7 @@ function savedPlantRows(items = []){
         <button type="button" class="line-section-card__delete" data-ph-delete="${esc(item.id)}" aria-label="Anlage löschen">×</button>
       </div>
       <div class="line-section-card__body">${resultRows([
-        { label:'Auswahl', value:res.productLabel || '—' },
+        { label:'Station / Gefäß', value:res.productLabel || '—' },
         { label:'Normvolumen', value:res.selectedStandardVolume ? fmt(res.selectedStandardVolume,0) : '—', unit:res.selectedStandardVolume ? 'Liter' : '' },
         { label:'Mindestbetriebsdruck p₀', value:res.p0 !== undefined ? fmt(res.p0,2) : '—', unit:res.p0 !== undefined ? 'bar' : '' },
         { label:'Enddruck pₑ', value:res.pe !== undefined ? fmt(res.pe,2) : '—', unit:res.pe !== undefined ? 'bar' : '' }
@@ -82,7 +82,7 @@ function view(s){
     ? { label:`Erforderliches Nennvolumen ${s.dynamicType === 'variomat' ? 'Variomat' : 'Reflexomat'}`, value:fmt(r.vnDynamic,1), unit:'Liter' }
     : { label:'Erforderliches MAG-Nennvolumen', value:r.vnMag > 0 ? fmt(r.vnMag,1) : '—', unit:r.vnMag > 0 ? 'Liter' : '' };
   const details = [
-    { label: s.holdingType === 'dynamic' ? 'Auswahl Station / Gefäß' : 'Auswahl MAG', value:r.productLabel },
+    { label: s.holdingType === 'dynamic' ? 'Station / Gefäß' : 'Auswahl MAG', value:r.productLabel },
     { label:'Nächstes Normvolumen', value: r.selectedVolume > 0 ? fmt(r.selectedStandardVolume,0) : '—', unit:'Liter' },
     { label:'Mindestbetriebsdruck p₀', value:fmt(r.p0,2), unit:'bar' },
     { label:'Anfangsdruck pₐ min.', value:fmt(r.paMin,2), unit:'bar' },

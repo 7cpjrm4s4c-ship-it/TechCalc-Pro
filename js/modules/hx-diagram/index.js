@@ -303,7 +303,13 @@ export default {
       rootEl.querySelectorAll('[data-hx-select-process]').forEach(row => {
         row.addEventListener('click', event => {
           if (event.target.closest('[data-hx-remove-process]')) return;
-          const process = (state.get().processes ?? []).find(item => item.id === row.dataset.hxSelectProcess);
+          const current = state.get();
+          const selectedId = row.dataset.hxSelectProcess;
+          if (current.activeProcessId === selectedId) {
+            state.set({ activeProcessId: null, activePath: [], points: [] });
+            return;
+          }
+          const process = (current.processes ?? []).find(item => item.id === selectedId);
           if (!process) return;
           state.set({
             ...(process.input ?? {}),
@@ -327,6 +333,14 @@ export default {
             activePath: wasActive ? [] : current.activePath
           });
         });
+      });
+
+      rootEl.addEventListener('click', event => {
+        const current = state.get();
+        if (!current.activeProcessId) return;
+        const ignored = event.target.closest('[data-hx-select-process], [data-hx-remove-process], [data-hx-add], [data-hx-update], [data-hx-clear], [data-field], [data-segment], input, select, textarea, button, label, .segmented');
+        if (ignored) return;
+        state.set({ activeProcessId: null, activePath: [], points: [] });
       });
     };
 

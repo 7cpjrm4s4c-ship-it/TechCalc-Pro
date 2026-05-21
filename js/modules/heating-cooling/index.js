@@ -157,6 +157,49 @@ function buildLineSectionRecord(currentState, r, items, id, name, existing = nul
   };
 }
 
+
+function firstFilled(...values) {
+  for (const value of values) {
+    if (value !== undefined && value !== null && value !== '') return value;
+  }
+  return '';
+}
+
+function parseDisplayNumber(value) {
+  if (value === undefined || value === null || value === '—') return '';
+  return String(value).replace(/\s+/g, '').replace(',', '.');
+}
+
+function inferStoredMode(input = {}, item = {}, fallback = 'heating') {
+  if (input.mode === 'cooling' || input.mode === 'heating') return input.mode;
+  if (item.uiState?.mode === 'cooling' || item.uiState?.mode === 'heating') return item.uiState.mode;
+  const hasCooling = ['coolingCalcTarget', 'coolingPowerW', 'coolingMassFlowKgh', 'coolingDeltaT'].some(k => input[k] !== undefined && input[k] !== null && input[k] !== '');
+  const hasHeating = ['heatingCalcTarget', 'heatingPowerW', 'heatingMassFlowKgh', 'heatingDeltaT'].some(k => input[k] !== undefined && input[k] !== null && input[k] !== '');
+  if (hasCooling && !hasHeating) return 'cooling';
+  return fallback === 'cooling' ? 'cooling' : 'heating';
+}
+
+function savedLineSectionPatch(item, currentState) {
+  const input = item.inputState || item.state || item.uiState || {};
+  const nextMode = inferStoredMode(input, item, currentState.mode || 'heating');
+  const prefix = nextMode === 'cooling' ? 'cooling' : 'heating';
+  const calcTarget = firstFilled(input.calcTarget, input[`${prefix}CalcTarget`], currentState[`${prefix}CalcTarget`], 'power');
+  const powerFromResult = parseDisplayNumber(item.powerKw);
+  return {
+    ...(item.uiState || {}),
+    mode: nextMode,
+    mediumId: firstFilled(input.mediumId, item.uiState?.mediumId, currentState.mediumId),
+    pipeSystemId: firstFilled(input.pipeSystemId, item.uiState?.pipeSystemId, currentState.pipeSystemId),
+    [`${prefix}CalcTarget`]: calcTarget,
+    [`${prefix}PowerW`]: firstFilled(input.powerW, input[`${prefix}PowerW`], calcTarget !== 'power' ? powerFromResult : ''),
+    [`${prefix}PowerUnit`]: firstFilled(input.powerUnit, input[`${prefix}PowerUnit`], calcTarget !== 'power' && powerFromResult ? 'kW' : 'W'),
+    [`${prefix}MassFlowKgh`]: firstFilled(input.massFlowKgh, input[`${prefix}MassFlowKgh`], parseDisplayNumber(item.massFlowKgh)),
+    [`${prefix}DeltaT`]: firstFilled(input.deltaT, input[`${prefix}DeltaT`], parseDisplayNumber(item.deltaT)),
+    activeLineSectionId: item.id,
+    activeLineSectionName: item.name || ''
+  };
+}
+
 function bindLineSections(root, r, rerender) {
   bindEditModeClear(root, { state, activeIdKey: 'activeLineSectionId', nameKey: 'activeLineSectionName' });
   const saveBtn = root.querySelector('[data-line-save]');
@@ -193,21 +236,11 @@ function bindLineSections(root, r, rerender) {
     onLoad(id) {
       const item = readLineSections().find(entry => isSameId(entry.id, id));
       if (!item) return;
-      const input = item.inputState || {};
-      const prefix = (input.mode === 'cooling') ? 'cooling' : 'heating';
-      state.set({
-        ...(item.uiState || {}),
-        mode: input.mode || item.uiState?.mode || state.get().mode,
-        mediumId: item.uiState?.mediumId || state.get().mediumId,
-        pipeSystemId: item.uiState?.pipeSystemId || state.get().pipeSystemId,
-        [`${prefix}CalcTarget`]: input.calcTarget || 'power',
-        [`${prefix}PowerW`]: input.powerW || '',
-        [`${prefix}PowerUnit`]: input.powerUnit || 'W',
-        [`${prefix}MassFlowKgh`]: input.massFlowKgh || '',
-        [`${prefix}DeltaT`]: input.deltaT || '',
-        activeLineSectionId: item.id,
-        activeLineSectionName: item.name || ''
-      });
+      if (isSameId(state.get().activeLineSectionId, id)) {
+        state.set({ activeLineSectionId: null, activeLineSectionName: '' });
+        return;
+      }
+      state.set(savedLineSectionPatch(item, state.get()));
     },
     onDelete(id) {
       writeLineSections(removeRecord(readLineSections(), id));

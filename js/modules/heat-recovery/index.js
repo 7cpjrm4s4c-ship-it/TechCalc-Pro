@@ -68,6 +68,16 @@ function buildRltDeviceRecord(r, s, items, id, name, existing = null) {
   };
 }
 
+
+function inferRltInputState(item) {
+  const input = { ...(item.inputState || item.state || {}) };
+  const modeLabel = String(item.mode || input.mode || '').toLowerCase();
+  if (input.mode !== 'wrg' && input.mode !== 'mixing') {
+    input.mode = modeLabel.includes('misch') || modeLabel.includes('mix') ? 'mixing' : 'wrg';
+  }
+  return input;
+}
+
 function bindRltDevices(root, r, s, rerender) {
   root.querySelector('[data-rlt-save]')?.addEventListener('click', event => {
     event.preventDefault();
@@ -104,9 +114,16 @@ function bindRltDevices(root, r, s, rerender) {
   root.querySelectorAll('[data-rlt-select]').forEach(row => {
     row.addEventListener('click', event => {
       if (event.target.closest('[data-rlt-delete]') || event.target.closest('[data-line-toggle]')) return;
-      const item = readRltDevices().find(entry => String(entry.id) === row.dataset.rltSelect);
-      if (!item?.inputState) return;
-      state.set({ ...item.inputState, activeRltDeviceId: item.id, activeRltDeviceName: item.name || '' });
+      event.preventDefault();
+      event.stopPropagation();
+      const selectedId = row.getAttribute('data-rlt-select');
+      const item = readRltDevices().find(entry => String(entry.id) === String(selectedId));
+      if (!item) return;
+      if (String(state.get().activeRltDeviceId || '') === String(selectedId || '')) {
+        state.set({ activeRltDeviceId: null, activeRltDeviceName: '' });
+        return;
+      }
+      state.set({ ...inferRltInputState(item), activeRltDeviceId: item.id, activeRltDeviceName: item.name || '' });
     });
   });
 

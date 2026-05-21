@@ -78,6 +78,33 @@ function singleRows(groups) {
   }).join('')}</div>`;
 }
 
+
+function normalizeSingleGroupForEdit(group) {
+  if (!group) return null;
+  if (Array.isArray(group.consumers)) return { ...group, consumers: group.consumers.map(c => ({ ...c })) };
+  const typeId = group.typeId || group.consumerType || group.id;
+  const fallback = createConsumer({ typeId, count: group.count || 1, permanent: Boolean(group.permanent) });
+  const consumer = {
+    ...fallback,
+    ...group,
+    id: group.consumerId || group.id || fallback.id,
+    typeId: fallback.typeId,
+    label: group.label || group.name || fallback.label,
+    count: Math.max(1, Math.round(Number(group.count) || 1)),
+    vr: Number(group.vr ?? fallback.vr),
+    pmin: Number(group.pmin ?? fallback.pmin),
+    neGroup: group.neGroup || fallback.neGroup,
+    hotWater: group.hotWater ?? fallback.hotWater,
+    permanent: Boolean(group.permanent)
+  };
+  return {
+    id: group.groupId || group.id || fallback.id,
+    name: group.groupName || group.name || group.label || 'Einzelverbraucher',
+    consumers: [consumer],
+    createdAt: group.createdAt || new Date().toISOString()
+  };
+}
+
 function selectedFixturesList(r) {
   const aggregate = new Map();
   const add = (consumer) => {
@@ -88,7 +115,13 @@ function selectedFixturesList(r) {
     aggregate.set(key, current);
   };
   (r.usageUnits || []).forEach(unit => (unit.consumers || []).forEach(add));
-  (r.rawSingles || []).forEach(add);
+  ((r.rawSingles && r.rawSingles.length) ? r.rawSingles : (r.singleGroups || []).flatMap(group => group.consumers || [])).forEach(add);
+  // Sicherheitsnetz: Ein ausgewählter Einzelverbraucher wird zusätzlich aus dem aktiven Entwurf gelesen,
+  // falls der gespeicherte Datenbestand noch aus einer älteren Version stammt.
+  const s = state.get();
+  if (s.activeSingleId && Array.isArray(s.singleDraftConsumers)) {
+    s.singleDraftConsumers.forEach(add);
+  }
   const rows = [...aggregate.values()];
   if (!rows.length) return '<div class="empty-state empty-state--compact">Noch keine Einrichtungsgegenstände ausgewählt</div>';
   return `<div class="dw-fixture-list dw-fixture-list--plain">${rows.map(item => `<div class="dw-fixture-row"><strong>${esc(item.count)} × ${esc(item.label)}</strong>${item.permanent ? '<em>Dauerverbraucher</em>' : ''}</div>`).join('')}</div>`;
@@ -281,7 +314,7 @@ function bindDrinkingWater(root, signal) {
       const units = readUsageUnits();
       const record = createUsageUnit({ name:s.unitName, consumers });
       record.id = s.activeUnitId;
-      writeUsageUnits(units.map(item => item.id === s.activeUnitId ? record : item));
+      writeUsageUnits(units.map(item => isSameId(item.id, s.activeUnitId) ? record : item));
       state.set({ activeUnitId:s.activeUnitId, uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
       root.innerHTML = view(state.get());
       return;
@@ -307,7 +340,7 @@ function bindDrinkingWater(root, signal) {
       const groups = readSingleConsumers();
       const record = createSingleGroup({ name:s.singleName || 'Einzelverbraucher', consumers: draft.map(c => ({ ...c, permanent:String(s.singlePermanent)==='true' })) });
       record.id = s.activeSingleId;
-      writeSingleConsumers(groups.map(item => item.id === s.activeSingleId ? record : item));
+      writeSingleConsumers(groups.map(item => isSameId(item.id, s.activeSingleId) ? record : item));
       state.set({ activeSingleId:s.activeSingleId, uiSingleFormOpen:true, uiSingleSavedOpen:true }, { notify:false });
       root.innerHTML = view(state.get());
       return;
@@ -335,7 +368,7 @@ function bindDrinkingWater(root, signal) {
     if (unitEdit && root.contains(unitEdit)) {
       event.preventDefault(); event.stopPropagation();
       const units = readUsageUnits();
-      const unit = units.find(item => item.id === unitEdit.dataset.dwUnitEdit);
+      const unit = units.find(item => isSameId(item.id, unitEdit.dataset.dwUnitEdit));
       if (unit) {
         const patch = { activeUnitId: unit.id, unitName: unit.name, unitDraftConsumers: unit.consumers || [], uiUnitFormOpen:true, uiUnitSavedOpen:true };
         state.set(patch, { notify:false });
@@ -350,17 +383,25 @@ function bindDrinkingWater(root, signal) {
     const singleEdit = event.target.closest('[data-dw-single-edit]');
     if (singleEdit && root.contains(singleEdit)) {
       event.preventDefault(); event.stopPropagation();
-      const groups = readSingleConsumers();
-      const group = groups.find(item => item.id === singleEdit.dataset.dwSingleEdit);
+      const groups = readSingleConsumers().map(normalizeSingleGroupForEdit).filter(Boolean);
+      const group = groups.find(item => isSameId(item.id, singleEdit.dataset.dwSingleEdit));
       if (group) {
-        const consumers = group.consumers || [];
-        const patch = { activeSingleId: group.id, singleName: group.name, singleDraftConsumers: consumers, singlePermanent: String(consumers.some(c => c.permanent)), uiSingleFormOpen:true, uiSingleSavedOpen:true };
+        const consumers = (group.consumers || []).map(c => ({ ...c }));
+        const patch = {
+          activeSingleId: group.id,
+          singleName: group.name,
+          singleDraftConsumers: consumers,
+          singlePermanent: String(consumers.some(c => c.permanent)),
+          uiSingleFormOpen:true,
+          uiSingleSavedOpen:true
+        };
         state.set(patch, { notify:false });
         syncFieldValues(root, patch);
         const details = root.querySelector('[data-dw-accordion="uiSingleFormOpen"]');
         if (details) details.open = true;
         root.innerHTML = view(state.get());
       }
+      return;
     }
 
 
