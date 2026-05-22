@@ -2,7 +2,7 @@ import config from './config.js';
 import { state, initialState } from './state.js';
 import { calculate, getFixture, toNumber } from './logic.js';
 import { fixtureTypes, usageTypes } from './tables.js';
-import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, resultRows, inlineStats, esc } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultRows, inlineStats, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { bindEditModeClear } from '../../core/savedRecords.js';
@@ -11,12 +11,25 @@ const opts = items => items.map(([value, label]) => ({ value, label }));
 const fixtureOptions = fixtureTypes.map(item => ({ value: item.id, label: item.name }));
 const usageOptions = usageTypes.map(item => ({ value: item.value, label: item.label }));
 
+const fmtDecimalInput = (value, digits = 1) => {
+  if (value === '' || value === null || value === undefined) return '';
+  const n = toNumber(value);
+  if (!Number.isFinite(n)) return String(value ?? '');
+  return n.toLocaleString('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+};
+const fmtStateNumber = (value, digits = 1) => {
+  if (value === '' || value === null || value === undefined) return '—';
+  const n = toNumber(value);
+  if (!Number.isFinite(n)) return String(value ?? '—');
+  return n.toLocaleString('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+};
+
 function lineTypeLabel(value) {
   return {
     'single-unvented': 'Einzelanschluss unbelüftet',
     'single-vented': 'Einzelanschluss belüftet',
-    'branch-unvented': 'Sammelanschluss unbelüftet',
-    'branch-vented': 'Sammelanschluss belüftet',
+    'branch-unvented': 'Anschlussleitung unbelüftet',
+    'branch-vented': 'Anschlussleitung belüftet',
     stack: 'Fallleitung',
     collector: 'Sammelleitung',
     'ground-inside': 'Grundleitung innen',
@@ -47,7 +60,7 @@ function lineTypeSelector(s) {
   const ventilation = lineVentilationValue(s.lineType);
   const families = [
     ['single', 'Einzelanschluss'],
-    ['branch', 'Sammelanschluss'],
+    ['branch', 'Anschlussleitung'],
     ['stack', 'Fallleitung'],
     ['collector', 'Sammelleitung'],
     ['ground-inside', 'Grund innen'],
@@ -106,51 +119,40 @@ function savedRows(s) {
 }
 function fixturesTable(s, r) {
   if (!r.fixtures.length) return '<div class="empty-state empty-state--compact">Noch keine Entwässerungsgegenstände hinzugefügt.</div>';
-  return `<div class="wastewater-fixtures">${r.fixtures.map((item, index) => {
+  return `<div class="wastewater-compact-list">${r.fixtures.map(item => {
     const custom = item.base.custom;
-    const open = item.uiOpen === true;
-    const title = `${item.name || 'Entwässerungsgegenstand'} · ${item.qty || 0} Stk.`;
-    const subtitle = `ΣDU ${fmt(item.totalDu,1)} l/s · Einzelanschluss ${item.dn || '—'}`;
-    return `<article class="wastewater-fixture line-section-card ${open ? '' : 'is-collapsed'}" data-fixture-id="${esc(item.id)}">
-      <div class="line-section-card__head">
-        <div class="line-section-card__title" data-fixture-toggle="${esc(item.id)}"><strong>${esc(title)}</strong><small>${esc(subtitle)}</small></div>
-        <button type="button" class="line-section-card__toggle" data-fixture-toggle="${esc(item.id)}" aria-expanded="${open ? 'true' : 'false'}" aria-label="Entwässerungsgegenstand aufklappen"><span>▾</span></button>
-        <button type="button" class="line-section-card__delete wastewater-fixture__delete" data-fixture-delete="${esc(item.id)}" aria-label="Gegenstand löschen">×</button>
-      </div>
-      <div class="line-section-card__body">
-        <div class="wastewater-fixture__main">
-          ${selectField({ id:`fixture-type-${item.id}`, label:'Gegenstand', value:item.typeId, options:fixtureOptions }).replaceAll('data-field="fixture-type-', 'data-fixture-field="typeId" data-field-disabled="fixture-type-')}
-          ${field({ id:`fixture-qty-${item.id}`, label:'Anzahl', value:item.quantity || '1', unit:'Stk.' }).replaceAll('data-field="fixture-qty-', 'data-fixture-field="quantity" data-field-disabled="fixture-qty-')}
-        </div>
-        ${custom ? `<div class="wastewater-fixture__custom">${grid([
-          field({ id:`fixture-name-${item.id}`, label:'Bezeichnung', value:item.customName || '', placeholder:'z. B. Laborbecken', inputmode:'text' }).replaceAll('data-field="fixture-name-', 'data-fixture-field="customName" data-field-disabled="fixture-name-'),
-          field({ id:`fixture-du-${item.id}`, label:'DU', value:item.customDu || '', unit:'l/s' }).replaceAll('data-field="fixture-du-', 'data-fixture-field="customDu" data-field-disabled="fixture-du-'),
-          field({ id:`fixture-dn-${item.id}`, label:'Mindest-DN', value:item.customDn || '', placeholder:'DN 50', inputmode:'text' }).replaceAll('data-field="fixture-dn-', 'data-fixture-field="customDn" data-field-disabled="fixture-dn-')
-        ].join(''), 3)}</div>` : ''}
-        <div class="wastewater-fixture__stats">${inlineStats([
-          { label:'DU/Stk.', value:fmt(item.du,1), unit:'l/s' },
-          { label:'ΣDU', value:fmt(item.totalDu,1), unit:'l/s' },
-          { label:'Einzelanschluss', value:item.dn }
-        ])}</div>
-      </div>
+    const selector = selectField({ id:`fixture-type-${item.id}`, label:'Gegenstand', value:item.typeId, options:fixtureOptions })
+      .replaceAll('data-field="fixture-type-', 'data-fixture-field="typeId" data-field-disabled="fixture-type-');
+    const qty = field({ id:`fixture-qty-${item.id}`, label:'Anzahl', value:item.quantity || '1', unit:'Stk.' })
+      .replaceAll('data-field="fixture-qty-', 'data-fixture-field="quantity" data-field-disabled="fixture-qty-');
+    const customFields = custom ? `<div class="wastewater-compact-row__custom">${grid([
+      field({ id:`fixture-name-${item.id}`, label:'Bezeichnung', value:item.customName || '', placeholder:'z. B. Laborbecken', inputmode:'text' }).replaceAll('data-field="fixture-name-', 'data-fixture-field="customName" data-field-disabled="fixture-name-'),
+      field({ id:`fixture-du-${item.id}`, label:'DU', value:item.customDu || '', unit:'l/s' }).replaceAll('data-field="fixture-du-', 'data-fixture-field="customDu" data-field-disabled="fixture-du-'),
+      field({ id:`fixture-dn-${item.id}`, label:'Mindest-DN', value:item.customDn || '', placeholder:'DN 50', inputmode:'text' }).replaceAll('data-field="fixture-dn-', 'data-fixture-field="customDn" data-field-disabled="fixture-dn-')
+    ].join(''), 3)}</div>` : '';
+    return `<article class="wastewater-compact-row" data-fixture-id="${esc(item.id)}">
+      <div class="wastewater-compact-row__inputs">${selector}${qty}<button type="button" class="line-section-card__delete wastewater-fixture__delete" data-fixture-delete="${esc(item.id)}" aria-label="Gegenstand löschen">×</button></div>
+      ${customFields}
+      <div class="wastewater-compact-row__meta">DU/Stk. ${fmt(item.du,1)} l/s · ΣDU ${fmt(item.totalDu,1)} l/s · Einzelanschluss ${esc(item.dn || '—')}</div>
     </article>`;
   }).join('')}</div>`;
 }
+
 function warningList(warnings) {
-  if (!warnings.length) return '<div class="empty-state empty-state--compact">Keine Regelverletzungen erkannt.</div>';
-  return `<div class="ph-warnings">${warnings.map(item => `<div class="ph-warning"><span>Hinweis</span><strong>${esc(item)}</strong></div>`).join('')}</div>`;
+  const fixed = '<div class="ph-warning ph-warning--norm"><span>Normgrundlage</span><strong>Berechnung erfolgt auf Grundlage der DIN 1986 - 100, aktuellste Fassung.</strong></div>';
+  if (!warnings.length) return `<div class="ph-warnings">${fixed}<div class="empty-state empty-state--compact">Keine Regelverletzungen erkannt.</div></div>`;
+  return `<div class="ph-warnings">${fixed}${warnings.map(item => `<div class="ph-warning"><span>Hinweis</span><strong>${esc(item)}</strong></div>`).join('')}</div>`;
 }
 function inputCards(s, r) {
   const lineFields = [
     lineTypeSelector(s),
     grid([
-      field({ id:'slopeCmM', label:'Gefälle J', value:fmtInput(s.slopeCmM,2), unit:'cm/m' }),
-      field({ id:'pipeLengthM', label:'Rohrlänge', value:fmtInput(s.pipeLengthM,2), unit:'m' }),
-      field({ id:'bends90', label:'90° Umlenkungen', value:s.bends90 || '0', unit:'Stk.' }),
+      field({ id:'slopeCmM', label:'Gefälle J', value:fmtDecimalInput(s.slopeCmM,1), unit:'cm/m' }),
       selectField({ id:'fillRatio', label:'Füllungsgrad h/di', value:s.fillRatio, options:opts([['0.5','0,5'],['0.7','0,7'],['1.0','1,0']]) })
-    ].join(''), 2)
+    ].join(''), 2),
+    '<p class="ph-help">Rohrlängen, Höhenversätze und Umlenkungen sind gemäß Norm zusätzlich zu prüfen. Die Vorbemessung erfolgt hier über Gefälle, Füllungsgrad und angeschlossene Entwässerungsgegenstände.</p>'
   ];
-  if (s.lineType === 'branch-vented') lineFields.push('<p class="ph-help">Belüftete Sammelanschlussleitungen werden als Sammelleitung über die hydraulischen Tabellen A.3 bis A.5 vorbemessen.</p>');
+  if (s.lineType === 'branch-vented') lineFields.push('<p class="ph-help">Belüftete Anschlussleitungen werden über die hydraulischen Tabellen A.3 bis A.5 vorbemessen.</p>');
   if (s.lineType === 'stack') lineFields.push(segmented('branchType', opts([['with-radius','Abzweige mit Innenradius'],['without-radius','ohne Innenradius']]), s.branchType, { accent:'green' }));
   if (s.lineType === 'ventilation') lineFields.push(segmented('ventilationType', opts([['single-main','Einzel-Hauptlüftung'],['collective-main','Sammel-Hauptlüftung'],['bypass','Umgehungsleitung'],['loop','Umlüftungsleitung']]), s.ventilationType, { accent:'green' }));
   return stack([
@@ -178,34 +180,30 @@ function inputCards(s, r) {
 }
 function resultCards(s, r) {
   const dn = r.selected?.dn || '—';
+  const fillApplies = ['collector','ground-inside','ground-outside','ground-full','branch-vented'].includes(s.lineType);
   return stack([
-    mainResult('Ergebnis Schmutzwasser', { label:'Gesamtschmutzwasserabfluss Qtot', value:fmt(r.qtot,2), unit:'l/s' }, [
+    mainResult('Ergebnis / Dimensionierung Schmutzwasser', { label:'Empfohlene Dimension', value:dn, unit:'' }, [
       { label:'Qww', value:fmt(r.qww,2), unit:'l/s' },
       { label:'ΣDU', value:fmt(r.sumDu,1), unit:'l/s' },
       { label:'K', value:fmt(r.k,1) },
-      { label:'Empfohlene DN', value:dn }
+      { label:'Qtot', value:fmt(r.qtot,2), unit:'l/s' }
     ], 'green'),
-    resultCard('Dimensionierung', [
-      { label:'Leitungstyp', value:lineTypeLabel(s.lineType) },
-      { label:'Bemessungsgrundlage', value:r.dimensionBasis },
-      { label:'Kapazität', value:r.selected?.capacity ? fmt(r.selected.capacity,1) : '—', unit:r.selected?.capacity ? 'l/s' : '' },
-      { label:'maßgebender Füllungsgrad', value:['collector','ground-inside','ground-outside','ground-full'].includes(s.lineType) ? `h/di ${s.fillRatio}` : '—' },
-      { label:'angesetztes Gefälle', value:s.slopeCmM || '—', unit:'cm/m' }
-    ], 'green'),
-    card('Berechnungsansatz', stack([
-      '<div class="formula ph-formula">Qww = K × √ΣDU</div>',
-      '<div class="formula ph-formula">Qtot = Qww + Qc + Qp + Qr,a</div>',
+    card('Dimensionierung und Berechnungsansatz', stack([
       resultRows([
-        { label:'Qww Formelwert', value:fmt(r.qwwFormula,2), unit:'l/s' },
+        { label:'Leitungsart', value:lineTypeLabel(s.lineType) },
+        { label:'Bemessungsgrundlage', value:r.dimensionBasis },
+        { label:'Kapazität', value:r.selected?.capacity ? fmt(r.selected.capacity,1) : '—', unit:r.selected?.capacity ? 'l/s' : '' },
+        { label:'Füllungsgrad', value:fillApplies ? `h/di ${String(s.fillRatio).replace('.', ',')}` : '—' },
+        { label:'angesetztes Gefälle', value:fmtStateNumber(s.slopeCmM,1), unit:'cm/m' },
         { label:'größter Einzel-DU', value:fmt(r.largestDu,1), unit:'l/s' },
-        { label:'Dauerabfluss Qc', value:fmt(r.qc,2), unit:'l/s' },
-        { label:'Pumpenförderstrom Qp', value:fmt(r.qp,2), unit:'l/s' },
-        { label:'Qr,a', value:fmt(r.qra,2), unit:'l/s' }
-      ])
+        { label:'Zusatzabflüsse', value:fmt(r.qc + r.qp + r.qra,2), unit:'l/s' }
+      ]),
+      '<div class="ph-formula ph-formula--small">Qww = K × √ΣDU · Qtot = Qww + Qc + Qp + Qr,a</div>'
     ].join('')), 'green'),
     card('Normhinweise / Plausibilität', warningList(r.warnings), 'green')
   ].join(''));
 }
+
 function view(s) {
   const r = calculate(s);
   return renderModuleShell(config, `<div class="span-6">${inputCards(s, r)}</div><div class="span-6">${resultCards(s, r)}</div>`);

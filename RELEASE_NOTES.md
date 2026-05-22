@@ -1,5 +1,13 @@
 # Release Notes
 
+## 1.1.2 - Schmutzwasser UX-Vereinfachung
+- Ergebnispriorität auf empfohlene DN umgestellt und Ergebnis/Dimensionierung/Berechnungsansatz zusammengeführt.
+- Gefälle-Eingabe auf deutsche Dezimaldarstellung mit 1,0 cm/m als Standard korrigiert.
+- Leitungsart und Entwässerungsgegenstände kompakter dargestellt; Länge und Umlenkungen nur noch als Normhinweis.
+- Für WC-Anlagen bei Sammel-/Grundleitungen anwenderseitig mindestens DN 100 angesetzt.
+- Fester DIN-1986-100-Hinweis in die Normhinweise aufgenommen.
+- Version und Cache auf 1.1.2 erhöht.
+
 ## 1.1.1 - Schmutzwasser UX und Fallleitungslogik
 - Entwässerungsgegenstände als Klappcards umgesetzt.
 - Leitungsart-Auswahl für Einzel-/Sammelanschluss mit Vorwahl belüftet/unbelüftet vereinfacht.

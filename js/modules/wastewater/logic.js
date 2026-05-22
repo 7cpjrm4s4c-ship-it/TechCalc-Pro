@@ -41,11 +41,11 @@ function chooseStack(qtot, branchType, hasWc) {
   }) || stackTable.at(-1);
 }
 
-function chooseHydraulic(qtot, fillRatio, slopeCmM, lineType) {
+function chooseHydraulic(qtot, fillRatio, slopeCmM, lineType, hasWc = false) {
   const table = hydraulicTables[String(fillRatio)] || hydraulicTables['0.5'];
   const slope = toNumber(slopeCmM);
   const row = table.find(item => item.slope >= slope) || table.at(-1);
-  const minDn = lineType === 'ground-outside' ? 'DN 80' : 'DN 70';
+  const minDn = hasWc && ['collector','ground-inside','ground-outside','ground-full'].includes(lineType) ? 'DN 100' : (lineType === 'ground-outside' ? 'DN 80' : 'DN 70');
   const minIndex = Math.max(0, dnOrder.indexOf(minDn));
   const chosenDn = dnOrder.slice(minIndex).find(name => (row?.values?.[name] || 0) >= qtot);
   return { dn: chosenDn || dnOrder.at(-1), slope: row?.slope || slope, capacity: row?.values?.[chosenDn] || null };
@@ -79,6 +79,9 @@ function validate(state, totals, selected) {
   if (lineType === 'stack' && totals.hasWc && selected?.dn && !['DN 100', 'DN 125', 'DN 150', 'DN 200'].includes(selected.dn)) {
     warnings.push('Bei angeschlossenem WC wird für die Fallleitung mindestens DN 100 angesetzt.');
   }
+  if (totals.hasWc && ['branch-unvented','branch-vented','collector','ground-inside','ground-outside','ground-full'].includes(lineType) && selected?.dn === 'DN 100') {
+    warnings.push('Bei angeschlossenen WC-Anlagen wird für Sammel-/Grundleitungen anwenderseitig mindestens DN 100 empfohlen.');
+  }
   if (lineType === 'collector') {
     if (slope < 0.5) warnings.push('Sammelleitungen innerhalb des Gebäudes: Mindestgefälle 0,5 cm/m und v ≥ 0,5 m/s prüfen.');
   }
@@ -105,15 +108,16 @@ export function calculate(state) {
 
   if (state.lineType === 'branch-unvented') {
     selected = chooseBranchConnection(sumDu, k);
-    dimensionBasis = 'Tabelle 7 · unbelüftete Sammelanschlussleitung';
+    if (hasWc && dnOrder.indexOf(selected?.dn) < dnOrder.indexOf('DN 100')) selected = { ...selected, dn: 'DN 100' };
+    dimensionBasis = 'Tabelle 7 · Anschlussleitung unbelüftet';
   } else if (state.lineType === 'branch-vented') {
-    selected = chooseHydraulic(qtot, state.fillRatio || '0.5', state.slopeCmM, 'collector');
-    dimensionBasis = `Tabelle A.${state.fillRatio === '0.7' ? '4' : state.fillRatio === '1.0' ? '5' : '3'} · belüftete Sammelanschlussleitung`;
+    selected = chooseHydraulic(qtot, state.fillRatio || '0.5', state.slopeCmM, 'collector', hasWc);
+    dimensionBasis = `Tabelle A.${state.fillRatio === '0.7' ? '4' : state.fillRatio === '1.0' ? '5' : '3'} · Anschlussleitung belüftet`;
   } else if (state.lineType === 'stack') {
     selected = chooseStack(qtot, state.branchType, hasWc);
     dimensionBasis = 'Tabelle 8 · Fallleitung mit Hauptlüftung';
   } else if (['collector', 'ground-inside', 'ground-outside', 'ground-full'].includes(state.lineType)) {
-    selected = chooseHydraulic(qtot, state.fillRatio, state.slopeCmM, state.lineType);
+    selected = chooseHydraulic(qtot, state.fillRatio, state.slopeCmM, state.lineType, hasWc);
     dimensionBasis = `Tabelle A.${state.fillRatio === '0.5' ? '3' : state.fillRatio === '0.7' ? '4' : '5'} · h/di=${state.fillRatio}`;
   } else {
     const maxDn = fixtures.map(item => item.dn).filter(Boolean).at(0) || '—';

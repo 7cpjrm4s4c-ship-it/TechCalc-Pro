@@ -4194,3 +4194,39 @@ body.settings-open {
 .module-view[data-module='wastewater'] .segmented button {
   min-width: max-content;
 }
+
+/* v1.1.2: Schmutzwasser compact UX */
+.wastewater-compact-list{
+  display:flex;
+  flex-direction:column;
+  gap:.65rem;
+}
+.wastewater-compact-row{
+  border:1px solid rgba(126,146,166,.28);
+  border-radius:16px;
+  padding:.65rem;
+  background:rgba(255,255,255,.035);
+}
+.wastewater-compact-row__inputs{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(120px,160px) auto;
+  gap:.55rem;
+  align-items:end;
+}
+.wastewater-compact-row__custom{margin-top:.55rem;}
+.wastewater-compact-row__meta{
+  margin-top:.45rem;
+  color:var(--text-muted);
+  font-size:.82rem;
+  font-weight:700;
+}
+.ph-formula--small{
+  margin-top:.75rem;
+  font-size:.78rem;
+  opacity:.72;
+  text-align:center;
+}
+.ph-warning--norm strong{color:var(--text-primary);}
+@media (max-width:720px){
+  .wastewater-compact-row__inputs{grid-template-columns:1fr;}
+}

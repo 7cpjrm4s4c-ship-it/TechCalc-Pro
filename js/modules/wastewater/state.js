@@ -7,7 +7,7 @@ export const initialState = {
   kValue: '0.5',
   lineType: 'single-unvented',
   fillRatio: '0.5',
-  slopeCmM: '1.0',
+  slopeCmM: '1,0',
   pipeLengthM: '',
   heightDifferenceM: '',
   bends90: '0',
