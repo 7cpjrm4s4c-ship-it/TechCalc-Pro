@@ -1,7 +1,7 @@
 import config from './config.js';
 import { state, initialState } from './state.js';
 import { calculate, getAreaType, toNumber } from './logic.js';
-import { areaTypes } from './tables.js';
+import { areaTypes, roofDrainTable } from './tables.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultRows, inlineStats, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
@@ -27,6 +27,7 @@ const modeLabel = value => ({ roof:'Dachfläche', property:'Grundstücksfläche'
 const drainLabel = mode => mode === 'property' ? 'Hoftöpfe' : 'Dacheinläufe';
 const drainCapacityLabel = mode => mode === 'property' ? 'Abflussvermögen Hoftopf' : 'Abflussvermögen Dacheinlauf';
 const rainLabel = mode => mode === 'property' ? 'Regenspende r(5,2)' : 'Regenspende r(5,5)';
+const drainOptions = roofDrainTable.map(item => ({ value:item.dn, label:`${item.dn} · ${String(item.capacity).replace('.', ',')} l/s · ${item.head} mm Anstauhöhe` }));
 
 function savedSnapshot(s, r) {
   const saved = Array.isArray(s.savedCalculations) ? s.savedCalculations : [];
@@ -87,16 +88,17 @@ function rainInputBlock(s) {
   const mode = s.surfaceMode || s.calculationType || 'roof';
   return stack([
     grid([
-      field({ id:'rainIntensity', label:rainLabel(mode), value:fmtInput(s.rainIntensity,1), unit:'l/(s·ha)' })
-    ].join(''), 1),
-    `<a class="action-button action-button--secondary" href="${esc(KOSTRA_URL)}" target="_blank" rel="noopener">KOSTRA / OpenKo Daten öffnen</a>`
+      field({ id:'rainIntensity', label:rainLabel(mode), value:fmtInput(s.rainIntensity,1), unit:'l/(s·ha)' }),
+      field({ id:'rainHundredIntensity', label:'Regenspende r(5,100)', value:fmtInput(s.rainHundredIntensity,1), unit:'l/(s·ha)' })
+    ].join(''), 2),
+    `<a class="action-button action-button--secondary rainwater-kostra-link" href="${esc(KOSTRA_URL)}" target="_blank" rel="noopener">KOSTRA / OpenKo Daten öffnen</a>`
   ].join(''));
 }
 function dimensionInputBlock(s) {
   const mode = s.surfaceMode || s.calculationType || 'roof';
   return stack([
     grid([
-      field({ id:'drainCapacity', label:drainCapacityLabel(mode), value:fmtInput(s.drainCapacity || s.roofDrainCapacity,1), unit:'l/s' }),
+      selectField({ id:'drainSize', label:mode === 'property' ? 'Dimension Hoftopf' : 'Dimension Dacheinlauf', value:s.drainSize || 'DN 100', options:drainOptions }),
       field({ id:'stackCount', label:'Anzahl Fallleitungen', value:fmtInput(s.stackCount,0), unit:'Stk.' }),
       field({ id:'slopeCmM', label:'Gefälle J', value:fmtDecimalInput(s.slopeCmM,1), unit:'cm/m' }),
       selectField({ id:'fillRatio', label:'Füllungsgrad h/di', value:s.fillRatio, options:opts([['0.5','0,5'],['0.7','0,7'],['1.0','1,0']]) })
@@ -138,6 +140,26 @@ function warningList(warnings, s) {
   const items = (warnings || []).map(text => `<div class="ph-warning"><span>Hinweis:</span><strong>${esc(text)}</strong></div>`).join('');
   return fixed + items;
 }
+function surfaceDimensionCards(r, s) {
+  if (!r.surfaces.length) return '<div class="empty-state empty-state--compact">Keine Einzelflächen berechnet.</div>';
+  const mode = r.mode || s.surfaceMode || 'roof';
+  return `<div class="ph-saved-list rainwater-result-list">${r.surfaces.map((item, idx) => `<article class="line-section-card is-collapsed" data-line-card>
+    <div class="line-section-card__head">
+      <div class="line-section-card__title"><strong>${esc(item.name)}</strong><small>${fmt(item.area,1)} m² · Qr ${fmt(item.qr,2)} l/s · SL ${item.collectorSelection?.dn || '—'} · FL ${item.stackSelection?.dn || '—'}</small></div>
+      <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Flächendimensionierung aufklappen"><span>▾</span></button>
+    </div>
+    <div class="line-section-card__body">${resultRows([
+      { label:'Entwässerungsmenge', value:fmt(item.qr,2), unit:'l/s' },
+      { label:'DN Sammelleitung', value:item.collectorSelection?.dn || '—' },
+      { label:'DN Fallleitung', value:item.stackSelection?.dn || '—' },
+      { label:drainLabel(mode), value:item.requiredDrains, unit:'Stk.' },
+      { label:'Q je Fallleitung', value:fmt(item.qPerStack,2), unit:'l/s' },
+      { label:'Abflussbeiwert Cs', value:fmt(item.cs,2) },
+      { label:'Regenspende', value:fmt(r.rdt,1), unit:'l/(s·ha)' },
+      { label:'Ablaufleistung', value:fmt(r.drainCapacity,1), unit:'l/s' }
+    ])}<div class="ph-formula ph-formula--small">Qr = r × C × A / 10000 · Anzahl Abläufe = Qr / Ablaufleistung · Q je Fallleitung = Qr / Anzahl Fallleitungen</div></div>
+  </article>`).join('')}</div>`;
+}
 function resultCards(s, r) {
   const mode = r.mode || s.surfaceMode || 'roof';
   return stack([
@@ -147,12 +169,16 @@ function resultCards(s, r) {
       { label:'Entwässerungsmenge', value:fmt(r.qr,2), unit:'l/s' },
       { label:'Fläche gesamt', value:fmt(r.area,1), unit:'m²' }
     ], 'green'),
+    card('Flächen / Dimensionierung', surfaceDimensionCards(r, s), 'green'),
     card('Dimensionierung und Berechnungsansatz', stack([
       resultRows([
         { label:'Berechnungsbereich', value:modeLabel(mode) },
         { label:'Regenspende', value:fmt(r.rdt,1), unit:'l/(s·ha)' },
+        { label:'r(5,100)', value:fmt(r.r100,1), unit:'l/(s·ha)' },
         { label:'Cs,resultierend', value:fmt(r.csResulting,2) },
+        { label:'Ablaufdimension', value:r.drainSize || '—' },
         { label:'Ablaufleistung', value:fmt(r.drainCapacity,1), unit:'l/s' },
+        { label:'Anstauhöhe Ablauf', value:r.drainHead || '—', unit:r.drainHead ? 'mm' : '' },
         { label:'Anzahl Fallleitungen', value:r.stackCount, unit:'Stk.' },
         { label:'Q je Fallleitung', value:fmt(r.qPerStack,2), unit:'l/s' },
         { label:'Füllungsgrad', value:`h/di ${String(s.fillRatio).replace('.', ',')}` },
@@ -160,7 +186,6 @@ function resultCards(s, r) {
       ]),
       '<div class="ph-formula ph-formula--small">Qr = r × C × A / 10000 · Anzahl Abläufe = Qr / Ablaufleistung · Q je Fallleitung = Qr / Anzahl Fallleitungen</div>'
     ].join('')), 'green'),
-    card('Flächenberechnung', r.surfaces.length ? resultRows(r.surfaces.map(item => ({ label:item.name, value:fmt(item.qr,2), unit:'l/s' }))) : '<div class="empty-state empty-state--compact">Keine Einzelflächen berechnet.</div>', 'green'),
     card('Normhinweise / Plausibilität', warningList(r.warnings, s), 'green')
   ].join(''));
 }

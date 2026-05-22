@@ -4294,3 +4294,14 @@ body.settings-open {
 .module-view[data-module='wastewater'] .ph-warning span::after {
   content: ' ';
 }
+
+/* Regenwasser 1.2.2 */
+.rainwater-kostra-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.rainwater-result-list .line-section-card__body .ph-formula--small {
+  margin-top: .75rem;
+}

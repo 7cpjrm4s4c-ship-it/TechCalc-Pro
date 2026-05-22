@@ -1,4 +1,4 @@
-import { areaTypes, hydraulicTables, dnOrder } from './tables.js';
+import { areaTypes, hydraulicTables, dnOrder, roofDrainTable } from './tables.js';
 
 export const toNumber = value => {
   const n = Number(String(value ?? '').replace(',', '.'));
@@ -7,6 +7,10 @@ export const toNumber = value => {
 
 export function getAreaType(id) {
   return areaTypes.find(item => item.id === id) || areaTypes[0];
+}
+
+function selectedDrain(state) {
+  return roofDrainTable.find(item => item.dn === (state.drainSize || 'DN 100')) || roofDrainTable.find(item => item.dn === 'DN 100') || roofDrainTable[0];
 }
 
 function surfaceRows(state) {
@@ -36,7 +40,8 @@ function validate(state, r) {
   const warnings = [];
   const isRoof = (state.surfaceMode || state.calculationType || 'roof') === 'roof';
   const slope = toNumber(state.slopeCmM);
-  const drainCapacity = toNumber(state.drainCapacity || state.roofDrainCapacity);
+  const drain = selectedDrain(state);
+  const drainCapacity = toNumber(drain?.capacity || state.drainCapacity || state.roofDrainCapacity);
   const stackCount = Math.max(1, Math.floor(toNumber(state.stackCount)) || 1);
 
   if (!r.surfaces.length) warnings.push('Noch keine Regenfläche erfasst.');
@@ -45,7 +50,7 @@ function validate(state, r) {
   if (stackCount < 1) warnings.push('Anzahl Fallleitungen muss mindestens 1 betragen.');
   if (slope < 0.5) warnings.push('Mindestgefälle für Sammel-/Grundleitungen innerhalb von Gebäuden: 0,5 cm/m.');
   if (!isRoof && slope < 1) warnings.push('Bei Grundleitungen außerhalb von Gebäuden sind 1,0 cm/m Gefälle und v ≥ 0,7 m/s zu prüfen.');
-  warnings.push(`Regenspende ${isRoof ? 'r(5,5)' : 'r(5,2)'} standortbezogen über KOSTRA/OpenKo ermitteln und manuell eintragen.`);
+  warnings.push(`Regenspende ${isRoof ? 'r(5,5)' : 'r(5,2)'} und r(5,100) standortbezogen über KOSTRA/OpenKo ermitteln und manuell eintragen.`);
   warnings.push('Berechnung erfolgt flächenweise; die Dimensionierung nutzt die Summe der Entwässerungsmenge.');
   return warnings;
 }
@@ -60,8 +65,10 @@ export function calculate(state) {
   const csResulting = area > 0 ? auCs / area : 0;
   const cmResulting = area > 0 ? auCm / area : 0;
   const rdt = toNumber(state.rainIntensity);
+  const r100 = toNumber(state.rainHundredIntensity);
   const qr = surfaces.reduce((sum, item) => sum + item.qr, 0);
-  const drainCapacity = toNumber(state.drainCapacity || state.roofDrainCapacity);
+  const drain = selectedDrain(state);
+  const drainCapacity = toNumber(drain?.capacity || state.drainCapacity || state.roofDrainCapacity);
   const requiredDrains = drainCapacity > 0 ? Math.ceil(qr / drainCapacity) : 0;
   const stackCount = Math.max(1, Math.floor(toNumber(state.stackCount)) || 1);
   const qPerStack = qr / stackCount;
@@ -69,6 +76,17 @@ export function calculate(state) {
   const stackMinDn = isRoof ? 'DN 70' : 'DN 100';
   const collectorSelection = chooseHydraulic(qr, state.fillRatio || '0.7', state.slopeCmM, collectorMinDn);
   const stackSelection = chooseHydraulic(qPerStack, '0.7', state.slopeCmM, stackMinDn);
+  const surfacesWithDimension = surfaces.map(item => {
+    const itemRequiredDrains = drainCapacity > 0 ? Math.ceil(item.qr / drainCapacity) : 0;
+    const itemQPerStack = item.qr / stackCount;
+    return {
+      ...item,
+      requiredDrains:itemRequiredDrains,
+      qPerStack:itemQPerStack,
+      collectorSelection:chooseHydraulic(item.qr, state.fillRatio || '0.7', state.slopeCmM, collectorMinDn),
+      stackSelection:chooseHydraulic(itemQPerStack, '0.7', state.slopeCmM, stackMinDn)
+    };
+  });
   const warnings = validate(state, { surfaces, qr });
-  return { mode, isRoof, surfaces, area, auCs, auCm, csResulting, cmResulting, rdt, qr, drainCapacity, requiredDrains, stackCount, qPerStack, collectorSelection, stackSelection, warnings };
+  return { mode, isRoof, surfaces:surfacesWithDimension, area, auCs, auCm, csResulting, cmResulting, rdt, r100, qr, drainSize, drainHead, drainCapacity, requiredDrains, stackCount, qPerStack, collectorSelection, stackSelection, warnings };
 }
