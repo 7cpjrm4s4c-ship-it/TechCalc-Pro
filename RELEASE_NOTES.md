@@ -1,5 +1,14 @@
 # Release Notes
 
+## 1.2.0 - Neues Modul Regenwasser
+- Neues Modul „Regenwasser“ als eigenständiger Sanitär-Rechner nach DIN 1986-100 vorbereitet.
+- Dachflächen-/Grundstücksflächen-Erfassung mit Abflussbeiwerten Cs/Cm nach Flächenart integriert.
+- Manuelle KOSTRA-Regenspendeingabe mit offiziellem DWD-Link ergänzt.
+- Qr-Berechnung, DN-Vorbemessung über Tabellen A.3 bis A.5, Dachablauf-Anzahl, Notentwässerungs-Basis und Rinnen-Basis integriert.
+- Druckströmungsentwässerung bewusst nicht berücksichtigt.
+- Speicher-/Auswahl-/Aktualisieren-Logik gemäß globaler Saved-Card-Systematik umgesetzt.
+- Version und Cache auf 1.2.0 erhöht.
+
 ## 1.1.4 - Schmutzwasser UX-Nachschärfung
 - Leitungsart-Card auf reine Auswahl und Eingaben reduziert.
 - Leitungsartspezifische Hinweise in die Normhinweise/Plausibilität verschoben.

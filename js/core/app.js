@@ -11,6 +11,7 @@ import drinkingWaterConfig from '../modules/drinking-water/config.js';
 import pressureHoldingConfig from '../modules/pressure-holding/config.js';
 import bufferStorageConfig from '../modules/buffer-storage/config.js';
 import wastewaterConfig from '../modules/wastewater/config.js';
+import rainwaterConfig from '../modules/rainwater/config.js';
 import { restoreSessionSnapshot } from './projectStorage.js';
 
 const lazyModules = [
@@ -24,6 +25,7 @@ const lazyModules = [
   { config: unitConverterConfig, path: '../modules/unit-converter/index.js' },
   { config: drinkingWaterConfig, path: '../modules/drinking-water/index.js' },
   { config: wastewaterConfig, path: '../modules/wastewater/index.js' },
+  { config: rainwaterConfig, path: '../modules/rainwater/index.js' },
 ];
 
 const moduleCache = new Map();
@@ -143,7 +145,7 @@ function applyThemeMode(mode = sessionStorage.getItem(THEME_STORAGE_KEY) || 'sys
 
 applyThemeMode();
 
-const APP_VERSION = '1.1.4';
+const APP_VERSION = '1.2.0';
 const FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
 const FEEDBACK_RECIPIENT = 'stefan.filly@proton.me';
 
