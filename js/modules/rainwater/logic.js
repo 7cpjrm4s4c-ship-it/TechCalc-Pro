@@ -28,10 +28,10 @@ function surfaceRows(state) {
 function chooseHydraulic(q, fillRatio, slopeCmM, minDn = 'DN 70') {
   const table = hydraulicTables[String(fillRatio)] || hydraulicTables['0.7'];
   const slope = Math.max(0, toNumber(slopeCmM));
-  const row = table.find(item => item.slope >= slope) || table.at(-1);
+  const row = table.find(item => item.slope >= slope) || table[table.length - 1];
   const minIndex = Math.max(0, dnOrder.indexOf(minDn));
   const chosenDn = dnOrder.slice(minIndex).find(name => (row?.values?.[name] || 0) >= q);
-  const fallbackDn = dnOrder.at(-1);
+  const fallbackDn = dnOrder[dnOrder.length - 1];
   const dn = chosenDn || fallbackDn;
   return { dn, slope: row?.slope || slope, capacity: row?.values?.[dn] || null };
 }
@@ -41,6 +41,8 @@ function validate(state, r) {
   const isRoof = (state.surfaceMode || state.calculationType || 'roof') === 'roof';
   const slope = toNumber(state.slopeCmM);
   const drain = selectedDrain(state);
+  const drainSize = drain?.dn || state.drainSize || 'DN 100';
+  const drainHead = drain?.head ?? null;
   const drainCapacity = toNumber(drain?.capacity || state.drainCapacity || state.roofDrainCapacity);
   const stackCount = Math.max(1, Math.floor(toNumber(state.stackCount)) || 1);
 
@@ -68,6 +70,8 @@ export function calculate(state) {
   const r100 = toNumber(state.rainHundredIntensity);
   const qr = surfaces.reduce((sum, item) => sum + item.qr, 0);
   const drain = selectedDrain(state);
+  const drainSize = drain?.dn || state.drainSize || 'DN 100';
+  const drainHead = drain?.head ?? null;
   const drainCapacity = toNumber(drain?.capacity || state.drainCapacity || state.roofDrainCapacity);
   const requiredDrains = drainCapacity > 0 ? Math.ceil(qr / drainCapacity) : 0;
   const stackCount = Math.max(1, Math.floor(toNumber(state.stackCount)) || 1);

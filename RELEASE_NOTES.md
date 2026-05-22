@@ -1,5 +1,11 @@
 # Release Notes
 
+## 1.2.3 - Regenwasser Lade-Hotfix
+- Regenwasser: Laufzeitfehler beim Initialisieren des Moduls behoben.
+- Fehlende Rückgabewerte für Ablaufdimension und Anstauhöhe sauber aus dem ausgewählten Dacheinlauf/Hoftopf abgeleitet.
+- Kompatibilität verbessert: interne Array-Endzugriffe ohne `.at()` umgesetzt.
+- Version und Cache auf 1.2.3 erhöht.
+
 ## 1.2.1 - Regenwasser UX und Berechnungsworkflow
 - Regenwasser-Eingabe auf Dachfläche/Grundstücksfläche reduziert.
 - Leitungsart-Auswahl entfernt; Dimensionierung über Sammelleitung, Fallleitung und Anzahl Dacheinläufe/Hoftöpfe.
