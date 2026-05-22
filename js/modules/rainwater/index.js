@@ -9,7 +9,7 @@ import { bindEditModeClear } from '../../core/savedRecords.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
 const areaOptions = areaTypes.map(item => ({ value:item.id, label:item.name }));
-const KOSTRA_URL = 'https://www.dwd.de/DE/leistungen/kostra_dwd_rasterwerte/kostra_dwd_rasterwerte.html';
+const KOSTRA_URL = 'https://www.openko.de';
 
 const fmtDecimalInput = (value, digits = 1) => {
   if (value === '' || value === null || value === undefined) return '';
@@ -23,13 +23,11 @@ const fmtStateNumber = (value, digits = 1) => {
   if (!Number.isFinite(n)) return String(value ?? '—');
   return n.toLocaleString('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 };
+const modeLabel = value => ({ roof:'Dachfläche', property:'Grundstücksfläche' }[value] || value);
+const drainLabel = mode => mode === 'property' ? 'Hoftöpfe' : 'Dacheinläufe';
+const drainCapacityLabel = mode => mode === 'property' ? 'Abflussvermögen Hoftopf' : 'Abflussvermögen Dacheinlauf';
+const rainLabel = mode => mode === 'property' ? 'Regenspende r(5,2)' : 'Regenspende r(5,5)';
 
-function lineTypeLabel(value) {
-  return { connection:'Anschlussleitung', stack:'Fallleitung', collector:'Sammelleitung', ground:'Grundleitung', gutter:'Rinne' }[value] || value;
-}
-function calcTypeLabel(value) {
-  return { roof:'Dachfläche', property:'Grundstücksfläche', 'roof-drain':'Dachabläufe', emergency:'Notentwässerung', gutter:'Rinnenbemessung' }[value] || value;
-}
 function savedSnapshot(s, r) {
   const saved = Array.isArray(s.savedCalculations) ? s.savedCalculations : [];
   const copy = { ...s };
@@ -41,7 +39,14 @@ function savedSnapshot(s, r) {
     createdAt: s.activeCalculationId ? (saved.find(x => x.id === s.activeCalculationId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     state: copy,
-    result: { qr:r.qr, dn:r.lineSelection?.dn, area:r.area, type:s.calculationType }
+    result: {
+      qr:r.qr,
+      collectorDn:r.collectorSelection?.dn,
+      stackDn:r.stackSelection?.dn,
+      drains:r.requiredDrains,
+      area:r.area,
+      mode:r.mode
+    }
   };
 }
 function clearedInputs(current = {}) { return { ...initialState, savedCalculations: current.savedCalculations || [] }; }
@@ -51,7 +56,7 @@ function savedRows(s) {
   return `<div class="ph-saved-list">${items.map(item => {
     const r = item.result || {};
     const active = String(s.activeCalculationId || '') === String(item.id);
-    const subtitle = [`${fmt(r.qr || 0,2)} l/s`, r.dn, calcTypeLabel(r.type)].filter(Boolean).join(' · ');
+    const subtitle = [`${fmt(r.qr || 0,2)} l/s`, `SL ${r.collectorDn || '—'}`, `FL ${r.stackDn || '—'}`, modeLabel(r.mode)].filter(Boolean).join(' · ');
     return `<article class="ph-saved-item line-section-card is-collapsed ${active ? 'is-active' : ''}" data-line-card data-rainwater-select="${esc(item.id)}">
       <div class="line-section-card__head">
         <div class="line-section-card__title"><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle)}</small></div>
@@ -59,29 +64,43 @@ function savedRows(s) {
         <button type="button" class="line-section-card__delete" data-rainwater-delete="${esc(item.id)}" aria-label="Berechnung löschen">×</button>
       </div>
       <div class="line-section-card__body">${resultRows([
-        { label:'Qr', value:fmt(r.qr || 0,2), unit:'l/s' },
-        { label:'Fläche', value:fmt(r.area || 0,1), unit:'m²' },
-        { label:'Empfohlene DN', value:r.dn || '—' }
+        { label:'Entwässerungsmenge', value:fmt(r.qr || 0,2), unit:'l/s' },
+        { label:'DN Sammelleitung', value:r.collectorDn || '—' },
+        { label:'DN Fallleitung', value:r.stackDn || '—' },
+        { label:drainLabel(r.mode), value:r.drains || 0, unit:'Stk.' }
       ])}</div>
     </article>`;
   }).join('')}</div>`;
 }
-function surfacesTable(s, r) {
+function surfacesTable(r) {
   if (!r.surfaces.length) return '<div class="empty-state empty-state--compact">Noch keine Regenflächen hinzugefügt.</div>';
   return `<div class="dw-consumer-list wastewater-fixture-list">${r.surfaces.map(item => `<div class="dw-consumer-row wastewater-fixture-row">
-    <div><strong>${esc(item.name)}</strong><span>${fmt(item.area,1)} m² · Cs ${fmt(item.cs,2)} · Cm ${fmt(item.cm,2)}</span></div>
+    <div><strong>${esc(item.name)}</strong><span>${fmt(item.area,1)} m² · Cs ${fmt(item.cs,2)} · Qr ${fmt(item.qr,2)} l/s</span></div>
     <button type="button" data-surface-delete="${esc(item.id)}" aria-label="Regenfläche entfernen">×</button>
   </div>`).join('')}</div>`;
 }
+function modeCard(s) {
+  const mode = s.surfaceMode || s.calculationType || 'roof';
+  return card('Berechnungsbereich', segmented('surfaceMode', opts([['roof','Dachfläche'],['property','Grundstücksfläche']]), mode, { accent:'green' }), 'green');
+}
 function rainInputBlock(s) {
+  const mode = s.surfaceMode || s.calculationType || 'roof';
   return stack([
     grid([
-      field({ id:'rainIntensity', label:'Regenspende r(D,T)', value:fmtInput(s.rainIntensity,1), unit:'l/(s·ha)' }),
-      field({ id:'rainDuration', label:'Dauer D', value:fmtInput(s.rainDuration,0), unit:'min' }),
-      field({ id:'returnPeriod', label:'Jährlichkeit T', value:fmtInput(s.returnPeriod,0), unit:'a' }),
-      field({ id:'emergencyRainIntensity', label:'r(5,100) für Notentwässerung', value:fmtInput(s.emergencyRainIntensity,1), unit:'l/(s·ha)' })
-    ].join(''), 2),
-    `<a class="action-button action-button--secondary" href="${esc(KOSTRA_URL)}" target="_blank" rel="noopener">KOSTRA-DWD Daten öffnen</a>`
+      field({ id:'rainIntensity', label:rainLabel(mode), value:fmtInput(s.rainIntensity,1), unit:'l/(s·ha)' })
+    ].join(''), 1),
+    `<a class="action-button action-button--secondary" href="${esc(KOSTRA_URL)}" target="_blank" rel="noopener">KOSTRA / OpenKo Daten öffnen</a>`
+  ].join(''));
+}
+function dimensionInputBlock(s) {
+  const mode = s.surfaceMode || s.calculationType || 'roof';
+  return stack([
+    grid([
+      field({ id:'drainCapacity', label:drainCapacityLabel(mode), value:fmtInput(s.drainCapacity || s.roofDrainCapacity,1), unit:'l/s' }),
+      field({ id:'stackCount', label:'Anzahl Fallleitungen', value:fmtInput(s.stackCount,0), unit:'Stk.' }),
+      field({ id:'slopeCmM', label:'Gefälle J', value:fmtDecimalInput(s.slopeCmM,1), unit:'cm/m' }),
+      selectField({ id:'fillRatio', label:'Füllungsgrad h/di', value:s.fillRatio, options:opts([['0.5','0,5'],['0.7','0,7'],['1.0','1,0']]) })
+    ].join(''), 2)
   ].join(''));
 }
 function surfaceInputBlock(s, r) {
@@ -95,83 +114,53 @@ function surfaceInputBlock(s, r) {
     ].join(''), 2),
     selected?.custom ? grid([field({ id:'customCm', label:'mittlerer Abflussbeiwert Cm', value:s.customCm || '', placeholder:'0,8' })].join(''), 1) : '',
     '<button type="button" class="action-button action-button--secondary" data-surface-add>Fläche hinzufügen</button>',
-    surfacesTable(s, r)
+    surfacesTable(r)
   ].join(''));
 }
-function lineInputBlock(s) {
-  return stack([
-    segmented('lineType', opts([['connection','Anschlussleitung'],['stack','Fallleitung'],['collector','Sammelleitung'],['ground','Grundleitung'],['gutter','Rinne']]), s.lineType, { accent:'green' }),
-    grid([
-      field({ id:'slopeCmM', label:'Gefälle J', value:fmtDecimalInput(s.slopeCmM,1), unit:'cm/m' }),
-      selectField({ id:'fillRatio', label:'Füllungsgrad h/di', value:s.fillRatio, options:opts([['0.5','0,5'],['0.7','0,7'],['1.0','1,0']]) })
-    ].join(''), 2)
-  ].join(''));
-}
-function specialInputBlock(s) {
-  if (s.calculationType === 'roof-drain') return card('Dachabläufe', grid([
-    field({ id:'roofDrainCapacity', label:'Abflussvermögen Dachablauf QDA', value:fmtInput(s.roofDrainCapacity,1), unit:'l/s' })
-  ].join(''), 1), 'green');
-  if (s.calculationType === 'emergency') return card('Notentwässerung', grid([
-    selectField({ id:'overflowType', label:'Überlaufart', value:s.overflowType, options:opts([['rectangular','rechteckiger Notüberlauf'],['round','runder Notüberlauf']]) }),
-    field({ id:'overflowWidth', label:'Überlaufbreite Lw', value:fmtInput(s.overflowWidth,0), unit:'mm' }),
-    field({ id:'overflowDiameter', label:'Durchmesser d', value:fmtInput(s.overflowDiameter,0), unit:'mm' }),
-    field({ id:'overflowHead', label:'Druckhöhe h', value:fmtInput(s.overflowHead,0), unit:'mm' })
-  ].join(''), 2), 'green');
-  if (s.calculationType === 'gutter') return card('Rinnen', grid([
-    selectField({ id:'gutterShape', label:'Rinnenform', value:s.gutterShape, options:opts([['semicircular','halbrund'],['box','kastenförmig']]) }),
-    field({ id:'gutterNominal', label:'Nennmaß', value:s.gutterNominal || '333', unit:'mm' }),
-    field({ id:'gutterLength', label:'Rinnenlänge', value:fmtInput(s.gutterLength,1), unit:'m' }),
-    field({ id:'directionChanges', label:'Richtungsänderungen > 10°', value:fmtInput(s.directionChanges,0), unit:'Stk.' })
-  ].join(''), 2), 'green');
-  return '';
+function saveCard(s) {
+  return card('Berechnung speichern', stack([
+    field({ id:'name', label:'Bezeichnung', value:s.name || '', placeholder:'z. B. Dachfläche Verwaltung', inputmode:'text' }),
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-rainwater-save ${s.activeCalculationId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-rainwater-update ${s.activeCalculationId ? '' : 'disabled'}>Aktualisieren</button></div>`,
+    savedRows(s)
+  ].join('')), 'green');
 }
 function inputCards(s, r) {
   return stack([
-    card('Entwässerungsart', segmented('calculationType', opts([['roof','Dachfläche'],['property','Grundstücksfläche'],['roof-drain','Dachabläufe'],['emergency','Notentwässerung'],['gutter','Rinnen']]), s.calculationType, { accent:'green' }), 'green'),
-    card('Leitungsart / Randbedingungen', lineInputBlock(s), 'green'),
+    modeCard(s),
     card('Regenspende', rainInputBlock(s), 'green'),
+    card('Dimensionierung / Randbedingungen', dimensionInputBlock(s), 'green'),
     card('Regenflächen', surfaceInputBlock(s, r), 'green'),
-    specialInputBlock(s),
-    card('Berechnung speichern', stack([
-      field({ id:'name', label:'Bezeichnung', value:s.name || '', placeholder:'z. B. Dachfläche Verwaltung', inputmode:'text' }),
-      `<div class="tc-save-actions"><button type="button" class="action-button" data-rainwater-save ${s.activeCalculationId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-rainwater-update ${s.activeCalculationId ? '' : 'disabled'}>Aktualisieren</button></div>`,
-      savedRows(s)
-    ].join('')), 'green')
+    saveCard(s)
   ].join(''));
 }
 function warningList(warnings, s) {
   const fixed = '<div class="ph-warning ph-warning--norm"><span>Normgrundlage:</span><strong>Berechnung erfolgt auf Grundlage der DIN 1986 - 100, aktuellste Fassung.</strong></div>';
-  const typeHints = {
-    connection: ['Anschlussleitungen werden wie Sammelleitungen bemessen; die Nennweite darf nicht kleiner als die Nennweite des Dachablaufs sein.'],
-    stack: ['Regenwasserfallleitungen können bis f = 0,33 bemessen werden; Fallleitungsverzüge > 10° gesondert prüfen.'],
-    collector: ['Sammelleitungen innerhalb von Gebäuden: Füllungsgrad h/di = 0,7 und Mindestgefälle 0,5 cm/m.'],
-    ground: ['Grundleitungen: Mindestdurchmesser DN 100; außerhalb v ≥ 0,7 m/s und vmax 2,5 m/s prüfen.'],
-    gutter: ['Bei Richtungsänderungen > 10° ist das Abflussvermögen der Rinne um 15 % zu reduzieren.']
-  }[s.lineType] || [];
-  const all = [...typeHints, ...warnings];
-  return `<div class="ph-warnings">${fixed}${all.map(item => `<div class="ph-warning"><span>Hinweis:</span><strong>${esc(item)}</strong></div>`).join('')}</div>`;
+  const items = (warnings || []).map(text => `<div class="ph-warning"><span>Hinweis:</span><strong>${esc(text)}</strong></div>`).join('');
+  return fixed + items;
 }
 function resultCards(s, r) {
+  const mode = r.mode || s.surfaceMode || 'roof';
   return stack([
-    mainResult('Ergebnis Regenwasser', { label:'Empfohlene Dimension', value:r.lineSelection?.dn || '—' }, [
-      { label:'Qr', value:fmt(r.qr,2), unit:'l/s' },
-      { label:'Fläche', value:fmt(r.area,1), unit:'m²' },
-      { label:'Cs,resultierend', value:fmt(r.csResulting,2) },
-      { label:'r(D,T)', value:fmt(r.rdt,1), unit:'l/(s·ha)' }
+    mainResult('Ergebnis Regenwasser', { label:'DN Sammelleitung', value:r.collectorSelection?.dn || '—' }, [
+      { label:'DN Fallleitung', value:r.stackSelection?.dn || '—' },
+      { label:drainLabel(mode), value:r.requiredDrains, unit:'Stk.' },
+      { label:'Entwässerungsmenge', value:fmt(r.qr,2), unit:'l/s' },
+      { label:'Fläche gesamt', value:fmt(r.area,1), unit:'m²' }
     ], 'green'),
     card('Dimensionierung und Berechnungsansatz', stack([
       resultRows([
-        { label:'Entwässerungsart', value:calcTypeLabel(s.calculationType) },
-        { label:'Leitungsart', value:lineTypeLabel(s.lineType) },
-        { label:'Kapazität gewählte DN', value:r.lineSelection?.capacity ? fmt(r.lineSelection.capacity,1) : '—', unit:r.lineSelection?.capacity ? 'l/s' : '' },
+        { label:'Berechnungsbereich', value:modeLabel(mode) },
+        { label:'Regenspende', value:fmt(r.rdt,1), unit:'l/(s·ha)' },
+        { label:'Cs,resultierend', value:fmt(r.csResulting,2) },
+        { label:'Ablaufleistung', value:fmt(r.drainCapacity,1), unit:'l/s' },
+        { label:'Anzahl Fallleitungen', value:r.stackCount, unit:'Stk.' },
+        { label:'Q je Fallleitung', value:fmt(r.qPerStack,2), unit:'l/s' },
         { label:'Füllungsgrad', value:`h/di ${String(s.fillRatio).replace('.', ',')}` },
-        { label:'angesetztes Gefälle', value:fmtStateNumber(s.slopeCmM,1), unit:'cm/m' },
-        { label:'erforderliche Dachabläufe', value:s.calculationType === 'roof-drain' ? r.roofDrains : '—', unit:s.calculationType === 'roof-drain' ? 'Stk.' : '' },
-        { label:'QNot', value:s.calculationType === 'emergency' ? fmt(r.qnot,2) : '—', unit:s.calculationType === 'emergency' ? 'l/s' : '' },
-        { label:'Rinnenempfehlung', value:s.calculationType === 'gutter' ? `RG ${r.gutter?.nominal} / Fallleitung ${r.gutter?.di} mm` : '—' }
+        { label:'angesetztes Gefälle', value:fmtStateNumber(s.slopeCmM,1), unit:'cm/m' }
       ]),
-      '<div class="ph-formula ph-formula--small">Qr = r(D,T) × C × A / 10000 · nDA = Q / QDA · QNot = (r(5,100) - r(D,T)) × C × A / 10000</div>'
+      '<div class="ph-formula ph-formula--small">Qr = r × C × A / 10000 · Anzahl Abläufe = Qr / Ablaufleistung · Q je Fallleitung = Qr / Anzahl Fallleitungen</div>'
     ].join('')), 'green'),
+    card('Flächenberechnung', r.surfaces.length ? resultRows(r.surfaces.map(item => ({ label:item.name, value:fmt(item.qr,2), unit:'l/s' }))) : '<div class="empty-state empty-state--compact">Keine Einzelflächen berechnet.</div>', 'green'),
     card('Normhinweise / Plausibilität', warningList(r.warnings, s), 'green')
   ].join(''));
 }

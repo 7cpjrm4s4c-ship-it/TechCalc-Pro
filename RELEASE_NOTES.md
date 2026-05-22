@@ -1,5 +1,14 @@
 # Release Notes
 
+## 1.2.1 - Regenwasser UX und Berechnungsworkflow
+- Regenwasser-Eingabe auf Dachfläche/Grundstücksfläche reduziert.
+- Leitungsart-Auswahl entfernt; Dimensionierung über Sammelleitung, Fallleitung und Anzahl Dacheinläufe/Hoftöpfe.
+- KOSTRA-Verlinkung auf OpenKo geändert.
+- Regenspende dynamisch als r(5,5) für Dachflächen bzw. r(5,2) für Grundstücksflächen geführt.
+- Flächen werden einzeln berechnet und in der Ausgabe separat ausgewiesen.
+- Speicherbereich bleibt am Ende des Eingabeworkflows.
+- Version und Cache auf 1.2.1 erhöht.
+
 ## 1.2.0 - Neues Modul Regenwasser
 - Neues Modul „Regenwasser“ als eigenständiger Sanitär-Rechner nach DIN 1986-100 vorbereitet.
 - Dachflächen-/Grundstücksflächen-Erfassung mit Abflussbeiwerten Cs/Cm nach Flächenart integriert.
