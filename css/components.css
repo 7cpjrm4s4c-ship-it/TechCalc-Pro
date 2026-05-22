@@ -4270,3 +4270,27 @@ body.settings-open {
     gap: .1rem;
   }
 }
+
+/* v1.1.4: Schmutzwasser kompakte Gegenstands-UX und Normhinweise */
+.module-view[data-module='wastewater'] .wastewater-fixture-list {
+  margin-top: .75rem;
+}
+.module-view[data-module='wastewater'] .wastewater-fixture-row {
+  align-items: center;
+}
+.module-view[data-module='wastewater'] .wastewater-fixture-row button {
+  border: 1px solid rgba(255,92,92,.55);
+  background: rgba(255,92,92,.13);
+  color: #ff9b9b;
+  border-radius: 999px;
+  width: 34px;
+  height: 34px;
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+.module-view[data-module='wastewater'] .ph-warning {
+  text-align: left;
+}
+.module-view[data-module='wastewater'] .ph-warning span::after {
+  content: ' ';
+}

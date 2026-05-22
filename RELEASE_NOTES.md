@@ -1,5 +1,12 @@
 # Release Notes
 
+## 1.1.4 - Schmutzwasser UX-Nachschärfung
+- Leitungsart-Card auf reine Auswahl und Eingaben reduziert.
+- Leitungsartspezifische Hinweise in die Normhinweise/Plausibilität verschoben.
+- Hinweise für Einzelanschluss/Anschlussleitung mit konkreten Leitungslängen und Umlenkungen ergänzt.
+- Entwässerungsgegenstände auf kompakte Trinkwasser-ähnliche Auswahl-/Listen-UX umgestellt.
+- Version und Cache auf 1.1.4 erhöht.
+
 ## 1.1.3 - Schmutzwasser UX-Hinweise und Projekt-Speichern
 
 - Schmutzwasser: Reihenfolge der Eingabecards angepasst: zuerst Leitungsart, danach Entwässerungsgegenstände.
