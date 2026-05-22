@@ -4122,3 +4122,46 @@ body.settings-open {
   min-width: 0;
   overflow-wrap: anywhere;
 }
+
+/* Wastewater module */
+.wastewater-fixtures {
+  display: grid;
+  gap: 10px;
+}
+
+.wastewater-fixture {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 12px 44px 12px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: rgba(255,255,255,.035);
+}
+
+.wastewater-fixture__main,
+.wastewater-fixture__custom {
+  display: grid;
+  gap: 10px;
+}
+
+.wastewater-fixture__main {
+  grid-template-columns: minmax(0, 1fr) minmax(110px, 160px);
+}
+
+.wastewater-fixture__stats .inline-stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.wastewater-fixture__delete {
+  position: absolute;
+  right: 10px;
+  top: 12px;
+}
+
+@media (max-width: 767px) {
+  .wastewater-fixture__main,
+  .wastewater-fixture__stats .inline-stats {
+    grid-template-columns: 1fr;
+  }
+}

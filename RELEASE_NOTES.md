@@ -1,5 +1,14 @@
 # Release Notes
 
+## 1.1.0 - Neues Modul Schmutzwasser
+
+- Neues Modul „Schmutzwasser“ als eigenständiger Sanitär-Rechner nach DIN 1986-100 angelegt.
+- DU-Katalog, Nutzung/K-Abflusskennzahl, Qww-/Qtot-Berechnung und Zusatzabflüsse integriert.
+- Leitungstypen für Einzelanschluss-, Sammelanschluss-, Fall-, Sammel-, Grund- und Lüftungsleitungen vorbereitet.
+- Tabellenlogik für Sammelanschlussleitungen, Fallleitungen und hydraulische Vorbemessung über Tabellen A.3 bis A.5 integriert.
+- Speicher-/Auswahl-/Aktualisieren-Logik gemäß globaler Saved-Card-Systematik umgesetzt.
+- Version und Cache auf 1.1.0 erhöht.
+
 ## 1.0.13 - Debug Hotfix
 
 - Heizung: Laden gespeicherter Leitungsabschnitte übernimmt Eingabewerte nun robust aus normalisierten und älteren gespeicherten Datensätzen.
