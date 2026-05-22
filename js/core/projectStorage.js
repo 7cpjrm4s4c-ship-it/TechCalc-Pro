@@ -10,6 +10,7 @@ import { state as hxDiagramState } from '../modules/hx-diagram/state.js';
 import { state as drinkingWaterState } from '../modules/drinking-water/state.js';
 import { state as pressureHoldingState } from '../modules/pressure-holding/state.js';
 import { state as bufferStorageState } from '../modules/buffer-storage/state.js';
+import { state as wastewaterState } from '../modules/wastewater/state.js';
 import { readUsageUnits, writeUsageUnits, readSingleConsumers, writeSingleConsumers } from '../modules/drinking-water/logic.js';
 
 const DEFAULT_META = {
@@ -93,7 +94,8 @@ export function collectProjectData() {
         state: drinkingWaterState.get(),
         usageUnits: readUsageUnits(),
         singleConsumers: readSingleConsumers()
-      }
+      },
+      wastewater: { state: wastewaterState.get() }
     }
   };
 }
@@ -116,6 +118,7 @@ export function applyProjectData(data = {}, { fileName = '' } = {}) {
   writeRltDevices(modules['heat-recovery']?.rltDevices || []);
   if (modules['hx-diagram']?.state) hxDiagramState.replace(modules['hx-diagram'].state, { notify: false });
   if (modules['drinking-water']?.state) drinkingWaterState.replace(modules['drinking-water'].state, { notify: false });
+  if (modules.wastewater?.state) wastewaterState.replace(modules.wastewater.state, { notify: false });
   writeUsageUnits(modules['drinking-water']?.usageUnits || []);
   writeSingleConsumers(modules['drinking-water']?.singleConsumers || []);
 
@@ -136,6 +139,7 @@ export function resetAllSessionData() {
   writeRltDevices([]);
   hxDiagramState.reset();
   drinkingWaterState.reset();
+  wastewaterState.reset();
   writeUsageUnits([]);
   writeSingleConsumers([]);
 }

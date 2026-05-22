@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-1.0.10';
+const CACHE_NAME = 'techcalc-pro-1.1.0';
 const ASSETS = [
   './','./index.html','./manifest.json',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',
@@ -13,6 +13,7 @@ const ASSETS = [
   './js/modules/pipe-sizing/index.js','./js/modules/pipe-sizing/config.js','./js/modules/pipe-sizing/logic.js','./js/modules/pipe-sizing/state.js',
   './js/modules/unit-converter/index.js','./js/modules/unit-converter/config.js','./js/modules/unit-converter/logic.js','./js/modules/unit-converter/state.js',
   './js/modules/drinking-water/index.js','./js/modules/drinking-water/config.js','./js/modules/drinking-water/logic.js','./js/modules/drinking-water/state.js',
+  './js/modules/wastewater/index.js','./js/modules/wastewater/config.js','./js/modules/wastewater/logic.js','./js/modules/wastewater/state.js','./js/modules/wastewater/tables.js',
   './assets/icons/icon-16.png','./assets/icons/icon-32.png','./assets/icons/icon-192.png','./assets/icons/icon-512.png','./assets/icons/apple-touch-icon.png','./assets/icons/favicon.ico'
 ];
 

@@ -4085,3 +4085,83 @@ body.settings-open {
   .saved-record-card__toggle,
   .saved-record-card__delete { width: 2rem; height: 2rem; min-width: 2rem; }
 }
+
+/* v1.0.12: prevent pressure-holding result labels/values from overflowing compact cards. */
+.module-view[data-module='pressure-holding'] .main-result .inline-stat,
+.module-view[data-module='pressure-holding'] .inline-stat {
+  min-width: 0;
+  overflow: hidden;
+}
+.module-view[data-module='pressure-holding'] .inline-stat span,
+.module-view[data-module='pressure-holding'] .inline-stat strong,
+.module-view[data-module='pressure-holding'] .result-row span,
+.module-view[data-module='pressure-holding'] .result-row strong {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.module-view[data-module='pressure-holding'] .inline-stat span {
+  font-size: clamp(.62rem, .72vw, .72rem);
+  letter-spacing: .08em;
+}
+.module-view[data-module='pressure-holding'] .inline-stat strong {
+  font-size: clamp(.8rem, .95vw, .95rem);
+  line-height: 1.12;
+}
+
+
+/* v1.0.12: pressure-holding desktop result cards need long labels to wrap inside compact fields. */
+.module-view[data-module='pressure-holding'] .main-result .inline-stat span {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.15;
+  max-width: 100%;
+}
+.module-view[data-module='pressure-holding'] .main-result .inline-stat strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Wastewater module */
+.wastewater-fixtures {
+  display: grid;
+  gap: 10px;
+}
+
+.wastewater-fixture {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 12px 44px 12px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: rgba(255,255,255,.035);
+}
+
+.wastewater-fixture__main,
+.wastewater-fixture__custom {
+  display: grid;
+  gap: 10px;
+}
+
+.wastewater-fixture__main {
+  grid-template-columns: minmax(0, 1fr) minmax(110px, 160px);
+}
+
+.wastewater-fixture__stats .inline-stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.wastewater-fixture__delete {
+  position: absolute;
+  right: 10px;
+  top: 12px;
+}
+
+@media (max-width: 767px) {
+  .wastewater-fixture__main,
+  .wastewater-fixture__stats .inline-stats {
+    grid-template-columns: 1fr;
+  }
+}
