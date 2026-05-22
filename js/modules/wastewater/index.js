@@ -138,10 +138,31 @@ function fixturesTable(s, r) {
   }).join('')}</div>`;
 }
 
+
+function lineTypeHints(lineType) {
+  const hints = {
+    'single-unvented': ['Unbelüftete Einzelanschlussleitungen: max. 4 m Leitungslänge.', 'Maximal drei 90°-Umlenkungen innerhalb eines Fließwegs.', 'Mindestgefälle: 1,0 cm/m.'],
+    'single-vented': ['Belüftete Einzelanschlussleitungen: max. 10 m Leitungslänge.', 'Mindestgefälle: 0,5 cm/m.', 'Belüftung ist erforderlich, wenn die Grenzen der unbelüfteten Einzelanschlussleitung nicht eingehalten werden.'],
+    'branch-unvented': ['Unbelüftete Anschlussleitungen sind über Tabelle 7 vorzubemessen.', 'Mindestgefälle: 1,0 cm/m.', 'Rohrlänge und Höhenversatz sind zusätzlich gemäß Norm zu prüfen.'],
+    'branch-vented': ['Belüftete Anschlussleitungen werden hydraulisch über die Tabellen A.3 bis A.5 vorbemessen.', 'Mindestgefälle: 0,5 cm/m.', 'Rohrlänge, Höhenversatz und Umlenkungen sind zusätzlich gemäß Norm zu prüfen.'],
+    stack: ['Fallleitungen werden nach Tabelle 8 mit Hauptlüftung vorbemessen.', 'Bei angeschlossenen WC-Anlagen wird mindestens DN 100 empfohlen.', 'Abzweigart mit/ohne Innenradius beeinflusst das zulässige Abflussvermögen.'],
+    collector: ['Sammelleitungen innerhalb des Gebäudes: Füllungsgrad h/di = 0,5 bzw. 0,7.', 'Mindestgefälle: 0,5 cm/m.', 'Mindestfließgeschwindigkeit v ≥ 0,5 m/s prüfen.'],
+    'ground-inside': ['Grundleitungen innerhalb des Gebäudes: Füllungsgrad h/di = 0,5.', 'Mindestgefälle: 0,5 cm/m.', 'Mindestfließgeschwindigkeit v ≥ 0,5 m/s prüfen.'],
+    'ground-outside': ['Grundleitungen außerhalb des Gebäudes: Füllungsgrad h/di = 0,7.', 'Mindestgefälle: 1,0 cm/m.', 'Mindestfließgeschwindigkeit v ≥ 0,7 m/s und vmax 2,5 m/s prüfen.'],
+    'ground-full': ['Vollfüllung h/di = 1,0 ist nur für zulässige Anwendungsfälle anzusetzen.', 'Anwendungsgrenzen und Schachtanordnung gemäß Norm prüfen.'],
+    ventilation: ['Lüftungsleitungen sind in Abhängigkeit der zugehörigen Fallleitung auszulegen.', 'Sammel-Hauptlüftungen müssen mindestens der halben Summe der Einzelquerschnitte entsprechen.']
+  };
+  return hints[lineType] || [];
+}
+function hintList(items = []) {
+  if (!items.length) return '';
+  return `<div class="wastewater-line-hints">${items.map(item => `<p>${esc(item)}</p>`).join('')}</div>`;
+}
+
 function warningList(warnings) {
-  const fixed = '<div class="ph-warning ph-warning--norm"><span>Normgrundlage</span><strong>Berechnung erfolgt auf Grundlage der DIN 1986 - 100, aktuellste Fassung.</strong></div>';
+  const fixed = '<div class="ph-warning ph-warning--norm"><span>Normgrundlage:</span><strong>Berechnung erfolgt auf Grundlage der DIN 1986 - 100, aktuellste Fassung.</strong></div>';
   if (!warnings.length) return `<div class="ph-warnings">${fixed}<div class="empty-state empty-state--compact">Keine Regelverletzungen erkannt.</div></div>`;
-  return `<div class="ph-warnings">${fixed}${warnings.map(item => `<div class="ph-warning"><span>Hinweis</span><strong>${esc(item)}</strong></div>`).join('')}</div>`;
+  return `<div class="ph-warnings">${fixed}${warnings.map(item => `<div class="ph-warning"><span>Hinweis:</span><strong>${esc(item)}</strong></div>`).join('')}</div>`;
 }
 function inputCards(s, r) {
   const lineFields = [
@@ -150,7 +171,8 @@ function inputCards(s, r) {
       field({ id:'slopeCmM', label:'Gefälle J', value:fmtDecimalInput(s.slopeCmM,1), unit:'cm/m' }),
       selectField({ id:'fillRatio', label:'Füllungsgrad h/di', value:s.fillRatio, options:opts([['0.5','0,5'],['0.7','0,7'],['1.0','1,0']]) })
     ].join(''), 2),
-    '<p class="ph-help">Rohrlängen, Höhenversätze und Umlenkungen sind gemäß Norm zusätzlich zu prüfen. Die Vorbemessung erfolgt hier über Gefälle, Füllungsgrad und angeschlossene Entwässerungsgegenstände.</p>'
+    '<p class="ph-help">Rohrlängen, Höhenversätze und Umlenkungen sind gemäß Norm zusätzlich zu prüfen. Die Vorbemessung erfolgt hier über Gefälle, Füllungsgrad und angeschlossene Entwässerungsgegenstände.</p>',
+    hintList(lineTypeHints(s.lineType))
   ];
   if (s.lineType === 'branch-vented') lineFields.push('<p class="ph-help">Belüftete Anschlussleitungen werden über die hydraulischen Tabellen A.3 bis A.5 vorbemessen.</p>');
   if (s.lineType === 'stack') lineFields.push(segmented('branchType', opts([['with-radius','Abzweige mit Innenradius'],['without-radius','ohne Innenradius']]), s.branchType, { accent:'green' }));
@@ -160,11 +182,11 @@ function inputCards(s, r) {
       selectField({ id:'usageType', label:'Gebäudeart und Benutzung', value:s.usageType, options:usageOptions }),
       s.usageType === 'custom' ? field({ id:'kValue', label:'Abflusskennzahl K', value:fmtInput(s.kValue,2) }) : inlineStats([{ label:'K', value:fmt(r.k,1) }])
     ].join('')), 'green'),
+    card('Leitungsart / Randbedingungen', stack(lineFields.join('')), 'green'),
     card('Entwässerungsgegenstände', stack([
       fixturesTable(s, r),
       '<button type="button" class="action-button" data-fixture-add>Gegenstand hinzufügen</button>'
     ].join('')), 'green'),
-    card('Leitungsart / Randbedingungen', stack(lineFields.join('')), 'green'),
     card('Zusatzabflüsse', grid([
       field({ id:'continuousFlow', label:'Dauerabfluss Qc', value:fmtInput(s.continuousFlow,2), unit:'l/s' }),
       field({ id:'pumpFlow', label:'Pumpenförderstrom Qp', value:fmtInput(s.pumpFlow,2), unit:'l/s' }),

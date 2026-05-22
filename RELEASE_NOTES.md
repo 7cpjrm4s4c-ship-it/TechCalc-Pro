@@ -1,5 +1,13 @@
 # Release Notes
 
+## 1.1.3 - Schmutzwasser UX-Hinweise und Projekt-Speichern
+
+- Schmutzwasser: Reihenfolge der Eingabecards angepasst: zuerst Leitungsart, danach Entwässerungsgegenstände.
+- Schmutzwasser: Normhinweise mit sauberer Label-Darstellung „Normgrundlage:“ und „Hinweis:“ formatiert.
+- Schmutzwasser: leitungsartspezifische Hinweise ergänzt, z. B. maximale Leitungslängen und Umlenkungen bei Anschlussleitungen.
+- Projekt speichern: nutzt unterstützte Browser-Dateiauswahl über File System Access API; Fallback bleibt Download.
+- Version und Cache auf 1.1.3 erhöht.
+
 ## 1.1.2 - Schmutzwasser UX-Vereinfachung
 - Ergebnispriorität auf empfohlene DN umgestellt und Ergebnis/Dimensionierung/Berechnungsansatz zusammengeführt.
 - Gefälle-Eingabe auf deutsche Dezimaldarstellung mit 1,0 cm/m als Standard korrigiert.

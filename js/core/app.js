@@ -143,7 +143,7 @@ function applyThemeMode(mode = sessionStorage.getItem(THEME_STORAGE_KEY) || 'sys
 
 applyThemeMode();
 
-const APP_VERSION = '1.1.2';
+const APP_VERSION = '1.1.3';
 const FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
 const FEEDBACK_RECIPIENT = 'stefan.filly@proton.me';
 

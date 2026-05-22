@@ -144,20 +144,44 @@ export function resetAllSessionData() {
   writeSingleConsumers([]);
 }
 
-export function downloadProjectFile() {
+export async function downloadProjectFile() {
   const data = collectProjectData();
   const meta = data.meta || {};
   const base = [meta.projectNo, meta.project, meta.client].filter(Boolean).join('-') || 'techcalc-projekt';
   const safe = base.toLowerCase().replace(/[^a-z0-9äöüß_-]+/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'techcalc-projekt';
+  const fileName = `${safe}.techcalc.json`;
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json;charset=utf-8' });
+
+  if (typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function') {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: fileName,
+        types: [{
+          description: 'TechCalc Projektdatei',
+          accept: { 'application/json': ['.techcalc.json', '.json'] }
+        }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      openedFileName = handle.name || fileName;
+      document.dispatchEvent(new CustomEvent('techcalc-project-saved', { detail: { fileName: openedFileName } }));
+      return true;
+    } catch (error) {
+      if (error?.name === 'AbortError') return false;
+      console.warn('Dateiauswahl nicht verfügbar, Projekt wird als Download gespeichert.', error);
+    }
+  }
+
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `${safe}.techcalc.json`;
+  link.download = fileName;
   document.body.appendChild(link);
   link.click();
   link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 2000);
+  return true;
 }
 
 export async function readProjectFile(file) {
