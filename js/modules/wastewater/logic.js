@@ -36,7 +36,7 @@ function chooseBranchConnection(sumDu, k) {
 function chooseStack(qtot, branchType, hasWc) {
   const key = branchType === 'without-radius' ? 'noRadius' : 'withRadius';
   return stackTable.find(row => {
-    if (hasWc && ['DN 60', 'DN 70'].includes(row.dn)) return false;
+    if (hasWc && !['DN 100', 'DN 125', 'DN 150', 'DN 200'].includes(row.dn)) return false;
     return qtot <= row[key];
   }) || stackTable.at(-1);
 }
@@ -73,6 +73,12 @@ function validate(state, totals, selected) {
     if (slope < 1) warnings.push('Mindestgefälle unbelüfteter Sammelanschlussleitungen: 1 cm/m.');
     if (length > (selected?.maxLength || 0)) warnings.push(`Maximale Rohrlänge für ${selected?.dn || 'gewählte DN'} überschritten.`);
   }
+  if (lineType === 'branch-vented') {
+    if (slope < 0.5) warnings.push('Belüftete Sammelanschlussleitungen werden als Sammelleitung mit mindestens 0,5 cm/m vorbemessen.');
+  }
+  if (lineType === 'stack' && totals.hasWc && selected?.dn && !['DN 100', 'DN 125', 'DN 150', 'DN 200'].includes(selected.dn)) {
+    warnings.push('Bei angeschlossenem WC wird für die Fallleitung mindestens DN 100 angesetzt.');
+  }
   if (lineType === 'collector') {
     if (slope < 0.5) warnings.push('Sammelleitungen innerhalb des Gebäudes: Mindestgefälle 0,5 cm/m und v ≥ 0,5 m/s prüfen.');
   }
@@ -100,6 +106,9 @@ export function calculate(state) {
   if (state.lineType === 'branch-unvented') {
     selected = chooseBranchConnection(sumDu, k);
     dimensionBasis = 'Tabelle 7 · unbelüftete Sammelanschlussleitung';
+  } else if (state.lineType === 'branch-vented') {
+    selected = chooseHydraulic(qtot, state.fillRatio || '0.5', state.slopeCmM, 'collector');
+    dimensionBasis = `Tabelle A.${state.fillRatio === '0.7' ? '4' : state.fillRatio === '1.0' ? '5' : '3'} · belüftete Sammelanschlussleitung`;
   } else if (state.lineType === 'stack') {
     selected = chooseStack(qtot, state.branchType, hasWc);
     dimensionBasis = 'Tabelle 8 · Fallleitung mit Hauptlüftung';
@@ -112,7 +121,7 @@ export function calculate(state) {
     dimensionBasis = state.lineType === 'single-vented' ? 'Einzelanschlussleitung belüftet' : 'Einzelanschlussleitung unbelüftet';
   }
 
-  const warnings = validate(state, { fixtures, qww, largestDu }, selected);
+  const warnings = validate(state, { fixtures, qww, largestDu, hasWc }, selected);
   if (qtot <= 0) warnings.push('Qtot ist 0 l/s. Eingaben prüfen.');
 
   return { fixtures, sumDu, largestDu, k, qwwFormula, qww, qc, qp, qra, qtot, hasWc, selected, dimensionBasis, warnings };

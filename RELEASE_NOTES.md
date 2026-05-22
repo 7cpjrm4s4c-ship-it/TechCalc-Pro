@@ -1,5 +1,11 @@
 # Release Notes
 
+## 1.1.1 - Schmutzwasser UX und Fallleitungslogik
+- Entwässerungsgegenstände als Klappcards umgesetzt.
+- Leitungsart-Auswahl für Einzel-/Sammelanschluss mit Vorwahl belüftet/unbelüftet vereinfacht.
+- Fallleitungen mit angeschlossenem WC setzen nun mindestens DN 100 an.
+- Version und Cache auf 1.1.1 erhöht.
+
 ## 1.1.0 - Neues Modul Schmutzwasser
 
 - Neues Modul „Schmutzwasser“ als eigenständiger Sanitär-Rechner nach DIN 1986-100 angelegt.

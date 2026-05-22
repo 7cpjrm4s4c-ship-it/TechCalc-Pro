@@ -4165,3 +4165,32 @@ body.settings-open {
     grid-template-columns: 1fr;
   }
 }
+
+/* v1.1.1: Schmutzwasser UX refinements */
+.module-view[data-module='wastewater'] .wastewater-fixture {
+  padding: 14px;
+}
+.module-view[data-module='wastewater'] .wastewater-fixture__delete {
+  position: static;
+}
+.module-view[data-module='wastewater'] .wastewater-fixture .line-section-card__body {
+  display: grid;
+  gap: 10px;
+}
+.module-view[data-module='wastewater'] .wastewater-subselect {
+  display: grid;
+  gap: 8px;
+}
+.module-view[data-module='wastewater'] .wastewater-subselect > span {
+  color: var(--color-muted);
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.module-view[data-module='wastewater'] .segmented {
+  overflow-x: auto;
+}
+.module-view[data-module='wastewater'] .segmented button {
+  min-width: max-content;
+}

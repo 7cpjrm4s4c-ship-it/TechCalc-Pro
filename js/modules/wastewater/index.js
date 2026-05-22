@@ -16,6 +16,7 @@ function lineTypeLabel(value) {
     'single-unvented': 'Einzelanschluss unbelüftet',
     'single-vented': 'Einzelanschluss belüftet',
     'branch-unvented': 'Sammelanschluss unbelüftet',
+    'branch-vented': 'Sammelanschluss belüftet',
     stack: 'Fallleitung',
     collector: 'Sammelleitung',
     'ground-inside': 'Grundleitung innen',
@@ -24,6 +25,46 @@ function lineTypeLabel(value) {
     ventilation: 'Lüftungsleitung'
   }[value] || value;
 }
+
+function lineFamilyValue(lineType) {
+  if (String(lineType).startsWith('single-')) return 'single';
+  if (String(lineType).startsWith('branch-')) return 'branch';
+  return lineType || 'single-unvented';
+}
+function lineVentilationValue(lineType) {
+  return String(lineType).endsWith('-vented') && !String(lineType).endsWith('unvented') ? 'vented' : 'unvented';
+}
+function resolveLineType(family, ventilation, previous = 'single-unvented') {
+  if (family === 'single') return ventilation === 'vented' ? 'single-vented' : 'single-unvented';
+  if (family === 'branch') return ventilation === 'vented' ? 'branch-vented' : 'branch-unvented';
+  return family || previous;
+}
+function miniSegment(buttons) {
+  return `<div class="segmented segmented--green" role="tablist">${buttons.map(btn => `<button type="button" ${btn.attr}="${esc(btn.value)}" class="${btn.active ? 'is-active' : ''}">${esc(btn.label)}</button>`).join('')}</div>`;
+}
+function lineTypeSelector(s) {
+  const family = lineFamilyValue(s.lineType);
+  const ventilation = lineVentilationValue(s.lineType);
+  const families = [
+    ['single', 'Einzelanschluss'],
+    ['branch', 'Sammelanschluss'],
+    ['stack', 'Fallleitung'],
+    ['collector', 'Sammelleitung'],
+    ['ground-inside', 'Grund innen'],
+    ['ground-outside', 'Grund außen'],
+    ['ground-full', 'Vollfüllung'],
+    ['ventilation', 'Lüftung']
+  ];
+  const blocks = [miniSegment(families.map(([value, label]) => ({ attr:'data-line-family', value, label, active: family === value })) )];
+  if (family === 'single' || family === 'branch') {
+    blocks.push(`<div class="wastewater-subselect"><span>Ausführung</span>${miniSegment([
+      { attr:'data-line-ventilation', value:'unvented', label:'unbelüftet', active: ventilation === 'unvented' },
+      { attr:'data-line-ventilation', value:'vented', label:'belüftet', active: ventilation === 'vented' }
+    ])}</div>`);
+  }
+  return blocks.join('');
+}
+
 function savedSnapshot(s, r) {
   const saved = Array.isArray(s.savedCalculations) ? s.savedCalculations : [];
   const copy = { ...s };
@@ -65,24 +106,33 @@ function savedRows(s) {
 }
 function fixturesTable(s, r) {
   if (!r.fixtures.length) return '<div class="empty-state empty-state--compact">Noch keine Entwässerungsgegenstände hinzugefügt.</div>';
-  return `<div class="wastewater-fixtures">${r.fixtures.map(item => {
+  return `<div class="wastewater-fixtures">${r.fixtures.map((item, index) => {
     const custom = item.base.custom;
-    return `<article class="wastewater-fixture" data-fixture-id="${esc(item.id)}">
-      <div class="wastewater-fixture__main">
-        ${selectField({ id:`fixture-type-${item.id}`, label:'Gegenstand', value:item.typeId, options:fixtureOptions }).replaceAll('data-field="fixture-type-', 'data-fixture-field="typeId" data-field-disabled="fixture-type-')}
-        ${field({ id:`fixture-qty-${item.id}`, label:'Anzahl', value:item.quantity || '1', unit:'Stk.' }).replaceAll('data-field="fixture-qty-', 'data-fixture-field="quantity" data-field-disabled="fixture-qty-')}
+    const open = item.uiOpen === true;
+    const title = `${item.name || 'Entwässerungsgegenstand'} · ${item.qty || 0} Stk.`;
+    const subtitle = `ΣDU ${fmt(item.totalDu,1)} l/s · Einzelanschluss ${item.dn || '—'}`;
+    return `<article class="wastewater-fixture line-section-card ${open ? '' : 'is-collapsed'}" data-fixture-id="${esc(item.id)}">
+      <div class="line-section-card__head">
+        <div class="line-section-card__title" data-fixture-toggle="${esc(item.id)}"><strong>${esc(title)}</strong><small>${esc(subtitle)}</small></div>
+        <button type="button" class="line-section-card__toggle" data-fixture-toggle="${esc(item.id)}" aria-expanded="${open ? 'true' : 'false'}" aria-label="Entwässerungsgegenstand aufklappen"><span>▾</span></button>
+        <button type="button" class="line-section-card__delete wastewater-fixture__delete" data-fixture-delete="${esc(item.id)}" aria-label="Gegenstand löschen">×</button>
       </div>
-      ${custom ? `<div class="wastewater-fixture__custom">${grid([
-        field({ id:`fixture-name-${item.id}`, label:'Bezeichnung', value:item.customName || '', placeholder:'z. B. Laborbecken', inputmode:'text' }).replaceAll('data-field="fixture-name-', 'data-fixture-field="customName" data-field-disabled="fixture-name-'),
-        field({ id:`fixture-du-${item.id}`, label:'DU', value:item.customDu || '', unit:'l/s' }).replaceAll('data-field="fixture-du-', 'data-fixture-field="customDu" data-field-disabled="fixture-du-'),
-        field({ id:`fixture-dn-${item.id}`, label:'Mindest-DN', value:item.customDn || '', placeholder:'DN 50', inputmode:'text' }).replaceAll('data-field="fixture-dn-', 'data-fixture-field="customDn" data-field-disabled="fixture-dn-')
-      ].join(''), 3)}</div>` : ''}
-      <div class="wastewater-fixture__stats">${inlineStats([
-        { label:'DU/Stk.', value:fmt(item.du,1), unit:'l/s' },
-        { label:'ΣDU', value:fmt(item.totalDu,1), unit:'l/s' },
-        { label:'Einzelanschluss', value:item.dn }
-      ])}</div>
-      <button type="button" class="line-section-card__delete wastewater-fixture__delete" data-fixture-delete="${esc(item.id)}" aria-label="Gegenstand löschen">×</button>
+      <div class="line-section-card__body">
+        <div class="wastewater-fixture__main">
+          ${selectField({ id:`fixture-type-${item.id}`, label:'Gegenstand', value:item.typeId, options:fixtureOptions }).replaceAll('data-field="fixture-type-', 'data-fixture-field="typeId" data-field-disabled="fixture-type-')}
+          ${field({ id:`fixture-qty-${item.id}`, label:'Anzahl', value:item.quantity || '1', unit:'Stk.' }).replaceAll('data-field="fixture-qty-', 'data-fixture-field="quantity" data-field-disabled="fixture-qty-')}
+        </div>
+        ${custom ? `<div class="wastewater-fixture__custom">${grid([
+          field({ id:`fixture-name-${item.id}`, label:'Bezeichnung', value:item.customName || '', placeholder:'z. B. Laborbecken', inputmode:'text' }).replaceAll('data-field="fixture-name-', 'data-fixture-field="customName" data-field-disabled="fixture-name-'),
+          field({ id:`fixture-du-${item.id}`, label:'DU', value:item.customDu || '', unit:'l/s' }).replaceAll('data-field="fixture-du-', 'data-fixture-field="customDu" data-field-disabled="fixture-du-'),
+          field({ id:`fixture-dn-${item.id}`, label:'Mindest-DN', value:item.customDn || '', placeholder:'DN 50', inputmode:'text' }).replaceAll('data-field="fixture-dn-', 'data-fixture-field="customDn" data-field-disabled="fixture-dn-')
+        ].join(''), 3)}</div>` : ''}
+        <div class="wastewater-fixture__stats">${inlineStats([
+          { label:'DU/Stk.', value:fmt(item.du,1), unit:'l/s' },
+          { label:'ΣDU', value:fmt(item.totalDu,1), unit:'l/s' },
+          { label:'Einzelanschluss', value:item.dn }
+        ])}</div>
+      </div>
     </article>`;
   }).join('')}</div>`;
 }
@@ -92,9 +142,7 @@ function warningList(warnings) {
 }
 function inputCards(s, r) {
   const lineFields = [
-    segmented('lineType', opts([
-      ['single-unvented','Einzel unb.'],['single-vented','Einzel bel.'],['branch-unvented','Sammelanschl.'],['stack','Fallleitung'],['collector','Sammel'],['ground-inside','Grund innen'],['ground-outside','Grund außen'],['ground-full','Vollfüllung'],['ventilation','Lüftung']
-    ]), s.lineType, { accent:'green' }),
+    lineTypeSelector(s),
     grid([
       field({ id:'slopeCmM', label:'Gefälle J', value:fmtInput(s.slopeCmM,2), unit:'cm/m' }),
       field({ id:'pipeLengthM', label:'Rohrlänge', value:fmtInput(s.pipeLengthM,2), unit:'m' }),
@@ -102,6 +150,7 @@ function inputCards(s, r) {
       selectField({ id:'fillRatio', label:'Füllungsgrad h/di', value:s.fillRatio, options:opts([['0.5','0,5'],['0.7','0,7'],['1.0','1,0']]) })
     ].join(''), 2)
   ];
+  if (s.lineType === 'branch-vented') lineFields.push('<p class="ph-help">Belüftete Sammelanschlussleitungen werden als Sammelleitung über die hydraulischen Tabellen A.3 bis A.5 vorbemessen.</p>');
   if (s.lineType === 'stack') lineFields.push(segmented('branchType', opts([['with-radius','Abzweige mit Innenradius'],['without-radius','ohne Innenradius']]), s.branchType, { accent:'green' }));
   if (s.lineType === 'ventilation') lineFields.push(segmented('ventilationType', opts([['single-main','Einzel-Hauptlüftung'],['collective-main','Sammel-Hauptlüftung'],['bypass','Umgehungsleitung'],['loop','Umlüftungsleitung']]), s.ventilationType, { accent:'green' }));
   return stack([
@@ -169,7 +218,7 @@ function bindActions(root) {
   bindEditModeClear(root, { state, activeIdKey: 'activeCalculationId', nameKey: 'name', onClear: () => state.set(clearedInputs(state.get())) });
   root.querySelector('[data-fixture-add]')?.addEventListener('click', () => {
     const current = state.get();
-    state.set({ fixtures: [...(current.fixtures || []), { id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, typeId: 'washbasin', quantity: '1' }] });
+    state.set({ fixtures: [...(current.fixtures || []), { id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, typeId: 'washbasin', quantity: '1', uiOpen: true }] });
   });
   root.querySelectorAll('[data-fixture-field]').forEach(el => {
     const commit = (options = {}) => {
@@ -193,6 +242,22 @@ function bindActions(root) {
     event.stopPropagation();
     const current = state.get();
     state.set({ fixtures: (current.fixtures || []).filter(item => String(item.id) !== String(btn.dataset.fixtureDelete)) });
+  }));
+  root.querySelectorAll('[data-fixture-toggle]').forEach(btn => btn.addEventListener('click', event => {
+    event.stopPropagation();
+    const current = state.get();
+    const id = btn.dataset.fixtureToggle;
+    state.set({ fixtures: (current.fixtures || []).map(item => String(item.id) === String(id) ? { ...item, uiOpen: item.uiOpen !== true } : item) });
+  }));
+  root.querySelectorAll('[data-line-family]').forEach(btn => btn.addEventListener('click', () => {
+    const current = state.get();
+    const ventilation = lineVentilationValue(current.lineType);
+    state.set({ lineType: resolveLineType(btn.dataset.lineFamily, ventilation, current.lineType) });
+  }));
+  root.querySelectorAll('[data-line-ventilation]').forEach(btn => btn.addEventListener('click', () => {
+    const current = state.get();
+    const family = lineFamilyValue(current.lineType);
+    state.set({ lineType: resolveLineType(family, btn.dataset.lineVentilation, current.lineType) });
   }));
   root.querySelector('[data-wastewater-save]')?.addEventListener('click', () => {
     const current = state.get();
