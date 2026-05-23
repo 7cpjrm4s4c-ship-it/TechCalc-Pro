@@ -59,7 +59,7 @@ function savedRows(s) {
   return `<div class="ph-saved-list">${items.map(item => {
     const r = item.result || {};
     const active = String(s.activeCalculationId || '') === String(item.id);
-    const subtitle = [`${fmt(r.qr || 0,2)} l/s`, `SL ${r.collectorDn || '—'}`, `FL ${r.stackDn || '—'}`, modeLabel(r.mode)].filter(Boolean).join(' · ');
+    const subtitle = [`${fmt(r.qr || 0,2)} l/s`, `FL ${r.stackDn || '—'}`, modeLabel(r.mode)].filter(Boolean).join(' · ');
     return `<article class="ph-saved-item line-section-card is-collapsed ${active ? 'is-active' : ''}" data-line-card data-rainwater-select="${esc(item.id)}">
       <div class="line-section-card__head">
         <div class="line-section-card__title"><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle)}</small></div>
@@ -68,7 +68,6 @@ function savedRows(s) {
       </div>
       <div class="line-section-card__body">${resultRows([
         { label:'Entwässerungsmenge', value:fmt(r.qr || 0,2), unit:'l/s' },
-        { label:'DN Sammelleitung', value:r.collectorDn || '—' },
         { label:'DN Fallleitung', value:r.stackDn || '—' },
         { label:drainLabel(r.mode), value:r.drains || 0, unit:'Stk.' }
       ])}</div>
@@ -81,7 +80,7 @@ function surfacesTable(r, s) {
   return `<div class="dw-consumer-list wastewater-fixture-list rainwater-surface-list">${r.surfaces.map(item => {
     const active = String(item.id) === activeId;
     return `<div class="dw-consumer-row wastewater-fixture-row rainwater-surface-row ${active ? 'is-active' : ''}" data-surface-select="${esc(item.id)}">
-      <div><strong>${esc(item.name)}</strong><span>${fmt(item.area,1)} m² · Cs ${fmt(item.cs,2)} · Qr ${fmt(item.qr,2)} l/s · ${item.collectorSelection?.dn || '—'}</span></div>
+      <div><strong>${esc(item.name)}</strong><span>${fmt(item.area,1)} m² · Cs ${fmt(item.cs,2)} · Qr ${fmt(item.qr,2)} l/s · FL ${item.stackSelection?.dn || '—'}</span></div>
       <button type="button" data-surface-delete="${esc(item.id)}" aria-label="Regenfläche entfernen">×</button>
     </div>`;
   }).join('')}</div>`;
@@ -110,9 +109,7 @@ function dimensionInputBlock(s) {
       field({ id:'drainSizeManual', label:'DN manuell', value:s.drainSizeManual || s.drainSize || 'DN 100', placeholder:'DN 100', inputmode:'text' }),
       field({ id:'drainCapacity', label:'Abflusswert manuell', value:fmtInput(s.drainCapacity,1), unit:'l/s' }),
       field({ id:'drainHead', label:'Anstauhöhe manuell', value:fmtInput(s.drainHead,0), unit:'mm' }),
-      field({ id:'stackCount', label:'Anzahl Fallleitungen', value:fmtInput(s.stackCount,0), unit:'Stk.' }),
-      field({ id:'slopeCmM', label:'Gefälle J', value:fmtDecimalInput(s.slopeCmM,1), unit:'cm/m' }),
-      selectField({ id:'fillRatio', label:'Füllungsgrad h/di', value:s.fillRatio, options:opts([['0.5','0,5'],['0.7','0,7'],['1.0','1,0']]) })
+      field({ id:'stackCount', label:'Anzahl Fallleitungen', value:fmtInput(s.stackCount,0), unit:'Stk.' })
     ].join(''), 2)
   ].join(''));
 }
@@ -159,7 +156,7 @@ function inputCards(s, r) {
   return stack([
     modeCard(s),
     card('Regenspende', rainInputBlock(s), 'green'),
-    card('Randbedingungen', dimensionInputBlock(s), 'green'),
+    card('Dacheinläufe / Hoftöpfe', dimensionInputBlock(s), 'green'),
     card('Notentwässerung', emergencyInputBlock(s), 'green'),
     card('Regenflächen', surfaceInputBlock(s, r), 'green')
   ].join(''));
@@ -175,46 +172,53 @@ function surfaceDimensionCards(r, s) {
   return `<div class="ph-saved-list rainwater-result-list">${r.surfaces.map((item) => {
     const mode = item.surfaceMode || r.mode || s.surfaceMode || 'roof';
     const active = String(item.id) === activeId;
+    const isRoof = mode === 'roof';
+    const mainRows = [
+      { label:'Regenspende', value:fmt(item.rdt,1), unit:'l/(s·ha)' },
+      { label:'Fläche', value:fmt(item.area,1), unit:'m²' },
+      { label:'Abflussbeiwert Cs', value:fmt(item.cs,2) },
+      { label:'Entwässerungsmenge Qr', value:fmt(item.qr,2), unit:'l/s' },
+      { label:drainLabel(mode), value:item.requiredDrains, unit:'Stk.' },
+      { label:'gewählte Ablaufdimension', value:item.drainSize || '—' },
+      { label:'Ablaufleistung je Ablauf', value:fmt(item.drainCapacity,1), unit:'l/s' },
+      { label:'Anstauhöhe Ablauf', value:item.drainHead || '—', unit:item.drainHead ? 'mm' : '' },
+      { label:'Anzahl Fallleitungen', value:item.stackCount, unit:'Stk.' },
+      { label:'Q je Fallleitung', value:fmt(item.qPerStack,2), unit:'l/s' },
+      { label:'DN Fallleitung', value:item.stackSelection?.dn || '—' }
+    ];
+    const emergencyRows = isRoof ? [
+      { label:'r(5,100)', value:fmt(item.r100,1), unit:'l/(s·ha)' },
+      { label:'Notabfluss Qnot', value:fmt(item.emergency?.qNot || 0,2), unit:'l/s' },
+      { label:'Art Notentwässerung', value:item.emergency?.type === 'round' ? 'Rund' : item.emergency?.type === 'manual' ? 'Herstellerwert' : 'Rechteckig' },
+      { label:'Notüberläufe', value:item.emergency?.requiredCount || 0, unit:'Stk.' },
+      { label:'erforderliche Überlaufbreite je Notüberlauf', value:item.emergency?.rectWidthPerOverflow ? fmt(item.emergency.rectWidthPerOverflow,0) : '—', unit:item.emergency?.rectWidthPerOverflow ? 'mm' : '' },
+      { label:'Notüberlauf-DN', value:item.emergency?.manufacturerDn || '—' },
+      { label:'gewählte Überlaufleistung je Notüberlauf', value:item.emergency?.capacity ? fmt(item.emergency.capacity,2) : '—', unit:item.emergency?.capacity ? 'l/s' : '' }
+    ] : [];
     return `<article class="line-section-card ${active ? 'is-active' : ''} ${active ? '' : 'is-collapsed'}" data-line-card data-surface-result-select="${esc(item.id)}">
       <div class="line-section-card__head">
-        <div class="line-section-card__title"><strong>${esc(item.name)}</strong><small>${fmt(item.area,1)} m² · Qr ${fmt(item.qr,2)} l/s · SL ${item.collectorSelection?.dn || '—'} · FL ${item.stackSelection?.dn || '—'}</small></div>
+        <div class="line-section-card__title"><strong>${esc(item.name)}</strong><small>${fmt(item.area,1)} m² · Qr ${fmt(item.qr,2)} l/s · FL ${item.stackSelection?.dn || '—'}</small></div>
         <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="${active ? 'true' : 'false'}" aria-label="Flächendimensionierung aufklappen"><span>${active ? '▴' : '▾'}</span></button>
       </div>
-      <div class="line-section-card__body">${resultRows([
-        { label:'Entwässerungsmenge', value:fmt(item.qr,2), unit:'l/s' },
-        { label:'DN Sammelleitung', value:item.collectorSelection?.dn || '—' },
-        { label:'DN Fallleitung', value:item.stackSelection?.dn || '—' },
-        { label:drainLabel(mode), value:item.requiredDrains, unit:'Stk.' },
-        { label:'Ablaufdimension', value:item.drainSize || '—' },
-        { label:'Ablaufleistung', value:fmt(item.drainCapacity,1), unit:'l/s' },
-        { label:'Anstauhöhe Ablauf', value:item.drainHead || '—', unit:item.drainHead ? 'mm' : '' },
-        { label:'Anzahl Fallleitungen', value:item.stackCount, unit:'Stk.' },
-        { label:'Q je Fallleitung', value:fmt(item.qPerStack,2), unit:'l/s' },
-        { label:'Abflussbeiwert Cs', value:fmt(item.cs,2) },
-        { label:'Regenspende', value:fmt(item.rdt,1), unit:'l/(s·ha)' },
-        { label:'r(5,100)', value:fmt(item.r100,1), unit:'l/(s·ha)' },
-        { label:'Notabfluss Qnot', value:fmt(item.emergency?.qNot || 0,2), unit:'l/s' },
-        { label:'Notüberläufe', value:item.emergency?.requiredCount || 0, unit:'Stk.' },
-        { label:'erf. Überlaufbreite je Notüberlauf', value:item.emergency?.rectWidthPerOverflow ? fmt(item.emergency.rectWidthPerOverflow,0) : '—', unit:item.emergency?.rectWidthPerOverflow ? 'mm' : '' },
-        { label:'Notüberlauf-DN', value:item.emergency?.manufacturerDn || '—' },
-        { label:'gewählte Überlaufleistung je Notüberlauf', value:item.emergency?.capacity ? fmt(item.emergency.capacity,2) : '—', unit:item.emergency?.capacity ? 'l/s' : '' },
-        { label:'Füllungsgrad', value:`h/di ${String(item.fillRatio).replace('.', ',')}` },
-        { label:'angesetztes Gefälle', value:fmtStateNumber(item.slopeCmM,1), unit:'cm/m' }
-      ])}<div class="ph-formula ph-formula--small">Qr = r × C × A / 10000 · Anzahl Abläufe = Qr / Ablaufleistung · Q je Fallleitung = Qr / Anzahl Fallleitungen</div></div>
+      <div class="line-section-card__body">
+        <div class="rainwater-result-group"><h4>Hauptentwässerung</h4>${resultRows(mainRows)}</div>
+        ${isRoof ? `<div class="rainwater-result-group"><h4>Notentwässerung</h4>${resultRows(emergencyRows)}</div>` : ''}
+        <div class="ph-formula ph-formula--small">Qr = r × C × A / 10000 · Anzahl Abläufe = Qr / Ablaufleistung · Q je Fallleitung = Qr / Anzahl Fallleitungen</div>
+      </div>
     </article>`;
   }).join('')}</div>`;
 }
 function resultCards(s, r) {
   const mode = r.selectedSurface?.surfaceMode || r.mode || s.surfaceMode || 'roof';
   return stack([
-    mainResult('Ergebnis Regenwasser', { label:'DN Sammelleitung', value:r.collectorSelection?.dn || '—' }, [
-      { label:'DN Fallleitung', value:r.stackSelection?.dn || '—' },
+    mainResult('Ergebnis Regenwasser', { label:'DN Fallleitung', value:r.stackSelection?.dn || '—' }, [
       { label:drainLabel(mode), value:r.requiredDrains, unit:'Stk.' },
       { label:'Entwässerungsmenge', value:fmt(r.qr,2), unit:'l/s' },
+      { label:'Ablaufdimension', value:r.drainSize || '—' },
       { label:'Notabfluss Qnot', value:fmt(r.qNot || 0,2), unit:'l/s' },
       { label:'markierte Fläche', value:r.selectedSurface?.name || '—' }
     ], 'green'),
-    card('Flächen / Dimensionierung', surfaceDimensionCards(r, s), 'green'),
+    card('Flächen / Berechnung', surfaceDimensionCards(r, s), 'green'),
     card('Normhinweise / Plausibilität', warningList(r.warnings, s), 'green')
   ].join(''));
 }
@@ -285,7 +289,7 @@ function statePatchFromSurface(item = {}) {
     emergencySafetyFactor: item.emergencySafetyFactor
   };
 }
-const surfaceEditFields = new Set(['surfaceMode','areaType','areaName','areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity','drainSize','drainSizeManual','drainCapacity','drainHead','stackCount','slopeCmM','fillRatio','emergencyType','emergencyHead','emergencyWidth','emergencyDiameter','emergencyManufacturerDn','emergencyCapacity','emergencySafetyFactor']);
+const surfaceEditFields = new Set(['surfaceMode','areaType','areaName','areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity','drainSize','drainSizeManual','drainCapacity','drainHead','stackCount','emergencyType','emergencyHead','emergencyWidth','emergencyDiameter','emergencyManufacturerDn','emergencyCapacity','emergencySafetyFactor']);
 function bindActions(root) {
   bindEditModeClear(root, { state, activeIdKey:'activeCalculationId', nameKey:'name', onClear: () => state.set(clearedInputs(state.get())) });
   root.querySelector('[data-surface-add]')?.addEventListener('click', () => {

@@ -4336,3 +4336,34 @@ body.settings-open {
 .module-view[data-module='rainwater'] .ph-warning span::after {
   content: ' ';
 }
+
+/* v1.2.7: Header transparent across GitHub Pages/Netlify and rainwater result grouping */
+.app-header,
+.app-header.glass-surface,
+.app-header.is-scrolled,
+.app-header.glass-surface.is-scrolled {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+  border-bottom-color: rgba(255,255,255,.10) !important;
+}
+.rainwater-result-group {
+  display: grid;
+  gap: var(--ui-gap);
+  margin-top: var(--space-2);
+}
+.rainwater-result-group + .rainwater-result-group {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid rgba(255,255,255,.10);
+}
+.rainwater-result-group h4 {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: .78rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}

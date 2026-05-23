@@ -124,7 +124,6 @@ function chooseHydraulic(q, fillRatio, slopeCmM, minDn = 'DN 70') {
 function validate(state, r) {
   const warnings = [];
   const mode = state.surfaceMode || state.calculationType || 'roof';
-  const slope = toNumber(state.slopeCmM);
   const drain = currentDrainSettings(state);
   const stackCount = Math.max(1, Math.floor(toNumber(state.stackCount)) || 1);
 
@@ -133,8 +132,6 @@ function validate(state, r) {
   if ((r.selectedSurface?.qr || 0) <= 0) warnings.push('Qr ist 0 l/s. Regenspende, Fläche und Abflussbeiwert prüfen.');
   if (drain.capacity <= 0) warnings.push(`${mode === 'property' ? 'Abflussvermögen des Hoftopfs' : 'Abflussvermögen des Dacheinlaufs'} eingeben.`);
   if (stackCount < 1) warnings.push('Anzahl Fallleitungen muss mindestens 1 betragen.');
-  if (slope < 0.5) warnings.push('Mindestgefälle für Sammel-/Grundleitungen innerhalb von Gebäuden: 0,5 cm/m.');
-  if (mode === 'property' && slope < 1) warnings.push('Bei Grundleitungen außerhalb von Gebäuden sind 1,0 cm/m Gefälle und v ≥ 0,7 m/s zu prüfen.');
   warnings.push(`Regenspende ${mode === 'property' ? 'r(5,2)' : 'r(5,5)'} und r(5,100) standortbezogen über KOSTRA/OpenKo ermitteln und manuell eintragen.`);
   if (mode === 'roof') warnings.push('Notentwässerung als Vorbemessung berücksichtigt. Überflutungsnachweis und Rückhalteraumbemessung sind nicht Bestandteil dieser Berechnung.');
   warnings.push('Die Ergebnis-Card zeigt die markierte bzw. zuletzt hinzugefügte Fläche. Weitere Flächen werden separat in den Klappcards berechnet.');

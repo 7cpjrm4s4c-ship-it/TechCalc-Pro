@@ -1,3 +1,11 @@
+
+## 1.2.7 - Regenwasser Ergebnisstruktur und Header-Fix
+- Header auf transparente Darstellung ohne schwarzen Fallback vereinheitlicht.
+- Regenwasser: Sammelleitungsdimensionierung aus der Ausgabe entfernt.
+- Regenwasser: Gefälle- und Füllgrad-Inputs entfernt.
+- Ergebnis- und Klappcards nach Hauptentwässerung und Notentwässerung sortiert.
+- Syntaxcheck durchgeführt.
+
 # Release Notes
 
 ## 1.2.6 - Regenwasser Notentwässerung UX und Flächenbearbeitung
