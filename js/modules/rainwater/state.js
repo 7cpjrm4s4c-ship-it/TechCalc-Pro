@@ -5,6 +5,8 @@ export const initialState = {
   activeCalculationId: null,
   surfaceMode: 'roof',
   calculationType: 'roof',
+  roofRainIntensity: '300',
+  propertyRainIntensity: '300',
   rainIntensity: '300',
   rainHundredIntensity: '500',
   areaType: 'metal-roof',
@@ -15,9 +17,12 @@ export const initialState = {
   fillRatio: '0.7',
   slopeCmM: '1,0',
   drainSize: 'DN 100',
+  drainSizeManual: 'DN 100',
   drainCapacity: '4,5',
+  drainHead: '35',
   roofDrainCapacity: '4,5',
   stackCount: '1',
+  activeSurfaceId: null,
   surfaces: [],
   savedCalculations: []
 };

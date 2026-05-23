@@ -9,19 +9,65 @@ export function getAreaType(id) {
   return areaTypes.find(item => item.id === id) || areaTypes[0];
 }
 
-function selectedDrain(state) {
-  return roofDrainTable.find(item => item.dn === (state.drainSize || 'DN 100')) || roofDrainTable.find(item => item.dn === 'DN 100') || roofDrainTable[0];
+export function getDrainByDn(dn) {
+  return roofDrainTable.find(item => item.dn === (dn || 'DN 100')) || roofDrainTable.find(item => item.dn === 'DN 100') || roofDrainTable[0];
+}
+
+function getRainForMode(state, mode) {
+  if (mode === 'property') return toNumber(state.propertyRainIntensity || state.rainIntensity || '300');
+  return toNumber(state.roofRainIntensity || state.rainIntensity || '300');
+}
+
+function currentDrainSettings(state) {
+  const preset = getDrainByDn(state.drainSize || 'DN 100');
+  const dn = state.drainSizeManual || state.drainSize || preset?.dn || 'DN 100';
+  const capacity = toNumber(state.drainCapacity || preset?.capacity || state.roofDrainCapacity);
+  const head = toNumber(state.drainHead || preset?.head);
+  return { dn, capacity, head };
 }
 
 function surfaceRows(state) {
-  const rdt = toNumber(state.rainIntensity);
+  const currentMode = state.surfaceMode || state.calculationType || 'roof';
+  const drain = currentDrainSettings(state);
+  const stackCount = Math.max(1, Math.floor(toNumber(state.stackCount)) || 1);
+  const fillRatio = state.fillRatio || '0.7';
+  const slopeCmM = state.slopeCmM || '1,0';
+
   return (state.surfaces || []).map(item => {
+    const mode = item.surfaceMode || item.calculationType || currentMode;
     const base = getAreaType(item.areaType);
     const area = Math.max(0, toNumber(item.areaSize));
     const cs = base.custom ? Math.max(0, toNumber(item.customCs)) : base.cs;
     const cm = base.custom ? Math.max(0, toNumber(item.customCm)) : base.cm;
+    const rdt = getRainForMode(state, mode);
     const qr = rdt * cs * area / 10000;
-    return { ...item, base, name: item.areaName || base.name, area, cs, cm, qr, effectiveCs: area * cs, effectiveCm: area * cm };
+    const itemRequiredDrains = drain.capacity > 0 ? Math.ceil(qr / drain.capacity) : 0;
+    const itemQPerStack = qr / stackCount;
+    const collectorMinDn = mode === 'property' ? 'DN 100' : 'DN 70';
+    const stackMinDn = mode === 'property' ? 'DN 100' : 'DN 70';
+    return {
+      ...item,
+      surfaceMode: mode,
+      base,
+      name: item.areaName || base.name,
+      area,
+      cs,
+      cm,
+      rdt,
+      qr,
+      effectiveCs: area * cs,
+      effectiveCm: area * cm,
+      requiredDrains: itemRequiredDrains,
+      qPerStack: itemQPerStack,
+      drainSize: drain.dn,
+      drainCapacity: drain.capacity,
+      drainHead: drain.head,
+      stackCount,
+      fillRatio,
+      slopeCmM,
+      collectorSelection: chooseHydraulic(qr, fillRatio, slopeCmM, collectorMinDn),
+      stackSelection: chooseHydraulic(itemQPerStack, '0.7', slopeCmM, stackMinDn)
+    };
   });
 }
 
@@ -38,22 +84,20 @@ function chooseHydraulic(q, fillRatio, slopeCmM, minDn = 'DN 70') {
 
 function validate(state, r) {
   const warnings = [];
-  const isRoof = (state.surfaceMode || state.calculationType || 'roof') === 'roof';
+  const mode = state.surfaceMode || state.calculationType || 'roof';
   const slope = toNumber(state.slopeCmM);
-  const drain = selectedDrain(state);
-  const drainSize = drain?.dn || state.drainSize || 'DN 100';
-  const drainHead = drain?.head ?? null;
-  const drainCapacity = toNumber(drain?.capacity || state.drainCapacity || state.roofDrainCapacity);
+  const drain = currentDrainSettings(state);
   const stackCount = Math.max(1, Math.floor(toNumber(state.stackCount)) || 1);
 
   if (!r.surfaces.length) warnings.push('Noch keine Regenfläche erfasst.');
-  if (r.qr <= 0) warnings.push('Qr ist 0 l/s. Regenspende, Fläche und Abflussbeiwert prüfen.');
-  if (drainCapacity <= 0) warnings.push(`${isRoof ? 'Abflussvermögen des Dacheinlaufs' : 'Abflussvermögen des Hoftopfs'} eingeben.`);
+  if (!r.selectedSurface) warnings.push('Keine Fläche markiert. Bitte eine Fläche für die Ergebnisanzeige auswählen.');
+  if ((r.selectedSurface?.qr || 0) <= 0) warnings.push('Qr ist 0 l/s. Regenspende, Fläche und Abflussbeiwert prüfen.');
+  if (drain.capacity <= 0) warnings.push(`${mode === 'property' ? 'Abflussvermögen des Hoftopfs' : 'Abflussvermögen des Dacheinlaufs'} eingeben.`);
   if (stackCount < 1) warnings.push('Anzahl Fallleitungen muss mindestens 1 betragen.');
   if (slope < 0.5) warnings.push('Mindestgefälle für Sammel-/Grundleitungen innerhalb von Gebäuden: 0,5 cm/m.');
-  if (!isRoof && slope < 1) warnings.push('Bei Grundleitungen außerhalb von Gebäuden sind 1,0 cm/m Gefälle und v ≥ 0,7 m/s zu prüfen.');
-  warnings.push(`Regenspende ${isRoof ? 'r(5,5)' : 'r(5,2)'} und r(5,100) standortbezogen über KOSTRA/OpenKo ermitteln und manuell eintragen.`);
-  warnings.push('Berechnung erfolgt flächenweise; die Dimensionierung nutzt die Summe der Entwässerungsmenge.');
+  if (mode === 'property' && slope < 1) warnings.push('Bei Grundleitungen außerhalb von Gebäuden sind 1,0 cm/m Gefälle und v ≥ 0,7 m/s zu prüfen.');
+  warnings.push(`Regenspende ${mode === 'property' ? 'r(5,2)' : 'r(5,5)'} und r(5,100) standortbezogen über KOSTRA/OpenKo ermitteln und manuell eintragen.`);
+  warnings.push('Die Ergebnis-Card zeigt die markierte bzw. zuletzt hinzugefügte Fläche. Weitere Flächen werden separat in den Klappcards berechnet.');
   return warnings;
 }
 
@@ -61,36 +105,43 @@ export function calculate(state) {
   const mode = state.surfaceMode || state.calculationType || 'roof';
   const isRoof = mode === 'roof';
   const surfaces = surfaceRows(state);
-  const area = surfaces.reduce((sum, item) => sum + item.area, 0);
-  const auCs = surfaces.reduce((sum, item) => sum + item.effectiveCs, 0);
-  const auCm = surfaces.reduce((sum, item) => sum + item.effectiveCm, 0);
-  const csResulting = area > 0 ? auCs / area : 0;
-  const cmResulting = area > 0 ? auCm / area : 0;
-  const rdt = toNumber(state.rainIntensity);
+  const lastSurfaceId = surfaces.length ? surfaces[surfaces.length - 1].id : null;
+  const selectedId = state.activeSurfaceId || lastSurfaceId;
+  const selectedSurface = surfaces.find(item => String(item.id) === String(selectedId)) || surfaces[surfaces.length - 1] || null;
+  const selectedArea = selectedSurface?.area || 0;
+  const rdt = getRainForMode(state, selectedSurface?.surfaceMode || mode);
   const r100 = toNumber(state.rainHundredIntensity);
-  const qr = surfaces.reduce((sum, item) => sum + item.qr, 0);
-  const drain = selectedDrain(state);
-  const drainSize = drain?.dn || state.drainSize || 'DN 100';
-  const drainHead = drain?.head ?? null;
-  const drainCapacity = toNumber(drain?.capacity || state.drainCapacity || state.roofDrainCapacity);
-  const requiredDrains = drainCapacity > 0 ? Math.ceil(qr / drainCapacity) : 0;
-  const stackCount = Math.max(1, Math.floor(toNumber(state.stackCount)) || 1);
-  const qPerStack = qr / stackCount;
-  const collectorMinDn = isRoof ? 'DN 70' : 'DN 100';
-  const stackMinDn = isRoof ? 'DN 70' : 'DN 100';
-  const collectorSelection = chooseHydraulic(qr, state.fillRatio || '0.7', state.slopeCmM, collectorMinDn);
-  const stackSelection = chooseHydraulic(qPerStack, '0.7', state.slopeCmM, stackMinDn);
-  const surfacesWithDimension = surfaces.map(item => {
-    const itemRequiredDrains = drainCapacity > 0 ? Math.ceil(item.qr / drainCapacity) : 0;
-    const itemQPerStack = item.qr / stackCount;
-    return {
-      ...item,
-      requiredDrains:itemRequiredDrains,
-      qPerStack:itemQPerStack,
-      collectorSelection:chooseHydraulic(item.qr, state.fillRatio || '0.7', state.slopeCmM, collectorMinDn),
-      stackSelection:chooseHydraulic(itemQPerStack, '0.7', state.slopeCmM, stackMinDn)
-    };
-  });
-  const warnings = validate(state, { surfaces, qr });
-  return { mode, isRoof, surfaces:surfacesWithDimension, area, auCs, auCm, csResulting, cmResulting, rdt, r100, qr, drainSize, drainHead, drainCapacity, requiredDrains, stackCount, qPerStack, collectorSelection, stackSelection, warnings };
+  const qr = selectedSurface?.qr || 0;
+  const csResulting = selectedSurface?.cs || 0;
+  const cmResulting = selectedSurface?.cm || 0;
+  const drain = currentDrainSettings(state);
+  const requiredDrains = selectedSurface?.requiredDrains || 0;
+  const stackCount = selectedSurface?.stackCount || Math.max(1, Math.floor(toNumber(state.stackCount)) || 1);
+  const qPerStack = selectedSurface?.qPerStack || 0;
+  const selectedIsRoof = (selectedSurface?.surfaceMode || mode) === 'roof';
+  const collectorSelection = selectedSurface?.collectorSelection || chooseHydraulic(qr, state.fillRatio || '0.7', state.slopeCmM, selectedIsRoof ? 'DN 70' : 'DN 100');
+  const stackSelection = selectedSurface?.stackSelection || chooseHydraulic(qPerStack, '0.7', state.slopeCmM, selectedIsRoof ? 'DN 70' : 'DN 100');
+  const warnings = validate(state, { surfaces, selectedSurface });
+  return {
+    mode,
+    isRoof,
+    surfaces,
+    selectedSurface,
+    selectedSurfaceId: selectedSurface?.id || null,
+    area: selectedArea,
+    csResulting,
+    cmResulting,
+    rdt,
+    r100,
+    qr,
+    drainSize: drain.dn,
+    drainHead: drain.head,
+    drainCapacity: drain.capacity,
+    requiredDrains,
+    stackCount,
+    qPerStack,
+    collectorSelection,
+    stackSelection,
+    warnings
+  };
 }

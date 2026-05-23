@@ -4305,3 +4305,13 @@ body.settings-open {
 .rainwater-result-list .line-section-card__body .ph-formula--small {
   margin-top: .75rem;
 }
+
+/* Regenwasser 1.2.4 */
+.rainwater-surface-row {
+  cursor: pointer;
+}
+.rainwater-surface-row.is-active,
+.rainwater-result-list .line-section-card.is-active {
+  border-color: rgba(51, 161, 255, .75);
+  box-shadow: 0 0 0 1px rgba(51, 161, 255, .22), 0 0 24px rgba(51, 161, 255, .12);
+}

@@ -1,5 +1,15 @@
 # Release Notes
 
+## 1.2.4 - Regenwasser Flächenauswahl und UX-Korrektur
+
+- Ergebnis-Card zeigt nur noch die markierte bzw. zuletzt berechnete Dach-/Grundstücksfläche.
+- Flächen sind markierbar; Klappcards enthalten alle relevanten Dimensionierungswerte inklusive Ablaufdimension.
+- Separater Speichern-Dialog im Regenwasser-Modul entfernt.
+- r(5,5) und r(5,2) werden als getrennte Eingabewerte gehalten.
+- Ablauf-/Hoftopf-DN, Abflusswert und Anstauhöhe manuell überschreibbar.
+- Separate Dimensionierungs-/Berechnungsansatz-Card entfernt; Angaben in Flächen-Klappcards verlagert.
+- Normhinweise mit sauberer Doppelpunkt-/Leerzeichen-Darstellung.
+
 ## 1.2.3 - Regenwasser Lade-Hotfix
 - Regenwasser: Laufzeitfehler beim Initialisieren des Moduls behoben.
 - Fehlende Rückgabewerte für Ablaufdimension und Anstauhöhe sauber aus dem ausgewählten Dacheinlauf/Hoftopf abgeleitet.
