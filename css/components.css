@@ -4315,3 +4315,24 @@ body.settings-open {
   border-color: rgba(51, 161, 255, .75);
   box-shadow: 0 0 0 1px rgba(51, 161, 255, .22), 0 0 24px rgba(51, 161, 255, .12);
 }
+
+
+/* v1.2.5: Header transparent across GitHub Pages / Netlify and Regenwasser Notentwässerung */
+.app-header,
+.app-header.is-scrolled {
+  background: rgba(8, 12, 24, .28) !important;
+  background-color: rgba(8, 12, 24, .28) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(125%);
+  backdrop-filter: blur(18px) saturate(125%);
+  box-shadow: none !important;
+}
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .app-header,
+  .app-header.is-scrolled {
+    background: rgba(8, 12, 24, .18) !important;
+    background-color: rgba(8, 12, 24, .18) !important;
+  }
+}
+.module-view[data-module='rainwater'] .ph-warning span::after {
+  content: ' ';
+}

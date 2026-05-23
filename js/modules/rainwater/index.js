@@ -28,6 +28,8 @@ const drainLabel = mode => mode === 'property' ? 'Hoftöpfe' : 'Dacheinläufe';
 const drainCapacityLabel = mode => mode === 'property' ? 'Abflussvermögen Hoftopf' : 'Abflussvermögen Dacheinlauf';
 const rainLabel = mode => mode === 'property' ? 'Regenspende r(5,2)' : 'Regenspende r(5,5)';
 const drainOptions = roofDrainTable.map(item => ({ value:item.dn, label:`${item.dn} · ${String(item.capacity).replace('.', ',')} l/s · ${item.head} mm Anstauhöhe` }));
+const emergencyOptions = opts([['yes','Notentwässerung vorbemessen'],['no','Nicht berücksichtigen']]);
+const emergencyTypeOptions = opts([['rect','Rechteckiger Notüberlauf'],['round','Runder Notüberlauf'],['manual','Herstellerwert / freie Eingabe']]);
 
 function savedSnapshot(s, r) {
   const saved = Array.isArray(s.savedCalculations) ? s.savedCalculations : [];
@@ -44,6 +46,7 @@ function savedSnapshot(s, r) {
       qr:r.qr,
       collectorDn:r.collectorSelection?.dn,
       stackDn:r.stackSelection?.dn,
+      qNot:r.qNot,
       drains:r.requiredDrains,
       area:r.area,
       mode:r.mode
@@ -114,6 +117,22 @@ function dimensionInputBlock(s) {
     ].join(''), 2)
   ].join(''));
 }
+
+function emergencyInputBlock(s) {
+  const mode = s.surfaceMode || s.calculationType || 'roof';
+  if (mode !== 'roof') return '<div class="empty-state empty-state--compact">Notentwässerung wird nur für Dachflächen vorbemessen.</div>';
+  return stack([
+    grid([
+      selectField({ id:'emergencyEnabled', label:'Notentwässerung', value:s.emergencyEnabled || 'yes', options:emergencyOptions }),
+      selectField({ id:'emergencyType', label:'Art Notentwässerung', value:s.emergencyType || 'rect', options:emergencyTypeOptions }),
+      field({ id:'emergencyHead', label:'Druckhöhe / Anstauhöhe', value:fmtInput(s.emergencyHead || '35',0), unit:'mm' }),
+      field({ id:'emergencyWidth', label:'Überlaufbreite Lw', value:fmtInput(s.emergencyWidth || '300',0), unit:'mm' }),
+      field({ id:'emergencyDiameter', label:'Durchmesser rund', value:fmtInput(s.emergencyDiameter || '100',0), unit:'mm' }),
+      field({ id:'emergencyCapacity', label:'Hersteller-Abflusswert optional', value:s.emergencyCapacity || '', unit:'l/s' }),
+      field({ id:'emergencySafetyFactor', label:'Sicherheitsfaktor', value:fmtDecimalInput(s.emergencySafetyFactor || '1,0',1) })
+    ].join(''), 2)
+  ].join(''));
+}
 function surfaceInputBlock(s, r) {
   const selected = getAreaType(s.areaType || 'metal-roof');
   return stack([
@@ -140,6 +159,7 @@ function inputCards(s, r) {
     modeCard(s),
     card('Regenspende', rainInputBlock(s), 'green'),
     card('Randbedingungen', dimensionInputBlock(s), 'green'),
+    card('Notentwässerung', emergencyInputBlock(s), 'green'),
     card('Regenflächen', surfaceInputBlock(s, r), 'green')
   ].join(''));
 }
@@ -171,6 +191,11 @@ function surfaceDimensionCards(r, s) {
         { label:'Q je Fallleitung', value:fmt(item.qPerStack,2), unit:'l/s' },
         { label:'Abflussbeiwert Cs', value:fmt(item.cs,2) },
         { label:'Regenspende', value:fmt(item.rdt,1), unit:'l/(s·ha)' },
+        { label:'r(5,100)', value:fmt(item.r100,1), unit:'l/(s·ha)' },
+        { label:'Notabfluss Qnot', value:fmt(item.emergency?.qNot || 0,2), unit:'l/s' },
+        { label:'Notüberläufe', value:item.emergency?.requiredCount || 0, unit:'Stk.' },
+        { label:'erf. Überlaufbreite', value:item.emergency?.rectRequiredWidth ? fmt(item.emergency.rectRequiredWidth,0) : '—', unit:item.emergency?.rectRequiredWidth ? 'mm' : '' },
+        { label:'gewählte Überlaufleistung', value:item.emergency?.capacity ? fmt(item.emergency.capacity,2) : '—', unit:item.emergency?.capacity ? 'l/s' : '' },
         { label:'Füllungsgrad', value:`h/di ${String(item.fillRatio).replace('.', ',')}` },
         { label:'angesetztes Gefälle', value:fmtStateNumber(item.slopeCmM,1), unit:'cm/m' }
       ])}<div class="ph-formula ph-formula--small">Qr = r × C × A / 10000 · Anzahl Abläufe = Qr / Ablaufleistung · Q je Fallleitung = Qr / Anzahl Fallleitungen</div></div>
@@ -184,6 +209,7 @@ function resultCards(s, r) {
       { label:'DN Fallleitung', value:r.stackSelection?.dn || '—' },
       { label:drainLabel(mode), value:r.requiredDrains, unit:'Stk.' },
       { label:'Entwässerungsmenge', value:fmt(r.qr,2), unit:'l/s' },
+      { label:'Notabfluss Qnot', value:fmt(r.qNot || 0,2), unit:'l/s' },
       { label:'markierte Fläche', value:r.selectedSurface?.name || '—' }
     ], 'green'),
     card('Flächen / Dimensionierung', surfaceDimensionCards(r, s), 'green'),

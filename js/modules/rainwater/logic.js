@@ -26,6 +26,37 @@ function currentDrainSettings(state) {
   return { dn, capacity, head };
 }
 
+
+function emergencySettings(state) {
+  const enabled = state.emergencyEnabled !== 'no';
+  const type = state.emergencyType || 'rect';
+  const head = Math.max(0, toNumber(state.emergencyHead || '35'));
+  const width = Math.max(0, toNumber(state.emergencyWidth || '300'));
+  const diameter = Math.max(0, toNumber(state.emergencyDiameter || '100'));
+  const manualCapacity = toNumber(state.emergencyCapacity);
+  const safetyFactor = Math.max(0, toNumber(state.emergencySafetyFactor || '1,0')) || 1;
+  return { enabled, type, head, width, diameter, manualCapacity, safetyFactor };
+}
+
+function calcEmergencyOverflow(qNotBase, state, mode) {
+  const settings = emergencySettings(state);
+  const qNot = mode === 'roof' && settings.enabled ? Math.max(0, qNotBase * settings.safetyFactor) : 0;
+  const head = settings.head;
+  const rectCapacity = settings.width > 0 && head > 0 ? (settings.width * Math.pow(head, 1.5)) / 24000 : 0;
+  const rectRequiredWidth = qNot > 0 && head > 0 ? (qNot * 24000) / Math.pow(head, 1.5) : 0;
+  const manualCapacity = settings.manualCapacity > 0 ? settings.manualCapacity : rectCapacity;
+  const requiredCount = manualCapacity > 0 ? Math.ceil(qNot / manualCapacity) : 0;
+  return {
+    ...settings,
+    qNot,
+    qNotBase,
+    capacity: manualCapacity,
+    rectCapacity,
+    rectRequiredWidth,
+    requiredCount
+  };
+}
+
 function surfaceRows(state) {
   const currentMode = state.surfaceMode || state.calculationType || 'roof';
   const drain = currentDrainSettings(state);
@@ -40,7 +71,10 @@ function surfaceRows(state) {
     const cs = base.custom ? Math.max(0, toNumber(item.customCs)) : base.cs;
     const cm = base.custom ? Math.max(0, toNumber(item.customCm)) : base.cm;
     const rdt = getRainForMode(state, mode);
+    const r100 = toNumber(state.rainHundredIntensity);
     const qr = rdt * cs * area / 10000;
+    const qNotBase = mode === 'roof' ? Math.max(0, (r100 - rdt) * cs * area / 10000) : 0;
+    const emergency = calcEmergencyOverflow(qNotBase, state, mode);
     const itemRequiredDrains = drain.capacity > 0 ? Math.ceil(qr / drain.capacity) : 0;
     const itemQPerStack = qr / stackCount;
     const collectorMinDn = mode === 'property' ? 'DN 100' : 'DN 70';
@@ -54,7 +88,10 @@ function surfaceRows(state) {
       cs,
       cm,
       rdt,
+      r100,
       qr,
+      emergency,
+      qNot: emergency.qNot,
       effectiveCs: area * cs,
       effectiveCm: area * cm,
       requiredDrains: itemRequiredDrains,
@@ -97,6 +134,7 @@ function validate(state, r) {
   if (slope < 0.5) warnings.push('Mindestgefälle für Sammel-/Grundleitungen innerhalb von Gebäuden: 0,5 cm/m.');
   if (mode === 'property' && slope < 1) warnings.push('Bei Grundleitungen außerhalb von Gebäuden sind 1,0 cm/m Gefälle und v ≥ 0,7 m/s zu prüfen.');
   warnings.push(`Regenspende ${mode === 'property' ? 'r(5,2)' : 'r(5,5)'} und r(5,100) standortbezogen über KOSTRA/OpenKo ermitteln und manuell eintragen.`);
+  if (mode === 'roof' && state.emergencyEnabled !== 'no') warnings.push('Notentwässerung als Vorbemessung berücksichtigt. Überflutungsnachweis und Rückhalteraumbemessung sind nicht Bestandteil dieser Berechnung.');
   warnings.push('Die Ergebnis-Card zeigt die markierte bzw. zuletzt hinzugefügte Fläche. Weitere Flächen werden separat in den Klappcards berechnet.');
   return warnings;
 }
@@ -121,6 +159,7 @@ export function calculate(state) {
   const selectedIsRoof = (selectedSurface?.surfaceMode || mode) === 'roof';
   const collectorSelection = selectedSurface?.collectorSelection || chooseHydraulic(qr, state.fillRatio || '0.7', state.slopeCmM, selectedIsRoof ? 'DN 70' : 'DN 100');
   const stackSelection = selectedSurface?.stackSelection || chooseHydraulic(qPerStack, '0.7', state.slopeCmM, selectedIsRoof ? 'DN 70' : 'DN 100');
+  const emergency = selectedSurface?.emergency || calcEmergencyOverflow(0, state, selectedSurface?.surfaceMode || mode);
   const warnings = validate(state, { surfaces, selectedSurface });
   return {
     mode,
@@ -134,6 +173,8 @@ export function calculate(state) {
     rdt,
     r100,
     qr,
+    qNot: emergency.qNot || 0,
+    emergency,
     drainSize: drain.dn,
     drainHead: drain.head,
     drainCapacity: drain.capacity,

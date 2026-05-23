@@ -1,5 +1,11 @@
 # Release Notes
 
+## 1.2.5 - Regenwasser Notentwässerung und Header-Fix
+- Header-Hintergrund für GitHub Pages / Netlify vereinheitlicht und schwarzen Balken entfernt.
+- Regenwasser Phase 2: Notentwässerung als Vorbemessung ergänzt.
+- r(5,100), Notabfluss Qnot, Notüberlaufanzahl und erforderliche Überlaufbreite in den Flächen-Klappcards ergänzt.
+- Überflutungsnachweis bleibt bewusst für ein separates späteres Modul ausgeklammert.
+
 ## 1.2.4 - Regenwasser Flächenauswahl und UX-Korrektur
 
 - Ergebnis-Card zeigt nur noch die markierte bzw. zuletzt berechnete Dach-/Grundstücksfläche.
