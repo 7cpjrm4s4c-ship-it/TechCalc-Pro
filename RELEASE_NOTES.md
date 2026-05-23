@@ -1,5 +1,11 @@
 # Release Notes
 
+## 1.2.10 - Header und Schmutzwasser UI Hotfix
+- Sichtbaren Header-Rahmen entfernt; Milchglas-Optik bleibt erhalten.
+- E-Mail-Fallback im Feedback-Dialog entfernt, damit keine private Zieladresse sichtbar wird.
+- Schmutzwasser-Dimensionierungszeilen für mobile Ansichten stabilisiert.
+- Leitungsart-Auswahl im Schmutzwasser bleibt nach Auswahl rechts liegender Tabs sichtbar und aktiv.
+
 ## 1.2.9 - Header Safe-Area Statusbar Hotfix
 - Safe-Area oberhalb des Headers auf dieselbe Milchglas-Optik wie der Header gesetzt.
 - Theme-Color und Manifest-Farben für GitHub/Netlify vereinheitlicht.

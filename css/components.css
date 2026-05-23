@@ -4410,3 +4410,51 @@ body::before {
   backdrop-filter: blur(22px) saturate(130%) !important;
   pointer-events: none;
 }
+
+
+/* v1.2.10: Header ohne sichtbaren Rahmen, Feedback ohne Mail-Fallback, Schmutzwasser Mobile-Fixes */
+.app-header,
+.app-header.glass-surface,
+.app-header.is-scrolled,
+.app-header.glass-surface.is-scrolled {
+  border: 0 !important;
+  border-bottom: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+.app-header::before,
+body::before {
+  border: 0 !important;
+  border-bottom: 0 !important;
+}
+.module-view[data-module='wastewater'] .result-row {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+  align-items: start;
+  column-gap: 12px;
+}
+.module-view[data-module='wastewater'] .result-row span {
+  min-width: 0;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+.module-view[data-module='wastewater'] .result-row strong {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.module-view[data-module='wastewater'] .card:has(.wastewater-line-selector) {
+  overflow: hidden;
+}
+.module-view[data-module='wastewater'] .wastewater-line-selector {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+.module-view[data-module='wastewater'] .wastewater-line-selector button {
+  scroll-snap-align: center;
+}

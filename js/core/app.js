@@ -145,16 +145,14 @@ function applyThemeMode(mode = sessionStorage.getItem(THEME_STORAGE_KEY) || 'sys
 
 applyThemeMode();
 
-const APP_VERSION = '1.2.9';
+const APP_VERSION = '1.2.10';
 const FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
-const FEEDBACK_RECIPIENT = 'stefan.filly@proton.me';
 
 function initFeedbackForm() {
   const form = document.getElementById('feedbackForm');
   if (!form) return;
   const status = document.getElementById('feedbackStatus');
   const submit = document.getElementById('feedbackSubmit');
-  const mailto = document.getElementById('feedbackMailto');
 
   function setStatus(message, type = '') {
     if (!status) return;
@@ -170,25 +168,6 @@ function initFeedbackForm() {
     data.set('timestamp', new Date().toISOString());
     return data;
   }
-
-  function openMailFallback() {
-    const data = buildPayload();
-    const subject = data.get('subject') || 'TechCalc Pro Feedback';
-    const lines = [
-      data.get('message') || '',
-      '',
-      '---',
-      `Name: ${data.get('name') || '-'}`,
-      `E-Mail: ${data.get('email') || '-'}`,
-      `Version: ${APP_VERSION}`,
-      `Modul: ${currentRoute()}`,
-      `Zeitpunkt: ${new Date().toLocaleString('de-DE')}`
-    ];
-    const href = `mailto:${FEEDBACK_RECIPIENT}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
-    window.location.href = href;
-  }
-
-  mailto?.addEventListener('click', openMailFallback);
 
   form.addEventListener('submit', async event => {
     event.preventDefault();
@@ -213,7 +192,7 @@ function initFeedbackForm() {
       setStatus('Feedback wurde gesendet. Danke!', 'success');
     } catch (error) {
       console.error('Feedback konnte nicht gesendet werden:', error);
-      setStatus('Feedback konnte nicht direkt gesendet werden. Bitte E-Mail-Fallback nutzen.', 'error');
+      setStatus('Feedback konnte nicht direkt gesendet werden. Bitte später erneut versuchen.', 'error');
     } finally {
       submit.disabled = false;
       submit.textContent = 'Feedback senden';

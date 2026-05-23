@@ -156,16 +156,15 @@
         <details class="settings-submenu">
           <summary>Feedback senden</summary>
           <div class="settings-submenu__content settings-form">
-            <p>Feedback wird direkt aus der App über Formspree an die hinterlegte Projektadresse gesendet. Falls der Versand nicht möglich ist, bleibt ein E-Mail-Fallback verfügbar.</p>
+            <p>Feedback wird direkt aus der App über Formspree an die hinterlegte Projektadresse gesendet.</p>
             <form id="feedbackForm" class="settings-form feedback-form">
               <label>Name optional<input id="feedbackName" name="name" type="text" autocomplete="name" placeholder="Name"></label>
               <label>E-Mail optional<input id="feedbackEmail" name="email" type="email" autocomplete="email" placeholder="name@example.com"></label>
               <label>Betreff<input id="feedbackSubject" name="subject" type="text" required value="TechCalc Pro Feedback"></label>
               <label>Nachricht<textarea id="feedbackMessage" name="message" required rows="6" placeholder="Feedback, Fehlerbeschreibung oder Verbesserungsvorschlag"></textarea></label>
               <input type="hidden" name="app" value="TechCalc Pro">
-              <input type="hidden" name="version" value="1.2.8">
-              <div class="settings-actions settings-actions--split">
-                <button class="mini-button" id="feedbackMailto" type="button">E-Mail-Fallback</button>
+              <input type="hidden" name="version" value="1.2.10">
+              <div class="settings-actions">
                 <button class="mini-button mini-button--primary" id="feedbackSubmit" type="submit">Feedback senden</button>
               </div>
               <div id="feedbackStatus" class="settings-hint" aria-live="polite"></div>
@@ -177,7 +176,7 @@
         <details class="settings-submenu">
           <summary>Rechtliches & App</summary>
           <div class="settings-submenu__content settings-form">
-            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.0.13</strong></div>
+            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.2.10</strong></div>
             <button class="mini-button" type="button" disabled>Impressum vorbereiten</button>
             <button class="mini-button" type="button" disabled>AGB vorbereiten</button>
           </div>

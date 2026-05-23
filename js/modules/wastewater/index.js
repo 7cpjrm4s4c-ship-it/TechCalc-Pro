@@ -52,8 +52,9 @@ function resolveLineType(family, ventilation, previous = 'single-unvented') {
   if (family === 'branch') return ventilation === 'vented' ? 'branch-vented' : 'branch-unvented';
   return family || previous;
 }
-function miniSegment(buttons) {
-  return `<div class="segmented segmented--green" role="tablist">${buttons.map(btn => `<button type="button" ${btn.attr}="${esc(btn.value)}" class="${btn.active ? 'is-active' : ''}">${esc(btn.label)}</button>`).join('')}</div>`;
+function miniSegment(buttons, extraClass = '') {
+  const cls = extraClass ? ` ${extraClass}` : '';
+  return `<div class="segmented segmented--green${cls}" role="tablist">${buttons.map(btn => `<button type="button" ${btn.attr}="${esc(btn.value)}" class="${btn.active ? 'is-active' : ''}">${esc(btn.label)}</button>`).join('')}</div>`;
 }
 function lineTypeSelector(s) {
   const family = lineFamilyValue(s.lineType);
@@ -68,7 +69,7 @@ function lineTypeSelector(s) {
     ['ground-full', 'Vollfüllung'],
     ['ventilation', 'Lüftung']
   ];
-  const blocks = [miniSegment(families.map(([value, label]) => ({ attr:'data-line-family', value, label, active: family === value })) )];
+  const blocks = [miniSegment(families.map(([value, label]) => ({ attr:'data-line-family', value, label, active: family === value })), 'wastewater-line-selector')];
   if (family === 'single' || family === 'branch') {
     blocks.push(`<div class="wastewater-subselect"><span>Ausführung</span>${miniSegment([
       { attr:'data-line-ventilation', value:'unvented', label:'unbelüftet', active: ventilation === 'unvented' },
@@ -234,6 +235,10 @@ function updateFixture(id, patch) {
   state.set({ fixtures: (current.fixtures || []).map(item => String(item.id) === String(id) ? { ...item, ...patch } : item) });
 }
 function bindActions(root) {
+  const activeLineButton = root.querySelector('.wastewater-line-selector button.is-active');
+  if (activeLineButton) {
+    requestAnimationFrame(() => activeLineButton.scrollIntoView({ block: 'nearest', inline: 'center' }));
+  }
   bindEditModeClear(root, { state, activeIdKey: 'activeCalculationId', nameKey: 'name', onClear: () => state.set(clearedInputs(state.get())) });
   root.querySelector('[data-fixture-add]')?.addEventListener('click', () => {
     const current = state.get();
@@ -262,12 +267,14 @@ function bindActions(root) {
     const current = state.get();
     state.set({ fixtures: (current.fixtures || []).filter(item => String(item.id) !== String(btn.dataset.fixtureDelete)) });
   }));
-  root.querySelectorAll('[data-line-family]').forEach(btn => btn.addEventListener('click', () => {
+  root.querySelectorAll('[data-line-family]').forEach(btn => btn.addEventListener('click', event => {
+    event.preventDefault();
     const current = state.get();
     const ventilation = lineVentilationValue(current.lineType);
     state.set({ lineType: resolveLineType(btn.dataset.lineFamily, ventilation, current.lineType) });
   }));
-  root.querySelectorAll('[data-line-ventilation]').forEach(btn => btn.addEventListener('click', () => {
+  root.querySelectorAll('[data-line-ventilation]').forEach(btn => btn.addEventListener('click', event => {
+    event.preventDefault();
     const current = state.get();
     const family = lineFamilyValue(current.lineType);
     state.set({ lineType: resolveLineType(family, btn.dataset.lineVentilation, current.lineType) });
