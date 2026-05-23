@@ -1,5 +1,10 @@
 # Release Notes
 
+## 1.2.9 - Header Safe-Area Statusbar Hotfix
+- Safe-Area oberhalb des Headers auf dieselbe Milchglas-Optik wie der Header gesetzt.
+- Theme-Color und Manifest-Farben für GitHub/Netlify vereinheitlicht.
+- Header selbst auf ursprüngliche Milchglas-Optik belassen.
+
 ## 1.2.8 - Header Safe-Area Hotfix
 - Header wieder auf ursprüngliche Milchglas-Optik zurückgesetzt.
 - Safe-Area/Statusbar-Bereich oberhalb des Headers erhält die gleiche Glasfläche statt schwarzem Hintergrund.

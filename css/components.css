@@ -4374,3 +4374,39 @@ body.settings-open {
   letter-spacing: .18em;
   text-transform: uppercase;
 }
+
+
+/* v1.2.9: iOS/standalone safe-area status band must use the same milk-glass header tone. */
+html,
+body {
+  background-color: #121922;
+}
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: max(env(safe-area-inset-top, 0px), constant(safe-area-inset-top, 0px), 0px);
+  min-height: max(env(safe-area-inset-top, 0px), constant(safe-area-inset-top, 0px), 0px);
+  background: var(--header-glass-bg) !important;
+  background-color: rgba(18, 25, 34, .62) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(130%) !important;
+  backdrop-filter: blur(22px) saturate(130%) !important;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  z-index: 100000;
+  pointer-events: none;
+}
+.app-header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: max(env(safe-area-inset-top, 0px), constant(safe-area-inset-top, 0px), 0px);
+  background: var(--header-glass-bg) !important;
+  background-color: rgba(18, 25, 34, .62) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(130%) !important;
+  backdrop-filter: blur(22px) saturate(130%) !important;
+  pointer-events: none;
+}
