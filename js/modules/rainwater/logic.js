@@ -13,68 +13,70 @@ export function getDrainByDn(dn) {
   return roofDrainTable.find(item => item.dn === (dn || 'DN 100')) || roofDrainTable.find(item => item.dn === 'DN 100') || roofDrainTable[0];
 }
 
-function getRainForMode(state, mode) {
-  if (mode === 'property') return toNumber(state.propertyRainIntensity || state.rainIntensity || '300');
-  return toNumber(state.roofRainIntensity || state.rainIntensity || '300');
+function getRainForMode(source, mode) {
+  if (mode === 'property') return toNumber(source.propertyRainIntensity || source.rainIntensity || '300');
+  return toNumber(source.roofRainIntensity || source.rainIntensity || '300');
 }
 
-function currentDrainSettings(state) {
-  const preset = getDrainByDn(state.drainSize || 'DN 100');
-  const dn = state.drainSizeManual || state.drainSize || preset?.dn || 'DN 100';
-  const capacity = toNumber(state.drainCapacity || preset?.capacity || state.roofDrainCapacity);
-  const head = toNumber(state.drainHead || preset?.head);
+function currentDrainSettings(source = {}, fallback = {}) {
+  const preset = getDrainByDn(source.drainSize || fallback.drainSize || 'DN 100');
+  const dn = source.drainSizeManual || source.drainSize || fallback.drainSizeManual || fallback.drainSize || preset?.dn || 'DN 100';
+  const capacity = toNumber(source.drainCapacity || fallback.drainCapacity || preset?.capacity || fallback.roofDrainCapacity);
+  const head = toNumber(source.drainHead || fallback.drainHead || preset?.head);
   return { dn, capacity, head };
 }
 
 
-function emergencySettings(state) {
-  const enabled = state.emergencyEnabled !== 'no';
-  const type = state.emergencyType || 'rect';
-  const head = Math.max(0, toNumber(state.emergencyHead || '35'));
-  const width = Math.max(0, toNumber(state.emergencyWidth || '300'));
-  const diameter = Math.max(0, toNumber(state.emergencyDiameter || '100'));
-  const manualCapacity = toNumber(state.emergencyCapacity);
-  const safetyFactor = Math.max(0, toNumber(state.emergencySafetyFactor || '1,0')) || 1;
-  return { enabled, type, head, width, diameter, manualCapacity, safetyFactor };
+function emergencySettings(source = {}, fallback = {}) {
+  const type = source.emergencyType || fallback.emergencyType || 'rect';
+  const head = Math.max(0, toNumber(source.emergencyHead || fallback.emergencyHead || '35'));
+  const width = Math.max(0, toNumber(source.emergencyWidth || fallback.emergencyWidth || '300'));
+  const diameter = Math.max(0, toNumber(source.emergencyDiameter || fallback.emergencyDiameter || '100'));
+  const manufacturerDn = source.emergencyManufacturerDn || fallback.emergencyManufacturerDn || '';
+  const manualCapacity = toNumber(source.emergencyCapacity || fallback.emergencyCapacity);
+  const safetyFactor = Math.max(0, toNumber(source.emergencySafetyFactor || fallback.emergencySafetyFactor || '1,0')) || 1;
+  return { type, head, width, diameter, manufacturerDn, manualCapacity, safetyFactor };
 }
 
-function calcEmergencyOverflow(qNotBase, state, mode) {
-  const settings = emergencySettings(state);
-  const qNot = mode === 'roof' && settings.enabled ? Math.max(0, qNotBase * settings.safetyFactor) : 0;
+function calcEmergencyOverflow(qNotBase, source, mode, fallback = {}) {
+  const settings = emergencySettings(source, fallback);
+  const qNot = mode === 'roof' ? Math.max(0, qNotBase * settings.safetyFactor) : 0;
   const head = settings.head;
-  const rectCapacity = settings.width > 0 && head > 0 ? (settings.width * Math.pow(head, 1.5)) / 24000 : 0;
+  const rectCapacity = settings.type === 'rect' && settings.width > 0 && head > 0 ? (settings.width * Math.pow(head, 1.5)) / 24000 : 0;
+  const manualCapacity = settings.manualCapacity > 0 ? settings.manualCapacity : 0;
+  const capacity = settings.type === 'rect' ? (manualCapacity || rectCapacity) : manualCapacity;
+  const requiredCount = capacity > 0 ? Math.ceil(qNot / capacity) : 0;
   const rectRequiredWidth = qNot > 0 && head > 0 ? (qNot * 24000) / Math.pow(head, 1.5) : 0;
-  const manualCapacity = settings.manualCapacity > 0 ? settings.manualCapacity : rectCapacity;
-  const requiredCount = manualCapacity > 0 ? Math.ceil(qNot / manualCapacity) : 0;
+  const rectWidthPerOverflow = settings.type === 'rect' && requiredCount > 0 ? rectRequiredWidth / requiredCount : 0;
   return {
     ...settings,
     qNot,
     qNotBase,
-    capacity: manualCapacity,
+    capacity,
     rectCapacity,
     rectRequiredWidth,
+    rectWidthPerOverflow,
     requiredCount
   };
 }
 
 function surfaceRows(state) {
   const currentMode = state.surfaceMode || state.calculationType || 'roof';
-  const drain = currentDrainSettings(state);
-  const stackCount = Math.max(1, Math.floor(toNumber(state.stackCount)) || 1);
-  const fillRatio = state.fillRatio || '0.7';
-  const slopeCmM = state.slopeCmM || '1,0';
-
   return (state.surfaces || []).map(item => {
     const mode = item.surfaceMode || item.calculationType || currentMode;
     const base = getAreaType(item.areaType);
     const area = Math.max(0, toNumber(item.areaSize));
     const cs = base.custom ? Math.max(0, toNumber(item.customCs)) : base.cs;
     const cm = base.custom ? Math.max(0, toNumber(item.customCm)) : base.cm;
-    const rdt = getRainForMode(state, mode);
-    const r100 = toNumber(state.rainHundredIntensity);
+    const rdt = getRainForMode(item, mode) || getRainForMode(state, mode);
+    const r100 = toNumber(item.rainHundredIntensity || state.rainHundredIntensity);
+    const drain = currentDrainSettings(item, state);
+    const stackCount = Math.max(1, Math.floor(toNumber(item.stackCount || state.stackCount)) || 1);
+    const fillRatio = item.fillRatio || state.fillRatio || '0.7';
+    const slopeCmM = item.slopeCmM || state.slopeCmM || '1,0';
     const qr = rdt * cs * area / 10000;
     const qNotBase = mode === 'roof' ? Math.max(0, (r100 - rdt) * cs * area / 10000) : 0;
-    const emergency = calcEmergencyOverflow(qNotBase, state, mode);
+    const emergency = calcEmergencyOverflow(qNotBase, item, mode, state);
     const itemRequiredDrains = drain.capacity > 0 ? Math.ceil(qr / drain.capacity) : 0;
     const itemQPerStack = qr / stackCount;
     const collectorMinDn = mode === 'property' ? 'DN 100' : 'DN 70';
@@ -134,7 +136,7 @@ function validate(state, r) {
   if (slope < 0.5) warnings.push('Mindestgefälle für Sammel-/Grundleitungen innerhalb von Gebäuden: 0,5 cm/m.');
   if (mode === 'property' && slope < 1) warnings.push('Bei Grundleitungen außerhalb von Gebäuden sind 1,0 cm/m Gefälle und v ≥ 0,7 m/s zu prüfen.');
   warnings.push(`Regenspende ${mode === 'property' ? 'r(5,2)' : 'r(5,5)'} und r(5,100) standortbezogen über KOSTRA/OpenKo ermitteln und manuell eintragen.`);
-  if (mode === 'roof' && state.emergencyEnabled !== 'no') warnings.push('Notentwässerung als Vorbemessung berücksichtigt. Überflutungsnachweis und Rückhalteraumbemessung sind nicht Bestandteil dieser Berechnung.');
+  if (mode === 'roof') warnings.push('Notentwässerung als Vorbemessung berücksichtigt. Überflutungsnachweis und Rückhalteraumbemessung sind nicht Bestandteil dieser Berechnung.');
   warnings.push('Die Ergebnis-Card zeigt die markierte bzw. zuletzt hinzugefügte Fläche. Weitere Flächen werden separat in den Klappcards berechnet.');
   return warnings;
 }
@@ -147,12 +149,13 @@ export function calculate(state) {
   const selectedId = state.activeSurfaceId || lastSurfaceId;
   const selectedSurface = surfaces.find(item => String(item.id) === String(selectedId)) || surfaces[surfaces.length - 1] || null;
   const selectedArea = selectedSurface?.area || 0;
-  const rdt = getRainForMode(state, selectedSurface?.surfaceMode || mode);
-  const r100 = toNumber(state.rainHundredIntensity);
+  const selectedMode = selectedSurface?.surfaceMode || mode;
+  const rdt = selectedSurface?.rdt || getRainForMode(state, selectedMode);
+  const r100 = selectedSurface?.r100 || toNumber(state.rainHundredIntensity);
   const qr = selectedSurface?.qr || 0;
   const csResulting = selectedSurface?.cs || 0;
   const cmResulting = selectedSurface?.cm || 0;
-  const drain = currentDrainSettings(state);
+  const drain = selectedSurface ? currentDrainSettings(selectedSurface, state) : currentDrainSettings(state);
   const requiredDrains = selectedSurface?.requiredDrains || 0;
   const stackCount = selectedSurface?.stackCount || Math.max(1, Math.floor(toNumber(state.stackCount)) || 1);
   const qPerStack = selectedSurface?.qPerStack || 0;

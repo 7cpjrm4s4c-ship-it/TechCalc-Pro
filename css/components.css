@@ -4317,7 +4317,7 @@ body.settings-open {
 }
 
 
-/* v1.2.5: Header transparent across GitHub Pages / Netlify and Regenwasser Notentwässerung */
+/* v1.2.6: Regenwasser Notentwässerung UX und Flächenbearbeitung */
 .app-header,
 .app-header.is-scrolled {
   background: rgba(8, 12, 24, .28) !important;

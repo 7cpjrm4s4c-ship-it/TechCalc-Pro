@@ -1,5 +1,14 @@
 # Release Notes
 
+## 1.2.6 - Regenwasser Notentwässerung UX und Flächenbearbeitung
+- Notentwässerung wird bei Dachflächen ohne zusätzlichen Aktivierungs-Switch berechnet.
+- Eingaben für rechteckige/runde Notüberläufe werden kontextabhängig angezeigt.
+- Hersteller-DN und Hersteller-Abflusswert für Notüberläufe ergänzt.
+- Regenflächen sind auswählbar und nachträglich editierbar; Änderungen werden auf die aktive Fläche übernommen.
+- Ergebnis-Card zeigt nur die markierte bzw. zuletzt berechnete Fläche.
+- Überlaufbreite wird je Notüberlauf ausgegeben.
+- Normhinweise-Format mit Leerzeichen nach Doppelpunkt gesichert.
+
 ## 1.2.5 - Regenwasser Notentwässerung und Header-Fix
 - Header-Hintergrund für GitHub Pages / Netlify vereinheitlicht und schwarzen Balken entfernt.
 - Regenwasser Phase 2: Notentwässerung als Vorbemessung ergänzt.

@@ -15,6 +15,7 @@ export const initialState = {
   emergencyWidth: '300',
   emergencyDiameter: '100',
   emergencyCapacity: '',
+  emergencyManufacturerDn: '',
   emergencySafetyFactor: '1,0',
   areaType: 'metal-roof',
   areaName: '',

@@ -28,7 +28,6 @@ const drainLabel = mode => mode === 'property' ? 'Hoftöpfe' : 'Dacheinläufe';
 const drainCapacityLabel = mode => mode === 'property' ? 'Abflussvermögen Hoftopf' : 'Abflussvermögen Dacheinlauf';
 const rainLabel = mode => mode === 'property' ? 'Regenspende r(5,2)' : 'Regenspende r(5,5)';
 const drainOptions = roofDrainTable.map(item => ({ value:item.dn, label:`${item.dn} · ${String(item.capacity).replace('.', ',')} l/s · ${item.head} mm Anstauhöhe` }));
-const emergencyOptions = opts([['yes','Notentwässerung vorbemessen'],['no','Nicht berücksichtigen']]);
 const emergencyTypeOptions = opts([['rect','Rechteckiger Notüberlauf'],['round','Runder Notüberlauf'],['manual','Herstellerwert / freie Eingabe']]);
 
 function savedSnapshot(s, r) {
@@ -121,17 +120,19 @@ function dimensionInputBlock(s) {
 function emergencyInputBlock(s) {
   const mode = s.surfaceMode || s.calculationType || 'roof';
   if (mode !== 'roof') return '<div class="empty-state empty-state--compact">Notentwässerung wird nur für Dachflächen vorbemessen.</div>';
-  return stack([
-    grid([
-      selectField({ id:'emergencyEnabled', label:'Notentwässerung', value:s.emergencyEnabled || 'yes', options:emergencyOptions }),
-      selectField({ id:'emergencyType', label:'Art Notentwässerung', value:s.emergencyType || 'rect', options:emergencyTypeOptions }),
-      field({ id:'emergencyHead', label:'Druckhöhe / Anstauhöhe', value:fmtInput(s.emergencyHead || '35',0), unit:'mm' }),
-      field({ id:'emergencyWidth', label:'Überlaufbreite Lw', value:fmtInput(s.emergencyWidth || '300',0), unit:'mm' }),
-      field({ id:'emergencyDiameter', label:'Durchmesser rund', value:fmtInput(s.emergencyDiameter || '100',0), unit:'mm' }),
-      field({ id:'emergencyCapacity', label:'Hersteller-Abflusswert optional', value:s.emergencyCapacity || '', unit:'l/s' }),
-      field({ id:'emergencySafetyFactor', label:'Sicherheitsfaktor', value:fmtDecimalInput(s.emergencySafetyFactor || '1,0',1) })
-    ].join(''), 2)
-  ].join(''));
+  const type = s.emergencyType || 'rect';
+  const fields = [
+    selectField({ id:'emergencyType', label:'Art Notentwässerung', value:type, options:emergencyTypeOptions }),
+    field({ id:'emergencyHead', label:'Druckhöhe / Anstauhöhe', value:fmtInput(s.emergencyHead || '35',0), unit:'mm' })
+  ];
+  if (type === 'rect') fields.push(field({ id:'emergencyWidth', label:'Überlaufbreite je Notüberlauf Lw', value:fmtInput(s.emergencyWidth || '300',0), unit:'mm' }));
+  if (type === 'round') fields.push(field({ id:'emergencyDiameter', label:'Durchmesser rund', value:fmtInput(s.emergencyDiameter || '100',0), unit:'mm' }));
+  if (type === 'manual') {
+    fields.push(field({ id:'emergencyManufacturerDn', label:'Hersteller-DN', value:s.emergencyManufacturerDn || '', placeholder:'DN 100', inputmode:'text' }));
+    fields.push(field({ id:'emergencyCapacity', label:'Hersteller-Abflusswert', value:s.emergencyCapacity || '', unit:'l/s' }));
+  }
+  fields.push(field({ id:'emergencySafetyFactor', label:'Sicherheitsfaktor', value:fmtDecimalInput(s.emergencySafetyFactor || '1,0',1) }));
+  return stack([grid(fields.join(''), 2)].join(''));
 }
 function surfaceInputBlock(s, r) {
   const selected = getAreaType(s.areaType || 'metal-roof');
@@ -194,8 +195,9 @@ function surfaceDimensionCards(r, s) {
         { label:'r(5,100)', value:fmt(item.r100,1), unit:'l/(s·ha)' },
         { label:'Notabfluss Qnot', value:fmt(item.emergency?.qNot || 0,2), unit:'l/s' },
         { label:'Notüberläufe', value:item.emergency?.requiredCount || 0, unit:'Stk.' },
-        { label:'erf. Überlaufbreite', value:item.emergency?.rectRequiredWidth ? fmt(item.emergency.rectRequiredWidth,0) : '—', unit:item.emergency?.rectRequiredWidth ? 'mm' : '' },
-        { label:'gewählte Überlaufleistung', value:item.emergency?.capacity ? fmt(item.emergency.capacity,2) : '—', unit:item.emergency?.capacity ? 'l/s' : '' },
+        { label:'erf. Überlaufbreite je Notüberlauf', value:item.emergency?.rectWidthPerOverflow ? fmt(item.emergency.rectWidthPerOverflow,0) : '—', unit:item.emergency?.rectWidthPerOverflow ? 'mm' : '' },
+        { label:'Notüberlauf-DN', value:item.emergency?.manufacturerDn || '—' },
+        { label:'gewählte Überlaufleistung je Notüberlauf', value:item.emergency?.capacity ? fmt(item.emergency.capacity,2) : '—', unit:item.emergency?.capacity ? 'l/s' : '' },
         { label:'Füllungsgrad', value:`h/di ${String(item.fillRatio).replace('.', ',')}` },
         { label:'angesetztes Gefälle', value:fmtStateNumber(item.slopeCmM,1), unit:'cm/m' }
       ])}<div class="ph-formula ph-formula--small">Qr = r × C × A / 10000 · Anzahl Abläufe = Qr / Ablaufleistung · Q je Fallleitung = Qr / Anzahl Fallleitungen</div></div>
@@ -220,12 +222,76 @@ function view(s) {
   const r = calculate(s);
   return renderModuleShell(config, `<div class="span-6">${inputCards(s, r)}</div><div class="span-6">${resultCards(s, r)}</div>`);
 }
+
+function surfacePatchFromState(current = {}) {
+  return {
+    surfaceMode: current.surfaceMode || current.calculationType || 'roof',
+    areaType: current.areaType,
+    areaName: current.areaName,
+    areaSize: current.areaSize,
+    customCs: current.customCs,
+    customCm: current.customCm,
+    roofRainIntensity: current.roofRainIntensity,
+    propertyRainIntensity: current.propertyRainIntensity,
+    rainHundredIntensity: current.rainHundredIntensity,
+    drainSize: current.drainSize,
+    drainSizeManual: current.drainSizeManual,
+    drainCapacity: current.drainCapacity,
+    drainHead: current.drainHead,
+    stackCount: current.stackCount,
+    slopeCmM: current.slopeCmM,
+    fillRatio: current.fillRatio,
+    emergencyType: current.emergencyType,
+    emergencyHead: current.emergencyHead,
+    emergencyWidth: current.emergencyWidth,
+    emergencyDiameter: current.emergencyDiameter,
+    emergencyManufacturerDn: current.emergencyManufacturerDn,
+    emergencyCapacity: current.emergencyCapacity,
+    emergencySafetyFactor: current.emergencySafetyFactor
+  };
+}
+function patchActiveSurfaceFromState() {
+  const current = state.get();
+  const activeId = current.activeSurfaceId;
+  if (!activeId) return;
+  const next = (current.surfaces || []).map(item => String(item.id) === String(activeId) ? { ...item, ...surfacePatchFromState(current) } : item);
+  state.set({ surfaces: next }, { notify:false });
+}
+function statePatchFromSurface(item = {}) {
+  return {
+    surfaceMode: item.surfaceMode || item.calculationType || 'roof',
+    calculationType: item.surfaceMode || item.calculationType || 'roof',
+    areaType: item.areaType || 'metal-roof',
+    areaName: item.areaName || '',
+    areaSize: item.areaSize || '100',
+    customCs: item.customCs || '',
+    customCm: item.customCm || '',
+    roofRainIntensity: item.roofRainIntensity,
+    propertyRainIntensity: item.propertyRainIntensity,
+    rainHundredIntensity: item.rainHundredIntensity,
+    drainSize: item.drainSize,
+    drainSizeManual: item.drainSizeManual,
+    drainCapacity: item.drainCapacity,
+    drainHead: item.drainHead,
+    stackCount: item.stackCount,
+    slopeCmM: item.slopeCmM,
+    fillRatio: item.fillRatio,
+    emergencyType: item.emergencyType,
+    emergencyHead: item.emergencyHead,
+    emergencyWidth: item.emergencyWidth,
+    emergencyDiameter: item.emergencyDiameter,
+    emergencyManufacturerDn: item.emergencyManufacturerDn,
+    emergencyCapacity: item.emergencyCapacity,
+    emergencySafetyFactor: item.emergencySafetyFactor
+  };
+}
+const surfaceEditFields = new Set(['surfaceMode','areaType','areaName','areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity','drainSize','drainSizeManual','drainCapacity','drainHead','stackCount','slopeCmM','fillRatio','emergencyType','emergencyHead','emergencyWidth','emergencyDiameter','emergencyManufacturerDn','emergencyCapacity','emergencySafetyFactor']);
 function bindActions(root) {
   bindEditModeClear(root, { state, activeIdKey:'activeCalculationId', nameKey:'name', onClear: () => state.set(clearedInputs(state.get())) });
   root.querySelector('[data-surface-add]')?.addEventListener('click', () => {
     const current = state.get();
     const base = getAreaType(current.areaType || 'metal-roof');
-    const record = { id:`${Date.now()}-${Math.random().toString(16).slice(2)}`, surfaceMode:current.surfaceMode || current.calculationType || 'roof', areaType:current.areaType, areaName:current.areaName, areaSize:current.areaSize };
+    const record = { id:`${Date.now()}-${Math.random().toString(16).slice(2)}`, ...surfacePatchFromState(current) };
     if (base?.custom) { record.customCs = current.customCs; record.customCm = current.customCm; }
     state.set({ surfaces:[...(current.surfaces || []), record], activeSurfaceId:record.id, areaName:'', areaSize:'100', customCs:'', customCm:'' });
   });
@@ -237,12 +303,27 @@ function bindActions(root) {
   }));
   root.querySelectorAll('[data-surface-select], [data-surface-result-select]').forEach(el => el.addEventListener('click', event => {
     if (event.target.closest('[data-surface-delete]') || event.target.closest('[data-line-toggle]')) return;
-    state.set({ activeSurfaceId:el.dataset.surfaceSelect || el.dataset.surfaceResultSelect });
+    const id = el.dataset.surfaceSelect || el.dataset.surfaceResultSelect;
+    const current = state.get();
+    const item = (current.surfaces || []).find(entry => String(entry.id) === String(id));
+    state.set({ ...statePatchFromSurface(item), activeSurfaceId:id });
   }));
   root.querySelector('#drainSize')?.addEventListener('change', event => {
     const selected = roofDrainTable.find(item => item.dn === event.target.value);
     if (!selected) return;
-    state.set({ drainSize:selected.dn, drainSizeManual:selected.dn, drainCapacity:String(selected.capacity).replace('.', ','), drainHead:String(selected.head) });
+    state.set({ drainSize:selected.dn, drainSizeManual:selected.dn, drainCapacity:String(selected.capacity).replace('.', ','), drainHead:String(selected.head) }, { notify:false });
+    patchActiveSurfaceFromState();
+    state.set({}, { notify:true });
+  });
+
+  root.querySelectorAll('[data-field]').forEach(el => {
+    if (!surfaceEditFields.has(el.dataset.field)) return;
+    const applyPatch = () => patchActiveSurfaceFromState();
+    el.addEventListener('change', applyPatch);
+    el.addEventListener('blur', applyPatch);
+  });
+  root.querySelectorAll('[data-segment="surfaceMode"]').forEach(btn => {
+    btn.addEventListener('click', () => setTimeout(patchActiveSurfaceFromState, 0));
   });
   root.querySelector('[data-rainwater-save]')?.addEventListener('click', () => {
     const current = state.get();
