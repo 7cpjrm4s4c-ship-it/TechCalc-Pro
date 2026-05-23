@@ -103,15 +103,14 @@ function rainInputBlock(s) {
 }
 function dimensionInputBlock(s) {
   const mode = s.surfaceMode || s.calculationType || 'roof';
-  return stack([
-    grid([
-      selectField({ id:'drainSize', label:mode === 'property' ? 'Vorwahl Hoftopf' : 'Vorwahl Dacheinlauf', value:s.drainSize || 'DN 100', options:drainOptions }),
-      field({ id:'drainSizeManual', label:'DN manuell', value:s.drainSizeManual || s.drainSize || 'DN 100', placeholder:'DN 100', inputmode:'text' }),
-      field({ id:'drainCapacity', label:'Abflusswert manuell', value:fmtInput(s.drainCapacity,1), unit:'l/s' }),
-      field({ id:'drainHead', label:'Anstauhöhe manuell', value:fmtInput(s.drainHead,0), unit:'mm' }),
-      field({ id:'stackCount', label:'Anzahl Fallleitungen', value:fmtInput(s.stackCount,0), unit:'Stk.' })
-    ].join(''), 2)
-  ].join(''));
+  const fields = [
+    selectField({ id:'drainSize', label:mode === 'property' ? 'Vorwahl Hoftopf' : 'Vorwahl Dacheinlauf', value:s.drainSize || 'DN 100', options:drainOptions }),
+    field({ id:'drainSizeManual', label:'DN manuell', value:s.drainSizeManual || s.drainSize || 'DN 100', placeholder:'DN 100', inputmode:'text' }),
+    field({ id:'drainCapacity', label:'Abflusswert manuell', value:fmtInput(s.drainCapacity,1), unit:'l/s' }),
+    field({ id:'drainHead', label:'Anstauhöhe manuell', value:fmtInput(s.drainHead,0), unit:'mm' })
+  ];
+  if (mode === 'roof') fields.push(field({ id:'stackCount', label:'Anzahl Fallleitungen', value:fmtInput(s.stackCount,0), unit:'Stk.' }));
+  return stack([grid(fields.join(''), 2)].join(''));
 }
 
 function emergencyInputBlock(s) {
@@ -181,11 +180,13 @@ function surfaceDimensionCards(r, s) {
       { label:drainLabel(mode), value:item.requiredDrains, unit:'Stk.' },
       { label:'gewählte Ablaufdimension', value:item.drainSize || '—' },
       { label:'Ablaufleistung je Ablauf', value:fmt(item.drainCapacity,1), unit:'l/s' },
-      { label:'Anstauhöhe Ablauf', value:item.drainHead || '—', unit:item.drainHead ? 'mm' : '' },
+      { label:'Anstauhöhe Ablauf', value:item.drainHead || '—', unit:item.drainHead ? 'mm' : '' }
+    ];
+    if (isRoof) mainRows.push(
       { label:'Anzahl Fallleitungen', value:item.stackCount, unit:'Stk.' },
       { label:'Q je Fallleitung', value:fmt(item.qPerStack,2), unit:'l/s' },
       { label:'DN Fallleitung', value:item.stackSelection?.dn || '—' }
-    ];
+    );
     const emergencyRows = isRoof ? [
       { label:'r(5,100)', value:fmt(item.r100,1), unit:'l/(s·ha)' },
       { label:'Notabfluss Qnot', value:fmt(item.emergency?.qNot || 0,2), unit:'l/s' },
@@ -197,7 +198,7 @@ function surfaceDimensionCards(r, s) {
     ] : [];
     return `<article class="line-section-card ${active ? 'is-active' : ''} ${active ? '' : 'is-collapsed'}" data-line-card data-surface-result-select="${esc(item.id)}">
       <div class="line-section-card__head">
-        <div class="line-section-card__title"><strong>${esc(item.name)}</strong><small>${fmt(item.area,1)} m² · Qr ${fmt(item.qr,2)} l/s · FL ${item.stackSelection?.dn || '—'}</small></div>
+        <div class="line-section-card__title"><strong>${esc(item.name)}</strong><small>${fmt(item.area,1)} m² · Qr ${fmt(item.qr,2)} l/s · ${drainLabel(mode)} ${item.requiredDrains} Stk.${isRoof ? ` · FL ${item.stackSelection?.dn || '—'}` : ''}</small></div>
         <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="${active ? 'true' : 'false'}" aria-label="Flächendimensionierung aufklappen"><span>${active ? '▴' : '▾'}</span></button>
       </div>
       <div class="line-section-card__body">
@@ -210,14 +211,16 @@ function surfaceDimensionCards(r, s) {
 }
 function resultCards(s, r) {
   const mode = r.selectedSurface?.surfaceMode || r.mode || s.surfaceMode || 'roof';
+  const isRoof = mode === 'roof';
+  const secondary = [
+    { label:'Entwässerungsmenge', value:fmt(r.qr,2), unit:'l/s' },
+    { label:'Ablaufdimension', value:r.drainSize || '—' },
+    { label:'Abläufe', value:r.requiredDrains, unit:'Stk.' },
+    { label:'markierte Fläche', value:r.selectedSurface?.name || '—' }
+  ];
+  if (isRoof) secondary.splice(1, 0, { label:'DN Fallleitung', value:r.stackSelection?.dn || '—' }, { label:'Notabfluss Qnot', value:fmt(r.qNot || 0,2), unit:'l/s' });
   return stack([
-    mainResult('Ergebnis Regenwasser', { label:'DN Fallleitung', value:r.stackSelection?.dn || '—' }, [
-      { label:drainLabel(mode), value:r.requiredDrains, unit:'Stk.' },
-      { label:'Entwässerungsmenge', value:fmt(r.qr,2), unit:'l/s' },
-      { label:'Ablaufdimension', value:r.drainSize || '—' },
-      { label:'Notabfluss Qnot', value:fmt(r.qNot || 0,2), unit:'l/s' },
-      { label:'markierte Fläche', value:r.selectedSurface?.name || '—' }
-    ], 'green'),
+    mainResult('Ergebnis Regenwasser', { label:isRoof ? 'DN Fallleitung' : drainLabel(mode), value:isRoof ? (r.stackSelection?.dn || '—') : r.requiredDrains, unit:isRoof ? '' : 'Stk.' }, secondary, 'green'),
     card('Flächen / Berechnung', surfaceDimensionCards(r, s), 'green'),
     card('Normhinweise / Plausibilität', warningList(r.warnings, s), 'green')
   ].join(''));

@@ -21,8 +21,9 @@ function consumerOptions() {
 
 function draftConsumerList(items, type) {
   if (!items?.length) return '<div class="empty-state empty-state--compact">Noch keine Verbraucher ausgewählt</div>';
-  return `<div class="dw-consumer-list">${items.map((c, index) => `<div class="dw-consumer-row">
-    <div><strong>${esc(c.count)} × ${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr, 2)} l/s je Verbraucher${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div>
+  return `<div class="dw-consumer-list">${items.map((c, index) => `<div class="dw-consumer-row dw-consumer-row--editable">
+    <div><strong>${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr, 2)} l/s je Verbraucher${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div>
+    <label class="mini-edit-field"><span>Anzahl</span><input type="number" min="0" step="1" value="${esc(c.count)}" data-dw-draft-count="${esc(type)}" data-index="${index}" inputmode="numeric"></label>
     <button type="button" data-dw-remove-draft="${esc(type)}" data-index="${index}" aria-label="Verbraucher entfernen">×</button>
   </div>`).join('')}</div>`;
 }
@@ -237,52 +238,6 @@ function bindDrinkingWater(root, signal) {
   }, { signal });
 
   root.addEventListener('change', event => {
-    const el = event.target.closest('[data-field]');
-    if (!el || !root.contains(el)) return;
-    state.set({ [el.dataset.field]: el.value }, { notify:false });
-    refresh(root);
-  }, { signal });
-
-  root.addEventListener('toggle', event => {
-    const details = event.target && typeof event.target.closest === 'function' ? event.target.closest('[data-dw-accordion]') : null;
-    if (!details || !root.contains(details)) return;
-    state.set({ [details.dataset.dwAccordion]: details.open }, { notify:false });
-  }, { capture: true, signal });
-
-  root.addEventListener('click', event => {
-    const lineToggle = event.target.closest('[data-line-toggle]');
-    if (lineToggle && root.contains(lineToggle)) {
-      event.preventDefault(); event.stopPropagation();
-      const itemCard = lineToggle.closest('[data-line-card]');
-      const collapsed = itemCard?.classList.toggle('is-collapsed');
-      lineToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-      return;
-    }
-
-    const segment = event.target.closest('[data-segment]');
-    if (segment && root.contains(segment)) {
-      const patch = { [segment.dataset.segment]: segment.dataset.value };
-      state.set(patch, { notify:false });
-      syncFieldValues(root, patch);
-      refresh(root);
-      return;
-    }
-
-    const draftAdd = event.target.closest('[data-dw-draft-add]');
-    if (draftAdd && root.contains(draftAdd)) {
-      const s = state.get();
-      const isUnit = draftAdd.dataset.dwDraftAdd === 'unit';
-      const consumer = createConsumer({
-        typeId: isUnit ? s.unitConsumerType : s.singleConsumerType,
-        count: isUnit ? s.unitCount : s.singleCount,
-        permanent: !isUnit && String(s.singlePermanent) === 'true'
-      });
-      const key = isUnit ? 'unitDraftConsumers' : 'singleDraftConsumers';
-      state.set({ [key]: [...(s[key] || []), consumer] }, { notify:false });
-      refresh(root);
-      return;
-    }
-
     const removeDraft = event.target.closest('[data-dw-remove-draft]');
     if (removeDraft && root.contains(removeDraft)) {
       const s = state.get();
@@ -406,7 +361,7 @@ function bindDrinkingWater(root, signal) {
 
 
     const current = state.get();
-    const ignored = event.target.closest('[data-dw-unit-edit], [data-dw-single-edit], [data-dw-unit-delete], [data-dw-single-delete], [data-dw-add-unit], [data-dw-update-unit], [data-dw-add-single], [data-dw-update-single], [data-dw-draft-add], [data-dw-remove-draft], details, summary, input, select, textarea, button, label, .segmented');
+    const ignored = event.target.closest('[data-dw-unit-edit], [data-dw-single-edit], [data-dw-unit-delete], [data-dw-single-delete], [data-dw-add-unit], [data-dw-update-unit], [data-dw-add-single], [data-dw-update-single], [data-dw-draft-add], [data-dw-remove-draft], [data-dw-draft-count], details, summary, input, select, textarea, button, label, .segmented');
     if (!ignored && (current.activeUnitId || current.activeSingleId)) {
       state.set({ activeUnitId:null, activeSingleId:null, unitName:'', singleName:'', unitDraftConsumers:[], singleDraftConsumers:[] }, { notify:false });
       root.innerHTML = view(state.get());

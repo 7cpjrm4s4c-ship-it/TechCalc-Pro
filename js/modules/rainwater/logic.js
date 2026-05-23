@@ -71,14 +71,14 @@ function surfaceRows(state) {
     const rdt = getRainForMode(item, mode) || getRainForMode(state, mode);
     const r100 = toNumber(item.rainHundredIntensity || state.rainHundredIntensity);
     const drain = currentDrainSettings(item, state);
-    const stackCount = Math.max(1, Math.floor(toNumber(item.stackCount || state.stackCount)) || 1);
+    const stackCount = mode === 'roof' ? (Math.max(1, Math.floor(toNumber(item.stackCount || state.stackCount)) || 1)) : 0;
     const fillRatio = item.fillRatio || state.fillRatio || '0.7';
     const slopeCmM = item.slopeCmM || state.slopeCmM || '1,0';
     const qr = rdt * cs * area / 10000;
     const qNotBase = mode === 'roof' ? Math.max(0, (r100 - rdt) * cs * area / 10000) : 0;
     const emergency = calcEmergencyOverflow(qNotBase, item, mode, state);
     const itemRequiredDrains = drain.capacity > 0 ? Math.ceil(qr / drain.capacity) : 0;
-    const itemQPerStack = qr / stackCount;
+    const itemQPerStack = mode === 'roof' && stackCount > 0 ? qr / stackCount : 0;
     const collectorMinDn = mode === 'property' ? 'DN 100' : 'DN 70';
     const stackMinDn = mode === 'property' ? 'DN 100' : 'DN 70';
     return {
@@ -105,7 +105,7 @@ function surfaceRows(state) {
       fillRatio,
       slopeCmM,
       collectorSelection: chooseHydraulic(qr, fillRatio, slopeCmM, collectorMinDn),
-      stackSelection: chooseHydraulic(itemQPerStack, '0.7', slopeCmM, stackMinDn)
+      stackSelection: mode === 'roof' ? chooseHydraulic(itemQPerStack, '0.7', slopeCmM, stackMinDn) : null
     };
   });
 }
@@ -125,13 +125,13 @@ function validate(state, r) {
   const warnings = [];
   const mode = state.surfaceMode || state.calculationType || 'roof';
   const drain = currentDrainSettings(state);
-  const stackCount = Math.max(1, Math.floor(toNumber(state.stackCount)) || 1);
+  const stackCount = mode === 'roof' ? Math.max(1, Math.floor(toNumber(state.stackCount)) || 1) : 0;
 
   if (!r.surfaces.length) warnings.push('Noch keine Regenfläche erfasst.');
   if (!r.selectedSurface) warnings.push('Keine Fläche markiert. Bitte eine Fläche für die Ergebnisanzeige auswählen.');
   if ((r.selectedSurface?.qr || 0) <= 0) warnings.push('Qr ist 0 l/s. Regenspende, Fläche und Abflussbeiwert prüfen.');
   if (drain.capacity <= 0) warnings.push(`${mode === 'property' ? 'Abflussvermögen des Hoftopfs' : 'Abflussvermögen des Dacheinlaufs'} eingeben.`);
-  if (stackCount < 1) warnings.push('Anzahl Fallleitungen muss mindestens 1 betragen.');
+  if (mode === 'roof' && stackCount < 1) warnings.push('Anzahl Fallleitungen muss mindestens 1 betragen.');
   warnings.push(`Regenspende ${mode === 'property' ? 'r(5,2)' : 'r(5,5)'} und r(5,100) standortbezogen über KOSTRA/OpenKo ermitteln und manuell eintragen.`);
   if (mode === 'roof') warnings.push('Notentwässerung als Vorbemessung berücksichtigt. Überflutungsnachweis und Rückhalteraumbemessung sind nicht Bestandteil dieser Berechnung.');
   warnings.push('Die Ergebnis-Card zeigt die markierte bzw. zuletzt hinzugefügte Fläche. Weitere Flächen werden separat in den Klappcards berechnet.');
@@ -154,11 +154,11 @@ export function calculate(state) {
   const cmResulting = selectedSurface?.cm || 0;
   const drain = selectedSurface ? currentDrainSettings(selectedSurface, state) : currentDrainSettings(state);
   const requiredDrains = selectedSurface?.requiredDrains || 0;
-  const stackCount = selectedSurface?.stackCount || Math.max(1, Math.floor(toNumber(state.stackCount)) || 1);
-  const qPerStack = selectedSurface?.qPerStack || 0;
   const selectedIsRoof = (selectedSurface?.surfaceMode || mode) === 'roof';
+  const stackCount = selectedSurface?.stackCount || (selectedIsRoof ? Math.max(1, Math.floor(toNumber(state.stackCount)) || 1) : 0);
+  const qPerStack = selectedSurface?.qPerStack || 0;
   const collectorSelection = selectedSurface?.collectorSelection || chooseHydraulic(qr, state.fillRatio || '0.7', state.slopeCmM, selectedIsRoof ? 'DN 70' : 'DN 100');
-  const stackSelection = selectedSurface?.stackSelection || chooseHydraulic(qPerStack, '0.7', state.slopeCmM, selectedIsRoof ? 'DN 70' : 'DN 100');
+  const stackSelection = selectedIsRoof ? (selectedSurface?.stackSelection || chooseHydraulic(qPerStack, '0.7', state.slopeCmM, 'DN 70')) : null;
   const emergency = selectedSurface?.emergency || calcEmergencyOverflow(0, state, selectedSurface?.surfaceMode || mode);
   const warnings = validate(state, { surfaces, selectedSurface });
   return {

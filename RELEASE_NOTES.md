@@ -1,3 +1,13 @@
+# TechCalc Pro Release Notes
+
+## 1.2.11 - Abschlusskorrekturen Entwässerung/Trinkwasser
+- Schmutzwasser: Entwässerungsgegenstände gespeicherter Berechnungen nachträglich bearbeitbar.
+- Schmutzwasser: Leitungsarten Vollfüllung und Lüftung aus der Auswahl entfernt.
+- Schmutzwasser: Scrollposition bleibt bei Änderungen erhalten.
+- Regenwasser: Grundstücksflächen ohne Fallleitungslogik; Hoftopfanzahl priorisiert.
+- Trinkwasser: Verbraucher in Nutzungseinheiten und freien Gruppen nachträglich bearbeitbar.
+- UI: Header-Rand bleibt entfernt und mobile Ergebnisdarstellung stabilisiert.
+
 # Release Notes
 
 ## 1.2.10 - Header und Schmutzwasser UI Hotfix
