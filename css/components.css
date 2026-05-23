@@ -4337,18 +4337,25 @@ body.settings-open {
   content: ' ';
 }
 
-/* v1.2.7: Header transparent across GitHub Pages/Netlify and rainwater result grouping */
+/* v1.2.8: Header safe-area uses the original milk-glass surface across GitHub Pages/Netlify. */
 .app-header,
 .app-header.glass-surface,
 .app-header.is-scrolled,
 .app-header.glass-surface.is-scrolled {
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  box-shadow: none !important;
-  border-bottom-color: rgba(255,255,255,.10) !important;
+  background: linear-gradient(135deg, rgba(18, 25, 34, .72), rgba(12, 18, 28, .50)) !important;
+  background-color: rgba(18, 25, 34, .62) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(130%) !important;
+  backdrop-filter: blur(22px) saturate(130%) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,.18) !important;
+  border-bottom-color: rgba(255,255,255,.12) !important;
+}
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .app-header,
+  .app-header.glass-surface,
+  .app-header.is-scrolled,
+  .app-header.glass-surface.is-scrolled {
+    background: linear-gradient(135deg, rgba(18, 25, 34, .88), rgba(12, 18, 28, .76)) !important;
+  }
 }
 .rainwater-result-group {
   display: grid;

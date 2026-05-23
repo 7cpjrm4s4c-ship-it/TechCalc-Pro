@@ -1,3 +1,11 @@
+# Release Notes
+
+## 1.2.8 - Header Safe-Area Hotfix
+- Header wieder auf ursprüngliche Milchglas-Optik zurückgesetzt.
+- Safe-Area/Statusbar-Bereich oberhalb des Headers erhält die gleiche Glasfläche statt schwarzem Hintergrund.
+- Theme-Color für Netlify/GitHub-Hosting vereinheitlicht.
+- Cache-Version erhöht.
+
 
 ## 1.2.7 - Regenwasser Ergebnisstruktur und Header-Fix
 - Header auf transparente Darstellung ohne schwarzen Fallback vereinheitlicht.
@@ -5,8 +13,6 @@
 - Regenwasser: Gefälle- und Füllgrad-Inputs entfernt.
 - Ergebnis- und Klappcards nach Hauptentwässerung und Notentwässerung sortiert.
 - Syntaxcheck durchgeführt.
-
-# Release Notes
 
 ## 1.2.6 - Regenwasser Notentwässerung UX und Flächenbearbeitung
 - Notentwässerung wird bei Dachflächen ohne zusätzlichen Aktivierungs-Switch berechnet.
