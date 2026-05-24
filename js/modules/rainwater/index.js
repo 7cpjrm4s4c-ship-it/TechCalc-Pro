@@ -60,11 +60,11 @@ function savedRows(s) {
     const r = item.result || {};
     const active = String(s.activeCalculationId || '') === String(item.id);
     const subtitle = [`${fmt(r.qr || 0,2)} l/s`, `FL ${r.stackDn || '—'}`, modeLabel(r.mode)].filter(Boolean).join(' · ');
-    return `<article class="ph-saved-item line-section-card is-collapsed ${active ? 'is-active' : ''}" data-line-card data-rainwater-select="${esc(item.id)}">
-      <div class="line-section-card__head">
-        <div class="line-section-card__title"><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle)}</small></div>
-        <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Gespeicherte Berechnung aufklappen"><span>▾</span></button>
-        <button type="button" class="line-section-card__delete" data-rainwater-delete="${esc(item.id)}" aria-label="Berechnung löschen">×</button>
+    return `<article class="line-section-card saved-record-card is-collapsed ${active ? 'is-active' : ''}" data-line-card data-rainwater-select="${esc(item.id)}">
+      <div class="line-section-card__head saved-record-card__head">
+        <div class="line-section-card__title saved-record-card__title"><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle)}</small></div>
+        <button type="button" class="line-section-card__toggle saved-record-card__toggle" data-line-toggle aria-expanded="false" aria-label="Gespeicherte Berechnung aufklappen"><span>▾</span></button>
+        <button type="button" class="line-section-card__delete saved-record-card__delete" data-rainwater-delete="${esc(item.id)}" aria-label="Berechnung löschen">×</button>
       </div>
       <div class="line-section-card__body">${resultRows([
         { label:'Entwässerungsmenge', value:fmt(r.qr || 0,2), unit:'l/s' },
@@ -151,13 +151,17 @@ function saveCard(s) {
     savedRows(s)
   ].join('')), 'green');
 }
+function savedCalculationsCard(s) {
+  return card('Gespeicherte Regenwasser-Berechnungen', savedRows(s), 'green');
+}
 function inputCards(s, r) {
   return stack([
     modeCard(s),
     card('Regenspende', rainInputBlock(s), 'green'),
     card('Dacheinläufe / Hoftöpfe', dimensionInputBlock(s), 'green'),
     card('Notentwässerung', emergencyInputBlock(s), 'green'),
-    card('Regenflächen', surfaceInputBlock(s, r), 'green')
+    card('Regenflächen', surfaceInputBlock(s, r), 'green'),
+    savedCalculationsCard(s)
   ].join(''));
 }
 function warningList(warnings, s) {
@@ -196,10 +200,10 @@ function surfaceDimensionCards(r, s) {
       { label:'Notüberlauf-DN', value:item.emergency?.manufacturerDn || '—' },
       { label:'gewählte Überlaufleistung je Notüberlauf', value:item.emergency?.capacity ? fmt(item.emergency.capacity,2) : '—', unit:item.emergency?.capacity ? 'l/s' : '' }
     ] : [];
-    return `<article class="line-section-card ${active ? 'is-active' : ''} ${active ? '' : 'is-collapsed'}" data-line-card data-surface-result-select="${esc(item.id)}">
+    return `<article class="line-section-card ${active ? 'is-active' : ''} is-collapsed" data-line-card data-surface-result-select="${esc(item.id)}">
       <div class="line-section-card__head">
         <div class="line-section-card__title"><strong>${esc(item.name)}</strong><small>${fmt(item.area,1)} m² · Qr ${fmt(item.qr,2)} l/s · ${drainLabel(mode)} ${item.requiredDrains} Stk.${isRoof ? ` · FL ${item.stackSelection?.dn || '—'}` : ''}</small></div>
-        <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="${active ? 'true' : 'false'}" aria-label="Flächendimensionierung aufklappen"><span>${active ? '▴' : '▾'}</span></button>
+        <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Flächendimensionierung aufklappen"><span>▾</span></button>
       </div>
       <div class="line-section-card__body">
         <div class="rainwater-result-group"><h4>Hauptentwässerung</h4>${resultRows(mainRows)}</div>
@@ -293,6 +297,13 @@ function statePatchFromSurface(item = {}) {
   };
 }
 const surfaceEditFields = new Set(['surfaceMode','areaType','areaName','areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity','drainSize','drainSizeManual','drainCapacity','drainHead','stackCount','emergencyType','emergencyHead','emergencyWidth','emergencyDiameter','emergencyManufacturerDn','emergencyCapacity','emergencySafetyFactor']);
+function preserveScroll(action) {
+  const x = window.scrollX || 0;
+  const y = window.scrollY || document.documentElement.scrollTop || 0;
+  action?.();
+  requestAnimationFrame(() => window.scrollTo(x, y));
+  setTimeout(() => window.scrollTo(x, y), 0);
+}
 function bindActions(root) {
   bindEditModeClear(root, { state, activeIdKey:'activeCalculationId', nameKey:'name', onClear: () => state.set(clearedInputs(state.get())) });
   root.querySelector('[data-surface-add]')?.addEventListener('click', () => {
@@ -310,10 +321,13 @@ function bindActions(root) {
   }));
   root.querySelectorAll('[data-surface-select], [data-surface-result-select]').forEach(el => el.addEventListener('click', event => {
     if (event.target.closest('[data-surface-delete]') || event.target.closest('[data-line-toggle]')) return;
+    event.preventDefault();
+    event.stopPropagation();
     const id = el.dataset.surfaceSelect || el.dataset.surfaceResultSelect;
     const current = state.get();
     const item = (current.surfaces || []).find(entry => String(entry.id) === String(id));
-    state.set({ ...statePatchFromSurface(item), activeSurfaceId:id });
+    if (!item) return;
+    preserveScroll(() => state.set({ ...statePatchFromSurface(item), activeSurfaceId:id }));
   }));
   root.querySelector('#drainSize')?.addEventListener('change', event => {
     const selected = roofDrainTable.find(item => item.dn === event.target.value);
@@ -348,6 +362,7 @@ function bindActions(root) {
     state.set({ savedCalculations:saved.map(item => String(item.id) === String(id) ? record : item), activeCalculationId:id, name:record.name });
   });
   root.querySelectorAll('[data-line-toggle]').forEach(toggle => toggle.addEventListener('click', event => {
+    event.preventDefault();
     event.stopPropagation();
     const itemCard = toggle.closest('[data-line-card]');
     const collapsed = itemCard?.classList.toggle('is-collapsed');
@@ -355,18 +370,31 @@ function bindActions(root) {
   }));
   root.querySelectorAll('[data-rainwater-select]').forEach(cardEl => cardEl.addEventListener('click', event => {
     if (event.target.closest('[data-rainwater-delete]') || event.target.closest('[data-line-toggle]')) return;
+    event.preventDefault();
+    event.stopPropagation();
     const current = state.get();
     const item = (current.savedCalculations || []).find(entry => String(entry.id) === String(cardEl.dataset.rainwaterSelect));
     if (!item?.state) return;
-    if (String(current.activeCalculationId || '') === String(item.id)) { state.set(clearedInputs(current)); return; }
-    state.set({ ...item.state, savedCalculations:current.savedCalculations || [], activeCalculationId:item.id, name:item.name || item.state.name || '' });
+    preserveScroll(() => {
+      if (String(current.activeCalculationId || '') === String(item.id)) { state.set(clearedInputs(current)); return; }
+      state.set({ ...item.state, savedCalculations:current.savedCalculations || [], activeCalculationId:item.id, name:item.name || item.state.name || '' });
+    });
   }));
   root.querySelectorAll('[data-rainwater-delete]').forEach(btn => btn.addEventListener('click', event => {
+    event.preventDefault();
     event.stopPropagation();
     const current = state.get();
     const next = (current.savedCalculations || []).filter(item => String(item.id) !== String(btn.dataset.rainwaterDelete));
-    state.set({ savedCalculations:next, activeCalculationId:String(current.activeCalculationId) === String(btn.dataset.rainwaterDelete) ? null : current.activeCalculationId });
+    preserveScroll(() => state.set({ savedCalculations:next, activeCalculationId:String(current.activeCalculationId) === String(btn.dataset.rainwaterDelete) ? null : current.activeCalculationId }));
   }));
+
+  root.addEventListener('click', event => {
+    const current = state.get();
+    if (!current.activeSurfaceId) return;
+    const ignore = '[data-surface-select], [data-surface-result-select], [data-surface-delete], [data-line-card], [data-line-toggle], input, select, textarea, button, label, a, .segmented';
+    if (event.target.closest(ignore)) return;
+    preserveScroll(() => state.set({ activeSurfaceId:null }));
+  });
 }
 
 export default { config, state, mount(root) { return mountModule(root, state, view, bindActions); } };

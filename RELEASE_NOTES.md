@@ -1,3 +1,18 @@
+## Version 1.2.13 - Trinkwasser/Regenwasser Interaktion Hotfix
+- Trinkwasser: gespeicherte Nutzungseinheiten und freie Einrichtungsgegenstände wieder per Klick auswählbar.
+- Regenwasser: gespeicherte Einträge bleiben beim Antippen geschlossen und öffnen nur über den Pfeil.
+- Regenwasser: Pfeil-Optik der gespeicherten Einträge an die einheitlichen Saved-Card-Controls angepasst.
+- Syntaxcheck erfolgreich.
+
+
+## Version 1.2.12 - Regenwasser Interaktion Hotfix
+
+- Auswahl gespeicherter Regenwasser-Berechnungen stabilisiert.
+- Regenflächen markieren jetzt ohne automatisches Aufklappen.
+- Klappcards öffnen nur noch über den Pfeil-Button.
+- Markierung wird durch Tippen außerhalb relevanter Bedienelemente aufgehoben.
+- Scrollposition beim Markieren, Bearbeiten und Laden von Regenflächen stabilisiert.
+
 # TechCalc Pro Release Notes
 
 ## 1.2.11 - Abschlusskorrekturen Entwässerung/Trinkwasser

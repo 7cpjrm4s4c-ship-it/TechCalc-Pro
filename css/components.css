@@ -4512,3 +4512,22 @@ body::before {
     grid-column: 2;
   }
 }
+
+/* v1.2.13: Regenwasser Saved-Card-Pfeil stabilisieren */
+.module-view[data-module='rainwater'] .saved-record-card .line-section-card__toggle,
+.module-view[data-module='rainwater'] .saved-record-card.is-active .line-section-card__toggle {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  flex: 0 0 34px !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+}
+.module-view[data-module='rainwater'] .saved-record-card .line-section-card__toggle span {
+  display: inline-block !important;
+  width: 1em !important;
+  height: 1em !important;
+  line-height: 1 !important;
+  text-align: center !important;
+}
