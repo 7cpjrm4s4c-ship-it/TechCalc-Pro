@@ -8,7 +8,18 @@ import { fmt, fmtInput } from '../../utils/calculations.js';
 import { bindEditModeClear } from '../../core/savedRecords.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
-const areaOptions = areaTypes.map(item => ({ value:item.id, label:item.name }));
+const splitIndex = areaTypes.findIndex(item => item.id === 'concrete-asphalt');
+const customAreaTypes = areaTypes.filter(item => item.custom);
+const roofAreaTypes = areaTypes.filter((item, idx) => !item.custom && (splitIndex < 0 || idx < splitIndex));
+const propertyAreaTypes = areaTypes.filter((item, idx) => !item.custom && (splitIndex < 0 || idx >= splitIndex));
+const areaOptionsForMode = mode => (mode === 'property' ? propertyAreaTypes : roofAreaTypes)
+  .concat(customAreaTypes)
+  .map(item => ({ value:item.id, label:item.name }));
+const defaultAreaTypeForMode = mode => (mode === 'property' ? 'concrete-asphalt' : 'metal-roof');
+const normalizeAreaType = (mode, areaType) => {
+  const allowed = areaOptionsForMode(mode).map(item => item.value);
+  return allowed.includes(areaType) ? areaType : defaultAreaTypeForMode(mode);
+};
 const KOSTRA_URL = 'https://www.openko.de';
 
 const fmtDecimalInput = (value, digits = 1) => {
@@ -76,7 +87,7 @@ function savedRows(s) {
 }
 function surfacesTable(r, s) {
   if (!r.surfaces.length) return '<div class="empty-state empty-state--compact">Noch keine Regenflächen hinzugefügt.</div>';
-  const activeId = String(r.selectedSurfaceId || s.activeSurfaceId || '');
+  const activeId = String(s.activeSurfaceId || '');
   return `<div class="dw-consumer-list wastewater-fixture-list rainwater-surface-list">${r.surfaces.map(item => {
     const active = String(item.id) === activeId;
     return `<div class="dw-consumer-row wastewater-fixture-row rainwater-surface-row ${active ? 'is-active' : ''}" data-surface-select="${esc(item.id)}">
@@ -131,11 +142,13 @@ function emergencyInputBlock(s) {
   return stack([grid(fields.join(''), 2)].join(''));
 }
 function surfaceInputBlock(s, r) {
-  const selected = getAreaType(s.areaType || 'metal-roof');
+  const mode = s.surfaceMode || s.calculationType || 'roof';
+  const areaType = normalizeAreaType(mode, s.areaType || defaultAreaTypeForMode(mode));
+  const selected = getAreaType(areaType);
   return stack([
     grid([
       field({ id:'areaName', label:'Bezeichnung', value:s.areaName || '', placeholder:'z. B. Dachfläche Nord', inputmode:'text' }),
-      selectField({ id:'areaType', label:'Flächenart', value:s.areaType || 'metal-roof', options:areaOptions }),
+      selectField({ id:'areaType', label:'Flächenart', value:areaType, options:areaOptionsForMode(mode) }),
       field({ id:'areaSize', label:'Fläche A', value:fmtInput(s.areaSize,1), unit:'m²' }),
       selected?.custom ? field({ id:'customCs', label:'Spitzenabflussbeiwert Cs', value:s.customCs || '', placeholder:'0,9' }) : inlineStats([{ label:'Cs', value:fmt(selected.cs,2) }, { label:'Cm', value:fmt(selected.cm,2) }])
     ].join(''), 2),
@@ -159,8 +172,7 @@ function inputCards(s, r) {
     card('Regenspende', rainInputBlock(s), 'green'),
     card('Dacheinläufe / Hoftöpfe', dimensionInputBlock(s), 'green'),
     card('Notentwässerung', emergencyInputBlock(s), 'green'),
-    card('Regenflächen', surfaceInputBlock(s, r), 'green'),
-    savedCalculationsCard(s)
+    card('Regenflächen', surfaceInputBlock(s, r), 'green')
   ].join(''));
 }
 function warningList(warnings, s) {
@@ -170,7 +182,7 @@ function warningList(warnings, s) {
 }
 function surfaceDimensionCards(r, s) {
   if (!r.surfaces.length) return '<div class="empty-state empty-state--compact">Keine Einzelflächen berechnet.</div>';
-  const activeId = String(r.selectedSurfaceId || s.activeSurfaceId || '');
+  const activeId = String(s.activeSurfaceId || '');
   return `<div class="ph-saved-list rainwater-result-list">${r.surfaces.map((item) => {
     const mode = item.surfaceMode || r.mode || s.surfaceMode || 'roof';
     const active = String(item.id) === activeId;
@@ -234,9 +246,10 @@ function view(s) {
 }
 
 function surfacePatchFromState(current = {}) {
+  const mode = current.surfaceMode || current.calculationType || 'roof';
   return {
-    surfaceMode: current.surfaceMode || current.calculationType || 'roof',
-    areaType: current.areaType,
+    surfaceMode: mode,
+    areaType: normalizeAreaType(mode, current.areaType || defaultAreaTypeForMode(mode)),
     areaName: current.areaName,
     areaSize: current.areaSize,
     customCs: current.customCs,
@@ -269,10 +282,11 @@ function patchActiveSurfaceFromState() {
   return true;
 }
 function statePatchFromSurface(item = {}) {
+  const mode = item.surfaceMode || item.calculationType || 'roof';
   return {
-    surfaceMode: item.surfaceMode || item.calculationType || 'roof',
-    calculationType: item.surfaceMode || item.calculationType || 'roof',
-    areaType: item.areaType || 'metal-roof',
+    surfaceMode: mode,
+    calculationType: mode,
+    areaType: normalizeAreaType(mode, item.areaType || defaultAreaTypeForMode(mode)),
     areaName: item.areaName || '',
     areaSize: item.areaSize || '100',
     customCs: item.customCs || '',
@@ -298,21 +312,33 @@ function statePatchFromSurface(item = {}) {
 }
 const surfaceEditFields = new Set(['surfaceMode','areaType','areaName','areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity','drainSize','drainSizeManual','drainCapacity','drainHead','stackCount','emergencyType','emergencyHead','emergencyWidth','emergencyDiameter','emergencyManufacturerDn','emergencyCapacity','emergencySafetyFactor']);
 function preserveScroll(action) {
-  const x = window.scrollX || 0;
-  const y = window.scrollY || document.documentElement.scrollTop || 0;
+  const doc = document.scrollingElement || document.documentElement;
+  const x = window.scrollX || doc.scrollLeft || 0;
+  const y = window.scrollY || doc.scrollTop || 0;
   action?.();
-  requestAnimationFrame(() => window.scrollTo(x, y));
-  setTimeout(() => window.scrollTo(x, y), 0);
+  const restore = () => window.scrollTo(x, y);
+  requestAnimationFrame(restore);
+  setTimeout(restore, 0);
+  setTimeout(restore, 60);
+  setTimeout(restore, 160);
 }
 function bindActions(root) {
   bindEditModeClear(root, { state, activeIdKey:'activeCalculationId', nameKey:'name', onClear: () => state.set(clearedInputs(state.get())) });
   root.querySelector('[data-surface-add]')?.addEventListener('click', () => {
     const current = state.get();
-    const base = getAreaType(current.areaType || 'metal-roof');
-    const record = { id:`${Date.now()}-${Math.random().toString(16).slice(2)}`, ...surfacePatchFromState(current) };
+    const patch = surfacePatchFromState(current);
+    const base = getAreaType(patch.areaType || defaultAreaTypeForMode(patch.surfaceMode));
+    const record = { id:`${Date.now()}-${Math.random().toString(16).slice(2)}`, ...patch };
     if (base?.custom) { record.customCs = current.customCs; record.customCm = current.customCm; }
-    state.set({ surfaces:[...(current.surfaces || []), record], activeSurfaceId:record.id, areaName:'', areaSize:'100', customCs:'', customCm:'' });
+    preserveScroll(() => state.set({ surfaces:[...(current.surfaces || []), record], activeSurfaceId:record.id, areaName:'', areaSize:'100', customCs:'', customCm:'' }));
   });
+
+  root.querySelectorAll('[data-segment="surfaceMode"]').forEach(btn => btn.addEventListener('click', event => {
+    const nextMode = btn.dataset.value || 'roof';
+    const current = state.get();
+    const nextAreaType = normalizeAreaType(nextMode, current.areaType || defaultAreaTypeForMode(nextMode));
+    if (nextAreaType !== current.areaType) preserveScroll(() => state.set({ areaType:nextAreaType }, { notify:true }));
+  }));
   root.querySelectorAll('[data-surface-delete]').forEach(btn => btn.addEventListener('click', event => {
     event.stopPropagation();
     const current = state.get();

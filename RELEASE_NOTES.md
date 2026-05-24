@@ -1,3 +1,10 @@
+## Version 1.2.15 - Regenwasser Flächen-UX Hotfix
+
+- Gespeicherte Regenwasser-Berechnungen Card entfernt.
+- Markierungsrahmen wird nur noch bei aktiv ausgewählter Fläche angezeigt.
+- Flächenarten nach Dachflächen und Hofflächen getrennt.
+- Scroll-Sprünge bei Auswahl/Bearbeitung von Regenflächen weiter stabilisiert.
+
 ## Version 1.2.14 - Regenwasser/Trinkwasser Interaktion Hotfix
 
 - Regenwasser: Scroll-Sprünge bei Flächenauswahl reduziert.
