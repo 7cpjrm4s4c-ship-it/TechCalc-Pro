@@ -288,7 +288,7 @@ function bindDrinkingWater(root, signal) {
       const units = readUsageUnits();
       const record = createUsageUnit({ name:s.unitName, consumers });
       writeUsageUnits([...units, record]);
-      state.set({ unitDraftConsumers: [], activeUnitId:null, unitName:'', uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
+      state.set({ unitDraftConsumers: [], activeUnitId:null, activeSingleId:null, unitName:'', uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
       root.innerHTML = view(state.get());
       return;
     }
@@ -305,7 +305,7 @@ function bindDrinkingWater(root, signal) {
       const record = createUsageUnit({ name:s.unitName, consumers });
       record.id = s.activeUnitId;
       writeUsageUnits(units.map(item => isSameId(item.id, s.activeUnitId) ? record : item));
-      state.set({ activeUnitId:s.activeUnitId, uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
+      state.set({ activeUnitId:s.activeUnitId, activeSingleId:null, uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
       root.innerHTML = view(state.get());
       return;
     }
@@ -320,7 +320,7 @@ function bindDrinkingWater(root, signal) {
       const groups = readSingleConsumers();
       const record = createSingleGroup({ name:s.singleName || 'Einzelverbraucher', consumers: draft.map(c => ({ ...c, permanent:String(s.singlePermanent)==='true' })) });
       writeSingleConsumers([...groups, record]);
-      state.set({ singleDraftConsumers: [], activeSingleId:null, singleName:'', uiSingleFormOpen:true, uiSingleSavedOpen:true }, { notify:false });
+      state.set({ singleDraftConsumers: [], activeUnitId:null, activeSingleId:null, singleName:'', uiSingleFormOpen:true, uiSingleSavedOpen:true }, { notify:false });
       root.innerHTML = view(state.get());
       return;
     }
@@ -337,7 +337,7 @@ function bindDrinkingWater(root, signal) {
       const record = createSingleGroup({ name:s.singleName || 'Einzelverbraucher', consumers: draft.map(c => ({ ...c, permanent:String(s.singlePermanent)==='true' })) });
       record.id = s.activeSingleId;
       writeSingleConsumers(groups.map(item => isSameId(item.id, s.activeSingleId) ? record : item));
-      state.set({ activeSingleId:s.activeSingleId, uiSingleFormOpen:true, uiSingleSavedOpen:true }, { notify:false });
+      state.set({ activeUnitId:null, activeSingleId:s.activeSingleId, uiSingleFormOpen:true, uiSingleSavedOpen:true }, { notify:false });
       root.innerHTML = view(state.get());
       return;
     }
@@ -369,7 +369,7 @@ function bindDrinkingWater(root, signal) {
       const units = readUsageUnits();
       const unit = units.find(item => isSameId(item.id, unitEdit.dataset.dwUnitEdit));
       if (unit) {
-        const patch = { activeUnitId: unit.id, unitName: unit.name, unitDraftConsumers: unit.consumers || [], uiUnitFormOpen:true, uiUnitSavedOpen:true };
+        const patch = { activeUnitId: unit.id, activeSingleId:null, unitName: unit.name, singleName:'', unitDraftConsumers: unit.consumers || [], singleDraftConsumers:[], uiUnitFormOpen:true, uiUnitSavedOpen:true };
         state.set(patch, { notify:false });
         root.innerHTML = view(state.get());
       }
@@ -385,7 +385,10 @@ function bindDrinkingWater(root, signal) {
       if (group) {
         const consumers = (group.consumers || []).map(c => ({ ...c }));
         const patch = {
+          activeUnitId:null,
           activeSingleId: group.id,
+          unitName:'',
+          unitDraftConsumers:[],
           singleName: group.name,
           singleDraftConsumers: consumers,
           singlePermanent: String(consumers.some(c => c.permanent)),
@@ -437,7 +440,7 @@ function bindDrinkingWater(root, signal) {
       const units = readUsageUnits();
       const record = createUsageUnit({ name:s.unitName, consumers });
       writeUsageUnits([...units, record]);
-      state.set({ unitDraftConsumers: [], activeUnitId:null, unitName:'', uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
+      state.set({ unitDraftConsumers: [], activeUnitId:null, activeSingleId:null, unitName:'', uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
       root.innerHTML = view(state.get());
       return;
     }
@@ -451,7 +454,7 @@ function bindDrinkingWater(root, signal) {
       const record = createUsageUnit({ name:s.unitName, consumers });
       record.id = s.activeUnitId;
       writeUsageUnits(units.map(item => isSameId(item.id, s.activeUnitId) ? record : item));
-      state.set({ activeUnitId:s.activeUnitId, uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
+      state.set({ activeUnitId:s.activeUnitId, activeSingleId:null, uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
       root.innerHTML = view(state.get());
       return;
     }
@@ -463,7 +466,7 @@ function bindDrinkingWater(root, signal) {
       const groups = readSingleConsumers();
       const record = createSingleGroup({ name:s.singleName || 'Einzelverbraucher', consumers: draft.map(c => ({ ...c, permanent:String(s.singlePermanent)==='true' })) });
       writeSingleConsumers([...groups, record]);
-      state.set({ singleDraftConsumers: [], activeSingleId:null, singleName:'', uiSingleFormOpen:true, uiSingleSavedOpen:true }, { notify:false });
+      state.set({ singleDraftConsumers: [], activeUnitId:null, activeSingleId:null, singleName:'', uiSingleFormOpen:true, uiSingleSavedOpen:true }, { notify:false });
       root.innerHTML = view(state.get());
       return;
     }
@@ -477,7 +480,7 @@ function bindDrinkingWater(root, signal) {
       const record = createSingleGroup({ name:s.singleName || 'Einzelverbraucher', consumers: draft.map(c => ({ ...c, permanent:String(s.singlePermanent)==='true' })) });
       record.id = s.activeSingleId;
       writeSingleConsumers(groups.map(item => isSameId(item.id, s.activeSingleId) ? record : item));
-      state.set({ activeSingleId:s.activeSingleId, uiSingleFormOpen:true, uiSingleSavedOpen:true }, { notify:false });
+      state.set({ activeUnitId:null, activeSingleId:s.activeSingleId, uiSingleFormOpen:true, uiSingleSavedOpen:true }, { notify:false });
       root.innerHTML = view(state.get());
       return;
     }
@@ -506,7 +509,7 @@ function bindDrinkingWater(root, signal) {
       const units = readUsageUnits();
       const unit = units.find(item => isSameId(item.id, unitEdit.dataset.dwUnitEdit));
       if (unit) {
-        const patch = { activeUnitId: unit.id, unitName: unit.name, unitDraftConsumers: unit.consumers || [], uiUnitFormOpen:true, uiUnitSavedOpen:true };
+        const patch = { activeUnitId: unit.id, activeSingleId:null, unitName: unit.name, singleName:'', unitDraftConsumers: unit.consumers || [], singleDraftConsumers:[], uiUnitFormOpen:true, uiUnitSavedOpen:true };
         state.set(patch, { notify:false });
         syncFieldValues(root, patch);
         const details = root.querySelector('[data-dw-accordion="uiUnitFormOpen"]');
@@ -524,7 +527,10 @@ function bindDrinkingWater(root, signal) {
       if (group) {
         const consumers = (group.consumers || []).map(c => ({ ...c }));
         const patch = {
+          activeUnitId:null,
           activeSingleId: group.id,
+          unitName:'',
+          unitDraftConsumers:[],
           singleName: group.name,
           singleDraftConsumers: consumers,
           singlePermanent: String(consumers.some(c => c.permanent)),

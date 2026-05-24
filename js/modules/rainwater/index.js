@@ -140,8 +140,7 @@ function surfaceInputBlock(s, r) {
       selected?.custom ? field({ id:'customCs', label:'Spitzenabflussbeiwert Cs', value:s.customCs || '', placeholder:'0,9' }) : inlineStats([{ label:'Cs', value:fmt(selected.cs,2) }, { label:'Cm', value:fmt(selected.cm,2) }])
     ].join(''), 2),
     selected?.custom ? grid([field({ id:'customCm', label:'mittlerer Abflussbeiwert Cm', value:s.customCm || '', placeholder:'0,8' })].join(''), 1) : '',
-    '<button type="button" class="action-button action-button--secondary" data-surface-add>Fläche hinzufügen</button>',
-    surfacesTable(r, s)
+    `<div class="tc-save-actions"><button type="button" class="action-button action-button--secondary" data-surface-add>Fläche hinzufügen</button><button type="button" class="action-button" data-surface-update ${s.activeSurfaceId ? '' : 'disabled'}>Aktualisieren</button></div>`
   ].join(''));
 }
 function saveCard(s) {
@@ -264,9 +263,10 @@ function surfacePatchFromState(current = {}) {
 function patchActiveSurfaceFromState() {
   const current = state.get();
   const activeId = current.activeSurfaceId;
-  if (!activeId) return;
+  if (!activeId) return false;
   const next = (current.surfaces || []).map(item => String(item.id) === String(activeId) ? { ...item, ...surfacePatchFromState(current) } : item);
   state.set({ surfaces: next }, { notify:false });
+  return true;
 }
 function statePatchFromSurface(item = {}) {
   return {
@@ -325,6 +325,10 @@ function bindActions(root) {
     event.stopPropagation();
     const id = el.dataset.surfaceSelect || el.dataset.surfaceResultSelect;
     const current = state.get();
+    if (String(current.activeSurfaceId || '') === String(id)) {
+      preserveScroll(() => state.set({ activeSurfaceId:null }));
+      return;
+    }
     const item = (current.surfaces || []).find(entry => String(entry.id) === String(id));
     if (!item) return;
     preserveScroll(() => state.set({ ...statePatchFromSurface(item), activeSurfaceId:id }));
@@ -332,19 +336,16 @@ function bindActions(root) {
   root.querySelector('#drainSize')?.addEventListener('change', event => {
     const selected = roofDrainTable.find(item => item.dn === event.target.value);
     if (!selected) return;
-    state.set({ drainSize:selected.dn, drainSizeManual:selected.dn, drainCapacity:String(selected.capacity).replace('.', ','), drainHead:String(selected.head) }, { notify:false });
-    patchActiveSurfaceFromState();
-    state.set({}, { notify:true });
+    preserveScroll(() => state.set({ drainSize:selected.dn, drainSizeManual:selected.dn, drainCapacity:String(selected.capacity).replace('.', ','), drainHead:String(selected.head) }));
   });
 
-  root.querySelectorAll('[data-field]').forEach(el => {
-    if (!surfaceEditFields.has(el.dataset.field)) return;
-    const applyPatch = () => patchActiveSurfaceFromState();
-    el.addEventListener('change', applyPatch);
-    el.addEventListener('blur', applyPatch);
-  });
-  root.querySelectorAll('[data-segment="surfaceMode"]').forEach(btn => {
-    btn.addEventListener('click', () => setTimeout(patchActiveSurfaceFromState, 0));
+  root.querySelector('[data-surface-update]')?.addEventListener('click', event => {
+    event.preventDefault();
+    event.stopPropagation();
+    preserveScroll(() => {
+      if (!patchActiveSurfaceFromState()) return;
+      state.set({}, { notify:true });
+    });
   });
   root.querySelector('[data-rainwater-save]')?.addEventListener('click', () => {
     const current = state.get();

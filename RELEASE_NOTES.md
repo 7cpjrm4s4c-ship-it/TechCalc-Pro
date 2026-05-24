@@ -1,3 +1,12 @@
+## Version 1.2.14 - Regenwasser/Trinkwasser Interaktion Hotfix
+
+- Regenwasser: Scroll-Sprünge bei Flächenauswahl reduziert.
+- Regenwasser: erneutes Antippen einer markierten Fläche hebt die Markierung auf.
+- Regenwasser: Flächenliste aus der Eingabe-Card entfernt, um doppelte Darstellung zu vermeiden.
+- Regenwasser: Aktualisieren-Button für nachträgliche Flächenkorrekturen ergänzt.
+- Regenwasser: Flächenänderungen werden erst nach aktiver Quittierung übernommen.
+- Trinkwasser: Auswahl freier Verbraucher von aktiven Nutzungseinheiten entkoppelt.
+
 ## Version 1.2.13 - Trinkwasser/Regenwasser Interaktion Hotfix
 - Trinkwasser: gespeicherte Nutzungseinheiten und freie Einrichtungsgegenstände wieder per Klick auswählbar.
 - Regenwasser: gespeicherte Einträge bleiben beim Antippen geschlossen und öffnen nur über den Pfeil.
