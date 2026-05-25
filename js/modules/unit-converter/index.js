@@ -12,7 +12,7 @@ function view(s) {
   const to = units.includes(s.to) ? s.to : units[1] || units[0];
   const result = calculate({ ...s, from, to });
 
-  const conversionCard = card('Kategorie wählen', stack([
+  const conversionCard = card('Kategorie waehlen', stack([
     selectField({ id: 'category', label: 'Kategorie', value: s.category, options: Object.entries(unitCategories).map(([value, c]) => ({ value, label: c.label })) }),
     field({
       id: 'value',
@@ -30,7 +30,7 @@ function view(s) {
       unitOptions: units.map(u => ({ value: u, label: u })),
       value: fmt(result, 2),
       disabled: true,
-      placeholder: '—'
+      placeholder: '-'
     })
   ].join('')), 'green');
 
@@ -40,7 +40,7 @@ function view(s) {
         value: fmt(calculate({ ...s, from, to: u }), 2),
         unit: u
       })))}</div>`
-    : '<div class="empty-state">Wert eingeben →</div>';
+    : '<div class="empty-state">Wert eingeben -></div>';
   const allValuesCard = card('Alle Werte', allValuesBody, 'blue');
 
   return renderModuleShell(config, `

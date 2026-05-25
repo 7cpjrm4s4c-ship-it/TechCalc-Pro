@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#121922" media="(prefers-color-scheme: light)">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="TechCalc Pro - modulare HLSK Quick Tools für Sanitär, Heizung, Lüftung und Klimatechnik.">
+  <meta name="description" content="TechCalc Pro - modulare HLSK Quick Tools fuer Sanitaer, Heizung, Lueftung und Klimatechnik.">
   <title>TechCalc Pro</title>
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./assets/icons/favicon.ico">
@@ -30,7 +30,7 @@
           <span class="brand__subtitle">HLSK Quick Tools</span>
         </span>
       </a>
-      <button class="icon-button" id="settingsButton" type="button" aria-label="Menü öffnen" aria-expanded="false">
+      <button class="icon-button" id="settingsButton" type="button" aria-label="Menue oeffnen" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
     </header>
@@ -45,14 +45,14 @@
     <aside class="settings-panel glass-surface" id="settingsPanel" hidden>
       <div class="settings-panel__head">
         <strong>Einstellungen</strong>
-        <button class="mini-button" id="closeSettings" type="button">Schließen</button>
+        <button class="mini-button" id="closeSettings" type="button">Schliessen</button>
       </div>
 
       <div class="settings-panel__body">
         <details class="settings-submenu">
           <summary>PDF-Export</summary>
           <div class="settings-submenu__content">
-            <p>Exportiert das aktuell geöffnete Modul als technisches Berechnungsprotokoll.</p>
+            <p>Exportiert das aktuell geoeffnete Modul als technisches Berechnungsprotokoll.</p>
             <div class="settings-actions">
               <button class="mini-button mini-button--primary" id="exportPdfButton" type="button">Aktuelles Modul exportieren</button>
             </div>
@@ -62,15 +62,15 @@
         <details class="settings-submenu">
           <summary>Projekteinstellungen</summary>
           <div class="settings-submenu__content settings-form" id="projectPdfSettings">
-            <p>Die App bleibt ohne Projektdatei vollständig bedienbar. Projektdaten gelten nur für die aktuelle Sitzung. Externe Projektdateien können geöffnet, weiterbearbeitet und wieder gespeichert werden.</p>
+            <p>Die App bleibt ohne Projektdatei vollstaendig bedienbar. Projektdaten gelten nur fuer die aktuelle Sitzung. Externe Projektdateien koennen geoeffnet, weiterbearbeitet und wieder gespeichert werden.</p>
             <div class="settings-actions settings-actions--split">
               <button class="mini-button mini-button--primary" id="saveProjectButton" type="button">Projekt speichern</button>
-              <button class="mini-button" id="openProjectButton" type="button">Projekt öffnen</button>
+              <button class="mini-button" id="openProjectButton" type="button">Projekt oeffnen</button>
               <input id="openProjectFile" class="visually-hidden" type="file" accept="application/json,.json,.techcalc">
             </div>
-            <div id="projectFileLabel" class="settings-hint" aria-live="polite">Kein externes Projekt geöffnet</div>
+            <div id="projectFileLabel" class="settings-hint" aria-live="polite">Kein externes Projekt geoeffnet</div>
             <label>Auftraggeber<input id="pdfClient" type="text" autocomplete="organization" placeholder="z. B. Muster GmbH"></label>
-            <label>Projektbezeichnung<input id="pdfProject" type="text" placeholder="z. B. Neubau Bürogebäude Nord"></label>
+            <label>Projektbezeichnung<input id="pdfProject" type="text" placeholder="z. B. Neubau Buerogebaeude Nord"></label>
             <label>Projektnummer<input id="pdfProjectNo" type="text" placeholder="z. B. 2025-041"></label>
             <label>Sachbearbeiter<input id="pdfEngineer" type="text" placeholder="z. B. Max Mustermann"></label>
           </div>
@@ -80,7 +80,7 @@
           <summary>Moduleinstellungen</summary>
           <div class="settings-submenu__content">
             <h3>Mobile Schnellzugriffe</h3>
-            <p>Wähle bis zu vier Module für die mobile Navigation. Reihenfolge wird gespeichert.</p>
+            <p>Waehle bis zu vier Module fuer die mobile Navigation. Reihenfolge wird gespeichert.</p>
             <div id="quickAccessSettings" class="settings-list"></div>
           </div>
         </details>
@@ -88,7 +88,7 @@
         <details class="settings-submenu">
           <summary>Darstellung</summary>
           <div class="settings-submenu__content settings-form">
-            <p>Vorbereitung für Dark, Light und System-Farbschema.</p>
+            <p>Vorbereitung fuer Dark, Light und System-Farbschema.</p>
             <div class="settings-field">
               <span class="settings-field__label">Farbschema</span>
               <div class="theme-switch" id="themeMode" role="radiogroup" aria-label="Farbschema">
@@ -104,21 +104,21 @@
         <details class="settings-submenu">
           <summary>Release Notes</summary>
           <div class="settings-submenu__content settings-form release-notes-panel">
-            <div class="settings-info-row"><span>Aktuelle Version</span><strong data-app-version-current>1.2.17</strong></div>
+            <div class="settings-info-row"><span>Aktuelle Version</span><strong data-app-version-current>1.2.18</strong></div>
             <div id="releaseNotesDynamic">
-              <p>Release Notes werden geladen …</p>
+              <p>Release Notes werden geladen ...</p>
             </div>
             <script type="text/plain" id="releaseNotesFallback">
-## Version 1.2.17 - Hosting / Darstellung Hotfix
-- Release Notes werden im Menü dynamisch mit Versionsparameter geladen und nicht mehr aus dem Browsercache gelesen.
-- Service Worker nutzt für Navigation und Release Notes eine Network-First-Strategie, damit nach dem Hosting neue Inhalte sichtbar werden.
-- Darstellungseinstellungen werden dauerhaft in localStorage gespeichert und bleiben nach Schließen der App erhalten.
+## Version 1.2.18 - Hosting / Darstellung Hotfix
+- Release Notes werden im Menue dynamisch mit Versionsparameter geladen und nicht mehr aus dem Browsercache gelesen.
+- Service Worker nutzt fuer Navigation und Release Notes eine Network-First-Strategie, damit nach dem Hosting neue Inhalte sichtbar werden.
+- Darstellungseinstellungen werden dauerhaft in localStorage gespeichert und bleiben nach Schliessen der App erhalten.
 
 ## Version 1.2.16 - Release Notes / Link-State Hotfix
-- Release Notes im Menü auf den aktuellen Stand gebracht.
-- Regenwasser-Status wird vor dem Öffnen externer KOSTRA/OpenKo-Links gesichert.
+- Release Notes im Menue auf den aktuellen Stand gebracht.
+- Regenwasser-Status wird vor dem Oeffnen externer KOSTRA/OpenKo-Links gesichert.
 - Mobile Schnellzugriffe werden dauerhaft gespeichert.
-- Eingestellte Werte, markierte Flächen und Flächenliste bleiben nach Rückkehr aus externen Links erhalten.
+- Eingestellte Werte, markierte Flaechen und Flaechenliste bleiben nach Rueckkehr aus externen Links erhalten.
             </script>
           </div>
         </details>
@@ -126,14 +126,14 @@
         <details class="settings-submenu">
           <summary>Feedback senden</summary>
           <div class="settings-submenu__content settings-form">
-            <p>Feedback wird direkt aus der App über Formspree an die hinterlegte Projektadresse gesendet.</p>
+            <p>Feedback wird direkt aus der App ueber Formspree an die hinterlegte Projektadresse gesendet.</p>
             <form id="feedbackForm" class="settings-form feedback-form">
               <label>Name optional<input id="feedbackName" name="name" type="text" autocomplete="name" placeholder="Name"></label>
               <label>E-Mail optional<input id="feedbackEmail" name="email" type="email" autocomplete="email" placeholder="name@example.com"></label>
               <label>Betreff<input id="feedbackSubject" name="subject" type="text" required value="TechCalc Pro Feedback"></label>
               <label>Nachricht<textarea id="feedbackMessage" name="message" required rows="6" placeholder="Feedback, Fehlerbeschreibung oder Verbesserungsvorschlag"></textarea></label>
               <input type="hidden" name="app" value="TechCalc Pro">
-              <input type="hidden" name="version" value="1.2.17">
+              <input type="hidden" name="version" value="1.2.18">
               <div class="settings-actions">
                 <button class="mini-button mini-button--primary" id="feedbackSubmit" type="submit">Feedback senden</button>
               </div>
@@ -146,7 +146,7 @@
         <details class="settings-submenu">
           <summary>Rechtliches & App</summary>
           <div class="settings-submenu__content settings-form">
-            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.2.17</strong></div>
+            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.2.18</strong></div>
             <button class="mini-button" type="button" disabled>Impressum vorbereiten</button>
             <button class="mini-button" type="button" disabled>AGB vorbereiten</button>
           </div>

@@ -6,5 +6,5 @@ export default {
   accent: 'cyan',
   order: 27,
   defaultVisible: false,
-  description: 'Luftzustände, Zustandsänderungen und Verlauf im h,x-Diagramm nach Mollier.'
+  description: 'Luftzustaende, Zustandsaenderungen und Verlauf im h,x-Diagramm nach Mollier.'
 };

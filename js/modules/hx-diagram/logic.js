@@ -157,10 +157,10 @@ function uniqueByClose(points) {
 
 export const PROCESS_OPTIONS = [
   { value: 'heat', label: 'Erhitzen' },
-  { value: 'cool', label: 'Kühlen' },
+  { value: 'cool', label: 'Kuehlen' },
   { value: 'adiabatic', label: 'Erhitzen + adiabat befeuchten' },
   { value: 'steam', label: 'Erhitzen + dampfbefeuchten' },
-  { value: 'cool-dehumidify', label: 'Kühlen + entfeuchten' }
+  { value: 'cool-dehumidify', label: 'Kuehlen + entfeuchten' }
 ];
 
 export function processLabel(value) {
@@ -173,16 +173,16 @@ function pointReached(a, b) {
 }
 
 function buildHeat(start, target) {
-  // Reines Erwärmen: x bleibt konstant. Es wird keine Befeuchtung ergänzt.
-  const heated = pointFromW({ label: '2 Erwärmen', tempC: target.tempC, wKgKg: start.humidityRatio });
+  // Reines Erwaermen: x bleibt konstant. Es wird keine Befeuchtung ergaenzt.
+  const heated = pointFromW({ label: '2 Erwaermen', tempC: target.tempC, wKgKg: start.humidityRatio });
   return uniqueByClose([{ ...start, label: '1 Ausgang' }, heated]);
 }
 
 function buildCool(start, target) {
-  // Reines Kühlen: x bleibt konstant bis maximal zum Taupunkt. Keine Entfeuchtung ergänzen.
+  // Reines Kuehlen: x bleibt konstant bis maximal zum Taupunkt. Keine Entfeuchtung ergaenzen.
   const saturated = saturationPointAtW(start.humidityRatio, '2 Taupunkt / 100 % r.F.');
   const endTemp = target.tempC < saturated.tempC ? saturated.tempC : target.tempC;
-  const cooled = pointFromW({ label: target.tempC < saturated.tempC ? '2 Taupunkt / 100 % r.F.' : '2 Kühlen', tempC: endTemp, wKgKg: start.humidityRatio });
+  const cooled = pointFromW({ label: target.tempC < saturated.tempC ? '2 Taupunkt / 100 % r.F.' : '2 Kuehlen', tempC: endTemp, wKgKg: start.humidityRatio });
   return uniqueByClose([{ ...start, label: '1 Ausgang' }, cooled]);
 }
 
@@ -192,14 +192,14 @@ function buildAdiabatic(start, target) {
   const preheatT = tempFromEnthalpyAndW(hSaturation, start.humidityRatio);
   return uniqueByClose([
     { ...start, label: '1 Ausgang' },
-    pointFromW({ label: '2 Vorerwärmen', tempC: preheatT, wKgKg: start.humidityRatio }),
+    pointFromW({ label: '2 Vorerwaermen', tempC: preheatT, wKgKg: start.humidityRatio }),
     saturationForTargetX,
-    { ...target, label: '4 Nacherwärmen / Ziel' }
+    { ...target, label: '4 Nacherwaermen / Ziel' }
   ]);
 }
 
 function buildSteam(start, target) {
-  const heated = pointFromW({ label: '2 Erwärmen', tempC: target.tempC, wKgKg: start.humidityRatio });
+  const heated = pointFromW({ label: '2 Erwaermen', tempC: target.tempC, wKgKg: start.humidityRatio });
   return uniqueByClose([
     { ...start, label: '1 Ausgang' },
     heated,
@@ -209,12 +209,12 @@ function buildSteam(start, target) {
 
 function buildCoolDehumidify(start, target) {
   const startSaturation = saturationPointAtW(start.humidityRatio, '2 Taupunkt / 100 % r.F.');
-  const targetSaturation = saturationPointAtW(target.humidityRatio, '3 Kühlen und entfeuchten');
+  const targetSaturation = saturationPointAtW(target.humidityRatio, '3 Kuehlen und entfeuchten');
   const points = [{ ...start, label: '1 Ausgang' }];
   if (start.tempC > startSaturation.tempC) points.push(startSaturation);
   points.push(targetSaturation);
   if (!pointReached(targetSaturation, target)) {
-    points.push({ ...target, label: '4 Nacherwärmen / Ziel' });
+    points.push({ ...target, label: '4 Nacherwaermen / Ziel' });
   }
   return uniqueByClose(points);
 }
@@ -238,15 +238,15 @@ export function classifyChange(start, target) {
   const epsX = 0.15;
   const epsH = 2.0;
 
-  if (Math.abs(dt) <= epsT && Math.abs(dx) <= epsX) return 'Keine relevante Zustandsänderung';
-  if (dx < -epsX && dt < -epsT) return 'Kühlen und Entfeuchten';
+  if (Math.abs(dt) <= epsT && Math.abs(dx) <= epsX) return 'Keine relevante Zustandsaenderung';
+  if (dx < -epsX && dt < -epsT) return 'Kuehlen und Entfeuchten';
   if (dx > epsX && Math.abs(dh) <= epsH) return 'Erhitzen und adiabat befeuchten';
   if (dx > epsX && dh > epsH) return 'Erhitzen und dampfbefeuchten';
   if (Math.abs(dx) <= epsX && dt > epsT) return 'Erhitzen';
-  if (Math.abs(dx) <= epsX && dt < -epsT) return 'Kühlen';
+  if (Math.abs(dx) <= epsX && dt < -epsT) return 'Kuehlen';
   if (dx < -epsX) return 'Entfeuchten';
   if (dx > epsX) return 'Befeuchten';
-  return dt > 0 ? 'Erhitzen' : 'Kühlen';
+  return dt > 0 ? 'Erhitzen' : 'Kuehlen';
 }
 export function calculate(input) {
   const current = calculatePoint({

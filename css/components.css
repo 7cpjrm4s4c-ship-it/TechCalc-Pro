@@ -1730,7 +1730,7 @@ button,
 }
 
 .settings-submenu > summary::after {
-  content: '›';
+  content: '';
   transform: rotate(90deg);
   transition: transform .18s ease;
   color: var(--accent-blue);
@@ -2125,7 +2125,7 @@ body.settings-open #settingsPanel * {
 }
 
 .project-select-card::after {
-  content: '⌄';
+  content: 'v';
   position: absolute;
   right: 16px;
   top: 50%;
@@ -2518,7 +2518,7 @@ body.settings-open {
 }
 
 .dw-accordion > summary::after {
-  content: '›';
+  content: '';
   color: var(--accent-blue);
   font-size: 28px;
   transform: rotate(90deg);
@@ -2895,7 +2895,7 @@ body.settings-open {
 
 
 /* v17 Trinkwasser: Einzelverbraucher-Card width constraints
-   Hält alle Formular-Elemente innerhalb der Card und verhindert horizontales Überlaufen auf Mobile. */
+   Haelt alle Formular-Elemente innerhalb der Card und verhindert horizontales Ueberlaufen auf Mobile. */
 .module-view[data-module='drinking-water'] .dw-accordion--form,
 .module-view[data-module='drinking-water'] .dw-accordion--form * {
   box-sizing: border-box;
@@ -4317,7 +4317,7 @@ body.settings-open {
 }
 
 
-/* v1.2.6: Regenwasser Notentwässerung UX und Flächenbearbeitung */
+/* v1.2.6: Regenwasser Notentwaesserung UX und Flaechenbearbeitung */
 .app-header,
 .app-header.is-scrolled {
   background: rgba(8, 12, 24, .28) !important;

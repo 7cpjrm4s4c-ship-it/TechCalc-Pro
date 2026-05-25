@@ -18,7 +18,7 @@ function pipeSnapshot(s, r){
     state: copy,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    result: r && !r.noDimension ? { system: r.system?.label, dn: r.dn, velocity: r.velocity, pressureLoss: r.pressureLoss, massFlowKgh: s.flowUnit === 'kg/h' ? s.flowValue : s.massFlowKgh, volumeFlowM3h: s.flowUnit === 'm³/h' ? s.flowValue : s.volumeFlowM3h } : { massFlowKgh: s.flowUnit === 'kg/h' ? s.flowValue : s.massFlowKgh, volumeFlowM3h: s.flowUnit === 'm³/h' ? s.flowValue : s.volumeFlowM3h }
+    result: r && !r.noDimension ? { system: r.system?.label, dn: r.dn, velocity: r.velocity, pressureLoss: r.pressureLoss, massFlowKgh: s.flowUnit === 'kg/h' ? s.flowValue : s.massFlowKgh, volumeFlowM3h: s.flowUnit === 'm3/h' ? s.flowValue : s.volumeFlowM3h } : { massFlowKgh: s.flowUnit === 'kg/h' ? s.flowValue : s.massFlowKgh, volumeFlowM3h: s.flowUnit === 'm3/h' ? s.flowValue : s.volumeFlowM3h }
   };
 }
 function savedPipeRows(s){
@@ -31,11 +31,11 @@ function savedPipeRows(s){
     deleteAttr: 'data-pipe-delete',
     title: item => item.name || 'Rohrauslegung',
     stats: item => [
-      {label:'System', value:item.result?.system || '—'},
-      {label:'Dimension', value:item.result?.dn ? `DN ${item.result.dn}` : '—'},
-      {label:'Druckverlust', value:item.result?.pressureLoss ? fmt(item.result.pressureLoss) : '—', unit:item.result?.pressureLoss ? 'Pa/m' : ''},
-      {label:'Massenstrom', value:item.result?.massFlowKgh || '—', unit:item.result?.massFlowKgh ? 'kg/h' : ''},
-      {label:'Volumenstrom', value:item.result?.volumeFlowM3h || '—', unit:item.result?.volumeFlowM3h ? 'm³/h' : ''}
+      {label:'System', value:item.result?.system || '-'},
+      {label:'Dimension', value:item.result?.dn ? `DN ${item.result.dn}` : '-'},
+      {label:'Druckverlust', value:item.result?.pressureLoss ? fmt(item.result.pressureLoss) : '-', unit:item.result?.pressureLoss ? 'Pa/m' : ''},
+      {label:'Massenstrom', value:item.result?.massFlowKgh || '-', unit:item.result?.massFlowKgh ? 'kg/h' : ''},
+      {label:'Volumenstrom', value:item.result?.volumeFlowM3h || '-', unit:item.result?.volumeFlowM3h ? 'm3/h' : ''}
     ]
   });
 }
@@ -56,10 +56,10 @@ function pipeDimensionCards(r) {
     const percent = Math.max(0, Math.min(ratio * 100, 100));
     const key = item.rating?.key || (ratio < .75 ? 'green' : ratio <= 1 ? 'yellow' : 'red');
     const isRecommended = item.dn === r.dn;
-    const label = isRecommended ? 'Empfohlen' : (item.dn < r.dn ? 'Eine DN kleiner' : 'Eine DN größer');
-    const dimension = item.dimension ? `Ø ${item.dimension} mm` : `di ${fmt(item.di, 1)} mm`;
+    const label = isRecommended ? 'Empfohlen' : (item.dn < r.dn ? 'Eine DN kleiner' : 'Eine DN groesser');
+    const dimension = item.dimension ? `Oe ${item.dimension} mm` : `di ${fmt(item.di, 1)} mm`;
     return `<div class="pipe-dimension-card pipe-dimension-card--${key}${isRecommended ? ' is-recommended' : ''}">
-      <div class="pipe-dimension-card__head"><span>${label}</span>${isRecommended ? '<small>★</small>' : ''}</div>
+      <div class="pipe-dimension-card__head"><span>${label}</span>${isRecommended ? '<small>*</small>' : ''}</div>
       <strong>DN ${item.dn}</strong>
       <div class="pipe-dimension-card__meta"><span>${dimension}</span><span>di ${fmt(item.di, 1)} mm</span><span>${fmt(item.velocity)} m/s</span><span>${fmt(item.pressureLoss)} Pa/m</span></div>
       <div class="pipe-bar"><span style="width:${percent}%"></span></div>
@@ -79,16 +79,16 @@ function view(s) {
       unitField: 'flowUnit',
       unitOptions: [
         { value: 'kg/h', label: 'kg/h' },
-        { value: 'm³/h', label: 'm³/h' }
+        { value: 'm3/h', label: 'm3/h' }
       ],
       value: s.flowValue || s.massFlowKgh || s.volumeFlowM3h || ''
     })
   ].join('')), 'blue');
 
   const outputBody = !r
-    ? '<div class="empty-state">Volumenstrom oder Massenstrom eingeben →</div>'
+    ? '<div class="empty-state">Volumenstrom oder Massenstrom eingeben -></div>'
     : r.noDimension
-      ? '<div class="empty-state">Keine Dimensionierung möglich!</div>'
+      ? '<div class="empty-state">Keine Dimensionierung moeglich!</div>'
       : stack([
           `<div class="pipe-result-head"><span>Empfohlene DN</span><strong>DN ${r.dn}</strong>${pressureBadge(r)}</div>`,
           resultRows([
@@ -99,10 +99,10 @@ function view(s) {
           pipeDimensionCards(r)
         ].join(''));
 
-  const outputCard = card(`Ergebnis — ${r?.system?.label ?? 'Rohrsystem'}`, outputBody, 'blue');
+  const outputCard = card(`Ergebnis - ${r?.system?.label ?? 'Rohrsystem'}`, outputBody, 'blue');
 
   return renderModuleShell(config, `
-    <div class="span-6">${inputCard}<div class="formula">≤ DN50: DIN EN 10255 · ≥ DN65: DIN EN 10220</div>${pipeSaveCard(s)}</div>
+    <div class="span-6">${inputCard}<div class="formula"><= DN50: DIN EN 10255  -  >= DN65: DIN EN 10220</div>${pipeSaveCard(s)}</div>
     <div class="span-6">${outputCard}<div class="formula">Auslegung nach Druckverlustgrenze</div></div>
   `);
 }

@@ -9,9 +9,9 @@ import { bindEditModeClear } from '../../core/savedRecords.js';
 const opts = items => items.map(([value, label]) => ({ value, label }));
 
 function modeLabel(mode){
-  if(mode === 'defrost') return 'Wärmepumpe / Abtauung';
+  if(mode === 'defrost') return 'Waermepumpe / Abtauung';
   if(mode === 'reserve') return 'Wasservorlage';
-  if(mode === 'compare') return 'Vergleich / maßgebend';
+  if(mode === 'compare') return 'Vergleich / massgebend';
   return 'Mindestlaufzeit';
 }
 function mediumLabel(s){
@@ -20,7 +20,7 @@ function mediumLabel(s){
   return `${name} ${s.glycolConcentration} %`;
 }
 function warnList(items){
-  if(!items.length) return '<div class="empty-state empty-state--compact">Keine Plausibilitätswarnungen.</div>';
+  if(!items.length) return '<div class="empty-state empty-state--compact">Keine Plausibilitaetswarnungen.</div>';
   return `<div class="ph-warnings">${items.map(item => `<div class="ph-warning"><span>Hinweis</span><strong>${esc(item)}</strong></div>`).join('')}</div>`;
 }
 function savedSnapshot(s, r){
@@ -41,18 +41,18 @@ function savedRows(items = []){
   if(!items.length) return '<div class="empty-state empty-state--compact">Noch keine Pufferspeicher-Berechnungen gespeichert.</div>';
   return `<div class="ph-saved-list">${items.map(item => {
     const res = item.result || {};
-    const subtitle = [modeLabel(res.mode), res.standard ? `${fmt(res.standard,0)} l` : '', res.medium].filter(Boolean).join(' · ');
+    const subtitle = [modeLabel(res.mode), res.standard ? `${fmt(res.standard,0)} l` : '', res.medium].filter(Boolean).join('  -  ');
     return `<article class="ph-saved-item line-section-card is-collapsed ${state.get().activeCalculationId === item.id ? 'is-active' : ''}" data-line-card data-buffer-select="${esc(item.id)}">
       <div class="line-section-card__head">
         <div class="line-section-card__title" ><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle || 'gespeicherte Berechnung')}</small></div>
-        <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Gespeicherte Berechnung aufklappen"><span>▾</span></button>
-        <button type="button" class="line-section-card__delete" data-buffer-delete="${esc(item.id)}" aria-label="Berechnung löschen">×</button>
+        <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Gespeicherte Berechnung aufklappen"><span>v</span></button>
+        <button type="button" class="line-section-card__delete" data-buffer-delete="${esc(item.id)}" aria-label="Berechnung loeschen"> x </button>
       </div>
       <div class="line-section-card__body">${resultRows([
         { label:'Berechnungsart', value:modeLabel(res.mode) },
-        { label:'Normvolumen', value:res.standard ? fmt(res.standard,0) : '—', unit:res.standard ? 'Liter' : '' },
-        { label:'Volumen', value:res.volume ? fmt(res.volume,1) : '—', unit:res.volume ? 'Liter' : '' },
-        { label:'Medium', value:res.medium || '—' }
+        { label:'Normvolumen', value:res.standard ? fmt(res.standard,0) : '-', unit:res.standard ? 'Liter' : '' },
+        { label:'Volumen', value:res.volume ? fmt(res.volume,1) : '-', unit:res.volume ? 'Liter' : '' },
+        { label:'Medium', value:res.medium || '-' }
       ])}</div>
     </article>`;
   }).join('')}</div>`;
@@ -98,30 +98,30 @@ function bufferInputGrid(content, modifier = ''){
 }
 function runtimeInputs(s){
   return card('Mindestlaufzeit Verdichter', bufferInputGrid([
-    field({ id:'qMaxKw', label:'QMax · max. Geräte-/Kälte-/Heizleistung', value:fmtInput(s.qMaxKw,2), unit:'kW' }),
-    field({ id:'compressorRunTimeMin', label:'TLaufzeit · Mindestlaufzeit Verdichter', value:fmtInput(s.compressorRunTimeMin,2), unit:'min' }),
-    field({ id:'qLoadKw', label:'QLast · konstante Lastabnahme', value:fmtInput(s.qLoadKw,2), unit:'kW' }),
-    field({ id:'partLoadFactor', label:'Teillast · kleinste Teillaststufe', value:fmtInput(s.partLoadFactor,3), unit:'%' }),
-    field({ id:'controllerDeltaT', label:'ΔT Hydraulikkreislauf', value:fmtInput(s.controllerDeltaT,2), unit:'K' }),
+    field({ id:'qMaxKw', label:'QMax  -  max. Geraete-/Kaelte-/Heizleistung', value:fmtInput(s.qMaxKw,2), unit:'kW' }),
+    field({ id:'compressorRunTimeMin', label:'TLaufzeit  -  Mindestlaufzeit Verdichter', value:fmtInput(s.compressorRunTimeMin,2), unit:'min' }),
+    field({ id:'qLoadKw', label:'QLast  -  konstante Lastabnahme', value:fmtInput(s.qLoadKw,2), unit:'kW' }),
+    field({ id:'partLoadFactor', label:'Teillast  -  kleinste Teillaststufe', value:fmtInput(s.partLoadFactor,3), unit:'%' }),
+    field({ id:'controllerDeltaT', label:'DeltaT Hydraulikkreislauf', value:fmtInput(s.controllerDeltaT,2), unit:'K' }),
     field({ id:'existingSystemVolumeL', label:'vorhandener Systeminhalt abziehen', value:fmtInput(s.existingSystemVolumeL,1), unit:'Liter' }),
-    '<p class="ph-help ph-help--inline buffer-help"><strong>Teillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große Verdichter ⇒ 25 %. Die Berechnung nutzt intern 0,25.</p>',
+    '<p class="ph-help ph-help--inline buffer-help"><strong>Teillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich grosse Verdichter => 25 %. Die Berechnung nutzt intern 0,25.</p>',
     '<p class="ph-help ph-help--inline buffer-help"><strong>QLast:</strong> konstant durch aktive Verbraucher abgenommene Leistung. Falls keine konstante Last vorhanden oder bekannt ist, 0 kW eintragen.</p>'
   ].join(''), 'buffer-input-grid--runtime'), 'cyan');
 }
 function defrostInputs(s){
-  return card('Abtaubetrieb Wärmepumpe', bufferInputGrid([
-    field({ id:'qConsumerKw', label:'QVerbraucher · Heizleistung aktive Verbraucher', value:fmtInput(s.qConsumerKw,2), unit:'kW' }),
-    field({ id:'qDefrostKw', label:'QKälte · Kälteleistung bei Abtauung', value:fmtInput(s.qDefrostKw,2), unit:'kW' }),
-    field({ id:'qHeatingCircuitKw', label:'QHeiz · Heizleistung verbleibender Kreis', value:fmtInput(s.qHeatingCircuitKw,2), unit:'kW' }),
-    field({ id:'maxDefrostTimeMin', label:'TMaxAbtauung · maximale Abtauzeit', value:fmtInput(s.maxDefrostTimeMin,2), unit:'min' }),
-    field({ id:'hydraulicDeltaT', label:'ΔT Hydraulikkreislauf', value:fmtInput(s.hydraulicDeltaT,2), unit:'K' }),
+  return card('Abtaubetrieb Waermepumpe', bufferInputGrid([
+    field({ id:'qConsumerKw', label:'QVerbraucher  -  Heizleistung aktive Verbraucher', value:fmtInput(s.qConsumerKw,2), unit:'kW' }),
+    field({ id:'qDefrostKw', label:'QKaelte  -  Kaelteleistung bei Abtauung', value:fmtInput(s.qDefrostKw,2), unit:'kW' }),
+    field({ id:'qHeatingCircuitKw', label:'QHeiz  -  Heizleistung verbleibender Kreis', value:fmtInput(s.qHeatingCircuitKw,2), unit:'kW' }),
+    field({ id:'maxDefrostTimeMin', label:'TMaxAbtauung  -  maximale Abtauzeit', value:fmtInput(s.maxDefrostTimeMin,2), unit:'min' }),
+    field({ id:'hydraulicDeltaT', label:'DeltaT Hydraulikkreislauf', value:fmtInput(s.hydraulicDeltaT,2), unit:'K' }),
     field({ id:'existingSystemVolumeL', label:'vorhandener Systeminhalt abziehen', value:fmtInput(s.existingSystemVolumeL,1), unit:'Liter' })
   ].join(''), 'buffer-input-grid--defrost'), 'cyan');
 }
 function reserveInputs(s){
-  return card('Wasservorlage als Kälte- / Wärmespeicher', bufferInputGrid([
-    field({ id:'consumerFlowM3h', label:'Volumenstrom Verbraucher', value:fmtInput(s.consumerFlowM3h,3), unit:'m³/h' }),
-    field({ id:'bridgeTimeMin', label:'Überbrückungszeit', value:fmtInput(s.bridgeTimeMin,2), unit:'min' })
+  return card('Wasservorlage als Kaelte- / Waermespeicher', bufferInputGrid([
+    field({ id:'consumerFlowM3h', label:'Volumenstrom Verbraucher', value:fmtInput(s.consumerFlowM3h,3), unit:'m3/h' }),
+    field({ id:'bridgeTimeMin', label:'Ueberbrueckungszeit', value:fmtInput(s.bridgeTimeMin,2), unit:'min' })
   ].join(''), 'buffer-input-grid--reserve'), 'cyan');
 }
 function inputBlocks(s){
@@ -132,9 +132,9 @@ function inputBlocks(s){
 }
 function view(s){
   const r = calculate(s);
-  const main = { label:'Erforderliches Pufferspeichervolumen', value:r.decisiveVolume > 0 ? fmt(r.decisiveVolume,1) : '—', unit:r.decisiveVolume > 0 ? 'Liter' : '' };
+  const main = { label:'Erforderliches Pufferspeichervolumen', value:r.decisiveVolume > 0 ? fmt(r.decisiveVolume,1) : '-', unit:r.decisiveVolume > 0 ? 'Liter' : '' };
   const details = [
-    { label:'Nächstes Normvolumen', value:r.nextStandardVolume ? fmt(r.nextStandardVolume,0) : '—', unit:r.nextStandardVolume ? 'Liter' : '' },
+    { label:'Naechstes Normvolumen', value:r.nextStandardVolume ? fmt(r.nextStandardVolume,0) : '-', unit:r.nextStandardVolume ? 'Liter' : '' },
     { label:'Berechnungsart', value:modeLabel(s.calculationMode) },
     { label:'Medium / Faktor', value:`${mediumLabel(s)} / ${fmt(r.factor,2)}` },
     { label:'minimaler Systeminhalt', value:fmt(r.decisiveSystemVolume,1), unit:'Liter' }
@@ -143,10 +143,10 @@ function view(s){
   const inputColumn = stack([
     card('Berechnungsart', stack([
       `<div class="buffer-mode-tabs">${segmented('calculationMode', opts([['runtime','Mindestlaufzeit'],['defrost','Abtauung'],['reserve','Wasservorlage'],['compare','Vergleich']]), s.calculationMode, { accent:'cyan' })}</div>`,
-      '<p class="ph-help">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'
+      '<p class="ph-help">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekuehlter Waermepumpen oder eine definierte Kaelte-/Waermevorlage betrachten.</p>'
     ].join('')), 'cyan'),
     card('Medium / Faktor', stack([
-      selectField({ id:'mediumMode', label:'Wärmeträger', value:s.mediumMode, options:opts([['water','Wasser'],['glycol','Wasser-Glykol-Gemisch']]) }),
+      selectField({ id:'mediumMode', label:'Waermetraeger', value:s.mediumMode, options:opts([['water','Wasser'],['glycol','Wasser-Glykol-Gemisch']]) }),
       glycolFields(s),
       inlineStats([{ label:'Berechnungsfaktor', value:fmt(r.factor,2) }, { label:'Grundlage', value:'Mitsubishi-Formel' }])
     ].join('')), 'cyan'),
@@ -166,10 +166,10 @@ function view(s){
       { label:'Wasservorlage', value:fmt(r.reserveVolume,1), unit:'Liter' },
       { label:'abgezogener Systeminhalt', value:fmt(r.existingSystemVolume,1), unit:'Liter' }
     ], 'cyan'),
-    card('Formeln / Plausibilität', stack([
-      '<div class="formula ph-formula">V = ((QMax × Teillast − QLast) × Faktor × TLaufzeit) / ΔTHydraulik</div>',
-      '<div class="formula ph-formula">VAbtau = ((QVerbraucher + QKälte − QHeiz) × Faktor × TMaxAbtauung) / ΔTHydraulik</div>',
-      '<div class="formula ph-formula">VWasservorlage = V̇Verbraucher × tÜberbrückung × 1000 / 60</div>',
+    card('Formeln / Plausibilitaet', stack([
+      '<div class="formula ph-formula">V = ((QMax  x  Teillast  QLast)  x  Faktor  x  TLaufzeit) / DeltaTHydraulik</div>',
+      '<div class="formula ph-formula">VAbtau = ((QVerbraucher + QKaelte  QHeiz)  x  Faktor  x  TMaxAbtauung) / DeltaTHydraulik</div>',
+      '<div class="formula ph-formula">VWasservorlage = VVerbraucher  x  tUeberbrueckung  x  1000 / 60</div>',
       warnList(r.warnings)
     ].join('')), 'cyan')
   ].join(''));

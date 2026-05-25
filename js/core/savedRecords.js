@@ -22,7 +22,7 @@ export function removeRecord(items, id) {
 
 export function renderSavedRecordList(items = [], {
   activeId = null,
-  emptyText = 'Noch keine Einträge gespeichert.',
+  emptyText = 'Noch keine Eintraege gespeichert.',
   loadAttr = 'data-saved-load',
   toggleAttr = 'data-saved-toggle',
   deleteAttr = 'data-saved-delete',
@@ -40,8 +40,8 @@ export function renderSavedRecordList(items = [], {
     return `<article class="line-section-card saved-record-card is-collapsed ${isSameId(activeId, item.id) ? 'is-active' : ''}" data-line-card ${loadAttr}="${esc(item.id)}">
       <div class="line-section-card__head saved-record-card__head">
         <div class="line-section-card__title saved-record-card__title"><strong>${esc(itemTitle)}</strong>${itemSubtitle ? `<small>${esc(itemSubtitle)}</small>` : ''}</div>
-        <button type="button" class="line-section-card__toggle saved-record-card__toggle" ${toggleAttr} aria-expanded="false" aria-label="Details aufklappen"><span>▾</span></button>
-        <button type="button" class="line-section-card__delete saved-record-card__delete" ${deleteAttr}="${esc(item.id)}" aria-label="Eintrag löschen">×</button>
+        <button type="button" class="line-section-card__toggle saved-record-card__toggle" ${toggleAttr} aria-expanded="false" aria-label="Details aufklappen"><span>v</span></button>
+        <button type="button" class="line-section-card__delete saved-record-card__delete" ${deleteAttr}="${esc(item.id)}" aria-label="Eintrag loeschen"> x </button>
       </div>
       <div class="line-section-card__body saved-record-card__body">${inlineStats(itemStats)}</div>
     </article>`;

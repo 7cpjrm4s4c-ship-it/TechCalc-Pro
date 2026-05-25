@@ -6,5 +6,5 @@ export default {
   accent: 'cyan',
   order: 25,
   defaultVisible: false,
-  description: 'Berechnung von Wärmerückgewinnung und Mischluftzuständen in Lüftungsanlagen.'
+  description: 'Berechnung von Waermerueckgewinnung und Mischluftzustaenden in Lueftungsanlagen.'
 };

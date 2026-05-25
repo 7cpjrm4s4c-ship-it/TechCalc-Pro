@@ -23,7 +23,7 @@ function fixtureRows(fixtures = []) {
     const qty = Math.max(0, Math.round(toNumber(item.quantity || 1)) || 0);
     const du = base.custom ? Math.max(0, toNumber(item.customDu)) : base.du;
     const name = base.custom ? (item.customName || 'Freier Gegenstand') : base.name;
-    const dn = base.custom ? (item.customDn || '—') : base.dn;
+    const dn = base.custom ? (item.customDn || '-') : base.dn;
     return { ...item, base, name, dn, qty, du, totalDu: qty * du, wc: Boolean(base.wc) };
   });
 }
@@ -58,35 +58,35 @@ function validate(state, totals, selected) {
   const slope = toNumber(state.slopeCmM);
   const lineType = ['ground-full','ventilation'].includes(state.lineType) ? 'ground-outside' : state.lineType;
 
-  if (!totals.fixtures.length) warnings.push('Noch keine Entwässerungsgegenstände erfasst.');
-  if (totals.qww < totals.largestDu && totals.largestDu > 0) warnings.push('Qww ist kleiner als der größte Einzelanschlusswert. Maßgebend ist der größte angeschlossene DU-Wert.');
+  if (!totals.fixtures.length) warnings.push('Noch keine Entwaesserungsgegenstaende erfasst.');
+  if (totals.qww < totals.largestDu && totals.largestDu > 0) warnings.push('Qww ist kleiner als der groesste Einzelanschlusswert. Massgebend ist der groesste angeschlossene DU-Wert.');
   if (lineType === 'single-unvented') {
-    if (length > 4) warnings.push('Unbelüftete Einzelanschlussleitungen dürfen höchstens 4 m lang sein.');
-    if (slope < 1) warnings.push('Mindestgefälle unbelüfteter Einzelanschlussleitungen: 1 cm/m.');
-    if (bends > 3) warnings.push('Innerhalb eines Fließwegs sind maximal drei 90°-Umlenkungen zulässig.');
+    if (length > 4) warnings.push('Unbelueftete Einzelanschlussleitungen duerfen hoechstens 4 m lang sein.');
+    if (slope < 1) warnings.push('Mindestgefaelle unbeluefteter Einzelanschlussleitungen: 1 cm/m.');
+    if (bends > 3) warnings.push('Innerhalb eines Fliesswegs sind maximal drei 90 Grad-Umlenkungen zulaessig.');
   }
   if (lineType === 'single-vented') {
-    if (length > 10) warnings.push('Belüftete Einzelanschlussleitungen dürfen höchstens 10 m lang sein.');
-    if (slope < 0.5) warnings.push('Mindestgefälle belüfteter Einzelanschlussleitungen: 0,5 cm/m.');
+    if (length > 10) warnings.push('Belueftete Einzelanschlussleitungen duerfen hoechstens 10 m lang sein.');
+    if (slope < 0.5) warnings.push('Mindestgefaelle beluefteter Einzelanschlussleitungen: 0,5 cm/m.');
   }
   if (lineType === 'branch-unvented') {
-    if (slope < 1) warnings.push('Mindestgefälle unbelüfteter Sammelanschlussleitungen: 1 cm/m.');
-    if (length > (selected?.maxLength || 0)) warnings.push(`Maximale Rohrlänge für ${selected?.dn || 'gewählte DN'} überschritten.`);
+    if (slope < 1) warnings.push('Mindestgefaelle unbeluefteter Sammelanschlussleitungen: 1 cm/m.');
+    if (length > (selected?.maxLength || 0)) warnings.push(`Maximale Rohrlaenge fuer ${selected?.dn || 'gewaehlte DN'} ueberschritten.`);
   }
   if (lineType === 'branch-vented') {
-    if (slope < 0.5) warnings.push('Belüftete Sammelanschlussleitungen werden als Sammelleitung mit mindestens 0,5 cm/m vorbemessen.');
+    if (slope < 0.5) warnings.push('Belueftete Sammelanschlussleitungen werden als Sammelleitung mit mindestens 0,5 cm/m vorbemessen.');
   }
   if (lineType === 'stack' && totals.hasWc && selected?.dn && !['DN 100', 'DN 125', 'DN 150', 'DN 200'].includes(selected.dn)) {
-    warnings.push('Bei angeschlossenem WC wird für die Fallleitung mindestens DN 100 angesetzt.');
+    warnings.push('Bei angeschlossenem WC wird fuer die Fallleitung mindestens DN 100 angesetzt.');
   }
   if (totals.hasWc && ['branch-unvented','branch-vented','collector','ground-inside','ground-outside'].includes(lineType) && selected?.dn === 'DN 100') {
-    warnings.push('Bei angeschlossenen WC-Anlagen wird für Sammel-/Grundleitungen anwenderseitig mindestens DN 100 empfohlen.');
+    warnings.push('Bei angeschlossenen WC-Anlagen wird fuer Sammel-/Grundleitungen anwenderseitig mindestens DN 100 empfohlen.');
   }
   if (lineType === 'collector') {
-    if (slope < 0.5) warnings.push('Sammelleitungen innerhalb des Gebäudes: Mindestgefälle 0,5 cm/m und v ≥ 0,5 m/s prüfen.');
+    if (slope < 0.5) warnings.push('Sammelleitungen innerhalb des Gebaeudes: Mindestgefaelle 0,5 cm/m und v >= 0,5 m/s pruefen.');
   }
   if (lineType === 'ground-outside') {
-    if (slope < 1) warnings.push('Grundleitungen außerhalb des Gebäudes: Mindestgefälle 1 cm/m, v ≥ 0,7 m/s und vmax 2,5 m/s prüfen.');
+    if (slope < 1) warnings.push('Grundleitungen ausserhalb des Gebaeudes: Mindestgefaelle 1 cm/m, v >= 0,7 m/s und vmax 2,5 m/s pruefen.');
   }
   return warnings;
 }
@@ -111,24 +111,24 @@ export function calculate(state) {
   if (effectiveLineType === 'branch-unvented') {
     selected = chooseBranchConnection(sumDu, k);
     if (hasWc && dnOrder.indexOf(selected?.dn) < dnOrder.indexOf('DN 100')) selected = { ...selected, dn: 'DN 100' };
-    dimensionBasis = 'Tabelle 7 · Anschlussleitung unbelüftet';
+    dimensionBasis = 'Tabelle 7  -  Anschlussleitung unbelueftet';
   } else if (effectiveLineType === 'branch-vented') {
     selected = chooseHydraulic(qtot, state.fillRatio || '0.5', state.slopeCmM, 'collector', hasWc);
-    dimensionBasis = `Tabelle A.${state.fillRatio === '0.7' ? '4' : state.fillRatio === '1.0' ? '5' : '3'} · Anschlussleitung belüftet`;
+    dimensionBasis = `Tabelle A.${state.fillRatio === '0.7' ? '4' : state.fillRatio === '1.0' ? '5' : '3'}  -  Anschlussleitung belueftet`;
   } else if (effectiveLineType === 'stack') {
     selected = chooseStack(qtot, state.branchType, hasWc);
-    dimensionBasis = 'Tabelle 8 · Fallleitung mit Hauptlüftung';
+    dimensionBasis = 'Tabelle 8  -  Fallleitung mit Hauptlueftung';
   } else if (['collector', 'ground-inside', 'ground-outside'].includes(effectiveLineType)) {
     selected = chooseHydraulic(qtot, state.fillRatio, state.slopeCmM, effectiveLineType, hasWc);
-    dimensionBasis = `Tabelle A.${state.fillRatio === '0.5' ? '3' : state.fillRatio === '0.7' ? '4' : '5'} · h/di=${state.fillRatio}`;
+    dimensionBasis = `Tabelle A.${state.fillRatio === '0.5' ? '3' : state.fillRatio === '0.7' ? '4' : '5'}  -  h/di=${state.fillRatio}`;
   } else {
-    const maxDn = fixtures.map(item => item.dn).filter(Boolean).at(0) || '—';
+    const maxDn = fixtures.map(item => item.dn).filter(Boolean).at(0) || '-';
     selected = { dn: maxDn, maxLength: effectiveLineType === 'single-unvented' ? 4 : 10 };
-    dimensionBasis = effectiveLineType === 'single-vented' ? 'Einzelanschlussleitung belüftet' : 'Einzelanschlussleitung unbelüftet';
+    dimensionBasis = effectiveLineType === 'single-vented' ? 'Einzelanschlussleitung belueftet' : 'Einzelanschlussleitung unbelueftet';
   }
 
   const warnings = validate(state, { fixtures, qww, largestDu, hasWc }, selected);
-  if (qtot <= 0) warnings.push('Qtot ist 0 l/s. Eingaben prüfen.');
+  if (qtot <= 0) warnings.push('Qtot ist 0 l/s. Eingaben pruefen.');
 
   return { fixtures, sumDu, largestDu, k, qwwFormula, qww, qc, qp, qra, qtot, hasWc, selected, dimensionBasis, warnings };
 }

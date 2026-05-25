@@ -18,22 +18,22 @@ const fmtDecimalInput = (value, digits = 1) => {
   return n.toLocaleString('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 };
 const fmtStateNumber = (value, digits = 1) => {
-  if (value === '' || value === null || value === undefined) return '—';
+  if (value === '' || value === null || value === undefined) return '-';
   const n = toNumber(value);
-  if (!Number.isFinite(n)) return String(value ?? '—');
+  if (!Number.isFinite(n)) return String(value ?? '-');
   return n.toLocaleString('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 };
 
 function lineTypeLabel(value) {
   return {
-    'single-unvented': 'Einzelanschluss unbelüftet',
-    'single-vented': 'Einzelanschluss belüftet',
-    'branch-unvented': 'Anschlussleitung unbelüftet',
-    'branch-vented': 'Anschlussleitung belüftet',
+    'single-unvented': 'Einzelanschluss unbelueftet',
+    'single-vented': 'Einzelanschluss belueftet',
+    'branch-unvented': 'Anschlussleitung unbelueftet',
+    'branch-vented': 'Anschlussleitung belueftet',
     stack: 'Fallleitung',
     collector: 'Sammelleitung',
     'ground-inside': 'Grundleitung innen',
-    'ground-outside': 'Grundleitung außen',
+    'ground-outside': 'Grundleitung aussen',
   }[value] || value;
 }
 
@@ -64,13 +64,13 @@ function lineTypeSelector(s) {
     ['stack', 'Fallleitung'],
     ['collector', 'Sammelleitung'],
     ['ground-inside', 'Grund innen'],
-    ['ground-outside', 'Grund außen']
+    ['ground-outside', 'Grund aussen']
   ];
   const blocks = [miniSegment(families.map(([value, label]) => ({ attr:'data-line-family', value, label, active: family === value })), 'wastewater-line-selector')];
   if (family === 'single' || family === 'branch') {
-    blocks.push(`<div class="wastewater-subselect"><span>Ausführung</span>${miniSegment([
-      { attr:'data-line-ventilation', value:'unvented', label:'unbelüftet', active: ventilation === 'unvented' },
-      { attr:'data-line-ventilation', value:'vented', label:'belüftet', active: ventilation === 'vented' }
+    blocks.push(`<div class="wastewater-subselect"><span>Ausfuehrung</span>${miniSegment([
+      { attr:'data-line-ventilation', value:'unvented', label:'unbelueftet', active: ventilation === 'unvented' },
+      { attr:'data-line-ventilation', value:'vented', label:'belueftet', active: ventilation === 'vented' }
     ])}</div>`);
   }
   return blocks.join('');
@@ -99,28 +99,28 @@ function savedRows(s) {
   return `<div class="ph-saved-list">${items.map(item => {
     const r = item.result || {};
     const active = String(s.activeCalculationId || '') === String(item.id);
-    const subtitle = [`${fmt(r.qtot || 0,2)} l/s`, r.dn, lineTypeLabel(r.lineType)].filter(Boolean).join(' · ');
+    const subtitle = [`${fmt(r.qtot || 0,2)} l/s`, r.dn, lineTypeLabel(r.lineType)].filter(Boolean).join('  -  ');
     return `<article class="ph-saved-item line-section-card is-collapsed ${active ? 'is-active' : ''}" data-line-card data-wastewater-select="${esc(item.id)}">
       <div class="line-section-card__head">
         <div class="line-section-card__title"><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle)}</small></div>
-        <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Gespeicherte Berechnung aufklappen"><span>▾</span></button>
-        <button type="button" class="line-section-card__delete" data-wastewater-delete="${esc(item.id)}" aria-label="Berechnung löschen">×</button>
+        <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Gespeicherte Berechnung aufklappen"><span>v</span></button>
+        <button type="button" class="line-section-card__delete" data-wastewater-delete="${esc(item.id)}" aria-label="Berechnung loeschen"> x </button>
       </div>
       <div class="line-section-card__body">${resultRows([
         { label:'Qtot', value:fmt(r.qtot || 0,2), unit:'l/s' },
         { label:'Qww', value:fmt(r.qww || 0,2), unit:'l/s' },
-        { label:'ΣDU', value:fmt(r.sumDu || 0,1), unit:'l/s' },
-        { label:'Empfohlene DN', value:r.dn || '—' }
+        { label:'SummeDU', value:fmt(r.sumDu || 0,1), unit:'l/s' },
+        { label:'Empfohlene DN', value:r.dn || '-' }
       ])}</div>
     </article>`;
   }).join('')}</div>`;
 }
 function fixturesTable(s, r) {
-  if (!r.fixtures.length) return '<div class="empty-state empty-state--compact">Noch keine Entwässerungsgegenstände hinzugefügt.</div>';
+  if (!r.fixtures.length) return '<div class="empty-state empty-state--compact">Noch keine Entwaesserungsgegenstaende hinzugefuegt.</div>';
   return `<div class="dw-consumer-list wastewater-fixture-list">${r.fixtures.map(item => `<div class="dw-consumer-row wastewater-fixture-row wastewater-fixture-row--editable">
-    <div><strong>${esc(item.name)}</strong><span>ΣDU ${fmt(item.totalDu,1)} l/s · DU/Stk. ${fmt(item.du,1)} l/s · Einzelanschluss ${esc(item.dn || '—')}</span></div>
+    <div><strong>${esc(item.name)}</strong><span>SummeDU ${fmt(item.totalDu,1)} l/s  -  DU/Stk. ${fmt(item.du,1)} l/s  -  Einzelanschluss ${esc(item.dn || '-')}</span></div>
     <label class="mini-edit-field"><span>Anzahl</span><input type="number" min="0" step="1" value="${esc(item.qty)}" data-fixture-qty="${esc(item.id)}" inputmode="numeric"></label>
-    <button type="button" data-fixture-delete="${esc(item.id)}" aria-label="Entwässerungsgegenstand entfernen">×</button>
+    <button type="button" data-fixture-delete="${esc(item.id)}" aria-label="Entwaesserungsgegenstand entfernen"> x </button>
   </div>`).join('')}</div>`;
 }
 
@@ -129,7 +129,7 @@ function fixtureInputBlock(s) {
   const custom = selected?.custom;
   return stack([
     grid([
-      selectField({ id:'fixtureType', label:'Gegenstand hinzufügen', value:s.fixtureType || 'washbasin', options:fixtureOptions }),
+      selectField({ id:'fixtureType', label:'Gegenstand hinzufuegen', value:s.fixtureType || 'washbasin', options:fixtureOptions }),
       field({ id:'fixtureQuantity', label:'Anzahl', value:fmtInput(s.fixtureQuantity || '1',0), unit:'Stk.', inputmode:'numeric' })
     ].join(''), 2),
     custom ? grid([
@@ -137,7 +137,7 @@ function fixtureInputBlock(s) {
       field({ id:'fixtureCustomDu', label:'DU', value:s.fixtureCustomDu || '', unit:'l/s' }),
       field({ id:'fixtureCustomDn', label:'Mindest-DN', value:s.fixtureCustomDn || '', placeholder:'DN 50', inputmode:'text' })
     ].join(''), 3) : '',
-    '<button type="button" class="action-button action-button--secondary" data-fixture-add>Gegenstand hinzufügen</button>',
+    '<button type="button" class="action-button action-button--secondary" data-fixture-add>Gegenstand hinzufuegen</button>',
     fixturesTable(s, calculate(s))
   ].join(''));
 }
@@ -146,14 +146,14 @@ function fixtureInputBlock(s) {
 
 function lineTypeHints(lineType) {
   const hints = {
-    'single-unvented': ['Einzelanschlussleitungen: max. 4 m Leitungslänge.', 'Maximal drei 90°-Umlenkungen innerhalb eines Fließwegs.', 'Mindestgefälle unbelüftet: 1,0 cm/m.'],
-    'single-vented': ['Belüftete Einzelanschlussleitungen: max. 10 m Leitungslänge.', 'Mindestgefälle belüftet: 0,5 cm/m.', 'Belüftung ist erforderlich, wenn die Grenzen der unbelüfteten Einzelanschlussleitung nicht eingehalten werden.'],
-    'branch-unvented': ['Anschlussleitungen: max. 10 m Leitungslänge.', 'Maximal drei 90°-Umlenkungen innerhalb eines Fließwegs prüfen.', 'Mindestgefälle unbelüftet: 1,0 cm/m.'],
-    'branch-vented': ['Belüftete Anschlussleitungen: max. 10 m Leitungslänge.', 'Maximal drei 90°-Umlenkungen innerhalb eines Fließwegs prüfen.', 'Mindestgefälle belüftet: 0,5 cm/m.'],
-    stack: ['Fallleitungen werden nach Tabelle 8 mit Hauptlüftung vorbemessen.', 'Bei angeschlossenen WC-Anlagen wird mindestens DN 100 empfohlen.', 'Abzweigart mit/ohne Innenradius beeinflusst das zulässige Abflussvermögen.'],
-    collector: ['Sammelleitungen innerhalb des Gebäudes: Füllungsgrad h/di = 0,5 bzw. 0,7.', 'Mindestgefälle: 0,5 cm/m.', 'Mindestfließgeschwindigkeit v ≥ 0,5 m/s prüfen.'],
-    'ground-inside': ['Grundleitungen innerhalb des Gebäudes: Füllungsgrad h/di = 0,5.', 'Mindestgefälle: 0,5 cm/m.', 'Mindestfließgeschwindigkeit v ≥ 0,5 m/s prüfen.'],
-    'ground-outside': ['Grundleitungen außerhalb des Gebäudes: Füllungsgrad h/di = 0,7.', 'Mindestgefälle: 1,0 cm/m.', 'Mindestfließgeschwindigkeit v ≥ 0,7 m/s und vmax 2,5 m/s prüfen.']
+    'single-unvented': ['Einzelanschlussleitungen: max. 4 m Leitungslaenge.', 'Maximal drei 90 Grad-Umlenkungen innerhalb eines Fliesswegs.', 'Mindestgefaelle unbelueftet: 1,0 cm/m.'],
+    'single-vented': ['Belueftete Einzelanschlussleitungen: max. 10 m Leitungslaenge.', 'Mindestgefaelle belueftet: 0,5 cm/m.', 'Belueftung ist erforderlich, wenn die Grenzen der unbeluefteten Einzelanschlussleitung nicht eingehalten werden.'],
+    'branch-unvented': ['Anschlussleitungen: max. 10 m Leitungslaenge.', 'Maximal drei 90 Grad-Umlenkungen innerhalb eines Fliesswegs pruefen.', 'Mindestgefaelle unbelueftet: 1,0 cm/m.'],
+    'branch-vented': ['Belueftete Anschlussleitungen: max. 10 m Leitungslaenge.', 'Maximal drei 90 Grad-Umlenkungen innerhalb eines Fliesswegs pruefen.', 'Mindestgefaelle belueftet: 0,5 cm/m.'],
+    stack: ['Fallleitungen werden nach Tabelle 8 mit Hauptlueftung vorbemessen.', 'Bei angeschlossenen WC-Anlagen wird mindestens DN 100 empfohlen.', 'Abzweigart mit/ohne Innenradius beeinflusst das zulaessige Abflussvermoegen.'],
+    collector: ['Sammelleitungen innerhalb des Gebaeudes: Fuellungsgrad h/di = 0,5 bzw. 0,7.', 'Mindestgefaelle: 0,5 cm/m.', 'Mindestfliessgeschwindigkeit v >= 0,5 m/s pruefen.'],
+    'ground-inside': ['Grundleitungen innerhalb des Gebaeudes: Fuellungsgrad h/di = 0,5.', 'Mindestgefaelle: 0,5 cm/m.', 'Mindestfliessgeschwindigkeit v >= 0,5 m/s pruefen.'],
+    'ground-outside': ['Grundleitungen ausserhalb des Gebaeudes: Fuellungsgrad h/di = 0,7.', 'Mindestgefaelle: 1,0 cm/m.', 'Mindestfliessgeschwindigkeit v >= 0,7 m/s und vmax 2,5 m/s pruefen.']
   };
   return hints[lineType] || [];
 }
@@ -169,22 +169,22 @@ function inputCards(s, r) {
   const lineFields = [
     lineTypeSelector(s),
     grid([
-      field({ id:'slopeCmM', label:'Gefälle J', value:fmtDecimalInput(s.slopeCmM,1), unit:'cm/m' }),
-      selectField({ id:'fillRatio', label:'Füllungsgrad h/di', value:s.fillRatio, options:opts([['0.5','0,5'],['0.7','0,7'],['1.0','1,0']]) })
+      field({ id:'slopeCmM', label:'Gefaelle J', value:fmtDecimalInput(s.slopeCmM,1), unit:'cm/m' }),
+      selectField({ id:'fillRatio', label:'Fuellungsgrad h/di', value:s.fillRatio, options:opts([['0.5','0,5'],['0.7','0,7'],['1.0','1,0']]) })
     ].join(''), 2),
     ''
   ];
   if (s.lineType === 'stack') lineFields.push(segmented('branchType', opts([['with-radius','Abzweige mit Innenradius'],['without-radius','ohne Innenradius']]), s.branchType, { accent:'green' }));
   return stack([
     card('Nutzung / Abflusskennzahl', stack([
-      selectField({ id:'usageType', label:'Gebäudeart und Benutzung', value:s.usageType, options:usageOptions }),
+      selectField({ id:'usageType', label:'Gebaeudeart und Benutzung', value:s.usageType, options:usageOptions }),
       s.usageType === 'custom' ? field({ id:'kValue', label:'Abflusskennzahl K', value:fmtInput(s.kValue,2) }) : inlineStats([{ label:'K', value:fmt(r.k,1) }])
     ].join('')), 'green'),
     card('Leitungsart / Randbedingungen', stack(lineFields.join('')), 'green'),
-    card('Entwässerungsgegenstände', fixtureInputBlock(s), 'green'),
-    card('Zusatzabflüsse', grid([
+    card('Entwaesserungsgegenstaende', fixtureInputBlock(s), 'green'),
+    card('Zusatzabfluesse', grid([
       field({ id:'continuousFlow', label:'Dauerabfluss Qc', value:fmtInput(s.continuousFlow,2), unit:'l/s' }),
-      field({ id:'pumpFlow', label:'Pumpenförderstrom Qp', value:fmtInput(s.pumpFlow,2), unit:'l/s' }),
+      field({ id:'pumpFlow', label:'Pumpenfoerderstrom Qp', value:fmtInput(s.pumpFlow,2), unit:'l/s' }),
       field({ id:'rainFlow', label:'verunreinigtes Niederschlagswasser Qr,a', value:fmtInput(s.rainFlow,2), unit:'l/s' }),
       selectField({ id:'hasWc', label:'WC angeschlossen', value:s.hasWc, options:opts([['no','automatisch / nein'],['yes','ja']]) })
     ].join(''), 2), 'green'),
@@ -197,12 +197,12 @@ function inputCards(s, r) {
 }
 function resultCards(s, r) {
   const effectiveLineType = ['ground-full','ventilation'].includes(s.lineType) ? 'ground-outside' : s.lineType;
-  const dn = r.selected?.dn || '—';
+  const dn = r.selected?.dn || '-';
   const fillApplies = ['collector','ground-inside','ground-outside','branch-vented'].includes(effectiveLineType);
   return stack([
     mainResult('Ergebnis / Dimensionierung Schmutzwasser', { label:'Empfohlene Dimension', value:dn, unit:'' }, [
       { label:'Qww', value:fmt(r.qww,2), unit:'l/s' },
-      { label:'ΣDU', value:fmt(r.sumDu,1), unit:'l/s' },
+      { label:'SummeDU', value:fmt(r.sumDu,1), unit:'l/s' },
       { label:'K', value:fmt(r.k,1) },
       { label:'Qtot', value:fmt(r.qtot,2), unit:'l/s' }
     ], 'green'),
@@ -210,15 +210,15 @@ function resultCards(s, r) {
       resultRows([
         { label:'Leitungsart', value:lineTypeLabel(effectiveLineType) },
         { label:'Bemessungsgrundlage', value:r.dimensionBasis },
-        { label:'Kapazität', value:r.selected?.capacity ? fmt(r.selected.capacity,1) : '—', unit:r.selected?.capacity ? 'l/s' : '' },
-        { label:'Füllungsgrad', value:fillApplies ? `h/di ${String(s.fillRatio).replace('.', ',')}` : '—' },
-        { label:'angesetztes Gefälle', value:fmtStateNumber(s.slopeCmM,1), unit:'cm/m' },
-        { label:'größter Einzel-DU', value:fmt(r.largestDu,1), unit:'l/s' },
-        { label:'Zusatzabflüsse', value:fmt(r.qc + r.qp + r.qra,2), unit:'l/s' }
+        { label:'Kapazitaet', value:r.selected?.capacity ? fmt(r.selected.capacity,1) : '-', unit:r.selected?.capacity ? 'l/s' : '' },
+        { label:'Fuellungsgrad', value:fillApplies ? `h/di ${String(s.fillRatio).replace('.', ',')}` : '-' },
+        { label:'angesetztes Gefaelle', value:fmtStateNumber(s.slopeCmM,1), unit:'cm/m' },
+        { label:'groesster Einzel-DU', value:fmt(r.largestDu,1), unit:'l/s' },
+        { label:'Zusatzabfluesse', value:fmt(r.qc + r.qp + r.qra,2), unit:'l/s' }
       ]),
-      '<div class="ph-formula ph-formula--small">Qww = K × √ΣDU · Qtot = Qww + Qc + Qp + Qr,a</div>'
+      '<div class="ph-formula ph-formula--small">Qww = K  x  sqrtSummeDU  -  Qtot = Qww + Qc + Qp + Qr,a</div>'
     ].join('')), 'green'),
-    card('Normhinweise / Plausibilität', warningList(r.warnings, effectiveLineType), 'green')
+    card('Normhinweise / Plausibilitaet', warningList(r.warnings, effectiveLineType), 'green')
   ].join(''));
 }
 
@@ -248,7 +248,7 @@ function bindActions(root) {
     if (base?.custom) {
       record.customName = current.fixtureCustomName || 'Freier Gegenstand';
       record.customDu = current.fixtureCustomDu || '0';
-      record.customDn = current.fixtureCustomDn || '—';
+      record.customDn = current.fixtureCustomDn || '-';
     }
     state.set({
       fixtures: [...(current.fixtures || []), record],

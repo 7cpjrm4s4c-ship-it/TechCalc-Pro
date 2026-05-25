@@ -55,19 +55,19 @@ function powerField(s) {
 function inputFields(s, active) {
   if (active.calcTarget === 'power') {
     return [
-      field({ id: key(s, 'MassFlowKgh'), label: 'Massenstrom ṁ', unit: 'kg/h', value: fmtInput(active.massFlowKgh, 2) }),
-      field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(active.deltaT, 2) })
+      field({ id: key(s, 'MassFlowKgh'), label: 'Massenstrom m', unit: 'kg/h', value: fmtInput(active.massFlowKgh, 2) }),
+      field({ id: key(s, 'DeltaT'), label: 'DeltaT Temperatur', unit: 'K', value: fmtInput(active.deltaT, 2) })
     ];
   }
   if (active.calcTarget === 'massFlow') {
     return [
       powerField(s),
-      field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(active.deltaT, 2) })
+      field({ id: key(s, 'DeltaT'), label: 'DeltaT Temperatur', unit: 'K', value: fmtInput(active.deltaT, 2) })
     ];
   }
   return [
     powerField(s),
-    field({ id: key(s, 'MassFlowKgh'), label: 'Massenstrom ṁ', unit: 'kg/h', value: fmtInput(active.massFlowKgh, 2) })
+    field({ id: key(s, 'MassFlowKgh'), label: 'Massenstrom m', unit: 'kg/h', value: fmtInput(active.massFlowKgh, 2) })
   ];
 }
 
@@ -83,11 +83,11 @@ function targetMain(target, r) {
 
 function mediumStats(medium) {
   const stats = [
-    { label: 'Dichte ρ', value: fmt(medium.density, 0), unit: 'kg/m³' },
-    { label: 'cₚ', value: fmt(medium.cpWhKgK, 3), unit: 'Wh/(kg·K)' }
+    { label: 'Dichte rho', value: fmt(medium.density, 0), unit: 'kg/m3' },
+    { label: 'cp', value: fmt(medium.cpWhKgK, 3), unit: 'Wh/(kg - K)' }
   ];
   if (medium.frostC !== null && medium.frostC !== undefined) {
-    stats.push({ label: 'Frostschutz', value: fmt(medium.frostC, 0), unit: '°C' });
+    stats.push({ label: 'Frostschutz', value: fmt(medium.frostC, 0), unit: ' GradC' });
   }
   return stats;
 }
@@ -105,16 +105,16 @@ export function writeLineSections(items) {
 
 function lineSectionStats(item) {
   return [
-    { label: 'Leistung', value: item.powerKw || '—', unit: item.powerKw && item.powerKw !== '—' ? 'kW' : '' },
-    { label: 'Massenstrom', value: item.massFlowKgh || '—', unit: item.massFlowKgh && item.massFlowKgh !== '—' ? 'kg/h' : '' },
-    { label: 'Volumenstrom', value: item.volumeFlowM3h || '—', unit: item.volumeFlowM3h && item.volumeFlowM3h !== '—' ? 'm³/h' : '' },
-    { label: 'Temperaturdifferenz', value: item.deltaT || '—', unit: item.deltaT && item.deltaT !== '—' ? 'K' : '' },
-    { label: 'Wärmeträger', value: item.medium || '—' },
-    { label: 'Rohrdimension', value: item.pipeDn || '—' },
-    { label: 'Rohrabmessung', value: item.pipeDimension || '—' },
-    { label: 'Werkstoff', value: item.pipeMaterial || '—' },
-    { label: 'Geschwindigkeit', value: item.pipeVelocity || '—', unit: item.pipeVelocity && item.pipeVelocity !== '—' ? 'm/s' : '' },
-    { label: 'Druckverlust', value: item.pipePressureLoss || '—', unit: item.pipePressureLoss && item.pipePressureLoss !== '—' ? 'Pa/m' : '' }
+    { label: 'Leistung', value: item.powerKw || '-', unit: item.powerKw && item.powerKw !== '-' ? 'kW' : '' },
+    { label: 'Massenstrom', value: item.massFlowKgh || '-', unit: item.massFlowKgh && item.massFlowKgh !== '-' ? 'kg/h' : '' },
+    { label: 'Volumenstrom', value: item.volumeFlowM3h || '-', unit: item.volumeFlowM3h && item.volumeFlowM3h !== '-' ? 'm3/h' : '' },
+    { label: 'Temperaturdifferenz', value: item.deltaT || '-', unit: item.deltaT && item.deltaT !== '-' ? 'K' : '' },
+    { label: 'Waermetraeger', value: item.medium || '-' },
+    { label: 'Rohrdimension', value: item.pipeDn || '-' },
+    { label: 'Rohrabmessung', value: item.pipeDimension || '-' },
+    { label: 'Werkstoff', value: item.pipeMaterial || '-' },
+    { label: 'Geschwindigkeit', value: item.pipeVelocity || '-', unit: item.pipeVelocity && item.pipeVelocity !== '-' ? 'm/s' : '' },
+    { label: 'Druckverlust', value: item.pipePressureLoss || '-', unit: item.pipePressureLoss && item.pipePressureLoss !== '-' ? 'Pa/m' : '' }
   ];
 }
 
@@ -144,12 +144,12 @@ function buildLineSectionRecord(currentState, r, items, id, name, existing = nul
     massFlowKgh: fmt(r.massFlowKgh),
     volumeFlowM3h: fmt(r.volumeFlowM3h, 3),
     deltaT: fmt(r.deltaT),
-    medium: r.medium?.label || '—',
-    pipeDn: r.pipe && !r.pipe.noDimension ? `DN ${r.pipe.dn}` : '—',
-    pipeDimension: r.pipe && !r.pipe.noDimension ? (r.pipe.dimension ? `Ø ${r.pipe.dimension} mm` : `di ${fmt(r.pipe.di, 1)} mm`) : '—',
-    pipeMaterial: r.pipe && !r.pipe.noDimension ? r.pipe.system.label : '—',
-    pipeVelocity: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.velocity) : '—',
-    pipePressureLoss: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.pressureLoss) : '—',
+    medium: r.medium?.label || '-',
+    pipeDn: r.pipe && !r.pipe.noDimension ? `DN ${r.pipe.dn}` : '-',
+    pipeDimension: r.pipe && !r.pipe.noDimension ? (r.pipe.dimension ? `Oe ${r.pipe.dimension} mm` : `di ${fmt(r.pipe.di, 1)} mm`) : '-',
+    pipeMaterial: r.pipe && !r.pipe.noDimension ? r.pipe.system.label : '-',
+    pipeVelocity: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.velocity) : '-',
+    pipePressureLoss: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.pressureLoss) : '-',
     inputState: activeCalculationState(currentState),
     uiState: { mode: currentState.mode, mediumId: currentState.mediumId, pipeSystemId: currentState.pipeSystemId },
     createdAt: existing?.createdAt || new Date().toISOString(),
@@ -166,7 +166,7 @@ function firstFilled(...values) {
 }
 
 function parseDisplayNumber(value) {
-  if (value === undefined || value === null || value === '—') return '';
+  if (value === undefined || value === null || value === '-') return '';
   return String(value).replace(/\s+/g, '').replace(',', '.');
 }
 
@@ -265,44 +265,44 @@ function view(s) {
   const active = activeCalculationState(s);
   const r = calculate(active);
   const accent = s.mode === 'cooling' ? 'cyan' : 'orange';
-  const modeLabel = s.mode === 'cooling' ? 'Kälte' : 'Heizung';
+  const modeLabel = s.mode === 'cooling' ? 'Kaelte' : 'Heizung';
 
   const mediumCard = card('Medium', stack([
-    selectField({ id: 'mediumId', label: 'Wärmeträger', value: s.mediumId, options: MEDIA.map(m => ({ value: m.id, label: m.label })) }),
+    selectField({ id: 'mediumId', label: 'Waermetraeger', value: s.mediumId, options: MEDIA.map(m => ({ value: m.id, label: m.label })) }),
     inlineStats(mediumStats(r.medium))
   ].join('')), 'blue', { compact: true });
 
   const resultDetails = [
     { label: 'Leistung', value: fmt(r.powerKw), unit: 'kW' },
     { label: 'Massenstrom', value: fmt(r.massFlowKgh), unit: 'kg/h' },
-    { label: 'Volumenstrom', value: fmt(r.volumeFlowM3h, 3), unit: 'm³/h' },
-    { label: 'ΔT', value: fmt(r.deltaT), unit: 'K' },
+    { label: 'Volumenstrom', value: fmt(r.volumeFlowM3h, 3), unit: 'm3/h' },
+    { label: 'DeltaT', value: fmt(r.deltaT), unit: 'K' },
     { label: 'Medium', value: r.medium.label },
-    { label: 'Dichte', value: fmt(r.medium.density, 0), unit: 'kg/m³' }
+    { label: 'Dichte', value: fmt(r.medium.density, 0), unit: 'kg/m3' }
   ].filter(item => item.label !== targetLabel(active.calcTarget));
 
   const inputColumn = stack([
     mediumCard,
     card('Betriebsart', segmented('mode', [
-      { value: 'heating', label: '● Heizung' },
-      { value: 'cooling', label: '● Kälte' }
+      { value: 'heating', label: '* Heizung' },
+      { value: 'cooling', label: '* Kaelte' }
     ], s.mode, { accent }), accent, { compact: true }),
-    card(`${modeLabel} — Eingaben`, stack([
+    card(`${modeLabel} - Eingaben`, stack([
       segmented(key(s, 'CalcTarget'), [
         { value: 'power', label: 'Q Leistung' },
-        { value: 'massFlow', label: 'ṁ Massenstrom' },
-        { value: 'deltaT', label: 'ΔT Temperatur' }
+        { value: 'massFlow', label: 'm Massenstrom' },
+        { value: 'deltaT', label: 'DeltaT Temperatur' }
       ], active.calcTarget, { accent }),
       grid(inputFields(s, active).join(''), 2)
     ].join('')), accent),
-    mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent),
-    `<div class="formula">Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)</div>`
+    mainResult(`Ergebnis - ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent),
+    `<div class="formula">Q = m  x  cp  x  DeltaT  -  rho = ${fmt(r.medium.density, 0)} kg/m3  -  cp = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg - K)</div>`
   ].join(''));
 
   const recommendationBody = !r.pipe
-    ? '<div class="empty-state">Massenstrom berechnen oder eingeben →<br>Rohrdimensionierung</div>'
+    ? '<div class="empty-state">Massenstrom berechnen oder eingeben -><br>Rohrdimensionierung</div>'
     : r.pipe.noDimension
-      ? '<div class="empty-state">Keine Dimensionierung möglich!</div>'
+      ? '<div class="empty-state">Keine Dimensionierung moeglich!</div>'
       : `<div class="main-result"><span>Empfohlene Dimension</span><strong>DN ${r.pipe.dn}</strong></div>${inlineStats(pipeDetails(r))}`;
 
   const recommendation = stack([

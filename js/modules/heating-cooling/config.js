@@ -1,1 +1,1 @@
-export default { id:'heating-cooling', title:'Heizung / Kälte', shortTitle:'Heizung', group:'HLK-Anlagen', accent:'orange', order:10, defaultVisible:true, description:'Leistung, Massenstrom und Temperaturspreizung für wassergeführte Systeme.' };
+export default { id:'heating-cooling', title:'Heizung / Kaelte', shortTitle:'Heizung', group:'HLK-Anlagen', accent:'orange', order:10, defaultVisible:true, description:'Leistung, Massenstrom und Temperaturspreizung fuer wassergefuehrte Systeme.' };

@@ -122,7 +122,7 @@ function renderOverflowMenu(overflow, overflowModules, activeId, visibleIds, isM
     <div class="overflow-menu__card">
       <div class="overflow-menu__head">
         <strong>Weitere Module</strong>
-        <small>${isMobile ? 'Nicht ausgewählte Schnellzugriffe' : 'Weitere Werkzeuge'}</small>
+        <small>${isMobile ? 'Nicht ausgewaehlte Schnellzugriffe' : 'Weitere Werkzeuge'}</small>
       </div>
       <div class="overflow-menu__list">
         ${content}
@@ -179,7 +179,7 @@ function renderTab(module, activeId) {
 
 function renderOverflowButton(activeInOverflow, expanded) {
   return `
-    <button class="module-tab module-tab--overflow ${activeInOverflow ? 'is-overflow-active' : ''}" data-overflow type="button" aria-label="Weitere Module öffnen" aria-expanded="${expanded ? 'true' : 'false'}">
+    <button class="module-tab module-tab--overflow ${activeInOverflow ? 'is-overflow-active' : ''}" data-overflow type="button" aria-label="Weitere Module oeffnen" aria-expanded="${expanded ? 'true' : 'false'}">
       +
     </button>
   `;
@@ -190,7 +190,7 @@ function renderOverflowItem(module, activeId, isMobile) {
     <div class="overflow-menu__row ${module.id === activeId ? 'is-active' : ''}">
       <button type="button" data-module-id="${esc(module.id)}" data-accent="${esc(module.accent)}" class="overflow-menu__item">
         <span>${esc(module.shortTitle)}</span>
-        <small>${esc(module.title)} · ${esc(module.group)}</small>
+        <small>${esc(module.title)}  -  ${esc(module.group)}</small>
       </button>
     </div>
   `;
@@ -202,8 +202,8 @@ function renderQuickAccessRow(module, index, length) {
     <div class="settings-row" data-module-id="${esc(module.id)}">
       <span>${esc(module.shortTitle)}</span>
       <span class="settings-row__actions">
-        <button class="mini-button" type="button" data-quick-move="up" data-index="${index}" ${index === 0 ? 'disabled' : ''}>↑</button>
-        <button class="mini-button" type="button" data-quick-move="down" data-index="${index}" ${index === length - 1 ? 'disabled' : ''}>↓</button>
+        <button class="mini-button" type="button" data-quick-move="up" data-index="${index}" ${index === 0 ? 'disabled' : ''}>up</button>
+        <button class="mini-button" type="button" data-quick-move="down" data-index="${index}" ${index === length - 1 ? 'disabled' : ''}>down</button>
         <button class="mini-button" type="button" data-quick-remove="${esc(module.id)}">Entfernen</button>
       </span>
     </div>

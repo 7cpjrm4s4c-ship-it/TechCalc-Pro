@@ -6,5 +6,5 @@ export default {
   accent: 'purple',
   order: 15,
   defaultVisible: false,
-  description: 'Auslegung von MAG und dynamischer Druckhaltung für Heiz- und Kühlwassersysteme nach Reflex-Berechnungsgrundlagen.'
+  description: 'Auslegung von MAG und dynamischer Druckhaltung fuer Heiz- und Kuehlwassersysteme nach Reflex-Berechnungsgrundlagen.'
 };

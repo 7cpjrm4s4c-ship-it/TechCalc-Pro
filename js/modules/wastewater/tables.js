@@ -1,32 +1,32 @@
 export const usageTypes = [
-  { value: 'residential', label: 'Unregelmäßige Benutzung · Wohnhäuser, Büros', k: 0.5 },
-  { value: 'regular', label: 'Regelmäßige Benutzung · Schulen, Hotels, Restaurants', k: 0.7 },
-  { value: 'frequent', label: 'Häufige Benutzung · öffentliche Toiletten/Duschen', k: 1.0 },
+  { value: 'residential', label: 'Unregelmaessige Benutzung  -  Wohnhaeuser, Bueros', k: 0.5 },
+  { value: 'regular', label: 'Regelmaessige Benutzung  -  Schulen, Hotels, Restaurants', k: 0.7 },
+  { value: 'frequent', label: 'Haeufige Benutzung  -  oeffentliche Toiletten/Duschen', k: 1.0 },
   { value: 'custom', label: 'Benutzerdefinierte Abflusskennzahl', k: null }
 ];
 
 export const fixtureTypes = [
   { id: 'washbasin', name: 'Waschbecken / Bidet', du: 0.5, dn: 'DN 40' },
-  { id: 'shower-no-plug', name: 'Dusche ohne Stöpsel', du: 0.6, dn: 'DN 50' },
-  { id: 'shower-plug', name: 'Dusche mit Stöpsel', du: 0.8, dn: 'DN 50' },
-  { id: 'urinal-cistern', name: 'Einzelurinal mit Spülkasten', du: 0.8, dn: 'DN 50' },
-  { id: 'urinal-flush', name: 'Einzelurinal mit Druckspüler', du: 0.5, dn: 'DN 50' },
+  { id: 'shower-no-plug', name: 'Dusche ohne Stoepsel', du: 0.6, dn: 'DN 50' },
+  { id: 'shower-plug', name: 'Dusche mit Stoepsel', du: 0.8, dn: 'DN 50' },
+  { id: 'urinal-cistern', name: 'Einzelurinal mit Spuelkasten', du: 0.8, dn: 'DN 50' },
+  { id: 'urinal-flush', name: 'Einzelurinal mit Druckspueler', du: 0.5, dn: 'DN 50' },
   { id: 'stand-urinal', name: 'Standurinal', du: 0.2, dn: 'DN 50' },
-  { id: 'waterless-urinal', name: 'Urinal ohne Wasserspülung', du: 0.1, dn: 'DN 50' },
+  { id: 'waterless-urinal', name: 'Urinal ohne Wasserspuelung', du: 0.1, dn: 'DN 50' },
   { id: 'bathtub', name: 'Badewanne', du: 0.8, dn: 'DN 50' },
-  { id: 'kitchen-combined', name: 'Küchenspüle + Geschirrspüler gemeinsamer Geruchverschluss', du: 0.8, dn: 'DN 50' },
-  { id: 'kitchen-sink', name: 'Küchenspüle / Ausgussbecken', du: 0.8, dn: 'DN 50' },
-  { id: 'dishwasher', name: 'Geschirrspüler', du: 0.8, dn: 'DN 50' },
+  { id: 'kitchen-combined', name: 'Kuechenspuele + Geschirrspueler gemeinsamer Geruchverschluss', du: 0.8, dn: 'DN 50' },
+  { id: 'kitchen-sink', name: 'Kuechenspuele / Ausgussbecken', du: 0.8, dn: 'DN 50' },
+  { id: 'dishwasher', name: 'Geschirrspueler', du: 0.8, dn: 'DN 50' },
   { id: 'washing-8', name: 'Waschmaschine bis 8 kg', du: 0.8, dn: 'DN 50' },
   { id: 'washing-12', name: 'Waschmaschine bis 12 kg', du: 1.5, dn: 'DN 56/60' },
-  { id: 'wc-45', name: 'WC mit 4,0/4,5 l Spülkasten', du: 1.8, dn: 'DN 80 / DN 90', wc: true },
-  { id: 'wc-6', name: 'WC mit 6,0 l Spülkasten/Druckspüler', du: 2.0, dn: 'DN 80 bis DN 100', wc: true },
-  { id: 'wc-75', name: 'WC mit 7,5 l Spülkasten/Druckspüler', du: 2.0, dn: 'siehe Anmerkung', wc: true },
-  { id: 'wc-9', name: 'WC mit 9,0 l Spülkasten/Druckspüler', du: 2.5, dn: 'DN 100', wc: true },
+  { id: 'wc-45', name: 'WC mit 4,0/4,5 l Spuelkasten', du: 1.8, dn: 'DN 80 / DN 90', wc: true },
+  { id: 'wc-6', name: 'WC mit 6,0 l Spuelkasten/Druckspueler', du: 2.0, dn: 'DN 80 bis DN 100', wc: true },
+  { id: 'wc-75', name: 'WC mit 7,5 l Spuelkasten/Druckspueler', du: 2.0, dn: 'siehe Anmerkung', wc: true },
+  { id: 'wc-9', name: 'WC mit 9,0 l Spuelkasten/Druckspueler', du: 2.5, dn: 'DN 100', wc: true },
   { id: 'floor-50', name: 'Bodenablauf DN 50', du: 0.8, dn: 'DN 50' },
   { id: 'floor-70', name: 'Bodenablauf DN 70', du: 1.5, dn: 'DN 70' },
   { id: 'floor-100', name: 'Bodenablauf DN 100', du: 2.0, dn: 'DN 100' },
-  { id: 'custom', name: 'Freier Entwässerungsgegenstand', du: 0, dn: '—', custom: true }
+  { id: 'custom', name: 'Freier Entwaesserungsgegenstand', du: 0, dn: '-', custom: true }
 ];
 
 export const branchConnectionTable = [

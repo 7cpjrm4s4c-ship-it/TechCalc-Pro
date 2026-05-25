@@ -72,21 +72,21 @@ export function calculate(s){
 
   const warnings = [];
   if(s.calculationMode === 'runtime' || s.calculationMode === 'compare'){
-    if(qMax <= 0) warnings.push('Maximale Geräte-/Kälte- bzw. Heizleistung fehlt.');
+    if(qMax <= 0) warnings.push('Maximale Geraete-/Kaelte- bzw. Heizleistung fehlt.');
     if(partLoad <= 0) warnings.push('Teillastfaktor der kleinsten Leistungsstufe fehlt.');
-    if(partLoadRaw > 100) warnings.push('Teillastfaktor f ist größer als 100 %. Eingabe prüfen.');
-    if(dtReg <= 0) warnings.push('ΔT Hydraulikkreislauf fehlt.');
-    if(runtimePower <= 0 && qMax > 0) warnings.push('Konstante Lastabnahme ist größer/gleich der kleinsten Teillaststufe; Puffervolumen für Mindestlaufzeit wird 0 l.');
+    if(partLoadRaw > 100) warnings.push('Teillastfaktor f ist groesser als 100 %. Eingabe pruefen.');
+    if(dtReg <= 0) warnings.push('DeltaT Hydraulikkreislauf fehlt.');
+    if(runtimePower <= 0 && qMax > 0) warnings.push('Konstante Lastabnahme ist groesser/gleich der kleinsten Teillaststufe; Puffervolumen fuer Mindestlaufzeit wird 0 l.');
   }
   if(s.calculationMode === 'defrost' || s.calculationMode === 'compare'){
-    if(dtHyd <= 0) warnings.push('Hydraulische Temperaturdifferenz für den Abtaubetrieb fehlt.');
-    if(defrostPower <= 0 && (qConsumer > 0 || qDefrost > 0)) warnings.push('Abtau-Leistungsbilanz ergibt kein zusätzliches Puffervolumen.');
+    if(dtHyd <= 0) warnings.push('Hydraulische Temperaturdifferenz fuer den Abtaubetrieb fehlt.');
+    if(defrostPower <= 0 && (qConsumer > 0 || qDefrost > 0)) warnings.push('Abtau-Leistungsbilanz ergibt kein zusaetzliches Puffervolumen.');
   }
   if(s.calculationMode === 'reserve' || s.calculationMode === 'compare'){
-    if(flow <= 0) warnings.push('Volumenstrom der Verbraucher für die Wasservorlage fehlt.');
-    if(bridgeTime <= 0) warnings.push('Überbrückungszeit für die Wasservorlage fehlt.');
+    if(flow <= 0) warnings.push('Volumenstrom der Verbraucher fuer die Wasservorlage fehlt.');
+    if(bridgeTime <= 0) warnings.push('Ueberbrueckungszeit fuer die Wasservorlage fehlt.');
   }
-  if(s.mediumMode !== 'water') warnings.push('Glykolbetrieb: Faktor wurde gemäß Tabelle der Berechnungsunterlage angepasst. Herstellerangaben prüfen.');
+  if(s.mediumMode !== 'water') warnings.push('Glykolbetrieb: Faktor wurde gemaess Tabelle der Berechnungsunterlage angepasst. Herstellerangaben pruefen.');
 
   return {
     factor,

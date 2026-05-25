@@ -22,9 +22,9 @@ export function signedTempField(id, label, value, signAttribute = 'data-sign') {
   return `<div class="field field--signed-temp">
     <label for="${esc(id)}">${esc(label)}</label>
     <div class="control control--with-sign">
-      <button type="button" tabindex="-1" class="sign-toggle" ${signAttribute}="${esc(id)}" aria-label="Vorzeichen umschalten">±</button>
+      <button type="button" tabindex="-1" class="sign-toggle" ${signAttribute}="${esc(id)}" aria-label="Vorzeichen umschalten">+/-</button>
       <input id="${esc(id)}" data-field="${esc(id)}" type="text" inputmode="decimal" value="${esc(value ?? '')}" placeholder="0" autocomplete="off">
-      <span class="unit">°C</span>
+      <span class="unit"> GradC</span>
     </div>
   </div>`;
 }
@@ -61,15 +61,15 @@ export function segmented(name, options, value, settings = {}) {
 
 
 export function inlineStats(items) {
-  return `<div class="inline-stats">${items.map(item => `<div class="inline-stat"><span>${esc(item.label)}</span><strong>${esc(item.value ?? '—')}${item.unit ? ` <small>${esc(item.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;
+  return `<div class="inline-stats">${items.map(item => `<div class="inline-stat"><span>${esc(item.label)}</span><strong>${esc(item.value ?? '-')}${item.unit ? ` <small>${esc(item.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;
 }
 
 export function mainResult(title, main, details = [], accent = 'blue') {
-  return card(title, `<div class="main-result"><span>${esc(main.label)}</span><strong>${esc(main.value ?? '—')}${main.unit ? ` <small>${esc(main.unit)}</small>` : ''}</strong></div>${inlineStats(details)}`, accent);
+  return card(title, `<div class="main-result"><span>${esc(main.label)}</span><strong>${esc(main.value ?? '-')}${main.unit ? ` <small>${esc(main.unit)}</small>` : ''}</strong></div>${inlineStats(details)}`, accent);
 }
 
 export function resultRows(rows) {
-  return `<div class="result-list">${rows.map(r => `<div class="result-row"><span>${esc(r.label)}</span><strong>${esc(r.value ?? '—')}${r.unit ? ` <small>${esc(r.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;
+  return `<div class="result-list">${rows.map(r => `<div class="result-row"><span>${esc(r.label)}</span><strong>${esc(r.value ?? '-')}${r.unit ? ` <small>${esc(r.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;
 }
 
 export function formCard(title, fields, accent = 'blue', cols = 2) {
@@ -102,7 +102,7 @@ export function bindCommonInputs(root, state) {
     if (pendingRender) clearTimeout(pendingRender);
     pendingRender = setTimeout(() => {
       const active = document.activeElement;
-      // Beim Wechsel per Klick oder Tab in das nächste Eingabefeld nicht sofort neu rendern.
+      // Beim Wechsel per Klick oder Tab in das naechste Eingabefeld nicht sofort neu rendern.
       // Dadurch bleibt der Fokus stabil und die Desktop-UX wirkt nicht ruckelig.
       if (active && root.contains(active) && active.matches('[data-field]')) return;
       state.set({}, { notify: true });
@@ -111,7 +111,7 @@ export function bindCommonInputs(root, state) {
 
   root.querySelectorAll('[data-field]').forEach(el => {
     if (el.matches('input')) {
-      // Während der Eingabe kein Re-Render: mobile Tastatur bleibt offen und Tab-Wechsel bleibt stabil.
+      // Waehrend der Eingabe kein Re-Render: mobile Tastatur bleibt offen und Tab-Wechsel bleibt stabil.
       el.addEventListener('input', () => commitField(el, { notify: false }));
       el.addEventListener('change', () => {
         commitField(el, { notify: false });

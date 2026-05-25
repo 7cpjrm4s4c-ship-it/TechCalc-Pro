@@ -21,14 +21,14 @@ function interp(table, t, col){
 function round(v, d=2){ return Number.isFinite(v) ? Math.round(v * 10**d) / 10**d : 0; }
 function nextVolume(v){ return STANDARD_VOLUMES.find(x => x >= v) || Math.ceil(v / 500) * 500; }
 function reflexNLabel(volume){
-  if(!volume || volume <= 0) return '—';
+  if(!volume || volume <= 0) return '-';
   const n = REFLEX_N_VOLUMES.find(x => x >= volume);
   return n ? `Reflex N ${n}` : `Reflex G/SL ${nextVolume(volume)}`;
 }
 function dynamicLabel(type, volume){
   const v = nextVolume(volume);
-  if(!volume || volume <= 0) return type === 'variomat' ? 'Variomat —' : 'Reflexomat —';
-  return type === 'variomat' ? `Variomat, VG Grundgefäß ${v} l` : `Reflexomat, RG Grundgefäß ${v} l`;
+  if(!volume || volume <= 0) return type === 'variomat' ? 'Variomat -' : 'Reflexomat -';
+  return type === 'variomat' ? `Variomat, VG Grundgefaess ${v} l` : `Reflexomat, RG Grundgefaess ${v} l`;
 }
 
 export function calculate(s){
@@ -63,10 +63,10 @@ export function calculate(s){
   const warnings = [];
   if(systemVolume <= 0) warnings.push('Anlagenvolumen fehlt.');
   if(psv <= 0) warnings.push('Sicherheitsventil-Ansprechdruck fehlt.');
-  if(psv > 0 && pe <= p0) warnings.push('Sicherheitsventil pSV zu klein: Enddruck pe muss größer als Mindestbetriebsdruck p0 sein.');
-  if(s.holdingType === 'mag' && denominator <= 0) warnings.push('MAG-Nennvolumen kann erst berechnet werden, wenn pe > p0 ist. Sicherheitsventil größer wählen oder statischen Druck prüfen.');
-  if(s.holdingType === 'dynamic' && pe < peDynamicMin) warnings.push('Enddruck pe liegt unter p0 + 0,3 bar + Arbeitsbereich AD. Sicherheitsventil/Station prüfen.');
-  if(num(s.tMaxC) > 70) warnings.push('Bei dauerhafter Temperatur > 70 °C am MAG/Vordruckgefäß Vorschaltgefäß prüfen.');
+  if(psv > 0 && pe <= p0) warnings.push('Sicherheitsventil pSV zu klein: Enddruck pe muss groesser als Mindestbetriebsdruck p0 sein.');
+  if(s.holdingType === 'mag' && denominator <= 0) warnings.push('MAG-Nennvolumen kann erst berechnet werden, wenn pe > p0 ist. Sicherheitsventil groesser waehlen oder statischen Druck pruefen.');
+  if(s.holdingType === 'dynamic' && pe < peDynamicMin) warnings.push('Enddruck pe liegt unter p0 + 0,3 bar + Arbeitsbereich AD. Sicherheitsventil/Station pruefen.');
+  if(num(s.tMaxC) > 70) warnings.push('Bei dauerhafter Temperatur > 70  GradC am MAG/Vordruckgefaess Vorschaltgefaess pruefen.');
   const standard = selected > 0 ? nextVolume(selected) : 0;
   const productLabel = s.holdingType === 'dynamic' ? dynamicLabel(s.dynamicType, selected) : reflexNLabel(selected);
   return { nMax, nMin, expansionPct, vaporPressure, staticPressure, pumpPressure, systemVolume, p0, p0Raw, psv, asv, pe, ve, vv, servitecAdd, factor, vnMag, ad, paMin, peDynamicMin, vnDynamic, selectedVolume: selected, selectedStandardVolume: standard, productLabel, warnings };
