@@ -1,3 +1,10 @@
+## Version 1.3.0 - Überflutungsnachweis
+
+- Neues Modul Überflutungsnachweis ergänzt.
+- Berechnung des erforderlichen Rückhaltevolumens mit Flächenansatz, r(D,30), r(D,2), Regendauer und vorhandenen Rückhaltevolumen.
+- Ergebnis ohne separaten Hauptentwässerungsblock; Haupt- und Notentwässerung bleiben im Modul Regenwasser.
+- Speicher-/Lade-/Aktualisieren-Logik und Projektdatei-Snapshot erweitert.
+
 ## Version 1.2.17 - Hosting / Darstellung Hotfix
 
 - Release Notes werden im Menü dynamisch mit Versionsparameter und `cache: no-store` geladen.
