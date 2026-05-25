@@ -1,3 +1,10 @@
+## Version 1.2.17 - Hosting / Darstellung Hotfix
+
+- Release Notes werden im Menü dynamisch mit Versionsparameter und `cache: no-store` geladen.
+- Service Worker behandelt `RELEASE_NOTES.md`, `index.html` und Navigationsanfragen netzwerkpriorisiert, damit gehostete Updates sichtbar werden.
+- Netlify-Header für `index.html`, `service-worker.js` und `RELEASE_NOTES.md` ergänzt.
+- Darstellungseinstellungen im Menü werden dauerhaft über `localStorage` gespeichert und nach dem Schließen der App wiederhergestellt.
+
 ## Version 1.2.16 - Release Notes / Link-State Hotfix
 
 - Release Notes im Menü auf den aktuellen Stand gebracht.

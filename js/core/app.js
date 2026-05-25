@@ -145,14 +145,42 @@ const settingsPanel = document.getElementById('settingsPanel');
 const closeSettings = document.getElementById('closeSettings');
 const settingsBody = settingsPanel?.querySelector('.settings-panel__body');
 const THEME_STORAGE_KEY = 'techcalc-theme-mode';
+const SETTINGS_UI_STORAGE_KEY = 'techcalc-settings-ui';
 
-function applyThemeMode(mode = sessionStorage.getItem(THEME_STORAGE_KEY) || 'system') {
+function readStorageJson(key, fallback = {}) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : fallback;
+  } catch (error) {
+    console.warn('Gespeicherte UI-Einstellungen konnten nicht geladen werden.', error);
+    return fallback;
+  }
+}
+
+function writeStorageJson(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.warn('UI-Einstellungen konnten nicht gespeichert werden.', error);
+  }
+}
+
+function getStoredThemeMode() {
+  return localStorage.getItem(THEME_STORAGE_KEY)
+    || sessionStorage.getItem(THEME_STORAGE_KEY)
+    || 'system';
+}
+
+function applyThemeMode(mode = getStoredThemeMode()) {
   const value = ['dark', 'light', 'system'].includes(mode) ? mode : 'system';
   if (value === 'system') {
     document.documentElement.removeAttribute('data-theme');
   } else {
     document.documentElement.setAttribute('data-theme', value);
   }
+  localStorage.setItem(THEME_STORAGE_KEY, value);
   sessionStorage.setItem(THEME_STORAGE_KEY, value);
   document.querySelectorAll('.theme-switch__option').forEach(item => {
     const active = item.dataset.theme === value;
@@ -163,7 +191,7 @@ function applyThemeMode(mode = sessionStorage.getItem(THEME_STORAGE_KEY) || 'sys
 
 applyThemeMode();
 
-const APP_VERSION = '1.2.16';
+const APP_VERSION = '1.2.17';
 const FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
 
 function initFeedbackForm() {
@@ -220,6 +248,74 @@ function initFeedbackForm() {
 
 initFeedbackForm();
 
+function escapeHtml(value = '') {
+  return String(value).replace(/[&<>"]/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;'
+  }[char]));
+}
+
+function parseReleaseNotes(markdown = '') {
+  const lines = markdown.split(/\r?\n/);
+  const notes = [];
+  let current = null;
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    const heading = line.match(/^##\s+(?:Version\s+)?([0-9]+\.[0-9]+\.[0-9]+)\s*(?:[-–]\s*(.*))?$/i)
+      || line.match(/^##\s+([0-9]+\.[0-9]+\.[0-9]+)\s*(?:[-–]\s*(.*))?$/i);
+    if (heading) {
+      current = { version: heading[1], title: heading[2] || '', items: [] };
+      notes.push(current);
+      continue;
+    }
+    if (!current) continue;
+    const item = line.replace(/^[-*]\s+/, '').trim();
+    if (item && !item.startsWith('#')) current.items.push(item);
+  }
+
+  return notes;
+}
+
+function renderReleaseNotes(notes) {
+  const host = document.getElementById('releaseNotesDynamic');
+  if (!host) return;
+  if (!notes?.length) {
+    host.innerHTML = '<p>Release Notes konnten nicht geladen werden.</p>';
+    return;
+  }
+  host.innerHTML = notes.slice(0, 18).map(note => `
+    <div class="release-note">
+      <strong>${escapeHtml(note.version)}${note.title ? ` · ${escapeHtml(note.title)}` : ''}</strong>
+      <small>${escapeHtml(note.items.slice(0, 4).join(' '))}</small>
+    </div>
+  `).join('');
+}
+
+async function loadReleaseNotes() {
+  const versionHost = document.querySelector('[data-app-version-current]');
+  if (versionHost) versionHost.textContent = APP_VERSION;
+
+  try {
+    const response = await fetch(`./RELEASE_NOTES.md?v=${encodeURIComponent(APP_VERSION)}&t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache' }
+    });
+    if (!response.ok) throw new Error(`Release Notes HTTP ${response.status}`);
+    const markdown = await response.text();
+    renderReleaseNotes(parseReleaseNotes(markdown));
+  } catch (error) {
+    console.warn('Release Notes konnten nicht dynamisch geladen werden.', error);
+    const fallback = document.getElementById('releaseNotesFallback');
+    if (fallback) renderReleaseNotes(parseReleaseNotes(fallback.textContent || ''));
+  }
+}
+
+loadReleaseNotes();
+
 // Bind PDF export and project actions as soon as the app is ready.
 // The menu may be opened and a button tapped before lazy initialization has finished.
 if ('requestIdleCallback' in window) {
@@ -267,7 +363,7 @@ function setSettingsOpen(open) {
   if (!settingsPanel || !settingsButton) return;
 
   if (open) {
-    closeAllSubmenus();
+    restoreSettingsUiState();
     lastFocusedElement = document.activeElement;
     settingsPanel.hidden = false;
     settingsPanel.removeAttribute('hidden');
@@ -283,7 +379,6 @@ function setSettingsOpen(open) {
     return;
   }
 
-  closeAllSubmenus();
   settingsPanel.classList.remove('is-open');
   settingsPanel.hidden = true;
   settingsPanel.setAttribute('hidden', '');
@@ -316,9 +411,31 @@ settingsPanel?.addEventListener('click', event => {
   event.stopPropagation();
 });
 
+settingsPanel?.querySelectorAll('.settings-submenu').forEach((details, index) => {
+  details.dataset.settingsIndex = String(index);
+});
+
+function restoreSettingsUiState() {
+  const state = readStorageJson(SETTINGS_UI_STORAGE_KEY, {});
+  if (!settingsPanel) return;
+  settingsPanel.querySelectorAll('.settings-submenu').forEach(details => {
+    details.open = details.dataset.settingsIndex === state.openSubmenu;
+  });
+}
+
+function saveSettingsOpenSubmenu(details) {
+  if (!details?.open) return;
+  const current = readStorageJson(SETTINGS_UI_STORAGE_KEY, {});
+  writeStorageJson(SETTINGS_UI_STORAGE_KEY, {
+    ...current,
+    openSubmenu: details.dataset.settingsIndex
+  });
+}
+
 settingsPanel?.querySelectorAll('.settings-submenu').forEach(details => {
   details.addEventListener('toggle', () => {
     if (!details.open) return;
+    saveSettingsOpenSubmenu(details);
     closeAllSubmenus(details);
     requestAnimationFrame(() => {
       const body = settingsBody;
@@ -379,6 +496,6 @@ if ('serviceWorker' in navigator) {
   });
 
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js').then(registration => registration.update());
+    navigator.serviceWorker.register(`./service-worker.js?v=${encodeURIComponent(APP_VERSION)}`).then(registration => registration.update());
   });
 }
