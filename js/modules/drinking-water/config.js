@@ -2,7 +2,7 @@ export default {
   id: 'drinking-water',
   title: 'Trinkwasserberechnung',
   shortTitle: 'Trinkwasser',
-  group: 'Sanitaertechnik',
+  group: 'Sanitärtechnik',
   accent: 'blue',
   order: 35,
   defaultVisible: false,

@@ -68,7 +68,7 @@ class ModuleRegistry {
 
     for (const field of REQUIRED_META_FIELDS) {
       if (!meta[field]) {
-        throw new Error(`Modul-Metadaten unvollstaendig: Feld "${field}" fehlt.`);
+        throw new Error(`Modul-Metadaten unvollständig: Feld "${field}" fehlt.`);
       }
     }
 

@@ -5,10 +5,10 @@ import { getProjectMeta, setProjectMeta, downloadProjectFile, readProjectFile, a
 
 function sanitizeText(value = '') {
   return String(value ?? '')
-    .replace(/[---]/g, '-')
-    .replace(/[ x  - ]/g, '-')
-    .replace(/[ThetathetaPhiphirhoDeltaetamv]/g, match => ({'Theta':'Theta','theta':'Theta','Phi':'Phi','phi':'phi','rho':'rho','Delta':'Delta','eta':'eta','m':'m','v':'V'}[match] || ''))
-    .replace(/[ Grad32]/g, match => ({' Grad':' Grad','3':'3','2':'2'}[match] || ''))
+    .replace(/[‐-―]/g, '-')
+    .replace(/[×·]/g, '-')
+    .replace(/[ΘϑΦφρΔηṁṽ]/g, match => ({'Θ':'Theta','ϑ':'Theta','Φ':'Phi','φ':'phi','ρ':'rho','Δ':'Delta','η':'eta','ṁ':'m','ṽ':'V'}[match] || ''))
+    .replace(/[°³²]/g, match => ({'°':'°','³':'3','²':'2'}[match] || ''))
     .replace(/[\u0000-\u001F\u007F]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
@@ -70,7 +70,7 @@ function updateOpenedProjectLabel() {
   const label = document.getElementById('projectFileLabel');
   if (!label) return;
   const name = getOpenedFileName();
-  label.textContent = name ? `Geoeffnet: ${name}` : 'Kein externes Projekt geoeffnet';
+  label.textContent = name ? `Geöffnet: ${name}` : 'Kein externes Projekt geöffnet';
 }
 
 function initProjectSettings() {
@@ -105,8 +105,8 @@ function initProjectSettings() {
       hydrateProjectForm(readProject());
       updateOpenedProjectLabel();
     } catch (error) {
-      console.error('Projekt konnte nicht geoeffnet werden.', error);
-      alert(error.message || 'Projekt konnte nicht geoeffnet werden.');
+      console.error('Projekt konnte nicht geöffnet werden.', error);
+      alert(error.message || 'Projekt konnte nicht geöffnet werden.');
     } finally {
       event.target.value = '';
     }
@@ -251,7 +251,7 @@ function firstColumnIsNumeric(rows) {
 
 function isNumericText(value) {
   const normalized = sanitizeText(value).replace(/\s+/g, '');
-  return normalized !== '' && /^[-+]?\d+(?:[.,]\d+)?(?:%| GradC|K|l\/s|m3\/h|kg\/h|kg\/m3|Pa\/m|m\/s|kW)?$/i.test(normalized);
+  return normalized !== '' && /^[-+]?\d+(?:[.,]\d+)?(?:%|°C|K|l\/s|m3\/h|kg\/h|kg\/m3|Pa\/m|m\/s|kW)?$/i.test(normalized);
 }
 
 function cellClass(value, columnIndex, isTextValue = false) {
@@ -298,13 +298,13 @@ function buildPrintableHtml(project, moduleData) {
   const sections = moduleData.sections.map(section => {
     const title = sectionTitle(section.title).replace(/Parameter/g, 'Bezeichnung');
     const mode = /prozessablauf/i.test(title) ? 'process' : 'standard';
-    const rows = section.rows.map(row => row.slice(0, 3).map(cell => sanitizeText(cell).replace(/^Saettigung$/i, 'Adiabate Befeuchtung').replace(/Parameter/g, 'Bezeichnung')));
+    const rows = section.rows.map(row => row.slice(0, 3).map(cell => sanitizeText(cell).replace(/^Sättigung$/i, 'Adiabate Befeuchtung').replace(/Parameter/g, 'Bezeichnung')));
     return `<section class="tcp-section"><h2>${esc(title)}</h2><div class="tcp-rule"></div>${tableHtml(rows, mode)}</section>`;
   }).join('');
 
   return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>TechCalc Pro - ${esc(moduleData.shortTitle)}</title>${PRINT_STYLE}</head><body>
     <div class="tcp-toolbar">
-      <button class="tcp-close" type="button" onclick="try{ if (window.opener) { window.opener.focus(); window.close(); return; } }catch(e){} if (history.length > 1) { history.back(); } else { window.close(); }">Zurueck zur App</button>
+      <button class="tcp-close" type="button" onclick="try{ if (window.opener) { window.opener.focus(); window.close(); return; } }catch(e){} if (history.length > 1) { history.back(); } else { window.close(); }">Zurück zur App</button>
       <button class="tcp-print" type="button" onclick="window.print()">PDF speichern / drucken</button>
     </div>
     <main class="tcp-page">
@@ -421,7 +421,7 @@ function openPrintWindow(project, moduleData) {
   } catch (error) {
     console.error('PDF-Export fehlgeschlagen.', error);
     try { win.close(); } catch {}
-    alert('PDF-Export konnte nicht erstellt werden. Bitte Browser-Konsole pruefen.');
+    alert('PDF-Export konnte nicht erstellt werden. Bitte Browser-Konsole prüfen.');
   }
 }
 
@@ -439,7 +439,7 @@ export function initPdfExport({ modules, currentRoute: routeGetter } = {}) {
       openPrintWindow(project, moduleData);
     } catch (error) {
       console.error('PDF-Export fehlgeschlagen.', error);
-      alert('PDF-Export konnte nicht erstellt werden. Bitte Browser-Konsole pruefen.');
+      alert('PDF-Export konnte nicht erstellt werden. Bitte Browser-Konsole prüfen.');
     }
   });
 }

@@ -83,11 +83,11 @@ function calculateWrg(s) {
   const bypassPercent = clamp(num(s.bypassPercent), 0, 100);
   const beta = bypassPercent / 100;
 
-  // WRG mit explizitem Bypass-Anteil beta:
-  // t_ZU,WTX = t_Aussen + eta  x  (t_Abluft  t_Aussen)
-  // t_ZU     = (1  beta)  x  t_ZU,WTX + beta  x  t_Aussen
-  // t_Fort   = t_Abluft  (1  beta)  x  eta  x  (t_Abluft  t_Aussen)
-  // Mehr Bypass senkt die Zulufttemperatur und erhoeht die Fortlufttemperatur.
+  // WRG mit explizitem Bypass-Anteil β:
+  // t_ZU,WTX = t_Außen + η × (t_Abluft − t_Außen)
+  // t_ZU     = (1 − β) × t_ZU,WTX + β × t_Außen
+  // t_Fort   = t_Abluft − (1 − β) × η × (t_Abluft − t_Außen)
+  // Mehr Bypass senkt die Zulufttemperatur und erhöht die Fortlufttemperatur.
   const deltaT = extract.tempC - outdoor.tempC;
   const wtxVolumeFlowM3h = systemVolumeFlowM3h * (1 - beta);
   const bypassVolumeFlowM3h = systemVolumeFlowM3h * beta;

@@ -24,7 +24,7 @@ export function heatingCooling({ powerW, powerUnit = 'W', massFlowKgh, deltaT, m
   let mass = m || null;
   let spread = dt || null;
 
-  // Keine automatische Rueckwaertsberechnung ausserhalb der gewaehlten Methode.
+  // Keine automatische Rückwärtsberechnung außerhalb der gewählten Methode.
   // Dadurch erscheinen keine scheinbaren Ergebnisse, solange Pflichtwerte fehlen.
   if (calcTarget === 'power') {
     powerKw = m && dt ? (m * cp * dt) / 1000 : null;
@@ -46,7 +46,7 @@ export function ventilation({ volumeFlowM3h, powerW, powerUnit = 'W', deltaT, su
   const referenceTemp = supplyTemp !== undefined && supplyTemp !== '' ? supplyTemp : tempC;
   const rho = airDensity(referenceTemp);
   const cp = 1.005;
-  // Waermewert Luft in Wh/(m3 - K): rho  x  cp / 3,6
+  // Wärmewert Luft in Wh/(m³·K): ρ × cₚ / 3,6
   const factor = rho * cp / 3.6;
   const inputPowerW = num(powerW) * (powerUnit === 'kW' ? 1000 : 1);
   const qKwInput = inputPowerW ? inputPowerW / 1000 : null;
@@ -92,7 +92,7 @@ export function num(v){
   const n = Number(normalized);
   return Number.isFinite(n) ? n : 0;
 }
-export function fmt(v, digits = 2){ return v === null || v === undefined || Number.isNaN(v) ? '-' : Number(v).toLocaleString('de-DE', { maximumFractionDigits: digits }); }
+export function fmt(v, digits = 2){ return v === null || v === undefined || Number.isNaN(v) ? '—' : Number(v).toLocaleString('de-DE', { maximumFractionDigits: digits }); }
 export function fmtInput(v, digits = 2){
   if (v === '' || v === null || v === undefined) return '';
   const n = num(v);

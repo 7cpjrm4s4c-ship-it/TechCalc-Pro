@@ -1,1 +1,1 @@
-export default { id:'ventilation', title:'Lueftung', shortTitle:'Lueftung', group:'Lufttechnik', accent:'cyan', order:20, defaultVisible:true, description:'Luftleistung, Volumenstrom, Temperaturspreizung und Massenstrom.' };
+export default { id:'ventilation', title:'Lüftung', shortTitle:'Lüftung', group:'Lufttechnik', accent:'cyan', order:20, defaultVisible:true, description:'Luftleistung, Volumenstrom, Temperaturspreizung und Massenstrom.' };

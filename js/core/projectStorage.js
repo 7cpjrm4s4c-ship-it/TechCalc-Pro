@@ -152,7 +152,7 @@ export async function downloadProjectFile() {
   const data = collectProjectData();
   const meta = data.meta || {};
   const base = [meta.projectNo, meta.project, meta.client].filter(Boolean).join('-') || 'techcalc-projekt';
-  const safe = base.toLowerCase().replace(/[^a-z0-9aeoeuess_-]+/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'techcalc-projekt';
+  const safe = base.toLowerCase().replace(/[^a-z0-9äöüß_-]+/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'techcalc-projekt';
   const fileName = `${safe}.techcalc.json`;
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json;charset=utf-8' });
 
@@ -173,7 +173,7 @@ export async function downloadProjectFile() {
       return true;
     } catch (error) {
       if (error?.name === 'AbortError') return false;
-      console.warn('Dateiauswahl nicht verfuegbar, Projekt wird als Download gespeichert.', error);
+      console.warn('Dateiauswahl nicht verfügbar, Projekt wird als Download gespeichert.', error);
     }
   }
 
@@ -192,7 +192,7 @@ export async function readProjectFile(file) {
   const text = await file.text();
   const parsed = JSON.parse(text);
   if (!parsed || parsed.format !== 'techcalc-project') {
-    throw new Error('Die Datei ist kein gueltiges TechCalc-Projekt.');
+    throw new Error('Die Datei ist kein gültiges TechCalc-Projekt.');
   }
   return clone(parsed);
 }

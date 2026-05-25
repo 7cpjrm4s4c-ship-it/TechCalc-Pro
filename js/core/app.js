@@ -191,7 +191,7 @@ function applyThemeMode(mode = getStoredThemeMode()) {
 
 applyThemeMode();
 
-const APP_VERSION = '1.2.18';
+const APP_VERSION = '1.2.17';
 const FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
 
 function initFeedbackForm() {
@@ -221,8 +221,8 @@ function initFeedbackForm() {
     if (!form.reportValidity()) return;
 
     submit.disabled = true;
-    submit.textContent = 'Sende ...';
-    setStatus('Feedback wird gesendet ...', 'pending');
+    submit.textContent = 'Sende …';
+    setStatus('Feedback wird gesendet …', 'pending');
 
     try {
       const response = await fetch(FEEDBACK_ENDPOINT, {
@@ -238,7 +238,7 @@ function initFeedbackForm() {
       setStatus('Feedback wurde gesendet. Danke!', 'success');
     } catch (error) {
       console.error('Feedback konnte nicht gesendet werden:', error);
-      setStatus('Feedback konnte nicht direkt gesendet werden. Bitte spaeter erneut versuchen.', 'error');
+      setStatus('Feedback konnte nicht direkt gesendet werden. Bitte später erneut versuchen.', 'error');
     } finally {
       submit.disabled = false;
       submit.textContent = 'Feedback senden';
@@ -265,8 +265,8 @@ function parseReleaseNotes(markdown = '') {
   for (const rawLine of lines) {
     const line = rawLine.trim();
     if (!line) continue;
-    const heading = line.match(/^##\s+(?:Version\s+)?([0-9]+\.[0-9]+\.[0-9]+)\s*(?:[--]\s*(.*))?$/i)
-      || line.match(/^##\s+([0-9]+\.[0-9]+\.[0-9]+)\s*(?:[--]\s*(.*))?$/i);
+    const heading = line.match(/^##\s+(?:Version\s+)?([0-9]+\.[0-9]+\.[0-9]+)\s*(?:[-–]\s*(.*))?$/i)
+      || line.match(/^##\s+([0-9]+\.[0-9]+\.[0-9]+)\s*(?:[-–]\s*(.*))?$/i);
     if (heading) {
       current = { version: heading[1], title: heading[2] || '', items: [] };
       notes.push(current);
@@ -289,7 +289,7 @@ function renderReleaseNotes(notes) {
   }
   host.innerHTML = notes.slice(0, 18).map(note => `
     <div class="release-note">
-      <strong>${escapeHtml(note.version)}${note.title ? `  -  ${escapeHtml(note.title)}` : ''}</strong>
+      <strong>${escapeHtml(note.version)}${note.title ? ` · ${escapeHtml(note.title)}` : ''}</strong>
       <small>${escapeHtml(note.items.slice(0, 4).join(' '))}</small>
     </div>
   `).join('');
@@ -491,7 +491,7 @@ if ('serviceWorker' in navigator) {
     if (event.data?.type !== 'TECHCALC_CACHE_UPDATED') return;
     const cacheName = event.data.cache || 'updated';
     sessionStorage.setItem('techcalc-active-cache', cacheName);
-    // Kein automatischer Reload: Beim Zurueckwechseln aus dem PDF-Export duerfen
+    // Kein automatischer Reload: Beim Zurückwechseln aus dem PDF-Export dürfen
     // aktuelle Berechnungsergebnisse in der Session nicht verloren gehen.
   });
 

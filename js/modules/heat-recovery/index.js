@@ -23,24 +23,24 @@ function rltDeviceCard(r, s) {
   const rows = items.length
     ? `<div class="line-section-list">${items.map((item, index) => { const active = state.get().activeRltDeviceId === item.id; return `<article class="line-section-card is-collapsed ${active ? 'is-active' : ''}" data-line-card data-rlt-select="${esc(item.id)}">
         <div class="line-section-card__head">
-          <div class="line-section-card__title"><strong>${esc(item.name || 'RLT-Geraet ' + (index + 1))}</strong></div>
-          <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="RLT-Geraet aufklappen"><span>v</span></button>
-          <button type="button" class="line-section-card__delete" data-rlt-delete="${esc(item.id)}" aria-label="RLT-Geraet loeschen"> x </button>
+          <div class="line-section-card__title"><strong>${esc(item.name || 'RLT-Gerät ' + (index + 1))}</strong></div>
+          <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="RLT-Gerät aufklappen"><span>▾</span></button>
+          <button type="button" class="line-section-card__delete" data-rlt-delete="${esc(item.id)}" aria-label="RLT-Gerät löschen">×</button>
         </div>
         <div class="line-section-card__body">${inlineStats([
-          { label: 'Berechnung', value: item.mode || '-' },
-          { label: 'Volumenstrom', value: item.volumeFlowM3h || '-', unit: 'm3/h' },
-          { label: 'Aussenluft', value: item.outdoor || '-' },
-          { label: 'Abluft/Umluft', value: item.extract || '-' },
-          { label: 'Zuluft/Mischluft', value: item.supply || '-' },
-          { label: 'Fortluft', value: item.exhaust || '-' },
-          { label: 'Leistung', value: item.power || '-', unit: item.power && item.power !== '-' ? 'kW' : '' },
-          { label: 'Kondensation', value: item.condensation || '-' }
+          { label: 'Berechnung', value: item.mode || '—' },
+          { label: 'Volumenstrom', value: item.volumeFlowM3h || '—', unit: 'm³/h' },
+          { label: 'Außenluft', value: item.outdoor || '—' },
+          { label: 'Abluft/Umluft', value: item.extract || '—' },
+          { label: 'Zuluft/Mischluft', value: item.supply || '—' },
+          { label: 'Fortluft', value: item.exhaust || '—' },
+          { label: 'Leistung', value: item.power || '—', unit: item.power && item.power !== '—' ? 'kW' : '' },
+          { label: 'Kondensation', value: item.condensation || '—' }
         ])}</div>
       </article>`; }).join('')}</div>`
-    : '<div class="empty-state empty-state--compact">Noch keine RLT-Geraete angelegt</div>';
-  return card('RLT-Geraete', stack([
-    `<div class="field"><label for="rltDeviceName">Bezeichnung</label><div class="control"><input id="rltDeviceName" type="text" placeholder="z. B. RLT Buero EG" autocomplete="off" value="${esc(state.get().activeRltDeviceName || '')}"></div></div>`,
+    : '<div class="empty-state empty-state--compact">Noch keine RLT-Geräte angelegt</div>';
+  return card('RLT-Geräte', stack([
+    `<div class="field"><label for="rltDeviceName">Bezeichnung</label><div class="control"><input id="rltDeviceName" type="text" placeholder="z. B. RLT Büro EG" autocomplete="off" value="${esc(state.get().activeRltDeviceName || '')}"></div></div>`,
     `<div class="tc-save-actions"><button type="button" class="action-button" data-rlt-save ${state.get().activeRltDeviceId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-rlt-update ${state.get().activeRltDeviceId ? '' : 'disabled'}>Aktualisieren</button></div>`,
     rows
   ].join('')), 'cyan');
@@ -53,15 +53,15 @@ function buildRltDeviceRecord(r, s, items, id, name, existing = null) {
   delete inputState.activeRltDeviceName;
   return {
     id,
-    name: name || s.activeRltDeviceName || existing?.name || `RLT-Geraet ${items.length + 1}`,
+    name: name || s.activeRltDeviceName || existing?.name || `RLT-Gerät ${items.length + 1}`,
     mode: isMixing ? 'Mischluft' : 'WRG',
     volumeFlowM3h: isMixing ? fmt(r.mixed?.volumeFlowM3h, 0) : fmt(s.wrgVolumeFlowM3h, 0),
-    outdoor: `${fmt(isMixing ? s.mixingOutdoorTemp : s.outdoorTemp, 2)}  GradC / ${fmt(isMixing ? s.mixingOutdoorRh : s.outdoorRh, 0)} %`,
-    extract: `${fmt(isMixing ? s.mixingRecircTemp : s.extractTemp, 2)}  GradC / ${fmt(isMixing ? s.mixingRecircRh : s.extractRh, 0)} %`,
-    supply: isMixing ? `${fmt(r.mixed?.tempC, 2)}  GradC / ${fmt(r.mixed?.rhPercent, 0)} %` : `${fmt(r.supply?.tempC, 2)}  GradC / ${fmt(r.supply?.rhPercent, 0)} %`,
-    exhaust: isMixing ? '-' : `${fmt(r.exhaust?.tempC, 2)}  GradC / ${fmt(r.exhaust?.rhPercent, 0)} %`,
-    power: isMixing ? '-' : fmt(r.recoveredPowerKw, 2),
-    condensation: r.hasCondensation ? `${fmt(r.condensateLs, 4)} l/s` : '-',
+    outdoor: `${fmt(isMixing ? s.mixingOutdoorTemp : s.outdoorTemp, 2)} °C / ${fmt(isMixing ? s.mixingOutdoorRh : s.outdoorRh, 0)} %`,
+    extract: `${fmt(isMixing ? s.mixingRecircTemp : s.extractTemp, 2)} °C / ${fmt(isMixing ? s.mixingRecircRh : s.extractRh, 0)} %`,
+    supply: isMixing ? `${fmt(r.mixed?.tempC, 2)} °C / ${fmt(r.mixed?.rhPercent, 0)} %` : `${fmt(r.supply?.tempC, 2)} °C / ${fmt(r.supply?.rhPercent, 0)} %`,
+    exhaust: isMixing ? '—' : `${fmt(r.exhaust?.tempC, 2)} °C / ${fmt(r.exhaust?.rhPercent, 0)} %`,
+    power: isMixing ? '—' : fmt(r.recoveredPowerKw, 2),
+    condensation: r.hasCondensation ? `${fmt(r.condensateLs, 4)} l/s` : '—',
     inputState,
     createdAt: existing?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -144,15 +144,15 @@ function readonlyAirCard(title, point, accent = 'cyan', options = {}) {
   const rows = [];
 
   if (includeVolume) {
-    rows.push(readonlyValue({ label: 'Volumenstrom V', value: fmt(point.volumeFlowM3h, 0), unit: 'm3/h' }));
+    rows.push(readonlyValue({ label: 'Volumenstrom V̇', value: fmt(point.volumeFlowM3h, 0), unit: 'm³/h' }));
   }
 
   if (includeMass) {
-    rows.push(readonlyValue({ label: 'Massenstrom m', value: fmt(point.massFlowKgh, 2), unit: 'kg/h' }));
+    rows.push(readonlyValue({ label: 'Massenstrom ṁ', value: fmt(point.massFlowKgh, 2), unit: 'kg/h' }));
   }
 
   rows.push(grid([
-    readonlyValue({ label: 'Temperatur', value: fmt(point.tempC, 2), unit: ' GradC' }),
+    readonlyValue({ label: 'Temperatur', value: fmt(point.tempC, 2), unit: '°C' }),
     readonlyValue({ label: 'rel. Feuchte', value: fmt(point.rhPercent, 0), unit: '%' })
   ].join(''), 2));
 
@@ -181,57 +181,57 @@ function condensationCard(r) {
   return mainResult('Kondensation', { label: 'Kondensationsleistung', value: fmt(r.condensateLs, 4), unit: 'l/s' }, [
     { label: 'Kondensat', value: fmt(r.condensateKgh, 2), unit: 'kg/h' },
     { label: 'Latente Leistung', value: fmt(r.condensationPowerKw, 2), unit: 'kW' },
-    { label: 'Hinweis', value: '100%-Enthalpielinie ueberschritten', unit: '' }
+    { label: 'Hinweis', value: '100%-Enthalpielinie überschritten', unit: '' }
   ], 'cyan');
 }
 
 function wrgInputCard(s) {
-  return card('WRG - Eingaben', `<div class="wrg-group-grid">
-    ${airInputCard('Aussenluft', {
-      temp: { id: 'outdoorTemp', label: 'Temperatur', unit: ' GradC', value: fmtInput(s.outdoorTemp, 2), signed: true },
+  return card('WRG — Eingaben', `<div class="wrg-group-grid">
+    ${airInputCard('Außenluft', {
+      temp: { id: 'outdoorTemp', label: 'Temperatur', unit: '°C', value: fmtInput(s.outdoorTemp, 2), signed: true },
       rh: { id: 'outdoorRh', label: 'rel. Feuchte', unit: '%', value: fmtInput(s.outdoorRh, 2) }
     })}
     ${airInputCard('Abluft', {
-      temp: { id: 'extractTemp', label: 'Temperatur', unit: ' GradC', value: fmtInput(s.extractTemp, 2) },
+      temp: { id: 'extractTemp', label: 'Temperatur', unit: '°C', value: fmtInput(s.extractTemp, 2) },
       rh: { id: 'extractRh', label: 'rel. Feuchte', unit: '%', value: fmtInput(s.extractRh, 2) }
     })}
     <div class="wrg-group-grid__full">
-      ${card('Waermerueckgewinnung', grid([
-        field({ id: 'wrgVolumeFlowM3h', label: 'Anlagenvolumenstrom V', unit: 'm3/h', value: fmtInput(s.wrgVolumeFlowM3h, 2) }),
+      ${card('Wärmerückgewinnung', grid([
+        field({ id: 'wrgVolumeFlowM3h', label: 'Anlagenvolumenstrom V̇', unit: 'm³/h', value: fmtInput(s.wrgVolumeFlowM3h, 2) }),
         field({ id: 'efficiency', label: 'WRG-Wirkungsgrad', unit: '%', value: fmtInput(s.efficiency, 2) }),
-        field({ id: 'bypassPercent', label: 'Bypass-Anteil beta', unit: '%', value: fmtInput(s.bypassPercent, 2) })
+        field({ id: 'bypassPercent', label: 'Bypass-Anteil β', unit: '%', value: fmtInput(s.bypassPercent, 2) })
       ].join(''), 3), 'cyan', { compact: true })}
     </div>
   </div>`, 'cyan');
 }
 
 function wrgOutputCard(r) {
-  return card('WRG - Ausgabe', `<div class="wrg-group-grid wrg-group-grid--output">
+  return card('WRG — Ausgabe', `<div class="wrg-group-grid wrg-group-grid--output">
     ${readonlyAirCard('Zuluft', r.supply, 'cyan', { includeMass: true })}
     ${readonlyAirCard('Fortluft', r.exhaust, 'cyan', { includeMass: true })}
   </div>`, 'cyan');
 }
 
 function mixingInputCard(s) {
-  return card('Mischluft - Eingaben', `<div class="wrg-group-grid">
-    ${airInputCard('Aussenluft', {
-      volume: { id: 'mixingOutdoorVolumeFlowM3h', label: 'Volumenstrom V', unit: 'm3/h', value: fmtInput(s.mixingOutdoorVolumeFlowM3h, 2) },
-      temp: { id: 'mixingOutdoorTemp', label: 'Temperatur', unit: ' GradC', value: fmtInput(s.mixingOutdoorTemp, 2), signed: true },
+  return card('Mischluft — Eingaben', `<div class="wrg-group-grid">
+    ${airInputCard('Außenluft', {
+      volume: { id: 'mixingOutdoorVolumeFlowM3h', label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(s.mixingOutdoorVolumeFlowM3h, 2) },
+      temp: { id: 'mixingOutdoorTemp', label: 'Temperatur', unit: '°C', value: fmtInput(s.mixingOutdoorTemp, 2), signed: true },
       rh: { id: 'mixingOutdoorRh', label: 'rel. Feuchte', unit: '%', value: fmtInput(s.mixingOutdoorRh, 2) }
     })}
     ${airInputCard('Umluft / Raumluft', {
-      volume: { id: 'mixingRecircVolumeFlowM3h', label: 'Volumenstrom V', unit: 'm3/h', value: fmtInput(s.mixingRecircVolumeFlowM3h, 2) },
-      temp: { id: 'mixingRecircTemp', label: 'Temperatur', unit: ' GradC', value: fmtInput(s.mixingRecircTemp, 2) },
+      volume: { id: 'mixingRecircVolumeFlowM3h', label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(s.mixingRecircVolumeFlowM3h, 2) },
+      temp: { id: 'mixingRecircTemp', label: 'Temperatur', unit: '°C', value: fmtInput(s.mixingRecircTemp, 2) },
       rh: { id: 'mixingRecircRh', label: 'rel. Feuchte', unit: '%', value: fmtInput(s.mixingRecircRh, 2) }
     })}
   </div>`, 'cyan');
 }
 
 function mixingOutputCard(r) {
-  return card('Mischluft - Ausgabe', `<div class="wrg-group-grid wrg-group-grid--output">
+  return card('Mischluft — Ausgabe', `<div class="wrg-group-grid wrg-group-grid--output">
     ${readonlyAirCard('Mischluft / Zuluft', r.mixed, 'cyan', { includeMass: false, includeVolume: true })}
-    ${card('Mischungsverhaeltnis', inlineStats([
-      { label: 'Aussenluftanteil', value: fmt(r.outdoorShare, 0), unit: '%' },
+    ${card('Mischungsverhältnis', inlineStats([
+      { label: 'Außenluftanteil', value: fmt(r.outdoorShare, 0), unit: '%' },
       { label: 'Umluftanteil', value: fmt(r.recircShare, 0), unit: '%' },
       { label: 'Massenstrom', value: fmt(r.mixed.massFlowKgh, 2), unit: 'kg/h' },
       { label: 'x', value: fmt(r.mixed.humidityRatioGkg, 2), unit: 'g/kg' }
@@ -242,11 +242,11 @@ function mixingOutputCard(r) {
 function wrgOutputs(r) {
   return stack([
     wrgOutputCard(r),
-    mainResult('WRG-Leistung', { label: 'Rueckgewonnene Leistung', value: fmt(r.recoveredPowerKw, 2), unit: 'kW' }, [
+    mainResult('WRG-Leistung', { label: 'Rückgewonnene Leistung', value: fmt(r.recoveredPowerKw, 2), unit: 'kW' }, [
       { label: 'Wirkungsgrad', value: fmt(r.efficiency, 0), unit: '%' },
       { label: 'Bypass', value: fmt(r.bypassPercent, 0), unit: '%' },
-      { label: 'WTX-Wirksam', value: fmt(r.effectiveVolumeFlowM3h, 0), unit: 'm3/h' },
-      { label: 'rho  x  cp / 3,6', value: fmt(r.factor, 3), unit: 'Wh/(m3 - K)' }
+      { label: 'WTX-Wirksam', value: fmt(r.effectiveVolumeFlowM3h, 0), unit: 'm³/h' },
+      { label: 'ρ × cₚ / 3,6', value: fmt(r.factor, 3), unit: 'Wh/(m³·K)' }
     ], 'cyan'),
     condensationCard(r)
   ].join(''));
@@ -263,8 +263,8 @@ function view(s) {
   const r = calculate(s);
   const isMixing = s.mode === 'mixing';
   const formula = isMixing
-    ? 'Mischluft: x und h aus Aussenluft + Umluft ueber Massenstromanteile'
-    : 'WRG: tZuluft = (1beta)  x  [tAussen + etaWRG  x  (tAbluft  tAussen)] + beta  x  tAussen  -  tFort = tAbluft  (1beta)  x  etaWRG  x  (tAbluft  tAussen)';
+    ? 'Mischluft: x und h aus Außenluft + Umluft über Massenstromanteile'
+    : 'WRG: tZuluft = (1−β) × [tAußen + ηWRG × (tAbluft − tAußen)] + β × tAußen · tFort = tAbluft − (1−β) × ηWRG × (tAbluft − tAußen)';
 
   const input = isMixing ? mixingInputCard(s) : wrgInputCard(s);
   const output = stack([(isMixing ? mixingOutputs(r) : wrgOutputs(r)), rltDeviceCard(r, s)].join(''));

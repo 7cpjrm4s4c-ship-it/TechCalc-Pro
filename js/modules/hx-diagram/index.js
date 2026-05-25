@@ -6,7 +6,7 @@ import { fmt, fmtInput } from '../../utils/calculations.js';
 
 function hxFmt(value, decimals = 2) {
   const n = Number(value);
-  if (!Number.isFinite(n)) return '-';
+  if (!Number.isFinite(n)) return '—';
   return n.toLocaleString('de-DE', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 }
 
@@ -24,21 +24,21 @@ function availableProcesses(s) {
 
 function processCard(s) {
   const options = availableProcesses(s);
-  return card('Luftbehandlung waehlen', `<div class="hx-process-grid">
+  return card('Luftbehandlung wählen', `<div class="hx-process-grid">
     ${options.map(option => `<button type="button" data-segment="process" data-value="${esc(option.value)}" class="hx-process ${option.value === s.process ? 'is-active' : ''}">${esc(option.label)}</button>`).join('')}
   </div>`, 'cyan', { compact: true });
 }
 
 function inputCard(s) {
   return card('Luftzustand erfassen', stack([
-    field({ id: 'label', label: 'Bezeichnung', value: s.label, placeholder: 'z. B. Aussenluft Winter', type: 'text', inputmode: 'text' }),
+    field({ id: 'label', label: 'Bezeichnung', value: s.label, placeholder: 'z. B. Außenluft Winter', type: 'text', inputmode: 'text' }),
     card('Ausgangszustand', grid([
-      signedTempField('tempC', 'Trockenkugeltemperatur thetat', fmtInput(s.tempC, 2), 'data-hx-sign'),
-      field({ id: 'rhPercent', label: 'Relative Feuchte phi', unit: '%', value: fmtInput(s.rhPercent, 2) })
+      signedTempField('tempC', 'Trockenkugeltemperatur θt', fmtInput(s.tempC, 2), 'data-hx-sign'),
+      field({ id: 'rhPercent', label: 'Relative Feuchte φ', unit: '%', value: fmtInput(s.rhPercent, 2) })
     ].join(''), 2), 'cyan', { compact: true }),
     card('Zielzustand', grid([
-      signedTempField('targetTempC', 'Zieltemperatur thetat', fmtInput(s.targetTempC, 2), 'data-hx-sign'),
-      field({ id: 'targetRhPercent', label: 'Relative Zielfeuchte phi', unit: '%', value: fmtInput(s.targetRhPercent, 2) })
+      signedTempField('targetTempC', 'Zieltemperatur θt', fmtInput(s.targetTempC, 2), 'data-hx-sign'),
+      field({ id: 'targetRhPercent', label: 'Relative Zielfeuchte φ', unit: '%', value: fmtInput(s.targetRhPercent, 2) })
     ].join(''), 2), 'cyan', { compact: true }),
     processCard(s),
     `<div class="tc-save-actions">${actionButton('Speichern', s.activeProcessId ? 'data-hx-add disabled' : 'data-hx-add')} ${actionButton('Aktualisieren', s.activeProcessId ? 'data-hx-update' : 'data-hx-update disabled')}</div><div class="tc-actions">${actionButton('Diagramm leeren', 'data-hx-clear', 'tc-action--ghost')}</div>`
@@ -47,20 +47,20 @@ function inputCard(s) {
 
 function readonlyStateCard(title, point) {
   return card(title, inlineStats([
-    { label: 'Temperatur thetat', value: hxFmt(point.tempC, 2), unit: ' GradC' },
-    { label: 'rel. Feuchte phi', value: hxFmt(point.rhPercent, 0), unit: '%' },
+    { label: 'Temperatur θt', value: hxFmt(point.tempC, 2), unit: '°C' },
+    { label: 'rel. Feuchte φ', value: hxFmt(point.rhPercent, 0), unit: '%' },
     { label: 'Feuchtegehalt x', value: hxFmt(point.humidityRatioGkg, 2), unit: 'g/kg' },
     { label: 'Enthalpie h', value: hxFmt(point.enthalpyKjKg, 2), unit: 'kJ/kg' },
-    { label: 'Dichte rho', value: hxFmt(point.densityKgm3, 3), unit: 'kg/m3' },
-    { label: 'Taupunkt thetap', value: hxFmt(point.dewPointC, 2), unit: ' GradC' }
+    { label: 'Dichte ρ', value: hxFmt(point.densityKgm3, 3), unit: 'kg/m³' },
+    { label: 'Taupunkt θp', value: hxFmt(point.dewPointC, 2), unit: '°C' }
   ]), 'cyan');
 }
 
 function processPathCard(r) {
   const rows = r.processPath.map((point, index) => `<div class="hx-process-step">
     <strong>${esc(point.label || `Punkt ${index + 1}`)}</strong>
-    <span><b>thetat</b>${hxFmt(point.tempC, 2)}  GradC</span>
-    <span><b>phi</b>${hxFmt(point.rhPercent, 0)} %</span>
+    <span><b>θt</b>${hxFmt(point.tempC, 2)} °C</span>
+    <span><b>φ</b>${hxFmt(point.rhPercent, 0)} %</span>
     <span><b>x</b>${hxFmt(point.humidityRatioGkg, 2)} g/kg</span>
     <span><b>h</b>${hxFmt(point.enthalpyKjKg, 2)} kJ/kg</span>
   </div>`).join('');
@@ -69,14 +69,14 @@ function processPathCard(r) {
 
 function resultCard(r, activePath) {
   if (!activePath.length) {
-    return card('Automatische Zustandsaenderung', '<div class="empty-state">Zustandsaenderung waehlen oder gespeicherten Prozess auswaehlen</div>', 'cyan');
+    return card('Automatische Zustandsänderung', '<div class="empty-state">Zustandsänderung wählen oder gespeicherten Prozess auswählen</div>', 'cyan');
   }
   return stack([
-    mainResult('Automatische Zustandsaenderung', { label: 'Prozess', value: r.changeType, unit: '' }, [
-      { label: 'Deltatheta', value: hxFmt(r.delta.tempK, 2), unit: 'K' },
-      { label: 'Deltax', value: hxFmt(r.delta.humidityGkg, 2), unit: 'g/kg' },
-      { label: 'Deltah', value: hxFmt(r.delta.enthalpyKjKg, 2), unit: 'kJ/kg' },
-      { label: 'Deltaphi', value: hxFmt(r.delta.rhPercent, 0), unit: '%' }
+    mainResult('Automatische Zustandsänderung', { label: 'Prozess', value: r.changeType, unit: '' }, [
+      { label: 'Δθ', value: hxFmt(r.delta.tempK, 2), unit: 'K' },
+      { label: 'Δx', value: hxFmt(r.delta.humidityGkg, 2), unit: 'g/kg' },
+      { label: 'Δh', value: hxFmt(r.delta.enthalpyKjKg, 2), unit: 'kJ/kg' },
+      { label: 'Δφ', value: hxFmt(r.delta.rhPercent, 0), unit: '%' }
     ], 'cyan'),
     processPathCard({ processPath: activePath }),
     `<div class="hx-state-grid">${readonlyStateCard('Ausgang', activePath[0])}${readonlyStateCard('Ziel', activePath[activePath.length - 1])}</div>`
@@ -89,9 +89,9 @@ function historyCard(processes, activeProcessId) {
       const last = process.path?.[process.path.length - 1];
       const selected = process.id === activeProcessId;
       return `<div class="hx-history__row hx-history__row--process ${selected ? 'is-active' : ''}" data-hx-select-process="${esc(process.id)}">
-        <div><strong>${esc(index + 1)}. ${esc(process.label)}</strong><small>${esc(process.processLabel || process.process)}  -  ${process.path?.length || 0} Punkte</small></div>
-        <div class="hx-history__values"><span>thetat ${hxFmt(last?.tempC, 2)}  GradC</span><span>phi ${hxFmt(last?.rhPercent, 0)} % r.F.</span></div>
-        <button type="button" class="mini-button mini-button--danger" data-hx-remove-process="${esc(process.id)}" aria-label="Prozess loeschen">Loeschen</button>
+        <div><strong>${esc(index + 1)}. ${esc(process.label)}</strong><small>${esc(process.processLabel || process.process)} · ${process.path?.length || 0} Punkte</small></div>
+        <div class="hx-history__values"><span>θt ${hxFmt(last?.tempC, 2)} °C</span><span>φ ${hxFmt(last?.rhPercent, 0)} % r.F.</span></div>
+        <button type="button" class="mini-button mini-button--danger" data-hx-remove-process="${esc(process.id)}" aria-label="Prozess löschen">Löschen</button>
       </div>`;
     }).join('')}
   </div>` : '<div class="empty-state">Noch keine Prozesse gespeichert</div>';
@@ -100,7 +100,7 @@ function historyCard(processes, activeProcessId) {
 
 function chartCard(activePath, targetReached = true) {
   const warning = targetReached ? '' : '<div class="hx-target-warning">Zielzustand wird nicht erreicht!</div>';
-  return card('h,x-Diagramm', `<div class="hx-chart-wrap">${renderHxSvg(activePath)}</div>${warning}<div class="formula">Naeherung bei Luftdruck 1.013 hPa  -  x horizontal  -  thetat vertikal</div>`, 'cyan');
+  return card('h,x-Diagramm', `<div class="hx-chart-wrap">${renderHxSvg(activePath)}</div>${warning}<div class="formula">Näherung bei Luftdruck 1.013 hPa · x horizontal · θt vertikal</div>`, 'cyan');
 }
 
 
@@ -187,8 +187,8 @@ function renderHxSvg(points) {
     ${STATIC_HX_BACKGROUND}
     <g>${segments}</g>
     <g>${markers}</g>
-    <text x="${w / 2}" y="${h - 12}" class="hx-title" text-anchor="middle">Feuchtegehalt x [g H2O/kg tr. Luft]</text>
-    <text x="16" y="${h / 2}" class="hx-title" transform="rotate(-90 16 ${h / 2})" text-anchor="middle">Trockenkugeltemperatur thetat [ GradC]</text>
+    <text x="${w / 2}" y="${h - 12}" class="hx-title" text-anchor="middle">Feuchtegehalt x [g H₂O/kg tr. Luft]</text>
+    <text x="16" y="${h / 2}" class="hx-title" transform="rotate(-90 16 ${h / 2})" text-anchor="middle">Trockenkugeltemperatur θt [°C]</text>
   </svg>`;
 }
 
@@ -223,7 +223,7 @@ export default {
       rootEl.querySelectorAll('[data-field]').forEach(el => {
         const clearGeneratedPath = () => {
           // Beim Bearbeiten gespeicherter Prozesse muss die aktive ID erhalten bleiben,
-          // sonst wird aus einer Aenderung anschliessend ein neuer Prozess statt eines Updates.
+          // sonst wird aus einer Änderung anschließend ein neuer Prozess statt eines Updates.
           state.set({ activePath: [], points: [] }, { notify: false });
         };
         el.addEventListener('input', clearGeneratedPath);

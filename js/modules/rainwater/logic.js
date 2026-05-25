@@ -127,14 +127,14 @@ function validate(state, r) {
   const drain = currentDrainSettings(state);
   const stackCount = mode === 'roof' ? Math.max(1, Math.floor(toNumber(state.stackCount)) || 1) : 0;
 
-  if (!r.surfaces.length) warnings.push('Noch keine Regenflaeche erfasst.');
-  if (!r.selectedSurface) warnings.push('Keine Flaeche markiert. Bitte eine Flaeche fuer die Ergebnisanzeige auswaehlen.');
-  if ((r.selectedSurface?.qr || 0) <= 0) warnings.push('Qr ist 0 l/s. Regenspende, Flaeche und Abflussbeiwert pruefen.');
-  if (drain.capacity <= 0) warnings.push(`${mode === 'property' ? 'Abflussvermoegen des Hoftopfs' : 'Abflussvermoegen des Dacheinlaufs'} eingeben.`);
+  if (!r.surfaces.length) warnings.push('Noch keine Regenfläche erfasst.');
+  if (!r.selectedSurface) warnings.push('Keine Fläche markiert. Bitte eine Fläche für die Ergebnisanzeige auswählen.');
+  if ((r.selectedSurface?.qr || 0) <= 0) warnings.push('Qr ist 0 l/s. Regenspende, Fläche und Abflussbeiwert prüfen.');
+  if (drain.capacity <= 0) warnings.push(`${mode === 'property' ? 'Abflussvermögen des Hoftopfs' : 'Abflussvermögen des Dacheinlaufs'} eingeben.`);
   if (mode === 'roof' && stackCount < 1) warnings.push('Anzahl Fallleitungen muss mindestens 1 betragen.');
-  warnings.push(`Regenspende ${mode === 'property' ? 'r(5,2)' : 'r(5,5)'} und r(5,100) standortbezogen ueber KOSTRA/OpenKo ermitteln und manuell eintragen.`);
-  if (mode === 'roof') warnings.push('Notentwaesserung als Vorbemessung beruecksichtigt. Ueberflutungsnachweis und Rueckhalteraumbemessung sind nicht Bestandteil dieser Berechnung.');
-  warnings.push('Die Ergebnis-Card zeigt die markierte bzw. zuletzt hinzugefuegte Flaeche. Weitere Flaechen werden separat in den Klappcards berechnet.');
+  warnings.push(`Regenspende ${mode === 'property' ? 'r(5,2)' : 'r(5,5)'} und r(5,100) standortbezogen über KOSTRA/OpenKo ermitteln und manuell eintragen.`);
+  if (mode === 'roof') warnings.push('Notentwässerung als Vorbemessung berücksichtigt. Überflutungsnachweis und Rückhalteraumbemessung sind nicht Bestandteil dieser Berechnung.');
+  warnings.push('Die Ergebnis-Card zeigt die markierte bzw. zuletzt hinzugefügte Fläche. Weitere Flächen werden separat in den Klappcards berechnet.');
   return warnings;
 }
 

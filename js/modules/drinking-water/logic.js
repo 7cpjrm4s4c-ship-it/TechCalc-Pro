@@ -2,14 +2,14 @@ import { num } from '../../utils/calculations.js';
 
 export const CONSUMERS = [
   { id:'basin', label:'Waschtisch / Bidet', short:'Waschtisch / Bidet', vr:0.07, pmin:0.10, neGroup:'basin', hotWater:true },
-  { id:'kitchenSink', label:'Kuechenspuele', short:'Kuechenspuele', vr:0.07, pmin:0.10, neGroup:'kitchenSink', hotWater:true },
+  { id:'kitchenSink', label:'Küchenspüle', short:'Küchenspüle', vr:0.07, pmin:0.10, neGroup:'kitchenSink', hotWater:true },
   { id:'utilitySinkMixer', label:'Ausgussbecken mit Mischbatterie', short:'Ausgussbecken MB', vr:0.15, pmin:0.10, neGroup:'utilitySink', hotWater:true },
-  { id:'dishwasher', label:'Geschirrspuelmaschine', short:'Geschirrspueler', vr:0.07, pmin:0.05, neGroup:'dishwasher', hotWater:false },
-  { id:'wcCistern', label:'WC-Spuelkasten', short:'Spuelkasten', vr:0.13, pmin:0.05, neGroup:'wc', hotWater:false },
+  { id:'dishwasher', label:'Geschirrspülmaschine', short:'Geschirrspüler', vr:0.07, pmin:0.05, neGroup:'dishwasher', hotWater:false },
+  { id:'wcCistern', label:'WC-Spülkasten', short:'Spülkasten', vr:0.13, pmin:0.05, neGroup:'wc', hotWater:false },
   { id:'bathShower', label:'Mischarmatur Bade-/Duschwanne', short:'Bad/Dusche', vr:0.15, pmin:0.10, neGroup:'bath', hotWater:true },
   { id:'shower', label:'Dusche', short:'Dusche', vr:0.15, pmin:0.10, neGroup:'shower', hotWater:true },
   { id:'washingMachine', label:'Waschmaschine', short:'Waschmaschine', vr:0.15, pmin:0.05, neGroup:'washing', hotWater:false },
-  { id:'urinalFlush', label:'Druckspueler Urinal', short:'Urinal-Druckspueler', vr:0.30, pmin:0.10, neGroup:'urinal', hotWater:false },
+  { id:'urinalFlush', label:'Druckspüler Urinal', short:'Urinal-Druckspüler', vr:0.30, pmin:0.10, neGroup:'urinal', hotWater:false },
   { id:'tapRegDn10', label:'Auslaufventil mit Strahlregler DN 10', short:'Auslauf DN10', vr:0.15, pmin:0.10, neGroup:'tapRegDn10', hotWater:false },
   { id:'tapDn15', label:'Auslaufventil ohne Strahlregler DN 15', short:'Auslauf DN15', vr:0.30, pmin:0.05, neGroup:'tapDn15', hotWater:false },
   { id:'tapDn20', label:'Auslaufventil ohne Strahlregler DN 20', short:'Auslauf DN20', vr:0.50, pmin:0.05, neGroup:'tapDn20', hotWater:false },
@@ -17,10 +17,10 @@ export const CONSUMERS = [
 ];
 
 export const BUILDING_TYPES = [
-  { id:'residential', label:'Wohngebaeude / Nutzungseinheiten', a:1.48, b:0.19, c:0.94 },
+  { id:'residential', label:'Wohngebäude / Nutzungseinheiten', a:1.48, b:0.19, c:0.94 },
   { id:'hotel', label:'Hotel', a:0.70, b:0.48, c:0.13 },
   { id:'hospital', label:'Bettenhaus Krankenhaus', a:0.75, b:0.44, c:0.18 },
-  { id:'school', label:'Schule / Verwaltungsgebaeude', a:0.70, b:0.40, c:0.13 },
+  { id:'school', label:'Schule / Verwaltungsgebäude', a:0.70, b:0.40, c:0.13 },
   { id:'senior', label:'Wohnheim / Seniorenheim', a:0.91, b:0.31, c:0.38 }
 ];
 
@@ -220,6 +220,6 @@ export function calculate(s = {}) {
     warmWaterMode,
     peakFlow,
     house,
-    formulaText: `Vs = ${building.a.toLocaleString('de-DE')}  x  (SummeVR)^${building.b.toLocaleString('de-DE')}  ${building.c.toLocaleString('de-DE')}`
+    formulaText: `Vs = ${building.a.toLocaleString('de-DE')} × (ΣVR)^${building.b.toLocaleString('de-DE')} − ${building.c.toLocaleString('de-DE')}`
   };
 }
