@@ -12,7 +12,7 @@ import pressureHoldingConfig from '../modules/pressure-holding/config.js';
 import bufferStorageConfig from '../modules/buffer-storage/config.js';
 import wastewaterConfig from '../modules/wastewater/config.js';
 import rainwaterConfig from '../modules/rainwater/config.js';
-import { restoreSessionSnapshot } from './projectStorage.js';
+import { restoreSessionSnapshot, saveSessionSnapshot } from './projectStorage.js';
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
@@ -62,6 +62,24 @@ restoreSessionSnapshot();
 window.addEventListener('pageshow', event => {
   if (event.persisted) restoreSessionSnapshot();
 });
+
+function persistSessionBeforeLeaving() {
+  saveSessionSnapshot();
+}
+
+window.addEventListener('pagehide', persistSessionBeforeLeaving, { capture: true });
+window.addEventListener('beforeunload', persistSessionBeforeLeaving, { capture: true });
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') persistSessionBeforeLeaving();
+});
+document.addEventListener('click', event => {
+  const link = event.target.closest?.('a[href]');
+  if (!link) return;
+  const href = link.getAttribute('href') || '';
+  const target = link.getAttribute('target') || '';
+  const external = target === '_blank' || /^https?:\/\//i.test(href);
+  if (external) persistSessionBeforeLeaving();
+}, { capture: true });
 
 const app = document.getElementById('app');
 let renderToken = 0;
@@ -145,7 +163,7 @@ function applyThemeMode(mode = sessionStorage.getItem(THEME_STORAGE_KEY) || 'sys
 
 applyThemeMode();
 
-const APP_VERSION = '1.2.15';
+const APP_VERSION = '1.2.16';
 const FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
 
 function initFeedbackForm() {

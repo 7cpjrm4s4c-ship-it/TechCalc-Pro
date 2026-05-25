@@ -1,3 +1,10 @@
+## Version 1.2.16 - Release Notes / Link-State Hotfix
+
+- Release Notes im Menü auf den aktuellen Stand gebracht.
+- Regenwasser-Status wird vor dem Öffnen externer KOSTRA/OpenKo-Links gesichert.
+- Mobile Schnellzugriffe werden dauerhaft gespeichert.
+- Eingestellte Werte, markierte Flächen und Flächenliste bleiben nach Rückkehr aus externen Links erhalten.
+
 ## Version 1.2.15 - Regenwasser Flächen-UX Hotfix
 
 - Gespeicherte Regenwasser-Berechnungen Card entfernt.
