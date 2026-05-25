@@ -10,6 +10,8 @@ import { state as hxDiagramState } from '../modules/hx-diagram/state.js';
 import { state as drinkingWaterState } from '../modules/drinking-water/state.js';
 import { state as pressureHoldingState } from '../modules/pressure-holding/state.js';
 import { state as bufferStorageState } from '../modules/buffer-storage/state.js';
+import { state as wastewaterState } from '../modules/wastewater/state.js';
+import { state as rainwaterState } from '../modules/rainwater/state.js';
 import { readUsageUnits, writeUsageUnits, readSingleConsumers, writeSingleConsumers } from '../modules/drinking-water/logic.js';
 
 const DEFAULT_META = {
@@ -93,7 +95,9 @@ export function collectProjectData() {
         state: drinkingWaterState.get(),
         usageUnits: readUsageUnits(),
         singleConsumers: readSingleConsumers()
-      }
+      },
+      wastewater: { state: wastewaterState.get() },
+      rainwater: { state: rainwaterState.get() }
     }
   };
 }
@@ -116,6 +120,8 @@ export function applyProjectData(data = {}, { fileName = '' } = {}) {
   writeRltDevices(modules['heat-recovery']?.rltDevices || []);
   if (modules['hx-diagram']?.state) hxDiagramState.replace(modules['hx-diagram'].state, { notify: false });
   if (modules['drinking-water']?.state) drinkingWaterState.replace(modules['drinking-water'].state, { notify: false });
+  if (modules.wastewater?.state) wastewaterState.replace(modules.wastewater.state, { notify: false });
+  if (modules.rainwater?.state) rainwaterState.replace(modules.rainwater.state, { notify: false });
   writeUsageUnits(modules['drinking-water']?.usageUnits || []);
   writeSingleConsumers(modules['drinking-water']?.singleConsumers || []);
 
@@ -136,24 +142,50 @@ export function resetAllSessionData() {
   writeRltDevices([]);
   hxDiagramState.reset();
   drinkingWaterState.reset();
+  wastewaterState.reset();
+  rainwaterState.reset();
   writeUsageUnits([]);
   writeSingleConsumers([]);
 }
 
-export function downloadProjectFile() {
+export async function downloadProjectFile() {
   const data = collectProjectData();
   const meta = data.meta || {};
   const base = [meta.projectNo, meta.project, meta.client].filter(Boolean).join('-') || 'techcalc-projekt';
   const safe = base.toLowerCase().replace(/[^a-z0-9äöüß_-]+/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'techcalc-projekt';
+  const fileName = `${safe}.techcalc.json`;
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json;charset=utf-8' });
+
+  if (typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function') {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: fileName,
+        types: [{
+          description: 'TechCalc Projektdatei',
+          accept: { 'application/json': ['.techcalc.json', '.json'] }
+        }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      openedFileName = handle.name || fileName;
+      document.dispatchEvent(new CustomEvent('techcalc-project-saved', { detail: { fileName: openedFileName } }));
+      return true;
+    } catch (error) {
+      if (error?.name === 'AbortError') return false;
+      console.warn('Dateiauswahl nicht verfügbar, Projekt wird als Download gespeichert.', error);
+    }
+  }
+
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `${safe}.techcalc.json`;
+  link.download = fileName;
   document.body.appendChild(link);
   link.click();
   link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 2000);
+  return true;
 }
 
 export async function readProjectFile(file) {

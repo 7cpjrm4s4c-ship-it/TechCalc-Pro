@@ -1,6 +1,6 @@
-const CACHE_NAME = 'techcalc-pro-1.0.13';
+const CACHE_NAME = 'techcalc-pro-1.2.17';
 const ASSETS = [
-  './','./index.html','./manifest.json',
+  './','./index.html','./manifest.json','./RELEASE_NOTES.md',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',
   './js/core/app.js','./js/core/registry.js','./js/core/router.js','./js/core/renderer.js','./js/core/preferences.js','./js/core/state.js','./js/core/navigation.js','./js/core/projectStorage.js','./js/core/pdfExport.js',
   './js/utils/calculations.js','./js/utils/units.js','./js/utils/pipes.js',
@@ -13,6 +13,8 @@ const ASSETS = [
   './js/modules/pipe-sizing/index.js','./js/modules/pipe-sizing/config.js','./js/modules/pipe-sizing/logic.js','./js/modules/pipe-sizing/state.js',
   './js/modules/unit-converter/index.js','./js/modules/unit-converter/config.js','./js/modules/unit-converter/logic.js','./js/modules/unit-converter/state.js',
   './js/modules/drinking-water/index.js','./js/modules/drinking-water/config.js','./js/modules/drinking-water/logic.js','./js/modules/drinking-water/state.js',
+  './js/modules/wastewater/index.js','./js/modules/wastewater/config.js','./js/modules/wastewater/logic.js','./js/modules/wastewater/state.js','./js/modules/wastewater/tables.js',
+  './js/modules/rainwater/index.js','./js/modules/rainwater/config.js','./js/modules/rainwater/logic.js','./js/modules/rainwater/state.js','./js/modules/rainwater/tables.js',
   './assets/icons/icon-16.png','./assets/icons/icon-32.png','./assets/icons/icon-192.png','./assets/icons/icon-512.png','./assets/icons/apple-touch-icon.png','./assets/icons/favicon.ico'
 ];
 
@@ -31,9 +33,9 @@ self.addEventListener('activate', event => {
   })());
 });
 
-async function updateCache(request) {
+async function fetchFresh(request) {
   try {
-    const response = await fetch(request, { cache: 'no-cache' });
+    const response = await fetch(request, { cache: 'no-store' });
     if (response?.ok) {
       const cache = await caches.open(CACHE_NAME);
       await cache.put(request, response.clone());
@@ -44,21 +46,35 @@ async function updateCache(request) {
   }
 }
 
+async function cacheFirstWithRefresh(request) {
+  const cached = await caches.match(request);
+  if (cached) {
+    fetchFresh(request);
+    return cached;
+  }
+  const response = await fetchFresh(request);
+  if (response) return response;
+  return caches.match('./index.html');
+}
+
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
   const requestUrl = new URL(event.request.url);
   if (requestUrl.origin !== self.location.origin) return;
 
-  event.respondWith((async () => {
-    const cached = await caches.match(event.request);
-    if (cached) {
-      event.waitUntil(updateCache(event.request));
-      return cached;
-    }
+  const isNavigation = event.request.mode === 'navigate' || event.request.destination === 'document';
+  const isReleaseNotes = requestUrl.pathname.endsWith('/RELEASE_NOTES.md') || requestUrl.pathname.endsWith('RELEASE_NOTES.md');
+  const isServiceWorker = requestUrl.pathname.endsWith('/service-worker.js') || requestUrl.pathname.endsWith('service-worker.js');
 
-    const response = await updateCache(event.request);
-    if (response) return response;
-    return caches.match('./index.html');
-  })());
+  if (isNavigation || isReleaseNotes || isServiceWorker) {
+    event.respondWith((async () => {
+      const fresh = await fetchFresh(event.request);
+      if (fresh) return fresh;
+      return caches.match(event.request) || caches.match('./index.html');
+    })());
+    return;
+  }
+
+  event.respondWith(cacheFirstWithRefresh(event.request));
 });

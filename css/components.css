@@ -4122,3 +4122,412 @@ body.settings-open {
   min-width: 0;
   overflow-wrap: anywhere;
 }
+
+/* Wastewater module */
+.wastewater-fixtures {
+  display: grid;
+  gap: 10px;
+}
+
+.wastewater-fixture {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 12px 44px 12px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: rgba(255,255,255,.035);
+}
+
+.wastewater-fixture__main,
+.wastewater-fixture__custom {
+  display: grid;
+  gap: 10px;
+}
+
+.wastewater-fixture__main {
+  grid-template-columns: minmax(0, 1fr) minmax(110px, 160px);
+}
+
+.wastewater-fixture__stats .inline-stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.wastewater-fixture__delete {
+  position: absolute;
+  right: 10px;
+  top: 12px;
+}
+
+@media (max-width: 767px) {
+  .wastewater-fixture__main,
+  .wastewater-fixture__stats .inline-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* v1.1.1: Schmutzwasser UX refinements */
+.module-view[data-module='wastewater'] .wastewater-fixture {
+  padding: 14px;
+}
+.module-view[data-module='wastewater'] .wastewater-fixture__delete {
+  position: static;
+}
+.module-view[data-module='wastewater'] .wastewater-fixture .line-section-card__body {
+  display: grid;
+  gap: 10px;
+}
+.module-view[data-module='wastewater'] .wastewater-subselect {
+  display: grid;
+  gap: 8px;
+}
+.module-view[data-module='wastewater'] .wastewater-subselect > span {
+  color: var(--color-muted);
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.module-view[data-module='wastewater'] .segmented {
+  overflow-x: auto;
+}
+.module-view[data-module='wastewater'] .segmented button {
+  min-width: max-content;
+}
+
+/* v1.1.2: Schmutzwasser compact UX */
+.wastewater-compact-list{
+  display:flex;
+  flex-direction:column;
+  gap:.65rem;
+}
+.wastewater-compact-row{
+  border:1px solid rgba(126,146,166,.28);
+  border-radius:16px;
+  padding:.65rem;
+  background:rgba(255,255,255,.035);
+}
+.wastewater-compact-row__inputs{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(120px,160px) auto;
+  gap:.55rem;
+  align-items:end;
+}
+.wastewater-compact-row__custom{margin-top:.55rem;}
+.wastewater-compact-row__meta{
+  margin-top:.45rem;
+  color:var(--text-muted);
+  font-size:.82rem;
+  font-weight:700;
+}
+.ph-formula--small{
+  margin-top:.75rem;
+  font-size:.78rem;
+  opacity:.72;
+  text-align:center;
+}
+.ph-warning--norm strong{color:var(--text-primary);}
+@media (max-width:720px){
+  .wastewater-compact-row__inputs{grid-template-columns:1fr;}
+}
+
+/* v1.1.3: Schmutzwasser Hinweise und Projekt-Speichern */
+.module-view[data-module='wastewater'] .ph-warnings {
+  display: grid;
+  gap: .55rem;
+}
+.module-view[data-module='wastewater'] .ph-warning {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: .35rem;
+  align-items: baseline;
+  padding: .15rem 0;
+}
+.module-view[data-module='wastewater'] .ph-warning span {
+  color: var(--text-muted);
+  font-weight: 800;
+}
+.module-view[data-module='wastewater'] .ph-warning strong {
+  color: var(--text-primary);
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.wastewater-line-hints {
+  display: grid;
+  gap: .35rem;
+  margin-top: .35rem;
+  color: var(--text-muted);
+  font-size: .9rem;
+  line-height: 1.3;
+}
+.wastewater-line-hints p {
+  margin: 0;
+}
+@media (max-width: 720px) {
+  .module-view[data-module='wastewater'] .ph-warning {
+    grid-template-columns: 1fr;
+    gap: .1rem;
+  }
+}
+
+/* v1.1.4: Schmutzwasser kompakte Gegenstands-UX und Normhinweise */
+.module-view[data-module='wastewater'] .wastewater-fixture-list {
+  margin-top: .75rem;
+}
+.module-view[data-module='wastewater'] .wastewater-fixture-row {
+  align-items: center;
+}
+.module-view[data-module='wastewater'] .wastewater-fixture-row button {
+  border: 1px solid rgba(255,92,92,.55);
+  background: rgba(255,92,92,.13);
+  color: #ff9b9b;
+  border-radius: 999px;
+  width: 34px;
+  height: 34px;
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+.module-view[data-module='wastewater'] .ph-warning {
+  text-align: left;
+}
+.module-view[data-module='wastewater'] .ph-warning span::after {
+  content: ' ';
+}
+
+/* Regenwasser 1.2.3 */
+.rainwater-kostra-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.rainwater-result-list .line-section-card__body .ph-formula--small {
+  margin-top: .75rem;
+}
+
+/* Regenwasser 1.2.4 */
+.rainwater-surface-row {
+  cursor: pointer;
+}
+.rainwater-surface-row.is-active,
+.rainwater-result-list .line-section-card.is-active {
+  border-color: rgba(51, 161, 255, .75);
+  box-shadow: 0 0 0 1px rgba(51, 161, 255, .22), 0 0 24px rgba(51, 161, 255, .12);
+}
+
+
+/* v1.2.6: Regenwasser Notentwässerung UX und Flächenbearbeitung */
+.app-header,
+.app-header.is-scrolled {
+  background: rgba(8, 12, 24, .28) !important;
+  background-color: rgba(8, 12, 24, .28) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(125%);
+  backdrop-filter: blur(18px) saturate(125%);
+  box-shadow: none !important;
+}
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .app-header,
+  .app-header.is-scrolled {
+    background: rgba(8, 12, 24, .18) !important;
+    background-color: rgba(8, 12, 24, .18) !important;
+  }
+}
+.module-view[data-module='rainwater'] .ph-warning span::after {
+  content: ' ';
+}
+
+/* v1.2.8: Header safe-area uses the original milk-glass surface across GitHub Pages/Netlify. */
+.app-header,
+.app-header.glass-surface,
+.app-header.is-scrolled,
+.app-header.glass-surface.is-scrolled {
+  background: linear-gradient(135deg, rgba(18, 25, 34, .72), rgba(12, 18, 28, .50)) !important;
+  background-color: rgba(18, 25, 34, .62) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(130%) !important;
+  backdrop-filter: blur(22px) saturate(130%) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,.18) !important;
+  border-bottom-color: rgba(255,255,255,.12) !important;
+}
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .app-header,
+  .app-header.glass-surface,
+  .app-header.is-scrolled,
+  .app-header.glass-surface.is-scrolled {
+    background: linear-gradient(135deg, rgba(18, 25, 34, .88), rgba(12, 18, 28, .76)) !important;
+  }
+}
+.rainwater-result-group {
+  display: grid;
+  gap: var(--ui-gap);
+  margin-top: var(--space-2);
+}
+.rainwater-result-group + .rainwater-result-group {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid rgba(255,255,255,.10);
+}
+.rainwater-result-group h4 {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: .78rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+
+/* v1.2.9: iOS/standalone safe-area status band must use the same milk-glass header tone. */
+html,
+body {
+  background-color: #121922;
+}
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: max(env(safe-area-inset-top, 0px), constant(safe-area-inset-top, 0px), 0px);
+  min-height: max(env(safe-area-inset-top, 0px), constant(safe-area-inset-top, 0px), 0px);
+  background: var(--header-glass-bg) !important;
+  background-color: rgba(18, 25, 34, .62) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(130%) !important;
+  backdrop-filter: blur(22px) saturate(130%) !important;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  z-index: 100000;
+  pointer-events: none;
+}
+.app-header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: max(env(safe-area-inset-top, 0px), constant(safe-area-inset-top, 0px), 0px);
+  background: var(--header-glass-bg) !important;
+  background-color: rgba(18, 25, 34, .62) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(130%) !important;
+  backdrop-filter: blur(22px) saturate(130%) !important;
+  pointer-events: none;
+}
+
+
+/* v1.2.10: Header ohne sichtbaren Rahmen, Feedback ohne Mail-Fallback, Schmutzwasser Mobile-Fixes */
+.app-header,
+.app-header.glass-surface,
+.app-header.is-scrolled,
+.app-header.glass-surface.is-scrolled {
+  border: 0 !important;
+  border-bottom: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+.app-header::before,
+body::before {
+  border: 0 !important;
+  border-bottom: 0 !important;
+}
+.module-view[data-module='wastewater'] .result-row {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+  align-items: start;
+  column-gap: 12px;
+}
+.module-view[data-module='wastewater'] .result-row span {
+  min-width: 0;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+.module-view[data-module='wastewater'] .result-row strong {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.module-view[data-module='wastewater'] .card:has(.wastewater-line-selector) {
+  overflow: hidden;
+}
+.module-view[data-module='wastewater'] .wastewater-line-selector {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+.module-view[data-module='wastewater'] .wastewater-line-selector button {
+  scroll-snap-align: center;
+}
+
+/* v1.2.11: finale UX-Korrekturen Schmutzwasser/Regenwasser/Trinkwasser */
+.mini-edit-field {
+  display: grid;
+  gap: 4px;
+  min-width: 92px;
+  max-width: 120px;
+  align-self: center;
+}
+.mini-edit-field span {
+  color: var(--color-muted);
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.mini-edit-field input {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.06);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 800;
+}
+.dw-consumer-row--editable,
+.wastewater-fixture-row--editable {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+}
+.module-view[data-module='wastewater'] .result-row {
+  grid-template-columns: minmax(130px, .95fr) minmax(0, 1.05fr) !important;
+}
+@media (max-width: 480px) {
+  .module-view[data-module='wastewater'] .result-row {
+    grid-template-columns: minmax(120px, .9fr) minmax(0, 1.1fr) !important;
+    gap: 10px;
+  }
+  .module-view[data-module='wastewater'] .result-row span,
+  .module-view[data-module='wastewater'] .result-row strong {
+    font-size: clamp(15px, 4vw, 18px);
+    line-height: 1.2;
+  }
+  .dw-consumer-row--editable,
+  .wastewater-fixture-row--editable {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .dw-consumer-row--editable button,
+  .wastewater-fixture-row--editable button {
+    grid-column: 2;
+  }
+}
+
+/* v1.2.13: Regenwasser Saved-Card-Pfeil stabilisieren */
+.module-view[data-module='rainwater'] .saved-record-card .line-section-card__toggle,
+.module-view[data-module='rainwater'] .saved-record-card.is-active .line-section-card__toggle {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  flex: 0 0 34px !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+}
+.module-view[data-module='rainwater'] .saved-record-card .line-section-card__toggle span {
+  display: inline-block !important;
+  width: 1em !important;
+  height: 1em !important;
+  line-height: 1 !important;
+  text-align: center !important;
+}
