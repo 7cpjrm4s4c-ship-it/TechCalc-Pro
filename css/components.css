@@ -4531,3 +4531,16 @@ body::before {
   line-height: 1 !important;
   text-align: center !important;
 }
+
+/* v1.3.0 Bugfix: Schmutzwasser-Anzahlfelder auf Desktop stabil ausrichten */
+@media (min-width: 481px) {
+  .module-view[data-module='wastewater'] .wastewater-fixture-row--editable {
+    grid-template-columns: minmax(0, 1fr) 112px 38px !important;
+    column-gap: 12px;
+  }
+  .module-view[data-module='wastewater'] .wastewater-fixture-row--editable .mini-edit-field {
+    width: 112px;
+    min-width: 112px;
+    max-width: 112px;
+  }
+}

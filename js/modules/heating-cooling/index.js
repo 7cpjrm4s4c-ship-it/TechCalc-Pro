@@ -150,6 +150,7 @@ function buildLineSectionRecord(currentState, r, items, id, name, existing = nul
     pipeMaterial: r.pipe && !r.pipe.noDimension ? r.pipe.system.label : '—',
     pipeVelocity: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.velocity) : '—',
     pipePressureLoss: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.pressureLoss) : '—',
+    modeLabel: currentState.mode === 'cooling' ? 'Kälte' : 'Heizung',
     inputState: activeCalculationState(currentState),
     uiState: { mode: currentState.mode, mediumId: currentState.mediumId, pipeSystemId: currentState.pipeSystemId },
     createdAt: existing?.createdAt || new Date().toISOString(),
@@ -173,6 +174,9 @@ function parseDisplayNumber(value) {
 function inferStoredMode(input = {}, item = {}, fallback = 'heating') {
   if (input.mode === 'cooling' || input.mode === 'heating') return input.mode;
   if (item.uiState?.mode === 'cooling' || item.uiState?.mode === 'heating') return item.uiState.mode;
+  const label = String(item.modeLabel || item.mode || '').toLowerCase();
+  if (label.includes('kälte') || label.includes('kuehl') || label.includes('kühl')) return 'cooling';
+  if (label.includes('heiz')) return 'heating';
   const hasCooling = ['coolingCalcTarget', 'coolingPowerW', 'coolingMassFlowKgh', 'coolingDeltaT'].some(k => input[k] !== undefined && input[k] !== null && input[k] !== '');
   const hasHeating = ['heatingCalcTarget', 'heatingPowerW', 'heatingMassFlowKgh', 'heatingDeltaT'].some(k => input[k] !== undefined && input[k] !== null && input[k] !== '');
   if (hasCooling && !hasHeating) return 'cooling';

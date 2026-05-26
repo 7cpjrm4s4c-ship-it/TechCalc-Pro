@@ -62,6 +62,7 @@ function buildVentilationLineSectionRecord(currentState, r, active, modeLabel, i
     roomTemp: fmt(active.roomTemp),
     modeLabel,
     inputState: activeCalculationState(currentState),
+    uiState: { mode: currentState.mode },
     createdAt: existing?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -82,6 +83,7 @@ function parseDisplayNumber(value) {
 
 function inferStoredMode(input = {}, item = {}, fallback = 'heating') {
   if (input.mode === 'cooling' || input.mode === 'heating') return input.mode;
+  if (item.uiState?.mode === 'cooling' || item.uiState?.mode === 'heating') return item.uiState.mode;
   const label = String(item.modeLabel || item.mode || '').toLowerCase();
   if (label.includes('kälte') || label.includes('kuehl') || label.includes('kühl')) return 'cooling';
   const hasCooling = ['coolingCalcTarget', 'coolingPowerW', 'coolingVolumeFlowM3h', 'coolingDeltaT', 'coolingSupplyTemp', 'coolingRoomTemp'].some(k => input[k] !== undefined && input[k] !== null && input[k] !== '');
@@ -91,12 +93,13 @@ function inferStoredMode(input = {}, item = {}, fallback = 'heating') {
 }
 
 function savedVentilationPatch(item, currentState) {
-  const input = item.inputState || item.state || {};
+  const input = item.inputState || item.state || item.uiState || {};
   const nextMode = inferStoredMode(input, item, currentState.mode || 'heating');
   const prefix = nextMode === 'cooling' ? 'cooling' : 'heating';
   const calcTarget = firstFilled(input.calcTarget, input[`${prefix}CalcTarget`], currentState[`${prefix}CalcTarget`], 'power');
   const powerFromResult = parseDisplayNumber(item.powerKw);
   return {
+    ...(item.uiState || {}),
     mode: nextMode,
     [`${prefix}CalcTarget`]: calcTarget,
     [`${prefix}PowerW`]: firstFilled(input.powerW, input[`${prefix}PowerW`], calcTarget !== 'power' ? powerFromResult : ''),

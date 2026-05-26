@@ -6,6 +6,7 @@ export const state = createModuleState({
   unitName: 'Bad 1',
   unitConsumerType: 'shower',
   unitCount: '1',
+  unitSimultaneityFactor: '',
   unitDraftConsumers: [],
   singleName: 'Außenzapfstelle',
   singleConsumerType: 'tapDn15',

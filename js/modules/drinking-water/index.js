@@ -46,7 +46,7 @@ function unitRows(units) {
         { label:'Verbraucher', value: unit.consumerCount },
         { label:'Σ NE', value: fmt(unit.sumFlow, 2), unit:'l/s' },
         { label:'Spitze NE', value: fmt(unit.peakFlow, 2), unit:'l/s' },
-        { label:'Ansatz', value:'2 größte Entnahmestellen' }
+        { label:'Ansatz', value: unit.simultaneityFactor ? `GL ${fmt(unit.simultaneityFactor, 2)}` : '2 größte Entnahmestellen' }
       ])}
       ${consumerRows(unit.consumers || [])}
     </div>
@@ -138,7 +138,7 @@ function inputCard(s, r) {
       ], s.waterHeatingMode, { accent:'blue' }),
       inlineStats([
         { label:'Gleichzeitigkeitsformel', value:r.formulaText },
-        { label:'NE-Ansatz', value:'2 größte Entnahmestellen' },
+        { label:'NE-Ansatz', value:'2 größte Entnahmestellen oder GL je NE' },
         { label:'Warmwasser', value:r.centralWarmWater ? 'TWW-Zapfstellen werden mitgerechnet' : 'Dezentral, Warmwasserbereitung mit 0,05 l/s je TWW-Verbraucher' }
       ])
     ].join('')), 'blue'),
@@ -147,8 +147,9 @@ function inputCard(s, r) {
       field({ id:'unitName', label:'Bezeichnung', value:s.unitName, placeholder:'z. B. Bad Wohnung 1', inputmode:'text' }),
       grid([
         selectField({ id:'unitConsumerType', label:'Verbraucher hinzufügen', value:s.unitConsumerType, options:consumerOptions() }),
-        field({ id:'unitCount', label:'Anzahl', value:fmtInput(s.unitCount,0), inputmode:'numeric' })
-      ].join(''), 2),
+        field({ id:'unitCount', label:'Anzahl', value:fmtInput(s.unitCount,0), inputmode:'numeric' }),
+        field({ id:'unitSimultaneityFactor', label:'GL der Nutzungseinheit', value:s.unitSimultaneityFactor || '', placeholder:'optional < 1,0', inputmode:'decimal' })
+      ].join(''), 3),
       '<button type="button" class="action-button action-button--secondary" data-dw-draft-add="unit">Verbraucher zur Nutzungseinheit hinzufügen</button>',
       `<div data-dw-unit-draft>${draftConsumerList(s.unitDraftConsumers || [], 'unit')}</div>`,
       `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-unit ${s.activeUnitId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-dw-update-unit ${s.activeUnitId ? '' : 'disabled'}>Aktualisieren</button></div>`,
@@ -286,9 +287,9 @@ function bindDrinkingWater(root, signal) {
       const consumers = [...(s.unitDraftConsumers || [])];
       if (!consumers.length) consumers.push(createConsumer({ typeId:s.unitConsumerType, count:s.unitCount }));
       const units = readUsageUnits();
-      const record = createUsageUnit({ name:s.unitName, consumers });
+      const record = createUsageUnit({ name:s.unitName, consumers, simultaneityFactor:s.unitSimultaneityFactor });
       writeUsageUnits([...units, record]);
-      state.set({ unitDraftConsumers: [], activeUnitId:null, activeSingleId:null, unitName:'', uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
+      state.set({ unitDraftConsumers: [], activeUnitId:null, activeSingleId:null, unitName:'', unitSimultaneityFactor:'', uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
       root.innerHTML = view(state.get());
       return;
     }
@@ -302,7 +303,7 @@ function bindDrinkingWater(root, signal) {
       const consumers = [...(s.unitDraftConsumers || [])];
       if (!consumers.length) consumers.push(createConsumer({ typeId:s.unitConsumerType, count:s.unitCount }));
       const units = readUsageUnits();
-      const record = createUsageUnit({ name:s.unitName, consumers });
+      const record = createUsageUnit({ name:s.unitName, consumers, simultaneityFactor:s.unitSimultaneityFactor });
       record.id = s.activeUnitId;
       writeUsageUnits(units.map(item => isSameId(item.id, s.activeUnitId) ? record : item));
       state.set({ activeUnitId:s.activeUnitId, activeSingleId:null, uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
@@ -347,7 +348,7 @@ function bindDrinkingWater(root, signal) {
       event.preventDefault();
       event.stopPropagation();
       writeUsageUnits(readUsageUnits().filter(item => item.id !== unitDelete.dataset.dwUnitDelete));
-      if (isSameId(state.get().activeUnitId, unitDelete.dataset.dwUnitDelete)) state.set({ activeUnitId:null, unitName:'', unitDraftConsumers:[] }, { notify:false });
+      if (isSameId(state.get().activeUnitId, unitDelete.dataset.dwUnitDelete)) state.set({ activeUnitId:null, unitName:'', unitSimultaneityFactor:'', unitDraftConsumers:[] }, { notify:false });
       root.innerHTML = view(state.get());
       return;
     }
@@ -369,7 +370,7 @@ function bindDrinkingWater(root, signal) {
       const units = readUsageUnits();
       const unit = units.find(item => isSameId(item.id, unitEdit.dataset.dwUnitEdit));
       if (unit) {
-        const patch = { activeUnitId: unit.id, activeSingleId:null, unitName: unit.name, singleName:'', unitDraftConsumers: unit.consumers || [], singleDraftConsumers:[], uiUnitFormOpen:true, uiUnitSavedOpen:true };
+        const patch = { activeUnitId: unit.id, activeSingleId:null, unitName: unit.name, unitSimultaneityFactor: unit.simultaneityFactor || '', singleName:'', unitDraftConsumers: unit.consumers || [], singleDraftConsumers:[], uiUnitFormOpen:true, uiUnitSavedOpen:true };
         state.set(patch, { notify:false });
         root.innerHTML = view(state.get());
       }
@@ -401,10 +402,19 @@ function bindDrinkingWater(root, signal) {
       return;
     }
 
+    const segment = event.target.closest('[data-segment]');
+    if (segment && root.contains(segment)) {
+      event.preventDefault();
+      event.stopPropagation();
+      state.set({ [segment.dataset.segment]: segment.dataset.value }, { notify:false });
+      root.innerHTML = view(state.get());
+      return;
+    }
+
     const current = state.get();
     const ignored = event.target.closest('[data-dw-unit-edit], [data-dw-single-edit], [data-dw-unit-delete], [data-dw-single-delete], [data-dw-add-unit], [data-dw-update-unit], [data-dw-add-single], [data-dw-update-single], [data-dw-draft-add], [data-dw-remove-draft], [data-dw-draft-count], [data-line-toggle], details, summary, input, select, textarea, button, label, .segmented');
     if (!ignored && (current.activeUnitId || current.activeSingleId)) {
-      state.set({ activeUnitId:null, activeSingleId:null, unitName:'', singleName:'', unitDraftConsumers:[], singleDraftConsumers:[] }, { notify:false });
+      state.set({ activeUnitId:null, activeSingleId:null, unitName:'', unitSimultaneityFactor:'', singleName:'', unitDraftConsumers:[], singleDraftConsumers:[] }, { notify:false });
       root.innerHTML = view(state.get());
     }
   }, { signal });
@@ -438,9 +448,9 @@ function bindDrinkingWater(root, signal) {
       const consumers = [...(s.unitDraftConsumers || [])];
       if (!consumers.length) consumers.push(createConsumer({ typeId:s.unitConsumerType, count:s.unitCount }));
       const units = readUsageUnits();
-      const record = createUsageUnit({ name:s.unitName, consumers });
+      const record = createUsageUnit({ name:s.unitName, consumers, simultaneityFactor:s.unitSimultaneityFactor });
       writeUsageUnits([...units, record]);
-      state.set({ unitDraftConsumers: [], activeUnitId:null, activeSingleId:null, unitName:'', uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
+      state.set({ unitDraftConsumers: [], activeUnitId:null, activeSingleId:null, unitName:'', unitSimultaneityFactor:'', uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
       root.innerHTML = view(state.get());
       return;
     }
@@ -451,7 +461,7 @@ function bindDrinkingWater(root, signal) {
       const consumers = [...(s.unitDraftConsumers || [])];
       if (!consumers.length) consumers.push(createConsumer({ typeId:s.unitConsumerType, count:s.unitCount }));
       const units = readUsageUnits();
-      const record = createUsageUnit({ name:s.unitName, consumers });
+      const record = createUsageUnit({ name:s.unitName, consumers, simultaneityFactor:s.unitSimultaneityFactor });
       record.id = s.activeUnitId;
       writeUsageUnits(units.map(item => isSameId(item.id, s.activeUnitId) ? record : item));
       state.set({ activeUnitId:s.activeUnitId, activeSingleId:null, uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
@@ -489,7 +499,7 @@ function bindDrinkingWater(root, signal) {
     if (unitDelete && root.contains(unitDelete)) {
       event.preventDefault(); event.stopPropagation();
       writeUsageUnits(readUsageUnits().filter(item => item.id !== unitDelete.dataset.dwUnitDelete));
-      if (isSameId(state.get().activeUnitId, unitDelete.dataset.dwUnitDelete)) state.set({ activeUnitId:null, unitName:'', unitDraftConsumers:[] }, { notify:false });
+      if (isSameId(state.get().activeUnitId, unitDelete.dataset.dwUnitDelete)) state.set({ activeUnitId:null, unitName:'', unitSimultaneityFactor:'', unitDraftConsumers:[] }, { notify:false });
       root.innerHTML = view(state.get());
       return;
     }
@@ -509,7 +519,7 @@ function bindDrinkingWater(root, signal) {
       const units = readUsageUnits();
       const unit = units.find(item => isSameId(item.id, unitEdit.dataset.dwUnitEdit));
       if (unit) {
-        const patch = { activeUnitId: unit.id, activeSingleId:null, unitName: unit.name, singleName:'', unitDraftConsumers: unit.consumers || [], singleDraftConsumers:[], uiUnitFormOpen:true, uiUnitSavedOpen:true };
+        const patch = { activeUnitId: unit.id, activeSingleId:null, unitName: unit.name, unitSimultaneityFactor: unit.simultaneityFactor || '', singleName:'', unitDraftConsumers: unit.consumers || [], singleDraftConsumers:[], uiUnitFormOpen:true, uiUnitSavedOpen:true };
         state.set(patch, { notify:false });
         syncFieldValues(root, patch);
         const details = root.querySelector('[data-dw-accordion="uiUnitFormOpen"]');
@@ -550,7 +560,7 @@ function bindDrinkingWater(root, signal) {
     const current = state.get();
     const ignored = event.target.closest('[data-dw-unit-edit], [data-dw-single-edit], [data-dw-unit-delete], [data-dw-single-delete], [data-dw-add-unit], [data-dw-update-unit], [data-dw-add-single], [data-dw-update-single], [data-dw-draft-add], [data-dw-remove-draft], [data-dw-draft-count], details, summary, input, select, textarea, button, label, .segmented');
     if (!ignored && (current.activeUnitId || current.activeSingleId)) {
-      state.set({ activeUnitId:null, activeSingleId:null, unitName:'', singleName:'', unitDraftConsumers:[], singleDraftConsumers:[] }, { notify:false });
+      state.set({ activeUnitId:null, activeSingleId:null, unitName:'', unitSimultaneityFactor:'', singleName:'', unitDraftConsumers:[], singleDraftConsumers:[] }, { notify:false });
       root.innerHTML = view(state.get());
     }
   }, { signal });

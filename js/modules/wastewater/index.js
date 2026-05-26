@@ -231,10 +231,6 @@ function updateFixture(id, patch) {
   state.set({ fixtures: (current.fixtures || []).map(item => String(item.id) === String(id) ? { ...item, ...patch } : item) });
 }
 function bindActions(root) {
-  const activeLineButton = root.querySelector('.wastewater-line-selector button.is-active');
-  if (activeLineButton) {
-    requestAnimationFrame(() => activeLineButton.scrollIntoView({ block: 'nearest', inline: 'center' }));
-  }
   bindEditModeClear(root, { state, activeIdKey: 'activeCalculationId', nameKey: 'name', onClear: () => state.set(clearedInputs(state.get())) });
   root.querySelector('[data-fixture-add]')?.addEventListener('click', () => {
     const current = state.get();
@@ -263,11 +259,19 @@ function bindActions(root) {
     const current = state.get();
     state.set({ fixtures: (current.fixtures || []).filter(item => String(item.id) !== String(btn.dataset.fixtureDelete)) });
   }));
-  root.querySelectorAll('[data-fixture-qty]').forEach(input => input.addEventListener('change', event => {
-    event.stopPropagation();
-    const current = state.get();
-    state.set({ fixtures: (current.fixtures || []).map(item => String(item.id) === String(input.dataset.fixtureQty) ? { ...item, quantity: input.value || '0' } : item) });
-  }));
+  root.querySelectorAll('[data-fixture-qty]').forEach(input => {
+    const commit = (notify = true) => {
+      const current = state.get();
+      state.set({ fixtures: (current.fixtures || []).map(item => String(item.id) === String(input.dataset.fixtureQty) ? { ...item, quantity: input.value || '0' } : item) }, { notify });
+    };
+    input.addEventListener('input', event => { event.stopPropagation(); commit(false); });
+    input.addEventListener('blur', event => { event.stopPropagation(); commit(true); });
+    input.addEventListener('keydown', event => {
+      if (event.key !== 'Enter') return;
+      event.preventDefault();
+      commit(true);
+    });
+  });
   root.querySelectorAll('[data-line-family]').forEach(btn => btn.addEventListener('click', event => {
     event.preventDefault();
     const current = state.get();
@@ -300,8 +304,15 @@ function bindActions(root) {
   root.querySelectorAll('[data-line-toggle]').forEach(toggle => toggle.addEventListener('click', event => {
     event.stopPropagation();
     const itemCard = toggle.closest('[data-line-card]');
-    const collapsed = itemCard?.classList.toggle('is-collapsed');
-    toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    const willOpen = itemCard?.classList.contains('is-collapsed');
+    root.querySelectorAll('[data-line-card]').forEach(card => {
+      if (card !== itemCard) {
+        card.classList.add('is-collapsed');
+        card.querySelector('[data-line-toggle]')?.setAttribute('aria-expanded', 'false');
+      }
+    });
+    if (itemCard) itemCard.classList.toggle('is-collapsed', !willOpen);
+    toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
   }));
   root.querySelectorAll('[data-wastewater-select]').forEach(cardEl => cardEl.addEventListener('click', event => {
     if (event.target.closest('[data-wastewater-delete]') || event.target.closest('[data-line-toggle]')) return;
