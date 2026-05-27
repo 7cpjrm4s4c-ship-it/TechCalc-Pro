@@ -38,5 +38,5 @@ const report = {
   }
 };
 
-writeFileSync(new URL('../module-contract-audit-phase4.json', import.meta.url), JSON.stringify(report, null, 2));
+writeFileSync(new URL('../module-contract-audit-phase5.json', import.meta.url), JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report.summary, null, 2));

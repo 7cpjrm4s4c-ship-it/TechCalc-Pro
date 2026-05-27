@@ -1,0 +1,13 @@
+{
+  "name": "techcalc-pro",
+  "version": "1.3.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node scripts/quality-gate.mjs",
+    "test:numbers": "node tests/number-service.test.mjs",
+    "test:imports": "node scripts/check-js-imports.mjs",
+    "audit:modules": "node scripts/audit-module-contracts.mjs",
+    "audit:ui": "node scripts/audit-ui-classes.mjs"
+  }
+}

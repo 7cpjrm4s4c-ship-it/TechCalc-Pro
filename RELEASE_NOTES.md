@@ -1,4 +1,14 @@
 
+## 1.3.0 - Phase 5 Quality Gates / Marktreife
+
+- Zentrale Quality-Gate-Pipeline ueber `npm test` ergaenzt.
+- Regressionstest fuer deutsche Zahlenformate (`2.500`, `2.500,5`, `2,5`) ergaenzt.
+- Modulvertrag-Test fuer alle Modulkonfigurationen ergaenzt.
+- Plattform-Policy- und Performance-Budget-Dateien ergaenzt.
+- App-Health-Snapshot fuer spaetere Diagnose-/Debug-Ansicht vorbereitet.
+- Doku `QUALITY_GATES_1_3_0.md` ergaenzt.
+
+
 ## 1.3.0 Phase 4 - Modulvertrag
 
 - Zentraler Modulvertrag ueber `moduleDefinition.js` eingefuehrt.

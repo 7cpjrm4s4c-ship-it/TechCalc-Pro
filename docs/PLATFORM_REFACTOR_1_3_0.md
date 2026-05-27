@@ -141,3 +141,22 @@ Phase 4 macht den Modulvertrag explizit und pruefbar. Die Registry validiert Mod
 - `scripts/audit-module-contracts.mjs`
 
 Regenwasser und Schmutzwasser besitzen erste zentrale Schemas. Diese sind bewusst noch als Adapter-Stufe eingebunden, damit die bestehende UI nicht bricht. Der naechste Schritt ist die schrittweise Entfernung modulindividueller View-Funktionen zugunsten des generischen Schema-Renderers.
+
+
+## Phase 5 - Marktreife und Quality Gates
+
+Phase 5 fuehrt eine verbindliche Qualitaetsschicht ein. Die App besitzt jetzt Regressionstests fuer deutsche Zahleneingabe, Plattformregeln, Modulvertrag und Syntax. `npm test` ist der zentrale Gate vor jedem Merge.
+
+Neu hinzugekommen:
+
+- `package.json` mit zentralen Test-/Audit-Scripts
+- `scripts/quality-gate.mjs`
+- `scripts/check-js-imports.mjs` als Syntax-Gate
+- `tests/number-service.test.mjs`
+- `tests/module-contract.test.mjs`
+- `tests/platform-policy.test.mjs`
+- `js/core/quality/performanceBudget.js`
+- `js/core/quality/appHealth.js`
+- `docs/QUALITY_GATES_1_3_0.md`
+
+Damit ist 1.3.0 nicht nur ein Architekturumbau, sondern eine belastbare Release-Basis.
