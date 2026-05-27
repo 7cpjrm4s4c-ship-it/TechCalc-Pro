@@ -1,7 +1,16 @@
 import { areaTypes, hydraulicTables, dnOrder, roofDrainTable } from './tables.js';
 
 export const toNumber = value => {
-  const n = Number(String(value ?? '').replace(',', '.'));
+  if (value === null || value === undefined) return 0;
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  const raw = String(value).trim().replace(/\s/g, '');
+  if (!raw) return 0;
+  // German numeric input: dots are thousands separators, comma is decimal separator.
+  // This keeps "2.500" as 2500 m² instead of 2.5 m², while "2,5" remains 2.5.
+  const normalized = raw.includes(',')
+    ? raw.replace(/\./g, '').replace(',', '.')
+    : (/^-?\d{1,3}(\.\d{3})+$/.test(raw) ? raw.replace(/\./g, '') : raw);
+  const n = Number(normalized);
   return Number.isFinite(n) ? n : 0;
 };
 

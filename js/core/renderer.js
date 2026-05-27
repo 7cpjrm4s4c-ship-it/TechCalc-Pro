@@ -85,10 +85,13 @@ export function emptyCard(title, message, accent = 'blue') {
 }
 
 
-export function preserveViewport(action, { frames = 2 } = {}) {
+export function preserveViewport(action, { frames = 2, blurActive = false } = {}) {
   const doc = document.scrollingElement || document.documentElement;
   const x = window.scrollX || doc.scrollLeft || 0;
   const y = window.scrollY || doc.scrollTop || 0;
+  if (blurActive) {
+    try { document.activeElement?.blur?.(); } catch { /* ignore */ }
+  }
   action?.();
   let remaining = Math.max(1, frames);
   const restore = () => {
@@ -97,6 +100,7 @@ export function preserveViewport(action, { frames = 2 } = {}) {
     if (remaining > 0) requestAnimationFrame(restore);
   };
   requestAnimationFrame(restore);
+  setTimeout(() => window.scrollTo(x, y), 60);
 }
 
 export function renderModuleShell(module, inner) {

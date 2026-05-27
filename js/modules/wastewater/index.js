@@ -259,7 +259,13 @@ function readFixtureDraft(root, current = {}) {
   return record;
 }
 function keepViewport(action) {
-  preserveViewport(action, { frames: 4 });
+  try { document.activeElement?.blur?.(); } catch { /* ignore */ }
+  preserveViewport(action, { frames: 12 });
+  const doc = document.scrollingElement || document.documentElement;
+  const x = window.scrollX || doc.scrollLeft || 0;
+  const y = window.scrollY || doc.scrollTop || 0;
+  setTimeout(() => window.scrollTo(x, y), 80);
+  setTimeout(() => window.scrollTo(x, y), 180);
 }
 
 function addFixtureFromCurrentInputs(root) {

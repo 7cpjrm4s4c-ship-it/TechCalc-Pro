@@ -1,3 +1,10 @@
+## 1.2.18 Refactor Phase 10
+
+- Entwässerung: Viewport-Stabilisierung beim Laden/Löschen gespeicherter Inhalte verstärkt.
+- Regenwasser: deutsche Tausender-Eingaben wie 2.500 m² werden wieder als 2500 m² interpretiert.
+- Regenwasser: Flächen-Aktualisierung nutzt dieselbe normalisierte Zahlenauswertung wie die Berechnung.
+- Versionierung bleibt für den Release bei 1.2.18.
+
 ## 1.2.18 Refactor Phase 5
 
 - Gemeinsamen Viewport-Stabilisierer im Renderer ergänzt und Regenwasser-Scroll-Patch darauf umgestellt.
