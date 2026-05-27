@@ -1,3 +1,5 @@
+import { parseGermanNumber } from './numbers.js';
+
 export function fieldSelector(key) {
   const safe = String(key || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
   return `[data-field="${safe}"]`;
@@ -60,8 +62,7 @@ export function bindDelegatedActionWithCommittedFields(root, selector, state, ke
 }
 
 export function normalizeQuantityInput(value, fallback = 0) {
-  const normalized = Number(String(value ?? '').replace(',', '.'));
-  return Number.isFinite(normalized) ? normalized : fallback;
+  return parseGermanNumber(value, fallback);
 }
 
 export function bindLiveCollectionInput(root, selector, { state, getItems, setItems, matchId, readValue, notifyOnInput = false }) {

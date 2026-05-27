@@ -1,3 +1,12 @@
+## Version 1.3.0 - Plattform-Refactor Start
+
+- Zentrale Plattform-Regeln fuer Module eingefuehrt (`platformPolicy`).
+- Neuer `numberService` als einzige Quelle fuer deutsche Zahleneingaben.
+- Bestehende Zahlen-Helfer auf `numberService` umgeleitet.
+- `normalizeQuantityInput` nutzt jetzt ebenfalls den deutschen Zahlenparser, damit Eingaben wie `2.500` nicht mehr als `2,5` interpretiert werden.
+- `moduleContract` als Zielvertrag fuer schema-basierte Module eingefuehrt.
+- Dokumentation fuer den 1.3.0 Plattform-Refactor ergänzt.
+
 ## 1.2.18 Refactor Phase 13
 
 - Core: Modul-Render hält während DOM-Austausch die vorherige Höhe, damit mobile Browser die Scrollposition nicht clampen.
