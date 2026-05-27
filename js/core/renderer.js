@@ -102,6 +102,10 @@ export function bindCommonInputs(root, state) {
     if (pendingRender) clearTimeout(pendingRender);
     pendingRender = setTimeout(() => {
       const active = document.activeElement;
+      const committedActionAt = Number(root?.dataset?.tcCommittedActionAt || 0);
+      // Klicks auf Aktionsbuttons sollen zuerst die Eingabe übernehmen und dann die Aktion ausführen.
+      // Der Blur-Render wird in diesem kurzen Fenster unterdrückt, damit der Click nicht verloren geht.
+      if (committedActionAt && Date.now() - committedActionAt < 500) return;
       // Beim Wechsel per Klick oder Tab in das nächste Eingabefeld nicht sofort neu rendern.
       // Dadurch bleibt der Fokus stabil und die Desktop-UX wirkt nicht ruckelig.
       if (active && root.contains(active) && active.matches('[data-field]')) return;

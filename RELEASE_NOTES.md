@@ -1,3 +1,9 @@
+## 1.2.18 Refactor Phase 4
+- Entwässerungs-Listen und Anzahlfelder weiter vereinheitlicht.
+- Aktionsbuttons übernehmen aktive Eingaben jetzt vor dem Klick-Workflow, damit Hinzufügen direkt nach Zahleneingabe funktioniert.
+- Schmutzwasser-Interaktionen teilweise auf Event-Delegation umgestellt, um wiederholte Einzelbindings nach Re-Render zu reduzieren.
+- Versionierung bleibt für den Release bei 1.2.18.
+
 ## 1.2.18 Refactor Phase 3
 
 - Trinkwasser-Modul intern bereinigt: doppelte Klick-/Change-Aktionslogik entfernt.

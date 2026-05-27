@@ -19,11 +19,24 @@ export function commitFields(root, state, keys = [], { notify = false } = {}) {
   return patch;
 }
 
+export function markCommittedAction(root) {
+  if (!root?.dataset) return;
+  root.dataset.tcCommittedActionAt = String(Date.now());
+}
+
+export function prepareCommittedAction(root, state, keys = []) {
+  markCommittedAction(root);
+  return commitFields(root, state, keys, { notify: false });
+}
+
 export function bindActionWithCommittedFields(root, selector, state, keys, handler) {
   const el = root?.querySelector?.(selector);
   if (!el) return;
+  const prepare = () => prepareCommittedAction(root, state, keys);
+  el.addEventListener('pointerdown', prepare, { capture: true });
+  el.addEventListener('mousedown', prepare, { capture: true });
   el.addEventListener('click', event => {
-    const patch = commitFields(root, state, keys, { notify: false });
+    const patch = prepareCommittedAction(root, state, keys);
     handler?.(event, patch);
   });
 }
@@ -31,10 +44,17 @@ export function bindActionWithCommittedFields(root, selector, state, keys, handl
 
 export function bindDelegatedActionWithCommittedFields(root, selector, state, keys, handler) {
   if (!root) return;
+  const prepare = event => {
+    const trigger = event.target.closest(selector);
+    if (!trigger) return;
+    prepareCommittedAction(root, state, keys);
+  };
+  root.addEventListener('pointerdown', prepare, { capture: true });
+  root.addEventListener('mousedown', prepare, { capture: true });
   root.addEventListener('click', event => {
     const trigger = event.target.closest(selector);
     if (!trigger) return;
-    const patch = commitFields(root, state, keys, { notify: false });
+    const patch = prepareCommittedAction(root, state, keys);
     handler?.(event, patch, trigger);
   });
 }

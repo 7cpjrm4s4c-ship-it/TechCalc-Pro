@@ -6,7 +6,7 @@ import { card, field, selectField, segmented, renderModuleShell, stack, grid, ma
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { bindEditModeClear, renderSavedRecordList, bindSavedRecordList, createRecordId, replaceRecord, removeRecord, isSameId } from '../../core/savedRecords.js';
-import { bindActionWithCommittedFields, readFieldValue } from '../../core/formActions.js';
+import { bindDelegatedActionWithCommittedFields, readFieldValue } from '../../core/formActions.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
 const fixtureOptions = fixtureTypes.map(item => ({ value: item.id, label: item.name }));
@@ -122,7 +122,7 @@ function fixturesTable(s, r) {
   if (!r.fixtures.length) return '<div class="empty-state empty-state--compact">Noch keine Entwässerungsgegenstände hinzugefügt.</div>';
   return `<div class="dw-consumer-list wastewater-fixture-list">${r.fixtures.map(item => `<div class="dw-consumer-row wastewater-fixture-row wastewater-fixture-row--editable">
     <div><strong>${esc(item.name)}</strong><span>ΣDU ${fmt(item.totalDu,1)} l/s · DU/Stk. ${fmt(item.du,1)} l/s · Einzelanschluss ${esc(item.dn || '—')}</span></div>
-    <label class="mini-edit-field"><span>Anzahl</span><input type="number" min="0" step="1" value="${esc(item.qty)}" data-fixture-qty="${esc(item.id)}" inputmode="numeric"></label>
+    <label class="mini-edit-field tc-quantity-field"><span>Anzahl</span><input type="number" min="0" step="1" value="${esc(item.qty)}" data-fixture-qty="${esc(item.id)}" inputmode="numeric"></label>
     <button type="button" data-fixture-delete="${esc(item.id)}" aria-label="Entwässerungsgegenstand entfernen">×</button>
   </div>`).join('')}</div>`;
 }
@@ -231,7 +231,7 @@ function view(s) {
 }
 function bindActions(root) {
   bindEditModeClear(root, { state, activeIdKey: 'activeCalculationId', nameKey: 'name', onClear: () => state.set(clearedInputs(state.get())) });
-  bindActionWithCommittedFields(root, '[data-fixture-add]', state, ['fixtureType', 'fixtureQuantity', 'fixtureCustomName', 'fixtureCustomDu', 'fixtureCustomDn'], () => {
+  bindDelegatedActionWithCommittedFields(root, '[data-fixture-add]', state, ['fixtureType', 'fixtureQuantity', 'fixtureCustomName', 'fixtureCustomDu', 'fixtureCustomDn'], () => {
     const current = state.get();
     const typeId = readFieldValue(root, 'fixtureType', current.fixtureType || 'washbasin');
     const base = getFixture(typeId);
@@ -253,11 +253,13 @@ function bindActions(root) {
       fixtureCustomDn: ''
     });
   });
-  root.querySelectorAll('[data-fixture-delete]').forEach(btn => btn.addEventListener('click', event => {
+  root.addEventListener('click', event => {
+    const btn = event.target.closest('[data-fixture-delete]');
+    if (!btn) return;
     event.stopPropagation();
     const current = state.get();
     state.set({ fixtures: (current.fixtures || []).filter(item => String(item.id) !== String(btn.dataset.fixtureDelete)) });
-  }));
+  });
   root.querySelectorAll('[data-fixture-qty]').forEach(input => {
     const commit = (notify = true) => {
       const current = state.get();
@@ -271,18 +273,23 @@ function bindActions(root) {
       commit(true);
     });
   });
-  root.querySelectorAll('[data-line-family]').forEach(btn => btn.addEventListener('click', event => {
-    event.preventDefault();
-    const current = state.get();
-    const ventilation = lineVentilationValue(current.lineType);
-    state.set({ lineType: resolveLineType(btn.dataset.lineFamily, ventilation, current.lineType) });
-  }));
-  root.querySelectorAll('[data-line-ventilation]').forEach(btn => btn.addEventListener('click', event => {
-    event.preventDefault();
-    const current = state.get();
-    const family = lineFamilyValue(current.lineType);
-    state.set({ lineType: resolveLineType(family, btn.dataset.lineVentilation, current.lineType) });
-  }));
+  root.addEventListener('click', event => {
+    const familyButton = event.target.closest('[data-line-family]');
+    if (familyButton) {
+      event.preventDefault();
+      const current = state.get();
+      const ventilation = lineVentilationValue(current.lineType);
+      state.set({ lineType: resolveLineType(familyButton.dataset.lineFamily, ventilation, current.lineType) });
+      return;
+    }
+    const ventilationButton = event.target.closest('[data-line-ventilation]');
+    if (ventilationButton) {
+      event.preventDefault();
+      const current = state.get();
+      const family = lineFamilyValue(current.lineType);
+      state.set({ lineType: resolveLineType(family, ventilationButton.dataset.lineVentilation, current.lineType) });
+    }
+  });
   root.querySelector('[data-wastewater-save]')?.addEventListener('click', () => {
     const current = state.get();
     const r = calculate(current);

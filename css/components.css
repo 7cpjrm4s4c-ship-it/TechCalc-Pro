@@ -4573,3 +4573,40 @@ body::before {
     max-width: none;
   }
 }
+
+
+/* v1.2.18 Refactor Phase 4: gemeinsame Mengenfeld- und Listen-Ausrichtung */
+.tc-quantity-field {
+  display: grid;
+  gap: 4px;
+  width: 112px;
+  min-width: 112px;
+  max-width: 112px;
+  align-self: center;
+  justify-self: start;
+}
+.tc-quantity-field input {
+  width: 100%;
+  min-height: 38px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.module-view[data-module='wastewater'] .wastewater-fixture-row--editable {
+  grid-template-columns: minmax(0, 1fr) 112px 38px !important;
+  column-gap: 14px;
+}
+.module-view[data-module='wastewater'] .wastewater-fixture-row--editable > button {
+  width: 38px;
+  min-width: 38px;
+  justify-self: end;
+}
+@media (max-width: 480px) {
+  .tc-quantity-field {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+  .module-view[data-module='wastewater'] .wastewater-fixture-row--editable {
+    grid-template-columns: minmax(0, 1fr) 38px !important;
+  }
+}
