@@ -1,4 +1,16 @@
 
+## 1.3.0 - Phase 6 Plattform-Konsolidierung
+
+- Geprueft, welche Module die zentralen Regeln tatsaechlich nutzen.
+- Lokale Zahlenparser in Pufferspeicher, Druckhaltung und h,x auf `numberService` umgestellt.
+- Rueckuebernahme von Ergebniswerten in Heizung/Kälte und Lüftung nutzt den zentralen Parser.
+- `components.css` von 4.898 auf 4.264 Zeilen reduziert.
+- Alter mehrfach gepatchter Trinkwasser-/Light-Mode-CSS-Block entfernt und unter `docs/components-css-phase6-removed-legacy-block.txt` archiviert.
+- Neue Audits fuer Plattformmigration und CSS-Schulden ergaenzt.
+- `npm test` fuehrt diese Audits jetzt mit aus.
+- Doku `PHASE_6_PLATFORM_CONSOLIDATION.md` ergaenzt.
+
+
 ## 1.3.0 - Phase 5 Quality Gates / Marktreife
 
 - Zentrale Quality-Gate-Pipeline ueber `npm test` ergaenzt.

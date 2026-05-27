@@ -1,3 +1,4 @@
+import { parseNumber } from '../../core/numberService.js';
 import config from './config.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';

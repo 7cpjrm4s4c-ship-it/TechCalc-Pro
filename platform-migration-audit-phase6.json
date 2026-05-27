@@ -1,0 +1,120 @@
+{
+  "total": 11,
+  "schemaModules": 2,
+  "centralNumberService": 11,
+  "legacyNumberParsers": 4,
+  "centralSavedRecords": 8,
+  "legacyClassModules": 7,
+  "modules": [
+    {
+      "id": "buffer-storage",
+      "defineModuleConfig": true,
+      "schemaFile": false,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "legacy-adapter"
+    },
+    {
+      "id": "drinking-water",
+      "defineModuleConfig": true,
+      "schemaFile": false,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "legacy-adapter"
+    },
+    {
+      "id": "heat-recovery",
+      "defineModuleConfig": true,
+      "schemaFile": false,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": false,
+      "hasLegacyModuleClasses": false,
+      "migrationStatus": "legacy-adapter"
+    },
+    {
+      "id": "heating-cooling",
+      "defineModuleConfig": true,
+      "schemaFile": false,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": false,
+      "migrationStatus": "legacy-adapter"
+    },
+    {
+      "id": "hx-diagram",
+      "defineModuleConfig": true,
+      "schemaFile": false,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 2,
+      "usesCentralSavedRecords": false,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "legacy-adapter"
+    },
+    {
+      "id": "pipe-sizing",
+      "defineModuleConfig": true,
+      "schemaFile": false,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "legacy-adapter"
+    },
+    {
+      "id": "pressure-holding",
+      "defineModuleConfig": true,
+      "schemaFile": false,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "legacy-adapter"
+    },
+    {
+      "id": "rainwater",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "phase-2-centralized"
+    },
+    {
+      "id": "unit-converter",
+      "defineModuleConfig": true,
+      "schemaFile": false,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": false,
+      "hasLegacyModuleClasses": false,
+      "migrationStatus": "legacy-adapter"
+    },
+    {
+      "id": "ventilation",
+      "defineModuleConfig": true,
+      "schemaFile": false,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 2,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": false,
+      "migrationStatus": "legacy-adapter"
+    },
+    {
+      "id": "wastewater",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "phase-2-centralized"
+    }
+  ]
+}
