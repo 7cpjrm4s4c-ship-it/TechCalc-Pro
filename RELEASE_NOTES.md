@@ -263,3 +263,9 @@
 - Core: mehrfach gebundene Edit-Mode-Clear-Listener werden verhindert.
 - Regenwasser: Nach dem Hinzufügen einer Fläche wird die Bearbeitung sauber beendet; Regenspenden bleiben erhalten, übrige Eingabefelder werden zurückgesetzt.
 - Regenwasser: neu angelegte Flächen bleiben nicht als aktive Bearbeitung markiert.
+
+## 1.2.18 Refactor Phase 11
+- Zentrale Viewport-Stabilisierung für Modul-Klicks ergänzt, damit Laden/Abwählen gespeicherter Inhalte keine Scroll-Sprünge mehr auslöst.
+- Deutsche Zahleneingabe zentralisiert: Tausenderpunkt und Dezimalkomma werden konsistent ausgewertet.
+- Regenwasser-Flächen speichern und aktualisieren Flächenwerte nun kanonisch, z. B. `2.500 m²` als `2500 m²`.
+- Schmutzwasser nutzt die zentrale Scroll-Stabilisierung statt modulinterner Scroll-Patches.

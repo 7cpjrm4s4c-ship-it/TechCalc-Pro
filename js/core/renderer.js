@@ -85,22 +85,62 @@ export function emptyCard(title, message, accent = 'blue') {
 }
 
 
-export function preserveViewport(action, { frames = 2, blurActive = false } = {}) {
+export function snapshotViewport() {
   const doc = document.scrollingElement || document.documentElement;
-  const x = window.scrollX || doc.scrollLeft || 0;
-  const y = window.scrollY || doc.scrollTop || 0;
+  return { x: window.scrollX || doc.scrollLeft || 0, y: window.scrollY || doc.scrollTop || 0 };
+}
+
+export function restoreViewport(snapshot) {
+  if (!snapshot) return;
+  window.scrollTo(snapshot.x || 0, snapshot.y || 0);
+}
+
+export function restoreViewportStable(snapshot, { frames = 6, delays = [40, 120, 260] } = {}) {
+  if (!snapshot) return;
+  let remaining = Math.max(1, frames);
+  const restoreFrame = () => {
+    restoreViewport(snapshot);
+    remaining -= 1;
+    if (remaining > 0) requestAnimationFrame(restoreFrame);
+  };
+  requestAnimationFrame(restoreFrame);
+  delays.forEach(delay => setTimeout(() => restoreViewport(snapshot), delay));
+}
+
+export function shouldPreserveViewportForClick(target) {
+  if (!target || !target.closest) return true;
+  // Textfelder dürfen beim Fokussieren natürlich in den sichtbaren Bereich scrollen.
+  if (target.closest('input, textarea, select, [contenteditable="true"]')) return false;
+  // Explizite Navigation/Links dürfen ihr natives Verhalten behalten.
+  if (target.closest('a[href], [data-allow-scroll]')) return false;
+  return true;
+}
+
+export function bindNoClickScroll(root) {
+  if (!root || root.__tcNoClickScrollBound) return;
+  root.__tcNoClickScrollBound = true;
+  let snapshot = null;
+  const capture = event => {
+    snapshot = shouldPreserveViewportForClick(event.target) ? snapshotViewport() : null;
+  };
+  const restore = event => {
+    if (!snapshot || !shouldPreserveViewportForClick(event.target)) return;
+    restoreViewportStable(snapshot, { frames: 8, delays: [0, 40, 100, 220, 400] });
+    snapshot = null;
+  };
+  root.addEventListener('pointerdown', capture, true);
+  root.addEventListener('mousedown', capture, true);
+  root.addEventListener('touchstart', capture, true);
+  root.addEventListener('click', restore, true);
+}
+
+export function preserveViewport(action, { frames = 6, blurActive = false, delays = [40, 120, 260] } = {}) {
+  const snapshot = snapshotViewport();
   if (blurActive) {
     try { document.activeElement?.blur?.(); } catch { /* ignore */ }
   }
   action?.();
-  let remaining = Math.max(1, frames);
-  const restore = () => {
-    window.scrollTo(x, y);
-    remaining -= 1;
-    if (remaining > 0) requestAnimationFrame(restore);
-  };
-  requestAnimationFrame(restore);
-  setTimeout(() => window.scrollTo(x, y), 60);
+  restoreViewportStable(snapshot, { frames, delays });
 }
 
 export function renderModuleShell(module, inner) {

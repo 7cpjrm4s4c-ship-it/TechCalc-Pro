@@ -6,6 +6,7 @@ import { card, field, selectField, segmented, renderModuleShell, stack, grid, ma
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { bindEditModeClear, bindSavedRecordList, renderSavedRecordList, replaceRecord, removeRecord, isSameId } from '../../core/savedRecords.js';
+import { canonicalGermanNumberInput } from '../../core/numbers.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
 const splitIndex = areaTypes.findIndex(item => item.id === 'concrete-asphalt');
@@ -253,26 +254,26 @@ function surfacePatchFromState(current = {}) {
     surfaceMode: mode,
     areaType: normalizeAreaType(mode, current.areaType || defaultAreaTypeForMode(mode)),
     areaName: current.areaName,
-    areaSize: current.areaSize,
-    customCs: current.customCs,
-    customCm: current.customCm,
-    roofRainIntensity: current.roofRainIntensity,
-    propertyRainIntensity: current.propertyRainIntensity,
-    rainHundredIntensity: current.rainHundredIntensity,
+    areaSize: normalizeSurfaceFieldValue('areaSize', current.areaSize),
+    customCs: normalizeSurfaceFieldValue('customCs', current.customCs),
+    customCm: normalizeSurfaceFieldValue('customCm', current.customCm),
+    roofRainIntensity: normalizeSurfaceFieldValue('roofRainIntensity', current.roofRainIntensity),
+    propertyRainIntensity: normalizeSurfaceFieldValue('propertyRainIntensity', current.propertyRainIntensity),
+    rainHundredIntensity: normalizeSurfaceFieldValue('rainHundredIntensity', current.rainHundredIntensity),
     drainSize: current.drainSize,
     drainSizeManual: current.drainSizeManual,
-    drainCapacity: current.drainCapacity,
-    drainHead: current.drainHead,
-    stackCount: current.stackCount,
-    slopeCmM: current.slopeCmM,
-    fillRatio: current.fillRatio,
+    drainCapacity: normalizeSurfaceFieldValue('drainCapacity', current.drainCapacity),
+    drainHead: normalizeSurfaceFieldValue('drainHead', current.drainHead),
+    stackCount: normalizeSurfaceFieldValue('stackCount', current.stackCount),
+    slopeCmM: normalizeSurfaceFieldValue('slopeCmM', current.slopeCmM),
+    fillRatio: normalizeSurfaceFieldValue('fillRatio', current.fillRatio),
     emergencyType: current.emergencyType,
-    emergencyHead: current.emergencyHead,
-    emergencyWidth: current.emergencyWidth,
-    emergencyDiameter: current.emergencyDiameter,
+    emergencyHead: normalizeSurfaceFieldValue('emergencyHead', current.emergencyHead),
+    emergencyWidth: normalizeSurfaceFieldValue('emergencyWidth', current.emergencyWidth),
+    emergencyDiameter: normalizeSurfaceFieldValue('emergencyDiameter', current.emergencyDiameter),
     emergencyManufacturerDn: current.emergencyManufacturerDn,
-    emergencyCapacity: current.emergencyCapacity,
-    emergencySafetyFactor: current.emergencySafetyFactor
+    emergencyCapacity: normalizeSurfaceFieldValue('emergencyCapacity', current.emergencyCapacity),
+    emergencySafetyFactor: normalizeSurfaceFieldValue('emergencySafetyFactor', current.emergencySafetyFactor)
   };
 }
 function patchActiveSurfaceFromState() {
@@ -288,10 +289,11 @@ function commitActiveSurfaceField(field, value) {
   const current = state.get();
   const activeId = current.activeSurfaceId;
   if (!activeId) return false;
-  const nextCurrent = { ...current, [field]: value };
+  const nextValue = normalizeSurfaceFieldValue(field, value);
+  const nextCurrent = { ...current, [field]: nextValue };
   const patch = surfacePatchFromState(nextCurrent);
   const next = (current.surfaces || []).map(item => String(item.id) === String(activeId) ? { ...item, ...patch } : item);
-  state.set({ [field]: value, surfaces: next }, { notify:false });
+  state.set({ [field]: nextValue, surfaces: next }, { notify:false });
   return true;
 }
 function commitSurfaceFieldsBeforeAction(root) {
@@ -362,6 +364,12 @@ function resetSurfaceEditorAfterAdd(current = {}) {
     rainHundredIntensity: current.rainHundredIntensity || '500'
   };
 }
+
+const surfaceNumericFields = new Set(['areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity','drainCapacity','drainHead','stackCount','slopeCmM','fillRatio','emergencyHead','emergencyWidth','emergencyDiameter','emergencyCapacity','emergencySafetyFactor']);
+function normalizeSurfaceFieldValue(field, value) {
+  return surfaceNumericFields.has(field) ? canonicalGermanNumberInput(value) : value;
+}
+
 const surfaceEditFields = new Set(['surfaceMode','areaType','areaName','areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity','drainSize','drainSizeManual','drainCapacity','drainHead','stackCount','emergencyType','emergencyHead','emergencyWidth','emergencyDiameter','emergencyManufacturerDn','emergencyCapacity','emergencySafetyFactor']);
 function preserveScroll(action) {
   preserveViewport(action);

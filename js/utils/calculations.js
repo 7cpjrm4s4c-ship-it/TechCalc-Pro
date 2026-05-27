@@ -1,3 +1,4 @@
+import { parseGermanNumber } from '../core/numbers.js';
 export const MEDIA = [
   { id:'water', label:'Wasser', density:998, cpWhKgK:1.163, cpKjKgK:4.187, frostC:null },
   { id:'eg25', label:'Ethylenglykol 25%', density:1038, cpWhKgK:1.045, cpKjKgK:3.762, frostC:-12 },
@@ -81,17 +82,7 @@ export function ventilation({ volumeFlowM3h, powerW, powerUnit = 'W', deltaT, su
   };
 }
 
-export function num(v){
-  if (v === null || v === undefined) return 0;
-  if (typeof v === 'number') return Number.isFinite(v) ? v : 0;
-  const normalized = String(v)
-    .trim()
-    .replace(/\s/g, '')
-    .replace(/\./g, '')
-    .replace(',', '.');
-  const n = Number(normalized);
-  return Number.isFinite(n) ? n : 0;
-}
+export function num(v){ return parseGermanNumber(v, 0); }
 export function fmt(v, digits = 2){ return v === null || v === undefined || Number.isNaN(v) ? '—' : Number(v).toLocaleString('de-DE', { maximumFractionDigits: digits }); }
 export function fmtInput(v, digits = 2){
   if (v === '' || v === null || v === undefined) return '';
