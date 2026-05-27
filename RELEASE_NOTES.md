@@ -1,3 +1,11 @@
+## 1.2.18 Refactor Phase 3
+
+- Trinkwasser-Modul intern bereinigt: doppelte Klick-/Change-Aktionslogik entfernt.
+- Gemeinsame Helfer für NE- und Einzelverbraucher-Aktionen ergänzt.
+- Eingabe-, Speicher-, Aktualisieren-, Löschen- und Bearbeiten-Workflow im Trinkwasser-Modul vereinheitlicht.
+- GL-/zentrale-WWB-Berechnung per Smoke-Test geprüft.
+- Versionierung bleibt für den Release bei 1.2.18.
+
 
 ## 1.2.18 Refactor UX Pass 2
 - Erweiterung der zentralen Form-Action-Helper.
