@@ -21,7 +21,7 @@ function mediumLabel(s){
 }
 function warnList(items){
   if(!items.length) return '<div class="empty-state empty-state--compact">Keine Plausibilitätswarnungen.</div>';
-  return `<div class="ph-warnings">${items.map(item => `<div class="ph-warning"><span>Hinweis</span><strong>${esc(item)}</strong></div>`).join('')}</div>`;
+  return `<div class="tc-warning-list ph-warnings">${items.map(item => `<div class="tc-warning ph-warning"><span>Hinweis</span><strong>${esc(item)}</strong></div>`).join('')}</div>`;
 }
 function savedSnapshot(s, r){
   const saved = Array.isArray(s.savedCalculations) ? s.savedCalculations : [];
@@ -39,7 +39,7 @@ function savedSnapshot(s, r){
 }
 function savedRows(items = []){
   if(!items.length) return '<div class="empty-state empty-state--compact">Noch keine Pufferspeicher-Berechnungen gespeichert.</div>';
-  return `<div class="ph-saved-list">${items.map(item => {
+  return `<div class="tc-saved-list ph-saved-list">${items.map(item => {
     const res = item.result || {};
     const subtitle = [modeLabel(res.mode), res.standard ? `${fmt(res.standard,0)} l` : '', res.medium].filter(Boolean).join(' · ');
     return `<article class="ph-saved-item line-section-card is-collapsed ${state.get().activeCalculationId === item.id ? 'is-active' : ''}" data-line-card data-buffer-select="${esc(item.id)}">
@@ -104,8 +104,8 @@ function runtimeInputs(s){
     field({ id:'partLoadFactor', label:'Teillast · kleinste Teillaststufe', value:fmtInput(s.partLoadFactor,3), unit:'%' }),
     field({ id:'controllerDeltaT', label:'ΔT Hydraulikkreislauf', value:fmtInput(s.controllerDeltaT,2), unit:'K' }),
     field({ id:'existingSystemVolumeL', label:'vorhandener Systeminhalt abziehen', value:fmtInput(s.existingSystemVolumeL,1), unit:'Liter' }),
-    '<p class="ph-help ph-help--inline buffer-help"><strong>Teillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große Verdichter ⇒ 25 %. Die Berechnung nutzt intern 0,25.</p>',
-    '<p class="ph-help ph-help--inline buffer-help"><strong>QLast:</strong> konstant durch aktive Verbraucher abgenommene Leistung. Falls keine konstante Last vorhanden oder bekannt ist, 0 kW eintragen.</p>'
+    '<p class="tc-help ph-help ph-help--inline buffer-help"><strong>Teillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große Verdichter ⇒ 25 %. Die Berechnung nutzt intern 0,25.</p>',
+    '<p class="tc-help ph-help ph-help--inline buffer-help"><strong>QLast:</strong> konstant durch aktive Verbraucher abgenommene Leistung. Falls keine konstante Last vorhanden oder bekannt ist, 0 kW eintragen.</p>'
   ].join(''), 'buffer-input-grid--runtime'), 'cyan');
 }
 function defrostInputs(s){
@@ -143,7 +143,7 @@ function view(s){
   const inputColumn = stack([
     card('Berechnungsart', stack([
       `<div class="buffer-mode-tabs">${segmented('calculationMode', opts([['runtime','Mindestlaufzeit'],['defrost','Abtauung'],['reserve','Wasservorlage'],['compare','Vergleich']]), s.calculationMode, { accent:'cyan' })}</div>`,
-      '<p class="ph-help">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'
+      '<p class="tc-help ph-help">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'
     ].join('')), 'cyan'),
     card('Medium / Faktor', stack([
       selectField({ id:'mediumMode', label:'Wärmeträger', value:s.mediumMode, options:opts([['water','Wasser'],['glycol','Wasser-Glykol-Gemisch']]) }),
@@ -167,9 +167,9 @@ function view(s){
       { label:'abgezogener Systeminhalt', value:fmt(r.existingSystemVolume,1), unit:'Liter' }
     ], 'cyan'),
     card('Formeln / Plausibilität', stack([
-      '<div class="formula ph-formula">V = ((QMax × Teillast − QLast) × Faktor × TLaufzeit) / ΔTHydraulik</div>',
-      '<div class="formula ph-formula">VAbtau = ((QVerbraucher + QKälte − QHeiz) × Faktor × TMaxAbtauung) / ΔTHydraulik</div>',
-      '<div class="formula ph-formula">VWasservorlage = V̇Verbraucher × tÜberbrückung × 1000 / 60</div>',
+      '<div class="formula tc-formula ph-formula">V = ((QMax × Teillast − QLast) × Faktor × TLaufzeit) / ΔTHydraulik</div>',
+      '<div class="formula tc-formula ph-formula">VAbtau = ((QVerbraucher + QKälte − QHeiz) × Faktor × TMaxAbtauung) / ΔTHydraulik</div>',
+      '<div class="formula tc-formula ph-formula">VWasservorlage = V̇Verbraucher × tÜberbrückung × 1000 / 60</div>',
       warnList(r.warnings)
     ].join('')), 'cyan')
   ].join(''));

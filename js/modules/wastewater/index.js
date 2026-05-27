@@ -132,7 +132,7 @@ function savedRows(s) {
 }
 function fixturesTable(s, r) {
   if (!r.fixtures.length) return '<div class="empty-state empty-state--compact">Noch keine Entwässerungsgegenstände hinzugefügt.</div>';
-  return `<div class="dw-consumer-list wastewater-fixture-list">${r.fixtures.map(item => `<div class="dw-consumer-row wastewater-fixture-row wastewater-fixture-row--editable">
+  return `<div class="tc-consumer-list dw-consumer-list wastewater-fixture-list">${r.fixtures.map(item => `<div class="tc-consumer-row dw-consumer-row wastewater-fixture-row wastewater-fixture-row--editable">
     <div><strong>${esc(item.name)}</strong><span>ΣDU ${fmt(item.totalDu,1)} l/s · DU/Stk. ${fmt(item.du,1)} l/s · Einzelanschluss ${esc(item.dn || '—')}</span></div>
     <label class="mini-edit-field tc-quantity-field"><span>Anzahl</span><input type="number" min="0" step="1" value="${esc(item.qty)}" data-fixture-qty="${esc(item.id)}" inputmode="numeric"></label>
     <button type="button" data-fixture-delete="${esc(item.id)}" aria-label="Entwässerungsgegenstand entfernen">×</button>
@@ -173,12 +173,12 @@ function lineTypeHints(lineType) {
   return hints[lineType] || [];
 }
 function warningList(warnings, lineType) {
-  const fixed = '<div class="ph-warning ph-warning--norm"><span>Normgrundlage:</span><strong>Berechnung erfolgt auf Grundlage der DIN 1986 - 100, aktuellste Fassung.</strong></div>';
-  const lineHints = lineTypeHints(lineType).map(item => `<div class="ph-warning"><span>Hinweis:</span><strong>${esc(item)}</strong></div>`).join('');
-  const dynamic = warnings.map(item => `<div class="ph-warning"><span>Hinweis:</span><strong>${esc(item)}</strong></div>`).join('');
+  const fixed = '<div class="tc-warning ph-warning ph-warning--norm"><span>Normgrundlage:</span><strong>Berechnung erfolgt auf Grundlage der DIN 1986 - 100, aktuellste Fassung.</strong></div>';
+  const lineHints = lineTypeHints(lineType).map(item => `<div class="tc-warning ph-warning"><span>Hinweis:</span><strong>${esc(item)}</strong></div>`).join('');
+  const dynamic = warnings.map(item => `<div class="tc-warning ph-warning"><span>Hinweis:</span><strong>${esc(item)}</strong></div>`).join('');
   const body = `${fixed}${lineHints}${dynamic}`;
-  if (!lineHints && !warnings.length) return `<div class="ph-warnings">${fixed}<div class="empty-state empty-state--compact">Keine Regelverletzungen erkannt.</div></div>`;
-  return `<div class="ph-warnings">${body}</div>`;
+  if (!lineHints && !warnings.length) return `<div class="tc-warning-list ph-warnings">${fixed}<div class="empty-state empty-state--compact">Keine Regelverletzungen erkannt.</div></div>`;
+  return `<div class="tc-warning-list ph-warnings">${body}</div>`;
 }
 function inputCards(s, r) {
   const lineFields = [
@@ -231,7 +231,7 @@ function resultCards(s, r) {
         { label:'größter Einzel-DU', value:fmt(r.largestDu,1), unit:'l/s' },
         { label:'Zusatzabflüsse', value:fmt(r.qc + r.qp + r.qra,2), unit:'l/s' }
       ]),
-      '<div class="ph-formula ph-formula--small">Qww = K × √ΣDU · Qtot = Qww + Qc + Qp + Qr,a</div>'
+      '<div class="tc-formula ph-formula ph-formula--small">Qww = K × √ΣDU · Qtot = Qww + Qc + Qp + Qr,a</div>'
     ].join('')), 'green'),
     card('Normhinweise / Plausibilität', warningList(r.warnings, effectiveLineType), 'green')
   ].join(''));

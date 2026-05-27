@@ -93,9 +93,9 @@ function savedRows(s) {
 function surfacesTable(r, s) {
   if (!r.surfaces.length) return '<div class="empty-state empty-state--compact">Noch keine Regenflächen hinzugefügt.</div>';
   const activeId = String(s.activeSurfaceId || '');
-  return `<div class="dw-consumer-list wastewater-fixture-list rainwater-surface-list">${r.surfaces.map(item => {
+  return `<div class="tc-consumer-list dw-consumer-list wastewater-fixture-list rainwater-surface-list">${r.surfaces.map(item => {
     const active = String(item.id) === activeId;
-    return `<div class="dw-consumer-row wastewater-fixture-row rainwater-surface-row ${active ? 'is-active' : ''}" data-surface-select="${esc(item.id)}">
+    return `<div class="tc-consumer-row dw-consumer-row wastewater-fixture-row rainwater-surface-row ${active ? 'is-active' : ''}" data-surface-select="${esc(item.id)}">
       <div><strong>${esc(item.name)}</strong><span>${fmt(item.area,1)} m² · Cs ${fmt(item.cs,2)} · Qr ${fmt(item.qr,2)} l/s · FL ${item.stackSelection?.dn || '—'}</span></div>
       <button type="button" data-surface-delete="${esc(item.id)}" aria-label="Regenfläche entfernen">×</button>
     </div>`;
@@ -181,14 +181,14 @@ function inputCards(s, r) {
   ].join(''));
 }
 function warningList(warnings, s) {
-  const fixed = '<div class="ph-warning ph-warning--norm"><span>Normgrundlage: </span><strong>Berechnung erfolgt auf Grundlage der DIN 1986 - 100, aktuellste Fassung.</strong></div>';
-  const items = (warnings || []).map(text => `<div class="ph-warning"><span>Hinweis: </span><strong>${esc(text)}</strong></div>`).join('');
+  const fixed = '<div class="tc-warning ph-warning ph-warning--norm"><span>Normgrundlage: </span><strong>Berechnung erfolgt auf Grundlage der DIN 1986 - 100, aktuellste Fassung.</strong></div>';
+  const items = (warnings || []).map(text => `<div class="tc-warning ph-warning"><span>Hinweis: </span><strong>${esc(text)}</strong></div>`).join('');
   return fixed + items;
 }
 function surfaceDimensionCards(r, s) {
   if (!r.surfaces.length) return '<div class="empty-state empty-state--compact">Keine Einzelflächen berechnet.</div>';
   const activeId = String(s.activeSurfaceId || '');
-  return `<div class="ph-saved-list rainwater-result-list">${r.surfaces.map((item) => {
+  return `<div class="tc-saved-list ph-saved-list rainwater-result-list">${r.surfaces.map((item) => {
     const mode = item.surfaceMode || r.mode || s.surfaceMode || 'roof';
     const active = String(item.id) === activeId;
     const isRoof = mode === 'roof';
@@ -222,9 +222,9 @@ function surfaceDimensionCards(r, s) {
         <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Flächendimensionierung aufklappen"><span>▾</span></button>
       </div>
       <div class="line-section-card__body">
-        <div class="rainwater-result-group"><h4>Hauptentwässerung</h4>${resultRows(mainRows)}</div>
-        ${isRoof ? `<div class="rainwater-result-group"><h4>Notentwässerung</h4>${resultRows(emergencyRows)}</div>` : ''}
-        <div class="ph-formula ph-formula--small">Qr = r × C × A / 10000 · Anzahl Abläufe = Qr / Ablaufleistung · Q je Fallleitung = Qr / Anzahl Fallleitungen</div>
+        <div class="tc-result-group rainwater-result-group"><h4>Hauptentwässerung</h4>${resultRows(mainRows)}</div>
+        ${isRoof ? `<div class="tc-result-group rainwater-result-group"><h4>Notentwässerung</h4>${resultRows(emergencyRows)}</div>` : ''}
+        <div class="tc-formula ph-formula ph-formula--small">Qr = r × C × A / 10000 · Anzahl Abläufe = Qr / Ablaufleistung · Q je Fallleitung = Qr / Anzahl Fallleitungen</div>
       </div>
     </article>`;
   }).join('')}</div>`;

@@ -10,7 +10,7 @@ const opts = (items) => items.map(([value,label]) => ({ value, label }));
 
 function warnList(items){
   if(!items.length) return '<div class="empty-state empty-state--compact ph-note">Keine Plausibilitätswarnungen.</div>';
-  return `<div class="ph-warnings">${items.map(w => `<div class="ph-warning"><span>Hinweis</span><strong>${w}</strong></div>`).join('')}</div>`;
+  return `<div class="tc-warning-list ph-warnings">${items.map(w => `<div class="tc-warning ph-warning"><span>Hinweis</span><strong>${w}</strong></div>`).join('')}</div>`;
 }
 
 
@@ -40,7 +40,7 @@ function savedPlantSnapshot(s, r){
 
 function savedPlantRows(items = []){
   if(!items.length) return '<div class="empty-state empty-state--compact ph-note">Noch keine Anlagen gespeichert.</div>';
-  return `<div class="ph-saved-list">${items.map(item => {
+  return `<div class="tc-saved-list ph-saved-list">${items.map(item => {
     const res = item.result || {};
     const subtitle = [res.productLabel, res.selectedStandardVolume ? `${fmt(res.selectedStandardVolume,0)} l` : '', res.systemVolume ? `VA ${fmt(res.systemVolume,0)} l` : ''].filter(Boolean).join(' · ');
     return `<article class="ph-saved-item line-section-card is-collapsed ${state.get().activePlantId === item.id ? 'is-active' : ''}" data-line-card data-ph-select="${esc(item.id)}">
@@ -93,7 +93,7 @@ function view(s){
     segmented('systemType', opts([['heating','Heizwasser'],['cooling','Kühlwasser']]), s.systemType, { accent:'purple' }),
     segmented('holdingType', opts([['mag','MAG statisch'],['dynamic','Druckhaltestation']]), s.holdingType, { accent:'purple' }),
     segmented('connectionType', opts([['suction','Vordruck / Saugseite'],['pressure','Nachdruck / Druckseite']]), s.connectionType, { accent:'purple' }),
-    `<p class="ph-help">${explain(s)}</p>`
+    `<p class="tc-help ph-help">${explain(s)}</p>`
   ].join('')), 'purple');
 
   const volumeFields = [
@@ -121,9 +121,9 @@ function view(s){
       field({ id:'tMinC', label:'tiefste Systemtemperatur', value:fmtInput(s.tMinC,1), unit:'°C' }),
       field({ id:'tMaxC', label:'höchste Temperatur tTR/tmax', value:fmtInput(s.tMaxC,1), unit:'°C' })
     ].join(''), 2), 'purple'),
-    card('Druckdaten', `${grid(pressureFields.join(''), 2)}<p class="ph-help">Ist die statische Höhe eingetragen, wird pₛₜ automatisch mit H/10 berechnet. Der manuelle pₛₜ-Wert gilt nur ohne Höhenangabe.</p>`, 'purple'),
+    card('Druckdaten', `${grid(pressureFields.join(''), 2)}<p class="tc-help ph-help">Ist die statische Höhe eingetragen, wird pₛₜ automatisch mit H/10 berechnet. Der manuelle pₛₜ-Wert gilt nur ohne Höhenangabe.</p>`, 'purple'),
     savedPlantsCard(s),
-    s.holdingType === 'mag' ? card('MAG-Optionen', `${segmented('includeServitec', opts([['false','ohne Servitec'],['true','mit Servitec +5 l']]), s.includeServitec, { accent:'purple' })}<p class="ph-help">Servitec steht für Entgasung/Nachspeisung. Bei „mit Servitec“ wird das Zusatzvolumen des Entgasungsrohres berücksichtigt.</p>`, 'purple') : card('Dynamisches System', `${selectField({ id:'dynamicType', label:'Druckhaltestation', value:s.dynamicType, options:opts([['reflexomat','Reflexomat · kompressorgesteuert · AD 0,2 bar'],['variomat','Variomat · pumpengesteuert · AD 0,4 bar']]) })}<p class="ph-help">Die Auswahl bestimmt Arbeitsbereich AD und die Ergebnisbezeichnung der Station.</p>`, 'purple')
+    s.holdingType === 'mag' ? card('MAG-Optionen', `${segmented('includeServitec', opts([['false','ohne Servitec'],['true','mit Servitec +5 l']]), s.includeServitec, { accent:'purple' })}<p class="tc-help ph-help">Servitec steht für Entgasung/Nachspeisung. Bei „mit Servitec“ wird das Zusatzvolumen des Entgasungsrohres berücksichtigt.</p>`, 'purple') : card('Dynamisches System', `${selectField({ id:'dynamicType', label:'Druckhaltestation', value:s.dynamicType, options:opts([['reflexomat','Reflexomat · kompressorgesteuert · AD 0,2 bar'],['variomat','Variomat · pumpengesteuert · AD 0,4 bar']]) })}<p class="tc-help ph-help">Die Auswahl bestimmt Arbeitsbereich AD und die Ergebnisbezeichnung der Station.</p>`, 'purple')
   ].join(''));
 
   const resultColumn = stack([
@@ -138,11 +138,11 @@ function view(s){
       { label:'Volumenfaktor MAG', value:fmt(r.factor,2) }
     ], 'purple'),
     card('Formeln / Plausibilität', stack([
-      `<div class="formula ph-formula">p₀ = pₛₜ + pD ${s.connectionType === 'pressure' ? '+ Δpₚ' : '+ 0,2 bar'} · pe = pSV − ASV</div>`,
-      `<div class="formula ph-formula">Ve = VA × n / 100 · VV = max(0,5 % × VA; 3 l)</div>`,
+      `<div class="formula tc-formula ph-formula">p₀ = pₛₜ + pD ${s.connectionType === 'pressure' ? '+ Δpₚ' : '+ 0,2 bar'} · pe = pSV − ASV</div>`,
+      `<div class="formula tc-formula ph-formula">Ve = VA × n / 100 · VV = max(0,5 % × VA; 3 l)</div>`,
       s.holdingType === 'mag'
-        ? `<div class="formula ph-formula">Vn = (Ve + VV${s.includeServitec === 'true' ? ' + 5 l' : ''}) × (pe + 1) / (pe − p₀)</div>`
-        : `<div class="formula ph-formula">Vn ≥ 1,1 × (Ve + VV) · pe ≥ p₀ + 0,3 bar + AD</div>`,
+        ? `<div class="formula tc-formula ph-formula">Vn = (Ve + VV${s.includeServitec === 'true' ? ' + 5 l' : ''}) × (pe + 1) / (pe − p₀)</div>`
+        : `<div class="formula tc-formula ph-formula">Vn ≥ 1,1 × (Ve + VV) · pe ≥ p₀ + 0,3 bar + AD</div>`,
       warnList(r.warnings)
     ].join('')), 'purple')
   ].join(''));

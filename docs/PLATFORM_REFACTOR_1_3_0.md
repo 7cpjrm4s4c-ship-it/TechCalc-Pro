@@ -99,3 +99,33 @@ Dieser Stand zieht die ersten bestehenden Module auf zentrale Plattformdienste, 
 Module dürfen für gespeicherte Berechnungen keine eigenen Save/Update/Load/Delete-Handler mehr implementieren. Neue oder migrierte Module nutzen ausschließlich `bindSavedCalculationActions` oder einen daraus abgeleiteten zentralen Controller.
 
 Module dürfen keine eigene Zahlenparser-Logik mehr definieren. Fachlogik nutzt `numberService` oder kompatible Wrapper in `core/numbers.js`.
+
+## Phase 3 - UI-System und CSS-Konsolidierung
+
+Dieser Stand friert modulbezogene UI-Sonderwege ein und fuehrt zentrale `tc-*` Primitives fuer wiederkehrende UI-Muster ein.
+
+### Zentral neu
+
+- `js/core/uiSystem.js`
+  - dokumentierte zentrale UI-Primitives
+  - Helper fuer Warnungen, Hilfetexte, Formeln, Accordions und Notizkarten
+- zentrale CSS-Primitives in `css/components.css`
+  - `tc-list`, `tc-item`, `tc-consumer-list`, `tc-consumer-row`
+  - `tc-fixture-list`, `tc-fixture-row`
+  - `tc-accordion`, `tc-accordion__body`
+  - `tc-warning-list`, `tc-warning`
+  - `tc-help`, `tc-note`, `tc-formula`
+- `docs/UI_SYSTEM_1_3_0.md`
+  - verbindliche UI-Regeln fuer neue Module
+- `scripts/audit-ui-classes.mjs`
+  - Audit fuer Legacy-Modulklassen
+
+### Migriert / angebunden
+
+- Trinkwasser nutzt zentrale `tc-*` Klassen zusaetzlich zu bisherigen `dw-*` Alias-Klassen.
+- Regenwasser und Schmutzwasser nutzen zentrale Listen-, Warnungs- und Formelklassen.
+- Druckhaltung und Pufferspeicher nutzen zentrale Warnungs-, Hilfe- und Formelklassen.
+
+### Neue Regel ab Phase 3
+
+Neue UI-Muster werden ausschliesslich als `tc-*` Primitive eingefuehrt. Modulbezogene Klassen duerfen nur noch als temporaere Legacy-Aliasse in bestehenden Modulen bleiben. Fachliche Eventbindung erfolgt ueber `data-*` Attribute, nicht ueber Styling-Klassen.

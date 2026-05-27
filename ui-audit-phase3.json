@@ -1,0 +1,1214 @@
+{
+  "checkedFiles": 73,
+  "deprecatedPrefixes": [
+    "dw-",
+    "ph-",
+    "hx-",
+    "rainwater-",
+    "wastewater-"
+  ],
+  "legacyUiClassHits": 446,
+  "note": "Legacy-Hits sind in Phase 3 erlaubt, muessen aber bei jeder Modulmigration sinken. Neue UI-Klassen muessen tc-* verwenden.",
+  "hits": [
+    {
+      "file": "js/core/pdfExport.js",
+      "line": 193,
+      "prefix": "hx-",
+      "text": "card.querySelectorAll(':scope .hx-process-step').forEach((step, index) => {"
+    },
+    {
+      "file": "js/core/pdfExport.js",
+      "line": 209,
+      "prefix": "hx-",
+      "text": "return Boolean(card.querySelector('.hx-chart, svg')) && /diagramm/i.test(textOf(card.querySelector('.card__title')));"
+    },
+    {
+      "file": "js/modules/buffer-storage/index.js",
+      "line": 24,
+      "prefix": "ph-",
+      "text": "return `<div class=\"tc-warning-list ph-warnings\">${items.map(item => `<div class=\"tc-warning ph-warning\"><span>Hinweis</span><strong>${esc(item)}</strong></div>`).join('')}</div>`;"
+    },
+    {
+      "file": "js/modules/buffer-storage/index.js",
+      "line": 42,
+      "prefix": "ph-",
+      "text": "return `<div class=\"tc-saved-list ph-saved-list\">${items.map(item => {"
+    },
+    {
+      "file": "js/modules/buffer-storage/index.js",
+      "line": 45,
+      "prefix": "ph-",
+      "text": "return `<article class=\"ph-saved-item line-section-card is-collapsed ${state.get().activeCalculationId === item.id ? 'is-active' : ''}\" data-line-card data-buffer-select=\"${esc(ite"
+    },
+    {
+      "file": "js/modules/buffer-storage/index.js",
+      "line": 107,
+      "prefix": "ph-",
+      "text": "'<p class=\"tc-help ph-help ph-help--inline buffer-help\"><strong>Teillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große V"
+    },
+    {
+      "file": "js/modules/buffer-storage/index.js",
+      "line": 108,
+      "prefix": "ph-",
+      "text": "'<p class=\"tc-help ph-help ph-help--inline buffer-help\"><strong>QLast:</strong> konstant durch aktive Verbraucher abgenommene Leistung. Falls keine konstante Last vorhanden oder be"
+    },
+    {
+      "file": "js/modules/buffer-storage/index.js",
+      "line": 146,
+      "prefix": "ph-",
+      "text": "'<p class=\"tc-help ph-help\">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.<"
+    },
+    {
+      "file": "js/modules/buffer-storage/index.js",
+      "line": 170,
+      "prefix": "ph-",
+      "text": "'<div class=\"formula tc-formula ph-formula\">V = ((QMax × Teillast − QLast) × Faktor × TLaufzeit) / ΔTHydraulik</div>',"
+    },
+    {
+      "file": "js/modules/buffer-storage/index.js",
+      "line": 171,
+      "prefix": "ph-",
+      "text": "'<div class=\"formula tc-formula ph-formula\">VAbtau = ((QVerbraucher + QKälte − QHeiz) × Faktor × TMaxAbtauung) / ΔTHydraulik</div>',"
+    },
+    {
+      "file": "js/modules/buffer-storage/index.js",
+      "line": 172,
+      "prefix": "ph-",
+      "text": "'<div class=\"formula tc-formula ph-formula\">VWasservorlage = V̇Verbraucher × tÜberbrückung × 1000 / 60</div>',"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 14,
+      "prefix": "dw-",
+      "text": "return `<div class=\"tc-consumer-list dw-consumer-list\">${items.map((c, index) => `<div class=\"tc-consumer-row dw-consumer-row dw-consumer-row--editable\">"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 16,
+      "prefix": "dw-",
+      "text": "<label class=\"mini-edit-field\"><span>Anzahl</span><input type=\"number\" min=\"0\" step=\"1\" value=\"${esc(c.count)}\" data-dw-draft-count=\"${esc(type)}\" data-index=\"${index}\" inputmode=\""
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 22,
+      "prefix": "dw-",
+      "text": "return `<div class=\"tc-consumer-list dw-consumer-list\">${consumers.map(c => `<div class=\"tc-consumer-row dw-consumer-row\"><div><strong>${esc(c.count)} × ${esc(c.label)}</strong><sp"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 28,
+      "prefix": "dw-",
+      "text": "return `<div class=\"line-section-list saved-record-list dw-list\">${units.map((unit, index) => `<article class=\"line-section-card saved-record-card is-collapsed ${isSameId(activeId,"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 32,
+      "prefix": "dw-",
+      "text": "<button type=\"button\" class=\"line-section-card__delete saved-record-card__delete\" data-dw-unit-delete=\"${esc(unit.id)}\" aria-label=\"Nutzungseinheit löschen\">×</button>"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 49,
+      "prefix": "dw-",
+      "text": "return `<div class=\"line-section-list saved-record-list dw-list\">${groups.map((group, index) => {"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 53,
+      "prefix": "dw-",
+      "text": "return `<article class=\"line-section-card saved-record-card is-collapsed ${isSameId(activeId, group.id) ? 'is-active' : ''}\" data-line-card data-dw-single-edit=\"${esc(group.id)}\">"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 57,
+      "prefix": "dw-",
+      "text": "<button type=\"button\" class=\"line-section-card__delete saved-record-card__delete\" data-dw-single-delete=\"${esc(group.id)}\" aria-label=\"Einzelverbraucher löschen\">×</button>"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 118,
+      "prefix": "dw-",
+      "text": "return `<div class=\"tc-fixture-list dw-fixture-list dw-fixture-list--plain\">${rows.map(item => `<div class=\"tc-fixture-row dw-fixture-row\"><strong>${esc(item.count)} × ${esc(item.l"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 136,
+      "prefix": "dw-",
+      "text": "`<details class=\"tc-accordion dw-accordion dw-accordion--form\" data-dw-accordion=\"uiUnitFormOpen\" ${s.uiUnitFormOpen ? 'open' : ''}><summary><span><strong>Nutzungseinheit zusammens"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 143,
+      "prefix": "dw-",
+      "text": "'<button type=\"button\" class=\"action-button action-button--secondary\" data-dw-draft-add=\"unit\">Verbraucher zur Nutzungseinheit hinzufügen</button>',"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 145,
+      "prefix": "dw-",
+      "text": "`<div class=\"tc-save-actions\"><button type=\"button\" class=\"action-button\" data-dw-add-unit ${s.activeUnitId ? 'disabled' : ''}>Speichern</button><button type=\"button\" class=\"action"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 147,
+      "prefix": "dw-",
+      "text": "`<details class=\"tc-accordion dw-accordion dw-accordion--saved\" data-dw-accordion=\"uiUnitSavedOpen\" ${s.uiUnitSavedOpen ? 'open' : ''}><summary><span><strong>Gespeicherte Nutzungse"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 150,
+      "prefix": "dw-",
+      "text": "`<details class=\"tc-accordion dw-accordion dw-accordion--form\" data-dw-accordion=\"uiSingleFormOpen\" ${s.uiSingleFormOpen ? 'open' : ''}><summary><span><strong>Freie Einrichtungsgeg"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 160,
+      "prefix": "dw-",
+      "text": "'<button type=\"button\" class=\"action-button action-button--secondary\" data-dw-draft-add=\"single\">Verbraucher zur Gruppe hinzufügen</button>',"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 162,
+      "prefix": "dw-",
+      "text": "`<div class=\"tc-save-actions\"><button type=\"button\" class=\"action-button\" data-dw-add-single ${s.activeSingleId ? 'disabled' : ''}>Speichern</button><button type=\"button\" class=\"ac"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 164,
+      "prefix": "dw-",
+      "text": "`<details class=\"tc-accordion dw-accordion dw-accordion--saved\" data-dw-accordion=\"uiSingleSavedOpen\" ${s.uiSingleSavedOpen ? 'open' : ''}><summary><span><strong>Gespeicherte Einze"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 186,
+      "prefix": "dw-",
+      "text": "card('Hinweis', `<div class=\"tc-note dw-note\">Dauerverbraucher werden zum nach Gleichzeitigkeit ermittelten Spitzendurchfluss addiert. Bei zentraler Warmwasserbereitung werden TWW-"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 193,
+      "prefix": "dw-",
+      "text": "<div class=\"span-6\" data-dw-input>${inputCard(s, r)}</div>"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 194,
+      "prefix": "dw-",
+      "text": "<div class=\"span-6\" data-dw-result>${resultCard(r)}</div>"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 201,
+      "prefix": "dw-",
+      "text": "const result = root.querySelector('[data-dw-result]');"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 203,
+      "prefix": "dw-",
+      "text": "const unitDraft = root.querySelector('[data-dw-unit-draft]');"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 205,
+      "prefix": "dw-",
+      "text": "const singleDraft = root.querySelector('[data-dw-single-draft]');"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 207,
+      "prefix": "dw-",
+      "text": "const unitSaved = root.querySelector('[data-dw-unit-saved]');"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 209,
+      "prefix": "dw-",
+      "text": "const singleSaved = root.querySelector('[data-dw-single-saved]');"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 211,
+      "prefix": "dw-",
+      "text": "const unitSummary = root.querySelector('[data-dw-unit-summary]');"
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "line": 213,
+      "prefix": "dw-",
+      "text": "const singleSummary = root.querySelector('[data-dw-single-summary]');"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 27,
+      "prefix": "hx-",
+      "text": "return card('Luftbehandlung wählen', `<div class=\"hx-process-grid\">"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 28,
+      "prefix": "hx-",
+      "text": "${options.map(option => `<button type=\"button\" data-segment=\"process\" data-value=\"${esc(option.value)}\" class=\"hx-process ${option.value === s.process ? 'is-active' : ''}\">${esc(op"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 44,
+      "prefix": "hx-",
+      "text": "`<div class=\"tc-save-actions\">${actionButton('Speichern', s.activeProcessId ? 'data-hx-add disabled' : 'data-hx-add')} ${actionButton('Aktualisieren', s.activeProcessId ? 'data-hx-"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 60,
+      "prefix": "hx-",
+      "text": "const rows = r.processPath.map((point, index) => `<div class=\"hx-process-step\">"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 67,
+      "prefix": "hx-",
+      "text": "return card('Berechnete Zustandspunkte', `<div class=\"hx-process-path\">${rows}</div>`, 'cyan');"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 82,
+      "prefix": "hx-",
+      "text": "`<div class=\"hx-state-grid\">${readonlyStateCard('Ausgang', activePath[0])}${readonlyStateCard('Ziel', activePath[activePath.length - 1])}</div>`"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 87,
+      "prefix": "hx-",
+      "text": "const body = processes.length ? `<div class=\"hx-history\">"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 91,
+      "prefix": "hx-",
+      "text": "return `<div class=\"hx-history__row hx-history__row--process ${selected ? 'is-active' : ''}\" data-hx-select-process=\"${esc(process.id)}\">"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 93,
+      "prefix": "hx-",
+      "text": "<div class=\"hx-history__values\"><span>θt ${hxFmt(last?.tempC, 2)} °C</span><span>φ ${hxFmt(last?.rhPercent, 0)} % r.F.</span></div>"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 94,
+      "prefix": "hx-",
+      "text": "<button type=\"button\" class=\"mini-button mini-button--danger\" data-hx-remove-process=\"${esc(process.id)}\" aria-label=\"Prozess löschen\">Löschen</button>"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 102,
+      "prefix": "hx-",
+      "text": "const warning = targetReached ? '' : '<div class=\"hx-target-warning\">Zielzustand wird nicht erreicht!</div>';"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 103,
+      "prefix": "hx-",
+      "text": "return card('h,x-Diagramm', `<div class=\"hx-chart-wrap\">${renderHxSvg(activePath)}</div>${warning}<div class=\"formula\">Näherung bei Luftdruck 1.013 hPa · x horizontal · θt vertikal"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 126,
+      "prefix": "hx-",
+      "text": "return points.slice(1).map((point, index) => `<path d=\"${buildSegmentPath(points[index], point, px, py)}\" class=\"hx-state-path hx-state-path--${index % 5}\"/>`).join('');"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 137,
+      "prefix": "hx-",
+      "text": "tempLines.push(`<line x1=\"${padL}\" y1=\"${hxPy(t)}\" x2=\"${w - padR}\" y2=\"${hxPy(t)}\" class=\"hx-grid-line\"/><text x=\"${padL - 10}\" y=\"${hxPy(t) + 4}\" class=\"hx-axis-label\" text-ancho"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 141,
+      "prefix": "hx-",
+      "text": "xLines.push(`<line x1=\"${hxPx(x)}\" y1=\"${padT}\" x2=\"${hxPx(x)}\" y2=\"${h - padB}\" class=\"hx-grid-line\"/><text x=\"${hxPx(x)}\" y=\"${h - padB + 20}\" class=\"hx-axis-label\" text-anchor=\""
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 163,
+      "prefix": "hx-",
+      "text": "return `<path d=\"${d.join(' ')}\" class=\"hx-rh hx-rh-${rh}\"/><text x=\"${hxPx(labelX)}\" y=\"${hxPy(labelT) - 4}\" class=\"hx-rh-label\">${rh}%</text>`;"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 179,
+      "prefix": "hx-",
+      "text": "return `<g class=\"hx-point\">"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 185,
+      "prefix": "hx-",
+      "text": "return `<svg class=\"hx-chart\" viewBox=\"0 0 ${w} ${h}\" role=\"img\" aria-label=\"h,x-Diagramm\">"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 186,
+      "prefix": "hx-",
+      "text": "<rect x=\"0\" y=\"0\" width=\"${w}\" height=\"${h}\" rx=\"18\" class=\"hx-chart-bg\"/>"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 190,
+      "prefix": "hx-",
+      "text": "<text x=\"${w / 2}\" y=\"${h - 12}\" class=\"hx-title\" text-anchor=\"middle\">Feuchtegehalt x [g H₂O/kg tr. Luft]</text>"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 191,
+      "prefix": "hx-",
+      "text": "<text x=\"16\" y=\"${h / 2}\" class=\"hx-title\" transform=\"rotate(-90 16 ${h / 2})\" text-anchor=\"middle\">Trockenkugeltemperatur θt [°C]</text>"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 202,
+      "prefix": "hx-",
+      "text": "const body = `<div class=\"hx-layout\">"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 203,
+      "prefix": "hx-",
+      "text": "<div class=\"hx-layout__left\">${stack([inputCard(s), resultCard(r, activePath), historyCard(s.processes ?? [], s.activeProcessId)].join(''))}</div>"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 204,
+      "prefix": "hx-",
+      "text": "<div class=\"hx-layout__right\">${chartCard(activePath, !activePath.length || r.targetReached)}</div>"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 239,
+      "prefix": "hx-",
+      "text": "rootEl.querySelectorAll('[data-hx-sign]').forEach(button => {"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 248,
+      "prefix": "hx-",
+      "text": "rootEl.querySelector('[data-hx-add]')?.addEventListener('click', () => {"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 285,
+      "prefix": "hx-",
+      "text": "const updateButton = rootEl.querySelector('[data-hx-update]');"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 289,
+      "prefix": "hx-",
+      "text": "rootEl.querySelector('[data-hx-clear]')?.addEventListener('click', () => {"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 303,
+      "prefix": "hx-",
+      "text": "rootEl.querySelectorAll('[data-hx-select-process]').forEach(row => {"
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "line": 323,
+      "prefix": "hx-",
+      "text": "rootEl.querySelectorAll('[data-hx-remove-process]').forEach(button => {"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 12,
+      "prefix": "ph-",
+      "text": "if(!items.length) return '<div class=\"empty-state empty-state--compact ph-note\">Keine Plausibilitätswarnungen.</div>';"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 13,
+      "prefix": "ph-",
+      "text": "return `<div class=\"tc-warning-list ph-warnings\">${items.map(w => `<div class=\"tc-warning ph-warning\"><span>Hinweis</span><strong>${w}</strong></div>`).join('')}</div>`;"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 42,
+      "prefix": "ph-",
+      "text": "if(!items.length) return '<div class=\"empty-state empty-state--compact ph-note\">Noch keine Anlagen gespeichert.</div>';"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 43,
+      "prefix": "ph-",
+      "text": "return `<div class=\"tc-saved-list ph-saved-list\">${items.map(item => {"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 46,
+      "prefix": "ph-",
+      "text": "return `<article class=\"ph-saved-item line-section-card is-collapsed ${state.get().activePlantId === item.id ? 'is-active' : ''}\" data-line-card data-ph-select=\"${esc(item.id)}\">"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 50,
+      "prefix": "ph-",
+      "text": "<button type=\"button\" class=\"line-section-card__delete\" data-ph-delete=\"${esc(item.id)}\" aria-label=\"Anlage löschen\">×</button>"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 65,
+      "prefix": "ph-",
+      "text": "`<div class=\"tc-save-actions\"><button type=\"button\" class=\"action-button\" data-ph-save ${s.activePlantId ? 'disabled' : ''}>Speichern</button><button type=\"button\" class=\"action-bu"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 96,
+      "prefix": "ph-",
+      "text": "`<p class=\"tc-help ph-help\">${explain(s)}</p>`"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 124,
+      "prefix": "ph-",
+      "text": "card('Druckdaten', `${grid(pressureFields.join(''), 2)}<p class=\"tc-help ph-help\">Ist die statische Höhe eingetragen, wird pₛₜ automatisch mit H/10 berechnet. Der manuelle pₛₜ-Wert"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 126,
+      "prefix": "ph-",
+      "text": "s.holdingType === 'mag' ? card('MAG-Optionen', `${segmented('includeServitec', opts([['false','ohne Servitec'],['true','mit Servitec +5 l']]), s.includeServitec, { accent:'purple' "
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 141,
+      "prefix": "ph-",
+      "text": "`<div class=\"formula tc-formula ph-formula\">p₀ = pₛₜ + pD ${s.connectionType === 'pressure' ? '+ Δpₚ' : '+ 0,2 bar'} · pe = pSV − ASV</div>`,"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 142,
+      "prefix": "ph-",
+      "text": "`<div class=\"formula tc-formula ph-formula\">Ve = VA × n / 100 · VV = max(0,5 % × VA; 3 l)</div>`,"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 144,
+      "prefix": "ph-",
+      "text": "? `<div class=\"formula tc-formula ph-formula\">Vn = (Ve + VV${s.includeServitec === 'true' ? ' + 5 l' : ''}) × (pe + 1) / (pe − p₀)</div>`"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 145,
+      "prefix": "ph-",
+      "text": ": `<div class=\"formula tc-formula ph-formula\">Vn ≥ 1,1 × (Ve + VV) · pe ≥ p₀ + 0,3 bar + AD</div>`,"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 155,
+      "prefix": "ph-",
+      "text": "root.querySelector('[data-ph-save]')?.addEventListener('click', () => {"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 162,
+      "prefix": "ph-",
+      "text": "root.querySelector('[data-ph-update]')?.addEventListener('click', () => {"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 181,
+      "prefix": "ph-",
+      "text": "root.querySelectorAll('[data-ph-select]').forEach(button => {"
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "line": 192,
+      "prefix": "ph-",
+      "text": "root.querySelectorAll('[data-ph-delete]').forEach(button => {"
+    },
+    {
+      "file": "js/modules/rainwater/index.js",
+      "line": 96,
+      "prefix": "dw-",
+      "text": "return `<div class=\"tc-consumer-list dw-consumer-list wastewater-fixture-list rainwater-surface-list\">${r.surfaces.map(item => {"
+    },
+    {
+      "file": "js/modules/rainwater/index.js",
+      "line": 96,
+      "prefix": "rainwater-",
+      "text": "return `<div class=\"tc-consumer-list dw-consumer-list wastewater-fixture-list rainwater-surface-list\">${r.surfaces.map(item => {"
+    },
+    {
+      "file": "js/modules/rainwater/index.js",
+      "line": 96,
+      "prefix": "wastewater-",
+      "text": "return `<div class=\"tc-consumer-list dw-consumer-list wastewater-fixture-list rainwater-surface-list\">${r.surfaces.map(item => {"
+    },
+    {
+      "file": "js/modules/rainwater/index.js",
+      "line": 98,
+      "prefix": "dw-",
+      "text": "return `<div class=\"tc-consumer-row dw-consumer-row wastewater-fixture-row rainwater-surface-row ${active ? 'is-active' : ''}\" data-surface-select=\"${esc(item.id)}\">"
+    },
+    {
+      "file": "js/modules/rainwater/index.js",
+      "line": 98,
+      "prefix": "rainwater-",
+      "text": "return `<div class=\"tc-consumer-row dw-consumer-row wastewater-fixture-row rainwater-surface-row ${active ? 'is-active' : ''}\" data-surface-select=\"${esc(item.id)}\">"
+    },
+    {
+      "file": "js/modules/rainwater/index.js",
+      "line": 98,
+      "prefix": "wastewater-",
+      "text": "return `<div class=\"tc-consumer-row dw-consumer-row wastewater-fixture-row rainwater-surface-row ${active ? 'is-active' : ''}\" data-surface-select=\"${esc(item.id)}\">"
+    },
+    {
+      "file": "js/modules/rainwater/index.js",
+      "line": 117,
+      "prefix": "rainwater-",
+      "text": "`<a class=\"action-button action-button--secondary rainwater-kostra-link\" href=\"${esc(KOSTRA_URL)}\" target=\"_blank\" rel=\"noopener\">KOSTRA / OpenKo Daten öffnen</a>`"
+    },
+    {
+      "file": "js/modules/rainwater/index.js",
+      "line": 167,
+      "prefix": "rainwater-",
+      "text": "`<div class=\"tc-save-actions\"><button type=\"button\" class=\"action-button\" data-rainwater-save ${s.activeCalculationId ? 'disabled' : ''}>Speichern</button><button type=\"button\" cla"
+    },
+    {
+      "file": "js/modules/rainwater/index.js",
+      "line": 184,
+      "prefix": "ph-",
+      "text": "const fixed = '<div class=\"tc-warning ph-warning ph-warning--norm\"><span>Normgrundlage: </span><strong>Berechnung erfolgt auf Grundlage der DIN 1986 - 100, aktuellste Fassung.</str"
+    },
+    {
+      "file": "js/modules/rainwater/index.js",
+      "line": 185,
+      "prefix": "ph-",
+      "text": "const items = (warnings || []).map(text => `<div class=\"tc-warning ph-warning\"><span>Hinweis: </span><strong>${esc(text)}</strong></div>`).join('');"
+    },
+    {
+      "file": "js/modules/rainwater/index.js",
+      "line": 191,
+      "prefix": "ph-",
+      "text": "return `<div class=\"tc-saved-list ph-saved-list rainwater-result-list\">${r.surfaces.map((item) => {"
+    },
+    {
+      "file": "js/modules/rainwater/index.js",
+      "line": 191,
+      "prefix": "rainwater-",
+      "text": "return `<div class=\"tc-saved-list ph-saved-list rainwater-result-list\">${r.surfaces.map((item) => {"
+    },
+    {
+      "file": "js/modules/rainwater/index.js",
+      "line": 225,
+      "prefix": "rainwater-",
+      "text": "<div class=\"tc-result-group rainwater-result-group\"><h4>Hauptentwässerung</h4>${resultRows(mainRows)}</div>"
+    },
+    {
+      "file": "js/modules/rainwater/index.js",
+      "line": 226,
+      "prefix": "rainwater-",
+      "text": "${isRoof ? `<div class=\"tc-result-group rainwater-result-group\"><h4>Notentwässerung</h4>${resultRows(emergencyRows)}</div>` : ''}"
+    },
+    {
+      "file": "js/modules/rainwater/index.js",
+      "line": 227,
+      "prefix": "ph-",
+      "text": "<div class=\"tc-formula ph-formula ph-formula--small\">Qr = r × C × A / 10000 · Anzahl Abläufe = Qr / Ablaufleistung · Q je Fallleitung = Qr / Anzahl Fallleitungen</div>"
+    },
+    {
+      "file": "js/modules/wastewater/index.js",
+      "line": 84,
+      "prefix": "wastewater-",
+      "text": "blocks.push(`<div class=\"wastewater-subselect\"><span>Ausführung</span>${miniSegment(["
+    },
+    {
+      "file": "js/modules/wastewater/index.js",
+      "line": 135,
+      "prefix": "dw-",
+      "text": "return `<div class=\"tc-consumer-list dw-consumer-list wastewater-fixture-list\">${r.fixtures.map(item => `<div class=\"tc-consumer-row dw-consumer-row wastewater-fixture-row wastewat"
+    },
+    {
+      "file": "js/modules/wastewater/index.js",
+      "line": 135,
+      "prefix": "wastewater-",
+      "text": "return `<div class=\"tc-consumer-list dw-consumer-list wastewater-fixture-list\">${r.fixtures.map(item => `<div class=\"tc-consumer-row dw-consumer-row wastewater-fixture-row wastewat"
+    },
+    {
+      "file": "js/modules/wastewater/index.js",
+      "line": 176,
+      "prefix": "ph-",
+      "text": "const fixed = '<div class=\"tc-warning ph-warning ph-warning--norm\"><span>Normgrundlage:</span><strong>Berechnung erfolgt auf Grundlage der DIN 1986 - 100, aktuellste Fassung.</stro"
+    },
+    {
+      "file": "js/modules/wastewater/index.js",
+      "line": 177,
+      "prefix": "ph-",
+      "text": "const lineHints = lineTypeHints(lineType).map(item => `<div class=\"tc-warning ph-warning\"><span>Hinweis:</span><strong>${esc(item)}</strong></div>`).join('');"
+    },
+    {
+      "file": "js/modules/wastewater/index.js",
+      "line": 178,
+      "prefix": "ph-",
+      "text": "const dynamic = warnings.map(item => `<div class=\"tc-warning ph-warning\"><span>Hinweis:</span><strong>${esc(item)}</strong></div>`).join('');"
+    },
+    {
+      "file": "js/modules/wastewater/index.js",
+      "line": 180,
+      "prefix": "ph-",
+      "text": "if (!lineHints && !warnings.length) return `<div class=\"tc-warning-list ph-warnings\">${fixed}<div class=\"empty-state empty-state--compact\">Keine Regelverletzungen erkannt.</div></d"
+    },
+    {
+      "file": "js/modules/wastewater/index.js",
+      "line": 181,
+      "prefix": "ph-",
+      "text": "return `<div class=\"tc-warning-list ph-warnings\">${body}</div>`;"
+    },
+    {
+      "file": "js/modules/wastewater/index.js",
+      "line": 208,
+      "prefix": "wastewater-",
+      "text": "`<div class=\"tc-save-actions\"><button type=\"button\" class=\"action-button\" data-wastewater-save ${s.activeCalculationId ? 'disabled' : ''}>Speichern</button><button type=\"button\" cl"
+    },
+    {
+      "file": "js/modules/wastewater/index.js",
+      "line": 234,
+      "prefix": "ph-",
+      "text": "'<div class=\"tc-formula ph-formula ph-formula--small\">Qww = K × √ΣDU · Qtot = Qww + Qc + Qp + Qr,a</div>'"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1358,
+      "prefix": "hx-",
+      "text": ".hx-layout__left,"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1359,
+      "prefix": "hx-",
+      "text": ".hx-layout__right {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1363,
+      "prefix": "hx-",
+      "text": ".hx-layout__left {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1392,
+      "prefix": "hx-",
+      "text": ".hx-chart-bg {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1397,
+      "prefix": "hx-",
+      "text": ".hx-grid-line {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1402,
+      "prefix": "hx-",
+      "text": ".hx-axis-label,"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1403,
+      "prefix": "hx-",
+      "text": ".hx-rh-label,"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1404,
+      "prefix": "hx-",
+      "text": ".hx-title {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1409,
+      "prefix": "hx-",
+      "text": ".hx-rh {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1415,
+      "prefix": "hx-",
+      "text": ".hx-rh-100 {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1420,
+      "prefix": "hx-",
+      "text": ".hx-state-path {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1429,
+      "prefix": "hx-",
+      "text": ".hx-point circle {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1436,
+      "prefix": "hx-",
+      "text": ".hx-history {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1442,
+      "prefix": "hx-",
+      "text": ".hx-history__row {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1453,
+      "prefix": "hx-",
+      "text": ".hx-history__row strong,"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1454,
+      "prefix": "hx-",
+      "text": ".hx-history__row small,"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1455,
+      "prefix": "hx-",
+      "text": ".hx-history__values {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1459,
+      "prefix": "hx-",
+      "text": ".hx-history__row small {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1465,
+      "prefix": "hx-",
+      "text": ".hx-history__values {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1475,
+      "prefix": "hx-",
+      "text": ".hx-layout {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1485,
+      "prefix": "hx-",
+      "text": ".hx-chart {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1489,
+      "prefix": "hx-",
+      "text": ".hx-history__row {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1493,
+      "prefix": "hx-",
+      "text": ".hx-history__values {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1499,
+      "prefix": "hx-",
+      "text": ".hx-process-grid {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1505,
+      "prefix": "hx-",
+      "text": ".hx-process {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1518,
+      "prefix": "hx-",
+      "text": ".hx-process.is-active {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1525,
+      "prefix": "hx-",
+      "text": ".hx-process-path {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1531,
+      "prefix": "hx-",
+      "text": ".hx-process-step strong {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1537,
+      "prefix": "hx-",
+      "text": ".hx-process-grid {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1541,
+      "prefix": "hx-",
+      "text": ".hx-process-step {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1545,
+      "prefix": "hx-",
+      "text": ".hx-process-step strong {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1550,
+      "prefix": "hx-",
+      "text": ".hx-layout {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1557,
+      "prefix": "hx-",
+      "text": ".hx-layout__right {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1562,
+      "prefix": "hx-",
+      "text": ".hx-layout__right > .card {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1566,
+      "prefix": "hx-",
+      "text": ".hx-chart-wrap {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1573,
+      "prefix": "hx-",
+      "text": ".hx-chart {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1580,
+      "prefix": "hx-",
+      "text": ".hx-process-step {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1592,
+      "prefix": "hx-",
+      "text": ".hx-process-step strong,"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1593,
+      "prefix": "hx-",
+      "text": ".hx-process-step span {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1600,
+      "prefix": "hx-",
+      "text": ".hx-process-step span {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1608,
+      "prefix": "hx-",
+      "text": ".hx-process-step span b {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1615,
+      "prefix": "hx-",
+      "text": ".hx-point text {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1625,
+      "prefix": "hx-",
+      "text": ".hx-layout {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1631,
+      "prefix": "hx-",
+      "text": ".hx-chart {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1635,
+      "prefix": "hx-",
+      "text": ".hx-process-step {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1639,
+      "prefix": "hx-",
+      "text": ".hx-process-step strong {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2430,
+      "prefix": "dw-",
+      "text": ".dw-list {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2435,
+      "prefix": "dw-",
+      "text": ".dw-item .inline-stats {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2439,
+      "prefix": "dw-",
+      "text": ".dw-consumers {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2446,
+      "prefix": "dw-",
+      "text": ".dw-consumers span {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2455,
+      "prefix": "dw-",
+      "text": ".dw-consumers small {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2459,
+      "prefix": "dw-",
+      "text": ".dw-add-row {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2467,
+      "prefix": "dw-",
+      "text": ".dw-add-row select,"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2468,
+      "prefix": "dw-",
+      "text": ".dw-add-row input {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2479,
+      "prefix": "dw-",
+      "text": ".dw-add-row {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2484,
+      "prefix": "dw-",
+      "text": ":root[data-theme='light'] .dw-consumers span,"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2485,
+      "prefix": "dw-",
+      "text": ":root[data-theme='light'] .dw-add-row select,"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2486,
+      "prefix": "dw-",
+      "text": ":root[data-theme='light'] .dw-add-row input {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2492,
+      "prefix": "dw-",
+      "text": ".dw-accordion {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2499,
+      "prefix": "dw-",
+      "text": ".dw-accordion + .dw-accordion {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2503,
+      "prefix": "dw-",
+      "text": ".dw-accordion > summary {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2516,
+      "prefix": "dw-",
+      "text": ".dw-accordion > summary::-webkit-details-marker {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2520,
+      "prefix": "dw-",
+      "text": ".dw-accordion > summary::after {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2529,
+      "prefix": "dw-",
+      "text": ".dw-accordion[open] > summary::after {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2533,
+      "prefix": "dw-",
+      "text": ".dw-accordion > summary span {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2539,
+      "prefix": "dw-",
+      "text": ".dw-accordion > summary small {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2546,
+      "prefix": "dw-",
+      "text": ".dw-accordion > summary button {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2558,
+      "prefix": "dw-",
+      "text": ".dw-accordion__body {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2563,
+      "prefix": "dw-",
+      "text": ".dw-accordion--form > summary,"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2564,
+      "prefix": "dw-",
+      "text": ".dw-accordion--saved > summary {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2568,
+      "prefix": "dw-",
+      "text": ".dw-consumer-list {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2574,
+      "prefix": "dw-",
+      "text": ".dw-consumer-row {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2586,
+      "prefix": "dw-",
+      "text": ".dw-consumer-row div {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2592,
+      "prefix": "dw-",
+      "text": ".dw-consumer-row strong {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2597,
+      "prefix": "dw-",
+      "text": ".dw-consumer-row span {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2603,
+      "prefix": "dw-",
+      "text": ".dw-consumer-row button {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2619,
+      "prefix": "dw-",
+      "text": ":root[data-theme='light'] .dw-accordion,"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2620,
+      "prefix": "dw-",
+      "text": ":root[data-theme='light'] .dw-consumer-row {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2625,
+      "prefix": "dw-",
+      "text": ":root[data-theme='light'] .dw-accordion__body {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2630,
+      "prefix": "dw-",
+      "text": ".dw-accordion > summary {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2634,
+      "prefix": "dw-",
+      "text": ".dw-accordion__body {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2638,
+      "prefix": "dw-",
+      "text": ".dw-consumer-row {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2645,
+      "prefix": "dw-",
+      "text": ".module-view[data-module='drinking-water'] .dw-list,"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2646,
+      "prefix": "dw-",
+      "text": ".module-view[data-module='drinking-water'] .dw-consumer-list {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2650,
+      "prefix": "dw-",
+      "text": ".module-view[data-module='drinking-water'] .dw-accordion {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2657,
+      "prefix": "dw-",
+      "text": ".module-view[data-module='drinking-water'] .dw-accordion + .dw-accordion {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2661,
+      "prefix": "dw-",
+      "text": ".module-view[data-module='drinking-water'] .dw-accordion > summary {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2667,
+      "prefix": "dw-",
+      "text": ".module-view[data-module='drinking-water'] .dw-accordion > summary span {"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2671,
+      "prefix": "dw-",
+      "text": ".module-view[data-module='drinking-water'] .dw-accordion > summary strong,"
+    }
+  ]
+}

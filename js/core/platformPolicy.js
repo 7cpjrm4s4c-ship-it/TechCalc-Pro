@@ -15,5 +15,7 @@ export const platformPolicy = Object.freeze({
     'eigene Saved-Record-Listen',
     'eigene Ergebnislayout-Komponenten'
   ]),
-  allowedCssPrefixes: Object.freeze(['tc-', 'card', 'field', 'control', 'action-', 'result-', 'empty-state', 'inline-', 'module-', 'saved-record', 'line-section'])
+  allowedCssPrefixes: Object.freeze(['tc-', 'card', 'field', 'control', 'action-', 'result-', 'empty-state', 'inline-', 'module-', 'saved-record', 'line-section']),
+  deprecatedModuleCssPrefixes: Object.freeze(['dw-', 'ph-', 'hx-', 'rainwater-', 'wastewater-']),
+  cssRule: 'Neue UI-Strukturen verwenden ausschliesslich tc-* Primitives. Bestehende Modulklassen duerfen nur noch als Migrations-Aliasse bleiben.'
 });

@@ -1,3 +1,12 @@
+
+## Version 1.3.0 - Phase 3 UI-System
+
+- Zentrale `tc-*` UI-Primitives fuer Listen, Accordions, Hinweise, Hilfetexte, Formeln und Objektzeilen eingefuehrt.
+- Bestehende Modulklassen in Trinkwasser, Regenwasser, Schmutzwasser, Druckhaltung und Pufferspeicher als Legacy-Aliasse markiert und mit zentralen Klassen kombiniert.
+- UI-System-Dokumentation unter `docs/UI_SYSTEM_1_3_0.md` ergaenzt.
+- Audit-Script fuer modulbezogene Legacy-Klassen ergaenzt: `node scripts/audit-ui-classes.mjs`.
+- Plattform-Regel erweitert: neue Module duerfen keine eigenen UI-/CSS-Klassen mehr einfuehren.
+
 ## Version 1.3.0 - Plattform-Refactor Phase 2
 
 - Zentrale Plattform-Regeln fuer Module eingefuehrt (`platformPolicy`).

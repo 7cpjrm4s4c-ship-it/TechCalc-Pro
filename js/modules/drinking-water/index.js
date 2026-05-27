@@ -11,7 +11,7 @@ function consumerOptions() {
 
 function draftConsumerList(items, type) {
   if (!items?.length) return '<div class="empty-state empty-state--compact">Noch keine Verbraucher ausgewählt</div>';
-  return `<div class="dw-consumer-list">${items.map((c, index) => `<div class="dw-consumer-row dw-consumer-row--editable">
+  return `<div class="tc-consumer-list dw-consumer-list">${items.map((c, index) => `<div class="tc-consumer-row dw-consumer-row dw-consumer-row--editable">
     <div><strong>${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr, 2)} l/s je Verbraucher${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div>
     <label class="mini-edit-field"><span>Anzahl</span><input type="number" min="0" step="1" value="${esc(c.count)}" data-dw-draft-count="${esc(type)}" data-index="${index}" inputmode="numeric"></label>
     <button type="button" data-dw-remove-draft="${esc(type)}" data-index="${index}" aria-label="Verbraucher entfernen">×</button>
@@ -19,7 +19,7 @@ function draftConsumerList(items, type) {
 }
 
 function consumerRows(consumers = []) {
-  return `<div class="dw-consumer-list">${consumers.map(c => `<div class="dw-consumer-row"><div><strong>${esc(c.count)} × ${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr,2)} l/s je Verbraucher${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div></div>`).join('')}</div>`;
+  return `<div class="tc-consumer-list dw-consumer-list">${consumers.map(c => `<div class="tc-consumer-row dw-consumer-row"><div><strong>${esc(c.count)} × ${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr,2)} l/s je Verbraucher${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div></div>`).join('')}</div>`;
 }
 
 function unitRows(units) {
@@ -115,7 +115,7 @@ function selectedFixturesList(r) {
   }
   const rows = [...aggregate.values()];
   if (!rows.length) return '<div class="empty-state empty-state--compact">Noch keine Einrichtungsgegenstände ausgewählt</div>';
-  return `<div class="dw-fixture-list dw-fixture-list--plain">${rows.map(item => `<div class="dw-fixture-row"><strong>${esc(item.count)} × ${esc(item.label)}</strong>${item.permanent ? '<em>Dauerverbraucher</em>' : ''}</div>`).join('')}</div>`;
+  return `<div class="tc-fixture-list dw-fixture-list dw-fixture-list--plain">${rows.map(item => `<div class="tc-fixture-row dw-fixture-row"><strong>${esc(item.count)} × ${esc(item.label)}</strong>${item.permanent ? '<em>Dauerverbraucher</em>' : ''}</div>`).join('')}</div>`;
 }
 
 function inputCard(s, r) {
@@ -133,7 +133,7 @@ function inputCard(s, r) {
       ])
     ].join('')), 'blue'),
     card('Nutzungseinheiten', stack([
-      `<details class="dw-accordion dw-accordion--form" data-dw-accordion="uiUnitFormOpen" ${s.uiUnitFormOpen ? 'open' : ''}><summary><span><strong>Nutzungseinheit zusammenstellen</strong><small>Mehrere Verbraucher auswählen und anschließend als NE speichern</small></span></summary><div class="dw-accordion__body">`,
+      `<details class="tc-accordion dw-accordion dw-accordion--form" data-dw-accordion="uiUnitFormOpen" ${s.uiUnitFormOpen ? 'open' : ''}><summary><span><strong>Nutzungseinheit zusammenstellen</strong><small>Mehrere Verbraucher auswählen und anschließend als NE speichern</small></span></summary><div class="tc-accordion__body dw-accordion__body">`,
       field({ id:'unitName', label:'Bezeichnung', value:s.unitName, placeholder:'z. B. Bad Wohnung 1', inputmode:'text' }),
       grid([
         selectField({ id:'unitConsumerType', label:'Verbraucher hinzufügen', value:s.unitConsumerType, options:consumerOptions() }),
@@ -144,10 +144,10 @@ function inputCard(s, r) {
       `<div data-dw-unit-draft>${draftConsumerList(s.unitDraftConsumers || [], 'unit')}</div>`,
       `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-unit ${s.activeUnitId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-dw-update-unit ${s.activeUnitId ? '' : 'disabled'}>Aktualisieren</button></div>`,
       '</div></details>',
-      `<details class="dw-accordion dw-accordion--saved" data-dw-accordion="uiUnitSavedOpen" ${s.uiUnitSavedOpen ? 'open' : ''}><summary><span><strong>Gespeicherte Nutzungseinheiten</strong><small data-dw-unit-summary>${r.usageUnits.length} Nutzungseinheiten angelegt</small></span></summary><div class="dw-accordion__body" data-dw-unit-saved>${unitRows(r.usageUnits)}</div></details>`
+      `<details class="tc-accordion dw-accordion dw-accordion--saved" data-dw-accordion="uiUnitSavedOpen" ${s.uiUnitSavedOpen ? 'open' : ''}><summary><span><strong>Gespeicherte Nutzungseinheiten</strong><small data-dw-unit-summary>${r.usageUnits.length} Nutzungseinheiten angelegt</small></span></summary><div class="tc-accordion__body dw-accordion__body" data-dw-unit-saved>${unitRows(r.usageUnits)}</div></details>`
     ].join('')), 'blue'),
     card('Einzelverbraucher außerhalb NE', stack([
-      `<details class="dw-accordion dw-accordion--form" data-dw-accordion="uiSingleFormOpen" ${s.uiSingleFormOpen ? 'open' : ''}><summary><span><strong>Freie Einrichtungsgegenstände zusammenstellen</strong><small>Mehrere Verbraucher außerhalb einer Nutzungseinheit als Gruppe anlegen</small></span></summary><div class="dw-accordion__body">`,
+      `<details class="tc-accordion dw-accordion dw-accordion--form" data-dw-accordion="uiSingleFormOpen" ${s.uiSingleFormOpen ? 'open' : ''}><summary><span><strong>Freie Einrichtungsgegenstände zusammenstellen</strong><small>Mehrere Verbraucher außerhalb einer Nutzungseinheit als Gruppe anlegen</small></span></summary><div class="tc-accordion__body dw-accordion__body">`,
       field({ id:'singleName', label:'Bezeichnung / Gruppe', value:s.singleName, placeholder:'z. B. WC EG', inputmode:'text' }),
       grid([
         selectField({ id:'singleConsumerType', label:'Verbraucher hinzufügen', value:s.singleConsumerType, options:consumerOptions() }),
@@ -161,7 +161,7 @@ function inputCard(s, r) {
       `<div data-dw-single-draft>${draftConsumerList(s.singleDraftConsumers || [], 'single')}</div>`,
       `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-single ${s.activeSingleId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-dw-update-single ${s.activeSingleId ? '' : 'disabled'}>Aktualisieren</button></div>`,
       '</div></details>',
-      `<details class="dw-accordion dw-accordion--saved" data-dw-accordion="uiSingleSavedOpen" ${s.uiSingleSavedOpen ? 'open' : ''}><summary><span><strong>Gespeicherte Einzelverbraucher</strong><small data-dw-single-summary>${r.singleGroups.length} Gruppen außerhalb NE</small></span></summary><div class="dw-accordion__body" data-dw-single-saved>${singleRows(r.singleGroups)}</div></details>`
+      `<details class="tc-accordion dw-accordion dw-accordion--saved" data-dw-accordion="uiSingleSavedOpen" ${s.uiSingleSavedOpen ? 'open' : ''}><summary><span><strong>Gespeicherte Einzelverbraucher</strong><small data-dw-single-summary>${r.singleGroups.length} Gruppen außerhalb NE</small></span></summary><div class="tc-accordion__body dw-accordion__body" data-dw-single-saved>${singleRows(r.singleGroups)}</div></details>`
     ].join('')), 'blue')
   ].join(''));
 }
@@ -183,7 +183,7 @@ function resultCard(r) {
       { label:'Auslegung', value:'Vorläufig über Spitzendurchfluss' }
     ]), 'blue'),
     card('Zusammenstellung Einrichtungsgegenstände', selectedFixturesList(r), 'blue'),
-    card('Hinweis', `<div class="dw-note">Dauerverbraucher werden zum nach Gleichzeitigkeit ermittelten Spitzendurchfluss addiert. Bei zentraler Warmwasserbereitung werden TWW-Zapfstellen zusätzlich berücksichtigt. Bei dezentraler Warmwasserbereitung werden TWW-Verbraucher mit 0,05 l/s für die Warmwasserbereitung angesetzt. 3-Liter-Regel, Probenahmestellen und hygienische Anforderungen sind separat zu prüfen.</div>`, 'blue', { compact:true })
+    card('Hinweis', `<div class="tc-note dw-note">Dauerverbraucher werden zum nach Gleichzeitigkeit ermittelten Spitzendurchfluss addiert. Bei zentraler Warmwasserbereitung werden TWW-Zapfstellen zusätzlich berücksichtigt. Bei dezentraler Warmwasserbereitung werden TWW-Verbraucher mit 0,05 l/s für die Warmwasserbereitung angesetzt. 3-Liter-Regel, Probenahmestellen und hygienische Anforderungen sind separat zu prüfen.</div>`, 'blue', { compact:true })
   ].join(''));
 }
 

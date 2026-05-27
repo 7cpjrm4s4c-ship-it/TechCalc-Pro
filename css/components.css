@@ -4649,3 +4649,250 @@ body::before {
     align-self: end;
   }
 }
+
+/* Phase 3: zentrale UI-Primitives fuer neue und migrierte Module.
+   Modulklassen wie dw-/ph-/rainwater- bleiben nur als Migrations-Aliasse bestehen. */
+.tc-list,
+.tc-consumer-list,
+.tc-saved-list,
+.tc-fixture-list,
+.dw-list,
+.dw-consumer-list,
+.dw-fixture-list,
+.ph-saved-list,
+.rainwater-result-list {
+  display: grid;
+  gap: var(--card-gap, 10px);
+}
+
+.tc-item,
+.tc-consumer-row,
+.tc-fixture-row,
+.dw-consumer-row,
+.dw-fixture-row,
+.wastewater-fixture-row {
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: rgba(255,255,255,.04);
+}
+
+.tc-consumer-row,
+.dw-consumer-row,
+.wastewater-fixture-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 52px;
+  padding: 10px 12px;
+}
+
+.tc-fixture-row,
+.dw-fixture-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 12px;
+}
+
+.tc-pill-list,
+.dw-consumers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.tc-pill,
+.dw-consumers span {
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 12px;
+  color: var(--color-muted);
+  background: rgba(255,255,255,.04);
+}
+
+.tc-add-row,
+.dw-add-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 78px auto;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.tc-add-row select,
+.tc-add-row input,
+.dw-add-row select,
+.dw-add-row input {
+  min-height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  background: rgba(255,255,255,.06);
+  color: var(--color-text);
+  padding: 0 12px;
+  font-weight: 700;
+}
+
+.tc-accordion,
+.dw-accordion {
+  border: 1px solid var(--color-border);
+  border-radius: 22px;
+  background: rgba(255,255,255,.035);
+  overflow: hidden;
+}
+
+.tc-accordion + .tc-accordion,
+.dw-accordion + .dw-accordion {
+  margin-top: var(--card-gap, 10px);
+}
+
+.tc-accordion > summary,
+.dw-accordion > summary {
+  list-style: none;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.tc-accordion > summary::-webkit-details-marker,
+.dw-accordion > summary::-webkit-details-marker {
+  display: none;
+}
+
+.tc-accordion > summary::after,
+.dw-accordion > summary::after {
+  content: '›';
+  color: var(--accent-blue);
+  font-size: 28px;
+  transform: rotate(90deg);
+  transition: transform .18s ease;
+  flex: 0 0 auto;
+}
+
+.tc-accordion[open] > summary::after,
+.dw-accordion[open] > summary::after {
+  transform: rotate(-90deg);
+}
+
+.tc-accordion__body,
+.dw-accordion__body {
+  border-top: 1px solid rgba(255,255,255,.08);
+  padding: 14px;
+}
+
+.tc-help,
+.ph-help {
+  color: var(--color-muted);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 10px 0 0;
+}
+
+.tc-help--inline,
+.ph-help--inline {
+  margin: 8px 0 0;
+}
+
+.tc-note,
+.ph-note,
+.dw-note {
+  font-size: clamp(11px, .9vw, 13px);
+  line-height: 1.35;
+  color: var(--color-muted);
+  font-weight: 700;
+}
+
+.tc-warning-list,
+.ph-warnings {
+  display: grid;
+  gap: 8px;
+}
+
+.tc-warning,
+.ph-warning {
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,.04);
+}
+
+.tc-warning span,
+.ph-warning span {
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.tc-warning strong,
+.ph-warning strong {
+  color: var(--color-text);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.tc-formula,
+.ph-formula {
+  overflow-wrap: anywhere;
+}
+
+.tc-formula--small,
+.ph-formula--small {
+  font-size: clamp(11px, .9vw, 13px);
+}
+
+@media (max-width: 767px) {
+  .tc-add-row,
+  .dw-add-row {
+    grid-template-columns: 1fr;
+  }
+
+  .tc-accordion > summary,
+  .dw-accordion > summary {
+    padding: 13px 14px;
+  }
+
+  .tc-accordion__body,
+  .dw-accordion__body {
+    padding: 12px;
+  }
+
+  .tc-consumer-row,
+  .dw-consumer-row,
+  .wastewater-fixture-row {
+    align-items: flex-start;
+  }
+}
+
+:root[data-theme='light'] .tc-item,
+:root[data-theme='light'] .tc-consumer-row,
+:root[data-theme='light'] .tc-fixture-row,
+:root[data-theme='light'] .tc-accordion,
+:root[data-theme='light'] .tc-warning,
+:root[data-theme='light'] .dw-consumers span,
+:root[data-theme='light'] .dw-add-row select,
+:root[data-theme='light'] .dw-add-row input,
+:root[data-theme='light'] .ph-warning {
+  background: #fff !important;
+  color: #0f172a !important;
+  border-color: rgba(15,23,42,.18) !important;
+}
+
+:root[data-theme='light'] .tc-accordion__body {
+  border-top-color: rgba(15,23,42,.12) !important;
+}
