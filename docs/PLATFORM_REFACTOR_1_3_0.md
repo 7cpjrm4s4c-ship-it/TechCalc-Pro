@@ -129,3 +129,15 @@ Dieser Stand friert modulbezogene UI-Sonderwege ein und fuehrt zentrale `tc-*` P
 ### Neue Regel ab Phase 3
 
 Neue UI-Muster werden ausschliesslich als `tc-*` Primitive eingefuehrt. Modulbezogene Klassen duerfen nur noch als temporaere Legacy-Aliasse in bestehenden Modulen bleiben. Fachliche Eventbindung erfolgt ueber `data-*` Attribute, nicht ueber Styling-Klassen.
+
+## Phase 4 - Modulvertrag und schema-faehige Migration
+
+Phase 4 macht den Modulvertrag explizit und pruefbar. Die Registry validiert Modul-Metadaten beim Registrieren. Konfigurationen werden ueber `defineModuleConfig` typisiert. Neue Plattformdateien:
+
+- `js/core/moduleDefinition.js`
+- `js/core/formSchema.js`
+- `js/core/schemaModuleMount.js`
+- `docs/MODULE_CONTRACT_1_3_0.md`
+- `scripts/audit-module-contracts.mjs`
+
+Regenwasser und Schmutzwasser besitzen erste zentrale Schemas. Diese sind bewusst noch als Adapter-Stufe eingebunden, damit die bestehende UI nicht bricht. Der naechste Schritt ist die schrittweise Entfernung modulindividueller View-Funktionen zugunsten des generischen Schema-Renderers.

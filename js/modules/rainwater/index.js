@@ -1,4 +1,5 @@
 import config from './config.js';
+import schema from './schema.js';
 import { state, initialState } from './state.js';
 import { calculate, getAreaType, toNumber } from './logic.js';
 import { areaTypes, roofDrainTable } from './tables.js';
@@ -472,4 +473,4 @@ function bindActions(root) {
   }
 }
 
-export default { config, state, mount(root) { return mountModule(root, state, view, bindActions); } };
+export default { config, schema, state, mount(root) { return mountModule(root, state, view, bindActions); } };

@@ -1,4 +1,15 @@
 
+## 1.3.0 Phase 4 - Modulvertrag
+
+- Zentraler Modulvertrag ueber `moduleDefinition.js` eingefuehrt.
+- Zentrale Form-/Result-Schemas ueber `formSchema.js` eingefuehrt.
+- Generischer Schema-Mount vorbereitet.
+- Registry validiert Module beim Registrieren.
+- Alle Modulkonfigurationen laufen ueber `defineModuleConfig`.
+- Regenwasser und Schmutzwasser besitzen erste zentrale `schema.js` Dateien.
+- Audit-Script fuer Modulvertrag ergaenzt.
+
+
 ## Version 1.3.0 - Phase 3 UI-System
 
 - Zentrale `tc-*` UI-Primitives fuer Listen, Accordions, Hinweise, Hilfetexte, Formeln und Objektzeilen eingefuehrt.
