@@ -1,4 +1,4 @@
-import { esc, inlineStats, preserveViewport, snapshotViewport, restoreViewportStable } from './renderer.js';
+import { esc, inlineStats, preserveViewport } from './renderer.js';
 
 export function createRecordId(prefix = 'record') {
   try {
@@ -21,35 +21,6 @@ export function removeRecord(items, id) {
 }
 
 
-function cssAttrEscape(value) {
-  return String(value ?? '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-}
-
-function preserveCardPosition(root, card, attr, id, action) {
-  const beforeTop = card?.getBoundingClientRect?.().top;
-  const before = snapshotViewport();
-  action?.();
-  if (!card || !Number.isFinite(beforeTop)) {
-    restoreViewportStable(before, { frames: 14, delays: [0, 40, 100, 220, 420, 800] });
-    return;
-  }
-  const selector = `[${attr}="${cssAttrEscape(id)}"]`;
-  let frames = 14;
-  const restore = () => {
-    const nextCard = root?.querySelector?.(selector);
-    if (nextCard) {
-      const afterTop = nextCard.getBoundingClientRect().top;
-      const delta = afterTop - beforeTop;
-      if (Math.abs(delta) > 0.5) window.scrollBy(0, delta);
-    } else {
-      restoreViewportStable(before, { frames: 1, delays: [] });
-    }
-    frames -= 1;
-    if (frames > 0) requestAnimationFrame(restore);
-  };
-  requestAnimationFrame(restore);
-  [0, 40, 100, 220, 420, 800].forEach(delay => setTimeout(restore, delay));
-}
 
 export function renderSavedRecordList(items = [], {
   activeId = null,
@@ -111,7 +82,7 @@ export function bindSavedRecordList(root, {
       event.preventDefault();
       event.stopPropagation();
       const id = card.getAttribute(loadAttr);
-      preserveCardPosition(root, card, loadAttr, id, () => onLoad?.(id, card, event));
+      preserveViewport(() => onLoad?.(id, card, event), { frames: 18, blurActive: true, delays: [0, 16, 40, 80, 140, 260, 420, 700] });
     });
   });
 

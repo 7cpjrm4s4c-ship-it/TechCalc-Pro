@@ -1,3 +1,10 @@
+## 1.2.18 Refactor Phase 13
+
+- Core: Modul-Render hält während DOM-Austausch die vorherige Höhe, damit mobile Browser die Scrollposition nicht clampen.
+- Core: Saved-Record-Auswahl nutzt nur noch absolute Viewport-Stabilisierung; positionsbasierte Card-Korrektur entfernt.
+- Entwässerung: Anwählen und Abwählen gespeicherter Inhalte ohne erzwungenes Scrollen vorbereitet.
+- Versionierung bleibt für den Release bei 1.2.18.
+
 ## 1.2.18 Refactor Phase 10
 
 - Entwässerung: Viewport-Stabilisierung beim Laden/Löschen gespeicherter Inhalte verstärkt.
