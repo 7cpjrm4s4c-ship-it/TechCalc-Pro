@@ -6,7 +6,7 @@ import { card, field, selectField, segmented, renderModuleShell, stack, grid, ma
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { bindEditModeClear, renderSavedRecordList, bindSavedRecordList, createRecordId, replaceRecord, removeRecord, isSameId } from '../../core/savedRecords.js';
-import { bindDelegatedActionWithCommittedFields, readFieldValue } from '../../core/formActions.js';
+import { bindDelegatedActionWithCommittedFields, bindLiveCollectionInput, readFieldValue } from '../../core/formActions.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
 const fixtureOptions = fixtureTypes.map(item => ({ value: item.id, label: item.name }));
@@ -260,18 +260,12 @@ function bindActions(root) {
     const current = state.get();
     state.set({ fixtures: (current.fixtures || []).filter(item => String(item.id) !== String(btn.dataset.fixtureDelete)) });
   });
-  root.querySelectorAll('[data-fixture-qty]').forEach(input => {
-    const commit = (notify = true) => {
-      const current = state.get();
-      state.set({ fixtures: (current.fixtures || []).map(item => String(item.id) === String(input.dataset.fixtureQty) ? { ...item, quantity: input.value || '0' } : item) }, { notify });
-    };
-    input.addEventListener('input', event => { event.stopPropagation(); commit(false); });
-    input.addEventListener('blur', event => { event.stopPropagation(); commit(true); });
-    input.addEventListener('keydown', event => {
-      if (event.key !== 'Enter') return;
-      event.preventDefault();
-      commit(true);
-    });
+  bindLiveCollectionInput(root, '[data-fixture-qty]', {
+    state,
+    getItems: current => current.fixtures || [],
+    setItems: fixtures => ({ fixtures }),
+    matchId: (item, input) => String(item.id) === String(input.dataset.fixtureQty),
+    readValue: input => ({ quantity: input.value || '0' })
   });
   root.addEventListener('click', event => {
     const familyButton = event.target.closest('[data-line-family]');

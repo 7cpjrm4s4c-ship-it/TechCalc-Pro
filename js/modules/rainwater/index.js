@@ -2,10 +2,10 @@ import config from './config.js';
 import { state, initialState } from './state.js';
 import { calculate, getAreaType, toNumber } from './logic.js';
 import { areaTypes, roofDrainTable } from './tables.js';
-import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultRows, inlineStats, esc } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultRows, inlineStats, esc, preserveViewport } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-import { bindEditModeClear } from '../../core/savedRecords.js';
+import { bindEditModeClear, bindSavedRecordList, renderSavedRecordList, replaceRecord, removeRecord, isSameId } from '../../core/savedRecords.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
 const splitIndex = areaTypes.findIndex(item => item.id === 'concrete-asphalt');
@@ -65,26 +65,28 @@ function savedSnapshot(s, r) {
 }
 function clearedInputs(current = {}) { return { ...initialState, savedCalculations: current.savedCalculations || [] }; }
 function savedRows(s) {
-  const items = Array.isArray(s.savedCalculations) ? s.savedCalculations : [];
-  if (!items.length) return '<div class="empty-state empty-state--compact">Noch keine Regenwasser-Berechnungen gespeichert.</div>';
-  return `<div class="ph-saved-list">${items.map(item => {
-    const r = item.result || {};
-    const active = String(s.activeCalculationId || '') === String(item.id);
-    const subtitle = [`${fmt(r.qr || 0,2)} l/s`, `FL ${r.stackDn || '—'}`, modeLabel(r.mode)].filter(Boolean).join(' · ');
-    return `<article class="line-section-card saved-record-card is-collapsed ${active ? 'is-active' : ''}" data-line-card data-rainwater-select="${esc(item.id)}">
-      <div class="line-section-card__head saved-record-card__head">
-        <div class="line-section-card__title saved-record-card__title"><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle)}</small></div>
-        <button type="button" class="line-section-card__toggle saved-record-card__toggle" data-line-toggle aria-expanded="false" aria-label="Gespeicherte Berechnung aufklappen"><span>▾</span></button>
-        <button type="button" class="line-section-card__delete saved-record-card__delete" data-rainwater-delete="${esc(item.id)}" aria-label="Berechnung löschen">×</button>
-      </div>
-      <div class="line-section-card__body">${resultRows([
-        { label:'Entwässerungsmenge', value:fmt(r.qr || 0,2), unit:'l/s' },
-        { label:'DN Fallleitung', value:r.stackDn || '—' },
-        { label:drainLabel(r.mode), value:r.drains || 0, unit:'Stk.' }
-      ])}</div>
-    </article>`;
-  }).join('')}</div>`;
+  return renderSavedRecordList(s.savedCalculations || [], {
+    activeId: s.activeCalculationId,
+    emptyText: 'Noch keine Regenwasser-Berechnungen gespeichert.',
+    loadAttr: 'data-rainwater-select',
+    toggleAttr: 'data-line-toggle',
+    deleteAttr: 'data-rainwater-delete',
+    title: item => item.name || 'Berechnung',
+    subtitle: item => {
+      const r = item.result || {};
+      return [`${fmt(r.qr || 0, 2)} l/s`, `FL ${r.stackDn || '—'}`, modeLabel(r.mode)].filter(Boolean).join(' · ');
+    },
+    stats: item => {
+      const r = item.result || {};
+      return [
+        { label: 'Entwässerungsmenge', value: fmt(r.qr || 0, 2), unit: 'l/s' },
+        { label: 'DN Fallleitung', value: r.stackDn || '—' },
+        { label: drainLabel(r.mode), value: r.drains || 0, unit: 'Stk.' }
+      ];
+    }
+  });
 }
+
 function surfacesTable(r, s) {
   if (!r.surfaces.length) return '<div class="empty-state empty-state--compact">Noch keine Regenflächen hinzugefügt.</div>';
   const activeId = String(s.activeSurfaceId || '');
@@ -312,15 +314,7 @@ function statePatchFromSurface(item = {}) {
 }
 const surfaceEditFields = new Set(['surfaceMode','areaType','areaName','areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity','drainSize','drainSizeManual','drainCapacity','drainHead','stackCount','emergencyType','emergencyHead','emergencyWidth','emergencyDiameter','emergencyManufacturerDn','emergencyCapacity','emergencySafetyFactor']);
 function preserveScroll(action) {
-  const doc = document.scrollingElement || document.documentElement;
-  const x = window.scrollX || doc.scrollLeft || 0;
-  const y = window.scrollY || doc.scrollTop || 0;
-  action?.();
-  const restore = () => window.scrollTo(x, y);
-  requestAnimationFrame(restore);
-  setTimeout(restore, 0);
-  setTimeout(restore, 60);
-  setTimeout(restore, 160);
+  preserveViewport(action);
 }
 function bindActions(root) {
   bindEditModeClear(root, { state, activeIdKey:'activeCalculationId', nameKey:'name', onClear: () => state.set(clearedInputs(state.get())) });
@@ -386,34 +380,26 @@ function bindActions(root) {
     const existing = saved.find(item => String(item.id) === String(id));
     if (!existing) return;
     const record = { ...savedSnapshot(current, calculate(current)), id, createdAt:existing.createdAt || new Date().toISOString() };
-    state.set({ savedCalculations:saved.map(item => String(item.id) === String(id) ? record : item), activeCalculationId:id, name:record.name });
+    state.set({ savedCalculations:replaceRecord(saved, id, record), activeCalculationId:id, name:record.name });
   });
-  root.querySelectorAll('[data-line-toggle]').forEach(toggle => toggle.addEventListener('click', event => {
-    event.preventDefault();
-    event.stopPropagation();
-    const itemCard = toggle.closest('[data-line-card]');
-    const collapsed = itemCard?.classList.toggle('is-collapsed');
-    toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-  }));
-  root.querySelectorAll('[data-rainwater-select]').forEach(cardEl => cardEl.addEventListener('click', event => {
-    if (event.target.closest('[data-rainwater-delete]') || event.target.closest('[data-line-toggle]')) return;
-    event.preventDefault();
-    event.stopPropagation();
-    const current = state.get();
-    const item = (current.savedCalculations || []).find(entry => String(entry.id) === String(cardEl.dataset.rainwaterSelect));
-    if (!item?.state) return;
-    preserveScroll(() => {
-      if (String(current.activeCalculationId || '') === String(item.id)) { state.set(clearedInputs(current)); return; }
-      state.set({ ...item.state, savedCalculations:current.savedCalculations || [], activeCalculationId:item.id, name:item.name || item.state.name || '' });
-    });
-  }));
-  root.querySelectorAll('[data-rainwater-delete]').forEach(btn => btn.addEventListener('click', event => {
-    event.preventDefault();
-    event.stopPropagation();
-    const current = state.get();
-    const next = (current.savedCalculations || []).filter(item => String(item.id) !== String(btn.dataset.rainwaterDelete));
-    preserveScroll(() => state.set({ savedCalculations:next, activeCalculationId:String(current.activeCalculationId) === String(btn.dataset.rainwaterDelete) ? null : current.activeCalculationId }));
-  }));
+  bindSavedRecordList(root, {
+    loadAttr: 'data-rainwater-select',
+    toggleAttr: 'data-line-toggle',
+    deleteAttr: 'data-rainwater-delete',
+    onLoad: id => {
+      const current = state.get();
+      const item = (current.savedCalculations || []).find(entry => isSameId(entry.id, id));
+      if (!item?.state) return;
+      preserveScroll(() => {
+        if (isSameId(current.activeCalculationId, item.id)) { state.set(clearedInputs(current)); return; }
+        state.set({ ...item.state, savedCalculations:current.savedCalculations || [], activeCalculationId:item.id, name:item.name || item.state.name || '' });
+      });
+    },
+    onDelete: id => {
+      const current = state.get();
+      preserveScroll(() => state.set({ savedCalculations:removeRecord(current.savedCalculations || [], id), activeCalculationId:isSameId(current.activeCalculationId, id) ? null : current.activeCalculationId }));
+    }
+  });
 
   root.addEventListener('click', event => {
     const current = state.get();

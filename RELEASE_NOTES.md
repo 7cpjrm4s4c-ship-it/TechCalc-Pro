@@ -1,3 +1,11 @@
+## 1.2.18 Refactor Phase 5
+
+- Gemeinsamen Viewport-Stabilisierer im Renderer ergänzt und Regenwasser-Scroll-Patch darauf umgestellt.
+- Regenwasser Saved-Record-Liste auf zentrale Komponente und zentrale ID-/Replace-/Remove-Helfer umgestellt.
+- Schmutzwasser Mengenfelder auf delegierten Live-Input-Helper umgestellt; weniger Einzelbindings nach jedem Render.
+- Eingabe-Render nach Blur/Change von Timeout auf requestAnimationFrame umgestellt.
+- Versionierung bleibt für den Release bei 1.2.18.
+
 ## 1.2.18 Refactor Phase 4
 - Entwässerungs-Listen und Anzahlfelder weiter vereinheitlicht.
 - Aktionsbuttons übernehmen aktive Eingaben jetzt vor dem Klick-Workflow, damit Hinzufügen direkt nach Zahleneingabe funktioniert.

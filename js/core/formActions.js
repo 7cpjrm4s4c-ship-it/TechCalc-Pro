@@ -63,3 +63,32 @@ export function normalizeQuantityInput(value, fallback = 0) {
   const normalized = Number(String(value ?? '').replace(',', '.'));
   return Number.isFinite(normalized) ? normalized : fallback;
 }
+
+export function bindLiveCollectionInput(root, selector, { state, getItems, setItems, matchId, readValue, notifyOnInput = false }) {
+  if (!root || !state || typeof state.set !== 'function') return;
+  const commit = (input, notify = true) => {
+    if (!input) return;
+    const current = state.get();
+    const items = typeof getItems === 'function' ? getItems(current) : [];
+    const next = (items || []).map(item => matchId(item, input) ? { ...item, ...readValue(input, item, current) } : item);
+    state.set(setItems(next, current), { notify });
+  };
+  root.addEventListener('input', event => {
+    const input = event.target.closest(selector);
+    if (!input) return;
+    event.stopPropagation();
+    commit(input, notifyOnInput);
+  });
+  root.addEventListener('blur', event => {
+    const input = event.target.closest(selector);
+    if (!input) return;
+    event.stopPropagation();
+    commit(input, true);
+  }, true);
+  root.addEventListener('keydown', event => {
+    const input = event.target.closest(selector);
+    if (!input || event.key !== 'Enter') return;
+    event.preventDefault();
+    commit(input, true);
+  });
+}

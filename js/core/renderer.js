@@ -84,6 +84,21 @@ export function emptyCard(title, message, accent = 'blue') {
   return card(title, `<div class="empty-state">${message}</div>`, accent);
 }
 
+
+export function preserveViewport(action, { frames = 2 } = {}) {
+  const doc = document.scrollingElement || document.documentElement;
+  const x = window.scrollX || doc.scrollLeft || 0;
+  const y = window.scrollY || doc.scrollTop || 0;
+  action?.();
+  let remaining = Math.max(1, frames);
+  const restore = () => {
+    window.scrollTo(x, y);
+    remaining -= 1;
+    if (remaining > 0) requestAnimationFrame(restore);
+  };
+  requestAnimationFrame(restore);
+}
+
 export function renderModuleShell(module, inner) {
   return `<section class="module-view" data-module="${esc(module.id)}">
     <div class="module-content">${inner}</div>
@@ -99,8 +114,8 @@ export function bindCommonInputs(root, state) {
   };
 
   const scheduleRenderAfterEditing = () => {
-    if (pendingRender) clearTimeout(pendingRender);
-    pendingRender = setTimeout(() => {
+    if (pendingRender) cancelAnimationFrame(pendingRender);
+    pendingRender = requestAnimationFrame(() => {
       const active = document.activeElement;
       const committedActionAt = Number(root?.dataset?.tcCommittedActionAt || 0);
       // Klicks auf Aktionsbuttons sollen zuerst die Eingabe übernehmen und dann die Aktion ausführen.
