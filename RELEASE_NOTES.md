@@ -229,3 +229,10 @@
 - Puffer: Beim Abwählen einer gespeicherten Card werden die Eingabefelder geleert.
 - Trinkwasser: Einzelverbraucher-Auswahl lädt sauber in Bearbeitung und Zusammenstellung; Auswahl-Handler bricht danach korrekt ab.
 - Navigation: Modulauswahlleiste bleibt auf Desktop/Tablet fix unterhalb des Headers, Content läuft dahinter durch.
+
+## 1.2.18 Refactor Phase 6 - Eingabe-UX Schmutzwasser/Regenwasser
+
+- Schmutzwasser: Gegenstände werden beim Hinzufügen nicht mehr als einzelne Mehrfachzeilen erzeugt; identische Gegenstände werden sauber zusammengeführt und die Anzahl wird kumuliert.
+- Schmutzwasser: Aktive Anzahl-Eingaben werden vor Aktionen zuverlässig übernommen.
+- Regenwasser: Aktive Flächenfelder werden laufend mit der ausgewählten Fläche synchronisiert, damit Fläche A bei Änderungen an anderen Parametern nicht auf den Ausgangswert zurückspringt.
+- Regenwasser: Fläche hinzufügen/aktualisieren übernimmt vor der Aktion alle offenen Eingabefelder.

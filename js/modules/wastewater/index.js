@@ -235,18 +235,27 @@ function bindActions(root) {
     const current = state.get();
     const typeId = readFieldValue(root, 'fixtureType', current.fixtureType || 'washbasin');
     const base = getFixture(typeId);
+    const quantity = readFieldValue(root, 'fixtureQuantity', current.fixtureQuantity || '1');
     const record = {
       id: createRecordId('fixture'),
       typeId,
-      quantity: readFieldValue(root, 'fixtureQuantity', current.fixtureQuantity || '1')
+      quantity
     };
     if (base?.custom) {
       record.customName = readFieldValue(root, 'fixtureCustomName', current.fixtureCustomName || 'Freier Gegenstand');
       record.customDu = readFieldValue(root, 'fixtureCustomDu', current.fixtureCustomDu || '0');
       record.customDn = readFieldValue(root, 'fixtureCustomDn', current.fixtureCustomDn || '—');
     }
+    const sameFixture = item => String(item.typeId) === String(record.typeId)
+      && String(item.customName || '') === String(record.customName || '')
+      && String(item.customDu || '') === String(record.customDu || '')
+      && String(item.customDn || '') === String(record.customDn || '');
+    const existing = (current.fixtures || []).find(sameFixture);
+    const fixtures = existing
+      ? (current.fixtures || []).map(item => sameFixture(item) ? { ...item, quantity: String(toNumber(item.quantity || 0) + toNumber(quantity || 0)).replace('.', ',') } : item)
+      : [...(current.fixtures || []), record];
     state.set({
-      fixtures: [...(current.fixtures || []), record],
+      fixtures,
       fixtureQuantity: '1',
       fixtureCustomName: '',
       fixtureCustomDu: '',

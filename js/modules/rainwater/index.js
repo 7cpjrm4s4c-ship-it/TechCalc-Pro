@@ -283,6 +283,22 @@ function patchActiveSurfaceFromState() {
   state.set({ surfaces: next }, { notify:false });
   return true;
 }
+function commitActiveSurfaceField(field, value) {
+  if (!surfaceEditFields.has(field)) return false;
+  const current = state.get();
+  const activeId = current.activeSurfaceId;
+  if (!activeId) return false;
+  const nextCurrent = { ...current, [field]: value };
+  const patch = surfacePatchFromState(nextCurrent);
+  const next = (current.surfaces || []).map(item => String(item.id) === String(activeId) ? { ...item, ...patch } : item);
+  state.set({ [field]: value, surfaces: next }, { notify:false });
+  return true;
+}
+function commitSurfaceFieldsBeforeAction(root) {
+  root.querySelectorAll('[data-field]').forEach(el => {
+    if (surfaceEditFields.has(el.dataset.field)) commitActiveSurfaceField(el.dataset.field, el.value);
+  });
+}
 function statePatchFromSurface(item = {}) {
   const mode = item.surfaceMode || item.calculationType || 'roof';
   return {
@@ -318,7 +334,19 @@ function preserveScroll(action) {
 }
 function bindActions(root) {
   bindEditModeClear(root, { state, activeIdKey:'activeCalculationId', nameKey:'name', onClear: () => state.set(clearedInputs(state.get())) });
+  root.addEventListener('input', event => {
+    const el = event.target.closest('[data-field]');
+    if (!el) return;
+    commitActiveSurfaceField(el.dataset.field, el.value);
+  });
+  root.addEventListener('change', event => {
+    const el = event.target.closest('[data-field]');
+    if (!el) return;
+    commitActiveSurfaceField(el.dataset.field, el.value);
+  });
+  root.querySelector('[data-surface-add]')?.addEventListener('pointerdown', () => commitSurfaceFieldsBeforeAction(root), { capture:true });
   root.querySelector('[data-surface-add]')?.addEventListener('click', () => {
+    commitSurfaceFieldsBeforeAction(root);
     const current = state.get();
     const patch = surfacePatchFromState(current);
     const base = getAreaType(patch.areaType || defaultAreaTypeForMode(patch.surfaceMode));
@@ -359,9 +387,11 @@ function bindActions(root) {
     preserveScroll(() => state.set({ drainSize:selected.dn, drainSizeManual:selected.dn, drainCapacity:String(selected.capacity).replace('.', ','), drainHead:String(selected.head) }));
   });
 
+  root.querySelector('[data-surface-update]')?.addEventListener('pointerdown', () => commitSurfaceFieldsBeforeAction(root), { capture:true });
   root.querySelector('[data-surface-update]')?.addEventListener('click', event => {
     event.preventDefault();
     event.stopPropagation();
+    commitSurfaceFieldsBeforeAction(root);
     preserveScroll(() => {
       if (!patchActiveSurfaceFromState()) return;
       state.set({}, { notify:true });
