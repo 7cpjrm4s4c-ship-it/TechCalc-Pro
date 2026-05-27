@@ -1,7 +1,7 @@
 import { areaTypes, hydraulicTables, dnOrder, roofDrainTable } from './tables.js';
-import { parseGermanNumber } from '../../core/numbers.js';
+import { numberService } from '../../core/numberService.js';
 
-export const toNumber = value => parseGermanNumber(value, 0);
+export const toNumber = value => numberService.parse(value, { fallback: 0, locale: 'de-DE' });
 
 export function getAreaType(id) {
   return areaTypes.find(item => item.id === id) || areaTypes[0];

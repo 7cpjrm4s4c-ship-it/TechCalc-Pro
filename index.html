@@ -109,10 +109,11 @@
               <p>Release Notes werden geladen …</p>
             </div>
             <script type="text/plain" id="releaseNotesFallback">
-## Version 1.3.0 - Hosting / Darstellung Hotfix
-- Release Notes werden im Menü dynamisch mit Versionsparameter geladen und nicht mehr aus dem Browsercache gelesen.
-- Service Worker nutzt für Navigation und Release Notes eine Network-First-Strategie, damit nach dem Hosting neue Inhalte sichtbar werden.
-- Darstellungseinstellungen werden dauerhaft in localStorage gespeichert und bleiben nach Schließen der App erhalten.
+## Version 1.3.0 - Plattform-Refactor Phase 2
+- Zentraler numberService fuer deutsche Zahleneingaben.
+- Zentraler scrollManager fuer einheitliche Scroll-Stabilität.
+- Zentraler savedCalculationController fuer Speichern, Aktualisieren, Laden und Löschen gespeicherter Berechnungen.
+- Regenwasser und Schmutzwasser/Entwässerung nutzen die zentrale Saved-Calculation-Logik.
 
 ## Version 1.2.16 - Release Notes / Link-State Hotfix
 - Release Notes im Menü auf den aktuellen Stand gebracht.

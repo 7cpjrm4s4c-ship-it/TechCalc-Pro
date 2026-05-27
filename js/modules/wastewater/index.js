@@ -2,11 +2,13 @@ import config from './config.js';
 import { state, initialState } from './state.js';
 import { calculate, getFixture, toNumber } from './logic.js';
 import { fixtureTypes, usageTypes } from './tables.js';
-import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultRows, inlineStats, esc, preserveViewport } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultRows, inlineStats, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-import { bindEditModeClear, renderSavedRecordList, bindSavedRecordList, createRecordId, replaceRecord, removeRecord, isSameId } from '../../core/savedRecords.js';
+import { bindEditModeClear, renderSavedRecordList, createRecordId } from '../../core/savedRecords.js';
 import { readFieldValue, normalizeQuantityInput } from '../../core/formActions.js';
+import { bindSavedCalculationActions } from '../../core/savedCalculationController.js';
+import { preserveActionScroll } from '../../core/scrollManager.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
 const fixtureOptions = fixtureTypes.map(item => ({ value: item.id, label: item.name }));
@@ -259,7 +261,7 @@ function readFixtureDraft(root, current = {}) {
   return record;
 }
 function keepViewport(action) {
-  preserveViewport(action, { frames: 10, blurActive: true, delays: [40, 100, 220, 420] });
+  preserveActionScroll(action);
 }
 
 function addFixtureFromCurrentInputs(root) {
@@ -330,41 +332,16 @@ function bindActions(root) {
       state.set({ fixtures }, { notify:true });
     });
   }
-  root.querySelector('[data-wastewater-save]')?.addEventListener('click', () => {
-    const current = state.get();
-    const r = calculate(current);
-    const saved = current.savedCalculations || [];
-    const record = savedSnapshot({ ...current, activeCalculationId: null }, r);
-    state.set({ savedCalculations: [record, ...saved], activeCalculationId: null, name: '' });
-  });
-  root.querySelector('[data-wastewater-update]')?.addEventListener('click', () => {
-    const current = state.get();
-    const id = current.activeCalculationId;
-    if (!id) return;
-    const saved = current.savedCalculations || [];
-    const existing = saved.find(item => String(item.id) === String(id));
-    if (!existing) return;
-    const record = { ...savedSnapshot(current, calculate(current)), id, createdAt: existing.createdAt || new Date().toISOString() };
-    state.set({ savedCalculations: replaceRecord(saved, id, record), activeCalculationId: id, name: record.name });
-  });
-  bindSavedRecordList(root, {
+  bindSavedCalculationActions(root, {
+    state,
+    calculate,
+    snapshot: savedSnapshot,
+    clearInputs: clearedInputs,
+    saveSelector: '[data-wastewater-save]',
+    updateSelector: '[data-wastewater-update]',
     loadAttr: 'data-wastewater-select',
     toggleAttr: 'data-line-toggle',
-    deleteAttr: 'data-wastewater-delete',
-    onLoad: id => {
-      const current = state.get();
-      const item = (current.savedCalculations || []).find(entry => isSameId(entry.id, id));
-      if (!item?.state) return;
-      if (isSameId(current.activeCalculationId, item.id)) {
-        state.set(clearedInputs(current));
-        return;
-      }
-      state.set({ ...item.state, savedCalculations: current.savedCalculations || [], activeCalculationId: item.id, name: item.name || item.state.name || '' });
-    },
-    onDelete: id => {
-      const current = state.get();
-      keepViewport(() => state.set({ savedCalculations: removeRecord(current.savedCalculations || [], id), activeCalculationId: isSameId(current.activeCalculationId, id) ? null : current.activeCalculationId }));
-    }
+    deleteAttr: 'data-wastewater-delete'
   });
 }
 

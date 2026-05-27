@@ -1,4 +1,4 @@
-## Version 1.3.0 - Plattform-Refactor Start
+## Version 1.3.0 - Plattform-Refactor Phase 2
 
 - Zentrale Plattform-Regeln fuer Module eingefuehrt (`platformPolicy`).
 - Neuer `numberService` als einzige Quelle fuer deutsche Zahleneingaben.
@@ -6,6 +6,10 @@
 - `normalizeQuantityInput` nutzt jetzt ebenfalls den deutschen Zahlenparser, damit Eingaben wie `2.500` nicht mehr als `2,5` interpretiert werden.
 - `moduleContract` als Zielvertrag fuer schema-basierte Module eingefuehrt.
 - Dokumentation fuer den 1.3.0 Plattform-Refactor ergänzt.
+- Zentraler `scrollManager` fuer einheitliche Scroll-Stabilität eingeführt.
+- Zentraler `savedCalculationController` fuer Speichern, Aktualisieren, Laden und Löschen gespeicherter Berechnungen eingeführt.
+- Regenwasser und Schmutzwasser/Entwässerung nutzen die zentrale Saved-Calculation-Logik.
+- Fachlogik von Regenwasser und Schmutzwasser nutzt den zentralen `numberService`.
 
 ## 1.2.18 Refactor Phase 13
 

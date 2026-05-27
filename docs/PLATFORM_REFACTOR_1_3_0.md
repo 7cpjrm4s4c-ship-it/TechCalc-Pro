@@ -69,3 +69,33 @@ js/core/
 - Auswahl, Abwahl und Löschen gespeicherter Inhalte verursachen keine Scroll-Sprünge.
 - Ein Modul kann ohne eigenes Layout gerendert werden.
 - Ergebnisse sind zentral formatiert und PDF-kompatibel.
+
+## Phase 2 - Module an Plattform anbinden
+
+Dieser Stand zieht die ersten bestehenden Module auf zentrale Plattformdienste, ohne die Fachlogik fachlich zu verändern.
+
+### Zentral neu
+
+- `js/core/scrollManager.js`
+  - zentrale Scroll-Stabilitätsprofile (`default`, `action`, `savedRecord`)
+  - keine modulindividuellen Timing-Arrays mehr für neue Migrationen
+- `js/core/savedCalculationController.js`
+  - einheitliche Save/Update/Load/Delete-Aktionen für gespeicherte Berechnungen
+  - nutzt zentralen Scroll Manager für gespeicherte Inhalte
+
+### Migriert
+
+- Regenwasser
+  - gespeicherte Berechnungen laufen über `bindSavedCalculationActions`
+  - Scroll-Verhalten nutzt `scrollManager`
+  - Fachzahlen laufen über `numberService`
+- Schmutzwasser / Entwässerung
+  - gespeicherte Berechnungen laufen über `bindSavedCalculationActions`
+  - Mengen- und Berechnungszahlen laufen über `numberService`
+  - bestehender Fixture-Editor bleibt fachlich unverändert
+
+### Neue Regel ab Phase 2
+
+Module dürfen für gespeicherte Berechnungen keine eigenen Save/Update/Load/Delete-Handler mehr implementieren. Neue oder migrierte Module nutzen ausschließlich `bindSavedCalculationActions` oder einen daraus abgeleiteten zentralen Controller.
+
+Module dürfen keine eigene Zahlenparser-Logik mehr definieren. Fachlogik nutzt `numberService` oder kompatible Wrapper in `core/numbers.js`.

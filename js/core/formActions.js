@@ -1,4 +1,4 @@
-import { parseGermanNumber } from './numbers.js';
+import { numberService } from './numberService.js';
 
 export function fieldSelector(key) {
   const safe = String(key || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
@@ -62,7 +62,7 @@ export function bindDelegatedActionWithCommittedFields(root, selector, state, ke
 }
 
 export function normalizeQuantityInput(value, fallback = 0) {
-  return parseGermanNumber(value, fallback);
+  return numberService.parse(value, { fallback, locale: 'de-DE' });
 }
 
 export function bindLiveCollectionInput(root, selector, { state, getItems, setItems, matchId, readValue, notifyOnInput = false }) {

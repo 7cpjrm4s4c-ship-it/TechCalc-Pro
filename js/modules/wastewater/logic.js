@@ -1,9 +1,7 @@
 import { branchConnectionTable, stackTable, hydraulicTables, dnOrder, fixtureTypes, usageTypes } from './tables.js';
+import { numberService } from '../../core/numberService.js';
 
-export const toNumber = value => {
-  const n = Number(String(value ?? '').replace(',', '.'));
-  return Number.isFinite(n) ? n : 0;
-};
+export const toNumber = value => numberService.parse(value, { fallback: 0, locale: 'de-DE' });
 
 export function getFixture(typeId) {
   return fixtureTypes.find(item => item.id === typeId) || fixtureTypes[0];
