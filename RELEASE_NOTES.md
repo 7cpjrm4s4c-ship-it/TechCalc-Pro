@@ -236,3 +236,17 @@
 - Schmutzwasser: Aktive Anzahl-Eingaben werden vor Aktionen zuverlässig übernommen.
 - Regenwasser: Aktive Flächenfelder werden laufend mit der ausgewählten Fläche synchronisiert, damit Fläche A bei Änderungen an anderen Parametern nicht auf den Ausgangswert zurückspringt.
 - Regenwasser: Fläche hinzufügen/aktualisieren übernimmt vor der Aktion alle offenen Eingabefelder.
+
+## 1.2.18 Refactor Phase 7
+- Schmutzwasser: Root-Event-Duplikate entfernt; Gegenstände werden bei Eingabe/Aktion nicht mehr mehrfach verarbeitet.
+- Schmutzwasser: Mengenfelder direkt und ohne mehrfach gebundene Delegation aktualisiert.
+- Regenwasser: Flächenanlage lässt Eingabewerte stabil stehen und markiert neue Flächen nicht mehr automatisch als aktiv.
+- Regenwasser: Aktive Fläche wird erst bei Abwahl/externem Klick sauber verlassen und der Editor danach zurückgesetzt.
+- Regenwasser: doppelte Root-Listener für Eingaben und Abwahl entfernt.
+
+
+## 1.2.18 Refactor Phase 8
+- Schmutzwasser: Gegenstands-Hinzufügen auf einmalige Event-Delegation umgestellt.
+- Schmutzwasser: Leitungsart als stabiles Auswahlmenü umgesetzt.
+- Schmutzwasser: Mengenfelder mobil/desktop neu ausgerichtet.
+- Regenwasser: Flächenformular behält die Eingabe nach dem Hinzufügen; aktive Markierung wird nicht mehr gesetzt.

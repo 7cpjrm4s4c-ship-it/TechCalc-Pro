@@ -328,22 +328,38 @@ function statePatchFromSurface(item = {}) {
     emergencySafetyFactor: item.emergencySafetyFactor
   };
 }
+function clearSurfaceEditorPatch(current = {}) {
+  const mode = current.surfaceMode || current.calculationType || 'roof';
+  return {
+    activeSurfaceId: null,
+    surfaceMode: mode,
+    calculationType: mode,
+    areaType: normalizeAreaType(mode, defaultAreaTypeForMode(mode)),
+    areaName: '',
+    areaSize: '100',
+    customCs: '',
+    customCm: ''
+  };
+}
 const surfaceEditFields = new Set(['surfaceMode','areaType','areaName','areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity','drainSize','drainSizeManual','drainCapacity','drainHead','stackCount','emergencyType','emergencyHead','emergencyWidth','emergencyDiameter','emergencyManufacturerDn','emergencyCapacity','emergencySafetyFactor']);
 function preserveScroll(action) {
   preserveViewport(action);
 }
 function bindActions(root) {
   bindEditModeClear(root, { state, activeIdKey:'activeCalculationId', nameKey:'name', onClear: () => state.set(clearedInputs(state.get())) });
-  root.addEventListener('input', event => {
-    const el = event.target.closest('[data-field]');
-    if (!el) return;
-    commitActiveSurfaceField(el.dataset.field, el.value);
-  });
-  root.addEventListener('change', event => {
-    const el = event.target.closest('[data-field]');
-    if (!el) return;
-    commitActiveSurfaceField(el.dataset.field, el.value);
-  });
+  if (!root.__rainwaterInputBound) {
+    root.__rainwaterInputBound = true;
+    root.addEventListener('input', event => {
+      const el = event.target.closest('[data-field]');
+      if (!el) return;
+      commitActiveSurfaceField(el.dataset.field, el.value);
+    });
+    root.addEventListener('change', event => {
+      const el = event.target.closest('[data-field]');
+      if (!el) return;
+      commitActiveSurfaceField(el.dataset.field, el.value);
+    });
+  }
   root.querySelector('[data-surface-add]')?.addEventListener('pointerdown', () => commitSurfaceFieldsBeforeAction(root), { capture:true });
   root.querySelector('[data-surface-add]')?.addEventListener('click', () => {
     commitSurfaceFieldsBeforeAction(root);
@@ -352,7 +368,7 @@ function bindActions(root) {
     const base = getAreaType(patch.areaType || defaultAreaTypeForMode(patch.surfaceMode));
     const record = { id:`${Date.now()}-${Math.random().toString(16).slice(2)}`, ...patch };
     if (base?.custom) { record.customCs = current.customCs; record.customCm = current.customCm; }
-    preserveScroll(() => state.set({ surfaces:[...(current.surfaces || []), record], activeSurfaceId:record.id, areaName:'', areaSize:'100', customCs:'', customCm:'' }));
+    preserveScroll(() => state.set({ ...patch, surfaces:[...(current.surfaces || []), record], activeSurfaceId:null }));
   });
 
   root.querySelectorAll('[data-segment="surfaceMode"]').forEach(btn => btn.addEventListener('click', event => {
@@ -374,7 +390,7 @@ function bindActions(root) {
     const id = el.dataset.surfaceSelect || el.dataset.surfaceResultSelect;
     const current = state.get();
     if (String(current.activeSurfaceId || '') === String(id)) {
-      preserveScroll(() => state.set({ activeSurfaceId:null }));
+      preserveScroll(() => state.set(clearSurfaceEditorPatch(current)));
       return;
     }
     const item = (current.surfaces || []).find(entry => String(entry.id) === String(id));
@@ -431,13 +447,16 @@ function bindActions(root) {
     }
   });
 
-  root.addEventListener('click', event => {
-    const current = state.get();
-    if (!current.activeSurfaceId) return;
-    const ignore = '[data-surface-select], [data-surface-result-select], [data-surface-delete], [data-line-card], [data-line-toggle], input, select, textarea, button, label, a, .segmented';
-    if (event.target.closest(ignore)) return;
-    preserveScroll(() => state.set({ activeSurfaceId:null }));
-  });
+  if (!root.__rainwaterOutsideBound) {
+    root.__rainwaterOutsideBound = true;
+    root.addEventListener('click', event => {
+      const current = state.get();
+      if (!current.activeSurfaceId) return;
+      const ignore = '[data-surface-select], [data-surface-result-select], [data-surface-delete], [data-line-card], [data-line-toggle], input, select, textarea, button, label, a, .segmented';
+      if (event.target.closest(ignore)) return;
+      preserveScroll(() => state.set(clearSurfaceEditorPatch(current)));
+    });
+  }
 }
 
 export default { config, state, mount(root) { return mountModule(root, state, view, bindActions); } };

@@ -6,11 +6,21 @@ import { card, field, selectField, segmented, renderModuleShell, stack, grid, ma
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { bindEditModeClear, renderSavedRecordList, bindSavedRecordList, createRecordId, replaceRecord, removeRecord, isSameId } from '../../core/savedRecords.js';
-import { bindDelegatedActionWithCommittedFields, bindLiveCollectionInput, readFieldValue } from '../../core/formActions.js';
+import { readFieldValue, normalizeQuantityInput } from '../../core/formActions.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
 const fixtureOptions = fixtureTypes.map(item => ({ value: item.id, label: item.name }));
 const usageOptions = usageTypes.map(item => ({ value: item.value, label: item.label }));
+const lineTypeOptions = [
+  { value:'single-unvented', label:'Einzelanschluss unbelüftet' },
+  { value:'single-vented', label:'Einzelanschluss belüftet' },
+  { value:'branch-unvented', label:'Anschlussleitung unbelüftet' },
+  { value:'branch-vented', label:'Anschlussleitung belüftet' },
+  { value:'stack', label:'Fallleitung' },
+  { value:'collector', label:'Sammelleitung' },
+  { value:'ground-inside', label:'Grundleitung innen' },
+  { value:'ground-outside', label:'Grundleitung außen' }
+];
 
 const fmtDecimalInput = (value, digits = 1) => {
   if (value === '' || value === null || value === undefined) return '';
@@ -170,7 +180,7 @@ function warningList(warnings, lineType) {
 }
 function inputCards(s, r) {
   const lineFields = [
-    lineTypeSelector(s),
+    selectField({ id:'lineType', label:'Leitungsart', value:s.lineType || 'single-unvented', options:lineTypeOptions }),
     grid([
       field({ id:'slopeCmM', label:'Gefälle J', value:fmtDecimalInput(s.slopeCmM,1), unit:'cm/m' }),
       selectField({ id:'fillRatio', label:'Füllungsgrad h/di', value:s.fillRatio, options:opts([['0.5','0,5'],['0.7','0,7'],['1.0','1,0']]) })
@@ -229,70 +239,93 @@ function view(s) {
   const r = calculate(s);
   return renderModuleShell(config, `<div class="span-6">${inputCards(s, r)}</div><div class="span-6">${resultCards(s, r)}</div>`);
 }
+
+function normalizedFixtureQuantity(value) {
+  return Math.max(0, Math.round(normalizeQuantityInput(value, 1)) || 0);
+}
+function fixtureKey(item = {}) {
+  return [item.typeId || '', item.customName || '', item.customDu || '', item.customDn || ''].join('|');
+}
+function readFixtureDraft(root, current = {}) {
+  const typeId = readFieldValue(root, 'fixtureType', current.fixtureType || 'washbasin');
+  const base = getFixture(typeId);
+  const quantity = normalizedFixtureQuantity(readFieldValue(root, 'fixtureQuantity', current.fixtureQuantity || '1'));
+  const record = { id: createRecordId('fixture'), typeId, quantity: String(quantity) };
+  if (base?.custom) {
+    record.customName = readFieldValue(root, 'fixtureCustomName', current.fixtureCustomName || 'Freier Gegenstand');
+    record.customDu = readFieldValue(root, 'fixtureCustomDu', current.fixtureCustomDu || '0');
+    record.customDn = readFieldValue(root, 'fixtureCustomDn', current.fixtureCustomDn || '—');
+  }
+  return record;
+}
+function addFixtureFromCurrentInputs(root) {
+  const current = state.get();
+  const record = readFixtureDraft(root, current);
+  if (normalizedFixtureQuantity(record.quantity) <= 0) return;
+  const key = fixtureKey(record);
+  let merged = false;
+  const fixtures = (current.fixtures || []).map(item => {
+    if (fixtureKey(item) !== key) return item;
+    merged = true;
+    const nextQty = normalizedFixtureQuantity(item.quantity) + normalizedFixtureQuantity(record.quantity);
+    return { ...item, quantity: String(nextQty) };
+  });
+  const nextFixtures = merged ? fixtures : [...fixtures, record];
+  state.set({ fixtures: nextFixtures, fixtureQuantity: '1', fixtureCustomName: '', fixtureCustomDu: '', fixtureCustomDn: '' });
+}
+
 function bindActions(root) {
   bindEditModeClear(root, { state, activeIdKey: 'activeCalculationId', nameKey: 'name', onClear: () => state.set(clearedInputs(state.get())) });
-  bindDelegatedActionWithCommittedFields(root, '[data-fixture-add]', state, ['fixtureType', 'fixtureQuantity', 'fixtureCustomName', 'fixtureCustomDu', 'fixtureCustomDn'], () => {
-    const current = state.get();
-    const typeId = readFieldValue(root, 'fixtureType', current.fixtureType || 'washbasin');
-    const base = getFixture(typeId);
-    const quantity = readFieldValue(root, 'fixtureQuantity', current.fixtureQuantity || '1');
-    const record = {
-      id: createRecordId('fixture'),
-      typeId,
-      quantity
-    };
-    if (base?.custom) {
-      record.customName = readFieldValue(root, 'fixtureCustomName', current.fixtureCustomName || 'Freier Gegenstand');
-      record.customDu = readFieldValue(root, 'fixtureCustomDu', current.fixtureCustomDu || '0');
-      record.customDn = readFieldValue(root, 'fixtureCustomDn', current.fixtureCustomDn || '—');
-    }
-    const sameFixture = item => String(item.typeId) === String(record.typeId)
-      && String(item.customName || '') === String(record.customName || '')
-      && String(item.customDu || '') === String(record.customDu || '')
-      && String(item.customDn || '') === String(record.customDn || '');
-    const existing = (current.fixtures || []).find(sameFixture);
-    const fixtures = existing
-      ? (current.fixtures || []).map(item => sameFixture(item) ? { ...item, quantity: String(toNumber(item.quantity || 0) + toNumber(quantity || 0)).replace('.', ',') } : item)
-      : [...(current.fixtures || []), record];
-    state.set({
-      fixtures,
-      fixtureQuantity: '1',
-      fixtureCustomName: '',
-      fixtureCustomDu: '',
-      fixtureCustomDn: ''
+
+  if (!root.__wastewaterDelegatedBound) {
+    root.__wastewaterDelegatedBound = true;
+    root.addEventListener('click', event => {
+      const addBtn = event.target.closest('[data-fixture-add]');
+      if (addBtn) {
+        event.preventDefault();
+        event.stopPropagation();
+        const now = Date.now();
+        const last = Number(root.dataset.wastewaterAddAt || 0);
+        if (now - last < 250) return;
+        root.dataset.wastewaterAddAt = String(now);
+        addFixtureFromCurrentInputs(root);
+        return;
+      }
+
+      const deleteBtn = event.target.closest('[data-fixture-delete]');
+      if (deleteBtn) {
+        event.preventDefault();
+        event.stopPropagation();
+        const current = state.get();
+        state.set({ fixtures: (current.fixtures || []).filter(item => String(item.id) !== String(deleteBtn.dataset.fixtureDelete)) });
+      }
     });
-  });
-  root.addEventListener('click', event => {
-    const btn = event.target.closest('[data-fixture-delete]');
-    if (!btn) return;
-    event.stopPropagation();
-    const current = state.get();
-    state.set({ fixtures: (current.fixtures || []).filter(item => String(item.id) !== String(btn.dataset.fixtureDelete)) });
-  });
-  bindLiveCollectionInput(root, '[data-fixture-qty]', {
-    state,
-    getItems: current => current.fixtures || [],
-    setItems: fixtures => ({ fixtures }),
-    matchId: (item, input) => String(item.id) === String(input.dataset.fixtureQty),
-    readValue: input => ({ quantity: input.value || '0' })
-  });
-  root.addEventListener('click', event => {
-    const familyButton = event.target.closest('[data-line-family]');
-    if (familyButton) {
+
+    root.addEventListener('input', event => {
+      const input = event.target.closest('[data-fixture-qty]');
+      if (!input) return;
+      event.stopPropagation();
+      const current = state.get();
+      const fixtures = (current.fixtures || []).map(item => String(item.id) === String(input.dataset.fixtureQty) ? { ...item, quantity: String(normalizedFixtureQuantity(input.value)) } : item);
+      state.set({ fixtures }, { notify:false });
+    });
+    root.addEventListener('blur', event => {
+      const input = event.target.closest('[data-fixture-qty]');
+      if (!input) return;
+      event.stopPropagation();
+      const current = state.get();
+      const fixtures = (current.fixtures || []).map(item => String(item.id) === String(input.dataset.fixtureQty) ? { ...item, quantity: String(normalizedFixtureQuantity(input.value)) } : item);
+      state.set({ fixtures }, { notify:true });
+    }, true);
+    root.addEventListener('keydown', event => {
+      const input = event.target.closest('[data-fixture-qty]');
+      if (!input || event.key !== 'Enter') return;
       event.preventDefault();
       const current = state.get();
-      const ventilation = lineVentilationValue(current.lineType);
-      state.set({ lineType: resolveLineType(familyButton.dataset.lineFamily, ventilation, current.lineType) });
-      return;
-    }
-    const ventilationButton = event.target.closest('[data-line-ventilation]');
-    if (ventilationButton) {
-      event.preventDefault();
-      const current = state.get();
-      const family = lineFamilyValue(current.lineType);
-      state.set({ lineType: resolveLineType(family, ventilationButton.dataset.lineVentilation, current.lineType) });
-    }
-  });
+      const fixtures = (current.fixtures || []).map(item => String(item.id) === String(input.dataset.fixtureQty) ? { ...item, quantity: String(normalizedFixtureQuantity(input.value)) } : item);
+      state.set({ fixtures }, { notify:true });
+    });
+  }
   root.querySelector('[data-wastewater-save]')?.addEventListener('click', () => {
     const current = state.get();
     const r = calculate(current);

@@ -4610,3 +4610,42 @@ body::before {
     grid-template-columns: minmax(0, 1fr) 38px !important;
   }
 }
+
+
+/* v1.2.18 Phase 8: Schmutzwasser-Listen neu ausgerichtet und mobile Mengenfelder kompakter */
+.module-view[data-module='wastewater'] .wastewater-fixture-row--editable {
+  grid-template-columns: minmax(0, 1fr) minmax(96px, 22vw) 42px !important;
+  align-items: center !important;
+}
+.module-view[data-module='wastewater'] .wastewater-fixture-row--editable .tc-quantity-field {
+  width: min(22vw, 132px);
+  min-width: 96px;
+  max-width: 132px;
+  justify-self: end;
+}
+.module-view[data-module='wastewater'] .wastewater-fixture-row--editable > button {
+  align-self: end;
+  justify-self: end;
+  margin-bottom: 2px;
+}
+@media (max-width: 480px) {
+  .module-view[data-module='wastewater'] .wastewater-fixture-row--editable {
+    grid-template-columns: minmax(0, 1fr) minmax(120px, 50%) 42px !important;
+    column-gap: 10px;
+  }
+  .module-view[data-module='wastewater'] .wastewater-fixture-row--editable > div:first-child {
+    grid-column: 1 / -1;
+  }
+  .module-view[data-module='wastewater'] .wastewater-fixture-row--editable .tc-quantity-field {
+    grid-column: 1 / 3;
+    width: 50%;
+    min-width: 120px;
+    max-width: 50%;
+    justify-self: start;
+  }
+  .module-view[data-module='wastewater'] .wastewater-fixture-row--editable > button {
+    grid-column: 3;
+    grid-row: 2;
+    align-self: end;
+  }
+}
