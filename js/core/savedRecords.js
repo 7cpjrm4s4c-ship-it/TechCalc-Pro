@@ -52,6 +52,7 @@ export function bindSavedRecordList(root, {
   loadAttr = 'data-saved-load',
   toggleAttr = 'data-saved-toggle',
   deleteAttr = 'data-saved-delete',
+  closeOthers = true,
   onLoad,
   onDelete
 } = {}) {
@@ -60,8 +61,16 @@ export function bindSavedRecordList(root, {
       event.preventDefault();
       event.stopPropagation();
       const card = toggle.closest('[data-line-card]');
-      const collapsed = card?.classList.toggle('is-collapsed');
-      toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      const willOpen = card?.classList.contains('is-collapsed');
+      if (closeOthers && card) {
+        root.querySelectorAll('[data-line-card]').forEach(item => {
+          if (item === card) return;
+          item.classList.add('is-collapsed');
+          item.querySelector(`[${toggleAttr}]`)?.setAttribute('aria-expanded', 'false');
+        });
+      }
+      card?.classList.toggle('is-collapsed', !willOpen);
+      toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
     });
   });
 
@@ -69,6 +78,7 @@ export function bindSavedRecordList(root, {
     card.addEventListener('click', event => {
       if (event.target.closest(`[${deleteAttr}]`) || event.target.closest(`[${toggleAttr}]`)) return;
       event.preventDefault();
+      event.stopPropagation();
       onLoad?.(card.getAttribute(loadAttr), card, event);
     });
   });
@@ -88,15 +98,22 @@ export function bindEditModeClear(root, {
   activeIdKey,
   nameKey,
   clearPatch = {},
-  ignoreSelector = ''
+  ignoreSelector = '',
+  onClear = null
 } = {}) {
   if (!root || !state || !activeIdKey) return;
+  const key = `editModeClear:${activeIdKey}:${nameKey || ''}`;
+  root.__tcEditModeClearBound = root.__tcEditModeClearBound || new Set();
+  if (root.__tcEditModeClearBound.has(key)) return;
+  root.__tcEditModeClearBound.add(key);
   root.addEventListener('click', event => {
     const current = state.get ? state.get() : {};
     if (!current?.[activeIdKey]) return;
     const baseIgnore = '[data-line-card], .saved-record-card, .line-section-card, .tc-save-actions, input, select, textarea, button, label, .segmented, .segmented button';
     const selector = ignoreSelector ? `${baseIgnore}, ${ignoreSelector}` : baseIgnore;
     if (event.target.closest(selector)) return;
-    state.set({ [activeIdKey]: null, ...(nameKey ? { [nameKey]: '' } : {}), ...clearPatch });
+    const patch = { [activeIdKey]: null, ...(nameKey ? { [nameKey]: '' } : {}), ...clearPatch };
+    if (typeof onClear === 'function') onClear(patch, event);
+    else state.set(patch);
   });
 }

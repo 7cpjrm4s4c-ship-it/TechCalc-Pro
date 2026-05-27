@@ -84,11 +84,11 @@ function initProjectSettings() {
   bindProjectInput('pdfEngineer', 'engineer');
 
 
-  document.getElementById('saveProjectButton')?.addEventListener('click', event => {
+  document.getElementById('saveProjectButton')?.addEventListener('click', async event => {
     event.preventDefault();
     setProjectMeta(collectProjectFormValues());
-    downloadProjectFile();
-    flashProjectSaved();
+    const saved = await downloadProjectFile();
+    if (saved) flashProjectSaved();
   });
 
   document.getElementById('openProjectButton')?.addEventListener('click', event => {

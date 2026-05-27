@@ -45,6 +45,7 @@
   --shadow-active: 0 0 0 1px rgba(53,170,255,.45), 0 0 28px rgba(53,170,255,.2);
 
   --header-h: 64px;
+  --header-glass-bg: linear-gradient(135deg, rgba(18, 25, 34, .72), rgba(12, 18, 28, .50));
   --nav-h: 46px;
   --bottom-nav-h: 72px;
   --ease: cubic-bezier(.2,.8,.2,1);
@@ -68,6 +69,21 @@ body {
 }
 button, input, select { font: inherit; }
 button, select, input[type="checkbox"], label { touch-action: manipulation; }
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: max(env(safe-area-inset-top, 0px), 0px);
+  background: var(--header-glass-bg);
+  -webkit-backdrop-filter: blur(22px) saturate(130%);
+  backdrop-filter: blur(22px) saturate(130%);
+  z-index: 39;
+  pointer-events: none;
+}
+
 
 
 /* Hard viewport width lock: prevents mobile layouts and wide content from pushing the page sideways. */

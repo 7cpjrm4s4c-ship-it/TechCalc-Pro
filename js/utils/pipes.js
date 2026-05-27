@@ -49,6 +49,27 @@ const copperDimensions = [
   {dn:100, dimension:'108 × 2,5', di:103}
 ];
 
+
+const pe100Sdr11Dimensions = [
+  {dn:20, dimension:'25 × 2,3', di:20.4},
+  {dn:25, dimension:'32 × 3,0', di:26.0},
+  {dn:32, dimension:'40 × 3,7', di:32.6},
+  {dn:40, dimension:'50 × 4,6', di:40.8},
+  {dn:50, dimension:'63 × 5,8', di:51.4},
+  {dn:65, dimension:'75 × 6,8', di:61.4},
+  {dn:80, dimension:'90 × 8,2', di:73.6},
+  {dn:100, dimension:'110 × 10,0', di:90.0},
+  {dn:125, dimension:'125 × 11,4', di:102.2},
+  {dn:150, dimension:'160 × 14,6', di:130.8},
+  {dn:200, dimension:'200 × 18,2', di:163.6},
+  {dn:250, dimension:'250 × 22,7', di:204.6},
+  {dn:300, dimension:'315 × 28,6', di:257.8},
+  {dn:350, dimension:'355 × 32,2', di:290.6},
+  {dn:400, dimension:'400 × 36,3', di:327.4},
+  {dn:450, dimension:'450 × 40,9', di:368.2},
+  {dn:500, dimension:'500 × 45,4', di:409.2}
+];
+
 const meplaDimensions = [
   {dn:12, dimension:'16 × 2,25', di:11.5},
   {dn:15, dimension:'20 × 2,5', di:15},
@@ -62,10 +83,10 @@ const meplaDimensions = [
 
 export const pipeSystems = [
   { id:'steel', label:'Stahl', normSmall:'DIN EN 10255 Reihe M', normLarge:'DIN EN 10220', roughness:0.045, maxDn:300, dimensions: steelDimensions },
-  { id:'copper', label:'Kupferrohr', normSmall:'DIN EN 1507', normLarge:'DIN EN 1507', roughness:0.045, maxDn:100, dimensions: copperDimensions },
+  { id:'copper', label:'Kupferrohr', normSmall:'DIN EN 1057', normLarge:'DIN EN 1057', roughness:0.0015, maxDn:100, dimensions: copperDimensions },
   { id:'mapress', label:'Mapress Edelstahl', normSmall:'DIN EN 10312', normLarge:'DIN EN 10312', roughness:0.0015, maxDn:100, dimensions: mapressDimensions },
   { id:'mepla', label:'Geberit Mepla', normSmall:'Geberit Mepla Systemrohr ML', normLarge:'Geberit Mepla Systemrohr ML', roughness:0.007, maxDn:65, dimensions: meplaDimensions },
-  { id:'plastic', label:'Kunststoff', normSmall:'Systemabhängig', normLarge:'Systemabhängig', roughness:0.007, maxDn:160, dimensions: steelDimensions.filter(p => p.dn <= 150) }
+  { id:'pe100sdr11', label:'PE 100 SDR 11', normSmall:'DIN EN 12201', normLarge:'DIN EN 12201', roughness:0.007, maxDn:500, dimensions: pe100Sdr11Dimensions }
 ];
 export const dnTable = steelDimensions;
 

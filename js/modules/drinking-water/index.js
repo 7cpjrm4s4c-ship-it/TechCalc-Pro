@@ -5,24 +5,15 @@ import { card, field, selectField, segmented, renderModuleShell, stack, grid, in
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { isSameId } from '../../core/savedRecords.js';
 
-function fieldSelector(key) {
-  const safe = String(key || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-  return `[data-field="${safe}"]`;
-}
-
-function segmentSelector(key) {
-  const safe = String(key || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-  return `[data-segment="${safe}"]`;
-}
-
 function consumerOptions() {
   return CONSUMERS.map(c => ({ value: c.id, label: `${c.label} · ${fmt(c.vr, 2)} l/s${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}` }));
 }
 
 function draftConsumerList(items, type) {
   if (!items?.length) return '<div class="empty-state empty-state--compact">Noch keine Verbraucher ausgewählt</div>';
-  return `<div class="dw-consumer-list">${items.map((c, index) => `<div class="dw-consumer-row">
-    <div><strong>${esc(c.count)} × ${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr, 2)} l/s je Verbraucher${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div>
+  return `<div class="dw-consumer-list">${items.map((c, index) => `<div class="dw-consumer-row dw-consumer-row--editable">
+    <div><strong>${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr, 2)} l/s je Verbraucher${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div>
+    <label class="mini-edit-field"><span>Anzahl</span><input type="number" min="0" step="1" value="${esc(c.count)}" data-dw-draft-count="${esc(type)}" data-index="${index}" inputmode="numeric"></label>
     <button type="button" data-dw-remove-draft="${esc(type)}" data-index="${index}" aria-label="Verbraucher entfernen">×</button>
   </div>`).join('')}</div>`;
 }
@@ -45,7 +36,7 @@ function unitRows(units) {
         { label:'Verbraucher', value: unit.consumerCount },
         { label:'Σ NE', value: fmt(unit.sumFlow, 2), unit:'l/s' },
         { label:'Spitze NE', value: fmt(unit.peakFlow, 2), unit:'l/s' },
-        { label:'Ansatz', value:'2 größte Entnahmestellen' }
+        { label:'Ansatz', value: unit.simultaneityFactor ? `GL ${fmt(unit.simultaneityFactor, 2)}` : '2 größte Entnahmestellen' }
       ])}
       ${consumerRows(unit.consumers || [])}
     </div>
@@ -78,6 +69,33 @@ function singleRows(groups) {
   }).join('')}</div>`;
 }
 
+
+function normalizeSingleGroupForEdit(group) {
+  if (!group) return null;
+  if (Array.isArray(group.consumers)) return { ...group, consumers: group.consumers.map(c => ({ ...c })) };
+  const typeId = group.typeId || group.consumerType || group.id;
+  const fallback = createConsumer({ typeId, count: group.count || 1, permanent: Boolean(group.permanent) });
+  const consumer = {
+    ...fallback,
+    ...group,
+    id: group.consumerId || group.id || fallback.id,
+    typeId: fallback.typeId,
+    label: group.label || group.name || fallback.label,
+    count: Math.max(1, Math.round(Number(group.count) || 1)),
+    vr: Number(group.vr ?? fallback.vr),
+    pmin: Number(group.pmin ?? fallback.pmin),
+    neGroup: group.neGroup || fallback.neGroup,
+    hotWater: group.hotWater ?? fallback.hotWater,
+    permanent: Boolean(group.permanent)
+  };
+  return {
+    id: group.groupId || group.id || fallback.id,
+    name: group.groupName || group.name || group.label || 'Einzelverbraucher',
+    consumers: [consumer],
+    createdAt: group.createdAt || new Date().toISOString()
+  };
+}
+
 function selectedFixturesList(r) {
   const aggregate = new Map();
   const add = (consumer) => {
@@ -88,7 +106,13 @@ function selectedFixturesList(r) {
     aggregate.set(key, current);
   };
   (r.usageUnits || []).forEach(unit => (unit.consumers || []).forEach(add));
-  (r.rawSingles || []).forEach(add);
+  ((r.rawSingles && r.rawSingles.length) ? r.rawSingles : (r.singleGroups || []).flatMap(group => group.consumers || [])).forEach(add);
+  // Sicherheitsnetz: Ein ausgewählter Einzelverbraucher wird zusätzlich aus dem aktiven Entwurf gelesen,
+  // falls der gespeicherte Datenbestand noch aus einer älteren Version stammt.
+  const s = state.get();
+  if (s.activeSingleId && Array.isArray(s.singleDraftConsumers)) {
+    s.singleDraftConsumers.forEach(add);
+  }
   const rows = [...aggregate.values()];
   if (!rows.length) return '<div class="empty-state empty-state--compact">Noch keine Einrichtungsgegenstände ausgewählt</div>';
   return `<div class="dw-fixture-list dw-fixture-list--plain">${rows.map(item => `<div class="dw-fixture-row"><strong>${esc(item.count)} × ${esc(item.label)}</strong>${item.permanent ? '<em>Dauerverbraucher</em>' : ''}</div>`).join('')}</div>`;
@@ -104,7 +128,7 @@ function inputCard(s, r) {
       ], s.waterHeatingMode, { accent:'blue' }),
       inlineStats([
         { label:'Gleichzeitigkeitsformel', value:r.formulaText },
-        { label:'NE-Ansatz', value:'2 größte Entnahmestellen' },
+        { label:'NE-Ansatz', value:'2 größte Entnahmestellen oder GL je NE' },
         { label:'Warmwasser', value:r.centralWarmWater ? 'TWW-Zapfstellen werden mitgerechnet' : 'Dezentral, Warmwasserbereitung mit 0,05 l/s je TWW-Verbraucher' }
       ])
     ].join('')), 'blue'),
@@ -113,8 +137,9 @@ function inputCard(s, r) {
       field({ id:'unitName', label:'Bezeichnung', value:s.unitName, placeholder:'z. B. Bad Wohnung 1', inputmode:'text' }),
       grid([
         selectField({ id:'unitConsumerType', label:'Verbraucher hinzufügen', value:s.unitConsumerType, options:consumerOptions() }),
-        field({ id:'unitCount', label:'Anzahl', value:fmtInput(s.unitCount,0), inputmode:'numeric' })
-      ].join(''), 2),
+        field({ id:'unitCount', label:'Anzahl', value:fmtInput(s.unitCount,0), inputmode:'numeric' }),
+        field({ id:'unitSimultaneityFactor', label:'GL der Nutzungseinheit', value:s.unitSimultaneityFactor || '', placeholder:'optional < 1,0', inputmode:'decimal' })
+      ].join(''), 3),
       '<button type="button" class="action-button action-button--secondary" data-dw-draft-add="unit">Verbraucher zur Nutzungseinheit hinzufügen</button>',
       `<div data-dw-unit-draft>${draftConsumerList(s.unitDraftConsumers || [], 'unit')}</div>`,
       `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-unit ${s.activeUnitId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-dw-update-unit ${s.activeUnitId ? '' : 'disabled'}>Aktualisieren</button></div>`,
@@ -189,11 +214,171 @@ function refresh(root) {
   if (singleSummary) singleSummary.textContent = `${r.singleGroups.length} Gruppen außerhalb NE`;
 }
 
-function syncFieldValues(root, patch) {
-  Object.entries(patch).forEach(([key, value]) => {
-    root.querySelectorAll(fieldSelector(key)).forEach(el => { el.value = value ?? ''; });
-    root.querySelectorAll(segmentSelector(key)).forEach(btn => btn.classList.toggle('is-active', btn.dataset.value === String(value)));
+function rerender(root) {
+  root.innerHTML = view(state.get());
+}
+
+function draftKey(type) {
+  return type === 'unit' ? 'unitDraftConsumers' : 'singleDraftConsumers';
+}
+
+function addDraftConsumer(type) {
+  const s = state.get();
+  if (type === 'unit') {
+    state.set({
+      unitDraftConsumers: [...(s.unitDraftConsumers || []), createConsumer({ typeId:s.unitConsumerType, count:s.unitCount })]
+    }, { notify:false });
+    return;
+  }
+  state.set({
+    singleDraftConsumers: [...(s.singleDraftConsumers || []), createConsumer({ typeId:s.singleConsumerType, count:s.singleCount, permanent:String(s.singlePermanent)==='true' })]
+  }, { notify:false });
+}
+
+function removeDraftConsumer(type, index) {
+  const key = draftKey(type);
+  const next = [...(state.get()[key] || [])];
+  next.splice(Number(index), 1);
+  state.set({ [key]: next }, { notify:false });
+}
+
+function updateDraftCount(type, index, value) {
+  const key = draftKey(type);
+  const next = [...(state.get()[key] || [])];
+  const i = Number(index);
+  if (next[i]) next[i] = { ...next[i], count: Math.max(0, Number(value || 0)) };
+  state.set({ [key]: next }, { notify:false });
+}
+
+function draftOrCurrentUnitConsumers(s) {
+  const consumers = [...(s.unitDraftConsumers || [])];
+  if (!consumers.length) consumers.push(createConsumer({ typeId:s.unitConsumerType, count:s.unitCount }));
+  return consumers;
+}
+
+function draftOrCurrentSingleConsumers(s) {
+  const permanent = String(s.singlePermanent) === 'true';
+  const consumers = [...(s.singleDraftConsumers || [])];
+  if (!consumers.length) consumers.push(createConsumer({ typeId:s.singleConsumerType, count:s.singleCount, permanent }));
+  return consumers.map(c => ({ ...c, permanent }));
+}
+
+function saveUnit(root, update = false) {
+  const s = state.get();
+  if (update && !s.activeUnitId) return;
+  const record = createUsageUnit({
+    name:s.unitName,
+    consumers:draftOrCurrentUnitConsumers(s),
+    simultaneityFactor:s.unitSimultaneityFactor
   });
+  const units = readUsageUnits();
+  if (update) {
+    record.id = s.activeUnitId;
+    writeUsageUnits(units.map(item => isSameId(item.id, s.activeUnitId) ? record : item));
+  } else {
+    writeUsageUnits([...units, record]);
+  }
+  state.set({
+    unitDraftConsumers: [],
+    activeUnitId: update ? s.activeUnitId : null,
+    activeSingleId:null,
+    unitName: update ? s.unitName : '',
+    unitSimultaneityFactor: update ? s.unitSimultaneityFactor : '',
+    uiUnitFormOpen:true,
+    uiUnitSavedOpen:true
+  }, { notify:false });
+  rerender(root);
+}
+
+function saveSingle(root, update = false) {
+  const s = state.get();
+  if (update && !s.activeSingleId) return;
+  const record = createSingleGroup({
+    name:s.singleName || 'Einzelverbraucher',
+    consumers:draftOrCurrentSingleConsumers(s)
+  });
+  const groups = readSingleConsumers();
+  if (update) {
+    record.id = s.activeSingleId;
+    writeSingleConsumers(groups.map(item => isSameId(item.id, s.activeSingleId) ? record : item));
+  } else {
+    writeSingleConsumers([...groups, record]);
+  }
+  state.set({
+    singleDraftConsumers: [],
+    activeUnitId:null,
+    activeSingleId: update ? s.activeSingleId : null,
+    singleName: update ? s.singleName : '',
+    uiSingleFormOpen:true,
+    uiSingleSavedOpen:true
+  }, { notify:false });
+  rerender(root);
+}
+
+function deleteUnit(root, id) {
+  writeUsageUnits(readUsageUnits().filter(item => !isSameId(item.id, id)));
+  if (isSameId(state.get().activeUnitId, id)) {
+    state.set({ activeUnitId:null, unitName:'', unitSimultaneityFactor:'', unitDraftConsumers:[] }, { notify:false });
+  }
+  rerender(root);
+}
+
+function deleteSingle(root, id) {
+  writeSingleConsumers(readSingleConsumers().filter(item => !isSameId(item.id, id)));
+  if (isSameId(state.get().activeSingleId, id)) {
+    state.set({ activeSingleId:null, singleName:'', singleDraftConsumers:[] }, { notify:false });
+  }
+  rerender(root);
+}
+
+function editUnit(root, id) {
+  const unit = readUsageUnits().find(item => isSameId(item.id, id));
+  if (!unit) return;
+  state.set({
+    activeUnitId:unit.id,
+    activeSingleId:null,
+    unitName:unit.name,
+    unitSimultaneityFactor:unit.simultaneityFactor || '',
+    singleName:'',
+    unitDraftConsumers:unit.consumers || [],
+    singleDraftConsumers:[],
+    uiUnitFormOpen:true,
+    uiUnitSavedOpen:true
+  }, { notify:false });
+  rerender(root);
+}
+
+function editSingle(root, id) {
+  const group = readSingleConsumers().map(normalizeSingleGroupForEdit).filter(Boolean).find(item => isSameId(item.id, id));
+  if (!group) return;
+  const consumers = (group.consumers || []).map(c => ({ ...c }));
+  state.set({
+    activeUnitId:null,
+    activeSingleId:group.id,
+    unitName:'',
+    unitDraftConsumers:[],
+    singleName:group.name,
+    singleDraftConsumers:consumers,
+    singlePermanent:String(consumers.some(c => c.permanent)),
+    uiSingleFormOpen:true,
+    uiSingleSavedOpen:true
+  }, { notify:false });
+  rerender(root);
+}
+
+function clearActiveEdit(root) {
+  const current = state.get();
+  if (!current.activeUnitId && !current.activeSingleId) return;
+  state.set({
+    activeUnitId:null,
+    activeSingleId:null,
+    unitName:'',
+    unitSimultaneityFactor:'',
+    singleName:'',
+    unitDraftConsumers:[],
+    singleDraftConsumers:[]
+  }, { notify:false });
+  rerender(root);
 }
 
 function bindDrinkingWater(root, signal) {
@@ -204,172 +389,86 @@ function bindDrinkingWater(root, signal) {
   }, { signal });
 
   root.addEventListener('change', event => {
-    const el = event.target.closest('[data-field]');
-    if (!el || !root.contains(el)) return;
-    state.set({ [el.dataset.field]: el.value }, { notify:false });
-    refresh(root);
+    const field = event.target.closest('[data-field]');
+    if (field && root.contains(field)) {
+      state.set({ [field.dataset.field]: field.value }, { notify:false });
+      refresh(root);
+      return;
+    }
+
+    const draftCount = event.target.closest('[data-dw-draft-count]');
+    if (draftCount && root.contains(draftCount)) {
+      updateDraftCount(draftCount.dataset.dwDraftCount, draftCount.dataset.index, draftCount.value);
+      refresh(root);
+    }
   }, { signal });
 
-  root.addEventListener('toggle', event => {
-    const details = event.target && typeof event.target.closest === 'function' ? event.target.closest('[data-dw-accordion]') : null;
-    if (!details || !root.contains(details)) return;
-    state.set({ [details.dataset.dwAccordion]: details.open }, { notify:false });
-  }, { capture: true, signal });
-
   root.addEventListener('click', event => {
-    const lineToggle = event.target.closest('[data-line-toggle]');
-    if (lineToggle && root.contains(lineToggle)) {
-      event.preventDefault(); event.stopPropagation();
-      const itemCard = lineToggle.closest('[data-line-card]');
-      const collapsed = itemCard?.classList.toggle('is-collapsed');
-      lineToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    const target = event.target;
+
+    const toggle = target.closest('[data-line-toggle]');
+    if (toggle && root.contains(toggle)) {
+      event.preventDefault();
+      event.stopPropagation();
+      const card = toggle.closest('[data-line-card]');
+      const collapsed = card?.classList.toggle('is-collapsed');
+      toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
       return;
     }
 
-    const segment = event.target.closest('[data-segment]');
-    if (segment && root.contains(segment)) {
-      const patch = { [segment.dataset.segment]: segment.dataset.value };
-      state.set(patch, { notify:false });
-      syncFieldValues(root, patch);
-      refresh(root);
-      return;
-    }
-
-    const draftAdd = event.target.closest('[data-dw-draft-add]');
-    if (draftAdd && root.contains(draftAdd)) {
-      const s = state.get();
-      const isUnit = draftAdd.dataset.dwDraftAdd === 'unit';
-      const consumer = createConsumer({
-        typeId: isUnit ? s.unitConsumerType : s.singleConsumerType,
-        count: isUnit ? s.unitCount : s.singleCount,
-        permanent: !isUnit && String(s.singlePermanent) === 'true'
-      });
-      const key = isUnit ? 'unitDraftConsumers' : 'singleDraftConsumers';
-      state.set({ [key]: [...(s[key] || []), consumer] }, { notify:false });
-      refresh(root);
-      return;
-    }
-
-    const removeDraft = event.target.closest('[data-dw-remove-draft]');
+    const removeDraft = target.closest('[data-dw-remove-draft]');
     if (removeDraft && root.contains(removeDraft)) {
-      const s = state.get();
-      const key = removeDraft.dataset.dwRemoveDraft === 'unit' ? 'unitDraftConsumers' : 'singleDraftConsumers';
-      const next = [...(s[key] || [])];
-      next.splice(Number(removeDraft.dataset.index), 1);
-      state.set({ [key]: next }, { notify:false });
+      event.preventDefault();
+      event.stopPropagation();
+      removeDraftConsumer(removeDraft.dataset.dwRemoveDraft, removeDraft.dataset.index);
       refresh(root);
       return;
     }
 
-    if (event.target.closest('[data-dw-add-unit]')) {
-      const s = state.get();
-      const consumers = [...(s.unitDraftConsumers || [])];
-      if (!consumers.length) consumers.push(createConsumer({ typeId:s.unitConsumerType, count:s.unitCount }));
-      const units = readUsageUnits();
-      const record = createUsageUnit({ name:s.unitName, consumers });
-      writeUsageUnits([...units, record]);
-      state.set({ unitDraftConsumers: [], activeUnitId:null, unitName:'', uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
-      root.innerHTML = view(state.get());
+    const draftAdd = target.closest('[data-dw-draft-add]');
+    if (draftAdd && root.contains(draftAdd)) {
+      event.preventDefault();
+      event.stopPropagation();
+      addDraftConsumer(draftAdd.dataset.dwDraftAdd);
+      refresh(root);
       return;
     }
 
-    if (event.target.closest('[data-dw-update-unit]')) {
-      const s = state.get();
-      if (!s.activeUnitId) return;
-      const consumers = [...(s.unitDraftConsumers || [])];
-      if (!consumers.length) consumers.push(createConsumer({ typeId:s.unitConsumerType, count:s.unitCount }));
-      const units = readUsageUnits();
-      const record = createUsageUnit({ name:s.unitName, consumers });
-      record.id = s.activeUnitId;
-      writeUsageUnits(units.map(item => item.id === s.activeUnitId ? record : item));
-      state.set({ activeUnitId:s.activeUnitId, uiUnitFormOpen:true, uiUnitSavedOpen:true }, { notify:false });
-      root.innerHTML = view(state.get());
+    const addUnit = target.closest('[data-dw-add-unit]');
+    if (addUnit && root.contains(addUnit)) { event.preventDefault(); event.stopPropagation(); saveUnit(root, false); return; }
+
+    const updateUnit = target.closest('[data-dw-update-unit]');
+    if (updateUnit && root.contains(updateUnit)) { event.preventDefault(); event.stopPropagation(); saveUnit(root, true); return; }
+
+    const addSingle = target.closest('[data-dw-add-single]');
+    if (addSingle && root.contains(addSingle)) { event.preventDefault(); event.stopPropagation(); saveSingle(root, false); return; }
+
+    const updateSingle = target.closest('[data-dw-update-single]');
+    if (updateSingle && root.contains(updateSingle)) { event.preventDefault(); event.stopPropagation(); saveSingle(root, true); return; }
+
+    const unitDelete = target.closest('[data-dw-unit-delete]');
+    if (unitDelete && root.contains(unitDelete)) { event.preventDefault(); event.stopPropagation(); deleteUnit(root, unitDelete.dataset.dwUnitDelete); return; }
+
+    const singleDelete = target.closest('[data-dw-single-delete]');
+    if (singleDelete && root.contains(singleDelete)) { event.preventDefault(); event.stopPropagation(); deleteSingle(root, singleDelete.dataset.dwSingleDelete); return; }
+
+    const unitEdit = target.closest('[data-dw-unit-edit]');
+    if (unitEdit && root.contains(unitEdit)) { event.preventDefault(); event.stopPropagation(); editUnit(root, unitEdit.dataset.dwUnitEdit); return; }
+
+    const singleEdit = target.closest('[data-dw-single-edit]');
+    if (singleEdit && root.contains(singleEdit)) { event.preventDefault(); event.stopPropagation(); editSingle(root, singleEdit.dataset.dwSingleEdit); return; }
+
+    const segment = target.closest('[data-segment]');
+    if (segment && root.contains(segment)) {
+      event.preventDefault();
+      event.stopPropagation();
+      state.set({ [segment.dataset.segment]: segment.dataset.value }, { notify:false });
+      rerender(root);
       return;
     }
 
-    if (event.target.closest('[data-dw-add-single]')) {
-      const s = state.get();
-      const draft = [...(s.singleDraftConsumers || [])];
-      if (!draft.length) draft.push(createConsumer({ typeId:s.singleConsumerType, count:s.singleCount, permanent:String(s.singlePermanent)==='true' }));
-      const groups = readSingleConsumers();
-      const record = createSingleGroup({ name:s.singleName || 'Einzelverbraucher', consumers: draft.map(c => ({ ...c, permanent:String(s.singlePermanent)==='true' })) });
-      writeSingleConsumers([...groups, record]);
-      state.set({ singleDraftConsumers: [], activeSingleId:null, singleName:'', uiSingleFormOpen:true, uiSingleSavedOpen:true }, { notify:false });
-      root.innerHTML = view(state.get());
-      return;
-    }
-
-    if (event.target.closest('[data-dw-update-single]')) {
-      const s = state.get();
-      if (!s.activeSingleId) return;
-      const draft = [...(s.singleDraftConsumers || [])];
-      if (!draft.length) draft.push(createConsumer({ typeId:s.singleConsumerType, count:s.singleCount, permanent:String(s.singlePermanent)==='true' }));
-      const groups = readSingleConsumers();
-      const record = createSingleGroup({ name:s.singleName || 'Einzelverbraucher', consumers: draft.map(c => ({ ...c, permanent:String(s.singlePermanent)==='true' })) });
-      record.id = s.activeSingleId;
-      writeSingleConsumers(groups.map(item => item.id === s.activeSingleId ? record : item));
-      state.set({ activeSingleId:s.activeSingleId, uiSingleFormOpen:true, uiSingleSavedOpen:true }, { notify:false });
-      root.innerHTML = view(state.get());
-      return;
-    }
-
-    const unitDelete = event.target.closest('[data-dw-unit-delete]');
-    if (unitDelete && root.contains(unitDelete)) {
-      event.preventDefault(); event.stopPropagation();
-      writeUsageUnits(readUsageUnits().filter(item => item.id !== unitDelete.dataset.dwUnitDelete));
-      if (isSameId(state.get().activeUnitId, unitDelete.dataset.dwUnitDelete)) state.set({ activeUnitId:null, unitName:'', unitDraftConsumers:[] }, { notify:false });
-      root.innerHTML = view(state.get());
-      return;
-    }
-
-    const singleDelete = event.target.closest('[data-dw-single-delete]');
-    if (singleDelete && root.contains(singleDelete)) {
-      event.preventDefault(); event.stopPropagation();
-      writeSingleConsumers(readSingleConsumers().filter(item => item.id !== singleDelete.dataset.dwSingleDelete));
-      if (isSameId(state.get().activeSingleId, singleDelete.dataset.dwSingleDelete)) state.set({ activeSingleId:null, singleName:'', singleDraftConsumers:[] }, { notify:false });
-      root.innerHTML = view(state.get());
-      return;
-    }
-
-    const unitEdit = event.target.closest('[data-dw-unit-edit]');
-    if (unitEdit && root.contains(unitEdit)) {
-      event.preventDefault(); event.stopPropagation();
-      const units = readUsageUnits();
-      const unit = units.find(item => item.id === unitEdit.dataset.dwUnitEdit);
-      if (unit) {
-        const patch = { activeUnitId: unit.id, unitName: unit.name, unitDraftConsumers: unit.consumers || [], uiUnitFormOpen:true, uiUnitSavedOpen:true };
-        state.set(patch, { notify:false });
-        syncFieldValues(root, patch);
-        const details = root.querySelector('[data-dw-accordion="uiUnitFormOpen"]');
-        if (details) details.open = true;
-        root.innerHTML = view(state.get());
-      }
-      return;
-    }
-
-    const singleEdit = event.target.closest('[data-dw-single-edit]');
-    if (singleEdit && root.contains(singleEdit)) {
-      event.preventDefault(); event.stopPropagation();
-      const groups = readSingleConsumers();
-      const group = groups.find(item => item.id === singleEdit.dataset.dwSingleEdit);
-      if (group) {
-        const consumers = group.consumers || [];
-        const patch = { activeSingleId: group.id, singleName: group.name, singleDraftConsumers: consumers, singlePermanent: String(consumers.some(c => c.permanent)), uiSingleFormOpen:true, uiSingleSavedOpen:true };
-        state.set(patch, { notify:false });
-        syncFieldValues(root, patch);
-        const details = root.querySelector('[data-dw-accordion="uiSingleFormOpen"]');
-        if (details) details.open = true;
-        root.innerHTML = view(state.get());
-      }
-    }
-
-
-    const current = state.get();
-    const ignored = event.target.closest('[data-dw-unit-edit], [data-dw-single-edit], [data-dw-unit-delete], [data-dw-single-delete], [data-dw-add-unit], [data-dw-update-unit], [data-dw-add-single], [data-dw-update-single], [data-dw-draft-add], [data-dw-remove-draft], details, summary, input, select, textarea, button, label, .segmented');
-    if (!ignored && (current.activeUnitId || current.activeSingleId)) {
-      state.set({ activeUnitId:null, activeSingleId:null, unitName:'', singleName:'', unitDraftConsumers:[], singleDraftConsumers:[] }, { notify:false });
-      root.innerHTML = view(state.get());
-    }
+    const ignored = target.closest('[data-dw-unit-edit], [data-dw-single-edit], [data-dw-unit-delete], [data-dw-single-delete], [data-dw-add-unit], [data-dw-update-unit], [data-dw-add-single], [data-dw-update-single], [data-dw-draft-add], [data-dw-remove-draft], [data-dw-draft-count], [data-line-toggle], details, summary, input, select, textarea, button, label, .segmented');
+    if (!ignored) clearActiveEdit(root);
   }, { signal });
 }
 

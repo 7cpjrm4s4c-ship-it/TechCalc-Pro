@@ -217,3 +217,19 @@
     max-width: calc(100vw - 20px);
   }
 }
+
+/* v1.0.12: keep module selector fixed below the header on desktop/tablet. Content scrolls underneath. */
+@media (min-width: 768px) {
+  .module-nav {
+    position: fixed;
+    top: var(--header-h);
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 39;
+    backdrop-filter: blur(18px);
+  }
+  .app-main {
+    padding-top: calc(var(--nav-h) + var(--space-3));
+  }
+}

@@ -62,8 +62,54 @@ function buildVentilationLineSectionRecord(currentState, r, active, modeLabel, i
     roomTemp: fmt(active.roomTemp),
     modeLabel,
     inputState: activeCalculationState(currentState),
+    uiState: { mode: currentState.mode },
     createdAt: existing?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString()
+  };
+}
+
+
+function firstFilled(...values) {
+  for (const value of values) {
+    if (value !== undefined && value !== null && value !== '') return value;
+  }
+  return '';
+}
+
+function parseDisplayNumber(value) {
+  if (value === undefined || value === null || value === '—') return '';
+  return String(value).replace(/\s+/g, '').replace(',', '.');
+}
+
+function inferStoredMode(input = {}, item = {}, fallback = 'heating') {
+  if (input.mode === 'cooling' || input.mode === 'heating') return input.mode;
+  if (item.uiState?.mode === 'cooling' || item.uiState?.mode === 'heating') return item.uiState.mode;
+  const label = String(item.modeLabel || item.mode || '').toLowerCase();
+  if (label.includes('kälte') || label.includes('kuehl') || label.includes('kühl')) return 'cooling';
+  const hasCooling = ['coolingCalcTarget', 'coolingPowerW', 'coolingVolumeFlowM3h', 'coolingDeltaT', 'coolingSupplyTemp', 'coolingRoomTemp'].some(k => input[k] !== undefined && input[k] !== null && input[k] !== '');
+  const hasHeating = ['heatingCalcTarget', 'heatingPowerW', 'heatingVolumeFlowM3h', 'heatingDeltaT', 'heatingSupplyTemp', 'heatingRoomTemp'].some(k => input[k] !== undefined && input[k] !== null && input[k] !== '');
+  if (hasCooling && !hasHeating) return 'cooling';
+  return fallback === 'cooling' ? 'cooling' : 'heating';
+}
+
+function savedVentilationPatch(item, currentState) {
+  const input = item.inputState || item.state || item.uiState || {};
+  const nextMode = inferStoredMode(input, item, currentState.mode || 'heating');
+  const prefix = nextMode === 'cooling' ? 'cooling' : 'heating';
+  const calcTarget = firstFilled(input.calcTarget, input[`${prefix}CalcTarget`], currentState[`${prefix}CalcTarget`], 'power');
+  const powerFromResult = parseDisplayNumber(item.powerKw);
+  return {
+    ...(item.uiState || {}),
+    mode: nextMode,
+    [`${prefix}CalcTarget`]: calcTarget,
+    [`${prefix}PowerW`]: firstFilled(input.powerW, input[`${prefix}PowerW`], calcTarget !== 'power' ? powerFromResult : ''),
+    [`${prefix}PowerUnit`]: firstFilled(input.powerUnit, input[`${prefix}PowerUnit`], calcTarget !== 'power' && powerFromResult ? 'kW' : 'W'),
+    [`${prefix}VolumeFlowM3h`]: firstFilled(input.volumeFlowM3h, input[`${prefix}VolumeFlowM3h`], parseDisplayNumber(item.volumeFlowM3h)),
+    [`${prefix}DeltaT`]: firstFilled(input.deltaT, input[`${prefix}DeltaT`], parseDisplayNumber(item.deltaT)),
+    [`${prefix}SupplyTemp`]: firstFilled(input.supplyTemp, input[`${prefix}SupplyTemp`], parseDisplayNumber(item.supplyTemp)),
+    [`${prefix}RoomTemp`]: firstFilled(input.roomTemp, input[`${prefix}RoomTemp`], parseDisplayNumber(item.roomTemp)),
+    activeVentLineSectionId: item.id,
+    activeVentLineSectionName: item.name || ''
   };
 }
 
@@ -100,21 +146,12 @@ function bindVentilationLineSections(root, r, active, modeLabel, rerender) {
     deleteAttr: 'data-line-delete',
     onLoad(id) {
       const item = readVentilationLineSections().find(entry => isSameId(entry.id, id));
-      if (!item?.inputState) return;
-      const input = item.inputState;
-      const prefix = (input.mode === 'cooling') ? 'cooling' : 'heating';
-      state.set({
-        mode: input.mode || state.get().mode,
-        [`${prefix}CalcTarget`]: input.calcTarget || 'power',
-        [`${prefix}PowerW`]: input.powerW || '',
-        [`${prefix}PowerUnit`]: input.powerUnit || 'W',
-        [`${prefix}VolumeFlowM3h`]: input.volumeFlowM3h || '',
-        [`${prefix}DeltaT`]: input.deltaT || '',
-        [`${prefix}SupplyTemp`]: input.supplyTemp || '',
-        [`${prefix}RoomTemp`]: input.roomTemp || '',
-        activeVentLineSectionId: item.id,
-        activeVentLineSectionName: item.name || ''
-      });
+      if (!item) return;
+      if (isSameId(state.get().activeVentLineSectionId, id)) {
+        state.set({ activeVentLineSectionId: null, activeVentLineSectionName: '' });
+        return;
+      }
+      state.set(savedVentilationPatch(item, state.get()));
     },
     onDelete(id) {
       writeVentilationLineSections(removeRecord(readVentilationLineSections(), id));

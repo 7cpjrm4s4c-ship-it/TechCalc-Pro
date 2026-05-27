@@ -3,7 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#03070c">
+  <meta name="theme-color" content="#121922" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#121922" media="(prefers-color-scheme: light)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="description" content="TechCalc Pro - modulare HLSK Quick Tools für Sanitär, Heizung, Lüftung und Klimatechnik.">
   <title>TechCalc Pro</title>
   <link rel="manifest" href="./manifest.json">
@@ -101,68 +104,37 @@
         <details class="settings-submenu">
           <summary>Release Notes</summary>
           <div class="settings-submenu__content settings-form release-notes-panel">
-            <div class="settings-info-row"><span>Aktuelle Version</span><strong>1.0.13</strong></div>
-            <div class="release-note">
-              <strong>1.0.13</strong>
-              <small>Hotfix: Modul-Mounts geben ihre Cleanup-Funktion wieder korrekt zurück. Veraltete Renderer können dadurch nicht mehr in das aktive Modul schreiben; Lüftung/WRG/h,x/Trinkwasser behalten beim Auswählen gespeicherter Cards ihr korrektes Modul.</small>
+            <div class="settings-info-row"><span>Aktuelle Version</span><strong data-app-version-current>1.2.18</strong></div>
+            <div id="releaseNotesDynamic">
+              <p>Release Notes werden geladen …</p>
             </div>
-            <div class="release-note">
-              <strong>1.0.9</strong>
-              <small>Debug-Release: Auswahl und Aktualisieren gespeicherter Inhalte in Heizung, Lüftung, WRG, h,x und Trinkwasser stabilisiert; h,x aktualisiert aktive Prozesse bei geänderter Luftbehandlung statt neue Prozesse anzulegen; Trinkwasser-Speicheransicht an die gemeinsame Saved-Card-Optik angepasst.</small>
-            </div>
-            <div class="release-note">
-              <strong>1.0.8</strong>
-              <small>Speicher-/Bearbeitungslogik weiter vereinheitlicht, Edit-Modus sauber rücksetzbar gemacht und Rohrdimensionierung um Massen-/Volumenstrom in gespeicherten Outputs ergänzt.</small>
-            </div>
-            <div class="release-note">
-              <strong>1.0.7</strong>
-              <small>Speicherlogik in Core ausgelagert und Darstellung gespeicherter Datensätze vereinheitlicht.</small>
-            </div>
-            <div class="release-note">
-              <strong>1.0.6</strong>
-              <small>Saved-Cards, Aufklappverhalten und Aktualisieren von gespeicherten Einträgen korrigiert.</small>
-            </div>
-            <div class="release-note">
-              <strong>1.0.5</strong>
-              <small>Einheitliches CRUD-Konzept für gespeicherte Prozesse und Anlagenteile eingeführt.</small>
-            </div>
-            <div class="release-note">
-              <strong>1.0.4</strong>
-              <small>Projekteinstellungen bereinigt und Bearbeitungslogik vorbereitet.</small>
-            </div>
-            <div class="release-note">
-              <strong>1.0.3</strong>
-              <small>Gespeicherte Prozesse und Anlagenteile mit Bearbeitungsmodus erweitert.</small>
-            </div>
-            <div class="release-note">
-              <strong>1.0.2</strong>
-              <small>Feedback-Versand über Formspree direkt aus der App ergänzt.</small>
-            </div>
-            <div class="release-note">
-              <strong>1.0.1</strong>
-              <small>Release Notes und Feedback-Bereich im Header-Menü integriert.</small>
-            </div>
-            <div class="release-note">
-              <strong>1.0.0</strong>
-              <small>Initialer stabiler Stand mit modularer Navigation, Projektdateien und PDF-Export.</small>
-            </div>
-            <p>Die Release Notes können später über das Hosting dynamisch bereitgestellt werden.</p>
+            <script type="text/plain" id="releaseNotesFallback">
+## Version 1.2.18 - Hosting / Darstellung Hotfix
+- Release Notes werden im Menü dynamisch mit Versionsparameter geladen und nicht mehr aus dem Browsercache gelesen.
+- Service Worker nutzt für Navigation und Release Notes eine Network-First-Strategie, damit nach dem Hosting neue Inhalte sichtbar werden.
+- Darstellungseinstellungen werden dauerhaft in localStorage gespeichert und bleiben nach Schließen der App erhalten.
+
+## Version 1.2.16 - Release Notes / Link-State Hotfix
+- Release Notes im Menü auf den aktuellen Stand gebracht.
+- Regenwasser-Status wird vor dem Öffnen externer KOSTRA/OpenKo-Links gesichert.
+- Mobile Schnellzugriffe werden dauerhaft gespeichert.
+- Eingestellte Werte, markierte Flächen und Flächenliste bleiben nach Rückkehr aus externen Links erhalten.
+            </script>
           </div>
         </details>
 
         <details class="settings-submenu">
           <summary>Feedback senden</summary>
           <div class="settings-submenu__content settings-form">
-            <p>Feedback wird direkt aus der App über Formspree an die hinterlegte Projektadresse gesendet. Falls der Versand nicht möglich ist, bleibt ein E-Mail-Fallback verfügbar.</p>
+            <p>Feedback wird direkt aus der App über Formspree an die hinterlegte Projektadresse gesendet.</p>
             <form id="feedbackForm" class="settings-form feedback-form">
               <label>Name optional<input id="feedbackName" name="name" type="text" autocomplete="name" placeholder="Name"></label>
               <label>E-Mail optional<input id="feedbackEmail" name="email" type="email" autocomplete="email" placeholder="name@example.com"></label>
               <label>Betreff<input id="feedbackSubject" name="subject" type="text" required value="TechCalc Pro Feedback"></label>
               <label>Nachricht<textarea id="feedbackMessage" name="message" required rows="6" placeholder="Feedback, Fehlerbeschreibung oder Verbesserungsvorschlag"></textarea></label>
               <input type="hidden" name="app" value="TechCalc Pro">
-              <input type="hidden" name="version" value="1.0.13">
-              <div class="settings-actions settings-actions--split">
-                <button class="mini-button" id="feedbackMailto" type="button">E-Mail-Fallback</button>
+              <input type="hidden" name="version" value="1.2.18">
+              <div class="settings-actions">
                 <button class="mini-button mini-button--primary" id="feedbackSubmit" type="submit">Feedback senden</button>
               </div>
               <div id="feedbackStatus" class="settings-hint" aria-live="polite"></div>
@@ -174,7 +146,7 @@
         <details class="settings-submenu">
           <summary>Rechtliches & App</summary>
           <div class="settings-submenu__content settings-form">
-            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.0.13</strong></div>
+            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.2.18</strong></div>
             <button class="mini-button" type="button" disabled>Impressum vorbereiten</button>
             <button class="mini-button" type="button" disabled>AGB vorbereiten</button>
           </div>

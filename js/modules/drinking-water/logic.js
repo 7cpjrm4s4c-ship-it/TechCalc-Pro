@@ -61,12 +61,20 @@ export function createConsumer({ typeId, count = 1, name = '', permanent = false
   };
 }
 
-export function createUsageUnit({ name, consumer, consumers }) {
+function parseFactor(value) {
+  if (value === null || value === undefined || value === '') return 0;
+  const n = Number(String(value).trim().replace(',', '.'));
+  return Number.isFinite(n) ? n : 0;
+}
+
+export function createUsageUnit({ name, consumer, consumers, simultaneityFactor = '' }) {
   const list = Array.isArray(consumers) && consumers.length ? consumers : consumer ? [consumer] : [];
+  const gl = parseFactor(simultaneityFactor);
   return {
     id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     name: name || 'Nutzungseinheit',
     consumers: list,
+    simultaneityFactor: gl > 0 && gl < 1 ? gl : '',
     createdAt: new Date().toISOString()
   };
 }
@@ -106,6 +114,30 @@ function hotWaterAddon(consumer, mode, index = 0) {
 }
 
 function unitEffectiveConsumers(unit, mode = 'central') {
+  const gl = parseFactor(unit.simultaneityFactor);
+  if (gl > 0 && gl < 1) {
+    const expanded = [];
+    (unit.consumers || []).forEach((consumer, index) => {
+      const effectiveCount = Math.max(0, Number(consumer.count) || 0) * gl;
+      expanded.push({
+        ...consumer,
+        count: 1,
+        effectiveCount,
+        vr: Number(consumer.vr || 0) * effectiveCount,
+        effectiveRole: 'PWC',
+        effectiveIndex:index,
+        simultaneityApplied:true
+      });
+      hotWaterAddon(consumer, mode, index).forEach(addon => expanded.push({
+        ...addon,
+        count: 1,
+        effectiveCount,
+        vr: Number(addon.vr || 0) * effectiveCount,
+        simultaneityApplied:true
+      }));
+    });
+    return expanded;
+  }
   const byGroup = new Map();
   (unit.consumers || []).forEach(consumer => {
     const key = consumer.neGroup || consumer.typeId;
@@ -135,7 +167,8 @@ export function summarizeUsageUnit(unit, warmWaterMode = 'central') {
     consumerCount: (unit.consumers || []).reduce((sum, c) => sum + (Number(c.count)||1), 0),
     rawFlow,
     sumFlow: effectiveFlow,
-    peakFlow: effectiveFlow
+    peakFlow: effectiveFlow,
+    simultaneityFactor: unit.simultaneityFactor || ''
   };
 }
 
