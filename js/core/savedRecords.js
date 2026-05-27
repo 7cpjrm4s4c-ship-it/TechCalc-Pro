@@ -1,4 +1,4 @@
-import { esc, inlineStats } from './renderer.js';
+import { esc, inlineStats, preserveViewport, snapshotViewport, restoreViewportStable } from './renderer.js';
 
 export function createRecordId(prefix = 'record') {
   try {
@@ -18,6 +18,37 @@ export function replaceRecord(items, id, nextRecord) {
 
 export function removeRecord(items, id) {
   return (Array.isArray(items) ? items : []).filter(item => !isSameId(item.id, id));
+}
+
+
+function cssAttrEscape(value) {
+  return String(value ?? '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+function preserveCardPosition(root, card, attr, id, action) {
+  const beforeTop = card?.getBoundingClientRect?.().top;
+  const before = snapshotViewport();
+  action?.();
+  if (!card || !Number.isFinite(beforeTop)) {
+    restoreViewportStable(before, { frames: 14, delays: [0, 40, 100, 220, 420, 800] });
+    return;
+  }
+  const selector = `[${attr}="${cssAttrEscape(id)}"]`;
+  let frames = 14;
+  const restore = () => {
+    const nextCard = root?.querySelector?.(selector);
+    if (nextCard) {
+      const afterTop = nextCard.getBoundingClientRect().top;
+      const delta = afterTop - beforeTop;
+      if (Math.abs(delta) > 0.5) window.scrollBy(0, delta);
+    } else {
+      restoreViewportStable(before, { frames: 1, delays: [] });
+    }
+    frames -= 1;
+    if (frames > 0) requestAnimationFrame(restore);
+  };
+  requestAnimationFrame(restore);
+  [0, 40, 100, 220, 420, 800].forEach(delay => setTimeout(restore, delay));
 }
 
 export function renderSavedRecordList(items = [], {
@@ -79,7 +110,8 @@ export function bindSavedRecordList(root, {
       if (event.target.closest(`[${deleteAttr}]`) || event.target.closest(`[${toggleAttr}]`)) return;
       event.preventDefault();
       event.stopPropagation();
-      onLoad?.(card.getAttribute(loadAttr), card, event);
+      const id = card.getAttribute(loadAttr);
+      preserveCardPosition(root, card, loadAttr, id, () => onLoad?.(id, card, event));
     });
   });
 
@@ -113,7 +145,9 @@ export function bindEditModeClear(root, {
     const selector = ignoreSelector ? `${baseIgnore}, ${ignoreSelector}` : baseIgnore;
     if (event.target.closest(selector)) return;
     const patch = { [activeIdKey]: null, ...(nameKey ? { [nameKey]: '' } : {}), ...clearPatch };
-    if (typeof onClear === 'function') onClear(patch, event);
-    else state.set(patch);
+    preserveViewport(() => {
+      if (typeof onClear === 'function') onClear(patch, event);
+      else state.set(patch);
+    }, { frames: 14, delays: [0, 40, 100, 220, 420, 800] });
   });
 }

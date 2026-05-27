@@ -355,13 +355,11 @@ function bindActions(root) {
       const current = state.get();
       const item = (current.savedCalculations || []).find(entry => isSameId(entry.id, id));
       if (!item?.state) return;
-      keepViewport(() => {
-        if (isSameId(current.activeCalculationId, item.id)) {
-          state.set(clearedInputs(current));
-          return;
-        }
-        state.set({ ...item.state, savedCalculations: current.savedCalculations || [], activeCalculationId: item.id, name: item.name || item.state.name || '' });
-      });
+      if (isSameId(current.activeCalculationId, item.id)) {
+        state.set(clearedInputs(current));
+        return;
+      }
+      state.set({ ...item.state, savedCalculations: current.savedCalculations || [], activeCalculationId: item.id, name: item.name || item.state.name || '' });
     },
     onDelete: id => {
       const current = state.get();

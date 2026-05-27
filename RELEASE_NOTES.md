@@ -269,3 +269,8 @@
 - Deutsche Zahleneingabe zentralisiert: Tausenderpunkt und Dezimalkomma werden konsistent ausgewertet.
 - Regenwasser-Flächen speichern und aktualisieren Flächenwerte nun kanonisch, z. B. `2.500 m²` als `2500 m²`.
 - Schmutzwasser nutzt die zentrale Scroll-Stabilisierung statt modulinterner Scroll-Patches.
+
+## 1.2.18 Refactor Phase 12
+- Core: Saved-Record-Karten stabilisieren beim Anwählen ihre eigene Bildschirmposition statt nur die absolute Scrollposition wiederherzustellen.
+- Core: Abwählen aktiver gespeicherter Inhalte wird zentral viewport-stabil ausgeführt.
+- Schmutzwasser: Scroll-Sprung nach oben beim Anwählen und nach unten beim Abwählen gespeicherter Inhalte behoben.
