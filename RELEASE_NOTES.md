@@ -1,3 +1,9 @@
+
+## 1.2.18 Refactor UX Pass 2
+- Erweiterung der zentralen Form-Action-Helper.
+- Vorbereitung fuer Event-Delegation in allen Modulen.
+- Basis fuer vereinheitlichte Mengen-/Anzahlfelder geschaffen.
+
 ## Version 1.2.18 - Refactor / UX-Konsolidierung
 
 - Schmutzwasser: gespeicherte Berechnungen auf zentrale Saved-Record-Komponente umgestellt.

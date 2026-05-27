@@ -27,3 +27,19 @@ export function bindActionWithCommittedFields(root, selector, state, keys, handl
     handler?.(event, patch);
   });
 }
+
+
+export function bindDelegatedActionWithCommittedFields(root, selector, state, keys, handler) {
+  if (!root) return;
+  root.addEventListener('click', event => {
+    const trigger = event.target.closest(selector);
+    if (!trigger) return;
+    const patch = commitFields(root, state, keys, { notify: false });
+    handler?.(event, patch, trigger);
+  });
+}
+
+export function normalizeQuantityInput(value, fallback = 0) {
+  const normalized = Number(String(value ?? '').replace(',', '.'));
+  return Number.isFinite(normalized) ? normalized : fallback;
+}
