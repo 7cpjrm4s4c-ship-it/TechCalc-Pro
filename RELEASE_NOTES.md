@@ -250,3 +250,9 @@
 - Schmutzwasser: Leitungsart als stabiles Auswahlmenü umgesetzt.
 - Schmutzwasser: Mengenfelder mobil/desktop neu ausgerichtet.
 - Regenwasser: Flächenformular behält die Eingabe nach dem Hinzufügen; aktive Markierung wird nicht mehr gesetzt.
+
+## 1.2.18 Refactor Phase 9
+- Schmutzwasser: gespeicherte Inhalte werden viewport-stabil geladen, ohne willkürliche Scroll-Sprünge.
+- Core: mehrfach gebundene Edit-Mode-Clear-Listener werden verhindert.
+- Regenwasser: Nach dem Hinzufügen einer Fläche wird die Bearbeitung sauber beendet; Regenspenden bleiben erhalten, übrige Eingabefelder werden zurückgesetzt.
+- Regenwasser: neu angelegte Flächen bleiben nicht als aktive Bearbeitung markiert.

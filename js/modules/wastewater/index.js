@@ -2,7 +2,7 @@ import config from './config.js';
 import { state, initialState } from './state.js';
 import { calculate, getFixture, toNumber } from './logic.js';
 import { fixtureTypes, usageTypes } from './tables.js';
-import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultRows, inlineStats, esc } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultRows, inlineStats, esc, preserveViewport } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { bindEditModeClear, renderSavedRecordList, bindSavedRecordList, createRecordId, replaceRecord, removeRecord, isSameId } from '../../core/savedRecords.js';
@@ -258,6 +258,10 @@ function readFixtureDraft(root, current = {}) {
   }
   return record;
 }
+function keepViewport(action) {
+  preserveViewport(action, { frames: 4 });
+}
+
 function addFixtureFromCurrentInputs(root) {
   const current = state.get();
   const record = readFixtureDraft(root, current);
@@ -351,15 +355,17 @@ function bindActions(root) {
       const current = state.get();
       const item = (current.savedCalculations || []).find(entry => isSameId(entry.id, id));
       if (!item?.state) return;
-      if (isSameId(current.activeCalculationId, item.id)) {
-        state.set(clearedInputs(current));
-        return;
-      }
-      state.set({ ...item.state, savedCalculations: current.savedCalculations || [], activeCalculationId: item.id, name: item.name || item.state.name || '' });
+      keepViewport(() => {
+        if (isSameId(current.activeCalculationId, item.id)) {
+          state.set(clearedInputs(current));
+          return;
+        }
+        state.set({ ...item.state, savedCalculations: current.savedCalculations || [], activeCalculationId: item.id, name: item.name || item.state.name || '' });
+      });
     },
     onDelete: id => {
       const current = state.get();
-      state.set({ savedCalculations: removeRecord(current.savedCalculations || [], id), activeCalculationId: isSameId(current.activeCalculationId, id) ? null : current.activeCalculationId });
+      keepViewport(() => state.set({ savedCalculations: removeRecord(current.savedCalculations || [], id), activeCalculationId: isSameId(current.activeCalculationId, id) ? null : current.activeCalculationId }));
     }
   });
 }

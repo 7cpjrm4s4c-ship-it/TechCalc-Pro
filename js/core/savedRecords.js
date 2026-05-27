@@ -102,6 +102,10 @@ export function bindEditModeClear(root, {
   onClear = null
 } = {}) {
   if (!root || !state || !activeIdKey) return;
+  const key = `editModeClear:${activeIdKey}:${nameKey || ''}`;
+  root.__tcEditModeClearBound = root.__tcEditModeClearBound || new Set();
+  if (root.__tcEditModeClearBound.has(key)) return;
+  root.__tcEditModeClearBound.add(key);
   root.addEventListener('click', event => {
     const current = state.get ? state.get() : {};
     if (!current?.[activeIdKey]) return;

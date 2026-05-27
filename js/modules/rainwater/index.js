@@ -336,9 +336,30 @@ function clearSurfaceEditorPatch(current = {}) {
     calculationType: mode,
     areaType: normalizeAreaType(mode, defaultAreaTypeForMode(mode)),
     areaName: '',
-    areaSize: '100',
+    areaSize: '',
     customCs: '',
-    customCm: ''
+    customCm: '',
+    drainSize: 'DN 100',
+    drainSizeManual: '',
+    drainCapacity: '',
+    drainHead: '',
+    stackCount: '',
+    emergencyType: 'rect',
+    emergencyHead: '',
+    emergencyWidth: '',
+    emergencyDiameter: '',
+    emergencyManufacturerDn: '',
+    emergencyCapacity: '',
+    emergencySafetyFactor: ''
+  };
+}
+function resetSurfaceEditorAfterAdd(current = {}) {
+  return {
+    ...clearSurfaceEditorPatch(current),
+    roofRainIntensity: current.roofRainIntensity || current.rainIntensity || '300',
+    propertyRainIntensity: current.propertyRainIntensity || current.rainIntensity || '300',
+    rainIntensity: current.rainIntensity || '300',
+    rainHundredIntensity: current.rainHundredIntensity || '500'
   };
 }
 const surfaceEditFields = new Set(['surfaceMode','areaType','areaName','areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity','drainSize','drainSizeManual','drainCapacity','drainHead','stackCount','emergencyType','emergencyHead','emergencyWidth','emergencyDiameter','emergencyManufacturerDn','emergencyCapacity','emergencySafetyFactor']);
@@ -368,7 +389,11 @@ function bindActions(root) {
     const base = getAreaType(patch.areaType || defaultAreaTypeForMode(patch.surfaceMode));
     const record = { id:`${Date.now()}-${Math.random().toString(16).slice(2)}`, ...patch };
     if (base?.custom) { record.customCs = current.customCs; record.customCm = current.customCm; }
-    preserveScroll(() => state.set({ ...patch, surfaces:[...(current.surfaces || []), record], activeSurfaceId:null }));
+    preserveScroll(() => state.set({
+      ...resetSurfaceEditorAfterAdd(current),
+      surfaces:[...(current.surfaces || []), record],
+      activeSurfaceId:null
+    }));
   });
 
   root.querySelectorAll('[data-segment="surfaceMode"]').forEach(btn => btn.addEventListener('click', event => {
