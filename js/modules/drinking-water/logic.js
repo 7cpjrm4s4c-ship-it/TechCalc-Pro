@@ -61,9 +61,15 @@ export function createConsumer({ typeId, count = 1, name = '', permanent = false
   };
 }
 
+function parseFactor(value) {
+  if (value === null || value === undefined || value === '') return 0;
+  const n = Number(String(value).trim().replace(',', '.'));
+  return Number.isFinite(n) ? n : 0;
+}
+
 export function createUsageUnit({ name, consumer, consumers, simultaneityFactor = '' }) {
   const list = Array.isArray(consumers) && consumers.length ? consumers : consumer ? [consumer] : [];
-  const gl = num(simultaneityFactor);
+  const gl = parseFactor(simultaneityFactor);
   return {
     id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     name: name || 'Nutzungseinheit',
@@ -108,12 +114,27 @@ function hotWaterAddon(consumer, mode, index = 0) {
 }
 
 function unitEffectiveConsumers(unit, mode = 'central') {
-  const gl = num(unit.simultaneityFactor);
+  const gl = parseFactor(unit.simultaneityFactor);
   if (gl > 0 && gl < 1) {
     const expanded = [];
     (unit.consumers || []).forEach((consumer, index) => {
-      expanded.push({ ...consumer, vr: Number(consumer.vr || 0) * gl, effectiveRole: 'PWC', effectiveIndex:index, simultaneityApplied:true });
-      hotWaterAddon(consumer, mode, index).forEach(addon => expanded.push({ ...addon, vr: Number(addon.vr || 0) * gl, simultaneityApplied:true }));
+      const effectiveCount = Math.max(0, Number(consumer.count) || 0) * gl;
+      expanded.push({
+        ...consumer,
+        count: 1,
+        effectiveCount,
+        vr: Number(consumer.vr || 0) * effectiveCount,
+        effectiveRole: 'PWC',
+        effectiveIndex:index,
+        simultaneityApplied:true
+      });
+      hotWaterAddon(consumer, mode, index).forEach(addon => expanded.push({
+        ...addon,
+        count: 1,
+        effectiveCount,
+        vr: Number(addon.vr || 0) * effectiveCount,
+        simultaneityApplied:true
+      }));
     });
     return expanded;
   }

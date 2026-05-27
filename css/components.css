@@ -4532,7 +4532,7 @@ body::before {
   text-align: center !important;
 }
 
-/* v1.3.0 Bugfix: Schmutzwasser-Anzahlfelder auf Desktop stabil ausrichten */
+/* v1.2.18 Bugfix: Schmutzwasser-Anzahlfelder auf Desktop stabil ausrichten */
 @media (min-width: 481px) {
   .module-view[data-module='wastewater'] .wastewater-fixture-row--editable {
     grid-template-columns: minmax(0, 1fr) 112px 38px !important;
@@ -4542,5 +4542,34 @@ body::before {
     width: 112px;
     min-width: 112px;
     max-width: 112px;
+  }
+}
+
+
+/* v1.2.18: Schmutzwasser Anzahlspalten im Desktop sauber ausrichten */
+.module-view[data-module='wastewater'] .wastewater-fixture-row--editable {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px 34px;
+  column-gap: 14px;
+  align-items: center;
+}
+.module-view[data-module='wastewater'] .wastewater-fixture-row--editable .mini-edit-field {
+  width: 112px;
+  min-width: 112px;
+  max-width: 112px;
+  justify-self: start;
+}
+.module-view[data-module='wastewater'] .wastewater-fixture-row--editable > button {
+  justify-self: end;
+}
+@media (max-width: 480px) {
+  .module-view[data-module='wastewater'] .wastewater-fixture-row--editable {
+    grid-template-columns: minmax(0, 1fr) 34px;
+  }
+  .module-view[data-module='wastewater'] .wastewater-fixture-row--editable .mini-edit-field {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
   }
 }

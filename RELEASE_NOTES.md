@@ -1,3 +1,12 @@
+## Version 1.2.18 - Refactor / UX-Konsolidierung
+
+- Schmutzwasser: gespeicherte Berechnungen auf zentrale Saved-Record-Komponente umgestellt.
+- Schmutzwasser: Eingabewerte werden vor Aktionsklicks zentral committed; Doppel-Klick-Workflows werden vermieden.
+- Core: `formActions` als wiederverwendbarer Helper für Action-Buttons mit aktiven Eingaben ergänzt.
+- Core: Saved-Card-Toggles schließen andere geöffnete Cards standardisiert.
+- Core: Record-IDs, Replace/Delete und Saved-Card-Binding werden konsequenter über zentrale Helfer genutzt.
+- Versionierung für Release-Linie auf 1.2.18 gesetzt.
+
 ## Version 1.2.17 - Hosting / Darstellung Hotfix
 
 - Release Notes werden im Menü dynamisch mit Versionsparameter und `cache: no-store` geladen.

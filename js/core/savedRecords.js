@@ -52,6 +52,7 @@ export function bindSavedRecordList(root, {
   loadAttr = 'data-saved-load',
   toggleAttr = 'data-saved-toggle',
   deleteAttr = 'data-saved-delete',
+  closeOthers = true,
   onLoad,
   onDelete
 } = {}) {
@@ -60,8 +61,16 @@ export function bindSavedRecordList(root, {
       event.preventDefault();
       event.stopPropagation();
       const card = toggle.closest('[data-line-card]');
-      const collapsed = card?.classList.toggle('is-collapsed');
-      toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      const willOpen = card?.classList.contains('is-collapsed');
+      if (closeOthers && card) {
+        root.querySelectorAll('[data-line-card]').forEach(item => {
+          if (item === card) return;
+          item.classList.add('is-collapsed');
+          item.querySelector(`[${toggleAttr}]`)?.setAttribute('aria-expanded', 'false');
+        });
+      }
+      card?.classList.toggle('is-collapsed', !willOpen);
+      toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
     });
   });
 

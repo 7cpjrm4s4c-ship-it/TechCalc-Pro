@@ -5,7 +5,8 @@ import { fixtureTypes, usageTypes } from './tables.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultRows, inlineStats, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-import { bindEditModeClear } from '../../core/savedRecords.js';
+import { bindEditModeClear, renderSavedRecordList, bindSavedRecordList, createRecordId, replaceRecord, removeRecord, isSameId } from '../../core/savedRecords.js';
+import { bindActionWithCommittedFields, readFieldValue } from '../../core/formActions.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
 const fixtureOptions = fixtureTypes.map(item => ({ value: item.id, label: item.name }));
@@ -82,7 +83,7 @@ function savedSnapshot(s, r) {
   delete copy.savedCalculations;
   delete copy.activeCalculationId;
   return {
-    id: s.activeCalculationId || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    id: s.activeCalculationId || createRecordId('wastewater'),
     name: s.name?.trim() || `Schmutzwasser ${saved.length + 1}`,
     createdAt: s.activeCalculationId ? (saved.find(x => x.id === s.activeCalculationId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -94,26 +95,28 @@ function clearedInputs(current = {}) {
   return { ...initialState, savedCalculations: current.savedCalculations || [] };
 }
 function savedRows(s) {
-  const items = Array.isArray(s.savedCalculations) ? s.savedCalculations : [];
-  if (!items.length) return '<div class="empty-state empty-state--compact">Noch keine Schmutzwasser-Berechnungen gespeichert.</div>';
-  return `<div class="ph-saved-list">${items.map(item => {
-    const r = item.result || {};
-    const active = String(s.activeCalculationId || '') === String(item.id);
-    const subtitle = [`${fmt(r.qtot || 0,2)} l/s`, r.dn, lineTypeLabel(r.lineType)].filter(Boolean).join(' · ');
-    return `<article class="ph-saved-item line-section-card is-collapsed ${active ? 'is-active' : ''}" data-line-card data-wastewater-select="${esc(item.id)}">
-      <div class="line-section-card__head">
-        <div class="line-section-card__title"><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle)}</small></div>
-        <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Gespeicherte Berechnung aufklappen"><span>▾</span></button>
-        <button type="button" class="line-section-card__delete" data-wastewater-delete="${esc(item.id)}" aria-label="Berechnung löschen">×</button>
-      </div>
-      <div class="line-section-card__body">${resultRows([
+  return renderSavedRecordList(s.savedCalculations || [], {
+    activeId: s.activeCalculationId,
+    emptyText: 'Noch keine Schmutzwasser-Berechnungen gespeichert.',
+    loadAttr: 'data-wastewater-select',
+    toggleAttr: 'data-line-toggle',
+    deleteAttr: 'data-wastewater-delete',
+    title: item => item.name || 'Berechnung',
+    subtitle: item => {
+      const r = item.result || {};
+      return [`${fmt(r.qtot || 0,2)} l/s`, r.dn, lineTypeLabel(r.lineType)].filter(Boolean).join(' · ');
+    },
+    stats: item => {
+      const r = item.result || {};
+      return [
         { label:'Qtot', value:fmt(r.qtot || 0,2), unit:'l/s' },
         { label:'Qww', value:fmt(r.qww || 0,2), unit:'l/s' },
         { label:'ΣDU', value:fmt(r.sumDu || 0,1), unit:'l/s' },
         { label:'Empfohlene DN', value:r.dn || '—' }
-      ])}</div>
-    </article>`;
-  }).join('')}</div>`;
+      ];
+    },
+    className: 'ph-saved-list'
+  });
 }
 function fixturesTable(s, r) {
   if (!r.fixtures.length) return '<div class="empty-state empty-state--compact">Noch keine Entwässerungsgegenstände hinzugefügt.</div>';
@@ -226,25 +229,21 @@ function view(s) {
   const r = calculate(s);
   return renderModuleShell(config, `<div class="span-6">${inputCards(s, r)}</div><div class="span-6">${resultCards(s, r)}</div>`);
 }
-function updateFixture(id, patch) {
-  const current = state.get();
-  state.set({ fixtures: (current.fixtures || []).map(item => String(item.id) === String(id) ? { ...item, ...patch } : item) });
-}
 function bindActions(root) {
   bindEditModeClear(root, { state, activeIdKey: 'activeCalculationId', nameKey: 'name', onClear: () => state.set(clearedInputs(state.get())) });
-  root.querySelector('[data-fixture-add]')?.addEventListener('click', () => {
+  bindActionWithCommittedFields(root, '[data-fixture-add]', state, ['fixtureType', 'fixtureQuantity', 'fixtureCustomName', 'fixtureCustomDu', 'fixtureCustomDn'], () => {
     const current = state.get();
-    const typeId = current.fixtureType || 'washbasin';
+    const typeId = readFieldValue(root, 'fixtureType', current.fixtureType || 'washbasin');
     const base = getFixture(typeId);
     const record = {
-      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      id: createRecordId('fixture'),
       typeId,
-      quantity: current.fixtureQuantity || '1'
+      quantity: readFieldValue(root, 'fixtureQuantity', current.fixtureQuantity || '1')
     };
     if (base?.custom) {
-      record.customName = current.fixtureCustomName || 'Freier Gegenstand';
-      record.customDu = current.fixtureCustomDu || '0';
-      record.customDn = current.fixtureCustomDn || '—';
+      record.customName = readFieldValue(root, 'fixtureCustomName', current.fixtureCustomName || 'Freier Gegenstand');
+      record.customDu = readFieldValue(root, 'fixtureCustomDu', current.fixtureCustomDu || '0');
+      record.customDn = readFieldValue(root, 'fixtureCustomDn', current.fixtureCustomDn || '—');
     }
     state.set({
       fixtures: [...(current.fixtures || []), record],
@@ -299,38 +298,27 @@ function bindActions(root) {
     const existing = saved.find(item => String(item.id) === String(id));
     if (!existing) return;
     const record = { ...savedSnapshot(current, calculate(current)), id, createdAt: existing.createdAt || new Date().toISOString() };
-    state.set({ savedCalculations: saved.map(item => String(item.id) === String(id) ? record : item), activeCalculationId: id, name: record.name });
+    state.set({ savedCalculations: replaceRecord(saved, id, record), activeCalculationId: id, name: record.name });
   });
-  root.querySelectorAll('[data-line-toggle]').forEach(toggle => toggle.addEventListener('click', event => {
-    event.stopPropagation();
-    const itemCard = toggle.closest('[data-line-card]');
-    const willOpen = itemCard?.classList.contains('is-collapsed');
-    root.querySelectorAll('[data-line-card]').forEach(card => {
-      if (card !== itemCard) {
-        card.classList.add('is-collapsed');
-        card.querySelector('[data-line-toggle]')?.setAttribute('aria-expanded', 'false');
+  bindSavedRecordList(root, {
+    loadAttr: 'data-wastewater-select',
+    toggleAttr: 'data-line-toggle',
+    deleteAttr: 'data-wastewater-delete',
+    onLoad: id => {
+      const current = state.get();
+      const item = (current.savedCalculations || []).find(entry => isSameId(entry.id, id));
+      if (!item?.state) return;
+      if (isSameId(current.activeCalculationId, item.id)) {
+        state.set(clearedInputs(current));
+        return;
       }
-    });
-    if (itemCard) itemCard.classList.toggle('is-collapsed', !willOpen);
-    toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-  }));
-  root.querySelectorAll('[data-wastewater-select]').forEach(cardEl => cardEl.addEventListener('click', event => {
-    if (event.target.closest('[data-wastewater-delete]') || event.target.closest('[data-line-toggle]')) return;
-    const current = state.get();
-    const item = (current.savedCalculations || []).find(entry => String(entry.id) === String(cardEl.dataset.wastewaterSelect));
-    if (!item?.state) return;
-    if (String(current.activeCalculationId || '') === String(item.id)) {
-      state.set(clearedInputs(current));
-      return;
+      state.set({ ...item.state, savedCalculations: current.savedCalculations || [], activeCalculationId: item.id, name: item.name || item.state.name || '' });
+    },
+    onDelete: id => {
+      const current = state.get();
+      state.set({ savedCalculations: removeRecord(current.savedCalculations || [], id), activeCalculationId: isSameId(current.activeCalculationId, id) ? null : current.activeCalculationId });
     }
-    state.set({ ...item.state, savedCalculations: current.savedCalculations || [], activeCalculationId: item.id, name: item.name || item.state.name || '' });
-  }));
-  root.querySelectorAll('[data-wastewater-delete]').forEach(btn => btn.addEventListener('click', event => {
-    event.stopPropagation();
-    const current = state.get();
-    const next = (current.savedCalculations || []).filter(item => String(item.id) !== String(btn.dataset.wastewaterDelete));
-    state.set({ savedCalculations: next, activeCalculationId: String(current.activeCalculationId) === String(btn.dataset.wastewaterDelete) ? null : current.activeCalculationId });
-  }));
+  });
 }
 
 export default { config, state, mount(root) { return mountModule(root, state, view, bindActions); } };
