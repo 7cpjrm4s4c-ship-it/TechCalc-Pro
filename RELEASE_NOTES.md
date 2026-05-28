@@ -1,4 +1,12 @@
 
+## 1.3.0 Phase 12G – Heizung/Kälte Globalisierung
+
+- Heizung/Kälte weiter store-first globalisiert.
+- Saved-Selection aktualisiert Save-/Update-Steuerung ohne statischen Card-Rebuild.
+- Eingabe-, Ergebnis- und Saved-Record-Bereiche bleiben als getrennte dynamische Inseln erhalten.
+- Regressionstest `heating-cooling-phase12g` ergänzt.
+
+
 ## 1.3.0 Phase 12F
 
 - Heizung/Kälte weiter globalisiert.
@@ -487,3 +495,12 @@
 - Extended module render stabilization for small screens and visual viewport changes.
 - Added mobile scroll CSS rules for stable line cards, saved records and module views.
 - Added `audit-mobile-scroll-stability.mjs` and included it in `npm test`.
+
+## 1.3.0 Phase 12H – Heizung/Kälte final globalisiert
+
+- Heizung/Kälte als Referenzmodul auf Store-first-Verhalten abgeschlossen.
+- Statische Layoutbereiche bleiben nach Initial-Mount stabil; Feld-, Select-, Segment- und Saved-Aktionen aktualisieren nur dynamische Inseln.
+- Saved Entries hydratisieren den zentralen Store und vermeiden Full-Card-Rebuilds.
+- Medium- und Rohr-Stammdaten werden über den Store in Ergebnis- und Detailbereiche propagiert.
+- Mobile und Desktop nutzen denselben Pipeline-Pfad für Segment-, Select- und Save-Aktionen.
+- Regressionstest `heating-cooling-phase12h` ergänzt.

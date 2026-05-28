@@ -20,6 +20,7 @@
     "test:state-binding": "node tests/state-binding.test.mjs",
     "test:render-coordinator": "node tests/render-coordinator.test.mjs",
     "audit:legacy-events": "node scripts/audit-legacy-event-handlers.mjs",
-    "test:heating-cooling-global": "node tests/heating-cooling-global-standard.test.mjs"
+    "test:heating-cooling-global": "node tests/heating-cooling-global-standard.test.mjs",
+    "test:heating-cooling-final": "node tests/heating-cooling-phase12h.test.mjs"
   }
 }

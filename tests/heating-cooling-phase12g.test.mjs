@@ -5,7 +5,7 @@ const moduleSource = fs.readFileSync('js/modules/heating-cooling/index.js', 'utf
 const configSource = fs.readFileSync('js/modules/heating-cooling/config.js', 'utf8');
 const pipelineSource = fs.readFileSync('js/core/eventPipeline.js', 'utf8');
 
-assert.match(configSource, /phase-12g-globalized/, 'heating/cooling config must identify the phase 12G globalized state.');
+assert.match(configSource, /phase-12(?:g-globalized|h-final-globalized)/, 'heating/cooling config must identify the phase 12G/12H globalized state.');
 assert.match(moduleSource, /function updateHeatingCoolingDynamic/, 'heating/cooling must use granular dynamic updates after initial mount.');
 assert.match(moduleSource, /return action !== 'initial';/, 'post-initial actions must stay on the dynamic render path.');
 assert.match(moduleSource, /updateSaveControls\(root, s, meta\)/, 'saved-entry selection must refresh save/update controls without a full module render.');
