@@ -1,9 +1,11 @@
 import config from './config.js';
+import schema from './schema.js';
 import { state, saveProcesses, makeProcessRecord, clearLegacyPoints } from './state.js';
 import { calculate, calculatePoint, humidityRatioKgKg, PROCESS_OPTIONS } from './logic.js';
 import { card, field, renderModuleShell, bindCommonInputs, stack, grid, inlineStats, mainResult, segmented, esc, signedTempField, toggleNumericSign } from '../../core/renderer.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { safeReplaceContent } from '../../core/domUpdate.js';
+import { parseNumber } from '../../core/numberService.js';
 
 function hxFmt(value, decimals = 2) {
   const n = Number(value);
@@ -16,8 +18,8 @@ function actionButton(label, attr, variant = '') {
 }
 
 function availableProcesses(s) {
-  const t0 = Number(String(s.tempC ?? 0).replace(',', '.')) || 0;
-  const t1 = Number(String(s.targetTempC ?? 0).replace(',', '.')) || 0;
+  const t0 = parseNumber(s.tempC, { fallback: 0 });
+  const t1 = parseNumber(s.targetTempC, { fallback: 0 });
   if (t0 < t1) return PROCESS_OPTIONS.filter(option => !['cool', 'cool-dehumidify'].includes(option.value));
   if (t0 > t1) return PROCESS_OPTIONS.filter(option => ['cool', 'cool-dehumidify'].includes(option.value));
   return PROCESS_OPTIONS;
@@ -209,6 +211,7 @@ function view(s) {
 
 export default {
   config,
+  schema,
   state,
   mount(root) {
     const mountToken = root?.dataset?.renderToken || '';

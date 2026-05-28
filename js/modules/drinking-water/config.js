@@ -9,7 +9,7 @@ export default defineModuleConfig({
   order: 35,
   defaultVisible: false,
 
-  migrationStatus: 'legacy-adapter',
-  capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE],
+  migrationStatus: 'phase-8-schema-inventory',
+  capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA],
   description: 'Nutzungseinheiten, Einzelverbraucher, Summen- und Spitzendurchfluss nach DIN 1988-300.'
 });

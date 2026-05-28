@@ -1,4 +1,5 @@
 import { num } from '../../utils/calculations.js';
+import { parseNumber } from '../../core/numberService.js';
 
 export const CONSUMERS = [
   { id:'basin', label:'Waschtisch / Bidet', short:'Waschtisch / Bidet', vr:0.07, pmin:0.10, neGroup:'basin', hotWater:true },
@@ -62,9 +63,7 @@ export function createConsumer({ typeId, count = 1, name = '', permanent = false
 }
 
 function parseFactor(value) {
-  if (value === null || value === undefined || value === '') return 0;
-  const n = Number(String(value).trim().replace(',', '.'));
-  return Number.isFinite(n) ? n : 0;
+  return parseNumber(value, { fallback: 0 });
 }
 
 export function createUsageUnit({ name, consumer, consumers, simultaneityFactor = '' }) {

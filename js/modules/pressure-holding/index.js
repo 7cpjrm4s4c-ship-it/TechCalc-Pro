@@ -1,4 +1,5 @@
 import config from './config.js';
+import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, resultRows, esc } from '../../core/renderer.js';
@@ -199,4 +200,4 @@ function bindPressureHoldingActions(root, snapshot){
   });
 }
 
-export default { config, state, mount(root){ return mountModule(root, state, view, bindPressureHoldingActions); } };
+export default { config, schema, state, mount(root){ return mountModule(root, state, view, bindPressureHoldingActions); } };

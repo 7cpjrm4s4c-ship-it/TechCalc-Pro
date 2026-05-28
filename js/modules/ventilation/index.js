@@ -1,5 +1,6 @@
 import { parseNumber } from '../../core/numberService.js';
 import config from './config.js';
+import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { card, field, segmented, renderModuleShell, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
@@ -79,7 +80,8 @@ function firstFilled(...values) {
 
 function parseDisplayNumber(value) {
   if (value === undefined || value === null || value === '—') return '';
-  return String(value).replace(/\s+/g, '').replace(',', '.');
+  const parsed = parseNumber(value, { fallback: NaN });
+  return Number.isFinite(parsed) ? String(parsed) : '';
 }
 
 function inferStoredMode(input = {}, item = {}, fallback = 'heating') {
@@ -192,8 +194,8 @@ function powerField(s) {
 
 function derivedDeltaT(active) {
   if (active.deltaT !== '' && active.deltaT !== null && active.deltaT !== undefined) return active.deltaT;
-  const supply = Number(String(active.supplyTemp || '').replace(',', '.'));
-  const room = Number(String(active.roomTemp || '').replace(',', '.'));
+  const supply = parseNumber(active.supplyTemp, { fallback: NaN });
+  const room = parseNumber(active.roomTemp, { fallback: NaN });
   if (Number.isFinite(supply) && Number.isFinite(room)) return Math.abs(supply - room);
   return '';
 }
@@ -271,6 +273,7 @@ function view(s) {
 
 export default {
   config,
+  schema,
   state,
   mount(root) {
     return mountModule(root, state, view, (rootEl, snapshot, render) => {

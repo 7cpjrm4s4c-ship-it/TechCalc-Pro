@@ -1,4 +1,5 @@
 import config from './config.js';
+import schema from './schema.js';
 import { state } from './state.js';
 import { calculate, CONSUMERS, BUILDING_TYPES, createConsumer, createUsageUnit, createSingleGroup, readUsageUnits, writeUsageUnits, readSingleConsumers, writeSingleConsumers } from './logic.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, esc } from '../../core/renderer.js';
@@ -475,6 +476,7 @@ function bindDrinkingWater(root, signal) {
 
 export default {
   config,
+  schema,
   state,
   mount(root) {
     const controller = new AbortController();

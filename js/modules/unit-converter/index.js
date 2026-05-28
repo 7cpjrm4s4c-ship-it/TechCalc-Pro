@@ -1,4 +1,5 @@
 import config from './config.js';
+import schema from './schema.js';
 import { state } from './state.js';
 import { calculate, unitsFor } from './logic.js';
 import { card, field, selectField, resultRows, renderModuleShell, stack, grid } from '../../core/renderer.js';
@@ -50,6 +51,7 @@ function view(s) {
 }
 export default {
   config,
+  schema,
   state,
   mount(root) {
     return mountModule(root, state, view);

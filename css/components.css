@@ -1868,23 +1868,6 @@ body.settings-open .settings-panel {
   justify-content: space-between;
 }
 
-@media (max-width: 767px) {
-.settings-panel {
-  position: fixed !important;
-  left: 10px !important;
-  right: 10px !important;
-  top: max(92px, calc(env(safe-area-inset-top) + 78px)) !important;
-  bottom: max(10px, env(safe-area-inset-bottom)) !important;
-  width: auto;
-  max-height: none;
-  padding: 16px;
-}
-
-.settings-panel__body {
-  padding-right: 0;
-}
-}
-
 body.settings-open .app-header,
 body.settings-open .module-nav,
 body.settings-open .app-main {
@@ -1911,40 +1894,23 @@ body.settings-open .app-main {
   min-height: 48px;
 }
 
-@media (max-width: 767px) {
-.settings-panel {
-  position: fixed !important;
-  left: 10px !important;
-  right: 10px !important;
-  top: max(88px, calc(env(safe-area-inset-top) + 76px)) !important;
-  bottom: max(10px, env(safe-area-inset-bottom)) !important;
-  width: auto;
-  max-height: none;
-  padding: 14px;
-}
-
-.settings-panel__body {
-  padding-right: 0;
-}
-}
-
 .settings-panel {
   position: fixed;
   right: 18px;
   top: 76px;
   width: min(420px, calc(100vw - 36px));
   border-radius: var(--radius-xl);
-  z-index: 1200 !important;
+  z-index: 1200;
   padding: var(--space-3);
   max-height: calc(100dvh - 96px);
   overflow: hidden;
-  display: flex !important;
+  display: flex;
   flex-direction: column;
   box-sizing: border-box;
   opacity: 0;
   visibility: hidden;
   transform: translateY(8px);
-  pointer-events: none !important;
+  pointer-events: none;
   transition: opacity .16s ease, transform .16s ease, visibility .16s ease;
 }
 
@@ -1954,25 +1920,25 @@ body.settings-open .app-main {
 
 .settings-panel.is-open {
   opacity: 1;
-  visibility: visible !important;
+  visibility: visible;
   transform: none;
-  pointer-events: auto !important;
+  pointer-events: auto;
 }
 
 body.settings-open .app-shell {
-  pointer-events: auto !important;
+  pointer-events: auto;
 }
 
 body.settings-open .app-header,
 body.settings-open .module-nav,
 body.settings-open .app-main,
 body.settings-open .overflow-menu {
-  pointer-events: none !important;
+  pointer-events: none;
 }
 
 body.settings-open .settings-panel,
 body.settings-open .settings-panel * {
-  pointer-events: auto !important;
+  pointer-events: auto;
 }
 
 .settings-panel__head {
@@ -1981,9 +1947,9 @@ body.settings-open .settings-panel * {
   align-items: center;
   margin-bottom: var(--space-2);
   flex: 0 0 auto;
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 3 !important;
+  position: sticky;
+  top: 0;
+  z-index: 3;
   padding-bottom: var(--space-2);
   background: linear-gradient(135deg, rgba(32,39,49,.96), rgba(18,22,28,.92));
 }
@@ -2002,13 +1968,30 @@ body.settings-open .settings-panel * {
   padding-bottom: max(18px, env(safe-area-inset-bottom));
 }
 
+@media (max-width: 767px) {
+  #settingsPanel.settings-panel {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    top: max(88px, calc(env(safe-area-inset-top) + 76px));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    max-height: none;
+    padding: 14px;
+  }
+
+  #settingsPanel .settings-panel__body {
+    padding-right: 0;
+  }
+}
+
 .settings-submenu {
   border: 1px solid rgba(255,255,255,.12);
   border-radius: var(--radius-lg);
   background: rgba(255,255,255,.035);
   overflow: hidden;
   min-height: 0;
-  display: block !important;
+  display: block;
   height: auto;
 }
 
@@ -2017,7 +2000,7 @@ body.settings-open .settings-panel * {
   min-height: 58px;
   height: 58px;
   padding: 0 14px;
-  display: flex !important;
+  display: flex;
   align-items: center;
 }
 
@@ -2026,26 +2009,13 @@ body.settings-open .settings-panel * {
 }
 
 .settings-submenu[open] > .settings-submenu__content {
-  display: grid !important;
-}
-
-@media (max-width: 767px) {
-.settings-panel {
-  position: fixed !important;
-  left: 10px !important;
-  right: 10px !important;
-  top: max(88px, calc(env(safe-area-inset-top) + 76px)) !important;
-  bottom: max(10px, env(safe-area-inset-bottom)) !important;
-  width: auto;
-  max-height: none;
-  padding: 14px;
-}
+  display: grid;
 }
 
 #settingsButton {
-  position: relative !important;
-  z-index: 1201 !important;
-  pointer-events: auto !important;
+  position: relative;
+  z-index: 1201;
+  pointer-events: auto;
   touch-action: manipulation;
 }
 
@@ -2054,20 +2024,8 @@ body.settings-open .settings-panel * {
   height: 58px;
   min-height: 58px;
   padding: 0 14px;
-  display: flex !important;
+  display: flex;
   align-items: center;
-}
-
-@media (max-width: 767px) {
-#settingsPanel.settings-panel {
-  position: fixed !important;
-  left: 10px !important;
-  right: 10px !important;
-  top: max(88px, calc(env(safe-area-inset-top) + 76px)) !important;
-  bottom: max(10px, env(safe-area-inset-bottom)) !important;
-  width: auto;
-  max-height: none;
-}
 }
 
 :root {
@@ -2075,11 +2033,11 @@ body.settings-open .settings-panel * {
 }
 
 #settingsPanel.settings-panel.is-open {
-  display: flex !important;
+  display: flex;
   opacity: 1;
-  visibility: visible !important;
+  visibility: visible;
   transform: none;
-  pointer-events: auto !important;
+  pointer-events: auto;
 }
 
 #settingsPanel .settings-submenu:not([open]) > .settings-submenu__content {
@@ -2089,13 +2047,13 @@ body.settings-open .settings-panel * {
 body.settings-open .app-main,
 body.settings-open .module-nav,
 body.settings-open .overflow-menu {
-  pointer-events: none !important;
+  pointer-events: none;
 }
 
 body.settings-open #settingsButton,
 body.settings-open #settingsPanel,
 body.settings-open #settingsPanel * {
-  pointer-events: auto !important;
+  pointer-events: auto;
 }
 
 .settings-field {
@@ -2113,7 +2071,7 @@ body.settings-open #settingsPanel * {
 
 .project-select-card {
   position: relative;
-  display: block !important;
+  display: block;
   width: 100%;
   min-height: 58px;
   border: 1px solid var(--color-border-strong);
@@ -2233,7 +2191,7 @@ body.settings-open {
 #settingsPanel.settings-panel {
   contain: layout style;
   overflow: hidden;
-  display: flex !important;
+  display: flex;
   flex-direction: column;
 }
 
@@ -2251,7 +2209,7 @@ body.settings-open {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  display: block !important;
+  display: block;
   flex: 1 1 auto;
   min-height: 0;
   touch-action: pan-y;
@@ -2260,7 +2218,7 @@ body.settings-open {
 }
 
 #settingsPanel .settings-submenu {
-  display: block !important;
+  display: block;
   margin: 0 0 12px 0;
   overflow: visible;
   min-height: 0;
@@ -2273,12 +2231,12 @@ body.settings-open {
   min-height: 64px;
   max-height: var(--settings-row-h);
   padding: 0 14px;
-  display: flex !important;
+  display: flex;
   align-items: center;
 }
 
 #settingsPanel .settings-submenu[open] > .settings-submenu__content {
-  display: grid !important;
+  display: grid;
   overflow: visible;
   max-height: none;
   padding: 14px;
@@ -2286,7 +2244,7 @@ body.settings-open {
 }
 
 #settingsPanel .theme-switch {
-  display: grid !important;
+  display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   min-height: 58px;
   width: 100%;
@@ -3003,7 +2961,7 @@ body.settings-open {
 }
 
 .line-section-card__toggle {
-  display: flex !important;
+  display: flex;
   width: 100%;
   height: auto;
   min-width: 0;
@@ -3373,7 +3331,7 @@ body.settings-open {
   display: none !important;
 }
 .line-section-card__head {
-  display: grid !important;
+  display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 10px;

@@ -14,11 +14,11 @@ for (const file of files) {
 }
 const report = {
   importantCount: total,
-  budget: 90,
-  status: total <= 90 ? 'ok' : 'over-budget',
-  note: 'Phase 7 keeps only defensive overrides such as fixed overlays, display locks and pointer-event guards.',
+  budget: 35,
+  status: total <= 35 ? 'ok' : 'over-budget',
+  note: 'Phase 8 tightens the !important budget after removing duplicated settings-panel overrides. Remaining usages are tracked debt, not a default styling mechanism.',
   examples: details.slice(0, 40)
 };
-fs.writeFileSync('important-usage-audit-phase7.json', JSON.stringify(report, null, 2));
+fs.writeFileSync('important-usage-audit-phase8.json', JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report, null, 2));
-if (total > 90) process.exitCode = 1;
+if (total > 35) process.exitCode = 1;

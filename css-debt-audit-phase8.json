@@ -205,5 +205,5 @@
       "count": 2
     }
   ],
-  "note": "Phase 6 reduced components.css by removing archived superseded DW/light-mode patches; remaining legacy selectors are migration aliases or specialized visualizations."
+  "note": "Phase 8 removes duplicated settings-panel overrides and tracks remaining legacy selectors as explicit migration debt."
 }

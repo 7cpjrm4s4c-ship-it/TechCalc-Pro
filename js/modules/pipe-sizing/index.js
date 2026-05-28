@@ -1,4 +1,5 @@
 import config from './config.js';
+import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { card, field, selectField, resultRows, renderModuleShell, stack, grid, inlineStats, pressureBadge, esc } from '../../core/renderer.js';
@@ -108,6 +109,7 @@ function view(s) {
 }
 export default {
   config,
+  schema,
   state,
   mount(root) {
     return mountModule(root, state, view, (rootEl, snapshot) => {

@@ -19,7 +19,7 @@ const report = {
   patchComments,
   legacySelectorLines: legacySelectorLines.length,
   duplicateSelectors: duplicates.slice(0, 50).map(([selector, count]) => ({ selector, count })),
-  note: 'Phase 6 reduced components.css by removing archived superseded DW/light-mode patches; remaining legacy selectors are migration aliases or specialized visualizations.'
+  note: 'Phase 8 removes duplicated settings-panel overrides and tracks remaining legacy selectors as explicit migration debt.'
 };
-fs.writeFileSync('css-debt-audit-phase6.json', JSON.stringify(report, null, 2));
+fs.writeFileSync('css-debt-audit-phase8.json', JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report, null, 2));

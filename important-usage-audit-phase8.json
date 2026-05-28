@@ -1,8 +1,8 @@
 {
   "importantCount": 29,
-  "budget": 90,
+  "budget": 35,
   "status": "ok",
-  "note": "Phase 7 keeps only defensive overrides such as fixed overlays, display locks and pointer-event guards.",
+  "note": "Phase 8 tightens the !important budget after removing duplicated settings-panel overrides. Remaining usages are tracked debt, not a default styling mechanism.",
   "examples": [
     {
       "file": "css/components.css",

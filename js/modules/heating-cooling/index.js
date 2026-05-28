@@ -1,5 +1,6 @@
 import { parseNumber } from '../../core/numberService.js';
 import config from './config.js';
+import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { MEDIA, fmt, fmtInput } from '../../utils/calculations.js';
@@ -169,7 +170,8 @@ function firstFilled(...values) {
 
 function parseDisplayNumber(value) {
   if (value === undefined || value === null || value === '—') return '';
-  return String(value).replace(/\s+/g, '').replace(',', '.');
+  const parsed = parseNumber(value, { fallback: NaN });
+  return Number.isFinite(parsed) ? String(parsed) : '';
 }
 
 function inferStoredMode(input = {}, item = {}, fallback = 'heating') {
@@ -323,6 +325,7 @@ function view(s) {
 
 export default {
   config,
+  schema,
   state,
   mount(root) {
     return mountModule(root, state, view, (rootEl, snapshot, render) => {

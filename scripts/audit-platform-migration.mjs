@@ -42,5 +42,5 @@ const summary = {
   modules
 };
 
-fs.writeFileSync('platform-migration-audit-phase6.json', JSON.stringify(summary, null, 2));
+fs.writeFileSync('platform-migration-audit-phase8.json', JSON.stringify(summary, null, 2));
 console.log(JSON.stringify(summary, null, 2));

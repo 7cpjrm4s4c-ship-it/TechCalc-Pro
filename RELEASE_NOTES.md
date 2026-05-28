@@ -347,3 +347,13 @@
 - Core: Saved-Record-Karten stabilisieren beim Anwählen ihre eigene Bildschirmposition statt nur die absolute Scrollposition wiederherzustellen.
 - Core: Abwählen aktiver gespeicherter Inhalte wird zentral viewport-stabil ausgeführt.
 - Schmutzwasser: Scroll-Sprung nach oben beim Anwählen und nach unten beim Abwählen gespeicherter Inhalte behoben.
+
+## 1.3.0 Phase 8 — Stabilisierung und Schema-Inventar
+
+- Alle Module besitzen und exportieren jetzt ein Formularschema.
+- Legacy-Zahlenparser wurden auf die zentrale `numberService`-Logik umgestellt.
+- `components.css` wurde weiter bereinigt.
+- Doppelte Settings-Panel-CSS-Patches wurden entfernt.
+- `!important`-Nutzung wurde deutlich reduziert und das Budget verschärft.
+- Phase-8-Audits für Modulvertrag, Plattformmigration, CSS-Schulden und `!important` ergänzt.
+- Quality Gate erfolgreich.
