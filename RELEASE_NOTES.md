@@ -1,4 +1,12 @@
 
+## 1.3.0 Phase 11
+
+- Saved-Entry-Selektion für Desktop und Mobile stabilisiert.
+- `bindSavedRecordList` auf zentrale capture-basierte Event-Delegation umgestellt.
+- Gespeicherte Karten sind jetzt tastaturbedienbar (`Enter`/`Space`).
+- Regressionstest für robuste Saved-Record-Delegation ergänzt.
+
+
 ## 1.3.0 Phase 10 - Scroll- und Saved-Record-Fixes
 
 - Desktop-Fix: gespeicherte Eintraege gehen beim Klick nach Feldbearbeitung nicht mehr durch Blur-Re-Render verloren.

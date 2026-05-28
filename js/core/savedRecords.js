@@ -21,8 +21,6 @@ export function removeRecord(items, id) {
   return (Array.isArray(items) ? items : []).filter(item => !isSameId(item.id, id));
 }
 
-
-
 export function renderSavedRecordList(items = [], {
   activeId = null,
   emptyText = 'Noch keine Einträge gespeichert.',
@@ -40,7 +38,7 @@ export function renderSavedRecordList(items = [], {
     const itemTitle = title(item, index);
     const itemSubtitle = typeof subtitle === 'function' ? subtitle(item, index) : '';
     const itemStats = typeof stats === 'function' ? stats(item, index) : [];
-    return `<article class="line-section-card saved-record-card is-collapsed ${isSameId(activeId, item.id) ? 'is-active' : ''}" data-line-card ${loadAttr}="${esc(item.id)}">
+    return `<article class="line-section-card saved-record-card is-collapsed ${isSameId(activeId, item.id) ? 'is-active' : ''}" data-line-card data-saved-record-card tabindex="0" role="button" ${loadAttr}="${esc(item.id)}">
       <div class="line-section-card__head saved-record-card__head">
         <div class="line-section-card__title saved-record-card__title"><strong>${esc(itemTitle)}</strong>${itemSubtitle ? `<small>${esc(itemSubtitle)}</small>` : ''}</div>
         <button type="button" class="line-section-card__toggle saved-record-card__toggle" ${toggleAttr} aria-expanded="false" aria-label="Details aufklappen"><span>▾</span></button>
@@ -49,6 +47,40 @@ export function renderSavedRecordList(items = [], {
       <div class="line-section-card__body saved-record-card__body">${inlineStats(itemStats)}</div>
     </article>`;
   }).join('')}</div>`;
+}
+
+function bindScopedOnce(root, key, eventName, listener, options) {
+  root.__tcSavedRecordBindings = root.__tcSavedRecordBindings || new Set();
+  const bindingKey = `${key}:${eventName}`;
+  if (root.__tcSavedRecordBindings.has(bindingKey)) return;
+  root.__tcSavedRecordBindings.add(bindingKey);
+  root.addEventListener(eventName, listener, options);
+}
+
+function closestAttr(target, attr, root) {
+  const item = target?.closest?.(`[${attr}]`);
+  return item && root.contains(item) ? item : null;
+}
+
+function shouldIgnoreLoad(event, toggleAttr, deleteAttr) {
+  const target = event.target;
+  return Boolean(
+    target?.closest?.(`[${deleteAttr}]`) ||
+    target?.closest?.(`[${toggleAttr}]`) ||
+    target?.closest?.('a[href], input, select, textarea, label')
+  );
+}
+
+function activateLoad({ root, card, event, loadAttr, onLoad, preserveLoadScroll }) {
+  const id = card.getAttribute(loadAttr);
+  if (!id) return;
+  event.preventDefault();
+  event.stopPropagation();
+  event.stopImmediatePropagation?.();
+  markCommittedAction(root);
+  const run = () => onLoad?.(id, card, event);
+  if (preserveLoadScroll) preserveViewport(run, { frames: 8, blurActive: false, anchor: card, event, delays: [0, 40, 100, 220] });
+  else run();
 }
 
 export function bindSavedRecordList(root, {
@@ -60,10 +92,15 @@ export function bindSavedRecordList(root, {
   onDelete,
   preserveLoadScroll = true
 } = {}) {
-  root.querySelectorAll(`[${toggleAttr}]`).forEach(toggle => {
-    toggle.addEventListener('click', event => {
+  if (!root) return;
+  const key = `${loadAttr}|${toggleAttr}|${deleteAttr}`;
+
+  bindScopedOnce(root, key, 'click', event => {
+    const toggle = closestAttr(event.target, toggleAttr, root);
+    if (toggle) {
       event.preventDefault();
       event.stopPropagation();
+      event.stopImmediatePropagation?.();
       const card = toggle.closest('[data-line-card]');
       const willOpen = card?.classList.contains('is-collapsed');
       if (closeOthers && card) {
@@ -75,32 +112,31 @@ export function bindSavedRecordList(root, {
       }
       card?.classList.toggle('is-collapsed', !willOpen);
       toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-    });
-  });
+      return;
+    }
 
-  root.querySelectorAll(`[${loadAttr}]`).forEach(card => {
-    card.addEventListener('click', event => {
-      if (event.target.closest(`[${deleteAttr}]`) || event.target.closest(`[${toggleAttr}]`)) return;
+    const deleteButton = closestAttr(event.target, deleteAttr, root);
+    if (deleteButton) {
       event.preventDefault();
       event.stopPropagation();
-      const id = card.getAttribute(loadAttr);
+      event.stopImmediatePropagation?.();
       markCommittedAction(root);
-      const run = () => onLoad?.(id, card, event);
-      if (preserveLoadScroll) preserveViewport(run, { frames: 8, blurActive: false, anchor: card, event, delays: [0, 40, 100, 220] });
-      else run();
-    });
-  });
+      onDelete?.(deleteButton.getAttribute(deleteAttr), deleteButton, event);
+      return;
+    }
 
-  root.querySelectorAll(`[${deleteAttr}]`).forEach(button => {
-    button.addEventListener('click', event => {
-      event.preventDefault();
-      event.stopPropagation();
-      markCommittedAction(root);
-      onDelete?.(button.getAttribute(deleteAttr), button, event);
-    });
+    const card = closestAttr(event.target, loadAttr, root);
+    if (!card || shouldIgnoreLoad(event, toggleAttr, deleteAttr)) return;
+    activateLoad({ root, card, event, loadAttr, onLoad, preserveLoadScroll });
+  }, true);
+
+  bindScopedOnce(root, key, 'keydown', event => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const card = closestAttr(event.target, loadAttr, root);
+    if (!card || shouldIgnoreLoad(event, toggleAttr, deleteAttr)) return;
+    activateLoad({ root, card, event, loadAttr, onLoad, preserveLoadScroll });
   });
 }
-
 
 export function bindEditModeClear(root, {
   state,

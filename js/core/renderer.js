@@ -133,7 +133,7 @@ export function restoreViewportStable(snapshot, { frames = 3, delays = [40, 120]
 
 function findViewportAnchor(target) {
   if (!target?.closest) return null;
-  return target.closest('[data-scroll-anchor], [data-line-card], .saved-record-card, [data-field], .module-view, main, #app');
+  return target.closest('[data-scroll-anchor], [data-line-card], [data-saved-record-card], .saved-record-card, [data-field], .module-view, main, #app');
 }
 
 function getAnchorSnapshot(anchor) {
@@ -174,7 +174,7 @@ export function shouldPreserveViewportForClick(target) {
   // Interaktive Elemente werden gezielt ueber die jeweilige Aktion stabilisiert.
   // Die globale Klick-Restaurierung darf diese Aktionen nicht uebersteuern, sonst entstehen
   // verzögerte Rueckspruenge nach dem eigentlichen State-Render.
-  if (target.closest('a[href], button, summary, details, [role="button"], [data-line-card], .saved-record-card, [data-allow-scroll]')) return false;
+  if (target.closest('a[href], button, summary, details, [role="button"], [data-line-card], [data-saved-record-card], .saved-record-card, [data-allow-scroll]')) return false;
   return true;
 }
 
@@ -234,6 +234,7 @@ function bindCommittedInteractionGuard(root) {
     'button',
     '[role="button"]',
     '[data-line-card]',
+    '[data-saved-record-card]',
     '.saved-record-card',
     '[data-saved-load]',
     '[data-rainwater-select]',
