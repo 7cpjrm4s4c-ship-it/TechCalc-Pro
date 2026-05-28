@@ -19,7 +19,7 @@ assert.match(moduleSource, /registerCentralActions/, 'heating/cooling must use c
 assert.match(moduleSource, /'line:save'/, 'line save must be a central action.');
 assert.match(moduleSource, /'line:update'/, 'line update must be a central action.');
 assert.match(moduleSource, /'saved:load'/, 'saved line selection must be a central action.');
-assert.ok(moduleSource.includes("state.set(hydrateLineSectionState(item, state.get()), { action: 'line:select' });"), 'saved line selection must update store through a structural action.');
+assert.match(moduleSource, /state\.set\(\{ \.\.\.hydrateLineSectionState\(item, state\.get\(\)\), expandedLineSectionId: state\.get\(\)\.expandedLineSectionId \}, \{ action: 'line:select' \}\);/, 'saved line selection must hydrate through the store while preserving accordion state.');
 
 console.log('heating-cooling global-standard regression ok');
 
@@ -50,3 +50,10 @@ assert.doesNotMatch(moduleSource, /updateSaveControls\(root, s\);/, 'static view
 assert.ok(moduleSource.includes("const lineStructural = /^(line:|saved:)/.test(action);"), 'line/saved actions must be classified separately from app structural actions.');
 assert.match(moduleSource, /if \(modeChanged \|\| targetChanged \|\| unitChanged \|\| appStructural\)/, 'saved line actions must not rebuild input fields unless mode/target/unit changed.');
 assert.doesNotMatch(moduleSource, /modeChanged \|\| targetChanged \|\| unitChanged \|\| structural/, 'legacy structural flag must not drive input-field rebuilds.');
+
+
+// Phase 12J+ UX: selection, scroll gestures and accordion state must be independent.
+assert.match(moduleSource, /const currentExpanded = state\.get\(\)\.expandedLineSectionId;/, 'accordion toggle must be derived from store state, not transient DOM classes.');
+assert.doesNotMatch(moduleSource, /card\.classList\.toggle\('is-collapsed'/, 'accordion state must not be mutated directly in the DOM.');
+assert.match(pipelineSource, /shouldSuppressTouchAction/, 'touch-scroll gestures must not dispatch saved/save/toggle actions.');
+assert.match(pipelineSource, /touchmove/, 'central pipeline must track movement to distinguish scroll from tap.');

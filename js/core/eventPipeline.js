@@ -77,6 +77,47 @@ function wasPointerActionHandled(root, action) {
   return root.dataset.tcPointerAction === String(action) && Date.now() - Number(root.dataset.tcPointerActionAt || 0) < 650;
 }
 
+function touchPoint(event) {
+  const touch = event?.changedTouches?.[0] || event?.touches?.[0];
+  if (!touch) return null;
+  return { x: Number(touch.clientX || 0), y: Number(touch.clientY || 0) };
+}
+
+function beginTouchGesture(root, event) {
+  if (!root?.dataset) return;
+  const point = touchPoint(event);
+  if (!point) return;
+  root.__tcTouchGesture = { x: point.x, y: point.y, moved: false };
+  delete root.dataset.tcSuppressTouchClickAt;
+}
+
+function updateTouchGesture(root, event) {
+  const gesture = root?.__tcTouchGesture;
+  const point = touchPoint(event);
+  if (!gesture || !point) return;
+  const dx = Math.abs(point.x - gesture.x);
+  const dy = Math.abs(point.y - gesture.y);
+  if (dx > 8 || dy > 8) gesture.moved = true;
+}
+
+function shouldSuppressTouchAction(root, event) {
+  if (event?.type !== 'touchend') return false;
+  const gesture = root?.__tcTouchGesture;
+  const point = touchPoint(event);
+  if (!gesture || !point) return false;
+  const dx = Math.abs(point.x - gesture.x);
+  const dy = Math.abs(point.y - gesture.y);
+  const moved = gesture.moved || dx > 8 || dy > 8;
+  if (moved && root?.dataset) root.dataset.tcSuppressTouchClickAt = String(Date.now());
+  root.__tcTouchGesture = null;
+  return moved;
+}
+
+function wasTouchClickSuppressed(root) {
+  if (!root?.dataset?.tcSuppressTouchClickAt) return false;
+  return Date.now() - Number(root.dataset.tcSuppressTouchClickAt || 0) < 700;
+}
+
 export function bindCentralEventPipeline(root, state, options = {}) {
   if (!root || !state?.set || root.__tcCentralEventPipelineBound) return () => {};
   root.__tcCentralEventPipelineBound = true;
@@ -175,6 +216,12 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   const onClick = event => {
     const actionEl = event.target?.closest?.('[data-tc-action], [data-action]');
     const action = actionEl?.dataset?.tcAction || actionEl?.dataset?.action;
+    if (actionEl && wasTouchClickSuppressed(root)) {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      event?.stopImmediatePropagation?.();
+      return;
+    }
     if (wasPointerActionHandled(root, action)) {
       event?.preventDefault?.();
       event?.stopPropagation?.();
@@ -191,6 +238,12 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     const actionEl = event.target?.closest?.('[data-tc-action], [data-action]');
     const action = actionEl?.dataset?.tcAction || actionEl?.dataset?.action;
     if (!actionEl || action === 'segment') return false;
+    if (shouldSuppressTouchAction(root, event)) {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      event?.stopImmediatePropagation?.();
+      return true;
+    }
     if (wasPointerActionHandled(root, action)) {
       event?.preventDefault?.();
       event?.stopPropagation?.();
@@ -228,10 +281,11 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   add(root, 'blur', onBlur, true);
   add(root, 'keydown', onKeydown, true);
   add(root, 'pointerup', onPointerSegment, true);
+  add(root, 'touchstart', event => { beginTouchGesture(root, event); confirmSurface(event); }, { capture: true, passive: true });
+  add(root, 'touchmove', event => updateTouchGesture(root, event), { capture: true, passive: true });
   add(root, 'touchend', onPointerSegment, { capture: true, passive: false });
   add(root, 'click', onClick, true);
   add(root, 'pointerdown', confirmSurface, true);
-  add(root, 'touchstart', confirmSurface, { capture: true, passive: true });
   add(root, 'click', confirmSurface, true);
 
   return () => {

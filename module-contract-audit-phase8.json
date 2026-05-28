@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-28T17:52:43.645Z",
+  "generatedAt": "2026-05-28T19:40:32.234Z",
   "contractTarget": "1.3.0",
   "modules": [
     {
@@ -83,7 +83,7 @@
         "data-hc-dynamic",
         "line-sections",
         "data-line-card",
-        "is-collapsed"
+        "medium-stats"
       ]
     },
     {

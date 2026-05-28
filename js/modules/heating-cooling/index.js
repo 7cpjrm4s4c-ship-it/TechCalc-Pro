@@ -281,8 +281,7 @@ function hydrateLineSectionState(item, currentState) {
     [`${prefix}MassFlowUnit`]: firstFilled(input[`${prefix}MassFlowUnit`], input.massFlowUnit, 'kg/h'),
     [`${prefix}DeltaT`]: firstFilled(input.deltaT, input[`${prefix}DeltaT`], parseDisplayNumber(item.deltaT)),
     activeLineSectionId: item.id,
-    activeLineSectionName: item.name || '',
-    expandedLineSectionId: item.id
+    activeLineSectionName: item.name || ''
   };
 }
 
@@ -314,7 +313,7 @@ function bindLineSections(root, r, rerender) {
     const items = currentItems();
     const id = createRecordId('line');
     const item = buildLineSectionRecord({ ...currentState, activeLineSectionId: null, activeLineSectionName: name }, currentResult(), items, id, name);
-    persistLineSections([item, ...items], { activeLineSectionId: null, activeLineSectionName: '', expandedLineSectionId: null }, 'line:save');
+    persistLineSections([item, ...items], { activeLineSectionId: null, activeLineSectionName: '', expandedLineSectionId: state.get().expandedLineSectionId }, 'line:save');
   };
   const updateCurrentLine = ({ root: actionRoot } = {}) => {
     if (shouldSkipDuplicateAction('line:update')) return;
@@ -327,13 +326,13 @@ function bindLineSections(root, r, rerender) {
     const existing = items.find(x => String(x.id) === String(id));
     if (!existing) return;
     const item = buildLineSectionRecord(currentState, currentResult(), items, id, name, existing);
-    persistLineSections(replaceRecord(items, id, item), { activeLineSectionId: id, activeLineSectionName: item.name }, 'line:update');
+    persistLineSections(replaceRecord(items, id, item), { activeLineSectionId: id, activeLineSectionName: item.name, expandedLineSectionId: state.get().expandedLineSectionId }, 'line:update');
   };
   const loadLine = id => {
     const item = currentItems().find(entry => isSameId(entry.id, id));
     if (!item) return;
     if (isSameId(state.get().activeLineSectionId, id)) {
-      state.set({ activeLineSectionId: null, activeLineSectionName: '', expandedLineSectionId: null }, { action: 'line:deselect' });
+      state.set({ activeLineSectionId: null, activeLineSectionName: '', expandedLineSectionId: state.get().expandedLineSectionId }, { action: 'line:deselect' });
       return;
     }
     state.set({ ...hydrateLineSectionState(item, state.get()), expandedLineSectionId: state.get().expandedLineSectionId }, { action: 'line:select' });
@@ -349,14 +348,9 @@ function bindLineSections(root, r, rerender) {
     const card = element?.closest?.('[data-line-card]');
     if (!card) return;
     const id = card.getAttribute('data-line-select');
-    const willOpen = card.classList.contains('is-collapsed');
-    root.querySelectorAll('[data-line-card]').forEach(item => {
-      if (item === card) return;
-      item.classList.add('is-collapsed');
-      item.querySelector('[data-line-toggle]')?.setAttribute('aria-expanded', 'false');
-    });
-    card.classList.toggle('is-collapsed', !willOpen);
-    element.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    if (!id) return;
+    const currentExpanded = state.get().expandedLineSectionId;
+    const willOpen = !isSameId(currentExpanded, id);
     state.set({ expandedLineSectionId: willOpen ? id : null }, { action: 'line:toggle' });
   };
 
