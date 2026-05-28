@@ -1,4 +1,5 @@
 import { esc, inlineStats, preserveViewport } from './renderer.js';
+import { markCommittedAction } from './formActions.js';
 
 export function createRecordId(prefix = 'record') {
   try {
@@ -56,7 +57,8 @@ export function bindSavedRecordList(root, {
   deleteAttr = 'data-saved-delete',
   closeOthers = true,
   onLoad,
-  onDelete
+  onDelete,
+  preserveLoadScroll = true
 } = {}) {
   root.querySelectorAll(`[${toggleAttr}]`).forEach(toggle => {
     toggle.addEventListener('click', event => {
@@ -82,7 +84,10 @@ export function bindSavedRecordList(root, {
       event.preventDefault();
       event.stopPropagation();
       const id = card.getAttribute(loadAttr);
-      preserveViewport(() => onLoad?.(id, card, event), { frames: 18, blurActive: true, anchor: card, event, delays: [0, 16, 40, 80, 140, 260, 420, 700] });
+      markCommittedAction(root);
+      const run = () => onLoad?.(id, card, event);
+      if (preserveLoadScroll) preserveViewport(run, { frames: 8, blurActive: false, anchor: card, event, delays: [0, 40, 100, 220] });
+      else run();
     });
   });
 
@@ -90,6 +95,7 @@ export function bindSavedRecordList(root, {
     button.addEventListener('click', event => {
       event.preventDefault();
       event.stopPropagation();
+      markCommittedAction(root);
       onDelete?.(button.getAttribute(deleteAttr), button, event);
     });
   });

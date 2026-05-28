@@ -171,8 +171,10 @@ export function shouldPreserveViewportForClick(target) {
   if (!target || !target.closest) return true;
   // Textfelder dürfen beim Fokussieren natürlich in den sichtbaren Bereich scrollen.
   if (target.closest('input, textarea, select, [contenteditable="true"]')) return false;
-  // Explizite Navigation/Links dürfen ihr natives Verhalten behalten.
-  if (target.closest('a[href], [data-allow-scroll]')) return false;
+  // Interaktive Elemente werden gezielt ueber die jeweilige Aktion stabilisiert.
+  // Die globale Klick-Restaurierung darf diese Aktionen nicht uebersteuern, sonst entstehen
+  // verzögerte Rueckspruenge nach dem eigentlichen State-Render.
+  if (target.closest('a[href], button, summary, details, [role="button"], [data-line-card], .saved-record-card, [data-allow-scroll]')) return false;
   return true;
 }
 
@@ -220,7 +222,37 @@ export function renderModuleShell(module, inner) {
   </section>`;
 }
 
+function markCommittedInteraction(root) {
+  if (!root?.dataset) return;
+  root.dataset.tcCommittedActionAt = String(Date.now());
+}
+
+function bindCommittedInteractionGuard(root) {
+  if (!root || root.__tcCommittedInteractionGuardBound) return;
+  root.__tcCommittedInteractionGuardBound = true;
+  const selector = [
+    'button',
+    '[role="button"]',
+    '[data-line-card]',
+    '.saved-record-card',
+    '[data-saved-load]',
+    '[data-rainwater-select]',
+    '[data-wastewater-select]',
+    '[data-pipe-load]',
+    '[data-buffer-select]',
+    '[data-line-select]',
+    '[data-vent-line-select]'
+  ].join(',');
+  const capture = event => {
+    if (event.target?.closest?.(selector)) markCommittedInteraction(root);
+  };
+  root.addEventListener('pointerdown', capture, true);
+  root.addEventListener('mousedown', capture, true);
+  root.addEventListener('touchstart', capture, { capture: true, passive: true });
+}
+
 export function bindCommonInputs(root, state) {
+  bindCommittedInteractionGuard(root);
   let pendingRender = null;
 
   const commitField = (el, options = {}) => {

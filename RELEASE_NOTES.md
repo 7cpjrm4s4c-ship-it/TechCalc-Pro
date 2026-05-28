@@ -1,4 +1,13 @@
 
+## 1.3.0 Phase 10 - Scroll- und Saved-Record-Fixes
+
+- Desktop-Fix: gespeicherte Eintraege gehen beim Klick nach Feldbearbeitung nicht mehr durch Blur-Re-Render verloren.
+- Mobile-Fix: globale Click-Scroll-Restaurierung ignoriert interaktive Saved Cards und Buttons.
+- Doppelte Saved-Record-Scroll-Transaktionen entfernt.
+- Scroll-Presets erzwingen kein `blur()` mehr.
+- Neuer Regressionstest fuer Saved-Record-Interaktionen im Quality Gate.
+
+
 ## 1.3.0 Phase 7 – Performance und Render-Optimierung
 
 - Zentralen `renderScheduler` ergänzt.
