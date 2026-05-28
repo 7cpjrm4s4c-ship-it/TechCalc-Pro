@@ -46,10 +46,10 @@ function massFlowInputToKgH(value, unit, mediumId) {
 function formatMassFlowInput(value, unit, mediumId) {
   const parsed = parseNumber(value, { fallback: NaN });
   if (!Number.isFinite(parsed)) return '';
-  if (unit === 'm3/h' || unit === 'm³/h') {
-    const density = mediumForId(mediumId)?.density || 998;
-    return fmtInput(parsed / density, 3);
-  }
+  // The UI state stores the value in the currently selected display unit.
+  // Conversion to kg/h happens only inside activeCalculationState(). This keeps
+  // an entered 25 m³/h stable as 25 instead of formatting it as 0,025.
+  if (unit === 'm3/h' || unit === 'm³/h') return fmtInput(parsed, 3);
   return fmtInput(parsed, 2);
 }
 
@@ -64,6 +64,28 @@ function activeCalculationState(s) {
     massFlowKgh: massFlowInputToKgH(activeValue(s, 'MassFlowKgh'), activeMassFlowUnit(s), s.mediumId),
     massFlowUnit: activeMassFlowUnit(s),
     deltaT: activeValue(s, 'DeltaT') || ''
+  };
+}
+
+
+function activeRawInputState(s) {
+  const prefix = prefixFor(s);
+  return {
+    mode: s.mode,
+    mediumId: s.mediumId,
+    pipeSystemId: s.pipeSystemId,
+    calcTarget: activeValue(s, 'CalcTarget') || 'power',
+    powerW: activeValue(s, 'PowerW') || '',
+    powerUnit: activeValue(s, 'PowerUnit') || 'W',
+    massFlowKgh: activeValue(s, 'MassFlowKgh') || '',
+    massFlowUnit: activeMassFlowUnit(s),
+    deltaT: activeValue(s, 'DeltaT') || '',
+    [`${prefix}CalcTarget`]: activeValue(s, 'CalcTarget') || 'power',
+    [`${prefix}PowerW`]: activeValue(s, 'PowerW') || '',
+    [`${prefix}PowerUnit`]: activeValue(s, 'PowerUnit') || 'W',
+    [`${prefix}MassFlowKgh`]: activeValue(s, 'MassFlowKgh') || '',
+    [`${prefix}MassFlowUnit`]: activeMassFlowUnit(s),
+    [`${prefix}DeltaT`]: activeValue(s, 'DeltaT') || ''
   };
 }
 
@@ -177,6 +199,7 @@ function lineSectionsCard(r) {
   const items = Array.isArray(currentSnapshot.lineSections) ? currentSnapshot.lineSections : readLineSections();
   const rows = renderSavedRecordList(items, {
     activeId: currentSnapshot.activeLineSectionId,
+    expandedId: currentSnapshot.expandedLineSectionId,
     emptyText: 'Noch keine Leitungsabschnitte angelegt',
     loadAttr: 'data-line-select',
     toggleAttr: 'data-line-toggle',
@@ -206,7 +229,8 @@ function buildLineSectionRecord(currentState, r, items, id, name, existing = nul
     pipeVelocity: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.velocity) : '—',
     pipePressureLoss: r.pipe && !r.pipe.noDimension ? fmt(r.pipe.pressureLoss) : '—',
     modeLabel: currentState.mode === 'cooling' ? 'Kälte' : 'Heizung',
-    inputState: activeCalculationState(currentState),
+    inputState: activeRawInputState(currentState),
+    calculationState: activeCalculationState(currentState),
     uiState: { mode: currentState.mode, mediumId: currentState.mediumId, pipeSystemId: currentState.pipeSystemId },
     createdAt: existing?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -253,11 +277,12 @@ function hydrateLineSectionState(item, currentState) {
     [`${prefix}CalcTarget`]: calcTarget,
     [`${prefix}PowerW`]: firstFilled(input.powerW, input[`${prefix}PowerW`], calcTarget !== 'power' ? powerFromResult : ''),
     [`${prefix}PowerUnit`]: firstFilled(input.powerUnit, input[`${prefix}PowerUnit`], calcTarget !== 'power' && powerFromResult ? 'kW' : 'W'),
-    [`${prefix}MassFlowKgh`]: firstFilled(input.massFlowKgh, input[`${prefix}MassFlowKgh`], parseDisplayNumber(item.massFlowKgh)),
-    [`${prefix}MassFlowUnit`]: firstFilled(input.massFlowUnit, input[`${prefix}MassFlowUnit`], 'kg/h'),
+    [`${prefix}MassFlowKgh`]: firstFilled(input[`${prefix}MassFlowKgh`], input.massFlowKgh, parseDisplayNumber(item.massFlowKgh)),
+    [`${prefix}MassFlowUnit`]: firstFilled(input[`${prefix}MassFlowUnit`], input.massFlowUnit, 'kg/h'),
     [`${prefix}DeltaT`]: firstFilled(input.deltaT, input[`${prefix}DeltaT`], parseDisplayNumber(item.deltaT)),
     activeLineSectionId: item.id,
-    activeLineSectionName: item.name || ''
+    activeLineSectionName: item.name || '',
+    expandedLineSectionId: item.id
   };
 }
 
@@ -274,16 +299,25 @@ function bindLineSections(root, r, rerender) {
     lineSectionsMemory = next;
     state.set({ lineSections: next, ...patch }, { action });
   };
+  const shouldSkipDuplicateAction = action => {
+    const now = Date.now();
+    const last = root.__tcLastHeatingCoolingLineAction || {};
+    if (last.action === action && now - Number(last.at || 0) < 700) return true;
+    root.__tcLastHeatingCoolingLineAction = { action, at: now };
+    return false;
+  };
   const saveCurrentLine = ({ root: actionRoot } = {}) => {
+    if (shouldSkipDuplicateAction('line:save')) return;
     const host = actionRoot || root;
     const name = host.querySelector('#lineSectionName')?.value?.trim() || '';
     const currentState = state.get();
     const items = currentItems();
     const id = createRecordId('line');
     const item = buildLineSectionRecord({ ...currentState, activeLineSectionId: null, activeLineSectionName: name }, currentResult(), items, id, name);
-    persistLineSections([item, ...items], { activeLineSectionId: null, activeLineSectionName: '' }, 'line:save');
+    persistLineSections([item, ...items], { activeLineSectionId: null, activeLineSectionName: '', expandedLineSectionId: item.id }, 'line:save');
   };
   const updateCurrentLine = ({ root: actionRoot } = {}) => {
+    if (shouldSkipDuplicateAction('line:update')) return;
     const host = actionRoot || root;
     const currentState = state.get();
     const id = currentState.activeLineSectionId;
@@ -293,13 +327,13 @@ function bindLineSections(root, r, rerender) {
     const existing = items.find(x => String(x.id) === String(id));
     if (!existing) return;
     const item = buildLineSectionRecord(currentState, currentResult(), items, id, name, existing);
-    persistLineSections(replaceRecord(items, id, item), { activeLineSectionId: id, activeLineSectionName: item.name }, 'line:update');
+    persistLineSections(replaceRecord(items, id, item), { activeLineSectionId: id, activeLineSectionName: item.name, expandedLineSectionId: id }, 'line:update');
   };
   const loadLine = id => {
     const item = currentItems().find(entry => isSameId(entry.id, id));
     if (!item) return;
     if (isSameId(state.get().activeLineSectionId, id)) {
-      state.set({ activeLineSectionId: null, activeLineSectionName: '' }, { action: 'line:deselect' });
+      state.set({ activeLineSectionId: null, activeLineSectionName: '', expandedLineSectionId: null }, { action: 'line:deselect' });
       return;
     }
     state.set(hydrateLineSectionState(item, state.get()), { action: 'line:select' });
@@ -307,13 +341,14 @@ function bindLineSections(root, r, rerender) {
   const deleteLine = id => {
     const next = removeRecord(currentItems(), id);
     const patch = isSameId(state.get().activeLineSectionId, id)
-      ? { activeLineSectionId: null, activeLineSectionName: '' }
-      : {};
+      ? { activeLineSectionId: null, activeLineSectionName: '', expandedLineSectionId: null }
+      : (isSameId(state.get().expandedLineSectionId, id) ? { expandedLineSectionId: null } : {});
     persistLineSections(next, patch, 'line:delete');
   };
   const toggleLine = element => {
     const card = element?.closest?.('[data-line-card]');
     if (!card) return;
+    const id = card.getAttribute('data-line-select');
     const willOpen = card.classList.contains('is-collapsed');
     root.querySelectorAll('[data-line-card]').forEach(item => {
       if (item === card) return;
@@ -322,6 +357,7 @@ function bindLineSections(root, r, rerender) {
     });
     card.classList.toggle('is-collapsed', !willOpen);
     element.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    state.set({ expandedLineSectionId: willOpen ? id : null }, { action: 'line:toggle' });
   };
 
   registerCentralActions(root, {
@@ -454,6 +490,7 @@ function renderLineSectionRows(s) {
   const items = Array.isArray(s.lineSections) ? s.lineSections : readLineSections();
   return renderSavedRecordList(items, {
     activeId: s.activeLineSectionId,
+    expandedId: s.expandedLineSectionId,
     emptyText: 'Noch keine Leitungsabschnitte angelegt',
     loadAttr: 'data-line-select',
     toggleAttr: 'data-line-toggle',
@@ -533,7 +570,7 @@ function updateHeatingCoolingDynamic(root, s, meta = {}) {
   setInner(root, '[data-hc-dynamic="result"]', mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent));
   setInner(root, '[data-hc-dynamic="formula"]', `Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)`);
   setInner(root, '[data-hc-dynamic="pipe-result"]', renderRecommendationBody(r));
-  if (lineStructural || appStructural || changed.includes('lineSections') || changed.includes('activeLineSectionId') || changed.includes('activeLineSectionName')) {
+  if (lineStructural || appStructural || changed.includes('lineSections') || changed.includes('activeLineSectionId') || changed.includes('activeLineSectionName') || changed.includes('expandedLineSectionId')) {
     // Phase 12G: saved-entry selection is store-first. Only the saved-list island
     // and save/update controls are refreshed; the static input cards stay mounted.
     updateSaveControls(root, s, meta);

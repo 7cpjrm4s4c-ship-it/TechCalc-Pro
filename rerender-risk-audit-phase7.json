@@ -6,12 +6,12 @@
   "findings": [
     {
       "file": "js/modules/heating-cooling/index.js",
-      "line": 409,
+      "line": 445,
       "text": "if (el.innerHTML !== next) el.innerHTML = next;"
     },
     {
       "file": "js/modules/heating-cooling/index.js",
-      "line": 563,
+      "line": 600,
       "text": "root.innerHTML = view(snapshot);"
     }
   ]

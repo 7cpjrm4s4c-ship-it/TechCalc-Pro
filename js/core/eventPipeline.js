@@ -191,6 +191,12 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     const actionEl = event.target?.closest?.('[data-tc-action], [data-action]');
     const action = actionEl?.dataset?.tcAction || actionEl?.dataset?.action;
     if (!actionEl || action === 'segment') return false;
+    if (wasPointerActionHandled(root, action)) {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      event?.stopImmediatePropagation?.();
+      return true;
+    }
     if (dispatchAction(root, state, actionEl, event, options)) {
       markPointerAction(root, action);
       return true;

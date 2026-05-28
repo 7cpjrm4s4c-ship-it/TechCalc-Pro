@@ -21,5 +21,6 @@ export const state = createModuleState({
 
   activeLineSectionId: null,
   activeLineSectionName: '',
+  expandedLineSectionId: null,
   lineSections: []
 }, { moduleId: 'heating-cooling' });

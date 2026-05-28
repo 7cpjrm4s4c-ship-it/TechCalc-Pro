@@ -1,4 +1,12 @@
 
+## 1.3.0 – Phase 12I Heating/Cooling Final Stabilization
+
+- m³/h Eingaben im Heizung/Kälte-Modul bleiben als Display-Wert stabil.
+- Mobile Save-Doppeltrigger werden verhindert.
+- Gespeicherte Leitungsabschnitte führen ihren Accordion-Zustand store-first.
+- Phase 12I basiert auf Phase 12H und enthält keine weiteren Architekturänderungen.
+
+
 ## 1.3.0 Phase 12G – Heizung/Kälte Globalisierung
 
 - Heizung/Kälte weiter store-first globalisiert.
