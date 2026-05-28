@@ -15,7 +15,8 @@ const commands = [
   ['node', ['scripts/audit-css-debt.mjs']],
   ['node', ['scripts/audit-important-usage.mjs']],
   ['node', ['scripts/audit-rerender-risk.mjs']],
-  ['node', ['scripts/audit-mobile-scroll-stability.mjs']]
+  ['node', ['scripts/audit-mobile-scroll-stability.mjs']],
+  ['node', ['scripts/audit-legacy-event-handlers.mjs']]
 ];
 
 for (const [cmd, args] of commands) {

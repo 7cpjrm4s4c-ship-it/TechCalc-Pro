@@ -2,6 +2,20 @@ import { bindSavedRecordList, replaceRecord, removeRecord, isSameId } from './sa
 import { preserveActionScroll, preserveSavedRecordScroll } from './scrollManager.js';
 import { markCommittedAction } from './formActions.js';
 
+function bindScopedOnce(root, key, eventName, listener, options) {
+  root.__tcSavedCalculationBindings = root.__tcSavedCalculationBindings || new Set();
+  const bindingKey = `${key}:${eventName}`;
+  if (root.__tcSavedCalculationBindings.has(bindingKey)) return;
+  root.__tcSavedCalculationBindings.add(bindingKey);
+  root.addEventListener(eventName, listener, options);
+}
+
+function matchesSelector(target, selector, root) {
+  if (!selector || !target?.closest) return null;
+  const el = target.closest(selector);
+  return el && root.contains(el) ? el : null;
+}
+
 export function bindSavedCalculationActions(root, {
   state,
   calculate,
@@ -16,34 +30,41 @@ export function bindSavedCalculationActions(root, {
 } = {}) {
   if (!root || !state || typeof state.get !== 'function' || typeof state.set !== 'function') return;
 
-  root.querySelector(saveSelector)?.addEventListener('click', event => {
-    event.preventDefault();
-    event.stopPropagation();
-    markCommittedAction(root);
-    const run = () => {
-      const current = state.get();
-      const record = snapshot({ ...current, activeCalculationId: null }, calculate(current));
-      state.set({ savedCalculations: [record, ...(current.savedCalculations || [])], activeCalculationId: null, name: '' });
-    };
-    preserveSaveScroll ? preserveActionScroll(run) : run();
-  });
+  const key = `savedCalculation:${saveSelector}|${updateSelector}|${loadAttr}|${deleteAttr}`;
 
-  root.querySelector(updateSelector)?.addEventListener('click', event => {
-    event.preventDefault();
-    event.stopPropagation();
-    markCommittedAction(root);
-    const run = () => {
-      const current = state.get();
-      const id = current.activeCalculationId;
-      if (!id) return;
-      const saved = current.savedCalculations || [];
-      const existing = saved.find(item => isSameId(item.id, id));
-      if (!existing) return;
-      const record = { ...snapshot(current, calculate(current)), id, createdAt: existing.createdAt || new Date().toISOString() };
-      state.set({ savedCalculations: replaceRecord(saved, id, record), activeCalculationId: id, name: record.name });
-    };
-    preserveActionScroll(run);
-  });
+  bindScopedOnce(root, key, 'click', event => {
+    const saveButton = matchesSelector(event.target, saveSelector, root);
+    if (saveButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      markCommittedAction(root);
+      const run = () => {
+        const current = state.get();
+        const record = snapshot({ ...current, activeCalculationId: null }, calculate(current));
+        state.set({ savedCalculations: [record, ...(current.savedCalculations || [])], activeCalculationId: null, name: '' });
+      };
+      preserveSaveScroll ? preserveActionScroll(run) : run();
+      return;
+    }
+
+    const updateButton = matchesSelector(event.target, updateSelector, root);
+    if (updateButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      markCommittedAction(root);
+      const run = () => {
+        const current = state.get();
+        const id = current.activeCalculationId;
+        if (!id) return;
+        const saved = current.savedCalculations || [];
+        const existing = saved.find(item => isSameId(item.id, id));
+        if (!existing) return;
+        const record = { ...snapshot(current, calculate(current)), id, createdAt: existing.createdAt || new Date().toISOString() };
+        state.set({ savedCalculations: replaceRecord(saved, id, record), activeCalculationId: id, name: record.name });
+      };
+      preserveActionScroll(run);
+    }
+  }, true);
 
   bindSavedRecordList(root, {
     loadAttr,

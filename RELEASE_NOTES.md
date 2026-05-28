@@ -1,4 +1,12 @@
 
+## 1.3.0 Phase 11B
+
+- Legacy-Handler-Bereinigung gestartet.
+- Saved-Calculation-Aktionen auf zentrale Root-Delegation umgestellt.
+- Audit fuer verbleibende modulinterne Event-Handler ergaenzt.
+- Vorbereitung fuer Phase 11C: zentrale Lookup-/Switch-/Record-Adapter.
+
+
 ## 1.3.0 Phase 13 — Heizung/Kälte Stabilisierung
 
 - Heizung/Kälte: Medium- und Rohrmaterialauswahl führen hinterlegte Eigenschaften wieder unmittelbar mit.

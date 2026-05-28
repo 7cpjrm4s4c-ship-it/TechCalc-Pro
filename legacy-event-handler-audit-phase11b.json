@@ -1,0 +1,70 @@
+{
+  "phase": "11B",
+  "purpose": "Find remaining module-local event handlers that must be migrated behind the central event pipeline.",
+  "totals": {
+    "filesWithLegacyHandlers": 10,
+    "legacyHandlerScore": 88
+  },
+  "findings": [
+    {
+      "file": "js/modules/buffer-storage/index.js",
+      "addEventListener": 5,
+      "directHandlers": 0,
+      "legacySelectors": 5
+    },
+    {
+      "file": "js/modules/drinking-water/index.js",
+      "addEventListener": 5,
+      "directHandlers": 0,
+      "legacySelectors": 2
+    },
+    {
+      "file": "js/modules/heat-recovery/index.js",
+      "addEventListener": 6,
+      "directHandlers": 0,
+      "legacySelectors": 5
+    },
+    {
+      "file": "js/modules/heating-cooling/index.js",
+      "addEventListener": 7,
+      "directHandlers": 0,
+      "legacySelectors": 2
+    },
+    {
+      "file": "js/modules/hx-diagram/index.js",
+      "addEventListener": 11,
+      "directHandlers": 0,
+      "legacySelectors": 2
+    },
+    {
+      "file": "js/modules/pipe-sizing/index.js",
+      "addEventListener": 3,
+      "directHandlers": 0,
+      "legacySelectors": 2
+    },
+    {
+      "file": "js/modules/pressure-holding/index.js",
+      "addEventListener": 5,
+      "directHandlers": 0,
+      "legacySelectors": 5
+    },
+    {
+      "file": "js/modules/rainwater/index.js",
+      "addEventListener": 11,
+      "directHandlers": 0,
+      "legacySelectors": 4
+    },
+    {
+      "file": "js/modules/ventilation/index.js",
+      "addEventListener": 2,
+      "directHandlers": 0,
+      "legacySelectors": 2
+    },
+    {
+      "file": "js/modules/wastewater/index.js",
+      "addEventListener": 4,
+      "directHandlers": 0,
+      "legacySelectors": 0
+    }
+  ]
+}
