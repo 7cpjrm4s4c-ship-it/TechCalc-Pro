@@ -8,6 +8,7 @@ const commands = [
   ['node', ['tests/saved-record-interaction.test.mjs']],
   ['node', ['tests/input-confirmation.test.mjs']],
   ['node', ['tests/heating-cooling-interaction.test.mjs']],
+  ['node', ['tests/central-platform-pipeline.test.mjs']],
   ['node', ['scripts/audit-module-contracts.mjs']],
   ['node', ['scripts/audit-ui-classes.mjs']],
   ['node', ['scripts/audit-platform-migration.mjs']],

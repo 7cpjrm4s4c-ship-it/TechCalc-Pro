@@ -1,20 +1,8 @@
-function cloneState(value) {
-  if (typeof structuredClone === 'function') return structuredClone(value);
-  return JSON.parse(JSON.stringify(value));
-}
+import { createStore, registerModuleStore } from './centralStore.js';
 
-export function createModuleState(initial = {}) {
-  let state = cloneState(initial);
-  const listeners = new Set();
-  const notify = () => listeners.forEach(fn => fn(cloneState(state)));
-  return {
-    get: () => cloneState(state),
-    set: (patch, options = {}) => {
-      state = { ...state, ...patch };
-      if (options.notify !== false) notify();
-    },
-    reset: () => { state = cloneState(initial); notify(); },
-    replace: (next = {}, options = {}) => { state = { ...cloneState(initial), ...cloneState(next) }; if (options.notify !== false) notify(); },
-    subscribe: fn => { listeners.add(fn); return () => listeners.delete(fn); }
-  };
+let anonymousStoreIndex = 0;
+
+export function createModuleState(initial = {}, options = {}) {
+  const moduleId = options.moduleId || `anonymous-${++anonymousStoreIndex}`;
+  return registerModuleStore(moduleId, createStore(initial, { moduleId }));
 }

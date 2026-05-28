@@ -15,6 +15,7 @@
     "audit:css": "node scripts/audit-css-debt.mjs",
     "audit:important": "node scripts/audit-important-usage.mjs",
     "audit:render": "node scripts/audit-rerender-risk.mjs",
-    "audit:mobile-scroll": "node scripts/audit-mobile-scroll-stability.mjs"
+    "audit:mobile-scroll": "node scripts/audit-mobile-scroll-stability.mjs",
+    "test:platform-pipeline": "node tests/central-platform-pipeline.test.mjs"
   }
 }
