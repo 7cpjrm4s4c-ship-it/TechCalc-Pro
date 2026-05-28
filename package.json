@@ -18,6 +18,7 @@
     "audit:mobile-scroll": "node scripts/audit-mobile-scroll-stability.mjs",
     "test:platform-pipeline": "node tests/central-platform-pipeline.test.mjs",
     "test:state-binding": "node tests/state-binding.test.mjs",
+    "test:render-coordinator": "node tests/render-coordinator.test.mjs",
     "audit:legacy-events": "node scripts/audit-legacy-event-handlers.mjs"
   }
 }

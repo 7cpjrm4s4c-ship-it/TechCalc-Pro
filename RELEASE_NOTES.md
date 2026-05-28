@@ -1,3 +1,12 @@
+## 1.3.0 Phase 11E
+
+- Zentralen `renderCoordinator` eingefuehrt.
+- `mountModule` rendert nicht mehr direkt, sondern ueber den zentralen Renderpfad.
+- Feld-/Select-/Switch-Aktionen werden von strukturellen Render-Aktionen getrennt.
+- Mobile Scroll-Restaurierung wird weniger aggressiv und nur gezielt angewendet.
+- Neuer Regressionstest fuer die Render-Pipeline.
+- Mobile-Scroll-Audit auf den neuen Renderpfad angepasst.
+
 
 ## 1.3.0 Phase 11D
 
