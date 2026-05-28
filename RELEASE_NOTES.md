@@ -1,4 +1,13 @@
 
+## 1.3.0 Phase 11D
+
+- Zentrale Event-Pipeline als primaerer UI-Schreibpfad gestaerkt.
+- Selects, Blur, Enter und Segment-Switches committen direkt in den Store.
+- Legacy-State-Binding deaktiviert sich, wenn die zentrale Pipeline aktiv ist.
+- Saved-Record-Karten, Toggles und Deletes tragen zentrale Action-Marker.
+- Regressionstest fuer Phase-11D-Eventpfad ergaenzt.
+
+
 ## 1.3.0 Phase 11B
 
 - Legacy-Handler-Bereinigung gestartet.

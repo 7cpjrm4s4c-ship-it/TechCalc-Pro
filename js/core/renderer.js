@@ -57,7 +57,7 @@ export function selectField({ id, label, value, options }) {
 
 export function segmented(name, options, value, settings = {}) {
   const accent = settings.accent ? ` segmented--${esc(settings.accent)}` : '';
-  return `<div class="segmented${accent}" role="tablist">${options.map(o => `<button type="button" data-segment="${esc(name)}" data-value="${esc(o.value)}" class="${o.value === value ? 'is-active' : ''}">${esc(o.label)}</button>`).join('')}</div>`;
+  return `<div class="segmented${accent}" role="tablist">${options.map(o => `<button type="button" data-tc-action="segment" data-segment="${esc(name)}" data-value="${esc(o.value)}" class="${o.value === value ? 'is-active' : ''}">${esc(o.label)}</button>`).join('')}</div>`;
 }
 
 

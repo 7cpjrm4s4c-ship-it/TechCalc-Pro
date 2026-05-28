@@ -38,11 +38,11 @@ export function renderSavedRecordList(items = [], {
     const itemTitle = title(item, index);
     const itemSubtitle = typeof subtitle === 'function' ? subtitle(item, index) : '';
     const itemStats = typeof stats === 'function' ? stats(item, index) : [];
-    return `<article class="line-section-card saved-record-card is-collapsed ${isSameId(activeId, item.id) ? 'is-active' : ''}" data-line-card data-saved-record-card tabindex="0" role="button" ${loadAttr}="${esc(item.id)}">
+    return `<article data-tc-action="saved:load" class="line-section-card saved-record-card is-collapsed ${isSameId(activeId, item.id) ? 'is-active' : ''}" data-line-card data-saved-record-card tabindex="0" role="button" ${loadAttr}="${esc(item.id)}">
       <div class="line-section-card__head saved-record-card__head">
         <div class="line-section-card__title saved-record-card__title"><strong>${esc(itemTitle)}</strong>${itemSubtitle ? `<small>${esc(itemSubtitle)}</small>` : ''}</div>
-        <button type="button" class="line-section-card__toggle saved-record-card__toggle" ${toggleAttr} aria-expanded="false" aria-label="Details aufklappen"><span>▾</span></button>
-        <button type="button" class="line-section-card__delete saved-record-card__delete" ${deleteAttr}="${esc(item.id)}" aria-label="Eintrag löschen">×</button>
+        <button type="button" data-tc-action="saved:toggle" class="line-section-card__toggle saved-record-card__toggle" ${toggleAttr} aria-expanded="false" aria-label="Details aufklappen"><span>▾</span></button>
+        <button type="button" data-tc-action="saved:delete" class="line-section-card__delete saved-record-card__delete" ${deleteAttr}="${esc(item.id)}" aria-label="Eintrag löschen">×</button>
       </div>
       <div class="line-section-card__body saved-record-card__body">${inlineStats(itemStats)}</div>
     </article>`;

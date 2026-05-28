@@ -6,7 +6,9 @@ function closest(root, target, selector) {
 }
 
 export function bindModuleStateBinding(root, state, options = {}) {
-  if (!root || !state?.set || root.__tcModuleStateBindingBound) return () => {};
+  // Phase 11D: the central event pipeline is the single write path.
+  // This fallback binder remains for legacy/manual mounts that do not call bindCommonInputs.
+  if (!root || !state?.set || root.__tcModuleStateBindingBound || root.__tcCentralEventPipelineBound) return () => {};
   root.__tcModuleStateBindingBound = true;
   const cleanup = [];
   const onAnyCommit = options.onCommit;
