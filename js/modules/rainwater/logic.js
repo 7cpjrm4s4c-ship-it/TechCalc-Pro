@@ -132,14 +132,53 @@ function validate(state, r) {
   if (mode === 'roof' && stackCount < 1) warnings.push('Anzahl Fallleitungen muss mindestens 1 betragen.');
   warnings.push(`Regenspende ${mode === 'property' ? 'r(5,2)' : 'r(5,5)'} und r(5,100) standortbezogen über KOSTRA/OpenKo ermitteln und manuell eintragen.`);
   if (mode === 'roof') warnings.push('Notentwässerung als Vorbemessung berücksichtigt. Überflutungsnachweis und Rückhalteraumbemessung sind nicht Bestandteil dieser Berechnung.');
-  warnings.push('Die Ergebnis-Card zeigt die markierte bzw. zuletzt hinzugefügte Fläche. Weitere Flächen werden separat in den Klappcards berechnet.');
+  warnings.push('Die Ergebnis-Card rechnet mit der bestätigten Eingabe. Speichern ist optional und dient nur der späteren Wiederverwendung.');
   return warnings;
+}
+
+function surfaceRowsWithCurrentDraft(state) {
+  const persisted = surfaceRows(state);
+  if (persisted.length) return persisted;
+  const area = toNumber(state.areaSize);
+  if (area <= 0) return persisted;
+  const mode = state.surfaceMode || state.calculationType || 'roof';
+  return surfaceRows({
+    ...state,
+    surfaces: [{
+      id: '__current_input__',
+      surfaceMode: mode,
+      calculationType: mode,
+      areaType: state.areaType,
+      areaName: state.areaName || 'Aktuelle Eingabe',
+      areaSize: state.areaSize,
+      customCs: state.customCs,
+      customCm: state.customCm,
+      roofRainIntensity: state.roofRainIntensity,
+      propertyRainIntensity: state.propertyRainIntensity,
+      rainHundredIntensity: state.rainHundredIntensity,
+      drainSize: state.drainSize,
+      drainSizeManual: state.drainSizeManual,
+      drainCapacity: state.drainCapacity,
+      drainHead: state.drainHead,
+      stackCount: state.stackCount,
+      slopeCmM: state.slopeCmM,
+      fillRatio: state.fillRatio,
+      emergencyType: state.emergencyType,
+      emergencyHead: state.emergencyHead,
+      emergencyWidth: state.emergencyWidth,
+      emergencyDiameter: state.emergencyDiameter,
+      emergencyManufacturerDn: state.emergencyManufacturerDn,
+      emergencyCapacity: state.emergencyCapacity,
+      emergencySafetyFactor: state.emergencySafetyFactor,
+      transient: true
+    }]
+  });
 }
 
 export function calculate(state) {
   const mode = state.surfaceMode || state.calculationType || 'roof';
   const isRoof = mode === 'roof';
-  const surfaces = surfaceRows(state);
+  const surfaces = surfaceRowsWithCurrentDraft(state);
   const lastSurfaceId = surfaces.length ? surfaces[surfaces.length - 1].id : null;
   const selectedId = state.activeSurfaceId || lastSurfaceId;
   const selectedSurface = surfaces.find(item => String(item.id) === String(selectedId)) || surfaces[surfaces.length - 1] || null;

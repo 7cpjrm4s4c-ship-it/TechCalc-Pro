@@ -214,11 +214,39 @@ function recommendHouseConnection(peakLs) {
   return { ...match, flowM3h };
 }
 
+function draftUsageUnitFromState(s = {}) {
+  const consumers = Array.isArray(s.unitDraftConsumers) && s.unitDraftConsumers.length
+    ? s.unitDraftConsumers
+    : s.unitConsumerType ? [createConsumer({ typeId: s.unitConsumerType, count: s.unitCount })] : [];
+  if (!consumers.length) return null;
+  return createUsageUnit({
+    name: s.unitName || 'Aktuelle Nutzungseinheit',
+    consumers,
+    simultaneityFactor: s.unitSimultaneityFactor
+  });
+}
+
+function draftSingleGroupFromState(s = {}) {
+  const permanent = String(s.singlePermanent) === 'true';
+  const consumers = Array.isArray(s.singleDraftConsumers) && s.singleDraftConsumers.length
+    ? s.singleDraftConsumers.map(c => ({ ...c, permanent }))
+    : s.singleConsumerType ? [createConsumer({ typeId: s.singleConsumerType, count: s.singleCount, permanent })] : [];
+  if (!consumers.length) return null;
+  return createSingleGroup({
+    name: s.singleName || 'Aktuelle Einzelverbraucher',
+    consumers
+  });
+}
+
 export function calculate(s = {}) {
   const warmWaterMode = s.waterHeatingMode === 'decentral' ? 'decentral' : 'central';
   const centralWarmWater = warmWaterMode === 'central';
-  const units = readUsageUnits().map(unit => summarizeUsageUnit(unit, warmWaterMode));
-  const singleGroupsRaw = normalizeSingleGroups(readSingleConsumers());
+  const unitSource = readUsageUnits();
+  const draftUnit = draftUsageUnitFromState(s);
+  const units = [...unitSource, ...(draftUnit ? [{ ...draftUnit, transient:true }] : [])].map(unit => summarizeUsageUnit(unit, warmWaterMode));
+  const singleGroupSource = normalizeSingleGroups(readSingleConsumers());
+  const draftSingleGroup = draftSingleGroupFromState(s);
+  const singleGroupsRaw = [...singleGroupSource, ...(draftSingleGroup ? [{ ...draftSingleGroup, transient:true }] : [])];
   const singlesRaw = [];
   singleGroupsRaw.forEach(group => {
     (group.consumers || []).forEach(c => singlesRaw.push({ ...c, groupId: group.id, groupName: group.name }));

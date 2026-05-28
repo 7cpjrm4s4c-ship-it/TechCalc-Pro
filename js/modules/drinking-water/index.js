@@ -405,6 +405,20 @@ function bindDrinkingWater(root, signal) {
     }
   }, { signal });
 
+  root.addEventListener('keydown', event => {
+    const field = event.target.closest('[data-field]');
+    if (!field || !root.contains(field) || event.key !== 'Enter') return;
+    event.preventDefault();
+    state.set({ [field.dataset.field]: field.value }, { notify:false });
+    refresh(root);
+  }, { signal });
+
+  root.addEventListener('pointerdown', event => {
+    const ignored = event.target.closest('[data-field], input, select, textarea, button, a, summary, details, [role="button"], [data-line-card], .segmented');
+    if (ignored) return;
+    refresh(root);
+  }, { capture:true, signal });
+
   root.addEventListener('click', event => {
     const target = event.target;
 
@@ -470,7 +484,10 @@ function bindDrinkingWater(root, signal) {
     }
 
     const ignored = target.closest('[data-dw-unit-edit], [data-dw-single-edit], [data-dw-unit-delete], [data-dw-single-delete], [data-dw-add-unit], [data-dw-update-unit], [data-dw-add-single], [data-dw-update-single], [data-dw-draft-add], [data-dw-remove-draft], [data-dw-draft-count], [data-line-toggle], details, summary, input, select, textarea, button, label, .segmented');
-    if (!ignored) clearActiveEdit(root);
+    if (!ignored) {
+      refresh(root);
+      clearActiveEdit(root);
+    }
   }, { signal });
 }
 

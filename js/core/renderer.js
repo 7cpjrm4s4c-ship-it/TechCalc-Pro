@@ -255,26 +255,52 @@ function bindCommittedInteractionGuard(root) {
 export function bindCommonInputs(root, state) {
   bindCommittedInteractionGuard(root);
   let pendingRender = null;
+  let hasUnrenderedInput = false;
 
   const commitField = (el, options = {}) => {
     if (!el?.dataset?.field) return;
     state.set({ [el.dataset.field]: el.value }, options);
+    if (options.notify === false) hasUnrenderedInput = true;
+    if (options.notify !== false) hasUnrenderedInput = false;
   };
 
-  const scheduleRenderAfterEditing = () => {
+  const renderCommittedInput = () => {
+    if (!hasUnrenderedInput) return;
+    hasUnrenderedInput = false;
+    state.set({}, { notify: true });
+  };
+
+  const scheduleRenderAfterEditing = ({ force = false } = {}) => {
     if (pendingRender) cancelAnimationFrame(pendingRender);
     pendingRender = requestAnimationFrame(() => {
       const active = document.activeElement;
       const committedActionAt = Number(root?.dataset?.tcCommittedActionAt || 0);
       // Klicks auf Aktionsbuttons sollen zuerst die Eingabe übernehmen und dann die Aktion ausführen.
       // Der Blur-Render wird in diesem kurzen Fenster unterdrückt, damit der Click nicht verloren geht.
-      if (committedActionAt && Date.now() - committedActionAt < 500) return;
+      if (!force && committedActionAt && Date.now() - committedActionAt < 500) return;
       // Beim Wechsel per Klick oder Tab in das nächste Eingabefeld nicht sofort neu rendern.
       // Dadurch bleibt der Fokus stabil und die Desktop-UX wirkt nicht ruckelig.
-      if (active && root.contains(active) && active.matches('[data-field]')) return;
-      state.set({}, { notify: true });
+      if (!force && active && root.contains(active) && active.matches('[data-field]')) return;
+      renderCommittedInput();
     }, 0);
   };
+
+  const commitAllFields = () => {
+    root.querySelectorAll('[data-field]').forEach(el => commitField(el, { notify: false }));
+  };
+
+  const confirmBySurfaceTouch = event => {
+    if (!event?.target || event.target.closest?.('[data-field], input, select, textarea, button, a, summary, [role="button"], [data-line-card], [data-saved-record-card], .saved-record-card, .segmented')) return;
+    commitAllFields();
+    scheduleRenderAfterEditing({ force: true });
+  };
+
+  if (!root.__tcConfirmInputOnSurfaceTouchBound) {
+    root.__tcConfirmInputOnSurfaceTouchBound = true;
+    root.addEventListener('pointerdown', confirmBySurfaceTouch, true);
+    root.addEventListener('touchstart', confirmBySurfaceTouch, { capture: true, passive: true });
+    root.addEventListener('click', confirmBySurfaceTouch, true);
+  }
 
   root.querySelectorAll('[data-field]').forEach(el => {
     if (el.matches('input')) {
@@ -292,7 +318,7 @@ export function bindCommonInputs(root, state) {
         if (event.key !== 'Enter') return;
         event.preventDefault();
         commitField(el, { notify: false });
-        state.set({}, { notify: true });
+        renderCommittedInput();
       });
     } else {
       el.addEventListener('change', () => commitField(el));

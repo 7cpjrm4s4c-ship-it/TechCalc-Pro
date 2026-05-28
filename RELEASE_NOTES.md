@@ -1,3 +1,13 @@
+## 1.3.0 Phase 12
+
+- Berechnung und Speicherung fachlich getrennt.
+- Eingaben rendern Ergebnisse nach Enter oder Touch/Klick auf freie App-Fläche.
+- Speichern bleibt optional und dient nur der Wiederverwendung.
+- Regenwasser rechnet mit aktueller Eingabe auch ohne gespeicherte Fläche.
+- Trinkwasser berücksichtigt aktuelle Nutzungseinheiten/Einzelverbraucher als temporäre Berechnungsgrundlage.
+- Neuer Regressionstest `input-confirmation.test.mjs` ins Quality Gate aufgenommen.
+
+
 
 ## 1.3.0 Phase 11
 
