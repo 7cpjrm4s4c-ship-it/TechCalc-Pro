@@ -314,7 +314,7 @@ function bindLineSections(root, r, rerender) {
     const items = currentItems();
     const id = createRecordId('line');
     const item = buildLineSectionRecord({ ...currentState, activeLineSectionId: null, activeLineSectionName: name }, currentResult(), items, id, name);
-    persistLineSections([item, ...items], { activeLineSectionId: null, activeLineSectionName: '', expandedLineSectionId: item.id }, 'line:save');
+    persistLineSections([item, ...items], { activeLineSectionId: null, activeLineSectionName: '', expandedLineSectionId: null }, 'line:save');
   };
   const updateCurrentLine = ({ root: actionRoot } = {}) => {
     if (shouldSkipDuplicateAction('line:update')) return;
@@ -327,7 +327,7 @@ function bindLineSections(root, r, rerender) {
     const existing = items.find(x => String(x.id) === String(id));
     if (!existing) return;
     const item = buildLineSectionRecord(currentState, currentResult(), items, id, name, existing);
-    persistLineSections(replaceRecord(items, id, item), { activeLineSectionId: id, activeLineSectionName: item.name, expandedLineSectionId: id }, 'line:update');
+    persistLineSections(replaceRecord(items, id, item), { activeLineSectionId: id, activeLineSectionName: item.name }, 'line:update');
   };
   const loadLine = id => {
     const item = currentItems().find(entry => isSameId(entry.id, id));
@@ -336,7 +336,7 @@ function bindLineSections(root, r, rerender) {
       state.set({ activeLineSectionId: null, activeLineSectionName: '', expandedLineSectionId: null }, { action: 'line:deselect' });
       return;
     }
-    state.set(hydrateLineSectionState(item, state.get()), { action: 'line:select' });
+    state.set({ ...hydrateLineSectionState(item, state.get()), expandedLineSectionId: state.get().expandedLineSectionId }, { action: 'line:select' });
   };
   const deleteLine = id => {
     const next = removeRecord(currentItems(), id);
