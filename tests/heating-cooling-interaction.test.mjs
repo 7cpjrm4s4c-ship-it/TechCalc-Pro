@@ -1,21 +1,50 @@
 import { readFileSync } from 'node:fs';
 
-const source = readFileSync('js/modules/heating-cooling/index.js', 'utf8');
+const moduleSource = readFileSync('js/modules/heating-cooling/index.js', 'utf8');
+const pipelineSource = readFileSync('js/core/eventPipeline.js', 'utf8');
 
-const requiredSnippets = [
-  'function bindHeatingCoolingInteractionAdapter',
-  "fieldEl.matches('select')",
-  "event.key !== 'Enter'",
-  "event.target?.closest?.('[data-segment]')",
-  "event.target?.closest?.('[data-line-select]')",
+const requiredModuleSnippets = [
+  'registerCentralActions(root',
+  "'line:save'",
+  "'line:update'",
+  "'saved:load'",
+  "'saved:delete'",
+  "'saved:toggle'",
   'savedLineSectionPatch(item, state.get())',
-  'bindHeatingCoolingInteractionAdapter(root);'
+  'bindCommonInputs(root, state)',
+  'data-hc-dynamic',
+  'updateHeatingCoolingDynamic(root, snapshot)'
 ];
 
-for (const snippet of requiredSnippets) {
-  if (!source.includes(snippet)) {
-    throw new Error(`Heating/cooling interaction adapter missing required snippet: ${snippet}`);
+for (const snippet of requiredModuleSnippets) {
+  if (!moduleSource.includes(snippet)) {
+    throw new Error(`Heating/cooling global interaction path missing required snippet: ${snippet}`);
   }
 }
 
-console.log('heating-cooling interaction adapter regression ok');
+const forbiddenModuleSnippets = [
+  'function bindHeatingCoolingInteractionAdapter',
+  'bindHeatingCoolingInteractionAdapter(root)',
+  'bindSavedRecordList(root'
+];
+
+for (const snippet of forbiddenModuleSnippets) {
+  if (moduleSource.includes(snippet)) {
+    throw new Error(`Heating/cooling must not keep legacy interaction snippet: ${snippet}`);
+  }
+}
+
+const requiredPipelineSnippets = [
+  'const commitSegment =',
+  "add(root, 'pointerup', onPointerSegment, true)",
+  "add(root, 'touchend', onPointerSegment",
+  "add(root, 'click', onClick, true)"
+];
+
+for (const snippet of requiredPipelineSnippets) {
+  if (!pipelineSource.includes(snippet)) {
+    throw new Error(`Central event pipeline missing segment commit support: ${snippet}`);
+  }
+}
+
+console.log('heating-cooling global interaction regression ok');

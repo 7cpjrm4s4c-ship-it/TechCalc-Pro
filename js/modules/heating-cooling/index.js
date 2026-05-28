@@ -7,7 +7,7 @@ import { MEDIA, fmt, fmtInput } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, bindCommonInputs, bindNoClickScroll } from '../../core/renderer.js';
 import { registerCentralActions } from '../../core/eventPipeline.js';
-import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
+import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
 
 const MODE_PREFIX = {
   heating: 'heating',
@@ -313,117 +313,9 @@ function bindLineSections(root, r, rerender) {
     'saved:delete': ({ element }) => deleteLine(element?.getAttribute('data-line-delete')),
     'saved:toggle': ({ element }) => toggleLine(element)
   });
-
-  // Keep the legacy binder as a fallback for browsers/tests that dispatch plain click
-  // events before the central action map has been registered. Central actions stop
-  // propagation, so normal runtime uses the global pipeline only.
-  bindSavedRecordList(root, {
-    loadAttr: 'data-line-select',
-    toggleAttr: 'data-line-toggle',
-    deleteAttr: 'data-line-delete',
-    preserveLoadScroll: false,
-    onLoad: loadLine,
-    onDelete: deleteLine
-  });
 }
 
 
-
-function bindHeatingCoolingInteractionAdapter(root, rerender) {
-  if (!root || root.__tcHeatingCoolingAdapterBound) return;
-  root.__tcHeatingCoolingAdapterBound = true;
-
-  const commitFieldElement = (el, { notify = true, action = 'field:commit' } = {}) => {
-    if (!el?.dataset?.field) return;
-    const fieldName = el.dataset.field;
-    let value = el.value;
-    if (/MassFlowKgh$/.test(fieldName)) {
-      const current = state.get();
-      const unit = current[fieldName.replace(/MassFlowKgh$/, 'MassFlowUnit')] || 'kg/h';
-      if (unit === 'm3/h' || unit === 'm³/h') {
-        const density = mediumForId(current.mediumId)?.density || 998;
-        const parsed = parseNumber(value, { fallback: NaN });
-        value = Number.isFinite(parsed) ? String(parsed * density) : value;
-      }
-    }
-    state.set({ [fieldName]: value }, { notify, action });
-  };
-
-  root.addEventListener('change', event => {
-    const fieldEl = event.target?.closest?.('[data-field]');
-    if (!fieldEl || !root.contains(fieldEl)) return;
-    // Selects in this module represent master-data choices. They must update the
-    // derived medium/pipe properties immediately, not only after a surface click.
-    if (fieldEl.matches('select')) {
-      event.preventDefault();
-      event.stopPropagation();
-      event.stopImmediatePropagation?.();
-      commitFieldElement(fieldEl, { notify: true, action: 'field:change:immediate' });
-      return;
-    }
-    event.stopPropagation();
-    event.stopImmediatePropagation?.();
-    commitFieldElement(fieldEl, { notify: true, action: 'field:change' });
-  }, true);
-
-  root.addEventListener('blur', event => {
-    const fieldEl = event.target?.closest?.('input[data-field]');
-    if (!fieldEl || !root.contains(fieldEl)) return;
-    // Desktop requirement: calculation starts when leaving the input.
-    event.stopPropagation();
-    event.stopImmediatePropagation?.();
-    commitFieldElement(fieldEl, { notify: true, action: 'field:blur' });
-  }, true);
-
-  root.addEventListener('keydown', event => {
-    const fieldEl = event.target?.closest?.('input[data-field]');
-    if (!fieldEl || !root.contains(fieldEl)) return;
-    if (event.key !== 'Enter') return;
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation?.();
-    commitFieldElement(fieldEl, { notify: true, action: 'field:enter' });
-  }, true);
-
-  const activateSegment = event => {
-    const segment = event.target?.closest?.('[data-segment]');
-    if (!segment || !root.contains(segment)) return;
-    event.preventDefault?.();
-    event.stopPropagation?.();
-    event.stopImmediatePropagation?.();
-    const field = segment.dataset.segment;
-    const value = segment.dataset.value;
-    if (!field) return;
-    if (String(state.get()[field] ?? '') === String(value ?? '')) return;
-    state.set({ [field]: value }, { action: 'segment:select' });
-  };
-
-  // Mobile Safari can defer synthetic click until after focus/scroll work.
-  // Segment decisions are therefore committed on pointer/touch end as the primary path.
-  root.addEventListener('pointerup', activateSegment, true);
-  root.addEventListener('touchend', activateSegment, { capture: true, passive: false });
-  root.addEventListener('click', activateSegment, true);
-
-  root.addEventListener('click', event => {
-    const deleteButton = event.target?.closest?.('[data-line-delete]');
-    if (deleteButton && root.contains(deleteButton)) return;
-    const toggleButton = event.target?.closest?.('[data-line-toggle]');
-    if (toggleButton && root.contains(toggleButton)) return;
-    const card = event.target?.closest?.('[data-line-select]');
-    if (!card || !root.contains(card)) return;
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation?.();
-    const id = card.getAttribute('data-line-select');
-    const item = readLineSections().find(entry => isSameId(entry.id, id));
-    if (!item) return;
-    if (isSameId(state.get().activeLineSectionId, id)) {
-      state.set({ activeLineSectionId: null, activeLineSectionName: '' });
-      return;
-    }
-    state.set(savedLineSectionPatch(item, state.get()));
-  }, true);
-}
 
 
 function pipeDetails(r) {
@@ -534,7 +426,10 @@ function updateHeatingCoolingDynamic(root, s) {
   setSelectValue(root, 'mediumId', s.mediumId);
   setSelectValue(root, 'pipeSystemId', s.pipeSystemId);
   setInner(root, '[data-hc-dynamic="medium-stats"]', inlineStats(mediumStats(r.medium)));
-  updateSegment(root, 'mode', s.mode);
+  setInner(root, '[data-hc-dynamic="mode-segment"]', segmented('mode', [
+    { value: 'heating', label: '● Heizung' },
+    { value: 'cooling', label: '● Kälte' }
+  ], s.mode, { accent }));
   updateSegment(root, key(s, 'CalcTarget'), active.calcTarget);
   setInner(root, '[data-hc-dynamic="target-segment"]', segmented(key(s, 'CalcTarget'), [
     { value: 'power', label: 'Q Leistung' },
@@ -558,7 +453,6 @@ function mountHeatingCooling(root) {
 
   const fullRender = (snapshot = state.get()) => {
     root.innerHTML = view(snapshot);
-    bindHeatingCoolingInteractionAdapter(root);
     bindCommonInputs(root, state);
     bindLineSections(root, calculate(activeCalculationState(snapshot)), fullRender);
   };

@@ -3,7 +3,7 @@
   "purpose": "Find remaining module-local event handlers that must be migrated behind the central event pipeline.",
   "totals": {
     "filesWithLegacyHandlers": 10,
-    "legacyHandlerScore": 87
+    "legacyHandlerScore": 80
   },
   "findings": [
     {
@@ -26,7 +26,7 @@
     },
     {
       "file": "js/modules/heating-cooling/index.js",
-      "addEventListener": 7,
+      "addEventListener": 0,
       "directHandlers": 0,
       "legacySelectors": 1
     },

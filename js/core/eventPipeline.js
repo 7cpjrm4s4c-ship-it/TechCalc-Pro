@@ -136,18 +136,33 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     notifyCommit({ action: 'field:enter', element: el });
   };
 
+  const commitSegment = (segment, event) => {
+    if (!segment || !root.contains(segment)) return false;
+    const field = segment.dataset.segment;
+    const value = segment.dataset.value;
+    if (!field) return false;
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    event?.stopImmediatePropagation?.();
+    if (String(state.get?.()[field] ?? '') !== String(value ?? '')) {
+      state.set({ [field]: value }, { action: 'segment:select' });
+      emitPipelineCommit(root, { type: 'segment', action: 'segment:select', field });
+      notifyCommit({ action: 'segment:select', element: segment });
+    }
+    return true;
+  };
+
   const onClick = event => {
     const actionEl = event.target?.closest?.('[data-tc-action], [data-action]');
     if (dispatchAction(root, state, actionEl, event, options)) return;
 
     const segment = event.target?.closest?.('[data-segment]');
-    if (!segment || !root.contains(segment)) return;
-    event.preventDefault();
-    event.stopPropagation();
-    const patch = { [segment.dataset.segment]: segment.dataset.value };
-    state.set(patch, { action: 'segment:select' });
-    emitPipelineCommit(root, { type: 'segment', action: 'segment:select', field: segment.dataset.segment });
-    notifyCommit({ action: 'segment:select', element: segment });
+    commitSegment(segment, event);
+  };
+
+  const onPointerSegment = event => {
+    const segment = event.target?.closest?.('[data-segment]');
+    commitSegment(segment, event);
   };
 
   const confirmSurface = event => {
@@ -166,6 +181,8 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   add(root, 'change', onChange, true);
   add(root, 'blur', onBlur, true);
   add(root, 'keydown', onKeydown, true);
+  add(root, 'pointerup', onPointerSegment, true);
+  add(root, 'touchend', onPointerSegment, { capture: true, passive: false });
   add(root, 'click', onClick, true);
   add(root, 'pointerdown', confirmSurface, true);
   add(root, 'touchstart', confirmSurface, { capture: true, passive: true });

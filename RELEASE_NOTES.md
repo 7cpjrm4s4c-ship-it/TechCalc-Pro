@@ -1,3 +1,10 @@
+## 1.3.0 Phase 12C - Heizung/Kälte Neuaufbau
+
+- Heizung/Kälte: Legacy-Interaktionsadapter entfernt.
+- Zentrale Event-Pipeline verarbeitet Segment-/Switch-Events jetzt auch per `pointerup`/`touchend`.
+- Saved-Record-Fallback im Modul entfernt, um doppelte Handler zu vermeiden.
+- Dynamische Updates ohne vollständigen Modul-Reload weiter gestärkt.
+
 
 ## 1.3.0 Phase 12B – No-Patch Modulstandard
 
