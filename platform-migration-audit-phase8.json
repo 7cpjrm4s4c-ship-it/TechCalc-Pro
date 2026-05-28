@@ -44,7 +44,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-8-schema-inventory"
+      "migrationStatus": "phase-12d-store-first-rebuild"
     },
     {
       "id": "hx-diagram",

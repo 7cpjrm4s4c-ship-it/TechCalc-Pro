@@ -230,7 +230,7 @@ function inferStoredMode(input = {}, item = {}, fallback = 'heating') {
   return fallback === 'cooling' ? 'cooling' : 'heating';
 }
 
-function savedLineSectionPatch(item, currentState) {
+function hydrateLineSectionState(item, currentState) {
   const input = item.inputState || item.state || item.uiState || {};
   const nextMode = inferStoredMode(input, item, currentState.mode || 'heating');
   const prefix = nextMode === 'cooling' ? 'cooling' : 'heating';
@@ -284,7 +284,7 @@ function bindLineSections(root, r, rerender) {
       state.set({ activeLineSectionId: null, activeLineSectionName: '' }, { action: 'line:deselect' });
       return;
     }
-    state.set(savedLineSectionPatch(item, state.get()), { action: 'line:select' });
+    state.set(hydrateLineSectionState(item, state.get()), { action: 'line:select' });
   };
   const deleteLine = id => {
     writeLineSections(removeRecord(readLineSections(), id));
@@ -396,9 +396,31 @@ function setSelectValue(root, field, value) {
   if (el && el.value !== String(value ?? '')) el.value = String(value ?? '');
 }
 
+function setInputValue(root, field, value) {
+  const el = root?.querySelector?.(`input[data-field="${field}"], textarea[data-field="${field}"]`);
+  if (!el || document.activeElement === el) return;
+  const next = String(value ?? '');
+  if (el.value !== next) el.value = next;
+}
+
+function updateCardAccent(root, selector, accent) {
+  const cardEl = root?.querySelector?.(selector)?.closest?.('.card');
+  if (!cardEl) return;
+  [...cardEl.classList].forEach(cls => {
+    if (cls.startsWith('card--accent-')) cardEl.classList.remove(cls);
+  });
+  cardEl.classList.add(`card--accent-${accent}`);
+}
+
+function setCardTitle(root, selector, title) {
+  const titleEl = root?.querySelector?.(selector)?.closest?.('.card')?.querySelector?.('.card__title');
+  if (titleEl && titleEl.textContent !== title) titleEl.textContent = title;
+}
+
 function updateSegment(root, name, value) {
   root?.querySelectorAll?.(`[data-segment="${name}"]`)?.forEach(button => {
     button.classList.toggle('is-active', String(button.dataset.value) === String(value));
+    button.setAttribute('aria-selected', String(String(button.dataset.value) === String(value)));
   });
 }
 
@@ -410,10 +432,20 @@ function renderRecommendationBody(r) {
       : `<div class="main-result"><span>Empfohlene Dimension</span><strong>DN ${r.pipe.dn}</strong></div>${inlineStats(pipeDetails(r))}`;
 }
 
-function updateHeatingCoolingDynamic(root, s) {
+function updateHeatingCoolingDynamic(root, s, meta = {}) {
   const active = activeCalculationState(s);
   const r = calculate(active);
   const accent = s.mode === 'cooling' ? 'cyan' : 'orange';
+  const modeLabel = s.mode === 'cooling' ? 'Kälte' : 'Heizung';
+  const previous = root.__tcHeatingCoolingDynamic || {};
+  const previousPrefix = previous.prefix || 'heating';
+  const currentPrefix = prefixFor(s);
+  const action = String(meta.action || '');
+  const changed = Array.isArray(meta.changed) ? meta.changed : [];
+  const modeChanged = previous.mode !== s.mode || changed.includes('mode');
+  const targetChanged = previous.calcTarget !== active.calcTarget || previousPrefix !== currentPrefix || changed.includes(key(s, 'CalcTarget'));
+  const unitChanged = previous.massFlowUnit !== active.massFlowUnit || changed.includes(key(s, 'MassFlowUnit')) || changed.includes(key(s, 'PowerUnit'));
+  const structural = /^(line:|saved:|record:|module:|replace|reset)/.test(action);
   const resultDetails = [
     { label: 'Leistung', value: fmt(r.powerKw), unit: 'kW' },
     { label: 'Massenstrom', value: fmt(r.massFlowKgh), unit: 'kg/h' },
@@ -426,22 +458,49 @@ function updateHeatingCoolingDynamic(root, s) {
   setSelectValue(root, 'mediumId', s.mediumId);
   setSelectValue(root, 'pipeSystemId', s.pipeSystemId);
   setInner(root, '[data-hc-dynamic="medium-stats"]', inlineStats(mediumStats(r.medium)));
-  setInner(root, '[data-hc-dynamic="mode-segment"]', segmented('mode', [
-    { value: 'heating', label: '● Heizung' },
-    { value: 'cooling', label: '● Kälte' }
-  ], s.mode, { accent }));
-  updateSegment(root, key(s, 'CalcTarget'), active.calcTarget);
-  setInner(root, '[data-hc-dynamic="target-segment"]', segmented(key(s, 'CalcTarget'), [
-    { value: 'power', label: 'Q Leistung' },
-    { value: 'massFlow', label: 'ṁ Massenstrom' },
-    { value: 'deltaT', label: 'ΔT Temperatur' }
-  ], active.calcTarget, { accent }));
-  setInner(root, '[data-hc-dynamic="input-fields"]', grid(inputFields(s, active).join(''), 2));
+
+  updateCardAccent(root, '[data-hc-dynamic="mode-segment"]', accent);
+  updateCardAccent(root, '[data-hc-dynamic="target-segment"]', accent);
+  updateSegment(root, 'mode', s.mode);
+
+  if (modeChanged) {
+    setInner(root, '[data-hc-dynamic="mode-segment"]', segmented('mode', [
+      { value: 'heating', label: '● Heizung' },
+      { value: 'cooling', label: '● Kälte' }
+    ], s.mode, { accent }));
+    setCardTitle(root, '[data-hc-dynamic="target-segment"]', `${modeLabel} — Eingaben`);
+  }
+
+  if (modeChanged || targetChanged) {
+    setInner(root, '[data-hc-dynamic="target-segment"]', segmented(key(s, 'CalcTarget'), [
+      { value: 'power', label: 'Q Leistung' },
+      { value: 'massFlow', label: 'ṁ Massenstrom' },
+      { value: 'deltaT', label: 'ΔT Temperatur' }
+    ], active.calcTarget, { accent }));
+  } else {
+    updateSegment(root, key(s, 'CalcTarget'), active.calcTarget);
+  }
+
+  if (modeChanged || targetChanged || unitChanged || structural) {
+    setInner(root, '[data-hc-dynamic="input-fields"]', grid(inputFields(s, active).join(''), 2));
+  } else {
+    setInputValue(root, key(s, 'PowerW'), fmtInput(active.powerW, 2));
+    setInputValue(root, key(s, 'MassFlowKgh'), formatMassFlowInput(activeValue(s, 'MassFlowKgh'), activeMassFlowUnit(s), s.mediumId));
+    setInputValue(root, key(s, 'DeltaT'), fmtInput(active.deltaT, 2));
+  }
+
   setInner(root, '[data-hc-dynamic="result"]', mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent));
   setInner(root, '[data-hc-dynamic="formula"]', `Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)`);
   setInner(root, '[data-hc-dynamic="pipe-result"]', renderRecommendationBody(r));
+  root.__tcHeatingCoolingDynamic = {
+    mode: s.mode,
+    prefix: currentPrefix,
+    calcTarget: active.calcTarget,
+    massFlowUnit: active.massFlowUnit,
+    mediumId: s.mediumId,
+    pipeSystemId: s.pipeSystemId
+  };
 }
-
 function isDynamicHeatingCoolingAction(meta = {}) {
   const action = String(meta.action || '');
   return /^(field:|segment:select|binding:|input:confirm|surface:confirm)/.test(action);
@@ -453,14 +512,16 @@ function mountHeatingCooling(root) {
 
   const fullRender = (snapshot = state.get()) => {
     root.innerHTML = view(snapshot);
+    root.__tcHeatingCoolingDynamic = null;
     bindCommonInputs(root, state);
     bindLineSections(root, calculate(activeCalculationState(snapshot)), fullRender);
+    updateHeatingCoolingDynamic(root, snapshot, { action: 'initial', changed: [] });
   };
 
   fullRender(state.get());
   const unsubscribe = state.subscribe((snapshot, meta = {}) => {
     if (isDynamicHeatingCoolingAction(meta)) {
-      updateHeatingCoolingDynamic(root, snapshot);
+      updateHeatingCoolingDynamic(root, snapshot, meta);
       return;
     }
     fullRender(snapshot);

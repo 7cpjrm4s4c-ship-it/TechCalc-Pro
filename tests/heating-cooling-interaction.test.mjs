@@ -10,10 +10,11 @@ const requiredModuleSnippets = [
   "'saved:load'",
   "'saved:delete'",
   "'saved:toggle'",
-  'savedLineSectionPatch(item, state.get())',
+  'hydrateLineSectionState(item, state.get())',
   'bindCommonInputs(root, state)',
   'data-hc-dynamic',
-  'updateHeatingCoolingDynamic(root, snapshot)'
+  'root.__tcHeatingCoolingDynamic',
+  'updateHeatingCoolingDynamic(root, snapshot, meta)'
 ];
 
 for (const snippet of requiredModuleSnippets) {

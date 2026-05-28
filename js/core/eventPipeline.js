@@ -144,6 +144,15 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     event?.preventDefault?.();
     event?.stopPropagation?.();
     event?.stopImmediatePropagation?.();
+
+    // Optimistic visual feedback: mobile Safari can delay click/change work until
+    // after a subsequent surface tap. The active state is therefore updated before
+    // the store notification and render scheduler run.
+    root.querySelectorAll(`[data-segment="${field}"]`).forEach(button => {
+      button.classList.toggle('is-active', String(button.dataset.value) === String(value));
+      button.setAttribute('aria-selected', String(String(button.dataset.value) === String(value)));
+    });
+
     if (String(state.get?.()[field] ?? '') !== String(value ?? '')) {
       state.set({ [field]: value }, { action: 'segment:select' });
       emitPipelineCommit(root, { type: 'segment', action: 'segment:select', field });
@@ -166,7 +175,8 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   };
 
   const confirmSurface = event => {
-    if (!event?.target || event.target.closest?.(options.interactiveSelector || DEFAULT_INTERACTIVE_SELECTOR)) return;
+    if (!event?.target) return;
+    if (event.target.closest?.(options.interactiveSelector || DEFAULT_INTERACTIVE_SELECTOR)) return;
     commitAllFields(root, state, { action: 'surface:confirm', notify: true });
     hasDeferredInput = false;
     notifyCommit({ action: 'surface:confirm', element: null });

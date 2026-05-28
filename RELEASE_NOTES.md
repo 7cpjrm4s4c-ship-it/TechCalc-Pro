@@ -1,3 +1,12 @@
+
+## 1.3.0 – Phase 12D Heating/Cooling Store-first Rebuild
+
+- Heizung/Kälte: Segment-Schalter reagieren zentral und sofort auf Pointer/Touch.
+- Heizung/Kälte: dynamische Feld-/Resultatbereiche werden granular aktualisiert statt komplette Karten neu zu laden.
+- Heizung/Kälte: Saved-Line-Auswahl hydratisiert den Store über `hydrateLineSectionState`.
+- Heizung/Kälte: Einheitenauswahl kg/h / m3/h bleibt im Feld erhalten.
+- Quality Gate erfolgreich.
+
 ## 1.3.0 Phase 12C - Heizung/Kälte Neuaufbau
 
 - Heizung/Kälte: Legacy-Interaktionsadapter entfernt.

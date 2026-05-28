@@ -19,7 +19,7 @@ assert.match(moduleSource, /registerCentralActions/, 'heating/cooling must use c
 assert.match(moduleSource, /'line:save'/, 'line save must be a central action.');
 assert.match(moduleSource, /'line:update'/, 'line update must be a central action.');
 assert.match(moduleSource, /'saved:load'/, 'saved line selection must be a central action.');
-assert.match(moduleSource, /state\.set\(savedLineSectionPatch\(item, state\.get\(\)\), \{ action: 'line:select' \}\)/, 'saved line selection must update store through a structural action.');
+assert.ok(moduleSource.includes("state.set(hydrateLineSectionState(item, state.get()), { action: 'line:select' });"), 'saved line selection must update store through a structural action.');
 
 console.log('heating-cooling global-standard regression ok');
 
@@ -29,3 +29,7 @@ assert.match(moduleSource, /isDynamicHeatingCoolingAction/, 'heating/cooling mus
 assert.match(stateSource, /heatingMassFlowUnit/, 'heating/cooling state must expose heating mass-flow unit switching.');
 assert.match(stateSource, /coolingMassFlowUnit/, 'heating/cooling state must expose cooling mass-flow unit switching.');
 assert.match(fs.readFileSync('js/utils/pipes.js', 'utf8'), /DIN 16836/, 'Mepla norm must use the short/correct DIN 16836 text.');
+
+assert.match(moduleSource, /function hydrateLineSectionState/, 'saved line selection must hydrate complete store state, not patch DOM state.');
+assert.match(moduleSource, /setInputValue/, 'field changes must update dynamic values without rebuilding static cards.');
+assert.ok(moduleSource.includes('root.__tcHeatingCoolingDynamic'), 'dynamic renderer must track previous state to avoid needless card rebuilds.');
