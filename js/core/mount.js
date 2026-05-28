@@ -1,6 +1,7 @@
 import { bindCommonInputs, bindNoClickScroll, snapshotViewport, restoreViewportStable, isMobileViewport } from './renderer.js';
 import { safeReplaceContent } from './domUpdate.js';
 import { createRenderScheduler } from './renderScheduler.js';
+import { bindModuleStateBinding } from './stateBinding.js';
 
 export function mountModule(root, state, view, afterRender) {
   const mountToken = root?.dataset?.renderToken || '';
@@ -26,6 +27,7 @@ export function mountModule(root, state, view, afterRender) {
     const changed = safeReplaceContent(root, view(snapshot), { restoreFocus: true });
     if (changed || !didInitialRender) {
       bindCommonInputs(root, state);
+      bindModuleStateBinding(root, state);
       if (afterRender) afterRender(root, snapshot, render);
     }
 
