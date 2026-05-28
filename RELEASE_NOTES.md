@@ -1,3 +1,12 @@
+
+## 1.3.0 Phase 12F
+
+- Heizung/Kälte weiter globalisiert.
+- Line-/Saved-Aktionen von App-Strukturaktionen getrennt.
+- Speichern/Aktualisieren/Auswahl gespeicherter Leitungsabschnitte bauen Eingabe-Cards nicht mehr neu auf.
+- Fehlerhaften dynamischen Save-Control-Aufruf im statischen Renderpfad entfernt.
+- Regressionstest für store-first Saved-Record-Updates erweitert.
+
 ## 1.3.0 — Phase 12E Heating/Cooling Globalized
 
 - Heizung/Kälte weiter auf Store-first/globalen Standard umgebaut.

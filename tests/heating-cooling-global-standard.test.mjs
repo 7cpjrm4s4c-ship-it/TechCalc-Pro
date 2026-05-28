@@ -44,3 +44,9 @@ assert.match(moduleSource, /updateSaveControls/, 'save/update buttons must updat
 assert.match(moduleSource, /return action !== 'initial';/, 'all post-initial heating/cooling state changes must use the dynamic renderer.');
 assert.match(pipelineSource, /onPointerAction/, 'central pipeline must dispatch action buttons on pointer/touch before delayed mobile click.');
 assert.match(pipelineSource, /wasPointerActionHandled/, 'central pipeline must suppress duplicate pointer-plus-click actions.');
+
+// Phase 12F: line/save structural actions must not force input-card rebuilds.
+assert.doesNotMatch(moduleSource, /updateSaveControls\(root, s\);/, 'static view must not call dynamic save-control updater with an implicit/root variable.');
+assert.ok(moduleSource.includes("const lineStructural = /^(line:|saved:)/.test(action);"), 'line/saved actions must be classified separately from app structural actions.');
+assert.match(moduleSource, /if \(modeChanged \|\| targetChanged \|\| unitChanged \|\| appStructural\)/, 'saved line actions must not rebuild input fields unless mode/target/unit changed.');
+assert.doesNotMatch(moduleSource, /modeChanged \|\| targetChanged \|\| unitChanged \|\| structural/, 'legacy structural flag must not drive input-field rebuilds.');

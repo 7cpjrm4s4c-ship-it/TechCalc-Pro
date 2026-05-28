@@ -357,7 +357,6 @@ function view(s) {
     `<div data-hc-dynamic="medium-stats">${inlineStats(mediumStats(r.medium))}</div>`
   ].join('')), 'blue', { compact: true });
 
-  updateSaveControls(root, s);
   const resultDetails = [
     { label: 'Leistung', value: fmt(r.powerKw), unit: 'kW' },
     { label: 'Massenstrom', value: fmt(r.massFlowKgh), unit: 'kg/h' },
@@ -486,8 +485,8 @@ function updateHeatingCoolingDynamic(root, s, meta = {}) {
   const modeChanged = previous.mode !== s.mode || changed.includes('mode');
   const targetChanged = previous.calcTarget !== active.calcTarget || previousPrefix !== currentPrefix || changed.includes(key(s, 'CalcTarget'));
   const unitChanged = previous.massFlowUnit !== active.massFlowUnit || changed.includes(key(s, 'MassFlowUnit')) || changed.includes(key(s, 'PowerUnit'));
-  const structural = /^(line:|saved:|record:|module:|replace|reset)/.test(action);
-  updateSaveControls(root, s);
+  const lineStructural = /^(line:|saved:)/.test(action);
+  const appStructural = /^(record:|module:|replace|reset)/.test(action);
   const resultDetails = [
     { label: 'Leistung', value: fmt(r.powerKw), unit: 'kW' },
     { label: 'Massenstrom', value: fmt(r.massFlowKgh), unit: 'kg/h' },
@@ -523,7 +522,7 @@ function updateHeatingCoolingDynamic(root, s, meta = {}) {
     updateSegment(root, key(s, 'CalcTarget'), active.calcTarget);
   }
 
-  if (modeChanged || targetChanged || unitChanged || structural) {
+  if (modeChanged || targetChanged || unitChanged || appStructural) {
     setInner(root, '[data-hc-dynamic="input-fields"]', grid(inputFields(s, active).join(''), 2));
   } else {
     setInputValue(root, key(s, 'PowerW'), fmtInput(active.powerW, 2));
@@ -534,7 +533,7 @@ function updateHeatingCoolingDynamic(root, s, meta = {}) {
   setInner(root, '[data-hc-dynamic="result"]', mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent));
   setInner(root, '[data-hc-dynamic="formula"]', `Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)`);
   setInner(root, '[data-hc-dynamic="pipe-result"]', renderRecommendationBody(r));
-  if (structural || changed.includes('lineSections') || changed.includes('activeLineSectionId') || changed.includes('activeLineSectionName')) {
+  if (lineStructural || appStructural || changed.includes('lineSections') || changed.includes('activeLineSectionId') || changed.includes('activeLineSectionName')) {
     setInner(root, '[data-hc-dynamic="line-sections"]', renderLineSectionRows(s));
   }
   root.__tcHeatingCoolingDynamic = {
@@ -548,6 +547,8 @@ function updateHeatingCoolingDynamic(root, s, meta = {}) {
 }
 function isDynamicHeatingCoolingAction(meta = {}) {
   const action = String(meta.action || '');
+  // After the initial mount Heizung/Kälte is store-first: even structural
+  // actions update named dynamic islands instead of replacing the full module.
   return action !== 'initial';
 }
 
