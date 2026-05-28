@@ -11,7 +11,7 @@
     },
     {
       "file": "js/modules/heating-cooling/index.js",
-      "line": 560,
+      "line": 563,
       "text": "root.innerHTML = view(snapshot);"
     }
   ]

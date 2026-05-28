@@ -534,6 +534,9 @@ function updateHeatingCoolingDynamic(root, s, meta = {}) {
   setInner(root, '[data-hc-dynamic="formula"]', `Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)`);
   setInner(root, '[data-hc-dynamic="pipe-result"]', renderRecommendationBody(r));
   if (lineStructural || appStructural || changed.includes('lineSections') || changed.includes('activeLineSectionId') || changed.includes('activeLineSectionName')) {
+    // Phase 12G: saved-entry selection is store-first. Only the saved-list island
+    // and save/update controls are refreshed; the static input cards stay mounted.
+    updateSaveControls(root, s, meta);
     setInner(root, '[data-hc-dynamic="line-sections"]', renderLineSectionRows(s));
   }
   root.__tcHeatingCoolingDynamic = {
