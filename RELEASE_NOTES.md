@@ -1,4 +1,12 @@
 
+## 1.3.0 Phase 12B – No-Patch Modulstandard
+
+- Select-Blur aus der zentralen Event-Pipeline entfernt, damit mobile Auswahlmenüs nach Auswahl nicht erneut öffnen.
+- Segment-/Switch-Aktionen im Heizung/Kälte-Modul committen mobil auf pointerup/touchend.
+- Dynamische Feldaktionen lösen keine erneute Saved-Record-Bindung aus.
+- Migrationsregel dokumentiert: weitere Module werden neu auf Schema/Store/Pipeline aufgebaut statt gepatcht.
+
+
 ## 1.3.0 Phase 12A - Heizung/Kälte Bedien- und Renderfix
 
 - Heizung/Kälte aktualisiert Select-Stammdaten ohne Full-Render.

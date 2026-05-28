@@ -115,7 +115,7 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   };
 
   const onBlur = event => {
-    const el = event.target?.closest?.('input[data-field], textarea[data-field], select[data-field]');
+    const el = event.target?.closest?.('input[data-field], textarea[data-field]');
     if (!el || !root.contains(el)) return;
     commitElementField(state, el, { action: 'field:blur', notify: true, root });
     hasDeferredInput = false;

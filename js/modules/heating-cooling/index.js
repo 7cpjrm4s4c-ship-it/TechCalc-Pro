@@ -385,14 +385,24 @@ function bindHeatingCoolingInteractionAdapter(root, rerender) {
     commitFieldElement(fieldEl, { notify: true, action: 'field:enter' });
   }, true);
 
-  root.addEventListener('click', event => {
+  const activateSegment = event => {
     const segment = event.target?.closest?.('[data-segment]');
     if (!segment || !root.contains(segment)) return;
-    event.preventDefault();
-    event.stopPropagation();
+    event.preventDefault?.();
+    event.stopPropagation?.();
     event.stopImmediatePropagation?.();
-    state.set({ [segment.dataset.segment]: segment.dataset.value }, { action: 'segment:select' });
-  }, true);
+    const field = segment.dataset.segment;
+    const value = segment.dataset.value;
+    if (!field) return;
+    if (String(state.get()[field] ?? '') === String(value ?? '')) return;
+    state.set({ [field]: value }, { action: 'segment:select' });
+  };
+
+  // Mobile Safari can defer synthetic click until after focus/scroll work.
+  // Segment decisions are therefore committed on pointer/touch end as the primary path.
+  root.addEventListener('pointerup', activateSegment, true);
+  root.addEventListener('touchend', activateSegment, { capture: true, passive: false });
+  root.addEventListener('click', activateSegment, true);
 
   root.addEventListener('click', event => {
     const deleteButton = event.target?.closest?.('[data-line-delete]');
@@ -557,7 +567,6 @@ function mountHeatingCooling(root) {
   const unsubscribe = state.subscribe((snapshot, meta = {}) => {
     if (isDynamicHeatingCoolingAction(meta)) {
       updateHeatingCoolingDynamic(root, snapshot);
-      bindLineSections(root, calculate(activeCalculationState(snapshot)), fullRender);
       return;
     }
     fullRender(snapshot);
