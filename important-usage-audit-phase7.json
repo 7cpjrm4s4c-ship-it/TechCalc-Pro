@@ -1,0 +1,208 @@
+{
+  "importantCount": 81,
+  "budget": 90,
+  "status": "ok",
+  "note": "Phase 7 keeps only defensive overrides such as fixed overlays, display locks and pointer-event guards.",
+  "examples": [
+    {
+      "file": "css/components.css",
+      "line": 1041,
+      "text": "display: none !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1183,
+      "text": "left: 18px !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1184,
+      "text": "right: 18px !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1185,
+      "text": "bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 22px) !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1186,
+      "text": "top: auto !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1774,
+      "text": "display: none !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1808,
+      "text": "display: inline-flex !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1873,
+      "text": "position: fixed !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1874,
+      "text": "left: 10px !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1875,
+      "text": "right: 10px !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1876,
+      "text": "top: max(92px, calc(env(safe-area-inset-top) + 78px)) !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1877,
+      "text": "bottom: max(10px, env(safe-area-inset-bottom)) !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1895,
+      "text": "display: none !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1916,
+      "text": "position: fixed !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1917,
+      "text": "left: 10px !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1918,
+      "text": "right: 10px !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1919,
+      "text": "top: max(88px, calc(env(safe-area-inset-top) + 76px)) !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1920,
+      "text": "bottom: max(10px, env(safe-area-inset-bottom)) !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1937,
+      "text": "z-index: 1200 !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1941,
+      "text": "display: flex !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1947,
+      "text": "pointer-events: none !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1952,
+      "text": "display: none !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1957,
+      "text": "visibility: visible !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1959,
+      "text": "pointer-events: auto !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1963,
+      "text": "pointer-events: auto !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1970,
+      "text": "pointer-events: none !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1975,
+      "text": "pointer-events: auto !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1984,
+      "text": "position: sticky !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1985,
+      "text": "top: 0 !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1986,
+      "text": "z-index: 3 !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2011,
+      "text": "display: block !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2020,
+      "text": "display: flex !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2025,
+      "text": "display: none !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2029,
+      "text": "display: grid !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2034,
+      "text": "position: fixed !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2035,
+      "text": "left: 10px !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2036,
+      "text": "right: 10px !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2037,
+      "text": "top: max(88px, calc(env(safe-area-inset-top) + 76px)) !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2038,
+      "text": "bottom: max(10px, env(safe-area-inset-bottom)) !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2046,
+      "text": "position: relative !important;"
+    }
+  ]
+}

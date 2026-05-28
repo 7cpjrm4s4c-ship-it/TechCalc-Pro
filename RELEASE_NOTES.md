@@ -1,4 +1,15 @@
 
+## 1.3.0 Phase 7 – Performance und Render-Optimierung
+
+- Zentralen `renderScheduler` ergänzt.
+- `safeReplaceContent` für DOM-stabile Renderpfade eingeführt.
+- Direkte Modul-`innerHTML`-Writes auf `0` reduziert.
+- Scroll-Restore entschärft und auf kurze gezielte Korrekturen reduziert.
+- `!important`-Verwendung in CSS stark reduziert und budgetiert.
+- Neue Audits: `audit:important` und `audit:render`.
+- Quality Gate erfolgreich erweitert.
+
+
 ## 1.3.0 - Phase 6 Plattform-Konsolidierung
 
 - Geprueft, welche Module die zentralen Regeln tatsaechlich nutzen.

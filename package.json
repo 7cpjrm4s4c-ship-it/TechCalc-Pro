@@ -10,6 +10,8 @@
     "audit:modules": "node scripts/audit-module-contracts.mjs",
     "audit:ui": "node scripts/audit-ui-classes.mjs",
     "audit:platform": "node scripts/audit-platform-migration.mjs",
-    "audit:css": "node scripts/audit-css-debt.mjs"
+    "audit:css": "node scripts/audit-css-debt.mjs",
+    "audit:important": "node scripts/audit-important-usage.mjs",
+    "audit:render": "node scripts/audit-rerender-risk.mjs"
   }
 }

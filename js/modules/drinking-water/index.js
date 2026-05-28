@@ -4,6 +4,7 @@ import { calculate, CONSUMERS, BUILDING_TYPES, createConsumer, createUsageUnit, 
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, esc } from '../../core/renderer.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { isSameId } from '../../core/savedRecords.js';
+import { safeReplaceContent } from '../../core/domUpdate.js';
 
 function consumerOptions() {
   return CONSUMERS.map(c => ({ value: c.id, label: `${c.label} · ${fmt(c.vr, 2)} l/s${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}` }));
@@ -199,15 +200,15 @@ function refresh(root) {
   const s = state.get();
   const r = calculate(s);
   const result = root.querySelector('[data-dw-result]');
-  if (result) result.innerHTML = resultCard(r);
+  if (result) safeReplaceContent(result, resultCard(r));
   const unitDraft = root.querySelector('[data-dw-unit-draft]');
-  if (unitDraft) unitDraft.innerHTML = draftConsumerList(s.unitDraftConsumers || [], 'unit');
+  if (unitDraft) safeReplaceContent(unitDraft, draftConsumerList(s.unitDraftConsumers || [], 'unit')); 
   const singleDraft = root.querySelector('[data-dw-single-draft]');
-  if (singleDraft) singleDraft.innerHTML = draftConsumerList(s.singleDraftConsumers || [], 'single');
+  if (singleDraft) safeReplaceContent(singleDraft, draftConsumerList(s.singleDraftConsumers || [], 'single')); 
   const unitSaved = root.querySelector('[data-dw-unit-saved]');
-  if (unitSaved) unitSaved.innerHTML = unitRows(r.usageUnits);
+  if (unitSaved) safeReplaceContent(unitSaved, unitRows(r.usageUnits));
   const singleSaved = root.querySelector('[data-dw-single-saved]');
-  if (singleSaved) singleSaved.innerHTML = singleRows(r.singleGroups);
+  if (singleSaved) safeReplaceContent(singleSaved, singleRows(r.singleGroups));
   const unitSummary = root.querySelector('[data-dw-unit-summary]');
   if (unitSummary) unitSummary.textContent = `${r.usageUnits.length} Nutzungseinheiten angelegt`;
   const singleSummary = root.querySelector('[data-dw-single-summary]');
@@ -215,7 +216,7 @@ function refresh(root) {
 }
 
 function rerender(root) {
-  root.innerHTML = view(state.get());
+  safeReplaceContent(root, view(state.get()));
 }
 
 function draftKey(type) {
@@ -477,7 +478,7 @@ export default {
   state,
   mount(root) {
     const controller = new AbortController();
-    root.innerHTML = view(state.get());
+    safeReplaceContent(root, view(state.get()));
     bindDrinkingWater(root, controller.signal);
     return () => controller.abort();
   }

@@ -95,7 +95,7 @@ export function restoreViewport(snapshot) {
   window.scrollTo(snapshot.x || 0, snapshot.y || 0);
 }
 
-export function restoreViewportStable(snapshot, { frames = 6, delays = [40, 120, 260] } = {}) {
+export function restoreViewportStable(snapshot, { frames = 3, delays = [40, 120] } = {}) {
   if (!snapshot) return;
   let remaining = Math.max(1, frames);
   const restoreFrame = () => {
@@ -125,7 +125,7 @@ export function bindNoClickScroll(root) {
   };
   const restore = event => {
     if (!snapshot || !shouldPreserveViewportForClick(event.target)) return;
-    restoreViewportStable(snapshot, { frames: 8, delays: [0, 40, 100, 220, 400] });
+    restoreViewportStable(snapshot, { frames: 3, delays: [32, 96] });
     snapshot = null;
   };
   root.addEventListener('pointerdown', capture, true);
@@ -134,7 +134,7 @@ export function bindNoClickScroll(root) {
   root.addEventListener('click', restore, true);
 }
 
-export function preserveViewport(action, { frames = 6, blurActive = false, delays = [40, 120, 260] } = {}) {
+export function preserveViewport(action, { frames = 3, blurActive = false, delays = [40, 120] } = {}) {
   const snapshot = snapshotViewport();
   if (blurActive) {
     try { document.activeElement?.blur?.(); } catch { /* ignore */ }

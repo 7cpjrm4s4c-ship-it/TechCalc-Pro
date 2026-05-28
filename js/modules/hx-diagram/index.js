@@ -3,6 +3,7 @@ import { state, saveProcesses, makeProcessRecord, clearLegacyPoints } from './st
 import { calculate, calculatePoint, humidityRatioKgKg, PROCESS_OPTIONS } from './logic.js';
 import { card, field, renderModuleShell, bindCommonInputs, stack, grid, inlineStats, mainResult, segmented, esc, signedTempField, toggleNumericSign } from '../../core/renderer.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
+import { safeReplaceContent } from '../../core/domUpdate.js';
 
 function hxFmt(value, decimals = 2) {
   const n = Number(value);
@@ -214,7 +215,7 @@ export default {
     const isCurrentMount = () => !mountToken || root?.dataset?.renderToken === mountToken;
     const render = () => {
       if (!isCurrentMount()) return;
-      root.innerHTML = view(state.get());
+      safeReplaceContent(root, view(state.get()));
       bindCommonInputs(root, state);
       bindActions(root);
     };
