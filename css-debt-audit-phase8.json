@@ -1,7 +1,7 @@
 {
-  "totalLines": 4223,
+  "totalLines": 4253,
   "importantCount": 25,
-  "patchComments": 85,
+  "patchComments": 86,
   "legacySelectorLines": 258,
   "duplicateSelectors": [
     {
@@ -19,6 +19,10 @@
     {
       "selector": ".overflow-menu",
       "count": 5
+    },
+    {
+      "selector": ".card",
+      "count": 4
     },
     {
       "selector": ".module-tab",
@@ -59,10 +63,6 @@
     {
       "selector": ".module-view[data-module='wastewater'] .wastewater-fixture-row--editable > button",
       "count": 4
-    },
-    {
-      "selector": ".card",
-      "count": 3
     },
     {
       "selector": "@media (min-width: 1024px)",

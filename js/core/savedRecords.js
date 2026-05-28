@@ -82,7 +82,7 @@ export function bindSavedRecordList(root, {
       event.preventDefault();
       event.stopPropagation();
       const id = card.getAttribute(loadAttr);
-      preserveViewport(() => onLoad?.(id, card, event), { frames: 18, blurActive: true, delays: [0, 16, 40, 80, 140, 260, 420, 700] });
+      preserveViewport(() => onLoad?.(id, card, event), { frames: 18, blurActive: true, anchor: card, event, delays: [0, 16, 40, 80, 140, 260, 420, 700] });
     });
   });
 
@@ -119,6 +119,6 @@ export function bindEditModeClear(root, {
     preserveViewport(() => {
       if (typeof onClear === 'function') onClear(patch, event);
       else state.set(patch);
-    }, { frames: 14, delays: [0, 40, 100, 220, 420, 800] });
+    }, { frames: 14, event, anchor: event.target?.closest?.('.module-view, main, #app'), delays: [0, 40, 100, 220, 420, 800] });
   });
 }

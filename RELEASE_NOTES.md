@@ -357,3 +357,11 @@
 - `!important`-Nutzung wurde deutlich reduziert und das Budget verschärft.
 - Phase-8-Audits für Modulvertrag, Plattformmigration, CSS-Schulden und `!important` ergänzt.
 - Quality Gate erfolgreich.
+
+## 1.3.0 Phase 9 - Mobile UX and Scroll Stability
+
+- Added anchor-based viewport preservation for mobile render cycles.
+- Prevented forced blur on mobile actions to avoid virtual-keyboard scroll jumps.
+- Extended module render stabilization for small screens and visual viewport changes.
+- Added mobile scroll CSS rules for stable line cards, saved records and module views.
+- Added `audit-mobile-scroll-stability.mjs` and included it in `npm test`.

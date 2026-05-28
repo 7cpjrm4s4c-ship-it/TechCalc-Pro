@@ -85,13 +85,37 @@ export function emptyCard(title, message, accent = 'blue') {
 }
 
 
-export function snapshotViewport() {
+export function isMobileViewport() {
+  return Boolean(
+    window.matchMedia?.('(max-width: 768px)').matches ||
+    window.visualViewport && Math.abs(window.innerHeight - window.visualViewport.height) > 80
+  );
+}
+
+export function snapshotViewport(options = {}) {
   const doc = document.scrollingElement || document.documentElement;
-  return { x: window.scrollX || doc.scrollLeft || 0, y: window.scrollY || doc.scrollTop || 0 };
+  const anchor = options.anchor || findViewportAnchor(options.event?.target) || findViewportAnchor(document.activeElement);
+  const anchorInfo = getAnchorSnapshot(anchor);
+  return {
+    x: window.scrollX || doc.scrollLeft || 0,
+    y: window.scrollY || doc.scrollTop || 0,
+    anchor: anchorInfo
+  };
 }
 
 export function restoreViewport(snapshot) {
   if (!snapshot) return;
+  if (snapshot.anchor?.selector) {
+    const anchor = document.querySelector(snapshot.anchor.selector);
+    if (anchor) {
+      const currentTop = anchor.getBoundingClientRect().top;
+      const delta = currentTop - snapshot.anchor.top;
+      if (Math.abs(delta) > 1) {
+        window.scrollTo(snapshot.x || 0, Math.max(0, (window.scrollY || 0) + delta));
+        return;
+      }
+    }
+  }
   window.scrollTo(snapshot.x || 0, snapshot.y || 0);
 }
 
@@ -105,6 +129,42 @@ export function restoreViewportStable(snapshot, { frames = 3, delays = [40, 120]
   };
   requestAnimationFrame(restoreFrame);
   delays.forEach(delay => setTimeout(() => restoreViewport(snapshot), delay));
+}
+
+function findViewportAnchor(target) {
+  if (!target?.closest) return null;
+  return target.closest('[data-scroll-anchor], [data-line-card], .saved-record-card, [data-field], .module-view, main, #app');
+}
+
+function getAnchorSnapshot(anchor) {
+  if (!anchor || !anchor.getBoundingClientRect) return null;
+  const selector = getStableSelector(anchor);
+  if (!selector) return null;
+  return { selector, top: anchor.getBoundingClientRect().top };
+}
+
+function getStableSelector(element) {
+  if (!element) return '';
+  if (element.id) return `#${cssEscape(element.id)}`;
+  if (element.matches?.('[data-field]')) return `[data-field="${cssEscape(element.dataset.field)}"]`;
+  const loadAttr = [...element.attributes || []].find(attr => attr.name.startsWith('data-') && /load|saved/.test(attr.name) && attr.value);
+  if (loadAttr) return `[${loadAttr.name}="${cssEscape(loadAttr.value)}"]`;
+  if (element.matches?.('[data-line-card]')) {
+    const indexed = stableNthOfType(element, '[data-line-card]');
+    if (indexed) return indexed;
+  }
+  if (element.matches?.('.module-view') && element.dataset.module) return `.module-view[data-module="${cssEscape(element.dataset.module)}"]`;
+  if (element.id === 'app') return '#app';
+  return '';
+}
+
+function stableNthOfType(element, selector) {
+  const parent = element.parentElement;
+  if (!parent) return '';
+  const parentSelector = parent.id ? `#${cssEscape(parent.id)}` : parent.classList?.length ? `.${[...parent.classList].map(cssEscape).join('.')}` : '';
+  if (!parentSelector) return '';
+  const index = [...parent.querySelectorAll(selector)].indexOf(element) + 1;
+  return index > 0 ? `${parentSelector} > ${selector}:nth-of-type(${index})` : '';
 }
 
 export function shouldPreserveViewportForClick(target) {
@@ -121,26 +181,37 @@ export function bindNoClickScroll(root) {
   root.__tcNoClickScrollBound = true;
   let snapshot = null;
   const capture = event => {
-    snapshot = shouldPreserveViewportForClick(event.target) ? snapshotViewport() : null;
+    snapshot = shouldPreserveViewportForClick(event.target) ? snapshotViewport({ event, anchor: findViewportAnchor(event.target) }) : null;
   };
   const restore = event => {
     if (!snapshot || !shouldPreserveViewportForClick(event.target)) return;
-    restoreViewportStable(snapshot, { frames: 3, delays: [32, 96] });
+    const frames = isMobileViewport() ? 8 : 3;
+    const delays = isMobileViewport() ? [16, 48, 120, 260] : [32, 96];
+    restoreViewportStable(snapshot, { frames, delays });
     snapshot = null;
   };
   root.addEventListener('pointerdown', capture, true);
   root.addEventListener('mousedown', capture, true);
-  root.addEventListener('touchstart', capture, true);
+  root.addEventListener('touchstart', capture, { capture: true, passive: true });
   root.addEventListener('click', restore, true);
 }
 
-export function preserveViewport(action, { frames = 3, blurActive = false, delays = [40, 120] } = {}) {
-  const snapshot = snapshotViewport();
-  if (blurActive) {
+export function preserveViewport(action, { frames = 3, blurActive = false, delays = [40, 120], anchor = null, event = null } = {}) {
+  const mobile = isMobileViewport();
+  const snapshot = snapshotViewport({ anchor: anchor || findViewportAnchor(event?.target), event });
+  // Auf mobilen Browsern verursacht blur() bei geöffneter Bildschirmtastatur oft den größten Viewport-Sprung.
+  // Deshalb wird dort nicht aktiv geblurt; Fokus wird über safeReplaceContent mit preventScroll restauriert.
+  if (blurActive && !mobile) {
     try { document.activeElement?.blur?.(); } catch { /* ignore */ }
   }
   action?.();
-  restoreViewportStable(snapshot, { frames, delays });
+  const stableFrames = mobile ? Math.max(frames, 10) : frames;
+  const stableDelays = mobile ? uniqueDelays([0, 16, 48, 120, 260, 520, ...delays]) : delays;
+  restoreViewportStable(snapshot, { frames: stableFrames, delays: stableDelays });
+}
+
+function uniqueDelays(values) {
+  return [...new Set(values.filter(value => Number.isFinite(value) && value >= 0))].sort((a, b) => a - b);
 }
 
 export function renderModuleShell(module, inner) {

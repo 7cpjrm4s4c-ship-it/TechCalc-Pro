@@ -4220,3 +4220,33 @@ body::before {
 :root[data-theme='light'] .tc-accordion__body {
   border-top-color: rgba(15,23,42,.12);
 }
+
+/* Phase 9: mobile viewport stability */
+.module-view,
+.module-content,
+.saved-record-list,
+.line-section-list {
+  overflow-anchor: none;
+}
+
+[data-scroll-anchor],
+[data-line-card],
+.saved-record-card {
+  overflow-anchor: auto;
+}
+
+@media (max-width: 768px) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  .module-view {
+    contain: layout paint;
+  }
+
+  .line-section-card,
+  .saved-record-card,
+  .card {
+    scroll-margin-top: calc(var(--header-height, 72px) + 12px);
+  }
+}

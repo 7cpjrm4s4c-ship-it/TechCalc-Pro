@@ -52,3 +52,20 @@ Der UI-Audit meldet in Phase 5 weiterhin Legacy-Klassen wie `dw-*`, `ph-*`, `hx-
 3. Druckhaltung/Pufferspeicher von `ph-*` befreien.
 4. Regenwasser/Schmutzwasser weiter von Legacy-Renderer-Strukturen entkoppeln.
 5. Ueberflutungsnachweis ausschliesslich als schema-basiertes Modul bauen.
+
+## Phase 9 - Mobile Scroll Stability
+
+Phase 9 adds a dedicated mobile scroll-stability audit. The app now verifies that module renders preserve the viewport by stable anchors instead of relying only on absolute `scrollY` restoration.
+
+Required guarantees:
+- mobile renders use a longer stabilization profile because browser UI bars and virtual keyboards resize the visual viewport asynchronously
+- `blur()` is not forced on mobile actions because it can close the virtual keyboard and produce large jumps
+- saved-record cards and line cards act as scroll anchors
+- focus-triggered smooth scrolling is disabled on small screens
+- touch listeners used for viewport capture remain passive
+
+Run with:
+
+```bash
+npm run audit:mobile-scroll
+```

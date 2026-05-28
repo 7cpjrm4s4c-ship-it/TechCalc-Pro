@@ -1,4 +1,4 @@
-import { bindCommonInputs, bindNoClickScroll, snapshotViewport, restoreViewportStable } from './renderer.js';
+import { bindCommonInputs, bindNoClickScroll, snapshotViewport, restoreViewportStable, isMobileViewport } from './renderer.js';
 import { safeReplaceContent } from './domUpdate.js';
 import { createRenderScheduler } from './renderScheduler.js';
 
@@ -12,7 +12,7 @@ export function mountModule(root, state, view, afterRender) {
   const renderNow = () => {
     if (!isCurrentMount()) return;
     const shouldPreserveScroll = didInitialRender;
-    const viewport = shouldPreserveScroll ? snapshotViewport() : null;
+    const viewport = shouldPreserveScroll ? snapshotViewport({ anchor: document.activeElement }) : null;
     const previousMinHeight = root.style.minHeight;
     const previousOverflowAnchor = root.style.overflowAnchor;
     const previousHeight = root.getBoundingClientRect?.().height || 0;
@@ -30,7 +30,7 @@ export function mountModule(root, state, view, afterRender) {
     }
 
     if (shouldPreserveScroll) {
-      restoreViewportStable(viewport, { frames: 4, delays: [32, 96] });
+      restoreViewportStable(viewport, isMobileViewport() ? { frames: 10, delays: [16, 48, 120, 260, 520] } : { frames: 4, delays: [32, 96] });
       requestAnimationFrame(() => {
         if (!isCurrentMount()) return;
         root.style.minHeight = previousMinHeight;
