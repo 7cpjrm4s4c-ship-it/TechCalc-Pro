@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-28T14:03:49.017Z",
+  "generatedAt": "2026-05-28T14:16:59.463Z",
   "contractTarget": "1.3.0",
   "modules": [
     {
@@ -72,6 +72,7 @@
       "exposesSchema": true,
       "legacyRendererImports": 1,
       "ownUiClassSamples": [
+        "external-write",
         "data-line-select",
         "data-line-toggle",
         "data-line-delete",
@@ -79,11 +80,10 @@
         "data-tc-action",
         "data-line-save",
         "data-line-update",
-        "data-line-card",
-        "is-collapsed",
-        "aria-expanded",
         "data-hc-dynamic",
-        "medium-stats"
+        "line-sections",
+        "data-line-card",
+        "is-collapsed"
       ]
     },
     {

@@ -66,6 +66,17 @@ export function registerCentralActions(root, actions = {}) {
   return root.__tcActionHandlers;
 }
 
+function markPointerAction(root, action) {
+  if (!root?.dataset || !action) return;
+  root.dataset.tcPointerAction = String(action);
+  root.dataset.tcPointerActionAt = String(Date.now());
+}
+
+function wasPointerActionHandled(root, action) {
+  if (!root?.dataset || !action) return false;
+  return root.dataset.tcPointerAction === String(action) && Date.now() - Number(root.dataset.tcPointerActionAt || 0) < 650;
+}
+
 export function bindCentralEventPipeline(root, state, options = {}) {
   if (!root || !state?.set || root.__tcCentralEventPipelineBound) return () => {};
   root.__tcCentralEventPipelineBound = true;
@@ -163,13 +174,32 @@ export function bindCentralEventPipeline(root, state, options = {}) {
 
   const onClick = event => {
     const actionEl = event.target?.closest?.('[data-tc-action], [data-action]');
+    const action = actionEl?.dataset?.tcAction || actionEl?.dataset?.action;
+    if (wasPointerActionHandled(root, action)) {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      event?.stopImmediatePropagation?.();
+      return;
+    }
     if (dispatchAction(root, state, actionEl, event, options)) return;
 
     const segment = event.target?.closest?.('[data-segment]');
     commitSegment(segment, event);
   };
 
+  const onPointerAction = event => {
+    const actionEl = event.target?.closest?.('[data-tc-action], [data-action]');
+    const action = actionEl?.dataset?.tcAction || actionEl?.dataset?.action;
+    if (!actionEl || action === 'segment') return false;
+    if (dispatchAction(root, state, actionEl, event, options)) {
+      markPointerAction(root, action);
+      return true;
+    }
+    return false;
+  };
+
   const onPointerSegment = event => {
+    if (onPointerAction(event)) return;
     const segment = event.target?.closest?.('[data-segment]');
     commitSegment(segment, event);
   };

@@ -20,5 +20,6 @@ export const state = createModuleState({
   coolingDeltaT: '10',
 
   activeLineSectionId: null,
-  activeLineSectionName: ''
+  activeLineSectionName: '',
+  lineSections: []
 }, { moduleId: 'heating-cooling' });

@@ -33,3 +33,14 @@ assert.match(fs.readFileSync('js/utils/pipes.js', 'utf8'), /DIN 16836/, 'Mepla n
 assert.match(moduleSource, /function hydrateLineSectionState/, 'saved line selection must hydrate complete store state, not patch DOM state.');
 assert.match(moduleSource, /setInputValue/, 'field changes must update dynamic values without rebuilding static cards.');
 assert.ok(moduleSource.includes('root.__tcHeatingCoolingDynamic'), 'dynamic renderer must track previous state to avoid needless card rebuilds.');
+
+
+// Phase 12E: line sections are store-first and dynamic updates must not rebuild the static shell.
+assert.match(stateSource, /lineSections:\s*\[\]/, 'line sections must be part of the heating/cooling store state.');
+assert.match(moduleSource, /const currentItems = \(\) => \{[\s\S]*lineSections/, 'line actions must read saved entries from store-first state.');
+assert.match(moduleSource, /persistLineSections/, 'line actions must persist saved entries through one store-first helper.');
+assert.match(moduleSource, /data-hc-dynamic="line-sections"/, 'saved line list must have a granular dynamic render anchor.');
+assert.match(moduleSource, /updateSaveControls/, 'save/update buttons must update dynamically without a module reload.');
+assert.match(moduleSource, /return action !== 'initial';/, 'all post-initial heating/cooling state changes must use the dynamic renderer.');
+assert.match(pipelineSource, /onPointerAction/, 'central pipeline must dispatch action buttons on pointer/touch before delayed mobile click.');
+assert.match(pipelineSource, /wasPointerActionHandled/, 'central pipeline must suppress duplicate pointer-plus-click actions.');

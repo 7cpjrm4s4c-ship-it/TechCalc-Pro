@@ -1,3 +1,11 @@
+## 1.3.0 — Phase 12E Heating/Cooling Globalized
+
+- Heizung/Kälte weiter auf Store-first/globalen Standard umgebaut.
+- Leitungsabschnitte liegen jetzt im Modul-Store (`lineSections`) statt in einer DOM-/Memory-Erstlogik.
+- Dynamische Updates laufen über `data-hc-dynamic`, statische Cards bleiben nach Initial-Render stabil.
+- Mobile Action-Buttons werden per Pointer/Touch sofort verarbeitet; doppelte Clicks werden unterdrückt.
+- Regressionstests für Phase 12E erweitert.
+
 
 ## 1.3.0 – Phase 12D Heating/Cooling Store-first Rebuild
 
