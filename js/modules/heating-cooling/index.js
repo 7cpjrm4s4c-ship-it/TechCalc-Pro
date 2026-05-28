@@ -258,6 +258,72 @@ function bindLineSections(root, r, rerender) {
 }
 
 
+function bindHeatingCoolingInteractionAdapter(root, rerender) {
+  if (!root || root.__tcHeatingCoolingAdapterBound) return;
+  root.__tcHeatingCoolingAdapterBound = true;
+
+  const commitFieldElement = (el, { notify = true } = {}) => {
+    if (!el?.dataset?.field) return;
+    state.set({ [el.dataset.field]: el.value }, { notify });
+  };
+
+  root.addEventListener('change', event => {
+    const fieldEl = event.target?.closest?.('[data-field]');
+    if (!fieldEl || !root.contains(fieldEl)) return;
+    // Selects in this module represent master-data choices. They must update the
+    // derived medium/pipe properties immediately, not only after a surface click.
+    if (fieldEl.matches('select')) {
+      commitFieldElement(fieldEl, { notify: true });
+      return;
+    }
+    commitFieldElement(fieldEl, { notify: true });
+  }, true);
+
+  root.addEventListener('blur', event => {
+    const fieldEl = event.target?.closest?.('input[data-field]');
+    if (!fieldEl || !root.contains(fieldEl)) return;
+    // Desktop requirement: calculation starts when leaving the input.
+    commitFieldElement(fieldEl, { notify: true });
+  }, true);
+
+  root.addEventListener('keydown', event => {
+    const fieldEl = event.target?.closest?.('input[data-field]');
+    if (!fieldEl || !root.contains(fieldEl)) return;
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    commitFieldElement(fieldEl, { notify: true });
+  }, true);
+
+  root.addEventListener('click', event => {
+    const segment = event.target?.closest?.('[data-segment]');
+    if (!segment || !root.contains(segment)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    state.set({ [segment.dataset.segment]: segment.dataset.value });
+  }, true);
+
+  root.addEventListener('click', event => {
+    const deleteButton = event.target?.closest?.('[data-line-delete]');
+    if (deleteButton && root.contains(deleteButton)) return;
+    const toggleButton = event.target?.closest?.('[data-line-toggle]');
+    if (toggleButton && root.contains(toggleButton)) return;
+    const card = event.target?.closest?.('[data-line-select]');
+    if (!card || !root.contains(card)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation?.();
+    const id = card.getAttribute('data-line-select');
+    const item = readLineSections().find(entry => isSameId(entry.id, id));
+    if (!item) return;
+    if (isSameId(state.get().activeLineSectionId, id)) {
+      state.set({ activeLineSectionId: null, activeLineSectionName: '' });
+      return;
+    }
+    state.set(savedLineSectionPatch(item, state.get()));
+  }, true);
+}
+
+
 function pipeDetails(r) {
   return [
     { label: 'Material', value: r.pipe.system.label },
@@ -328,7 +394,9 @@ export default {
   schema,
   state,
   mount(root) {
+    bindHeatingCoolingInteractionAdapter(root);
     return mountModule(root, state, view, (rootEl, snapshot, render) => {
+      bindHeatingCoolingInteractionAdapter(rootEl, render);
       bindLineSections(rootEl, calculate(activeCalculationState(snapshot)), render);
     });
   }

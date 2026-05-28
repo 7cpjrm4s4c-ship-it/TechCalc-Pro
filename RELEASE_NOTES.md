@@ -1,3 +1,12 @@
+
+## 1.3.0 Phase 13 — Heizung/Kälte Stabilisierung
+
+- Heizung/Kälte: Medium- und Rohrmaterialauswahl führen hinterlegte Eigenschaften wieder unmittelbar mit.
+- Heizung/Kälte: Switches für Betriebsart und Berechnungsziel funktionieren wieder.
+- Heizung/Kälte: Berechnung startet nach Verlassen des Inputs oder Enter.
+- Heizung/Kälte: Leitungsabschnitte lassen sich wieder speichern, auswählen und bearbeiten.
+- Neuer Regressionstest für den Heizung/Kälte-Interaktionsadapter.
+
 ## 1.3.0 Phase 12
 
 - Berechnung und Speicherung fachlich getrennt.
