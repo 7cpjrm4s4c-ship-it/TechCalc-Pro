@@ -5,8 +5,7 @@ import { state } from './state.js';
 import { calculate } from './logic.js';
 import { MEDIA, fmt, fmtInput } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
-import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, pressureBadge } from '../../core/renderer.js';
-import { mountModule } from '../../core/mount.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, bindCommonInputs, bindNoClickScroll } from '../../core/renderer.js';
 import { registerCentralActions } from '../../core/eventPipeline.js';
 import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
 
@@ -27,6 +26,33 @@ function activeValue(s, name) {
   return s[key(s, name)];
 }
 
+function mediumForId(id) {
+  return MEDIA.find(m => m.id === id) || MEDIA[0];
+}
+
+function activeMassFlowUnit(s) {
+  return activeValue(s, 'MassFlowUnit') || 'kg/h';
+}
+
+function massFlowInputToKgH(value, unit, mediumId) {
+  const parsed = parseNumber(value, { fallback: 0 });
+  if (!Number.isFinite(parsed) || parsed <= 0) return '';
+  if (unit === 'm3/h' || unit === 'm³/h') {
+    return String(parsed * (mediumForId(mediumId)?.density || 998));
+  }
+  return String(parsed);
+}
+
+function formatMassFlowInput(value, unit, mediumId) {
+  const parsed = parseNumber(value, { fallback: NaN });
+  if (!Number.isFinite(parsed)) return '';
+  if (unit === 'm3/h' || unit === 'm³/h') {
+    const density = mediumForId(mediumId)?.density || 998;
+    return fmtInput(parsed / density, 3);
+  }
+  return fmtInput(parsed, 2);
+}
+
 function activeCalculationState(s) {
   return {
     mode: s.mode,
@@ -35,9 +61,26 @@ function activeCalculationState(s) {
     calcTarget: activeValue(s, 'CalcTarget') || 'power',
     powerW: activeValue(s, 'PowerW') || '',
     powerUnit: activeValue(s, 'PowerUnit') || 'W',
-    massFlowKgh: activeValue(s, 'MassFlowKgh') || '',
+    massFlowKgh: massFlowInputToKgH(activeValue(s, 'MassFlowKgh'), activeMassFlowUnit(s), s.mediumId),
+    massFlowUnit: activeMassFlowUnit(s),
     deltaT: activeValue(s, 'DeltaT') || ''
   };
+}
+
+
+function massFlowField(s) {
+  const unit = activeMassFlowUnit(s);
+  return field({
+    id: key(s, 'MassFlowKgh'),
+    label: 'Massenstrom ṁ',
+    unit,
+    unitField: key(s, 'MassFlowUnit'),
+    unitOptions: [
+      { value: 'kg/h', label: 'kg/h' },
+      { value: 'm3/h', label: 'm³/h' }
+    ],
+    value: formatMassFlowInput(activeValue(s, 'MassFlowKgh'), unit, s.mediumId)
+  });
 }
 
 function powerField(s) {
@@ -58,7 +101,7 @@ function powerField(s) {
 function inputFields(s, active) {
   if (active.calcTarget === 'power') {
     return [
-      field({ id: key(s, 'MassFlowKgh'), label: 'Massenstrom ṁ', unit: 'kg/h', value: fmtInput(active.massFlowKgh, 2) }),
+      massFlowField(s),
       field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(active.deltaT, 2) })
     ];
   }
@@ -70,7 +113,7 @@ function inputFields(s, active) {
   }
   return [
     powerField(s),
-    field({ id: key(s, 'MassFlowKgh'), label: 'Massenstrom ṁ', unit: 'kg/h', value: fmtInput(active.massFlowKgh, 2) })
+    massFlowField(s)
   ];
 }
 
@@ -202,6 +245,7 @@ function savedLineSectionPatch(item, currentState) {
     [`${prefix}PowerW`]: firstFilled(input.powerW, input[`${prefix}PowerW`], calcTarget !== 'power' ? powerFromResult : ''),
     [`${prefix}PowerUnit`]: firstFilled(input.powerUnit, input[`${prefix}PowerUnit`], calcTarget !== 'power' && powerFromResult ? 'kW' : 'W'),
     [`${prefix}MassFlowKgh`]: firstFilled(input.massFlowKgh, input[`${prefix}MassFlowKgh`], parseDisplayNumber(item.massFlowKgh)),
+    [`${prefix}MassFlowUnit`]: firstFilled(input.massFlowUnit, input[`${prefix}MassFlowUnit`], 'kg/h'),
     [`${prefix}DeltaT`]: firstFilled(input.deltaT, input[`${prefix}DeltaT`], parseDisplayNumber(item.deltaT)),
     activeLineSectionId: item.id,
     activeLineSectionName: item.name || ''
@@ -289,9 +333,20 @@ function bindHeatingCoolingInteractionAdapter(root, rerender) {
   if (!root || root.__tcHeatingCoolingAdapterBound) return;
   root.__tcHeatingCoolingAdapterBound = true;
 
-  const commitFieldElement = (el, { notify = true } = {}) => {
+  const commitFieldElement = (el, { notify = true, action = 'field:commit' } = {}) => {
     if (!el?.dataset?.field) return;
-    state.set({ [el.dataset.field]: el.value }, { notify });
+    const fieldName = el.dataset.field;
+    let value = el.value;
+    if (/MassFlowKgh$/.test(fieldName)) {
+      const current = state.get();
+      const unit = current[fieldName.replace(/MassFlowKgh$/, 'MassFlowUnit')] || 'kg/h';
+      if (unit === 'm3/h' || unit === 'm³/h') {
+        const density = mediumForId(current.mediumId)?.density || 998;
+        const parsed = parseNumber(value, { fallback: NaN });
+        value = Number.isFinite(parsed) ? String(parsed * density) : value;
+      }
+    }
+    state.set({ [fieldName]: value }, { notify, action });
   };
 
   root.addEventListener('change', event => {
@@ -300,17 +355,24 @@ function bindHeatingCoolingInteractionAdapter(root, rerender) {
     // Selects in this module represent master-data choices. They must update the
     // derived medium/pipe properties immediately, not only after a surface click.
     if (fieldEl.matches('select')) {
-      commitFieldElement(fieldEl, { notify: true });
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation?.();
+      commitFieldElement(fieldEl, { notify: true, action: 'field:change:immediate' });
       return;
     }
-    commitFieldElement(fieldEl, { notify: true });
+    event.stopPropagation();
+    event.stopImmediatePropagation?.();
+    commitFieldElement(fieldEl, { notify: true, action: 'field:change' });
   }, true);
 
   root.addEventListener('blur', event => {
     const fieldEl = event.target?.closest?.('input[data-field]');
     if (!fieldEl || !root.contains(fieldEl)) return;
     // Desktop requirement: calculation starts when leaving the input.
-    commitFieldElement(fieldEl, { notify: true });
+    event.stopPropagation();
+    event.stopImmediatePropagation?.();
+    commitFieldElement(fieldEl, { notify: true, action: 'field:blur' });
   }, true);
 
   root.addEventListener('keydown', event => {
@@ -318,7 +380,9 @@ function bindHeatingCoolingInteractionAdapter(root, rerender) {
     if (!fieldEl || !root.contains(fieldEl)) return;
     if (event.key !== 'Enter') return;
     event.preventDefault();
-    commitFieldElement(fieldEl, { notify: true });
+    event.stopPropagation();
+    event.stopImmediatePropagation?.();
+    commitFieldElement(fieldEl, { notify: true, action: 'field:enter' });
   }, true);
 
   root.addEventListener('click', event => {
@@ -326,7 +390,8 @@ function bindHeatingCoolingInteractionAdapter(root, rerender) {
     if (!segment || !root.contains(segment)) return;
     event.preventDefault();
     event.stopPropagation();
-    state.set({ [segment.dataset.segment]: segment.dataset.value });
+    event.stopImmediatePropagation?.();
+    state.set({ [segment.dataset.segment]: segment.dataset.value }, { action: 'segment:select' });
   }, true);
 
   root.addEventListener('click', event => {
@@ -369,7 +434,7 @@ function view(s) {
 
   const mediumCard = card('Medium', stack([
     selectField({ id: 'mediumId', label: 'Wärmeträger', value: s.mediumId, options: MEDIA.map(m => ({ value: m.id, label: m.label })) }),
-    inlineStats(mediumStats(r.medium))
+    `<div data-hc-dynamic="medium-stats">${inlineStats(mediumStats(r.medium))}</div>`
   ].join('')), 'blue', { compact: true });
 
   const resultDetails = [
@@ -383,20 +448,20 @@ function view(s) {
 
   const inputColumn = stack([
     mediumCard,
-    card('Betriebsart', segmented('mode', [
+    card('Betriebsart', `<div data-hc-dynamic="mode-segment">${segmented('mode', [
       { value: 'heating', label: '● Heizung' },
       { value: 'cooling', label: '● Kälte' }
-    ], s.mode, { accent }), accent, { compact: true }),
+    ], s.mode, { accent })}</div>`, accent, { compact: true }),
     card(`${modeLabel} — Eingaben`, stack([
-      segmented(key(s, 'CalcTarget'), [
+      `<div data-hc-dynamic="target-segment">${segmented(key(s, 'CalcTarget'), [
         { value: 'power', label: 'Q Leistung' },
         { value: 'massFlow', label: 'ṁ Massenstrom' },
         { value: 'deltaT', label: 'ΔT Temperatur' }
-      ], active.calcTarget, { accent }),
-      grid(inputFields(s, active).join(''), 2)
+      ], active.calcTarget, { accent })}</div>`,
+      `<div data-hc-dynamic="input-fields">${grid(inputFields(s, active).join(''), 2)}</div>`
     ].join('')), accent),
-    mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent),
-    `<div class="formula">Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)</div>`
+    `<div data-hc-dynamic="result">${mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent)}</div>`,
+    `<div class="formula" data-hc-dynamic="formula">Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)</div>`
   ].join(''));
 
   const recommendationBody = !r.pipe
@@ -407,7 +472,7 @@ function view(s) {
 
   const recommendation = stack([
     selectField({ id: 'pipeSystemId', label: 'Rohrmaterial', value: s.pipeSystemId, options: pipeSystems.map(p => ({ value: p.id, label: p.label })) }),
-    recommendationBody
+    `<div data-hc-dynamic="pipe-result">${recommendationBody}</div>`
   ].join(''));
 
   return renderModuleShell(config, `
@@ -416,15 +481,95 @@ function view(s) {
   `);
 }
 
+
+function setInner(root, selector, html) {
+  const el = root?.querySelector?.(selector);
+  if (!el) return;
+  const next = String(html ?? '');
+  if (el.innerHTML !== next) el.innerHTML = next;
+}
+
+function setSelectValue(root, field, value) {
+  const el = root?.querySelector?.(`[data-field="${field}"]`);
+  if (el && el.value !== String(value ?? '')) el.value = String(value ?? '');
+}
+
+function updateSegment(root, name, value) {
+  root?.querySelectorAll?.(`[data-segment="${name}"]`)?.forEach(button => {
+    button.classList.toggle('is-active', String(button.dataset.value) === String(value));
+  });
+}
+
+function renderRecommendationBody(r) {
+  return !r.pipe
+    ? '<div class="empty-state">Massenstrom berechnen oder eingeben →<br>Rohrdimensionierung</div>'
+    : r.pipe.noDimension
+      ? '<div class="empty-state">Keine Dimensionierung möglich!</div>'
+      : `<div class="main-result"><span>Empfohlene Dimension</span><strong>DN ${r.pipe.dn}</strong></div>${inlineStats(pipeDetails(r))}`;
+}
+
+function updateHeatingCoolingDynamic(root, s) {
+  const active = activeCalculationState(s);
+  const r = calculate(active);
+  const accent = s.mode === 'cooling' ? 'cyan' : 'orange';
+  const resultDetails = [
+    { label: 'Leistung', value: fmt(r.powerKw), unit: 'kW' },
+    { label: 'Massenstrom', value: fmt(r.massFlowKgh), unit: 'kg/h' },
+    { label: 'Volumenstrom', value: fmt(r.volumeFlowM3h, 3), unit: 'm³/h' },
+    { label: 'ΔT', value: fmt(r.deltaT), unit: 'K' },
+    { label: 'Medium', value: r.medium.label },
+    { label: 'Dichte', value: fmt(r.medium.density, 0), unit: 'kg/m³' }
+  ].filter(item => item.label !== targetLabel(active.calcTarget));
+
+  setSelectValue(root, 'mediumId', s.mediumId);
+  setSelectValue(root, 'pipeSystemId', s.pipeSystemId);
+  setInner(root, '[data-hc-dynamic="medium-stats"]', inlineStats(mediumStats(r.medium)));
+  updateSegment(root, 'mode', s.mode);
+  updateSegment(root, key(s, 'CalcTarget'), active.calcTarget);
+  setInner(root, '[data-hc-dynamic="target-segment"]', segmented(key(s, 'CalcTarget'), [
+    { value: 'power', label: 'Q Leistung' },
+    { value: 'massFlow', label: 'ṁ Massenstrom' },
+    { value: 'deltaT', label: 'ΔT Temperatur' }
+  ], active.calcTarget, { accent }));
+  setInner(root, '[data-hc-dynamic="input-fields"]', grid(inputFields(s, active).join(''), 2));
+  setInner(root, '[data-hc-dynamic="result"]', mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent));
+  setInner(root, '[data-hc-dynamic="formula"]', `Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)`);
+  setInner(root, '[data-hc-dynamic="pipe-result"]', renderRecommendationBody(r));
+}
+
+function isDynamicHeatingCoolingAction(meta = {}) {
+  const action = String(meta.action || '');
+  return /^(field:|segment:select|binding:|input:confirm|surface:confirm)/.test(action);
+}
+
+function mountHeatingCooling(root) {
+  if (!root) return () => {};
+  bindNoClickScroll(root);
+
+  const fullRender = (snapshot = state.get()) => {
+    root.innerHTML = view(snapshot);
+    bindHeatingCoolingInteractionAdapter(root);
+    bindCommonInputs(root, state);
+    bindLineSections(root, calculate(activeCalculationState(snapshot)), fullRender);
+  };
+
+  fullRender(state.get());
+  const unsubscribe = state.subscribe((snapshot, meta = {}) => {
+    if (isDynamicHeatingCoolingAction(meta)) {
+      updateHeatingCoolingDynamic(root, snapshot);
+      bindLineSections(root, calculate(activeCalculationState(snapshot)), fullRender);
+      return;
+    }
+    fullRender(snapshot);
+  });
+  return () => { if (typeof unsubscribe === 'function') unsubscribe(); };
+}
+
 export default {
   config,
   schema,
   state,
   mount(root) {
-    bindHeatingCoolingInteractionAdapter(root);
-    return mountModule(root, state, view, (rootEl, snapshot, render) => {
-      bindHeatingCoolingInteractionAdapter(rootEl, render);
-      bindLineSections(rootEl, calculate(activeCalculationState(snapshot)), render);
-    });
+    return mountHeatingCooling(root);
   }
 };

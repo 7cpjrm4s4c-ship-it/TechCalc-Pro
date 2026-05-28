@@ -22,3 +22,10 @@ assert.match(moduleSource, /'saved:load'/, 'saved line selection must be a centr
 assert.match(moduleSource, /state\.set\(savedLineSectionPatch\(item, state\.get\(\)\), \{ action: 'line:select' \}\)/, 'saved line selection must update store through a structural action.');
 
 console.log('heating-cooling global-standard regression ok');
+
+assert.match(moduleSource, /function mountHeatingCooling/, 'heating/cooling must use the granular mount to avoid full renders on field/select actions.');
+assert.match(moduleSource, /data-hc-dynamic/, 'heating/cooling must expose granular dynamic render anchors.');
+assert.match(moduleSource, /isDynamicHeatingCoolingAction/, 'heating/cooling must distinguish field actions from structural line actions.');
+assert.match(stateSource, /heatingMassFlowUnit/, 'heating/cooling state must expose heating mass-flow unit switching.');
+assert.match(stateSource, /coolingMassFlowUnit/, 'heating/cooling state must expose cooling mass-flow unit switching.');
+assert.match(fs.readFileSync('js/utils/pipes.js', 'utf8'), /DIN 16836/, 'Mepla norm must use the short/correct DIN 16836 text.');

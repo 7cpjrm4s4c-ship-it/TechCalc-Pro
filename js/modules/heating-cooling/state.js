@@ -9,12 +9,14 @@ export const state = createModuleState({
   heatingPowerW: '',
   heatingPowerUnit: 'W',
   heatingMassFlowKgh: '',
+  heatingMassFlowUnit: 'kg/h',
   heatingDeltaT: '10',
 
   coolingCalcTarget: 'power',
   coolingPowerW: '',
   coolingPowerUnit: 'W',
   coolingMassFlowKgh: '',
+  coolingMassFlowUnit: 'kg/h',
   coolingDeltaT: '10',
 
   activeLineSectionId: null,

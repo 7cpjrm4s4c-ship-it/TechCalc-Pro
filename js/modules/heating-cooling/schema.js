@@ -10,16 +10,18 @@ export const heatingCoolingSchema = defineFormSchema({
     { key: 'heatingCalcTarget', label: 'Berechnung Heizung', type: FIELD_TYPES.SEGMENT, options: [{ value: 'power', label: 'Leistung' }, { value: 'massFlow', label: 'Massenstrom' }, { value: 'deltaT', label: 'Temperatur' }] },
     { key: 'heatingPowerW', label: 'Heizleistung', type: FIELD_TYPES.DECIMAL, unit: 'W' },
     { key: 'heatingMassFlowKgh', label: 'Massenstrom Heizung', type: FIELD_TYPES.DECIMAL, unit: 'kg/h' },
+    { key: 'heatingMassFlowUnit', label: 'Einheit Massenstrom Heizung', type: FIELD_TYPES.SELECT, options: [{ value: 'kg/h', label: 'kg/h' }, { value: 'm3/h', label: 'm³/h' }], commit: 'immediate' },
     { key: 'heatingDeltaT', label: 'ΔT Heizung', type: FIELD_TYPES.DECIMAL, unit: 'K' },
     { key: 'coolingCalcTarget', label: 'Berechnung Kälte', type: FIELD_TYPES.SEGMENT, options: [{ value: 'power', label: 'Leistung' }, { value: 'massFlow', label: 'Massenstrom' }, { value: 'deltaT', label: 'Temperatur' }] },
     { key: 'coolingPowerW', label: 'Kälteleistung', type: FIELD_TYPES.DECIMAL, unit: 'W' },
     { key: 'coolingMassFlowKgh', label: 'Massenstrom Kälte', type: FIELD_TYPES.DECIMAL, unit: 'kg/h' },
+    { key: 'coolingMassFlowUnit', label: 'Einheit Massenstrom Kälte', type: FIELD_TYPES.SELECT, options: [{ value: 'kg/h', label: 'kg/h' }, { value: 'm3/h', label: 'm³/h' }], commit: 'immediate' },
     { key: 'coolingDeltaT', label: 'ΔT Kälte', type: FIELD_TYPES.DECIMAL, unit: 'K' }
   ],
   groups: [
     { title: 'System', fields: ['mode', 'mediumId', 'pipeSystemId'], columns: 2 },
-    { title: 'Heizung', fields: ['heatingCalcTarget', 'heatingPowerW', 'heatingMassFlowKgh', 'heatingDeltaT'], columns: 2 },
-    { title: 'Kälte', fields: ['coolingCalcTarget', 'coolingPowerW', 'coolingMassFlowKgh', 'coolingDeltaT'], columns: 2 }
+    { title: 'Heizung', fields: ['heatingCalcTarget', 'heatingPowerW', 'heatingMassFlowKgh', 'heatingMassFlowUnit', 'heatingDeltaT'], columns: 2 },
+    { title: 'Kälte', fields: ['coolingCalcTarget', 'coolingPowerW', 'coolingMassFlowKgh', 'coolingMassFlowUnit', 'coolingDeltaT'], columns: 2 }
   ]
 });
 

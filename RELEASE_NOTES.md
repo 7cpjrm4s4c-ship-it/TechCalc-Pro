@@ -1,4 +1,13 @@
 
+## 1.3.0 Phase 12A - Heizung/Kälte Bedien- und Renderfix
+
+- Heizung/Kälte aktualisiert Select-Stammdaten ohne Full-Render.
+- Switches für Betriebsart und Berechnungsziel committen sofort.
+- Massenstrom-Einheit kg/h / m³/h wieder sichtbar.
+- Gespeicherte Leitungsabschnitte bleiben strukturelle Aktionen.
+- Geberit Mepla Norm auf DIN 16836 korrigiert.
+
+
 ## 1.3.0 - Phase 12 Module Migration
 
 - Heizung/Kälte als erstes Modul auf den globalen Modulstandard migriert.
