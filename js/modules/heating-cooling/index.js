@@ -7,6 +7,7 @@ import { MEDIA, fmt, fmtInput } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, pressureBadge } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
+import { registerCentralActions } from '../../core/eventPipeline.js';
 import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
 
 const MODE_PREFIX = {
@@ -133,7 +134,7 @@ function lineSectionsCard(r) {
   });
   return card('Leitungsabschnitte', stack([
     `<div class="field"><label for="lineSectionName">Bezeichnung</label><div class="control"><input id="lineSectionName" type="text" placeholder="z. B. Verteilerabgang Nord" autocomplete="off" value="${(state.get().activeLineSectionName || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></div></div>`,
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-line-save ${state.get().activeLineSectionId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-line-update ${state.get().activeLineSectionId ? '' : 'disabled'}>Aktualisieren</button></div>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-tc-action="line:save" data-line-save ${state.get().activeLineSectionId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-tc-action="line:update" data-line-update ${state.get().activeLineSectionId ? '' : 'disabled'}>Aktualisieren</button></div>`,
     rows
   ].join('')), 'blue');
 }
@@ -209,21 +210,18 @@ function savedLineSectionPatch(item, currentState) {
 
 function bindLineSections(root, r, rerender) {
   bindEditModeClear(root, { state, activeIdKey: 'activeLineSectionId', nameKey: 'activeLineSectionName' });
-  const saveBtn = root.querySelector('[data-line-save]');
-  const updateBtn = root.querySelector('[data-line-update]');
-  saveBtn?.addEventListener('click', (event) => {
-    event.preventDefault();
+
+  const currentResult = () => calculate(activeCalculationState(state.get()));
+  const saveCurrentLine = () => {
     const name = root.querySelector('#lineSectionName')?.value?.trim() || '';
     const currentState = state.get();
     const items = readLineSections();
     const id = createRecordId('line');
-    const item = buildLineSectionRecord({ ...currentState, activeLineSectionId: null, activeLineSectionName: name }, r, items, id, name);
+    const item = buildLineSectionRecord({ ...currentState, activeLineSectionId: null, activeLineSectionName: name }, currentResult(), items, id, name);
     writeLineSections([item, ...items]);
-    state.set({ activeLineSectionId: null, activeLineSectionName: '' }, { notify:false });
-    if (typeof rerender === 'function') rerender();
-  });
-  updateBtn?.addEventListener('click', (event) => {
-    event.preventDefault();
+    state.set({ activeLineSectionId: null, activeLineSectionName: '' }, { action: 'line:save' });
+  };
+  const updateCurrentLine = () => {
     const currentState = state.get();
     const id = currentState.activeLineSectionId;
     if (!id) return;
@@ -231,31 +229,60 @@ function bindLineSections(root, r, rerender) {
     const items = readLineSections();
     const existing = items.find(x => String(x.id) === String(id));
     if (!existing) return;
-    const item = buildLineSectionRecord(currentState, r, items, id, name, existing);
+    const item = buildLineSectionRecord(currentState, currentResult(), items, id, name, existing);
     writeLineSections(replaceRecord(items, id, item));
-    state.set({ activeLineSectionId: id, activeLineSectionName: item.name }, { notify:false });
-    if (typeof rerender === 'function') rerender();
+    state.set({ activeLineSectionId: id, activeLineSectionName: item.name }, { action: 'line:update' });
+  };
+  const loadLine = id => {
+    const item = readLineSections().find(entry => isSameId(entry.id, id));
+    if (!item) return;
+    if (isSameId(state.get().activeLineSectionId, id)) {
+      state.set({ activeLineSectionId: null, activeLineSectionName: '' }, { action: 'line:deselect' });
+      return;
+    }
+    state.set(savedLineSectionPatch(item, state.get()), { action: 'line:select' });
+  };
+  const deleteLine = id => {
+    writeLineSections(removeRecord(readLineSections(), id));
+    const patch = isSameId(state.get().activeLineSectionId, id)
+      ? { activeLineSectionId: null, activeLineSectionName: '' }
+      : {};
+    state.set(patch, { action: 'line:delete', notify: true });
+  };
+  const toggleLine = element => {
+    const card = element?.closest?.('[data-line-card]');
+    if (!card) return;
+    const willOpen = card.classList.contains('is-collapsed');
+    root.querySelectorAll('[data-line-card]').forEach(item => {
+      if (item === card) return;
+      item.classList.add('is-collapsed');
+      item.querySelector('[data-line-toggle]')?.setAttribute('aria-expanded', 'false');
+    });
+    card.classList.toggle('is-collapsed', !willOpen);
+    element.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+  };
+
+  registerCentralActions(root, {
+    'line:save': saveCurrentLine,
+    'line:update': updateCurrentLine,
+    'saved:load': ({ element }) => loadLine(element?.getAttribute('data-line-select') || element?.closest?.('[data-line-select]')?.getAttribute('data-line-select')),
+    'saved:delete': ({ element }) => deleteLine(element?.getAttribute('data-line-delete')),
+    'saved:toggle': ({ element }) => toggleLine(element)
   });
+
+  // Keep the legacy binder as a fallback for browsers/tests that dispatch plain click
+  // events before the central action map has been registered. Central actions stop
+  // propagation, so normal runtime uses the global pipeline only.
   bindSavedRecordList(root, {
     loadAttr: 'data-line-select',
     toggleAttr: 'data-line-toggle',
     deleteAttr: 'data-line-delete',
-    onLoad(id) {
-      const item = readLineSections().find(entry => isSameId(entry.id, id));
-      if (!item) return;
-      if (isSameId(state.get().activeLineSectionId, id)) {
-        state.set({ activeLineSectionId: null, activeLineSectionName: '' });
-        return;
-      }
-      state.set(savedLineSectionPatch(item, state.get()));
-    },
-    onDelete(id) {
-      writeLineSections(removeRecord(readLineSections(), id));
-      if (isSameId(state.get().activeLineSectionId, id)) state.set({ activeLineSectionId:null, activeLineSectionName:'' }, { notify:false });
-      if (typeof rerender === 'function') rerender();
-    }
+    preserveLoadScroll: false,
+    onLoad: loadLine,
+    onDelete: deleteLine
   });
 }
+
 
 
 function bindHeatingCoolingInteractionAdapter(root, rerender) {

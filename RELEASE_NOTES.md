@@ -1,3 +1,13 @@
+
+## 1.3.0 - Phase 12 Module Migration
+
+- Heizung/Kälte als erstes Modul auf den globalen Modulstandard migriert.
+- Medium- und Rohrsystem-Auswahl committen Stammdatenwechsel sofort.
+- Segment-/Switch-Aktionen laufen über die zentrale Event-Pipeline.
+- Leitungsabschnitte speichern, aktualisieren, auswählen und löschen über zentrale Actions.
+- Tastaturaktivierung zentraler Actions ergänzt.
+- Regressionstest für Heizung/Kälte Global Standard ergänzt.
+
 ## 1.3.0 Phase 11E
 
 - Zentralen `renderCoordinator` eingefuehrt.

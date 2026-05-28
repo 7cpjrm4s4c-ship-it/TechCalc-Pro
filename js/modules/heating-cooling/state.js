@@ -15,5 +15,8 @@ export const state = createModuleState({
   coolingPowerW: '',
   coolingPowerUnit: 'W',
   coolingMassFlowKgh: '',
-  coolingDeltaT: '10'
-});
+  coolingDeltaT: '10',
+
+  activeLineSectionId: null,
+  activeLineSectionName: ''
+}, { moduleId: 'heating-cooling' });

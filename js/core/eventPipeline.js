@@ -123,6 +123,11 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   };
 
   const onKeydown = event => {
+    const actionEl = event.target?.closest?.('[data-tc-action], [data-action]');
+    if (actionEl && root.contains(actionEl) && (event.key === 'Enter' || event.key === ' ')) {
+      if (dispatchAction(root, state, actionEl, event, options)) return;
+    }
+
     const el = event.target?.closest?.('input[data-field], textarea[data-field], select[data-field]');
     if (!el || !root.contains(el) || event.key !== 'Enter') return;
     event.preventDefault();

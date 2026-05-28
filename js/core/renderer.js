@@ -46,13 +46,15 @@ export function card(title, body, accent = 'blue', options = {}) {
 
 export function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', inputmode = 'decimal', disabled = false, unitField = '', unitOptions = [] }) {
   const unitHtml = unitOptions.length
-    ? `<select class="unit unit-select" aria-label="Einheit" data-field="${esc(unitField)}">${unitOptions.map(o => `<option value="${esc(o.value)}" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`
+    ? `<select class="unit unit-select" aria-label="Einheit" data-field="${esc(unitField)}" data-commit="immediate">${unitOptions.map(o => `<option value="${esc(o.value)}" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`
     : unit ? `<span class="unit">${esc(unit)}</span>` : '';
   return `<div class="field"><label for="${esc(id)}">${esc(label)}</label><div class="control"><input id="${esc(id)}" data-field="${esc(id)}" type="${esc(type)}" inputmode="${esc(inputmode)}" value="${esc(value ?? '')}" placeholder="${esc(placeholder)}" ${disabled ? 'disabled' : ''} autocomplete="off">${unitHtml}</div></div>`;
 }
 
-export function selectField({ id, label, value, options }) {
-  return `<div class="field"><label for="${esc(id)}">${esc(label)}</label><div class="control"><select id="${esc(id)}" data-field="${esc(id)}">${options.map(o => `<option value="${esc(o.value)}" ${o.value === value ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select></div></div>`;
+export function selectField({ id, label, value, options, commit = 'immediate', lookup = true }) {
+  const commitAttr = commit ? ` data-commit="${esc(commit)}"` : '';
+  const lookupAttr = lookup ? ' data-lookup="true"' : '';
+  return `<div class="field"><label for="${esc(id)}">${esc(label)}</label><div class="control"><select id="${esc(id)}" data-field="${esc(id)}"${commitAttr}${lookupAttr}>${options.map(o => `<option value="${esc(o.value)}" ${o.value === value ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select></div></div>`;
 }
 
 export function segmented(name, options, value, settings = {}) {
