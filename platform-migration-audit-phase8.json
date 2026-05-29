@@ -104,7 +104,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": false,
-      "migrationStatus": "phase-13a-ventilation-globalized"
+      "migrationStatus": "phase-13b-ventilation-pipeline-rebind"
     },
     {
       "id": "wastewater",

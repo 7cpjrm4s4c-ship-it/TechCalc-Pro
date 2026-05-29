@@ -16,6 +16,7 @@ const commands = [
   ['node', ['tests/central-platform-pipeline.test.mjs']],
   ['node', ['tests/state-binding.test.mjs']],
   ['node', ['tests/event-pipeline-phase11d.test.mjs']],
+  ['node', ['tests/event-pipeline-rebind.test.mjs']],
   ['node', ['tests/render-coordinator.test.mjs']],
   ['node', ['scripts/audit-module-contracts.mjs']],
   ['node', ['scripts/audit-ui-classes.mjs']],

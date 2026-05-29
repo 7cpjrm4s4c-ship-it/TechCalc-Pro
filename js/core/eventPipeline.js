@@ -164,8 +164,15 @@ function wasPointerActionSuppressed(root) {
 }
 
 export function bindCentralEventPipeline(root, state, options = {}) {
-  if (!root || !state?.set || root.__tcCentralEventPipelineBound) return () => {};
+  if (!root || !state?.set) return () => {};
+  if (root.__tcCentralEventPipelineBound) {
+    if (root.__tcCentralEventPipelineState === state) {
+      return root.__tcCentralEventPipelineCleanup || (() => {});
+    }
+    try { root.__tcCentralEventPipelineCleanup?.(); } catch { /* allow safe rebind on route/module changes */ }
+  }
   root.__tcCentralEventPipelineBound = true;
+  root.__tcCentralEventPipelineState = state;
   const cleanup = [];
   let hasDeferredInput = false;
   let pendingRaf = 0;
@@ -334,9 +341,13 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   add(root, 'pointermove', event => updatePointerGesture(root, event), { capture: true, passive: true });
   add(root, 'click', confirmSurface, true);
 
-  return () => {
+  const unbind = () => {
     if (pendingRaf) cancelAnimationFrame(pendingRaf);
     while (cleanup.length) cleanup.pop()();
     root.__tcCentralEventPipelineBound = false;
+    root.__tcCentralEventPipelineState = null;
+    root.__tcCentralEventPipelineCleanup = null;
   };
+  root.__tcCentralEventPipelineCleanup = unbind;
+  return unbind;
 }
