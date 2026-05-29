@@ -43,7 +43,7 @@ export function heatingCooling({ powerW, powerUnit = 'W', massFlowKgh, deltaT, m
 }
 
 export function airDensity(tempC = 20) { return 353.05 / (Number(tempC) + 273.15); }
-export function ventilation({ volumeFlowM3h, powerW, powerUnit = 'W', deltaT, supplyTemp, roomTemp, tempC = 20, calcTarget = 'power' }) {
+export function ventilation({ volumeFlowM3h, powerW, powerUnit = 'W', deltaT, supplyTemp, roomTemp, tempC = 20, calcTarget = 'power', mode = 'heating' }) {
   const referenceTemp = supplyTemp !== undefined && supplyTemp !== '' ? supplyTemp : tempC;
   const rho = airDensity(referenceTemp);
   const cp = 1.005;
@@ -54,8 +54,8 @@ export function ventilation({ volumeFlowM3h, powerW, powerUnit = 'W', deltaT, su
   const v = num(volumeFlowM3h);
   const derivedDt = deltaT !== '' && deltaT !== null && deltaT !== undefined
     ? num(deltaT)
-    : Math.abs(num(supplyTemp) - num(roomTemp)) || 0;
-  const dt = derivedDt;
+    : (mode === 'cooling' ? num(roomTemp) - num(supplyTemp) : num(supplyTemp) - num(roomTemp)) || 0;
+  const dt = derivedDt > 0 ? derivedDt : 0;
 
   let volume = v || null;
   let powerKw = qKwInput;

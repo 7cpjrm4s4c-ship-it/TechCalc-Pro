@@ -7,7 +7,7 @@ import schema from '../js/modules/ventilation/schema.js';
 const source = readFileSync(new URL('../js/modules/ventilation/index.js', import.meta.url), 'utf8');
 const docs = readFileSync(new URL('../docs/PHASE_13A_VENTILATION_GLOBALIZATION.md', import.meta.url), 'utf8');
 
-assert.match(config.migrationStatus, /^phase-13[abc]-ventilation-/, 'ventilation migration status is current phase 13');
+assert.match(config.migrationStatus, /^phase-13[abcd]-ventilation-/, 'ventilation migration status is current phase 13');
 assert.ok(module.schema, 'ventilation module exposes schema');
 assert.ok(schema.fields.some(field => field.key === 'mode'), 'mode is schema-defined');
 
@@ -28,5 +28,15 @@ assert.doesNotMatch(source, /\[\`\$\{prefix\}DeltaT\`\]: firstFilled/, 'stored v
 assert.doesNotMatch(source, /addEventListener\(['"]click['"]/, 'module has no local click listener');
 assert.doesNotMatch(source, /addEventListener\(['"]touch/, 'module has no local touch listener');
 assert.match(docs, /Heizung\/Kälte als Referenzmodul/, 'docs document reference-module basis');
+
+const derivedMatch = source.match(/function derivedDeltaT\(active\) \{[\s\S]*?\n\}/);
+assert.ok(derivedMatch, 'derivedDeltaT function exists');
+const derivedSource = derivedMatch[0];
+assert.match(derivedSource, /mode === 'cooling'/, 'deltaT derivation branches by cooling mode');
+assert.match(derivedSource, /room - supply/, 'cooling deltaT is room minus supply');
+assert.match(derivedSource, /supply - room/, 'heating deltaT is supply minus room');
+assert.doesNotMatch(derivedSource, /Math\.abs/, 'deltaT must not use absolute difference');
+assert.match(source, /heatingSupplyTemp/, 'heating temperature inputs are store-separated');
+assert.match(source, /coolingSupplyTemp/, 'cooling temperature inputs are store-separated');
 
 console.log('ventilation global-standard regression ok');

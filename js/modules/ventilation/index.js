@@ -204,19 +204,18 @@ function bindVentilationLineSections(root, r, active, modeLabel, rerender) {
 }
 
 function activeCalculationState(s) {
-  return {
+  const active = {
     mode: s.mode,
     calcTarget: activeValue(s, 'CalcTarget') || 'power',
     powerW: activeValue(s, 'PowerW') || '',
     powerUnit: activeValue(s, 'PowerUnit') || 'W',
     volumeFlowM3h: activeValue(s, 'VolumeFlowM3h') || '',
-    deltaT: derivedDeltaT({
-      deltaT: '',
-      supplyTemp: activeValue(s, 'SupplyTemp') || '',
-      roomTemp: activeValue(s, 'RoomTemp') || ''
-    }),
     supplyTemp: activeValue(s, 'SupplyTemp') || '',
     roomTemp: activeValue(s, 'RoomTemp') || ''
+  };
+  return {
+    ...active,
+    deltaT: derivedDeltaT(active)
   };
 }
 
@@ -236,11 +235,16 @@ function powerField(s) {
 }
 
 function derivedDeltaT(active) {
-  if (active.deltaT !== '' && active.deltaT !== null && active.deltaT !== undefined) return active.deltaT;
   const supply = parseNumber(active.supplyTemp, { fallback: NaN });
   const room = parseNumber(active.roomTemp, { fallback: NaN });
-  if (Number.isFinite(supply) && Number.isFinite(room)) return Math.abs(supply - room);
-  return '';
+  if (!Number.isFinite(supply) || !Number.isFinite(room)) return '';
+
+  const mode = active.mode === 'cooling' ? 'cooling' : 'heating';
+  const delta = mode === 'cooling'
+    ? room - supply
+    : supply - room;
+
+  return delta > 0 ? delta : 0;
 }
 
 function derivedDeltaTField(s, active) {
