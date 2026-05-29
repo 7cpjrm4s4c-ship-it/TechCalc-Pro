@@ -3,7 +3,7 @@
   "purpose": "Find remaining module-local event handlers that must be migrated behind the central event pipeline.",
   "totals": {
     "filesWithLegacyHandlers": 8,
-    "legacyHandlerScore": 75
+    "legacyHandlerScore": 63
   },
   "findings": [
     {
@@ -44,9 +44,9 @@
     },
     {
       "file": "js/modules/rainwater/index.js",
-      "addEventListener": 11,
+      "addEventListener": 3,
       "directHandlers": 0,
-      "legacySelectors": 4
+      "legacySelectors": 0
     },
     {
       "file": "js/modules/wastewater/index.js",

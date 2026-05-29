@@ -22,6 +22,7 @@
     "audit:legacy-events": "node scripts/audit-legacy-event-handlers.mjs",
     "test:heating-cooling-global": "node tests/heating-cooling-global-standard.test.mjs",
     "test:heating-cooling-final": "node tests/heating-cooling-phase12h.test.mjs",
-    "test:ventilation-global": "node tests/ventilation-global-standard.test.mjs"
+    "test:ventilation-global": "node tests/ventilation-global-standard.test.mjs",
+    "test:rainwater-global": "node tests/rainwater-global-standard.test.mjs"
   }
 }
