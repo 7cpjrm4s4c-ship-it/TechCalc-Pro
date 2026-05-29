@@ -44,11 +44,11 @@ export function card(title, body, accent = 'blue', options = {}) {
   return `<section class="card card--accent-${esc(accent)}${compact}"><h2 class="card__title">${esc(title)}</h2><div class="card__body">${body}</div></section>`;
 }
 
-export function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', inputmode = 'decimal', disabled = false, unitField = '', unitOptions = [] }) {
+export function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', inputmode = 'decimal', disabled = false, readonly = false, unitField = '', unitOptions = [] }) {
   const unitHtml = unitOptions.length
     ? `<select class="unit unit-select" aria-label="Einheit" data-field="${esc(unitField)}" data-commit="immediate">${unitOptions.map(o => `<option value="${esc(o.value)}" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`
     : unit ? `<span class="unit">${esc(unit)}</span>` : '';
-  return `<div class="field"><label for="${esc(id)}">${esc(label)}</label><div class="control"><input id="${esc(id)}" data-field="${esc(id)}" type="${esc(type)}" inputmode="${esc(inputmode)}" value="${esc(value ?? '')}" placeholder="${esc(placeholder)}" ${disabled ? 'disabled' : ''} autocomplete="off">${unitHtml}</div></div>`;
+  return `<div class="field"><label for="${esc(id)}">${esc(label)}</label><div class="control"><input id="${esc(id)}" data-field="${esc(id)}" type="${esc(type)}" inputmode="${esc(inputmode)}" value="${esc(value ?? '')}" placeholder="${esc(placeholder)}" ${disabled ? 'disabled' : ''} ${readonly ? 'readonly aria-readonly="true"' : ''} autocomplete="off">${unitHtml}</div></div>`;
 }
 
 export function selectField({ id, label, value, options, commit = 'immediate', lookup = true }) {

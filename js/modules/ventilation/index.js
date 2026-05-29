@@ -110,7 +110,6 @@ function savedVentilationPatch(item, currentState) {
     [`${prefix}PowerW`]: firstFilled(input.powerW, input[`${prefix}PowerW`], calcTarget !== 'power' ? powerFromResult : ''),
     [`${prefix}PowerUnit`]: firstFilled(input.powerUnit, input[`${prefix}PowerUnit`], calcTarget !== 'power' && powerFromResult ? 'kW' : 'W'),
     [`${prefix}VolumeFlowM3h`]: firstFilled(input.volumeFlowM3h, input[`${prefix}VolumeFlowM3h`], parseDisplayNumber(item.volumeFlowM3h)),
-    [`${prefix}DeltaT`]: firstFilled(input.deltaT, input[`${prefix}DeltaT`], parseDisplayNumber(item.deltaT)),
     [`${prefix}SupplyTemp`]: firstFilled(input.supplyTemp, input[`${prefix}SupplyTemp`], parseDisplayNumber(item.supplyTemp)),
     [`${prefix}RoomTemp`]: firstFilled(input.roomTemp, input[`${prefix}RoomTemp`], parseDisplayNumber(item.roomTemp)),
     activeVentLineSectionId: item.id,
@@ -211,7 +210,11 @@ function activeCalculationState(s) {
     powerW: activeValue(s, 'PowerW') || '',
     powerUnit: activeValue(s, 'PowerUnit') || 'W',
     volumeFlowM3h: activeValue(s, 'VolumeFlowM3h') || '',
-    deltaT: activeValue(s, 'DeltaT') || '',
+    deltaT: derivedDeltaT({
+      deltaT: '',
+      supplyTemp: activeValue(s, 'SupplyTemp') || '',
+      roomTemp: activeValue(s, 'RoomTemp') || ''
+    }),
     supplyTemp: activeValue(s, 'SupplyTemp') || '',
     roomTemp: activeValue(s, 'RoomTemp') || ''
   };
@@ -240,16 +243,26 @@ function derivedDeltaT(active) {
   return '';
 }
 
+function derivedDeltaTField(s, active) {
+  return field({
+    id: key(s, 'DeltaT'),
+    label: 'ΔT Temperatur',
+    unit: 'K',
+    value: fmtInput(derivedDeltaT(active), 2),
+    readonly: true
+  });
+}
+
 function inputFields(s, active) {
   const dtValue = derivedDeltaT(active);
   if (active.calcTarget === 'power') {
     return [
       field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) }),
-      field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(dtValue, 2) })
+      derivedDeltaTField(s, active)
     ];
   }
   if (active.calcTarget === 'volumeFlow') {
-    return [powerField(s), field({ id: key(s, 'DeltaT'), label: 'ΔT Temperatur', unit: 'K', value: fmtInput(dtValue, 2) })];
+    return [powerField(s), derivedDeltaTField(s, active)];
   }
   return [powerField(s), field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) })];
 }

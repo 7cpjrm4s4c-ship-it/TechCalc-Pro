@@ -104,7 +104,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": false,
-      "migrationStatus": "phase-13b-ventilation-pipeline-rebind"
+      "migrationStatus": "phase-13c-ventilation-derived-deltat"
     },
     {
       "id": "wastewater",

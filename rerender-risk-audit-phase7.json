@@ -16,12 +16,12 @@
     },
     {
       "file": "js/modules/ventilation/index.js",
-      "line": 318,
+      "line": 331,
       "text": "if (el.innerHTML !== next) el.innerHTML = next;"
     },
     {
       "file": "js/modules/ventilation/index.js",
-      "line": 453,
+      "line": 466,
       "text": "root.innerHTML = view(snapshot);"
     }
   ]
