@@ -100,6 +100,13 @@ function updateTouchGesture(root, event) {
   if (dx > 8 || dy > 8) gesture.moved = true;
 }
 
+function markScrollGesture(root) {
+  if (!root?.dataset) return;
+  const now = String(Date.now());
+  root.dataset.tcSuppressTouchClickAt = now;
+  root.dataset.tcSuppressPointerActionAt = now;
+}
+
 function shouldSuppressTouchAction(root, event) {
   if (event?.type !== 'touchend') return false;
   const gesture = root?.__tcTouchGesture;
@@ -108,14 +115,52 @@ function shouldSuppressTouchAction(root, event) {
   const dx = Math.abs(point.x - gesture.x);
   const dy = Math.abs(point.y - gesture.y);
   const moved = gesture.moved || dx > 8 || dy > 8;
-  if (moved && root?.dataset) root.dataset.tcSuppressTouchClickAt = String(Date.now());
+  if (moved) markScrollGesture(root);
   root.__tcTouchGesture = null;
+  return moved;
+}
+
+function pointerPoint(event) {
+  if (!event) return null;
+  return { x: Number(event.clientX || 0), y: Number(event.clientY || 0), pointerType: event.pointerType || 'mouse' };
+}
+
+function beginPointerGesture(root, event) {
+  if (!root || event?.pointerType === 'mouse') return;
+  const point = pointerPoint(event);
+  if (!point) return;
+  root.__tcPointerGesture = { x: point.x, y: point.y, pointerId: event.pointerId, moved: false };
+}
+
+function updatePointerGesture(root, event) {
+  const gesture = root?.__tcPointerGesture;
+  const point = pointerPoint(event);
+  if (!gesture || !point) return;
+  if (gesture.pointerId !== undefined && event.pointerId !== undefined && gesture.pointerId !== event.pointerId) return;
+  const dx = Math.abs(point.x - gesture.x);
+  const dy = Math.abs(point.y - gesture.y);
+  if (dx > 8 || dy > 8) gesture.moved = true;
+}
+
+function shouldSuppressPointerAction(root, event) {
+  if (event?.type !== 'pointerup' || event?.pointerType === 'mouse') return false;
+  const gesture = root?.__tcPointerGesture;
+  if (!gesture) return false;
+  updatePointerGesture(root, event);
+  const moved = Boolean(gesture.moved);
+  root.__tcPointerGesture = null;
+  if (moved) markScrollGesture(root);
   return moved;
 }
 
 function wasTouchClickSuppressed(root) {
   if (!root?.dataset?.tcSuppressTouchClickAt) return false;
   return Date.now() - Number(root.dataset.tcSuppressTouchClickAt || 0) < 700;
+}
+
+function wasPointerActionSuppressed(root) {
+  if (!root?.dataset?.tcSuppressPointerActionAt) return false;
+  return Date.now() - Number(root.dataset.tcSuppressPointerActionAt || 0) < 700;
 }
 
 export function bindCentralEventPipeline(root, state, options = {}) {
@@ -216,7 +261,7 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   const onClick = event => {
     const actionEl = event.target?.closest?.('[data-tc-action], [data-action]');
     const action = actionEl?.dataset?.tcAction || actionEl?.dataset?.action;
-    if (actionEl && wasTouchClickSuppressed(root)) {
+    if (actionEl && (wasTouchClickSuppressed(root) || wasPointerActionSuppressed(root))) {
       event?.preventDefault?.();
       event?.stopPropagation?.();
       event?.stopImmediatePropagation?.();
@@ -238,7 +283,7 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     const actionEl = event.target?.closest?.('[data-tc-action], [data-action]');
     const action = actionEl?.dataset?.tcAction || actionEl?.dataset?.action;
     if (!actionEl || action === 'segment') return false;
-    if (shouldSuppressTouchAction(root, event)) {
+    if (shouldSuppressTouchAction(root, event) || shouldSuppressPointerAction(root, event)) {
       event?.preventDefault?.();
       event?.stopPropagation?.();
       event?.stopImmediatePropagation?.();
@@ -285,7 +330,8 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   add(root, 'touchmove', event => updateTouchGesture(root, event), { capture: true, passive: true });
   add(root, 'touchend', onPointerSegment, { capture: true, passive: false });
   add(root, 'click', onClick, true);
-  add(root, 'pointerdown', confirmSurface, true);
+  add(root, 'pointerdown', event => { beginPointerGesture(root, event); confirmSurface(event); }, true);
+  add(root, 'pointermove', event => updatePointerGesture(root, event), { capture: true, passive: true });
   add(root, 'click', confirmSurface, true);
 
   return () => {
