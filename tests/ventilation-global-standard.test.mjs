@@ -1,0 +1,28 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import module from '../js/modules/ventilation/index.js';
+import config from '../js/modules/ventilation/config.js';
+import schema from '../js/modules/ventilation/schema.js';
+
+const source = readFileSync(new URL('../js/modules/ventilation/index.js', import.meta.url), 'utf8');
+const docs = readFileSync(new URL('../docs/PHASE_13A_VENTILATION_GLOBALIZATION.md', import.meta.url), 'utf8');
+
+assert.equal(config.migrationStatus, 'phase-13a-ventilation-globalized');
+assert.ok(module.schema, 'ventilation module exposes schema');
+assert.ok(schema.fields.some(field => field.key === 'mode'), 'mode is schema-defined');
+
+const fullRenderMatches = source.match(/root\.innerHTML\s*=\s*view\(/g) || [];
+assert.equal(fullRenderMatches.length, 1, 'only initial full render is allowed');
+assert.match(source, /function updateVentilationDynamic/, 'dynamic island updater exists');
+assert.match(source, /function mountVentilation/, 'custom store-first mount exists');
+assert.match(source, /registerCentralActions\(root/, 'saved actions use central event pipeline');
+assert.match(source, /data-vent-dynamic="input-fields"/, 'input fields are dynamic island');
+assert.match(source, /data-vent-dynamic="result"/, 'result area is dynamic island');
+assert.match(source, /data-vent-dynamic="line-sections"/, 'saved records are dynamic island');
+assert.match(source, /expandedVentLineSectionId/, 'accordion expanded state is store-backed');
+assert.match(source, /shouldSkipDuplicateAction/, 'save/update actions are deduplicated');
+assert.doesNotMatch(source, /addEventListener\(['"]click['"]/, 'module has no local click listener');
+assert.doesNotMatch(source, /addEventListener\(['"]touch/, 'module has no local touch listener');
+assert.match(docs, /Heizung\/Kälte als Referenzmodul/, 'docs document reference-module basis');
+
+console.log('ventilation global-standard regression ok');

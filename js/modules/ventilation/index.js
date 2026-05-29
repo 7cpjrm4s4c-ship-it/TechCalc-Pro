@@ -3,10 +3,10 @@ import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, segmented, renderModuleShell, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
-import { mountModule } from '../../core/mount.js';
+import { card, field, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, bindCommonInputs, bindNoClickScroll } from '../../core/renderer.js';
+import { registerCentralActions } from '../../core/eventPipeline.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
+import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
 
 const MODE_PREFIX = { heating: 'heating', cooling: 'cooling' };
 function prefixFor(s) { return MODE_PREFIX[s.mode] || 'heating'; }
@@ -35,9 +35,11 @@ function ventilationLineSectionStats(item) {
 }
 
 function ventilationLineSectionsCard(r, active, modeLabel) {
-  const items = readVentilationLineSections();
+  const snapshot = state.get();
+  const items = Array.isArray(snapshot.ventLineSections) ? snapshot.ventLineSections : readVentilationLineSections();
   const rows = renderSavedRecordList(items, {
-    activeId: state.get().activeVentLineSectionId,
+    activeId: snapshot.activeVentLineSectionId,
+    expandedId: snapshot.expandedVentLineSectionId,
     emptyText: 'Noch keine Leitungsabschnitte angelegt',
     loadAttr: 'data-vent-line-select',
     toggleAttr: 'data-line-toggle',
@@ -46,9 +48,9 @@ function ventilationLineSectionsCard(r, active, modeLabel) {
     stats: item => ventilationLineSectionStats(item)
   });
   return card('Leitungsabschnitte', stack([
-    `<div class="field"><label for="ventLineSectionName">Bezeichnung</label><div class="control"><input id="ventLineSectionName" type="text" placeholder="z. B. Zuluft Büro Nord" autocomplete="off" value="${(state.get().activeVentLineSectionName || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></div></div>`,
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-vent-line-save ${state.get().activeVentLineSectionId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-vent-line-update ${state.get().activeVentLineSectionId ? '' : 'disabled'}>Aktualisieren</button></div>`,
-    rows
+    `<div class="field"><label for="ventLineSectionName">Bezeichnung</label><div class="control"><input id="ventLineSectionName" type="text" placeholder="z. B. Zuluft Büro Nord" autocomplete="off" value="${(snapshot.activeVentLineSectionName || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></div></div>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-tc-action="vent-line:save" data-vent-line-save ${snapshot.activeVentLineSectionId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-tc-action="vent-line:update" data-vent-line-update ${snapshot.activeVentLineSectionId ? '' : 'disabled'}>Aktualisieren</button></div>`,
+    `<div data-vent-dynamic="line-sections">${rows}</div>`
   ].join('')), 'cyan');
 }
 
@@ -118,49 +120,87 @@ function savedVentilationPatch(item, currentState) {
 
 function bindVentilationLineSections(root, r, active, modeLabel, rerender) {
   bindEditModeClear(root, { state, activeIdKey: 'activeVentLineSectionId', nameKey: 'activeVentLineSectionName' });
-  root.querySelector('[data-vent-line-save]')?.addEventListener('click', event => {
-    event.preventDefault();
-    const name = root.querySelector('#ventLineSectionName')?.value?.trim() || '';
+
+  const currentResult = () => calculate(activeCalculationState(state.get()));
+  const currentItems = () => {
+    const snapshot = state.get();
+    return Array.isArray(snapshot.ventLineSections) ? snapshot.ventLineSections : readVentilationLineSections();
+  };
+  const persistLineSections = (items, patch = {}, action = 'vent-line:update') => {
+    const next = Array.isArray(items) ? [...items] : [];
+    ventilationLineSectionsMemory = next;
+    state.set({ ventLineSections: next, ...patch }, { action });
+  };
+  const shouldSkipDuplicateAction = action => {
+    const now = Date.now();
+    const last = root.__tcLastVentilationLineAction || {};
+    if (last.action === action && now - Number(last.at || 0) < 700) return true;
+    root.__tcLastVentilationLineAction = { action, at: now };
+    return false;
+  };
+  const currentModeLabel = () => state.get().mode === 'cooling' ? 'Kälte' : 'Heizung';
+
+  const saveCurrentLine = ({ root: actionRoot } = {}) => {
+    if (shouldSkipDuplicateAction('vent-line:save')) return;
+    const host = actionRoot || root;
+    const name = host.querySelector('#ventLineSectionName')?.value?.trim() || '';
     const currentState = state.get();
-    const items = readVentilationLineSections();
+    const activeState = activeCalculationState(currentState);
+    const items = currentItems();
     const id = createRecordId('vent');
-    const item = buildVentilationLineSectionRecord({ ...currentState, activeVentLineSectionId: null, activeVentLineSectionName: name }, r, active, modeLabel, items, id, name);
-    writeVentilationLineSections([item, ...items]);
-    state.set({ activeVentLineSectionId: null, activeVentLineSectionName: '' }, { notify:false });
-    if (typeof rerender === 'function') rerender();
-  });
-  root.querySelector('[data-vent-line-update]')?.addEventListener('click', event => {
-    event.preventDefault();
+    const item = buildVentilationLineSectionRecord({ ...currentState, activeVentLineSectionId: null, activeVentLineSectionName: name }, currentResult(), activeState, currentModeLabel(), items, id, name);
+    persistLineSections([item, ...items], { activeVentLineSectionId: null, activeVentLineSectionName: '', expandedVentLineSectionId: state.get().expandedVentLineSectionId }, 'vent-line:save');
+  };
+
+  const updateCurrentLine = ({ root: actionRoot } = {}) => {
+    if (shouldSkipDuplicateAction('vent-line:update')) return;
+    const host = actionRoot || root;
     const currentState = state.get();
     const id = currentState.activeVentLineSectionId;
     if (!id) return;
-    const name = root.querySelector('#ventLineSectionName')?.value?.trim() || '';
-    const items = readVentilationLineSections();
-    const existing = items.find(entry => String(entry.id) === String(id));
+    const name = host.querySelector('#ventLineSectionName')?.value?.trim() || '';
+    const items = currentItems();
+    const existing = items.find(entry => isSameId(entry.id, id));
     if (!existing) return;
-    const item = buildVentilationLineSectionRecord(currentState, r, active, modeLabel, items, id, name, existing);
-    writeVentilationLineSections(replaceRecord(items, id, item));
-    state.set({ activeVentLineSectionId: id, activeVentLineSectionName: item.name }, { notify:false });
-    if (typeof rerender === 'function') rerender();
-  });
-  bindSavedRecordList(root, {
-    loadAttr: 'data-vent-line-select',
-    toggleAttr: 'data-line-toggle',
-    deleteAttr: 'data-line-delete',
-    onLoad(id) {
-      const item = readVentilationLineSections().find(entry => isSameId(entry.id, id));
-      if (!item) return;
-      if (isSameId(state.get().activeVentLineSectionId, id)) {
-        state.set({ activeVentLineSectionId: null, activeVentLineSectionName: '' });
-        return;
-      }
-      state.set(savedVentilationPatch(item, state.get()));
-    },
-    onDelete(id) {
-      writeVentilationLineSections(removeRecord(readVentilationLineSections(), id));
-      if (isSameId(state.get().activeVentLineSectionId, id)) state.set({ activeVentLineSectionId:null, activeVentLineSectionName:'' }, { notify:false });
-      if (typeof rerender === 'function') rerender();
+    const activeState = activeCalculationState(currentState);
+    const item = buildVentilationLineSectionRecord(currentState, currentResult(), activeState, currentModeLabel(), items, id, name, existing);
+    persistLineSections(replaceRecord(items, id, item), { activeVentLineSectionId: id, activeVentLineSectionName: item.name, expandedVentLineSectionId: state.get().expandedVentLineSectionId }, 'vent-line:update');
+  };
+
+  const loadLine = id => {
+    const item = currentItems().find(entry => isSameId(entry.id, id));
+    if (!item) return;
+    if (isSameId(state.get().activeVentLineSectionId, id)) {
+      state.set({ activeVentLineSectionId: null, activeVentLineSectionName: '', expandedVentLineSectionId: state.get().expandedVentLineSectionId }, { action: 'vent-line:deselect' });
+      return;
     }
+    state.set({ ...savedVentilationPatch(item, state.get()), expandedVentLineSectionId: state.get().expandedVentLineSectionId }, { action: 'vent-line:select' });
+  };
+
+  const deleteLine = id => {
+    const next = removeRecord(currentItems(), id);
+    const patch = isSameId(state.get().activeVentLineSectionId, id)
+      ? { activeVentLineSectionId: null, activeVentLineSectionName: '', expandedVentLineSectionId: null }
+      : (isSameId(state.get().expandedVentLineSectionId, id) ? { expandedVentLineSectionId: null } : {});
+    persistLineSections(next, patch, 'vent-line:delete');
+  };
+
+  const toggleLine = element => {
+    const card = element?.closest?.('[data-line-card]');
+    if (!card) return;
+    const id = card.getAttribute('data-vent-line-select');
+    if (!id) return;
+    const currentExpanded = state.get().expandedVentLineSectionId;
+    const willOpen = !isSameId(currentExpanded, id);
+    state.set({ expandedVentLineSectionId: willOpen ? id : null }, { action: 'vent-line:toggle' });
+  };
+
+  registerCentralActions(root, {
+    'vent-line:save': saveCurrentLine,
+    'vent-line:update': updateCurrentLine,
+    'saved:load': ({ element }) => loadLine(element?.getAttribute('data-vent-line-select') || element?.closest?.('[data-vent-line-select]')?.getAttribute('data-vent-line-select')),
+    'saved:delete': ({ element }) => deleteLine(element?.getAttribute('data-line-delete')),
+    'saved:toggle': ({ element }) => toggleLine(element)
   });
 }
 
@@ -238,19 +278,19 @@ function view(s) {
       field({ id: key(s, 'SupplyTemp'), label: 'Zuluft Tzl', unit: '°C', value: fmtInput(active.supplyTemp, 2) }),
       field({ id: key(s, 'RoomTemp'), label: 'Raum Tr', unit: '°C', value: fmtInput(active.roomTemp, 2) })
     ].join(''), 2), accent),
-    card('Betriebsart', segmented('mode', [
+    card('Betriebsart', `<div data-vent-dynamic="mode-segment">${segmented('mode', [
       { value: 'heating', label: '● Heizleistung' },
       { value: 'cooling', label: '● Kühlleistung' }
-    ], s.mode, { accent }), accent, { compact: true }),
+    ], s.mode, { accent })}</div>`, accent, { compact: true }),
     card(`${modeLabel} — Eingaben`, stack([
-      segmented(key(s, 'CalcTarget'), [
+      `<div data-vent-dynamic="target-segment">${segmented(key(s, 'CalcTarget'), [
         { value: 'power', label: 'Q Leistung' },
         { value: 'volumeFlow', label: 'V̇ Volumenstrom' },
         { value: 'deltaT', label: 'ΔT Temperatur' }
-      ], active.calcTarget, { accent }),
-      grid(inputFields(s, active).join(''), 2)
+      ], active.calcTarget, { accent })}</div>`,
+      `<div data-vent-dynamic="input-fields">${grid(inputFields(s, active).join(''), 2)}</div>`
     ].join('')), accent),
-    `<div class="formula">Q = V̇ × (ρ × cₚ / 3,6) × ΔT / 1000 · Wärmewert = ${fmt(r.factor, 3)} Wh/(m³·K)</div>`
+    `<div class="formula" data-vent-dynamic="formula">Q = V̇ × (ρ × cₚ / 3,6) × ΔT / 1000 · Wärmewert = ${fmt(r.factor, 3)} Wh/(m³·K)</div>`
   ].join(''));
 
   const airStats = card('Luftkennwerte aktuell', inlineStats([
@@ -260,8 +300,8 @@ function view(s) {
   ]), 'cyan', { compact: true });
 
   const outputColumn = stack([
-    mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent),
-    airStats,
+    `<div data-vent-dynamic="result">${mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent)}</div>`,
+    `<div data-vent-dynamic="air-stats">${airStats}</div>`,
     ventilationLineSectionsCard(r, active, modeLabel)
   ].join(''));
 
@@ -271,16 +311,170 @@ function view(s) {
   `);
 }
 
+function setInner(root, selector, html) {
+  const el = root?.querySelector?.(selector);
+  if (!el) return;
+  const next = String(html ?? '');
+  if (el.innerHTML !== next) el.innerHTML = next;
+}
+
+function setInputValue(root, field, value) {
+  const el = root?.querySelector?.(`input[data-field="${field}"], textarea[data-field="${field}"]`);
+  if (!el || document.activeElement === el) return;
+  const next = String(value ?? '');
+  if (el.value !== next) el.value = next;
+}
+
+function updateSegment(root, name, value) {
+  root?.querySelectorAll?.(`[data-segment="${name}"]`)?.forEach(button => {
+    button.classList.toggle('is-active', String(button.dataset.value) === String(value));
+    button.setAttribute('aria-selected', String(String(button.dataset.value) === String(value)));
+  });
+}
+
+function updateCardAccent(root, selector, accent) {
+  const cardEl = root?.querySelector?.(selector)?.closest?.('.card');
+  if (!cardEl) return;
+  [...cardEl.classList].forEach(cls => {
+    if (cls.startsWith('card--accent-')) cardEl.classList.remove(cls);
+  });
+  cardEl.classList.add(`card--accent-${accent}`);
+}
+
+function setCardTitle(root, selector, title) {
+  const titleEl = root?.querySelector?.(selector)?.closest?.('.card')?.querySelector?.('.card__title');
+  if (titleEl && titleEl.textContent !== title) titleEl.textContent = title;
+}
+
+function renderVentLineSectionRows(s) {
+  const items = Array.isArray(s.ventLineSections) ? s.ventLineSections : readVentilationLineSections();
+  return renderSavedRecordList(items, {
+    activeId: s.activeVentLineSectionId,
+    expandedId: s.expandedVentLineSectionId,
+    emptyText: 'Noch keine Leitungsabschnitte angelegt',
+    loadAttr: 'data-vent-line-select',
+    toggleAttr: 'data-line-toggle',
+    deleteAttr: 'data-line-delete',
+    title: item => item.name || 'Abschnitt',
+    stats: item => ventilationLineSectionStats(item)
+  });
+}
+
+function updateVentSaveControls(root, s) {
+  const nameInput = root?.querySelector?.('#ventLineSectionName');
+  if (nameInput && document.activeElement !== nameInput) nameInput.value = s.activeVentLineSectionName || '';
+  const saveButton = root?.querySelector?.('[data-vent-line-save]');
+  const updateButton = root?.querySelector?.('[data-vent-line-update]');
+  if (saveButton) saveButton.disabled = Boolean(s.activeVentLineSectionId);
+  if (updateButton) updateButton.disabled = !s.activeVentLineSectionId;
+}
+
+function renderAirStats(r) {
+  return card('Luftkennwerte aktuell', inlineStats([
+    { label: 'ρL', value: fmt(r.rho, 3), unit: 'kg/m³' },
+    { label: 'cₚ,L', value: fmt(r.cp, 3), unit: 'kJ/(kg·K)' },
+    { label: 'ρ × cₚ / 3,6', value: fmt(r.factor, 3), unit: 'Wh/(m³·K)' }
+  ]), 'cyan', { compact: true });
+}
+
+function updateVentilationDynamic(root, s, meta = {}) {
+  const active = activeCalculationState(s);
+  const r = calculate(active);
+  const accent = s.mode === 'cooling' ? 'cyan' : 'orange';
+  const modeLabel = s.mode === 'cooling' ? 'Kälte' : 'Heizung';
+  const previous = root.__tcVentilationDynamic || {};
+  const previousPrefix = previous.prefix || 'heating';
+  const currentPrefix = prefixFor(s);
+  const action = String(meta.action || '');
+  const changed = Array.isArray(meta.changed) ? meta.changed : [];
+  const modeChanged = previous.mode !== s.mode || changed.includes('mode');
+  const targetChanged = previous.calcTarget !== active.calcTarget || previousPrefix !== currentPrefix || changed.includes(key(s, 'CalcTarget'));
+  const lineStructural = /^(vent-line:|saved:)/.test(action);
+  const appStructural = /^(record:|module:|replace|reset)/.test(action);
+  const resultDetails = [
+    { label: 'Leistung', value: fmt(r.powerKw), unit: 'kW' },
+    { label: 'Volumenstrom', value: fmt(r.volumeFlowM3h), unit: 'm³/h' },
+    { label: 'Massenstrom', value: fmt(r.massFlowKgh), unit: 'kg/h' }
+  ].filter(item => item.label !== targetLabel(active.calcTarget));
+
+  updateCardAccent(root, '[data-vent-dynamic="mode-segment"]', accent);
+  updateCardAccent(root, '[data-vent-dynamic="target-segment"]', accent);
+  updateSegment(root, 'mode', s.mode);
+
+  if (modeChanged) {
+    setInner(root, '[data-vent-dynamic="mode-segment"]', segmented('mode', [
+      { value: 'heating', label: '● Heizleistung' },
+      { value: 'cooling', label: '● Kühlleistung' }
+    ], s.mode, { accent }));
+    setCardTitle(root, '[data-vent-dynamic="target-segment"]', `${modeLabel} — Eingaben`);
+  }
+
+  if (modeChanged || targetChanged) {
+    setInner(root, '[data-vent-dynamic="target-segment"]', segmented(key(s, 'CalcTarget'), [
+      { value: 'power', label: 'Q Leistung' },
+      { value: 'volumeFlow', label: 'V̇ Volumenstrom' },
+      { value: 'deltaT', label: 'ΔT Temperatur' }
+    ], active.calcTarget, { accent }));
+    setInner(root, '[data-vent-dynamic="input-fields"]', grid(inputFields(s, active).join(''), 2));
+  } else {
+    updateSegment(root, key(s, 'CalcTarget'), active.calcTarget);
+    setInputValue(root, key(s, 'PowerW'), fmtInput(active.powerW, 2));
+    setInputValue(root, key(s, 'VolumeFlowM3h'), fmtInput(active.volumeFlowM3h, 2));
+    setInputValue(root, key(s, 'DeltaT'), fmtInput(derivedDeltaT(active), 2));
+    setInputValue(root, key(s, 'SupplyTemp'), fmtInput(active.supplyTemp, 2));
+    setInputValue(root, key(s, 'RoomTemp'), fmtInput(active.roomTemp, 2));
+  }
+
+  setInner(root, '[data-vent-dynamic="result"]', mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent));
+  setInner(root, '[data-vent-dynamic="air-stats"]', renderAirStats(r));
+  setInner(root, '[data-vent-dynamic="formula"]', `Q = V̇ × (ρ × cₚ / 3,6) × ΔT / 1000 · Wärmewert = ${fmt(r.factor, 3)} Wh/(m³·K)`);
+
+  if (lineStructural || appStructural || changed.includes('ventLineSections') || changed.includes('activeVentLineSectionId') || changed.includes('activeVentLineSectionName') || changed.includes('expandedVentLineSectionId')) {
+    updateVentSaveControls(root, s);
+    setInner(root, '[data-vent-dynamic="line-sections"]', renderVentLineSectionRows(s));
+  }
+
+  root.__tcVentilationDynamic = {
+    mode: s.mode,
+    prefix: currentPrefix,
+    calcTarget: active.calcTarget
+  };
+}
+
+function isDynamicVentilationAction(meta = {}) {
+  return String(meta.action || '') !== 'initial';
+}
+
+function mountVentilation(root) {
+  if (!root) return () => {};
+  bindNoClickScroll(root);
+
+  const fullRender = (snapshot = state.get()) => {
+    root.innerHTML = view(snapshot);
+    root.__tcVentilationDynamic = null;
+    bindCommonInputs(root, state);
+    const active = activeCalculationState(snapshot);
+    const modeLabel = snapshot.mode === 'cooling' ? 'Kälte' : 'Heizung';
+    bindVentilationLineSections(root, calculate(active), active, modeLabel, fullRender);
+    updateVentilationDynamic(root, snapshot, { action: 'initial', changed: [] });
+  };
+
+  fullRender(state.get());
+  const unsubscribe = state.subscribe((snapshot, meta = {}) => {
+    if (isDynamicVentilationAction(meta)) {
+      updateVentilationDynamic(root, snapshot, meta);
+      return;
+    }
+    fullRender(snapshot);
+  });
+  return () => { if (typeof unsubscribe === 'function') unsubscribe(); };
+}
+
 export default {
   config,
   schema,
   state,
   mount(root) {
-    return mountModule(root, state, view, (rootEl, snapshot, render) => {
-      const active = activeCalculationState(snapshot);
-      const r = calculate(active);
-      const modeLabel = snapshot.mode === 'cooling' ? 'Kälte' : 'Heizung';
-      bindVentilationLineSections(rootEl, r, active, modeLabel, render);
-    });
+    return mountVentilation(root);
   }
 };

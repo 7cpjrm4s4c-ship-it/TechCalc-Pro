@@ -104,7 +104,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": false,
-      "migrationStatus": "phase-8-schema-inventory"
+      "migrationStatus": "phase-13a-ventilation-globalized"
     },
     {
       "id": "wastewater",
