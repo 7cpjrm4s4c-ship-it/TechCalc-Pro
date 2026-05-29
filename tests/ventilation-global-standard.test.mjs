@@ -7,7 +7,7 @@ import schema from '../js/modules/ventilation/schema.js';
 const source = readFileSync(new URL('../js/modules/ventilation/index.js', import.meta.url), 'utf8');
 const docs = readFileSync(new URL('../docs/PHASE_13A_VENTILATION_GLOBALIZATION.md', import.meta.url), 'utf8');
 
-assert.match(config.migrationStatus, /^phase-13[abcd]-ventilation-/, 'ventilation migration status is current phase 13');
+assert.match(config.migrationStatus, /^phase-13[a-e]-ventilation-/, 'ventilation migration status is current phase 13');
 assert.ok(module.schema, 'ventilation module exposes schema');
 assert.ok(schema.fields.some(field => field.key === 'mode'), 'mode is schema-defined');
 

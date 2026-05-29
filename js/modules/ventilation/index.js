@@ -278,6 +278,13 @@ function targetMain(target, r) {
   return { label: 'Berechnete Temperaturspreizung', value: fmt(r.deltaT), unit: 'K' };
 }
 
+function temperatureFields(s, active) {
+  return grid([
+    field({ id: key(s, 'SupplyTemp'), label: 'Zuluft Tzl', unit: '°C', value: fmtInput(active.supplyTemp, 2) }),
+    field({ id: key(s, 'RoomTemp'), label: 'Raum Tr', unit: '°C', value: fmtInput(active.roomTemp, 2) })
+  ].join(''), 2);
+}
+
 function view(s) {
   const active = activeCalculationState(s);
   const r = calculate(active);
@@ -291,10 +298,7 @@ function view(s) {
   ].filter(item => item.label !== targetLabel(active.calcTarget));
 
   const inputColumn = stack([
-    card('Temperaturen', grid([
-      field({ id: key(s, 'SupplyTemp'), label: 'Zuluft Tzl', unit: '°C', value: fmtInput(active.supplyTemp, 2) }),
-      field({ id: key(s, 'RoomTemp'), label: 'Raum Tr', unit: '°C', value: fmtInput(active.roomTemp, 2) })
-    ].join(''), 2), accent),
+    card('Temperaturen', `<div data-vent-dynamic="temperatures">${temperatureFields(s, active)}</div>`, accent),
     card('Betriebsart', `<div data-vent-dynamic="mode-segment">${segmented('mode', [
       { value: 'heating', label: '● Heizleistung' },
       { value: 'cooling', label: '● Kühlleistung' }
@@ -414,11 +418,13 @@ function updateVentilationDynamic(root, s, meta = {}) {
     { label: 'Massenstrom', value: fmt(r.massFlowKgh), unit: 'kg/h' }
   ].filter(item => item.label !== targetLabel(active.calcTarget));
 
+  updateCardAccent(root, '[data-vent-dynamic="temperatures"]', accent);
   updateCardAccent(root, '[data-vent-dynamic="mode-segment"]', accent);
   updateCardAccent(root, '[data-vent-dynamic="target-segment"]', accent);
   updateSegment(root, 'mode', s.mode);
 
   if (modeChanged) {
+    setInner(root, '[data-vent-dynamic="temperatures"]', temperatureFields(s, active));
     setInner(root, '[data-vent-dynamic="mode-segment"]', segmented('mode', [
       { value: 'heating', label: '● Heizleistung' },
       { value: 'cooling', label: '● Kühlleistung' }
@@ -441,6 +447,9 @@ function updateVentilationDynamic(root, s, meta = {}) {
     setInputValue(root, key(s, 'SupplyTemp'), fmtInput(active.supplyTemp, 2));
     setInputValue(root, key(s, 'RoomTemp'), fmtInput(active.roomTemp, 2));
   }
+
+  setInputValue(root, key(s, 'SupplyTemp'), fmtInput(active.supplyTemp, 2));
+  setInputValue(root, key(s, 'RoomTemp'), fmtInput(active.roomTemp, 2));
 
   setInner(root, '[data-vent-dynamic="result"]', mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent));
   setInner(root, '[data-vent-dynamic="air-stats"]', renderAirStats(r));

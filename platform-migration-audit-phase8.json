@@ -104,7 +104,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": false,
-      "migrationStatus": "phase-13d-ventilation-mode-deltat"
+      "migrationStatus": "phase-13e-ventilation-temperature-render-fix"
     },
     {
       "id": "wastewater",
