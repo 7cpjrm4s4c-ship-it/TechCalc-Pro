@@ -84,7 +84,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-14f-rainwater-reference-workflow"
+      "migrationStatus": "phase-14g-rainwater-global-standard"
     },
     {
       "id": "unit-converter",

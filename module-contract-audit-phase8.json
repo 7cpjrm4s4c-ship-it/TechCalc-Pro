@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-30T15:56:39.011Z",
+  "generatedAt": "2026-05-30T16:28:56.865Z",
   "contractTarget": "1.3.0",
   "modules": [
     {
@@ -158,16 +158,16 @@
       "ownUiClassSamples": [
         "concrete-asphalt",
         "metal-roof",
-        "data-rainwater-select",
-        "data-line-toggle",
-        "data-rainwater-delete",
         "data-rainwater-surface-select",
         "data-rainwater-surface-toggle",
         "data-rainwater-surface-delete",
         "action-button",
         "action-button--secondary",
         "empty-state",
-        "empty-state--compact"
+        "empty-state--compact",
+        "data-tc-action",
+        "surface-add",
+        "data-surface-add"
       ]
     },
     {

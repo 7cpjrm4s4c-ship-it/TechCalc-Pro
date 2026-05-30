@@ -533,3 +533,10 @@
 - Regenwasser nutzt fuer den Bereichswechsel den Modul-spezifischen Segment-Handler vor dem generischen Fallback.
 - Ergebnis-seitige Doppel-Card "Flaechen / Berechnung" entfernt; Flaechenverwaltung bleibt im globalen Save/List/Delete-Workflow.
 - Regressionstest `rainwater-phase14e` ergaenzt.
+
+## 1.3.0 Phase 14G - Regenwasser Global Standard
+- Removed dormant calculation-level save workflow from Regenwasser.
+- Regenwasser now uses a single global saved-record workflow for Regenflächen.
+- Removed bespoke surface result renderer in favor of the global saved-record UI.
+- Removed obsolete calculation saved-state keys from Regenwasser initial state.
+- Added Phase 14G regression gate for duplicate workflow removal.

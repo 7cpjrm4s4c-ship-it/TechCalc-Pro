@@ -6,7 +6,7 @@ import { areaTypes, roofDrainTable } from './tables.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultRows, inlineStats, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-import { bindEditModeClear, renderSavedRecordList, isSameId, replaceRecord, removeRecord } from '../../core/savedRecords.js';
+import { renderSavedRecordList, isSameId } from '../../core/savedRecords.js';
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { preserveScroll as keepScroll } from '../../core/scrollManager.js';
 import { registerCentralActions, commitAllFields } from '../../core/eventPipeline.js';
@@ -44,55 +44,6 @@ const drainCapacityLabel = mode => mode === 'property' ? 'Abflussvermögen Hofto
 const rainLabel = mode => mode === 'property' ? 'Regenspende r(5,2)' : 'Regenspende r(5,5)';
 const drainOptions = roofDrainTable.map(item => ({ value:item.dn, label:`${item.dn} · ${String(item.capacity).replace('.', ',')} l/s · ${item.head} mm Anstauhöhe` }));
 const emergencyTypeOptions = opts([['rect','Rechteckiger Notüberlauf'],['round','Runder Notüberlauf'],['manual','Herstellerwert / freie Eingabe']]);
-
-function savedSnapshot(s, r) {
-  const saved = Array.isArray(s.savedCalculations) ? s.savedCalculations : [];
-  const copy = { ...s };
-  delete copy.savedCalculations;
-  delete copy.activeCalculationId;
-  delete copy.expandedCalculationId;
-  delete copy.expandedSurfaceResultId;
-  return {
-    id: s.activeCalculationId || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    name: s.name?.trim() || `Regenwasser ${saved.length + 1}`,
-    createdAt: s.activeCalculationId ? (saved.find(x => x.id === s.activeCalculationId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    state: copy,
-    result: {
-      qr:r.qr,
-      collectorDn:r.collectorSelection?.dn,
-      stackDn:r.stackSelection?.dn,
-      qNot:r.qNot,
-      drains:r.requiredDrains,
-      area:r.area,
-      mode:r.mode
-    }
-  };
-}
-function clearedInputs(current = {}) { return { ...initialState, savedCalculations: current.savedCalculations || [] }; }
-function savedRows(s) {
-  return renderSavedRecordList(s.savedCalculations || [], {
-    activeId: s.activeCalculationId,
-    expandedId: s.expandedCalculationId,
-    emptyText: 'Noch keine Regenwasser-Berechnungen gespeichert.',
-    loadAttr: 'data-rainwater-select',
-    toggleAttr: 'data-line-toggle',
-    deleteAttr: 'data-rainwater-delete',
-    title: item => item.name || 'Berechnung',
-    subtitle: item => {
-      const r = item.result || {};
-      return [`${fmt(r.qr || 0, 2)} l/s`, `FL ${r.stackDn || '—'}`, modeLabel(r.mode)].filter(Boolean).join(' · ');
-    },
-    stats: item => {
-      const r = item.result || {};
-      return [
-        { label: 'Entwässerungsmenge', value: fmt(r.qr || 0, 2), unit: 'l/s' },
-        { label: 'DN Fallleitung', value: r.stackDn || '—' },
-        { label: drainLabel(r.mode), value: r.drains || 0, unit: 'Stk.' }
-      ];
-    }
-  });
-}
 
 function surfacesTable(r, s) {
   const items = Array.isArray(r.surfaces) ? r.surfaces : [];
@@ -197,54 +148,6 @@ function warningList(warnings, s) {
   const fixed = '<div class="tc-warning"><span>Normgrundlage: </span><strong>Berechnung erfolgt auf Grundlage der DIN 1986 - 100, aktuellste Fassung.</strong></div>';
   const items = (warnings || []).map(text => `<div class="tc-warning"><span>Hinweis: </span><strong>${esc(text)}</strong></div>`).join('');
   return fixed + items;
-}
-function surfaceDimensionCards(r, s) {
-  if (!r.surfaces.length) return '<div class="empty-state empty-state--compact">Keine Einzelflächen berechnet.</div>';
-  const activeId = String(s.activeSurfaceId || '');
-  return `<div class="tc-saved-list">${r.surfaces.map((item) => {
-    const mode = item.surfaceMode || r.mode || s.surfaceMode || 'roof';
-    const active = String(item.id) === activeId;
-    const expanded = isSameId(s.expandedSurfaceResultId, item.id);
-    const isRoof = mode === 'roof';
-    const mainRows = [
-      { label:'Regenspende', value:fmt(item.rdt,1), unit:'l/(s·ha)' },
-      { label:'Fläche', value:fmt(item.area,1), unit:'m²' },
-      { label:'Abflussbeiwert Cs', value:fmt(item.cs,2) },
-      { label:'Entwässerungsmenge Qr', value:fmt(item.qr,2), unit:'l/s' },
-      { label:drainLabel(mode), value:item.requiredDrains, unit:'Stk.' },
-      { label:'gewählte Ablaufdimension', value:item.drainSize || '—' },
-      { label:'Ablaufleistung je Ablauf', value:fmt(item.drainCapacity,1), unit:'l/s' },
-      { label:'Anstauhöhe Ablauf', value:item.drainHead || '—', unit:item.drainHead ? 'mm' : '' }
-    ];
-    if (isRoof) mainRows.push(
-      { label:'Anzahl Fallleitungen', value:item.stackCount, unit:'Stk.' },
-      { label:'Q je Fallleitung', value:fmt(item.qPerStack,2), unit:'l/s' },
-      { label:'DN Fallleitung', value:item.stackSelection?.dn || '—' }
-    );
-    const emergencyRows = isRoof ? [
-      { label:'r(5,100)', value:fmt(item.r100,1), unit:'l/(s·ha)' },
-      { label:'Notabfluss Qnot', value:fmt(item.emergency?.qNot || 0,2), unit:'l/s' },
-      { label:'Art Notentwässerung', value:item.emergency?.type === 'round' ? 'Rund' : item.emergency?.type === 'manual' ? 'Herstellerwert' : 'Rechteckig' },
-      { label:'Notüberläufe', value:item.emergency?.requiredCount || 0, unit:'Stk.' },
-      { label:'erforderliche Überlaufbreite je Notüberlauf', value:item.emergency?.rectWidthPerOverflow ? fmt(item.emergency.rectWidthPerOverflow,0) : '—', unit:item.emergency?.rectWidthPerOverflow ? 'mm' : '' },
-      { label:'Notüberlauf-DN', value:item.emergency?.manufacturerDn || '—' },
-      { label:'gewählte Überlaufleistung je Notüberlauf', value:item.emergency?.capacity ? fmt(item.emergency.capacity,2) : '—', unit:item.emergency?.capacity ? 'l/s' : '' }
-    ] : [];
-    return `<article class="line-section-card ${active ? 'is-active' : ''} ${expanded ? '' : 'is-collapsed'}" data-line-card data-tc-action="rainwater:surface-select" data-surface-result-select="${esc(item.id)}">
-      <div class="line-section-card__head">
-        <div class="line-section-card__title"><strong>${esc(item.name)}</strong><small>${fmt(item.area,1)} m² · Qr ${fmt(item.qr,2)} l/s · ${drainLabel(mode)} ${item.requiredDrains} Stk.${isRoof ? ` · FL ${item.stackSelection?.dn || '—'}` : ''}</small></div>
-        <div class="line-section-card__actions">
-          <button type="button" class="line-section-card__delete" data-tc-action="rainwater:surface-delete" data-surface-delete="${esc(item.id)}" aria-label="Regenfläche löschen">×</button>
-          <button type="button" class="line-section-card__toggle" data-tc-action="rainwater:surface-toggle" data-line-toggle aria-expanded="${expanded ? 'true' : 'false'}" aria-label="Flächendimensionierung aufklappen"><span>▾</span></button>
-        </div>
-      </div>
-      <div class="line-section-card__body">
-        <div class="tc-result-group"><h4>Hauptentwässerung</h4>${resultRows(mainRows)}</div>
-        ${isRoof ? `<div class="tc-result-group"><h4>Notentwässerung</h4>${resultRows(emergencyRows)}</div>` : ''}
-        <div class="tc-formula tc-formula--small">Qr = r × C × A / 10000 · Anzahl Abläufe = Qr / Ablaufleistung · Q je Fallleitung = Qr / Anzahl Fallleitungen</div>
-      </div>
-    </article>`;
-  }).join('')}</div>`;
 }
 function resultCards(s, r) {
   const mode = r.selectedSurface?.surfaceMode || r.mode || s.surfaceMode || 'roof';
@@ -393,8 +296,6 @@ function preserveScroll(action) {
   keepScroll(action);
 }
 function bindActions(root) {
-  bindEditModeClear(root, { state, activeIdKey:'activeCalculationId', nameKey:'name', onClear: () => state.set(clearedInputs(state.get())) });
-
   // Regenwasser uses the central event pipeline as the only write path.
   // Field changes are committed globally; area records are synchronized when
   // the user explicitly saves/updates/selects a surface. Keeping module-owned
@@ -460,73 +361,6 @@ function bindActions(root) {
     state.set({ expandedSurfaceResultId: isSameId(current.expandedSurfaceResultId, id) ? null : id }, { action:'rainwater:surface-toggle' });
   };
 
-  const saveCalculation = () => {
-    commitAllFields(root, state, { action:'rainwater:pre-save', notify:false });
-    const current = state.get();
-    const record = savedSnapshot({ ...current, activeCalculationId: null, expandedCalculationId: current.expandedCalculationId || null }, calculate(current));
-    state.set({
-      savedCalculations: [record, ...(current.savedCalculations || [])],
-      activeCalculationId: null,
-      name: '',
-      expandedCalculationId: current.expandedCalculationId || null
-    }, { action:'rainwater:save' });
-  };
-
-  const updateCalculation = () => {
-    commitAllFields(root, state, { action:'rainwater:pre-update', notify:false });
-    const current = state.get();
-    const id = current.activeCalculationId;
-    if (!id) return;
-    const saved = current.savedCalculations || [];
-    const existing = saved.find(item => isSameId(item.id, id));
-    if (!existing) return;
-    const record = { ...savedSnapshot(current, calculate(current)), id, createdAt: existing.createdAt || new Date().toISOString() };
-    state.set({
-      savedCalculations: replaceRecord(saved, id, record),
-      activeCalculationId: id,
-      name: record.name,
-      expandedCalculationId: current.expandedCalculationId || null
-    }, { action:'rainwater:update' });
-  };
-
-  const loadCalculation = element => {
-    const card = element?.closest?.('[data-rainwater-select]');
-    const id = card?.getAttribute?.('data-rainwater-select') || element?.getAttribute?.('data-rainwater-select');
-    if (!id) return;
-    const current = state.get();
-    const item = (current.savedCalculations || []).find(entry => isSameId(entry.id, id));
-    if (!item?.state) return;
-    if (isSameId(current.activeCalculationId, id)) {
-      state.set(clearedInputs(current), { action:'rainwater:saved-deselect' });
-      return;
-    }
-    state.set({
-      ...item.state,
-      savedCalculations: current.savedCalculations || [],
-      activeCalculationId: item.id,
-      name: item.name || item.state.name || '',
-      expandedCalculationId: current.expandedCalculationId || null
-    }, { action:'rainwater:saved-load' });
-  };
-
-  const deleteCalculation = element => {
-    const id = element?.getAttribute?.('data-rainwater-delete') || element?.closest?.('[data-rainwater-delete]')?.getAttribute('data-rainwater-delete');
-    if (!id) return;
-    const current = state.get();
-    state.set({
-      savedCalculations: removeRecord(current.savedCalculations || [], id),
-      activeCalculationId: isSameId(current.activeCalculationId, id) ? null : current.activeCalculationId,
-      expandedCalculationId: isSameId(current.expandedCalculationId, id) ? null : current.expandedCalculationId
-    }, { action:'rainwater:saved-delete' });
-  };
-
-  const toggleCalculation = element => {
-    const card = element?.closest?.('[data-rainwater-select]');
-    const id = card?.getAttribute?.('data-rainwater-select');
-    if (!id) return;
-    const current = state.get();
-    state.set({ expandedCalculationId: isSameId(current.expandedCalculationId, id) ? null : id }, { action:'rainwater:saved-toggle' });
-  };
 
 
   const selectSegment = ({ element }) => {
@@ -551,19 +385,20 @@ function bindActions(root) {
     'rainwater:surface-select': ({ element }) => selectSurface(element),
     'rainwater:surface-delete': ({ element }) => deleteSurface(element),
     'rainwater:surface-toggle': ({ element }) => toggleSurface(element),
-    'rainwater:save': saveCalculation,
-    'rainwater:update': updateCalculation,
+    // Global saved-record actions are scoped to Regenflächen only. The former
+    // duplicate calculation-level save workflow was removed in Phase 14G so
+    // Regenwasser follows the same single-record workflow as the reference modules.
     'saved:load': ({ element }) => {
       if (element?.closest?.('[data-rainwater-surface-select]')) return selectSurface(element);
-      return loadCalculation(element);
+      return undefined;
     },
     'saved:delete': ({ element }) => {
       if (element?.closest?.('[data-rainwater-surface-delete]')) return deleteSurface(element);
-      return deleteCalculation(element);
+      return undefined;
     },
     'saved:toggle': ({ element }) => {
       if (element?.closest?.('[data-rainwater-surface-select]')) return toggleSurface(element);
-      return toggleCalculation(element);
+      return undefined;
     }
   });
 

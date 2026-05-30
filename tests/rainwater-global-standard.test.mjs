@@ -9,11 +9,10 @@ assert.doesNotMatch(source, /bindSavedCalculationActions/, 'Rainwater must not u
 assert.match(source, /'rainwater:surface-add'/, 'Surface add action must be pipeline-driven.');
 assert.match(source, /'rainwater:surface-update'/, 'Surface update action must be pipeline-driven.');
 assert.match(source, /'rainwater:surface-select'/, 'Surface selection must be pipeline-driven.');
-assert.match(source, /'rainwater:save'/, 'Calculation save must be pipeline-driven.');
+assert.doesNotMatch(source, /function savedSnapshot|function savedRows|function surfaceDimensionCards/, 'Rainwater must not keep dormant duplicate save/result render paths.');
+assert.doesNotMatch(source, /'rainwater:save'/, 'Rainwater must not keep duplicate calculation-level save workflow.');
 assert.match(source, /'saved:toggle'/, 'Saved accordion toggle must use central saved action.');
-assert.match(state, /expandedCalculationId:\s*null/, 'Saved calculation accordion state must be explicit store state.');
+assert.doesNotMatch(state, /activeCalculationId|expandedCalculationId|savedCalculations|name:\s*''/, 'Rainwater initial state must not keep duplicate calculation-save state.');
 assert.match(state, /expandedSurfaceResultId:\s*null/, 'Surface result accordion state must be explicit store state.');
-assert.match(source, /delete copy\.expandedCalculationId/, 'UI accordion state must not be persisted inside saved calculation snapshots.');
-assert.match(source, /delete copy\.expandedSurfaceResultId/, 'Surface accordion state must not be persisted inside saved calculation snapshots.');
 
 console.log('rainwater global standard ok');
