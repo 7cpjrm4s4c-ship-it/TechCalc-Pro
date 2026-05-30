@@ -212,11 +212,12 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     const el = event.target?.closest?.('[data-field]');
     if (!el || !root.contains(el)) return;
     const deferRender = el.dataset.commit === 'defer' || el.dataset.render === 'defer';
-    const immediate = !deferRender && (el.matches('select') || el.dataset.commit === 'immediate' || el.dataset.lookup === 'true');
-    commitElementField(state, el, { action: immediate ? 'field:change:immediate' : 'field:change', notify: immediate ? true : false, root });
-    hasDeferredInput = !immediate;
-    notifyCommit({ action: immediate ? 'field:change:immediate' : 'field:change', element: el });
-    if (!immediate) scheduleDeferredRender();
+    const immediateCommit = el.matches('select') || el.dataset.commit === 'immediate' || el.dataset.lookup === 'true';
+    const shouldNotify = immediateCommit && !deferRender;
+    commitElementField(state, el, { action: immediateCommit ? 'field:change:immediate' : 'field:change', notify: shouldNotify, root });
+    hasDeferredInput = !immediateCommit;
+    notifyCommit({ action: immediateCommit ? 'field:change:immediate' : 'field:change', element: el });
+    if (!immediateCommit) scheduleDeferredRender();
   };
 
   const onBlur = event => {

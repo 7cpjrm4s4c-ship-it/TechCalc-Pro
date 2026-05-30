@@ -18,7 +18,18 @@ export function initRouter(onRoute) {
 
 export function navigate(id) {
   if (!modules.get(id)) return;
+  const targetHash = `${HASH_PREFIX}${id}`;
+  if (window.location.hash === targetHash) {
+    renderCallback(id);
+    return;
+  }
   window.location.hash = `/${id}`;
+  // Mobile Safari can occasionally delay or drop hashchange after pointer-driven
+  // navigation from highly interactive modules. The route callback is idempotent
+  // and render-token guarded, so this fallback makes module switches deterministic.
+  window.setTimeout(() => {
+    if (currentRoute() === id) renderCallback(id);
+  }, 0);
 }
 
 export function currentRoute() {

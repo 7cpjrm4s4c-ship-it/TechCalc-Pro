@@ -540,3 +540,6 @@
 - Removed bespoke surface result renderer in favor of the global saved-record UI.
 - Removed obsolete calculation saved-state keys from Regenwasser initial state.
 - Added Phase 14G regression gate for duplicate workflow removal.
+
+## 1.3.0 Phase 14J
+- Regenwasser: Navigation, Select-Hydration, Switch-Render, Normhinweis-Position und gespeicherte Notentwässerungswerte stabilisiert.
