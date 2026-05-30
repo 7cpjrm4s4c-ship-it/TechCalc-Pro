@@ -95,16 +95,34 @@ function savedRows(s) {
 }
 
 function surfacesTable(r, s) {
-  if (!r.surfaces.length) return '<div class="empty-state empty-state--compact">Noch keine Regenflächen hinzugefügt.</div>';
-  const activeId = String(s.activeSurfaceId || '');
-  return `<div class="tc-consumer-list">${r.surfaces.map(item => {
-    const active = String(item.id) === activeId;
-    return `<div class="tc-consumer-row ${active ? 'is-active' : ''}" data-tc-action="rainwater:surface-select" data-surface-select="${esc(item.id)}">
-      <div><strong>${esc(item.name)}</strong><span>${fmt(item.area,1)} m² · Cs ${fmt(item.cs,2)} · Qr ${fmt(item.qr,2)} l/s · FL ${item.stackSelection?.dn || '—'}</span></div>
-      <button type="button" data-tc-action="rainwater:surface-delete" data-surface-delete="${esc(item.id)}" aria-label="Regenfläche entfernen">×</button>
-    </div>`;
-  }).join('')}</div>`;
+  const items = Array.isArray(r.surfaces) ? r.surfaces : [];
+  return renderSavedRecordList(items, {
+    activeId: s.activeSurfaceId,
+    expandedId: s.expandedSurfaceResultId,
+    emptyText: 'Noch keine Regenflächen gespeichert.',
+    loadAttr: 'data-rainwater-surface-select',
+    toggleAttr: 'data-rainwater-surface-toggle',
+    deleteAttr: 'data-rainwater-surface-delete',
+    title: item => item.name || 'Regenfläche',
+    subtitle: item => {
+      const mode = item.surfaceMode || s.surfaceMode || 'roof';
+      return `${modeLabel(mode)} · ${fmt(item.area,1)} m² · Qr ${fmt(item.qr || 0,2)} l/s`;
+    },
+    stats: item => {
+      const mode = item.surfaceMode || s.surfaceMode || 'roof';
+      const rows = [
+        { label: 'Fläche', value: fmt(item.area,1), unit: 'm²' },
+        { label: 'Cs', value: fmt(item.cs,2) },
+        { label: 'Qr', value: fmt(item.qr || 0,2), unit: 'l/s' },
+        { label: drainLabel(mode), value: item.requiredDrains || 0, unit: 'Stk.' },
+        { label: 'Ablaufdimension', value: item.drainSize || '—' }
+      ];
+      if (mode === 'roof') rows.push({ label: 'DN Fallleitung', value: item.stackSelection?.dn || '—' });
+      return rows;
+    }
+  });
 }
+
 function modeCard(s) {
   const mode = s.surfaceMode || s.calculationType || 'roof';
   return card('Berechnungsbereich', segmented('surfaceMode', opts([['roof','Dachfläche'],['property','Grundstücksfläche']]), mode, { accent:'green' }), 'green');
@@ -118,7 +136,7 @@ function rainInputBlock(s) {
       field({ id:activeRainField, label:rainLabel(mode), value:fmtInput(activeRainValue,1), unit:'l/(s·ha)' }),
       field({ id:'rainHundredIntensity', label:'Regenspende r(5,100)', value:fmtInput(s.rainHundredIntensity,1), unit:'l/(s·ha)' })
     ].join(''), 2),
-    `<a class="action-button action-button--secondary" href="${esc(KOSTRA_URL)}" target="_blank" rel="noopener">KOSTRA / OpenKo Daten öffnen</a>`
+    `<a class="action-button action-button--secondary tc-action-link" href="${esc(KOSTRA_URL)}" target="_blank" rel="noopener">KOSTRA / OpenKo Daten öffnen</a>`
   ].join(''));
 }
 function dimensionInputBlock(s) {
@@ -377,28 +395,11 @@ function preserveScroll(action) {
 function bindActions(root) {
   bindEditModeClear(root, { state, activeIdKey:'activeCalculationId', nameKey:'name', onClear: () => state.set(clearedInputs(state.get())) });
 
-  if (!root.__rainwaterInputBound) {
-    root.__rainwaterInputBound = true;
-    root.addEventListener('input', event => {
-      const el = event.target.closest('[data-field]');
-      if (!el) return;
-      commitActiveSurfaceField(el.dataset.field, el.value);
-    }, true);
-    root.addEventListener('change', event => {
-      const el = event.target.closest('[data-field]');
-      if (!el) return;
-      commitActiveSurfaceField(el.dataset.field, el.value);
-      if (el.dataset.field === 'drainSize') {
-        const selected = roofDrainTable.find(item => item.dn === el.value);
-        if (selected) preserveScroll(() => state.set({
-          drainSize:selected.dn,
-          drainSizeManual:selected.dn,
-          drainCapacity:String(selected.capacity).replace('.', ','),
-          drainHead:String(selected.head)
-        }, { notify:false, action:'rainwater:drain-select' }));
-      }
-    }, true);
-  }
+  // Regenwasser uses the central event pipeline as the only write path.
+  // Field changes are committed globally; area records are synchronized when
+  // the user explicitly saves/updates/selects a surface. Keeping module-owned
+  // input/change listeners on the shared app root caused stale handlers after
+  // module switches and broke navigation from Heizung/Lüftung to Regenwasser.
 
   const addSurface = () => {
     commitAllFields(root, state, { action:'rainwater:pre-surface-add', notify:false });
@@ -425,7 +426,8 @@ function bindActions(root) {
   };
 
   const selectSurface = element => {
-    const id = element?.getAttribute?.('data-surface-select') || element?.getAttribute?.('data-surface-result-select') || element?.closest?.('[data-surface-select], [data-surface-result-select]')?.getAttribute('data-surface-select') || element?.closest?.('[data-surface-select], [data-surface-result-select]')?.getAttribute('data-surface-result-select');
+    const carrier = element?.closest?.('[data-rainwater-surface-select], [data-surface-select], [data-surface-result-select]') || element;
+    const id = carrier?.getAttribute?.('data-rainwater-surface-select') || carrier?.getAttribute?.('data-surface-select') || carrier?.getAttribute?.('data-surface-result-select');
     if (!id) return;
     const current = state.get();
     if (isSameId(current.activeSurfaceId, id)) {
@@ -438,7 +440,8 @@ function bindActions(root) {
   };
 
   const deleteSurface = element => {
-    const id = element?.getAttribute?.('data-surface-delete') || element?.closest?.('[data-surface-delete]')?.getAttribute('data-surface-delete');
+    const carrier = element?.closest?.('[data-rainwater-surface-delete], [data-surface-delete]') || element;
+    const id = carrier?.getAttribute?.('data-rainwater-surface-delete') || carrier?.getAttribute?.('data-surface-delete');
     if (!id) return;
     const current = state.get();
     const next = (current.surfaces || []).filter(item => !isSameId(item.id, id));
@@ -450,8 +453,8 @@ function bindActions(root) {
   };
 
   const toggleSurface = element => {
-    const card = element?.closest?.('[data-line-card]');
-    const id = card?.getAttribute?.('data-surface-result-select');
+    const card = element?.closest?.('[data-rainwater-surface-select], [data-line-card]');
+    const id = card?.getAttribute?.('data-rainwater-surface-select') || card?.getAttribute?.('data-surface-result-select');
     if (!id) return;
     const current = state.get();
     state.set({ expandedSurfaceResultId: isSameId(current.expandedSurfaceResultId, id) ? null : id }, { action:'rainwater:surface-toggle' });
@@ -535,9 +538,9 @@ function bindActions(root) {
     preserveScroll(() => state.set({
       surfaceMode: nextMode,
       calculationType: nextMode,
-      areaType: normalizeAreaType(nextMode, current.areaType || defaultAreaTypeForMode(nextMode)),
+      areaType: defaultAreaTypeForMode(nextMode),
       activeSurfaceId: null,
-      expandedSurfaceResultId: current.expandedSurfaceResultId || null
+      expandedSurfaceResultId: null
     }, { action:'rainwater:surface-mode-select' }));
   };
 
@@ -550,9 +553,18 @@ function bindActions(root) {
     'rainwater:surface-toggle': ({ element }) => toggleSurface(element),
     'rainwater:save': saveCalculation,
     'rainwater:update': updateCalculation,
-    'saved:load': ({ element }) => loadCalculation(element),
-    'saved:delete': ({ element }) => deleteCalculation(element),
-    'saved:toggle': ({ element }) => toggleCalculation(element)
+    'saved:load': ({ element }) => {
+      if (element?.closest?.('[data-rainwater-surface-select]')) return selectSurface(element);
+      return loadCalculation(element);
+    },
+    'saved:delete': ({ element }) => {
+      if (element?.closest?.('[data-rainwater-surface-delete]')) return deleteSurface(element);
+      return deleteCalculation(element);
+    },
+    'saved:toggle': ({ element }) => {
+      if (element?.closest?.('[data-rainwater-surface-select]')) return toggleSurface(element);
+      return toggleCalculation(element);
+    }
   });
 
 }

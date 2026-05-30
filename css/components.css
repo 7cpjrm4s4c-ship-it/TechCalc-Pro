@@ -4266,3 +4266,12 @@ body::before {
     transform: translateY(calc(100% + 24px));
   }
 }
+
+
+.tc-action-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+}

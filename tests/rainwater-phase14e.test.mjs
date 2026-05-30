@@ -10,6 +10,6 @@ assert.match(rainwater, /data-tc-action="rainwater:surface-delete"/, 'Rainwater 
 assert.match(rainwater, /'segment': selectSegment/, 'Rainwater must keep the surfaceMode switch on the central segment handler.');
 assert.match(pipeline, /segmentActionKey/, 'Central pipeline must de-duplicate pointer/click segment actions.');
 assert.match(pipeline, /handleSegment\(segment, event\)/, 'Central pipeline must dispatch module segment handlers before fallback commits.');
-assert.match(config, /phase-14e-rainwater-global-workflow/, 'Rainwater migration status must reflect Phase 14E.');
+assert.match(config, /phase-14f-rainwater-reference-workflow/, 'Rainwater migration status must reflect Phase 14F.');
 
 console.log('rainwater phase14e global workflow regression ok');

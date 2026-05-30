@@ -2,8 +2,8 @@
   "phase": "11B",
   "purpose": "Find remaining module-local event handlers that must be migrated behind the central event pipeline.",
   "totals": {
-    "filesWithLegacyHandlers": 8,
-    "legacyHandlerScore": 62
+    "filesWithLegacyHandlers": 7,
+    "legacyHandlerScore": 60
   },
   "findings": [
     {
@@ -41,12 +41,6 @@
       "addEventListener": 5,
       "directHandlers": 0,
       "legacySelectors": 5
-    },
-    {
-      "file": "js/modules/rainwater/index.js",
-      "addEventListener": 2,
-      "directHandlers": 0,
-      "legacySelectors": 0
     },
     {
       "file": "js/modules/wastewater/index.js",

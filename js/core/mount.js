@@ -6,6 +6,12 @@ export function mountModule(root, state, view, afterRender) {
   const mountToken = root?.dataset?.renderToken || '';
   const isCurrentMount = () => !mountToken || root?.dataset?.renderToken === mountToken;
 
+  // Each module mount owns its action map. Reset stale handlers from the previous
+  // module before the central event pipeline is rebound. Without this, modules
+  // opened from another module can inherit saved/segment handlers from the old
+  // view and appear visually active while committing to the wrong state.
+  root.__tcActionHandlers = {};
+
   bindNoClickScroll(root);
 
   const coordinator = createRenderCoordinator(root, {
