@@ -211,7 +211,8 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   const onChange = event => {
     const el = event.target?.closest?.('[data-field]');
     if (!el || !root.contains(el)) return;
-    const immediate = el.matches('select') || el.dataset.commit === 'immediate' || el.dataset.lookup === 'true';
+    const deferRender = el.dataset.commit === 'defer' || el.dataset.render === 'defer';
+    const immediate = !deferRender && (el.matches('select') || el.dataset.commit === 'immediate' || el.dataset.lookup === 'true');
     commitElementField(state, el, { action: immediate ? 'field:change:immediate' : 'field:change', notify: immediate ? true : false, root });
     hasDeferredInput = !immediate;
     notifyCommit({ action: immediate ? 'field:change:immediate' : 'field:change', element: el });
@@ -323,11 +324,29 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     notifyCommit({ action: 'surface:confirm', element: null });
   };
 
+  const keyboardFieldSelector = 'input[data-field], textarea[data-field], select[data-field]';
+  const setKeyboardOpen = value => {
+    if (!document?.body) return;
+    document.body.classList.toggle('tc-keyboard-open', Boolean(value));
+  };
+  const onFocusIn = event => {
+    if (event.target?.closest?.(keyboardFieldSelector) && root.contains(event.target)) setKeyboardOpen(true);
+  };
+  const onFocusOut = event => {
+    if (!event.target?.closest?.(keyboardFieldSelector)) return;
+    setTimeout(() => {
+      const active = document.activeElement;
+      if (!active || !root.contains(active) || !active.matches?.(keyboardFieldSelector)) setKeyboardOpen(false);
+    }, 80);
+  };
+
   const add = (target, name, fn, opts) => {
     target.addEventListener(name, fn, opts);
     cleanup.push(() => target.removeEventListener(name, fn, opts));
   };
 
+  add(root, 'focusin', onFocusIn, true);
+  add(root, 'focusout', onFocusOut, true);
   add(root, 'input', onInput, true);
   add(root, 'change', onChange, true);
   add(root, 'blur', onBlur, true);
@@ -346,6 +365,7 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     while (cleanup.length) cleanup.pop()();
     root.__tcCentralEventPipelineBound = false;
     root.__tcCentralEventPipelineState = null;
+    setKeyboardOpen(false);
     root.__tcCentralEventPipelineCleanup = null;
   };
   root.__tcCentralEventPipelineCleanup = unbind;

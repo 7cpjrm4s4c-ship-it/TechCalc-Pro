@@ -4250,3 +4250,12 @@ body::before {
     scroll-margin-top: calc(var(--header-height, 72px) + 12px);
   }
 }
+
+/* Phase 14B: keep the mobile module navigation from being pushed above the virtual keyboard. */
+@media (max-width: 768px) {
+  body.tc-keyboard-open .module-nav {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(calc(100% + 24px));
+  }
+}

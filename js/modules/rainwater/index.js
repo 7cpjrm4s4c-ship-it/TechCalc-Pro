@@ -9,7 +9,7 @@ import { fmt, fmtInput } from '../../utils/calculations.js';
 import { bindEditModeClear, renderSavedRecordList, isSameId, replaceRecord, removeRecord } from '../../core/savedRecords.js';
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { preserveScroll as keepScroll } from '../../core/scrollManager.js';
-import { registerCentralActions } from '../../core/eventPipeline.js';
+import { registerCentralActions, commitAllFields } from '../../core/eventPipeline.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
 const splitIndex = areaTypes.findIndex(item => item.id === 'concrete-asphalt');
@@ -124,7 +124,7 @@ function rainInputBlock(s) {
 function dimensionInputBlock(s) {
   const mode = s.surfaceMode || s.calculationType || 'roof';
   const fields = [
-    selectField({ id:'drainSize', label:mode === 'property' ? 'Vorwahl Hoftopf' : 'Vorwahl Dacheinlauf', value:s.drainSize || 'DN 100', options:drainOptions }),
+    selectField({ id:'drainSize', label:mode === 'property' ? 'Vorwahl Hoftopf' : 'Vorwahl Dacheinlauf', value:s.drainSize || 'DN 100', options:drainOptions, commit:'defer', lookup:false }),
     field({ id:'drainSizeManual', label:'DN manuell', value:s.drainSizeManual || s.drainSize || 'DN 100', placeholder:'DN 100', inputmode:'text' }),
     field({ id:'drainCapacity', label:'Abflusswert manuell', value:fmtInput(s.drainCapacity,1), unit:'l/s' }),
     field({ id:'drainHead', label:'Anstauhöhe manuell', value:fmtInput(s.drainHead,0), unit:'mm' })
@@ -138,7 +138,7 @@ function emergencyInputBlock(s) {
   if (mode !== 'roof') return '<div class="empty-state empty-state--compact">Notentwässerung wird nur für Dachflächen vorbemessen.</div>';
   const type = s.emergencyType || 'rect';
   const fields = [
-    selectField({ id:'emergencyType', label:'Art Notentwässerung', value:type, options:emergencyTypeOptions }),
+    selectField({ id:'emergencyType', label:'Art Notentwässerung', value:type, options:emergencyTypeOptions, commit:'defer', lookup:false }),
     field({ id:'emergencyHead', label:'Druckhöhe / Anstauhöhe', value:fmtInput(s.emergencyHead || '35',0), unit:'mm' })
   ];
   if (type === 'rect') fields.push(field({ id:'emergencyWidth', label:'Überlaufbreite je Notüberlauf Lw', value:fmtInput(s.emergencyWidth || '300',0), unit:'mm' }));
@@ -157,7 +157,7 @@ function surfaceInputBlock(s, r) {
   return stack([
     grid([
       field({ id:'areaName', label:'Bezeichnung', value:s.areaName || '', placeholder:'z. B. Dachfläche Nord', inputmode:'text' }),
-      selectField({ id:'areaType', label:'Flächenart', value:areaType, options:areaOptionsForMode(mode) }),
+      selectField({ id:'areaType', label:'Flächenart', value:areaType, options:areaOptionsForMode(mode), commit:'defer', lookup:false }),
       field({ id:'areaSize', label:'Fläche A', value:fmtInput(s.areaSize,1), unit:'m²' }),
       selected?.custom ? field({ id:'customCs', label:'Spitzenabflussbeiwert Cs', value:s.customCs || '', placeholder:'0,9' }) : inlineStats([{ label:'Cs', value:fmt(selected.cs,2) }, { label:'Cm', value:fmt(selected.cm,2) }])
     ].join(''), 2),
@@ -181,7 +181,8 @@ function inputCards(s, r) {
     card('Regenspende', rainInputBlock(s), 'green'),
     card('Dacheinläufe / Hoftöpfe', dimensionInputBlock(s), 'green'),
     card('Notentwässerung', emergencyInputBlock(s), 'green'),
-    card('Regenflächen', surfaceInputBlock(s, r), 'green')
+    card('Regenflächen', surfaceInputBlock(s, r), 'green'),
+    saveCard(s)
   ].join(''));
 }
 function warningList(warnings, s) {
@@ -408,6 +409,7 @@ function bindActions(root) {
   }
 
   const addSurface = () => {
+    commitAllFields(root, state, { action:'rainwater:pre-surface-add', notify:false });
     commitSurfaceFieldsBeforeAction(root);
     const current = state.get();
     const patch = surfacePatchFromState(current);
@@ -422,6 +424,7 @@ function bindActions(root) {
   };
 
   const updateSurface = () => {
+    commitAllFields(root, state, { action:'rainwater:pre-surface-update', notify:false });
     commitSurfaceFieldsBeforeAction(root);
     preserveScroll(() => {
       if (!patchActiveSurfaceFromState()) return;
@@ -463,6 +466,7 @@ function bindActions(root) {
   };
 
   const saveCalculation = () => {
+    commitAllFields(root, state, { action:'rainwater:pre-save', notify:false });
     const current = state.get();
     const record = savedSnapshot({ ...current, activeCalculationId: null, expandedCalculationId: current.expandedCalculationId || null }, calculate(current));
     state.set({
@@ -474,6 +478,7 @@ function bindActions(root) {
   };
 
   const updateCalculation = () => {
+    commitAllFields(root, state, { action:'rainwater:pre-update', notify:false });
     const current = state.get();
     const id = current.activeCalculationId;
     if (!id) return;

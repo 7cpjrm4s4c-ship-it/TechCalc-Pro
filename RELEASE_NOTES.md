@@ -512,3 +512,9 @@
 - Medium- und Rohr-Stammdaten werden über den Store in Ergebnis- und Detailbereiche propagiert.
 - Mobile und Desktop nutzen denselben Pipeline-Pfad für Segment-, Select- und Save-Aktionen.
 - Regressionstest `heating-cooling-phase12h` ergänzt.
+
+## Phase 14B – Regenwasser Mobile/Event Fixes
+- Select-Felder rendern verzögert, damit native Mobile-Menüs nicht erneut öffnen.
+- Speicher-Card wieder im Regenwasser-Layout.
+- Speichern/Aktualisieren committen aktuelle Feldwerte vor der Aktion.
+- Mobile Modulnavigation wird bei aktiver Tastatur ausgeblendet.
