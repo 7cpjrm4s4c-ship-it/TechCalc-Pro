@@ -240,7 +240,6 @@ function resultCards(s, r) {
   if (isRoof) secondary.splice(1, 0, { label:'DN Fallleitung', value:r.stackSelection?.dn || '—' }, { label:'Notabfluss Qnot', value:fmt(r.qNot || 0,2), unit:'l/s' });
   return stack([
     mainResult('Ergebnis Regenwasser', { label:isRoof ? 'DN Fallleitung' : drainLabel(mode), value:isRoof ? (r.stackSelection?.dn || '—') : r.requiredDrains, unit:isRoof ? '' : 'Stk.' }, secondary, 'green'),
-    card('Flächen / Berechnung', surfaceDimensionCards(r, s), 'green'),
     card('Normhinweise / Plausibilität', warningList(r.warnings, s), 'green')
   ].join(''));
 }

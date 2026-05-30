@@ -8,6 +8,6 @@ assert.doesNotMatch(source, /rainwater-surface-list|rainwater-surface-row|rainwa
 assert.doesNotMatch(source, /dw-consumer-|wastewater-fixture-|ph-warning|ph-formula|ph-saved-list/, 'Rainwater must not reuse legacy module UI classes.');
 assert.doesNotMatch(source, /__rainwaterOutsideBound|rainwater:outside-clear/, 'Rainwater must not clear edit state on arbitrary outside clicks.');
 assert.doesNotMatch(source, /function saveCard\(/, 'Rainwater must not keep the dormant duplicate calculation-save card.');
-assert.match(config, /phase-14d-rainwater-global-ux/, 'Rainwater migration status must reflect Phase 14D.');
+assert.match(config, /phase-14[d-e]-rainwater-(global-ux|global-workflow)/, 'Rainwater migration status must reflect Phase 14D or later.');
 
 console.log('rainwater phase14d global UX regression ok');

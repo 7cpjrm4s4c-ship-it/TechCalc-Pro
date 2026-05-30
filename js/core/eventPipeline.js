@@ -266,6 +266,20 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     return true;
   };
 
+  const segmentActionKey = segment => {
+    if (!segment) return '';
+    return `segment:${segment.dataset.segment || ''}:${segment.dataset.value || ''}`;
+  };
+
+  const handleSegment = (segment, event) => {
+    if (!segment || !root.contains(segment)) return false;
+    const handlers = options.actions || root.__tcActionHandlers || {};
+    if (typeof handlers.segment === 'function') {
+      return dispatchAction(root, state, segment, event, options);
+    }
+    return commitSegment(segment, event);
+  };
+
   const onClick = event => {
     const actionEl = event.target?.closest?.('[data-tc-action], [data-action]');
     const action = actionEl?.dataset?.tcAction || actionEl?.dataset?.action;
@@ -284,7 +298,16 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     if (dispatchAction(root, state, actionEl, event, options)) return;
 
     const segment = event.target?.closest?.('[data-segment]');
-    commitSegment(segment, event);
+    if (segment) {
+      const key = segmentActionKey(segment);
+      if (wasPointerActionHandled(root, key)) {
+        event?.preventDefault?.();
+        event?.stopPropagation?.();
+        event?.stopImmediatePropagation?.();
+        return;
+      }
+      handleSegment(segment, event);
+    }
   };
 
   const onPointerAction = event => {
@@ -313,7 +336,21 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   const onPointerSegment = event => {
     if (onPointerAction(event)) return;
     const segment = event.target?.closest?.('[data-segment]');
-    commitSegment(segment, event);
+    if (!segment) return;
+    if (shouldSuppressTouchAction(root, event) || shouldSuppressPointerAction(root, event)) {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      event?.stopImmediatePropagation?.();
+      return;
+    }
+    const key = segmentActionKey(segment);
+    if (wasPointerActionHandled(root, key)) {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      event?.stopImmediatePropagation?.();
+      return;
+    }
+    if (handleSegment(segment, event)) markPointerAction(root, key);
   };
 
   const confirmSurface = event => {

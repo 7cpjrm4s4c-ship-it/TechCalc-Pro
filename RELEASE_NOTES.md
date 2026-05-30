@@ -526,3 +526,10 @@
 - Speicher-Card wieder im Regenwasser-Layout.
 - Speichern/Aktualisieren committen aktuelle Feldwerte vor der Aktion.
 - Mobile Modulnavigation wird bei aktiver Tastatur ausgeblendet.
+
+## 1.3.0 Phase 14E - Regenwasser Global Workflow
+- Modulwechsel in die Regenwasser-Ansicht ueber zentrale Event-Pipeline stabilisiert.
+- Segment-Events werden auf Touch/Pointer und Click entprellt, damit Dach-/Grundstuecksflaeche nicht doppelt committen.
+- Regenwasser nutzt fuer den Bereichswechsel den Modul-spezifischen Segment-Handler vor dem generischen Fallback.
+- Ergebnis-seitige Doppel-Card "Flaechen / Berechnung" entfernt; Flaechenverwaltung bleibt im globalen Save/List/Delete-Workflow.
+- Regressionstest `rainwater-phase14e` ergaenzt.
