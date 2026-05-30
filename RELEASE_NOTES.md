@@ -1,3 +1,11 @@
+## 1.3.0 – Phase 14D Rainwater Global UX
+
+- Regenwasser weiter auf globale UX/UI-Regeln konsolidiert.
+- Regenflächen-Workflow nutzt zentrale Listen-/Record-Klassen ohne `rainwater-*`, `dw-*`, `wastewater-*` oder `ph-*` UI-Klassen im Modulmarkup.
+- Lokaler Outside-Click-Clear entfernt, damit Touch/Klick auf freie Flächen keinen Editor-Reset und keinen Full-Render erzeugt.
+- Dormante doppelte Berechnung-Speichern-Card aus dem Modulcode entfernt.
+- Quality Gate erweitert und erfolgreich geprüft.
+
 
 ## 1.3.0 – Phase 12I Heating/Cooling Final Stabilization
 

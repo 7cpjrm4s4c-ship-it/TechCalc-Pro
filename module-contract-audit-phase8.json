@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-30T08:47:38.213Z",
+  "generatedAt": "2026-05-30T10:17:08.756Z",
   "contractTarget": "1.3.0",
   "modules": [
     {
@@ -163,11 +163,11 @@
         "data-rainwater-delete",
         "empty-state",
         "empty-state--compact",
-        "dw-consumer-list",
-        "wastewater-fixture-list",
-        "rainwater-surface-list",
-        "dw-consumer-row",
-        "wastewater-fixture-row"
+        "is-active",
+        "data-tc-action",
+        "surface-select",
+        "data-surface-select",
+        "surface-delete"
       ]
     },
     {

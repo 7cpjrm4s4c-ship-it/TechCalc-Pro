@@ -97,9 +97,9 @@ function savedRows(s) {
 function surfacesTable(r, s) {
   if (!r.surfaces.length) return '<div class="empty-state empty-state--compact">Noch keine Regenflächen hinzugefügt.</div>';
   const activeId = String(s.activeSurfaceId || '');
-  return `<div class="tc-consumer-list dw-consumer-list wastewater-fixture-list rainwater-surface-list">${r.surfaces.map(item => {
+  return `<div class="tc-consumer-list">${r.surfaces.map(item => {
     const active = String(item.id) === activeId;
-    return `<div class="tc-consumer-row dw-consumer-row wastewater-fixture-row rainwater-surface-row ${active ? 'is-active' : ''}" data-tc-action="rainwater:surface-select" data-surface-select="${esc(item.id)}">
+    return `<div class="tc-consumer-row ${active ? 'is-active' : ''}" data-tc-action="rainwater:surface-select" data-surface-select="${esc(item.id)}">
       <div><strong>${esc(item.name)}</strong><span>${fmt(item.area,1)} m² · Cs ${fmt(item.cs,2)} · Qr ${fmt(item.qr,2)} l/s · FL ${item.stackSelection?.dn || '—'}</span></div>
       <button type="button" data-tc-action="rainwater:surface-delete" data-surface-delete="${esc(item.id)}" aria-label="Regenfläche entfernen">×</button>
     </div>`;
@@ -118,7 +118,7 @@ function rainInputBlock(s) {
       field({ id:activeRainField, label:rainLabel(mode), value:fmtInput(activeRainValue,1), unit:'l/(s·ha)' }),
       field({ id:'rainHundredIntensity', label:'Regenspende r(5,100)', value:fmtInput(s.rainHundredIntensity,1), unit:'l/(s·ha)' })
     ].join(''), 2),
-    `<a class="action-button action-button--secondary rainwater-kostra-link" href="${esc(KOSTRA_URL)}" target="_blank" rel="noopener">KOSTRA / OpenKo Daten öffnen</a>`
+    `<a class="action-button action-button--secondary" href="${esc(KOSTRA_URL)}" target="_blank" rel="noopener">KOSTRA / OpenKo Daten öffnen</a>`
   ].join(''));
 }
 function dimensionInputBlock(s) {
@@ -166,16 +166,6 @@ function surfaceInputBlock(s, r) {
     surfacesTable(r, s)
   ].join(''));
 }
-function saveCard(s) {
-  return card('Berechnung speichern', stack([
-    field({ id:'name', label:'Bezeichnung', value:s.name || '', placeholder:'z. B. Dachfläche Verwaltung', inputmode:'text' }),
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-tc-action="rainwater:save" data-rainwater-save ${s.activeCalculationId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-tc-action="rainwater:update" data-rainwater-update ${s.activeCalculationId ? '' : 'disabled'}>Aktualisieren</button></div>`,
-    savedRows(s)
-  ].join('')), 'green');
-}
-function savedCalculationsCard(s) {
-  return card('Gespeicherte Regenwasser-Berechnungen', savedRows(s), 'green');
-}
 function inputCards(s, r) {
   return stack([
     modeCard(s),
@@ -186,14 +176,14 @@ function inputCards(s, r) {
   ].join(''));
 }
 function warningList(warnings, s) {
-  const fixed = '<div class="tc-warning ph-warning ph-warning--norm"><span>Normgrundlage: </span><strong>Berechnung erfolgt auf Grundlage der DIN 1986 - 100, aktuellste Fassung.</strong></div>';
-  const items = (warnings || []).map(text => `<div class="tc-warning ph-warning"><span>Hinweis: </span><strong>${esc(text)}</strong></div>`).join('');
+  const fixed = '<div class="tc-warning"><span>Normgrundlage: </span><strong>Berechnung erfolgt auf Grundlage der DIN 1986 - 100, aktuellste Fassung.</strong></div>';
+  const items = (warnings || []).map(text => `<div class="tc-warning"><span>Hinweis: </span><strong>${esc(text)}</strong></div>`).join('');
   return fixed + items;
 }
 function surfaceDimensionCards(r, s) {
   if (!r.surfaces.length) return '<div class="empty-state empty-state--compact">Keine Einzelflächen berechnet.</div>';
   const activeId = String(s.activeSurfaceId || '');
-  return `<div class="tc-saved-list ph-saved-list rainwater-result-list">${r.surfaces.map((item) => {
+  return `<div class="tc-saved-list">${r.surfaces.map((item) => {
     const mode = item.surfaceMode || r.mode || s.surfaceMode || 'roof';
     const active = String(item.id) === activeId;
     const expanded = isSameId(s.expandedSurfaceResultId, item.id);
@@ -231,9 +221,9 @@ function surfaceDimensionCards(r, s) {
         </div>
       </div>
       <div class="line-section-card__body">
-        <div class="tc-result-group rainwater-result-group"><h4>Hauptentwässerung</h4>${resultRows(mainRows)}</div>
-        ${isRoof ? `<div class="tc-result-group rainwater-result-group"><h4>Notentwässerung</h4>${resultRows(emergencyRows)}</div>` : ''}
-        <div class="tc-formula ph-formula ph-formula--small">Qr = r × C × A / 10000 · Anzahl Abläufe = Qr / Ablaufleistung · Q je Fallleitung = Qr / Anzahl Fallleitungen</div>
+        <div class="tc-result-group"><h4>Hauptentwässerung</h4>${resultRows(mainRows)}</div>
+        ${isRoof ? `<div class="tc-result-group"><h4>Notentwässerung</h4>${resultRows(emergencyRows)}</div>` : ''}
+        <div class="tc-formula tc-formula--small">Qr = r × C × A / 10000 · Anzahl Abläufe = Qr / Ablaufleistung · Q je Fallleitung = Qr / Anzahl Fallleitungen</div>
       </div>
     </article>`;
   }).join('')}</div>`;
@@ -566,16 +556,6 @@ function bindActions(root) {
     'saved:toggle': ({ element }) => toggleCalculation(element)
   });
 
-  if (!root.__rainwaterOutsideBound) {
-    root.__rainwaterOutsideBound = true;
-    root.addEventListener('click', event => {
-      const current = state.get();
-      if (!current.activeSurfaceId) return;
-      const ignore = '[data-surface-select], [data-surface-result-select], [data-surface-delete], [data-line-card], [data-line-toggle], input, select, textarea, button, label, a, .segmented';
-      if (event.target.closest(ignore)) return;
-      preserveScroll(() => state.set(clearSurfaceEditorPatch(current), { action:'rainwater:outside-clear' }));
-    });
-  }
 }
 
 export default { config, schema, state, mount(root) { return mountModule(root, state, view, bindActions); } };

@@ -84,7 +84,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-8-schema-inventory"
+      "migrationStatus": "phase-14d-rainwater-global-ux"
     },
     {
       "id": "unit-converter",
