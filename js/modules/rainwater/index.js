@@ -162,7 +162,8 @@ function surfaceInputBlock(s, r) {
       selected?.custom ? field({ id:'customCs', label:'Spitzenabflussbeiwert Cs', value:s.customCs || '', placeholder:'0,9' }) : inlineStats([{ label:'Cs', value:fmt(selected.cs,2) }, { label:'Cm', value:fmt(selected.cm,2) }])
     ].join(''), 2),
     selected?.custom ? grid([field({ id:'customCm', label:'mittlerer Abflussbeiwert Cm', value:s.customCm || '', placeholder:'0,8' })].join(''), 1) : '',
-    `<div class="tc-save-actions"><button type="button" class="action-button action-button--secondary" data-tc-action="rainwater:surface-add" data-surface-add>Fläche hinzufügen</button><button type="button" class="action-button" data-tc-action="rainwater:surface-update" data-surface-update ${s.activeSurfaceId ? '' : 'disabled'}>Aktualisieren</button></div>`
+    `<div class="tc-save-actions"><button type="button" class="action-button action-button--secondary" data-tc-action="rainwater:surface-add" data-surface-add>Speichern</button><button type="button" class="action-button" data-tc-action="rainwater:surface-update" data-surface-update ${s.activeSurfaceId ? '' : 'disabled'}>Aktualisieren</button></div>`,
+    surfacesTable(r, s)
   ].join(''));
 }
 function saveCard(s) {
@@ -181,8 +182,7 @@ function inputCards(s, r) {
     card('Regenspende', rainInputBlock(s), 'green'),
     card('Dacheinläufe / Hoftöpfe', dimensionInputBlock(s), 'green'),
     card('Notentwässerung', emergencyInputBlock(s), 'green'),
-    card('Regenflächen', surfaceInputBlock(s, r), 'green'),
-    saveCard(s)
+    card('Regenflächen', surfaceInputBlock(s, r), 'green')
   ].join(''));
 }
 function warningList(warnings, s) {
@@ -225,7 +225,10 @@ function surfaceDimensionCards(r, s) {
     return `<article class="line-section-card ${active ? 'is-active' : ''} ${expanded ? '' : 'is-collapsed'}" data-line-card data-tc-action="rainwater:surface-select" data-surface-result-select="${esc(item.id)}">
       <div class="line-section-card__head">
         <div class="line-section-card__title"><strong>${esc(item.name)}</strong><small>${fmt(item.area,1)} m² · Qr ${fmt(item.qr,2)} l/s · ${drainLabel(mode)} ${item.requiredDrains} Stk.${isRoof ? ` · FL ${item.stackSelection?.dn || '—'}` : ''}</small></div>
-        <button type="button" class="line-section-card__toggle" data-tc-action="rainwater:surface-toggle" data-line-toggle aria-expanded="${expanded ? 'true' : 'false'}" aria-label="Flächendimensionierung aufklappen"><span>▾</span></button>
+        <div class="line-section-card__actions">
+          <button type="button" class="line-section-card__delete" data-tc-action="rainwater:surface-delete" data-surface-delete="${esc(item.id)}" aria-label="Regenfläche löschen">×</button>
+          <button type="button" class="line-section-card__toggle" data-tc-action="rainwater:surface-toggle" data-line-toggle aria-expanded="${expanded ? 'true' : 'false'}" aria-label="Flächendimensionierung aufklappen"><span>▾</span></button>
+        </div>
       </div>
       <div class="line-section-card__body">
         <div class="tc-result-group rainwater-result-group"><h4>Hauptentwässerung</h4>${resultRows(mainRows)}</div>
@@ -403,7 +406,7 @@ function bindActions(root) {
           drainSizeManual:selected.dn,
           drainCapacity:String(selected.capacity).replace('.', ','),
           drainHead:String(selected.head)
-        }));
+        }, { notify:false, action:'rainwater:drain-select' }));
       }
     }, true);
   }
@@ -533,7 +536,24 @@ function bindActions(root) {
     state.set({ expandedCalculationId: isSameId(current.expandedCalculationId, id) ? null : id }, { action:'rainwater:saved-toggle' });
   };
 
+
+  const selectSegment = ({ element }) => {
+    const field = element?.dataset?.segment;
+    const value = element?.dataset?.value;
+    if (field !== 'surfaceMode' || !value) return;
+    const current = state.get();
+    const nextMode = value === 'property' ? 'property' : 'roof';
+    preserveScroll(() => state.set({
+      surfaceMode: nextMode,
+      calculationType: nextMode,
+      areaType: normalizeAreaType(nextMode, current.areaType || defaultAreaTypeForMode(nextMode)),
+      activeSurfaceId: null,
+      expandedSurfaceResultId: current.expandedSurfaceResultId || null
+    }, { action:'rainwater:surface-mode-select' }));
+  };
+
   registerCentralActions(root, {
+    'segment': selectSegment,
     'rainwater:surface-add': addSurface,
     'rainwater:surface-update': updateSurface,
     'rainwater:surface-select': ({ element }) => selectSurface(element),
