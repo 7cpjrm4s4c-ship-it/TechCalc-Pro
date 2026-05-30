@@ -87,13 +87,34 @@ export function renderQuickAccessSettings() {
   });
 }
 
+function navigateFromButton(button, overflow, event) {
+  if (!button?.dataset?.moduleId) return;
+  event?.preventDefault?.();
+  event?.stopPropagation?.();
+  if (overflow) overflow.hidden = true;
+  navigate(button.dataset.moduleId);
+}
+
+function bindModuleNavButton(button, overflow) {
+  if (!button || button.__tcNavBound) return;
+  button.__tcNavBound = true;
+  let handledAt = 0;
+  const handle = event => {
+    const now = Date.now();
+    if (event.type === 'click' && now - handledAt < 500) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    handledAt = now;
+    navigateFromButton(button, overflow, event);
+  };
+  button.addEventListener('pointerup', handle, true);
+  button.addEventListener('click', handle, true);
+}
+
 function bindPrimaryNav(nav, overflow) {
-  nav.querySelectorAll('[data-module-id]').forEach(button => {
-    button.addEventListener('click', () => {
-      overflow.hidden = true;
-      navigate(button.dataset.moduleId);
-    });
-  });
+  nav.querySelectorAll('[data-module-id]').forEach(button => bindModuleNavButton(button, overflow));
 
   nav.querySelector('[data-overflow]')?.addEventListener('click', event => {
     event.preventDefault();
@@ -130,12 +151,7 @@ function renderOverflowMenu(overflow, overflowModules, activeId, visibleIds, isM
     </div>
   `;
 
-  overflow.querySelectorAll('[data-module-id]').forEach(button => {
-    button.addEventListener('click', () => {
-      overflow.hidden = true;
-      navigate(button.dataset.moduleId);
-    });
-  });
+  overflow.querySelectorAll('[data-module-id]').forEach(button => bindModuleNavButton(button, overflow));
 
   overflow.querySelectorAll('[data-set-quick]').forEach(button => {
     button.addEventListener('click', event => {

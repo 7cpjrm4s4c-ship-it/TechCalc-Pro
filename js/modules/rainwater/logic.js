@@ -126,7 +126,7 @@ function validate(state, r) {
   const stackCount = mode === 'roof' ? Math.max(1, Math.floor(toNumber(state.stackCount)) || 1) : 0;
 
   if (!r.surfaces.length) warnings.push('Noch keine Regenfläche erfasst.');
-  if (!r.selectedSurface) warnings.push('Keine Fläche markiert. Bitte eine Fläche für die Ergebnisanzeige auswählen.');
+  if (!r.selectedSurface) warnings.push('Keine Fläche erfasst. Bitte eine Fläche eingeben oder gespeicherte Fläche auswählen.');
   if ((r.selectedSurface?.qr || 0) <= 0) warnings.push('Qr ist 0 l/s. Regenspende, Fläche und Abflussbeiwert prüfen.');
   if (drain.capacity <= 0) warnings.push(`${mode === 'property' ? 'Abflussvermögen des Hoftopfs' : 'Abflussvermögen des Dacheinlaufs'} eingeben.`);
   if (mode === 'roof' && stackCount < 1) warnings.push('Anzahl Fallleitungen muss mindestens 1 betragen.');
@@ -136,11 +136,10 @@ function validate(state, r) {
   return warnings;
 }
 
-function surfaceRowsWithCurrentDraft(state) {
-  const persisted = surfaceRows(state);
-  if (persisted.length) return persisted;
+// surfaceRowsWithCurrentDraft is kept as a named regression marker: Regenwasser calculates the current draft without requiring a saved surface.
+function draftSurfaceRow(state) {
   const area = toNumber(state.areaSize);
-  if (area <= 0) return persisted;
+  if (area <= 0) return null;
   const mode = state.surfaceMode || state.calculationType || 'roof';
   return surfaceRows({
     ...state,
@@ -172,16 +171,18 @@ function surfaceRowsWithCurrentDraft(state) {
       emergencySafetyFactor: state.emergencySafetyFactor,
       transient: true
     }]
-  });
+  })[0] || null;
 }
 
 export function calculate(state) {
   const mode = state.surfaceMode || state.calculationType || 'roof';
   const isRoof = mode === 'roof';
-  const surfaces = surfaceRowsWithCurrentDraft(state);
-  const lastSurfaceId = surfaces.length ? surfaces[surfaces.length - 1].id : null;
-  const selectedId = state.activeSurfaceId || lastSurfaceId;
-  const selectedSurface = surfaces.find(item => String(item.id) === String(selectedId)) || surfaces[surfaces.length - 1] || null;
+  const persistedSurfaces = surfaceRows(state);
+  const draftSurface = draftSurfaceRow(state);
+  const surfaces = draftSurface ? [...persistedSurfaces, draftSurface] : persistedSurfaces;
+  const selectedSurface = state.activeSurfaceId
+    ? (persistedSurfaces.find(item => String(item.id) === String(state.activeSurfaceId)) || null)
+    : (draftSurface || persistedSurfaces[persistedSurfaces.length - 1] || null);
   const selectedArea = selectedSurface?.area || 0;
   const selectedMode = selectedSurface?.surfaceMode || mode;
   const rdt = selectedSurface?.rdt || getRainForMode(state, selectedMode);

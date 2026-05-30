@@ -98,7 +98,7 @@ function dimensionInputBlock(s) {
   const mode = s.surfaceMode || s.calculationType || 'roof';
   const preset = selectedDrainPreset(s);
   const fields = [
-    selectField({ id:'drainSize', label:mode === 'property' ? 'Vorwahl Hoftopf' : 'Vorwahl Dacheinlauf', value:s.drainSize || 'DN 100', options:drainOptions, commit:'immediate', lookup:true }),
+    selectField({ id:'drainSize', label:mode === 'property' ? 'Vorwahl Hoftopf' : 'Vorwahl Dacheinlauf', value:s.drainSize || 'DN 100', options:drainOptions, commit:'immediate', lookup:true, render:'defer' }),
     field({ id:'drainSizeManual', label:'DN manuell', value:s.drainSizeManual || s.drainSize || preset?.dn || 'DN 100', placeholder:'DN 100', inputmode:'text' }),
     field({ id:'drainCapacity', label:'Abflusswert', value:fmtInput(s.drainCapacity || preset?.capacity,1), unit:'l/s', readonly:true }),
     field({ id:'drainHead', label:'Anstauhöhe', value:fmtInput(s.drainHead || preset?.head,0), unit:'mm', readonly:true })
@@ -150,8 +150,7 @@ function inputCards(s, r) {
     card('Regenspende', rainInputBlock(s), 'green'),
     card('Dacheinläufe / Hoftöpfe', dimensionInputBlock(s), 'green'),
     card('Notentwässerung', emergencyInputBlock(s), 'green'),
-    card('Regenfläche', surfaceInputBlock(s), 'green'),
-    surfaceSaveCard(s, r)
+    card('Regenfläche', surfaceInputBlock(s), 'green')
   ].join(''));
 }
 function warningList(warnings, s) {
@@ -162,21 +161,23 @@ function warningList(warnings, s) {
 function resultCards(s, r) {
   const mode = r.selectedSurface?.surfaceMode || r.mode || s.surfaceMode || 'roof';
   const isRoof = mode === 'roof';
+  const selectedLabel = r.selectedSurface && !r.selectedSurface.transient ? r.selectedSurface.name : 'Aktuelle Eingabe';
   const secondary = [
     { label:'Entwässerungsmenge', value:fmt(r.qr,2), unit:'l/s' },
     { label:'Ablaufdimension', value:r.drainSize || '—' },
     { label:'Abläufe', value:r.requiredDrains, unit:'Stk.' },
-    { label:'markierte Fläche', value:r.selectedSurface?.name || '—' }
+    { label:'Quelle', value:selectedLabel || 'Aktuelle Eingabe' }
   ];
   if (isRoof) secondary.splice(1, 0, { label:'DN Fallleitung', value:r.stackSelection?.dn || '—' }, { label:'Notabfluss Qnot', value:fmt(r.qNot || 0,2), unit:'l/s' });
+  const clearSelection = s.activeSurfaceId ? '<div class="tc-save-actions"><button type="button" class="action-button action-button--secondary" data-tc-action="rainwater:surface-clear-selection">Auswahl aufheben</button></div>' : '';
   return stack([
-    mainResult('Ergebnis Regenwasser', { label:isRoof ? 'DN Fallleitung' : drainLabel(mode), value:isRoof ? (r.stackSelection?.dn || '—') : r.requiredDrains, unit:isRoof ? '' : 'Stk.' }, secondary, 'green'),
+    mainResult('Ergebnis Regenwasser', { label:isRoof ? 'DN Fallleitung' : drainLabel(mode), value:isRoof ? (r.stackSelection?.dn || '—') : r.requiredDrains, unit:isRoof ? '' : 'Stk.' }, secondary, 'green') + clearSelection,
     card('Normhinweise / Plausibilität', warningList(r.warnings, s), 'green')
   ].join(''));
 }
 function view(s) {
   const r = calculate(s);
-  return renderModuleShell(config, `<div class="span-6">${inputCards(s, r)}</div><div class="span-6">${resultCards(s, r)}</div>`);
+  return renderModuleShell(config, `<div class="span-6">${inputCards(s, r)}</div><div class="span-6">${resultCards(s, r)}${surfaceSaveCard(s, r)}</div>`);
 }
 
 function surfacePatchFromState(current = {}) {
@@ -328,6 +329,28 @@ function patchLookupDefaults(patch = {}, base = state.get()) {
   return next;
 }
 
+
+function setSegmentVisual(root, field, value) {
+  root?.querySelectorAll?.(`[data-segment="${field}"]`)?.forEach(button => {
+    const active = String(button.dataset.value) === String(value);
+    button.classList.toggle('is-active', active);
+    button.setAttribute('aria-selected', String(active));
+  });
+}
+
+function patchFieldDomValue(root, field, value, digits = null) {
+  const el = root?.querySelector?.(`[data-field="${field}"]`);
+  if (!el) return;
+  const next = digits == null ? String(value ?? '') : fmtInput(value, digits);
+  if (el.value !== next) el.value = next;
+}
+
+function hydrateDrainDom(root, patch) {
+  patchFieldDomValue(root, 'drainSizeManual', patch.drainSizeManual || '', null);
+  patchFieldDomValue(root, 'drainCapacity', patch.drainCapacity || '', 1);
+  patchFieldDomValue(root, 'drainHead', patch.drainHead || '', 0);
+}
+
 const surfaceEditFields = new Set(['surfaceMode','areaType','areaName','areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity','drainSize','drainSizeManual','drainCapacity','drainHead','stackCount','emergencyType','emergencyHead','emergencyWidth','emergencyDiameter','emergencyManufacturerDn','emergencyCapacity','emergencySafetyFactor']);
 function preserveScroll(action) {
   keepScroll(action);
@@ -400,13 +423,16 @@ function bindActions(root) {
 
 
 
-  const selectSegment = ({ element }) => {
+  const selectSegment = ({ element, root }) => {
     const field = element?.dataset?.segment;
     const value = element?.dataset?.value;
     if (field !== 'surfaceMode' || !value) return;
-    const current = state.get();
     const nextMode = value === 'property' ? 'property' : 'roof';
+    setSegmentVisual(root, 'surfaceMode', nextMode);
+    const current = state.get();
+    const drainPatch = patchLookupDefaults({ drainSize: current.drainSize || 'DN 100' }, current);
     preserveScroll(() => state.set({
+      ...drainPatch,
       surfaceMode: nextMode,
       calculationType: nextMode,
       areaType: defaultAreaTypeForMode(nextMode),
@@ -423,7 +449,9 @@ function bindActions(root) {
       state.set({ areaType: normalizeAreaType(current.surfaceMode || current.calculationType || 'roof', current.areaType) }, { action:'rainwater:area-type-normalize', notify:true });
       return;
     }
-    state.set(patchLookupDefaults({ [fieldName]: current[fieldName] }, current), { action:`rainwater:${fieldName}:lookup`, notify:true });
+    const lookupPatch = patchLookupDefaults({ [fieldName]: current[fieldName] }, current);
+    state.set(lookupPatch, { action:`rainwater:${fieldName}:lookup`, notify: fieldName !== 'drainSize' });
+    if (fieldName === 'drainSize') hydrateDrainDom(root, lookupPatch);
   };
   if (!root.__tcRainwaterLookupHydrationBound) {
     root.__tcRainwaterLookupHydrationBound = true;
@@ -442,6 +470,7 @@ function bindActions(root) {
     'rainwater:surface-select': ({ element }) => selectSurface(element),
     'rainwater:surface-delete': ({ element }) => deleteSurface(element),
     'rainwater:surface-toggle': ({ element }) => toggleSurface(element),
+    'rainwater:surface-clear-selection': () => preserveScroll(() => state.set(clearSurfaceEditorPatch(state.get()), { action:'rainwater:surface-clear-selection' })),
     // Global saved-record actions are scoped to Regenflächen only. The former
     // duplicate calculation-level save workflow was removed in Phase 14G so
     // Regenwasser follows the same single-record workflow as the reference modules.
