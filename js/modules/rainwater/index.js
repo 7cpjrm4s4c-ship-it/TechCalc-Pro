@@ -61,17 +61,34 @@ function surfacesTable(r, s) {
     },
     stats: item => {
       const mode = item.surfaceMode || s.surfaceMode || 'roof';
+      const isRoof = mode === 'roof';
+      const emergency = item.emergency || {};
       const rows = [
+        { label: 'Bereich', value: modeLabel(mode) },
+        { label: 'Flächenart', value: item.base?.name || getAreaType(item.areaType)?.name || item.areaType || '—' },
         { label: 'Fläche', value: fmt(item.area,1), unit: 'm²' },
         { label: 'Cs', value: fmt(item.cs,2) },
-        { label: 'Qr', value: fmt(item.qr || 0,2), unit: 'l/s' },
+        { label: 'Cm', value: fmt(item.cm,2) },
+        { label: rainLabel(mode), value: fmt(item.rdt || 0,1), unit: 'l/(s·ha)' },
+        { label: 'r(5,100)', value: fmt(item.r100 || 0,1), unit: 'l/(s·ha)' },
+        { label: 'Entwässerungsmenge Qr', value: fmt(item.qr || 0,2), unit: 'l/s' },
         { label: drainLabel(mode), value: item.requiredDrains || 0, unit: 'Stk.' },
-        { label: 'Ablaufdimension', value: item.drainSize || '—' }
+        { label: 'Ablaufdimension', value: item.drainSize || '—' },
+        { label: drainCapacityLabel(mode), value: fmt(item.drainCapacity || 0,1), unit: 'l/s' },
+        { label: 'Anstauhöhe', value: fmt(item.drainHead || 0,0), unit: 'mm' },
+        { label: 'Sammelleitung', value: item.collectorSelection?.dn || '—' }
       ];
-      if (mode === 'roof') {
+      if (isRoof) {
+        rows.push({ label: 'Fallleitungen', value: item.stackCount || 0, unit: 'Stk.' });
+        rows.push({ label: 'Volumenstrom je Fallleitung', value: fmt(item.qPerStack || 0,2), unit: 'l/s' });
         rows.push({ label: 'DN Fallleitung', value: item.stackSelection?.dn || '—' });
         rows.push({ label: 'Notabfluss Qnot', value: fmt(item.qNot || 0,2), unit: 'l/s' });
-        rows.push({ label: 'Notüberläufe', value: item.emergency?.requiredCount || 0, unit: 'Stk.' });
+        rows.push({ label: 'Notüberlauf-Art', value: emergency.type === 'round' ? 'Rund' : emergency.type === 'manual' ? 'Herstellerwert' : 'Rechteckig' });
+        rows.push({ label: 'Notüberlauf Druckhöhe', value: fmt(emergency.head || 0,0), unit: 'mm' });
+        if (emergency.type === 'rect') rows.push({ label: 'Breite je Notüberlauf', value: fmt(emergency.rectWidthPerOverflow || emergency.width || 0,0), unit: 'mm' });
+        if (emergency.type === 'round') rows.push({ label: 'Durchmesser Notüberlauf', value: fmt(emergency.diameter || 0,0), unit: 'mm' });
+        rows.push({ label: 'Abfluss je Notüberlauf', value: fmt(emergency.capacity || 0,2), unit: 'l/s' });
+        rows.push({ label: 'Notüberläufe', value: emergency.requiredCount || 0, unit: 'Stk.' });
       }
       return rows;
     }
@@ -422,7 +439,13 @@ function bindActions(root) {
     const id = card?.getAttribute?.('data-rainwater-surface-select') || card?.getAttribute?.('data-surface-result-select');
     if (!id) return;
     const current = state.get();
-    state.set({ expandedSurfaceResultId: isSameId(current.expandedSurfaceResultId, id) ? null : id }, { action:'rainwater:surface-toggle' });
+    const willCollapse = isSameId(current.expandedSurfaceResultId, id);
+    // Immediate visual feedback for mobile: the store remains authoritative, but
+    // the card does not wait for a deferred render before opening/closing.
+    card?.classList?.toggle('is-collapsed', willCollapse);
+    const toggle = card?.querySelector?.('[data-rainwater-surface-toggle], [data-saved-toggle]');
+    toggle?.setAttribute?.('aria-expanded', willCollapse ? 'false' : 'true');
+    state.set({ expandedSurfaceResultId: willCollapse ? null : id }, { action:'rainwater:surface-toggle' });
   };
 
 

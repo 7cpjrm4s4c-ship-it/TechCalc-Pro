@@ -1,5 +1,5 @@
 import { modules } from './registry.js';
-import { initRouter, currentRoute } from './router.js';
+import { initRouter, currentRoute, navigate } from './router.js';
 import { renderNavigation, renderQuickAccessSettings } from './navigation.js';
 import heatingCoolingConfig from '../modules/heating-cooling/config.js';
 import ventilationConfig from '../modules/ventilation/config.js';
@@ -80,6 +80,33 @@ document.addEventListener('click', event => {
   const external = target === '_blank' || /^https?:\/\//i.test(href);
   if (external) persistSessionBeforeLeaving();
 }, { capture: true });
+
+
+let globalNavHandledAt = 0;
+let globalNavHandledId = '';
+function handleGlobalModuleNav(event) {
+  const button = event.target?.closest?.('.module-nav [data-module-id]');
+  if (!button?.dataset?.moduleId) return;
+  const now = Date.now();
+  const id = button.dataset.moduleId;
+  if (globalNavHandledId === id && now - globalNavHandledAt < 500) {
+    event.preventDefault?.();
+    event.stopPropagation?.();
+    event.stopImmediatePropagation?.();
+    return;
+  }
+  globalNavHandledAt = now;
+  globalNavHandledId = id;
+  event.preventDefault?.();
+  event.stopPropagation?.();
+  event.stopImmediatePropagation?.();
+  const overflow = document.getElementById('overflowMenu');
+  if (overflow) overflow.hidden = true;
+  navigate(id);
+}
+document.addEventListener('pointerup', handleGlobalModuleNav, true);
+document.addEventListener('touchend', handleGlobalModuleNav, { capture: true, passive: false });
+document.addEventListener('click', handleGlobalModuleNav, true);
 
 const app = document.getElementById('app');
 let renderToken = 0;

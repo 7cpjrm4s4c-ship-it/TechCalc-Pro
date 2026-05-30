@@ -34,6 +34,10 @@ function restoreFocus(root, key, selection) {
   const selector = `[id="${cssEscape(key)}"], [data-field="${cssEscape(key)}"], [name="${cssEscape(key)}"]`;
   const next = root.querySelector(selector);
   if (!next || next.disabled) return;
+  // Do not restore focus to native select elements. On mobile Safari/Chrome this
+  // can reopen the picker after a render and makes lookup selections appear to
+  // require a second screen tap. Text inputs still keep their caret normally.
+  if (next.tagName === 'SELECT') return;
   try {
     next.focus({ preventScroll: true });
     if (selection && 'setSelectionRange' in next && next.value === selection.value) {

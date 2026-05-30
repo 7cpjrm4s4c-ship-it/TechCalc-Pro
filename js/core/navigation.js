@@ -101,15 +101,17 @@ function bindModuleNavButton(button, overflow) {
   let handledAt = 0;
   const handle = event => {
     const now = Date.now();
-    if (event.type === 'click' && now - handledAt < 500) {
+    if ((event.type === 'click' || event.type === 'touchend') && now - handledAt < 500) {
       event.preventDefault();
       event.stopPropagation();
+      event.stopImmediatePropagation?.();
       return;
     }
     handledAt = now;
     navigateFromButton(button, overflow, event);
   };
   button.addEventListener('pointerup', handle, true);
+  button.addEventListener('touchend', handle, { capture: true, passive: false });
   button.addEventListener('click', handle, true);
 }
 

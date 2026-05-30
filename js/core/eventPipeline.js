@@ -215,6 +215,9 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     const immediateCommit = el.matches('select') || el.dataset.commit === 'immediate' || el.dataset.lookup === 'true';
     const shouldNotify = immediateCommit && !deferRender;
     commitElementField(state, el, { action: immediateCommit ? 'field:change:immediate' : 'field:change', notify: shouldNotify, root });
+    if (el.matches('select')) {
+      try { el.blur(); } catch { /* native select may not allow blur in all runtimes */ }
+    }
     hasDeferredInput = !immediateCommit;
     notifyCommit({ action: immediateCommit ? 'field:change:immediate' : 'field:change', element: el });
     if (!immediateCommit) scheduleDeferredRender();

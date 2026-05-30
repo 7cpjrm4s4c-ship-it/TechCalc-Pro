@@ -1,3 +1,9 @@
+## Version 1.3.0 – Phase 14K Regenwasser Final Stability
+- Modulwechsel aus Heizung/Kälte und Lüftung nach Regenwasser und andere Module stabilisiert.
+- Regenwasser-Selects übernehmen Lookup-Werte ohne zweiten Touch und ohne erneutes Öffnen der Auswahlkarte.
+- Gespeicherte Dachflächen zeigen ausführlichere Ergebnisdetails inklusive Notentwässerung.
+- Accordion-Feedback für gespeicherte Flächen beschleunigt.
+
 ## 1.3.0 – Phase 14D Rainwater Global UX
 
 - Regenwasser weiter auf globale UX/UI-Regeln konsolidiert.
