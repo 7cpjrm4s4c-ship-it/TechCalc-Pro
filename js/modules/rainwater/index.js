@@ -6,7 +6,7 @@ import { areaTypes, roofDrainTable } from './tables.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultRows, inlineStats, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-import { renderSavedRecordList, isSameId } from '../../core/savedRecords.js';
+import { renderSavedRecordList, isSameId, createRecordId, replaceRecord, removeRecord } from '../../core/savedRecords.js';
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { preserveScroll as keepScroll } from '../../core/scrollManager.js';
 import { registerCentralActions, commitAllFields } from '../../core/eventPipeline.js';
@@ -46,7 +46,7 @@ const drainOptions = roofDrainTable.map(item => ({ value:item.dn, label:`${item.
 const emergencyTypeOptions = opts([['rect','Rechteckiger Notüberlauf'],['round','Runder Notüberlauf'],['manual','Herstellerwert / freie Eingabe']]);
 
 function surfacesTable(r, s) {
-  const items = Array.isArray(r.surfaces) ? r.surfaces : [];
+  const items = (Array.isArray(r.surfaces) ? r.surfaces : []).filter(item => !item.transient && String(item.id) !== '__current_input__');
   return renderSavedRecordList(items, {
     activeId: s.activeSurfaceId,
     expandedId: s.expandedSurfaceResultId,
@@ -90,13 +90,18 @@ function rainInputBlock(s) {
     `<a class="action-button action-button--secondary tc-action-link" href="${esc(KOSTRA_URL)}" target="_blank" rel="noopener">KOSTRA / OpenKo Daten öffnen</a>`
   ].join(''));
 }
+function selectedDrainPreset(s) {
+  return roofDrainTable.find(item => item.dn === (s.drainSize || 'DN 100')) || roofDrainTable.find(item => item.dn === 'DN 100') || roofDrainTable[0];
+}
+
 function dimensionInputBlock(s) {
   const mode = s.surfaceMode || s.calculationType || 'roof';
+  const preset = selectedDrainPreset(s);
   const fields = [
-    selectField({ id:'drainSize', label:mode === 'property' ? 'Vorwahl Hoftopf' : 'Vorwahl Dacheinlauf', value:s.drainSize || 'DN 100', options:drainOptions, commit:'defer', lookup:false }),
-    field({ id:'drainSizeManual', label:'DN manuell', value:s.drainSizeManual || s.drainSize || 'DN 100', placeholder:'DN 100', inputmode:'text' }),
-    field({ id:'drainCapacity', label:'Abflusswert manuell', value:fmtInput(s.drainCapacity,1), unit:'l/s' }),
-    field({ id:'drainHead', label:'Anstauhöhe manuell', value:fmtInput(s.drainHead,0), unit:'mm' })
+    selectField({ id:'drainSize', label:mode === 'property' ? 'Vorwahl Hoftopf' : 'Vorwahl Dacheinlauf', value:s.drainSize || 'DN 100', options:drainOptions, commit:'immediate', lookup:true }),
+    field({ id:'drainSizeManual', label:'DN manuell', value:s.drainSizeManual || s.drainSize || preset?.dn || 'DN 100', placeholder:'DN 100', inputmode:'text' }),
+    field({ id:'drainCapacity', label:'Abflusswert', value:fmtInput(s.drainCapacity || preset?.capacity,1), unit:'l/s', readonly:true }),
+    field({ id:'drainHead', label:'Anstauhöhe', value:fmtInput(s.drainHead || preset?.head,0), unit:'mm', readonly:true })
   ];
   if (mode === 'roof') fields.push(field({ id:'stackCount', label:'Anzahl Fallleitungen', value:fmtInput(s.stackCount,0), unit:'Stk.' }));
   return stack([grid(fields.join(''), 2)].join(''));
@@ -107,7 +112,7 @@ function emergencyInputBlock(s) {
   if (mode !== 'roof') return '<div class="empty-state empty-state--compact">Notentwässerung wird nur für Dachflächen vorbemessen.</div>';
   const type = s.emergencyType || 'rect';
   const fields = [
-    selectField({ id:'emergencyType', label:'Art Notentwässerung', value:type, options:emergencyTypeOptions, commit:'defer', lookup:false }),
+    selectField({ id:'emergencyType', label:'Art Notentwässerung', value:type, options:emergencyTypeOptions, commit:'immediate', lookup:true }),
     field({ id:'emergencyHead', label:'Druckhöhe / Anstauhöhe', value:fmtInput(s.emergencyHead || '35',0), unit:'mm' })
   ];
   if (type === 'rect') fields.push(field({ id:'emergencyWidth', label:'Überlaufbreite je Notüberlauf Lw', value:fmtInput(s.emergencyWidth || '300',0), unit:'mm' }));
@@ -119,21 +124,25 @@ function emergencyInputBlock(s) {
   fields.push(field({ id:'emergencySafetyFactor', label:'Sicherheitsfaktor', value:fmtDecimalInput(s.emergencySafetyFactor || '1,0',1) }));
   return stack([grid(fields.join(''), 2)].join(''));
 }
-function surfaceInputBlock(s, r) {
+function surfaceInputBlock(s) {
   const mode = s.surfaceMode || s.calculationType || 'roof';
   const areaType = normalizeAreaType(mode, s.areaType || defaultAreaTypeForMode(mode));
   const selected = getAreaType(areaType);
   return stack([
     grid([
-      field({ id:'areaName', label:'Bezeichnung', value:s.areaName || '', placeholder:'z. B. Dachfläche Nord', inputmode:'text' }),
-      selectField({ id:'areaType', label:'Flächenart', value:areaType, options:areaOptionsForMode(mode), commit:'defer', lookup:false }),
+      selectField({ id:'areaType', label:'Flächenart', value:areaType, options:areaOptionsForMode(mode), commit:'immediate', lookup:true }),
       field({ id:'areaSize', label:'Fläche A', value:fmtInput(s.areaSize,1), unit:'m²' }),
       selected?.custom ? field({ id:'customCs', label:'Spitzenabflussbeiwert Cs', value:s.customCs || '', placeholder:'0,9' }) : inlineStats([{ label:'Cs', value:fmt(selected.cs,2) }, { label:'Cm', value:fmt(selected.cm,2) }])
     ].join(''), 2),
-    selected?.custom ? grid([field({ id:'customCm', label:'mittlerer Abflussbeiwert Cm', value:s.customCm || '', placeholder:'0,8' })].join(''), 1) : '',
-    `<div class="tc-save-actions"><button type="button" class="action-button action-button--secondary" data-tc-action="rainwater:surface-add" data-surface-add>Speichern</button><button type="button" class="action-button" data-tc-action="rainwater:surface-update" data-surface-update ${s.activeSurfaceId ? '' : 'disabled'}>Aktualisieren</button></div>`,
-    surfacesTable(r, s)
+    selected?.custom ? grid([field({ id:'customCm', label:'mittlerer Abflussbeiwert Cm', value:s.customCm || '', placeholder:'0,8' })].join(''), 1) : ''
   ].join(''));
+}
+function surfaceSaveCard(s, r) {
+  return card('Gespeicherte Flächen', stack([
+    field({ id:'areaName', label:'Bezeichnung', value:s.areaName || '', placeholder:'z. B. Dachfläche Nord', inputmode:'text' }),
+    `<div class="tc-save-actions"><button type="button" class="action-button action-button--secondary" data-tc-action="rainwater:surface-add" data-surface-add ${s.activeSurfaceId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-tc-action="rainwater:surface-update" data-surface-update ${s.activeSurfaceId ? '' : 'disabled'}>Aktualisieren</button></div>`,
+    `<div data-rainwater-dynamic="surface-list">${surfacesTable(r, s)}</div>`
+  ].join('')), 'green');
 }
 function inputCards(s, r) {
   return stack([
@@ -141,7 +150,8 @@ function inputCards(s, r) {
     card('Regenspende', rainInputBlock(s), 'green'),
     card('Dacheinläufe / Hoftöpfe', dimensionInputBlock(s), 'green'),
     card('Notentwässerung', emergencyInputBlock(s), 'green'),
-    card('Regenflächen', surfaceInputBlock(s, r), 'green')
+    card('Regenfläche', surfaceInputBlock(s), 'green'),
+    surfaceSaveCard(s, r)
   ].join(''));
 }
 function warningList(warnings, s) {
@@ -291,6 +301,33 @@ function normalizeSurfaceFieldValue(field, value) {
   return surfaceNumericFields.has(field) ? canonicalGermanNumberInput(value) : value;
 }
 
+function patchLookupDefaults(patch = {}, base = state.get()) {
+  const next = { ...patch };
+  const drainSize = next.drainSize || base.drainSize;
+  if (Object.prototype.hasOwnProperty.call(patch, 'drainSize')) {
+    const preset = roofDrainTable.find(item => item.dn === drainSize) || roofDrainTable.find(item => item.dn === 'DN 100') || roofDrainTable[0];
+    next.drainSizeManual = preset?.dn || drainSize || 'DN 100';
+    next.drainCapacity = preset?.capacity != null ? String(preset.capacity).replace('.', ',') : '';
+    next.drainHead = preset?.head != null ? String(preset.head) : '';
+  }
+  if (Object.prototype.hasOwnProperty.call(patch, 'emergencyType')) {
+    const type = next.emergencyType || base.emergencyType || 'rect';
+    if (type === 'rect') {
+      next.emergencyWidth = base.emergencyWidth || '300';
+      next.emergencyDiameter = '';
+      next.emergencyCapacity = '';
+    } else if (type === 'round') {
+      next.emergencyDiameter = base.emergencyDiameter || '100';
+      next.emergencyWidth = '';
+      next.emergencyCapacity = '';
+    } else if (type === 'manual') {
+      next.emergencyWidth = '';
+      next.emergencyDiameter = '';
+    }
+  }
+  return next;
+}
+
 const surfaceEditFields = new Set(['surfaceMode','areaType','areaName','areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity','drainSize','drainSizeManual','drainCapacity','drainHead','stackCount','emergencyType','emergencyHead','emergencyWidth','emergencyDiameter','emergencyManufacturerDn','emergencyCapacity','emergencySafetyFactor']);
 function preserveScroll(action) {
   keepScroll(action);
@@ -308,7 +345,7 @@ function bindActions(root) {
     const current = state.get();
     const patch = surfacePatchFromState(current);
     const base = getAreaType(patch.areaType || defaultAreaTypeForMode(patch.surfaceMode));
-    const record = { id:`${Date.now()}-${Math.random().toString(16).slice(2)}`, ...patch };
+    const record = { id:createRecordId('rain-surface'), ...patch };
     if (base?.custom) { record.customCs = current.customCs; record.customCm = current.customCm; }
     preserveScroll(() => state.set({
       ...resetSurfaceEditorAfterAdd(current),
@@ -345,7 +382,7 @@ function bindActions(root) {
     const id = carrier?.getAttribute?.('data-rainwater-surface-delete') || carrier?.getAttribute?.('data-surface-delete');
     if (!id) return;
     const current = state.get();
-    const next = (current.surfaces || []).filter(item => !isSameId(item.id, id));
+    const next = removeRecord(current.surfaces || [], id);
     state.set({
       surfaces: next,
       activeSurfaceId: isSameId(current.activeSurfaceId, id) ? null : current.activeSurfaceId,
@@ -377,6 +414,26 @@ function bindActions(root) {
       expandedSurfaceResultId: null
     }, { action:'rainwater:surface-mode-select' }));
   };
+
+  const normalizeLookupsAfterCommit = event => {
+    const fieldName = event?.detail?.field;
+    if (fieldName !== 'drainSize' && fieldName !== 'emergencyType' && fieldName !== 'areaType') return;
+    const current = state.get();
+    if (fieldName === 'areaType') {
+      state.set({ areaType: normalizeAreaType(current.surfaceMode || current.calculationType || 'roof', current.areaType) }, { action:'rainwater:area-type-normalize', notify:true });
+      return;
+    }
+    state.set(patchLookupDefaults({ [fieldName]: current[fieldName] }, current), { action:`rainwater:${fieldName}:lookup`, notify:true });
+  };
+  if (!root.__tcRainwaterLookupHydrationBound) {
+    root.__tcRainwaterLookupHydrationBound = true;
+    root.addEventListener('tc:commit', normalizeLookupsAfterCommit);
+    root.__tcRainwaterLookupHydrationCleanup = () => {
+      root.removeEventListener('tc:commit', normalizeLookupsAfterCommit);
+      root.__tcRainwaterLookupHydrationBound = false;
+      root.__tcRainwaterLookupHydrationCleanup = null;
+    };
+  }
 
   registerCentralActions(root, {
     'segment': selectSegment,

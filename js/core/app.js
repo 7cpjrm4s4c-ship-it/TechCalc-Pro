@@ -84,12 +84,35 @@ document.addEventListener('click', event => {
 const app = document.getElementById('app');
 let renderToken = 0;
 let cleanupCurrentModule = () => {};
+function resetAppRootPlatformState(root) {
+  if (!root) return;
+  try { root.__tcCentralEventPipelineCleanup?.(); } catch { /* stale module pipeline cleanup */ }
+  try { root.__tcRainwaterLookupHydrationCleanup?.(); } catch { /* rainwater module cleanup */ }
+  root.__tcCentralEventPipelineBound = false;
+  root.__tcCentralEventPipelineState = null;
+  root.__tcCentralEventPipelineCleanup = null;
+  root.__tcRainwaterLookupHydrationCleanup = null;
+  root.__tcRainwaterLookupHydrationBound = false;
+  root.__tcActionHandlers = {};
+  root.__tcTouchGesture = null;
+  root.__tcPointerGesture = null;
+  if (root.dataset) {
+    delete root.dataset.tcPointerAction;
+    delete root.dataset.tcPointerActionAt;
+    delete root.dataset.tcSuppressTouchClickAt;
+    delete root.dataset.tcSuppressPointerActionAt;
+    delete root.dataset.tcCommittedActionAt;
+  }
+}
+
 async function render(id){
   const module = modules.get(id);
   if (!module) return;
   const token = ++renderToken;
   app.dataset.renderToken = String(token);
+  resetAppRootPlatformState(app);
   cleanupCurrentModule();
+  resetAppRootPlatformState(app);
   cleanupCurrentModule = () => {};
   renderNavigation(id);
   app.setAttribute('aria-busy', 'true');
