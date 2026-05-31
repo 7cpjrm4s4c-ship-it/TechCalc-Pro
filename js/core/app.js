@@ -41,7 +41,12 @@ function registerLazyModule({ config, path, module: eagerModule }) {
       const renderToken = root?.dataset?.renderToken || '';
       let loaded = moduleCache.get(config.id);
       if (!loaded) {
-        loaded = import(path).then(mod => mod.default || mod);
+        loaded = import(path)
+          .then(mod => mod.default || mod)
+          .catch(error => {
+            moduleCache.delete(config.id);
+            throw error;
+          });
         moduleCache.set(config.id, loaded);
       }
       const module = await loaded;
@@ -199,9 +204,6 @@ function resetAppRootPlatformState(root) {
   }
 }
 
-let renderQueue = Promise.resolve(true);
-let latestRequestedModuleId = '';
-
 function disposeCurrentModule() {
   try { cleanupCurrentModule?.(); } catch (error) {
     console.warn('Modul-Cleanup konnte nicht vollständig ausgeführt werden.', error);
@@ -210,12 +212,28 @@ function disposeCurrentModule() {
   resetAppRootPlatformState(app);
 }
 
+const MODULE_MOUNT_TIMEOUT_MS = 7000;
+function withModuleMountTimeout(promise, id, token) {
+  let timeoutId = 0;
+  const timeout = new Promise((_, reject) => {
+    timeoutId = window.setTimeout(() => {
+      reject(new Error(`Modul ${id} konnte nicht vollständig gemountet werden.`));
+    }, MODULE_MOUNT_TIMEOUT_MS);
+  });
+  return Promise.race([Promise.resolve(promise), timeout])
+    .finally(() => { if (timeoutId) window.clearTimeout(timeoutId); });
+}
+
 async function performModuleRender(id) {
   const module = modules.get(id);
   if (!module) return false;
   const token = ++renderToken;
   app.dataset.renderToken = String(token);
 
+  // Phase 15B: rendering is intentionally NOT queued behind a previous module
+  // mount. A stale async render must never block the latest user selection in
+  // the loading state. The render token is the single source of truth: older
+  // mounts may finish later, but their cleanup/result is discarded.
   disposeCurrentModule();
 
   app.setAttribute('aria-busy', 'true');
@@ -223,7 +241,7 @@ async function performModuleRender(id) {
   app.innerHTML = '<div class="card tc-module-loading" role="status">Modul wird geladen...</div>';
 
   try {
-    const cleanup = await Promise.resolve(module.mount(app));
+    const cleanup = await withModuleMountTimeout(module.mount(app), id, token);
     if (token !== renderToken) {
       if (typeof cleanup === 'function') cleanup();
       return false;
@@ -241,28 +259,14 @@ async function performModuleRender(id) {
     if (token === renderToken) {
       app.removeAttribute('aria-busy');
       delete app.dataset.pendingModuleId;
-      app.focus({ preventScroll:true });
+      try { app.focus({ preventScroll:true }); } catch { /* focus is optional */ }
     }
   }
 }
 
 function render(id){
   if (!modules.get(id)) return Promise.resolve(false);
-  latestRequestedModuleId = id;
-
-  // Phase 15A: module rendering is serialized globally. Navigation may emit
-  // click, popstate, hashchange or project-load requests in quick succession;
-  // only this queue is allowed to touch the module root. This prevents the
-  // broken state "navigation active, content stuck on loading" after switching
-  // Heizung/Lüftung -> other module -> back -> other module.
-  renderQueue = renderQueue
-    .catch(() => true)
-    .then(async () => {
-      const target = latestRequestedModuleId || id;
-      return performModuleRender(target);
-    });
-
-  return renderQueue;
+  return performModuleRender(id);
 }
 
 initRouter(render);
