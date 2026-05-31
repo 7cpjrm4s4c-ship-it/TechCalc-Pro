@@ -105,13 +105,17 @@ function moduleNavButtonFromEvent(event) {
 function commitGlobalModuleNav(button, event) {
   if (!button?.dataset?.moduleId) return false;
   const id = button.dataset.moduleId;
+  const root = document.getElementById('app');
+  const isMountedActive = root?.dataset?.activeModuleId === id && !root?.hasAttribute?.('aria-busy');
+  const isPendingActive = root?.dataset?.pendingModuleId === id && root?.hasAttribute?.('aria-busy');
   event?.preventDefault?.();
   event?.stopPropagation?.();
   event?.stopImmediatePropagation?.();
 
   const overflow = document.getElementById('overflowMenu');
   if (overflow) overflow.hidden = true;
-  navigate(id, { force: true });
+  if (isMountedActive || isPendingActive) return true;
+  navigate(id);
   return true;
 }
 

@@ -23,6 +23,7 @@ const commands = [
   ['node', ['tests/rainwater-phase14l.test.mjs']],
   ['node', ['tests/router-direct-navigation.test.mjs']],
   ['node', ['tests/router-single-navigation-path.test.mjs']],
+  ['node', ['tests/router-same-module-guard-phase15c.test.mjs']],
   ['node', ['tests/module-lifecycle-phase15a.test.mjs']],
   ['node', ['tests/central-platform-pipeline.test.mjs']],
   ['node', ['tests/state-binding.test.mjs']],

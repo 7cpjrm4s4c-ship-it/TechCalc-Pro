@@ -576,3 +576,9 @@
 - App-Root wird nur noch über einen globalen Renderpfad beschrieben.
 - Cleanup alter Modul-/Event-Pipeline-Zustände vor jedem neuen Mount gehärtet.
 - Fehlerbild „Modul wird geladen...“ nach wiederholtem Modulwechsel reduziert.
+
+### Phase 15C - Global Router Same-Module Guard
+- Der globale Router ignoriert erneute Aktivierungen des bereits gemounteten Moduls.
+- Navigation startet keinen neuen Mount mehr, wenn das Zielmodul bereits aktiv oder gerade pending ist.
+- Touch/Click auf aktive Module kann keinen dauerhaften Loading-State mehr erzeugen.
+- Heizung, Lüftung und Trinkwasser dienen als Vergleichsverhalten: stabile Module bleiben gemountet, statt neu initialisiert zu werden.
