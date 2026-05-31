@@ -31,6 +31,10 @@ function resetRootLifecycleState(root) {
   root.__tcActionHandlers = {};
   root.__tcTouchGesture = null;
   root.__tcPointerGesture = null;
+  // DOM render cache belongs to the currently mounted markup. It must be
+  // cleared before every module transition because legacy and fully migrated
+  // modules do not all use the same low-level renderer yet.
+  root.__tcLastHtml = '';
 
   if (root.dataset) {
     delete root.dataset.tcPointerAction;

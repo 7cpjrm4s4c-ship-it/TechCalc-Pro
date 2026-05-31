@@ -1,5 +1,5 @@
 {
-  "directDomWrites": 12,
+  "directDomWrites": 13,
   "moduleDirectDomWrites": 4,
   "status": "ok",
   "note": "Phase 7 allows shell/navigation writes, but module-level writes must continue moving toward safeReplaceContent or granular updates.",

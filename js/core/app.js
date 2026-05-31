@@ -226,6 +226,10 @@ async function performModuleRender(id) {
 
   app.setAttribute('aria-busy', 'true');
   app.dataset.pendingModuleId = id;
+  // Direct loading markup invalidates the safeReplaceContent cache. Without this
+  // reset, a subsequent module using the cached renderer can falsely skip its
+  // mount replacement and leave the loading card in the app shell.
+  app.__tcLastHtml = '';
   app.innerHTML = '<div class="card tc-module-loading" role="status">Modul wird geladen...</div>';
 
   try {

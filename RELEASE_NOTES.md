@@ -1,4 +1,10 @@
 
+## Version 1.3.0 – Phase 15E DOM Cache Router Fix
+- Behebt dauerhaftes `Modul wird geladen...` nach wiederholten Modulwechseln zwischen Referenz- und Legacy-Modulen.
+- `safeReplaceContent` validiert jetzt den echten DOM-Inhalt vor Cache-Skip.
+- Modul-Lifecycle und Router invalidieren den DOM-Render-Cache vor Mount-Wechseln.
+
+
 ## 1.3.0 – Phase 15D Legacy Module Adapter
 
 - zentralen Legacy Module Adapter ergänzt

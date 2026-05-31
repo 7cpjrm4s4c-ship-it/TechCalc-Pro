@@ -1,7 +1,12 @@
 export function safeReplaceContent(root, html, options = {}) {
   if (!root) return false;
   const next = String(html ?? '');
-  if (root.__tcLastHtml === next) return false;
+  // The HTML cache is only valid when the actual DOM still contains the same
+  // markup. Some migrated reference modules still write via root.innerHTML, and
+  // the global router also writes a loading placeholder directly. If the cache
+  // alone is trusted, a later module mount can skip the replacement and leave
+  // "Modul wird geladen..." visible forever.
+  if (root.__tcLastHtml === next && root.innerHTML === next) return false;
 
   const active = document.activeElement;
   const activeKey = active && root.contains(active) ? getStableKey(active) : null;
