@@ -13,6 +13,7 @@ import bufferStorageConfig from '../modules/buffer-storage/config.js';
 import wastewaterConfig from '../modules/wastewater/config.js';
 import rainwaterConfig from '../modules/rainwater/config.js';
 import { restoreSessionSnapshot, saveSessionSnapshot } from './projectStorage.js';
+import { createModuleLifecycleAdapter, hardResetModuleRoot } from './moduleLifecycleAdapter.js';
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
@@ -31,7 +32,7 @@ const lazyModules = [
 const moduleCache = new Map();
 function registerLazyModule({ config, path, module: eagerModule }) {
   if (eagerModule) {
-    modules.register({ config, mount: eagerModule.mount });
+    modules.register({ config, mount: createModuleLifecycleAdapter(config.id, eagerModule.mount) });
     return;
   }
 
@@ -56,7 +57,7 @@ function registerLazyModule({ config, path, module: eagerModule }) {
       if (!module || typeof module.mount !== 'function') {
         throw new Error(`Modul ${config.id} konnte nicht initialisiert werden.`);
       }
-      return module.mount(root);
+      return createModuleLifecycleAdapter(config.id, module.mount)(root);
     }
   });
 }
@@ -188,24 +189,7 @@ const app = document.getElementById('app');
 let renderToken = 0;
 let cleanupCurrentModule = () => {};
 function resetAppRootPlatformState(root) {
-  if (!root) return;
-  try { root.__tcCentralEventPipelineCleanup?.(); } catch { /* stale module pipeline cleanup */ }
-  try { root.__tcRainwaterLookupHydrationCleanup?.(); } catch { /* rainwater module cleanup */ }
-  root.__tcCentralEventPipelineBound = false;
-  root.__tcCentralEventPipelineState = null;
-  root.__tcCentralEventPipelineCleanup = null;
-  root.__tcRainwaterLookupHydrationCleanup = null;
-  root.__tcRainwaterLookupHydrationBound = false;
-  root.__tcActionHandlers = {};
-  root.__tcTouchGesture = null;
-  root.__tcPointerGesture = null;
-  if (root.dataset) {
-    delete root.dataset.tcPointerAction;
-    delete root.dataset.tcPointerActionAt;
-    delete root.dataset.tcSuppressTouchClickAt;
-    delete root.dataset.tcSuppressPointerActionAt;
-    delete root.dataset.tcCommittedActionAt;
-  }
+  hardResetModuleRoot(root);
 }
 
 function disposeCurrentModule() {

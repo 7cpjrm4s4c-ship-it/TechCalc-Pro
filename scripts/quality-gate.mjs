@@ -25,6 +25,7 @@ const commands = [
   ['node', ['tests/router-single-navigation-path.test.mjs']],
   ['node', ['tests/router-same-module-guard-phase15c.test.mjs']],
   ['node', ['tests/module-lifecycle-phase15a.test.mjs']],
+  ['node', ['tests/module-lifecycle-phase15d.test.mjs']],
   ['node', ['tests/central-platform-pipeline.test.mjs']],
   ['node', ['tests/state-binding.test.mjs']],
   ['node', ['tests/event-pipeline-phase11d.test.mjs']],

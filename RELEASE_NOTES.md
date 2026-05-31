@@ -1,3 +1,12 @@
+
+## 1.3.0 – Phase 15D Legacy Module Adapter
+
+- zentralen Legacy Module Adapter ergänzt
+- alle Lazy-Module laufen über denselben Mount-/Unmount-Vertrag
+- alte Event-Pipelines und Gesten-Zustände werden vor jedem Mount bereinigt
+- optionaler `lifecycle`-Context für künftige Modulmigrationen vorbereitet
+- Ziel: stabile Wechsel aus globalisierten Modulen zu noch nicht migrierten Modulen
+
 ## Version 1.3.0 – Phase 14K Regenwasser Final Stability
 - Modulwechsel aus Heizung/Kälte und Lüftung nach Regenwasser und andere Module stabilisiert.
 - Regenwasser-Selects übernehmen Lookup-Werte ohne zweiten Touch und ohne erneutes Öffnen der Auswahlkarte.
