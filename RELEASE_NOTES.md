@@ -549,3 +549,9 @@
 
 ## 1.3.0 Phase 14J
 - Regenwasser: Navigation, Select-Hydration, Switch-Render, Normhinweis-Position und gespeicherte Notentwässerungswerte stabilisiert.
+
+## Version 1.3.0 - Phase 14M Regenwasser Router Direct Render
+- Modulwechsel nutzt einen direkten pushState-Renderpfad statt doppelte hashchange-Renderzyklen.
+- Navigation aus Heizung/Kälte und Lüftung zu Regenwasser/Legacy-Modulen rendert das Zielmodul sofort.
+- Overflow-Menü ist im globalen Modulwechsel-Handler enthalten.
+- Regressionstest für direkte Router-Navigation ergänzt.

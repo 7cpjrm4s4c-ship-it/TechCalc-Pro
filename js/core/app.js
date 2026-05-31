@@ -85,11 +85,11 @@ document.addEventListener('click', event => {
 let globalNavHandledAt = 0;
 let globalNavHandledId = '';
 function handleGlobalModuleNav(event) {
-  const button = event.target?.closest?.('.module-nav [data-module-id]');
+  const button = event.target?.closest?.('.module-nav [data-module-id], #overflowMenu [data-module-id]');
   if (!button?.dataset?.moduleId) return;
   const now = Date.now();
   const id = button.dataset.moduleId;
-  if (globalNavHandledId === id && now - globalNavHandledAt < 500) {
+  if (globalNavHandledId === id && now - globalNavHandledAt < 500 && currentRoute() === id) {
     event.preventDefault?.();
     event.stopPropagation?.();
     event.stopImmediatePropagation?.();
