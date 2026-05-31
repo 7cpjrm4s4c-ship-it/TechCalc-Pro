@@ -199,33 +199,38 @@ function resetAppRootPlatformState(root) {
   }
 }
 
-async function render(id){
+let renderQueue = Promise.resolve(true);
+let latestRequestedModuleId = '';
+
+function disposeCurrentModule() {
+  try { cleanupCurrentModule?.(); } catch (error) {
+    console.warn('Modul-Cleanup konnte nicht vollständig ausgeführt werden.', error);
+  }
+  cleanupCurrentModule = () => {};
+  resetAppRootPlatformState(app);
+}
+
+async function performModuleRender(id) {
   const module = modules.get(id);
   if (!module) return false;
   const token = ++renderToken;
   app.dataset.renderToken = String(token);
 
-  cleanupCurrentModule();
-  cleanupCurrentModule = () => {};
-  resetAppRootPlatformState(app);
+  disposeCurrentModule();
 
   app.setAttribute('aria-busy', 'true');
   app.dataset.pendingModuleId = id;
-  // Replace old module content with a stable loading shell before the async
-  // module import/mount starts. This prevents the broken state "nav active, old
-  // content still rendered" when a prior route is selected twice or an async
-  // mount gets cancelled by a duplicate event.
   app.innerHTML = '<div class="card tc-module-loading" role="status">Modul wird geladen...</div>';
 
   try {
-    const cleanup = await module.mount(app);
+    const cleanup = await Promise.resolve(module.mount(app));
     if (token !== renderToken) {
       if (typeof cleanup === 'function') cleanup();
       return false;
     }
     cleanupCurrentModule = typeof cleanup === 'function' ? cleanup : () => {};
-    renderNavigation(id);
     app.dataset.activeModuleId = id;
+    renderNavigation(id);
     return true;
   } catch (error) {
     if (token !== renderToken) return false;
@@ -240,6 +245,26 @@ async function render(id){
     }
   }
 }
+
+function render(id){
+  if (!modules.get(id)) return Promise.resolve(false);
+  latestRequestedModuleId = id;
+
+  // Phase 15A: module rendering is serialized globally. Navigation may emit
+  // click, popstate, hashchange or project-load requests in quick succession;
+  // only this queue is allowed to touch the module root. This prevents the
+  // broken state "navigation active, content stuck on loading" after switching
+  // Heizung/Lüftung -> other module -> back -> other module.
+  renderQueue = renderQueue
+    .catch(() => true)
+    .then(async () => {
+      const target = latestRequestedModuleId || id;
+      return performModuleRender(target);
+    });
+
+  return renderQueue;
+}
+
 initRouter(render);
 renderQuickAccessSettings();
 

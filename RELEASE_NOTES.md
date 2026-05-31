@@ -570,3 +570,9 @@
 - Der Content-Bereich wird vor asynchronem Mount geleert, damit kein Zustand "Nav aktiv, alter Content sichtbar" entstehen kann.
 - Navigation wird erst nach erfolgreichem Content-Mount aktiv gerendert.
 - Mobile "Weitere Module"-Card gegen Scroll-Jitter stabilisiert.
+
+## 1.3.0 – Phase 15A Module Lifecycle Cleanup
+- Zentralen Modulwechsel serialisiert.
+- App-Root wird nur noch über einen globalen Renderpfad beschrieben.
+- Cleanup alter Modul-/Event-Pipeline-Zustände vor jedem neuen Mount gehärtet.
+- Fehlerbild „Modul wird geladen...“ nach wiederholtem Modulwechsel reduziert.
