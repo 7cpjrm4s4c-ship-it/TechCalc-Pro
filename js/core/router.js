@@ -24,9 +24,12 @@ export function navigate(id) {
     return;
   }
   window.location.hash = `/${id}`;
-  // Mobile Safari can occasionally delay or drop hashchange after pointer-driven
-  // navigation from highly interactive modules. The route callback is idempotent
-  // and render-token guarded, so this fallback makes module switches deterministic.
+  // Navigation must not depend on hashchange timing. Highly interactive modules
+  // such as Heizung/Kälte and Lüftung can leave pointer/touch reconciliation work
+  // pending; rendering the route immediately keeps Wechsel zu Regenwasser and the
+  // other platform modules deterministic. The render callback is token guarded and
+  // therefore safe when the subsequent hashchange fires as well.
+  renderCallback(id);
   window.setTimeout(() => {
     if (currentRoute() === id) renderCallback(id);
   }, 0);

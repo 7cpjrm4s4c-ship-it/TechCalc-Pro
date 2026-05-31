@@ -20,6 +20,7 @@ const commands = [
   ['node', ['tests/rainwater-phase14e.test.mjs']],
   ['node', ['tests/rainwater-phase14f.test.mjs']],
   ['node', ['tests/rainwater-phase14g.test.mjs']],
+  ['node', ['tests/rainwater-phase14l.test.mjs']],
   ['node', ['tests/central-platform-pipeline.test.mjs']],
   ['node', ['tests/state-binding.test.mjs']],
   ['node', ['tests/event-pipeline-phase11d.test.mjs']],

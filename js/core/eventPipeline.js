@@ -201,8 +201,15 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   };
 
   const onInput = event => {
-    const el = event.target?.closest?.('input[data-field], textarea[data-field]');
+    const el = event.target?.closest?.('input[data-field], textarea[data-field], select[data-field]');
     if (!el || !root.contains(el)) return;
+    if (el.matches('select')) {
+      const deferRender = el.dataset.render === 'defer';
+      commitElementField(state, el, { action: 'field:input:select', notify: !deferRender, root });
+      hasDeferredInput = false;
+      notifyCommit({ action: 'field:input:select', element: el });
+      return;
+    }
     commitElementField(state, el, { action: 'field:input', notify: false, root });
     hasDeferredInput = true;
     notifyCommit({ action: 'field:input', element: el });

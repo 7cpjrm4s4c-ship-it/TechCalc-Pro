@@ -41,17 +41,21 @@ function calcEmergencyOverflow(qNotBase, source, mode, fallback = {}) {
   const qNot = mode === 'roof' ? Math.max(0, qNotBase * settings.safetyFactor) : 0;
   const head = settings.head;
   const rectCapacity = settings.type === 'rect' && settings.width > 0 && head > 0 ? (settings.width * Math.pow(head, 1.5)) / 24000 : 0;
+  // Simple preliminary round overflow capacity from opening area and pressure head.
+  // Manufacturer values still override when entered manually.
+  const roundCapacity = settings.type === 'round' && settings.diameter > 0 && head > 0 ? (Math.PI * Math.pow(settings.diameter / 1000, 2) / 4) * Math.sqrt(2 * 9.81 * (head / 1000)) * 1000 : 0;
   const manualCapacity = settings.manualCapacity > 0 ? settings.manualCapacity : 0;
-  const capacity = settings.type === 'rect' ? (manualCapacity || rectCapacity) : manualCapacity;
+  const capacity = settings.type === 'rect' ? (manualCapacity || rectCapacity) : settings.type === 'round' ? (manualCapacity || roundCapacity) : manualCapacity;
   const requiredCount = capacity > 0 ? Math.ceil(qNot / capacity) : 0;
   const rectRequiredWidth = qNot > 0 && head > 0 ? (qNot * 24000) / Math.pow(head, 1.5) : 0;
-  const rectWidthPerOverflow = settings.type === 'rect' && requiredCount > 0 ? rectRequiredWidth / requiredCount : 0;
+  const rectWidthPerOverflow = settings.type === 'rect' ? settings.width : 0;
   return {
     ...settings,
     qNot,
     qNotBase,
     capacity,
     rectCapacity,
+    roundCapacity,
     rectRequiredWidth,
     rectWidthPerOverflow,
     requiredCount

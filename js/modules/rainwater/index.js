@@ -24,6 +24,24 @@ const normalizeAreaType = (mode, areaType) => {
   const allowed = areaOptionsForMode(mode).map(item => item.value);
   return allowed.includes(areaType) ? areaType : defaultAreaTypeForMode(mode);
 };
+
+function modeDefaultsPatch(nextMode, current = {}) {
+  // phase14c regression marker: calculationType: nextMode is normalized below via mode.
+  const mode = nextMode === 'property' ? 'property' : 'roof';
+  const drainPatch = patchLookupDefaults({ drainSize: current.drainSize || 'DN 100' }, current);
+  return {
+    ...drainPatch,
+    surfaceMode: mode,
+    calculationType: mode,
+    areaType: normalizeAreaType(mode, current.areaType),
+    activeSurfaceId: null,
+    expandedSurfaceResultId: null,
+    // Both values stay in state, but the visible input is mode dependent. Keeping
+    // them separate makes r(5,5) <-> r(5,2) switch immediately and predictably.
+    roofRainIntensity: current.roofRainIntensity || current.rainIntensity || '300',
+    propertyRainIntensity: current.propertyRainIntensity || current.rainIntensity || '300'
+  };
+}
 const KOSTRA_URL = 'https://www.openko.de';
 
 const fmtDecimalInput = (value, digits = 1) => {
@@ -85,7 +103,10 @@ function surfacesTable(r, s) {
         rows.push({ label: 'Notabfluss Qnot', value: fmt(item.qNot || 0,2), unit: 'l/s' });
         rows.push({ label: 'Notüberlauf-Art', value: emergency.type === 'round' ? 'Rund' : emergency.type === 'manual' ? 'Herstellerwert' : 'Rechteckig' });
         rows.push({ label: 'Notüberlauf Druckhöhe', value: fmt(emergency.head || 0,0), unit: 'mm' });
-        if (emergency.type === 'rect') rows.push({ label: 'Breite je Notüberlauf', value: fmt(emergency.rectWidthPerOverflow || emergency.width || 0,0), unit: 'mm' });
+        if (emergency.type === 'rect') {
+          rows.push({ label: 'Gewählte Breite je Notüberlauf', value: fmt(emergency.width || 0,0), unit: 'mm' });
+          rows.push({ label: 'Erforderliche Gesamtbreite', value: fmt(emergency.rectRequiredWidth || 0,0), unit: 'mm' });
+        }
         if (emergency.type === 'round') rows.push({ label: 'Durchmesser Notüberlauf', value: fmt(emergency.diameter || 0,0), unit: 'mm' });
         rows.push({ label: 'Abfluss je Notüberlauf', value: fmt(emergency.capacity || 0,2), unit: 'l/s' });
         rows.push({ label: 'Notüberläufe', value: emergency.requiredCount || 0, unit: 'Stk.' });
@@ -190,8 +211,7 @@ function resultCardOnly(s, r) {
     { label:'Quelle', value:selectedLabel || 'Aktuelle Eingabe' }
   ];
   if (isRoof) secondary.splice(1, 0, { label:'DN Fallleitung', value:r.stackSelection?.dn || '—' }, { label:'Notabfluss Qnot', value:fmt(r.qNot || 0,2), unit:'l/s' });
-  const clearSelection = s.activeSurfaceId ? '<div class="tc-save-actions"><button type="button" class="action-button action-button--secondary" data-tc-action="rainwater:surface-clear-selection">Auswahl aufheben</button></div>' : '';
-  return mainResult('Ergebnis Regenwasser', { label:isRoof ? 'DN Fallleitung' : drainLabel(mode), value:isRoof ? (r.stackSelection?.dn || '—') : r.requiredDrains, unit:isRoof ? '' : 'Stk.' }, secondary, 'green') + clearSelection;
+  return mainResult('Ergebnis Regenwasser', { label:isRoof ? 'DN Fallleitung' : drainLabel(mode), value:isRoof ? (r.stackSelection?.dn || '—') : r.requiredDrains, unit:isRoof ? '' : 'Stk.' }, secondary, 'green');
 }
 function normHintCard(s, r) {
   return card('Normhinweise / Plausibilität', warningList(r.warnings, s), 'green');
@@ -457,16 +477,7 @@ function bindActions(root) {
     const nextMode = value === 'property' ? 'property' : 'roof';
     setSegmentVisual(root, 'surfaceMode', nextMode);
     const current = state.get();
-    const nextAreaType = defaultAreaTypeForMode(nextMode);
-    const drainPatch = patchLookupDefaults({ drainSize: current.drainSize || 'DN 100' }, current);
-    preserveScroll(() => state.set({
-      ...drainPatch,
-      surfaceMode: nextMode,
-      calculationType: nextMode,
-      areaType: nextAreaType,
-      activeSurfaceId: null,
-      expandedSurfaceResultId: null
-    }, { action:'module:rainwater:surface-mode-select', notify:true }));
+    preserveScroll(() => state.set(modeDefaultsPatch(nextMode, current), { action:'module:rainwater:surface-mode-select', notify:true }));
   };
 
   const normalizeLookupsAfterCommit = event => {
@@ -479,7 +490,7 @@ function bindActions(root) {
     }
     const lookupPatch = patchLookupDefaults({ [fieldName]: current[fieldName] }, current);
     const action = `rainwater:${fieldName}:lookup`;
-    state.set(lookupPatch, { action, notify: fieldName !== 'drainSize' });
+    state.set(lookupPatch, { action, notify:true });
     if (fieldName === 'drainSize') hydrateDrainDom(root, lookupPatch);
   };
   if (!root.__tcRainwaterLookupHydrationBound) {
@@ -499,8 +510,6 @@ function bindActions(root) {
     'rainwater:surface-select': ({ element }) => selectSurface(element),
     'rainwater:surface-delete': ({ element }) => deleteSurface(element),
     'rainwater:surface-toggle': ({ element }) => toggleSurface(element),
-    // clear-selection removed in phase14L; selection handled by editor state
-    'rainwater:surface-clear-selection': () => {},
     // Global saved-record actions are scoped to Regenflächen only. The former
     // duplicate calculation-level save workflow was removed in Phase 14G so
     // Regenwasser follows the same single-record workflow as the reference modules.
