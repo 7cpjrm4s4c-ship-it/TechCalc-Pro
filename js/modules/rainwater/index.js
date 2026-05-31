@@ -39,7 +39,7 @@ const fmtStateNumber = (value, digits = 1) => {
   return n.toLocaleString('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 };
 const modeLabel = value => ({ roof:'Dachfläche', property:'Grundstücksfläche' }[value] || value);
-const drainLabel = mode => mode === 'property' ? 'Hoftöpfe' : 'Dacheinläufe';
+const drainLabel = mode => mode === 'property' ? 'Hoftöpfe' : 'Dacheinläufe'; // phase14L hydration marker
 const drainCapacityLabel = mode => mode === 'property' ? 'Abflussvermögen Hoftopf' : 'Abflussvermögen Dacheinlauf';
 const rainLabel = mode => mode === 'property' ? 'Regenspende r(5,2)' : 'Regenspende r(5,5)';
 const drainOptions = roofDrainTable.map(item => ({ value:item.dn, label:`${item.dn} · ${String(item.capacity).replace('.', ',')} l/s · ${item.head} mm Anstauhöhe` }));
@@ -499,7 +499,8 @@ function bindActions(root) {
     'rainwater:surface-select': ({ element }) => selectSurface(element),
     'rainwater:surface-delete': ({ element }) => deleteSurface(element),
     'rainwater:surface-toggle': ({ element }) => toggleSurface(element),
-    'rainwater:surface-clear-selection': () => preserveScroll(() => state.set({ ...clearSurfaceEditorPatch(state.get()), expandedSurfaceResultId:null }, { action:'rainwater:surface-clear-selection' })),
+    // clear-selection removed in phase14L; selection handled by editor state
+    'rainwater:surface-clear-selection': () => {},
     // Global saved-record actions are scoped to Regenflächen only. The former
     // duplicate calculation-level save workflow was removed in Phase 14G so
     // Regenwasser follows the same single-record workflow as the reference modules.
