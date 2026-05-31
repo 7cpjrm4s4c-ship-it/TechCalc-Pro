@@ -1,12 +1,12 @@
 {
-  "totalLines": 4278,
+  "totalLines": 4303,
   "importantCount": 25,
-  "patchComments": 87,
+  "patchComments": 89,
   "legacySelectorLines": 258,
   "duplicateSelectors": [
     {
       "selector": "@media (max-width: 767px)",
-      "count": 22
+      "count": 23
     },
     {
       "selector": "@media (max-width:767px)",

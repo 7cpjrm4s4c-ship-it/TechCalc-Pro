@@ -2,12 +2,12 @@ import { modules } from './registry.js';
 
 const DEFAULT_ROUTE = 'heating-cooling';
 const HASH_PREFIX = '#/';
-let renderCallback = () => {};
+let renderCallback = () => Promise.resolve(false);
 let activeRouteId = '';
 let navigationVersion = 0;
 
 export function initRouter(onRoute) {
-  renderCallback = typeof onRoute === 'function' ? onRoute : () => {};
+  renderCallback = typeof onRoute === 'function' ? onRoute : () => Promise.resolve(false);
   window.addEventListener('hashchange', handleRouteChange);
   window.addEventListener('popstate', handleRouteChange);
 
@@ -22,25 +22,25 @@ export function initRouter(onRoute) {
   normalizeHashAndRender(initialRoute);
 }
 
-export function navigate(id) {
-  if (!modules.get(id)) return;
+export async function navigate(id, options = {}) {
+  if (!modules.get(id)) return false;
   const targetHash = `${HASH_PREFIX}${id}`;
   const currentHash = window.location.hash || '';
   navigationVersion += 1;
   activeRouteId = id;
 
-  // Use history.pushState for app-internal navigation. Changing location.hash can
-  // enqueue an additional hashchange event on mobile browsers. During a module
-  // switch from the fully pipeline-driven reference modules this produced a race:
-  // navigation was highlighted, but the content render could be cancelled by a
-  // later duplicate render token. pushState gives us exactly one synchronous
-  // render path for touch, mouse and programmatic navigation.
+  // App-internal navigation has exactly one content-render path. Touch, mouse,
+  // overflow menu and programmatic navigation all call this function directly.
+  // The content render is awaited so navigation state and module content cannot
+  // diverge into the broken state "button active, old module still visible".
   if (currentHash !== targetHash) {
     const path = `${window.location.pathname}${window.location.search}${targetHash}`;
     window.history.pushState({ moduleId: id, version: navigationVersion }, '', path);
+  } else if (options.force) {
+    window.history.replaceState({ moduleId: id, version: navigationVersion }, '', `${window.location.pathname}${window.location.search}${targetHash}`);
   }
 
-  renderCallback(id);
+  return Promise.resolve(renderCallback(id));
 }
 
 export function currentRoute() {
@@ -70,12 +70,12 @@ function normalizeHashAndRender(routeId) {
     return;
   }
 
-  renderCallback(routeId);
+  Promise.resolve(renderCallback(routeId));
 }
 
 function replaceHash(routeId) {
   const path = `${window.location.pathname}${window.location.search}${HASH_PREFIX}${routeId}`;
   window.history.replaceState({ moduleId: routeId, version: navigationVersion }, '', path);
   activeRouteId = routeId;
-  renderCallback(routeId);
+  Promise.resolve(renderCallback(routeId));
 }

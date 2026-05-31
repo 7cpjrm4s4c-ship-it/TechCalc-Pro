@@ -5,7 +5,7 @@ const source = readFileSync(new URL('../js/modules/rainwater/index.js', import.m
 const logic = readFileSync(new URL('../js/modules/rainwater/logic.js', import.meta.url), 'utf8');
 const router = readFileSync(new URL('../js/core/router.js', import.meta.url), 'utf8');
 
-assert.match(router, /renderCallback\(id\);/, 'Navigation must render the target route immediately, not only after hashchange.');
+assert.match(router, /Promise\.resolve\(renderCallback\(id\)\)/, 'Navigation must render the target route immediately, not only after hashchange.');
 assert.match(source, /modeDefaultsPatch/, 'Rainwater surfaceMode switch must hydrate dependent mode defaults in one store patch.');
 assert.match(source, /propertyRainIntensity/, 'Rainwater must keep property r(5,2) separate from roof r(5,5).');
 assert.doesNotMatch(source, /rainwater:surface-clear-selection/, 'Rainwater must not render or bind a separate clear-selection button.');

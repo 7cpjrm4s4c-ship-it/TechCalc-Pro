@@ -84,7 +84,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-14g-rainwater-global-standard phase-14l-rainwater-reference-completion"
+      "migrationStatus": "phase-14g-rainwater-global-standard phase-14l-rainwater-reference-completion phase-14m-router-direct-render"
     },
     {
       "id": "unit-converter",

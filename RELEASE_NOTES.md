@@ -555,3 +555,18 @@
 - Navigation aus Heizung/Kälte und Lüftung zu Regenwasser/Legacy-Modulen rendert das Zielmodul sofort.
 - Overflow-Menü ist im globalen Modulwechsel-Handler enthalten.
 - Regressionstest für direkte Router-Navigation ergänzt.
+
+## 1.3.0 Phase 14N - Global Router Lifecycle Stabilisierung
+
+- Modulwechsel zentralisiert: Navigation laeuft nur noch ueber einen globalen delegierten Pfad.
+- Per-Button Pointer-/Touch-/Click-Handler der Navigation entfernt, um doppelte Render-Token und abgebrochene Mounts zu verhindern.
+- `navigate(id, { force: true })` rendert das Zielmodul auch dann neu, wenn der Hash bereits auf dem Ziel steht.
+- Scroll-Gesten in der Modulnavigation werden von echten Taps unterschieden.
+- Overflow-Menue bleibt beim Scrollen/Interagieren innerhalb der Card stabil.
+- Regressionstest `router-single-navigation-path` ergaenzt.
+
+### Phase 14O – Router Lifecycle Hardening
+- Globaler Modulwechsel nutzt jetzt Click als einzigen Aktivierungspfad; Pointer-Gesten dienen nur noch zur Scroll-Erkennung.
+- Der Content-Bereich wird vor asynchronem Mount geleert, damit kein Zustand "Nav aktiv, alter Content sichtbar" entstehen kann.
+- Navigation wird erst nach erfolgreichem Content-Mount aktiv gerendert.
+- Mobile "Weitere Module"-Card gegen Scroll-Jitter stabilisiert.

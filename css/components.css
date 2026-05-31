@@ -4275,3 +4275,28 @@ body::before {
   text-align: center;
   width: 100%;
 }
+
+/* Phase 14O: stable global overflow module menu during mobile scroll. */
+@media (max-width: 767px) {
+  .overflow-menu:not([hidden]) {
+    position: fixed;
+    left: 18px;
+    right: 18px;
+    top: auto;
+    bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 22px);
+    width: auto;
+    max-height: min(55vh, 420px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    transform: translateZ(0);
+    contain: layout paint;
+  }
+
+  .overflow-menu__card,
+  .overflow-menu__list {
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+  }
+}

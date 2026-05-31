@@ -82,31 +82,98 @@ document.addEventListener('click', event => {
 }, { capture: true });
 
 
-let globalNavHandledAt = 0;
-let globalNavHandledId = '';
-function handleGlobalModuleNav(event) {
-  const button = event.target?.closest?.('.module-nav [data-module-id], #overflowMenu [data-module-id]');
-  if (!button?.dataset?.moduleId) return;
-  const now = Date.now();
+const NAV_INTERACTIVE_SELECTOR = '.module-nav [data-module-id], #overflowMenu [data-module-id]';
+const NAV_MOVE_TOLERANCE_PX = 10;
+let navPointerGesture = null;
+let navLastTapWasScroll = false;
+let navLastTapAt = 0;
+
+function navPoint(event) {
+  if (!event) return null;
+  return { x: Number(event.clientX || 0), y: Number(event.clientY || 0), pointerId: event.pointerId };
+}
+
+function moduleNavButtonFromEvent(event) {
+  return event.target?.closest?.(NAV_INTERACTIVE_SELECTOR) || null;
+}
+
+function commitGlobalModuleNav(button, event) {
+  if (!button?.dataset?.moduleId) return false;
   const id = button.dataset.moduleId;
-  if (globalNavHandledId === id && now - globalNavHandledAt < 500 && currentRoute() === id) {
-    event.preventDefault?.();
-    event.stopPropagation?.();
-    event.stopImmediatePropagation?.();
-    return;
-  }
-  globalNavHandledAt = now;
-  globalNavHandledId = id;
-  event.preventDefault?.();
-  event.stopPropagation?.();
-  event.stopImmediatePropagation?.();
+  event?.preventDefault?.();
+  event?.stopPropagation?.();
+  event?.stopImmediatePropagation?.();
+
   const overflow = document.getElementById('overflowMenu');
   if (overflow) overflow.hidden = true;
-  navigate(id);
+  navigate(id, { force: true });
+  return true;
 }
-document.addEventListener('pointerup', handleGlobalModuleNav, true);
-document.addEventListener('touchend', handleGlobalModuleNav, { capture: true, passive: false });
-document.addEventListener('click', handleGlobalModuleNav, true);
+
+function onGlobalNavPointerDown(event) {
+  const button = moduleNavButtonFromEvent(event);
+  if (!button) return;
+  const point = navPoint(event);
+  navPointerGesture = point ? { ...point, button, moved: false } : null;
+  navLastTapWasScroll = false;
+}
+
+function onGlobalNavPointerMove(event) {
+  if (!navPointerGesture) return;
+  if (navPointerGesture.pointerId !== undefined && event.pointerId !== undefined && navPointerGesture.pointerId !== event.pointerId) return;
+  const point = navPoint(event);
+  if (!point) return;
+  const dx = Math.abs(point.x - navPointerGesture.x);
+  const dy = Math.abs(point.y - navPointerGesture.y);
+  if (dx > NAV_MOVE_TOLERANCE_PX || dy > NAV_MOVE_TOLERANCE_PX) {
+    navPointerGesture.moved = true;
+    navLastTapWasScroll = true;
+    navLastTapAt = Date.now();
+  }
+}
+
+function onGlobalNavPointerCancel() {
+  navPointerGesture = null;
+  navLastTapWasScroll = true;
+  navLastTapAt = Date.now();
+}
+
+function onGlobalNavPointerUp(event) {
+  const button = moduleNavButtonFromEvent(event);
+  if (!button) return;
+  if (navPointerGesture?.moved) {
+    navPointerGesture = null;
+    navLastTapWasScroll = true;
+    navLastTapAt = Date.now();
+    return;
+  }
+  navPointerGesture = null;
+  // Deliberately do not navigate on pointerup. The click event is the single
+  // route-change entry point for mouse, touch and keyboard activation. Keeping
+  // pointerup passive prevents a route from being marked active before the
+  // module content mount has actually completed.
+}
+
+function onGlobalNavClick(event) {
+  const button = moduleNavButtonFromEvent(event);
+  if (!button) return;
+  if (navLastTapWasScroll && Date.now() - navLastTapAt < 550) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation?.();
+    navLastTapWasScroll = false;
+    return;
+  }
+  navLastTapWasScroll = false;
+  commitGlobalModuleNav(button, event);
+}
+
+document.addEventListener('pointerdown', onGlobalNavPointerDown, true);
+document.addEventListener('pointermove', onGlobalNavPointerMove, { capture: true, passive: true });
+document.addEventListener('pointercancel', onGlobalNavPointerCancel, true);
+document.addEventListener('pointerup', onGlobalNavPointerUp, true);
+document.addEventListener('click', onGlobalNavClick, true);
+
 
 const app = document.getElementById('app');
 let renderToken = 0;
@@ -134,29 +201,41 @@ function resetAppRootPlatformState(root) {
 
 async function render(id){
   const module = modules.get(id);
-  if (!module) return;
+  if (!module) return false;
   const token = ++renderToken;
   app.dataset.renderToken = String(token);
-  resetAppRootPlatformState(app);
+
   cleanupCurrentModule();
-  resetAppRootPlatformState(app);
   cleanupCurrentModule = () => {};
-  renderNavigation(id);
+  resetAppRootPlatformState(app);
+
   app.setAttribute('aria-busy', 'true');
+  app.dataset.pendingModuleId = id;
+  // Replace old module content with a stable loading shell before the async
+  // module import/mount starts. This prevents the broken state "nav active, old
+  // content still rendered" when a prior route is selected twice or an async
+  // mount gets cancelled by a duplicate event.
+  app.innerHTML = '<div class="card tc-module-loading" role="status">Modul wird geladen...</div>';
+
   try {
     const cleanup = await module.mount(app);
     if (token !== renderToken) {
       if (typeof cleanup === 'function') cleanup();
-      return;
+      return false;
     }
     cleanupCurrentModule = typeof cleanup === 'function' ? cleanup : () => {};
+    renderNavigation(id);
+    app.dataset.activeModuleId = id;
+    return true;
   } catch (error) {
-    if (token !== renderToken) return;
+    if (token !== renderToken) return false;
     console.error(`Modul konnte nicht geladen werden: ${id}`, error);
     app.innerHTML = '<div class="module-error card">Modul konnte nicht geladen werden.</div>';
+    return false;
   } finally {
     if (token === renderToken) {
       app.removeAttribute('aria-busy');
+      delete app.dataset.pendingModuleId;
       app.focus({ preventScroll:true });
     }
   }

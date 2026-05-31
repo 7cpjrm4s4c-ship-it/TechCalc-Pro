@@ -9,6 +9,6 @@ assert.doesNotMatch(routerSource, /window\.location\.hash\s*=\s*`?\/\$\{id\}/, '
 assert.match(routerSource, /window\.addEventListener\('popstate'/, 'Router must still support browser back/forward navigation.');
 assert.match(routerSource, /renderCallback\(id\)/, 'navigate(id) must render the selected module immediately.');
 assert.match(appSource, /#overflowMenu \[data-module-id\]/, 'Global navigation handler must also cover overflow menu module buttons.');
-assert.match(appSource, /currentRoute\(\) === id/, 'Duplicate nav suppression must not block a route that is selected but not rendered yet.');
+assert.match(routerSource, /options\.force/, 'Duplicate nav suppression must not block a route that is selected but not rendered yet.');
 
 console.log('router direct navigation ok');
