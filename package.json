@@ -8,6 +8,7 @@
     "test:numbers": "node tests/number-service.test.mjs",
     "test:imports": "node scripts/check-js-imports.mjs",
     "test:saved-records": "node tests/saved-record-interaction.test.mjs",
+    "test:module-runtime": "node tests/module-runtime-phase16a.test.mjs",
     "test:input-confirmation": "node tests/input-confirmation.test.mjs",
     "audit:modules": "node scripts/audit-module-contracts.mjs",
     "audit:ui": "node scripts/audit-ui-classes.mjs",

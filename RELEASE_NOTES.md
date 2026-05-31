@@ -597,3 +597,11 @@
 - Navigation startet keinen neuen Mount mehr, wenn das Zielmodul bereits aktiv oder gerade pending ist.
 - Touch/Click auf aktive Module kann keinen dauerhaften Loading-State mehr erzeugen.
 - Heizung, Lüftung und Trinkwasser dienen als Vergleichsverhalten: stabile Module bleiben gemountet, statt neu initialisiert zu werden.
+
+## 1.3.0 – Phase 16A
+
+- Zentrale Module Runtime eingeführt.
+- Router/Lifecycle-Konsolidierung gestartet.
+- Modulwechsel läuft jetzt über einen verbindlichen zentralen Mount-Ablauf.
+- Loading-State, Cleanup, DOM-Cache-Reset und Navigation-Update werden zentral koordiniert.
+- Regressionstest für die neue Module Runtime ergänzt.

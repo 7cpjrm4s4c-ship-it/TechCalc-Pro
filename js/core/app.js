@@ -13,7 +13,8 @@ import bufferStorageConfig from '../modules/buffer-storage/config.js';
 import wastewaterConfig from '../modules/wastewater/config.js';
 import rainwaterConfig from '../modules/rainwater/config.js';
 import { restoreSessionSnapshot, saveSessionSnapshot } from './projectStorage.js';
-import { createModuleLifecycleAdapter, hardResetModuleRoot } from './moduleLifecycleAdapter.js';
+import { createModuleLifecycleAdapter } from './moduleLifecycleAdapter.js';
+import { createModuleRuntime } from './moduleRuntime.js';
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
@@ -186,81 +187,19 @@ document.addEventListener('click', onGlobalNavClick, true);
 
 
 const app = document.getElementById('app');
-let renderToken = 0;
-let cleanupCurrentModule = () => {};
-function resetAppRootPlatformState(root) {
-  hardResetModuleRoot(root);
-}
-
-function disposeCurrentModule() {
-  try { cleanupCurrentModule?.(); } catch (error) {
-    console.warn('Modul-Cleanup konnte nicht vollständig ausgeführt werden.', error);
+const moduleRuntime = createModuleRuntime({
+  root: app,
+  modules,
+  renderNavigation,
+  loadingView() {
+    return '<div class="card tc-module-loading" role="status">Modul wird geladen...</div>';
   }
-  cleanupCurrentModule = () => {};
-  resetAppRootPlatformState(app);
-}
-
-const MODULE_MOUNT_TIMEOUT_MS = 7000;
-function withModuleMountTimeout(promise, id, token) {
-  let timeoutId = 0;
-  const timeout = new Promise((_, reject) => {
-    timeoutId = window.setTimeout(() => {
-      reject(new Error(`Modul ${id} konnte nicht vollständig gemountet werden.`));
-    }, MODULE_MOUNT_TIMEOUT_MS);
-  });
-  return Promise.race([Promise.resolve(promise), timeout])
-    .finally(() => { if (timeoutId) window.clearTimeout(timeoutId); });
-}
-
-async function performModuleRender(id) {
-  const module = modules.get(id);
-  if (!module) return false;
-  const token = ++renderToken;
-  app.dataset.renderToken = String(token);
-
-  // Phase 15B: rendering is intentionally NOT queued behind a previous module
-  // mount. A stale async render must never block the latest user selection in
-  // the loading state. The render token is the single source of truth: older
-  // mounts may finish later, but their cleanup/result is discarded.
-  disposeCurrentModule();
-
-  app.setAttribute('aria-busy', 'true');
-  app.dataset.pendingModuleId = id;
-  // Direct loading markup invalidates the safeReplaceContent cache. Without this
-  // reset, a subsequent module using the cached renderer can falsely skip its
-  // mount replacement and leave the loading card in the app shell.
-  app.__tcLastHtml = '';
-  app.innerHTML = '<div class="card tc-module-loading" role="status">Modul wird geladen...</div>';
-
-  try {
-    const cleanup = await withModuleMountTimeout(module.mount(app), id, token);
-    if (token !== renderToken) {
-      if (typeof cleanup === 'function') cleanup();
-      return false;
-    }
-    cleanupCurrentModule = typeof cleanup === 'function' ? cleanup : () => {};
-    app.dataset.activeModuleId = id;
-    renderNavigation(id);
-    return true;
-  } catch (error) {
-    if (token !== renderToken) return false;
-    console.error(`Modul konnte nicht geladen werden: ${id}`, error);
-    app.innerHTML = '<div class="module-error card">Modul konnte nicht geladen werden.</div>';
-    return false;
-  } finally {
-    if (token === renderToken) {
-      app.removeAttribute('aria-busy');
-      delete app.dataset.pendingModuleId;
-      try { app.focus({ preventScroll:true }); } catch { /* focus is optional */ }
-    }
-  }
-}
+});
 
 function render(id){
   if (!modules.get(id)) return Promise.resolve(false);
-  return performModuleRender(id);
+  return moduleRuntime.mount(id);
 }
-
 initRouter(render);
 renderQuickAccessSettings();
 
