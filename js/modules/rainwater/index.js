@@ -6,7 +6,7 @@ import { areaTypes, roofDrainTable } from './tables.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-import { renderSavedRecordList, isSameId } from '../../core/savedRecords.js';
+import { renderSavedRecordList, renderSavedRecordPanel, isSameId } from '../../core/savedRecords.js';
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { preserveScroll as keepScroll } from '../../core/scrollManager.js';
 import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../../core/eventPipeline.js';
@@ -182,11 +182,19 @@ function surfaceInputBlock(s) {
   ].join(''));
 }
 function surfaceSaveCard(s, r) {
-  return card('Gespeicherte Flächen', stack([
-    field({ id:'areaName', label:'Bezeichnung', value:s.areaName || '', placeholder:'z. B. Dachfläche Nord', inputmode:'text' }),
-    `<div class="tc-save-actions"><button type="button" class="action-button action-button--secondary" data-tc-action="rainwater:surface-add" data-surface-add ${s.activeSurfaceId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-tc-action="rainwater:surface-update" data-surface-update ${s.activeSurfaceId ? '' : 'disabled'}>Aktualisieren</button></div>`,
-    `<div data-rainwater-dynamic="surface-list">${surfacesTable(r, s)}</div>`
-  ].join('')), 'green');
+  return renderSavedRecordPanel({
+    title: 'Gespeicherte Flächen',
+    nameFieldId: 'areaName',
+    nameLabel: 'Bezeichnung',
+    nameValue: s.areaName || '',
+    namePlaceholder: 'z. B. Dachfläche Nord',
+    addAction: 'rainwater:surface-add',
+    updateAction: 'rainwater:surface-update',
+    addDisabled: Boolean(s.activeSurfaceId),
+    updateDisabled: !s.activeSurfaceId,
+    listHtml: `<div data-rainwater-dynamic="surface-list">${surfacesTable(r, s)}</div>`,
+    accent: 'green'
+  });
 }
 function inputCards(s, r) {
   return stack([

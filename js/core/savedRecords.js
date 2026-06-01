@@ -51,6 +51,30 @@ export function renderSavedRecordList(items = [], {
   }).join('')}</div>`;
 }
 
+
+export function renderSavedRecordPanel({
+  title = 'Gespeicherte Einträge',
+  nameFieldId = 'recordName',
+  nameLabel = 'Bezeichnung',
+  nameValue = '',
+  namePlaceholder = '',
+  addAction = 'saved:add',
+  updateAction = 'saved:update',
+  addDisabled = false,
+  updateDisabled = true,
+  addLabel = 'Speichern',
+  updateLabel = 'Aktualisieren',
+  listHtml = '',
+  accent = 'blue'
+} = {}) {
+  const body = [
+    `<div class="field"><label for="${esc(nameFieldId)}">${esc(nameLabel)}</label><div class="control"><input id="${esc(nameFieldId)}" data-field="${esc(nameFieldId)}" value="${esc(nameValue)}" placeholder="${esc(namePlaceholder)}" inputmode="text"></div></div>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button action-button--secondary" data-tc-action="${esc(addAction)}" ${addDisabled ? 'disabled' : ''}>${esc(addLabel)}</button><button type="button" class="action-button" data-tc-action="${esc(updateAction)}" ${updateDisabled ? 'disabled' : ''}>${esc(updateLabel)}</button></div>`,
+    listHtml || `<div class="empty-state empty-state--compact">Noch keine Einträge gespeichert.</div>`
+  ].join('');
+  return `<section class="card card--${esc(accent)} tc-card tc-saved-record-panel"><div class="card__title tc-card__header">${esc(title)}</div><div class="card__body tc-card__body">${body}</div></section>`;
+}
+
 function bindScopedOnce(root, key, eventName, listener, options) {
   root.__tcSavedRecordBindings = root.__tcSavedRecordBindings || new Set();
   const bindingKey = `${key}:${eventName}`;
