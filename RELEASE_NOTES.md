@@ -605,3 +605,12 @@
 - Modulwechsel läuft jetzt über einen verbindlichen zentralen Mount-Ablauf.
 - Loading-State, Cleanup, DOM-Cache-Reset und Navigation-Update werden zentral koordiniert.
 - Regressionstest für die neue Module Runtime ergänzt.
+
+
+## 1.3.0 – Phase 16C Schema Renderer
+
+- Added central `schemaRenderer` for schema-driven forms and result cards.
+- `formSchema` now delegates rendering to the central renderer.
+- `schemaModuleMount` now uses `createSchemaView()` as the canonical schema render path.
+- Added Phase 16C regression test for fields, segments, selects, visibility, and result rendering.
+- Prepared the next module migrations to remove module-owned UI markup.

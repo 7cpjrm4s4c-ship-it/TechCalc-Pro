@@ -1,6 +1,6 @@
 import { renderModuleShell } from './renderer.js';
 import { mountModule } from './mount.js';
-import { renderFormSchema, renderResultSchema } from './formSchema.js';
+import { createSchemaView } from './schemaRenderer.js';
 import { defineModuleDefinition } from './moduleDefinition.js';
 
 export function createSchemaModule(definition) {
@@ -8,13 +8,9 @@ export function createSchemaModule(definition) {
   if (typeof moduleDefinition.calculate !== 'function') {
     throw new Error(`Schema module ${moduleDefinition.config.id} needs calculate(state).`);
   }
+  const schemaView = createSchemaView(moduleDefinition);
   function view(snapshot) {
-    const result = moduleDefinition.calculate(snapshot || {});
-    const body = [
-      renderFormSchema(moduleDefinition.schema, snapshot, { accent: moduleDefinition.config.accent }),
-      renderResultSchema(moduleDefinition.results, result, { accent: moduleDefinition.config.accent })
-    ].join('');
-    return renderModuleShell(moduleDefinition.config, body);
+    return renderModuleShell(moduleDefinition.config, schemaView(snapshot || {}));
   }
   return {
     ...moduleDefinition,

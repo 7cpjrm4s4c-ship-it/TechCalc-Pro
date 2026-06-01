@@ -1,5 +1,3 @@
-import { esc, card, grid, field, selectField, segmented, resultRows } from './renderer.js';
-import { numberService } from './numberService.js';
 
 export const FIELD_TYPES = Object.freeze({
   TEXT: 'text',
@@ -52,48 +50,5 @@ export function readSchemaDefaults(schema = {}) {
   }, {});
 }
 
-function renderSchemaField(def, state = {}) {
-  const value = state?.[def.key] ?? def.default ?? '';
-  const type = def.type || FIELD_TYPES.TEXT;
-  if (type === FIELD_TYPES.SELECT) {
-    return selectField({ id: def.key, label: def.label, value, options: def.options || [] });
-  }
-  if (type === FIELD_TYPES.SEGMENT || type === FIELD_TYPES.BOOLEAN) {
-    return `<div class="field field--segment"><label>${esc(def.label)}</label>${segmented(def.key, def.options || [], value, { accent: def.accent })}</div>`;
-  }
-  if (type === FIELD_TYPES.READONLY) {
-    return `<div class="field field--readonly"><label>${esc(def.label)}</label><div class="control"><output>${esc(value || '—')}</output>${def.unit ? `<span class="unit">${esc(def.unit)}</span>` : ''}</div></div>`;
-  }
-  return field({
-    id: def.key,
-    label: def.label,
-    value: type === FIELD_TYPES.DECIMAL || type === FIELD_TYPES.INTEGER ? numberService.toInput(value) : value,
-    unit: def.unit || '',
-    placeholder: def.placeholder || (type === FIELD_TYPES.TEXT ? '' : '0'),
-    type: 'text',
-    inputmode: type === FIELD_TYPES.INTEGER ? 'numeric' : type === FIELD_TYPES.DECIMAL ? 'decimal' : 'text',
-    disabled: def.disabled === true
-  });
-}
 
-export function renderFormSchema(schema = {}, state = {}, options = {}) {
-  validateFormSchema(schema);
-  const fieldsByKey = new Map((schema.fields || []).map(item => [item.key, item]));
-  const fallbackGroup = { title: options.title || 'Eingaben', fields: (schema.fields || []).map(item => item.key), columns: 2 };
-  const groups = Array.isArray(schema.groups) && schema.groups.length ? schema.groups : [fallbackGroup];
-  return groups.map(group => {
-    const fields = (group.fields || []).map(key => fieldsByKey.get(key)).filter(Boolean).map(def => renderSchemaField(def, state));
-    return card(group.title || options.title || 'Eingaben', grid(fields.join(''), group.columns || 2), group.accent || options.accent || 'blue');
-  }).join('');
-}
-
-export function renderResultSchema(resultSchema = [], result = {}, options = {}) {
-  return (resultSchema || []).map(section => {
-    const rows = (section.rows || []).map(row => ({
-      label: row.label,
-      value: typeof row.value === 'function' ? row.value(result) : result[row.key],
-      unit: row.unit || ''
-    }));
-    return card(section.title || 'Ergebnis', resultRows(rows), section.accent || options.accent || 'blue');
-  }).join('');
-}
+export { renderSchemaField, renderSchemaForm as renderFormSchema, renderSchemaResults as renderResultSchema } from './schemaRenderer.js';
