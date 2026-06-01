@@ -1,4 +1,12 @@
 
+## 1.3.0 Phase 16D
+
+- Added global CSS/UI primitives for platform-rendered modules.
+- Added CSS system audit and regression test.
+- Kept legacy module selectors as tracked migration debt.
+- Removed a duplicated CSS declaration in the pill component.
+
+
 ## Version 1.3.0 – Phase 15E DOM Cache Router Fix
 - Behebt dauerhaftes `Modul wird geladen...` nach wiederholten Modulwechseln zwischen Referenz- und Legacy-Modulen.
 - `safeReplaceContent` validiert jetzt den echten DOM-Inhalt vor Cache-Skip.

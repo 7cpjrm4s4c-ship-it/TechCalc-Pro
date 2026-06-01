@@ -1,7 +1,7 @@
 {
-  "totalLines": 4303,
+  "totalLines": 4405,
   "importantCount": 25,
-  "patchComments": 89,
+  "patchComments": 90,
   "legacySelectorLines": 258,
   "duplicateSelectors": [
     {
@@ -74,6 +74,10 @@
     },
     {
       "selector": ".overflow-menu__card",
+      "count": 3
+    },
+    {
+      "selector": ".tc-actions",
       "count": 3
     },
     {
@@ -198,10 +202,6 @@
     },
     {
       "selector": ".result-row strong",
-      "count": 2
-    },
-    {
-      "selector": ".inline-stats",
       "count": 2
     }
   ],

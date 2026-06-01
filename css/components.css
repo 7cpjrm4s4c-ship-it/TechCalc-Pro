@@ -3981,6 +3981,108 @@ body::before {
   }
 }
 
+
+/* Phase 16D: global UI/CSS primitives.
+   New module UI must compose tc-* primitives instead of module-specific classes. */
+.tc-card {
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg, 24px);
+  background: var(--card-bg, rgba(255,255,255,.04));
+  box-shadow: var(--shadow-card, none);
+}
+
+.tc-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ui-gap, 12px);
+  padding: var(--space-3, 16px) var(--space-3, 16px) 0;
+}
+
+.tc-card__title {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(16px, 1.8vw, 20px);
+  line-height: 1.2;
+  font-weight: 900;
+}
+
+.tc-card__subtitle {
+  margin: 4px 0 0;
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.tc-card__body {
+  padding: var(--space-3, 16px);
+}
+
+.tc-field {
+  min-width: 0;
+}
+
+.tc-field__label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.tc-result-list {
+  display: grid;
+  gap: var(--ui-gap, 12px);
+}
+
+.tc-result-item {
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 16px);
+  background: rgba(255,255,255,.035);
+  padding: 10px 12px;
+}
+
+.tc-result-item span {
+  display: block;
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.tc-result-item strong {
+  display: block;
+  color: var(--color-text);
+  font-size: 15px;
+  line-height: 1.3;
+  font-weight: 900;
+}
+
+.tc-save-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.tc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.tc-scroll-safe {
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
 /* Phase 3: zentrale UI-Primitives fuer neue und migrierte Module.
    Modulklassen wie dw-/ph-/rainwater- bleiben nur als Migrations-Aliasse bestehen. */
 .tc-list,
