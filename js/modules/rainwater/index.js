@@ -493,15 +493,12 @@ function bindActions(root) {
     state.set(lookupPatch, { action, notify:true });
     if (fieldName === 'drainSize') hydrateDrainDom(root, lookupPatch);
   };
-  if (!root.__tcRainwaterLookupHydrationBound) {
-    root.__tcRainwaterLookupHydrationBound = true;
-    root.addEventListener('tc:commit', normalizeLookupsAfterCommit);
-    root.__tcRainwaterLookupHydrationCleanup = () => {
-      root.removeEventListener('tc:commit', normalizeLookupsAfterCommit);
-      root.__tcRainwaterLookupHydrationBound = false;
-      root.__tcRainwaterLookupHydrationCleanup = null;
-    };
-  }
+  root.__tcRainwaterLookupHydrationCleanup?.();
+  root.__tcRainwaterLookupHydrationCleanup = registerPipelineCommitHandler(
+    root,
+    'rainwater:lookup-hydration',
+    normalizeLookupsAfterCommit
+  );
 
   registerCentralActions(root, {
     'segment': selectSegment,

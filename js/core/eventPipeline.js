@@ -15,9 +15,24 @@ function fieldPatch(el) {
 }
 
 function emitPipelineCommit(root, detail = {}) {
+  const handlers = root?.__tcCommitHandlers;
+  if (handlers && typeof handlers.forEach === 'function') {
+    handlers.forEach(handler => {
+      try { handler({ detail, root }); } catch { /* a module commit hook must not break the global pipeline */ }
+    });
+  }
   try {
     root?.dispatchEvent?.(new CustomEvent('tc:commit', { bubbles: true, detail }));
   } catch { /* CustomEvent can be unavailable in minimal test runtimes. */ }
+}
+
+export function registerPipelineCommitHandler(root, key, handler) {
+  if (!root || !key || typeof handler !== 'function') return () => {};
+  root.__tcCommitHandlers = root.__tcCommitHandlers || new Map();
+  root.__tcCommitHandlers.set(String(key), handler);
+  return () => {
+    if (root.__tcCommitHandlers?.get(String(key)) === handler) root.__tcCommitHandlers.delete(String(key));
+  };
 }
 
 export function commitElementField(state, el, meta = {}) {

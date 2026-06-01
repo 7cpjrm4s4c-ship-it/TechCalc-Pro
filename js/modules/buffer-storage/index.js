@@ -5,7 +5,7 @@ import { calculate } from './logic.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, resultRows, inlineStats, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-import { bindEditModeClear } from '../../core/savedRecords.js';
+import { bindSavedRecordWorkflow } from '../../core/savedRecordController.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
 
@@ -177,56 +177,29 @@ function view(s){
 
   return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6">${resultColumn}</div>`);
 }
-function bindActions(root, snapshot){
-  bindEditModeClear(root, { state, activeIdKey: 'activeCalculationId', nameKey: 'plantName', onClear: () => state.set(clearedBufferInputs()) });
-  root.querySelector('[data-buffer-save]')?.addEventListener('click', () => {
-    const current = state.get();
-    const result = calculate(current);
-    const saved = Array.isArray(current.savedCalculations) ? current.savedCalculations : [];
-    const record = savedSnapshot({ ...current, activeCalculationId: null }, result);
-    state.set({ savedCalculations: [record, ...saved], activeCalculationId: null, plantName: '' });
-  });
-  root.querySelector('[data-buffer-update]')?.addEventListener('click', () => {
-    const current = state.get();
-    const id = current.activeCalculationId;
-    if(!id) return;
-    const result = calculate(current);
-    const saved = Array.isArray(current.savedCalculations) ? current.savedCalculations : [];
-    const existing = saved.find(entry => String(entry.id) === String(id));
-    if(!existing) return;
-    const record = { ...savedSnapshot(current, result), id, createdAt: existing.createdAt || new Date().toISOString() };
-    state.set({ savedCalculations: saved.map(item => String(item.id) === String(id) ? record : item), activeCalculationId: id, plantName: record.name });
-  });
-  root.querySelectorAll('[data-line-toggle]').forEach(toggle => {
-    toggle.addEventListener('click', event => {
-      event.stopPropagation();
-      const itemCard = toggle.closest('[data-line-card]');
-      const collapsed = itemCard?.classList.toggle('is-collapsed');
-      toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-    });
-  });
-  root.querySelectorAll('[data-buffer-select]').forEach(button => {
-    button.addEventListener('click', event => {
-      if (event.target.closest('[data-buffer-delete]') || event.target.closest('[data-line-toggle]')) return;
-      event.preventDefault();
-      event.stopPropagation();
-      const current = state.get();
-      const item = (current.savedCalculations || []).find(entry => String(entry.id) === String(button.dataset.bufferSelect));
-      if(!item?.state) return;
-      if (String(current.activeCalculationId || '') === String(button.dataset.bufferSelect || '')) {
-        state.set({ ...clearedBufferInputs(current), savedCalculations: current.savedCalculations || [] });
-        return;
-      }
-      state.set({ ...item.state, savedCalculations: current.savedCalculations || [], activeCalculationId: item.id, plantName: item.name || item.state?.plantName || '' });
-    });
-  });
-  root.querySelectorAll('[data-buffer-delete]').forEach(button => {
-    button.addEventListener('click', event => {
-      event.stopPropagation();
-      const current = state.get();
-      const next = (current.savedCalculations || []).filter(entry => String(entry.id) !== String(button.dataset.bufferDelete));
-      state.set({ savedCalculations: next, activeCalculationId: String(current.activeCalculationId) === String(button.dataset.bufferDelete) ? null : current.activeCalculationId });
-    });
+function bindActions(root){
+  bindSavedRecordWorkflow(root, {
+    state,
+    calculate,
+    snapshot: savedSnapshot,
+    hydrate: (item, current) => ({
+      ...(item.state || {}),
+      savedCalculations: current.savedCalculations || [],
+      activeCalculationId: item.id,
+      plantName: item.name || item.state?.plantName || ''
+    }),
+    clear: current => ({ ...clearedBufferInputs(), savedCalculations: current.savedCalculations || [] }),
+    listKey: 'savedCalculations',
+    activeIdKey: 'activeCalculationId',
+    nameKey: 'plantName',
+    recordPrefix: 'buffer',
+    saveSelector: '[data-buffer-save]',
+    updateSelector: '[data-buffer-update]',
+    loadAttr: 'data-buffer-select',
+    deleteAttr: 'data-buffer-delete',
+    preserveSaveScroll: true,
+    preserveLoadScroll: true,
+    clearOnOutsideClick: true
   });
 }
 

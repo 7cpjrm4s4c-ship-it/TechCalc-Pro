@@ -31,6 +31,7 @@ const commands = [
   ['node', ['tests/saved-record-controller-phase16b.test.mjs']],
   ['node', ['tests/schema-renderer-phase16c.test.mjs']],
   ['node', ['tests/css-system-phase16d.test.mjs']],
+  ['node', ['tests/event-pipeline-phase16e.test.mjs']],
   ['node', ['tests/central-platform-pipeline.test.mjs']],
   ['node', ['tests/state-binding.test.mjs']],
   ['node', ['tests/event-pipeline-phase11d.test.mjs']],

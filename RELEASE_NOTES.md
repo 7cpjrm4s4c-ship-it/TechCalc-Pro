@@ -1,4 +1,13 @@
 
+## 1.3.0 – Phase 16E Event Pipeline Consolidation
+
+- Zentrale Commit-Hooks in der Event-Pipeline ergänzt.
+- Regenwasser-Lookup-Hydration von direktem DOM-Event auf Pipeline-Hook umgestellt.
+- Pufferspeicher und Druckhaltung auf zentralen Saved-Record-Workflow umgestellt.
+- Modul-lokale Save/Update/Select/Delete/Accordion-Handler in diesen Modulen entfernt.
+- Regressionstest und Dokumentation für Phase 16E ergänzt.
+
+
 ## 1.3.0 Phase 16D
 
 - Added global CSS/UI primitives for platform-rendered modules.

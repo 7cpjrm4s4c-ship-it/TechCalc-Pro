@@ -14,7 +14,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-8-schema-inventory"
+      "migrationStatus": "phase-16e-event-pipeline-consolidation"
     },
     {
       "id": "drinking-water",
@@ -74,7 +74,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-8-schema-inventory"
+      "migrationStatus": "phase-16e-event-pipeline-consolidation"
     },
     {
       "id": "rainwater",

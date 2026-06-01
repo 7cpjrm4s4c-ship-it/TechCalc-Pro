@@ -5,7 +5,7 @@ import { calculate } from './logic.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, resultRows, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-import { bindEditModeClear } from '../../core/savedRecords.js';
+import { bindSavedRecordWorkflow } from '../../core/savedRecordController.js';
 
 const opts = (items) => items.map(([value,label]) => ({ value, label }));
 
@@ -151,52 +151,29 @@ function view(s){
   return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6">${resultColumn}</div>`);
 }
 
-function bindPressureHoldingActions(root, snapshot){
-  bindEditModeClear(root, { state, activeIdKey: 'activePlantId', nameKey: 'plantName' });
-  root.querySelector('[data-ph-save]')?.addEventListener('click', () => {
-    const current = state.get();
-    const result = calculate(current);
-    const saved = Array.isArray(current.savedPlants) ? current.savedPlants : [];
-    const record = savedPlantSnapshot({ ...current, activePlantId: null }, result);
-    state.set({ savedPlants: [record, ...saved], activePlantId: null, plantName: '' });
-  });
-  root.querySelector('[data-ph-update]')?.addEventListener('click', () => {
-    const current = state.get();
-    const id = current.activePlantId;
-    if(!id) return;
-    const result = calculate(current);
-    const saved = Array.isArray(current.savedPlants) ? current.savedPlants : [];
-    const existing = saved.find(entry => String(entry.id) === String(id));
-    if(!existing) return;
-    const record = { ...savedPlantSnapshot(current, result), id, createdAt: existing.createdAt || new Date().toISOString() };
-    state.set({ savedPlants: saved.map(item => String(item.id) === String(id) ? record : item), activePlantId: id, plantName: record.name });
-  });
-  root.querySelectorAll('[data-line-toggle]').forEach(toggle => {
-    toggle.addEventListener('click', event => {
-      event.stopPropagation();
-      const itemCard = toggle.closest('[data-line-card]');
-      const collapsed = itemCard?.classList.toggle('is-collapsed');
-      toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-    });
-  });
-  root.querySelectorAll('[data-ph-select]').forEach(button => {
-    button.addEventListener('click', event => {
-      if (event.target.closest('[data-ph-delete]') || event.target.closest('[data-line-toggle]')) return;
-      event.preventDefault();
-      event.stopPropagation();
-      const current = state.get();
-      const item = (current.savedPlants || []).find(entry => String(entry.id) === String(button.dataset.phSelect));
-      if(!item?.state) return;
-      state.set({ ...item.state, savedPlants: current.savedPlants || [], activePlantId: item.id, plantName: item.name || item.state?.plantName || '' });
-    });
-  });
-  root.querySelectorAll('[data-ph-delete]').forEach(button => {
-    button.addEventListener('click', event => {
-      event.stopPropagation();
-      const current = state.get();
-      const next = (current.savedPlants || []).filter(entry => String(entry.id) !== String(button.dataset.phDelete));
-      state.set({ savedPlants: next, activePlantId: String(current.activePlantId) === String(button.dataset.phDelete) ? null : current.activePlantId });
-    });
+function bindPressureHoldingActions(root){
+  bindSavedRecordWorkflow(root, {
+    state,
+    calculate,
+    snapshot: savedPlantSnapshot,
+    hydrate: (item, current) => ({
+      ...(item.state || {}),
+      savedPlants: current.savedPlants || [],
+      activePlantId: item.id,
+      plantName: item.name || item.state?.plantName || ''
+    }),
+    clear: () => ({}),
+    listKey: 'savedPlants',
+    activeIdKey: 'activePlantId',
+    nameKey: 'plantName',
+    recordPrefix: 'pressure',
+    saveSelector: '[data-ph-save]',
+    updateSelector: '[data-ph-update]',
+    loadAttr: 'data-ph-select',
+    deleteAttr: 'data-ph-delete',
+    preserveSaveScroll: true,
+    preserveLoadScroll: true,
+    clearOnOutsideClick: true
   });
 }
 

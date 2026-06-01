@@ -26,7 +26,7 @@ const modules = moduleIds.map(id => {
     schemaFile: fs.existsSync(path.join(base, 'schema.js')),
     usesCentralNumberService: fullText.includes('numberService') || fullText.includes("core/numbers") || fullText.includes('utils/calculations.js'),
     legacyNumberParsers: countLegacyNumber(fullText),
-    usesCentralSavedRecords: fullText.includes('savedRecords.js') || fullText.includes('savedCalculationController'),
+    usesCentralSavedRecords: fullText.includes('savedRecords.js') || fullText.includes('savedRecordController') || fullText.includes('savedCalculationController'),
     hasLegacyModuleClasses: /(dw-|ph-|rainwater-|wastewater-|hx-|pipe-|buffer-)/.test(fullText),
     migrationStatus: (config.match(/migrationStatus:\s*['"]([^'"]+)['"]/) || [])[1] || 'unknown'
   };
