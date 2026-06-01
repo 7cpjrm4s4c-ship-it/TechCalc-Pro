@@ -8,7 +8,7 @@ const css = readFileSync(new URL('../css/components.css', import.meta.url), 'utf
 assert.match(mount, /root\.__tcActionHandlers = \{\}/, 'Module mounts must clear stale action handlers before rebinding the pipeline.');
 assert.doesNotMatch(rainwater, /__rainwaterInputBound/, 'Rainwater must not keep module-owned root input listeners.');
 assert.match(rainwater, /renderSavedRecordList\(items, \{/, 'Rainwater surfaces must use the global saved-record UI.');
-assert.match(rainwater, /data-rainwater-surface-select/, 'Rainwater surfaces must use explicit global saved surface load attributes.');
+assert.match(rainwater, /data-saved-load/, 'Rainwater surfaces must use platform saved-record load attributes.');
 assert.match(rainwater, /expandedSurfaceResultId: null/, 'Switching Dachfläche/Grundstücksfläche must reset stale expanded surface state.');
 assert.match(css, /\.tc-action-link[\s\S]*justify-content: center/, 'Global action links must be centered in cards.');
 

@@ -6,11 +6,11 @@ import { areaTypes, roofDrainTable } from './tables.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-import { renderSavedRecordList, renderSavedRecordPanel, isSameId } from '../../core/savedRecords.js';
+import { renderSavedRecordList, renderSavedRecordPanel } from '../../core/savedRecords.js';
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { preserveScroll as keepScroll } from '../../core/scrollManager.js';
 import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../../core/eventPipeline.js';
-import { createSavedRecord, savedRecordReducer } from '../../core/savedRecordController.js';
+import { createSavedRecordActions } from '../../core/savedRecordController.js';
 import { renderPrimaryResultCard, renderNoticeCard } from '../../core/resultRenderer.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
@@ -71,9 +71,9 @@ function surfacesTable(r, s) {
     activeId: s.activeSurfaceId,
     expandedId: s.expandedSurfaceResultId,
     emptyText: 'Noch keine Regenflächen gespeichert.',
-    loadAttr: 'data-rainwater-surface-select',
-    toggleAttr: 'data-rainwater-surface-toggle',
-    deleteAttr: 'data-rainwater-surface-delete',
+    loadAttr: 'data-saved-load',
+    toggleAttr: 'data-saved-toggle',
+    deleteAttr: 'data-saved-delete',
     title: item => item.name || 'Regenfläche',
     subtitle: item => {
       const mode = item.surfaceMode || s.surfaceMode || 'roof';
@@ -188,8 +188,8 @@ function surfaceSaveCard(s, r) {
     nameLabel: 'Bezeichnung',
     nameValue: s.areaName || '',
     namePlaceholder: 'z. B. Dachfläche Nord',
-    addAction: 'rainwater:surface-add',
-    updateAction: 'rainwater:surface-update',
+    addAction: 'saved:add',
+    updateAction: 'saved:update',
     addDisabled: Boolean(s.activeSurfaceId),
     updateDisabled: !s.activeSurfaceId,
     listHtml: `<div data-rainwater-dynamic="surface-list">${surfacesTable(r, s)}</div>`,
@@ -437,100 +437,33 @@ function bindActions(root) {
   // input/change listeners on the shared app root caused stale handlers after
   // module switches and broke navigation from Heizung/Lüftung to Regenwasser.
 
-  const addSurface = () => {
-    commitAllFields(root, state, { action:'rainwater:pre-surface-add', notify:false });
-    commitSurfaceFieldsBeforeAction(root);
-    const current = state.get();
-    const record = createSavedRecord({
-      prefix: 'rain-surface',
-      current: { ...current, activeSurfaceId: null },
-      calculate,
-      snapshot: surfaceRecordSnapshot
-    });
-    preserveScroll(() => state.set(savedRecordReducer(current, {
-      listKey: 'surfaces',
-      activeIdKey: 'activeSurfaceId',
-      nameKey: 'areaName',
-      action: 'create',
-      record,
-      patch: resetSurfaceEditorAfterAdd(current)
-    }), { action:'rainwater:surface-add' }));
-  };
-
-  const updateSurface = () => {
-    commitAllFields(root, state, { action:'rainwater:pre-surface-update', notify:false });
-    commitSurfaceFieldsBeforeAction(root);
-    preserveScroll(() => {
-      const current = state.get();
-      const id = current.activeSurfaceId;
-      if (!id) return;
-      const existing = (current.surfaces || []).find(item => isSameId(item.id, id));
-      if (!existing) return;
-      const record = createSavedRecord({
-        prefix: 'rain-surface',
-        current,
-        calculate,
-        snapshot: surfaceRecordSnapshot,
-        existing
-      });
-      state.set(savedRecordReducer(current, {
-        listKey: 'surfaces',
-        activeIdKey: 'activeSurfaceId',
-        nameKey: 'areaName',
-        action: 'update',
-        id,
-        record
-      }), { action:'rainwater:surface-update' });
-    });
-  };
-
-  const selectSurface = element => {
-    const carrier = element?.closest?.('[data-rainwater-surface-select], [data-surface-select], [data-surface-result-select]') || element;
-    const id = carrier?.getAttribute?.('data-rainwater-surface-select') || carrier?.getAttribute?.('data-surface-select') || carrier?.getAttribute?.('data-surface-result-select');
-    if (!id) return;
-    const current = state.get();
-    const item = (current.surfaces || []).find(entry => isSameId(entry.id, id));
-    if (!item) return;
-    preserveScroll(() => state.set(savedRecordReducer(current, {
-      listKey: 'surfaces',
-      activeIdKey: 'activeSurfaceId',
-      nameKey: 'areaName',
-      action: 'load',
-      id: item.id,
-      record: item,
-      patch: surfaceRecordHydrate(item)
-    }), { action:'rainwater:surface-select' }));
-  };
-
-  const deleteSurface = element => {
-    const carrier = element?.closest?.('[data-rainwater-surface-delete], [data-surface-delete]') || element;
-    const id = carrier?.getAttribute?.('data-rainwater-surface-delete') || carrier?.getAttribute?.('data-surface-delete');
-    if (!id) return;
-    const current = state.get();
-    state.set(savedRecordReducer(current, {
-      listKey: 'surfaces',
-      activeIdKey: 'activeSurfaceId',
-      expandedIdKey: 'expandedSurfaceResultId',
-      nameKey: 'areaName',
-      action: 'delete',
-      id,
-      patch: isSameId(current.activeSurfaceId, id) ? clearSurfaceEditorPatch(current) : {}
-    }), { action:'rainwater:surface-delete' });
-  };
-
-  const toggleSurface = element => {
-    const card = element?.closest?.('[data-rainwater-surface-select], [data-line-card]');
-    const id = card?.getAttribute?.('data-rainwater-surface-select') || card?.getAttribute?.('data-surface-result-select');
-    if (!id) return;
-    const current = state.get();
-    state.set(savedRecordReducer(current, {
-      listKey: 'surfaces',
-      activeIdKey: 'activeSurfaceId',
-      expandedIdKey: 'expandedSurfaceResultId',
-      action: 'toggle-expanded',
-      id
-    }), { action:'rainwater:surface-toggle' });
-  };
+  const surfaceRecordActions = createSavedRecordActions({
+    root,
+    state,
+    calculate,
+    snapshot: surfaceRecordSnapshot,
+    hydrate: surfaceRecordHydrate,
+    clear: clearSurfaceEditorPatch,
+    listKey: 'surfaces',
+    activeIdKey: 'activeSurfaceId',
+    expandedIdKey: 'expandedSurfaceResultId',
+    nameKey: 'areaName',
+    recordPrefix: 'rain-surface',
+    beforeCreate: ({ root, state }) => {
+      commitAllFields(root, state, { action:'rainwater:pre-surface-add', notify:false });
+    },
+    beforeUpdate: ({ root, state }) => {
+      commitAllFields(root, state, { action:'rainwater:pre-surface-update', notify:false });
+    },
+    afterCreatePatch: resetSurfaceEditorAfterAdd,
+    attrs: {
+      loadAttr: 'data-saved-load',
+      toggleAttr: 'data-saved-toggle',
+      deleteAttr: 'data-saved-delete'
+    },
+    preserveSaveScroll: true,
+    preserveLoadScroll: true
+  });
 
 
 
@@ -566,26 +499,14 @@ function bindActions(root) {
 
   registerCentralActions(root, {
     'segment': selectSegment,
-    'rainwater:surface-add': addSurface,
-    'rainwater:surface-update': updateSurface,
-    'rainwater:surface-select': ({ element }) => selectSurface(element),
-    'rainwater:surface-delete': ({ element }) => deleteSurface(element),
-    'rainwater:surface-toggle': ({ element }) => toggleSurface(element),
-    // Global saved-record actions are scoped to Regenflächen only. The former
-    // duplicate calculation-level save workflow was removed in Phase 14G so
-    // Regenwasser follows the same single-record workflow as the reference modules.
-    'saved:load': ({ element }) => {
-      if (element?.closest?.('[data-rainwater-surface-select]')) return selectSurface(element);
-      return undefined;
-    },
-    'saved:delete': ({ element }) => {
-      if (element?.closest?.('[data-rainwater-surface-delete]')) return deleteSurface(element);
-      return undefined;
-    },
-    'saved:toggle': ({ element }) => {
-      if (element?.closest?.('[data-rainwater-surface-select]')) return toggleSurface(element);
-      return undefined;
-    }
+    // Regenwasser now uses the platform saved-record action contract.
+    // The module supplies snapshot/hydration functions only; Save/Update/Load/Delete/Accordion
+    // are executed by createSavedRecordActions from the central controller.
+    'saved:add': () => surfaceRecordActions.save(),
+    'saved:update': () => surfaceRecordActions.update(),
+    'saved:load': ({ element, event }) => surfaceRecordActions.load({ element, event }),
+    'saved:delete': ({ element }) => surfaceRecordActions.delete({ element }),
+    'saved:toggle': ({ element }) => surfaceRecordActions.toggle({ element })
   });
 
 }

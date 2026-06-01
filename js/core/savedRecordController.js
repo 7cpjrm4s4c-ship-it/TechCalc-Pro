@@ -213,3 +213,157 @@ export function bindSavedRecordWorkflow(root, {
     });
   }
 }
+
+
+function recordIdFromElement(element, attrs = {}) {
+  const loadAttr = attrs.loadAttr || 'data-saved-load';
+  const toggleAttr = attrs.toggleAttr || 'data-saved-toggle';
+  const deleteAttr = attrs.deleteAttr || 'data-saved-delete';
+  const selector = `[${loadAttr}], [${toggleAttr}], [${deleteAttr}], [data-line-card]`;
+  const carrier = element?.closest?.(selector) || element;
+  let id = carrier?.getAttribute?.(loadAttr)
+    || carrier?.getAttribute?.(toggleAttr)
+    || carrier?.getAttribute?.(deleteAttr)
+    || carrier?.getAttribute?.('data-saved-record-id')
+    || carrier?.dataset?.savedRecordId
+    || '';
+  if (!id) {
+    const card = element?.closest?.(`[${loadAttr}], [data-saved-record-id], [data-line-card]`);
+    id = card?.getAttribute?.(loadAttr) || card?.getAttribute?.('data-saved-record-id') || card?.dataset?.savedRecordId || '';
+  }
+  return id;
+}
+
+export function createSavedRecordActions({
+  root,
+  state,
+  calculate,
+  snapshot,
+  hydrate,
+  clear,
+  listKey,
+  activeIdKey,
+  expandedIdKey = null,
+  nameKey = null,
+  recordPrefix = 'record',
+  beforeCreate = null,
+  beforeUpdate = null,
+  afterCreatePatch = null,
+  attrs = {},
+  preserveSaveScroll = true,
+  preserveLoadScroll = true
+} = {}) {
+  const requireContext = () => {
+    if (!state || typeof state.get !== 'function' || typeof state.set !== 'function') return null;
+    if (!listKey || !activeIdKey) return null;
+    return state.get() || {};
+  };
+
+  const save = () => {
+    beforeCreate?.({ root, state });
+    const current = requireContext();
+    if (!current) return;
+    const run = () => {
+      const latest = state.get() || current;
+      const record = createSavedRecord({
+        prefix: recordPrefix,
+        current: { ...latest, [activeIdKey]: null },
+        calculate,
+        snapshot
+      });
+      const patch = typeof afterCreatePatch === 'function' ? afterCreatePatch(latest, record) : {};
+      state.set(savedRecordReducer(latest, {
+        listKey,
+        activeIdKey,
+        expandedIdKey,
+        nameKey,
+        action: 'create',
+        record,
+        patch
+      }), { action: 'saved-record:create' });
+    };
+    preserveSaveScroll ? preserveActionScroll(run) : run();
+  };
+
+  const update = () => {
+    beforeUpdate?.({ root, state });
+    const current = requireContext();
+    if (!current) return;
+    const run = () => {
+      const latest = state.get() || current;
+      const id = latest[activeIdKey];
+      if (!id) return;
+      const existing = arrayValue(latest[listKey]).find(item => isSameId(item.id, id));
+      if (!existing) return;
+      const record = createSavedRecord({ prefix: recordPrefix, current: latest, calculate, snapshot, existing });
+      state.set(savedRecordReducer(latest, {
+        listKey,
+        activeIdKey,
+        expandedIdKey,
+        nameKey,
+        action: 'update',
+        id,
+        record
+      }), { action: 'saved-record:update' });
+    };
+    preserveActionScroll(run);
+  };
+
+  const load = ({ element, event } = {}) => {
+    const id = recordIdFromElement(element, attrs);
+    if (!id) return;
+    const current = requireContext();
+    if (!current) return;
+    const item = arrayValue(current[listKey]).find(entry => isSameId(entry.id, id));
+    if (!item) return;
+    const apply = () => {
+      const latest = state.get() || current;
+      const patch = typeof hydrate === 'function' ? hydrate(item, latest) : { ...(item.state || item.inputState || item) };
+      state.set(savedRecordReducer(latest, {
+        listKey,
+        activeIdKey,
+        expandedIdKey,
+        nameKey,
+        action: 'load',
+        id: item.id,
+        record: item,
+        patch
+      }), { action: 'saved-record:load' });
+    };
+    const card = element?.closest?.('[data-line-card], [data-saved-record-card]') || element;
+    preserveLoadScroll ? preserveSavedRecordScroll(apply, { anchor: card, event }) : apply();
+  };
+
+  const remove = ({ element } = {}) => {
+    const id = recordIdFromElement(element, attrs);
+    if (!id) return;
+    const current = requireContext();
+    if (!current) return;
+    const patch = typeof clear === 'function' && isSameId(current[activeIdKey], id) ? clear(current) : {};
+    preserveActionScroll(() => state.set(savedRecordReducer(current, {
+      listKey,
+      activeIdKey,
+      expandedIdKey,
+      nameKey,
+      action: 'delete',
+      id,
+      patch
+    }), { action: 'saved-record:delete' }));
+  };
+
+  const toggle = ({ element } = {}) => {
+    const id = recordIdFromElement(element, attrs);
+    if (!id) return;
+    const current = requireContext();
+    if (!current) return;
+    state.set(savedRecordReducer(current, {
+      listKey,
+      activeIdKey,
+      expandedIdKey,
+      action: 'toggle-expanded',
+      id
+    }), { action: 'saved-record:toggle' });
+  };
+
+  return { save, update, load, delete: remove, toggle };
+}

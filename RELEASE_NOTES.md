@@ -646,3 +646,10 @@
 - Moved Rainwater surface create/update/load/delete/toggle state changes onto central saved-record reducer/factory.
 - Added saved-record expanded-state support to central reducer.
 - Added regression coverage for Rainwater Phase 17A decoupling.
+
+## Phase 17A.2 - Rainwater Saved Actions
+
+- Regenwasser-Saved-Actions auf zentrale `createSavedRecordActions()` umgestellt.
+- Modulinterne Regenwasser-Save-Aktionsnamen entfernt.
+- Globale Saved-Record-Attribute eingeführt.
+- Regressionstest ergänzt.
