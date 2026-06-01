@@ -28,6 +28,7 @@
     "test:rainwater-global": "node tests/rainwater-global-standard.test.mjs",
     "audit:css-system": "node scripts/audit-css-system-phase16d.mjs",
     "test:css-system": "node tests/css-system-phase16d.test.mjs",
-    "test:event-pipeline-phase16e": "node tests/event-pipeline-phase16e.test.mjs"
+    "test:event-pipeline-phase16e": "node tests/event-pipeline-phase16e.test.mjs",
+    "test:rainwater-phase16e1": "node tests/rainwater-phase16e1-recovery.test.mjs"
   }
 }

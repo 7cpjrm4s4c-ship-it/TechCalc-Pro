@@ -631,3 +631,10 @@
 - `schemaModuleMount` now uses `createSchemaView()` as the canonical schema render path.
 - Added Phase 16C regression test for fields, segments, selects, visibility, and result rendering.
 - Prepared the next module migrations to remove module-owned UI markup.
+
+## 1.3.0 – Phase 16E.1 Rainwater Recovery
+
+- Regenwasser-Mount nach Event-Pipeline-Konsolidierung repariert.
+- Fehlenden Import von `registerPipelineCommitHandler` ergänzt.
+- Lookup-Hydration von Regenwasser bleibt über den zentralen Pipeline-Hook angebunden.
+- Regressionstest `rainwater-phase16e1-recovery` ergänzt.

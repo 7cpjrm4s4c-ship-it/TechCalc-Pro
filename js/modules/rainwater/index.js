@@ -9,7 +9,7 @@ import { fmt, fmtInput } from '../../utils/calculations.js';
 import { renderSavedRecordList, isSameId, createRecordId, replaceRecord, removeRecord } from '../../core/savedRecords.js';
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { preserveScroll as keepScroll } from '../../core/scrollManager.js';
-import { registerCentralActions, commitAllFields } from '../../core/eventPipeline.js';
+import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../../core/eventPipeline.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
 const splitIndex = areaTypes.findIndex(item => item.id === 'concrete-asphalt');
