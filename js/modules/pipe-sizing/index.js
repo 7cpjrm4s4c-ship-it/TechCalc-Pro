@@ -6,7 +6,8 @@ import { card, field, selectField, resultRows, renderModuleShell, stack, grid, i
 import { mountModule } from '../../core/mount.js';
 import { fmt } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
-import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
+import { createRecordId, isSameId, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
+import { bindSavedRecordWorkflow } from '../../core/savedRecordController.js';
 
 
 function pipeSnapshot(s, r){
@@ -113,43 +114,29 @@ export default {
   state,
   mount(root) {
     return mountModule(root, state, view, (rootEl, snapshot) => {
-      rootEl.querySelector('[data-pipe-save]')?.addEventListener('click', () => {
-        const current = state.get();
-        const result = calculate(current);
-        const saved = Array.isArray(current.savedPipes) ? current.savedPipes : [];
-        const record = pipeSnapshot({ ...current, activePipeId:null }, result);
-        state.set({ savedPipes:[record, ...saved], activePipeId:null, pipeName:'' });
-      });
-      rootEl.querySelector('[data-pipe-update]')?.addEventListener('click', () => {
-        const current = state.get();
-        const id = current.activePipeId;
-        if(!id) return;
-        const saved = Array.isArray(current.savedPipes) ? current.savedPipes : [];
-        const existing = saved.find(item => String(item.id) === String(id));
-        if(!existing) return;
-        const record = { ...pipeSnapshot(current, calculate(current)), id, createdAt: existing.createdAt || new Date().toISOString() };
-        state.set({ savedPipes:replaceRecord(saved, id, record), activePipeId:id, pipeName:record.name });
-      });
-      bindSavedRecordList(rootEl, {
+      bindSavedRecordWorkflow(rootEl, {
+        state,
+        calculate,
+        snapshot: (current, result, existing) => ({
+          ...pipeSnapshot(current, result),
+          ...(existing ? { id: existing.id, createdAt: existing.createdAt } : {})
+        }),
+        hydrate: (item, current) => item?.state ? {
+          ...item.state,
+          activePipeId: item.id,
+          pipeName: item.name || item.state?.pipeName || ''
+        } : {},
+        clear: () => ({ activePipeId: null, pipeName: '' }),
+        listKey: 'savedPipes',
+        activeIdKey: 'activePipeId',
+        nameKey: 'pipeName',
+        recordPrefix: 'pipe',
+        saveSelector: '[data-pipe-save]',
+        updateSelector: '[data-pipe-update]',
         loadAttr: 'data-pipe-load',
         toggleAttr: 'data-line-toggle',
         deleteAttr: 'data-pipe-delete',
-        onLoad(id) {
-          const current = state.get();
-          const item = (current.savedPipes || []).find(entry => isSameId(entry.id, id));
-          if(!item?.state) return;
-          state.set({ ...item.state, savedPipes:current.savedPipes || [], activePipeId:item.id, pipeName:item.name || item.state?.pipeName || '' });
-        },
-        onDelete(id) {
-          const current = state.get();
-          const next = removeRecord(current.savedPipes || [], id);
-          state.set({ savedPipes:next, activePipeId:isSameId(current.activePipeId, id) ? null : current.activePipeId, pipeName:isSameId(current.activePipeId, id) ? '' : current.pipeName });
-        }
-      });
-      rootEl.addEventListener('click', event => {
-        if (!state.get().activePipeId) return;
-        if (event.target.closest('[data-pipe-load], [data-pipe-save], [data-pipe-update], [data-pipe-delete], [data-line-toggle], input, select, textarea, button')) return;
-        state.set({ activePipeId:null, pipeName:'' });
+        clearOnOutsideClick: true
       });
     });
   }

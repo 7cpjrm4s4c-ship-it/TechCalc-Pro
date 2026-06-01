@@ -28,6 +28,7 @@ const commands = [
   ['node', ['tests/module-lifecycle-phase15a.test.mjs']],
   ['node', ['tests/module-lifecycle-phase15d.test.mjs']],
   ['node', ['tests/module-runtime-phase16a.test.mjs']],
+  ['node', ['tests/saved-record-controller-phase16b.test.mjs']],
   ['node', ['tests/central-platform-pipeline.test.mjs']],
   ['node', ['tests/state-binding.test.mjs']],
   ['node', ['tests/event-pipeline-phase11d.test.mjs']],
