@@ -653,3 +653,10 @@
 - Modulinterne Regenwasser-Save-Aktionsnamen entfernt.
 - Globale Saved-Record-Attribute eingeführt.
 - Regressionstest ergänzt.
+
+## Phase 17A.3 - Rainwater Result Model Decoupling
+
+- Added central `renderResultModel` in `js/core/resultRenderer.js`.
+- Moved rainwater result data construction into `js/modules/rainwater/results.js`.
+- Rainwater index now delegates result/notice rendering to the platform result renderer.
+- Added regression coverage for rainwater result decoupling.

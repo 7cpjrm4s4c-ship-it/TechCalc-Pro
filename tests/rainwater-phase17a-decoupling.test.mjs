@@ -12,8 +12,8 @@ assert.match(savedController, /expandedIdKey/, 'savedRecordReducer must support 
 assert.match(rainwater, /createSavedRecordActions/, 'Rainwater must create surfaces through the central saved-record action factory');
 assert.match(savedController, /savedRecordReducer/, 'Platform saved-record controller must own the reducer');
 assert.doesNotMatch(rainwater, /savedRecordReducer/, 'Rainwater must not call the saved-record reducer directly');
-assert.match(rainwater, /renderPrimaryResultCard/, 'Rainwater result card must use platform result renderer');
-assert.match(rainwater, /renderNoticeCard/, 'Rainwater notices must use platform result renderer');
+assert.match(rainwater, /renderResultModel/, 'Rainwater result card must use the platform result model renderer');
+assert.match(rainwater, /buildRainwaterResultModel/, 'Rainwater must provide result data through a module result model');
 assert.doesNotMatch(rainwater, /removeRecord\(/, 'Rainwater must not delete surfaces through direct module list mutation');
 assert.doesNotMatch(rainwater, /createRecordId\(/, 'Rainwater must not allocate record ids outside the central saved-record factory');
 assert.doesNotMatch(rainwater, /mainResult\(/, 'Rainwater must not render primary result cards directly');

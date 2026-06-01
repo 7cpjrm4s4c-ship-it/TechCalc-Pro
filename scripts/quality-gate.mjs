@@ -35,6 +35,8 @@ const commands = [
   ['node', ['tests/rainwater-phase16e1-recovery.test.mjs']],
   ['node', ['tests/rainwater-phase17a-decoupling.test.mjs']],
   ['node', ['tests/rainwater-phase17a1-decoupling.test.mjs']],
+  ['node', ['tests/rainwater-phase17a2-saved-actions.test.mjs']],
+  ['node', ['tests/rainwater-phase17a3-results.test.mjs']],
   ['node', ['tests/central-platform-pipeline.test.mjs']],
   ['node', ['tests/state-binding.test.mjs']],
   ['node', ['tests/event-pipeline-phase11d.test.mjs']],

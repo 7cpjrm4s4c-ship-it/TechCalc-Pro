@@ -30,6 +30,7 @@
     "test:css-system": "node tests/css-system-phase16d.test.mjs",
     "test:event-pipeline-phase16e": "node tests/event-pipeline-phase16e.test.mjs",
     "test:rainwater-phase16e1": "node tests/rainwater-phase16e1-recovery.test.mjs",
-    "test:rainwater-phase17a1": "node tests/rainwater-phase17a1-decoupling.test.mjs"
+    "test:rainwater-phase17a1": "node tests/rainwater-phase17a1-decoupling.test.mjs",
+    "test:rainwater-phase17a3": "node tests/rainwater-phase17a3-results.test.mjs"
   }
 }

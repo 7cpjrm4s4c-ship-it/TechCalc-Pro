@@ -11,7 +11,8 @@ import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { preserveScroll as keepScroll } from '../../core/scrollManager.js';
 import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../../core/eventPipeline.js';
 import { createSavedRecordActions } from '../../core/savedRecordController.js';
-import { renderPrimaryResultCard, renderNoticeCard } from '../../core/resultRenderer.js';
+import { renderResultModel } from '../../core/resultRenderer.js';
+import { buildRainwaterResultModel } from './results.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
 const splitIndex = areaTypes.findIndex(item => item.id === 'concrete-asphalt');
@@ -205,39 +206,12 @@ function inputCards(s, r) {
     card('Regenfläche', surfaceInputBlock(s), 'green')
   ].join(''));
 }
-function resultRowsForRainwater(s, r) {
-  const mode = r.selectedSurface?.surfaceMode || r.mode || s.surfaceMode || 'roof';
-  const isRoof = mode === 'roof';
-  const selectedLabel = r.selectedSurface && !r.selectedSurface.transient ? r.selectedSurface.name : 'Aktuelle Eingabe';
-  const rows = [
-    { label:'Entwässerungsmenge', value:fmt(r.qr,2), unit:'l/s' },
-    { label:'Ablaufdimension', value:r.drainSize || '—' },
-    { label:'Abläufe', value:r.requiredDrains, unit:'Stk.' },
-    { label:'Quelle', value:selectedLabel || 'Aktuelle Eingabe' }
-  ];
-  if (isRoof) rows.splice(1, 0, { label:'DN Fallleitung', value:r.stackSelection?.dn || '—' }, { label:'Notabfluss Qnot', value:fmt(r.qNot || 0,2), unit:'l/s' });
-  return rows;
-}
-function resultCardOnly(s, r) {
-  const mode = r.selectedSurface?.surfaceMode || r.mode || s.surfaceMode || 'roof';
-  const isRoof = mode === 'roof';
-  return renderPrimaryResultCard(
-    'Ergebnis Regenwasser',
-    { label:isRoof ? 'DN Fallleitung' : drainLabel(mode), value:isRoof ? (r.stackSelection?.dn || '—') : r.requiredDrains, unit:isRoof ? '' : 'Stk.' },
-    resultRowsForRainwater(s, r),
-    'green'
-  );
-}
-function normHintCard(s, r) {
-  const warnings = [
-    'Berechnung erfolgt auf Grundlage der DIN 1986 - 100, aktuellste Fassung.',
-    ...(r.warnings || [])
-  ];
-  return renderNoticeCard('Normhinweise / Plausibilität', warnings, { accent:'green', prefix:'Hinweis' });
+function rainwaterResultPanel(s, r) {
+  return renderResultModel(buildRainwaterResultModel(s, r), 'green');
 }
 function view(s) {
   const r = calculate(s);
-  return renderModuleShell(config, `<div class="span-6">${inputCards(s, r)}</div><div class="span-6">${stack([resultCardOnly(s, r), surfaceSaveCard(s, r), normHintCard(s, r)].join(''))}</div>`);
+  return renderModuleShell(config, `<div class="span-6">${inputCards(s, r)}</div><div class="span-6">${stack([rainwaterResultPanel(s, r), surfaceSaveCard(s, r)].join(''))}</div>`);
 }
 
 function surfacePatchFromState(current = {}) {
