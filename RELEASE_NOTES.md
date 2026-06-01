@@ -638,3 +638,11 @@
 - Fehlenden Import von `registerPipelineCommitHandler` ergänzt.
 - Lookup-Hydration von Regenwasser bleibt über den zentralen Pipeline-Hook angebunden.
 - Regressionstest `rainwater-phase16e1-recovery` ergänzt.
+
+## 1.3.0 - Phase 17A Rainwater Decoupling
+
+- Started Rainwater module decoupling from module-owned UI/actions.
+- Added central result renderer facade for platform-owned result/notice cards.
+- Moved Rainwater surface create/update/load/delete/toggle state changes onto central saved-record reducer/factory.
+- Added saved-record expanded-state support to central reducer.
+- Added regression coverage for Rainwater Phase 17A decoupling.

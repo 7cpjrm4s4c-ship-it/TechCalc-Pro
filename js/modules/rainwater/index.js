@@ -3,13 +3,15 @@ import schema from './schema.js';
 import { state, initialState } from './state.js';
 import { calculate, getAreaType, toNumber } from './logic.js';
 import { areaTypes, roofDrainTable } from './tables.js';
-import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultRows, inlineStats, esc } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-import { renderSavedRecordList, isSameId, createRecordId, replaceRecord, removeRecord } from '../../core/savedRecords.js';
+import { renderSavedRecordList, isSameId } from '../../core/savedRecords.js';
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { preserveScroll as keepScroll } from '../../core/scrollManager.js';
 import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../../core/eventPipeline.js';
+import { createSavedRecord, savedRecordReducer } from '../../core/savedRecordController.js';
+import { renderPrimaryResultCard, renderNoticeCard } from '../../core/resultRenderer.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
 const splitIndex = areaTypes.findIndex(item => item.id === 'concrete-asphalt');
@@ -195,26 +197,35 @@ function inputCards(s, r) {
     card('Regenfläche', surfaceInputBlock(s), 'green')
   ].join(''));
 }
-function warningList(warnings, s) {
-  const fixed = '<div class="tc-warning"><span>Normgrundlage: </span><strong>Berechnung erfolgt auf Grundlage der DIN 1986 - 100, aktuellste Fassung.</strong></div>';
-  const items = (warnings || []).map(text => `<div class="tc-warning"><span>Hinweis: </span><strong>${esc(text)}</strong></div>`).join('');
-  return fixed + items;
-}
-function resultCardOnly(s, r) {
+function resultRowsForRainwater(s, r) {
   const mode = r.selectedSurface?.surfaceMode || r.mode || s.surfaceMode || 'roof';
   const isRoof = mode === 'roof';
   const selectedLabel = r.selectedSurface && !r.selectedSurface.transient ? r.selectedSurface.name : 'Aktuelle Eingabe';
-  const secondary = [
+  const rows = [
     { label:'Entwässerungsmenge', value:fmt(r.qr,2), unit:'l/s' },
     { label:'Ablaufdimension', value:r.drainSize || '—' },
     { label:'Abläufe', value:r.requiredDrains, unit:'Stk.' },
     { label:'Quelle', value:selectedLabel || 'Aktuelle Eingabe' }
   ];
-  if (isRoof) secondary.splice(1, 0, { label:'DN Fallleitung', value:r.stackSelection?.dn || '—' }, { label:'Notabfluss Qnot', value:fmt(r.qNot || 0,2), unit:'l/s' });
-  return mainResult('Ergebnis Regenwasser', { label:isRoof ? 'DN Fallleitung' : drainLabel(mode), value:isRoof ? (r.stackSelection?.dn || '—') : r.requiredDrains, unit:isRoof ? '' : 'Stk.' }, secondary, 'green');
+  if (isRoof) rows.splice(1, 0, { label:'DN Fallleitung', value:r.stackSelection?.dn || '—' }, { label:'Notabfluss Qnot', value:fmt(r.qNot || 0,2), unit:'l/s' });
+  return rows;
+}
+function resultCardOnly(s, r) {
+  const mode = r.selectedSurface?.surfaceMode || r.mode || s.surfaceMode || 'roof';
+  const isRoof = mode === 'roof';
+  return renderPrimaryResultCard(
+    'Ergebnis Regenwasser',
+    { label:isRoof ? 'DN Fallleitung' : drainLabel(mode), value:isRoof ? (r.stackSelection?.dn || '—') : r.requiredDrains, unit:isRoof ? '' : 'Stk.' },
+    resultRowsForRainwater(s, r),
+    'green'
+  );
 }
 function normHintCard(s, r) {
-  return card('Normhinweise / Plausibilität', warningList(r.warnings, s), 'green');
+  const warnings = [
+    'Berechnung erfolgt auf Grundlage der DIN 1986 - 100, aktuellste Fassung.',
+    ...(r.warnings || [])
+  ];
+  return renderNoticeCard('Normhinweise / Plausibilität', warnings, { accent:'green', prefix:'Hinweis' });
 }
 function view(s) {
   const r = calculate(s);
@@ -249,6 +260,21 @@ function surfacePatchFromState(current = {}) {
     emergencySafetyFactor: normalizeSurfaceFieldValue('emergencySafetyFactor', current.emergencySafetyFactor)
   };
 }
+function surfaceRecordSnapshot(current = {}) {
+  const patch = surfacePatchFromState(current);
+  const base = getAreaType(patch.areaType || defaultAreaTypeForMode(patch.surfaceMode));
+  return {
+    ...patch,
+    name: patch.areaName || base?.name || 'Regenfläche',
+    customCs: base?.custom ? current.customCs : patch.customCs,
+    customCm: base?.custom ? current.customCm : patch.customCm
+  };
+}
+
+function surfaceRecordHydrate(item = {}) {
+  return statePatchFromSurface(item);
+}
+
 function patchActiveSurfaceFromState() {
   const current = state.get();
   const activeId = current.activeSurfaceId;
@@ -407,23 +433,46 @@ function bindActions(root) {
     commitAllFields(root, state, { action:'rainwater:pre-surface-add', notify:false });
     commitSurfaceFieldsBeforeAction(root);
     const current = state.get();
-    const patch = surfacePatchFromState(current);
-    const base = getAreaType(patch.areaType || defaultAreaTypeForMode(patch.surfaceMode));
-    const record = { id:createRecordId('rain-surface'), ...patch };
-    if (base?.custom) { record.customCs = current.customCs; record.customCm = current.customCm; }
-    preserveScroll(() => state.set({
-      ...resetSurfaceEditorAfterAdd(current),
-      surfaces:[...(current.surfaces || []), record],
-      activeSurfaceId:null
-    }, { action:'rainwater:surface-add' }));
+    const record = createSavedRecord({
+      prefix: 'rain-surface',
+      current: { ...current, activeSurfaceId: null },
+      calculate,
+      snapshot: surfaceRecordSnapshot
+    });
+    preserveScroll(() => state.set(savedRecordReducer(current, {
+      listKey: 'surfaces',
+      activeIdKey: 'activeSurfaceId',
+      nameKey: 'areaName',
+      action: 'create',
+      record,
+      patch: resetSurfaceEditorAfterAdd(current)
+    }), { action:'rainwater:surface-add' }));
   };
 
   const updateSurface = () => {
     commitAllFields(root, state, { action:'rainwater:pre-surface-update', notify:false });
     commitSurfaceFieldsBeforeAction(root);
     preserveScroll(() => {
-      if (!patchActiveSurfaceFromState()) return;
-      state.set({}, { notify:true, action:'rainwater:surface-update' });
+      const current = state.get();
+      const id = current.activeSurfaceId;
+      if (!id) return;
+      const existing = (current.surfaces || []).find(item => isSameId(item.id, id));
+      if (!existing) return;
+      const record = createSavedRecord({
+        prefix: 'rain-surface',
+        current,
+        calculate,
+        snapshot: surfaceRecordSnapshot,
+        existing
+      });
+      state.set(savedRecordReducer(current, {
+        listKey: 'surfaces',
+        activeIdKey: 'activeSurfaceId',
+        nameKey: 'areaName',
+        action: 'update',
+        id,
+        record
+      }), { action:'rainwater:surface-update' });
     });
   };
 
@@ -432,13 +481,17 @@ function bindActions(root) {
     const id = carrier?.getAttribute?.('data-rainwater-surface-select') || carrier?.getAttribute?.('data-surface-select') || carrier?.getAttribute?.('data-surface-result-select');
     if (!id) return;
     const current = state.get();
-    if (isSameId(current.activeSurfaceId, id)) {
-      preserveScroll(() => state.set(clearSurfaceEditorPatch(current), { action:'rainwater:surface-deselect' }));
-      return;
-    }
     const item = (current.surfaces || []).find(entry => isSameId(entry.id, id));
     if (!item) return;
-    preserveScroll(() => state.set({ ...statePatchFromSurface(item), activeSurfaceId:id }, { action:'rainwater:surface-select' }));
+    preserveScroll(() => state.set(savedRecordReducer(current, {
+      listKey: 'surfaces',
+      activeIdKey: 'activeSurfaceId',
+      nameKey: 'areaName',
+      action: 'load',
+      id: item.id,
+      record: item,
+      patch: surfaceRecordHydrate(item)
+    }), { action:'rainwater:surface-select' }));
   };
 
   const deleteSurface = element => {
@@ -446,12 +499,15 @@ function bindActions(root) {
     const id = carrier?.getAttribute?.('data-rainwater-surface-delete') || carrier?.getAttribute?.('data-surface-delete');
     if (!id) return;
     const current = state.get();
-    const next = removeRecord(current.surfaces || [], id);
-    state.set({
-      surfaces: next,
-      activeSurfaceId: isSameId(current.activeSurfaceId, id) ? null : current.activeSurfaceId,
-      expandedSurfaceResultId: isSameId(current.expandedSurfaceResultId, id) ? null : current.expandedSurfaceResultId
-    }, { action:'rainwater:surface-delete' });
+    state.set(savedRecordReducer(current, {
+      listKey: 'surfaces',
+      activeIdKey: 'activeSurfaceId',
+      expandedIdKey: 'expandedSurfaceResultId',
+      nameKey: 'areaName',
+      action: 'delete',
+      id,
+      patch: isSameId(current.activeSurfaceId, id) ? clearSurfaceEditorPatch(current) : {}
+    }), { action:'rainwater:surface-delete' });
   };
 
   const toggleSurface = element => {
@@ -459,13 +515,13 @@ function bindActions(root) {
     const id = card?.getAttribute?.('data-rainwater-surface-select') || card?.getAttribute?.('data-surface-result-select');
     if (!id) return;
     const current = state.get();
-    const willCollapse = isSameId(current.expandedSurfaceResultId, id);
-    // Immediate visual feedback for mobile: the store remains authoritative, but
-    // the card does not wait for a deferred render before opening/closing.
-    card?.classList?.toggle('is-collapsed', willCollapse);
-    const toggle = card?.querySelector?.('[data-rainwater-surface-toggle], [data-saved-toggle]');
-    toggle?.setAttribute?.('aria-expanded', willCollapse ? 'false' : 'true');
-    state.set({ expandedSurfaceResultId: willCollapse ? null : id }, { action:'rainwater:surface-toggle' });
+    state.set(savedRecordReducer(current, {
+      listKey: 'surfaces',
+      activeIdKey: 'activeSurfaceId',
+      expandedIdKey: 'expandedSurfaceResultId',
+      action: 'toggle-expanded',
+      id
+    }), { action:'rainwater:surface-toggle' });
   };
 
 

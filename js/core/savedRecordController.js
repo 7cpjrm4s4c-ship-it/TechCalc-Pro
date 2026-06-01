@@ -41,6 +41,7 @@ export function createSavedRecord({
 export function savedRecordReducer(state, {
   listKey,
   activeIdKey,
+  expandedIdKey = null,
   nameKey = null,
   action,
   record = null,
@@ -73,11 +74,22 @@ export function savedRecordReducer(state, {
 
   if (action === 'delete') {
     const wasActive = isSameId(current[activeIdKey], id);
+    const wasExpanded = expandedIdKey ? isSameId(current[expandedIdKey], id) : false;
     return {
       ...current,
       [listKey]: removeRecord(list, id),
       [activeIdKey]: wasActive ? null : current[activeIdKey],
+      ...(expandedIdKey ? { [expandedIdKey]: wasExpanded ? null : current[expandedIdKey] } : {}),
       ...(nameKey && wasActive ? { [nameKey]: '' } : {}),
+      ...patch
+    };
+  }
+
+  if (action === 'toggle-expanded') {
+    if (!expandedIdKey) return current;
+    return {
+      ...current,
+      [expandedIdKey]: isSameId(current[expandedIdKey], id) ? null : id,
       ...patch
     };
   }
