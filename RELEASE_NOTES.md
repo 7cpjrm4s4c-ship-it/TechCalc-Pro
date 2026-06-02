@@ -1,4 +1,13 @@
 
+## Phase 17C.4 – Reference Event and Spacing Fixes
+
+- Saved-Record-Interaktionen zentral gehärtet: Markieren, Bearbeiten, Accordion und Löschen.
+- Segment-Schalter laufen als strukturelle Plattform-Controls mit Capture-Fallback.
+- Regenwasser-Berechnungsbereich aktualisiert r(5,5)/r(5,2) sofort.
+- Plattform-Card-Abstände für Referenzmodule wiederhergestellt.
+- `npm test` erfolgreich.
+
+
 ## Phase 17C.2 – Reference Bugfix Follow-up
 
 - Fixed compact platform collection columns for long Schmutzwasser fixture labels.

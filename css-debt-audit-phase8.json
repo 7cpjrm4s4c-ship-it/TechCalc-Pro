@@ -1,7 +1,7 @@
 {
-  "totalLines": 4482,
+  "totalLines": 4523,
   "importantCount": 25,
-  "patchComments": 92,
+  "patchComments": 93,
   "legacySelectorLines": 258,
   "duplicateSelectors": [
     {
@@ -49,6 +49,10 @@
       "count": 4
     },
     {
+      "selector": "@media (max-width: 1023px)",
+      "count": 4
+    },
+    {
       "selector": "#settingsPanel.settings-panel",
       "count": 4
     },
@@ -77,6 +81,10 @@
       "count": 3
     },
     {
+      "selector": ".module-content > .span-4",
+      "count": 3
+    },
+    {
       "selector": ".overflow-menu .overflow-menu__item",
       "count": 3
     },
@@ -90,10 +98,6 @@
     },
     {
       "selector": ".hx-history__values",
-      "count": 3
-    },
-    {
-      "selector": "@media (max-width: 1023px)",
       "count": 3
     },
     {
@@ -198,10 +202,6 @@
     },
     {
       "selector": ".card__title",
-      "count": 2
-    },
-    {
-      "selector": ".control",
       "count": 2
     }
   ],

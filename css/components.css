@@ -4479,3 +4479,44 @@ body::before {
     max-width: 82px;
   }
 }
+
+/* Phase 17C.4: restore platform module spacing contract after reference renderer migration. */
+.module-view {
+  display: block;
+}
+.module-content {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--ui-gap, 16px);
+  align-items: start;
+}
+.module-content > .span-6,
+.module-content > .span-8,
+.module-content > .span-4 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-gap, 16px);
+  min-width: 0;
+}
+.tc-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-gap, 16px);
+  min-width: 0;
+}
+.tc-stack > .card,
+.tc-stack > .tc-card,
+.module-content > .span-6 > .card,
+.module-content > .span-6 > .tc-card {
+  margin: 0;
+}
+@media (max-width: 1023px) {
+  .module-content {
+    grid-template-columns: 1fr;
+  }
+  .module-content > .span-6,
+  .module-content > .span-8,
+  .module-content > .span-4 {
+    grid-column: 1 / -1;
+  }
+}

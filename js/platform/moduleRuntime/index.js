@@ -67,10 +67,14 @@ function bindSegments(root, state, segmentConfig = {}) {
   const fields = segmentConfig.fields || {};
   const handlers = {};
   if (!Object.keys(fields).length) return handlers;
-  handlers.segment = ({ element, root }) => {
+
+  const commit = (element, event) => {
     const field = element?.dataset?.segment;
     const value = element?.dataset?.value;
-    if (!field || value === undefined || !fields[field]) return;
+    if (!field || value === undefined || !fields[field]) return false;
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    event?.stopImmediatePropagation?.();
     const current = state.get();
     const patchFactory = asFn(fields[field].patch);
     const patch = patchFactory(value, current, { field, root }) || { [field]: value };
@@ -79,11 +83,32 @@ function bindSegments(root, state, segmentConfig = {}) {
     preserveScroll(() => state.set(patch, { action, notify: true }));
     const scheduler = getRenderScheduler(root);
     scheduler?.flushNow?.(action);
-    // Phase 17C.3: the surface-mode switch changes visible/labelled fields.
-    // Flush once synchronously and once in a microtask so mobile Safari cannot
-    // leave the previous schema branch visible until the next unrelated input.
+    if (typeof fields[field].domPatch === 'function') fields[field].domPatch({ root, field, value, patch, state: state.get() });
     if (typeof queueMicrotask === 'function') queueMicrotask(() => scheduler?.flushNow?.(`${action}:settled`));
+    return true;
   };
+
+  handlers.segment = ({ element, event }) => commit(element, event);
+
+  // Phase 17C.4: segment switches are structural UI decisions in platform modules.
+  // A capture-level platform binding prevents mobile Safari from leaving a
+  // stale schema branch visible until another input/change event occurs.
+  if (!root.__tcPlatformSegmentCaptureBound) {
+    root.__tcPlatformSegmentCaptureBound = true;
+    const capture = event => {
+      const element = event.target?.closest?.('[data-segment]');
+      if (!element || !root.contains(element)) return;
+      commit(element, event);
+    };
+    root.addEventListener('pointerup', capture, true);
+    root.addEventListener('click', capture, true);
+    root.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const element = event.target?.closest?.('[data-segment]');
+      if (!element || !root.contains(element)) return;
+      commit(element, event);
+    }, true);
+  }
   return handlers;
 }
 
@@ -184,19 +209,43 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     preserveLoadScroll: savedConfig.preserveLoadScroll !== false
   });
 
-  // Phase 17C.3: saved-record interaction is handled exclusively by
-  // the central event pipeline through data-tc-action.  A previous direct
-  // pointer binding captured stale module state after route/module re-renders
-  // and blocked accordion/delete/load propagation on the reference modules.
-
-
-  return {
+  const handlers = {
     'saved:add': () => actions.save(),
     'saved:update': () => actions.update(),
     'saved:load': ({ element, event }) => actions.load({ element, event }),
     'saved:delete': ({ element }) => actions.delete({ element }),
     'saved:toggle': ({ element }) => actions.toggle({ element })
   };
+
+  // Phase 17C.4: saved-record cards are structural controls.  They must work
+  // even when the generic pointer/click suppression layer is active after a
+  // scroll or mobile tap.  This capture fallback uses the same central action
+  // handlers and always reads the current platform state.
+  if (!root.__tcPlatformSavedRecordCaptureBound) {
+    root.__tcPlatformSavedRecordCaptureBound = true;
+    const capture = event => {
+      const actionEl = event.target?.closest?.('[data-tc-action^="saved:"], [data-saved-load], [data-saved-toggle], [data-saved-delete], [data-saved-record-card]');
+      if (!actionEl || !root.contains(actionEl)) return;
+      const action = actionEl.dataset?.tcAction
+        || (actionEl.hasAttribute?.('data-saved-delete') ? 'saved:delete' : '')
+        || (actionEl.hasAttribute?.('data-saved-toggle') ? 'saved:toggle' : '')
+        || 'saved:load';
+      const handler = handlers[action];
+      if (typeof handler !== 'function') return;
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      event?.stopImmediatePropagation?.();
+      handler({ action, element: actionEl, event, state, root });
+    };
+    root.addEventListener('pointerup', capture, true);
+    root.addEventListener('click', capture, true);
+    root.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      capture(event);
+    }, true);
+  }
+
+  return handlers;
 }
 
 export function createPlatformModule(definition = {}) {

@@ -40,6 +40,20 @@ function patchLookupDefaults(patch = {}, base = {}) {
   return next;
 }
 
+
+function patchSurfaceModeDom({ root, state } = {}) {
+  const mode = state?.surfaceMode || state?.calculationType || 'roof';
+  const roof = mode !== 'property';
+  const roofWrap = root?.querySelector?.('[data-schema-field-wrapper="roofRainIntensity"]');
+  const propertyWrap = root?.querySelector?.('[data-schema-field-wrapper="propertyRainIntensity"]');
+  const roofLabel = roofWrap?.querySelector?.('label');
+  const propertyLabel = propertyWrap?.querySelector?.('label');
+  if (roofLabel) roofLabel.textContent = roof ? 'Regenspende r(5,5)' : 'Regenspende r(5,2)';
+  if (propertyLabel) propertyLabel.textContent = roof ? 'Regenspende r(5,5)' : 'Regenspende r(5,2)';
+  if (roofWrap) roofWrap.hidden = !roof;
+  if (propertyWrap) propertyWrap.hidden = roof;
+}
+
 function modeDefaultsPatch(nextMode, current = {}) {
   const mode = nextMode === 'property' ? 'property' : 'roof';
   const drainPatch = patchLookupDefaults({ drainSize: current.drainSize || 'DN 100' }, current);
@@ -173,7 +187,8 @@ export default {
     fields: {
       surfaceMode: {
         action: 'platform:segment:surfaceMode',
-        patch: modeDefaultsPatch
+        patch: modeDefaultsPatch,
+        domPatch: patchSurfaceModeDom
       }
     }
   },
@@ -200,4 +215,4 @@ export default {
   }
 };
 
-export { modeDefaultsPatch, surfaceRecordSnapshot, statePatchFromSurface, clearSurfaceEditorPatch, resetSurfaceEditorAfterAdd };
+export { modeDefaultsPatch, patchSurfaceModeDom, surfaceRecordSnapshot, statePatchFromSurface, clearSurfaceEditorPatch, resetSurfaceEditorAfterAdd };
