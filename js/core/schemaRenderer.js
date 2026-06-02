@@ -9,7 +9,8 @@ const FIELD_TYPES = Object.freeze({
   SELECT: 'select',
   SEGMENT: 'segment',
   READONLY: 'readonly',
-  BOOLEAN: 'boolean'
+  BOOLEAN: 'boolean',
+  CUSTOM: 'custom'
 });
 
 const FIELD_TYPE_TO_INPUTMODE = Object.freeze({
@@ -31,8 +32,24 @@ function fieldValue(def, state = {}) {
   return raw;
 }
 
+function resolve(value, state = {}, fallback = undefined) {
+  return typeof value === 'function' ? value(state) : value ?? fallback;
+}
+
 function optionLabel(option = {}) {
   return option.label ?? option.name ?? option.value ?? '';
+}
+
+function fieldLabel(def, state = {}) {
+  return resolve(def.label, state, def.key || '');
+}
+
+function fieldOptions(def, state = {}) {
+  return resolve(def.options, state, []) || [];
+}
+
+function fieldUnit(def, state = {}) {
+  return resolve(def.unit, state, '');
 }
 
 function attrs(attributes = {}) {
@@ -44,7 +61,7 @@ function attrs(attributes = {}) {
 
 function renderSelect(def, state = {}) {
   const value = String(state?.[def.key] ?? def.default ?? '');
-  const options = (def.options || []).map(option => {
+  const options = fieldOptions(def, state).map(option => {
     const optionValue = String(option.value ?? '');
     return `<option value="${esc(optionValue)}" ${optionValue === value ? 'selected' : ''}>${esc(optionLabel(option))}</option>`;
   }).join('');
@@ -56,45 +73,48 @@ function renderSelect(def, state = {}) {
     'data-render': def.render || null,
     disabled: def.disabled === true
   });
-  return `<div class="field tc-field" data-schema-field-wrapper="${esc(def.key)}"><label for="${esc(def.key)}">${esc(def.label)}</label><div class="control"><select id="${esc(def.key)}"${extra}>${options}</select></div></div>`;
+  return `<div class="field tc-field" data-schema-field-wrapper="${esc(def.key)}"><label for="${esc(def.key)}">${esc(fieldLabel(def, state))}</label><div class="control"><select id="${esc(def.key)}"${extra}>${options}</select></div></div>`;
 }
 
 function renderSegment(def, state = {}) {
   const value = state?.[def.key] ?? def.default ?? '';
-  return `<div class="field field--segment tc-field" data-schema-field-wrapper="${esc(def.key)}"><label>${esc(def.label)}</label>${segmented(def.key, def.options || [], value, { accent: def.accent })}</div>`;
+  return `<div class="field field--segment tc-field" data-schema-field-wrapper="${esc(def.key)}"><label>${esc(fieldLabel(def, state))}</label>${segmented(def.key, fieldOptions(def, state), value, { accent: def.accent })}</div>`;
 }
 
 function renderReadonly(def, state = {}) {
   const value = typeof def.value === 'function' ? def.value(state) : fieldValue(def, state);
-  return `<div class="field field--readonly tc-field" data-schema-field-wrapper="${esc(def.key)}"><label>${esc(def.label)}</label><div class="control"><output data-schema-output="${esc(def.key)}">${esc(value || '—')}</output>${def.unit ? `<span class="unit">${esc(def.unit)}</span>` : ''}</div></div>`;
+  const unit = fieldUnit(def, state);
+  return `<div class="field field--readonly tc-field" data-schema-field-wrapper="${esc(def.key)}"><label>${esc(fieldLabel(def, state))}</label><div class="control"><output data-schema-output="${esc(def.key)}">${esc(value || '—')}</output>${unit ? `<span class="unit">${esc(unit)}</span>` : ''}</div></div>`;
 }
 
 function renderBoolean(def, state = {}) {
   const checked = Boolean(state?.[def.key] ?? def.default);
-  return `<div class="field field--boolean tc-field" data-schema-field-wrapper="${esc(def.key)}"><label class="tc-checkbox"><input type="checkbox" data-field="${esc(def.key)}" data-schema-field="${esc(def.key)}" data-commit="immediate" ${checked ? 'checked' : ''}> <span>${esc(def.label)}</span></label></div>`;
+  return `<div class="field field--boolean tc-field" data-schema-field-wrapper="${esc(def.key)}"><label class="tc-checkbox"><input type="checkbox" data-field="${esc(def.key)}" data-schema-field="${esc(def.key)}" data-commit="immediate" ${checked ? 'checked' : ''}> <span>${esc(fieldLabel(def, state))}</span></label></div>`;
 }
 
 function renderInput(def, state = {}) {
   const type = def.htmlType || 'text';
   const inputmode = def.inputmode || FIELD_TYPE_TO_INPUTMODE[def.type || FIELD_TYPES.TEXT] || 'text';
   const value = fieldValue(def, state);
-  const unitHtml = def.unit ? `<span class="unit">${esc(def.unit)}</span>` : '';
+  const unit = fieldUnit(def, state);
+  const unitHtml = unit ? `<span class="unit">${esc(unit)}</span>` : '';
   const extra = attrs({
     'data-field': def.key,
     'data-schema-field': def.key,
     'data-commit': def.commit || null,
     'data-render': def.render || null,
     disabled: def.disabled === true,
-    readonly: def.readonly === true,
+    readonly: resolve(def.readonly, state, false) === true,
     'aria-readonly': def.readonly === true ? 'true' : null,
     autocomplete: 'off'
   });
-  return `<div class="field tc-field" data-schema-field-wrapper="${esc(def.key)}"><label for="${esc(def.key)}">${esc(def.label)}</label><div class="control"><input id="${esc(def.key)}" type="${esc(type)}" inputmode="${esc(inputmode)}" value="${esc(value ?? '')}" placeholder="${esc(def.placeholder ?? (def.type === FIELD_TYPES.TEXT ? '' : '0'))}"${extra}>${unitHtml}</div></div>`;
+  return `<div class="field tc-field" data-schema-field-wrapper="${esc(def.key)}"><label for="${esc(def.key)}">${esc(fieldLabel(def, state))}</label><div class="control"><input id="${esc(def.key)}" type="${esc(type)}" inputmode="${esc(inputmode)}" value="${esc(value ?? '')}" placeholder="${esc(resolve(def.placeholder, state, def.type === FIELD_TYPES.TEXT ? '' : '0'))}"${extra}>${unitHtml}</div></div>`;
 }
 
 export function renderSchemaField(def, state = {}) {
   if (!isVisible(def, state)) return '';
   const type = def.type || FIELD_TYPES.TEXT;
+  if (type === FIELD_TYPES.CUSTOM || type === 'custom') return typeof def.render === 'function' ? def.render(state) : String(def.html || '');
   if (type === FIELD_TYPES.SELECT) return renderSelect(def, state);
   if (type === FIELD_TYPES.SEGMENT) return renderSegment(def, state);
   if (type === FIELD_TYPES.BOOLEAN) return renderBoolean(def, state);
@@ -113,8 +133,11 @@ export function renderSchemaForm(schema = {}, state = {}, options = {}) {
       .map(def => renderSchemaField(def, state))
       .filter(Boolean)
       .join('');
-    if (!body && group.hideWhenEmpty !== false) return '';
-    return card(group.title || options.title || 'Eingaben', grid(body, group.columns || 2), group.accent || options.accent || 'blue');
+    const beforeHtml = typeof group.beforeHtml === 'function' ? group.beforeHtml(state) : group.beforeHtml || '';
+    const afterHtml = typeof group.afterHtml === 'function' ? group.afterHtml(state) : group.afterHtml || '';
+    const content = [beforeHtml, grid(body, group.columns || 2), afterHtml].filter(Boolean).join('');
+    if (!content && group.hideWhenEmpty !== false) return '';
+    return card(group.title || options.title || 'Eingaben', content, group.accent || options.accent || 'blue');
   }).filter(Boolean).join('');
 }
 

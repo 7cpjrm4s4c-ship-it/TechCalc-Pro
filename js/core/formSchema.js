@@ -6,7 +6,8 @@ export const FIELD_TYPES = Object.freeze({
   SELECT: 'select',
   SEGMENT: 'segment',
   READONLY: 'readonly',
-  BOOLEAN: 'boolean'
+  BOOLEAN: 'boolean',
+  CUSTOM: 'custom'
 });
 
 const ALLOWED_FIELD_TYPES = new Set(Object.values(FIELD_TYPES));
@@ -31,7 +32,7 @@ export function validateFormSchema(schema = {}) {
     if (!fieldDef.label) throw new Error(`Schema field without label: ${fieldDef.key}`);
     const type = fieldDef.type || FIELD_TYPES.TEXT;
     if (!ALLOWED_FIELD_TYPES.has(type)) throw new Error(`Unknown schema field type: ${type}`);
-    if ((type === FIELD_TYPES.SELECT || type === FIELD_TYPES.SEGMENT) && !Array.isArray(fieldDef.options)) {
+    if ((type === FIELD_TYPES.SELECT || type === FIELD_TYPES.SEGMENT) && !Array.isArray(fieldDef.options) && typeof fieldDef.options !== 'function') {
       throw new Error(`Schema field needs options: ${fieldDef.key}`);
     }
   });

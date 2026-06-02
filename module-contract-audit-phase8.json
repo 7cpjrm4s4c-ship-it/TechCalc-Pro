@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-02T06:57:25.536Z",
+  "generatedAt": "2026-06-02T07:09:58.892Z",
   "contractTarget": "1.3.0",
   "modules": [
     {
@@ -154,20 +154,20 @@
       "usesDefineConfig": true,
       "hasSchemaFile": true,
       "exposesSchema": true,
-      "legacyRendererImports": 1,
+      "legacyRendererImports": 0,
       "ownUiClassSamples": [
-        "concrete-asphalt",
-        "metal-roof",
+        "data-segment",
+        "is-active",
+        "aria-selected",
+        "data-field",
+        "rain-surface",
+        "pre-surface-add",
+        "pre-surface-update",
         "data-saved-load",
         "data-saved-toggle",
         "data-saved-delete",
-        "action-button",
-        "action-button--secondary",
-        "empty-state",
-        "empty-state--compact",
-        "data-rainwater-dynamic",
-        "surface-list",
-        "span-6"
+        "surface-mode-select",
+        "area-type-normalize"
       ]
     },
     {
