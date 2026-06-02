@@ -2,17 +2,11 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 
 const source = fs.readFileSync('js/modules/rainwater/index.js', 'utf8');
+const controller = fs.readFileSync('js/modules/rainwater/controller.js', 'utf8');
+const runtime = fs.readFileSync('js/platform/moduleRuntime/index.js', 'utf8');
 
-assert.match(
-  source,
-  /import\s*\{[^}]*registerPipelineCommitHandler[^}]*\}\s*from\s*['"]\.\.\/\.\.\/core\/eventPipeline\.js['"]/s,
-  'rainwater must explicitly import registerPipelineCommitHandler from the central event pipeline'
-);
-
-assert.match(
-  source,
-  /registerPipelineCommitHandler\(\s*root\s*,\s*['"]rainwater:lookup-hydration['"]/,
-  'rainwater lookup hydration must be registered through the central pipeline hook'
-);
+assert.doesNotMatch(source, /registerPipelineCommitHandler/, 'rainwater index must not bind platform commit hooks directly');
+assert.match(runtime, /registerPipelineCommitHandler/, 'platform module runtime must own lookup hydration commit hooks');
+assert.match(controller, /key:\s*'rainwater:lookup-hydration'/, 'rainwater lookup hydration key must be declarative controller config');
 
 console.log('phase16e.1 rainwater recovery regression ok');

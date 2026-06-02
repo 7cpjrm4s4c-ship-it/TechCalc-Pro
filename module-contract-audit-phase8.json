@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-02T07:09:58.892Z",
+  "generatedAt": "2026-06-02T09:55:28.699Z",
   "contractTarget": "1.3.0",
   "modules": [
     {
@@ -155,20 +155,7 @@
       "hasSchemaFile": true,
       "exposesSchema": true,
       "legacyRendererImports": 0,
-      "ownUiClassSamples": [
-        "data-segment",
-        "is-active",
-        "aria-selected",
-        "data-field",
-        "rain-surface",
-        "pre-surface-add",
-        "pre-surface-update",
-        "data-saved-load",
-        "data-saved-toggle",
-        "data-saved-delete",
-        "surface-mode-select",
-        "area-type-normalize"
-      ]
+      "ownUiClassSamples": []
     },
     {
       "module": "unit-converter",

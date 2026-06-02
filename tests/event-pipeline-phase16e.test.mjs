@@ -12,7 +12,11 @@ for (const file of ['js/modules/buffer-storage/index.js', 'js/modules/pressure-h
 }
 
 const rainwater = readFileSync('js/modules/rainwater/index.js', 'utf8');
-assert.match(rainwater, /registerPipelineCommitHandler/, 'rainwater lookup hydration must use pipeline commit hook');
+const controller = readFileSync('js/modules/rainwater/controller.js', 'utf8');
+const runtime = readFileSync('js/platform/moduleRuntime/index.js', 'utf8');
+assert.doesNotMatch(rainwater, /registerPipelineCommitHandler/, 'rainwater index must not own lookup hydration hooks');
+assert.match(runtime, /registerPipelineCommitHandler/, 'platform runtime must use pipeline commit hook for lookup hydration');
+assert.match(controller, /rainwater:lookup-hydration/, 'rainwater lookup hydration must be declared in controller data');
 assert.doesNotMatch(rainwater, /addEventListener\('tc:commit'/, 'rainwater must not bind tc:commit directly');
 
 console.log('phase16e event pipeline consolidation ok');

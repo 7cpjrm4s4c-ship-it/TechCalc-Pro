@@ -2,12 +2,13 @@ import fs from 'node:fs';
 
 const source = fs.readFileSync('js/modules/rainwater/index.js', 'utf8');
 const saved = fs.readFileSync('js/core/savedRecords.js', 'utf8');
+const moduleRenderer = fs.readFileSync('js/platform/moduleRenderer/index.js', 'utf8');
 
 if (!saved.includes('export function renderSavedRecordPanel')) {
   throw new Error('central renderSavedRecordPanel must exist in savedRecords platform layer');
 }
-if (!source.includes('renderSavedRecordPanel')) {
-  throw new Error('rainwater save panel must be rendered through the central saved-record panel renderer');
+if (!moduleRenderer.includes('renderSavedRecordPanel')) {
+  throw new Error('platform module renderer must render save panels through the central saved-record panel renderer');
 }
 if (source.includes("card('Gespeicherte Flächen'")) {
   throw new Error('rainwater must not render its saved-record card with module-local card markup');

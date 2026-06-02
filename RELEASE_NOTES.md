@@ -668,3 +668,12 @@
 - Moved rainwater result data construction into `js/modules/rainwater/results.js`.
 - Rainwater index now delegates result/notice rendering to the platform result renderer.
 - Added regression coverage for rainwater result decoupling.
+
+## Phase 17A.5 - Rainwater Platform Control
+
+- Neue Plattform-Runtime `js/platform/moduleRuntime/` eingeführt.
+- Regenwasser-Index auf reine Moduldefinition reduziert.
+- Mount, Layout, Result-Rendering, Saved Actions, Segment-Actions und Lookup-Hydration in die Plattform verschoben.
+- Regenwasser-spezifische Workflow-Regeln in `controller.js` als Fachadapter gekapselt.
+- Regressionstests auf Plattformverantwortung aktualisiert.
+- `npm test` erfolgreich.

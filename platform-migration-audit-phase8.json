@@ -3,7 +3,7 @@
   "schemaModules": 11,
   "centralNumberService": 11,
   "legacyNumberParsers": 0,
-  "centralSavedRecords": 8,
+  "centralSavedRecords": 7,
   "legacyClassModules": 8,
   "modules": [
     {
@@ -82,9 +82,9 @@
       "schemaFile": true,
       "usesCentralNumberService": true,
       "legacyNumberParsers": 0,
-      "usesCentralSavedRecords": true,
+      "usesCentralSavedRecords": false,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-14g-rainwater-global-standard phase-14l-rainwater-reference-completion phase-14m-router-direct-render phase-17a2-rainwater-saved-actions"
+      "migrationStatus": "phase-14g-rainwater-global-standard phase-14l-rainwater-reference-completion phase-14m-router-direct-render phase-17a2-rainwater-saved-actions phase-17a5-rainwater-platform-control"
     },
     {
       "id": "unit-converter",
