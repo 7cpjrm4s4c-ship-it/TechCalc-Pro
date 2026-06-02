@@ -4,6 +4,7 @@ import { createSavedRecordActions } from '../../core/savedRecordController.js';
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { preserveScroll as keepScroll } from '../../core/scrollManager.js';
 import { renderPlatformModuleView } from '../moduleRenderer/index.js';
+import { getRenderScheduler } from '../../core/renderScheduler.js';
 
 const noop = () => {};
 const asFn = value => typeof value === 'function' ? value : noop;
@@ -75,6 +76,7 @@ function bindSegments(root, state, segmentConfig = {}) {
     const patch = patchFactory(value, current, { field, root }) || { [field]: value };
     setSegmentVisual(root, field, patch?.[field] ?? value);
     preserveScroll(() => state.set(patch, { action: fields[field].action || `platform:segment:${field}`, notify: true }));
+    getRenderScheduler(root)?.flushNow?.(fields[field].action || `platform:segment:${field}`);
   };
   return handlers;
 }
@@ -175,6 +177,53 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     preserveSaveScroll: savedConfig.preserveSaveScroll !== false,
     preserveLoadScroll: savedConfig.preserveLoadScroll !== false
   });
+
+  // Phase 17C.2: saved-record cards are reference-module critical.  Mobile
+  // browsers can suppress the synthetic click after touch/scroll gestures, so
+  // selection/editing must not depend on the generic action dispatcher alone.
+  if (!root.__tcPlatformSavedRecordDirectBinding) {
+    root.__tcPlatformSavedRecordDirectBinding = true;
+    const handleSavedPointer = event => {
+      if (event.type === 'click' && Date.now() - Number(root.dataset.tcSavedDirectAt || 0) < 650) {
+        event.preventDefault?.();
+        event.stopPropagation?.();
+        event.stopImmediatePropagation?.();
+        return;
+      }
+      const target = event.target;
+      const deleteButton = target?.closest?.('[data-saved-delete]');
+      const toggleButton = target?.closest?.('[data-saved-toggle]');
+      const loadCard = target?.closest?.('[data-saved-load], [data-saved-record-card]');
+      if (!root.contains(loadCard || deleteButton || toggleButton)) return;
+      const mark = () => { root.dataset.tcSavedDirectAt = String(Date.now()); };
+      if (deleteButton) {
+        event.preventDefault?.();
+        event.stopPropagation?.();
+        event.stopImmediatePropagation?.();
+        mark();
+        actions.delete({ element: deleteButton });
+        return;
+      }
+      if (toggleButton) {
+        event.preventDefault?.();
+        event.stopPropagation?.();
+        event.stopImmediatePropagation?.();
+        mark();
+        actions.toggle({ element: toggleButton });
+        return;
+      }
+      if (loadCard && !target?.closest?.('input, select, textarea, label, a[href], button')) {
+        event.preventDefault?.();
+        event.stopPropagation?.();
+        event.stopImmediatePropagation?.();
+        mark();
+        actions.load({ element: loadCard, event });
+      }
+    };
+    root.addEventListener('pointerup', handleSavedPointer, true);
+    root.addEventListener('click', handleSavedPointer, true);
+  }
+
   return {
     'saved:add': () => actions.save(),
     'saved:update': () => actions.update(),

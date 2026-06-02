@@ -1,4 +1,12 @@
 
+## Phase 17C.2 – Reference Bugfix Follow-up
+
+- Fixed compact platform collection columns for long Schmutzwasser fixture labels.
+- Added direct platform saved-record binding for robust mobile selection/editing.
+- Forced immediate platform render flush for segment changes so Regenwasser r(5,5)/r(5,2) labels update instantly.
+- Added regression `reference-modules-phase17c2-reference-fixes`.
+
+
 ## Phase 17C.1 – Referenzmodule UI-Bugfixes
 
 - Schmutzwasser: Leitungsart von Segment-Auswahl auf Plattform-Dropdown `lineType` umgestellt.

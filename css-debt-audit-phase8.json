@@ -1,7 +1,7 @@
 {
-  "totalLines": 4445,
+  "totalLines": 4482,
   "importantCount": 25,
-  "patchComments": 91,
+  "patchComments": 92,
   "legacySelectorLines": 258,
   "duplicateSelectors": [
     {
@@ -17,11 +17,11 @@
       "count": 7
     },
     {
-      "selector": ".overflow-menu",
-      "count": 5
+      "selector": "@media (max-width: 480px)",
+      "count": 6
     },
     {
-      "selector": "@media (max-width: 480px)",
+      "selector": ".overflow-menu",
       "count": 5
     },
     {
@@ -62,6 +62,14 @@
     },
     {
       "selector": ".module-view[data-module='wastewater'] .wastewater-fixture-row--editable > button",
+      "count": 4
+    },
+    {
+      "selector": ".tc-collection-row.tc-consumer-row--editable",
+      "count": 4
+    },
+    {
+      "selector": ".tc-collection-row.tc-consumer-row--editable .tc-quantity-field",
       "count": 4
     },
     {
@@ -194,14 +202,6 @@
     },
     {
       "selector": ".control",
-      "count": 2
-    },
-    {
-      "selector": ".result-list",
-      "count": 2
-    },
-    {
-      "selector": ".result-row strong",
       "count": 2
     }
   ],

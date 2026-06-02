@@ -23,7 +23,7 @@ const wastewaterHtml = renderFormSchema(wastewater.schema, {
 assert.match(wastewaterHtml, /<select[^>]+id="lineType"/, 'Line type must render as a native select.');
 assert.match(wastewaterHtml, /tc-consumer-row--editable/, 'Collection rows must use the editable platform row contract.');
 assert.match(collectionRendererSource, /tc-collection-row__content/, 'Collection renderer must expose a stable content column for quantity alignment.');
-assert.match(cssSource, /tc-collection-row\.tc-consumer-row--editable[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\) 112px 42px/, 'Platform CSS must stabilize quantity/delete columns.');
+assert.match(cssSource, /tc-collection-row\.tc-consumer-row--editable[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\) 82px 38px/, 'Platform CSS must stabilize quantity/delete columns.');
 
 assert.match(savedRecordsSource, /data-saved-record-id="\$\{esc\(item\.id\)\}"/, 'Saved cards must expose an explicit platform record id.');
 assert.match(savedRecordsSource, /\$\{toggleAttr\}="\$\{esc\(item\.id\)\}"/, 'Saved-card toggles must carry the record id for robust mobile selection.');

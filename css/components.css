@@ -4442,3 +4442,40 @@ body::before {
     max-width: 112px;
   }
 }
+
+/* Phase 17C.2: compact reference-module collection quantity column.
+   Prevents long Entwaesserungsgegenstand labels from colliding with Anzahl. */
+.tc-collection-row.tc-consumer-row--editable {
+  grid-template-columns: minmax(0, 1fr) 82px 38px;
+  column-gap: 8px;
+}
+.tc-collection-row__content {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.tc-collection-row.tc-consumer-row--editable .tc-quantity-field {
+  width: 82px;
+  min-width: 82px;
+  max-width: 82px;
+}
+.tc-collection-row.tc-consumer-row--editable .tc-quantity-field input {
+  min-height: 34px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+.tc-collection-row.tc-consumer-row--editable > button {
+  width: 38px;
+  min-width: 38px;
+  height: 34px;
+}
+@media (max-width: 480px) {
+  .tc-collection-row.tc-consumer-row--editable {
+    grid-template-columns: minmax(0, 1fr) 82px 38px;
+    column-gap: 8px;
+  }
+  .tc-collection-row.tc-consumer-row--editable .tc-quantity-field {
+    width: 82px;
+    min-width: 82px;
+    max-width: 82px;
+  }
+}
