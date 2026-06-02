@@ -2,26 +2,14 @@ import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { readFieldValue, normalizeQuantityInput } from '../../core/formActions.js';
 import { getFixture, toNumber } from './logic.js';
 import { initialState } from './state.js';
+import { lineFamilyValue, lineVentilationValue, resolveLineType } from './lineModel.js';
+import { deleteCollectionItem, patchCollectionItem, upsertCollectionRecord } from '../../platform/collectionModel/index.js';
+import { createStateSnapshot, hydrateStateRecord } from '../../platform/savedRecordModel/index.js';
 
 const numericFields = new Set(['fixtureQuantity','fixtureCustomDu','kValue','fillRatio','slopeCmM','pipeLengthM','heightDifferenceM','bends90','continuousFlow','pumpFlow','rainFlow']);
 const normalizeNumeric = value => canonicalGermanNumberInput(value);
 const normalizedFixtureQuantity = value => Math.max(0, Math.round(normalizeQuantityInput(value, 1)) || 0);
-const fixtureKey = (item = {}) => [item.typeId || '', item.customName || '', item.customDu || '', item.customDn || ''].join('|');
-
-function lineFamilyValue(lineType) {
-  if (String(lineType).startsWith('single-')) return 'single';
-  if (String(lineType).startsWith('branch-')) return 'branch';
-  if (lineType === 'ground-full' || lineType === 'ventilation') return 'ground-outside';
-  return lineType || 'single-unvented';
-}
-function lineVentilationValue(lineType) {
-  return String(lineType).endsWith('-vented') && !String(lineType).endsWith('unvented') ? 'vented' : 'unvented';
-}
-function resolveLineType(family, ventilation, previous = 'single-unvented') {
-  if (family === 'single') return ventilation === 'vented' ? 'single-vented' : 'single-unvented';
-  if (family === 'branch') return ventilation === 'vented' ? 'branch-vented' : 'branch-unvented';
-  return family || previous;
-}
+const fixtureKeyFields = ['typeId', 'customName', 'customDu', 'customDn'];
 
 function draftFromRoot(root, current = {}) {
   const typeId = readFieldValue(root, 'fixtureType', current.fixtureType || 'washbasin');
@@ -39,15 +27,11 @@ function draftFromRoot(root, current = {}) {
 function addFixture({ current = {}, root } = {}) {
   const record = draftFromRoot(root, current);
   if (normalizedFixtureQuantity(record.quantity) <= 0) return {};
-  const key = fixtureKey(record);
-  let merged = false;
-  const fixtures = (current.fixtures || []).map(item => {
-    if (fixtureKey(item) !== key) return item;
-    merged = true;
-    return { ...item, quantity: String(normalizedFixtureQuantity(item.quantity) + normalizedFixtureQuantity(record.quantity)) };
-  });
   return {
-    fixtures: merged ? fixtures : [...fixtures, record],
+    fixtures: upsertCollectionRecord(current.fixtures || [], record, {
+      keyFields: fixtureKeyFields,
+      merge: (item, added) => ({ ...item, quantity: String(normalizedFixtureQuantity(item.quantity) + normalizedFixtureQuantity(added.quantity)) })
+    }),
     fixtureQuantity: '1',
     fixtureCustomName: '',
     fixtureCustomDu: '',
@@ -56,27 +40,23 @@ function addFixture({ current = {}, root } = {}) {
 }
 
 function patchFixtureQuantity({ id, value, current = {} } = {}) {
-  return {
-    fixtures: (current.fixtures || []).map(item => String(item.id) === String(id) ? { ...item, quantity: String(normalizedFixtureQuantity(value)) } : item)
-  };
+  return { fixtures: patchCollectionItem(current.fixtures || [], id, { quantity: String(normalizedFixtureQuantity(value)) }) };
 }
 function deleteFixture({ id, current = {} } = {}) {
-  return { fixtures: (current.fixtures || []).filter(item => String(item.id) !== String(id)) };
+  return { fixtures: deleteCollectionItem(current.fixtures || [], id) };
 }
 
 function snapshot(current = {}, result = {}) {
-  const copy = { ...current };
-  delete copy.savedCalculations;
-  delete copy.activeCalculationId;
-  delete copy.expandedCalculationId;
-  return {
-    name: current.name?.trim() || `Schmutzwasser ${(current.savedCalculations || []).length + 1}`,
-    state: copy,
-    result: { qtot: result.qtot, qww: result.qww, sumDu: result.sumDu, dn: result.selected?.dn, lineType: current.lineType }
-  };
+  return createStateSnapshot({
+    current,
+    calculationResult: result,
+    excludeKeys: ['savedCalculations', 'activeCalculationId', 'expandedCalculationId'],
+    name: state => state.name?.trim() || `Schmutzwasser ${(state.savedCalculations || []).length + 1}`,
+    resultMapper: output => ({ qtot: output.qtot, qww: output.qww, sumDu: output.sumDu, dn: output.selected?.dn, lineType: current.lineType })
+  });
 }
 function hydrate(item = {}) {
-  return { ...(item.state || {}), activeCalculationId: item.id, name: item.name || '' };
+  return hydrateStateRecord(item, { activeIdKey: 'activeCalculationId', nameKey: 'name' });
 }
 function clear(current = {}) {
   return { ...initialState, savedCalculations: current.savedCalculations || [] };
@@ -131,4 +111,3 @@ export default {
   normalizeFields: [...numericFields]
 };
 
-export { lineFamilyValue, lineVentilationValue, resolveLineType };

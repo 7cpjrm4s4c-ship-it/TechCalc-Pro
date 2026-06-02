@@ -1,8 +1,8 @@
 import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { fixtureTypes, usageTypes } from './tables.js';
-import { calculate, getFixture } from './logic.js';
-import { lineFamilyValue, lineVentilationValue } from './controller.js';
+import { getFixture } from './logic.js';
+import { lineFamilyValue, lineVentilationValue } from './lineModel.js';
 
 const fixtureOptions = fixtureTypes.map(item => ({ value: item.id, label: item.name }));
 const usageOptions = usageTypes.map(item => ({ value: item.value, label: item.label }));
@@ -29,9 +29,8 @@ const showLength = s => ['single-unvented','single-vented','branch-unvented'].in
 const showBends = s => ['single-unvented','branch-unvented','branch-vented'].includes(s.lineType);
 const usageK = s => usageTypes.find(item => item.value === s.usageType)?.k;
 
-function fixtureItems(state = {}) {
-  const result = calculate(state);
-  return (result.fixtures || []).map(item => ({
+function fixtureItems(state = {}, context = {}) {
+  return (context.result?.fixtures || []).map(item => ({
     id: item.id,
     title: item.name,
     quantity: item.qty,

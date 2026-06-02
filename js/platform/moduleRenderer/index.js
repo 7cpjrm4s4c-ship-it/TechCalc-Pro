@@ -35,7 +35,7 @@ function renderSavedRecords(model = {}, accent = 'blue') {
 
 export function renderPlatformModuleView({ config, schema, state, result, resultModel, savedRecords } = {}) {
   const accent = config?.accent || 'blue';
-  const form = renderFormSchema(schema, state, { title: 'Eingaben', accent });
+  const form = renderFormSchema(schema, state, { title: 'Eingaben', accent, result });
   const results = renderResultModel(resultModel || {}, accent);
   const saved = renderSavedRecords(savedRecords, accent);
   return renderModuleShell(config, `<div class="span-6">${form}</div><div class="span-6">${stack([results, saved].filter(Boolean).join(''))}</div>`);

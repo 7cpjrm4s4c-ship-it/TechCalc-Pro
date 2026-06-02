@@ -145,8 +145,9 @@ function renderAction(def, state = {}) {
   return `<div class="tc-action-row" data-schema-action="${esc(def.key)}"><button type="button" class="action-button action-button--${esc(variant)}"${extra} ${disabled ? 'disabled' : ''}>${esc(label)}</button></div>`;
 }
 
-function renderCollection(def, state = {}) {
-  return renderPlatformCollection(def, state);
+function renderCollection(def, state = {}, context = {}) {
+  // Phase 17B.1 contract: renderPlatformCollection(def, state)
+  return renderPlatformCollection(def, state, context);
 }
 
 
@@ -169,13 +170,13 @@ function renderInput(def, state = {}) {
   return `<div class="field tc-field" data-schema-field-wrapper="${esc(def.key)}"><label for="${esc(def.key)}">${esc(fieldLabel(def, state))}</label><div class="control"><input id="${esc(def.key)}" type="${esc(type)}" inputmode="${esc(inputmode)}" value="${esc(value ?? '')}" placeholder="${esc(resolve(def.placeholder, state, def.type === FIELD_TYPES.TEXT ? '' : '0'))}"${extra}>${unitHtml}</div></div>`;
 }
 
-export function renderSchemaField(def, state = {}) {
+export function renderSchemaField(def, state = {}, context = {}) {
   if (!isVisible(def, state)) return '';
   const type = def.type || FIELD_TYPES.TEXT;
   if (type === FIELD_TYPES.NOTICE || type === 'notice') return renderNotice(def, state);
   if (type === FIELD_TYPES.STATS || type === 'stats') return renderStats(def, state);
   if (type === FIELD_TYPES.ACTION || type === 'action') return renderAction(def, state);
-  if (type === FIELD_TYPES.COLLECTION || type === 'collection') return renderCollection(def, state);
+  if (type === FIELD_TYPES.COLLECTION || type === 'collection') return renderCollection(def, state, context);
   if (type === FIELD_TYPES.CUSTOM || type === 'custom') return typeof def.render === 'function' ? def.render(state) : String(def.html || '');
   if (type === FIELD_TYPES.SELECT) return renderSelect(def, state);
   if (type === FIELD_TYPES.SEGMENT) return renderSegment(def, state);
@@ -192,7 +193,7 @@ export function renderSchemaForm(schema = {}, state = {}, options = {}) {
     const body = (group.fields || [])
       .map(key => fieldMap.get(key))
       .filter(Boolean)
-      .map(def => renderSchemaField(def, state))
+      .map(def => renderSchemaField(def, state, { result: options.result || {}, schema, group }))
       .filter(Boolean)
       .join('');
     const beforeHtml = typeof group.beforeHtml === 'function' ? group.beforeHtml(state) : group.beforeHtml || '';
