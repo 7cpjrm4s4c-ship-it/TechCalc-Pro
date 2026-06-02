@@ -11,6 +11,28 @@ const array = value => Array.isArray(value) ? value : [];
 
 function preserveScroll(action) { keepScroll(action); }
 
+function createNormalizedState(state, fields = []) {
+  const numericFields = Array.isArray(fields) ? fields : [];
+  if (!numericFields.length || !state?.set) return state;
+  return {
+    ...state,
+    set(patch = {}, meta = {}) {
+      return state.set(normalizeConfiguredFields(patch, numericFields), meta);
+    },
+    update(updater, meta = {}) {
+      if (typeof updater !== 'function') {
+        return state.update ? state.update(normalizeConfiguredFields(updater || {}, numericFields), meta) : this.set(updater || {}, meta);
+      }
+      const wrappedUpdater = current => normalizeConfiguredFields(updater(current) || {}, numericFields);
+      return state.update ? state.update(wrappedUpdater, meta) : this.set(wrappedUpdater(state.get?.() || {}), meta);
+    },
+    replace(next = {}, meta = {}) {
+      const normalized = normalizeConfiguredFields(next, numericFields);
+      return state.replace ? state.replace(normalized, meta) : state.set(normalized, meta);
+    }
+  };
+}
+
 export function normalizeConfiguredFields(patch = {}, fields = []) {
   if (!fields.length) return patch;
   const numeric = new Set(fields);
@@ -164,6 +186,7 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
 
 export function createPlatformModule(definition = {}) {
   const { config, schema, state, initialState, calculate, results, savedRecords, controller = {} } = definition;
+  const runtimeState = createNormalizedState(state, controller.normalizeFields);
   function view(snapshot) {
     const result = calculate(snapshot);
     return renderPlatformModuleView({
@@ -177,14 +200,14 @@ export function createPlatformModule(definition = {}) {
   }
   function bindPlatformActions(root) {
     const actions = {
-      ...bindSegments(root, state, controller.segments),
-      ...bindCollections(root, state, controller.collections),
-      ...bindSavedRecords(root, state, calculate, controller.savedRecords)
+      ...bindSegments(root, runtimeState, controller.segments),
+      ...bindCollections(root, runtimeState, controller.collections),
+      ...bindSavedRecords(root, runtimeState, calculate, controller.savedRecords)
     };
-    bindLookupHydration(root, state, controller.lookupHydration);
+    bindLookupHydration(root, runtimeState, controller.lookupHydration);
     registerCentralActions(root, actions);
   }
-  return { config, schema, state, initialState, calculate, results, savedRecords, controller, mount(root) { return mountModule(root, state, view, bindPlatformActions); } };
+  return { config, schema, state: runtimeState, initialState, calculate, results, savedRecords, controller, mount(root) { return mountModule(root, runtimeState, view, bindPlatformActions); } };
 }
 
 export default { createPlatformModule };

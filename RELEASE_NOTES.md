@@ -1,4 +1,13 @@
 
+## 1.3.0 – Phase 17C Reference Bugfix Stabilization
+
+- Plattform-Runtime normalisiert konfigurierte numerische Felder zentral.
+- Regenwasser nutzt `normalizeFields` für Flächen, Regenspenden, Ablauf- und Notentwässerungswerte.
+- Schmutzwasser-Normalisierung ist nun als Runtime-Vertrag aktiv.
+- Regression gegen deutsche Tausender-/Kommaeingaben ergänzt.
+- `npm test` erfolgreich.
+
+
 ## Phase 17B - Schmutzwasser Plattformsteuerung
 
 - Schmutzwasser als zweites Referenzmodul in `createPlatformModule` migriert.

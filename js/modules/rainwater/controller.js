@@ -183,6 +183,7 @@ export default {
     hydrateDomFields: { drainSize: ['drainSizeManual', 'drainCapacity', 'drainHead'] },
         patch: lookupPatch
   },
+  normalizeFields: [...surfaceNumericFields],
   savedRecords: {
     enabled: true,
     snapshot: surfaceRecordSnapshot,
