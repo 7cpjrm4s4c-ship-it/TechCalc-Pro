@@ -10,6 +10,6 @@ assert.match(config, /phase-14g-rainwater-global-standard/, 'Rainwater migration
 assert.doesNotMatch(source, /function savedSnapshot|function savedRows|function surfaceDimensionCards/, 'Rainwater must remove duplicate calculation save and bespoke surface result render paths.');
 assert.doesNotMatch(source, /rainwater:save|rainwater:update|rainwater:saved-load|rainwater:saved-delete|rainwater:saved-toggle/, 'Rainwater must not keep calculation-level saved-record actions.');
 assert.match(moduleRenderer, /renderSavedRecordList\(items, \{/, 'Rainwater surfaces must keep the global saved-record renderer.');
-assert.match(controller, /data-saved-load/, 'Rainwater surface records must stay selectable through platform saved-record attributes.');
+assert.doesNotMatch(controller, /data-saved-load/, 'Rainwater surface records must not redeclare platform saved-record attributes.');
 
 console.log('rainwater phase14g global standard regression ok');

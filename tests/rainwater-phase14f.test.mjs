@@ -10,7 +10,7 @@ const css = readFileSync(new URL('../css/components.css', import.meta.url), 'utf
 assert.match(mount, /root\.__tcActionHandlers = \{\}/, 'Module mounts must clear stale action handlers before rebinding the pipeline.');
 assert.doesNotMatch(rainwater, /__rainwaterInputBound/, 'Rainwater must not keep module-owned root input listeners.');
 assert.match(moduleRenderer, /renderSavedRecordList\(items, \{/, 'Rainwater surfaces must use the platform saved-record UI.');
-assert.match(controller, /data-saved-load/, 'Rainwater surfaces must use platform saved-record load attributes through controller data.');
+assert.doesNotMatch(controller, /data-saved-load/, 'Rainwater surfaces must inherit platform saved-record load attributes.');
 assert.match(controller, /expandedSurfaceResultId:\s*null/, 'Switching Dachfläche/Grundstücksfläche must reset stale expanded surface state.');
 assert.match(css, /\.tc-action-link[\s\S]*justify-content: center/, 'Global action links must be centered in cards.');
 

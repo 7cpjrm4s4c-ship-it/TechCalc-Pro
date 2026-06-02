@@ -172,17 +172,16 @@ export default {
   segments: {
     fields: {
       surfaceMode: {
-        action: 'platform:rainwater:surface-mode-select',
+        action: 'platform:segment:surfaceMode',
         patch: modeDefaultsPatch
       }
     }
   },
   lookupHydration: {
-    key: 'rainwater:lookup-hydration',
+    key: 'platform:lookup-hydration',
     fields: ['drainSize', 'emergencyType', 'areaType'],
     hydrateDomFields: { drainSize: ['drainSizeManual', 'drainCapacity', 'drainHead'] },
-    action: field => `rainwater:${field}:lookup`,
-    patch: lookupPatch
+        patch: lookupPatch
   },
   savedRecords: {
     enabled: true,
@@ -194,14 +193,7 @@ export default {
     expandedIdKey: 'expandedSurfaceResultId',
     nameKey: 'areaName',
     recordPrefix: 'rain-surface',
-    preCreateAction: 'rainwater:pre-surface-add',
-    preUpdateAction: 'rainwater:pre-surface-update',
-    afterCreatePatch: resetSurfaceEditorAfterAdd,
-    attrs: {
-      loadAttr: 'data-saved-load',
-      toggleAttr: 'data-saved-toggle',
-      deleteAttr: 'data-saved-delete'
-    },
+        afterCreatePatch: resetSurfaceEditorAfterAdd,
     preserveSaveScroll: true,
     preserveLoadScroll: true
   }

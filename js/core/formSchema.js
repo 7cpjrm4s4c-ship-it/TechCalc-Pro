@@ -7,7 +7,9 @@ export const FIELD_TYPES = Object.freeze({
   SEGMENT: 'segment',
   READONLY: 'readonly',
   BOOLEAN: 'boolean',
-  CUSTOM: 'custom'
+  CUSTOM: 'custom',
+  NOTICE: 'notice',
+  STATS: 'stats'
 });
 
 const ALLOWED_FIELD_TYPES = new Set(Object.values(FIELD_TYPES));

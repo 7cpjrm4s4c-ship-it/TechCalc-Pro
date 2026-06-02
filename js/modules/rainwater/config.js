@@ -9,7 +9,7 @@ export default defineModuleConfig({
   order: 19,
   defaultVisible: false,
 
-  migrationStatus: 'phase-14g-rainwater-global-standard phase-14l-rainwater-reference-completion phase-14m-router-direct-render phase-17a2-rainwater-saved-actions phase-17a5-rainwater-platform-control',
+  migrationStatus: 'phase-14g-rainwater-global-standard phase-14l-rainwater-reference-completion phase-14m-router-direct-render phase-17a2-rainwater-saved-actions phase-17a5-rainwater-platform-control phase-17a6-rainwater-platform-only-reference',
   capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.CENTRAL_SCROLL, MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS, MODULE_CAPABILITIES.FORM_SCHEMA],
   description: 'Vorbemessung von Regenwasser nach DIN 1986-100 mit Dach-/Grundstücksflächen, KOSTRA-Eingabe, Ablaufanzahl, Fallleitungsdimension und Notentwässerung.'
 });

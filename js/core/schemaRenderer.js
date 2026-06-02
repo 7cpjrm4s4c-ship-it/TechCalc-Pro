@@ -1,4 +1,4 @@
-import { esc, card, grid, resultRows, segmented } from './renderer.js';
+import { esc, card, grid, resultRows, segmented, inlineStats } from './renderer.js';
 import { numberService } from './numberService.js';
 
 
@@ -10,7 +10,9 @@ const FIELD_TYPES = Object.freeze({
   SEGMENT: 'segment',
   READONLY: 'readonly',
   BOOLEAN: 'boolean',
-  CUSTOM: 'custom'
+  CUSTOM: 'custom',
+  NOTICE: 'notice',
+  STATS: 'stats'
 });
 
 const FIELD_TYPE_TO_INPUTMODE = Object.freeze({
@@ -92,6 +94,41 @@ function renderBoolean(def, state = {}) {
   return `<div class="field field--boolean tc-field" data-schema-field-wrapper="${esc(def.key)}"><label class="tc-checkbox"><input type="checkbox" data-field="${esc(def.key)}" data-schema-field="${esc(def.key)}" data-commit="immediate" ${checked ? 'checked' : ''}> <span>${esc(fieldLabel(def, state))}</span></label></div>`;
 }
 
+
+function renderNotice(def, state = {}) {
+  const text = resolve(def.text, state, '');
+  if (!text) return '';
+  const tone = resolve(def.tone, state, 'compact');
+  const modifier = tone ? ` empty-state--${esc(tone)}` : '';
+  return `<div class="empty-state${modifier}" data-schema-notice="${esc(def.key)}">${esc(text)}</div>`;
+}
+
+function renderStats(def, state = {}) {
+  const items = resolve(def.items, state, []) || [];
+  if (!items.length) return '';
+  return inlineStats(items.map(item => ({
+    label: resolve(item.label, state, ''),
+    value: resolve(item.value, state, '—'),
+    unit: resolve(item.unit, state, '')
+  })));
+}
+
+function renderGroupAction(action = {}, state = {}) {
+  const href = resolve(action.href, state, '');
+  const label = resolve(action.label, state, '');
+  if (!href || !label) return '';
+  const classes = ['action-button', `action-button--${action.variant || 'secondary'}`, 'tc-action-link']
+    .concat(action.classes || [])
+    .filter(Boolean)
+    .join(' ');
+  return `<a class="${esc(classes)}" href="${esc(href)}" target="${action.target ? esc(action.target) : '_blank'}" rel="${esc(action.rel || 'noopener')}">${esc(label)}</a>`;
+}
+
+function renderGroupActions(group = {}, state = {}) {
+  const actions = Array.isArray(group.actions) ? group.actions : [];
+  return actions.map(action => renderGroupAction(action, state)).filter(Boolean).join('');
+}
+
 function renderInput(def, state = {}) {
   const type = def.htmlType || 'text';
   const inputmode = def.inputmode || FIELD_TYPE_TO_INPUTMODE[def.type || FIELD_TYPES.TEXT] || 'text';
@@ -114,6 +151,8 @@ function renderInput(def, state = {}) {
 export function renderSchemaField(def, state = {}) {
   if (!isVisible(def, state)) return '';
   const type = def.type || FIELD_TYPES.TEXT;
+  if (type === FIELD_TYPES.NOTICE || type === 'notice') return renderNotice(def, state);
+  if (type === FIELD_TYPES.STATS || type === 'stats') return renderStats(def, state);
   if (type === FIELD_TYPES.CUSTOM || type === 'custom') return typeof def.render === 'function' ? def.render(state) : String(def.html || '');
   if (type === FIELD_TYPES.SELECT) return renderSelect(def, state);
   if (type === FIELD_TYPES.SEGMENT) return renderSegment(def, state);
@@ -134,8 +173,9 @@ export function renderSchemaForm(schema = {}, state = {}, options = {}) {
       .filter(Boolean)
       .join('');
     const beforeHtml = typeof group.beforeHtml === 'function' ? group.beforeHtml(state) : group.beforeHtml || '';
+    const actionHtml = renderGroupActions(group, state);
     const afterHtml = typeof group.afterHtml === 'function' ? group.afterHtml(state) : group.afterHtml || '';
-    const content = [beforeHtml, grid(body, group.columns || 2), afterHtml].filter(Boolean).join('');
+    const content = [beforeHtml, grid(body, group.columns || 2), actionHtml, afterHtml].filter(Boolean).join('');
     if (!content && group.hideWhenEmpty !== false) return '';
     return card(group.title || options.title || 'Eingaben', content, group.accent || options.accent || 'blue');
   }).filter(Boolean).join('');

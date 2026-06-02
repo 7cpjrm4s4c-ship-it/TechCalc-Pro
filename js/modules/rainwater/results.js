@@ -162,10 +162,6 @@ export function savedRecords(s = {}, r = {}) {
     activeId: s.activeSurfaceId,
     expandedId: s.expandedSurfaceResultId,
     emptyText: 'Noch keine Regenflächen gespeichert.',
-    loadAttr: 'data-saved-load',
-    toggleAttr: 'data-saved-toggle',
-    deleteAttr: 'data-saved-delete',
-    dynamicAttr: 'data-rainwater-dynamic="surface-list"',
     accent: 'green',
     items
   };

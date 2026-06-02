@@ -1,5 +1,4 @@
 import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
-import { inlineStats, esc } from '../../core/renderer.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { toNumber } from './logic.js';
 import { areaTypes, roofDrainTable } from './tables.js';
@@ -63,19 +62,19 @@ export const rainwaterSchema = defineFormSchema({
     { key:'emergencyManufacturerDn', label:'Hersteller-DN', type:FIELD_TYPES.TEXT, placeholder:'DN 100', visibleWhen:s => mode(s) === 'roof' && s.emergencyType === 'manual' },
     { key:'emergencyCapacity', label:'Hersteller-Abflusswert', type:FIELD_TYPES.DECIMAL, unit:'l/s', visibleWhen:s => mode(s) === 'roof' && s.emergencyType === 'manual' },
     { key:'emergencySafetyFactor', label:'Sicherheitsfaktor', type:FIELD_TYPES.DECIMAL, format:value => fmtDecimalInput(value || '1,0', 1), visibleWhen:s => mode(s) === 'roof' },
-    { key:'emergencyInfo', label:'Notentwässerung', type:FIELD_TYPES.CUSTOM, render:() => '<div class="empty-state empty-state--compact">Notentwässerung wird nur für Dachflächen vorbemessen.</div>', visibleWhen:s => mode(s) !== 'roof' },
+    { key:'emergencyInfo', label:'Notentwässerung', type:FIELD_TYPES.NOTICE, text:'Notentwässerung wird nur für Dachflächen vorbemessen.', tone:'compact', visibleWhen:s => mode(s) !== 'roof' },
     { key:'areaType', label:'Flächenart', type:FIELD_TYPES.SELECT, options:s => areaOptionsForMode(mode(s)), commit:'immediate', lookup:true },
     { key:'areaSize', label:'Fläche A', type:FIELD_TYPES.DECIMAL, unit:'m²', default:'100' },
-    { key:'areaCoefficients', label:'Abflussbeiwerte', type:FIELD_TYPES.CUSTOM, render:s => {
+    { key:'areaCoefficients', label:'Abflussbeiwerte', type:FIELD_TYPES.STATS, items:s => {
       const selected = selectedArea(s);
-      return selected?.custom ? '' : inlineStats([{ label:'Cs', value:fmt(selected?.cs, 2) }, { label:'Cm', value:fmt(selected?.cm, 2) }]);
+      return selected?.custom ? [] : [{ label:'Cs', value:fmt(selected?.cs, 2) }, { label:'Cm', value:fmt(selected?.cm, 2) }];
     }, visibleWhen:s => !selectedArea(s)?.custom },
     { key:'customCs', label:'Spitzenabflussbeiwert Cs', type:FIELD_TYPES.DECIMAL, placeholder:'0,9', visibleWhen:s => selectedArea(s)?.custom },
     { key:'customCm', label:'mittlerer Abflussbeiwert Cm', type:FIELD_TYPES.DECIMAL, placeholder:'0,8', visibleWhen:s => selectedArea(s)?.custom }
   ],
   groups: [
     { title:'Berechnungsbereich', fields:['surfaceMode'], columns:1, accent:'green' },
-    { title:'Regenspende', fields:['roofRainIntensity','propertyRainIntensity','rainHundredIntensity'], columns:2, accent:'green', afterHtml:() => `<a class="action-button action-button--secondary tc-action-link" href="${esc(KOSTRA_URL)}" target="_blank" rel="noopener">KOSTRA / OpenKo Daten öffnen</a>` },
+    { title:'Regenspende', fields:['roofRainIntensity','propertyRainIntensity','rainHundredIntensity'], columns:2, accent:'green', actions:[{ label:'KOSTRA / OpenKo Daten öffnen', href:KOSTRA_URL, variant:'secondary' }] },
     { title:'Dacheinläufe / Hoftöpfe', fields:['drainSize','drainSizeManual','drainCapacity','drainHead','stackCount'], columns:2, accent:'green' },
     { title:'Notentwässerung', fields:['emergencyType','emergencyHead','emergencyWidth','emergencyDiameter','emergencyManufacturerDn','emergencyCapacity','emergencySafetyFactor','emergencyInfo'], columns:2, accent:'green' },
     { title:'Regenfläche', fields:['areaType','areaSize','areaCoefficients','customCs','customCm'], columns:2, accent:'green' }
