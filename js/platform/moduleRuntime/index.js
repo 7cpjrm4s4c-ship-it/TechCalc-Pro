@@ -75,8 +75,14 @@ function bindSegments(root, state, segmentConfig = {}) {
     const patchFactory = asFn(fields[field].patch);
     const patch = patchFactory(value, current, { field, root }) || { [field]: value };
     setSegmentVisual(root, field, patch?.[field] ?? value);
-    preserveScroll(() => state.set(patch, { action: fields[field].action || `platform:segment:${field}`, notify: true }));
-    getRenderScheduler(root)?.flushNow?.(fields[field].action || `platform:segment:${field}`);
+    const action = fields[field].action || `platform:segment:${field}`;
+    preserveScroll(() => state.set(patch, { action, notify: true }));
+    const scheduler = getRenderScheduler(root);
+    scheduler?.flushNow?.(action);
+    // Phase 17C.3: the surface-mode switch changes visible/labelled fields.
+    // Flush once synchronously and once in a microtask so mobile Safari cannot
+    // leave the previous schema branch visible until the next unrelated input.
+    if (typeof queueMicrotask === 'function') queueMicrotask(() => scheduler?.flushNow?.(`${action}:settled`));
   };
   return handlers;
 }
@@ -178,51 +184,11 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     preserveLoadScroll: savedConfig.preserveLoadScroll !== false
   });
 
-  // Phase 17C.2: saved-record cards are reference-module critical.  Mobile
-  // browsers can suppress the synthetic click after touch/scroll gestures, so
-  // selection/editing must not depend on the generic action dispatcher alone.
-  if (!root.__tcPlatformSavedRecordDirectBinding) {
-    root.__tcPlatformSavedRecordDirectBinding = true;
-    const handleSavedPointer = event => {
-      if (event.type === 'click' && Date.now() - Number(root.dataset.tcSavedDirectAt || 0) < 650) {
-        event.preventDefault?.();
-        event.stopPropagation?.();
-        event.stopImmediatePropagation?.();
-        return;
-      }
-      const target = event.target;
-      const deleteButton = target?.closest?.('[data-saved-delete]');
-      const toggleButton = target?.closest?.('[data-saved-toggle]');
-      const loadCard = target?.closest?.('[data-saved-load], [data-saved-record-card]');
-      if (!root.contains(loadCard || deleteButton || toggleButton)) return;
-      const mark = () => { root.dataset.tcSavedDirectAt = String(Date.now()); };
-      if (deleteButton) {
-        event.preventDefault?.();
-        event.stopPropagation?.();
-        event.stopImmediatePropagation?.();
-        mark();
-        actions.delete({ element: deleteButton });
-        return;
-      }
-      if (toggleButton) {
-        event.preventDefault?.();
-        event.stopPropagation?.();
-        event.stopImmediatePropagation?.();
-        mark();
-        actions.toggle({ element: toggleButton });
-        return;
-      }
-      if (loadCard && !target?.closest?.('input, select, textarea, label, a[href], button')) {
-        event.preventDefault?.();
-        event.stopPropagation?.();
-        event.stopImmediatePropagation?.();
-        mark();
-        actions.load({ element: loadCard, event });
-      }
-    };
-    root.addEventListener('pointerup', handleSavedPointer, true);
-    root.addEventListener('click', handleSavedPointer, true);
-  }
+  // Phase 17C.3: saved-record interaction is handled exclusively by
+  // the central event pipeline through data-tc-action.  A previous direct
+  // pointer binding captured stale module state after route/module re-renders
+  // and blocked accordion/delete/load propagation on the reference modules.
+
 
   return {
     'saved:add': () => actions.save(),

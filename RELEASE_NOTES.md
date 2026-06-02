@@ -713,3 +713,10 @@
 - Regenwasser-spezifische Workflow-Regeln in `controller.js` als Fachadapter gekapselt.
 - Regressionstests auf Plattformverantwortung aktualisiert.
 - `npm test` erfolgreich.
+
+## Phase 17C.3 – Reference Event Fixes
+
+- Fixed saved-record selection/edit/delete/toggle regression in rainwater and wastewater by removing stale direct pointer binding.
+- Restored central `data-tc-action` handling for saved records.
+- Added settled microtask render flush for rainwater surface-mode schema switches.
+- Added regression `reference-modules-phase17c3-saved-and-switch`.
