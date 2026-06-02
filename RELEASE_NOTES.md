@@ -1,4 +1,14 @@
 
+## Phase 17C.1 – Referenzmodule UI-Bugfixes
+
+- Schmutzwasser: Leitungsart von Segment-Auswahl auf Plattform-Dropdown `lineType` umgestellt.
+- Schmutzwasser: alte `lineFamily`-/`lineVentilation`-Segmentlogik aus Schema und Controller entfernt.
+- Schmutzwasser: Anzahl-Felder in Entwässerungsgegenständen über generischen Plattform-Collection-Grid-Vertrag vereinheitlicht.
+- Regenwasser: Bereichswechsel Dachfläche/Grundstücksfläche rendert Regenspende-Beschriftung direkt von `r(5,5)` auf `r(5,2)`.
+- Saved Records: Karten und Toggle-Buttons tragen explizite Record-IDs für robustes Markieren/Bearbeiten auf Touch-Geräten.
+- Neue Regression `reference-modules-phase17c1-ui-bugfix`; `npm test` erfolgreich.
+
+
 ## 1.3.0 – Phase 17C Reference Bugfix Stabilization
 
 - Plattform-Runtime normalisiert konfigurierte numerische Felder zentral.

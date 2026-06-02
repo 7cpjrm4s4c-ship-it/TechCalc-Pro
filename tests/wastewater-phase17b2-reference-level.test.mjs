@@ -11,13 +11,13 @@ const collectionModelSource = readFileSync(new URL('../js/platform/collectionMod
 const savedRecordModelSource = readFileSync(new URL('../js/platform/savedRecordModel/index.js', import.meta.url), 'utf8');
 
 assert.doesNotMatch(schemaSource, /from '\.\/controller\.js'|calculate\(/, 'Wastewater schema must not depend on controller code or recalculate collection presentation itself.');
-assert.match(schemaSource, /from '\.\/lineModel\.js'/, 'Line type view state must be separated from the runtime controller.');
+assert.ok(schema.fields.some(field => field.key === 'lineType' && field.type === 'select'), 'Line type must be rendered as a platform select/dropdown.');
 assert.match(schemaRendererSource, /options\.result/, 'Schema renderer must pass calculated result context into platform field rendering.');
 assert.match(collectionModelSource, /upsertCollectionRecord/, 'Collection mutation helpers must live in the platform.');
 assert.match(savedRecordModelSource, /createStateSnapshot/, 'Saved-record snapshot helpers must live in the platform.');
 assert.match(controllerSource, /platform\/collectionModel/, 'Wastewater controller must use platform collection mutations.');
 assert.match(controllerSource, /platform\/savedRecordModel/, 'Wastewater controller must use platform saved-record model helpers.');
-assert.doesNotMatch(controllerSource, /function lineFamilyValue|function lineVentilationValue|function resolveLineType/, 'Wastewater controller must not own line presentation transforms.');
+assert.doesNotMatch(controllerSource, /lineFamily|lineVentilation|resolveLineType|segments:/, 'Wastewater controller must not own line presentation transforms or segment handlers.');
 
 const state = {
   ...wastewater.initialState,

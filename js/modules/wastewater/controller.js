@@ -2,7 +2,6 @@ import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { readFieldValue, normalizeQuantityInput } from '../../core/formActions.js';
 import { getFixture, toNumber } from './logic.js';
 import { initialState } from './state.js';
-import { lineFamilyValue, lineVentilationValue, resolveLineType } from './lineModel.js';
 import { deleteCollectionItem, patchCollectionItem, upsertCollectionRecord } from '../../platform/collectionModel/index.js';
 import { createStateSnapshot, hydrateStateRecord } from '../../platform/savedRecordModel/index.js';
 
@@ -63,18 +62,6 @@ function clear(current = {}) {
 }
 
 export default {
-  segments: {
-    fields: {
-      lineFamily: {
-        action: 'platform:segment:lineFamily',
-        patch: (value, current = {}) => ({ lineType: resolveLineType(value, lineVentilationValue(current.lineType), current.lineType) })
-      },
-      lineVentilation: {
-        action: 'platform:segment:lineVentilation',
-        patch: (value, current = {}) => ({ lineType: resolveLineType(lineFamilyValue(current.lineType), value, current.lineType) })
-      }
-    }
-  },
   lookupHydration: {
     key: 'platform:lookup-hydration',
     fields: ['usageType','fixtureType','lineType'],

@@ -18,7 +18,7 @@ export function renderCollectionItem(item = {}, definition = {}, collection = ''
   const deletable = definition.deletable !== false;
   const qtyHtml = editableQuantity ? `<label class="mini-edit-field tc-quantity-field"><span>${esc(qtyLabel)}</span><input type="number" min="0" step="1" value="${esc(qty)}" data-collection-input="${esc(collection)}" data-collection-field="quantity" data-collection-id="${esc(id)}" inputmode="numeric">${qtyUnit ? `<small>${esc(qtyUnit)}</small>` : ''}</label>` : '';
   const deleteHtml = deletable ? `<button type="button" data-tc-action="platform:collection:delete" data-collection="${esc(collection)}" data-collection-id="${esc(id)}" aria-label="${esc(deleteLabel)}">×</button>` : '';
-  return `<div class="tc-collection-row tc-consumer-row" data-collection-row="${esc(collection)}" data-record-id="${esc(id)}"><div><strong>${esc(title)}</strong>${subtitle ? `<span>${esc(subtitle)}</span>` : ''}</div>${qtyHtml}${deleteHtml}</div>`;
+  return `<div class="tc-collection-row tc-consumer-row tc-consumer-row--editable" data-collection-row="${esc(collection)}" data-record-id="${esc(id)}"><div class="tc-collection-row__content"><strong>${esc(title)}</strong>${subtitle ? `<span>${esc(subtitle)}</span>` : ''}</div>${qtyHtml}${deleteHtml}</div>`;
 }
 
 export function renderCollection(definition = {}, state = {}, context = {}) {

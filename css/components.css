@@ -4402,3 +4402,43 @@ body::before {
     overscroll-behavior: contain;
   }
 }
+
+/* Phase 17C.1: platform collection rows use one grid contract across reference modules. */
+.tc-collection-row.tc-consumer-row--editable {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px 42px;
+  align-items: center;
+  column-gap: 12px;
+}
+.tc-collection-row__content {
+  min-width: 0;
+}
+.tc-collection-row__content strong,
+.tc-collection-row__content span {
+  display: block;
+  min-width: 0;
+}
+.tc-collection-row.tc-consumer-row--editable .tc-quantity-field {
+  width: 112px;
+  min-width: 112px;
+  max-width: 112px;
+  justify-self: end;
+}
+.tc-collection-row.tc-consumer-row--editable > button {
+  width: 42px;
+  min-width: 42px;
+  height: 38px;
+  justify-self: end;
+  align-self: center;
+}
+@media (max-width: 480px) {
+  .tc-collection-row.tc-consumer-row--editable {
+    grid-template-columns: minmax(0, 1fr) 112px 42px;
+    column-gap: 10px;
+  }
+  .tc-collection-row.tc-consumer-row--editable .tc-quantity-field {
+    width: 112px;
+    min-width: 112px;
+    max-width: 112px;
+  }
+}

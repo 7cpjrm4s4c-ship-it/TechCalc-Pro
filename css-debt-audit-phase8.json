@@ -1,7 +1,7 @@
 {
-  "totalLines": 4405,
+  "totalLines": 4445,
   "importantCount": 25,
-  "patchComments": 90,
+  "patchComments": 91,
   "legacySelectorLines": 258,
   "duplicateSelectors": [
     {
@@ -18,6 +18,10 @@
     },
     {
       "selector": ".overflow-menu",
+      "count": 5
+    },
+    {
+      "selector": "@media (max-width: 480px)",
       "count": 5
     },
     {
@@ -54,10 +58,6 @@
     },
     {
       "selector": ".line-section-card .inline-stats",
-      "count": 4
-    },
-    {
-      "selector": "@media (max-width: 480px)",
       "count": 4
     },
     {
