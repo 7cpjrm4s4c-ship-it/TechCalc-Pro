@@ -14,7 +14,7 @@ assert.equal(typeof wastewater.results, 'function');
 assert.equal(typeof wastewater.savedRecords, 'function');
 assert.ok(wastewater.controller?.collections?.fixtures);
 assert.ok(schema.fields.some(field => field.type === 'collection' && field.key === 'fixtures'));
-assert.ok(schema.fields.some(field => field.type === 'action' && field.action === 'collection:fixtures:add'));
+assert.ok(schema.fields.some(field => field.type === 'action' && field.collection === 'fixtures'));
 
 assert.doesNotMatch(indexSource, /renderModuleShell|mountModule|addEventListener|querySelector|innerHTML|data-wastewater|wastewater-/);
 assert.doesNotMatch(moduleSources, /renderResult|resultCard|noticeCard|data-wastewater/);

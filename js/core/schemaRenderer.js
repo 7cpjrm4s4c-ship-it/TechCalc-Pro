@@ -1,4 +1,5 @@
 import { esc, card, grid, resultRows, segmented, inlineStats } from './renderer.js';
+import { renderCollection as renderPlatformCollection } from '../platform/collectionRenderer/index.js';
 import { numberService } from './numberService.js';
 
 
@@ -134,30 +135,20 @@ function renderGroupActions(group = {}, state = {}) {
 
 function renderAction(def, state = {}) {
   const label = resolve(def.text || def.buttonLabel || def.label, state, 'Ausführen');
-  const action = resolve(def.action, state, 'platform:action');
+  const action = resolve(def.action, state, def.collection ? 'platform:collection:add' : 'platform:action');
   const variant = resolve(def.variant, state, 'secondary');
   const disabled = resolve(def.disabled, state, false) === true;
-  return `<div class="tc-action-row" data-schema-action="${esc(def.key)}"><button type="button" class="action-button action-button--${esc(variant)}" data-tc-action="${esc(action)}" ${disabled ? 'disabled' : ''}>${esc(label)}</button></div>`;
+  const extra = attrs({
+    'data-tc-action': action,
+    'data-collection': def.collection || null
+  });
+  return `<div class="tc-action-row" data-schema-action="${esc(def.key)}"><button type="button" class="action-button action-button--${esc(variant)}"${extra} ${disabled ? 'disabled' : ''}>${esc(label)}</button></div>`;
 }
 
 function renderCollection(def, state = {}) {
-  const items = resolve(def.items, state, []) || [];
-  const emptyText = resolve(def.emptyText, state, 'Noch keine Einträge vorhanden.');
-  const collection = def.collection || def.key;
-  if (!items.length) return `<div class="empty-state empty-state--compact" data-schema-collection="${esc(collection)}">${esc(emptyText)}</div>`;
-  return `<div class="tc-consumer-list dw-consumer-list" data-schema-collection="${esc(collection)}">${items.map(item => {
-    const id = item.id ?? item.key ?? '';
-    const title = item.title ?? item.name ?? 'Eintrag';
-    const subtitle = item.subtitle ?? '';
-    const qty = item.quantity ?? item.qty ?? '';
-    const qtyLabel = def.quantityLabel || 'Anzahl';
-    const qtyUnit = def.quantityUnit || '';
-    const deleteLabel = def.deleteLabel || 'Eintrag entfernen';
-    const qtyHtml = def.editableQuantity === false ? '' : `<label class="mini-edit-field tc-quantity-field"><span>${esc(qtyLabel)}</span><input type="number" min="0" step="1" value="${esc(qty)}" data-collection-input="${esc(collection)}" data-collection-field="quantity" data-collection-id="${esc(id)}" inputmode="numeric">${qtyUnit ? `<small>${esc(qtyUnit)}</small>` : ''}</label>`;
-    const deleteHtml = def.deletable === false ? '' : `<button type="button" data-tc-action="collection:delete" data-collection="${esc(collection)}" data-collection-id="${esc(id)}" aria-label="${esc(deleteLabel)}">×</button>`;
-    return `<div class="tc-consumer-row dw-consumer-row" data-collection-row="${esc(collection)}" data-record-id="${esc(id)}"><div><strong>${esc(title)}</strong>${subtitle ? `<span>${esc(subtitle)}</span>` : ''}</div>${qtyHtml}${deleteHtml}</div>`;
-  }).join('')}</div>`;
+  return renderPlatformCollection(def, state);
 }
+
 
 function renderInput(def, state = {}) {
   const type = def.htmlType || 'text';

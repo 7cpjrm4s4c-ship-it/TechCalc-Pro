@@ -107,20 +107,28 @@ function bindCollections(root, state, collectionConfig = {}) {
       commit(event);
     }, true);
   }
-  const actions = {};
-  Object.entries(collections).forEach(([name, cfg]) => {
-    if (typeof cfg.add === 'function') actions[cfg.addAction || `collection:${name}:add`] = ({ root }) => {
-      const patch = cfg.add({ current: state.get(), root }) || {};
-      if (Object.keys(patch).length) preserveScroll(() => state.set(patch, { action: cfg.addStateAction || `platform:collection:${name}:add`, notify: true }));
-    };
-  });
-  actions['collection:delete'] = ({ element }) => {
+  const addCollectionItem = ({ element, root }) => {
+    const name = element?.dataset?.collection;
+    const cfg = collections[name];
+    if (!cfg || typeof cfg.add !== 'function') return;
+    const patch = cfg.add({ current: state.get(), root, element, collection: name }) || {};
+    if (Object.keys(patch).length) preserveScroll(() => state.set(patch, { action: cfg.addStateAction || `platform:collection:${name}:add`, notify: true }));
+  };
+  const deleteCollectionItem = ({ element }) => {
     const name = element?.dataset?.collection;
     const cfg = collections[name];
     if (!cfg || typeof cfg.delete !== 'function') return;
     const patch = cfg.delete({ id: element.dataset.collectionId, current: state.get(), element, root }) || {};
     if (Object.keys(patch).length) preserveScroll(() => state.set(patch, { action: cfg.deleteAction || `platform:collection:${name}:delete`, notify: true }));
   };
+  const actions = {
+    'platform:collection:add': addCollectionItem,
+    'platform:collection:delete': deleteCollectionItem,
+    'collection:delete': deleteCollectionItem
+  };
+  Object.entries(collections).forEach(([name, cfg]) => {
+    if (typeof cfg.add === 'function' && cfg.addAction) actions[cfg.addAction] = addCollectionItem;
+  });
   return actions;
 }
 

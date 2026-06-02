@@ -96,7 +96,7 @@ export default {
     }
   },
   lookupHydration: {
-    key: 'platform:wastewater:lookup',
+    key: 'platform:lookup-hydration',
     fields: ['usageType','fixtureType','lineType'],
     patch: (field, current = {}) => {
       const patch = {};
@@ -110,7 +110,6 @@ export default {
   },
   collections: {
     fixtures: {
-      addAction: 'collection:fixtures:add',
       add: addFixture,
       patchInput: patchFixtureQuantity,
       delete: deleteFixture
