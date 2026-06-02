@@ -11,8 +11,8 @@ import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { preserveScroll as keepScroll } from '../../core/scrollManager.js';
 import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../../core/eventPipeline.js';
 import { createSavedRecordActions } from '../../core/savedRecordController.js';
-import { renderResultModel } from '../../core/resultRenderer.js';
-import { buildRainwaterResultModel } from './results.js';
+import { renderResultModel } from '../../platform/resultRenderer/index.js';
+import { results as buildRainwaterResultModel } from './results.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
 const splitIndex = areaTypes.findIndex(item => item.id === 'concrete-asphalt');

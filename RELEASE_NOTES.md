@@ -1,4 +1,12 @@
 
+## 1.3.0 - Phase 17A.3 Rainwater Result Renderer
+
+- Plattformschicht `js/platform/resultRenderer/` fuer Ergebnis-Cards, Gruppen, Tabellen und Hinweise ergaenzt.
+- Regenwasser-Ergebnisse in ein reines Result-Datenmodell (`results()`) ausgelagert.
+- Core-ResultRenderer bleibt als Kompatibilitaets-Fassade erhalten.
+- Quality Gate (`npm test`) erfolgreich.
+
+
 ## 1.3.0 – Phase 16E Event Pipeline Consolidation
 
 - Zentrale Commit-Hooks in der Event-Pipeline ergänzt.
