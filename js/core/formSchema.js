@@ -9,7 +9,9 @@ export const FIELD_TYPES = Object.freeze({
   BOOLEAN: 'boolean',
   CUSTOM: 'custom',
   NOTICE: 'notice',
-  STATS: 'stats'
+  STATS: 'stats',
+  ACTION: 'action',
+  COLLECTION: 'collection'
 });
 
 const ALLOWED_FIELD_TYPES = new Set(Object.values(FIELD_TYPES));

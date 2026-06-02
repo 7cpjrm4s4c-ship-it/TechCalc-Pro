@@ -12,7 +12,9 @@ const FIELD_TYPES = Object.freeze({
   BOOLEAN: 'boolean',
   CUSTOM: 'custom',
   NOTICE: 'notice',
-  STATS: 'stats'
+  STATS: 'stats',
+  ACTION: 'action',
+  COLLECTION: 'collection'
 });
 
 const FIELD_TYPE_TO_INPUTMODE = Object.freeze({
@@ -79,7 +81,7 @@ function renderSelect(def, state = {}) {
 }
 
 function renderSegment(def, state = {}) {
-  const value = state?.[def.key] ?? def.default ?? '';
+  const value = resolve(def.value, state, state?.[def.key] ?? def.default ?? '');
   return `<div class="field field--segment tc-field" data-schema-field-wrapper="${esc(def.key)}"><label>${esc(fieldLabel(def, state))}</label>${segmented(def.key, fieldOptions(def, state), value, { accent: def.accent })}</div>`;
 }
 
@@ -129,6 +131,34 @@ function renderGroupActions(group = {}, state = {}) {
   return actions.map(action => renderGroupAction(action, state)).filter(Boolean).join('');
 }
 
+
+function renderAction(def, state = {}) {
+  const label = resolve(def.text || def.buttonLabel || def.label, state, 'Ausführen');
+  const action = resolve(def.action, state, 'platform:action');
+  const variant = resolve(def.variant, state, 'secondary');
+  const disabled = resolve(def.disabled, state, false) === true;
+  return `<div class="tc-action-row" data-schema-action="${esc(def.key)}"><button type="button" class="action-button action-button--${esc(variant)}" data-tc-action="${esc(action)}" ${disabled ? 'disabled' : ''}>${esc(label)}</button></div>`;
+}
+
+function renderCollection(def, state = {}) {
+  const items = resolve(def.items, state, []) || [];
+  const emptyText = resolve(def.emptyText, state, 'Noch keine Einträge vorhanden.');
+  const collection = def.collection || def.key;
+  if (!items.length) return `<div class="empty-state empty-state--compact" data-schema-collection="${esc(collection)}">${esc(emptyText)}</div>`;
+  return `<div class="tc-consumer-list dw-consumer-list" data-schema-collection="${esc(collection)}">${items.map(item => {
+    const id = item.id ?? item.key ?? '';
+    const title = item.title ?? item.name ?? 'Eintrag';
+    const subtitle = item.subtitle ?? '';
+    const qty = item.quantity ?? item.qty ?? '';
+    const qtyLabel = def.quantityLabel || 'Anzahl';
+    const qtyUnit = def.quantityUnit || '';
+    const deleteLabel = def.deleteLabel || 'Eintrag entfernen';
+    const qtyHtml = def.editableQuantity === false ? '' : `<label class="mini-edit-field tc-quantity-field"><span>${esc(qtyLabel)}</span><input type="number" min="0" step="1" value="${esc(qty)}" data-collection-input="${esc(collection)}" data-collection-field="quantity" data-collection-id="${esc(id)}" inputmode="numeric">${qtyUnit ? `<small>${esc(qtyUnit)}</small>` : ''}</label>`;
+    const deleteHtml = def.deletable === false ? '' : `<button type="button" data-tc-action="collection:delete" data-collection="${esc(collection)}" data-collection-id="${esc(id)}" aria-label="${esc(deleteLabel)}">×</button>`;
+    return `<div class="tc-consumer-row dw-consumer-row" data-collection-row="${esc(collection)}" data-record-id="${esc(id)}"><div><strong>${esc(title)}</strong>${subtitle ? `<span>${esc(subtitle)}</span>` : ''}</div>${qtyHtml}${deleteHtml}</div>`;
+  }).join('')}</div>`;
+}
+
 function renderInput(def, state = {}) {
   const type = def.htmlType || 'text';
   const inputmode = def.inputmode || FIELD_TYPE_TO_INPUTMODE[def.type || FIELD_TYPES.TEXT] || 'text';
@@ -153,6 +183,8 @@ export function renderSchemaField(def, state = {}) {
   const type = def.type || FIELD_TYPES.TEXT;
   if (type === FIELD_TYPES.NOTICE || type === 'notice') return renderNotice(def, state);
   if (type === FIELD_TYPES.STATS || type === 'stats') return renderStats(def, state);
+  if (type === FIELD_TYPES.ACTION || type === 'action') return renderAction(def, state);
+  if (type === FIELD_TYPES.COLLECTION || type === 'collection') return renderCollection(def, state);
   if (type === FIELD_TYPES.CUSTOM || type === 'custom') return typeof def.render === 'function' ? def.render(state) : String(def.html || '');
   if (type === FIELD_TYPES.SELECT) return renderSelect(def, state);
   if (type === FIELD_TYPES.SEGMENT) return renderSegment(def, state);

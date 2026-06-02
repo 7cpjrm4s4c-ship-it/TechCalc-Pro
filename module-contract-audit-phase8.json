@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-02T11:15:04.595Z",
+  "generatedAt": "2026-06-02T11:49:06.702Z",
   "contractTarget": "1.3.0",
   "modules": [
     {
@@ -195,21 +195,8 @@
       "usesDefineConfig": true,
       "hasSchemaFile": true,
       "exposesSchema": true,
-      "legacyRendererImports": 1,
-      "ownUiClassSamples": [
-        "single-unvented",
-        "single-vented",
-        "branch-unvented",
-        "branch-vented",
-        "ground-inside",
-        "ground-outside",
-        "ground-full",
-        "segmented--green",
-        "is-active",
-        "data-line-family",
-        "wastewater-line-selector",
-        "wastewater-subselect"
-      ]
+      "legacyRendererImports": 0,
+      "ownUiClassSamples": []
     }
   ],
   "summary": {

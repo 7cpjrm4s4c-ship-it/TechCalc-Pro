@@ -72,6 +72,58 @@ function bindLookupHydration(root, state, lookupConfig = {}) {
   });
 }
 
+
+function bindCollections(root, state, collectionConfig = {}) {
+  const collections = collectionConfig.collections || collectionConfig;
+  if (!collections || !Object.keys(collections).length) return {};
+  if (!root.__tcPlatformCollectionBound) {
+    root.__tcPlatformCollectionBound = true;
+    root.addEventListener('input', event => {
+      const input = event.target?.closest?.('[data-collection-input]');
+      if (!input || !root.contains(input)) return;
+      const name = input.dataset.collectionInput;
+      const cfg = collections[name];
+      if (!cfg || typeof cfg.patchInput !== 'function') return;
+      event.stopPropagation();
+      const patch = cfg.patchInput({ id: input.dataset.collectionId, field: input.dataset.collectionField, value: input.value, current: state.get(), element: input, root }) || {};
+      if (Object.keys(patch).length) state.set(patch, { action: cfg.inputAction || `platform:collection:${name}:input`, notify: false });
+    }, true);
+    const commit = event => {
+      const input = event.target?.closest?.('[data-collection-input]');
+      if (!input || !root.contains(input)) return;
+      const name = input.dataset.collectionInput;
+      const cfg = collections[name];
+      if (!cfg || typeof cfg.patchInput !== 'function') return;
+      event.stopPropagation();
+      const patch = cfg.patchInput({ id: input.dataset.collectionId, field: input.dataset.collectionField, value: input.value, current: state.get(), element: input, root }) || {};
+      if (Object.keys(patch).length) state.set(patch, { action: cfg.commitAction || `platform:collection:${name}:commit`, notify: true });
+    };
+    root.addEventListener('blur', commit, true);
+    root.addEventListener('keydown', event => {
+      if (event.key !== 'Enter') return;
+      const input = event.target?.closest?.('[data-collection-input]');
+      if (!input || !root.contains(input)) return;
+      event.preventDefault();
+      commit(event);
+    }, true);
+  }
+  const actions = {};
+  Object.entries(collections).forEach(([name, cfg]) => {
+    if (typeof cfg.add === 'function') actions[cfg.addAction || `collection:${name}:add`] = ({ root }) => {
+      const patch = cfg.add({ current: state.get(), root }) || {};
+      if (Object.keys(patch).length) preserveScroll(() => state.set(patch, { action: cfg.addStateAction || `platform:collection:${name}:add`, notify: true }));
+    };
+  });
+  actions['collection:delete'] = ({ element }) => {
+    const name = element?.dataset?.collection;
+    const cfg = collections[name];
+    if (!cfg || typeof cfg.delete !== 'function') return;
+    const patch = cfg.delete({ id: element.dataset.collectionId, current: state.get(), element, root }) || {};
+    if (Object.keys(patch).length) preserveScroll(() => state.set(patch, { action: cfg.deleteAction || `platform:collection:${name}:delete`, notify: true }));
+  };
+  return actions;
+}
+
 function bindSavedRecords(root, state, calculate, savedConfig = {}) {
   if (!savedConfig.enabled) return {};
   const actions = createSavedRecordActions({
@@ -118,6 +170,7 @@ export function createPlatformModule(definition = {}) {
   function bindPlatformActions(root) {
     const actions = {
       ...bindSegments(root, state, controller.segments),
+      ...bindCollections(root, state, controller.collections),
       ...bindSavedRecords(root, state, calculate, controller.savedRecords)
     };
     bindLookupHydration(root, state, controller.lookupHydration);

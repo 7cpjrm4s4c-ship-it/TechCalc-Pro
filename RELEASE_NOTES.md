@@ -1,4 +1,13 @@
 
+## Phase 17B - Schmutzwasser Plattformsteuerung
+
+- Schmutzwasser als zweites Referenzmodul in `createPlatformModule` migriert.
+- Eigene Render-/Mount-/Saved-Record-Pfade aus `modules/wastewater` entfernt.
+- Plattform-Schema um `ACTION` und `COLLECTION` erweitert.
+- Dynamische Entwässerungsgegenstände laufen über zentrale Collection-Actions.
+- Neue Regression `wastewater-phase17b-platform-control`.
+
+
 ## 1.3.0 - Phase 17A.3 Rainwater Result Renderer
 
 - Plattformschicht `js/platform/resultRenderer/` fuer Ergebnis-Cards, Gruppen, Tabellen und Hinweise ergaenzt.

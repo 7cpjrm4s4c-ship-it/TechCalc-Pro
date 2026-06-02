@@ -3,8 +3,8 @@
   "schemaModules": 11,
   "centralNumberService": 11,
   "legacyNumberParsers": 0,
-  "centralSavedRecords": 7,
-  "legacyClassModules": 8,
+  "centralSavedRecords": 6,
+  "legacyClassModules": 7,
   "modules": [
     {
       "id": "buffer-storage",
@@ -112,8 +112,8 @@
       "schemaFile": true,
       "usesCentralNumberService": true,
       "legacyNumberParsers": 0,
-      "usesCentralSavedRecords": true,
-      "hasLegacyModuleClasses": true,
+      "usesCentralSavedRecords": false,
+      "hasLegacyModuleClasses": false,
       "migrationStatus": "phase-8-schema-inventory"
     }
   ]
