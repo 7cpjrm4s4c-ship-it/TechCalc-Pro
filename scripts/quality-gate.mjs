@@ -44,6 +44,7 @@ const commands = [
   ['node', ['tests/reference-modules-phase17c-bugfix.test.mjs']],
   ['node', ['tests/reference-modules-phase17c1-ui-bugfix.test.mjs']],
   ['node', ['tests/reference-modules-phase17c2-reference-fixes.test.mjs']],
+  ['node', ['tests/reference-modules-phase17c5-event-scroll.test.mjs']],
   ['node', ['tests/central-platform-pipeline.test.mjs']],
   ['node', ['tests/state-binding.test.mjs']],
   ['node', ['tests/event-pipeline-phase11d.test.mjs']],

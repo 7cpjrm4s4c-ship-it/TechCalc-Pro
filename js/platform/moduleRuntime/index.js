@@ -90,15 +90,16 @@ function bindSegments(root, state, segmentConfig = {}) {
 
   handlers.segment = ({ element, event }) => commit(element, event);
 
-  // Phase 17C.4: segment switches are structural UI decisions in platform modules.
-  // A capture-level platform binding prevents mobile Safari from leaving a
-  // stale schema branch visible until another input/change event occurs.
+  // Phase 17C.5: keep capture bindings module-agnostic. The app root is reused
+  // between modules; a one-time listener must therefore read the latest commit
+  // function from the root instead of closing over the first mounted module.
+  root.__tcPlatformSegmentContext = { commit };
   if (!root.__tcPlatformSegmentCaptureBound) {
     root.__tcPlatformSegmentCaptureBound = true;
     const capture = event => {
       const element = event.target?.closest?.('[data-segment]');
       if (!element || !root.contains(element)) return;
-      commit(element, event);
+      root.__tcPlatformSegmentContext?.commit?.(element, event);
     };
     root.addEventListener('pointerup', capture, true);
     root.addEventListener('click', capture, true);
@@ -106,7 +107,7 @@ function bindSegments(root, state, segmentConfig = {}) {
       if (event.key !== 'Enter' && event.key !== ' ') return;
       const element = event.target?.closest?.('[data-segment]');
       if (!element || !root.contains(element)) return;
-      commit(element, event);
+      root.__tcPlatformSegmentContext?.commit?.(element, event);
     }, true);
   }
   return handlers;
@@ -217,10 +218,12 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     'saved:toggle': ({ element }) => actions.toggle({ element })
   };
 
-  // Phase 17C.4: saved-record cards are structural controls.  They must work
-  // even when the generic pointer/click suppression layer is active after a
-  // scroll or mobile tap.  This capture fallback uses the same central action
-  // handlers and always reads the current platform state.
+  // Phase 17C.5: saved-record cards are structural controls. The capture
+  // listener is attached once to the reused app root, so it must dereference the
+  // latest handlers/context on every event. Otherwise the first module mounted
+  // owns all later saved-record clicks, which disables load/toggle/delete after
+  // navigation or rerender.
+  root.__tcPlatformSavedRecordContext = { handlers, state };
   if (!root.__tcPlatformSavedRecordCaptureBound) {
     root.__tcPlatformSavedRecordCaptureBound = true;
     const capture = event => {
@@ -230,12 +233,13 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
         || (actionEl.hasAttribute?.('data-saved-delete') ? 'saved:delete' : '')
         || (actionEl.hasAttribute?.('data-saved-toggle') ? 'saved:toggle' : '')
         || 'saved:load';
-      const handler = handlers[action];
+      const context = root.__tcPlatformSavedRecordContext || {};
+      const handler = context.handlers?.[action];
       if (typeof handler !== 'function') return;
       event?.preventDefault?.();
       event?.stopPropagation?.();
       event?.stopImmediatePropagation?.();
-      handler({ action, element: actionEl, event, state, root });
+      handler({ action, element: actionEl, event, state: context.state, root });
     };
     root.addEventListener('pointerup', capture, true);
     root.addEventListener('click', capture, true);

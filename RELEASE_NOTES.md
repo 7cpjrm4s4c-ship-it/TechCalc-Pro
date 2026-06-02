@@ -1,4 +1,13 @@
 
+## Phase 17C.5 – Reference Event + Scroll Boundary Fixes
+
+- SavedRecord-Events zentral gegen stale Modul-Closures gehärtet.
+- Markieren, Bearbeiten, Accordion und Löschen laufen wieder über den aktuellen Plattform-Context.
+- Segment-Switches nutzen immer den aktuellen Modul-Commit.
+- Scrollposition wird nach strukturellen Rerendern an das reale Dokumentende geklemmt.
+- Regression `reference-modules-phase17c5-event-scroll` ergänzt.
+
+
 ## Phase 17C.4 – Reference Event and Spacing Fixes
 
 - Saved-Record-Interaktionen zentral gehärtet: Markieren, Bearbeiten, Accordion und Löschen.

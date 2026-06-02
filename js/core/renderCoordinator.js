@@ -5,6 +5,22 @@ import { snapshotViewport, restoreViewportStable, isMobileViewport } from './ren
 const FIELD_ACTION_RE = /^(field:input|field:change|field:blur|field:enter|input:confirm|surface:confirm|segment:select|binding:)/;
 const STRUCTURAL_ACTION_RE = /^(saved:|line:|record:|delete|reset|replace|module:)/;
 
+
+function clampViewportToDocumentEnd() {
+  const doc = document.scrollingElement || document.documentElement;
+  if (!doc || typeof window === 'undefined') return;
+  const viewportHeight = window.visualViewport?.height || window.innerHeight || 0;
+  const maxY = Math.max(0, (doc.scrollHeight || 0) - viewportHeight);
+  const currentY = window.scrollY || doc.scrollTop || 0;
+  if (currentY > maxY + 1) window.scrollTo(window.scrollX || doc.scrollLeft || 0, maxY);
+}
+
+function clampViewportStable() {
+  requestAnimationFrame(clampViewportToDocumentEnd);
+  setTimeout(clampViewportToDocumentEnd, 80);
+  setTimeout(clampViewportToDocumentEnd, 220);
+}
+
 function actionFrom(meta = {}) {
   return String(meta?.action || 'render');
 }
@@ -77,7 +93,10 @@ export function createRenderCoordinator(root, options = {}) {
         if (!isCurrent()) return;
         root.style.minHeight = previousMinHeight;
         root.style.overflowAnchor = previousOverflowAnchor;
+        clampViewportStable();
       });
+    } else {
+      clampViewportStable();
     }
     didInitialRender = true;
   };
