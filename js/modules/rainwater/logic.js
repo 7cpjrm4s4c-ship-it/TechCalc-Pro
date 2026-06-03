@@ -65,29 +65,34 @@ function calcEmergencyOverflow(qNotBase, source, mode, fallback = {}) {
 function surfaceRows(state) {
   const currentMode = state.surfaceMode || state.calculationType || 'roof';
   return (state.surfaces || []).map(item => {
-    const mode = item.surfaceMode || item.calculationType || currentMode;
-    const base = getAreaType(item.areaType);
-    const area = Math.max(0, toNumber(item.areaSize));
-    const cs = base.custom ? Math.max(0, toNumber(item.customCs)) : base.cs;
-    const cm = base.custom ? Math.max(0, toNumber(item.customCm)) : base.cm;
-    const rdt = getRainForMode(item, mode) || getRainForMode(state, mode);
-    const r100 = toNumber(item.rainHundredIntensity || state.rainHundredIntensity);
-    const drain = currentDrainSettings(item, state);
-    const stackCount = mode === 'roof' ? (Math.max(1, Math.floor(toNumber(item.stackCount || state.stackCount)) || 1)) : 0;
-    const fillRatio = item.fillRatio || state.fillRatio || '0.7';
-    const slopeCmM = item.slopeCmM || state.slopeCmM || '1,0';
+    const source = item?.state || item?.inputState || item || {};
+    const mode = source.surfaceMode || source.calculationType || currentMode;
+    const base = getAreaType(source.areaType);
+    const area = Math.max(0, toNumber(source.areaSize));
+    const cs = base.custom ? Math.max(0, toNumber(source.customCs)) : base.cs;
+    const cm = base.custom ? Math.max(0, toNumber(source.customCm)) : base.cm;
+    const rdt = getRainForMode(source, mode) || getRainForMode(state, mode);
+    const r100 = toNumber(source.rainHundredIntensity || state.rainHundredIntensity);
+    const drain = currentDrainSettings(source, state);
+    const stackCount = mode === 'roof' ? (Math.max(1, Math.floor(toNumber(source.stackCount || state.stackCount)) || 1)) : 0;
+    const fillRatio = source.fillRatio || state.fillRatio || '0.7';
+    const slopeCmM = source.slopeCmM || state.slopeCmM || '1,0';
     const qr = rdt * cs * area / 10000;
     const qNotBase = mode === 'roof' ? Math.max(0, (r100 - rdt) * cs * area / 10000) : 0;
-    const emergency = calcEmergencyOverflow(qNotBase, item, mode, state);
+    const emergency = calcEmergencyOverflow(qNotBase, source, mode, state);
     const itemRequiredDrains = drain.capacity > 0 ? Math.ceil(qr / drain.capacity) : 0;
     const itemQPerStack = mode === 'roof' && stackCount > 0 ? qr / stackCount : 0;
     const collectorMinDn = mode === 'property' ? 'DN 100' : 'DN 70';
     const stackMinDn = mode === 'property' ? 'DN 100' : 'DN 70';
     return {
       ...item,
+      ...source,
+      id: item.id || source.id,
+      state: item.state,
+      result: item.result,
       surfaceMode: mode,
       base,
-      name: item.areaName || base.name,
+      name: item.name || source.areaName || source.name || base.name,
       area,
       cs,
       cm,

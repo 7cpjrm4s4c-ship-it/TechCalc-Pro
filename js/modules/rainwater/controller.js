@@ -2,6 +2,7 @@ import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { getAreaType } from './logic.js';
 import { roofDrainTable } from './tables.js';
 import { normalizeAreaType, defaultAreaTypeForMode } from './schema.js';
+import { createStateSnapshot, hydrateStateRecord } from '../../platform/savedRecordModel/index.js';
 
 const surfaceNumericFields = new Set([
   'areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity',
@@ -41,18 +42,6 @@ function patchLookupDefaults(patch = {}, base = {}) {
 }
 
 
-function patchSurfaceModeDom({ root, state } = {}) {
-  const mode = state?.surfaceMode || state?.calculationType || 'roof';
-  const roof = mode !== 'property';
-  const roofWrap = root?.querySelector?.('[data-schema-field-wrapper="roofRainIntensity"]');
-  const propertyWrap = root?.querySelector?.('[data-schema-field-wrapper="propertyRainIntensity"]');
-  const roofLabel = roofWrap?.querySelector?.('label');
-  const propertyLabel = propertyWrap?.querySelector?.('label');
-  if (roofLabel) roofLabel.textContent = roof ? 'Regenspende r(5,5)' : 'Regenspende r(5,2)';
-  if (propertyLabel) propertyLabel.textContent = roof ? 'Regenspende r(5,5)' : 'Regenspende r(5,2)';
-  if (roofWrap) roofWrap.hidden = !roof;
-  if (propertyWrap) propertyWrap.hidden = roof;
-}
 
 function modeDefaultsPatch(nextMode, current = {}) {
   const mode = nextMode === 'property' ? 'property' : 'roof';
@@ -98,44 +87,67 @@ function surfacePatchFromState(current = {}) {
   };
 }
 
-function surfaceRecordSnapshot(current = {}) {
+function surfaceRecordSnapshot(current = {}, result = {}) {
   const patch = surfacePatchFromState(current);
   const base = getAreaType(patch.areaType || defaultAreaTypeForMode(patch.surfaceMode));
-  return {
-    ...patch,
-    name: patch.areaName || base?.name || 'Regenfläche',
-    customCs: base?.custom ? current.customCs : patch.customCs,
-    customCm: base?.custom ? current.customCm : patch.customCm
-  };
+  const name = (patch.areaName || '').trim() || base?.name || 'Regenfläche';
+  return createStateSnapshot({
+    current: {
+      ...current,
+      ...patch,
+      areaName: name,
+      customCs: base?.custom ? current.customCs : patch.customCs,
+      customCm: base?.custom ? current.customCm : patch.customCm
+    },
+    calculationResult: result,
+    excludeKeys: ['surfaces', 'activeSurfaceId', 'expandedSurfaceResultId'],
+    name: () => name,
+    resultMapper: output => ({
+      mode: output?.mode || patch.surfaceMode,
+      qr: output?.qr,
+      rdt: output?.rdt,
+      r100: output?.r100,
+      requiredDrains: output?.requiredDrains,
+      drainSize: output?.drainSize,
+      stackDn: output?.stackSelection?.dn,
+      collectorDn: output?.collectorSelection?.dn
+    })
+  });
 }
 
 function statePatchFromSurface(item = {}) {
-  const mode = item.surfaceMode || item.calculationType || 'roof';
+  const source = item.state || item.inputState || item;
+  const hydrated = item.state || item.inputState
+    ? hydrateStateRecord(item, { activeIdKey: 'activeSurfaceId', nameKey: 'areaName' })
+    : { ...source, activeSurfaceId: item.id || source.id, areaName: source.areaName || item.name || source.name || '' };
+  const mode = hydrated.surfaceMode || hydrated.calculationType || source.surfaceMode || source.calculationType || 'roof';
   return {
+    ...hydrated,
     surfaceMode: mode,
     calculationType: mode,
-    areaType: normalizeAreaType(mode, item.areaType || defaultAreaTypeForMode(mode)),
-    areaName: item.areaName || '',
-    areaSize: item.areaSize || '100',
-    customCs: item.customCs || '',
-    customCm: item.customCm || '',
-    roofRainIntensity: item.roofRainIntensity,
-    propertyRainIntensity: item.propertyRainIntensity,
-    rainHundredIntensity: item.rainHundredIntensity,
-    drainSize: item.drainSize,
-    drainSizeManual: item.drainSizeManual,
-    drainCapacity: item.drainCapacity,
-    drainHead: item.drainHead,
-    stackCount: item.stackCount,
-    slopeCmM: item.slopeCmM,
-    fillRatio: item.fillRatio,
-    emergencyType: item.emergencyType,
-    emergencyHead: item.emergencyHead,
-    emergencyWidth: item.emergencyWidth,
-    emergencyDiameter: item.emergencyDiameter,
-    emergencyManufacturerDn: item.emergencyManufacturerDn,
-    emergencyCapacity: item.emergencyCapacity,
-    emergencySafetyFactor: item.emergencySafetyFactor
+    areaType: normalizeAreaType(mode, hydrated.areaType || source.areaType || defaultAreaTypeForMode(mode)),
+    areaName: hydrated.areaName || item.name || source.areaName || '',
+    areaSize: hydrated.areaSize || source.areaSize || '100',
+    customCs: hydrated.customCs || source.customCs || '',
+    customCm: hydrated.customCm || source.customCm || '',
+    roofRainIntensity: hydrated.roofRainIntensity || source.roofRainIntensity || '300',
+    propertyRainIntensity: hydrated.propertyRainIntensity || source.propertyRainIntensity || '300',
+    rainHundredIntensity: hydrated.rainHundredIntensity || source.rainHundredIntensity || '500',
+    drainSize: hydrated.drainSize || source.drainSize || 'DN 100',
+    drainSizeManual: hydrated.drainSizeManual || source.drainSizeManual || '',
+    drainCapacity: hydrated.drainCapacity || source.drainCapacity || '',
+    drainHead: hydrated.drainHead || source.drainHead || '',
+    stackCount: hydrated.stackCount || source.stackCount || '1',
+    slopeCmM: hydrated.slopeCmM || source.slopeCmM || '1,0',
+    fillRatio: hydrated.fillRatio || source.fillRatio || '0.7',
+    emergencyType: hydrated.emergencyType || source.emergencyType || 'rect',
+    emergencyHead: hydrated.emergencyHead || source.emergencyHead || '35',
+    emergencyWidth: hydrated.emergencyWidth || source.emergencyWidth || '300',
+    emergencyDiameter: hydrated.emergencyDiameter || source.emergencyDiameter || '',
+    emergencyManufacturerDn: hydrated.emergencyManufacturerDn || source.emergencyManufacturerDn || '',
+    emergencyCapacity: hydrated.emergencyCapacity || source.emergencyCapacity || '',
+    emergencySafetyFactor: hydrated.emergencySafetyFactor || source.emergencySafetyFactor || '1,0',
+    activeSurfaceId: item.id || hydrated.activeSurfaceId || source.id || null
   };
 }
 
@@ -187,8 +199,7 @@ export default {
     fields: {
       surfaceMode: {
         action: 'platform:segment:surfaceMode',
-        patch: modeDefaultsPatch,
-        domPatch: patchSurfaceModeDom
+        patch: modeDefaultsPatch
       }
     }
   },
@@ -216,4 +227,4 @@ export default {
   }
 };
 
-export { modeDefaultsPatch, patchSurfaceModeDom, surfaceRecordSnapshot, statePatchFromSurface, clearSurfaceEditorPatch, resetSurfaceEditorAfterAdd };
+export { modeDefaultsPatch, surfaceRecordSnapshot, statePatchFromSurface, clearSurfaceEditorPatch, resetSurfaceEditorAfterAdd };
