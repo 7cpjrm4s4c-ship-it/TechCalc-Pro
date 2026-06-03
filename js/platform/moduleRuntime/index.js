@@ -122,6 +122,10 @@ function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
   };
 
   handlers.segment = ({ element, event }) => commit(element, event);
+  Object.keys(fields).forEach(field => {
+    const action = fields[field].action || `platform:segment:${field}`;
+    handlers[action] = ({ element, event }) => commit(element, event);
+  });
 
   // Direct segment bridge: the generic event pipeline processes segments on
   // pointerup/touchend/click. Reference modules with schema-dependent segments

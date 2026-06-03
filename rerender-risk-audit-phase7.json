@@ -36,17 +36,17 @@
     },
     {
       "file": "js/platform/moduleRuntime/index.js",
-      "line": 377,
+      "line": 381,
       "text": "if (root.innerHTML !== nextView) root.innerHTML = nextView;"
     },
     {
       "file": "js/platform/moduleRuntime/index.js",
-      "line": 389,
+      "line": 393,
       "text": "if (formHost.innerHTML !== nextForm) formHost.innerHTML = nextForm;"
     },
     {
       "file": "js/platform/moduleRuntime/index.js",
-      "line": 393,
+      "line": 397,
       "text": "if (sideHost.innerHTML !== nextSide) sideHost.innerHTML = nextSide;"
     }
   ]

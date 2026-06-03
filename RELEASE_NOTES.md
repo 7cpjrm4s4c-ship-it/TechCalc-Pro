@@ -758,3 +758,9 @@
 - Segment-Actions in der Plattform-Runtime als strukturelle Schema-Updates gehaertet.
 - Synchroner Full-View-Rebuild fuer `platform:segment:*` eingefuehrt.
 - Regenwasser-Switch ohne Modul-DOM-Sonderlogik weiter zentralisiert.
+
+## Phase 17C.15 - Platform Segment Action Contract
+- Regenwasser-Segment `surfaceMode` nutzt jetzt einen expliziten Plattform-Action-Pfad statt des generischen `segment`-Fallbacks.
+- Schema-Renderer kann segment-spezifische Actions durchreichen.
+- Plattform-Runtime registriert pro konfiguriertem Segment den expliziten Action-Handler plus Legacy-Fallback.
+- Ziel: konkurrierende Segment-Fallbacks vermeiden und schemaabhängige Rebuilds zuverlässig auslösen.

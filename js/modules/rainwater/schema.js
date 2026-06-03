@@ -46,7 +46,7 @@ const emergencyTypeOptions = [
 
 export const rainwaterSchema = defineFormSchema({
   fields: [
-    { key:'surfaceMode', label:'Berechnungsbereich', type:FIELD_TYPES.SEGMENT, options:[{ value:'roof', label:'Dachfläche' }, { value:'property', label:'Grundstücksfläche' }], accent:'green' },
+    { key:'surfaceMode', label:'Berechnungsbereich', type:FIELD_TYPES.SEGMENT, options:[{ value:'roof', label:'Dachfläche' }, { value:'property', label:'Grundstücksfläche' }], accent:'green', action:'platform:segment:surfaceMode' },
     { key:'roofRainIntensity', label:rainLabel, type:FIELD_TYPES.DECIMAL, unit:'l/(s·ha)', format:(_, s) => fmtInput(activeRainValue(s), 1), visibleWhen:s => activeRainField(s) === 'roofRainIntensity' },
     { key:'propertyRainIntensity', label:rainLabel, type:FIELD_TYPES.DECIMAL, unit:'l/(s·ha)', format:(_, s) => fmtInput(activeRainValue(s), 1), visibleWhen:s => activeRainField(s) === 'propertyRainIntensity' },
     { key:'rainHundredIntensity', label:'Regenspende r(5,100)', type:FIELD_TYPES.DECIMAL, unit:'l/(s·ha)', default:'500' },

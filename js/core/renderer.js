@@ -58,9 +58,11 @@ export function selectField({ id, label, value, options, commit = 'immediate', l
   return `<div class="field"><label for="${esc(id)}">${esc(label)}</label><div class="control"><select id="${esc(id)}" data-field="${esc(id)}"${commitAttr}${lookupAttr}${renderAttr}>${options.map(o => `<option value="${esc(o.value)}" ${o.value === value ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select></div></div>`;
 }
 
+// Default central segment marker remains data-tc-action="segment" for legacy/global tests.
 export function segmented(name, options, value, settings = {}) {
   const accent = settings.accent ? ` segmented--${esc(settings.accent)}` : '';
-  return `<div class="segmented${accent}" role="tablist">${options.map(o => `<button type="button" data-tc-action="segment" data-segment="${esc(name)}" data-value="${esc(o.value)}" class="${o.value === value ? 'is-active' : ''}">${esc(o.label)}</button>`).join('')}</div>`;
+  const action = settings.action || 'segment';
+  return `<div class="segmented${accent}" role="tablist">${options.map(o => `<button type="button" data-tc-action="${esc(action)}" data-segment="${esc(name)}" data-value="${esc(o.value)}" class="${o.value === value ? 'is-active' : ''}">${esc(o.label)}</button>`).join('')}</div>`;
 }
 
 
