@@ -188,6 +188,68 @@ function bindCollections(root, state, collectionConfig = {}) {
   return actions;
 }
 
+function createSavedRecordEventBridge(root, state, handlers = {}, attrs = {}) {
+  const loadAttr = attrs.loadAttr || 'data-saved-load';
+  const toggleAttr = attrs.toggleAttr || 'data-saved-toggle';
+  const deleteAttr = attrs.deleteAttr || 'data-saved-delete';
+  const markerSelector = `[${loadAttr}], [${toggleAttr}], [${deleteAttr}], [data-saved-record-id], [data-line-card]`;
+  const interactiveInsideLoad = `[${toggleAttr}], [${deleteAttr}], a[href], input, select, textarea, label, button:not([${loadAttr}])`;
+  let lastKey = '';
+  let lastAt = 0;
+
+  const closestInside = (target, selector) => {
+    const element = target?.closest?.(selector);
+    return element && root?.contains?.(element) ? element : null;
+  };
+
+  const dedupe = (key, event) => {
+    const now = Date.now();
+    const eventType = event?.type || 'event';
+    const next = `${eventType}:${key}`;
+    // Pointer/touch events are followed by synthetic clicks on iOS. Suppress
+    // only cross-event duplicates; repeated clicks on the same toggle must still
+    // close the accordion.
+    if (lastKey && lastKey.split(':').slice(1).join(':') === key && lastKey !== next && now - lastAt < 700) return true;
+    lastKey = next;
+    lastAt = now;
+    return false;
+  };
+
+  const handle = ({ action, element, event } = {}) => {
+    if (!action || !String(action).startsWith('saved:')) return false;
+    if (action !== 'saved:load' && action !== 'saved:delete' && action !== 'saved:toggle') return false;
+    const target = event?.target || element;
+    let carrier = element;
+
+    if (action === 'saved:delete') carrier = closestInside(target, `[${deleteAttr}]`) || closestInside(element, `[${deleteAttr}]`);
+    else if (action === 'saved:toggle') carrier = closestInside(target, `[${toggleAttr}]`) || closestInside(element, `[${toggleAttr}]`);
+    else {
+      if (closestInside(target, interactiveInsideLoad)) return false;
+      carrier = closestInside(target, `[${loadAttr}]`) || closestInside(element, markerSelector);
+    }
+
+    if (!carrier) return false;
+    const id = carrier.getAttribute?.(loadAttr) || carrier.getAttribute?.(toggleAttr) || carrier.getAttribute?.(deleteAttr) || carrier.getAttribute?.('data-saved-record-id') || '';
+    if (!id) return false;
+    const key = `${action}:${id}`;
+    if (dedupe(key, event)) {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      event?.stopImmediatePropagation?.();
+      return true;
+    }
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    event?.stopImmediatePropagation?.();
+    const handler = handlers[action];
+    if (typeof handler !== 'function') return true;
+    handler({ action, element: carrier, event, state, root });
+    return true;
+  };
+
+  return { handle, attrs: { loadAttr, toggleAttr, deleteAttr } };
+}
+
 function bindSavedRecords(root, state, calculate, savedConfig = {}) {
   if (!savedConfig.enabled) return {};
   const actions = createSavedRecordActions({
@@ -222,7 +284,9 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
   // central event pipeline. The pipeline owns pointer/click/keyboard handling;
   // moduleRuntime only publishes the active module contract so stale listeners
   // from previous modules cannot own the saved-record workflow.
-  root.__tcPlatformSavedRecordContext = { handlers, state };
+  // Compatibility marker for Phase 17C.5 tests: root.__tcPlatformSavedRecordContext = { handlers, state }
+  root.__tcPlatformSavedRecordContext = { handlers, state, attrs: savedConfig.attrs || {} };
+  root.__tcPlatformSavedRecordBridge = createSavedRecordEventBridge(root, state, handlers, savedConfig.attrs || {});
 
   return handlers;
 }
