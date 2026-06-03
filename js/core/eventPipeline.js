@@ -64,14 +64,6 @@ function resolveActionHandler(root, action, options = {}) {
   const primary = (options.actions || root.__tcActionHandlers || {})[action];
   if (typeof primary === 'function') return primary;
 
-  // Phase 17C.6: SavedRecord controls are structural platform controls. They
-  // must not depend on a stale per-render action map or on legacy module-level
-  // data-saved patches. Always resolve them from the current platform context
-  // before treating the action as unknown.
-  if (String(action || '').startsWith('saved:')) {
-    const saved = root?.__tcPlatformSavedRecordContext?.handlers?.[action];
-    if (typeof saved === 'function') return saved;
-  }
   return null;
 }
 
@@ -79,11 +71,6 @@ function dispatchAction(root, state, actionEl, event, options = {}) {
   if (!actionEl || !root?.contains?.(actionEl)) return false;
   const action = actionEl.dataset.tcAction || actionEl.dataset.action;
   if (!action) return false;
-
-  // Phase 17C.8: SavedRecord actions intentionally use the same direct
-  // central-action path as the proven Heizung/Kälte line-section workflow. The
-  // concrete id attributes are resolved by createSavedRecordActions via the
-  // active platform contract; no capture bridge or module patch sits in between.
 
   const handler = resolveActionHandler(root, action, options);
   if (typeof handler !== 'function') return false;

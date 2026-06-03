@@ -1,3 +1,11 @@
+## Phase 17C.10 - Referenzmodule SavedRecord-Vertrag bereinigt
+
+- Regenwasser und Schmutzwasser nutzen jetzt fuer Speichern/Aktualisieren den Heizung/Kälte-Vertrag `line:save` / `line:update`.
+- konkurrierende `saved:add` / `saved:update` Pfade sowie alte SavedRecord-Bridge-/Context-Aufloesung entfernt.
+- Save-/Update-Buttons rendern mit `data-line-save` / `data-line-update`.
+- Segment-Switches laufen ohne zusaetzliche konkurrierende Capture-Schicht ueber die zentrale Event-Pipeline.
+- `npm test` erfolgreich.
+
 
 ## Phase 17C.8
 - SavedRecord-Vertrag von Heizung/Kälte auf Regenwasser und Schmutzwasser übertragen.

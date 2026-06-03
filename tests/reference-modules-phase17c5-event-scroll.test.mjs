@@ -5,11 +5,12 @@ const runtimeSource = readFileSync(new URL('../js/platform/moduleRuntime/index.j
 const eventPipelineSource = readFileSync(new URL('../js/core/eventPipeline.js', import.meta.url), 'utf8');
 const coordinatorSource = readFileSync(new URL('../js/core/renderCoordinator.js', import.meta.url), 'utf8');
 
-assert.match(runtimeSource, /root\.__tcPlatformSavedRecordContext = \{ handlers, state, attrs:/, 'Saved-record context must publish the latest module handlers and attrs.');
+assert.match(runtimeSource, /'line:save': save/, 'Saved-record save must be registered through the central Heizung/Kälte action map.');
+assert.match(runtimeSource, /'saved:toggle': toggle/, 'Saved-record toggle must be registered through the central Heizung/Kälte action map.');
 assert.match(eventPipelineSource, /resolveActionHandler/, 'Central event pipeline must resolve platform action handlers.');
-assert.match(eventPipelineSource, /__tcPlatformSavedRecordContext\?\.handlers\?\.\[action\]/, 'Saved-record actions must be resolved from current context per event.');
-assert.match(runtimeSource, /root\.__tcPlatformSegmentContext = \{ commit \}/, 'Segment capture listener must use the latest module commit function.');
-assert.match(runtimeSource, /__tcPlatformSegmentContext\?\.commit\?\./, 'Segment capture handler must call current module segment commit.');
+assert.doesNotMatch(eventPipelineSource, /__tcPlatformSavedRecordContext\?\.handlers/, 'Saved-record actions must not use the removed context bridge.');
+assert.match(runtimeSource, /root\.__tcPlatformSegmentContext\s*=\s*null/, 'Legacy segment capture context must be disabled; the central pipeline owns segment actions.');
+assert.doesNotMatch(runtimeSource, /__tcPlatformSegmentContext\?\.commit/, 'Segment capture handler must not compete with the central pipeline.');
 assert.match(coordinatorSource, /clampViewportToDocumentEnd/, 'Renderer must clamp scroll after structural rerenders.');
 assert.match(coordinatorSource, /clampViewportStable\(\)/, 'Renderer must stabilize scroll clamping after DOM replacement.');
 

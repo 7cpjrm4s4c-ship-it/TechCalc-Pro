@@ -99,26 +99,7 @@ function bindSegments(root, state, segmentConfig = {}) {
 
   handlers.segment = ({ element, event }) => commit(element, event);
 
-  // Phase 17C.5: keep capture bindings module-agnostic. The app root is reused
-  // between modules; a one-time listener must therefore read the latest commit
-  // function from the root instead of closing over the first mounted module.
-  root.__tcPlatformSegmentContext = { commit };
-  if (!root.__tcPlatformSegmentCaptureBound) {
-    root.__tcPlatformSegmentCaptureBound = true;
-    const capture = event => {
-      const element = event.target?.closest?.('[data-segment]');
-      if (!element || !root.contains(element)) return;
-      root.__tcPlatformSegmentContext?.commit?.(element, event);
-    };
-    root.addEventListener('pointerup', capture, true);
-    root.addEventListener('click', capture, true);
-    root.addEventListener('keydown', event => {
-      if (event.key !== 'Enter' && event.key !== ' ') return;
-      const element = event.target?.closest?.('[data-segment]');
-      if (!element || !root.contains(element)) return;
-      root.__tcPlatformSegmentContext?.commit?.(element, event);
-    }, true);
-  }
+  root.__tcPlatformSegmentContext = null;
   return handlers;
 }
 
@@ -225,10 +206,6 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
   const loadAttr = attrs.loadAttr || 'data-line-select';
   const toggleAttr = attrs.toggleAttr || 'data-line-toggle';
   const deleteAttr = attrs.deleteAttr || 'data-line-delete';
-  const bindingKey = `platformHeatingStyleSavedRecords:${savedConfig.listKey}:${savedConfig.activeIdKey}:${loadAttr}:${toggleAttr}:${deleteAttr}`;
-  root.__tcPlatformSavedRecordBindings = root.__tcPlatformSavedRecordBindings || new Set();
-  if (root.__tcPlatformSavedRecordBindings.has(bindingKey)) return {};
-  root.__tcPlatformSavedRecordBindings.add(bindingKey);
 
   const list = current => Array.isArray(current?.[savedConfig.listKey]) ? current[savedConfig.listKey] : [];
   const createRecord = (current, existing = null) => createSavedRecord({
@@ -246,16 +223,29 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     ...payload
   }), { action: metaAction || `line:${payload.action || 'saved'}` });
 
-  const save = () => {
-    savedConfig.commitBeforeCreate === false ? null : commitAllFields(root, state, { action: savedConfig.preCreateAction || 'platform:saved:pre-create', notify: false });
+  const shouldSkipDuplicateAction = action => {
+    const now = Date.now();
+    const key = `__tcLastPlatformLineAction:${savedConfig.listKey || 'records'}`;
+    const last = root?.[key] || {};
+    if (last.action === action && now - Number(last.at || 0) < 450) return true;
+    if (root) root[key] = { action, at: now };
+    return false;
+  };
+
+  const save = ({ root: actionRoot } = {}) => {
+    if (shouldSkipDuplicateAction('line:save')) return;
+    const host = actionRoot || root;
+    savedConfig.commitBeforeCreate === false ? null : commitAllFields(host, state, { action: savedConfig.preCreateAction || 'line:pre-save', notify: false });
     const current = state.get();
     const record = createRecord(current);
     const patch = typeof savedConfig.afterCreatePatch === 'function' ? savedConfig.afterCreatePatch(current, record) : {};
     preserveScroll(() => setReduced(current, { action: 'create', record, patch }, 'line:save'));
   };
 
-  const update = () => {
-    savedConfig.commitBeforeUpdate === false ? null : commitAllFields(root, state, { action: savedConfig.preUpdateAction || 'platform:saved:pre-update', notify: false });
+  const update = ({ root: actionRoot } = {}) => {
+    if (shouldSkipDuplicateAction('line:update')) return;
+    const host = actionRoot || root;
+    savedConfig.commitBeforeUpdate === false ? null : commitAllFields(host, state, { action: savedConfig.preUpdateAction || 'line:pre-update', notify: false });
     const current = state.get();
     const id = current?.[savedConfig.activeIdKey];
     if (!id) return;
@@ -265,7 +255,10 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     preserveScroll(() => setReduced(current, { action: 'update', id, record }, 'line:update'));
   };
 
-  const load = id => {
+  const readId = element => readRecordIdFromElement(element, { loadAttr, toggleAttr, deleteAttr });
+
+  const load = ({ element } = {}) => {
+    const id = readId(element);
     const current = state.get();
     const item = list(current).find(entry => String(entry.id) === String(id));
     if (!item) return;
@@ -280,69 +273,30 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     setReduced(current, { action: 'load', id: item.id, record: item, patch }, 'line:select');
   };
 
-  const remove = id => {
+  const remove = ({ element } = {}) => {
+    const id = readId(element);
     const current = state.get();
     const patch = typeof savedConfig.clear === 'function' && String(current?.[savedConfig.activeIdKey] || '') === String(id) ? savedConfig.clear(current) : {};
     preserveScroll(() => setReduced(current, { action: 'delete', id, patch }, 'line:delete'));
   };
 
-  const toggle = id => {
+  const toggle = ({ element } = {}) => {
+    const id = readId(element);
     const current = state.get();
     setReduced(current, { action: 'toggle-expanded', id }, 'line:toggle');
   };
 
-  const handle = event => {
-    const target = event.target;
-    const actionEl = findInside(root, target, '[data-tc-action], [data-action]');
-    const action = actionEl?.dataset?.tcAction || actionEl?.dataset?.action || '';
-
-    if (action === 'saved:add') {
-      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
-      save();
-      return;
-    }
-    if (action === 'saved:update') {
-      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
-      update();
-      return;
-    }
-
-    const deleteEl = findInside(root, target, `[${deleteAttr}]`);
-    if (deleteEl) {
-      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
-      remove(readRecordIdFromElement(deleteEl, attrs));
-      return;
-    }
-    const toggleEl = findInside(root, target, `[${toggleAttr}]`);
-    if (toggleEl) {
-      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
-      toggle(readRecordIdFromElement(toggleEl, attrs));
-      return;
-    }
-    const loadEl = findInside(root, target, `[${loadAttr}], [data-line-card], [data-saved-record-card]`);
-    if (!loadEl) return;
-    if (findInside(root, target, `[${toggleAttr}], [${deleteAttr}], a[href], input, select, textarea, label, button:not([${loadAttr}])`)) return;
-    event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
-    load(readRecordIdFromElement(loadEl, attrs));
-  };
-
-  // Same event contract as the proven Heizung/Kälte line-section workflow:
-  // a root-level capture listener owns save/load/toggle/delete for the whole
-  // saved-record panel. No module-specific SavedRecord patch and no competing
-  // platform bridge sits between the DOM and the store.
-  root.addEventListener('click', handle, true);
-  root.addEventListener('keydown', event => {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    const card = findInside(root, event.target, `[${loadAttr}], [data-line-card], [data-saved-record-card]`);
-    if (!card) return;
-    event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
-    load(readRecordIdFromElement(card, attrs));
-  }, true);
-
-  // Legacy regression marker only: root.__tcPlatformSavedRecordContext = { handlers, state, attrs: }; 'saved:load' 'saved:delete' 'saved:toggle'
+  // Heizung/Kälte parity: saved-record panels are controlled exclusively by the
+  // central action map. No module-specific capture listener, bridge, or legacy add/update path is registered here.
   root.__tcPlatformSavedRecordContext = null;
   root.__tcPlatformSavedRecordBridge = null;
-  return {};
+  return {
+    'line:save': save,
+    'line:update': update,
+    'saved:load': load,
+    'saved:delete': remove,
+    'saved:toggle': toggle
+  };
 }
 
 export function createPlatformModule(definition = {}) {

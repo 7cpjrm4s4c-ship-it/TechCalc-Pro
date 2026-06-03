@@ -10,8 +10,8 @@ assert.match(source, /createPlatformModule/, 'Rainwater must be mounted through 
 assert.match(runtime, /registerCentralActions\(root, actions\)/, 'Platform runtime must register actions through the central event pipeline.');
 assert.doesNotMatch(source, /registerCentralActions|createSavedRecordActions|renderPlatformModuleView|mountModule/, 'Rainwater index must not own platform action, renderer, or mount wiring.');
 assert.doesNotMatch(source, /bindSavedCalculationActions/, 'Rainwater must not use legacy saved calculation binding.');
-assert.match(runtime, /'saved:add'/, 'Surface add action must use the platform saved-record action.');
-assert.match(runtime, /'saved:update'/, 'Surface update action must use the platform saved-record action.');
+assert.match(runtime, /'line:save'/, 'Surface add action must use the heating/cooling line-save contract.');
+assert.match(runtime, /'line:update'/, 'Surface update action must use the heating/cooling line-update contract.');
 assert.match(runtime, /'saved:load'/, 'Surface selection must use the platform saved-record action.');
 assert.match(runtime, /'saved:toggle'/, 'Saved accordion toggle must use central saved action.');
 assert.match(controller, /listKey:\s*'surfaces'/, 'Rainwater saved surface storage must be declarative controller config.');

@@ -7,8 +7,9 @@ const rainwater = readFileSync(new URL('../js/modules/rainwater/controller.js', 
 const wastewater = readFileSync(new URL('../js/modules/wastewater/controller.js', import.meta.url), 'utf8');
 
 assert.match(eventPipeline, /function resolveActionHandler/, 'Central event pipeline must own platform action resolution.');
-assert.match(eventPipeline, /startsWith\('saved:'\)/, 'SavedRecord actions must be routed as structural platform actions.');
-assert.match(eventPipeline, /__tcPlatformSavedRecordContext\?\.handlers\?\.\[action\]/, 'SavedRecord handler must be resolved from the latest mounted module context.');
+assert.doesNotMatch(eventPipeline, /startsWith\('saved:'\)/, 'SavedRecord actions must not use a special pipeline branch.');
+assert.doesNotMatch(eventPipeline, /__tcPlatformSavedRecordContext\?\.handlers\?\.\[action\]/, 'SavedRecord handler must not use the removed context bridge.');
+assert.match(runtime, /'saved:load': load/, 'SavedRecord load must be registered in the same central action map as Heizung/Kälte.');
 assert.doesNotMatch(runtime, /__tcPlatformSavedRecordCaptureBound/, 'moduleRuntime must not install a competing SavedRecord capture flag.');
 assert.doesNotMatch(runtime, /SavedRecord[\s\S]{0,900}addEventListener\('pointerup', capture/, 'moduleRuntime must not install a competing SavedRecord pointer capture patch.');
 assert.doesNotMatch(runtime, /SavedRecord[\s\S]{0,900}addEventListener\('click', capture/, 'moduleRuntime must not install a competing SavedRecord click capture patch.');
