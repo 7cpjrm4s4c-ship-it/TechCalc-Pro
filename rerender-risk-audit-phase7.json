@@ -1,5 +1,5 @@
 {
-  "directDomWrites": 13,
+  "directDomWrites": 15,
   "moduleDirectDomWrites": 4,
   "status": "ok",
   "note": "Phase 7 allows shell/navigation writes, but module-level writes must continue moving toward safeReplaceContent or granular updates.",
@@ -33,6 +33,16 @@
       "file": "js/modules/ventilation/index.js",
       "line": 479,
       "text": "root.innerHTML = view(snapshot);"
+    },
+    {
+      "file": "js/platform/moduleRuntime/index.js",
+      "line": 370,
+      "text": "if (formHost.innerHTML !== nextForm) formHost.innerHTML = nextForm;"
+    },
+    {
+      "file": "js/platform/moduleRuntime/index.js",
+      "line": 374,
+      "text": "if (sideHost.innerHTML !== nextSide) sideHost.innerHTML = nextSide;"
     }
   ]
 }

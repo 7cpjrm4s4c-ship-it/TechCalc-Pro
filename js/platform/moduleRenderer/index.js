@@ -33,12 +33,22 @@ function renderSavedRecords(model = {}, accent = 'blue') {
   });
 }
 
-export function renderPlatformModuleView({ config, schema, state, result, resultModel, savedRecords } = {}) {
+export function renderPlatformForm({ config, schema, state, result } = {}) {
   const accent = config?.accent || 'blue';
-  const form = renderFormSchema(schema, state, { title: 'Eingaben', accent, result });
-  const results = renderResultModel(resultModel || {}, accent);
-  const saved = renderSavedRecords(savedRecords, accent);
-  return renderModuleShell(config, `<div class="span-6">${form}</div><div class="span-6">${stack([results, saved].filter(Boolean).join(''))}</div>`);
+  return renderFormSchema(schema, state, { title: 'Eingaben', accent, result });
 }
 
-export default { renderPlatformModuleView };
+export function renderPlatformResultsAndSaved({ config, resultModel, savedRecords } = {}) {
+  const accent = config?.accent || 'blue';
+  const results = renderResultModel(resultModel || {}, accent);
+  const saved = renderSavedRecords(savedRecords, accent);
+  return stack([results, saved].filter(Boolean).join(''));
+}
+
+export function renderPlatformModuleView({ config, schema, state, result, resultModel, savedRecords } = {}) {
+  const form = renderPlatformForm({ config, schema, state, result });
+  const side = renderPlatformResultsAndSaved({ config, resultModel, savedRecords });
+  return renderModuleShell(config, `<div class="span-6" data-platform-dynamic="form">${form}</div><div class="span-6" data-platform-dynamic="result-saved">${side}</div>`);
+}
+
+export default { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved };

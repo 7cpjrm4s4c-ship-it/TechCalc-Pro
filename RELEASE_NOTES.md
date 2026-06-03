@@ -1,4 +1,12 @@
 
+## Phase 17C.13 — Platform Dynamic Islands
+
+- Zentraler Dynamic-Island-Rebuild in `platform/moduleRuntime` ergänzt.
+- `moduleRenderer` stellt Formular und Ergebnis/Speichern als updatefähige Plattform-Inseln bereit.
+- Regenwasser-Switch nutzt jetzt State + zentralen Schema-Rebuild statt Modul-DOM-Patch.
+- Regression `rainwater-phase17c13-platform-dynamic-islands` ergänzt.
+
+
 ## Phase 17C.5 – Reference Event + Scroll Boundary Fixes
 
 - SavedRecord-Events zentral gegen stale Modul-Closures gehärtet.

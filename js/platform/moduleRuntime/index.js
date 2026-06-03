@@ -5,7 +5,7 @@ import { createSavedRecord, savedRecordReducer } from '../../core/savedRecordCon
 // uses the Heizung/Kälte-compatible direct binding to avoid duplicate mobile events.
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { preserveScroll as keepScroll } from '../../core/scrollManager.js';
-import { renderPlatformModuleView } from '../moduleRenderer/index.js';
+import { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved } from '../moduleRenderer/index.js';
 import { getRenderScheduler } from '../../core/renderScheduler.js';
 
 const noop = () => {};
@@ -65,12 +65,12 @@ function patchFieldDomValues(root, patch = {}, fields = []) {
   targetFields.forEach(field => patchFieldDomValue(root, field, patch[field]));
 }
 
-function bindSegments(root, state, segmentConfig = {}) {
+function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
   const fields = segmentConfig.fields || {};
   const handlers = {};
   if (!Object.keys(fields).length) return handlers;
 
-  const commit = (element, event, options = {}) => {
+  const commit = (element, event, commitOptions = {}) => {
     const field = element?.dataset?.segment;
     const value = element?.dataset?.value;
     if (!field || value === undefined || !fields[field]) return false;
@@ -98,10 +98,26 @@ function bindSegments(root, state, segmentConfig = {}) {
 
     setSegmentVisual(root, field, patch?.[field] ?? value);
     preserveScroll(() => state.set(patch, { action, notify: true }));
+
+    // Platform dynamic-update contract: schema-dependent segment changes must
+    // rebuild the form/result islands immediately, just like Heizung/Kälte does
+    // with its named dynamic containers. This avoids stale labels/visibleWhen
+    // state on mobile browsers where the normal async render can be delayed
+    // until the next field commit.
+    if (typeof dynamicOptions.dynamicUpdate === 'function') {
+      dynamicOptions.dynamicUpdate({ action, field, value: patch?.[field] ?? value, patch, reason: 'segment' });
+    }
+
     const scheduler = getRenderScheduler(root);
     scheduler?.flushNow?.(action);
-    if (typeof queueMicrotask === 'function') queueMicrotask(() => scheduler?.flushNow?.(`${action}:settled`));
-    if (options.settled !== false) setTimeout(() => scheduler?.flushNow?.(`${action}:settled-timeout`), 0);
+    if (typeof queueMicrotask === 'function') queueMicrotask(() => {
+      if (typeof dynamicOptions.dynamicUpdate === 'function') dynamicOptions.dynamicUpdate({ action: `${action}:settled`, field, value: patch?.[field] ?? value, patch, reason: 'segment:settled' });
+      scheduler?.flushNow?.(`${action}:settled`);
+    });
+    if (commitOptions.settled !== false) setTimeout(() => {
+      if (typeof dynamicOptions.dynamicUpdate === 'function') dynamicOptions.dynamicUpdate({ action: `${action}:settled-timeout`, field, value: patch?.[field] ?? value, patch, reason: 'segment:settled-timeout' });
+      scheduler?.flushNow?.(`${action}:settled-timeout`);
+    }, 0);
     return true;
   };
 
@@ -326,20 +342,45 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
 export function createPlatformModule(definition = {}) {
   const { config, schema, state, initialState, calculate, results, savedRecords, controller = {} } = definition;
   const runtimeState = createNormalizedState(state, controller.normalizeFields);
-  function view(snapshot) {
+
+  function buildRenderModel(snapshot) {
     const result = calculate(snapshot);
-    return renderPlatformModuleView({
+    return {
       config,
       schema,
       state: snapshot,
       result,
       resultModel: typeof results === 'function' ? results(snapshot, result) : results,
       savedRecords: typeof savedRecords === 'function' ? savedRecords(snapshot, result) : savedRecords
-    });
+    };
   }
+
+  function view(snapshot) {
+    return renderPlatformModuleView(buildRenderModel(snapshot));
+  }
+
+  function updateDynamicIslands(root, meta = {}) {
+    if (!root) return false;
+    const formHost = root.querySelector?.('[data-platform-dynamic="form"]');
+    const sideHost = root.querySelector?.('[data-platform-dynamic="result-saved"]');
+    if (!formHost && !sideHost) return false;
+    const model = buildRenderModel(runtimeState.get());
+    if (formHost) {
+      const nextForm = renderPlatformForm(model);
+      if (formHost.innerHTML !== nextForm) formHost.innerHTML = nextForm;
+    }
+    if (sideHost) {
+      const nextSide = renderPlatformResultsAndSaved(model);
+      if (sideHost.innerHTML !== nextSide) sideHost.innerHTML = nextSide;
+    }
+    root.__tcPlatformLastDynamicUpdate = { ...(meta || {}), at: Date.now() };
+    return true;
+  }
+
   function bindPlatformActions(root) {
+    const dynamicUpdate = meta => updateDynamicIslands(root, meta);
     const actions = {
-      ...bindSegments(root, runtimeState, controller.segments),
+      ...bindSegments(root, runtimeState, controller.segments, { dynamicUpdate }),
       ...bindCollections(root, runtimeState, controller.collections),
       ...bindSavedRecords(root, runtimeState, calculate, controller.savedRecords)
     };
