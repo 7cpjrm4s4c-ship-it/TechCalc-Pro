@@ -218,36 +218,11 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     'saved:toggle': ({ element }) => actions.toggle({ element })
   };
 
-  // Phase 17C.5: saved-record cards are structural controls. The capture
-  // listener is attached once to the reused app root, so it must dereference the
-  // latest handlers/context on every event. Otherwise the first module mounted
-  // owns all later saved-record clicks, which disables load/toggle/delete after
-  // navigation or rerender.
+  // Phase 17C.6: expose the current SavedRecord action context to the
+  // central event pipeline. The pipeline owns pointer/click/keyboard handling;
+  // moduleRuntime only publishes the active module contract so stale listeners
+  // from previous modules cannot own the saved-record workflow.
   root.__tcPlatformSavedRecordContext = { handlers, state };
-  if (!root.__tcPlatformSavedRecordCaptureBound) {
-    root.__tcPlatformSavedRecordCaptureBound = true;
-    const capture = event => {
-      const actionEl = event.target?.closest?.('[data-tc-action^="saved:"], [data-saved-load], [data-saved-toggle], [data-saved-delete], [data-saved-record-card]');
-      if (!actionEl || !root.contains(actionEl)) return;
-      const action = actionEl.dataset?.tcAction
-        || (actionEl.hasAttribute?.('data-saved-delete') ? 'saved:delete' : '')
-        || (actionEl.hasAttribute?.('data-saved-toggle') ? 'saved:toggle' : '')
-        || 'saved:load';
-      const context = root.__tcPlatformSavedRecordContext || {};
-      const handler = context.handlers?.[action];
-      if (typeof handler !== 'function') return;
-      event?.preventDefault?.();
-      event?.stopPropagation?.();
-      event?.stopImmediatePropagation?.();
-      handler({ action, element: actionEl, event, state: context.state, root });
-    };
-    root.addEventListener('pointerup', capture, true);
-    root.addEventListener('click', capture, true);
-    root.addEventListener('keydown', event => {
-      if (event.key !== 'Enter' && event.key !== ' ') return;
-      capture(event);
-    }, true);
-  }
 
   return handlers;
 }

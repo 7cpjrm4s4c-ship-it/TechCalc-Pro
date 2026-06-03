@@ -738,3 +738,9 @@
 - Restored central `data-tc-action` handling for saved records.
 - Added settled microtask render flush for rainwater surface-mode schema switches.
 - Added regression `reference-modules-phase17c3-saved-and-switch`.
+
+## Phase 17C.6
+
+- SavedRecord-Root-Cause-Fix in der zentralen Event-Pipeline.
+- Entfernt konkurrierenden SavedRecord-Capture-Patch aus `moduleRuntime`.
+- Regenwasser und Schmutzwasser bleiben frei von modulnahen SavedRecord-Sonderregeln.
