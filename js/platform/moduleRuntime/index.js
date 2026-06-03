@@ -70,34 +70,58 @@ function bindSegments(root, state, segmentConfig = {}) {
   const handlers = {};
   if (!Object.keys(fields).length) return handlers;
 
-  const commit = (element, event) => {
+  const commit = (element, event, options = {}) => {
     const field = element?.dataset?.segment;
     const value = element?.dataset?.value;
     if (!field || value === undefined || !fields[field]) return false;
-    event?.preventDefault?.();
-    event?.stopPropagation?.();
-    event?.stopImmediatePropagation?.();
     const current = state.get();
     const patchFactory = asFn(fields[field].patch);
     const patch = patchFactory(value, current, { field, root }) || { [field]: value };
-    setSegmentVisual(root, field, patch?.[field] ?? value);
     const action = fields[field].action || `platform:segment:${field}`;
+    const dedupeKey = `${field}:${value}:${action}`;
+    const now = Date.now();
+    const last = root?.__tcPlatformSegmentCommit || {};
+
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    event?.stopImmediatePropagation?.();
+
+    // Heizung/Kälte parity: segment changes are store-first and render-immediate.
+    // Mobile Safari can leave click/touchend work pending until the next input
+    // confirmation. Committing on the earliest reliable interaction keeps schema
+    // labels, visibility and dependent fields in sync with the active segment.
+    if (last.key === dedupeKey && now - Number(last.at || 0) < 350) {
+      setSegmentVisual(root, field, patch?.[field] ?? value);
+      return true;
+    }
+    if (root) root.__tcPlatformSegmentCommit = { key: dedupeKey, at: now };
+
+    setSegmentVisual(root, field, patch?.[field] ?? value);
     preserveScroll(() => state.set(patch, { action, notify: true }));
     const scheduler = getRenderScheduler(root);
     scheduler?.flushNow?.(action);
-    if (typeof fields[field].domPatch === 'function') fields[field].domPatch({ root, field, value, patch, state: state.get() });
-    if (typeof queueMicrotask === 'function') queueMicrotask(() => {
-      scheduler?.flushNow?.(`${action}:settled`);
-      if (typeof fields[field].domPatch === 'function') fields[field].domPatch({ root, field, value, patch, state: state.get() });
-    });
-    setTimeout(() => {
-      scheduler?.flushNow?.(`${action}:settled-timeout`);
-      if (typeof fields[field].domPatch === 'function') fields[field].domPatch({ root, field, value, patch, state: state.get() });
-    }, 0);
+    if (typeof queueMicrotask === 'function') queueMicrotask(() => scheduler?.flushNow?.(`${action}:settled`));
+    if (options.settled !== false) setTimeout(() => scheduler?.flushNow?.(`${action}:settled-timeout`), 0);
     return true;
   };
 
   handlers.segment = ({ element, event }) => commit(element, event);
+
+  // Direct segment bridge: the generic event pipeline processes segments on
+  // pointerup/touchend/click. Reference modules with schema-dependent segments
+  // need the same immediate dynamic update behaviour as Heizung/Kälte, so we
+  // commit configured platform segments already on pointerdown/touchstart.
+  if (root && !root.__tcPlatformSegmentDirectBound) {
+    root.__tcPlatformSegmentDirectBound = true;
+    const direct = event => {
+      const segment = event.target?.closest?.('[data-segment]');
+      const field = segment?.dataset?.segment;
+      if (!segment || !root.contains(segment) || !fields[field]) return;
+      commit(segment, event, { settled: false });
+    };
+    root.addEventListener('pointerdown', direct, true);
+    root.addEventListener('touchstart', direct, { capture: true, passive: false });
+  }
 
   root.__tcPlatformSegmentContext = null;
   return handlers;

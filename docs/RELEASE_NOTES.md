@@ -1,3 +1,10 @@
+## Phase 17C.12 - Regenwasser Segment Dynamic Update
+
+- Plattform-Segmente committen konfigurierte Felder jetzt bereits auf pointerdown/touchstart.
+- Regenwasser-Switch Dachfläche / Grundstücksfläche aktualisiert schemaabhängige Labels und Felder sofort.
+- Keine Regenwasser-DOM-Sonderregel, kein domPatch, kein querySelector-Patch.
+- Neue Regression `rainwater-phase17c12-switch`.
+
 ## Phase 17C.10 - Referenzmodule SavedRecord-Vertrag bereinigt
 
 - Regenwasser und Schmutzwasser nutzen jetzt fuer Speichern/Aktualisieren den Heizung/Kälte-Vertrag `line:save` / `line:update`.
