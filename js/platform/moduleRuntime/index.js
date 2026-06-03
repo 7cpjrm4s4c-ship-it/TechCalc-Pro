@@ -361,6 +361,25 @@ export function createPlatformModule(definition = {}) {
 
   function updateDynamicIslands(root, meta = {}) {
     if (!root) return false;
+    const action = String(meta?.action || '');
+    const reason = String(meta?.reason || '');
+    const isSegmentUpdate = reason.startsWith('segment') || action.startsWith('platform:segment:') || action === 'segment:select';
+
+    // Phase 17C.14: segment changes are schema-structural. They can alter labels,
+    // visibleWhen fields, select captions and entire cards. Updating only the
+    // form/side islands was still too weak on mobile Safari because the old
+    // event target could survive visually until the next confirmed input.
+    // Heizung/Kälte solves this by synchronously replacing named dynamic areas;
+    // the platform equivalent is a synchronous full platform-view rebuild for
+    // segment commits, followed by rebinding the platform action map.
+    if (isSegmentUpdate) {
+      const nextView = view(runtimeState.get());
+      if (root.innerHTML !== nextView) root.innerHTML = nextView;
+      root.__tcPlatformLastDynamicUpdate = { ...(meta || {}), full: true, at: Date.now() };
+      bindPlatformActions(root);
+      return true;
+    }
+
     const formHost = root.querySelector?.('[data-platform-dynamic="form"]');
     const sideHost = root.querySelector?.('[data-platform-dynamic="result-saved"]');
     if (!formHost && !sideHost) return false;

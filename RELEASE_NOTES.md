@@ -752,3 +752,9 @@
 - SavedRecord-Root-Cause-Fix in der zentralen Event-Pipeline.
 - Entfernt konkurrierenden SavedRecord-Capture-Patch aus `moduleRuntime`.
 - Regenwasser und Schmutzwasser bleiben frei von modulnahen SavedRecord-Sonderregeln.
+
+## Phase 17C.14 – Platform Segment Rebuild
+
+- Segment-Actions in der Plattform-Runtime als strukturelle Schema-Updates gehaertet.
+- Synchroner Full-View-Rebuild fuer `platform:segment:*` eingefuehrt.
+- Regenwasser-Switch ohne Modul-DOM-Sonderlogik weiter zentralisiert.
