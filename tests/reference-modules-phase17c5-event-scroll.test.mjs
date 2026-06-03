@@ -9,8 +9,9 @@ assert.match(runtimeSource, /'line:save': save/, 'Saved-record save must be regi
 assert.match(runtimeSource, /'saved:toggle': toggle/, 'Saved-record toggle must be registered through the central Heizung/Kälte action map.');
 assert.match(eventPipelineSource, /resolveActionHandler/, 'Central event pipeline must resolve platform action handlers.');
 assert.doesNotMatch(eventPipelineSource, /__tcPlatformSavedRecordContext\?\.handlers/, 'Saved-record actions must not use the removed context bridge.');
-assert.match(runtimeSource, /root\.__tcPlatformSegmentContext\s*=\s*null/, 'Legacy segment capture context must be disabled; the central pipeline owns segment actions.');
-assert.doesNotMatch(runtimeSource, /__tcPlatformSegmentContext\?\.commit/, 'Segment capture handler must not compete with the central pipeline.');
+assert.match(runtimeSource, /root\.__tcPlatformSegmentContext\s*=\s*\{ fields, commit \}/, 'Segment bridge must refresh the active module context instead of keeping a stale closure.');
+assert.match(runtimeSource, /context\.commit\(segment, event, \{ settled: false \}\)/, 'Segment bridge must dispatch through the current module commit handler.');
+assert.doesNotMatch(runtimeSource, /root\.__tcPlatformSegmentContext\s*=\s*null/, 'Segment context must not be cleared after binding.');
 assert.match(coordinatorSource, /clampViewportToDocumentEnd/, 'Renderer must clamp scroll after structural rerenders.');
 assert.match(coordinatorSource, /clampViewportStable\(\)/, 'Renderer must stabilize scroll clamping after DOM replacement.');
 

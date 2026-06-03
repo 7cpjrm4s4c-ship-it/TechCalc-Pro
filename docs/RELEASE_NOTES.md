@@ -1,3 +1,11 @@
+
+## Phase 17C.16 – Platform Segment Context Bridge
+
+- Fixed the Regenwasser Dachfläche/Grundstücksfläche startup switch path.
+- The platform direct segment bridge now refreshes its active module context after every mount/re-render.
+- Removed the stale-closure behavior where the first mounted platform module could own the pointerdown segment context.
+- Added regression coverage for the current-context segment bridge.
+
 ## Phase 17C.12 - Regenwasser Segment Dynamic Update
 
 - Plattform-Segmente committen konfigurierte Felder jetzt bereits auf pointerdown/touchstart.

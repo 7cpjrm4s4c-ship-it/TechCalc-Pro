@@ -131,19 +131,29 @@ function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
   // pointerup/touchend/click. Reference modules with schema-dependent segments
   // need the same immediate dynamic update behaviour as Heizung/Kälte, so we
   // commit configured platform segments already on pointerdown/touchstart.
-  if (root && !root.__tcPlatformSegmentDirectBound) {
-    root.__tcPlatformSegmentDirectBound = true;
-    const direct = event => {
-      const segment = event.target?.closest?.('[data-segment]');
-      const field = segment?.dataset?.segment;
-      if (!segment || !root.contains(segment) || !fields[field]) return;
-      commit(segment, event, { settled: false });
-    };
-    root.addEventListener('pointerdown', direct, true);
-    root.addEventListener('touchstart', direct, { capture: true, passive: false });
+  //
+  // Important: the bridge itself may only be bound once per stable module root,
+  // but the active module context must be refreshed after every mount/re-render.
+  // Otherwise the listener keeps the old `fields`/`state` closure from the first
+  // platform module mounted into that root. That was the Regenwasser startup bug:
+  // the first surfaceMode tap only became effective after a later field commit.
+  if (root) {
+    root.__tcPlatformSegmentContext = { fields, commit };
+    if (!root.__tcPlatformSegmentDirectBound) {
+      root.__tcPlatformSegmentDirectBound = true;
+      const direct = event => {
+        const segment = event.target?.closest?.('[data-segment]');
+        if (!segment || !root.contains(segment)) return;
+        const field = segment?.dataset?.segment;
+        const context = root.__tcPlatformSegmentContext || {};
+        if (!field || !context.fields?.[field] || typeof context.commit !== 'function') return;
+        context.commit(segment, event, { settled: false });
+      };
+      root.addEventListener('pointerdown', direct, true);
+      root.addEventListener('touchstart', direct, { capture: true, passive: false });
+    }
   }
 
-  root.__tcPlatformSegmentContext = null;
   return handlers;
 }
 
