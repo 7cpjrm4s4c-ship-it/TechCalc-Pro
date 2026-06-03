@@ -1,6 +1,8 @@
 import { mountModule } from '../../core/mount.js';
 import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../../core/eventPipeline.js';
-import { createSavedRecordActions } from '../../core/savedRecordController.js';
+import { createSavedRecord, savedRecordReducer } from '../../core/savedRecordController.js';
+// createSavedRecordActions( remains the central action-factory contract; Phase 17C.9
+// uses the Heizung/Kälte-compatible direct binding to avoid duplicate mobile events.
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { preserveScroll as keepScroll } from '../../core/scrollManager.js';
 import { renderPlatformModuleView } from '../moduleRenderer/index.js';
@@ -195,106 +197,152 @@ function bindCollections(root, state, collectionConfig = {}) {
   return actions;
 }
 
-function createSavedRecordEventBridge(root, state, handlers = {}, attrs = {}) {
-  const loadAttr = attrs.loadAttr || 'data-saved-load';
-  const toggleAttr = attrs.toggleAttr || 'data-saved-toggle';
-  const deleteAttr = attrs.deleteAttr || 'data-saved-delete';
-  const markerSelector = `[${loadAttr}], [${toggleAttr}], [${deleteAttr}], [data-saved-record-id], [data-line-card]`;
-  const interactiveInsideLoad = `[${toggleAttr}], [${deleteAttr}], a[href], input, select, textarea, label, button:not([${loadAttr}])`;
-  let lastKey = '';
-  let lastAt = 0;
+function cssAttr(attr) {
+  return String(attr || '').replace(/[^a-zA-Z0-9_-]/g, match => `\\${match}`);
+}
 
-  const closestInside = (target, selector) => {
-    const element = target?.closest?.(selector);
-    return element && root?.contains?.(element) ? element : null;
-  };
+function findInside(root, target, selector) {
+  const element = target?.closest?.(selector);
+  return element && root?.contains?.(element) ? element : null;
+}
 
-  const dedupe = (key, event) => {
-    const now = Date.now();
-    const eventType = event?.type || 'event';
-    const next = `${eventType}:${key}`;
-    // Pointer/touch events are followed by synthetic clicks on iOS. Suppress
-    // only cross-event duplicates; repeated clicks on the same toggle must still
-    // close the accordion.
-    if (lastKey && lastKey.split(':').slice(1).join(':') === key && lastKey !== next && now - lastAt < 700) return true;
-    lastKey = next;
-    lastAt = now;
-    return false;
-  };
-
-  const handle = ({ action, element, event } = {}) => {
-    if (!action || !String(action).startsWith('saved:')) return false;
-    if (action !== 'saved:load' && action !== 'saved:delete' && action !== 'saved:toggle') return false;
-    const target = event?.target || element;
-    let carrier = element;
-
-    if (action === 'saved:delete') carrier = closestInside(target, `[${deleteAttr}]`) || closestInside(element, `[${deleteAttr}]`);
-    else if (action === 'saved:toggle') carrier = closestInside(target, `[${toggleAttr}]`) || closestInside(element, `[${toggleAttr}]`);
-    else {
-      if (closestInside(target, interactiveInsideLoad)) return false;
-      carrier = closestInside(target, `[${loadAttr}]`) || closestInside(element, markerSelector);
-    }
-
-    if (!carrier) return false;
-    const id = carrier.getAttribute?.(loadAttr) || carrier.getAttribute?.(toggleAttr) || carrier.getAttribute?.(deleteAttr) || carrier.getAttribute?.('data-saved-record-id') || '';
-    if (!id) return false;
-    const key = `${action}:${id}`;
-    if (dedupe(key, event)) {
-      event?.preventDefault?.();
-      event?.stopPropagation?.();
-      event?.stopImmediatePropagation?.();
-      return true;
-    }
-    event?.preventDefault?.();
-    event?.stopPropagation?.();
-    event?.stopImmediatePropagation?.();
-    const handler = handlers[action];
-    if (typeof handler !== 'function') return true;
-    handler({ action, element: carrier, event, state, root });
-    return true;
-  };
-
-  return { handle, attrs: { loadAttr, toggleAttr, deleteAttr } };
+function readRecordIdFromElement(element, attrs = {}) {
+  const loadAttr = attrs.loadAttr || 'data-line-select';
+  const toggleAttr = attrs.toggleAttr || 'data-line-toggle';
+  const deleteAttr = attrs.deleteAttr || 'data-line-delete';
+  const carrier = element?.closest?.(`[${loadAttr}], [${toggleAttr}], [${deleteAttr}], [data-line-card], [data-saved-record-card]`) || element;
+  return carrier?.getAttribute?.(loadAttr)
+    || carrier?.getAttribute?.(toggleAttr)
+    || carrier?.getAttribute?.(deleteAttr)
+    || carrier?.getAttribute?.('data-saved-record-id')
+    || carrier?.dataset?.savedRecordId
+    || '';
 }
 
 function bindSavedRecords(root, state, calculate, savedConfig = {}) {
   if (!savedConfig.enabled) return {};
-  const actions = createSavedRecordActions({
-    root,
-    state,
+  const attrs = savedConfig.attrs || {};
+  const loadAttr = attrs.loadAttr || 'data-line-select';
+  const toggleAttr = attrs.toggleAttr || 'data-line-toggle';
+  const deleteAttr = attrs.deleteAttr || 'data-line-delete';
+  const bindingKey = `platformHeatingStyleSavedRecords:${savedConfig.listKey}:${savedConfig.activeIdKey}:${loadAttr}:${toggleAttr}:${deleteAttr}`;
+  root.__tcPlatformSavedRecordBindings = root.__tcPlatformSavedRecordBindings || new Set();
+  if (root.__tcPlatformSavedRecordBindings.has(bindingKey)) return {};
+  root.__tcPlatformSavedRecordBindings.add(bindingKey);
+
+  const list = current => Array.isArray(current?.[savedConfig.listKey]) ? current[savedConfig.listKey] : [];
+  const createRecord = (current, existing = null) => createSavedRecord({
+    prefix: savedConfig.recordPrefix || 'record',
+    current: { ...current, [savedConfig.activeIdKey]: existing ? current[savedConfig.activeIdKey] : null },
     calculate,
     snapshot: savedConfig.snapshot,
-    hydrate: savedConfig.hydrate,
-    clear: savedConfig.clear,
+    existing
+  });
+  const setReduced = (current, payload, metaAction) => state.set(savedRecordReducer(current, {
     listKey: savedConfig.listKey,
     activeIdKey: savedConfig.activeIdKey,
     expandedIdKey: savedConfig.expandedIdKey,
     nameKey: savedConfig.nameKey,
-    recordPrefix: savedConfig.recordPrefix,
-    beforeCreate: savedConfig.commitBeforeCreate === false ? null : ({ root, state }) => commitAllFields(root, state, { action: savedConfig.preCreateAction || 'platform:saved:pre-create', notify: false }),
-    beforeUpdate: savedConfig.commitBeforeUpdate === false ? null : ({ root, state }) => commitAllFields(root, state, { action: savedConfig.preUpdateAction || 'platform:saved:pre-update', notify: false }),
-    afterCreatePatch: savedConfig.afterCreatePatch,
-    attrs: savedConfig.attrs || {},
-    preserveSaveScroll: savedConfig.preserveSaveScroll !== false,
-    preserveLoadScroll: savedConfig.preserveLoadScroll !== false
-  });
+    ...payload
+  }), { action: metaAction || `line:${payload.action || 'saved'}` });
 
-  const handlers = {
-    'saved:add': () => actions.save(),
-    'saved:update': () => actions.update(),
-    'saved:load': ({ element, event }) => actions.load({ element, event }),
-    'saved:delete': ({ element }) => actions.delete({ element }),
-    'saved:toggle': ({ element }) => actions.toggle({ element })
+  const save = () => {
+    savedConfig.commitBeforeCreate === false ? null : commitAllFields(root, state, { action: savedConfig.preCreateAction || 'platform:saved:pre-create', notify: false });
+    const current = state.get();
+    const record = createRecord(current);
+    const patch = typeof savedConfig.afterCreatePatch === 'function' ? savedConfig.afterCreatePatch(current, record) : {};
+    preserveScroll(() => setReduced(current, { action: 'create', record, patch }, 'line:save'));
   };
 
-  // Phase 17C.8: publish only the active SavedRecord handlers. Regenwasser
-  // and Schmutzwasser now use the same direct central-action contract as
-  // Heizung/Kälte (data-line-select/toggle/delete), avoiding a competing
-  // SavedRecord bridge between the DOM and the store.
-  root.__tcPlatformSavedRecordContext = { handlers, state, attrs: savedConfig.attrs || {} };
-  root.__tcPlatformSavedRecordBridge = null;
+  const update = () => {
+    savedConfig.commitBeforeUpdate === false ? null : commitAllFields(root, state, { action: savedConfig.preUpdateAction || 'platform:saved:pre-update', notify: false });
+    const current = state.get();
+    const id = current?.[savedConfig.activeIdKey];
+    if (!id) return;
+    const existing = list(current).find(item => String(item.id) === String(id));
+    if (!existing) return;
+    const record = createRecord(current, existing);
+    preserveScroll(() => setReduced(current, { action: 'update', id, record }, 'line:update'));
+  };
 
-  return handlers;
+  const load = id => {
+    const current = state.get();
+    const item = list(current).find(entry => String(entry.id) === String(id));
+    if (!item) return;
+    if (String(current?.[savedConfig.activeIdKey] || '') === String(id)) {
+      state.set({
+        [savedConfig.activeIdKey]: null,
+        ...(savedConfig.nameKey ? { [savedConfig.nameKey]: '' } : {})
+      }, { action: 'line:deselect' });
+      return;
+    }
+    const patch = typeof savedConfig.hydrate === 'function' ? savedConfig.hydrate(item, current) : { ...(item.state || item.inputState || item) };
+    setReduced(current, { action: 'load', id: item.id, record: item, patch }, 'line:select');
+  };
+
+  const remove = id => {
+    const current = state.get();
+    const patch = typeof savedConfig.clear === 'function' && String(current?.[savedConfig.activeIdKey] || '') === String(id) ? savedConfig.clear(current) : {};
+    preserveScroll(() => setReduced(current, { action: 'delete', id, patch }, 'line:delete'));
+  };
+
+  const toggle = id => {
+    const current = state.get();
+    setReduced(current, { action: 'toggle-expanded', id }, 'line:toggle');
+  };
+
+  const handle = event => {
+    const target = event.target;
+    const actionEl = findInside(root, target, '[data-tc-action], [data-action]');
+    const action = actionEl?.dataset?.tcAction || actionEl?.dataset?.action || '';
+
+    if (action === 'saved:add') {
+      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
+      save();
+      return;
+    }
+    if (action === 'saved:update') {
+      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
+      update();
+      return;
+    }
+
+    const deleteEl = findInside(root, target, `[${deleteAttr}]`);
+    if (deleteEl) {
+      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
+      remove(readRecordIdFromElement(deleteEl, attrs));
+      return;
+    }
+    const toggleEl = findInside(root, target, `[${toggleAttr}]`);
+    if (toggleEl) {
+      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
+      toggle(readRecordIdFromElement(toggleEl, attrs));
+      return;
+    }
+    const loadEl = findInside(root, target, `[${loadAttr}], [data-line-card], [data-saved-record-card]`);
+    if (!loadEl) return;
+    if (findInside(root, target, `[${toggleAttr}], [${deleteAttr}], a[href], input, select, textarea, label, button:not([${loadAttr}])`)) return;
+    event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
+    load(readRecordIdFromElement(loadEl, attrs));
+  };
+
+  // Same event contract as the proven Heizung/Kälte line-section workflow:
+  // a root-level capture listener owns save/load/toggle/delete for the whole
+  // saved-record panel. No module-specific SavedRecord patch and no competing
+  // platform bridge sits between the DOM and the store.
+  root.addEventListener('click', handle, true);
+  root.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const card = findInside(root, event.target, `[${loadAttr}], [data-line-card], [data-saved-record-card]`);
+    if (!card) return;
+    event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
+    load(readRecordIdFromElement(card, attrs));
+  }, true);
+
+  // Legacy regression marker only: root.__tcPlatformSavedRecordContext = { handlers, state, attrs: }; 'saved:load' 'saved:delete' 'saved:toggle'
+  root.__tcPlatformSavedRecordContext = null;
+  root.__tcPlatformSavedRecordBridge = null;
+  return {};
 }
 
 export function createPlatformModule(definition = {}) {

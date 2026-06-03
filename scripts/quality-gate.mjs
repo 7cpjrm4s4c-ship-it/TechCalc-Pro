@@ -46,6 +46,7 @@ const commands = [
   ['node', ['tests/reference-modules-phase17c2-reference-fixes.test.mjs']],
   ['node', ['tests/reference-modules-phase17c5-event-scroll.test.mjs']],
   ['node', ['tests/reference-modules-phase17c6-saved-record-root-cause.test.mjs']],
+  ['node', ['tests/reference-modules-phase17c9-heating-saved-contract.test.mjs']],
   ['node', ['tests/central-platform-pipeline.test.mjs']],
   ['node', ['tests/state-binding.test.mjs']],
   ['node', ['tests/event-pipeline-phase11d.test.mjs']],
