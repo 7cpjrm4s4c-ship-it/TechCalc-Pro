@@ -210,6 +210,7 @@ export default {
     nameKey: 'areaName',
     recordPrefix: 'rain-surface',
         afterCreatePatch: resetSurfaceEditorAfterAdd,
+    attrs: { loadAttr: 'data-line-select', toggleAttr: 'data-line-toggle', deleteAttr: 'data-line-delete' },
     preserveSaveScroll: true,
     preserveLoadScroll: true
   }

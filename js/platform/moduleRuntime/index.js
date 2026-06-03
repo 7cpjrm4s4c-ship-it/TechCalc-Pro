@@ -84,7 +84,14 @@ function bindSegments(root, state, segmentConfig = {}) {
     const scheduler = getRenderScheduler(root);
     scheduler?.flushNow?.(action);
     if (typeof fields[field].domPatch === 'function') fields[field].domPatch({ root, field, value, patch, state: state.get() });
-    if (typeof queueMicrotask === 'function') queueMicrotask(() => scheduler?.flushNow?.(`${action}:settled`));
+    if (typeof queueMicrotask === 'function') queueMicrotask(() => {
+      scheduler?.flushNow?.(`${action}:settled`);
+      if (typeof fields[field].domPatch === 'function') fields[field].domPatch({ root, field, value, patch, state: state.get() });
+    });
+    setTimeout(() => {
+      scheduler?.flushNow?.(`${action}:settled-timeout`);
+      if (typeof fields[field].domPatch === 'function') fields[field].domPatch({ root, field, value, patch, state: state.get() });
+    }, 0);
     return true;
   };
 
@@ -280,13 +287,12 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     'saved:toggle': ({ element }) => actions.toggle({ element })
   };
 
-  // Phase 17C.6: expose the current SavedRecord action context to the
-  // central event pipeline. The pipeline owns pointer/click/keyboard handling;
-  // moduleRuntime only publishes the active module contract so stale listeners
-  // from previous modules cannot own the saved-record workflow.
-  // Compatibility marker for Phase 17C.5 tests: root.__tcPlatformSavedRecordContext = { handlers, state }
+  // Phase 17C.8: publish only the active SavedRecord handlers. Regenwasser
+  // and Schmutzwasser now use the same direct central-action contract as
+  // Heizung/Kälte (data-line-select/toggle/delete), avoiding a competing
+  // SavedRecord bridge between the DOM and the store.
   root.__tcPlatformSavedRecordContext = { handlers, state, attrs: savedConfig.attrs || {} };
-  root.__tcPlatformSavedRecordBridge = createSavedRecordEventBridge(root, state, handlers, savedConfig.attrs || {});
+  root.__tcPlatformSavedRecordBridge = null;
 
   return handlers;
 }

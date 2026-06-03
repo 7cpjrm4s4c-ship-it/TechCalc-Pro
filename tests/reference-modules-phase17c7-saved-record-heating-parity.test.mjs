@@ -15,10 +15,10 @@ assert.match(runtime, /createSavedRecordEventBridge/, 'Platform modules need a d
 assert.match(runtime, /__tcPlatformSavedRecordBridge/, 'Runtime must publish the active SavedRecord bridge on the root.');
 assert.match(runtime, /interactiveInsideLoad/, 'Bridge must prevent article-level load from swallowing toggle/delete controls.');
 assert.match(runtime, /saved:load' && action !== 'saved:delete' && action !== 'saved:toggle'/, 'Bridge must be restricted to structural saved list actions.');
-assert.match(pipeline, /__tcPlatformSavedRecordBridge/, 'Central event pipeline must route saved list actions through the active bridge first.');
-assert.match(pipeline, /nested\s+buttons\s+cannot\s+be\s+swallowed/, 'Pipeline must document why saved bridge precedence exists.');
+assert.doesNotMatch(pipeline, /__tcPlatformSavedRecordBridge[\s\S]{0,220}handle/, 'Central event pipeline must no longer route saved actions through the old bridge.');
+assert.match(pipeline, /same direct\s+central-action path as the proven Heizung\/Kälte/, 'Pipeline must document direct heating-style saved action handling.');
 
-assert.doesNotMatch(rainwater, /data-saved-|loadAttr|toggleAttr|deleteAttr|bindSavedRecord|createSavedRecordActions/, 'Rainwater must not carry module-local SavedRecord patches.');
-assert.doesNotMatch(wastewater, /data-saved-|loadAttr|toggleAttr|deleteAttr|bindSavedRecord|createSavedRecordActions/, 'Wastewater must not carry module-local SavedRecord patches.');
+assert.doesNotMatch(rainwater, /data-saved-|bindSavedRecord|createSavedRecordActions/, 'Rainwater must not carry module-local SavedRecord listeners or legacy attrs.');
+assert.doesNotMatch(wastewater, /data-saved-|bindSavedRecord|createSavedRecordActions/, 'Wastewater must not carry module-local SavedRecord listeners or legacy attrs.');
 
 console.log('phase17c7 saved-record heating parity regression ok');

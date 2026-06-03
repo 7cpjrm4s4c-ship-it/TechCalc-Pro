@@ -80,18 +80,10 @@ function dispatchAction(root, state, actionEl, event, options = {}) {
   const action = actionEl.dataset.tcAction || actionEl.dataset.action;
   if (!action) return false;
 
-  // Platform SavedRecord rows are structural controls. Handle load/toggle/delete
-  // through the current platform bridge before generic action dispatch so nested
-  // buttons cannot be swallowed by the article-level saved:load action. This
-  // mirrors the stable Heizung/Kälte contract while keeping the implementation
-  // central and module-agnostic.
-  if (String(action).startsWith('saved:')) {
-    const bridge = root?.__tcPlatformSavedRecordBridge;
-    if (bridge?.handle?.({ action, element: actionEl, event, state, root })) {
-      emitPipelineCommit(root, { type: 'action', action });
-      return true;
-    }
-  }
+  // Phase 17C.8: SavedRecord actions intentionally use the same direct
+  // central-action path as the proven Heizung/Kälte line-section workflow. The
+  // concrete id attributes are resolved by createSavedRecordActions via the
+  // active platform contract; no capture bridge or module patch sits in between.
 
   const handler = resolveActionHandler(root, action, options);
   if (typeof handler !== 'function') return false;

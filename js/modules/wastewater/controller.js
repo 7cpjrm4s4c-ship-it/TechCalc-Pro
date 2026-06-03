@@ -92,6 +92,7 @@ export default {
     expandedIdKey: 'expandedCalculationId',
     nameKey: 'name',
     recordPrefix: 'wastewater',
+    attrs: { loadAttr: 'data-line-select', toggleAttr: 'data-line-toggle', deleteAttr: 'data-line-delete' },
     preserveSaveScroll: true,
     preserveLoadScroll: true
   },

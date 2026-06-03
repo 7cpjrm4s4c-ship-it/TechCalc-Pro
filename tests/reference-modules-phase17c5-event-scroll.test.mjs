@@ -5,7 +5,7 @@ const runtimeSource = readFileSync(new URL('../js/platform/moduleRuntime/index.j
 const eventPipelineSource = readFileSync(new URL('../js/core/eventPipeline.js', import.meta.url), 'utf8');
 const coordinatorSource = readFileSync(new URL('../js/core/renderCoordinator.js', import.meta.url), 'utf8');
 
-assert.match(runtimeSource, /root\.__tcPlatformSavedRecordContext = \{ handlers, state \}/, 'Saved-record context must publish the latest module handlers.');
+assert.match(runtimeSource, /root\.__tcPlatformSavedRecordContext = \{ handlers, state, attrs:/, 'Saved-record context must publish the latest module handlers and attrs.');
 assert.match(eventPipelineSource, /resolveActionHandler/, 'Central event pipeline must resolve platform action handlers.');
 assert.match(eventPipelineSource, /__tcPlatformSavedRecordContext\?\.handlers\?\.\[action\]/, 'Saved-record actions must be resolved from current context per event.');
 assert.match(runtimeSource, /root\.__tcPlatformSegmentContext = \{ commit \}/, 'Segment capture listener must use the latest module commit function.');

@@ -80,6 +80,9 @@ export function savedRecords(s = {}, r = {}) {
     updateDisabled: !s.activeCalculationId,
     activeId: s.activeCalculationId,
     expandedId: s.expandedCalculationId,
+    loadAttr: 'data-line-select',
+    toggleAttr: 'data-line-toggle',
+    deleteAttr: 'data-line-delete',
     emptyText: 'Noch keine Schmutzwasser-Berechnungen gespeichert.',
     accent: 'green',
     items

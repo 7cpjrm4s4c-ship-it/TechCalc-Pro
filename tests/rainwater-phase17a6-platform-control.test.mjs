@@ -16,7 +16,9 @@ assert.match(formSchema, /STATS:\s*'stats'/, 'Form schema must expose stats fiel
 assert.match(schemaRenderer, /function renderNotice/, 'Schema renderer must own notice rendering.');
 assert.match(schemaRenderer, /function renderStats/, 'Schema renderer must own stats rendering.');
 assert.match(schemaRenderer, /function renderGroupActions/, 'Schema renderer must own group action rendering.');
-assert.doesNotMatch(controller, /rainwater:|platform:rainwater|loadAttr|toggleAttr|deleteAttr|preCreateAction|preUpdateAction/, 'Rainwater controller must not contain module-specific platform action names or default saved attribute declarations.');
-assert.doesNotMatch(results, /data-rainwater|loadAttr|toggleAttr|deleteAttr/, 'Rainwater saved-record data must inherit platform saved-record defaults.');
+assert.doesNotMatch(controller, /rainwater:|platform:rainwater|preCreateAction|preUpdateAction/, 'Rainwater controller must not contain module-specific platform action names.');
+assert.match(controller, /attrs:\s*\{\s*loadAttr:\s*'data-line-select',\s*toggleAttr:\s*'data-line-toggle',\s*deleteAttr:\s*'data-line-delete'\s*\}/, 'Rainwater controller must use the heating-style saved-record attrs.');
+assert.doesNotMatch(results, /data-rainwater/, 'Rainwater saved-record data must not use module hooks.');
+assert.match(results, /loadAttr:\s*'data-line-select'/, 'Rainwater saved-record data must use heating-style load attr.');
 
 console.log('rainwater phase17a.6 platform-control decoupling ok');

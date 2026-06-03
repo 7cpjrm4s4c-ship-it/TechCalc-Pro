@@ -161,6 +161,9 @@ export function savedRecords(s = {}, r = {}) {
     updateDisabled: !s.activeSurfaceId,
     activeId: s.activeSurfaceId,
     expandedId: s.expandedSurfaceResultId,
+    loadAttr: 'data-line-select',
+    toggleAttr: 'data-line-toggle',
+    deleteAttr: 'data-line-delete',
     emptyText: 'Noch keine Regenflächen gespeichert.',
     accent: 'green',
     items
