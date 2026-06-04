@@ -70,6 +70,15 @@ function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
   const handlers = {};
   if (!Object.keys(fields).length) return handlers;
 
+ console.log('BIND SEGMENT CLICK', {
+  element,
+  dataset: element?.dataset,
+  segment: element?.dataset?.segment,
+  value: element?.dataset?.value,
+  action: element?.dataset?.tcAction,
+  current: state.get()
+}); 
+
   const commit = (element, event, commitOptions = {}) => {
     const field = element?.dataset?.segment;
     const value = element?.dataset?.value;
@@ -77,6 +86,14 @@ function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
     const current = state.get();
     const patchFactory = asFn(fields[field].patch);
     const patch = patchFactory(value, current, { field, root }) || { [field]: value };
+    
+    console.log('BIND SEGMENT PATCH', {
+  field,
+  value,
+  patch,
+  before: current
+});
+
     const action = fields[field].action || `platform:segment:${field}`;
     const dedupeKey = `${field}:${value}:${action}`;
     const now = Date.now();
@@ -97,7 +114,11 @@ function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
     if (root) root.__tcPlatformSegmentCommit = { key: dedupeKey, at: now };
 
     setSegmentVisual(root, field, patch?.[field] ?? value);
-    preserveScroll(() => state.set(patch, { action, notify: true }));
+    state.set(patch, { action, notify: true });
+    
+console.log('BIND SEGMENT AFTER', {
+  after: state.get()
+}); 
 
     // Platform dynamic-update contract: schema-dependent segment changes must
     // rebuild the form/result islands immediately, just like Heizung/Kälte does
