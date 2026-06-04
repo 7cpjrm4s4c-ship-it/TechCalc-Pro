@@ -6,7 +6,7 @@ import schema from '../js/modules/heating-cooling/schema.js';
 
 const source = readFileSync(new URL('../js/modules/heating-cooling/index.js', import.meta.url), 'utf8');
 
-assert.equal(config.migrationStatus, 'phase-12h-final-globalized');
+assert.match(config.migrationStatus, /phase-12h-final-globalized/);
 assert.ok(module.schema, 'module exposes schema');
 assert.ok(schema.fields.some(field => field.key === 'mode'), 'mode is schema-defined');
 assert.ok(schema.fields.some(field => field.key === 'mediumId' && field.commit === 'immediate'), 'medium commits immediately');

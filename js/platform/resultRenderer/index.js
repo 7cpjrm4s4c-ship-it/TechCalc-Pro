@@ -32,6 +32,22 @@ export function renderResultGroup({ title = 'Details', rows = [], groups = [], a
   return card(title, `${table}${nested}`, accent);
 }
 
+export function renderStatsGroup({ title = 'Details', rows = [], accent = 'blue', compact = false } = {}) {
+  return card(title, renderResultTable(rows), accent, { compact });
+}
+
+export function renderRecommendationCard({ title = 'Empfehlung', primary = null, rows = [], emptyText = '', accent = 'blue', controlsHtml = '' } = {}) {
+  const controls = controlsHtml ? String(controlsHtml) : '';
+  const normalizedRows = normalizeResultRows(rows);
+  const primaryHtml = primary
+    ? `<div class="main-result"><span>${esc(primary.label || '')}</span><strong>${esc(primary.value ?? '—')}${primary.unit ? ` <small>${esc(primary.unit)}</small>` : ''}</strong></div>`
+    : '';
+  const body = emptyText
+    ? `<div class="empty-state">${emptyText}</div>`
+    : `${primaryHtml}${normalizedRows.length ? renderResultTable(normalizedRows) : ''}`;
+  return card(title, `${controls}${body}`, accent);
+}
+
 export function renderNoticeCard({ title = 'Hinweise', messages = [], accent = 'blue', prefix = 'Hinweis' } = {}) {
   const body = list(messages)
     .map(message => {
@@ -85,5 +101,7 @@ export default {
   renderResultGroup,
   renderResultTable,
   renderNoticeCard,
+  renderStatsGroup,
+  renderRecommendationCard,
   renderResultModel
 };

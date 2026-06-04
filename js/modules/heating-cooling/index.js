@@ -5,9 +5,11 @@ import { state } from './state.js';
 import { calculate } from './logic.js';
 import { MEDIA, fmt, fmtInput } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
-import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, bindCommonInputs, bindNoClickScroll } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid, bindCommonInputs, bindNoClickScroll } from '../../core/renderer.js';
 import { registerCentralActions } from '../../core/eventPipeline.js';
 import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
+import { renderResultModel, renderResultTable, renderRecommendationCard } from '../../platform/resultRenderer/index.js';
+import { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRows, targetLabel } from './results.js';
 
 const MODE_PREFIX = {
   heating: 'heating',
@@ -139,26 +141,8 @@ function inputFields(s, active) {
   ];
 }
 
-function targetLabel(target) {
-  return target === 'power' ? 'Leistung' : target === 'massFlow' ? 'Massenstrom' : 'Temperaturspreizung';
-}
 
-function targetMain(target, r) {
-  if (target === 'power') return { label: 'Berechnete Leistung', value: fmt(r.powerKw), unit: 'kW' };
-  if (target === 'massFlow') return { label: 'Berechneter Massenstrom', value: fmt(r.massFlowKgh), unit: 'kg/h' };
-  return { label: 'Berechnete Temperaturspreizung', value: fmt(r.deltaT), unit: 'K' };
-}
 
-function mediumStats(medium) {
-  const stats = [
-    { label: 'Dichte ρ', value: fmt(medium.density, 0), unit: 'kg/m³' },
-    { label: 'cₚ', value: fmt(medium.cpWhKgK, 3), unit: 'Wh/(kg·K)' }
-  ];
-  if (medium.frostC !== null && medium.frostC !== undefined) {
-    stats.push({ label: 'Frostschutz', value: fmt(medium.frostC, 0), unit: '°C' });
-  }
-  return stats;
-}
 
 
 let lineSectionsMemory = [];
@@ -212,6 +196,14 @@ function lineSectionsCard(r) {
     `<div class="tc-save-actions"><button type="button" class="action-button" data-tc-action="line:save" data-line-save ${currentSnapshot.activeLineSectionId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-tc-action="line:update" data-line-update ${currentSnapshot.activeLineSectionId ? '' : 'disabled'}>Aktualisieren</button></div>`,
     `<div data-hc-dynamic="line-sections">${rows}</div>`
   ].join('')), 'blue');
+}
+
+
+function renderPipeRecommendation(s, r) {
+  return renderRecommendationCard({
+    ...buildPipeRecommendationModel(r),
+    controlsHtml: selectField({ id: 'pipeSystemId', label: 'Rohrmaterial', value: s.pipeSystemId, options: pipeSystems.map(p => ({ value: p.id, label: p.label })) })
+  });
 }
 
 function buildLineSectionRecord(currentState, r, items, id, name, existing = null) {
@@ -366,14 +358,8 @@ function bindLineSections(root, r, rerender) {
 
 
 
-function pipeDetails(r) {
-  return [
-    { label: 'Material', value: r.pipe.system.label },
-    { label: 'Geschwindigkeit', value: fmt(r.pipe.velocity), unit: 'm/s' },
-    { label: 'Druckverlust', value: fmt(r.pipe.pressureLoss), unit: 'Pa/m' },
-    { label: 'Norm', value: r.pipe.norm }
-  ];
-}
+
+
 
 
 function view(s) {
@@ -384,17 +370,8 @@ function view(s) {
 
   const mediumCard = card('Medium', stack([
     selectField({ id: 'mediumId', label: 'Wärmeträger', value: s.mediumId, options: MEDIA.map(m => ({ value: m.id, label: m.label })) }),
-    `<div data-hc-dynamic="medium-stats">${inlineStats(mediumStats(r.medium))}</div>`
+    `<div data-hc-dynamic="medium-stats">${renderResultTable(mediumRows(r.medium))}</div>`
   ].join('')), 'blue', { compact: true });
-
-  const resultDetails = [
-    { label: 'Leistung', value: fmt(r.powerKw), unit: 'kW' },
-    { label: 'Massenstrom', value: fmt(r.massFlowKgh), unit: 'kg/h' },
-    { label: 'Volumenstrom', value: fmt(r.volumeFlowM3h, 3), unit: 'm³/h' },
-    { label: 'ΔT', value: fmt(r.deltaT), unit: 'K' },
-    { label: 'Medium', value: r.medium.label },
-    { label: 'Dichte', value: fmt(r.medium.density, 0), unit: 'kg/m³' }
-  ].filter(item => item.label !== targetLabel(active.calcTarget));
 
   const inputColumn = stack([
     mediumCard,
@@ -410,24 +387,13 @@ function view(s) {
       ], active.calcTarget, { accent })}</div>`,
       `<div data-hc-dynamic="input-fields">${grid(inputFields(s, active).join(''), 2)}</div>`
     ].join('')), accent),
-    `<div data-hc-dynamic="result">${mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent)}</div>`,
+    `<div data-hc-dynamic="result">${renderResultModel(buildHeatingCoolingResultModel(active, r, accent), accent)}</div>`,
     `<div class="formula" data-hc-dynamic="formula">Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)</div>`
-  ].join(''));
-
-  const recommendationBody = !r.pipe
-    ? '<div class="empty-state">Massenstrom berechnen oder eingeben →<br>Rohrdimensionierung</div>'
-    : r.pipe.noDimension
-      ? '<div class="empty-state">Keine Dimensionierung möglich!</div>'
-      : `<div class="main-result"><span>Empfohlene Dimension</span><strong>DN ${r.pipe.dn}</strong></div>${inlineStats(pipeDetails(r))}`;
-
-  const recommendation = stack([
-    selectField({ id: 'pipeSystemId', label: 'Rohrmaterial', value: s.pipeSystemId, options: pipeSystems.map(p => ({ value: p.id, label: p.label })) }),
-    `<div data-hc-dynamic="pipe-result">${recommendationBody}</div>`
   ].join(''));
 
   return renderModuleShell(config, `
     <div class="span-6">${inputColumn}</div>
-    <div class="span-6">${stack([card('Rohrdimensionsempfehlung', recommendation, 'blue'), lineSectionsCard(r)].join(''))}</div>
+    <div class="span-6">${stack([`<div data-hc-dynamic="pipe-recommendation">${renderPipeRecommendation(s, r)}</div>`, lineSectionsCard(r)].join(''))}</div>
   `);
 }
 
@@ -472,13 +438,7 @@ function updateSegment(root, name, value) {
   });
 }
 
-function renderRecommendationBody(r) {
-  return !r.pipe
-    ? '<div class="empty-state">Massenstrom berechnen oder eingeben →<br>Rohrdimensionierung</div>'
-    : r.pipe.noDimension
-      ? '<div class="empty-state">Keine Dimensionierung möglich!</div>'
-      : `<div class="main-result"><span>Empfohlene Dimension</span><strong>DN ${r.pipe.dn}</strong></div>${inlineStats(pipeDetails(r))}`;
-}
+
 
 function renderLineSectionRows(s) {
   const items = Array.isArray(s.lineSections) ? s.lineSections : readLineSections();
@@ -518,18 +478,9 @@ function updateHeatingCoolingDynamic(root, s, meta = {}) {
   const unitChanged = previous.massFlowUnit !== active.massFlowUnit || changed.includes(key(s, 'MassFlowUnit')) || changed.includes(key(s, 'PowerUnit'));
   const lineStructural = /^(line:|saved:)/.test(action);
   const appStructural = /^(record:|module:|replace|reset)/.test(action);
-  const resultDetails = [
-    { label: 'Leistung', value: fmt(r.powerKw), unit: 'kW' },
-    { label: 'Massenstrom', value: fmt(r.massFlowKgh), unit: 'kg/h' },
-    { label: 'Volumenstrom', value: fmt(r.volumeFlowM3h, 3), unit: 'm³/h' },
-    { label: 'ΔT', value: fmt(r.deltaT), unit: 'K' },
-    { label: 'Medium', value: r.medium.label },
-    { label: 'Dichte', value: fmt(r.medium.density, 0), unit: 'kg/m³' }
-  ].filter(item => item.label !== targetLabel(active.calcTarget));
-
   setSelectValue(root, 'mediumId', s.mediumId);
   setSelectValue(root, 'pipeSystemId', s.pipeSystemId);
-  setInner(root, '[data-hc-dynamic="medium-stats"]', inlineStats(mediumStats(r.medium)));
+  setInner(root, '[data-hc-dynamic="medium-stats"]', renderResultTable(mediumRows(r.medium)));
 
   updateCardAccent(root, '[data-hc-dynamic="mode-segment"]', accent);
   updateCardAccent(root, '[data-hc-dynamic="target-segment"]', accent);
@@ -561,9 +512,9 @@ function updateHeatingCoolingDynamic(root, s, meta = {}) {
     setInputValue(root, key(s, 'DeltaT'), fmtInput(active.deltaT, 2));
   }
 
-  setInner(root, '[data-hc-dynamic="result"]', mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent));
+  setInner(root, '[data-hc-dynamic="result"]', renderResultModel(buildHeatingCoolingResultModel(active, r, accent), accent));
   setInner(root, '[data-hc-dynamic="formula"]', `Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)`);
-  setInner(root, '[data-hc-dynamic="pipe-result"]', renderRecommendationBody(r));
+  setInner(root, '[data-hc-dynamic="pipe-recommendation"]', renderPipeRecommendation(s, r));
   if (lineStructural || appStructural || changed.includes('lineSections') || changed.includes('activeLineSectionId') || changed.includes('activeLineSectionName') || changed.includes('expandedLineSectionId')) {
     // Phase 12G: saved-entry selection is store-first. Only the saved-list island
     // and save/update controls are refreshed; the static input cards stay mounted.

@@ -16,12 +16,12 @@
     },
     {
       "file": "js/modules/heating-cooling/index.js",
-      "line": 439,
+      "line": 405,
       "text": "if (el.innerHTML !== next) el.innerHTML = next;"
     },
     {
       "file": "js/modules/heating-cooling/index.js",
-      "line": 594,
+      "line": 545,
       "text": "root.innerHTML = view(snapshot);"
     },
     {

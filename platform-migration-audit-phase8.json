@@ -44,7 +44,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-12h-final-globalized"
+      "migrationStatus": "phase-12h-final-globalized phase-18b1-result-model"
     },
     {
       "id": "hx-diagram",

@@ -12,6 +12,7 @@ const commands = [
   ['node', ['tests/heating-cooling-phase12g.test.mjs']],
   ['node', ['tests/heating-cooling-phase12h.test.mjs']],
   ['node', ['tests/heating-cooling-phase12i.test.mjs']],
+  ['node', ['tests/heating-cooling-phase18b1-result-model.test.mjs']],
   ['node', ['tests/ventilation-global-standard.test.mjs']],
   ['node', ['tests/ventilation-phase13e.test.mjs']],
   ['node', ['tests/rainwater-global-standard.test.mjs']],

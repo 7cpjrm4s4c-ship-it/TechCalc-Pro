@@ -1,4 +1,15 @@
 
+## Phase 18B.1 - Heizung/Kälte Result-Model
+
+- Heizung/Kälte Ergebnisdarstellung teilweise aus dem Modul herausgelöst.
+- Neues `js/modules/heating-cooling/results.js` für strukturierte Ergebnisdaten.
+- Plattform-ResultRenderer erweitert um `renderStatsGroup()` und `renderRecommendationCard()`.
+- Ergebnis, Medium-Stats und Rohrdimensionsempfehlung werden nun über Plattform-Renderer ausgegeben.
+- Stabiler Heizung/Kälte-Mount bleibt bewusst erhalten; Dynamic-/Saved-Record-Migration folgt separat.
+- Neue Regression: `heating-cooling-phase18b1-result-model`.
+- `npm test` erfolgreich.
+
+
 ## Phase 17C.13 — Platform Dynamic Islands
 
 - Zentraler Dynamic-Island-Rebuild in `platform/moduleRuntime` ergänzt.
