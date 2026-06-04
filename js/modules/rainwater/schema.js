@@ -47,6 +47,19 @@ const emergencyTypeOptions = [
 export const rainwaterSchema = defineFormSchema({
   fields: [
     { key:'surfaceMode', label:'Berechnungsbereich', type:FIELD_TYPES.SEGMENT, options:[{ value:'roof', label:'Dachfläche' }, { value:'property', label:'Grundstücksfläche' }], accent:'green', action:'platform:segment:surfaceMode' },
+{
+  key:'debugSurfaceMode',
+  label:'DEBUG',
+  type:FIELD_TYPES.NOTICE,
+  tone:'compact',
+  text: state => [
+    `surfaceMode = ${state.surfaceMode || 'undefined'}`,
+    `calculationType = ${state.calculationType || 'undefined'}`,
+    `activeRainField = ${activeRainField(state)}`,
+    `rainLabel = ${rainLabel(state)}`,
+    `areaType = ${state.areaType || 'undefined'}`
+  ].join('\n')
+}, 
     { key:'roofRainIntensity', label:rainLabel, type:FIELD_TYPES.DECIMAL, unit:'l/(s·ha)', format:(_, s) => fmtInput(activeRainValue(s), 1), visibleWhen:s => activeRainField(s) === 'roofRainIntensity' },
     { key:'propertyRainIntensity', label:rainLabel, type:FIELD_TYPES.DECIMAL, unit:'l/(s·ha)', format:(_, s) => fmtInput(activeRainValue(s), 1), visibleWhen:s => activeRainField(s) === 'propertyRainIntensity' },
     { key:'rainHundredIntensity', label:'Regenspende r(5,100)', type:FIELD_TYPES.DECIMAL, unit:'l/(s·ha)', default:'500' },
@@ -73,7 +86,7 @@ export const rainwaterSchema = defineFormSchema({
     { key:'customCm', label:'mittlerer Abflussbeiwert Cm', type:FIELD_TYPES.DECIMAL, placeholder:'0,8', visibleWhen:s => selectedArea(s)?.custom }
   ],
   groups: [
-    { title:'Berechnungsbereich', fields:['surfaceMode'], columns:1, accent:'green' },
+    { title:'Berechnungsbereich', fields:['surfaceMode', 'debugSurfaceMode'],   columns:1, accent:'green' },
     { title:'Regenspende', fields:['roofRainIntensity','propertyRainIntensity','rainHundredIntensity'], columns:2, accent:'green', actions:[{ label:'KOSTRA / OpenKo Daten öffnen', href:KOSTRA_URL, variant:'secondary' }] },
     { title:'Dacheinläufe / Hoftöpfe', fields:['drainSize','drainSizeManual','drainCapacity','drainHead','stackCount'], columns:2, accent:'green' },
     { title:'Notentwässerung', fields:['emergencyType','emergencyHead','emergencyWidth','emergencyDiameter','emergencyManufacturerDn','emergencyCapacity','emergencySafetyFactor','emergencyInfo'], columns:2, accent:'green' },
