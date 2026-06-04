@@ -1,4 +1,13 @@
 
+## Phase 18B.2 – Heizung/Kälte Line-Section Controller
+
+- Neuer Plattformbaustein `platform/lineSectionController`.
+- Leitungsabschnitt Save/Update/Load/Delete/Toggle aus Heizung/Kälte extrahiert.
+- Heizung/Kälte behält den stabilen Mount, nutzt aber zentrale LineSection-Bindings und Rendering.
+- Import/Export-Kompatibilität für `readLineSections` / `writeLineSections` erhalten.
+- `npm test` erfolgreich.
+
+
 ## Phase 18B.1 - Heizung/Kälte Result-Model
 
 - Heizung/Kälte Ergebnisdarstellung teilweise aus dem Modul herausgelöst.

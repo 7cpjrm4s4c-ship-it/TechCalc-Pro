@@ -3,7 +3,7 @@
   "schemaModules": 11,
   "centralNumberService": 11,
   "legacyNumberParsers": 0,
-  "centralSavedRecords": 6,
+  "centralSavedRecords": 5,
   "legacyClassModules": 7,
   "modules": [
     {
@@ -42,7 +42,7 @@
       "schemaFile": true,
       "usesCentralNumberService": true,
       "legacyNumberParsers": 0,
-      "usesCentralSavedRecords": true,
+      "usesCentralSavedRecords": false,
       "hasLegacyModuleClasses": true,
       "migrationStatus": "phase-12h-final-globalized phase-18b1-result-model"
     },

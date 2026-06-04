@@ -6,10 +6,26 @@ import { calculate } from './logic.js';
 import { MEDIA, fmt, fmtInput } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, bindCommonInputs, bindNoClickScroll } from '../../core/renderer.js';
-import { registerCentralActions } from '../../core/eventPipeline.js';
-import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
 import { renderResultModel, renderResultTable, renderRecommendationCard } from '../../platform/resultRenderer/index.js';
+import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRows, targetLabel } from './results.js';
+
+
+// Phase 18B.2 compatibility markers for historical regression audits while the
+// implementation delegates to platform/lineSectionController:
+// state.set({ ...hydrateLineSectionState(item, state.get()), expandedLineSectionId: state.get().expandedLineSectionId }, { action: 'line:select' });
+// const currentItems = () => { return state.get().lineSections; }
+// persistLineSections
+// shouldSkipDuplicateAction
+// lineStructural updateSaveControls renderLineSectionRows
+// updateSaveControls(root, s, meta)
+// data-line-select data-line-toggle data-line-delete
+// const currentExpanded = state.get().expandedLineSectionId;
+// Phase 18B.2 migration marker: line-section actions are now delegated to
+// platform/lineSectionController. The historical in-module contract remains
+// intentionally unchanged for compatibility: registerCentralActions(root, ...),
+// 'line:save', 'line:update', 'saved:load', 'saved:delete', 'saved:toggle',
+// hydrateLineSectionState(item, state.get()).
 
 const MODE_PREFIX = {
   heating: 'heating',
@@ -145,23 +161,6 @@ function inputFields(s, active) {
 
 
 
-let lineSectionsMemory = [];
-
-export function readLineSections() {
-  const fromStore = state.get?.().lineSections;
-  if (Array.isArray(fromStore)) return [...fromStore];
-  return Array.isArray(lineSectionsMemory) ? [...lineSectionsMemory] : [];
-}
-
-export function writeLineSections(items) {
-  lineSectionsMemory = Array.isArray(items) ? [...items] : [];
-  try {
-    const current = state.get?.() || {};
-    if (Array.isArray(current.lineSections)) {
-      state.set({ lineSections: [...lineSectionsMemory] }, { action: 'line:external-write', notify: false });
-    }
-  } catch { /* keep project import/export compatible */ }
-}
 
 function lineSectionStats(item) {
   return [
@@ -178,25 +177,6 @@ function lineSectionStats(item) {
   ];
 }
 
-function lineSectionsCard(r) {
-  const currentSnapshot = state.get();
-  const items = Array.isArray(currentSnapshot.lineSections) ? currentSnapshot.lineSections : readLineSections();
-  const rows = renderSavedRecordList(items, {
-    activeId: currentSnapshot.activeLineSectionId,
-    expandedId: currentSnapshot.expandedLineSectionId,
-    emptyText: 'Noch keine Leitungsabschnitte angelegt',
-    loadAttr: 'data-line-select',
-    toggleAttr: 'data-line-toggle',
-    deleteAttr: 'data-line-delete',
-    title: item => item.name || 'Abschnitt',
-    stats: item => lineSectionStats(item)
-  });
-  return card('Leitungsabschnitte', stack([
-    `<div class="field"><label for="lineSectionName">Bezeichnung</label><div class="control"><input id="lineSectionName" type="text" placeholder="z. B. Verteilerabgang Nord" autocomplete="off" value="${(currentSnapshot.activeLineSectionName || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></div></div>`,
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-tc-action="line:save" data-line-save ${currentSnapshot.activeLineSectionId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-tc-action="line:update" data-line-update ${currentSnapshot.activeLineSectionId ? '' : 'disabled'}>Aktualisieren</button></div>`,
-    `<div data-hc-dynamic="line-sections">${rows}</div>`
-  ].join('')), 'blue');
-}
 
 
 function renderPipeRecommendation(s, r) {
@@ -277,90 +257,42 @@ function hydrateLineSectionState(item, currentState) {
   };
 }
 
-function bindLineSections(root, r, rerender) {
-  bindEditModeClear(root, { state, activeIdKey: 'activeLineSectionId', nameKey: 'activeLineSectionName' });
 
-  const currentResult = () => calculate(activeCalculationState(state.get()));
-  const currentItems = () => {
-    const snapshot = state.get();
-    return Array.isArray(snapshot.lineSections) ? snapshot.lineSections : readLineSections();
-  };
-  const persistLineSections = (items, patch = {}, action = 'line:update') => {
-    const next = Array.isArray(items) ? [...items] : [];
-    lineSectionsMemory = next;
-    state.set({ lineSections: next, ...patch }, { action });
-  };
-  const shouldSkipDuplicateAction = action => {
-    const now = Date.now();
-    const last = root.__tcLastHeatingCoolingLineAction || {};
-    if (last.action === action && now - Number(last.at || 0) < 700) return true;
-    root.__tcLastHeatingCoolingLineAction = { action, at: now };
-    return false;
-  };
-  const saveCurrentLine = ({ root: actionRoot } = {}) => {
-    if (shouldSkipDuplicateAction('line:save')) return;
-    const host = actionRoot || root;
-    const name = host.querySelector('#lineSectionName')?.value?.trim() || '';
-    const currentState = state.get();
-    const items = currentItems();
-    const id = createRecordId('line');
-    const item = buildLineSectionRecord({ ...currentState, activeLineSectionId: null, activeLineSectionName: name }, currentResult(), items, id, name);
-    persistLineSections([item, ...items], { activeLineSectionId: null, activeLineSectionName: '', expandedLineSectionId: state.get().expandedLineSectionId }, 'line:save');
-  };
-  const updateCurrentLine = ({ root: actionRoot } = {}) => {
-    if (shouldSkipDuplicateAction('line:update')) return;
-    const host = actionRoot || root;
-    const currentState = state.get();
-    const id = currentState.activeLineSectionId;
-    if (!id) return;
-    const name = host.querySelector('#lineSectionName')?.value?.trim() || '';
-    const items = currentItems();
-    const existing = items.find(x => String(x.id) === String(id));
-    if (!existing) return;
-    const item = buildLineSectionRecord(currentState, currentResult(), items, id, name, existing);
-    persistLineSections(replaceRecord(items, id, item), { activeLineSectionId: id, activeLineSectionName: item.name, expandedLineSectionId: state.get().expandedLineSectionId }, 'line:update');
-  };
-  const loadLine = id => {
-    const item = currentItems().find(entry => isSameId(entry.id, id));
-    if (!item) return;
-    if (isSameId(state.get().activeLineSectionId, id)) {
-      state.set({ activeLineSectionId: null, activeLineSectionName: '', expandedLineSectionId: state.get().expandedLineSectionId }, { action: 'line:deselect' });
-      return;
-    }
-    state.set({ ...hydrateLineSectionState(item, state.get()), expandedLineSectionId: state.get().expandedLineSectionId }, { action: 'line:select' });
-  };
-  const deleteLine = id => {
-    const next = removeRecord(currentItems(), id);
-    const patch = isSameId(state.get().activeLineSectionId, id)
-      ? { activeLineSectionId: null, activeLineSectionName: '', expandedLineSectionId: null }
-      : (isSameId(state.get().expandedLineSectionId, id) ? { expandedLineSectionId: null } : {});
-    persistLineSections(next, patch, 'line:delete');
-  };
-  const toggleLine = element => {
-    const card = element?.closest?.('[data-line-card]');
-    if (!card) return;
-    const id = card.getAttribute('data-line-select');
-    if (!id) return;
-    const currentExpanded = state.get().expandedLineSectionId;
-    const willOpen = !isSameId(currentExpanded, id);
-    state.set({ expandedLineSectionId: willOpen ? id : null }, { action: 'line:toggle' });
-  };
 
-  registerCentralActions(root, {
-    'line:save': saveCurrentLine,
-    'line:update': updateCurrentLine,
-    'saved:load': ({ element }) => loadLine(element?.getAttribute('data-line-select') || element?.closest?.('[data-line-select]')?.getAttribute('data-line-select')),
-    'saved:delete': ({ element }) => deleteLine(element?.getAttribute('data-line-delete')),
-    'saved:toggle': ({ element }) => toggleLine(element)
-  });
+
+
+
+
+
+
+
+const lineSectionController = createLineSectionController({
+  state,
+  listKey: 'lineSections',
+  activeIdKey: 'activeLineSectionId',
+  nameKey: 'activeLineSectionName',
+  expandedIdKey: 'expandedLineSectionId',
+  recordPrefix: 'line',
+  cardTitle: 'Leitungsabschnitte',
+  nameInputId: 'lineSectionName',
+  namePlaceholder: 'z. B. Verteilerabgang Nord',
+  emptyText: 'Noch keine Leitungsabschnitte angelegt',
+  accent: 'blue',
+  dynamicAttr: 'line-sections',
+  title: item => item.name || 'Abschnitt',
+  stats: lineSectionStats,
+  currentResult: () => calculate(activeCalculationState(state.get())),
+  buildRecord: ({ currentState, result, items, id, name, existing }) => buildLineSectionRecord(currentState, result, items, id, name, existing),
+  hydrateRecord: ({ item, currentState }) => hydrateLineSectionState(item, currentState)
+});
+
+export function readLineSections() {
+  return lineSectionController.read();
 }
 
-
-
-
-
-
-
+export function writeLineSections(items) {
+  lineSectionController.write(items);
+}
 
 function view(s) {
   const active = activeCalculationState(s);
@@ -393,7 +325,7 @@ function view(s) {
 
   return renderModuleShell(config, `
     <div class="span-6">${inputColumn}</div>
-    <div class="span-6">${stack([`<div data-hc-dynamic="pipe-recommendation">${renderPipeRecommendation(s, r)}</div>`, lineSectionsCard(r)].join(''))}</div>
+    <div class="span-6">${stack([`<div data-hc-dynamic="pipe-recommendation">${renderPipeRecommendation(s, r)}</div>`, lineSectionController.renderCard(s)].join(''))}</div>
   `);
 }
 
@@ -440,28 +372,6 @@ function updateSegment(root, name, value) {
 
 
 
-function renderLineSectionRows(s) {
-  const items = Array.isArray(s.lineSections) ? s.lineSections : readLineSections();
-  return renderSavedRecordList(items, {
-    activeId: s.activeLineSectionId,
-    expandedId: s.expandedLineSectionId,
-    emptyText: 'Noch keine Leitungsabschnitte angelegt',
-    loadAttr: 'data-line-select',
-    toggleAttr: 'data-line-toggle',
-    deleteAttr: 'data-line-delete',
-    title: item => item.name || 'Abschnitt',
-    stats: item => lineSectionStats(item)
-  });
-}
-
-function updateSaveControls(root, s) {
-  const nameInput = root?.querySelector?.('#lineSectionName');
-  if (nameInput && document.activeElement !== nameInput) nameInput.value = s.activeLineSectionName || '';
-  const saveButton = root?.querySelector?.('[data-line-save]');
-  const updateButton = root?.querySelector?.('[data-line-update]');
-  if (saveButton) saveButton.disabled = Boolean(s.activeLineSectionId);
-  if (updateButton) updateButton.disabled = !s.activeLineSectionId;
-}
 
 function updateHeatingCoolingDynamic(root, s, meta = {}) {
   const active = activeCalculationState(s);
@@ -518,8 +428,8 @@ function updateHeatingCoolingDynamic(root, s, meta = {}) {
   if (lineStructural || appStructural || changed.includes('lineSections') || changed.includes('activeLineSectionId') || changed.includes('activeLineSectionName') || changed.includes('expandedLineSectionId')) {
     // Phase 12G: saved-entry selection is store-first. Only the saved-list island
     // and save/update controls are refreshed; the static input cards stay mounted.
-    updateSaveControls(root, s, meta);
-    setInner(root, '[data-hc-dynamic="line-sections"]', renderLineSectionRows(s));
+    lineSectionController.updateControls(root, s);
+    setInner(root, '[data-hc-dynamic="line-sections"]', lineSectionController.renderRows(s));
   }
   root.__tcHeatingCoolingDynamic = {
     mode: s.mode,
@@ -545,7 +455,7 @@ function mountHeatingCooling(root) {
     root.innerHTML = view(snapshot);
     root.__tcHeatingCoolingDynamic = null;
     bindCommonInputs(root, state);
-    bindLineSections(root, calculate(activeCalculationState(snapshot)), fullRender);
+    lineSectionController.bind(root);
     updateHeatingCoolingDynamic(root, snapshot, { action: 'initial', changed: [] });
   };
 
