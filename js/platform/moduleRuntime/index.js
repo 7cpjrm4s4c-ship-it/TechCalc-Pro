@@ -69,6 +69,7 @@ function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
   const fields = segmentConfig.fields || {};
   const handlers = {};
   if (!Object.keys(fields).length) return handlers;
+
   const commit = (element, event, commitOptions = {}) => {
     const field = element?.dataset?.segment;
     const value = element?.dataset?.value;
@@ -97,10 +98,10 @@ function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
 
     setSegmentVisual(root, field, patch?.[field] ?? value);
     if (action.startsWith('platform:segment:') || action === 'segment:select') {
-  state.set(patch, { action, notify: true });
-} else {
-  preserveScroll(() => state.set(patch, { action, notify: true }));
-} 
+      state.set(patch, { action, notify: true });
+    } else {
+      preserveScroll(() => state.set(patch, { action, notify: true }));
+    }
 
     // Platform dynamic-update contract: schema-dependent segment changes must
     // rebuild the form/result islands immediately, just like Heizung/Kälte does

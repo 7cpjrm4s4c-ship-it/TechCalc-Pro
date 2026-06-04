@@ -764,3 +764,10 @@
 - Schema-Renderer kann segment-spezifische Actions durchreichen.
 - Plattform-Runtime registriert pro konfiguriertem Segment den expliziten Action-Handler plus Legacy-Fallback.
 - Ziel: konkurrierende Segment-Fallbacks vermeiden und schemaabhängige Rebuilds zuverlässig auslösen.
+
+## Phase 17C.17 - Platform Segment Immediate Commit
+
+- Segment-Actions `platform:segment:*` und `segment:select` schreiben ihren State jetzt direkt und ohne `preserveScroll()`.
+- Behebt den Mobile-Safari-Fehler, bei dem Regenwasser nach erstem Segment-Tap optisch reagierte, aber `surfaceMode` erst nach einer weiteren Eingabe commitete.
+- Normale Input- und SavedRecord-Aktionen behalten den zentralen Scroll-Stabilisierer.
+- Keine Regenwasser-Sonderlogik; Fix liegt zentral in `platform/moduleRuntime`.
