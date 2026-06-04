@@ -96,7 +96,7 @@ function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
     if (root) root.__tcPlatformSegmentCommit = { key: dedupeKey, at: now };
 
     setSegmentVisual(root, field, patch?.[field] ?? value);
-    state.set(patch, { action, notify: true })); 
+    state.set(patch, { action, notify: true }); 
 
     // Platform dynamic-update contract: schema-dependent segment changes must
     // rebuild the form/result islands immediately, just like Heizung/Kälte does
