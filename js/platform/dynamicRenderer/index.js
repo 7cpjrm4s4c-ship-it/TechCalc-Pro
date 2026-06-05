@@ -13,6 +13,25 @@ function setInner(root, selector, html) {
   if (el.innerHTML !== next) el.innerHTML = next;
 }
 
+function findDynamicIsland(root, selector) {
+  const island = root?.querySelector?.(selector);
+  if (!island) return null;
+  // Phase 18C.1: dynamic module updates must never cross from the module body
+  // into the global app shell/navigation. If a future mount accidentally passes
+  // a larger root, this guard still constrains the update to the requested
+  // island instead of replacing an ancestor.
+  if (island.id === 'primaryNav' || island.closest?.('#primaryNav, .module-nav, #overflowMenu')) return null;
+  return island;
+}
+
+function setIslandInner(root, selector, html) {
+  const island = findDynamicIsland(root, selector);
+  if (!island) return false;
+  const next = String(html ?? '');
+  if (island.innerHTML !== next) island.innerHTML = next;
+  return true;
+}
+
 function setSelectValue(root, field, value) {
   const el = root?.querySelector?.(`[data-field="${field}"]`);
   if (el && el.value !== String(value ?? '')) el.value = String(value ?? '');
@@ -89,6 +108,26 @@ export function createHeatingCoolingDynamicRenderer(options = {}) {
     const unitChanged = previous.massFlowUnit !== active.massFlowUnit || hasAnyChanged(changed, [key(s, 'MassFlowUnit'), key(s, 'PowerUnit')]);
     const lineStructural = /^(line:|saved:)/.test(action);
     const appStructural = /^(record:|module:|replace|reset)/.test(action);
+    const pipeOnlyChange = !appStructural
+      && !lineStructural
+      && changed.length > 0
+      && changed.every(field => field === 'pipeSystemId');
+
+    if (pipeOnlyChange) {
+      // Phase 18C.1: Rohrwerkstoff changes are recommendation-only. Keep the
+      // global nav/app shell and all unrelated dynamic islands mounted.
+      setSelectValue(root, 'pipeSystemId', s.pipeSystemId);
+      setIslandInner(root, '[data-hc-dynamic="pipe-recommendation"]', renderPipeRecommendation(s, r, active, accent));
+      root.__tcHeatingCoolingDynamic = {
+        mode: s.mode,
+        prefix: currentPrefix,
+        calcTarget: active.calcTarget,
+        massFlowUnit: active.massFlowUnit,
+        mediumId: s.mediumId,
+        pipeSystemId: s.pipeSystemId
+      };
+      return;
+    }
 
     setSelectValue(root, 'mediumId', s.mediumId);
     setSelectValue(root, 'pipeSystemId', s.pipeSystemId);
@@ -119,7 +158,7 @@ export function createHeatingCoolingDynamicRenderer(options = {}) {
 
     setInner(root, '[data-hc-dynamic="result"]', renderResult(s, r, active, accent));
     setInner(root, '[data-hc-dynamic="formula"]', renderFormula(s, r, active, accent));
-    setInner(root, '[data-hc-dynamic="pipe-recommendation"]', renderPipeRecommendation(s, r, active, accent));
+    setIslandInner(root, '[data-hc-dynamic="pipe-recommendation"]', renderPipeRecommendation(s, r, active, accent));
 
     if (lineStructural || appStructural || hasAnyChanged(changed, ['lineSections', 'activeLineSectionId', 'activeLineSectionName', 'expandedLineSectionId'])) {
       lineSectionController?.updateControls?.(root, s);
@@ -145,5 +184,7 @@ export const dynamicRendererInternals = {
   setInputValue,
   updateCardAccent,
   setCardTitle,
-  updateSegment
+  updateSegment,
+  findDynamicIsland,
+  setIslandInner
 };

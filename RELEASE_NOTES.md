@@ -824,3 +824,9 @@
 - Schema-Gruppen auf `Medium`, `Betriebsart`, aktive Eingaben vorbereitet.
 - `layout.order` dokumentiert die Soll-Reihenfolge: Medium → Betriebsart → Eingaben → Ergebnis → Rohrdimension → Leitungsabschnitte.
 - Globale Nav-Pill bleibt außerhalb des Modul-Layouts; Cards werden nicht um die Navigation herum gerendert.
+
+## Phase 18C.1 - Pipe Recommendation Island Guard
+
+- Heizung/Kälte: `pipeSystemId` updates are now constrained to the `pipe-recommendation` dynamic island.
+- Global navigation/app shell is guarded against accidental dynamic-island replacement.
+- Added regression `heating-cooling-phase18c1-pipe-island-guard`.
