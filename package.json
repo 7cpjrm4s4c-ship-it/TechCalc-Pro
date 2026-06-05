@@ -31,6 +31,7 @@
     "test:event-pipeline-phase16e": "node tests/event-pipeline-phase16e.test.mjs",
     "test:rainwater-phase16e1": "node tests/rainwater-phase16e1-recovery.test.mjs",
     "test:rainwater-phase17a1": "node tests/rainwater-phase17a1-decoupling.test.mjs",
-    "test:rainwater-phase17a3": "node tests/rainwater-phase17a3-results.test.mjs"
+    "test:rainwater-phase17a3": "node tests/rainwater-phase17a3-results.test.mjs",
+    "test:heating-cooling-phase18d1": "node tests/heating-cooling-phase18d1-reference-cleanup.test.mjs"
   }
 }

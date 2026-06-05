@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 
 const moduleSource = readFileSync('js/modules/heating-cooling/index.js', 'utf8');
+const viewSource = readFileSync('js/modules/heating-cooling/view.js', 'utf8');
 const pipelineSource = readFileSync('js/core/eventPipeline.js', 'utf8');
 const lineSectionSource = readFileSync('js/platform/lineSectionController/index.js', 'utf8');
 const runtimeSource = readFileSync('js/platform/moduleRuntime/index.js', 'utf8');
@@ -10,7 +11,6 @@ const requiredModuleSnippets = [
   'export default createPlatformModule',
   'createHeatingCoolingDynamicRenderer',
   'createLineSectionController',
-  'data-hc-dynamic',
   'bindHeatingCoolingPlatform',
   'dynamicUpdate: updateHeatingCoolingDynamic'
 ];
@@ -18,6 +18,7 @@ const requiredModuleSnippets = [
 for (const snippet of requiredModuleSnippets) {
   if (!moduleSource.includes(snippet)) throw new Error(`Heating/cooling platform integration missing required snippet: ${snippet}`);
 }
+if (!viewSource.includes('data-hc-dynamic')) throw new Error('Heating/cooling ordered view must keep dynamic islands in view.js.');
 
 const requiredPlatformSnippets = [
   "'line:save'",

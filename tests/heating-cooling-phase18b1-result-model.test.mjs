@@ -3,12 +3,13 @@ import { readFileSync } from 'node:fs';
 import { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRows } from '../js/modules/heating-cooling/results.js';
 
 const indexSource = readFileSync('js/modules/heating-cooling/index.js', 'utf8');
+const viewSource = readFileSync('js/modules/heating-cooling/view.js', 'utf8');
 const resultsSource = readFileSync('js/modules/heating-cooling/results.js', 'utf8');
 const platformRendererSource = readFileSync('js/platform/resultRenderer/index.js', 'utf8');
 
-assert.match(indexSource, /platform\/resultRenderer/, 'heating/cooling must render result areas through the platform result renderer.');
-assert.match(indexSource, /buildHeatingCoolingResultModel/, 'heating/cooling result data must be provided as a result model.');
-assert.match(indexSource, /buildPipeRecommendationModel/, 'pipe recommendation must be provided as a result model.');
+assert.match(viewSource, /platform\/resultRenderer/, 'heating/cooling must render result areas through the platform result renderer.');
+assert.match(viewSource, /buildHeatingCoolingResultModel/, 'heating/cooling result data must be provided as a result model.');
+assert.match(viewSource, /buildPipeRecommendationModel/, 'pipe recommendation must be provided as a result model.');
 assert.doesNotMatch(indexSource, /inlineStats|mainResult/, 'heating/cooling module must no longer call legacy inline result/card render helpers directly.');
 assert.doesNotMatch(indexSource, /function\s+(targetMain|mediumStats|pipeDetails|renderRecommendationBody)/, 'result presentation helpers must be extracted from the module mount file.');
 assert.match(resultsSource, /export function buildHeatingCoolingResultModel/, 'heating/cooling result model builder must be exported.');

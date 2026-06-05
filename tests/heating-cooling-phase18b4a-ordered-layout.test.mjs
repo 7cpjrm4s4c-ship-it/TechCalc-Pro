@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 const schemaSource = fs.readFileSync('js/modules/heating-cooling/schema.js', 'utf8');
 const moduleSource = fs.readFileSync('js/modules/heating-cooling/index.js', 'utf8');
+const viewSource = fs.readFileSync('js/modules/heating-cooling/view.js', 'utf8');
 const configSource = fs.readFileSync('js/modules/heating-cooling/config.js', 'utf8');
 
 assert.match(schemaSource, /layout:\s*\{[\s\S]*order:\s*\['medium', 'operatingMode', 'activeInputs', 'result', 'recommendation', 'lineSections'\]/, 'heating/cooling schema must declare the ordered card layout contract.');
@@ -12,12 +13,12 @@ assert.doesNotMatch(schemaSource, /title:\s*'System'/, 'heating/cooling must not
 assert.match(schemaSource, /visibleWhen:\s*state\s*=>\s*state\.mode !== 'cooling'/, 'heating inputs must be visible only in heating mode.');
 assert.match(schemaSource, /visibleWhen:\s*state\s*=>\s*state\.mode === 'cooling'/, 'cooling inputs must be visible only in cooling mode.');
 
-const mediumIndex = moduleSource.indexOf("card('Medium'");
-const modeIndex = moduleSource.indexOf("card('Betriebsart'");
-const inputIndex = moduleSource.indexOf("card(`${modeLabel} — Eingaben`");
-const resultIndex = moduleSource.indexOf('data-hc-dynamic="result"');
-const recommendationIndex = moduleSource.indexOf('data-hc-dynamic="pipe-recommendation"');
-const lineIndex = moduleSource.indexOf('lineSectionController.renderCard');
+const mediumIndex = viewSource.indexOf("card('Medium'");
+const modeIndex = viewSource.indexOf("card('Betriebsart'");
+const inputIndex = viewSource.indexOf("card(`${modeLabel} — Eingaben`");
+const resultIndex = viewSource.indexOf('data-hc-dynamic="result"');
+const recommendationIndex = viewSource.indexOf('data-hc-dynamic="pipe-recommendation"');
+const lineIndex = viewSource.indexOf('lineSectionController.renderCard');
 assert.ok(mediumIndex >= 0 && modeIndex > mediumIndex && inputIndex > modeIndex && resultIndex > inputIndex, 'custom view must keep Medium → Betriebsart → Eingaben → Ergebnis order.');
 assert.ok(recommendationIndex > resultIndex && lineIndex > recommendationIndex, 'custom view must keep Ergebnis → Rohrdimensionsempfehlung → Leitungsabschnitte order.');
 assert.match(configSource, /phase-18b4a-ordered-card-layout/, 'module migration status must record Phase 18B.4A.');

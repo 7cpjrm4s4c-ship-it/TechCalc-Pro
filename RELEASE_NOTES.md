@@ -1,4 +1,12 @@
 
+## Phase 18D - Heizung/Kälte Reference Consolidation
+
+- Heizung/Kälte-Controller-Helfer aus `index.js` nach `controller.js` extrahiert.
+- Aktive Berechnungszustände, Eingabefelder, Leitungsabschnitt-Record-Erzeugung und Hydration fachlich gebündelt.
+- Plattform-Mount, DynamicRenderer, ResultRenderer und LineSectionController bleiben unverändert zentral.
+- Regression `heating-cooling-phase18d-reference-consolidation` ergänzt.
+
+
 ## Phase 18C.2 – Select Focus Nav Guard
 - Behebt die verschwindende Mobile-Nav-Pill nach Rohrwerkstoff-Auswahl in Heizung/Kälte.
 - Select-Felder setzen den globalen `tc-keyboard-open` Zustand nicht mehr, da native Picker keine Bildschirmtastatur sind.
@@ -836,3 +844,11 @@
 - Heizung/Kälte: `pipeSystemId` updates are now constrained to the `pipe-recommendation` dynamic island.
 - Global navigation/app shell is guarded against accidental dynamic-island replacement.
 - Added regression `heating-cooling-phase18c1-pipe-island-guard`.
+
+
+## Phase 18D.1 – Heizung/Kälte Referenzbereinigung
+
+- Heizung/Kälte View-Komposition in `modules/heating-cooling/view.js` ausgelagert.
+- `index.js` weiter reduziert und von Card-/Result-View-Helfern bereinigt.
+- Dynamic-Renderer-Callbacks mit dem geordneten View-Adapter zusammengeführt.
+- Neue Regression `heating-cooling-phase18d1-reference-cleanup`.

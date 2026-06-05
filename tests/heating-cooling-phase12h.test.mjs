@@ -5,6 +5,7 @@ import config from '../js/modules/heating-cooling/config.js';
 import schema from '../js/modules/heating-cooling/schema.js';
 
 const source = readFileSync(new URL('../js/modules/heating-cooling/index.js', import.meta.url), 'utf8');
+const viewSource = readFileSync(new URL('../js/modules/heating-cooling/view.js', import.meta.url), 'utf8');
 const runtimeSource = readFileSync(new URL('../js/platform/moduleRuntime/index.js', import.meta.url), 'utf8');
 const dynamicRendererSource = readFileSync(new URL('../js/platform/dynamicRenderer/index.js', import.meta.url), 'utf8');
 
@@ -16,8 +17,8 @@ assert.ok(schema.fields.some(field => field.key === 'pipeSystemId' && field.comm
 assert.match(source, /createPlatformModule/, 'module uses platform lifecycle');
 assert.match(source, /createHeatingCoolingDynamicRenderer/, 'dynamic island updater is provided by platform dynamic renderer');
 assert.match(source, /action !== 'initial'/, 'non-initial actions use dynamic path');
-assert.match(source, /data-hc-dynamic="input-fields"/, 'input fields are dynamic island');
-assert.match(source, /data-hc-dynamic="result"/, 'result area is dynamic island');
+assert.match(viewSource, /data-hc-dynamic="input-fields"/, 'input fields are dynamic island');
+assert.match(viewSource, /data-hc-dynamic="result"/, 'result area is dynamic island');
 assert.match(dynamicRendererSource, /line-sections/, 'saved records are dynamic island');
 assert.match(runtimeSource, /root\.innerHTML\s*=\s*view\(snapshot\)/, 'full render is owned by platform runtime');
 assert.doesNotMatch(source, /addEventListener\(['"]click['"]/, 'module has no local click listener');

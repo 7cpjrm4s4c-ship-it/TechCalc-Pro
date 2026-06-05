@@ -44,7 +44,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": false,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-12h-final-globalized phase-18b1-result-model phase-18b2-line-section-controller phase-18b3-dynamic-renderer phase-18b4-platform-mount phase-18b4a-ordered-card-layout phase-18c-platform-hardening"
+      "migrationStatus": "phase-12h-final-globalized phase-18b1-result-model phase-18b2-line-section-controller phase-18b3-dynamic-renderer phase-18b4-platform-mount phase-18b4a-ordered-card-layout phase-18c-platform-hardening phase-18d-reference-consolidation phase-18d1-reference-cleanup"
     },
     {
       "id": "hx-diagram",
