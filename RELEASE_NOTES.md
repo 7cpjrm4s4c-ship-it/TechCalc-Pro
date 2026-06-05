@@ -807,3 +807,11 @@
 - Common Inputs, State Binding, Dynamic Subscription und Custom Bind Hooks liegen im Plattform-Mount.
 - Bestehender Heizung/Kälte-View und DynamicRenderer bleiben als stabiler Adapter erhalten.
 - Regression `heating-cooling-phase18b4-platform-mount` ergänzt.
+
+## Phase 18B.4A – Heizung/Kälte Ordered Card Layout
+
+- Heizung/Kälte Layout-Reihenfolge wieder auf die ursprüngliche fachliche UI-Struktur gesetzt.
+- Generischen `System / Heizung / Kälte / Gespeicherte Einträge` Fallback entschärft.
+- Schema-Gruppen auf `Medium`, `Betriebsart`, aktive Eingaben vorbereitet.
+- `layout.order` dokumentiert die Soll-Reihenfolge: Medium → Betriebsart → Eingaben → Ergebnis → Rohrdimension → Leitungsabschnitte.
+- Globale Nav-Pill bleibt außerhalb des Modul-Layouts; Cards werden nicht um die Navigation herum gerendert.
