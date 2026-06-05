@@ -798,3 +798,12 @@
 - Behebt den Mobile-Safari-Fehler, bei dem Regenwasser nach erstem Segment-Tap optisch reagierte, aber `surfaceMode` erst nach einer weiteren Eingabe commitete.
 - Normale Input- und SavedRecord-Aktionen behalten den zentralen Scroll-Stabilisierer.
 - Keine Regenwasser-Sonderlogik; Fix liegt zentral in `platform/moduleRuntime`.
+
+## Phase 18B.4 - Heating/Cooling Platform Mount
+
+- Heizung/Kälte exportiert jetzt über `createPlatformModule(...)`.
+- Der modulinterne `mountHeatingCooling()`-Lifecycle wurde entfernt.
+- `platform/moduleRuntime` unterstützt jetzt einen Custom-View-Dynamic-Mount für Übergangsmodule.
+- Common Inputs, State Binding, Dynamic Subscription und Custom Bind Hooks liegen im Plattform-Mount.
+- Bestehender Heizung/Kälte-View und DynamicRenderer bleiben als stabiler Adapter erhalten.
+- Regression `heating-cooling-phase18b4-platform-mount` ergänzt.

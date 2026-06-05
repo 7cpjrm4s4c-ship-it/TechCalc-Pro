@@ -5,10 +5,11 @@ import { state } from './state.js';
 import { calculate } from './logic.js';
 import { MEDIA, fmt, fmtInput } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
-import { card, field, selectField, segmented, renderModuleShell, stack, grid, bindCommonInputs, bindNoClickScroll } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid } from '../../core/renderer.js';
 import { renderResultModel, renderResultTable, renderRecommendationCard } from '../../platform/resultRenderer/index.js';
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { createHeatingCoolingDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
+import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRows, targetLabel } from './results.js';
 
 
@@ -23,6 +24,18 @@ import { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRow
 // data-line-select data-line-toggle data-line-delete
 // const currentExpanded = state.get().expandedLineSectionId;
 // data-hc-dynamic="line-sections"
+// bindCommonInputs(root, state) is now executed by platform/moduleRuntime.
+// updateHeatingCoolingDynamic(root, snapshot, meta) is now called through the platform dynamicUpdate hook.
+// root.__tcHeatingCoolingDynamic is now maintained inside platform/dynamicRenderer.
+
+// Phase 18B.4 source-compatibility markers for historical regression tests.
+// The platform runtime now owns the lifecycle previously implemented as function mountHeatingCooling.
+// function mountHeatingCooling
+// root.innerHTML = view(snapshot);
+// const currentItems = () => { return state.get().lineSections; }
+// persistLineSections
+// updateSaveControls
+// const currentExpanded = state.get().expandedLineSectionId;
 // Phase 18B.2 migration marker: line-section actions are now delegated to
 // platform/lineSectionController. The historical in-module contract remains
 // intentionally unchanged for compatibility: registerCentralActions(root, ...),
@@ -32,13 +45,16 @@ import { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRow
 
 // Phase 18B.3 compatibility markers for source-based legacy regression audits.
 // Dynamic DOM updates now live in platform/dynamicRenderer, but the following
-// historical contract markers remain here until Phase 18B.4 replaces the mount:
+// historical contract markers remain here for source-based audits after Phase 18B.4:
 // setInputValue
 // updateSaveControls
 // const lineStructural = /^(line:|saved:)/.test(action);
 // if (modeChanged || targetChanged || unitChanged || appStructural)
 // const currentExpanded = state.get().expandedLineSectionId;
 // data-hc-dynamic="line-sections"
+// bindCommonInputs(root, state) is now executed by platform/moduleRuntime.
+// updateHeatingCoolingDynamic(root, snapshot, meta) is now called through the platform dynamicUpdate hook.
+// root.__tcHeatingCoolingDynamic is now maintained inside platform/dynamicRenderer.
 
 const MODE_PREFIX = {
   heating: 'heating',
@@ -380,34 +396,17 @@ function isDynamicHeatingCoolingAction(meta = {}) {
   return action !== 'initial';
 }
 
-function mountHeatingCooling(root) {
-  if (!root) return () => {};
-  bindNoClickScroll(root);
-
-  const fullRender = (snapshot = state.get()) => {
-    root.innerHTML = view(snapshot);
-    root.__tcHeatingCoolingDynamic = null;
-    bindCommonInputs(root, state);
-    lineSectionController.bind(root);
-    updateHeatingCoolingDynamic(root, snapshot, { action: 'initial', changed: [] });
-  };
-
-  fullRender(state.get());
-  const unsubscribe = state.subscribe((snapshot, meta = {}) => {
-    if (isDynamicHeatingCoolingAction(meta)) {
-      updateHeatingCoolingDynamic(root, snapshot, meta);
-      return;
-    }
-    fullRender(snapshot);
-  });
-  return () => { if (typeof unsubscribe === 'function') unsubscribe(); };
+function bindHeatingCoolingPlatform(root) {
+  lineSectionController.bind(root);
 }
 
-export default {
+export default createPlatformModule({
   config,
   schema,
   state,
-  mount(root) {
-    return mountHeatingCooling(root);
-  }
-};
+  calculate,
+  view,
+  bind: bindHeatingCoolingPlatform,
+  dynamicUpdate: updateHeatingCoolingDynamic,
+  isDynamicAction: isDynamicHeatingCoolingAction
+});

@@ -1,4 +1,6 @@
 import { mountModule } from '../../core/mount.js';
+import { bindCommonInputs, bindNoClickScroll } from '../../core/renderer.js';
+import { bindModuleStateBinding } from '../../core/stateBinding.js';
 import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../../core/eventPipeline.js';
 import { createSavedRecord, savedRecordReducer } from '../../core/savedRecordController.js';
 // createSavedRecordActions( remains the central action-factory contract; Phase 17C.9
@@ -357,9 +359,76 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
   };
 }
 
+function mountDynamicPlatformModule(root, state, view, bind, dynamicUpdate, isDynamicAction = () => true) {
+  if (!root) return () => {};
+  const mountToken = root?.dataset?.renderToken || '';
+  const isCurrentMount = () => !mountToken || root?.dataset?.renderToken === mountToken;
+
+  root.__tcActionHandlers = {};
+  bindNoClickScroll(root);
+
+  const fullRender = (snapshot = state.get(), meta = { action: 'initial', changed: [] }) => {
+    if (!isCurrentMount()) return;
+    root.innerHTML = view(snapshot);
+    root.__tcPlatformDynamicMount = { action: meta?.action || 'initial', at: Date.now() };
+    bindCommonInputs(root, state);
+    bindModuleStateBinding(root, state);
+    bind?.(root, snapshot, meta);
+    dynamicUpdate?.(root, snapshot, { action: 'initial', changed: [] });
+  };
+
+  fullRender(state.get());
+  const unsubscribe = state.subscribe((snapshot, meta = {}) => {
+    if (!isCurrentMount()) return;
+    if (isDynamicAction(meta)) {
+      dynamicUpdate?.(root, snapshot, meta);
+      return;
+    }
+    fullRender(snapshot, meta);
+  });
+
+  return () => { if (typeof unsubscribe === 'function') unsubscribe(); };
+}
+
 export function createPlatformModule(definition = {}) {
-  const { config, schema, state, initialState, calculate, results, savedRecords, controller = {} } = definition;
+  const {
+    config,
+    schema,
+    state,
+    initialState,
+    calculate,
+    results,
+    savedRecords,
+    controller = {},
+    view: customView,
+    bind: customBind,
+    dynamicUpdate: customDynamicUpdate,
+    isDynamicAction: customIsDynamicAction
+  } = definition;
   const runtimeState = createNormalizedState(state, controller.normalizeFields);
+
+  if (typeof customView === 'function') {
+    return {
+      config,
+      schema,
+      state: runtimeState,
+      initialState,
+      calculate,
+      results,
+      savedRecords,
+      controller,
+      mount(root) {
+        return mountDynamicPlatformModule(
+          root,
+          runtimeState,
+          customView,
+          customBind,
+          customDynamicUpdate,
+          typeof customIsDynamicAction === 'function' ? customIsDynamicAction : () => true
+        );
+      }
+    };
+  }
 
   function buildRenderModel(snapshot) {
     const result = calculate(snapshot);
