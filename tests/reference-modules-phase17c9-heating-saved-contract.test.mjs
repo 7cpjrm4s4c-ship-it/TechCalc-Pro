@@ -6,9 +6,9 @@ const rainwaterController = readFileSync('js/modules/rainwater/controller.js', '
 const wastewaterController = readFileSync('js/modules/wastewater/controller.js', 'utf8');
 const rainwaterResults = readFileSync('js/modules/rainwater/results.js', 'utf8');
 const wastewaterResults = readFileSync('js/modules/wastewater/results.js', 'utf8');
-const heating = readFileSync('js/modules/heating-cooling/index.js', 'utf8');
+const heating = readFileSync('js/platform/lineSectionController/index.js', 'utf8');
 
-assert.match(heating, /data-line-select/, 'baseline: Heizung/Kälte uses line-section select attributes.');
+assert.match(heating, /data-line-select/, 'baseline: Heizung/Kälte platform line-section controller uses line-section select attributes.');
 assert.match(runtime, /Heizung\/Kälte parity/, 'Platform saved records must explicitly use the heating/cooling interaction contract.');
 assert.match(runtime, /'line:save': save/, 'Platform saved records must register the same line:save action as Heizung/Kälte.');
 assert.match(runtime, /'line:update': update/, 'Platform saved records must register the same line:update action as Heizung/Kälte.');

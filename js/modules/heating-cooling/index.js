@@ -13,49 +13,6 @@ import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRows, targetLabel } from './results.js';
 
 
-// Phase 18B.2 compatibility markers for historical regression audits while the
-// implementation delegates to platform/lineSectionController:
-// state.set({ ...hydrateLineSectionState(item, state.get()), expandedLineSectionId: state.get().expandedLineSectionId }, { action: 'line:select' });
-// const currentItems = () => { return state.get().lineSections; }
-// persistLineSections
-// shouldSkipDuplicateAction
-// lineStructural updateSaveControls renderLineSectionRows
-// updateSaveControls(root, s, meta)
-// data-line-select data-line-toggle data-line-delete
-// const currentExpanded = state.get().expandedLineSectionId;
-// data-hc-dynamic="line-sections"
-// bindCommonInputs(root, state) is now executed by platform/moduleRuntime.
-// updateHeatingCoolingDynamic(root, snapshot, meta) is now called through the platform dynamicUpdate hook.
-// root.__tcHeatingCoolingDynamic is now maintained inside platform/dynamicRenderer.
-
-// Phase 18B.4 source-compatibility markers for historical regression tests.
-// The platform runtime now owns the lifecycle previously implemented as function mountHeatingCooling.
-// function mountHeatingCooling
-// root.innerHTML = view(snapshot);
-// const currentItems = () => { return state.get().lineSections; }
-// persistLineSections
-// updateSaveControls
-// const currentExpanded = state.get().expandedLineSectionId;
-// Phase 18B.2 migration marker: line-section actions are now delegated to
-// platform/lineSectionController. The historical in-module contract remains
-// intentionally unchanged for compatibility: registerCentralActions(root, ...),
-// 'line:save', 'line:update', 'saved:load', 'saved:delete', 'saved:toggle',
-// hydrateLineSectionState(item, state.get()).
-
-
-// Phase 18B.3 compatibility markers for source-based legacy regression audits.
-// Dynamic DOM updates now live in platform/dynamicRenderer, but the following
-// historical contract markers remain here for source-based audits after Phase 18B.4:
-// setInputValue
-// updateSaveControls
-// const lineStructural = /^(line:|saved:)/.test(action);
-// if (modeChanged || targetChanged || unitChanged || appStructural)
-// const currentExpanded = state.get().expandedLineSectionId;
-// data-hc-dynamic="line-sections"
-// bindCommonInputs(root, state) is now executed by platform/moduleRuntime.
-// updateHeatingCoolingDynamic(root, snapshot, meta) is now called through the platform dynamicUpdate hook.
-// root.__tcHeatingCoolingDynamic is now maintained inside platform/dynamicRenderer.
-
 const MODE_PREFIX = {
   heating: 'heating',
   cooling: 'cooling'
@@ -285,13 +242,6 @@ function hydrateLineSectionState(item, currentState) {
     activeLineSectionName: item.name || ''
   };
 }
-
-
-
-
-
-
-
 
 
 

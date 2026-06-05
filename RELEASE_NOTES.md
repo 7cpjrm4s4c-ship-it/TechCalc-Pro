@@ -1,4 +1,13 @@
 
+## Phase 18C – Platform Hardening after Three Reference Modules
+
+- Heizung/Kälte migration status cleaned up and marked as `phase-18c-platform-hardening`.
+- Source-only compatibility marker comments removed from `modules/heating-cooling/index.js`.
+- Legacy heating/cooling regression tests updated to assert current platform ownership instead of old module-owned mount/dynamic/save paths.
+- Added `heating-cooling-phase18c-platform-hardening` regression.
+- Platform contract confirmed across Regenwasser, Schmutzwasser and Heizung/Kälte.
+
+
 ## Phase 18B.3 – Heizung/Kälte Dynamic Renderer
 
 - Added `platform/dynamicRenderer` for centralized dynamic-island updates.

@@ -1,6 +1,6 @@
 {
-  "directDomWrites": 17,
-  "moduleDirectDomWrites": 3,
+  "directDomWrites": 16,
+  "moduleDirectDomWrites": 2,
   "status": "ok",
   "note": "Phase 7 allows shell/navigation writes, but module-level writes must continue moving toward safeReplaceContent or granular updates.",
   "findings": [
@@ -13,11 +13,6 @@
       "file": "js/core/moduleRuntime.js",
       "line": 130,
       "text": "root.innerHTML = '<div class=\"module-error card\">Modul konnte nicht geladen werden.</div>';"
-    },
-    {
-      "file": "js/modules/heating-cooling/index.js",
-      "line": 34,
-      "text": "// root.innerHTML = view(snapshot);"
     },
     {
       "file": "js/modules/ventilation/index.js",
