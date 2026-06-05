@@ -1,4 +1,10 @@
 
+## Phase 18C.2 – Select Focus Nav Guard
+- Behebt die verschwindende Mobile-Nav-Pill nach Rohrwerkstoff-Auswahl in Heizung/Kälte.
+- Select-Felder setzen den globalen `tc-keyboard-open` Zustand nicht mehr, da native Picker keine Bildschirmtastatur sind.
+- Nach Select-Commits wird `tc-keyboard-open` defensiv entfernt, damit die globale Navigation sichtbar bleibt.
+
+
 ## Phase 18C – Platform Hardening after Three Reference Modules
 
 - Heizung/Kälte migration status cleaned up and marked as `phase-18c-platform-hardening`.

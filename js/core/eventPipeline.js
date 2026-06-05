@@ -246,6 +246,9 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     commitElementField(state, el, { action: immediateCommit ? 'field:change:immediate' : 'field:change', notify: shouldNotify, root });
     if (el.matches('select')) {
       try { el.blur(); } catch { /* native select may not allow blur in all runtimes */ }
+      // Select controls do not open the software keyboard on mobile Safari.
+      // Keep the global module navigation visible after picker-based commits.
+      if (document?.body) document.body.classList.remove('tc-keyboard-open');
     }
     hasDeferredInput = !immediateCommit;
     notifyCommit({ action: immediateCommit ? 'field:change:immediate' : 'field:change', element: el });
@@ -394,7 +397,7 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     notifyCommit({ action: 'surface:confirm', element: null });
   };
 
-  const keyboardFieldSelector = 'input[data-field], textarea[data-field], select[data-field]';
+  const keyboardFieldSelector = 'input[data-field], textarea[data-field]';
   const setKeyboardOpen = value => {
     if (!document?.body) return;
     document.body.classList.toggle('tc-keyboard-open', Boolean(value));

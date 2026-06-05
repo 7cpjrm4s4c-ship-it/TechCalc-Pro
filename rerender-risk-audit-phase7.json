@@ -1,5 +1,5 @@
 {
-  "directDomWrites": 16,
+  "directDomWrites": 17,
   "moduleDirectDomWrites": 2,
   "status": "ok",
   "note": "Phase 7 allows shell/navigation writes, but module-level writes must continue moving toward safeReplaceContent or granular updates.",
@@ -28,6 +28,11 @@
       "file": "js/platform/dynamicRenderer/index.js",
       "line": 13,
       "text": "if (el.innerHTML !== next) el.innerHTML = next;"
+    },
+    {
+      "file": "js/platform/dynamicRenderer/index.js",
+      "line": 31,
+      "text": "if (island.innerHTML !== next) island.innerHTML = next;"
     },
     {
       "file": "js/platform/moduleRuntime/index.js",
