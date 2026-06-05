@@ -1,4 +1,11 @@
 
+## Phase 18B.3 – Heizung/Kälte Dynamic Renderer
+
+- Added `platform/dynamicRenderer` for centralized dynamic-island updates.
+- Moved heating/cooling dynamic DOM update mechanics out of the module adapter.
+- Kept `mountHeatingCooling()` as adapter for the final Phase 18B.4 migration.
+
+
 ## Phase 18B.2 – Heizung/Kälte Line-Section Controller
 
 - Neuer Plattformbaustein `platform/lineSectionController`.

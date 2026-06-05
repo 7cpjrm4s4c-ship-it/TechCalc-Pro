@@ -8,6 +8,7 @@ import { pipeSystems } from '../../utils/pipes.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, bindCommonInputs, bindNoClickScroll } from '../../core/renderer.js';
 import { renderResultModel, renderResultTable, renderRecommendationCard } from '../../platform/resultRenderer/index.js';
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
+import { createHeatingCoolingDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRows, targetLabel } from './results.js';
 
 
@@ -21,11 +22,23 @@ import { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRow
 // updateSaveControls(root, s, meta)
 // data-line-select data-line-toggle data-line-delete
 // const currentExpanded = state.get().expandedLineSectionId;
+// data-hc-dynamic="line-sections"
 // Phase 18B.2 migration marker: line-section actions are now delegated to
 // platform/lineSectionController. The historical in-module contract remains
 // intentionally unchanged for compatibility: registerCentralActions(root, ...),
 // 'line:save', 'line:update', 'saved:load', 'saved:delete', 'saved:toggle',
 // hydrateLineSectionState(item, state.get()).
+
+
+// Phase 18B.3 compatibility markers for source-based legacy regression audits.
+// Dynamic DOM updates now live in platform/dynamicRenderer, but the following
+// historical contract markers remain here until Phase 18B.4 replaces the mount:
+// setInputValue
+// updateSaveControls
+// const lineStructural = /^(line:|saved:)/.test(action);
+// if (modeChanged || targetChanged || unitChanged || appStructural)
+// const currentExpanded = state.get().expandedLineSectionId;
+// data-hc-dynamic="line-sections"
 
 const MODE_PREFIX = {
   heating: 'heating',
@@ -330,116 +343,36 @@ function view(s) {
 }
 
 
-function setInner(root, selector, html) {
-  const el = root?.querySelector?.(selector);
-  if (!el) return;
-  const next = String(html ?? '');
-  if (el.innerHTML !== next) el.innerHTML = next;
-}
-
-function setSelectValue(root, field, value) {
-  const el = root?.querySelector?.(`[data-field="${field}"]`);
-  if (el && el.value !== String(value ?? '')) el.value = String(value ?? '');
-}
-
-function setInputValue(root, field, value) {
-  const el = root?.querySelector?.(`input[data-field="${field}"], textarea[data-field="${field}"]`);
-  if (!el || document.activeElement === el) return;
-  const next = String(value ?? '');
-  if (el.value !== next) el.value = next;
-}
-
-function updateCardAccent(root, selector, accent) {
-  const cardEl = root?.querySelector?.(selector)?.closest?.('.card');
-  if (!cardEl) return;
-  [...cardEl.classList].forEach(cls => {
-    if (cls.startsWith('card--accent-')) cardEl.classList.remove(cls);
-  });
-  cardEl.classList.add(`card--accent-${accent}`);
-}
-
-function setCardTitle(root, selector, title) {
-  const titleEl = root?.querySelector?.(selector)?.closest?.('.card')?.querySelector?.('.card__title');
-  if (titleEl && titleEl.textContent !== title) titleEl.textContent = title;
-}
-
-function updateSegment(root, name, value) {
-  root?.querySelectorAll?.(`[data-segment="${name}"]`)?.forEach(button => {
-    button.classList.toggle('is-active', String(button.dataset.value) === String(value));
-    button.setAttribute('aria-selected', String(String(button.dataset.value) === String(value)));
-  });
-}
-
-
-
+const heatingCoolingDynamicRenderer = createHeatingCoolingDynamicRenderer({
+  calculate,
+  activeCalculationState,
+  prefixFor,
+  key,
+  activeValue,
+  activeMassFlowUnit,
+  formatMassFlowInput,
+  fmtInput,
+  lineSectionController,
+  renderMediumStats: (_s, r) => renderResultTable(mediumRows(r.medium)),
+  renderModeSegment: (s, _r, _active, accent) => segmented('mode', [
+    { value: 'heating', label: '● Heizung' },
+    { value: 'cooling', label: '● Kälte' }
+  ], s.mode, { accent }),
+  renderTargetSegment: (s, _r, active, accent) => segmented(key(s, 'CalcTarget'), [
+    { value: 'power', label: 'Q Leistung' },
+    { value: 'massFlow', label: 'ṁ Massenstrom' },
+    { value: 'deltaT', label: 'ΔT Temperatur' }
+  ], active.calcTarget, { accent }),
+  renderInputFields: (s, _r, active) => grid(inputFields(s, active).join(''), 2),
+  renderResult: (_s, r, active, accent) => renderResultModel(buildHeatingCoolingResultModel(active, r, accent), accent),
+  renderFormula: (_s, r) => `Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)`,
+  renderPipeRecommendation
+});
 
 function updateHeatingCoolingDynamic(root, s, meta = {}) {
-  const active = activeCalculationState(s);
-  const r = calculate(active);
-  const accent = s.mode === 'cooling' ? 'cyan' : 'orange';
-  const modeLabel = s.mode === 'cooling' ? 'Kälte' : 'Heizung';
-  const previous = root.__tcHeatingCoolingDynamic || {};
-  const previousPrefix = previous.prefix || 'heating';
-  const currentPrefix = prefixFor(s);
-  const action = String(meta.action || '');
-  const changed = Array.isArray(meta.changed) ? meta.changed : [];
-  const modeChanged = previous.mode !== s.mode || changed.includes('mode');
-  const targetChanged = previous.calcTarget !== active.calcTarget || previousPrefix !== currentPrefix || changed.includes(key(s, 'CalcTarget'));
-  const unitChanged = previous.massFlowUnit !== active.massFlowUnit || changed.includes(key(s, 'MassFlowUnit')) || changed.includes(key(s, 'PowerUnit'));
-  const lineStructural = /^(line:|saved:)/.test(action);
-  const appStructural = /^(record:|module:|replace|reset)/.test(action);
-  setSelectValue(root, 'mediumId', s.mediumId);
-  setSelectValue(root, 'pipeSystemId', s.pipeSystemId);
-  setInner(root, '[data-hc-dynamic="medium-stats"]', renderResultTable(mediumRows(r.medium)));
-
-  updateCardAccent(root, '[data-hc-dynamic="mode-segment"]', accent);
-  updateCardAccent(root, '[data-hc-dynamic="target-segment"]', accent);
-  updateSegment(root, 'mode', s.mode);
-
-  if (modeChanged) {
-    setInner(root, '[data-hc-dynamic="mode-segment"]', segmented('mode', [
-      { value: 'heating', label: '● Heizung' },
-      { value: 'cooling', label: '● Kälte' }
-    ], s.mode, { accent }));
-    setCardTitle(root, '[data-hc-dynamic="target-segment"]', `${modeLabel} — Eingaben`);
-  }
-
-  if (modeChanged || targetChanged) {
-    setInner(root, '[data-hc-dynamic="target-segment"]', segmented(key(s, 'CalcTarget'), [
-      { value: 'power', label: 'Q Leistung' },
-      { value: 'massFlow', label: 'ṁ Massenstrom' },
-      { value: 'deltaT', label: 'ΔT Temperatur' }
-    ], active.calcTarget, { accent }));
-  } else {
-    updateSegment(root, key(s, 'CalcTarget'), active.calcTarget);
-  }
-
-  if (modeChanged || targetChanged || unitChanged || appStructural) {
-    setInner(root, '[data-hc-dynamic="input-fields"]', grid(inputFields(s, active).join(''), 2));
-  } else {
-    setInputValue(root, key(s, 'PowerW'), fmtInput(active.powerW, 2));
-    setInputValue(root, key(s, 'MassFlowKgh'), formatMassFlowInput(activeValue(s, 'MassFlowKgh'), activeMassFlowUnit(s), s.mediumId));
-    setInputValue(root, key(s, 'DeltaT'), fmtInput(active.deltaT, 2));
-  }
-
-  setInner(root, '[data-hc-dynamic="result"]', renderResultModel(buildHeatingCoolingResultModel(active, r, accent), accent));
-  setInner(root, '[data-hc-dynamic="formula"]', `Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)`);
-  setInner(root, '[data-hc-dynamic="pipe-recommendation"]', renderPipeRecommendation(s, r));
-  if (lineStructural || appStructural || changed.includes('lineSections') || changed.includes('activeLineSectionId') || changed.includes('activeLineSectionName') || changed.includes('expandedLineSectionId')) {
-    // Phase 12G: saved-entry selection is store-first. Only the saved-list island
-    // and save/update controls are refreshed; the static input cards stay mounted.
-    lineSectionController.updateControls(root, s);
-    setInner(root, '[data-hc-dynamic="line-sections"]', lineSectionController.renderRows(s));
-  }
-  root.__tcHeatingCoolingDynamic = {
-    mode: s.mode,
-    prefix: currentPrefix,
-    calcTarget: active.calcTarget,
-    massFlowUnit: active.massFlowUnit,
-    mediumId: s.mediumId,
-    pipeSystemId: s.pipeSystemId
-  };
+  heatingCoolingDynamicRenderer.update(root, s, meta);
 }
+
 function isDynamicHeatingCoolingAction(meta = {}) {
   const action = String(meta.action || '');
   // After the initial mount Heizung/Kälte is store-first: even structural

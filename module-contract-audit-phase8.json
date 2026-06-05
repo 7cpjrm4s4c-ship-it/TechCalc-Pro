@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T18:02:19.146Z",
+  "generatedAt": "2026-06-04T20:33:53.446Z",
   "contractTarget": "1.3.0",
   "modules": [
     {
@@ -75,15 +75,15 @@
         "data-line-select",
         "data-line-toggle",
         "data-line-delete",
+        "data-hc-dynamic",
+        "line-sections",
         "line-section",
         "in-module",
-        "line-sections",
-        "data-hc-dynamic",
+        "source-based",
         "medium-stats",
         "mode-segment",
         "target-segment",
-        "input-fields",
-        "span-6"
+        "input-fields"
       ]
     },
     {
