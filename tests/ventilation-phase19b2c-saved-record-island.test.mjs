@@ -3,12 +3,13 @@ import { readFileSync } from 'node:fs';
 
 const ventilationSource = readFileSync(new URL('../js/modules/ventilation/index.js', import.meta.url), 'utf8');
 const lineControllerSource = readFileSync(new URL('../js/platform/lineSectionController/index.js', import.meta.url), 'utf8');
+const dynamicRendererSource = readFileSync(new URL('../js/platform/dynamicRenderer/index.js', import.meta.url), 'utf8');
 const configSource = readFileSync(new URL('../js/modules/ventilation/config.js', import.meta.url), 'utf8');
 
 assert.match(configSource, /phase-19b2c-saved-record-island/, 'ventilation declares phase 19B.2C saved-record-island migration');
 assert.match(ventilationSource, /createLineSectionController\(\{/, 'ventilation saved records are delegated to the platform line-section controller');
 assert.match(ventilationSource, /dynamicDataAttr:\s*'data-line-dynamic'/, 'ventilation requests the neutral line-section dynamic island attribute');
-assert.match(ventilationSource, /\[data-line-dynamic="line-sections"\]/, 'ventilation refreshes saved rows through the neutral dynamic island selector');
+assert.match(ventilationSource + dynamicRendererSource, /\[data-line-dynamic=\"line-sections\"\]|\[data-line-dynamic="line-sections"\]/, 'ventilation refreshes saved rows through the neutral dynamic island selector');
 assert.doesNotMatch(ventilationSource, /\[data-hc-dynamic="line-sections"\]/, 'ventilation no longer targets the heating-specific saved-record island selector');
 assert.match(lineControllerSource, /dynamicDataAttr\s*=\s*'data-line-dynamic'/, 'line-section controller exposes a neutral dynamic island attribute contract');
 assert.match(lineControllerSource, /\$\{dynamicDataAttr\}="\$\{dynamicAttr\}" data-hc-dynamic="\$\{dynamicAttr\}"/, 'line-section controller keeps heating compatibility while exposing the neutral selector');

@@ -5,6 +5,7 @@ import config from '../js/modules/ventilation/config.js';
 import schema from '../js/modules/ventilation/schema.js';
 
 const source = readFileSync(new URL('../js/modules/ventilation/index.js', import.meta.url), 'utf8');
+const dynamicRendererSource = readFileSync(new URL('../js/platform/dynamicRenderer/index.js', import.meta.url), 'utf8');
 const docs = readFileSync(new URL('../docs/PHASE_13A_VENTILATION_GLOBALIZATION.md', import.meta.url), 'utf8');
 
 assert.match(config.migrationStatus, /^phase-13[a-e]-ventilation-/, 'ventilation migration status is current phase 13');
@@ -19,7 +20,7 @@ assert.match(source, /bind:\s*bindVentilationPlatform/, 'saved-line binding is p
 assert.match(source, /createLineSectionController\(\{/, 'saved actions use central line-section controller');
 assert.match(source, /data-vent-dynamic="input-fields"/, 'input fields are dynamic island');
 assert.match(source, /data-vent-dynamic="result"/, 'result area is dynamic island');
-assert.match(source, /data-line-dynamic="line-sections"/, 'saved records use neutral line-section dynamic island');
+assert.match(source + dynamicRendererSource, /data-line-dynamic=\"line-sections\"|data-line-dynamic="line-sections"/, 'saved records use neutral line-section dynamic island');
 assert.match(source, /expandedVentLineSectionId/, 'accordion expanded state is store-backed');
 assert.doesNotMatch(source, /shouldSkipDuplicateAction/, 'save/update dedupe is no longer module-owned');
 

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T18:00:58.711Z",
+  "generatedAt": "2026-06-06T18:06:13.557Z",
   "contractTarget": "1.3.0",
   "modules": [
     {
@@ -173,11 +173,7 @@
         "target-segment",
         "input-fields",
         "air-stats",
-        "span-6",
-        "data-field",
-        "data-segment",
-        "is-active",
-        "aria-selected"
+        "span-6"
       ]
     },
     {

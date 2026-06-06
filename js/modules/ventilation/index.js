@@ -7,8 +7,9 @@ import { card, field, segmented, renderModuleShell, stack, grid } from '../../co
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
+import { createVentilationDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { renderResultGroup, renderResultModel } from '../../platform/resultRenderer/index.js';
-import { airStatsRows, buildVentilationResultModel, targetLabel } from './results.js';
+import { airStatsRows, buildVentilationResultModel } from './results.js';
 
 const MODE_PREFIX = { heating: 'heating', cooling: 'cooling' };
 function prefixFor(s) { return MODE_PREFIX[s.mode] || 'heating'; }
@@ -242,41 +243,6 @@ function view(s) {
   `);
 }
 
-function setInner(root, selector, html) {
-  const el = root?.querySelector?.(selector);
-  if (!el) return;
-  const next = String(html ?? '');
-  if (el.innerHTML !== next) el.innerHTML = next;
-}
-
-function setInputValue(root, field, value) {
-  const el = root?.querySelector?.(`input[data-field="${field}"], textarea[data-field="${field}"]`);
-  if (!el || document.activeElement === el) return;
-  const next = String(value ?? '');
-  if (el.value !== next) el.value = next;
-}
-
-function updateSegment(root, name, value) {
-  root?.querySelectorAll?.(`[data-segment="${name}"]`)?.forEach(button => {
-    button.classList.toggle('is-active', String(button.dataset.value) === String(value));
-    button.setAttribute('aria-selected', String(String(button.dataset.value) === String(value)));
-  });
-}
-
-function updateCardAccent(root, selector, accent) {
-  const cardEl = root?.querySelector?.(selector)?.closest?.('.card');
-  if (!cardEl) return;
-  [...cardEl.classList].forEach(cls => {
-    if (cls.startsWith('card--accent-')) cardEl.classList.remove(cls);
-  });
-  cardEl.classList.add(`card--accent-${accent}`);
-}
-
-function setCardTitle(root, selector, title) {
-  const titleEl = root?.querySelector?.(selector)?.closest?.('.card')?.querySelector?.('.card__title');
-  if (titleEl && titleEl.textContent !== title) titleEl.textContent = title;
-}
-
 
 function renderAirStats(r) {
   return renderResultGroup({
@@ -286,68 +252,31 @@ function renderAirStats(r) {
   });
 }
 
+const ventilationDynamicRenderer = createVentilationDynamicRenderer({
+  calculate,
+  activeCalculationState,
+  prefixFor,
+  key,
+  fmtInput,
+  lineSectionController: ventilationLineSectionController,
+  renderTemperatures: (s, _r, active) => temperatureFields(s, active),
+  renderModeSegment: (s, _r, _active, accent) => segmented('mode', [
+    { value: 'heating', label: '● Heizleistung' },
+    { value: 'cooling', label: '● Kühlleistung' }
+  ], s.mode, { accent }),
+  renderTargetSegment: (s, _r, active, accent) => segmented(key(s, 'CalcTarget'), [
+    { value: 'power', label: 'Q Leistung' },
+    { value: 'volumeFlow', label: 'V̇ Volumenstrom' },
+    { value: 'deltaT', label: 'ΔT Temperatur' }
+  ], active.calcTarget, { accent }),
+  renderInputFields: (s, _r, active) => grid(inputFields(s, active).join(''), 2),
+  renderResult: (_s, r, active, accent) => renderResultModel(buildVentilationResultModel(active, r, accent), accent),
+  renderAirStats: (_s, r) => renderAirStats(r),
+  renderFormula: (_s, r) => `Q = V̇ × (ρ × cₚ / 3,6) × ΔT / 1000 · Wärmewert = ${fmt(r.factor, 3)} Wh/(m³·K)`
+});
+
 function updateVentilationDynamic(root, s, meta = {}) {
-  const active = activeCalculationState(s);
-  const r = calculate(active);
-  const accent = s.mode === 'cooling' ? 'cyan' : 'orange';
-  const modeLabel = s.mode === 'cooling' ? 'Kälte' : 'Heizung';
-  const previous = root.__tcVentilationDynamic || {};
-  const previousPrefix = previous.prefix || 'heating';
-  const currentPrefix = prefixFor(s);
-  const action = String(meta.action || '');
-  const changed = Array.isArray(meta.changed) ? meta.changed : [];
-  const modeChanged = previous.mode !== s.mode || changed.includes('mode');
-  const targetChanged = previous.calcTarget !== active.calcTarget || previousPrefix !== currentPrefix || changed.includes(key(s, 'CalcTarget'));
-  const lineStructural = /^(line:|saved:)/.test(action);
-  const appStructural = /^(record:|module:|replace|reset)/.test(action);
-
-  updateCardAccent(root, '[data-vent-dynamic="temperatures"]', accent);
-  updateCardAccent(root, '[data-vent-dynamic="mode-segment"]', accent);
-  updateCardAccent(root, '[data-vent-dynamic="target-segment"]', accent);
-  updateSegment(root, 'mode', s.mode);
-
-  if (modeChanged) {
-    setInner(root, '[data-vent-dynamic="temperatures"]', temperatureFields(s, active));
-    setInner(root, '[data-vent-dynamic="mode-segment"]', segmented('mode', [
-      { value: 'heating', label: '● Heizleistung' },
-      { value: 'cooling', label: '● Kühlleistung' }
-    ], s.mode, { accent }));
-    setCardTitle(root, '[data-vent-dynamic="target-segment"]', `${modeLabel} — Eingaben`);
-  }
-
-  if (modeChanged || targetChanged) {
-    setInner(root, '[data-vent-dynamic="target-segment"]', segmented(key(s, 'CalcTarget'), [
-      { value: 'power', label: 'Q Leistung' },
-      { value: 'volumeFlow', label: 'V̇ Volumenstrom' },
-      { value: 'deltaT', label: 'ΔT Temperatur' }
-    ], active.calcTarget, { accent }));
-    setInner(root, '[data-vent-dynamic="input-fields"]', grid(inputFields(s, active).join(''), 2));
-  } else {
-    updateSegment(root, key(s, 'CalcTarget'), active.calcTarget);
-    setInputValue(root, key(s, 'PowerW'), fmtInput(active.powerW, 2));
-    setInputValue(root, key(s, 'VolumeFlowM3h'), fmtInput(active.volumeFlowM3h, 2));
-    setInputValue(root, key(s, 'DeltaT'), fmtInput(derivedDeltaT(active), 2));
-    setInputValue(root, key(s, 'SupplyTemp'), fmtInput(active.supplyTemp, 2));
-    setInputValue(root, key(s, 'RoomTemp'), fmtInput(active.roomTemp, 2));
-  }
-
-  setInputValue(root, key(s, 'SupplyTemp'), fmtInput(active.supplyTemp, 2));
-  setInputValue(root, key(s, 'RoomTemp'), fmtInput(active.roomTemp, 2));
-
-  setInner(root, '[data-vent-dynamic="result"]', renderResultModel(buildVentilationResultModel(active, r, accent), accent));
-  setInner(root, '[data-vent-dynamic="air-stats"]', renderAirStats(r));
-  setInner(root, '[data-vent-dynamic="formula"]', `Q = V̇ × (ρ × cₚ / 3,6) × ΔT / 1000 · Wärmewert = ${fmt(r.factor, 3)} Wh/(m³·K)`);
-
-  if (lineStructural || appStructural || changed.includes('ventLineSections') || changed.includes('activeVentLineSectionId') || changed.includes('activeVentLineSectionName') || changed.includes('expandedVentLineSectionId')) {
-    ventilationLineSectionController.updateControls(root, s);
-    setInner(root, '[data-line-dynamic="line-sections"]', ventilationLineSectionController.renderRows(s));
-  }
-
-  root.__tcVentilationDynamic = {
-    mode: s.mode,
-    prefix: currentPrefix,
-    calcTarget: active.calcTarget
-  };
+  ventilationDynamicRenderer.update(root, s, meta);
 }
 
 function isDynamicVentilationAction(meta = {}) {

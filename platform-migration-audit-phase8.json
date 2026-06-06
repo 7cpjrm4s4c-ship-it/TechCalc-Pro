@@ -104,7 +104,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": false,
       "hasLegacyModuleClasses": false,
-      "migrationStatus": "phase-13e-ventilation-temperature-render-fix phase-19b1-platform-mount phase-19b2b-line-section-controller phase-19b2c-saved-record-island phase-19b2c-hydrator-final phase-19b2d-saved-record-cleanup phase-19b3-result-renderer"
+      "migrationStatus": "phase-13e-ventilation-temperature-render-fix phase-19b1-platform-mount phase-19b2b-line-section-controller phase-19b2c-saved-record-island phase-19b2c-hydrator-final phase-19b2d-saved-record-cleanup phase-19b3-result-renderer phase-19c-dynamic-renderer"
     },
     {
       "id": "wastewater",
