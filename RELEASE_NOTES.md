@@ -888,3 +888,10 @@
 - `createLineSectionController` unterstützt `dynamicDataAttr` und hält die Heizung/Kälte-Kompatibilität übergangsweise aufrecht.
 - Neue Regression: `ventilation-phase19b2c-saved-record-island`.
 
+### Phase 19B.3 – Lüftung Result Renderer
+
+- Lüftungs-Ergebnisdarstellung auf den Plattform-Result-Renderer umgestellt.
+- Neues `js/modules/ventilation/results.js` für Result-Model, Target-Mapping und Luftkennwerte ergänzt.
+- Eigene `mainResult`-/`inlineStats`-Resultpfade aus `index.js` entfernt.
+- Regression `ventilation-phase19b3-result-renderer` ergänzt.
+

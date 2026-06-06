@@ -3,10 +3,12 @@ import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, segmented, renderModuleShell, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
+import { card, field, segmented, renderModuleShell, stack, grid } from '../../core/renderer.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
+import { renderResultGroup, renderResultModel } from '../../platform/resultRenderer/index.js';
+import { airStatsRows, buildVentilationResultModel, targetLabel } from './results.js';
 
 const MODE_PREFIX = { heating: 'heating', cooling: 'cooling' };
 function prefixFor(s) { return MODE_PREFIX[s.mode] || 'heating'; }
@@ -195,13 +197,6 @@ function inputFields(s, active) {
   return [powerField(s), field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) })];
 }
 
-function targetLabel(target) { return target === 'power' ? 'Leistung' : target === 'volumeFlow' ? 'Volumenstrom' : 'Temperaturspreizung'; }
-function targetMain(target, r) {
-  if (target === 'power') return { label: 'Berechnete Luftleistung', value: fmt(r.powerKw), unit: 'kW' };
-  if (target === 'volumeFlow') return { label: 'Berechneter Volumenstrom', value: fmt(r.volumeFlowM3h), unit: 'm³/h' };
-  return { label: 'Berechnete Temperaturspreizung', value: fmt(r.deltaT), unit: 'K' };
-}
-
 function temperatureFields(s, active) {
   return grid([
     field({ id: key(s, 'SupplyTemp'), label: 'Zuluft Tzl', unit: '°C', value: fmtInput(active.supplyTemp, 2) }),
@@ -215,11 +210,6 @@ function view(s) {
   const accent = s.mode === 'cooling' ? 'cyan' : 'orange';
   const modeLabel = s.mode === 'cooling' ? 'Kälte' : 'Heizung';
 
-  const resultDetails = [
-    { label: 'Leistung', value: fmt(r.powerKw), unit: 'kW' },
-    { label: 'Volumenstrom', value: fmt(r.volumeFlowM3h), unit: 'm³/h' },
-    { label: 'Massenstrom', value: fmt(r.massFlowKgh), unit: 'kg/h' }
-  ].filter(item => item.label !== targetLabel(active.calcTarget));
 
   const inputColumn = stack([
     card('Temperaturen', `<div data-vent-dynamic="temperatures">${temperatureFields(s, active)}</div>`, accent),
@@ -238,14 +228,10 @@ function view(s) {
     `<div class="formula" data-vent-dynamic="formula">Q = V̇ × (ρ × cₚ / 3,6) × ΔT / 1000 · Wärmewert = ${fmt(r.factor, 3)} Wh/(m³·K)</div>`
   ].join(''));
 
-  const airStats = card('Luftkennwerte aktuell', inlineStats([
-    { label: 'ρL', value: fmt(r.rho, 3), unit: 'kg/m³' },
-    { label: 'cₚ,L', value: fmt(r.cp, 3), unit: 'kJ/(kg·K)' },
-    { label: 'ρ × cₚ / 3,6', value: fmt(r.factor, 3), unit: 'Wh/(m³·K)' }
-  ]), 'cyan', { compact: true });
+  const airStats = renderAirStats(r);
 
   const outputColumn = stack([
-    `<div data-vent-dynamic="result">${mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent)}</div>`,
+    `<div data-vent-dynamic="result">${renderResultModel(buildVentilationResultModel(active, r, accent), accent)}</div>`,
     `<div data-vent-dynamic="air-stats">${airStats}</div>`,
     ventilationLineSectionController.renderCard(s)
   ].join(''));
@@ -293,11 +279,11 @@ function setCardTitle(root, selector, title) {
 
 
 function renderAirStats(r) {
-  return card('Luftkennwerte aktuell', inlineStats([
-    { label: 'ρL', value: fmt(r.rho, 3), unit: 'kg/m³' },
-    { label: 'cₚ,L', value: fmt(r.cp, 3), unit: 'kJ/(kg·K)' },
-    { label: 'ρ × cₚ / 3,6', value: fmt(r.factor, 3), unit: 'Wh/(m³·K)' }
-  ]), 'cyan', { compact: true });
+  return renderResultGroup({
+    title: 'Luftkennwerte aktuell',
+    rows: airStatsRows(r),
+    accent: 'cyan'
+  });
 }
 
 function updateVentilationDynamic(root, s, meta = {}) {
@@ -314,11 +300,6 @@ function updateVentilationDynamic(root, s, meta = {}) {
   const targetChanged = previous.calcTarget !== active.calcTarget || previousPrefix !== currentPrefix || changed.includes(key(s, 'CalcTarget'));
   const lineStructural = /^(line:|saved:)/.test(action);
   const appStructural = /^(record:|module:|replace|reset)/.test(action);
-  const resultDetails = [
-    { label: 'Leistung', value: fmt(r.powerKw), unit: 'kW' },
-    { label: 'Volumenstrom', value: fmt(r.volumeFlowM3h), unit: 'm³/h' },
-    { label: 'Massenstrom', value: fmt(r.massFlowKgh), unit: 'kg/h' }
-  ].filter(item => item.label !== targetLabel(active.calcTarget));
 
   updateCardAccent(root, '[data-vent-dynamic="temperatures"]', accent);
   updateCardAccent(root, '[data-vent-dynamic="mode-segment"]', accent);
@@ -353,7 +334,7 @@ function updateVentilationDynamic(root, s, meta = {}) {
   setInputValue(root, key(s, 'SupplyTemp'), fmtInput(active.supplyTemp, 2));
   setInputValue(root, key(s, 'RoomTemp'), fmtInput(active.roomTemp, 2));
 
-  setInner(root, '[data-vent-dynamic="result"]', mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent));
+  setInner(root, '[data-vent-dynamic="result"]', renderResultModel(buildVentilationResultModel(active, r, accent), accent));
   setInner(root, '[data-vent-dynamic="air-stats"]', renderAirStats(r));
   setInner(root, '[data-vent-dynamic="formula"]', `Q = V̇ × (ρ × cₚ / 3,6) × ΔT / 1000 · Wärmewert = ${fmt(r.factor, 3)} Wh/(m³·K)`);
 
