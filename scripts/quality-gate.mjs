@@ -25,6 +25,8 @@ const commands = [
   ['node', ['tests/ventilation-phase19b2c-hydrator-final.test.mjs']],
   ['node', ['tests/ventilation-phase19b3-result-renderer.test.mjs']],
   ['node', ['tests/ventilation-phase19c-dynamic-renderer.test.mjs']],
+  ['node', ['tests/ventilation-phase19d-platform-contract.test.mjs']],
+  ['node', ['tests/ventilation-phase19d-project-storage-import.test.mjs']],
   ['node', ['tests/rainwater-global-standard.test.mjs']],
   ['node', ['tests/rainwater-phase14c.test.mjs']],
   ['node', ['tests/rainwater-phase14d.test.mjs']],
