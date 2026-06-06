@@ -5,11 +5,17 @@ const eventPipeline = readFileSync('js/core/eventPipeline.js', 'utf8');
 assert.match(eventPipeline, /export function registerPipelineCommitHandler/, 'eventPipeline must expose central commit hooks');
 assert.match(eventPipeline, /__tcCommitHandlers/, 'eventPipeline must keep commit hooks inside the platform');
 
-for (const file of ['js/modules/buffer-storage/index.js', 'js/modules/pressure-holding/index.js']) {
+for (const file of ['js/modules/buffer-storage/index.js']) {
   const src = readFileSync(file, 'utf8');
   assert.match(src, /bindSavedRecordWorkflow/, `${file} must use the central saved-record workflow`);
   assert.doesNotMatch(src, /\.addEventListener\s*\(/, `${file} must not bind module-local DOM events`);
 }
+
+const pressureHolding = readFileSync('js/modules/pressure-holding/index.js', 'utf8');
+assert.match(pressureHolding, /createSavedRecordActions/, 'pressure-holding must use central saved-record actions');
+assert.match(pressureHolding, /registerCentralActions/, 'pressure-holding saved-record actions must use the central action registry');
+assert.doesNotMatch(pressureHolding, /bindSavedRecordWorkflow/, 'pressure-holding must not use the legacy saved-record workflow after phase 20B.2');
+assert.doesNotMatch(pressureHolding, /\.addEventListener\s*\(/, 'pressure-holding must not bind module-local DOM events');
 
 const rainwater = readFileSync('js/modules/rainwater/index.js', 'utf8');
 const controller = readFileSync('js/modules/rainwater/controller.js', 'utf8');

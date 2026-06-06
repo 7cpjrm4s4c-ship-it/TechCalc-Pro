@@ -9,7 +9,7 @@ export default defineModuleConfig({
   order: 15,
   defaultVisible: false,
 
-  migrationStatus: 'phase-16e-event-pipeline-consolidation',
-  capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA],
+  migrationStatus: 'phase-16e-event-pipeline-consolidation phase-20b2-saved-record-controller',
+  capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS],
   description: 'Auslegung von MAG und dynamischer Druckhaltung für Heiz- und Kühlwassersysteme nach Reflex-Berechnungsgrundlagen.'
 });

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T18:20:05.092Z",
+  "generatedAt": "2026-06-06T19:27:31.789Z",
   "contractTarget": "1.3.0",
   "modules": [
     {
@@ -131,12 +131,11 @@
         "ph-warnings",
         "ph-warning",
         "ph-saved-list",
-        "ph-saved-item",
-        "line-section-card",
-        "is-collapsed",
-        "is-active",
-        "data-line-card",
-        "data-ph-select"
+        "ph-help",
+        "ph-formula",
+        "span-6",
+        "pre-save",
+        "pre-update"
       ]
     },
     {

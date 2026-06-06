@@ -2,10 +2,12 @@ import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, resultRows, esc } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, esc } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-import { bindSavedRecordWorkflow } from '../../core/savedRecordController.js';
+import { createSavedRecordActions } from '../../core/savedRecordController.js';
+import { renderSavedRecordList, renderSavedRecordPanel, bindEditModeClear } from '../../core/savedRecords.js';
+import { commitAllFields, registerCentralActions } from '../../core/eventPipeline.js';
 
 const opts = (items) => items.map(([value,label]) => ({ value, label }));
 
@@ -39,34 +41,67 @@ function savedPlantSnapshot(s, r){
   };
 }
 
-function savedPlantRows(items = []){
-  if(!items.length) return '<div class="empty-state empty-state--compact ph-note">Noch keine Anlagen gespeichert.</div>';
-  return `<div class="tc-saved-list ph-saved-list">${items.map(item => {
-    const res = item.result || {};
-    const subtitle = [res.productLabel, res.selectedStandardVolume ? `${fmt(res.selectedStandardVolume,0)} l` : '', res.systemVolume ? `VA ${fmt(res.systemVolume,0)} l` : ''].filter(Boolean).join(' · ');
-    return `<article class="ph-saved-item line-section-card is-collapsed ${state.get().activePlantId === item.id ? 'is-active' : ''}" data-line-card data-ph-select="${esc(item.id)}">
-      <div class="line-section-card__head">
-        <div class="line-section-card__title" ><strong>${esc(item.name || 'Anlage')}</strong><small>${esc(subtitle || 'gespeicherte Druckhaltung')}</small></div>
-        <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Gespeicherte Anlage aufklappen"><span>▾</span></button>
-        <button type="button" class="line-section-card__delete" data-ph-delete="${esc(item.id)}" aria-label="Anlage löschen">×</button>
-      </div>
-      <div class="line-section-card__body">${resultRows([
-        { label:'Station / Gefäß', value:res.productLabel || '—' },
-        { label:'Normvolumen', value:res.selectedStandardVolume ? fmt(res.selectedStandardVolume,0) : '—', unit:res.selectedStandardVolume ? 'Liter' : '' },
-        { label:'Mindestbetriebsdruck p₀', value:res.p0 !== undefined ? fmt(res.p0,2) : '—', unit:res.p0 !== undefined ? 'bar' : '' },
-        { label:'Enddruck pₑ', value:res.pe !== undefined ? fmt(res.pe,2) : '—', unit:res.pe !== undefined ? 'bar' : '' }
-      ])}</div>
-    </article>`;
-  }).join('')}</div>`;
+function savedPlantStats(item = {}){
+  const res = item.result || {};
+  return [
+    { label:'Station / Gefäß', value:res.productLabel || '—' },
+    { label:'Normvolumen', value:res.selectedStandardVolume ? fmt(res.selectedStandardVolume,0) : '—', unit:res.selectedStandardVolume ? 'Liter' : '' },
+    { label:'Mindestbetriebsdruck p₀', value:res.p0 !== undefined ? fmt(res.p0,2) : '—', unit:res.p0 !== undefined ? 'bar' : '' },
+    { label:'Enddruck pₑ', value:res.pe !== undefined ? fmt(res.pe,2) : '—', unit:res.pe !== undefined ? 'bar' : '' }
+  ];
+}
+
+function savedPlantSubtitle(item = {}){
+  const res = item.result || {};
+  return [
+    res.productLabel,
+    res.selectedStandardVolume ? `${fmt(res.selectedStandardVolume,0)} l` : '',
+    res.systemVolume ? `VA ${fmt(res.systemVolume,0)} l` : ''
+  ].filter(Boolean).join(' · ');
+}
+
+function savedPlantRows(s){
+  return renderSavedRecordList(Array.isArray(s.savedPlants) ? s.savedPlants : [], {
+    activeId: s.activePlantId,
+    expandedId: s.expandedPlantId,
+    emptyText: 'Noch keine Anlagen gespeichert.',
+    title: item => item.name || 'Anlage',
+    subtitle: savedPlantSubtitle,
+    stats: savedPlantStats,
+    className: 'ph-saved-list'
+  });
 }
 
 function savedPlantsCard(s){
-  return card('Anlagen speichern', stack([
-    field({ id:'plantName', label:'Anlagenbezeichnung', value:s.plantName || '', placeholder:'z. B. Heizzentrale BT A', inputmode:'text' }),
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-ph-save ${s.activePlantId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-ph-update ${s.activePlantId ? '' : 'disabled'}>Aktualisieren</button></div>`,
-    savedPlantRows(Array.isArray(s.savedPlants) ? s.savedPlants : [])
-  ].join('')), 'purple');
+  return renderSavedRecordPanel({
+    title: 'Anlagen speichern',
+    nameFieldId: 'plantName',
+    nameLabel: 'Anlagenbezeichnung',
+    nameValue: s.plantName || '',
+    namePlaceholder: 'z. B. Heizzentrale BT A',
+    addAction: 'pressure:save',
+    updateAction: 'pressure:update',
+    addDisabled: Boolean(s.activePlantId),
+    updateDisabled: !s.activePlantId,
+    listHtml: savedPlantRows(s),
+    accent: 'purple'
+  });
 }
+
+function hydrateSavedPlant(item, current){
+  return {
+    ...(item.state || {}),
+    savedPlants: current.savedPlants || [],
+    activePlantId: item.id,
+    expandedPlantId: current.expandedPlantId || null,
+    plantName: item.name || item.state?.plantName || ''
+  };
+}
+
+function clearSavedPlant(){
+  return { activePlantId: null, plantName: '' };
+}
+
 
 function explain(s){
   if(s.holdingType === 'mag'){
@@ -152,29 +187,38 @@ function view(s){
 }
 
 function bindPressureHoldingActions(root){
-  bindSavedRecordWorkflow(root, {
+  bindEditModeClear(root, {
+    state,
+    activeIdKey: 'activePlantId',
+    nameKey: 'plantName'
+  });
+
+  const actions = createSavedRecordActions({
+    root,
     state,
     calculate,
     snapshot: savedPlantSnapshot,
-    hydrate: (item, current) => ({
-      ...(item.state || {}),
-      savedPlants: current.savedPlants || [],
-      activePlantId: item.id,
-      plantName: item.name || item.state?.plantName || ''
-    }),
-    clear: () => ({}),
+    hydrate: hydrateSavedPlant,
+    clear: clearSavedPlant,
     listKey: 'savedPlants',
     activeIdKey: 'activePlantId',
+    expandedIdKey: 'expandedPlantId',
     nameKey: 'plantName',
     recordPrefix: 'pressure',
-    saveSelector: '[data-ph-save]',
-    updateSelector: '[data-ph-update]',
-    loadAttr: 'data-ph-select',
-    deleteAttr: 'data-ph-delete',
+    beforeCreate: ({ root: host }) => commitAllFields(host || root, state, { action: 'pressure:pre-save', notify: false }),
+    beforeUpdate: ({ root: host }) => commitAllFields(host || root, state, { action: 'pressure:pre-update', notify: false }),
     preserveSaveScroll: true,
-    preserveLoadScroll: true,
-    clearOnOutsideClick: true
+    preserveLoadScroll: true
+  });
+
+  registerCentralActions(root, {
+    'pressure:save': actions.save,
+    'pressure:update': actions.update,
+    'saved:load': actions.load,
+    'saved:delete': actions.delete,
+    'saved:toggle': actions.toggle
   });
 }
+
 
 export default { config, schema, state, mount(root){ return mountModule(root, state, view, bindPressureHoldingActions); } };

@@ -74,7 +74,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-16e-event-pipeline-consolidation"
+      "migrationStatus": "phase-16e-event-pipeline-consolidation phase-20b2-saved-record-controller"
     },
     {
       "id": "rainwater",
