@@ -3,10 +3,11 @@ import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, segmented, renderModuleShell, stack, grid, inlineStats, mainResult, bindCommonInputs, bindNoClickScroll } from '../../core/renderer.js';
+import { card, field, segmented, renderModuleShell, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
 import { registerCentralActions } from '../../core/eventPipeline.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
+import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 
 const MODE_PREFIX = { heating: 'heating', cooling: 'cooling' };
 function prefixFor(s) { return MODE_PREFIX[s.mode] || 'heating'; }
@@ -471,36 +472,19 @@ function isDynamicVentilationAction(meta = {}) {
   return String(meta.action || '') !== 'initial';
 }
 
-function mountVentilation(root) {
-  if (!root) return () => {};
-  bindNoClickScroll(root);
-
-  const fullRender = (snapshot = state.get()) => {
-    root.innerHTML = view(snapshot);
-    root.__tcVentilationDynamic = null;
-    bindCommonInputs(root, state);
-    const active = activeCalculationState(snapshot);
-    const modeLabel = snapshot.mode === 'cooling' ? 'Kälte' : 'Heizung';
-    bindVentilationLineSections(root, calculate(active), active, modeLabel, fullRender);
-    updateVentilationDynamic(root, snapshot, { action: 'initial', changed: [] });
-  };
-
-  fullRender(state.get());
-  const unsubscribe = state.subscribe((snapshot, meta = {}) => {
-    if (isDynamicVentilationAction(meta)) {
-      updateVentilationDynamic(root, snapshot, meta);
-      return;
-    }
-    fullRender(snapshot);
-  });
-  return () => { if (typeof unsubscribe === 'function') unsubscribe(); };
+function bindVentilationPlatform(root, snapshot = state.get()) {
+  const active = activeCalculationState(snapshot);
+  const modeLabel = snapshot.mode === 'cooling' ? 'Kälte' : 'Heizung';
+  bindVentilationLineSections(root, calculate(active), active, modeLabel);
 }
 
-export default {
+export default createPlatformModule({
   config,
   schema,
   state,
-  mount(root) {
-    return mountVentilation(root);
-  }
-};
+  calculate,
+  view,
+  bind: bindVentilationPlatform,
+  dynamicUpdate: updateVentilationDynamic,
+  isDynamicAction: isDynamicVentilationAction
+});

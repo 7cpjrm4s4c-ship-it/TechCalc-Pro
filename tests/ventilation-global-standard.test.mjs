@@ -11,10 +11,11 @@ assert.match(config.migrationStatus, /^phase-13[a-e]-ventilation-/, 'ventilation
 assert.ok(module.schema, 'ventilation module exposes schema');
 assert.ok(schema.fields.some(field => field.key === 'mode'), 'mode is schema-defined');
 
-const fullRenderMatches = source.match(/root\.innerHTML\s*=\s*view\(/g) || [];
-assert.equal(fullRenderMatches.length, 1, 'only initial full render is allowed');
-assert.match(source, /function updateVentilationDynamic/, 'dynamic island updater exists');
-assert.match(source, /function mountVentilation/, 'custom store-first mount exists');
+assert.match(source, /createPlatformModule\(\{/, 'ventilation uses platform module runtime');
+assert.doesNotMatch(source, /function mountVentilation/, 'legacy custom mount has been removed');
+assert.doesNotMatch(source, /root\.innerHTML\s*=\s*view\(/, 'module no longer owns full-render innerHTML');
+assert.match(source, /function updateVentilationDynamic/, 'dynamic island updater exists as platform adapter');
+assert.match(source, /bind:\s*bindVentilationPlatform/, 'saved-line binding is provided through platform bind hook');
 assert.match(source, /registerCentralActions\(root/, 'saved actions use central event pipeline');
 assert.match(source, /data-vent-dynamic="input-fields"/, 'input fields are dynamic island');
 assert.match(source, /data-vent-dynamic="result"/, 'result area is dynamic island');

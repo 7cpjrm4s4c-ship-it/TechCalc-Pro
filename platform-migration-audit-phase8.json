@@ -104,7 +104,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": false,
-      "migrationStatus": "phase-13e-ventilation-temperature-render-fix"
+      "migrationStatus": "phase-13e-ventilation-temperature-render-fix phase-19b1-platform-mount"
     },
     {
       "id": "wastewater",

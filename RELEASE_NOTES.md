@@ -860,3 +860,10 @@
 - `controller.js` now focuses on state derivation, line-section records and hydration.
 - `view.js` imports `inputFields()` from the dedicated view model.
 - Keeps the restored ordered UI layout unchanged while tightening module responsibilities.
+
+
+## Phase 19B.1 – Lüftung Platform Mount
+- Lüftung an `createPlatformModule(...)` angebunden.
+- Eigenen `mountVentilation()` entfernt.
+- State um LineSection-Felder ergänzt.
+- Bestehende View/Dynamic/Saved-Line-Adapter bewusst stabil belassen.
