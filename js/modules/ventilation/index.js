@@ -126,13 +126,6 @@ const ventilationLineSectionController = createLineSectionController({
   hydrateRecord: ({ item, currentState }) => savedVentilationPatch(item, currentState)
 });
 
-export function readVentilationLineSections() {
-  return ventilationLineSectionController.read();
-}
-
-export function writeVentilationLineSections(items) {
-  ventilationLineSectionController.write(items);
-}
 
 function activeCalculationState(s) {
   const active = {
@@ -319,7 +312,7 @@ function updateVentilationDynamic(root, s, meta = {}) {
   const changed = Array.isArray(meta.changed) ? meta.changed : [];
   const modeChanged = previous.mode !== s.mode || changed.includes('mode');
   const targetChanged = previous.calcTarget !== active.calcTarget || previousPrefix !== currentPrefix || changed.includes(key(s, 'CalcTarget'));
-  const lineStructural = /^(line:|saved:|vent-line:)/.test(action);
+  const lineStructural = /^(line:|saved:)/.test(action);
   const appStructural = /^(record:|module:|replace|reset)/.test(action);
   const resultDetails = [
     { label: 'Leistung', value: fmt(r.powerKw), unit: 'kW' },

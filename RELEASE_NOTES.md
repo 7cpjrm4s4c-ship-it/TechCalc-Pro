@@ -1,3 +1,10 @@
+## Phase 19B.2D - Ventilation SavedRecord Cleanup
+
+- Removed legacy ventilation line-section wrapper exports (`readVentilationLineSections`, `writeVentilationLineSections`).
+- Removed legacy `vent-line:*` dynamic action namespace from ventilation structural update detection.
+- Verified cleanup search for `vent-line`, `data-vent-line`, `bindVentilationLineSections`, `readVentilationLineSections`, `writeVentilationLineSections` in the ventilation module and platform paths.
+- Quality gate passed.
+
 
 ## Phase 18D - Heizung/Kälte Reference Consolidation
 
