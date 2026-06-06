@@ -3,7 +3,7 @@
   "schemaModules": 11,
   "centralNumberService": 11,
   "legacyNumberParsers": 0,
-  "centralSavedRecords": 5,
+  "centralSavedRecords": 4,
   "legacyClassModules": 7,
   "modules": [
     {
@@ -102,7 +102,7 @@
       "schemaFile": true,
       "usesCentralNumberService": true,
       "legacyNumberParsers": 0,
-      "usesCentralSavedRecords": true,
+      "usesCentralSavedRecords": false,
       "hasLegacyModuleClasses": false,
       "migrationStatus": "phase-13e-ventilation-temperature-render-fix phase-19b1-platform-mount"
     },

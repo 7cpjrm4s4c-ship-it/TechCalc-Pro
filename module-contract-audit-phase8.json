@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T11:52:52.714Z",
+  "generatedAt": "2026-06-06T15:57:39.317Z",
   "contractTarget": "1.3.0",
   "modules": [
     {
@@ -166,18 +166,18 @@
       "exposesSchema": true,
       "legacyRendererImports": 1,
       "ownUiClassSamples": [
-        "data-vent-line-select",
-        "data-line-toggle",
-        "data-line-delete",
-        "action-button",
-        "data-tc-action",
-        "vent-line",
-        "data-vent-line-save",
-        "data-vent-line-update",
-        "data-vent-dynamic",
         "line-sections",
-        "data-line-card",
-        "mode-segment"
+        "data-vent-dynamic",
+        "mode-segment",
+        "target-segment",
+        "input-fields",
+        "air-stats",
+        "span-6",
+        "data-field",
+        "data-segment",
+        "is-active",
+        "aria-selected",
+        "card--accent-"
       ]
     },
     {

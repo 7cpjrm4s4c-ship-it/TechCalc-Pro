@@ -867,3 +867,11 @@
 - Eigenen `mountVentilation()` entfernt.
 - State um LineSection-Felder ergänzt.
 - Bestehende View/Dynamic/Saved-Line-Adapter bewusst stabil belassen.
+
+
+## Phase 19B.2B - Ventilation LineSectionController
+- Lüftung Leitungsabschnitte auf `platform/lineSectionController` umgestellt.
+- Modulinterne `vent-line:save/update/load/delete/toggle`-Pfadlogik entfernt.
+- `ventLineSections`, `activeVentLineSectionId`, `activeVentLineSectionName` und `expandedVentLineSectionId` sind jetzt der einzige State-Pfad.
+- Regression `ventilation-phase19b2b-line-section-controller` ergänzt.
+- `npm test` erfolgreich.

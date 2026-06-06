@@ -16,12 +16,12 @@ assert.doesNotMatch(source, /function mountVentilation/, 'legacy custom mount ha
 assert.doesNotMatch(source, /root\.innerHTML\s*=\s*view\(/, 'module no longer owns full-render innerHTML');
 assert.match(source, /function updateVentilationDynamic/, 'dynamic island updater exists as platform adapter');
 assert.match(source, /bind:\s*bindVentilationPlatform/, 'saved-line binding is provided through platform bind hook');
-assert.match(source, /registerCentralActions\(root/, 'saved actions use central event pipeline');
+assert.match(source, /createLineSectionController\(\{/, 'saved actions use central line-section controller');
 assert.match(source, /data-vent-dynamic="input-fields"/, 'input fields are dynamic island');
 assert.match(source, /data-vent-dynamic="result"/, 'result area is dynamic island');
-assert.match(source, /data-vent-dynamic="line-sections"/, 'saved records are dynamic island');
+assert.match(source, /data-hc-dynamic="line-sections"/, 'saved records use shared line-section dynamic island');
 assert.match(source, /expandedVentLineSectionId/, 'accordion expanded state is store-backed');
-assert.match(source, /shouldSkipDuplicateAction/, 'save/update actions are deduplicated');
+assert.doesNotMatch(source, /shouldSkipDuplicateAction/, 'save/update dedupe is no longer module-owned');
 
 assert.match(source, /function derivedDeltaTField/, 'temperature difference is rendered by a dedicated derived field');
 assert.match(source, /readonly:\s*true/, 'temperature difference field is read-only');

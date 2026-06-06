@@ -4,10 +4,9 @@ import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { card, field, segmented, renderModuleShell, stack, grid, inlineStats, mainResult } from '../../core/renderer.js';
-import { registerCentralActions } from '../../core/eventPipeline.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 
 const MODE_PREFIX = { heating: 'heating', cooling: 'cooling' };
 function prefixFor(s) { return MODE_PREFIX[s.mode] || 'heating'; }
@@ -15,15 +14,8 @@ function key(s, name) { return `${prefixFor(s)}${name}`; }
 function activeValue(s, name) { return s[key(s, name)]; }
 
 
-let ventilationLineSectionsMemory = [];
-export function readVentilationLineSections() {
-  return Array.isArray(ventilationLineSectionsMemory) ? [...ventilationLineSectionsMemory] : [];
-}
-export function writeVentilationLineSections(items) {
-  ventilationLineSectionsMemory = Array.isArray(items) ? [...items] : [];
-}
 
-function ventilationLineSectionStats(item) {
+function ventilationLineSectionStats(item = {}) {
   return [
     { label: 'Leistung', value: item.powerKw || '—', unit: item.powerKw && item.powerKw !== '—' ? 'kW' : '' },
     { label: 'Volumenstrom', value: item.volumeFlowM3h || '—', unit: item.volumeFlowM3h && item.volumeFlowM3h !== '—' ? 'm³/h' : '' },
@@ -33,26 +25,6 @@ function ventilationLineSectionStats(item) {
     { label: 'Raum', value: item.roomTemp || '—', unit: item.roomTemp && item.roomTemp !== '—' ? '°C' : '' },
     { label: 'Betriebsart', value: item.modeLabel || '—' }
   ];
-}
-
-function ventilationLineSectionsCard(r, active, modeLabel) {
-  const snapshot = state.get();
-  const items = Array.isArray(snapshot.ventLineSections) ? snapshot.ventLineSections : readVentilationLineSections();
-  const rows = renderSavedRecordList(items, {
-    activeId: snapshot.activeVentLineSectionId,
-    expandedId: snapshot.expandedVentLineSectionId,
-    emptyText: 'Noch keine Leitungsabschnitte angelegt',
-    loadAttr: 'data-vent-line-select',
-    toggleAttr: 'data-line-toggle',
-    deleteAttr: 'data-line-delete',
-    title: item => item.name || 'Abschnitt',
-    stats: item => ventilationLineSectionStats(item)
-  });
-  return card('Leitungsabschnitte', stack([
-    `<div class="field"><label for="ventLineSectionName">Bezeichnung</label><div class="control"><input id="ventLineSectionName" type="text" placeholder="z. B. Zuluft Büro Nord" autocomplete="off" value="${(snapshot.activeVentLineSectionName || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></div></div>`,
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-tc-action="vent-line:save" data-vent-line-save ${snapshot.activeVentLineSectionId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-tc-action="vent-line:update" data-vent-line-update ${snapshot.activeVentLineSectionId ? '' : 'disabled'}>Aktualisieren</button></div>`,
-    `<div data-vent-dynamic="line-sections">${rows}</div>`
-  ].join('')), 'cyan');
 }
 
 function buildVentilationLineSectionRecord(currentState, r, active, modeLabel, items, id, name, existing = null) {
@@ -118,90 +90,42 @@ function savedVentilationPatch(item, currentState) {
   };
 }
 
-function bindVentilationLineSections(root, r, active, modeLabel, rerender) {
-  bindEditModeClear(root, { state, activeIdKey: 'activeVentLineSectionId', nameKey: 'activeVentLineSectionName' });
 
-  const currentResult = () => calculate(activeCalculationState(state.get()));
-  const currentItems = () => {
-    const snapshot = state.get();
-    return Array.isArray(snapshot.ventLineSections) ? snapshot.ventLineSections : readVentilationLineSections();
-  };
-  const persistLineSections = (items, patch = {}, action = 'vent-line:update') => {
-    const next = Array.isArray(items) ? [...items] : [];
-    ventilationLineSectionsMemory = next;
-    state.set({ ventLineSections: next, ...patch }, { action });
-  };
-  const shouldSkipDuplicateAction = action => {
-    const now = Date.now();
-    const last = root.__tcLastVentilationLineAction || {};
-    if (last.action === action && now - Number(last.at || 0) < 700) return true;
-    root.__tcLastVentilationLineAction = { action, at: now };
-    return false;
-  };
-  const currentModeLabel = () => state.get().mode === 'cooling' ? 'Kälte' : 'Heizung';
+const ventilationLineSectionController = createLineSectionController({
+  state,
+  listKey: 'ventLineSections',
+  activeIdKey: 'activeVentLineSectionId',
+  nameKey: 'activeVentLineSectionName',
+  expandedIdKey: 'expandedVentLineSectionId',
+  recordPrefix: 'vent',
+  cardTitle: 'Leitungsabschnitte',
+  nameInputId: 'ventLineSectionName',
+  namePlaceholder: 'z. B. Zuluft Büro Nord',
+  emptyText: 'Noch keine Leitungsabschnitte angelegt',
+  accent: 'cyan',
+  dynamicAttr: 'line-sections',
+  title: item => item.name || 'Abschnitt',
+  stats: ventilationLineSectionStats,
+  currentResult: () => calculate(activeCalculationState(state.get())),
+  buildRecord: ({ currentState, result, items, id, name, existing }) => buildVentilationLineSectionRecord(
+    currentState,
+    result,
+    activeCalculationState(currentState),
+    currentState.mode === 'cooling' ? 'Kälte' : 'Heizung',
+    items,
+    id,
+    name,
+    existing
+  ),
+  hydrateRecord: ({ item, currentState }) => savedVentilationPatch(item, currentState)
+});
 
-  const saveCurrentLine = ({ root: actionRoot } = {}) => {
-    if (shouldSkipDuplicateAction('vent-line:save')) return;
-    const host = actionRoot || root;
-    const name = host.querySelector('#ventLineSectionName')?.value?.trim() || '';
-    const currentState = state.get();
-    const activeState = activeCalculationState(currentState);
-    const items = currentItems();
-    const id = createRecordId('vent');
-    const item = buildVentilationLineSectionRecord({ ...currentState, activeVentLineSectionId: null, activeVentLineSectionName: name }, currentResult(), activeState, currentModeLabel(), items, id, name);
-    persistLineSections([item, ...items], { activeVentLineSectionId: null, activeVentLineSectionName: '', expandedVentLineSectionId: state.get().expandedVentLineSectionId }, 'vent-line:save');
-  };
+export function readVentilationLineSections() {
+  return ventilationLineSectionController.read();
+}
 
-  const updateCurrentLine = ({ root: actionRoot } = {}) => {
-    if (shouldSkipDuplicateAction('vent-line:update')) return;
-    const host = actionRoot || root;
-    const currentState = state.get();
-    const id = currentState.activeVentLineSectionId;
-    if (!id) return;
-    const name = host.querySelector('#ventLineSectionName')?.value?.trim() || '';
-    const items = currentItems();
-    const existing = items.find(entry => isSameId(entry.id, id));
-    if (!existing) return;
-    const activeState = activeCalculationState(currentState);
-    const item = buildVentilationLineSectionRecord(currentState, currentResult(), activeState, currentModeLabel(), items, id, name, existing);
-    persistLineSections(replaceRecord(items, id, item), { activeVentLineSectionId: id, activeVentLineSectionName: item.name, expandedVentLineSectionId: state.get().expandedVentLineSectionId }, 'vent-line:update');
-  };
-
-  const loadLine = id => {
-    const item = currentItems().find(entry => isSameId(entry.id, id));
-    if (!item) return;
-    if (isSameId(state.get().activeVentLineSectionId, id)) {
-      state.set({ activeVentLineSectionId: null, activeVentLineSectionName: '', expandedVentLineSectionId: state.get().expandedVentLineSectionId }, { action: 'vent-line:deselect' });
-      return;
-    }
-    state.set({ ...savedVentilationPatch(item, state.get()), expandedVentLineSectionId: state.get().expandedVentLineSectionId }, { action: 'vent-line:select' });
-  };
-
-  const deleteLine = id => {
-    const next = removeRecord(currentItems(), id);
-    const patch = isSameId(state.get().activeVentLineSectionId, id)
-      ? { activeVentLineSectionId: null, activeVentLineSectionName: '', expandedVentLineSectionId: null }
-      : (isSameId(state.get().expandedVentLineSectionId, id) ? { expandedVentLineSectionId: null } : {});
-    persistLineSections(next, patch, 'vent-line:delete');
-  };
-
-  const toggleLine = element => {
-    const card = element?.closest?.('[data-line-card]');
-    if (!card) return;
-    const id = card.getAttribute('data-vent-line-select');
-    if (!id) return;
-    const currentExpanded = state.get().expandedVentLineSectionId;
-    const willOpen = !isSameId(currentExpanded, id);
-    state.set({ expandedVentLineSectionId: willOpen ? id : null }, { action: 'vent-line:toggle' });
-  };
-
-  registerCentralActions(root, {
-    'vent-line:save': saveCurrentLine,
-    'vent-line:update': updateCurrentLine,
-    'saved:load': ({ element }) => loadLine(element?.getAttribute('data-vent-line-select') || element?.closest?.('[data-vent-line-select]')?.getAttribute('data-vent-line-select')),
-    'saved:delete': ({ element }) => deleteLine(element?.getAttribute('data-line-delete')),
-    'saved:toggle': ({ element }) => toggleLine(element)
-  });
+export function writeVentilationLineSections(items) {
+  ventilationLineSectionController.write(items);
 }
 
 function activeCalculationState(s) {
@@ -324,7 +248,7 @@ function view(s) {
   const outputColumn = stack([
     `<div data-vent-dynamic="result">${mainResult(`Ergebnis — ${targetLabel(active.calcTarget)}`, targetMain(active.calcTarget, r), resultDetails, accent)}</div>`,
     `<div data-vent-dynamic="air-stats">${airStats}</div>`,
-    ventilationLineSectionsCard(r, active, modeLabel)
+    ventilationLineSectionController.renderCard(s)
   ].join(''));
 
   return renderModuleShell(config, `
@@ -368,28 +292,6 @@ function setCardTitle(root, selector, title) {
   if (titleEl && titleEl.textContent !== title) titleEl.textContent = title;
 }
 
-function renderVentLineSectionRows(s) {
-  const items = Array.isArray(s.ventLineSections) ? s.ventLineSections : readVentilationLineSections();
-  return renderSavedRecordList(items, {
-    activeId: s.activeVentLineSectionId,
-    expandedId: s.expandedVentLineSectionId,
-    emptyText: 'Noch keine Leitungsabschnitte angelegt',
-    loadAttr: 'data-vent-line-select',
-    toggleAttr: 'data-line-toggle',
-    deleteAttr: 'data-line-delete',
-    title: item => item.name || 'Abschnitt',
-    stats: item => ventilationLineSectionStats(item)
-  });
-}
-
-function updateVentSaveControls(root, s) {
-  const nameInput = root?.querySelector?.('#ventLineSectionName');
-  if (nameInput && document.activeElement !== nameInput) nameInput.value = s.activeVentLineSectionName || '';
-  const saveButton = root?.querySelector?.('[data-vent-line-save]');
-  const updateButton = root?.querySelector?.('[data-vent-line-update]');
-  if (saveButton) saveButton.disabled = Boolean(s.activeVentLineSectionId);
-  if (updateButton) updateButton.disabled = !s.activeVentLineSectionId;
-}
 
 function renderAirStats(r) {
   return card('Luftkennwerte aktuell', inlineStats([
@@ -411,7 +313,7 @@ function updateVentilationDynamic(root, s, meta = {}) {
   const changed = Array.isArray(meta.changed) ? meta.changed : [];
   const modeChanged = previous.mode !== s.mode || changed.includes('mode');
   const targetChanged = previous.calcTarget !== active.calcTarget || previousPrefix !== currentPrefix || changed.includes(key(s, 'CalcTarget'));
-  const lineStructural = /^(vent-line:|saved:)/.test(action);
+  const lineStructural = /^(line:|saved:|vent-line:)/.test(action);
   const appStructural = /^(record:|module:|replace|reset)/.test(action);
   const resultDetails = [
     { label: 'Leistung', value: fmt(r.powerKw), unit: 'kW' },
@@ -457,8 +359,8 @@ function updateVentilationDynamic(root, s, meta = {}) {
   setInner(root, '[data-vent-dynamic="formula"]', `Q = V̇ × (ρ × cₚ / 3,6) × ΔT / 1000 · Wärmewert = ${fmt(r.factor, 3)} Wh/(m³·K)`);
 
   if (lineStructural || appStructural || changed.includes('ventLineSections') || changed.includes('activeVentLineSectionId') || changed.includes('activeVentLineSectionName') || changed.includes('expandedVentLineSectionId')) {
-    updateVentSaveControls(root, s);
-    setInner(root, '[data-vent-dynamic="line-sections"]', renderVentLineSectionRows(s));
+    ventilationLineSectionController.updateControls(root, s);
+    setInner(root, '[data-hc-dynamic="line-sections"]', ventilationLineSectionController.renderRows(s));
   }
 
   root.__tcVentilationDynamic = {
@@ -472,10 +374,8 @@ function isDynamicVentilationAction(meta = {}) {
   return String(meta.action || '') !== 'initial';
 }
 
-function bindVentilationPlatform(root, snapshot = state.get()) {
-  const active = activeCalculationState(snapshot);
-  const modeLabel = snapshot.mode === 'cooling' ? 'Kälte' : 'Heizung';
-  bindVentilationLineSections(root, calculate(active), active, modeLabel);
+function bindVentilationPlatform(root) {
+  ventilationLineSectionController.bind(root);
 }
 
 export default createPlatformModule({
