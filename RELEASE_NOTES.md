@@ -875,3 +875,9 @@
 - `ventLineSections`, `activeVentLineSectionId`, `activeVentLineSectionName` und `expandedVentLineSectionId` sind jetzt der einzige State-Pfad.
 - Regression `ventilation-phase19b2b-line-section-controller` ergänzt.
 - `npm test` erfolgreich.
+## 1.3.0 – Phase 19B.2C Lüftung Saved-Record-Island
+
+- Lüftung nutzt für Leitungsabschnitt-Saved-Records jetzt den neutralen `data-line-dynamic`-Dynamic-Island-Vertrag.
+- `createLineSectionController` unterstützt `dynamicDataAttr` und hält die Heizung/Kälte-Kompatibilität übergangsweise aufrecht.
+- Neue Regression: `ventilation-phase19b2c-saved-record-island`.
+

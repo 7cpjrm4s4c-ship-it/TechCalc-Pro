@@ -104,6 +104,7 @@ const ventilationLineSectionController = createLineSectionController({
   emptyText: 'Noch keine Leitungsabschnitte angelegt',
   accent: 'cyan',
   dynamicAttr: 'line-sections',
+  dynamicDataAttr: 'data-line-dynamic',
   title: item => item.name || 'Abschnitt',
   stats: ventilationLineSectionStats,
   currentResult: () => calculate(activeCalculationState(state.get())),
@@ -360,7 +361,7 @@ function updateVentilationDynamic(root, s, meta = {}) {
 
   if (lineStructural || appStructural || changed.includes('ventLineSections') || changed.includes('activeVentLineSectionId') || changed.includes('activeVentLineSectionName') || changed.includes('expandedVentLineSectionId')) {
     ventilationLineSectionController.updateControls(root, s);
-    setInner(root, '[data-hc-dynamic="line-sections"]', ventilationLineSectionController.renderRows(s));
+    setInner(root, '[data-line-dynamic="line-sections"]', ventilationLineSectionController.renderRows(s));
   }
 
   root.__tcVentilationDynamic = {

@@ -21,6 +21,7 @@ const commands = [
   ['node', ['tests/heating-cooling-phase18d2-viewmodel-split.test.mjs']],
   ['node', ['tests/ventilation-global-standard.test.mjs']],
   ['node', ['tests/ventilation-phase13e.test.mjs']],
+  ['node', ['tests/ventilation-phase19b2c-saved-record-island.test.mjs']],
   ['node', ['tests/rainwater-global-standard.test.mjs']],
   ['node', ['tests/rainwater-phase14c.test.mjs']],
   ['node', ['tests/rainwater-phase14d.test.mjs']],

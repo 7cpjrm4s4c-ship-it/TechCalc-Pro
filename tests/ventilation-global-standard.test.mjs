@@ -19,7 +19,7 @@ assert.match(source, /bind:\s*bindVentilationPlatform/, 'saved-line binding is p
 assert.match(source, /createLineSectionController\(\{/, 'saved actions use central line-section controller');
 assert.match(source, /data-vent-dynamic="input-fields"/, 'input fields are dynamic island');
 assert.match(source, /data-vent-dynamic="result"/, 'result area is dynamic island');
-assert.match(source, /data-hc-dynamic="line-sections"/, 'saved records use shared line-section dynamic island');
+assert.match(source, /data-line-dynamic="line-sections"/, 'saved records use neutral line-section dynamic island');
 assert.match(source, /expandedVentLineSectionId/, 'accordion expanded state is store-backed');
 assert.doesNotMatch(source, /shouldSkipDuplicateAction/, 'save/update dedupe is no longer module-owned');
 

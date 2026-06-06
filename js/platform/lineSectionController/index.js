@@ -20,6 +20,7 @@ export function createLineSectionController({
   emptyText = 'Noch keine Leitungsabschnitte angelegt',
   accent = 'blue',
   dynamicAttr = 'line-sections',
+  dynamicDataAttr = 'data-line-dynamic',
   stats = () => [],
   title = item => item?.name || 'Abschnitt',
   currentResult = () => ({}),
@@ -59,7 +60,7 @@ export function createLineSectionController({
   const renderCard = (snapshot = state?.get?.() || {}) => card(cardTitle, stack([
     `<div class="field"><label for="${nameInputId}">${nameLabel}</label><div class="control"><input id="${nameInputId}" type="text" placeholder="${escapeAttribute(namePlaceholder)}" autocomplete="off" value="${escapeAttribute(snapshot?.[nameKey] || '')}"></div></div>`,
     `<div class="tc-save-actions"><button type="button" class="action-button" data-tc-action="line:save" data-line-save ${snapshot?.[activeIdKey] ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-tc-action="line:update" data-line-update ${snapshot?.[activeIdKey] ? '' : 'disabled'}>Aktualisieren</button></div>`,
-    `<div data-hc-dynamic="${dynamicAttr}">${renderRows(snapshot)}</div>`
+    `<div ${dynamicDataAttr}="${dynamicAttr}" data-hc-dynamic="${dynamicAttr}">${renderRows(snapshot)}</div>`
   ].join('')), accent);
 
   const updateControls = (root, snapshot = state?.get?.() || {}) => {
