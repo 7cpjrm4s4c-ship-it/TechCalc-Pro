@@ -852,3 +852,11 @@
 - `index.js` weiter reduziert und von Card-/Result-View-Helfern bereinigt.
 - Dynamic-Renderer-Callbacks mit dem geordneten View-Adapter zusammengeführt.
 - Neue Regression `heating-cooling-phase18d1-reference-cleanup`.
+
+
+## Phase 18D.2 - Heating/Cooling Controller ViewModel Split
+
+- Moved heating/cooling field composition from `controller.js` into new `viewModel.js`.
+- `controller.js` now focuses on state derivation, line-section records and hydration.
+- `view.js` imports `inputFields()` from the dedicated view model.
+- Keeps the restored ordered UI layout unchanged while tightening module responsibilities.

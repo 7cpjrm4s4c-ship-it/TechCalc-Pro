@@ -18,6 +18,7 @@ const commands = [
   ['node', ['tests/heating-cooling-phase18b4a-ordered-layout.test.mjs']],
   ['node', ['tests/heating-cooling-phase18c-platform-hardening.test.mjs']],
   ['node', ['tests/heating-cooling-phase18c1-pipe-island-guard.test.mjs']],
+  ['node', ['tests/heating-cooling-phase18d2-viewmodel-split.test.mjs']],
   ['node', ['tests/ventilation-global-standard.test.mjs']],
   ['node', ['tests/ventilation-phase13e.test.mjs']],
   ['node', ['tests/rainwater-global-standard.test.mjs']],

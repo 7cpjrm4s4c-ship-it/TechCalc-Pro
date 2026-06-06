@@ -3,7 +3,8 @@ import { pipeSystems } from '../../utils/pipes.js';
 import { card, selectField, segmented, renderModuleShell, stack, grid } from '../../core/renderer.js';
 import { renderResultModel, renderResultTable, renderRecommendationCard } from '../../platform/resultRenderer/index.js';
 import { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRows } from './results.js';
-import { activeCalculationState, inputFields, key } from './controller.js';
+import { activeCalculationState, key } from './controller.js';
+import { inputFields } from './viewModel.js';
 
 export function createHeatingCoolingView({ config, calculate, lineSectionController }) {
   if (!config) throw new Error('createHeatingCoolingView requires config');
