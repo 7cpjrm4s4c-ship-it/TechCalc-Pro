@@ -4,7 +4,11 @@ import module from '../js/modules/ventilation/index.js';
 import config from '../js/modules/ventilation/config.js';
 import schema from '../js/modules/ventilation/schema.js';
 
-const source = readFileSync(new URL('../js/modules/ventilation/index.js', import.meta.url), 'utf8');
+const indexSource = readFileSync(new URL('../js/modules/ventilation/index.js', import.meta.url), 'utf8');
+const controllerSource = readFileSync(new URL('../js/modules/ventilation/controller.js', import.meta.url), 'utf8');
+const viewSource = readFileSync(new URL('../js/modules/ventilation/view.js', import.meta.url), 'utf8');
+const viewModelSource = readFileSync(new URL('../js/modules/ventilation/viewModel.js', import.meta.url), 'utf8');
+const source = `${indexSource}\n${controllerSource}\n${viewSource}\n${viewModelSource}`;
 const dynamicRendererSource = readFileSync(new URL('../js/platform/dynamicRenderer/index.js', import.meta.url), 'utf8');
 const docs = readFileSync(new URL('../docs/PHASE_13A_VENTILATION_GLOBALIZATION.md', import.meta.url), 'utf8');
 
@@ -12,12 +16,12 @@ assert.match(config.migrationStatus, /^phase-13[a-e]-ventilation-/, 'ventilation
 assert.ok(module.schema, 'ventilation module exposes schema');
 assert.ok(schema.fields.some(field => field.key === 'mode'), 'mode is schema-defined');
 
-assert.match(source, /createPlatformModule\(\{/, 'ventilation uses platform module runtime');
+assert.match(indexSource, /createPlatformModule\(\{/, 'ventilation uses platform module runtime');
 assert.doesNotMatch(source, /function mountVentilation/, 'legacy custom mount has been removed');
 assert.doesNotMatch(source, /root\.innerHTML\s*=\s*view\(/, 'module no longer owns full-render innerHTML');
 assert.match(source, /function updateVentilationDynamic/, 'dynamic island updater exists as platform adapter');
-assert.match(source, /bind:\s*bindVentilationPlatform/, 'saved-line binding is provided through platform bind hook');
-assert.match(source, /createLineSectionController\(\{/, 'saved actions use central line-section controller');
+assert.match(indexSource, /bind:\s*bindVentilationPlatform/, 'saved-line binding is provided through platform bind hook');
+assert.match(controllerSource, /createLineSectionController\(\{/, 'saved actions use central line-section controller');
 assert.match(source, /data-vent-dynamic="input-fields"/, 'input fields are dynamic island');
 assert.match(source, /data-vent-dynamic="result"/, 'result area is dynamic island');
 assert.match(source + dynamicRendererSource, /data-line-dynamic=\"line-sections\"|data-line-dynamic="line-sections"/, 'saved records use neutral line-section dynamic island');
@@ -31,7 +35,7 @@ assert.doesNotMatch(source, /addEventListener\(['"]click['"]/, 'module has no lo
 assert.doesNotMatch(source, /addEventListener\(['"]touch/, 'module has no local touch listener');
 assert.match(docs, /Heizung\/Kälte als Referenzmodul/, 'docs document reference-module basis');
 
-const derivedMatch = source.match(/function derivedDeltaT\(active\) \{[\s\S]*?\n\}/);
+const derivedMatch = source.match(/function derivedDeltaT\(active(?:\s*=\s*\{\})?\) \{[\s\S]*?\n\}/);
 assert.ok(derivedMatch, 'derivedDeltaT function exists');
 const derivedSource = derivedMatch[0];
 assert.match(derivedSource, /mode === 'cooling'/, 'deltaT derivation branches by cooling mode');

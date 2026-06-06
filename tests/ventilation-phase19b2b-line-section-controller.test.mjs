@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const source = readFileSync(new URL('../js/modules/ventilation/index.js', import.meta.url), 'utf8');
+const controllerSource = readFileSync(new URL('../js/modules/ventilation/controller.js', import.meta.url), 'utf8');
+const viewSource = readFileSync(new URL('../js/modules/ventilation/view.js', import.meta.url), 'utf8');
+const source = `${controllerSource}\n${viewSource}`;
 const stateSource = readFileSync(new URL('../js/modules/ventilation/state.js', import.meta.url), 'utf8');
 
 assert.match(source, /createLineSectionController\(\{/, 'ventilation uses shared line-section controller');

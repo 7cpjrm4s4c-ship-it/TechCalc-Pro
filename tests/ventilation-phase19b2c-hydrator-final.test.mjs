@@ -1,20 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const source = readFileSync(new URL('../js/modules/ventilation/index.js', import.meta.url), 'utf8');
+const source = readFileSync(new URL('../js/modules/ventilation/viewModel.js', import.meta.url), 'utf8');
 const configSource = readFileSync(new URL('../js/modules/ventilation/config.js', import.meta.url), 'utf8');
 
-const start = source.indexOf('function firstFilled');
-const end = source.indexOf('const ventilationLineSectionController');
-assert.ok(start > -1 && end > start, 'hydrator helper block can be extracted');
-
-const parseNumber = (value, { fallback = NaN } = {}) => {
-  if (value === undefined || value === null || value === '—') return fallback;
-  const normalized = String(value).trim().replace(/\./g, '').replace(',', '.');
-  const parsed = Number.parseFloat(normalized);
-  return Number.isFinite(parsed) ? parsed : fallback;
-};
-const { savedVentilationPatch } = new Function('parseNumber', `${source.slice(start, end)}; return { savedVentilationPatch };`)(parseNumber);
+const { savedVentilationPatch } = await import('../js/modules/ventilation/viewModel.js');
 
 assert.match(configSource, /phase-19b2c-hydrator-final/, 'ventilation declares phase 19B.2C hydrator finalization');
 

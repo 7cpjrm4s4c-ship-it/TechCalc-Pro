@@ -1,7 +1,7 @@
 import { state as heatingCoolingState } from '../modules/heating-cooling/state.js';
 import { readLineSections, writeLineSections } from '../modules/heating-cooling/index.js';
 import { state as ventilationState } from '../modules/ventilation/state.js';
-import { readVentilationLineSections, writeVentilationLineSections } from '../modules/ventilation/index.js';
+import { ventilationLineSectionController } from '../modules/ventilation/controller.js';
 import { state as pipeSizingState } from '../modules/pipe-sizing/state.js';
 import { state as unitConverterState } from '../modules/unit-converter/state.js';
 import { state as heatRecoveryState } from '../modules/heat-recovery/state.js';
@@ -86,7 +86,7 @@ export function collectProjectData() {
         state: heatingCoolingState.get(),
         lineSections: readLineSections()
       },
-      ventilation: { state: ventilationState.get(), lineSections: readVentilationLineSections() },
+      ventilation: { state: ventilationState.get(), lineSections: ventilationLineSectionController.read() },
       'pipe-sizing': { state: pipeSizingState.get() },
       'unit-converter': { state: unitConverterState.get() },
       'heat-recovery': { state: heatRecoveryState.get(), rltDevices: readRltDevices() },
@@ -113,7 +113,7 @@ export function applyProjectData(data = {}, { fileName = '' } = {}) {
   writeLineSections(modules['heating-cooling']?.lineSections || []);
 
   if (modules.ventilation?.state) ventilationState.replace(modules.ventilation.state, { notify: false });
-  writeVentilationLineSections(modules.ventilation?.lineSections || []);
+  ventilationLineSectionController.write(modules.ventilation?.lineSections || []);
   if (modules['pipe-sizing']?.state) pipeSizingState.replace(modules['pipe-sizing'].state, { notify: false });
   if (modules['unit-converter']?.state) unitConverterState.replace(modules['unit-converter'].state, { notify: false });
   if (modules['heat-recovery']?.state) heatRecoveryState.replace(modules['heat-recovery'].state, { notify: false });
@@ -135,7 +135,7 @@ export function resetAllSessionData() {
   heatingCoolingState.reset();
   writeLineSections([]);
   ventilationState.reset();
-  writeVentilationLineSections([]);
+  ventilationLineSectionController.write([]);
   pipeSizingState.reset();
   unitConverterState.reset();
   heatRecoveryState.reset();

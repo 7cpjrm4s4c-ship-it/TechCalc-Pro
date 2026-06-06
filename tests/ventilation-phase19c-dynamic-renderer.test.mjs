@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 
-const moduleSource = fs.readFileSync('js/modules/ventilation/index.js', 'utf8');
+const moduleSource = fs.readFileSync('js/modules/ventilation/controller.js', 'utf8');
 const dynamicRendererSource = fs.readFileSync('js/platform/dynamicRenderer/index.js', 'utf8');
 const configSource = fs.readFileSync('js/modules/ventilation/config.js', 'utf8');
 

@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const ventilationSource = readFileSync(new URL('../js/modules/ventilation/index.js', import.meta.url), 'utf8');
+const indexSource = readFileSync(new URL('../js/modules/ventilation/index.js', import.meta.url), 'utf8');
+const controllerSource = readFileSync(new URL('../js/modules/ventilation/controller.js', import.meta.url), 'utf8');
+const ventilationSource = `${indexSource}\n${controllerSource}`;
 const lineControllerSource = readFileSync(new URL('../js/platform/lineSectionController/index.js', import.meta.url), 'utf8');
 const dynamicRendererSource = readFileSync(new URL('../js/platform/dynamicRenderer/index.js', import.meta.url), 'utf8');
 const configSource = readFileSync(new URL('../js/modules/ventilation/config.js', import.meta.url), 'utf8');

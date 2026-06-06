@@ -895,3 +895,12 @@
 - Eigene `mainResult`-/`inlineStats`-Resultpfade aus `index.js` entfernt.
 - Regression `ventilation-phase19b3-result-renderer` ergänzt.
 
+## Phase 19D - Lüftung Entkernung
+
+- Lüftungsmodul in Plattformvertrag aufgeteilt: `controller.js`, `viewModel.js`, `view.js`.
+- `index.js` bleibt reiner `createPlatformModule`-Adapter.
+- Saved-Record- und Dynamic-Renderer-Anbindung liegen im Controller.
+- Hydrator und aktiver Rechenzustand liegen im ViewModel.
+- Project-Storage nutzt den `ventilationLineSectionController` direkt; Legacy-Wrapper wurden entfernt.
+- Regression ergänzt: `ventilation-phase19d-platform-contract`.
+

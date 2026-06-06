@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const ventilationSource = readFileSync(new URL('../js/modules/ventilation/index.js', import.meta.url), 'utf8');
+const ventilationSource = readFileSync(new URL('../js/modules/ventilation/view.js', import.meta.url), 'utf8');
 const resultsSource = readFileSync(new URL('../js/modules/ventilation/results.js', import.meta.url), 'utf8');
 const configSource = readFileSync(new URL('../js/modules/ventilation/config.js', import.meta.url), 'utf8');
 
