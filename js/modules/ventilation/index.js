@@ -75,13 +75,18 @@ function savedVentilationPatch(item, currentState) {
   const nextMode = inferStoredMode(input, item, currentState.mode || 'heating');
   const prefix = nextMode === 'cooling' ? 'cooling' : 'heating';
   const calcTarget = firstFilled(input.calcTarget, input[`${prefix}CalcTarget`], currentState[`${prefix}CalcTarget`], 'power');
-  const powerFromResult = parseDisplayNumber(item.powerKw);
+  const powerFromInput = firstFilled(input.powerW, input[`${prefix}PowerW`]);
+  const powerFromResult = calcTarget !== 'power' ? parseDisplayNumber(item.powerKw) : '';
+  const restoredPower = firstFilled(powerFromInput, powerFromResult);
+  const restoredPowerUnit = powerFromInput
+    ? firstFilled(input.powerUnit, input[`${prefix}PowerUnit`], 'W')
+    : (powerFromResult ? 'kW' : firstFilled(input.powerUnit, input[`${prefix}PowerUnit`], 'W'));
   return {
     ...(item.uiState || {}),
     mode: nextMode,
     [`${prefix}CalcTarget`]: calcTarget,
-    [`${prefix}PowerW`]: firstFilled(input.powerW, input[`${prefix}PowerW`], calcTarget !== 'power' ? powerFromResult : ''),
-    [`${prefix}PowerUnit`]: firstFilled(input.powerUnit, input[`${prefix}PowerUnit`], calcTarget !== 'power' && powerFromResult ? 'kW' : 'W'),
+    [`${prefix}PowerW`]: restoredPower,
+    [`${prefix}PowerUnit`]: restoredPowerUnit,
     [`${prefix}VolumeFlowM3h`]: firstFilled(input.volumeFlowM3h, input[`${prefix}VolumeFlowM3h`], parseDisplayNumber(item.volumeFlowM3h)),
     [`${prefix}SupplyTemp`]: firstFilled(input.supplyTemp, input[`${prefix}SupplyTemp`], parseDisplayNumber(item.supplyTemp)),
     [`${prefix}RoomTemp`]: firstFilled(input.roomTemp, input[`${prefix}RoomTemp`], parseDisplayNumber(item.roomTemp)),
