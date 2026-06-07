@@ -259,6 +259,80 @@ export function createVentilationDynamicRenderer(options = {}) {
   return { update };
 }
 
+export function createPressureHoldingDynamicRenderer(options = {}) {
+  const {
+    calculate,
+    fmtInput,
+    renderBasis,
+    renderVolumeFields,
+    renderPressureFields,
+    renderHoldingOptions,
+    renderSavedPanel,
+    renderResult
+  } = options;
+
+  if (typeof calculate !== 'function') throw new Error('createPressureHoldingDynamicRenderer requires calculate');
+  if (typeof renderResult !== 'function') throw new Error('createPressureHoldingDynamicRenderer requires renderResult');
+
+  const structuralVolumeFields = ['waterContentMode'];
+  const structuralPressureFields = ['connectionType'];
+  const structuralHoldingFields = ['holdingType'];
+  const savedFields = ['savedPlants', 'activePlantId', 'expandedPlantId', 'plantName'];
+
+  function syncFields(root, s = {}) {
+    updateSegment(root, 'systemType', s.systemType);
+    updateSegment(root, 'holdingType', s.holdingType);
+    updateSegment(root, 'connectionType', s.connectionType);
+    updateSegment(root, 'includeServitec', s.includeServitec);
+    setSelectValue(root, 'waterContentMode', s.waterContentMode);
+    setSelectValue(root, 'frostMode', s.frostMode);
+    setSelectValue(root, 'dynamicType', s.dynamicType);
+    setInputValue(root, 'plantName', s.plantName || '');
+    setInputValue(root, 'heatPowerKw', fmtInput?.(s.heatPowerKw, 1) ?? s.heatPowerKw);
+    setInputValue(root, 'systemVolumeL', fmtInput?.(s.systemVolumeL, 1) ?? s.systemVolumeL);
+    setInputValue(root, 'specificWaterContent', fmtInput?.(s.specificWaterContent, 1) ?? s.specificWaterContent);
+    setInputValue(root, 'additionalVolumeL', fmtInput?.(s.additionalVolumeL, 1) ?? s.additionalVolumeL);
+    setInputValue(root, 'tMinC', fmtInput?.(s.tMinC, 1) ?? s.tMinC);
+    setInputValue(root, 'tMaxC', fmtInput?.(s.tMaxC, 1) ?? s.tMaxC);
+    setInputValue(root, 'staticHeightM', fmtInput?.(s.staticHeightM, 1) ?? s.staticHeightM);
+    setInputValue(root, 'staticPressureBar', fmtInput?.(s.staticPressureBar, 2) ?? s.staticPressureBar);
+    setInputValue(root, 'pumpPressureBar', fmtInput?.(s.pumpPressureBar, 2) ?? s.pumpPressureBar);
+    setInputValue(root, 'safetyValveBar', fmtInput?.(s.safetyValveBar, 2) ?? s.safetyValveBar);
+  }
+
+  function update(root, s = {}, meta = {}) {
+    const r = calculate(s);
+    const action = String(meta.action || '');
+    const changed = Array.isArray(meta.changed) ? meta.changed : [];
+    const previous = root.__tcPressureHoldingDynamic || {};
+    const appStructural = /^(record:|module:|replace|reset)/.test(action);
+    const savedStructural = /^(saved:|pressure:)/.test(action) || hasAnyChanged(changed, savedFields);
+    const volumeStructural = appStructural || hasAnyChanged(changed, structuralVolumeFields) || previous.waterContentMode !== s.waterContentMode;
+    const pressureStructural = appStructural || hasAnyChanged(changed, structuralPressureFields) || previous.connectionType !== s.connectionType;
+    const holdingStructural = appStructural || hasAnyChanged(changed, structuralHoldingFields) || previous.holdingType !== s.holdingType;
+    const basisStructural = appStructural || holdingStructural || pressureStructural || hasAnyChanged(changed, ['systemType']);
+
+    if (basisStructural && typeof renderBasis === 'function') setIslandInner(root, '[data-ph-dynamic="basis"]', renderBasis(s, r, 'purple'));
+    if (volumeStructural && typeof renderVolumeFields === 'function') setIslandInner(root, '[data-ph-dynamic="volume-fields"]', renderVolumeFields(s, r, 'purple'));
+    if (pressureStructural && typeof renderPressureFields === 'function') setIslandInner(root, '[data-ph-dynamic="pressure-fields"]', renderPressureFields(s, r, 'purple'));
+    if (holdingStructural && typeof renderHoldingOptions === 'function') setIslandInner(root, '[data-ph-dynamic="holding-options"]', renderHoldingOptions(s, r, 'purple'));
+    if (savedStructural && typeof renderSavedPanel === 'function') setIslandInner(root, '[data-ph-dynamic="saved-records"]', renderSavedPanel(s, r, 'purple'));
+
+    syncFields(root, s);
+    setIslandInner(root, '[data-ph-dynamic="result"]', renderResult(s, r, 'purple'));
+
+    root.__tcPressureHoldingDynamic = {
+      waterContentMode: s.waterContentMode,
+      connectionType: s.connectionType,
+      holdingType: s.holdingType,
+      activePlantId: s.activePlantId,
+      expandedPlantId: s.expandedPlantId
+    };
+  }
+
+  return { update };
+}
+
 export const dynamicRendererInternals = {
   setInner,
   setSelectValue,

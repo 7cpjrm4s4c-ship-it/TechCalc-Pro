@@ -8,6 +8,7 @@ import { fmt, fmtInput } from '../../utils/calculations.js';
 import { createSavedRecordActions } from '../../core/savedRecordController.js';
 import { renderSavedRecordList, renderSavedRecordPanel, bindEditModeClear } from '../../core/savedRecords.js';
 import { renderResultModel } from '../../platform/resultRenderer/index.js';
+import { createPressureHoldingDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { buildPressureHoldingResultModel } from './results.js';
 import { commitAllFields, registerCentralActions } from '../../core/eventPipeline.js';
 
@@ -110,15 +111,17 @@ function explain(s){
     : 'Reflexomat: kompressorgesteuerte Druckhaltestation. Das Nennvolumen wird dynamisch mit 1,1 × (Ve + VV) angesetzt; Arbeitsbereich AD 0,2 bar.';
 }
 
-function view(s){
-  const r = calculate(s);
-  const basis = card('Berechnungsart', stack([
+
+function basisContent(s){
+  return stack([
     segmented('systemType', opts([['heating','Heizwasser'],['cooling','Kühlwasser']]), s.systemType, { accent:'purple' }),
     segmented('holdingType', opts([['mag','MAG statisch'],['dynamic','Druckhaltestation']]), s.holdingType, { accent:'purple' }),
     segmented('connectionType', opts([['suction','Vordruck / Saugseite'],['pressure','Nachdruck / Druckseite']]), s.connectionType, { accent:'purple' }),
     `<p class="tc-help ph-help">${explain(s)}</p>`
-  ].join('')), 'purple');
+  ].join(''));
+}
 
+function volumeFieldsContent(s){
   const volumeFields = [
     selectField({ id:'waterContentMode', label:'Anlagenvolumen', value:s.waterContentMode, options:opts([['known','bekannt eingeben'],['estimated','über Leistung schätzen']]) }),
     s.waterContentMode === 'estimated'
@@ -128,30 +131,49 @@ function view(s){
       ? field({ id:'specificWaterContent', label:'spez. Wasserinhalt vₐ', value:fmtInput(s.specificWaterContent,1), unit:'l/kW' })
       : field({ id:'additionalVolumeL', label:'Zusatzvolumen', value:fmtInput(s.additionalVolumeL,1), unit:'Liter' })
   ];
+  return grid(volumeFields.join(''), 2);
+}
 
+function temperatureFieldsContent(s){
+  return grid([
+    selectField({ id:'frostMode', label:'Medium', value:s.frostMode, options:opts([['water','Wasser'],['glycol20','Antifrogen N 20 %'],['glycol34','Antifrogen N 34 %']]) }),
+    field({ id:'tMinC', label:'tiefste Systemtemperatur', value:fmtInput(s.tMinC,1), unit:'°C' }),
+    field({ id:'tMaxC', label:'höchste Temperatur tTR/tmax', value:fmtInput(s.tMaxC,1), unit:'°C' })
+  ].join(''), 2);
+}
+
+function pressureFieldsContent(s){
   const pressureFields = [
     field({ id:'staticHeightM', label:'statische Höhe H', value:fmtInput(s.staticHeightM,1), unit:'m' }),
     field({ id:'staticPressureBar', label:'statischer Druck pₛₜ manuell', value:fmtInput(s.staticPressureBar,2), unit:'bar' }),
     s.connectionType === 'pressure' ? field({ id:'pumpPressureBar', label:'Pumpendifferenzdruck Δpₚ', value:fmtInput(s.pumpPressureBar,2), unit:'bar' }) : '',
     field({ id:'safetyValveBar', label:'Sicherheitsventil pSV', value:fmtInput(s.safetyValveBar,2), unit:'bar' })
   ].filter(Boolean);
+  return `${grid(pressureFields.join(''), 2)}<p class="tc-help ph-help">Ist die statische Höhe eingetragen, wird pₛₜ automatisch mit H/10 berechnet. Der manuelle pₛₜ-Wert gilt nur ohne Höhenangabe.</p>`;
+}
 
+function holdingOptionsContent(s){
+  return s.holdingType === 'mag'
+    ? `${segmented('includeServitec', opts([['false','ohne Servitec'],['true','mit Servitec +5 l']]), s.includeServitec, { accent:'purple' })}<p class="tc-help ph-help">Servitec steht für Entgasung/Nachspeisung. Bei „mit Servitec“ wird das Zusatzvolumen des Entgasungsrohres berücksichtigt.</p>`
+    : `${selectField({ id:'dynamicType', label:'Druckhaltestation', value:s.dynamicType, options:opts([['reflexomat','Reflexomat · kompressorgesteuert · AD 0,2 bar'],['variomat','Variomat · pumpengesteuert · AD 0,4 bar']]) })}<p class="tc-help ph-help">Die Auswahl bestimmt Arbeitsbereich AD und die Ergebnisbezeichnung der Station.</p>`;
+}
+
+function resultContent(s, r = calculate(s)){
+  return renderResultModel(buildPressureHoldingResultModel(s, r, 'purple'), 'purple');
+}
+
+function view(s){
+  const r = calculate(s);
   const inputColumn = stack([
-    basis,
-    card('Anlagenvolumen', grid(volumeFields.join(''), 2), 'purple'),
-    card('Temperaturen / Stoffwerte', grid([
-      selectField({ id:'frostMode', label:'Medium', value:s.frostMode, options:opts([['water','Wasser'],['glycol20','Antifrogen N 20 %'],['glycol34','Antifrogen N 34 %']]) }),
-      field({ id:'tMinC', label:'tiefste Systemtemperatur', value:fmtInput(s.tMinC,1), unit:'°C' }),
-      field({ id:'tMaxC', label:'höchste Temperatur tTR/tmax', value:fmtInput(s.tMaxC,1), unit:'°C' })
-    ].join(''), 2), 'purple'),
-    card('Druckdaten', `${grid(pressureFields.join(''), 2)}<p class="tc-help ph-help">Ist die statische Höhe eingetragen, wird pₛₜ automatisch mit H/10 berechnet. Der manuelle pₛₜ-Wert gilt nur ohne Höhenangabe.</p>`, 'purple'),
-    savedPlantsCard(s),
-    s.holdingType === 'mag' ? card('MAG-Optionen', `${segmented('includeServitec', opts([['false','ohne Servitec'],['true','mit Servitec +5 l']]), s.includeServitec, { accent:'purple' })}<p class="tc-help ph-help">Servitec steht für Entgasung/Nachspeisung. Bei „mit Servitec“ wird das Zusatzvolumen des Entgasungsrohres berücksichtigt.</p>`, 'purple') : card('Dynamisches System', `${selectField({ id:'dynamicType', label:'Druckhaltestation', value:s.dynamicType, options:opts([['reflexomat','Reflexomat · kompressorgesteuert · AD 0,2 bar'],['variomat','Variomat · pumpengesteuert · AD 0,4 bar']]) })}<p class="tc-help ph-help">Die Auswahl bestimmt Arbeitsbereich AD und die Ergebnisbezeichnung der Station.</p>`, 'purple')
+    card('Berechnungsart', `<div data-ph-dynamic="basis">${basisContent(s)}</div>`, 'purple'),
+    card('Anlagenvolumen', `<div data-ph-dynamic="volume-fields">${volumeFieldsContent(s)}</div>`, 'purple'),
+    card('Temperaturen / Stoffwerte', `<div data-ph-dynamic="temperature-fields">${temperatureFieldsContent(s)}</div>`, 'purple'),
+    card('Druckdaten', `<div data-ph-dynamic="pressure-fields">${pressureFieldsContent(s)}</div>`, 'purple'),
+    `<div data-ph-dynamic="saved-records">${savedPlantsCard(s)}</div>`,
+    card(s.holdingType === 'mag' ? 'MAG-Optionen' : 'Dynamisches System', `<div data-ph-dynamic="holding-options">${holdingOptionsContent(s)}</div>`, 'purple')
   ].join(''));
 
-  const resultColumn = renderResultModel(buildPressureHoldingResultModel(s, r, 'purple'), 'purple');
-
-  return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6">${resultColumn}</div>`);
+  return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6" data-ph-dynamic="result">${resultContent(s, r)}</div>`);
 }
 
 function bindPressureHoldingActions(root){
@@ -189,11 +211,33 @@ function bindPressureHoldingActions(root){
 }
 
 
+const pressureHoldingDynamicRenderer = createPressureHoldingDynamicRenderer({
+  calculate,
+  fmtInput,
+  renderBasis: basisContent,
+  renderVolumeFields: volumeFieldsContent,
+  renderPressureFields: pressureFieldsContent,
+  renderHoldingOptions: holdingOptionsContent,
+  renderSavedPanel: savedPlantsCard,
+  renderResult: resultContent
+});
+
+function updatePressureHoldingDynamic(root, s, meta = {}) {
+  pressureHoldingDynamicRenderer.update(root, s, meta);
+}
+
+function isDynamicPressureHoldingAction(meta = {}) {
+  return String(meta.action || '') !== 'initial';
+}
+
+
 export default createPlatformModule({
   config,
   schema,
   state,
   calculate,
   view,
-  bind: bindPressureHoldingActions
+  bind: bindPressureHoldingActions,
+  dynamicUpdate: updatePressureHoldingDynamic,
+  isDynamicAction: isDynamicPressureHoldingAction
 });

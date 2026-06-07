@@ -47,6 +47,8 @@ const commands = [
   ['node', ['tests/event-pipeline-phase16e.test.mjs']],
   ['node', ['tests/pressure-holding-phase20b1-platform-mount.test.mjs']],
   ['node', ['tests/pressure-holding-phase20b2-saved-record-controller.test.mjs']],
+  ['node', ['tests/pressure-holding-phase20b3-result-renderer.test.mjs']],
+  ['node', ['tests/pressure-holding-phase20c-dynamic-renderer.test.mjs']],
   ['node', ['tests/rainwater-phase16e1-recovery.test.mjs']],
   ['node', ['tests/rainwater-phase17a-decoupling.test.mjs']],
   ['node', ['tests/rainwater-phase17a1-decoupling.test.mjs']],
