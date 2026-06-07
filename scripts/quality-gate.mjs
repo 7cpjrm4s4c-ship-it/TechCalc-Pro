@@ -58,6 +58,7 @@ const commands = [
   ['node', ['tests/pipe-sizing-phase21d-platform-contract.test.mjs']],
   ['node', ['tests/pipe-sizing-phase21e-hardening.test.mjs']],
   ['node', ['tests/unit-converter-phase22b1-platform-mount.test.mjs']],
+  ['node', ['tests/unit-converter-phase22b3-result-renderer.test.mjs']],
   ['node', ['tests/rainwater-phase16e1-recovery.test.mjs']],
   ['node', ['tests/rainwater-phase17a-decoupling.test.mjs']],
   ['node', ['tests/rainwater-phase17a1-decoupling.test.mjs']],

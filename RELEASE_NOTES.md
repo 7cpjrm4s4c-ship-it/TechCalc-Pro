@@ -22,3 +22,9 @@
 
 - `npm test` vollständig bestanden.
 - Import-/Syntaxprüfung bestanden.
+
+## Phase 22B.3 – Unit Converter Result Renderer
+- Einheitenergebnis auf renderResultModel() umgestellt.
+- Neues js/modules/unit-converter/results.js ergaenzt.
+- Legacy resultRows-Nutzung aus unit-converter/index.js entfernt.
+- Regression unit-converter-phase22b3-result-renderer.test.mjs ins Quality Gate aufgenommen.

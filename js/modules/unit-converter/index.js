@@ -1,16 +1,16 @@
 import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
-import { calculate, unitsFor } from './logic.js';
-import { card, field, selectField, resultRows, renderModuleShell, stack, grid } from '../../core/renderer.js';
+import { calculate } from './logic.js';
+import { buildUnitConverterResultModel, normalizeUnitSelection } from './results.js';
+import { card, field, selectField, renderModuleShell, stack } from '../../core/renderer.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { unitCategories } from '../../utils/units.js';
 import { fmt } from '../../utils/calculations.js';
+import { renderResultModel } from '../../platform/resultRenderer/index.js';
 
 function view(s) {
-  const units = unitsFor(s.category);
-  const from = units.includes(s.from) ? s.from : units[0];
-  const to = units.includes(s.to) ? s.to : units[1] || units[0];
+  const { units, from, to } = normalizeUnitSelection(s);
   const result = calculate({ ...s, from, to });
 
   const conversionCard = card('Kategorie wählen', stack([
@@ -35,18 +35,11 @@ function view(s) {
     })
   ].join('')), 'green');
 
-  const allValuesBody = s.value
-    ? `<div class="unit-all-values">${resultRows(units.map(u => ({
-        label: u,
-        value: fmt(calculate({ ...s, from, to: u }), 2),
-        unit: u
-      })))}</div>`
-    : '<div class="empty-state">Wert eingeben →</div>';
-  const allValuesCard = card('Alle Werte', allValuesBody, 'blue');
+  const resultCards = renderResultModel(buildUnitConverterResultModel({ ...s, from, to }, 'green'), 'green');
 
   return renderModuleShell(config, `
     <div class="span-6">${conversionCard}</div>
-    <div class="span-6">${allValuesCard}</div>
+    <div class="span-6">${resultCards}</div>
   `);
 }
 export default createPlatformModule({

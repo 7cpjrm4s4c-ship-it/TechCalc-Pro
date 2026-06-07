@@ -94,7 +94,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": false,
       "hasLegacyModuleClasses": false,
-      "migrationStatus": "phase-8-schema-inventory phase-22b1-platform-mount phase-22b1-render-fix"
+      "migrationStatus": "phase-8-schema-inventory phase-22b1-platform-mount phase-22b1-render-fix phase-22b3-result-renderer"
     },
     {
       "id": "ventilation",
