@@ -13,10 +13,10 @@ assert.match(config, /phase-22b3-result-renderer/, 'migrationStatus must include
 
 const resultModule = await import('../js/modules/unit-converter/results.js');
 const model = resultModule.buildUnitConverterResultModel({ category: 'pressure', value: '1', from: 'bar', to: 'kPa' }, 'green');
-assert.equal(model.primary.title, 'Umrechnung');
-assert.equal(model.primary.primary.value, '100');
-assert.equal(model.primary.primary.unit, 'kPa');
+assert.equal(model.primary, undefined, 'unit converter must not render a separate conversion result card');
 assert.ok(model.groups.some(group => group.title === 'Alle Werte'), 'all values group must be part of the result model');
+const allValues = model.groups.find(group => group.title === 'Alle Werte');
+assert.ok(allValues.rows.some(row => row.label === 'kPa' && row.value === '100'), 'all values group must contain converted target values');
 
 const module = await import('../js/modules/unit-converter/index.js');
 assert.equal(typeof module.default.mount, 'function', 'platform module must remain mountable');

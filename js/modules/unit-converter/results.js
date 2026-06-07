@@ -36,16 +36,6 @@ export function unitConverterAllValueRows(s = {}) {
 export function buildUnitConverterResultModel(s = {}, accent = 'green') {
   const { from, to } = normalizeUnitSelection(s);
   return {
-    primary: {
-      title: 'Umrechnung',
-      primary: unitConverterPrimary(s),
-      rows: [
-        { label: 'Kategorie', value: unitCategoryLabel(s.category) },
-        { label: 'Von', value: from },
-        { label: 'Nach', value: to }
-      ],
-      accent
-    },
     groups: [
       {
         title: 'Alle Werte',

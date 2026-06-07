@@ -1,30 +1,14 @@
-# TechCalc Pro 1.3.0 - Phase 21E
+# TechCalc Pro 1.3.0 – Phase 22C.1
 
-## Rohrdimensionierung Hardening
+## Einheitenrechner – Result Cleanup
 
-- Phase `phase-21e-hardening` in `pipe-sizing/config.js` ergänzt.
-- Regression `pipe-sizing-phase21e-hardening.test.mjs` ergänzt.
-- Quality Gate um 21E-Regression erweitert.
-- Plattformvertrag Rohrdimensionierung verifiziert:
-  - `createPlatformModule`
-  - `createPipeSizingDynamicRenderer`
-  - `createLineSectionController`
-  - `renderResultModel`
-  - `controller.js` / `viewModel.js` / `view.js`
-- Legacy-Pfade geprüft:
-  - kein `mountModule`
-  - kein `bindSavedRecordWorkflow`
-  - kein `createSavedRecordActions`
-  - keine `data-pipe-save/load/delete` Altpfade
-  - keine modulinterne DOM-Patchlogik außerhalb `platform/dynamicRenderer`
+- separate Result-Card `Umrechnung` entfernt
+- Ergebnisbereich auf die relevante Card `Alle Werte` reduziert
+- Eingabecard `Kategorie wählen` bleibt inklusive direkter Ausgabe erhalten
+- Result-Model vereinfacht: kein `primary`-Result mehr, nur noch Gruppenmodell
+- Regression ergänzt: `unit-converter-phase22c1-result-cleanup.test.mjs`
+- Quality Gate erweitert
 
-## Tests
+## Prüfung
 
-- `npm test` vollständig bestanden.
-- Import-/Syntaxprüfung bestanden.
-
-## Phase 22B.3 – Unit Converter Result Renderer
-- Einheitenergebnis auf renderResultModel() umgestellt.
-- Neues js/modules/unit-converter/results.js ergaenzt.
-- Legacy resultRows-Nutzung aus unit-converter/index.js entfernt.
-- Regression unit-converter-phase22b3-result-renderer.test.mjs ins Quality Gate aufgenommen.
+- `npm test` vollständig bestanden
