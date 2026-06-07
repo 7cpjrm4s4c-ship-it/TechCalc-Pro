@@ -54,5 +54,10 @@ export default createPlatformModule({
   schema,
   state,
   calculate,
-  view
+  view,
+  // Unit converter fields change the available unit selectors and result list.
+  // Without a dedicated dynamic renderer, every state change must use the
+  // platform full-render path; otherwise createPlatformModule treats the
+  // custom view as dynamic-only and no visible conversion update happens.
+  isDynamicAction: () => false
 });
