@@ -38,3 +38,10 @@
 - Regression `pipe-sizing-phase21b3-result-renderer.test.mjs` ergänzt und ins Quality Gate eingebunden.
 - `npm test` vollständig bestanden.
 
+
+## Phase 21C - Pipe Sizing Dynamic Renderer
+
+- Added `createPipeSizingDynamicRenderer()` to the central platform dynamic renderer.
+- Pipe sizing now registers `dynamicUpdate` and `isDynamicAction` via `createPlatformModule`.
+- Added `data-pipe-dynamic` islands for input, saved records, and result rendering.
+- Added regression `pipe-sizing-phase21c-dynamic-renderer.test.mjs` and included it in the quality gate.

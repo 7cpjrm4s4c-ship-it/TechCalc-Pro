@@ -333,6 +333,59 @@ export function createPressureHoldingDynamicRenderer(options = {}) {
   return { update };
 }
 
+
+export function createPipeSizingDynamicRenderer(options = {}) {
+  const {
+    calculate,
+    fmt,
+    renderInput,
+    renderSavedPanel,
+    renderResult
+  } = options;
+
+  if (typeof calculate !== 'function') throw new Error('createPipeSizingDynamicRenderer requires calculate');
+  if (typeof renderResult !== 'function') throw new Error('createPipeSizingDynamicRenderer requires renderResult');
+
+  const savedFields = ['savedPipes', 'activePipeId', 'expandedPipeId'];
+
+  function syncFields(root, s = {}) {
+    setSelectValue(root, 'systemId', s.systemId);
+    setInputValue(root, 'maxPressurePam', s.maxPressurePam || '');
+    setInputValue(root, 'flowValue', s.flowValue || s.massFlowKgh || s.volumeFlowM3h || '');
+    setSelectValue(root, 'flowUnit', s.flowUnit || 'kg/h');
+    setInputValue(root, 'pipeName', s.pipeName || '');
+  }
+
+  function update(root, s = {}, meta = {}) {
+    const r = calculate(s);
+    const action = String(meta.action || '');
+    const changed = Array.isArray(meta.changed) ? meta.changed : [];
+    const previous = root.__tcPipeSizingDynamic || {};
+    const appStructural = /^(record:|module:|replace|reset)/.test(action);
+    const savedStructural = /^(saved:|pipe:)/.test(action) || hasAnyChanged(changed, savedFields);
+    const inputStructural = appStructural || previous.flowUnit !== s.flowUnit || hasAnyChanged(changed, ['flowUnit']);
+
+    if (inputStructural && typeof renderInput === 'function') {
+      setIslandInner(root, '[data-pipe-dynamic="input"]', renderInput(s, r, 'blue'));
+    }
+
+    if (savedStructural && typeof renderSavedPanel === 'function') {
+      setIslandInner(root, '[data-pipe-dynamic="saved-records"]', renderSavedPanel(s, r, 'blue'));
+    }
+
+    syncFields(root, s);
+    setIslandInner(root, '[data-pipe-dynamic="result"]', renderResult(s, r, 'blue'));
+
+    root.__tcPipeSizingDynamic = {
+      flowUnit: s.flowUnit,
+      activePipeId: s.activePipeId,
+      expandedPipeId: s.expandedPipeId
+    };
+  }
+
+  return { update };
+}
+
 export const dynamicRendererInternals = {
   setInner,
   setSelectValue,

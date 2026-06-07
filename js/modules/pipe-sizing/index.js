@@ -4,6 +4,7 @@ import { state } from './state.js';
 import { calculate } from './logic.js';
 import { card, field, selectField, renderModuleShell, stack } from '../../core/renderer.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createPipeSizingDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { fmt } from '../../utils/calculations.js';
 import { renderResultModel } from '../../platform/resultRenderer/index.js';
 import { buildPipeSizingResultModel } from './results.js';
@@ -58,9 +59,8 @@ function pipeSaveCard(s){
   });
 }
 
-function view(s) {
-  const r = calculate(s);
-  const inputCard = card('Basisdaten', stack([
+function inputContent(s) {
+  return stack([
     selectField({ id: 'systemId', label: 'Rohrsystem', value: s.systemId, options: pipeSystems.map(p => ({ value: p.id, label: p.label })) }),
     field({ id: 'maxPressurePam', label: 'Max. Druckverlust', unit: 'Pa/m', value: s.maxPressurePam }),
     field({
@@ -74,13 +74,21 @@ function view(s) {
       ],
       value: s.flowValue || s.massFlowKgh || s.volumeFlowM3h || ''
     })
-  ].join('')), 'blue');
+  ].join(''));
+}
 
-  const outputCard = renderResultModel(buildPipeSizingResultModel(s, r, 'blue'), 'blue');
+function resultContent(s, r) {
+  return renderResultModel(buildPipeSizingResultModel(s, r, 'blue'), 'blue');
+}
+
+function view(s) {
+  const r = calculate(s);
+  const inputCard = card('Basisdaten', `<div data-pipe-dynamic="input">${inputContent(s)}</div>`, 'blue');
+  const outputCard = resultContent(s, r);
 
   return renderModuleShell(config, `
-    <div class="span-6">${inputCard}<div class="formula">≤ DN50: DIN EN 10255 · ≥ DN65: DIN EN 10220</div>${pipeSaveCard(s)}</div>
-    <div class="span-6">${outputCard}<div class="formula">Auslegung nach Druckverlustgrenze</div></div>
+    <div class="span-6">${inputCard}<div class="formula">≤ DN50: DIN EN 10255 · ≥ DN65: DIN EN 10220</div><div data-pipe-dynamic="saved-records">${pipeSaveCard(s)}</div></div>
+    <div class="span-6"><div data-pipe-dynamic="result">${outputCard}</div><div class="formula">Auslegung nach Druckverlustgrenze</div></div>
   `);
 }
 function hydrateSavedPipe(item, current) {
@@ -134,11 +142,28 @@ function bindPipeSizingActions(root) {
   });
 }
 
+const pipeSizingDynamicRenderer = createPipeSizingDynamicRenderer({
+  calculate,
+  renderInput: inputContent,
+  renderSavedPanel: pipeSaveCard,
+  renderResult: resultContent
+});
+
+function updatePipeSizingDynamic(root, s, meta = {}) {
+  pipeSizingDynamicRenderer.update(root, s, meta);
+}
+
+function isDynamicPipeSizingAction(meta = {}) {
+  return String(meta.action || '') !== 'initial';
+}
+
 export default createPlatformModule({
   config,
   schema,
   state,
   calculate,
   view,
-  bind: bindPipeSizingActions
+  bind: bindPipeSizingActions,
+  dynamicUpdate: updatePipeSizingDynamic,
+  isDynamicAction: isDynamicPipeSizingAction
 });
