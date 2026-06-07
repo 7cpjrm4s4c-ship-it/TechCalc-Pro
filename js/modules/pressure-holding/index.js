@@ -2,19 +2,17 @@ import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, esc } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid } from '../../core/renderer.js';
 import { mountModule } from '../../core/mount.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { createSavedRecordActions } from '../../core/savedRecordController.js';
 import { renderSavedRecordList, renderSavedRecordPanel, bindEditModeClear } from '../../core/savedRecords.js';
+import { renderResultModel } from '../../platform/resultRenderer/index.js';
+import { buildPressureHoldingResultModel } from './results.js';
 import { commitAllFields, registerCentralActions } from '../../core/eventPipeline.js';
 
 const opts = (items) => items.map(([value,label]) => ({ value, label }));
 
-function warnList(items){
-  if(!items.length) return '<div class="empty-state empty-state--compact ph-note">Keine Plausibilitätswarnungen.</div>';
-  return `<div class="tc-warning-list ph-warnings">${items.map(w => `<div class="tc-warning ph-warning"><span>Hinweis</span><strong>${w}</strong></div>`).join('')}</div>`;
-}
 
 
 function savedPlantSnapshot(s, r){
@@ -114,17 +112,6 @@ function explain(s){
 
 function view(s){
   const r = calculate(s);
-  const main = s.holdingType === 'dynamic'
-    ? { label:`Erforderliches Nennvolumen ${s.dynamicType === 'variomat' ? 'Variomat' : 'Reflexomat'}`, value:fmt(r.vnDynamic,1), unit:'Liter' }
-    : { label:'Erforderliches MAG-Nennvolumen', value:r.vnMag > 0 ? fmt(r.vnMag,1) : '—', unit:r.vnMag > 0 ? 'Liter' : '' };
-  const details = [
-    { label: s.holdingType === 'dynamic' ? 'Station / Gefäß' : 'Auswahl MAG', value:r.productLabel },
-    { label:'Nächstes Normvolumen', value: r.selectedVolume > 0 ? fmt(r.selectedStandardVolume,0) : '—', unit:'Liter' },
-    { label:'Mindestbetriebsdruck p₀', value:fmt(r.p0,2), unit:'bar' },
-    { label:'Anfangsdruck pₐ min.', value:fmt(r.paMin,2), unit:'bar' },
-    { label:'Enddruck pₑ', value:fmt(r.pe,2), unit:'bar' }
-  ];
-
   const basis = card('Berechnungsart', stack([
     segmented('systemType', opts([['heating','Heizwasser'],['cooling','Kühlwasser']]), s.systemType, { accent:'purple' }),
     segmented('holdingType', opts([['mag','MAG statisch'],['dynamic','Druckhaltestation']]), s.holdingType, { accent:'purple' }),
@@ -162,26 +149,7 @@ function view(s){
     s.holdingType === 'mag' ? card('MAG-Optionen', `${segmented('includeServitec', opts([['false','ohne Servitec'],['true','mit Servitec +5 l']]), s.includeServitec, { accent:'purple' })}<p class="tc-help ph-help">Servitec steht für Entgasung/Nachspeisung. Bei „mit Servitec“ wird das Zusatzvolumen des Entgasungsrohres berücksichtigt.</p>`, 'purple') : card('Dynamisches System', `${selectField({ id:'dynamicType', label:'Druckhaltestation', value:s.dynamicType, options:opts([['reflexomat','Reflexomat · kompressorgesteuert · AD 0,2 bar'],['variomat','Variomat · pumpengesteuert · AD 0,4 bar']]) })}<p class="tc-help ph-help">Die Auswahl bestimmt Arbeitsbereich AD und die Ergebnisbezeichnung der Station.</p>`, 'purple')
   ].join(''));
 
-  const resultColumn = stack([
-    mainResult('Ergebnis Druckhaltung', main, details, 'purple'),
-    resultCard('Zwischenergebnisse', [
-      { label:'Ausdehnungskoeffizient n', value:fmt(r.expansionPct,2), unit:'%' },
-      { label:'Verdampfungsdruck pD', value:fmt(r.vaporPressure,2), unit:'bar' },
-      { label:'statischer Druck pₛₜ verwendet', value:fmt(r.staticPressure,2), unit:'bar' },
-      { label:'Ausdehnungsvolumen Ve', value:fmt(r.ve,1), unit:'Liter' },
-      { label:'Wasservorlage VV', value:fmt(r.vv,1), unit:'Liter' },
-      { label:'Schließdruckdifferenz ASV', value:fmt(r.asv,2), unit:'bar' },
-      { label:'Volumenfaktor MAG', value:fmt(r.factor,2) }
-    ], 'purple'),
-    card('Formeln / Plausibilität', stack([
-      `<div class="formula tc-formula ph-formula">p₀ = pₛₜ + pD ${s.connectionType === 'pressure' ? '+ Δpₚ' : '+ 0,2 bar'} · pe = pSV − ASV</div>`,
-      `<div class="formula tc-formula ph-formula">Ve = VA × n / 100 · VV = max(0,5 % × VA; 3 l)</div>`,
-      s.holdingType === 'mag'
-        ? `<div class="formula tc-formula ph-formula">Vn = (Ve + VV${s.includeServitec === 'true' ? ' + 5 l' : ''}) × (pe + 1) / (pe − p₀)</div>`
-        : `<div class="formula tc-formula ph-formula">Vn ≥ 1,1 × (Ve + VV) · pe ≥ p₀ + 0,3 bar + AD</div>`,
-      warnList(r.warnings)
-    ].join('')), 'purple')
-  ].join(''));
+  const resultColumn = renderResultModel(buildPressureHoldingResultModel(s, r, 'purple'), 'purple');
 
   return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6">${resultColumn}</div>`);
 }
