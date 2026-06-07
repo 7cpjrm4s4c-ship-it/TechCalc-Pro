@@ -64,7 +64,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-8-schema-inventory"
+      "migrationStatus": "phase-8-schema-inventory phase-21b1-platform-mount phase-21b2-saved-record-controller"
     },
     {
       "id": "pressure-holding",

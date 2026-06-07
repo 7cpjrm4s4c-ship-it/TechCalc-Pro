@@ -19,3 +19,13 @@
 - `npm test` bestanden.
 - Import-/Syntax-Check bestanden.
 - Pressure-Holding Regressionen 20B.1, 20B.2, 20B.3, 20C, 20D und 20E bestanden.
+
+## Phase 21B.2 – Pipe Sizing Saved Record Controller
+
+- Rohrdimensionierung Saved Records auf `createSavedRecordActions` migriert.
+- Zentrales `renderSavedRecordPanel` / `renderSavedRecordList` eingebunden.
+- Legacy `bindSavedRecordWorkflow` und `data-pipe-*` Saved-Record-Selektoren aus dem Modul entfernt.
+- `expandedPipeId` ergaenzt.
+- `CENTRAL_SAVED_RECORDS` fuer pipe-sizing aktiviert.
+- Regression `pipe-sizing-phase21b2-saved-record-controller.test.mjs` ergaenzt.
+- Vollstaendiges `npm test` bestanden.

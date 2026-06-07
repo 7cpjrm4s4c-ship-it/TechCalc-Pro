@@ -6,19 +6,20 @@ import { card, field, selectField, resultRows, renderModuleShell, stack, grid, p
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { fmt } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
-import { createRecordId, renderSavedRecordList } from '../../core/savedRecords.js';
-import { bindSavedRecordWorkflow } from '../../core/savedRecordController.js';
+import { createRecordId, renderSavedRecordList, renderSavedRecordPanel, bindEditModeClear } from '../../core/savedRecords.js';
+import { createSavedRecordActions } from '../../core/savedRecordController.js';
+import { commitAllFields, registerCentralActions } from '../../core/eventPipeline.js';
 
 
 function pipeSnapshot(s, r){
   const saved = Array.isArray(s.savedPipes) ? s.savedPipes : [];
   const copy = { ...s };
-  delete copy.savedPipes; delete copy.activePipeId;
+  delete copy.savedPipes; delete copy.activePipeId; delete copy.expandedPipeId;
   return {
     id: s.activePipeId || createRecordId('pipe'),
     name: s.pipeName?.trim() || `Rohrauslegung ${saved.length + 1}`,
     state: copy,
-    createdAt: new Date().toISOString(),
+    createdAt: s.activePipeId ? (saved.find(x => x.id === s.activePipeId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     result: r && !r.noDimension ? { system: r.system?.label, dn: r.dn, velocity: r.velocity, pressureLoss: r.pressureLoss, massFlowKgh: s.flowUnit === 'kg/h' ? s.flowValue : s.massFlowKgh, volumeFlowM3h: s.flowUnit === 'm³/h' ? s.flowValue : s.volumeFlowM3h } : { massFlowKgh: s.flowUnit === 'kg/h' ? s.flowValue : s.massFlowKgh, volumeFlowM3h: s.flowUnit === 'm³/h' ? s.flowValue : s.volumeFlowM3h }
   };
@@ -27,10 +28,8 @@ function savedPipeRows(s){
   const items = Array.isArray(s.savedPipes) ? s.savedPipes : [];
   return renderSavedRecordList(items, {
     activeId: s.activePipeId,
+    expandedId: s.expandedPipeId,
     emptyText: 'Noch keine Rohrauslegungen gespeichert.',
-    loadAttr: 'data-pipe-load',
-    toggleAttr: 'data-line-toggle',
-    deleteAttr: 'data-pipe-delete',
     title: item => item.name || 'Rohrauslegung',
     stats: item => [
       {label:'System', value:item.result?.system || '—'},
@@ -42,11 +41,19 @@ function savedPipeRows(s){
   });
 }
 function pipeSaveCard(s){
-  return card('Rohrauslegung speichern', stack([
-    field({ id:'pipeName', label:'Bezeichnung', value:s.pipeName || '', placeholder:'z. B. Hauptleitung Technik', inputmode:'text' }),
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-pipe-save ${s.activePipeId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-pipe-update ${s.activePipeId ? '' : 'disabled'}>Aktualisieren</button></div>`,
-    savedPipeRows(s)
-  ].join('')), 'blue');
+  return renderSavedRecordPanel({
+    title: 'Rohrauslegung speichern',
+    nameFieldId: 'pipeName',
+    nameLabel: 'Bezeichnung',
+    nameValue: s.pipeName || '',
+    namePlaceholder: 'z. B. Hauptleitung Technik',
+    addAction: 'pipe:save',
+    updateAction: 'pipe:update',
+    addDisabled: Boolean(s.activePipeId),
+    updateDisabled: !s.activePipeId,
+    listHtml: savedPipeRows(s),
+    accent: 'blue'
+  });
 }
 
 function pipeDimensionCards(r) {
@@ -108,30 +115,54 @@ function view(s) {
     <div class="span-6">${outputCard}<div class="formula">Auslegung nach Druckverlustgrenze</div></div>
   `);
 }
+function hydrateSavedPipe(item, current) {
+  return item?.state ? {
+    ...item.state,
+    savedPipes: current.savedPipes || [],
+    activePipeId: item.id,
+    expandedPipeId: current.expandedPipeId || null,
+    pipeName: item.name || item.state?.pipeName || ''
+  } : {};
+}
+
+function clearSavedPipe() {
+  return { activePipeId: null, pipeName: '' };
+}
+
 function bindPipeSizingActions(root) {
-  bindSavedRecordWorkflow(root, {
+  bindEditModeClear(root, {
+    state,
+    activeIdKey: 'activePipeId',
+    nameKey: 'pipeName'
+  });
+
+  const actions = createSavedRecordActions({
+    root,
     state,
     calculate,
     snapshot: (current, result, existing) => ({
       ...pipeSnapshot(current, result),
       ...(existing ? { id: existing.id, createdAt: existing.createdAt } : {})
     }),
-    hydrate: (item, current) => item?.state ? {
-      ...item.state,
-      activePipeId: item.id,
-      pipeName: item.name || item.state?.pipeName || ''
-    } : {},
-    clear: () => ({ activePipeId: null, pipeName: '' }),
+    hydrate: hydrateSavedPipe,
+    clear: clearSavedPipe,
     listKey: 'savedPipes',
     activeIdKey: 'activePipeId',
+    expandedIdKey: 'expandedPipeId',
     nameKey: 'pipeName',
     recordPrefix: 'pipe',
-    saveSelector: '[data-pipe-save]',
-    updateSelector: '[data-pipe-update]',
-    loadAttr: 'data-pipe-load',
-    toggleAttr: 'data-line-toggle',
-    deleteAttr: 'data-pipe-delete',
-    clearOnOutsideClick: true
+    beforeCreate: ({ root: host }) => commitAllFields(host || root, state, { action: 'pipe:pre-save', notify: false }),
+    beforeUpdate: ({ root: host }) => commitAllFields(host || root, state, { action: 'pipe:pre-update', notify: false }),
+    preserveSaveScroll: true,
+    preserveLoadScroll: true
+  });
+
+  registerCentralActions(root, {
+    'pipe:save': actions.save,
+    'pipe:update': actions.update,
+    'saved:load': actions.load,
+    'saved:delete': actions.delete,
+    'saved:toggle': actions.toggle
   });
 }
 

@@ -8,5 +8,6 @@ export const state = createModuleState({
   maxPressurePam:'100',
   pipeName:'',
   activePipeId:null,
+  expandedPipeId:null,
   savedPipes:[]
 });
