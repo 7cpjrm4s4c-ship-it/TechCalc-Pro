@@ -8,7 +8,7 @@ assert.match(index, /createPlatformModule\s*\(/, 'unit-converter must use create
 assert.doesNotMatch(index, /mountModule\s*\(/, 'unit-converter must not call legacy mountModule');
 assert.match(config, /phase-22b1-platform-mount/, 'migrationStatus must include phase-22b1-platform-mount');
 assert.match(config, /phase-22b1-render-fix/, 'migrationStatus must include phase-22b1-render-fix');
-assert.match(index, /isDynamicAction:\s*\(\)\s*=>\s*false/, 'custom view must force full renders until unit dynamic renderer exists');
+assert.ok(/isDynamicAction:\s*isDynamicUnitConverterAction/.test(index) || /isDynamicAction:\s*\(\)\s*=>\s*false/.test(index), 'custom view must either force full renders or use the unit dynamic renderer');
 
 const module = await import('../js/modules/unit-converter/index.js');
 assert.equal(typeof module.default.mount, 'function', 'platform module must expose mount function');

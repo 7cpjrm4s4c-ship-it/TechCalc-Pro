@@ -386,6 +386,52 @@ export function createPipeSizingDynamicRenderer(options = {}) {
   return { update };
 }
 
+export function createUnitConverterDynamicRenderer(options = {}) {
+  const {
+    calculate,
+    fmt,
+    normalizeUnitSelection,
+    renderConversion,
+    renderResult
+  } = options;
+
+  if (typeof calculate !== 'function') throw new Error('createUnitConverterDynamicRenderer requires calculate');
+  if (typeof normalizeUnitSelection !== 'function') throw new Error('createUnitConverterDynamicRenderer requires normalizeUnitSelection');
+  if (typeof renderResult !== 'function') throw new Error('createUnitConverterDynamicRenderer requires renderResult');
+
+  function syncFields(root, s = {}) {
+    const { from, to } = normalizeUnitSelection(s);
+    setSelectValue(root, 'category', s.category || 'pressure');
+    setInputValue(root, 'value', s.value || '');
+    setSelectValue(root, 'from', from);
+    setSelectValue(root, 'to', to);
+    setInputValue(root, 'convertedValue', fmt?.(calculate({ ...s, from, to }), 2) ?? calculate({ ...s, from, to }));
+  }
+
+  function update(root, s = {}, meta = {}) {
+    const action = String(meta.action || '');
+    const changed = Array.isArray(meta.changed) ? meta.changed : [];
+    const previous = root.__tcUnitConverterDynamic || {};
+    const { units, from, to } = normalizeUnitSelection(s);
+    const categoryStructural = previous.category !== s.category || changed.includes('category') || /^(record:|module:|replace|reset)/.test(action);
+
+    if (categoryStructural && typeof renderConversion === 'function') {
+      setIslandInner(root, '[data-unit-dynamic="conversion"]', renderConversion({ ...s, from, to }, units, from, to, 'green'));
+    }
+
+    syncFields(root, { ...s, from, to });
+    setIslandInner(root, '[data-unit-dynamic="result"]', renderResult({ ...s, from, to }, 'green'));
+
+    root.__tcUnitConverterDynamic = {
+      category: s.category,
+      from,
+      to
+    };
+  }
+
+  return { update };
+}
+
 export const dynamicRendererInternals = {
   setInner,
   setSelectValue,

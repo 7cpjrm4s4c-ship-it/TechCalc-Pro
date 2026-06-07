@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-07T16:02:15.306Z",
+  "generatedAt": "2026-06-07T16:59:48.314Z",
   "contractTarget": "1.3.0",
   "modules": [
     {
@@ -128,9 +128,8 @@
       "exposesSchema": true,
       "legacyRendererImports": 1,
       "ownUiClassSamples": [
-        "span-6",
-        "full-render",
-        "dynamic-only"
+        "data-unit-dynamic",
+        "span-6"
       ]
     },
     {

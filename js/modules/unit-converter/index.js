@@ -5,15 +5,14 @@ import { calculate } from './logic.js';
 import { buildUnitConverterResultModel, normalizeUnitSelection } from './results.js';
 import { card, field, selectField, renderModuleShell, stack } from '../../core/renderer.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createUnitConverterDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { unitCategories } from '../../utils/units.js';
 import { fmt } from '../../utils/calculations.js';
 import { renderResultModel } from '../../platform/resultRenderer/index.js';
 
-function view(s) {
-  const { units, from, to } = normalizeUnitSelection(s);
+function renderConversionCardBody(s, units, from, to) {
   const result = calculate({ ...s, from, to });
-
-  const conversionCard = card('Kategorie wählen', stack([
+  return stack([
     selectField({ id: 'category', label: 'Kategorie', value: s.category, options: Object.entries(unitCategories).map(([value, c]) => ({ value, label: c.label })) }),
     field({
       id: 'value',
@@ -33,24 +32,50 @@ function view(s) {
       disabled: true,
       placeholder: '—'
     })
-  ].join('')), 'green');
+  ].join(''));
+}
 
-  const resultCards = renderResultModel(buildUnitConverterResultModel({ ...s, from, to }, 'green'), 'green');
+function renderConversion(s, units, from, to) {
+  return renderConversionCardBody(s, units, from, to);
+}
+
+function renderResult(s, accent = 'green') {
+  const { from, to } = normalizeUnitSelection(s);
+  return renderResultModel(buildUnitConverterResultModel({ ...s, from, to }, accent), accent);
+}
+
+const unitConverterDynamicRenderer = createUnitConverterDynamicRenderer({
+  calculate,
+  fmt,
+  normalizeUnitSelection,
+  renderConversion,
+  renderResult
+});
+
+function view(s) {
+  const { units, from, to } = normalizeUnitSelection(s);
+  const conversionCard = card('Kategorie wählen', `<div data-unit-dynamic="conversion">${renderConversionCardBody({ ...s, from, to }, units, from, to)}</div>`, 'green');
 
   return renderModuleShell(config, `
     <div class="span-6">${conversionCard}</div>
-    <div class="span-6">${resultCards}</div>
+    <div class="span-6"><div data-unit-dynamic="result">${renderResult({ ...s, from, to }, 'green')}</div></div>
   `);
 }
+
+function updateUnitConverterDynamic(root, s, meta = {}) {
+  unitConverterDynamicRenderer.update(root, s, meta);
+}
+
+function isDynamicUnitConverterAction(meta = {}) {
+  return String(meta.action || '') !== 'initial';
+}
+
 export default createPlatformModule({
   config,
   schema,
   state,
   calculate,
   view,
-  // Unit converter fields change the available unit selectors and result list.
-  // Without a dedicated dynamic renderer, every state change must use the
-  // platform full-render path; otherwise createPlatformModule treats the
-  // custom view as dynamic-only and no visible conversion update happens.
-  isDynamicAction: () => false
+  dynamicUpdate: updateUnitConverterDynamic,
+  isDynamicAction: isDynamicUnitConverterAction
 });
