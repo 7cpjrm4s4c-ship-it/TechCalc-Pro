@@ -1,14 +1,14 @@
-# TechCalc Pro 1.3.0 – Phase 22C.1
+# TechCalc Pro 1.3.0 – Phase 22E
 
-## Einheitenrechner – Result Cleanup
+## Einheitenrechner Hardening
 
-- separate Result-Card `Umrechnung` entfernt
-- Ergebnisbereich auf die relevante Card `Alle Werte` reduziert
-- Eingabecard `Kategorie wählen` bleibt inklusive direkter Ausgabe erhalten
-- Result-Model vereinfacht: kein `primary`-Result mehr, nur noch Gruppenmodell
-- Regression ergänzt: `unit-converter-phase22c1-result-cleanup.test.mjs`
-- Quality Gate erweitert
+- Phase `phase-22e-hardening` im Modulstatus ergänzt.
+- Regression `unit-converter-phase22e-hardening.test.mjs` ergänzt.
+- Quality Gate um die 22E-Regression erweitert.
+- Utility-Ausnahme verifiziert: Der Einheitenrechner bleibt bewusst ohne Saved-Record-Funktion.
+- Plattformvertrag verifiziert: `config`, `schema`, `state`, `logic`, `results`, `viewModel`, `view`, `index`.
+- Legacy Mount, Legacy Result Renderer und Saved-Record-Pfade ausgeschlossen.
 
 ## Prüfung
 
-- `npm test` vollständig bestanden
+- `npm test` vollständig bestanden.

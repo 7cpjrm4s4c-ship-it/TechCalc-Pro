@@ -94,7 +94,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": false,
       "hasLegacyModuleClasses": false,
-      "migrationStatus": "phase-8-schema-inventory phase-22b1-platform-mount phase-22b1-render-fix phase-22b3-result-renderer phase-22c-dynamic-renderer phase-22c1-result-cleanup"
+      "migrationStatus": "phase-8-schema-inventory phase-22b1-platform-mount phase-22b1-render-fix phase-22b3-result-renderer phase-22c-dynamic-renderer phase-22c1-result-cleanup phase-22d-platform-contract phase-22e-hardening"
     },
     {
       "id": "ventilation",

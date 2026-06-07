@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-07T17:23:55.911Z",
+  "generatedAt": "2026-06-07T17:55:49.886Z",
   "contractTarget": "1.3.0",
   "modules": [
     {
@@ -126,11 +126,8 @@
       "usesDefineConfig": true,
       "hasSchemaFile": true,
       "exposesSchema": true,
-      "legacyRendererImports": 1,
-      "ownUiClassSamples": [
-        "data-unit-dynamic",
-        "span-6"
-      ]
+      "legacyRendererImports": 0,
+      "ownUiClassSamples": []
     },
     {
       "module": "ventilation",
