@@ -3,7 +3,7 @@ import schema from './schema.js';
 import { state } from './state.js';
 import { calculate, unitsFor } from './logic.js';
 import { card, field, selectField, resultRows, renderModuleShell, stack, grid } from '../../core/renderer.js';
-import { mountModule } from '../../core/mount.js';
+import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { unitCategories } from '../../utils/units.js';
 import { fmt } from '../../utils/calculations.js';
 
@@ -49,11 +49,10 @@ function view(s) {
     <div class="span-6">${allValuesCard}</div>
   `);
 }
-export default {
+export default createPlatformModule({
   config,
   schema,
   state,
-  mount(root) {
-    return mountModule(root, state, view);
-  }
-};
+  calculate,
+  view
+});
