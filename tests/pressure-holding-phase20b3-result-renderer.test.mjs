@@ -6,13 +6,14 @@ import { buildPressureHoldingResultModel } from '../js/modules/pressure-holding/
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const indexSource = fs.readFileSync(path.join(root, 'js/modules/pressure-holding/index.js'), 'utf8');
+const viewModelSource = fs.readFileSync(path.join(root, 'js/modules/pressure-holding/viewModel.js'), 'utf8');
 const resultsSource = fs.readFileSync(path.join(root, 'js/modules/pressure-holding/results.js'), 'utf8');
 
-assert.match(indexSource, /renderResultModel/);
-assert.match(indexSource, /buildPressureHoldingResultModel/);
-assert.doesNotMatch(indexSource, /\bmainResult\b/);
-assert.doesNotMatch(indexSource, /\bresultCard\b/);
-assert.doesNotMatch(indexSource, /\bresultRows\b/);
+assert.match(viewModelSource, /renderResultModel/);
+assert.match(viewModelSource, /buildPressureHoldingResultModel/);
+assert.doesNotMatch(indexSource + viewModelSource, /\bmainResult\b/);
+assert.doesNotMatch(indexSource + viewModelSource, /\bresultCard\b/);
+assert.doesNotMatch(indexSource + viewModelSource, /\bresultRows\b/);
 assert.match(resultsSource, /pressureHoldingPrimary/);
 assert.match(resultsSource, /pressureHoldingIntermediateRows/);
 

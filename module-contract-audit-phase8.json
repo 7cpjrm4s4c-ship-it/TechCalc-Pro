@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-07T05:20:43.334Z",
+  "generatedAt": "2026-06-07T07:42:09.652Z",
   "contractTarget": "1.3.0",
   "modules": [
     {
@@ -123,14 +123,8 @@
       "usesDefineConfig": true,
       "hasSchemaFile": true,
       "exposesSchema": true,
-      "legacyRendererImports": 1,
-      "ownUiClassSamples": [
-        "ph-saved-list",
-        "ph-help",
-        "span-6",
-        "pre-save",
-        "pre-update"
-      ]
+      "legacyRendererImports": 0,
+      "ownUiClassSamples": []
     },
     {
       "module": "rainwater",

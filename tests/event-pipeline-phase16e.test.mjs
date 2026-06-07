@@ -12,10 +12,11 @@ for (const file of ['js/modules/buffer-storage/index.js']) {
 }
 
 const pressureHolding = readFileSync('js/modules/pressure-holding/index.js', 'utf8');
-assert.match(pressureHolding, /createSavedRecordActions/, 'pressure-holding must use central saved-record actions');
-assert.match(pressureHolding, /registerCentralActions/, 'pressure-holding saved-record actions must use the central action registry');
-assert.doesNotMatch(pressureHolding, /bindSavedRecordWorkflow/, 'pressure-holding must not use the legacy saved-record workflow after phase 20B.2');
-assert.doesNotMatch(pressureHolding, /\.addEventListener\s*\(/, 'pressure-holding must not bind module-local DOM events');
+const pressureHoldingController = readFileSync('js/modules/pressure-holding/controller.js', 'utf8');
+assert.match(pressureHoldingController, /createSavedRecordActions/, 'pressure-holding must use central saved-record actions');
+assert.match(pressureHoldingController, /registerCentralActions/, 'pressure-holding saved-record actions must use the central action registry');
+assert.doesNotMatch(pressureHolding + pressureHoldingController, /bindSavedRecordWorkflow/, 'pressure-holding must not use the legacy saved-record workflow after phase 20B.2');
+assert.doesNotMatch(pressureHolding + pressureHoldingController, /\.addEventListener\s*\(/, 'pressure-holding must not bind module-local DOM events');
 
 const rainwater = readFileSync('js/modules/rainwater/index.js', 'utf8');
 const controller = readFileSync('js/modules/rainwater/controller.js', 'utf8');

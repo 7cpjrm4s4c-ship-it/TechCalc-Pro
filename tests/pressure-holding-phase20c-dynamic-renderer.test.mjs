@@ -9,16 +9,17 @@ globalThis.document = { activeElement: null };
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const indexSource = fs.readFileSync(path.join(rootDir, 'js/modules/pressure-holding/index.js'), 'utf8');
+const viewSource = fs.readFileSync(path.join(rootDir, 'js/modules/pressure-holding/view.js'), 'utf8');
 const dynamicSource = fs.readFileSync(path.join(rootDir, 'js/platform/dynamicRenderer/index.js'), 'utf8');
 
 assert.match(dynamicSource, /createPressureHoldingDynamicRenderer/);
 assert.match(indexSource, /createPressureHoldingDynamicRenderer/);
-assert.match(indexSource, /data-ph-dynamic="basis"/);
-assert.match(indexSource, /data-ph-dynamic="volume-fields"/);
-assert.match(indexSource, /data-ph-dynamic="pressure-fields"/);
-assert.match(indexSource, /data-ph-dynamic="holding-options"/);
-assert.match(indexSource, /data-ph-dynamic="saved-records"/);
-assert.match(indexSource, /data-ph-dynamic="result"/);
+assert.match(viewSource, /data-ph-dynamic="basis"/);
+assert.match(viewSource, /data-ph-dynamic="volume-fields"/);
+assert.match(viewSource, /data-ph-dynamic="pressure-fields"/);
+assert.match(viewSource, /data-ph-dynamic="holding-options"/);
+assert.match(viewSource, /data-ph-dynamic="saved-records"/);
+assert.match(viewSource, /data-ph-dynamic="result"/);
 assert.match(indexSource, /dynamicUpdate: updatePressureHoldingDynamic/);
 assert.match(indexSource, /isDynamicAction: isDynamicPressureHoldingAction/);
 assert.equal(typeof createPressureHoldingDynamicRenderer, 'function');
@@ -83,3 +84,19 @@ assert.ok(rendered.includes('pressure'));
 assert.ok(rendered.includes('result'));
 
 console.log('pressure-holding-phase20c-dynamic-renderer ok');
+
+rendered = [];
+renderer.update(fakeRoot, {
+  systemType: 'heating',
+  holdingType: 'mag',
+  connectionType: 'pressure',
+  waterContentMode: 'known',
+  includeServitec: 'false',
+  frostMode: 'water',
+  dynamicType: 'reflexomat',
+  plantName: 'Neue Anlagenbezeichnung',
+  savedPlants: []
+}, { action: 'field:change', changed: ['plantName'] });
+
+assert.deepEqual(rendered, ['result']);
+assert.doesNotMatch(dynamicSource, /const savedFields = \[[^\]]*plantName/);

@@ -277,7 +277,7 @@ export function createPressureHoldingDynamicRenderer(options = {}) {
   const structuralVolumeFields = ['waterContentMode'];
   const structuralPressureFields = ['connectionType'];
   const structuralHoldingFields = ['holdingType'];
-  const savedFields = ['savedPlants', 'activePlantId', 'expandedPlantId', 'plantName'];
+  const savedFields = ['savedPlants', 'activePlantId', 'expandedPlantId'];
 
   function syncFields(root, s = {}) {
     updateSegment(root, 'systemType', s.systemType);
