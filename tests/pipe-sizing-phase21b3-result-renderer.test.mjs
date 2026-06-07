@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { buildPipeSizingResultModel, pipeDimensionRows } from '../js/modules/pipe-sizing/results.js';
+import { buildPipeSizingResultModel, pipeDimensionRows, pipeDimensionCardsHtml } from '../js/modules/pipe-sizing/results.js';
 
 const index = readFileSync('js/modules/pipe-sizing/index.js', 'utf8');
 const config = readFileSync('js/modules/pipe-sizing/config.js', 'utf8');
@@ -27,5 +27,7 @@ assert.equal(model.primary.title, 'Ergebnis — Stahlrohr');
 assert.equal(model.primary.primary.value, 'DN 25');
 assert.equal(model.groups[0].title, 'Dimensionsvergleich');
 assert.equal(pipeDimensionRows(result).length, 3, 'dimension comparison must include smaller/recommended/larger when available');
+assert.match(model.groups[0].html, /pipe-dimension-card/, 'dimension comparison must render as card html');
+assert.match(pipeDimensionCardsHtml(result), /is-recommended/, 'dimension cards must mark the recommended DN');
 
 console.log('pipe-sizing phase21b3 result-renderer regression ok');

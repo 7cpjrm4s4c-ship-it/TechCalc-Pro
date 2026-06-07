@@ -26,10 +26,11 @@ export function renderResultTable(rows = []) {
   return resultRows(normalizeResultRows(rows));
 }
 
-export function renderResultGroup({ title = 'Details', rows = [], groups = [], accent = 'blue' } = {}) {
+export function renderResultGroup({ title = 'Details', rows = [], groups = [], html = '', bodyHtml = '', customHtml = '', accent = 'blue' } = {}) {
   const nested = list(groups).map(group => renderResultGroup({ accent, ...group })).join('');
   const table = rows?.length ? renderResultTable(rows) : '';
-  return card(title, `${table}${nested}`, accent);
+  const extraHtml = String(html || bodyHtml || customHtml || '');
+  return card(title, `${table}${extraHtml}${nested}`, accent);
 }
 
 export function renderStatsGroup({ title = 'Details', rows = [], accent = 'blue', compact = false } = {}) {

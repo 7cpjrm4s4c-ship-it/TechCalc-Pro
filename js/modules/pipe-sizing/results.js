@@ -1,4 +1,5 @@
 import { fmt } from '../../utils/calculations.js';
+import { esc } from '../../core/renderer.js';
 
 export function pipeSizingPrimary(r = {}) {
   if (!r) return null;
@@ -39,6 +40,27 @@ export function pipeDimensionRows(r = {}) {
   });
 }
 
+
+export function pipeDimensionCardsHtml(r = {}) {
+  if (!r || r.noDimension) return '';
+  const list = [r.smaller, r, r.larger].filter(Boolean);
+  const max = Number(r.maxPressurePam || 100);
+  return `<div class="pipe-dimension-list">${list.map(item => {
+    const ratio = max ? item.pressureLoss / max : 0;
+    const percent = Math.max(0, Math.min(ratio * 100, 100));
+    const key = item.rating?.key || (ratio < 0.75 ? 'green' : ratio <= 1 ? 'yellow' : 'red');
+    const isRecommended = item.dn === r.dn;
+    const label = isRecommended ? 'Empfohlen' : (item.dn < r.dn ? 'Eine DN kleiner' : 'Eine DN größer');
+    const dimension = item.dimension ? `Ø ${item.dimension} mm` : `di ${fmt(item.di, 1)} mm`;
+    return `<div class="pipe-dimension-card pipe-dimension-card--${esc(key)}${isRecommended ? ' is-recommended' : ''}">
+      <div class="pipe-dimension-card__head"><span>${esc(label)}</span>${isRecommended ? '<small>★</small>' : ''}</div>
+      <strong>DN ${esc(item.dn)}</strong>
+      <div class="pipe-dimension-card__meta"><span>${esc(dimension)}</span><span>di ${esc(fmt(item.di, 1))} mm</span><span>${esc(fmt(item.velocity))} m/s</span><span>${esc(fmt(item.pressureLoss))} Pa/m</span></div>
+      <div class="pipe-bar"><span style="width:${percent}%"></span></div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
 export function buildPipeSizingResultModel(_s = {}, r = {}, accent = 'blue') {
   if (!r) {
     return {
@@ -73,7 +95,8 @@ export function buildPipeSizingResultModel(_s = {}, r = {}, accent = 'blue') {
     groups: [
       {
         title: 'Dimensionsvergleich',
-        rows: pipeDimensionRows(r),
+        rows: [],
+        html: pipeDimensionCardsHtml(r),
         accent
       }
     ]
@@ -84,5 +107,6 @@ export default {
   pipeSizingPrimary,
   pipeSizingDetailRows,
   pipeDimensionRows,
+  pipeDimensionCardsHtml,
   buildPipeSizingResultModel
 };
