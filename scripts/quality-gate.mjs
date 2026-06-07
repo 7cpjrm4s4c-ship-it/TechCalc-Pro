@@ -45,6 +45,7 @@ const commands = [
   ['node', ['tests/schema-renderer-phase16c.test.mjs']],
   ['node', ['tests/css-system-phase16d.test.mjs']],
   ['node', ['tests/event-pipeline-phase16e.test.mjs']],
+  ['node', ['tests/pressure-holding-phase20b1-platform-mount.test.mjs']],
   ['node', ['tests/pressure-holding-phase20b2-saved-record-controller.test.mjs']],
   ['node', ['tests/rainwater-phase16e1-recovery.test.mjs']],
   ['node', ['tests/rainwater-phase17a-decoupling.test.mjs']],

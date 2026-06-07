@@ -1,12 +1,13 @@
-# TechCalc Pro 1.3.0 – Phase 20B.2
+# TechCalc Pro 1.3.0 — Phase 20B.1 Retrofit
 
-## Druckhaltung – Saved-Record-Controller Migration
+## Druckhaltung: Platform Mount Migration
 
-- Druckhaltung Saved Records von legacy `bindSavedRecordWorkflow` auf zentrale `createSavedRecordActions` umgestellt.
-- Gespeicherte Anlagen nutzen jetzt `renderSavedRecordPanel` und `renderSavedRecordList`.
-- Legacy-Selektoren `data-ph-save`, `data-ph-update`, `data-ph-select`, `data-ph-delete` entfernt.
-- `activePlantId` und `expandedPlantId` im Modulstate ergänzt.
-- `CENTRAL_SAVED_RECORDS` Capability aktiviert.
-- Save/Update committen Feldwerte vor Snapshot-Erzeugung zentral über `commitAllFields`.
-- Regression ergänzt: `pressure-holding-phase20b2-saved-record-controller.test.mjs`.
-- Quality Gate bestanden.
+- `pressure-holding` nachträglich auf `createPlatformModule(...)` umgestellt.
+- Legacy-Import `mountModule` aus dem Druckhaltungsmodul entfernt.
+- 20B.2 Saved Records und 20B.3 Result Renderer bleiben unverändert erhalten.
+- Reihenfolge der Phase 20 korrigiert: 20B.1 wurde als Retrofit auf dem Stand 20B.3 nachgezogen.
+
+## Checks
+
+- Syntax-/Import-Check für `js/modules/pressure-holding/index.js` bestanden.
+- Suche bestätigt: kein `mountModule` mehr im Druckhaltungsmodul.

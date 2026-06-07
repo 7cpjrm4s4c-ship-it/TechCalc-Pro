@@ -3,7 +3,7 @@ import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid } from '../../core/renderer.js';
-import { mountModule } from '../../core/mount.js';
+import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { createSavedRecordActions } from '../../core/savedRecordController.js';
 import { renderSavedRecordList, renderSavedRecordPanel, bindEditModeClear } from '../../core/savedRecords.js';
@@ -189,4 +189,11 @@ function bindPressureHoldingActions(root){
 }
 
 
-export default { config, schema, state, mount(root){ return mountModule(root, state, view, bindPressureHoldingActions); } };
+export default createPlatformModule({
+  config,
+  schema,
+  state,
+  calculate,
+  view,
+  bind: bindPressureHoldingActions
+});
