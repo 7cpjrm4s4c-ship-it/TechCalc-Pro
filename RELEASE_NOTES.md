@@ -1,16 +1,21 @@
-# TechCalc Pro 1.3.0 – Phase 20D
+# TechCalc Pro 1.3.0 — Phase 20E
 
-Druckhaltung wurde auf den finalen Plattformvertrag entkernt.
+## Phase 20E — Druckhaltung Hardening
 
-## Änderungen
-- `js/modules/pressure-holding/controller.js` ergänzt
-- `js/modules/pressure-holding/viewModel.js` ergänzt
-- `js/modules/pressure-holding/view.js` ergänzt
-- `js/modules/pressure-holding/index.js` auf reinen Plattformadapter reduziert
-- `migrationStatus` um `phase-20d-platform-contract` erweitert
-- Regression `pressure-holding-phase20d-platform-contract.test.mjs` ergänzt
-- bestehende Phase-20B/20C-Regressionen an die neue Dateistruktur angepasst
+- Phase-20E-Migrationsmarker fuer Druckhaltung ergaenzt.
+- Hardening-Regression `pressure-holding-phase20e-hardening.test.mjs` ergaenzt.
+- Quality Gate um die neue Druckhaltung-Hardening-Regression erweitert.
+- Verifiziert:
+  - Plattform-Mount ueber `createPlatformModule`.
+  - Saved Records ueber zentrale Saved-Record-Actions und zentrales Panel/List-Rendering.
+  - Result Renderer ueber zentrales Result-Model.
+  - Dynamic Updates ueber `createPressureHoldingDynamicRenderer`.
+  - Keine modul-eigene direkte DOM-Patchlogik in Druckhaltung.
+  - Keine alten `data-ph-*` Saved-Record-Selektoren.
+  - Keine alten Result-Renderer-Helfer in Druckhaltung.
 
-## Prüfung
-- Syntax-/Import-Check bestanden
-- vollständiges `npm test` / Quality Gate bestanden
+## Quality Gate
+
+- `npm test` bestanden.
+- Import-/Syntax-Check bestanden.
+- Pressure-Holding Regressionen 20B.1, 20B.2, 20B.3, 20C, 20D und 20E bestanden.
