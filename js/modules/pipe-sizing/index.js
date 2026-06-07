@@ -2,9 +2,11 @@ import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, selectField, resultRows, renderModuleShell, stack, grid, pressureBadge } from '../../core/renderer.js';
+import { card, field, selectField, renderModuleShell, stack } from '../../core/renderer.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { fmt } from '../../utils/calculations.js';
+import { renderResultModel } from '../../platform/resultRenderer/index.js';
+import { buildPipeSizingResultModel } from './results.js';
 import { pipeSystems } from '../../utils/pipes.js';
 import { createRecordId, renderSavedRecordList, renderSavedRecordPanel, bindEditModeClear } from '../../core/savedRecords.js';
 import { createSavedRecordActions } from '../../core/savedRecordController.js';
@@ -56,26 +58,6 @@ function pipeSaveCard(s){
   });
 }
 
-function pipeDimensionCards(r) {
-  if (!r || r.noDimension) return '';
-  const list = [r.smaller, r, r.larger].filter(Boolean);
-  const max = Number(r.maxPressurePam || 100);
-  return `<div class="pipe-dimension-list">${list.map(item => {
-    const ratio = max ? item.pressureLoss / max : 0;
-    const percent = Math.max(0, Math.min(ratio * 100, 100));
-    const key = item.rating?.key || (ratio < .75 ? 'green' : ratio <= 1 ? 'yellow' : 'red');
-    const isRecommended = item.dn === r.dn;
-    const label = isRecommended ? 'Empfohlen' : (item.dn < r.dn ? 'Eine DN kleiner' : 'Eine DN größer');
-    const dimension = item.dimension ? `Ø ${item.dimension} mm` : `di ${fmt(item.di, 1)} mm`;
-    return `<div class="pipe-dimension-card pipe-dimension-card--${key}${isRecommended ? ' is-recommended' : ''}">
-      <div class="pipe-dimension-card__head"><span>${label}</span>${isRecommended ? '<small>★</small>' : ''}</div>
-      <strong>DN ${item.dn}</strong>
-      <div class="pipe-dimension-card__meta"><span>${dimension}</span><span>di ${fmt(item.di, 1)} mm</span><span>${fmt(item.velocity)} m/s</span><span>${fmt(item.pressureLoss)} Pa/m</span></div>
-      <div class="pipe-bar"><span style="width:${percent}%"></span></div>
-    </div>`;
-  }).join('')}</div>`;
-}
-
 function view(s) {
   const r = calculate(s);
   const inputCard = card('Basisdaten', stack([
@@ -94,21 +76,7 @@ function view(s) {
     })
   ].join('')), 'blue');
 
-  const outputBody = !r
-    ? '<div class="empty-state">Volumenstrom oder Massenstrom eingeben →</div>'
-    : r.noDimension
-      ? '<div class="empty-state">Keine Dimensionierung möglich!</div>'
-      : stack([
-          `<div class="pipe-result-head"><span>Empfohlene DN</span><strong>DN ${r.dn}</strong>${pressureBadge(r)}</div>`,
-          resultRows([
-            { label: 'Geschwindigkeit', value: fmt(r.velocity), unit: 'm/s' },
-            { label: 'Druckverlust', value: fmt(r.pressureLoss), unit: 'Pa/m' },
-            { label: 'Norm', value: r.norm }
-          ]),
-          pipeDimensionCards(r)
-        ].join(''));
-
-  const outputCard = card(`Ergebnis — ${r?.system?.label ?? 'Rohrsystem'}`, outputBody, 'blue');
+  const outputCard = renderResultModel(buildPipeSizingResultModel(s, r, 'blue'), 'blue');
 
   return renderModuleShell(config, `
     <div class="span-6">${inputCard}<div class="formula">≤ DN50: DIN EN 10255 · ≥ DN65: DIN EN 10220</div>${pipeSaveCard(s)}</div>

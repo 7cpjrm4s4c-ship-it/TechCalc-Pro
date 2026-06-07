@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-07T10:05:34.298Z",
+  "generatedAt": "2026-06-07T10:26:41.920Z",
   "contractTarget": "1.3.0",
   "modules": [
     {
@@ -104,13 +104,6 @@
       "exposesSchema": true,
       "legacyRendererImports": 1,
       "ownUiClassSamples": [
-        "pipe-dimension-list",
-        "pipe-dimension-card",
-        "pipe-dimension-card--",
-        "is-recommended",
-        "pipe-bar",
-        "empty-state",
-        "pipe-result-head",
         "span-6",
         "pre-save",
         "pre-update"

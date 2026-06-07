@@ -29,3 +29,12 @@
 - `CENTRAL_SAVED_RECORDS` fuer pipe-sizing aktiviert.
 - Regression `pipe-sizing-phase21b2-saved-record-controller.test.mjs` ergaenzt.
 - Vollstaendiges `npm test` bestanden.
+
+## Phase 21B.3 – Rohrdimensionierung Result Renderer
+
+- Neues `js/modules/pipe-sizing/results.js` ergänzt.
+- Ergebnisbereich der Rohrdimensionierung auf `renderResultModel()` umgestellt.
+- Direkte `resultRows`-, `pressureBadge`- und eigene Dimension-Card-Resultpfade aus `index.js` entfernt.
+- Regression `pipe-sizing-phase21b3-result-renderer.test.mjs` ergänzt und ins Quality Gate eingebunden.
+- `npm test` vollständig bestanden.
+
