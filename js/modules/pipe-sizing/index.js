@@ -33,6 +33,9 @@ function savedPipeRows(s){
     activeId: s.activePipeId,
     expandedId: s.expandedPipeId,
     emptyText: 'Noch keine Rohrauslegungen gespeichert.',
+    loadAttr: 'data-line-select',
+    toggleAttr: 'data-line-toggle',
+    deleteAttr: 'data-line-delete',
     title: item => item.name || 'Rohrauslegung',
     stats: item => [
       {label:'System', value:item.result?.system || '—'},
@@ -127,6 +130,11 @@ function bindPipeSizingActions(root) {
     expandedIdKey: 'expandedPipeId',
     nameKey: 'pipeName',
     recordPrefix: 'pipe',
+    attrs: {
+      loadAttr: 'data-line-select',
+      toggleAttr: 'data-line-toggle',
+      deleteAttr: 'data-line-delete'
+    },
     beforeCreate: ({ root: host }) => commitAllFields(host || root, state, { action: 'pipe:pre-save', notify: false }),
     beforeUpdate: ({ root: host }) => commitAllFields(host || root, state, { action: 'pipe:pre-update', notify: false }),
     preserveSaveScroll: true,

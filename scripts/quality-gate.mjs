@@ -53,6 +53,7 @@ const commands = [
   ['node', ['tests/pipe-sizing-phase21b2-saved-record-controller.test.mjs']],
   ['node', ['tests/pipe-sizing-phase21b3-result-renderer.test.mjs']],
   ['node', ['tests/pipe-sizing-phase21c-dynamic-renderer.test.mjs']],
+  ['node', ['tests/pipe-sizing-phase21c2-saved-record-line-attrs.test.mjs']],
   ['node', ['tests/rainwater-phase16e1-recovery.test.mjs']],
   ['node', ['tests/rainwater-phase17a-decoupling.test.mjs']],
   ['node', ['tests/rainwater-phase17a1-decoupling.test.mjs']],
