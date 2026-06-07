@@ -2,11 +2,11 @@ import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, selectField, resultRows, renderModuleShell, stack, grid, inlineStats, pressureBadge, esc } from '../../core/renderer.js';
-import { mountModule } from '../../core/mount.js';
+import { card, field, selectField, resultRows, renderModuleShell, stack, grid, pressureBadge } from '../../core/renderer.js';
+import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { fmt } from '../../utils/calculations.js';
 import { pipeSystems } from '../../utils/pipes.js';
-import { createRecordId, isSameId, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
+import { createRecordId, renderSavedRecordList } from '../../core/savedRecords.js';
 import { bindSavedRecordWorkflow } from '../../core/savedRecordController.js';
 
 
@@ -108,36 +108,38 @@ function view(s) {
     <div class="span-6">${outputCard}<div class="formula">Auslegung nach Druckverlustgrenze</div></div>
   `);
 }
-export default {
+function bindPipeSizingActions(root) {
+  bindSavedRecordWorkflow(root, {
+    state,
+    calculate,
+    snapshot: (current, result, existing) => ({
+      ...pipeSnapshot(current, result),
+      ...(existing ? { id: existing.id, createdAt: existing.createdAt } : {})
+    }),
+    hydrate: (item, current) => item?.state ? {
+      ...item.state,
+      activePipeId: item.id,
+      pipeName: item.name || item.state?.pipeName || ''
+    } : {},
+    clear: () => ({ activePipeId: null, pipeName: '' }),
+    listKey: 'savedPipes',
+    activeIdKey: 'activePipeId',
+    nameKey: 'pipeName',
+    recordPrefix: 'pipe',
+    saveSelector: '[data-pipe-save]',
+    updateSelector: '[data-pipe-update]',
+    loadAttr: 'data-pipe-load',
+    toggleAttr: 'data-line-toggle',
+    deleteAttr: 'data-pipe-delete',
+    clearOnOutsideClick: true
+  });
+}
+
+export default createPlatformModule({
   config,
   schema,
   state,
-  mount(root) {
-    return mountModule(root, state, view, (rootEl, snapshot) => {
-      bindSavedRecordWorkflow(rootEl, {
-        state,
-        calculate,
-        snapshot: (current, result, existing) => ({
-          ...pipeSnapshot(current, result),
-          ...(existing ? { id: existing.id, createdAt: existing.createdAt } : {})
-        }),
-        hydrate: (item, current) => item?.state ? {
-          ...item.state,
-          activePipeId: item.id,
-          pipeName: item.name || item.state?.pipeName || ''
-        } : {},
-        clear: () => ({ activePipeId: null, pipeName: '' }),
-        listKey: 'savedPipes',
-        activeIdKey: 'activePipeId',
-        nameKey: 'pipeName',
-        recordPrefix: 'pipe',
-        saveSelector: '[data-pipe-save]',
-        updateSelector: '[data-pipe-update]',
-        loadAttr: 'data-pipe-load',
-        toggleAttr: 'data-line-toggle',
-        deleteAttr: 'data-pipe-delete',
-        clearOnOutsideClick: true
-      });
-    });
-  }
-};
+  calculate,
+  view,
+  bind: bindPipeSizingActions
+});
