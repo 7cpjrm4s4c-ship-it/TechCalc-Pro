@@ -9,57 +9,80 @@ import { fmt } from '../../utils/calculations.js';
 import { renderResultModel } from '../../platform/resultRenderer/index.js';
 import { buildPipeSizingResultModel } from './results.js';
 import { pipeSystems } from '../../utils/pipes.js';
-import { createRecordId, renderSavedRecordList, renderSavedRecordPanel, bindEditModeClear } from '../../core/savedRecords.js';
-import { createSavedRecordActions } from '../../core/savedRecordController.js';
-import { commitAllFields, registerCentralActions } from '../../core/eventPipeline.js';
+import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 
 
-function pipeSnapshot(s, r){
-  const saved = Array.isArray(s.savedPipes) ? s.savedPipes : [];
-  const copy = { ...s };
-  delete copy.savedPipes; delete copy.activePipeId; delete copy.expandedPipeId;
+function savedPipeStats(item = {}){
+  return [
+    {label:'System', value:item.result?.system || '—'},
+    {label:'Dimension', value:item.result?.dn ? `DN ${item.result.dn}` : '—'},
+    {label:'Druckverlust', value:item.result?.pressureLoss ? fmt(item.result.pressureLoss) : '—', unit:item.result?.pressureLoss ? 'Pa/m' : ''},
+    {label:'Massenstrom', value:item.result?.massFlowKgh || '—', unit:item.result?.massFlowKgh ? 'kg/h' : ''},
+    {label:'Volumenstrom', value:item.result?.volumeFlowM3h || '—', unit:item.result?.volumeFlowM3h ? 'm³/h' : ''}
+  ];
+}
+
+function buildPipeRecord(currentState, result, items, id, name, existing = null){
+  const copy = { ...currentState };
+  delete copy.savedPipes;
+  delete copy.activePipeId;
+  delete copy.expandedPipeId;
   return {
-    id: s.activePipeId || createRecordId('pipe'),
-    name: s.pipeName?.trim() || `Rohrauslegung ${saved.length + 1}`,
+    id,
+    name: name || currentState.pipeName?.trim() || existing?.name || `Rohrauslegung ${items.length + 1}`,
     state: copy,
-    createdAt: s.activePipeId ? (saved.find(x => x.id === s.activePipeId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
+    createdAt: existing?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    result: r && !r.noDimension ? { system: r.system?.label, dn: r.dn, velocity: r.velocity, pressureLoss: r.pressureLoss, massFlowKgh: s.flowUnit === 'kg/h' ? s.flowValue : s.massFlowKgh, volumeFlowM3h: s.flowUnit === 'm³/h' ? s.flowValue : s.volumeFlowM3h } : { massFlowKgh: s.flowUnit === 'kg/h' ? s.flowValue : s.massFlowKgh, volumeFlowM3h: s.flowUnit === 'm³/h' ? s.flowValue : s.volumeFlowM3h }
+    result: result && !result.noDimension
+      ? {
+          system: result.system?.label,
+          dn: result.dn,
+          velocity: result.velocity,
+          pressureLoss: result.pressureLoss,
+          massFlowKgh: currentState.flowUnit === 'kg/h' ? currentState.flowValue : currentState.massFlowKgh,
+          volumeFlowM3h: currentState.flowUnit === 'm³/h' ? currentState.flowValue : currentState.volumeFlowM3h
+        }
+      : {
+          massFlowKgh: currentState.flowUnit === 'kg/h' ? currentState.flowValue : currentState.massFlowKgh,
+          volumeFlowM3h: currentState.flowUnit === 'm³/h' ? currentState.flowValue : currentState.volumeFlowM3h
+        }
   };
 }
-function savedPipeRows(s){
-  const items = Array.isArray(s.savedPipes) ? s.savedPipes : [];
-  return renderSavedRecordList(items, {
-    activeId: s.activePipeId,
-    expandedId: s.expandedPipeId,
-    emptyText: 'Noch keine Rohrauslegungen gespeichert.',
-    loadAttr: 'data-line-select',
-    toggleAttr: 'data-line-toggle',
-    deleteAttr: 'data-line-delete',
-    title: item => item.name || 'Rohrauslegung',
-    stats: item => [
-      {label:'System', value:item.result?.system || '—'},
-      {label:'Dimension', value:item.result?.dn ? `DN ${item.result.dn}` : '—'},
-      {label:'Druckverlust', value:item.result?.pressureLoss ? fmt(item.result.pressureLoss) : '—', unit:item.result?.pressureLoss ? 'Pa/m' : ''},
-      {label:'Massenstrom', value:item.result?.massFlowKgh || '—', unit:item.result?.massFlowKgh ? 'kg/h' : ''},
-      {label:'Volumenstrom', value:item.result?.volumeFlowM3h || '—', unit:item.result?.volumeFlowM3h ? 'm³/h' : ''}
-    ]
-  });
+
+function hydrateSavedPipe(item, current) {
+  return item?.state ? {
+    ...item.state,
+    savedPipes: current.savedPipes || [],
+    activePipeId: item.id,
+    expandedPipeId: current.expandedPipeId || null,
+    pipeName: item.name || item.state?.pipeName || ''
+  } : {};
 }
+
+const pipeSizingSavedController = createLineSectionController({
+  state,
+  listKey: 'savedPipes',
+  activeIdKey: 'activePipeId',
+  nameKey: 'pipeName',
+  expandedIdKey: 'expandedPipeId',
+  recordPrefix: 'pipe',
+  cardTitle: 'Rohrauslegung speichern',
+  nameLabel: 'Bezeichnung',
+  nameInputId: 'pipeName',
+  namePlaceholder: 'z. B. Hauptleitung Technik',
+  emptyText: 'Noch keine Rohrauslegungen gespeichert.',
+  accent: 'blue',
+  dynamicAttr: 'saved-records',
+  dynamicDataAttr: 'data-pipe-dynamic',
+  title: item => item.name || 'Rohrauslegung',
+  stats: savedPipeStats,
+  currentResult: () => calculate(state.get()),
+  buildRecord: ({ currentState, result, items, id, name, existing }) => buildPipeRecord(currentState, result, items, id, name, existing),
+  hydrateRecord: ({ item, currentState }) => hydrateSavedPipe(item, currentState)
+});
+
 function pipeSaveCard(s){
-  return renderSavedRecordPanel({
-    title: 'Rohrauslegung speichern',
-    nameFieldId: 'pipeName',
-    nameLabel: 'Bezeichnung',
-    nameValue: s.pipeName || '',
-    namePlaceholder: 'z. B. Hauptleitung Technik',
-    addAction: 'pipe:save',
-    updateAction: 'pipe:update',
-    addDisabled: Boolean(s.activePipeId),
-    updateDisabled: !s.activePipeId,
-    listHtml: savedPipeRows(s),
-    accent: 'blue'
-  });
+  return pipeSizingSavedController.renderCard(s);
 }
 
 function inputContent(s) {
@@ -94,60 +117,8 @@ function view(s) {
     <div class="span-6"><div data-pipe-dynamic="result">${outputCard}</div><div class="formula">Auslegung nach Druckverlustgrenze</div></div>
   `);
 }
-function hydrateSavedPipe(item, current) {
-  return item?.state ? {
-    ...item.state,
-    savedPipes: current.savedPipes || [],
-    activePipeId: item.id,
-    expandedPipeId: current.expandedPipeId || null,
-    pipeName: item.name || item.state?.pipeName || ''
-  } : {};
-}
-
-function clearSavedPipe() {
-  return { activePipeId: null, pipeName: '' };
-}
-
 function bindPipeSizingActions(root) {
-  bindEditModeClear(root, {
-    state,
-    activeIdKey: 'activePipeId',
-    nameKey: 'pipeName'
-  });
-
-  const actions = createSavedRecordActions({
-    root,
-    state,
-    calculate,
-    snapshot: (current, result, existing) => ({
-      ...pipeSnapshot(current, result),
-      ...(existing ? { id: existing.id, createdAt: existing.createdAt } : {})
-    }),
-    hydrate: hydrateSavedPipe,
-    clear: clearSavedPipe,
-    listKey: 'savedPipes',
-    activeIdKey: 'activePipeId',
-    expandedIdKey: 'expandedPipeId',
-    nameKey: 'pipeName',
-    recordPrefix: 'pipe',
-    attrs: {
-      loadAttr: 'data-line-select',
-      toggleAttr: 'data-line-toggle',
-      deleteAttr: 'data-line-delete'
-    },
-    beforeCreate: ({ root: host }) => commitAllFields(host || root, state, { action: 'pipe:pre-save', notify: false }),
-    beforeUpdate: ({ root: host }) => commitAllFields(host || root, state, { action: 'pipe:pre-update', notify: false }),
-    preserveSaveScroll: true,
-    preserveLoadScroll: true
-  });
-
-  registerCentralActions(root, {
-    'pipe:save': actions.save,
-    'pipe:update': actions.update,
-    'saved:load': actions.load,
-    'saved:delete': actions.delete,
-    'saved:toggle': actions.toggle
-  });
+  pipeSizingSavedController.bind(root);
 }
 
 const pipeSizingDynamicRenderer = createPipeSizingDynamicRenderer({

@@ -3,7 +3,7 @@
   "schemaModules": 11,
   "centralNumberService": 11,
   "legacyNumberParsers": 0,
-  "centralSavedRecords": 4,
+  "centralSavedRecords": 3,
   "legacyClassModules": 7,
   "modules": [
     {
@@ -62,9 +62,9 @@
       "schemaFile": true,
       "usesCentralNumberService": true,
       "legacyNumberParsers": 0,
-      "usesCentralSavedRecords": true,
+      "usesCentralSavedRecords": false,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-8-schema-inventory phase-21b1-platform-mount phase-21b2-saved-record-controller phase-21b3-result-renderer phase-21c-dynamic-renderer phase-21c1-dimension-cards-fix phase-21c2-saved-record-line-attrs"
+      "migrationStatus": "phase-8-schema-inventory phase-21b1-platform-mount phase-21b2-saved-record-controller phase-21b3-result-renderer phase-21c-dynamic-renderer phase-21c1-dimension-cards-fix phase-21c2-saved-record-line-attrs phase-21c3-saved-record-controller-parity"
     },
     {
       "id": "pressure-holding",

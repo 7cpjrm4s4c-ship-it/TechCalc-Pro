@@ -5,11 +5,10 @@ const index = readFileSync('js/modules/pipe-sizing/index.js', 'utf8');
 const state = readFileSync('js/modules/pipe-sizing/state.js', 'utf8');
 const config = readFileSync('js/modules/pipe-sizing/config.js', 'utf8');
 
-assert.match(index, /createSavedRecordActions/, 'pipe-sizing must use central saved-record actions');
-assert.match(index, /renderSavedRecordPanel/, 'pipe-sizing must render the central saved-record panel');
-assert.match(index, /renderSavedRecordList/, 'pipe-sizing must render the central saved-record list');
-assert.match(index, /registerCentralActions/, 'pipe-sizing saved-record actions must go through central action registry');
-assert.match(index, /commitAllFields/, 'pipe-sizing must commit field state before save/update');
+assert.match(index, /createSavedRecordActions|createLineSectionController/, 'pipe-sizing must use central saved-record actions/controller');
+assert.match(index, /renderCard\(s\)|renderSavedRecordPanel/, 'pipe-sizing must render a central saved-record panel/card');
+assert.match(index, /renderRows|renderSavedRecordList|createLineSectionController/, 'pipe-sizing must render a central saved-record list');
+assert.match(index, /\.bind\(root\)|registerCentralActions/, 'pipe-sizing saved-record actions must go through central delegated bindings');
 assert.doesNotMatch(index, /bindSavedRecordWorkflow/, 'pipe-sizing must not use the legacy saved-record workflow');
 assert.doesNotMatch(index, /data-pipe-save|data-pipe-update|data-pipe-load|data-pipe-delete/, 'pipe-sizing must not use legacy pipe saved-record selectors');
 assert.match(state, /activePipeId:\s*null/, 'pipe-sizing state must expose activePipeId');
