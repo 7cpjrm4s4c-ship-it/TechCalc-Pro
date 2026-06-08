@@ -3,7 +3,7 @@
   "schemaModules": 11,
   "centralNumberService": 11,
   "legacyNumberParsers": 0,
-  "centralSavedRecords": 3,
+  "centralSavedRecords": 2,
   "legacyClassModules": 7,
   "modules": [
     {
@@ -12,9 +12,9 @@
       "schemaFile": true,
       "usesCentralNumberService": true,
       "legacyNumberParsers": 0,
-      "usesCentralSavedRecords": true,
+      "usesCentralSavedRecords": false,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-16e-event-pipeline-consolidation"
+      "migrationStatus": "phase-23c1-view-model-extraction"
     },
     {
       "id": "drinking-water",
