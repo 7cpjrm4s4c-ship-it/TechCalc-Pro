@@ -3,7 +3,7 @@
   "schemaModules": 11,
   "centralNumberService": 11,
   "legacyNumberParsers": 0,
-  "centralSavedRecords": 6,
+  "centralSavedRecords": 7,
   "legacyClassModules": 7,
   "modules": [
     {
@@ -32,9 +32,9 @@
       "schemaFile": true,
       "usesCentralNumberService": true,
       "legacyNumberParsers": 0,
-      "usesCentralSavedRecords": false,
+      "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": false,
-      "migrationStatus": "phase-8-schema-inventory"
+      "migrationStatus": "phase-24b1-platform-mount-saved-records"
     },
     {
       "id": "heating-cooling",

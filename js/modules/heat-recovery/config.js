@@ -9,7 +9,11 @@ export default defineModuleConfig({
   order: 25,
   defaultVisible: false,
 
-  migrationStatus: 'phase-8-schema-inventory',
-  capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA],
+  migrationStatus: 'phase-24b1-platform-mount-saved-records',
+  capabilities: [
+    MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE,
+    MODULE_CAPABILITIES.FORM_SCHEMA,
+    MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS
+  ],
   description: 'Berechnung von Wärmerückgewinnung und Mischluftzuständen in Lüftungsanlagen.'
 });
