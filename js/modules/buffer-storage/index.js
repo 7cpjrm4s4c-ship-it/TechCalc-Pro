@@ -2,28 +2,15 @@ import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, inlineStats, esc } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats } from '../../core/renderer.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { bindBufferStorageActions, bufferSaveCard } from './controller.js';
+import { buildBufferStorageResultModel } from './results.js';
+import { renderResultModel } from '../../platform/resultRenderer/index.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
 
-function modeLabel(mode){
-  if(mode === 'defrost') return 'Wärmepumpe / Abtauung';
-  if(mode === 'reserve') return 'Wasservorlage';
-  if(mode === 'compare') return 'Vergleich / maßgebend';
-  return 'Mindestlaufzeit';
-}
-function mediumLabel(s){
-  if(s.mediumMode === 'water') return 'Wasser';
-  const name = s.glycolType === 'propylene' ? 'Propylenglykol' : 'Ethylenglykol';
-  return `${name} ${s.glycolConcentration} %`;
-}
-function warnList(items){
-  if(!items.length) return '<div class="empty-state empty-state--compact">Keine Plausibilitätswarnungen.</div>';
-  return `<div class="tc-warning-list ph-warnings">${items.map(item => `<div class="tc-warning ph-warning"><span>Hinweis</span><strong>${esc(item)}</strong></div>`).join('')}</div>`;
-}
 function savedCard(s){
   return bufferSaveCard(s);
 }
@@ -74,14 +61,6 @@ function inputBlocks(s){
 }
 function view(s){
   const r = calculate(s);
-  const main = { label:'Erforderliches Pufferspeichervolumen', value:r.decisiveVolume > 0 ? fmt(r.decisiveVolume,1) : '—', unit:r.decisiveVolume > 0 ? 'Liter' : '' };
-  const details = [
-    { label:'Nächstes Normvolumen', value:r.nextStandardVolume ? fmt(r.nextStandardVolume,0) : '—', unit:r.nextStandardVolume ? 'Liter' : '' },
-    { label:'Berechnungsart', value:modeLabel(s.calculationMode) },
-    { label:'Medium / Faktor', value:`${mediumLabel(s)} / ${fmt(r.factor,2)}` },
-    { label:'minimaler Systeminhalt', value:fmt(r.decisiveSystemVolume,1), unit:'Liter' }
-  ];
-
   const inputColumn = stack([
     card('Berechnungsart', stack([
       `<div class="buffer-mode-tabs">${segmented('calculationMode', opts([['runtime','Mindestlaufzeit'],['defrost','Abtauung'],['reserve','Wasservorlage'],['compare','Vergleich']]), s.calculationMode, { accent:'cyan' })}</div>`,
@@ -97,23 +76,7 @@ function view(s){
   ].join(''));
 
   const resultColumn = stack([
-    mainResult('Ergebnis Pufferspeicher', main, details, 'cyan'),
-    resultCard('Zwischenergebnisse', [
-      { label:'Leistungsanteil Mindestlaufzeit', value:fmt(r.runtimePower,2), unit:'kW' },
-      { label:'Systeminhalt Mindestlaufzeit', value:fmt(r.runtimeSystemVolume,1), unit:'Liter' },
-      { label:'Puffervolumen Mindestlaufzeit', value:fmt(r.runtimeBufferVolume,1), unit:'Liter' },
-      { label:'Leistungsbilanz Abtauung', value:fmt(r.defrostPower,2), unit:'kW' },
-      { label:'Systeminhalt Abtauung', value:fmt(r.defrostSystemVolume,1), unit:'Liter' },
-      { label:'Puffervolumen Abtauung', value:fmt(r.defrostBufferVolume,1), unit:'Liter' },
-      { label:'Wasservorlage', value:fmt(r.reserveVolume,1), unit:'Liter' },
-      { label:'abgezogener Systeminhalt', value:fmt(r.existingSystemVolume,1), unit:'Liter' }
-    ], 'cyan'),
-    card('Formeln / Plausibilität', stack([
-      '<div class="formula tc-formula ph-formula">V = ((QMax × Teillast − QLast) × Faktor × TLaufzeit) / ΔTHydraulik</div>',
-      '<div class="formula tc-formula ph-formula">VAbtau = ((QVerbraucher + QKälte − QHeiz) × Faktor × TMaxAbtauung) / ΔTHydraulik</div>',
-      '<div class="formula tc-formula ph-formula">VWasservorlage = V̇Verbraucher × tÜberbrückung × 1000 / 60</div>',
-      warnList(r.warnings)
-    ].join('')), 'cyan')
+    renderResultModel(buildBufferStorageResultModel(s, r, 'cyan'), 'cyan')
   ].join(''));
 
   return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6">${resultColumn}</div>`);
