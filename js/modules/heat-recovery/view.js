@@ -41,7 +41,7 @@ export function renderInputs(vm){
 }
 
 export function renderOutputs(vm){
-  return renderResultModel(vm.resultModel, vm.accent);
+  return stack(renderResultModel(vm.resultModel, vm.accent));
 }
 
 export function renderSavedRecords(vm){
@@ -53,8 +53,8 @@ export function renderView(s) {
   const body = stack([
     `<div data-wrg-dynamic="mode">${renderModeCard(vm)}</div>`,
     `<div class="wrg-desktop-split">
-      <div class="wrg-desktop-split__input"><div data-wrg-dynamic="inputs">${renderInputs(vm)}</div><div data-wrg-dynamic="formula" class="formula">${esc(vm.formula)}</div></div>
-      <div class="wrg-desktop-split__output"><div data-wrg-dynamic="outputs">${renderOutputs(vm)}</div><div data-wrg-dynamic="rlt-devices">${renderSavedRecords(vm)}</div></div>
+      <div class="wrg-desktop-split__input tc-stack"><div data-wrg-dynamic="inputs">${renderInputs(vm)}</div><div data-wrg-dynamic="formula" class="formula">${esc(vm.formula)}</div></div>
+      <div class="wrg-desktop-split__output tc-stack"><div data-wrg-dynamic="outputs">${renderOutputs(vm)}</div><div data-wrg-dynamic="rlt-devices">${renderSavedRecords(vm)}</div></div>
     </div>`
   ].join(''));
 
