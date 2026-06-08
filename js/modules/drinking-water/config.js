@@ -9,7 +9,7 @@ export default defineModuleConfig({
   order: 35,
   defaultVisible: false,
 
-  migrationStatus: 'phase-8-schema-inventory',
+  migrationStatus: 'phase-25b1-platform-mount-view-split',
   capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA],
   description: 'Nutzungseinheiten, Einzelverbraucher, Summen- und Spitzendurchfluss nach DIN 1988-300.'
 });

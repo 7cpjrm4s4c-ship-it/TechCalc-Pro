@@ -16,5 +16,9 @@ export const state = createModuleState({
   uiUnitFormOpen: false,
   uiUnitSavedOpen: false,
   uiSingleFormOpen: false,
-  uiSingleSavedOpen: false
+  uiSingleSavedOpen: false,
+  activeUnitId: null,
+  activeSingleId: null,
+  expandedUnitId: null,
+  expandedSingleId: null
 });

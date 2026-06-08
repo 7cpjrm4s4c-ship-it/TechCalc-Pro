@@ -39,6 +39,7 @@
     "test:heat-recovery-phase24b3": "node tests/heat-recovery-phase24b3-dynamic-controller-hardening.test.mjs",
     "test:heat-recovery-phase24c": "node tests/heat-recovery-phase24c-platform-contract.test.mjs",
     "test:heat-recovery-phase24d": "node tests/heat-recovery-phase24d-hardening.test.mjs",
-    "test:heat-recovery-phase24e": "node tests/heat-recovery-phase24e-final-hardening.test.mjs"
+    "test:heat-recovery-phase24e": "node tests/heat-recovery-phase24e-final-hardening.test.mjs",
+    "test:drinking-water-phase25b1": "node tests/drinking-water-phase25b1-platform-mount-view-split.test.mjs"
   }
 }
