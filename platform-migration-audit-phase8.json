@@ -24,7 +24,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-25b2-saved-record-state-migration"
+      "migrationStatus": "phase-25b2a-saved-record-list-fix"
     },
     {
       "id": "heat-recovery",

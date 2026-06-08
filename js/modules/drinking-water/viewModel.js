@@ -10,6 +10,8 @@ export function createDrinkingWaterViewModel(s = {}, result = calculate(s)){
   return {
     state: s,
     result,
+    savedUsageUnits: (result.usageUnits || []).filter(unit => !unit.transient),
+    savedSingleGroups: (result.singleGroups || []).filter(group => !group.transient),
     accent: 'blue',
     buildingOptions: BUILDING_TYPES.map(t => ({ value:t.id, label:t.label })),
     consumerOptions: consumerOptions(),
