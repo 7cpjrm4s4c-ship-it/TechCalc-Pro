@@ -72,6 +72,21 @@ export function getOpenedFileName() {
   return openedFileName;
 }
 
+
+function normalizeHeatRecoveryProjectModule(moduleData = {}) {
+  const moduleState = moduleData?.state && typeof moduleData.state === 'object' ? moduleData.state : {};
+  const saved = Array.isArray(moduleData?.rltDevices)
+    ? moduleData.rltDevices
+    : (Array.isArray(moduleState.savedRltDevices)
+      ? moduleState.savedRltDevices
+      : (Array.isArray(moduleState.rltDevices) ? moduleState.rltDevices : []));
+  const { rltDevices, ...cleanState } = moduleState;
+  return {
+    state: { ...cleanState, savedRltDevices: saved },
+    rltDevices: saved
+  };
+}
+
 export function collectProjectData() {
   return {
     app: 'TechCalc Pro',
@@ -116,8 +131,11 @@ export function applyProjectData(data = {}, { fileName = '' } = {}) {
   ventilationLineSectionController.write(modules.ventilation?.lineSections || []);
   if (modules['pipe-sizing']?.state) pipeSizingState.replace(modules['pipe-sizing'].state, { notify: false });
   if (modules['unit-converter']?.state) unitConverterState.replace(modules['unit-converter'].state, { notify: false });
-  if (modules['heat-recovery']?.state) heatRecoveryState.replace(modules['heat-recovery'].state, { notify: false });
-  rltDeviceController.write(modules['heat-recovery']?.rltDevices || modules['heat-recovery']?.state?.savedRltDevices || []);
+  if (modules['heat-recovery']) {
+    const heatRecoveryModule = normalizeHeatRecoveryProjectModule(modules['heat-recovery']);
+    heatRecoveryState.replace(heatRecoveryModule.state, { notify: false });
+    rltDeviceController.write(heatRecoveryModule.rltDevices);
+  }
   if (modules['hx-diagram']?.state) hxDiagramState.replace(modules['hx-diagram'].state, { notify: false });
   if (modules['drinking-water']?.state) drinkingWaterState.replace(modules['drinking-water'].state, { notify: false });
   if (modules.wastewater?.state) wastewaterState.replace(modules.wastewater.state, { notify: false });

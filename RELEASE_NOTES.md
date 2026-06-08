@@ -1,14 +1,18 @@
-# TechCalc Pro 1.3.0 - Phase 24C
+# TechCalc Pro 1.3.0 – Phase 24D
 
-## WRG / Mischluft Plattformvertrag
+## WRG / Mischluft Hardening
 
-- Dynamic-Renderer aus `view.js` in `dynamicRenderer.js` ausgelagert.
-- `view.js` rendert nur noch View/View-Islands und enthält keine Berechnung oder DOM-Patch-Logik mehr.
-- `index.js` bleibt dünner Plattformadapter auf `createPlatformModule`.
-- Plattformvertrag durch neuen Regressionstest `heat-recovery-phase24c-platform-contract.test.mjs` abgesichert.
-- Bestehende 24B.1-24B.3 Regressionen an die finale Schichttrennung angepasst.
+- `migrationStatus` auf `phase-24d-hardening` erweitert.
+- Projekt-Restore für WRG/Mischluft normalisiert alte und neue RLT-Gerätepfade:
+  - `rltDevices`
+  - `state.savedRltDevices`
+  - `state.rltDevices`
+- Legacy-RLT-State wird beim Laden in `savedRltDevices` überführt.
+- `projectStorage.js` schreibt keine alten RLT-Memory-Helper mehr an.
+- Neuer Regressionstest: `heat-recovery-phase24d-hardening.test.mjs`.
+- Neues NPM-Script: `test:heat-recovery-phase24d`.
 
-## Validierung
+## Validation
 
 - `npm run test:imports`
 - `npm run test:saved-records`
@@ -16,4 +20,5 @@
 - `npm run test:heat-recovery-phase24b2`
 - `npm run test:heat-recovery-phase24b3`
 - `npm run test:heat-recovery-phase24c`
+- `npm run test:heat-recovery-phase24d`
 - `npm run audit:platform`
