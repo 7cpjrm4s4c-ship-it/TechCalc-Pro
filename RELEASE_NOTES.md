@@ -1,14 +1,20 @@
-# TechCalc Pro 1.3.0 – Phase 22E
+# TechCalc Pro 1.3.0 – Phase 23E Pufferspeicher Hardening
 
-## Einheitenrechner Hardening
+## Pufferspeicher
 
-- Phase `phase-22e-hardening` im Modulstatus ergänzt.
-- Regression `unit-converter-phase22e-hardening.test.mjs` ergänzt.
-- Quality Gate um die 22E-Regression erweitert.
-- Utility-Ausnahme verifiziert: Der Einheitenrechner bleibt bewusst ohne Saved-Record-Funktion.
-- Plattformvertrag verifiziert: `config`, `schema`, `state`, `logic`, `results`, `viewModel`, `view`, `index`.
-- Legacy Mount, Legacy Result Renderer und Saved-Record-Pfade ausgeschlossen.
+- Phase 23E Hardening abgeschlossen.
+- `migrationStatus` um `phase-23e-hardening` erweitert.
+- Saved-Record-Restore für alte `savedCalculations`-Projektstände gehärtet.
+- Saved-Record-Dynamic-Island-Attribut auf `data-buffer-dynamic` vereinheitlicht.
+- Plattform-Audit erkennt `createLineSectionController` jetzt als zentralen Saved-Record-Pfad.
+- Neuer Regressionstest: `tests/buffer-storage-phase23e-hardening.test.mjs`.
+- Neuer npm-Script: `npm run test:buffer-storage-phase23e`.
 
-## Prüfung
+## Validierung
 
-- `npm test` vollständig bestanden.
+- `npm run test:imports`
+- `npm run test:saved-records`
+- `node tests/buffer-storage-phase23c1-platform-contract.test.mjs`
+- `node tests/buffer-storage-phase23d-platform-contract.test.mjs`
+- `npm run test:buffer-storage-phase23e`
+- `npm run audit:platform`

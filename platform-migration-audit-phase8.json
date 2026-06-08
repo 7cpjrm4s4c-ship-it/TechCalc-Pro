@@ -3,7 +3,7 @@
   "schemaModules": 11,
   "centralNumberService": 11,
   "legacyNumberParsers": 0,
-  "centralSavedRecords": 2,
+  "centralSavedRecords": 6,
   "legacyClassModules": 7,
   "modules": [
     {
@@ -12,9 +12,9 @@
       "schemaFile": true,
       "usesCentralNumberService": true,
       "legacyNumberParsers": 0,
-      "usesCentralSavedRecords": false,
+      "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-23d-platform-contract-finalization"
+      "migrationStatus": "phase-23d-platform-contract-finalization phase-23e-hardening"
     },
     {
       "id": "drinking-water",
@@ -42,7 +42,7 @@
       "schemaFile": true,
       "usesCentralNumberService": true,
       "legacyNumberParsers": 0,
-      "usesCentralSavedRecords": false,
+      "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
       "migrationStatus": "phase-12h-final-globalized phase-18b1-result-model phase-18b2-line-section-controller phase-18b3-dynamic-renderer phase-18b4-platform-mount phase-18b4a-ordered-card-layout phase-18c-platform-hardening phase-18d-reference-consolidation phase-18d1-reference-cleanup phase-18d2-controller-viewmodel-split"
     },
@@ -62,7 +62,7 @@
       "schemaFile": true,
       "usesCentralNumberService": true,
       "legacyNumberParsers": 0,
-      "usesCentralSavedRecords": false,
+      "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
       "migrationStatus": "phase-8-schema-inventory phase-21b1-platform-mount phase-21b2-saved-record-controller phase-21b3-result-renderer phase-21c-dynamic-renderer phase-21c1-dimension-cards-fix phase-21c2-saved-record-line-attrs phase-21c3-saved-record-controller-parity phase-21d-platform-contract phase-21e-hardening"
     },
@@ -102,7 +102,7 @@
       "schemaFile": true,
       "usesCentralNumberService": true,
       "legacyNumberParsers": 0,
-      "usesCentralSavedRecords": false,
+      "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": false,
       "migrationStatus": "phase-13e-ventilation-temperature-render-fix phase-19b1-platform-mount phase-19b2b-line-section-controller phase-19b2c-saved-record-island phase-19b2c-hydrator-final phase-19b2d-saved-record-cleanup phase-19b3-result-renderer phase-19c-dynamic-renderer phase-19d-controller-viewmodel-view"
     },

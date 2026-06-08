@@ -37,10 +37,12 @@ export function buildBufferRecord(currentState, result, items, id, name, existin
   };
 }
 
-export function savedBufferPatch(item, currentState){
+export function savedBufferPatch(item, currentState = {}){
+  const legacy = Array.isArray(currentState.savedCalculations) ? currentState.savedCalculations : [];
+  const saved = Array.isArray(currentState.savedBuffers) && currentState.savedBuffers.length ? currentState.savedBuffers : legacy;
   return item?.state ? {
     ...item.state,
-    savedBuffers: currentState.savedBuffers || currentState.savedCalculations || [],
+    savedBuffers: saved,
     activeBufferId: item.id,
     expandedBufferId: currentState.expandedBufferId || null,
     plantName: item.name || item.state?.plantName || ''
@@ -61,7 +63,7 @@ export const bufferStorageSavedController = createLineSectionController({
   emptyText: 'Noch keine Pufferspeicher-Berechnungen gespeichert.',
   accent: 'cyan',
   dynamicAttr: 'saved-records',
-  dynamicDataAttr: 'data-puffer-dynamic',
+  dynamicDataAttr: 'data-buffer-dynamic',
   title: item => item.name || 'Pufferspeicher',
   stats: savedBufferStats,
   currentResult: () => calculate(state.get()),
