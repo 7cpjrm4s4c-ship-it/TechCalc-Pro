@@ -5,7 +5,7 @@ import { ventilationLineSectionController } from '../modules/ventilation/control
 import { state as pipeSizingState } from '../modules/pipe-sizing/state.js';
 import { state as unitConverterState } from '../modules/unit-converter/state.js';
 import { state as heatRecoveryState } from '../modules/heat-recovery/state.js';
-import { readRltDevices, writeRltDevices } from '../modules/heat-recovery/index.js';
+import { rltDeviceController } from '../modules/heat-recovery/controller.js';
 import { state as hxDiagramState } from '../modules/hx-diagram/state.js';
 import { state as drinkingWaterState } from '../modules/drinking-water/state.js';
 import { state as pressureHoldingState } from '../modules/pressure-holding/state.js';
@@ -89,7 +89,7 @@ export function collectProjectData() {
       ventilation: { state: ventilationState.get(), lineSections: ventilationLineSectionController.read() },
       'pipe-sizing': { state: pipeSizingState.get() },
       'unit-converter': { state: unitConverterState.get() },
-      'heat-recovery': { state: heatRecoveryState.get(), rltDevices: readRltDevices() },
+      'heat-recovery': { state: heatRecoveryState.get(), rltDevices: rltDeviceController.read() },
       'hx-diagram': { state: hxDiagramState.get() },
       'drinking-water': {
         state: drinkingWaterState.get(),
@@ -117,7 +117,7 @@ export function applyProjectData(data = {}, { fileName = '' } = {}) {
   if (modules['pipe-sizing']?.state) pipeSizingState.replace(modules['pipe-sizing'].state, { notify: false });
   if (modules['unit-converter']?.state) unitConverterState.replace(modules['unit-converter'].state, { notify: false });
   if (modules['heat-recovery']?.state) heatRecoveryState.replace(modules['heat-recovery'].state, { notify: false });
-  writeRltDevices(modules['heat-recovery']?.rltDevices || []);
+  rltDeviceController.write(modules['heat-recovery']?.rltDevices || modules['heat-recovery']?.state?.savedRltDevices || []);
   if (modules['hx-diagram']?.state) hxDiagramState.replace(modules['hx-diagram'].state, { notify: false });
   if (modules['drinking-water']?.state) drinkingWaterState.replace(modules['drinking-water'].state, { notify: false });
   if (modules.wastewater?.state) wastewaterState.replace(modules.wastewater.state, { notify: false });
@@ -139,7 +139,7 @@ export function resetAllSessionData() {
   pipeSizingState.reset();
   unitConverterState.reset();
   heatRecoveryState.reset();
-  writeRltDevices([]);
+  rltDeviceController.write([]);
   hxDiagramState.reset();
   drinkingWaterState.reset();
   wastewaterState.reset();
