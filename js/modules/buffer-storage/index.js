@@ -4,6 +4,7 @@ import { state } from './state.js';
 import { calculate } from './logic.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats } from '../../core/renderer.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createBufferStorageDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { bindBufferStorageActions, bufferSaveCard } from './controller.js';
 import { buildBufferStorageResultModel } from './results.js';
@@ -59,6 +60,18 @@ function inputBlocks(s){
   if(s.calculationMode === 'reserve') return reserveInputs(s);
   return runtimeInputs(s);
 }
+
+function mediumContent(s, r){
+  return stack([
+    selectField({ id:'mediumMode', label:'Wärmeträger', value:s.mediumMode, options:opts([['water','Wasser'],['glycol','Wasser-Glykol-Gemisch']]) }),
+    glycolFields(s),
+    inlineStats([{ label:'Berechnungsfaktor', value:fmt(r.factor,2) }, { label:'Grundlage', value:'Mitsubishi-Formel' }])
+  ].join(''));
+}
+
+function resultContent(s, r){
+  return renderResultModel(buildBufferStorageResultModel(s, r, 'cyan'), 'cyan');
+}
 function view(s){
   const r = calculate(s);
   const inputColumn = stack([
@@ -66,21 +79,35 @@ function view(s){
       `<div class="buffer-mode-tabs">${segmented('calculationMode', opts([['runtime','Mindestlaufzeit'],['defrost','Abtauung'],['reserve','Wasservorlage'],['compare','Vergleich']]), s.calculationMode, { accent:'cyan' })}</div>`,
       '<p class="tc-help ph-help">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'
     ].join('')), 'cyan'),
-    card('Medium / Faktor', stack([
-      selectField({ id:'mediumMode', label:'Wärmeträger', value:s.mediumMode, options:opts([['water','Wasser'],['glycol','Wasser-Glykol-Gemisch']]) }),
-      glycolFields(s),
-      inlineStats([{ label:'Berechnungsfaktor', value:fmt(r.factor,2) }, { label:'Grundlage', value:'Mitsubishi-Formel' }])
-    ].join('')), 'cyan'),
-    inputBlocks(s),
-    savedCard(s)
+    card('Medium / Faktor', `<div data-buffer-dynamic="medium">${mediumContent(s, r)}</div>`, 'cyan'),
+    `<div data-buffer-dynamic="input-blocks">${inputBlocks(s)}</div>`,
+    `<div data-buffer-dynamic="saved-records">${savedCard(s)}</div>`
   ].join(''));
 
   const resultColumn = stack([
-    renderResultModel(buildBufferStorageResultModel(s, r, 'cyan'), 'cyan')
+    `<div data-buffer-dynamic="result">${resultContent(s, r)}</div>`
   ].join(''));
 
   return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6">${resultColumn}</div>`);
 }
+const bufferStorageDynamicRenderer = createBufferStorageDynamicRenderer({
+  calculate,
+  fmt,
+  fmtInput,
+  renderMedium: mediumContent,
+  renderInputBlocks: inputBlocks,
+  renderSavedPanel: savedCard,
+  renderResult: resultContent
+});
+
+function updateBufferStorageDynamic(root, s, meta = {}) {
+  bufferStorageDynamicRenderer.update(root, s, meta);
+}
+
+function isDynamicBufferStorageAction(meta = {}) {
+  return String(meta.action || '') !== 'initial';
+}
+
 function bindActions(root){
   bindBufferStorageActions(root);
 }
@@ -93,5 +120,6 @@ export default createPlatformModule({
   calculate,
   view,
   bind: bindActions,
-  isDynamicAction: () => false
+  dynamicUpdate: updateBufferStorageDynamic,
+  isDynamicAction: isDynamicBufferStorageAction
 });

@@ -442,3 +442,81 @@ export const dynamicRendererInternals = {
   findDynamicIsland,
   setIslandInner
 };
+
+export function createBufferStorageDynamicRenderer(options = {}) {
+  const {
+    calculate,
+    fmt,
+    fmtInput,
+    renderMedium,
+    renderInputBlocks,
+    renderSavedPanel,
+    renderResult
+  } = options;
+
+  if (typeof calculate !== 'function') throw new Error('createBufferStorageDynamicRenderer requires calculate');
+  if (typeof renderResult !== 'function') throw new Error('createBufferStorageDynamicRenderer requires renderResult');
+
+  const savedFields = ['savedBuffers', 'activeBufferId', 'expandedBufferId'];
+  const inputStructuralFields = ['calculationMode'];
+  const mediumStructuralFields = ['mediumMode', 'glycolType'];
+
+  function syncFields(root, s = {}) {
+    updateSegment(root, 'calculationMode', s.calculationMode);
+    setSelectValue(root, 'mediumMode', s.mediumMode);
+    setSelectValue(root, 'glycolType', s.glycolType);
+    setSelectValue(root, 'glycolConcentration', s.glycolConcentration);
+    setInputValue(root, 'plantName', s.plantName || '');
+    setInputValue(root, 'qMaxKw', fmtInput?.(s.qMaxKw, 2) ?? s.qMaxKw);
+    setInputValue(root, 'partLoadFactor', fmtInput?.(s.partLoadFactor, 3) ?? s.partLoadFactor);
+    setInputValue(root, 'qLoadKw', fmtInput?.(s.qLoadKw, 2) ?? s.qLoadKw);
+    setInputValue(root, 'compressorRunTimeMin', fmtInput?.(s.compressorRunTimeMin, 2) ?? s.compressorRunTimeMin);
+    setInputValue(root, 'controllerDeltaT', fmtInput?.(s.controllerDeltaT, 2) ?? s.controllerDeltaT);
+    setInputValue(root, 'existingSystemVolumeL', fmtInput?.(s.existingSystemVolumeL, 1) ?? s.existingSystemVolumeL);
+    setInputValue(root, 'qConsumerKw', fmtInput?.(s.qConsumerKw, 2) ?? s.qConsumerKw);
+    setInputValue(root, 'qDefrostKw', fmtInput?.(s.qDefrostKw, 2) ?? s.qDefrostKw);
+    setInputValue(root, 'qHeatingCircuitKw', fmtInput?.(s.qHeatingCircuitKw, 2) ?? s.qHeatingCircuitKw);
+    setInputValue(root, 'maxDefrostTimeMin', fmtInput?.(s.maxDefrostTimeMin, 2) ?? s.maxDefrostTimeMin);
+    setInputValue(root, 'hydraulicDeltaT', fmtInput?.(s.hydraulicDeltaT, 2) ?? s.hydraulicDeltaT);
+    setInputValue(root, 'consumerFlowM3h', fmtInput?.(s.consumerFlowM3h, 3) ?? s.consumerFlowM3h);
+    setInputValue(root, 'bridgeTimeMin', fmtInput?.(s.bridgeTimeMin, 2) ?? s.bridgeTimeMin);
+  }
+
+  function update(root, s = {}, meta = {}) {
+    const r = calculate(s);
+    const action = String(meta.action || '');
+    const changed = Array.isArray(meta.changed) ? meta.changed : [];
+    const previous = root.__tcBufferStorageDynamic || {};
+    const appStructural = /^(record:|module:|replace|reset)/.test(action);
+    const savedStructural = /^(saved:|buffer:)/.test(action) || hasAnyChanged(changed, savedFields);
+    const inputStructural = appStructural || hasAnyChanged(changed, inputStructuralFields) || previous.calculationMode !== s.calculationMode;
+    const mediumStructural = appStructural || hasAnyChanged(changed, mediumStructuralFields) || previous.mediumMode !== s.mediumMode || previous.glycolType !== s.glycolType;
+
+    if (mediumStructural && typeof renderMedium === 'function') {
+      setIslandInner(root, '[data-buffer-dynamic="medium"]', renderMedium(s, r, 'cyan'));
+    }
+
+    if (inputStructural && typeof renderInputBlocks === 'function') {
+      setIslandInner(root, '[data-buffer-dynamic="input-blocks"]', renderInputBlocks(s, r, 'cyan'));
+    }
+
+    if (savedStructural && typeof renderSavedPanel === 'function') {
+      setIslandInner(root, '[data-buffer-dynamic="saved-records"]', renderSavedPanel(s, r, 'cyan'));
+    }
+
+    syncFields(root, s);
+    setIslandInner(root, '[data-buffer-dynamic="result"]', renderResult(s, r, 'cyan'));
+
+    root.__tcBufferStorageDynamic = {
+      calculationMode: s.calculationMode,
+      mediumMode: s.mediumMode,
+      glycolType: s.glycolType,
+      glycolConcentration: s.glycolConcentration,
+      activeBufferId: s.activeBufferId,
+      expandedBufferId: s.expandedBufferId
+    };
+  }
+
+  return { update };
+}
+
