@@ -2,10 +2,10 @@ import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, resultRows, inlineStats, esc } from '../../core/renderer.js';
+import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, inlineStats, esc } from '../../core/renderer.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
-import { bindSavedRecordWorkflow } from '../../core/savedRecordController.js';
+import { bindBufferStorageActions, bufferSaveCard } from './controller.js';
 
 const opts = items => items.map(([value, label]) => ({ value, label }));
 
@@ -24,67 +24,8 @@ function warnList(items){
   if(!items.length) return '<div class="empty-state empty-state--compact">Keine Plausibilitätswarnungen.</div>';
   return `<div class="tc-warning-list ph-warnings">${items.map(item => `<div class="tc-warning ph-warning"><span>Hinweis</span><strong>${esc(item)}</strong></div>`).join('')}</div>`;
 }
-function savedSnapshot(s, r){
-  const saved = Array.isArray(s.savedCalculations) ? s.savedCalculations : [];
-  const copy = { ...s };
-  delete copy.savedCalculations;
-  delete copy.activeCalculationId;
-  return {
-    id: s.activeCalculationId || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    name: s.plantName?.trim() || `Pufferspeicher ${saved.length + 1}`,
-    createdAt: s.activeCalculationId ? (saved.find(x => x.id === s.activeCalculationId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    state: copy,
-    result: { mode: s.calculationMode, volume: r.decisiveVolume, standard: r.nextStandardVolume, medium: mediumLabel(s) }
-  };
-}
-function savedRows(items = []){
-  if(!items.length) return '<div class="empty-state empty-state--compact">Noch keine Pufferspeicher-Berechnungen gespeichert.</div>';
-  return `<div class="tc-saved-list ph-saved-list">${items.map(item => {
-    const res = item.result || {};
-    const subtitle = [modeLabel(res.mode), res.standard ? `${fmt(res.standard,0)} l` : '', res.medium].filter(Boolean).join(' · ');
-    return `<article class="ph-saved-item line-section-card is-collapsed ${state.get().activeCalculationId === item.id ? 'is-active' : ''}" data-line-card data-buffer-select="${esc(item.id)}">
-      <div class="line-section-card__head">
-        <div class="line-section-card__title" ><strong>${esc(item.name || 'Berechnung')}</strong><small>${esc(subtitle || 'gespeicherte Berechnung')}</small></div>
-        <button type="button" class="line-section-card__toggle" data-line-toggle aria-expanded="false" aria-label="Gespeicherte Berechnung aufklappen"><span>▾</span></button>
-        <button type="button" class="line-section-card__delete" data-buffer-delete="${esc(item.id)}" aria-label="Berechnung löschen">×</button>
-      </div>
-      <div class="line-section-card__body">${resultRows([
-        { label:'Berechnungsart', value:modeLabel(res.mode) },
-        { label:'Normvolumen', value:res.standard ? fmt(res.standard,0) : '—', unit:res.standard ? 'Liter' : '' },
-        { label:'Volumen', value:res.volume ? fmt(res.volume,1) : '—', unit:res.volume ? 'Liter' : '' },
-        { label:'Medium', value:res.medium || '—' }
-      ])}</div>
-    </article>`;
-  }).join('')}</div>`;
-}
-
-function clearedBufferInputs() {
-  return {
-    plantName: '',
-    activeCalculationId: null,
-    qMaxKw: '',
-    partLoadFactor: '',
-    qLoadKw: '',
-    compressorRunTimeMin: '',
-    controllerDeltaT: '',
-    existingSystemVolumeL: '',
-    qConsumerKw: '',
-    qDefrostKw: '',
-    qHeatingCircuitKw: '',
-    maxDefrostTimeMin: '',
-    hydraulicDeltaT: '',
-    consumerFlowM3h: '',
-    bridgeTimeMin: ''
-  };
-}
-
 function savedCard(s){
-  return card('Berechnung speichern', stack([
-    field({ id:'plantName', label:'Bezeichnung', value:s.plantName || '', placeholder:'z. B. Kaltwassersatz BT A', inputmode:'text' }),
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-buffer-save ${s.activeCalculationId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-buffer-update ${s.activeCalculationId ? '' : 'disabled'}>Aktualisieren</button></div>`,
-    savedRows(Array.isArray(s.savedCalculations) ? s.savedCalculations : [])
-  ].join('')), 'cyan');
+  return bufferSaveCard(s);
 }
 function glycolFields(s){
   if(s.mediumMode === 'water') return '';
@@ -178,30 +119,9 @@ function view(s){
   return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6">${resultColumn}</div>`);
 }
 function bindActions(root){
-  bindSavedRecordWorkflow(root, {
-    state,
-    calculate,
-    snapshot: savedSnapshot,
-    hydrate: (item, current) => ({
-      ...(item.state || {}),
-      savedCalculations: current.savedCalculations || [],
-      activeCalculationId: item.id,
-      plantName: item.name || item.state?.plantName || ''
-    }),
-    clear: current => ({ ...clearedBufferInputs(), savedCalculations: current.savedCalculations || [] }),
-    listKey: 'savedCalculations',
-    activeIdKey: 'activeCalculationId',
-    nameKey: 'plantName',
-    recordPrefix: 'buffer',
-    saveSelector: '[data-buffer-save]',
-    updateSelector: '[data-buffer-update]',
-    loadAttr: 'data-buffer-select',
-    deleteAttr: 'data-buffer-delete',
-    preserveSaveScroll: true,
-    preserveLoadScroll: true,
-    clearOnOutsideClick: true
-  });
+  bindBufferStorageActions(root);
 }
+
 
 export default createPlatformModule({
   config,

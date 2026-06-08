@@ -19,5 +19,7 @@ export const state = createModuleState({
   hydraulicDeltaT: '5',
   consumerFlowM3h: '',
   bridgeTimeMin: '10',
-  savedCalculations: []
+  savedBuffers: [],
+  activeBufferId: null,
+  expandedBufferId: null
 });
