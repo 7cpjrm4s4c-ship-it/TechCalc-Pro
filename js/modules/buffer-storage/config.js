@@ -9,7 +9,7 @@ export default defineModuleConfig({
   order: 16,
   defaultVisible: false,
 
-  migrationStatus: 'phase-16e-event-pipeline-consolidation',
+  migrationStatus: 'phase-23b1-platform-mount',
   capabilities: [MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE],
   description: 'Auslegung von Pufferspeichern für Kaltwassersätze, Wärmepumpen-Abtaubetrieb sowie Kälte-/Wärmevorlagen.'
 });

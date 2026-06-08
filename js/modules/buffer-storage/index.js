@@ -3,7 +3,7 @@ import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, mainResult, resultCard, resultRows, inlineStats, esc } from '../../core/renderer.js';
-import { mountModule } from '../../core/mount.js';
+import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { bindSavedRecordWorkflow } from '../../core/savedRecordController.js';
 
@@ -203,4 +203,12 @@ function bindActions(root){
   });
 }
 
-export default { config, schema, state, mount(root){ return mountModule(root, state, view, bindActions); } };
+export default createPlatformModule({
+  config,
+  schema,
+  state,
+  calculate,
+  view,
+  bind: bindActions,
+  isDynamicAction: () => false
+});
