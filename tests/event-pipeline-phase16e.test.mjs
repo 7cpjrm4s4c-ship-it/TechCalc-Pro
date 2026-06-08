@@ -7,8 +7,8 @@ assert.match(eventPipeline, /__tcCommitHandlers/, 'eventPipeline must keep commi
 
 for (const file of ['js/modules/buffer-storage/index.js']) {
   const src = readFileSync(file, 'utf8');
-  assert.match(src, /bindSavedRecordWorkflow/, `${file} must use the central saved-record workflow`);
-  assert.doesNotMatch(src, /\.addEventListener\s*\(/, `${file} must not bind module-local DOM events`);
+  assert.match(src, /bindBufferStorageActions/, `${file} must delegate saved-record binding to the platform controller`);
+  assert.doesNotMatch(src, /bindSavedRecordWorkflow|\.addEventListener\s*\(/, `${file} must not bind legacy saved-record workflow or module-local DOM events`);
 }
 
 const pressureHolding = readFileSync('js/modules/pressure-holding/index.js', 'utf8');

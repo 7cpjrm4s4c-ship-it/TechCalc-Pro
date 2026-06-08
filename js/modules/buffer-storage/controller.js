@@ -2,19 +2,7 @@ import { createLineSectionController } from '../../platform/lineSectionControlle
 import { fmt } from '../../utils/calculations.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-
-function modeLabel(mode){
-  if(mode === 'defrost') return 'Wärmepumpe / Abtauung';
-  if(mode === 'reserve') return 'Wasservorlage';
-  if(mode === 'compare') return 'Vergleich / maßgebend';
-  return 'Mindestlaufzeit';
-}
-
-function mediumLabel(s){
-  if(s.mediumMode === 'water') return 'Wasser';
-  const name = s.glycolType === 'propylene' ? 'Propylenglykol' : 'Ethylenglykol';
-  return `${name} ${s.glycolConcentration} %`;
-}
+import { mediumLabel, modeLabel } from './results.js';
 
 export function savedBufferStats(item = {}){
   const res = item.result || {};

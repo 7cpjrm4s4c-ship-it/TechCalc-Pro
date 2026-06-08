@@ -8,9 +8,10 @@ const controllerSource = readFileSync('js/modules/buffer-storage/controller.js',
 const resultsSource = readFileSync('js/modules/buffer-storage/results.js', 'utf8');
 const configSource = readFileSync('js/modules/buffer-storage/config.js', 'utf8');
 
-assert.match(configSource, /phase-23c1-view-model-extraction/, 'buffer-storage declares phase 23C.1 contract split');
+assert.match(configSource, /phase-23d-platform-contract-finalization/, 'buffer-storage declares phase 23D contract finalization');
 assert.match(indexSource, /createPlatformModule\(\{/, 'index keeps the platform module adapter contract');
-assert.match(indexSource, /createBufferStorageDynamicRenderer\(\{/, 'index wires the central dynamic renderer adapter');
+assert.doesNotMatch(indexSource, /createBufferStorageDynamicRenderer\(\{/, 'index no longer owns dynamic renderer wiring');
+assert.match(viewSource, /createBufferStorageDynamicRenderer\(\{/, 'view owns dynamic island renderer wiring');
 assert.doesNotMatch(indexSource, /function\s+(runtimeInputs|defrostInputs|reserveInputs|inputBlocks|mediumContent|resultContent|view)\b/, 'index no longer owns rendering functions');
 assert.doesNotMatch(indexSource, /from '..\/..\/core\/renderer\.js'/, 'index no longer imports renderer primitives');
 assert.doesNotMatch(indexSource, /renderModuleShell|card\(|field\(|selectField\(|segmented\(|inlineStats/, 'index contains no direct UI composition');
@@ -29,4 +30,4 @@ assert.match(resultsSource, /buildBufferStorageResultModel/, 'results owns resul
 const activeModuleSources = `${indexSource}\n${viewSource}\n${viewModelSource}\n${controllerSource}\n${resultsSource}`;
 assert.doesNotMatch(activeModuleSources, /mainResult|resultCard|resultRows|bindSavedRecordWorkflow|data-buffer-save|data-buffer-update|data-buffer-select|data-buffer-delete|mountModule\(/, 'legacy mount, saved-record and result renderer paths are removed');
 
-console.log('buffer-storage phase23c1 platform contract regression ok');
+console.log('buffer-storage phase23d platform contract regression ok');

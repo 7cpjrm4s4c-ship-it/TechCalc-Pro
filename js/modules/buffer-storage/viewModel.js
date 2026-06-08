@@ -1,7 +1,6 @@
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { calculate } from './logic.js';
 import { buildBufferStorageResultModel, mediumLabel, modeLabel } from './results.js';
-import { bufferSaveCard } from './controller.js';
 
 export const BUFFER_ACCENT = 'cyan';
 
@@ -84,8 +83,7 @@ export function createBufferStorageViewModel(s = {}, r = calculate(s), accent = 
     runtimeFields: runtimeFieldModels(s),
     defrostFields: defrostFieldModels(s),
     reserveFields: reserveFieldModels(s),
-    resultModel: buildBufferStorageResultModel(s, r, accent),
-    savedRecordsHtml: bufferSaveCard(s)
+    resultModel: buildBufferStorageResultModel(s, r, accent)
   };
 }
 

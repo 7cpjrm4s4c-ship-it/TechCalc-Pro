@@ -14,7 +14,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": false,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-23c1-view-model-extraction"
+      "migrationStatus": "phase-23d-platform-contract-finalization"
     },
     {
       "id": "drinking-water",

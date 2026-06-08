@@ -1,7 +1,10 @@
 import config from './config.js';
+import { calculate } from './logic.js';
 import { card, field, grid, inlineStats, renderModuleShell, segmented, selectField, stack } from '../../core/renderer.js';
+import { createBufferStorageDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { renderResultModel } from '../../platform/resultRenderer/index.js';
 import { createBufferStorageViewModel } from './viewModel.js';
+import { bufferSaveCard } from './controller.js';
 
 function renderFieldGrid(fields = [], modifier = '') {
   return `<div class="buffer-input-grid ${modifier}">${fields.map(item => field(item)).join('')}</div>`;
@@ -53,7 +56,7 @@ export function renderResultContent(vm) {
 }
 
 export function renderSavedRecords(vm) {
-  return vm.savedRecordsHtml;
+  return bufferSaveCard(vm.state);
 }
 
 export function renderView(s) {
@@ -74,5 +77,24 @@ export function renderView(s) {
 
   return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6">${resultColumn}</div>`);
 }
+
+const renderWithViewModel = renderer => (s, r) => renderer(createBufferStorageViewModel(s, r));
+
+const bufferStorageDynamicRenderer = createBufferStorageDynamicRenderer({
+  calculate,
+  renderMedium: renderWithViewModel(renderMediumContent),
+  renderInputBlocks: renderWithViewModel(renderInputBlocks),
+  renderSavedPanel: renderWithViewModel(renderSavedRecords),
+  renderResult: renderWithViewModel(renderResultContent)
+});
+
+export function updateBufferStorageDynamic(root, s, meta = {}) {
+  bufferStorageDynamicRenderer.update(root, s, meta);
+}
+
+export function isDynamicBufferStorageAction(meta = {}) {
+  return String(meta.action || '') !== 'initial';
+}
+
 
 export default renderView;
