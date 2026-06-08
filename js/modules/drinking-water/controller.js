@@ -47,6 +47,28 @@ export function renderSingleRows(groups = [], snapshot = state.get()) {
   }).join('')}</div>`;
 }
 
+
+function syncSavedRecordsPatch(patch = {}, action = 'dw:saved-sync') {
+  const next = { ...patch };
+  if (Object.prototype.hasOwnProperty.call(next, 'savedUsageUnits')) writeUsageUnits(next.savedUsageUnits || []);
+  if (Object.prototype.hasOwnProperty.call(next, 'savedSingleConsumers')) writeSingleConsumers(next.savedSingleConsumers || []);
+  state.set(next, { action, notify:false });
+}
+
+export function normalizeDrinkingWaterSavedState(snapshot = {}) {
+  const savedUsageUnits = Array.isArray(snapshot.savedUsageUnits) && snapshot.savedUsageUnits.length ? snapshot.savedUsageUnits : readUsageUnits();
+  const savedSingleConsumers = Array.isArray(snapshot.savedSingleConsumers) && snapshot.savedSingleConsumers.length ? snapshot.savedSingleConsumers : readSingleConsumers();
+  return { ...snapshot, savedUsageUnits, savedSingleConsumers };
+}
+
+export function hydrateDrinkingWaterSavedState() {
+  const current = state.get();
+  const patch = {};
+  if ((!Array.isArray(current.savedUsageUnits) || !current.savedUsageUnits.length) && readUsageUnits().length) patch.savedUsageUnits = readUsageUnits();
+  if ((!Array.isArray(current.savedSingleConsumers) || !current.savedSingleConsumers.length) && readSingleConsumers().length) patch.savedSingleConsumers = readSingleConsumers();
+  if (Object.keys(patch).length) state.set(patch, { action:'dw:migrate-saved-records', notify:false });
+}
+
 function normalizeSingleGroupForEdit(group) {
   if (!group) return null;
   if (Array.isArray(group.consumers)) return { ...group, consumers: group.consumers.map(c => ({ ...c })) };
@@ -131,12 +153,12 @@ function saveUnit(root, update = false) {
   const s = state.get();
   if (update && !s.activeUnitId) return;
   const record = createUsageUnit({ name:s.unitName, consumers:draftOrCurrentUnitConsumers(s), simultaneityFactor:s.unitSimultaneityFactor });
-  const units = readUsageUnits();
+  const units = normalizeDrinkingWaterSavedState(state.get()).savedUsageUnits;
   if (update) {
     record.id = s.activeUnitId;
-    writeUsageUnits(units.map(item => isSameId(item.id, s.activeUnitId) ? record : item));
+    syncSavedRecordsPatch({ savedUsageUnits: units.map(item => isSameId(item.id, s.activeUnitId) ? record : item) }, 'dw:unit-update');
   } else {
-    writeUsageUnits([...units, record]);
+    syncSavedRecordsPatch({ savedUsageUnits: [...units, record] }, 'dw:unit-save');
   }
   state.set({ unitDraftConsumers: [], activeUnitId: update ? s.activeUnitId : null, activeSingleId:null, unitName: update ? s.unitName : '', unitSimultaneityFactor: update ? s.unitSimultaneityFactor : '', uiUnitFormOpen:true, uiUnitSavedOpen:true }, { action:'dw:unit-save', notify:false });
   rerender(root);
@@ -146,38 +168,38 @@ function saveSingle(root, update = false) {
   const s = state.get();
   if (update && !s.activeSingleId) return;
   const record = createSingleGroup({ name:s.singleName || 'Einzelverbraucher', consumers:draftOrCurrentSingleConsumers(s) });
-  const groups = readSingleConsumers();
+  const groups = normalizeDrinkingWaterSavedState(state.get()).savedSingleConsumers;
   if (update) {
     record.id = s.activeSingleId;
-    writeSingleConsumers(groups.map(item => isSameId(item.id, s.activeSingleId) ? record : item));
+    syncSavedRecordsPatch({ savedSingleConsumers: groups.map(item => isSameId(item.id, s.activeSingleId) ? record : item) }, 'dw:single-update');
   } else {
-    writeSingleConsumers([...groups, record]);
+    syncSavedRecordsPatch({ savedSingleConsumers: [...groups, record] }, 'dw:single-save');
   }
   state.set({ singleDraftConsumers: [], activeUnitId:null, activeSingleId: update ? s.activeSingleId : null, singleName: update ? s.singleName : '', uiSingleFormOpen:true, uiSingleSavedOpen:true }, { action:'dw:single-save', notify:false });
   rerender(root);
 }
 
 function deleteUnit(root, id) {
-  writeUsageUnits(readUsageUnits().filter(item => !isSameId(item.id, id)));
+  syncSavedRecordsPatch({ savedUsageUnits: normalizeDrinkingWaterSavedState(state.get()).savedUsageUnits.filter(item => !isSameId(item.id, id)) }, 'dw:unit-delete');
   if (isSameId(state.get().activeUnitId, id)) state.set({ activeUnitId:null, unitName:'', unitSimultaneityFactor:'', unitDraftConsumers:[] }, { action:'dw:unit-delete', notify:false });
   rerender(root);
 }
 
 function deleteSingle(root, id) {
-  writeSingleConsumers(readSingleConsumers().filter(item => !isSameId(item.id, id)));
+  syncSavedRecordsPatch({ savedSingleConsumers: normalizeDrinkingWaterSavedState(state.get()).savedSingleConsumers.filter(item => !isSameId(item.id, id)) }, 'dw:single-delete');
   if (isSameId(state.get().activeSingleId, id)) state.set({ activeSingleId:null, singleName:'', singleDraftConsumers:[] }, { action:'dw:single-delete', notify:false });
   rerender(root);
 }
 
 function editUnit(root, id) {
-  const unit = readUsageUnits().find(item => isSameId(item.id, id));
+  const unit = normalizeDrinkingWaterSavedState(state.get()).savedUsageUnits.find(item => isSameId(item.id, id));
   if (!unit) return;
   state.set({ activeUnitId:unit.id, activeSingleId:null, unitName:unit.name, unitSimultaneityFactor:unit.simultaneityFactor || '', singleName:'', unitDraftConsumers:unit.consumers || [], singleDraftConsumers:[], uiUnitFormOpen:true, uiUnitSavedOpen:true }, { action:'dw:unit-edit', notify:false });
   rerender(root);
 }
 
 function editSingle(root, id) {
-  const group = readSingleConsumers().map(normalizeSingleGroupForEdit).filter(Boolean).find(item => isSameId(item.id, id));
+  const group = normalizeDrinkingWaterSavedState(state.get()).savedSingleConsumers.map(normalizeSingleGroupForEdit).filter(Boolean).find(item => isSameId(item.id, id));
   if (!group) return;
   const consumers = (group.consumers || []).map(c => ({ ...c }));
   state.set({ activeUnitId:null, activeSingleId:group.id, unitName:'', unitDraftConsumers:[], singleName:group.name, singleDraftConsumers:consumers, singlePermanent:String(consumers.some(c => c.permanent)), uiSingleFormOpen:true, uiSingleSavedOpen:true }, { action:'dw:single-edit', notify:false });
@@ -199,6 +221,7 @@ function updateAccordionState(event) {
 }
 
 export function bindDrinkingWaterActions(root) {
+  hydrateDrinkingWaterSavedState();
   root.addEventListener('input', event => {
     const el = event.target.closest('[data-field]');
     if (!el || !root.contains(el)) return;

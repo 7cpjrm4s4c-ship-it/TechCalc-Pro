@@ -13,12 +13,14 @@ export const state = createModuleState({
   singleCount: '1',
   singlePermanent: 'false',
   singleDraftConsumers: [],
-  uiUnitFormOpen: false,
-  uiUnitSavedOpen: false,
-  uiSingleFormOpen: false,
-  uiSingleSavedOpen: false,
+  savedUsageUnits: [],
+  savedSingleConsumers: [],
   activeUnitId: null,
   activeSingleId: null,
   expandedUnitId: null,
-  expandedSingleId: null
+  expandedSingleId: null,
+  uiUnitFormOpen: false,
+  uiUnitSavedOpen: false,
+  uiSingleFormOpen: false,
+  uiSingleSavedOpen: false
 });
