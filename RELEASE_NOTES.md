@@ -1,20 +1,18 @@
-# TechCalc Pro 1.3.0 – Phase 23E Pufferspeicher Hardening
+# TechCalc Pro 1.3.0 – Phase 24B.2
 
-## Pufferspeicher
+## WRG / Mischluft – Result Renderer + Dynamic Islands
 
-- Phase 23E Hardening abgeschlossen.
-- `migrationStatus` um `phase-23e-hardening` erweitert.
-- Saved-Record-Restore für alte `savedCalculations`-Projektstände gehärtet.
-- Saved-Record-Dynamic-Island-Attribut auf `data-buffer-dynamic` vereinheitlicht.
-- Plattform-Audit erkennt `createLineSectionController` jetzt als zentralen Saved-Record-Pfad.
-- Neuer Regressionstest: `tests/buffer-storage-phase23e-hardening.test.mjs`.
-- Neuer npm-Script: `npm run test:buffer-storage-phase23e`.
+- Ergebnisdarstellung auf `buildHeatRecoveryResultModel` und `renderResultModel` konsolidiert.
+- Legacy-Renderer `mainResult`, `resultCard`, `resultRows` im Modul entfernt.
+- WRG- und Mischluft-Ergebnisse in Primary/Groups/Notices-Struktur überführt.
+- ViewModel erzeugt jetzt das zentrale `resultModel`.
+- Dynamic-Island `outputs` rendert über Plattform-ResultRenderer.
+- Regressionstest `heat-recovery-phase24b2-result-renderer-dynamic-islands.test.mjs` ergänzt.
 
-## Validierung
+## Geprüft
 
 - `npm run test:imports`
 - `npm run test:saved-records`
-- `node tests/buffer-storage-phase23c1-platform-contract.test.mjs`
-- `node tests/buffer-storage-phase23d-platform-contract.test.mjs`
-- `npm run test:buffer-storage-phase23e`
+- `npm run test:heat-recovery-phase24b1`
+- `npm run test:heat-recovery-phase24b2`
 - `npm run audit:platform`

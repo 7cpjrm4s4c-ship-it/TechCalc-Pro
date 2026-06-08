@@ -1,6 +1,6 @@
 import { fmtInput } from '../../utils/calculations.js';
 import { calculate } from './logic.js';
-import { formulaText, modeLabel } from './results.js';
+import { buildHeatRecoveryResultModel, formulaText, modeLabel } from './results.js';
 
 export const HEAT_RECOVERY_ACCENT = 'cyan';
 
@@ -61,6 +61,7 @@ export function createHeatRecoveryViewModel(s = {}, r = calculate(s), accent = H
     modeOptions,
     modeLabel: modeLabel(s.mode),
     formula: formulaText(s),
+    resultModel: buildHeatRecoveryResultModel(s, r, accent),
     wrg: wrgInputGroups(s),
     mixing: mixingInputGroups(s)
   };

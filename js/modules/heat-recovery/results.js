@@ -19,6 +19,123 @@ export function formulaText(s = {}){
     : 'WRG: tZuluft = (1−β) × [tAußen + ηWRG × (tAbluft − tAußen)] + β × tAußen · tFort = tAbluft − (1−β) × ηWRG × (tAbluft − tAußen)';
 }
 
+export function buildHeatRecoveryResultModel(s = {}, r = {}, accent = 'cyan'){
+  const isMixing = s.mode === 'mixing';
+  const hasCondensation = Boolean(r?.hasCondensation);
+
+  if (isMixing) {
+    return {
+      primary: {
+        title: 'Ergebnis Mischluft',
+        primary: {
+          label: 'Mischluft / Zuluft',
+          value: fmt(r?.mixed?.tempC, 2),
+          unit: '°C'
+        },
+        rows: [
+          { label: 'rel. Feuchte', value: fmt(r?.mixed?.rhPercent, 0), unit: '%' },
+          { label: 'Volumenstrom', value: fmt(r?.mixed?.volumeFlowM3h, 0), unit: 'm³/h' },
+          { label: 'Massenstrom', value: fmt(r?.mixed?.massFlowKgh, 2), unit: 'kg/h' },
+          { label: 'x', value: fmt(r?.mixed?.humidityRatioGkg, 2), unit: 'g/kg' }
+        ],
+        accent
+      },
+      groups: [
+        {
+          title: 'Mischungsverhältnis',
+          rows: [
+            { label: 'Außenluftanteil', value: fmt(r?.outdoorShare, 0), unit: '%' },
+            { label: 'Umluftanteil', value: fmt(r?.recircShare, 0), unit: '%' }
+          ],
+          accent
+        },
+        {
+          title: 'Außenluft',
+          rows: formatAirPoint(r?.outdoor, { includeVolume: true, includeMass: true }),
+          accent
+        },
+        {
+          title: 'Umluft / Raumluft',
+          rows: formatAirPoint(r?.recirc, { includeVolume: true, includeMass: true }),
+          accent
+        },
+        {
+          title: 'Formel',
+          html: `<div class="formula tc-formula">${formulaText(s)}</div>`,
+          accent
+        }
+      ],
+      notices: hasCondensation ? [{
+        title: 'Kondensation',
+        messages: [
+          `Kondensat: ${fmt(r?.condensateKgh, 2)} kg/h`,
+          `Kondensationsleistung: ${fmt(r?.condensateLs, 4)} l/s`,
+          `Latente Leistung: ${fmt(r?.condensationPowerKw, 2)} kW`,
+          '100%-Enthalpielinie überschritten'
+        ],
+        accent,
+        prefix: 'Hinweis'
+      }] : []
+    };
+  }
+
+  return {
+    primary: {
+      title: 'WRG-Leistung',
+      primary: {
+        label: 'Rückgewonnene Leistung',
+        value: fmt(r?.recoveredPowerKw, 2),
+        unit: 'kW'
+      },
+      rows: [
+        { label: 'Wirkungsgrad', value: fmt(r?.efficiency, 0), unit: '%' },
+        { label: 'Bypass', value: fmt(r?.bypassPercent, 0), unit: '%' },
+        { label: 'WTX-Wirksam', value: fmt(r?.effectiveVolumeFlowM3h, 0), unit: 'm³/h' },
+        { label: 'ρ × cₚ / 3,6', value: fmt(r?.factor, 3), unit: 'Wh/(m³·K)' }
+      ],
+      accent
+    },
+    groups: [
+      {
+        title: 'Zuluft',
+        rows: formatAirPoint(r?.supply, { includeMass: true }),
+        accent
+      },
+      {
+        title: 'Fortluft',
+        rows: formatAirPoint(r?.exhaust, { includeMass: true }),
+        accent
+      },
+      {
+        title: 'Außenluft',
+        rows: formatAirPoint(r?.outdoor, { includeVolume: true, includeMass: true }),
+        accent
+      },
+      {
+        title: 'Abluft',
+        rows: formatAirPoint(r?.extract, { includeVolume: true, includeMass: true }),
+        accent
+      },
+      {
+        title: 'Formel',
+        html: `<div class="formula tc-formula">${formulaText(s)}</div>`,
+        accent
+      }
+    ],
+    notices: hasCondensation ? [{
+      title: 'Kondensation',
+      messages: [
+        `Kondensat: ${fmt(r?.condensateKgh, 2)} kg/h`,
+        `Kondensationsleistung: ${fmt(r?.condensateLs, 4)} l/s`,
+        `Latente Leistung: ${fmt(r?.condensationPowerKw, 2)} kW`,
+        '100%-Enthalpielinie überschritten'
+      ],
+      accent,
+      prefix: 'Hinweis'
+    }] : []
+  };
+}
+
 export function buildRltDeviceRecord(currentState = {}, result = {}, items = [], id, name, existing = null){
   const isMixing = currentState.mode === 'mixing';
   const inputState = { ...currentState };
@@ -66,3 +183,5 @@ export function inferRltInputState(item = {}){
   }
   return input;
 }
+
+export default buildHeatRecoveryResultModel;

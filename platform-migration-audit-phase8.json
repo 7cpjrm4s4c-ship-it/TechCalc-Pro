@@ -34,7 +34,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": false,
-      "migrationStatus": "phase-24b1-platform-mount-saved-records"
+      "migrationStatus": "phase-24b2-result-renderer-dynamic-islands"
     },
     {
       "id": "heating-cooling",
