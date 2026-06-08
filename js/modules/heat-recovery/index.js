@@ -4,7 +4,8 @@ import { state } from './state.js';
 import { calculate } from './logic.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { bindHeatRecoveryActions } from './controller.js';
-import { isDynamicHeatRecoveryAction, renderView, updateHeatRecoveryDynamic } from './view.js';
+import { renderView } from './view.js';
+import { isDynamicHeatRecoveryAction, updateHeatRecoveryDynamic } from './dynamicRenderer.js';
 
 export default createPlatformModule({
   config,

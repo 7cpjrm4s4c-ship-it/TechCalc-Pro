@@ -20,11 +20,15 @@ assert.doesNotMatch(controller, /querySelectorAll\('\[data-wrg-sign\]'\)\.forEac
 assert.doesNotMatch(controller, /data-rlt-save|data-rlt-update|data-rlt-select|data-rlt-delete/);
 
 const view = read('view.js');
-assert.match(view, /updateHeatRecoveryDynamic/);
 assert.match(view, /data-wrg-dynamic="inputs"/);
 assert.match(view, /data-wrg-dynamic="outputs"/);
 assert.match(view, /data-wrg-dynamic="rlt-devices"/);
 assert.doesNotMatch(view, /mainResult|resultCard|resultRows/);
+
+const dynamicRenderer = read('dynamicRenderer.js');
+assert.match(dynamicRenderer, /updateHeatRecoveryDynamic/);
+assert.match(dynamicRenderer, /isDynamicHeatRecoveryAction/);
+assert.match(dynamicRenderer, /syncFields/);
 
 const results = read('results.js');
 assert.match(results, /buildHeatRecoveryResultModel/);

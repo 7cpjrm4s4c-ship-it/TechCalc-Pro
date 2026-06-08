@@ -9,7 +9,7 @@ export default defineModuleConfig({
   order: 25,
   defaultVisible: false,
 
-  migrationStatus: 'phase-24b2-result-renderer-dynamic-islands phase-24b3-dynamic-controller-hardening',
+  migrationStatus: 'phase-24b2-result-renderer-dynamic-islands phase-24b3-dynamic-controller-hardening phase-24c-platform-contract-finalization',
   capabilities: [
     MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE,
     MODULE_CAPABILITIES.FORM_SCHEMA,

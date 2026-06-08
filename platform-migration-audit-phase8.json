@@ -34,7 +34,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": false,
-      "migrationStatus": "phase-24b2-result-renderer-dynamic-islands phase-24b3-dynamic-controller-hardening"
+      "migrationStatus": "phase-24b2-result-renderer-dynamic-islands phase-24b3-dynamic-controller-hardening phase-24c-platform-contract-finalization"
     },
     {
       "id": "heating-cooling",
