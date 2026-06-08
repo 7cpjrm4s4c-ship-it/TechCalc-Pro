@@ -47,19 +47,26 @@ export function rltDeviceCard(snapshot = {}){
   return rltDeviceController.renderCard(normalizeRltSnapshot(snapshot));
 }
 
+function bindWrgSignDelegation(root){
+  if (!root || root.__tcHeatRecoverySignBound) return;
+  root.__tcHeatRecoverySignBound = true;
+  root.addEventListener('click', event => {
+    const button = event.target?.closest?.('[data-wrg-sign]');
+    if (!button || !root.contains(button)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const id = button.dataset.wrgSign;
+    const input = root.querySelector(`[data-field="${id}"]`);
+    state.set({ [id]: toggleNumericSign(input?.value) }, { action: 'wrg:toggle-sign' });
+  });
+}
+
 export function bindHeatRecoveryActions(root){
   const current = state.get();
   if ((!Array.isArray(current.savedRltDevices) || !current.savedRltDevices.length) && Array.isArray(current.rltDevices) && current.rltDevices.length) {
     state.set({ savedRltDevices: current.rltDevices }, { action: 'rlt:migrate-saved-records', notify: false });
   }
 
-  root.querySelectorAll('[data-wrg-sign]').forEach(button => {
-    button.addEventListener('click', () => {
-      const id = button.dataset.wrgSign;
-      const input = root.querySelector(`[data-field="${id}"]`);
-      state.set({ [id]: toggleNumericSign(input?.value) }, { action: 'wrg:toggle-sign' });
-    });
-  });
-
+  bindWrgSignDelegation(root);
   rltDeviceController.bind(root);
 }

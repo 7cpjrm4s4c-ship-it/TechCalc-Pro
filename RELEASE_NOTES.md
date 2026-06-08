@@ -1,18 +1,18 @@
-# TechCalc Pro 1.3.0 – Phase 24B.2
+# TechCalc Pro 1.3.0 - Phase 24B.3
 
-## WRG / Mischluft – Result Renderer + Dynamic Islands
+## WRG / Mischluft Dynamic Controller Hardening
 
-- Ergebnisdarstellung auf `buildHeatRecoveryResultModel` und `renderResultModel` konsolidiert.
-- Legacy-Renderer `mainResult`, `resultCard`, `resultRows` im Modul entfernt.
-- WRG- und Mischluft-Ergebnisse in Primary/Groups/Notices-Struktur überführt.
-- ViewModel erzeugt jetzt das zentrale `resultModel`.
-- Dynamic-Island `outputs` rendert über Plattform-ResultRenderer.
-- Regressionstest `heat-recovery-phase24b2-result-renderer-dynamic-islands.test.mjs` ergänzt.
+- WRG/Mischluft sign-toggle binding auf delegierten Controller umgestellt.
+- Dynamic-Island-Replacement fuer Eingabebloecke bleibt damit nach Moduswechsel stabil.
+- Plattformadapter `index.js` bleibt entkernt.
+- RLT-Geraete bleiben auf `createLineSectionController`.
+- Neuer Regressionstest `heat-recovery-phase24b3-dynamic-controller-hardening.test.mjs`.
 
-## Geprüft
+## Checks
 
 - `npm run test:imports`
 - `npm run test:saved-records`
 - `npm run test:heat-recovery-phase24b1`
 - `npm run test:heat-recovery-phase24b2`
+- `npm run test:heat-recovery-phase24b3`
 - `npm run audit:platform`
