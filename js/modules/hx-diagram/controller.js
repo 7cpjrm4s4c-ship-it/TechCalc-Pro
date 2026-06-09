@@ -1,4 +1,5 @@
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
+import { registerCentralActions } from '../../core/eventPipeline.js';
 import { toggleNumericSign } from '../../core/renderer.js';
 import { state, normalizeSavedProcesses, clearLegacyPoints } from './state.js';
 import { calculate } from './logic.js';
@@ -11,6 +12,76 @@ function clearGeneratedPath() {
 function normalizeProcessSnapshot(snapshot = {}) {
   const savedProcesses = normalizeSavedProcesses(snapshot);
   return { ...snapshot, savedProcesses, processes: savedProcesses };
+}
+
+function commitVisibleFields(rootEl) {
+  if (!rootEl?.querySelectorAll) return;
+  const patch = {};
+  rootEl.querySelectorAll('[data-field]').forEach(el => {
+    if (el?.dataset?.field) patch[el.dataset.field] = el.value;
+  });
+  if (Object.keys(patch).length) state.set(patch, { action: 'hx:commit-visible-fields', notify: false });
+}
+
+function sameId(a, b) {
+  return String(a ?? '') === String(b ?? '');
+}
+
+function readSavedProcessesFromState(snapshot = state.get()) {
+  return normalizeSavedProcesses(snapshot).map(item => ({ ...item }));
+}
+
+export function updateActiveProcessFromDialog(rootEl) {
+  commitVisibleFields(rootEl);
+  const current = normalizeProcessSnapshot(state.get());
+  const id = current.activeProcessId;
+  if (!id) return null;
+  const items = readSavedProcessesFromState(current);
+  const existing = items.find(item => sameId(item.id, id));
+  if (!existing) return null;
+  const name = rootEl?.querySelector?.('#hxProcessName')?.value?.trim() || current.label || existing.name || existing.label || 'h,x-Prozess';
+  const nextState = { ...current, label: name };
+  const result = calculate(nextState);
+  const record = buildHxProcessRecord(nextState, result, items, id, name, existing);
+  const next = items.map(item => sameId(item.id, id) ? record : item);
+  state.set({
+    savedProcesses: next,
+    processes: next,
+    label: record.input?.label || record.name || name,
+    process: record.process || record.input?.process || current.process || 'heat',
+    activeProcessId: record.id,
+    activePath: Array.isArray(record.path) ? record.path : [],
+    expandedProcessId: current.expandedProcessId || null,
+    points: []
+  }, { action: 'hx:line:update' });
+  return record;
+}
+
+export function deleteSavedProcessById(id) {
+  const current = normalizeProcessSnapshot(state.get());
+  const next = readSavedProcessesFromState(current).filter(item => !sameId(item.id, id));
+  const wasActive = sameId(current.activeProcessId, id);
+  const wasExpanded = sameId(current.expandedProcessId, id);
+  state.set({
+    savedProcesses: next,
+    processes: next,
+    activeProcessId: wasActive ? null : current.activeProcessId,
+    label: wasActive ? '' : current.label,
+    activePath: wasActive ? [] : (Array.isArray(current.activePath) ? current.activePath : []),
+    expandedProcessId: wasExpanded || wasActive ? null : current.expandedProcessId,
+    points: []
+  }, { action: 'hx:line:delete' });
+  return next;
+}
+
+function bindHxProcessActionOverrides(rootEl) {
+  registerCentralActions(rootEl, {
+    'line:update': ({ root }) => updateActiveProcessFromDialog(root || rootEl),
+    'saved:delete': ({ element }) => {
+      const id = element?.getAttribute?.('data-line-delete') || element?.closest?.('[data-line-delete]')?.getAttribute?.('data-line-delete');
+      if (id) deleteSavedProcessById(id);
+    }
+  });
 }
 
 export function savedProcessPatch(item, currentState = {}) {
@@ -124,4 +195,6 @@ export function bindHxDiagramActions(rootEl) {
   }
   bindHxDelegation(rootEl);
   hxProcessController.bind(rootEl);
+  bindHxProcessActionOverrides(rootEl);
 }
+
