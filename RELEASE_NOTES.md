@@ -1,10 +1,5 @@
-# TechCalc Pro 1.3.0 - Phase 26B.2
+# TechCalc Pro 1.3.0 – Phase 25E.2B
 
-## h,x-Diagramm
-
-- Saved-Record-Dialog auf Plattform-Line-Section-Controller migriert.
-- `savedProcesses` und `expandedProcessId` eingeführt.
-- Legacy-Feld `processes` bleibt für Restore alter Projekte kompatibel.
-- Alte `data-hx-select-process` / `data-hx-remove-process` Listenlogik entfernt.
-- Speichern, Aktualisieren, Laden, Löschen und Aufklappen laufen über zentrale Saved-Record-Actions.
-- Neuer Regressionstest `test:hx-diagram-phase26b2` ergänzt.
+- Trinkwasser: Nav-Pill bleibt nach Texteingabe und mobiler Tastatur wieder sichtbar.
+- Stale `tc-keyboard-open` Locks werden nach Blur, Change, Enter/Escape und Visual-Viewport-Änderungen gelöst.
+- Dynamic-Updates bleiben auf Input-/Result-Islands beschränkt.

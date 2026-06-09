@@ -54,6 +54,7 @@
     "test:hx-diagram-phase26b2": "node tests/hx-diagram-phase26b2-saved-records-platform-dialog.test.mjs",
     "test:hx-diagram-phase26b2a": "node tests/hx-diagram-phase26b2a-update-delete-fix.test.mjs",
     "test:drinking-water-phase25e1": "node tests/drinking-water-phase25e1-water-heating-preview.test.mjs",
-    "test:drinking-water-phase25e2a": "node tests/drinking-water-phase25e2a-water-heating-ui-switch.test.mjs"
+    "test:drinking-water-phase25e2a": "node tests/drinking-water-phase25e2a-water-heating-ui-switch.test.mjs",
+    "test:drinking-water-phase25e2b": "node tests/drinking-water-phase25e2b-navigation-persistence.test.mjs"
   }
 }

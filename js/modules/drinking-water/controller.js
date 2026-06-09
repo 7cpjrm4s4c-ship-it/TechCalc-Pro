@@ -53,6 +53,57 @@ function normalizeSingleGroupForEdit(group) {
 }
 
 
+
+function releaseKeyboardNavigationLock(root, delay = 120) {
+  if (typeof document === 'undefined') return;
+  const release = () => {
+    const active = document.activeElement;
+    const activeField = active?.matches?.('input[data-field], textarea[data-field]') && root?.contains?.(active);
+    if (!activeField) document.body?.classList?.remove('tc-keyboard-open');
+  };
+  if (delay > 0) setTimeout(release, delay);
+  else release();
+}
+
+function installNavigationPersistenceGuard(root) {
+  if (!root || root.__tcDrinkingWaterNavPersistenceBound) return;
+  root.__tcDrinkingWaterNavPersistenceBound = true;
+
+  const scheduleRelease = () => {
+    releaseKeyboardNavigationLock(root, 80);
+    releaseKeyboardNavigationLock(root, 240);
+    releaseKeyboardNavigationLock(root, 520);
+  };
+
+  root.addEventListener('focusout', event => {
+    if (!event.target?.closest?.('input[data-field], textarea[data-field]')) return;
+    scheduleRelease();
+  }, true);
+
+  root.addEventListener('blur', event => {
+    if (!event.target?.closest?.('input[data-field], textarea[data-field]')) return;
+    scheduleRelease();
+  }, true);
+
+  root.addEventListener('change', event => {
+    if (!event.target?.closest?.('input[data-field], textarea[data-field]')) return;
+    scheduleRelease();
+  }, true);
+
+  root.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' && event.key !== 'Escape') return;
+    if (!event.target?.closest?.('input[data-field], textarea[data-field]')) return;
+    scheduleRelease();
+  }, true);
+
+  const viewport = typeof window !== 'undefined' ? window.visualViewport : null;
+  if (viewport && !root.__tcDrinkingWaterVisualViewportGuardBound) {
+    root.__tcDrinkingWaterVisualViewportGuardBound = true;
+    viewport.addEventListener('resize', scheduleRelease, { passive: true });
+    viewport.addEventListener('scroll', scheduleRelease, { passive: true });
+  }
+}
+
 function preserveScrollPosition(callback) {
   const scroller = document.scrollingElement || document.documentElement;
   const scrollTop = scroller?.scrollTop ?? window.scrollY ?? 0;
@@ -75,6 +126,8 @@ export function refreshDrinkingWater(root) {
     const input = root.querySelector('[data-dw-dynamic="input"]');
     if (input) safeReplaceContent(input, renderInputCard(vm));
   });
+  releaseKeyboardNavigationLock(root, 0);
+  releaseKeyboardNavigationLock(root, 180);
 }
 
 function draftKey(type) {
@@ -191,6 +244,7 @@ function updateAccordionState(event) {
 
 export function bindDrinkingWaterActions(root) {
   hydrateDrinkingWaterSavedState();
+  installNavigationPersistenceGuard(root);
   if (root.__tcDrinkingWaterActionsBound) return;
   root.__tcDrinkingWaterActionsBound = true;
   root.addEventListener('input', event => {
