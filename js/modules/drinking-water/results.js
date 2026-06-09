@@ -1,6 +1,16 @@
 import { inlineStats, esc } from '../../core/renderer.js';
 import { fmt } from '../../utils/calculations.js';
 
+function hasStoredConsumers(r = {}) {
+  return Boolean((r.usageUnits || []).length || (r.singleGroups || []).length || (r.rawSingles || []).length);
+}
+function resultValue(r, value, digits = 2) {
+  return hasStoredConsumers(r) ? fmt(value, digits) : '—';
+}
+function resultUnit(r, unit = '') {
+  return hasStoredConsumers(r) ? unit : '';
+}
+
 export function consumerRows(consumers = []) {
   return `<div class="tc-consumer-list">${consumers.map(c => `<div class="tc-consumer-row"><div><strong>${esc(c.count)} × ${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr,2)} l/s je Verbraucher${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div></div>`).join('')}</div>`;
 }
@@ -16,7 +26,6 @@ export function selectedFixturesList(r, state = {}) {
   };
   (r.usageUnits || []).forEach(unit => (unit.consumers || []).forEach(add));
   ((r.rawSingles && r.rawSingles.length) ? r.rawSingles : (r.singleGroups || []).flatMap(group => group.consumers || [])).forEach(add);
-  if (state.activeSingleId && Array.isArray(state.singleDraftConsumers)) state.singleDraftConsumers.forEach(add);
   const rows = [...aggregate.values()];
   if (!rows.length) return '<div class="empty-state empty-state--compact">Noch keine Einrichtungsgegenstände ausgewählt</div>';
   return `<div class="tc-fixture-list">${rows.map(item => `<div class="tc-fixture-row"><strong>${esc(item.count)} × ${esc(item.label)}</strong>${item.permanent ? '<em>Dauerverbraucher</em>' : ''}</div>`).join('')}</div>`;
@@ -47,14 +56,14 @@ export function buildDrinkingWaterResultModel(s = {}, r = {}, accent = 'blue'){
   return {
     primary: {
       title: 'Ergebnis — Trinkwasser',
-      primary: { label:'Spitzendurchfluss', value:fmt(r.peakFlow, 2), unit:'l/s' },
+      primary: { label:'Spitzendurchfluss', value:resultValue(r, r.peakFlow, 2), unit:resultUnit(r, 'l/s') },
       rows: [
-        { label:'Σ NE', value:fmt(r.neSumFlow, 2), unit:'l/s' },
-        { label:'NE-Spitzen', value:fmt(r.nePeakSum, 2), unit:'l/s' },
-        { label:'Einzel', value:fmt(r.singleSumFlow, 2), unit:'l/s' },
-        { label:'Gesamt Σ', value:fmt(r.totalSumFlow, 2), unit:'l/s' },
-        { label:'Spitze', value:fmt(r.peakFlow, 2), unit:'l/s' },
-        { label:'Spitze', value:fmt(r.house?.flowM3h, 2), unit:'m³/h' }
+        { label:'Σ NE', value:resultValue(r, r.neSumFlow, 2), unit:resultUnit(r, 'l/s') },
+        { label:'NE-Spitzen', value:resultValue(r, r.nePeakSum, 2), unit:resultUnit(r, 'l/s') },
+        { label:'Einzel', value:resultValue(r, r.singleSumFlow, 2), unit:resultUnit(r, 'l/s') },
+        { label:'Gesamt Σ', value:resultValue(r, r.totalSumFlow, 2), unit:resultUnit(r, 'l/s') },
+        { label:'Spitze', value:resultValue(r, r.peakFlow, 2), unit:resultUnit(r, 'l/s') },
+        { label:'Spitze', value:resultValue(r, r.house?.flowM3h, 2), unit:resultUnit(r, 'm³/h') }
       ],
       accent
     },
@@ -62,9 +71,9 @@ export function buildDrinkingWaterResultModel(s = {}, r = {}, accent = 'blue'){
       {
         title: 'Dimensionierung — Hauseinführung / Wasserzähler',
         rows: [
-          { label:'Hauseinführung', value:r.house?.dn || '—' },
-          { label:'Wasserzähler', value:r.house?.meter || '—' },
-          { label:'Q3 Wasserzähler', value:fmt(r.house?.q3, 0), unit:'m³/h' },
+          { label:'Hauseinführung', value:hasStoredConsumers(r) ? (r.house?.dn || '—') : '—' },
+          { label:'Wasserzähler', value:hasStoredConsumers(r) ? (r.house?.meter || '—') : '—' },
+          { label:'Q3 Wasserzähler', value:resultValue(r, r.house?.q3, 0), unit:resultUnit(r, 'm³/h') },
           { label:'Auslegung', value:'Vorläufig über Spitzendurchfluss' }
         ],
         accent

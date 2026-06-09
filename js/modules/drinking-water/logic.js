@@ -241,12 +241,13 @@ function draftSingleGroupFromState(s = {}) {
 export function calculate(s = {}) {
   const warmWaterMode = s.waterHeatingMode === 'decentral' ? 'decentral' : 'central';
   const centralWarmWater = warmWaterMode === 'central';
-  const unitSource = readUsageUnits();
-  const draftUnit = draftUsageUnitFromState(s);
-  const units = [...unitSource, ...(draftUnit ? [{ ...draftUnit, transient:true }] : [])].map(unit => summarizeUsageUnit(unit, warmWaterMode));
-  const singleGroupSource = normalizeSingleGroups(readSingleConsumers());
-  const draftSingleGroup = draftSingleGroupFromState(s);
-  const singleGroupsRaw = [...singleGroupSource, ...(draftSingleGroup ? [{ ...draftSingleGroup, transient:true }] : [])];
+  // Plattformvertrag: Berechnet wird ausschließlich aus persistent gespeicherten
+  // Nutzungseinheiten und Einzelverbrauchergruppen. Eingabedialoge sind Entwürfe
+  // und dürfen das Ergebnis beim Modulstart oder während der Eingabe nicht beeinflussen.
+  const unitSource = Array.isArray(s.savedUsageUnits) && s.savedUsageUnits.length ? s.savedUsageUnits : readUsageUnits();
+  const units = unitSource.map(unit => summarizeUsageUnit(unit, warmWaterMode));
+  const singleGroupSource = normalizeSingleGroups(Array.isArray(s.savedSingleConsumers) && s.savedSingleConsumers.length ? s.savedSingleConsumers : readSingleConsumers());
+  const singleGroupsRaw = singleGroupSource;
   const singlesRaw = [];
   singleGroupsRaw.forEach(group => {
     (group.consumers || []).forEach(c => singlesRaw.push({ ...c, groupId: group.id, groupName: group.name }));

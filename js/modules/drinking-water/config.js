@@ -9,7 +9,7 @@ export default defineModuleConfig({
   order: 35,
   defaultVisible: false,
 
-  migrationStatus: 'phase-25b2b2-scroll-stability',
+  migrationStatus: 'phase-25b2b2b-startup-spacing-result-fix',
   capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS],
   description: 'Nutzungseinheiten, Einzelverbraucher, Summen- und Spitzendurchfluss nach DIN 1988-300.'
 });

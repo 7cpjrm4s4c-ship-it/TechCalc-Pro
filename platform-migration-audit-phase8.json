@@ -24,7 +24,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-25b2b2-scroll-stability"
+      "migrationStatus": "phase-25b2b2b-startup-spacing-result-fix"
     },
     {
       "id": "heat-recovery",

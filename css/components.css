@@ -4522,19 +4522,30 @@ body::before {
 }
 
 
-/* Phase 25B.2B.1: Trinkwasser nutzt wieder den globalen Plattform-Abstand.
-   Fachliche dw-* Alias-Klassen duerfen Selektoren bleiben, steuern aber keine vertikalen Card-Abstaende mehr. */
-.module-view[data-module='drinking-water'] .dw-list,
-.module-view[data-module='drinking-water'] .dw-consumer-list,
-.module-view[data-module='drinking-water'] .dw-fixture-list {
-  gap: var(--card-gap, 10px);
-}
-
-.module-view[data-module='drinking-water'] .dw-accordion + .dw-accordion {
-  margin-top: 0;
+/* Phase 25B.2B.1 / 25B.2B.2B: Trinkwasser folgt ausschließlich dem globalen Plattformabstand. */
+.module-view[data-module='drinking-water'] .tc-stack,
+.module-view[data-module='drinking-water'] .tc-accordion__body.tc-stack,
+.module-view[data-module='drinking-water'] .line-section-list,
+.module-view[data-module='drinking-water'] .saved-record-list,
+.module-view[data-module='drinking-water'] .tc-consumer-list,
+.module-view[data-module='drinking-water'] .tc-fixture-list {
+  gap: var(--ui-gap, 16px);
 }
 
 .module-view[data-module='drinking-water'] .tc-accordion__body.tc-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.module-view[data-module='drinking-water'] .tc-accordion__summary-text {
   display: grid;
-  gap: var(--card-gap, 10px);
+  gap: 4px;
+  min-width: 0;
+}
+
+.module-view[data-module='drinking-water'] .tc-accordion__summary-text strong,
+.module-view[data-module='drinking-water'] .tc-accordion__summary-text small {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
