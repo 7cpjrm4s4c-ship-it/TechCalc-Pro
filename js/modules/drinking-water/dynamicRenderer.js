@@ -1,5 +1,6 @@
 import { createDrinkingWaterViewModel } from './viewModel.js';
 import { renderInputCard, renderResultCard } from './view.js';
+import { preserveScroll } from '../../core/scrollManager.js';
 
 function setIslandInner(root, selector, html){
   const island = root?.querySelector?.(selector);
@@ -76,6 +77,10 @@ const RESULT_KEYS = [
 ];
 
 export function updateDrinkingWaterDynamic(root, s, meta = {}){
+  return preserveScroll(() => updateDrinkingWaterDynamicUnsafe(root, s, meta), 'savedRecord');
+}
+
+function updateDrinkingWaterDynamicUnsafe(root, s, meta = {}){
   const vm = createDrinkingWaterViewModel(s);
   const changed = Array.isArray(meta.changed) ? meta.changed : [];
   const action = String(meta.action || '');

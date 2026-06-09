@@ -191,6 +191,8 @@ function updateAccordionState(event) {
 
 export function bindDrinkingWaterActions(root) {
   hydrateDrinkingWaterSavedState();
+  if (root.__tcDrinkingWaterActionsBound) return;
+  root.__tcDrinkingWaterActionsBound = true;
   root.addEventListener('input', event => {
     const el = event.target.closest('[data-field]');
     if (!el || !root.contains(el)) return;

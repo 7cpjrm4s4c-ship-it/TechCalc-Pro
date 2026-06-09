@@ -73,6 +73,23 @@ export function getOpenedFileName() {
 }
 
 
+
+function normalizeDrinkingWaterProjectModule(moduleData = {}) {
+  const moduleState = moduleData?.state && typeof moduleData.state === 'object' ? moduleData.state : {};
+  const usageUnits = Array.isArray(moduleData?.usageUnits)
+    ? moduleData.usageUnits
+    : (Array.isArray(moduleState.savedUsageUnits) ? moduleState.savedUsageUnits : []);
+  const singleConsumers = Array.isArray(moduleData?.singleConsumers)
+    ? moduleData.singleConsumers
+    : (Array.isArray(moduleState.savedSingleConsumers) ? moduleState.savedSingleConsumers : []);
+  const { usageUnits: legacyUsageUnits, singleConsumers: legacySingleConsumers, ...cleanState } = moduleState;
+  return {
+    state: { ...cleanState, savedUsageUnits: usageUnits, savedSingleConsumers: singleConsumers },
+    usageUnits,
+    singleConsumers
+  };
+}
+
 function normalizeHeatRecoveryProjectModule(moduleData = {}) {
   const moduleState = moduleData?.state && typeof moduleData.state === 'object' ? moduleData.state : {};
   const saved = Array.isArray(moduleData?.rltDevices)
@@ -137,11 +154,14 @@ export function applyProjectData(data = {}, { fileName = '' } = {}) {
     rltDeviceController.write(heatRecoveryModule.rltDevices);
   }
   if (modules['hx-diagram']?.state) hxDiagramState.replace(modules['hx-diagram'].state, { notify: false });
-  if (modules['drinking-water']?.state) drinkingWaterState.replace(modules['drinking-water'].state, { notify: false });
+  if (modules['drinking-water']) {
+    const drinkingWaterModule = normalizeDrinkingWaterProjectModule(modules['drinking-water']);
+    drinkingWaterState.replace(drinkingWaterModule.state, { notify: false });
+    writeUsageUnits(drinkingWaterModule.usageUnits);
+    writeSingleConsumers(drinkingWaterModule.singleConsumers);
+  }
   if (modules.wastewater?.state) wastewaterState.replace(modules.wastewater.state, { notify: false });
   if (modules.rainwater?.state) rainwaterState.replace(modules.rainwater.state, { notify: false });
-  writeUsageUnits(modules['drinking-water']?.usageUnits || []);
-  writeSingleConsumers(modules['drinking-water']?.singleConsumers || []);
 
   document.dispatchEvent(new CustomEvent('techcalc-project-loaded', { detail: { fileName: openedFileName } }));
 }
