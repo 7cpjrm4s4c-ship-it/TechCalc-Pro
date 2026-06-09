@@ -22,3 +22,10 @@
 - `npm run test:heat-recovery-phase24c`
 - `npm run test:heat-recovery-phase24d`
 - `npm run audit:platform`
+
+
+## Phase 25B.2B.2C - Trinkwasser Speicherdialog Spacing
+
+- Speicherdialog-Accordions auf globale Plattformabstände ausgerichtet.
+- Record-Cards, Inline-Stats und Verbraucherlisten im Trinkwasser-Modul verwenden jetzt konsistente `var(--ui-gap)`-Abstände.
+- Überschrift und Unterüberschrift der Speicherdialoge bleiben dauerhaft zweizeilig mit sauberem Zeilenversatz.
