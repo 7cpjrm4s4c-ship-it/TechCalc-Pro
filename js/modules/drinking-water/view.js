@@ -58,7 +58,7 @@ export function renderInputCard(vm) {
   const s = vm.state;
   const r = vm.result;
   return stack([
-    card('Berechnungsgrundlage', stack([
+    card(vm.waterHeating.basisTitle, stack([
       selectField({ id:'buildingType', label:'Gebäude-/Nutzungsart', value:s.buildingType, options:vm.buildingOptions }),
       segmented('waterHeatingMode', [
         { value:'central', label:'Zentrale Warmwasserbereitung' },
@@ -67,14 +67,14 @@ export function renderInputCard(vm) {
       inlineStats([
         { label:'Gleichzeitigkeitsformel', value:r.formulaText },
         { label:'NE-Ansatz', value:'2 größte Entnahmestellen oder GL je NE' },
-        { label:'Warmwasser', value:r.centralWarmWater ? 'TWW-Zapfstellen werden mitgerechnet' : 'Dezentral, Warmwasserbereitung mit 0,05 l/s je TWW-Verbraucher' }
+        { label:'Warmwasser', value:vm.waterHeating.warmWaterText }
       ])
     ].join('')), vm.accent),
-    card('Nutzungseinheiten', stack([
-      `<details class="tc-accordion dw-save-dialog" data-dw-accordion="uiUnitFormOpen" ${s.uiUnitFormOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text dw-save-dialog__summary"><strong>Nutzungseinheit zusammenstellen</strong><small>Mehrere Verbraucher auswählen und anschließend als NE speichern</small></span></summary><div class="tc-accordion__body tc-stack dw-save-dialog__body">`,
+    card(vm.waterHeating.unitCardTitle, stack([
+      `<details class="tc-accordion dw-save-dialog" data-dw-accordion="uiUnitFormOpen" ${s.uiUnitFormOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text dw-save-dialog__summary"><strong>Nutzungseinheit zusammenstellen</strong><small>${esc(vm.waterHeating.unitHelp)}</small></span></summary><div class="tc-accordion__body tc-stack dw-save-dialog__body">`,
       field({ id:'unitName', label:'Bezeichnung', value:s.unitName, placeholder:'z. B. Bad Wohnung 1', inputmode:'text' }),
       grid([
-        selectField({ id:'unitConsumerType', label:'Verbraucher hinzufügen', value:s.unitConsumerType, options:vm.consumerOptions }),
+        selectField({ id:'unitConsumerType', label:vm.waterHeating.unitConsumerLabel, value:s.unitConsumerType, options:vm.consumerOptions }),
         field({ id:'unitCount', label:'Anzahl', value:fmtInput(s.unitCount,0), inputmode:'numeric' }),
         field({ id:'unitSimultaneityFactor', label:'GL der Nutzungseinheit', value:s.unitSimultaneityFactor || '', placeholder:'optional < 1,0', inputmode:'decimal' })
       ].join(''), 3),
@@ -84,11 +84,11 @@ export function renderInputCard(vm) {
       '</div></details>',
       `<details class="tc-accordion dw-save-dialog dw-save-dialog--saved" data-dw-accordion="uiUnitSavedOpen" ${s.uiUnitSavedOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text dw-save-dialog__summary"><strong>Gespeicherte Nutzungseinheiten</strong><small data-dw-unit-summary>${vm.savedUsageUnits.length} Nutzungseinheiten angelegt</small></span></summary><div class="tc-accordion__body tc-stack dw-save-dialog__body" data-dw-unit-saved>${renderUsageUnitRows(vm.savedUsageUnits, s)}</div></details>`
     ].join('')), vm.accent),
-    card('Einzelverbraucher außerhalb NE', stack([
-      `<details class="tc-accordion dw-save-dialog" data-dw-accordion="uiSingleFormOpen" ${s.uiSingleFormOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text dw-save-dialog__summary"><strong>Freie Einrichtungsgegenstände zusammenstellen</strong><small>Mehrere Verbraucher außerhalb einer Nutzungseinheit als Gruppe anlegen</small></span></summary><div class="tc-accordion__body tc-stack dw-save-dialog__body">`,
+    card(vm.waterHeating.singleCardTitle, stack([
+      `<details class="tc-accordion dw-save-dialog" data-dw-accordion="uiSingleFormOpen" ${s.uiSingleFormOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text dw-save-dialog__summary"><strong>Freie Einrichtungsgegenstände zusammenstellen</strong><small>${esc(vm.waterHeating.singleHelp)}</small></span></summary><div class="tc-accordion__body tc-stack dw-save-dialog__body">`,
       field({ id:'singleName', label:'Bezeichnung / Gruppe', value:s.singleName, placeholder:'z. B. WC EG', inputmode:'text' }),
       grid([
-        selectField({ id:'singleConsumerType', label:'Verbraucher hinzufügen', value:s.singleConsumerType, options:vm.consumerOptions }),
+        selectField({ id:'singleConsumerType', label:vm.waterHeating.singleConsumerLabel, value:s.singleConsumerType, options:vm.consumerOptions }),
         field({ id:'singleCount', label:'Anzahl', value:fmtInput(s.singleCount,0), inputmode:'numeric' })
       ].join(''), 2),
       segmented('singlePermanent', [

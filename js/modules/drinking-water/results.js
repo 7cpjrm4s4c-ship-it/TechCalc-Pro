@@ -87,7 +87,13 @@ export function buildDrinkingWaterResultModel(s = {}, r = {}, accent = 'blue'){
     ],
     notices: [{
       title: 'Hinweis',
-      messages: ['Dauerverbraucher werden zum nach Gleichzeitigkeit ermittelten Spitzendurchfluss addiert.', '3-Liter-Regel, Probenahmestellen und hygienische Anforderungen sind separat zu prüfen.'],
+      messages: [
+        r.centralWarmWater
+          ? 'Zentrale Warmwasserbereitung: TWW-Zapfstellen werden zusätzlich mitgeführt.'
+          : 'Dezentrale Warmwasserbereitung: TWW-Verbraucher werden mit 0,05 l/s als WW-Bereitung angesetzt.',
+        'Dauerverbraucher werden zum nach Gleichzeitigkeit ermittelten Spitzendurchfluss addiert.',
+        '3-Liter-Regel, Probenahmestellen und hygienische Anforderungen sind separat zu prüfen.'
+      ],
       accent,
       prefix: 'Hinweis'
     }]
