@@ -63,7 +63,7 @@ export function renderInputCard(vm) {
       segmented('waterHeatingMode', [
         { value:'central', label:'Zentrale Warmwasserbereitung' },
         { value:'decentral', label:'Dezentral' }
-      ], s.waterHeatingMode, { accent:vm.accent }),
+      ], s.waterHeatingMode, { accent:vm.accent, action:'platform:segment:waterHeatingMode' }),
       inlineStats([
         { label:'Gleichzeitigkeitsformel', value:r.formulaText },
         { label:'NE-Ansatz', value:'2 größte Entnahmestellen oder GL je NE' },

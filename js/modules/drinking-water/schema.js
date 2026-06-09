@@ -4,7 +4,7 @@ import { BUILDING_TYPES, CONSUMERS } from './logic.js';
 export const drinkingWaterSchema = defineFormSchema({
   fields: [
     { key: 'buildingType', label: 'Gebäudetyp', type: FIELD_TYPES.SELECT, options: BUILDING_TYPES.map(item => ({ value: item.id, label: item.label })) },
-    { key: 'waterHeatingMode', label: 'Warmwasserbereitung', type: FIELD_TYPES.SEGMENT, options: [{ value: 'central', label: 'Zentral' }, { value: 'decentral', label: 'Dezentral' }] },
+    { key: 'waterHeatingMode', label: 'Warmwasserbereitung', type: FIELD_TYPES.SEGMENT, options: [{ value: 'central', label: 'Zentral' }, { value: 'decentral', label: 'Dezentral' }], action: 'platform:segment:waterHeatingMode' },
     { key: 'unitName', label: 'Nutzungseinheit', type: FIELD_TYPES.TEXT },
     { key: 'unitConsumerType', label: 'Verbraucher', type: FIELD_TYPES.SELECT, options: CONSUMERS.map(item => ({ value: item.id, label: item.label })) },
     { key: 'unitCount', label: 'Anzahl', type: FIELD_TYPES.INTEGER },

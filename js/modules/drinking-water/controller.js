@@ -54,6 +54,53 @@ function normalizeSingleGroupForEdit(group) {
 
 
 
+
+function commitWaterHeatingModeSegment(root, segment, event = null) {
+  if (!segment || !root?.contains?.(segment)) return false;
+  if (segment.dataset.segment !== 'waterHeatingMode') return false;
+  const value = segment.dataset.value === 'decentral' ? 'decentral' : 'central';
+  const current = state.get();
+  if (String(current.waterHeatingMode || 'central') === value) {
+    root.querySelectorAll('[data-segment="waterHeatingMode"]').forEach(button => {
+      const selected = String(button.dataset.value) === value;
+      button.classList.toggle('is-active', selected);
+      button.setAttribute('aria-selected', String(selected));
+    });
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    event?.stopImmediatePropagation?.();
+    return true;
+  }
+
+  event?.preventDefault?.();
+  event?.stopPropagation?.();
+  event?.stopImmediatePropagation?.();
+
+  root.querySelectorAll('[data-segment="waterHeatingMode"]').forEach(button => {
+    const selected = String(button.dataset.value) === value;
+    button.classList.toggle('is-active', selected);
+    button.setAttribute('aria-selected', String(selected));
+  });
+
+  state.set({ waterHeatingMode: value }, { action:'platform:segment:waterHeatingMode', notify:false });
+  refreshDrinkingWater(root);
+  queueMicrotask?.(() => refreshDrinkingWater(root));
+  setTimeout(() => refreshDrinkingWater(root), 0);
+  return true;
+}
+
+function installWaterHeatingModeSegmentBridge(root) {
+  if (!root || root.__tcDrinkingWaterWaterHeatingSegmentBound) return;
+  root.__tcDrinkingWaterWaterHeatingSegmentBound = true;
+  const direct = event => {
+    const segment = event.target?.closest?.('[data-segment="waterHeatingMode"]');
+    if (!segment || !root.contains(segment)) return;
+    commitWaterHeatingModeSegment(root, segment, event);
+  };
+  root.addEventListener('pointerdown', direct, true);
+  root.addEventListener('touchstart', direct, { capture:true, passive:false });
+}
+
 function releaseKeyboardNavigationLock(root, delay = 120) {
   if (typeof document === 'undefined') return;
   const release = () => {
@@ -245,6 +292,7 @@ function updateAccordionState(event) {
 export function bindDrinkingWaterActions(root) {
   hydrateDrinkingWaterSavedState();
   installNavigationPersistenceGuard(root);
+  installWaterHeatingModeSegmentBridge(root);
   if (root.__tcDrinkingWaterActionsBound) return;
   root.__tcDrinkingWaterActionsBound = true;
   root.addEventListener('input', event => {
@@ -307,7 +355,13 @@ export function bindDrinkingWaterActions(root) {
     const singleEdit = target.closest('[data-dw-single-edit]');
     if (singleEdit && root.contains(singleEdit)) { event.preventDefault(); event.stopPropagation(); editSingle(root, singleEdit.dataset.dwSingleEdit); return; }
     const segment = target.closest('[data-segment]');
-    if (segment && root.contains(segment)) { event.preventDefault(); event.stopPropagation(); state.set({ [segment.dataset.segment]: segment.dataset.value }, { action:'dw:segment', notify:false }); refreshDrinkingWater(root); return; }
+    if (segment && root.contains(segment)) {
+      if (segment.dataset.segment === 'waterHeatingMode') {
+        commitWaterHeatingModeSegment(root, segment, event);
+        return;
+      }
+      event.preventDefault(); event.stopPropagation(); state.set({ [segment.dataset.segment]: segment.dataset.value }, { action:'dw:segment', notify:false }); refreshDrinkingWater(root); return;
+    }
 
     const ignored = target.closest('[data-dw-unit-edit], [data-dw-single-edit], [data-dw-unit-delete], [data-dw-single-delete], [data-dw-add-unit], [data-dw-update-unit], [data-dw-add-single], [data-dw-update-single], [data-dw-draft-add], [data-dw-remove-draft], [data-dw-draft-count], [data-line-toggle], details, summary, input, select, textarea, button, label, .segmented');
     if (!ignored) {
