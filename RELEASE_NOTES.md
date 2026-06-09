@@ -1,21 +1,10 @@
-# TechCalc Pro 1.3.0 – Phase 25E Trinkwasser Final Hardening
+# TechCalc Pro 1.3.0 - Phase 26B.2
 
-## Schwerpunkt
-- Abschluss-Härtung der Trinkwasser-Migration auf den Plattformvertrag.
-- Absicherung des gespeicherte-Verbraucher-only Ergebnisvertrags.
-- Finale Regression für ViewModel, View, Dynamic Renderer, Controller und Restore-Kompatibilität.
+## h,x-Diagramm
 
-## Geändert
-- `drinking-water/config.js`: `migrationStatus` um `phase-25e-final-hardening` erweitert.
-- `package.json`: Script `test:drinking-water-phase25e` ergänzt.
-- Neuer Test: `tests/drinking-water-phase25e-final-hardening.test.mjs`.
-
-## Geprüft
-- `npm run test:imports`
-- `npm run test:saved-records`
-- `npm run test:drinking-water-phase25b2b2b`
-- `npm run test:drinking-water-phase25b3`
-- `npm run test:drinking-water-phase25c`
-- `npm run test:drinking-water-phase25d`
-- `npm run test:drinking-water-phase25e`
-- `npm run audit:platform`
+- Saved-Record-Dialog auf Plattform-Line-Section-Controller migriert.
+- `savedProcesses` und `expandedProcessId` eingeführt.
+- Legacy-Feld `processes` bleibt für Restore alter Projekte kompatibel.
+- Alte `data-hx-select-process` / `data-hx-remove-process` Listenlogik entfernt.
+- Speichern, Aktualisieren, Laden, Löschen und Aufklappen laufen über zentrale Saved-Record-Actions.
+- Neuer Regressionstest `test:hx-diagram-phase26b2` ergänzt.

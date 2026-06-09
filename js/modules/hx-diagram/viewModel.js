@@ -15,7 +15,7 @@ export function createViewModel(s = {}) {
     result,
     activePath,
     hasCompleteInput: hasCompleteInput(s),
-    processes: Array.isArray(s.processes) ? s.processes : [],
+    processes: Array.isArray(s.savedProcesses) ? s.savedProcesses : (Array.isArray(s.processes) ? s.processes : []),
     activeProcessId: s.activeProcessId || null,
     targetReached: !activePath.length || result.targetReached
   };

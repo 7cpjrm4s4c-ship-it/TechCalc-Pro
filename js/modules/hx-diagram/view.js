@@ -1,14 +1,11 @@
 import config from './config.js';
 import { PROCESS_OPTIONS, humidityRatioKgKg } from './logic.js';
 import { createViewModel } from './viewModel.js';
-import { renderResultCard, hxFmt } from './results.js';
+import { renderResultCard } from './results.js';
+import { hxProcessCard } from './controller.js';
 import { card, field, renderModuleShell, stack, grid, esc, signedTempField } from '../../core/renderer.js';
 import { fmtInput } from '../../utils/calculations.js';
 import { parseNumber } from '../../core/numberService.js';
-
-function actionButton(label, attr, variant = '') {
-  return `<button type="button" class="tc-action ${variant}" ${attr}>${esc(label)}</button>`;
-}
 
 function availableProcesses(s) {
   const t0 = parseNumber(s.tempC, { fallback: 0 });
@@ -37,23 +34,8 @@ function inputCard(s) {
       field({ id: 'targetRhPercent', label: 'Relative Zielfeuchte φ', unit: '%', value: fmtInput(s.targetRhPercent, 2) })
     ].join(''), 2), 'cyan', { compact: true }),
     processCard(s),
-    `<div class="tc-save-actions">${actionButton('Speichern', s.activeProcessId ? 'data-hx-add disabled' : 'data-hx-add')} ${actionButton('Aktualisieren', s.activeProcessId ? 'data-hx-update' : 'data-hx-update disabled')}</div><div class="tc-actions">${actionButton('Diagramm leeren', 'data-hx-clear', 'tc-action--ghost')}</div>`
+    `<div class="tc-actions"><button type="button" class="tc-action tc-action--ghost" data-hx-clear>Diagramm leeren</button></div>`
   ].join('')), 'cyan');
-}
-
-function historyCard(processes, activeProcessId) {
-  const body = processes.length ? `<div class="hx-history">
-    ${processes.map((process, index) => {
-      const last = process.path?.[process.path.length - 1];
-      const selected = process.id === activeProcessId;
-      return `<div class="hx-history__row hx-history__row--process ${selected ? 'is-active' : ''}" data-hx-select-process="${esc(process.id)}">
-        <div><strong>${esc(index + 1)}. ${esc(process.label)}</strong><small>${esc(process.processLabel || process.process)} · ${process.path?.length || 0} Punkte</small></div>
-        <div class="hx-history__values"><span>θt ${hxFmt(last?.tempC, 2)} °C</span><span>φ ${hxFmt(last?.rhPercent, 0)} % r.F.</span></div>
-        <button type="button" class="mini-button mini-button--danger" data-hx-remove-process="${esc(process.id)}" aria-label="Prozess löschen">Löschen</button>
-      </div>`;
-    }).join('')}
-  </div>` : '<div class="empty-state">Noch keine Prozesse gespeichert</div>';
-  return card('Gespeicherte Prozesse', body, 'cyan');
 }
 
 function buildSegmentPath(a, b, px, py) {
@@ -140,7 +122,7 @@ function chartCard(activePath, targetReached = true) {
 export function renderView(s) {
   const vm = createViewModel(s);
   const body = `<div class="hx-layout">
-    <div class="hx-layout__left">${stack([inputCard(s), renderResultCard(vm), historyCard(vm.processes, vm.activeProcessId)].join(''))}</div>
+    <div class="hx-layout__left">${stack([inputCard(s), renderResultCard(vm), hxProcessCard(vm.state)].join(''))}</div>
     <div class="hx-layout__right">${chartCard(vm.activePath, vm.targetReached)}</div>
   </div>`;
   return renderModuleShell(config, `<div class="span-12">${body}</div>`);

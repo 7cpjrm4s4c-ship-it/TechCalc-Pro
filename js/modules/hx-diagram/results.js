@@ -45,3 +45,41 @@ export function renderResultCard(vm) {
     `<div class="hx-state-grid">${readonlyStateCard('Ausgang', activePath[0])}${readonlyStateCard('Ziel', activePath[activePath.length - 1])}</div>`
   ].join(''));
 }
+
+
+export function buildHxProcessRecord(currentState = {}, result = {}, items = [], id = null, name = '', existing = null) {
+  const recordId = id || currentState.activeProcessId || existing?.id;
+  const processPath = Array.isArray(result.processPath) ? result.processPath : [];
+  return {
+    id: recordId,
+    name: String(name || currentState.label || existing?.name || existing?.label || `h,x-Prozess ${items.length + 1}`),
+    label: String(name || currentState.label || existing?.label || existing?.name || `h,x-Prozess ${items.length + 1}`),
+    process: result.selectedProcess || currentState.process || existing?.process || 'heat',
+    processLabel: result.changeType || existing?.processLabel || 'Prozess',
+    input: {
+      label: String(name || currentState.label || existing?.input?.label || ''),
+      tempC: String(currentState.tempC ?? ''),
+      rhPercent: String(currentState.rhPercent ?? ''),
+      targetTempC: String(currentState.targetTempC ?? ''),
+      targetRhPercent: String(currentState.targetRhPercent ?? ''),
+      process: result.selectedProcess || currentState.process || existing?.input?.process || 'heat'
+    },
+    path: processPath,
+    createdAt: existing?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+}
+
+export function hxProcessStats(item = {}) {
+  const path = Array.isArray(item.path) ? item.path : [];
+  const first = path[0] || null;
+  const last = path[path.length - 1] || null;
+  return [
+    { label: 'Prozess', value: item.processLabel || item.process || '—' },
+    { label: 'Punkte', value: path.length || '—' },
+    { label: 'Start', value: first ? `${hxFmt(first.tempC, 2)} °C / ${hxFmt(first.rhPercent, 0)} %` : '—' },
+    { label: 'Ziel', value: last ? `${hxFmt(last.tempC, 2)} °C / ${hxFmt(last.rhPercent, 0)} %` : '—' },
+    { label: 'x Ziel', value: last ? hxFmt(last.humidityRatioGkg, 2) : '—', unit: last ? 'g/kg' : '' },
+    { label: 'h Ziel', value: last ? hxFmt(last.enthalpyKjKg, 2) : '—', unit: last ? 'kJ/kg' : '' }
+  ];
+}

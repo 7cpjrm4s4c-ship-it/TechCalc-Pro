@@ -15,7 +15,7 @@ assert.doesNotMatch(index, /renderHxSvg/, 'index must not own chart rendering');
 
 const controller = fs.readFileSync(base + 'controller.js', 'utf8');
 assert.match(controller, /bindHxDiagramActions/, 'controller must expose bindHxDiagramActions');
-assert.match(controller, /makeProcessRecord/, 'controller must handle process records during adapter phase');
+assert.match(controller, /createLineSectionController/, 'controller must use platform saved-record controller after 26B.2');
 
 const view = fs.readFileSync(base + 'view.js', 'utf8');
 assert.match(view, /renderModuleShell/, 'view must render module shell');

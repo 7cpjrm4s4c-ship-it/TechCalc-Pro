@@ -3,7 +3,7 @@
   "schemaModules": 11,
   "centralNumberService": 11,
   "legacyNumberParsers": 0,
-  "centralSavedRecords": 7,
+  "centralSavedRecords": 8,
   "legacyClassModules": 7,
   "modules": [
     {
@@ -52,9 +52,9 @@
       "schemaFile": true,
       "usesCentralNumberService": true,
       "legacyNumberParsers": 0,
-      "usesCentralSavedRecords": false,
+      "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-26b1-platform-mount-view-split"
+      "migrationStatus": "phase-26b2-saved-records-platform-dialog"
     },
     {
       "id": "pipe-sizing",
