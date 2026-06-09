@@ -24,7 +24,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-25b3-result-renderer-migration phase-25c-dynamic-controller-contract phase-25d-hardening"
+      "migrationStatus": "phase-25b3-result-renderer-migration phase-25c-dynamic-controller-contract phase-25d-hardening phase-25e-final-hardening"
     },
     {
       "id": "heat-recovery",
