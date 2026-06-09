@@ -1,9 +1,9 @@
 import config from './config.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, esc } from '../../core/renderer.js';
-import { renderResultModel } from '../../platform/resultRenderer/index.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { createDrinkingWaterViewModel } from './viewModel.js';
 import { renderUsageUnitRows, renderSingleRows } from './controller.js';
+import { renderDrinkingWaterResultModel } from './results.js';
 
 export function draftConsumerList(items, type) {
   if (!items?.length) return '<div class="empty-state empty-state--compact">Noch keine Verbraucher ausgewählt</div>';
@@ -65,7 +65,7 @@ export function renderInputCard(vm) {
 }
 
 export function renderResultCard(vm){
-  return stack(renderResultModel(vm.resultModel, vm.accent));
+  return stack(renderDrinkingWaterResultModel(vm.resultModel, vm.accent));
 }
 
 export function renderView(s) {

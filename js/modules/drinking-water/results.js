@@ -1,4 +1,5 @@
 import { inlineStats, esc } from '../../core/renderer.js';
+import { renderResultModel } from '../../platform/resultRenderer/index.js';
 import { fmt } from '../../utils/calculations.js';
 
 function hasStoredConsumers(r = {}) {
@@ -91,6 +92,11 @@ export function buildDrinkingWaterResultModel(s = {}, r = {}, accent = 'blue'){
       prefix: 'Hinweis'
     }]
   };
+}
+
+
+export function renderDrinkingWaterResultModel(model, accent = 'blue'){
+  return renderResultModel(model, accent);
 }
 
 export default buildDrinkingWaterResultModel;

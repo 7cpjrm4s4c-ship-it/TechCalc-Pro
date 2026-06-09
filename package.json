@@ -45,6 +45,7 @@
     "test:drinking-water-phase25b2a": "node tests/drinking-water-phase25b2a-saved-record-list-fix.test.mjs",
     "test:drinking-water-phase25b2b1": "node tests/drinking-water-phase25b2b1-global-spacing.test.mjs",
     "test:drinking-water-phase25b2b2": "node tests/drinking-water-phase25b2b2-scroll-stability.test.mjs",
-    "test:drinking-water-phase25b2b2b": "node tests/drinking-water-phase25b2b2b-startup-result-contract.test.mjs"
+    "test:drinking-water-phase25b2b2b": "node tests/drinking-water-phase25b2b2b-startup-result-contract.test.mjs",
+    "test:drinking-water-phase25b3": "node tests/drinking-water-phase25b3-result-renderer.test.mjs"
   }
 }
