@@ -2,8 +2,8 @@ import config from './config.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, esc } from '../../core/renderer.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { createDrinkingWaterViewModel } from './viewModel.js';
-import { renderUsageUnitRows, renderSingleRows } from './controller.js';
-import { renderDrinkingWaterResultModel } from './results.js';
+import { renderDrinkingWaterResultModel, consumerRows, unitStats, singleStats } from './results.js';
+import { isSameId } from '../../core/savedRecords.js';
 
 export function draftConsumerList(items, type) {
   if (!items?.length) return '<div class="empty-state empty-state--compact">Noch keine Verbraucher ausgewählt</div>';
@@ -12,6 +12,46 @@ export function draftConsumerList(items, type) {
     <label class="mini-edit-field"><span>Anzahl</span><input type="number" min="0" step="1" value="${esc(c.count)}" data-dw-draft-count="${esc(type)}" data-index="${index}" inputmode="numeric"></label>
     <button type="button" data-dw-remove-draft="${esc(type)}" data-index="${index}" aria-label="Verbraucher entfernen">×</button>
   </div>`).join('')}</div>`;
+}
+
+
+export function renderUsageUnitRows(units = [], snapshot = {}) {
+  if (!units.length) return '<div class="empty-state empty-state--compact">Noch keine Nutzungseinheit angelegt</div>';
+  const activeId = snapshot.activeUnitId;
+  const expandedId = snapshot.expandedUnitId;
+  return `<div class="line-section-list saved-record-list dw-save-dialog__list">${units.map((unit, index) => `<article class="line-section-card saved-record-card dw-save-dialog__record ${isSameId(expandedId, unit.id) ? '' : 'is-collapsed'} ${isSameId(activeId, unit.id) ? 'is-active' : ''}" data-line-card data-dw-unit-edit="${esc(unit.id)}">
+    <div class="line-section-card__head saved-record-card__head">
+      <div class="line-section-card__title saved-record-card__title"><strong>${esc(unit.name || 'Nutzungseinheit ' + (index + 1))}</strong><small>${unit.consumerCount} Verbraucher · Σ ${fmt(unit.sumFlow, 2)} l/s · Spitze ${fmt(unit.peakFlow, 2)} l/s</small></div>
+      <button type="button" class="line-section-card__toggle saved-record-card__toggle" data-line-toggle data-dw-toggle-unit="${esc(unit.id)}" aria-expanded="${isSameId(expandedId, unit.id) ? 'true' : 'false'}" aria-label="Details aufklappen"><span>▾</span></button>
+      <button type="button" class="line-section-card__delete saved-record-card__delete" data-dw-unit-delete="${esc(unit.id)}" aria-label="Nutzungseinheit löschen">×</button>
+    </div>
+    <div class="line-section-card__body saved-record-card__body">
+      ${inlineStats(unitStats(unit))}
+      ${consumerRows(unit.consumers || [])}
+    </div>
+  </article>`).join('')}</div>`;
+}
+
+export function renderSingleRows(groups = [], snapshot = {}) {
+  if (!groups.length) return '<div class="empty-state empty-state--compact">Noch keine Einzelverbraucher angelegt</div>';
+  const activeId = snapshot.activeSingleId;
+  const expandedId = snapshot.expandedSingleId;
+  return `<div class="line-section-list saved-record-list dw-save-dialog__list">${groups.map((group, index) => {
+    const consumers = group.consumers || [];
+    const count = consumers.reduce((sum, c) => sum + (Number(c.count) || 1), 0);
+    const sumFlow = consumers.reduce((sum, c) => sum + Number(c.vr || 0) * (Number(c.count) || 1), 0);
+    return `<article class="line-section-card saved-record-card dw-save-dialog__record ${isSameId(expandedId, group.id) ? '' : 'is-collapsed'} ${isSameId(activeId, group.id) ? 'is-active' : ''}" data-line-card data-dw-single-edit="${esc(group.id)}">
+      <div class="line-section-card__head saved-record-card__head">
+        <div class="line-section-card__title saved-record-card__title"><strong>${esc(group.name || 'Einzelverbraucher ' + (index + 1))}</strong><small>${count} Verbraucher · ${fmt(sumFlow, 2)} l/s</small></div>
+        <button type="button" class="line-section-card__toggle saved-record-card__toggle" data-line-toggle data-dw-toggle-single="${esc(group.id)}" aria-expanded="${isSameId(expandedId, group.id) ? 'true' : 'false'}" aria-label="Details aufklappen"><span>▾</span></button>
+        <button type="button" class="line-section-card__delete saved-record-card__delete" data-dw-single-delete="${esc(group.id)}" aria-label="Einzelverbraucher löschen">×</button>
+      </div>
+      <div class="line-section-card__body saved-record-card__body">
+        ${inlineStats(singleStats(group))}
+        ${consumerRows(consumers)}
+      </div>
+    </article>`;
+  }).join('')}</div>`;
 }
 
 export function renderInputCard(vm) {

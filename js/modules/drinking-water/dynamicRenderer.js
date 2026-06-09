@@ -9,11 +9,94 @@ function setIslandInner(root, selector, html){
   return true;
 }
 
-export function updateDrinkingWaterDynamic(root, s){
+function setInputValue(root, fieldName, value){
+  const el = root?.querySelector?.(`[data-field="${fieldName}"]`);
+  if (!el || document.activeElement === el) return;
+  const next = String(value ?? '');
+  if (el.value !== next) el.value = next;
+}
+
+function updateSegment(root, name, value){
+  root?.querySelectorAll?.(`[data-segment="${name}"]`)?.forEach(button => {
+    const selected = String(button.dataset.value) === String(value);
+    button.classList.toggle('is-active', selected);
+    button.setAttribute('aria-selected', String(selected));
+  });
+}
+
+function syncFields(root, s = {}){
+  updateSegment(root, 'waterHeatingMode', s.waterHeatingMode);
+  updateSegment(root, 'singlePermanent', String(s.singlePermanent));
+  [
+    'buildingType',
+    'unitName',
+    'unitConsumerType',
+    'unitCount',
+    'unitSimultaneityFactor',
+    'singleName',
+    'singleConsumerType',
+    'singleCount'
+  ].forEach(key => setInputValue(root, key, s[key] ?? ''));
+}
+
+function hasAnyChanged(changed = [], keys = []){
+  return changed.some(key => keys.includes(key));
+}
+
+const INPUT_KEYS = [
+  'buildingType',
+  'waterHeatingMode',
+  'unitName',
+  'unitConsumerType',
+  'unitCount',
+  'unitSimultaneityFactor',
+  'unitDraftConsumers',
+  'singleName',
+  'singleConsumerType',
+  'singleCount',
+  'singlePermanent',
+  'singleDraftConsumers',
+  'savedUsageUnits',
+  'savedSingleConsumers',
+  'activeUnitId',
+  'activeSingleId',
+  'expandedUnitId',
+  'expandedSingleId',
+  'uiUnitFormOpen',
+  'uiUnitSavedOpen',
+  'uiSingleFormOpen',
+  'uiSingleSavedOpen'
+];
+
+const RESULT_KEYS = [
+  'buildingType',
+  'waterHeatingMode',
+  'savedUsageUnits',
+  'savedSingleConsumers'
+];
+
+export function updateDrinkingWaterDynamic(root, s, meta = {}){
   const vm = createDrinkingWaterViewModel(s);
-  setIslandInner(root, '[data-dw-dynamic="input"]', renderInputCard(vm));
-  setIslandInner(root, '[data-dw-dynamic="result"]', renderResultCard(vm));
-  root.__tcDrinkingWaterDynamic = { at: Date.now() };
+  const changed = Array.isArray(meta.changed) ? meta.changed : [];
+  const action = String(meta.action || '');
+  const initial = !root.__tcDrinkingWaterDynamic;
+  const inputAction = /^(dw:|line:|saved:)/.test(action);
+
+  if (initial || inputAction || !changed.length || hasAnyChanged(changed, INPUT_KEYS)) {
+    setIslandInner(root, '[data-dw-dynamic="input"]', renderInputCard(vm));
+  }
+  if (initial || inputAction || !changed.length || hasAnyChanged(changed, RESULT_KEYS)) {
+    setIslandInner(root, '[data-dw-dynamic="result"]', renderResultCard(vm));
+  }
+
+  syncFields(root, s);
+  root.__tcDrinkingWaterDynamic = {
+    at: Date.now(),
+    activeUnitId: s.activeUnitId || null,
+    activeSingleId: s.activeSingleId || null,
+    expandedUnitId: s.expandedUnitId || null,
+    expandedSingleId: s.expandedSingleId || null
+  };
 }
 
 export function isDynamicDrinkingWaterAction(meta = {}){
