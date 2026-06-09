@@ -54,7 +54,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": false,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-8-schema-inventory"
+      "migrationStatus": "phase-26b1-platform-mount-view-split"
     },
     {
       "id": "pipe-sizing",

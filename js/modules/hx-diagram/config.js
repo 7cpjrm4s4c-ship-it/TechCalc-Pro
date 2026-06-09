@@ -9,7 +9,7 @@ export default defineModuleConfig({
   order: 27,
   defaultVisible: false,
 
-  migrationStatus: 'phase-8-schema-inventory',
+  migrationStatus: 'phase-26b1-platform-mount-view-split',
   capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA],
   description: 'Luftzustände, Zustandsänderungen und Verlauf im h,x-Diagramm nach Mollier.'
 });
