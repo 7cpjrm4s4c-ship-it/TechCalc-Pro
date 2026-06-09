@@ -4520,3 +4520,21 @@ body::before {
     grid-column: 1 / -1;
   }
 }
+
+
+/* Phase 25B.2B.1: Trinkwasser nutzt wieder den globalen Plattform-Abstand.
+   Fachliche dw-* Alias-Klassen duerfen Selektoren bleiben, steuern aber keine vertikalen Card-Abstaende mehr. */
+.module-view[data-module='drinking-water'] .dw-list,
+.module-view[data-module='drinking-water'] .dw-consumer-list,
+.module-view[data-module='drinking-water'] .dw-fixture-list {
+  gap: var(--card-gap, 10px);
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion + .dw-accordion {
+  margin-top: 0;
+}
+
+.module-view[data-module='drinking-water'] .tc-accordion__body.tc-stack {
+  display: grid;
+  gap: var(--card-gap, 10px);
+}

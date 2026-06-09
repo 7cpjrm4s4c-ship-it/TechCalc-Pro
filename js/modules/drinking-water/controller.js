@@ -6,13 +6,13 @@ import { inlineStats, esc } from '../../core/renderer.js';
 import { fmt } from '../../utils/calculations.js';
 import { consumerRows, unitStats, singleStats } from './results.js';
 import { createDrinkingWaterViewModel } from './viewModel.js';
-import { renderInputCard, renderResultCard, draftConsumerList, renderView } from './view.js';
+import { renderInputCard, renderResultCard, draftConsumerList } from './view.js';
 
 export function renderUsageUnitRows(units = [], snapshot = state.get()) {
   if (!units.length) return '<div class="empty-state empty-state--compact">Noch keine Nutzungseinheit angelegt</div>';
   const activeId = snapshot.activeUnitId;
   const expandedId = snapshot.expandedUnitId;
-  return `<div class="line-section-list saved-record-list dw-list">${units.map((unit, index) => `<article class="line-section-card saved-record-card ${isSameId(expandedId, unit.id) ? '' : 'is-collapsed'} ${isSameId(activeId, unit.id) ? 'is-active' : ''}" data-line-card data-dw-unit-edit="${esc(unit.id)}">
+  return `<div class="line-section-list saved-record-list">${units.map((unit, index) => `<article class="line-section-card saved-record-card ${isSameId(expandedId, unit.id) ? '' : 'is-collapsed'} ${isSameId(activeId, unit.id) ? 'is-active' : ''}" data-line-card data-dw-unit-edit="${esc(unit.id)}">
     <div class="line-section-card__head saved-record-card__head">
       <div class="line-section-card__title saved-record-card__title"><strong>${esc(unit.name || 'Nutzungseinheit ' + (index + 1))}</strong><small>${unit.consumerCount} Verbraucher · Σ ${fmt(unit.sumFlow, 2)} l/s · Spitze ${fmt(unit.peakFlow, 2)} l/s</small></div>
       <button type="button" class="line-section-card__toggle saved-record-card__toggle" data-line-toggle data-dw-toggle-unit="${esc(unit.id)}" aria-expanded="${isSameId(expandedId, unit.id) ? 'true' : 'false'}" aria-label="Details aufklappen"><span>▾</span></button>
@@ -29,7 +29,7 @@ export function renderSingleRows(groups = [], snapshot = state.get()) {
   if (!groups.length) return '<div class="empty-state empty-state--compact">Noch keine Einzelverbraucher angelegt</div>';
   const activeId = snapshot.activeSingleId;
   const expandedId = snapshot.expandedSingleId;
-  return `<div class="line-section-list saved-record-list dw-list">${groups.map((group, index) => {
+  return `<div class="line-section-list saved-record-list">${groups.map((group, index) => {
     const consumers = group.consumers || [];
     const count = consumers.reduce((sum, c) => sum + (Number(c.count) || 1), 0);
     const sumFlow = consumers.reduce((sum, c) => sum + Number(c.vr || 0) * (Number(c.count) || 1), 0);
@@ -95,17 +95,29 @@ function normalizeSingleGroupForEdit(group) {
   };
 }
 
-function rerender(root) {
-  safeReplaceContent(root, renderView(state.get()));
+
+function preserveScrollPosition(callback) {
+  const scroller = document.scrollingElement || document.documentElement;
+  const scrollTop = scroller?.scrollTop ?? window.scrollY ?? 0;
+  const scrollLeft = scroller?.scrollLeft ?? window.scrollX ?? 0;
+  callback();
+  if (scroller) {
+    scroller.scrollTop = scrollTop;
+    scroller.scrollLeft = scrollLeft;
+  } else if (typeof window.scrollTo === 'function') {
+    window.scrollTo(scrollLeft, scrollTop);
+  }
 }
 
 export function refreshDrinkingWater(root) {
-  const s = state.get();
-  const vm = createDrinkingWaterViewModel(s, calculate(s));
-  const result = root.querySelector('[data-dw-dynamic="result"]');
-  if (result) safeReplaceContent(result, renderResultCard(vm));
-  const input = root.querySelector('[data-dw-dynamic="input"]');
-  if (input) safeReplaceContent(input, renderInputCard(vm));
+  preserveScrollPosition(() => {
+    const s = state.get();
+    const vm = createDrinkingWaterViewModel(s, calculate(s));
+    const result = root.querySelector('[data-dw-dynamic="result"]');
+    if (result) safeReplaceContent(result, renderResultCard(vm));
+    const input = root.querySelector('[data-dw-dynamic="input"]');
+    if (input) safeReplaceContent(input, renderInputCard(vm));
+  });
 }
 
 function draftKey(type) {
@@ -161,7 +173,7 @@ function saveUnit(root, update = false) {
     syncSavedRecordsPatch({ savedUsageUnits: [...units, record] }, 'dw:unit-save');
   }
   state.set({ unitDraftConsumers: [], activeUnitId: update ? s.activeUnitId : null, activeSingleId:null, unitName: update ? s.unitName : '', unitSimultaneityFactor: update ? s.unitSimultaneityFactor : '', uiUnitFormOpen:true, uiUnitSavedOpen:true }, { action:'dw:unit-save', notify:false });
-  rerender(root);
+  refreshDrinkingWater(root);
 }
 
 function saveSingle(root, update = false) {
@@ -176,26 +188,26 @@ function saveSingle(root, update = false) {
     syncSavedRecordsPatch({ savedSingleConsumers: [...groups, record] }, 'dw:single-save');
   }
   state.set({ singleDraftConsumers: [], activeUnitId:null, activeSingleId: update ? s.activeSingleId : null, singleName: update ? s.singleName : '', uiSingleFormOpen:true, uiSingleSavedOpen:true }, { action:'dw:single-save', notify:false });
-  rerender(root);
+  refreshDrinkingWater(root);
 }
 
 function deleteUnit(root, id) {
   syncSavedRecordsPatch({ savedUsageUnits: normalizeDrinkingWaterSavedState(state.get()).savedUsageUnits.filter(item => !isSameId(item.id, id)) }, 'dw:unit-delete');
   if (isSameId(state.get().activeUnitId, id)) state.set({ activeUnitId:null, unitName:'', unitSimultaneityFactor:'', unitDraftConsumers:[] }, { action:'dw:unit-delete', notify:false });
-  rerender(root);
+  refreshDrinkingWater(root);
 }
 
 function deleteSingle(root, id) {
   syncSavedRecordsPatch({ savedSingleConsumers: normalizeDrinkingWaterSavedState(state.get()).savedSingleConsumers.filter(item => !isSameId(item.id, id)) }, 'dw:single-delete');
   if (isSameId(state.get().activeSingleId, id)) state.set({ activeSingleId:null, singleName:'', singleDraftConsumers:[] }, { action:'dw:single-delete', notify:false });
-  rerender(root);
+  refreshDrinkingWater(root);
 }
 
 function editUnit(root, id) {
   const unit = normalizeDrinkingWaterSavedState(state.get()).savedUsageUnits.find(item => isSameId(item.id, id));
   if (!unit) return;
   state.set({ activeUnitId:unit.id, activeSingleId:null, unitName:unit.name, unitSimultaneityFactor:unit.simultaneityFactor || '', singleName:'', unitDraftConsumers:unit.consumers || [], singleDraftConsumers:[], uiUnitFormOpen:true, uiUnitSavedOpen:true }, { action:'dw:unit-edit', notify:false });
-  rerender(root);
+  refreshDrinkingWater(root);
 }
 
 function editSingle(root, id) {
@@ -203,14 +215,14 @@ function editSingle(root, id) {
   if (!group) return;
   const consumers = (group.consumers || []).map(c => ({ ...c }));
   state.set({ activeUnitId:null, activeSingleId:group.id, unitName:'', unitDraftConsumers:[], singleName:group.name, singleDraftConsumers:consumers, singlePermanent:String(consumers.some(c => c.permanent)), uiSingleFormOpen:true, uiSingleSavedOpen:true }, { action:'dw:single-edit', notify:false });
-  rerender(root);
+  refreshDrinkingWater(root);
 }
 
 function clearActiveEdit(root) {
   const current = state.get();
   if (!current.activeUnitId && !current.activeSingleId) return;
   state.set({ activeUnitId:null, activeSingleId:null, unitName:'', unitSimultaneityFactor:'', singleName:'', unitDraftConsumers:[], singleDraftConsumers:[] }, { action:'dw:clear-active', notify:false });
-  rerender(root);
+  refreshDrinkingWater(root);
 }
 
 function updateAccordionState(event) {
@@ -282,7 +294,7 @@ export function bindDrinkingWaterActions(root) {
     const singleEdit = target.closest('[data-dw-single-edit]');
     if (singleEdit && root.contains(singleEdit)) { event.preventDefault(); event.stopPropagation(); editSingle(root, singleEdit.dataset.dwSingleEdit); return; }
     const segment = target.closest('[data-segment]');
-    if (segment && root.contains(segment)) { event.preventDefault(); event.stopPropagation(); state.set({ [segment.dataset.segment]: segment.dataset.value }, { action:'dw:segment', notify:false }); rerender(root); return; }
+    if (segment && root.contains(segment)) { event.preventDefault(); event.stopPropagation(); state.set({ [segment.dataset.segment]: segment.dataset.value }, { action:'dw:segment', notify:false }); refreshDrinkingWater(root); return; }
 
     const ignored = target.closest('[data-dw-unit-edit], [data-dw-single-edit], [data-dw-unit-delete], [data-dw-single-delete], [data-dw-add-unit], [data-dw-update-unit], [data-dw-add-single], [data-dw-update-single], [data-dw-draft-add], [data-dw-remove-draft], [data-dw-draft-count], [data-line-toggle], details, summary, input, select, textarea, button, label, .segmented');
     if (!ignored) {

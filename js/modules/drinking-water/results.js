@@ -2,7 +2,7 @@ import { inlineStats, esc } from '../../core/renderer.js';
 import { fmt } from '../../utils/calculations.js';
 
 export function consumerRows(consumers = []) {
-  return `<div class="tc-consumer-list dw-consumer-list">${consumers.map(c => `<div class="tc-consumer-row dw-consumer-row"><div><strong>${esc(c.count)} × ${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr,2)} l/s je Verbraucher${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div></div>`).join('')}</div>`;
+  return `<div class="tc-consumer-list">${consumers.map(c => `<div class="tc-consumer-row"><div><strong>${esc(c.count)} × ${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr,2)} l/s je Verbraucher${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div></div>`).join('')}</div>`;
 }
 
 export function selectedFixturesList(r, state = {}) {
@@ -19,7 +19,7 @@ export function selectedFixturesList(r, state = {}) {
   if (state.activeSingleId && Array.isArray(state.singleDraftConsumers)) state.singleDraftConsumers.forEach(add);
   const rows = [...aggregate.values()];
   if (!rows.length) return '<div class="empty-state empty-state--compact">Noch keine Einrichtungsgegenstände ausgewählt</div>';
-  return `<div class="tc-fixture-list dw-fixture-list dw-fixture-list--plain">${rows.map(item => `<div class="tc-fixture-row dw-fixture-row"><strong>${esc(item.count)} × ${esc(item.label)}</strong>${item.permanent ? '<em>Dauerverbraucher</em>' : ''}</div>`).join('')}</div>`;
+  return `<div class="tc-fixture-list">${rows.map(item => `<div class="tc-fixture-row"><strong>${esc(item.count)} × ${esc(item.label)}</strong>${item.permanent ? '<em>Dauerverbraucher</em>' : ''}</div>`).join('')}</div>`;
 }
 
 export function unitStats(unit = {}){
