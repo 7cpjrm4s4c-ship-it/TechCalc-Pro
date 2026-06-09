@@ -214,10 +214,10 @@ function recommendHouseConnection(peakLs) {
   return { ...match, flowM3h };
 }
 
-function draftUsageUnitFromState(s = {}) {
+function draftUsageUnitFromState(s = {}, includeCurrentControls = false) {
   const consumers = Array.isArray(s.unitDraftConsumers) && s.unitDraftConsumers.length
     ? s.unitDraftConsumers
-    : s.unitConsumerType ? [createConsumer({ typeId: s.unitConsumerType, count: s.unitCount })] : [];
+    : includeCurrentControls && s.unitConsumerType ? [createConsumer({ typeId: s.unitConsumerType, count: s.unitCount })] : [];
   if (!consumers.length) return null;
   return createUsageUnit({
     name: s.unitName || 'Aktuelle Nutzungseinheit',
@@ -226,11 +226,11 @@ function draftUsageUnitFromState(s = {}) {
   });
 }
 
-function draftSingleGroupFromState(s = {}) {
+function draftSingleGroupFromState(s = {}, includeCurrentControls = false) {
   const permanent = String(s.singlePermanent) === 'true';
   const consumers = Array.isArray(s.singleDraftConsumers) && s.singleDraftConsumers.length
     ? s.singleDraftConsumers.map(c => ({ ...c, permanent }))
-    : s.singleConsumerType ? [createConsumer({ typeId: s.singleConsumerType, count: s.singleCount, permanent })] : [];
+    : includeCurrentControls && s.singleConsumerType ? [createConsumer({ typeId: s.singleConsumerType, count: s.singleCount, permanent })] : [];
   if (!consumers.length) return null;
   return createSingleGroup({
     name: s.singleName || 'Aktuelle Einzelverbraucher',
@@ -238,16 +238,19 @@ function draftSingleGroupFromState(s = {}) {
   });
 }
 
-export function calculate(s = {}) {
+export function calculate(s = {}, options = {}) {
   const warmWaterMode = s.waterHeatingMode === 'decentral' ? 'decentral' : 'central';
   const centralWarmWater = warmWaterMode === 'central';
   // Plattformvertrag: Berechnet wird ausschließlich aus persistent gespeicherten
   // Nutzungseinheiten und Einzelverbrauchergruppen. Eingabedialoge sind Entwürfe
   // und dürfen das Ergebnis beim Modulstart oder während der Eingabe nicht beeinflussen.
+  const includeDrafts = options.includeDrafts === true;
   const unitSource = Array.isArray(s.savedUsageUnits) && s.savedUsageUnits.length ? s.savedUsageUnits : readUsageUnits();
-  const units = unitSource.map(unit => summarizeUsageUnit(unit, warmWaterMode));
+  const draftUnit = includeDrafts ? draftUsageUnitFromState(s, false) : null;
+  const units = [...unitSource, ...(draftUnit ? [{ ...draftUnit, transient:true }] : [])].map(unit => summarizeUsageUnit(unit, warmWaterMode));
   const singleGroupSource = normalizeSingleGroups(Array.isArray(s.savedSingleConsumers) && s.savedSingleConsumers.length ? s.savedSingleConsumers : readSingleConsumers());
-  const singleGroupsRaw = singleGroupSource;
+  const draftSingleGroup = includeDrafts ? draftSingleGroupFromState(s, false) : null;
+  const singleGroupsRaw = [...singleGroupSource, ...(draftSingleGroup ? [{ ...draftSingleGroup, transient:true }] : [])];
   const singlesRaw = [];
   singleGroupsRaw.forEach(group => {
     (group.consumers || []).forEach(c => singlesRaw.push({ ...c, groupId: group.id, groupName: group.name }));

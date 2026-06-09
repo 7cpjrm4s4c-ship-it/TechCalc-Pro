@@ -6,7 +6,7 @@ export function consumerOptions() {
   return CONSUMERS.map(c => ({ value: c.id, label: `${c.label} · ${fmt(c.vr, 2)} l/s${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}` }));
 }
 
-export function createDrinkingWaterViewModel(s = {}, result = calculate(s)){
+export function createDrinkingWaterViewModel(s = {}, result = calculate(s, { includeDrafts:true })){
   return {
     state: s,
     result,

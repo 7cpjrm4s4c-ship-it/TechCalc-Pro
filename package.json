@@ -51,6 +51,7 @@
     "test:drinking-water-phase25d": "node tests/drinking-water-phase25d-hardening.test.mjs",
     "test:drinking-water-phase25e": "node tests/drinking-water-phase25e-final-hardening.test.mjs",
     "test:hx-diagram-phase26b1": "node tests/hx-diagram-phase26b1-platform-mount-view-split.test.mjs",
-    "test:hx-diagram-phase26b2": "node tests/hx-diagram-phase26b2-saved-records-platform-dialog.test.mjs"
+    "test:hx-diagram-phase26b2": "node tests/hx-diagram-phase26b2-saved-records-platform-dialog.test.mjs",
+    "test:drinking-water-phase25e1": "node tests/drinking-water-phase25e1-water-heating-preview.test.mjs"
   }
 }

@@ -69,7 +69,7 @@ function preserveScrollPosition(callback) {
 export function refreshDrinkingWater(root) {
   preserveScrollPosition(() => {
     const s = state.get();
-    const vm = createDrinkingWaterViewModel(s, calculate(s));
+    const vm = createDrinkingWaterViewModel(s);
     const result = root.querySelector('[data-dw-dynamic="result"]');
     if (result) safeReplaceContent(result, renderResultCard(vm));
     const input = root.querySelector('[data-dw-dynamic="input"]');
