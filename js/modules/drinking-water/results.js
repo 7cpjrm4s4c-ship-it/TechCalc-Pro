@@ -12,8 +12,14 @@ function resultUnit(r, unit = '') {
   return hasStoredConsumers(r) ? unit : '';
 }
 
-export function consumerRows(consumers = []) {
-  return `<div class="tc-consumer-list">${consumers.map(c => `<div class="tc-consumer-row"><div><strong>${esc(c.count)} × ${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr,2)} l/s je Verbraucher${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div></div>`).join('')}</div>`;
+export function consumerModeSuffix(consumer = {}, waterHeatingMode = 'central') {
+  if (!consumer.hotWater) return 'nur TWK';
+  if (waterHeatingMode === 'decentral') return consumer.decentralizedAddon ? 'WW-Bereitung' : 'TWK + WW-Bereitung';
+  return consumer.hotWaterClone ? 'TWW' : 'TWK/TWW';
+}
+
+export function consumerRows(consumers = [], waterHeatingMode = 'central') {
+  return `<div class="tc-consumer-list">${consumers.map(c => `<div class="tc-consumer-row"><div><strong>${esc(c.count)} × ${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr,2)} l/s je Verbraucher · ${esc(consumerModeSuffix(c, waterHeatingMode))}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div></div>`).join('')}</div>`;
 }
 
 export function selectedFixturesList(r, state = {}) {
@@ -28,7 +34,7 @@ export function selectedFixturesList(r, state = {}) {
   (r.usageUnits || []).forEach(unit => (unit.consumers || []).forEach(add));
   ((r.rawSingles && r.rawSingles.length) ? r.rawSingles : (r.singleGroups || []).flatMap(group => group.consumers || [])).forEach(add);
   const rows = [...aggregate.values()];
-  if (!rows.length) return '<div class="empty-state empty-state--compact">Noch keine Einrichtungsgegenstände ausgewählt</div>';
+  if (!rows.length) return `<div class="empty-state empty-state--compact">${esc(state.waterHeatingMode === 'decentral' ? 'Noch keine Einrichtungsgegenstände für die dezentrale Berechnung ausgewählt' : 'Noch keine Einrichtungsgegenstände für die zentrale Berechnung ausgewählt')}</div>`;
   return `<div class="tc-fixture-list">${rows.map(item => `<div class="tc-fixture-row"><strong>${esc(item.count)} × ${esc(item.label)}</strong>${item.permanent ? '<em>Dauerverbraucher</em>' : ''}</div>`).join('')}</div>`;
 }
 
@@ -56,7 +62,7 @@ export function singleStats(group = {}){
 export function buildDrinkingWaterResultModel(s = {}, r = {}, accent = 'blue'){
   return {
     primary: {
-      title: 'Ergebnis — Trinkwasser',
+      title: s.waterHeatingMode === 'decentral' ? 'Ergebnis — Trinkwasser dezentral' : 'Ergebnis — Trinkwasser zentral',
       primary: { label:'Spitzendurchfluss', value:resultValue(r, r.peakFlow, 2), unit:resultUnit(r, 'l/s') },
       rows: [
         { label:'Σ NE', value:resultValue(r, r.neSumFlow, 2), unit:resultUnit(r, 'l/s') },
@@ -80,7 +86,7 @@ export function buildDrinkingWaterResultModel(s = {}, r = {}, accent = 'blue'){
         accent
       },
       {
-        title: 'Zusammenstellung Einrichtungsgegenstände',
+        title: s.waterHeatingMode === 'decentral' ? 'Zusammenstellung Einrichtungsgegenstände — dezentral' : 'Zusammenstellung Einrichtungsgegenstände — zentral',
         html: selectedFixturesList(r, s),
         accent
       }

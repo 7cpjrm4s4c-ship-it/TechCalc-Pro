@@ -2,20 +2,20 @@ import config from './config.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, esc } from '../../core/renderer.js';
 import { fmt, fmtInput } from '../../utils/calculations.js';
 import { createDrinkingWaterViewModel } from './viewModel.js';
-import { renderDrinkingWaterResultModel, consumerRows, unitStats, singleStats } from './results.js';
+import { renderDrinkingWaterResultModel, consumerRows, unitStats, singleStats, consumerModeSuffix } from './results.js';
 import { isSameId } from '../../core/savedRecords.js';
 
-export function draftConsumerList(items, type) {
+export function draftConsumerList(items, type, waterHeatingMode = 'central') {
   if (!items?.length) return '<div class="empty-state empty-state--compact">Noch keine Verbraucher ausgewählt</div>';
   return `<div class="tc-consumer-list">${items.map((c, index) => `<div class="tc-consumer-row dw-consumer-row--editable">
-    <div><strong>${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr, 2)} l/s je Verbraucher${c.hotWater ? ' · TWW/TWK' : ' · nur TWK'}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div>
+    <div><strong>${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr, 2)} l/s je Verbraucher · ${esc(consumerModeSuffix(c, waterHeatingMode))}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div>
     <label class="mini-edit-field"><span>Anzahl</span><input type="number" min="0" step="1" value="${esc(c.count)}" data-dw-draft-count="${esc(type)}" data-index="${index}" inputmode="numeric"></label>
     <button type="button" data-dw-remove-draft="${esc(type)}" data-index="${index}" aria-label="Verbraucher entfernen">×</button>
   </div>`).join('')}</div>`;
 }
 
 
-export function renderUsageUnitRows(units = [], snapshot = {}) {
+export function renderUsageUnitRows(units = [], snapshot = {}, waterHeatingMode = 'central') {
   if (!units.length) return '<div class="empty-state empty-state--compact">Noch keine Nutzungseinheit angelegt</div>';
   const activeId = snapshot.activeUnitId;
   const expandedId = snapshot.expandedUnitId;
@@ -27,12 +27,12 @@ export function renderUsageUnitRows(units = [], snapshot = {}) {
     </div>
     <div class="line-section-card__body saved-record-card__body">
       ${inlineStats(unitStats(unit))}
-      ${consumerRows(unit.consumers || [])}
+      ${consumerRows(unit.consumers || [], waterHeatingMode)}
     </div>
   </article>`).join('')}</div>`;
 }
 
-export function renderSingleRows(groups = [], snapshot = {}) {
+export function renderSingleRows(groups = [], snapshot = {}, waterHeatingMode = 'central') {
   if (!groups.length) return '<div class="empty-state empty-state--compact">Noch keine Einzelverbraucher angelegt</div>';
   const activeId = snapshot.activeSingleId;
   const expandedId = snapshot.expandedSingleId;
@@ -48,7 +48,7 @@ export function renderSingleRows(groups = [], snapshot = {}) {
       </div>
       <div class="line-section-card__body saved-record-card__body">
         ${inlineStats(singleStats(group))}
-        ${consumerRows(consumers)}
+        ${consumerRows(consumers, waterHeatingMode)}
       </div>
     </article>`;
   }).join('')}</div>`;
@@ -79,10 +79,10 @@ export function renderInputCard(vm) {
         field({ id:'unitSimultaneityFactor', label:'GL der Nutzungseinheit', value:s.unitSimultaneityFactor || '', placeholder:'optional < 1,0', inputmode:'decimal' })
       ].join(''), 3),
       '<button type="button" class="action-button action-button--secondary" data-dw-draft-add="unit">Verbraucher zur Nutzungseinheit hinzufügen</button>',
-      `<div data-dw-unit-draft>${draftConsumerList(s.unitDraftConsumers || [], 'unit')}</div>`,
+      `<div data-dw-unit-draft>${draftConsumerList(s.unitDraftConsumers || [], 'unit', s.waterHeatingMode)}</div>`,
       `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-unit ${s.activeUnitId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-dw-update-unit ${s.activeUnitId ? '' : 'disabled'}>Aktualisieren</button></div>`,
       '</div></details>',
-      `<details class="tc-accordion dw-save-dialog dw-save-dialog--saved" data-dw-accordion="uiUnitSavedOpen" ${s.uiUnitSavedOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text dw-save-dialog__summary"><strong>Gespeicherte Nutzungseinheiten</strong><small data-dw-unit-summary>${vm.savedUsageUnits.length} Nutzungseinheiten angelegt</small></span></summary><div class="tc-accordion__body tc-stack dw-save-dialog__body" data-dw-unit-saved>${renderUsageUnitRows(vm.savedUsageUnits, s)}</div></details>`
+      `<details class="tc-accordion dw-save-dialog dw-save-dialog--saved" data-dw-accordion="uiUnitSavedOpen" ${s.uiUnitSavedOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text dw-save-dialog__summary"><strong>Gespeicherte Nutzungseinheiten</strong><small data-dw-unit-summary>${vm.savedUsageUnits.length} Nutzungseinheiten angelegt</small></span></summary><div class="tc-accordion__body tc-stack dw-save-dialog__body" data-dw-unit-saved>${renderUsageUnitRows(vm.savedUsageUnits, s, s.waterHeatingMode)}</div></details>`
     ].join('')), vm.accent),
     card(vm.waterHeating.singleCardTitle, stack([
       `<details class="tc-accordion dw-save-dialog" data-dw-accordion="uiSingleFormOpen" ${s.uiSingleFormOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text dw-save-dialog__summary"><strong>Freie Einrichtungsgegenstände zusammenstellen</strong><small>${esc(vm.waterHeating.singleHelp)}</small></span></summary><div class="tc-accordion__body tc-stack dw-save-dialog__body">`,
@@ -96,10 +96,10 @@ export function renderInputCard(vm) {
         { value:'true', label:'Dauerverbraucher > 15 min' }
       ], String(s.singlePermanent), { accent:vm.accent }),
       '<button type="button" class="action-button action-button--secondary" data-dw-draft-add="single">Verbraucher zur Gruppe hinzufügen</button>',
-      `<div data-dw-single-draft>${draftConsumerList(s.singleDraftConsumers || [], 'single')}</div>`,
+      `<div data-dw-single-draft>${draftConsumerList(s.singleDraftConsumers || [], 'single', s.waterHeatingMode)}</div>`,
       `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-single ${s.activeSingleId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-dw-update-single ${s.activeSingleId ? '' : 'disabled'}>Aktualisieren</button></div>`,
       '</div></details>',
-      `<details class="tc-accordion dw-save-dialog dw-save-dialog--saved" data-dw-accordion="uiSingleSavedOpen" ${s.uiSingleSavedOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text dw-save-dialog__summary"><strong>Gespeicherte Einzelverbraucher</strong><small data-dw-single-summary>${vm.savedSingleGroups.length} Gruppen außerhalb NE</small></span></summary><div class="tc-accordion__body tc-stack dw-save-dialog__body" data-dw-single-saved>${renderSingleRows(vm.savedSingleGroups, s)}</div></details>`
+      `<details class="tc-accordion dw-save-dialog dw-save-dialog--saved" data-dw-accordion="uiSingleSavedOpen" ${s.uiSingleSavedOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text dw-save-dialog__summary"><strong>Gespeicherte Einzelverbraucher</strong><small data-dw-single-summary>${vm.savedSingleGroups.length} Gruppen außerhalb NE</small></span></summary><div class="tc-accordion__body tc-stack dw-save-dialog__body" data-dw-single-saved>${renderSingleRows(vm.savedSingleGroups, s, s.waterHeatingMode)}</div></details>`
     ].join('')), vm.accent)
   ].join(''));
 }

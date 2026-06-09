@@ -24,7 +24,11 @@ export function waterHeatingUi(mode = 'central') {
       : 'TWW-Verbraucher werden bei zentraler Warmwasserbereitung als Trinkwarmwasser-Zapfstellen mitgeführt.',
     singleHelp: decentralized
       ? 'Freie TWW-Verbraucher werden dezentral mit 0,05 l/s für die WW-Bereitung angesetzt.'
-      : 'Freie TWW-Verbraucher werden bei zentraler Warmwasserbereitung zusätzlich angesetzt.'
+      : 'Freie TWW-Verbraucher werden bei zentraler Warmwasserbereitung zusätzlich angesetzt.',
+    consumerSuffixHot: decentralized ? 'TWK + WW-Bereitung' : 'TWK/TWW',
+    resultTitle: decentralized ? 'Ergebnis — Trinkwasser dezentral' : 'Ergebnis — Trinkwasser zentral',
+    fixtureTitle: decentralized ? 'Zusammenstellung Einrichtungsgegenstände — dezentral' : 'Zusammenstellung Einrichtungsgegenstände — zentral',
+    fixtureEmpty: decentralized ? 'Noch keine Einrichtungsgegenstände für die dezentrale Berechnung ausgewählt' : 'Noch keine Einrichtungsgegenstände für die zentrale Berechnung ausgewählt'
   };
 }
 
