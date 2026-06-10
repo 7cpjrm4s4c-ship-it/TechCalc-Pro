@@ -1,0 +1,86 @@
+{
+  "phase": "28C",
+  "title": "Event System Cleanup",
+  "score": 4.82,
+  "grade": "A",
+  "p0": [],
+  "p1": [],
+  "p2": [
+    "Es bestehen weitere direkte globale Listener, die in spätere Cleanup-Phasen übernommen werden sollten."
+  ],
+  "summary": {
+    "eventManagerExists": true,
+    "delegationManaged": true,
+    "appManaged": true,
+    "managedReferences": 27,
+    "directGlobalListeners": 9,
+    "directDomListeners": 62
+  },
+  "findings": [
+    {
+      "id": "EVT-28C-001",
+      "priority": "closed",
+      "area": "Platform Event Manager",
+      "finding": "Zentraler Event Manager ist vorhanden und bietet on(), once(), createEventScope() und Listener-Snapshot."
+    },
+    {
+      "id": "EVT-28C-002",
+      "priority": "closed",
+      "area": "Global App Events",
+      "finding": "Zentrale App-Global-Listener sind über trackGlobalEventListener inventarisierbar."
+    },
+    {
+      "id": "EVT-28C-003",
+      "priority": "P2",
+      "area": "Legacy Direct Events",
+      "finding": "Verbleibende direkte Listener sind überwiegend modul- oder elementgebunden und bleiben funktional unverändert."
+    }
+  ],
+  "directGlobalSample": [
+    {
+      "file": "js/core/menuFallback.js",
+      "line": 111,
+      "text": "document.addEventListener('click', clickHandler, true);"
+    },
+    {
+      "file": "js/core/menuFallback.js",
+      "line": 112,
+      "text": "document.addEventListener('keydown', keyHandler, true);"
+    },
+    {
+      "file": "js/core/menuFallback.js",
+      "line": 113,
+      "text": "document.addEventListener('click', outsideHandler, false);"
+    },
+    {
+      "file": "js/core/menuFallback.js",
+      "line": 114,
+      "text": "document.addEventListener('touchmove', touchMoveHandler, { passive: false });"
+    },
+    {
+      "file": "js/core/menuFallback.js",
+      "line": 118,
+      "text": "document.addEventListener('DOMContentLoaded', init, { once: true });"
+    },
+    {
+      "file": "js/core/navigation.js",
+      "line": 104,
+      "text": "document.addEventListener('click', closeOverflowOnOutsideClick);"
+    },
+    {
+      "file": "js/core/pdfExport.js",
+      "line": 115,
+      "text": "document.addEventListener('techcalc-project-loaded', () => {"
+    },
+    {
+      "file": "js/core/router.js",
+      "line": 26,
+      "text": "window.addEventListener('hashchange', handleRouteChange);"
+    },
+    {
+      "file": "js/core/router.js",
+      "line": 27,
+      "text": "window.addEventListener('popstate', handleRouteChange);"
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { on, createEventScope } from './eventManager.js';
 export function delegate(root, eventName, selector, handler, options) {
   if (!root) return () => {};
   const listener = event => {
@@ -5,18 +6,17 @@ export function delegate(root, eventName, selector, handler, options) {
     if (!target || !root.contains(target)) return;
     handler(event, target);
   };
-  root.addEventListener(eventName, listener, options);
-  return () => root.removeEventListener(eventName, listener, options);
+  return on(root, eventName, listener, options);
 }
 
 export function createDelegationScope(root) {
-  const cleanup = [];
+  const scope = createEventScope('delegation-scope');
   return {
     on(eventName, selector, handler, options) {
-      cleanup.push(delegate(root, eventName, selector, handler, options));
+      scope.add(delegate(root, eventName, selector, handler, options));
     },
     destroy() {
-      while (cleanup.length) cleanup.pop()?.();
+      scope.dispose();
     }
   };
 }

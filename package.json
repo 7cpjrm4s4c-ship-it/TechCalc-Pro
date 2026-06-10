@@ -96,6 +96,8 @@
     "audit:tab-navigation": "node scripts/audit-tab-navigation-phase28b3.mjs",
     "test:platform-focus-phase28b3": "node tests/platform-tab-navigation-phase28b3.test.mjs",
     "audit:dynamic-input-focus": "node scripts/audit-dynamic-input-focus-phase28b4.mjs",
-    "test:platform-focus-phase28b4": "node tests/platform-dynamic-input-focus-phase28b4.test.mjs"
+    "test:platform-focus-phase28b4": "node tests/platform-dynamic-input-focus-phase28b4.test.mjs",
+    "audit:event-system": "node scripts/audit-event-system-phase28c.mjs",
+    "test:platform-event-system-phase28c": "node tests/platform-event-system-phase28c.test.mjs"
   }
 }
