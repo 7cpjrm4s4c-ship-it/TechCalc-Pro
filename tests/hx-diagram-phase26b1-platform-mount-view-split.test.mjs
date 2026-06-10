@@ -19,7 +19,7 @@ assert.match(controller, /createLineSectionController/, 'controller must use pla
 
 const view = fs.readFileSync(base + 'view.js', 'utf8');
 assert.match(view, /renderModuleShell/, 'view must render module shell');
-assert.match(view, /chartCard/, 'view composes diagram card from diagramRenderer after 26C.1');
+assert.match(view, /renderDiagram/, 'view composes diagram card through the render pipeline after 26C.2');
 assert.doesNotMatch(view, /function\s+renderHxSvg/, 'view must not own SVG chart rendering after 26C.1');
 assert.doesNotMatch(view, /bindActions/, 'view must not own action binding');
 

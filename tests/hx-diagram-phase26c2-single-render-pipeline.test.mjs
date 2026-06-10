@@ -8,12 +8,13 @@ const base = 'js/modules/hx-diagram/';
 const view = fs.readFileSync(base + 'view.js', 'utf8');
 const dynamic = fs.readFileSync(base + 'dynamicRenderer.js', 'utf8');
 const pipeline = fs.readFileSync(base + 'renderPipeline.js', 'utf8');
+const formRenderer = fs.readFileSync(base + 'formRenderer.js', 'utf8');
 
-assert.equal(config.migrationStatus, 'phase-26c2-single-render-pipeline');
+assert.match(config.migrationStatus, /^phase-26c(2|3)-/);
 assert.ok(fs.existsSync(base + 'renderPipeline.js'), 'renderPipeline.js must exist');
 assert.match(view, /data-hx-dynamic="\$\{HX_DYNAMIC\.results\}"/, 'view must expose result dynamic island');
 assert.match(view, /data-hx-dynamic="\$\{HX_DYNAMIC\.diagram\}"/, 'view must expose diagram dynamic island');
-assert.match(view, /data-hx-dynamic="\$\{HX_DYNAMIC\.process\}"/, 'view must expose process dynamic island');
+assert.match(formRenderer, /data-hx-dynamic="\$\{HX_DYNAMIC\.process\}"/, 'form renderer must expose process dynamic island');
 assert.match(dynamic, /renderDynamicSections/, 'dynamic renderer must delegate to the central h,x render pipeline');
 assert.match(pipeline, /export function renderResults/, 'pipeline must own result rendering entrypoint');
 assert.match(pipeline, /export function renderDiagram/, 'pipeline must own diagram rendering entrypoint');
