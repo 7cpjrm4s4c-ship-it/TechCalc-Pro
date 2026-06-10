@@ -124,6 +124,72 @@ export function handlePlatformFieldNavigation(root, current, event, options = {}
   return false;
 }
 
+
+export function captureActiveField(root = document, options = {}) {
+  const active = typeof document !== 'undefined' ? document.activeElement : null;
+  if (!active || active === document.body) return null;
+  if (root?.contains && !root.contains(active)) return null;
+  const field = active.closest?.('[data-field]') || active;
+  if (!field?.matches?.('[data-field]')) return null;
+  const key = field.dataset.field || field.id || field.name || null;
+  if (!key) return null;
+  const fields = getPlatformFields(root);
+  const index = fields.indexOf(field);
+  return {
+    key,
+    index,
+    tagName: field.tagName,
+    value: 'value' in field ? field.value : null,
+    selectionStart: 'selectionStart' in field ? field.selectionStart : null,
+    selectionEnd: 'selectionEnd' in field ? field.selectionEnd : null,
+    select: options.select === true
+  };
+}
+
+function findFieldBySnapshot(root, snapshot) {
+  if (!root?.querySelector || !snapshot) return null;
+  const escaped = cssEscape(snapshot.key);
+  const byKey = root.querySelector(`[data-field="${escaped}"], [id="${escaped}"], [name="${escaped}"]`);
+  if (byKey && byKey.matches?.('[data-field]') && !byKey.disabled && isElementVisible(byKey)) return byKey;
+  const fields = getPlatformFields(root);
+  if (snapshot.index >= 0 && fields[snapshot.index]) return fields[snapshot.index];
+  return null;
+}
+
+export function restoreCapturedField(root = document, snapshot, options = {}) {
+  const next = findFieldBySnapshot(root, snapshot);
+  if (!next) return false;
+  if (options.skipSelect !== false && next.tagName === 'SELECT') return false;
+  const restored = safeFocus(next, { preventScroll: true, select: snapshot.select && options.select !== false });
+  if (!restored) return false;
+  if (snapshot && 'setSelectionRange' in next && next.value === snapshot.value && Number.isFinite(snapshot.selectionStart) && Number.isFinite(snapshot.selectionEnd)) {
+    try { next.setSelectionRange(snapshot.selectionStart, snapshot.selectionEnd); } catch { /* ignore */ }
+  }
+  return true;
+}
+
+export function preserveFocusDuring(root = document, mutate, options = {}) {
+  const snapshot = captureActiveField(root, options);
+  const result = typeof mutate === 'function' ? mutate() : undefined;
+  const restore = () => {
+    if (snapshot && options.restoreFocus !== false) restoreCapturedField(root, snapshot, options);
+  };
+  if (result && typeof result.then === 'function') {
+    return result.finally(() => {
+      if (typeof requestAnimationFrame === 'function') requestAnimationFrame(restore);
+      else setTimeout(restore, 0);
+    });
+  }
+  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(restore);
+  else setTimeout(restore, 0);
+  return result;
+}
+
+function cssEscape(value) {
+  if (typeof window !== 'undefined' && window.CSS?.escape) return window.CSS.escape(value);
+  return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
 export function restoreFocus(element, options = {}) {
   return safeFocus(element, { preventScroll: true, ...options });
 }
@@ -141,5 +207,8 @@ export const PlatformFocusManager = Object.freeze({
   handleEnterNavigation,
   focusByTab,
   handleTabNavigation,
-  handlePlatformFieldNavigation
+  handlePlatformFieldNavigation,
+  captureActiveField,
+  restoreCapturedField,
+  preserveFocusDuring
 });

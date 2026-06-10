@@ -5,6 +5,7 @@ import { chartCard } from './diagramRenderer.js';
 import { hxProcessCard, hxProcessController } from './controller.js';
 import { card, esc } from '../../core/renderer.js';
 import { parseNumber } from '../../core/numberService.js';
+import { preserveFocusDuring } from '../../core/focusManager.js';
 
 export const HX_DYNAMIC = Object.freeze({
   results: 'results',
@@ -53,7 +54,7 @@ function setInner(root, selector, html) {
   const el = root?.querySelector?.(selector);
   if (!el) return false;
   const next = String(html ?? '');
-  if (el.innerHTML !== next) el.innerHTML = next;
+  if (el.innerHTML !== next) preserveFocusDuring(root, () => { el.innerHTML = next; }, { skipSelect: true });
   return true;
 }
 

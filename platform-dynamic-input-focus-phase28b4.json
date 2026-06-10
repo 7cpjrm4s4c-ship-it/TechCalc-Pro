@@ -1,0 +1,26 @@
+{
+  "phase": "28B.4",
+  "name": "Dynamic Input Focus Hardening",
+  "generatedAt": "2026-06-10T17:05:55.719Z",
+  "overallScore": 5,
+  "overallGrade": "A",
+  "executiveSummary": {
+    "p0": [],
+    "p1": [],
+    "p2": [],
+    "conclusion": "Dynamic Render Islands preserve active data-field focus by stable field key with index fallback, caret restoration and preventScroll. The protection is applied to h,x, WRG and Trinkwasser dynamic renderers while select reopening remains guarded."
+  },
+  "acceptance": {
+    "activeFieldSnapshotApiExists": true,
+    "stableKeyAndIndexFallbackExists": true,
+    "caretRestoreExists": true,
+    "preventScrollPreserved": true,
+    "platformObjectExportsDynamicApi": true,
+    "hxDynamicRenderPreservesFocus": true,
+    "heatRecoveryDynamicRenderPreservesFocus": true,
+    "drinkingWaterDynamicRenderPreservesFocus": true,
+    "selectReopenGuardPreserved": true,
+    "legacyDomUpdateStillUsesFocusService": true
+  },
+  "findings": []
+}
