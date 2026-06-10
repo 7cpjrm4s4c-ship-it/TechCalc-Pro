@@ -169,9 +169,10 @@ function bindHxDelegation(rootEl) {
       const hasCompleteInput = [nextState.tempC, nextState.rhPercent, nextState.targetTempC, nextState.targetRhPercent]
         .every(value => String(value ?? '').trim() !== '');
       const nextResult = hasCompleteInput ? calculate(nextState) : null;
+      const previewPath = nextResult?.processPath || [];
       state.set({
         process: nextProcess,
-        activePath: nextResult?.processPath || [],
+        activePath: previewPath,
         points: []
       }, { action: 'hx:process' });
       return;
