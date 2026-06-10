@@ -64,8 +64,6 @@
     "test:hx-diagram-phase26c1": "node tests/hx-diagram-phase26c1-diagram-renderer-extraction.test.mjs",
     "test:hx-diagram-phase26c2": "node tests/hx-diagram-phase26c2-single-render-pipeline.test.mjs",
     "test:hx-diagram-phase26c3": "node tests/hx-diagram-phase26c3-view-purification.test.mjs",
-    "test:hx-diagram-phase26d": "node tests/hx-diagram-phase26d-final-platform-cleanup.test.mjs",
-    "audit:platform-framework": "node scripts/audit-platform-framework-phase27a.mjs",
-    "test:platform-audit-framework-phase27a": "node tests/platform-audit-framework-phase27a.test.mjs"
+    "test:hx-diagram-phase26d": "node tests/hx-diagram-phase26d-final-platform-cleanup.test.mjs"
   }
 }
