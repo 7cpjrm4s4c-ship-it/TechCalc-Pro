@@ -19,6 +19,14 @@ export function preserveSavedRecordScroll(action, overrides = {}) {
   return preserveScroll(action, 'savedRecord', overrides);
 }
 
+export function preserveSavedRecordMutation(action, overrides = {}) {
+  return runWithoutScrollJump(action, {
+    frames: 8,
+    delays: [0, 40, 100, 220, 420],
+    ...overrides
+  });
+}
+
 
 function getDefaultScrollScope(scope = null) {
   if (scope && scope !== window) return scope;
@@ -123,5 +131,6 @@ export const PlatformScrollManager = Object.freeze({
   preserveScroll,
   preserveActionScroll,
   preserveSavedRecordScroll,
+  preserveSavedRecordMutation,
   preserveModuleSwitchScroll
 });

@@ -1,5 +1,6 @@
-import { esc, inlineStats, preserveViewport } from './renderer.js';
+import { esc, inlineStats } from './renderer.js';
 import { markCommittedAction } from './formActions.js';
+import { preserveSavedRecordScroll, preserveSavedRecordMutation } from './scrollManager.js';
 
 export function createRecordId(prefix = 'record') {
   try {
@@ -105,7 +106,7 @@ function activateLoad({ root, card, event, loadAttr, onLoad, preserveLoadScroll 
   event.stopImmediatePropagation?.();
   markCommittedAction(root);
   const run = () => onLoad?.(id, card, event);
-  if (preserveLoadScroll) preserveViewport(run, { frames: 8, blurActive: false, anchor: card, event, delays: [0, 40, 100, 220] });
+  if (preserveLoadScroll) preserveSavedRecordScroll(run, { anchor: card, event });
   else run();
 }
 
@@ -129,15 +130,17 @@ export function bindSavedRecordList(root, {
       event.stopImmediatePropagation?.();
       const card = toggle.closest('[data-line-card]');
       const willOpen = card?.classList.contains('is-collapsed');
-      if (closeOthers && card) {
-        root.querySelectorAll('[data-line-card]').forEach(item => {
-          if (item === card) return;
-          item.classList.add('is-collapsed');
-          item.querySelector(`[${toggleAttr}]`)?.setAttribute('aria-expanded', 'false');
-        });
-      }
-      card?.classList.toggle('is-collapsed', !willOpen);
-      toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      preserveSavedRecordMutation(() => {
+        if (closeOthers && card) {
+          root.querySelectorAll('[data-line-card]').forEach(item => {
+            if (item === card) return;
+            item.classList.add('is-collapsed');
+            item.querySelector(`[${toggleAttr}]`)?.setAttribute('aria-expanded', 'false');
+          });
+        }
+        card?.classList.toggle('is-collapsed', !willOpen);
+        toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      }, { anchor: card, event });
       return;
     }
 
@@ -184,7 +187,7 @@ export function bindEditModeClear(root, {
     const selector = ignoreSelector ? `${baseIgnore}, ${ignoreSelector}` : baseIgnore;
     if (event.target.closest(selector)) return;
     const patch = { [activeIdKey]: null, ...(nameKey ? { [nameKey]: '' } : {}), ...clearPatch };
-    preserveViewport(() => {
+    preserveSavedRecordMutation(() => {
       if (typeof onClear === 'function') onClear(patch, event);
       else state.set(patch);
     }, { frames: 14, event, anchor: event.target?.closest?.('.module-view, main, #app'), delays: [0, 40, 100, 220, 420, 800] });

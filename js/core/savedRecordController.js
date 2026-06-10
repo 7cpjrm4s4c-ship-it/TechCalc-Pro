@@ -1,5 +1,5 @@
 import { bindSavedRecordList, createRecordId, isSameId, removeRecord, replaceRecord } from './savedRecords.js';
-import { preserveActionScroll, preserveSavedRecordScroll } from './scrollManager.js';
+import { preserveActionScroll, preserveSavedRecordScroll, preserveSavedRecordMutation } from './scrollManager.js';
 import { markCommittedAction } from './formActions.js';
 
 function bindScopedOnce(root, key, eventName, listener, options) {
@@ -356,13 +356,13 @@ export function createSavedRecordActions({
     if (!id) return;
     const current = requireContext();
     if (!current) return;
-    state.set(savedRecordReducer(current, {
+    preserveSavedRecordMutation(() => state.set(savedRecordReducer(current, {
       listKey,
       activeIdKey,
       expandedIdKey,
       action: 'toggle-expanded',
       id
-    }), { action: 'saved-record:toggle' });
+    }), { action: 'saved-record:toggle' }));
   };
 
   return { save, update, load, delete: remove, toggle };
