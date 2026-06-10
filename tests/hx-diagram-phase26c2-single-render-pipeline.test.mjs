@@ -10,7 +10,7 @@ const dynamic = fs.readFileSync(base + 'dynamicRenderer.js', 'utf8');
 const pipeline = fs.readFileSync(base + 'renderPipeline.js', 'utf8');
 const formRenderer = fs.readFileSync(base + 'formRenderer.js', 'utf8');
 
-assert.match(config.migrationStatus, /^phase-26c(2|3)-/);
+assert.match(config.migrationStatus, /^phase-26(c(2|3)|d)-/);
 assert.ok(fs.existsSync(base + 'renderPipeline.js'), 'renderPipeline.js must exist');
 assert.match(view, /data-hx-dynamic="\$\{HX_DYNAMIC\.results\}"/, 'view must expose result dynamic island');
 assert.match(view, /data-hx-dynamic="\$\{HX_DYNAMIC\.diagram\}"/, 'view must expose diagram dynamic island');

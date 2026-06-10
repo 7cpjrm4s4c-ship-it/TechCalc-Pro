@@ -9,7 +9,7 @@ const base = 'js/modules/hx-diagram/';
 const view = fs.readFileSync(base + 'view.js', 'utf8');
 const formRenderer = fs.readFileSync(base + 'formRenderer.js', 'utf8');
 
-assert.equal(config.migrationStatus, 'phase-26c3-view-purification');
+assert.ok(['phase-26c3-view-purification', 'phase-26d-final-platform-cleanup'].includes(config.migrationStatus));
 assert.ok(fs.existsSync(base + 'formRenderer.js'), 'formRenderer.js must exist');
 
 assert.match(view, /renderHxInputCard/, 'view must compose the input card through the form renderer');

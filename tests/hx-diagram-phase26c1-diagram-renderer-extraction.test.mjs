@@ -8,7 +8,7 @@ const base = 'js/modules/hx-diagram/';
 const view = fs.readFileSync(base + 'view.js', 'utf8');
 const diagram = fs.readFileSync(base + 'diagramRenderer.js', 'utf8');
 
-assert.match(config.migrationStatus, /^phase-26c(1|2|3)-/, 'config must report h,x 26C migration status');
+assert.match(config.migrationStatus, /^phase-26(c(1|2|3)|d)-/, 'config must report h,x 26C/26D migration status');
 assert.ok(fs.existsSync(base + 'diagramRenderer.js'), 'diagramRenderer.js must exist');
 assert.match(view, /renderDiagram/, 'view must preserve the extracted diagram renderer contract through the render pipeline');
 assert.match(view, /chartCard|renderDiagram/, 'view must compose chart output through the diagram render path');

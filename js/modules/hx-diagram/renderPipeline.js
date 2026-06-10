@@ -1,4 +1,4 @@
-import { calculate, PROCESS_OPTIONS } from './logic.js';
+import { PROCESS_OPTIONS } from './logic.js';
 import { createViewModel } from './viewModel.js';
 import { renderHxResultModel } from './results.js';
 import { chartCard } from './diagramRenderer.js';
@@ -31,7 +31,7 @@ export function renderProcessSelection(snapshotOrVm = {}) {
 }
 
 export function createHxRenderModel(snapshot = {}) {
-  return createViewModel(snapshot, calculate(snapshot));
+  return createViewModel(snapshot);
 }
 
 export function renderResults(snapshotOrVm = {}) {

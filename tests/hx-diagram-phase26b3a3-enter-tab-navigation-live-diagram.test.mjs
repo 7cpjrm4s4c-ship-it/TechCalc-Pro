@@ -11,7 +11,7 @@ const comparablePath = path => path.map(point => ({
   humidityRatioGkg: Number(point.humidityRatioGkg.toFixed(3))
 }));
 
-assert.ok(['phase-26b3a3-enter-tab-navigation-and-live-diagram', 'phase-26c1-diagram-renderer-extraction', 'phase-26c2-single-render-pipeline', 'phase-26c3-view-purification'].includes(config.migrationStatus));
+assert.ok(['phase-26b3a3-enter-tab-navigation-and-live-diagram', 'phase-26c1-diagram-renderer-extraction', 'phase-26c2-single-render-pipeline', 'phase-26c3-view-purification', 'phase-26d-final-platform-cleanup'].includes(config.migrationStatus));
 
 state.replace({
   tempC: '20',
