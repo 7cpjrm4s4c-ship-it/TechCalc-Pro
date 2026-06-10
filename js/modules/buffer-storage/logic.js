@@ -1,3 +1,5 @@
+import { parseNumber } from '../../core/numberService.js';
+
 const FACTORS = {
   water: 14.32,
   ethylene: { 20: 15.89, 25: 16.41, 30: 16.96, 35: 17.55, 40: 18.15, 45: 18.87, 50: 19.57 },
@@ -7,8 +9,7 @@ const FACTORS = {
 const STANDARD_VOLUMES = [50, 80, 100, 140, 200, 300, 400, 500, 600, 800, 1000, 1500, 2000, 2500, 3000, 4000, 5000, 7500, 10000, 15000, 20000];
 
 function num(value){
-  const n = Number(String(value ?? '').replace(/\./g, '').replace(',', '.'));
-  return Number.isFinite(n) ? n : 0;
+  return parseNumber(value, { fallback: 0 });
 }
 function round(value, digits = 2){
   return Number.isFinite(value) ? Math.round(value * 10 ** digits) / 10 ** digits : 0;

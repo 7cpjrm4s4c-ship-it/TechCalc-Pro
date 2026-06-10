@@ -1,0 +1,48 @@
+{
+  "directDomWrites": 15,
+  "moduleDirectDomWrites": 0,
+  "status": "ok",
+  "note": "Phase 7 allows shell/navigation writes, but module-level writes must continue moving toward safeReplaceContent or granular updates.",
+  "findings": [
+    {
+      "file": "js/core/moduleRuntime.js",
+      "line": 102,
+      "text": "root.innerHTML = typeof loadingView === 'function'"
+    },
+    {
+      "file": "js/core/moduleRuntime.js",
+      "line": 130,
+      "text": "root.innerHTML = '<div class=\"module-error card\">Modul konnte nicht geladen werden.</div>';"
+    },
+    {
+      "file": "js/platform/dynamicRenderer/index.js",
+      "line": 13,
+      "text": "if (el.innerHTML !== next) el.innerHTML = next;"
+    },
+    {
+      "file": "js/platform/dynamicRenderer/index.js",
+      "line": 31,
+      "text": "if (island.innerHTML !== next) island.innerHTML = next;"
+    },
+    {
+      "file": "js/platform/moduleRuntime/index.js",
+      "line": 372,
+      "text": "root.innerHTML = view(snapshot);"
+    },
+    {
+      "file": "js/platform/moduleRuntime/index.js",
+      "line": 464,
+      "text": "if (root.innerHTML !== nextView) root.innerHTML = nextView;"
+    },
+    {
+      "file": "js/platform/moduleRuntime/index.js",
+      "line": 476,
+      "text": "if (formHost.innerHTML !== nextForm) formHost.innerHTML = nextForm;"
+    },
+    {
+      "file": "js/platform/moduleRuntime/index.js",
+      "line": 480,
+      "text": "if (sideHost.innerHTML !== nextSide) sideHost.innerHTML = nextSide;"
+    }
+  ]
+}

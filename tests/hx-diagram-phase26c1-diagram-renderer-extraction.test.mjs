@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import config from '../js/modules/hx-diagram/config.js';
+import { chartCard, renderHxSvg, buildStateSegments } from '../js/modules/hx-diagram/diagramRenderer.js';
+import { calculate } from '../js/modules/hx-diagram/logic.js';
+
+const base = 'js/modules/hx-diagram/';
+const view = fs.readFileSync(base + 'view.js', 'utf8');
+const diagram = fs.readFileSync(base + 'diagramRenderer.js', 'utf8');
+
+assert.match(config.migrationStatus, /^phase-26(c(1|2|3)|d)-/, 'config must report h,x 26C/26D migration status');
+assert.ok(fs.existsSync(base + 'diagramRenderer.js'), 'diagramRenderer.js must exist');
+assert.match(view, /renderDiagram/, 'view must preserve the extracted diagram renderer contract through the render pipeline');
+assert.match(view, /chartCard|renderDiagram/, 'view must compose chart output through the diagram render path');
+assert.doesNotMatch(view, /humidityRatioKgKg/, 'view must not own psychrometric curve calculations');
+assert.doesNotMatch(view, /STATIC_HX_BACKGROUND/, 'view must not own static SVG background generation');
+assert.doesNotMatch(view, /function\s+buildStateSegments/, 'view must not own state path segment generation');
+assert.match(diagram, /humidityRatioKgKg/, 'diagram renderer owns chart psychrometric curve rendering');
+assert.match(diagram, /export function renderHxSvg/, 'diagram renderer exports renderHxSvg');
+assert.match(diagram, /export function chartCard/, 'diagram renderer exports chartCard');
+
+const result = calculate({ tempC: '20', rhPercent: '50', targetTempC: '8', targetRhPercent: '90', process: 'cool-dehumidify' });
+const segments = buildStateSegments(result.processPath);
+const svg = renderHxSvg(result.processPath);
+const card = chartCard(result.processPath, result.targetReached);
+
+assert.match(segments, /hx-state-path/, 'diagram renderer must render process path segments');
+assert.match(svg, /<svg class="hx-chart"/, 'diagram renderer must render the h,x SVG');
+assert.match(svg, /Feuchtegehalt x/, 'diagram renderer must preserve x-axis title');
+assert.match(card, /h,x-Diagramm/, 'chartCard must preserve diagram card title');
+assert.match(card, /hx-chart-wrap/, 'chartCard must wrap the SVG for existing CSS');
+
+console.log('hx diagram phase 26C.1 diagram renderer extraction ok');

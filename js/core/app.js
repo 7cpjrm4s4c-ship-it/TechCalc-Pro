@@ -1,5 +1,5 @@
 import { modules } from './registry.js';
-import { initRouter, currentRoute } from './router.js';
+import { initRouter, currentRoute, navigate } from './router.js';
 import { renderNavigation, renderQuickAccessSettings } from './navigation.js';
 import heatingCoolingConfig from '../modules/heating-cooling/config.js';
 import ventilationConfig from '../modules/ventilation/config.js';
@@ -13,6 +13,8 @@ import bufferStorageConfig from '../modules/buffer-storage/config.js';
 import wastewaterConfig from '../modules/wastewater/config.js';
 import rainwaterConfig from '../modules/rainwater/config.js';
 import { restoreSessionSnapshot, saveSessionSnapshot } from './projectStorage.js';
+import { createModuleLifecycleAdapter } from './moduleLifecycleAdapter.js';
+import { createModuleRuntime } from './moduleRuntime.js';
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
@@ -31,7 +33,7 @@ const lazyModules = [
 const moduleCache = new Map();
 function registerLazyModule({ config, path, module: eagerModule }) {
   if (eagerModule) {
-    modules.register({ config, mount: eagerModule.mount });
+    modules.register({ config, mount: createModuleLifecycleAdapter(config.id, eagerModule.mount) });
     return;
   }
 
@@ -41,7 +43,12 @@ function registerLazyModule({ config, path, module: eagerModule }) {
       const renderToken = root?.dataset?.renderToken || '';
       let loaded = moduleCache.get(config.id);
       if (!loaded) {
-        loaded = import(path).then(mod => mod.default || mod);
+        loaded = import(path)
+          .then(mod => mod.default || mod)
+          .catch(error => {
+            moduleCache.delete(config.id);
+            throw error;
+          });
         moduleCache.set(config.id, loaded);
       }
       const module = await loaded;
@@ -51,7 +58,7 @@ function registerLazyModule({ config, path, module: eagerModule }) {
       if (!module || typeof module.mount !== 'function') {
         throw new Error(`Modul ${config.id} konnte nicht initialisiert werden.`);
       }
-      return module.mount(root);
+      return createModuleLifecycleAdapter(config.id, module.mount)(root);
     }
   });
 }
@@ -81,35 +88,117 @@ document.addEventListener('click', event => {
   if (external) persistSessionBeforeLeaving();
 }, { capture: true });
 
-const app = document.getElementById('app');
-let renderToken = 0;
-let cleanupCurrentModule = () => {};
-async function render(id){
-  const module = modules.get(id);
-  if (!module) return;
-  const token = ++renderToken;
-  app.dataset.renderToken = String(token);
-  cleanupCurrentModule();
-  cleanupCurrentModule = () => {};
-  renderNavigation(id);
-  app.setAttribute('aria-busy', 'true');
-  try {
-    const cleanup = await module.mount(app);
-    if (token !== renderToken) {
-      if (typeof cleanup === 'function') cleanup();
-      return;
-    }
-    cleanupCurrentModule = typeof cleanup === 'function' ? cleanup : () => {};
-  } catch (error) {
-    if (token !== renderToken) return;
-    console.error(`Modul konnte nicht geladen werden: ${id}`, error);
-    app.innerHTML = '<div class="module-error card">Modul konnte nicht geladen werden.</div>';
-  } finally {
-    if (token === renderToken) {
-      app.removeAttribute('aria-busy');
-      app.focus({ preventScroll:true });
-    }
+
+const NAV_INTERACTIVE_SELECTOR = '.module-nav [data-module-id], #overflowMenu [data-module-id]';
+const NAV_MOVE_TOLERANCE_PX = 10;
+let navPointerGesture = null;
+let navLastTapWasScroll = false;
+let navLastTapAt = 0;
+
+function navPoint(event) {
+  if (!event) return null;
+  return { x: Number(event.clientX || 0), y: Number(event.clientY || 0), pointerId: event.pointerId };
+}
+
+function moduleNavButtonFromEvent(event) {
+  return event.target?.closest?.(NAV_INTERACTIVE_SELECTOR) || null;
+}
+
+function commitGlobalModuleNav(button, event) {
+  if (!button?.dataset?.moduleId) return false;
+  const id = button.dataset.moduleId;
+  const root = document.getElementById('app');
+  const isMountedActive = root?.dataset?.activeModuleId === id && !root?.hasAttribute?.('aria-busy');
+  const isPendingActive = root?.dataset?.pendingModuleId === id && root?.hasAttribute?.('aria-busy');
+  event?.preventDefault?.();
+  event?.stopPropagation?.();
+  event?.stopImmediatePropagation?.();
+
+  const overflow = document.getElementById('overflowMenu');
+  if (overflow) overflow.hidden = true;
+  if (isMountedActive || isPendingActive) return true;
+  navigate(id);
+  return true;
+}
+
+function onGlobalNavPointerDown(event) {
+  const button = moduleNavButtonFromEvent(event);
+  if (!button) return;
+  const point = navPoint(event);
+  navPointerGesture = point ? { ...point, button, moved: false } : null;
+  navLastTapWasScroll = false;
+}
+
+function onGlobalNavPointerMove(event) {
+  if (!navPointerGesture) return;
+  if (navPointerGesture.pointerId !== undefined && event.pointerId !== undefined && navPointerGesture.pointerId !== event.pointerId) return;
+  const point = navPoint(event);
+  if (!point) return;
+  const dx = Math.abs(point.x - navPointerGesture.x);
+  const dy = Math.abs(point.y - navPointerGesture.y);
+  if (dx > NAV_MOVE_TOLERANCE_PX || dy > NAV_MOVE_TOLERANCE_PX) {
+    navPointerGesture.moved = true;
+    navLastTapWasScroll = true;
+    navLastTapAt = Date.now();
   }
+}
+
+function onGlobalNavPointerCancel() {
+  navPointerGesture = null;
+  navLastTapWasScroll = true;
+  navLastTapAt = Date.now();
+}
+
+function onGlobalNavPointerUp(event) {
+  const button = moduleNavButtonFromEvent(event);
+  if (!button) return;
+  if (navPointerGesture?.moved) {
+    navPointerGesture = null;
+    navLastTapWasScroll = true;
+    navLastTapAt = Date.now();
+    return;
+  }
+  navPointerGesture = null;
+  // Deliberately do not navigate on pointerup. The click event is the single
+  // route-change entry point for mouse, touch and keyboard activation. Keeping
+  // pointerup passive prevents a route from being marked active before the
+  // module content mount has actually completed.
+}
+
+function onGlobalNavClick(event) {
+  const button = moduleNavButtonFromEvent(event);
+  if (!button) return;
+  if (navLastTapWasScroll && Date.now() - navLastTapAt < 550) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation?.();
+    navLastTapWasScroll = false;
+    return;
+  }
+  navLastTapWasScroll = false;
+  commitGlobalModuleNav(button, event);
+}
+
+document.addEventListener('pointerdown', onGlobalNavPointerDown, true);
+document.addEventListener('pointermove', onGlobalNavPointerMove, { capture: true, passive: true });
+document.addEventListener('pointercancel', onGlobalNavPointerCancel, true);
+document.addEventListener('pointerup', onGlobalNavPointerUp, true);
+document.addEventListener('click', onGlobalNavClick, true);
+
+
+const app = document.getElementById('app');
+const moduleRuntime = createModuleRuntime({
+  root: app,
+  modules,
+  renderNavigation,
+  loadingView() {
+    return '<div class="card tc-module-loading" role="status">Modul wird geladen...</div>';
+  }
+});
+
+function render(id){
+  if (!modules.get(id)) return Promise.resolve(false);
+  return moduleRuntime.mount(id);
 }
 initRouter(render);
 renderQuickAccessSettings();
@@ -191,7 +280,7 @@ function applyThemeMode(mode = getStoredThemeMode()) {
 
 applyThemeMode();
 
-const APP_VERSION = '1.2.17';
+const APP_VERSION = '1.3.0';
 const FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
 
 function initFeedbackForm() {

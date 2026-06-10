@@ -1,0 +1,120 @@
+{
+  "total": 11,
+  "schemaModules": 11,
+  "centralNumberService": 11,
+  "legacyNumberParsers": 0,
+  "centralSavedRecords": 8,
+  "legacyClassModules": 7,
+  "modules": [
+    {
+      "id": "buffer-storage",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "phase-23d-platform-contract-finalization phase-23e-hardening"
+    },
+    {
+      "id": "drinking-water",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "phase-25b3-result-renderer-migration phase-25c-dynamic-controller-contract phase-25d-hardening phase-25e-final-hardening phase-25e1-water-heating-preview-fix phase-25e2a-water-heating-ui-switch-fix phase-25e2b-navigation-persistence-fix phase-25e2c-water-heating-visible-labels-fix phase-25e2d-rainwater-segment-bridge"
+    },
+    {
+      "id": "heat-recovery",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": false,
+      "migrationStatus": "phase-24b2-result-renderer-dynamic-islands phase-24b3-dynamic-controller-hardening phase-24c-platform-contract-finalization phase-24d-hardening phase-24d1-global-spacing-fix phase-24e-final-hardening"
+    },
+    {
+      "id": "heating-cooling",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "phase-12h-final-globalized phase-18b1-result-model phase-18b2-line-section-controller phase-18b3-dynamic-renderer phase-18b4-platform-mount phase-18b4a-ordered-card-layout phase-18c-platform-hardening phase-18d-reference-consolidation phase-18d1-reference-cleanup phase-18d2-controller-viewmodel-split"
+    },
+    {
+      "id": "hx-diagram",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "phase-26b3a3-enter-tab-navigation-and-live-diagram"
+    },
+    {
+      "id": "pipe-sizing",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "phase-8-schema-inventory phase-21b1-platform-mount phase-21b2-saved-record-controller phase-21b3-result-renderer phase-21c-dynamic-renderer phase-21c1-dimension-cards-fix phase-21c2-saved-record-line-attrs phase-21c3-saved-record-controller-parity phase-21d-platform-contract phase-21e-hardening"
+    },
+    {
+      "id": "pressure-holding",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "phase-16e-event-pipeline-consolidation phase-20b1-platform-mount phase-20b2-saved-record-controller phase-20b3-result-renderer phase-20c-dynamic-renderer phase-20d-platform-contract phase-20e-hardening"
+    },
+    {
+      "id": "rainwater",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": false,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "phase-14g-rainwater-global-standard phase-14l-rainwater-reference-completion phase-14m-router-direct-render phase-17a2-rainwater-saved-actions phase-17a5-rainwater-platform-control phase-17a6-rainwater-platform-only-reference"
+    },
+    {
+      "id": "unit-converter",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": false,
+      "hasLegacyModuleClasses": false,
+      "migrationStatus": "phase-8-schema-inventory phase-22b1-platform-mount phase-22b1-render-fix phase-22b3-result-renderer phase-22c-dynamic-renderer phase-22c1-result-cleanup phase-22d-platform-contract phase-22e-hardening"
+    },
+    {
+      "id": "ventilation",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": false,
+      "migrationStatus": "phase-13e-ventilation-temperature-render-fix phase-19b1-platform-mount phase-19b2b-line-section-controller phase-19b2c-saved-record-island phase-19b2c-hydrator-final phase-19b2d-saved-record-cleanup phase-19b3-result-renderer phase-19c-dynamic-renderer phase-19d-controller-viewmodel-view"
+    },
+    {
+      "id": "wastewater",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": false,
+      "hasLegacyModuleClasses": false,
+      "migrationStatus": "phase-8-schema-inventory"
+    }
+  ]
+}

@@ -1,8 +1,6 @@
 import { createModuleState } from '../../core/state.js';
 
 export const initialState = {
-  name: '',
-  activeCalculationId: null,
   surfaceMode: 'roof',
   calculationType: 'roof',
   roofRainIntensity: '300',
@@ -31,8 +29,8 @@ export const initialState = {
   roofDrainCapacity: '4,5',
   stackCount: '1',
   activeSurfaceId: null,
-  surfaces: [],
-  savedCalculations: []
+  expandedSurfaceResultId: null,
+  surfaces: []
 };
 
 export const state = createModuleState(initialState);

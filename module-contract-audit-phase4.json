@@ -1,0 +1,226 @@
+{
+  "generatedAt": "2026-05-27T20:51:58.047Z",
+  "contractTarget": "1.3.0",
+  "modules": [
+    {
+      "module": "buffer-storage",
+      "usesDefineConfig": true,
+      "hasSchemaFile": false,
+      "exposesSchema": false,
+      "legacyRendererImports": 1,
+      "ownUiClassSamples": [
+        "empty-state",
+        "empty-state--compact",
+        "ph-warnings",
+        "ph-warning",
+        "ph-saved-list",
+        "ph-saved-item",
+        "line-section-card",
+        "is-collapsed",
+        "is-active",
+        "data-line-card",
+        "data-buffer-select",
+        "data-line-toggle"
+      ]
+    },
+    {
+      "module": "drinking-water",
+      "usesDefineConfig": true,
+      "hasSchemaFile": false,
+      "exposesSchema": false,
+      "legacyRendererImports": 1,
+      "ownUiClassSamples": [
+        "empty-state",
+        "empty-state--compact",
+        "dw-consumer-list",
+        "dw-consumer-row",
+        "dw-consumer-row--editable",
+        "mini-edit-field",
+        "data-dw-draft-count",
+        "data-index",
+        "data-dw-remove-draft",
+        "aria-label",
+        "line-section-list",
+        "saved-record-list"
+      ]
+    },
+    {
+      "module": "heat-recovery",
+      "usesDefineConfig": true,
+      "hasSchemaFile": false,
+      "exposesSchema": false,
+      "legacyRendererImports": 1,
+      "ownUiClassSamples": [
+        "field--readonly",
+        "control--readonly",
+        "line-section-list",
+        "line-section-card",
+        "is-collapsed",
+        "is-active",
+        "data-line-card",
+        "data-rlt-select",
+        "data-line-toggle",
+        "aria-expanded",
+        "aria-label",
+        "data-rlt-delete"
+      ]
+    },
+    {
+      "module": "heating-cooling",
+      "usesDefineConfig": true,
+      "hasSchemaFile": false,
+      "exposesSchema": false,
+      "legacyRendererImports": 1,
+      "ownUiClassSamples": [
+        "data-line-select",
+        "data-line-toggle",
+        "data-line-delete",
+        "action-button",
+        "data-line-save",
+        "data-line-update",
+        "empty-state",
+        "main-result",
+        "span-6"
+      ]
+    },
+    {
+      "module": "hx-diagram",
+      "usesDefineConfig": true,
+      "hasSchemaFile": false,
+      "exposesSchema": false,
+      "legacyRendererImports": 1,
+      "ownUiClassSamples": [
+        "cool-dehumidify",
+        "hx-process-grid",
+        "data-segment",
+        "data-value",
+        "hx-process",
+        "is-active",
+        "data-hx-sign",
+        "data-hx-add",
+        "data-hx-update",
+        "data-hx-clear",
+        "hx-process-step",
+        "hx-process-path"
+      ]
+    },
+    {
+      "module": "pipe-sizing",
+      "usesDefineConfig": true,
+      "hasSchemaFile": false,
+      "exposesSchema": false,
+      "legacyRendererImports": 1,
+      "ownUiClassSamples": [
+        "data-pipe-load",
+        "data-line-toggle",
+        "data-pipe-delete",
+        "action-button",
+        "data-pipe-save",
+        "data-pipe-update",
+        "pipe-dimension-list",
+        "pipe-dimension-card",
+        "pipe-dimension-card--",
+        "is-recommended",
+        "pipe-bar",
+        "empty-state"
+      ]
+    },
+    {
+      "module": "pressure-holding",
+      "usesDefineConfig": true,
+      "hasSchemaFile": false,
+      "exposesSchema": false,
+      "legacyRendererImports": 1,
+      "ownUiClassSamples": [
+        "empty-state",
+        "empty-state--compact",
+        "ph-note",
+        "ph-warnings",
+        "ph-warning",
+        "ph-saved-list",
+        "ph-saved-item",
+        "line-section-card",
+        "is-collapsed",
+        "is-active",
+        "data-line-card",
+        "data-ph-select"
+      ]
+    },
+    {
+      "module": "rainwater",
+      "usesDefineConfig": true,
+      "hasSchemaFile": true,
+      "exposesSchema": true,
+      "legacyRendererImports": 1,
+      "ownUiClassSamples": [
+        "concrete-asphalt",
+        "metal-roof",
+        "data-rainwater-select",
+        "data-line-toggle",
+        "data-rainwater-delete",
+        "empty-state",
+        "empty-state--compact",
+        "dw-consumer-list",
+        "wastewater-fixture-list",
+        "rainwater-surface-list",
+        "dw-consumer-row",
+        "wastewater-fixture-row"
+      ]
+    },
+    {
+      "module": "unit-converter",
+      "usesDefineConfig": true,
+      "hasSchemaFile": false,
+      "exposesSchema": false,
+      "legacyRendererImports": 1,
+      "ownUiClassSamples": [
+        "unit-all-values",
+        "empty-state",
+        "span-6"
+      ]
+    },
+    {
+      "module": "ventilation",
+      "usesDefineConfig": true,
+      "hasSchemaFile": false,
+      "exposesSchema": false,
+      "legacyRendererImports": 1,
+      "ownUiClassSamples": [
+        "data-vent-line-select",
+        "data-line-toggle",
+        "data-line-delete",
+        "action-button",
+        "data-vent-line-save",
+        "data-vent-line-update",
+        "span-6"
+      ]
+    },
+    {
+      "module": "wastewater",
+      "usesDefineConfig": true,
+      "hasSchemaFile": true,
+      "exposesSchema": true,
+      "legacyRendererImports": 1,
+      "ownUiClassSamples": [
+        "single-unvented",
+        "single-vented",
+        "branch-unvented",
+        "branch-vented",
+        "ground-inside",
+        "ground-outside",
+        "ground-full",
+        "segmented--green",
+        "is-active",
+        "data-line-family",
+        "wastewater-line-selector",
+        "wastewater-subselect"
+      ]
+    }
+  ],
+  "summary": {
+    "total": 11,
+    "withDefineConfig": 11,
+    "withSchemaFile": 2,
+    "exposingSchema": 2
+  }
+}

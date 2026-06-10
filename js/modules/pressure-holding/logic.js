@@ -1,3 +1,5 @@
+import { parseNumber } from '../../core/numberService.js';
+
 const WATER = [
   [0,0,0,1000],[10,0,0,1000],[20,0.13,0,998],[30,0.37,0,996],[40,0.72,0,992],[50,1.15,0,988],[60,1.66,0,983],[70,2.24,0,978],[80,2.88,0,972],[90,3.58,0,965],[100,4.34,0.01,958],[105,4.74,0.43,955],[110,5.15,0.98,951],[120,6.03,1.70,943],[130,6.96,2.61,935],[140,7.96,3.76,926],[150,9.03,5.18,917],[160,10.20,6.30,907]
 ];
@@ -6,7 +8,7 @@ const GLYCOL34 = [[0,0.35,0,1066],[10,0.66,0,1063],[20,1.04,0,1059],[30,1.49,0,1
 const STANDARD_VOLUMES = [8,12,18,25,35,50,80,100,140,200,250,300,400,500,600,800,1000,1500,2000,3000,4000,5000];
 const REFLEX_N_VOLUMES = [8,12,18,25,35,50,80,100,140,200,250,300,400,500,600,800,1000];
 
-function num(v){ const n = Number(String(v ?? '').replace(',', '.')); return Number.isFinite(n) ? n : 0; }
+function num(v){ return parseNumber(v, { fallback: 0 }); }
 function tableFor(mode){ return mode === 'glycol20' ? GLYCOL20 : mode === 'glycol34' ? GLYCOL34 : WATER; }
 function interp(table, t, col){
   const temp = Math.max(table[0][0], Math.min(table[table.length-1][0], num(t)));

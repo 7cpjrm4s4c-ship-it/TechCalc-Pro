@@ -1,9 +1,7 @@
 import { areaTypes, hydraulicTables, dnOrder, roofDrainTable } from './tables.js';
+import { numberService } from '../../core/numberService.js';
 
-export const toNumber = value => {
-  const n = Number(String(value ?? '').replace(',', '.'));
-  return Number.isFinite(n) ? n : 0;
-};
+export const toNumber = value => numberService.parse(value, { fallback: 0, locale: 'de-DE' });
 
 export function getAreaType(id) {
   return areaTypes.find(item => item.id === id) || areaTypes[0];
@@ -43,17 +41,21 @@ function calcEmergencyOverflow(qNotBase, source, mode, fallback = {}) {
   const qNot = mode === 'roof' ? Math.max(0, qNotBase * settings.safetyFactor) : 0;
   const head = settings.head;
   const rectCapacity = settings.type === 'rect' && settings.width > 0 && head > 0 ? (settings.width * Math.pow(head, 1.5)) / 24000 : 0;
+  // Simple preliminary round overflow capacity from opening area and pressure head.
+  // Manufacturer values still override when entered manually.
+  const roundCapacity = settings.type === 'round' && settings.diameter > 0 && head > 0 ? (Math.PI * Math.pow(settings.diameter / 1000, 2) / 4) * Math.sqrt(2 * 9.81 * (head / 1000)) * 1000 : 0;
   const manualCapacity = settings.manualCapacity > 0 ? settings.manualCapacity : 0;
-  const capacity = settings.type === 'rect' ? (manualCapacity || rectCapacity) : manualCapacity;
+  const capacity = settings.type === 'rect' ? (manualCapacity || rectCapacity) : settings.type === 'round' ? (manualCapacity || roundCapacity) : manualCapacity;
   const requiredCount = capacity > 0 ? Math.ceil(qNot / capacity) : 0;
   const rectRequiredWidth = qNot > 0 && head > 0 ? (qNot * 24000) / Math.pow(head, 1.5) : 0;
-  const rectWidthPerOverflow = settings.type === 'rect' && requiredCount > 0 ? rectRequiredWidth / requiredCount : 0;
+  const rectWidthPerOverflow = settings.type === 'rect' ? settings.width : 0;
   return {
     ...settings,
     qNot,
     qNotBase,
     capacity,
     rectCapacity,
+    roundCapacity,
     rectRequiredWidth,
     rectWidthPerOverflow,
     requiredCount
@@ -63,29 +65,34 @@ function calcEmergencyOverflow(qNotBase, source, mode, fallback = {}) {
 function surfaceRows(state) {
   const currentMode = state.surfaceMode || state.calculationType || 'roof';
   return (state.surfaces || []).map(item => {
-    const mode = item.surfaceMode || item.calculationType || currentMode;
-    const base = getAreaType(item.areaType);
-    const area = Math.max(0, toNumber(item.areaSize));
-    const cs = base.custom ? Math.max(0, toNumber(item.customCs)) : base.cs;
-    const cm = base.custom ? Math.max(0, toNumber(item.customCm)) : base.cm;
-    const rdt = getRainForMode(item, mode) || getRainForMode(state, mode);
-    const r100 = toNumber(item.rainHundredIntensity || state.rainHundredIntensity);
-    const drain = currentDrainSettings(item, state);
-    const stackCount = mode === 'roof' ? (Math.max(1, Math.floor(toNumber(item.stackCount || state.stackCount)) || 1)) : 0;
-    const fillRatio = item.fillRatio || state.fillRatio || '0.7';
-    const slopeCmM = item.slopeCmM || state.slopeCmM || '1,0';
+    const source = item?.state || item?.inputState || item || {};
+    const mode = source.surfaceMode || source.calculationType || currentMode;
+    const base = getAreaType(source.areaType);
+    const area = Math.max(0, toNumber(source.areaSize));
+    const cs = base.custom ? Math.max(0, toNumber(source.customCs)) : base.cs;
+    const cm = base.custom ? Math.max(0, toNumber(source.customCm)) : base.cm;
+    const rdt = getRainForMode(source, mode) || getRainForMode(state, mode);
+    const r100 = toNumber(source.rainHundredIntensity || state.rainHundredIntensity);
+    const drain = currentDrainSettings(source, state);
+    const stackCount = mode === 'roof' ? (Math.max(1, Math.floor(toNumber(source.stackCount || state.stackCount)) || 1)) : 0;
+    const fillRatio = source.fillRatio || state.fillRatio || '0.7';
+    const slopeCmM = source.slopeCmM || state.slopeCmM || '1,0';
     const qr = rdt * cs * area / 10000;
     const qNotBase = mode === 'roof' ? Math.max(0, (r100 - rdt) * cs * area / 10000) : 0;
-    const emergency = calcEmergencyOverflow(qNotBase, item, mode, state);
+    const emergency = calcEmergencyOverflow(qNotBase, source, mode, state);
     const itemRequiredDrains = drain.capacity > 0 ? Math.ceil(qr / drain.capacity) : 0;
     const itemQPerStack = mode === 'roof' && stackCount > 0 ? qr / stackCount : 0;
     const collectorMinDn = mode === 'property' ? 'DN 100' : 'DN 70';
     const stackMinDn = mode === 'property' ? 'DN 100' : 'DN 70';
     return {
       ...item,
+      ...source,
+      id: item.id || source.id,
+      state: item.state,
+      result: item.result,
       surfaceMode: mode,
       base,
-      name: item.areaName || base.name,
+      name: item.name || source.areaName || source.name || base.name,
       area,
       cs,
       cm,
@@ -128,23 +135,63 @@ function validate(state, r) {
   const stackCount = mode === 'roof' ? Math.max(1, Math.floor(toNumber(state.stackCount)) || 1) : 0;
 
   if (!r.surfaces.length) warnings.push('Noch keine Regenfläche erfasst.');
-  if (!r.selectedSurface) warnings.push('Keine Fläche markiert. Bitte eine Fläche für die Ergebnisanzeige auswählen.');
+  if (!r.selectedSurface) warnings.push('Keine Fläche erfasst. Bitte eine Fläche eingeben oder gespeicherte Fläche auswählen.');
   if ((r.selectedSurface?.qr || 0) <= 0) warnings.push('Qr ist 0 l/s. Regenspende, Fläche und Abflussbeiwert prüfen.');
   if (drain.capacity <= 0) warnings.push(`${mode === 'property' ? 'Abflussvermögen des Hoftopfs' : 'Abflussvermögen des Dacheinlaufs'} eingeben.`);
   if (mode === 'roof' && stackCount < 1) warnings.push('Anzahl Fallleitungen muss mindestens 1 betragen.');
   warnings.push(`Regenspende ${mode === 'property' ? 'r(5,2)' : 'r(5,5)'} und r(5,100) standortbezogen über KOSTRA/OpenKo ermitteln und manuell eintragen.`);
   if (mode === 'roof') warnings.push('Notentwässerung als Vorbemessung berücksichtigt. Überflutungsnachweis und Rückhalteraumbemessung sind nicht Bestandteil dieser Berechnung.');
-  warnings.push('Die Ergebnis-Card zeigt die markierte bzw. zuletzt hinzugefügte Fläche. Weitere Flächen werden separat in den Klappcards berechnet.');
+  warnings.push('Die Ergebnis-Card rechnet mit der bestätigten Eingabe. Speichern ist optional und dient nur der späteren Wiederverwendung.');
   return warnings;
+}
+
+// surfaceRowsWithCurrentDraft is kept as a named regression marker: Regenwasser calculates the current draft without requiring a saved surface.
+function draftSurfaceRow(state) {
+  const area = toNumber(state.areaSize);
+  if (area <= 0) return null;
+  const mode = state.surfaceMode || state.calculationType || 'roof';
+  return surfaceRows({
+    ...state,
+    surfaces: [{
+      id: '__current_input__',
+      surfaceMode: mode,
+      calculationType: mode,
+      areaType: state.areaType,
+      areaName: state.areaName || 'Aktuelle Eingabe',
+      areaSize: state.areaSize,
+      customCs: state.customCs,
+      customCm: state.customCm,
+      roofRainIntensity: state.roofRainIntensity,
+      propertyRainIntensity: state.propertyRainIntensity,
+      rainHundredIntensity: state.rainHundredIntensity,
+      drainSize: state.drainSize,
+      drainSizeManual: state.drainSizeManual,
+      drainCapacity: state.drainCapacity,
+      drainHead: state.drainHead,
+      stackCount: state.stackCount,
+      slopeCmM: state.slopeCmM,
+      fillRatio: state.fillRatio,
+      emergencyType: state.emergencyType,
+      emergencyHead: state.emergencyHead,
+      emergencyWidth: state.emergencyWidth,
+      emergencyDiameter: state.emergencyDiameter,
+      emergencyManufacturerDn: state.emergencyManufacturerDn,
+      emergencyCapacity: state.emergencyCapacity,
+      emergencySafetyFactor: state.emergencySafetyFactor,
+      transient: true
+    }]
+  })[0] || null;
 }
 
 export function calculate(state) {
   const mode = state.surfaceMode || state.calculationType || 'roof';
   const isRoof = mode === 'roof';
-  const surfaces = surfaceRows(state);
-  const lastSurfaceId = surfaces.length ? surfaces[surfaces.length - 1].id : null;
-  const selectedId = state.activeSurfaceId || lastSurfaceId;
-  const selectedSurface = surfaces.find(item => String(item.id) === String(selectedId)) || surfaces[surfaces.length - 1] || null;
+  const persistedSurfaces = surfaceRows(state);
+  const draftSurface = draftSurfaceRow(state);
+  const surfaces = draftSurface ? [...persistedSurfaces, draftSurface] : persistedSurfaces;
+  const selectedSurface = state.activeSurfaceId
+    ? (persistedSurfaces.find(item => String(item.id) === String(state.activeSurfaceId)) || null)
+    : (draftSurface || persistedSurfaces[persistedSurfaces.length - 1] || null);
   const selectedArea = selectedSurface?.area || 0;
   const selectedMode = selectedSurface?.surfaceMode || mode;
   const rdt = selectedSurface?.rdt || getRainForMode(state, selectedMode);

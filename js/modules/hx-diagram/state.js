@@ -11,9 +11,17 @@ function loadProcesses() {
   return [];
 }
 
-export function saveProcesses(processes) {
-  state.set({ processes: Array.isArray(processes) ? processes : [] }, { notify: false });
+export function normalizeSavedProcesses(snapshot = {}) {
+  const saved = Array.isArray(snapshot.savedProcesses) ? snapshot.savedProcesses : [];
+  const legacy = Array.isArray(snapshot.processes) ? snapshot.processes : [];
+  return saved.length ? saved : legacy;
 }
+
+export function saveProcesses(processes) {
+  const next = Array.isArray(processes) ? processes : [];
+  state.set({ savedProcesses: next, processes: next }, { notify: false });
+}
+
 
 export function makeProcessRecord({ input, result, id = null, existing = null }) {
   const recordId = id || input.activeProcessId || existing?.id || createId();
@@ -39,7 +47,6 @@ export function makeProcessRecord({ input, result, id = null, existing = null })
 export function clearLegacyPoints() { /* no persistent legacy data */ }
 
 export const state = createModuleState({
-  label: '',
   tempC: '',
   rhPercent: '',
   targetTempC: '',
@@ -47,6 +54,8 @@ export const state = createModuleState({
   process: 'heat',
   activeProcessId: null,
   activePath: [],
+  savedProcesses: loadProcesses(),
   processes: loadProcesses(),
+  expandedProcessId: null,
   points: []
 });

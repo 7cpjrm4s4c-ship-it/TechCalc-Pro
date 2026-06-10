@@ -1,0 +1,120 @@
+{
+  "total": 11,
+  "schemaModules": 11,
+  "centralNumberService": 11,
+  "legacyNumberParsers": 0,
+  "centralSavedRecords": 8,
+  "legacyClassModules": 7,
+  "modules": [
+    {
+      "id": "buffer-storage",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "phase-8-schema-inventory"
+    },
+    {
+      "id": "drinking-water",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "phase-8-schema-inventory"
+    },
+    {
+      "id": "heat-recovery",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": false,
+      "hasLegacyModuleClasses": false,
+      "migrationStatus": "phase-8-schema-inventory"
+    },
+    {
+      "id": "heating-cooling",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": false,
+      "migrationStatus": "phase-8-schema-inventory"
+    },
+    {
+      "id": "hx-diagram",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": false,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "phase-8-schema-inventory"
+    },
+    {
+      "id": "pipe-sizing",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "phase-8-schema-inventory"
+    },
+    {
+      "id": "pressure-holding",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "phase-8-schema-inventory"
+    },
+    {
+      "id": "rainwater",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "phase-8-schema-inventory"
+    },
+    {
+      "id": "unit-converter",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": false,
+      "hasLegacyModuleClasses": false,
+      "migrationStatus": "phase-8-schema-inventory"
+    },
+    {
+      "id": "ventilation",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": false,
+      "migrationStatus": "phase-8-schema-inventory"
+    },
+    {
+      "id": "wastewater",
+      "defineModuleConfig": true,
+      "schemaFile": true,
+      "usesCentralNumberService": true,
+      "legacyNumberParsers": 0,
+      "usesCentralSavedRecords": true,
+      "hasLegacyModuleClasses": true,
+      "migrationStatus": "phase-8-schema-inventory"
+    }
+  ]
+}

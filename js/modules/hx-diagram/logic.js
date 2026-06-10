@@ -1,27 +1,9 @@
+import { parseNumber } from '../../core/numberService.js';
+
 const P_ATM_PA = 101325;
 
 function num(value, fallback = 0) {
-  if (typeof value === 'number') {
-    return Number.isFinite(value) ? value : fallback;
-  }
-
-  const raw = String(value ?? '').trim();
-  if (!raw) return fallback;
-
-  // Accept German input notation (1.234,56), plain decimal values (0.0012),
-  // and already calculated numeric strings without destroying decimal points.
-  let normalized = raw.replace(/\s/g, '');
-  const hasComma = normalized.includes(',');
-  const hasDot = normalized.includes('.');
-
-  if (hasComma && hasDot) {
-    normalized = normalized.replace(/\./g, '').replace(',', '.');
-  } else if (hasComma) {
-    normalized = normalized.replace(',', '.');
-  }
-
-  const n = Number(normalized);
-  return Number.isFinite(n) ? n : fallback;
+  return parseNumber(value, { fallback });
 }
 
 function clamp(value, min, max) {

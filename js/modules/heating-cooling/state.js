@@ -9,11 +9,18 @@ export const state = createModuleState({
   heatingPowerW: '',
   heatingPowerUnit: 'W',
   heatingMassFlowKgh: '',
+  heatingMassFlowUnit: 'kg/h',
   heatingDeltaT: '10',
 
   coolingCalcTarget: 'power',
   coolingPowerW: '',
   coolingPowerUnit: 'W',
   coolingMassFlowKgh: '',
-  coolingDeltaT: '10'
-});
+  coolingMassFlowUnit: 'kg/h',
+  coolingDeltaT: '10',
+
+  activeLineSectionId: null,
+  activeLineSectionName: '',
+  expandedLineSectionId: null,
+  lineSections: []
+}, { moduleId: 'heating-cooling' });

@@ -1,0 +1,638 @@
+
+.dw-list {
+  display: grid;
+  gap: 10px;
+}
+
+.dw-item .inline-stats {
+  margin-top: 8px;
+}
+
+.dw-consumers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.dw-consumers span {
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 12px;
+  color: var(--color-muted);
+  background: rgba(255,255,255,.04);
+}
+
+.dw-consumers small {
+  opacity: .72;
+}
+
+.dw-add-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 78px auto;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.dw-add-row select,
+.dw-add-row input {
+  min-height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  background: rgba(255,255,255,.06);
+  color: var(--color-text);
+  padding: 0 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 767px) {
+.dw-add-row {
+  grid-template-columns: 1fr;
+}
+}
+
+:root[data-theme='light'] .dw-consumers span,
+:root[data-theme='light'] .dw-add-row select,
+:root[data-theme='light'] .dw-add-row input {
+  background: #fff !important;
+  color: #0f172a !important;
+  border-color: rgba(15,23,42,.24) !important;
+}
+
+.dw-accordion {
+  border: 1px solid var(--color-border);
+  border-radius: 22px;
+  background: rgba(255,255,255,.035);
+  overflow: hidden;
+}
+
+.dw-accordion + .dw-accordion {
+  margin-top: 10px;
+}
+
+.dw-accordion > summary {
+  list-style: none;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.dw-accordion > summary::-webkit-details-marker {
+  display: none;
+}
+
+.dw-accordion > summary::after {
+  content: '›';
+  color: var(--accent-blue);
+  font-size: 28px;
+  transform: rotate(90deg);
+  transition: transform .18s ease;
+  flex: 0 0 auto;
+}
+
+.dw-accordion[open] > summary::after {
+  transform: rotate(-90deg);
+}
+
+.dw-accordion > summary span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.dw-accordion > summary small {
+  color: var(--color-muted);
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.dw-accordion > summary button {
+  position: relative;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: rgba(255,255,255,.05);
+  color: var(--color-muted);
+  font-size: 20px;
+}
+
+.dw-accordion__body {
+  border-top: 1px solid rgba(255,255,255,.08);
+  padding: 14px;
+}
+
+.dw-accordion--form > summary,
+.dw-accordion--saved > summary {
+  background: rgba(255,255,255,.025);
+}
+
+.dw-consumer-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.dw-consumer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 52px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,.04);
+}
+
+.dw-consumer-row div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.dw-consumer-row strong {
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+.dw-consumer-row span {
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dw-consumer-row button {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: rgba(255,255,255,.06);
+  color: var(--color-muted);
+  font-size: 20px;
+}
+
+.action-button--secondary {
+  background: rgba(255,255,255,.04);
+  color: var(--color-text);
+}
+
+:root[data-theme='light'] .dw-accordion,
+:root[data-theme='light'] .dw-consumer-row {
+  background: #fff !important;
+  border-color: rgba(15,23,42,.18) !important;
+}
+
+:root[data-theme='light'] .dw-accordion__body {
+  border-top-color: rgba(15,23,42,.12) !important;
+}
+
+@media (max-width: 767px) {
+.dw-accordion > summary {
+  padding: 13px 14px;
+}
+
+.dw-accordion__body {
+  padding: 12px;
+}
+
+.dw-consumer-row {
+  align-items: flex-start;
+}
+}
+
+.module-view[data-module='drinking-water'] .card__body,
+.module-view[data-module='drinking-water'] .tc-stack,
+.module-view[data-module='drinking-water'] .dw-list,
+.module-view[data-module='drinking-water'] .dw-consumer-list {
+  gap: var(--card-gap);
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion {
+  width: 100%;
+  max-width: 100%;
+  border-radius: var(--radius-lg);
+  background: rgba(255,255,255,.032);
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion + .dw-accordion {
+  margin-top: var(--card-gap);
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion > summary {
+  min-height: 56px;
+  padding: 12px 14px;
+  gap: 10px;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion > summary span {
+  overflow: hidden;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion > summary strong,
+.module-view[data-module='drinking-water'] .dw-accordion > summary small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion > summary small {
+  white-space: normal;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion__body {
+  padding: 12px 14px 14px;
+  display: grid;
+  gap: var(--card-gap);
+}
+
+.module-view[data-module='drinking-water'] .dw-consumer-row {
+  min-height: 48px;
+  padding: 9px 10px;
+  border-radius: 14px;
+}
+
+.module-view[data-module='drinking-water'] .dw-consumer-row strong,
+.module-view[data-module='drinking-water'] .dw-consumer-row span {
+  overflow-wrap: anywhere;
+}
+
+.module-view[data-module='drinking-water'] .action-button,
+.module-view[data-module='drinking-water'] .mini-button {
+  max-width: 100%;
+  white-space: normal;
+  line-height: 1.2;
+}
+
+.module-view[data-module='drinking-water'] .dw-fixture-list {
+  display: grid;
+  gap: var(--card-gap);
+}
+
+.module-view[data-module='drinking-water'] .dw-fixture-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: rgba(255,255,255,.04);
+}
+
+.module-view[data-module='drinking-water'] .dw-fixture-row strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text);
+}
+
+.module-view[data-module='drinking-water'] .dw-fixture-row span {
+  color: var(--color-muted);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.module-view[data-module='drinking-water'] .dw-fixture-row em {
+  grid-column: 1 / -1;
+  color: var(--accent-blue);
+  font-style: normal;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 767px) {
+.module-view[data-module='drinking-water'] .tc-fields,
+  .module-view[data-module='drinking-water'] .tc-fields--3 {
+  grid-template-columns: 1fr;
+}
+
+.module-view[data-module='drinking-water'] .card {
+  padding: 14px;
+  min-height: 0;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion > summary {
+  min-height: 54px;
+  padding: 11px 12px;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion__body {
+  padding: 11px 12px 12px;
+}
+
+.module-view[data-module='drinking-water'] .dw-fixture-row {
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+.module-view[data-module='drinking-water'] .dw-fixture-row span {
+  white-space: normal;
+}
+}
+
+:root[data-theme='light'] .module-view[data-module='drinking-water'] .dw-fixture-row {
+  background: #fff !important;
+  border-color: rgba(15,23,42,.18) !important;
+}
+
+/* Drinking water module: compact, non-overlapping cards */
+.module-view[data-module='drinking-water'] .module-content {
+  gap: var(--card-gap);
+}
+
+.module-view[data-module='drinking-water'] .card {
+  overflow: hidden;
+}
+
+.module-view[data-module='drinking-water'] .card__body {
+  min-width: 0;
+}
+
+.module-view[data-module='drinking-water'] .inline-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+  gap: 8px;
+}
+
+.module-view[data-module='drinking-water'] .inline-stat {
+  min-width: 0;
+  padding: 10px 11px;
+  border-radius: 14px;
+  display: grid;
+  align-content: center;
+  gap: 4px;
+}
+
+.module-view[data-module='drinking-water'] .inline-stat span {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+  line-height: 1.05;
+  font-size: clamp(9px, .76vw, 11px);
+  letter-spacing: .11em;
+}
+
+.module-view[data-module='drinking-water'] .inline-stat strong {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.12;
+  font-size: clamp(13px, 1.05vw, 16px);
+}
+
+.module-view[data-module='drinking-water'] .main-result + .inline-stats {
+  margin-top: 10px;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion > summary {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion > summary > span {
+  min-width: 0;
+}
+
+.module-view[data-module='drinking-water'] .dw-consumer-row {
+  min-width: 0;
+  width: 100%;
+}
+
+.module-view[data-module='drinking-water'] .dw-consumer-row strong {
+  font-size: clamp(14px, 1.2vw, 16px);
+  line-height: 1.15;
+}
+
+.module-view[data-module='drinking-water'] .dw-consumer-row span {
+  line-height: 1.2;
+}
+
+.module-view[data-module='drinking-water'] .dw-fixture-list--plain {
+  gap: 8px;
+}
+
+.module-view[data-module='drinking-water'] .dw-fixture-list--plain .dw-fixture-row {
+  grid-template-columns: 1fr;
+  min-height: 42px;
+  padding: 9px 12px;
+}
+
+.module-view[data-module='drinking-water'] .dw-fixture-list--plain .dw-fixture-row strong {
+  font-size: clamp(13px, 1vw, 15px);
+  font-weight: 800;
+  overflow: visible;
+  white-space: normal;
+}
+
+.module-view[data-module='drinking-water'] .dw-note {
+  font-size: clamp(11px, .9vw, 13px);
+  line-height: 1.35;
+  color: var(--color-muted);
+  font-weight: 700;
+  text-align: center;
+}
+
+.module-view[data-module='drinking-water'] .segmented {
+  margin-bottom: 8px;
+}
+
+@media (max-width: 767px) {
+  .module-view[data-module='drinking-water'] .inline-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .module-view[data-module='drinking-water'] .inline-stat {
+    padding: 9px 10px;
+  }
+  .module-view[data-module='drinking-water'] .segmented {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+}
+
+
+/* v17 Trinkwasser: Einzelverbraucher-Card width constraints
+   Hält alle Formular-Elemente innerhalb der Card und verhindert horizontales Überlaufen auf Mobile. */
+.module-view[data-module='drinking-water'] .dw-accordion--form,
+.module-view[data-module='drinking-water'] .dw-accordion--form * {
+  box-sizing: border-box;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form {
+  overflow: hidden;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .dw-accordion__body {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  padding-inline: clamp(12px, 2.8vw, 18px);
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .field,
+.module-view[data-module='drinking-water'] .dw-accordion--form .tc-fields,
+.module-view[data-module='drinking-water'] .dw-accordion--form .segmented,
+.module-view[data-module='drinking-water'] .dw-accordion--form .action-button,
+.module-view[data-module='drinking-water'] .dw-accordion--form .mini-button,
+.module-view[data-module='drinking-water'] .dw-accordion--form .dw-consumer-list,
+.module-view[data-module='drinking-water'] .dw-accordion--form .dw-list,
+.module-view[data-module='drinking-water'] .dw-accordion--form .empty-state {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .control,
+.module-view[data-module='drinking-water'] .dw-accordion--form .control input,
+.module-view[data-module='drinking-water'] .dw-accordion--form .control select,
+.module-view[data-module='drinking-water'] .dw-accordion--form input,
+.module-view[data-module='drinking-water'] .dw-accordion--form select,
+.module-view[data-module='drinking-water'] .dw-accordion--form button {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .control select,
+.module-view[data-module='drinking-water'] .dw-accordion--form select {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .segmented {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-flow: initial;
+  grid-auto-columns: initial;
+  overflow: hidden;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .segmented button {
+  width: 100%;
+  min-width: 0;
+  padding-inline: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  line-height: 1.15;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-inline: 12px;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .dw-consumer-row {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.module-view[data-module='drinking-water'] .dw-accordion--form .dw-consumer-row strong,
+.module-view[data-module='drinking-water'] .dw-accordion--form .dw-consumer-row span {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 767px) {
+  .module-view[data-module='drinking-water'] .dw-accordion--form .dw-accordion__body {
+    padding-inline: 10px;
+  }
+
+  .module-view[data-module='drinking-water'] .dw-accordion--form .tc-fields,
+  .module-view[data-module='drinking-water'] .dw-accordion--form .tc-fields--3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .module-view[data-module='drinking-water'] .dw-accordion--form .field label {
+    overflow-wrap: anywhere;
+  }
+}
+
+/* v18: softer beige/grey light mode with readable contrast */
+:root[data-theme='light'] .app-shell,
+:root[data-theme='light'] body {
+  background:
+    radial-gradient(circle at 20% 10%, rgba(120, 126, 135, .10), transparent 34%),
+    radial-gradient(circle at 85% 18%, rgba(190, 158, 122, .14), transparent 32%),
+    linear-gradient(135deg, #f4f1eb 0%, #ece8df 52%, #e3e6e8 100%) !important;
+  color: #1f2933 !important;
+}
+:root[data-theme='light'] .card,
+:root[data-theme='light'] .glass-surface,
+:root[data-theme='light'] #settingsPanel.settings-panel,
+:root[data-theme='light'] #settingsPanel .settings-submenu,
+:root[data-theme='light'] #settingsPanel .settings-submenu__content,
+:root[data-theme='light'] .inline-stat,
+:root[data-theme='light'] .dw-accordion,
+:root[data-theme='light'] .dw-consumer-row,
+:root[data-theme='light'] .dw-fixture-row {
+  background: linear-gradient(145deg, rgba(250,248,243,.96), rgba(232,230,224,.94)) !important;
+  color: #1f2933 !important;
+  border-color: rgba(82, 82, 91, .24) !important;
+  box-shadow: 0 18px 44px rgba(54, 48, 40, .12), inset 0 1px 0 rgba(255,255,255,.72) !important;
+}
+:root[data-theme='light'] .app-header {
+  background: rgba(242,239,232,.96) !important;
+  border-color: rgba(82,82,91,.18) !important;
+}
+:root[data-theme='light'] .module-nav,
+:root[data-theme='light'] .bottom-nav {
+  background: rgba(230,227,220,.92) !important;
+  border-color: rgba(82,82,91,.20) !important;
+}
+:root[data-theme='light'] .control,
+:root[data-theme='light'] .control input,
+:root[data-theme='light'] .control select,
+:root[data-theme='light'] #settingsPanel input,
+:root[data-theme='light'] #settingsPanel select,
+:root[data-theme='light'] .project-select-card select {
+  background: #f8f6f1 !important;
+  color: #1f2933 !important;
+  border-color: rgba(82,82,91,.34) !important;
+}
+:root[data-theme='light'] label,
+:root[data-theme='light'] .field label,
+:root[data-theme='light'] .card__title,
+:root[data-theme='light'] .settings-field__label,
+:root[data-theme='light'] .inline-stat span {
+  color: #52606d !important;
+}
+:root[data-theme='light'] strong,
+:root[data-theme='light'] .inline-stat strong,
+:root[data-theme='light'] .result-row strong,
+:root[data-theme='light'] .main-result strong {
+  color: #111827 !important;
+}
+:root[data-theme='light'] .theme-switch {
+  background: #e5e0d6 !important;
+  border-color: rgba(82,82,91,.26) !important;
+}
+:root[data-theme='light'] .theme-switch__option.is-active,
+:root[data-theme='light'] .module-tab.is-active,
+:root[data-theme='light'] .module-tab.is-overflow-active {
+  background: linear-gradient(145deg, #d8d0c2, #ece7dc) !important;
+  color: #111827 !important;
+  box-shadow: inset 0 0 0 2px rgba(92,111,128,.34) !important;
+}

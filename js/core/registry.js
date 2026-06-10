@@ -1,3 +1,5 @@
+import { assertModuleRegistrationContract, moduleContractSummary, MODULE_CONTRACT_VERSION } from './moduleDefinition.js';
+
 const REQUIRED_META_FIELDS = ['id', 'title', 'shortTitle', 'group', 'accent'];
 
 class ModuleRegistry {
@@ -21,6 +23,7 @@ class ModuleRegistry {
     const id = typeof idOrModule === 'string' ? idOrModule : config.id;
 
     const normalized = this.#normalizeModule(id, source, config);
+    assertModuleRegistrationContract(normalized);
 
     if (this.modules.has(normalized.id)) {
       throw new Error(`Module id doppelt registriert: ${normalized.id}`);
@@ -53,6 +56,10 @@ class ModuleRegistry {
     return metadata;
   }
 
+  contractReport() {
+    return this.all().map(module => moduleContractSummary(module));
+  }
+
   #normalizeModule(id, source, config) {
     const meta = {
       id,
@@ -64,6 +71,9 @@ class ModuleRegistry {
       defaultVisible: config.defaultVisible !== false,
       description: config.description ?? '',
       icon: config.icon ?? null,
+      contractVersion: config.contractVersion ?? MODULE_CONTRACT_VERSION,
+      migrationStatus: config.migrationStatus ?? 'legacy',
+      capabilities: Array.isArray(config.capabilities) ? [...config.capabilities] : [],
     };
 
     for (const field of REQUIRED_META_FIELDS) {

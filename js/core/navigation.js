@@ -1,5 +1,5 @@
 import { modules } from './registry.js';
-import { currentRoute, navigate } from './router.js';
+import { currentRoute } from './router.js';
 import { loadPreferences, setMobileQuickAccess } from './preferences.js';
 import { esc } from './renderer.js';
 
@@ -87,14 +87,11 @@ export function renderQuickAccessSettings() {
   });
 }
 
-function bindPrimaryNav(nav, overflow) {
-  nav.querySelectorAll('[data-module-id]').forEach(button => {
-    button.addEventListener('click', () => {
-      overflow.hidden = true;
-      navigate(button.dataset.moduleId);
-    });
-  });
 
+function bindPrimaryNav(nav, overflow) {
+  // Module buttons are handled once, globally, in app.js. Keeping navigation
+  // itself passive prevents duplicate pointer/click flows that can mark a module
+  // active while cancelling the content render.
   nav.querySelector('[data-overflow]')?.addEventListener('click', event => {
     event.preventDefault();
     event.stopPropagation();
@@ -110,7 +107,7 @@ function bindPrimaryNav(nav, overflow) {
 function closeOverflowOnOutsideClick(event) {
   const overflow = document.getElementById('overflowMenu');
   if (!overflow || overflow.hidden) return;
-  if (!event.target.closest('.module-nav')) overflow.hidden = true;
+  if (!event.target.closest('.module-nav, #overflowMenu')) overflow.hidden = true;
 }
 
 function renderOverflowMenu(overflow, overflowModules, activeId, visibleIds, isMobile) {
@@ -129,13 +126,6 @@ function renderOverflowMenu(overflow, overflowModules, activeId, visibleIds, isM
       </div>
     </div>
   `;
-
-  overflow.querySelectorAll('[data-module-id]').forEach(button => {
-    button.addEventListener('click', () => {
-      overflow.hidden = true;
-      navigate(button.dataset.moduleId);
-    });
-  });
 
   overflow.querySelectorAll('[data-set-quick]').forEach(button => {
     button.addEventListener('click', event => {
