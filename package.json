@@ -78,6 +78,8 @@
     "audit:ux-infrastructure": "node scripts/audit-ux-infrastructure-phase27c4.mjs",
     "test:platform-ux-infrastructure-phase27c4": "node tests/platform-ux-infrastructure-audit-phase27c4.test.mjs",
     "audit:performance": "node scripts/audit-performance-phase27c5.mjs",
-    "test:platform-performance-phase27c5": "node tests/platform-performance-audit-phase27c5.test.mjs"
+    "test:platform-performance-phase27c5": "node tests/platform-performance-audit-phase27c5.test.mjs",
+    "audit:risk-register": "node scripts/audit-platform-risk-register-phase27d.mjs",
+    "test:platform-risk-register-phase27d": "node tests/platform-risk-register-phase27d.test.mjs"
   }
 }
