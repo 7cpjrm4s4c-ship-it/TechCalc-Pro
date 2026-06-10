@@ -1,4 +1,5 @@
 import { hardResetModuleRoot } from './moduleLifecycleAdapter.js';
+import { preserveModuleSwitchScroll } from './scrollManager.js';
 
 const DEFAULT_MOUNT_TIMEOUT_MS = 7000;
 
@@ -134,40 +135,46 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
   }
 
   async function mount(moduleId, options = {}) {
-    const module = modules.get(moduleId);
-    if (!module) return false;
+    return preserveModuleSwitchScroll(async () => {
+      const module = modules.get(moduleId);
+      if (!module) return false;
 
-    const token = ++renderToken;
-    await unmount(moduleId);
-    await prepareMount(moduleId, token);
+      const token = ++renderToken;
+      await unmount(moduleId);
+      await prepareMount(moduleId, token);
 
-    const runtimeContext = Object.freeze({
-      moduleId,
-      token,
-      startedAt: now(),
-      addCleanup(cleanup) { normalizeHookResult(cleanup, activeRuntimeCleanups); },
-      isCurrent() { return isCurrent(token); }
-    });
+      const runtimeContext = Object.freeze({
+        moduleId,
+        token,
+        startedAt: now(),
+        addCleanup(cleanup) { normalizeHookResult(cleanup, activeRuntimeCleanups); },
+        isCurrent() { return isCurrent(token); }
+      });
 
-    try {
-      const cleanup = await withTimeout(
-        module.mount(root, runtimeContext),
-        options.timeoutMs ?? DEFAULT_MOUNT_TIMEOUT_MS,
-        `Modul ${moduleId} konnte nicht vollständig gemountet werden.`
-      );
+      try {
+        const cleanup = await withTimeout(
+          module.mount(root, runtimeContext),
+          options.timeoutMs ?? DEFAULT_MOUNT_TIMEOUT_MS,
+          `Modul ${moduleId} konnte nicht vollständig gemountet werden.`
+        );
 
-      if (!isCurrent(token)) {
-        normalizeHookResult(cleanup, activeRuntimeCleanups);
-        clearRuntimeCleanups();
-        return false;
+        if (!isCurrent(token)) {
+          normalizeHookResult(cleanup, activeRuntimeCleanups);
+          clearRuntimeCleanups();
+          return false;
+        }
+
+        activeCleanup = typeof cleanup === 'function' ? cleanup : noop;
+        if (cleanup && typeof cleanup !== 'function') normalizeHookResult(cleanup, activeRuntimeCleanups);
+        return afterMount(moduleId, token);
+      } catch (error) {
+        return failMount(moduleId, token, error);
       }
-
-      activeCleanup = typeof cleanup === 'function' ? cleanup : noop;
-      if (cleanup && typeof cleanup !== 'function') normalizeHookResult(cleanup, activeRuntimeCleanups);
-      return afterMount(moduleId, token);
-    } catch (error) {
-      return failMount(moduleId, token, error);
-    }
+    }, {
+      reason: 'module-runtime-switch',
+      frames: 10,
+      delays: [0, 40, 120, 260, 520]
+    });
   }
 
   function dispose() {

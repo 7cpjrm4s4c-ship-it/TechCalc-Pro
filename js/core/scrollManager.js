@@ -100,25 +100,37 @@ export function isScrollFrozen() {
 
 export function runWithoutScrollJump(action, options = {}) {
   const snapshot = options.snapshot || capturePosition(options.scope || window);
-  const result = action?.();
   const restore = () => restorePosition(snapshot, options);
-  restore();
-  const delays = Array.isArray(options.delays) ? options.delays : [];
-  delays.forEach(delay => setTimeout(restore, delay));
-  if (options.frames) {
-    let remaining = Math.max(0, Number(options.frames) || 0);
-    const frame = () => {
-      restore();
-      remaining -= 1;
+  const scheduleRestore = () => {
+    restore();
+    const delays = Array.isArray(options.delays) ? options.delays : [];
+    delays.forEach(delay => setTimeout(restore, delay));
+    if (options.frames) {
+      let remaining = Math.max(0, Number(options.frames) || 0);
+      const frame = () => {
+        restore();
+        remaining -= 1;
+        if (remaining > 0) requestAnimationFrame(frame);
+      };
       if (remaining > 0) requestAnimationFrame(frame);
-    };
-    if (remaining > 0) requestAnimationFrame(frame);
+    }
+  };
+
+  const result = action?.();
+  if (result && typeof result.then === 'function') {
+    scheduleRestore();
+    return result.finally(scheduleRestore);
   }
+  scheduleRestore();
   return result;
 }
 
 export function preserveModuleSwitchScroll(action, overrides = {}) {
-  return preserveScroll(action, 'action', { frames: 8, delays: [0, 40, 120, 260], ...overrides });
+  return runWithoutScrollJump(action, {
+    frames: 10,
+    delays: [0, 40, 120, 260, 520],
+    ...overrides
+  });
 }
 
 export const PlatformScrollManager = Object.freeze({

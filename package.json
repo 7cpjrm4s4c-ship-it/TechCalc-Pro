@@ -86,6 +86,8 @@
     "audit:scroll-service": "node scripts/audit-scroll-service-phase28a2.mjs",
     "test:platform-scroll-phase28a2": "node tests/platform-scroll-service-phase28a2.test.mjs",
     "audit:scroll-saved-records": "node scripts/audit-scroll-saved-records-phase28a3.mjs",
-    "test:platform-scroll-phase28a3": "node tests/platform-scroll-saved-records-phase28a3.test.mjs"
+    "test:platform-scroll-phase28a3": "node tests/platform-scroll-saved-records-phase28a3.test.mjs",
+    "audit:scroll-module-switch": "node scripts/audit-scroll-module-switch-phase28a4.mjs",
+    "test:platform-scroll-phase28a4": "node tests/platform-scroll-module-switch-phase28a4.test.mjs"
   }
 }
