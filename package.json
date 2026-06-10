@@ -74,6 +74,8 @@
     "audit:state-storage": "node scripts/audit-state-storage-phase27c2.mjs",
     "test:platform-state-storage-phase27c2": "node tests/platform-state-storage-audit-phase27c2.test.mjs",
     "audit:rendering": "node scripts/audit-rendering-phase27c3.mjs",
-    "test:platform-rendering-phase27c3": "node tests/platform-rendering-audit-phase27c3.test.mjs"
+    "test:platform-rendering-phase27c3": "node tests/platform-rendering-audit-phase27c3.test.mjs",
+    "audit:ux-infrastructure": "node scripts/audit-ux-infrastructure-phase27c4.mjs",
+    "test:platform-ux-infrastructure-phase27c4": "node tests/platform-ux-infrastructure-audit-phase27c4.test.mjs"
   }
 }
