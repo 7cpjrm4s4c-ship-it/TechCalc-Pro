@@ -6,7 +6,7 @@ import { hxProcessCard, hxProcessController, savedProcessPatch } from '../js/mod
 import { buildHxProcessRecord, hxProcessStats } from '../js/modules/hx-diagram/results.js';
 import { calculate } from '../js/modules/hx-diagram/logic.js';
 
-assert.ok(['phase-26b2-saved-records-platform-dialog', 'phase-26b2a-saved-records-update-delete-fix', 'phase-26b3-result-renderer', 'phase-26b3a2-process-immediate-render', 'phase-26b3a3-enter-tab-navigation-and-live-diagram', 'phase-26c1-diagram-renderer-extraction'].includes(config.migrationStatus));
+assert.ok(['phase-26b2-saved-records-platform-dialog', 'phase-26b2a-saved-records-update-delete-fix', 'phase-26b3-result-renderer', 'phase-26b3a2-process-immediate-render', 'phase-26b3a3-enter-tab-navigation-and-live-diagram', 'phase-26c1-diagram-renderer-extraction', 'phase-26c2-single-render-pipeline'].includes(config.migrationStatus));
 assert.ok(config.capabilities.includes('centralSavedRecords'));
 assert.equal(typeof hxModule.mount, 'function');
 

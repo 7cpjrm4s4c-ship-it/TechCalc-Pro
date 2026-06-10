@@ -11,7 +11,7 @@ const comparablePath = path => path.map(point => ({
   humidityRatioGkg: Number(point.humidityRatioGkg.toFixed(3))
 }));
 
-assert.ok(['phase-26b3a2-process-immediate-render', 'phase-26b3a3-enter-tab-navigation-and-live-diagram', 'phase-26c1-diagram-renderer-extraction'].includes(config.migrationStatus));
+assert.ok(['phase-26b3a2-process-immediate-render', 'phase-26b3a3-enter-tab-navigation-and-live-diagram', 'phase-26c1-diagram-renderer-extraction', 'phase-26c2-single-render-pipeline'].includes(config.migrationStatus));
 
 state.replace({
   tempC: '20',
@@ -39,8 +39,8 @@ assert.equal(vm.state.process, 'cool-dehumidify');
 assert.deepEqual(comparablePath(vm.activePath), comparablePath(nextPath));
 assert.notDeepEqual(comparablePath(vm.activePath), comparablePath(coolPath));
 
-assert.equal(isDynamicHxDiagramAction({ action: 'hx:process' }), false);
-assert.equal(isDynamicHxDiagramAction({ action: 'hx:line:update' }), false);
+assert.equal(isDynamicHxDiagramAction({ action: 'hx:process' }), true);
+assert.equal(isDynamicHxDiagramAction({ action: 'hx:line:update' }), true);
 assert.equal(isDynamicHxDiagramAction({ action: 'platform:field:tempC' }), true);
 assert.equal(updateHxDiagramDynamic(), true);
 

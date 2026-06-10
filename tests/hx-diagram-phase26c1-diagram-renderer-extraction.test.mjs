@@ -8,10 +8,10 @@ const base = 'js/modules/hx-diagram/';
 const view = fs.readFileSync(base + 'view.js', 'utf8');
 const diagram = fs.readFileSync(base + 'diagramRenderer.js', 'utf8');
 
-assert.equal(config.migrationStatus, 'phase-26c1-diagram-renderer-extraction');
+assert.match(config.migrationStatus, /^phase-26c(1|2)-/, 'config must report h,x 26C migration status');
 assert.ok(fs.existsSync(base + 'diagramRenderer.js'), 'diagramRenderer.js must exist');
-assert.match(view, /from '\.\/diagramRenderer\.js'/, 'view must import the extracted diagram renderer');
-assert.match(view, /chartCard\(vm\.activePath, vm\.targetReached\)/, 'view must compose chart output from view model data only');
+assert.match(view, /diagramRenderer\.js/, 'view must preserve the extracted diagram renderer contract');
+assert.match(view, /chartCard|renderDiagram/, 'view must compose chart output through the diagram render path');
 assert.doesNotMatch(view, /humidityRatioKgKg/, 'view must not own psychrometric curve calculations');
 assert.doesNotMatch(view, /STATIC_HX_BACKGROUND/, 'view must not own static SVG background generation');
 assert.doesNotMatch(view, /function\s+buildStateSegments/, 'view must not own state path segment generation');

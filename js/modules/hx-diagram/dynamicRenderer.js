@@ -1,13 +1,16 @@
-export function isDynamicHxDiagramAction(meta = '') {
+import { renderDynamicSections } from './renderPipeline.js';
+
+export function isDynamicHxDiagramAction(meta = {}) {
   const action = typeof meta === 'string' ? meta : String(meta?.action || '');
-
-  // Field typing must not rebuild the h,x diagram on every keystroke.
-  // All semantic actions such as process selection, sign toggle, save/update/delete
-  // and clear intentionally fall through to the platform full-render path so the
-  // result model and SVG diagram are rebuilt immediately.
-  return action.startsWith('platform:field:');
+  if (action === 'initial') return false;
+  return action.startsWith('platform:field:')
+    || action.startsWith('hx:')
+    || action.startsWith('line:')
+    || action.startsWith('saved:');
 }
 
-export function updateHxDiagramDynamic() {
-  return true;
+export function updateHxDiagramDynamic(root, snapshot = {}, meta = {}) {
+  return renderDynamicSections(root, snapshot, meta);
 }
+
+export default updateHxDiagramDynamic;
