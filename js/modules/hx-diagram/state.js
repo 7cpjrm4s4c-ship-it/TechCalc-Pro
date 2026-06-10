@@ -47,7 +47,6 @@ export function makeProcessRecord({ input, result, id = null, existing = null })
 export function clearLegacyPoints() { /* no persistent legacy data */ }
 
 export const state = createModuleState({
-  label: '',
   tempC: '',
   rhPercent: '',
   targetTempC: '',

@@ -23,9 +23,7 @@ function processCard(s) {
 }
 
 function inputCard(s) {
-  return card('Luftzustand erfassen', stack([
-    field({ id: 'label', label: 'Bezeichnung', value: s.label, placeholder: 'z. B. Außenluft Winter', type: 'text', inputmode: 'text' }),
-    card('Ausgangszustand', grid([
+  return card('Luftzustand erfassen', stack([    card('Ausgangszustand', grid([
       signedTempField('tempC', 'Trockenkugeltemperatur θt', fmtInput(s.tempC, 2), 'data-hx-sign'),
       field({ id: 'rhPercent', label: 'Relative Feuchte φ', unit: '%', value: fmtInput(s.rhPercent, 2) })
     ].join(''), 2), 'cyan', { compact: true }),
