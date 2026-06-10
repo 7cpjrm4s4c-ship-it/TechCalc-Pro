@@ -1,4 +1,5 @@
 import { commitAllFields, commitElementField } from './eventPipeline.js';
+import { handleEnterNavigation as handlePlatformEnterNavigation } from './focusManager.js';
 
 function closest(root, target, selector) {
   const node = target?.closest?.(selector);
@@ -41,8 +42,8 @@ export function bindModuleStateBinding(root, state, options = {}) {
     if (event.key !== 'Enter') return;
     const field = closest(root, event.target, 'input[data-field], textarea[data-field], select[data-field]');
     if (!field) return;
-    event.preventDefault();
     commitField(field, 'binding:enter', true);
+    handlePlatformEnterNavigation(root, field, event, { select: true });
   };
 
   const onClick = event => {

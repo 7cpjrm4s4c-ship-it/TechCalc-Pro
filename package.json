@@ -90,6 +90,8 @@
     "audit:scroll-module-switch": "node scripts/audit-scroll-module-switch-phase28a4.mjs",
     "test:platform-scroll-phase28a4": "node tests/platform-scroll-module-switch-phase28a4.test.mjs",
     "audit:focus-service": "node scripts/audit-focus-service-phase28b1.mjs",
-    "test:platform-focus-phase28b1": "node tests/platform-focus-service-phase28b1.test.mjs"
+    "test:platform-focus-phase28b1": "node tests/platform-focus-service-phase28b1.test.mjs",
+    "audit:enter-navigation": "node scripts/audit-enter-navigation-phase28b2.mjs",
+    "test:platform-focus-phase28b2": "node tests/platform-enter-navigation-phase28b2.test.mjs"
   }
 }

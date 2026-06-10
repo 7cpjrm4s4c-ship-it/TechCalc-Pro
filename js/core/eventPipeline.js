@@ -1,4 +1,4 @@
-import { focusNext as focusNextPlatform, safeFocus as safePlatformFocus } from './focusManager.js';
+import { handleEnterNavigation as handlePlatformEnterNavigation } from './focusManager.js';
 const DEFAULT_INTERACTIVE_SELECTOR = '[data-field], input, select, textarea, button, a, summary, [role="button"], [data-line-card], [data-saved-record-card], .saved-record-card, .segmented, [data-tc-action]';
 
 function readElementValue(el) {
@@ -187,9 +187,9 @@ function wasPointerActionSuppressed(root) {
 }
 
 
-function focusNextPlatformField(root, current) {
+function focusNextPlatformField(root, current, event) {
   if (!root || !current?.matches?.('[data-field]')) return false;
-  return focusNextPlatform(root, current, { select: true });
+  return handlePlatformEnterNavigation(root, current, event, { select: true });
 }
 
 export function bindCentralEventPipeline(root, state, options = {}) {
@@ -282,7 +282,7 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     commitElementField(state, el, { action: 'field:enter', notify: true, root });
     hasDeferredInput = false;
     notifyCommit({ action: 'field:enter', element: el });
-    if (!event.shiftKey && !event.altKey && !event.ctrlKey && !event.metaKey) focusNextPlatformField(root, el);
+    focusNextPlatformField(root, el, event);
   };
 
   const commitSegment = (segment, event) => {

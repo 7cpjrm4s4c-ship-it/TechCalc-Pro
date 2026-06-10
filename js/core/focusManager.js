@@ -73,6 +73,29 @@ export function focusNext(root, current, options = {}) {
   return true;
 }
 
+
+export function shouldHandleEnterNavigation(event) {
+  if (!event || event.key !== 'Enter') return false;
+  if (event.altKey || event.ctrlKey || event.metaKey) return false;
+  return true;
+}
+
+export function focusByEnter(root, current, options = {}) {
+  if (!current?.matches?.('[data-field]')) return false;
+  const direction = options.direction || (options.event?.shiftKey ? 'previous' : 'next');
+  return focusNext(root, current, {
+    direction: direction === 'previous' ? 'previous' : 'next',
+    select: options.select !== false,
+    defer: options.defer
+  });
+}
+
+export function handleEnterNavigation(root, current, event, options = {}) {
+  if (!shouldHandleEnterNavigation(event)) return false;
+  if (options.preventDefault !== false) event?.preventDefault?.();
+  return focusByEnter(root, current, { ...options, event });
+}
+
 export function restoreFocus(element, options = {}) {
   return safeFocus(element, { preventScroll: true, ...options });
 }
@@ -83,5 +106,8 @@ export const PlatformFocusManager = Object.freeze({
   blurActiveElement,
   getFocusableElements,
   getPlatformFields,
-  focusNext
+  focusNext,
+  shouldHandleEnterNavigation,
+  focusByEnter,
+  handleEnterNavigation
 });
