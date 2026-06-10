@@ -68,6 +68,10 @@
     "audit:platform-framework": "node scripts/audit-platform-framework-phase27a.mjs",
     "test:platform-audit-framework-phase27a": "node tests/platform-audit-framework-phase27a.test.mjs",
     "audit:platform-comparison": "node scripts/audit-platform-module-comparison-phase27b.mjs",
-    "test:platform-module-comparison-phase27b": "node tests/platform-module-comparison-phase27b.test.mjs"
+    "test:platform-module-comparison-phase27b": "node tests/platform-module-comparison-phase27b.test.mjs",
+    "audit:core-platform": "node scripts/audit-core-platform-phase27c1.mjs",
+    "test:platform-core-audit-phase27c1": "node tests/platform-core-audit-phase27c1.test.mjs",
+    "audit:state-storage": "node scripts/audit-state-storage-phase27c2.mjs",
+    "test:platform-state-storage-phase27c2": "node tests/platform-state-storage-audit-phase27c2.test.mjs"
   }
 }

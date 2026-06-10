@@ -1,0 +1,507 @@
+{
+  "phase": "27C.2",
+  "name": "State and Storage Audit",
+  "generatedBy": "scripts/audit-state-storage-phase27c2.mjs",
+  "generatedAt": "2026-06-10T13:32:39.433Z",
+  "auditAreas": [
+    "storageBoundary",
+    "savedRecordStateModel",
+    "hydrationSerialization",
+    "migrationReadiness",
+    "moduleStorageIsolation"
+  ],
+  "overallScore": 4.37,
+  "overallGrade": "B",
+  "scores": {
+    "storageBoundary": 4.55,
+    "savedRecordStateModel": 2.9,
+    "hydrationSerialization": 4.4,
+    "migrationReadiness": 5,
+    "moduleStorageIsolation": 5
+  },
+  "grades": {
+    "storageBoundary": "A",
+    "savedRecordStateModel": "D",
+    "hydrationSerialization": "B",
+    "migrationReadiness": "A",
+    "moduleStorageIsolation": "A"
+  },
+  "findings": [
+    {
+      "area": "savedRecordStateModel",
+      "score": 2.9,
+      "grade": "D",
+      "risk": "P1",
+      "action": "Saved-Record-State je Modul mit einheitlichen Arrays, aktiver ID und optionaler expanded ID nachweisen."
+    },
+    {
+      "area": "hydrationSerialization",
+      "score": 4.4,
+      "grade": "B",
+      "risk": "P3",
+      "action": "Hydration/Serialization-Pfade zentralisieren und defensiv gegen fehlerhafte gespeicherte Payloads absichern."
+    }
+  ],
+  "evidence": {
+    "storageBoundary": {
+      "projectStorageExists": true,
+      "savedRecordsCoreExists": true,
+      "preferencesExists": true,
+      "directStorageFiles": [
+        {
+          "file": "js/core/app.js",
+          "hits": 7,
+          "allowed": false,
+          "tolerated": true,
+          "inModule": false
+        },
+        {
+          "file": "js/core/preferences.js",
+          "hits": 2,
+          "allowed": true,
+          "tolerated": false,
+          "inModule": false
+        },
+        {
+          "file": "js/core/projectStorage.js",
+          "hits": 2,
+          "allowed": true,
+          "tolerated": false,
+          "inModule": false
+        }
+      ],
+      "forbiddenModuleStorageAccess": [],
+      "uncapsulatedCoreStorageAccess": [],
+      "toleratedStorageAccess": [
+        {
+          "file": "js/core/app.js",
+          "hits": 7,
+          "allowed": false,
+          "tolerated": true,
+          "inModule": false
+        }
+      ]
+    },
+    "savedRecordStateModel": {
+      "modules": [
+        {
+          "module": "buffer-storage",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 599
+        },
+        {
+          "module": "drinking-water",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": true,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 664
+        },
+        {
+          "module": "heat-recovery",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 585
+        },
+        {
+          "module": "heating-cooling",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 624
+        },
+        {
+          "module": "hx-diagram",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": true,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 2079
+        },
+        {
+          "module": "pipe-sizing",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 294
+        },
+        {
+          "module": "pressure-holding",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 617
+        },
+        {
+          "module": "rainwater",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 874
+        },
+        {
+          "module": "unit-converter",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": false,
+          "hasExpandedId": false,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 154
+        },
+        {
+          "module": "ventilation",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 603
+        },
+        {
+          "module": "wastewater",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 678
+        }
+      ],
+      "modulesWithSavedRecordSignals": [
+        {
+          "module": "buffer-storage",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 599
+        },
+        {
+          "module": "drinking-water",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": true,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 664
+        },
+        {
+          "module": "heat-recovery",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 585
+        },
+        {
+          "module": "heating-cooling",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 624
+        },
+        {
+          "module": "hx-diagram",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": true,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 2079
+        },
+        {
+          "module": "pipe-sizing",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 294
+        },
+        {
+          "module": "pressure-holding",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 617
+        },
+        {
+          "module": "rainwater",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 874
+        },
+        {
+          "module": "unit-converter",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": false,
+          "hasExpandedId": false,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 154
+        },
+        {
+          "module": "ventilation",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 603
+        },
+        {
+          "module": "wastewater",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 678
+        }
+      ],
+      "savedRecordModelGaps": [
+        {
+          "module": "buffer-storage",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 599
+        },
+        {
+          "module": "heat-recovery",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 585
+        },
+        {
+          "module": "heating-cooling",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 624
+        },
+        {
+          "module": "pipe-sizing",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 294
+        },
+        {
+          "module": "pressure-holding",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 617
+        },
+        {
+          "module": "rainwater",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 874
+        },
+        {
+          "module": "unit-converter",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": false,
+          "hasExpandedId": false,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 154
+        },
+        {
+          "module": "ventilation",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 603
+        },
+        {
+          "module": "wastewater",
+          "hasStateFile": true,
+          "hasSavedArray": true,
+          "hasActiveId": true,
+          "hasExpandedId": true,
+          "hasSaveFunction": false,
+          "hasHydrationTerms": true,
+          "hasSerializationTerms": true,
+          "directStorage": false,
+          "stateSize": 678
+        }
+      ]
+    },
+    "hydrationSerialization": {
+      "projectStorageHasCollect": true,
+      "projectStorageHasRestore": true,
+      "hasJsonParseGuards": true,
+      "hasJsonStringify": true,
+      "hydrationGaps": [],
+      "serializationGaps": []
+    },
+    "migrationReadiness": {
+      "storageKeyCount": 23,
+      "versionTerms": 10,
+      "importExportTerms": 67,
+      "docsMentionMigration": true
+    },
+    "moduleStorageIsolation": {
+      "modulesWithDirectStorage": [],
+      "forbiddenModuleStorageAccess": []
+    }
+  },
+  "executiveSummary": {
+    "status": "state-storage-stable",
+    "p0": [],
+    "p1": [
+      {
+        "area": "savedRecordStateModel",
+        "score": 2.9,
+        "grade": "D",
+        "risk": "P1",
+        "action": "Saved-Record-State je Modul mit einheitlichen Arrays, aktiver ID und optionaler expanded ID nachweisen."
+      }
+    ],
+    "p2": [],
+    "p3": [
+      {
+        "area": "hydrationSerialization",
+        "score": 4.4,
+        "grade": "B",
+        "risk": "P3",
+        "action": "Hydration/Serialization-Pfade zentralisieren und defensiv gegen fehlerhafte gespeicherte Payloads absichern."
+      }
+    ]
+  }
+}
