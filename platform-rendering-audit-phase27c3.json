@@ -1,0 +1,474 @@
+{
+  "phase": "27C.3",
+  "name": "Rendering Audit",
+  "generatedBy": "scripts/audit-rendering-phase27c3.mjs",
+  "generatedAt": "2026-06-10T13:49:54.197Z",
+  "auditAreas": [
+    "renderPipeline",
+    "dynamicRenderer",
+    "resultRenderer",
+    "diagramRenderer",
+    "viewRenderPurity",
+    "renderTriggerConsistency"
+  ],
+  "modulesAudited": 11,
+  "overallScore": 4.52,
+  "overallGrade": "A",
+  "scores": {
+    "renderPipeline": 4.55,
+    "dynamicRenderer": 4.4,
+    "resultRenderer": 4.65,
+    "diagramRenderer": 4.9,
+    "viewRenderPurity": 4.5,
+    "renderTriggerConsistency": 4.1
+  },
+  "grades": {
+    "renderPipeline": "A",
+    "dynamicRenderer": "B",
+    "resultRenderer": "A",
+    "diagramRenderer": "A",
+    "viewRenderPurity": "A",
+    "renderTriggerConsistency": "B"
+  },
+  "findings": [
+    {
+      "area": "renderTriggerConsistency",
+      "score": 4.1,
+      "grade": "B",
+      "risk": "P2",
+      "action": "Render-Trigger vereinheitlichen: State-Update -> Pipeline/Renderer; keine parallelen manuellen Re-Render-Pfade."
+    },
+    {
+      "area": "dynamicRenderer",
+      "score": 4.4,
+      "grade": "B",
+      "risk": "P3",
+      "action": "Dynamic Renderer fuer Module mit dynamischen Inseln beibehalten und direkte DOM-Aktualisierungen aus Controller/View entfernen."
+    }
+  ],
+  "evidence": {
+    "coreRendering": {
+      "renderCoordinatorExists": true,
+      "renderSchedulerExists": true,
+      "coreRendererExists": true,
+      "resultRendererExists": true,
+      "domUpdateExists": true,
+      "renderCoordinatorSignals": 39
+    },
+    "moduleRendering": {
+      "modules": [
+        {
+          "module": "buffer-storage",
+          "score": 5,
+          "files": [
+            "config.js",
+            "controller.js",
+            "index.js",
+            "logic.js",
+            "results.js",
+            "schema.js",
+            "state.js",
+            "view.js",
+            "viewModel.js"
+          ],
+          "rendererFiles": [
+            "results.js",
+            "viewModel.js"
+          ],
+          "usesResultRenderer": true,
+          "hasDynamicRenderer": false,
+          "hasRenderPipeline": false,
+          "delegatesToDynamicRenderer": true,
+          "hasDiagramRenderer": false,
+          "hasDiagramSignals": false,
+          "diagramInView": false,
+          "hasTableRenderer": false,
+          "renderTerms": 31,
+          "manualDomWrites": 0,
+          "controllerDomWrites": 0,
+          "viewLogicSignals": 2,
+          "indexRenderSignals": 0
+        },
+        {
+          "module": "drinking-water",
+          "score": 5,
+          "files": [
+            "config.js",
+            "controller.js",
+            "dynamicRenderer.js",
+            "index.js",
+            "logic.js",
+            "results.js",
+            "schema.js",
+            "state.js",
+            "view.js",
+            "viewModel.js"
+          ],
+          "rendererFiles": [
+            "dynamicRenderer.js",
+            "results.js",
+            "viewModel.js"
+          ],
+          "usesResultRenderer": true,
+          "hasDynamicRenderer": true,
+          "hasRenderPipeline": false,
+          "delegatesToDynamicRenderer": true,
+          "hasDiagramRenderer": false,
+          "hasDiagramSignals": false,
+          "diagramInView": false,
+          "hasTableRenderer": false,
+          "renderTerms": 17,
+          "manualDomWrites": 1,
+          "controllerDomWrites": 0,
+          "viewLogicSignals": 0,
+          "indexRenderSignals": 0
+        },
+        {
+          "module": "heat-recovery",
+          "score": 5,
+          "files": [
+            "config.js",
+            "controller.js",
+            "dynamicRenderer.js",
+            "index.js",
+            "logic.js",
+            "results.js",
+            "schema.js",
+            "state.js",
+            "view.js",
+            "viewModel.js"
+          ],
+          "rendererFiles": [
+            "dynamicRenderer.js",
+            "results.js",
+            "viewModel.js"
+          ],
+          "usesResultRenderer": true,
+          "hasDynamicRenderer": true,
+          "hasRenderPipeline": false,
+          "delegatesToDynamicRenderer": true,
+          "hasDiagramRenderer": false,
+          "hasDiagramSignals": false,
+          "diagramInView": false,
+          "hasTableRenderer": false,
+          "renderTerms": 20,
+          "manualDomWrites": 1,
+          "controllerDomWrites": 0,
+          "viewLogicSignals": 0,
+          "indexRenderSignals": 0
+        },
+        {
+          "module": "heating-cooling",
+          "score": 4.8,
+          "files": [
+            "config.js",
+            "controller.js",
+            "index.js",
+            "logic.js",
+            "results.js",
+            "schema.js",
+            "state.js",
+            "view.js",
+            "viewModel.js"
+          ],
+          "rendererFiles": [
+            "results.js",
+            "viewModel.js"
+          ],
+          "usesResultRenderer": true,
+          "hasDynamicRenderer": false,
+          "hasRenderPipeline": false,
+          "delegatesToDynamicRenderer": true,
+          "hasDiagramRenderer": false,
+          "hasDiagramSignals": false,
+          "diagramInView": false,
+          "hasTableRenderer": false,
+          "renderTerms": 9,
+          "manualDomWrites": 0,
+          "controllerDomWrites": 0,
+          "viewLogicSignals": 4,
+          "indexRenderSignals": 0
+        },
+        {
+          "module": "hx-diagram",
+          "score": 5,
+          "files": [
+            "config.js",
+            "controller.js",
+            "diagramRenderer.js",
+            "dynamicRenderer.js",
+            "formRenderer.js",
+            "index.js",
+            "logic.js",
+            "renderPipeline.js",
+            "results.js",
+            "schema.js",
+            "state.js",
+            "view.js",
+            "viewModel.js"
+          ],
+          "rendererFiles": [
+            "diagramRenderer.js",
+            "dynamicRenderer.js",
+            "formRenderer.js",
+            "renderPipeline.js",
+            "results.js",
+            "viewModel.js"
+          ],
+          "usesResultRenderer": true,
+          "hasDynamicRenderer": true,
+          "hasRenderPipeline": true,
+          "delegatesToDynamicRenderer": true,
+          "hasDiagramRenderer": true,
+          "hasDiagramSignals": true,
+          "diagramInView": false,
+          "hasTableRenderer": false,
+          "renderTerms": 26,
+          "manualDomWrites": 1,
+          "controllerDomWrites": 0,
+          "viewLogicSignals": 0,
+          "indexRenderSignals": 0
+        },
+        {
+          "module": "pipe-sizing",
+          "score": 5,
+          "files": [
+            "config.js",
+            "controller.js",
+            "index.js",
+            "logic.js",
+            "results.js",
+            "schema.js",
+            "state.js",
+            "view.js",
+            "viewModel.js"
+          ],
+          "rendererFiles": [
+            "results.js",
+            "viewModel.js"
+          ],
+          "usesResultRenderer": true,
+          "hasDynamicRenderer": false,
+          "hasRenderPipeline": false,
+          "delegatesToDynamicRenderer": true,
+          "hasDiagramRenderer": false,
+          "hasDiagramSignals": false,
+          "diagramInView": false,
+          "hasTableRenderer": false,
+          "renderTerms": 3,
+          "manualDomWrites": 0,
+          "controllerDomWrites": 0,
+          "viewLogicSignals": 2,
+          "indexRenderSignals": 0
+        },
+        {
+          "module": "pressure-holding",
+          "score": 5,
+          "files": [
+            "config.js",
+            "controller.js",
+            "index.js",
+            "logic.js",
+            "results.js",
+            "schema.js",
+            "state.js",
+            "view.js",
+            "viewModel.js"
+          ],
+          "rendererFiles": [
+            "results.js",
+            "viewModel.js"
+          ],
+          "usesResultRenderer": true,
+          "hasDynamicRenderer": false,
+          "hasRenderPipeline": false,
+          "delegatesToDynamicRenderer": true,
+          "hasDiagramRenderer": false,
+          "hasDiagramSignals": false,
+          "diagramInView": false,
+          "hasTableRenderer": false,
+          "renderTerms": 4,
+          "manualDomWrites": 0,
+          "controllerDomWrites": 0,
+          "viewLogicSignals": 2,
+          "indexRenderSignals": 0
+        },
+        {
+          "module": "rainwater",
+          "score": 4.1,
+          "files": [
+            "config.js",
+            "controller.js",
+            "index.js",
+            "logic.js",
+            "results.js",
+            "schema.js",
+            "state.js",
+            "tables.js"
+          ],
+          "rendererFiles": [
+            "results.js",
+            "tables.js"
+          ],
+          "usesResultRenderer": true,
+          "hasDynamicRenderer": false,
+          "hasRenderPipeline": false,
+          "delegatesToDynamicRenderer": false,
+          "hasDiagramRenderer": false,
+          "hasDiagramSignals": false,
+          "diagramInView": false,
+          "hasTableRenderer": true,
+          "renderTerms": 0,
+          "manualDomWrites": 0,
+          "controllerDomWrites": 0,
+          "viewLogicSignals": 0,
+          "indexRenderSignals": 0
+        },
+        {
+          "module": "unit-converter",
+          "score": 5,
+          "files": [
+            "config.js",
+            "index.js",
+            "logic.js",
+            "results.js",
+            "schema.js",
+            "state.js",
+            "view.js",
+            "viewModel.js"
+          ],
+          "rendererFiles": [
+            "results.js",
+            "viewModel.js"
+          ],
+          "usesResultRenderer": true,
+          "hasDynamicRenderer": false,
+          "hasRenderPipeline": false,
+          "delegatesToDynamicRenderer": true,
+          "hasDiagramRenderer": false,
+          "hasDiagramSignals": false,
+          "diagramInView": false,
+          "hasTableRenderer": false,
+          "renderTerms": 2,
+          "manualDomWrites": 0,
+          "controllerDomWrites": 0,
+          "viewLogicSignals": 0,
+          "indexRenderSignals": 0
+        },
+        {
+          "module": "ventilation",
+          "score": 5,
+          "files": [
+            "config.js",
+            "controller.js",
+            "index.js",
+            "logic.js",
+            "results.js",
+            "schema.js",
+            "state.js",
+            "view.js",
+            "viewModel.js"
+          ],
+          "rendererFiles": [
+            "results.js",
+            "viewModel.js"
+          ],
+          "usesResultRenderer": true,
+          "hasDynamicRenderer": false,
+          "hasRenderPipeline": false,
+          "delegatesToDynamicRenderer": true,
+          "hasDiagramRenderer": false,
+          "hasDiagramSignals": false,
+          "diagramInView": false,
+          "hasTableRenderer": false,
+          "renderTerms": 16,
+          "manualDomWrites": 0,
+          "controllerDomWrites": 0,
+          "viewLogicSignals": 2,
+          "indexRenderSignals": 0
+        },
+        {
+          "module": "wastewater",
+          "score": 4.2,
+          "files": [
+            "config.js",
+            "controller.js",
+            "index.js",
+            "lineModel.js",
+            "logic.js",
+            "results.js",
+            "schema.js",
+            "state.js",
+            "tables.js"
+          ],
+          "rendererFiles": [
+            "results.js",
+            "tables.js"
+          ],
+          "usesResultRenderer": true,
+          "hasDynamicRenderer": false,
+          "hasRenderPipeline": false,
+          "delegatesToDynamicRenderer": false,
+          "hasDiagramRenderer": false,
+          "hasDiagramSignals": false,
+          "diagramInView": false,
+          "hasTableRenderer": true,
+          "renderTerms": 0,
+          "manualDomWrites": 0,
+          "controllerDomWrites": 0,
+          "viewLogicSignals": 0,
+          "indexRenderSignals": 0
+        }
+      ],
+      "modulesWithResultRenderer": [
+        "buffer-storage",
+        "drinking-water",
+        "heat-recovery",
+        "heating-cooling",
+        "hx-diagram",
+        "pipe-sizing",
+        "pressure-holding",
+        "rainwater",
+        "unit-converter",
+        "ventilation",
+        "wastewater"
+      ],
+      "modulesWithoutResultRenderer": [],
+      "modulesWithDynamicRenderer": [
+        "drinking-water",
+        "heat-recovery",
+        "hx-diagram"
+      ],
+      "modulesWithRenderPipeline": [
+        "hx-diagram"
+      ],
+      "renderPipelineGaps": [],
+      "modulesWithControllerDomWrites": [],
+      "modulesWithViewLogic": [],
+      "modulesWithDiagramInView": []
+    }
+  },
+  "executiveSummary": {
+    "status": "rendering-stable",
+    "p0": [],
+    "p1": [],
+    "p2": [
+      {
+        "area": "renderTriggerConsistency",
+        "score": 4.1,
+        "grade": "B",
+        "risk": "P2",
+        "action": "Render-Trigger vereinheitlichen: State-Update -> Pipeline/Renderer; keine parallelen manuellen Re-Render-Pfade."
+      }
+    ],
+    "p3": [
+      {
+        "area": "dynamicRenderer",
+        "score": 4.4,
+        "grade": "B",
+        "risk": "P3",
+        "action": "Dynamic Renderer fuer Module mit dynamischen Inseln beibehalten und direkte DOM-Aktualisierungen aus Controller/View entfernen."
+      }
+    ]
+  }
+}
