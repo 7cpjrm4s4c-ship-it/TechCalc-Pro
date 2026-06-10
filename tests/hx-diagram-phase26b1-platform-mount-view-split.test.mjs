@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const base = 'js/modules/hx-diagram/';
-for (const file of ['index.js','controller.js','viewModel.js','view.js','results.js','dynamicRenderer.js','logic.js','schema.js','state.js','config.js']) {
+for (const file of ['index.js','controller.js','viewModel.js','view.js','results.js','dynamicRenderer.js','diagramRenderer.js','logic.js','schema.js','state.js','config.js']) {
   assert.ok(fs.existsSync(base + file), `missing ${file}`);
 }
 
@@ -19,7 +19,8 @@ assert.match(controller, /createLineSectionController/, 'controller must use pla
 
 const view = fs.readFileSync(base + 'view.js', 'utf8');
 assert.match(view, /renderModuleShell/, 'view must render module shell');
-assert.match(view, /renderHxSvg/, 'view owns chart rendering during 26B.1');
+assert.match(view, /chartCard/, 'view composes diagram card from diagramRenderer after 26C.1');
+assert.doesNotMatch(view, /function\s+renderHxSvg/, 'view must not own SVG chart rendering after 26C.1');
 assert.doesNotMatch(view, /bindActions/, 'view must not own action binding');
 
 const results = fs.readFileSync(base + 'results.js', 'utf8');
@@ -28,6 +29,11 @@ assert.match(results, /renderHxResultModel/, 'results must expose renderHxResult
 
 const dynamic = fs.readFileSync(base + 'dynamicRenderer.js', 'utf8');
 assert.match(dynamic, /updateHxDiagramDynamic/, 'dynamic renderer must be extracted');
+
+const diagram = fs.readFileSync(base + 'diagramRenderer.js', 'utf8');
+assert.match(diagram, /renderHxSvg/, 'diagram renderer must own SVG rendering after 26C.1');
+assert.match(diagram, /buildStateSegments/, 'diagram renderer must own process path segment rendering after 26C.1');
+assert.match(diagram, /chartCard/, 'diagram renderer must expose chartCard after 26C.1');
 
 const mod = await import('../js/modules/hx-diagram/index.js');
 assert.equal(mod.default.config.id, 'hx-diagram');

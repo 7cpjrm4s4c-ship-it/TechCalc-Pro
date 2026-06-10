@@ -60,6 +60,7 @@
     "test:drinking-water-phase25e2d": "node tests/drinking-water-phase25e2d-rainwater-segment-bridge.test.mjs",
     "test:hx-diagram-phase26b3": "node tests/hx-diagram-phase26b3-result-renderer.test.mjs",
     "test:hx-diagram-phase26b3a2": "node tests/hx-diagram-phase26b3a2-process-immediate-render.test.mjs",
-    "test:hx-diagram-phase26b3a3": "node tests/hx-diagram-phase26b3a3-enter-tab-navigation-live-diagram.test.mjs"
+    "test:hx-diagram-phase26b3a3": "node tests/hx-diagram-phase26b3a3-enter-tab-navigation-live-diagram.test.mjs",
+    "test:hx-diagram-phase26c1": "node tests/hx-diagram-phase26c1-diagram-renderer-extraction.test.mjs"
   }
 }

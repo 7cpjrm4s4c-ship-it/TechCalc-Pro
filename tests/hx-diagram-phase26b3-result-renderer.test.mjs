@@ -6,7 +6,7 @@ import { createViewModel } from '../js/modules/hx-diagram/viewModel.js';
 import { buildHxResultModel, renderHxResultModel } from '../js/modules/hx-diagram/results.js';
 import { renderView } from '../js/modules/hx-diagram/view.js';
 
-assert.ok(['phase-26b3-result-renderer', 'phase-26b3a2-process-immediate-render', 'phase-26b3a3-enter-tab-navigation-and-live-diagram'].includes(config.migrationStatus));
+assert.ok(['phase-26b3-result-renderer', 'phase-26b3a2-process-immediate-render', 'phase-26b3a3-enter-tab-navigation-and-live-diagram', 'phase-26c1-diagram-renderer-extraction'].includes(config.migrationStatus));
 
 state.replace({
   label: 'Result Test',
