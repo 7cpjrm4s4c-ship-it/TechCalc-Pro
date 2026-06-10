@@ -1,0 +1,1615 @@
+{
+  "phase": "27B",
+  "name": "Platform Module Comparison",
+  "generatedBy": "scripts/audit-platform-module-comparison-phase27b.mjs",
+  "generatedAt": "2026-06-10T12:27:02.349Z",
+  "modulesExpected": 11,
+  "modulesAudited": 11,
+  "missingModules": [],
+  "referenceModules": [
+    "heat-recovery",
+    "buffer-storage",
+    "hx-diagram"
+  ],
+  "dimensions": [
+    "platformMount",
+    "stateContract",
+    "controllerSeparation",
+    "viewModelSeparation",
+    "viewPurity",
+    "resultRenderer",
+    "dynamicRenderer",
+    "diagramRenderer",
+    "savedRecords",
+    "renderPipeline",
+    "numericLocaleHandling",
+    "uxStability",
+    "testCoverage"
+  ],
+  "matrix": {
+    "buffer-storage": {
+      "platformMount": 5,
+      "stateContract": 4,
+      "controllerSeparation": 4,
+      "viewModelSeparation": 4,
+      "viewPurity": 2,
+      "resultRenderer": 4,
+      "dynamicRenderer": 5,
+      "diagramRenderer": 5,
+      "savedRecords": 4,
+      "renderPipeline": 3,
+      "numericLocaleHandling": 4,
+      "uxStability": 4,
+      "testCoverage": 4
+    },
+    "drinking-water": {
+      "platformMount": 5,
+      "stateContract": 4,
+      "controllerSeparation": 4,
+      "viewModelSeparation": 4,
+      "viewPurity": 2,
+      "resultRenderer": 4,
+      "dynamicRenderer": 4,
+      "diagramRenderer": 5,
+      "savedRecords": 4,
+      "renderPipeline": 4,
+      "numericLocaleHandling": 4,
+      "uxStability": 4,
+      "testCoverage": 5
+    },
+    "heat-recovery": {
+      "platformMount": 5,
+      "stateContract": 4,
+      "controllerSeparation": 4,
+      "viewModelSeparation": 4,
+      "viewPurity": 5,
+      "resultRenderer": 4,
+      "dynamicRenderer": 4,
+      "diagramRenderer": 5,
+      "savedRecords": 4,
+      "renderPipeline": 4,
+      "numericLocaleHandling": 4,
+      "uxStability": 4,
+      "testCoverage": 5
+    },
+    "heating-cooling": {
+      "platformMount": 5,
+      "stateContract": 4,
+      "controllerSeparation": 3,
+      "viewModelSeparation": 4,
+      "viewPurity": 5,
+      "resultRenderer": 4,
+      "dynamicRenderer": 5,
+      "diagramRenderer": 5,
+      "savedRecords": 5,
+      "renderPipeline": 3,
+      "numericLocaleHandling": 4,
+      "uxStability": 4,
+      "testCoverage": 5
+    },
+    "hx-diagram": {
+      "platformMount": 5,
+      "stateContract": 4,
+      "controllerSeparation": 4,
+      "viewModelSeparation": 4,
+      "viewPurity": 5,
+      "resultRenderer": 4,
+      "dynamicRenderer": 4,
+      "diagramRenderer": 4,
+      "savedRecords": 4,
+      "renderPipeline": 5,
+      "numericLocaleHandling": 4,
+      "uxStability": 4,
+      "testCoverage": 5
+    },
+    "pipe-sizing": {
+      "platformMount": 5,
+      "stateContract": 4,
+      "controllerSeparation": 4,
+      "viewModelSeparation": 4,
+      "viewPurity": 5,
+      "resultRenderer": 4,
+      "dynamicRenderer": 5,
+      "diagramRenderer": 5,
+      "savedRecords": 4,
+      "renderPipeline": 3,
+      "numericLocaleHandling": 4,
+      "uxStability": 3,
+      "testCoverage": 5
+    },
+    "pressure-holding": {
+      "platformMount": 5,
+      "stateContract": 4,
+      "controllerSeparation": 4,
+      "viewModelSeparation": 4,
+      "viewPurity": 5,
+      "resultRenderer": 4,
+      "dynamicRenderer": 5,
+      "diagramRenderer": 5,
+      "savedRecords": 4,
+      "renderPipeline": 3,
+      "numericLocaleHandling": 4,
+      "uxStability": 4,
+      "testCoverage": 5
+    },
+    "rainwater": {
+      "platformMount": 5,
+      "stateContract": 4,
+      "controllerSeparation": 3,
+      "viewModelSeparation": 1,
+      "viewPurity": 1,
+      "resultRenderer": 4,
+      "dynamicRenderer": 5,
+      "diagramRenderer": 5,
+      "savedRecords": 4,
+      "renderPipeline": 3,
+      "numericLocaleHandling": 4,
+      "uxStability": 4,
+      "testCoverage": 5
+    },
+    "unit-converter": {
+      "platformMount": 5,
+      "stateContract": 4,
+      "controllerSeparation": 1,
+      "viewModelSeparation": 4,
+      "viewPurity": 5,
+      "resultRenderer": 4,
+      "dynamicRenderer": 5,
+      "diagramRenderer": 5,
+      "savedRecords": 5,
+      "renderPipeline": 3,
+      "numericLocaleHandling": 4,
+      "uxStability": 3,
+      "testCoverage": 5
+    },
+    "ventilation": {
+      "platformMount": 5,
+      "stateContract": 4,
+      "controllerSeparation": 4,
+      "viewModelSeparation": 4,
+      "viewPurity": 5,
+      "resultRenderer": 4,
+      "dynamicRenderer": 5,
+      "diagramRenderer": 5,
+      "savedRecords": 5,
+      "renderPipeline": 3,
+      "numericLocaleHandling": 4,
+      "uxStability": 3,
+      "testCoverage": 5
+    },
+    "wastewater": {
+      "platformMount": 5,
+      "stateContract": 4,
+      "controllerSeparation": 3,
+      "viewModelSeparation": 1,
+      "viewPurity": 1,
+      "resultRenderer": 4,
+      "dynamicRenderer": 5,
+      "diagramRenderer": 5,
+      "savedRecords": 4,
+      "renderPipeline": 3,
+      "numericLocaleHandling": 4,
+      "uxStability": 4,
+      "testCoverage": 4
+    }
+  },
+  "averages": {
+    "buffer-storage": 4,
+    "drinking-water": 4.08,
+    "heat-recovery": 4.31,
+    "heating-cooling": 4.31,
+    "hx-diagram": 4.31,
+    "pipe-sizing": 4.23,
+    "pressure-holding": 4.31,
+    "rainwater": 3.69,
+    "unit-converter": 4.08,
+    "ventilation": 4.31,
+    "wastewater": 3.62
+  },
+  "byDimension": {
+    "platformMount": {
+      "average": 5,
+      "lowest": [
+        {
+          "module": "buffer-storage",
+          "score": 5
+        },
+        {
+          "module": "drinking-water",
+          "score": 5
+        },
+        {
+          "module": "heat-recovery",
+          "score": 5
+        },
+        {
+          "module": "heating-cooling",
+          "score": 5
+        }
+      ]
+    },
+    "stateContract": {
+      "average": 4,
+      "lowest": [
+        {
+          "module": "buffer-storage",
+          "score": 4
+        },
+        {
+          "module": "drinking-water",
+          "score": 4
+        },
+        {
+          "module": "heat-recovery",
+          "score": 4
+        },
+        {
+          "module": "heating-cooling",
+          "score": 4
+        }
+      ]
+    },
+    "controllerSeparation": {
+      "average": 3.45,
+      "lowest": [
+        {
+          "module": "unit-converter",
+          "score": 1
+        },
+        {
+          "module": "heating-cooling",
+          "score": 3
+        },
+        {
+          "module": "rainwater",
+          "score": 3
+        },
+        {
+          "module": "wastewater",
+          "score": 3
+        }
+      ]
+    },
+    "viewModelSeparation": {
+      "average": 3.45,
+      "lowest": [
+        {
+          "module": "rainwater",
+          "score": 1
+        },
+        {
+          "module": "wastewater",
+          "score": 1
+        },
+        {
+          "module": "buffer-storage",
+          "score": 4
+        },
+        {
+          "module": "drinking-water",
+          "score": 4
+        }
+      ]
+    },
+    "viewPurity": {
+      "average": 3.73,
+      "lowest": [
+        {
+          "module": "rainwater",
+          "score": 1
+        },
+        {
+          "module": "wastewater",
+          "score": 1
+        },
+        {
+          "module": "buffer-storage",
+          "score": 2
+        },
+        {
+          "module": "drinking-water",
+          "score": 2
+        }
+      ]
+    },
+    "resultRenderer": {
+      "average": 4,
+      "lowest": [
+        {
+          "module": "buffer-storage",
+          "score": 4
+        },
+        {
+          "module": "drinking-water",
+          "score": 4
+        },
+        {
+          "module": "heat-recovery",
+          "score": 4
+        },
+        {
+          "module": "heating-cooling",
+          "score": 4
+        }
+      ]
+    },
+    "dynamicRenderer": {
+      "average": 4.73,
+      "lowest": [
+        {
+          "module": "drinking-water",
+          "score": 4
+        },
+        {
+          "module": "heat-recovery",
+          "score": 4
+        },
+        {
+          "module": "hx-diagram",
+          "score": 4
+        },
+        {
+          "module": "buffer-storage",
+          "score": 5
+        }
+      ]
+    },
+    "diagramRenderer": {
+      "average": 4.91,
+      "lowest": [
+        {
+          "module": "hx-diagram",
+          "score": 4
+        },
+        {
+          "module": "buffer-storage",
+          "score": 5
+        },
+        {
+          "module": "drinking-water",
+          "score": 5
+        },
+        {
+          "module": "heat-recovery",
+          "score": 5
+        }
+      ]
+    },
+    "savedRecords": {
+      "average": 4.27,
+      "lowest": [
+        {
+          "module": "buffer-storage",
+          "score": 4
+        },
+        {
+          "module": "drinking-water",
+          "score": 4
+        },
+        {
+          "module": "heat-recovery",
+          "score": 4
+        },
+        {
+          "module": "hx-diagram",
+          "score": 4
+        }
+      ]
+    },
+    "renderPipeline": {
+      "average": 3.36,
+      "lowest": [
+        {
+          "module": "buffer-storage",
+          "score": 3
+        },
+        {
+          "module": "heating-cooling",
+          "score": 3
+        },
+        {
+          "module": "pipe-sizing",
+          "score": 3
+        },
+        {
+          "module": "pressure-holding",
+          "score": 3
+        }
+      ]
+    },
+    "numericLocaleHandling": {
+      "average": 4,
+      "lowest": [
+        {
+          "module": "buffer-storage",
+          "score": 4
+        },
+        {
+          "module": "drinking-water",
+          "score": 4
+        },
+        {
+          "module": "heat-recovery",
+          "score": 4
+        },
+        {
+          "module": "heating-cooling",
+          "score": 4
+        }
+      ]
+    },
+    "uxStability": {
+      "average": 3.73,
+      "lowest": [
+        {
+          "module": "pipe-sizing",
+          "score": 3
+        },
+        {
+          "module": "unit-converter",
+          "score": 3
+        },
+        {
+          "module": "ventilation",
+          "score": 3
+        },
+        {
+          "module": "buffer-storage",
+          "score": 4
+        }
+      ]
+    },
+    "testCoverage": {
+      "average": 4.82,
+      "lowest": [
+        {
+          "module": "buffer-storage",
+          "score": 4
+        },
+        {
+          "module": "wastewater",
+          "score": 4
+        },
+        {
+          "module": "drinking-water",
+          "score": 5
+        },
+        {
+          "module": "heat-recovery",
+          "score": 5
+        }
+      ]
+    }
+  },
+  "riskRegister": [
+    {
+      "module": "unit-converter",
+      "dimension": "controllerSeparation",
+      "score": 1,
+      "risk": "P1"
+    },
+    {
+      "module": "rainwater",
+      "dimension": "viewPurity",
+      "score": 1,
+      "risk": "P2"
+    },
+    {
+      "module": "wastewater",
+      "dimension": "viewPurity",
+      "score": 1,
+      "risk": "P2"
+    },
+    {
+      "module": "buffer-storage",
+      "dimension": "viewPurity",
+      "score": 2,
+      "risk": "P2"
+    },
+    {
+      "module": "drinking-water",
+      "dimension": "viewPurity",
+      "score": 2,
+      "risk": "P2"
+    },
+    {
+      "module": "rainwater",
+      "dimension": "viewModelSeparation",
+      "score": 1,
+      "risk": "P3"
+    },
+    {
+      "module": "wastewater",
+      "dimension": "viewModelSeparation",
+      "score": 1,
+      "risk": "P3"
+    },
+    {
+      "module": "buffer-storage",
+      "dimension": "renderPipeline",
+      "score": 3,
+      "risk": "P4"
+    },
+    {
+      "module": "heating-cooling",
+      "dimension": "controllerSeparation",
+      "score": 3,
+      "risk": "P4"
+    },
+    {
+      "module": "heating-cooling",
+      "dimension": "renderPipeline",
+      "score": 3,
+      "risk": "P4"
+    },
+    {
+      "module": "pipe-sizing",
+      "dimension": "renderPipeline",
+      "score": 3,
+      "risk": "P4"
+    },
+    {
+      "module": "pipe-sizing",
+      "dimension": "uxStability",
+      "score": 3,
+      "risk": "P4"
+    },
+    {
+      "module": "pressure-holding",
+      "dimension": "renderPipeline",
+      "score": 3,
+      "risk": "P4"
+    },
+    {
+      "module": "rainwater",
+      "dimension": "controllerSeparation",
+      "score": 3,
+      "risk": "P4"
+    },
+    {
+      "module": "rainwater",
+      "dimension": "renderPipeline",
+      "score": 3,
+      "risk": "P4"
+    },
+    {
+      "module": "unit-converter",
+      "dimension": "renderPipeline",
+      "score": 3,
+      "risk": "P4"
+    },
+    {
+      "module": "unit-converter",
+      "dimension": "uxStability",
+      "score": 3,
+      "risk": "P4"
+    },
+    {
+      "module": "ventilation",
+      "dimension": "renderPipeline",
+      "score": 3,
+      "risk": "P4"
+    },
+    {
+      "module": "ventilation",
+      "dimension": "uxStability",
+      "score": 3,
+      "risk": "P4"
+    },
+    {
+      "module": "wastewater",
+      "dimension": "controllerSeparation",
+      "score": 3,
+      "risk": "P4"
+    },
+    {
+      "module": "wastewater",
+      "dimension": "renderPipeline",
+      "score": 3,
+      "risk": "P4"
+    }
+  ],
+  "backlog": [
+    {
+      "rank": 1,
+      "risk": "P1",
+      "module": "unit-converter",
+      "dimension": "controllerSeparation",
+      "action": "Controller-Grenze nachziehen und Event-Binding aus View/Index entfernen"
+    },
+    {
+      "rank": 2,
+      "risk": "P2",
+      "module": "rainwater",
+      "dimension": "viewPurity",
+      "action": "View auf Layout/Shell reduzieren; Mutationen und Fachrenderer auslagern"
+    },
+    {
+      "rank": 3,
+      "risk": "P2",
+      "module": "wastewater",
+      "dimension": "viewPurity",
+      "action": "View auf Layout/Shell reduzieren; Mutationen und Fachrenderer auslagern"
+    },
+    {
+      "rank": 4,
+      "risk": "P2",
+      "module": "buffer-storage",
+      "dimension": "viewPurity",
+      "action": "View auf Layout/Shell reduzieren; Mutationen und Fachrenderer auslagern"
+    },
+    {
+      "rank": 5,
+      "risk": "P2",
+      "module": "drinking-water",
+      "dimension": "viewPurity",
+      "action": "View auf Layout/Shell reduzieren; Mutationen und Fachrenderer auslagern"
+    },
+    {
+      "rank": 6,
+      "risk": "P3",
+      "module": "rainwater",
+      "dimension": "viewModelSeparation",
+      "action": "ViewModel-Vertrag ergänzen und Renderdaten aus Fachlogik ableiten"
+    },
+    {
+      "rank": 7,
+      "risk": "P3",
+      "module": "wastewater",
+      "dimension": "viewModelSeparation",
+      "action": "ViewModel-Vertrag ergänzen und Renderdaten aus Fachlogik ableiten"
+    },
+    {
+      "rank": 8,
+      "risk": "P4",
+      "module": "buffer-storage",
+      "dimension": "renderPipeline",
+      "action": "Zentralen Render-Orchestrator einführen oder bestehende Pipeline dokumentieren"
+    },
+    {
+      "rank": 9,
+      "risk": "P4",
+      "module": "heating-cooling",
+      "dimension": "controllerSeparation",
+      "action": "Controller-Grenze nachziehen und Event-Binding aus View/Index entfernen"
+    },
+    {
+      "rank": 10,
+      "risk": "P4",
+      "module": "heating-cooling",
+      "dimension": "renderPipeline",
+      "action": "Zentralen Render-Orchestrator einführen oder bestehende Pipeline dokumentieren"
+    },
+    {
+      "rank": 11,
+      "risk": "P4",
+      "module": "pipe-sizing",
+      "dimension": "renderPipeline",
+      "action": "Zentralen Render-Orchestrator einführen oder bestehende Pipeline dokumentieren"
+    },
+    {
+      "rank": 12,
+      "risk": "P4",
+      "module": "pipe-sizing",
+      "dimension": "uxStability",
+      "action": "Scroll-, Enter-/Tab- und Live-Update-Regression ergänzen"
+    },
+    {
+      "rank": 13,
+      "risk": "P4",
+      "module": "pressure-holding",
+      "dimension": "renderPipeline",
+      "action": "Zentralen Render-Orchestrator einführen oder bestehende Pipeline dokumentieren"
+    },
+    {
+      "rank": 14,
+      "risk": "P4",
+      "module": "rainwater",
+      "dimension": "controllerSeparation",
+      "action": "Controller-Grenze nachziehen und Event-Binding aus View/Index entfernen"
+    },
+    {
+      "rank": 15,
+      "risk": "P4",
+      "module": "rainwater",
+      "dimension": "renderPipeline",
+      "action": "Zentralen Render-Orchestrator einführen oder bestehende Pipeline dokumentieren"
+    },
+    {
+      "rank": 16,
+      "risk": "P4",
+      "module": "unit-converter",
+      "dimension": "renderPipeline",
+      "action": "Zentralen Render-Orchestrator einführen oder bestehende Pipeline dokumentieren"
+    },
+    {
+      "rank": 17,
+      "risk": "P4",
+      "module": "unit-converter",
+      "dimension": "uxStability",
+      "action": "Scroll-, Enter-/Tab- und Live-Update-Regression ergänzen"
+    },
+    {
+      "rank": 18,
+      "risk": "P4",
+      "module": "ventilation",
+      "dimension": "renderPipeline",
+      "action": "Zentralen Render-Orchestrator einführen oder bestehende Pipeline dokumentieren"
+    },
+    {
+      "rank": 19,
+      "risk": "P4",
+      "module": "ventilation",
+      "dimension": "uxStability",
+      "action": "Scroll-, Enter-/Tab- und Live-Update-Regression ergänzen"
+    },
+    {
+      "rank": 20,
+      "risk": "P4",
+      "module": "wastewater",
+      "dimension": "controllerSeparation",
+      "action": "Controller-Grenze nachziehen und Event-Binding aus View/Index entfernen"
+    },
+    {
+      "rank": 21,
+      "risk": "P4",
+      "module": "wastewater",
+      "dimension": "renderPipeline",
+      "action": "Zentralen Render-Orchestrator einführen oder bestehende Pipeline dokumentieren"
+    }
+  ],
+  "modules": [
+    {
+      "module": "buffer-storage",
+      "cluster": "reference-candidate",
+      "average": 4,
+      "status": "platform-conformant",
+      "scores": {
+        "platformMount": 5,
+        "stateContract": 4,
+        "controllerSeparation": 4,
+        "viewModelSeparation": 4,
+        "viewPurity": 2,
+        "resultRenderer": 4,
+        "dynamicRenderer": 5,
+        "diagramRenderer": 5,
+        "savedRecords": 4,
+        "renderPipeline": 3,
+        "numericLocaleHandling": 4,
+        "uxStability": 4,
+        "testCoverage": 4
+      },
+      "findings": [
+        {
+          "dimension": "viewPurity",
+          "score": 2,
+          "risk": "P2"
+        },
+        {
+          "dimension": "renderPipeline",
+          "score": 3,
+          "risk": "P4"
+        }
+      ],
+      "evidence": {
+        "files": {
+          "config.js": true,
+          "schema.js": true,
+          "state.js": true,
+          "logic.js": true,
+          "index.js": true,
+          "controller.js": true,
+          "viewModel.js": true,
+          "view.js": true,
+          "results.js": true,
+          "dynamicRenderer.js": false,
+          "diagramRenderer.js": false,
+          "renderPipeline.js": false,
+          "formRenderer.js": false
+        },
+        "lineCounts": {
+          "index": 19,
+          "controller": 91,
+          "view": 101,
+          "results": 71
+        },
+        "tests": [
+          "buffer-storage-phase23c1-platform-contract.test.mjs",
+          "buffer-storage-phase23d-platform-contract.test.mjs",
+          "buffer-storage-phase23e-hardening.test.mjs"
+        ],
+        "flags": {
+          "usesCreatePlatformModule": true,
+          "indexExportsDefault": true,
+          "hasSavedRecordState": true,
+          "viewHasSvgInternals": false,
+          "viewHasStorageMutation": true,
+          "controllerBindsEvents": true,
+          "resultsRenderMarkup": true,
+          "hasGermanNumberHandling": true,
+          "hasScrollGuard": true
+        }
+      }
+    },
+    {
+      "module": "drinking-water",
+      "cluster": "saved-record-module",
+      "average": 4.08,
+      "status": "platform-conformant",
+      "scores": {
+        "platformMount": 5,
+        "stateContract": 4,
+        "controllerSeparation": 4,
+        "viewModelSeparation": 4,
+        "viewPurity": 2,
+        "resultRenderer": 4,
+        "dynamicRenderer": 4,
+        "diagramRenderer": 5,
+        "savedRecords": 4,
+        "renderPipeline": 4,
+        "numericLocaleHandling": 4,
+        "uxStability": 4,
+        "testCoverage": 5
+      },
+      "findings": [
+        {
+          "dimension": "viewPurity",
+          "score": 2,
+          "risk": "P2"
+        }
+      ],
+      "evidence": {
+        "files": {
+          "config.js": true,
+          "schema.js": true,
+          "state.js": true,
+          "logic.js": true,
+          "index.js": true,
+          "controller.js": true,
+          "viewModel.js": true,
+          "view.js": true,
+          "results.js": true,
+          "dynamicRenderer.js": true,
+          "diagramRenderer.js": false,
+          "renderPipeline.js": false,
+          "formRenderer.js": false
+        },
+        "lineCounts": {
+          "index": 20,
+          "controller": 375,
+          "view": 120,
+          "results": 115
+        },
+        "tests": [
+          "drinking-water-phase25b1-platform-mount-view-split.test.mjs",
+          "drinking-water-phase25b2-saved-record-state-migration.test.mjs",
+          "drinking-water-phase25b2a-saved-record-list-fix.test.mjs",
+          "drinking-water-phase25b2b1-global-spacing.test.mjs",
+          "drinking-water-phase25b2b2-scroll-stability.test.mjs",
+          "drinking-water-phase25b2b2b-startup-result-contract.test.mjs",
+          "drinking-water-phase25b3-result-renderer.test.mjs",
+          "drinking-water-phase25c-dynamic-controller-contract.test.mjs",
+          "drinking-water-phase25d-hardening.test.mjs",
+          "drinking-water-phase25e-final-hardening.test.mjs",
+          "drinking-water-phase25e1-water-heating-preview.test.mjs",
+          "drinking-water-phase25e2a-water-heating-ui-switch.test.mjs",
+          "drinking-water-phase25e2b-navigation-persistence.test.mjs",
+          "drinking-water-phase25e2c-water-heating-visible-labels.test.mjs",
+          "drinking-water-phase25e2d-rainwater-segment-bridge.test.mjs"
+        ],
+        "flags": {
+          "usesCreatePlatformModule": true,
+          "indexExportsDefault": true,
+          "hasSavedRecordState": true,
+          "viewHasSvgInternals": false,
+          "viewHasStorageMutation": true,
+          "controllerBindsEvents": true,
+          "resultsRenderMarkup": true,
+          "hasGermanNumberHandling": true,
+          "hasScrollGuard": true
+        }
+      }
+    },
+    {
+      "module": "heat-recovery",
+      "cluster": "reference-candidate",
+      "average": 4.31,
+      "status": "platform-conformant",
+      "scores": {
+        "platformMount": 5,
+        "stateContract": 4,
+        "controllerSeparation": 4,
+        "viewModelSeparation": 4,
+        "viewPurity": 5,
+        "resultRenderer": 4,
+        "dynamicRenderer": 4,
+        "diagramRenderer": 5,
+        "savedRecords": 4,
+        "renderPipeline": 4,
+        "numericLocaleHandling": 4,
+        "uxStability": 4,
+        "testCoverage": 5
+      },
+      "findings": [],
+      "evidence": {
+        "files": {
+          "config.js": true,
+          "schema.js": true,
+          "state.js": true,
+          "logic.js": true,
+          "index.js": true,
+          "controller.js": true,
+          "viewModel.js": true,
+          "view.js": true,
+          "results.js": true,
+          "dynamicRenderer.js": true,
+          "diagramRenderer.js": false,
+          "renderPipeline.js": false,
+          "formRenderer.js": false
+        },
+        "lineCounts": {
+          "index": 20,
+          "controller": 73,
+          "view": 66,
+          "results": 188
+        },
+        "tests": [
+          "heat-recovery-phase24b1-platform-mount-saved-records.test.mjs",
+          "heat-recovery-phase24b2-result-renderer-dynamic-islands.test.mjs",
+          "heat-recovery-phase24b3-dynamic-controller-hardening.test.mjs",
+          "heat-recovery-phase24c-platform-contract.test.mjs",
+          "heat-recovery-phase24d-hardening.test.mjs",
+          "heat-recovery-phase24e-final-hardening.test.mjs"
+        ],
+        "flags": {
+          "usesCreatePlatformModule": true,
+          "indexExportsDefault": true,
+          "hasSavedRecordState": true,
+          "viewHasSvgInternals": false,
+          "viewHasStorageMutation": false,
+          "controllerBindsEvents": true,
+          "resultsRenderMarkup": true,
+          "hasGermanNumberHandling": true,
+          "hasScrollGuard": true
+        }
+      }
+    },
+    {
+      "module": "heating-cooling",
+      "cluster": "standard-module",
+      "average": 4.31,
+      "status": "platform-conformant",
+      "scores": {
+        "platformMount": 5,
+        "stateContract": 4,
+        "controllerSeparation": 3,
+        "viewModelSeparation": 4,
+        "viewPurity": 5,
+        "resultRenderer": 4,
+        "dynamicRenderer": 5,
+        "diagramRenderer": 5,
+        "savedRecords": 5,
+        "renderPipeline": 3,
+        "numericLocaleHandling": 4,
+        "uxStability": 4,
+        "testCoverage": 5
+      },
+      "findings": [
+        {
+          "dimension": "controllerSeparation",
+          "score": 3,
+          "risk": "P4"
+        },
+        {
+          "dimension": "renderPipeline",
+          "score": 3,
+          "risk": "P4"
+        }
+      ],
+      "evidence": {
+        "files": {
+          "config.js": true,
+          "schema.js": true,
+          "state.js": true,
+          "logic.js": true,
+          "index.js": true,
+          "controller.js": true,
+          "viewModel.js": true,
+          "view.js": true,
+          "results.js": true,
+          "dynamicRenderer.js": false,
+          "diagramRenderer.js": false,
+          "renderPipeline.js": false,
+          "formRenderer.js": false
+        },
+        "lineCounts": {
+          "index": 96,
+          "controller": 167,
+          "view": 77,
+          "results": 88
+        },
+        "tests": [
+          "heating-cooling-global-standard.test.mjs",
+          "heating-cooling-interaction.test.mjs",
+          "heating-cooling-phase12g.test.mjs",
+          "heating-cooling-phase12h.test.mjs",
+          "heating-cooling-phase12i.test.mjs",
+          "heating-cooling-phase18b1-result-model.test.mjs",
+          "heating-cooling-phase18b2-line-section-controller.test.mjs",
+          "heating-cooling-phase18b3-dynamic-renderer.test.mjs",
+          "heating-cooling-phase18b4-platform-mount.test.mjs",
+          "heating-cooling-phase18b4a-ordered-layout.test.mjs",
+          "heating-cooling-phase18c-platform-hardening.test.mjs",
+          "heating-cooling-phase18c1-pipe-island-guard.test.mjs",
+          "heating-cooling-phase18c2-select-focus-nav-guard.test.mjs",
+          "heating-cooling-phase18d-reference-consolidation.test.mjs",
+          "heating-cooling-phase18d1-reference-cleanup.test.mjs",
+          "heating-cooling-phase18d2-viewmodel-split.test.mjs"
+        ],
+        "flags": {
+          "usesCreatePlatformModule": true,
+          "indexExportsDefault": true,
+          "hasSavedRecordState": true,
+          "viewHasSvgInternals": false,
+          "viewHasStorageMutation": false,
+          "controllerBindsEvents": false,
+          "resultsRenderMarkup": true,
+          "hasGermanNumberHandling": true,
+          "hasScrollGuard": true
+        }
+      }
+    },
+    {
+      "module": "hx-diagram",
+      "cluster": "reference-candidate",
+      "average": 4.31,
+      "status": "platform-conformant",
+      "scores": {
+        "platformMount": 5,
+        "stateContract": 4,
+        "controllerSeparation": 4,
+        "viewModelSeparation": 4,
+        "viewPurity": 5,
+        "resultRenderer": 4,
+        "dynamicRenderer": 4,
+        "diagramRenderer": 4,
+        "savedRecords": 4,
+        "renderPipeline": 5,
+        "numericLocaleHandling": 4,
+        "uxStability": 4,
+        "testCoverage": 5
+      },
+      "findings": [],
+      "evidence": {
+        "files": {
+          "config.js": true,
+          "schema.js": true,
+          "state.js": true,
+          "logic.js": true,
+          "index.js": true,
+          "controller.js": true,
+          "viewModel.js": true,
+          "view.js": true,
+          "results.js": true,
+          "dynamicRenderer.js": true,
+          "diagramRenderer.js": true,
+          "renderPipeline.js": true,
+          "formRenderer.js": true
+        },
+        "lineCounts": {
+          "index": 20,
+          "controller": 213,
+          "view": 22,
+          "results": 128
+        },
+        "tests": [
+          "hx-diagram-phase26b1-platform-mount-view-split.test.mjs",
+          "hx-diagram-phase26b2-saved-records-platform-dialog.test.mjs",
+          "hx-diagram-phase26b2a-update-delete-fix.test.mjs",
+          "hx-diagram-phase26b3-result-renderer.test.mjs",
+          "hx-diagram-phase26b3a2-process-immediate-render.test.mjs",
+          "hx-diagram-phase26b3a3-enter-tab-navigation-live-diagram.test.mjs",
+          "hx-diagram-phase26c1-diagram-renderer-extraction.test.mjs",
+          "hx-diagram-phase26c2-single-render-pipeline.test.mjs",
+          "hx-diagram-phase26c3-view-purification.test.mjs",
+          "hx-diagram-phase26d-final-platform-cleanup.test.mjs"
+        ],
+        "flags": {
+          "usesCreatePlatformModule": true,
+          "indexExportsDefault": true,
+          "hasSavedRecordState": true,
+          "viewHasSvgInternals": false,
+          "viewHasStorageMutation": false,
+          "controllerBindsEvents": true,
+          "resultsRenderMarkup": true,
+          "hasGermanNumberHandling": true,
+          "hasScrollGuard": false
+        }
+      }
+    },
+    {
+      "module": "pipe-sizing",
+      "cluster": "saved-record-module",
+      "average": 4.23,
+      "status": "platform-conformant",
+      "scores": {
+        "platformMount": 5,
+        "stateContract": 4,
+        "controllerSeparation": 4,
+        "viewModelSeparation": 4,
+        "viewPurity": 5,
+        "resultRenderer": 4,
+        "dynamicRenderer": 5,
+        "diagramRenderer": 5,
+        "savedRecords": 4,
+        "renderPipeline": 3,
+        "numericLocaleHandling": 4,
+        "uxStability": 3,
+        "testCoverage": 5
+      },
+      "findings": [
+        {
+          "dimension": "renderPipeline",
+          "score": 3,
+          "risk": "P4"
+        },
+        {
+          "dimension": "uxStability",
+          "score": 3,
+          "risk": "P4"
+        }
+      ],
+      "evidence": {
+        "files": {
+          "config.js": true,
+          "schema.js": true,
+          "state.js": true,
+          "logic.js": true,
+          "index.js": true,
+          "controller.js": true,
+          "viewModel.js": true,
+          "view.js": true,
+          "results.js": true,
+          "dynamicRenderer.js": false,
+          "diagramRenderer.js": false,
+          "renderPipeline.js": false,
+          "formRenderer.js": false
+        },
+        "lineCounts": {
+          "index": 36,
+          "controller": 82,
+          "view": 18,
+          "results": 113
+        },
+        "tests": [
+          "pipe-sizing-phase21b2-saved-record-controller.test.mjs",
+          "pipe-sizing-phase21b3-result-renderer.test.mjs",
+          "pipe-sizing-phase21c-dynamic-renderer.test.mjs",
+          "pipe-sizing-phase21c2-saved-record-line-attrs.test.mjs",
+          "pipe-sizing-phase21c3-saved-record-controller-parity.test.mjs",
+          "pipe-sizing-phase21d-platform-contract.test.mjs",
+          "pipe-sizing-phase21e-hardening.test.mjs"
+        ],
+        "flags": {
+          "usesCreatePlatformModule": true,
+          "indexExportsDefault": true,
+          "hasSavedRecordState": true,
+          "viewHasSvgInternals": false,
+          "viewHasStorageMutation": false,
+          "controllerBindsEvents": true,
+          "resultsRenderMarkup": true,
+          "hasGermanNumberHandling": true,
+          "hasScrollGuard": false
+        }
+      }
+    },
+    {
+      "module": "pressure-holding",
+      "cluster": "saved-record-module",
+      "average": 4.31,
+      "status": "platform-conformant",
+      "scores": {
+        "platformMount": 5,
+        "stateContract": 4,
+        "controllerSeparation": 4,
+        "viewModelSeparation": 4,
+        "viewPurity": 5,
+        "resultRenderer": 4,
+        "dynamicRenderer": 5,
+        "diagramRenderer": 5,
+        "savedRecords": 4,
+        "renderPipeline": 3,
+        "numericLocaleHandling": 4,
+        "uxStability": 4,
+        "testCoverage": 5
+      },
+      "findings": [
+        {
+          "dimension": "renderPipeline",
+          "score": 3,
+          "risk": "P4"
+        }
+      ],
+      "evidence": {
+        "files": {
+          "config.js": true,
+          "schema.js": true,
+          "state.js": true,
+          "logic.js": true,
+          "index.js": true,
+          "controller.js": true,
+          "viewModel.js": true,
+          "view.js": true,
+          "results.js": true,
+          "dynamicRenderer.js": false,
+          "diagramRenderer.js": false,
+          "renderPipeline.js": false,
+          "formRenderer.js": false
+        },
+        "lineCounts": {
+          "index": 47,
+          "controller": 124,
+          "view": 22,
+          "results": 88
+        },
+        "tests": [
+          "pressure-holding-phase20b1-platform-mount.test.mjs",
+          "pressure-holding-phase20b2-saved-record-controller.test.mjs",
+          "pressure-holding-phase20b3-result-renderer.test.mjs",
+          "pressure-holding-phase20c-dynamic-renderer.test.mjs",
+          "pressure-holding-phase20d-platform-contract.test.mjs",
+          "pressure-holding-phase20e-hardening.test.mjs"
+        ],
+        "flags": {
+          "usesCreatePlatformModule": true,
+          "indexExportsDefault": true,
+          "hasSavedRecordState": true,
+          "viewHasSvgInternals": false,
+          "viewHasStorageMutation": false,
+          "controllerBindsEvents": true,
+          "resultsRenderMarkup": true,
+          "hasGermanNumberHandling": true,
+          "hasScrollGuard": true
+        }
+      }
+    },
+    {
+      "module": "rainwater",
+      "cluster": "saved-record-module",
+      "average": 3.69,
+      "status": "compatible-with-cleanup",
+      "scores": {
+        "platformMount": 5,
+        "stateContract": 4,
+        "controllerSeparation": 3,
+        "viewModelSeparation": 1,
+        "viewPurity": 1,
+        "resultRenderer": 4,
+        "dynamicRenderer": 5,
+        "diagramRenderer": 5,
+        "savedRecords": 4,
+        "renderPipeline": 3,
+        "numericLocaleHandling": 4,
+        "uxStability": 4,
+        "testCoverage": 5
+      },
+      "findings": [
+        {
+          "dimension": "viewModelSeparation",
+          "score": 1,
+          "risk": "P3"
+        },
+        {
+          "dimension": "viewPurity",
+          "score": 1,
+          "risk": "P2"
+        },
+        {
+          "dimension": "controllerSeparation",
+          "score": 3,
+          "risk": "P4"
+        },
+        {
+          "dimension": "renderPipeline",
+          "score": 3,
+          "risk": "P4"
+        }
+      ],
+      "evidence": {
+        "files": {
+          "config.js": true,
+          "schema.js": true,
+          "state.js": true,
+          "logic.js": true,
+          "index.js": true,
+          "controller.js": true,
+          "viewModel.js": false,
+          "view.js": false,
+          "results.js": true,
+          "dynamicRenderer.js": false,
+          "diagramRenderer.js": false,
+          "renderPipeline.js": false,
+          "formRenderer.js": false
+        },
+        "lineCounts": {
+          "index": 19,
+          "controller": 231,
+          "view": 0,
+          "results": 176
+        },
+        "tests": [
+          "drinking-water-phase25e2d-rainwater-segment-bridge.test.mjs",
+          "rainwater-global-standard.test.mjs",
+          "rainwater-phase14c.test.mjs",
+          "rainwater-phase14d.test.mjs",
+          "rainwater-phase14e.test.mjs",
+          "rainwater-phase14f.test.mjs",
+          "rainwater-phase14g.test.mjs",
+          "rainwater-phase14l.test.mjs",
+          "rainwater-phase16e1-recovery.test.mjs",
+          "rainwater-phase17a-decoupling.test.mjs",
+          "rainwater-phase17a1-decoupling.test.mjs",
+          "rainwater-phase17a2-saved-actions.test.mjs",
+          "rainwater-phase17a3-results.test.mjs",
+          "rainwater-phase17a6-platform-control.test.mjs",
+          "rainwater-phase17c11-heating-contract.test.mjs",
+          "rainwater-phase17c12-switch.test.mjs",
+          "rainwater-phase17c13-platform-dynamic-islands.test.mjs",
+          "rainwater-phase17c16-segment-context.test.mjs"
+        ],
+        "flags": {
+          "usesCreatePlatformModule": true,
+          "indexExportsDefault": true,
+          "hasSavedRecordState": true,
+          "viewHasSvgInternals": false,
+          "viewHasStorageMutation": false,
+          "controllerBindsEvents": false,
+          "resultsRenderMarkup": true,
+          "hasGermanNumberHandling": true,
+          "hasScrollGuard": true
+        }
+      }
+    },
+    {
+      "module": "unit-converter",
+      "cluster": "standard-module",
+      "average": 4.08,
+      "status": "platform-conformant",
+      "scores": {
+        "platformMount": 5,
+        "stateContract": 4,
+        "controllerSeparation": 1,
+        "viewModelSeparation": 4,
+        "viewPurity": 5,
+        "resultRenderer": 4,
+        "dynamicRenderer": 5,
+        "diagramRenderer": 5,
+        "savedRecords": 5,
+        "renderPipeline": 3,
+        "numericLocaleHandling": 4,
+        "uxStability": 3,
+        "testCoverage": 5
+      },
+      "findings": [
+        {
+          "dimension": "controllerSeparation",
+          "score": 1,
+          "risk": "P1"
+        },
+        {
+          "dimension": "renderPipeline",
+          "score": 3,
+          "risk": "P4"
+        },
+        {
+          "dimension": "uxStability",
+          "score": 3,
+          "risk": "P4"
+        }
+      ],
+      "evidence": {
+        "files": {
+          "config.js": true,
+          "schema.js": true,
+          "state.js": true,
+          "logic.js": true,
+          "index.js": true,
+          "controller.js": false,
+          "viewModel.js": true,
+          "view.js": true,
+          "results.js": true,
+          "dynamicRenderer.js": false,
+          "diagramRenderer.js": false,
+          "renderPipeline.js": false,
+          "formRenderer.js": false
+        },
+        "lineCounts": {
+          "index": 37,
+          "controller": 0,
+          "view": 16,
+          "results": 56
+        },
+        "tests": [
+          "unit-converter-phase22b1-platform-mount.test.mjs",
+          "unit-converter-phase22b3-result-renderer.test.mjs",
+          "unit-converter-phase22c-dynamic-renderer.test.mjs",
+          "unit-converter-phase22c1-result-cleanup.test.mjs",
+          "unit-converter-phase22d-platform-contract.test.mjs",
+          "unit-converter-phase22e-hardening.test.mjs"
+        ],
+        "flags": {
+          "usesCreatePlatformModule": true,
+          "indexExportsDefault": true,
+          "hasSavedRecordState": false,
+          "viewHasSvgInternals": false,
+          "viewHasStorageMutation": false,
+          "controllerBindsEvents": false,
+          "resultsRenderMarkup": true,
+          "hasGermanNumberHandling": true,
+          "hasScrollGuard": false
+        }
+      }
+    },
+    {
+      "module": "ventilation",
+      "cluster": "standard-module",
+      "average": 4.31,
+      "status": "platform-conformant",
+      "scores": {
+        "platformMount": 5,
+        "stateContract": 4,
+        "controllerSeparation": 4,
+        "viewModelSeparation": 4,
+        "viewPurity": 5,
+        "resultRenderer": 4,
+        "dynamicRenderer": 5,
+        "diagramRenderer": 5,
+        "savedRecords": 5,
+        "renderPipeline": 3,
+        "numericLocaleHandling": 4,
+        "uxStability": 3,
+        "testCoverage": 5
+      },
+      "findings": [
+        {
+          "dimension": "renderPipeline",
+          "score": 3,
+          "risk": "P4"
+        },
+        {
+          "dimension": "uxStability",
+          "score": 3,
+          "risk": "P4"
+        }
+      ],
+      "evidence": {
+        "files": {
+          "config.js": true,
+          "schema.js": true,
+          "state.js": true,
+          "logic.js": true,
+          "index.js": true,
+          "controller.js": true,
+          "viewModel.js": true,
+          "view.js": true,
+          "results.js": true,
+          "dynamicRenderer.js": false,
+          "diagramRenderer.js": false,
+          "renderPipeline.js": false,
+          "formRenderer.js": false
+        },
+        "lineCounts": {
+          "index": 26,
+          "controller": 83,
+          "view": 116,
+          "results": 47
+        },
+        "tests": [
+          "ventilation-global-standard.test.mjs",
+          "ventilation-phase13e.test.mjs",
+          "ventilation-phase19b1-platform-mount.test.mjs",
+          "ventilation-phase19b2b-line-section-controller.test.mjs",
+          "ventilation-phase19b2c-hydrator-final.test.mjs",
+          "ventilation-phase19b2c-saved-record-island.test.mjs",
+          "ventilation-phase19b3-result-renderer.test.mjs",
+          "ventilation-phase19c-dynamic-renderer.test.mjs",
+          "ventilation-phase19d-platform-contract.test.mjs",
+          "ventilation-phase19d-project-storage-import.test.mjs"
+        ],
+        "flags": {
+          "usesCreatePlatformModule": true,
+          "indexExportsDefault": true,
+          "hasSavedRecordState": true,
+          "viewHasSvgInternals": false,
+          "viewHasStorageMutation": false,
+          "controllerBindsEvents": true,
+          "resultsRenderMarkup": true,
+          "hasGermanNumberHandling": true,
+          "hasScrollGuard": false
+        }
+      }
+    },
+    {
+      "module": "wastewater",
+      "cluster": "saved-record-module",
+      "average": 3.62,
+      "status": "compatible-with-cleanup",
+      "scores": {
+        "platformMount": 5,
+        "stateContract": 4,
+        "controllerSeparation": 3,
+        "viewModelSeparation": 1,
+        "viewPurity": 1,
+        "resultRenderer": 4,
+        "dynamicRenderer": 5,
+        "diagramRenderer": 5,
+        "savedRecords": 4,
+        "renderPipeline": 3,
+        "numericLocaleHandling": 4,
+        "uxStability": 4,
+        "testCoverage": 4
+      },
+      "findings": [
+        {
+          "dimension": "viewModelSeparation",
+          "score": 1,
+          "risk": "P3"
+        },
+        {
+          "dimension": "viewPurity",
+          "score": 1,
+          "risk": "P2"
+        },
+        {
+          "dimension": "controllerSeparation",
+          "score": 3,
+          "risk": "P4"
+        },
+        {
+          "dimension": "renderPipeline",
+          "score": 3,
+          "risk": "P4"
+        }
+      ],
+      "evidence": {
+        "files": {
+          "config.js": true,
+          "schema.js": true,
+          "state.js": true,
+          "logic.js": true,
+          "index.js": true,
+          "controller.js": true,
+          "viewModel.js": false,
+          "view.js": false,
+          "results.js": true,
+          "dynamicRenderer.js": false,
+          "diagramRenderer.js": false,
+          "renderPipeline.js": false,
+          "formRenderer.js": false
+        },
+        "lineCounts": {
+          "index": 19,
+          "controller": 102,
+          "view": 0,
+          "results": 91
+        },
+        "tests": [
+          "wastewater-phase17b-platform-control.test.mjs",
+          "wastewater-phase17b1-platform-collections.test.mjs",
+          "wastewater-phase17b2-reference-level.test.mjs"
+        ],
+        "flags": {
+          "usesCreatePlatformModule": true,
+          "indexExportsDefault": true,
+          "hasSavedRecordState": true,
+          "viewHasSvgInternals": false,
+          "viewHasStorageMutation": false,
+          "controllerBindsEvents": false,
+          "resultsRenderMarkup": true,
+          "hasGermanNumberHandling": true,
+          "hasScrollGuard": true
+        }
+      }
+    }
+  ]
+}
