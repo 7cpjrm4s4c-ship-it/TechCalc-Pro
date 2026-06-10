@@ -76,6 +76,8 @@
     "audit:rendering": "node scripts/audit-rendering-phase27c3.mjs",
     "test:platform-rendering-phase27c3": "node tests/platform-rendering-audit-phase27c3.test.mjs",
     "audit:ux-infrastructure": "node scripts/audit-ux-infrastructure-phase27c4.mjs",
-    "test:platform-ux-infrastructure-phase27c4": "node tests/platform-ux-infrastructure-audit-phase27c4.test.mjs"
+    "test:platform-ux-infrastructure-phase27c4": "node tests/platform-ux-infrastructure-audit-phase27c4.test.mjs",
+    "audit:performance": "node scripts/audit-performance-phase27c5.mjs",
+    "test:platform-performance-phase27c5": "node tests/platform-performance-audit-phase27c5.test.mjs"
   }
 }
