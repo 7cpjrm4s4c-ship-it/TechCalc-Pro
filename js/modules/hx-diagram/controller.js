@@ -162,7 +162,18 @@ function bindHxDelegation(rootEl) {
     if (processButton && rootEl.contains(processButton)) {
       event.preventDefault();
       event.stopPropagation();
-      state.set({ process: processButton.dataset.value, activePath: [], points: [] }, { action: 'hx:process' });
+      commitVisibleFields(rootEl);
+      const current = state.get();
+      const nextProcess = processButton.dataset.value || current.process || 'heat';
+      const nextState = { ...current, process: nextProcess };
+      const hasCompleteInput = [nextState.tempC, nextState.rhPercent, nextState.targetTempC, nextState.targetRhPercent]
+        .every(value => String(value ?? '').trim() !== '');
+      const nextResult = hasCompleteInput ? calculate(nextState) : null;
+      state.set({
+        process: nextProcess,
+        activePath: nextResult?.processPath || [],
+        points: []
+      }, { action: 'hx:process' });
       return;
     }
 
