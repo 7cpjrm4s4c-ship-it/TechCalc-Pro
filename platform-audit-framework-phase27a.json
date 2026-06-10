@@ -1,0 +1,55 @@
+{
+  "phase": "27A",
+  "name": "Platform Audit Framework",
+  "purpose": "Define objective criteria and evidence for the full platform audit after module migration completion.",
+  "scoreScale": {
+    "0": "not migrated / boundary absent",
+    "1": "legacy dominant",
+    "2": "partially migrated with architectural leakage",
+    "3": "platform compatible with known weaknesses",
+    "4": "platform conformant with minor cleanup potential",
+    "5": "reference-grade implementation"
+  },
+  "modules": [
+    "heating-cooling",
+    "ventilation",
+    "rainwater",
+    "wastewater",
+    "pipe-sizing",
+    "pressure-holding",
+    "unit-converter",
+    "buffer-storage",
+    "heat-recovery",
+    "drinking-water",
+    "hx-diagram"
+  ],
+  "dimensions": [
+    "platformMount",
+    "stateContract",
+    "controllerSeparation",
+    "viewModelSeparation",
+    "viewPurity",
+    "resultRenderer",
+    "dynamicRenderer",
+    "diagramRenderer",
+    "savedRecords",
+    "renderPipeline",
+    "numericLocaleHandling",
+    "uxStability",
+    "testCoverage"
+  ],
+  "riskLevels": {
+    "P0": "release blocker",
+    "P1": "critical regression risk",
+    "P2": "high architecture risk",
+    "P3": "medium cleanup risk",
+    "P4": "low consistency risk"
+  },
+  "phase27BOutput": [
+    "module score matrix",
+    "evidence-backed findings",
+    "reference-module comparison",
+    "P0/P1/P2 risk register",
+    "ordered remediation backlog"
+  ]
+}
