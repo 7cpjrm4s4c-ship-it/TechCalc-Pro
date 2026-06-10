@@ -1,27 +1,12 @@
 {
   "phase": "28A.1",
   "name": "Scroll Audit & Scroll Manager Design",
-  "generatedAt": "2026-06-10T14:30:42.281Z",
-  "overallScore": 4.73,
+  "generatedAt": "2026-06-10T15:07:59.573Z",
+  "overallScore": 4.85,
   "overallGrade": "A",
   "executiveSummary": {
     "p0": [],
-    "p1": [
-      {
-        "area": "moduleDirectScrollCalls",
-        "risk": "P1",
-        "score": 3.9,
-        "grade": "B",
-        "action": "Direkte Modul-Scrollschreibzugriffe in 28A.2 ueber den PlatformScrollManager kapseln.",
-        "evidence": [
-          {
-            "module": "drinking-water",
-            "directScrollWrites": 2,
-            "scrollManagerSignals": 5
-          }
-        ]
-      }
-    ],
+    "p1": [],
     "p2": [
       {
         "area": "focusWithoutPreventScroll",
@@ -54,7 +39,7 @@
     "directScrollFiles": 5,
     "focusRiskFiles": 2,
     "hashNavigationFiles": 1,
-    "modulesWithDirectScroll": 1,
+    "modulesWithDirectScroll": 0,
     "modulesWithoutScrollManagerUse": 0
   },
   "coreEvidence": {
@@ -68,22 +53,21 @@
       "js/core/app.js",
       "js/core/menuFallback.js",
       "js/core/renderCoordinator.js",
-      "js/core/renderer.js"
+      "js/core/renderer.js",
+      "js/core/scrollManager.js"
     ],
-    "directModuleScrollFiles": [
-      "js/modules/drinking-water/controller.js"
-    ]
+    "directModuleScrollFiles": []
   },
   "moduleEvidence": [
     {
       "module": "drinking-water",
       "files": 2,
-      "directScrollWrites": 2,
+      "directScrollWrites": 0,
       "focusCalls": 0,
       "preventScrollFocus": 0,
       "focusWithoutPreventScroll": 0,
       "preserveSignals": 4,
-      "scrollManagerSignals": 5,
+      "scrollManagerSignals": 6,
       "hashNavigation": 0
     }
   ],
@@ -346,6 +330,29 @@
       "layer": "core",
       "module": null,
       "scroll": {
+        "windowScrollTo": 1,
+        "elementScrollTo": 2,
+        "scrollIntoView": 0,
+        "scrollTopWrite": 1,
+        "scrollYRead": 1,
+        "hashNavigation": 0
+      },
+      "focus": {
+        "focusCall": 0,
+        "preventScrollFocus": 0,
+        "activeElement": 0
+      },
+      "preserveSignals": 15,
+      "scrollManagerSignals": 9,
+      "directScrollWrites": 3,
+      "focusWithoutPreventScroll": 0,
+      "needs28A2Review": true
+    },
+    {
+      "path": "js/modules/drinking-water/controller.js",
+      "layer": "module",
+      "module": "drinking-water",
+      "scroll": {
         "windowScrollTo": 0,
         "elementScrollTo": 0,
         "scrollIntoView": 0,
@@ -356,36 +363,13 @@
       "focus": {
         "focusCall": 0,
         "preventScrollFocus": 0,
-        "activeElement": 0
-      },
-      "preserveSignals": 11,
-      "scrollManagerSignals": 5,
-      "directScrollWrites": 0,
-      "focusWithoutPreventScroll": 0,
-      "needs28A2Review": false
-    },
-    {
-      "path": "js/modules/drinking-water/controller.js",
-      "layer": "module",
-      "module": "drinking-water",
-      "scroll": {
-        "windowScrollTo": 1,
-        "elementScrollTo": 1,
-        "scrollIntoView": 0,
-        "scrollTopWrite": 1,
-        "scrollYRead": 1,
-        "hashNavigation": 0
-      },
-      "focus": {
-        "focusCall": 0,
-        "preventScrollFocus": 0,
         "activeElement": 1
       },
       "preserveSignals": 2,
-      "scrollManagerSignals": 2,
-      "directScrollWrites": 2,
+      "scrollManagerSignals": 3,
+      "directScrollWrites": 0,
       "focusWithoutPreventScroll": 0,
-      "needs28A2Review": true
+      "needs28A2Review": false
     },
     {
       "path": "js/modules/drinking-water/dynamicRenderer.js",
@@ -435,20 +419,6 @@
     }
   ],
   "findings": [
-    {
-      "area": "moduleDirectScrollCalls",
-      "risk": "P1",
-      "score": 3.9,
-      "grade": "B",
-      "action": "Direkte Modul-Scrollschreibzugriffe in 28A.2 ueber den PlatformScrollManager kapseln.",
-      "evidence": [
-        {
-          "module": "drinking-water",
-          "directScrollWrites": 2,
-          "scrollManagerSignals": 5
-        }
-      ]
-    },
     {
       "area": "focusWithoutPreventScroll",
       "risk": "P2",

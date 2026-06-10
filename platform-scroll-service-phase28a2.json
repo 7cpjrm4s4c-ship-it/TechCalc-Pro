@@ -1,0 +1,52 @@
+{
+  "phase": "28A.2",
+  "name": "Platform Scroll Service",
+  "generatedAt": "2026-06-10T15:08:33.290Z",
+  "overallScore": 5,
+  "overallGrade": "A",
+  "executiveSummary": {
+    "p0": [],
+    "p1": [],
+    "p2": [
+      {
+        "area": "focusServiceFollowUp",
+        "risk": "P2",
+        "action": "Fokusaufrufe ohne preventScroll bleiben bewusst fuer 28B im Scope.",
+        "evidence": [
+          "js/core/eventPipeline.js",
+          "js/core/pdfExport.js"
+        ]
+      }
+    ],
+    "conclusion": "Der PlatformScrollManager besitzt jetzt einen expliziten Service-Vertrag. Direkte Modul-Scrollschreibzugriffe sind gekapselt; verbleibende Core-Zugriffe sind Infrastruktur-Implementierungen."
+  },
+  "api": {
+    "capturePosition": true,
+    "restorePosition": true,
+    "freeze": true,
+    "unfreeze": true,
+    "runWithoutScrollJump": true,
+    "preserveModuleSwitchScroll": true,
+    "platformObject": true
+  },
+  "apiCoverage": 1,
+  "moduleDirectScrollFiles": [],
+  "drinkingWaterKapselung": true,
+  "acceptance": {
+    "explicitServiceContract": true,
+    "moduleScrollWritesEncapsulated": true,
+    "savedRecordCompatibilityPreserved": true,
+    "moduleSwitchStrategyAvailable": true
+  },
+  "findings": [
+    {
+      "area": "focusServiceFollowUp",
+      "risk": "P2",
+      "action": "Fokusaufrufe ohne preventScroll bleiben bewusst fuer 28B im Scope.",
+      "evidence": [
+        "js/core/eventPipeline.js",
+        "js/core/pdfExport.js"
+      ]
+    }
+  ]
+}

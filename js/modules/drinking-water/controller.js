@@ -4,6 +4,7 @@ import { isSameId } from '../../core/savedRecords.js';
 import { safeReplaceContent } from '../../core/domUpdate.js';
 import { createDrinkingWaterViewModel } from './viewModel.js';
 import { renderInputCard, renderResultCard, draftConsumerList } from './view.js';
+import { runWithoutScrollJump } from '../../core/scrollManager.js';
 
 function syncSavedRecordsPatch(patch = {}, action = 'dw:saved-sync') {
   const next = { ...patch };
@@ -152,16 +153,7 @@ function installNavigationPersistenceGuard(root) {
 }
 
 function preserveScrollPosition(callback) {
-  const scroller = document.scrollingElement || document.documentElement;
-  const scrollTop = scroller?.scrollTop ?? window.scrollY ?? 0;
-  const scrollLeft = scroller?.scrollLeft ?? window.scrollX ?? 0;
-  callback();
-  if (scroller) {
-    scroller.scrollTop = scrollTop;
-    scroller.scrollLeft = scrollLeft;
-  } else if (typeof window.scrollTo === 'function') {
-    window.scrollTo(scrollLeft, scrollTop);
-  }
+  return runWithoutScrollJump(callback, { frames: 2, delays: [40, 120] });
 }
 
 export function refreshDrinkingWater(root) {
