@@ -100,6 +100,8 @@
     "audit:event-system": "node scripts/audit-event-system-phase28c.mjs",
     "test:platform-event-system-phase28c": "node tests/platform-event-system-phase28c.test.mjs",
     "audit:platform-verification": "node scripts/audit-platform-verification-phase28d.mjs",
-    "test:platform-verification-phase28d": "node tests/platform-verification-phase28d.test.mjs"
+    "test:platform-verification-phase28d": "node tests/platform-verification-phase28d.test.mjs",
+    "audit:ui-ux-framework": "node scripts/audit-ui-ux-framework-phase29a.mjs",
+    "test:platform-ui-ux-phase29a": "node tests/platform-ui-ux-framework-phase29a.test.mjs"
   }
 }

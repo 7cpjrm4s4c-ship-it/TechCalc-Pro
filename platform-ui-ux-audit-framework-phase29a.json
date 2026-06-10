@@ -1,0 +1,1783 @@
+{
+  "phase": "29A",
+  "title": "Module-wide UI/UX Bugfix Audit Framework",
+  "generatedAt": "2026-06-10T18:08:01.701Z",
+  "score": 5,
+  "grade": "A",
+  "summary": {
+    "modules": 11,
+    "axes": 10,
+    "totalPlannedChecks": 110,
+    "referenceModules": [
+      "buffer-storage",
+      "heat-recovery",
+      "hx-diagram"
+    ],
+    "highRiskModules": [
+      "drinking-water",
+      "hx-diagram",
+      "rainwater",
+      "wastewater"
+    ],
+    "p0": 0,
+    "p1": 0,
+    "p2": 0
+  },
+  "severityRules": {
+    "P0": "Blockiert produktive Nutzung, Datenverlust, nicht ladbares Modul oder vollstaendig falscher Ergebniszustand.",
+    "P1": "Kern-UX oder Rechenfluss gestoert: Eingabe, Saved Records, Fokus/Scroll, Live-Rendering oder Ergebnisanzeige.",
+    "P2": "Nicht blockierende Inkonsistenz: Layout, Labels, Edge Cases, mobile Detailfehler, kosmetische Validierung.",
+    "P3": "Kosmetik, Text, optionale Verbesserung ohne Workflow-Auswirkung."
+  },
+  "axes": [
+    {
+      "id": "input-confirmation",
+      "label": "Eingabe und automatische Bestaetigung",
+      "severityIfBroken": "P1"
+    },
+    {
+      "id": "enter-tab-navigation",
+      "label": "Enter/Tab/Shift+Tab Navigation",
+      "severityIfBroken": "P1"
+    },
+    {
+      "id": "focus-restore",
+      "label": "Fokus- und Caret-Restore nach Re-Render",
+      "severityIfBroken": "P1"
+    },
+    {
+      "id": "scroll-stability",
+      "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+      "severityIfBroken": "P1"
+    },
+    {
+      "id": "saved-records",
+      "label": "Saved Records: save/load/update/delete/expand/collapse",
+      "severityIfBroken": "P1"
+    },
+    {
+      "id": "live-rendering",
+      "label": "Live-Rendering ohne Aktualisieren-Zwang",
+      "severityIfBroken": "P1"
+    },
+    {
+      "id": "unit-switching",
+      "label": "Einheitenwechsel und deutsche Zahlformate",
+      "severityIfBroken": "P2"
+    },
+    {
+      "id": "result-rendering",
+      "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+      "severityIfBroken": "P1"
+    },
+    {
+      "id": "responsive-layout",
+      "label": "Desktop/Mobile Layout und Touch-Ziele",
+      "severityIfBroken": "P2"
+    },
+    {
+      "id": "error-reset-states",
+      "label": "Fehlermeldungen, Reset und Default-State",
+      "severityIfBroken": "P2"
+    }
+  ],
+  "moduleMatrix": [
+    {
+      "module": "buffer-storage",
+      "risk": "reference",
+      "signals": {
+        "files": [
+          "js/modules/buffer-storage/config.js",
+          "js/modules/buffer-storage/controller.js",
+          "js/modules/buffer-storage/index.js",
+          "js/modules/buffer-storage/logic.js",
+          "js/modules/buffer-storage/results.js",
+          "js/modules/buffer-storage/schema.js",
+          "js/modules/buffer-storage/state.js",
+          "js/modules/buffer-storage/view.js",
+          "js/modules/buffer-storage/viewModel.js"
+        ],
+        "hasController": true,
+        "hasViewModel": true,
+        "hasView": true,
+        "hasResults": true,
+        "hasDynamicRenderer": false,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasSavedRecords": true,
+        "usesFocusManager": false,
+        "usesScrollManager": false,
+        "hasLiveHandlers": true,
+        "directFocusCalls": 0,
+        "directScrollCalls": 0,
+        "lineCount": 568
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "module": "drinking-water",
+      "risk": "high",
+      "signals": {
+        "files": [
+          "js/modules/drinking-water/config.js",
+          "js/modules/drinking-water/controller.js",
+          "js/modules/drinking-water/dynamicRenderer.js",
+          "js/modules/drinking-water/index.js",
+          "js/modules/drinking-water/logic.js",
+          "js/modules/drinking-water/results.js",
+          "js/modules/drinking-water/schema.js",
+          "js/modules/drinking-water/state.js",
+          "js/modules/drinking-water/view.js",
+          "js/modules/drinking-water/viewModel.js"
+        ],
+        "hasController": true,
+        "hasViewModel": true,
+        "hasView": true,
+        "hasResults": true,
+        "hasDynamicRenderer": true,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasSavedRecords": true,
+        "usesFocusManager": true,
+        "usesScrollManager": true,
+        "hasLiveHandlers": true,
+        "directFocusCalls": 0,
+        "directScrollCalls": 0,
+        "lineCount": 1144
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "module": "heat-recovery",
+      "risk": "reference",
+      "signals": {
+        "files": [
+          "js/modules/heat-recovery/config.js",
+          "js/modules/heat-recovery/controller.js",
+          "js/modules/heat-recovery/dynamicRenderer.js",
+          "js/modules/heat-recovery/index.js",
+          "js/modules/heat-recovery/logic.js",
+          "js/modules/heat-recovery/results.js",
+          "js/modules/heat-recovery/schema.js",
+          "js/modules/heat-recovery/state.js",
+          "js/modules/heat-recovery/view.js",
+          "js/modules/heat-recovery/viewModel.js"
+        ],
+        "hasController": true,
+        "hasViewModel": true,
+        "hasView": true,
+        "hasResults": true,
+        "hasDynamicRenderer": true,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasSavedRecords": true,
+        "usesFocusManager": true,
+        "usesScrollManager": false,
+        "hasLiveHandlers": true,
+        "directFocusCalls": 0,
+        "directScrollCalls": 0,
+        "lineCount": 752
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "module": "heating-cooling",
+      "risk": "normal",
+      "signals": {
+        "files": [
+          "js/modules/heating-cooling/config.js",
+          "js/modules/heating-cooling/controller.js",
+          "js/modules/heating-cooling/index.js",
+          "js/modules/heating-cooling/logic.js",
+          "js/modules/heating-cooling/results.js",
+          "js/modules/heating-cooling/schema.js",
+          "js/modules/heating-cooling/state.js",
+          "js/modules/heating-cooling/view.js",
+          "js/modules/heating-cooling/viewModel.js"
+        ],
+        "hasController": true,
+        "hasViewModel": true,
+        "hasView": true,
+        "hasResults": true,
+        "hasDynamicRenderer": false,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasSavedRecords": true,
+        "usesFocusManager": false,
+        "usesScrollManager": false,
+        "hasLiveHandlers": true,
+        "directFocusCalls": 0,
+        "directScrollCalls": 0,
+        "lineCount": 593
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "module": "hx-diagram",
+      "risk": "high",
+      "signals": {
+        "files": [
+          "js/modules/hx-diagram/config.js",
+          "js/modules/hx-diagram/controller.js",
+          "js/modules/hx-diagram/diagramRenderer.js",
+          "js/modules/hx-diagram/dynamicRenderer.js",
+          "js/modules/hx-diagram/formRenderer.js",
+          "js/modules/hx-diagram/index.js",
+          "js/modules/hx-diagram/logic.js",
+          "js/modules/hx-diagram/renderPipeline.js",
+          "js/modules/hx-diagram/results.js",
+          "js/modules/hx-diagram/schema.js",
+          "js/modules/hx-diagram/state.js",
+          "js/modules/hx-diagram/view.js",
+          "js/modules/hx-diagram/viewModel.js"
+        ],
+        "hasController": true,
+        "hasViewModel": true,
+        "hasView": true,
+        "hasResults": true,
+        "hasDynamicRenderer": true,
+        "hasRenderPipeline": true,
+        "hasDiagramRenderer": true,
+        "hasSavedRecords": true,
+        "usesFocusManager": true,
+        "usesScrollManager": false,
+        "hasLiveHandlers": true,
+        "directFocusCalls": 0,
+        "directScrollCalls": 0,
+        "lineCount": 977
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "module": "pipe-sizing",
+      "risk": "normal",
+      "signals": {
+        "files": [
+          "js/modules/pipe-sizing/config.js",
+          "js/modules/pipe-sizing/controller.js",
+          "js/modules/pipe-sizing/index.js",
+          "js/modules/pipe-sizing/logic.js",
+          "js/modules/pipe-sizing/results.js",
+          "js/modules/pipe-sizing/schema.js",
+          "js/modules/pipe-sizing/state.js",
+          "js/modules/pipe-sizing/view.js",
+          "js/modules/pipe-sizing/viewModel.js"
+        ],
+        "hasController": true,
+        "hasViewModel": true,
+        "hasView": true,
+        "hasResults": true,
+        "hasDynamicRenderer": false,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasSavedRecords": true,
+        "usesFocusManager": false,
+        "usesScrollManager": false,
+        "hasLiveHandlers": true,
+        "directFocusCalls": 0,
+        "directScrollCalls": 0,
+        "lineCount": 328
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "module": "pressure-holding",
+      "risk": "normal",
+      "signals": {
+        "files": [
+          "js/modules/pressure-holding/config.js",
+          "js/modules/pressure-holding/controller.js",
+          "js/modules/pressure-holding/index.js",
+          "js/modules/pressure-holding/logic.js",
+          "js/modules/pressure-holding/results.js",
+          "js/modules/pressure-holding/schema.js",
+          "js/modules/pressure-holding/state.js",
+          "js/modules/pressure-holding/view.js",
+          "js/modules/pressure-holding/viewModel.js"
+        ],
+        "hasController": true,
+        "hasViewModel": true,
+        "hasView": true,
+        "hasResults": true,
+        "hasDynamicRenderer": false,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasSavedRecords": true,
+        "usesFocusManager": false,
+        "usesScrollManager": false,
+        "hasLiveHandlers": true,
+        "directFocusCalls": 0,
+        "directScrollCalls": 0,
+        "lineCount": 504
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "module": "rainwater",
+      "risk": "high",
+      "signals": {
+        "files": [
+          "js/modules/rainwater/config.js",
+          "js/modules/rainwater/controller.js",
+          "js/modules/rainwater/index.js",
+          "js/modules/rainwater/logic.js",
+          "js/modules/rainwater/results.js",
+          "js/modules/rainwater/schema.js",
+          "js/modules/rainwater/state.js",
+          "js/modules/rainwater/tables.js"
+        ],
+        "hasController": true,
+        "hasViewModel": false,
+        "hasView": false,
+        "hasResults": true,
+        "hasDynamicRenderer": false,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasSavedRecords": true,
+        "usesFocusManager": false,
+        "usesScrollManager": false,
+        "hasLiveHandlers": true,
+        "directFocusCalls": 0,
+        "directScrollCalls": 0,
+        "lineCount": 840
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "module": "unit-converter",
+      "risk": "normal",
+      "signals": {
+        "files": [
+          "js/modules/unit-converter/config.js",
+          "js/modules/unit-converter/index.js",
+          "js/modules/unit-converter/logic.js",
+          "js/modules/unit-converter/results.js",
+          "js/modules/unit-converter/schema.js",
+          "js/modules/unit-converter/state.js",
+          "js/modules/unit-converter/view.js",
+          "js/modules/unit-converter/viewModel.js"
+        ],
+        "hasController": false,
+        "hasViewModel": true,
+        "hasView": true,
+        "hasResults": true,
+        "hasDynamicRenderer": false,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasSavedRecords": false,
+        "usesFocusManager": false,
+        "usesScrollManager": false,
+        "hasLiveHandlers": true,
+        "directFocusCalls": 0,
+        "directScrollCalls": 0,
+        "lineCount": 189
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "module": "ventilation",
+      "risk": "normal",
+      "signals": {
+        "files": [
+          "js/modules/ventilation/config.js",
+          "js/modules/ventilation/controller.js",
+          "js/modules/ventilation/index.js",
+          "js/modules/ventilation/logic.js",
+          "js/modules/ventilation/results.js",
+          "js/modules/ventilation/schema.js",
+          "js/modules/ventilation/state.js",
+          "js/modules/ventilation/view.js",
+          "js/modules/ventilation/viewModel.js"
+        ],
+        "hasController": true,
+        "hasViewModel": true,
+        "hasView": true,
+        "hasResults": true,
+        "hasDynamicRenderer": false,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasSavedRecords": true,
+        "usesFocusManager": false,
+        "usesScrollManager": false,
+        "hasLiveHandlers": true,
+        "directFocusCalls": 0,
+        "directScrollCalls": 0,
+        "lineCount": 463
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "module": "wastewater",
+      "risk": "high",
+      "signals": {
+        "files": [
+          "js/modules/wastewater/config.js",
+          "js/modules/wastewater/controller.js",
+          "js/modules/wastewater/index.js",
+          "js/modules/wastewater/lineModel.js",
+          "js/modules/wastewater/logic.js",
+          "js/modules/wastewater/results.js",
+          "js/modules/wastewater/schema.js",
+          "js/modules/wastewater/state.js",
+          "js/modules/wastewater/tables.js"
+        ],
+        "hasController": true,
+        "hasViewModel": false,
+        "hasView": false,
+        "hasResults": true,
+        "hasDynamicRenderer": false,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasSavedRecords": true,
+        "usesFocusManager": false,
+        "usesScrollManager": false,
+        "hasLiveHandlers": true,
+        "directFocusCalls": 0,
+        "directScrollCalls": 0,
+        "lineCount": 553
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "severityIfBroken": "P1",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "severityIfBroken": "P2",
+          "requiredEvidence": [
+            "Desktop manual pass",
+            "Mobile/responsive manual pass",
+            "Saved-record pass where supported",
+            "Regression note with exact reproduction path"
+          ],
+          "status": "planned"
+        }
+      ]
+    }
+  ],
+  "findings": {
+    "p0": [],
+    "p1": [],
+    "p2": []
+  },
+  "nextPhase": {
+    "id": "29B",
+    "title": "Modulpruefung einzeln",
+    "recommendation": "Mit den historisch risikoreichsten Modulen starten: Regenwasser, Entwaesserung, h,x, Trinkwasser."
+  }
+}
