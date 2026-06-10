@@ -54,7 +54,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-26b2a-saved-records-update-delete-fix"
+      "migrationStatus": "phase-26b3-result-renderer"
     },
     {
       "id": "pipe-sizing",

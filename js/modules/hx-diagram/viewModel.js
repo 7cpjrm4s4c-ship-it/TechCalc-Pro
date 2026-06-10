@@ -1,4 +1,5 @@
 import { calculate } from './logic.js';
+import { buildHxResultModel } from './results.js';
 
 function hasCompleteInput(s) {
   return [s.tempC, s.rhPercent, s.targetTempC, s.targetRhPercent]
@@ -10,7 +11,7 @@ export function createViewModel(s = {}) {
   const activePath = Array.isArray(s.activePath) && s.activePath.length
     ? s.activePath
     : hasCompleteInput(s) ? result.processPath : [];
-  return {
+  const vm = {
     state: s,
     result,
     activePath,
@@ -19,4 +20,6 @@ export function createViewModel(s = {}) {
     activeProcessId: s.activeProcessId || null,
     targetReached: !activePath.length || result.targetReached
   };
+  vm.resultModel = buildHxResultModel(vm);
+  return vm;
 }

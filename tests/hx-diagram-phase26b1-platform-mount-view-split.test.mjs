@@ -23,8 +23,8 @@ assert.match(view, /renderHxSvg/, 'view owns chart rendering during 26B.1');
 assert.doesNotMatch(view, /bindActions/, 'view must not own action binding');
 
 const results = fs.readFileSync(base + 'results.js', 'utf8');
-assert.match(results, /renderResultCard/, 'results must expose renderResultCard');
-assert.match(results, /mainResult/, 'results may use legacy-compatible mainResult during 26B.1');
+assert.match(results, /buildHxResultModel/, 'results must expose buildHxResultModel');
+assert.match(results, /renderHxResultModel/, 'results must expose renderHxResultModel');
 
 const dynamic = fs.readFileSync(base + 'dynamicRenderer.js', 'utf8');
 assert.match(dynamic, /updateHxDiagramDynamic/, 'dynamic renderer must be extracted');

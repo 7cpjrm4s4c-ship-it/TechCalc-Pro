@@ -1,7 +1,7 @@
 import config from './config.js';
 import { PROCESS_OPTIONS, humidityRatioKgKg } from './logic.js';
 import { createViewModel } from './viewModel.js';
-import { renderResultCard } from './results.js';
+import { renderHxResultModel } from './results.js';
 import { hxProcessCard } from './controller.js';
 import { card, field, renderModuleShell, stack, grid, esc, signedTempField } from '../../core/renderer.js';
 import { fmtInput } from '../../utils/calculations.js';
@@ -122,7 +122,7 @@ function chartCard(activePath, targetReached = true) {
 export function renderView(s) {
   const vm = createViewModel(s);
   const body = `<div class="hx-layout">
-    <div class="hx-layout__left">${stack([inputCard(s), renderResultCard(vm), hxProcessCard(vm.state)].join(''))}</div>
+    <div class="hx-layout__left">${stack([inputCard(s), renderHxResultModel(vm), hxProcessCard(vm.state)].join(''))}</div>
     <div class="hx-layout__right">${chartCard(vm.activePath, vm.targetReached)}</div>
   </div>`;
   return renderModuleShell(config, `<div class="span-12">${body}</div>`);

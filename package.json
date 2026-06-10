@@ -57,6 +57,7 @@
     "test:drinking-water-phase25e2a": "node tests/drinking-water-phase25e2a-water-heating-ui-switch.test.mjs",
     "test:drinking-water-phase25e2b": "node tests/drinking-water-phase25e2b-navigation-persistence.test.mjs",
     "test:drinking-water-phase25e2c": "node tests/drinking-water-phase25e2c-water-heating-visible-labels.test.mjs",
-    "test:drinking-water-phase25e2d": "node tests/drinking-water-phase25e2d-rainwater-segment-bridge.test.mjs"
+    "test:drinking-water-phase25e2d": "node tests/drinking-water-phase25e2d-rainwater-segment-bridge.test.mjs",
+    "test:hx-diagram-phase26b3": "node tests/hx-diagram-phase26b3-result-renderer.test.mjs"
   }
 }
