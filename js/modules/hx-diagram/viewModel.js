@@ -8,14 +8,18 @@ function hasCompleteInput(s) {
 
 export function createViewModel(s = {}) {
   const result = calculate(s);
-  const activePath = Array.isArray(s.activePath) && s.activePath.length
-    ? s.activePath
-    : hasCompleteInput(s) ? result.processPath : [];
+  const completeInput = hasCompleteInput(s);
+  // A selected saved process can carry an old persisted path in state.activePath.
+  // The visible diagram must always be a live preview of the current form values
+  // and selected air-treatment process. Persistence happens only on Update.
+  const activePath = completeInput
+    ? result.processPath
+    : Array.isArray(s.activePath) && s.activePath.length ? s.activePath : [];
   const vm = {
     state: s,
     result,
     activePath,
-    hasCompleteInput: hasCompleteInput(s),
+    hasCompleteInput: completeInput,
     processes: Array.isArray(s.savedProcesses) ? s.savedProcesses : (Array.isArray(s.processes) ? s.processes : []),
     activeProcessId: s.activeProcessId || null,
     targetReached: !activePath.length || result.targetReached

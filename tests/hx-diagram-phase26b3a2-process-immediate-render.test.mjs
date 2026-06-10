@@ -5,7 +5,13 @@ import { calculate } from '../js/modules/hx-diagram/logic.js';
 import { createViewModel } from '../js/modules/hx-diagram/viewModel.js';
 import { isDynamicHxDiagramAction, updateHxDiagramDynamic } from '../js/modules/hx-diagram/dynamicRenderer.js';
 
-assert.equal(config.migrationStatus, 'phase-26b3a2-process-immediate-render');
+const comparablePath = path => path.map(point => ({
+  label: point.label,
+  tempC: Number(point.tempC.toFixed(3)),
+  humidityRatioGkg: Number(point.humidityRatioGkg.toFixed(3))
+}));
+
+assert.ok(['phase-26b3a2-process-immediate-render', 'phase-26b3a3-enter-tab-navigation-and-live-diagram'].includes(config.migrationStatus));
 
 state.replace({
   tempC: '20',
@@ -30,8 +36,8 @@ state.set({ process: 'cool-dehumidify', activePath: nextPath, points: [] }, { ac
 
 const vm = createViewModel(state.get());
 assert.equal(vm.state.process, 'cool-dehumidify');
-assert.deepEqual(vm.activePath, nextPath);
-assert.notDeepEqual(vm.activePath, coolPath);
+assert.deepEqual(comparablePath(vm.activePath), comparablePath(nextPath));
+assert.notDeepEqual(comparablePath(vm.activePath), comparablePath(coolPath));
 
 assert.equal(isDynamicHxDiagramAction({ action: 'hx:process' }), false);
 assert.equal(isDynamicHxDiagramAction({ action: 'hx:line:update' }), false);

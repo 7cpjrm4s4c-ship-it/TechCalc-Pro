@@ -5,7 +5,7 @@ import { calculate } from '../js/modules/hx-diagram/logic.js';
 import { buildHxProcessRecord } from '../js/modules/hx-diagram/results.js';
 import { updateActiveProcessFromDialog, deleteSavedProcessById } from '../js/modules/hx-diagram/controller.js';
 
-assert.equal(['phase-26b2a-saved-records-update-delete-fix', 'phase-26b3-result-renderer', 'phase-26b3a2-process-immediate-render'].includes(config.migrationStatus), true);
+assert.equal(['phase-26b2a-saved-records-update-delete-fix', 'phase-26b3-result-renderer', 'phase-26b3a2-process-immediate-render', 'phase-26b3a3-enter-tab-navigation-and-live-diagram'].includes(config.migrationStatus), true);
 
 state.replace({
   label: 'Alt',

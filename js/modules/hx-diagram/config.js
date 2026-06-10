@@ -9,7 +9,7 @@ export default defineModuleConfig({
   order: 27,
   defaultVisible: false,
 
-  migrationStatus: 'phase-26b3a2-process-immediate-render',
+  migrationStatus: 'phase-26b3a3-enter-tab-navigation-and-live-diagram',
   capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS],
   description: 'Luftzustände, Zustandsänderungen und Verlauf im h,x-Diagramm nach Mollier.'
 });
