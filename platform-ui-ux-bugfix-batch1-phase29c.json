@@ -1,0 +1,92 @@
+{
+  "phase": "29C",
+  "title": "UI/UX Bugfix Batch 1 - P1 Stabilization",
+  "generatedAt": "2026-06-10T19:52:47.451Z",
+  "score": 5,
+  "grade": "A",
+  "summary": {
+    "checks": 6,
+    "passed": 6,
+    "failed": 0,
+    "p0": 0,
+    "p1Open": 0,
+    "p1Closed": 6,
+    "modules": [
+      "hx-diagram",
+      "rainwater",
+      "wastewater"
+    ]
+  },
+  "fixes": [
+    "Saved-record load/deselect/toggle/delete paths are protected through preserveSavedRecordMutation.",
+    "Dynamic schema island and segment re-renders preserve active field/caret and viewport.",
+    "Line-section based saved records, including h,x saved processes, use the shared scroll/focus protection."
+  ],
+  "checks": [
+    {
+      "id": "29C-P1-001",
+      "area": "platform-saved-record-scroll",
+      "severity": "P1",
+      "title": "Platform saved-record actions preserve scroll",
+      "pass": true,
+      "evidence": [
+        "moduleRuntime saved-record load/deselect/toggle/delete actions wrapped"
+      ]
+    },
+    {
+      "id": "29C-P1-002",
+      "area": "platform-dynamic-focus",
+      "severity": "P1",
+      "title": "Dynamic schema re-render preserves focus and caret",
+      "pass": true,
+      "evidence": [
+        "dynamic island/full segment renders run through preservePlatformUx"
+      ]
+    },
+    {
+      "id": "29C-P1-003",
+      "area": "line-section-scroll",
+      "severity": "P1",
+      "title": "Line-section saved records preserve scroll",
+      "pass": true,
+      "evidence": [
+        "lineSectionController persist/load/toggle operations wrapped"
+      ]
+    },
+    {
+      "id": "29C-P1-004",
+      "area": "rainwater-saved-records",
+      "severity": "P1",
+      "title": "Regenwasser saved records use platform preserved flows",
+      "pass": true,
+      "evidence": [
+        "rainwater controller exposes preserved save/load saved-record contract"
+      ]
+    },
+    {
+      "id": "29C-P1-005",
+      "area": "wastewater-saved-records",
+      "severity": "P1",
+      "title": "Entwaesserung saved records use platform preserved flows",
+      "pass": true,
+      "evidence": [
+        "wastewater controller exposes preserved save/load saved-record contract"
+      ]
+    },
+    {
+      "id": "29C-P1-006",
+      "area": "hx-line-section",
+      "severity": "P1",
+      "title": "h,x saved process flow benefits from line-section scroll protection",
+      "pass": true,
+      "evidence": [
+        "hx process controller uses shared line-section controller"
+      ]
+    }
+  ],
+  "nextPhase": {
+    "id": "29D",
+    "title": "Bugfix Batch 2: P2 Cleanup",
+    "recommendation": "Proceed with P2 cleanup sweep."
+  }
+}

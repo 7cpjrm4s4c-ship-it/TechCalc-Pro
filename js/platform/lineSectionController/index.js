@@ -1,5 +1,7 @@
 import { card, stack } from '../../core/renderer.js';
 import { registerCentralActions } from '../../core/eventPipeline.js';
+import { preserveSavedRecordMutation } from '../../core/scrollManager.js';
+import { PlatformFocusManager } from '../../core/focusManager.js';
 import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
 
 function escapeAttribute(value) {
@@ -78,8 +80,11 @@ export function createLineSectionController({
 
     const persist = (items, patch = {}, action = 'line:update') => {
       const next = Array.isArray(items) ? [...items] : [];
-      memory = next;
-      state.set({ [listKey]: next, ...patch }, { action });
+      const commit = () => {
+        memory = next;
+        state.set({ [listKey]: next, ...patch }, { action });
+      };
+      return PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(commit));
     };
 
     const shouldSkipDuplicateAction = action => {
@@ -122,11 +127,11 @@ export function createLineSectionController({
       const item = read().find(entry => isSameId(entry.id, id));
       if (!item) return;
       if (isSameId(state.get()?.[activeIdKey], id)) {
-        state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' });
+        PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' })));
         return;
       }
       const hydrated = hydrateRecord?.({ item, currentState: state.get() }) || {};
-      state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' });
+      PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' })));
     };
 
     const deleteLine = id => {
@@ -144,7 +149,7 @@ export function createLineSectionController({
       if (!id) return;
       const currentExpanded = state.get()?.[expandedIdKey];
       const willOpen = !isSameId(currentExpanded, id);
-      state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' });
+      PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' })));
     };
 
     registerCentralActions(root, {

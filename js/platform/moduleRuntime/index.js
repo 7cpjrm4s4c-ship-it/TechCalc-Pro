@@ -6,7 +6,8 @@ import { createSavedRecord, savedRecordReducer } from '../../core/savedRecordCon
 // createSavedRecordActions( remains the central action-factory contract; Phase 17C.9
 // uses the Heizung/Kälte-compatible direct binding to avoid duplicate mobile events.
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
-import { preserveScroll as keepScroll } from '../../core/scrollManager.js';
+import { preserveScroll as keepScroll, preserveSavedRecordMutation, PlatformScrollManager } from '../../core/scrollManager.js';
+import { PlatformFocusManager } from '../../core/focusManager.js';
 import { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved } from '../moduleRenderer/index.js';
 import { getRenderScheduler } from '../../core/renderScheduler.js';
 
@@ -15,6 +16,15 @@ const asFn = value => typeof value === 'function' ? value : noop;
 const array = value => Array.isArray(value) ? value : [];
 
 function preserveScroll(action) { keepScroll(action); }
+
+function preservePlatformUx(root, action, options = {}) {
+  const run = () => PlatformScrollManager.runWithoutScrollJump(action, {
+    frames: 8,
+    delays: [0, 40, 100, 220, 420],
+    ...options
+  });
+  return PlatformFocusManager.preserveFocusDuring(root || document, run, { restoreFocus: true });
+}
 
 function createNormalizedState(state, fields = []) {
   const numericFields = Array.isArray(fields) ? fields : [];
@@ -299,7 +309,7 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     const current = state.get();
     const record = createRecord(current);
     const patch = typeof savedConfig.afterCreatePatch === 'function' ? savedConfig.afterCreatePatch(current, record) : {};
-    preserveScroll(() => setReduced(current, { action: 'create', record, patch }, 'line:save'));
+    preserveSavedRecordMutation(() => setReduced(current, { action: 'create', record, patch }, 'line:save'));
   };
 
   const update = ({ root: actionRoot } = {}) => {
@@ -312,7 +322,7 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     const existing = list(current).find(item => String(item.id) === String(id));
     if (!existing) return;
     const record = createRecord(current, existing);
-    preserveScroll(() => setReduced(current, { action: 'update', id, record }, 'line:update'));
+    preserveSavedRecordMutation(() => setReduced(current, { action: 'update', id, record }, 'line:update'));
   };
 
   const readId = element => readRecordIdFromElement(element, { loadAttr, toggleAttr, deleteAttr });
@@ -323,27 +333,27 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     const item = list(current).find(entry => String(entry.id) === String(id));
     if (!item) return;
     if (String(current?.[savedConfig.activeIdKey] || '') === String(id)) {
-      state.set({
+      preserveSavedRecordMutation(() => state.set({
         [savedConfig.activeIdKey]: null,
         ...(savedConfig.nameKey ? { [savedConfig.nameKey]: '' } : {})
-      }, { action: 'line:deselect' });
+      }, { action: 'line:deselect' }));
       return;
     }
     const patch = typeof savedConfig.hydrate === 'function' ? savedConfig.hydrate(item, current) : { ...(item.state || item.inputState || item) };
-    setReduced(current, { action: 'load', id: item.id, record: item, patch }, 'line:select');
+    preserveSavedRecordMutation(() => setReduced(current, { action: 'load', id: item.id, record: item, patch }, 'line:select'));
   };
 
   const remove = ({ element } = {}) => {
     const id = readId(element);
     const current = state.get();
     const patch = typeof savedConfig.clear === 'function' && String(current?.[savedConfig.activeIdKey] || '') === String(id) ? savedConfig.clear(current) : {};
-    preserveScroll(() => setReduced(current, { action: 'delete', id, patch }, 'line:delete'));
+    preserveSavedRecordMutation(() => setReduced(current, { action: 'delete', id, patch }, 'line:delete'));
   };
 
   const toggle = ({ element } = {}) => {
     const id = readId(element);
     const current = state.get();
-    setReduced(current, { action: 'toggle-expanded', id }, 'line:toggle');
+    preserveSavedRecordMutation(() => setReduced(current, { action: 'toggle-expanded', id }, 'line:toggle'));
   };
 
   // Heizung/Kälte parity: saved-record panels are controlled exclusively by the
@@ -460,10 +470,12 @@ export function createPlatformModule(definition = {}) {
     // the platform equivalent is a synchronous full platform-view rebuild for
     // segment commits, followed by rebinding the platform action map.
     if (isSegmentUpdate) {
-      const nextView = view(runtimeState.get());
-      if (root.innerHTML !== nextView) root.innerHTML = nextView;
-      root.__tcPlatformLastDynamicUpdate = { ...(meta || {}), full: true, at: Date.now() };
-      bindPlatformActions(root);
+      preservePlatformUx(root, () => {
+        const nextView = view(runtimeState.get());
+        if (root.innerHTML !== nextView) root.innerHTML = nextView;
+        root.__tcPlatformLastDynamicUpdate = { ...(meta || {}), full: true, at: Date.now() };
+        bindPlatformActions(root);
+      });
       return true;
     }
 
@@ -471,15 +483,17 @@ export function createPlatformModule(definition = {}) {
     const sideHost = root.querySelector?.('[data-platform-dynamic="result-saved"]');
     if (!formHost && !sideHost) return false;
     const model = buildRenderModel(runtimeState.get());
-    if (formHost) {
-      const nextForm = renderPlatformForm(model);
-      if (formHost.innerHTML !== nextForm) formHost.innerHTML = nextForm;
-    }
-    if (sideHost) {
-      const nextSide = renderPlatformResultsAndSaved(model);
-      if (sideHost.innerHTML !== nextSide) sideHost.innerHTML = nextSide;
-    }
-    root.__tcPlatformLastDynamicUpdate = { ...(meta || {}), at: Date.now() };
+    preservePlatformUx(root, () => {
+      if (formHost) {
+        const nextForm = renderPlatformForm(model);
+        if (formHost.innerHTML !== nextForm) formHost.innerHTML = nextForm;
+      }
+      if (sideHost) {
+        const nextSide = renderPlatformResultsAndSaved(model);
+        if (sideHost.innerHTML !== nextSide) sideHost.innerHTML = nextSide;
+      }
+      root.__tcPlatformLastDynamicUpdate = { ...(meta || {}), at: Date.now() };
+    });
     return true;
   }
 
