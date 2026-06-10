@@ -88,6 +88,8 @@
     "audit:scroll-saved-records": "node scripts/audit-scroll-saved-records-phase28a3.mjs",
     "test:platform-scroll-phase28a3": "node tests/platform-scroll-saved-records-phase28a3.test.mjs",
     "audit:scroll-module-switch": "node scripts/audit-scroll-module-switch-phase28a4.mjs",
-    "test:platform-scroll-phase28a4": "node tests/platform-scroll-module-switch-phase28a4.test.mjs"
+    "test:platform-scroll-phase28a4": "node tests/platform-scroll-module-switch-phase28a4.test.mjs",
+    "audit:focus-service": "node scripts/audit-focus-service-phase28b1.mjs",
+    "test:platform-focus-phase28b1": "node tests/platform-focus-service-phase28b1.test.mjs"
   }
 }

@@ -1,0 +1,97 @@
+{
+  "phase": "28B.1",
+  "name": "Platform Focus Service Foundation",
+  "generatedAt": "2026-06-10T16:49:56.878Z",
+  "overallScore": 5,
+  "overallGrade": "A",
+  "executiveSummary": {
+    "p0": [],
+    "p1": [],
+    "p2": [
+      {
+        "area": "enterTabNavigation",
+        "risk": "P2",
+        "action": "Enter-/Tab-Navigation bleibt absichtlich Scope von 28B.2/28B.3.",
+        "evidence": [
+          "js/core/eventPipeline.js"
+        ]
+      },
+      {
+        "area": "modalFocusRestore",
+        "risk": "P2",
+        "action": "Dialog-/Menue-Fokuspfade in 28B.4 gegen Dynamic Inputs haerten.",
+        "evidence": [
+          {
+            "path": "js/core/app.js",
+            "focusCalls": 1,
+            "usesFocusManager": false
+          }
+        ]
+      }
+    ],
+    "conclusion": "Der zentrale PlatformFocusManager ist eingefuehrt. Core-Fokuspfade fuer Render-Restore, Modul-Mount und naechstes Plattformfeld sind gekapselt; Navigationssemantik folgt in 28B.2/28B.3."
+  },
+  "api": {
+    "safeFocus": true,
+    "restoreFocus": true,
+    "blurActiveElement": true,
+    "getFocusableElements": true,
+    "getPlatformFields": true,
+    "focusNext": true,
+    "platformObject": true
+  },
+  "apiCoverage": 1,
+  "coreAdapters": {
+    "domUpdate": true,
+    "moduleRuntime": true,
+    "eventPipeline": true
+  },
+  "coreAdapterCoverage": 1,
+  "directModuleFocusFiles": [],
+  "coreFocusOccurrences": [
+    {
+      "path": "js/core/app.js",
+      "focusCalls": 1,
+      "usesFocusManager": false
+    },
+    {
+      "path": "js/core/focusManager.js",
+      "focusCalls": 2,
+      "usesFocusManager": true
+    },
+    {
+      "path": "js/core/pdfExport.js",
+      "focusCalls": 2,
+      "usesFocusManager": false
+    }
+  ],
+  "acceptance": {
+    "explicitServiceContract": true,
+    "coreRestoreFocusEncapsulated": true,
+    "enterFieldFocusDelegatesToService": true,
+    "moduleDirectFocusCallsEncapsulated": true,
+    "enterTabImplementationDeferred": true
+  },
+  "findings": [
+    {
+      "area": "enterTabNavigation",
+      "risk": "P2",
+      "action": "Enter-/Tab-Navigation bleibt absichtlich Scope von 28B.2/28B.3.",
+      "evidence": [
+        "js/core/eventPipeline.js"
+      ]
+    },
+    {
+      "area": "modalFocusRestore",
+      "risk": "P2",
+      "action": "Dialog-/Menue-Fokuspfade in 28B.4 gegen Dynamic Inputs haerten.",
+      "evidence": [
+        {
+          "path": "js/core/app.js",
+          "focusCalls": 1,
+          "usesFocusManager": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import { hardResetModuleRoot } from './moduleLifecycleAdapter.js';
 import { preserveModuleSwitchScroll } from './scrollManager.js';
+import { restoreFocus as restorePlatformFocus } from './focusManager.js';
 
 const DEFAULT_MOUNT_TIMEOUT_MS = 7000;
 
@@ -120,7 +121,7 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
       bubbles: false,
       detail: { moduleId, token }
     }));
-    try { root.focus({ preventScroll: true }); } catch { /* optional */ }
+    restorePlatformFocus(root, { select: false });
     return true;
   }
 

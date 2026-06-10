@@ -1,3 +1,4 @@
+import { focusNext as focusNextPlatform, safeFocus as safePlatformFocus } from './focusManager.js';
 const DEFAULT_INTERACTIVE_SELECTOR = '[data-field], input, select, textarea, button, a, summary, [role="button"], [data-line-card], [data-saved-record-card], .saved-record-card, .segmented, [data-tc-action]';
 
 function readElementValue(el) {
@@ -187,25 +188,8 @@ function wasPointerActionSuppressed(root) {
 
 
 function focusNextPlatformField(root, current) {
-  if (!root || !current?.matches?.('[data-field]')) return;
-  const selector = 'input[data-field]:not([type="hidden"]):not([disabled]), textarea[data-field]:not([disabled]), select[data-field]:not([disabled])';
-  const fields = [...root.querySelectorAll(selector)].filter(el => {
-    if (el.tabIndex < 0) return false;
-    const style = typeof getComputedStyle === 'function' ? getComputedStyle(el) : null;
-    return !style || (style.display !== 'none' && style.visibility !== 'hidden');
-  });
-  if (!fields.length) return;
-  const index = fields.indexOf(current);
-  const next = fields[index >= 0 ? index + 1 : 0];
-  if (!next) return;
-  const applyFocus = () => {
-    try { next.focus({ preventScroll: true }); } catch { try { next.focus(); } catch { /* ignore */ } }
-    if (typeof next.select === 'function' && next.tagName !== 'SELECT') {
-      try { next.select(); } catch { /* ignore */ }
-    }
-  };
-  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(applyFocus);
-  else setTimeout(applyFocus, 0);
+  if (!root || !current?.matches?.('[data-field]')) return false;
+  return focusNextPlatform(root, current, { select: true });
 }
 
 export function bindCentralEventPipeline(root, state, options = {}) {
