@@ -1,0 +1,1705 @@
+{
+  "phase": "29B",
+  "title": "Module-wide UI/UX Module Review",
+  "generatedAt": "2026-06-10T18:39:13.169Z",
+  "score": 4.16,
+  "grade": "B",
+  "summary": {
+    "modules": 11,
+    "axes": 10,
+    "totalChecks": 110,
+    "pass": 68,
+    "review": 40,
+    "fail": 0,
+    "notApplicable": 2,
+    "p0": 0,
+    "p1": 9,
+    "p2": 22,
+    "p3": 9,
+    "highRiskModules": [
+      "drinking-water",
+      "hx-diagram",
+      "rainwater",
+      "wastewater"
+    ],
+    "referenceModules": [
+      "buffer-storage",
+      "heat-recovery",
+      "hx-diagram"
+    ]
+  },
+  "severityRules": {
+    "P0": "Blockiert produktive Nutzung, Datenverlust, nicht ladbares Modul oder vollstaendig falscher Ergebniszustand.",
+    "P1": "Kern-UX oder Rechenfluss gestoert: Eingabe, Saved Records, Fokus/Scroll, Live-Rendering oder Ergebnisanzeige.",
+    "P2": "Nicht blockierende Inkonsistenz: Layout, Labels, Edge Cases, mobile Detailfehler, kosmetische Validierung.",
+    "P3": "Kosmetik, Text, optionale Verbesserung ohne Workflow-Auswirkung."
+  },
+  "moduleReviews": [
+    {
+      "module": "buffer-storage",
+      "risk": "reference",
+      "score": 4.1,
+      "grade": "B",
+      "summary": {
+        "pass": 6,
+        "review": 4,
+        "fail": 0,
+        "notApplicable": 0
+      },
+      "signals": {
+        "files": [
+          "js/modules/buffer-storage/config.js",
+          "js/modules/buffer-storage/controller.js",
+          "js/modules/buffer-storage/index.js",
+          "js/modules/buffer-storage/logic.js",
+          "js/modules/buffer-storage/results.js",
+          "js/modules/buffer-storage/schema.js",
+          "js/modules/buffer-storage/state.js",
+          "js/modules/buffer-storage/view.js",
+          "js/modules/buffer-storage/viewModel.js"
+        ],
+        "fileNames": [
+          "config.js",
+          "controller.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "hasController": true,
+        "hasView": true,
+        "hasViewModel": true,
+        "hasResults": true,
+        "hasDynamicRenderer": false,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasTables": false,
+        "usesPlatformModule": true,
+        "usesFocusManager": false,
+        "usesScrollManager": false,
+        "usesNumberService": true,
+        "hasSavedRecords": true,
+        "hasLiveRendering": true,
+        "hasResetHandling": false,
+        "hasErrorHandling": true,
+        "directScrollCalls": 0,
+        "directFocusCalls": 0,
+        "directStorageCalls": 0,
+        "lineCount": 568
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "No module-level FocusManager signal"
+          ]
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "No module-level FocusManager signal"
+          ]
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "Direct scroll calls: 0"
+          ]
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Saved-record surface detected"
+          ]
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Live handlers inferred from controller/source"
+          ]
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Number/locale service signal present"
+          ]
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "results.js present"
+          ]
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "status": "review",
+          "severity": "P3",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "module": "drinking-water",
+      "risk": "high",
+      "score": 4.78,
+      "grade": "A",
+      "summary": {
+        "pass": 9,
+        "review": 1,
+        "fail": 0,
+        "notApplicable": 0
+      },
+      "signals": {
+        "files": [
+          "js/modules/drinking-water/config.js",
+          "js/modules/drinking-water/controller.js",
+          "js/modules/drinking-water/dynamicRenderer.js",
+          "js/modules/drinking-water/index.js",
+          "js/modules/drinking-water/logic.js",
+          "js/modules/drinking-water/results.js",
+          "js/modules/drinking-water/schema.js",
+          "js/modules/drinking-water/state.js",
+          "js/modules/drinking-water/view.js",
+          "js/modules/drinking-water/viewModel.js"
+        ],
+        "fileNames": [
+          "config.js",
+          "controller.js",
+          "dynamicRenderer.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "hasController": true,
+        "hasView": true,
+        "hasViewModel": true,
+        "hasResults": true,
+        "hasDynamicRenderer": true,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasTables": false,
+        "usesPlatformModule": true,
+        "usesFocusManager": true,
+        "usesScrollManager": true,
+        "usesNumberService": true,
+        "hasSavedRecords": true,
+        "hasLiveRendering": true,
+        "hasResetHandling": true,
+        "hasErrorHandling": false,
+        "directScrollCalls": 0,
+        "directFocusCalls": 0,
+        "directStorageCalls": 0,
+        "lineCount": 1144
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "FocusManager signal present"
+          ]
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "FocusManager signal present"
+          ]
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "ScrollManager signal present"
+          ]
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Saved-record surface detected"
+          ]
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Dedicated dynamic/render pipeline present"
+          ]
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Number/locale service signal present"
+          ]
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "results.js present"
+          ]
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "status": "review",
+          "severity": "P3",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "module": "heat-recovery",
+      "risk": "reference",
+      "score": 4.33,
+      "grade": "B",
+      "summary": {
+        "pass": 7,
+        "review": 3,
+        "fail": 0,
+        "notApplicable": 0
+      },
+      "signals": {
+        "files": [
+          "js/modules/heat-recovery/config.js",
+          "js/modules/heat-recovery/controller.js",
+          "js/modules/heat-recovery/dynamicRenderer.js",
+          "js/modules/heat-recovery/index.js",
+          "js/modules/heat-recovery/logic.js",
+          "js/modules/heat-recovery/results.js",
+          "js/modules/heat-recovery/schema.js",
+          "js/modules/heat-recovery/state.js",
+          "js/modules/heat-recovery/view.js",
+          "js/modules/heat-recovery/viewModel.js"
+        ],
+        "fileNames": [
+          "config.js",
+          "controller.js",
+          "dynamicRenderer.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "hasController": true,
+        "hasView": true,
+        "hasViewModel": true,
+        "hasResults": true,
+        "hasDynamicRenderer": true,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasTables": false,
+        "usesPlatformModule": true,
+        "usesFocusManager": true,
+        "usesScrollManager": false,
+        "usesNumberService": false,
+        "hasSavedRecords": true,
+        "hasLiveRendering": true,
+        "hasResetHandling": false,
+        "hasErrorHandling": true,
+        "directScrollCalls": 0,
+        "directFocusCalls": 0,
+        "directStorageCalls": 0,
+        "lineCount": 752
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "FocusManager signal present"
+          ]
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "FocusManager signal present"
+          ]
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "Direct scroll calls: 0"
+          ]
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Saved-record surface detected"
+          ]
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Dedicated dynamic/render pipeline present"
+          ]
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "status": "review",
+          "severity": "P3",
+          "evidence": [
+            "Manual locale check required"
+          ]
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "results.js present"
+          ]
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "status": "review",
+          "severity": "P3",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "module": "heating-cooling",
+      "risk": "normal",
+      "score": 4,
+      "grade": "B",
+      "summary": {
+        "pass": 5,
+        "review": 4,
+        "fail": 0,
+        "notApplicable": 1
+      },
+      "signals": {
+        "files": [
+          "js/modules/heating-cooling/config.js",
+          "js/modules/heating-cooling/controller.js",
+          "js/modules/heating-cooling/index.js",
+          "js/modules/heating-cooling/logic.js",
+          "js/modules/heating-cooling/results.js",
+          "js/modules/heating-cooling/schema.js",
+          "js/modules/heating-cooling/state.js",
+          "js/modules/heating-cooling/view.js",
+          "js/modules/heating-cooling/viewModel.js"
+        ],
+        "fileNames": [
+          "config.js",
+          "controller.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "hasController": true,
+        "hasView": true,
+        "hasViewModel": true,
+        "hasResults": true,
+        "hasDynamicRenderer": false,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasTables": false,
+        "usesPlatformModule": true,
+        "usesFocusManager": false,
+        "usesScrollManager": false,
+        "usesNumberService": true,
+        "hasSavedRecords": false,
+        "hasLiveRendering": true,
+        "hasResetHandling": false,
+        "hasErrorHandling": true,
+        "directScrollCalls": 0,
+        "directFocusCalls": 0,
+        "directStorageCalls": 0,
+        "lineCount": 593
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "No module-level FocusManager signal"
+          ]
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "No module-level FocusManager signal"
+          ]
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "Direct scroll calls: 0"
+          ]
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "status": "not-applicable",
+          "severity": null,
+          "evidence": [
+            "No saved-record surface detected"
+          ]
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Live handlers inferred from controller/source"
+          ]
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Number/locale service signal present"
+          ]
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "results.js present"
+          ]
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "status": "review",
+          "severity": "P3",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "module": "hx-diagram",
+      "risk": "reference",
+      "score": 4.78,
+      "grade": "A",
+      "summary": {
+        "pass": 9,
+        "review": 1,
+        "fail": 0,
+        "notApplicable": 0
+      },
+      "signals": {
+        "files": [
+          "js/modules/hx-diagram/config.js",
+          "js/modules/hx-diagram/controller.js",
+          "js/modules/hx-diagram/diagramRenderer.js",
+          "js/modules/hx-diagram/dynamicRenderer.js",
+          "js/modules/hx-diagram/formRenderer.js",
+          "js/modules/hx-diagram/index.js",
+          "js/modules/hx-diagram/logic.js",
+          "js/modules/hx-diagram/renderPipeline.js",
+          "js/modules/hx-diagram/results.js",
+          "js/modules/hx-diagram/schema.js",
+          "js/modules/hx-diagram/state.js",
+          "js/modules/hx-diagram/view.js",
+          "js/modules/hx-diagram/viewModel.js"
+        ],
+        "fileNames": [
+          "config.js",
+          "controller.js",
+          "diagramRenderer.js",
+          "dynamicRenderer.js",
+          "formRenderer.js",
+          "index.js",
+          "logic.js",
+          "renderPipeline.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "hasController": true,
+        "hasView": true,
+        "hasViewModel": true,
+        "hasResults": true,
+        "hasDynamicRenderer": true,
+        "hasRenderPipeline": true,
+        "hasDiagramRenderer": true,
+        "hasTables": false,
+        "usesPlatformModule": true,
+        "usesFocusManager": true,
+        "usesScrollManager": false,
+        "usesNumberService": true,
+        "hasSavedRecords": true,
+        "hasLiveRendering": true,
+        "hasResetHandling": true,
+        "hasErrorHandling": true,
+        "directScrollCalls": 0,
+        "directFocusCalls": 0,
+        "directStorageCalls": 0,
+        "lineCount": 977
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "FocusManager signal present"
+          ]
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "FocusManager signal present"
+          ]
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "status": "review",
+          "severity": "P1",
+          "evidence": [
+            "Direct scroll calls: 0"
+          ]
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Saved-record surface detected"
+          ]
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Dedicated dynamic/render pipeline present"
+          ]
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Number/locale service signal present"
+          ]
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "results.js present"
+          ]
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "module": "pipe-sizing",
+      "risk": "normal",
+      "score": 3.88,
+      "grade": "C",
+      "summary": {
+        "pass": 5,
+        "review": 5,
+        "fail": 0,
+        "notApplicable": 0
+      },
+      "signals": {
+        "files": [
+          "js/modules/pipe-sizing/config.js",
+          "js/modules/pipe-sizing/controller.js",
+          "js/modules/pipe-sizing/index.js",
+          "js/modules/pipe-sizing/logic.js",
+          "js/modules/pipe-sizing/results.js",
+          "js/modules/pipe-sizing/schema.js",
+          "js/modules/pipe-sizing/state.js",
+          "js/modules/pipe-sizing/view.js",
+          "js/modules/pipe-sizing/viewModel.js"
+        ],
+        "fileNames": [
+          "config.js",
+          "controller.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "hasController": true,
+        "hasView": true,
+        "hasViewModel": true,
+        "hasResults": true,
+        "hasDynamicRenderer": false,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasTables": false,
+        "usesPlatformModule": true,
+        "usesFocusManager": false,
+        "usesScrollManager": false,
+        "usesNumberService": false,
+        "hasSavedRecords": true,
+        "hasLiveRendering": true,
+        "hasResetHandling": false,
+        "hasErrorHandling": false,
+        "directScrollCalls": 0,
+        "directFocusCalls": 0,
+        "directStorageCalls": 0,
+        "lineCount": 328
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "No module-level FocusManager signal"
+          ]
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "No module-level FocusManager signal"
+          ]
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "Direct scroll calls: 0"
+          ]
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Saved-record surface detected"
+          ]
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Live handlers inferred from controller/source"
+          ]
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "status": "review",
+          "severity": "P3",
+          "evidence": [
+            "Manual locale check required"
+          ]
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "results.js present"
+          ]
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "status": "review",
+          "severity": "P3",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "module": "pressure-holding",
+      "risk": "normal",
+      "score": 4.33,
+      "grade": "B",
+      "summary": {
+        "pass": 7,
+        "review": 3,
+        "fail": 0,
+        "notApplicable": 0
+      },
+      "signals": {
+        "files": [
+          "js/modules/pressure-holding/config.js",
+          "js/modules/pressure-holding/controller.js",
+          "js/modules/pressure-holding/index.js",
+          "js/modules/pressure-holding/logic.js",
+          "js/modules/pressure-holding/results.js",
+          "js/modules/pressure-holding/schema.js",
+          "js/modules/pressure-holding/state.js",
+          "js/modules/pressure-holding/view.js",
+          "js/modules/pressure-holding/viewModel.js"
+        ],
+        "fileNames": [
+          "config.js",
+          "controller.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "hasController": true,
+        "hasView": true,
+        "hasViewModel": true,
+        "hasResults": true,
+        "hasDynamicRenderer": false,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasTables": false,
+        "usesPlatformModule": true,
+        "usesFocusManager": false,
+        "usesScrollManager": false,
+        "usesNumberService": true,
+        "hasSavedRecords": true,
+        "hasLiveRendering": true,
+        "hasResetHandling": true,
+        "hasErrorHandling": true,
+        "directScrollCalls": 0,
+        "directFocusCalls": 0,
+        "directStorageCalls": 0,
+        "lineCount": 504
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "No module-level FocusManager signal"
+          ]
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "No module-level FocusManager signal"
+          ]
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "Direct scroll calls: 0"
+          ]
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Saved-record surface detected"
+          ]
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Live handlers inferred from controller/source"
+          ]
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Number/locale service signal present"
+          ]
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "results.js present"
+          ]
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "module": "rainwater",
+      "risk": "high",
+      "score": 3.88,
+      "grade": "C",
+      "summary": {
+        "pass": 5,
+        "review": 5,
+        "fail": 0,
+        "notApplicable": 0
+      },
+      "signals": {
+        "files": [
+          "js/modules/rainwater/config.js",
+          "js/modules/rainwater/controller.js",
+          "js/modules/rainwater/index.js",
+          "js/modules/rainwater/logic.js",
+          "js/modules/rainwater/results.js",
+          "js/modules/rainwater/schema.js",
+          "js/modules/rainwater/state.js",
+          "js/modules/rainwater/tables.js"
+        ],
+        "fileNames": [
+          "config.js",
+          "controller.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "tables.js"
+        ],
+        "hasController": true,
+        "hasView": false,
+        "hasViewModel": false,
+        "hasResults": true,
+        "hasDynamicRenderer": false,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasTables": true,
+        "usesPlatformModule": true,
+        "usesFocusManager": false,
+        "usesScrollManager": false,
+        "usesNumberService": true,
+        "hasSavedRecords": true,
+        "hasLiveRendering": true,
+        "hasResetHandling": true,
+        "hasErrorHandling": true,
+        "directScrollCalls": 0,
+        "directFocusCalls": 0,
+        "directStorageCalls": 0,
+        "lineCount": 840
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "No module-level FocusManager signal"
+          ]
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "status": "review",
+          "severity": "P1",
+          "evidence": [
+            "No module-level FocusManager signal"
+          ]
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "status": "review",
+          "severity": "P1",
+          "evidence": [
+            "Direct scroll calls: 0"
+          ]
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "status": "review",
+          "severity": "P1",
+          "evidence": [
+            "Saved-record surface detected"
+          ]
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "status": "review",
+          "severity": "P1",
+          "evidence": [
+            "Live handlers inferred from controller/source"
+          ]
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Number/locale service signal present"
+          ]
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "results.js present"
+          ]
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "module": "unit-converter",
+      "risk": "normal",
+      "score": 3.77,
+      "grade": "C",
+      "summary": {
+        "pass": 4,
+        "review": 5,
+        "fail": 0,
+        "notApplicable": 1
+      },
+      "signals": {
+        "files": [
+          "js/modules/unit-converter/config.js",
+          "js/modules/unit-converter/index.js",
+          "js/modules/unit-converter/logic.js",
+          "js/modules/unit-converter/results.js",
+          "js/modules/unit-converter/schema.js",
+          "js/modules/unit-converter/state.js",
+          "js/modules/unit-converter/view.js",
+          "js/modules/unit-converter/viewModel.js"
+        ],
+        "fileNames": [
+          "config.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "hasController": false,
+        "hasView": true,
+        "hasViewModel": true,
+        "hasResults": true,
+        "hasDynamicRenderer": false,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasTables": false,
+        "usesPlatformModule": true,
+        "usesFocusManager": false,
+        "usesScrollManager": false,
+        "usesNumberService": false,
+        "hasSavedRecords": false,
+        "hasLiveRendering": true,
+        "hasResetHandling": false,
+        "hasErrorHandling": false,
+        "directScrollCalls": 0,
+        "directFocusCalls": 0,
+        "directStorageCalls": 0,
+        "lineCount": 189
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "status": "review",
+          "severity": "P2",
+          "evidence": []
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "No module-level FocusManager signal"
+          ]
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "No module-level FocusManager signal"
+          ]
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "Direct scroll calls: 0"
+          ]
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "status": "not-applicable",
+          "severity": null,
+          "evidence": [
+            "No saved-record surface detected"
+          ]
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Live handlers inferred from controller/source"
+          ]
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Manual locale check required"
+          ]
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "results.js present"
+          ]
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "status": "review",
+          "severity": "P3",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "module": "ventilation",
+      "risk": "normal",
+      "score": 4.1,
+      "grade": "B",
+      "summary": {
+        "pass": 6,
+        "review": 4,
+        "fail": 0,
+        "notApplicable": 0
+      },
+      "signals": {
+        "files": [
+          "js/modules/ventilation/config.js",
+          "js/modules/ventilation/controller.js",
+          "js/modules/ventilation/index.js",
+          "js/modules/ventilation/logic.js",
+          "js/modules/ventilation/results.js",
+          "js/modules/ventilation/schema.js",
+          "js/modules/ventilation/state.js",
+          "js/modules/ventilation/view.js",
+          "js/modules/ventilation/viewModel.js"
+        ],
+        "fileNames": [
+          "config.js",
+          "controller.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "hasController": true,
+        "hasView": true,
+        "hasViewModel": true,
+        "hasResults": true,
+        "hasDynamicRenderer": false,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasTables": false,
+        "usesPlatformModule": true,
+        "usesFocusManager": false,
+        "usesScrollManager": false,
+        "usesNumberService": true,
+        "hasSavedRecords": true,
+        "hasLiveRendering": true,
+        "hasResetHandling": false,
+        "hasErrorHandling": true,
+        "directScrollCalls": 0,
+        "directFocusCalls": 0,
+        "directStorageCalls": 0,
+        "lineCount": 463
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "No module-level FocusManager signal"
+          ]
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "No module-level FocusManager signal"
+          ]
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "Direct scroll calls: 0"
+          ]
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Saved-record surface detected"
+          ]
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Live handlers inferred from controller/source"
+          ]
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Number/locale service signal present"
+          ]
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "results.js present"
+          ]
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "status": "review",
+          "severity": "P3",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "module": "wastewater",
+      "risk": "high",
+      "score": 3.88,
+      "grade": "C",
+      "summary": {
+        "pass": 5,
+        "review": 5,
+        "fail": 0,
+        "notApplicable": 0
+      },
+      "signals": {
+        "files": [
+          "js/modules/wastewater/config.js",
+          "js/modules/wastewater/controller.js",
+          "js/modules/wastewater/index.js",
+          "js/modules/wastewater/lineModel.js",
+          "js/modules/wastewater/logic.js",
+          "js/modules/wastewater/results.js",
+          "js/modules/wastewater/schema.js",
+          "js/modules/wastewater/state.js",
+          "js/modules/wastewater/tables.js"
+        ],
+        "fileNames": [
+          "config.js",
+          "controller.js",
+          "index.js",
+          "lineModel.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "tables.js"
+        ],
+        "hasController": true,
+        "hasView": false,
+        "hasViewModel": false,
+        "hasResults": true,
+        "hasDynamicRenderer": false,
+        "hasRenderPipeline": false,
+        "hasDiagramRenderer": false,
+        "hasTables": true,
+        "usesPlatformModule": true,
+        "usesFocusManager": false,
+        "usesScrollManager": false,
+        "usesNumberService": true,
+        "hasSavedRecords": true,
+        "hasLiveRendering": true,
+        "hasResetHandling": true,
+        "hasErrorHandling": true,
+        "directScrollCalls": 0,
+        "directFocusCalls": 0,
+        "directStorageCalls": 0,
+        "lineCount": 553
+      },
+      "checks": [
+        {
+          "axis": "input-confirmation",
+          "label": "Eingabe und automatische Bestaetigung",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "enter-tab-navigation",
+          "label": "Enter/Tab/Shift+Tab Navigation",
+          "status": "review",
+          "severity": "P2",
+          "evidence": [
+            "No module-level FocusManager signal"
+          ]
+        },
+        {
+          "axis": "focus-restore",
+          "label": "Fokus- und Caret-Restore nach Re-Render",
+          "status": "review",
+          "severity": "P1",
+          "evidence": [
+            "No module-level FocusManager signal"
+          ]
+        },
+        {
+          "axis": "scroll-stability",
+          "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+          "status": "review",
+          "severity": "P1",
+          "evidence": [
+            "Direct scroll calls: 0"
+          ]
+        },
+        {
+          "axis": "saved-records",
+          "label": "Saved Records: save/load/update/delete/expand/collapse",
+          "status": "review",
+          "severity": "P1",
+          "evidence": [
+            "Saved-record surface detected"
+          ]
+        },
+        {
+          "axis": "live-rendering",
+          "label": "Live-Rendering ohne Aktualisieren-Zwang",
+          "status": "review",
+          "severity": "P1",
+          "evidence": [
+            "Live handlers inferred from controller/source"
+          ]
+        },
+        {
+          "axis": "unit-switching",
+          "label": "Einheitenwechsel und deutsche Zahlformate",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "Number/locale service signal present"
+          ]
+        },
+        {
+          "axis": "result-rendering",
+          "label": "Ergebnisanzeige, Plausibilitaet und leere Zustaende",
+          "status": "pass",
+          "severity": null,
+          "evidence": [
+            "results.js present"
+          ]
+        },
+        {
+          "axis": "responsive-layout",
+          "label": "Desktop/Mobile Layout und Touch-Ziele",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        },
+        {
+          "axis": "error-reset-states",
+          "label": "Fehlermeldungen, Reset und Default-State",
+          "status": "pass",
+          "severity": null,
+          "evidence": []
+        }
+      ]
+    }
+  ],
+  "findings": {
+    "p0": [],
+    "p1": [
+      "hx-diagram: scroll-stability -> review (P1)",
+      "rainwater: focus-restore -> review (P1)",
+      "rainwater: scroll-stability -> review (P1)",
+      "rainwater: saved-records -> review (P1)",
+      "rainwater: live-rendering -> review (P1)",
+      "wastewater: focus-restore -> review (P1)",
+      "wastewater: scroll-stability -> review (P1)",
+      "wastewater: saved-records -> review (P1)",
+      "wastewater: live-rendering -> review (P1)"
+    ],
+    "p2": [
+      "buffer-storage: enter-tab-navigation -> review (P2)",
+      "buffer-storage: focus-restore -> review (P2)",
+      "buffer-storage: scroll-stability -> review (P2)",
+      "heat-recovery: scroll-stability -> review (P2)",
+      "heating-cooling: enter-tab-navigation -> review (P2)",
+      "heating-cooling: focus-restore -> review (P2)",
+      "heating-cooling: scroll-stability -> review (P2)",
+      "pipe-sizing: enter-tab-navigation -> review (P2)",
+      "pipe-sizing: focus-restore -> review (P2)",
+      "pipe-sizing: scroll-stability -> review (P2)",
+      "pressure-holding: enter-tab-navigation -> review (P2)",
+      "pressure-holding: focus-restore -> review (P2)",
+      "pressure-holding: scroll-stability -> review (P2)",
+      "rainwater: enter-tab-navigation -> review (P2)",
+      "unit-converter: input-confirmation -> review (P2)",
+      "unit-converter: enter-tab-navigation -> review (P2)",
+      "unit-converter: focus-restore -> review (P2)",
+      "unit-converter: scroll-stability -> review (P2)",
+      "ventilation: enter-tab-navigation -> review (P2)",
+      "ventilation: focus-restore -> review (P2)",
+      "ventilation: scroll-stability -> review (P2)",
+      "wastewater: enter-tab-navigation -> review (P2)"
+    ],
+    "p3": [
+      "buffer-storage: error-reset-states -> review (P3)",
+      "drinking-water: error-reset-states -> review (P3)",
+      "heat-recovery: unit-switching -> review (P3)",
+      "heat-recovery: error-reset-states -> review (P3)",
+      "heating-cooling: error-reset-states -> review (P3)",
+      "pipe-sizing: unit-switching -> review (P3)",
+      "pipe-sizing: error-reset-states -> review (P3)",
+      "unit-converter: error-reset-states -> review (P3)",
+      "ventilation: error-reset-states -> review (P3)"
+    ]
+  },
+  "remediationBacklog": [
+    {
+      "id": "29C-P1-001",
+      "priority": "P1",
+      "title": "High-risk module manual UX verification",
+      "modules": [
+        "drinking-water",
+        "rainwater",
+        "wastewater"
+      ],
+      "scope": "Saved Records, live rendering, focus restore and scroll stability must be manually replayed before bugfix batching."
+    },
+    {
+      "id": "29C-P1-002",
+      "priority": "P1",
+      "title": "Legacy surface review for Regenwasser and Entwaesserung",
+      "modules": [
+        "rainwater",
+        "wastewater"
+      ],
+      "scope": "Review table/result surfaces and saved-record flows because these modules still expose legacy rendering surfaces."
+    },
+    {
+      "id": "29D-P2-001",
+      "priority": "P2",
+      "title": "Locale/unit switching manual sweep",
+      "modules": [
+        "buffer-storage",
+        "drinking-water",
+        "heat-recovery",
+        "heating-cooling",
+        "hx-diagram",
+        "pipe-sizing",
+        "pressure-holding",
+        "rainwater",
+        "unit-converter",
+        "ventilation",
+        "wastewater"
+      ],
+      "scope": "German comma formatting, thousand separators and unit label changes across all modules."
+    }
+  ],
+  "nextPhase": {
+    "id": "29C",
+    "title": "Bugfix Batch 1: P0/P1",
+    "recommendation": "Start with P1 manual verification and targeted fixes for high-risk modules."
+  }
+}

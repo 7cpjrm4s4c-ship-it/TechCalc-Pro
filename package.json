@@ -102,6 +102,8 @@
     "audit:platform-verification": "node scripts/audit-platform-verification-phase28d.mjs",
     "test:platform-verification-phase28d": "node tests/platform-verification-phase28d.test.mjs",
     "audit:ui-ux-framework": "node scripts/audit-ui-ux-framework-phase29a.mjs",
-    "test:platform-ui-ux-phase29a": "node tests/platform-ui-ux-framework-phase29a.test.mjs"
+    "test:platform-ui-ux-phase29a": "node tests/platform-ui-ux-framework-phase29a.test.mjs",
+    "audit:ui-ux-module-review": "node scripts/audit-ui-ux-module-review-phase29b.mjs",
+    "test:platform-ui-ux-phase29b": "node tests/platform-ui-ux-module-review-phase29b.test.mjs"
   }
 }
