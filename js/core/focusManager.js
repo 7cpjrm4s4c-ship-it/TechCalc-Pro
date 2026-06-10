@@ -80,6 +80,12 @@ export function shouldHandleEnterNavigation(event) {
   return true;
 }
 
+export function shouldHandleTabNavigation(event) {
+  if (!event || event.key !== 'Tab') return false;
+  if (event.altKey || event.ctrlKey || event.metaKey) return false;
+  return true;
+}
+
 export function focusByEnter(root, current, options = {}) {
   if (!current?.matches?.('[data-field]')) return false;
   const direction = options.direction || (options.event?.shiftKey ? 'previous' : 'next');
@@ -96,6 +102,28 @@ export function handleEnterNavigation(root, current, event, options = {}) {
   return focusByEnter(root, current, { ...options, event });
 }
 
+export function focusByTab(root, current, options = {}) {
+  if (!current?.matches?.('[data-field]')) return false;
+  const direction = options.direction || (options.event?.shiftKey ? 'previous' : 'next');
+  return focusNext(root, current, {
+    direction: direction === 'previous' ? 'previous' : 'next',
+    select: options.select !== false,
+    defer: options.defer
+  });
+}
+
+export function handleTabNavigation(root, current, event, options = {}) {
+  if (!shouldHandleTabNavigation(event)) return false;
+  if (options.preventDefault !== false) event?.preventDefault?.();
+  return focusByTab(root, current, { ...options, event });
+}
+
+export function handlePlatformFieldNavigation(root, current, event, options = {}) {
+  if (shouldHandleEnterNavigation(event)) return handleEnterNavigation(root, current, event, options);
+  if (shouldHandleTabNavigation(event)) return handleTabNavigation(root, current, event, options);
+  return false;
+}
+
 export function restoreFocus(element, options = {}) {
   return safeFocus(element, { preventScroll: true, ...options });
 }
@@ -108,6 +136,10 @@ export const PlatformFocusManager = Object.freeze({
   getPlatformFields,
   focusNext,
   shouldHandleEnterNavigation,
+  shouldHandleTabNavigation,
   focusByEnter,
-  handleEnterNavigation
+  handleEnterNavigation,
+  focusByTab,
+  handleTabNavigation,
+  handlePlatformFieldNavigation
 });
