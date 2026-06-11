@@ -114,6 +114,8 @@
     "audit:structure-cleanup": "node scripts/audit-structure-cleanup-phase30a.mjs",
     "test:platform-cleanup-phase30a": "node tests/platform-structure-cleanup-phase30a.test.mjs",
     "audit:dead-code-duplicates": "node scripts/audit-dead-code-duplicates-phase30b.mjs",
-    "test:platform-cleanup-phase30b": "node tests/platform-dead-code-duplicates-phase30b.test.mjs"
+    "test:platform-cleanup-phase30b": "node tests/platform-dead-code-duplicates-phase30b.test.mjs",
+    "audit:documentation-structure": "node scripts/audit-documentation-structure-phase30c.mjs",
+    "test:platform-cleanup-phase30c": "node tests/platform-documentation-structure-phase30c.test.mjs"
   }
 }
