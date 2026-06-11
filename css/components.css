@@ -4819,3 +4819,209 @@ body::before {
     text-align: left;
   }
 }
+
+/* Phase 33: global UI geometry contract.
+   All module cards, fields, controls, toggles and result blocks inherit the 10px rhythm from tokens.css.
+   Modules must not override these primitives locally. */
+.module-view,
+.module-content,
+.grid-12,
+.tc-grid,
+.tc-stack,
+.tc-stack--section,
+.tc-fields,
+.card-grid,
+.form-grid,
+.two-column,
+.tc-two-column,
+.result-list,
+.inline-stats,
+.result-groups,
+.saved-record-list,
+.line-section-list,
+.wrg-flow-layout,
+.wrg-flow-column,
+.hx-process-grid,
+.ph-saved-list,
+.pipe-dimension-grid,
+[data-platform-dynamic],
+[data-pipe-dynamic],
+[data-ph-dynamic],
+[data-buffer-dynamic],
+[data-hx-dynamic],
+[data-dw-dynamic],
+[data-wastewater-dynamic],
+[data-rainwater-dynamic],
+[data-wrg-dynamic] {
+  gap: var(--tc-gap) !important;
+  row-gap: var(--tc-gap) !important;
+  column-gap: var(--tc-gap) !important;
+}
+
+.card,
+.tc-card,
+.result-card,
+.line-section-card,
+.saved-record-card,
+.pipe-dimension-card,
+.ph-saved-item,
+.empty-state,
+.formula,
+.overflow-menu__card,
+.settings-panel,
+.settings-row,
+.settings-check,
+.settings-info-row {
+  border-radius: var(--tc-radius-card);
+}
+
+.card,
+.tc-card,
+.result-card,
+.line-section-card,
+.saved-record-card,
+.pipe-dimension-card,
+.ph-saved-item {
+  padding: var(--tc-card-padding);
+  gap: var(--tc-gap);
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.card__body,
+.tc-card__body,
+.result-card__body,
+.saved-record-card__body,
+.line-section-card__body,
+.main-result,
+.result-list,
+.result-row,
+.inline-stat,
+.pipe-result-head,
+.dw-save-dialog,
+.settings-submenu__content {
+  gap: var(--tc-gap) !important;
+}
+
+.field,
+.tc-field,
+.control-group,
+.settings-list,
+.quick-access-list,
+.quick-access-pool {
+  gap: var(--tc-gap) !important;
+}
+
+.control,
+.tc-control,
+.action-button,
+.mini-button,
+.segmented,
+.segmented button,
+.sign-toggle,
+.line-section-card__toggle,
+.saved-record-card__toggle,
+.line-section-card__delete,
+.saved-record-card__delete,
+.overflow-menu__quick,
+.settings-submenu > summary,
+input,
+select,
+button {
+  border-radius: var(--radius-md);
+}
+
+.control,
+.tc-control {
+  min-height: var(--tc-control-height);
+}
+
+.control input,
+.control select,
+.tc-control input,
+.tc-control select {
+  height: calc(var(--tc-control-height) - 2px);
+  padding-inline: var(--tc-control-padding-x);
+}
+
+.segmented,
+.result-row,
+.settings-row,
+.settings-check,
+.settings-info-row,
+.overflow-menu__row {
+  padding: var(--tc-gap);
+}
+
+.badge,
+.mini-button,
+.overflow-menu__quick,
+.module-nav,
+.sign-toggle {
+  border-radius: var(--tc-radius-pill);
+}
+
+.card *,
+.tc-card *,
+.result-card *,
+.line-section-card *,
+.saved-record-card *,
+.pipe-dimension-card *,
+.ph-saved-item *,
+.result-row *,
+.inline-stat *,
+.main-result * {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.result-row,
+.inline-stat,
+.main-result,
+.pipe-result-head {
+  align-items: start;
+}
+
+.result-row strong,
+.result-row span,
+.inline-stat strong,
+.inline-stat span,
+.main-result strong,
+.main-result span,
+.pipe-result-head strong,
+.pipe-result-head span {
+  white-space: normal;
+}
+
+@media (max-width: 767px) {
+  .card,
+  .tc-card,
+  .result-card,
+  .line-section-card,
+  .saved-record-card,
+  .pipe-dimension-card,
+  .ph-saved-item,
+  .wrg-flow-layout .card {
+    padding: var(--tc-card-padding);
+    border-radius: var(--tc-radius-card);
+  }
+
+  .control,
+  .tc-control,
+  .wrg-flow-layout .control {
+    min-height: var(--tc-control-height);
+    border-radius: var(--radius-md);
+  }
+
+  .control input,
+  .control select,
+  .tc-control input,
+  .tc-control select,
+  .wrg-flow-layout .control input,
+  .wrg-flow-layout .control select {
+    height: calc(var(--tc-control-height) - 2px);
+    padding-inline: var(--tc-control-padding-x);
+  }
+}
