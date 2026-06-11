@@ -32,6 +32,40 @@ const lazyModules = [
 ];
 
 const moduleCache = new Map();
+const preloadedModuleIds = new Set();
+
+function loadLazyModule(config, path) {
+  let loaded = moduleCache.get(config.id);
+  if (!loaded) {
+    loaded = import(path)
+      .then(mod => mod.default || mod)
+      .catch(error => {
+        moduleCache.delete(config.id);
+        preloadedModuleIds.delete(config.id);
+        throw error;
+      });
+    moduleCache.set(config.id, loaded);
+  }
+  return loaded;
+}
+
+function preloadLazyModule(config, path) {
+  if (!config?.id || preloadedModuleIds.has(config.id)) return;
+  preloadedModuleIds.add(config.id);
+  loadLazyModule(config, path).catch(error => {
+    console.warn(`Modul konnte nicht vorgeladen werden: ${config.id}`, error);
+  });
+}
+
+function scheduleLazyModulePreload() {
+  const preload = () => lazyModules.forEach(({ config, path }) => preloadLazyModule(config, path));
+  if ('requestIdleCallback' in window) window.requestIdleCallback(preload, { timeout: 1500 });
+  else window.setTimeout(preload, 250);
+}
+
+const currentRouteConfig = lazyModules.find(({ config }) => config.id === currentRoute());
+if (currentRouteConfig) preloadLazyModule(currentRouteConfig.config, currentRouteConfig.path);
+
 function registerLazyModule({ config, path, module: eagerModule }) {
   if (eagerModule) {
     modules.register({ config, mount: createModuleLifecycleAdapter(config.id, eagerModule.mount) });
@@ -42,17 +76,7 @@ function registerLazyModule({ config, path, module: eagerModule }) {
     config,
     async mount(root) {
       const renderToken = root?.dataset?.renderToken || '';
-      let loaded = moduleCache.get(config.id);
-      if (!loaded) {
-        loaded = import(path)
-          .then(mod => mod.default || mod)
-          .catch(error => {
-            moduleCache.delete(config.id);
-            throw error;
-          });
-        moduleCache.set(config.id, loaded);
-      }
-      const module = await loaded;
+      const module = await loadLazyModule(config, path);
       if (renderToken && root?.dataset?.renderToken !== renderToken) {
         return () => {};
       }
@@ -194,7 +218,8 @@ const moduleRuntime = createModuleRuntime({
   renderNavigation,
   loadingView() {
     return '<div class="card tc-module-loading" role="status">Modul wird geladen...</div>';
-  }
+  },
+  loadingDelayMs: 180
 });
 
 function render(id){
@@ -203,6 +228,7 @@ function render(id){
 }
 initRouter(render);
 renderQuickAccessSettings();
+scheduleLazyModulePreload();
 
 trackGlobalEventListener(document, 'techcalc-project-loaded', () => {
   render(currentRoute());
@@ -355,8 +381,7 @@ function parseReleaseNotes(markdown = '') {
   for (const rawLine of lines) {
     const line = rawLine.trim();
     if (!line) continue;
-    const heading = line.match(/^##\s+(?:Version\s+)?([0-9]+\.[0-9]+\.[0-9]+)\s*(?:[-–]\s*(.*))?$/i)
-      || line.match(/^##\s+([0-9]+\.[0-9]+\.[0-9]+)\s*(?:[-–]\s*(.*))?$/i);
+    const heading = line.match(/^#{1,3}\s+(?:TechCalc\s+Pro\s+)?(?:Version\s+)?([0-9]+\.[0-9]+\.[0-9]+(?:[-.]rc\.?\d+)?)\s*(?:[-–]\s*(.*))?$/i);
     if (heading) {
       current = { version: heading[1], title: heading[2] || '', items: [] };
       notes.push(current);
@@ -390,7 +415,7 @@ async function loadReleaseNotes() {
   if (versionHost) versionHost.textContent = APP_VERSION;
 
   try {
-    const response = await fetch(`./RELEASE_NOTES.md?v=${encodeURIComponent(APP_VERSION)}&t=${Date.now()}`, {
+    const response = await fetch(`./RELEASE_NOTES.md?v=${encodeURIComponent(APP_VERSION)}`, {
       cache: 'no-store',
       headers: { 'Cache-Control': 'no-cache' }
     });
