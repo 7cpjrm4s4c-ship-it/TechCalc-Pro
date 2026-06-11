@@ -64,7 +64,6 @@ const intentionalPlatformWrapperDuplicate = duplicateGroup.every(exists) && dupl
 
 const runtimeDeadCodeCandidates = [
   'js/core/eventDelegation.js',
-  'js/core/menuFallback.js',
   'js/core/moduleContract.js',
   'js/core/pdfExport.js',
   'js/core/platformLifecycle.js',

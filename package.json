@@ -118,6 +118,8 @@
     "audit:documentation-structure": "node scripts/audit-documentation-structure-phase30c.mjs",
     "test:platform-cleanup-phase30c": "node tests/platform-documentation-structure-phase30c.test.mjs",
     "audit:controlled-cleanup": "node scripts/audit-controlled-cleanup-phase30d.mjs",
-    "test:platform-cleanup-phase30d": "node tests/platform-controlled-cleanup-phase30d.test.mjs"
+    "test:platform-cleanup-phase30d": "node tests/platform-controlled-cleanup-phase30d.test.mjs",
+    "audit:final-baseline": "node scripts/audit-final-baseline-phase30e.mjs",
+    "test:platform-cleanup-phase30e": "node tests/platform-final-baseline-phase30e.test.mjs"
   }
 }
