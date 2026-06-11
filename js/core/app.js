@@ -281,7 +281,7 @@ function applyThemeMode(mode = getStoredThemeMode()) {
 
 applyThemeMode();
 
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.3.0-rc.1';
 const FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
 
 function initFeedbackForm() {

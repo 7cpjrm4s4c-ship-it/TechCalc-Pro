@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techcalc-pro-1.3.0';
+const CACHE_NAME = 'techcalc-pro-1.3.0-rc.1';
 const ASSETS = [
   './','./index.html','./manifest.json','./RELEASE_NOTES.md',
   './css/tokens.css','./css/layout.css','./css/components.css','./css/modules.css',
