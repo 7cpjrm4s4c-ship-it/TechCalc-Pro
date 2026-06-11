@@ -122,6 +122,8 @@
     "audit:final-baseline": "node scripts/audit-final-baseline-phase30e.mjs",
     "test:platform-cleanup-phase30e": "node tests/platform-final-baseline-phase30e.test.mjs",
     "build": "node scripts/check-js-imports.mjs",
-    "audit:imports": "node scripts/check-js-imports.mjs"
+    "audit:imports": "node scripts/check-js-imports.mjs",
+    "audit:module-smoke": "node scripts/audit-module-smoke-phase31c.mjs",
+    "test:module-smoke": "node scripts/audit-module-smoke-phase31c.mjs"
   }
 }

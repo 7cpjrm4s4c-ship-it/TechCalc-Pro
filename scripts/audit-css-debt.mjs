@@ -21,5 +21,6 @@ const report = {
   duplicateSelectors: duplicates.slice(0, 50).map(([selector, count]) => ({ selector, count })),
   note: 'Phase 8 removes duplicated settings-panel overrides and tracks remaining legacy selectors as explicit migration debt.'
 };
-fs.writeFileSync('css-debt-audit-phase8.json', JSON.stringify(report, null, 2));
+fs.mkdirSync('docs/audits/json', { recursive: true });
+fs.writeFileSync('docs/audits/json/css-debt-audit-phase8.json', JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report, null, 2));

@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 function walk(dir) {
@@ -30,7 +30,8 @@ const result = {
   },
   findings
 };
-writeFileSync('legacy-event-handler-audit-phase11b.json', JSON.stringify(result, null, 2));
+mkdirSync('docs/audits/json', { recursive: true });
+writeFileSync('docs/audits/json/legacy-event-handler-audit-phase11b.json', JSON.stringify(result, null, 2));
 
 if (total > 140) {
   throw new Error(`Legacy event handler score too high: ${total}`);

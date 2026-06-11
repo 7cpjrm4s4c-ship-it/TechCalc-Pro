@@ -42,5 +42,6 @@ const summary = {
   modules
 };
 
-fs.writeFileSync('platform-migration-audit-phase8.json', JSON.stringify(summary, null, 2));
+fs.mkdirSync('docs/audits/json', { recursive: true });
+fs.writeFileSync('docs/audits/json/platform-migration-audit-phase8.json', JSON.stringify(summary, null, 2));
 console.log(JSON.stringify(summary, null, 2));

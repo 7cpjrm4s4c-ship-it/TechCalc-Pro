@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 
 const commands = [
   ['node', ['scripts/check-js-imports.mjs']],
+  ['node', ['scripts/audit-module-smoke-phase31c.mjs']],
   ['node', ['tests/number-service.test.mjs']],
   ['node', ['tests/platform-policy.test.mjs']],
   ['node', ['tests/module-contract.test.mjs']],

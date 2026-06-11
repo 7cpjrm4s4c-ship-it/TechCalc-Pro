@@ -54,7 +54,7 @@
       "legacyNumberParsers": 0,
       "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
-      "migrationStatus": "phase-26b3a3-enter-tab-navigation-and-live-diagram"
+      "migrationStatus": "phase-26d-final-platform-cleanup"
     },
     {
       "id": "pipe-sizing",
