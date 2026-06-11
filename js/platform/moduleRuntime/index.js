@@ -8,7 +8,7 @@ import { createSavedRecord, savedRecordReducer } from '../../core/savedRecordCon
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { preserveScroll as keepScroll, preserveSavedRecordMutation, PlatformScrollManager } from '../../core/scrollManager.js';
 import { PlatformFocusManager } from '../../core/focusManager.js';
-import { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved } from '../moduleRenderer/index.js';
+import { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved, renderPlatformSaved } from '../moduleRenderer/index.js';
 import { getRenderScheduler } from '../../core/renderScheduler.js';
 
 const noop = () => {};
@@ -482,13 +482,18 @@ export function createPlatformModule(definition = {}) {
     }
 
     const formHost = root.querySelector?.('[data-platform-dynamic="form"]');
+    const savedHost = root.querySelector?.('[data-platform-dynamic="saved-records"]');
     const sideHost = root.querySelector?.('[data-platform-dynamic="result-saved"]');
-    if (!formHost && !sideHost) return false;
+    if (!formHost && !savedHost && !sideHost) return false;
     const model = buildRenderModel(runtimeState.get());
     preservePlatformUx(root, () => {
       if (formHost) {
         const nextForm = renderPlatformForm(model);
         if (formHost.innerHTML !== nextForm) formHost.innerHTML = nextForm;
+      }
+      if (savedHost) {
+        const nextSaved = renderPlatformSaved(model);
+        if (savedHost.innerHTML !== nextSaved) savedHost.innerHTML = nextSaved;
       }
       if (sideHost) {
         const nextSide = renderPlatformResultsAndSaved(model);

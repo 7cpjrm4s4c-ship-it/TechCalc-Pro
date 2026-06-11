@@ -4690,3 +4690,132 @@ body::before {
   min-height: 42px;
   height: 42px;
 }
+
+/* Phase 32C RC UI hardening: card overflow, spacing, and compact field parity. */
+.card,
+.tc-card,
+.result-card,
+.line-section-card,
+.saved-record-card,
+.ph-saved-item,
+.pipe-dimension-card {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.card *,
+.tc-card *,
+.result-card *,
+.line-section-card *,
+.saved-record-card *,
+.ph-saved-item *,
+.pipe-dimension-card * {
+  min-width: 0;
+}
+
+.card__body,
+.tc-card__body,
+.result-card__body,
+.result-groups,
+.result-list,
+.inline-stats,
+.saved-record-card__body,
+.line-section-card__body,
+[data-buffer-dynamic="result"],
+[data-hx-dynamic="results"],
+[data-platform-dynamic="result-saved"] {
+  display: grid;
+  gap: var(--ui-gap, 12px);
+}
+
+.result-row,
+.result-line,
+.inline-stat,
+.main-result,
+.pipe-result-head,
+.ph-saved-item,
+.tc-result-item {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.result-row {
+  align-items: flex-start;
+}
+
+.result-row strong,
+.result-row span,
+.result-row small,
+.inline-stat strong,
+.inline-stat span,
+.inline-stat small,
+.main-result strong,
+.main-result span,
+.pipe-result-head strong,
+.pipe-result-head span,
+.ph-saved-item strong,
+.ph-saved-item small,
+.tc-result-item strong,
+.tc-result-item span {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.module-view[data-module='pipe-sizing'] .pipe-result-head,
+.module-view[data-module='pressure-holding'] .result-row,
+.module-view[data-module='hx-diagram'] .result-row,
+.module-view[data-module='buffer-storage'] .result-row {
+  gap: var(--ui-gap, 12px);
+}
+
+.module-view[data-module='buffer-storage'] [data-buffer-dynamic="result"] > *,
+.module-view[data-module='hx-diagram'] [data-hx-dynamic="results"] > *,
+.module-view[data-module='pressure-holding'] [data-ph-dynamic="result"] > *,
+.module-view[data-module='pipe-sizing'] [data-pipe-dynamic="result"] > * {
+  margin-block: 0;
+}
+
+.module-view[data-module='buffer-storage'] [data-buffer-dynamic="result"],
+.module-view[data-module='hx-diagram'] [data-hx-dynamic="results"],
+.module-view[data-module='pressure-holding'] [data-ph-dynamic="result"],
+.module-view[data-module='pipe-sizing'] [data-pipe-dynamic="result"] {
+  gap: var(--ui-gap, 12px);
+}
+
+.module-view[data-module='drinking-water'] .dw-save-dialog .field,
+.module-view[data-module='drinking-water'] .dw-save-dialog .tc-field {
+  min-height: 0;
+}
+
+.module-view[data-module='drinking-water'] .dw-save-dialog .control,
+.module-view[data-module='drinking-water'] .dw-save-dialog .tc-control,
+.module-view[data-module='drinking-water'] .dw-save-dialog .control input,
+.module-view[data-module='drinking-water'] .dw-save-dialog .control select,
+.module-view[data-module='drinking-water'] .dw-save-dialog input,
+.module-view[data-module='drinking-water'] .dw-save-dialog select {
+  min-height: 50px;
+  height: 50px;
+}
+
+@media (min-width: 768px) {
+  [data-platform-dynamic="form-saved"],
+  .wrg-desktop-split__input,
+  .wrg-desktop-split__output {
+    align-content: start;
+  }
+}
+
+@media (max-width: 767px) {
+  .result-row {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .result-row strong {
+    text-align: left;
+  }
+}

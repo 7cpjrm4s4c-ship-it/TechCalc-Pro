@@ -1,12 +1,12 @@
 {
-  "totalLines": 4693,
+  "totalLines": 4822,
   "importantCount": 25,
-  "patchComments": 97,
-  "legacySelectorLines": 281,
+  "patchComments": 98,
+  "legacySelectorLines": 312,
   "duplicateSelectors": [
     {
       "selector": "@media (max-width: 767px)",
-      "count": 24
+      "count": 25
     },
     {
       "selector": "@media (max-width:767px)",
@@ -77,6 +77,14 @@
       "count": 4
     },
     {
+      "selector": ".result-row",
+      "count": 3
+    },
+    {
+      "selector": ".result-row strong",
+      "count": 3
+    },
+    {
       "selector": "@media (min-width: 1024px)",
       "count": 3
     },
@@ -90,6 +98,10 @@
     },
     {
       "selector": ".overflow-menu__card",
+      "count": 3
+    },
+    {
+      "selector": ".wrg-desktop-split__output",
       "count": 3
     },
     {
@@ -190,18 +202,6 @@
     },
     {
       "selector": ".brand__subtitle",
-      "count": 2
-    },
-    {
-      "selector": ".icon-button",
-      "count": 2
-    },
-    {
-      "selector": ".module-tab.is-overflow-active",
-      "count": 2
-    },
-    {
-      "selector": ".empty-state",
       "count": 2
     }
   ],
