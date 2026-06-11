@@ -1,36 +1,14 @@
+# TechCalc Pro Release Notes
 
-## Phase 17C.16 – Platform Segment Context Bridge
+## 1.3.0 - Platform Consolidation Release
 
-- Fixed the Regenwasser Dachfläche/Grundstücksfläche startup switch path.
-- The platform direct segment bridge now refreshes its active module context after every mount/re-render.
-- Removed the stale-closure behavior where the first mounted platform module could own the pointerdown segment context.
-- Added regression coverage for the current-context segment bridge.
+See the consolidated release documentation:
 
-## Phase 17C.12 - Regenwasser Segment Dynamic Update
+- `docs/release-notes/RELEASE_NOTES_1.3.0.md`
+- `docs/changelog/CHANGELOG_1.3.0.md`
+- `docs/release/MIGRATION_SUMMARY_1.3.0.md`
+- `docs/release/KNOWN_LIMITATIONS_1.3.0.md`
 
-- Plattform-Segmente committen konfigurierte Felder jetzt bereits auf pointerdown/touchstart.
-- Regenwasser-Switch Dachfläche / Grundstücksfläche aktualisiert schemaabhängige Labels und Felder sofort.
-- Keine Regenwasser-DOM-Sonderregel, kein domPatch, kein querySelector-Patch.
-- Neue Regression `rainwater-phase17c12-switch`.
+### Summary
 
-## Phase 17C.10 - Referenzmodule SavedRecord-Vertrag bereinigt
-
-- Regenwasser und Schmutzwasser nutzen jetzt fuer Speichern/Aktualisieren den Heizung/Kälte-Vertrag `line:save` / `line:update`.
-- konkurrierende `saved:add` / `saved:update` Pfade sowie alte SavedRecord-Bridge-/Context-Aufloesung entfernt.
-- Save-/Update-Buttons rendern mit `data-line-save` / `data-line-update`.
-- Segment-Switches laufen ohne zusaetzliche konkurrierende Capture-Schicht ueber die zentrale Event-Pipeline.
-- `npm test` erfolgreich.
-
-
-## Phase 17C.8
-- SavedRecord-Vertrag von Heizung/Kälte auf Regenwasser und Schmutzwasser übertragen.
-- SavedRecord-Bridge aus aktivem Pfad entfernt; direkte zentrale Actions.
-- Regenwasser-Segmentwechsel mit zusätzlichem settled Re-Render.
-
-## Phase 17C.9 - SavedRecord-Vertrag Heizung/Kälte
-
-- Regenwasser und Schmutzwasser verwenden fuer gespeicherte Eintraege jetzt den Heizung/Kälte-kompatiblen `data-line-*` Root-Capture-Vertrag.
-- Alte SavedRecord-Bridge aus `platform/moduleRuntime` entfernt.
-- Markieren, Bearbeiten, Accordion und Loeschen laufen wieder ueber einen eindeutigen Store-Pfad.
-- Regenwasser-Segmentwechsel erzwingt weiterhin sofortigen Schema-Rebuild fuer `r(5,5)` / `r(5,2)`.
-- Regression `reference-modules-phase17c9-heating-saved-contract` ergaenzt.
+TechCalc Pro 1.3.0 consolidates the application around a shared platform runtime, hardened UI/UX behavior, centralized audit artefacts and release-candidate quality gates.
