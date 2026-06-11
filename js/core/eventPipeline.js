@@ -1,4 +1,5 @@
 import { handlePlatformFieldNavigation } from './focusManager.js';
+import { markCommittedAction } from './formActions.js';
 const DEFAULT_INTERACTIVE_SELECTOR = '[data-field], input, select, textarea, button, a, summary, [role="button"], [data-line-card], [data-saved-record-card], .saved-record-card, .segmented, [data-tc-action]';
 
 function readElementValue(el) {
@@ -441,11 +442,19 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   add(root, 'blur', onBlur, true);
   add(root, 'keydown', onKeydown, true);
   add(root, 'pointerup', onPointerSegment, true);
-  add(root, 'touchstart', event => { beginTouchGesture(root, event); confirmSurface(event); }, { capture: true, passive: true });
+  add(root, 'touchstart', event => {
+    beginTouchGesture(root, event);
+    if (event.target?.closest?.('[data-tc-action], [data-action]')) markCommittedAction(root);
+    confirmSurface(event);
+  }, { capture: true, passive: true });
   add(root, 'touchmove', event => updateTouchGesture(root, event), { capture: true, passive: true });
   add(root, 'touchend', onPointerSegment, { capture: true, passive: false });
   add(root, 'click', onClick, true);
-  add(root, 'pointerdown', event => { beginPointerGesture(root, event); confirmSurface(event); }, true);
+  add(root, 'pointerdown', event => {
+    beginPointerGesture(root, event);
+    if (event.target?.closest?.('[data-tc-action], [data-action]')) markCommittedAction(root);
+    confirmSurface(event);
+  }, true);
   add(root, 'pointermove', event => updatePointerGesture(root, event), { capture: true, passive: true });
   add(root, 'click', confirmSurface, true);
 
