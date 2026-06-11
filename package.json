@@ -124,6 +124,7 @@
     "build": "node scripts/check-js-imports.mjs",
     "audit:imports": "node scripts/check-js-imports.mjs",
     "audit:module-smoke": "node scripts/audit-module-smoke-phase31c.mjs",
-    "test:module-smoke": "node scripts/audit-module-smoke-phase31c.mjs"
+    "test:module-smoke": "node scripts/audit-module-smoke-phase31c.mjs",
+    "test:hx-diagram-phase32a3": "node tests/hx-diagram-phase32a3-mobile-action-hardening.test.mjs"
   }
 }

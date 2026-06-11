@@ -4360,12 +4360,14 @@ body::before {
   }
 }
 
-/* Phase 14B: keep the mobile module navigation from being pushed above the virtual keyboard. */
+/* RC 32A.3: keep the mobile module navigation pill visible after the
+   virtual keyboard closes. Older hiding rules made the pill disappear in h,x
+   after input focus/blur cycles. */
 @media (max-width: 768px) {
   body.tc-keyboard-open .module-nav {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(calc(100% + 24px));
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
   }
 }
 

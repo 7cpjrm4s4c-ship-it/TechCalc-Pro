@@ -144,8 +144,10 @@ function clearDiagram(rootEl = null) {
     rhPercent: '',
     targetTempC: '',
     targetRhPercent: '',
+    process: 'heat',
     activeProcessId: null,
     activePath: [],
+    expandedProcessId: null,
     points: []
   };
   if (rootEl?.querySelectorAll) {
@@ -157,9 +159,54 @@ function clearDiagram(rootEl = null) {
   state.set(patch, { action: 'hx:clear' });
 }
 
+function shouldSkipDuplicateHxAction(rootEl, key) {
+  const last = rootEl?.__tcHxImmediateAction || {};
+  if (last.key === key && Date.now() - Number(last.at || 0) < 350) return true;
+  if (rootEl) rootEl.__tcHxImmediateAction = { key, at: Date.now() };
+  return false;
+}
+
+function handleHxSignToggle(rootEl, signButton, event) {
+  if (!signButton || !rootEl?.contains?.(signButton)) return false;
+  event?.preventDefault?.();
+  event?.stopPropagation?.();
+  event?.stopImmediatePropagation?.();
+  const id = signButton.dataset.hxSign;
+  if (shouldSkipDuplicateHxAction(rootEl, `sign:${id}`)) return true;
+  const input = rootEl.querySelector(`[data-field="${id}"]`);
+  const currentValue = input?.value ?? state.get?.()?.[id] ?? '';
+  const next = toggleNumericSign(currentValue);
+  commitFieldValue(rootEl, id, next, 'hx:toggle-sign');
+  try { input?.focus?.({ preventScroll: true }); input?.select?.(); } catch { /* optional focus restore */ }
+  return true;
+}
+
+function handleHxClear(rootEl, clearButton, event) {
+  if (!clearButton || !rootEl?.contains?.(clearButton)) return false;
+  event?.preventDefault?.();
+  event?.stopPropagation?.();
+  event?.stopImmediatePropagation?.();
+  if (shouldSkipDuplicateHxAction(rootEl, 'clear')) return true;
+  clearDiagram(rootEl);
+  return true;
+}
+
 function bindHxDelegation(rootEl) {
   if (!rootEl || rootEl.__tcHxDiagramActionsBound) return;
   rootEl.__tcHxDiagramActionsBound = true;
+
+  // RC 32A.3: mobile browsers dispatch blur/render before click after a virtual
+  // keyboard interaction. Handle the two h,x toolbar actions at pointerdown so
+  // the state mutation is not lost behind the subsequent structural render.
+  const earlyAction = event => {
+    const target = event.target;
+    const signButton = target?.closest?.('[data-hx-sign]');
+    if (handleHxSignToggle(rootEl, signButton, event)) return;
+    const clearButton = target?.closest?.('[data-hx-clear]');
+    handleHxClear(rootEl, clearButton, event);
+  };
+  rootEl.addEventListener('pointerdown', earlyAction, true);
+  rootEl.addEventListener('touchstart', earlyAction, { capture: true, passive: false });
 
   rootEl.addEventListener('input', event => {
     const field = event.target?.closest?.('[data-field]');
@@ -197,25 +244,10 @@ function bindHxDelegation(rootEl) {
     }
 
     const signButton = target.closest?.('[data-hx-sign]');
-    if (signButton && rootEl.contains(signButton)) {
-      event.preventDefault();
-      event.stopPropagation();
-      const id = signButton.dataset.hxSign;
-      const input = rootEl.querySelector(`[data-field="${id}"]`);
-      const currentValue = input?.value ?? state.get?.()?.[id] ?? '';
-      const next = toggleNumericSign(currentValue);
-      commitFieldValue(rootEl, id, next, 'hx:toggle-sign');
-      try { input?.focus?.({ preventScroll: true }); input?.select?.(); } catch { /* optional focus restore */ }
-      return;
-    }
+    if (handleHxSignToggle(rootEl, signButton, event)) return;
 
     const clearButton = target.closest?.('[data-hx-clear]');
-    if (clearButton && rootEl.contains(clearButton)) {
-      event.preventDefault();
-      event.stopPropagation();
-      clearDiagram(rootEl);
-      return;
-    }
+    if (handleHxClear(rootEl, clearButton, event)) return;
   }, true);
 }
 
