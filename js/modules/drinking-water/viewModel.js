@@ -32,7 +32,7 @@ export function waterHeatingUi(mode = 'central') {
   };
 }
 
-export function createDrinkingWaterViewModel(s = {}, result = calculate(s, { includeDrafts:true })){
+export function createDrinkingWaterViewModel(s = {}, result = calculate(s, { includeDrafts:false })){
   const waterHeating = waterHeatingUi(s.waterHeatingMode);
   const consumerOptionsBase = consumerOptions();
   return {

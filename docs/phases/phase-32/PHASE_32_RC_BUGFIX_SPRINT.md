@@ -40,3 +40,12 @@ Releasekritische RC-Befunde aus der manuellen Prüfmatrix stabilisieren, ohne ne
 ## Hinweis
 
 Die Phase behebt die ersten P1/P3-Cluster. Nicht alle aus der vollständigen Bugliste gemeldeten Punkte sind damit automatisch abgeschlossen; verbleibende Punkte sind in nachfolgenden 32.x-Batches zu prüfen.
+
+
+## Phase 32A.2 - Saved Records / Scroll / Trinkwasser
+
+Status: abgeschlossen.
+
+Siehe: `PHASE_32A2_RC_BUGFIX_SAVED_RECORD_SCROLL_DRINKING_WATER.md`
+
+Quality Gate: `npm run build`, `npm run audit:imports`, `npm test` bestanden.

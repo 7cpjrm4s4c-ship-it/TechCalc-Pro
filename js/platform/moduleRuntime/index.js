@@ -343,17 +343,19 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     preserveSavedRecordMutation(() => setReduced(current, { action: 'load', id: item.id, record: item, patch }, 'line:select'));
   };
 
-  const remove = ({ element } = {}) => {
+  const remove = ({ element, event } = {}) => {
     const id = readId(element);
     const current = state.get();
     const patch = typeof savedConfig.clear === 'function' && String(current?.[savedConfig.activeIdKey] || '') === String(id) ? savedConfig.clear(current) : {};
-    preserveSavedRecordMutation(() => setReduced(current, { action: 'delete', id, patch }, 'line:delete'));
+    const anchor = element?.closest?.('[data-line-card], [data-saved-record-card]') || element;
+    preserveSavedRecordMutation(() => setReduced(current, { action: 'delete', id, patch }, 'line:delete'), { anchor, event });
   };
 
-  const toggle = ({ element } = {}) => {
+  const toggle = ({ element, event } = {}) => {
     const id = readId(element);
     const current = state.get();
-    preserveSavedRecordMutation(() => setReduced(current, { action: 'toggle-expanded', id }, 'line:toggle'));
+    const anchor = element?.closest?.('[data-line-card], [data-saved-record-card]') || element;
+    preserveSavedRecordMutation(() => setReduced(current, { action: 'toggle-expanded', id }, 'line:toggle'), { anchor, event });
   };
 
   // Heizung/Kälte parity: saved-record panels are controlled exclusively by the

@@ -41,22 +41,22 @@
     },
     {
       "file": "js/platform/moduleRuntime/index.js",
-      "line": 382,
+      "line": 384,
       "text": "root.innerHTML = view(snapshot);"
     },
     {
       "file": "js/platform/moduleRuntime/index.js",
-      "line": 475,
+      "line": 477,
       "text": "if (root.innerHTML !== nextView) root.innerHTML = nextView;"
     },
     {
       "file": "js/platform/moduleRuntime/index.js",
-      "line": 489,
+      "line": 491,
       "text": "if (formHost.innerHTML !== nextForm) formHost.innerHTML = nextForm;"
     },
     {
       "file": "js/platform/moduleRuntime/index.js",
-      "line": 493,
+      "line": 495,
       "text": "if (sideHost.innerHTML !== nextSide) sideHost.innerHTML = nextSide;"
     }
   ]

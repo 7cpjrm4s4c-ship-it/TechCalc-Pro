@@ -265,7 +265,14 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   const onBlur = event => {
     const el = event.target?.closest?.('input[data-field], textarea[data-field]');
     if (!el || !root.contains(el)) return;
-    commitElementField(state, el, { action: 'field:blur', notify: true, root });
+    const committedActionAt = Number(root?.dataset?.tcCommittedActionAt || 0);
+    const actionInProgress = committedActionAt && Date.now() - committedActionAt < 650;
+    // RC 32A.2: saved-record cards and save/update buttons mark an interaction on
+    // pointerdown/touchstart. Native blur fires before the final click on many
+    // browsers; a notifying blur render can replace the clicked card/button and
+    // make the user click a second time. Commit the field silently while an
+    // action is in progress and let the action itself own the structural render.
+    commitElementField(state, el, { action: 'field:blur', notify: true && !actionInProgress, root });
     hasDeferredInput = false;
     notifyCommit({ action: 'field:blur', element: el });
   };

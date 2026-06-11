@@ -269,7 +269,7 @@ function deleteSingle(root, id) {
 function editUnit(root, id) {
   const unit = normalizeDrinkingWaterSavedState(state.get()).savedUsageUnits.find(item => isSameId(item.id, id));
   if (!unit) return;
-  state.set({ activeUnitId:unit.id, activeSingleId:null, unitName:unit.name, unitSimultaneityFactor:unit.simultaneityFactor || '', singleName:'', unitDraftConsumers:unit.consumers || [], singleDraftConsumers:[], uiUnitFormOpen:true, uiUnitSavedOpen:true }, { action:'dw:unit-edit', notify:false });
+  state.set({ activeUnitId:unit.id, activeSingleId:null, unitName:unit.name, unitSimultaneityFactor:unit.simultaneityFactor || '', singleName:'', unitDraftConsumers:unit.consumers || [], singleDraftConsumers:[], uiUnitFormOpen:Boolean(state.get().uiUnitFormOpen), uiUnitSavedOpen:true }, { action:'dw:unit-edit', notify:false });
   refreshDrinkingWater(root);
 }
 
@@ -277,7 +277,7 @@ function editSingle(root, id) {
   const group = normalizeDrinkingWaterSavedState(state.get()).savedSingleConsumers.map(normalizeSingleGroupForEdit).filter(Boolean).find(item => isSameId(item.id, id));
   if (!group) return;
   const consumers = (group.consumers || []).map(c => ({ ...c }));
-  state.set({ activeUnitId:null, activeSingleId:group.id, unitName:'', unitDraftConsumers:[], singleName:group.name, singleDraftConsumers:consumers, singlePermanent:String(consumers.some(c => c.permanent)), uiSingleFormOpen:true, uiSingleSavedOpen:true }, { action:'dw:single-edit', notify:false });
+  state.set({ activeUnitId:null, activeSingleId:group.id, unitName:'', unitDraftConsumers:[], singleName:group.name, singleDraftConsumers:consumers, singlePermanent:String(consumers.some(c => c.permanent)), uiSingleFormOpen:Boolean(state.get().uiSingleFormOpen), uiSingleSavedOpen:true }, { action:'dw:single-edit', notify:false });
   refreshDrinkingWater(root);
 }
 
