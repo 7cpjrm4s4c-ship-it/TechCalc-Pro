@@ -1,8 +1,8 @@
 {
-  "totalLines": 4642,
+  "totalLines": 4691,
   "importantCount": 25,
-  "patchComments": 97,
-  "legacySelectorLines": 275,
+  "patchComments": 98,
+  "legacySelectorLines": 281,
   "duplicateSelectors": [
     {
       "selector": "@media (max-width: 767px)",
@@ -149,6 +149,10 @@
       "count": 3
     },
     {
+      "selector": ".line-section-card__body",
+      "count": 3
+    },
+    {
       "selector": "@media (max-width: 720px)",
       "count": 3
     },
@@ -198,10 +202,6 @@
     },
     {
       "selector": ".empty-state",
-      "count": 2
-    },
-    {
-      "selector": ".card__title",
       "count": 2
     }
   ],

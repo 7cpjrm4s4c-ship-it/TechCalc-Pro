@@ -5,6 +5,17 @@ import { safeReplaceContent } from '../../core/domUpdate.js';
 import { createDrinkingWaterViewModel } from './viewModel.js';
 import { renderInputCard, renderResultCard, draftConsumerList } from './view.js';
 import { runWithoutScrollJump } from '../../core/scrollManager.js';
+import { handlePlatformFieldNavigation } from '../../core/focusManager.js';
+
+
+function commitVisibleFields(root) {
+  if (!root?.querySelectorAll) return;
+  const patch = {};
+  root.querySelectorAll('[data-field]').forEach(el => {
+    if (el?.dataset?.field) patch[el.dataset.field] = el.value;
+  });
+  if (Object.keys(patch).length) state.set(patch, { action:'dw:commit-visible-fields', notify:false });
+}
 
 function syncSavedRecordsPatch(patch = {}, action = 'dw:saved-sync') {
   const next = { ...patch };
@@ -173,7 +184,8 @@ function draftKey(type) {
   return type === 'unit' ? 'unitDraftConsumers' : 'singleDraftConsumers';
 }
 
-function addDraftConsumer(type) {
+function addDraftConsumer(type, root = null) {
+  commitVisibleFields(root);
   const s = state.get();
   if (type === 'unit') {
     state.set({ unitDraftConsumers: [...(s.unitDraftConsumers || []), createConsumer({ typeId:s.unitConsumerType, count:s.unitCount })] }, { action:'dw:draft-add', notify:false });
@@ -211,6 +223,7 @@ function draftOrCurrentSingleConsumers(s) {
 }
 
 function saveUnit(root, update = false) {
+  commitVisibleFields(root);
   const s = state.get();
   if (update && !s.activeUnitId) return;
   const record = createUsageUnit({ name:s.unitName, consumers:draftOrCurrentUnitConsumers(s), simultaneityFactor:s.unitSimultaneityFactor });
@@ -226,6 +239,7 @@ function saveUnit(root, update = false) {
 }
 
 function saveSingle(root, update = false) {
+  commitVisibleFields(root);
   const s = state.get();
   if (update && !s.activeSingleId) return;
   const record = createSingleGroup({ name:s.singleName || 'Einzelverbraucher', consumers:draftOrCurrentSingleConsumers(s) });
@@ -310,13 +324,34 @@ export function bindDrinkingWaterActions(root) {
   });
 
   root.addEventListener('toggle', updateAccordionState, true);
+  root.addEventListener('pointerdown', event => {
+    const draftAdd = event.target?.closest?.('[data-dw-draft-add]');
+    if (!draftAdd || !root.contains(draftAdd)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    root.dataset.tcDwDraftAddAt = String(Date.now());
+    addDraftConsumer(draftAdd.dataset.dwDraftAdd, root);
+    refreshDrinkingWater(root);
+  }, true);
+
+  root.addEventListener('touchstart', event => {
+    const draftAdd = event.target?.closest?.('[data-dw-draft-add]');
+    if (!draftAdd || !root.contains(draftAdd)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    root.dataset.tcDwDraftAddAt = String(Date.now());
+    addDraftConsumer(draftAdd.dataset.dwDraftAdd, root);
+    refreshDrinkingWater(root);
+  }, { capture:true, passive:false });
+
 
   root.addEventListener('keydown', event => {
     const field = event.target.closest('[data-field]');
-    if (!field || !root.contains(field) || event.key !== 'Enter') return;
+    if (!field || !root.contains(field) || (event.key !== 'Enter' && event.key !== 'Tab')) return;
     event.preventDefault();
-    state.set({ [field.dataset.field]: field.value }, { action:'dw:enter', notify:false });
+    state.set({ [field.dataset.field]: field.value }, { action:event.key === 'Tab' ? 'dw:tab' : 'dw:enter', notify:false });
     refreshDrinkingWater(root);
+    handlePlatformFieldNavigation(root, field, event, { select:true });
   });
 
   root.addEventListener('click', event => {
@@ -329,7 +364,7 @@ export function bindDrinkingWaterActions(root) {
     const removeDraft = target.closest('[data-dw-remove-draft]');
     if (removeDraft && root.contains(removeDraft)) { event.preventDefault(); event.stopPropagation(); removeDraftConsumer(removeDraft.dataset.dwRemoveDraft, removeDraft.dataset.index); refreshDrinkingWater(root); return; }
     const draftAdd = target.closest('[data-dw-draft-add]');
-    if (draftAdd && root.contains(draftAdd)) { event.preventDefault(); event.stopPropagation(); addDraftConsumer(draftAdd.dataset.dwDraftAdd); refreshDrinkingWater(root); return; }
+    if (draftAdd && root.contains(draftAdd)) { event.preventDefault(); event.stopPropagation(); if (Date.now() - Number(root.dataset.tcDwDraftAddAt || 0) > 650) { addDraftConsumer(draftAdd.dataset.dwDraftAdd, root); refreshDrinkingWater(root); } return; }
     const addUnit = target.closest('[data-dw-add-unit]');
     if (addUnit && root.contains(addUnit)) { event.preventDefault(); event.stopPropagation(); saveUnit(root, false); return; }
     const updateUnit = target.closest('[data-dw-update-unit]');

@@ -4639,3 +4639,52 @@ body::before {
     padding: var(--ui-gap, 14px);
   }
 }
+
+/* Phase 32 RC hardening: prevent long technical labels/results from escaping cards. */
+.card,
+.tc-card,
+.result-card,
+.inline-stat,
+.line-section-card,
+.saved-record-card {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.inline-stats,
+.result-groups,
+.result-card__body,
+.card__body,
+.tc-card__body,
+.saved-record-card__body,
+.line-section-card__body {
+  gap: var(--space-3, 0.75rem);
+}
+
+.inline-stat strong,
+.line-section-card__title,
+.saved-record-card__title,
+.tc-consumer-row,
+.result-row,
+.result-line {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.tc-stack > .result-card,
+.tc-stack > .card,
+.tc-stack > .tc-card,
+.result-groups > *,
+[data-buffer-dynamic="result"] > *,
+[data-hx-dynamic="results"] > * {
+  margin-block-end: var(--space-3, 0.75rem);
+}
+
+.dw-save-dialog .field input,
+.dw-save-dialog .field select,
+.dw-save-dialog .control input,
+.dw-save-dialog .control select {
+  min-height: 42px;
+  height: 42px;
+}

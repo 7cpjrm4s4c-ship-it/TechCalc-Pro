@@ -3,12 +3,12 @@
   "purpose": "Find remaining module-local event handlers that must be migrated behind the central event pipeline.",
   "totals": {
     "filesWithLegacyHandlers": 3,
-    "legacyHandlerScore": 17
+    "legacyHandlerScore": 19
   },
   "findings": [
     {
       "file": "js/modules/drinking-water/controller.js",
-      "addEventListener": 13,
+      "addEventListener": 15,
       "directHandlers": 0,
       "legacySelectors": 0
     },

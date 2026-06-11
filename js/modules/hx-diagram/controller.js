@@ -9,6 +9,16 @@ function clearGeneratedPath() {
   state.set({ activePath: [], points: [] }, { notify: false });
 }
 
+function commitFieldValue(rootEl, id, value, action = 'hx:field-commit') {
+  if (!id) return;
+  const input = rootEl?.querySelector?.(`[data-field="${id}"]`);
+  if (input) {
+    input.value = value;
+    input.dispatchEvent?.(new Event('input', { bubbles: true }));
+  }
+  state.set({ [id]: value, activePath: [], points: [] }, { action });
+}
+
 function normalizeProcessSnapshot(snapshot = {}) {
   const savedProcesses = normalizeSavedProcesses(snapshot);
   return { ...snapshot, savedProcesses, processes: savedProcesses };
@@ -76,6 +86,7 @@ export function deleteSavedProcessById(id) {
 
 function bindHxProcessActionOverrides(rootEl) {
   registerCentralActions(rootEl, {
+    'hx:clear': ({ root }) => clearDiagram(root || rootEl),
     'line:update': ({ root }) => updateActiveProcessFromDialog(root || rootEl),
     'saved:delete': ({ element }) => {
       const id = element?.getAttribute?.('data-line-delete') || element?.closest?.('[data-line-delete]')?.getAttribute?.('data-line-delete');
@@ -125,9 +136,9 @@ export function hxProcessCard(snapshot = {}) {
   return hxProcessController.renderCard(normalizeProcessSnapshot(snapshot));
 }
 
-function clearDiagram() {
+function clearDiagram(rootEl = null) {
   clearLegacyPoints();
-  state.set({
+  const patch = {
     label: '',
     tempC: '',
     rhPercent: '',
@@ -136,7 +147,14 @@ function clearDiagram() {
     activeProcessId: null,
     activePath: [],
     points: []
-  }, { action: 'hx:clear' });
+  };
+  if (rootEl?.querySelectorAll) {
+    ['tempC', 'rhPercent', 'targetTempC', 'targetRhPercent', 'hxProcessName'].forEach(id => {
+      const field = rootEl.querySelector(`#${id}, [data-field="${id}"]`);
+      if (field) field.value = '';
+    });
+  }
+  state.set(patch, { action: 'hx:clear' });
 }
 
 function bindHxDelegation(rootEl) {
@@ -184,8 +202,10 @@ function bindHxDelegation(rootEl) {
       event.stopPropagation();
       const id = signButton.dataset.hxSign;
       const input = rootEl.querySelector(`[data-field="${id}"]`);
-      const next = toggleNumericSign(input?.value);
-      state.set({ [id]: next, activePath: [], points: [] }, { action: 'hx:toggle-sign' });
+      const currentValue = input?.value ?? state.get?.()?.[id] ?? '';
+      const next = toggleNumericSign(currentValue);
+      commitFieldValue(rootEl, id, next, 'hx:toggle-sign');
+      try { input?.focus?.({ preventScroll: true }); input?.select?.(); } catch { /* optional focus restore */ }
       return;
     }
 
@@ -193,7 +213,7 @@ function bindHxDelegation(rootEl) {
     if (clearButton && rootEl.contains(clearButton)) {
       event.preventDefault();
       event.stopPropagation();
-      clearDiagram();
+      clearDiagram(rootEl);
       return;
     }
   }, true);
