@@ -1,0 +1,103 @@
+{
+  "generatedAt": "2026-06-11T09:02:55.356Z",
+  "contractTarget": "1.3.0",
+  "modules": [
+    {
+      "module": "buffer-storage",
+      "usesDefineConfig": true,
+      "hasSchemaFile": true,
+      "exposesSchema": true,
+      "legacyRendererImports": 0,
+      "ownUiClassSamples": []
+    },
+    {
+      "module": "drinking-water",
+      "usesDefineConfig": true,
+      "hasSchemaFile": true,
+      "exposesSchema": true,
+      "legacyRendererImports": 0,
+      "ownUiClassSamples": []
+    },
+    {
+      "module": "heat-recovery",
+      "usesDefineConfig": true,
+      "hasSchemaFile": true,
+      "exposesSchema": true,
+      "legacyRendererImports": 0,
+      "ownUiClassSamples": []
+    },
+    {
+      "module": "heating-cooling",
+      "usesDefineConfig": true,
+      "hasSchemaFile": true,
+      "exposesSchema": true,
+      "legacyRendererImports": 0,
+      "ownUiClassSamples": [
+        "line-sections",
+        "store-first"
+      ]
+    },
+    {
+      "module": "hx-diagram",
+      "usesDefineConfig": true,
+      "hasSchemaFile": true,
+      "exposesSchema": true,
+      "legacyRendererImports": 0,
+      "ownUiClassSamples": []
+    },
+    {
+      "module": "pipe-sizing",
+      "usesDefineConfig": true,
+      "hasSchemaFile": true,
+      "exposesSchema": true,
+      "legacyRendererImports": 0,
+      "ownUiClassSamples": []
+    },
+    {
+      "module": "pressure-holding",
+      "usesDefineConfig": true,
+      "hasSchemaFile": true,
+      "exposesSchema": true,
+      "legacyRendererImports": 0,
+      "ownUiClassSamples": []
+    },
+    {
+      "module": "rainwater",
+      "usesDefineConfig": true,
+      "hasSchemaFile": true,
+      "exposesSchema": true,
+      "legacyRendererImports": 0,
+      "ownUiClassSamples": []
+    },
+    {
+      "module": "unit-converter",
+      "usesDefineConfig": true,
+      "hasSchemaFile": true,
+      "exposesSchema": true,
+      "legacyRendererImports": 0,
+      "ownUiClassSamples": []
+    },
+    {
+      "module": "ventilation",
+      "usesDefineConfig": true,
+      "hasSchemaFile": true,
+      "exposesSchema": true,
+      "legacyRendererImports": 0,
+      "ownUiClassSamples": []
+    },
+    {
+      "module": "wastewater",
+      "usesDefineConfig": true,
+      "hasSchemaFile": true,
+      "exposesSchema": true,
+      "legacyRendererImports": 0,
+      "ownUiClassSamples": []
+    }
+  ],
+  "summary": {
+    "total": 11,
+    "withDefineConfig": 11,
+    "withSchemaFile": 11,
+    "exposingSchema": 11
+  }
+}

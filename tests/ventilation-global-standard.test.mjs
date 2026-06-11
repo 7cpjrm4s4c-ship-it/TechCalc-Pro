@@ -10,7 +10,7 @@ const viewSource = readFileSync(new URL('../js/modules/ventilation/view.js', imp
 const viewModelSource = readFileSync(new URL('../js/modules/ventilation/viewModel.js', import.meta.url), 'utf8');
 const source = `${indexSource}\n${controllerSource}\n${viewSource}\n${viewModelSource}`;
 const dynamicRendererSource = readFileSync(new URL('../js/platform/dynamicRenderer/index.js', import.meta.url), 'utf8');
-const docs = readFileSync(new URL('../docs/PHASE_13A_VENTILATION_GLOBALIZATION.md', import.meta.url), 'utf8');
+const docs = readFileSync(new URL('../docs/phases/phase-13/PHASE_13A_VENTILATION_GLOBALIZATION.md', import.meta.url), 'utf8');
 
 assert.match(config.migrationStatus, /^phase-13[a-e]-ventilation-/, 'ventilation migration status is current phase 13');
 assert.ok(module.schema, 'ventilation module exposes schema');

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 
-assert.equal(existsSync('docs/PHASE_27A_PLATFORM_AUDIT_FRAMEWORK.md'), true, 'Phase 27A framework documentation must exist');
+assert.equal(existsSync('docs/phases/phase-27/PHASE_27A_PLATFORM_AUDIT_FRAMEWORK.md'), true, 'Phase 27A framework documentation must exist');
 assert.equal(existsSync('platform-audit-framework-phase27a.json'), true, 'Phase 27A framework JSON must exist');
 
 const framework = JSON.parse(readFileSync('platform-audit-framework-phase27a.json', 'utf8'));

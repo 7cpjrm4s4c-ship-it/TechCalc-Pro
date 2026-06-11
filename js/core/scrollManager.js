@@ -70,7 +70,7 @@ function writeScrollPosition(snapshot = {}, options = {}) {
   if (typeof window.scrollTo === 'function') window.scrollTo({ left: x, top: y, behavior });
 }
 
-export function capturePosition(scope = window) {
+export function capturePosition(scope = null) {
   return readScrollPosition(scope);
 }
 
@@ -99,7 +99,7 @@ export function isScrollFrozen() {
 }
 
 export function runWithoutScrollJump(action, options = {}) {
-  const snapshot = options.snapshot || capturePosition(options.scope || window);
+  const snapshot = options.snapshot || capturePosition(options.scope || null);
   const restore = () => restorePosition(snapshot, options);
   const scheduleRestore = () => {
     restore();
@@ -110,9 +110,11 @@ export function runWithoutScrollJump(action, options = {}) {
       const frame = () => {
         restore();
         remaining -= 1;
-        if (remaining > 0) requestAnimationFrame(frame);
+        const scheduleFrame = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : callback => setTimeout(callback, 0);
+      if (remaining > 0) scheduleFrame(frame);
       };
-      if (remaining > 0) requestAnimationFrame(frame);
+      const scheduleFrame = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : callback => setTimeout(callback, 0);
+      if (remaining > 0) scheduleFrame(frame);
     }
   };
 

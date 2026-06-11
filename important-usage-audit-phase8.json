@@ -1,0 +1,153 @@
+{
+  "importantCount": 29,
+  "budget": 35,
+  "status": "ok",
+  "note": "Phase 8 tightens the !important budget after removing duplicated settings-panel overrides. Remaining usages are tracked debt, not a default styling mechanism.",
+  "examples": [
+    {
+      "file": "css/components.css",
+      "line": 1041,
+      "text": "display: none !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1183,
+      "text": "left: 18px !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1184,
+      "text": "right: 18px !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1185,
+      "text": "bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 22px) !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1186,
+      "text": "top: auto !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1774,
+      "text": "display: none !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1808,
+      "text": "display: inline-flex !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1878,
+      "text": "display: none !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 1918,
+      "text": "display: none !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2008,
+      "text": "display: none !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2044,
+      "text": "display: none !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2160,
+      "text": "left: 10px !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2161,
+      "text": "right: 10px !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2162,
+      "text": "top: max(88px, calc(env(safe-area-inset-top) + 76px)) !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2163,
+      "text": "bottom: max(10px, env(safe-area-inset-bottom)) !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2199,
+      "text": "display: none !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2279,
+      "text": "left: 10px !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2280,
+      "text": "right: 10px !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2281,
+      "text": "top: max(84px, calc(env(safe-area-inset-top) + 74px)) !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2282,
+      "text": "bottom: max(10px, env(safe-area-inset-bottom)) !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 2933,
+      "text": "position: absolute !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 3046,
+      "text": "display: none !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 3338,
+      "text": "display: none !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 3368,
+      "text": "display: inline-flex !important;"
+    },
+    {
+      "file": "css/components.css",
+      "line": 3859,
+      "text": "display: inline-block !important;"
+    },
+    {
+      "file": "css/modules.css",
+      "line": 9,
+      "text": ".module-head { display: none !important; }"
+    },
+    {
+      "file": "css/modules.css",
+      "line": 10,
+      "text": ".module-content { gap: var(--ui-gap) !important; }"
+    },
+    {
+      "file": "css/modules.css",
+      "line": 11,
+      "text": ".module-content > * { margin-block: 0 !important; }"
+    },
+    {
+      "file": "css/tokens.css",
+      "line": 159,
+      "text": "linear-gradient(135deg, #f8fafc, #eef4fb 52%, #e8eef7) !important;"
+    }
+  ]
+}

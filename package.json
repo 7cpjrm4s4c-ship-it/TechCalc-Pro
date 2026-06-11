@@ -120,6 +120,8 @@
     "audit:controlled-cleanup": "node scripts/audit-controlled-cleanup-phase30d.mjs",
     "test:platform-cleanup-phase30d": "node tests/platform-controlled-cleanup-phase30d.test.mjs",
     "audit:final-baseline": "node scripts/audit-final-baseline-phase30e.mjs",
-    "test:platform-cleanup-phase30e": "node tests/platform-final-baseline-phase30e.test.mjs"
+    "test:platform-cleanup-phase30e": "node tests/platform-final-baseline-phase30e.test.mjs",
+    "build": "node scripts/check-js-imports.mjs",
+    "audit:imports": "node scripts/check-js-imports.mjs"
   }
 }

@@ -1,0 +1,28 @@
+{
+  "phase": "11B",
+  "purpose": "Find remaining module-local event handlers that must be migrated behind the central event pipeline.",
+  "totals": {
+    "filesWithLegacyHandlers": 3,
+    "legacyHandlerScore": 17
+  },
+  "findings": [
+    {
+      "file": "js/modules/drinking-water/controller.js",
+      "addEventListener": 13,
+      "directHandlers": 0,
+      "legacySelectors": 0
+    },
+    {
+      "file": "js/modules/heat-recovery/controller.js",
+      "addEventListener": 1,
+      "directHandlers": 0,
+      "legacySelectors": 0
+    },
+    {
+      "file": "js/modules/hx-diagram/controller.js",
+      "addEventListener": 3,
+      "directHandlers": 0,
+      "legacySelectors": 0
+    }
+  ]
+}
