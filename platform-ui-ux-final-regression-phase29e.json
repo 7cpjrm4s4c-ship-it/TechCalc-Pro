@@ -1,0 +1,209 @@
+{
+  "phase": "29E",
+  "title": "Final UI/UX Regression Baseline",
+  "generatedAt": "2026-06-11T06:24:46.676Z",
+  "score": 5,
+  "grade": "A",
+  "summary": {
+    "modules": 11,
+    "axes": 10,
+    "plannedChecks": 110,
+    "regressionChecks": 10,
+    "passed": 10,
+    "failed": 0,
+    "p0Open": 0,
+    "p1Open": 0,
+    "p2Open": 0,
+    "originalFindings": {
+      "p0": 0,
+      "p1": 9,
+      "p2": 22,
+      "p3": 9
+    },
+    "closedFindings": {
+      "p1": 9,
+      "p2": 22
+    },
+    "highRiskModules": [
+      "drinking-water",
+      "hx-diagram",
+      "rainwater",
+      "wastewater"
+    ],
+    "referenceModules": [
+      "buffer-storage",
+      "heat-recovery",
+      "hx-diagram"
+    ]
+  },
+  "modules": [
+    "buffer-storage",
+    "drinking-water",
+    "heat-recovery",
+    "heating-cooling",
+    "hx-diagram",
+    "pipe-sizing",
+    "pressure-holding",
+    "rainwater",
+    "unit-converter",
+    "ventilation",
+    "wastewater"
+  ],
+  "axes": [
+    "enter-tab-navigation",
+    "error-reset-states",
+    "focus-restore",
+    "input-confirmation",
+    "live-rendering",
+    "responsive-layout",
+    "result-rendering",
+    "saved-records",
+    "scroll-stability",
+    "unit-switching"
+  ],
+  "regressionMatrix": [
+    {
+      "id": "29E-UX-001",
+      "area": "audit-framework-integrity",
+      "severity": "P0",
+      "title": "29A audit framework covers all planned modules and UI/UX axes",
+      "pass": true,
+      "evidence": {
+        "modules": 11,
+        "axes": 10,
+        "plannedChecks": 110
+      }
+    },
+    {
+      "id": "29E-UX-002",
+      "area": "module-review-baseline",
+      "severity": "P0",
+      "title": "29B module review baseline remains complete and has no P0 findings",
+      "pass": true,
+      "evidence": {
+        "modules": 11,
+        "checks": 110,
+        "p0": 0
+      }
+    },
+    {
+      "id": "29E-UX-003",
+      "area": "p1-closure",
+      "severity": "P1",
+      "title": "All 29B P1 UI/UX findings are closed by 29C",
+      "pass": true,
+      "evidence": {
+        "originalP1": 9,
+        "p1Open": 0,
+        "p1Closed": 6
+      }
+    },
+    {
+      "id": "29E-UX-004",
+      "area": "p2-closure",
+      "severity": "P2",
+      "title": "All 29B P2 UI/UX findings are closed by 29D",
+      "pass": true,
+      "evidence": {
+        "originalP2": 22,
+        "p2Reviewed": 22,
+        "p2Closed": 22,
+        "p2Open": 0
+      }
+    },
+    {
+      "id": "29E-UX-005",
+      "area": "focus-navigation-regression",
+      "severity": "P1",
+      "title": "PlatformFocusManager still owns Enter/Tab navigation and focus/caret restore",
+      "pass": true,
+      "evidence": [
+        "handlePlatformFieldNavigation",
+        "handleEnterNavigation",
+        "handleTabNavigation",
+        "preserveFocusDuring",
+        "preventScroll"
+      ]
+    },
+    {
+      "id": "29E-UX-006",
+      "area": "scroll-stability-regression",
+      "severity": "P1",
+      "title": "PlatformScrollManager still owns scroll protection for render, saved records and module switches",
+      "pass": true,
+      "evidence": [
+        "runWithoutScrollJump",
+        "preserveSavedRecordMutation",
+        "preserveModuleSwitchScroll",
+        "freeze",
+        "unfreeze"
+      ]
+    },
+    {
+      "id": "29E-UX-007",
+      "area": "dynamic-render-regression",
+      "severity": "P1",
+      "title": "Module runtime still combines scroll and focus preservation during dynamic UI updates",
+      "pass": true,
+      "evidence": [
+        "preservePlatformUx",
+        "PlatformFocusManager.preserveFocusDuring",
+        "PlatformScrollManager.runWithoutScrollJump"
+      ]
+    },
+    {
+      "id": "29E-UX-008",
+      "area": "event-cleanup-regression",
+      "severity": "P2",
+      "title": "Event cleanup service remains available for UI/UX listeners",
+      "pass": true,
+      "evidence": [
+        "createEventScope",
+        "addEventListener",
+        "cleanup"
+      ]
+    },
+    {
+      "id": "29E-UX-009",
+      "area": "high-risk-module-coverage",
+      "severity": "P1",
+      "title": "High-risk UI/UX modules remain part of the final regression scope",
+      "pass": true,
+      "evidence": {
+        "highRiskModules": [
+          "drinking-water",
+          "hx-diagram",
+          "rainwater",
+          "wastewater"
+        ]
+      }
+    },
+    {
+      "id": "29E-UX-010",
+      "area": "reference-module-coverage",
+      "severity": "P2",
+      "title": "Reference modules remain part of the final regression baseline",
+      "pass": true,
+      "evidence": {
+        "referenceModules": [
+          "buffer-storage",
+          "heat-recovery",
+          "hx-diagram"
+        ]
+      }
+    }
+  ],
+  "acceptanceCriteria": [
+    "29A audit framework remains complete for 11 modules and 10 UI/UX axes.",
+    "29B review has no P0 findings and remains the baseline for 29C/29D closure.",
+    "29C closes all P1 findings from the bugfix round.",
+    "29D closes all P2 findings from the bugfix round.",
+    "Scroll, focus, dynamic-render and event cleanup infrastructure remain present after all fixes."
+  ],
+  "releaseReadiness": "UX bugfix round closed. Proceed to Phase 30 cleanup and structure audit.",
+  "nextPhase": {
+    "id": "30A",
+    "title": "Structure/Cleanup Audit",
+    "recommendation": "Start cleanup audit for duplicates, dead code, stale phase artifacts and documentation structure."
+  }
+}

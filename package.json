@@ -108,6 +108,8 @@
     "audit:ui-ux-bugfix-batch1": "node scripts/audit-ui-ux-bugfix-batch1-phase29c.mjs",
     "test:platform-ui-ux-phase29c": "node tests/platform-ui-ux-bugfix-batch1-phase29c.test.mjs",
     "audit:ui-ux-bugfix-batch2": "node scripts/audit-ui-ux-bugfix-batch2-phase29d.mjs",
-    "test:platform-ui-ux-phase29d": "node tests/platform-ui-ux-bugfix-batch2-phase29d.test.mjs"
+    "test:platform-ui-ux-phase29d": "node tests/platform-ui-ux-bugfix-batch2-phase29d.test.mjs",
+    "audit:ui-ux-final-regression": "node scripts/audit-ui-ux-final-regression-phase29e.mjs",
+    "test:platform-ui-ux-phase29e": "node tests/platform-ui-ux-final-regression-phase29e.test.mjs"
   }
 }
