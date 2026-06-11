@@ -112,6 +112,8 @@
     "audit:ui-ux-final-regression": "node scripts/audit-ui-ux-final-regression-phase29e.mjs",
     "test:platform-ui-ux-phase29e": "node tests/platform-ui-ux-final-regression-phase29e.test.mjs",
     "audit:structure-cleanup": "node scripts/audit-structure-cleanup-phase30a.mjs",
-    "test:platform-cleanup-phase30a": "node tests/platform-structure-cleanup-phase30a.test.mjs"
+    "test:platform-cleanup-phase30a": "node tests/platform-structure-cleanup-phase30a.test.mjs",
+    "audit:dead-code-duplicates": "node scripts/audit-dead-code-duplicates-phase30b.mjs",
+    "test:platform-cleanup-phase30b": "node tests/platform-dead-code-duplicates-phase30b.test.mjs"
   }
 }

@@ -1,0 +1,778 @@
+{
+  "phase": "30B",
+  "title": "Dead Code and Duplicate Detection",
+  "generatedAt": "2026-06-11T07:31:30.868Z",
+  "score": 4.24,
+  "grade": "B",
+  "summary": {
+    "sourceFiles": 344,
+    "runtimeFiles": 154,
+    "docsFiles": 117,
+    "exactDuplicateGroups": 1,
+    "duplicateNameGroups": 11,
+    "runtimeDeadCodeCandidates": 11,
+    "testOrScriptCandidates": 79,
+    "unusedExportCandidates": 109,
+    "unresolvedRelativeImports": 0
+  },
+  "findings": [
+    {
+      "id": "P30B-F1",
+      "priority": "P1",
+      "area": "Root/report clutter",
+      "count": 39,
+      "finding": "Root-level generated audit JSON files should be moved to a report/docs area before release packaging."
+    },
+    {
+      "id": "P30B-F2",
+      "priority": "P2",
+      "area": "Runtime dead-code candidates",
+      "count": 11,
+      "finding": "Runtime JS files without inbound static imports or package/html references require manual review before deletion."
+    },
+    {
+      "id": "P30B-F3",
+      "priority": "P2",
+      "area": "Historical tests/scripts",
+      "count": 79,
+      "finding": "Unreferenced tests/scripts are likely phase history; classify as archive, active quality gate, or removable."
+    },
+    {
+      "id": "P30B-F4",
+      "priority": "P2",
+      "area": "Exact duplicates",
+      "count": 1,
+      "finding": "Exact duplicate groups detected by SHA-256. Do not delete before checking package scripts and docs links."
+    },
+    {
+      "id": "P30B-F5",
+      "priority": "P3",
+      "area": "Import graph",
+      "count": 0,
+      "finding": "Unresolved relative import candidates detected by static scanner."
+    },
+    {
+      "id": "P30B-F6",
+      "priority": "P2",
+      "area": "Unused export candidates",
+      "count": 109,
+      "finding": "Exported runtime symbols without external textual references require manual review; dynamic use may exist."
+    }
+  ],
+  "candidates": {
+    "runtimeDeadCodeCandidates": [
+      "js/core/eventDelegation.js",
+      "js/core/menuFallback.js",
+      "js/core/moduleContract.js",
+      "js/core/pdfExport.js",
+      "js/core/platformLifecycle.js",
+      "js/core/quality/appHealth.js",
+      "js/core/resultRenderer.js",
+      "js/core/savedCalculationController.js",
+      "js/core/schemaModuleMount.js",
+      "js/core/uiSystem.js",
+      "js/modules/wastewater/lineModel.js"
+    ],
+    "testOrScriptCandidates": [
+      "tests/buffer-storage-phase23c1-platform-contract.test.mjs",
+      "tests/buffer-storage-phase23d-platform-contract.test.mjs",
+      "tests/dom-cache-loading-regression-phase15e.test.mjs",
+      "tests/event-pipeline-phase11d.test.mjs",
+      "tests/event-pipeline-rebind.test.mjs",
+      "tests/heating-cooling-interaction.test.mjs",
+      "tests/heating-cooling-phase12g.test.mjs",
+      "tests/heating-cooling-phase12i.test.mjs",
+      "tests/heating-cooling-phase18b1-result-model.test.mjs",
+      "tests/heating-cooling-phase18b2-line-section-controller.test.mjs",
+      "tests/heating-cooling-phase18b3-dynamic-renderer.test.mjs",
+      "tests/heating-cooling-phase18b4-platform-mount.test.mjs",
+      "tests/heating-cooling-phase18b4a-ordered-layout.test.mjs",
+      "tests/heating-cooling-phase18c-platform-hardening.test.mjs",
+      "tests/heating-cooling-phase18c1-pipe-island-guard.test.mjs",
+      "tests/heating-cooling-phase18c2-select-focus-nav-guard.test.mjs",
+      "tests/heating-cooling-phase18d-reference-consolidation.test.mjs",
+      "tests/heating-cooling-phase18d2-viewmodel-split.test.mjs",
+      "tests/module-contract.test.mjs",
+      "tests/module-lifecycle-phase15a.test.mjs",
+      "tests/module-lifecycle-phase15d.test.mjs",
+      "tests/pipe-sizing-phase21b2-saved-record-controller.test.mjs",
+      "tests/pipe-sizing-phase21b3-result-renderer.test.mjs",
+      "tests/pipe-sizing-phase21c-dynamic-renderer.test.mjs",
+      "tests/pipe-sizing-phase21c2-saved-record-line-attrs.test.mjs",
+      "tests/pipe-sizing-phase21c3-saved-record-controller-parity.test.mjs",
+      "tests/pipe-sizing-phase21d-platform-contract.test.mjs",
+      "tests/pipe-sizing-phase21e-hardening.test.mjs",
+      "tests/platform-policy.test.mjs",
+      "tests/pressure-holding-phase20b1-platform-mount.test.mjs",
+      "tests/pressure-holding-phase20b2-saved-record-controller.test.mjs",
+      "tests/pressure-holding-phase20b3-result-renderer.test.mjs",
+      "tests/pressure-holding-phase20c-dynamic-renderer.test.mjs",
+      "tests/pressure-holding-phase20d-platform-contract.test.mjs",
+      "tests/pressure-holding-phase20e-hardening.test.mjs",
+      "tests/rainwater-phase14c.test.mjs",
+      "tests/rainwater-phase14d.test.mjs",
+      "tests/rainwater-phase14e.test.mjs",
+      "tests/rainwater-phase14f.test.mjs",
+      "tests/rainwater-phase14g.test.mjs",
+      "tests/rainwater-phase14l.test.mjs",
+      "tests/rainwater-phase17a-decoupling.test.mjs",
+      "tests/rainwater-phase17a2-saved-actions.test.mjs",
+      "tests/rainwater-phase17a6-platform-control.test.mjs",
+      "tests/rainwater-phase17c11-heating-contract.test.mjs",
+      "tests/rainwater-phase17c12-switch.test.mjs",
+      "tests/rainwater-phase17c13-platform-dynamic-islands.test.mjs",
+      "tests/rainwater-phase17c16-segment-context.test.mjs",
+      "tests/reference-modules-phase17c-bugfix.test.mjs",
+      "tests/reference-modules-phase17c1-ui-bugfix.test.mjs",
+      "tests/reference-modules-phase17c2-reference-fixes.test.mjs",
+      "tests/reference-modules-phase17c3-saved-and-switch.test.mjs",
+      "tests/reference-modules-phase17c5-event-scroll.test.mjs",
+      "tests/reference-modules-phase17c6-saved-record-root-cause.test.mjs",
+      "tests/reference-modules-phase17c7-saved-record-heating-parity.test.mjs",
+      "tests/reference-modules-phase17c8-saved-record-heating-contract.test.mjs",
+      "tests/reference-modules-phase17c9-heating-saved-contract.test.mjs",
+      "tests/router-direct-navigation.test.mjs",
+      "tests/router-same-module-guard-phase15c.test.mjs",
+      "tests/router-single-navigation-path.test.mjs",
+      "tests/saved-record-controller-phase16b.test.mjs",
+      "tests/unit-converter-phase22b1-platform-mount.test.mjs",
+      "tests/unit-converter-phase22b3-result-renderer.test.mjs",
+      "tests/unit-converter-phase22c-dynamic-renderer.test.mjs",
+      "tests/unit-converter-phase22c1-result-cleanup.test.mjs",
+      "tests/unit-converter-phase22d-platform-contract.test.mjs",
+      "tests/unit-converter-phase22e-hardening.test.mjs",
+      "tests/ventilation-phase13e.test.mjs",
+      "tests/ventilation-phase19b1-platform-mount.test.mjs",
+      "tests/ventilation-phase19b2b-line-section-controller.test.mjs",
+      "tests/ventilation-phase19b2c-hydrator-final.test.mjs",
+      "tests/ventilation-phase19b2c-saved-record-island.test.mjs",
+      "tests/ventilation-phase19b3-result-renderer.test.mjs",
+      "tests/ventilation-phase19c-dynamic-renderer.test.mjs",
+      "tests/ventilation-phase19d-platform-contract.test.mjs",
+      "tests/ventilation-phase19d-project-storage-import.test.mjs",
+      "tests/wastewater-phase17b-platform-control.test.mjs",
+      "tests/wastewater-phase17b1-platform-collections.test.mjs",
+      "tests/wastewater-phase17b2-reference-level.test.mjs"
+    ],
+    "exactDuplicateGroups": [
+      [
+        "js/modules/rainwater/index.js",
+        "js/modules/wastewater/index.js"
+      ]
+    ],
+    "duplicateNameGroups": [
+      {
+        "basename": "state.js",
+        "files": [
+          "js/core/state.js",
+          "js/modules/buffer-storage/state.js",
+          "js/modules/drinking-water/state.js",
+          "js/modules/heat-recovery/state.js",
+          "js/modules/heating-cooling/state.js",
+          "js/modules/hx-diagram/state.js",
+          "js/modules/pipe-sizing/state.js",
+          "js/modules/pressure-holding/state.js",
+          "js/modules/rainwater/state.js",
+          "js/modules/unit-converter/state.js",
+          "js/modules/ventilation/state.js",
+          "js/modules/wastewater/state.js"
+        ]
+      },
+      {
+        "basename": "config.js",
+        "files": [
+          "js/modules/buffer-storage/config.js",
+          "js/modules/drinking-water/config.js",
+          "js/modules/heat-recovery/config.js",
+          "js/modules/heating-cooling/config.js",
+          "js/modules/hx-diagram/config.js",
+          "js/modules/pipe-sizing/config.js",
+          "js/modules/pressure-holding/config.js",
+          "js/modules/rainwater/config.js",
+          "js/modules/unit-converter/config.js",
+          "js/modules/ventilation/config.js",
+          "js/modules/wastewater/config.js"
+        ]
+      },
+      {
+        "basename": "controller.js",
+        "files": [
+          "js/modules/buffer-storage/controller.js",
+          "js/modules/drinking-water/controller.js",
+          "js/modules/heat-recovery/controller.js",
+          "js/modules/heating-cooling/controller.js",
+          "js/modules/hx-diagram/controller.js",
+          "js/modules/pipe-sizing/controller.js",
+          "js/modules/pressure-holding/controller.js",
+          "js/modules/rainwater/controller.js",
+          "js/modules/ventilation/controller.js",
+          "js/modules/wastewater/controller.js"
+        ]
+      },
+      {
+        "basename": "index.js",
+        "files": [
+          "js/modules/buffer-storage/index.js",
+          "js/modules/drinking-water/index.js",
+          "js/modules/heat-recovery/index.js",
+          "js/modules/heating-cooling/index.js",
+          "js/modules/hx-diagram/index.js",
+          "js/modules/pipe-sizing/index.js",
+          "js/modules/pressure-holding/index.js",
+          "js/modules/rainwater/index.js",
+          "js/modules/unit-converter/index.js",
+          "js/modules/ventilation/index.js",
+          "js/modules/wastewater/index.js",
+          "js/platform/collectionModel/index.js",
+          "js/platform/collectionRenderer/index.js",
+          "js/platform/dynamicRenderer/index.js",
+          "js/platform/lineSectionController/index.js",
+          "js/platform/moduleRenderer/index.js",
+          "js/platform/moduleRuntime/index.js",
+          "js/platform/resultRenderer/index.js",
+          "js/platform/savedRecordModel/index.js"
+        ]
+      },
+      {
+        "basename": "logic.js",
+        "files": [
+          "js/modules/buffer-storage/logic.js",
+          "js/modules/drinking-water/logic.js",
+          "js/modules/heat-recovery/logic.js",
+          "js/modules/heating-cooling/logic.js",
+          "js/modules/hx-diagram/logic.js",
+          "js/modules/pipe-sizing/logic.js",
+          "js/modules/pressure-holding/logic.js",
+          "js/modules/rainwater/logic.js",
+          "js/modules/unit-converter/logic.js",
+          "js/modules/ventilation/logic.js",
+          "js/modules/wastewater/logic.js"
+        ]
+      },
+      {
+        "basename": "results.js",
+        "files": [
+          "js/modules/buffer-storage/results.js",
+          "js/modules/drinking-water/results.js",
+          "js/modules/heat-recovery/results.js",
+          "js/modules/heating-cooling/results.js",
+          "js/modules/hx-diagram/results.js",
+          "js/modules/pipe-sizing/results.js",
+          "js/modules/pressure-holding/results.js",
+          "js/modules/rainwater/results.js",
+          "js/modules/unit-converter/results.js",
+          "js/modules/ventilation/results.js",
+          "js/modules/wastewater/results.js"
+        ]
+      },
+      {
+        "basename": "schema.js",
+        "files": [
+          "js/modules/buffer-storage/schema.js",
+          "js/modules/drinking-water/schema.js",
+          "js/modules/heat-recovery/schema.js",
+          "js/modules/heating-cooling/schema.js",
+          "js/modules/hx-diagram/schema.js",
+          "js/modules/pipe-sizing/schema.js",
+          "js/modules/pressure-holding/schema.js",
+          "js/modules/rainwater/schema.js",
+          "js/modules/unit-converter/schema.js",
+          "js/modules/ventilation/schema.js",
+          "js/modules/wastewater/schema.js"
+        ]
+      },
+      {
+        "basename": "view.js",
+        "files": [
+          "js/modules/buffer-storage/view.js",
+          "js/modules/drinking-water/view.js",
+          "js/modules/heat-recovery/view.js",
+          "js/modules/heating-cooling/view.js",
+          "js/modules/hx-diagram/view.js",
+          "js/modules/pipe-sizing/view.js",
+          "js/modules/pressure-holding/view.js",
+          "js/modules/unit-converter/view.js",
+          "js/modules/ventilation/view.js"
+        ]
+      },
+      {
+        "basename": "viewmodel.js",
+        "files": [
+          "js/modules/buffer-storage/viewModel.js",
+          "js/modules/drinking-water/viewModel.js",
+          "js/modules/heat-recovery/viewModel.js",
+          "js/modules/heating-cooling/viewModel.js",
+          "js/modules/hx-diagram/viewModel.js",
+          "js/modules/pipe-sizing/viewModel.js",
+          "js/modules/pressure-holding/viewModel.js",
+          "js/modules/unit-converter/viewModel.js",
+          "js/modules/ventilation/viewModel.js"
+        ]
+      },
+      {
+        "basename": "dynamicrenderer.js",
+        "files": [
+          "js/modules/drinking-water/dynamicRenderer.js",
+          "js/modules/heat-recovery/dynamicRenderer.js",
+          "js/modules/hx-diagram/dynamicRenderer.js"
+        ]
+      },
+      {
+        "basename": "tables.js",
+        "files": [
+          "js/modules/rainwater/tables.js",
+          "js/modules/wastewater/tables.js"
+        ]
+      }
+    ],
+    "unusedExportCandidates": [
+      {
+        "file": "js/core/centralStore.js",
+        "symbol": "getModuleStore"
+      },
+      {
+        "file": "js/core/centralStore.js",
+        "symbol": "getAppStateSnapshot"
+      },
+      {
+        "file": "js/core/eventDelegation.js",
+        "symbol": "createDelegationScope"
+      },
+      {
+        "file": "js/core/formActions.js",
+        "symbol": "fieldSelector"
+      },
+      {
+        "file": "js/core/formActions.js",
+        "symbol": "commitFields"
+      },
+      {
+        "file": "js/core/formActions.js",
+        "symbol": "prepareCommittedAction"
+      },
+      {
+        "file": "js/core/formActions.js",
+        "symbol": "bindActionWithCommittedFields"
+      },
+      {
+        "file": "js/core/formActions.js",
+        "symbol": "bindDelegatedActionWithCommittedFields"
+      },
+      {
+        "file": "js/core/formActions.js",
+        "symbol": "bindLiveCollectionInput"
+      },
+      {
+        "file": "js/core/moduleContract.js",
+        "symbol": "normalizeModuleDefinition"
+      },
+      {
+        "file": "js/core/moduleContract.js",
+        "symbol": "renderContractModule"
+      },
+      {
+        "file": "js/core/numberService.js",
+        "symbol": "parsePositiveNumber"
+      },
+      {
+        "file": "js/core/numberService.js",
+        "symbol": "parseInteger"
+      },
+      {
+        "file": "js/core/numbers.js",
+        "symbol": "formatGermanNumber"
+      },
+      {
+        "file": "js/core/platformLifecycle.js",
+        "symbol": "createPlatformLifecycle"
+      },
+      {
+        "file": "js/core/preferences.js",
+        "symbol": "savePreferences"
+      },
+      {
+        "file": "js/core/projectStorage.js",
+        "symbol": "resetProjectMeta"
+      },
+      {
+        "file": "js/core/projectStorage.js",
+        "symbol": "resetAllSessionData"
+      },
+      {
+        "file": "js/core/quality/appHealth.js",
+        "symbol": "appHealthChecks"
+      },
+      {
+        "file": "js/core/quality/appHealth.js",
+        "symbol": "createHealthSnapshot"
+      },
+      {
+        "file": "js/core/quality/performanceBudget.js",
+        "symbol": "measureBudget"
+      },
+      {
+        "file": "js/core/renderScheduler.js",
+        "symbol": "batchDOMUpdates"
+      },
+      {
+        "file": "js/core/renderer.js",
+        "symbol": "formCard"
+      },
+      {
+        "file": "js/core/renderer.js",
+        "symbol": "emptyCard"
+      },
+      {
+        "file": "js/core/renderer.js",
+        "symbol": "restoreViewport"
+      },
+      {
+        "file": "js/core/renderer.js",
+        "symbol": "shouldPreserveViewportForClick"
+      },
+      {
+        "file": "js/core/resultRenderer.js",
+        "symbol": "renderDetailResultCard"
+      },
+      {
+        "file": "js/core/router.js",
+        "symbol": "getRouteFromHash"
+      },
+      {
+        "file": "js/core/schemaModuleMount.js",
+        "symbol": "createSchemaModule"
+      },
+      {
+        "file": "js/core/scrollManager.js",
+        "symbol": "isScrollFrozen"
+      },
+      {
+        "file": "js/core/uiSystem.js",
+        "symbol": "uiSystem"
+      },
+      {
+        "file": "js/core/uiSystem.js",
+        "symbol": "warningList"
+      },
+      {
+        "file": "js/core/uiSystem.js",
+        "symbol": "helpText"
+      },
+      {
+        "file": "js/core/uiSystem.js",
+        "symbol": "noteCard"
+      },
+      {
+        "file": "js/modules/buffer-storage/controller.js",
+        "symbol": "savedBufferStats"
+      },
+      {
+        "file": "js/modules/buffer-storage/logic.js",
+        "symbol": "factorFor"
+      },
+      {
+        "file": "js/modules/buffer-storage/schema.js",
+        "symbol": "bufferStorageSchema"
+      },
+      {
+        "file": "js/modules/buffer-storage/view.js",
+        "symbol": "renderGlycolFields"
+      },
+      {
+        "file": "js/modules/buffer-storage/view.js",
+        "symbol": "renderRuntimeInputs"
+      },
+      {
+        "file": "js/modules/buffer-storage/view.js",
+        "symbol": "renderDefrostInputs"
+      },
+      {
+        "file": "js/modules/buffer-storage/view.js",
+        "symbol": "renderReserveInputs"
+      },
+      {
+        "file": "js/modules/buffer-storage/viewModel.js",
+        "symbol": "BUFFER_ACCENT"
+      },
+      {
+        "file": "js/modules/buffer-storage/viewModel.js",
+        "symbol": "inputModeFlags"
+      },
+      {
+        "file": "js/modules/drinking-water/logic.js",
+        "symbol": "consumerById"
+      },
+      {
+        "file": "js/modules/drinking-water/logic.js",
+        "symbol": "buildingById"
+      },
+      {
+        "file": "js/modules/drinking-water/logic.js",
+        "symbol": "summarizeUsageUnit"
+      },
+      {
+        "file": "js/modules/drinking-water/schema.js",
+        "symbol": "drinkingWaterSchema"
+      },
+      {
+        "file": "js/modules/heat-recovery/results.js",
+        "symbol": "formatAirPoint"
+      },
+      {
+        "file": "js/modules/heat-recovery/schema.js",
+        "symbol": "heatRecoverySchema"
+      },
+      {
+        "file": "js/modules/heat-recovery/view.js",
+        "symbol": "renderWrgInputCard"
+      },
+      {
+        "file": "js/modules/heat-recovery/view.js",
+        "symbol": "renderMixingInputCard"
+      },
+      {
+        "file": "js/modules/heat-recovery/viewModel.js",
+        "symbol": "HEAT_RECOVERY_ACCENT"
+      },
+      {
+        "file": "js/modules/heat-recovery/viewModel.js",
+        "symbol": "wrgInputGroups"
+      },
+      {
+        "file": "js/modules/heat-recovery/viewModel.js",
+        "symbol": "mixingInputGroups"
+      },
+      {
+        "file": "js/modules/heating-cooling/controller.js",
+        "symbol": "massFlowInputToKgH"
+      },
+      {
+        "file": "js/modules/heating-cooling/results.js",
+        "symbol": "pipeRows"
+      },
+      {
+        "file": "js/modules/heating-cooling/schema.js",
+        "symbol": "heatingCoolingSchema"
+      },
+      {
+        "file": "js/modules/hx-diagram/logic.js",
+        "symbol": "airDensityKgm3"
+      },
+      {
+        "file": "js/modules/hx-diagram/logic.js",
+        "symbol": "wetBulbApproxC"
+      },
+      {
+        "file": "js/modules/hx-diagram/logic.js",
+        "symbol": "calculatePoint"
+      },
+      {
+        "file": "js/modules/hx-diagram/logic.js",
+        "symbol": "pointFromW"
+      },
+      {
+        "file": "js/modules/hx-diagram/logic.js",
+        "symbol": "buildProcessPath"
+      },
+      {
+        "file": "js/modules/hx-diagram/logic.js",
+        "symbol": "classifyChange"
+      },
+      {
+        "file": "js/modules/hx-diagram/renderPipeline.js",
+        "symbol": "syncSavedProcessControls"
+      },
+      {
+        "file": "js/modules/hx-diagram/results.js",
+        "symbol": "hxFmt"
+      },
+      {
+        "file": "js/modules/hx-diagram/schema.js",
+        "symbol": "hxDiagramSchema"
+      },
+      {
+        "file": "js/modules/hx-diagram/state.js",
+        "symbol": "saveProcesses"
+      },
+      {
+        "file": "js/modules/hx-diagram/state.js",
+        "symbol": "makeProcessRecord"
+      },
+      {
+        "file": "js/modules/pipe-sizing/controller.js",
+        "symbol": "savedPipeStats"
+      },
+      {
+        "file": "js/modules/pipe-sizing/controller.js",
+        "symbol": "buildPipeRecord"
+      },
+      {
+        "file": "js/modules/pipe-sizing/results.js",
+        "symbol": "pipeSizingPrimary"
+      },
+      {
+        "file": "js/modules/pipe-sizing/results.js",
+        "symbol": "pipeSizingDetailRows"
+      },
+      {
+        "file": "js/modules/pipe-sizing/results.js",
+        "symbol": "pipeDimensionRows"
+      },
+      {
+        "file": "js/modules/pipe-sizing/schema.js",
+        "symbol": "pipeSizingSchema"
+      },
+      {
+        "file": "js/modules/pipe-sizing/viewModel.js",
+        "symbol": "savedRecordsContent"
+      },
+      {
+        "file": "js/modules/pressure-holding/controller.js",
+        "symbol": "savedPlantRows"
+      },
+      {
+        "file": "js/modules/pressure-holding/controller.js",
+        "symbol": "hydrateSavedPlant"
+      },
+      {
+        "file": "js/modules/pressure-holding/controller.js",
+        "symbol": "clearSavedPlant"
+      },
+      {
+        "file": "js/modules/pressure-holding/results.js",
+        "symbol": "pressureHoldingDetailRows"
+      },
+      {
+        "file": "js/modules/pressure-holding/results.js",
+        "symbol": "pressureHoldingFormulaRows"
+      },
+      {
+        "file": "js/modules/pressure-holding/schema.js",
+        "symbol": "pressureHoldingSchema"
+      },
+      {
+        "file": "js/modules/pressure-holding/viewModel.js",
+        "symbol": "explain"
+      },
+      {
+        "file": "js/modules/pressure-holding/viewModel.js",
+        "symbol": "temperatureFieldsContent"
+      },
+      {
+        "file": "js/modules/rainwater/controller.js",
+        "symbol": "surfaceRecordSnapshot"
+      },
+      {
+        "file": "js/modules/rainwater/controller.js",
+        "symbol": "statePatchFromSurface"
+      },
+      {
+        "file": "js/modules/rainwater/controller.js",
+        "symbol": "clearSurfaceEditorPatch"
+      },
+      {
+        "file": "js/modules/rainwater/controller.js",
+        "symbol": "resetSurfaceEditorAfterAdd"
+      },
+      {
+        "file": "js/modules/rainwater/logic.js",
+        "symbol": "getDrainByDn"
+      },
+      {
+        "file": "js/modules/rainwater/schema.js",
+        "symbol": "areaOptionsForMode"
+      },
+      {
+        "file": "js/modules/rainwater/schema.js",
+        "symbol": "rainwaterSchema"
+      },
+      {
+        "file": "js/modules/rainwater/tables.js",
+        "symbol": "gutterCombinations"
+      },
+      {
+        "file": "js/modules/unit-converter/results.js",
+        "symbol": "unitCategoryLabel"
+      },
+      {
+        "file": "js/modules/unit-converter/results.js",
+        "symbol": "unitConverterPrimary"
+      },
+      {
+        "file": "js/modules/unit-converter/results.js",
+        "symbol": "unitConverterAllValueRows"
+      },
+      {
+        "file": "js/modules/unit-converter/schema.js",
+        "symbol": "unitConverterSchema"
+      },
+      {
+        "file": "js/modules/ventilation/results.js",
+        "symbol": "ventilationResultRows"
+      },
+      {
+        "file": "js/modules/ventilation/schema.js",
+        "symbol": "ventilationSchema"
+      },
+      {
+        "file": "js/modules/wastewater/lineModel.js",
+        "symbol": "lineFamilyValue"
+      },
+      {
+        "file": "js/modules/wastewater/lineModel.js",
+        "symbol": "lineVentilationValue"
+      },
+      {
+        "file": "js/modules/wastewater/logic.js",
+        "symbol": "normalizeK"
+      },
+      {
+        "file": "js/modules/wastewater/results.js",
+        "symbol": "lineTypeLabel"
+      },
+      {
+        "file": "js/modules/wastewater/schema.js",
+        "symbol": "wastewaterSchema"
+      },
+      {
+        "file": "js/platform/collectionModel/index.js",
+        "symbol": "collectionKey"
+      },
+      {
+        "file": "js/platform/collectionRenderer/index.js",
+        "symbol": "renderCollectionEmpty"
+      },
+      {
+        "file": "js/platform/collectionRenderer/index.js",
+        "symbol": "renderCollectionItem"
+      },
+      {
+        "file": "js/platform/dynamicRenderer/index.js",
+        "symbol": "dynamicRendererInternals"
+      },
+      {
+        "file": "js/platform/resultRenderer/index.js",
+        "symbol": "renderStatsGroup"
+      },
+      {
+        "file": "js/utils/calculations.js",
+        "symbol": "getMedium"
+      },
+      {
+        "file": "js/utils/pipes.js",
+        "symbol": "dnTable"
+      }
+    ],
+    "unresolvedRelativeImports": []
+  },
+  "policy": {
+    "deleteAutomatically": false,
+    "reason": "Phase 30B is detection only. Deletion/moves happen in Phase 30C/30D after package scripts, docs references, and runtime import graph are updated.",
+    "safeNextStep": "Move generated audit JSONs and phase docs first; then remove only candidates with zero runtime/package/doc references."
+  },
+  "nextPhases": [
+    "30C - Documentation Reorganization",
+    "30D - Cleanup Batch",
+    "30E - Final Build/Import Baseline"
+  ]
+}
