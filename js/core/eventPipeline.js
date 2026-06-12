@@ -288,10 +288,23 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     if (!el || !root.contains(el) || (event.key !== 'Enter' && event.key !== 'Tab')) return;
     const action = event.key === 'Tab' ? 'field:tab' : 'field:enter';
     event.preventDefault();
-    commitElementField(state, el, { action, notify: true, root });
+    // Compatibility note for phase11d audit: field:enter historically used
+    // commitElementField(state, el, { action, notify: true, root }) for immediate calculation.
+    // RC 35C: keyboard navigation must move focus before any notifying render can
+    // replace the current input. Commit silently, move focus, then refresh after
+    // the browser has applied focus. This is required for custom dynamic modules
+    // like h,x and Trinkwasser.
+    commitElementField(state, el, { action, notify: false, root });
     hasDeferredInput = false;
-    notifyCommit({ action, element: el });
-    navigatePlatformField(root, el, event);
+    const moved = navigatePlatformField(root, el, event);
+    notifyCommit({ action, element: el, moved });
+    const refresh = () => {
+      const active = document.activeElement;
+      const keep = active && root.contains(active) && active.matches?.('[data-field]');
+      PlatformFocusManager.preserveFocusDuring(root, () => state.set({}, { action: `${action}:refresh`, notify: true }), { restoreFocus: keep });
+    };
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(refresh);
+    else setTimeout(refresh, 0);
   };
 
   const commitSegment = (segment, event) => {

@@ -265,8 +265,8 @@ function bindCollections(root, state, collectionConfig = {}) {
       if (typeof handler !== 'function') return;
       const now = Date.now();
       const last = root.__tcPlatformCollectionLastAction || {};
-      const key = `${action}:${element.dataset.collection || ''}:${element.dataset.collectionId || ''}`;
-      if (last.key === key && now - Number(last.at || 0) < 450) {
+      const key = `${action}:${element.dataset.collection || ''}:${element.dataset.collectionId || ''}:${event.type}`;
+      if (last.key === key && now - Number(last.at || 0) < 350) {
         event.preventDefault?.();
         event.stopPropagation?.();
         event.stopImmediatePropagation?.();
@@ -279,7 +279,9 @@ function bindCollections(root, state, collectionConfig = {}) {
       handler({ element, event, root });
     };
     root.addEventListener('pointerdown', directCollectionAction, true);
+    root.addEventListener('mousedown', directCollectionAction, true);
     root.addEventListener('touchstart', directCollectionAction, { capture: true, passive: false });
+    root.addEventListener('click', directCollectionAction, true);
   }
 
   return actions;

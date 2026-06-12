@@ -864,3 +864,37 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
     min-height: auto;
   }
 }
+
+/* Phase 35C: menu cards and overflow panels must grow or scroll with content. */
+.overflow-menu,
+.module-menu,
+.module-menu__card,
+.menu-card,
+.quick-access-card {
+  min-height: 0;
+  height: auto;
+  max-height: min(72vh, 560px);
+}
+.overflow-menu,
+.module-menu {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.overflow-menu__item,
+.module-menu__item,
+.menu-card,
+.quick-access-card {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+.overflow-menu__item span,
+.overflow-menu__item small,
+.module-menu__item span,
+.module-menu__item small,
+.menu-card *,
+.quick-access-card * {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
