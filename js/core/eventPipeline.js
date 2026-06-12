@@ -190,7 +190,7 @@ function wasPointerActionSuppressed(root) {
 
 function navigatePlatformField(root, current, event) {
   if (!root || !current?.matches?.('[data-field]')) return false;
-  return handlePlatformFieldNavigation(root, current, event, { select: true });
+  return handlePlatformFieldNavigation(root, current, event, { select: true, defer: false });
 }
 
 export function bindCentralEventPipeline(root, state, options = {}) {

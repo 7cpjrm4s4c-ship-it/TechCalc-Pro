@@ -43,7 +43,7 @@ export function savedPlantsCard(s = {}){
     namePlaceholder: 'z. B. Heizzentrale BT A',
     addAction: 'pressure:save',
     updateAction: 'pressure:update',
-    addDisabled: Boolean(s.activePlantId),
+    addDisabled: false,
     updateDisabled: !s.activePlantId,
     listHtml: savedPlantRows(s),
     accent: 'purple'

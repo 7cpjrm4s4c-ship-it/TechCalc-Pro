@@ -164,7 +164,7 @@ function installNavigationPersistenceGuard(root) {
 }
 
 function preserveScrollPosition(callback) {
-  return runWithoutScrollJump(callback, { frames: 2, delays: [40, 120] });
+  return runWithoutScrollJump(callback, { frames: 12, delays: [0, 40, 100, 220, 420, 800] });
 }
 
 export function refreshDrinkingWater(root) {
@@ -237,7 +237,7 @@ function saveUnit(root, update = false) {
   }
   state.set({ unitDraftConsumers: [], activeUnitId: update ? s.activeUnitId : null, activeSingleId:null, unitName: update ? s.unitName : '', unitSimultaneityFactor: update ? s.unitSimultaneityFactor : '', uiUnitFormOpen:true, uiUnitSavedOpen:true }, { action:'dw:unit-save', notify:false });
   refreshDrinkingWater(root);
-  }, { frames: 10, delays: [0, 40, 120, 260, 520] });
+  }, { frames: 14, delays: [0, 40, 100, 220, 420, 800] });
 }
 
 function saveSingle(root, update = false) {
@@ -255,7 +255,7 @@ function saveSingle(root, update = false) {
   }
   state.set({ singleDraftConsumers: [], activeUnitId:null, activeSingleId: update ? s.activeSingleId : null, singleName: update ? s.singleName : '', uiSingleFormOpen:true, uiSingleSavedOpen:true }, { action:'dw:single-save', notify:false });
   refreshDrinkingWater(root);
-  }, { frames: 10, delays: [0, 40, 120, 260, 520] });
+  }, { frames: 14, delays: [0, 40, 100, 220, 420, 800] });
 }
 
 function deleteUnit(root, id) {
@@ -371,7 +371,7 @@ export function bindDrinkingWaterActions(root) {
     event.stopImmediatePropagation?.();
     state.set({ [field.dataset.field]: field.value }, { action:event.key === 'Tab' ? 'dw:tab' : 'dw:enter', notify:false });
     refreshDrinkingWater(root);
-    handlePlatformFieldNavigation(root, field, event, { select:true });
+    handlePlatformFieldNavigation(root, field, event, { select:true, defer:false });
   };
   root.addEventListener('keydown', handleFieldConfirmNavigation, true);
 

@@ -157,7 +157,7 @@ export function savedRecords(s = {}, r = {}) {
     namePlaceholder: 'z. B. Dachfläche Nord',
     addAction: 'line:save',
     updateAction: 'line:update',
-    addDisabled: Boolean(s.activeSurfaceId),
+    addDisabled: false,
     updateDisabled: !s.activeSurfaceId,
     activeId: s.activeSurfaceId,
     expandedId: s.expandedSurfaceResultId,

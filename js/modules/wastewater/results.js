@@ -76,7 +76,7 @@ export function savedRecords(s = {}, r = {}) {
     nameLabel: 'Bezeichnung',
     nameValue: s.name || '',
     namePlaceholder: 'z. B. Strang WC-Kern Nord',
-    addDisabled: Boolean(s.activeCalculationId),
+    addDisabled: false,
     updateDisabled: !s.activeCalculationId,
     activeId: s.activeCalculationId,
     expandedId: s.expandedCalculationId,

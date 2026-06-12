@@ -222,7 +222,7 @@ function bindHxDelegation(rootEl) {
     event.stopPropagation();
     commitVisibleFields(rootEl);
     const fields = [...rootEl.querySelectorAll('input[data-field], select[data-field], textarea[data-field]')]
-      .filter(el => !el.disabled && el.offsetParent !== null);
+      .filter(el => !el.disabled && !el.hidden && el.getAttribute('aria-hidden') !== 'true' && !el.closest('[hidden], [aria-hidden="true"]'));
     const index = fields.indexOf(field);
     const next = fields[index + (event.shiftKey ? -1 : 1)];
     if (next) {
