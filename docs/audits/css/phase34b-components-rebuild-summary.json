@@ -1,0 +1,23 @@
+{
+  "phase": "34B",
+  "scope": "components-css-rebuild",
+  "before": {
+    "componentsCssLines": 5027,
+    "importantCount": 30,
+    "duplicateSelectors": 250
+  },
+  "after": {
+    "componentsCssLines": 747,
+    "modulesCssLines": 211,
+    "componentsImportantCount": 0,
+    "componentsDuplicateSelectors": 0
+  },
+  "decision": "global components remain in css/components.css; module-specific exceptions move to css/modules.css",
+  "qualityGate": {
+    "npmRunBuild": "ok",
+    "npmRunAuditImports": "ok",
+    "npmRunAuditCss": "ok",
+    "npmRunTestPhase34b": "ok",
+    "npmTest": "ok"
+  }
+}

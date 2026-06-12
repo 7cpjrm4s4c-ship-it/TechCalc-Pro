@@ -11,8 +11,8 @@
     ".tc-scroll-safe"
   ],
   "missing": [],
-  "importantCount": 25,
+  "importantCount": 0,
   "importantBudget": 35,
-  "legacySelectorLines": 312,
+  "legacySelectorLines": 55,
   "note": "Phase 16D establishes global tc-* primitives and keeps legacy module selectors as tracked migration debt."
 }

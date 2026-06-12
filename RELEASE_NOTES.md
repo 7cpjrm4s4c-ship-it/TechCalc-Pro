@@ -16,3 +16,9 @@ Release-hardening status after Phase 31D:
 - Module smoke audit completed for 11 active modules
 - Audit artefacts stored under `docs/audits/json/`
 - Release documentation consolidated
+
+## 1.3.0-rc.1 / Phase 34B
+
+- `components.css` neu aufgebaut und von 5027 auf 747 Zeilen reduziert.
+- Globale UI-Komponenten zentralisiert; Modul-Ausnahmen nach `css/modules.css` isoliert.
+- CSS-Quality-Gate ohne `!important` in `components.css` bestanden.

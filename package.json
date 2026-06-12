@@ -128,6 +128,7 @@
     "test:hx-diagram-phase32a3": "node tests/hx-diagram-phase32a3-mobile-action-hardening.test.mjs",
     "test:phase32b": "node tests/phase32b-scroll-saved-record-hardening.test.mjs",
     "test:phase32d": "node tests/phase32d-loading-release-notes.test.mjs",
-    "test:phase33-ui": "node tests/phase33-global-ui-foundation.test.mjs"
+    "test:phase33-ui": "node tests/phase33-global-ui-foundation.test.mjs",
+    "test:phase34b": "node tests/phase34b-components-rebuild.test.mjs"
   }
 }

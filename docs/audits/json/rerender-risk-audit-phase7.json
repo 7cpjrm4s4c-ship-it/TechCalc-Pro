@@ -6,12 +6,12 @@
   "findings": [
     {
       "file": "js/core/moduleRuntime.js",
-      "line": 104,
+      "line": 116,
       "text": "root.innerHTML = typeof loadingView === 'function'"
     },
     {
       "file": "js/core/moduleRuntime.js",
-      "line": 132,
+      "line": 151,
       "text": "root.innerHTML = '<div class=\"module-error card\">Modul konnte nicht geladen werden.</div>';"
     },
     {
