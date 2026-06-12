@@ -898,3 +898,38 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
   white-space: normal;
   overflow-wrap: anywhere;
 }
+
+/* Phase 35E: main overflow menu cards must size to content and scroll on small screens. */
+.overflow-menu,
+.overflow-menu__card,
+.overflow-menu__list {
+  min-height: 0;
+}
+.overflow-menu {
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.overflow-menu__card {
+  align-content: start;
+}
+.overflow-menu__row,
+.overflow-menu .overflow-menu__item {
+  min-height: auto;
+  height: auto;
+}
+.overflow-menu__item,
+.overflow-menu__item span,
+.overflow-menu__item small,
+.overflow-menu__head,
+.overflow-menu__empty {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 767px) {
+  .overflow-menu:not([hidden]) {
+    max-height: min(68dvh, calc(100dvh - var(--bottom-nav-h, 76px) - 120px));
+    overflow-y: auto;
+  }
+}

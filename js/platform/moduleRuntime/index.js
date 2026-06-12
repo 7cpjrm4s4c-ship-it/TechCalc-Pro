@@ -192,30 +192,34 @@ function bindLookupHydration(root, state, lookupConfig = {}) {
 function bindCollections(root, state, collectionConfig = {}) {
   const collections = collectionConfig.collections || collectionConfig;
   if (!collections || !Object.keys(collections).length) return {};
-  root.__tcPlatformCollectionContext = { collections };
+  root.__tcPlatformCollectionContext = { collections, state };
   if (!root.__tcPlatformCollectionBound) {
     root.__tcPlatformCollectionBound = true;
     root.addEventListener('input', event => {
       const input = event.target?.closest?.('[data-collection-input]');
       if (!input || !root.contains(input)) return;
       const name = input.dataset.collectionInput;
-      const activeCollections = root.__tcPlatformCollectionContext?.collections || collections;
+      const context = root.__tcPlatformCollectionContext || {};
+      const activeCollections = context.collections || collections;
+      const activeState = context.state || state;
       const cfg = activeCollections[name];
       if (!cfg || typeof cfg.patchInput !== 'function') return;
       event.stopPropagation();
-      const patch = cfg.patchInput({ id: input.dataset.collectionId, field: input.dataset.collectionField, value: input.value, current: state.get(), element: input, root }) || {};
-      if (Object.keys(patch).length) state.set(patch, { action: cfg.inputAction || `platform:collection:${name}:input`, notify: false });
+      const patch = cfg.patchInput({ id: input.dataset.collectionId, field: input.dataset.collectionField, value: input.value, current: activeState.get(), element: input, root }) || {};
+      if (Object.keys(patch).length) activeState.set(patch, { action: cfg.inputAction || `platform:collection:${name}:input`, notify: false });
     }, true);
     const commit = event => {
       const input = event.target?.closest?.('[data-collection-input]');
       if (!input || !root.contains(input)) return;
       const name = input.dataset.collectionInput;
-      const activeCollections = root.__tcPlatformCollectionContext?.collections || collections;
+      const context = root.__tcPlatformCollectionContext || {};
+      const activeCollections = context.collections || collections;
+      const activeState = context.state || state;
       const cfg = activeCollections[name];
       if (!cfg || typeof cfg.patchInput !== 'function') return;
       event.stopPropagation();
-      const patch = cfg.patchInput({ id: input.dataset.collectionId, field: input.dataset.collectionField, value: input.value, current: state.get(), element: input, root }) || {};
-      if (Object.keys(patch).length) state.set(patch, { action: cfg.commitAction || `platform:collection:${name}:commit`, notify: true });
+      const patch = cfg.patchInput({ id: input.dataset.collectionId, field: input.dataset.collectionField, value: input.value, current: activeState.get(), element: input, root }) || {};
+      if (Object.keys(patch).length) activeState.set(patch, { action: cfg.commitAction || `platform:collection:${name}:commit`, notify: true });
     };
     root.addEventListener('blur', commit, true);
     root.addEventListener('keydown', event => {
@@ -228,19 +232,24 @@ function bindCollections(root, state, collectionConfig = {}) {
   }
   const addCollectionItem = ({ element, root }) => {
     const name = element?.dataset?.collection;
-    const activeCollections = root.__tcPlatformCollectionContext?.collections || collections;
+    const context = root.__tcPlatformCollectionContext || {};
+    const activeCollections = context.collections || collections;
+    const activeState = context.state || state;
     const cfg = activeCollections[name];
     if (!cfg || typeof cfg.add !== 'function') return;
-    const patch = cfg.add({ current: state.get(), root, element, collection: name }) || {};
-    if (Object.keys(patch).length) preserveScroll(() => state.set(patch, { action: cfg.addStateAction || `platform:collection:${name}:add`, notify: true }));
+    commitAllFields(root, activeState, { action: cfg.preAddAction || `platform:collection:${name}:pre-add`, notify: false });
+    const patch = cfg.add({ current: activeState.get(), root, element, collection: name }) || {};
+    if (Object.keys(patch).length) preservePlatformUx(root, () => activeState.set(patch, { action: cfg.addStateAction || `platform:collection:${name}:add`, notify: true }), { frames: 10, delays: [0,40,100,220,420] });
   };
   const deleteCollectionItem = ({ element }) => {
     const name = element?.dataset?.collection;
-    const activeCollections = root.__tcPlatformCollectionContext?.collections || collections;
+    const context = root.__tcPlatformCollectionContext || {};
+    const activeCollections = context.collections || collections;
+    const activeState = context.state || state;
     const cfg = activeCollections[name];
     if (!cfg || typeof cfg.delete !== 'function') return;
-    const patch = cfg.delete({ id: element.dataset.collectionId, current: state.get(), element, root }) || {};
-    if (Object.keys(patch).length) preserveScroll(() => state.set(patch, { action: cfg.deleteAction || `platform:collection:${name}:delete`, notify: true }));
+    const patch = cfg.delete({ id: element.dataset.collectionId, current: activeState.get(), element, root }) || {};
+    if (Object.keys(patch).length) preservePlatformUx(root, () => activeState.set(patch, { action: cfg.deleteAction || `platform:collection:${name}:delete`, notify: true }), { frames: 10, delays: [0,40,100,220,420] });
   };
   const actions = {
     'platform:collection:add': addCollectionItem,

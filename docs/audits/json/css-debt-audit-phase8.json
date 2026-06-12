@@ -1,9 +1,21 @@
 {
-  "totalLines": 901,
+  "totalLines": 936,
   "importantCount": 0,
-  "patchComments": 11,
+  "patchComments": 12,
   "legacySelectorLines": 64,
   "duplicateSelectors": [
+    {
+      "selector": "@media (max-width: 767px)",
+      "count": 3
+    },
+    {
+      "selector": ".overflow-menu:not([hidden])",
+      "count": 3
+    },
+    {
+      "selector": ".overflow-menu",
+      "count": 2
+    },
     {
       "selector": ".sign-toggle",
       "count": 2
@@ -13,11 +25,7 @@
       "count": 2
     },
     {
-      "selector": "@media (max-width: 767px)",
-      "count": 2
-    },
-    {
-      "selector": ".overflow-menu:not([hidden])",
+      "selector": ".overflow-menu__list",
       "count": 2
     },
     {
