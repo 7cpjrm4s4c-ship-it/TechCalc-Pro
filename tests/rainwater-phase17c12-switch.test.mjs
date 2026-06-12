@@ -1,17 +1,9 @@
 import assert from 'node:assert/strict';
 import rainwater from '../js/modules/rainwater/index.js';
-import { renderPlatformModuleView } from '../js/platform/moduleRenderer/index.js';
+import { view as rainwaterView } from '../js/modules/rainwater/view.js';
 
 function render(snapshot) {
-  const result = rainwater.calculate(snapshot);
-  return renderPlatformModuleView({
-    config: rainwater.config,
-    schema: rainwater.schema,
-    state: snapshot,
-    result,
-    resultModel: rainwater.results(snapshot, result),
-    savedRecords: rainwater.savedRecords(snapshot, result)
-  });
+  return rainwaterView(snapshot);
 }
 
 const roof = rainwater.initialState;

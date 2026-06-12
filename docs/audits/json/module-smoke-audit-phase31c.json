@@ -1,7 +1,7 @@
 {
   "phase": "31C",
   "title": "Module smoke test audit",
-  "generatedAt": "2026-06-12T13:28:58.011Z",
+  "generatedAt": "2026-06-12T18:11:53.472Z",
   "central": {
     "enterTab": true,
     "scroll": true,
@@ -303,11 +303,15 @@
         "results.js",
         "schema.js",
         "state.js",
-        "tables.js"
+        "tables.js",
+        "view.js",
+        "viewModel.js"
       ],
       "missingRequired": [],
       "optionalRuntimeFilesPresent": [
-        "controller.js"
+        "controller.js",
+        "view.js",
+        "viewModel.js"
       ],
       "schema": {
         "fieldCount": 22,

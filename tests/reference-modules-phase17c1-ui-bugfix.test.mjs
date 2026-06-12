@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import wastewater from '../js/modules/wastewater/index.js';
 import rainwater from '../js/modules/rainwater/index.js';
+import { view as rainwaterView } from '../js/modules/rainwater/view.js';
 import { renderFormSchema } from '../js/core/formSchema.js';
-import { renderPlatformModuleView } from '../js/platform/moduleRenderer/index.js';
 
 const savedRecordsSource = readFileSync(new URL('../js/core/savedRecords.js', import.meta.url), 'utf8');
 const collectionRendererSource = readFileSync(new URL('../js/platform/collectionRenderer/index.js', import.meta.url), 'utf8');
@@ -29,15 +29,7 @@ assert.match(savedRecordsSource, /data-saved-record-id="\$\{esc\(item\.id\)\}"/,
 assert.match(savedRecordsSource, /\$\{toggleAttr\}="\$\{esc\(item\.id\)\}"/, 'Saved-card toggles must carry the record id for robust mobile selection.');
 
 function renderRainwater(state) {
-  const result = rainwater.calculate(state);
-  return renderPlatformModuleView({
-    config: rainwater.config,
-    schema: rainwater.schema,
-    state,
-    result,
-    resultModel: rainwater.results(state, result),
-    savedRecords: rainwater.savedRecords(state, result)
-  });
+  return rainwaterView(state);
 }
 const roofHtml = renderRainwater({ ...rainwater.initialState, surfaceMode:'roof', calculationType:'roof' });
 const propertyPatch = rainwater.controller.segments.fields.surfaceMode.patch('property', rainwater.initialState);

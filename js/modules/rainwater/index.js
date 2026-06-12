@@ -4,6 +4,7 @@ import { state, initialState } from './state.js';
 import { calculate } from './logic.js';
 import { results } from './results.js';
 import controller, { bindRainwaterPlatform } from './controller.js';
+import { view } from './view.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 
 export default createPlatformModule({
@@ -14,5 +15,7 @@ export default createPlatformModule({
   calculate,
   results,
   controller,
-  bind: bindRainwaterPlatform
+  view,
+  bind: bindRainwaterPlatform,
+  isDynamicAction: () => false
 });

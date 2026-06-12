@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 const schema = readFileSync('js/modules/rainwater/schema.js', 'utf8');
 const controller = readFileSync('js/modules/rainwater/controller.js', 'utf8');
 const results = readFileSync('js/modules/rainwater/results.js', 'utf8');
+const viewModel = readFileSync('js/modules/rainwater/viewModel.js', 'utf8');
 const schemaRenderer = readFileSync('js/core/schemaRenderer.js', 'utf8');
 const formSchema = readFileSync('js/core/formSchema.js', 'utf8');
 
@@ -20,6 +21,7 @@ assert.doesNotMatch(controller, /rainwater:|platform:rainwater|preCreateAction|p
 assert.match(controller, /createLineSectionController\s*\(/, 'Rainwater controller must use the heating-style line-section saved-record controller.');
 assert.doesNotMatch(controller, /attrs:\s*\{/, 'Rainwater controller must not keep legacy saved-record attr configuration.');
 assert.doesNotMatch(results, /data-rainwater/, 'Rainwater saved-record data must not use module hooks.');
-assert.match(results, /loadAttr:\s*'data-line-select'/, 'Rainwater saved-record data must use heating-style load attr.');
+assert.doesNotMatch(results, /export function savedRecords/, 'Rainwater results must not keep legacy saved-record data renderer.');
+assert.match(viewModel, /rainwaterSavedController\.renderCard/, 'Rainwater saved panel must be rendered through the line-section controller.');
 
 console.log('rainwater phase17a.6 platform-control decoupling ok');
