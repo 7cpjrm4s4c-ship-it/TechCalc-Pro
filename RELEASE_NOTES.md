@@ -29,3 +29,9 @@ Release-hardening status after Phase 31D:
 - Regenwasser-Flächeneditor behält sein Reset-Verhalten nach dem Speichern.
 - Phase-35D Regressionstest ergänzt.
 
+
+## Phase 35F – Save Dialog Module Cleanup
+
+- Druckhaltung, Schmutzwasser und Regenwasser auf Single-Controller-Speicherpattern bereinigt.
+- Legacy-`savedRecords`-Reste aus Schmutzwasser/Regenwasser entfernt.
+- Save-Dialog-Tests auf aktuelles `createLineSectionController`-Pattern aktualisiert.

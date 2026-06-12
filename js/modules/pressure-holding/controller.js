@@ -1,5 +1,3 @@
-// Phase 35D: pressure-holding now uses createLineSectionController, which internally registers central actions.
-// Compatibility markers for legacy audits: createSavedRecordActions, registerCentralActions, renderSavedRecordPanel, renderSavedRecordList, commitAllFields.
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';

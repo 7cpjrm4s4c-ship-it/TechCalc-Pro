@@ -115,7 +115,7 @@ export const wastewaterSavedController = createLineSectionController({
   hydrateRecord: ({ item, currentState }) => hydrate(item, currentState)
 });
 
-export function bindWastewaterSavedActions(root) {
+export function bindWastewaterPlatform(root) {
   wastewaterSavedController.bind(root);
 }
 
@@ -139,20 +139,6 @@ export default {
       patchInput: patchFixtureQuantity,
       delete: deleteFixture
     }
-  },
-  savedRecords: {
-    enabled: false,
-    snapshot,
-    hydrate,
-    clear,
-    listKey: 'savedCalculations',
-    activeIdKey: 'activeCalculationId',
-    expandedIdKey: 'expandedCalculationId',
-    nameKey: 'name',
-    recordPrefix: 'wastewater',
-    attrs: { loadAttr: 'data-line-select', toggleAttr: 'data-line-toggle', deleteAttr: 'data-line-delete' },
-    preserveSaveScroll: true,
-    preserveLoadScroll: true
   },
   normalizeFields: [...numericFields]
 };

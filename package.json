@@ -135,6 +135,7 @@
     "audit:css:regression": "node scripts/audit-css-regression-smoke-phase34d.mjs",
     "test:phase34d": "node tests/phase34d-css-regression-smoke.test.mjs",
     "test:phase35d": "node tests/phase35d-save-dialog-parity.test.mjs",
-    "test:phase35e": "node tests/phase35e-save-collection-navigation-menu.test.mjs"
+    "test:phase35e": "node tests/phase35e-save-collection-navigation-menu.test.mjs",
+    "test:phase35f": "node tests/phase35f-save-dialog-single-controller-cleanup.test.mjs"
   }
 }

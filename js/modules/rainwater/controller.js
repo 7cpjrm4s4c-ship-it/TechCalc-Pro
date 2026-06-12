@@ -250,7 +250,7 @@ export const rainwaterSavedController = createLineSectionController({
   afterCreatePatch: current => resetSurfaceEditorAfterAdd(current)
 });
 
-export function bindRainwaterSavedActions(root) {
+export function bindRainwaterPlatform(root) {
   rainwaterSavedController.bind(root);
 }
 
@@ -269,22 +269,7 @@ export default {
     hydrateDomFields: { drainSize: ['drainSizeManual', 'drainCapacity', 'drainHead'] },
         patch: lookupPatch
   },
-  normalizeFields: [...surfaceNumericFields],
-  savedRecords: {
-    enabled: false,
-    snapshot: surfaceRecordSnapshot,
-    hydrate: item => statePatchFromSurface(item),
-    clear: clearSurfaceEditorPatch,
-    listKey: 'surfaces',
-    activeIdKey: 'activeSurfaceId',
-    expandedIdKey: 'expandedSurfaceResultId',
-    nameKey: 'areaName',
-    recordPrefix: 'rain-surface',
-        afterCreatePatch: resetSurfaceEditorAfterAdd,
-    attrs: { loadAttr: 'data-line-select', toggleAttr: 'data-line-toggle', deleteAttr: 'data-line-delete' },
-    preserveSaveScroll: true,
-    preserveLoadScroll: true
-  }
+  normalizeFields: [...surfaceNumericFields]
 };
 
 export { modeDefaultsPatch };

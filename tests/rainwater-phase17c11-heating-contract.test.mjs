@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import schema from '../js/modules/rainwater/schema.js';
-import controller from '../js/modules/rainwater/controller.js';
+import { surfaceRecordSnapshot, statePatchFromSurface } from '../js/modules/rainwater/controller.js';
 import { initialState } from '../js/modules/rainwater/state.js';
 import { calculate } from '../js/modules/rainwater/logic.js';
 import { renderSchemaForm } from '../js/core/schemaRenderer.js';
@@ -26,7 +26,7 @@ const propertyState = {
   drainSize: 'DN 100'
 };
 
-const record = controller.savedRecords.snapshot(propertyState, calculate(propertyState));
+const record = surfaceRecordSnapshot(propertyState, calculate(propertyState));
 assert.equal(record.name, 'Hofflaeche Test');
 assert.ok(record.state, 'Rainwater saved surface record must store input values under state.');
 assert.equal(record.state.surfaceMode, 'property');
@@ -34,7 +34,7 @@ assert.equal(record.state.areaSize, '2500');
 assert.equal(record.surfaces, undefined, 'Rainwater saved surface record must not recursively store the surface list.');
 
 const saved = { id: 'surface-test-1', ...record };
-const hydrated = controller.savedRecords.hydrate(saved, propertyState);
+const hydrated = statePatchFromSurface(saved, propertyState);
 assert.equal(hydrated.activeSurfaceId, 'surface-test-1');
 assert.equal(hydrated.areaName, 'Hofflaeche Test');
 assert.equal(hydrated.surfaceMode, 'property');

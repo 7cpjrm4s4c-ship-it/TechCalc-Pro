@@ -17,7 +17,8 @@ assert.match(runtime, /root\.__tcPlatformSavedRecordContext\s*=\s*null/, 'Centra
 assert.doesNotMatch(runtime, /action === 'saved:add'|action === 'saved:update'/, 'Legacy saved:add/saved:update handlers must not compete with line save/update.');
 
 for (const [name, source] of [['rainwater', rainwaterController], ['wastewater', wastewaterController]]) {
-  assert.match(source, /attrs:\s*\{\s*loadAttr:\s*'data-line-select',\s*toggleAttr:\s*'data-line-toggle',\s*deleteAttr:\s*'data-line-delete'\s*\}/, `${name} must keep the heating-style saved attrs.`);
+  assert.match(source, /createLineSectionController\s*\(/, `${name} must use the heating-style line-section saved controller.`);
+  assert.doesNotMatch(source, /attrs:\s*\{/, `${name} must not keep legacy saved attr configuration.`);
   assert.doesNotMatch(source, /data-saved-|SavedRecordEventBridge|bindSavedRecordWorkflow|bindSavedRecordList/, `${name} must not carry local saved-record patches.`);
 }
 

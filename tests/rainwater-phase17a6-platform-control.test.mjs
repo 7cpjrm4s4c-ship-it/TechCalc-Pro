@@ -17,7 +17,8 @@ assert.match(schemaRenderer, /function renderNotice/, 'Schema renderer must own 
 assert.match(schemaRenderer, /function renderStats/, 'Schema renderer must own stats rendering.');
 assert.match(schemaRenderer, /function renderGroupActions/, 'Schema renderer must own group action rendering.');
 assert.doesNotMatch(controller, /rainwater:|platform:rainwater|preCreateAction|preUpdateAction/, 'Rainwater controller must not contain module-specific platform action names.');
-assert.match(controller, /attrs:\s*\{\s*loadAttr:\s*'data-line-select',\s*toggleAttr:\s*'data-line-toggle',\s*deleteAttr:\s*'data-line-delete'\s*\}/, 'Rainwater controller must use the heating-style saved-record attrs.');
+assert.match(controller, /createLineSectionController\s*\(/, 'Rainwater controller must use the heating-style line-section saved-record controller.');
+assert.doesNotMatch(controller, /attrs:\s*\{/, 'Rainwater controller must not keep legacy saved-record attr configuration.');
 assert.doesNotMatch(results, /data-rainwater/, 'Rainwater saved-record data must not use module hooks.');
 assert.match(results, /loadAttr:\s*'data-line-select'/, 'Rainwater saved-record data must use heating-style load attr.');
 
