@@ -1,0 +1,15 @@
+{
+  "phase": "32E",
+  "basis": "1.3.0-rc.1 phase34d",
+  "status": "pass_with_manual_visual_retest_required",
+  "totalBugs": 25,
+  "technicalVerified": 25,
+  "manualVisualRetestRecommended": 10,
+  "qualityGate": {
+    "build": "pass",
+    "auditImports": "pass",
+    "auditCss": "pass",
+    "testPhase32e": "pass",
+    "npmTest": "pass"
+  }
+}
