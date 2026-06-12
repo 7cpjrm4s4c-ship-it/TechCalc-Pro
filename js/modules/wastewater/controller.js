@@ -7,6 +7,11 @@ import { createStateSnapshot, hydrateStateRecord } from '../../platform/savedRec
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
+import { commitAllFields } from '../../core/eventPipeline.js';
+import { PlatformScrollManager } from '../../core/scrollManager.js';
+import { renderResultModel } from '../../platform/resultRenderer/index.js';
+import { results } from './results.js';
+import { renderWastewaterFixtures } from './view.js';
 
 const numericFields = new Set(['fixtureQuantity','fixtureCustomDu','kValue','fillRatio','slopeCmM','pipeLengthM','heightDifferenceM','bends90','continuousFlow','pumpFlow','rainFlow']);
 const normalizeNumeric = value => canonicalGermanNumberInput(value);
@@ -115,8 +120,141 @@ export const wastewaterSavedController = createLineSectionController({
   hydrateRecord: ({ item, currentState }) => hydrate(item, currentState)
 });
 
+function bindWastewaterCollections(root) {
+  if (!root || !state?.set) return;
+  const collectionConfig = {
+    fixtures: {
+      add: addFixture,
+      patchInput: patchFixtureQuantity,
+      delete: deleteFixture
+    }
+  };
+  root.__tcWastewaterCollectionContext = { collections: collectionConfig, state };
+
+  if (!root.__tcWastewaterCollectionInputBound) {
+    root.__tcWastewaterCollectionInputBound = true;
+    const commitQuantity = (event, notify = true) => {
+      const input = event.target?.closest?.('[data-collection-input="fixtures"]');
+      if (!input || !root.contains(input)) return;
+      event.stopPropagation?.();
+      const patch = patchFixtureQuantity({ id: input.dataset.collectionId, value: input.value, current: state.get(), element: input, root }) || {};
+      if (Object.keys(patch).length) state.set(patch, { action: notify ? 'platform:collection:fixtures:commit' : 'platform:collection:fixtures:input', notify });
+    };
+    root.addEventListener('input', event => commitQuantity(event, false), true);
+    root.addEventListener('blur', event => commitQuantity(event, true), true);
+    root.addEventListener('keydown', event => {
+      if (event.key !== 'Enter') return;
+      const input = event.target?.closest?.('[data-collection-input="fixtures"]');
+      if (!input || !root.contains(input)) return;
+      event.preventDefault();
+      commitQuantity(event, true);
+    }, true);
+  }
+
+  const add = ({ element, event } = {}) => {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    event?.stopImmediatePropagation?.();
+    commitAllFields(root, state, { action: 'platform:collection:fixtures:pre-add', notify: false });
+    const patch = addFixture({ current: state.get(), root, element, collection: 'fixtures' }) || {};
+    if (Object.keys(patch).length) {
+      PlatformScrollManager.runWithoutScrollJump(() => state.set(patch, { action: 'platform:collection:fixtures:add', notify: true }), { frames: 10, delays: [0, 40, 100, 220, 420] });
+    }
+  };
+  const remove = ({ element, event } = {}) => {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    event?.stopImmediatePropagation?.();
+    const patch = deleteFixture({ id: element?.dataset?.collectionId, current: state.get(), element, root }) || {};
+    if (Object.keys(patch).length) {
+      PlatformScrollManager.runWithoutScrollJump(() => state.set(patch, { action: 'platform:collection:fixtures:delete', notify: true }), { frames: 10, delays: [0, 40, 100, 220, 420] });
+    }
+  };
+
+  root.__tcWastewaterCollectionDirectContext = { add, remove };
+  if (!root.__tcWastewaterCollectionDirectBound) {
+    root.__tcWastewaterCollectionDirectBound = true;
+    const direct = event => {
+      const element = event.target?.closest?.('[data-tc-action]');
+      if (!element || !root.contains(element)) return;
+      const action = element.dataset.tcAction || '';
+      if (action !== 'platform:collection:add' && action !== 'platform:collection:delete' && action !== 'collection:delete') return;
+      const handler = action === 'platform:collection:add' ? root.__tcWastewaterCollectionDirectContext?.add : root.__tcWastewaterCollectionDirectContext?.remove;
+      if (typeof handler !== 'function') return;
+      const key = `${action}:${element.dataset.collection || ''}:${element.dataset.collectionId || ''}:${event.type}`;
+      const now = Date.now();
+      const last = root.__tcWastewaterCollectionLastAction || {};
+      if (last.key === key && now - Number(last.at || 0) < 350) {
+        event.preventDefault?.();
+        event.stopPropagation?.();
+        event.stopImmediatePropagation?.();
+        return;
+      }
+      root.__tcWastewaterCollectionLastAction = { key, at: now };
+      handler({ element, event, root });
+    };
+    root.addEventListener('pointerdown', direct, true);
+    root.addEventListener('mousedown', direct, true);
+    root.addEventListener('touchstart', direct, { capture: true, passive: false });
+    root.addEventListener('click', direct, true);
+  }
+}
+
 export function bindWastewaterPlatform(root) {
   wastewaterSavedController.bind(root);
+  bindWastewaterCollections(root);
+}
+
+function setIslandInner(root, selector, html) {
+  const el = root?.querySelector?.(selector);
+  if (!el) return false;
+  const next = String(html ?? '');
+  if (el.innerHTML !== next) el.innerHTML = next;
+  return true;
+}
+
+function setInputValue(root, field, value) {
+  const el = root?.querySelector?.(`input[data-field="${field}"], textarea[data-field="${field}"]`);
+  if (!el || document.activeElement === el) return;
+  const next = String(value ?? '');
+  if (el.value !== next) el.value = next;
+}
+
+export function updateWastewaterDynamic(root, s = {}, meta = {}) {
+  const r = calculate(s);
+  const action = String(meta.action || '');
+  const changed = Array.isArray(meta.changed) ? meta.changed : [];
+
+  setIslandInner(root, '[data-ww-dynamic="result"]', renderResultModel(results(s, r), 'green'));
+
+  if (/^platform:collection:fixtures:/.test(action) || changed.includes('fixtures')) {
+    setIslandInner(root, '[data-ww-dynamic="fixtures"]', renderWastewaterFixtures(r.fixtures || []));
+    setInputValue(root, 'fixtureQuantity', s.fixtureQuantity || '1');
+    setInputValue(root, 'fixtureCustomName', s.fixtureCustomName || '');
+    setInputValue(root, 'fixtureCustomDu', s.fixtureCustomDu || '');
+    setInputValue(root, 'fixtureCustomDn', s.fixtureCustomDn || '');
+  }
+
+  if (/^(line:|saved:)/.test(action) || changed.some(field => ['savedCalculations', 'activeCalculationId', 'name', 'expandedCalculationId'].includes(field))) {
+    wastewaterSavedController.updateControls(root, s);
+    setIslandInner(root, '[data-platform-dynamic="saved-records"]', wastewaterSavedController.renderRows(s));
+  }
+}
+
+const structuralFields = new Set([
+  'usageType',
+  'lineType',
+  'fixtureType',
+  'holdingType'
+]);
+
+export function isDynamicWastewaterAction(meta = {}) {
+  const action = String(meta.action || '');
+  if (action === 'initial') return false;
+  const changed = Array.isArray(meta.changed) ? meta.changed : [];
+  if (changed.some(field => structuralFields.has(field))) return false;
+  if (action.startsWith('platform:segment:') || action === 'segment:select') return false;
+  return true;
 }
 
 export default {

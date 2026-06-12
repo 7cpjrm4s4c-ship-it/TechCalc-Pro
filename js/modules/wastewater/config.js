@@ -9,7 +9,7 @@ export default defineModuleConfig({
   order: 18,
   defaultVisible: false,
 
-  migrationStatus: 'phase-8-schema-inventory',
+  migrationStatus: 'phase-8-schema-inventory phase-36a2-controller-viewmodel-view',
   capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.CENTRAL_SCROLL, MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS, MODULE_CAPABILITIES.FORM_SCHEMA],
   description: 'Vorbemessung von Schmutzwasserleitungen nach DIN 1986-100 mit DU-Summierung, Leitungstypen, DN-Auswahl und Plausibilitätsprüfung.'
 });

@@ -3,14 +3,15 @@ import schema from './schema.js';
 import { state, initialState } from './state.js';
 import { calculate } from './logic.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
-import { bindWastewaterPlatform, wastewaterSavedController } from './controller.js';
+import {
+  bindWastewaterPlatform,
+  isDynamicWastewaterAction,
+  updateWastewaterDynamic,
+  wastewaterSavedController
+} from './controller.js';
 import { createWastewaterView } from './view.js';
 
-const view = createWastewaterView(
-  config,
-  calculate,
-  wastewaterSavedController
-);
+const view = createWastewaterView(config, calculate, wastewaterSavedController);
 
 export default createPlatformModule({
   config,
@@ -19,5 +20,7 @@ export default createPlatformModule({
   initialState,
   calculate,
   view,
-  bind: bindWastewaterPlatform
+  bind: bindWastewaterPlatform,
+  dynamicUpdate: updateWastewaterDynamic,
+  isDynamicAction: isDynamicWastewaterAction
 });
