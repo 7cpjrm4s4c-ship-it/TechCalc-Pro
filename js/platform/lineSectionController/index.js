@@ -182,7 +182,7 @@ export function createLineSectionController({
         if (!element || !root.contains(element)) return;
         const action = element.dataset.tcAction || '';
         const id = element.getAttribute('data-line-select') || element.getAttribute('data-line-delete') || element.getAttribute('data-line-toggle') || element.closest?.('[data-line-select]')?.getAttribute('data-line-select') || '';
-        const key = `${action}:${id}:${event.type}`;
+        const key = `${action}:${id}`;
         const now = Date.now();
         const last = root.__tcLineSectionDirectLast || {};
         if (last.key === key && now - Number(last.at || 0) < 350) {
@@ -195,8 +195,6 @@ export function createLineSectionController({
         if (typeof handler === 'function' && handler(element, event)) root.__tcLineSectionDirectLast = { key, at: now };
       };
       root.addEventListener('pointerdown', direct, true);
-      root.addEventListener('mousedown', direct, true);
-      root.addEventListener('touchstart', direct, { capture: true, passive: false });
     }
 
     registerCentralActions(root, {
