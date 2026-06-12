@@ -933,3 +933,18 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
     overflow-y: auto;
   }
 }
+
+/* Phase 36A.5: enforce global 10px module card spacing after custom view migrations. */
+.tc-module-column > .tc-stack,
+.module-view .tc-module-column .tc-stack {
+  gap: 10px;
+}
+.tc-module-column .card + .card,
+.tc-module-column .card + [data-platform-dynamic],
+.tc-module-column [data-platform-dynamic] + .card {
+  margin-top: 10px;
+}
+.card__body > .tc-stack {
+  gap: 10px;
+}
+

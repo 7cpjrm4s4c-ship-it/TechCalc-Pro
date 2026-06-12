@@ -158,19 +158,50 @@ export function createLineSectionController({
       PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' })));
     };
 
+    const markHandledLineAction = (action, id = '') => {
+      root.__tcLineSectionHandledAction = {
+        key: `${action}:${id || ''}`,
+        at: Date.now()
+      };
+    };
+
+    const wasHandledLineAction = (action, id = '') => {
+      const last = root.__tcLineSectionHandledAction || {};
+      return last.key === `${action}:${id || ''}` && Date.now() - Number(last.at || 0) < 700;
+    };
+
     const handleLineAction = (element, event) => {
       const action = element?.dataset?.tcAction || '';
       if (!action || !root.contains(element)) return false;
       if (action !== 'line:save' && action !== 'line:update' && action !== 'saved:load' && action !== 'saved:delete' && action !== 'saved:toggle') return false;
+
+      const actionId = element?.getAttribute?.('data-line-select')
+        || element?.getAttribute?.('data-line-delete')
+        || element?.getAttribute?.('data-line-toggle')
+        || element?.closest?.('[data-line-select]')?.getAttribute?.('data-line-select')
+        || element?.closest?.('[data-line-delete]')?.getAttribute?.('data-line-delete')
+        || element?.closest?.('[data-line-toggle]')?.getAttribute?.('data-line-toggle')
+        || '';
+
+      if (event?.type === 'click' && wasHandledLineAction(action, actionId)) {
+        event?.preventDefault?.();
+        event?.stopPropagation?.();
+        event?.stopImmediatePropagation?.();
+        return true;
+      }
+
       event?.preventDefault?.();
       event?.stopPropagation?.();
       event?.stopImmediatePropagation?.();
       commitAllFields(root, state, { action: `${action}:pre-commit`, notify: false });
+
       if (action === 'line:save') saveCurrent({ root, element, event });
       else if (action === 'line:update') updateCurrent({ root, element, event });
-      else if (action === 'saved:load') load(element?.getAttribute('data-line-select') || element?.closest?.('[data-line-select]')?.getAttribute('data-line-select'));
-      else if (action === 'saved:delete') deleteLine(element?.getAttribute('data-line-delete') || element?.closest?.('[data-line-delete]')?.getAttribute('data-line-delete'));
+      else if (action === 'saved:load') load(actionId);
+      else if (action === 'saved:delete') deleteLine(actionId);
       else if (action === 'saved:toggle') toggle(element);
+
+      markHandledLineAction(action, actionId);
       return true;
     };
 
@@ -198,11 +229,11 @@ export function createLineSectionController({
     }
 
     registerCentralActions(root, {
-      'line:save': saveCurrent,
-      'line:update': updateCurrent,
-      'saved:load': ({ element }) => load(element?.getAttribute('data-line-select') || element?.closest?.('[data-line-select]')?.getAttribute('data-line-select')),
-      'saved:delete': ({ element }) => deleteLine(element?.getAttribute('data-line-delete')),
-      'saved:toggle': ({ element }) => toggle(element)
+      'line:save': ({ element, event }) => handleLineAction(element, event),
+      'line:update': ({ element, event }) => handleLineAction(element, event),
+      'saved:load': ({ element, event }) => handleLineAction(element, event),
+      'saved:delete': ({ element, event }) => handleLineAction(element, event),
+      'saved:toggle': ({ element, event }) => handleLineAction(element, event)
     });
   };
 

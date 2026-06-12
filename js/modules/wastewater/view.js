@@ -50,8 +50,8 @@ export function createWastewaterView(config, calculate, wastewaterSavedControlle
     ].join(''));
 
     return renderModuleShell(config, `
-      <div class="span-6">${inputColumn}</div>
-      <div class="span-6">${outputColumn}</div>
+      <div class="span-6 tc-module-column">${inputColumn}</div>
+      <div class="span-6 tc-module-column">${outputColumn}</div>
     `);
   };
 }
