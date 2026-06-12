@@ -41,27 +41,27 @@
     },
     {
       "file": "js/platform/moduleRuntime/index.js",
-      "line": 384,
+      "line": 416,
       "text": "root.innerHTML = view(snapshot);"
     },
     {
       "file": "js/platform/moduleRuntime/index.js",
-      "line": 477,
+      "line": 509,
       "text": "if (root.innerHTML !== nextView) root.innerHTML = nextView;"
     },
     {
       "file": "js/platform/moduleRuntime/index.js",
-      "line": 492,
+      "line": 524,
       "text": "if (formHost.innerHTML !== nextForm) formHost.innerHTML = nextForm;"
     },
     {
       "file": "js/platform/moduleRuntime/index.js",
-      "line": 496,
+      "line": 528,
       "text": "if (savedHost.innerHTML !== nextSaved) savedHost.innerHTML = nextSaved;"
     },
     {
       "file": "js/platform/moduleRuntime/index.js",
-      "line": 500,
+      "line": 532,
       "text": "if (sideHost.innerHTML !== nextSide) sideHost.innerHTML = nextSide;"
     }
   ]

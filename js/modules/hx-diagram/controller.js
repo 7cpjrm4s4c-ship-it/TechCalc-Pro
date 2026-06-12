@@ -177,7 +177,8 @@ function handleHxSignToggle(rootEl, signButton, event) {
   const currentValue = input?.value ?? state.get?.()?.[id] ?? '';
   const next = toggleNumericSign(currentValue);
   commitFieldValue(rootEl, id, next, 'hx:toggle-sign');
-  try { input?.focus?.({ preventScroll: true }); input?.select?.(); } catch { /* optional focus restore */ }
+  // Do not focus/select the input after toggling. Retest showed the toggle
+  // must change only the sign, not place a text selection into the field.
   return true;
 }
 
@@ -212,6 +213,23 @@ function bindHxDelegation(rootEl) {
     const field = event.target?.closest?.('[data-field]');
     if (!field || !rootEl.contains(field)) return;
     clearGeneratedPath();
+  }, true);
+
+  rootEl.addEventListener('keydown', event => {
+    const field = event.target?.closest?.('input[data-field], select[data-field], textarea[data-field]');
+    if (!field || !rootEl.contains(field) || (event.key !== 'Enter' && event.key !== 'Tab')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    commitVisibleFields(rootEl);
+    const fields = [...rootEl.querySelectorAll('input[data-field], select[data-field], textarea[data-field]')]
+      .filter(el => !el.disabled && el.offsetParent !== null);
+    const index = fields.indexOf(field);
+    const next = fields[index + (event.shiftKey ? -1 : 1)];
+    if (next) {
+      try { next.focus({ preventScroll: true }); if (next.select && next.matches('input, textarea')) next.select(); } catch { next.focus?.(); }
+    } else {
+      try { field.blur(); } catch { /* ignore */ }
+    }
   }, true);
 
   rootEl.addEventListener('change', event => {

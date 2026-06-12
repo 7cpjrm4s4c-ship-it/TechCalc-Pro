@@ -453,6 +453,10 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   add(root, 'pointerdown', event => {
     beginPointerGesture(root, event);
     if (event.target?.closest?.('[data-tc-action], [data-action]')) markCommittedAction(root);
+    // RC retest hardening: structural action buttons such as save/update/add
+    // must execute before a focused input blur can trigger a render and replace
+    // the tapped element. Segments keep their dedicated direct bridge.
+    if (onPointerAction(event)) return;
     confirmSurface(event);
   }, true);
   add(root, 'pointermove', event => updatePointerGesture(root, event), { capture: true, passive: true });

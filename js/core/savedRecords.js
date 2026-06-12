@@ -122,7 +122,7 @@ export function bindSavedRecordList(root, {
   if (!root) return;
   const key = `${loadAttr}|${toggleAttr}|${deleteAttr}`;
 
-  bindScopedOnce(root, key, 'click', event => {
+  const handleActivation = event => {
     const toggle = closestAttr(event.target, toggleAttr, root);
     if (toggle) {
       event.preventDefault();
@@ -141,7 +141,7 @@ export function bindSavedRecordList(root, {
         card?.classList.toggle('is-collapsed', !willOpen);
         toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
       }, { anchor: card, event });
-      return;
+      return true;
     }
 
     const deleteButton = closestAttr(event.target, deleteAttr, root);
@@ -151,12 +151,45 @@ export function bindSavedRecordList(root, {
       event.stopImmediatePropagation?.();
       markCommittedAction(root);
       onDelete?.(deleteButton.getAttribute(deleteAttr), deleteButton, event);
-      return;
+      return true;
     }
 
     const card = closestAttr(event.target, loadAttr, root);
-    if (!card || shouldIgnoreLoad(event, toggleAttr, deleteAttr)) return;
+    if (!card || shouldIgnoreLoad(event, toggleAttr, deleteAttr)) return false;
     activateLoad({ root, card, event, loadAttr, onLoad, preserveLoadScroll });
+    return true;
+  };
+
+  bindScopedOnce(root, `${key}:early`, 'pointerdown', event => {
+    const candidate = event.target?.closest?.(`[${loadAttr}], [${toggleAttr}], [${deleteAttr}], [data-line-card], [data-saved-record-card]`);
+    if (!candidate || !root.contains(candidate)) return;
+    const id = candidate.getAttribute?.(loadAttr) || candidate.getAttribute?.(toggleAttr) || candidate.getAttribute?.(deleteAttr) || candidate.dataset?.savedRecordId || '';
+    const action = candidate.hasAttribute?.(deleteAttr) ? 'delete' : candidate.hasAttribute?.(toggleAttr) ? 'toggle' : 'load';
+    const now = Date.now();
+    const last = root.__tcSavedRecordEarlyAction || {};
+    const earlyKey = `${action}:${id}`;
+    if (last.key === earlyKey && now - Number(last.at || 0) < 450) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation?.();
+      return;
+    }
+    root.__tcSavedRecordEarlyAction = { key: earlyKey, at: now };
+    handleActivation(event);
+  }, true);
+
+  bindScopedOnce(root, key, 'click', event => {
+    const candidate = event.target?.closest?.(`[${loadAttr}], [${toggleAttr}], [${deleteAttr}], [data-line-card], [data-saved-record-card]`);
+    const id = candidate?.getAttribute?.(loadAttr) || candidate?.getAttribute?.(toggleAttr) || candidate?.getAttribute?.(deleteAttr) || candidate?.dataset?.savedRecordId || '';
+    const action = candidate?.hasAttribute?.(deleteAttr) ? 'delete' : candidate?.hasAttribute?.(toggleAttr) ? 'toggle' : 'load';
+    const last = root.__tcSavedRecordEarlyAction || {};
+    if (last.key === `${action}:${id}` && Date.now() - Number(last.at || 0) < 450) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation?.();
+      return;
+    }
+    handleActivation(event);
   }, true);
 
   bindScopedOnce(root, key, 'keydown', event => {

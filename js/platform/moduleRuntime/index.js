@@ -245,6 +245,38 @@ function bindCollections(root, state, collectionConfig = {}) {
   Object.entries(collections).forEach(([name, cfg]) => {
     if (typeof cfg.add === 'function' && cfg.addAction) actions[cfg.addAction] = addCollectionItem;
   });
+
+  // RC visual retest hardening: collection add buttons must work even while a
+  // mobile keyboard is still open. Native blur can otherwise trigger a render
+  // before the final click reaches the button, making the first tap appear dead.
+  root.__tcPlatformCollectionActionContext = { actions };
+  if (!root.__tcPlatformCollectionActionDirectBound) {
+    root.__tcPlatformCollectionActionDirectBound = true;
+    const directCollectionAction = event => {
+      const element = event.target?.closest?.('[data-tc-action], [data-action]');
+      if (!element || !root.contains(element)) return;
+      const action = element.dataset.tcAction || element.dataset.action || '';
+      const handler = root.__tcPlatformCollectionActionContext?.actions?.[action];
+      if (typeof handler !== 'function') return;
+      const now = Date.now();
+      const last = root.__tcPlatformCollectionLastAction || {};
+      const key = `${action}:${element.dataset.collection || ''}:${element.dataset.collectionId || ''}`;
+      if (last.key === key && now - Number(last.at || 0) < 450) {
+        event.preventDefault?.();
+        event.stopPropagation?.();
+        event.stopImmediatePropagation?.();
+        return;
+      }
+      root.__tcPlatformCollectionLastAction = { key, at: now };
+      event.preventDefault?.();
+      event.stopPropagation?.();
+      event.stopImmediatePropagation?.();
+      handler({ element, event, root });
+    };
+    root.addEventListener('pointerdown', directCollectionAction, true);
+    root.addEventListener('touchstart', directCollectionAction, { capture: true, passive: false });
+  }
+
   return actions;
 }
 

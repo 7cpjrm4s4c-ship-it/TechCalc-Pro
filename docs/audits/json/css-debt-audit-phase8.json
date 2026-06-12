@@ -1,8 +1,25 @@
 {
-  "totalLines": 741,
+  "totalLines": 867,
   "importantCount": 0,
-  "patchComments": 9,
-  "legacySelectorLines": 49,
-  "duplicateSelectors": [],
+  "patchComments": 10,
+  "legacySelectorLines": 64,
+  "duplicateSelectors": [
+    {
+      "selector": ".sign-toggle",
+      "count": 2
+    },
+    {
+      "selector": ".tc-result-item",
+      "count": 2
+    },
+    {
+      "selector": "@media (max-width: 767px)",
+      "count": 2
+    },
+    {
+      "selector": ".overflow-menu:not([hidden])",
+      "count": 2
+    }
+  ],
   "note": "Phase 8 removes duplicated settings-panel overrides and tracks remaining legacy selectors as explicit migration debt."
 }

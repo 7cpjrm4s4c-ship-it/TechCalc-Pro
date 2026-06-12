@@ -738,3 +738,129 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
     scroll-behavior: auto;
   }
 }
+
+/* Phase 35A: RC retest UI contract hardening.
+   Keep spacing, menu sizing and result rows globally consistent after 34D rebuild. */
+.module-content,
+.module-content > *,
+.tc-stack,
+.card,
+.tc-card,
+.card__body,
+.tc-card__body,
+.result-card__body,
+.result-list,
+.result-groups,
+.inline-stats,
+.line-section-list,
+.saved-record-list,
+[data-platform-dynamic],
+[data-pipe-dynamic],
+[data-ph-dynamic],
+[data-buffer-dynamic],
+[data-hx-dynamic],
+[data-dw-dynamic],
+[data-wastewater-dynamic],
+[data-rainwater-dynamic] {
+  gap: var(--tc-gap);
+}
+
+.card,
+.tc-card,
+.result-card,
+.line-section-card,
+.saved-record-card,
+.ph-saved-item,
+.pipe-dimension-card,
+.inline-stat,
+.result-row,
+.main-result {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.card__body,
+.tc-card__body,
+.result-card__body,
+.line-section-card__body,
+.saved-record-card__body,
+[data-platform-dynamic],
+[data-buffer-dynamic="result"],
+[data-hx-dynamic="results"],
+[data-ph-dynamic="result"],
+[data-pipe-dynamic="result"] {
+  display: grid;
+  gap: var(--tc-gap);
+  align-content: start;
+}
+
+.result-row,
+.inline-stat,
+.main-result,
+.pipe-result-head,
+.tc-result-item {
+  padding: var(--tc-gap);
+  border-radius: var(--radius-md);
+}
+
+.result-row > *,
+.inline-stat > *,
+.main-result > *,
+.pipe-result-head > *,
+.tc-result-item > * {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.sign-toggle {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.overflow-menu,
+.overflow-menu:not([hidden]) {
+  height: auto;
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.overflow-menu__card,
+.overflow-menu__list {
+  min-height: 0;
+  height: auto;
+  max-height: none;
+}
+
+.overflow-menu__row,
+.overflow-menu__item,
+.overflow-menu button {
+  min-height: auto;
+  height: auto;
+  white-space: normal;
+  overflow: visible;
+}
+
+.overflow-menu__item span,
+.overflow-menu__item small {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+@media (max-width: 767px) {
+  .overflow-menu,
+  .overflow-menu:not([hidden]) {
+    max-height: min(68dvh, calc(100dvh - var(--bottom-nav-h) - 58px));
+    overflow-y: auto;
+  }
+
+  .overflow-menu__row {
+    min-height: auto;
+  }
+}

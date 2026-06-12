@@ -275,17 +275,27 @@ function deleteSingle(root, id) {
 }
 
 function editUnit(root, id) {
-  const unit = normalizeDrinkingWaterSavedState(state.get()).savedUsageUnits.find(item => isSameId(item.id, id));
+  const current = state.get();
+  if (isSameId(current.activeUnitId, id)) {
+    clearActiveEdit(root);
+    return;
+  }
+  const unit = normalizeDrinkingWaterSavedState(current).savedUsageUnits.find(item => isSameId(item.id, id));
   if (!unit) return;
-  state.set({ activeUnitId:unit.id, activeSingleId:null, unitName:unit.name, unitSimultaneityFactor:unit.simultaneityFactor || '', singleName:'', unitDraftConsumers:unit.consumers || [], singleDraftConsumers:[], uiUnitFormOpen:Boolean(state.get().uiUnitFormOpen), uiUnitSavedOpen:true }, { action:'dw:unit-edit', notify:false });
+  state.set({ activeUnitId:unit.id, activeSingleId:null, unitName:unit.name, unitSimultaneityFactor:unit.simultaneityFactor || '', singleName:'', unitDraftConsumers:unit.consumers || [], singleDraftConsumers:[], uiUnitFormOpen:Boolean(current.uiUnitFormOpen), uiUnitSavedOpen:true }, { action:'dw:unit-edit', notify:false });
   refreshDrinkingWater(root);
 }
 
 function editSingle(root, id) {
-  const group = normalizeDrinkingWaterSavedState(state.get()).savedSingleConsumers.map(normalizeSingleGroupForEdit).filter(Boolean).find(item => isSameId(item.id, id));
+  const current = state.get();
+  if (isSameId(current.activeSingleId, id)) {
+    clearActiveEdit(root);
+    return;
+  }
+  const group = normalizeDrinkingWaterSavedState(current).savedSingleConsumers.map(normalizeSingleGroupForEdit).filter(Boolean).find(item => isSameId(item.id, id));
   if (!group) return;
   const consumers = (group.consumers || []).map(c => ({ ...c }));
-  state.set({ activeUnitId:null, activeSingleId:group.id, unitName:'', unitDraftConsumers:[], singleName:group.name, singleDraftConsumers:consumers, singlePermanent:String(consumers.some(c => c.permanent)), uiSingleFormOpen:Boolean(state.get().uiSingleFormOpen), uiSingleSavedOpen:true }, { action:'dw:single-edit', notify:false });
+  state.set({ activeUnitId:null, activeSingleId:group.id, unitName:'', unitDraftConsumers:[], singleName:group.name, singleDraftConsumers:consumers, singlePermanent:String(consumers.some(c => c.permanent)), uiSingleFormOpen:Boolean(current.uiSingleFormOpen), uiSingleSavedOpen:true }, { action:'dw:single-edit', notify:false });
   refreshDrinkingWater(root);
 }
 
@@ -353,14 +363,17 @@ export function bindDrinkingWaterActions(root) {
   }, { capture:true, passive:false });
 
 
-  root.addEventListener('keydown', event => {
+  const handleFieldConfirmNavigation = event => {
     const field = event.target.closest('[data-field]');
     if (!field || !root.contains(field) || (event.key !== 'Enter' && event.key !== 'Tab')) return;
     event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation?.();
     state.set({ [field.dataset.field]: field.value }, { action:event.key === 'Tab' ? 'dw:tab' : 'dw:enter', notify:false });
     refreshDrinkingWater(root);
     handlePlatformFieldNavigation(root, field, event, { select:true });
-  });
+  };
+  root.addEventListener('keydown', handleFieldConfirmNavigation, true);
 
   root.addEventListener('click', event => {
     const target = event.target;
