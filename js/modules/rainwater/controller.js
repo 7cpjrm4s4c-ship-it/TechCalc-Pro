@@ -254,6 +254,24 @@ export function bindRainwaterPlatform(root) {
   rainwaterSavedController.bind(root);
 }
 
+
+export function updateRainwaterDynamic(root, s = {}, meta = {}) {
+  rainwaterSavedController.updateControls(root, s);
+  const host = root?.querySelector?.('[data-rw-dynamic="saved-records"]');
+  if (host) {
+    const next = rainwaterSavedController.renderCard(s);
+    if (host.innerHTML !== next) host.innerHTML = next;
+  }
+}
+
+export function isDynamicRainwaterAction(meta = {}) {
+  const action = String(meta.action || '');
+  if (action === 'initial') return false;
+  if (action.startsWith('line:') || action.startsWith('saved:')) return true;
+  const changed = Array.isArray(meta.changed) ? meta.changed : [];
+  return changed.some(f => ['surfaces','activeSurfaceId','expandedSurfaceResultId','areaName'].includes(f));
+}
+
 export default {
   segments: {
     fields: {
