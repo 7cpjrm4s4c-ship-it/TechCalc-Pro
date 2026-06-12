@@ -25,9 +25,12 @@ export function createLineSectionController({
   dynamicDataAttr = 'data-line-dynamic',
   stats = () => [],
   title = item => item?.name || 'Abschnitt',
+  subtitle = null,
   currentResult = () => ({}),
   buildRecord,
   hydrateRecord,
+  afterCreatePatch = null,
+  afterUpdatePatch = null,
   debounceMs = 700
 } = {}) {
   let memory = [];
@@ -56,6 +59,7 @@ export function createLineSectionController({
     toggleAttr: 'data-line-toggle',
     deleteAttr: 'data-line-delete',
     title,
+    subtitle,
     stats
   });
 
@@ -105,7 +109,8 @@ export function createLineSectionController({
       const id = createRecordId(recordPrefix);
       const item = buildRecord?.({ currentState: { ...currentState, [activeIdKey]: null, [nameKey]: name }, result: currentResult(), items, id, name }) || null;
       if (!item) return;
-      persist([item, ...items], { [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, 'line:save');
+      const extraPatch = typeof afterCreatePatch === 'function' ? (afterCreatePatch(currentState, item) || {}) : {};
+      persist([item, ...items], { [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey], ...extraPatch }, 'line:save');
     };
 
     const updateCurrent = ({ root: actionRoot } = {}) => {
@@ -120,7 +125,8 @@ export function createLineSectionController({
       if (!existing) return;
       const item = buildRecord?.({ currentState, result: currentResult(), items, id, name, existing }) || null;
       if (!item) return;
-      persist(replaceRecord(items, id, item), { [activeIdKey]: id, [nameKey]: item.name, [expandedIdKey]: state.get()?.[expandedIdKey] }, 'line:update');
+      const extraPatch = typeof afterUpdatePatch === 'function' ? (afterUpdatePatch(currentState, item) || {}) : {};
+      persist(replaceRecord(items, id, item), { [activeIdKey]: id, [nameKey]: item.name, [expandedIdKey]: state.get()?.[expandedIdKey], ...extraPatch }, 'line:update');
     };
 
     const load = id => {

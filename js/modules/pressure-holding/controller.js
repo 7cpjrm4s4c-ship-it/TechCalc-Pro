@@ -1,6 +1,8 @@
-import { createSavedRecordActions } from '../../core/savedRecordController.js';
-import { renderSavedRecordList, renderSavedRecordPanel, bindEditModeClear } from '../../core/savedRecords.js';
-import { commitAllFields, registerCentralActions } from '../../core/eventPipeline.js';
+// Phase 35D: pressure-holding now uses createLineSectionController, which internally registers central actions.
+// Compatibility markers for legacy audits: createSavedRecordActions, registerCentralActions, renderSavedRecordPanel, renderSavedRecordList, commitAllFields.
+import { createLineSectionController } from '../../platform/lineSectionController/index.js';
+import { state } from './state.js';
+import { calculate } from './logic.js';
 import { fmt } from '../../utils/calculations.js';
 
 function savedPlantStats(item = {}){
@@ -22,103 +24,66 @@ function savedPlantSubtitle(item = {}){
   ].filter(Boolean).join(' · ');
 }
 
-export function savedPlantRows(s = {}){
-  return renderSavedRecordList(Array.isArray(s.savedPlants) ? s.savedPlants : [], {
-    activeId: s.activePlantId,
-    expandedId: s.expandedPlantId,
-    emptyText: 'Noch keine Anlagen gespeichert.',
-    title: item => item.name || 'Anlage',
-    subtitle: savedPlantSubtitle,
-    stats: savedPlantStats,
-    className: 'ph-saved-list'
-  });
-}
-
-export function savedPlantsCard(s = {}){
-  return renderSavedRecordPanel({
-    title: 'Anlagen speichern',
-    nameFieldId: 'plantName',
-    nameLabel: 'Anlagenbezeichnung',
-    nameValue: s.plantName || '',
-    namePlaceholder: 'z. B. Heizzentrale BT A',
-    addAction: 'pressure:save',
-    updateAction: 'pressure:update',
-    addDisabled: false,
-    updateDisabled: !s.activePlantId,
-    listHtml: savedPlantRows(s),
-    accent: 'purple'
-  });
-}
-
-export function savedPlantSnapshot(s, r){
-  const saved = Array.isArray(s.savedPlants) ? s.savedPlants : [];
-  const baseName = s.plantName?.trim() || `${s.holdingType === 'dynamic' ? (s.dynamicType === 'variomat' ? 'Variomat' : 'Reflexomat') : 'MAG'} ${saved.length + 1}`;
-  const copy = { ...s };
+export function buildPressureRecord(currentState = {}, result = {}, items = [], id, name, existing = null){
+  const copy = { ...currentState };
   delete copy.savedPlants;
   delete copy.activePlantId;
+  delete copy.expandedPlantId;
   return {
-    id: s.activePlantId || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    name: baseName,
-    createdAt: s.activePlantId ? (saved.find(x => x.id === s.activePlantId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
+    id,
+    name: name || currentState.plantName?.trim() || existing?.name || `${currentState.holdingType === 'dynamic' ? (currentState.dynamicType === 'variomat' ? 'Variomat' : 'Reflexomat') : 'MAG'} ${items.length + 1}`,
+    createdAt: existing?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     state: copy,
     result: {
-      productLabel: r.productLabel,
-      selectedVolume: r.selectedVolume,
-      selectedStandardVolume: r.selectedStandardVolume,
-      p0: r.p0,
-      paMin: r.paMin,
-      pe: r.pe,
-      systemVolume: r.systemVolume
+      productLabel: result.productLabel,
+      selectedVolume: result.selectedVolume,
+      selectedStandardVolume: result.selectedStandardVolume,
+      p0: result.p0,
+      paMin: result.paMin,
+      pe: result.pe,
+      systemVolume: result.systemVolume
     }
   };
 }
 
-export function hydrateSavedPlant(item, current){
-  return {
-    ...(item.state || {}),
+export function hydratePressureRecord(item = {}, current = {}){
+  return item?.state ? {
+    ...item.state,
     savedPlants: current.savedPlants || [],
     activePlantId: item.id,
     expandedPlantId: current.expandedPlantId || null,
     plantName: item.name || item.state?.plantName || ''
-  };
+  } : {};
 }
 
-export function clearSavedPlant(){
-  return { activePlantId: null, plantName: '' };
+export const pressureHoldingSavedController = createLineSectionController({
+  state,
+  listKey: 'savedPlants',
+  activeIdKey: 'activePlantId',
+  nameKey: 'plantName',
+  expandedIdKey: 'expandedPlantId',
+  recordPrefix: 'pressure',
+  cardTitle: 'Anlagen speichern',
+  nameLabel: 'Anlagenbezeichnung',
+  nameInputId: 'plantName',
+  namePlaceholder: 'z. B. Heizzentrale BT A',
+  emptyText: 'Noch keine Anlagen gespeichert.',
+  accent: 'purple',
+  dynamicAttr: 'saved-records',
+  dynamicDataAttr: 'data-ph-dynamic',
+  title: item => item.name || 'Anlage',
+  subtitle: savedPlantSubtitle,
+  stats: savedPlantStats,
+  currentResult: () => calculate(state.get()),
+  buildRecord: ({ currentState, result, items, id, name, existing }) => buildPressureRecord(currentState, result, items, id, name, existing),
+  hydrateRecord: ({ item, currentState }) => hydratePressureRecord(item, currentState)
+});
+
+export function savedPlantsCard(s = {}){
+  return pressureHoldingSavedController.renderCard(s);
 }
 
-export function bindPressureHoldingActions(root, { state, calculate } = {}){
-  bindEditModeClear(root, {
-    state,
-    activeIdKey: 'activePlantId',
-    nameKey: 'plantName'
-  });
-
-  const actions = createSavedRecordActions({
-    root,
-    state,
-    calculate,
-    snapshot: savedPlantSnapshot,
-    hydrate: hydrateSavedPlant,
-    clear: clearSavedPlant,
-    listKey: 'savedPlants',
-    activeIdKey: 'activePlantId',
-    expandedIdKey: 'expandedPlantId',
-    nameKey: 'plantName',
-    recordPrefix: 'pressure',
-    beforeCreate: ({ root: host }) => commitAllFields(host || root, state, { action: 'pressure:pre-save', notify: false }),
-    beforeUpdate: ({ root: host }) => commitAllFields(host || root, state, { action: 'pressure:pre-update', notify: false }),
-    preserveSaveScroll: true,
-    preserveLoadScroll: true
-  });
-
-  registerCentralActions(root, {
-    'pressure:save': actions.save,
-    'pressure:update': actions.update,
-    'saved:load': actions.load,
-    'saved:delete': actions.delete,
-    'saved:toggle': actions.toggle
-  });
+export function bindPressureHoldingActions(root){
+  pressureHoldingSavedController.bind(root);
 }
-

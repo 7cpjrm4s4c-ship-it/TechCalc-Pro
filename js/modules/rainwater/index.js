@@ -3,7 +3,7 @@ import schema from './schema.js';
 import { state, initialState } from './state.js';
 import { calculate } from './logic.js';
 import { results, savedRecords } from './results.js';
-import controller from './controller.js';
+import controller, { bindRainwaterSavedActions } from './controller.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 
 export default createPlatformModule({
@@ -14,5 +14,6 @@ export default createPlatformModule({
   calculate,
   results,
   savedRecords,
-  controller
+  controller,
+  bind: bindRainwaterSavedActions
 });

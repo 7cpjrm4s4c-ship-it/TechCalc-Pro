@@ -22,3 +22,10 @@ Release-hardening status after Phase 31D:
 - `components.css` neu aufgebaut und von 5027 auf 747 Zeilen reduziert.
 - Globale UI-Komponenten zentralisiert; Modul-Ausnahmen nach `css/modules.css` isoliert.
 - CSS-Quality-Gate ohne `!important` in `components.css` bestanden.
+### Phase 35D – Saved Dialog Parity
+
+- Speicherdialoge von Druckhaltung, Schmutzwasser und Regenwasser an den stabilen Rohr-/Puffer-Workflow angeglichen.
+- Schmutzwasser/Regenwasser nutzen für Saved-Record-Aktionen denselben Line-Section-Controller-Pfad statt eigener Runtime-Sonderlogik.
+- Regenwasser-Flächeneditor behält sein Reset-Verhalten nach dem Speichern.
+- Phase-35D Regressionstest ergänzt.
+

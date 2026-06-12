@@ -552,6 +552,7 @@ export function createPlatformModule(definition = {}) {
     };
     bindLookupHydration(root, runtimeState, controller.lookupHydration);
     registerCentralActions(root, actions);
+    if (typeof customBind === 'function') customBind(root, runtimeState.get(), { action: 'platform:bind' });
   }
   return { config, schema, state: runtimeState, initialState, calculate, results, savedRecords, controller, mount(root) { return mountModule(root, runtimeState, view, bindPlatformActions); } };
 }

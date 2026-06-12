@@ -3,7 +3,7 @@
   "schemaModules": 11,
   "centralNumberService": 11,
   "legacyNumberParsers": 0,
-  "centralSavedRecords": 8,
+  "centralSavedRecords": 10,
   "legacyClassModules": 7,
   "modules": [
     {
@@ -82,7 +82,7 @@
       "schemaFile": true,
       "usesCentralNumberService": true,
       "legacyNumberParsers": 0,
-      "usesCentralSavedRecords": false,
+      "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": true,
       "migrationStatus": "phase-14g-rainwater-global-standard phase-14l-rainwater-reference-completion phase-14m-router-direct-render phase-17a2-rainwater-saved-actions phase-17a5-rainwater-platform-control phase-17a6-rainwater-platform-only-reference"
     },
@@ -112,7 +112,7 @@
       "schemaFile": true,
       "usesCentralNumberService": true,
       "legacyNumberParsers": 0,
-      "usesCentralSavedRecords": false,
+      "usesCentralSavedRecords": true,
       "hasLegacyModuleClasses": false,
       "migrationStatus": "phase-8-schema-inventory"
     }

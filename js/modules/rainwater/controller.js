@@ -3,6 +3,9 @@ import { getAreaType } from './logic.js';
 import { roofDrainTable } from './tables.js';
 import { normalizeAreaType, defaultAreaTypeForMode } from './schema.js';
 import { createStateSnapshot, hydrateStateRecord } from '../../platform/savedRecordModel/index.js';
+import { createLineSectionController } from '../../platform/lineSectionController/index.js';
+import { state } from './state.js';
+import { calculate } from './logic.js';
 
 const surfaceNumericFields = new Set([
   'areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity',
@@ -87,7 +90,7 @@ function surfacePatchFromState(current = {}) {
   };
 }
 
-function surfaceRecordSnapshot(current = {}, result = {}) {
+export function surfaceRecordSnapshot(current = {}, result = {}) {
   const patch = surfacePatchFromState(current);
   const base = getAreaType(patch.areaType || defaultAreaTypeForMode(patch.surfaceMode));
   const name = (patch.areaName || '').trim() || base?.name || 'Regenfläche';
@@ -115,7 +118,7 @@ function surfaceRecordSnapshot(current = {}, result = {}) {
   });
 }
 
-function statePatchFromSurface(item = {}) {
+export function statePatchFromSurface(item = {}, current = {}) {
   const source = item.state || item.inputState || item;
   const hydrated = item.state || item.inputState
     ? hydrateStateRecord(item, { activeIdKey: 'activeSurfaceId', nameKey: 'areaName' })
@@ -151,7 +154,7 @@ function statePatchFromSurface(item = {}) {
   };
 }
 
-function clearSurfaceEditorPatch(current = {}) {
+export function clearSurfaceEditorPatch(current = {}) {
   const mode = current.surfaceMode || current.calculationType || 'roof';
   return {
     activeSurfaceId: null,
@@ -177,7 +180,7 @@ function clearSurfaceEditorPatch(current = {}) {
   };
 }
 
-function resetSurfaceEditorAfterAdd(current = {}) {
+export function resetSurfaceEditorAfterAdd(current = {}) {
   return {
     ...clearSurfaceEditorPatch(current),
     roofRainIntensity: current.roofRainIntensity || current.rainIntensity || '300',
@@ -192,6 +195,63 @@ function lookupPatch(fieldName, current = {}) {
     return { areaType: normalizeAreaType(current.surfaceMode || current.calculationType || 'roof', current.areaType) };
   }
   return patchLookupDefaults({ [fieldName]: current[fieldName] }, current);
+}
+
+
+function rainwaterSavedStats(item = {}) {
+  const result = item.result || {};
+  return [
+    { label: 'Bereich', value: result.mode || item.state?.surfaceMode || '—' },
+    { label: 'Entwässerungsmenge Qr', value: result.qr !== undefined ? String(result.qr).replace('.', ',') : '—', unit: result.qr !== undefined ? 'l/s' : '' },
+    { label: 'Abläufe', value: result.requiredDrains !== undefined ? result.requiredDrains : '—', unit: result.requiredDrains !== undefined ? 'Stk.' : '' },
+    { label: 'Ablaufdimension', value: result.drainSize || '—' },
+    { label: 'Fallleitung', value: result.stackDn || '—' },
+    { label: 'Sammelleitung', value: result.collectorDn || '—' }
+  ];
+}
+
+function rainwaterSavedSubtitle(item = {}) {
+  const result = item.result || {};
+  return [result.mode || item.state?.surfaceMode, result.qr !== undefined ? `Qr ${String(result.qr).replace('.', ',')} l/s` : '', result.drainSize].filter(Boolean).join(' · ');
+}
+
+export function buildRainwaterRecord(currentState = {}, result = {}, items = [], id, name, existing = null) {
+  const record = surfaceRecordSnapshot({ ...currentState, activeSurfaceId: null, areaName: name }, result);
+  return {
+    ...record,
+    id,
+    name: name || currentState.areaName?.trim() || existing?.name || record.name || `Regenfläche ${items.length + 1}`,
+    createdAt: existing?.createdAt || record.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+}
+
+export const rainwaterSavedController = createLineSectionController({
+  state,
+  listKey: 'surfaces',
+  activeIdKey: 'activeSurfaceId',
+  nameKey: 'areaName',
+  expandedIdKey: 'expandedSurfaceResultId',
+  recordPrefix: 'rain-surface',
+  cardTitle: 'Gespeicherte Flächen',
+  nameLabel: 'Bezeichnung',
+  nameInputId: 'areaName',
+  namePlaceholder: 'z. B. Dachfläche Nord',
+  emptyText: 'Noch keine Regenflächen gespeichert.',
+  accent: 'green',
+  dynamicAttr: 'saved-records',
+  dynamicDataAttr: 'data-platform-dynamic',
+  title: item => item.name || 'Regenfläche',
+  subtitle: rainwaterSavedSubtitle,
+  stats: rainwaterSavedStats,
+  currentResult: () => calculate(state.get()),
+  buildRecord: ({ currentState, result, items, id, name, existing }) => buildRainwaterRecord(currentState, result, items, id, name, existing),
+  hydrateRecord: ({ item, currentState }) => statePatchFromSurface(item, currentState),
+  afterCreatePatch: current => resetSurfaceEditorAfterAdd(current)
+});
+
+export function bindRainwaterSavedActions(root) {
+  rainwaterSavedController.bind(root);
 }
 
 export default {
@@ -211,7 +271,7 @@ export default {
   },
   normalizeFields: [...surfaceNumericFields],
   savedRecords: {
-    enabled: true,
+    enabled: false,
     snapshot: surfaceRecordSnapshot,
     hydrate: item => statePatchFromSurface(item),
     clear: clearSurfaceEditorPatch,
@@ -227,4 +287,4 @@ export default {
   }
 };
 
-export { modeDefaultsPatch, surfaceRecordSnapshot, statePatchFromSurface, clearSurfaceEditorPatch, resetSurfaceEditorAfterAdd };
+export { modeDefaultsPatch };

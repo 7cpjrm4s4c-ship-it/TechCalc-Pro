@@ -4,6 +4,9 @@ import { getFixture, toNumber } from './logic.js';
 import { initialState } from './state.js';
 import { deleteCollectionItem, patchCollectionItem, upsertCollectionRecord } from '../../platform/collectionModel/index.js';
 import { createStateSnapshot, hydrateStateRecord } from '../../platform/savedRecordModel/index.js';
+import { createLineSectionController } from '../../platform/lineSectionController/index.js';
+import { state } from './state.js';
+import { calculate } from './logic.js';
 
 const numericFields = new Set(['fixtureQuantity','fixtureCustomDu','kValue','fillRatio','slopeCmM','pipeLengthM','heightDifferenceM','bends90','continuousFlow','pumpFlow','rainFlow']);
 const normalizeNumeric = value => canonicalGermanNumberInput(value);
@@ -45,7 +48,7 @@ function deleteFixture({ id, current = {} } = {}) {
   return { fixtures: deleteCollectionItem(current.fixtures || [], id) };
 }
 
-function snapshot(current = {}, result = {}) {
+export function snapshot(current = {}, result = {}) {
   return createStateSnapshot({
     current,
     calculationResult: result,
@@ -54,11 +57,66 @@ function snapshot(current = {}, result = {}) {
     resultMapper: output => ({ qtot: output.qtot, qww: output.qww, sumDu: output.sumDu, dn: output.selected?.dn, lineType: current.lineType })
   });
 }
-function hydrate(item = {}) {
-  return hydrateStateRecord(item, { activeIdKey: 'activeCalculationId', nameKey: 'name' });
+export function hydrate(item = {}, current = {}) {
+  const patch = hydrateStateRecord(item, { activeIdKey: 'activeCalculationId', nameKey: 'name' });
+  return { ...patch, savedCalculations: current.savedCalculations || [] };
 }
-function clear(current = {}) {
+export function clear(current = {}) {
   return { ...initialState, savedCalculations: current.savedCalculations || [] };
+}
+
+
+function wastewaterSavedStats(item = {}) {
+  const result = item.result || {};
+  return [
+    { label: 'Gesamtabfluss', value: result.qtot !== undefined ? String(result.qtot).replace('.', ',') : '—', unit: result.qtot !== undefined ? 'l/s' : '' },
+    { label: 'Schmutzwasser', value: result.qww !== undefined ? String(result.qww).replace('.', ',') : '—', unit: result.qww !== undefined ? 'l/s' : '' },
+    { label: 'Σ DU', value: result.sumDu !== undefined ? String(result.sumDu).replace('.', ',') : '—' },
+    { label: 'Dimension', value: result.dn || '—' }
+  ];
+}
+
+function wastewaterSavedSubtitle(item = {}) {
+  const result = item.result || {};
+  return [result.qtot !== undefined ? `${String(result.qtot).replace('.', ',')} l/s` : '', result.dn, result.lineType].filter(Boolean).join(' · ');
+}
+
+export function buildWastewaterRecord(currentState = {}, result = {}, items = [], id, name, existing = null) {
+  const record = snapshot({ ...currentState, activeCalculationId: null, name }, result);
+  return {
+    ...record,
+    id,
+    name: name || currentState.name?.trim() || existing?.name || record.name || `Schmutzwasser ${items.length + 1}`,
+    createdAt: existing?.createdAt || record.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+}
+
+export const wastewaterSavedController = createLineSectionController({
+  state,
+  listKey: 'savedCalculations',
+  activeIdKey: 'activeCalculationId',
+  nameKey: 'name',
+  expandedIdKey: 'expandedCalculationId',
+  recordPrefix: 'wastewater',
+  cardTitle: 'Gespeicherte Berechnungen',
+  nameLabel: 'Bezeichnung',
+  nameInputId: 'name',
+  namePlaceholder: 'z. B. Strang WC-Kern Nord',
+  emptyText: 'Noch keine Schmutzwasser-Berechnungen gespeichert.',
+  accent: 'green',
+  dynamicAttr: 'saved-records',
+  dynamicDataAttr: 'data-platform-dynamic',
+  title: item => item.name || 'Berechnung',
+  subtitle: wastewaterSavedSubtitle,
+  stats: wastewaterSavedStats,
+  currentResult: () => calculate(state.get()),
+  buildRecord: ({ currentState, result, items, id, name, existing }) => buildWastewaterRecord(currentState, result, items, id, name, existing),
+  hydrateRecord: ({ item, currentState }) => hydrate(item, currentState)
+});
+
+export function bindWastewaterSavedActions(root) {
+  wastewaterSavedController.bind(root);
 }
 
 export default {
@@ -83,7 +141,7 @@ export default {
     }
   },
   savedRecords: {
-    enabled: true,
+    enabled: false,
     snapshot,
     hydrate,
     clear,
