@@ -13,6 +13,6 @@
   "missing": [],
   "importantCount": 0,
   "importantBudget": 35,
-  "legacySelectorLines": 55,
+  "legacySelectorLines": 49,
   "note": "Phase 16D establishes global tc-* primitives and keeps legacy module selectors as tracked migration debt."
 }

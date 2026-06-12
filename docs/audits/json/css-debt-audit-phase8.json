@@ -1,8 +1,8 @@
 {
-  "totalLines": 747,
+  "totalLines": 741,
   "importantCount": 0,
-  "patchComments": 12,
-  "legacySelectorLines": 55,
+  "patchComments": 9,
+  "legacySelectorLines": 49,
   "duplicateSelectors": [],
   "note": "Phase 8 removes duplicated settings-panel overrides and tracks remaining legacy selectors as explicit migration debt."
 }

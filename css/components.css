@@ -337,8 +337,7 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .mini-button--danger,
 .line-section-card__delete,
 .saved-record-card__delete,
-.dw-delete-button,
-[data-hx-remove-process] { border-color: rgba(255,82,82,.55); color: #ffb3b3; background: rgba(255,82,82,.10); }
+.dw-delete-button { border-color: rgba(255,82,82,.55); color: #ffb3b3; background: rgba(255,82,82,.10); }
 .control--with-sign { display: grid; grid-template-columns: auto 1fr auto; align-items: center; }
 .sign-toggle { width: 44px; height: 44px; border-width: 0 1px 0 0; border-radius: 0; background: rgba(255,255,255,.05); color: var(--color-text); font-size: 1.1rem; }
 .sign-toggle:hover,
@@ -382,8 +381,7 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .dw-list,
 .dw-consumer-list,
 .dw-fixture-list,
-.ph-saved-list,
-.rainwater-result-list { display: grid; gap: var(--tc-gap); min-width: 0; }
+.ph-saved-list { display: grid; gap: var(--tc-gap); min-width: 0; }
 
 .result-row {
   display: flex;
@@ -441,8 +439,7 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .tc-consumer-row,
 .tc-fixture-row,
 .dw-consumer-row,
-.dw-fixture-row,
-.wastewater-fixture-row {
+.dw-fixture-row {
   min-width: 0;
   border: 1px solid var(--color-border);
   border-radius: var(--tc-radius-card);
@@ -454,7 +451,6 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .line-section-card.is-active,
 .ph-saved-item.is-active,
 .saved-record-card.is-active,
-.hx-history__row.is-active,
 .dw-saved-row.is-active { border-color: color-mix(in srgb, var(--accent-blue) 72%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-blue) 30%, transparent), 0 0 18px color-mix(in srgb, var(--accent-blue) 12%, transparent); }
 .line-section-card__head,
 .saved-record-card__head { display: grid; grid-template-columns: minmax(0,1fr) auto auto; align-items: center; gap: var(--tc-gap); }
@@ -477,8 +473,7 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .saved-record-card.is-collapsed .saved-record-card__body,
 .ph-saved-item.is-collapsed .line-section-card__body { display: none; }
 .tc-consumer-row,
-.dw-consumer-row,
-.wastewater-fixture-row { display: flex; align-items: center; justify-content: space-between; gap: var(--tc-gap); min-height: 52px; padding: var(--tc-gap); }
+.dw-consumer-row { display: flex; align-items: center; justify-content: space-between; gap: var(--tc-gap); min-height: 52px; padding: var(--tc-gap); }
 .tc-fixture-row,
 .dw-fixture-row { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: var(--tc-gap); min-height: 48px; padding: var(--tc-gap); }
 .tc-pill-list,
@@ -692,8 +687,7 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
   .line-section-card__head,
   .saved-record-card__head { gap: 8px; }
   .tc-consumer-row,
-  .dw-consumer-row,
-  .wastewater-fixture-row { align-items: flex-start; }
+  .dw-consumer-row { align-items: flex-start; }
   .tc-quantity-field,
   .mini-edit-field { width: 100%; min-width: 0; max-width: none; }
   .unit-select,

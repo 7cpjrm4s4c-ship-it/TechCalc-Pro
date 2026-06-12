@@ -129,6 +129,8 @@
     "test:phase32b": "node tests/phase32b-scroll-saved-record-hardening.test.mjs",
     "test:phase32d": "node tests/phase32d-loading-release-notes.test.mjs",
     "test:phase33-ui": "node tests/phase33-global-ui-foundation.test.mjs",
-    "test:phase34b": "node tests/phase34b-components-rebuild.test.mjs"
+    "test:phase34b": "node tests/phase34b-components-rebuild.test.mjs",
+    "audit:css:modules": "node scripts/audit-modules-css-isolation-phase34c.mjs",
+    "test:phase34c": "node tests/phase34c-modules-css-isolation.test.mjs"
   }
 }

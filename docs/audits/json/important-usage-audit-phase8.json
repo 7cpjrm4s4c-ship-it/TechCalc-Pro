@@ -1,19 +1,9 @@
 {
-  "importantCount": 3,
+  "importantCount": 1,
   "budget": 35,
   "status": "ok",
   "note": "Phase 8 tightens the !important budget after removing duplicated settings-panel overrides. Remaining usages are tracked debt, not a default styling mechanism.",
   "examples": [
-    {
-      "file": "css/modules.css",
-      "line": 5,
-      "text": ".module-head { display: none !important; }"
-    },
-    {
-      "file": "css/modules.css",
-      "line": 7,
-      "text": ".module-content > * { margin-block: 0 !important; }"
-    },
     {
       "file": "css/tokens.css",
       "line": 169,

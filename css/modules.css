@@ -1,10 +1,13 @@
-/* Module-specific layout exceptions only. Global geometry lives in components.css. */
+/* Phase 34C: Module exceptions only. Module-specific layout exceptions only.
+   Global component geometry (cards, fields, controls, buttons, saved records, result rows)
+   lives in components.css. This file may define only module-specific layouts, charts,
+   domain widgets and responsive exceptions that cannot be represented by tc-* primitives. */
 
 .module-view { grid-column: span 12; animation: moduleIn .22s var(--ease); }
 @keyframes moduleIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-.module-head { display: none !important; }
+.module-head { display: none; }
 .module-content { grid-column: span 12; }
-.module-content > * { margin-block: 0 !important; }
+.module-content > * { margin-block: 0; }
 
 /* h,x diagram ------------------------------------------------------------- */
 .hx-layout { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: var(--tc-gap); align-items: stretch; }
@@ -45,7 +48,9 @@
 .hx-process-step span b { color: var(--color-muted); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; }
 .hx-history__row { display: grid; grid-template-columns: minmax(0,1fr) auto auto; gap: var(--tc-gap); align-items: center; padding: var(--tc-gap); border: 1px solid rgba(255,255,255,.08); border-radius: var(--radius-md); background: rgba(255,255,255,.035); }
 .hx-history__row--process { cursor: pointer; }
-.hx-history__row--process.is-active { border-color: rgba(53,170,255,.82); background: linear-gradient(135deg, rgba(53,170,255,.18), rgba(53,229,255,.06)); }
+.hx-history__row--process.is-active,
+.hx-history__row.is-active { border-color: rgba(53,170,255,.82); background: linear-gradient(135deg, rgba(53,170,255,.18), rgba(53,229,255,.06)); }
+[data-hx-remove-process] { border-color: rgba(255,82,82,.55); color: #ffb3b3; background: rgba(255,82,82,.10); }
 .hx-history__row small { display: block; color: var(--color-muted); margin-top: 2px; }
 .hx-history__values { display: flex; gap: var(--tc-gap); flex-wrap: wrap; justify-content: flex-end; color: var(--color-text); font-weight: 800; }
 .hx-target-warning { margin: var(--tc-gap) auto; padding: 10px 14px; width: fit-content; max-width: 100%; border: 1px solid rgba(245,158,11,.55); border-radius: 999px; background: rgba(245,158,11,.10); color: #fbbf24; font-weight: 900; text-align: center; }
@@ -82,12 +87,14 @@
 .pipe-dimension-card--green .pipe-bar span { background: #25d96a; }
 
 /* Wastewater / rainwater / drinking water -------------------------------- */
+.rainwater-result-list,
 .wastewater-fixtures,
 .wastewater-fixture__main,
 .wastewater-fixture__custom,
 .wastewater-compact-list,
 .wastewater-line-hints { display: grid; gap: var(--tc-gap); }
 .wastewater-fixture { position: relative; display: grid; gap: var(--tc-gap); padding: var(--tc-gap); border: 1px solid var(--color-border); border-radius: var(--tc-radius-card); background: rgba(255,255,255,.035); }
+.wastewater-fixture-row { min-width: 0; border: 1px solid var(--color-border); border-radius: var(--tc-radius-card); background: rgba(255,255,255,.04); display: flex; align-items: center; justify-content: space-between; gap: var(--tc-gap); min-height: 52px; padding: var(--tc-gap); }
 .wastewater-fixture__main { grid-template-columns: minmax(0,1fr) minmax(110px,160px); }
 .wastewater-fixture__stats .inline-stats { grid-template-columns: repeat(3,minmax(0,1fr)); }
 .wastewater-fixture__delete { position: static; }
@@ -139,10 +146,10 @@
 .buffer-mode-tabs .segmented button { min-height: 34px; padding: 0 6px; font-size: clamp(10px,2.45vw,13px); letter-spacing: -.035em; line-height: 1.05; white-space: nowrap; }
 
 /* Unit converter ---------------------------------------------------------- */
-#convertedValue,
-#convertedValue:disabled,
-.field:has(#convertedValue) input,
-.field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }
+.module-view[data-module='unit-converter'] #convertedValue,
+.module-view[data-module='unit-converter'] #convertedValue:disabled,
+.module-view[data-module='unit-converter'] .field:has(#convertedValue) input,
+.module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }
 .unit-all-values .result-list { gap: 2px; }
 .unit-all-values .result-row { min-height: 34px; padding-block: 4px; }
 .unit-all-values .result-row span { font-size: 15px; font-weight: 500; color: var(--color-muted); }
@@ -155,10 +162,10 @@
 :root[data-theme='light'] .hx-rh-label,
 :root[data-theme='light'] .hx-title { fill: #f8fafc; paint-order: stroke fill; stroke: rgba(15,23,42,.65); stroke-width: 2px; stroke-linejoin: round; }
 :root[data-theme='light'] .hx-rh-100 { stroke: rgba(255,255,255,.92); }
-:root[data-theme='light'] #convertedValue,
-:root[data-theme='light'] #convertedValue:disabled,
-:root[data-theme='light'] .field:has(#convertedValue) input,
-:root[data-theme='light'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }
+:root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,
+:root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,
+:root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,
+:root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }
 :root[data-theme='light'] .unit-all-values .result-row span,
 :root[data-theme='light'] .unit-all-values .result-row small { color: #6b7280; }
 :root[data-theme='light'] .unit-all-values .result-row strong { color: #4b5563; }
@@ -208,4 +215,5 @@
 @media (max-width: 480px) {
   .module-view[data-module='wastewater'] .wastewater-fixture-row--editable,
   .tc-collection-row.tc-consumer-row--editable { grid-template-columns: minmax(0,1fr) 82px 38px; column-gap: 8px; }
+  .wastewater-fixture-row { align-items: flex-start; }
 }
