@@ -6,7 +6,6 @@ import { deleteCollectionItem, patchCollectionItem, upsertCollectionRecord } fro
 import { createStateSnapshot, hydrateStateRecord } from '../../platform/savedRecordModel/index.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { bindDebugPanel } from '../../platform/debugPanel/index.js';
 import { commitAllFields } from '../../core/eventPipeline.js';
 import { PlatformScrollManager } from '../../core/scrollManager.js';
 
@@ -172,7 +171,6 @@ function bindWastewaterCollections(root) {
 }
 
 export function bindWastewaterPlatform(root, lineSectionController) {
-  bindDebugPanel(root);
   lineSectionController?.bind?.(root);
   bindWastewaterCollections(root);
 }

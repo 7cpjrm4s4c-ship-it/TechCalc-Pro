@@ -30,7 +30,6 @@ const lineSectionController = createLineSectionController({
   emptyText: 'Noch keine Regenflächen gespeichert.',
   accent: 'green',
   dynamicAttr: 'line-sections',
-  dynamicDataAttr: 'data-line-dynamic',
   title: item => item.name || 'Regenfläche',
   subtitle: rainwaterSavedSubtitle,
   stats: rainwaterSavedStats,

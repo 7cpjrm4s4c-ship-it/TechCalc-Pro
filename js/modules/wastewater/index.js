@@ -29,7 +29,6 @@ const lineSectionController = createLineSectionController({
   emptyText: 'Noch keine Schmutzwasser-Berechnungen gespeichert.',
   accent: 'green',
   dynamicAttr: 'line-sections',
-  dynamicDataAttr: 'data-line-dynamic',
   title: item => item.name || 'Berechnung',
   subtitle: wastewaterSavedSubtitle,
   stats: wastewaterSavedStats,

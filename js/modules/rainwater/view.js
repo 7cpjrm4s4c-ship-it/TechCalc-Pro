@@ -2,7 +2,6 @@ import config from './config.js';
 import { renderModuleShell, stack } from '../../core/renderer.js';
 import { calculate } from './logic.js';
 import { createRainwaterViewModel } from './viewModel.js';
-import { renderDebugCard } from '../../platform/debugPanel/index.js';
 
 export function createRainwaterView({ config: moduleConfig = config, calculate: calculateFn = calculate, lineSectionController }) {
   if (!moduleConfig) throw new Error('createRainwaterView requires config');
@@ -19,8 +18,7 @@ export function createRainwaterView({ config: moduleConfig = config, calculate: 
     ].join(''));
 
     const savedColumn = stack([
-      lineSectionController.renderCard(s),
-      `<div data-debug-panel>${renderDebugCard()}</div>`
+      lineSectionController.renderCard(s)
     ].join(''));
 
     return renderModuleShell(moduleConfig, `

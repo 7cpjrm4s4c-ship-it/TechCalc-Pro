@@ -5,7 +5,6 @@ import { normalizeAreaType, defaultAreaTypeForMode } from './schema.js';
 import { createStateSnapshot, hydrateStateRecord } from '../../platform/savedRecordModel/index.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { bindDebugPanel } from '../../platform/debugPanel/index.js';
 
 const surfaceNumericFields = new Set([
   'areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity',
@@ -227,7 +226,6 @@ export function buildRainwaterRecord(currentState = {}, result = {}, items = [],
 }
 
 export function bindRainwaterPlatform(root, lineSectionController) {
-  bindDebugPanel(root);
   lineSectionController?.bind?.(root);
 }
 
