@@ -147,14 +147,10 @@ export function createLineSectionController({
       debugLineAction('load:start', { id });
       const item = read().find(entry => isSameId(entry.id, id));
       if (!item) return;
-      if (isSameId(state.get()?.[activeIdKey], id)) {
-        debugLineAction('load:deselect', { id });
-        PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' })));
-        return;
-      }
       const hydrated = hydrateRecord?.({ item, currentState: state.get() }) || {};
-      debugLineAction('load:select', { id, hydratedActiveId: hydrated?.[activeIdKey] });
-      PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' })));
+      const alreadyActive = isSameId(state.get()?.[activeIdKey], id);
+      debugLineAction(alreadyActive ? 'load:refresh-active' : 'load:select', { id, hydratedActiveId: hydrated?.[activeIdKey] });
+      PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ ...hydrated, [activeIdKey]: id, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: alreadyActive ? 'line:refresh-active' : 'line:select' })));
     };
 
     const deleteLine = id => {
@@ -171,8 +167,10 @@ export function createLineSectionController({
       const id = cardEl.getAttribute('data-line-select');
       if (!id) return;
       const currentExpanded = state.get()?.[expandedIdKey];
-      debugLineAction('toggle:start', { id, currentExpanded });
-      const willOpen = !isSameId(currentExpanded, id);
+      const toggleButton = element?.closest?.('[data-line-toggle]') || cardEl.querySelector?.('[data-line-toggle]');
+      const domExpanded = toggleButton?.getAttribute?.('aria-expanded') === 'true' || !cardEl.classList.contains('is-collapsed');
+      const willOpen = domExpanded ? false : true;
+      debugLineAction('toggle:start', { id, currentExpanded, domExpanded, willOpen });
       PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' })));
     };
 
