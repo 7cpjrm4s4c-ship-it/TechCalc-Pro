@@ -59,20 +59,23 @@ function payloadRows(payload = {}) {
 }
 
 export function renderDebugCard() {
+  const enabled = isDebugEnabled();
   const list = events();
   const body = [
     `<div class="tc-debug-actions">
-      <button type="button" class="action-button action-button--secondary" data-tc-action="debug:clear">Debug leeren</button>
-      <span class="tc-help">Nur sichtbar, wenn Debug Card aktiv ist.</span>
+      <button type="button" class="action-button ${enabled ? '' : 'action-button--secondary'}" data-tc-action="debug:toggle">${enabled ? 'Debug ausblenden' : 'Debug anzeigen'}</button>
+      <button type="button" class="action-button action-button--secondary" data-tc-action="debug:clear" ${enabled ? '' : 'disabled'}>Debug leeren</button>
     </div>`,
-    list.length
-      ? `<div class="tc-debug-list">${list.map(item => `
-        <div class="tc-debug-event">
-          <div class="tc-debug-head"><strong>${esc(item.type)}</strong><span>${esc(item.at)}</span></div>
-          ${payloadRows(item.payload)}
-        </div>
-      `).join('')}</div>`
-      : '<div class="empty-state">Noch keine Debug Events.</div>'
+    enabled
+      ? (list.length
+        ? `<div class="tc-debug-list">${list.map(item => `
+          <div class="tc-debug-event">
+            <div class="tc-debug-head"><strong>${esc(item.type)}</strong><span>${esc(item.at)}</span></div>
+            ${payloadRows(item.payload)}
+          </div>
+        `).join('')}</div>`
+        : '<div class="empty-state">Noch keine Debug Events.</div>')
+      : '<div class="empty-state">Debug ist deaktiviert. Zum Mitschreiben „Debug anzeigen“ antippen.</div>'
   ].join('');
   return card('Debug Events', body, 'purple');
 }
@@ -80,15 +83,25 @@ export function renderDebugCard() {
 export function bindDebugPanel(root) {
   if (!root || root.__tcDebugPanelBound) return;
   root.__tcDebugPanelBound = true;
-  root.addEventListener('click', event => {
-    const button = event.target?.closest?.('[data-tc-action="debug:clear"]');
-    if (!button || !root.contains(button)) return;
-    event.preventDefault();
-    event.stopPropagation();
-    clearDebugEvents();
+
+  const refresh = () => {
     root.querySelectorAll('[data-debug-panel]').forEach(panel => {
       panel.innerHTML = renderDebugCard();
     });
+  };
+
+  root.addEventListener('click', event => {
+    const toggle = event.target?.closest?.('[data-tc-action="debug:toggle"]');
+    const clear = event.target?.closest?.('[data-tc-action="debug:clear"]');
+    if ((!toggle && !clear) || !root.contains(toggle || clear)) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    if (toggle) enableDebugCard(!isDebugEnabled());
+    if (clear) clearDebugEvents();
+    refresh();
   }, true);
 }
 

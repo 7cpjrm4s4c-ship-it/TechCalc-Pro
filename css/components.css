@@ -1011,3 +1011,9 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
   word-break: break-word;
 }
 
+/* Phase 36A.7.1: visible debug toggle */
+.tc-debug-actions .action-button[disabled] {
+  opacity: .55;
+  pointer-events: none;
+}
+
