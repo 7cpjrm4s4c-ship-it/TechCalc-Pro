@@ -149,13 +149,11 @@ export function createLineSectionController({
       if (!item) return;
       const hydrated = hydrateRecord?.({ item, currentState: state.get() }) || {};
       const alreadyActive = isSameId(state.get()?.[activeIdKey], id);
-      root.__tcLineSectionAccordionOpen = root.__tcLineSectionAccordionOpen || {};
       debugLineAction(alreadyActive ? 'load:refresh-active' : 'load:select', { id, hydratedActiveId: hydrated?.[activeIdKey] });
       PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ ...hydrated, [activeIdKey]: id, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: alreadyActive ? 'line:refresh-active' : 'line:select' })));
     };
 
     const deleteLine = id => {
-      if (root.__tcLineSectionAccordionOpen) delete root.__tcLineSectionAccordionOpen[id];
       const next = removeRecord(read(), id);
       const patch = isSameId(state.get()?.[activeIdKey], id)
         ? { [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: null }
@@ -169,23 +167,8 @@ export function createLineSectionController({
       const id = cardEl.getAttribute('data-line-select');
       if (!id) return;
       const currentExpanded = state.get()?.[expandedIdKey];
-      const toggleButton = element?.closest?.('[data-line-toggle]') || cardEl.querySelector?.('[data-line-toggle]');
-
-      // Phase 36A.10: Regenwasser/Schmutzwasser can start with expandedId
-      // already equal to the clicked id while the user has never opened the
-      // accordion visually in this mounted DOM. A pure state-based toggle then
-      // closes on the first tap. Keep an explicit per-root user-open memory.
-      root.__tcLineSectionAccordionOpen = root.__tcLineSectionAccordionOpen || {};
-      const userOpen = root.__tcLineSectionAccordionOpen[id] === true;
-      const willOpen = !userOpen;
-
-      root.__tcLineSectionAccordionOpen[id] = willOpen;
-      if (!willOpen) delete root.__tcLineSectionAccordionOpen[id];
-
-      cardEl.classList.toggle('is-collapsed', !willOpen);
-      toggleButton?.setAttribute?.('aria-expanded', willOpen ? 'true' : 'false');
-
-      debugLineAction('toggle:start', { id, currentExpanded, userOpen, willOpen });
+      const willOpen = !isSameId(currentExpanded, id);
+      debugLineAction('toggle:start', { id, currentExpanded, willOpen });
       PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' })));
     };
 

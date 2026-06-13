@@ -182,7 +182,7 @@ function bindWastewaterCollections(root) {
       if (action !== 'platform:collection:add' && action !== 'platform:collection:delete' && action !== 'collection:delete') return;
       const handler = action === 'platform:collection:add' ? root.__tcWastewaterCollectionDirectContext?.add : root.__tcWastewaterCollectionDirectContext?.remove;
       if (typeof handler !== 'function') return;
-      const key = `${action}:${element.dataset.collection || ''}:${element.dataset.collectionId || ''}:${event.type}`;
+      const key = `${action}:${element.dataset.collection || ''}:${element.dataset.collectionId || ''}`;
       const now = Date.now();
       const last = root.__tcWastewaterCollectionLastAction || {};
       if (last.key === key && now - Number(last.at || 0) < 350) {
@@ -195,9 +195,6 @@ function bindWastewaterCollections(root) {
       handler({ element, event, root });
     };
     root.addEventListener('pointerdown', direct, true);
-    root.addEventListener('mousedown', direct, true);
-    root.addEventListener('touchstart', direct, { capture: true, passive: false });
-    root.addEventListener('click', direct, true);
   }
 }
 

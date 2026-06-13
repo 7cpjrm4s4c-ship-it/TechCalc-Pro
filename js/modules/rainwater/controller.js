@@ -259,10 +259,10 @@ export function bindRainwaterPlatform(root) {
 
 export function updateRainwaterDynamic(root, s = {}, meta = {}) {
   rainwaterSavedController.updateControls(root, s);
-  const host = root?.querySelector?.('[data-rw-dynamic="saved-records"]');
-  if (host) {
-    const next = rainwaterSavedController.renderCard(s);
-    if (host.innerHTML !== next) host.innerHTML = next;
+  const rowsHost = root?.querySelector?.('[data-platform-dynamic="saved-records"]');
+  if (rowsHost) {
+    const next = rainwaterSavedController.renderRows(s);
+    if (rowsHost.innerHTML !== next) rowsHost.innerHTML = next;
   }
 }
 
