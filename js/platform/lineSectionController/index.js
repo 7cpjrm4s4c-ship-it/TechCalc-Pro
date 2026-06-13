@@ -3,6 +3,7 @@ import { registerCentralActions, commitAllFields } from '../../core/eventPipelin
 import { preserveSavedRecordMutation } from '../../core/scrollManager.js';
 import { PlatformFocusManager } from '../../core/focusManager.js';
 import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
+import { addDebugEvent } from '../../platform/debugPanel/index.js';
 
 function escapeAttribute(value) {
   return String(value ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
@@ -82,6 +83,19 @@ export function createLineSectionController({
     if (!root || !state) return;
     bindEditModeClear(root, { state, activeIdKey, nameKey });
 
+    const debugLineAction = (stage, payload = {}) => {
+      try {
+        const event = {
+          module: root?.dataset?.module || root?.closest?.('[data-module]')?.dataset?.module || '',
+          activeId: state.get?.()?.[activeIdKey],
+          expandedId: state.get?.()?.[expandedIdKey],
+          ...payload
+        };
+        if (window.__TC_DEBUG_LINE_SECTION__) console.log('[LineSectionController]', stage, event);
+        addDebugEvent(`line:${stage}`, event);
+      } catch { /* debug only */ }
+    };
+
     const persist = (items, patch = {}, action = 'line:update') => {
       const next = Array.isArray(items) ? [...items] : [];
       const commit = () => {
@@ -130,13 +144,16 @@ export function createLineSectionController({
     };
 
     const load = id => {
+      debugLineAction('load:start', { id });
       const item = read().find(entry => isSameId(entry.id, id));
       if (!item) return;
       if (isSameId(state.get()?.[activeIdKey], id)) {
+        debugLineAction('load:deselect', { id });
         PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' })));
         return;
       }
       const hydrated = hydrateRecord?.({ item, currentState: state.get() }) || {};
+      debugLineAction('load:select', { id, hydratedActiveId: hydrated?.[activeIdKey] });
       PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' })));
     };
 
@@ -154,6 +171,7 @@ export function createLineSectionController({
       const id = cardEl.getAttribute('data-line-select');
       if (!id) return;
       const currentExpanded = state.get()?.[expandedIdKey];
+      debugLineAction('toggle:start', { id, currentExpanded });
       const willOpen = !isSameId(currentExpanded, id);
       PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' })));
     };
@@ -184,6 +202,7 @@ export function createLineSectionController({
         || '';
 
       if (event?.type === 'click' && wasHandledLineAction(action, actionId)) {
+        debugLineAction('skip-click-replay', { action, id: actionId, eventType: event?.type });
         event?.preventDefault?.();
         event?.stopPropagation?.();
         event?.stopImmediatePropagation?.();
@@ -193,6 +212,7 @@ export function createLineSectionController({
       event?.preventDefault?.();
       event?.stopPropagation?.();
       event?.stopImmediatePropagation?.();
+      debugLineAction('handle', { action, id: actionId, eventType: event?.type });
       commitAllFields(root, state, { action: `${action}:pre-commit`, notify: false });
 
       if (action === 'line:save') saveCurrent({ root, element, event });
@@ -201,6 +221,7 @@ export function createLineSectionController({
       else if (action === 'saved:delete') deleteLine(actionId);
       else if (action === 'saved:toggle') toggle(element);
 
+      debugLineAction('handled', { action, id: actionId, eventType: event?.type });
       markHandledLineAction(action, actionId);
       return true;
     };

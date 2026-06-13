@@ -18,6 +18,18 @@
   <link rel="stylesheet" href="./css/layout.css">
   <link rel="stylesheet" href="./css/components.css">
   <link rel="stylesheet" href="./css/modules.css">
+<script>
+  (function(){
+    try {
+      var debug = /(?:\?|&)debug=1(?:&|$)/.test(location.search) || location.hash.indexOf('debug') >= 0;
+      if (debug) {
+        window.__TC_DEBUG_CARD__ = true;
+        window.__TC_DEBUG_LINE_SECTION__ = true;
+      }
+    } catch(e) {}
+  })();
+</script>
+
 </head>
 <body>
   <div class="app-shell">

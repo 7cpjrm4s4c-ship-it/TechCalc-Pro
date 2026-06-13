@@ -6,6 +6,7 @@ import { createStateSnapshot, hydrateStateRecord } from '../../platform/savedRec
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
+import { bindDebugPanel } from '../../platform/debugPanel/index.js';
 
 const surfaceNumericFields = new Set([
   'areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity',
@@ -251,6 +252,7 @@ export const rainwaterSavedController = createLineSectionController({
 });
 
 export function bindRainwaterPlatform(root) {
+  bindDebugPanel(root);
   rainwaterSavedController.bind(root);
 }
 

@@ -948,3 +948,66 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
   gap: 10px;
 }
 
+/* Phase 36A.6: module column/card spacing normalization */
+.module-view .tc-module-column,
+.module-view .tc-module-column > .tc-stack,
+.module-view .span-6.tc-module-column,
+.module-view .span-8.tc-module-column,
+.module-view .span-4.tc-module-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.module-view .tc-module-column > .card,
+.module-view .tc-module-column > [data-rw-dynamic],
+.module-view .tc-module-column > [data-ww-dynamic],
+.module-view .tc-module-column > [data-platform-dynamic] {
+  margin: 0;
+}
+
+.module-view .card__body > .tc-stack {
+  gap: 10px;
+}
+
+/* Phase 36A.7: visible mobile debug card */
+.tc-debug-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.tc-debug-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.tc-debug-event {
+  border: 1px solid var(--tc-border, rgba(148, 163, 184, .35));
+  border-radius: var(--tc-radius-sm, 10px);
+  padding: 10px;
+  background: var(--tc-surface-muted, rgba(148, 163, 184, .08));
+}
+
+.tc-debug-head,
+.tc-debug-row {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.tc-debug-row span {
+  opacity: .72;
+}
+
+.tc-debug-row strong {
+  text-align: right;
+  word-break: break-word;
+}
+

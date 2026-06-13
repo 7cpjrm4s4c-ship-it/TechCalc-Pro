@@ -1,5 +1,6 @@
 import { card, renderModuleShell, stack, esc } from '../../core/renderer.js';
 import { renderResultModel } from '../../platform/resultRenderer/index.js';
+import { isDebugEnabled, renderDebugCard } from '../../platform/debugPanel/index.js';
 import { results } from './results.js';
 import { createWastewaterViewModel } from './viewModel.js';
 
@@ -46,7 +47,8 @@ export function createWastewaterView(config, calculate, wastewaterSavedControlle
 
     const outputColumn = stack([
       `<div data-ww-dynamic="result">${renderWastewaterResult(s, r)}</div>`,
-      vm.savedRecordsHtml
+      vm.savedRecordsHtml,
+      isDebugEnabled() ? `<div data-debug-panel>${renderDebugCard()}</div>` : ''
     ].join(''));
 
     return renderModuleShell(config, `

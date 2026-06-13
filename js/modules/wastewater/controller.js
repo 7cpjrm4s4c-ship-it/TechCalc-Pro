@@ -7,6 +7,7 @@ import { createStateSnapshot, hydrateStateRecord } from '../../platform/savedRec
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
+import { bindDebugPanel } from '../../platform/debugPanel/index.js';
 import { commitAllFields } from '../../core/eventPipeline.js';
 import { PlatformScrollManager } from '../../core/scrollManager.js';
 import { renderResultModel } from '../../platform/resultRenderer/index.js';
@@ -201,6 +202,7 @@ function bindWastewaterCollections(root) {
 }
 
 export function bindWastewaterPlatform(root) {
+  bindDebugPanel(root);
   wastewaterSavedController.bind(root);
   bindWastewaterCollections(root);
 }
