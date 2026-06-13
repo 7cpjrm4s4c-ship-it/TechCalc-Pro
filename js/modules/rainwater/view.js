@@ -2,6 +2,10 @@ import config from './config.js';
 import { renderModuleShell, stack } from '../../core/renderer.js';
 import { calculate } from './logic.js';
 import { createRainwaterViewModel } from './viewModel.js';
+import {
+  isDebugEnabled,
+  renderDebugCard
+} from '../../platform/debugPanel/index.js';
 
 export function view(s = {}) {
   const r = calculate(s);
