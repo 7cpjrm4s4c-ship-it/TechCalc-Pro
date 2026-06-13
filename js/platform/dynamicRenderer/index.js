@@ -520,3 +520,98 @@ export function createBufferStorageDynamicRenderer(options = {}) {
   return { update };
 }
 
+
+
+export function createRainwaterDynamicRenderer(options = {}) {
+  const {
+    calculate,
+    renderForm,
+    renderResult,
+    lineSectionController
+  } = options;
+
+  if (typeof calculate !== 'function') throw new Error('createRainwaterDynamicRenderer requires calculate');
+  if (typeof renderResult !== 'function') throw new Error('createRainwaterDynamicRenderer requires renderResult');
+
+  function update(root, s = {}, meta = {}) {
+    const r = calculate(s);
+    const action = String(meta.action || '');
+    const changed = Array.isArray(meta.changed) ? meta.changed : [];
+    const appStructural = /^(record:|module:|replace|reset)/.test(action);
+    const savedStructural = /^(line:|saved:)/.test(action)
+      || hasAnyChanged(changed, ['surfaces', 'activeSurfaceId', 'areaName', 'expandedSurfaceResultId']);
+
+    // Keep form island stable for saved-record actions. Re-render form only when
+    // the domain itself is structurally changed.
+    if (appStructural && typeof renderForm === 'function') {
+      setIslandInner(root, '[data-rw-dynamic="form"]', renderForm(s, r));
+    }
+
+    setIslandInner(root, '[data-rw-dynamic="result"]', renderResult(s, r));
+
+    if (savedStructural) {
+      lineSectionController?.updateControls?.(root, s);
+      setIslandInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
+    }
+
+    root.__tcRainwaterDynamic = {
+      activeSurfaceId: s.activeSurfaceId,
+      expandedSurfaceResultId: s.expandedSurfaceResultId,
+      surfacesLength: Array.isArray(s.surfaces) ? s.surfaces.length : 0
+    };
+  }
+
+  return { update };
+}
+
+export function createWastewaterDynamicRenderer(options = {}) {
+  const {
+    calculate,
+    renderResult,
+    renderFixtures,
+    lineSectionController
+  } = options;
+
+  if (typeof calculate !== 'function') throw new Error('createWastewaterDynamicRenderer requires calculate');
+  if (typeof renderResult !== 'function') throw new Error('createWastewaterDynamicRenderer requires renderResult');
+
+  function setInput(root, field, value) {
+    const el = root?.querySelector?.(`input[data-field="${field}"], textarea[data-field="${field}"]`);
+    if (!el || document.activeElement === el) return;
+    const next = String(value ?? '');
+    if (el.value !== next) el.value = next;
+  }
+
+  function update(root, s = {}, meta = {}) {
+    const r = calculate(s);
+    const action = String(meta.action || '');
+    const changed = Array.isArray(meta.changed) ? meta.changed : [];
+    const appStructural = /^(record:|module:|replace|reset)/.test(action);
+    const savedStructural = /^(line:|saved:)/.test(action)
+      || hasAnyChanged(changed, ['savedCalculations', 'activeCalculationId', 'name', 'expandedCalculationId']);
+    const collectionStructural = /^platform:collection:fixtures:/.test(action) || changed.includes('fixtures');
+
+    setIslandInner(root, '[data-ww-dynamic="result"]', renderResult(s, r));
+
+    if (collectionStructural && typeof renderFixtures === 'function') {
+      setIslandInner(root, '[data-ww-dynamic="fixtures"]', renderFixtures(r.fixtures || []));
+      setInput(root, 'fixtureQuantity', s.fixtureQuantity || '1');
+      setInput(root, 'fixtureCustomName', s.fixtureCustomName || '');
+      setInput(root, 'fixtureCustomDu', s.fixtureCustomDu || '');
+      setInput(root, 'fixtureCustomDn', s.fixtureCustomDn || '');
+    }
+
+    if (savedStructural || appStructural) {
+      lineSectionController?.updateControls?.(root, s);
+      setIslandInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
+    }
+
+    root.__tcWastewaterDynamic = {
+      activeCalculationId: s.activeCalculationId,
+      expandedCalculationId: s.expandedCalculationId,
+      savedLength: Array.isArray(s.savedCalculations) ? s.savedCalculations.length : 0
+    };
+  }
+
+  return { update };
+}

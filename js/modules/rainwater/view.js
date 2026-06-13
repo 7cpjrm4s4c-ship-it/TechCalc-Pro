@@ -29,7 +29,12 @@ export function createRainwaterView({ config: moduleConfig = config, calculate: 
     `);
   }
 
-  return { view };
+  const dynamicRenderers = {
+    renderForm: (s, r) => createRainwaterViewModel(s, r).formHtml,
+    renderResult: (s, r) => createRainwaterViewModel(s, r).resultHtml
+  };
+
+  return { view, dynamicRenderers };
 }
 
 export default createRainwaterView;

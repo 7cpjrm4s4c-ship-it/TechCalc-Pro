@@ -4,12 +4,12 @@ import { state, initialState } from './state.js';
 import { calculate } from './logic.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
+import { createWastewaterDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import {
   bindWastewaterPlatform,
   buildWastewaterRecord,
   hydrate,
   isDynamicWastewaterAction,
-  updateWastewaterDynamic,
   wastewaterSavedStats,
   wastewaterSavedSubtitle
 } from './controller.js';
@@ -38,14 +38,20 @@ const lineSectionController = createLineSectionController({
   hydrateRecord: ({ item, currentState }) => hydrate(item, currentState)
 });
 
-const view = createWastewaterView(config, calculate, lineSectionController);
+const { view, dynamicRenderers } = createWastewaterView(config, calculate, lineSectionController);
+
+const wastewaterDynamicRenderer = createWastewaterDynamicRenderer({
+  calculate,
+  lineSectionController,
+  ...dynamicRenderers
+});
 
 function bind(root) {
   bindWastewaterPlatform(root, lineSectionController);
 }
 
 function dynamicUpdate(root, s, meta = {}) {
-  updateWastewaterDynamic(root, s, meta, lineSectionController);
+  wastewaterDynamicRenderer.update(root, s, meta);
 }
 
 export default createPlatformModule({

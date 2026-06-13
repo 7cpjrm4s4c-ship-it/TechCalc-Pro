@@ -232,15 +232,6 @@ export function bindRainwaterPlatform(root, lineSectionController) {
 }
 
 
-export function updateRainwaterDynamic(root, s = {}, meta = {}, lineSectionController) {
-  lineSectionController?.updateControls?.(root, s);
-  const rowsHost = root?.querySelector?.('[data-line-dynamic="line-sections"]');
-  if (rowsHost) {
-    const next = lineSectionController?.renderRows?.(s) || '';
-    if (rowsHost.innerHTML !== next) rowsHost.innerHTML = next;
-  }
-}
-
 export function isDynamicRainwaterAction(meta = {}) {
   const action = String(meta.action || '');
   return action !== 'initial';

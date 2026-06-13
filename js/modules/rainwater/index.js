@@ -9,10 +9,10 @@ import controller, {
   isDynamicRainwaterAction,
   rainwaterSavedStats,
   rainwaterSavedSubtitle,
-  statePatchFromSurface,
-  updateRainwaterDynamic
+  statePatchFromSurface
 } from './controller.js';
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
+import { createRainwaterDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { createRainwaterView } from './view.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 
@@ -39,10 +39,16 @@ const lineSectionController = createLineSectionController({
   hydrateRecord: ({ item, currentState }) => statePatchFromSurface(item, currentState)
 });
 
-const { view } = createRainwaterView({
+const { view, dynamicRenderers } = createRainwaterView({
   config,
   calculate,
   lineSectionController
+});
+
+const rainwaterDynamicRenderer = createRainwaterDynamicRenderer({
+  calculate,
+  lineSectionController,
+  ...dynamicRenderers
 });
 
 function bind(root) {
@@ -50,7 +56,7 @@ function bind(root) {
 }
 
 function dynamicUpdate(root, s, meta = {}) {
-  updateRainwaterDynamic(root, s, meta, lineSectionController);
+  rainwaterDynamicRenderer.update(root, s, meta);
 }
 
 export default createPlatformModule({

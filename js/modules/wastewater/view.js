@@ -32,7 +32,7 @@ export function createWastewaterView(config, calculate, lineSectionController) {
   if (typeof calculate !== 'function') throw new Error('createWastewaterView requires calculate');
   if (!lineSectionController) throw new Error('createWastewaterView requires lineSectionController');
 
-  return function view(s) {
+  function view(s) {
     const r = calculate(s);
     const vm = createWastewaterViewModel(s, r);
     const inputColumn = stack([
@@ -55,7 +55,14 @@ export function createWastewaterView(config, calculate, lineSectionController) {
       <div class="span-6">${inputColumn}</div>
       <div class="span-6">${outputColumn}</div>
     `);
+  }
+
+  const dynamicRenderers = {
+    renderResult: renderWastewaterResult,
+    renderFixtures: renderWastewaterFixtures
   };
+
+  return { view, dynamicRenderers };
 }
 
 export default createWastewaterView;

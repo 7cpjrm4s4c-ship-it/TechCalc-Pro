@@ -9,9 +9,6 @@ import { calculate } from './logic.js';
 import { bindDebugPanel } from '../../platform/debugPanel/index.js';
 import { commitAllFields } from '../../core/eventPipeline.js';
 import { PlatformScrollManager } from '../../core/scrollManager.js';
-import { renderResultModel } from '../../platform/resultRenderer/index.js';
-import { results } from './results.js';
-import { renderWastewaterFixtures } from './view.js';
 
 const numericFields = new Set(['fixtureQuantity','fixtureCustomDu','kValue','fillRatio','slopeCmM','pipeLengthM','heightDifferenceM','bends90','continuousFlow','pumpFlow','rainFlow']);
 const normalizeNumeric = value => canonicalGermanNumberInput(value);
@@ -178,42 +175,6 @@ export function bindWastewaterPlatform(root, lineSectionController) {
   bindDebugPanel(root);
   lineSectionController?.bind?.(root);
   bindWastewaterCollections(root);
-}
-
-function setIslandInner(root, selector, html) {
-  const el = root?.querySelector?.(selector);
-  if (!el) return false;
-  const next = String(html ?? '');
-  if (el.innerHTML !== next) el.innerHTML = next;
-  return true;
-}
-
-function setInputValue(root, field, value) {
-  const el = root?.querySelector?.(`input[data-field="${field}"], textarea[data-field="${field}"]`);
-  if (!el || document.activeElement === el) return;
-  const next = String(value ?? '');
-  if (el.value !== next) el.value = next;
-}
-
-export function updateWastewaterDynamic(root, s = {}, meta = {}, lineSectionController) {
-  const r = calculate(s);
-  const action = String(meta.action || '');
-  const changed = Array.isArray(meta.changed) ? meta.changed : [];
-
-  setIslandInner(root, '[data-ww-dynamic="result"]', renderResultModel(results(s, r), 'green'));
-
-  if (/^platform:collection:fixtures:/.test(action) || changed.includes('fixtures')) {
-    setIslandInner(root, '[data-ww-dynamic="fixtures"]', renderWastewaterFixtures(r.fixtures || []));
-    setInputValue(root, 'fixtureQuantity', s.fixtureQuantity || '1');
-    setInputValue(root, 'fixtureCustomName', s.fixtureCustomName || '');
-    setInputValue(root, 'fixtureCustomDu', s.fixtureCustomDu || '');
-    setInputValue(root, 'fixtureCustomDn', s.fixtureCustomDn || '');
-  }
-
-  if (/^(line:|saved:)/.test(action) || changed.some(field => ['savedCalculations', 'activeCalculationId', 'name', 'expandedCalculationId'].includes(field))) {
-    lineSectionController?.updateControls?.(root, s);
-    setIslandInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
-  }
 }
 
 const structuralFields = new Set([
