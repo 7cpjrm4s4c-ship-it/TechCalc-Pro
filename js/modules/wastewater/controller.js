@@ -4,7 +4,6 @@ import { getFixture, toNumber } from './logic.js';
 import { initialState } from './state.js';
 import { deleteCollectionItem, patchCollectionItem, upsertCollectionRecord } from '../../platform/collectionModel/index.js';
 import { createStateSnapshot, hydrateStateRecord } from '../../platform/savedRecordModel/index.js';
-import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { bindDebugPanel } from '../../platform/debugPanel/index.js';
@@ -72,7 +71,7 @@ export function clear(current = {}) {
 }
 
 
-function wastewaterSavedStats(item = {}) {
+export function wastewaterSavedStats(item = {}) {
   const result = item.result || {};
   return [
     { label: 'Gesamtabfluss', value: result.qtot !== undefined ? String(result.qtot).replace('.', ',') : '—', unit: result.qtot !== undefined ? 'l/s' : '' },
@@ -82,7 +81,7 @@ function wastewaterSavedStats(item = {}) {
   ];
 }
 
-function wastewaterSavedSubtitle(item = {}) {
+export function wastewaterSavedSubtitle(item = {}) {
   const result = item.result || {};
   return [result.qtot !== undefined ? `${String(result.qtot).replace('.', ',')} l/s` : '', result.dn, result.lineType].filter(Boolean).join(' · ');
 }
@@ -97,29 +96,6 @@ export function buildWastewaterRecord(currentState = {}, result = {}, items = []
     updatedAt: new Date().toISOString()
   };
 }
-
-export const wastewaterSavedController = createLineSectionController({
-  state,
-  listKey: 'savedCalculations',
-  activeIdKey: 'activeCalculationId',
-  nameKey: 'name',
-  expandedIdKey: 'expandedCalculationId',
-  recordPrefix: 'wastewater',
-  cardTitle: 'Gespeicherte Berechnungen',
-  nameLabel: 'Bezeichnung',
-  nameInputId: 'name',
-  namePlaceholder: 'z. B. Strang WC-Kern Nord',
-  emptyText: 'Noch keine Schmutzwasser-Berechnungen gespeichert.',
-  accent: 'green',
-  dynamicAttr: 'line-sections',
-  dynamicDataAttr: 'data-line-dynamic',
-  title: item => item.name || 'Berechnung',
-  subtitle: wastewaterSavedSubtitle,
-  stats: wastewaterSavedStats,
-  currentResult: () => calculate(state.get()),
-  buildRecord: ({ currentState, result, items, id, name, existing }) => buildWastewaterRecord(currentState, result, items, id, name, existing),
-  hydrateRecord: ({ item, currentState }) => hydrate(item, currentState)
-});
 
 function bindWastewaterCollections(root) {
   if (!root || !state?.set) return;
@@ -198,9 +174,9 @@ function bindWastewaterCollections(root) {
   }
 }
 
-export function bindWastewaterPlatform(root) {
+export function bindWastewaterPlatform(root, lineSectionController) {
   bindDebugPanel(root);
-  wastewaterSavedController.bind(root);
+  lineSectionController?.bind?.(root);
   bindWastewaterCollections(root);
 }
 
@@ -219,7 +195,7 @@ function setInputValue(root, field, value) {
   if (el.value !== next) el.value = next;
 }
 
-export function updateWastewaterDynamic(root, s = {}, meta = {}) {
+export function updateWastewaterDynamic(root, s = {}, meta = {}, lineSectionController) {
   const r = calculate(s);
   const action = String(meta.action || '');
   const changed = Array.isArray(meta.changed) ? meta.changed : [];
@@ -235,8 +211,8 @@ export function updateWastewaterDynamic(root, s = {}, meta = {}) {
   }
 
   if (/^(line:|saved:)/.test(action) || changed.some(field => ['savedCalculations', 'activeCalculationId', 'name', 'expandedCalculationId'].includes(field))) {
-    wastewaterSavedController.updateControls(root, s);
-    setIslandInner(root, '[data-line-dynamic="line-sections"]', wastewaterSavedController.renderRows(s));
+    lineSectionController?.updateControls?.(root, s);
+    setIslandInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
   }
 }
 

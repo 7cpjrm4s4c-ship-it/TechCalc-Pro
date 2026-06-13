@@ -3,7 +3,6 @@ import { getAreaType } from './logic.js';
 import { roofDrainTable } from './tables.js';
 import { normalizeAreaType, defaultAreaTypeForMode } from './schema.js';
 import { createStateSnapshot, hydrateStateRecord } from '../../platform/savedRecordModel/index.js';
-import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { bindDebugPanel } from '../../platform/debugPanel/index.js';
@@ -199,7 +198,7 @@ function lookupPatch(fieldName, current = {}) {
 }
 
 
-function rainwaterSavedStats(item = {}) {
+export function rainwaterSavedStats(item = {}) {
   const result = item.result || {};
   return [
     { label: 'Bereich', value: result.mode || item.state?.surfaceMode || '—' },
@@ -211,7 +210,7 @@ function rainwaterSavedStats(item = {}) {
   ];
 }
 
-function rainwaterSavedSubtitle(item = {}) {
+export function rainwaterSavedSubtitle(item = {}) {
   const result = item.result || {};
   return [result.mode || item.state?.surfaceMode, result.qr !== undefined ? `Qr ${String(result.qr).replace('.', ',')} l/s` : '', result.drainSize].filter(Boolean).join(' · ');
 }
@@ -227,41 +226,17 @@ export function buildRainwaterRecord(currentState = {}, result = {}, items = [],
   };
 }
 
-export const rainwaterSavedController = createLineSectionController({
-  state,
-  listKey: 'surfaces',
-  activeIdKey: 'activeSurfaceId',
-  nameKey: 'areaName',
-  expandedIdKey: 'expandedSurfaceResultId',
-  recordPrefix: 'rain-surface',
-  cardTitle: 'Gespeicherte Flächen',
-  nameLabel: 'Bezeichnung',
-  nameInputId: 'areaName',
-  namePlaceholder: 'z. B. Dachfläche Nord',
-  emptyText: 'Noch keine Regenflächen gespeichert.',
-  accent: 'green',
-  dynamicAttr: 'line-sections',
-  dynamicDataAttr: 'data-line-dynamic',
-  title: item => item.name || 'Regenfläche',
-  subtitle: rainwaterSavedSubtitle,
-  stats: rainwaterSavedStats,
-  currentResult: () => calculate(state.get()),
-  buildRecord: ({ currentState, result, items, id, name, existing }) => buildRainwaterRecord(currentState, result, items, id, name, existing),
-  hydrateRecord: ({ item, currentState }) => statePatchFromSurface(item, currentState),
-  afterCreatePatch: current => resetSurfaceEditorAfterAdd(current)
-});
-
-export function bindRainwaterPlatform(root) {
+export function bindRainwaterPlatform(root, lineSectionController) {
   bindDebugPanel(root);
-  rainwaterSavedController.bind(root);
+  lineSectionController?.bind?.(root);
 }
 
 
-export function updateRainwaterDynamic(root, s = {}, meta = {}) {
-  rainwaterSavedController.updateControls(root, s);
+export function updateRainwaterDynamic(root, s = {}, meta = {}, lineSectionController) {
+  lineSectionController?.updateControls?.(root, s);
   const rowsHost = root?.querySelector?.('[data-line-dynamic="line-sections"]');
   if (rowsHost) {
-    const next = rainwaterSavedController.renderRows(s);
+    const next = lineSectionController?.renderRows?.(s) || '';
     if (rowsHost.innerHTML !== next) rowsHost.innerHTML = next;
   }
 }
