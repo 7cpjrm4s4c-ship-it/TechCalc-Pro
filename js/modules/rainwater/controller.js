@@ -268,10 +268,7 @@ export function updateRainwaterDynamic(root, s = {}, meta = {}) {
 
 export function isDynamicRainwaterAction(meta = {}) {
   const action = String(meta.action || '');
-  if (action === 'initial') return false;
-  if (action.startsWith('line:') || action.startsWith('saved:')) return true;
-  const changed = Array.isArray(meta.changed) ? meta.changed : [];
-  return changed.some(f => ['surfaces','activeSurfaceId','expandedSurfaceResultId','areaName'].includes(f));
+  return action !== 'initial';
 }
 
 export default {

@@ -249,11 +249,7 @@ const structuralFields = new Set([
 
 export function isDynamicWastewaterAction(meta = {}) {
   const action = String(meta.action || '');
-  if (action === 'initial') return false;
-  const changed = Array.isArray(meta.changed) ? meta.changed : [];
-  if (changed.some(field => structuralFields.has(field))) return false;
-  if (action.startsWith('platform:segment:') || action === 'segment:select') return false;
-  return true;
+  return action !== 'initial';
 }
 
 export default {

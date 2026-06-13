@@ -4,16 +4,32 @@ import { calculate } from './logic.js';
 import { createRainwaterViewModel } from './viewModel.js';
 import { renderDebugCard } from '../../platform/debugPanel/index.js';
 
-export function view(s = {}) {
-  const r = calculate(s);
-  const vm = createRainwaterViewModel(s, r);
-  const inputColumn = stack([
-    `<div data-rw-dynamic="form">${vm.formHtml}</div>`,
-    `<div data-rw-dynamic="saved-records">${vm.savedRecordsHtml}</div>`,
-    `<div data-debug-panel>${renderDebugCard()}</div>`
-  ].join(''));
+export function createRainwaterView({ config: moduleConfig = config, calculate: calculateFn = calculate, lineSectionController }) {
+  if (!moduleConfig) throw new Error('createRainwaterView requires config');
+  if (typeof calculateFn !== 'function') throw new Error('createRainwaterView requires calculate');
+  if (!lineSectionController) throw new Error('createRainwaterView requires lineSectionController');
 
-  return renderModuleShell(config, `<div class="span-6 tc-module-column">${inputColumn}</div><div class="span-6 tc-module-column"><div data-rw-dynamic="result">${vm.resultHtml}</div></div>`);
+  function view(s = {}) {
+    const r = calculateFn(s);
+    const vm = createRainwaterViewModel(s, r);
+
+    const inputColumn = stack([
+      `<div data-rw-dynamic="form">${vm.formHtml}</div>`,
+      `<div data-rw-dynamic="result">${vm.resultHtml}</div>`
+    ].join(''));
+
+    const savedColumn = stack([
+      lineSectionController.renderCard(s),
+      `<div data-debug-panel>${renderDebugCard()}</div>`
+    ].join(''));
+
+    return renderModuleShell(moduleConfig, `
+      <div class="span-6">${inputColumn}</div>
+      <div class="span-6">${savedColumn}</div>
+    `);
+  }
+
+  return { view };
 }
 
-export default view;
+export default createRainwaterView;

@@ -2,7 +2,6 @@ import { fmtInput } from '../../utils/calculations.js';
 import { field, selectField, grid } from '../../core/renderer.js';
 import { fixtureTypes, usageTypes } from './tables.js';
 import { getFixture } from './logic.js';
-import { wastewaterSavedController } from './controller.js';
 
 const options = items => items.map(item => ({ value: item.value ?? item.id, label: item.label ?? item.name }));
 const fixtureOptions = fixtureTypes.map(item => ({ value: item.id, label: item.name }));
@@ -86,17 +85,12 @@ export function additionalFlowFields(s = {}) {
   ].join(''), 2);
 }
 
-export function savedRecordsHtml(s = {}) {
-  return wastewaterSavedController.renderCard(s);
-}
-
 export function createWastewaterViewModel(s = {}, r = {}) {
   return {
     usageHtml: usageFields(s),
     lineHtml: lineFields(s),
     fixtureInputHtml: fixtureInputFields(s),
-    additionalFlowsHtml: additionalFlowFields(s),
-    savedRecordsHtml: savedRecordsHtml(s)
+    additionalFlowsHtml: additionalFlowFields(s)
   };
 }
 

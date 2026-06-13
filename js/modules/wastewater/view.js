@@ -27,10 +27,10 @@ export function renderWastewaterResult(s, r) {
   return renderResultModel(results(s, r), 'green');
 }
 
-export function createWastewaterView(config, calculate, wastewaterSavedController) {
+export function createWastewaterView(config, calculate, lineSectionController) {
   if (!config) throw new Error('createWastewaterView requires config');
   if (typeof calculate !== 'function') throw new Error('createWastewaterView requires calculate');
-  if (!wastewaterSavedController) throw new Error('createWastewaterView requires wastewaterSavedController');
+  if (!lineSectionController) throw new Error('createWastewaterView requires lineSectionController');
 
   return function view(s) {
     const r = calculate(s);
@@ -47,13 +47,13 @@ export function createWastewaterView(config, calculate, wastewaterSavedControlle
 
     const outputColumn = stack([
       `<div data-ww-dynamic="result">${renderWastewaterResult(s, r)}</div>`,
-      vm.savedRecordsHtml,
+      lineSectionController.renderCard(s),
       `<div data-debug-panel>${renderDebugCard()}</div>`
     ].join(''));
 
     return renderModuleShell(config, `
-      <div class="span-6 tc-module-column">${inputColumn}</div>
-      <div class="span-6 tc-module-column">${outputColumn}</div>
+      <div class="span-6">${inputColumn}</div>
+      <div class="span-6">${outputColumn}</div>
     `);
   };
 }
