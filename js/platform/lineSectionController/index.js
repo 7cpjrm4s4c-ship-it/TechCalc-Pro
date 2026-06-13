@@ -168,9 +168,20 @@ export function createLineSectionController({
       if (!id) return;
       const currentExpanded = state.get()?.[expandedIdKey];
       const toggleButton = element?.closest?.('[data-line-toggle]') || cardEl.querySelector?.('[data-line-toggle]');
-      const domExpanded = toggleButton?.getAttribute?.('aria-expanded') === 'true' || !cardEl.classList.contains('is-collapsed');
-      const willOpen = domExpanded ? false : true;
-      debugLineAction('toggle:start', { id, currentExpanded, domExpanded, willOpen });
+      const bodyEl = cardEl.querySelector?.('.saved-record-card__body, .line-section-card__body');
+      const bodyRect = bodyEl?.getBoundingClientRect?.();
+      const visualExpanded = Boolean(bodyRect && bodyRect.height > 4);
+      const willOpen = !visualExpanded;
+
+      // Phase 36A.9: use the visual DOM state as source of truth for the
+      // accordion interaction. Regenwasser/Schmutzwasser can drift into a state
+      // where expandedId is already set while the body is still visually closed.
+      // State-only toggling then closes on the first tap. Patch the DOM
+      // immediately and let the following state update persist the same target.
+      cardEl.classList.toggle('is-collapsed', !willOpen);
+      toggleButton?.setAttribute?.('aria-expanded', willOpen ? 'true' : 'false');
+
+      debugLineAction('toggle:start', { id, currentExpanded, visualExpanded, willOpen });
       PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' })));
     };
 
