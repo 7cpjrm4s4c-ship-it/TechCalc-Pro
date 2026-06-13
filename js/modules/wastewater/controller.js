@@ -111,8 +111,8 @@ export const wastewaterSavedController = createLineSectionController({
   namePlaceholder: 'z. B. Strang WC-Kern Nord',
   emptyText: 'Noch keine Schmutzwasser-Berechnungen gespeichert.',
   accent: 'green',
-  dynamicAttr: 'saved-records',
-  dynamicDataAttr: 'data-platform-dynamic',
+  dynamicAttr: 'line-sections',
+  dynamicDataAttr: 'data-line-dynamic',
   title: item => item.name || 'Berechnung',
   subtitle: wastewaterSavedSubtitle,
   stats: wastewaterSavedStats,
@@ -236,7 +236,7 @@ export function updateWastewaterDynamic(root, s = {}, meta = {}) {
 
   if (/^(line:|saved:)/.test(action) || changed.some(field => ['savedCalculations', 'activeCalculationId', 'name', 'expandedCalculationId'].includes(field))) {
     wastewaterSavedController.updateControls(root, s);
-    setIslandInner(root, '[data-platform-dynamic="saved-records"]', wastewaterSavedController.renderRows(s));
+    setIslandInner(root, '[data-line-dynamic="line-sections"]', wastewaterSavedController.renderRows(s));
   }
 }
 

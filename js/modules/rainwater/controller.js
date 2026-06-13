@@ -240,8 +240,8 @@ export const rainwaterSavedController = createLineSectionController({
   namePlaceholder: 'z. B. Dachfläche Nord',
   emptyText: 'Noch keine Regenflächen gespeichert.',
   accent: 'green',
-  dynamicAttr: 'saved-records',
-  dynamicDataAttr: 'data-platform-dynamic',
+  dynamicAttr: 'line-sections',
+  dynamicDataAttr: 'data-line-dynamic',
   title: item => item.name || 'Regenfläche',
   subtitle: rainwaterSavedSubtitle,
   stats: rainwaterSavedStats,
@@ -259,7 +259,7 @@ export function bindRainwaterPlatform(root) {
 
 export function updateRainwaterDynamic(root, s = {}, meta = {}) {
   rainwaterSavedController.updateControls(root, s);
-  const rowsHost = root?.querySelector?.('[data-platform-dynamic="saved-records"]');
+  const rowsHost = root?.querySelector?.('[data-line-dynamic="line-sections"]');
   if (rowsHost) {
     const next = rainwaterSavedController.renderRows(s);
     if (rowsHost.innerHTML !== next) rowsHost.innerHTML = next;
