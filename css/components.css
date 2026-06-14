@@ -981,22 +981,59 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
   pointer-events: none;
 }
 
-/* Phase 36O: global 10px module spacing standard */
-.module-view .span-4,
-.module-view .span-6,
-.module-view .span-8,
-.module-view .span-12 {
+/* Phase 36P: authoritative global module spacing */
+:root {
+  --tc-module-gap: 10px;
+}
+
+/* Module shell columns: support all known shell/grid wrappers, not only .module-view. */
+.module-view [class*="span-"],
+.module-shell [class*="span-"],
+.module-grid [class*="span-"],
+.tc-module [class*="span-"],
+#moduleRoot [class*="span-"],
+#app [data-module] [class*="span-"] {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--tc-module-gap);
 }
 
-.module-view .tc-stack,
-.module-view .card__body > .tc-stack {
-  gap: 10px;
+/* Stack helper must be the single vertical rhythm inside cards and columns. */
+.tc-stack,
+.stack,
+.card__body > .tc-stack,
+.card__body > .stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tc-module-gap);
 }
 
-.module-view .card {
-  margin: 0;
+/* Card bodies: child flow uses gap, not child margins. */
+.card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tc-module-gap);
+}
+
+/* Remove legacy child margins that can override the global gap. */
+.card__body > *,
+.tc-stack > *,
+.stack > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Rainwater/Wastewater dynamic wrappers are layout-neutral. */
+[data-rw-dynamic],
+[data-ww-dynamic] {
+  display: contents;
+}
+
+/* But nested dynamic wrappers that contain a complete card/list must not collapse interactive structure. */
+[data-rw-dynamic="form"],
+[data-rw-dynamic="result"],
+[data-ww-dynamic="result"],
+[data-ww-dynamic="fixtures"] {
+  display: block;
 }
 
