@@ -1,0 +1,147 @@
+{
+  "checks": [
+    {
+      "description": "rainwater: no export function savedRecords()",
+      "ok": true,
+      "count": 0,
+      "locations": []
+    },
+    {
+      "description": "rainwater: no createLineSectionController in controller.js",
+      "ok": true,
+      "count": 0,
+      "locations": []
+    },
+    {
+      "description": "rainwater: exactly one createLineSectionController in index.js",
+      "ok": true,
+      "count": 1,
+      "locations": [
+        [
+          "js/modules/rainwater/index.js",
+          17,
+          "import { createRainwaterView } from './view.js';\\n\\nconst lineSectionController = createLineSectionController({\\n  state,\\n  listKey: 'surfaces',\\n  activeIdKey: 'activeSurfaceId',\\n  nameKey: 'areaName',\\n  expandedIdKey: 'expandedSur"
+        ]
+      ]
+    },
+    {
+      "description": "rainwater: no dynamicAttr saved-records",
+      "ok": true,
+      "count": 0,
+      "locations": []
+    },
+    {
+      "description": "rainwater: no data-platform-dynamic saved-records",
+      "ok": true,
+      "count": 0,
+      "locations": []
+    },
+    {
+      "description": "rainwater: no exported SavedController in controller.js",
+      "ok": true,
+      "count": 0,
+      "locations": []
+    },
+    {
+      "description": "rainwater: renderCard only in view.js",
+      "ok": true,
+      "count": 1,
+      "locations": []
+    },
+    {
+      "description": "wastewater: no export function savedRecords()",
+      "ok": true,
+      "count": 0,
+      "locations": []
+    },
+    {
+      "description": "wastewater: no createLineSectionController in controller.js",
+      "ok": true,
+      "count": 0,
+      "locations": []
+    },
+    {
+      "description": "wastewater: exactly one createLineSectionController in index.js",
+      "ok": true,
+      "count": 1,
+      "locations": [
+        [
+          "js/modules/wastewater/index.js",
+          17,
+          "mport { createWastewaterView } from './view.js';\\n\\nconst lineSectionController = createLineSectionController({\\n  state,\\n  listKey: 'savedCalculations',\\n  activeIdKey: 'activeCalculationId',\\n  nameKey: 'name',\\n  expandedIdKey: 'ex"
+        ]
+      ]
+    },
+    {
+      "description": "wastewater: no dynamicAttr saved-records",
+      "ok": true,
+      "count": 0,
+      "locations": []
+    },
+    {
+      "description": "wastewater: no data-platform-dynamic saved-records",
+      "ok": true,
+      "count": 0,
+      "locations": []
+    },
+    {
+      "description": "wastewater: no exported SavedController in controller.js",
+      "ok": true,
+      "count": 0,
+      "locations": []
+    },
+    {
+      "description": "wastewater: renderCard only in view.js",
+      "ok": true,
+      "count": 1,
+      "locations": []
+    }
+  ],
+  "findings": {
+    "js/modules/rainwater/index.js": [
+      {
+        "pattern": "createLineSectionController",
+        "line": 17,
+        "snippet": "import { createRainwaterView } from './view.js';\\n\\nconst lineSectionController = createLineSectionController({\\n  state,\\n  listKey: 'surfaces',\\n  activeIdKey: 'activeSurfaceId',\\n  nameKey: 'areaName',\\n  expandedIdKey: 'expandedSur"
+      },
+      {
+        "pattern": "line_sections_dynamic_attr",
+        "line": 29,
+        "snippet": "ord',\\n  emptyText: 'Noch keine Regenflächen gespeichert.',\\n  accent: 'green',\\n  dynamicAttr: 'line-sections',\\n  title: item => item.name || 'Regenfläche',\\n  subtitle: rainwaterSavedSubtitle,\\n  stats: rainwaterSavedStats,\\n  curre"
+      }
+    ],
+    "js/modules/rainwater/view.js": [
+      {
+        "pattern": "renderCard",
+        "line": 21,
+        "snippet": ">`\\n    ].join(''));\\n\\n    const savedColumn = stack([\\n      lineSectionController.renderCard(s)\\n    ].join(''));\\n\\n    return renderModuleShell(moduleConfig, `\\n      <div class=\"span-6\">${inputColumn}</div>\\n      <"
+      }
+    ],
+    "js/modules/wastewater/index.js": [
+      {
+        "pattern": "createLineSectionController",
+        "line": 17,
+        "snippet": "mport { createWastewaterView } from './view.js';\\n\\nconst lineSectionController = createLineSectionController({\\n  state,\\n  listKey: 'savedCalculations',\\n  activeIdKey: 'activeCalculationId',\\n  nameKey: 'name',\\n  expandedIdKey: 'ex"
+      },
+      {
+        "pattern": "line_sections_dynamic_attr",
+        "line": 29,
+        "snippet": "ext: 'Noch keine Schmutzwasser-Berechnungen gespeichert.',\\n  accent: 'green',\\n  dynamicAttr: 'line-sections',\\n  title: item => item.name || 'Berechnung',\\n  subtitle: wastewaterSavedSubtitle,\\n  stats: wastewaterSavedStats,\\n  curr"
+      }
+    ],
+    "js/modules/wastewater/view.js": [
+      {
+        "pattern": "renderCard",
+        "line": 49,
+        "snippet": "mic=\"result\">${renderWastewaterResult(s, r)}</div>`,\\n      lineSectionController.renderCard(s)\\n    ].join(''));\\n\\n    return renderModuleShell(config, `\\n      <div class=\"span-6\">${inputColumn}</div>\\n      <div cl"
+      }
+    ],
+    "js/platform/lineSectionController/index.js": [
+      {
+        "pattern": "createLineSectionController",
+        "line": 11,
+        "snippet": "value ?? '').replace(/&/g, '&amp;').replace(/\"/g, '&quot;');\\n}\\n\\nexport function createLineSectionController({\\n  state,\\n  listKey = 'lineSections',\\n  activeIdKey = 'activeLineSectionId',\\n  nameKey = 'activeLineSectionName',\\n  exp"
+      }
+    ]
+  }
+}
