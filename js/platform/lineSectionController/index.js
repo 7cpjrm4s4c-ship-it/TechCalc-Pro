@@ -129,15 +129,25 @@ export function createLineSectionController({
       persist(replaceRecord(items, id, item), { [activeIdKey]: id, [nameKey]: item.name, [expandedIdKey]: state.get()?.[expandedIdKey], ...extraPatch }, 'line:update');
     };
 
-    const load = id => {
+    const load = (id, element = null) => {
       const item = read().find(entry => isSameId(entry.id, id));
       if (!item) return;
-      if (isSameId(state.get()?.[activeIdKey], id)) {
+
+      const cardEl = element?.closest?.('[data-line-card]')
+        || root.querySelector?.(`[data-line-card][data-line-select="${escapeAttribute(id)}"]`);
+      const domActive = Boolean(cardEl?.classList?.contains('is-active'));
+      const stateActive = isSameId(state.get()?.[activeIdKey], id);
+
+      // Phase 36I: State/UI drift guard. If the state says the row is active
+      // but the DOM does not show it as active, the first user tap must repair
+      // the visual state by selecting again, not deselecting.
+      if (stateActive && domActive) {
         PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' })));
         return;
       }
+
       const hydrated = hydrateRecord?.({ item, currentState: state.get() }) || {};
-      PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' })));
+      PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ ...hydrated, [activeIdKey]: id, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: stateActive ? 'line:resync-active' : 'line:select' })));
     };
 
     const deleteLine = id => {
@@ -153,8 +163,14 @@ export function createLineSectionController({
       if (!cardEl) return;
       const id = cardEl.getAttribute('data-line-select');
       if (!id) return;
+
       const currentExpanded = state.get()?.[expandedIdKey];
-      const willOpen = !isSameId(currentExpanded, id);
+      const domCollapsed = cardEl.classList.contains('is-collapsed');
+
+      // Phase 36I: State/UI drift guard. If the state says expanded but the DOM
+      // row is collapsed, the first user tap must open the row, not close it.
+      const willOpen = domCollapsed ? true : !isSameId(currentExpanded, id);
+
       PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' })));
     };
 
@@ -199,7 +215,7 @@ export function createLineSectionController({
 
       if (action === 'line:save') saveCurrent({ root, element, event });
       else if (action === 'line:update') updateCurrent({ root, element, event });
-      else if (action === 'saved:load') load(id);
+      else if (action === 'saved:load') load(id, element);
       else if (action === 'saved:delete') deleteLine(id);
       else if (action === 'saved:toggle') toggle(element);
 
