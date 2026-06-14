@@ -58,41 +58,76 @@ function setInner(root, selector, html) {
   return true;
 }
 
+function captureHxScroll(root) {
+  const scroller = root?.closest?.('.app-main, .main, main, .module-scroll, .module-view') || document.scrollingElement || document.documentElement;
+  return {
+    scroller,
+    top: scroller?.scrollTop ?? 0,
+    left: scroller?.scrollLeft ?? 0,
+    winX: window.scrollX || 0,
+    winY: window.scrollY || 0
+  };
+}
+
+function restoreHxScroll(snapshot) {
+  if (!snapshot) return;
+  const apply = () => {
+    try {
+      if (snapshot.scroller) {
+        snapshot.scroller.scrollTop = snapshot.top;
+        snapshot.scroller.scrollLeft = snapshot.left;
+      }
+      window.scrollTo(snapshot.winX, snapshot.winY);
+    } catch { /* scroll restore only */ }
+  };
+  apply();
+  requestAnimationFrame(apply);
+  setTimeout(apply, 40);
+  setTimeout(apply, 120);
+  setTimeout(apply, 260);
+}
+
+function withHxScrollFreeze(root, enabled, mutation) {
+  if (!enabled) return mutation();
+  const snapshot = captureHxScroll(root);
+  const result = mutation();
+  restoreHxScroll(snapshot);
+  return result;
+}
+
 export function syncSavedProcessControls(root, snapshot = {}) {
   hxProcessController?.updateControls?.(root, snapshot);
 }
 
 export function renderDynamicSections(root, snapshot = {}, meta = {}) {
   if (!root) return true;
-  const vm = createHxRenderModel(snapshot);
   const action = String(meta?.action || '');
   const changed = Array.isArray(meta?.changed) ? meta.changed : [];
   const savedStructural = /^(line:|saved:|hx:line:)/.test(action)
     || changed.some(key => ['savedProcesses', 'processes', 'activeProcessId', 'expandedProcessId', 'label'].includes(key));
 
-  setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.process}"]`, renderProcessSelection(vm));
-  setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.results}"]`, renderResults(vm));
-  setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.diagram}"]`, renderDiagram(vm));
+  return withHxScrollFreeze(root, savedStructural, () => {
+    const vm = createHxRenderModel(snapshot);
 
-  if (savedStructural) {
-    syncSavedProcessControls(root, snapshot);
+    setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.process}"]`, renderProcessSelection(vm));
+    setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.results}"]`, renderResults(vm));
+    setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.diagram}"]`, renderDiagram(vm));
 
-    // Phase 36K: Do not replace the complete saved-process card on select/delete.
-    // Replacing the outer card changes the browser scroll anchor and caused
-    // a jump on the first selection and on deletion. Keep the card and controls
-    // mounted; update only the inner saved-record rows managed by the
-    // lineSectionController.
-    const rowsHost = root.querySelector?.(`[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"] [data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`);
-    if (rowsHost) {
-      const nextRows = hxProcessController.renderRows(snapshot);
-      if (rowsHost.innerHTML !== nextRows) preserveFocusDuring(root, () => { rowsHost.innerHTML = nextRows; }, { skipSelect: true });
+    if (savedStructural) {
+      syncSavedProcessControls(root, snapshot);
+
+      const rowsHost = root.querySelector?.(`[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"] [data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`);
+      if (rowsHost) {
+        const nextRows = hxProcessController.renderRows(snapshot);
+        if (rowsHost.innerHTML !== nextRows) preserveFocusDuring(root, () => { rowsHost.innerHTML = nextRows; }, { skipSelect: true });
+      } else {
+        setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`, renderSavedProcesses(vm));
+      }
     } else {
-      setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`, renderSavedProcesses(vm));
+      syncSavedProcessControls(root, snapshot);
     }
-  } else {
-    syncSavedProcessControls(root, snapshot);
-  }
 
-  root.__tcHxRenderPipeline = { action, changed, at: Date.now() };
-  return true;
+    root.__tcHxRenderPipeline = { action, changed, at: Date.now(), scrollFrozen: savedStructural };
+    return true;
+  });
 }

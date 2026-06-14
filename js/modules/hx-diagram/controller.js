@@ -37,6 +37,34 @@ function sameId(a, b) {
   return String(a ?? '') === String(b ?? '');
 }
 
+function captureHxActionScroll(rootEl) {
+  const scroller = rootEl?.closest?.('.app-main, .main, main, .module-scroll, .module-view') || document.scrollingElement || document.documentElement;
+  return {
+    scroller,
+    top: scroller?.scrollTop ?? 0,
+    left: scroller?.scrollLeft ?? 0,
+    winX: window.scrollX || 0,
+    winY: window.scrollY || 0
+  };
+}
+
+function restoreHxActionScroll(snapshot) {
+  if (!snapshot) return;
+  const apply = () => {
+    try {
+      if (snapshot.scroller) {
+        snapshot.scroller.scrollTop = snapshot.top;
+        snapshot.scroller.scrollLeft = snapshot.left;
+      }
+      window.scrollTo(snapshot.winX, snapshot.winY);
+    } catch { /* scroll restore only */ }
+  };
+  apply();
+  requestAnimationFrame(apply);
+  setTimeout(apply, 40);
+  setTimeout(apply, 120);
+}
+
 function readSavedProcessesFromState(snapshot = state.get()) {
   return normalizeSavedProcesses(snapshot).map(item => ({ ...item }));
 }
@@ -88,9 +116,13 @@ function bindHxProcessActionOverrides(rootEl) {
   registerCentralActions(rootEl, {
     'hx:clear': ({ root }) => clearDiagram(root || rootEl),
     'line:update': ({ root }) => updateActiveProcessFromDialog(root || rootEl),
-    'saved:delete': ({ element }) => {
+    'saved:delete': ({ element, root }) => {
       const id = element?.getAttribute?.('data-line-delete') || element?.closest?.('[data-line-delete]')?.getAttribute?.('data-line-delete');
-      if (id) deleteSavedProcessById(id);
+      if (id) {
+        const scroll = captureHxActionScroll(root || rootEl);
+        deleteSavedProcessById(id);
+        restoreHxActionScroll(scroll);
+      }
     }
   });
 }
