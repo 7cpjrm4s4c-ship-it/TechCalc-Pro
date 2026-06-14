@@ -111,7 +111,11 @@ export function renderDynamicSections(root, snapshot = {}, meta = {}) {
 
     setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.process}"]`, renderProcessSelection(vm));
     setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.results}"]`, renderResults(vm));
-    setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.diagram}"]`, renderDiagram(vm));
+    // setInner(
+//   root,
+//   `[data-hx-dynamic="${HX_DYNAMIC.diagram}"]`,
+//   renderDiagram(vm)
+// );
 
     if (savedStructural) {
       syncSavedProcessControls(root, snapshot);
