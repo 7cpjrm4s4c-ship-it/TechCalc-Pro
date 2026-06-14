@@ -225,9 +225,6 @@ export function buildRainwaterRecord(currentState = {}, result = {}, items = [],
   };
 }
 
-export function bindRainwaterPlatform(root, lineSectionController) {
-  lineSectionController?.bind?.(root);
-}
 
 
 export function isDynamicRainwaterAction(meta = {}) {

@@ -4,17 +4,15 @@ import { state, initialState } from './state.js';
 import { calculate } from './logic.js';
 import { results } from './results.js';
 import controller, {
-  bindRainwaterPlatform,
   buildRainwaterRecord,
-  isDynamicRainwaterAction,
   rainwaterSavedStats,
   rainwaterSavedSubtitle,
   statePatchFromSurface
 } from './controller.js';
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { createRainwaterDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
-import { createRainwaterView } from './view.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createRainwaterView } from './view.js';
 
 const lineSectionController = createLineSectionController({
   state,
@@ -24,7 +22,6 @@ const lineSectionController = createLineSectionController({
   expandedIdKey: 'expandedSurfaceResultId',
   recordPrefix: 'rain-surface',
   cardTitle: 'Gespeicherte Flächen',
-  nameLabel: 'Bezeichnung',
   nameInputId: 'areaName',
   namePlaceholder: 'z. B. Dachfläche Nord',
   emptyText: 'Noch keine Regenflächen gespeichert.',
@@ -50,12 +47,17 @@ const rainwaterDynamicRenderer = createRainwaterDynamicRenderer({
   ...dynamicRenderers
 });
 
-function bind(root) {
-  bindRainwaterPlatform(root, lineSectionController);
+function updateRainwaterDynamic(root, s, meta = {}) {
+  rainwaterDynamicRenderer.update(root, s, meta);
 }
 
-function dynamicUpdate(root, s, meta = {}) {
-  rainwaterDynamicRenderer.update(root, s, meta);
+function isDynamicRainwaterAction(meta = {}) {
+  const action = String(meta.action || '');
+  return action !== 'initial';
+}
+
+function bindRainwaterPlatform(root) {
+  lineSectionController.bind(root);
 }
 
 export default createPlatformModule({
@@ -67,7 +69,7 @@ export default createPlatformModule({
   results,
   controller,
   view,
-  bind,
-  dynamicUpdate,
+  bind: bindRainwaterPlatform,
+  dynamicUpdate: updateRainwaterDynamic,
   isDynamicAction: isDynamicRainwaterAction
 });

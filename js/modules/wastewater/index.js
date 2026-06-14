@@ -2,14 +2,13 @@ import config from './config.js';
 import schema from './schema.js';
 import { state, initialState } from './state.js';
 import { calculate } from './logic.js';
-import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { createWastewaterDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
+import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import {
-  bindWastewaterPlatform,
+  bindWastewaterCollections,
   buildWastewaterRecord,
   hydrate,
-  isDynamicWastewaterAction,
   wastewaterSavedStats,
   wastewaterSavedSubtitle
 } from './controller.js';
@@ -23,7 +22,6 @@ const lineSectionController = createLineSectionController({
   expandedIdKey: 'expandedCalculationId',
   recordPrefix: 'wastewater',
   cardTitle: 'Gespeicherte Berechnungen',
-  nameLabel: 'Bezeichnung',
   nameInputId: 'name',
   namePlaceholder: 'z. B. Strang WC-Kern Nord',
   emptyText: 'Noch keine Schmutzwasser-Berechnungen gespeichert.',
@@ -45,12 +43,18 @@ const wastewaterDynamicRenderer = createWastewaterDynamicRenderer({
   ...dynamicRenderers
 });
 
-function bind(root) {
-  bindWastewaterPlatform(root, lineSectionController);
+function updateWastewaterDynamic(root, s, meta = {}) {
+  wastewaterDynamicRenderer.update(root, s, meta);
 }
 
-function dynamicUpdate(root, s, meta = {}) {
-  wastewaterDynamicRenderer.update(root, s, meta);
+function isDynamicWastewaterAction(meta = {}) {
+  const action = String(meta.action || '');
+  return action !== 'initial';
+}
+
+function bindWastewaterPlatform(root) {
+  lineSectionController.bind(root);
+  bindWastewaterCollections(root);
 }
 
 export default createPlatformModule({
@@ -60,7 +64,7 @@ export default createPlatformModule({
   initialState,
   calculate,
   view,
-  bind,
-  dynamicUpdate,
+  bind: bindWastewaterPlatform,
+  dynamicUpdate: updateWastewaterDynamic,
   isDynamicAction: isDynamicWastewaterAction
 });

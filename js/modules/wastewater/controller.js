@@ -93,7 +93,7 @@ export function buildWastewaterRecord(currentState = {}, result = {}, items = []
   };
 }
 
-function bindWastewaterCollections(root) {
+export function bindWastewaterCollections(root) {
   if (!root || !state?.set) return;
   const collectionConfig = {
     fixtures: {
@@ -170,10 +170,6 @@ function bindWastewaterCollections(root) {
   }
 }
 
-export function bindWastewaterPlatform(root, lineSectionController) {
-  lineSectionController?.bind?.(root);
-  bindWastewaterCollections(root);
-}
 
 const structuralFields = new Set([
   'usageType',
