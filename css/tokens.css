@@ -94,8 +94,6 @@ body::before {
   pointer-events: none;
 }
 
-
-
 /* Hard viewport width lock: prevents mobile layouts and wide content from pushing the page sideways. */
 body,
 .app-shell,

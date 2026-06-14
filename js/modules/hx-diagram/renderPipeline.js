@@ -105,43 +105,46 @@ export function renderDynamicSections(root, snapshot = {}, meta = {}) {
   const changed = Array.isArray(meta?.changed) ? meta.changed : [];
   const savedStructural = /^(line:|saved:|hx:line:)/.test(action)
     || changed.some(key => ['savedProcesses', 'processes', 'activeProcessId', 'expandedProcessId', 'label'].includes(key));
-    
-    if (savedStructural) {
-  syncSavedProcessControls(root, snapshot);
 
-  const rowsHost = root.querySelector(
-    `[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"] [data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`
-  );
+  if (savedStructural) {
+    return withHxScrollFreeze(root, true, () => {
+      syncSavedProcessControls(root, snapshot);
 
-  if (rowsHost) {
-    const nextRows = hxProcessController.renderRows(snapshot);
-    if (rowsHost.innerHTML !== nextRows) {
-      preserveFocusDuring(root, () => {
-        rowsHost.innerHTML = nextRows;
-      }, { skipSelect: true });
-    }
+      const rowsHost = root.querySelector?.(`[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"] [data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`);
+      if (rowsHost) {
+        const nextRows = hxProcessController.renderRows(snapshot);
+        if (rowsHost.innerHTML !== nextRows) preserveFocusDuring(root, () => { rowsHost.innerHTML = nextRows; }, { skipSelect: true });
+      } else {
+        const vm = createHxRenderModel(snapshot);
+        setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`, renderSavedProcesses(vm));
+      }
+
+      root.__tcHxRenderPipeline = { action, changed, at: Date.now(), savedOnly: true, scrollFrozen: true };
+      return true;
+    });
   }
 
-  root.__tcHxRenderPipeline = {
-    action,
-    changed,
-    at: Date.now(),
-    savedOnly: true
-  };
+  const vm = createHxRenderModel(snapshot);
+  setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.process}"]`, renderProcessSelection(vm));
+  setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.results}"]`, renderResults(vm));
+  setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.diagram}"]`, renderDiagram(vm));
+  syncSavedProcessControls(root, snapshot);
 
+  root.__tcHxRenderPipeline = { action, changed, at: Date.now(), savedOnly: false };
   return true;
-}
+}, meta = {}) {
+  if (!root) return true;
+  const action = String(meta?.action || '');
+  const changed = Array.isArray(meta?.changed) ? meta.changed : [];
+  const savedStructural = /^(line:|saved:|hx:line:)/.test(action)
+    || changed.some(key => ['savedProcesses', 'processes', 'activeProcessId', 'expandedProcessId', 'label'].includes(key));
 
   return withHxScrollFreeze(root, savedStructural, () => {
     const vm = createHxRenderModel(snapshot);
 
     setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.process}"]`, renderProcessSelection(vm));
     setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.results}"]`, renderResults(vm));
-    // setInner(
-//   root,
-//   `[data-hx-dynamic="${HX_DYNAMIC.diagram}"]`,
-//   renderDiagram(vm)
-// );
+    setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.diagram}"]`, renderDiagram(vm));
 
     if (savedStructural) {
       syncSavedProcessControls(root, snapshot);
