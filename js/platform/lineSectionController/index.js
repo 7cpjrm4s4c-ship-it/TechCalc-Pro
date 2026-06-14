@@ -1,5 +1,5 @@
 import { card, stack } from '../../core/renderer.js';
-import { registerCentralActions, commitAllFields } from '../../core/eventPipeline.js';
+import { registerCentralActions } from '../../core/eventPipeline.js';
 import { preserveSavedRecordMutation } from '../../core/scrollManager.js';
 import { PlatformFocusManager } from '../../core/focusManager.js';
 import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
@@ -25,12 +25,9 @@ export function createLineSectionController({
   dynamicDataAttr = 'data-line-dynamic',
   stats = () => [],
   title = item => item?.name || 'Abschnitt',
-  subtitle = null,
   currentResult = () => ({}),
   buildRecord,
   hydrateRecord,
-  afterCreatePatch = null,
-  afterUpdatePatch = null,
   debounceMs = 700
 } = {}) {
   let memory = [];
@@ -59,12 +56,11 @@ export function createLineSectionController({
     toggleAttr: 'data-line-toggle',
     deleteAttr: 'data-line-delete',
     title,
-    subtitle,
     stats
   });
 
   const renderCard = (snapshot = state?.get?.() || {}) => card(cardTitle, stack([
-    `<div class="field"><label for="${nameInputId}">${nameLabel}</label><div class="control"><input id="${nameInputId}" data-field="${nameKey}" type="text" placeholder="${escapeAttribute(namePlaceholder)}" autocomplete="off" value="${escapeAttribute(snapshot?.[nameKey] || '')}"></div></div>`,
+    `<div class="field"><label for="${nameInputId}">${nameLabel}</label><div class="control"><input id="${nameInputId}" type="text" placeholder="${escapeAttribute(namePlaceholder)}" autocomplete="off" value="${escapeAttribute(snapshot?.[nameKey] || '')}"></div></div>`,
     `<div class="tc-save-actions"><button type="button" class="action-button" data-tc-action="line:save" data-line-save ${snapshot?.[activeIdKey] ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-tc-action="line:update" data-line-update ${snapshot?.[activeIdKey] ? '' : 'disabled'}>Aktualisieren</button></div>`,
     `<div ${dynamicDataAttr}="${dynamicAttr}" data-hc-dynamic="${dynamicAttr}">${renderRows(snapshot)}</div>`
   ].join('')), accent);
@@ -109,8 +105,7 @@ export function createLineSectionController({
       const id = createRecordId(recordPrefix);
       const item = buildRecord?.({ currentState: { ...currentState, [activeIdKey]: null, [nameKey]: name }, result: currentResult(), items, id, name }) || null;
       if (!item) return;
-      const extraPatch = typeof afterCreatePatch === 'function' ? (afterCreatePatch(currentState, item) || {}) : {};
-      persist([item, ...items], { [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey], ...extraPatch }, 'line:save');
+      persist([item, ...items], { [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, 'line:save');
     };
 
     const updateCurrent = ({ root: actionRoot } = {}) => {
@@ -125,8 +120,7 @@ export function createLineSectionController({
       if (!existing) return;
       const item = buildRecord?.({ currentState, result: currentResult(), items, id, name, existing }) || null;
       if (!item) return;
-      const extraPatch = typeof afterUpdatePatch === 'function' ? (afterUpdatePatch(currentState, item) || {}) : {};
-      persist(replaceRecord(items, id, item), { [activeIdKey]: id, [nameKey]: item.name, [expandedIdKey]: state.get()?.[expandedIdKey], ...extraPatch }, 'line:update');
+      persist(replaceRecord(items, id, item), { [activeIdKey]: id, [nameKey]: item.name, [expandedIdKey]: state.get()?.[expandedIdKey] }, 'line:update');
     };
 
     const load = id => {
@@ -157,47 +151,6 @@ export function createLineSectionController({
       const willOpen = !isSameId(currentExpanded, id);
       PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' })));
     };
-
-    const handleLineAction = (element, event) => {
-      const action = element?.dataset?.tcAction || '';
-      if (!action || !root.contains(element)) return false;
-      if (action !== 'line:save' && action !== 'line:update' && action !== 'saved:load' && action !== 'saved:delete' && action !== 'saved:toggle') return false;
-      event?.preventDefault?.();
-      event?.stopPropagation?.();
-      event?.stopImmediatePropagation?.();
-      commitAllFields(root, state, { action: `${action}:pre-commit`, notify: false });
-      if (action === 'line:save') saveCurrent({ root, element, event });
-      else if (action === 'line:update') updateCurrent({ root, element, event });
-      else if (action === 'saved:load') load(element?.getAttribute('data-line-select') || element?.closest?.('[data-line-select]')?.getAttribute('data-line-select'));
-      else if (action === 'saved:delete') deleteLine(element?.getAttribute('data-line-delete') || element?.closest?.('[data-line-delete]')?.getAttribute('data-line-delete'));
-      else if (action === 'saved:toggle') toggle(element);
-      return true;
-    };
-
-    root.__tcLineSectionDirectContext = { handleLineAction };
-    if (!root.__tcLineSectionDirectActionBound) {
-      root.__tcLineSectionDirectActionBound = true;
-      const direct = event => {
-        const element = event.target?.closest?.('[data-tc-action]');
-        if (!element || !root.contains(element)) return;
-        const action = element.dataset.tcAction || '';
-        const id = element.getAttribute('data-line-select') || element.getAttribute('data-line-delete') || element.getAttribute('data-line-toggle') || element.closest?.('[data-line-select]')?.getAttribute('data-line-select') || '';
-        const key = `${action}:${id}:${event.type}`;
-        const now = Date.now();
-        const last = root.__tcLineSectionDirectLast || {};
-        if (last.key === key && now - Number(last.at || 0) < 350) {
-          event.preventDefault?.();
-          event.stopPropagation?.();
-          event.stopImmediatePropagation?.();
-          return;
-        }
-        const handler = root.__tcLineSectionDirectContext?.handleLineAction;
-        if (typeof handler === 'function' && handler(element, event)) root.__tcLineSectionDirectLast = { key, at: now };
-      };
-      root.addEventListener('pointerdown', direct, true);
-      root.addEventListener('mousedown', direct, true);
-      root.addEventListener('touchstart', direct, { capture: true, passive: false });
-    }
 
     registerCentralActions(root, {
       'line:save': saveCurrent,
