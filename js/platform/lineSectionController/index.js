@@ -194,12 +194,14 @@ export function createLineSectionController({
         const handler = root.__tcLineSectionDirectContext?.handleLineAction;
         if (typeof handler === 'function' && handler(element, event)) root.__tcLineSectionDirectLast = { key, at: now };
       };
-      root.addEventListener('pointerdown', direct, true);
-root.addEventListener('mousedown', direct, true);
-root.addEventListener('touchstart', direct, {
-  capture: true,
-  passive: false
-});
+    
+    root.addEventListener('pointerdown', direct, true);
+    root.addEventListener('mousedown', direct, true);
+    root.addEventListener('touchstart', direct, {
+    capture: true,
+    passive: false
+  });
+}
 
     registerCentralActions(root, {
       'line:save': saveCurrent,
