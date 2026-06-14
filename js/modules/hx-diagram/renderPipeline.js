@@ -75,9 +75,24 @@ export function renderDynamicSections(root, snapshot = {}, meta = {}) {
   setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.diagram}"]`, renderDiagram(vm));
 
   if (savedStructural) {
-    setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`, renderSavedProcesses(vm));
+    syncSavedProcessControls(root, snapshot);
+
+    // Phase 36K: Do not replace the complete saved-process card on select/delete.
+    // Replacing the outer card changes the browser scroll anchor and caused
+    // a jump on the first selection and on deletion. Keep the card and controls
+    // mounted; update only the inner saved-record rows managed by the
+    // lineSectionController.
+    const rowsHost = root.querySelector?.(`[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"] [data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`);
+    if (rowsHost) {
+      const nextRows = hxProcessController.renderRows(snapshot);
+      if (rowsHost.innerHTML !== nextRows) preserveFocusDuring(root, () => { rowsHost.innerHTML = nextRows; }, { skipSelect: true });
+    } else {
+      setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`, renderSavedProcesses(vm));
+    }
+  } else {
+    syncSavedProcessControls(root, snapshot);
   }
-  syncSavedProcessControls(root, snapshot);
+
   root.__tcHxRenderPipeline = { action, changed, at: Date.now() };
   return true;
 }
