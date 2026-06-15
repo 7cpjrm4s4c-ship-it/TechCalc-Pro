@@ -5,7 +5,7 @@ import { safeReplaceContent } from '../../core/domUpdate.js';
 import { createDrinkingWaterViewModel } from './viewModel.js';
 import { renderInputCard, renderResultCard, draftConsumerList } from './view.js';
 import { runWithoutScrollJump } from '../../core/scrollManager.js';
-import { handlePlatformFieldNavigation } from '../../core/focusManager.js';
+import { handlePlatformFieldNavigation, PlatformFocusManager } from '../../core/focusManager.js';
 
 
 function commitVisibleFields(root) {
@@ -369,9 +369,26 @@ export function bindDrinkingWaterActions(root) {
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation?.();
-    state.set({ [field.dataset.field]: field.value }, { action:event.key === 'Tab' ? 'dw:tab' : 'dw:enter', notify:false });
-    refreshDrinkingWater(root);
-    handlePlatformFieldNavigation(root, field, event, { select:true, defer:false });
+
+    const action = event.key === 'Tab' ? 'dw:tab' : 'dw:enter';
+    state.set({ [field.dataset.field]: field.value }, { action, notify:false });
+
+    const moved = handlePlatformFieldNavigation(root, field, event, { select:true, defer:false });
+
+    const refresh = () => {
+      const active = document.activeElement;
+      const keep = Boolean(active && root.contains(active) && active.matches?.('[data-field]'));
+      PlatformFocusManager.preserveFocusDuring(root, () => {
+        refreshDrinkingWater(root);
+      }, { restoreFocus: keep });
+    };
+
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(refresh);
+    else setTimeout(refresh, 0);
+
+    if (!moved) {
+      try { field.blur(); } catch { /* ignore */ }
+    }
   };
   root.addEventListener('keydown', handleFieldConfirmNavigation, true);
 
