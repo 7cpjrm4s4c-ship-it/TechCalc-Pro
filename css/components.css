@@ -759,9 +759,7 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
 [data-ph-dynamic],
 [data-buffer-dynamic],
 [data-hx-dynamic],
-[data-dw-dynamic],
-[data-wastewater-dynamic],
-[data-rainwater-dynamic] {
+[data-dw-dynamic] {
   gap: var(--tc-gap);
 }
 
@@ -1028,5 +1026,18 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
 .tc-stack > * {
   margin-top: 0;
   margin-bottom: 0;
+}
+
+/* Phase 36Q.5: complete dynamic wrapper display reset */
+[data-rw-dynamic="form"],
+[data-rw-dynamic="result"],
+[data-ww-dynamic="usage"],
+[data-ww-dynamic="line-fields"],
+[data-ww-dynamic="fixture-inputs"],
+[data-ww-dynamic="fixtures"],
+[data-ww-dynamic="additional-flows"],
+[data-ww-dynamic="result"] {
+  display: block;
+  min-width: 0;
 }
 
