@@ -1,0 +1,6 @@
+{
+  "remaining_result_row_padding_rules": [
+    "\n\n.result-row {\n  display: flex;\n  justify-content: space-between;\n  align-items: flex-start;\n  gap: var(--tc-gap);\n  min-height: 36px;\n  padding: 0;",
+    "\n\n/* Phase 36S.1: result-row spacing is owned by .result-list gap */\n.result-list > .result-row,\n.tc-result-list > .result-row {\n  padding: 0;"
+  ]
+}

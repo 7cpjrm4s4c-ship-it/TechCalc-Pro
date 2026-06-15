@@ -389,7 +389,7 @@ select option:checked { background-color: #1f3347; color: #fff; }
   align-items: flex-start;
   gap: var(--tc-gap);
   min-height: 36px;
-  padding: 0; /* Phase 36Q.5B: spacing owned by .result-list gap */
+  padding: 0;
   border-bottom: 1px solid rgba(255,255,255,.08);
 }
 .result-row span { color: var(--color-muted); }
@@ -793,7 +793,6 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
   align-content: start;
 }
 
-.result-row,
 .inline-stat,
 .main-result,
 .pipe-result-head,
@@ -1039,5 +1038,11 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
 [data-ww-dynamic="result"] {
   display: block;
   min-width: 0;
+}
+
+/* Phase 36S.1: result-row spacing is owned by .result-list gap */
+.result-list > .result-row,
+.tc-result-list > .result-row {
+  padding: 0;
 }
 
