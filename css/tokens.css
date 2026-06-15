@@ -166,3 +166,11 @@ canvas {
     radial-gradient(circle at 84% 22%, rgba(249,115,22,.10), transparent 30%),
     linear-gradient(135deg, #f8fafc, #eef4fb 52%, #e8eef7) !important;
 }
+
+/* Phase 36Q.4: single global spacing contract */
+:root {
+  --tc-gap: 10px;
+  --ui-gap: var(--tc-gap);
+  --section-gap: var(--tc-gap);
+}
+
