@@ -1,0 +1,14 @@
+{
+  "js/modules/hx-diagram/controller.js": {
+    "keydown": 0,
+    "handlePlatformFieldNavigation": 0,
+    "PlatformFocusManager": 0,
+    "stopImmediatePropagation": 2
+  },
+  "js/modules/drinking-water/controller.js": {
+    "keydown": 1,
+    "handlePlatformFieldNavigation": 0,
+    "PlatformFocusManager": 0,
+    "stopImmediatePropagation": 2
+  }
+}

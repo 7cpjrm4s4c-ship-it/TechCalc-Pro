@@ -1,6 +1,5 @@
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { registerCentralActions } from '../../core/eventPipeline.js';
-import { handlePlatformFieldNavigation, PlatformFocusManager } from '../../core/focusManager.js';
 import { toggleNumericSign } from '../../core/renderer.js';
 import { state, normalizeSavedProcesses, clearLegacyPoints } from './state.js';
 import { calculate } from './logic.js';
@@ -248,40 +247,7 @@ function bindHxDelegation(rootEl) {
     clearGeneratedPath();
   }, true);
 
-  rootEl.addEventListener('keydown', event => {
-    const field = event.target?.closest?.('input[data-field], select[data-field], textarea[data-field]');
-    if (!field || !rootEl.contains(field) || (event.key !== 'Enter' && event.key !== 'Tab')) return;
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation?.();
 
-    // Phase 36R: follow the central event-pipeline order.
-    // Silent commit -> focus navigation -> notifying refresh in RAF with focus preservation.
-    state.set({ [field.dataset.field]: field.value, activePath: [], points: [] }, {
-      action: event.key === 'Tab' ? 'hx:field:tab' : 'hx:field:enter',
-      notify: false
-    });
-
-    const moved = handlePlatformFieldNavigation(rootEl, field, event, { select: true, defer: false });
-
-    const refresh = () => {
-      const active = document.activeElement;
-      const keep = Boolean(active && rootEl.contains(active) && active.matches?.('[data-field]'));
-      PlatformFocusManager.preserveFocusDuring(rootEl, () => {
-        state.set({}, {
-          action: event.key === 'Tab' ? 'hx:field:tab:refresh' : 'hx:field:enter:refresh',
-          notify: true
-        });
-      }, { restoreFocus: keep });
-    };
-
-    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(refresh);
-    else setTimeout(refresh, 0);
-
-    if (!moved) {
-      try { field.blur(); } catch { /* ignore */ }
-    }
-  }, true);
 
   rootEl.addEventListener('change', event => {
     const field = event.target?.closest?.('[data-field]');
