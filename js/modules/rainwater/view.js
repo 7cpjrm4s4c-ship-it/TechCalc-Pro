@@ -14,16 +14,16 @@ export function createRainwaterView({ config: moduleConfig = config, calculate: 
 
     const inputColumn = stack([
       `<div data-rw-dynamic="form">${vm.formHtml}</div>`,
-      `<div data-rw-dynamic="result">${vm.resultHtml}</div>`
+      lineSectionController.renderCard(s)
     ].join(''));
 
-    const savedColumn = stack([
-      lineSectionController.renderCard(s)
+    const outputColumn = stack([
+      `<div data-rw-dynamic="result">${vm.resultHtml}</div>`
     ].join(''));
 
     return renderModuleShell(moduleConfig, `
       <div class="span-6">${inputColumn}</div>
-      <div class="span-6">${savedColumn}</div>
+      <div class="span-6">${outputColumn}</div>
     `);
   }
 

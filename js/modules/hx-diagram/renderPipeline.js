@@ -131,3 +131,4 @@ export function renderDynamicSections(root, snapshot = {}, meta = {}) {
 
   return true;
 }
+

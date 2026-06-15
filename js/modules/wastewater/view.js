@@ -7,17 +7,17 @@ export function renderWastewaterFixtures(fixtures = []) {
   if (!Array.isArray(fixtures) || !fixtures.length) {
     return '<div class="empty-state">Noch keine Entwässerungsgegenstände hinzugefügt.</div>';
   }
-  return `<div class="collection-list collection-list--fixtures">${fixtures.map(item => `
-    <div class="collection-item" data-collection-row="fixtures" data-collection-id="${esc(item.id)}">
-      <div class="collection-item__main">
+  return `<div class="tc-consumer-list wastewater-fixtures">${fixtures.map(item => `
+    <div class="tc-consumer-row tc-collection-row tc-consumer-row--editable wastewater-fixture-row wastewater-fixture-row--editable" data-collection-row="fixtures" data-collection-id="${esc(item.id)}">
+      <div class="tc-collection-row__content">
         <strong>${esc(item.name || 'Entwässerungsgegenstand')}</strong>
-        <span>${esc(`ΣDU ${item.totalDu ?? '—'} l/s · DU/Stk. ${item.du ?? '—'} l/s · Einzelanschluss ${item.dn || '—'}`)}</span>
+        <small>${esc(`ΣDU ${item.totalDu ?? '—'} l/s · DU/Stk. ${item.du ?? '—'} l/s · Einzelanschluss ${item.dn || '—'}`)}</small>
       </div>
-      <div class="collection-item__actions">
-        <label class="sr-only" for="fixture-${esc(item.id)}-quantity">Anzahl</label>
-        <input id="fixture-${esc(item.id)}-quantity" class="collection-input" data-collection-input="fixtures" data-collection-id="${esc(item.id)}" data-collection-field="quantity" inputmode="numeric" value="${esc(item.qty ?? item.quantity ?? 1)}" autocomplete="off">
-        <button type="button" class="icon-button" data-tc-action="platform:collection:delete" data-collection="fixtures" data-collection-id="${esc(item.id)}" aria-label="Gegenstand entfernen">×</button>
-      </div>
+      <label class="tc-quantity-field" for="fixture-${esc(item.id)}-quantity">
+        <span>Anzahl</span>
+        <input id="fixture-${esc(item.id)}-quantity" data-collection-input="fixtures" data-collection-id="${esc(item.id)}" data-collection-field="quantity" inputmode="numeric" value="${esc(item.qty ?? item.quantity ?? 1)}" autocomplete="off">
+      </label>
+      <button type="button" class="mini-button mini-button--danger" data-tc-action="platform:collection:delete" data-collection="fixtures" data-collection-id="${esc(item.id)}" aria-label="Gegenstand entfernen">×</button>
     </div>
   `).join('')}</div>`;
 }
@@ -41,12 +41,12 @@ export function createWastewaterView(config, calculate, lineSectionController) {
         `<div data-ww-dynamic="fixture-inputs">${vm.fixtureInputHtml}</div>`,
         `<div data-ww-dynamic="fixtures">${renderWastewaterFixtures(r.fixtures || [])}</div>`
       ].join('')), 'green'),
-      card('Zusatzabflüsse', `<div data-ww-dynamic="additional-flows">${vm.additionalFlowsHtml}</div>`, 'green')
+      card('Zusatzabflüsse', `<div data-ww-dynamic="additional-flows">${vm.additionalFlowsHtml}</div>`, 'green'),
+      lineSectionController.renderCard(s)
     ].join(''));
 
     const outputColumn = stack([
-      `<div data-ww-dynamic="result">${renderWastewaterResult(s, r)}</div>`,
-      lineSectionController.renderCard(s)
+      `<div data-ww-dynamic="result">${renderWastewaterResult(s, r)}</div>`
     ].join(''));
 
     return renderModuleShell(config, `
