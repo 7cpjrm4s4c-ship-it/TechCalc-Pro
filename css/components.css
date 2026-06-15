@@ -389,7 +389,7 @@ select option:checked { background-color: #1f3347; color: #fff; }
   align-items: flex-start;
   gap: var(--tc-gap);
   min-height: 36px;
-  padding: var(--tc-gap) 0;
+  padding: 0; /* Phase 36Q.5B: spacing owned by .result-list gap */
   border-bottom: 1px solid rgba(255,255,255,.08);
 }
 .result-row span { color: var(--color-muted); }

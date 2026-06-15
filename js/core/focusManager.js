@@ -25,6 +25,38 @@ function isElementVisible(element) {
   return true;
 }
 
+function closedDetailsAncestor(element) {
+  const details = element?.closest?.('details:not([open])');
+  if (!details) return null;
+  const summary = details.querySelector?.('summary');
+  if (summary && summary.contains?.(element)) return null;
+  return details;
+}
+
+function isPlatformFieldReachable(element) {
+  if (!element || element.tabIndex < 0) return false;
+  if (isElementVisible(element)) return true;
+  const details = closedDetailsAncestor(element);
+  if (!details) return false;
+
+  // Allow fields hidden only because their parent details is closed.
+  // Still reject explicitly hidden/aria-hidden elements or nested hidden wrappers.
+  if (element.hidden || element.getAttribute?.('aria-hidden') === 'true') return false;
+  const hiddenContainer = element.closest?.('[hidden], [aria-hidden="true"]');
+  if (hiddenContainer && hiddenContainer !== details) return false;
+  return true;
+}
+
+function openClosedDetailsForField(element) {
+  const details = closedDetailsAncestor(element);
+  if (!details) return false;
+  details.open = true;
+  try {
+    details.dispatchEvent?.(new Event('toggle', { bubbles: true }));
+  } catch { /* toggle event is best-effort */ }
+  return true;
+}
+
 export function safeFocus(element, options = {}) {
   if (!element || typeof element.focus !== 'function') return false;
   const focusOptions = { preventScroll: options.preventScroll !== false };
@@ -55,7 +87,8 @@ export function getFocusableElements(root = document, selector = FOCUSABLE_SELEC
 }
 
 export function getPlatformFields(root = document) {
-  return getFocusableElements(root, PLATFORM_FIELD_SELECTOR);
+  if (!root?.querySelectorAll) return [];
+  return [...root.querySelectorAll(PLATFORM_FIELD_SELECTOR)].filter(isPlatformFieldReachable);
 }
 
 export function focusNext(root, current, options = {}) {
@@ -66,7 +99,12 @@ export function focusNext(root, current, options = {}) {
   const nextIndex = index >= 0 ? index + direction : 0;
   const next = fields[nextIndex];
   if (!next) return false;
-  const applyFocus = () => safeFocus(next, { preventScroll: true, select: options.select !== false });
+
+  const applyFocus = () => {
+    openClosedDetailsForField(next);
+    return safeFocus(next, { preventScroll: true, select: options.select !== false });
+  };
+
   if (options.defer === false) return applyFocus();
   if (typeof requestAnimationFrame === 'function') requestAnimationFrame(applyFocus);
   else setTimeout(applyFocus, 0);
