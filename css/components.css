@@ -337,7 +337,8 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .mini-button--danger,
 .line-section-card__delete,
 .saved-record-card__delete,
-.dw-delete-button { border-color: rgba(255,82,82,.55); color: #ffb3b3; background: rgba(255,82,82,.10); }
+.dw-delete-button,
+[data-hx-remove-process] { border-color: rgba(255,82,82,.55); color: #ffb3b3; background: rgba(255,82,82,.10); }
 .control--with-sign { display: grid; grid-template-columns: auto 1fr auto; align-items: center; }
 .sign-toggle { width: 44px; height: 44px; border-width: 0 1px 0 0; border-radius: 0; background: rgba(255,255,255,.05); color: var(--color-text); font-size: 1.1rem; }
 .sign-toggle:hover,
@@ -381,7 +382,8 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .dw-list,
 .dw-consumer-list,
 .dw-fixture-list,
-.ph-saved-list { display: grid; gap: var(--tc-gap); min-width: 0; }
+.ph-saved-list,
+.rainwater-result-list { display: grid; gap: var(--tc-gap); min-width: 0; }
 
 .result-row {
   display: flex;
@@ -439,7 +441,8 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .tc-consumer-row,
 .tc-fixture-row,
 .dw-consumer-row,
-.dw-fixture-row {
+.dw-fixture-row,
+.wastewater-fixture-row {
   min-width: 0;
   border: 1px solid var(--color-border);
   border-radius: var(--tc-radius-card);
@@ -451,6 +454,7 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .line-section-card.is-active,
 .ph-saved-item.is-active,
 .saved-record-card.is-active,
+.hx-history__row.is-active,
 .dw-saved-row.is-active { border-color: color-mix(in srgb, var(--accent-blue) 72%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-blue) 30%, transparent), 0 0 18px color-mix(in srgb, var(--accent-blue) 12%, transparent); }
 .line-section-card__head,
 .saved-record-card__head { display: grid; grid-template-columns: minmax(0,1fr) auto auto; align-items: center; gap: var(--tc-gap); }
@@ -473,7 +477,8 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .saved-record-card.is-collapsed .saved-record-card__body,
 .ph-saved-item.is-collapsed .line-section-card__body { display: none; }
 .tc-consumer-row,
-.dw-consumer-row { display: flex; align-items: center; justify-content: space-between; gap: var(--tc-gap); min-height: 52px; padding: var(--tc-gap); }
+.dw-consumer-row,
+.wastewater-fixture-row { display: flex; align-items: center; justify-content: space-between; gap: var(--tc-gap); min-height: 52px; padding: var(--tc-gap); }
 .tc-fixture-row,
 .dw-fixture-row { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: var(--tc-gap); min-height: 48px; padding: var(--tc-gap); }
 .tc-pill-list,
@@ -687,7 +692,8 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
   .line-section-card__head,
   .saved-record-card__head { gap: 8px; }
   .tc-consumer-row,
-  .dw-consumer-row { align-items: flex-start; }
+  .dw-consumer-row,
+  .wastewater-fixture-row { align-items: flex-start; }
   .tc-quantity-field,
   .mini-edit-field { width: 100%; min-width: 0; max-width: none; }
   .unit-select,
@@ -738,302 +744,3 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
     scroll-behavior: auto;
   }
 }
-
-/* Phase 35A: RC retest UI contract hardening.
-   Keep spacing, menu sizing and result rows globally consistent after 34D rebuild. */
-.module-content,
-.module-content > *,
-.tc-stack,
-.card,
-.tc-card,
-.card__body,
-.tc-card__body,
-.result-card__body,
-.result-list,
-.result-groups,
-.inline-stats,
-.line-section-list,
-.saved-record-list,
-[data-platform-dynamic],
-[data-pipe-dynamic],
-[data-ph-dynamic],
-[data-buffer-dynamic],
-[data-hx-dynamic],
-[data-dw-dynamic],
-[data-wastewater-dynamic],
-[data-rainwater-dynamic] {
-  gap: var(--tc-gap);
-}
-
-.card,
-.tc-card,
-.result-card,
-.line-section-card,
-.saved-record-card,
-.ph-saved-item,
-.pipe-dimension-card,
-.inline-stat,
-.result-row,
-.main-result {
-  min-width: 0;
-  max-width: 100%;
-  overflow: hidden;
-}
-
-.card__body,
-.tc-card__body,
-.result-card__body,
-.line-section-card__body,
-.saved-record-card__body,
-[data-platform-dynamic],
-[data-buffer-dynamic="result"],
-[data-hx-dynamic="results"],
-[data-ph-dynamic="result"],
-[data-pipe-dynamic="result"] {
-  display: grid;
-  gap: var(--tc-gap);
-  align-content: start;
-}
-
-.result-row,
-.inline-stat,
-.main-result,
-.pipe-result-head,
-.tc-result-item {
-  padding: var(--tc-gap);
-  border-radius: var(--radius-md);
-}
-
-.result-row > *,
-.inline-stat > *,
-.main-result > *,
-.pipe-result-head > *,
-.tc-result-item > * {
-  min-width: 0;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  white-space: normal;
-}
-
-.sign-toggle {
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-}
-
-.overflow-menu,
-.overflow-menu:not([hidden]) {
-  height: auto;
-  max-height: min(70vh, 560px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.overflow-menu__card,
-.overflow-menu__list {
-  min-height: 0;
-  height: auto;
-  max-height: none;
-}
-
-.overflow-menu__row,
-.overflow-menu__item,
-.overflow-menu button {
-  min-height: auto;
-  height: auto;
-  white-space: normal;
-  overflow: visible;
-}
-
-.overflow-menu__item span,
-.overflow-menu__item small {
-  display: block;
-  min-width: 0;
-  overflow-wrap: anywhere;
-  white-space: normal;
-}
-
-@media (max-width: 767px) {
-  .overflow-menu,
-  .overflow-menu:not([hidden]) {
-    max-height: min(68dvh, calc(100dvh - var(--bottom-nav-h) - 58px));
-    overflow-y: auto;
-  }
-
-  .overflow-menu__row {
-    min-height: auto;
-  }
-}
-
-/* Phase 35C: menu cards and overflow panels must grow or scroll with content. */
-.overflow-menu,
-.module-menu,
-.module-menu__card,
-.menu-card,
-.quick-access-card {
-  min-height: 0;
-  height: auto;
-  max-height: min(72vh, 560px);
-}
-.overflow-menu,
-.module-menu {
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-.overflow-menu__item,
-.module-menu__item,
-.menu-card,
-.quick-access-card {
-  white-space: normal;
-  overflow: visible;
-  text-overflow: clip;
-}
-.overflow-menu__item span,
-.overflow-menu__item small,
-.module-menu__item span,
-.module-menu__item small,
-.menu-card *,
-.quick-access-card * {
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
-/* Phase 35E: main overflow menu cards must size to content and scroll on small screens. */
-.overflow-menu,
-.overflow-menu__card,
-.overflow-menu__list {
-  min-height: 0;
-}
-.overflow-menu {
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-.overflow-menu__card {
-  align-content: start;
-}
-.overflow-menu__row,
-.overflow-menu .overflow-menu__item {
-  min-height: auto;
-  height: auto;
-}
-.overflow-menu__item,
-.overflow-menu__item span,
-.overflow-menu__item small,
-.overflow-menu__head,
-.overflow-menu__empty {
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-@media (max-width: 767px) {
-  .overflow-menu:not([hidden]) {
-    max-height: min(68dvh, calc(100dvh - var(--bottom-nav-h, 76px) - 120px));
-    overflow-y: auto;
-  }
-}
-
-/* Phase 36A.7: visible mobile debug card */
-.tc-debug-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-
-.tc-debug-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-height: 320px;
-  overflow: auto;
-}
-
-.tc-debug-event {
-  border: 1px solid var(--tc-border, rgba(148, 163, 184, .35));
-  border-radius: var(--tc-radius-sm, 10px);
-  padding: 10px;
-  background: var(--tc-surface-muted, rgba(148, 163, 184, .08));
-}
-
-.tc-debug-head,
-.tc-debug-row {
-  display: flex;
-  gap: 10px;
-  justify-content: space-between;
-  align-items: baseline;
-}
-
-.tc-debug-row span {
-  opacity: .72;
-}
-
-.tc-debug-row strong {
-  text-align: right;
-  word-break: break-word;
-}
-
-/* Phase 36A.7.1: visible debug toggle */
-.tc-debug-actions .action-button[disabled] {
-  opacity: .55;
-  pointer-events: none;
-}
-
-/* Phase 36P: authoritative global module spacing */
-:root {
-  --tc-module-gap: 10px;
-}
-
-/* Module shell columns: support all known shell/grid wrappers, not only .module-view. */
-.module-view [class*="span-"],
-.module-shell [class*="span-"],
-.module-grid [class*="span-"],
-.tc-module [class*="span-"],
-#moduleRoot [class*="span-"],
-#app [data-module] [class*="span-"] {
-  display: flex;
-  flex-direction: column;
-  gap: var(--tc-module-gap);
-}
-
-/* Stack helper must be the single vertical rhythm inside cards and columns. */
-.tc-stack,
-.stack,
-.card__body > .tc-stack,
-.card__body > .stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--tc-module-gap);
-}
-
-/* Card bodies: child flow uses gap, not child margins. */
-.card__body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--tc-module-gap);
-}
-
-/* Remove legacy child margins that can override the global gap. */
-.card__body > *,
-.tc-stack > *,
-.stack > * {
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-/* Rainwater/Wastewater dynamic wrappers are layout-neutral. */
-[data-rw-dynamic],
-[data-ww-dynamic] {
-  display: contents;
-}
-
-/* But nested dynamic wrappers that contain a complete card/list must not collapse interactive structure. */
-[data-rw-dynamic="form"],
-[data-rw-dynamic="result"],
-[data-ww-dynamic="result"],
-[data-ww-dynamic="fixtures"] {
-  display: block;
-}
-
