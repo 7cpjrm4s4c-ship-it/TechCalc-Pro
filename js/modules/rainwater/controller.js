@@ -105,12 +105,22 @@ export function surfaceRecordSnapshot(current = {}, result = {}) {
     excludeKeys: ['surfaces', 'activeSurfaceId', 'expandedSurfaceResultId'],
     name: () => name,
     resultMapper: output => ({
-      mode: output?.mode || patch.surfaceMode,
+      mode: output?.selectedSurface?.surfaceMode || output?.mode || patch.surfaceMode,
+      area: output?.area,
+      areaType: patch.areaType,
+      areaTypeLabel: base?.name,
+      cs: output?.csResulting,
+      cm: output?.cmResulting,
       qr: output?.qr,
       rdt: output?.rdt,
       r100: output?.r100,
+      qNot: output?.qNot,
       requiredDrains: output?.requiredDrains,
       drainSize: output?.drainSize,
+      drainCapacity: output?.drainCapacity,
+      drainHead: output?.drainHead,
+      stackCount: output?.stackCount,
+      qPerStack: output?.qPerStack,
       stackDn: output?.stackSelection?.dn,
       collectorDn: output?.collectorSelection?.dn
     })
