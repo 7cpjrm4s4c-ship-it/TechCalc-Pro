@@ -73,13 +73,13 @@ function surfaceRows(state) {
     const cm = base.custom ? Math.max(0, toNumber(source.customCm)) : base.cm;
     const rdt = getRainForMode(source, mode) || getRainForMode(state, mode);
     const r100 = toNumber(source.rainHundredIntensity || state.rainHundredIntensity);
-    const drain = currentDrainSettings(source, state);
+    const drain = currentDrainSettings(source, source);
     const stackCount = mode === 'roof' ? (Math.max(1, Math.floor(toNumber(source.stackCount || state.stackCount)) || 1)) : 0;
     const fillRatio = source.fillRatio || state.fillRatio || '0.7';
     const slopeCmM = source.slopeCmM || state.slopeCmM || '1,0';
     const qr = rdt * cs * area / 10000;
     const qNotBase = mode === 'roof' ? Math.max(0, (r100 - rdt) * cs * area / 10000) : 0;
-    const emergency = calcEmergencyOverflow(qNotBase, source, mode, state);
+    const emergency = calcEmergencyOverflow(qNotBase, source, mode, source);
     const itemRequiredDrains = drain.capacity > 0 ? Math.ceil(qr / drain.capacity) : 0;
     const itemQPerStack = mode === 'roof' && stackCount > 0 ? qr / stackCount : 0;
     const collectorMinDn = mode === 'property' ? 'DN 100' : 'DN 70';
