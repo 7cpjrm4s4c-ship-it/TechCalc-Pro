@@ -84,27 +84,10 @@
 .pipe-bar span { display: block; height: 100%; border-radius: inherit; }
 .pipe-dimension-card--red .pipe-bar span { background: #ff3b49; }
 .pipe-dimension-card--yellow .pipe-bar span { background: #ffd34d; }
-.pipe-dimension-card--green .pipe-bar span { background: #25d96a; }
-
-/* Wastewater / drinking water -------------------------------- */
-.wastewater-fixtures,
-.wastewater-fixture__main,
-.wastewater-fixture__custom,
-.wastewater-compact-list,
-.wastewater-line-hints { display: grid; gap: var(--tc-gap); }
-.wastewater-fixture { position: relative; display: grid; gap: var(--tc-gap); padding: var(--tc-gap); border: 1px solid var(--color-border); border-radius: var(--tc-radius-card); background: rgba(255,255,255,.035); }
-.wastewater-fixture-row { min-width: 0; border: 1px solid var(--color-border); border-radius: var(--tc-radius-card); background: rgba(255,255,255,.04); display: flex; align-items: center; justify-content: space-between; gap: var(--tc-gap); min-height: 52px; padding: var(--tc-gap); }
-.wastewater-fixture__main { grid-template-columns: minmax(0,1fr) minmax(110px,160px); }
-.wastewater-fixture__stats .inline-stats { grid-template-columns: repeat(3,minmax(0,1fr)); }
-.wastewater-fixture__delete { position: static; }
-.wastewater-subselect { display: grid; gap: var(--tc-gap); }
+.pipe-dimension-card--green .pipe-bar span { background: #25d96a; }.wastewater-subselect { display: grid; gap: var(--tc-gap); }
 .wastewater-subselect > span { color: var(--color-muted); font-size: .78rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
 .module-view[data-module='wastewater'] .segmented { overflow-x: auto; }
-.module-view[data-module='wastewater'] .segmented button { min-width: max-content; }
-.wastewater-compact-row { border: 1px solid rgba(126,146,166,.28); border-radius: var(--radius-md); padding: var(--tc-gap); background: rgba(255,255,255,.035); }
-.wastewater-compact-row__inputs { display: grid; grid-template-columns: minmax(0,1fr) minmax(120px,160px) auto; gap: var(--tc-gap); align-items: end; }
-.wastewater-compact-row__meta { margin-top: var(--tc-gap); color: var(--color-muted); font-size: .82rem; font-weight: 700; }
-.wastewater-line-selector { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+.module-view[data-module='wastewater'] .segmented button { min-width: max-content; }.wastewater-line-selector { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
 .wastewater-line-selector button { scroll-snap-align: center; }
 .tc-collection-row__content { min-width: 0; overflow-wrap: anywhere; }
 .module-view[data-module='drinking-water'] .dw-save-dialog > summary,
@@ -187,44 +170,9 @@
   .wrg-flow-layout .tc-fields,
   .wrg-group-grid .tc-fields { grid-template-columns: 1fr; }
   .wrg-flow-layout .inline-stats,
-  .wrg-group-grid .inline-stats { grid-template-columns: 1fr; }
-  .pipe-dimension-card__meta,
-  .wastewater-fixture__main,
-  .wastewater-fixture__stats .inline-stats,
-  .wastewater-compact-row__inputs,
-  .buffer-input-grid,
-  .buffer-input-grid--reserve { grid-template-columns: 1fr; }
-  .module-view[data-module='wastewater'] .wastewater-fixture-row--editable,
-  .tc-collection-row.tc-consumer-row--editable { grid-template-columns: minmax(0,1fr) 82px 38px; }
-}
+  .wrg-group-grid .inline-stats { grid-template-columns: 1fr; }}
 
-@media (max-width: 480px) {
-  .module-view[data-module='wastewater'] .wastewater-fixture-row--editable,
-  .tc-collection-row.tc-consumer-row--editable { grid-template-columns: minmax(0,1fr) 82px 38px; column-gap: 8px; }
-  .wastewater-fixture-row { align-items: flex-start; }
-}
-
-/* Phase 35A: module exception cleanup after RC retest. */
-.module-view[data-module='drinking-water'] .tc-collection-row.tc-consumer-row--editable,
-.module-view[data-module='drinking-water'] .dw-consumer-row--editable,
-.module-view[data-module='wastewater'] .wastewater-fixture-row--editable {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 96px 42px;
-  align-items: center;
-  column-gap: var(--tc-gap);
-}
-
-.module-view[data-module='drinking-water'] .tc-quantity-field,
-.module-view[data-module='wastewater'] .tc-quantity-field,
-.module-view[data-module='drinking-water'] .mini-edit-field,
-.module-view[data-module='wastewater'] .mini-edit-field {
-  width: 96px;
-  min-width: 96px;
-  max-width: 96px;
-  justify-self: end;
-}
-
-.module-view[data-module='drinking-water'] .tc-quantity-field input,
+@media (max-width: 480px) {}.module-view[data-module='drinking-water'] .tc-quantity-field input,
 .module-view[data-module='wastewater'] .tc-quantity-field input,
 .module-view[data-module='drinking-water'] .mini-edit-field input,
 .module-view[data-module='wastewater'] .mini-edit-field input {
@@ -240,14 +188,7 @@
   gap: var(--tc-gap);
 }
 
-@media (max-width: 480px) {
-  .module-view[data-module='drinking-water'] .tc-collection-row.tc-consumer-row--editable,
-  .module-view[data-module='drinking-water'] .dw-consumer-row--editable,
-  .module-view[data-module='wastewater'] .wastewater-fixture-row--editable {
-    grid-template-columns: minmax(0, 1fr) 86px 38px;
-  }
-
-  .module-view[data-module='drinking-water'] .tc-quantity-field,
+@media (max-width: 480px) {.module-view[data-module='drinking-water'] .tc-quantity-field,
   .module-view[data-module='wastewater'] .tc-quantity-field,
   .module-view[data-module='drinking-water'] .mini-edit-field,
   .module-view[data-module='wastewater'] .mini-edit-field {
@@ -265,32 +206,4 @@
 
 .module-view[data-module='wastewater'] .card__body {
   gap: var(--tc-gap);
-}
-
-/* Phase 36U.2B: consolidated editable collection row contract */
-:root {
-  --tc-collection-quantity-width: 96px;
-  --tc-collection-action-width: 42px;
-  --tc-collection-action-height: 34px;
-}
-
-.tc-collection-row.tc-consumer-row--editable {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--tc-collection-quantity-width) var(--tc-collection-action-width);
-  column-gap: var(--tc-gap);
-  align-items: center;
-}
-
-.tc-collection-row.tc-consumer-row--editable .tc-quantity-field {
-  width: var(--tc-collection-quantity-width);
-  min-width: var(--tc-collection-quantity-width);
-  max-width: var(--tc-collection-quantity-width);
-  justify-self: end;
-}
-
-.tc-collection-row.tc-consumer-row--editable > button {
-  width: var(--tc-collection-action-width);
-  min-width: var(--tc-collection-action-width);
-  height: var(--tc-collection-action-height);
-  justify-self: end;
 }

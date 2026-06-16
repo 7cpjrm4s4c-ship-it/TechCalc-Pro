@@ -7,8 +7,8 @@ export function renderWastewaterFixtures(fixtures = []) {
   if (!Array.isArray(fixtures) || !fixtures.length) {
     return '<div class="empty-state">Noch keine Entwässerungsgegenstände hinzugefügt.</div>';
   }
-  return `<div class="tc-consumer-list wastewater-fixtures">${fixtures.map(item => `
-    <div class="tc-consumer-row tc-collection-row tc-consumer-row--editable wastewater-fixture-row wastewater-fixture-row--editable" data-collection-row="fixtures" data-collection-id="${esc(item.id)}">
+  return `<div class="tc-consumer-list">${fixtures.map(item => `
+    <div class="tc-consumer-row tc-collection-row tc-consumer-row--editable" data-collection-row="fixtures" data-collection-id="${esc(item.id)}">
       <div class="tc-collection-row__content">
         <strong>${esc(item.name || 'Entwässerungsgegenstand')}</strong>
         <small>${esc(`ΣDU ${item.totalDu ?? '—'} l/s · DU/Stk. ${item.du ?? '—'} l/s · Einzelanschluss ${item.dn || '—'}`)}</small>

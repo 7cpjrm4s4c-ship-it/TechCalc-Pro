@@ -1085,3 +1085,31 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
   }
 }
 
+/* Phase 36U.2C: global editable collection row contract */
+:root {
+  --tc-collection-quantity-width: 96px;
+  --tc-collection-action-width: 42px;
+  --tc-collection-action-height: 34px;
+}
+
+.tc-collection-row.tc-consumer-row--editable {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--tc-collection-quantity-width) var(--tc-collection-action-width);
+  column-gap: var(--tc-gap);
+  align-items: center;
+}
+
+.tc-collection-row.tc-consumer-row--editable .tc-quantity-field {
+  width: var(--tc-collection-quantity-width);
+  min-width: var(--tc-collection-quantity-width);
+  max-width: var(--tc-collection-quantity-width);
+  justify-self: end;
+}
+
+.tc-collection-row.tc-consumer-row--editable > button {
+  width: var(--tc-collection-action-width);
+  min-width: var(--tc-collection-action-width);
+  height: var(--tc-collection-action-height);
+  justify-self: end;
+}
+
