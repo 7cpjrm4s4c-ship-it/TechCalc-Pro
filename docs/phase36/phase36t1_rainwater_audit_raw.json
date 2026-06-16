@@ -1,0 +1,202 @@
+{
+  "basis": "techcalc-pro-1.3.0-rc.1-phase36s3-platform-navigation-parity.zip",
+  "rain_selectors": [
+    {
+      "selector": "/* Wastewater / rainwater / drinking water -------------------------------- */ .rainwater-result-list, .wastewater-fixtures, .wastewater-fixture__main, .wastewater-fixture__custom, .wastewater-compact-list, .wastewater-line-hints",
+      "body": "display: grid; gap: var(--tc-gap);"
+    },
+    {
+      "selector": ".rainwater-kostra-link",
+      "body": "display: flex; align-items: center; justify-content: center; text-align: center;"
+    },
+    {
+      "selector": ".rainwater-result-group",
+      "body": "display: grid; gap: var(--tc-gap); margin-top: var(--tc-gap);"
+    },
+    {
+      "selector": ".rainwater-result-group + .rainwater-result-group",
+      "body": "margin-top: var(--tc-gap); padding-top: var(--tc-gap); border-top: 1px solid rgba(255,255,255,.10);"
+    },
+    {
+      "selector": ".rainwater-result-group h4",
+      "body": "margin: 0; color: var(--color-muted); font-size: .78rem; letter-spacing: .18em; text-transform: uppercase;"
+    },
+    {
+      "selector": ".rainwater-surface-row",
+      "body": "cursor: pointer;"
+    },
+    {
+      "selector": ".rainwater-surface-row.is-active, .rainwater-result-list .line-section-card.is-active",
+      "body": "border-color: rgba(51,161,255,.75); box-shadow: 0 0 0 1px rgba(51,161,255,.22), 0 0 24px rgba(51,161,255,.12);"
+    },
+    {
+      "selector": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"result\"], .module-view[data-module='hx-diagram'] [data-hx-dynamic=\"results\"], .module-view[data-module='wastewater'] .card__body, .module-view[data-module='rainwater'] .card__body",
+      "body": "display: grid;\n  gap: var(--tc-gap);"
+    },
+    {
+      "selector": "/* Phase 36Q.4: rainwater/wastewater follow global spacing only. */ .module-view[data-module='rainwater'] .card, .module-view[data-module='wastewater'] .card, .module-view[data-module='rainwater'] .result-card, .module-view[data-module='wastewater'] .result-card",
+      "body": "margin: 0;"
+    },
+    {
+      "selector": ".module-view[data-module='rainwater'] .card__body, .module-view[data-module='wastewater'] .card__body",
+      "body": "gap: var(--tc-gap);"
+    }
+  ],
+  "classes": {
+    "rainwater-kostra-link": {
+      "kind": "dead-css-or-selector-only",
+      "recommended_action": "löschen, falls kein Runtime-HTML diese Klasse erzeugt",
+      "in_css_modules": true,
+      "in_css_components": false,
+      "in_js": false,
+      "js_files": [],
+      "css_rules": [
+        {
+          "selector": ".rainwater-kostra-link",
+          "body": "display: flex; align-items: center; justify-content: center; text-align: center;"
+        }
+      ]
+    },
+    "rainwater-result-group": {
+      "kind": "dead-css-or-selector-only",
+      "recommended_action": "löschen, falls kein Runtime-HTML diese Klasse erzeugt",
+      "in_css_modules": true,
+      "in_css_components": false,
+      "in_js": false,
+      "js_files": [],
+      "css_rules": [
+        {
+          "selector": ".rainwater-result-group",
+          "body": "display: grid; gap: var(--tc-gap); margin-top: var(--tc-gap);"
+        },
+        {
+          "selector": ".rainwater-result-group + .rainwater-result-group",
+          "body": "margin-top: var(--tc-gap); padding-top: var(--tc-gap); border-top: 1px solid rgba(255,255,255,.10);"
+        },
+        {
+          "selector": ".rainwater-result-group h4",
+          "body": "margin: 0; color: var(--color-muted); font-size: .78rem; letter-spacing: .18em; text-transform: uppercase;"
+        }
+      ]
+    },
+    "rainwater-result-list": {
+      "kind": "dead-css-or-selector-only",
+      "recommended_action": "löschen, falls kein Runtime-HTML diese Klasse erzeugt",
+      "in_css_modules": true,
+      "in_css_components": false,
+      "in_js": false,
+      "js_files": [],
+      "css_rules": [
+        {
+          "selector": "/* Wastewater / rainwater / drinking water -------------------------------- */ .rainwater-result-list, .wastewater-fixtures, .wastewater-fixture__main, .wastewater-fixture__custom, .wastewater-compact-list, .wastewater-line-hints",
+          "body": "display: grid; gap: var(--tc-gap);"
+        },
+        {
+          "selector": ".rainwater-surface-row.is-active, .rainwater-result-list .line-section-card.is-active",
+          "body": "border-color: rgba(51,161,255,.75); box-shadow: 0 0 0 1px rgba(51,161,255,.22), 0 0 24px rgba(51,161,255,.12);"
+        }
+      ]
+    },
+    "rainwater-surface-row": {
+      "kind": "dead-css-or-selector-only",
+      "recommended_action": "löschen, falls kein Runtime-HTML diese Klasse erzeugt",
+      "in_css_modules": true,
+      "in_css_components": false,
+      "in_js": false,
+      "js_files": [],
+      "css_rules": [
+        {
+          "selector": ".rainwater-surface-row",
+          "body": "cursor: pointer;"
+        },
+        {
+          "selector": ".rainwater-surface-row.is-active, .rainwater-result-list .line-section-card.is-active",
+          "body": "border-color: rgba(51,161,255,.75); box-shadow: 0 0 0 1px rgba(51,161,255,.22), 0 0 24px rgba(51,161,255,.12);"
+        }
+      ]
+    }
+  },
+  "view_comparison": {
+    "rainwater": {
+      "uses_renderModuleShell": true,
+      "uses_stack": true,
+      "uses_card": false,
+      "lineSectionController_renderCard": true,
+      "span6_count": 2,
+      "dynamic_wrappers": [
+        "form",
+        "result"
+      ],
+      "custom_classes": []
+    },
+    "heating_view": {
+      "uses_renderModuleShell": true,
+      "uses_stack": true,
+      "uses_card": true,
+      "lineSectionController_renderCard": true,
+      "span6_count": 2,
+      "dynamic_wrappers": [
+        "formula",
+        "input-fields",
+        "medium-stats",
+        "mode-segment",
+        "pipe-recommendation",
+        "result",
+        "target-segment"
+      ],
+      "custom_classes": []
+    },
+    "pressure_view": {
+      "uses_renderModuleShell": true,
+      "uses_stack": true,
+      "uses_card": true,
+      "lineSectionController_renderCard": false,
+      "span6_count": 2,
+      "dynamic_wrappers": [
+        "basis",
+        "holding-options",
+        "pressure-fields",
+        "result",
+        "saved-records",
+        "temperature-fields",
+        "volume-fields"
+      ],
+      "custom_classes": []
+    },
+    "buffer_view": {
+      "uses_renderModuleShell": true,
+      "uses_stack": true,
+      "uses_card": true,
+      "lineSectionController_renderCard": false,
+      "span6_count": 2,
+      "dynamic_wrappers": [
+        "input-blocks",
+        "medium",
+        "result",
+        "saved-records"
+      ],
+      "custom_classes": [
+        "buffer-input-grid",
+        "buffer-mode-tabs",
+        "ph-help"
+      ]
+    },
+    "ventilation_view": {
+      "uses_renderModuleShell": true,
+      "uses_stack": true,
+      "uses_card": true,
+      "lineSectionController_renderCard": true,
+      "span6_count": 2,
+      "dynamic_wrappers": [
+        "air-stats",
+        "formula",
+        "input-fields",
+        "mode-segment",
+        "result",
+        "target-segment",
+        "temperatures"
+      ],
+      "custom_classes": []
+    }
+  }
+}

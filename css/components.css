@@ -1002,7 +1002,6 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
 }
 
 /* Dynamic update wrappers must be normal block boxes inside stacks. */
-[data-rw-dynamic],
 [data-ww-dynamic],
 [data-hx-dynamic],
 [data-ph-dynamic],
@@ -1012,8 +1011,7 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
   min-width: 0;
 }
 
-/* Rainwater and wastewater: direct dynamic wrappers inside module columns need the same rhythm as cards. */
-.module-view[data-module='rainwater'] .span-6 > [data-rw-dynamic],
+/* Wastewater: direct dynamic wrappers inside module columns need the same rhythm as cards. */
 .module-view[data-module='wastewater'] .span-6 > [data-ww-dynamic] {
   margin: 0;
 }
@@ -1028,8 +1026,6 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
 }
 
 /* Phase 36Q.5: complete dynamic wrapper display reset */
-[data-rw-dynamic="form"],
-[data-rw-dynamic="result"],
 [data-ww-dynamic="usage"],
 [data-ww-dynamic="line-fields"],
 [data-ww-dynamic="fixture-inputs"],
@@ -1045,4 +1041,3 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
 .tc-result-list > .result-row {
   padding: 0;
 }
-

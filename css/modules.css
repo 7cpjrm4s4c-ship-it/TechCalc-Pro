@@ -87,7 +87,6 @@
 .pipe-dimension-card--green .pipe-bar span { background: #25d96a; }
 
 /* Wastewater / rainwater / drinking water -------------------------------- */
-.rainwater-result-list,
 .wastewater-fixtures,
 .wastewater-fixture__main,
 .wastewater-fixture__custom,
@@ -113,14 +112,7 @@
 .tc-collection-row.tc-consumer-row--editable .tc-quantity-field { width: 82px; min-width: 82px; max-width: 82px; justify-self: end; }
 .tc-collection-row.tc-consumer-row--editable > button,
 .module-view[data-module='wastewater'] .wastewater-fixture-row--editable > button { width: 38px; min-width: 38px; height: 34px; justify-self: end; }
-.rainwater-kostra-link { display: flex; align-items: center; justify-content: center; text-align: center; }
-.rainwater-result-group { display: grid; gap: var(--tc-gap); margin-top: var(--tc-gap); }
-.rainwater-result-group + .rainwater-result-group { margin-top: var(--tc-gap); padding-top: var(--tc-gap); border-top: 1px solid rgba(255,255,255,.10); }
-.rainwater-result-group h4 { margin: 0; color: var(--color-muted); font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; }
-.rainwater-surface-row { cursor: pointer; }
-.rainwater-surface-row.is-active,
-.rainwater-result-list .line-section-card.is-active { border-color: rgba(51,161,255,.75); box-shadow: 0 0 0 1px rgba(51,161,255,.22), 0 0 24px rgba(51,161,255,.12); }
-.module-view[data-module='drinking-water'] .dw-save-dialog { margin: 0; }
+.rainwater-result-group + .module-view[data-module='drinking-water'] .dw-save-dialog { margin: 0; }
 .module-view[data-module='drinking-water'] .dw-save-dialog > summary,
 .module-view[data-module='drinking-water'] .dw-save-dialog__body,
 .module-view[data-module='drinking-water'] .dw-save-dialog__record { padding: var(--tc-gap); }
@@ -249,8 +241,7 @@
 
 .module-view[data-module='buffer-storage'] [data-buffer-dynamic="result"],
 .module-view[data-module='hx-diagram'] [data-hx-dynamic="results"],
-.module-view[data-module='wastewater'] .card__body,
-.module-view[data-module='rainwater'] .card__body {
+.module-view[data-module='wastewater'] .card__body {
   display: grid;
   gap: var(--tc-gap);
 }
@@ -272,16 +263,12 @@
   }
 }
 
-/* Phase 36Q.4: rainwater/wastewater follow global spacing only. */
-.module-view[data-module='rainwater'] .card,
+/* Phase 36Q.4: wastewater follows global spacing only. */
 .module-view[data-module='wastewater'] .card,
-.module-view[data-module='rainwater'] .result-card,
 .module-view[data-module='wastewater'] .result-card {
   margin: 0;
 }
 
-.module-view[data-module='rainwater'] .card__body,
 .module-view[data-module='wastewater'] .card__body {
   gap: var(--tc-gap);
 }
-
