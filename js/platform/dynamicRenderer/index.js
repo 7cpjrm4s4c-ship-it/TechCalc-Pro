@@ -540,10 +540,12 @@ export function createRainwaterDynamicRenderer(options = {}) {
     const appStructural = /^(record:|module:|replace|reset)/.test(action);
     const savedStructural = /^(line:|saved:)/.test(action)
       || hasAnyChanged(changed, ['surfaces', 'activeSurfaceId', 'areaName', 'expandedSurfaceResultId']);
+    const previous = root.__tcRainwaterDynamic || {};
+    const surfaceModeChanged = previous.surfaceMode !== s.surfaceMode || changed.includes('surfaceMode');
 
     // Keep form island stable for saved-record actions. Re-render form only when
-    // the domain itself is structurally changed.
-    if (appStructural && typeof renderForm === 'function') {
+    // the domain itself is structurally changed or the calculation mode changes.
+    if ((appStructural || surfaceModeChanged) && typeof renderForm === 'function') {
       setIslandInner(root, '[data-rw-dynamic="form"]', renderForm(s, r));
     }
 
@@ -557,7 +559,8 @@ export function createRainwaterDynamicRenderer(options = {}) {
     root.__tcRainwaterDynamic = {
       activeSurfaceId: s.activeSurfaceId,
       expandedSurfaceResultId: s.expandedSurfaceResultId,
-      surfacesLength: Array.isArray(s.surfaces) ? s.surfaces.length : 0
+      surfacesLength: Array.isArray(s.surfaces) ? s.surfaces.length : 0,
+      surfaceMode: s.surfaceMode
     };
   }
 
