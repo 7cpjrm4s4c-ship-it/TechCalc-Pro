@@ -542,10 +542,32 @@ export function createRainwaterDynamicRenderer(options = {}) {
       || hasAnyChanged(changed, ['surfaces', 'activeSurfaceId', 'areaName', 'expandedSurfaceResultId']);
     const previous = root.__tcRainwaterDynamic || {};
     const surfaceModeChanged = previous.surfaceMode !== s.surfaceMode || changed.includes('surfaceMode');
+    const selectionHydrationChanged = /^platform:lookup:/.test(action)
+      || /^field:(input:select|change:immediate|change)/.test(action)
+      || hasAnyChanged(changed, [
+        'drainSize',
+        'drainSizeManual',
+        'drainCapacity',
+        'drainHead',
+        'emergencyType',
+        'emergencyHead',
+        'emergencyWidth',
+        'emergencyDiameter',
+        'emergencyManufacturerDn',
+        'emergencyCapacity',
+        'emergencySafetyFactor',
+        'areaType',
+        'customCs',
+        'customCm'
+      ])
+      || previous.drainSize !== s.drainSize
+      || previous.emergencyType !== s.emergencyType
+      || previous.areaType !== s.areaType;
 
-    // Keep form island stable for saved-record actions. Re-render form only when
-    // the domain itself is structurally changed or the calculation mode changes.
-    if ((appStructural || surfaceModeChanged) && typeof renderForm === 'function') {
+    // Keep form island stable for saved-record actions. Re-render form when the
+    // domain itself is structurally changed, the calculation mode changes, or a
+    // lookup/selection change affects dependent visible fields and readonly values.
+    if ((appStructural || surfaceModeChanged || selectionHydrationChanged) && typeof renderForm === 'function') {
       setIslandInner(root, '[data-rw-dynamic="form"]', renderForm(s, r));
     }
 
@@ -560,7 +582,10 @@ export function createRainwaterDynamicRenderer(options = {}) {
       activeSurfaceId: s.activeSurfaceId,
       expandedSurfaceResultId: s.expandedSurfaceResultId,
       surfacesLength: Array.isArray(s.surfaces) ? s.surfaces.length : 0,
-      surfaceMode: s.surfaceMode
+      surfaceMode: s.surfaceMode,
+      drainSize: s.drainSize,
+      emergencyType: s.emergencyType,
+      areaType: s.areaType
     };
   }
 

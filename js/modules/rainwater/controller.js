@@ -201,7 +201,14 @@ export function resetSurfaceEditorAfterAdd(current = {}) {
 
 function lookupPatch(fieldName, current = {}) {
   if (fieldName === 'areaType') {
-    return { areaType: normalizeAreaType(current.surfaceMode || current.calculationType || 'roof', current.areaType) };
+    const mode = current.surfaceMode || current.calculationType || 'roof';
+    const areaType = normalizeAreaType(mode, current.areaType);
+    const selected = getAreaType(areaType);
+    return {
+      areaType,
+      customCs: selected?.custom ? (current.customCs || '') : '',
+      customCm: selected?.custom ? (current.customCm || '') : ''
+    };
   }
   return patchLookupDefaults({ [fieldName]: current[fieldName] }, current);
 }
