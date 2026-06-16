@@ -14,7 +14,7 @@ export function renderHxInputCard(vm = {}) {
       field({ id: 'targetRhPercent', label: 'Relative Zielfeuchte φ', unit: '%', value: fmtInput(s.targetRhPercent, 2) })
     ].join(''), 2), 'cyan', { compact: true }),
     `<div data-hx-dynamic="${HX_DYNAMIC.process}">${renderProcessSelection(vm)}</div>`,
-    '<div class="tc-actions"><button type="button" class="tc-action tc-action--ghost" data-tc-action="hx:clear" data-hx-clear>Diagramm leeren</button></div>'
+    '<div class="tc-actions"><button type="button" class="tc-action tc-action--ghost" data-platform-focus data-tc-action="hx:clear" data-hx-clear>Diagramm leeren</button></div>'
   ].join('')), 'cyan');
 }
 

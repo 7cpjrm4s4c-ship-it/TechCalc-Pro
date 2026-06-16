@@ -1,0 +1,44 @@
+{
+  "basis": "techcalc-pro-1.3.0-rc.1-phase36u4-wastewater-zero-dynamic-css-exceptions.zip",
+  "focus_selector_has_platform_focus": true,
+  "hx_process_buttons_marked": true,
+  "hx_clear_button_marked": true,
+  "hx_dynamic_field_actions": true,
+  "syntax": [
+    [
+      "js/core/focusManager.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/hx-diagram/renderPipeline.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/hx-diagram/formRenderer.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/hx-diagram/dynamicRenderer.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/hx-diagram/controller.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/wastewater/view.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/rainwater/view.js",
+      0,
+      ""
+    ]
+  ]
+}

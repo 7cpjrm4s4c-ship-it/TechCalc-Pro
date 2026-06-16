@@ -27,7 +27,7 @@ export function renderProcessSelection(snapshotOrVm = {}) {
   const s = snapshotOrVm?.state || snapshotOrVm || {};
   const options = availableProcesses(s);
   return card('Luftbehandlung wählen', `<div class="hx-process-grid">
-    ${options.map(option => `<button type="button" data-segment="process" data-value="${esc(option.value)}" class="hx-process ${option.value === s.process ? 'is-active' : ''}">${esc(option.label)}</button>`).join('')}
+    ${options.map(option => `<button type="button" data-platform-focus data-segment="process" data-value="${esc(option.value)}" class="hx-process ${option.value === s.process ? 'is-active' : ''}">${esc(option.label)}</button>`).join('')}
   </div>`, 'cyan', { compact: true });
 }
 

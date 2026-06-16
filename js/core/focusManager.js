@@ -11,7 +11,8 @@ const FOCUSABLE_SELECTOR = [
 const PLATFORM_FIELD_SELECTOR = [
   'input[data-field]:not([type="hidden"]):not([disabled])',
   'textarea[data-field]:not([disabled])',
-  'select[data-field]:not([disabled])'
+  'select[data-field]:not([disabled])',
+  '[data-platform-focus]:not([disabled])'
 ].join(',');
 
 function isElementVisible(element) {
