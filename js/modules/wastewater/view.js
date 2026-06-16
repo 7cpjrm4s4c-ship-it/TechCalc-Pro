@@ -35,18 +35,18 @@ export function createWastewaterView(config, calculate, lineSectionController) {
     const r = calculate(s);
     const vm = createWastewaterViewModel(s, r);
     const inputColumn = stack([
-      card('Nutzung', `<div data-ww-dynamic="usage">${vm.usageHtml}</div>`, 'green'),
-      card('Leitungsart / Randbedingungen', `<div data-ww-dynamic="line-fields">${vm.lineHtml}</div>`, 'green'),
+      card('Nutzung', `<div class="tc-stack" data-ww-dynamic="usage">${vm.usageHtml}</div>`, 'green'),
+      card('Leitungsart / Randbedingungen', `<div class="tc-stack" data-ww-dynamic="line-fields">${vm.lineHtml}</div>`, 'green'),
       card('Entwässerungsgegenstände', stack([
-        `<div data-ww-dynamic="fixture-inputs">${vm.fixtureInputHtml}</div>`,
-        `<div data-ww-dynamic="fixtures">${renderWastewaterFixtures(r.fixtures || [])}</div>`
+        `<div class="tc-stack" data-ww-dynamic="fixture-inputs">${vm.fixtureInputHtml}</div>`,
+        `<div class="tc-stack" data-ww-dynamic="fixtures">${renderWastewaterFixtures(r.fixtures || [])}</div>`
       ].join('')), 'green'),
-      card('Zusatzabflüsse', `<div data-ww-dynamic="additional-flows">${vm.additionalFlowsHtml}</div>`, 'green'),
+      card('Zusatzabflüsse', `<div class="tc-stack" data-ww-dynamic="additional-flows">${vm.additionalFlowsHtml}</div>`, 'green'),
       lineSectionController.renderCard(s)
     ].join(''));
 
     const outputColumn = stack([
-      `<div data-ww-dynamic="result">${renderWastewaterResult(s, r)}</div>`
+      `<div class="tc-stack" data-ww-dynamic="result">${renderWastewaterResult(s, r)}</div>`
     ].join(''));
 
     return renderModuleShell(config, `
