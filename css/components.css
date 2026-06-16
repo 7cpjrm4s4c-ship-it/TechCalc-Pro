@@ -999,44 +999,14 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
 .tc-card__body,
 .result-card__body {
   gap: var(--tc-gap);
-}
-
-/* Dynamic update wrappers must be normal block boxes inside stacks. */
-[data-ww-dynamic],
-[data-hx-dynamic],
-[data-ph-dynamic],
-[data-buffer-dynamic],
-[data-platform-dynamic],
-[data-pipe-dynamic] {
-  min-width: 0;
-}
-
-/* Wastewater: direct dynamic wrappers inside module columns need the same rhythm as cards. */
-.module-view[data-module='wastewater'] .span-6 > [data-ww-dynamic] {
-  margin: 0;
-}
-
-/* Do not stack vertical margins inside card bodies; spacing is gap-owned. */
+}/* Do not stack vertical margins inside card bodies; spacing is gap-owned. */
 .card__body > *,
 .tc-card__body > *,
 .result-card__body > *,
 .tc-stack > * {
   margin-top: 0;
   margin-bottom: 0;
-}
-
-/* Phase 36Q.5: complete dynamic wrapper display reset */
-[data-ww-dynamic="usage"],
-[data-ww-dynamic="line-fields"],
-[data-ww-dynamic="fixture-inputs"],
-[data-ww-dynamic="fixtures"],
-[data-ww-dynamic="additional-flows"],
-[data-ww-dynamic="result"] {
-  display: block;
-  min-width: 0;
-}
-
-/* Phase 36S.1: result-row spacing is owned by .result-list gap */
+}/* Phase 36S.1: result-row spacing is owned by .result-list gap */
 .result-list > .result-row,
 .tc-result-list > .result-row {
   padding: 0;
@@ -1112,4 +1082,3 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
   height: var(--tc-collection-action-height);
   justify-self: end;
 }
-

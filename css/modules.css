@@ -85,9 +85,7 @@
 .pipe-dimension-card--red .pipe-bar span { background: #ff3b49; }
 .pipe-dimension-card--yellow .pipe-bar span { background: #ffd34d; }
 .pipe-dimension-card--green .pipe-bar span { background: #25d96a; }.wastewater-subselect { display: grid; gap: var(--tc-gap); }
-.wastewater-subselect > span { color: var(--color-muted); font-size: .78rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
-.module-view[data-module='wastewater'] .segmented { overflow-x: auto; }
-.module-view[data-module='wastewater'] .segmented button { min-width: max-content; }.wastewater-line-selector { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+.wastewater-subselect > span { color: var(--color-muted); font-size: .78rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }.wastewater-line-selector { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
 .wastewater-line-selector button { scroll-snap-align: center; }
 .tc-collection-row__content { min-width: 0; overflow-wrap: anywhere; }
 .module-view[data-module='drinking-water'] .dw-save-dialog > summary,
@@ -172,38 +170,4 @@
   .wrg-flow-layout .inline-stats,
   .wrg-group-grid .inline-stats { grid-template-columns: 1fr; }}
 
-@media (max-width: 480px) {}.module-view[data-module='drinking-water'] .tc-quantity-field input,
-.module-view[data-module='wastewater'] .tc-quantity-field input,
-.module-view[data-module='drinking-water'] .mini-edit-field input,
-.module-view[data-module='wastewater'] .mini-edit-field input {
-  width: 100%;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-.module-view[data-module='buffer-storage'] [data-buffer-dynamic="result"],
-.module-view[data-module='hx-diagram'] [data-hx-dynamic="results"],
-.module-view[data-module='wastewater'] .card__body {
-  display: grid;
-  gap: var(--tc-gap);
-}
-
-@media (max-width: 480px) {.module-view[data-module='drinking-water'] .tc-quantity-field,
-  .module-view[data-module='wastewater'] .tc-quantity-field,
-  .module-view[data-module='drinking-water'] .mini-edit-field,
-  .module-view[data-module='wastewater'] .mini-edit-field {
-    width: 86px;
-    min-width: 86px;
-    max-width: 86px;
-  }
-}
-
-/* Phase 36Q.4: wastewater follows global spacing only. */
-.module-view[data-module='wastewater'] .card,
-.module-view[data-module='wastewater'] .result-card {
-  margin: 0;
-}
-
-.module-view[data-module='wastewater'] .card__body {
-  gap: var(--tc-gap);
-}
+@media (max-width: 480px) {}@media (max-width: 480px) {}
