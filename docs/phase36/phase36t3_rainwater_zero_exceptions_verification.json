@@ -1,0 +1,30 @@
+{
+  "rain_css_hits_after_cleanup": {},
+  "syntax": [
+    [
+      "js/modules/rainwater/config.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/rainwater/view.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/rainwater/results.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/rainwater/controller.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/rainwater/logic.js",
+      0,
+      ""
+    ]
+  ]
+}
