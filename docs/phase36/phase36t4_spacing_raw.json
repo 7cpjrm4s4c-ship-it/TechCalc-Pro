@@ -1,0 +1,605 @@
+{
+  "basis": "techcalc-pro-1.3.0-rc.1-phase36t3-rainwater-zero-css-exceptions.zip",
+  "rules": [
+    {
+      "file": "css/components.css",
+      "selector": "/* Phase 34B: rebuilt component system. This file contains global, reusable UI components only. Module-specific exceptions belong in css/modules.css. */ /* Surfaces / typography -------------------------------------------------- */ .glass-surface, .card, .tc-card",
+      "body": "min-width: 0;\n  max-width: 100%;\n  border: 1px solid var(--color-border);\n  border-radius: var(--tc-radius-card);\n  background: linear-gradient(135deg, rgba(32,39,49,.80), rgba(18,22,28,.66));\n  box-shadow: var(--shadow-glass);\n  -webkit-backdrop-filter: blur(22px) saturate(130%);\n  backdrop-filter: blur(22px) saturate(130%);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".card, .tc-card, .result-card",
+      "body": "display: flex;\n  flex-direction: column;\n  gap: var(--tc-gap);\n  min-height: 0;\n  margin: 0;\n  padding: var(--tc-card-padding);\n  overflow: hidden;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".card--compact",
+      "body": "min-height: 0;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".card--accent-orange",
+      "body": "border-color: rgba(255,122,46,.38);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".card--accent-cyan",
+      "body": "border-color: rgba(53,229,255,.32);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".card--accent-blue",
+      "body": "border-color: rgba(53,170,255,.34);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".card--accent-green",
+      "body": "border-color: rgba(45,224,161,.34);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".card--accent-purple",
+      "body": "border-color: rgba(169,140,255,.36);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".card__title, .tc-card__title",
+      "body": "margin: 0;\n  color: var(--color-muted);\n  font-size: 12px;\n  line-height: 1.25;\n  letter-spacing: 1.7px;\n  text-transform: uppercase;\n  font-weight: 900;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".card__body, .tc-card__body, .result-card__body",
+      "body": "display: grid;\n  gap: var(--tc-gap);\n  min-width: 0;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".card *, .tc-card *, .result-card *, .result-row *, .inline-stat *, .main-result *, .saved-record-card *, .line-section-card *",
+      "body": "min-width: 0;\n  max-width: 100%;\n  overflow-wrap: anywhere;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": "/* Layout primitives ------------------------------------------------------- */ .module-content, .tc-grid, .grid-12",
+      "body": "display: grid;\n  grid-template-columns: repeat(12, minmax(0,1fr));\n  gap: var(--tc-gap);\n  align-items: start;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".module-content > .span-6",
+      "body": "grid-column: span 6;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".module-content > .span-8",
+      "body": "grid-column: span 8;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".module-content > .span-4",
+      "body": "grid-column: span 4;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".module-content > .span-12",
+      "body": "grid-column: 1 / -1;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".module-content > .span-6, .module-content > .span-8, .module-content > .span-4, .module-content > .span-12",
+      "body": "min-width: 0;\n  display: flex;\n  flex-direction: column;\n  gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".tc-stack, .tc-stack--section, .card-grid, .form-grid, .two-column, .tc-two-column, .settings-list, .quick-access-list, .quick-access-pool",
+      "body": "display: grid;\n  gap: var(--tc-gap);\n  min-width: 0;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".tc-fields",
+      "body": "display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": "/* Fields / controls ------------------------------------------------------- */ .field, .tc-field, .settings-field",
+      "body": "display: grid; gap: var(--tc-gap); min-width: 0;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".field label, .tc-field__label, .settings-field__label, .settings-form label",
+      "body": "color: var(--color-muted);\n  font-size: 12px;\n  line-height: 1.2;\n  font-weight: 900;\n  text-transform: uppercase;\n  letter-spacing: 1.3px;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".field--readonly .control--readonly",
+      "body": "justify-content: space-between; padding-left: var(--tc-control-padding-x);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".field--readonly .control--readonly strong",
+      "body": "color: var(--color-text); font-size: 16px; font-weight: 900;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": "/* Results ---------------------------------------------------------------- */ .result-list, .tc-result-list, .inline-stats, .result-groups, .line-section-list, .saved-record-list, .tc-list, .tc-consumer-list, .tc-saved-list, .tc-fixture-list, .dw-list, .dw-consumer-list, .dw-fixture-list, .ph-saved-list",
+      "body": "display: grid; gap: var(--tc-gap); min-width: 0;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".result-row",
+      "body": "display: flex;\n  justify-content: space-between;\n  align-items: flex-start;\n  gap: var(--tc-gap);\n  min-height: 36px;\n  padding: 0;\n  border-bottom: 1px solid rgba(255,255,255,.08);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".result-row span",
+      "body": "color: var(--color-muted);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".result-row strong",
+      "body": "color: var(--color-text); font-size: 18px; line-height: 1.2; text-align: left; white-space: normal;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".result-row small",
+      "body": "font-size: .85em; color: var(--color-text);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".inline-stats",
+      "body": "grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); align-items: stretch;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".inline-stat, .tc-result-item",
+      "body": "display: grid;\n  gap: 4px;\n  min-width: 0;\n  padding: var(--tc-gap);\n  border: 1px solid rgba(255,255,255,.075);\n  border-radius: var(--radius-md);\n  background: rgba(255,255,255,.035);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".inline-stat span, .tc-result-item span",
+      "body": "color: var(--color-muted); font-size: 10px; line-height: 1.15; letter-spacing: 1.1px; text-transform: uppercase; font-weight: 900;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".inline-stat strong, .tc-result-item strong",
+      "body": "color: var(--color-text); font-size: 13px; line-height: 1.2; font-weight: 900; white-space: normal;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".inline-stat small",
+      "body": "font-size: .82em;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".main-result",
+      "body": "display: grid; gap: 4px; padding: var(--tc-gap) 0; border-bottom: 1px solid rgba(255,255,255,.10);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".main-result span",
+      "body": "color: var(--color-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1.4px; font-weight: 900;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".main-result strong",
+      "body": "color: var(--color-text); font-size: clamp(24px,3vw,36px); line-height: 1.05; font-weight: 900; text-align: left;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".module-view, .module-content, .saved-record-list, .line-section-list",
+      "body": "overflow-anchor: none;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": "/* Light theme ------------------------------------------------------------- */ :root[data-theme='light'] .glass-surface, :root[data-theme='light'] .card, :root[data-theme='light'] .tc-card, :root[data-theme='light'] .settings-panel, :root[data-theme='light'] .settings-submenu, :root[data-theme='light'] .inline-stat, :root[data-theme='light'] .tc-result-item, :root[data-theme='light'] .line-section-card, :root[data-theme='light'] .saved-record-card, :root[data-theme='light'] .ph-saved-item, :root[data-theme='light'] .tc-warning, :root[data-theme='light'] .ph-warning, :root[data-theme='light'] .tc-accordion, :root[data-theme='light'] .dw-accordion, :root[data-theme='light'] .settings-row, :root[data-theme='light'] .settings-check, :root[data-theme='light'] .settings-info-row",
+      "body": "background: linear-gradient(145deg, rgba(255,253,248,.98), rgba(241,237,228,.96));\n  color: #17202c;\n  border-color: rgba(68,76,88,.28);\n  box-shadow: 0 12px 32px rgba(75,64,47,.10), inset 0 1px 0 rgba(255,255,255,.86);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ":root[data-theme='light'] .unit, :root[data-theme='light'] .field label, :root[data-theme='light'] .card__title, :root[data-theme='light'] .formula, :root[data-theme='light'] .inline-stat span",
+      "body": "color: #435164;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ":root[data-theme='light'] strong, :root[data-theme='light'] .inline-stat strong, :root[data-theme='light'] .main-result strong, :root[data-theme='light'] .result-row strong",
+      "body": "color: #101827;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".module-content",
+      "body": "grid-template-columns: 1fr;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".module-content > .span-6, .module-content > .span-8, .module-content > .span-4, .module-content > .span-12",
+      "body": "grid-column: 1 / -1;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".tc-fields, .tc-add-row, .dw-add-row",
+      "body": "grid-template-columns: 1fr;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".inline-stats",
+      "body": "grid-template-columns: repeat(2, minmax(0,1fr));"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".inline-stat strong",
+      "body": "white-space: normal;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".result-row",
+      "body": "display: grid; grid-template-columns: 1fr;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".card, .tc-card, .result-card, .line-section-card, .saved-record-card, .ph-saved-item",
+      "body": "scroll-margin-top: calc(var(--header-height,72px) + 12px);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".inline-stats",
+      "body": "grid-template-columns: 1fr;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": "/* Phase 35A: RC retest UI contract hardening. Keep spacing, menu sizing and result rows globally consistent after 34D rebuild. */ .module-content, .module-content > *, .tc-stack, .card, .tc-card, .card__body, .tc-card__body, .result-card__body, .result-list, .result-groups, .inline-stats, .line-section-list, .saved-record-list, [data-platform-dynamic], [data-pipe-dynamic], [data-ph-dynamic], [data-buffer-dynamic], [data-hx-dynamic], [data-dw-dynamic]",
+      "body": "gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".card, .tc-card, .result-card, .line-section-card, .saved-record-card, .ph-saved-item, .pipe-dimension-card, .inline-stat, .result-row, .main-result",
+      "body": "min-width: 0;\n  max-width: 100%;\n  overflow: hidden;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".card__body, .tc-card__body, .result-card__body, .line-section-card__body, .saved-record-card__body, [data-platform-dynamic], [data-buffer-dynamic=\"result\"], [data-hx-dynamic=\"results\"], [data-ph-dynamic=\"result\"], [data-pipe-dynamic=\"result\"]",
+      "body": "display: grid;\n  gap: var(--tc-gap);\n  align-content: start;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".inline-stat, .main-result, .pipe-result-head, .tc-result-item",
+      "body": "padding: var(--tc-gap);\n  border-radius: var(--radius-md);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".result-row > *, .inline-stat > *, .main-result > *, .pipe-result-head > *, .tc-result-item > *",
+      "body": "min-width: 0;\n  max-width: 100%;\n  overflow-wrap: anywhere;\n  white-space: normal;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": "/* Phase 36Q.4: global card spacing contract */ .module-content",
+      "body": "gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".module-content > .span-4, .module-content > .span-6, .module-content > .span-8, .module-content > .span-12",
+      "body": "display: flex;\n  flex-direction: column;\n  gap: var(--tc-gap);\n  min-width: 0;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".tc-stack, .tc-stack--section, .card__body, .tc-card__body, .result-card__body",
+      "body": "gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": "/* Wastewater: direct dynamic wrappers inside module columns need the same rhythm as cards. */ .module-view[data-module='wastewater'] .span-6 > [data-ww-dynamic]",
+      "body": "margin: 0;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": "/* Do not stack vertical margins inside card bodies; spacing is gap-owned. */ .card__body > *, .tc-card__body > *, .result-card__body > *, .tc-stack > *",
+      "body": "margin-top: 0;\n  margin-bottom: 0;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": "/* Phase 36S.1: result-row spacing is owned by .result-list gap */ .result-list > .result-row, .tc-result-list > .result-row",
+      "body": "padding: 0;"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".module-view, .module-content, .tc-grid, .tc-fields, .card-grid, .form-grid",
+      "body": "row-gap: var(--ui-gap);\n  column-gap: var(--ui-gap);"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".module-content > .span-12, .module-content > .span-8, .module-content > .span-6, .module-content > .span-4",
+      "body": "min-width: 0;"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".span-6",
+      "body": "grid-column: span 6;"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".tc-fields",
+      "body": "display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));\n  gap: var(--ui-gap);"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".tc-fields--1",
+      "body": "grid-template-columns: 1fr;"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".tc-fields--3",
+      "body": "grid-template-columns: repeat(3, minmax(0, 1fr));"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".card-grid, .form-grid",
+      "body": "display: grid;\n  grid-template-columns: repeat(2, minmax(0,1fr));\n  gap: var(--ui-gap);"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".span-8, .span-6, .span-4",
+      "body": "grid-column: span 12;"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".card-grid, .form-grid, .tc-fields, .tc-fields--3",
+      "body": "grid-template-columns: 1fr;"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": "/* Renderer layout: module-content owns the 12-column grid; all direct module blocks use the central 8px gap. */ .module-content",
+      "body": "display: grid;\n  grid-template-columns: repeat(12, minmax(0, 1fr));\n  gap: var(--ui-gap);\n  grid-column: 1 / -1;\n  min-width: 0;"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".module-content",
+      "body": "grid-template-columns: 1fr;"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".module-content > .span-12, .module-content > .span-8, .module-content > .span-6, .module-content > .span-4",
+      "body": "grid-column: 1 / -1;"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": "/* Mobile width lock and clipping guards. */ .app-main, .grid-12, .module-view, .tc-grid, .module-content, .two-column, .tc-two-column, .card-grid, .form-grid, .tc-fields",
+      "body": "min-width: 0;\n  max-width: 100%;"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": "/* Phase 36Q.4: renderer module columns use the same gap variable as cards. */ .module-content, .module-view, .tc-grid",
+      "body": "gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".module-content > .span-12, .module-content > .span-8, .module-content > .span-6, .module-content > .span-4",
+      "body": "gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".module-content",
+      "body": "grid-column: span 12;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".module-content > *",
+      "body": "margin-block: 0;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".hx-layout__right > .card",
+      "body": "flex: 1;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".wrg-flow-layout .card, .wrg-group-grid .card",
+      "body": "min-height: 0;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".wastewater-fixture__stats .inline-stats",
+      "body": "grid-template-columns: repeat(3,minmax(0,1fr));"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".module-view[data-module='pressure-holding'] .inline-stat span",
+      "body": "white-space: normal; font-size: clamp(.62rem,.72vw,.72rem); letter-spacing: .08em;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".module-view[data-module='pressure-holding'] .inline-stat strong",
+      "body": "font-size: clamp(.8rem,.95vw,.95rem); line-height: 1.12;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": "/* Unit converter ---------------------------------------------------------- */ .module-view[data-module='unit-converter'] #convertedValue, .module-view[data-module='unit-converter'] #convertedValue:disabled, .module-view[data-module='unit-converter'] .field:has(#convertedValue) input, .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled",
+      "body": "color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".unit-all-values .result-list",
+      "body": "gap: 2px;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".unit-all-values .result-row",
+      "body": "min-height: 34px; padding-block: 4px;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".unit-all-values .result-row span",
+      "body": "font-size: 15px; font-weight: 500; color: var(--color-muted);"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".unit-all-values .result-row strong",
+      "body": "font-size: 16px; font-weight: 650; color: var(--color-muted);"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue, :root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled, :root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input, :root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled",
+      "body": "color: #111827; -webkit-text-fill-color: #111827;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ":root[data-theme='light'] .unit-all-values .result-row span, :root[data-theme='light'] .unit-all-values .result-row small",
+      "body": "color: #6b7280;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ":root[data-theme='light'] .unit-all-values .result-row strong",
+      "body": "color: #4b5563;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".module-content > .span-8, .module-content > .span-4",
+      "body": "grid-column: span 6;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".wrg-flow-layout .tc-fields, .wrg-group-grid .tc-fields",
+      "body": "grid-template-columns: 1fr;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".wrg-flow-layout .inline-stats, .wrg-group-grid .inline-stats",
+      "body": "grid-template-columns: 1fr;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".pipe-dimension-card__meta, .wastewater-fixture__main, .wastewater-fixture__stats .inline-stats, .wastewater-compact-row__inputs, .buffer-input-grid, .buffer-input-grid--reserve",
+      "body": "grid-template-columns: 1fr;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"result\"], .module-view[data-module='hx-diagram'] [data-hx-dynamic=\"results\"], .module-view[data-module='wastewater'] .card__body",
+      "body": "display: grid;\n  gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": "/* Phase 36Q.4: wastewater follows global spacing only. */ .module-view[data-module='wastewater'] .card, .module-view[data-module='wastewater'] .result-card",
+      "body": "margin: 0;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".module-view[data-module='wastewater'] .card__body",
+      "body": "gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/tokens.css",
+      "selector": "/* Hard viewport width lock: prevents mobile layouts and wide content from pushing the page sideways. */ body, .app-shell, .app-header, .module-nav, .app-main, .module-content, .card, .control, .formula",
+      "body": "max-width: 100%;"
+    }
+  ],
+  "mobile_blocks": [
+    {
+      "file": "css/components.css",
+      "block": "@media (max-width: 767px) {\n  .brand { gap: 8px; }\n  .brand__icon { width: 38px; height: 38px; }\n  .brand__title { font-size: 18px; }\n  .brand__subtitle { font-size: 10px; }\n  .module-nav { padding: 6px; overflow: visible; }\n  .module-nav__track { grid-template-columns: repeat(5, minmax(0,1fr)); grid-auto-columns: unset; gap: 4px; overflow: visible; }\n  .module-tab { position: relative; z-index: 1; border-right: 0; border-radius: var(--tc-radius-pill); background: transparent; box-shadow: none; font-size: 12px; line-height: 1.1; isolation: isolate; }\n  .module-tab::before { content: ''; position: absolute; inset: 5px 3px; border-radius: var(--tc-radius-pill); z-index: -1; opacity: 0; transform: scale(.92); transition: opacity .2s var(--ease), transform .2s var(--ease), box-shadow .2s var(--ease); }\n  .module-tab.is-active,\n  .module-tab.is-overflow-active { color: var(--accent-blue); background: transparent; box-shadow: none; }\n  .module-tab.is-active::before,\n  .module-tab.is-overflow-active::before { opacity: 1; transform: scale(1); background: linear-gradient(135deg, rgba(53,170,255,.22), rgba(53,170,255,.08)); border: 1px solid rgba(53,170,255,.42); box-shadow: 0 8px 22px rgba(0,0,0,.22), 0 0 22px rgba(53,170,255,.18); }\n  .overflow-menu:not([hidden]),\n  .overflow-menu { position: fixed; left: 18px; right: 18px; top: auto; bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom,0px) + 22px); width: auto; min-width: 0; max-height: min(55vh,420px); overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; transform: translateZ(0); contain: layout paint; }\n  .overflow-menu__row { grid-template-columns: minmax(0,1fr); min-height: 72px; padding: var(--tc-gap); }\n  .overflow-menu__quick { display: none; }\n  .tc-fields,\n  .tc-add-row,\n  .dw-add-row { grid-template-columns: 1fr; }\n  .inline-stats { grid-template-columns: repeat(2, minmax(0,1fr)); }\n  .inline-stat strong { white-space: normal; }\n  .result-row { display: grid; grid-template-columns: 1fr; }\n  .line-section-card__head,\n  .saved-record-card__head { gap: 8px; }\n  .tc-consumer-row,\n  .dw-consumer-row { align-items: flex-start; }\n  .tc-quantity-field,\n  .mini-edit-field { width: 100%; min-width: 0; max-width: none; }\n  .unit-select,\n  .control .unit-select { flex-basis: 72px; width: 72px; min-width: 72px; }\n  #settingsPanel.settings-panel,\n  .settings-panel { left: 10px; right: 10px; top: max(84px, calc(env(safe-area-inset-top) + 74px)); bottom: max("
+    },
+    {
+      "file": "css/components.css",
+      "block": "@media (max-width: 430px) {\n  .inline-stats { grid-template-columns: 1fr; }\n}"
+    },
+    {
+      "file": "css/layout.css",
+      "block": "@media (max-width: 767px) {\n  .app-shell { padding-bottom: calc(var(--bottom-nav-h) + var(--space-2) + env(safe-area-inset-bottom, 0px)); }\n  .app-header {\n    grid-template-columns: 48px 1fr 48px;\n    min-height: calc(var(--header-h) + env(safe-area-inset-top, 0px));\n    padding-top: max(env(safe-area-inset-top, 0px), var(--space-2));\n    padding-bottom: var(--space-2);\n  }\n  .module-nav {\n    position: fixed;\n    top: auto;\n    bottom: max(10px, env(safe-area-inset-bottom, 0px));\n    left: 10px;\n    right: 10px;\n    height: var(--bottom-nav-h);\n    border: 1px solid rgba(255,255,255,.12);\n    border-radius: 999px;\n    background: rgba(8,12,18,.82);\n    backdrop-filter: blur(22px);\n    overflow: visible;\n  }\n  .module-nav__track { grid-auto-columns: 1fr; border-radius: inherit; overflow: hidden; }\n  .app-main { padding: var(--space-2); }\n  .card-grid, .form-grid, .tc-fields, .tc-fields--3 { grid-template-columns: 1fr; }\n}"
+    },
+    {
+      "file": "css/modules.css",
+      "block": "@media (max-width: 767px) {\n  .hx-chart { min-height: 360px; }\n  .hx-process-grid,\n  .hx-state-grid { grid-template-columns: 1fr; }\n  .hx-process-step { grid-template-columns: repeat(2,minmax(0,1fr)); }\n  .hx-process-step strong { grid-column: 1 / -1; }\n  .hx-history__row { grid-template-columns: 1fr auto; }\n  .hx-history__row--process { grid-template-columns: 1fr; }\n  .hx-history__values { grid-column: 1 / -1; justify-content: flex-start; }\n  .wrg-flow-layout,\n  .wrg-group-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }\n  .wrg-flow-layout .tc-fields,\n  .wrg-group-grid .tc-fields { grid-template-columns: 1fr; }\n  .wrg-flow-layout .inline-stats,\n  .wrg-group-grid .inline-stats { grid-template-columns: 1fr; }\n  .pipe-dimension-card__meta,\n  .wastewater-fixture__main,\n  .wastewater-fixture__stats .inline-stats,\n  .wastewater-compact-row__inputs,\n  .buffer-input-grid,\n  .buffer-input-grid--reserve { grid-template-columns: 1fr; }\n  .module-view[data-module='wastewater'] .wastewater-fixture-row--editable,\n  .tc-collection-row.tc-consumer-row--editable { grid-template-columns: minmax(0,1fr) 82px 38px; }\n}"
+    }
+  ],
+  "renderer_snips": {
+    "renderer": {
+      "field": [
+        " .replaceAll(\"'\", '&#039;');\n}\n\nexport function pressureBadge(r) {\n  if (!r?.rating) return '';\n  return `<span class=\"traffic traffic--${esc(r.rating.key)}\" aria-label=\"${esc(r.rating.label || '')}\"></span>`;\n}\n\nexport function toggleNumericSign(value) {\n  const raw = String(value ?? '').trim();\n  if (!raw || raw === '0') return '-';\n  return raw.startsWith('-') ? raw.slice(1) : `-${raw}`;\n}\n\nexport function signedTempField(id, label, value, signAttribute = 'data-sign') {\n  return `<div class=\"field field--signed-temp\">\n    <label for=\"${esc(id)}\">${esc(label)}</label>\n    <div class=\"control control--with-sign\">\n      <button type=\"button\" tabindex=\"-1\" class=\"sign-toggle\" ${signAttribute}=\"${esc(id)}\" aria-label=\"Vorzeichen umschalten\">±</button>\n      <input id=\"${esc(id)}\" data-field=\"${esc(id)}\" type=\"text\" inputmode=\"decimal\" value=\"${esc(value ?? '')}\" placeholder=\"0\" autocomplete=\"off\">\n      <span class=\"unit\">°C</span>\n    </div>\n  </div>`;\n}\n\nexport function stack(content, modifier = '') {\n  return `<div class=\"tc-stack ${modifier}\">${content}</div>`;\n}\n\nexport function grid(content, cols = 2) {\n  const cls = cols === 1 ? 'tc-fields tc-fields--1' : cols === 3 ? 'tc-fields tc-fields--3' : 'tc-fields';\n  return `<div class=\"${cls}\">${content}</div>`;\n}\n\nexport function card(title, body, accent = 'blue', options = {}) {\n  const compact = options.compact ? ' card--compact' : '';\n  return `<section class=\"card card--accent-${esc(accent)}${compact}\"><h2 class=\"card__title\">${esc(title)}</h2><div class=\"card__body\">${body}</div></section>`;\n}\n\nexport function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', inputmode = 'decimal', disabled =",
+        "aceAll(\"'\", '&#039;');\n}\n\nexport function pressureBadge(r) {\n  if (!r?.rating) return '';\n  return `<span class=\"traffic traffic--${esc(r.rating.key)}\" aria-label=\"${esc(r.rating.label || '')}\"></span>`;\n}\n\nexport function toggleNumericSign(value) {\n  const raw = String(value ?? '').trim();\n  if (!raw || raw === '0') return '-';\n  return raw.startsWith('-') ? raw.slice(1) : `-${raw}`;\n}\n\nexport function signedTempField(id, label, value, signAttribute = 'data-sign') {\n  return `<div class=\"field field--signed-temp\">\n    <label for=\"${esc(id)}\">${esc(label)}</label>\n    <div class=\"control control--with-sign\">\n      <button type=\"button\" tabindex=\"-1\" class=\"sign-toggle\" ${signAttribute}=\"${esc(id)}\" aria-label=\"Vorzeichen umschalten\">±</button>\n      <input id=\"${esc(id)}\" data-field=\"${esc(id)}\" type=\"text\" inputmode=\"decimal\" value=\"${esc(value ?? '')}\" placeholder=\"0\" autocomplete=\"off\">\n      <span class=\"unit\">°C</span>\n    </div>\n  </div>`;\n}\n\nexport function stack(content, modifier = '') {\n  return `<div class=\"tc-stack ${modifier}\">${content}</div>`;\n}\n\nexport function grid(content, cols = 2) {\n  const cls = cols === 1 ? 'tc-fields tc-fields--1' : cols === 3 ? 'tc-fields tc-fields--3' : 'tc-fields';\n  return `<div class=\"${cls}\">${content}</div>`;\n}\n\nexport function card(title, body, accent = 'blue', options = {}) {\n  const compact = options.compact ? ' card--compact' : '';\n  return `<section class=\"card card--accent-${esc(accent)}${compact}\"><h2 class=\"card__title\">${esc(title)}</h2><div class=\"card__body\">${body}</div></section>`;\n}\n\nexport function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', inputmode = 'decimal', disabled = false",
+        "();\n  if (!raw || raw === '0') return '-';\n  return raw.startsWith('-') ? raw.slice(1) : `-${raw}`;\n}\n\nexport function signedTempField(id, label, value, signAttribute = 'data-sign') {\n  return `<div class=\"field field--signed-temp\">\n    <label for=\"${esc(id)}\">${esc(label)}</label>\n    <div class=\"control control--with-sign\">\n      <button type=\"button\" tabindex=\"-1\" class=\"sign-toggle\" ${signAttribute}=\"${esc(id)}\" aria-label=\"Vorzeichen umschalten\">±</button>\n      <input id=\"${esc(id)}\" data-field=\"${esc(id)}\" type=\"text\" inputmode=\"decimal\" value=\"${esc(value ?? '')}\" placeholder=\"0\" autocomplete=\"off\">\n      <span class=\"unit\">°C</span>\n    </div>\n  </div>`;\n}\n\nexport function stack(content, modifier = '') {\n  return `<div class=\"tc-stack ${modifier}\">${content}</div>`;\n}\n\nexport function grid(content, cols = 2) {\n  const cls = cols === 1 ? 'tc-fields tc-fields--1' : cols === 3 ? 'tc-fields tc-fields--3' : 'tc-fields';\n  return `<div class=\"${cls}\">${content}</div>`;\n}\n\nexport function card(title, body, accent = 'blue', options = {}) {\n  const compact = options.compact ? ' card--compact' : '';\n  return `<section class=\"card card--accent-${esc(accent)}${compact}\"><h2 class=\"card__title\">${esc(title)}</h2><div class=\"card__body\">${body}</div></section>`;\n}\n\nexport function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', inputmode = 'decimal', disabled = false, readonly = false, unitField = '', unitOptions = [] }) {\n  const unitHtml = unitOptions.length\n    ? `<select class=\"unit unit-select\" aria-label=\"Einheit\" data-field=\"${esc(unitField)}\" data-commit=\"immediate\">${unitOptions.map(o => `<option value=\"${esc(o.value)}\" ${o.value === unit ?",
+        "ex=\"-1\" class=\"sign-toggle\" ${signAttribute}=\"${esc(id)}\" aria-label=\"Vorzeichen umschalten\">±</button>\n      <input id=\"${esc(id)}\" data-field=\"${esc(id)}\" type=\"text\" inputmode=\"decimal\" value=\"${esc(value ?? '')}\" placeholder=\"0\" autocomplete=\"off\">\n      <span class=\"unit\">°C</span>\n    </div>\n  </div>`;\n}\n\nexport function stack(content, modifier = '') {\n  return `<div class=\"tc-stack ${modifier}\">${content}</div>`;\n}\n\nexport function grid(content, cols = 2) {\n  const cls = cols === 1 ? 'tc-fields tc-fields--1' : cols === 3 ? 'tc-fields tc-fields--3' : 'tc-fields';\n  return `<div class=\"${cls}\">${content}</div>`;\n}\n\nexport function card(title, body, accent = 'blue', options = {}) {\n  const compact = options.compact ? ' card--compact' : '';\n  return `<section class=\"card card--accent-${esc(accent)}${compact}\"><h2 class=\"card__title\">${esc(title)}</h2><div class=\"card__body\">${body}</div></section>`;\n}\n\nexport function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', inputmode = 'decimal', disabled = false, readonly = false, unitField = '', unitOptions = [] }) {\n  const unitHtml = unitOptions.length\n    ? `<select class=\"unit unit-select\" aria-label=\"Einheit\" data-field=\"${esc(unitField)}\" data-commit=\"immediate\">${unitOptions.map(o => `<option value=\"${esc(o.value)}\" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`\n    : unit ? `<span class=\"unit\">${esc(unit)}</span>` : '';\n  return `<div class=\"field\"><label for=\"${esc(id)}\">${esc(label)}</label><div class=\"control\"><input id=\"${esc(id)}\" data-field=\"${esc(id)}\" type=\"${esc(type)}\" inputmode=\"${esc(inputmode)}\" value=\"${esc(value ?? '')}\" placeholder=\"${es",
+        "ass=\"sign-toggle\" ${signAttribute}=\"${esc(id)}\" aria-label=\"Vorzeichen umschalten\">±</button>\n      <input id=\"${esc(id)}\" data-field=\"${esc(id)}\" type=\"text\" inputmode=\"decimal\" value=\"${esc(value ?? '')}\" placeholder=\"0\" autocomplete=\"off\">\n      <span class=\"unit\">°C</span>\n    </div>\n  </div>`;\n}\n\nexport function stack(content, modifier = '') {\n  return `<div class=\"tc-stack ${modifier}\">${content}</div>`;\n}\n\nexport function grid(content, cols = 2) {\n  const cls = cols === 1 ? 'tc-fields tc-fields--1' : cols === 3 ? 'tc-fields tc-fields--3' : 'tc-fields';\n  return `<div class=\"${cls}\">${content}</div>`;\n}\n\nexport function card(title, body, accent = 'blue', options = {}) {\n  const compact = options.compact ? ' card--compact' : '';\n  return `<section class=\"card card--accent-${esc(accent)}${compact}\"><h2 class=\"card__title\">${esc(title)}</h2><div class=\"card__body\">${body}</div></section>`;\n}\n\nexport function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', inputmode = 'decimal', disabled = false, readonly = false, unitField = '', unitOptions = [] }) {\n  const unitHtml = unitOptions.length\n    ? `<select class=\"unit unit-select\" aria-label=\"Einheit\" data-field=\"${esc(unitField)}\" data-commit=\"immediate\">${unitOptions.map(o => `<option value=\"${esc(o.value)}\" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`\n    : unit ? `<span class=\"unit\">${esc(unit)}</span>` : '';\n  return `<div class=\"field\"><label for=\"${esc(id)}\">${esc(label)}</label><div class=\"control\"><input id=\"${esc(id)}\" data-field=\"${esc(id)}\" type=\"${esc(type)}\" inputmode=\"${esc(inputmode)}\" value=\"${esc(value ?? '')}\" placeholder=\"${esc(placehol"
+      ],
+      "result-row": [
+        ".value ?? '—')}${item.unit ? ` <small>${esc(item.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;\n}\n\nexport function mainResult(title, main, details = [], accent = 'blue') {\n  return card(title, `<div class=\"main-result\"><span>${esc(main.label)}</span><strong>${esc(main.value ?? '—')}${main.unit ? ` <small>${esc(main.unit)}</small>` : ''}</strong></div>${inlineStats(details)}`, accent);\n}\n\nexport function resultRows(rows) {\n  return `<div class=\"result-list\">${rows.map(r => `<div class=\"result-row\"><span>${esc(r.label)}</span><strong>${esc(r.value ?? '—')}${r.unit ? ` <small>${esc(r.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;\n}\n\nexport function formCard(title, fields, accent = 'blue', cols = 2) {\n  return card(title, grid(fields.join(''), cols), accent);\n}\n\nexport function resultCard(title, rows, accent = 'blue') {\n  return card(title, resultRows(rows), accent);\n}\n\nexport function emptyCard(title, message, accent = 'blue') {\n  return card(title, `<div class=\"empty-state\">${message}</div>`, accent);\n}\n\n\nexport function isMobileViewport() {\n  return Boolean(\n    window.matchMedia?.('(max-width: 768px)').matches ||\n    window.visualViewport && Math.abs(window.innerHeight - window.visualViewport.height) > 80\n  );\n}\n\nexport function snapshotViewport(options = {}) {\n  const doc = document.scrollingElement || document.documentElement;\n  const anchor = options.anchor || findViewportAnchor(options.event?.target) || findViewportAnchor(document.activeElement);\n  const anchorInfo = getAnchorSnapshot(anchor);\n  return {\n    x: window.scrollX || doc.scrollLeft || 0,\n    y: window.scrollY || doc.scrollTop || 0,\n    anchor: anchorInfo\n  };\n}\n\nexport function restoreV"
+      ],
+      "main-result": [
+        "=\"${esc(o.value)}\" class=\"${o.value === value ? 'is-active' : ''}\">${esc(o.label)}</button>`).join('')}</div>`;\n}\n\n\nexport function inlineStats(items) {\n  return `<div class=\"inline-stats\">${items.map(item => `<div class=\"inline-stat\"><span>${esc(item.label)}</span><strong>${esc(item.value ?? '—')}${item.unit ? ` <small>${esc(item.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;\n}\n\nexport function mainResult(title, main, details = [], accent = 'blue') {\n  return card(title, `<div class=\"main-result\"><span>${esc(main.label)}</span><strong>${esc(main.value ?? '—')}${main.unit ? ` <small>${esc(main.unit)}</small>` : ''}</strong></div>${inlineStats(details)}`, accent);\n}\n\nexport function resultRows(rows) {\n  return `<div class=\"result-list\">${rows.map(r => `<div class=\"result-row\"><span>${esc(r.label)}</span><strong>${esc(r.value ?? '—')}${r.unit ? ` <small>${esc(r.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;\n}\n\nexport function formCard(title, fields, accent = 'blue', cols = 2) {\n  return card(title, grid(fields.join(''), cols), accent);\n}\n\nexport function resultCard(title, rows, accent = 'blue') {\n  return card(title, resultRows(rows), accent);\n}\n\nexport function emptyCard(title, message, accent = 'blue') {\n  return card(title, `<div class=\"empty-state\">${message}</div>`, accent);\n}\n\n\nexport function isMobileViewport() {\n  return Boolean(\n    window.matchMedia?.('(max-width: 768px)').matches ||\n    window.visualViewport && Math.abs(window.innerHeight - window.visualViewport.height) > 80\n  );\n}\n\nexport function snapshotViewport(options = {}) {\n  const doc = document.scrollingElement || document.documentElement;\n  const anchor = options.anchor || findViewpo"
+      ],
+      "inline-stats": [
+        "ions, value, settings = {}) {\n  const accent = settings.accent ? ` segmented--${esc(settings.accent)}` : '';\n  const action = settings.action || 'segment';\n  return `<div class=\"segmented${accent}\" role=\"tablist\">${options.map(o => `<button type=\"button\" data-tc-action=\"${esc(action)}\" data-segment=\"${esc(name)}\" data-value=\"${esc(o.value)}\" class=\"${o.value === value ? 'is-active' : ''}\">${esc(o.label)}</button>`).join('')}</div>`;\n}\n\n\nexport function inlineStats(items) {\n  return `<div class=\"inline-stats\">${items.map(item => `<div class=\"inline-stat\"><span>${esc(item.label)}</span><strong>${esc(item.value ?? '—')}${item.unit ? ` <small>${esc(item.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;\n}\n\nexport function mainResult(title, main, details = [], accent = 'blue') {\n  return card(title, `<div class=\"main-result\"><span>${esc(main.label)}</span><strong>${esc(main.value ?? '—')}${main.unit ? ` <small>${esc(main.unit)}</small>` : ''}</strong></div>${inlineStats(details)}`, accent);\n}\n\nexport function resultRows(rows) {\n  return `<div class=\"result-list\">${rows.map(r => `<div class=\"result-row\"><span>${esc(r.label)}</span><strong>${esc(r.value ?? '—')}${r.unit ? ` <small>${esc(r.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;\n}\n\nexport function formCard(title, fields, accent = 'blue', cols = 2) {\n  return card(title, grid(fields.join(''), cols), accent);\n}\n\nexport function resultCard(title, rows, accent = 'blue') {\n  return card(title, resultRows(rows), accent);\n}\n\nexport function emptyCard(title, message, accent = 'blue') {\n  return card(title, `<div class=\"empty-state\">${message}</div>`, accent);\n}\n\n\nexport function isMobileViewport() {\n  return Boolea"
+      ],
+      "card(": [
+        "\"${esc(id)}\" type=\"text\" inputmode=\"decimal\" value=\"${esc(value ?? '')}\" placeholder=\"0\" autocomplete=\"off\">\n      <span class=\"unit\">°C</span>\n    </div>\n  </div>`;\n}\n\nexport function stack(content, modifier = '') {\n  return `<div class=\"tc-stack ${modifier}\">${content}</div>`;\n}\n\nexport function grid(content, cols = 2) {\n  const cls = cols === 1 ? 'tc-fields tc-fields--1' : cols === 3 ? 'tc-fields tc-fields--3' : 'tc-fields';\n  return `<div class=\"${cls}\">${content}</div>`;\n}\n\nexport function card(title, body, accent = 'blue', options = {}) {\n  const compact = options.compact ? ' card--compact' : '';\n  return `<section class=\"card card--accent-${esc(accent)}${compact}\"><h2 class=\"card__title\">${esc(title)}</h2><div class=\"card__body\">${body}</div></section>`;\n}\n\nexport function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', inputmode = 'decimal', disabled = false, readonly = false, unitField = '', unitOptions = [] }) {\n  const unitHtml = unitOptions.length\n    ? `<select class=\"unit unit-select\" aria-label=\"Einheit\" data-field=\"${esc(unitField)}\" data-commit=\"immediate\">${unitOptions.map(o => `<option value=\"${esc(o.value)}\" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`\n    : unit ? `<span class=\"unit\">${esc(unit)}</span>` : '';\n  return `<div class=\"field\"><label for=\"${esc(id)}\">${esc(label)}</label><div class=\"control\"><input id=\"${esc(id)}\" data-field=\"${esc(id)}\" type=\"${esc(type)}\" inputmode=\"${esc(inputmode)}\" value=\"${esc(value ?? '')}\" placeholder=\"${esc(placeholder)}\" ${disabled ? 'disabled' : ''} ${readonly ? 'readonly aria-readonly=\"true\"' : ''} autocomplete=\"off\">${unitHtml}</div></div>`;\n}",
+        "\"${esc(name)}\" data-value=\"${esc(o.value)}\" class=\"${o.value === value ? 'is-active' : ''}\">${esc(o.label)}</button>`).join('')}</div>`;\n}\n\n\nexport function inlineStats(items) {\n  return `<div class=\"inline-stats\">${items.map(item => `<div class=\"inline-stat\"><span>${esc(item.label)}</span><strong>${esc(item.value ?? '—')}${item.unit ? ` <small>${esc(item.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;\n}\n\nexport function mainResult(title, main, details = [], accent = 'blue') {\n  return card(title, `<div class=\"main-result\"><span>${esc(main.label)}</span><strong>${esc(main.value ?? '—')}${main.unit ? ` <small>${esc(main.unit)}</small>` : ''}</strong></div>${inlineStats(details)}`, accent);\n}\n\nexport function resultRows(rows) {\n  return `<div class=\"result-list\">${rows.map(r => `<div class=\"result-row\"><span>${esc(r.label)}</span><strong>${esc(r.value ?? '—')}${r.unit ? ` <small>${esc(r.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;\n}\n\nexport function formCard(title, fields, accent = 'blue', cols = 2) {\n  return card(title, grid(fields.join(''), cols), accent);\n}\n\nexport function resultCard(title, rows, accent = 'blue') {\n  return card(title, resultRows(rows), accent);\n}\n\nexport function emptyCard(title, message, accent = 'blue') {\n  return card(title, `<div class=\"empty-state\">${message}</div>`, accent);\n}\n\n\nexport function isMobileViewport() {\n  return Boolean(\n    window.matchMedia?.('(max-width: 768px)').matches ||\n    window.visualViewport && Math.abs(window.innerHeight - window.visualViewport.height) > 80\n  );\n}\n\nexport function snapshotViewport(options = {}) {\n  const doc = document.scrollingElement || document.documentElement;\n  const anchor = opt",
+        "{esc(main.label)}</span><strong>${esc(main.value ?? '—')}${main.unit ? ` <small>${esc(main.unit)}</small>` : ''}</strong></div>${inlineStats(details)}`, accent);\n}\n\nexport function resultRows(rows) {\n  return `<div class=\"result-list\">${rows.map(r => `<div class=\"result-row\"><span>${esc(r.label)}</span><strong>${esc(r.value ?? '—')}${r.unit ? ` <small>${esc(r.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;\n}\n\nexport function formCard(title, fields, accent = 'blue', cols = 2) {\n  return card(title, grid(fields.join(''), cols), accent);\n}\n\nexport function resultCard(title, rows, accent = 'blue') {\n  return card(title, resultRows(rows), accent);\n}\n\nexport function emptyCard(title, message, accent = 'blue') {\n  return card(title, `<div class=\"empty-state\">${message}</div>`, accent);\n}\n\n\nexport function isMobileViewport() {\n  return Boolean(\n    window.matchMedia?.('(max-width: 768px)').matches ||\n    window.visualViewport && Math.abs(window.innerHeight - window.visualViewport.height) > 80\n  );\n}\n\nexport function snapshotViewport(options = {}) {\n  const doc = document.scrollingElement || document.documentElement;\n  const anchor = options.anchor || findViewportAnchor(options.event?.target) || findViewportAnchor(document.activeElement);\n  const anchorInfo = getAnchorSnapshot(anchor);\n  return {\n    x: window.scrollX || doc.scrollLeft || 0,\n    y: window.scrollY || doc.scrollTop || 0,\n    anchor: anchorInfo\n  };\n}\n\nexport function restoreViewport(snapshot) {\n  if (!snapshot) return;\n  if (snapshot.anchor?.selector) {\n    const anchor = document.querySelector(snapshot.anchor.selector);\n    if (anchor) {\n      const currentTop = anchor.getBoundingClientRect().top;\n      co",
+        "</div>${inlineStats(details)}`, accent);\n}\n\nexport function resultRows(rows) {\n  return `<div class=\"result-list\">${rows.map(r => `<div class=\"result-row\"><span>${esc(r.label)}</span><strong>${esc(r.value ?? '—')}${r.unit ? ` <small>${esc(r.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;\n}\n\nexport function formCard(title, fields, accent = 'blue', cols = 2) {\n  return card(title, grid(fields.join(''), cols), accent);\n}\n\nexport function resultCard(title, rows, accent = 'blue') {\n  return card(title, resultRows(rows), accent);\n}\n\nexport function emptyCard(title, message, accent = 'blue') {\n  return card(title, `<div class=\"empty-state\">${message}</div>`, accent);\n}\n\n\nexport function isMobileViewport() {\n  return Boolean(\n    window.matchMedia?.('(max-width: 768px)').matches ||\n    window.visualViewport && Math.abs(window.innerHeight - window.visualViewport.height) > 80\n  );\n}\n\nexport function snapshotViewport(options = {}) {\n  const doc = document.scrollingElement || document.documentElement;\n  const anchor = options.anchor || findViewportAnchor(options.event?.target) || findViewportAnchor(document.activeElement);\n  const anchorInfo = getAnchorSnapshot(anchor);\n  return {\n    x: window.scrollX || doc.scrollLeft || 0,\n    y: window.scrollY || doc.scrollTop || 0,\n    anchor: anchorInfo\n  };\n}\n\nexport function restoreViewport(snapshot) {\n  if (!snapshot) return;\n  if (snapshot.anchor?.selector) {\n    const anchor = document.querySelector(snapshot.anchor.selector);\n    if (anchor) {\n      const currentTop = anchor.getBoundingClientRect().top;\n      const delta = currentTop - snapshot.anchor.top;\n      if (Math.abs(delta) > 1) {\n        window.scrollTo(snapshot.x || 0, M",
+        "\">${rows.map(r => `<div class=\"result-row\"><span>${esc(r.label)}</span><strong>${esc(r.value ?? '—')}${r.unit ? ` <small>${esc(r.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;\n}\n\nexport function formCard(title, fields, accent = 'blue', cols = 2) {\n  return card(title, grid(fields.join(''), cols), accent);\n}\n\nexport function resultCard(title, rows, accent = 'blue') {\n  return card(title, resultRows(rows), accent);\n}\n\nexport function emptyCard(title, message, accent = 'blue') {\n  return card(title, `<div class=\"empty-state\">${message}</div>`, accent);\n}\n\n\nexport function isMobileViewport() {\n  return Boolean(\n    window.matchMedia?.('(max-width: 768px)').matches ||\n    window.visualViewport && Math.abs(window.innerHeight - window.visualViewport.height) > 80\n  );\n}\n\nexport function snapshotViewport(options = {}) {\n  const doc = document.scrollingElement || document.documentElement;\n  const anchor = options.anchor || findViewportAnchor(options.event?.target) || findViewportAnchor(document.activeElement);\n  const anchorInfo = getAnchorSnapshot(anchor);\n  return {\n    x: window.scrollX || doc.scrollLeft || 0,\n    y: window.scrollY || doc.scrollTop || 0,\n    anchor: anchorInfo\n  };\n}\n\nexport function restoreViewport(snapshot) {\n  if (!snapshot) return;\n  if (snapshot.anchor?.selector) {\n    const anchor = document.querySelector(snapshot.anchor.selector);\n    if (anchor) {\n      const currentTop = anchor.getBoundingClientRect().top;\n      const delta = currentTop - snapshot.anchor.top;\n      if (Math.abs(delta) > 1) {\n        window.scrollTo(snapshot.x || 0, Math.max(0, (window.scrollY || 0) + delta));\n        return;\n      }\n    }\n  }\n  window.scrollTo(snapshot.x || 0,"
+      ]
+    },
+    "moduleRenderer": {
+      "renderFormSchema": [
+        "import { renderModuleShell, stack } from '../../core/renderer.js';\nimport { renderFormSchema } from '../../core/formSchema.js';\nimport { renderSavedRecordPanel, renderSavedRecordList } from '../../core/savedRecords.js';\nimport { renderResultModel } from '../resultRenderer/index.js';\n\nfunction renderSavedRecords(model = {}, accent = 'blue') {\n  if (!model || model.enabled === false) return '';\n  const items = Array.isArray(model.items) ? model.items : [];\n  const listHtml = renderSavedRecordList(items, {\n    activeId: model.activeId,\n    expandedId: model.expandedId,\n    emptyText: model.emptyText || 'Noch keine Einträge gespeichert.',\n    loadAttr: model.loadAttr || 'data-saved-load',\n    toggleAttr: model.toggleAttr || 'data-saved-toggle',\n    deleteAttr: model.deleteAttr || 'data-saved-delete',\n    title: item => item.title || item.name || model.itemTitle || 'Eintrag',\n    subtitle: item => item.subtitle || '',\n    stats: item => item.stats || []\n  });\n\n  return renderSavedRecordPanel({\n    title: model.title || 'Gespeicherte Einträge',\n    nameFieldId: model.nameFieldId || 'name',\n    nameLabel: model.nameLabel || 'Bezeichnung',\n    nameValue: model.nameValue || '',\n    namePlaceholder: model.namePlaceholder || '',\n    addAction: model.addAction || 'lin",
+        "mePlaceholder || '',\n    addAction: model.addAction || 'line:save',\n    updateAction: model.updateAction || 'line:update',\n    addDisabled: Boolean(model.addDisabled),\n    updateDisabled: Boolean(model.updateDisabled),\n    listHtml: `<div ${model.dynamicAttr || 'data-platform-dynamic=\"saved-record-list\"'}>${listHtml}</div>`,\n    accent: model.accent || accent\n  });\n}\n\nexport function renderPlatformForm({ config, schema, state, result } = {}) {\n  const accent = config?.accent || 'blue';\n  return renderFormSchema(schema, state, { title: 'Eingaben', accent, result });\n}\n\nexport function renderPlatformSaved({ config, savedRecords } = {}) {\n  const accent = config?.accent || 'blue';\n  return renderSavedRecords(savedRecords, accent);\n}\n\nexport function renderPlatformResultsAndSaved({ config, resultModel } = {}) {\n  return renderPlatformResults({ config, resultModel });\n}\n\nexport function renderPlatformResults({ config, resultModel } = {}) {\n  const accent = config?.accent || 'blue';\n  return renderResultModel(resultModel || {}, accent);\n}\n\nexport function renderPlatformModuleView({ config, schema, state, result, resultModel, savedRecords } = {}) {\n  const form = renderPlatformForm({ config, schema, state, result });\n  const saved = renderPlatformSaved({ config, savedRecords });\n  const side = renderPlatformResults({ config, resultModel });\n  return renderModuleShell(config, `<div class=\"span-6 tc-stack\" data-platform-dynamic=\"form-saved\"><div data-platform-dynamic=\"form\">${form}</div><div data-platform-dynamic=\"saved-records\">${saved}</div></div><div class=\"span-6\" data-platform-dynamic=\"result-saved\">${side}</div>`);\n}\n\nexport default { renderPlatformModuleView, renderPlatform"
+      ],
+      "renderResultModel": [
+        "import { renderModuleShell, stack } from '../../core/renderer.js';\nimport { renderFormSchema } from '../../core/formSchema.js';\nimport { renderSavedRecordPanel, renderSavedRecordList } from '../../core/savedRecords.js';\nimport { renderResultModel } from '../resultRenderer/index.js';\n\nfunction renderSavedRecords(model = {}, accent = 'blue') {\n  if (!model || model.enabled === false) return '';\n  const items = Array.isArray(model.items) ? model.items : [];\n  const listHtml = renderSavedRecordList(items, {\n    activeId: model.activeId,\n    expandedId: model.expandedId,\n    emptyText: model.emptyText || 'Noch keine Einträge gespeichert.',\n    loadAttr: model.loadAttr || 'data-saved-load',\n    toggleAttr: model.toggleAttr || 'data-saved-toggle',\n    deleteAttr: model.deleteAttr || 'data-saved-delete',\n    title: item => item.title || item.name || model.itemTitle || 'Eintrag',\n    subtitle: item => item.subtitle || '',\n    stats: item => item.stats || []\n  });\n\n  return renderSavedRecordPanel({\n    title: model.title || 'Gespeicherte Einträge',\n    nameFieldId: model.nameFieldId || 'name',\n    nameLabel: model.nameLabel || 'Bezeichnung',\n    nameValue: model.nameValue || '',\n    namePlaceholder: model.namePlaceholder || '',\n    addAction: model.addAction || 'line:save',\n    updateAction: model.updateAction || 'line:update',\n    addDisabled: Boolean(model.addDisabled),\n    updateDisabled: Boolean(model.updateDisa",
+        "enderFormSchema(schema, state, { title: 'Eingaben', accent, result });\n}\n\nexport function renderPlatformSaved({ config, savedRecords } = {}) {\n  const accent = config?.accent || 'blue';\n  return renderSavedRecords(savedRecords, accent);\n}\n\nexport function renderPlatformResultsAndSaved({ config, resultModel } = {}) {\n  return renderPlatformResults({ config, resultModel });\n}\n\nexport function renderPlatformResults({ config, resultModel } = {}) {\n  const accent = config?.accent || 'blue';\n  return renderResultModel(resultModel || {}, accent);\n}\n\nexport function renderPlatformModuleView({ config, schema, state, result, resultModel, savedRecords } = {}) {\n  const form = renderPlatformForm({ config, schema, state, result });\n  const saved = renderPlatformSaved({ config, savedRecords });\n  const side = renderPlatformResults({ config, resultModel });\n  return renderModuleShell(config, `<div class=\"span-6 tc-stack\" data-platform-dynamic=\"form-saved\"><div data-platform-dynamic=\"form\">${form}</div><div data-platform-dynamic=\"saved-records\">${saved}</div></div><div class=\"span-6\" data-platform-dynamic=\"result-saved\">${side}</div>`);\n}\n\nexport default { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved };\n"
+      ]
+    },
+    "rainwater_view": {},
+    "rainwater_results": {},
+    "rainwater_viewModel": {
+      "renderFormSchema": [
+        "import { renderFormSchema } from '../../core/formSchema.js';\nimport { renderResultModel } from '../../platform/resultRenderer/index.js';\nimport schema from './schema.js';\nimport { buildRainwaterResultModel } from './results.js';\n\nexport function formContent(s = {}, r = {}) {\n  return renderFormSchema(schema, s, { title: 'Eingaben', accent: 'green', result: r });\n}\n\nexport function resultContent(s = {}, r = {}) {\n  return renderResultModel(buildRainwaterResultModel(s, r), 'green');\n}\n\nexport function createRainwaterViewModel(s = {}, r = {}) {\n  return {\n    formHtml: formContent(s, r),\n    resultHtml: resultContent(s, r)\n  };\n}\n\nexport default {\n  formContent,\n  resultContent,\n  createRainwaterViewModel\n};\n",
+        "import { renderFormSchema } from '../../core/formSchema.js';\nimport { renderResultModel } from '../../platform/resultRenderer/index.js';\nimport schema from './schema.js';\nimport { buildRainwaterResultModel } from './results.js';\n\nexport function formContent(s = {}, r = {}) {\n  return renderFormSchema(schema, s, { title: 'Eingaben', accent: 'green', result: r });\n}\n\nexport function resultContent(s = {}, r = {}) {\n  return renderResultModel(buildRainwaterResultModel(s, r), 'green');\n}\n\nexport function createRainwaterViewModel(s = {}, r = {}) {\n  return {\n    formHtml: formContent(s, r),\n    resultHtml: resultContent(s, r)\n  };\n}\n\nexport default {\n  formContent,\n  resultContent,\n  createRainwaterViewModel\n};\n"
+      ],
+      "renderResultModel": [
+        "import { renderFormSchema } from '../../core/formSchema.js';\nimport { renderResultModel } from '../../platform/resultRenderer/index.js';\nimport schema from './schema.js';\nimport { buildRainwaterResultModel } from './results.js';\n\nexport function formContent(s = {}, r = {}) {\n  return renderFormSchema(schema, s, { title: 'Eingaben', accent: 'green', result: r });\n}\n\nexport function resultContent(s = {}, r = {}) {\n  return renderResultModel(buildRainwaterResultModel(s, r), 'green');\n}\n\nexport function createRainwaterViewModel(s = {}, r = {}) {\n  return {\n    formHtml: formContent(s, r),\n    resultHtml: resultContent(s, r)\n  };\n}\n\nexport default {\n  formContent,\n  resultContent,\n  createRainwaterViewModel\n};\n",
+        "import { renderFormSchema } from '../../core/formSchema.js';\nimport { renderResultModel } from '../../platform/resultRenderer/index.js';\nimport schema from './schema.js';\nimport { buildRainwaterResultModel } from './results.js';\n\nexport function formContent(s = {}, r = {}) {\n  return renderFormSchema(schema, s, { title: 'Eingaben', accent: 'green', result: r });\n}\n\nexport function resultContent(s = {}, r = {}) {\n  return renderResultModel(buildRainwaterResultModel(s, r), 'green');\n}\n\nexport function createRainwaterViewModel(s = {}, r = {}) {\n  return {\n    formHtml: formContent(s, r),\n    resultHtml: resultContent(s, r)\n  };\n}\n\nexport default {\n  formContent,\n  resultContent,\n  createRainwaterViewModel\n};\n"
+      ]
+    },
+    "heating_view": {
+      "field": [
+        "ung' },\n        { value: 'cooling', label: '● Kälte' }\n      ], s.mode, { accent })}</div>`, accent, { compact: true }),\n      card(`${modeLabel} — Eingaben`, stack([\n        `<div data-hc-dynamic=\"target-segment\">${segmented(key(s, 'CalcTarget'), [\n          { value: 'power', label: 'Q Leistung' },\n          { value: 'massFlow', label: 'ṁ Massenstrom' },\n          { value: 'deltaT', label: 'ΔT Temperatur' }\n        ], active.calcTarget, { accent })}</div>`,\n        `<div data-hc-dynamic=\"input-fields\">${grid(inputFields(s, active).join(''), 2)}</div>`\n      ].join('')), accent),\n      `<div data-hc-dynamic=\"result\">${renderResultModel(buildHeatingCoolingResultModel(active, r, accent), accent)}</div>`,\n      `<div class=\"formula\" data-hc-dynamic=\"formula\">Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)</div>`\n    ].join(''));\n\n    return renderModuleShell(config, `\n      <div class=\"span-6\">${inputColumn}</div>\n      <div class=\"span-6\">${stack([`<div data-hc-dynamic=\"pipe-recommendation\">${renderPipeRecommendation(s, r)}</div>`, lineSectionController.renderCard(s)].join(''))}</div>\n    `);\n  }\n\n  const dynamicRenderers = {\n    renderMediumStats: (_s, r) => renderResultTable(mediumRows(r.medium)),\n    renderModeSegment: (s, _r, _active, accent) => segmented('mode', [\n      { value: 'heating', label: '● Heizung' },\n      { value: 'cooling', label: '● Kälte' }\n    ], s.mode, { accent }),\n    renderTargetSegment: (s, _r, active, accent) => segmented(key(s, 'CalcTarget'), [\n      { value: 'power', label: 'Q Leistung' },\n      { value: 'massFlow', label: 'ṁ Massenstrom' },\n      { value: 'deltaT', label: 'ΔT Temperatur' }\n  "
+      ],
+      "renderResultModel": [
+        "import { MEDIA, fmt, fmtInput } from '../../utils/calculations.js';\nimport { pipeSystems } from '../../utils/pipes.js';\nimport { card, selectField, segmented, renderModuleShell, stack, grid } from '../../core/renderer.js';\nimport { renderResultModel, renderResultTable, renderRecommendationCard } from '../../platform/resultRenderer/index.js';\nimport { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRows } from './results.js';\nimport { activeCalculationState, key } from './controller.js';\nimport { inputFields } from './viewModel.js';\n\nexport function createHeatingCoolingView({ config, calculate, lineSectionController }) {\n  if (!config) throw new Error('createHeatingCoolingView requires config');\n  if (typeof calculate !== 'function') throw new Error('createHeatingCoolingView requires calculate');\n  if (!lineSectionController) throw new Error('createHeatingCoolingView requires lineSectionController');\n\n  function renderPipeRecommendation(s, r) {\n    return renderRecommendationCard({\n      ...buildPipeRecommendationModel(r),\n      controlsHtml: selectField({ id: 'pipeSystemId', label: 'Rohrmaterial', value: s.pipeSystemId, options: pipeSystems.map(p => ({ value: p.id, label: p.label })) })\n    });\n  }\n\n  function view(s) {\n    const active = activeCalculationState(s);\n    const r = calculate(active);\n    const accent = s.mode === 'cooling' ? 'cyan' : 'orange';\n    const modeLabel = s.mode ===",
+        " card(`${modeLabel} — Eingaben`, stack([\n        `<div data-hc-dynamic=\"target-segment\">${segmented(key(s, 'CalcTarget'), [\n          { value: 'power', label: 'Q Leistung' },\n          { value: 'massFlow', label: 'ṁ Massenstrom' },\n          { value: 'deltaT', label: 'ΔT Temperatur' }\n        ], active.calcTarget, { accent })}</div>`,\n        `<div data-hc-dynamic=\"input-fields\">${grid(inputFields(s, active).join(''), 2)}</div>`\n      ].join('')), accent),\n      `<div data-hc-dynamic=\"result\">${renderResultModel(buildHeatingCoolingResultModel(active, r, accent), accent)}</div>`,\n      `<div class=\"formula\" data-hc-dynamic=\"formula\">Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)</div>`\n    ].join(''));\n\n    return renderModuleShell(config, `\n      <div class=\"span-6\">${inputColumn}</div>\n      <div class=\"span-6\">${stack([`<div data-hc-dynamic=\"pipe-recommendation\">${renderPipeRecommendation(s, r)}</div>`, lineSectionController.renderCard(s)].join(''))}</div>\n    `);\n  }\n\n  const dynamicRenderers = {\n    renderMediumStats: (_s, r) => renderResultTable(mediumRows(r.medium)),\n    renderModeSegment: (s, _r, _active, accent) => segmented('mode', [\n      { value: 'heating', label: '● Heizung' },\n      { value: 'cooling', label: '● Kälte' }\n    ], s.mode, { accent }),\n    renderTargetSegment: (s, _r, active, accent) => segmented(key(s, 'CalcTarget'), [\n      { value: 'power', label: 'Q Leistung' },\n      { value: 'massFlow', label: 'ṁ Massenstrom' },\n      { value: 'deltaT', label: 'ΔT Temperatur' }\n    ], active.calcTarget, { accent }),\n    renderInputFields: (s, _r, active) => grid(inputFields(s, active).join(''), 2),\n    r",
+        " label: '● Heizung' },\n      { value: 'cooling', label: '● Kälte' }\n    ], s.mode, { accent }),\n    renderTargetSegment: (s, _r, active, accent) => segmented(key(s, 'CalcTarget'), [\n      { value: 'power', label: 'Q Leistung' },\n      { value: 'massFlow', label: 'ṁ Massenstrom' },\n      { value: 'deltaT', label: 'ΔT Temperatur' }\n    ], active.calcTarget, { accent }),\n    renderInputFields: (s, _r, active) => grid(inputFields(s, active).join(''), 2),\n    renderResult: (_s, r, active, accent) => renderResultModel(buildHeatingCoolingResultModel(active, r, accent), accent),\n    renderFormula: (_s, r) => `Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)`,\n    renderPipeRecommendation\n  };\n\n  return { view, renderPipeRecommendation, dynamicRenderers };\n}\n\nexport default createHeatingCoolingView;\n"
+      ],
+      "card(": [
+        "enderRecommendationCard({\n      ...buildPipeRecommendationModel(r),\n      controlsHtml: selectField({ id: 'pipeSystemId', label: 'Rohrmaterial', value: s.pipeSystemId, options: pipeSystems.map(p => ({ value: p.id, label: p.label })) })\n    });\n  }\n\n  function view(s) {\n    const active = activeCalculationState(s);\n    const r = calculate(active);\n    const accent = s.mode === 'cooling' ? 'cyan' : 'orange';\n    const modeLabel = s.mode === 'cooling' ? 'Kälte' : 'Heizung';\n\n    const mediumCard = card('Medium', stack([\n      selectField({ id: 'mediumId', label: 'Wärmeträger', value: s.mediumId, options: MEDIA.map(m => ({ value: m.id, label: m.label })) }),\n      `<div data-hc-dynamic=\"medium-stats\">${renderResultTable(mediumRows(r.medium))}</div>`\n    ].join('')), 'blue', { compact: true });\n\n    const inputColumn = stack([\n      mediumCard,\n      card('Betriebsart', `<div data-hc-dynamic=\"mode-segment\">${segmented('mode', [\n        { value: 'heating', label: '● Heizung' },\n        { value: 'cooling', label: '● Kälte' }\n      ], s.mode, { accent })}</div>`, accent, { compact: true }),\n      card(`${modeLabel} — Eingaben`, stack([\n        `<div data-hc-dynamic=\"target-segment\">${segmented(key(s, 'CalcTarget'), [\n          { value: 'power', label: 'Q Leistung' },\n          { value: 'massFlow', label: 'ṁ Massenstrom' },\n          { value: 'deltaT', label: 'ΔT Temperatur' }\n        ], active.calcTarget, { accent })}</div>`,\n        `<div data-hc-dynamic=\"input-fields\">${grid(inputFields(s, active).join(''), 2)}</div>`\n      ].join('')), accent),\n      `<div data-hc-dynamic=\"result\">${renderResultModel(buildHeatingCoolingResultModel(active, r, accent), accent)}</div>`,\n      `<d",
+        " accent = s.mode === 'cooling' ? 'cyan' : 'orange';\n    const modeLabel = s.mode === 'cooling' ? 'Kälte' : 'Heizung';\n\n    const mediumCard = card('Medium', stack([\n      selectField({ id: 'mediumId', label: 'Wärmeträger', value: s.mediumId, options: MEDIA.map(m => ({ value: m.id, label: m.label })) }),\n      `<div data-hc-dynamic=\"medium-stats\">${renderResultTable(mediumRows(r.medium))}</div>`\n    ].join('')), 'blue', { compact: true });\n\n    const inputColumn = stack([\n      mediumCard,\n      card('Betriebsart', `<div data-hc-dynamic=\"mode-segment\">${segmented('mode', [\n        { value: 'heating', label: '● Heizung' },\n        { value: 'cooling', label: '● Kälte' }\n      ], s.mode, { accent })}</div>`, accent, { compact: true }),\n      card(`${modeLabel} — Eingaben`, stack([\n        `<div data-hc-dynamic=\"target-segment\">${segmented(key(s, 'CalcTarget'), [\n          { value: 'power', label: 'Q Leistung' },\n          { value: 'massFlow', label: 'ṁ Massenstrom' },\n          { value: 'deltaT', label: 'ΔT Temperatur' }\n        ], active.calcTarget, { accent })}</div>`,\n        `<div data-hc-dynamic=\"input-fields\">${grid(inputFields(s, active).join(''), 2)}</div>`\n      ].join('')), accent),\n      `<div data-hc-dynamic=\"result\">${renderResultModel(buildHeatingCoolingResultModel(active, r, accent), accent)}</div>`,\n      `<div class=\"formula\" data-hc-dynamic=\"formula\">Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)</div>`\n    ].join(''));\n\n    return renderModuleShell(config, `\n      <div class=\"span-6\">${inputColumn}</div>\n      <div class=\"span-6\">${stack([`<div data-hc-dynamic=\"pipe-recommendation\">${renderPipeRecommenda",
+        "s: MEDIA.map(m => ({ value: m.id, label: m.label })) }),\n      `<div data-hc-dynamic=\"medium-stats\">${renderResultTable(mediumRows(r.medium))}</div>`\n    ].join('')), 'blue', { compact: true });\n\n    const inputColumn = stack([\n      mediumCard,\n      card('Betriebsart', `<div data-hc-dynamic=\"mode-segment\">${segmented('mode', [\n        { value: 'heating', label: '● Heizung' },\n        { value: 'cooling', label: '● Kälte' }\n      ], s.mode, { accent })}</div>`, accent, { compact: true }),\n      card(`${modeLabel} — Eingaben`, stack([\n        `<div data-hc-dynamic=\"target-segment\">${segmented(key(s, 'CalcTarget'), [\n          { value: 'power', label: 'Q Leistung' },\n          { value: 'massFlow', label: 'ṁ Massenstrom' },\n          { value: 'deltaT', label: 'ΔT Temperatur' }\n        ], active.calcTarget, { accent })}</div>`,\n        `<div data-hc-dynamic=\"input-fields\">${grid(inputFields(s, active).join(''), 2)}</div>`\n      ].join('')), accent),\n      `<div data-hc-dynamic=\"result\">${renderResultModel(buildHeatingCoolingResultModel(active, r, accent), accent)}</div>`,\n      `<div class=\"formula\" data-hc-dynamic=\"formula\">Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)</div>`\n    ].join(''));\n\n    return renderModuleShell(config, `\n      <div class=\"span-6\">${inputColumn}</div>\n      <div class=\"span-6\">${stack([`<div data-hc-dynamic=\"pipe-recommendation\">${renderPipeRecommendation(s, r)}</div>`, lineSectionController.renderCard(s)].join(''))}</div>\n    `);\n  }\n\n  const dynamicRenderers = {\n    renderMediumStats: (_s, r) => renderResultTable(mediumRows(r.medium)),\n    renderModeSegment: (s, _r, _active, accent) => segmen"
+      ]
+    },
+    "pressure_view": {
+      "field": [
+        "rt { calculate } from './logic.js';\nimport { createPressureHoldingViewModel } from './viewModel.js';\n\nexport function view(s){\n  const r = calculate(s);\n  const vm = createPressureHoldingViewModel(s, r);\n  const inputColumn = stack([\n    card('Berechnungsart', `<div data-ph-dynamic=\"basis\">${vm.basisHtml}</div>`, 'purple'),\n    card(vm.holdingOptionsTitle, `<div data-ph-dynamic=\"holding-options\">${vm.holdingOptionsHtml}</div>`, 'purple'),\n    card('Anlagenvolumen', `<div data-ph-dynamic=\"volume-fields\">${vm.volumeFieldsHtml}</div>`, 'purple'),\n    card('Temperaturen / Stoffwerte', `<div data-ph-dynamic=\"temperature-fields\">${vm.temperatureFieldsHtml}</div>`, 'purple'),\n    card('Druckdaten', `<div data-ph-dynamic=\"pressure-fields\">${vm.pressureFieldsHtml}</div>`, 'purple'),\n    `<div data-ph-dynamic=\"saved-records\">${vm.savedRecordsHtml}</div>`\n  ].join(''));\n\n  return renderModuleShell(config, `<div class=\"span-6\">${inputColumn}</div><div class=\"span-6\" data-ph-dynamic=\"result\">${vm.resultHtml}</div>`);\n}\n\nexport default view;\n",
+        "s){\n  const r = calculate(s);\n  const vm = createPressureHoldingViewModel(s, r);\n  const inputColumn = stack([\n    card('Berechnungsart', `<div data-ph-dynamic=\"basis\">${vm.basisHtml}</div>`, 'purple'),\n    card(vm.holdingOptionsTitle, `<div data-ph-dynamic=\"holding-options\">${vm.holdingOptionsHtml}</div>`, 'purple'),\n    card('Anlagenvolumen', `<div data-ph-dynamic=\"volume-fields\">${vm.volumeFieldsHtml}</div>`, 'purple'),\n    card('Temperaturen / Stoffwerte', `<div data-ph-dynamic=\"temperature-fields\">${vm.temperatureFieldsHtml}</div>`, 'purple'),\n    card('Druckdaten', `<div data-ph-dynamic=\"pressure-fields\">${vm.pressureFieldsHtml}</div>`, 'purple'),\n    `<div data-ph-dynamic=\"saved-records\">${vm.savedRecordsHtml}</div>`\n  ].join(''));\n\n  return renderModuleShell(config, `<div class=\"span-6\">${inputColumn}</div><div class=\"span-6\" data-ph-dynamic=\"result\">${vm.resultHtml}</div>`);\n}\n\nexport default view;\n",
+        "\n    card('Berechnungsart', `<div data-ph-dynamic=\"basis\">${vm.basisHtml}</div>`, 'purple'),\n    card(vm.holdingOptionsTitle, `<div data-ph-dynamic=\"holding-options\">${vm.holdingOptionsHtml}</div>`, 'purple'),\n    card('Anlagenvolumen', `<div data-ph-dynamic=\"volume-fields\">${vm.volumeFieldsHtml}</div>`, 'purple'),\n    card('Temperaturen / Stoffwerte', `<div data-ph-dynamic=\"temperature-fields\">${vm.temperatureFieldsHtml}</div>`, 'purple'),\n    card('Druckdaten', `<div data-ph-dynamic=\"pressure-fields\">${vm.pressureFieldsHtml}</div>`, 'purple'),\n    `<div data-ph-dynamic=\"saved-records\">${vm.savedRecordsHtml}</div>`\n  ].join(''));\n\n  return renderModuleShell(config, `<div class=\"span-6\">${inputColumn}</div><div class=\"span-6\" data-ph-dynamic=\"result\">${vm.resultHtml}</div>`);\n}\n\nexport default view;\n"
+      ],
+      "card(": [
+        "import config from './config.js';\nimport { card, renderModuleShell, stack } from '../../core/renderer.js';\nimport { calculate } from './logic.js';\nimport { createPressureHoldingViewModel } from './viewModel.js';\n\nexport function view(s){\n  const r = calculate(s);\n  const vm = createPressureHoldingViewModel(s, r);\n  const inputColumn = stack([\n    card('Berechnungsart', `<div data-ph-dynamic=\"basis\">${vm.basisHtml}</div>`, 'purple'),\n    card(vm.holdingOptionsTitle, `<div data-ph-dynamic=\"holding-options\">${vm.holdingOptionsHtml}</div>`, 'purple'),\n    card('Anlagenvolumen', `<div data-ph-dynamic=\"volume-fields\">${vm.volumeFieldsHtml}</div>`, 'purple'),\n    card('Temperaturen / Stoffwerte', `<div data-ph-dynamic=\"temperature-fields\">${vm.temperatureFieldsHtml}</div>`, 'purple'),\n    card('Druckdaten', `<div data-ph-dynamic=\"pressure-fields\">${vm.pressureFieldsHtml}</div>`, 'purple'),\n    `<div data-ph-dynamic=\"saved-records\">${vm.savedRecordsHtml}</div>`\n  ].join(''));\n\n  return renderModuleShell(config, `<div class=\"span-6\">${inputColumn}</div><div class=\"span-6\" data-ph-dynamic=\"result\">${vm.resultHtml}</div>`);\n}\n\nexport default view;\n",
+        "import config from './config.js';\nimport { card, renderModuleShell, stack } from '../../core/renderer.js';\nimport { calculate } from './logic.js';\nimport { createPressureHoldingViewModel } from './viewModel.js';\n\nexport function view(s){\n  const r = calculate(s);\n  const vm = createPressureHoldingViewModel(s, r);\n  const inputColumn = stack([\n    card('Berechnungsart', `<div data-ph-dynamic=\"basis\">${vm.basisHtml}</div>`, 'purple'),\n    card(vm.holdingOptionsTitle, `<div data-ph-dynamic=\"holding-options\">${vm.holdingOptionsHtml}</div>`, 'purple'),\n    card('Anlagenvolumen', `<div data-ph-dynamic=\"volume-fields\">${vm.volumeFieldsHtml}</div>`, 'purple'),\n    card('Temperaturen / Stoffwerte', `<div data-ph-dynamic=\"temperature-fields\">${vm.temperatureFieldsHtml}</div>`, 'purple'),\n    card('Druckdaten', `<div data-ph-dynamic=\"pressure-fields\">${vm.pressureFieldsHtml}</div>`, 'purple'),\n    `<div data-ph-dynamic=\"saved-records\">${vm.savedRecordsHtml}</div>`\n  ].join(''));\n\n  return renderModuleShell(config, `<div class=\"span-6\">${inputColumn}</div><div class=\"span-6\" data-ph-dynamic=\"result\">${vm.resultHtml}</div>`);\n}\n\nexport default view;\n",
+        "uleShell, stack } from '../../core/renderer.js';\nimport { calculate } from './logic.js';\nimport { createPressureHoldingViewModel } from './viewModel.js';\n\nexport function view(s){\n  const r = calculate(s);\n  const vm = createPressureHoldingViewModel(s, r);\n  const inputColumn = stack([\n    card('Berechnungsart', `<div data-ph-dynamic=\"basis\">${vm.basisHtml}</div>`, 'purple'),\n    card(vm.holdingOptionsTitle, `<div data-ph-dynamic=\"holding-options\">${vm.holdingOptionsHtml}</div>`, 'purple'),\n    card('Anlagenvolumen', `<div data-ph-dynamic=\"volume-fields\">${vm.volumeFieldsHtml}</div>`, 'purple'),\n    card('Temperaturen / Stoffwerte', `<div data-ph-dynamic=\"temperature-fields\">${vm.temperatureFieldsHtml}</div>`, 'purple'),\n    card('Druckdaten', `<div data-ph-dynamic=\"pressure-fields\">${vm.pressureFieldsHtml}</div>`, 'purple'),\n    `<div data-ph-dynamic=\"saved-records\">${vm.savedRecordsHtml}</div>`\n  ].join(''));\n\n  return renderModuleShell(config, `<div class=\"span-6\">${inputColumn}</div><div class=\"span-6\" data-ph-dynamic=\"result\">${vm.resultHtml}</div>`);\n}\n\nexport default view;\n",
+        "ssureHoldingViewModel } from './viewModel.js';\n\nexport function view(s){\n  const r = calculate(s);\n  const vm = createPressureHoldingViewModel(s, r);\n  const inputColumn = stack([\n    card('Berechnungsart', `<div data-ph-dynamic=\"basis\">${vm.basisHtml}</div>`, 'purple'),\n    card(vm.holdingOptionsTitle, `<div data-ph-dynamic=\"holding-options\">${vm.holdingOptionsHtml}</div>`, 'purple'),\n    card('Anlagenvolumen', `<div data-ph-dynamic=\"volume-fields\">${vm.volumeFieldsHtml}</div>`, 'purple'),\n    card('Temperaturen / Stoffwerte', `<div data-ph-dynamic=\"temperature-fields\">${vm.temperatureFieldsHtml}</div>`, 'purple'),\n    card('Druckdaten', `<div data-ph-dynamic=\"pressure-fields\">${vm.pressureFieldsHtml}</div>`, 'purple'),\n    `<div data-ph-dynamic=\"saved-records\">${vm.savedRecordsHtml}</div>`\n  ].join(''));\n\n  return renderModuleShell(config, `<div class=\"span-6\">${inputColumn}</div><div class=\"span-6\" data-ph-dynamic=\"result\">${vm.resultHtml}</div>`);\n}\n\nexport default view;\n",
+        "ldingViewModel(s, r);\n  const inputColumn = stack([\n    card('Berechnungsart', `<div data-ph-dynamic=\"basis\">${vm.basisHtml}</div>`, 'purple'),\n    card(vm.holdingOptionsTitle, `<div data-ph-dynamic=\"holding-options\">${vm.holdingOptionsHtml}</div>`, 'purple'),\n    card('Anlagenvolumen', `<div data-ph-dynamic=\"volume-fields\">${vm.volumeFieldsHtml}</div>`, 'purple'),\n    card('Temperaturen / Stoffwerte', `<div data-ph-dynamic=\"temperature-fields\">${vm.temperatureFieldsHtml}</div>`, 'purple'),\n    card('Druckdaten', `<div data-ph-dynamic=\"pressure-fields\">${vm.pressureFieldsHtml}</div>`, 'purple'),\n    `<div data-ph-dynamic=\"saved-records\">${vm.savedRecordsHtml}</div>`\n  ].join(''));\n\n  return renderModuleShell(config, `<div class=\"span-6\">${inputColumn}</div><div class=\"span-6\" data-ph-dynamic=\"result\">${vm.resultHtml}</div>`);\n}\n\nexport default view;\n"
+      ]
+    },
+    "buffer_view": {
+      "field": [
+        "import config from './config.js';\nimport { calculate } from './logic.js';\nimport { card, field, grid, inlineStats, renderModuleShell, segmented, selectField, stack } from '../../core/renderer.js';\nimport { createBufferStorageDynamicRenderer } from '../../platform/dynamicRenderer/index.js';\nimport { renderResultModel } from '../../platform/resultRenderer/index.js';\nimport { createBufferStorageViewModel } from './viewModel.js';\nimport { bufferSaveCard } from './controller.js';\n\nfunction renderFieldGrid(fields = [], modifier = '') {\n  return `<div class=\"buffer-input-grid ${modifier}\">${fields.map(item => field(item)).join('')}</div>`;\n}\n\nexport function renderGlycolFields(vm) {\n  const s = vm.state;\n  if (s.mediumMode === 'water') return '';\n  return grid([\n    selectField({ id: 'glycolType', label: 'Glykolart', value: s.glycolType, options: vm.glycolTypeOptions }),\n    selectField({ id: 'glycolConcentration', label: 'Konzentration', value: s.glycolConcentration, options: vm.glycolConcentrationOptions })\n  ].join(''), 2);\n}\n\nexport function renderMediumContent(vm) {\n  const s = vm.state;\n  return stack([\n    selectField({ id: 'mediumMode', label: 'Wärmeträger', value: s.mediumMode, options: vm.mediumOptions }),\n    renderGlycolFields(vm),\n    inlineStats([{ label: 'Berec",
+        " config from './config.js';\nimport { calculate } from './logic.js';\nimport { card, field, grid, inlineStats, renderModuleShell, segmented, selectField, stack } from '../../core/renderer.js';\nimport { createBufferStorageDynamicRenderer } from '../../platform/dynamicRenderer/index.js';\nimport { renderResultModel } from '../../platform/resultRenderer/index.js';\nimport { createBufferStorageViewModel } from './viewModel.js';\nimport { bufferSaveCard } from './controller.js';\n\nfunction renderFieldGrid(fields = [], modifier = '') {\n  return `<div class=\"buffer-input-grid ${modifier}\">${fields.map(item => field(item)).join('')}</div>`;\n}\n\nexport function renderGlycolFields(vm) {\n  const s = vm.state;\n  if (s.mediumMode === 'water') return '';\n  return grid([\n    selectField({ id: 'glycolType', label: 'Glykolart', value: s.glycolType, options: vm.glycolTypeOptions }),\n    selectField({ id: 'glycolConcentration', label: 'Konzentration', value: s.glycolConcentration, options: vm.glycolConcentrationOptions })\n  ].join(''), 2);\n}\n\nexport function renderMediumContent(vm) {\n  const s = vm.state;\n  return stack([\n    selectField({ id: 'mediumMode', label: 'Wärmeträger', value: s.mediumMode, options: vm.mediumOptions }),\n    renderGlycolFields(vm),\n    inlineStats([{ label: 'Berechnungsfaktor', value: vm.factorLabel }, { label: 'Grundlage', value: 'Mitsubishi-Formel' }])\n  ].join(''));\n}\n\nexport function renderRuntimeInputs(vm) {\n  return card('Mindestlaufzeit Verdichter', [\n    renderFieldGrid(vm.runtimeFields, 'buffer-input-grid--runtime'),\n    '<p class=\"tc-help ph-help ph-help--inline buffer-help\"><strong>Teillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistun",
+        "eld, grid, inlineStats, renderModuleShell, segmented, selectField, stack } from '../../core/renderer.js';\nimport { createBufferStorageDynamicRenderer } from '../../platform/dynamicRenderer/index.js';\nimport { renderResultModel } from '../../platform/resultRenderer/index.js';\nimport { createBufferStorageViewModel } from './viewModel.js';\nimport { bufferSaveCard } from './controller.js';\n\nfunction renderFieldGrid(fields = [], modifier = '') {\n  return `<div class=\"buffer-input-grid ${modifier}\">${fields.map(item => field(item)).join('')}</div>`;\n}\n\nexport function renderGlycolFields(vm) {\n  const s = vm.state;\n  if (s.mediumMode === 'water') return '';\n  return grid([\n    selectField({ id: 'glycolType', label: 'Glykolart', value: s.glycolType, options: vm.glycolTypeOptions }),\n    selectField({ id: 'glycolConcentration', label: 'Konzentration', value: s.glycolConcentration, options: vm.glycolConcentrationOptions })\n  ].join(''), 2);\n}\n\nexport function renderMediumContent(vm) {\n  const s = vm.state;\n  return stack([\n    selectField({ id: 'mediumMode', label: 'Wärmeträger', value: s.mediumMode, options: vm.mediumOptions }),\n    renderGlycolFields(vm),\n    inlineStats([{ label: 'Berechnungsfaktor', value: vm.factorLabel }, { label: 'Grundlage', value: 'Mitsubishi-Formel' }])\n  ].join(''));\n}\n\nexport function renderRuntimeInputs(vm) {\n  return card('Mindestlaufzeit Verdichter', [\n    renderFieldGrid(vm.runtimeFields, 'buffer-input-grid--runtime'),\n    '<p class=\"tc-help ph-help ph-help--inline buffer-help\"><strong>Teillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große Verdichter ⇒ 25 %. Die Berechnung nutzt intern 0,25",
+        "ats, renderModuleShell, segmented, selectField, stack } from '../../core/renderer.js';\nimport { createBufferStorageDynamicRenderer } from '../../platform/dynamicRenderer/index.js';\nimport { renderResultModel } from '../../platform/resultRenderer/index.js';\nimport { createBufferStorageViewModel } from './viewModel.js';\nimport { bufferSaveCard } from './controller.js';\n\nfunction renderFieldGrid(fields = [], modifier = '') {\n  return `<div class=\"buffer-input-grid ${modifier}\">${fields.map(item => field(item)).join('')}</div>`;\n}\n\nexport function renderGlycolFields(vm) {\n  const s = vm.state;\n  if (s.mediumMode === 'water') return '';\n  return grid([\n    selectField({ id: 'glycolType', label: 'Glykolart', value: s.glycolType, options: vm.glycolTypeOptions }),\n    selectField({ id: 'glycolConcentration', label: 'Konzentration', value: s.glycolConcentration, options: vm.glycolConcentrationOptions })\n  ].join(''), 2);\n}\n\nexport function renderMediumContent(vm) {\n  const s = vm.state;\n  return stack([\n    selectField({ id: 'mediumMode', label: 'Wärmeträger', value: s.mediumMode, options: vm.mediumOptions }),\n    renderGlycolFields(vm),\n    inlineStats([{ label: 'Berechnungsfaktor', value: vm.factorLabel }, { label: 'Grundlage', value: 'Mitsubishi-Formel' }])\n  ].join(''));\n}\n\nexport function renderRuntimeInputs(vm) {\n  return card('Mindestlaufzeit Verdichter', [\n    renderFieldGrid(vm.runtimeFields, 'buffer-input-grid--runtime'),\n    '<p class=\"tc-help ph-help ph-help--inline buffer-help\"><strong>Teillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große Verdichter ⇒ 25 %. Die Berechnung nutzt intern 0,25.</p>',\n    '<p cla"
+      ],
+      "renderResultModel": [
+        "import config from './config.js';\nimport { calculate } from './logic.js';\nimport { card, field, grid, inlineStats, renderModuleShell, segmented, selectField, stack } from '../../core/renderer.js';\nimport { createBufferStorageDynamicRenderer } from '../../platform/dynamicRenderer/index.js';\nimport { renderResultModel } from '../../platform/resultRenderer/index.js';\nimport { createBufferStorageViewModel } from './viewModel.js';\nimport { bufferSaveCard } from './controller.js';\n\nfunction renderFieldGrid(fields = [], modifier = '') {\n  return `<div class=\"buffer-input-grid ${modifier}\">${fields.map(item => field(item)).join('')}</div>`;\n}\n\nexport function renderGlycolFields(vm) {\n  const s = vm.state;\n  if (s.mediumMode === 'water') return '';\n  return grid([\n    selectField({ id: 'glycolType', label: 'Glykolart', value: s.glycolType, options: vm.glycolTypeOptions }),\n    selectField({ id: 'glycolConcentration', label: 'Konzentration', value: s.glycolConcentration, options: vm.glycolConcentrationOptions })\n  ].join(''), 2);\n}\n\nexport function renderMediumContent(vm) {\n  const s = vm.state;\n  return stack([\n    selectField({ id: 'mediumMode', label: 'Wärmeträger', value: s.mediumMode, options: vm.mediumOptions }),\n    renderGlycolFields(vm),\n    inlineStats([{ label: 'Berechnungsfaktor', value: vm.factorLabel }, { label: 'Grundlage', value: 'Mitsubishi-Formel' }])\n  ].join(''));\n}\n\nexport function renderRuntimeInputs(vm) {\n  return card('Mindestlaufzeit Verdichter', [\n    renderFi",
+        "m) {\n  return card('Wasservorlage als Kälte- / Wärmespeicher', renderFieldGrid(vm.reserveFields, 'buffer-input-grid--reserve'), vm.accent);\n}\n\nexport function renderInputBlocks(vm) {\n  if (vm.isCompareMode) return [renderRuntimeInputs(vm), renderDefrostInputs(vm), renderReserveInputs(vm)].join('');\n  if (vm.isDefrostMode) return renderDefrostInputs(vm);\n  if (vm.isReserveMode) return renderReserveInputs(vm);\n  return renderRuntimeInputs(vm);\n}\n\nexport function renderResultContent(vm) {\n  return renderResultModel(vm.resultModel, vm.accent);\n}\n\nexport function renderSavedRecords(vm) {\n  return bufferSaveCard(vm.state);\n}\n\nexport function renderView(s) {\n  const vm = createBufferStorageViewModel(s);\n  const inputColumn = stack([\n    card('Berechnungsart', stack([\n      `<div class=\"buffer-mode-tabs\">${segmented('calculationMode', vm.bufferModeOptions, s.calculationMode, { accent: vm.accent })}</div>`,\n      '<p class=\"tc-help ph-help\">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'\n    ].join('')), vm.accent),\n    card('Medium / Faktor', `<div data-buffer-dynamic=\"medium\">${renderMediumContent(vm)}</div>`, vm.accent),\n    `<div data-buffer-dynamic=\"input-blocks\">${renderInputBlocks(vm)}</div>`,\n    `<div data-buffer-dynamic=\"saved-records\">${renderSavedRecords(vm)}</div>`\n  ].join(''));\n\n  const resultColumn = stack([\n    `<div data-buffer-dynamic=\"result\">${renderResultContent(vm)}</div>`\n  ].join(''));\n\n  return renderModuleShell(config, `<div class=\"span-6\">${inputColumn}</div><div class=\"span-6\">${resultColumn}</div>`);\n}\n\nconst renderWithViewModel = renderer => ("
+      ],
+      "card(": [
+        ": s.glycolConcentration, options: vm.glycolConcentrationOptions })\n  ].join(''), 2);\n}\n\nexport function renderMediumContent(vm) {\n  const s = vm.state;\n  return stack([\n    selectField({ id: 'mediumMode', label: 'Wärmeträger', value: s.mediumMode, options: vm.mediumOptions }),\n    renderGlycolFields(vm),\n    inlineStats([{ label: 'Berechnungsfaktor', value: vm.factorLabel }, { label: 'Grundlage', value: 'Mitsubishi-Formel' }])\n  ].join(''));\n}\n\nexport function renderRuntimeInputs(vm) {\n  return card('Mindestlaufzeit Verdichter', [\n    renderFieldGrid(vm.runtimeFields, 'buffer-input-grid--runtime'),\n    '<p class=\"tc-help ph-help ph-help--inline buffer-help\"><strong>Teillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große Verdichter ⇒ 25 %. Die Berechnung nutzt intern 0,25.</p>',\n    '<p class=\"tc-help ph-help ph-help--inline buffer-help\"><strong>QLast:</strong> konstant durch aktive Verbraucher abgenommene Leistung. Falls keine konstante Last vorhanden oder bekannt ist, 0 kW eintragen.</p>'\n  ].join(''), vm.accent);\n}\n\nexport function renderDefrostInputs(vm) {\n  return card('Abtaubetrieb Wärmepumpe', renderFieldGrid(vm.defrostFields, 'buffer-input-grid--defrost'), vm.accent);\n}\n\nexport function renderReserveInputs(vm) {\n  return card('Wasservorlage als Kälte- / Wärmespeicher', renderFieldGrid(vm.reserveFields, 'buffer-input-grid--reserve'), vm.accent);\n}\n\nexport function renderInputBlocks(vm) {\n  if (vm.isCompareMode) return [renderRuntimeInputs(vm), renderDefrostInputs(vm), renderReserveInputs(vm)].join('');\n  if (vm.isDefrostMode) return renderDefrostInputs(vm);\n  if (vm.isReserveMode) return renderReserveInputs(",
+        "--inline buffer-help\"><strong>Teillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große Verdichter ⇒ 25 %. Die Berechnung nutzt intern 0,25.</p>',\n    '<p class=\"tc-help ph-help ph-help--inline buffer-help\"><strong>QLast:</strong> konstant durch aktive Verbraucher abgenommene Leistung. Falls keine konstante Last vorhanden oder bekannt ist, 0 kW eintragen.</p>'\n  ].join(''), vm.accent);\n}\n\nexport function renderDefrostInputs(vm) {\n  return card('Abtaubetrieb Wärmepumpe', renderFieldGrid(vm.defrostFields, 'buffer-input-grid--defrost'), vm.accent);\n}\n\nexport function renderReserveInputs(vm) {\n  return card('Wasservorlage als Kälte- / Wärmespeicher', renderFieldGrid(vm.reserveFields, 'buffer-input-grid--reserve'), vm.accent);\n}\n\nexport function renderInputBlocks(vm) {\n  if (vm.isCompareMode) return [renderRuntimeInputs(vm), renderDefrostInputs(vm), renderReserveInputs(vm)].join('');\n  if (vm.isDefrostMode) return renderDefrostInputs(vm);\n  if (vm.isReserveMode) return renderReserveInputs(vm);\n  return renderRuntimeInputs(vm);\n}\n\nexport function renderResultContent(vm) {\n  return renderResultModel(vm.resultModel, vm.accent);\n}\n\nexport function renderSavedRecords(vm) {\n  return bufferSaveCard(vm.state);\n}\n\nexport function renderView(s) {\n  const vm = createBufferStorageViewModel(s);\n  const inputColumn = stack([\n    card('Berechnungsart', stack([\n      `<div class=\"buffer-mode-tabs\">${segmented('calculationMode', vm.bufferModeOptions, s.calculationMode, { accent: vm.accent })}</div>`,\n      '<p class=\"tc-help ph-help\">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder e",
+        " Die Berechnung nutzt intern 0,25.</p>',\n    '<p class=\"tc-help ph-help ph-help--inline buffer-help\"><strong>QLast:</strong> konstant durch aktive Verbraucher abgenommene Leistung. Falls keine konstante Last vorhanden oder bekannt ist, 0 kW eintragen.</p>'\n  ].join(''), vm.accent);\n}\n\nexport function renderDefrostInputs(vm) {\n  return card('Abtaubetrieb Wärmepumpe', renderFieldGrid(vm.defrostFields, 'buffer-input-grid--defrost'), vm.accent);\n}\n\nexport function renderReserveInputs(vm) {\n  return card('Wasservorlage als Kälte- / Wärmespeicher', renderFieldGrid(vm.reserveFields, 'buffer-input-grid--reserve'), vm.accent);\n}\n\nexport function renderInputBlocks(vm) {\n  if (vm.isCompareMode) return [renderRuntimeInputs(vm), renderDefrostInputs(vm), renderReserveInputs(vm)].join('');\n  if (vm.isDefrostMode) return renderDefrostInputs(vm);\n  if (vm.isReserveMode) return renderReserveInputs(vm);\n  return renderRuntimeInputs(vm);\n}\n\nexport function renderResultContent(vm) {\n  return renderResultModel(vm.resultModel, vm.accent);\n}\n\nexport function renderSavedRecords(vm) {\n  return bufferSaveCard(vm.state);\n}\n\nexport function renderView(s) {\n  const vm = createBufferStorageViewModel(s);\n  const inputColumn = stack([\n    card('Berechnungsart', stack([\n      `<div class=\"buffer-mode-tabs\">${segmented('calculationMode', vm.bufferModeOptions, s.calculationMode, { accent: vm.accent })}</div>`,\n      '<p class=\"tc-help ph-help\">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'\n    ].join('')), vm.accent),\n    card('Medium / Faktor', `<div data-buffer-dynamic=\"medium\">${renderMediumConte",
+        "renderDefrostInputs(vm), renderReserveInputs(vm)].join('');\n  if (vm.isDefrostMode) return renderDefrostInputs(vm);\n  if (vm.isReserveMode) return renderReserveInputs(vm);\n  return renderRuntimeInputs(vm);\n}\n\nexport function renderResultContent(vm) {\n  return renderResultModel(vm.resultModel, vm.accent);\n}\n\nexport function renderSavedRecords(vm) {\n  return bufferSaveCard(vm.state);\n}\n\nexport function renderView(s) {\n  const vm = createBufferStorageViewModel(s);\n  const inputColumn = stack([\n    card('Berechnungsart', stack([\n      `<div class=\"buffer-mode-tabs\">${segmented('calculationMode', vm.bufferModeOptions, s.calculationMode, { accent: vm.accent })}</div>`,\n      '<p class=\"tc-help ph-help\">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'\n    ].join('')), vm.accent),\n    card('Medium / Faktor', `<div data-buffer-dynamic=\"medium\">${renderMediumContent(vm)}</div>`, vm.accent),\n    `<div data-buffer-dynamic=\"input-blocks\">${renderInputBlocks(vm)}</div>`,\n    `<div data-buffer-dynamic=\"saved-records\">${renderSavedRecords(vm)}</div>`\n  ].join(''));\n\n  const resultColumn = stack([\n    `<div data-buffer-dynamic=\"result\">${renderResultContent(vm)}</div>`\n  ].join(''));\n\n  return renderModuleShell(config, `<div class=\"span-6\">${inputColumn}</div><div class=\"span-6\">${resultColumn}</div>`);\n}\n\nconst renderWithViewModel = renderer => (s, r) => renderer(createBufferStorageViewModel(s, r));\n\nconst bufferStorageDynamicRenderer = createBufferStorageDynamicRenderer({\n  calculate,\n  renderMedium: renderWithViewModel(renderMediumContent),\n  renderInputBlocks: renderWithViewMode",
+        "unction renderView(s) {\n  const vm = createBufferStorageViewModel(s);\n  const inputColumn = stack([\n    card('Berechnungsart', stack([\n      `<div class=\"buffer-mode-tabs\">${segmented('calculationMode', vm.bufferModeOptions, s.calculationMode, { accent: vm.accent })}</div>`,\n      '<p class=\"tc-help ph-help\">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'\n    ].join('')), vm.accent),\n    card('Medium / Faktor', `<div data-buffer-dynamic=\"medium\">${renderMediumContent(vm)}</div>`, vm.accent),\n    `<div data-buffer-dynamic=\"input-blocks\">${renderInputBlocks(vm)}</div>`,\n    `<div data-buffer-dynamic=\"saved-records\">${renderSavedRecords(vm)}</div>`\n  ].join(''));\n\n  const resultColumn = stack([\n    `<div data-buffer-dynamic=\"result\">${renderResultContent(vm)}</div>`\n  ].join(''));\n\n  return renderModuleShell(config, `<div class=\"span-6\">${inputColumn}</div><div class=\"span-6\">${resultColumn}</div>`);\n}\n\nconst renderWithViewModel = renderer => (s, r) => renderer(createBufferStorageViewModel(s, r));\n\nconst bufferStorageDynamicRenderer = createBufferStorageDynamicRenderer({\n  calculate,\n  renderMedium: renderWithViewModel(renderMediumContent),\n  renderInputBlocks: renderWithViewModel(renderInputBlocks),\n  renderSavedPanel: renderWithViewModel(renderSavedRecords),\n  renderResult: renderWithViewModel(renderResultContent)\n});\n\nexport function updateBufferStorageDynamic(root, s, meta = {}) {\n  bufferStorageDynamicRenderer.update(root, s, meta);\n}\n\nexport function isDynamicBufferStorageAction(meta = {}) {\n  return String(meta.action || '') !== 'initial';\n}\n\n\nexport default re"
+      ]
+    }
+  }
+}

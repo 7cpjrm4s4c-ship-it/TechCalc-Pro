@@ -1,0 +1,173 @@
+{
+  "basis": "techcalc-pro-1.3.0-rc.1-phase36t4-rainwater-inner-card-spacing-audit.zip",
+  "relevant_rules": [
+    {
+      "selector": ".card__body, .tc-card__body, .result-card__body",
+      "body": "display: grid;\n  gap: var(--tc-gap);\n  min-width: 0;"
+    },
+    {
+      "selector": ".card *, .tc-card *, .result-card *, .result-row *, .inline-stat *, .main-result *, .saved-record-card *, .line-section-card *",
+      "body": "min-width: 0;\n  max-width: 100%;\n  overflow-wrap: anywhere;"
+    },
+    {
+      "selector": ".tc-stack, .tc-stack--section, .card-grid, .form-grid, .two-column, .tc-two-column, .settings-list, .quick-access-list, .quick-access-pool",
+      "body": "display: grid;\n  gap: var(--tc-gap);\n  min-width: 0;"
+    },
+    {
+      "selector": "/* Fields / controls ------------------------------------------------------- */ .field, .tc-field, .settings-field",
+      "body": "display: grid; gap: var(--tc-gap); min-width: 0;"
+    },
+    {
+      "selector": ".field label, .tc-field__label, .settings-field__label, .settings-form label",
+      "body": "color: var(--color-muted);\n  font-size: 12px;\n  line-height: 1.2;\n  font-weight: 900;\n  text-transform: uppercase;\n  letter-spacing: 1.3px;"
+    },
+    {
+      "selector": ".field--readonly .control--readonly",
+      "body": "justify-content: space-between; padding-left: var(--tc-control-padding-x);"
+    },
+    {
+      "selector": ".field--readonly .control--readonly strong",
+      "body": "color: var(--color-text); font-size: 16px; font-weight: 900;"
+    },
+    {
+      "selector": "/* Results ---------------------------------------------------------------- */ .result-list, .tc-result-list, .inline-stats, .result-groups, .line-section-list, .saved-record-list, .tc-list, .tc-consumer-list, .tc-saved-list, .tc-fixture-list, .dw-list, .dw-consumer-list, .dw-fixture-list, .ph-saved-list",
+      "body": "display: grid; gap: var(--tc-gap); min-width: 0;"
+    },
+    {
+      "selector": ".result-row",
+      "body": "display: flex;\n  justify-content: space-between;\n  align-items: flex-start;\n  gap: var(--tc-gap);\n  min-height: 36px;\n  padding: 0;\n  border-bottom: 1px solid rgba(255,255,255,.08);"
+    },
+    {
+      "selector": ".result-row span",
+      "body": "color: var(--color-muted);"
+    },
+    {
+      "selector": ".result-row strong",
+      "body": "color: var(--color-text); font-size: 18px; line-height: 1.2; text-align: left; white-space: normal;"
+    },
+    {
+      "selector": ".result-row small",
+      "body": "font-size: .85em; color: var(--color-text);"
+    },
+    {
+      "selector": ".inline-stats",
+      "body": "grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); align-items: stretch;"
+    },
+    {
+      "selector": ".inline-stat, .tc-result-item",
+      "body": "display: grid;\n  gap: 4px;\n  min-width: 0;\n  padding: var(--tc-gap);\n  border: 1px solid rgba(255,255,255,.075);\n  border-radius: var(--radius-md);\n  background: rgba(255,255,255,.035);"
+    },
+    {
+      "selector": ".inline-stat span, .tc-result-item span",
+      "body": "color: var(--color-muted); font-size: 10px; line-height: 1.15; letter-spacing: 1.1px; text-transform: uppercase; font-weight: 900;"
+    },
+    {
+      "selector": ".inline-stat strong, .tc-result-item strong",
+      "body": "color: var(--color-text); font-size: 13px; line-height: 1.2; font-weight: 900; white-space: normal;"
+    },
+    {
+      "selector": ".inline-stat small",
+      "body": "font-size: .82em;"
+    },
+    {
+      "selector": ".main-result",
+      "body": "display: grid; gap: 4px; padding: var(--tc-gap) 0; border-bottom: 1px solid rgba(255,255,255,.10);"
+    },
+    {
+      "selector": ".main-result span",
+      "body": "color: var(--color-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1.4px; font-weight: 900;"
+    },
+    {
+      "selector": ".main-result strong",
+      "body": "color: var(--color-text); font-size: clamp(24px,3vw,36px); line-height: 1.05; font-weight: 900; text-align: left;"
+    },
+    {
+      "selector": "/* Light theme ------------------------------------------------------------- */ :root[data-theme='light'] .glass-surface, :root[data-theme='light'] .card, :root[data-theme='light'] .tc-card, :root[data-theme='light'] .settings-panel, :root[data-theme='light'] .settings-submenu, :root[data-theme='light'] .inline-stat, :root[data-theme='light'] .tc-result-item, :root[data-theme='light'] .line-section-card, :root[data-theme='light'] .saved-record-card, :root[data-theme='light'] .ph-saved-item, :root[data-theme='light'] .tc-warning, :root[data-theme='light'] .ph-warning, :root[data-theme='light'] .tc-accordion, :root[data-theme='light'] .dw-accordion, :root[data-theme='light'] .settings-row, :root[data-theme='light'] .settings-check, :root[data-theme='light'] .settings-info-row",
+      "body": "background: linear-gradient(145deg, rgba(255,253,248,.98), rgba(241,237,228,.96));\n  color: #17202c;\n  border-color: rgba(68,76,88,.28);\n  box-shadow: 0 12px 32px rgba(75,64,47,.10), inset 0 1px 0 rgba(255,255,255,.86);"
+    },
+    {
+      "selector": ":root[data-theme='light'] .unit, :root[data-theme='light'] .field label, :root[data-theme='light'] .card__title, :root[data-theme='light'] .formula, :root[data-theme='light'] .inline-stat span",
+      "body": "color: #435164;"
+    },
+    {
+      "selector": ":root[data-theme='light'] strong, :root[data-theme='light'] .inline-stat strong, :root[data-theme='light'] .main-result strong, :root[data-theme='light'] .result-row strong",
+      "body": "color: #101827;"
+    },
+    {
+      "selector": ".inline-stats",
+      "body": "grid-template-columns: repeat(2, minmax(0,1fr));"
+    },
+    {
+      "selector": ".inline-stat strong",
+      "body": "white-space: normal;"
+    },
+    {
+      "selector": ".result-row",
+      "body": "display: grid; grid-template-columns: 1fr;"
+    },
+    {
+      "selector": ".inline-stats",
+      "body": "grid-template-columns: 1fr;"
+    },
+    {
+      "selector": "/* Phase 35A: RC retest UI contract hardening. Keep spacing, menu sizing and result rows globally consistent after 34D rebuild. */ .module-content, .module-content > *, .tc-stack, .card, .tc-card, .card__body, .tc-card__body, .result-card__body, .result-list, .result-groups, .inline-stats, .line-section-list, .saved-record-list, [data-platform-dynamic], [data-pipe-dynamic], [data-ph-dynamic], [data-buffer-dynamic], [data-hx-dynamic], [data-dw-dynamic]",
+      "body": "gap: var(--tc-gap);"
+    },
+    {
+      "selector": ".card, .tc-card, .result-card, .line-section-card, .saved-record-card, .ph-saved-item, .pipe-dimension-card, .inline-stat, .result-row, .main-result",
+      "body": "min-width: 0;\n  max-width: 100%;\n  overflow: hidden;"
+    },
+    {
+      "selector": ".card__body, .tc-card__body, .result-card__body, .line-section-card__body, .saved-record-card__body, [data-platform-dynamic], [data-buffer-dynamic=\"result\"], [data-hx-dynamic=\"results\"], [data-ph-dynamic=\"result\"], [data-pipe-dynamic=\"result\"]",
+      "body": "display: grid;\n  gap: var(--tc-gap);\n  align-content: start;"
+    },
+    {
+      "selector": ".inline-stat, .main-result, .pipe-result-head, .tc-result-item",
+      "body": "padding: var(--tc-gap);\n  border-radius: var(--radius-md);"
+    },
+    {
+      "selector": ".result-row > *, .inline-stat > *, .main-result > *, .pipe-result-head > *, .tc-result-item > *",
+      "body": "min-width: 0;\n  max-width: 100%;\n  overflow-wrap: anywhere;\n  white-space: normal;"
+    },
+    {
+      "selector": ".tc-stack, .tc-stack--section, .card__body, .tc-card__body, .result-card__body",
+      "body": "gap: var(--tc-gap);"
+    },
+    {
+      "selector": "/* Do not stack vertical margins inside card bodies; spacing is gap-owned. */ .card__body > *, .tc-card__body > *, .result-card__body > *, .tc-stack > *",
+      "body": "margin-top: 0;\n  margin-bottom: 0;"
+    },
+    {
+      "selector": "/* Phase 36S.1: result-row spacing is owned by .result-list gap */ .result-list > .result-row, .tc-result-list > .result-row",
+      "body": "padding: 0;"
+    },
+    {
+      "selector": ".field, .tc-field, .settings-field",
+      "body": "gap: calc(var(--tc-gap) * .5);"
+    },
+    {
+      "selector": ".form-grid, .tc-fields, .card__body, .tc-card__body, .result-card__body",
+      "body": "gap: calc(var(--tc-gap) * .75);"
+    },
+    {
+      "selector": ".result-list, .tc-result-list",
+      "body": "gap: calc(var(--tc-gap) * .75);"
+    },
+    {
+      "selector": ".result-row",
+      "body": "min-height: 0;\n    gap: calc(var(--tc-gap) * .5);\n    padding: 0;"
+    },
+    {
+      "selector": ".main-result",
+      "body": "gap: calc(var(--tc-gap) * .5);\n    padding-top: calc(var(--tc-gap) * .5);\n    padding-bottom: calc(var(--tc-gap) * .5);"
+    },
+    {
+      "selector": ".inline-stats",
+      "body": "gap: calc(var(--tc-gap) * .75);"
+    },
+    {
+      "selector": ".inline-stat, .tc-result-item",
+      "body": "padding: calc(var(--tc-gap) * .75);"
+    }
+  ]
+}

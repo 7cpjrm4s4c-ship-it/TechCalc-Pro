@@ -1041,3 +1041,47 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
 .tc-result-list > .result-row {
   padding: 0;
 }
+
+/* Phase 36T.5: global mobile compact contract for dense forms/results */
+@media (max-width: 767px) {
+  .field,
+  .tc-field,
+  .settings-field {
+    gap: calc(var(--tc-gap) * .5);
+  }
+
+  .form-grid,
+  .tc-fields,
+  .card__body,
+  .tc-card__body,
+  .result-card__body {
+    gap: calc(var(--tc-gap) * .75);
+  }
+
+  .result-list,
+  .tc-result-list {
+    gap: calc(var(--tc-gap) * .75);
+  }
+
+  .result-row {
+    min-height: 0;
+    gap: calc(var(--tc-gap) * .5);
+    padding: 0;
+  }
+
+  .main-result {
+    gap: calc(var(--tc-gap) * .5);
+    padding-top: calc(var(--tc-gap) * .5);
+    padding-bottom: calc(var(--tc-gap) * .5);
+  }
+
+  .inline-stats {
+    gap: calc(var(--tc-gap) * .75);
+  }
+
+  .inline-stat,
+  .tc-result-item {
+    padding: calc(var(--tc-gap) * .75);
+  }
+}
+
