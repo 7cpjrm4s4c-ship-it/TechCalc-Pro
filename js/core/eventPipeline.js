@@ -284,6 +284,15 @@ export function bindCentralEventPipeline(root, state, options = {}) {
       if (dispatchAction(root, state, actionEl, event, options)) return;
     }
 
+    const segment = event.target?.closest?.('[data-segment]');
+    if (segment && root.contains(segment) && (event.key === 'Enter' || event.key === ' ')) {
+      const handled = handleSegment(segment, event);
+      if (handled && event.key === 'Enter') {
+        handlePlatformFieldNavigation(root, segment, event, { select: false, defer: false, preventDefault: false });
+      }
+      return;
+    }
+
     const el = event.target?.closest?.('input[data-field], textarea[data-field], select[data-field]');
     if (!el || !root.contains(el) || (event.key !== 'Enter' && event.key !== 'Tab')) return;
     const action = event.key === 'Tab' ? 'field:tab' : 'field:enter';
@@ -300,7 +309,7 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     notifyCommit({ action, element: el, moved });
     const refresh = () => {
       const active = document.activeElement;
-      const keep = active && root.contains(active) && active.matches?.('[data-field]');
+      const keep = active && root.contains(active) && active.matches?.('[data-field], [data-platform-focus]');
       PlatformFocusManager.preserveFocusDuring(root, () => state.set({}, { action: `${action}:refresh`, notify: true }), { restoreFocus: keep });
     };
     if (typeof requestAnimationFrame === 'function') requestAnimationFrame(refresh);

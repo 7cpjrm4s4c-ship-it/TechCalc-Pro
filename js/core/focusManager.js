@@ -126,7 +126,7 @@ export function shouldHandleTabNavigation(event) {
 }
 
 export function focusByEnter(root, current, options = {}) {
-  if (!current?.matches?.('[data-field]')) return false;
+  if (!current?.matches?.('[data-field], [data-platform-focus]')) return false;
   const direction = options.direction || (options.event?.shiftKey ? 'previous' : 'next');
   return focusNext(root, current, {
     direction: direction === 'previous' ? 'previous' : 'next',
@@ -142,7 +142,7 @@ export function handleEnterNavigation(root, current, event, options = {}) {
 }
 
 export function focusByTab(root, current, options = {}) {
-  if (!current?.matches?.('[data-field]')) return false;
+  if (!current?.matches?.('[data-field], [data-platform-focus]')) return false;
   const direction = options.direction || (options.event?.shiftKey ? 'previous' : 'next');
   return focusNext(root, current, {
     direction: direction === 'previous' ? 'previous' : 'next',
