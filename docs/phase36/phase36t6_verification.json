@@ -1,0 +1,31 @@
+{
+  "basis": "techcalc-pro-1.3.0-rc.1-phase36t5-global-mobile-compact-contract.zip",
+  "css_rainwater_exceptions": {},
+  "syntax": [
+    [
+      "js/modules/rainwater/view.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/rainwater/results.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/rainwater/controller.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/hx-diagram/controller.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/drinking-water/controller.js",
+      0,
+      ""
+    ]
+  ]
+}
