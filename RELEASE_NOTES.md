@@ -1,3 +1,10 @@
+## 1.3.0-rc.1 · Phase 37A abgeschlossen
+
+- Platform Convergence Audit abgeschlossen.
+- P1-Findings nach 37A.1 vollständig geschlossen.
+- Runtime-`migrationStatus`-Breadcrumbs nach 37A.2 vollständig entfernt.
+- Finaler Abschluss-Guard `test:phase37a-final` ergänzt.
+- Restbestand bewusst auf 6 P2-Findings begrenzt: CSS-Spezialisierungen, Drinking-Water Event-Density und zwei Utility-Kandidaten für 37B.
 
 ## 1.3.0-rc.1 · Phase 37A.2
 
@@ -42,3 +49,9 @@ Release-hardening status after Phase 31D:
 - Druckhaltung, Schmutzwasser und Regenwasser auf Single-Controller-Speicherpattern bereinigt.
 - Legacy-`savedRecords`-Reste aus Schmutzwasser/Regenwasser entfernt.
 - Save-Dialog-Tests auf aktuelles `createLineSectionController`-Pattern aktualisiert.
+
+## Version 1.3.0-rc.1 - Phase 37B Browser Runtime Smoke Baseline
+- Playwright-Konfiguration für Chromium Desktop und WebKit Mobile ergänzt.
+- Browser-Smoke-Spezifikation für Modulwechsel, Saved-Record-Erreichbarkeit, mobile Navigation, Settings-Scroll-Lock und Service-Worker-Offline-Reload angelegt.
+- Node-Gate `test:phase37b` ergänzt, das die Browser-Testschicht statisch validiert und den Importcheck ausführt.
+- Keine Runtime-Logik geändert.

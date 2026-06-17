@@ -52,4 +52,4 @@ Ziel: alle Module gegen die Referenzarchitektur Heizung, Lüftung, Druckhaltung 
 
 ## SVP-Bewertung
 
-Phase 37A bestätigt: Die Plattform ist stabil, aber noch nicht vollständig konvergiert. Die größten Restschulden liegen nicht in Fachlogik, sondern in Runtime-Metadaten, lokalen Event-Boundaries und wenigen modulspezifischen Renderer-/CSS-Sonderpfaden. Empfehlung: vor Feature-Arbeit Phase 37B als kontrollierte Bereinigung der P1/P2-Findings durchführen.
+Phase 37A ist als Plattform-Konvergenzaudit abgeschlossen. Die P1-Findings aus 37A.1 sowie die Runtime-Metadaten-Schuld aus 37A.2 sind geschlossen. Übrig bleiben bewusst akzeptierte P2-Themen: CSS-Spezialisierungen, eine Drinking-Water-Event-Density-Prüfung und zwei Utility-Kandidaten. Empfehlung: diese Restpunkte nicht mehr in 37A, sondern in Phase 37B als kontrollierte Cleanup-Runde ohne Feature-Arbeit behandeln.

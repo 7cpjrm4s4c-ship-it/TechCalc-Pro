@@ -195,7 +195,7 @@ mdTable(['| Modul | Score | Status | P1 | P2 |', '|---|---:|---|---:|---:|', ...
 mdTable(['| Datei | !important | Modul-Selektoren |', '|---|---:|---:|', ...cssDebt.map(item => `| ${item.file} | ${item.important} | ${item.moduleScopedSelectors} |`)]) +
 `\n\n## Utility-Kandidaten für Phase 37B\n\n` +
 (unusedUtilityExports.length ? unusedUtilityExports.map(item => `- ${item.file} :: ${item.symbol}`).join('\n') : '- Keine unbenutzten Utility-Exports gefunden.') +
-`\n\n## SVP-Bewertung\n\nPhase 37A bestätigt: Die Plattform ist stabil, aber noch nicht vollständig konvergiert. Die größten Restschulden liegen nicht in Fachlogik, sondern in Runtime-Metadaten, lokalen Event-Boundaries und wenigen modulspezifischen Renderer-/CSS-Sonderpfaden. Empfehlung: vor Feature-Arbeit Phase 37B als kontrollierte Bereinigung der P1/P2-Findings durchführen.\n`;
+`\n\n## SVP-Bewertung\n\nPhase 37A ist als Plattform-Konvergenzaudit abgeschlossen. Die P1-Findings aus 37A.1 sowie die Runtime-Metadaten-Schuld aus 37A.2 sind geschlossen. Übrig bleiben bewusst akzeptierte P2-Themen: CSS-Spezialisierungen, eine Drinking-Water-Event-Density-Prüfung und zwei Utility-Kandidaten. Empfehlung: diese Restpunkte nicht mehr in 37A, sondern in Phase 37B als kontrollierte Cleanup-Runde ohne Feature-Arbeit behandeln.\n`;
 writeFileSync(abs('docs', 'phases', 'phase37a-platform-convergence-audit.md'), md);
 
 console.log(`phase37a platform convergence audit ok (${modules.length} modules, ${riskRegister.length} findings)`);
