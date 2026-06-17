@@ -149,6 +149,9 @@
     "test:phase37b1": "node tests/platform-browser-runtime-phase37b1.test.mjs",
     "test:e2e:phase37b1": "playwright test tests/e2e/phase37b-runtime-smoke.spec.mjs",
     "test:phase37b1a": "node tests/platform-browser-runtime-phase37b1a.test.mjs",
-    "test:phase37b1b": "node tests/platform-browser-runtime-phase37b1b.test.mjs"
+    "test:phase37b1b": "node tests/platform-browser-runtime-phase37b1b.test.mjs",
+    "audit:phase37b2": "node scripts/audit-browser-runtime-phase37b2.mjs",
+    "test:phase37b2": "node tests/platform-browser-runtime-phase37b2.test.mjs",
+    "test:e2e:phase37b2": "playwright test tests/e2e/phase37b-runtime-smoke.spec.mjs"
   }
 }

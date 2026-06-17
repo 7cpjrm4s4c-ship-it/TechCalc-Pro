@@ -78,3 +78,10 @@ Release-hardening status after Phase 31D:
 - Trinkwasser Dynamic Renderer: Dynamic-Island `innerHTML`-Writes gegen stale/detached DOM-Anker gehärtet.
 - Neuer Guard: `test:phase37b1b`.
 
+
+## Phase 37B.2 - Browser Runtime Smoke Coverage Expansion
+
+- Playwright-Smoke-Spec um Saved-Record-, Dynamic-Renderer-, Enter-/Tab-, Mobile-Nav-, Scroll-Lock- und Offline-Reload-Szenarien erweitert.
+- Bekannte externe Browser-Meldungen werden als Nicht-App-Befund gefiltert; echte App-Errors bleiben testrelevant.
+- Neuer Guard: `test:phase37b2`.
+- Keine Runtime-Logik geaendert.

@@ -1,0 +1,130 @@
+{
+  "phase": "37B.2",
+  "name": "Browser Runtime Smoke Coverage Expansion",
+  "status": "passed",
+  "generatedAt": "2026-06-17T14:46:24.596Z",
+  "coverage": {
+    "modules": 11,
+    "scenarios": [
+      "module-route-mount",
+      "saved-record-controls",
+      "dynamic-renderer-field-commit",
+      "enter-tab-navigation",
+      "mobile-nav-swipe-guard",
+      "settings-scroll-lock",
+      "service-worker-offline-reload"
+    ]
+  },
+  "checks": [
+    {
+      "id": "route:heating-cooling",
+      "status": "passed",
+      "detail": "E2E route smoke includes heating-cooling"
+    },
+    {
+      "id": "route:ventilation",
+      "status": "passed",
+      "detail": "E2E route smoke includes ventilation"
+    },
+    {
+      "id": "route:pressure-holding",
+      "status": "passed",
+      "detail": "E2E route smoke includes pressure-holding"
+    },
+    {
+      "id": "route:buffer-storage",
+      "status": "passed",
+      "detail": "E2E route smoke includes buffer-storage"
+    },
+    {
+      "id": "route:heat-recovery",
+      "status": "passed",
+      "detail": "E2E route smoke includes heat-recovery"
+    },
+    {
+      "id": "route:hx-diagram",
+      "status": "passed",
+      "detail": "E2E route smoke includes hx-diagram"
+    },
+    {
+      "id": "route:pipe-sizing",
+      "status": "passed",
+      "detail": "E2E route smoke includes pipe-sizing"
+    },
+    {
+      "id": "route:unit-converter",
+      "status": "passed",
+      "detail": "E2E route smoke includes unit-converter"
+    },
+    {
+      "id": "route:drinking-water",
+      "status": "passed",
+      "detail": "E2E route smoke includes drinking-water"
+    },
+    {
+      "id": "route:wastewater",
+      "status": "passed",
+      "detail": "E2E route smoke includes wastewater"
+    },
+    {
+      "id": "route:rainwater",
+      "status": "passed",
+      "detail": "E2E route smoke includes rainwater"
+    },
+    {
+      "id": "console-filter:external-only",
+      "status": "passed",
+      "detail": "known non-app browser noise is explicitly filtered"
+    },
+    {
+      "id": "console-guard:pageerror",
+      "status": "passed",
+      "detail": "uncaught page errors are collected"
+    },
+    {
+      "id": "console-guard:error-console",
+      "status": "passed",
+      "detail": "console errors are collected"
+    },
+    {
+      "id": "saved-record-smoke",
+      "status": "passed",
+      "detail": "saved-record capable modules are covered"
+    },
+    {
+      "id": "dynamic-renderer-smoke",
+      "status": "passed",
+      "detail": "dynamic renderer field commit smoke is covered"
+    },
+    {
+      "id": "keyboard-navigation-smoke",
+      "status": "passed",
+      "detail": "Enter/Tab navigation smoke is covered"
+    },
+    {
+      "id": "mobile-nav-smoke",
+      "status": "passed",
+      "detail": "mobile nav gesture smoke is covered"
+    },
+    {
+      "id": "scroll-lock-smoke",
+      "status": "passed",
+      "detail": "settings scroll lock smoke is covered"
+    },
+    {
+      "id": "offline-sw-smoke",
+      "status": "passed",
+      "detail": "service worker offline reload smoke is covered"
+    },
+    {
+      "id": "package-script:phase37b2",
+      "status": "passed",
+      "detail": "package exposes phase37b2 guard"
+    },
+    {
+      "id": "package-script:e2e-phase37b2",
+      "status": "passed",
+      "detail": "package exposes phase37b2 Playwright command"
+    }
+  ]
+}
