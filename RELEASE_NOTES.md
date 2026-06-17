@@ -1,3 +1,12 @@
+
+## 1.3.0-rc.1 · Phase 37C.1 – App-Shell Decomposition Map
+
+- `app.js` responsibility map created without runtime changes.
+- 13 app-shell responsibilities identified and mapped to target controllers.
+- Incremental extraction order defined for 37C.2 through 37C.6.
+- Highest-risk extraction flagged: settings drawer scroll/focus/touch behavior.
+- Added guard: `test:phase37c1`.
+
 ## Phase 37B.3 - Service Worker Offline Runtime Hardening
 
 - Service-Worker-Precache auf vollstaendigen Runtime-Surface erweitert: alle `js/**/*.js`, alle CSS-Dateien, Shell-Dateien und Icons.

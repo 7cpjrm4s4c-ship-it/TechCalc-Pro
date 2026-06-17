@@ -1,9 +1,9 @@
 {
   "phase": "37B.4",
-  "fileCount": 25,
+  "fileCount": 26,
   "summaryFileCount": 24,
   "nestedPhaseFileCount": 0,
-  "totalBytes": 68227,
+  "totalBytes": 71748,
   "status": "pass",
   "files": [
     "README.md",
@@ -30,6 +30,7 @@
     "phase-33.md",
     "phase-34.md",
     "phase-35.md",
-    "phase-37.md"
+    "phase-37.md",
+    "phase37c-app-shell-decomposition.md"
   ]
 }

@@ -157,6 +157,8 @@
     "test:phase37b3": "node tests/platform-service-worker-offline-phase37b3.test.mjs",
     "test:e2e:phase37b3": "playwright test tests/e2e/phase37b-runtime-smoke.spec.mjs",
     "audit:phase37b4": "node scripts/audit-documentation-consolidation-phase37b4.mjs",
-    "test:phase37b4": "node scripts/audit-documentation-consolidation-phase37b4.mjs && node tests/platform-documentation-consolidation-phase37b4.test.mjs"
+    "test:phase37b4": "node scripts/audit-documentation-consolidation-phase37b4.mjs && node tests/platform-documentation-consolidation-phase37b4.test.mjs",
+    "audit:phase37c1": "node scripts/audit-app-shell-decomposition-phase37c1.mjs",
+    "test:phase37c1": "node scripts/audit-app-shell-decomposition-phase37c1.mjs && node tests/platform-app-shell-decomposition-phase37c1.test.mjs"
   }
 }
