@@ -138,6 +138,7 @@
     "test:phase35e": "node tests/phase35e-save-collection-navigation-menu.test.mjs",
     "test:phase35f": "node tests/phase35f-save-dialog-single-controller-cleanup.test.mjs",
     "audit:platform-convergence": "node scripts/audit-platform-convergence-phase37a.mjs",
-    "test:phase37a": "node tests/platform-convergence-phase37a.test.mjs"
+    "test:phase37a": "node tests/platform-convergence-phase37a.test.mjs",
+    "test:phase37a1": "node tests/platform-convergence-phase37a1.test.mjs"
   }
 }

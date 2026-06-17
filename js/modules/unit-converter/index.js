@@ -8,6 +8,7 @@ import { fmt } from '../../utils/calculations.js';
 import { normalizeUnitSelection } from './results.js';
 import { conversionContent, resultContent } from './viewModel.js';
 import { view } from './view.js';
+import controller from './controller.js';
 
 const unitConverterDynamicRenderer = createUnitConverterDynamicRenderer({
   calculate,
@@ -30,6 +31,7 @@ export default createPlatformModule({
   schema,
   state,
   calculate,
+  controller,
   view,
   dynamicUpdate: updateUnitConverterDynamic,
   isDynamicAction: isDynamicUnitConverterAction

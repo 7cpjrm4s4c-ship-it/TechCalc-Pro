@@ -25,7 +25,11 @@ for (const name of report.referenceModules) {
 
 const rainwater = report.modules.find(item => item.module === 'rainwater');
 assert.ok(rainwater, 'rainwater must be audited');
-assert.ok(rainwater.metrics.nonControllerAddEventListeners >= 1, 'phase37a must keep visibility on rainwater precommit event boundary');
+assert.equal(rainwater.metrics.nonControllerAddEventListeners, 0, 'rainwater precommit listener must stay inside controller boundary after 37A.1');
+
+const unitConverter = report.modules.find(item => item.module === 'unit-converter');
+assert.ok(unitConverter, 'unit-converter must be audited');
+assert.equal(unitConverter.files.includes('controller.js'), true, 'unit-converter must expose controller.js after 37A.1');
 
 const cssComponents = report.cssDebt.find(item => item.file === 'css/components.css');
 const cssLayout = report.cssDebt.find(item => item.file === 'css/layout.css');

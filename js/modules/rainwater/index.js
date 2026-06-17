@@ -7,26 +7,13 @@ import controller, {
   buildRainwaterRecord,
   rainwaterSavedStats,
   rainwaterSavedSubtitle,
-  statePatchFromSurface
+  statePatchFromSurface,
+  bindRainwaterController
 } from './controller.js';
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { createRainwaterDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { createRainwaterView } from './view.js';
-import { roofDrainTable } from './tables.js';
-
-
-function drainLookupPatchFromValue(drainSize = 'DN 100') {
-  const preset = roofDrainTable.find(item => item.dn === drainSize)
-    || roofDrainTable.find(item => item.dn === 'DN 100')
-    || roofDrainTable[0];
-  return {
-    drainSize: preset?.dn || drainSize || 'DN 100',
-    drainSizeManual: preset?.dn || drainSize || 'DN 100',
-    drainCapacity: preset?.capacity != null ? String(preset.capacity).replace('.', ',') : '',
-    drainHead: preset?.head != null ? String(preset.head) : ''
-  };
-}
 
 const lineSectionController = createLineSectionController({
   state,
@@ -71,24 +58,7 @@ function isDynamicRainwaterAction(meta = {}) {
 }
 
 function bindRainwaterPlatform(root) {
-  lineSectionController.bind(root);
-
-  if (!root || root.__tcRainwaterDrainPrecommitBound) return;
-  root.__tcRainwaterDrainPrecommitBound = true;
-
-  const precommitDrain = event => {
-    const field = event.target?.closest?.('[data-field="drainSize"]');
-    if (!field || !root.contains(field)) return;
-
-    const patch = drainLookupPatchFromValue(field.value || 'DN 100');
-    // Precommit silently before the root event pipeline renders. The normal
-    // field/change pipeline then performs the notifying render with the complete
-    // drain patch already present in state.
-    state.set(patch, { action: 'rainwater:drainSize:precommit', notify: false });
-  };
-
-  document.addEventListener('input', precommitDrain, true);
-  document.addEventListener('change', precommitDrain, true);
+  bindRainwaterController(root, lineSectionController);
 }
 
 export default createPlatformModule({

@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-06-17T12:00:54.056Z",
+  "generatedAt": "2026-06-17T12:10:09.545Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -18,13 +18,12 @@
     "hx-diagram": 93,
     "pipe-sizing": 93,
     "pressure-holding": 86,
-    "rainwater": 78,
-    "unit-converter": 71,
+    "rainwater": 93,
+    "unit-converter": 86,
     "ventilation": 93,
     "wastewater": 86
   },
   "riskCounts": {
-    "P1": 2,
     "P2": 17
   },
   "cssDebt": [
@@ -66,38 +65,6 @@
     }
   ],
   "topFindings": [
-    {
-      "module": "rainwater",
-      "priority": "P1",
-      "area": "event-boundary",
-      "message": "Event-Listener außerhalb controller.js gefunden.",
-      "evidence": {
-        "count": 2,
-        "samples": [
-          {
-            "file": "index.js",
-            "line": 90,
-            "text": "document.addEventListener('input', precommitDrain, true);"
-          },
-          {
-            "file": "index.js",
-            "line": 91,
-            "text": "document.addEventListener('change', precommitDrain, true);"
-          }
-        ]
-      }
-    },
-    {
-      "module": "unit-converter",
-      "priority": "P1",
-      "area": "module-contract",
-      "message": "Pflichtdateien fehlen: controller.js",
-      "evidence": {
-        "missing": [
-          "controller.js"
-        ]
-      }
-    },
     {
       "module": "buffer-storage",
       "priority": "P2",
@@ -916,9 +883,9 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 1008,
-        "controllerAddEventListeners": 0,
-        "nonControllerAddEventListeners": 2,
+        "lineCount": 1004,
+        "controllerAddEventListeners": 2,
+        "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
         "moduleCssSelectors": 0,
@@ -928,29 +895,9 @@
         "usesCentralSavedRecordController": false,
         "migrationStatusEntries": 1
       },
-      "score": 78,
-      "status": "platform-conformant-with-minor-debt",
+      "score": 93,
+      "status": "reference-aligned",
       "findings": [
-        {
-          "priority": "P1",
-          "area": "event-boundary",
-          "message": "Event-Listener außerhalb controller.js gefunden.",
-          "evidence": {
-            "count": 2,
-            "samples": [
-              {
-                "file": "index.js",
-                "line": 90,
-                "text": "document.addEventListener('input', precommitDrain, true);"
-              },
-              {
-                "file": "index.js",
-                "line": 91,
-                "text": "document.addEventListener('change', precommitDrain, true);"
-              }
-            ]
-          }
-        },
         {
           "priority": "P2",
           "area": "runtime-metadata",
@@ -972,6 +919,7 @@
       "reference": false,
       "files": [
         "config.js",
+        "controller.js",
         "index.js",
         "logic.js",
         "results.js",
@@ -981,7 +929,7 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 189,
+        "lineCount": 197,
         "controllerAddEventListeners": 0,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
@@ -993,19 +941,9 @@
         "usesCentralSavedRecordController": false,
         "migrationStatusEntries": 1
       },
-      "score": 71,
-      "status": "cleanup-required",
+      "score": 86,
+      "status": "platform-conformant-with-minor-debt",
       "findings": [
-        {
-          "priority": "P1",
-          "area": "module-contract",
-          "message": "Pflichtdateien fehlen: controller.js",
-          "evidence": {
-            "missing": [
-              "controller.js"
-            ]
-          }
-        },
         {
           "priority": "P2",
           "area": "runtime-metadata",
@@ -1340,38 +1278,6 @@
     }
   ],
   "riskRegister": [
-    {
-      "module": "rainwater",
-      "priority": "P1",
-      "area": "event-boundary",
-      "message": "Event-Listener außerhalb controller.js gefunden.",
-      "evidence": {
-        "count": 2,
-        "samples": [
-          {
-            "file": "index.js",
-            "line": 90,
-            "text": "document.addEventListener('input', precommitDrain, true);"
-          },
-          {
-            "file": "index.js",
-            "line": 91,
-            "text": "document.addEventListener('change', precommitDrain, true);"
-          }
-        ]
-      }
-    },
-    {
-      "module": "unit-converter",
-      "priority": "P1",
-      "area": "module-contract",
-      "message": "Pflichtdateien fehlen: controller.js",
-      "evidence": {
-        "missing": [
-          "controller.js"
-        ]
-      }
-    },
     {
       "module": "buffer-storage",
       "priority": "P2",

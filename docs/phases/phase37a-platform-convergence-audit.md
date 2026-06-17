@@ -5,7 +5,7 @@ Ziel: alle Module gegen die Referenzarchitektur Heizung, Lüftung, Druckhaltung 
 ## Executive Summary
 
 - Geprüfte Module: 11
-- P1-Findings: 2
+- P1-Findings: 0
 - P2-Findings: 17
 - Unbenutzte Utility-Export-Kandidaten: 2
 
@@ -20,8 +20,8 @@ Ziel: alle Module gegen die Referenzarchitektur Heizung, Lüftung, Druckhaltung 
 | hx-diagram | 93 | reference-aligned | 0 | 1 |
 | pipe-sizing | 93 | reference-aligned | 0 | 1 |
 | pressure-holding * | 86 | platform-conformant-with-minor-debt | 0 | 2 |
-| rainwater | 78 | platform-conformant-with-minor-debt | 1 | 1 |
-| unit-converter | 71 | cleanup-required | 1 | 2 |
+| rainwater | 93 | reference-aligned | 0 | 1 |
+| unit-converter | 86 | platform-conformant-with-minor-debt | 0 | 2 |
 | ventilation * | 93 | reference-aligned | 0 | 1 |
 | wastewater | 86 | platform-conformant-with-minor-debt | 0 | 2 |
 
@@ -29,18 +29,18 @@ Ziel: alle Module gegen die Referenzarchitektur Heizung, Lüftung, Druckhaltung 
 
 ## Wichtigste Cleanup-Felder
 
-1. **P1 · rainwater · event-boundary** — Event-Listener außerhalb controller.js gefunden.
-2. **P1 · unit-converter · module-contract** — Pflichtdateien fehlen: controller.js
-3. **P2 · buffer-storage · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
-4. **P2 · buffer-storage · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-5. **P2 · drinking-water · event-density** — Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.
-6. **P2 · drinking-water · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
-7. **P2 · drinking-water · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-8. **P2 · heat-recovery · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
-9. **P2 · heating-cooling · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
-10. **P2 · hx-diagram · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
-11. **P2 · pipe-sizing · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
-12. **P2 · pressure-holding · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
+1. **P2 · buffer-storage · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
+2. **P2 · buffer-storage · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+3. **P2 · drinking-water · event-density** — Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.
+4. **P2 · drinking-water · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
+5. **P2 · drinking-water · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+6. **P2 · heat-recovery · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
+7. **P2 · heating-cooling · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
+8. **P2 · hx-diagram · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
+9. **P2 · pipe-sizing · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
+10. **P2 · pressure-holding · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
+11. **P2 · pressure-holding · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+12. **P2 · rainwater · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
 
 ## CSS-Gate
 
