@@ -189,9 +189,15 @@ export function calculate(state) {
   const persistedSurfaces = surfaceRows(state);
   const draftSurface = draftSurfaceRow(state);
   const surfaces = draftSurface ? [...persistedSurfaces, draftSurface] : persistedSurfaces;
-  const selectedSurface = state.activeSurfaceId
-    ? (persistedSurfaces.find(item => String(item.id) === String(state.activeSurfaceId)) || null)
-    : (draftSurface || persistedSurfaces[persistedSurfaces.length - 1] || null);
+  // Phase 36W.2H:
+  // The editor state is the source of truth while a surface is selected for editing.
+  // A live change such as drainSize must immediately affect calculation and result
+  // rendering before the saved record is updated. Therefore the current draft
+  // takes precedence over the persisted selected surface.
+  const selectedSurface = draftSurface
+    || (state.activeSurfaceId ? (persistedSurfaces.find(item => String(item.id) === String(state.activeSurfaceId)) || null) : null)
+    || persistedSurfaces[persistedSurfaces.length - 1]
+    || null;
   const selectedArea = selectedSurface?.area || 0;
   const selectedMode = selectedSurface?.surfaceMode || mode;
   const rdt = selectedSurface?.rdt || getRainForMode(state, selectedMode);

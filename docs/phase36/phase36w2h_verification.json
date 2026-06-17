@@ -1,0 +1,31 @@
+{
+  "basis": "techcalc-pro-1.3.0-rc.1-phase36w2g-rainwater-drain-direct-commit.zip",
+  "draft_precedence": true,
+  "syntax": [
+    [
+      "js/modules/rainwater/logic.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/rainwater/index.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/rainwater/schema.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/rainwater/controller.js",
+      0,
+      ""
+    ],
+    [
+      "js/platform/dynamicRenderer/index.js",
+      0,
+      ""
+    ]
+  ]
+}
