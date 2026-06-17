@@ -261,8 +261,7 @@ export default {
   lookupHydration: {
     key: 'platform:lookup-hydration',
     fields: ['drainSize', 'emergencyType', 'areaType'],
-    hydrateDomFields: { drainSize: ['drainSizeManual', 'drainCapacity', 'drainHead'] },
-        patch: lookupPatch
+    patch: lookupPatch
   },
   normalizeFields: [...surfaceNumericFields]
 };
