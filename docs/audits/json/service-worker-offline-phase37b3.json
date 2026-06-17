@@ -1,0 +1,77 @@
+{
+  "phase": "37B.3",
+  "name": "Service Worker Offline Runtime Hardening",
+  "status": "passed",
+  "generatedAt": "2026-06-17T15:00:11.288Z",
+  "assets": {
+    "required": 173,
+    "cached": 173,
+    "missing": 0,
+    "stale": 0,
+    "jsModules": 159
+  },
+  "checks": [
+    {
+      "id": "offline-precache:complete-runtime-surface",
+      "status": "passed",
+      "detail": "service worker precaches every runtime JS/CSS/icon/shell asset",
+      "missingAssets": []
+    },
+    {
+      "id": "offline-precache:no-stale-assets",
+      "status": "passed",
+      "detail": "service worker asset manifest has no stale runtime entries",
+      "staleAssets": []
+    },
+    {
+      "id": "offline-precache:all-js-modules",
+      "status": "passed",
+      "detail": "all JavaScript modules are available after first install"
+    },
+    {
+      "id": "offline-strategy:navigation-fallback",
+      "status": "passed",
+      "detail": "offline navigation falls back to cached shell"
+    },
+    {
+      "id": "offline-strategy:cache-first-refresh",
+      "status": "passed",
+      "detail": "static assets use cache-first with background refresh"
+    },
+    {
+      "id": "offline-update:versioned-cache",
+      "status": "passed",
+      "detail": "cache name is versioned for deterministic updates"
+    },
+    {
+      "id": "offline-update:skip-waiting",
+      "status": "passed",
+      "detail": "new service worker activates immediately after install"
+    },
+    {
+      "id": "offline-update:client-claim",
+      "status": "passed",
+      "detail": "activated worker claims open clients"
+    },
+    {
+      "id": "offline-update:post-message",
+      "status": "passed",
+      "detail": "clients receive cache update notification"
+    },
+    {
+      "id": "e2e:offline-all-module-reload",
+      "status": "passed",
+      "detail": "Playwright spec covers offline reload for all module routes"
+    },
+    {
+      "id": "package-script:phase37b3",
+      "status": "passed",
+      "detail": "package exposes phase37b3 guard"
+    },
+    {
+      "id": "package-script:e2e-phase37b3",
+      "status": "passed",
+      "detail": "package exposes phase37b3 Playwright command"
+    }
+  ]
+}

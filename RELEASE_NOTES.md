@@ -1,3 +1,10 @@
+## Phase 37B.3 - Service Worker Offline Runtime Hardening
+
+- Service-Worker-Precache auf vollstaendigen Runtime-Surface erweitert: alle `js/**/*.js`, alle CSS-Dateien, Shell-Dateien und Icons.
+- Offline-All-Module-Reload-Smoke fuer alle 11 Modulrouten in Playwright-Spec ergaenzt.
+- Neuer Guard `test:phase37b3` prueft Precache-Vollstaendigkeit, Navigation-Fallback, Cache-First-with-Refresh, versionierten Cache und Client-Update-Message.
+- Keine Feature-Aenderung; gezielte PWA-/Offline-Haertung fuer den 1.3.0 RC.
+
 # Phase 37B.1 — Browser Runtime Execution
 
 - Added zero-dependency static server for Playwright runtime smoke execution.

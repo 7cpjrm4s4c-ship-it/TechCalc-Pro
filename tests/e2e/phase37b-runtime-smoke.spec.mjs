@@ -170,4 +170,30 @@ test.describe('Phase 37B browser runtime smoke', () => {
     await context.setOffline(false);
     expect(errors).toEqual([]);
   });
+
+  test('offline reload keeps every module route available after initial cache warmup', async ({ page, context }) => {
+    const errors = collectRuntimeErrors(page);
+
+    for (const moduleId of MODULE_IDS) {
+      await gotoModule(page, moduleId);
+    }
+
+    const hasServiceWorker = await page.evaluate(async () => {
+      if (!('serviceWorker' in navigator)) return false;
+      const registration = await navigator.serviceWorker.ready;
+      return Boolean(registration?.active || registration?.installing || registration?.waiting);
+    });
+    expect(hasServiceWorker).toBe(true);
+
+    await context.setOffline(true);
+    for (const moduleId of MODULE_IDS) {
+      await page.goto(`./#/${moduleId}`, { waitUntil: 'domcontentloaded' });
+      await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', moduleId, { timeout: 10_000 });
+      await expect(page.locator('#app')).toBeVisible();
+    }
+    await context.setOffline(false);
+
+    expect(errors).toEqual([]);
+  });
+
 });
