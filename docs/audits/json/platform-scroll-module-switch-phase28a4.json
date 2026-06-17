@@ -1,0 +1,32 @@
+{
+  "phase": "28A.4",
+  "name": "Module Switch Scroll Integration",
+  "generatedAt": "2026-06-10T16:44:04.627Z",
+  "overallScore": 5,
+  "overallGrade": "A",
+  "executiveSummary": {
+    "p0": [],
+    "p1": [],
+    "p2": [],
+    "conclusion": "Modulwechsel werden zentral im ModuleRuntime-Mount ueber den PlatformScrollManager scrollgeschuetzt. Hash-, Navigation- und programmgesteuerte Wechsel bleiben auf einem Renderpfad."
+  },
+  "checks": {
+    "moduleSwitchContractExists": true,
+    "moduleSwitchContractExported": true,
+    "asyncScrollMutationSupported": true,
+    "moduleRuntimeImportsScrollService": true,
+    "moduleRuntimeMountWrapped": true,
+    "moduleRuntimeUsesModuleSwitchReason": true,
+    "routerKeepsSingleRenderPath": true,
+    "globalNavDelegatesToNavigate": true
+  },
+  "acceptance": {
+    "moduleSwitchContractAvailable": true,
+    "asyncModuleMountSupported": true,
+    "moduleRuntimeUsesPlatformScrollManager": true,
+    "moduleSwitchReasonTagged": true,
+    "navigationPathRemainsCentralized": true,
+    "noP1Findings": true
+  },
+  "findings": []
+}

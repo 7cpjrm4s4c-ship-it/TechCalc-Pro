@@ -1,0 +1,42 @@
+{
+  "phase": "28B.3",
+  "name": "Platform Tab Navigation",
+  "generatedAt": "2026-06-10T17:01:03.405Z",
+  "overallScore": 5,
+  "overallGrade": "A",
+  "executiveSummary": {
+    "p0": [],
+    "p1": [],
+    "p2": [
+      {
+        "area": "dynamicInputs",
+        "risk": "P2",
+        "action": "Dynamic collection-specific inputs remain final hardening scope of 28B.4.",
+        "evidence": [
+          "js/platform/moduleRuntime/index.js"
+        ]
+      }
+    ],
+    "conclusion": "Tab- und Shift+Tab-Navigation sind zentral im PlatformFocusManager definiert. Die zentrale Event-Pipeline und der Legacy-Fallback committen Feldwerte vor dem Fokuswechsel und delegieren die Navigation an denselben Service wie Enter."
+  },
+  "acceptance": {
+    "tabNavigationApiExists": true,
+    "unifiedFieldNavigationExists": true,
+    "platformObjectExportsTabApi": true,
+    "centralPipelineDelegatesTabNavigation": true,
+    "tabCommitPreserved": true,
+    "fallbackBindingDelegatesTabNavigation": true,
+    "shiftTabPreviousSupported": true,
+    "preventScrollFocusPreserved": true
+  },
+  "findings": [
+    {
+      "area": "dynamicInputs",
+      "risk": "P2",
+      "action": "Dynamic collection-specific inputs remain final hardening scope of 28B.4.",
+      "evidence": [
+        "js/platform/moduleRuntime/index.js"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,334 @@
+{
+  "phase": "29D",
+  "title": "UI/UX Bugfix Batch 2 - P2 Cleanup",
+  "generatedAt": "2026-06-10T20:19:51.881Z",
+  "score": 5,
+  "grade": "A",
+  "summary": {
+    "checks": 7,
+    "passed": 7,
+    "failed": 0,
+    "p0": 0,
+    "p1Open": 0,
+    "p2Reviewed": 22,
+    "p2Closed": 22,
+    "p2Open": 0,
+    "modulesWithP2": [
+      "buffer-storage",
+      "heat-recovery",
+      "heating-cooling",
+      "pipe-sizing",
+      "pressure-holding",
+      "rainwater",
+      "unit-converter",
+      "ventilation",
+      "wastewater"
+    ],
+    "axesWithP2": [
+      "enter-tab-navigation",
+      "focus-restore",
+      "input-confirmation",
+      "scroll-stability"
+    ]
+  },
+  "cleanupActions": [
+    "Enter/Tab P2 findings consolidated under PlatformFocusManager instead of module-level navigation patches.",
+    "Focus/caret restore P2 findings consolidated under captureActiveField/restoreCapturedField/preserveFocusDuring.",
+    "Scroll stability P2 findings consolidated under PlatformScrollManager runWithoutScrollJump and preserveSavedRecordMutation.",
+    "Dynamic render edge cases consolidated through moduleRuntime preservePlatformUx.",
+    "29C P1 closure is enforced as a prerequisite for accepting the P2 cleanup batch."
+  ],
+  "p2Findings": [
+    {
+      "module": "buffer-storage",
+      "axis": "enter-tab-navigation",
+      "label": "Enter/Tab/Shift+Tab Navigation",
+      "evidence": [
+        "No module-level FocusManager signal"
+      ]
+    },
+    {
+      "module": "buffer-storage",
+      "axis": "focus-restore",
+      "label": "Fokus- und Caret-Restore nach Re-Render",
+      "evidence": [
+        "No module-level FocusManager signal"
+      ]
+    },
+    {
+      "module": "buffer-storage",
+      "axis": "scroll-stability",
+      "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+      "evidence": [
+        "Direct scroll calls: 0"
+      ]
+    },
+    {
+      "module": "heat-recovery",
+      "axis": "scroll-stability",
+      "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+      "evidence": [
+        "Direct scroll calls: 0"
+      ]
+    },
+    {
+      "module": "heating-cooling",
+      "axis": "enter-tab-navigation",
+      "label": "Enter/Tab/Shift+Tab Navigation",
+      "evidence": [
+        "No module-level FocusManager signal"
+      ]
+    },
+    {
+      "module": "heating-cooling",
+      "axis": "focus-restore",
+      "label": "Fokus- und Caret-Restore nach Re-Render",
+      "evidence": [
+        "No module-level FocusManager signal"
+      ]
+    },
+    {
+      "module": "heating-cooling",
+      "axis": "scroll-stability",
+      "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+      "evidence": [
+        "Direct scroll calls: 0"
+      ]
+    },
+    {
+      "module": "pipe-sizing",
+      "axis": "enter-tab-navigation",
+      "label": "Enter/Tab/Shift+Tab Navigation",
+      "evidence": [
+        "No module-level FocusManager signal"
+      ]
+    },
+    {
+      "module": "pipe-sizing",
+      "axis": "focus-restore",
+      "label": "Fokus- und Caret-Restore nach Re-Render",
+      "evidence": [
+        "No module-level FocusManager signal"
+      ]
+    },
+    {
+      "module": "pipe-sizing",
+      "axis": "scroll-stability",
+      "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+      "evidence": [
+        "Direct scroll calls: 0"
+      ]
+    },
+    {
+      "module": "pressure-holding",
+      "axis": "enter-tab-navigation",
+      "label": "Enter/Tab/Shift+Tab Navigation",
+      "evidence": [
+        "No module-level FocusManager signal"
+      ]
+    },
+    {
+      "module": "pressure-holding",
+      "axis": "focus-restore",
+      "label": "Fokus- und Caret-Restore nach Re-Render",
+      "evidence": [
+        "No module-level FocusManager signal"
+      ]
+    },
+    {
+      "module": "pressure-holding",
+      "axis": "scroll-stability",
+      "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+      "evidence": [
+        "Direct scroll calls: 0"
+      ]
+    },
+    {
+      "module": "rainwater",
+      "axis": "enter-tab-navigation",
+      "label": "Enter/Tab/Shift+Tab Navigation",
+      "evidence": [
+        "No module-level FocusManager signal"
+      ]
+    },
+    {
+      "module": "unit-converter",
+      "axis": "input-confirmation",
+      "label": "Eingabe und automatische Bestaetigung",
+      "evidence": []
+    },
+    {
+      "module": "unit-converter",
+      "axis": "enter-tab-navigation",
+      "label": "Enter/Tab/Shift+Tab Navigation",
+      "evidence": [
+        "No module-level FocusManager signal"
+      ]
+    },
+    {
+      "module": "unit-converter",
+      "axis": "focus-restore",
+      "label": "Fokus- und Caret-Restore nach Re-Render",
+      "evidence": [
+        "No module-level FocusManager signal"
+      ]
+    },
+    {
+      "module": "unit-converter",
+      "axis": "scroll-stability",
+      "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+      "evidence": [
+        "Direct scroll calls: 0"
+      ]
+    },
+    {
+      "module": "ventilation",
+      "axis": "enter-tab-navigation",
+      "label": "Enter/Tab/Shift+Tab Navigation",
+      "evidence": [
+        "No module-level FocusManager signal"
+      ]
+    },
+    {
+      "module": "ventilation",
+      "axis": "focus-restore",
+      "label": "Fokus- und Caret-Restore nach Re-Render",
+      "evidence": [
+        "No module-level FocusManager signal"
+      ]
+    },
+    {
+      "module": "ventilation",
+      "axis": "scroll-stability",
+      "label": "Scroll-Stabilitaet bei Auswahl, Abwahl und Live-Render",
+      "evidence": [
+        "Direct scroll calls: 0"
+      ]
+    },
+    {
+      "module": "wastewater",
+      "axis": "enter-tab-navigation",
+      "label": "Enter/Tab/Shift+Tab Navigation",
+      "evidence": [
+        "No module-level FocusManager signal"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "29D-P2-001",
+      "area": "focus-navigation-consistency",
+      "severity": "P2",
+      "title": "Enter/Tab P2 findings are covered by shared PlatformFocusManager navigation",
+      "pass": true,
+      "findingCount": 8,
+      "modules": [
+        "buffer-storage",
+        "heating-cooling",
+        "pipe-sizing",
+        "pressure-holding",
+        "rainwater",
+        "unit-converter",
+        "ventilation",
+        "wastewater"
+      ],
+      "resolution": "closed-by-platform-service"
+    },
+    {
+      "id": "29D-P2-002",
+      "area": "focus-restore-consistency",
+      "severity": "P2",
+      "title": "Focus/caret restore P2 findings are covered by shared capture/restore flow",
+      "pass": true,
+      "findingCount": 6,
+      "modules": [
+        "buffer-storage",
+        "heating-cooling",
+        "pipe-sizing",
+        "pressure-holding",
+        "unit-converter",
+        "ventilation"
+      ],
+      "resolution": "closed-by-platform-service"
+    },
+    {
+      "id": "29D-P2-003",
+      "area": "scroll-stability-consistency",
+      "severity": "P2",
+      "title": "Scroll-stability P2 findings are covered by shared mutation and module-switch protection",
+      "pass": true,
+      "findingCount": 7,
+      "modules": [
+        "buffer-storage",
+        "heat-recovery",
+        "heating-cooling",
+        "pipe-sizing",
+        "pressure-holding",
+        "unit-converter",
+        "ventilation"
+      ],
+      "resolution": "closed-by-platform-service"
+    },
+    {
+      "id": "29D-P2-004",
+      "area": "dynamic-render-consistency",
+      "severity": "P2",
+      "title": "Dynamic re-render uses combined focus/scroll preservation instead of module-specific patches",
+      "pass": true,
+      "findingCount": 13,
+      "modules": [
+        "buffer-storage",
+        "heat-recovery",
+        "heating-cooling",
+        "pipe-sizing",
+        "pressure-holding",
+        "rainwater",
+        "unit-converter",
+        "ventilation",
+        "wastewater"
+      ],
+      "resolution": "closed-by-platform-runtime"
+    },
+    {
+      "id": "29D-P2-005",
+      "area": "input-confirmation-edge-cases",
+      "severity": "P2",
+      "title": "Unit-converter input-confirmation P2 remains covered by platform field navigation and commit-before-focus contract",
+      "pass": true,
+      "findingCount": 1,
+      "modules": [
+        "unit-converter"
+      ],
+      "resolution": "closed-by-platform-contract"
+    },
+    {
+      "id": "29D-P2-006",
+      "area": "p1-regression-guard",
+      "severity": "P1",
+      "title": "29C P1 bugfix batch remains closed before P2 cleanup is accepted",
+      "pass": true,
+      "findingCount": 0,
+      "modules": [
+        "hx-diagram",
+        "rainwater",
+        "wastewater"
+      ],
+      "resolution": "regression-guard"
+    },
+    {
+      "id": "29D-P2-007",
+      "area": "event-cleanup-support",
+      "severity": "P2",
+      "title": "Event cleanup infrastructure remains available for UX edge-case listeners",
+      "pass": true,
+      "findingCount": 0,
+      "modules": [],
+      "resolution": "verified-supporting-infrastructure"
+    }
+  ],
+  "nextPhase": {
+    "id": "29E",
+    "title": "Final UX Regression",
+    "recommendation": "Proceed with final module-wide UX regression."
+  }
+}

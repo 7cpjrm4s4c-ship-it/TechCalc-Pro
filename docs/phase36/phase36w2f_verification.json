@@ -1,0 +1,32 @@
+{
+  "basis": "techcalc-pro-1.3.0-rc.1-phase36w2e-drain-lookup-unification-fixed.zip",
+  "drainSize_has_render_defer": false,
+  "drainSize_line": "{ key:'drainSize', label:drai",
+  "syntax": [
+    [
+      "js/modules/rainwater/schema.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/rainwater/controller.js",
+      0,
+      ""
+    ],
+    [
+      "js/modules/rainwater/logic.js",
+      0,
+      ""
+    ],
+    [
+      "js/platform/dynamicRenderer/index.js",
+      0,
+      ""
+    ],
+    [
+      "js/core/eventPipeline.js",
+      0,
+      ""
+    ]
+  ]
+}

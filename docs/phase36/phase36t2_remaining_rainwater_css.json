@@ -1,0 +1,9 @@
+{
+  "modules_rainwater_occurrences": [
+    "rainwater",
+    "rainwater-result-group"
+  ],
+  "components_rainwater_occurrences": [],
+  "modules_data_rw": false,
+  "components_data_rw": false
+}

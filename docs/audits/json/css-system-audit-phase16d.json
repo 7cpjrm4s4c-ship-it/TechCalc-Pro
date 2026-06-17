@@ -1,0 +1,18 @@
+{
+  "requiredPrimitives": [
+    ".tc-card",
+    ".tc-card__header",
+    ".tc-card__body",
+    ".tc-field",
+    ".tc-result-list",
+    ".tc-result-item",
+    ".tc-save-actions",
+    ".tc-actions",
+    ".tc-scroll-safe"
+  ],
+  "missing": [],
+  "importantCount": 0,
+  "importantBudget": 35,
+  "legacySelectorLines": 64,
+  "note": "Phase 16D establishes global tc-* primitives and keeps legacy module selectors as tracked migration debt."
+}

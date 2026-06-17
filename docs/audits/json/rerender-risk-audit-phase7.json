@@ -1,0 +1,68 @@
+{
+  "directDomWrites": 19,
+  "moduleDirectDomWrites": 3,
+  "status": "ok",
+  "note": "Phase 7 allows shell/navigation writes, but module-level writes must continue moving toward safeReplaceContent or granular updates.",
+  "findings": [
+    {
+      "file": "js/core/moduleRuntime.js",
+      "line": 116,
+      "text": "root.innerHTML = typeof loadingView === 'function'"
+    },
+    {
+      "file": "js/core/moduleRuntime.js",
+      "line": 151,
+      "text": "root.innerHTML = '<div class=\"module-error card\">Modul konnte nicht geladen werden.</div>';"
+    },
+    {
+      "file": "js/modules/drinking-water/dynamicRenderer.js",
+      "line": 10,
+      "text": "if (island.innerHTML !== next) preserveFocusDuring(root, () => { island.innerHTML = next; }, { skipSelect: true });"
+    },
+    {
+      "file": "js/modules/heat-recovery/dynamicRenderer.js",
+      "line": 11,
+      "text": "if (island.innerHTML !== next) preserveFocusDuring(root, () => { island.innerHTML = next; }, { skipSelect: true });"
+    },
+    {
+      "file": "js/modules/hx-diagram/renderPipeline.js",
+      "line": 57,
+      "text": "if (el.innerHTML !== next) preserveFocusDuring(root, () => { el.innerHTML = next; }, { skipSelect: true });"
+    },
+    {
+      "file": "js/platform/dynamicRenderer/index.js",
+      "line": 13,
+      "text": "if (el.innerHTML !== next) el.innerHTML = next;"
+    },
+    {
+      "file": "js/platform/dynamicRenderer/index.js",
+      "line": 31,
+      "text": "if (island.innerHTML !== next) island.innerHTML = next;"
+    },
+    {
+      "file": "js/platform/moduleRuntime/index.js",
+      "line": 432,
+      "text": "root.innerHTML = view(snapshot);"
+    },
+    {
+      "file": "js/platform/moduleRuntime/index.js",
+      "line": 525,
+      "text": "if (root.innerHTML !== nextView) root.innerHTML = nextView;"
+    },
+    {
+      "file": "js/platform/moduleRuntime/index.js",
+      "line": 540,
+      "text": "if (formHost.innerHTML !== nextForm) formHost.innerHTML = nextForm;"
+    },
+    {
+      "file": "js/platform/moduleRuntime/index.js",
+      "line": 544,
+      "text": "if (savedHost.innerHTML !== nextSaved) savedHost.innerHTML = nextSaved;"
+    },
+    {
+      "file": "js/platform/moduleRuntime/index.js",
+      "line": 548,
+      "text": "if (sideHost.innerHTML !== nextSide) sideHost.innerHTML = nextSide;"
+    }
+  ]
+}

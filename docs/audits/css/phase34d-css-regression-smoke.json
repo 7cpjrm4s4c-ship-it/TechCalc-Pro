@@ -1,0 +1,46 @@
+{
+  "phase": "34D",
+  "status": "pass",
+  "cssLinks": [
+    "css/tokens.css",
+    "css/layout.css",
+    "css/components.css",
+    "css/modules.css"
+  ],
+  "expectedCssOrder": [
+    "css/tokens.css",
+    "css/layout.css",
+    "css/components.css",
+    "css/modules.css"
+  ],
+  "moduleCount": 11,
+  "modules": [
+    "buffer-storage",
+    "drinking-water",
+    "heat-recovery",
+    "heating-cooling",
+    "hx-diagram",
+    "pipe-sizing",
+    "pressure-holding",
+    "rainwater",
+    "unit-converter",
+    "ventilation",
+    "wastewater"
+  ],
+  "componentsLineCount": 741,
+  "modulesLineCount": 220,
+  "totalCssLines": 1368,
+  "rebuiltLayerImportantCount": 0,
+  "totalImportantCount": 1,
+  "checks": {
+    "cssOrder": true,
+    "tokenContract": true,
+    "componentSelectors": true,
+    "componentsBelowLimit": true,
+    "modulesBelowLimit": true,
+    "rebuiltLayersHaveNoImportant": true,
+    "modulesAreExceptionLayer": true,
+    "allModulesPresent": true,
+    "moduleFileContainsContractHeader": true
+  }
+}

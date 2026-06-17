@@ -1,0 +1,41 @@
+{
+  "phase": "28B.2",
+  "name": "Platform Enter Navigation",
+  "generatedAt": "2026-06-10T16:56:48.526Z",
+  "overallScore": 5,
+  "overallGrade": "A",
+  "executiveSummary": {
+    "p0": [],
+    "p1": [],
+    "p2": [
+      {
+        "area": "tabNavigation",
+        "risk": "P2",
+        "action": "Tab order hardening remains scope of 28B.3.",
+        "evidence": [
+          "js/core/focusManager.js"
+        ]
+      }
+    ],
+    "conclusion": "Enter-Navigation ist zentral im PlatformFocusManager definiert. Die zentrale Event-Pipeline und der Legacy-Fallback committen weiterhin zuerst den Feldwert und delegieren anschliessend die Navigation zum naechsten beziehungsweise vorherigen Plattformfeld."
+  },
+  "acceptance": {
+    "enterNavigationApiExists": true,
+    "platformObjectExportsEnterApi": true,
+    "centralPipelineDelegatesEnterNavigation": true,
+    "enterCommitPreserved": true,
+    "fallbackBindingDelegatesEnterNavigation": true,
+    "shiftEnterPreviousSupported": true,
+    "preventScrollFocusPreserved": true
+  },
+  "findings": [
+    {
+      "area": "tabNavigation",
+      "risk": "P2",
+      "action": "Tab order hardening remains scope of 28B.3.",
+      "evidence": [
+        "js/core/focusManager.js"
+      ]
+    }
+  ]
+}

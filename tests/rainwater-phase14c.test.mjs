@@ -9,6 +9,7 @@ assert.doesNotMatch(controller, /deleteAttr:\s*'data-saved-delete'/, 'Rainwater 
 assert.match(controller, /surfaceMode:[\s\S]*patch:\s*modeDefaultsPatch/, 'Rainwater surfaceMode switch must be handled through platform segment config.');
 assert.match(controller, /calculationType:\s*mode/, 'Rainwater surfaceMode switch must keep calculationType in sync.');
 assert.ok(!/card\('Regenflächen', surfaceInputBlock\(s, r\), 'green'\),\s*saveCard\(s\)/.test(source), 'Rainwater must not render the extra calculation save card in the main input flow.');
-assert.match(results, /export function savedRecords/, 'Rainwater surface list must be provided as saved-record data only.');
+assert.doesNotMatch(results, /export function savedRecords/, 'Rainwater must not keep legacy savedRecords renderer after controller-view migration.');
+assert.match(source, /view,/, 'Rainwater must register a custom controller-backed view.');
 
 console.log('rainwater phase14c workflow regression ok');

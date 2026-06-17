@@ -1,0 +1,27 @@
+[
+  [
+    "js/modules/rainwater/view.js",
+    0,
+    ""
+  ],
+  [
+    "js/modules/rainwater/results.js",
+    0,
+    ""
+  ],
+  [
+    "js/modules/wastewater/view.js",
+    0,
+    ""
+  ],
+  [
+    "js/modules/hx-diagram/controller.js",
+    0,
+    ""
+  ],
+  [
+    "js/modules/drinking-water/controller.js",
+    0,
+    ""
+  ]
+]

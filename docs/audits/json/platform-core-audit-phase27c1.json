@@ -1,0 +1,232 @@
+{
+  "phase": "27C.1",
+  "name": "Core Platform Audit",
+  "generatedBy": "scripts/audit-core-platform-phase27c1.mjs",
+  "generatedAt": "2026-06-10T13:27:29.582Z",
+  "auditAreas": [
+    "platformKernel",
+    "moduleRegistry",
+    "lifecycle",
+    "eventSystem",
+    "navigation",
+    "dependencyGraph"
+  ],
+  "overallScore": 4.22,
+  "overallGrade": "B",
+  "scores": {
+    "platformKernel": 5,
+    "moduleRegistry": 5,
+    "lifecycle": 4.2,
+    "eventSystem": 3.7,
+    "navigation": 4.5,
+    "dependencyGraph": 2.9
+  },
+  "grades": {
+    "platformKernel": "A",
+    "moduleRegistry": "A",
+    "lifecycle": "B",
+    "eventSystem": "C",
+    "navigation": "A",
+    "dependencyGraph": "D"
+  },
+  "findings": [
+    {
+      "area": "dependencyGraph",
+      "score": 2.9,
+      "grade": "D",
+      "risk": "P1",
+      "action": "Verbotene View/Renderer-Abhaengigkeiten entfernen und Boundary-Test erweitern"
+    },
+    {
+      "area": "eventSystem",
+      "score": 3.7,
+      "grade": "C",
+      "risk": "P1",
+      "action": "Direkte globale Listener reduzieren oder mit Cleanup-Contract absichern"
+    },
+    {
+      "area": "lifecycle",
+      "score": 4.2,
+      "grade": "B",
+      "risk": "P3",
+      "action": "Lifecycle-Cleanup fuer Event-Listener und Runtime-Hooks explizit nachweisen"
+    }
+  ],
+  "evidence": {
+    "kernel": {
+      "missingCoreFiles": [],
+      "requiredCoreFilesPresent": 16,
+      "moduleDefinitionHasFactory": true,
+      "mountHasRuntimeBoundary": true,
+      "centralStoreExists": true
+    },
+    "registry": {
+      "registryExists": true,
+      "moduleCount": 11,
+      "createPlatformModuleCount": 11,
+      "indexDefaultExportCount": 11,
+      "allModulesUsePlatformMount": true,
+      "allModulesExportDefault": true
+    },
+    "lifecycle": {
+      "runtimeExists": true,
+      "adapterExists": true,
+      "platformLifecycleExists": true,
+      "lifecycleTerms": 222,
+      "cleanupTerms": 101
+    },
+    "eventSystem": {
+      "eventPipelineExists": true,
+      "eventDelegationExists": true,
+      "directGlobalListeners": [
+        {
+          "file": "js/core/app.js",
+          "add": 17,
+          "remove": 0,
+          "balance": 17
+        },
+        {
+          "file": "js/core/menuFallback.js",
+          "add": 5,
+          "remove": 0,
+          "balance": 5
+        },
+        {
+          "file": "js/core/router.js",
+          "add": 2,
+          "remove": 0,
+          "balance": 2
+        },
+        {
+          "file": "js/core/pdfExport.js",
+          "add": 1,
+          "remove": 0,
+          "balance": 1
+        },
+        {
+          "file": "js/core/navigation.js",
+          "add": 1,
+          "remove": 1,
+          "balance": 0
+        }
+      ],
+      "unbalancedGlobalListenerFiles": [
+        {
+          "file": "js/core/app.js",
+          "add": 17,
+          "remove": 0,
+          "balance": 17
+        },
+        {
+          "file": "js/core/menuFallback.js",
+          "add": 5,
+          "remove": 0,
+          "balance": 5
+        },
+        {
+          "file": "js/core/router.js",
+          "add": 2,
+          "remove": 0,
+          "balance": 2
+        },
+        {
+          "file": "js/core/pdfExport.js",
+          "add": 1,
+          "remove": 0,
+          "balance": 1
+        }
+      ],
+      "delegatedEventTerms": 163
+    },
+    "navigation": {
+      "routerExists": true,
+      "navigationExists": true,
+      "scrollManagerExists": true,
+      "sameModuleGuard": true,
+      "hashHandling": true,
+      "scrollPolicy": true
+    },
+    "dependencyGraph": {
+      "dependencyViolations": [
+        {
+          "file": "js/modules/buffer-storage/view.js",
+          "reason": "view imports logic/state/storage/controller"
+        },
+        {
+          "file": "js/modules/drinking-water/view.js",
+          "reason": "view imports logic/state/storage/controller"
+        },
+        {
+          "file": "js/modules/heat-recovery/view.js",
+          "reason": "view imports logic/state/storage/controller"
+        },
+        {
+          "file": "js/modules/heating-cooling/view.js",
+          "reason": "view imports logic/state/storage/controller"
+        },
+        {
+          "file": "js/modules/pipe-sizing/view.js",
+          "reason": "view imports logic/state/storage/controller"
+        },
+        {
+          "file": "js/modules/pressure-holding/view.js",
+          "reason": "view imports logic/state/storage/controller"
+        }
+      ],
+      "directStorageAccess": [
+        {
+          "file": "js/core/app.js",
+          "hits": 7,
+          "allowed": false
+        },
+        {
+          "file": "js/core/preferences.js",
+          "hits": 2,
+          "allowed": true
+        },
+        {
+          "file": "js/core/projectStorage.js",
+          "hits": 2,
+          "allowed": true
+        }
+      ],
+      "forbiddenStorageAccess": [
+        {
+          "file": "js/core/app.js",
+          "hits": 7,
+          "allowed": false
+        }
+      ]
+    }
+  },
+  "executiveSummary": {
+    "status": "platform-core-stable-with-hardening",
+    "p0": [],
+    "p1": [
+      {
+        "area": "dependencyGraph",
+        "score": 2.9,
+        "grade": "D",
+        "risk": "P1",
+        "action": "Verbotene View/Renderer-Abhaengigkeiten entfernen und Boundary-Test erweitern"
+      },
+      {
+        "area": "eventSystem",
+        "score": 3.7,
+        "grade": "C",
+        "risk": "P1",
+        "action": "Direkte globale Listener reduzieren oder mit Cleanup-Contract absichern"
+      }
+    ],
+    "p2": [],
+    "p3": [
+      {
+        "area": "lifecycle",
+        "score": 4.2,
+        "grade": "B",
+        "risk": "P3",
+        "action": "Lifecycle-Cleanup fuer Event-Listener und Runtime-Hooks explizit nachweisen"
+      }
+    ]
+  }
+}

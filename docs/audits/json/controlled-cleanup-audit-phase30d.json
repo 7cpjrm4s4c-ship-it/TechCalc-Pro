@@ -1,0 +1,33 @@
+{
+  "phase": "30D",
+  "name": "Controlled Cleanup Batch",
+  "score": 4.85,
+  "grade": "A",
+  "counts": {
+    "phase30Docs": 4,
+    "auditJson": 42,
+    "misplacedRootPhaseDocs": 0,
+    "misplacedRootAuditJson": 0,
+    "topLevelDocsPhaseDocs": 0,
+    "packageScriptTargets": 115,
+    "missingPackageScriptTargets": 0,
+    "qualityGateTargets": 94,
+    "missingQualityGateTargets": 0,
+    "retainedRuntimeReviewCandidates": 11
+  },
+  "cleanupActions": [
+    "Moved Phase 30C documentation into docs/phases/phase-30.",
+    "Added controlled cleanup audit and regression test.",
+    "Classified rainwater/wastewater index duplicate as intentional platform wrapper.",
+    "Retained runtime/test candidates pending manual validation instead of deleting them."
+  ],
+  "findings": [
+    {
+      "severity": "P2",
+      "area": "runtime-review",
+      "count": 11,
+      "message": "Runtime dead-code candidates retained for manual review; no unsafe deletion performed."
+    }
+  ],
+  "generatedAt": "2026-06-11T07:43:52.859Z"
+}

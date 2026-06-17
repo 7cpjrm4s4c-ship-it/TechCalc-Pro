@@ -35,6 +35,7 @@ const report = {
   note: 'Phase 7 allows shell/navigation writes, but module-level writes must continue moving toward safeReplaceContent or granular updates.',
   findings: risky.filter(item => !allowed.has(item.file)).slice(0, 80)
 };
-fs.writeFileSync('rerender-risk-audit-phase7.json', JSON.stringify(report, null, 2));
+fs.mkdirSync('docs/audits/json', { recursive: true });
+fs.writeFileSync('docs/audits/json/rerender-risk-audit-phase7.json', JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report, null, 2));
 if (moduleRisks.length > 8) process.exitCode = 1;

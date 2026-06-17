@@ -1,0 +1,465 @@
+{
+  "phase": "27C.4",
+  "name": "UX Infrastructure Audit",
+  "generatedAt": "2026-06-10T13:54:06.571Z",
+  "overallScore": 4.46,
+  "overallGrade": "B",
+  "scores": {
+    "focusNavigation": 4.6,
+    "enterTabCommit": 4.55,
+    "scrollStability": 4.24,
+    "savedRecordUx": 4.6,
+    "liveUpdateSideEffects": 4.25,
+    "mobileKeyboardGuards": 4.5
+  },
+  "scorecard": {
+    "focusNavigation": {
+      "score": 4.6,
+      "grade": "A",
+      "risk": null,
+      "action": "Fokusnavigation als expliziten Plattformvertrag dokumentieren und Modul-Sonderlogik schrittweise auf die zentrale Event Pipeline reduzieren."
+    },
+    "enterTabCommit": {
+      "score": 4.55,
+      "grade": "A",
+      "risk": null,
+      "action": "Enter/Tab-Commit-Verhalten weiter ueber die zentrale Event Pipeline absichern; keine lokalen Sonderpfade fuer Input-Bestaetigung einfuehren."
+    },
+    "scrollStability": {
+      "score": 4.24,
+      "grade": "B",
+      "risk": "P1",
+      "action": "Scroll-Stabilitaet bei Saved-Record-Auswahl, Live-Updates und Modulwechseln weiter zentral ueber scrollManager/preserveViewport erzwingen."
+    },
+    "savedRecordUx": {
+      "score": 4.6,
+      "grade": "A",
+      "risk": null,
+      "action": "Saved-Record-Auswahl, Expand/Collapse und Update/Delete als einheitliches UX-Verhalten ueber alle Module kontraktieren."
+    },
+    "liveUpdateSideEffects": {
+      "score": 4.25,
+      "grade": "B",
+      "risk": "P2",
+      "action": "Live-Updates muessen State, Results, Dynamic Sections und Sonderrenderer aktualisieren, ohne Fokus oder Scrollposition zu verlieren."
+    },
+    "mobileKeyboardGuards": {
+      "score": 4.5,
+      "grade": "A",
+      "risk": null,
+      "action": "Mobile Keyboard Guards fuer Selects, Fokusrestore und Bottom Navigation in Regressionstests halten."
+    }
+  },
+  "findings": [
+    {
+      "area": "scrollStability",
+      "score": 4.24,
+      "grade": "B",
+      "risk": "P1",
+      "action": "Scroll-Stabilitaet bei Saved-Record-Auswahl, Live-Updates und Modulwechseln weiter zentral ueber scrollManager/preserveViewport erzwingen."
+    },
+    {
+      "area": "liveUpdateSideEffects",
+      "score": 4.25,
+      "grade": "B",
+      "risk": "P2",
+      "action": "Live-Updates muessen State, Results, Dynamic Sections und Sonderrenderer aktualisieren, ohne Fokus oder Scrollposition zu verlieren."
+    }
+  ],
+  "evidence": {
+    "coreEvidence": {
+      "eventPipelineExists": true,
+      "scrollManagerExists": true,
+      "domUpdateExists": true,
+      "renderCoordinatorExists": true,
+      "savedRecordsExists": true,
+      "moduleRuntimeExists": true,
+      "focusNextSignals": 8,
+      "enterCommitSignals": 9,
+      "tabSignals": 88,
+      "scrollPreserveSignals": 34,
+      "savedRecordScrollSignals": 107,
+      "mobileKeyboardSignals": 67,
+      "globalListenerSignals": 26
+    },
+    "moduleEvidence": [
+      {
+        "module": "buffer-storage",
+        "score": 4.6,
+        "files": [
+          "config.js",
+          "controller.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "focusSignals": 0,
+        "localEnterHandlers": 0,
+        "localTabHandlers": 0,
+        "directScrollCalls": 0,
+        "scrollManagerUse": 0,
+        "savedRecordSignals": 38,
+        "savedRecordUxSignals": 11,
+        "liveUpdateSignals": 0,
+        "directDomMutationSignals": 0,
+        "globalListenerSignals": 0,
+        "hasRenderPipeline": false,
+        "hasComplexUx": true
+      },
+      {
+        "module": "drinking-water",
+        "score": 4.14,
+        "files": [
+          "config.js",
+          "controller.js",
+          "dynamicRenderer.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "focusSignals": 7,
+        "localEnterHandlers": 4,
+        "localTabHandlers": 0,
+        "directScrollCalls": 3,
+        "scrollManagerUse": 4,
+        "savedRecordSignals": 121,
+        "savedRecordUxSignals": 49,
+        "liveUpdateSignals": 0,
+        "directDomMutationSignals": 0,
+        "globalListenerSignals": 0,
+        "hasRenderPipeline": false,
+        "hasComplexUx": true
+      },
+      {
+        "module": "heat-recovery",
+        "score": 4.6,
+        "files": [
+          "config.js",
+          "controller.js",
+          "dynamicRenderer.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "focusSignals": 0,
+        "localEnterHandlers": 0,
+        "localTabHandlers": 0,
+        "directScrollCalls": 0,
+        "scrollManagerUse": 0,
+        "savedRecordSignals": 34,
+        "savedRecordUxSignals": 13,
+        "liveUpdateSignals": 0,
+        "directDomMutationSignals": 0,
+        "globalListenerSignals": 0,
+        "hasRenderPipeline": false,
+        "hasComplexUx": true
+      },
+      {
+        "module": "heating-cooling",
+        "score": 4.75,
+        "files": [
+          "config.js",
+          "controller.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "focusSignals": 0,
+        "localEnterHandlers": 0,
+        "localTabHandlers": 0,
+        "directScrollCalls": 0,
+        "scrollManagerUse": 0,
+        "savedRecordSignals": 7,
+        "savedRecordUxSignals": 5,
+        "liveUpdateSignals": 4,
+        "directDomMutationSignals": 0,
+        "globalListenerSignals": 0,
+        "hasRenderPipeline": false,
+        "hasComplexUx": true
+      },
+      {
+        "module": "hx-diagram",
+        "score": 5,
+        "files": [
+          "config.js",
+          "controller.js",
+          "diagramRenderer.js",
+          "dynamicRenderer.js",
+          "formRenderer.js",
+          "index.js",
+          "logic.js",
+          "renderPipeline.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "focusSignals": 0,
+        "localEnterHandlers": 0,
+        "localTabHandlers": 0,
+        "directScrollCalls": 0,
+        "scrollManagerUse": 0,
+        "savedRecordSignals": 56,
+        "savedRecordUxSignals": 29,
+        "liveUpdateSignals": 14,
+        "directDomMutationSignals": 0,
+        "globalListenerSignals": 0,
+        "hasRenderPipeline": true,
+        "hasComplexUx": true
+      },
+      {
+        "module": "pipe-sizing",
+        "score": 4.6,
+        "files": [
+          "config.js",
+          "controller.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "focusSignals": 0,
+        "localEnterHandlers": 0,
+        "localTabHandlers": 0,
+        "directScrollCalls": 0,
+        "scrollManagerUse": 0,
+        "savedRecordSignals": 22,
+        "savedRecordUxSignals": 13,
+        "liveUpdateSignals": 0,
+        "directDomMutationSignals": 0,
+        "globalListenerSignals": 0,
+        "hasRenderPipeline": false,
+        "hasComplexUx": true
+      },
+      {
+        "module": "pressure-holding",
+        "score": 4.6,
+        "files": [
+          "config.js",
+          "controller.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "focusSignals": 0,
+        "localEnterHandlers": 0,
+        "localTabHandlers": 0,
+        "directScrollCalls": 0,
+        "scrollManagerUse": 0,
+        "savedRecordSignals": 48,
+        "savedRecordUxSignals": 12,
+        "liveUpdateSignals": 0,
+        "directDomMutationSignals": 0,
+        "globalListenerSignals": 0,
+        "hasRenderPipeline": false,
+        "hasComplexUx": true
+      },
+      {
+        "module": "rainwater",
+        "score": 4.5,
+        "files": [
+          "config.js",
+          "controller.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "tables.js"
+        ],
+        "focusSignals": 0,
+        "localEnterHandlers": 0,
+        "localTabHandlers": 0,
+        "directScrollCalls": 0,
+        "scrollManagerUse": 0,
+        "savedRecordSignals": 29,
+        "savedRecordUxSignals": 8,
+        "liveUpdateSignals": 3,
+        "directDomMutationSignals": 0,
+        "globalListenerSignals": 0,
+        "hasRenderPipeline": false,
+        "hasComplexUx": true
+      },
+      {
+        "module": "unit-converter",
+        "score": 4.5,
+        "files": [
+          "config.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "focusSignals": 0,
+        "localEnterHandlers": 0,
+        "localTabHandlers": 0,
+        "directScrollCalls": 0,
+        "scrollManagerUse": 0,
+        "savedRecordSignals": 0,
+        "savedRecordUxSignals": 1,
+        "liveUpdateSignals": 0,
+        "directDomMutationSignals": 0,
+        "globalListenerSignals": 0,
+        "hasRenderPipeline": false,
+        "hasComplexUx": true
+      },
+      {
+        "module": "ventilation",
+        "score": 4.6,
+        "files": [
+          "config.js",
+          "controller.js",
+          "index.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "view.js",
+          "viewModel.js"
+        ],
+        "focusSignals": 0,
+        "localEnterHandlers": 0,
+        "localTabHandlers": 0,
+        "directScrollCalls": 0,
+        "scrollManagerUse": 0,
+        "savedRecordSignals": 10,
+        "savedRecordUxSignals": 7,
+        "liveUpdateSignals": 0,
+        "directDomMutationSignals": 0,
+        "globalListenerSignals": 0,
+        "hasRenderPipeline": false,
+        "hasComplexUx": true
+      },
+      {
+        "module": "wastewater",
+        "score": 4.5,
+        "files": [
+          "config.js",
+          "controller.js",
+          "index.js",
+          "lineModel.js",
+          "logic.js",
+          "results.js",
+          "schema.js",
+          "state.js",
+          "tables.js"
+        ],
+        "focusSignals": 0,
+        "localEnterHandlers": 0,
+        "localTabHandlers": 0,
+        "directScrollCalls": 0,
+        "scrollManagerUse": 0,
+        "savedRecordSignals": 29,
+        "savedRecordUxSignals": 16,
+        "liveUpdateSignals": 3,
+        "directDomMutationSignals": 0,
+        "globalListenerSignals": 0,
+        "hasRenderPipeline": false,
+        "hasComplexUx": true
+      }
+    ],
+    "focusNavigation": {
+      "modulesWithLocalEnterHandlers": [
+        "drinking-water"
+      ],
+      "modulesWithLocalTabHandlers": []
+    },
+    "scrollStability": {
+      "modulesWithDirectScroll": [
+        "drinking-water"
+      ],
+      "modulesUsingScrollManager": [
+        "drinking-water"
+      ]
+    },
+    "savedRecordUx": {
+      "complexSavedModules": [
+        "buffer-storage",
+        "drinking-water",
+        "heat-recovery",
+        "heating-cooling",
+        "hx-diagram",
+        "pipe-sizing",
+        "pressure-holding",
+        "rainwater",
+        "ventilation",
+        "wastewater"
+      ],
+      "savedModulesWithUxSignals": [
+        "buffer-storage",
+        "drinking-water",
+        "heat-recovery",
+        "heating-cooling",
+        "hx-diagram",
+        "pipe-sizing",
+        "pressure-holding",
+        "rainwater",
+        "ventilation",
+        "wastewater"
+      ]
+    },
+    "liveUpdateSideEffects": {
+      "liveUpdateModules": [
+        "heating-cooling",
+        "hx-diagram",
+        "rainwater",
+        "wastewater"
+      ],
+      "modulesWithDirectDomMutation": []
+    },
+    "mobileKeyboardGuards": {
+      "modulesWithGlobalListeners": [],
+      "mobileKeyboardSignals": 67
+    }
+  },
+  "executiveSummary": {
+    "status": "ux-infrastructure-stable",
+    "p0": [],
+    "p1": [
+      {
+        "area": "scrollStability",
+        "score": 4.24,
+        "grade": "B",
+        "risk": "P1",
+        "action": "Scroll-Stabilitaet bei Saved-Record-Auswahl, Live-Updates und Modulwechseln weiter zentral ueber scrollManager/preserveViewport erzwingen."
+      }
+    ],
+    "p2": [
+      {
+        "area": "liveUpdateSideEffects",
+        "score": 4.25,
+        "grade": "B",
+        "risk": "P2",
+        "action": "Live-Updates muessen State, Results, Dynamic Sections und Sonderrenderer aktualisieren, ohne Fokus oder Scrollposition zu verlieren."
+      }
+    ],
+    "p3": []
+  }
+}

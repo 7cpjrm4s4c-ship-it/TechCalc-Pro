@@ -66,7 +66,6 @@
   gap: var(--section-gap);
 }
 
-
 .tc-fields {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -186,7 +185,6 @@
   .module-nav { top: auto; }
 }
 
-
 /* Mobile width lock and clipping guards. */
 .app-main,
 .grid-12,
@@ -233,3 +231,18 @@
     padding-top: calc(var(--nav-h) + var(--space-3));
   }
 }
+
+/* Phase 36Q.4: renderer module columns use the same gap variable as cards. */
+.module-content,
+.module-view,
+.tc-grid {
+  gap: var(--tc-gap);
+}
+
+.module-content > .span-12,
+.module-content > .span-8,
+.module-content > .span-6,
+.module-content > .span-4 {
+  gap: var(--tc-gap);
+}
+

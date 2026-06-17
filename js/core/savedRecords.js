@@ -1,5 +1,6 @@
-import { esc, inlineStats, preserveViewport } from './renderer.js';
+import { esc, inlineStats } from './renderer.js';
 import { markCommittedAction } from './formActions.js';
+import { preserveSavedRecordScroll, preserveSavedRecordMutation } from './scrollManager.js';
 
 export function createRecordId(prefix = 'record') {
   try {
@@ -69,7 +70,7 @@ export function renderSavedRecordPanel({
 } = {}) {
   const body = [
     `<div class="field"><label for="${esc(nameFieldId)}">${esc(nameLabel)}</label><div class="control"><input id="${esc(nameFieldId)}" data-field="${esc(nameFieldId)}" value="${esc(nameValue)}" placeholder="${esc(namePlaceholder)}" inputmode="text"></div></div>`,
-    `<div class="tc-save-actions"><button type="button" class="action-button action-button--secondary" data-tc-action="${esc(addAction)}" data-line-save ${addDisabled ? 'disabled' : ''}>${esc(addLabel)}</button><button type="button" class="action-button" data-tc-action="${esc(updateAction)}" data-line-update ${updateDisabled ? 'disabled' : ''}>${esc(updateLabel)}</button></div>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-tc-action="${esc(addAction)}" data-line-save ${addDisabled ? 'disabled' : ''}>${esc(addLabel)}</button><button type="button" class="action-button action-button--secondary" data-tc-action="${esc(updateAction)}" data-line-update ${updateDisabled ? 'disabled' : ''}>${esc(updateLabel)}</button></div>`,
     listHtml || `<div class="empty-state empty-state--compact">Noch keine Einträge gespeichert.</div>`
   ].join('');
   return `<section class="card card--${esc(accent)} tc-card tc-saved-record-panel"><div class="card__title tc-card__header">${esc(title)}</div><div class="card__body tc-card__body">${body}</div></section>`;
@@ -105,7 +106,7 @@ function activateLoad({ root, card, event, loadAttr, onLoad, preserveLoadScroll 
   event.stopImmediatePropagation?.();
   markCommittedAction(root);
   const run = () => onLoad?.(id, card, event);
-  if (preserveLoadScroll) preserveViewport(run, { frames: 8, blurActive: false, anchor: card, event, delays: [0, 40, 100, 220] });
+  if (preserveLoadScroll) preserveSavedRecordScroll(run, { anchor: card, event });
   else run();
 }
 
@@ -121,7 +122,7 @@ export function bindSavedRecordList(root, {
   if (!root) return;
   const key = `${loadAttr}|${toggleAttr}|${deleteAttr}`;
 
-  bindScopedOnce(root, key, 'click', event => {
+  const handleActivation = event => {
     const toggle = closestAttr(event.target, toggleAttr, root);
     if (toggle) {
       event.preventDefault();
@@ -129,16 +130,18 @@ export function bindSavedRecordList(root, {
       event.stopImmediatePropagation?.();
       const card = toggle.closest('[data-line-card]');
       const willOpen = card?.classList.contains('is-collapsed');
-      if (closeOthers && card) {
-        root.querySelectorAll('[data-line-card]').forEach(item => {
-          if (item === card) return;
-          item.classList.add('is-collapsed');
-          item.querySelector(`[${toggleAttr}]`)?.setAttribute('aria-expanded', 'false');
-        });
-      }
-      card?.classList.toggle('is-collapsed', !willOpen);
-      toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-      return;
+      preserveSavedRecordMutation(() => {
+        if (closeOthers && card) {
+          root.querySelectorAll('[data-line-card]').forEach(item => {
+            if (item === card) return;
+            item.classList.add('is-collapsed');
+            item.querySelector(`[${toggleAttr}]`)?.setAttribute('aria-expanded', 'false');
+          });
+        }
+        card?.classList.toggle('is-collapsed', !willOpen);
+        toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      }, { anchor: card, event });
+      return true;
     }
 
     const deleteButton = closestAttr(event.target, deleteAttr, root);
@@ -148,12 +151,45 @@ export function bindSavedRecordList(root, {
       event.stopImmediatePropagation?.();
       markCommittedAction(root);
       onDelete?.(deleteButton.getAttribute(deleteAttr), deleteButton, event);
-      return;
+      return true;
     }
 
     const card = closestAttr(event.target, loadAttr, root);
-    if (!card || shouldIgnoreLoad(event, toggleAttr, deleteAttr)) return;
+    if (!card || shouldIgnoreLoad(event, toggleAttr, deleteAttr)) return false;
     activateLoad({ root, card, event, loadAttr, onLoad, preserveLoadScroll });
+    return true;
+  };
+
+  bindScopedOnce(root, `${key}:early`, 'pointerdown', event => {
+    const candidate = event.target?.closest?.(`[${loadAttr}], [${toggleAttr}], [${deleteAttr}], [data-line-card], [data-saved-record-card]`);
+    if (!candidate || !root.contains(candidate)) return;
+    const id = candidate.getAttribute?.(loadAttr) || candidate.getAttribute?.(toggleAttr) || candidate.getAttribute?.(deleteAttr) || candidate.dataset?.savedRecordId || '';
+    const action = candidate.hasAttribute?.(deleteAttr) ? 'delete' : candidate.hasAttribute?.(toggleAttr) ? 'toggle' : 'load';
+    const now = Date.now();
+    const last = root.__tcSavedRecordEarlyAction || {};
+    const earlyKey = `${action}:${id}`;
+    if (last.key === earlyKey && now - Number(last.at || 0) < 450) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation?.();
+      return;
+    }
+    root.__tcSavedRecordEarlyAction = { key: earlyKey, at: now };
+    handleActivation(event);
+  }, true);
+
+  bindScopedOnce(root, key, 'click', event => {
+    const candidate = event.target?.closest?.(`[${loadAttr}], [${toggleAttr}], [${deleteAttr}], [data-line-card], [data-saved-record-card]`);
+    const id = candidate?.getAttribute?.(loadAttr) || candidate?.getAttribute?.(toggleAttr) || candidate?.getAttribute?.(deleteAttr) || candidate?.dataset?.savedRecordId || '';
+    const action = candidate?.hasAttribute?.(deleteAttr) ? 'delete' : candidate?.hasAttribute?.(toggleAttr) ? 'toggle' : 'load';
+    const last = root.__tcSavedRecordEarlyAction || {};
+    if (last.key === `${action}:${id}` && Date.now() - Number(last.at || 0) < 450) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation?.();
+      return;
+    }
+    handleActivation(event);
   }, true);
 
   bindScopedOnce(root, key, 'keydown', event => {
@@ -184,7 +220,7 @@ export function bindEditModeClear(root, {
     const selector = ignoreSelector ? `${baseIgnore}, ${ignoreSelector}` : baseIgnore;
     if (event.target.closest(selector)) return;
     const patch = { [activeIdKey]: null, ...(nameKey ? { [nameKey]: '' } : {}), ...clearPatch };
-    preserveViewport(() => {
+    preserveSavedRecordMutation(() => {
       if (typeof onClear === 'function') onClear(patch, event);
       else state.set(patch);
     }, { frames: 14, event, anchor: event.target?.closest?.('.module-view, main, #app'), delays: [0, 40, 100, 220, 420, 800] });

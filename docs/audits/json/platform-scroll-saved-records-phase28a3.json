@@ -1,0 +1,32 @@
+{
+  "phase": "28A.3",
+  "name": "Saved Records Scroll Integration",
+  "generatedAt": "2026-06-10T16:44:16.632Z",
+  "overallScore": 5,
+  "overallGrade": "A",
+  "executiveSummary": {
+    "p0": [],
+    "p1": [],
+    "p2": [],
+    "conclusion": "Saved-Record-Aktionen laufen ueber den PlatformScrollManager. Auswahl, Abwahl, Toggle und Edit-Mode-Clear besitzen einen zentralen Scroll-Stabilitaetsvertrag."
+  },
+  "checks": {
+    "serviceHasSavedRecordMutation": true,
+    "serviceExportsSavedRecordMutation": true,
+    "savedListUsesScrollService": true,
+    "savedListTogglePreserved": true,
+    "editModeClearPreserved": true,
+    "controllerLoadPreserved": true,
+    "controllerTogglePreserved": true,
+    "controllerDeletePreserved": true
+  },
+  "acceptance": {
+    "savedRecordMutationContractAvailable": true,
+    "savedRecordListUsesPlatformScrollManager": true,
+    "savedRecordToggleProtected": true,
+    "savedRecordLoadProtected": true,
+    "savedRecordClearProtected": true,
+    "noP1Findings": true
+  },
+  "findings": []
+}

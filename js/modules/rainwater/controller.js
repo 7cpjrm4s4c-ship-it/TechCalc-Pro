@@ -3,6 +3,8 @@ import { getAreaType } from './logic.js';
 import { roofDrainTable } from './tables.js';
 import { normalizeAreaType, defaultAreaTypeForMode } from './schema.js';
 import { createStateSnapshot, hydrateStateRecord } from '../../platform/savedRecordModel/index.js';
+import { state } from './state.js';
+import { calculate } from './logic.js';
 
 const surfaceNumericFields = new Set([
   'areaSize','customCs','customCm','roofRainIntensity','propertyRainIntensity','rainHundredIntensity',
@@ -87,7 +89,7 @@ function surfacePatchFromState(current = {}) {
   };
 }
 
-function surfaceRecordSnapshot(current = {}, result = {}) {
+export function surfaceRecordSnapshot(current = {}, result = {}) {
   const patch = surfacePatchFromState(current);
   const base = getAreaType(patch.areaType || defaultAreaTypeForMode(patch.surfaceMode));
   const name = (patch.areaName || '').trim() || base?.name || 'Regenfläche';
@@ -103,19 +105,29 @@ function surfaceRecordSnapshot(current = {}, result = {}) {
     excludeKeys: ['surfaces', 'activeSurfaceId', 'expandedSurfaceResultId'],
     name: () => name,
     resultMapper: output => ({
-      mode: output?.mode || patch.surfaceMode,
+      mode: output?.selectedSurface?.surfaceMode || output?.mode || patch.surfaceMode,
+      area: output?.area,
+      areaType: patch.areaType,
+      areaTypeLabel: base?.name,
+      cs: output?.csResulting,
+      cm: output?.cmResulting,
       qr: output?.qr,
       rdt: output?.rdt,
       r100: output?.r100,
+      qNot: output?.qNot,
       requiredDrains: output?.requiredDrains,
       drainSize: output?.drainSize,
+      drainCapacity: output?.drainCapacity,
+      drainHead: output?.drainHead,
+      stackCount: output?.stackCount,
+      qPerStack: output?.qPerStack,
       stackDn: output?.stackSelection?.dn,
       collectorDn: output?.collectorSelection?.dn
     })
   });
 }
 
-function statePatchFromSurface(item = {}) {
+export function statePatchFromSurface(item = {}, current = {}) {
   const source = item.state || item.inputState || item;
   const hydrated = item.state || item.inputState
     ? hydrateStateRecord(item, { activeIdKey: 'activeSurfaceId', nameKey: 'areaName' })
@@ -151,7 +163,7 @@ function statePatchFromSurface(item = {}) {
   };
 }
 
-function clearSurfaceEditorPatch(current = {}) {
+export function clearSurfaceEditorPatch(current = {}) {
   const mode = current.surfaceMode || current.calculationType || 'roof';
   return {
     activeSurfaceId: null,
@@ -177,7 +189,7 @@ function clearSurfaceEditorPatch(current = {}) {
   };
 }
 
-function resetSurfaceEditorAfterAdd(current = {}) {
+export function resetSurfaceEditorAfterAdd(current = {}) {
   return {
     ...clearSurfaceEditorPatch(current),
     roofRainIntensity: current.roofRainIntensity || current.rainIntensity || '300',
@@ -189,9 +201,52 @@ function resetSurfaceEditorAfterAdd(current = {}) {
 
 function lookupPatch(fieldName, current = {}) {
   if (fieldName === 'areaType') {
-    return { areaType: normalizeAreaType(current.surfaceMode || current.calculationType || 'roof', current.areaType) };
+    const mode = current.surfaceMode || current.calculationType || 'roof';
+    const areaType = normalizeAreaType(mode, current.areaType);
+    const selected = getAreaType(areaType);
+    return {
+      areaType,
+      customCs: selected?.custom ? (current.customCs || '') : '',
+      customCm: selected?.custom ? (current.customCm || '') : ''
+    };
   }
   return patchLookupDefaults({ [fieldName]: current[fieldName] }, current);
+}
+
+
+export function rainwaterSavedStats(item = {}) {
+  const result = item.result || {};
+  return [
+    { label: 'Bereich', value: result.mode || item.state?.surfaceMode || '—' },
+    { label: 'Entwässerungsmenge Qr', value: result.qr !== undefined ? String(result.qr).replace('.', ',') : '—', unit: result.qr !== undefined ? 'l/s' : '' },
+    { label: 'Abläufe', value: result.requiredDrains !== undefined ? result.requiredDrains : '—', unit: result.requiredDrains !== undefined ? 'Stk.' : '' },
+    { label: 'Ablaufdimension', value: result.drainSize || '—' },
+    { label: 'Fallleitung', value: result.stackDn || '—' },
+    { label: 'Sammelleitung', value: result.collectorDn || '—' }
+  ];
+}
+
+export function rainwaterSavedSubtitle(item = {}) {
+  const result = item.result || {};
+  return [result.mode || item.state?.surfaceMode, result.qr !== undefined ? `Qr ${String(result.qr).replace('.', ',')} l/s` : '', result.drainSize].filter(Boolean).join(' · ');
+}
+
+export function buildRainwaterRecord(currentState = {}, result = {}, items = [], id, name, existing = null) {
+  const record = surfaceRecordSnapshot({ ...currentState, activeSurfaceId: null, areaName: name }, result);
+  return {
+    ...record,
+    id,
+    name: name || currentState.areaName?.trim() || existing?.name || record.name || `Regenfläche ${items.length + 1}`,
+    createdAt: existing?.createdAt || record.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+}
+
+
+
+export function isDynamicRainwaterAction(meta = {}) {
+  const action = String(meta.action || '');
+  return action !== 'initial';
 }
 
 export default {
@@ -206,25 +261,9 @@ export default {
   lookupHydration: {
     key: 'platform:lookup-hydration',
     fields: ['drainSize', 'emergencyType', 'areaType'],
-    hydrateDomFields: { drainSize: ['drainSizeManual', 'drainCapacity', 'drainHead'] },
-        patch: lookupPatch
+    patch: lookupPatch
   },
-  normalizeFields: [...surfaceNumericFields],
-  savedRecords: {
-    enabled: true,
-    snapshot: surfaceRecordSnapshot,
-    hydrate: item => statePatchFromSurface(item),
-    clear: clearSurfaceEditorPatch,
-    listKey: 'surfaces',
-    activeIdKey: 'activeSurfaceId',
-    expandedIdKey: 'expandedSurfaceResultId',
-    nameKey: 'areaName',
-    recordPrefix: 'rain-surface',
-        afterCreatePatch: resetSurfaceEditorAfterAdd,
-    attrs: { loadAttr: 'data-line-select', toggleAttr: 'data-line-toggle', deleteAttr: 'data-line-delete' },
-    preserveSaveScroll: true,
-    preserveLoadScroll: true
-  }
+  normalizeFields: [...surfaceNumericFields]
 };
 
-export { modeDefaultsPatch, surfaceRecordSnapshot, statePatchFromSurface, clearSurfaceEditorPatch, resetSurfaceEditorAfterAdd };
+export { modeDefaultsPatch };

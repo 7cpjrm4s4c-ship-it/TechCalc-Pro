@@ -6,8 +6,9 @@ import { createSavedRecord, savedRecordReducer } from '../../core/savedRecordCon
 // createSavedRecordActions( remains the central action-factory contract; Phase 17C.9
 // uses the Heizung/Kälte-compatible direct binding to avoid duplicate mobile events.
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
-import { preserveScroll as keepScroll } from '../../core/scrollManager.js';
-import { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved } from '../moduleRenderer/index.js';
+import { preserveScroll as keepScroll, preserveSavedRecordMutation, PlatformScrollManager } from '../../core/scrollManager.js';
+import { PlatformFocusManager } from '../../core/focusManager.js';
+import { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved, renderPlatformSaved } from '../moduleRenderer/index.js';
 import { getRenderScheduler } from '../../core/renderScheduler.js';
 
 const noop = () => {};
@@ -15,6 +16,15 @@ const asFn = value => typeof value === 'function' ? value : noop;
 const array = value => Array.isArray(value) ? value : [];
 
 function preserveScroll(action) { keepScroll(action); }
+
+function preservePlatformUx(root, action, options = {}) {
+  const run = () => PlatformScrollManager.runWithoutScrollJump(action, {
+    frames: 8,
+    delays: [0, 40, 100, 220, 420],
+    ...options
+  });
+  return PlatformFocusManager.preserveFocusDuring(root || document, run, { restoreFocus: true });
+}
 
 function createNormalizedState(state, fields = []) {
   const numericFields = Array.isArray(fields) ? fields : [];
@@ -182,27 +192,34 @@ function bindLookupHydration(root, state, lookupConfig = {}) {
 function bindCollections(root, state, collectionConfig = {}) {
   const collections = collectionConfig.collections || collectionConfig;
   if (!collections || !Object.keys(collections).length) return {};
+  root.__tcPlatformCollectionContext = { collections, state };
   if (!root.__tcPlatformCollectionBound) {
     root.__tcPlatformCollectionBound = true;
     root.addEventListener('input', event => {
       const input = event.target?.closest?.('[data-collection-input]');
       if (!input || !root.contains(input)) return;
       const name = input.dataset.collectionInput;
-      const cfg = collections[name];
+      const context = root.__tcPlatformCollectionContext || {};
+      const activeCollections = context.collections || collections;
+      const activeState = context.state || state;
+      const cfg = activeCollections[name];
       if (!cfg || typeof cfg.patchInput !== 'function') return;
       event.stopPropagation();
-      const patch = cfg.patchInput({ id: input.dataset.collectionId, field: input.dataset.collectionField, value: input.value, current: state.get(), element: input, root }) || {};
-      if (Object.keys(patch).length) state.set(patch, { action: cfg.inputAction || `platform:collection:${name}:input`, notify: false });
+      const patch = cfg.patchInput({ id: input.dataset.collectionId, field: input.dataset.collectionField, value: input.value, current: activeState.get(), element: input, root }) || {};
+      if (Object.keys(patch).length) activeState.set(patch, { action: cfg.inputAction || `platform:collection:${name}:input`, notify: false });
     }, true);
     const commit = event => {
       const input = event.target?.closest?.('[data-collection-input]');
       if (!input || !root.contains(input)) return;
       const name = input.dataset.collectionInput;
-      const cfg = collections[name];
+      const context = root.__tcPlatformCollectionContext || {};
+      const activeCollections = context.collections || collections;
+      const activeState = context.state || state;
+      const cfg = activeCollections[name];
       if (!cfg || typeof cfg.patchInput !== 'function') return;
       event.stopPropagation();
-      const patch = cfg.patchInput({ id: input.dataset.collectionId, field: input.dataset.collectionField, value: input.value, current: state.get(), element: input, root }) || {};
-      if (Object.keys(patch).length) state.set(patch, { action: cfg.commitAction || `platform:collection:${name}:commit`, notify: true });
+      const patch = cfg.patchInput({ id: input.dataset.collectionId, field: input.dataset.collectionField, value: input.value, current: activeState.get(), element: input, root }) || {};
+      if (Object.keys(patch).length) activeState.set(patch, { action: cfg.commitAction || `platform:collection:${name}:commit`, notify: true });
     };
     root.addEventListener('blur', commit, true);
     root.addEventListener('keydown', event => {
@@ -215,17 +232,24 @@ function bindCollections(root, state, collectionConfig = {}) {
   }
   const addCollectionItem = ({ element, root }) => {
     const name = element?.dataset?.collection;
-    const cfg = collections[name];
+    const context = root.__tcPlatformCollectionContext || {};
+    const activeCollections = context.collections || collections;
+    const activeState = context.state || state;
+    const cfg = activeCollections[name];
     if (!cfg || typeof cfg.add !== 'function') return;
-    const patch = cfg.add({ current: state.get(), root, element, collection: name }) || {};
-    if (Object.keys(patch).length) preserveScroll(() => state.set(patch, { action: cfg.addStateAction || `platform:collection:${name}:add`, notify: true }));
+    commitAllFields(root, activeState, { action: cfg.preAddAction || `platform:collection:${name}:pre-add`, notify: false });
+    const patch = cfg.add({ current: activeState.get(), root, element, collection: name }) || {};
+    if (Object.keys(patch).length) preservePlatformUx(root, () => activeState.set(patch, { action: cfg.addStateAction || `platform:collection:${name}:add`, notify: true }), { frames: 10, delays: [0,40,100,220,420] });
   };
   const deleteCollectionItem = ({ element }) => {
     const name = element?.dataset?.collection;
-    const cfg = collections[name];
+    const context = root.__tcPlatformCollectionContext || {};
+    const activeCollections = context.collections || collections;
+    const activeState = context.state || state;
+    const cfg = activeCollections[name];
     if (!cfg || typeof cfg.delete !== 'function') return;
-    const patch = cfg.delete({ id: element.dataset.collectionId, current: state.get(), element, root }) || {};
-    if (Object.keys(patch).length) preserveScroll(() => state.set(patch, { action: cfg.deleteAction || `platform:collection:${name}:delete`, notify: true }));
+    const patch = cfg.delete({ id: element.dataset.collectionId, current: activeState.get(), element, root }) || {};
+    if (Object.keys(patch).length) preservePlatformUx(root, () => activeState.set(patch, { action: cfg.deleteAction || `platform:collection:${name}:delete`, notify: true }), { frames: 10, delays: [0,40,100,220,420] });
   };
   const actions = {
     'platform:collection:add': addCollectionItem,
@@ -235,6 +259,40 @@ function bindCollections(root, state, collectionConfig = {}) {
   Object.entries(collections).forEach(([name, cfg]) => {
     if (typeof cfg.add === 'function' && cfg.addAction) actions[cfg.addAction] = addCollectionItem;
   });
+
+  // RC visual retest hardening: collection add buttons must work even while a
+  // mobile keyboard is still open. Native blur can otherwise trigger a render
+  // before the final click reaches the button, making the first tap appear dead.
+  root.__tcPlatformCollectionActionContext = { actions };
+  if (!root.__tcPlatformCollectionActionDirectBound) {
+    root.__tcPlatformCollectionActionDirectBound = true;
+    const directCollectionAction = event => {
+      const element = event.target?.closest?.('[data-tc-action], [data-action]');
+      if (!element || !root.contains(element)) return;
+      const action = element.dataset.tcAction || element.dataset.action || '';
+      const handler = root.__tcPlatformCollectionActionContext?.actions?.[action];
+      if (typeof handler !== 'function') return;
+      const now = Date.now();
+      const last = root.__tcPlatformCollectionLastAction || {};
+      const key = `${action}:${element.dataset.collection || ''}:${element.dataset.collectionId || ''}:${event.type}`;
+      if (last.key === key && now - Number(last.at || 0) < 350) {
+        event.preventDefault?.();
+        event.stopPropagation?.();
+        event.stopImmediatePropagation?.();
+        return;
+      }
+      root.__tcPlatformCollectionLastAction = { key, at: now };
+      event.preventDefault?.();
+      event.stopPropagation?.();
+      event.stopImmediatePropagation?.();
+      handler({ element, event, root });
+    };
+    root.addEventListener('pointerdown', directCollectionAction, true);
+    root.addEventListener('mousedown', directCollectionAction, true);
+    root.addEventListener('touchstart', directCollectionAction, { capture: true, passive: false });
+    root.addEventListener('click', directCollectionAction, true);
+  }
+
   return actions;
 }
 
@@ -299,7 +357,7 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     const current = state.get();
     const record = createRecord(current);
     const patch = typeof savedConfig.afterCreatePatch === 'function' ? savedConfig.afterCreatePatch(current, record) : {};
-    preserveScroll(() => setReduced(current, { action: 'create', record, patch }, 'line:save'));
+    preserveSavedRecordMutation(() => setReduced(current, { action: 'create', record, patch }, 'line:save'));
   };
 
   const update = ({ root: actionRoot } = {}) => {
@@ -312,7 +370,7 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     const existing = list(current).find(item => String(item.id) === String(id));
     if (!existing) return;
     const record = createRecord(current, existing);
-    preserveScroll(() => setReduced(current, { action: 'update', id, record }, 'line:update'));
+    preserveSavedRecordMutation(() => setReduced(current, { action: 'update', id, record }, 'line:update'));
   };
 
   const readId = element => readRecordIdFromElement(element, { loadAttr, toggleAttr, deleteAttr });
@@ -323,27 +381,29 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     const item = list(current).find(entry => String(entry.id) === String(id));
     if (!item) return;
     if (String(current?.[savedConfig.activeIdKey] || '') === String(id)) {
-      state.set({
+      preserveSavedRecordMutation(() => state.set({
         [savedConfig.activeIdKey]: null,
         ...(savedConfig.nameKey ? { [savedConfig.nameKey]: '' } : {})
-      }, { action: 'line:deselect' });
+      }, { action: 'line:deselect' }));
       return;
     }
     const patch = typeof savedConfig.hydrate === 'function' ? savedConfig.hydrate(item, current) : { ...(item.state || item.inputState || item) };
-    setReduced(current, { action: 'load', id: item.id, record: item, patch }, 'line:select');
+    preserveSavedRecordMutation(() => setReduced(current, { action: 'load', id: item.id, record: item, patch }, 'line:select'));
   };
 
-  const remove = ({ element } = {}) => {
+  const remove = ({ element, event } = {}) => {
     const id = readId(element);
     const current = state.get();
     const patch = typeof savedConfig.clear === 'function' && String(current?.[savedConfig.activeIdKey] || '') === String(id) ? savedConfig.clear(current) : {};
-    preserveScroll(() => setReduced(current, { action: 'delete', id, patch }, 'line:delete'));
+    const anchor = element?.closest?.('[data-line-card], [data-saved-record-card]') || element;
+    preserveSavedRecordMutation(() => setReduced(current, { action: 'delete', id, patch }, 'line:delete'), { anchor, event });
   };
 
-  const toggle = ({ element } = {}) => {
+  const toggle = ({ element, event } = {}) => {
     const id = readId(element);
     const current = state.get();
-    setReduced(current, { action: 'toggle-expanded', id }, 'line:toggle');
+    const anchor = element?.closest?.('[data-line-card], [data-saved-record-card]') || element;
+    preserveSavedRecordMutation(() => setReduced(current, { action: 'toggle-expanded', id }, 'line:toggle'), { anchor, event });
   };
 
   // Heizung/Kälte parity: saved-record panels are controlled exclusively by the
@@ -460,26 +520,35 @@ export function createPlatformModule(definition = {}) {
     // the platform equivalent is a synchronous full platform-view rebuild for
     // segment commits, followed by rebinding the platform action map.
     if (isSegmentUpdate) {
-      const nextView = view(runtimeState.get());
-      if (root.innerHTML !== nextView) root.innerHTML = nextView;
-      root.__tcPlatformLastDynamicUpdate = { ...(meta || {}), full: true, at: Date.now() };
-      bindPlatformActions(root);
+      preservePlatformUx(root, () => {
+        const nextView = view(runtimeState.get());
+        if (root.innerHTML !== nextView) root.innerHTML = nextView;
+        root.__tcPlatformLastDynamicUpdate = { ...(meta || {}), full: true, at: Date.now() };
+        bindPlatformActions(root);
+      });
       return true;
     }
 
     const formHost = root.querySelector?.('[data-platform-dynamic="form"]');
+    const savedHost = root.querySelector?.('[data-platform-dynamic="saved-records"]');
     const sideHost = root.querySelector?.('[data-platform-dynamic="result-saved"]');
-    if (!formHost && !sideHost) return false;
+    if (!formHost && !savedHost && !sideHost) return false;
     const model = buildRenderModel(runtimeState.get());
-    if (formHost) {
-      const nextForm = renderPlatformForm(model);
-      if (formHost.innerHTML !== nextForm) formHost.innerHTML = nextForm;
-    }
-    if (sideHost) {
-      const nextSide = renderPlatformResultsAndSaved(model);
-      if (sideHost.innerHTML !== nextSide) sideHost.innerHTML = nextSide;
-    }
-    root.__tcPlatformLastDynamicUpdate = { ...(meta || {}), at: Date.now() };
+    preservePlatformUx(root, () => {
+      if (formHost) {
+        const nextForm = renderPlatformForm(model);
+        if (formHost.innerHTML !== nextForm) formHost.innerHTML = nextForm;
+      }
+      if (savedHost) {
+        const nextSaved = renderPlatformSaved(model);
+        if (savedHost.innerHTML !== nextSaved) savedHost.innerHTML = nextSaved;
+      }
+      if (sideHost) {
+        const nextSide = renderPlatformResultsAndSaved(model);
+        if (sideHost.innerHTML !== nextSide) sideHost.innerHTML = nextSide;
+      }
+      root.__tcPlatformLastDynamicUpdate = { ...(meta || {}), at: Date.now() };
+    });
     return true;
   }
 
@@ -492,6 +561,7 @@ export function createPlatformModule(definition = {}) {
     };
     bindLookupHydration(root, runtimeState, controller.lookupHydration);
     registerCentralActions(root, actions);
+    if (typeof customBind === 'function') customBind(root, runtimeState.get(), { action: 'platform:bind' });
   }
   return { config, schema, state: runtimeState, initialState, calculate, results, savedRecords, controller, mount(root) { return mountModule(root, runtimeState, view, bindPlatformActions); } };
 }

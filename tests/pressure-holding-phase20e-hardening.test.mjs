@@ -17,9 +17,9 @@ assert.doesNotMatch(indexSource, /mountModule\(/, 'legacy mountModule is not use
 assert.doesNotMatch(indexSource, /bindSavedRecordWorkflow/, 'legacy saved-record workflow is not imported by adapter');
 assert.doesNotMatch(controllerSource + indexSource, /data-ph-save|data-ph-update|data-ph-select|data-ph-delete/, 'legacy pressure saved selectors are removed');
 
-assert.match(controllerSource, /createSavedRecordActions/, 'saved records use central actions');
-assert.match(controllerSource, /renderSavedRecordPanel/, 'saved records use central panel renderer');
-assert.match(controllerSource, /renderSavedRecordList/, 'saved records use central list renderer');
+assert.match(controllerSource, /createLineSectionController/, 'saved records use the central line-section controller');
+assert.match(controllerSource, /pressureHoldingSavedController\.renderCard/, 'saved records use the controller-owned panel renderer');
+assert.match(controllerSource, /pressureHoldingSavedController\.bind/, 'saved records use the controller-owned bind path');
 assert.match(controllerSource, /activePlantId/, 'active plant id is part of saved-record contract');
 assert.match(controllerSource, /expandedPlantId/, 'expanded plant id is part of saved-record contract');
 

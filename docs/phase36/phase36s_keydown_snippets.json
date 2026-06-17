@@ -1,0 +1,18 @@
+{
+  "js/modules/hx-diagram": [
+    {
+      "file": "js/modules/hx-diagram/controller.js",
+      "snippet": "addEventListener('keydown', event => {\n    const field = event.target?.closest?.('input[data-field], select[data-field], textarea[data-field]');\n    if (!field || !rootEl.contains(field) || (event.key !== 'Enter' && event.key !== 'Tab')) return;\n    event.preventDefault();\n    event.stopPropagation();\n    event.stopImmediatePropagation?.();\n\n    // Phase 36R: follow the central event-pipeline order.\n    // Silent commit -> focus navigation -> notifying refresh in RAF with focus preservation.\n    state.set({ [field.dataset.field]: field.value, activePath: [], points: [] }, {\n      action: event.key === 'Tab' ? 'hx:field:tab' : 'hx:field:enter',\n      notify: false\n    });\n\n    const moved = handlePlatformFieldNavigation(rootEl, field, event, { select: true, defer: false });\n\n    const refresh = () => {\n      const active = document.activeElement;\n      const keep = Boolean(active && rootEl.contains(active) && active.matches?.('[data-field]'));\n      PlatformFocusManager.preserveFocusDuring(rootEl, () => {\n        state.set({}, {\n          action: event.key === 'Tab' ? 'hx:field:tab:refresh' : 'hx:field:enter:refresh',\n          notify: true\n        });\n      }, { restoreFocus: keep });\n    };\n\n    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(refresh);\n    else setTimeout(refresh, 0);\n\n    if (!moved) {\n      try { field.blur(); } catch { /* ignore */ }\n    }\n  }, true)"
+    }
+  ],
+  "js/modules/drinking-water": [
+    {
+      "file": "js/modules/drinking-water/controller.js",
+      "snippet": "addEventListener('keydown', event => {\n    if (event.key !== 'Enter' && event.key !== 'Escape') return;\n    if (!event.target?.closest?.('input[data-field], textarea[data-field]')) return;\n    scheduleRelease();\n  }, true)"
+    }
+  ],
+  "js/modules/heating-cooling": [],
+  "js/modules/pressure-holding": [],
+  "js/modules/buffer-storage": [],
+  "js/modules/ventilation": []
+}

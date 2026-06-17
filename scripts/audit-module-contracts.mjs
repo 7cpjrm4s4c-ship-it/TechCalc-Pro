@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const modulesDir = new URL('../js/modules/', import.meta.url).pathname;
@@ -38,5 +38,6 @@ const report = {
   }
 };
 
-writeFileSync(new URL('../module-contract-audit-phase8.json', import.meta.url), JSON.stringify(report, null, 2));
+mkdirSync(new URL('../docs/audits/json', import.meta.url), { recursive: true });
+writeFileSync(new URL('../docs/audits/json/module-contract-audit-phase8.json', import.meta.url), JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report.summary, null, 2));

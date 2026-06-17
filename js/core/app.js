@@ -15,6 +15,7 @@ import rainwaterConfig from '../modules/rainwater/config.js';
 import { restoreSessionSnapshot, saveSessionSnapshot } from './projectStorage.js';
 import { createModuleLifecycleAdapter } from './moduleLifecycleAdapter.js';
 import { createModuleRuntime } from './moduleRuntime.js';
+import { trackGlobalEventListener } from './eventManager.js';
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
@@ -31,6 +32,40 @@ const lazyModules = [
 ];
 
 const moduleCache = new Map();
+const preloadedModuleIds = new Set();
+
+function loadLazyModule(config, path) {
+  let loaded = moduleCache.get(config.id);
+  if (!loaded) {
+    loaded = import(path)
+      .then(mod => mod.default || mod)
+      .catch(error => {
+        moduleCache.delete(config.id);
+        preloadedModuleIds.delete(config.id);
+        throw error;
+      });
+    moduleCache.set(config.id, loaded);
+  }
+  return loaded;
+}
+
+function preloadLazyModule(config, path) {
+  if (!config?.id || preloadedModuleIds.has(config.id)) return;
+  preloadedModuleIds.add(config.id);
+  loadLazyModule(config, path).catch(error => {
+    console.warn(`Modul konnte nicht vorgeladen werden: ${config.id}`, error);
+  });
+}
+
+function scheduleLazyModulePreload() {
+  const preload = () => lazyModules.forEach(({ config, path }) => preloadLazyModule(config, path));
+  if ('requestIdleCallback' in window) window.requestIdleCallback(preload, { timeout: 1500 });
+  else window.setTimeout(preload, 250);
+}
+
+const currentRouteConfig = lazyModules.find(({ config }) => config.id === currentRoute());
+if (currentRouteConfig) preloadLazyModule(currentRouteConfig.config, currentRouteConfig.path);
+
 function registerLazyModule({ config, path, module: eagerModule }) {
   if (eagerModule) {
     modules.register({ config, mount: createModuleLifecycleAdapter(config.id, eagerModule.mount) });
@@ -41,17 +76,7 @@ function registerLazyModule({ config, path, module: eagerModule }) {
     config,
     async mount(root) {
       const renderToken = root?.dataset?.renderToken || '';
-      let loaded = moduleCache.get(config.id);
-      if (!loaded) {
-        loaded = import(path)
-          .then(mod => mod.default || mod)
-          .catch(error => {
-            moduleCache.delete(config.id);
-            throw error;
-          });
-        moduleCache.set(config.id, loaded);
-      }
-      const module = await loaded;
+      const module = await loadLazyModule(config, path);
       if (renderToken && root?.dataset?.renderToken !== renderToken) {
         return () => {};
       }
@@ -66,7 +91,7 @@ function registerLazyModule({ config, path, module: eagerModule }) {
 lazyModules.forEach(registerLazyModule);
 
 restoreSessionSnapshot();
-window.addEventListener('pageshow', event => {
+trackGlobalEventListener(window, 'pageshow', event => {
   if (event.persisted) restoreSessionSnapshot();
 });
 
@@ -74,12 +99,12 @@ function persistSessionBeforeLeaving() {
   saveSessionSnapshot();
 }
 
-window.addEventListener('pagehide', persistSessionBeforeLeaving, { capture: true });
-window.addEventListener('beforeunload', persistSessionBeforeLeaving, { capture: true });
-document.addEventListener('visibilitychange', () => {
+trackGlobalEventListener(window, 'pagehide', persistSessionBeforeLeaving, { capture: true });
+trackGlobalEventListener(window, 'beforeunload', persistSessionBeforeLeaving, { capture: true });
+trackGlobalEventListener(document, 'visibilitychange', () => {
   if (document.visibilityState === 'hidden') persistSessionBeforeLeaving();
 });
-document.addEventListener('click', event => {
+trackGlobalEventListener(document, 'click', event => {
   const link = event.target.closest?.('a[href]');
   if (!link) return;
   const href = link.getAttribute('href') || '';
@@ -179,11 +204,11 @@ function onGlobalNavClick(event) {
   commitGlobalModuleNav(button, event);
 }
 
-document.addEventListener('pointerdown', onGlobalNavPointerDown, true);
-document.addEventListener('pointermove', onGlobalNavPointerMove, { capture: true, passive: true });
-document.addEventListener('pointercancel', onGlobalNavPointerCancel, true);
-document.addEventListener('pointerup', onGlobalNavPointerUp, true);
-document.addEventListener('click', onGlobalNavClick, true);
+trackGlobalEventListener(document, 'pointerdown', onGlobalNavPointerDown, true);
+trackGlobalEventListener(document, 'pointermove', onGlobalNavPointerMove, { capture: true, passive: true });
+trackGlobalEventListener(document, 'pointercancel', onGlobalNavPointerCancel, true);
+trackGlobalEventListener(document, 'pointerup', onGlobalNavPointerUp, true);
+trackGlobalEventListener(document, 'click', onGlobalNavClick, true);
 
 
 const app = document.getElementById('app');
@@ -193,7 +218,8 @@ const moduleRuntime = createModuleRuntime({
   renderNavigation,
   loadingView() {
     return '<div class="card tc-module-loading" role="status">Modul wird geladen...</div>';
-  }
+  },
+  loadingDelayMs: 180
 });
 
 function render(id){
@@ -202,8 +228,9 @@ function render(id){
 }
 initRouter(render);
 renderQuickAccessSettings();
+scheduleLazyModulePreload();
 
-document.addEventListener('techcalc-project-loaded', () => {
+trackGlobalEventListener(document, 'techcalc-project-loaded', () => {
   render(currentRoute());
 });
 
@@ -221,7 +248,7 @@ function ensurePdfExport() {
 }
 
 let resizeRaf = 0;
-window.addEventListener('resize', () => {
+trackGlobalEventListener(window, 'resize', () => {
   if (resizeRaf) return;
   resizeRaf = requestAnimationFrame(() => {
     resizeRaf = 0;
@@ -280,7 +307,7 @@ function applyThemeMode(mode = getStoredThemeMode()) {
 
 applyThemeMode();
 
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.3.0-rc.1';
 const FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
 
 function initFeedbackForm() {
@@ -354,8 +381,7 @@ function parseReleaseNotes(markdown = '') {
   for (const rawLine of lines) {
     const line = rawLine.trim();
     if (!line) continue;
-    const heading = line.match(/^##\s+(?:Version\s+)?([0-9]+\.[0-9]+\.[0-9]+)\s*(?:[-–]\s*(.*))?$/i)
-      || line.match(/^##\s+([0-9]+\.[0-9]+\.[0-9]+)\s*(?:[-–]\s*(.*))?$/i);
+    const heading = line.match(/^#{1,3}\s+(?:TechCalc\s+Pro\s+)?(?:Version\s+)?([0-9]+\.[0-9]+\.[0-9]+(?:[-.]rc\.?\d+)?)\s*(?:[-–]\s*(.*))?$/i);
     if (heading) {
       current = { version: heading[1], title: heading[2] || '', items: [] };
       notes.push(current);
@@ -389,7 +415,7 @@ async function loadReleaseNotes() {
   if (versionHost) versionHost.textContent = APP_VERSION;
 
   try {
-    const response = await fetch(`./RELEASE_NOTES.md?v=${encodeURIComponent(APP_VERSION)}&t=${Date.now()}`, {
+    const response = await fetch(`./RELEASE_NOTES.md?v=${encodeURIComponent(APP_VERSION)}`, {
       cache: 'no-store',
       headers: { 'Cache-Control': 'no-cache' }
     });
@@ -548,18 +574,18 @@ settingsPanel?.querySelectorAll('.theme-switch__option').forEach(button => {
   });
 });
 
-document.addEventListener('click', event => {
+trackGlobalEventListener(document, 'click', event => {
   if (!isSettingsOpen()) return;
   if (event.target.closest('#settingsButton') || event.target.closest('#settingsPanel')) return;
   setSettingsOpen(false);
 });
 
-document.addEventListener('keydown', event => {
+trackGlobalEventListener(document, 'keydown', event => {
   if (event.key === 'Escape') setSettingsOpen(false);
 });
 
 // iOS/Safari: lock the app background; only the drawer body is scrollable.
-document.addEventListener('touchmove', event => {
+trackGlobalEventListener(document, 'touchmove', event => {
   if (!isSettingsOpen()) return;
   const panel = event.target.closest('#settingsPanel');
   const scrollHost = event.target.closest('.settings-panel__body');
@@ -572,7 +598,7 @@ function updateHeaderTransparency(){
   if (!header) return;
   header.classList.toggle('is-scrolled', window.scrollY > 8);
 }
-window.addEventListener('scroll', updateHeaderTransparency, { passive: true });
+trackGlobalEventListener(window, 'scroll', updateHeaderTransparency, { passive: true });
 updateHeaderTransparency();
 
 if ('serviceWorker' in navigator) {
@@ -584,7 +610,7 @@ if ('serviceWorker' in navigator) {
     // aktuelle Berechnungsergebnisse in der Session nicht verloren gehen.
   });
 
-  window.addEventListener('load', () => {
+  trackGlobalEventListener(window, 'load', () => {
     navigator.serviceWorker.register(`./service-worker.js?v=${encodeURIComponent(APP_VERSION)}`).then(registration => registration.update());
   });
 }

@@ -11,7 +11,7 @@ assert.match(pipeline, /registerCentralActions/, 'central pipeline must expose a
 assert.match(pipeline, /tc:commit/, 'central pipeline must emit commit events for lifecycle integration');
 assert.match(pipeline, /field:change:immediate/, 'select/master-data changes must commit immediately');
 assert.match(pipeline, /field:blur[^\n]+notify: true/s, 'blur must trigger calculation immediately');
-assert.match(pipeline, /field:enter[^\n]+notify: true/s, 'Enter must trigger calculation immediately');
+assert.match(pipeline, /field:enter[\s\S]+commitElementField\(state, el, \{ action, notify: true, root \}\)/, 'Enter must trigger calculation immediately');
 assert.match(pipeline, /segment:select/, 'switches/segments must use one central action');
 assert.match(binding, /root\.__tcCentralEventPipelineBound/, 'legacy state binding must stand down when central pipeline is active');
 assert.match(renderer, /data-tc-action="segment"/, 'segment controls must be marked as central actions');

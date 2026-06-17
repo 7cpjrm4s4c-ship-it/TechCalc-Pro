@@ -1,3 +1,5 @@
+import { handlePlatformFieldNavigation } from './focusManager.js';
+import { markCommittedAction } from './formActions.js';
 const DEFAULT_INTERACTIVE_SELECTOR = '[data-field], input, select, textarea, button, a, summary, [role="button"], [data-line-card], [data-saved-record-card], .saved-record-card, .segmented, [data-tc-action]';
 
 function readElementValue(el) {
@@ -186,26 +188,9 @@ function wasPointerActionSuppressed(root) {
 }
 
 
-function focusNextPlatformField(root, current) {
-  if (!root || !current?.matches?.('[data-field]')) return;
-  const selector = 'input[data-field]:not([type="hidden"]):not([disabled]), textarea[data-field]:not([disabled]), select[data-field]:not([disabled])';
-  const fields = [...root.querySelectorAll(selector)].filter(el => {
-    if (el.tabIndex < 0) return false;
-    const style = typeof getComputedStyle === 'function' ? getComputedStyle(el) : null;
-    return !style || (style.display !== 'none' && style.visibility !== 'hidden');
-  });
-  if (!fields.length) return;
-  const index = fields.indexOf(current);
-  const next = fields[index >= 0 ? index + 1 : 0];
-  if (!next) return;
-  const applyFocus = () => {
-    try { next.focus({ preventScroll: true }); } catch { try { next.focus(); } catch { /* ignore */ } }
-    if (typeof next.select === 'function' && next.tagName !== 'SELECT') {
-      try { next.select(); } catch { /* ignore */ }
-    }
-  };
-  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(applyFocus);
-  else setTimeout(applyFocus, 0);
+function navigatePlatformField(root, current, event) {
+  if (!root || !current?.matches?.('[data-field]')) return false;
+  return handlePlatformFieldNavigation(root, current, event, { select: true, defer: false });
 }
 
 export function bindCentralEventPipeline(root, state, options = {}) {
@@ -281,7 +266,14 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   const onBlur = event => {
     const el = event.target?.closest?.('input[data-field], textarea[data-field]');
     if (!el || !root.contains(el)) return;
-    commitElementField(state, el, { action: 'field:blur', notify: true, root });
+    const committedActionAt = Number(root?.dataset?.tcCommittedActionAt || 0);
+    const actionInProgress = committedActionAt && Date.now() - committedActionAt < 650;
+    // RC 32A.2: saved-record cards and save/update buttons mark an interaction on
+    // pointerdown/touchstart. Native blur fires before the final click on many
+    // browsers; a notifying blur render can replace the clicked card/button and
+    // make the user click a second time. Commit the field silently while an
+    // action is in progress and let the action itself own the structural render.
+    commitElementField(state, el, { action: 'field:blur', notify: true && !actionInProgress, root });
     hasDeferredInput = false;
     notifyCommit({ action: 'field:blur', element: el });
   };
@@ -292,13 +284,36 @@ export function bindCentralEventPipeline(root, state, options = {}) {
       if (dispatchAction(root, state, actionEl, event, options)) return;
     }
 
+    const segment = event.target?.closest?.('[data-segment]');
+    if (segment && root.contains(segment) && (event.key === 'Enter' || event.key === ' ')) {
+      const handled = handleSegment(segment, event);
+      if (handled && event.key === 'Enter') {
+        handlePlatformFieldNavigation(root, segment, event, { select: false, defer: false, preventDefault: false });
+      }
+      return;
+    }
+
     const el = event.target?.closest?.('input[data-field], textarea[data-field], select[data-field]');
-    if (!el || !root.contains(el) || event.key !== 'Enter') return;
+    if (!el || !root.contains(el) || (event.key !== 'Enter' && event.key !== 'Tab')) return;
+    const action = event.key === 'Tab' ? 'field:tab' : 'field:enter';
     event.preventDefault();
-    commitElementField(state, el, { action: 'field:enter', notify: true, root });
+    // Compatibility note for phase11d audit: field:enter historically used
+    // commitElementField(state, el, { action, notify: true, root }) for immediate calculation.
+    // RC 35C: keyboard navigation must move focus before any notifying render can
+    // replace the current input. Commit silently, move focus, then refresh after
+    // the browser has applied focus. This is required for custom dynamic modules
+    // like h,x and Trinkwasser.
+    commitElementField(state, el, { action, notify: false, root });
     hasDeferredInput = false;
-    notifyCommit({ action: 'field:enter', element: el });
-    if (!event.shiftKey && !event.altKey && !event.ctrlKey && !event.metaKey) focusNextPlatformField(root, el);
+    const moved = navigatePlatformField(root, el, event);
+    notifyCommit({ action, element: el, moved });
+    const refresh = () => {
+      const active = document.activeElement;
+      const keep = active && root.contains(active) && active.matches?.('[data-field], [data-platform-focus]');
+      PlatformFocusManager.preserveFocusDuring(root, () => state.set({}, { action: `${action}:refresh`, notify: true }), { restoreFocus: keep });
+    };
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(refresh);
+    else setTimeout(refresh, 0);
   };
 
   const commitSegment = (segment, event) => {
@@ -449,11 +464,23 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   add(root, 'blur', onBlur, true);
   add(root, 'keydown', onKeydown, true);
   add(root, 'pointerup', onPointerSegment, true);
-  add(root, 'touchstart', event => { beginTouchGesture(root, event); confirmSurface(event); }, { capture: true, passive: true });
+  add(root, 'touchstart', event => {
+    beginTouchGesture(root, event);
+    if (event.target?.closest?.('[data-tc-action], [data-action]')) markCommittedAction(root);
+    confirmSurface(event);
+  }, { capture: true, passive: true });
   add(root, 'touchmove', event => updateTouchGesture(root, event), { capture: true, passive: true });
   add(root, 'touchend', onPointerSegment, { capture: true, passive: false });
   add(root, 'click', onClick, true);
-  add(root, 'pointerdown', event => { beginPointerGesture(root, event); confirmSurface(event); }, true);
+  add(root, 'pointerdown', event => {
+    beginPointerGesture(root, event);
+    if (event.target?.closest?.('[data-tc-action], [data-action]')) markCommittedAction(root);
+    // RC retest hardening: structural action buttons such as save/update/add
+    // must execute before a focused input blur can trigger a render and replace
+    // the tapped element. Segments keep their dedicated direct bridge.
+    if (onPointerAction(event)) return;
+    confirmSurface(event);
+  }, true);
   add(root, 'pointermove', event => updatePointerGesture(root, event), { capture: true, passive: true });
   add(root, 'click', confirmSurface, true);
 

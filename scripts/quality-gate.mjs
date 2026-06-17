@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 
 const commands = [
   ['node', ['scripts/check-js-imports.mjs']],
+  ['node', ['scripts/audit-module-smoke-phase31c.mjs']],
   ['node', ['tests/number-service.test.mjs']],
   ['node', ['tests/platform-policy.test.mjs']],
   ['node', ['tests/module-contract.test.mjs']],
@@ -81,6 +82,8 @@ const commands = [
   ['node', ['tests/reference-modules-phase17c9-heating-saved-contract.test.mjs']],
   ['node', ['tests/rainwater-phase17c11-heating-contract.test.mjs']],
   ['node', ['tests/rainwater-phase17c13-platform-dynamic-islands.test.mjs']],
+  ['node', ['tests/hx-diagram-phase32a3-mobile-action-hardening.test.mjs']],
+  ['node', ['tests/phase32d-loading-release-notes.test.mjs']],
   ['node', ['tests/central-platform-pipeline.test.mjs']],
   ['node', ['tests/state-binding.test.mjs']],
   ['node', ['tests/event-pipeline-phase11d.test.mjs']],

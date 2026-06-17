@@ -9,6 +9,16 @@ function clearGeneratedPath() {
   state.set({ activePath: [], points: [] }, { notify: false });
 }
 
+function commitFieldValue(rootEl, id, value, action = 'hx:field-commit') {
+  if (!id) return;
+  const input = rootEl?.querySelector?.(`[data-field="${id}"]`);
+  if (input) {
+    input.value = value;
+    input.dispatchEvent?.(new Event('input', { bubbles: true }));
+  }
+  state.set({ [id]: value, activePath: [], points: [] }, { action });
+}
+
 function normalizeProcessSnapshot(snapshot = {}) {
   const savedProcesses = normalizeSavedProcesses(snapshot);
   return { ...snapshot, savedProcesses, processes: savedProcesses };
@@ -25,6 +35,34 @@ function commitVisibleFields(rootEl) {
 
 function sameId(a, b) {
   return String(a ?? '') === String(b ?? '');
+}
+
+function captureHxActionScroll(rootEl) {
+  const scroller = rootEl?.closest?.('.app-main, .main, main, .module-scroll, .module-view') || document.scrollingElement || document.documentElement;
+  return {
+    scroller,
+    top: scroller?.scrollTop ?? 0,
+    left: scroller?.scrollLeft ?? 0,
+    winX: window.scrollX || 0,
+    winY: window.scrollY || 0
+  };
+}
+
+function restoreHxActionScroll(snapshot) {
+  if (!snapshot) return;
+  const apply = () => {
+    try {
+      if (snapshot.scroller) {
+        snapshot.scroller.scrollTop = snapshot.top;
+        snapshot.scroller.scrollLeft = snapshot.left;
+      }
+      window.scrollTo(snapshot.winX, snapshot.winY);
+    } catch { /* scroll restore only */ }
+  };
+  apply();
+  requestAnimationFrame(apply);
+  setTimeout(apply, 40);
+  setTimeout(apply, 120);
 }
 
 function readSavedProcessesFromState(snapshot = state.get()) {
@@ -76,10 +114,15 @@ export function deleteSavedProcessById(id) {
 
 function bindHxProcessActionOverrides(rootEl) {
   registerCentralActions(rootEl, {
+    'hx:clear': ({ root }) => clearDiagram(root || rootEl),
     'line:update': ({ root }) => updateActiveProcessFromDialog(root || rootEl),
-    'saved:delete': ({ element }) => {
+    'saved:delete': ({ element, root }) => {
       const id = element?.getAttribute?.('data-line-delete') || element?.closest?.('[data-line-delete]')?.getAttribute?.('data-line-delete');
-      if (id) deleteSavedProcessById(id);
+      if (id) {
+        const scroll = captureHxActionScroll(root || rootEl);
+        deleteSavedProcessById(id);
+        restoreHxActionScroll(scroll);
+      }
     }
   });
 }
@@ -125,29 +168,86 @@ export function hxProcessCard(snapshot = {}) {
   return hxProcessController.renderCard(normalizeProcessSnapshot(snapshot));
 }
 
-function clearDiagram() {
+function clearDiagram(rootEl = null) {
   clearLegacyPoints();
-  state.set({
+  const patch = {
     label: '',
     tempC: '',
     rhPercent: '',
     targetTempC: '',
     targetRhPercent: '',
+    process: 'heat',
     activeProcessId: null,
     activePath: [],
+    expandedProcessId: null,
     points: []
-  }, { action: 'hx:clear' });
+  };
+  if (rootEl?.querySelectorAll) {
+    ['tempC', 'rhPercent', 'targetTempC', 'targetRhPercent', 'hxProcessName'].forEach(id => {
+      const field = rootEl.querySelector(`#${id}, [data-field="${id}"]`);
+      if (field) field.value = '';
+    });
+  }
+  state.set(patch, { action: 'hx:clear' });
+}
+
+function shouldSkipDuplicateHxAction(rootEl, key) {
+  const last = rootEl?.__tcHxImmediateAction || {};
+  if (last.key === key && Date.now() - Number(last.at || 0) < 350) return true;
+  if (rootEl) rootEl.__tcHxImmediateAction = { key, at: Date.now() };
+  return false;
+}
+
+function handleHxSignToggle(rootEl, signButton, event) {
+  if (!signButton || !rootEl?.contains?.(signButton)) return false;
+  event?.preventDefault?.();
+  event?.stopPropagation?.();
+  event?.stopImmediatePropagation?.();
+  const id = signButton.dataset.hxSign;
+  if (shouldSkipDuplicateHxAction(rootEl, `sign:${id}`)) return true;
+  const input = rootEl.querySelector(`[data-field="${id}"]`);
+  const currentValue = input?.value ?? state.get?.()?.[id] ?? '';
+  const next = toggleNumericSign(currentValue);
+  commitFieldValue(rootEl, id, next, 'hx:toggle-sign');
+  // Do not focus/select the input after toggling. Retest showed the toggle
+  // must change only the sign, not place a text selection into the field.
+  return true;
+}
+
+function handleHxClear(rootEl, clearButton, event) {
+  if (!clearButton || !rootEl?.contains?.(clearButton)) return false;
+  event?.preventDefault?.();
+  event?.stopPropagation?.();
+  event?.stopImmediatePropagation?.();
+  if (shouldSkipDuplicateHxAction(rootEl, 'clear')) return true;
+  clearDiagram(rootEl);
+  return true;
 }
 
 function bindHxDelegation(rootEl) {
   if (!rootEl || rootEl.__tcHxDiagramActionsBound) return;
   rootEl.__tcHxDiagramActionsBound = true;
 
+  // RC 32A.3: mobile browsers dispatch blur/render before click after a virtual
+  // keyboard interaction. Handle the two h,x toolbar actions at pointerdown so
+  // the state mutation is not lost behind the subsequent structural render.
+  const earlyAction = event => {
+    const target = event.target;
+    const signButton = target?.closest?.('[data-hx-sign]');
+    if (handleHxSignToggle(rootEl, signButton, event)) return;
+    const clearButton = target?.closest?.('[data-hx-clear]');
+    handleHxClear(rootEl, clearButton, event);
+  };
+  rootEl.addEventListener('pointerdown', earlyAction, true);
+  rootEl.addEventListener('touchstart', earlyAction, { capture: true, passive: false });
+
   rootEl.addEventListener('input', event => {
     const field = event.target?.closest?.('[data-field]');
     if (!field || !rootEl.contains(field)) return;
     clearGeneratedPath();
   }, true);
+
+
 
   rootEl.addEventListener('change', event => {
     const field = event.target?.closest?.('[data-field]');
@@ -179,23 +279,10 @@ function bindHxDelegation(rootEl) {
     }
 
     const signButton = target.closest?.('[data-hx-sign]');
-    if (signButton && rootEl.contains(signButton)) {
-      event.preventDefault();
-      event.stopPropagation();
-      const id = signButton.dataset.hxSign;
-      const input = rootEl.querySelector(`[data-field="${id}"]`);
-      const next = toggleNumericSign(input?.value);
-      state.set({ [id]: next, activePath: [], points: [] }, { action: 'hx:toggle-sign' });
-      return;
-    }
+    if (handleHxSignToggle(rootEl, signButton, event)) return;
 
     const clearButton = target.closest?.('[data-hx-clear]');
-    if (clearButton && rootEl.contains(clearButton)) {
-      event.preventDefault();
-      event.stopPropagation();
-      clearDiagram();
-      return;
-    }
+    if (handleHxClear(rootEl, clearButton, event)) return;
   }, true);
 }
 

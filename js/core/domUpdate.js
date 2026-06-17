@@ -1,3 +1,4 @@
+import { restoreFocus as restorePlatformFocus } from './focusManager.js';
 export function safeReplaceContent(root, html, options = {}) {
   if (!root) return false;
   const next = String(html ?? '');
@@ -44,7 +45,7 @@ function restoreFocus(root, key, selection) {
   // require a second screen tap. Text inputs still keep their caret normally.
   if (next.tagName === 'SELECT') return;
   try {
-    next.focus({ preventScroll: true });
+    restorePlatformFocus(next);
     if (selection && 'setSelectionRange' in next && next.value === selection.value) {
       next.setSelectionRange(selection.start, selection.end);
     }

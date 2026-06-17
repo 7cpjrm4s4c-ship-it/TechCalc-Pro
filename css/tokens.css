@@ -20,26 +20,36 @@
   --accent-purple: #a98cff;
   --gradient-brand: linear-gradient(90deg, #35e5ff 0%, #2c8cff 45%, #ff8a24 100%);
 
-  /* 8px spacing system */
+  /* Phase 33: single-source UI spacing and radius contract.
+     The module UI grid uses one global 10px rhythm for cards, fields and controls. */
   --space-0: 0;
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 16px;
-  --space-4: 24px;
-  --space-5: 32px;
-  --space-6: 40px;
-  --space-7: 48px;
+  --space-05: 5px;
+  --space-1: 10px;
+  --space-2: 20px;
+  --space-3: 30px;
+  --space-4: 40px;
+  --space-5: 50px;
+  --space-6: 60px;
+  --space-7: 70px;
 
-  --ui-gap: var(--space-2);
-  --card-gap: var(--space-2);
-  --card-padding: var(--space-3);
-  --field-gap: var(--space-2);
-  --section-gap: var(--space-2);
+  --tc-gap: 10px;
+  --tc-card-padding: 10px;
+  --tc-control-height: 50px;
+  --tc-control-padding-x: 10px;
+  --tc-radius-base: 14px;
+  --tc-radius-card: 18px;
+  --tc-radius-pill: 999px;
 
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 22px;
-  --radius-xl: 30px;
+  --ui-gap: var(--tc-gap);
+  --card-gap: var(--tc-gap);
+  --card-padding: var(--tc-card-padding);
+  --field-gap: var(--tc-gap);
+  --section-gap: var(--tc-gap);
+
+  --radius-sm: calc(var(--tc-radius-base) - 6px);
+  --radius-md: var(--tc-radius-base);
+  --radius-lg: calc(var(--tc-radius-base) + 4px);
+  --radius-xl: var(--tc-radius-card);
 
   --shadow-glass: 0 20px 70px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08);
   --shadow-active: 0 0 0 1px rgba(53,170,255,.45), 0 0 28px rgba(53,170,255,.2);
@@ -83,8 +93,6 @@ body::before {
   z-index: 39;
   pointer-events: none;
 }
-
-
 
 /* Hard viewport width lock: prevents mobile layouts and wide content from pushing the page sideways. */
 body,
@@ -158,3 +166,11 @@ canvas {
     radial-gradient(circle at 84% 22%, rgba(249,115,22,.10), transparent 30%),
     linear-gradient(135deg, #f8fafc, #eef4fb 52%, #e8eef7) !important;
 }
+
+/* Phase 36Q.4: single global spacing contract */
+:root {
+  --tc-gap: 10px;
+  --ui-gap: var(--tc-gap);
+  --section-gap: var(--tc-gap);
+}
+

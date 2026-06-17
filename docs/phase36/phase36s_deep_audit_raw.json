@@ -1,0 +1,423 @@
+{
+  "basis": "techcalc-pro-1.3.0-rc.1-phase36q5a-focus-details-auto-open.zip",
+  "modules": {
+    "js/modules/heating-cooling": {
+      "files": [
+        "js/modules/heating-cooling/config.js",
+        "js/modules/heating-cooling/controller.js",
+        "js/modules/heating-cooling/index.js",
+        "js/modules/heating-cooling/logic.js",
+        "js/modules/heating-cooling/results.js",
+        "js/modules/heating-cooling/schema.js",
+        "js/modules/heating-cooling/state.js",
+        "js/modules/heating-cooling/view.js",
+        "js/modules/heating-cooling/viewModel.js"
+      ],
+      "bindCentralEventPipeline": false,
+      "handlePlatformFieldNavigation": false,
+      "localKeydownHandlers": 0,
+      "refreshInKeydown": false,
+      "preserveFocusDuring": false,
+      "safeReplaceContent": false,
+      "innerHTMLAssignments": 0,
+      "setInnerUsage": false,
+      "renderModuleShell": true,
+      "stackUsage": 4,
+      "span6Count": 2,
+      "detailsCount": 0,
+      "dataFieldCountStatic": 0
+    },
+    "js/modules/ventilation": {
+      "files": [
+        "js/modules/ventilation/config.js",
+        "js/modules/ventilation/controller.js",
+        "js/modules/ventilation/index.js",
+        "js/modules/ventilation/logic.js",
+        "js/modules/ventilation/results.js",
+        "js/modules/ventilation/schema.js",
+        "js/modules/ventilation/state.js",
+        "js/modules/ventilation/view.js",
+        "js/modules/ventilation/viewModel.js"
+      ],
+      "bindCentralEventPipeline": false,
+      "handlePlatformFieldNavigation": false,
+      "localKeydownHandlers": 0,
+      "refreshInKeydown": false,
+      "preserveFocusDuring": false,
+      "safeReplaceContent": false,
+      "innerHTMLAssignments": 0,
+      "setInnerUsage": false,
+      "renderModuleShell": true,
+      "stackUsage": 3,
+      "span6Count": 2,
+      "detailsCount": 0,
+      "dataFieldCountStatic": 0
+    },
+    "js/modules/pressure-holding": {
+      "files": [
+        "js/modules/pressure-holding/config.js",
+        "js/modules/pressure-holding/controller.js",
+        "js/modules/pressure-holding/index.js",
+        "js/modules/pressure-holding/logic.js",
+        "js/modules/pressure-holding/results.js",
+        "js/modules/pressure-holding/schema.js",
+        "js/modules/pressure-holding/state.js",
+        "js/modules/pressure-holding/view.js",
+        "js/modules/pressure-holding/viewModel.js"
+      ],
+      "bindCentralEventPipeline": false,
+      "handlePlatformFieldNavigation": false,
+      "localKeydownHandlers": 0,
+      "refreshInKeydown": false,
+      "preserveFocusDuring": false,
+      "safeReplaceContent": false,
+      "innerHTMLAssignments": 0,
+      "setInnerUsage": false,
+      "renderModuleShell": true,
+      "stackUsage": 2,
+      "span6Count": 2,
+      "detailsCount": 0,
+      "dataFieldCountStatic": 0
+    },
+    "js/modules/buffer-storage": {
+      "files": [
+        "js/modules/buffer-storage/config.js",
+        "js/modules/buffer-storage/controller.js",
+        "js/modules/buffer-storage/index.js",
+        "js/modules/buffer-storage/logic.js",
+        "js/modules/buffer-storage/results.js",
+        "js/modules/buffer-storage/schema.js",
+        "js/modules/buffer-storage/state.js",
+        "js/modules/buffer-storage/view.js",
+        "js/modules/buffer-storage/viewModel.js"
+      ],
+      "bindCentralEventPipeline": false,
+      "handlePlatformFieldNavigation": false,
+      "localKeydownHandlers": 0,
+      "refreshInKeydown": false,
+      "preserveFocusDuring": false,
+      "safeReplaceContent": false,
+      "innerHTMLAssignments": 0,
+      "setInnerUsage": false,
+      "renderModuleShell": true,
+      "stackUsage": 4,
+      "span6Count": 2,
+      "detailsCount": 0,
+      "dataFieldCountStatic": 0
+    },
+    "js/modules/hx-diagram": {
+      "files": [
+        "js/modules/hx-diagram/config.js",
+        "js/modules/hx-diagram/controller.js",
+        "js/modules/hx-diagram/diagramRenderer.js",
+        "js/modules/hx-diagram/dynamicRenderer.js",
+        "js/modules/hx-diagram/formRenderer.js",
+        "js/modules/hx-diagram/index.js",
+        "js/modules/hx-diagram/logic.js",
+        "js/modules/hx-diagram/renderPipeline.js",
+        "js/modules/hx-diagram/results.js",
+        "js/modules/hx-diagram/schema.js",
+        "js/modules/hx-diagram/state.js",
+        "js/modules/hx-diagram/view.js",
+        "js/modules/hx-diagram/viewModel.js"
+      ],
+      "bindCentralEventPipeline": false,
+      "handlePlatformFieldNavigation": true,
+      "localKeydownHandlers": 1,
+      "refreshInKeydown": false,
+      "preserveFocusDuring": true,
+      "safeReplaceContent": false,
+      "innerHTMLAssignments": 2,
+      "setInnerUsage": true,
+      "renderModuleShell": true,
+      "stackUsage": 2,
+      "span6Count": 0,
+      "detailsCount": 0,
+      "dataFieldCountStatic": 3
+    },
+    "js/modules/drinking-water": {
+      "files": [
+        "js/modules/drinking-water/config.js",
+        "js/modules/drinking-water/controller.js",
+        "js/modules/drinking-water/dynamicRenderer.js",
+        "js/modules/drinking-water/index.js",
+        "js/modules/drinking-water/logic.js",
+        "js/modules/drinking-water/results.js",
+        "js/modules/drinking-water/schema.js",
+        "js/modules/drinking-water/state.js",
+        "js/modules/drinking-water/view.js",
+        "js/modules/drinking-water/viewModel.js"
+      ],
+      "bindCentralEventPipeline": false,
+      "handlePlatformFieldNavigation": true,
+      "localKeydownHandlers": 2,
+      "refreshInKeydown": true,
+      "preserveFocusDuring": true,
+      "safeReplaceContent": true,
+      "innerHTMLAssignments": 1,
+      "setInnerUsage": false,
+      "renderModuleShell": true,
+      "stackUsage": 5,
+      "span6Count": 2,
+      "detailsCount": 13,
+      "dataFieldCountStatic": 1
+    },
+    "js/modules/rainwater": {
+      "files": [
+        "js/modules/rainwater/config.js",
+        "js/modules/rainwater/controller.js",
+        "js/modules/rainwater/index.js",
+        "js/modules/rainwater/logic.js",
+        "js/modules/rainwater/results.js",
+        "js/modules/rainwater/schema.js",
+        "js/modules/rainwater/state.js",
+        "js/modules/rainwater/tables.js",
+        "js/modules/rainwater/view.js",
+        "js/modules/rainwater/viewModel.js"
+      ],
+      "bindCentralEventPipeline": false,
+      "handlePlatformFieldNavigation": false,
+      "localKeydownHandlers": 0,
+      "refreshInKeydown": false,
+      "preserveFocusDuring": false,
+      "safeReplaceContent": false,
+      "innerHTMLAssignments": 0,
+      "setInnerUsage": false,
+      "renderModuleShell": true,
+      "stackUsage": 2,
+      "span6Count": 2,
+      "detailsCount": 0,
+      "dataFieldCountStatic": 0
+    },
+    "js/modules/wastewater": {
+      "files": [
+        "js/modules/wastewater/config.js",
+        "js/modules/wastewater/controller.js",
+        "js/modules/wastewater/index.js",
+        "js/modules/wastewater/lineModel.js",
+        "js/modules/wastewater/logic.js",
+        "js/modules/wastewater/results.js",
+        "js/modules/wastewater/schema.js",
+        "js/modules/wastewater/state.js",
+        "js/modules/wastewater/tables.js",
+        "js/modules/wastewater/view.js",
+        "js/modules/wastewater/viewModel.js"
+      ],
+      "bindCentralEventPipeline": false,
+      "handlePlatformFieldNavigation": false,
+      "localKeydownHandlers": 1,
+      "refreshInKeydown": false,
+      "preserveFocusDuring": false,
+      "safeReplaceContent": false,
+      "innerHTMLAssignments": 0,
+      "setInnerUsage": false,
+      "renderModuleShell": true,
+      "stackUsage": 3,
+      "span6Count": 2,
+      "detailsCount": 0,
+      "dataFieldCountStatic": 0
+    },
+    "rainwater_view": {
+      "file": "js/modules/rainwater/view.js",
+      "span_layout": [
+        "<div class=\"span-6\">${inputColumn}</div>\n      <div class=\"span-6\">${outputColumn}</div>\n    `);\n  }\n\n  const dynamicRenderers = {\n    renderForm: (s, r) => createRainwaterViewModel(s, r).formHtml,\n    renderResult: (s, r) => createRainwaterViewModel(s, r).resultHtml\n  };\n\n  return { view, dynamicRenderers };\n}\n\nexport"
+      ],
+      "stack_columns": [
+        "const inputColumn = stack([\n      `<div data-rw-dynamic=\"form\">${vm.formHtml}</div>`,\n      lineSectionController.renderCard(s)\n    ].join(''))",
+        "const outputColumn = stack([\n      `<div data-rw-dynamic=\"result\">${vm.resultHtml}</div>`\n    ].join(''))"
+      ],
+      "data_dynamic_attrs": [
+        "form",
+        "result"
+      ],
+      "lineSectionControllerRenderCard": true,
+      "resultPlacementIndex": 928,
+      "savedPlacementIndex": 812
+    },
+    "wastewater_view": {
+      "file": "js/modules/wastewater/view.js",
+      "span_layout": [
+        "<div class=\"span-6\">${inputColumn}</div>\n      <div class=\"span-6\">${outputColumn}</div>\n    `);\n  }\n\n  const dynamicRenderers = {\n    renderResult: renderWastewaterResult,\n    renderFixtures: renderWastewaterFixtures\n  };\n\n  return { view, dynamicRenderers };\n}\n\nexport default createWastewaterView;\n"
+      ],
+      "stack_columns": [
+        "const inputColumn = stack([\n      card('Nutzung', `<div data-ww-dynamic=\"usage\">${vm.usageHtml}</div>`, 'green'),\n      card('Leitungsart / Randbedingungen', `<div data-ww-dynamic=\"line-fields\">${vm.lineHtml}</div>`, 'green'),\n      card('Entwässerungsgegenstände', stack([\n        `<div data-ww-dynamic=\"fixture-inputs\">${vm.fixtureInputHtml}</div>`,\n        `<div data-ww-dynamic=\"fixtures\">${renderWastewaterFixtures(r.fixtures || [])}</div>`\n      ].join(''))",
+        "const outputColumn = stack([\n      `<div data-ww-dynamic=\"result\">${renderWastewaterResult(s, r)}</div>`\n    ].join(''))"
+      ],
+      "data_dynamic_attrs": [
+        "additional-flows",
+        "fixture-inputs",
+        "fixtures",
+        "line-fields",
+        "result",
+        "usage"
+      ],
+      "lineSectionControllerRenderCard": true,
+      "resultPlacementIndex": 128,
+      "savedPlacementIndex": 2792
+    },
+    "pressure_view": {
+      "file": "js/modules/pressure-holding/view.js",
+      "span_layout": [
+        "<div class=\"span-6\">${inputColumn}</div><div class=\"span-6\" data-ph-dynamic=\"result\">${vm.resultHtml}</div>`);\n}\n\nexport default view;\n"
+      ],
+      "stack_columns": [
+        "const inputColumn = stack([\n    card('Berechnungsart', `<div data-ph-dynamic=\"basis\">${vm.basisHtml}</div>`, 'purple'),\n    card(vm.holdingOptionsTitle, `<div data-ph-dynamic=\"holding-options\">${vm.holdingOptionsHtml}</div>`, 'purple'),\n    card('Anlagenvolumen', `<div data-ph-dynamic=\"volume-fields\">${vm.volumeFieldsHtml}</div>`, 'purple'),\n    card('Temperaturen / Stoffwerte', `<div data-ph-dynamic=\"temperature-fields\">${vm.temperatureFieldsHtml}</div>`, 'purple'),\n    card('Druckdaten', `<div data-ph-dynamic=\"pressure-fields\">${vm.pressureFieldsHtml}</div>`, 'purple'),\n    `<div data-ph-dynamic=\"saved-records\">${vm.savedRecordsHtml}</div>`\n  ].join(''))"
+      ],
+      "data_dynamic_attrs": [
+        "basis",
+        "holding-options",
+        "pressure-fields",
+        "result",
+        "saved-records",
+        "temperature-fields",
+        "volume-fields"
+      ],
+      "lineSectionControllerRenderCard": false,
+      "resultPlacementIndex": 1097,
+      "savedPlacementIndex": -1
+    },
+    "buffer_view": {
+      "file": "js/modules/buffer-storage/view.js",
+      "span_layout": [
+        "<div class=\"span-6\">${inputColumn}</div><div class=\"span-6\">${resultColumn}</div>`);\n}\n\nconst renderWithViewModel = renderer => (s, r) => renderer(createBufferStorageViewModel(s, r));\n\nconst bufferStorageDynamicRenderer = createBufferStorageDynamicRenderer({\n  calculate,\n  renderMedium: renderWithViewModel(renderMedium"
+      ],
+      "stack_columns": [
+        "const inputColumn = stack([\n    card('Berechnungsart', stack([\n      `<div class=\"buffer-mode-tabs\">${segmented('calculationMode', vm.bufferModeOptions, s.calculationMode, { accent: vm.accent })}</div>`,\n      '<p class=\"tc-help ph-help\">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'\n    ].join(''))",
+        "const resultColumn = stack([\n    `<div data-buffer-dynamic=\"result\">${renderResultContent(vm)}</div>`\n  ].join(''))"
+      ],
+      "data_dynamic_attrs": [
+        "input-blocks",
+        "medium",
+        "result",
+        "saved-records"
+      ],
+      "lineSectionControllerRenderCard": false,
+      "resultPlacementIndex": 341,
+      "savedPlacementIndex": -1
+    },
+    "heating_view": {
+      "file": "js/modules/heating-cooling/view.js",
+      "span_layout": [
+        "<div class=\"span-6\">${inputColumn}</div>\n      <div class=\"span-6\">${stack([`<div data-hc-dynamic=\"pipe-recommendation\">${renderPipeRecommendation(s, r)}</div>`, lineSectionController.renderCard(s)].join(''))}</div>\n    `);\n  }\n\n  const dynamicRenderers = {\n    renderMediumStats: (_s, r) => renderResultTable(mediumRows"
+      ],
+      "stack_columns": [],
+      "data_dynamic_attrs": [
+        "formula",
+        "input-fields",
+        "medium-stats",
+        "mode-segment",
+        "pipe-recommendation",
+        "result",
+        "target-segment"
+      ],
+      "lineSectionControllerRenderCard": true,
+      "resultPlacementIndex": 318,
+      "savedPlacementIndex": 3068
+    },
+    "ventilation_view": {
+      "file": "js/modules/ventilation/view.js",
+      "span_layout": [
+        "<div class=\"span-6\">${inputColumn}</div>\n      <div class=\"span-6\">${outputColumn}</div>\n    `);\n  };\n}\n"
+      ],
+      "stack_columns": [
+        "const inputColumn = stack([\n      card('Temperaturen', `<div data-vent-dynamic=\"temperatures\">${temperatureFields(s, active)}</div>`, accent),\n      card('Betriebsart', `<div data-vent-dynamic=\"mode-segment\">${renderModeSegment(s, accent)}</div>`, accent, { compact: true }),\n      card(`${modeLabel} — Eingaben`, stack([\n        `<div data-vent-dynamic=\"target-segment\">${renderTargetSegment(s, active, accent)}</div>`,\n        `<div data-vent-dynamic=\"input-fields\">${grid(inputFields(s, active).join(''), 2)}</div>`\n      ].join(''))",
+        "const outputColumn = stack([\n      `<div data-vent-dynamic=\"result\">${renderVentilationResult(s, r, active, accent)}</div>`,\n      `<div data-vent-dynamic=\"air-stats\">${renderAirStats(r)}</div>`,\n      lineSectionController.renderCard(s)\n    ].join(''))"
+      ],
+      "data_dynamic_attrs": [
+        "air-stats",
+        "formula",
+        "input-fields",
+        "mode-segment",
+        "result",
+        "target-segment",
+        "temperatures"
+      ],
+      "lineSectionControllerRenderCard": true,
+      "resultPlacementIndex": 222,
+      "savedPlacementIndex": 3826
+    }
+  },
+  "css": {
+    "result_rules": [
+      {
+        "selector": ".card, .tc-card, .result-card",
+        "body": "display: flex;\n  flex-direction: column;\n  gap: var(--tc-gap);\n  min-height: 0;\n  margin: 0;\n  padding: var(--tc-card-padding);\n  overflow: hidden;"
+      },
+      {
+        "selector": ".card__body, .tc-card__body, .result-card__body",
+        "body": "display: grid;\n  gap: var(--tc-gap);\n  min-width: 0;"
+      },
+      {
+        "selector": ".card *, .tc-card *, .result-card *, .result-row *, .inline-stat *, .main-result *, .saved-record-card *, .line-section-card *",
+        "body": "min-width: 0;\n  max-width: 100%;\n  overflow-wrap: anywhere;"
+      },
+      {
+        "selector": "/* Results ---------------------------------------------------------------- */ .result-list, .tc-result-list, .inline-stats, .result-groups, .line-section-list, .saved-record-list, .tc-list, .tc-consumer-list, .tc-saved-list, .tc-fixture-list, .dw-list, .dw-consumer-list, .dw-fixture-list, .ph-saved-list",
+        "body": "display: grid; gap: var(--tc-gap); min-width: 0;"
+      },
+      {
+        "selector": ".result-row",
+        "body": "display: flex;\n  justify-content: space-between;\n  align-items: flex-start;\n  gap: var(--tc-gap);\n  min-height: 36px;\n  padding: var(--tc-gap) 0;\n  border-bottom: 1px solid rgba(255,255,255,.08);"
+      },
+      {
+        "selector": ".result-row span",
+        "body": "color: var(--color-muted);"
+      },
+      {
+        "selector": ".result-row strong",
+        "body": "color: var(--color-text); font-size: 18px; line-height: 1.2; text-align: left; white-space: normal;"
+      },
+      {
+        "selector": ".result-row small",
+        "body": "font-size: .85em; color: var(--color-text);"
+      },
+      {
+        "selector": ":root[data-theme='light'] strong, :root[data-theme='light'] .inline-stat strong, :root[data-theme='light'] .main-result strong, :root[data-theme='light'] .result-row strong",
+        "body": "color: #101827;"
+      },
+      {
+        "selector": ".result-row",
+        "body": "display: grid; grid-template-columns: 1fr;"
+      },
+      {
+        "selector": ".card, .tc-card, .result-card, .line-section-card, .saved-record-card, .ph-saved-item",
+        "body": "scroll-margin-top: calc(var(--header-height,72px) + 12px);"
+      },
+      {
+        "selector": "/* Phase 35A: RC retest UI contract hardening. Keep spacing, menu sizing and result rows globally consistent after 34D rebuild. */ .module-content, .module-content > *, .tc-stack, .card, .tc-card, .card__body, .tc-card__body, .result-card__body, .result-list, .result-groups, .inline-stats, .line-section-list, .saved-record-list, [data-platform-dynamic], [data-pipe-dynamic], [data-ph-dynamic], [data-buffer-dynamic], [data-hx-dynamic], [data-dw-dynamic]",
+        "body": "gap: var(--tc-gap);"
+      },
+      {
+        "selector": ".card, .tc-card, .result-card, .line-section-card, .saved-record-card, .ph-saved-item, .pipe-dimension-card, .inline-stat, .result-row, .main-result",
+        "body": "min-width: 0;\n  max-width: 100%;\n  overflow: hidden;"
+      },
+      {
+        "selector": ".card__body, .tc-card__body, .result-card__body, .line-section-card__body, .saved-record-card__body, [data-platform-dynamic], [data-buffer-dynamic=\"result\"], [data-hx-dynamic=\"results\"], [data-ph-dynamic=\"result\"], [data-pipe-dynamic=\"result\"]",
+        "body": "display: grid;\n  gap: var(--tc-gap);\n  align-content: start;"
+      },
+      {
+        "selector": ".result-row, .inline-stat, .main-result, .pipe-result-head, .tc-result-item",
+        "body": "padding: var(--tc-gap);\n  border-radius: var(--radius-md);"
+      },
+      {
+        "selector": ".result-row > *, .inline-stat > *, .main-result > *, .pipe-result-head > *, .tc-result-item > *",
+        "body": "min-width: 0;\n  max-width: 100%;\n  overflow-wrap: anywhere;\n  white-space: normal;"
+      },
+      {
+        "selector": ".tc-stack, .tc-stack--section, .card__body, .tc-card__body, .result-card__body",
+        "body": "gap: var(--tc-gap);"
+      },
+      {
+        "selector": "/* Do not stack vertical margins inside card bodies; spacing is gap-owned. */ .card__body > *, .tc-card__body > *, .result-card__body > *, .tc-stack > *",
+        "body": "margin-top: 0;\n  margin-bottom: 0;"
+      }
+    ],
+    "result_row_padding_occurrences": [
+      ".result-row {\n  display: flex;\n  justify-content: space-between;\n  align-items: flex-start;\n  gap: var(--tc-gap);\n  min-height: 36px;\n  padding: var(--tc-gap) 0;",
+      ".result-row,\n.inline-stat,\n.main-result,\n.pipe-result-head,\n.tc-result-item {\n  padding: var(--tc-gap);"
+    ],
+    "dynamic_display_contents": false,
+    "rw_ww_dynamic_rules": []
+  },
+  "pipeline": {}
+}

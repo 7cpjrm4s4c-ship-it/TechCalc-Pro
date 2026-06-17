@@ -38,17 +38,25 @@ export function renderPlatformForm({ config, schema, state, result } = {}) {
   return renderFormSchema(schema, state, { title: 'Eingaben', accent, result });
 }
 
-export function renderPlatformResultsAndSaved({ config, resultModel, savedRecords } = {}) {
+export function renderPlatformSaved({ config, savedRecords } = {}) {
   const accent = config?.accent || 'blue';
-  const results = renderResultModel(resultModel || {}, accent);
-  const saved = renderSavedRecords(savedRecords, accent);
-  return stack([results, saved].filter(Boolean).join(''));
+  return renderSavedRecords(savedRecords, accent);
+}
+
+export function renderPlatformResultsAndSaved({ config, resultModel } = {}) {
+  return renderPlatformResults({ config, resultModel });
+}
+
+export function renderPlatformResults({ config, resultModel } = {}) {
+  const accent = config?.accent || 'blue';
+  return renderResultModel(resultModel || {}, accent);
 }
 
 export function renderPlatformModuleView({ config, schema, state, result, resultModel, savedRecords } = {}) {
   const form = renderPlatformForm({ config, schema, state, result });
-  const side = renderPlatformResultsAndSaved({ config, resultModel, savedRecords });
-  return renderModuleShell(config, `<div class="span-6" data-platform-dynamic="form">${form}</div><div class="span-6" data-platform-dynamic="result-saved">${side}</div>`);
+  const saved = renderPlatformSaved({ config, savedRecords });
+  const side = renderPlatformResults({ config, resultModel });
+  return renderModuleShell(config, `<div class="span-6 tc-stack" data-platform-dynamic="form-saved"><div data-platform-dynamic="form">${form}</div><div data-platform-dynamic="saved-records">${saved}</div></div><div class="span-6" data-platform-dynamic="result-saved">${side}</div>`);
 }
 
 export default { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved };

@@ -19,6 +19,7 @@ const report = {
   note: 'Phase 8 tightens the !important budget after removing duplicated settings-panel overrides. Remaining usages are tracked debt, not a default styling mechanism.',
   examples: details.slice(0, 40)
 };
-fs.writeFileSync('important-usage-audit-phase8.json', JSON.stringify(report, null, 2));
+fs.mkdirSync('docs/audits/json', { recursive: true });
+fs.writeFileSync('docs/audits/json/important-usage-audit-phase8.json', JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report, null, 2));
 if (total > 35) process.exitCode = 1;

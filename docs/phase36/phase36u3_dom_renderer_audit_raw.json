@@ -1,0 +1,251 @@
+{
+  "basis": "techcalc-pro-1.3.0-rc.1-phase36v1-hx-field-action-dynamic-path.zip",
+  "summaries": {
+    "wastewater": {
+      "renderModuleShell": true,
+      "stack_calls": 3,
+      "card_calls": 4,
+      "span6": 2,
+      "span12": 0,
+      "dynamic_wrappers": [
+        "<div class=\"tc-stack\" data-ww-dynamic=\"usage\">",
+        "<div class=\"tc-stack\" data-ww-dynamic=\"line-fields\">",
+        "<div class=\"tc-stack\" data-ww-dynamic=\"fixture-inputs\">",
+        "<div class=\"tc-stack\" data-ww-dynamic=\"fixtures\">",
+        "<div class=\"tc-stack\" data-ww-dynamic=\"additional-flows\">",
+        "<div class=\"tc-stack\" data-ww-dynamic=\"result\">"
+      ],
+      "cards_in_stack_snippets": [
+        "const inputColumn = stack([\n      card('Nutzung', `<div class=\"tc-stack\" data-ww-dynamic=\"usage\">${vm.usageHtml}</div>`, 'green'),\n      card('Leitungsart / Randbedingungen', `<div class=\"tc-stack\" data-ww-dynamic=\"line-fields\">${vm.lineHtml}</div>`, 'green'),\n      card('Entwässerungsgegenstände', stack([\n        `<div class=\"tc-stack\" data-ww-dynamic=\"fixture-inputs\">${vm.fixtureInputHtml}</div>`,\n        `<div class=\"tc-stack\" data-ww-dynamic=\"fixtures\">${renderWastewaterFixtures(r.fixtures || [])}</div>`\n      ].join(''))",
+        "const outputColumn = stack([\n      `<div class=\"tc-stack\" data-ww-dynamic=\"result\">${renderWastewaterResult(s, r)}</div>`\n    ].join(''))"
+      ],
+      "direct_stack_wrappers": [
+        "class=\"tc-stack\" data-ww-dynamic=\"usage\"",
+        "class=\"tc-stack\" data-ww-dynamic=\"line-fields\"",
+        "class=\"tc-stack\" data-ww-dynamic=\"fixture-inputs\"",
+        "class=\"tc-stack\" data-ww-dynamic=\"fixtures\"",
+        "class=\"tc-stack\" data-ww-dynamic=\"additional-flows\"",
+        "class=\"tc-stack\" data-ww-dynamic=\"result\""
+      ],
+      "custom_classes": []
+    },
+    "rainwater": {
+      "renderModuleShell": true,
+      "stack_calls": 2,
+      "card_calls": 0,
+      "span6": 2,
+      "span12": 0,
+      "dynamic_wrappers": [
+        "<div class=\"tc-stack\" data-rw-dynamic=\"form\">",
+        "<div class=\"tc-stack\" data-rw-dynamic=\"result\">"
+      ],
+      "cards_in_stack_snippets": [
+        "const inputColumn = stack([\n      `<div class=\"tc-stack\" data-rw-dynamic=\"form\">${vm.formHtml}</div>`,\n      lineSectionController.renderCard(s)\n    ].join(''))",
+        "const outputColumn = stack([\n      `<div class=\"tc-stack\" data-rw-dynamic=\"result\">${vm.resultHtml}</div>`\n    ].join(''))"
+      ],
+      "direct_stack_wrappers": [
+        "class=\"tc-stack\" data-rw-dynamic=\"form\"",
+        "class=\"tc-stack\" data-rw-dynamic=\"result\""
+      ],
+      "custom_classes": []
+    },
+    "pressure": {
+      "renderModuleShell": true,
+      "stack_calls": 1,
+      "card_calls": 5,
+      "span6": 2,
+      "span12": 0,
+      "dynamic_wrappers": [
+        "<div data-ph-dynamic=\"basis\">",
+        "<div data-ph-dynamic=\"holding-options\">",
+        "<div data-ph-dynamic=\"volume-fields\">",
+        "<div data-ph-dynamic=\"temperature-fields\">",
+        "<div data-ph-dynamic=\"pressure-fields\">",
+        "<div data-ph-dynamic=\"saved-records\">",
+        "<div class=\"span-6\" data-ph-dynamic=\"result\">"
+      ],
+      "cards_in_stack_snippets": [
+        "const inputColumn = stack([\n    card('Berechnungsart', `<div data-ph-dynamic=\"basis\">${vm.basisHtml}</div>`, 'purple'),\n    card(vm.holdingOptionsTitle, `<div data-ph-dynamic=\"holding-options\">${vm.holdingOptionsHtml}</div>`, 'purple'),\n    card('Anlagenvolumen', `<div data-ph-dynamic=\"volume-fields\">${vm.volumeFieldsHtml}</div>`, 'purple'),\n    card('Temperaturen / Stoffwerte', `<div data-ph-dynamic=\"temperature-fields\">${vm.temperatureFieldsHtml}</div>`, 'purple'),\n    card('Druckdaten', `<div data-ph-dynamic=\"pressure-fields\">${vm.pressureFieldsHtml}</div>`, 'purple'),\n    `<div data-ph-dynamic=\"saved-records\">${vm.savedRecordsHtml}</div>`\n  ].join(''))"
+      ],
+      "direct_stack_wrappers": [],
+      "custom_classes": [
+        "ph-dynamic",
+        "pressure-fields"
+      ]
+    },
+    "buffer": {
+      "renderModuleShell": true,
+      "stack_calls": 4,
+      "card_calls": 5,
+      "span6": 2,
+      "span12": 0,
+      "dynamic_wrappers": [
+        "<div data-buffer-dynamic=\"medium\">",
+        "<div data-buffer-dynamic=\"input-blocks\">",
+        "<div data-buffer-dynamic=\"saved-records\">",
+        "<div data-buffer-dynamic=\"result\">"
+      ],
+      "cards_in_stack_snippets": [
+        "const inputColumn = stack([\n    card('Berechnungsart', stack([\n      `<div class=\"buffer-mode-tabs\">${segmented('calculationMode', vm.bufferModeOptions, s.calculationMode, { accent: vm.accent })}</div>`,\n      '<p class=\"tc-help ph-help\">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'\n    ].join(''))",
+        "const resultColumn = stack([\n    `<div data-buffer-dynamic=\"result\">${renderResultContent(vm)}</div>`\n  ].join(''))"
+      ],
+      "direct_stack_wrappers": [],
+      "custom_classes": [
+        "buffer-dynamic",
+        "buffer-help",
+        "buffer-input-grid",
+        "buffer-input-grid--defrost",
+        "buffer-input-grid--reserve",
+        "buffer-input-grid--runtime",
+        "buffer-mode-tabs",
+        "ph-help",
+        "ph-help--inline"
+      ]
+    },
+    "heating": {
+      "renderModuleShell": true,
+      "stack_calls": 4,
+      "card_calls": 3,
+      "span6": 2,
+      "span12": 0,
+      "dynamic_wrappers": [
+        "<div data-hc-dynamic=\"medium-stats\">",
+        "<div data-hc-dynamic=\"mode-segment\">",
+        "<div data-hc-dynamic=\"target-segment\">",
+        "<div data-hc-dynamic=\"input-fields\">",
+        "<div data-hc-dynamic=\"result\">",
+        "<div class=\"formula\" data-hc-dynamic=\"formula\">",
+        "<div data-hc-dynamic=\"pipe-recommendation\">"
+      ],
+      "cards_in_stack_snippets": [
+        "const inputColumn = stack([\n      mediumCard,\n      card('Betriebsart', `<div data-hc-dynamic=\"mode-segment\">${segmented('mode', [\n        { value: 'heating', label: '● Heizung' },\n        { value: 'cooling', label: '● Kälte' }\n      ], s.mode, { accent })}</div>`, accent, { compact: true }),\n      card(`${modeLabel} — Eingaben`, stack([\n        `<div data-hc-dynamic=\"target-segment\">${segmented(key(s, 'CalcTarget'), [\n          { value: 'power', label: 'Q Leistung' },\n          { value: 'massFlow', label: 'ṁ Massenstrom' },\n          { value: 'deltaT', label: 'ΔT Temperatur' }\n        ], active.calcTarget, { accent })}</div>`,\n        `<div data-hc-dynamic=\"input-fields\">${grid(inputFields(s, active).join(''), 2)}</div>`\n      ].join(''))"
+      ],
+      "direct_stack_wrappers": [],
+      "custom_classes": []
+    }
+  },
+  "css_gap_rules": [
+    {
+      "file": "css/components.css",
+      "selector": "/* Layout primitives ------------------------------------------------------- */ .module-content, .tc-grid, .grid-12",
+      "body": "display: grid;\n  grid-template-columns: repeat(12, minmax(0,1fr));\n  gap: var(--tc-gap);\n  align-items: start;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".module-content > .span-6, .module-content > .span-8, .module-content > .span-4, .module-content > .span-12",
+      "body": "min-width: 0;\n  display: flex;\n  flex-direction: column;\n  gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".tc-stack, .tc-stack--section, .card-grid, .form-grid, .two-column, .tc-two-column, .settings-list, .quick-access-list, .quick-access-pool",
+      "body": "display: grid;\n  gap: var(--tc-gap);\n  min-width: 0;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": "/* Phase 35A: RC retest UI contract hardening. Keep spacing, menu sizing and result rows globally consistent after 34D rebuild. */ .module-content, .module-content > *, .tc-stack, .card, .tc-card, .card__body, .tc-card__body, .result-card__body, .result-list, .result-groups, .inline-stats, .line-section-list, .saved-record-list, [data-platform-dynamic], [data-pipe-dynamic], [data-ph-dynamic], [data-buffer-dynamic], [data-hx-dynamic], [data-dw-dynamic]",
+      "body": "gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": "/* Phase 36Q.4: global card spacing contract */ .module-content",
+      "body": "gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".module-content > .span-4, .module-content > .span-6, .module-content > .span-8, .module-content > .span-12",
+      "body": "display: flex;\n  flex-direction: column;\n  gap: var(--tc-gap);\n  min-width: 0;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": ".tc-stack, .tc-stack--section, .card__body, .tc-card__body, .result-card__body",
+      "body": "gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/components.css",
+      "selector": "/* Wastewater: direct dynamic wrappers inside module columns need the same rhythm as cards. */ .module-view[data-module='wastewater'] .span-6 > [data-ww-dynamic]",
+      "body": "margin: 0;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": "/* Do not stack vertical margins inside card bodies; spacing is gap-owned. */ .card__body > *, .tc-card__body > *, .result-card__body > *, .tc-stack > *",
+      "body": "margin-top: 0;\n  margin-bottom: 0;"
+    },
+    {
+      "file": "css/components.css",
+      "selector": "/* Phase 36Q.5: complete dynamic wrapper display reset */ [data-ww-dynamic=\"usage\"], [data-ww-dynamic=\"line-fields\"], [data-ww-dynamic=\"fixture-inputs\"], [data-ww-dynamic=\"fixtures\"], [data-ww-dynamic=\"additional-flows\"], [data-ww-dynamic=\"result\"]",
+      "body": "display: block;\n  min-width: 0;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".module-content > *",
+      "body": "margin-block: 0;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".wastewater-subselect",
+      "body": "display: grid; gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"result\"], .module-view[data-module='hx-diagram'] [data-hx-dynamic=\"results\"], .module-view[data-module='wastewater'] .card__body",
+      "body": "display: grid;\n  gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": "/* Phase 36Q.4: wastewater follows global spacing only. */ .module-view[data-module='wastewater'] .card, .module-view[data-module='wastewater'] .result-card",
+      "body": "margin: 0;"
+    },
+    {
+      "file": "css/modules.css",
+      "selector": ".module-view[data-module='wastewater'] .card__body",
+      "body": "gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".module-view, .module-content, .tc-grid, .tc-fields, .card-grid, .form-grid",
+      "body": "row-gap: var(--ui-gap);\n  column-gap: var(--ui-gap);"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".tc-stack",
+      "body": "display: flex;\n  flex-direction: column;\n  gap: var(--ui-gap);"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".tc-stack > *",
+      "body": "margin-block: 0;"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".tc-stack > * + *",
+      "body": "margin-top: 0;"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".tc-stack--section",
+      "body": "gap: var(--section-gap);"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": "/* Renderer layout: module-content owns the 12-column grid; all direct module blocks use the central 8px gap. */ .module-content",
+      "body": "display: grid;\n  grid-template-columns: repeat(12, minmax(0, 1fr));\n  gap: var(--ui-gap);\n  grid-column: 1 / -1;\n  min-width: 0;"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": "/* Phase 36Q.4: renderer module columns use the same gap variable as cards. */ .module-content, .module-view, .tc-grid",
+      "body": "gap: var(--tc-gap);"
+    },
+    {
+      "file": "css/layout.css",
+      "selector": ".module-content > .span-12, .module-content > .span-8, .module-content > .span-6, .module-content > .span-4",
+      "body": "gap: var(--tc-gap);"
+    }
+  ],
+  "renderer_relevant": {
+    "export function stack": "export function stack(content, modifier = '') {\n  return `<div class=\"tc-stack ${modifier}\">${content}</div>`;\n}\n\nexport function grid(content, cols = 2) {\n  const cls = cols === 1 ? 'tc-fields tc-fields--1' : cols === 3 ? 'tc-fields tc-fields--3' : 'tc-fields';\n  return `<div class=\"${cls}\">${content}</div>`;\n}\n\nexport function card(title, body, accent = 'blue', options = {}) {\n  const compact = options.compact ? ' card--compact' : '';\n  return `<section class=\"card card--accent-${esc(accent)}${compact}\"><h2 class=\"card__title\">${esc(title)}</h2><div class=\"card__body\">${body}</div></section>`;\n}\n\nexport function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', inputmode = 'decimal', disabled = false, readonly = false, unitField = '', unitOptions = [] }) {\n  const unitHtml = unitOptions.length\n    ? `<select class=\"unit unit-select\" aria-label=\"Einheit\" data-field=\"${esc(unitField)}\" data-commit=\"immediate\">${unitOptions.map(o => `<option value=\"${esc(o.value)}\" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`\n    : unit ? `<span class=\"unit\">${esc(unit)}</span>` : '';\n  return `<div class=\"field\"><label for=\"${esc(id)}\">${esc(label)}</label><div class=\"control\"><input id=\"${esc(id)}\" data-field=\"${esc(id)}\" type=\"${esc(type)}\" inputmode=\"${esc(inputmode)}\" value=\"${esc(value ?? '')}\" placeholder=\"${esc(placeholder)}\" ${disabled ? 'disabled' : ''} ${readonly ? 'readonly aria-readonly=\"true\"' : ''} autocomplete=\"off\">${unitHtml}</div></div>`;\n}\n\nexport function selectField({ id, label, value, options, commit = '",
+    "export function card": "export function card(title, body, accent = 'blue', options = {}) {\n  const compact = options.compact ? ' card--compact' : '';\n  return `<section class=\"card card--accent-${esc(accent)}${compact}\"><h2 class=\"card__title\">${esc(title)}</h2><div class=\"card__body\">${body}</div></section>`;\n}\n\nexport function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', inputmode = 'decimal', disabled = false, readonly = false, unitField = '', unitOptions = [] }) {\n  const unitHtml = unitOptions.length\n    ? `<select class=\"unit unit-select\" aria-label=\"Einheit\" data-field=\"${esc(unitField)}\" data-commit=\"immediate\">${unitOptions.map(o => `<option value=\"${esc(o.value)}\" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`\n    : unit ? `<span class=\"unit\">${esc(unit)}</span>` : '';\n  return `<div class=\"field\"><label for=\"${esc(id)}\">${esc(label)}</label><div class=\"control\"><input id=\"${esc(id)}\" data-field=\"${esc(id)}\" type=\"${esc(type)}\" inputmode=\"${esc(inputmode)}\" value=\"${esc(value ?? '')}\" placeholder=\"${esc(placeholder)}\" ${disabled ? 'disabled' : ''} ${readonly ? 'readonly aria-readonly=\"true\"' : ''} autocomplete=\"off\">${unitHtml}</div></div>`;\n}\n\nexport function selectField({ id, label, value, options, commit = 'immediate', lookup = true, render = '' }) {\n  const commitAttr = commit ? ` data-commit=\"${esc(commit)}\"` : '';\n  const lookupAttr = lookup ? ' data-lookup=\"true\"' : '';\n  const renderAttr = render ? ` data-render=\"${esc(render)}\"` : '';\n  return `<div class=\"field\"><label for=\"${esc(id)}\">${esc(label)}</label><di",
+    "export function grid": "export function grid(content, cols = 2) {\n  const cls = cols === 1 ? 'tc-fields tc-fields--1' : cols === 3 ? 'tc-fields tc-fields--3' : 'tc-fields';\n  return `<div class=\"${cls}\">${content}</div>`;\n}\n\nexport function card(title, body, accent = 'blue', options = {}) {\n  const compact = options.compact ? ' card--compact' : '';\n  return `<section class=\"card card--accent-${esc(accent)}${compact}\"><h2 class=\"card__title\">${esc(title)}</h2><div class=\"card__body\">${body}</div></section>`;\n}\n\nexport function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', inputmode = 'decimal', disabled = false, readonly = false, unitField = '', unitOptions = [] }) {\n  const unitHtml = unitOptions.length\n    ? `<select class=\"unit unit-select\" aria-label=\"Einheit\" data-field=\"${esc(unitField)}\" data-commit=\"immediate\">${unitOptions.map(o => `<option value=\"${esc(o.value)}\" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`\n    : unit ? `<span class=\"unit\">${esc(unit)}</span>` : '';\n  return `<div class=\"field\"><label for=\"${esc(id)}\">${esc(label)}</label><div class=\"control\"><input id=\"${esc(id)}\" data-field=\"${esc(id)}\" type=\"${esc(type)}\" inputmode=\"${esc(inputmode)}\" value=\"${esc(value ?? '')}\" placeholder=\"${esc(placeholder)}\" ${disabled ? 'disabled' : ''} ${readonly ? 'readonly aria-readonly=\"true\"' : ''} autocomplete=\"off\">${unitHtml}</div></div>`;\n}\n\nexport function selectField({ id, label, value, options, commit = 'immediate', lookup = true, render = '' }) {\n  const commitAttr = commit ? ` data-commit=\"${esc(commit)}\"` : '';\n  ",
+    "export function field": "export function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', inputmode = 'decimal', disabled = false, readonly = false, unitField = '', unitOptions = [] }) {\n  const unitHtml = unitOptions.length\n    ? `<select class=\"unit unit-select\" aria-label=\"Einheit\" data-field=\"${esc(unitField)}\" data-commit=\"immediate\">${unitOptions.map(o => `<option value=\"${esc(o.value)}\" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`\n    : unit ? `<span class=\"unit\">${esc(unit)}</span>` : '';\n  return `<div class=\"field\"><label for=\"${esc(id)}\">${esc(label)}</label><div class=\"control\"><input id=\"${esc(id)}\" data-field=\"${esc(id)}\" type=\"${esc(type)}\" inputmode=\"${esc(inputmode)}\" value=\"${esc(value ?? '')}\" placeholder=\"${esc(placeholder)}\" ${disabled ? 'disabled' : ''} ${readonly ? 'readonly aria-readonly=\"true\"' : ''} autocomplete=\"off\">${unitHtml}</div></div>`;\n}\n\nexport function selectField({ id, label, value, options, commit = 'immediate', lookup = true, render = '' }) {\n  const commitAttr = commit ? ` data-commit=\"${esc(commit)}\"` : '';\n  const lookupAttr = lookup ? ' data-lookup=\"true\"' : '';\n  const renderAttr = render ? ` data-render=\"${esc(render)}\"` : '';\n  return `<div class=\"field\"><label for=\"${esc(id)}\">${esc(label)}</label><div class=\"control\"><select id=\"${esc(id)}\" data-field=\"${esc(id)}\"${commitAttr}${lookupAttr}${renderAttr}>${options.map(o => `<option value=\"${esc(o.value)}\" ${o.value === value ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select></div></div>`;\n}\n\n// Default central segment marke",
+    "renderModuleShell": "renderModuleShell(module, inner) {\n  return `<section class=\"module-view\" data-module=\"${esc(module.id)}\">\n    <div class=\"module-content\">${inner}</div>\n  </section>`;\n}\n\nfunction markCommittedInteraction(root) {\n  if (!root?.dataset) return;\n  root.dataset.tcCommittedActionAt = String(Date.now());\n}\n\nfunction bindCommittedInteractionGuard(root) {\n  if (!root || root.__tcCommittedInteractionGuardBound) return;\n  root.__tcCommittedInteractionGuardBound = true;\n  const selector = [\n    'button',\n    '[role=\"button\"]',\n    '[data-line-card]',\n    '[data-saved-record-card]',\n    '.saved-record-card',\n    '[data-saved-load]',\n    '[data-rainwater-select]',\n    '[data-wastewater-select]',\n    '[data-pipe-load]',\n    '[data-buffer-select]',\n    '[data-line-select]',\n    '[data-vent-line-select]'\n  ].join(',');\n  const capture = event => {\n    if (event.target?.closest?.(selector)) markCommittedInteraction(root);\n  };\n  root.addEventListener('pointerdown', capture, true);\n  root.addEventListener('mousedown', capture, true);\n  root.addEventListener('touchstart', capture, { capture: true, passive: true });\n}\n\nexport function bindCommonInputs(root, state) {\n  // hasUnrenderedInput, renderCommittedInput(), confirmBySurfaceTouch and event.key !== 'Enter' are now owned by the central event pipeline.\n  bindCommittedInteractionGuard(root);\n  bindCentralEventPipeline(root, state, { renderOnBlur: true });\n}\n\n"
+  }
+}

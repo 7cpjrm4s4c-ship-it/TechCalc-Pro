@@ -16,15 +16,6 @@ export const lineTypeLabel = value => ({
 const effectiveLineType = s => ['ground-full','ventilation'].includes(s.lineType) ? 'ground-outside' : s.lineType;
 const fillApplies = lineType => ['collector','ground-inside','ground-outside','branch-vented'].includes(lineType);
 
-function savedStats(record = {}) {
-  const r = record.result || {};
-  return [
-    { label:'Qtot', value:fmt(r.qtot || 0,2), unit:'l/s' },
-    { label:'Qww', value:fmt(r.qww || 0,2), unit:'l/s' },
-    { label:'ΣDU', value:fmt(r.sumDu || 0,1), unit:'l/s' },
-    { label:'Empfohlene DN', value:r.dn || '—' }
-  ];
-}
 
 export function results(s = {}, r = {}) {
   const lineType = effectiveLineType(s);
@@ -57,34 +48,5 @@ export function results(s = {}, r = {}) {
       prefix: 'Hinweis',
       messages: (r.warnings || []).length ? r.warnings : ['Keine Plausibilitätswarnungen.']
     }]
-  };
-}
-
-export function savedRecords(s = {}, r = {}) {
-  const items = (s.savedCalculations || []).map(item => {
-    const result = item.result || {};
-    return {
-      ...item,
-      title: item.name || 'Berechnung',
-      subtitle: [`${fmt(result.qtot || 0,2)} l/s`, result.dn, lineTypeLabel(result.lineType)].filter(Boolean).join(' · '),
-      stats: savedStats(item)
-    };
-  });
-  return {
-    title: 'Gespeicherte Berechnungen',
-    nameFieldId: 'name',
-    nameLabel: 'Bezeichnung',
-    nameValue: s.name || '',
-    namePlaceholder: 'z. B. Strang WC-Kern Nord',
-    addDisabled: Boolean(s.activeCalculationId),
-    updateDisabled: !s.activeCalculationId,
-    activeId: s.activeCalculationId,
-    expandedId: s.expandedCalculationId,
-    loadAttr: 'data-line-select',
-    toggleAttr: 'data-line-toggle',
-    deleteAttr: 'data-line-delete',
-    emptyText: 'Noch keine Schmutzwasser-Berechnungen gespeichert.',
-    accent: 'green',
-    items
   };
 }

@@ -17,7 +17,8 @@ for (const [name, controller, results] of [
   ['rainwater', rainwaterController, rainwaterResults],
   ['wastewater', wastewaterController, wastewaterResults]
 ]) {
-  assert.match(controller, /attrs:\s*\{\s*loadAttr:\s*'data-line-select',\s*toggleAttr:\s*'data-line-toggle',\s*deleteAttr:\s*'data-line-delete'\s*\}/, `${name} controller must use heating-style saved attrs.`);
+  assert.match(controller, /createLineSectionController\s*\(/, `${name} controller must use the heating-style line-section saved controller.`);
+  assert.doesNotMatch(controller, /attrs:\s*\{/, `${name} controller must not keep legacy saved attr configuration.`);
   assert.match(results, /loadAttr:\s*'data-line-select'/, `${name} result model must render heating-style load attr.`);
   assert.match(results, /toggleAttr:\s*'data-line-toggle'/, `${name} result model must render heating-style toggle attr.`);
   assert.match(results, /deleteAttr:\s*'data-line-delete'/, `${name} result model must render heating-style delete attr.`);

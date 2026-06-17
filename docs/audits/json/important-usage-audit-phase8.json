@@ -1,0 +1,13 @@
+{
+  "importantCount": 1,
+  "budget": 35,
+  "status": "ok",
+  "note": "Phase 8 tightens the !important budget after removing duplicated settings-panel overrides. Remaining usages are tracked debt, not a default styling mechanism.",
+  "examples": [
+    {
+      "file": "css/tokens.css",
+      "line": 169,
+      "text": "linear-gradient(135deg, #f8fafc, #eef4fb 52%, #e8eef7) !important;"
+    }
+  ]
+}

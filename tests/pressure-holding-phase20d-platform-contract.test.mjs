@@ -14,7 +14,7 @@ assert.doesNotMatch(indexSource, /function view\(/);
 assert.doesNotMatch(indexSource, /renderModuleShell/);
 assert.doesNotMatch(indexSource, /createSavedRecordActions/);
 
-assert.match(controllerSource, /createSavedRecordActions/, 'controller owns saved-record actions');
+assert.match(controllerSource, /createLineSectionController/, 'controller owns the central line-section saved-record controller');
 assert.match(controllerSource, /export function bindPressureHoldingActions/, 'controller exports platform bind hook');
 assert.match(controllerSource, /export function savedPlantsCard/, 'controller exports saved panel renderer for view/dynamic renderer');
 

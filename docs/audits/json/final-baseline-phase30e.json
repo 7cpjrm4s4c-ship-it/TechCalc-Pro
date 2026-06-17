@@ -1,0 +1,46 @@
+{
+  "phase": "30E",
+  "name": "Final Build Import Baseline",
+  "score": 4.9,
+  "grade": "A",
+  "counts": {
+    "jsFiles": 351,
+    "importFilesOk": null,
+    "docsPhaseFiles": 115,
+    "auditJsonFiles": 42,
+    "misplacedRootPhaseDocs": 0,
+    "misplacedRootAuditJson": 0,
+    "packageScriptTargets": 117,
+    "missingPackageScriptTargets": 0,
+    "retainedRuntimeReviewCandidates": 11
+  },
+  "validation": {
+    "importCheck": {
+      "status": "passed",
+      "filesOk": null,
+      "output": "syntax check ok (351 files)"
+    }
+  },
+  "conclusion": "Phase 30 cleanup is complete. Remaining P2 items are explicit manual runtime review candidates and not release blockers.",
+  "findings": [
+    {
+      "severity": "P2",
+      "area": "manual-runtime-review",
+      "count": 11,
+      "files": [
+        "js/core/eventDelegation.js",
+        "js/core/menuFallback.js",
+        "js/core/moduleContract.js",
+        "js/core/pdfExport.js",
+        "js/core/platformLifecycle.js",
+        "js/core/quality/appHealth.js",
+        "js/core/resultRenderer.js",
+        "js/core/savedCalculationController.js",
+        "js/core/schemaModuleMount.js",
+        "js/core/uiSystem.js",
+        "js/modules/wastewater/lineModel.js"
+      ]
+    }
+  ],
+  "generatedAt": "2026-06-11T07:52:48.182Z"
+}

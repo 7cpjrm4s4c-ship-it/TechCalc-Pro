@@ -5,6 +5,7 @@ import { chartCard } from './diagramRenderer.js';
 import { hxProcessCard, hxProcessController } from './controller.js';
 import { card, esc } from '../../core/renderer.js';
 import { parseNumber } from '../../core/numberService.js';
+import { preserveFocusDuring } from '../../core/focusManager.js';
 
 export const HX_DYNAMIC = Object.freeze({
   results: 'results',
@@ -26,7 +27,7 @@ export function renderProcessSelection(snapshotOrVm = {}) {
   const s = snapshotOrVm?.state || snapshotOrVm || {};
   const options = availableProcesses(s);
   return card('Luftbehandlung wählen', `<div class="hx-process-grid">
-    ${options.map(option => `<button type="button" data-segment="process" data-value="${esc(option.value)}" class="hx-process ${option.value === s.process ? 'is-active' : ''}">${esc(option.label)}</button>`).join('')}
+    ${options.map(option => `<button type="button" data-platform-focus data-segment="process" data-value="${esc(option.value)}" class="hx-process ${option.value === s.process ? 'is-active' : ''}">${esc(option.label)}</button>`).join('')}
   </div>`, 'cyan', { compact: true });
 }
 
@@ -53,8 +54,45 @@ function setInner(root, selector, html) {
   const el = root?.querySelector?.(selector);
   if (!el) return false;
   const next = String(html ?? '');
-  if (el.innerHTML !== next) el.innerHTML = next;
+  if (el.innerHTML !== next) preserveFocusDuring(root, () => { el.innerHTML = next; }, { skipSelect: true });
   return true;
+}
+
+function captureHxScroll(root) {
+  const scroller = root?.closest?.('.app-main, .main, main, .module-scroll, .module-view') || document.scrollingElement || document.documentElement;
+  return {
+    scroller,
+    top: scroller?.scrollTop ?? 0,
+    left: scroller?.scrollLeft ?? 0,
+    winX: window.scrollX || 0,
+    winY: window.scrollY || 0
+  };
+}
+
+function restoreHxScroll(snapshot) {
+  if (!snapshot) return;
+  const apply = () => {
+    try {
+      if (snapshot.scroller) {
+        snapshot.scroller.scrollTop = snapshot.top;
+        snapshot.scroller.scrollLeft = snapshot.left;
+      }
+      window.scrollTo(snapshot.winX, snapshot.winY);
+    } catch { /* scroll restore only */ }
+  };
+  apply();
+  requestAnimationFrame(apply);
+  setTimeout(apply, 40);
+  setTimeout(apply, 120);
+  setTimeout(apply, 260);
+}
+
+function withHxScrollFreeze(root, enabled, mutation) {
+  if (!enabled) return mutation();
+  const snapshot = captureHxScroll(root);
+  const result = mutation();
+  restoreHxScroll(snapshot);
+  return result;
 }
 
 export function syncSavedProcessControls(root, snapshot = {}) {
@@ -63,20 +101,34 @@ export function syncSavedProcessControls(root, snapshot = {}) {
 
 export function renderDynamicSections(root, snapshot = {}, meta = {}) {
   if (!root) return true;
-  const vm = createHxRenderModel(snapshot);
   const action = String(meta?.action || '');
   const changed = Array.isArray(meta?.changed) ? meta.changed : [];
   const savedStructural = /^(line:|saved:|hx:line:)/.test(action)
     || changed.some(key => ['savedProcesses', 'processes', 'activeProcessId', 'expandedProcessId', 'label'].includes(key));
 
+  if (savedStructural) {
+    return withHxScrollFreeze(root, true, () => {
+      syncSavedProcessControls(root, snapshot);
+
+      const rowsHost = root.querySelector?.(`[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"] [data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`);
+      if (rowsHost) {
+        const nextRows = hxProcessController.renderRows(snapshot);
+        if (rowsHost.innerHTML !== nextRows) preserveFocusDuring(root, () => { rowsHost.innerHTML = nextRows; }, { skipSelect: true });
+      } else {
+        const vm = createHxRenderModel(snapshot);
+        setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`, renderSavedProcesses(vm));
+      }
+
+      return true;
+    });
+  }
+
+  const vm = createHxRenderModel(snapshot);
   setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.process}"]`, renderProcessSelection(vm));
   setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.results}"]`, renderResults(vm));
   setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.diagram}"]`, renderDiagram(vm));
-
-  if (savedStructural) {
-    setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`, renderSavedProcesses(vm));
-  }
   syncSavedProcessControls(root, snapshot);
-  root.__tcHxRenderPipeline = { action, changed, at: Date.now() };
+
   return true;
 }
+

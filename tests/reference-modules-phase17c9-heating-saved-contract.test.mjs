@@ -5,6 +5,7 @@ const runtime = readFileSync('js/platform/moduleRuntime/index.js', 'utf8');
 const rainwaterController = readFileSync('js/modules/rainwater/controller.js', 'utf8');
 const wastewaterController = readFileSync('js/modules/wastewater/controller.js', 'utf8');
 const rainwaterResults = readFileSync('js/modules/rainwater/results.js', 'utf8');
+const rainwaterViewModel = readFileSync('js/modules/rainwater/viewModel.js', 'utf8');
 const wastewaterResults = readFileSync('js/modules/wastewater/results.js', 'utf8');
 const heating = readFileSync('js/platform/lineSectionController/index.js', 'utf8');
 
@@ -17,11 +18,15 @@ assert.match(runtime, /root\.__tcPlatformSavedRecordContext\s*=\s*null/, 'Centra
 assert.doesNotMatch(runtime, /action === 'saved:add'|action === 'saved:update'/, 'Legacy saved:add/saved:update handlers must not compete with line save/update.');
 
 for (const [name, source] of [['rainwater', rainwaterController], ['wastewater', wastewaterController]]) {
-  assert.match(source, /attrs:\s*\{\s*loadAttr:\s*'data-line-select',\s*toggleAttr:\s*'data-line-toggle',\s*deleteAttr:\s*'data-line-delete'\s*\}/, `${name} must keep the heating-style saved attrs.`);
+  assert.match(source, /createLineSectionController\s*\(/, `${name} must use the heating-style line-section saved controller.`);
+  assert.doesNotMatch(source, /attrs:\s*\{/, `${name} must not keep legacy saved attr configuration.`);
   assert.doesNotMatch(source, /data-saved-|SavedRecordEventBridge|bindSavedRecordWorkflow|bindSavedRecordList/, `${name} must not carry local saved-record patches.`);
 }
 
-for (const [name, source] of [['rainwater', rainwaterResults], ['wastewater', wastewaterResults]]) {
+assert.doesNotMatch(rainwaterResults, /saved:add|saved:update|export function savedRecords/, 'rainwater must not keep legacy saved result model.');
+assert.match(rainwaterViewModel, /rainwaterSavedController\.renderCard/, 'rainwater saved panel must render through the line-section controller.');
+
+for (const [name, source] of [['wastewater', wastewaterResults]]) {
   assert.doesNotMatch(source, /saved:add|saved:update/, `${name} saved result model must not render legacy saved add/update actions.`);
   assert.match(source, /loadAttr:\s*'data-line-select'/, `${name} saved result model must render line-select.`);
   assert.match(source, /toggleAttr:\s*'data-line-toggle'/, `${name} saved result model must render line-toggle.`);

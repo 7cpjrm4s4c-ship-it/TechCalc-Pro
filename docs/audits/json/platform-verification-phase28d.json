@@ -1,0 +1,157 @@
+{
+  "phase": "28D",
+  "title": "Platform Verification",
+  "score": 4.9,
+  "grade": "A",
+  "p0": [],
+  "p1": [],
+  "p2": [
+    "Direkte Scroll-Aufrufe ausserhalb des ScrollManagers/Renderers bleiben zu beobachten.",
+    "Direkte globale Listener bestehen weiter, sind aber ueber 28C inventarisiert."
+  ],
+  "summary": {
+    "verifiedReports": 9,
+    "missingReports": [],
+    "capabilityScore": 5,
+    "averagePrerequisiteScore": 4.82,
+    "directScrollCalls": 4,
+    "directFocusCalls": 3,
+    "directGlobalListeners": 9
+  },
+  "capabilities": {
+    "scroll": {
+      "manager": true,
+      "capturePosition": true,
+      "restorePosition": true,
+      "runWithoutScrollJump": true,
+      "savedRecordGuard": true,
+      "moduleSwitchGuard": true,
+      "runtimeIntegrated": true
+    },
+    "focus": {
+      "manager": true,
+      "safeFocus": true,
+      "enterNavigation": true,
+      "tabNavigation": true,
+      "platformFieldNavigation": true,
+      "dynamicFocusRestore": true,
+      "preventScrollDefault": true
+    },
+    "events": {
+      "manager": true,
+      "scopes": true,
+      "globalTracking": true,
+      "snapshot": true,
+      "appIntegrated": true,
+      "delegationIntegrated": true
+    }
+  },
+  "findings": [
+    {
+      "id": "VER-28D-001",
+      "priority": "closed",
+      "area": "Phase 28 Integrity",
+      "finding": "Alle Scroll-, Fokus- und Event-Artefakte aus Phase 28A bis 28C sind als Verifikationsgrundlage vorhanden."
+    },
+    {
+      "id": "VER-28D-002",
+      "priority": "closed",
+      "area": "Platform Hardening Services",
+      "finding": "ScrollManager, FocusManager und EventManager bieten die benoetigten Plattformfaehigkeiten fuer UX-Stabilitaet."
+    },
+    {
+      "id": "VER-28D-003",
+      "priority": "P2",
+      "area": "Legacy Surface",
+      "finding": "Verbleibende direkte Aufrufe sind nicht release-blockierend, sollten aber bei zukuenftigen Infrastruktur-Cleanups weiter reduziert werden."
+    }
+  ],
+  "samples": {
+    "directScrollCalls": [
+      {
+        "file": "js/core/app.js",
+        "line": 443,
+        "text": "window.scrollTo(0, settingsScrollY || 0);"
+      },
+      {
+        "file": "js/core/app.js",
+        "line": 541,
+        "text": "if (details.offsetHeight > body.clientHeight) summary?.scrollIntoView({ block: 'start', behavior: 'smooth' });"
+      },
+      {
+        "file": "js/core/menuFallback.js",
+        "line": 35,
+        "text": "window.scrollTo(0, scrollY || 0);"
+      },
+      {
+        "file": "js/core/renderCoordinator.js",
+        "line": 15,
+        "text": "if (currentY > maxY + 1) window.scrollTo(window.scrollX || doc.scrollLeft || 0, maxY);"
+      }
+    ],
+    "directFocusCalls": [
+      {
+        "file": "js/core/app.js",
+        "line": 479,
+        "text": "lastFocusedElement.focus({ preventScroll: true });"
+      },
+      {
+        "file": "js/core/pdfExport.js",
+        "line": 307,
+        "text": "<button class=\"tcp-close\" type=\"button\" onclick=\"try{ if (window.opener) { window.opener.focus(); window.close(); return; } }catch(e){} if (history.length > 1) { history.back(); } else { window.close(); }\">Zurück zur App</button>"
+      },
+      {
+        "file": "js/core/pdfExport.js",
+        "line": 420,
+        "text": "win.focus();"
+      }
+    ],
+    "directGlobalListeners": [
+      {
+        "file": "js/core/menuFallback.js",
+        "line": 111,
+        "text": "document.addEventListener('click', clickHandler, true);"
+      },
+      {
+        "file": "js/core/menuFallback.js",
+        "line": 112,
+        "text": "document.addEventListener('keydown', keyHandler, true);"
+      },
+      {
+        "file": "js/core/menuFallback.js",
+        "line": 113,
+        "text": "document.addEventListener('click', outsideHandler, false);"
+      },
+      {
+        "file": "js/core/menuFallback.js",
+        "line": 114,
+        "text": "document.addEventListener('touchmove', touchMoveHandler, { passive: false });"
+      },
+      {
+        "file": "js/core/menuFallback.js",
+        "line": 118,
+        "text": "document.addEventListener('DOMContentLoaded', init, { once: true });"
+      },
+      {
+        "file": "js/core/navigation.js",
+        "line": 104,
+        "text": "document.addEventListener('click', closeOverflowOnOutsideClick);"
+      },
+      {
+        "file": "js/core/pdfExport.js",
+        "line": 115,
+        "text": "document.addEventListener('techcalc-project-loaded', () => {"
+      },
+      {
+        "file": "js/core/router.js",
+        "line": 26,
+        "text": "window.addEventListener('hashchange', handleRouteChange);"
+      },
+      {
+        "file": "js/core/router.js",
+        "line": 27,
+        "text": "window.addEventListener('popstate', handleRouteChange);"
+      }
+    ]
+  }
+}

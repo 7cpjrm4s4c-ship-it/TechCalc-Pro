@@ -1,5 +1,5 @@
 import { bindSavedRecordList, createRecordId, isSameId, removeRecord, replaceRecord } from './savedRecords.js';
-import { preserveActionScroll, preserveSavedRecordScroll } from './scrollManager.js';
+import { preserveActionScroll, preserveSavedRecordScroll, preserveSavedRecordMutation } from './scrollManager.js';
 import { markCommittedAction } from './formActions.js';
 
 function bindScopedOnce(root, key, eventName, listener, options) {
@@ -334,13 +334,14 @@ export function createSavedRecordActions({
     preserveLoadScroll ? preserveSavedRecordScroll(apply, { anchor: card, event }) : apply();
   };
 
-  const remove = ({ element } = {}) => {
+  const remove = ({ element, event } = {}) => {
     const id = recordIdFromElement(element, attrs);
     if (!id) return;
     const current = requireContext();
     if (!current) return;
     const patch = typeof clear === 'function' && isSameId(current[activeIdKey], id) ? clear(current) : {};
-    preserveActionScroll(() => state.set(savedRecordReducer(current, {
+    const anchor = element?.closest?.('[data-line-card], [data-saved-record-card]') || element;
+    preserveSavedRecordScroll(() => state.set(savedRecordReducer(current, {
       listKey,
       activeIdKey,
       expandedIdKey,
@@ -348,21 +349,22 @@ export function createSavedRecordActions({
       action: 'delete',
       id,
       patch
-    }), { action: 'saved-record:delete' }));
+    }), { action: 'saved-record:delete' }), { anchor, event });
   };
 
-  const toggle = ({ element } = {}) => {
+  const toggle = ({ element, event } = {}) => {
     const id = recordIdFromElement(element, attrs);
     if (!id) return;
     const current = requireContext();
     if (!current) return;
-    state.set(savedRecordReducer(current, {
+    const anchor = element?.closest?.('[data-line-card], [data-saved-record-card]') || element;
+    preserveSavedRecordMutation(() => state.set(savedRecordReducer(current, {
       listKey,
       activeIdKey,
       expandedIdKey,
       action: 'toggle-expanded',
       id
-    }), { action: 'saved-record:toggle' });
+    }), { action: 'saved-record:toggle' }), { anchor, event });
   };
 
   return { save, update, load, delete: remove, toggle };

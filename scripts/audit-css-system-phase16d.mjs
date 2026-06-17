@@ -28,7 +28,8 @@ const report = {
   note: 'Phase 16D establishes global tc-* primitives and keeps legacy module selectors as tracked migration debt.'
 };
 
-fs.writeFileSync('css-system-audit-phase16d.json', JSON.stringify(report, null, 2));
+fs.mkdirSync('docs/audits/json', { recursive: true });
+fs.writeFileSync('docs/audits/json/css-system-audit-phase16d.json', JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report, null, 2));
 
 if (missing.length) {

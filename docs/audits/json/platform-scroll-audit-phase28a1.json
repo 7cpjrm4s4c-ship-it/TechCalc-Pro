@@ -1,0 +1,469 @@
+{
+  "phase": "28A.1",
+  "name": "Scroll Audit & Scroll Manager Design",
+  "generatedAt": "2026-06-10T15:07:59.573Z",
+  "overallScore": 4.85,
+  "overallGrade": "A",
+  "executiveSummary": {
+    "p0": [],
+    "p1": [],
+    "p2": [
+      {
+        "area": "focusWithoutPreventScroll",
+        "risk": "P2",
+        "score": 4.1,
+        "grade": "B",
+        "action": "Fokusaufrufe ohne preventScroll in 28B ueber den Focus Service standardisieren; scrollrelevante Faelle in 28A.2 pruefen.",
+        "evidence": [
+          "js/core/eventPipeline.js",
+          "js/core/pdfExport.js"
+        ]
+      },
+      {
+        "area": "hashNavigationScrollRisk",
+        "risk": "P2",
+        "score": 4.2,
+        "grade": "B",
+        "action": "Hash- und Deep-Link-Navigation gegen unbeabsichtigte Scrollspruenge absichern.",
+        "evidence": [
+          "js/core/router.js"
+        ]
+      }
+    ],
+    "p3": [],
+    "conclusion": "Die bestehende Scroll-Infrastruktur ist vorhanden, aber direkte Scroll-Schreibzugriffe muessen in 28A.2 konsequent ueber einen expliziten PlatformScrollManager-Vertrag gefuehrt werden."
+  },
+  "totals": {
+    "scannedFiles": 152,
+    "relevantFiles": 15,
+    "directScrollFiles": 5,
+    "focusRiskFiles": 2,
+    "hashNavigationFiles": 1,
+    "modulesWithDirectScroll": 0,
+    "modulesWithoutScrollManagerUse": 0
+  },
+  "coreEvidence": {
+    "scrollManagerExists": true,
+    "rendererPreserveViewportExists": true,
+    "scrollManagerExportsPreserveScroll": true,
+    "scrollManagerExportsActionPreset": true,
+    "scrollManagerExportsSavedRecordPreset": true,
+    "scrollPresets": 3,
+    "directCoreScrollFiles": [
+      "js/core/app.js",
+      "js/core/menuFallback.js",
+      "js/core/renderCoordinator.js",
+      "js/core/renderer.js",
+      "js/core/scrollManager.js"
+    ],
+    "directModuleScrollFiles": []
+  },
+  "moduleEvidence": [
+    {
+      "module": "drinking-water",
+      "files": 2,
+      "directScrollWrites": 0,
+      "focusCalls": 0,
+      "preventScrollFocus": 0,
+      "focusWithoutPreventScroll": 0,
+      "preserveSignals": 4,
+      "scrollManagerSignals": 6,
+      "hashNavigation": 0
+    }
+  ],
+  "fileEvidence": [
+    {
+      "path": "js/core/app.js",
+      "layer": "core",
+      "module": null,
+      "scroll": {
+        "windowScrollTo": 1,
+        "elementScrollTo": 2,
+        "scrollIntoView": 1,
+        "scrollTopWrite": 0,
+        "scrollYRead": 3,
+        "hashNavigation": 0
+      },
+      "focus": {
+        "focusCall": 1,
+        "preventScrollFocus": 1,
+        "activeElement": 1
+      },
+      "preserveSignals": 0,
+      "scrollManagerSignals": 0,
+      "directScrollWrites": 3,
+      "focusWithoutPreventScroll": 0,
+      "needs28A2Review": true
+    },
+    {
+      "path": "js/core/domUpdate.js",
+      "layer": "core",
+      "module": null,
+      "scroll": {
+        "windowScrollTo": 0,
+        "elementScrollTo": 0,
+        "scrollIntoView": 0,
+        "scrollTopWrite": 0,
+        "scrollYRead": 0,
+        "hashNavigation": 0
+      },
+      "focus": {
+        "focusCall": 1,
+        "preventScrollFocus": 1,
+        "activeElement": 1
+      },
+      "preserveSignals": 0,
+      "scrollManagerSignals": 0,
+      "directScrollWrites": 0,
+      "focusWithoutPreventScroll": 0,
+      "needs28A2Review": false
+    },
+    {
+      "path": "js/core/eventPipeline.js",
+      "layer": "core",
+      "module": null,
+      "scroll": {
+        "windowScrollTo": 0,
+        "elementScrollTo": 0,
+        "scrollIntoView": 0,
+        "scrollTopWrite": 0,
+        "scrollYRead": 0,
+        "hashNavigation": 0
+      },
+      "focus": {
+        "focusCall": 2,
+        "preventScrollFocus": 1,
+        "activeElement": 2
+      },
+      "preserveSignals": 0,
+      "scrollManagerSignals": 0,
+      "directScrollWrites": 0,
+      "focusWithoutPreventScroll": 1,
+      "needs28A2Review": true
+    },
+    {
+      "path": "js/core/menuFallback.js",
+      "layer": "core",
+      "module": null,
+      "scroll": {
+        "windowScrollTo": 1,
+        "elementScrollTo": 1,
+        "scrollIntoView": 0,
+        "scrollTopWrite": 1,
+        "scrollYRead": 2,
+        "hashNavigation": 0
+      },
+      "focus": {
+        "focusCall": 0,
+        "preventScrollFocus": 0,
+        "activeElement": 0
+      },
+      "preserveSignals": 0,
+      "scrollManagerSignals": 0,
+      "directScrollWrites": 2,
+      "focusWithoutPreventScroll": 0,
+      "needs28A2Review": true
+    },
+    {
+      "path": "js/core/moduleRuntime.js",
+      "layer": "core",
+      "module": null,
+      "scroll": {
+        "windowScrollTo": 0,
+        "elementScrollTo": 0,
+        "scrollIntoView": 0,
+        "scrollTopWrite": 0,
+        "scrollYRead": 0,
+        "hashNavigation": 0
+      },
+      "focus": {
+        "focusCall": 1,
+        "preventScrollFocus": 1,
+        "activeElement": 0
+      },
+      "preserveSignals": 0,
+      "scrollManagerSignals": 0,
+      "directScrollWrites": 0,
+      "focusWithoutPreventScroll": 0,
+      "needs28A2Review": false
+    },
+    {
+      "path": "js/core/pdfExport.js",
+      "layer": "core",
+      "module": null,
+      "scroll": {
+        "windowScrollTo": 0,
+        "elementScrollTo": 0,
+        "scrollIntoView": 0,
+        "scrollTopWrite": 0,
+        "scrollYRead": 0,
+        "hashNavigation": 0
+      },
+      "focus": {
+        "focusCall": 2,
+        "preventScrollFocus": 0,
+        "activeElement": 0
+      },
+      "preserveSignals": 0,
+      "scrollManagerSignals": 0,
+      "directScrollWrites": 0,
+      "focusWithoutPreventScroll": 2,
+      "needs28A2Review": true
+    },
+    {
+      "path": "js/core/renderCoordinator.js",
+      "layer": "core",
+      "module": null,
+      "scroll": {
+        "windowScrollTo": 1,
+        "elementScrollTo": 1,
+        "scrollIntoView": 0,
+        "scrollTopWrite": 0,
+        "scrollYRead": 1,
+        "hashNavigation": 0
+      },
+      "focus": {
+        "focusCall": 0,
+        "preventScrollFocus": 0,
+        "activeElement": 1
+      },
+      "preserveSignals": 0,
+      "scrollManagerSignals": 0,
+      "directScrollWrites": 1,
+      "focusWithoutPreventScroll": 0,
+      "needs28A2Review": true
+    },
+    {
+      "path": "js/core/renderer.js",
+      "layer": "core",
+      "module": null,
+      "scroll": {
+        "windowScrollTo": 2,
+        "elementScrollTo": 2,
+        "scrollIntoView": 0,
+        "scrollTopWrite": 0,
+        "scrollYRead": 2,
+        "hashNavigation": 0
+      },
+      "focus": {
+        "focusCall": 0,
+        "preventScrollFocus": 0,
+        "activeElement": 2
+      },
+      "preserveSignals": 1,
+      "scrollManagerSignals": 0,
+      "directScrollWrites": 2,
+      "focusWithoutPreventScroll": 0,
+      "needs28A2Review": true
+    },
+    {
+      "path": "js/core/router.js",
+      "layer": "core",
+      "module": null,
+      "scroll": {
+        "windowScrollTo": 0,
+        "elementScrollTo": 0,
+        "scrollIntoView": 0,
+        "scrollTopWrite": 0,
+        "scrollYRead": 0,
+        "hashNavigation": 4
+      },
+      "focus": {
+        "focusCall": 0,
+        "preventScrollFocus": 0,
+        "activeElement": 0
+      },
+      "preserveSignals": 0,
+      "scrollManagerSignals": 0,
+      "directScrollWrites": 0,
+      "focusWithoutPreventScroll": 0,
+      "needs28A2Review": false
+    },
+    {
+      "path": "js/core/savedRecordController.js",
+      "layer": "core",
+      "module": null,
+      "scroll": {
+        "windowScrollTo": 0,
+        "elementScrollTo": 0,
+        "scrollIntoView": 0,
+        "scrollTopWrite": 0,
+        "scrollYRead": 0,
+        "hashNavigation": 0
+      },
+      "focus": {
+        "focusCall": 0,
+        "preventScrollFocus": 0,
+        "activeElement": 0
+      },
+      "preserveSignals": 11,
+      "scrollManagerSignals": 12,
+      "directScrollWrites": 0,
+      "focusWithoutPreventScroll": 0,
+      "needs28A2Review": false
+    },
+    {
+      "path": "js/core/savedRecords.js",
+      "layer": "core",
+      "module": null,
+      "scroll": {
+        "windowScrollTo": 0,
+        "elementScrollTo": 0,
+        "scrollIntoView": 0,
+        "scrollTopWrite": 0,
+        "scrollYRead": 0,
+        "hashNavigation": 0
+      },
+      "focus": {
+        "focusCall": 0,
+        "preventScrollFocus": 0,
+        "activeElement": 0
+      },
+      "preserveSignals": 3,
+      "scrollManagerSignals": 0,
+      "directScrollWrites": 0,
+      "focusWithoutPreventScroll": 0,
+      "needs28A2Review": false
+    },
+    {
+      "path": "js/core/scrollManager.js",
+      "layer": "core",
+      "module": null,
+      "scroll": {
+        "windowScrollTo": 1,
+        "elementScrollTo": 2,
+        "scrollIntoView": 0,
+        "scrollTopWrite": 1,
+        "scrollYRead": 1,
+        "hashNavigation": 0
+      },
+      "focus": {
+        "focusCall": 0,
+        "preventScrollFocus": 0,
+        "activeElement": 0
+      },
+      "preserveSignals": 15,
+      "scrollManagerSignals": 9,
+      "directScrollWrites": 3,
+      "focusWithoutPreventScroll": 0,
+      "needs28A2Review": true
+    },
+    {
+      "path": "js/modules/drinking-water/controller.js",
+      "layer": "module",
+      "module": "drinking-water",
+      "scroll": {
+        "windowScrollTo": 0,
+        "elementScrollTo": 0,
+        "scrollIntoView": 0,
+        "scrollTopWrite": 0,
+        "scrollYRead": 0,
+        "hashNavigation": 0
+      },
+      "focus": {
+        "focusCall": 0,
+        "preventScrollFocus": 0,
+        "activeElement": 1
+      },
+      "preserveSignals": 2,
+      "scrollManagerSignals": 3,
+      "directScrollWrites": 0,
+      "focusWithoutPreventScroll": 0,
+      "needs28A2Review": false
+    },
+    {
+      "path": "js/modules/drinking-water/dynamicRenderer.js",
+      "layer": "module",
+      "module": "drinking-water",
+      "scroll": {
+        "windowScrollTo": 0,
+        "elementScrollTo": 0,
+        "scrollIntoView": 0,
+        "scrollTopWrite": 0,
+        "scrollYRead": 0,
+        "hashNavigation": 0
+      },
+      "focus": {
+        "focusCall": 0,
+        "preventScrollFocus": 0,
+        "activeElement": 1
+      },
+      "preserveSignals": 2,
+      "scrollManagerSignals": 3,
+      "directScrollWrites": 0,
+      "focusWithoutPreventScroll": 0,
+      "needs28A2Review": false
+    },
+    {
+      "path": "js/platform/moduleRuntime/index.js",
+      "layer": "other",
+      "module": null,
+      "scroll": {
+        "windowScrollTo": 0,
+        "elementScrollTo": 0,
+        "scrollIntoView": 0,
+        "scrollTopWrite": 0,
+        "scrollYRead": 0,
+        "hashNavigation": 0
+      },
+      "focus": {
+        "focusCall": 0,
+        "preventScrollFocus": 0,
+        "activeElement": 0
+      },
+      "preserveSignals": 8,
+      "scrollManagerSignals": 9,
+      "directScrollWrites": 0,
+      "focusWithoutPreventScroll": 0,
+      "needs28A2Review": false
+    }
+  ],
+  "findings": [
+    {
+      "area": "focusWithoutPreventScroll",
+      "risk": "P2",
+      "score": 4.1,
+      "grade": "B",
+      "action": "Fokusaufrufe ohne preventScroll in 28B ueber den Focus Service standardisieren; scrollrelevante Faelle in 28A.2 pruefen.",
+      "evidence": [
+        "js/core/eventPipeline.js",
+        "js/core/pdfExport.js"
+      ]
+    },
+    {
+      "area": "hashNavigationScrollRisk",
+      "risk": "P2",
+      "score": 4.2,
+      "grade": "B",
+      "action": "Hash- und Deep-Link-Navigation gegen unbeabsichtigte Scrollspruenge absichern.",
+      "evidence": [
+        "js/core/router.js"
+      ]
+    }
+  ],
+  "designContract": {
+    "serviceName": "PlatformScrollManager",
+    "targetFile": "js/core/scrollManager.js",
+    "phase28A2Api": [
+      "capturePosition(scope = window)",
+      "restorePosition(snapshot, options)",
+      "freeze(reason)",
+      "unfreeze(token)",
+      "runWithoutScrollJump(action, options)",
+      "preserveSavedRecordScroll(action, options)",
+      "preserveModuleSwitchScroll(action, options)"
+    ],
+    "nonGoalsFor28A1": [
+      "Keine Runtime-Logik aendern",
+      "Keine Modul-Controller umbauen",
+      "Keine bestehenden Scroll-Workarounds entfernen"
+    ],
+    "acceptanceFor28A2": [
+      "Record-Auswahl verursacht keinen Scrollsprung",
+      "Record-Abwahl verursacht keinen Scrollsprung",
+      "Live-Render bleibt scrollstabil",
+      "Modulwechsel kann definierte Scrollstrategie anwenden",
+      "Direkte Scrollschreibzugriffe in Modulen sind inventarisiert oder gekapselt"
+    ]
+  }
+}

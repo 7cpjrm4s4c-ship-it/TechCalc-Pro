@@ -1,6 +1,9 @@
 import { hardResetModuleRoot } from './moduleLifecycleAdapter.js';
+import { preserveModuleSwitchScroll } from './scrollManager.js';
+import { restoreFocus as restorePlatformFocus } from './focusManager.js';
 
 const DEFAULT_MOUNT_TIMEOUT_MS = 7000;
+const DEFAULT_LOADING_DELAY_MS = 120;
 
 function now() {
   return Date.now();
@@ -47,7 +50,7 @@ function withTimeout(promise, timeoutMs, message) {
     });
 }
 
-export function createModuleRuntime({ root, modules, renderNavigation, loadingView } = {}) {
+export function createModuleRuntime({ root, modules, renderNavigation, loadingView, loadingDelayMs = DEFAULT_LOADING_DELAY_MS } = {}) {
   if (!root) throw new Error('ModuleRuntime benötigt einen App-Root.');
   if (!modules?.get) throw new Error('ModuleRuntime benötigt eine Modul-Registry.');
 
@@ -55,6 +58,7 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
   let activeCleanup = noop;
   let activeModuleId = '';
   let activeRuntimeCleanups = [];
+  let loadingTimer = 0;
 
   function isCurrent(token) {
     return token === renderToken && root.dataset?.renderToken === String(token);
@@ -67,7 +71,15 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
     activeRuntimeCleanups = [];
   }
 
+  function clearLoadingTimer() {
+    if (loadingTimer) {
+      globalThis.clearTimeout(loadingTimer);
+      loadingTimer = 0;
+    }
+  }
+
   function resetRoot() {
+    clearLoadingTimer();
     hardResetModuleRoot(root);
     root.__tcLastHtml = '';
   }
@@ -99,9 +111,16 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
     root.dataset.pendingModuleId = moduleId;
     delete root.dataset.activeModuleId;
     root.__tcLastHtml = '';
-    root.innerHTML = typeof loadingView === 'function'
-      ? loadingView(moduleId)
-      : '<div class="card tc-module-loading" role="status">Modul wird geladen...</div>';
+    const renderLoading = () => {
+      if (!isCurrent(token) || !root.hasAttribute?.('aria-busy')) return;
+      root.innerHTML = typeof loadingView === 'function'
+        ? loadingView(moduleId)
+        : '<div class="card tc-module-loading" role="status">Modul wird geladen...</div>';
+    };
+    clearLoadingTimer();
+    const delay = Number(loadingDelayMs);
+    if (delay > 0) loadingTimer = globalThis.setTimeout(renderLoading, delay);
+    else renderLoading();
     root.dispatchEvent(new CustomEvent('techcalc:module-prepare-mount', {
       bubbles: false,
       detail: { moduleId, token }
@@ -109,6 +128,7 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
   }
 
   async function afterMount(moduleId, token) {
+    clearLoadingTimer();
     if (!isCurrent(token)) return false;
     root.dataset.activeModuleId = moduleId;
     delete root.dataset.pendingModuleId;
@@ -119,11 +139,12 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
       bubbles: false,
       detail: { moduleId, token }
     }));
-    try { root.focus({ preventScroll: true }); } catch { /* optional */ }
+    restorePlatformFocus(root, { select: false });
     return true;
   }
 
   async function failMount(moduleId, token, error) {
+    clearLoadingTimer();
     if (!isCurrent(token)) return false;
     console.error(`Modul konnte nicht geladen werden: ${moduleId}`, error);
     root.__tcLastHtml = '';
@@ -134,43 +155,50 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
   }
 
   async function mount(moduleId, options = {}) {
-    const module = modules.get(moduleId);
-    if (!module) return false;
+    return preserveModuleSwitchScroll(async () => {
+      const module = modules.get(moduleId);
+      if (!module) return false;
 
-    const token = ++renderToken;
-    await unmount(moduleId);
-    await prepareMount(moduleId, token);
+      const token = ++renderToken;
+      await unmount(moduleId);
+      await prepareMount(moduleId, token);
 
-    const runtimeContext = Object.freeze({
-      moduleId,
-      token,
-      startedAt: now(),
-      addCleanup(cleanup) { normalizeHookResult(cleanup, activeRuntimeCleanups); },
-      isCurrent() { return isCurrent(token); }
-    });
+      const runtimeContext = Object.freeze({
+        moduleId,
+        token,
+        startedAt: now(),
+        addCleanup(cleanup) { normalizeHookResult(cleanup, activeRuntimeCleanups); },
+        isCurrent() { return isCurrent(token); }
+      });
 
-    try {
-      const cleanup = await withTimeout(
-        module.mount(root, runtimeContext),
-        options.timeoutMs ?? DEFAULT_MOUNT_TIMEOUT_MS,
-        `Modul ${moduleId} konnte nicht vollständig gemountet werden.`
-      );
+      try {
+        const cleanup = await withTimeout(
+          module.mount(root, runtimeContext),
+          options.timeoutMs ?? DEFAULT_MOUNT_TIMEOUT_MS,
+          `Modul ${moduleId} konnte nicht vollständig gemountet werden.`
+        );
 
-      if (!isCurrent(token)) {
-        normalizeHookResult(cleanup, activeRuntimeCleanups);
-        clearRuntimeCleanups();
-        return false;
+        if (!isCurrent(token)) {
+          normalizeHookResult(cleanup, activeRuntimeCleanups);
+          clearRuntimeCleanups();
+          return false;
+        }
+
+        activeCleanup = typeof cleanup === 'function' ? cleanup : noop;
+        if (cleanup && typeof cleanup !== 'function') normalizeHookResult(cleanup, activeRuntimeCleanups);
+        return afterMount(moduleId, token);
+      } catch (error) {
+        return failMount(moduleId, token, error);
       }
-
-      activeCleanup = typeof cleanup === 'function' ? cleanup : noop;
-      if (cleanup && typeof cleanup !== 'function') normalizeHookResult(cleanup, activeRuntimeCleanups);
-      return afterMount(moduleId, token);
-    } catch (error) {
-      return failMount(moduleId, token, error);
-    }
+    }, {
+      reason: 'module-runtime-switch',
+      frames: 10,
+      delays: [0, 40, 120, 260, 520]
+    });
   }
 
   function dispose() {
+    clearLoadingTimer();
     renderToken += 1;
     try { activeCleanup?.(); } catch { /* dispose is best effort */ }
     activeCleanup = noop;

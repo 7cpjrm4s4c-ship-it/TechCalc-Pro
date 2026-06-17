@@ -1,0 +1,24 @@
+{
+  "phase": "30C",
+  "name": "Documentation Reorganization",
+  "score": 5,
+  "grade": "A",
+  "counts": {
+    "phaseDocs": 111,
+    "auditJson": 41,
+    "architectureDocs": 4,
+    "archivedRootPhaseDocs": 8,
+    "misplacedRootDocs": 0,
+    "misplacedRootAuditJson": 0
+  },
+  "findings": [],
+  "targetStructure": [
+    "docs/phases",
+    "docs/audits/json",
+    "docs/audits/reports",
+    "docs/architecture",
+    "docs/release-notes",
+    "docs/archive/phase-artifacts"
+  ],
+  "generatedAt": "2026-06-11T07:35:02.436Z"
+}
