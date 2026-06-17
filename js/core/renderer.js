@@ -1,4 +1,15 @@
 import { bindCentralEventPipeline } from './eventPipeline.js';
+
+export function cssEscape(value) {
+  const text = String(value ?? '');
+  if (typeof window !== 'undefined' && window.CSS?.escape) return window.CSS.escape(text);
+  return text.replace(/[\0-\x1F\x7F]|^-?\d|^-$|[^a-zA-Z0-9_-]/g, (char, index) => {
+    if (char === '\0') return '\uFFFD';
+    const hex = char.charCodeAt(0).toString(16).toUpperCase();
+    return index === 0 || /[^a-zA-Z0-9_-]/.test(char) ? `\\${hex} ` : `\\${char}`;
+  });
+}
+
 export function esc(value) {
   return String(value ?? '')
     .replaceAll('&', '&amp;')

@@ -62,3 +62,12 @@ Release-hardening status after Phase 31D:
 - Browser-Smoke-Spezifikation für Modulwechsel, Saved-Record-Erreichbarkeit, mobile Navigation, Settings-Scroll-Lock und Service-Worker-Offline-Reload angelegt.
 - Node-Gate `test:phase37b` ergänzt, das die Browser-Testschicht statisch validiert und den Importcheck ausführt.
 - Keine Runtime-Logik geändert.
+
+
+## Phase 37B.1A - Browser Console Cleanup
+
+- Fix: `renderer.js` definiert jetzt `cssEscape()` fuer stabile Viewport-/Anchor-Selektoren.
+- Fix: `safeReplaceContent()` ist gegen detached roots und reentrant DOM-Replacement-Races gehaertet.
+- Test: `test:phase37b1a` ergaenzt.
+- Validierung: Build ok, Phase 37B.1 Preflight ok, Module Smoke 11/11.
+- Runtime-Logik: keine Feature-Aenderung, gezieltes Browser-Hardening.
