@@ -73,16 +73,22 @@ function isDynamicRainwaterAction(meta = {}) {
 function bindRainwaterPlatform(root) {
   lineSectionController.bind(root);
 
-  if (!root || root.__tcRainwaterDrainDirectBound) return;
-  root.__tcRainwaterDrainDirectBound = true;
+  if (!root || root.__tcRainwaterDrainPrecommitBound) return;
+  root.__tcRainwaterDrainPrecommitBound = true;
 
-  root.addEventListener('change', event => {
+  const precommitDrain = event => {
     const field = event.target?.closest?.('[data-field="drainSize"]');
     if (!field || !root.contains(field)) return;
 
     const patch = drainLookupPatchFromValue(field.value || 'DN 100');
-    state.set(patch, { action: 'rainwater:drainSize:direct-change', notify: true });
-  }, true);
+    // Precommit silently before the root event pipeline renders. The normal
+    // field/change pipeline then performs the notifying render with the complete
+    // drain patch already present in state.
+    state.set(patch, { action: 'rainwater:drainSize:precommit', notify: false });
+  };
+
+  document.addEventListener('input', precommitDrain, true);
+  document.addEventListener('change', precommitDrain, true);
 }
 
 export default createPlatformModule({
