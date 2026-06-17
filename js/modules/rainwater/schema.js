@@ -50,7 +50,7 @@ export const rainwaterSchema = defineFormSchema({
     { key:'roofRainIntensity', label:rainLabel, type:FIELD_TYPES.DECIMAL, unit:'l/(s·ha)', format:(_, s) => fmtInput(activeRainValue(s), 1), visibleWhen:s => activeRainField(s) === 'roofRainIntensity' },
     { key:'propertyRainIntensity', label:rainLabel, type:FIELD_TYPES.DECIMAL, unit:'l/(s·ha)', format:(_, s) => fmtInput(activeRainValue(s), 1), visibleWhen:s => activeRainField(s) === 'propertyRainIntensity' },
     { key:'rainHundredIntensity', label:'Regenspende r(5,100)', type:FIELD_TYPES.DECIMAL, unit:'l/(s·ha)', default:'500' },
-    { key:'drainSize', label:drainLabel, type:FIELD_TYPES.SELECT, options:drainOptions, default:'DN 100', commit:'immediate', lookup:true, render:'defer' },
+    { key:'drainSize', label:drainLabel, type:FIELD_TYPES.SELECT, options:drainOptions, default:'DN 100', commit:'immediate', lookup:true },
     { key:'drainSizeManual', label:'DN manuell', type:FIELD_TYPES.TEXT, placeholder:'DN 100', format:(value, s) => value || s.drainSize || selectedDrainPreset(s)?.dn || 'DN 100' },
     { key:'drainCapacity', label:'Abflusswert', type:FIELD_TYPES.DECIMAL, unit:'l/s', readonly:true, format:(value, s) => fmtInput(value || selectedDrainPreset(s)?.capacity, 1) },
     { key:'drainHead', label:'Anstauhöhe', type:FIELD_TYPES.DECIMAL, unit:'mm', readonly:true, format:(value, s) => fmtInput(value || selectedDrainPreset(s)?.head, 0) },
