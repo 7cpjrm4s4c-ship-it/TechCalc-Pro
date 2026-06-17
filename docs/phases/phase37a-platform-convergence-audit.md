@@ -6,41 +6,35 @@ Ziel: alle Module gegen die Referenzarchitektur Heizung, Lüftung, Druckhaltung 
 
 - Geprüfte Module: 11
 - P1-Findings: 0
-- P2-Findings: 17
+- P2-Findings: 6
 - Unbenutzte Utility-Export-Kandidaten: 2
 
 ## Modul-Scorecard
 
 | Modul | Score | Status | P1 | P2 |
 |---|---:|---|---:|---:|
-| buffer-storage * | 86 | platform-conformant-with-minor-debt | 0 | 2 |
-| drinking-water | 79 | platform-conformant-with-minor-debt | 0 | 3 |
-| heat-recovery | 93 | reference-aligned | 0 | 1 |
-| heating-cooling * | 93 | reference-aligned | 0 | 1 |
-| hx-diagram | 93 | reference-aligned | 0 | 1 |
-| pipe-sizing | 93 | reference-aligned | 0 | 1 |
-| pressure-holding * | 86 | platform-conformant-with-minor-debt | 0 | 2 |
-| rainwater | 93 | reference-aligned | 0 | 1 |
-| unit-converter | 86 | platform-conformant-with-minor-debt | 0 | 2 |
-| ventilation * | 93 | reference-aligned | 0 | 1 |
-| wastewater | 86 | platform-conformant-with-minor-debt | 0 | 2 |
+| buffer-storage * | 93 | reference-aligned | 0 | 1 |
+| drinking-water | 86 | platform-conformant-with-minor-debt | 0 | 2 |
+| heat-recovery | 100 | reference-aligned | 0 | 0 |
+| heating-cooling * | 100 | reference-aligned | 0 | 0 |
+| hx-diagram | 100 | reference-aligned | 0 | 0 |
+| pipe-sizing | 100 | reference-aligned | 0 | 0 |
+| pressure-holding * | 93 | reference-aligned | 0 | 1 |
+| rainwater | 100 | reference-aligned | 0 | 0 |
+| unit-converter | 93 | reference-aligned | 0 | 1 |
+| ventilation * | 100 | reference-aligned | 0 | 0 |
+| wastewater | 93 | reference-aligned | 0 | 1 |
 
 \* Referenzmodul.
 
 ## Wichtigste Cleanup-Felder
 
-1. **P2 · buffer-storage · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
-2. **P2 · buffer-storage · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-3. **P2 · drinking-water · event-density** — Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.
-4. **P2 · drinking-water · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
-5. **P2 · drinking-water · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-6. **P2 · heat-recovery · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
-7. **P2 · heating-cooling · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
-8. **P2 · hx-diagram · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
-9. **P2 · pipe-sizing · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
-10. **P2 · pressure-holding · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
-11. **P2 · pressure-holding · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-12. **P2 · rainwater · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
+1. **P2 · buffer-storage · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+2. **P2 · drinking-water · event-density** — Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.
+3. **P2 · drinking-water · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+4. **P2 · pressure-holding · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+5. **P2 · unit-converter · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+6. **P2 · wastewater · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
 
 ## CSS-Gate
 

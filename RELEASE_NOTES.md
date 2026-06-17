@@ -1,3 +1,10 @@
+
+## 1.3.0-rc.1 · Phase 37A.2
+
+- Removed runtime `migrationStatus` breadcrumbs from all module configs.
+- Added `test:phase37a2` metadata cleanup guard.
+- Platform convergence backlog reduced from 17 P2 findings to 6 P2 findings.
+
 # TechCalc Pro 1.3.0
 
 TechCalc Pro 1.3.0 is the platform consolidation release.

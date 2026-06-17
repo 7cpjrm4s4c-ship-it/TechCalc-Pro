@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-06-17T12:10:09.545Z",
+  "generatedAt": "2026-06-17T12:53:45.857Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -11,20 +11,20 @@
   ],
   "modulesAudited": 11,
   "moduleScores": {
-    "buffer-storage": 86,
-    "drinking-water": 79,
-    "heat-recovery": 93,
-    "heating-cooling": 93,
-    "hx-diagram": 93,
-    "pipe-sizing": 93,
-    "pressure-holding": 86,
-    "rainwater": 93,
-    "unit-converter": 86,
-    "ventilation": 93,
-    "wastewater": 86
+    "buffer-storage": 93,
+    "drinking-water": 86,
+    "heat-recovery": 100,
+    "heating-cooling": 100,
+    "hx-diagram": 100,
+    "pipe-sizing": 100,
+    "pressure-holding": 93,
+    "rainwater": 100,
+    "unit-converter": 93,
+    "ventilation": 100,
+    "wastewater": 93
   },
   "riskCounts": {
-    "P2": 17
+    "P2": 6
   },
   "cssDebt": [
     {
@@ -68,21 +68,6 @@
     {
       "module": "buffer-storage",
       "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 12,
-            "text": "migrationStatus: 'phase-23d-platform-contract-finalization phase-23e-hardening',"
-          }
-        ]
-      }
-    },
-    {
-      "module": "buffer-storage",
-      "priority": "P2",
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
@@ -113,21 +98,6 @@
       "message": "Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.",
       "evidence": {
         "addEventListener": 14
-      }
-    },
-    {
-      "module": "drinking-water",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 12,
-            "text": "migrationStatus: 'phase-25b3-result-renderer-migration phase-25c-dynamic-controller-contract phase-25d-hardening phase-25e-final-hardening phase-25e1-water-heating-preview-fix phase-25e2a-water-heating-ui-switch-fix phase-25e2b-navigation-persistence-fix phase-25e2c-water-heating-visible-labels-fix phase-25e2d-rainwater-segment-bridge',"
-          }
-        ]
       }
     },
     {
@@ -177,81 +147,6 @@
       }
     },
     {
-      "module": "heat-recovery",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 12,
-            "text": "migrationStatus: 'phase-24b2-result-renderer-dynamic-islands phase-24b3-dynamic-controller-hardening phase-24c-platform-contract-finalization phase-24d-hardening phase-24d1-global-spacing-fix phase-24e-final-hardening',"
-          }
-        ]
-      }
-    },
-    {
-      "module": "heating-cooling",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 3,
-            "text": "export default defineModuleConfig({ id:'heating-cooling', title:'Heizung / Kälte', shortTitle:'Heizung', group:'HLK-Anlagen', accent:'orange', order:10, defaultVisible:true, migrationStatus: 'phase-12h-final-globalized phase-18b1-result-model phase-18b2-line-section-controller phase-18b3-dynamic-renderer phase-18b4-platform-mount phase-18b4a-ordered-card-layout phase-18c-platform-hardening phase-18d-reference-consolidation phase-18d1-reference-cleanup phase-18d2-controller-viewmodel-split', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA], description:'Leistung, Massenstrom und Temperaturspreizung für wassergeführte Systeme.' });"
-          }
-        ]
-      }
-    },
-    {
-      "module": "hx-diagram",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 12,
-            "text": "migrationStatus: 'phase-26d-final-platform-cleanup',"
-          }
-        ]
-      }
-    },
-    {
-      "module": "pipe-sizing",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 3,
-            "text": "export default defineModuleConfig({ id:'pipe-sizing', title:'Rohrdimensionierung', shortTitle:'Rohr', group:'Sanitär / Heizung', accent:'blue', order:30, defaultVisible:true, migrationStatus: 'phase-8-schema-inventory phase-21b1-platform-mount phase-21b2-saved-record-controller phase-21b3-result-renderer phase-21c-dynamic-renderer phase-21c1-dimension-cards-fix phase-21c2-saved-record-line-attrs phase-21c3-saved-record-controller-parity phase-21d-platform-contract phase-21e-hardening', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS], description:'Empfehlung der DN anhand Volumenstrom oder Massenstrom und maximalem Druckverlust.' });"
-          }
-        ]
-      }
-    },
-    {
-      "module": "pressure-holding",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 12,
-            "text": "migrationStatus: 'phase-16e-event-pipeline-consolidation phase-20b1-platform-mount phase-20b2-saved-record-controller phase-20b3-result-renderer phase-20c-dynamic-renderer phase-20d-platform-contract phase-20e-hardening',"
-          }
-        ]
-      }
-    },
-    {
       "module": "pressure-holding",
       "priority": "P2",
       "area": "css-specialization",
@@ -283,36 +178,6 @@
             "cssFile": "css/modules.css",
             "line": 107,
             "text": ".module-view[data-module='pressure-holding'] .inline-stat strong { font-size: clamp(.8rem,.95vw,.95rem); line-height: 1.12; }"
-          }
-        ]
-      }
-    },
-    {
-      "module": "rainwater",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 12,
-            "text": "migrationStatus: 'phase-14g- phase-14l- phase-14m-router-direct-render phase-17a2- phase-17a5- phase-17a6-',"
-          }
-        ]
-      }
-    },
-    {
-      "module": "unit-converter",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 3,
-            "text": "export default defineModuleConfig({ id:'unit-converter', title:'Einheitenrechner', shortTitle:'Einheiten', group:'Utilities', accent:'green', order:40, defaultVisible:true, migrationStatus: 'phase-8-schema-inventory phase-22b1-platform-mount phase-22b1-render-fix phase-22b3-result-renderer phase-22c-dynamic-renderer phase-22c1-result-cleanup phase-22d-platform-contract phase-22e-hardening', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA], description:'Kategorie-basierte Umrechnung technischer Einheiten.' });"
           }
         ]
       }
@@ -369,36 +234,6 @@
       }
     },
     {
-      "module": "ventilation",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 3,
-            "text": "export default defineModuleConfig({ id:'ventilation', title:'Lüftung', shortTitle:'Lüftung', group:'Lufttechnik', accent:'cyan', order:20, defaultVisible:true, migrationStatus: 'phase-13e-ventilation-temperature-render-fix phase-19b1-platform-mount phase-19b2b-line-section-controller phase-19b2c-saved-record-island phase-19b2c-hydrator-final phase-19b2d-saved-record-cleanup phase-19b3-result-renderer phase-19c-dynamic-renderer phase-19d-controller-viewmodel-view', capabilities: [MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE], description:'Luftleistung, Volumenstrom, Temperaturspreizung und Massenstrom.' });"
-          }
-        ]
-      }
-    },
-    {
-      "module": "wastewater",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 12,
-            "text": "migrationStatus: 'phase-8-schema-inventory phase-36a2-controller-viewmodel-view',"
-          }
-        ]
-      }
-    },
-    {
       "module": "wastewater",
       "priority": "P2",
       "area": "css-specialization",
@@ -441,7 +276,7 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 568,
+        "lineCount": 567,
         "controllerAddEventListeners": 0,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
@@ -451,25 +286,11 @@
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
         "usesCentralSavedRecordController": false,
-        "migrationStatusEntries": 1
+        "migrationStatusEntries": 0
       },
-      "score": 86,
-      "status": "platform-conformant-with-minor-debt",
+      "score": 93,
+      "status": "reference-aligned",
       "findings": [
-        {
-          "priority": "P2",
-          "area": "runtime-metadata",
-          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-          "evidence": {
-            "count": 1,
-            "samples": [
-              {
-                "line": 12,
-                "text": "migrationStatus: 'phase-23d-platform-contract-finalization phase-23e-hardening',"
-              }
-            ]
-          }
-        },
         {
           "priority": "P2",
           "area": "css-specialization",
@@ -513,7 +334,7 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 1188,
+        "lineCount": 1187,
         "controllerAddEventListeners": 14,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
@@ -523,9 +344,9 @@
         "hasLocalDynamic": true,
         "hasLegacyCollection": false,
         "usesCentralSavedRecordController": false,
-        "migrationStatusEntries": 1
+        "migrationStatusEntries": 0
       },
-      "score": 79,
+      "score": 86,
       "status": "platform-conformant-with-minor-debt",
       "findings": [
         {
@@ -534,20 +355,6 @@
           "message": "Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.",
           "evidence": {
             "addEventListener": 14
-          }
-        },
-        {
-          "priority": "P2",
-          "area": "runtime-metadata",
-          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-          "evidence": {
-            "count": 1,
-            "samples": [
-              {
-                "line": 12,
-                "text": "migrationStatus: 'phase-25b3-result-renderer-migration phase-25c-dynamic-controller-contract phase-25d-hardening phase-25e-final-hardening phase-25e1-water-heating-preview-fix phase-25e2a-water-heating-ui-switch-fix phase-25e2b-navigation-persistence-fix phase-25e2c-water-heating-visible-labels-fix phase-25e2d-rainwater-segment-bridge',"
-              }
-            ]
           }
         },
         {
@@ -613,7 +420,7 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 752,
+        "lineCount": 751,
         "controllerAddEventListeners": 1,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
@@ -623,26 +430,11 @@
         "hasLocalDynamic": true,
         "hasLegacyCollection": false,
         "usesCentralSavedRecordController": false,
-        "migrationStatusEntries": 1
+        "migrationStatusEntries": 0
       },
-      "score": 93,
+      "score": 100,
       "status": "reference-aligned",
-      "findings": [
-        {
-          "priority": "P2",
-          "area": "runtime-metadata",
-          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-          "evidence": {
-            "count": 1,
-            "samples": [
-              {
-                "line": 12,
-                "text": "migrationStatus: 'phase-24b2-result-renderer-dynamic-islands phase-24b3-dynamic-controller-hardening phase-24c-platform-contract-finalization phase-24d-hardening phase-24d1-global-spacing-fix phase-24e-final-hardening',"
-              }
-            ]
-          }
-        }
-      ]
+      "findings": []
     },
     {
       "module": "heating-cooling",
@@ -669,26 +461,11 @@
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
         "usesCentralSavedRecordController": false,
-        "migrationStatusEntries": 1
+        "migrationStatusEntries": 0
       },
-      "score": 93,
+      "score": 100,
       "status": "reference-aligned",
-      "findings": [
-        {
-          "priority": "P2",
-          "area": "runtime-metadata",
-          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-          "evidence": {
-            "count": 1,
-            "samples": [
-              {
-                "line": 3,
-                "text": "export default defineModuleConfig({ id:'heating-cooling', title:'Heizung / Kälte', shortTitle:'Heizung', group:'HLK-Anlagen', accent:'orange', order:10, defaultVisible:true, migrationStatus: 'phase-12h-final-globalized phase-18b1-result-model phase-18b2-line-section-controller phase-18b3-dynamic-renderer phase-18b4-platform-mount phase-18b4a-ordered-card-layout phase-18c-platform-hardening phase-18d-reference-consolidation phase-18d1-reference-cleanup phase-18d2-controller-viewmodel-split', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA], description:'Leistung, Massenstrom und Temperaturspreizung für wassergeführte Systeme.' });"
-              }
-            ]
-          }
-        }
-      ]
+      "findings": []
     },
     {
       "module": "hx-diagram",
@@ -709,7 +486,7 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 1128,
+        "lineCount": 1127,
         "controllerAddEventListeners": 5,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
@@ -719,26 +496,11 @@
         "hasLocalDynamic": true,
         "hasLegacyCollection": false,
         "usesCentralSavedRecordController": false,
-        "migrationStatusEntries": 1
+        "migrationStatusEntries": 0
       },
-      "score": 93,
+      "score": 100,
       "status": "reference-aligned",
-      "findings": [
-        {
-          "priority": "P2",
-          "area": "runtime-metadata",
-          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-          "evidence": {
-            "count": 1,
-            "samples": [
-              {
-                "line": 12,
-                "text": "migrationStatus: 'phase-26d-final-platform-cleanup',"
-              }
-            ]
-          }
-        }
-      ]
+      "findings": []
     },
     {
       "module": "pipe-sizing",
@@ -765,26 +527,11 @@
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
         "usesCentralSavedRecordController": false,
-        "migrationStatusEntries": 1
+        "migrationStatusEntries": 0
       },
-      "score": 93,
+      "score": 100,
       "status": "reference-aligned",
-      "findings": [
-        {
-          "priority": "P2",
-          "area": "runtime-metadata",
-          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-          "evidence": {
-            "count": 1,
-            "samples": [
-              {
-                "line": 3,
-                "text": "export default defineModuleConfig({ id:'pipe-sizing', title:'Rohrdimensionierung', shortTitle:'Rohr', group:'Sanitär / Heizung', accent:'blue', order:30, defaultVisible:true, migrationStatus: 'phase-8-schema-inventory phase-21b1-platform-mount phase-21b2-saved-record-controller phase-21b3-result-renderer phase-21c-dynamic-renderer phase-21c1-dimension-cards-fix phase-21c2-saved-record-line-attrs phase-21c3-saved-record-controller-parity phase-21d-platform-contract phase-21e-hardening', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS], description:'Empfehlung der DN anhand Volumenstrom oder Massenstrom und maximalem Druckverlust.' });"
-              }
-            ]
-          }
-        }
-      ]
+      "findings": []
     },
     {
       "module": "pressure-holding",
@@ -801,7 +548,7 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 468,
+        "lineCount": 467,
         "controllerAddEventListeners": 0,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
@@ -811,25 +558,11 @@
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
         "usesCentralSavedRecordController": false,
-        "migrationStatusEntries": 1
+        "migrationStatusEntries": 0
       },
-      "score": 86,
-      "status": "platform-conformant-with-minor-debt",
+      "score": 93,
+      "status": "reference-aligned",
       "findings": [
-        {
-          "priority": "P2",
-          "area": "runtime-metadata",
-          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-          "evidence": {
-            "count": 1,
-            "samples": [
-              {
-                "line": 12,
-                "text": "migrationStatus: 'phase-16e-event-pipeline-consolidation phase-20b1-platform-mount phase-20b2-saved-record-controller phase-20b3-result-renderer phase-20c-dynamic-renderer phase-20d-platform-contract phase-20e-hardening',"
-              }
-            ]
-          }
-        },
         {
           "priority": "P2",
           "area": "css-specialization",
@@ -883,7 +616,7 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 1004,
+        "lineCount": 1003,
         "controllerAddEventListeners": 2,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
@@ -893,26 +626,11 @@
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
         "usesCentralSavedRecordController": false,
-        "migrationStatusEntries": 1
+        "migrationStatusEntries": 0
       },
-      "score": 93,
+      "score": 100,
       "status": "reference-aligned",
-      "findings": [
-        {
-          "priority": "P2",
-          "area": "runtime-metadata",
-          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-          "evidence": {
-            "count": 1,
-            "samples": [
-              {
-                "line": 12,
-                "text": "migrationStatus: 'phase-14g- phase-14l- phase-14m-router-direct-render phase-17a2- phase-17a5- phase-17a6-',"
-              }
-            ]
-          }
-        }
-      ]
+      "findings": []
     },
     {
       "module": "unit-converter",
@@ -939,25 +657,11 @@
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
         "usesCentralSavedRecordController": false,
-        "migrationStatusEntries": 1
+        "migrationStatusEntries": 0
       },
-      "score": 86,
-      "status": "platform-conformant-with-minor-debt",
+      "score": 93,
+      "status": "reference-aligned",
       "findings": [
-        {
-          "priority": "P2",
-          "area": "runtime-metadata",
-          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-          "evidence": {
-            "count": 1,
-            "samples": [
-              {
-                "line": 3,
-                "text": "export default defineModuleConfig({ id:'unit-converter', title:'Einheitenrechner', shortTitle:'Einheiten', group:'Utilities', accent:'green', order:40, defaultVisible:true, migrationStatus: 'phase-8-schema-inventory phase-22b1-platform-mount phase-22b1-render-fix phase-22b3-result-renderer phase-22c-dynamic-renderer phase-22c1-result-cleanup phase-22d-platform-contract phase-22e-hardening', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA], description:'Kategorie-basierte Umrechnung technischer Einheiten.' });"
-              }
-            ]
-          }
-        },
         {
           "priority": "P2",
           "area": "css-specialization",
@@ -1035,26 +739,11 @@
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
         "usesCentralSavedRecordController": false,
-        "migrationStatusEntries": 1
+        "migrationStatusEntries": 0
       },
-      "score": 93,
+      "score": 100,
       "status": "reference-aligned",
-      "findings": [
-        {
-          "priority": "P2",
-          "area": "runtime-metadata",
-          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-          "evidence": {
-            "count": 1,
-            "samples": [
-              {
-                "line": 3,
-                "text": "export default defineModuleConfig({ id:'ventilation', title:'Lüftung', shortTitle:'Lüftung', group:'Lufttechnik', accent:'cyan', order:20, defaultVisible:true, migrationStatus: 'phase-13e-ventilation-temperature-render-fix phase-19b1-platform-mount phase-19b2b-line-section-controller phase-19b2c-saved-record-island phase-19b2c-hydrator-final phase-19b2d-saved-record-cleanup phase-19b3-result-renderer phase-19c-dynamic-renderer phase-19d-controller-viewmodel-view', capabilities: [MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE], description:'Luftleistung, Volumenstrom, Temperaturspreizung und Massenstrom.' });"
-              }
-            ]
-          }
-        }
-      ]
+      "findings": []
     },
     {
       "module": "wastewater",
@@ -1073,7 +762,7 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 840,
+        "lineCount": 839,
         "controllerAddEventListeners": 4,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
@@ -1083,25 +772,11 @@
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
         "usesCentralSavedRecordController": false,
-        "migrationStatusEntries": 1
+        "migrationStatusEntries": 0
       },
-      "score": 86,
-      "status": "platform-conformant-with-minor-debt",
+      "score": 93,
+      "status": "reference-aligned",
       "findings": [
-        {
-          "priority": "P2",
-          "area": "runtime-metadata",
-          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-          "evidence": {
-            "count": 1,
-            "samples": [
-              {
-                "line": 12,
-                "text": "migrationStatus: 'phase-8-schema-inventory phase-36a2-controller-viewmodel-view',"
-              }
-            ]
-          }
-        },
         {
           "priority": "P2",
           "area": "css-specialization",
@@ -1281,21 +956,6 @@
     {
       "module": "buffer-storage",
       "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 12,
-            "text": "migrationStatus: 'phase-23d-platform-contract-finalization phase-23e-hardening',"
-          }
-        ]
-      }
-    },
-    {
-      "module": "buffer-storage",
-      "priority": "P2",
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
@@ -1326,21 +986,6 @@
       "message": "Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.",
       "evidence": {
         "addEventListener": 14
-      }
-    },
-    {
-      "module": "drinking-water",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 12,
-            "text": "migrationStatus: 'phase-25b3-result-renderer-migration phase-25c-dynamic-controller-contract phase-25d-hardening phase-25e-final-hardening phase-25e1-water-heating-preview-fix phase-25e2a-water-heating-ui-switch-fix phase-25e2b-navigation-persistence-fix phase-25e2c-water-heating-visible-labels-fix phase-25e2d-rainwater-segment-bridge',"
-          }
-        ]
       }
     },
     {
@@ -1390,81 +1035,6 @@
       }
     },
     {
-      "module": "heat-recovery",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 12,
-            "text": "migrationStatus: 'phase-24b2-result-renderer-dynamic-islands phase-24b3-dynamic-controller-hardening phase-24c-platform-contract-finalization phase-24d-hardening phase-24d1-global-spacing-fix phase-24e-final-hardening',"
-          }
-        ]
-      }
-    },
-    {
-      "module": "heating-cooling",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 3,
-            "text": "export default defineModuleConfig({ id:'heating-cooling', title:'Heizung / Kälte', shortTitle:'Heizung', group:'HLK-Anlagen', accent:'orange', order:10, defaultVisible:true, migrationStatus: 'phase-12h-final-globalized phase-18b1-result-model phase-18b2-line-section-controller phase-18b3-dynamic-renderer phase-18b4-platform-mount phase-18b4a-ordered-card-layout phase-18c-platform-hardening phase-18d-reference-consolidation phase-18d1-reference-cleanup phase-18d2-controller-viewmodel-split', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA], description:'Leistung, Massenstrom und Temperaturspreizung für wassergeführte Systeme.' });"
-          }
-        ]
-      }
-    },
-    {
-      "module": "hx-diagram",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 12,
-            "text": "migrationStatus: 'phase-26d-final-platform-cleanup',"
-          }
-        ]
-      }
-    },
-    {
-      "module": "pipe-sizing",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 3,
-            "text": "export default defineModuleConfig({ id:'pipe-sizing', title:'Rohrdimensionierung', shortTitle:'Rohr', group:'Sanitär / Heizung', accent:'blue', order:30, defaultVisible:true, migrationStatus: 'phase-8-schema-inventory phase-21b1-platform-mount phase-21b2-saved-record-controller phase-21b3-result-renderer phase-21c-dynamic-renderer phase-21c1-dimension-cards-fix phase-21c2-saved-record-line-attrs phase-21c3-saved-record-controller-parity phase-21d-platform-contract phase-21e-hardening', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS], description:'Empfehlung der DN anhand Volumenstrom oder Massenstrom und maximalem Druckverlust.' });"
-          }
-        ]
-      }
-    },
-    {
-      "module": "pressure-holding",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 12,
-            "text": "migrationStatus: 'phase-16e-event-pipeline-consolidation phase-20b1-platform-mount phase-20b2-saved-record-controller phase-20b3-result-renderer phase-20c-dynamic-renderer phase-20d-platform-contract phase-20e-hardening',"
-          }
-        ]
-      }
-    },
-    {
       "module": "pressure-holding",
       "priority": "P2",
       "area": "css-specialization",
@@ -1496,36 +1066,6 @@
             "cssFile": "css/modules.css",
             "line": 107,
             "text": ".module-view[data-module='pressure-holding'] .inline-stat strong { font-size: clamp(.8rem,.95vw,.95rem); line-height: 1.12; }"
-          }
-        ]
-      }
-    },
-    {
-      "module": "rainwater",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 12,
-            "text": "migrationStatus: 'phase-14g- phase-14l- phase-14m-router-direct-render phase-17a2- phase-17a5- phase-17a6-',"
-          }
-        ]
-      }
-    },
-    {
-      "module": "unit-converter",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 3,
-            "text": "export default defineModuleConfig({ id:'unit-converter', title:'Einheitenrechner', shortTitle:'Einheiten', group:'Utilities', accent:'green', order:40, defaultVisible:true, migrationStatus: 'phase-8-schema-inventory phase-22b1-platform-mount phase-22b1-render-fix phase-22b3-result-renderer phase-22c-dynamic-renderer phase-22c1-result-cleanup phase-22d-platform-contract phase-22e-hardening', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA], description:'Kategorie-basierte Umrechnung technischer Einheiten.' });"
           }
         ]
       }
@@ -1577,36 +1117,6 @@
             "cssFile": "css/modules.css",
             "line": 135,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
-          }
-        ]
-      }
-    },
-    {
-      "module": "ventilation",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 3,
-            "text": "export default defineModuleConfig({ id:'ventilation', title:'Lüftung', shortTitle:'Lüftung', group:'Lufttechnik', accent:'cyan', order:20, defaultVisible:true, migrationStatus: 'phase-13e-ventilation-temperature-render-fix phase-19b1-platform-mount phase-19b2b-line-section-controller phase-19b2c-saved-record-island phase-19b2c-hydrator-final phase-19b2d-saved-record-cleanup phase-19b3-result-renderer phase-19c-dynamic-renderer phase-19d-controller-viewmodel-view', capabilities: [MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE], description:'Luftleistung, Volumenstrom, Temperaturspreizung und Massenstrom.' });"
-          }
-        ]
-      }
-    },
-    {
-      "module": "wastewater",
-      "priority": "P2",
-      "area": "runtime-metadata",
-      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
-      "evidence": {
-        "count": 1,
-        "samples": [
-          {
-            "line": 12,
-            "text": "migrationStatus: 'phase-8-schema-inventory phase-36a2-controller-viewmodel-view',"
           }
         ]
       }
