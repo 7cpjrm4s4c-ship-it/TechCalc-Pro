@@ -1,4 +1,4 @@
-import { handlePlatformFieldNavigation } from './focusManager.js';
+import { handlePlatformFieldNavigation, preserveFocusDuring } from './focusManager.js';
 import { markCommittedAction } from './formActions.js';
 const DEFAULT_INTERACTIVE_SELECTOR = '[data-field], input, select, textarea, button, a, summary, [role="button"], [data-line-card], [data-saved-record-card], .saved-record-card, .segmented, [data-tc-action]';
 
@@ -310,7 +310,7 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     const refresh = () => {
       const active = document.activeElement;
       const keep = active && root.contains(active) && active.matches?.('[data-field], [data-platform-focus]');
-      PlatformFocusManager.preserveFocusDuring(root, () => state.set({}, { action: `${action}:refresh`, notify: true }), { restoreFocus: keep });
+      preserveFocusDuring(root, () => state.set({}, { action: `${action}:refresh`, notify: true }), { restoreFocus: keep });
     };
     if (typeof requestAnimationFrame === 'function') requestAnimationFrame(refresh);
     else setTimeout(refresh, 0);

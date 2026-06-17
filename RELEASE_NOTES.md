@@ -71,3 +71,10 @@ Release-hardening status after Phase 31D:
 - Test: `test:phase37b1a` ergaenzt.
 - Validierung: Build ok, Phase 37B.1 Preflight ok, Module Smoke 11/11.
 - Runtime-Logik: keine Feature-Aenderung, gezieltes Browser-Hardening.
+
+## Phase 37B.1B — Browser Runtime Error Elimination
+
+- EventPipeline: fehlende globale `PlatformFocusManager`-Referenz durch expliziten `preserveFocusDuring`-Import ersetzt.
+- Trinkwasser Dynamic Renderer: Dynamic-Island `innerHTML`-Writes gegen stale/detached DOM-Anker gehärtet.
+- Neuer Guard: `test:phase37b1b`.
+

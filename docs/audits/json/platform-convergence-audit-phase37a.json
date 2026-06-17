@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-06-17T13:48:54.145Z",
+  "generatedAt": "2026-06-17T14:15:11.719Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -334,7 +334,7 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 1187,
+        "lineCount": 1202,
         "controllerAddEventListeners": 14,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,

@@ -3,11 +3,26 @@ import { renderInputCard, renderResultCard } from './view.js';
 import { preserveScroll } from '../../core/scrollManager.js';
 import { preserveFocusDuring } from '../../core/focusManager.js';
 
+function isDetachedNodeRace(error) {
+  return error?.name === 'NotFoundError' || /no longer a child/i.test(String(error?.message || ''));
+}
+
 function setIslandInner(root, selector, html){
   const island = root?.querySelector?.(selector);
-  if (!island) return false;
+  if (!island || island.isConnected === false || root?.isConnected === false) return false;
   const next = String(html ?? '');
-  if (island.innerHTML !== next) preserveFocusDuring(root, () => { island.innerHTML = next; }, { skipSelect: true });
+  if (island.innerHTML === next) return true;
+  const apply = () => {
+    if (!island.isConnected || (root?.contains && !root.contains(island))) return false;
+    try {
+      island.innerHTML = next;
+      return true;
+    } catch (error) {
+      if (!isDetachedNodeRace(error)) throw error;
+      return false;
+    }
+  };
+  preserveFocusDuring(root, apply, { skipSelect: true });
   return true;
 }
 
