@@ -1,7 +1,9 @@
 # Phase Documentation
 
-Phase documents are grouped by numeric phase directory, for example `phase-26`, `phase-27`, `phase-28`, `phase-29` and `phase-30`.
+Phase 37B.4 consolidated the historical phase notes. Each phase is now represented by one summary file. Intermediate patch notes were collapsed into the matching phase summary to reduce repository noise and documentation payload.
 
-This keeps long migration history searchable without cluttering the project root.
+## Layout
 
-- [Phase 34C – Module CSS Isolation](PHASE_34C_MODULE_CSS_ISOLATION.md)
+- `phase-06.md` ... `phase-37.md`
+- one file per phase family
+- release notes remain the chronological top-level overview

@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 execFileSync('node', ['scripts/phase37b1-runtime-preflight.mjs'], { stdio: 'inherit' });
 
 const reportPath = 'docs/audits/json/browser-runtime-execution-phase37b1.json';
-const docPath = 'docs/phases/phase37b1-browser-runtime-execution.md';
+const docPath = 'docs/phases/phase-37.md';
 const serverPath = 'scripts/serve-static.mjs';
 const configPath = 'playwright.config.mjs';
 const specPath = 'tests/e2e/phase37b-runtime-smoke.spec.mjs';

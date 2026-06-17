@@ -29,8 +29,8 @@ assert.equal(cssComponents.important, 0, 'components.css must remain !important-
 assert.equal(cssLayout.important, 0, 'layout.css must remain !important-free');
 assert.equal(cssModules.important, 0, 'modules.css must remain !important-free');
 
-assert.equal(existsSync('docs/phases/phase37a-platform-convergence-closure.md'), true, 'Phase 37A closure document must exist');
-const closure = readFileSync('docs/phases/phase37a-platform-convergence-closure.md', 'utf8');
+assert.equal(existsSync('docs/phases/phase-37.md'), true, 'Phase 37A closure document must exist');
+const closure = readFileSync('docs/phases/phase-37.md', 'utf8');
 assert.match(closure, /Phase 37A abgeschlossen/);
 assert.match(closure, /P1-Findings: 0/);
 assert.match(closure, /P2-Restpunkte: 6/);

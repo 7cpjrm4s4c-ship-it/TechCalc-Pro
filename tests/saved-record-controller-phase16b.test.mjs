@@ -5,7 +5,7 @@ const controller = readFileSync('js/core/savedRecordController.js', 'utf8');
 const savedCalculation = readFileSync('js/core/savedCalculationController.js', 'utf8');
 const pipe = readFileSync('js/modules/pipe-sizing/index.js', 'utf8');
 const pipeController = readFileSync('js/modules/pipe-sizing/controller.js', 'utf8');
-const docs = readFileSync('docs/phases/phase-16/PHASE_16B_SAVED_RECORD_CONTROLLER.md', 'utf8');
+const docs = readFileSync('docs/phases/phase-16.md', 'utf8');
 
 assert.match(controller, /export function bindSavedRecordWorkflow/, 'central saved-record workflow must exist');
 assert.match(controller, /savedRecordReducer/, 'central reducer must own create/update/delete/load patches');

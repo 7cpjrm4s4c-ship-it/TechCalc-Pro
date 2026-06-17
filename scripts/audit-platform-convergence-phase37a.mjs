@@ -176,7 +176,7 @@ function mdTable(rows) {
 const report = { ...summary, modules, utilityUsage, riskRegister };
 
 mkdirSync(abs('docs', 'audits', 'json'), { recursive: true });
-mkdirSync(abs('docs', 'phases'), { recursive: true });
+mkdirSync(abs('docs', 'audits'), { recursive: true });
 writeFileSync(abs('docs', 'audits', 'json', 'platform-convergence-audit-phase37a.json'), `${JSON.stringify(report, null, 2)}\n`);
 
 const md = `# Phase 37A – Platform Convergence Audit\n\n` +
@@ -196,8 +196,8 @@ mdTable(['| Datei | !important | Modul-Selektoren |', '|---|---:|---:|', ...cssD
 `\n\n## Utility-Kandidaten für Phase 37B\n\n` +
 (unusedUtilityExports.length ? unusedUtilityExports.map(item => `- ${item.file} :: ${item.symbol}`).join('\n') : '- Keine unbenutzten Utility-Exports gefunden.') +
 `\n\n## SVP-Bewertung\n\nPhase 37A ist als Plattform-Konvergenzaudit abgeschlossen. Die P1-Findings aus 37A.1 sowie die Runtime-Metadaten-Schuld aus 37A.2 sind geschlossen. Übrig bleiben bewusst akzeptierte P2-Themen: CSS-Spezialisierungen, eine Drinking-Water-Event-Density-Prüfung und zwei Utility-Kandidaten. Empfehlung: diese Restpunkte nicht mehr in 37A, sondern in Phase 37B als kontrollierte Cleanup-Runde ohne Feature-Arbeit behandeln.\n`;
-writeFileSync(abs('docs', 'phases', 'phase37a-platform-convergence-audit.md'), md);
+writeFileSync(abs('docs', 'audits', 'phase37a-platform-convergence-audit.md'), md);
 
 console.log(`phase37a platform convergence audit ok (${modules.length} modules, ${riskRegister.length} findings)`);
 console.log(`report: docs/audits/json/platform-convergence-audit-phase37a.json`);
-console.log(`doc: docs/phases/phase37a-platform-convergence-audit.md`);
+console.log(`doc: docs/audits/phase37a-platform-convergence-audit.md`);

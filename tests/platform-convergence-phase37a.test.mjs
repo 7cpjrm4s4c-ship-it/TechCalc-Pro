@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 execFileSync('node', ['scripts/audit-platform-convergence-phase37a.mjs'], { stdio: 'inherit' });
 
 const jsonPath = 'docs/audits/json/platform-convergence-audit-phase37a.json';
-const mdPath = 'docs/phases/phase37a-platform-convergence-audit.md';
+const mdPath = 'docs/phases/phase-37.md';
 assert.equal(existsSync(jsonPath), true, 'phase37a JSON audit report must be generated');
 assert.equal(existsSync(mdPath), true, 'phase37a markdown report must be generated');
 

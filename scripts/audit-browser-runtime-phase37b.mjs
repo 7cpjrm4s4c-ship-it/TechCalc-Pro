@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process';
 
 const phase = '37B';
 const jsonPath = 'docs/audits/json/browser-runtime-smoke-phase37b.json';
-const mdPath = 'docs/phases/phase37b-browser-runtime-smoke.md';
+const mdPath = 'docs/audits/phase37b-browser-runtime-smoke.md';
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
 const specs = [
@@ -78,7 +78,7 @@ const report = {
 };
 
 mkdirSync('docs/audits/json', { recursive: true });
-mkdirSync('docs/phases', { recursive: true });
+mkdirSync('docs/audits', { recursive: true });
 writeFileSync(jsonPath, `${JSON.stringify(report, null, 2)}\n`);
 
 const md = `# Phase 37B - Browser Runtime Smoke Baseline\n\n## Ziel\n\nPhase 37B ergänzt die bisherige Node-Testbasis um eine Browser-Runtime-Smoke-Schicht. Der Fokus liegt auf den Risiken, die Node-Tests strukturell nicht abdecken: echtes Routing im Browser, DOM-Mounts, mobile Pointer-Gesten, Scroll-Lock-Verhalten und Service-Worker-Offline-Fähigkeit.\n\n## Umfang\n\n- 11 aktive Modulrouten\n- Chromium Desktop\n- WebKit Mobile Profil\n- Modulwechsel\n- Saved-Record-Erreichbarkeit\n- Mobile Navigation Swipe Guard\n- Settings Scroll Lock / Restore\n- Service-Worker Offline Reload\n\n## Neue Artefakte\n\n- \`playwright.config.mjs\`\n- \`tests/e2e/phase37b-runtime-smoke.spec.mjs\`\n- \`tests/platform-browser-runtime-phase37b.test.mjs\`\n- \`docs/audits/json/browser-runtime-smoke-phase37b.json\`\n\n## Ergebnis\n\nStatus: **${report.status}**\n\nDie Phase 37B ändert keine Runtime-Logik. Sie legt die Browser-Testschicht als Release-Candidate-Gate an und hält die bestehende Node-Import- und Modul-Smoke-Basis unverändert stabil.\n\n## Ausführung\n\nLokale Browser-Ausführung nach Dependency-Installation:\n\n\`\`\`bash\nnpm install\nnpx playwright install\nnpm run test:e2e:phase37b\n\`\`\`\n\nNode-Gate ohne Browser-Installation:\n\n\`\`\`bash\nnpm run test:phase37b\n\`\`\`\n`;

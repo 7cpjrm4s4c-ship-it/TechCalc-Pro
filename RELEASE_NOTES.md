@@ -92,3 +92,11 @@ Release-hardening status after Phase 31D:
 - Bekannte externe Browser-Meldungen werden als Nicht-App-Befund gefiltert; echte App-Errors bleiben testrelevant.
 - Neuer Guard: `test:phase37b2`.
 - Keine Runtime-Logik geaendert.
+## 1.3.0-rc.1 - Phase 37B.4 Documentation Consolidation
+
+- Consolidated `docs/phases` from 145 historical markdown files to 25 phase-level markdown files.
+- Replaced nested phase/subphase note folders with one summary file per phase family.
+- Added `audit:phase37b4` and `test:phase37b4` guards.
+- Preserved critical regression contracts for Phase 12, Phase 13, Phase 16, Phase 27, Phase 37A and Phase 37B inside consolidated files.
+- Runtime logic unchanged.
+
