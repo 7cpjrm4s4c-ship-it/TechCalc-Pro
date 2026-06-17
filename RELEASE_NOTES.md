@@ -1,3 +1,10 @@
+# Phase 37B.1 — Browser Runtime Execution
+
+- Added zero-dependency static server for Playwright runtime smoke execution.
+- Replaced `npx http-server` dependency in Playwright config with `node scripts/serve-static.mjs`.
+- Added `test:phase37b1` guard and runtime preflight report.
+- App runtime logic unchanged.
+
 ## 1.3.0-rc.1 · Phase 37A abgeschlossen
 
 - Platform Convergence Audit abgeschlossen.

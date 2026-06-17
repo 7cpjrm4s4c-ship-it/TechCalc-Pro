@@ -17,7 +17,7 @@ export default defineConfig({
     video: 'retain-on-failure'
   },
   webServer: {
-    command: `npx http-server . -p ${PORT} -c-1`,
+    command: `node scripts/serve-static.mjs`,
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 15_000

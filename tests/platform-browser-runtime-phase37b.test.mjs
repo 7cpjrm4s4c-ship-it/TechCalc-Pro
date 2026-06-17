@@ -37,6 +37,6 @@ assert.match(spec, /module-nav/, 'mobile nav gesture smoke must be present');
 const config = readFileSync(configPath, 'utf8');
 assert.match(config, /chromium-desktop/, 'desktop chromium project must be configured');
 assert.match(config, /webkit-mobile/, 'mobile webkit project must be configured');
-assert.match(config, /http-server/, 'static server must be configured for PWA smoke tests');
+assert.match(config, /serve-static|http-server/, 'static server must be configured for PWA smoke tests');
 
 console.log('phase37b browser runtime harness test ok');
