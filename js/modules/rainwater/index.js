@@ -13,6 +13,20 @@ import { createLineSectionController } from '../../platform/lineSectionControlle
 import { createRainwaterDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { createRainwaterView } from './view.js';
+import { roofDrainTable } from './tables.js';
+
+
+function drainLookupPatchFromValue(drainSize = 'DN 100') {
+  const preset = roofDrainTable.find(item => item.dn === drainSize)
+    || roofDrainTable.find(item => item.dn === 'DN 100')
+    || roofDrainTable[0];
+  return {
+    drainSize: preset?.dn || drainSize || 'DN 100',
+    drainSizeManual: preset?.dn || drainSize || 'DN 100',
+    drainCapacity: preset?.capacity != null ? String(preset.capacity).replace('.', ',') : '',
+    drainHead: preset?.head != null ? String(preset.head) : ''
+  };
+}
 
 const lineSectionController = createLineSectionController({
   state,
@@ -58,6 +72,17 @@ function isDynamicRainwaterAction(meta = {}) {
 
 function bindRainwaterPlatform(root) {
   lineSectionController.bind(root);
+
+  if (!root || root.__tcRainwaterDrainDirectBound) return;
+  root.__tcRainwaterDrainDirectBound = true;
+
+  root.addEventListener('change', event => {
+    const field = event.target?.closest?.('[data-field="drainSize"]');
+    if (!field || !root.contains(field)) return;
+
+    const patch = drainLookupPatchFromValue(field.value || 'DN 100');
+    state.set(patch, { action: 'rainwater:drainSize:direct-change', notify: true });
+  }, true);
 }
 
 export default createPlatformModule({
