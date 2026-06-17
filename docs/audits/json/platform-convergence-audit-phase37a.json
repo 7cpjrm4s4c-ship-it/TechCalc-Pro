@@ -1,0 +1,1735 @@
+{
+  "phase": "37A",
+  "name": "Platform Convergence Audit",
+  "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
+  "generatedAt": "2026-06-17T12:00:54.056Z",
+  "referenceModules": [
+    "heating-cooling",
+    "ventilation",
+    "pressure-holding",
+    "buffer-storage"
+  ],
+  "modulesAudited": 11,
+  "moduleScores": {
+    "buffer-storage": 86,
+    "drinking-water": 79,
+    "heat-recovery": 93,
+    "heating-cooling": 93,
+    "hx-diagram": 93,
+    "pipe-sizing": 93,
+    "pressure-holding": 86,
+    "rainwater": 78,
+    "unit-converter": 71,
+    "ventilation": 93,
+    "wastewater": 86
+  },
+  "riskCounts": {
+    "P1": 2,
+    "P2": 17
+  },
+  "cssDebt": [
+    {
+      "file": "css/components.css",
+      "important": 0,
+      "inlineStyleSelectors": 0,
+      "moduleScopedSelectors": 0
+    },
+    {
+      "file": "css/layout.css",
+      "important": 0,
+      "inlineStyleSelectors": 0,
+      "moduleScopedSelectors": 0
+    },
+    {
+      "file": "css/modules.css",
+      "important": 0,
+      "inlineStyleSelectors": 0,
+      "moduleScopedSelectors": 27
+    },
+    {
+      "file": "css/tokens.css",
+      "important": 1,
+      "inlineStyleSelectors": 0,
+      "moduleScopedSelectors": 0
+    }
+  ],
+  "unusedUtilityExports": [
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "getMedium",
+      "consumers": []
+    },
+    {
+      "file": "js/utils/pipes.js",
+      "symbol": "dnTable",
+      "consumers": []
+    }
+  ],
+  "topFindings": [
+    {
+      "module": "rainwater",
+      "priority": "P1",
+      "area": "event-boundary",
+      "message": "Event-Listener außerhalb controller.js gefunden.",
+      "evidence": {
+        "count": 2,
+        "samples": [
+          {
+            "file": "index.js",
+            "line": 90,
+            "text": "document.addEventListener('input', precommitDrain, true);"
+          },
+          {
+            "file": "index.js",
+            "line": 91,
+            "text": "document.addEventListener('change', precommitDrain, true);"
+          }
+        ]
+      }
+    },
+    {
+      "module": "unit-converter",
+      "priority": "P1",
+      "area": "module-contract",
+      "message": "Pflichtdateien fehlen: controller.js",
+      "evidence": {
+        "missing": [
+          "controller.js"
+        ]
+      }
+    },
+    {
+      "module": "buffer-storage",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 12,
+            "text": "migrationStatus: 'phase-23d-platform-contract-finalization phase-23e-hardening',"
+          }
+        ]
+      }
+    },
+    {
+      "module": "buffer-storage",
+      "priority": "P2",
+      "area": "css-specialization",
+      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
+      "evidence": {
+        "count": 3,
+        "samples": [
+          {
+            "cssFile": "css/modules.css",
+            "line": 102,
+            "text": ".module-view[data-module='buffer-storage'] .ph-help,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 103,
+            "text": ".module-view[data-module='buffer-storage'] .ph-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 105,
+            "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
+          }
+        ]
+      }
+    },
+    {
+      "module": "drinking-water",
+      "priority": "P2",
+      "area": "event-density",
+      "message": "Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.",
+      "evidence": {
+        "addEventListener": 14
+      }
+    },
+    {
+      "module": "drinking-water",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 12,
+            "text": "migrationStatus: 'phase-25b3-result-renderer-migration phase-25c-dynamic-controller-contract phase-25d-hardening phase-25e-final-hardening phase-25e1-water-heating-preview-fix phase-25e2a-water-heating-ui-switch-fix phase-25e2b-navigation-persistence-fix phase-25e2c-water-heating-visible-labels-fix phase-25e2d-rainwater-segment-bridge',"
+          }
+        ]
+      }
+    },
+    {
+      "module": "drinking-water",
+      "priority": "P2",
+      "area": "css-specialization",
+      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
+      "evidence": {
+        "count": 7,
+        "samples": [
+          {
+            "cssFile": "css/modules.css",
+            "line": 91,
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog > summary,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 92,
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 93,
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__record { padding: var(--tc-gap); }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 94,
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__list,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 95,
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 96,
+            "text": ".module-view[data-module='drinking-water'] .tc-consumer-row > div,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 97,
+            "text": ".module-view[data-module='drinking-water'] .tc-fixture-row > div { display: grid; gap: 4px; min-width: 0; }"
+          }
+        ]
+      }
+    },
+    {
+      "module": "heat-recovery",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 12,
+            "text": "migrationStatus: 'phase-24b2-result-renderer-dynamic-islands phase-24b3-dynamic-controller-hardening phase-24c-platform-contract-finalization phase-24d-hardening phase-24d1-global-spacing-fix phase-24e-final-hardening',"
+          }
+        ]
+      }
+    },
+    {
+      "module": "heating-cooling",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 3,
+            "text": "export default defineModuleConfig({ id:'heating-cooling', title:'Heizung / Kälte', shortTitle:'Heizung', group:'HLK-Anlagen', accent:'orange', order:10, defaultVisible:true, migrationStatus: 'phase-12h-final-globalized phase-18b1-result-model phase-18b2-line-section-controller phase-18b3-dynamic-renderer phase-18b4-platform-mount phase-18b4a-ordered-card-layout phase-18c-platform-hardening phase-18d-reference-consolidation phase-18d1-reference-cleanup phase-18d2-controller-viewmodel-split', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA], description:'Leistung, Massenstrom und Temperaturspreizung für wassergeführte Systeme.' });"
+          }
+        ]
+      }
+    },
+    {
+      "module": "hx-diagram",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 12,
+            "text": "migrationStatus: 'phase-26d-final-platform-cleanup',"
+          }
+        ]
+      }
+    },
+    {
+      "module": "pipe-sizing",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 3,
+            "text": "export default defineModuleConfig({ id:'pipe-sizing', title:'Rohrdimensionierung', shortTitle:'Rohr', group:'Sanitär / Heizung', accent:'blue', order:30, defaultVisible:true, migrationStatus: 'phase-8-schema-inventory phase-21b1-platform-mount phase-21b2-saved-record-controller phase-21b3-result-renderer phase-21c-dynamic-renderer phase-21c1-dimension-cards-fix phase-21c2-saved-record-line-attrs phase-21c3-saved-record-controller-parity phase-21d-platform-contract phase-21e-hardening', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS], description:'Empfehlung der DN anhand Volumenstrom oder Massenstrom und maximalem Druckverlust.' });"
+          }
+        ]
+      }
+    },
+    {
+      "module": "pressure-holding",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 12,
+            "text": "migrationStatus: 'phase-16e-event-pipeline-consolidation phase-20b1-platform-mount phase-20b2-saved-record-controller phase-20b3-result-renderer phase-20c-dynamic-renderer phase-20d-platform-contract phase-20e-hardening',"
+          }
+        ]
+      }
+    },
+    {
+      "module": "pressure-holding",
+      "priority": "P2",
+      "area": "css-specialization",
+      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
+      "evidence": {
+        "count": 5,
+        "samples": [
+          {
+            "cssFile": "css/modules.css",
+            "line": 100,
+            "text": ".module-view[data-module='pressure-holding'] .ph-help,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 101,
+            "text": ".module-view[data-module='pressure-holding'] .ph-note,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 104,
+            "text": ".module-view[data-module='pressure-holding'] .ph-formula,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 106,
+            "text": ".module-view[data-module='pressure-holding'] .inline-stat span { white-space: normal; font-size: clamp(.62rem,.72vw,.72rem); letter-spacing: .08em; }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 107,
+            "text": ".module-view[data-module='pressure-holding'] .inline-stat strong { font-size: clamp(.8rem,.95vw,.95rem); line-height: 1.12; }"
+          }
+        ]
+      }
+    },
+    {
+      "module": "rainwater",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 12,
+            "text": "migrationStatus: 'phase-14g- phase-14l- phase-14m-router-direct-render phase-17a2- phase-17a5- phase-17a6-',"
+          }
+        ]
+      }
+    },
+    {
+      "module": "unit-converter",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 3,
+            "text": "export default defineModuleConfig({ id:'unit-converter', title:'Einheitenrechner', shortTitle:'Einheiten', group:'Utilities', accent:'green', order:40, defaultVisible:true, migrationStatus: 'phase-8-schema-inventory phase-22b1-platform-mount phase-22b1-render-fix phase-22b3-result-renderer phase-22c-dynamic-renderer phase-22c1-result-cleanup phase-22d-platform-contract phase-22e-hardening', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA], description:'Kategorie-basierte Umrechnung technischer Einheiten.' });"
+          }
+        ]
+      }
+    },
+    {
+      "module": "unit-converter",
+      "priority": "P2",
+      "area": "css-specialization",
+      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
+      "evidence": {
+        "count": 8,
+        "samples": [
+          {
+            "cssFile": "css/modules.css",
+            "line": 116,
+            "text": ".module-view[data-module='unit-converter'] #convertedValue,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 117,
+            "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 118,
+            "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 119,
+            "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 132,
+            "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 133,
+            "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 134,
+            "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 135,
+            "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
+          }
+        ]
+      }
+    },
+    {
+      "module": "ventilation",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 3,
+            "text": "export default defineModuleConfig({ id:'ventilation', title:'Lüftung', shortTitle:'Lüftung', group:'Lufttechnik', accent:'cyan', order:20, defaultVisible:true, migrationStatus: 'phase-13e-ventilation-temperature-render-fix phase-19b1-platform-mount phase-19b2b-line-section-controller phase-19b2c-saved-record-island phase-19b2c-hydrator-final phase-19b2d-saved-record-cleanup phase-19b3-result-renderer phase-19c-dynamic-renderer phase-19d-controller-viewmodel-view', capabilities: [MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE], description:'Luftleistung, Volumenstrom, Temperaturspreizung und Massenstrom.' });"
+          }
+        ]
+      }
+    },
+    {
+      "module": "wastewater",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 12,
+            "text": "migrationStatus: 'phase-8-schema-inventory phase-36a2-controller-viewmodel-view',"
+          }
+        ]
+      }
+    },
+    {
+      "module": "wastewater",
+      "priority": "P2",
+      "area": "css-specialization",
+      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
+      "evidence": {
+        "count": 3,
+        "samples": [
+          {
+            "cssFile": "css/modules.css",
+            "line": 87,
+            "text": ".pipe-dimension-card--green .pipe-bar span { background: #25d96a; }.wastewater-subselect { display: grid; gap: var(--tc-gap); }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 88,
+            "text": ".wastewater-subselect > span { color: var(--color-muted); font-size: .78rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }.wastewater-line-selector { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 89,
+            "text": ".wastewater-line-selector button { scroll-snap-align: center; }"
+          }
+        ]
+      }
+    }
+  ],
+  "modules": [
+    {
+      "module": "buffer-storage",
+      "reference": true,
+      "files": [
+        "config.js",
+        "controller.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 568,
+        "controllerAddEventListeners": 0,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 3,
+        "hasPlatformDynamic": true,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 1
+      },
+      "score": 86,
+      "status": "platform-conformant-with-minor-debt",
+      "findings": [
+        {
+          "priority": "P2",
+          "area": "runtime-metadata",
+          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+          "evidence": {
+            "count": 1,
+            "samples": [
+              {
+                "line": 12,
+                "text": "migrationStatus: 'phase-23d-platform-contract-finalization phase-23e-hardening',"
+              }
+            ]
+          }
+        },
+        {
+          "priority": "P2",
+          "area": "css-specialization",
+          "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
+          "evidence": {
+            "count": 3,
+            "samples": [
+              {
+                "cssFile": "css/modules.css",
+                "line": 102,
+                "text": ".module-view[data-module='buffer-storage'] .ph-help,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 103,
+                "text": ".module-view[data-module='buffer-storage'] .ph-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 105,
+                "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "module": "drinking-water",
+      "reference": false,
+      "files": [
+        "config.js",
+        "controller.js",
+        "dynamicRenderer.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 1188,
+        "controllerAddEventListeners": 14,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 7,
+        "hasPlatformDynamic": false,
+        "hasLocalDynamic": true,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 1
+      },
+      "score": 79,
+      "status": "platform-conformant-with-minor-debt",
+      "findings": [
+        {
+          "priority": "P2",
+          "area": "event-density",
+          "message": "Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.",
+          "evidence": {
+            "addEventListener": 14
+          }
+        },
+        {
+          "priority": "P2",
+          "area": "runtime-metadata",
+          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+          "evidence": {
+            "count": 1,
+            "samples": [
+              {
+                "line": 12,
+                "text": "migrationStatus: 'phase-25b3-result-renderer-migration phase-25c-dynamic-controller-contract phase-25d-hardening phase-25e-final-hardening phase-25e1-water-heating-preview-fix phase-25e2a-water-heating-ui-switch-fix phase-25e2b-navigation-persistence-fix phase-25e2c-water-heating-visible-labels-fix phase-25e2d-rainwater-segment-bridge',"
+              }
+            ]
+          }
+        },
+        {
+          "priority": "P2",
+          "area": "css-specialization",
+          "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
+          "evidence": {
+            "count": 7,
+            "samples": [
+              {
+                "cssFile": "css/modules.css",
+                "line": 91,
+                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog > summary,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 92,
+                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 93,
+                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__record { padding: var(--tc-gap); }"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 94,
+                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__list,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 95,
+                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 96,
+                "text": ".module-view[data-module='drinking-water'] .tc-consumer-row > div,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 97,
+                "text": ".module-view[data-module='drinking-water'] .tc-fixture-row > div { display: grid; gap: 4px; min-width: 0; }"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "module": "heat-recovery",
+      "reference": false,
+      "files": [
+        "config.js",
+        "controller.js",
+        "dynamicRenderer.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 752,
+        "controllerAddEventListeners": 1,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": false,
+        "hasLocalDynamic": true,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 1
+      },
+      "score": 93,
+      "status": "reference-aligned",
+      "findings": [
+        {
+          "priority": "P2",
+          "area": "runtime-metadata",
+          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+          "evidence": {
+            "count": 1,
+            "samples": [
+              {
+                "line": 12,
+                "text": "migrationStatus: 'phase-24b2-result-renderer-dynamic-islands phase-24b3-dynamic-controller-hardening phase-24c-platform-contract-finalization phase-24d-hardening phase-24d1-global-spacing-fix phase-24e-final-hardening',"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "module": "heating-cooling",
+      "reference": true,
+      "files": [
+        "config.js",
+        "controller.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 593,
+        "controllerAddEventListeners": 0,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": true,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 1
+      },
+      "score": 93,
+      "status": "reference-aligned",
+      "findings": [
+        {
+          "priority": "P2",
+          "area": "runtime-metadata",
+          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+          "evidence": {
+            "count": 1,
+            "samples": [
+              {
+                "line": 3,
+                "text": "export default defineModuleConfig({ id:'heating-cooling', title:'Heizung / Kälte', shortTitle:'Heizung', group:'HLK-Anlagen', accent:'orange', order:10, defaultVisible:true, migrationStatus: 'phase-12h-final-globalized phase-18b1-result-model phase-18b2-line-section-controller phase-18b3-dynamic-renderer phase-18b4-platform-mount phase-18b4a-ordered-card-layout phase-18c-platform-hardening phase-18d-reference-consolidation phase-18d1-reference-cleanup phase-18d2-controller-viewmodel-split', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA], description:'Leistung, Massenstrom und Temperaturspreizung für wassergeführte Systeme.' });"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "module": "hx-diagram",
+      "reference": false,
+      "files": [
+        "config.js",
+        "controller.js",
+        "diagramRenderer.js",
+        "dynamicRenderer.js",
+        "formRenderer.js",
+        "index.js",
+        "logic.js",
+        "renderPipeline.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 1128,
+        "controllerAddEventListeners": 5,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": false,
+        "hasLocalDynamic": true,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 1
+      },
+      "score": 93,
+      "status": "reference-aligned",
+      "findings": [
+        {
+          "priority": "P2",
+          "area": "runtime-metadata",
+          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+          "evidence": {
+            "count": 1,
+            "samples": [
+              {
+                "line": 12,
+                "text": "migrationStatus: 'phase-26d-final-platform-cleanup',"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "module": "pipe-sizing",
+      "reference": false,
+      "files": [
+        "config.js",
+        "controller.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 328,
+        "controllerAddEventListeners": 0,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": true,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 1
+      },
+      "score": 93,
+      "status": "reference-aligned",
+      "findings": [
+        {
+          "priority": "P2",
+          "area": "runtime-metadata",
+          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+          "evidence": {
+            "count": 1,
+            "samples": [
+              {
+                "line": 3,
+                "text": "export default defineModuleConfig({ id:'pipe-sizing', title:'Rohrdimensionierung', shortTitle:'Rohr', group:'Sanitär / Heizung', accent:'blue', order:30, defaultVisible:true, migrationStatus: 'phase-8-schema-inventory phase-21b1-platform-mount phase-21b2-saved-record-controller phase-21b3-result-renderer phase-21c-dynamic-renderer phase-21c1-dimension-cards-fix phase-21c2-saved-record-line-attrs phase-21c3-saved-record-controller-parity phase-21d-platform-contract phase-21e-hardening', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS], description:'Empfehlung der DN anhand Volumenstrom oder Massenstrom und maximalem Druckverlust.' });"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "module": "pressure-holding",
+      "reference": true,
+      "files": [
+        "config.js",
+        "controller.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 468,
+        "controllerAddEventListeners": 0,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 5,
+        "hasPlatformDynamic": true,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 1
+      },
+      "score": 86,
+      "status": "platform-conformant-with-minor-debt",
+      "findings": [
+        {
+          "priority": "P2",
+          "area": "runtime-metadata",
+          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+          "evidence": {
+            "count": 1,
+            "samples": [
+              {
+                "line": 12,
+                "text": "migrationStatus: 'phase-16e-event-pipeline-consolidation phase-20b1-platform-mount phase-20b2-saved-record-controller phase-20b3-result-renderer phase-20c-dynamic-renderer phase-20d-platform-contract phase-20e-hardening',"
+              }
+            ]
+          }
+        },
+        {
+          "priority": "P2",
+          "area": "css-specialization",
+          "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
+          "evidence": {
+            "count": 5,
+            "samples": [
+              {
+                "cssFile": "css/modules.css",
+                "line": 100,
+                "text": ".module-view[data-module='pressure-holding'] .ph-help,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 101,
+                "text": ".module-view[data-module='pressure-holding'] .ph-note,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 104,
+                "text": ".module-view[data-module='pressure-holding'] .ph-formula,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 106,
+                "text": ".module-view[data-module='pressure-holding'] .inline-stat span { white-space: normal; font-size: clamp(.62rem,.72vw,.72rem); letter-spacing: .08em; }"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 107,
+                "text": ".module-view[data-module='pressure-holding'] .inline-stat strong { font-size: clamp(.8rem,.95vw,.95rem); line-height: 1.12; }"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "module": "rainwater",
+      "reference": false,
+      "files": [
+        "config.js",
+        "controller.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "tables.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 1008,
+        "controllerAddEventListeners": 0,
+        "nonControllerAddEventListeners": 2,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": true,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 1
+      },
+      "score": 78,
+      "status": "platform-conformant-with-minor-debt",
+      "findings": [
+        {
+          "priority": "P1",
+          "area": "event-boundary",
+          "message": "Event-Listener außerhalb controller.js gefunden.",
+          "evidence": {
+            "count": 2,
+            "samples": [
+              {
+                "file": "index.js",
+                "line": 90,
+                "text": "document.addEventListener('input', precommitDrain, true);"
+              },
+              {
+                "file": "index.js",
+                "line": 91,
+                "text": "document.addEventListener('change', precommitDrain, true);"
+              }
+            ]
+          }
+        },
+        {
+          "priority": "P2",
+          "area": "runtime-metadata",
+          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+          "evidence": {
+            "count": 1,
+            "samples": [
+              {
+                "line": 12,
+                "text": "migrationStatus: 'phase-14g- phase-14l- phase-14m-router-direct-render phase-17a2- phase-17a5- phase-17a6-',"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "module": "unit-converter",
+      "reference": false,
+      "files": [
+        "config.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 189,
+        "controllerAddEventListeners": 0,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 8,
+        "hasPlatformDynamic": true,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 1
+      },
+      "score": 71,
+      "status": "cleanup-required",
+      "findings": [
+        {
+          "priority": "P1",
+          "area": "module-contract",
+          "message": "Pflichtdateien fehlen: controller.js",
+          "evidence": {
+            "missing": [
+              "controller.js"
+            ]
+          }
+        },
+        {
+          "priority": "P2",
+          "area": "runtime-metadata",
+          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+          "evidence": {
+            "count": 1,
+            "samples": [
+              {
+                "line": 3,
+                "text": "export default defineModuleConfig({ id:'unit-converter', title:'Einheitenrechner', shortTitle:'Einheiten', group:'Utilities', accent:'green', order:40, defaultVisible:true, migrationStatus: 'phase-8-schema-inventory phase-22b1-platform-mount phase-22b1-render-fix phase-22b3-result-renderer phase-22c-dynamic-renderer phase-22c1-result-cleanup phase-22d-platform-contract phase-22e-hardening', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA], description:'Kategorie-basierte Umrechnung technischer Einheiten.' });"
+              }
+            ]
+          }
+        },
+        {
+          "priority": "P2",
+          "area": "css-specialization",
+          "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
+          "evidence": {
+            "count": 8,
+            "samples": [
+              {
+                "cssFile": "css/modules.css",
+                "line": 116,
+                "text": ".module-view[data-module='unit-converter'] #convertedValue,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 117,
+                "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 118,
+                "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 119,
+                "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 132,
+                "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 133,
+                "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 134,
+                "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 135,
+                "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "module": "ventilation",
+      "reference": true,
+      "files": [
+        "config.js",
+        "controller.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 463,
+        "controllerAddEventListeners": 0,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": false,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 1
+      },
+      "score": 93,
+      "status": "reference-aligned",
+      "findings": [
+        {
+          "priority": "P2",
+          "area": "runtime-metadata",
+          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+          "evidence": {
+            "count": 1,
+            "samples": [
+              {
+                "line": 3,
+                "text": "export default defineModuleConfig({ id:'ventilation', title:'Lüftung', shortTitle:'Lüftung', group:'Lufttechnik', accent:'cyan', order:20, defaultVisible:true, migrationStatus: 'phase-13e-ventilation-temperature-render-fix phase-19b1-platform-mount phase-19b2b-line-section-controller phase-19b2c-saved-record-island phase-19b2c-hydrator-final phase-19b2d-saved-record-cleanup phase-19b3-result-renderer phase-19c-dynamic-renderer phase-19d-controller-viewmodel-view', capabilities: [MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE], description:'Luftleistung, Volumenstrom, Temperaturspreizung und Massenstrom.' });"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "module": "wastewater",
+      "reference": false,
+      "files": [
+        "config.js",
+        "controller.js",
+        "index.js",
+        "lineModel.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "tables.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 840,
+        "controllerAddEventListeners": 4,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 3,
+        "hasPlatformDynamic": true,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 1
+      },
+      "score": 86,
+      "status": "platform-conformant-with-minor-debt",
+      "findings": [
+        {
+          "priority": "P2",
+          "area": "runtime-metadata",
+          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+          "evidence": {
+            "count": 1,
+            "samples": [
+              {
+                "line": 12,
+                "text": "migrationStatus: 'phase-8-schema-inventory phase-36a2-controller-viewmodel-view',"
+              }
+            ]
+          }
+        },
+        {
+          "priority": "P2",
+          "area": "css-specialization",
+          "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
+          "evidence": {
+            "count": 3,
+            "samples": [
+              {
+                "cssFile": "css/modules.css",
+                "line": 87,
+                "text": ".pipe-dimension-card--green .pipe-bar span { background: #25d96a; }.wastewater-subselect { display: grid; gap: var(--tc-gap); }"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 88,
+                "text": ".wastewater-subselect > span { color: var(--color-muted); font-size: .78rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }.wastewater-line-selector { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 89,
+                "text": ".wastewater-line-selector button { scroll-snap-align: center; }"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "utilityUsage": [
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "MEDIA",
+      "consumers": [
+        "js/modules/heating-cooling/controller.js",
+        "js/modules/heating-cooling/schema.js",
+        "js/modules/heating-cooling/view.js"
+      ]
+    },
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "getMedium",
+      "consumers": []
+    },
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "heatingCooling",
+      "consumers": [
+        "js/modules/heating-cooling/logic.js"
+      ]
+    },
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "airDensity",
+      "consumers": [
+        "js/modules/heat-recovery/logic.js"
+      ]
+    },
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "ventilation",
+      "consumers": [
+        "js/core/app.js",
+        "js/core/preferences.js",
+        "js/core/projectStorage.js",
+        "js/modules/heat-recovery/logic.js",
+        "js/modules/ventilation/config.js",
+        "js/modules/ventilation/logic.js",
+        "js/modules/wastewater/lineModel.js",
+        "js/modules/wastewater/logic.js"
+      ]
+    },
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "num",
+      "consumers": [
+        "js/core/pdfExport.js",
+        "js/modules/buffer-storage/logic.js",
+        "js/modules/drinking-water/logic.js",
+        "js/modules/heat-recovery/logic.js",
+        "js/modules/hx-diagram/logic.js",
+        "js/modules/pressure-holding/logic.js"
+      ]
+    },
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "fmt",
+      "consumers": [
+        "js/modules/buffer-storage/controller.js",
+        "js/modules/buffer-storage/results.js",
+        "js/modules/buffer-storage/viewModel.js",
+        "js/modules/drinking-water/results.js",
+        "js/modules/drinking-water/view.js",
+        "js/modules/drinking-water/viewModel.js",
+        "js/modules/heat-recovery/results.js",
+        "js/modules/heating-cooling/controller.js",
+        "js/modules/heating-cooling/results.js",
+        "js/modules/heating-cooling/schema.js",
+        "js/modules/heating-cooling/view.js",
+        "js/modules/pipe-sizing/controller.js",
+        "js/modules/pipe-sizing/results.js",
+        "js/modules/pressure-holding/controller.js",
+        "js/modules/pressure-holding/results.js",
+        "js/modules/rainwater/results.js",
+        "js/modules/rainwater/schema.js",
+        "js/modules/unit-converter/index.js",
+        "js/modules/unit-converter/results.js",
+        "js/modules/unit-converter/viewModel.js",
+        "js/modules/ventilation/results.js",
+        "js/modules/ventilation/viewModel.js",
+        "js/modules/wastewater/results.js",
+        "js/modules/wastewater/schema.js",
+        "js/platform/dynamicRenderer/index.js"
+      ]
+    },
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "fmtInput",
+      "consumers": [
+        "js/modules/buffer-storage/viewModel.js",
+        "js/modules/drinking-water/view.js",
+        "js/modules/heat-recovery/viewModel.js",
+        "js/modules/heating-cooling/controller.js",
+        "js/modules/heating-cooling/index.js",
+        "js/modules/heating-cooling/view.js",
+        "js/modules/heating-cooling/viewModel.js",
+        "js/modules/hx-diagram/formRenderer.js",
+        "js/modules/pressure-holding/index.js",
+        "js/modules/pressure-holding/viewModel.js",
+        "js/modules/rainwater/schema.js",
+        "js/modules/ventilation/controller.js",
+        "js/modules/ventilation/view.js",
+        "js/modules/wastewater/schema.js",
+        "js/modules/wastewater/viewModel.js",
+        "js/platform/dynamicRenderer/index.js"
+      ]
+    },
+    {
+      "file": "js/utils/pipes.js",
+      "symbol": "pipeSystems",
+      "consumers": [
+        "js/modules/heating-cooling/schema.js",
+        "js/modules/heating-cooling/view.js",
+        "js/modules/pipe-sizing/viewModel.js"
+      ]
+    },
+    {
+      "file": "js/utils/pipes.js",
+      "symbol": "dnTable",
+      "consumers": []
+    },
+    {
+      "file": "js/utils/pipes.js",
+      "symbol": "recommendPipe",
+      "consumers": [
+        "js/modules/heating-cooling/logic.js",
+        "js/modules/pipe-sizing/logic.js"
+      ]
+    },
+    {
+      "file": "js/utils/units.js",
+      "symbol": "unitCategories",
+      "consumers": [
+        "js/modules/unit-converter/logic.js",
+        "js/modules/unit-converter/results.js",
+        "js/modules/unit-converter/viewModel.js"
+      ]
+    },
+    {
+      "file": "js/utils/units.js",
+      "symbol": "convert",
+      "consumers": [
+        "js/modules/unit-converter/logic.js"
+      ]
+    }
+  ],
+  "riskRegister": [
+    {
+      "module": "rainwater",
+      "priority": "P1",
+      "area": "event-boundary",
+      "message": "Event-Listener außerhalb controller.js gefunden.",
+      "evidence": {
+        "count": 2,
+        "samples": [
+          {
+            "file": "index.js",
+            "line": 90,
+            "text": "document.addEventListener('input', precommitDrain, true);"
+          },
+          {
+            "file": "index.js",
+            "line": 91,
+            "text": "document.addEventListener('change', precommitDrain, true);"
+          }
+        ]
+      }
+    },
+    {
+      "module": "unit-converter",
+      "priority": "P1",
+      "area": "module-contract",
+      "message": "Pflichtdateien fehlen: controller.js",
+      "evidence": {
+        "missing": [
+          "controller.js"
+        ]
+      }
+    },
+    {
+      "module": "buffer-storage",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 12,
+            "text": "migrationStatus: 'phase-23d-platform-contract-finalization phase-23e-hardening',"
+          }
+        ]
+      }
+    },
+    {
+      "module": "buffer-storage",
+      "priority": "P2",
+      "area": "css-specialization",
+      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
+      "evidence": {
+        "count": 3,
+        "samples": [
+          {
+            "cssFile": "css/modules.css",
+            "line": 102,
+            "text": ".module-view[data-module='buffer-storage'] .ph-help,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 103,
+            "text": ".module-view[data-module='buffer-storage'] .ph-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 105,
+            "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
+          }
+        ]
+      }
+    },
+    {
+      "module": "drinking-water",
+      "priority": "P2",
+      "area": "event-density",
+      "message": "Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.",
+      "evidence": {
+        "addEventListener": 14
+      }
+    },
+    {
+      "module": "drinking-water",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 12,
+            "text": "migrationStatus: 'phase-25b3-result-renderer-migration phase-25c-dynamic-controller-contract phase-25d-hardening phase-25e-final-hardening phase-25e1-water-heating-preview-fix phase-25e2a-water-heating-ui-switch-fix phase-25e2b-navigation-persistence-fix phase-25e2c-water-heating-visible-labels-fix phase-25e2d-rainwater-segment-bridge',"
+          }
+        ]
+      }
+    },
+    {
+      "module": "drinking-water",
+      "priority": "P2",
+      "area": "css-specialization",
+      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
+      "evidence": {
+        "count": 7,
+        "samples": [
+          {
+            "cssFile": "css/modules.css",
+            "line": 91,
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog > summary,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 92,
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 93,
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__record { padding: var(--tc-gap); }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 94,
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__list,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 95,
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 96,
+            "text": ".module-view[data-module='drinking-water'] .tc-consumer-row > div,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 97,
+            "text": ".module-view[data-module='drinking-water'] .tc-fixture-row > div { display: grid; gap: 4px; min-width: 0; }"
+          }
+        ]
+      }
+    },
+    {
+      "module": "heat-recovery",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 12,
+            "text": "migrationStatus: 'phase-24b2-result-renderer-dynamic-islands phase-24b3-dynamic-controller-hardening phase-24c-platform-contract-finalization phase-24d-hardening phase-24d1-global-spacing-fix phase-24e-final-hardening',"
+          }
+        ]
+      }
+    },
+    {
+      "module": "heating-cooling",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 3,
+            "text": "export default defineModuleConfig({ id:'heating-cooling', title:'Heizung / Kälte', shortTitle:'Heizung', group:'HLK-Anlagen', accent:'orange', order:10, defaultVisible:true, migrationStatus: 'phase-12h-final-globalized phase-18b1-result-model phase-18b2-line-section-controller phase-18b3-dynamic-renderer phase-18b4-platform-mount phase-18b4a-ordered-card-layout phase-18c-platform-hardening phase-18d-reference-consolidation phase-18d1-reference-cleanup phase-18d2-controller-viewmodel-split', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA], description:'Leistung, Massenstrom und Temperaturspreizung für wassergeführte Systeme.' });"
+          }
+        ]
+      }
+    },
+    {
+      "module": "hx-diagram",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 12,
+            "text": "migrationStatus: 'phase-26d-final-platform-cleanup',"
+          }
+        ]
+      }
+    },
+    {
+      "module": "pipe-sizing",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 3,
+            "text": "export default defineModuleConfig({ id:'pipe-sizing', title:'Rohrdimensionierung', shortTitle:'Rohr', group:'Sanitär / Heizung', accent:'blue', order:30, defaultVisible:true, migrationStatus: 'phase-8-schema-inventory phase-21b1-platform-mount phase-21b2-saved-record-controller phase-21b3-result-renderer phase-21c-dynamic-renderer phase-21c1-dimension-cards-fix phase-21c2-saved-record-line-attrs phase-21c3-saved-record-controller-parity phase-21d-platform-contract phase-21e-hardening', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS], description:'Empfehlung der DN anhand Volumenstrom oder Massenstrom und maximalem Druckverlust.' });"
+          }
+        ]
+      }
+    },
+    {
+      "module": "pressure-holding",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 12,
+            "text": "migrationStatus: 'phase-16e-event-pipeline-consolidation phase-20b1-platform-mount phase-20b2-saved-record-controller phase-20b3-result-renderer phase-20c-dynamic-renderer phase-20d-platform-contract phase-20e-hardening',"
+          }
+        ]
+      }
+    },
+    {
+      "module": "pressure-holding",
+      "priority": "P2",
+      "area": "css-specialization",
+      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
+      "evidence": {
+        "count": 5,
+        "samples": [
+          {
+            "cssFile": "css/modules.css",
+            "line": 100,
+            "text": ".module-view[data-module='pressure-holding'] .ph-help,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 101,
+            "text": ".module-view[data-module='pressure-holding'] .ph-note,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 104,
+            "text": ".module-view[data-module='pressure-holding'] .ph-formula,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 106,
+            "text": ".module-view[data-module='pressure-holding'] .inline-stat span { white-space: normal; font-size: clamp(.62rem,.72vw,.72rem); letter-spacing: .08em; }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 107,
+            "text": ".module-view[data-module='pressure-holding'] .inline-stat strong { font-size: clamp(.8rem,.95vw,.95rem); line-height: 1.12; }"
+          }
+        ]
+      }
+    },
+    {
+      "module": "rainwater",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 12,
+            "text": "migrationStatus: 'phase-14g- phase-14l- phase-14m-router-direct-render phase-17a2- phase-17a5- phase-17a6-',"
+          }
+        ]
+      }
+    },
+    {
+      "module": "unit-converter",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 3,
+            "text": "export default defineModuleConfig({ id:'unit-converter', title:'Einheitenrechner', shortTitle:'Einheiten', group:'Utilities', accent:'green', order:40, defaultVisible:true, migrationStatus: 'phase-8-schema-inventory phase-22b1-platform-mount phase-22b1-render-fix phase-22b3-result-renderer phase-22c-dynamic-renderer phase-22c1-result-cleanup phase-22d-platform-contract phase-22e-hardening', capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA], description:'Kategorie-basierte Umrechnung technischer Einheiten.' });"
+          }
+        ]
+      }
+    },
+    {
+      "module": "unit-converter",
+      "priority": "P2",
+      "area": "css-specialization",
+      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
+      "evidence": {
+        "count": 8,
+        "samples": [
+          {
+            "cssFile": "css/modules.css",
+            "line": 116,
+            "text": ".module-view[data-module='unit-converter'] #convertedValue,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 117,
+            "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 118,
+            "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 119,
+            "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 132,
+            "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 133,
+            "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 134,
+            "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 135,
+            "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
+          }
+        ]
+      }
+    },
+    {
+      "module": "ventilation",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 3,
+            "text": "export default defineModuleConfig({ id:'ventilation', title:'Lüftung', shortTitle:'Lüftung', group:'Lufttechnik', accent:'cyan', order:20, defaultVisible:true, migrationStatus: 'phase-13e-ventilation-temperature-render-fix phase-19b1-platform-mount phase-19b2b-line-section-controller phase-19b2c-saved-record-island phase-19b2c-hydrator-final phase-19b2d-saved-record-cleanup phase-19b3-result-renderer phase-19c-dynamic-renderer phase-19d-controller-viewmodel-view', capabilities: [MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE], description:'Luftleistung, Volumenstrom, Temperaturspreizung und Massenstrom.' });"
+          }
+        ]
+      }
+    },
+    {
+      "module": "wastewater",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 12,
+            "text": "migrationStatus: 'phase-8-schema-inventory phase-36a2-controller-viewmodel-view',"
+          }
+        ]
+      }
+    },
+    {
+      "module": "wastewater",
+      "priority": "P2",
+      "area": "css-specialization",
+      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
+      "evidence": {
+        "count": 3,
+        "samples": [
+          {
+            "cssFile": "css/modules.css",
+            "line": 87,
+            "text": ".pipe-dimension-card--green .pipe-bar span { background: #25d96a; }.wastewater-subselect { display: grid; gap: var(--tc-gap); }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 88,
+            "text": ".wastewater-subselect > span { color: var(--color-muted); font-size: .78rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }.wastewater-line-selector { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 89,
+            "text": ".wastewater-line-selector button { scroll-snap-align: center; }"
+          }
+        ]
+      }
+    }
+  ]
+}
