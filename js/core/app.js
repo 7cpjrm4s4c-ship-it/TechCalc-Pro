@@ -16,6 +16,7 @@ import { restoreSessionSnapshot, saveSessionSnapshot } from './projectStorage.js
 import { createModuleLifecycleAdapter } from './moduleLifecycleAdapter.js';
 import { createModuleRuntime } from './moduleRuntime.js';
 import { trackGlobalEventListener } from './eventManager.js';
+import { initializeThemeController } from '../platform/shell/themeController.js';
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
@@ -260,7 +261,6 @@ const settingsButton = document.getElementById('settingsButton');
 const settingsPanel = document.getElementById('settingsPanel');
 const closeSettings = document.getElementById('closeSettings');
 const settingsBody = settingsPanel?.querySelector('.settings-panel__body');
-const THEME_STORAGE_KEY = 'techcalc-theme-mode';
 const SETTINGS_UI_STORAGE_KEY = 'techcalc-settings-ui';
 
 function readStorageJson(key, fallback = {}) {
@@ -283,29 +283,7 @@ function writeStorageJson(key, value) {
   }
 }
 
-function getStoredThemeMode() {
-  return localStorage.getItem(THEME_STORAGE_KEY)
-    || sessionStorage.getItem(THEME_STORAGE_KEY)
-    || 'system';
-}
-
-function applyThemeMode(mode = getStoredThemeMode()) {
-  const value = ['dark', 'light', 'system'].includes(mode) ? mode : 'system';
-  if (value === 'system') {
-    document.documentElement.removeAttribute('data-theme');
-  } else {
-    document.documentElement.setAttribute('data-theme', value);
-  }
-  localStorage.setItem(THEME_STORAGE_KEY, value);
-  sessionStorage.setItem(THEME_STORAGE_KEY, value);
-  document.querySelectorAll('.theme-switch__option').forEach(item => {
-    const active = item.dataset.theme === value;
-    item.classList.toggle('is-active', active);
-    item.setAttribute('aria-pressed', String(active));
-  });
-}
-
-applyThemeMode();
+initializeThemeController({ root: settingsPanel || document });
 
 const APP_VERSION = '1.3.0-rc.1';
 const FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
@@ -565,12 +543,6 @@ settingsPanel?.querySelectorAll('.settings-submenu').forEach(details => {
       else if (bottomOverflow > 0) body.scrollBy({ top: bottomOverflow, behavior: 'smooth' });
       if (details.offsetHeight > body.clientHeight) summary?.scrollIntoView({ block: 'start', behavior: 'smooth' });
     });
-  });
-});
-
-settingsPanel?.querySelectorAll('.theme-switch__option').forEach(button => {
-  button.addEventListener('click', () => {
-    applyThemeMode(button.dataset.theme || 'system');
   });
 });
 

@@ -1,0 +1,70 @@
+{
+  "phase": "37C.2",
+  "title": "Theme Controller Extraction",
+  "policy": {
+    "runtimeBehaviorChanged": false,
+    "appShellCompositionChanged": true,
+    "moduleCodeChanged": false
+  },
+  "totals": {
+    "appJsLineCount": 589,
+    "themeControllerLineCount": 68,
+    "checks": 8,
+    "passed": 8,
+    "failed": 0
+  },
+  "extracted": {
+    "source": "js/core/app.js",
+    "target": "js/platform/shell/themeController.js",
+    "responsibilities": [
+      "theme initialization",
+      "theme persistence",
+      "dark/light/system mode application",
+      "theme switch option active-state updates",
+      "theme button event binding"
+    ]
+  },
+  "checks": [
+    {
+      "id": "theme-controller-file",
+      "passed": true,
+      "detail": "Theme shell controller exists under js/platform/shell."
+    },
+    {
+      "id": "app-imports-theme-controller",
+      "passed": true,
+      "detail": "app.js imports the extracted controller through an explicit relative ESM import."
+    },
+    {
+      "id": "app-initializes-theme-controller",
+      "passed": true,
+      "detail": "Theme initialization remains in the app shell composition root."
+    },
+    {
+      "id": "theme-implementation-removed-from-app",
+      "passed": true,
+      "detail": "Theme storage and DOM mutation implementation moved out of app.js."
+    },
+    {
+      "id": "theme-public-api",
+      "passed": true,
+      "detail": "Theme controller exposes the agreed public API."
+    },
+    {
+      "id": "theme-safe-storage",
+      "passed": true,
+      "detail": "Theme storage access remains guarded for private-mode/browser restrictions."
+    },
+    {
+      "id": "service-worker-precache",
+      "passed": true,
+      "detail": "New runtime module is included in the offline precache surface."
+    },
+    {
+      "id": "app-line-count-reduced",
+      "passed": true,
+      "detail": "app.js line count reduced from 616 to 589."
+    }
+  ],
+  "next": "37C.3 settings-controller preparation or next low-risk shell extraction after browser smoke confirmation."
+}

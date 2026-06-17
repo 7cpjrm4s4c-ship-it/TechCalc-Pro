@@ -83,3 +83,59 @@ Any new browser console error, module-smoke regression, settings scroll-lock reg
 - `npm run test:phase37b4`
 - `npm run test:phase37b3`
 - `npm run test:module-smoke`
+
+---
+
+# Phase 37C.2 – Theme Controller Extraction
+
+## Ziel
+
+37C.2 ist die erste produktive App-Shell-Extraktion. Der Theme-Pfad wurde aus `js/core/app.js` gelöst und in einen eigenen Shell-Controller überführt. Das Laufzeitverhalten bleibt unverändert: Theme-Auswahl, Persistenz und aktive Button-Zustände funktionieren weiterhin über dieselben DOM-Attribute und Storage-Keys.
+
+## Geänderte Struktur
+
+Neu:
+
+- `js/platform/shell/themeController.js`
+
+Aus `app.js` entfernt:
+
+- `THEME_STORAGE_KEY`
+- `getStoredThemeMode()`
+- `applyThemeMode()`
+- direkte Theme-Button-Listener
+
+In `app.js` verbleibt nur die Composition-Root-Initialisierung:
+
+```js
+initializeThemeController({ root: settingsPanel || document });
+```
+
+## Öffentliche Theme-API
+
+- `initializeThemeController()`
+- `applyTheme()`
+- `toggleTheme()`
+- `getCurrentTheme()`
+
+## Offline/PWA
+
+Der neue Runtime-Pfad wurde in `service-worker.js` in die Precache-Liste aufgenommen:
+
+- `./js/platform/shell/themeController.js`
+
+## Ergebnis
+
+- `app.js`: 616 → 588 Zeilen
+- keine Moduldateien geändert
+- keine Feature-Änderung
+- erster App-Shell-Verantwortungsbereich extrahiert
+
+## Validierung
+
+- `npm run build`
+- `npm run test:phase37c2`
+- `npm run test:phase37c1`
+- `npm run test:phase37b4`
+- `npm run test:phase37b3`
+- `npm run test:module-smoke`

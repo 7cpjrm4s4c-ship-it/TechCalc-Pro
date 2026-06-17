@@ -109,3 +109,12 @@ Release-hardening status after Phase 31D:
 - Preserved critical regression contracts for Phase 12, Phase 13, Phase 16, Phase 27, Phase 37A and Phase 37B inside consolidated files.
 - Runtime logic unchanged.
 
+
+## 1.3.0-rc.1 · Phase 37C.2 – Theme Controller Extraction
+
+- Theme-Initialisierung, Theme-Persistenz und Theme-Button-Binding aus `js/core/app.js` extrahiert.
+- Neuer Shell-Controller: `js/platform/shell/themeController.js`.
+- `app.js` von 616 auf 588 Zeilen reduziert.
+- Neuer Guard: `test:phase37c2`.
+- Service-Worker-Precache um den neuen Theme-Controller ergänzt.
+- Keine Modul- oder Feature-Änderung.

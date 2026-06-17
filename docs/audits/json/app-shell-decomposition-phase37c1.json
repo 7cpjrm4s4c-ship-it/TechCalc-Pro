@@ -1,10 +1,10 @@
 {
   "phase": "37C.1",
   "title": "App Shell Decomposition Responsibility Map",
-  "generatedAt": "2026-06-17T17:09:00.843Z",
+  "generatedAt": "2026-06-17T17:22:27.360Z",
   "source": "js/core/app.js",
   "totals": {
-    "totalLines": 617,
+    "totalLines": 589,
     "mappedLines": 602,
     "byRisk": {
       "medium": 5,
@@ -18,7 +18,7 @@
       "37C.5": 1,
       "37C.6": 1
     },
-    "appJsLineCount": 617,
+    "appJsLineCount": 589,
     "targetAppJsLineCountAfter37C": "80-130",
     "runtimeChanged": false
   },
@@ -285,14 +285,15 @@
       "import { restoreSessionSnapshot, saveSessionSnapshot } from './projectStorage.js';",
       "import { createModuleLifecycleAdapter } from './moduleLifecycleAdapter.js';",
       "import { createModuleRuntime } from './moduleRuntime.js';",
-      "import { trackGlobalEventListener } from './eventManager.js';"
+      "import { trackGlobalEventListener } from './eventManager.js';",
+      "import { initializeThemeController } from '../platform/shell/themeController.js';"
     ],
-    "directDomQueries": 15,
+    "directDomQueries": 14,
     "globalListeners": 17,
-    "nativeListeners": 7,
+    "nativeListeners": 6,
     "dynamicImports": 2,
-    "localStorageReferences": 4,
-    "sessionStorageReferences": 3
+    "localStorageReferences": 2,
+    "sessionStorageReferences": 1
   },
   "policy": {
     "runtimeCodeChanged": false,
