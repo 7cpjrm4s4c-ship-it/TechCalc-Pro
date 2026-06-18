@@ -63,9 +63,16 @@ export function initializeSettingsController({
     window.scrollTo(0, settingsScrollY || 0);
   }
 
+  function setSubmenuOpenState(details, open) {
+    if (!details) return;
+    details.open = Boolean(open);
+    details.classList.toggle('is-open', Boolean(open));
+    details.setAttribute('aria-expanded', String(Boolean(open)));
+  }
+
   function closeAllSubmenus(except = null) {
     settingsPanel?.querySelectorAll('.settings-submenu').forEach(details => {
-      if (details !== except) details.open = false;
+      if (details !== except) setSubmenuOpenState(details, false);
     });
   }
 
@@ -73,7 +80,7 @@ export function initializeSettingsController({
     const state = readStorageJson(SETTINGS_UI_STORAGE_KEY, {});
     if (!settingsPanel) return;
     settingsPanel.querySelectorAll('.settings-submenu').forEach(details => {
-      details.open = details.dataset.settingsIndex === state.openSubmenu;
+      setSubmenuOpenState(details, details.dataset.settingsIndex === state.openSubmenu);
     });
   }
 
@@ -189,7 +196,10 @@ export function initializeSettingsController({
   });
 
   settingsPanel?.querySelectorAll('.settings-submenu').forEach(details => {
+    details.classList.toggle('is-open', details.open);
+    details.setAttribute('aria-expanded', String(Boolean(details.open)));
     details.addEventListener('toggle', () => {
+      setSubmenuOpenState(details, details.open);
       saveSettingsOpenSubmenu(details);
       if (!details.open) return;
       closeAllSubmenus(details);

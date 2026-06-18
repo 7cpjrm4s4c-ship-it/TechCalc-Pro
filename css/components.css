@@ -509,11 +509,16 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .settings-submenu > summary::after { content: '›'; color: var(--accent-blue); font-size: 28px; line-height: 1; transform: rotate(90deg); transition: transform .18s ease; flex: 0 0 auto; }
 .tc-accordion[open] > summary::after,
 .dw-accordion[open] > summary::after,
-.settings-submenu[open] > summary::after { transform: rotate(-90deg); }
+.settings-submenu[open] > summary::after,
+.settings-submenu.is-open > summary::after { transform: rotate(-90deg); }
 .tc-accordion__body,
 .dw-accordion__body,
 .settings-submenu__content { display: grid; gap: var(--tc-gap); padding: var(--tc-gap); border-top: 1px solid rgba(255,255,255,.08); min-width: 0; }
-.settings-submenu:not([open]) > .settings-submenu__content { display: none; }
+.settings-submenu[open],
+.settings-submenu.is-open { height: auto; max-height: none; overflow: visible; }
+.settings-submenu[open] > .settings-submenu__content,
+.settings-submenu.is-open > .settings-submenu__content { display: grid; height: auto; max-height: none; overflow: visible; visibility: visible; opacity: 1; position: relative; pointer-events: auto; }
+.settings-submenu:not([open]):not(.is-open) > .settings-submenu__content { display: none; }
 .tc-accordion__summary-text,
 .dw-save-dialog__summary { display: grid; gap: 4px; min-width: 0; }
 .tc-accordion__summary-text strong,

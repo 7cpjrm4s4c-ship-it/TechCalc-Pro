@@ -1,4 +1,12 @@
 
+## 1.3.0-rc.1 · Phase 37C.4B – Settings Accordion Body Visibility Fix
+
+- Settings-Accordion Body-Visibility repariert.
+- Offene Settings-Submenus synchronisieren `open`, `.is-open` und `aria-expanded`.
+- Inhalte in PDF-Export, Release Notes, Feedback und Rechtliches bleiben sichtbar und im Drawer scrollbar.
+- Keine Modul-Logik geändert.
+
+
 ## Phase 37C.2B — Drinking-Water Mobile Scroll Restore Dampening
 
 - Trinkwasser-spezifische aggressive Scroll-Restore-Parameter entschärft.
