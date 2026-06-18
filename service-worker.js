@@ -13,6 +13,7 @@ const ASSETS = [
   './js/platform/shell/settingsController.js',
   './js/platform/shell/releaseNotesController.js',
   './js/platform/shell/feedbackController.js',
+  './js/platform/shell/serviceWorkerController.js',
   './js/core/centralStore.js',
   './js/core/domUpdate.js',
   './js/core/eventDelegation.js',

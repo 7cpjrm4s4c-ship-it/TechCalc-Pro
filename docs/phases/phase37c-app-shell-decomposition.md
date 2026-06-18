@@ -40,3 +40,22 @@ Umfang:
 - Release-Notes-Liste rendern
 
 Ziel: App-Shell weiter in Richtung Composition Root reduzieren; keine Änderung am sichtbaren Release-Notes-Verhalten.
+
+
+## 37C.5 – Feedback Controller Extraction
+
+Feedback-Submit, Payload-Aufbau, Statusmeldungen und Fehlerbehandlung wurden aus `js/core/app.js` nach `js/platform/shell/feedbackController.js` extrahiert.
+
+## 37C.6 – Service Worker Controller Extraction
+
+Service-Worker-Registration, `TECHCALC_CACHE_UPDATED`-Message-Handling und Session-Cache-Markierung wurden aus `js/core/app.js` nach `js/platform/shell/serviceWorkerController.js` extrahiert.
+
+Umfang:
+
+- registriert `service-worker.js` weiterhin mit Version-Query
+- fordert `registration.update()` nach Load an
+- verarbeitet Cache-Update-Nachrichten ohne Auto-Reload
+- hält laufende Berechnungen bei PDF-/PWA-Wechseln stabil
+- ergänzt Precache um den neuen Shell-Controller
+
+Ziel: `app.js` weiter auf Bootstrap und Composition Root reduzieren, ohne Service-Worker-Verhalten zu ändern.

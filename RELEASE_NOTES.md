@@ -1,3 +1,11 @@
+## 1.3.0-rc.1 · Phase 37C.6 – Service Worker Controller Extraction
+
+- Service-Worker-Registration und Cache-Update-Message-Handling aus `app.js` extrahiert.
+- Neuer Controller: `js/platform/shell/serviceWorkerController.js`.
+- `app.js` weiter auf Bootstrap-/Composition-Root-Aufgaben reduziert.
+- Service-Worker-Precache um den neuen Shell-Controller erweitert.
+- Neuer Guard: `test:phase37c6`.
+
 ## 1.3.0-rc.1 · Phase 37C.5 – Feedback Controller Extraction
 
 - Feedback-Formular-Logik aus `app.js` in `js/platform/shell/feedbackController.js` extrahiert.

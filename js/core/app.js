@@ -20,6 +20,7 @@ import { initializeThemeController } from '../platform/shell/themeController.js'
 import { initializeSettingsController } from '../platform/shell/settingsController.js';
 import { initializeReleaseNotesController } from '../platform/shell/releaseNotesController.js';
 import { initializeFeedbackController } from '../platform/shell/feedbackController.js';
+import { initializeServiceWorkerController } from '../platform/shell/serviceWorkerController.js';
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
@@ -291,16 +292,4 @@ function updateHeaderTransparency(){
 trackGlobalEventListener(window, 'scroll', updateHeaderTransparency, { passive: true });
 updateHeaderTransparency();
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener('message', event => {
-    if (event.data?.type !== 'TECHCALC_CACHE_UPDATED') return;
-    const cacheName = event.data.cache || 'updated';
-    sessionStorage.setItem('techcalc-active-cache', cacheName);
-    // Kein automatischer Reload: Beim Zurückwechseln aus dem PDF-Export dürfen
-    // aktuelle Berechnungsergebnisse in der Session nicht verloren gehen.
-  });
-
-  trackGlobalEventListener(window, 'load', () => {
-    navigator.serviceWorker.register(`./service-worker.js?v=${encodeURIComponent(APP_VERSION)}`).then(registration => registration.update());
-  });
-}
+initializeServiceWorkerController({ appVersion: APP_VERSION });
