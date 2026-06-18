@@ -103,10 +103,20 @@ function updateDrinkingWaterDynamicUnsafe(root, s, meta = {}){
   const initial = !root.__tcDrinkingWaterDynamic;
   const inputAction = /^(dw:|line:|saved:)/.test(action);
 
+let __tcDwActiveTouch = window.__tcDwActiveTouch || false;
+if (typeof window !== 'undefined' && !window.__tcDwTouchGuardInstalled) {
+  window.__tcDwTouchGuardInstalled = true;
+  window.addEventListener('touchstart', () => { window.__tcDwActiveTouch = true; }, { passive:true });
+  const release=()=>{ window.__tcDwActiveTouch = false; };
+  window.addEventListener('touchend', release, { passive:true });
+  window.addEventListener('touchcancel', release, { passive:true });
+}
+
   if (initial || inputAction || !changed.length || hasAnyChanged(changed, INPUT_KEYS)) {
     setIslandInner(root, '[data-dw-dynamic="input"]', renderInputCard(vm));
   }
-  if (initial || inputAction || !changed.length || hasAnyChanged(changed, RESULT_KEYS)) {
+  const shouldRenderResult = initial || !changed.length || hasAnyChanged(changed, RESULT_KEYS);
+  if (shouldRenderResult && !window.__tcDwActiveTouch) {
     setIslandInner(root, '[data-dw-dynamic="result"]', renderResultCard(vm));
   }
 
