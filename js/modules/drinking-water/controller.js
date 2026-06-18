@@ -434,8 +434,7 @@ export function bindDrinkingWaterActions(root) {
     }
 
     const ignored = target.closest('[data-dw-unit-edit], [data-dw-single-edit], [data-dw-unit-delete], [data-dw-single-delete], [data-dw-add-unit], [data-dw-update-unit], [data-dw-add-single], [data-dw-update-single], [data-dw-draft-add], [data-dw-remove-draft], [data-dw-draft-count], [data-line-toggle], details, summary, input, select, textarea, button, label, .segmented');
-    if (!ignored) {
-      refreshDrinkingWater(root);
+    if (!ignored && !event.target?.cloest?.('[data-dw-dynamic], .module-shell, .module-card, .result-catd')) { 
       clearActiveEdit(root);
     }
   });
