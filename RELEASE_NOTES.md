@@ -191,6 +191,13 @@ Release-hardening status after Phase 31D:
 - Accordion-Open-State scrollt deterministisch in den sichtbaren Drawer-Bereich.
 - Keine Modul- oder Runtime-Berechnungslogik geändert.
 
+## 1.3.0-rc.1 · Phase 37C.4D – Settings Accordion Chevron Layer Fix
+
+- Settings-Accordion-Layering korrigiert.
+- Pfeile geschlossener Accordions scheinen nicht mehr durch geöffnete Cards.
+- Drawer-Body und Submenus erhalten isolierte Stacking Contexts.
+- Keine Runtime- oder Modul-Logik geändert.
+
 ## 1.3.0-rc.1 · Phase 37C.4C – Settings Drawer Surface Opacity Fix
 
 - Settings Drawer Hintergrund auf opake Surface-Ebene gehärtet.
