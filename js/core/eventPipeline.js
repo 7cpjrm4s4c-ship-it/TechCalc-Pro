@@ -16,6 +16,11 @@ function fieldPatch(el) {
   return { [el.dataset.field]: value };
 }
 
+function isSameFieldValue(a, b) {
+  if (Object.is(a, b)) return true;
+  return String(a ?? '') === String(b ?? '');
+}
+
 function emitPipelineCommit(root, detail = {}) {
   const handlers = root?.__tcCommitHandlers;
   if (handlers && typeof handlers.forEach === 'function') {
@@ -52,11 +57,15 @@ export function commitElementField(state, el, meta = {}) {
 
 export function commitAllFields(root, state, meta = {}) {
   if (!root || !state?.set) return false;
+  const current = typeof state.get === 'function' ? state.get() : {};
   const patch = {};
   root.querySelectorAll('[data-field]').forEach(el => {
+    const field = el?.dataset?.field;
     const value = readElementValue(el);
-    if (value !== undefined) patch[el.dataset.field] = value;
+    if (!field || value === undefined) return;
+    if (!isSameFieldValue(current?.[field], value)) patch[field] = value;
   });
+  if (!Object.keys(patch).length) return false;
   state.set(patch, { action: meta.action || 'fields:commit', notify: meta.notify });
   emitPipelineCommit(root, { type: 'fields', action: meta.action || 'fields:commit', notify: meta.notify !== false });
   return true;
@@ -431,9 +440,13 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   const confirmSurface = event => {
     if (!event?.target) return;
     if (event.target.closest?.(options.interactiveSelector || DEFAULT_INTERACTIVE_SELECTOR)) return;
-    commitAllFields(root, state, { action: 'surface:confirm', notify: true });
-    hasDeferredInput = false;
-    notifyCommit({ action: 'surface:confirm', element: null });
+    const committed = commitAllFields(root, state, { action: 'surface:confirm', notify: true });
+    if (committed) {
+      hasDeferredInput = false;
+      notifyCommit({ action: 'surface:confirm', element: null });
+      return;
+    }
+    if (hasDeferredInput) renderDeferred(true);
   };
 
   const keyboardFieldSelector = 'input[data-field], textarea[data-field]';

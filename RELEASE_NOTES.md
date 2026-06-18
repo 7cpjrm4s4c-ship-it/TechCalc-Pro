@@ -141,3 +141,11 @@ Release-hardening status after Phase 31D:
 - Passive Klicks auf freie Trinkwasser-Flächen lösen keinen Vollrefresh mehr aus; aktive Edits werden weiterhin bereinigt.
 - Dynamic-Renderer-Scroll-Preserve nutzt `skipDuringActiveTouch`.
 - Neuer Guard: `test:phase37c2d`.
+
+## Phase 37C.2E – Surface Confirm No-Op Suppression
+
+- Suppressed no-op `surface:confirm` commits in the central event pipeline.
+- `commitAllFields()` now compares DOM field values against state before emitting.
+- Passive taps/scroll-end clicks on module background no longer notify the store when no field changed.
+- Deferred input confirmation remains supported through `input:confirm`.
+- Added `test:phase37c2e` guard.
