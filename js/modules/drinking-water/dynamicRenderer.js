@@ -97,6 +97,11 @@ export function updateDrinkingWaterDynamic(root, s, meta = {}){
 }
 
 function updateDrinkingWaterDynamicUnsafe(root, s, meta = {}){
+  const vm = createDrinkingWaterViewModel(s);
+  const changed = Array.isArray(meta.changed) ? meta.changed : [];
+  const action = String(meta.action || '');
+  if (action === 'surface-confirm' && 
+  (!Array.isArray(meta.changed) || meta.changed.length === 0)
   console.debug(
   '[DW_DYNAMIC]',
   {
@@ -105,11 +110,6 @@ function updateDrinkingWaterDynamicUnsafe(root, s, meta = {}){
     ts: performance.now()
   }
 );
-  const vm = createDrinkingWaterViewModel(s);
-  const changed = Array.isArray(meta.changed) ? meta.changed : [];
-  const action = String(meta.action || '');
-  if (action === 'surface-confirm' && 
-  (!Array.isArray(meta.changed) || meta.changed.length === 0)
   ) {
     return;
   }; 
