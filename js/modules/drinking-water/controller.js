@@ -94,6 +94,11 @@ function commitWaterHeatingModeSegment(root, segment, event = null) {
   });
 
   state.set({ waterHeatingMode: value }, { action:'platform:segment:waterHeatingMode', notify:false });
+  
+  console.debug(
+    '[DW_REFRESH_SOURCE]',
+    'surface-confirm'
+  
   refreshDrinkingWater(root);
   queueMicrotask?.(() => refreshDrinkingWater(root));
   setTimeout(() => refreshDrinkingWater(root), 0);
