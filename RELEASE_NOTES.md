@@ -157,3 +157,12 @@ Release-hardening status after Phase 31D:
 - DN80 now uses `88,9 × 2,0` with `di 84.9`.
 - DN100 now uses `108 × 2,0` with `di 104`.
 - Added `test:phase37c2f` guard.
+
+
+### Phase 37C.3 – Settings Controller Extraction
+
+- Settings-Drawer-Logik aus `js/core/app.js` extrahiert.
+- Neuer Controller: `js/platform/shell/settingsController.js`.
+- Settings-Scroll-Lock, Submenu-Persistenz, Escape-/Outside-Click und iOS-Touchmove-Guard bleiben erhalten.
+- Service-Worker-Precache um Settings-Controller erweitert.
+- Guard ergänzt: `test:phase37c3`.
