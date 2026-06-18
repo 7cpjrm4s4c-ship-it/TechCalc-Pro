@@ -174,3 +174,11 @@ Release-hardening status after Phase 31D:
 - Versionsanzeige und dynamisches Laden von `RELEASE_NOTES.md` bleiben erhalten.
 - Service-Worker-Precache um Release-Notes-Controller erweitert.
 - Guard ergänzt: `test:phase37c4`.
+
+## 1.3.0-rc.1 – Phase 37C.4A Settings Drawer Scroll Fix
+
+- Settings-Drawer auf einen stabilen inneren Scroll-Host umgestellt.
+- Lange Accordion-Inhalte bleiben vollständig erreichbar.
+- Bottom-/Safe-Area-Padding für Mobile, Desktop Responsive und Hosted Preview erweitert.
+- Accordion-Open-State scrollt deterministisch in den sichtbaren Drawer-Bereich.
+- Keine Modul- oder Runtime-Berechnungslogik geändert.

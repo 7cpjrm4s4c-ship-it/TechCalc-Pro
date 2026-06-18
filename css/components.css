@@ -495,7 +495,7 @@ select option:checked { background-color: #1f3347; color: #fff; }
 /* Accordion / warning components ---------------------------------------- */
 .tc-accordion,
 .dw-accordion,
-.settings-submenu { border: 1px solid var(--color-border); border-radius: var(--tc-radius-card); background: rgba(255,255,255,.035); overflow: hidden; }
+.settings-submenu { border: 1px solid var(--color-border); border-radius: var(--tc-radius-card); background: rgba(255,255,255,.035); overflow: hidden; min-height: 58px; }
 .tc-accordion + .tc-accordion,
 .dw-accordion + .dw-accordion { margin-top: var(--tc-gap); }
 .tc-accordion > summary,
@@ -512,7 +512,7 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .settings-submenu[open] > summary::after { transform: rotate(-90deg); }
 .tc-accordion__body,
 .dw-accordion__body,
-.settings-submenu__content { display: grid; gap: var(--tc-gap); padding: var(--tc-gap); border-top: 1px solid rgba(255,255,255,.08); }
+.settings-submenu__content { display: grid; gap: var(--tc-gap); padding: var(--tc-gap); border-top: 1px solid rgba(255,255,255,.08); min-width: 0; }
 .settings-submenu:not([open]) > .settings-submenu__content { display: none; }
 .tc-accordion__summary-text,
 .dw-save-dialog__summary { display: grid; gap: 4px; min-width: 0; }
@@ -535,7 +535,8 @@ select option:checked { background-color: #1f3347; color: #fff; }
   right: 18px;
   top: 76px;
   width: min(420px, calc(100vw - 36px));
-  max-height: calc(100dvh - 96px);
+  bottom: max(18px, env(safe-area-inset-bottom));
+  max-height: none;
   z-index: 1200;
   display: flex;
   flex-direction: column;
@@ -551,7 +552,7 @@ select option:checked { background-color: #1f3347; color: #fff; }
 }
 .settings-panel.is-open { opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
 .settings-panel__head { flex: 0 0 auto; display: flex; justify-content: space-between; align-items: center; gap: var(--tc-gap); padding-bottom: var(--tc-gap); background: linear-gradient(135deg, rgba(32,39,49,.96), rgba(18,22,28,.92)); }
-.settings-panel__body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; display: grid; align-content: start; gap: var(--tc-gap); padding-bottom: max(18px, env(safe-area-inset-bottom)); }
+.settings-panel__body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; scroll-padding-top: 8px; scroll-padding-bottom: max(128px, calc(env(safe-area-inset-bottom) + 96px)); display: grid; align-content: start; gap: var(--tc-gap); padding-bottom: max(128px, calc(env(safe-area-inset-bottom) + 96px)); }
 .settings-row,
 .settings-check,
 .settings-info-row { display: flex; align-items: center; justify-content: space-between; gap: var(--tc-gap); min-height: 48px; padding: var(--tc-gap); border: 1px solid rgba(255,255,255,.10); border-radius: var(--radius-md); background: rgba(255,255,255,.035); }
@@ -694,7 +695,7 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
   .control .unit-select { flex-basis: 72px; width: 72px; min-width: 72px; }
   #settingsPanel.settings-panel,
   .settings-panel { left: 10px; right: 10px; top: max(84px, calc(env(safe-area-inset-top) + 74px)); bottom: max(10px, env(safe-area-inset-bottom)); width: auto; max-height: none; padding: var(--tc-gap); }
-  .settings-panel__body { padding-right: 0; }
+  .settings-panel__body { padding-right: 0; padding-bottom: max(144px, calc(env(safe-area-inset-bottom) + 112px)); scroll-padding-bottom: max(144px, calc(env(safe-area-inset-bottom) + 112px)); }
   body.tc-keyboard-open .module-nav { opacity: 1; pointer-events: auto; transform: translateY(0); }
   .card,
   .tc-card,

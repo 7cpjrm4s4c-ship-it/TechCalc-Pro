@@ -78,11 +78,55 @@ export function initializeSettingsController({
   }
 
   function saveSettingsOpenSubmenu(details) {
-    if (!details?.open) return;
     const current = readStorageJson(SETTINGS_UI_STORAGE_KEY, {});
+    if (!details?.open) {
+      if (current.openSubmenu === details?.dataset?.settingsIndex) {
+        const { openSubmenu, ...rest } = current;
+        writeStorageJson(SETTINGS_UI_STORAGE_KEY, rest);
+      }
+      return;
+    }
     writeStorageJson(SETTINGS_UI_STORAGE_KEY, {
       ...current,
       openSubmenu: details.dataset.settingsIndex
+    });
+  }
+
+  function scrollSubmenuIntoView(details, mode = 'nearest') {
+    const body = settingsBody;
+    if (!body || !details || !body.contains(details)) return;
+
+    const summary = details.querySelector('summary') || details;
+    const bodyTop = body.getBoundingClientRect().top;
+    const targetTop = details.offsetTop - body.offsetTop - 8;
+
+    if (mode === 'start') {
+      body.scrollTo({ top: Math.max(0, targetTop), left: 0, behavior: 'auto' });
+      return;
+    }
+
+    const bodyRect = body.getBoundingClientRect();
+    const detailsRect = details.getBoundingClientRect();
+    const summaryRect = summary.getBoundingClientRect();
+    const topOverflow = bodyRect.top - summaryRect.top + 8;
+    const bottomOverflow = detailsRect.bottom - bodyRect.bottom + 24;
+
+    if (details.offsetHeight >= body.clientHeight) {
+      body.scrollTo({ top: Math.max(0, targetTop), left: 0, behavior: 'auto' });
+      return;
+    }
+    if (topOverflow > 0) body.scrollBy({ top: -topOverflow, left: 0, behavior: 'auto' });
+    else if (bottomOverflow > 0) body.scrollBy({ top: bottomOverflow, left: 0, behavior: 'auto' });
+
+    // Some hosted preview overlays sit above the viewport bottom. Re-check after
+    // the browser has resolved details height and fonts.
+    requestAnimationFrame(() => {
+      const nextBodyRect = body.getBoundingClientRect();
+      const nextDetailsRect = details.getBoundingClientRect();
+      const nextBottomOverflow = nextDetailsRect.bottom - nextBodyRect.bottom + 96;
+      if (nextBottomOverflow > 0 && nextDetailsRect.height < body.clientHeight) {
+        body.scrollBy({ top: nextBottomOverflow, left: 0, behavior: 'auto' });
+      }
     });
   }
 
@@ -100,7 +144,9 @@ export function initializeSettingsController({
       lockPageScroll();
       ensurePdfExport();
       requestAnimationFrame(() => {
-        settingsBody?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        const openSubmenu = settingsPanel.querySelector('.settings-submenu[open]');
+        if (openSubmenu) scrollSubmenuIntoView(openSubmenu, 'start');
+        else settingsBody?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
         closeSettings?.focus?.({ preventScroll: true });
       });
       return;
@@ -144,22 +190,10 @@ export function initializeSettingsController({
 
   settingsPanel?.querySelectorAll('.settings-submenu').forEach(details => {
     details.addEventListener('toggle', () => {
-      if (!details.open) return;
       saveSettingsOpenSubmenu(details);
+      if (!details.open) return;
       closeAllSubmenus(details);
-      requestAnimationFrame(() => {
-        const body = settingsBody;
-        if (!body) return;
-        const summary = details.querySelector('summary');
-        const bodyRect = body.getBoundingClientRect();
-        const detailsRect = details.getBoundingClientRect();
-        const summaryRect = summary?.getBoundingClientRect() || detailsRect;
-        const bottomOverflow = detailsRect.bottom - bodyRect.bottom + 24;
-        const topOverflow = bodyRect.top - summaryRect.top + 10;
-        if (topOverflow > 0) body.scrollBy({ top: -topOverflow, behavior: 'smooth' });
-        else if (bottomOverflow > 0) body.scrollBy({ top: bottomOverflow, behavior: 'smooth' });
-        if (details.offsetHeight > body.clientHeight) summary?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-      });
+      requestAnimationFrame(() => scrollSubmenuIntoView(details, 'nearest'));
     });
   });
 
