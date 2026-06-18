@@ -167,6 +167,14 @@ function preserveScrollPosition(callback) {
 }
 
 export function refreshDrinkingWater(root) {
+  console.debug(
+    '[DW_REFRESH]',
+    {
+      ts: performance.now(),
+      active: document.activeElement?.dataset?.field || null
+    }
+  );
+
   preserveScrollPosition(() => {
     const s = state.get();
     const vm = createDrinkingWaterViewModel(s);
@@ -318,6 +326,21 @@ export function bindDrinkingWaterActions(root) {
   installWaterHeatingModeSegmentBridge(root);
   if (root.__tcDrinkingWaterActionsBound) return;
   root.__tcDrinkingWaterActionsBound = true;
+  
+  if (!root.__tcDwScrollAudit) {
+  root.__tcDwScrollAudit = true;
+
+  root.addEventListener('scroll', () => {
+    console.debug(
+      '[DW_SCROLL]',
+      {
+        y: window.scrollY,
+        ts: performance.now()
+      }
+    );
+  }, true);
+}
+
   root.addEventListener('input', event => {
     const el = event.target.closest('[data-field]');
     if (!el || !root.contains(el)) return;

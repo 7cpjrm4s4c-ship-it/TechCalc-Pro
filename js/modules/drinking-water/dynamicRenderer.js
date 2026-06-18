@@ -97,6 +97,14 @@ export function updateDrinkingWaterDynamic(root, s, meta = {}){
 }
 
 function updateDrinkingWaterDynamicUnsafe(root, s, meta = {}){
+  console.debug(
+  '[DW_DYNAMIC]',
+  {
+    action: meta?.action || 'unknown',
+    changed: meta?.changed || [],
+    ts: performance.now()
+  }
+);
   const vm = createDrinkingWaterViewModel(s);
   const changed = Array.isArray(meta.changed) ? meta.changed : [];
   const action = String(meta.action || '');
