@@ -1,3 +1,12 @@
+## 1.3.0-rc.1 · Phase 37C.4F – Settings Accordion Stack Flow Fix
+
+- Settings-Accordion-Inhalte in normalen Dokumentfluss zurückgeführt.
+- Geöffnete Accordion-Bodies schieben nachfolgende Cards wieder korrekt nach unten.
+- Overlay-/Layering-Regression aus 37C.4E beseitigt.
+- Settings Drawer Scroll, opake Surfaces und Accordion Visibility bleiben erhalten.
+- Neuer Guard: `test:phase37c4f`.
+- Keine Modul-Logik geändert.
+
 
 ## 1.3.0-rc.1 · Phase 37C.4B – Settings Accordion Body Visibility Fix
 
