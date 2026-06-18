@@ -163,6 +163,7 @@
     "audit:phase37c2": "node scripts/audit-app-shell-theme-controller-phase37c2.mjs",
     "test:phase37c2": "node scripts/audit-app-shell-theme-controller-phase37c2.mjs && node tests/platform-app-shell-theme-controller-phase37c2.test.mjs",
     "test:phase37c2a": "node tests/platform-app-shell-theme-controller-phase37c2a.test.mjs",
-    "test:phase37c2b": "node tests/platform-app-shell-theme-controller-phase37c2b.test.mjs"
+    "test:phase37c2b": "node tests/platform-app-shell-theme-controller-phase37c2b.test.mjs",
+    "test:phase37c2d": "node tests/platform-app-shell-theme-controller-phase37c2d.test.mjs"
   }
 }

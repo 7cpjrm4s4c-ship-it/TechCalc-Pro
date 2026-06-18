@@ -94,22 +94,11 @@ function commitWaterHeatingModeSegment(root, segment, event = null) {
   });
 
   state.set({ waterHeatingMode: value }, { action:'platform:segment:waterHeatingMode', notify:false });
-  
-  console.debug(
-    '[DW_REFRESH_SOURCE]',
-    'surface-confirm'
-  ); 
-  
-  console.debug(
-    '[DW_REFRESH_SOURCE]',
-    'accordion-toggle'
-  ); 
-  
-  // refreshDrinkingWater(root);
+  refreshDrinkingWater(root);
   queueMicrotask?.(() => refreshDrinkingWater(root));
   setTimeout(() => refreshDrinkingWater(root), 0);
   return true;
-} 
+}
 
 function installWaterHeatingModeSegmentBridge(root) {
   if (!root || root.__tcDrinkingWaterWaterHeatingSegmentBound) return;
@@ -178,14 +167,6 @@ function preserveScrollPosition(callback) {
 }
 
 export function refreshDrinkingWater(root) {
-  console.debug(
-    '[DW_REFRESH]',
-    {
-      ts: performance.now(),
-      active: document.activeElement?.dataset?.field || null
-    }
-  );
-
   preserveScrollPosition(() => {
     const s = state.get();
     const vm = createDrinkingWaterViewModel(s);
@@ -337,21 +318,6 @@ export function bindDrinkingWaterActions(root) {
   installWaterHeatingModeSegmentBridge(root);
   if (root.__tcDrinkingWaterActionsBound) return;
   root.__tcDrinkingWaterActionsBound = true;
-  
-  if (!root.__tcDwScrollAudit) {
-  root.__tcDwScrollAudit = true;
-
-  root.addEventListener('scroll', () => {
-    console.debug(
-      '[DW_SCROLL]',
-      {
-        y: window.scrollY,
-        ts: performance.now()
-      }
-    );
-  }, true);
-}
-
   root.addEventListener('input', event => {
     const el = event.target.closest('[data-field]');
     if (!el || !root.contains(el)) return;
@@ -434,7 +400,7 @@ export function bindDrinkingWaterActions(root) {
     }
 
     const ignored = target.closest('[data-dw-unit-edit], [data-dw-single-edit], [data-dw-unit-delete], [data-dw-single-delete], [data-dw-add-unit], [data-dw-update-unit], [data-dw-add-single], [data-dw-update-single], [data-dw-draft-add], [data-dw-remove-draft], [data-dw-draft-count], [data-line-toggle], details, summary, input, select, textarea, button, label, .segmented');
-    if (!ignored && !event.target?.cloest?.('[data-dw-dynamic], .module-shell, .module-card, .result-catd')) { 
+    if (!ignored) {
       clearActiveEdit(root);
     }
   });

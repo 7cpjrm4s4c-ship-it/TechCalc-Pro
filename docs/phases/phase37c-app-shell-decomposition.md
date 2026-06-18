@@ -155,3 +155,21 @@ Validierung:
 - `npm run test:phase37c2`
 - `npm run test:phase37b3`
 - `npm run test:module-smoke`
+
+## Phase 37C.2D – Drinking Water Surface Confirm Isolation
+
+### Ausgangslage
+
+Nach 37C.2B/37C.2C blieben mobile Scroll-Rücksprünge im Trinkwasser-Modul bestehen. Console-Diagnostik zeigte keine Runtime-Errors, aber wiederkehrende `surface:confirm`-Events mit leerem oder nicht trinkwasserrelevantem `changed`-Set. Diese Events liefen dennoch durch `updateDrinkingWaterDynamic()` und aktivierten `preserveScroll()` beziehungsweise DOM-Sync-Pfade.
+
+### Änderung
+
+- `surface:confirm` ohne relevante Trinkwasser-State-Änderungen wird vor dem Scroll-Preserve-Pfad verworfen.
+- Relevanz wird ausschließlich gegen die Trinkwasser-Input-/Result-Keysets geprüft.
+- `isDynamicDrinkingWaterAction()` nutzt denselben Guard.
+- Passive Background-Clicks im Trinkwasser-Modul lösen keinen `refreshDrinkingWater()` mehr aus; `clearActiveEdit()` bleibt erhalten.
+- Dynamic-Renderer-Scroll-Preserve wird während aktivem Touch-Scroll übersprungen.
+
+### Ziel
+
+Normale Mobile-Taps und Plattform-Surface-Bestätigungen dürfen im Trinkwasser-Modul keine DOM-Mutation oder Scroll-Restore-Kette mehr auslösen, solange sich keine fachlich oder UI-seitig relevanten Trinkwasser-Keys geändert haben.

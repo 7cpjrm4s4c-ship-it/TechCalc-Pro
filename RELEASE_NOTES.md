@@ -133,3 +133,11 @@ Release-hardening status after Phase 31D:
 - `bindNoClickScroll()` verwirft Viewport-Snapshots jetzt bei echter Touch-/Pointer-Bewegung und nativen Scroll-Events.
 - `themeController` Initialisierung idempotent gehärtet, um doppelte Listener auszuschließen.
 - Neuer Guard: `test:phase37c2a`.
+
+### Phase 37C.2D – Drinking Water Surface Confirm Isolation
+
+- Trinkwasser Dynamic Renderer ignoriert `surface:confirm`-Events ohne trinkwasserrelevante State-Keys jetzt vor `preserveScroll()`.
+- `isDynamicDrinkingWaterAction()` weist irrelevante `surface:confirm`-Events ebenfalls ab.
+- Passive Klicks auf freie Trinkwasser-Flächen lösen keinen Vollrefresh mehr aus; aktive Edits werden weiterhin bereinigt.
+- Dynamic-Renderer-Scroll-Preserve nutzt `skipDuringActiveTouch`.
+- Neuer Guard: `test:phase37c2d`.

@@ -92,46 +92,52 @@ const RESULT_KEYS = [
   'savedSingleConsumers'
 ];
 
-export function updateDrinkingWaterDynamic(root, s, meta = {}){
-  return preserveScroll(() => updateDrinkingWaterDynamicUnsafe(root, s, meta), 'savedRecord');
+const DYNAMIC_KEYS = [...new Set([...INPUT_KEYS, ...RESULT_KEYS])];
+
+function shouldIgnoreSurfaceConfirm(meta = {}) {
+  const action = String(meta.action || '');
+  if (action !== 'surface:confirm') return false;
+  const changed = Array.isArray(meta.changed) ? meta.changed : [];
+  return !hasAnyChanged(changed, DYNAMIC_KEYS);
 }
 
-function updateDrinkingWaterDynamicUnsafe(root, s, meta = {}){
+function isDwTouchActive() {
+  return typeof window !== 'undefined' && window.__tcDwActiveTouch === true;
+}
 
-  console.debug(
-  '[DW_DYNAMIC_DETAIL]',
-  {
-    action: meta?.action || 'unknown',
-    changed: meta?.changed || [],
-    ts: performance.now()
-  }
-);
-
-  const vm = createDrinkingWaterViewModel(s);
-  const changed = Array.isArray(meta.changed) ? meta.changed : [];
-  const action = String(meta.action || '');
-  
-  if (action === 'surface:confirm' && 
-  changed.length === 0) {
-    return;
-  }; 
-  const initial = !root.__tcDrinkingWaterDynamic;
-  const inputAction = /^(dw:|line:|saved:)/.test(action);
-
-let __tcDwActiveTouch = window.__tcDwActiveTouch || false;
-if (typeof window !== 'undefined' && !window.__tcDwTouchGuardInstalled) {
+function installDwTouchGuard() {
+  if (typeof window === 'undefined' || window.__tcDwTouchGuardInstalled) return;
   window.__tcDwTouchGuardInstalled = true;
-  window.addEventListener('touchstart', () => { window.__tcDwActiveTouch = true; }, { passive:true });
-  const release=()=>{ window.__tcDwActiveTouch = false; };
+  const activate = () => { window.__tcDwActiveTouch = true; };
+  const release = () => { window.__tcDwActiveTouch = false; };
+  window.addEventListener('touchstart', activate, { passive:true });
+  window.addEventListener('touchmove', activate, { passive:true });
   window.addEventListener('touchend', release, { passive:true });
   window.addEventListener('touchcancel', release, { passive:true });
 }
+
+export function updateDrinkingWaterDynamic(root, s, meta = {}){
+  installDwTouchGuard();
+  if (shouldIgnoreSurfaceConfirm(meta)) return false;
+  return preserveScroll(
+    () => updateDrinkingWaterDynamicUnsafe(root, s, meta),
+    'savedRecord',
+    { skipDuringActiveTouch: true }
+  );
+}
+
+function updateDrinkingWaterDynamicUnsafe(root, s, meta = {}){
+  const vm = createDrinkingWaterViewModel(s);
+  const changed = Array.isArray(meta.changed) ? meta.changed : [];
+  const action = String(meta.action || '');
+  const initial = !root.__tcDrinkingWaterDynamic;
+  const inputAction = /^(dw:|line:|saved:)/.test(action);
 
   if (initial || inputAction || !changed.length || hasAnyChanged(changed, INPUT_KEYS)) {
     setIslandInner(root, '[data-dw-dynamic="input"]', renderInputCard(vm));
   }
   const shouldRenderResult = initial || !changed.length || hasAnyChanged(changed, RESULT_KEYS);
-  if (shouldRenderResult && !window.__tcDwActiveTouch) {
+  if (shouldRenderResult && !isDwTouchActive()) {
     setIslandInner(root, '[data-dw-dynamic="result"]', renderResultCard(vm));
   }
 
@@ -146,6 +152,7 @@ if (typeof window !== 'undefined' && !window.__tcDwTouchGuardInstalled) {
 }
 
 export function isDynamicDrinkingWaterAction(meta = {}){
+  if (shouldIgnoreSurfaceConfirm(meta)) return false;
   return String(meta.action || '') !== 'initial';
 }
 
