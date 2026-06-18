@@ -105,11 +105,11 @@ function commitWaterHeatingModeSegment(root, segment, event = null) {
     'accordion-toggle'
   ); 
   
-  refreshDrinkingWater(root);
+  // refreshDrinkingWater(root);
   queueMicrotask?.(() => refreshDrinkingWater(root));
   setTimeout(() => refreshDrinkingWater(root), 0);
   return true;
-}
+} 
 
 function installWaterHeatingModeSegmentBridge(root) {
   if (!root || root.__tcDrinkingWaterWaterHeatingSegmentBound) return;
