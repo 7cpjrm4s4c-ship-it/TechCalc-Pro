@@ -149,3 +149,11 @@ Release-hardening status after Phase 31D:
 - Passive taps/scroll-end clicks on module background no longer notify the store when no field changed.
 - Deferred input confirmation remains supported through `input:confirm`.
 - Added `test:phase37c2e` guard.
+
+## Phase 37C.2F – Copper Pipe Dimension Correction
+
+- Corrected copper pipe large-diameter master data for DN65, DN80 and DN100.
+- DN65 now uses `76,1 × 2,0` with `di 72.1`.
+- DN80 now uses `88,9 × 2,0` with `di 84.9`.
+- DN100 now uses `108 × 2,0` with `di 104`.
+- Added `test:phase37c2f` guard.

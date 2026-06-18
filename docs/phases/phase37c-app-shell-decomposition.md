@@ -173,3 +173,13 @@ Nach 37C.2B/37C.2C blieben mobile Scroll-Rücksprünge im Trinkwasser-Modul best
 ### Ziel
 
 Normale Mobile-Taps und Plattform-Surface-Bestätigungen dürfen im Trinkwasser-Modul keine DOM-Mutation oder Scroll-Restore-Kette mehr auslösen, solange sich keine fachlich oder UI-seitig relevanten Trinkwasser-Keys geändert haben.
+
+## Phase 37C.2F – Copper Pipe Dimension Correction
+
+Nach erfolgreicher Stabilisierung des Trinkwasser-Mobile-Scroll-Verhaltens wurde ein Stammdatenfehler im Rohrmodul korrigiert. Die Kupferrohr-Großdurchmesser DN65 bis DN100 wurden an die geprüfte Tabelle angepasst:
+
+- DN65: `76,1 × 2,0`, `di 72.1`
+- DN80: `88,9 × 2,0`, `di 84.9`
+- DN100: `108 × 2,0`, `di 104`
+
+Die Änderung betrifft ausschließlich die Stammdatentabelle `js/utils/pipes.js`. Runtime-Architektur und Modul-Logik bleiben unverändert. Der Guard `test:phase37c2f` fixiert die korrigierten Werte.
