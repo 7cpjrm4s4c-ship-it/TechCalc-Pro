@@ -19,6 +19,7 @@ import { trackGlobalEventListener } from './eventManager.js';
 import { initializeThemeController } from '../platform/shell/themeController.js';
 import { initializeSettingsController } from '../platform/shell/settingsController.js';
 import { initializeReleaseNotesController } from '../platform/shell/releaseNotesController.js';
+import { initializeFeedbackController } from '../platform/shell/feedbackController.js';
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
@@ -264,61 +265,11 @@ const settingsPanel = document.getElementById('settingsPanel');
 initializeThemeController({ root: settingsPanel || document });
 
 const APP_VERSION = '1.3.0-rc.1';
-const FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
 
-function initFeedbackForm() {
-  const form = document.getElementById('feedbackForm');
-  if (!form) return;
-  const status = document.getElementById('feedbackStatus');
-  const submit = document.getElementById('feedbackSubmit');
-
-  function setStatus(message, type = '') {
-    if (!status) return;
-    status.textContent = message;
-    status.dataset.type = type;
-  }
-
-  function buildPayload() {
-    const data = new FormData(form);
-    data.set('version', APP_VERSION);
-    data.set('route', currentRoute());
-    data.set('userAgent', navigator.userAgent || '');
-    data.set('timestamp', new Date().toISOString());
-    return data;
-  }
-
-  form.addEventListener('submit', async event => {
-    event.preventDefault();
-    setStatus('', '');
-    if (!form.reportValidity()) return;
-
-    submit.disabled = true;
-    submit.textContent = 'Sende …';
-    setStatus('Feedback wird gesendet …', 'pending');
-
-    try {
-      const response = await fetch(FEEDBACK_ENDPOINT, {
-        method: 'POST',
-        body: buildPayload(),
-        headers: { Accept: 'application/json' }
-      });
-
-      if (!response.ok) throw new Error(`Formspree HTTP ${response.status}`);
-      form.reset();
-      const subject = document.getElementById('feedbackSubject');
-      if (subject) subject.value = 'TechCalc Pro Feedback';
-      setStatus('Feedback wurde gesendet. Danke!', 'success');
-    } catch (error) {
-      console.error('Feedback konnte nicht gesendet werden:', error);
-      setStatus('Feedback konnte nicht direkt gesendet werden. Bitte später erneut versuchen.', 'error');
-    } finally {
-      submit.disabled = false;
-      submit.textContent = 'Feedback senden';
-    }
-  });
-}
-
-initFeedbackForm();
+initializeFeedbackController({
+  appVersion: APP_VERSION,
+  getRoute: currentRoute
+});
 
 initializeReleaseNotesController({ appVersion: APP_VERSION });
 
