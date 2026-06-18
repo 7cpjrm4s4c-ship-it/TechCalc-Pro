@@ -1,9 +1,9 @@
 {
   "phase": "37B.4",
-  "fileCount": 26,
+  "fileCount": 27,
   "summaryFileCount": 24,
   "nestedPhaseFileCount": 0,
-  "totalBytes": 73061,
+  "totalBytes": 75567,
   "status": "pass",
   "files": [
     "README.md",
@@ -31,6 +31,7 @@
     "phase-34.md",
     "phase-35.md",
     "phase-37.md",
-    "phase37c-app-shell-decomposition.md"
+    "phase37c-app-shell-decomposition.md",
+    "phase37c2a-theme-scroll-regression-fix.md"
   ]
 }

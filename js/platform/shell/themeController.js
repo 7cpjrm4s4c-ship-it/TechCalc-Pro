@@ -56,8 +56,13 @@ export function toggleTheme() {
   return applyTheme(current === 'dark' ? 'light' : 'dark');
 }
 
+let themeControllerInitialized = false;
+
 export function initializeThemeController({ root = document } = {}) {
   applyTheme(getCurrentTheme(), document.documentElement);
+
+  if (themeControllerInitialized) return;
+  themeControllerInitialized = true;
 
   root.querySelectorAll('.theme-switch__option').forEach(button => {
     button.addEventListener('click', () => {

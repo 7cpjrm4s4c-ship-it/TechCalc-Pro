@@ -139,3 +139,19 @@ Der neue Runtime-Pfad wurde in `service-worker.js` in die Precache-Liste aufgeno
 - `npm run test:phase37b4`
 - `npm run test:phase37b3`
 - `npm run test:module-smoke`
+
+## Phase 37C.2A – Theme Extraction Regression Fix
+
+Nach 37C.2 wurde eine Touch-Scroll-Regression im Modul Trinkwasser gemeldet: Beim Finger-Scroll innerhalb eines Teilbereichs sprang der Viewport auf die Ausgangsposition zurück. Die Ursache lag in `bindNoClickScroll()`: Ein bei `touchstart` / `pointerdown` erfasster Viewport-Snapshot konnte bis zum synthetischen `click` erhalten bleiben, obwohl der Nutzer tatsächlich gescrollt hatte.
+
+Korrektur:
+- Pending Viewport-Snapshots werden bei `pointermove` / `touchmove` über 8 px verworfen.
+- Native `scroll`-Events verwerfen pending Snapshots ebenfalls.
+- `themeController` wurde idempotent gehärtet, damit die extrahierte Theme-Logik keine doppelten Listener registriert.
+
+Validierung:
+- `npm run build`
+- `npm run test:phase37c2a`
+- `npm run test:phase37c2`
+- `npm run test:phase37b3`
+- `npm run test:module-smoke`

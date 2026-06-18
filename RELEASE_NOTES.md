@@ -118,3 +118,10 @@ Release-hardening status after Phase 31D:
 - Neuer Guard: `test:phase37c2`.
 - Service-Worker-Precache um den neuen Theme-Controller ergänzt.
 - Keine Modul- oder Feature-Änderung.
+
+### Phase 37C.2A – Theme Extraction Regression Fix
+
+- Touch-Scroll-Regression nach 37C.2 im Trinkwasser-Modul isoliert.
+- `bindNoClickScroll()` verwirft Viewport-Snapshots jetzt bei echter Touch-/Pointer-Bewegung und nativen Scroll-Events.
+- `themeController` Initialisierung idempotent gehärtet, um doppelte Listener auszuschließen.
+- Neuer Guard: `test:phase37c2a`.

@@ -161,6 +161,7 @@
     "audit:phase37c1": "node scripts/audit-app-shell-decomposition-phase37c1.mjs",
     "test:phase37c1": "node scripts/audit-app-shell-decomposition-phase37c1.mjs && node tests/platform-app-shell-decomposition-phase37c1.test.mjs",
     "audit:phase37c2": "node scripts/audit-app-shell-theme-controller-phase37c2.mjs",
-    "test:phase37c2": "node scripts/audit-app-shell-theme-controller-phase37c2.mjs && node tests/platform-app-shell-theme-controller-phase37c2.test.mjs"
+    "test:phase37c2": "node scripts/audit-app-shell-theme-controller-phase37c2.mjs && node tests/platform-app-shell-theme-controller-phase37c2.test.mjs",
+    "test:phase37c2a": "node tests/platform-app-shell-theme-controller-phase37c2a.test.mjs"
   }
 }
