@@ -108,6 +108,11 @@ function updateDrinkingWaterDynamicUnsafe(root, s, meta = {}){
   const vm = createDrinkingWaterViewModel(s);
   const changed = Array.isArray(meta.changed) ? meta.changed : [];
   const action = String(meta.action || '');
+  if (action === 'surface-confirm' && 
+  (!Array.isArray(meta.changed) || meta.changed.length === 0)
+  ) {
+    return;
+  }; 
   const initial = !root.__tcDrinkingWaterDynamic;
   const inputAction = /^(dw:|line:|saved:)/.test(action);
 
