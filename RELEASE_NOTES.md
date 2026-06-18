@@ -190,3 +190,10 @@ Release-hardening status after Phase 31D:
 - Bottom-/Safe-Area-Padding für Mobile, Desktop Responsive und Hosted Preview erweitert.
 - Accordion-Open-State scrollt deterministisch in den sichtbaren Drawer-Bereich.
 - Keine Modul- oder Runtime-Berechnungslogik geändert.
+
+## 1.3.0-rc.1 · Phase 37C.4C – Settings Drawer Surface Opacity Fix
+
+- Settings Drawer Hintergrund auf opake Surface-Ebene gehärtet.
+- Accordion-Bodies und Settings Cards erhalten eigene undurchsichtige Surface-Hintergründe.
+- Durchscheinen des Modulhintergrunds hinter Settings-Texten behoben.
+- Keine Änderung an Modul- oder Settings-Controller-Logik.

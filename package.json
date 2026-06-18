@@ -170,6 +170,7 @@
     "test:phase37c3": "node tests/platform-app-shell-settings-controller-phase37c3.test.mjs",
     "test:phase37c4": "node tests/platform-app-shell-release-notes-controller-phase37c4.test.mjs",
     "test:phase37c4a": "node tests/platform-app-shell-settings-drawer-phase37c4a.test.mjs",
-    "test:phase37c4b": "node tests/platform-app-shell-settings-drawer-phase37c4b.test.mjs"
+    "test:phase37c4b": "node tests/platform-app-shell-settings-drawer-phase37c4b.test.mjs",
+    "test:phase37c4c": "node tests/platform-app-shell-settings-drawer-phase37c4c.test.mjs"
   }
 }
