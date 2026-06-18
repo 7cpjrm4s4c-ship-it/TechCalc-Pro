@@ -26,3 +26,17 @@ Umfang:
 - PDF-Preload beim Öffnen
 
 Ziel: App-Shell weiter entflechten, ohne Runtime-Verhalten zu ändern.
+
+## 37C.4 – Release Notes Controller Extraction
+
+Release-Notes-Parsing, dynamisches Laden und Rendering wurden aus `js/core/app.js` nach `js/platform/shell/releaseNotesController.js` extrahiert.
+
+Umfang:
+
+- Versionsanzeige setzen
+- `RELEASE_NOTES.md` cache-bypassed laden
+- Fallback aus eingebettetem Release-Notes-Block verwenden
+- Markdown-Abschnitte parsen
+- Release-Notes-Liste rendern
+
+Ziel: App-Shell weiter in Richtung Composition Root reduzieren; keine Änderung am sichtbaren Release-Notes-Verhalten.

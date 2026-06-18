@@ -166,3 +166,11 @@ Release-hardening status after Phase 31D:
 - Settings-Scroll-Lock, Submenu-Persistenz, Escape-/Outside-Click und iOS-Touchmove-Guard bleiben erhalten.
 - Service-Worker-Precache um Settings-Controller erweitert.
 - Guard ergänzt: `test:phase37c3`.
+
+### Phase 37C.4 – Release Notes Controller Extraction
+
+- Release-Notes-Parser, Renderer und Loader aus `js/core/app.js` extrahiert.
+- Neuer Controller: `js/platform/shell/releaseNotesController.js`.
+- Versionsanzeige und dynamisches Laden von `RELEASE_NOTES.md` bleiben erhalten.
+- Service-Worker-Precache um Release-Notes-Controller erweitert.
+- Guard ergänzt: `test:phase37c4`.

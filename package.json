@@ -167,6 +167,7 @@
     "test:phase37c2d": "node tests/platform-app-shell-theme-controller-phase37c2d.test.mjs",
     "test:phase37c2e": "node tests/platform-app-shell-theme-controller-phase37c2e.test.mjs",
     "test:phase37c2f": "node tests/phase37c2f-copper-dimensions.test.mjs",
-    "test:phase37c3": "node tests/platform-app-shell-settings-controller-phase37c3.test.mjs"
+    "test:phase37c3": "node tests/platform-app-shell-settings-controller-phase37c3.test.mjs",
+    "test:phase37c4": "node tests/platform-app-shell-release-notes-controller-phase37c4.test.mjs"
   }
 }

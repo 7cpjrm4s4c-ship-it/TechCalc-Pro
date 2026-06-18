@@ -18,6 +18,7 @@ import { createModuleRuntime } from './moduleRuntime.js';
 import { trackGlobalEventListener } from './eventManager.js';
 import { initializeThemeController } from '../platform/shell/themeController.js';
 import { initializeSettingsController } from '../platform/shell/settingsController.js';
+import { initializeReleaseNotesController } from '../platform/shell/releaseNotesController.js';
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
@@ -319,72 +320,7 @@ function initFeedbackForm() {
 
 initFeedbackForm();
 
-function escapeHtml(value = '') {
-  return String(value).replace(/[&<>"]/g, char => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;'
-  }[char]));
-}
-
-function parseReleaseNotes(markdown = '') {
-  const lines = markdown.split(/\r?\n/);
-  const notes = [];
-  let current = null;
-
-  for (const rawLine of lines) {
-    const line = rawLine.trim();
-    if (!line) continue;
-    const heading = line.match(/^#{1,3}\s+(?:TechCalc\s+Pro\s+)?(?:Version\s+)?([0-9]+\.[0-9]+\.[0-9]+(?:[-.]rc\.?\d+)?)\s*(?:[-–]\s*(.*))?$/i);
-    if (heading) {
-      current = { version: heading[1], title: heading[2] || '', items: [] };
-      notes.push(current);
-      continue;
-    }
-    if (!current) continue;
-    const item = line.replace(/^[-*]\s+/, '').trim();
-    if (item && !item.startsWith('#')) current.items.push(item);
-  }
-
-  return notes;
-}
-
-function renderReleaseNotes(notes) {
-  const host = document.getElementById('releaseNotesDynamic');
-  if (!host) return;
-  if (!notes?.length) {
-    host.innerHTML = '<p>Release Notes konnten nicht geladen werden.</p>';
-    return;
-  }
-  host.innerHTML = notes.slice(0, 18).map(note => `
-    <div class="release-note">
-      <strong>${escapeHtml(note.version)}${note.title ? ` · ${escapeHtml(note.title)}` : ''}</strong>
-      <small>${escapeHtml(note.items.slice(0, 4).join(' '))}</small>
-    </div>
-  `).join('');
-}
-
-async function loadReleaseNotes() {
-  const versionHost = document.querySelector('[data-app-version-current]');
-  if (versionHost) versionHost.textContent = APP_VERSION;
-
-  try {
-    const response = await fetch(`./RELEASE_NOTES.md?v=${encodeURIComponent(APP_VERSION)}`, {
-      cache: 'no-store',
-      headers: { 'Cache-Control': 'no-cache' }
-    });
-    if (!response.ok) throw new Error(`Release Notes HTTP ${response.status}`);
-    const markdown = await response.text();
-    renderReleaseNotes(parseReleaseNotes(markdown));
-  } catch (error) {
-    console.warn('Release Notes konnten nicht dynamisch geladen werden.', error);
-    const fallback = document.getElementById('releaseNotesFallback');
-    if (fallback) renderReleaseNotes(parseReleaseNotes(fallback.textContent || ''));
-  }
-}
-
-loadReleaseNotes();
+initializeReleaseNotesController({ appVersion: APP_VERSION });
 
 // Bind PDF export and project actions as soon as the app is ready.
 // The menu may be opened and a button tapped before lazy initialization has finished.
