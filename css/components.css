@@ -500,7 +500,7 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .dw-accordion + .dw-accordion { margin-top: var(--tc-gap); }
 .tc-accordion > summary,
 .dw-accordion > summary,
-.settings-submenu > summary { position: relative; z-index: 3; list-style: none; min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: var(--tc-gap); padding: 0 var(--tc-gap); cursor: pointer; font-weight: 900; color: var(--color-text); user-select: none; background: linear-gradient(145deg, rgb(34,40,50), rgb(25,30,38)); }
+.settings-submenu > summary { position: relative; list-style: none; min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: var(--tc-gap); padding: 0 var(--tc-gap); cursor: pointer; font-weight: 900; color: var(--color-text); user-select: none; background: linear-gradient(145deg, rgb(34,40,50), rgb(25,30,38)); }
 .tc-accordion > summary::-webkit-details-marker,
 .dw-accordion > summary::-webkit-details-marker,
 .settings-submenu > summary::-webkit-details-marker { display: none; }
@@ -513,9 +513,9 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .settings-submenu.is-open > summary::after { transform: rotate(-90deg); }
 .tc-accordion__body,
 .dw-accordion__body { display: grid; gap: var(--tc-gap); padding: var(--tc-gap); border-top: 1px solid rgba(255,255,255,.08); min-width: 0; }
-.settings-submenu__content { position: relative; z-index: 4; display: grid; gap: var(--tc-gap); padding: var(--tc-gap); border-top: 1px solid rgba(255,255,255,.12); min-width: 0; background: linear-gradient(145deg, rgb(29,35,44), rgb(22,27,35)); color: var(--color-text); box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
+.settings-submenu__content { position: relative; display: grid; gap: var(--tc-gap); padding: var(--tc-gap); border-top: 1px solid rgba(255,255,255,.12); min-width: 0; background: linear-gradient(145deg, rgb(29,35,44), rgb(22,27,35)); color: var(--color-text); box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
 .settings-submenu[open],
-.settings-submenu.is-open { z-index: 6; height: auto; max-height: none; overflow: hidden; }
+.settings-submenu.is-open { height: auto; max-height: none; overflow: visible; }
 .settings-submenu[open] > .settings-submenu__content,
 .settings-submenu.is-open > .settings-submenu__content { display: grid; height: auto; max-height: none; overflow: visible; visibility: visible; opacity: 1; position: relative; pointer-events: auto; }
 .settings-submenu:not([open]):not(.is-open) > .settings-submenu__content { display: none; }
