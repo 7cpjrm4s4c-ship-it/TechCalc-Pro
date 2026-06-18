@@ -103,10 +103,10 @@ function updateDrinkingWaterDynamicUnsafe(root, s, meta = {}){
   if (action === 'surface-confirm' && 
   (!Array.isArray(meta.changed) || meta.changed.length === 0);
   console.debug(
-  '[DW_DYNAMIC]',
+  '[DW_DYNAMIC_DETAIL]',
   {
-    action: meta?.action || 'unknown',
-    changed: meta?.changed || [],
+    action: "surface:confirm" || 'unknown',
+    changed: meta?.changed || ["uiUnitFormOpen"],
     ts: performance.now()
   }
 )
