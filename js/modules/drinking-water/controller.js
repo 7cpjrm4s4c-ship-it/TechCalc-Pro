@@ -98,6 +98,7 @@ function commitWaterHeatingModeSegment(root, segment, event = null) {
   console.debug(
     '[DW_REFRESH_SOURCE]',
     'surface-confirm'
+  ); 
   
   refreshDrinkingWater(root);
   queueMicrotask?.(() => refreshDrinkingWater(root));
