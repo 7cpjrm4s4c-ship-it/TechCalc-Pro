@@ -1,4 +1,12 @@
 
+## Phase 37C.2B — Drinking-Water Mobile Scroll Restore Dampening
+
+- Trinkwasser-spezifische aggressive Scroll-Restore-Parameter entschärft.
+- Aktive Touch-Scrolls unterdrücken jetzt opt-in Restore-Schreibzugriffe.
+- ThemeController-Extraktion aus 37C.2 bleibt erhalten.
+- Neuer Guard: `test:phase37c2b`.
+
+
 ## 1.3.0-rc.1 · Phase 37C.1 – App-Shell Decomposition Map
 
 - `app.js` responsibility map created without runtime changes.

@@ -163,7 +163,7 @@ function installNavigationPersistenceGuard(root) {
 }
 
 function preserveScrollPosition(callback) {
-  return runWithoutScrollJump(callback, { frames: 12, delays: [0, 40, 100, 220, 420, 800] });
+  return runWithoutScrollJump(callback, { frames: 2, delays: [0, 40, 100], skipDuringActiveTouch: true });
 }
 
 export function refreshDrinkingWater(root) {
@@ -236,7 +236,7 @@ function saveUnit(root, update = false) {
   }
   state.set({ unitDraftConsumers: [], activeUnitId: update ? s.activeUnitId : null, activeSingleId:null, unitName: update ? s.unitName : '', unitSimultaneityFactor: update ? s.unitSimultaneityFactor : '', uiUnitFormOpen:true, uiUnitSavedOpen:true }, { action:'dw:unit-save', notify:false });
   refreshDrinkingWater(root);
-  }, { frames: 14, delays: [0, 40, 100, 220, 420, 800] });
+  }, { frames: 2, delays: [0, 40, 100], skipDuringActiveTouch: true });
 }
 
 function saveSingle(root, update = false) {
@@ -254,7 +254,7 @@ function saveSingle(root, update = false) {
   }
   state.set({ singleDraftConsumers: [], activeUnitId:null, activeSingleId: update ? s.activeSingleId : null, singleName: update ? s.singleName : '', uiSingleFormOpen:true, uiSingleSavedOpen:true }, { action:'dw:single-save', notify:false });
   refreshDrinkingWater(root);
-  }, { frames: 14, delays: [0, 40, 100, 220, 420, 800] });
+  }, { frames: 2, delays: [0, 40, 100], skipDuringActiveTouch: true });
 }
 
 function deleteUnit(root, id) {
@@ -262,7 +262,7 @@ function deleteUnit(root, id) {
   syncSavedRecordsPatch({ savedUsageUnits: normalizeDrinkingWaterSavedState(state.get()).savedUsageUnits.filter(item => !isSameId(item.id, id)) }, 'dw:unit-delete');
   if (isSameId(state.get().activeUnitId, id)) state.set({ activeUnitId:null, unitName:'', unitSimultaneityFactor:'', unitDraftConsumers:[] }, { action:'dw:unit-delete', notify:false });
   refreshDrinkingWater(root);
-  }, { frames: 12, delays: [0, 40, 120, 260, 520, 820] });
+  }, { frames: 2, delays: [0, 40, 100], skipDuringActiveTouch: true });
 }
 
 function deleteSingle(root, id) {
@@ -270,7 +270,7 @@ function deleteSingle(root, id) {
   syncSavedRecordsPatch({ savedSingleConsumers: normalizeDrinkingWaterSavedState(state.get()).savedSingleConsumers.filter(item => !isSameId(item.id, id)) }, 'dw:single-delete');
   if (isSameId(state.get().activeSingleId, id)) state.set({ activeSingleId:null, singleName:'', singleDraftConsumers:[] }, { action:'dw:single-delete', notify:false });
   refreshDrinkingWater(root);
-  }, { frames: 12, delays: [0, 40, 120, 260, 520, 820] });
+  }, { frames: 2, delays: [0, 40, 100], skipDuringActiveTouch: true });
 }
 
 function editUnit(root, id) {

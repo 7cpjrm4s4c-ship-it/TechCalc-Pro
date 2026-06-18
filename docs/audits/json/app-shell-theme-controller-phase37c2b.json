@@ -1,0 +1,14 @@
+{
+  "phase": "37C.2B",
+  "title": "Drinking-Water Mobile Scroll Restore Dampening",
+  "runtimeBehaviorChanged": true,
+  "moduleLogicChanged": false,
+  "themeExtractionRetained": true,
+  "changes": [
+    "Added opt-in skipDuringActiveTouch guard to runWithoutScrollJump",
+    "Reduced Drinking Water scroll restore frames to 2",
+    "Reduced Drinking Water delayed restores to [0,40,100]",
+    "Applied active-touch restore suppression to all Drinking Water restore paths"
+  ],
+  "guards": ["test:phase37c2b"]
+}
