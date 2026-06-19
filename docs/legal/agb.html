@@ -16,6 +16,23 @@
   html { background: #ffffff; }
   body { font-family: 'Inter', sans-serif; color: var(--ink); line-height: 1.7; }
   .container { max-width: 900px; margin: 0 auto; padding: 60px 40px; }
+  .back-nav { margin-bottom: 28px; }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--accent);
+    background: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 8px 24px rgba(15, 15, 20, 0.06);
+  }
+  .back-link:hover { border-color: var(--accent); background: #f0f7ff; }
   .header { text-align: center; margin-bottom: 60px; border-bottom: 2px solid var(--border); padding-bottom: 40px; }
   h1 { font-size: 28px; margin-bottom: 8px; font-weight: 700; }
   .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 4px; }
@@ -30,11 +47,12 @@
   .section { margin-bottom: 40px; }
   .footer { margin-top: 60px; padding-top: 40px; border-top: 2px solid var(--border); font-size: 12px; color: var(--muted); }
   strong { font-weight: 600; color: var(--ink); }
-  @media (max-width: 640px) { .container { padding: 32px 20px; } p { text-align: left; } }
+  @media (max-width: 640px) { .container { padding: 32px 20px; } p { text-align: left; } .back-link { width: 100%; justify-content: center; } }
 </style>
 </head>
 <body>
 <div class="container">
+  <nav class="back-nav" aria-label="Navigation zurück zur App"><a class="back-link" href="../../index.html">← Zurück zur App</a></nav>
   <div class="header">
     <h1>Allgemeine Geschäftsbedingungen</h1>
     <p class="subtitle">TechCalc Pro – Heizungs-, Lüftungs- und Sanitärberechnung</p>

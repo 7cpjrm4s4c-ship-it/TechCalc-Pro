@@ -262,3 +262,11 @@ Release-hardening status after Phase 31D:
 - App-Shell-, Browser-Runtime-, Offline- und Performance-Stabilisierungen aus Phase 37 zusammengeführt.
 - Temporäre Trinkwasser-Debugpfade werden im RC-Audit blockiert.
 - Keine Feature- oder Fachlogikänderung.
+
+## Phase 37F.1 – AGB Replacement & Back Navigation
+
+- AGB-Dokument unter `docs/legal/agb.html` durch finalen Textstand ersetzt.
+- Herausgeber-/Kontaktinformationen ergänzt.
+- Zurück-zur-App-Link ergänzt (`../../index.html`).
+- Guard `test:phase37f1` ergänzt.
+
