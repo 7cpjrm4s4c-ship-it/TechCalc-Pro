@@ -59,3 +59,27 @@ Umfang:
 - ergänzt Precache um den neuen Shell-Controller
 
 Ziel: `app.js` weiter auf Bootstrap und Composition Root reduzieren, ohne Service-Worker-Verhalten zu ändern.
+
+## 37C.7 – App-Shell Decomposition Closure
+
+Phase 37C.7 schließt die App-Shell-Decomposition als kontrollierte Stabilisierungsphase ab.
+
+Ergebnis:
+
+- `js/core/app.js` bleibt als Composition Root erhalten.
+- Theme, Settings, Release Notes, Feedback und Service Worker liegen in eigenen Shell-Controllern.
+- `app.js` enthält weiterhin nur Bootstrap, Lazy-Module-Registrierung, Router-Composition, Session-Persistenz und globale Modulnavigation.
+- Alle Shell-Controller sind im Service-Worker-Precache enthalten.
+- Die Settings-Drawer-Korrekturen aus 37C.4A–37C.4F bleiben als stabile Mobile-UX-Basis erhalten.
+
+Technischer Abschluss:
+
+- App-Shell-Controller: 5/5 vorhanden.
+- `app.js`: unter 320 Zeilen.
+- Keine extrahierten Shell-Verantwortungen verbleiben in `app.js`.
+- Neuer Audit: `scripts/audit-app-shell-closure-phase37c7.mjs`.
+- Neuer Guard: `test:phase37c7`.
+
+Bewertung:
+
+Phase 37C hat den Monolith-Befund aus dem Audit substanziell reduziert. `app.js` ist nicht vollständig leergezogen, sondern bewusst als Composition Root belassen. Das ist der richtige Zielzustand vor RC: minimale Orchestrierung im Core, konkrete UI-/Shell-Verantwortungen in separaten Controllern.

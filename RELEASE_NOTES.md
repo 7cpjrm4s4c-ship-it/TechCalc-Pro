@@ -1,3 +1,13 @@
+## 1.3.0-rc.1 · Phase 37C.7 – App-Shell Decomposition Closure
+
+- App-Shell-Decomposition abgeschlossen.
+- `js/core/app.js` bleibt als Composition Root für Bootstrap, Lazy-Module, Router, Session-Persistenz und globale Navigation erhalten.
+- Shell-Controller-Boundaries für Theme, Settings, Release Notes, Feedback und Service Worker per Audit fixiert.
+- Service-Worker-Precache-Abdeckung der Shell-Controller validiert.
+- Neuer Audit: `audit:phase37c7`.
+- Neuer Guard: `test:phase37c7`.
+- Keine Runtime- oder Modul-Logik geändert.
+
 ## 1.3.0-rc.1 · Phase 37C.6 – Service Worker Controller Extraction
 
 - Service-Worker-Registration und Cache-Update-Message-Handling aus `app.js` extrahiert.

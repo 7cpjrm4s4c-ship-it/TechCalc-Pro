@@ -175,6 +175,8 @@
     "test:phase37c4d": "node tests/platform-app-shell-settings-drawer-phase37c4d.test.mjs",
     "test:phase37c4f": "node tests/platform-app-shell-settings-drawer-phase37c4f.test.mjs",
     "test:phase37c5": "node tests/platform-app-shell-feedback-controller-phase37c5.test.mjs",
-    "test:phase37c6": "node tests/platform-app-shell-service-worker-controller-phase37c6.test.mjs"
+    "test:phase37c6": "node tests/platform-app-shell-service-worker-controller-phase37c6.test.mjs",
+    "audit:phase37c7": "node scripts/audit-app-shell-closure-phase37c7.mjs",
+    "test:phase37c7": "node scripts/audit-app-shell-closure-phase37c7.mjs && node tests/platform-app-shell-closure-phase37c7.test.mjs"
   }
 }

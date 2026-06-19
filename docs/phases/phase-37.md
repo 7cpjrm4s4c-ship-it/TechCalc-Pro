@@ -80,3 +80,9 @@ Validation target: fewer files, smaller documentation payload, preserved phase-l
 - Phase 37A abgeschlossen
 - P1-Findings: 0
 - P2-Restpunkte: 6
+
+## Phase 37C App-Shell Decomposition Closure
+
+Phase 37C reduced `js/core/app.js` from the original monolithic shell toward a Composition Root. Theme, Settings, Release Notes, Feedback and Service Worker responsibilities were extracted to `js/platform/shell/*Controller.js`. Phase 37C.7 added the final closure audit and guard for controller presence, app.js size, extracted responsibility boundaries and service-worker precache coverage.
+
+Validation target: `test:phase37c7`, `build`, `test:phase37c6`, `test:phase37c5`, `test:phase37c4f`, `test:module-smoke`.
