@@ -7,7 +7,7 @@ import { isSameId } from '../../core/savedRecords.js';
 
 export function draftConsumerList(items, type, waterHeatingMode = 'central') {
   if (!items?.length) return '<div class="empty-state empty-state--compact">Noch keine Verbraucher ausgewählt</div>';
-  return `<div class="tc-consumer-list">${items.map((c, index) => `<div class="tc-consumer-row dw-consumer-row--editable">
+  return `<div class="tc-consumer-list">${items.map((c, index) => `<div class="tc-consumer-row tc-consumer-row--editable">
     <div><strong>${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr, 2)} l/s je Verbraucher · ${esc(consumerModeSuffix(c, waterHeatingMode))}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div>
     <label class="mini-edit-field"><span>Anzahl</span><input type="number" min="0" step="1" value="${esc(c.count)}" data-dw-draft-count="${esc(type)}" data-index="${index}" inputmode="numeric"></label>
     <button type="button" data-dw-remove-draft="${esc(type)}" data-index="${index}" aria-label="Verbraucher entfernen">×</button>
@@ -19,7 +19,7 @@ export function renderUsageUnitRows(units = [], snapshot = {}, waterHeatingMode 
   if (!units.length) return '<div class="empty-state empty-state--compact">Noch keine Nutzungseinheit angelegt</div>';
   const activeId = snapshot.activeUnitId;
   const expandedId = snapshot.expandedUnitId;
-  return `<div class="line-section-list saved-record-list dw-save-dialog__list">${units.map((unit, index) => `<article class="line-section-card saved-record-card dw-save-dialog__record ${isSameId(expandedId, unit.id) ? '' : 'is-collapsed'} ${isSameId(activeId, unit.id) ? 'is-active' : ''}" data-line-card data-dw-unit-edit="${esc(unit.id)}">
+  return `<div class="line-section-list saved-record-list">${units.map((unit, index) => `<article class="line-section-card saved-record-card ${isSameId(expandedId, unit.id) ? '' : 'is-collapsed'} ${isSameId(activeId, unit.id) ? 'is-active' : ''}" data-line-card data-dw-unit-edit="${esc(unit.id)}">
     <div class="line-section-card__head saved-record-card__head">
       <div class="line-section-card__title saved-record-card__title"><strong>${esc(unit.name || 'Nutzungseinheit ' + (index + 1))}</strong><small>${unit.consumerCount} Verbraucher · Σ ${fmt(unit.sumFlow, 2)} l/s · Spitze ${fmt(unit.peakFlow, 2)} l/s</small></div>
       <button type="button" class="line-section-card__toggle saved-record-card__toggle" data-line-toggle data-dw-toggle-unit="${esc(unit.id)}" aria-expanded="${isSameId(expandedId, unit.id) ? 'true' : 'false'}" aria-label="Details aufklappen"><span>▾</span></button>
@@ -36,11 +36,11 @@ export function renderSingleRows(groups = [], snapshot = {}, waterHeatingMode = 
   if (!groups.length) return '<div class="empty-state empty-state--compact">Noch keine Einzelverbraucher angelegt</div>';
   const activeId = snapshot.activeSingleId;
   const expandedId = snapshot.expandedSingleId;
-  return `<div class="line-section-list saved-record-list dw-save-dialog__list">${groups.map((group, index) => {
+  return `<div class="line-section-list saved-record-list">${groups.map((group, index) => {
     const consumers = group.consumers || [];
     const count = consumers.reduce((sum, c) => sum + (Number(c.count) || 1), 0);
     const sumFlow = consumers.reduce((sum, c) => sum + Number(c.vr || 0) * (Number(c.count) || 1), 0);
-    return `<article class="line-section-card saved-record-card dw-save-dialog__record ${isSameId(expandedId, group.id) ? '' : 'is-collapsed'} ${isSameId(activeId, group.id) ? 'is-active' : ''}" data-line-card data-dw-single-edit="${esc(group.id)}">
+    return `<article class="line-section-card saved-record-card ${isSameId(expandedId, group.id) ? '' : 'is-collapsed'} ${isSameId(activeId, group.id) ? 'is-active' : ''}" data-line-card data-dw-single-edit="${esc(group.id)}">
       <div class="line-section-card__head saved-record-card__head">
         <div class="line-section-card__title saved-record-card__title"><strong>${esc(group.name || 'Einzelverbraucher ' + (index + 1))}</strong><small>${count} Verbraucher · ${fmt(sumFlow, 2)} l/s</small></div>
         <button type="button" class="line-section-card__toggle saved-record-card__toggle" data-line-toggle data-dw-toggle-single="${esc(group.id)}" aria-expanded="${isSameId(expandedId, group.id) ? 'true' : 'false'}" aria-label="Details aufklappen"><span>▾</span></button>
@@ -71,7 +71,7 @@ export function renderInputCard(vm) {
       ])
     ].join('')), vm.accent),
     card(vm.waterHeating.unitCardTitle, stack([
-      `<details class="tc-accordion dw-save-dialog" data-dw-accordion="uiUnitFormOpen" ${s.uiUnitFormOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text dw-save-dialog__summary"><strong>Nutzungseinheit zusammenstellen</strong><small>${esc(vm.waterHeating.unitHelp)}</small></span></summary><div class="tc-accordion__body tc-stack dw-save-dialog__body">`,
+      `<details class="tc-accordion" data-dw-accordion="uiUnitFormOpen" ${s.uiUnitFormOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text"><strong>Nutzungseinheit zusammenstellen</strong><small>${esc(vm.waterHeating.unitHelp)}</small></span></summary><div class="tc-accordion__body tc-stack">`,
       field({ id:'unitName', label:'Bezeichnung', value:s.unitName, placeholder:'z. B. Bad Wohnung 1', inputmode:'text' }),
       grid([
         selectField({ id:'unitConsumerType', label:vm.waterHeating.unitConsumerLabel, value:s.unitConsumerType, options:vm.consumerOptions }),
@@ -82,10 +82,10 @@ export function renderInputCard(vm) {
       `<div data-dw-unit-draft>${draftConsumerList(s.unitDraftConsumers || [], 'unit', s.waterHeatingMode)}</div>`,
       `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-unit ${s.activeUnitId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-dw-update-unit ${s.activeUnitId ? '' : 'disabled'}>Aktualisieren</button></div>`,
       '</div></details>',
-      `<details class="tc-accordion dw-save-dialog dw-save-dialog--saved" data-dw-accordion="uiUnitSavedOpen" ${s.uiUnitSavedOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text dw-save-dialog__summary"><strong>Gespeicherte Nutzungseinheiten</strong><small data-dw-unit-summary>${vm.savedUsageUnits.length} Nutzungseinheiten angelegt</small></span></summary><div class="tc-accordion__body tc-stack dw-save-dialog__body" data-dw-unit-saved>${renderUsageUnitRows(vm.savedUsageUnits, s, s.waterHeatingMode)}</div></details>`
+      `<details class="tc-accordion" data-dw-accordion="uiUnitSavedOpen" ${s.uiUnitSavedOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text"><strong>Gespeicherte Nutzungseinheiten</strong><small data-dw-unit-summary>${vm.savedUsageUnits.length} Nutzungseinheiten angelegt</small></span></summary><div class="tc-accordion__body tc-stack" data-dw-unit-saved>${renderUsageUnitRows(vm.savedUsageUnits, s, s.waterHeatingMode)}</div></details>`
     ].join('')), vm.accent),
     card(vm.waterHeating.singleCardTitle, stack([
-      `<details class="tc-accordion dw-save-dialog" data-dw-accordion="uiSingleFormOpen" ${s.uiSingleFormOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text dw-save-dialog__summary"><strong>Freie Einrichtungsgegenstände zusammenstellen</strong><small>${esc(vm.waterHeating.singleHelp)}</small></span></summary><div class="tc-accordion__body tc-stack dw-save-dialog__body">`,
+      `<details class="tc-accordion" data-dw-accordion="uiSingleFormOpen" ${s.uiSingleFormOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text"><strong>Freie Einrichtungsgegenstände zusammenstellen</strong><small>${esc(vm.waterHeating.singleHelp)}</small></span></summary><div class="tc-accordion__body tc-stack">`,
       field({ id:'singleName', label:'Bezeichnung / Gruppe', value:s.singleName, placeholder:'z. B. WC EG', inputmode:'text' }),
       grid([
         selectField({ id:'singleConsumerType', label:vm.waterHeating.singleConsumerLabel, value:s.singleConsumerType, options:vm.consumerOptions }),
@@ -99,7 +99,7 @@ export function renderInputCard(vm) {
       `<div data-dw-single-draft>${draftConsumerList(s.singleDraftConsumers || [], 'single', s.waterHeatingMode)}</div>`,
       `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-single ${s.activeSingleId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-dw-update-single ${s.activeSingleId ? '' : 'disabled'}>Aktualisieren</button></div>`,
       '</div></details>',
-      `<details class="tc-accordion dw-save-dialog dw-save-dialog--saved" data-dw-accordion="uiSingleSavedOpen" ${s.uiSingleSavedOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text dw-save-dialog__summary"><strong>Gespeicherte Einzelverbraucher</strong><small data-dw-single-summary>${vm.savedSingleGroups.length} Gruppen außerhalb NE</small></span></summary><div class="tc-accordion__body tc-stack dw-save-dialog__body" data-dw-single-saved>${renderSingleRows(vm.savedSingleGroups, s, s.waterHeatingMode)}</div></details>`
+      `<details class="tc-accordion" data-dw-accordion="uiSingleSavedOpen" ${s.uiSingleSavedOpen ? 'open' : ''}><summary><span class="tc-accordion__summary-text"><strong>Gespeicherte Einzelverbraucher</strong><small data-dw-single-summary>${vm.savedSingleGroups.length} Gruppen außerhalb NE</small></span></summary><div class="tc-accordion__body tc-stack" data-dw-single-saved>${renderSingleRows(vm.savedSingleGroups, s, s.waterHeatingMode)}</div></details>`
     ].join('')), vm.accent)
   ].join(''));
 }

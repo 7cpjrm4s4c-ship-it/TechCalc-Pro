@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-06-19T16:38:08.123Z",
+  "generatedAt": "2026-06-19T16:44:42.060Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -108,17 +108,17 @@
           {
             "cssFile": "css/modules.css",
             "line": 102,
-            "text": ".module-view[data-module='buffer-storage'] .ph-help,"
+            "text": ".module-view[data-module='buffer-storage'] .tc-help,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 103,
-            "text": ".module-view[data-module='buffer-storage'] .ph-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
+            "text": ".module-view[data-module='buffer-storage'] .tc-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
           },
           {
             "cssFile": "css/modules.css",
             "line": 105,
-            "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
+            "text": ".module-view[data-module='buffer-storage'] .tc-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
           }
         ]
       }
@@ -143,27 +143,27 @@
           {
             "cssFile": "css/modules.css",
             "line": 91,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog > summary,"
+            "text": ".module-view[data-module='drinking-water'] .tc-accordion > summary,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 92,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body,"
+            "text": ".module-view[data-module='drinking-water'] .tc-accordion__body,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 93,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__record { padding: var(--tc-gap); }"
+            "text": ".module-view[data-module='drinking-water'] .saved-record-card { padding: var(--tc-gap); }"
           },
           {
             "cssFile": "css/modules.css",
             "line": 94,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__list,"
+            "text": ".module-view[data-module='drinking-water'] .saved-record-list,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 95,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
+            "text": ".module-view[data-module='drinking-water'] .tc-accordion__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
           },
           {
             "cssFile": "css/modules.css",
@@ -189,17 +189,17 @@
           {
             "cssFile": "css/modules.css",
             "line": 100,
-            "text": ".module-view[data-module='pressure-holding'] .ph-help,"
+            "text": ".module-view[data-module='pressure-holding'] .tc-help,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 101,
-            "text": ".module-view[data-module='pressure-holding'] .ph-note,"
+            "text": ".module-view[data-module='pressure-holding'] .tc-note,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 104,
-            "text": ".module-view[data-module='pressure-holding'] .ph-formula,"
+            "text": ".module-view[data-module='pressure-holding'] .tc-formula,"
           },
           {
             "cssFile": "css/modules.css",
@@ -333,17 +333,17 @@
               {
                 "cssFile": "css/modules.css",
                 "line": 102,
-                "text": ".module-view[data-module='buffer-storage'] .ph-help,"
+                "text": ".module-view[data-module='buffer-storage'] .tc-help,"
               },
               {
                 "cssFile": "css/modules.css",
                 "line": 103,
-                "text": ".module-view[data-module='buffer-storage'] .ph-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
+                "text": ".module-view[data-module='buffer-storage'] .tc-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
               },
               {
                 "cssFile": "css/modules.css",
                 "line": 105,
-                "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
+                "text": ".module-view[data-module='buffer-storage'] .tc-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
               }
             ]
           }
@@ -429,27 +429,27 @@
               {
                 "cssFile": "css/modules.css",
                 "line": 91,
-                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog > summary,"
+                "text": ".module-view[data-module='drinking-water'] .tc-accordion > summary,"
               },
               {
                 "cssFile": "css/modules.css",
                 "line": 92,
-                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body,"
+                "text": ".module-view[data-module='drinking-water'] .tc-accordion__body,"
               },
               {
                 "cssFile": "css/modules.css",
                 "line": 93,
-                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__record { padding: var(--tc-gap); }"
+                "text": ".module-view[data-module='drinking-water'] .saved-record-card { padding: var(--tc-gap); }"
               },
               {
                 "cssFile": "css/modules.css",
                 "line": 94,
-                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__list,"
+                "text": ".module-view[data-module='drinking-water'] .saved-record-list,"
               },
               {
                 "cssFile": "css/modules.css",
                 "line": 95,
-                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
+                "text": ".module-view[data-module='drinking-water'] .tc-accordion__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
               },
               {
                 "cssFile": "css/modules.css",
@@ -635,17 +635,17 @@
               {
                 "cssFile": "css/modules.css",
                 "line": 100,
-                "text": ".module-view[data-module='pressure-holding'] .ph-help,"
+                "text": ".module-view[data-module='pressure-holding'] .tc-help,"
               },
               {
                 "cssFile": "css/modules.css",
                 "line": 101,
-                "text": ".module-view[data-module='pressure-holding'] .ph-note,"
+                "text": ".module-view[data-module='pressure-holding'] .tc-note,"
               },
               {
                 "cssFile": "css/modules.css",
                 "line": 104,
-                "text": ".module-view[data-module='pressure-holding'] .ph-formula,"
+                "text": ".module-view[data-module='pressure-holding'] .tc-formula,"
               },
               {
                 "cssFile": "css/modules.css",
@@ -1057,17 +1057,17 @@
           {
             "cssFile": "css/modules.css",
             "line": 102,
-            "text": ".module-view[data-module='buffer-storage'] .ph-help,"
+            "text": ".module-view[data-module='buffer-storage'] .tc-help,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 103,
-            "text": ".module-view[data-module='buffer-storage'] .ph-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
+            "text": ".module-view[data-module='buffer-storage'] .tc-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
           },
           {
             "cssFile": "css/modules.css",
             "line": 105,
-            "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
+            "text": ".module-view[data-module='buffer-storage'] .tc-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
           }
         ]
       }
@@ -1092,27 +1092,27 @@
           {
             "cssFile": "css/modules.css",
             "line": 91,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog > summary,"
+            "text": ".module-view[data-module='drinking-water'] .tc-accordion > summary,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 92,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body,"
+            "text": ".module-view[data-module='drinking-water'] .tc-accordion__body,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 93,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__record { padding: var(--tc-gap); }"
+            "text": ".module-view[data-module='drinking-water'] .saved-record-card { padding: var(--tc-gap); }"
           },
           {
             "cssFile": "css/modules.css",
             "line": 94,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__list,"
+            "text": ".module-view[data-module='drinking-water'] .saved-record-list,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 95,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
+            "text": ".module-view[data-module='drinking-water'] .tc-accordion__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
           },
           {
             "cssFile": "css/modules.css",
@@ -1138,17 +1138,17 @@
           {
             "cssFile": "css/modules.css",
             "line": 100,
-            "text": ".module-view[data-module='pressure-holding'] .ph-help,"
+            "text": ".module-view[data-module='pressure-holding'] .tc-help,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 101,
-            "text": ".module-view[data-module='pressure-holding'] .ph-note,"
+            "text": ".module-view[data-module='pressure-holding'] .tc-note,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 104,
-            "text": ".module-view[data-module='pressure-holding'] .ph-formula,"
+            "text": ".module-view[data-module='pressure-holding'] .tc-formula,"
           },
           {
             "cssFile": "css/modules.css",

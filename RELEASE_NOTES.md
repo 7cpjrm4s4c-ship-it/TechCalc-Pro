@@ -1,3 +1,10 @@
+
+## Phase 38D — UI Alias Cleanup
+
+- Removed visual `dw-*` / `ph-*` class aliases from shared component CSS and module markup.
+- Kept semantic module data hooks such as `data-dw-*`, `data-ph-*` and h,x diagram-specific classes intact.
+- Added `scripts/audit-ui-alias-cleanup-phase38d.mjs` to the integration gate to prevent visual alias regressions before RC freeze.
+
 ## 1.3.0-rc.1 · Phase 38B – Test Script Consolidation
 
 - `package.json` auf die RC-Standard-Gates `test`, `test:integration` und `test:e2e` reduziert.

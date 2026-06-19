@@ -31,8 +31,8 @@ export function renderMediumContent(vm) {
 export function renderRuntimeInputs(vm) {
   return card('Mindestlaufzeit Verdichter', [
     renderFieldGrid(vm.runtimeFields, 'buffer-input-grid--runtime'),
-    '<p class="tc-help ph-help ph-help--inline buffer-help"><strong>Teillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große Verdichter ⇒ 25 %. Die Berechnung nutzt intern 0,25.</p>',
-    '<p class="tc-help ph-help ph-help--inline buffer-help"><strong>QLast:</strong> konstant durch aktive Verbraucher abgenommene Leistung. Falls keine konstante Last vorhanden oder bekannt ist, 0 kW eintragen.</p>'
+    '<p class="tc-help tc-help--inline buffer-help"><strong>Teillast:</strong> prozentualer Leistungsanteil der kleinsten Verdichter-/Leistungsstufe. Beispiel: 4 gleich große Verdichter ⇒ 25 %. Die Berechnung nutzt intern 0,25.</p>',
+    '<p class="tc-help tc-help--inline buffer-help"><strong>QLast:</strong> konstant durch aktive Verbraucher abgenommene Leistung. Falls keine konstante Last vorhanden oder bekannt ist, 0 kW eintragen.</p>'
   ].join(''), vm.accent);
 }
 
@@ -64,7 +64,7 @@ export function renderView(s) {
   const inputColumn = stack([
     card('Berechnungsart', stack([
       `<div class="buffer-mode-tabs">${segmented('calculationMode', vm.bufferModeOptions, s.calculationMode, { accent: vm.accent })}</div>`,
-      '<p class="tc-help ph-help">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'
+      '<p class="tc-help">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'
     ].join('')), vm.accent),
     card('Medium / Faktor', `<div data-buffer-dynamic="medium">${renderMediumContent(vm)}</div>`, vm.accent),
     `<div data-buffer-dynamic="input-blocks">${renderInputBlocks(vm)}</div>`,
