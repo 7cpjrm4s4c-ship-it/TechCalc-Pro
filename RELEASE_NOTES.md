@@ -300,3 +300,11 @@ Release-hardening status after Phase 31D:
 - `width=device-width`, `initial-scale=1` und `viewport-fit=cover` bleiben erhalten.
 - Guard ergänzt: `tests/platform-viewport-accessibility-phase38c.test.mjs`.
 - Keine Änderung an Modul-, Berechnungs- oder Service-Worker-Logik.
+
+## Phase 38F — Optional esbuild Minification
+
+- Added `esbuild` as a development dependency.
+- Added `scripts/minify-static-assets.mjs` for static asset minification into `dist/`.
+- Preserved the existing ES-module file graph: no bundling, no import rewriting, no runtime path changes.
+- Added optional `npm run build:minified` so the deployable `dist/` artifact is generated after precache generation and import validation, while keeping the standard build path unchanged.
+- Added `scripts/audit-esbuild-minification-phase38f.mjs` and wired it into `npm run test:integration`.

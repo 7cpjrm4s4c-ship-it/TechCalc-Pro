@@ -10,6 +10,11 @@
     "test:integration": "node scripts/test-integration.mjs",
     "test:e2e": "playwright test",
     "serve:static": "node scripts/serve-static.mjs",
-    "audit:imports": "node scripts/check-js-imports.mjs"
+    "audit:imports": "node scripts/check-js-imports.mjs",
+    "test:phase38f": "node scripts/audit-esbuild-minification-phase38f.mjs",
+    "build:minified": "node scripts/generate-precache-manifest.mjs && node scripts/check-js-imports.mjs && node scripts/minify-static-assets.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
   }
 }
