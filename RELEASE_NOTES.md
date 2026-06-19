@@ -278,3 +278,10 @@ Release-hardening status after Phase 31D:
 - Zurück-zur-App-Link ergänzt (`../../index.html`).
 - Guard `test:phase37f1` ergänzt.
 
+## 1.3.0-rc.1 · Phase 38C – Accessibility / Viewport Fix
+
+- `user-scalable=no` aus dem App-Viewport entfernt.
+- `maximum-scale=1` entfernt, damit Browser-Zoom nicht künstlich begrenzt wird.
+- `width=device-width`, `initial-scale=1` und `viewport-fit=cover` bleiben erhalten.
+- Guard ergänzt: `tests/platform-viewport-accessibility-phase38c.test.mjs`.
+- Keine Änderung an Modul-, Berechnungs- oder Service-Worker-Logik.

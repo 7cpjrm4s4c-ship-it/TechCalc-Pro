@@ -12,7 +12,8 @@ const commands = [
   ['node', ['tests/platform-service-worker-offline-phase37b3.test.mjs']],
   ['node', ['tests/platform-release-candidate-phase37e.test.mjs']],
   ['node', ['tests/platform-legal-agb-phase37f1.test.mjs']],
-  ['node', ['tests/platform-precache-manifest-phase38a.test.mjs']]
+  ['node', ['tests/platform-precache-manifest-phase38a.test.mjs']],
+  ['node', ['tests/platform-viewport-accessibility-phase38c.test.mjs']]
 ];
 
 for (const [cmd, args] of commands) {
