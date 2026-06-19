@@ -1,4 +1,12 @@
 
+## Phase 37F – AGB Integration
+
+- AGB als statische Legal-Seite unter `docs/legal/agb.html` ergänzt.
+- Settings-Menü unter „Rechtliches & App“ mit aktivem AGB-Link erweitert.
+- Service-Worker-Precache um die AGB-Seite ergänzt.
+- Keine Fachlogik geändert.
+
+
 ## 1.3.0-rc.1 – Phase 37D Performance Observability Baseline
 
 - Performance Controller ergänzt.

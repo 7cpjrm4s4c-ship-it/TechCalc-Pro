@@ -4,6 +4,7 @@ const ASSETS = [
   './index.html',
   './manifest.json',
   './RELEASE_NOTES.md',
+  './docs/legal/agb.html',
   './css/components.css',
   './css/layout.css',
   './css/modules.css',

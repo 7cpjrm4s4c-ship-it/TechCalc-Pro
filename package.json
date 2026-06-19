@@ -181,6 +181,7 @@
     "audit:phase37d": "node scripts/audit-performance-observability-phase37d.mjs",
     "test:phase37d": "node scripts/audit-performance-observability-phase37d.mjs && node tests/platform-performance-observability-phase37d.test.mjs",
     "audit:phase37e": "node scripts/audit-release-candidate-phase37e.mjs",
-    "test:phase37e": "node scripts/audit-release-candidate-phase37e.mjs && node tests/platform-release-candidate-phase37e.test.mjs"
+    "test:phase37e": "node scripts/audit-release-candidate-phase37e.mjs && node tests/platform-release-candidate-phase37e.test.mjs",
+    "test:phase37f": "node tests/platform-legal-agb-phase37f.test.mjs"
   }
 }
