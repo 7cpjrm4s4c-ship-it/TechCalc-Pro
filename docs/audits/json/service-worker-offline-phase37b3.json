@@ -2,10 +2,10 @@
   "phase": "37B.3",
   "name": "Service Worker Offline Runtime Hardening",
   "status": "passed",
-  "generatedAt": "2026-06-19T14:58:55.510Z",
+  "generatedAt": "2026-06-19T16:26:35.053Z",
   "assets": {
-    "required": 179,
-    "cached": 179,
+    "required": 180,
+    "cached": 180,
     "missing": 0,
     "stale": 0,
     "jsModules": 165
@@ -64,14 +64,14 @@
       "detail": "Playwright spec covers offline reload for all module routes"
     },
     {
-      "id": "package-script:phase37b3",
+      "id": "package-script:integration-gate",
       "status": "passed",
-      "detail": "package exposes phase37b3 guard"
+      "detail": "package exposes consolidated integration guard"
     },
     {
-      "id": "package-script:e2e-phase37b3",
+      "id": "package-script:e2e-gate",
       "status": "passed",
-      "detail": "package exposes phase37b3 Playwright command"
+      "detail": "package exposes consolidated Playwright e2e command"
     }
   ]
 }

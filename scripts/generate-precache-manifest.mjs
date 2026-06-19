@@ -14,7 +14,8 @@ const STATIC_ASSETS = [
 const GENERATED_DIRS = [
   { dir: 'css', extensions: new Set(['.css']) },
   { dir: 'js', extensions: new Set(['.js']) },
-  { dir: 'assets/icons', extensions: null }
+  { dir: 'assets/icons', extensions: null },
+  { dir: 'docs/legal', extensions: new Set(['.html']) }
 ];
 
 function toAssetPath(filePath) {

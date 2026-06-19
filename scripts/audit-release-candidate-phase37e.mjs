@@ -43,22 +43,21 @@ const debugHits = execSync(`grep -R "${debugNeedles.join('\\|')}" -n js scripts 
   .filter(Boolean)
   .filter(line => !line.includes('audit-release-candidate-phase37e.mjs'));
 
-const requiredScripts = [
-  'test:phase37a-final',
-  'test:phase37b4',
-  'test:phase37c7',
-  'test:phase37d',
-  'test:module-smoke',
-  'test:phase37e'
-];
-const missingScripts = requiredScripts.filter(name => !packageJson.scripts?.[name]);
+const requiredScripts = {
+  test: 'node scripts/test-fast.mjs',
+  'test:integration': 'node scripts/test-integration.mjs',
+  'test:e2e': 'playwright test'
+};
+const missingScripts = Object.entries(requiredScripts)
+  .filter(([name, command]) => packageJson.scripts?.[name] !== command)
+  .map(([name]) => name);
 
 const checks = [
   { id: 'required-files', pass: requiredFiles.every(existsSync), detail: requiredFiles.filter(file => !existsSync(file)) },
   { id: 'app-shell-size', pass: appLines <= 320, detail: { appLines, max: 320 } },
   { id: 'shell-controllers-precached', pass: shellControllers.every(item => item.exists && item.precached), detail: shellControllers },
   { id: 'debug-logs-removed', pass: debugHits.length === 0, detail: debugHits.slice(0, 20) },
-  { id: 'phase-scripts-present', pass: missingScripts.length === 0, detail: missingScripts },
+  { id: 'consolidated-test-gates-present', pass: missingScripts.length === 0, detail: missingScripts },
   { id: 'release-notes-phase37e', pass: releaseNotes.includes('Phase 37E'), detail: 'RELEASE_NOTES.md contains Phase 37E closure entry' }
 ];
 

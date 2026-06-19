@@ -178,7 +178,8 @@ const ASSETS = [
   './assets/icons/icon-16.png',
   './assets/icons/icon-192.png',
   './assets/icons/icon-32.png',
-  './assets/icons/icon-512.png'
+  './assets/icons/icon-512.png',
+  './docs/legal/agb.html'
 ];
 
 self.addEventListener('install', event => {

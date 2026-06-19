@@ -2,7 +2,7 @@
   "phase": "37E",
   "title": "Release Candidate Closure Audit",
   "status": "pass",
-  "checkedAt": "2026-06-19T11:49:26.712Z",
+  "checkedAt": "2026-06-19T16:26:34.835Z",
   "checks": [
     {
       "id": "required-files",
@@ -59,7 +59,7 @@
       "detail": []
     },
     {
-      "id": "phase-scripts-present",
+      "id": "consolidated-test-gates-present",
       "pass": true,
       "detail": []
     },

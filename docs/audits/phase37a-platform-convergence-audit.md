@@ -5,7 +5,7 @@ Ziel: alle Module gegen die Referenzarchitektur Heizung, Lüftung, Druckhaltung 
 ## Executive Summary
 
 - Geprüfte Module: 11
-- P1-Findings: 0
+- P1-Findings: 1
 - P2-Findings: 6
 - Unbenutzte Utility-Export-Kandidaten: 2
 
@@ -14,7 +14,7 @@ Ziel: alle Module gegen die Referenzarchitektur Heizung, Lüftung, Druckhaltung 
 | Modul | Score | Status | P1 | P2 |
 |---|---:|---|---:|---:|
 | buffer-storage * | 93 | reference-aligned | 0 | 1 |
-| drinking-water | 86 | platform-conformant-with-minor-debt | 0 | 2 |
+| drinking-water | 71 | cleanup-required | 1 | 2 |
 | heat-recovery | 100 | reference-aligned | 0 | 0 |
 | heating-cooling * | 100 | reference-aligned | 0 | 0 |
 | hx-diagram | 100 | reference-aligned | 0 | 0 |
@@ -29,12 +29,13 @@ Ziel: alle Module gegen die Referenzarchitektur Heizung, Lüftung, Druckhaltung 
 
 ## Wichtigste Cleanup-Felder
 
-1. **P2 · buffer-storage · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-2. **P2 · drinking-water · event-density** — Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.
-3. **P2 · drinking-water · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-4. **P2 · pressure-holding · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-5. **P2 · unit-converter · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-6. **P2 · wastewater · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+1. **P1 · drinking-water · event-boundary** — Event-Listener außerhalb controller.js gefunden.
+2. **P2 · buffer-storage · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+3. **P2 · drinking-water · event-density** — Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.
+4. **P2 · drinking-water · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+5. **P2 · pressure-holding · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+6. **P2 · unit-converter · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+7. **P2 · wastewater · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
 
 ## CSS-Gate
 

@@ -35,7 +35,8 @@ const requiredAssets = [
   './RELEASE_NOTES.md',
   ...listFiles('css', file => file.endsWith('.css')),
   ...listFiles('js', file => file.endsWith('.js')),
-  ...listFiles('assets/icons')
+  ...listFiles('assets/icons'),
+  ...listFiles('docs/legal', file => file.endsWith('.html'))
 ].filter((item, index, array) => array.indexOf(item) === index).sort();
 
 const checks = [];
@@ -56,8 +57,8 @@ check('offline-update:skip-waiting', /self\.skipWaiting\(\)/.test(serviceWorker)
 check('offline-update:client-claim', /self\.clients\.claim\(\)/.test(serviceWorker), 'activated worker claims open clients');
 check('offline-update:post-message', /TECHCALC_CACHE_UPDATED/.test(serviceWorker), 'clients receive cache update notification');
 check('e2e:offline-all-module-reload', /offline reload keeps every module route available/.test(e2eSpec) && /for \(const moduleId of MODULE_IDS\)/.test(e2eSpec), 'Playwright spec covers offline reload for all module routes');
-check('package-script:phase37b3', packageJson.scripts?.['test:phase37b3'] === 'node tests/platform-service-worker-offline-phase37b3.test.mjs', 'package exposes phase37b3 guard');
-check('package-script:e2e-phase37b3', packageJson.scripts?.['test:e2e:phase37b3'] === 'playwright test tests/e2e/phase37b-runtime-smoke.spec.mjs', 'package exposes phase37b3 Playwright command');
+check('package-script:integration-gate', packageJson.scripts?.['test:integration'] === 'node scripts/test-integration.mjs', 'package exposes consolidated integration guard');
+check('package-script:e2e-gate', packageJson.scripts?.['test:e2e'] === 'playwright test', 'package exposes consolidated Playwright e2e command');
 
 const report = {
   phase: '37B.3',

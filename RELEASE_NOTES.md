@@ -1,3 +1,11 @@
+## 1.3.0-rc.1 · Phase 38B – Test Script Consolidation
+
+- `package.json` auf die RC-Standard-Gates `test`, `test:integration` und `test:e2e` reduziert.
+- Schneller lokaler Testlauf in `scripts/test-fast.mjs` ausgelagert.
+- Integrations-Gate in `scripts/test-integration.mjs` gebündelt.
+- Historische Phase-Tests bleiben im Repository, sind aber nicht mehr als einzelne npm-Standard-Scripts exponiert.
+- Phase-37-Audits auf die konsolidierte Script-Oberfläche angepasst.
+- Keine Fachlogik geändert.
 
 ## Phase 37F – AGB Integration
 
