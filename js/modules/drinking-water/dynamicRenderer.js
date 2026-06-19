@@ -3,11 +3,26 @@ import { renderInputCard, renderResultCard } from './view.js';
 import { preserveScroll } from '../../core/scrollManager.js';
 import { preserveFocusDuring } from '../../core/focusManager.js';
 
+function isDetachedNodeRace(error) {
+  return error?.name === 'NotFoundError' || /no longer a child/i.test(String(error?.message || ''));
+}
+
 function setIslandInner(root, selector, html){
   const island = root?.querySelector?.(selector);
-  if (!island) return false;
+  if (!island || island.isConnected === false || root?.isConnected === false) return false;
   const next = String(html ?? '');
-  if (island.innerHTML !== next) preserveFocusDuring(root, () => { island.innerHTML = next; }, { skipSelect: true });
+  if (island.innerHTML === next) return true;
+  const apply = () => {
+    if (!island.isConnected || (root?.contains && !root.contains(island))) return false;
+    try {
+      island.innerHTML = next;
+      return true;
+    } catch (error) {
+      if (!isDetachedNodeRace(error)) throw error;
+      return false;
+    }
+  };
+  preserveFocusDuring(root, apply, { skipSelect: true });
   return true;
 }
 
@@ -77,8 +92,38 @@ const RESULT_KEYS = [
   'savedSingleConsumers'
 ];
 
+const DYNAMIC_KEYS = [...new Set([...INPUT_KEYS, ...RESULT_KEYS])];
+
+function shouldIgnoreSurfaceConfirm(meta = {}) {
+  const action = String(meta.action || '');
+  if (action !== 'surface:confirm') return false;
+  const changed = Array.isArray(meta.changed) ? meta.changed : [];
+  return !hasAnyChanged(changed, DYNAMIC_KEYS);
+}
+
+function isDwTouchActive() {
+  return typeof window !== 'undefined' && window.__tcDwActiveTouch === true;
+}
+
+function installDwTouchGuard() {
+  if (typeof window === 'undefined' || window.__tcDwTouchGuardInstalled) return;
+  window.__tcDwTouchGuardInstalled = true;
+  const activate = () => { window.__tcDwActiveTouch = true; };
+  const release = () => { window.__tcDwActiveTouch = false; };
+  window.addEventListener('touchstart', activate, { passive:true });
+  window.addEventListener('touchmove', activate, { passive:true });
+  window.addEventListener('touchend', release, { passive:true });
+  window.addEventListener('touchcancel', release, { passive:true });
+}
+
 export function updateDrinkingWaterDynamic(root, s, meta = {}){
-  return preserveScroll(() => updateDrinkingWaterDynamicUnsafe(root, s, meta), 'savedRecord');
+  installDwTouchGuard();
+  if (shouldIgnoreSurfaceConfirm(meta)) return false;
+  return preserveScroll(
+    () => updateDrinkingWaterDynamicUnsafe(root, s, meta),
+    'savedRecord',
+    { skipDuringActiveTouch: true }
+  );
 }
 
 function updateDrinkingWaterDynamicUnsafe(root, s, meta = {}){
@@ -91,7 +136,8 @@ function updateDrinkingWaterDynamicUnsafe(root, s, meta = {}){
   if (initial || inputAction || !changed.length || hasAnyChanged(changed, INPUT_KEYS)) {
     setIslandInner(root, '[data-dw-dynamic="input"]', renderInputCard(vm));
   }
-  if (initial || inputAction || !changed.length || hasAnyChanged(changed, RESULT_KEYS)) {
+  const shouldRenderResult = initial || !changed.length || hasAnyChanged(changed, RESULT_KEYS);
+  if (shouldRenderResult && !isDwTouchActive()) {
     setIslandInner(root, '[data-dw-dynamic="result"]', renderResultCard(vm));
   }
 
@@ -106,6 +152,7 @@ function updateDrinkingWaterDynamicUnsafe(root, s, meta = {}){
 }
 
 export function isDynamicDrinkingWaterAction(meta = {}){
+  if (shouldIgnoreSurfaceConfirm(meta)) return false;
   return String(meta.action || '') !== 'initial';
 }
 

@@ -1,0 +1,68 @@
+{
+  "phase": "37C.7",
+  "title": "App-Shell Decomposition Closure",
+  "appJs": {
+    "path": "js/core/app.js",
+    "lines": 306,
+    "maxAllowedLines": 320,
+    "role": "bootstrap, lazy-module registration, route composition, session persistence, global module navigation"
+  },
+  "shell": {
+    "directory": "js/platform/shell",
+    "files": [
+      "feedbackController.js",
+      "performanceController.js",
+      "releaseNotesController.js",
+      "serviceWorkerController.js",
+      "settingsController.js",
+      "themeController.js"
+    ],
+    "requiredControllers": [
+      {
+        "file": "themeController.js",
+        "exists": true,
+        "exportedInitializer": true,
+        "importedByApp": true,
+        "precached": true
+      },
+      {
+        "file": "settingsController.js",
+        "exists": true,
+        "exportedInitializer": true,
+        "importedByApp": true,
+        "precached": true
+      },
+      {
+        "file": "releaseNotesController.js",
+        "exists": true,
+        "exportedInitializer": true,
+        "importedByApp": true,
+        "precached": true
+      },
+      {
+        "file": "feedbackController.js",
+        "exists": true,
+        "exportedInitializer": true,
+        "importedByApp": true,
+        "precached": true
+      },
+      {
+        "file": "serviceWorkerController.js",
+        "exists": true,
+        "exportedInitializer": true,
+        "importedByApp": true,
+        "precached": true
+      }
+    ]
+  },
+  "guards": {
+    "packageScripts": {
+      "phase37c2": true,
+      "phase37c3": true,
+      "phase37c4": true,
+      "phase37c5": true,
+      "phase37c6": true
+    },
+    "forbiddenMatches": []
+  }
+}

@@ -1,6 +1,7 @@
 import { safeReplaceContent } from './domUpdate.js';
 import { createRenderScheduler } from './renderScheduler.js';
 import { snapshotViewport, restoreViewportStable, isMobileViewport } from './renderer.js';
+import { startPerformanceSpan } from '../platform/shell/performanceController.js';
 
 const FIELD_ACTION_RE = /^(field:input|field:change|field:blur|field:enter|input:confirm|surface:confirm|segment:select|binding:)/;
 const STRUCTURAL_ACTION_RE = /^(saved:|line:|record:|delete|reset|replace|module:)/;
@@ -59,6 +60,7 @@ export function createRenderCoordinator(root, options = {}) {
 
   const run = ({ reason } = {}) => {
     if (!isCurrent()) return;
+    const finishRender = startPerformanceSpan('render:commit', { action: currentMeta?.action || reason || 'render' });
     const snapshot = state.get();
     const meta = currentMeta || { action: reason || 'render' };
     currentMeta = { action: 'render' };
@@ -99,6 +101,7 @@ export function createRenderCoordinator(root, options = {}) {
       clampViewportStable();
     }
     didInitialRender = true;
+    finishRender({ status: 'ok', changed });
   };
 
   const scheduler = createRenderScheduler(root, run);

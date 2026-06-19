@@ -1,4 +1,15 @@
 import { bindCentralEventPipeline } from './eventPipeline.js';
+
+export function cssEscape(value) {
+  const text = String(value ?? '');
+  if (typeof window !== 'undefined' && window.CSS?.escape) return window.CSS.escape(text);
+  return text.replace(/[\0-\x1F\x7F]|^-?\d|^-$|[^a-zA-Z0-9_-]/g, (char, index) => {
+    if (char === '\0') return '\uFFFD';
+    const hex = char.charCodeAt(0).toString(16).toUpperCase();
+    return index === 0 || /[^a-zA-Z0-9_-]/.test(char) ? `\\${hex} ` : `\\${char}`;
+  });
+}
+
 export function esc(value) {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -188,19 +199,53 @@ export function bindNoClickScroll(root) {
   if (!root || root.__tcNoClickScrollBound) return;
   root.__tcNoClickScrollBound = true;
   let snapshot = null;
+  let startPoint = null;
+  const MOVE_CANCEL_PX = 8;
+
+  const pointFromEvent = event => {
+    const touch = event?.touches?.[0] || event?.changedTouches?.[0];
+    const source = touch || event;
+    if (!source) return null;
+    return { x: Number(source.clientX || 0), y: Number(source.clientY || 0) };
+  };
+
   const capture = event => {
     snapshot = shouldPreserveViewportForClick(event.target) ? snapshotViewport({ event, anchor: findViewportAnchor(event.target) }) : null;
+    startPoint = snapshot ? pointFromEvent(event) : null;
   };
+
+  const cancelIfMoved = event => {
+    if (!snapshot || !startPoint) return;
+    const point = pointFromEvent(event);
+    if (!point) return;
+    const dx = Math.abs(point.x - startPoint.x);
+    const dy = Math.abs(point.y - startPoint.y);
+    if (dx > MOVE_CANCEL_PX || dy > MOVE_CANCEL_PX) {
+      snapshot = null;
+      startPoint = null;
+    }
+  };
+
+  const cancelOnScroll = () => {
+    snapshot = null;
+    startPoint = null;
+  };
+
   const restore = event => {
     if (!snapshot || !shouldPreserveViewportForClick(event.target)) return;
     const frames = isMobileViewport() ? 8 : 3;
     const delays = isMobileViewport() ? [16, 48, 120, 260] : [32, 96];
     restoreViewportStable(snapshot, { frames, delays });
     snapshot = null;
+    startPoint = null;
   };
+
   root.addEventListener('pointerdown', capture, true);
   root.addEventListener('mousedown', capture, true);
   root.addEventListener('touchstart', capture, { capture: true, passive: true });
+  root.addEventListener('pointermove', cancelIfMoved, { capture: true, passive: true });
+  root.addEventListener('touchmove', cancelIfMoved, { capture: true, passive: true });
+  root.addEventListener('scroll', cancelOnScroll, { capture: true, passive: true });
   root.addEventListener('click', restore, true);
 }
 

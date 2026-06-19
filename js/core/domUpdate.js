@@ -1,6 +1,7 @@
 import { restoreFocus as restorePlatformFocus } from './focusManager.js';
 export function safeReplaceContent(root, html, options = {}) {
-  if (!root) return false;
+  if (!root || root.__tcReplacingContent) return false;
+  if (root.isConnected === false) return false;
   const next = String(html ?? '');
   // The HTML cache is only valid when the actual DOM still contains the same
   // markup. Some migrated reference modules still write via root.innerHTML, and
@@ -13,8 +14,23 @@ export function safeReplaceContent(root, html, options = {}) {
   const activeKey = active && root.contains(active) ? getStableKey(active) : null;
   const selection = captureSelection(active, root);
 
-  root.innerHTML = next;
-  root.__tcLastHtml = next;
+  try {
+    root.__tcReplacingContent = true;
+    root.innerHTML = next;
+    root.__tcLastHtml = next;
+  } catch (error) {
+    // Browser-runtime guard: blur/focus handlers can synchronously mutate a
+    // dynamic island while another replacement is in progress. In that case the
+    // original anchor is no longer a child of this node. Do not escalate this to
+    // an uncaught console error; the next scheduled render will reconcile the
+    // current state.
+    if (error?.name !== 'NotFoundError' && !/no longer a child/i.test(String(error?.message || ''))) {
+      throw error;
+    }
+    return false;
+  } finally {
+    root.__tcReplacingContent = false;
+  }
 
   if (options.restoreFocus !== false && activeKey) {
     restoreFocus(root, activeKey, selection);

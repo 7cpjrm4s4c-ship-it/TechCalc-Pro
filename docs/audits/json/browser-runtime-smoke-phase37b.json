@@ -1,0 +1,97 @@
+{
+  "phase": "37B",
+  "name": "Browser Runtime Smoke Baseline",
+  "status": "ready",
+  "modulesInScope": 11,
+  "browserProjects": [
+    "chromium-desktop",
+    "webkit-mobile"
+  ],
+  "specCount": 5,
+  "specs": [
+    {
+      "id": "BR-01",
+      "name": "Shell boot and module mount",
+      "scope": "All 11 active module routes",
+      "priority": "P1",
+      "selectorContract": [
+        "#app[data-active-module-id]",
+        ".module-nav [data-module-id], #overflowMenu [data-module-id]"
+      ]
+    },
+    {
+      "id": "BR-02",
+      "name": "Saved-record controls reachable",
+      "scope": "Saved-record capable modules",
+      "priority": "P1",
+      "selectorContract": [
+        "#app",
+        "save/edit/delete text affordances"
+      ]
+    },
+    {
+      "id": "BR-03",
+      "name": "Mobile nav swipe guard",
+      "scope": "Pointer movement over module nav",
+      "priority": "P1",
+      "selectorContract": [
+        ".module-nav",
+        "#app[data-active-module-id]"
+      ]
+    },
+    {
+      "id": "BR-04",
+      "name": "Settings scroll lock restore",
+      "scope": "Mobile and desktop settings panel",
+      "priority": "P1",
+      "selectorContract": [
+        "#settingsButton",
+        "#settingsPanel",
+        "#closeSettings"
+      ]
+    },
+    {
+      "id": "BR-05",
+      "name": "Service-worker offline shell",
+      "scope": "PWA registration and cached reload",
+      "priority": "P1",
+      "selectorContract": [
+        "navigator.serviceWorker",
+        "#app"
+      ]
+    }
+  ],
+  "fileChecks": [
+    {
+      "file": "playwright.config.mjs",
+      "exists": true
+    },
+    {
+      "file": "tests/e2e/phase37b-runtime-smoke.spec.mjs",
+      "exists": true
+    },
+    {
+      "file": "tests/platform-browser-runtime-phase37b.test.mjs",
+      "exists": true
+    }
+  ],
+  "scriptChecks": [
+    {
+      "name": "test:phase37b",
+      "command": "node tests/platform-browser-runtime-phase37b.test.mjs",
+      "exists": true
+    },
+    {
+      "name": "test:e2e",
+      "command": "playwright test",
+      "exists": true
+    },
+    {
+      "name": "test:e2e:phase37b",
+      "command": "playwright test tests/e2e/phase37b-runtime-smoke.spec.mjs",
+      "exists": true
+    }
+  ],
+  "importCheck": "passed",
+  "note": "Phase 37B adds executable Playwright browser-runtime smoke coverage. Node validation verifies the harness contract; Playwright execution requires npm install --save-dev @playwright/test http-server and npx playwright install in the target environment."
+}

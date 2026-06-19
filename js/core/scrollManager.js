@@ -28,6 +28,26 @@ export function preserveSavedRecordMutation(action, overrides = {}) {
 }
 
 
+
+let touchScrollActive = false;
+let touchScrollListenersBound = false;
+
+function bindTouchScrollGuards() {
+  if (touchScrollListenersBound || typeof window === 'undefined') return;
+  touchScrollListenersBound = true;
+  const activate = () => { touchScrollActive = true; };
+  const release = () => { touchScrollActive = false; };
+  window.addEventListener('touchstart', activate, { passive: true });
+  window.addEventListener('touchmove', activate, { passive: true });
+  window.addEventListener('touchend', release, { passive: true });
+  window.addEventListener('touchcancel', release, { passive: true });
+}
+
+export function isTouchScrollActive() {
+  bindTouchScrollGuards();
+  return touchScrollActive;
+}
+
 function getDefaultScrollScope(scope = null) {
   if (scope && scope !== window) return scope;
   if (typeof document === 'undefined') return null;
@@ -99,8 +119,13 @@ export function isScrollFrozen() {
 }
 
 export function runWithoutScrollJump(action, options = {}) {
+  bindTouchScrollGuards();
   const snapshot = options.snapshot || capturePosition(options.scope || null);
-  const restore = () => restorePosition(snapshot, options);
+  const skipDuringActiveTouch = options.skipDuringActiveTouch === true;
+  const restore = () => {
+    if (skipDuringActiveTouch && isTouchScrollActive()) return;
+    restorePosition(snapshot, options);
+  };
   const scheduleRestore = () => {
     restore();
     const delays = Array.isArray(options.delays) ? options.delays : [];
@@ -142,6 +167,7 @@ export const PlatformScrollManager = Object.freeze({
   unfreeze,
   isScrollFrozen,
   runWithoutScrollJump,
+  isTouchScrollActive,
   preserveScroll,
   preserveActionScroll,
   preserveSavedRecordScroll,

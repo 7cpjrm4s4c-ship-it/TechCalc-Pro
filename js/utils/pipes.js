@@ -44,9 +44,9 @@ const copperDimensions = [
   {dn:32, dimension:'35 × 1,5', di:32},
   {dn:40, dimension:'42 × 1,5', di:39},
   {dn:50, dimension:'54 × 2,0', di:50},
-  {dn:65, dimension:'64 × 2,0', di:60},
-  {dn:80, dimension:'76,1 × 2,0', di:72.1},
-  {dn:100, dimension:'108 × 2,5', di:103}
+  {dn:65, dimension:'76,1 × 2,0', di:72.1},
+  {dn:80, dimension:'88,9 × 2,0', di:84.9},
+  {dn:100, dimension:'108 × 2,0', di:104}
 ];
 
 

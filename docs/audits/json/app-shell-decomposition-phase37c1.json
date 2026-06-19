@@ -1,0 +1,303 @@
+{
+  "phase": "37C.1",
+  "title": "App Shell Decomposition Responsibility Map",
+  "generatedAt": "2026-06-18T07:18:41.881Z",
+  "source": "js/core/app.js",
+  "totals": {
+    "totalLines": 589,
+    "mappedLines": 602,
+    "byRisk": {
+      "medium": 5,
+      "low": 7,
+      "high": 1
+    },
+    "byPhase": {
+      "37C.2": 3,
+      "37C.3": 3,
+      "37C.4": 5,
+      "37C.5": 1,
+      "37C.6": 1
+    },
+    "appJsLineCount": 589,
+    "targetAppJsLineCountAfter37C": "80-130",
+    "runtimeChanged": false
+  },
+  "responsibilities": [
+    {
+      "id": "module-manifest-lazy-loader",
+      "title": "Module manifest, registration and lazy preload",
+      "lines": [
+        1,
+        91
+      ],
+      "target": "js/core/moduleRegistryBootstrap.js",
+      "extractionPhase": "37C.2",
+      "risk": "medium",
+      "notes": "Contains config imports, dynamic import paths, module cache, preloading and modules.register wiring. Extract first because it has clear inputs and few DOM dependencies."
+    },
+    {
+      "id": "session-persistence-hooks",
+      "title": "Session persistence lifecycle hooks",
+      "lines": [
+        93,
+        114
+      ],
+      "target": "js/core/sessionPersistenceController.js",
+      "extractionPhase": "37C.2",
+      "risk": "low",
+      "notes": "Pure page lifecycle and external-link persistence hooks around projectStorage."
+    },
+    {
+      "id": "global-navigation-gesture-controller",
+      "title": "Global module navigation gesture guard",
+      "lines": [
+        117,
+        211
+      ],
+      "target": "js/core/navigationGestureController.js",
+      "extractionPhase": "37C.3",
+      "risk": "medium",
+      "notes": "Pointer/click boundary must preserve the 37B mobile swipe guard and single click route-change semantics."
+    },
+    {
+      "id": "module-runtime-bootstrap",
+      "title": "Module runtime bootstrap and route render bridge",
+      "lines": [
+        214,
+        235
+      ],
+      "target": "js/core/appRuntimeBootstrap.js",
+      "extractionPhase": "37C.2",
+      "risk": "medium",
+      "notes": "Creates ModuleRuntime, initializes router, renders quick access settings and project-loaded remount bridge."
+    },
+    {
+      "id": "pdf-export-bootstrap",
+      "title": "Lazy PDF export bootstrap",
+      "lines": [
+        237,
+        248
+      ],
+      "target": "js/core/pdfExportController.js",
+      "extractionPhase": "37C.4",
+      "risk": "low",
+      "notes": "Already lazy loaded; extraction should preserve one-shot promise semantics."
+    },
+    {
+      "id": "responsive-navigation-refresh",
+      "title": "Resize-driven navigation refresh",
+      "lines": [
+        250,
+        257
+      ],
+      "target": "js/core/responsiveNavigationController.js",
+      "extractionPhase": "37C.3",
+      "risk": "low",
+      "notes": "RAF throttled resize hook. Safe to extract once navigation gestures are isolated."
+    },
+    {
+      "id": "theme-and-storage-helpers",
+      "title": "Theme mode and UI storage helpers",
+      "lines": [
+        259,
+        308
+      ],
+      "target": "js/core/themeController.js",
+      "extractionPhase": "37C.4",
+      "risk": "medium",
+      "notes": "Theme state currently shares settings-panel DOM constants and storage helpers; extract with explicit initThemeController()."
+    },
+    {
+      "id": "feedback-form-controller",
+      "title": "Feedback form submission controller",
+      "lines": [
+        310,
+        365
+      ],
+      "target": "js/core/feedbackController.js",
+      "extractionPhase": "37C.4",
+      "risk": "low",
+      "notes": "Hardcoded endpoint remains known tech debt; extraction should parameterize endpoint/version/currentRoute without changing behavior."
+    },
+    {
+      "id": "release-notes-controller",
+      "title": "Release notes loader and renderer",
+      "lines": [
+        367,
+        432
+      ],
+      "target": "js/core/releaseNotesController.js",
+      "extractionPhase": "37C.4",
+      "risk": "low",
+      "notes": "Self-contained parser/render path. Needs escapeHtml local to the module."
+    },
+    {
+      "id": "pdf-idle-preinit",
+      "title": "Idle pre-initialization for PDF export",
+      "lines": [
+        434,
+        440
+      ],
+      "target": "js/core/pdfExportController.js",
+      "extractionPhase": "37C.4",
+      "risk": "low",
+      "notes": "Move together with PDF bootstrap to preserve early menu readiness."
+    },
+    {
+      "id": "settings-panel-controller",
+      "title": "Settings drawer, scroll lock and submenu state",
+      "lines": [
+        442,
+        594
+      ],
+      "target": "js/core/settingsPanelController.js",
+      "extractionPhase": "37C.5",
+      "risk": "high",
+      "notes": "Highest-risk extraction because it owns iOS scroll lock, focus restore, submenu persistence and touchmove prevention. Requires 37B smoke coverage after extraction."
+    },
+    {
+      "id": "header-scroll-controller",
+      "title": "Header transparency on scroll",
+      "lines": [
+        596,
+        602
+      ],
+      "target": "js/core/headerScrollController.js",
+      "extractionPhase": "37C.3",
+      "risk": "low",
+      "notes": "Small passive scroll controller; safe extraction."
+    },
+    {
+      "id": "service-worker-controller",
+      "title": "Service worker registration and cache update message",
+      "lines": [
+        604,
+        616
+      ],
+      "target": "js/core/serviceWorkerController.js",
+      "extractionPhase": "37C.6",
+      "risk": "medium",
+      "notes": "Preserve no-forced-reload behavior and APP_VERSION cache busting."
+    }
+  ],
+  "extractionOrder": [
+    {
+      "phase": "37C.2",
+      "name": "Bootstrap boundaries",
+      "move": [
+        "module-manifest-lazy-loader",
+        "session-persistence-hooks",
+        "module-runtime-bootstrap"
+      ],
+      "guard": [
+        "build",
+        "test:module-smoke",
+        "test:phase37b3"
+      ]
+    },
+    {
+      "phase": "37C.3",
+      "name": "Navigation and small UI controllers",
+      "move": [
+        "global-navigation-gesture-controller",
+        "responsive-navigation-refresh",
+        "header-scroll-controller"
+      ],
+      "guard": [
+        "test:phase37b2",
+        "test:phase37b1b"
+      ]
+    },
+    {
+      "phase": "37C.4",
+      "name": "Settings-adjacent low-risk controllers",
+      "move": [
+        "pdf-export-bootstrap",
+        "pdf-idle-preinit",
+        "theme-and-storage-helpers",
+        "feedback-form-controller",
+        "release-notes-controller"
+      ],
+      "guard": [
+        "test:phase37b2",
+        "test:phase37b3"
+      ]
+    },
+    {
+      "phase": "37C.5",
+      "name": "Settings panel controller",
+      "move": [
+        "settings-panel-controller"
+      ],
+      "guard": [
+        "test:phase37b2",
+        "manual mobile settings scroll-lock check"
+      ]
+    },
+    {
+      "phase": "37C.6",
+      "name": "Service worker shell controller and closure",
+      "move": [
+        "service-worker-controller"
+      ],
+      "guard": [
+        "test:phase37b3",
+        "offline reload manual check"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "F-37C1-01",
+      "severity": "P1",
+      "title": "app.js still owns 13 responsibilities",
+      "detail": "The file remains an app-shell monolith. The immediate risk is not runtime correctness but high coupling before further platform work."
+    },
+    {
+      "id": "F-37C1-02",
+      "severity": "P1",
+      "title": "Settings panel extraction is the highest-risk refactor",
+      "detail": "Settings owns scroll lock, focus restore and Safari touchmove prevention. It must be extracted after lower-risk controllers and guarded by 37B browser smokes."
+    },
+    {
+      "id": "F-37C1-03",
+      "severity": "P2",
+      "title": "Feedback endpoint remains hardcoded",
+      "detail": "Keep behavior unchanged in 37C; after extraction the endpoint should become an injected controller option in a later security/config phase."
+    }
+  ],
+  "appJsDependencies": {
+    "imports": [
+      "import { modules } from './registry.js';",
+      "import { initRouter, currentRoute, navigate } from './router.js';",
+      "import { renderNavigation, renderQuickAccessSettings } from './navigation.js';",
+      "import heatingCoolingConfig from '../modules/heating-cooling/config.js';",
+      "import ventilationConfig from '../modules/ventilation/config.js';",
+      "import pipeSizingConfig from '../modules/pipe-sizing/config.js';",
+      "import unitConverterConfig from '../modules/unit-converter/config.js';",
+      "import heatRecoveryConfig from '../modules/heat-recovery/config.js';",
+      "import hxDiagramConfig from '../modules/hx-diagram/config.js';",
+      "import drinkingWaterConfig from '../modules/drinking-water/config.js';",
+      "import pressureHoldingConfig from '../modules/pressure-holding/config.js';",
+      "import bufferStorageConfig from '../modules/buffer-storage/config.js';",
+      "import wastewaterConfig from '../modules/wastewater/config.js';",
+      "import rainwaterConfig from '../modules/rainwater/config.js';",
+      "import { restoreSessionSnapshot, saveSessionSnapshot } from './projectStorage.js';",
+      "import { createModuleLifecycleAdapter } from './moduleLifecycleAdapter.js';",
+      "import { createModuleRuntime } from './moduleRuntime.js';",
+      "import { trackGlobalEventListener } from './eventManager.js';",
+      "import { initializeThemeController } from '../platform/shell/themeController.js';"
+    ],
+    "directDomQueries": 14,
+    "globalListeners": 17,
+    "nativeListeners": 6,
+    "dynamicImports": 2,
+    "localStorageReferences": 2,
+    "sessionStorageReferences": 1
+  },
+  "policy": {
+    "runtimeCodeChanged": false,
+    "nextPhaseCanModifyRuntime": "37C.2",
+    "stopCondition": "Any new browser console error, module smoke regression or settings scroll-lock regression stops the refactor."
+  }
+}

@@ -16,6 +16,16 @@ import { restoreSessionSnapshot, saveSessionSnapshot } from './projectStorage.js
 import { createModuleLifecycleAdapter } from './moduleLifecycleAdapter.js';
 import { createModuleRuntime } from './moduleRuntime.js';
 import { trackGlobalEventListener } from './eventManager.js';
+import { initializeThemeController } from '../platform/shell/themeController.js';
+import { initializeSettingsController } from '../platform/shell/settingsController.js';
+import { initializeReleaseNotesController } from '../platform/shell/releaseNotesController.js';
+import { initializeFeedbackController } from '../platform/shell/feedbackController.js';
+import { initializeServiceWorkerController } from '../platform/shell/serviceWorkerController.js';
+import { initializePerformanceController, markPerformance, measurePerformance, startPerformanceSpan } from '../platform/shell/performanceController.js';
+
+const APP_VERSION = '1.3.0-rc.1';
+initializePerformanceController({ appVersion: APP_VERSION });
+const appInitStartMark = markPerformance('app:init:start', { appVersion: APP_VERSION });
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
@@ -37,11 +47,13 @@ const preloadedModuleIds = new Set();
 function loadLazyModule(config, path) {
   let loaded = moduleCache.get(config.id);
   if (!loaded) {
+    const finishLoad = startPerformanceSpan('module:lazy-load', { moduleId: config.id });
     loaded = import(path)
-      .then(mod => mod.default || mod)
+      .then(mod => { finishLoad({ status: 'ok' }); return mod.default || mod; })
       .catch(error => {
         moduleCache.delete(config.id);
         preloadedModuleIds.delete(config.id);
+        finishLoad({ status: 'error', error: error?.message || String(error) });
         throw error;
       });
     moduleCache.set(config.id, loaded);
@@ -224,7 +236,10 @@ const moduleRuntime = createModuleRuntime({
 
 function render(id){
   if (!modules.get(id)) return Promise.resolve(false);
-  return moduleRuntime.mount(id);
+  const finish = startPerformanceSpan('module:switch', { moduleId: id });
+  return Promise.resolve(moduleRuntime.mount(id))
+    .then(result => { finish({ moduleId: id, status: 'ok' }); return result; })
+    .catch(error => { finish({ moduleId: id, status: 'error', error: error?.message || String(error) }); throw error; });
 }
 initRouter(render);
 renderQuickAccessSettings();
@@ -256,180 +271,16 @@ trackGlobalEventListener(window, 'resize', () => {
   });
 }, { passive: true });
 
-const settingsButton = document.getElementById('settingsButton');
 const settingsPanel = document.getElementById('settingsPanel');
-const closeSettings = document.getElementById('closeSettings');
-const settingsBody = settingsPanel?.querySelector('.settings-panel__body');
-const THEME_STORAGE_KEY = 'techcalc-theme-mode';
-const SETTINGS_UI_STORAGE_KEY = 'techcalc-settings-ui';
 
-function readStorageJson(key, fallback = {}) {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return fallback;
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? parsed : fallback;
-  } catch (error) {
-    console.warn('Gespeicherte UI-Einstellungen konnten nicht geladen werden.', error);
-    return fallback;
-  }
-}
+initializeThemeController({ root: settingsPanel || document });
 
-function writeStorageJson(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch (error) {
-    console.warn('UI-Einstellungen konnten nicht gespeichert werden.', error);
-  }
-}
+initializeFeedbackController({
+  appVersion: APP_VERSION,
+  getRoute: currentRoute
+});
 
-function getStoredThemeMode() {
-  return localStorage.getItem(THEME_STORAGE_KEY)
-    || sessionStorage.getItem(THEME_STORAGE_KEY)
-    || 'system';
-}
-
-function applyThemeMode(mode = getStoredThemeMode()) {
-  const value = ['dark', 'light', 'system'].includes(mode) ? mode : 'system';
-  if (value === 'system') {
-    document.documentElement.removeAttribute('data-theme');
-  } else {
-    document.documentElement.setAttribute('data-theme', value);
-  }
-  localStorage.setItem(THEME_STORAGE_KEY, value);
-  sessionStorage.setItem(THEME_STORAGE_KEY, value);
-  document.querySelectorAll('.theme-switch__option').forEach(item => {
-    const active = item.dataset.theme === value;
-    item.classList.toggle('is-active', active);
-    item.setAttribute('aria-pressed', String(active));
-  });
-}
-
-applyThemeMode();
-
-const APP_VERSION = '1.3.0-rc.1';
-const FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
-
-function initFeedbackForm() {
-  const form = document.getElementById('feedbackForm');
-  if (!form) return;
-  const status = document.getElementById('feedbackStatus');
-  const submit = document.getElementById('feedbackSubmit');
-
-  function setStatus(message, type = '') {
-    if (!status) return;
-    status.textContent = message;
-    status.dataset.type = type;
-  }
-
-  function buildPayload() {
-    const data = new FormData(form);
-    data.set('version', APP_VERSION);
-    data.set('route', currentRoute());
-    data.set('userAgent', navigator.userAgent || '');
-    data.set('timestamp', new Date().toISOString());
-    return data;
-  }
-
-  form.addEventListener('submit', async event => {
-    event.preventDefault();
-    setStatus('', '');
-    if (!form.reportValidity()) return;
-
-    submit.disabled = true;
-    submit.textContent = 'Sende …';
-    setStatus('Feedback wird gesendet …', 'pending');
-
-    try {
-      const response = await fetch(FEEDBACK_ENDPOINT, {
-        method: 'POST',
-        body: buildPayload(),
-        headers: { Accept: 'application/json' }
-      });
-
-      if (!response.ok) throw new Error(`Formspree HTTP ${response.status}`);
-      form.reset();
-      const subject = document.getElementById('feedbackSubject');
-      if (subject) subject.value = 'TechCalc Pro Feedback';
-      setStatus('Feedback wurde gesendet. Danke!', 'success');
-    } catch (error) {
-      console.error('Feedback konnte nicht gesendet werden:', error);
-      setStatus('Feedback konnte nicht direkt gesendet werden. Bitte später erneut versuchen.', 'error');
-    } finally {
-      submit.disabled = false;
-      submit.textContent = 'Feedback senden';
-    }
-  });
-}
-
-initFeedbackForm();
-
-function escapeHtml(value = '') {
-  return String(value).replace(/[&<>"]/g, char => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;'
-  }[char]));
-}
-
-function parseReleaseNotes(markdown = '') {
-  const lines = markdown.split(/\r?\n/);
-  const notes = [];
-  let current = null;
-
-  for (const rawLine of lines) {
-    const line = rawLine.trim();
-    if (!line) continue;
-    const heading = line.match(/^#{1,3}\s+(?:TechCalc\s+Pro\s+)?(?:Version\s+)?([0-9]+\.[0-9]+\.[0-9]+(?:[-.]rc\.?\d+)?)\s*(?:[-–]\s*(.*))?$/i);
-    if (heading) {
-      current = { version: heading[1], title: heading[2] || '', items: [] };
-      notes.push(current);
-      continue;
-    }
-    if (!current) continue;
-    const item = line.replace(/^[-*]\s+/, '').trim();
-    if (item && !item.startsWith('#')) current.items.push(item);
-  }
-
-  return notes;
-}
-
-function renderReleaseNotes(notes) {
-  const host = document.getElementById('releaseNotesDynamic');
-  if (!host) return;
-  if (!notes?.length) {
-    host.innerHTML = '<p>Release Notes konnten nicht geladen werden.</p>';
-    return;
-  }
-  host.innerHTML = notes.slice(0, 18).map(note => `
-    <div class="release-note">
-      <strong>${escapeHtml(note.version)}${note.title ? ` · ${escapeHtml(note.title)}` : ''}</strong>
-      <small>${escapeHtml(note.items.slice(0, 4).join(' '))}</small>
-    </div>
-  `).join('');
-}
-
-async function loadReleaseNotes() {
-  const versionHost = document.querySelector('[data-app-version-current]');
-  if (versionHost) versionHost.textContent = APP_VERSION;
-
-  try {
-    const response = await fetch(`./RELEASE_NOTES.md?v=${encodeURIComponent(APP_VERSION)}`, {
-      cache: 'no-store',
-      headers: { 'Cache-Control': 'no-cache' }
-    });
-    if (!response.ok) throw new Error(`Release Notes HTTP ${response.status}`);
-    const markdown = await response.text();
-    renderReleaseNotes(parseReleaseNotes(markdown));
-  } catch (error) {
-    console.warn('Release Notes konnten nicht dynamisch geladen werden.', error);
-    const fallback = document.getElementById('releaseNotesFallback');
-    if (fallback) renderReleaseNotes(parseReleaseNotes(fallback.textContent || ''));
-  }
-}
-
-loadReleaseNotes();
+initializeReleaseNotesController({ appVersion: APP_VERSION });
 
 // Bind PDF export and project actions as soon as the app is ready.
 // The menu may be opened and a button tapped before lazy initialization has finished.
@@ -439,159 +290,7 @@ if ('requestIdleCallback' in window) {
   setTimeout(() => ensurePdfExport(), 0);
 }
 
-let settingsScrollY = 0;
-let lastFocusedElement = null;
-
-function isSettingsOpen() {
-  return Boolean(settingsPanel?.classList.contains('is-open'));
-}
-
-function lockPageScroll() {
-  settingsScrollY = window.scrollY || document.documentElement.scrollTop || 0;
-  document.documentElement.classList.add('settings-open');
-  document.body.classList.add('settings-open');
-  document.body.style.position = 'fixed';
-  document.body.style.top = `-${settingsScrollY}px`;
-  document.body.style.left = '0';
-  document.body.style.right = '0';
-  document.body.style.width = '100%';
-}
-
-function unlockPageScroll() {
-  document.documentElement.classList.remove('settings-open');
-  document.body.classList.remove('settings-open');
-  document.body.style.position = '';
-  document.body.style.top = '';
-  document.body.style.left = '';
-  document.body.style.right = '';
-  document.body.style.width = '';
-  window.scrollTo(0, settingsScrollY || 0);
-}
-
-function closeAllSubmenus(except = null) {
-  settingsPanel?.querySelectorAll('.settings-submenu').forEach(details => {
-    if (details !== except) details.open = false;
-  });
-}
-
-function setSettingsOpen(open) {
-  if (!settingsPanel || !settingsButton) return;
-
-  if (open) {
-    restoreSettingsUiState();
-    lastFocusedElement = document.activeElement;
-    settingsPanel.hidden = false;
-    settingsPanel.removeAttribute('hidden');
-    settingsPanel.classList.add('is-open');
-    settingsButton.setAttribute('aria-expanded', 'true');
-    settingsPanel.setAttribute('aria-modal', 'true');
-    lockPageScroll();
-    ensurePdfExport();
-    requestAnimationFrame(() => {
-      settingsBody?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-      closeSettings?.focus?.({ preventScroll: true });
-    });
-    return;
-  }
-
-  settingsPanel.classList.remove('is-open');
-  settingsPanel.hidden = true;
-  settingsPanel.setAttribute('hidden', '');
-  settingsButton.setAttribute('aria-expanded', 'false');
-  settingsPanel.removeAttribute('aria-modal');
-  unlockPageScroll();
-  if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
-    lastFocusedElement.focus({ preventScroll: true });
-  }
-}
-
-// Defensive cleanup in case an older cached build left the app locked.
-settingsPanel?.classList.remove('is-open');
-unlockPageScroll();
-setSettingsOpen(false);
-
-settingsButton?.addEventListener('click', event => {
-  event.preventDefault();
-  event.stopPropagation();
-  setSettingsOpen(!isSettingsOpen());
-});
-
-closeSettings?.addEventListener('click', event => {
-  event.preventDefault();
-  event.stopPropagation();
-  setSettingsOpen(false);
-});
-
-settingsPanel?.addEventListener('click', event => {
-  event.stopPropagation();
-});
-
-settingsPanel?.querySelectorAll('.settings-submenu').forEach((details, index) => {
-  details.dataset.settingsIndex = String(index);
-});
-
-function restoreSettingsUiState() {
-  const state = readStorageJson(SETTINGS_UI_STORAGE_KEY, {});
-  if (!settingsPanel) return;
-  settingsPanel.querySelectorAll('.settings-submenu').forEach(details => {
-    details.open = details.dataset.settingsIndex === state.openSubmenu;
-  });
-}
-
-function saveSettingsOpenSubmenu(details) {
-  if (!details?.open) return;
-  const current = readStorageJson(SETTINGS_UI_STORAGE_KEY, {});
-  writeStorageJson(SETTINGS_UI_STORAGE_KEY, {
-    ...current,
-    openSubmenu: details.dataset.settingsIndex
-  });
-}
-
-settingsPanel?.querySelectorAll('.settings-submenu').forEach(details => {
-  details.addEventListener('toggle', () => {
-    if (!details.open) return;
-    saveSettingsOpenSubmenu(details);
-    closeAllSubmenus(details);
-    requestAnimationFrame(() => {
-      const body = settingsBody;
-      if (!body) return;
-      const summary = details.querySelector('summary');
-      const bodyRect = body.getBoundingClientRect();
-      const detailsRect = details.getBoundingClientRect();
-      const summaryRect = summary?.getBoundingClientRect() || detailsRect;
-      const bottomOverflow = detailsRect.bottom - bodyRect.bottom + 24;
-      const topOverflow = bodyRect.top - summaryRect.top + 10;
-      if (topOverflow > 0) body.scrollBy({ top: -topOverflow, behavior: 'smooth' });
-      else if (bottomOverflow > 0) body.scrollBy({ top: bottomOverflow, behavior: 'smooth' });
-      if (details.offsetHeight > body.clientHeight) summary?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-    });
-  });
-});
-
-settingsPanel?.querySelectorAll('.theme-switch__option').forEach(button => {
-  button.addEventListener('click', () => {
-    applyThemeMode(button.dataset.theme || 'system');
-  });
-});
-
-trackGlobalEventListener(document, 'click', event => {
-  if (!isSettingsOpen()) return;
-  if (event.target.closest('#settingsButton') || event.target.closest('#settingsPanel')) return;
-  setSettingsOpen(false);
-});
-
-trackGlobalEventListener(document, 'keydown', event => {
-  if (event.key === 'Escape') setSettingsOpen(false);
-});
-
-// iOS/Safari: lock the app background; only the drawer body is scrollable.
-trackGlobalEventListener(document, 'touchmove', event => {
-  if (!isSettingsOpen()) return;
-  const panel = event.target.closest('#settingsPanel');
-  const scrollHost = event.target.closest('.settings-panel__body');
-  if (panel && scrollHost && scrollHost.scrollHeight > scrollHost.clientHeight) return;
-  event.preventDefault();
-}, { passive: false });
+initializeSettingsController({ settingsPanel, ensurePdfExport });
 
 const header = document.querySelector('.app-header');
 function updateHeaderTransparency(){
@@ -601,16 +300,6 @@ function updateHeaderTransparency(){
 trackGlobalEventListener(window, 'scroll', updateHeaderTransparency, { passive: true });
 updateHeaderTransparency();
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener('message', event => {
-    if (event.data?.type !== 'TECHCALC_CACHE_UPDATED') return;
-    const cacheName = event.data.cache || 'updated';
-    sessionStorage.setItem('techcalc-active-cache', cacheName);
-    // Kein automatischer Reload: Beim Zurückwechseln aus dem PDF-Export dürfen
-    // aktuelle Berechnungsergebnisse in der Session nicht verloren gehen.
-  });
-
-  trackGlobalEventListener(window, 'load', () => {
-    navigator.serviceWorker.register(`./service-worker.js?v=${encodeURIComponent(APP_VERSION)}`).then(registration => registration.update());
-  });
-}
+initializeServiceWorkerController({ appVersion: APP_VERSION });
+const appInitEndMark = markPerformance('app:init:end', { appVersion: APP_VERSION });
+measurePerformance('app:init', appInitStartMark, appInitEndMark, { appVersion: APP_VERSION });

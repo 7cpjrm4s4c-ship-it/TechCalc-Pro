@@ -1,7 +1,7 @@
 {
   "phase": "31C",
   "title": "Module smoke test audit",
-  "generatedAt": "2026-06-12T18:11:53.472Z",
+  "generatedAt": "2026-06-19T11:49:27.653Z",
   "central": {
     "enterTab": true,
     "scroll": true,
@@ -337,6 +337,7 @@
       "module": "unit-converter",
       "files": [
         "config.js",
+        "controller.js",
         "index.js",
         "logic.js",
         "results.js",
@@ -347,6 +348,7 @@
       ],
       "missingRequired": [],
       "optionalRuntimeFilesPresent": [
+        "controller.js",
         "view.js",
         "viewModel.js"
       ],
@@ -420,11 +422,15 @@
         "results.js",
         "schema.js",
         "state.js",
-        "tables.js"
+        "tables.js",
+        "view.js",
+        "viewModel.js"
       ],
       "missingRequired": [],
       "optionalRuntimeFilesPresent": [
-        "controller.js"
+        "controller.js",
+        "view.js",
+        "viewModel.js"
       ],
       "schema": {
         "fieldCount": 20,

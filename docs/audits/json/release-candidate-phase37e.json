@@ -1,0 +1,72 @@
+{
+  "phase": "37E",
+  "title": "Release Candidate Closure Audit",
+  "status": "pass",
+  "checkedAt": "2026-06-19T11:49:26.712Z",
+  "checks": [
+    {
+      "id": "required-files",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "app-shell-size",
+      "pass": true,
+      "detail": {
+        "appLines": 306,
+        "max": 320
+      }
+    },
+    {
+      "id": "shell-controllers-precached",
+      "pass": true,
+      "detail": [
+        {
+          "file": "js/platform/shell/themeController.js",
+          "exists": true,
+          "precached": true
+        },
+        {
+          "file": "js/platform/shell/settingsController.js",
+          "exists": true,
+          "precached": true
+        },
+        {
+          "file": "js/platform/shell/releaseNotesController.js",
+          "exists": true,
+          "precached": true
+        },
+        {
+          "file": "js/platform/shell/feedbackController.js",
+          "exists": true,
+          "precached": true
+        },
+        {
+          "file": "js/platform/shell/serviceWorkerController.js",
+          "exists": true,
+          "precached": true
+        },
+        {
+          "file": "js/platform/shell/performanceController.js",
+          "exists": true,
+          "precached": true
+        }
+      ]
+    },
+    {
+      "id": "debug-logs-removed",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "phase-scripts-present",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "release-notes-phase37e",
+      "pass": true,
+      "detail": "RELEASE_NOTES.md contains Phase 37E closure entry"
+    }
+  ]
+}

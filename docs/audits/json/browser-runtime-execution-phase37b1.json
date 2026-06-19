@@ -1,0 +1,33 @@
+{
+  "phase": "37B.1",
+  "name": "Browser Runtime Execution Preflight",
+  "status": "blocked-by-environment",
+  "generatedAt": "2026-06-17T16:13:11.400Z",
+  "findings": [
+    {
+      "id": "playwright-test-package",
+      "status": "blocked",
+      "detail": "@playwright/test is not installed in this runtime; install it with npm install -D @playwright/test before npm run test:e2e:phase37b1"
+    },
+    {
+      "id": "static-server",
+      "status": "passed",
+      "detail": "zero-dependency static server answered on http://127.0.0.1:4173"
+    },
+    {
+      "id": "file:playwright.config.mjs",
+      "status": "passed",
+      "detail": "playwright.config.mjs"
+    },
+    {
+      "id": "file:tests/e2e/phase37b-runtime-smoke.spec.mjs",
+      "status": "passed",
+      "detail": "tests/e2e/phase37b-runtime-smoke.spec.mjs"
+    },
+    {
+      "id": "file:scripts/serve-static.mjs",
+      "status": "passed",
+      "detail": "scripts/serve-static.mjs"
+    }
+  ]
+}

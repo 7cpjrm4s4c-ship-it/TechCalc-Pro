@@ -6,7 +6,7 @@ const controller = readFileSync('js/modules/heating-cooling/controller.js', 'utf
 const lineSectionController = readFileSync('js/platform/lineSectionController/index.js', 'utf8');
 const savedRecords = readFileSync('js/core/savedRecords.js', 'utf8');
 const eventPipeline = readFileSync('js/core/eventPipeline.js', 'utf8');
-const docs = readFileSync('docs/phases/phase-12/PHASE_12I_HEATING_COOLING_FINAL_STABILIZATION.md', 'utf8');
+const docs = readFileSync('docs/phases/phase-12.md', 'utf8');
 
 assert.match(controller, /Conversion to kg\/h happens only inside activeCalculationState\(\)/, 'm3/h display values must not be normalized twice.');
 assert.match(controller, /function activeRawInputState\(s/, 'line records must store raw input state separately from calculation state.');

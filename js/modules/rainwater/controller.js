@@ -45,6 +45,32 @@ function patchLookupDefaults(patch = {}, base = {}) {
 
 
 
+function drainLookupPatchFromValue(drainSize = 'DN 100') {
+  return patchLookupDefaults({ drainSize }, {});
+}
+
+export function bindRainwaterController(root, lineSectionController) {
+  lineSectionController?.bind?.(root);
+
+  if (!root || root.__tcRainwaterDrainPrecommitBound) return;
+  root.__tcRainwaterDrainPrecommitBound = true;
+
+  const precommitDrain = event => {
+    const field = event.target?.closest?.('[data-field="drainSize"]');
+    if (!field || !root.contains(field)) return;
+
+    const patch = drainLookupPatchFromValue(field.value || 'DN 100');
+    // Precommit silently before the root event pipeline renders. The normal
+    // field/change pipeline then performs the notifying render with the complete
+    // drain patch already present in state.
+    state.set(patch, { action: 'rainwater:drainSize:precommit', notify: false });
+  };
+
+  document.addEventListener('input', precommitDrain, true);
+  document.addEventListener('change', precommitDrain, true);
+}
+
+
 function modeDefaultsPatch(nextMode, current = {}) {
   const mode = nextMode === 'property' ? 'property' : 'roof';
   const drainPatch = patchLookupDefaults({ drainSize: current.drainSize || 'DN 100' }, current);
