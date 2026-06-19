@@ -16,7 +16,8 @@ const commands = [
   ['node', ['tests/platform-viewport-accessibility-phase38c.test.mjs']],
   ['node', ['scripts/audit-ui-alias-cleanup-phase38d.mjs']],
   ['node', ['scripts/audit-low-end-mobile-rendering-phase38e.mjs']],
-  ['node', ['scripts/audit-esbuild-minification-phase38f.mjs']]
+  ['node', ['scripts/audit-esbuild-minification-phase38f.mjs']],
+  ['node', ['scripts/audit-release-package-hygiene-phase38g.mjs']]
 ];
 
 for (const [cmd, args] of commands) {

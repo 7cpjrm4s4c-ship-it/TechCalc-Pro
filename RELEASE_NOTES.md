@@ -308,3 +308,10 @@ Release-hardening status after Phase 31D:
 - Preserved the existing ES-module file graph: no bundling, no import rewriting, no runtime path changes.
 - Added optional `npm run build:minified` so the deployable `dist/` artifact is generated after precache generation and import validation, while keeping the standard build path unchanged.
 - Added `scripts/audit-esbuild-minification-phase38f.mjs` and wired it into `npm run test:integration`.
+
+## Phase 38G — RC Package Hygiene Closure
+
+- Added a final release-package hygiene guard for RC-freeze readiness.
+- Blocks generated artifacts such as `dist/`, `node_modules/`, coverage output, browser reports, source maps and packaged archives from entering the source release ZIP.
+- Keeps optional esbuild minification explicit through `npm run build:minified`; the standard `npm run build` remains non-emitting.
+- Added `scripts/audit-release-package-hygiene-phase38g.mjs` and wired it into `npm run test:integration`.
