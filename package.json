@@ -121,7 +121,7 @@
     "test:platform-cleanup-phase30d": "node tests/platform-controlled-cleanup-phase30d.test.mjs",
     "audit:final-baseline": "node scripts/audit-final-baseline-phase30e.mjs",
     "test:platform-cleanup-phase30e": "node tests/platform-final-baseline-phase30e.test.mjs",
-    "build": "node scripts/check-js-imports.mjs",
+    "build": "node scripts/generate-precache-manifest.mjs && node scripts/check-js-imports.mjs",
     "audit:imports": "node scripts/check-js-imports.mjs",
     "audit:module-smoke": "node scripts/audit-module-smoke-phase31c.mjs",
     "test:module-smoke": "node scripts/audit-module-smoke-phase31c.mjs",
@@ -183,6 +183,8 @@
     "audit:phase37e": "node scripts/audit-release-candidate-phase37e.mjs",
     "test:phase37e": "node scripts/audit-release-candidate-phase37e.mjs && node tests/platform-release-candidate-phase37e.test.mjs",
     "test:phase37f": "node tests/platform-legal-agb-phase37f.test.mjs",
-    "test:phase37f1": "node tests/platform-legal-agb-phase37f1.test.mjs"
+    "test:phase37f1": "node tests/platform-legal-agb-phase37f1.test.mjs",
+    "precache": "node scripts/generate-precache-manifest.mjs",
+    "test:phase38a": "node tests/platform-precache-manifest-phase38a.test.mjs"
   }
 }

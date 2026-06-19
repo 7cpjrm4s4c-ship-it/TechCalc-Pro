@@ -1,0 +1,31 @@
+{
+  "phase": "38A",
+  "name": "Automated Precache Manifest",
+  "status": "passed",
+  "assets": {
+    "total": 179,
+    "js": 165,
+    "css": 4,
+    "icons": 6,
+    "missing": 0,
+    "staleRuntime": 0
+  },
+  "checks": [
+    {
+      "id": "precache:generator-script",
+      "status": "passed"
+    },
+    {
+      "id": "precache:all-js-css-discovered",
+      "status": "passed"
+    },
+    {
+      "id": "precache:build-integration",
+      "status": "passed"
+    },
+    {
+      "id": "precache:no-duplicates",
+      "status": "passed"
+    }
+  ]
+}
