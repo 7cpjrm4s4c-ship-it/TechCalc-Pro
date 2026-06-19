@@ -179,6 +179,8 @@
     "audit:phase37c7": "node scripts/audit-app-shell-closure-phase37c7.mjs",
     "test:phase37c7": "node scripts/audit-app-shell-closure-phase37c7.mjs && node tests/platform-app-shell-closure-phase37c7.test.mjs",
     "audit:phase37d": "node scripts/audit-performance-observability-phase37d.mjs",
-    "test:phase37d": "node scripts/audit-performance-observability-phase37d.mjs && node tests/platform-performance-observability-phase37d.test.mjs"
+    "test:phase37d": "node scripts/audit-performance-observability-phase37d.mjs && node tests/platform-performance-observability-phase37d.test.mjs",
+    "audit:phase37e": "node scripts/audit-release-candidate-phase37e.mjs",
+    "test:phase37e": "node scripts/audit-release-candidate-phase37e.mjs && node tests/platform-release-candidate-phase37e.test.mjs"
   }
 }

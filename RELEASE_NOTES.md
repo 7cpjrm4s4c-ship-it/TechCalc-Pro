@@ -246,3 +246,11 @@ Release-hardening status after Phase 31D:
 - Accordion-Bodies und Settings Cards erhalten eigene undurchsichtige Surface-Hintergründe.
 - Durchscheinen des Modulhintergrunds hinter Settings-Texten behoben.
 - Keine Änderung an Modul- oder Settings-Controller-Logik.
+
+## 1.3.0-rc.1 · Phase 37E – RC Closure
+
+- Release-Candidate-Abschlussaudit ergänzt.
+- Neuer Guard: `audit:phase37e` / `test:phase37e`.
+- App-Shell-, Browser-Runtime-, Offline- und Performance-Stabilisierungen aus Phase 37 zusammengeführt.
+- Temporäre Trinkwasser-Debugpfade werden im RC-Audit blockiert.
+- Keine Feature- oder Fachlogikänderung.
