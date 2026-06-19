@@ -1,3 +1,11 @@
+## Phase 38E — Low-End Mobile Rendering Hardening
+
+- Moved active `backdrop-filter` / `-webkit-backdrop-filter` blur usage behind explicit `@supports` blocks.
+- Added opaque fallback backgrounds for cards, app header, safe-area header and module navigation.
+- Kept deliberate `backdrop-filter: none` guards for settings surfaces unchanged.
+- Added `scripts/audit-low-end-mobile-rendering-phase38e.mjs` to the integration gate.
+- Keine Fachlogik geändert.
+
 
 ## Phase 38D — UI Alias Cleanup
 

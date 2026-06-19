@@ -10,10 +10,18 @@
   max-width: 100%;
   border: 1px solid var(--color-border);
   border-radius: var(--tc-radius-card);
-  background: linear-gradient(135deg, rgba(32,39,49,.80), rgba(18,22,28,.66));
+  background: linear-gradient(135deg, rgba(32,39,49,.94), rgba(18,22,28,.90));
   box-shadow: var(--shadow-glass);
-  -webkit-backdrop-filter: blur(22px) saturate(130%);
-  backdrop-filter: blur(22px) saturate(130%);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .glass-surface,
+  .card,
+  .tc-card {
+    background: linear-gradient(135deg, rgba(32,39,49,.80), rgba(18,22,28,.66));
+    -webkit-backdrop-filter: blur(22px) saturate(130%);
+    backdrop-filter: blur(22px) saturate(130%);
+  }
 }
 
 .card,
@@ -93,12 +101,22 @@
 .app-header.glass-surface,
 .app-header.is-scrolled,
 .app-header.glass-surface.is-scrolled {
-  background: var(--header-glass-bg);
-  background-color: rgba(18,25,34,.62);
-  -webkit-backdrop-filter: blur(22px) saturate(130%);
-  backdrop-filter: blur(22px) saturate(130%);
+  background: rgba(18,25,34,.94);
+  background-color: rgba(18,25,34,.94);
   border: 0;
   box-shadow: none;
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .app-header,
+  .app-header.glass-surface,
+  .app-header.is-scrolled,
+  .app-header.glass-surface.is-scrolled {
+    background: var(--header-glass-bg);
+    background-color: rgba(18,25,34,.62);
+    -webkit-backdrop-filter: blur(22px) saturate(130%);
+    backdrop-filter: blur(22px) saturate(130%);
+  }
 }
 
 .app-header::before {

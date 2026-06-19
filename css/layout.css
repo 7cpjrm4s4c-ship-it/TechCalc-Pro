@@ -127,8 +127,7 @@
     height: var(--bottom-nav-h);
     border: 1px solid rgba(255,255,255,.12);
     border-radius: 999px;
-    background: rgba(8,12,18,.82);
-    backdrop-filter: blur(22px);
+    background: rgba(8,12,18,.94);
     overflow: visible;
   }
   .module-nav__track { grid-auto-columns: 1fr; border-radius: inherit; overflow: hidden; }
@@ -143,6 +142,16 @@
   gap: var(--ui-gap);
   grid-column: 1 / -1;
   min-width: 0;
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  @media (max-width: 767px) {
+    .module-nav {
+      background: rgba(8,12,18,.82);
+      -webkit-backdrop-filter: blur(22px);
+      backdrop-filter: blur(22px);
+    }
+  }
 }
 
 @media (max-width: 767px) {
@@ -225,10 +234,20 @@
     right: 0;
     width: 100%;
     z-index: 39;
-    backdrop-filter: blur(18px);
+    background: rgba(8,12,18,.94);
   }
   .app-main {
     padding-top: calc(var(--nav-h) + var(--space-3));
+  }
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  @media (min-width: 768px) {
+    .module-nav {
+      background: rgba(8,12,18,.82);
+      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px);
+    }
   }
 }
 

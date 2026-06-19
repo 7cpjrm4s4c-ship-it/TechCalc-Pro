@@ -87,11 +87,17 @@ body::before {
   left: 0;
   right: 0;
   height: max(env(safe-area-inset-top, 0px), 0px);
-  background: var(--header-glass-bg);
-  -webkit-backdrop-filter: blur(22px) saturate(130%);
-  backdrop-filter: blur(22px) saturate(130%);
+  background: rgba(18,25,34,.94);
   z-index: 39;
   pointer-events: none;
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  body::before {
+    background: var(--header-glass-bg);
+    -webkit-backdrop-filter: blur(22px) saturate(130%);
+    backdrop-filter: blur(22px) saturate(130%);
+  }
 }
 
 /* Hard viewport width lock: prevents mobile layouts and wide content from pushing the page sideways. */
