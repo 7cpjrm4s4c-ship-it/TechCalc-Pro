@@ -1,3 +1,5 @@
+import { markPerformance, startPerformanceSpan } from './performanceController.js';
+
 let serviceWorkerControllerInitialized = false;
 
 export const DEFAULT_CACHE_UPDATED_TYPE = 'TECHCALC_CACHE_UPDATED';
@@ -25,15 +27,23 @@ export function initializeServiceWorkerController(options = {}) {
     if (event?.data?.type !== cacheUpdatedType) return;
     const cacheName = event.data.cache || 'updated';
     sessionStorageRef?.setItem?.('techcalc-active-cache', cacheName);
+    markPerformance('service-worker:cache-updated', { cacheName });
     // Kein automatischer Reload: Beim Zurueckwechseln aus dem PDF-Export duerfen
     // aktuelle Berechnungsergebnisse in der Session nicht verloren gehen.
   });
 
   windowRef.addEventListener?.('load', () => {
+    const finishRegistration = startPerformanceSpan('service-worker:register', { registerUrl });
     navigatorRef.serviceWorker
       .register(registerUrl)
-      .then(registration => registration?.update?.())
-      .catch(error => console.warn('Service worker registration failed:', error));
+      .then(registration => {
+        finishRegistration({ status: 'ok' });
+        return registration?.update?.();
+      })
+      .catch(error => {
+        finishRegistration({ status: 'error', error: error?.message || String(error) });
+        console.warn('Service worker registration failed:', error);
+      });
   });
 
   return true;

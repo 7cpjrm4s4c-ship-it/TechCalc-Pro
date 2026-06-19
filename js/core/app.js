@@ -21,6 +21,11 @@ import { initializeSettingsController } from '../platform/shell/settingsControll
 import { initializeReleaseNotesController } from '../platform/shell/releaseNotesController.js';
 import { initializeFeedbackController } from '../platform/shell/feedbackController.js';
 import { initializeServiceWorkerController } from '../platform/shell/serviceWorkerController.js';
+import { initializePerformanceController, markPerformance, measurePerformance, startPerformanceSpan } from '../platform/shell/performanceController.js';
+
+const APP_VERSION = '1.3.0-rc.1';
+initializePerformanceController({ appVersion: APP_VERSION });
+const appInitStartMark = markPerformance('app:init:start', { appVersion: APP_VERSION });
 
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
@@ -42,11 +47,13 @@ const preloadedModuleIds = new Set();
 function loadLazyModule(config, path) {
   let loaded = moduleCache.get(config.id);
   if (!loaded) {
+    const finishLoad = startPerformanceSpan('module:lazy-load', { moduleId: config.id });
     loaded = import(path)
-      .then(mod => mod.default || mod)
+      .then(mod => { finishLoad({ status: 'ok' }); return mod.default || mod; })
       .catch(error => {
         moduleCache.delete(config.id);
         preloadedModuleIds.delete(config.id);
+        finishLoad({ status: 'error', error: error?.message || String(error) });
         throw error;
       });
     moduleCache.set(config.id, loaded);
@@ -229,7 +236,10 @@ const moduleRuntime = createModuleRuntime({
 
 function render(id){
   if (!modules.get(id)) return Promise.resolve(false);
-  return moduleRuntime.mount(id);
+  const finish = startPerformanceSpan('module:switch', { moduleId: id });
+  return Promise.resolve(moduleRuntime.mount(id))
+    .then(result => { finish({ moduleId: id, status: 'ok' }); return result; })
+    .catch(error => { finish({ moduleId: id, status: 'error', error: error?.message || String(error) }); throw error; });
 }
 initRouter(render);
 renderQuickAccessSettings();
@@ -265,8 +275,6 @@ const settingsPanel = document.getElementById('settingsPanel');
 
 initializeThemeController({ root: settingsPanel || document });
 
-const APP_VERSION = '1.3.0-rc.1';
-
 initializeFeedbackController({
   appVersion: APP_VERSION,
   getRoute: currentRoute
@@ -293,3 +301,5 @@ trackGlobalEventListener(window, 'scroll', updateHeaderTransparency, { passive: 
 updateHeaderTransparency();
 
 initializeServiceWorkerController({ appVersion: APP_VERSION });
+const appInitEndMark = markPerformance('app:init:end', { appVersion: APP_VERSION });
+measurePerformance('app:init', appInitStartMark, appInitEndMark, { appVersion: APP_VERSION });

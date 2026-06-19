@@ -1,0 +1,53 @@
+{
+  "phase": "37D",
+  "title": "Performance Observability Baseline",
+  "status": "pass",
+  "checkedAt": "2026-06-19T05:03:25.116Z",
+  "findings": [
+    {
+      "mark": "app:init",
+      "file": "js/core/app.js",
+      "present": true
+    },
+    {
+      "mark": "module:switch",
+      "file": "js/core/app.js",
+      "present": true
+    },
+    {
+      "mark": "module:lazy-load",
+      "file": "js/core/app.js",
+      "present": true
+    },
+    {
+      "mark": "module:mount",
+      "file": "js/platform/moduleRuntime/index.js",
+      "present": true
+    },
+    {
+      "mark": "dynamic-render",
+      "file": "js/platform/moduleRuntime/index.js",
+      "present": true
+    },
+    {
+      "mark": "saved-record:interaction",
+      "file": "js/platform/moduleRuntime/index.js",
+      "present": true
+    },
+    {
+      "mark": "render:commit",
+      "file": "js/core/renderCoordinator.js",
+      "present": true
+    },
+    {
+      "mark": "service-worker:register",
+      "file": "js/platform/shell/serviceWorkerController.js",
+      "present": true
+    },
+    {
+      "mark": "service-worker:cache-updated",
+      "file": "js/platform/shell/serviceWorkerController.js",
+      "present": true
+    }
+  ]
+}

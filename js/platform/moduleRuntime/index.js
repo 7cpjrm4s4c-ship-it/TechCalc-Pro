@@ -10,6 +10,7 @@ import { preserveScroll as keepScroll, preserveSavedRecordMutation, PlatformScro
 import { PlatformFocusManager } from '../../core/focusManager.js';
 import { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved, renderPlatformSaved } from '../moduleRenderer/index.js';
 import { getRenderScheduler } from '../../core/renderScheduler.js';
+import { startPerformanceSpan } from '../shell/performanceController.js';
 
 const noop = () => {};
 const asFn = value => typeof value === 'function' ? value : noop;
@@ -134,6 +135,7 @@ function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
       if (typeof dynamicOptions.dynamicUpdate === 'function') dynamicOptions.dynamicUpdate({ action: `${action}:settled-timeout`, field, value: patch?.[field] ?? value, patch, reason: 'segment:settled-timeout' });
       scheduler?.flushNow?.(`${action}:settled-timeout`);
     }, 0);
+    finishDynamic({ status: 'ok' });
     return true;
   };
 
@@ -350,7 +352,19 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     return false;
   };
 
-  const save = ({ root: actionRoot } = {}) => {
+  const withSavedPerformance = (action, callback) => {
+    const finishSaved = startPerformanceSpan('saved-record:interaction', { action });
+    try {
+      const result = callback();
+      finishSaved({ status: 'ok' });
+      return result;
+    } catch (error) {
+      finishSaved({ status: 'error', error: error?.message || String(error) });
+      throw error;
+    }
+  };
+
+  const save = ({ root: actionRoot } = {}) => withSavedPerformance('line:save', () => {
     if (shouldSkipDuplicateAction('line:save')) return;
     const host = actionRoot || root;
     savedConfig.commitBeforeCreate === false ? null : commitAllFields(host, state, { action: savedConfig.preCreateAction || 'line:pre-save', notify: false });
@@ -358,9 +372,9 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     const record = createRecord(current);
     const patch = typeof savedConfig.afterCreatePatch === 'function' ? savedConfig.afterCreatePatch(current, record) : {};
     preserveSavedRecordMutation(() => setReduced(current, { action: 'create', record, patch }, 'line:save'));
-  };
+  });
 
-  const update = ({ root: actionRoot } = {}) => {
+  const update = ({ root: actionRoot } = {}) => withSavedPerformance('line:update', () => {
     if (shouldSkipDuplicateAction('line:update')) return;
     const host = actionRoot || root;
     savedConfig.commitBeforeUpdate === false ? null : commitAllFields(host, state, { action: savedConfig.preUpdateAction || 'line:pre-update', notify: false });
@@ -371,11 +385,11 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     if (!existing) return;
     const record = createRecord(current, existing);
     preserveSavedRecordMutation(() => setReduced(current, { action: 'update', id, record }, 'line:update'));
-  };
+  });
 
   const readId = element => readRecordIdFromElement(element, { loadAttr, toggleAttr, deleteAttr });
 
-  const load = ({ element } = {}) => {
+  const load = ({ element } = {}) => withSavedPerformance('line:select', () => {
     const id = readId(element);
     const current = state.get();
     const item = list(current).find(entry => String(entry.id) === String(id));
@@ -389,22 +403,22 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     }
     const patch = typeof savedConfig.hydrate === 'function' ? savedConfig.hydrate(item, current) : { ...(item.state || item.inputState || item) };
     preserveSavedRecordMutation(() => setReduced(current, { action: 'load', id: item.id, record: item, patch }, 'line:select'));
-  };
+  });
 
-  const remove = ({ element, event } = {}) => {
+  const remove = ({ element, event } = {}) => withSavedPerformance('line:delete', () => {
     const id = readId(element);
     const current = state.get();
     const patch = typeof savedConfig.clear === 'function' && String(current?.[savedConfig.activeIdKey] || '') === String(id) ? savedConfig.clear(current) : {};
     const anchor = element?.closest?.('[data-line-card], [data-saved-record-card]') || element;
     preserveSavedRecordMutation(() => setReduced(current, { action: 'delete', id, patch }, 'line:delete'), { anchor, event });
-  };
+  });
 
-  const toggle = ({ element, event } = {}) => {
+  const toggle = ({ element, event } = {}) => withSavedPerformance('line:toggle', () => {
     const id = readId(element);
     const current = state.get();
     const anchor = element?.closest?.('[data-line-card], [data-saved-record-card]') || element;
     preserveSavedRecordMutation(() => setReduced(current, { action: 'toggle-expanded', id }, 'line:toggle'), { anchor, event });
-  };
+  });
 
   // Heizung/Kälte parity: saved-record panels are controlled exclusively by the
   // central action map. No module-specific capture listener, bridge, or legacy add/update path is registered here.
@@ -429,19 +443,35 @@ function mountDynamicPlatformModule(root, state, view, bind, dynamicUpdate, isDy
 
   const fullRender = (snapshot = state.get(), meta = { action: 'initial', changed: [] }) => {
     if (!isCurrentMount()) return;
-    root.innerHTML = view(snapshot);
-    root.__tcPlatformDynamicMount = { action: meta?.action || 'initial', at: Date.now() };
-    bindCommonInputs(root, state);
-    bindModuleStateBinding(root, state);
-    bind?.(root, snapshot, meta);
-    dynamicUpdate?.(root, snapshot, { action: 'initial', changed: [] });
+    const finish = startPerformanceSpan('module:mount', { action: meta?.action || 'initial', mode: 'custom-dynamic' });
+    try {
+      root.innerHTML = view(snapshot);
+      root.__tcPlatformDynamicMount = { action: meta?.action || 'initial', at: Date.now() };
+      bindCommonInputs(root, state);
+      bindModuleStateBinding(root, state);
+      bind?.(root, snapshot, meta);
+      const finishDynamic = startPerformanceSpan('dynamic-render', { action: 'initial', mode: 'custom-dynamic' });
+      dynamicUpdate?.(root, snapshot, { action: 'initial', changed: [] });
+      finishDynamic({ status: 'ok' });
+      finish({ status: 'ok' });
+    } catch (error) {
+      finish({ status: 'error', error: error?.message || String(error) });
+      throw error;
+    }
   };
 
   fullRender(state.get());
   const unsubscribe = state.subscribe((snapshot, meta = {}) => {
     if (!isCurrentMount()) return;
     if (isDynamicAction(meta)) {
-      dynamicUpdate?.(root, snapshot, meta);
+      const finishDynamic = startPerformanceSpan('dynamic-render', { action: meta?.action || 'dynamic', mode: 'custom-dynamic', changed: meta?.changed || [] });
+      try {
+        dynamicUpdate?.(root, snapshot, meta);
+        finishDynamic({ status: 'ok' });
+      } catch (error) {
+        finishDynamic({ status: 'error', error: error?.message || String(error) });
+        throw error;
+      }
       return;
     }
     fullRender(snapshot, meta);
@@ -508,6 +538,7 @@ export function createPlatformModule(definition = {}) {
 
   function updateDynamicIslands(root, meta = {}) {
     if (!root) return false;
+    const finishDynamic = startPerformanceSpan('dynamic-render', { action: meta?.action || 'dynamic', mode: 'platform', reason: meta?.reason || '', changed: meta?.changed || [] });
     const action = String(meta?.action || '');
     const reason = String(meta?.reason || '');
     const isSegmentUpdate = reason.startsWith('segment') || action.startsWith('platform:segment:') || action === 'segment:select';
@@ -526,13 +557,14 @@ export function createPlatformModule(definition = {}) {
         root.__tcPlatformLastDynamicUpdate = { ...(meta || {}), full: true, at: Date.now() };
         bindPlatformActions(root);
       });
+      finishDynamic({ status: 'ok', full: true });
       return true;
     }
 
     const formHost = root.querySelector?.('[data-platform-dynamic="form"]');
     const savedHost = root.querySelector?.('[data-platform-dynamic="saved-records"]');
     const sideHost = root.querySelector?.('[data-platform-dynamic="result-saved"]');
-    if (!formHost && !savedHost && !sideHost) return false;
+    if (!formHost && !savedHost && !sideHost) { finishDynamic({ status: 'skipped' }); return false; }
     const model = buildRenderModel(runtimeState.get());
     preservePlatformUx(root, () => {
       if (formHost) {

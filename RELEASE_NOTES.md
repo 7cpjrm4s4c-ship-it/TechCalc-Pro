@@ -1,3 +1,11 @@
+
+## 1.3.0-rc.1 – Phase 37D Performance Observability Baseline
+
+- Performance Controller ergänzt.
+- Browser-seitige `performance.mark()` / `performance.measure()` Baseline eingeführt.
+- Messpunkte für App Init, Lazy Load, Modulwechsel, Mount, Dynamic Render, Render Commit, Saved Records und Service Worker ergänzt.
+- Keine Fachlogik- oder UX-Änderung.
+
 ## 1.3.0-rc.1 · Phase 37C.7 – App-Shell Decomposition Closure
 
 - App-Shell-Decomposition abgeschlossen.

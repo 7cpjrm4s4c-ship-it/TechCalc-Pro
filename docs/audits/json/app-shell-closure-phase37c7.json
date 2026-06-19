@@ -3,7 +3,7 @@
   "title": "App-Shell Decomposition Closure",
   "appJs": {
     "path": "js/core/app.js",
-    "lines": 296,
+    "lines": 306,
     "maxAllowedLines": 320,
     "role": "bootstrap, lazy-module registration, route composition, session persistence, global module navigation"
   },
@@ -11,6 +11,7 @@
     "directory": "js/platform/shell",
     "files": [
       "feedbackController.js",
+      "performanceController.js",
       "releaseNotesController.js",
       "serviceWorkerController.js",
       "settingsController.js",
