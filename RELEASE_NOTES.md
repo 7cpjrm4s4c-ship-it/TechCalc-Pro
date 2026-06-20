@@ -315,3 +315,11 @@ Release-hardening status after Phase 31D:
 - Blocks generated artifacts such as `dist/`, `node_modules/`, coverage output, browser reports, source maps and packaged archives from entering the source release ZIP.
 - Keeps optional esbuild minification explicit through `npm run build:minified`; the standard `npm run build` remains non-emitting.
 - Added `scripts/audit-release-package-hygiene-phase38g.mjs` and wired it into `npm run test:integration`.
+
+
+## Phase 38D.1 — Pufferspeicher Compare Card Spacing Regression
+
+- Fixed a Phase 38D regression where the Pufferspeicher compare-mode input cards could visually collapse into each other.
+- Added `data-buffer-dynamic="input-blocks"` to the shared grid/gap dynamic container rule.
+- Corrected the accidental `.tc-help--inline--inline` selector back to `.tc-help--inline`.
+- Added a focused Phase 38D.1 guard for buffer-storage compare spacing.

@@ -81,7 +81,7 @@
 }
 
 .tc-help { margin-top: var(--tc-gap); }
-.tc-help--inline--inline { margin-top: 0; }
+.tc-help--inline { margin-top: 0; }
 
 .card *,
 .tc-card *,
@@ -765,6 +765,7 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
 .line-section-card__body,
 .saved-record-card__body,
 [data-platform-dynamic],
+[data-buffer-dynamic="input-blocks"],
 [data-buffer-dynamic="result"],
 [data-hx-dynamic="results"],
 [data-ph-dynamic="result"],
