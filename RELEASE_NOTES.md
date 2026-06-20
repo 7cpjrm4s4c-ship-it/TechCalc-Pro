@@ -329,3 +329,11 @@ Release-hardening status after Phase 31D:
 - Added `data-buffer-dynamic="input-blocks"` to the shared grid/gap dynamic container rule.
 - Corrected the accidental `.tc-help--inline--inline` selector back to `.tc-help--inline`.
 - Added a focused Phase 38D.1 guard for buffer-storage compare spacing.
+
+
+## Phase 38D.3 — Buffer Storage Compare Spacing Hard Fix
+
+- Hardened Pufferspeicher comparison section spacing with both flex-gap and adjacent-card margin fallback.
+- Covers current `.buffer-compare-sections` markup and older direct-child compare card markup.
+- Bumped service-worker cache name to force CSS/JS invalidation for installed/mobile clients.
+- Added `test:phase38d3` guard for spacing CSS and cache invalidation.

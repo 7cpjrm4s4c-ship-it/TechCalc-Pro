@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-06-20T12:08:16.046Z",
+  "generatedAt": "2026-06-20T13:01:46.341Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -42,9 +42,9 @@
     },
     {
       "file": "css/modules.css",
-      "important": 0,
+      "important": 1,
       "inlineStyleSelectors": 0,
-      "moduleScopedSelectors": 27
+      "moduleScopedSelectors": 32
     },
     {
       "file": "css/tokens.css",
@@ -103,7 +103,7 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 3,
+        "count": 8,
         "samples": [
           {
             "cssFile": "css/modules.css",
@@ -119,6 +119,31 @@
             "cssFile": "css/modules.css",
             "line": 105,
             "text": ".module-view[data-module='buffer-storage'] .tc-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 108,
+            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] { display: flex; flex-direction: column; gap: var(--tc-gap); align-content: start; }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 110,
+            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .card,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 111,
+            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .tc-card,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 114,
+            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .card + .card,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 115,
+            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .tc-card + .tc-card,"
           }
         ]
       }
@@ -224,42 +249,42 @@
         "samples": [
           {
             "cssFile": "css/modules.css",
-            "line": 119,
+            "line": 126,
             "text": ".module-view[data-module='unit-converter'] #convertedValue,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 120,
+            "line": 127,
             "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 121,
+            "line": 128,
             "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 122,
+            "line": 129,
             "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 135,
+            "line": 142,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 136,
+            "line": 143,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 137,
+            "line": 144,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 138,
+            "line": 145,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
           }
         ]
@@ -313,7 +338,7 @@
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 3,
+        "moduleCssSelectors": 8,
         "hasPlatformDynamic": true,
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
@@ -328,7 +353,7 @@
           "area": "css-specialization",
           "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
           "evidence": {
-            "count": 3,
+            "count": 8,
             "samples": [
               {
                 "cssFile": "css/modules.css",
@@ -344,6 +369,31 @@
                 "cssFile": "css/modules.css",
                 "line": 105,
                 "text": ".module-view[data-module='buffer-storage'] .tc-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 108,
+                "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] { display: flex; flex-direction: column; gap: var(--tc-gap); align-content: start; }"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 110,
+                "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .card,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 111,
+                "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .tc-card,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 114,
+                "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .card + .card,"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 115,
+                "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .tc-card + .tc-card,"
               }
             ]
           }
@@ -733,42 +783,42 @@
             "samples": [
               {
                 "cssFile": "css/modules.css",
-                "line": 119,
+                "line": 126,
                 "text": ".module-view[data-module='unit-converter'] #convertedValue,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 120,
+                "line": 127,
                 "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 121,
+                "line": 128,
                 "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 122,
+                "line": 129,
                 "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 135,
+                "line": 142,
                 "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 136,
+                "line": 143,
                 "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 137,
+                "line": 144,
                 "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 138,
+                "line": 145,
                 "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
               }
             ]
@@ -1052,7 +1102,7 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 3,
+        "count": 8,
         "samples": [
           {
             "cssFile": "css/modules.css",
@@ -1068,6 +1118,31 @@
             "cssFile": "css/modules.css",
             "line": 105,
             "text": ".module-view[data-module='buffer-storage'] .tc-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 108,
+            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] { display: flex; flex-direction: column; gap: var(--tc-gap); align-content: start; }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 110,
+            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .card,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 111,
+            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .tc-card,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 114,
+            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .card + .card,"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 115,
+            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .tc-card + .tc-card,"
           }
         ]
       }
@@ -1173,42 +1248,42 @@
         "samples": [
           {
             "cssFile": "css/modules.css",
-            "line": 119,
+            "line": 126,
             "text": ".module-view[data-module='unit-converter'] #convertedValue,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 120,
+            "line": 127,
             "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 121,
+            "line": 128,
             "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 122,
+            "line": 129,
             "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 135,
+            "line": 142,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 136,
+            "line": 143,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 137,
+            "line": 144,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 138,
+            "line": 145,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
           }
         ]
