@@ -321,3 +321,11 @@ Release-hardening status after Phase 31D:
 - Blocks generated artifacts such as `dist/`, `node_modules/`, coverage output, browser reports, source maps and packaged archives from entering the source release ZIP.
 - Keeps optional esbuild minification explicit through `npm run build:minified`; the standard `npm run build` remains non-emitting.
 - Added `scripts/audit-release-package-hygiene-phase38g.mjs` and wired it into `npm run test:integration`.
+
+## Phase 38D.7 — Buffer Storage Compare Stack Root Fix
+
+- Fixes the persistent Pufferspeicher compare-mode card spacing regression at the renderer boundary.
+- `renderInputBlocks(vm)` now wraps compare-mode cards in a dedicated `.tc-stack.buffer-compare-stack`.
+- Adds explicit grid/gap ownership for `[data-buffer-dynamic="input-blocks"]` and `.buffer-compare-stack`.
+- Adds a margin fallback for adjacent compare cards and a static/render audit `test:phase38d7`.
+

@@ -10,12 +10,15 @@ const sw = fs.readFileSync('service-worker.js', 'utf8');
 const mustContain = [
   [view, 'ph-help ph-help--inline buffer-help', 'buffer runtime help keeps legacy spacing alias'],
   [view, 'data-buffer-dynamic="input-blocks"', 'buffer input dynamic target exists'],
-  [view, "if (vm.isCompareMode) return [renderRuntimeInputs(vm), renderDefrostInputs(vm), renderReserveInputs(vm)].join('');", 'compare renderer returns canonical 38C card sequence'],
+  [view, 'if (vm.isCompareMode)', 'compare renderer keeps explicit compare branch'],
+  [view, 'renderRuntimeInputs(vm)', 'compare renderer includes runtime card'],
+  [view, 'renderDefrostInputs(vm)', 'compare renderer includes defrost card'],
+  [view, 'renderReserveInputs(vm)', 'compare renderer includes reserve card'],
   [results, 'formula tc-formula ph-formula', 'buffer formulas keep pressure-holding formula alias'],
   [components, '.tc-help,\n.ph-help { margin-top: var(--tc-gap); }', 'legacy help alias spacing restored'],
   [components, '.tc-stack,\n.tc-stack--section,', 'stack layout contract exists'],
   [modules, ".module-view[data-module='buffer-storage'] .ph-help", 'buffer help module alias restored'],
-  [sw, "CACHE_REVISION = 'phase38d6-buffer-compare-rollback'", 'cache revision bumped for stale mobile clients']
+  [sw, "CACHE_REVISION = 'phase38d7-buffer-compare-stack-fix'", 'cache revision bumped for stale mobile clients']
 ];
 
 const failures = mustContain.filter(([text, needle]) => !text.includes(needle));

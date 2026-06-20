@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-06-20T15:00:30.479Z",
+  "generatedAt": "2026-06-20T16:04:42.233Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -44,7 +44,7 @@
       "file": "css/modules.css",
       "important": 0,
       "inlineStyleSelectors": 0,
-      "moduleScopedSelectors": 27
+      "moduleScopedSelectors": 31
     },
     {
       "file": "css/tokens.css",
@@ -103,7 +103,7 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 3,
+        "count": 7,
         "samples": [
           {
             "cssFile": "css/modules.css",
@@ -119,6 +119,26 @@
             "cssFile": "css/modules.css",
             "line": 105,
             "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 115,
+            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"],"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 116,
+            "text": ".module-view[data-module='buffer-storage'] .buffer-compare-stack {"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 121,
+            "text": ".module-view[data-module='buffer-storage'] .buffer-compare-stack > .card + .card {"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 126,
+            "text": ".module-view[data-module='buffer-storage'] .buffer-compare-stack > .card + .card {"
           }
         ]
       }
@@ -224,42 +244,42 @@
         "samples": [
           {
             "cssFile": "css/modules.css",
-            "line": 116,
+            "line": 135,
             "text": ".module-view[data-module='unit-converter'] #convertedValue,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 117,
+            "line": 136,
             "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 118,
+            "line": 137,
             "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 119,
+            "line": 138,
             "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 132,
+            "line": 151,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 133,
+            "line": 152,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 134,
+            "line": 153,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 135,
+            "line": 154,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
           }
         ]
@@ -308,12 +328,12 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 567,
+        "lineCount": 573,
         "controllerAddEventListeners": 0,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 3,
+        "moduleCssSelectors": 7,
         "hasPlatformDynamic": true,
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
@@ -328,7 +348,7 @@
           "area": "css-specialization",
           "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
           "evidence": {
-            "count": 3,
+            "count": 7,
             "samples": [
               {
                 "cssFile": "css/modules.css",
@@ -344,6 +364,26 @@
                 "cssFile": "css/modules.css",
                 "line": 105,
                 "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 115,
+                "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"],"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 116,
+                "text": ".module-view[data-module='buffer-storage'] .buffer-compare-stack {"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 121,
+                "text": ".module-view[data-module='buffer-storage'] .buffer-compare-stack > .card + .card {"
+              },
+              {
+                "cssFile": "css/modules.css",
+                "line": 126,
+                "text": ".module-view[data-module='buffer-storage'] .buffer-compare-stack > .card + .card {"
               }
             ]
           }
@@ -733,42 +773,42 @@
             "samples": [
               {
                 "cssFile": "css/modules.css",
-                "line": 116,
+                "line": 135,
                 "text": ".module-view[data-module='unit-converter'] #convertedValue,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 117,
+                "line": 136,
                 "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 118,
+                "line": 137,
                 "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 119,
+                "line": 138,
                 "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 132,
+                "line": 151,
                 "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 133,
+                "line": 152,
                 "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 134,
+                "line": 153,
                 "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 135,
+                "line": 154,
                 "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
               }
             ]
@@ -1052,7 +1092,7 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 3,
+        "count": 7,
         "samples": [
           {
             "cssFile": "css/modules.css",
@@ -1068,6 +1108,26 @@
             "cssFile": "css/modules.css",
             "line": 105,
             "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 115,
+            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"],"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 116,
+            "text": ".module-view[data-module='buffer-storage'] .buffer-compare-stack {"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 121,
+            "text": ".module-view[data-module='buffer-storage'] .buffer-compare-stack > .card + .card {"
+          },
+          {
+            "cssFile": "css/modules.css",
+            "line": 126,
+            "text": ".module-view[data-module='buffer-storage'] .buffer-compare-stack > .card + .card {"
           }
         ]
       }
@@ -1173,42 +1233,42 @@
         "samples": [
           {
             "cssFile": "css/modules.css",
-            "line": 116,
+            "line": 135,
             "text": ".module-view[data-module='unit-converter'] #convertedValue,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 117,
+            "line": 136,
             "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 118,
+            "line": 137,
             "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 119,
+            "line": 138,
             "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 132,
+            "line": 151,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 133,
+            "line": 152,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 134,
+            "line": 153,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 135,
+            "line": 154,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
           }
         ]
