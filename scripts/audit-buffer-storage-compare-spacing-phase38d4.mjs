@@ -13,9 +13,9 @@ if (!/\[data-buffer-dynamic="input-blocks"\]\s*\{[^}]*display:\s*grid[^}]*gap:\s
 if (!/\.buffer-compare-sections\s*\{[^}]*display:\s*grid[^}]*gap:\s*var\(--space-2\)/s.test(css)) failures.push('compare wrapper CSS fallback must use grid with var(--space-2) gap.');
 
 if (failures.length) {
-  console.error('Phase 38D.3 compatibility buffer compare root-cause guard failed:');
+  console.error('Phase 38D.4 buffer compare root-cause guard failed:');
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
 
-console.log('Phase 38D.3 compatibility buffer compare root-cause guard passed.');
+console.log('Phase 38D.4 buffer compare root-cause guard passed.');

@@ -105,16 +105,16 @@
 .module-view[data-module='buffer-storage'] .tc-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }
 .module-view[data-module='pressure-holding'] .inline-stat span { white-space: normal; font-size: clamp(.62rem,.72vw,.72rem); letter-spacing: .08em; }
 .module-view[data-module='pressure-holding'] .inline-stat strong { font-size: clamp(.8rem,.95vw,.95rem); line-height: 1.12; }
-.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] { display: flex; flex-direction: column; gap: var(--tc-gap); align-content: start; }
-.buffer-compare-sections { display: flex; flex-direction: column; gap: var(--tc-gap); align-content: start; }
+.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] { display: grid; row-gap: var(--space-2); gap: var(--space-2); align-content: start; }
 .module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] > .card,
 .module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] > .tc-card,
-.buffer-compare-sections > .card,
-.buffer-compare-sections > .tc-card { margin: 0; }
+.module-view[data-module='buffer-storage'] .buffer-compare-sections > .card,
+.module-view[data-module='buffer-storage'] .buffer-compare-sections > .tc-card { margin: 0; }
 .module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] > .card + .card,
 .module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] > .tc-card + .tc-card,
-.buffer-compare-sections > .card + .card,
-.buffer-compare-sections > .tc-card + .tc-card { margin-top: var(--tc-gap) !important; }
+.module-view[data-module='buffer-storage'] .buffer-compare-sections > .card + .card,
+.module-view[data-module='buffer-storage'] .buffer-compare-sections > .tc-card + .tc-card { margin-top: var(--space-2) !important; }
+.module-view[data-module='buffer-storage'] .buffer-compare-sections { display: grid; row-gap: var(--space-2); gap: var(--space-2); align-content: start; }
 .buffer-input-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--tc-gap); align-items: end; }
 .buffer-input-grid--reserve { grid-template-columns: repeat(2,minmax(0,1fr)); }
 .buffer-input-grid > * { min-width: 0; }

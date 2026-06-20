@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-06-20T13:01:46.341Z",
+  "generatedAt": "2026-06-20T13:23:34.461Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -44,7 +44,7 @@
       "file": "css/modules.css",
       "important": 1,
       "inlineStyleSelectors": 0,
-      "moduleScopedSelectors": 32
+      "moduleScopedSelectors": 37
     },
     {
       "file": "css/tokens.css",
@@ -103,7 +103,7 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 8,
+        "count": 13,
         "samples": [
           {
             "cssFile": "css/modules.css",
@@ -123,27 +123,27 @@
           {
             "cssFile": "css/modules.css",
             "line": 108,
-            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] { display: flex; flex-direction: column; gap: var(--tc-gap); align-content: start; }"
+            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] { display: grid; row-gap: var(--space-2); gap: var(--space-2); align-content: start; }"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 110,
+            "line": 109,
             "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .card,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 111,
+            "line": 110,
             "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .tc-card,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 114,
-            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .card + .card,"
+            "line": 111,
+            "text": ".module-view[data-module='buffer-storage'] .buffer-compare-sections > .card,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 115,
-            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .tc-card + .tc-card,"
+            "line": 112,
+            "text": ".module-view[data-module='buffer-storage'] .buffer-compare-sections > .tc-card { margin: 0; }"
           }
         ]
       }
@@ -333,12 +333,12 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 573,
+        "lineCount": 579,
         "controllerAddEventListeners": 0,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 8,
+        "moduleCssSelectors": 13,
         "hasPlatformDynamic": true,
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
@@ -353,7 +353,7 @@
           "area": "css-specialization",
           "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
           "evidence": {
-            "count": 8,
+            "count": 13,
             "samples": [
               {
                 "cssFile": "css/modules.css",
@@ -373,27 +373,27 @@
               {
                 "cssFile": "css/modules.css",
                 "line": 108,
-                "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] { display: flex; flex-direction: column; gap: var(--tc-gap); align-content: start; }"
+                "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] { display: grid; row-gap: var(--space-2); gap: var(--space-2); align-content: start; }"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 110,
+                "line": 109,
                 "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .card,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 111,
+                "line": 110,
                 "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .tc-card,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 114,
-                "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .card + .card,"
+                "line": 111,
+                "text": ".module-view[data-module='buffer-storage'] .buffer-compare-sections > .card,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 115,
-                "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .tc-card + .tc-card,"
+                "line": 112,
+                "text": ".module-view[data-module='buffer-storage'] .buffer-compare-sections > .tc-card { margin: 0; }"
               }
             ]
           }
@@ -1102,7 +1102,7 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 8,
+        "count": 13,
         "samples": [
           {
             "cssFile": "css/modules.css",
@@ -1122,27 +1122,27 @@
           {
             "cssFile": "css/modules.css",
             "line": 108,
-            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] { display: flex; flex-direction: column; gap: var(--tc-gap); align-content: start; }"
+            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] { display: grid; row-gap: var(--space-2); gap: var(--space-2); align-content: start; }"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 110,
+            "line": 109,
             "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .card,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 111,
+            "line": 110,
             "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .tc-card,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 114,
-            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .card + .card,"
+            "line": 111,
+            "text": ".module-view[data-module='buffer-storage'] .buffer-compare-sections > .card,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 115,
-            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .tc-card + .tc-card,"
+            "line": 112,
+            "text": ".module-view[data-module='buffer-storage'] .buffer-compare-sections > .tc-card { margin: 0; }"
           }
         ]
       }

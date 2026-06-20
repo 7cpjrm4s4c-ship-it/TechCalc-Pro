@@ -16,7 +16,8 @@
     "test:phase38g": "node scripts/audit-release-package-hygiene-phase38g.mjs",
     "test:phase38d1": "node scripts/audit-buffer-storage-compare-spacing-phase38d1.mjs",
     "test:phase38d2": "node scripts/audit-buffer-storage-compare-spacing-phase38d2.mjs",
-    "test:phase38d3": "node scripts/audit-buffer-storage-compare-spacing-phase38d3.mjs"
+    "test:phase38d3": "node scripts/audit-buffer-storage-compare-spacing-phase38d3.mjs",
+    "test:phase38d4": "node scripts/audit-buffer-storage-compare-spacing-phase38d4.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.28.1"

@@ -337,3 +337,10 @@ Release-hardening status after Phase 31D:
 - Covers current `.buffer-compare-sections` markup and older direct-child compare card markup.
 - Bumped service-worker cache name to force CSS/JS invalidation for installed/mobile clients.
 - Added `test:phase38d3` guard for spacing CSS and cache invalidation.
+
+
+## Phase 38D.4 — Buffer Storage Compare Root Cause Fix
+
+- Root cause: compare-mode spacing depended on a dynamic island/generic alias path that could be neutralized after 38D alias cleanup and later partial CSS patches.
+- Fix: compare-mode now renders a dedicated stable wrapper with explicit grid section spacing and a data hook.
+- Guard: `test:phase38d4` verifies the renderer contract and CSS fallback.

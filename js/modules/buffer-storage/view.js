@@ -44,14 +44,20 @@ export function renderReserveInputs(vm) {
   return card('Wasservorlage als Kälte- / Wärmespeicher', renderFieldGrid(vm.reserveFields, 'buffer-input-grid--reserve'), vm.accent);
 }
 
+function renderCompareSections(vm) {
+  const sections = [
+    renderRuntimeInputs(vm),
+    renderDefrostInputs(vm),
+    renderReserveInputs(vm)
+  ];
+
+  // Compare mode is dynamically re-rendered and must not depend on legacy
+  // alias spacing. Keep the vertical section contract local and explicit.
+  return `<div class="buffer-compare-sections" data-buffer-compare-sections style="display:grid;row-gap:var(--space-2);gap:var(--space-2);align-content:start">${sections.join('')}</div>`;
+}
+
 export function renderInputBlocks(vm) {
-  if (vm.isCompareMode) {
-    return `<div class="buffer-compare-sections">${[
-      renderRuntimeInputs(vm),
-      renderDefrostInputs(vm),
-      renderReserveInputs(vm)
-    ].join('')}</div>`;
-  }
+  if (vm.isCompareMode) return renderCompareSections(vm);
   if (vm.isDefrostMode) return renderDefrostInputs(vm);
   if (vm.isReserveMode) return renderReserveInputs(vm);
   return renderRuntimeInputs(vm);
