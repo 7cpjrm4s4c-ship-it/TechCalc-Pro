@@ -15,6 +15,7 @@ const commands = [
   ['node', ['tests/platform-precache-manifest-phase38a.test.mjs']],
   ['node', ['tests/platform-viewport-accessibility-phase38c.test.mjs']],
   ['node', ['scripts/audit-buffer-storage-remove-compare-phase38d9.mjs']],
+  ['node', ['scripts/audit-buffer-storage-remove-compare-phase38d10.mjs']],
   ['node', ['scripts/audit-low-end-mobile-rendering-phase38e.mjs']],
   ['node', ['scripts/audit-esbuild-minification-phase38f.mjs']],
   ['node', ['scripts/audit-release-package-hygiene-phase38g.mjs']]

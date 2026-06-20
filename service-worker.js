@@ -1,5 +1,5 @@
 const CACHE_NAME = 'techcalc-pro-1.3.0-rc.1';
-const CACHE_REVISION = 'phase38d8-buffer-global-stack-fix';
+const CACHE_REVISION = 'phase38d10-buffer-compare-code-removal';
 const ASSETS = [
   './',
   './index.html',

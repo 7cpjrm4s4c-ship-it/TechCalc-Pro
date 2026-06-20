@@ -1,3 +1,12 @@
+
+## Phase 38D.10 — Pufferspeicher Vergleich vollständig entfernt
+
+- Entfernt den Vergleich als auswählbare Berechnungsart vollständig aus dem Pufferspeicher-Pfad.
+- Erzwingt genau drei zulässige Berechnungsarten: Mindestlaufzeit, Abtauung, Wasservorlage.
+- Normalisiert alte gespeicherte `compare`-States weiterhin defensiv auf `runtime`.
+- Erhöht die Service-Worker-Revision, damit Mobile-Clients keine alte Switch-Struktur aus dem Cache behalten.
+- Ergänzt `test:phase38d10` gegen erneute Compare-Strukturen im Pufferspeicher-Modul.
+
 # Phase 38D.6 – Buffer Storage Compare Regression Rollback
 
 - Reverts the risky 38D visual alias cleanup for the Pufferspeicher render path to the last known good 38C contract.
@@ -336,12 +345,3 @@ Release-hardening status after Phase 31D:
 - Removes the module-specific compare spacing workaround from `css/modules.css`.
 - Compare mode again renders the three input cards as direct children of a globally spaced stack.
 - Adds `test:phase38d8` to prevent competing buffer compare spacing exceptions from returning.
-
-
-## Phase 38D.9 — Pufferspeicher Vergleich entfernt
-
-- Vergleich aus dem Berechnungsart-Switch im Pufferspeicher-Modul entfernt.
-- Legacy-Zustand `calculationMode: compare` wird auf `runtime` normalisiert.
-- Compare-Renderzweig aus dem Pufferspeicher-Inputpfad entfernt.
-- Ergebnis-/Speicherpfad behandelt alte Compare-Datensätze als Mindestlaufzeit-Fallback.
-- Guard `test:phase38d9` ergänzt und ins Integration-Gate aufgenommen.
