@@ -18,7 +18,7 @@ const mustContain = [
   [components, '.tc-help,\n.ph-help { margin-top: var(--tc-gap); }', 'legacy help alias spacing restored'],
   [components, '.tc-stack,\n.tc-stack--section,', 'stack layout contract exists'],
   [modules, ".module-view[data-module='buffer-storage'] .ph-help", 'buffer help module alias restored'],
-  [sw, "CACHE_REVISION = 'phase38d7-buffer-compare-stack-fix'", 'cache revision bumped for stale mobile clients']
+  [sw, "CACHE_REVISION = 'phase38d8-buffer-global-stack-fix'", 'cache revision bumped for stale mobile clients']
 ];
 
 const failures = mustContain.filter(([text, needle]) => !text.includes(needle));

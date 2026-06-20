@@ -1,9 +1,9 @@
+#!/usr/bin/env node
 import { readFileSync } from 'node:fs';
 import { renderInputBlocks } from '../js/modules/buffer-storage/view.js';
 import { createBufferStorageViewModel } from '../js/modules/buffer-storage/viewModel.js';
 import { state as defaultState } from '../js/modules/buffer-storage/state.js';
 
-const css = readFileSync('css/modules.css', 'utf8');
 const view = readFileSync('js/modules/buffer-storage/view.js', 'utf8');
 
 const vm = createBufferStorageViewModel({
@@ -16,33 +16,21 @@ const vm = createBufferStorageViewModel({
 const html = renderInputBlocks(vm);
 
 const fail = message => {
-  console.error(`Phase 38D.7 audit failed: ${message}`);
+  console.error(`Phase 38D.7 compatibility audit failed: ${message}`);
   process.exit(1);
 };
 
-if (!view.includes('buffer-compare-stack')) {
-  fail('renderInputBlocks must emit a dedicated buffer-compare-stack wrapper for compare mode');
-}
-
-if (!html.startsWith('<div class="tc-stack buffer-compare-stack">')) {
-  fail('compare input blocks must start with the dedicated tc-stack buffer-compare-stack wrapper');
+if (!view.includes('class="tc-stack" data-buffer-dynamic="input-blocks"')) {
+  fail('input-blocks island must now use the global tc-stack spacing contract');
 }
 
 const cardCount = (html.match(/<section class="card /g) || []).length;
 if (cardCount !== 3) {
-  fail(`compare wrapper must contain exactly 3 input cards, found ${cardCount}`);
+  fail(`compare mode must render exactly 3 input cards, found ${cardCount}`);
 }
 
-if (!css.includes('.module-view[data-module=\'buffer-storage\'] [data-buffer-dynamic="input-blocks"]') && !css.includes('.module-view[data-module="buffer-storage"] [data-buffer-dynamic="input-blocks"]')) {
-  fail('buffer-storage input-blocks island needs an explicit display/gap rule');
+if (html.includes('buffer-compare-stack') || view.includes('buffer-input-blocks')) {
+  fail('obsolete module-specific compare spacing wrappers must not return');
 }
 
-if (!css.includes('.buffer-compare-stack') || !/\.buffer-compare-stack\s*\{[^}]*display:\s*grid;[^}]*gap:\s*var\(--tc-gap\)/s.test(css)) {
-  fail('buffer-compare-stack needs display:grid and gap:var(--tc-gap)');
-}
-
-if (!css.includes('.buffer-compare-stack > .card + .card')) {
-  fail('compare stack needs a margin fallback for engines or overridden gap contexts');
-}
-
-console.log('Phase 38D.7 buffer-storage compare stack audit ok');
+console.log('Phase 38D.7 compatibility audit ok; superseded by Phase 38D.8 global stack contract.');

@@ -329,3 +329,10 @@ Release-hardening status after Phase 31D:
 - Adds explicit grid/gap ownership for `[data-buffer-dynamic="input-blocks"]` and `.buffer-compare-stack`.
 - Adds a margin fallback for adjacent compare cards and a static/render audit `test:phase38d7`.
 
+
+## Phase 38D.8 — Buffer Storage Compare Global Stack Fix
+
+- Moves the Pufferspeicher `input-blocks` dynamic island onto the global `.tc-stack` spacing contract.
+- Removes the module-specific compare spacing workaround from `css/modules.css`.
+- Compare mode again renders the three input cards as direct children of a globally spaced stack.
+- Adds `test:phase38d8` to prevent competing buffer compare spacing exceptions from returning.

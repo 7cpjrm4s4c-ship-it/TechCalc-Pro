@@ -46,11 +46,11 @@ export function renderReserveInputs(vm) {
 
 export function renderInputBlocks(vm) {
   if (vm.isCompareMode) {
-    return `<div class="tc-stack buffer-compare-stack">${[
+    return [
       renderRuntimeInputs(vm),
       renderDefrostInputs(vm),
       renderReserveInputs(vm)
-    ].join('')}</div>`;
+    ].join('');
   }
   if (vm.isDefrostMode) return renderDefrostInputs(vm);
   if (vm.isReserveMode) return renderReserveInputs(vm);
@@ -73,7 +73,7 @@ export function renderView(s) {
       '<p class="tc-help ph-help">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'
     ].join('')), vm.accent),
     card('Medium / Faktor', `<div data-buffer-dynamic="medium">${renderMediumContent(vm)}</div>`, vm.accent),
-    `<div data-buffer-dynamic="input-blocks">${renderInputBlocks(vm)}</div>`,
+    `<div class="tc-stack" data-buffer-dynamic="input-blocks">${renderInputBlocks(vm)}</div>`,
     `<div data-buffer-dynamic="saved-records">${renderSavedRecords(vm)}</div>`
   ].join(''));
 

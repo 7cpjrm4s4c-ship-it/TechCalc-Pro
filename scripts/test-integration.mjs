@@ -16,6 +16,7 @@ const commands = [
   ['node', ['tests/platform-viewport-accessibility-phase38c.test.mjs']],
   ['node', ['scripts/audit-buffer-storage-compare-rollback-phase38d6.mjs']],
   ['node', ['scripts/audit-buffer-storage-compare-stack-phase38d7.mjs']],
+  ['node', ['scripts/audit-buffer-storage-compare-global-stack-phase38d8.mjs']],
   ['node', ['scripts/audit-low-end-mobile-rendering-phase38e.mjs']],
   ['node', ['scripts/audit-esbuild-minification-phase38f.mjs']],
   ['node', ['scripts/audit-release-package-hygiene-phase38g.mjs']]
