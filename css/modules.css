@@ -181,3 +181,32 @@
   .wrg-group-grid .inline-stats { grid-template-columns: 1fr; }}
 
 @media (max-width: 480px) {}@media (max-width: 480px) {}
+
+/* Phase 38D.5: buffer compare card spacing owns a real flex stack contract.
+   This must survive dynamic re-rendering and legacy alias cleanup. */
+.module-view[data-module='buffer-storage'] .buffer-input-blocks,
+.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"],
+.module-view[data-module='buffer-storage'] .buffer-compare-sections {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: var(--space-2) !important;
+  row-gap: var(--space-2) !important;
+}
+.module-view[data-module='buffer-storage'] .buffer-input-blocks > .card,
+.module-view[data-module='buffer-storage'] .buffer-input-blocks > .tc-card,
+.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] > .card,
+.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] > .tc-card,
+.module-view[data-module='buffer-storage'] .buffer-compare-sections > .card,
+.module-view[data-module='buffer-storage'] .buffer-compare-sections > .tc-card {
+  flex: 0 0 auto !important;
+  margin-block: 0 !important;
+}
+.module-view[data-module='buffer-storage'] .buffer-input-blocks > .card + .card,
+.module-view[data-module='buffer-storage'] .buffer-input-blocks > .tc-card + .tc-card,
+.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] > .card + .card,
+.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] > .tc-card + .tc-card,
+.module-view[data-module='buffer-storage'] .buffer-compare-sections > .card + .card,
+.module-view[data-module='buffer-storage'] .buffer-compare-sections > .tc-card + .tc-card {
+  margin-top: var(--space-2) !important;
+}

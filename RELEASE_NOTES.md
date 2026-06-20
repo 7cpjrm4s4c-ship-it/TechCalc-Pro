@@ -1,3 +1,11 @@
+## Phase 38D.5 — Buffer Storage Compare Spacing Root Fix
+
+- Added an explicit `buffer-input-blocks` class to the dynamic Pufferspeicher input island.
+- Enforced a real flex-column stack contract for compare-mode cards, independent of removed `ph-*` aliases.
+- Added adjacent-card margin fallback for browsers or cached CSS paths where `gap` is not enough.
+- Advanced the service-worker cache name/revision so mobile clients cannot keep the stale 38D stylesheet.
+- Added `test:phase38d5` guard.
+
 ## Phase 38E — Low-End Mobile Rendering Hardening
 
 - Moved active `backdrop-filter` / `-webkit-backdrop-filter` blur usage behind explicit `@supports` blocks.

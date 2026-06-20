@@ -1,5 +1,5 @@
 const CACHE_NAME = 'techcalc-pro-1.3.0-rc.1';
-const CACHE_REVISION = 'phase38d3-buffer-spacing';
+const CACHE_REVISION = 'phase38d5-buffer-compare-spacing';
 const ASSETS = [
   './',
   './index.html',
@@ -194,7 +194,7 @@ self.addEventListener('activate', event => {
     await Promise.all(keys.map(key => key === CACHE_NAME ? null : caches.delete(key)));
     await self.clients.claim();
     const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    clients.forEach(client => client.postMessage({ type: 'TECHCALC_CACHE_UPDATED', cache: CACHE_NAME }));
+    clients.forEach(client => client.postMessage({ type: 'TECHCALC_CACHE_UPDATED', cache: CACHE_NAME, revision: CACHE_REVISION }));
   })());
 });
 

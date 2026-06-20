@@ -79,7 +79,7 @@ export function renderView(s) {
       '<p class="tc-help">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'
     ].join('')), vm.accent),
     card('Medium / Faktor', `<div data-buffer-dynamic="medium">${renderMediumContent(vm)}</div>`, vm.accent),
-    `<div data-buffer-dynamic="input-blocks">${renderInputBlocks(vm)}</div>`,
+    `<div class="buffer-input-blocks" data-buffer-dynamic="input-blocks">${renderInputBlocks(vm)}</div>`,
     `<div data-buffer-dynamic="saved-records">${renderSavedRecords(vm)}</div>`
   ].join(''));
 

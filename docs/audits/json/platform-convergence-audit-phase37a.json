@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-06-20T13:23:34.461Z",
+  "generatedAt": "2026-06-20T13:56:10.990Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -42,9 +42,9 @@
     },
     {
       "file": "css/modules.css",
-      "important": 1,
+      "important": 9,
       "inlineStyleSelectors": 0,
-      "moduleScopedSelectors": 37
+      "moduleScopedSelectors": 52
     },
     {
       "file": "css/tokens.css",
@@ -103,7 +103,7 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 13,
+        "count": 28,
         "samples": [
           {
             "cssFile": "css/modules.css",
@@ -338,7 +338,7 @@
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 13,
+        "moduleCssSelectors": 28,
         "hasPlatformDynamic": true,
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
@@ -353,7 +353,7 @@
           "area": "css-specialization",
           "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
           "evidence": {
-            "count": 13,
+            "count": 28,
             "samples": [
               {
                 "cssFile": "css/modules.css",
@@ -1102,7 +1102,7 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 13,
+        "count": 28,
         "samples": [
           {
             "cssFile": "css/modules.css",
