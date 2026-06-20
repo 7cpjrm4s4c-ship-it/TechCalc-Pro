@@ -3,7 +3,6 @@ import { fmt } from '../../utils/calculations.js';
 export function modeLabel(mode){
   if(mode === 'defrost') return 'Wärmepumpe / Abtauung';
   if(mode === 'reserve') return 'Wasservorlage';
-  if(mode === 'compare') return 'Vergleich / maßgebend';
   return 'Mindestlaufzeit';
 }
 

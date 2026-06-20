@@ -14,9 +14,7 @@
     "test:phase38f": "node scripts/audit-esbuild-minification-phase38f.mjs",
     "build:minified": "node scripts/generate-precache-manifest.mjs && node scripts/check-js-imports.mjs && node scripts/minify-static-assets.mjs",
     "test:phase38g": "node scripts/audit-release-package-hygiene-phase38g.mjs",
-    "test:phase38d6": "node scripts/audit-buffer-storage-compare-rollback-phase38d6.mjs",
-    "test:phase38d7": "node scripts/audit-buffer-storage-compare-stack-phase38d7.mjs",
-    "test:phase38d8": "node scripts/audit-buffer-storage-compare-global-stack-phase38d8.mjs"
+    "test:phase38d9": "node scripts/audit-buffer-storage-remove-compare-phase38d9.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.28.1"

@@ -7,8 +7,7 @@ export const BUFFER_ACCENT = 'cyan';
 export const bufferModeOptions = [
   { value: 'runtime', label: 'Mindestlaufzeit' },
   { value: 'defrost', label: 'Abtauung' },
-  { value: 'reserve', label: 'Wasservorlage' },
-  { value: 'compare', label: 'Vergleich' }
+  { value: 'reserve', label: 'Wasservorlage' }
 ];
 
 export const mediumOptions = [
@@ -28,12 +27,20 @@ export function glycolConcentrationOptions(s = {}) {
   return concentrations.map(value => ({ value, label: `${value} %` }));
 }
 
+export function normalizeBufferCalculationMode(mode) {
+  return ['runtime', 'defrost', 'reserve'].includes(mode) ? mode : 'runtime';
+}
+
+export function normalizeBufferStorageState(s = {}) {
+  return { ...s, calculationMode: normalizeBufferCalculationMode(s.calculationMode) };
+}
+
 export function inputModeFlags(s = {}) {
+  const calculationMode = normalizeBufferCalculationMode(s.calculationMode);
   return {
-    isRuntimeMode: s.calculationMode === 'runtime',
-    isDefrostMode: s.calculationMode === 'defrost',
-    isReserveMode: s.calculationMode === 'reserve',
-    isCompareMode: s.calculationMode === 'compare'
+    isRuntimeMode: calculationMode === 'runtime',
+    isDefrostMode: calculationMode === 'defrost',
+    isReserveMode: calculationMode === 'reserve'
   };
 }
 
@@ -66,24 +73,26 @@ export function reserveFieldModels(s = {}) {
   ];
 }
 
-export function createBufferStorageViewModel(s = {}, r = calculate(s), accent = BUFFER_ACCENT) {
-  const flags = inputModeFlags(s);
+export function createBufferStorageViewModel(s = {}, r = null, accent = BUFFER_ACCENT) {
+  const state = normalizeBufferStorageState(s);
+  const result = r || calculate(state);
+  const flags = inputModeFlags(state);
   return {
-    state: s,
-    result: r,
+    state,
+    result,
     accent,
     ...flags,
-    modeLabel: modeLabel(s.calculationMode),
-    mediumLabel: mediumLabel(s),
-    factorLabel: fmt(r?.factor || 0, 2),
+    modeLabel: modeLabel(state.calculationMode),
+    mediumLabel: mediumLabel(state),
+    factorLabel: fmt(result?.factor || 0, 2),
     bufferModeOptions,
     mediumOptions,
     glycolTypeOptions,
-    glycolConcentrationOptions: glycolConcentrationOptions(s),
-    runtimeFields: runtimeFieldModels(s),
-    defrostFields: defrostFieldModels(s),
-    reserveFields: reserveFieldModels(s),
-    resultModel: buildBufferStorageResultModel(s, r, accent)
+    glycolConcentrationOptions: glycolConcentrationOptions(state),
+    runtimeFields: runtimeFieldModels(state),
+    defrostFields: defrostFieldModels(state),
+    reserveFields: reserveFieldModels(state),
+    resultModel: buildBufferStorageResultModel(state, result, accent)
   };
 }
 
