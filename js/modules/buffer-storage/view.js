@@ -45,7 +45,13 @@ export function renderReserveInputs(vm) {
 }
 
 export function renderInputBlocks(vm) {
-  if (vm.isCompareMode) return [renderRuntimeInputs(vm), renderDefrostInputs(vm), renderReserveInputs(vm)].join('');
+  if (vm.isCompareMode) {
+    return `<div class="buffer-compare-sections">${[
+      renderRuntimeInputs(vm),
+      renderDefrostInputs(vm),
+      renderReserveInputs(vm)
+    ].join('')}</div>`;
+  }
   if (vm.isDefrostMode) return renderDefrostInputs(vm);
   if (vm.isReserveMode) return renderReserveInputs(vm);
   return renderRuntimeInputs(vm);

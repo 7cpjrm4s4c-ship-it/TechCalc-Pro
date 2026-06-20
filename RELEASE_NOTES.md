@@ -7,6 +7,12 @@
 - Keine Fachlogik geändert.
 
 
+## Phase 38D.2 — Buffer Storage Compare Section Spacing Fix
+
+- Fixes the post-38D Pufferspeicher compare-mode card collision by restoring a dedicated compare-section wrapper.
+- Adds `.buffer-compare-sections` with explicit `display: grid` and `gap: var(--space-2)`, independent of legacy `ph-*`/`dw-*` aliases.
+- Adds `test:phase38d2` to guard that the compare renderer keeps the runtime, defrost and reserve cards inside the spacing wrapper.
+
 ## Phase 38D — UI Alias Cleanup
 
 - Removed visual `dw-*` / `ph-*` class aliases from shared component CSS and module markup.
