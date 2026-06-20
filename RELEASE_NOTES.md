@@ -345,3 +345,9 @@ Release-hardening status after Phase 31D:
 - Removes the module-specific compare spacing workaround from `css/modules.css`.
 - Compare mode again renders the three input cards as direct children of a globally spaced stack.
 - Adds `test:phase38d8` to prevent competing buffer compare spacing exceptions from returning.
+
+## Phase 38H — Netlify npm Registry Fix
+
+- Fixed Netlify dependency installation failure caused by internal Artifactory `resolved` URLs in `package-lock.json`.
+- Added `.npmrc` pinning installs to `https://registry.npmjs.org/`.
+- Added `test:phase38h` guard to block private/internal npm registry references in npm/Netlify config files.
