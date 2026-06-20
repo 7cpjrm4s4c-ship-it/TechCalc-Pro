@@ -56,9 +56,9 @@ export function buildBufferStorageResultModel(s, r, accent = 'cyan'){
       {
         title: 'Formeln',
         html: [
-          '<div class="formula tc-formula">V = ((QMax × Teillast − QLast) × Faktor × TLaufzeit) / ΔTHydraulik</div>',
-          '<div class="formula tc-formula">VAbtau = ((QVerbraucher + QKälte − QHeiz) × Faktor × TMaxAbtauung) / ΔTHydraulik</div>',
-          '<div class="formula tc-formula">VWasservorlage = V̇Verbraucher × tÜberbrückung × 1000 / 60</div>'
+          '<div class="formula tc-formula ph-formula">V = ((QMax × Teillast − QLast) × Faktor × TLaufzeit) / ΔTHydraulik</div>',
+          '<div class="formula tc-formula ph-formula">VAbtau = ((QVerbraucher + QKälte − QHeiz) × Faktor × TMaxAbtauung) / ΔTHydraulik</div>',
+          '<div class="formula tc-formula ph-formula">VWasservorlage = V̇Verbraucher × tÜberbrückung × 1000 / 60</div>'
         ].join(''),
         accent
       }

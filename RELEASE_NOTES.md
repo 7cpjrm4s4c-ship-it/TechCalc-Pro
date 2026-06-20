@@ -1,10 +1,8 @@
-## Phase 38D.5 — Buffer Storage Compare Spacing Root Fix
+# Phase 38D.6 – Buffer Storage Compare Regression Rollback
 
-- Added an explicit `buffer-input-blocks` class to the dynamic Pufferspeicher input island.
-- Enforced a real flex-column stack contract for compare-mode cards, independent of removed `ph-*` aliases.
-- Added adjacent-card margin fallback for browsers or cached CSS paths where `gap` is not enough.
-- Advanced the service-worker cache name/revision so mobile clients cannot keep the stale 38D stylesheet.
-- Added `test:phase38d5` guard.
+- Reverts the risky 38D visual alias cleanup for the Pufferspeicher render path to the last known good 38C contract.
+- Keeps 38E low-end rendering hardening, 38F optional esbuild minification and 38G package hygiene.
+- Bumps the service-worker cache name so mobile/PWA clients cannot continue using stale CSS/JS.
 
 ## Phase 38E — Low-End Mobile Rendering Hardening
 
@@ -14,12 +12,6 @@
 - Added `scripts/audit-low-end-mobile-rendering-phase38e.mjs` to the integration gate.
 - Keine Fachlogik geändert.
 
-
-## Phase 38D.2 — Buffer Storage Compare Section Spacing Fix
-
-- Fixes the post-38D Pufferspeicher compare-mode card collision by restoring a dedicated compare-section wrapper.
-- Adds `.buffer-compare-sections` with explicit `display: grid` and `gap: var(--space-2)`, independent of legacy `ph-*`/`dw-*` aliases.
-- Adds `test:phase38d2` to guard that the compare renderer keeps the runtime, defrost and reserve cards inside the spacing wrapper.
 
 ## Phase 38D — UI Alias Cleanup
 
@@ -329,26 +321,3 @@ Release-hardening status after Phase 31D:
 - Blocks generated artifacts such as `dist/`, `node_modules/`, coverage output, browser reports, source maps and packaged archives from entering the source release ZIP.
 - Keeps optional esbuild minification explicit through `npm run build:minified`; the standard `npm run build` remains non-emitting.
 - Added `scripts/audit-release-package-hygiene-phase38g.mjs` and wired it into `npm run test:integration`.
-
-
-## Phase 38D.1 — Pufferspeicher Compare Card Spacing Regression
-
-- Fixed a Phase 38D regression where the Pufferspeicher compare-mode input cards could visually collapse into each other.
-- Added `data-buffer-dynamic="input-blocks"` to the shared grid/gap dynamic container rule.
-- Corrected the accidental `.tc-help--inline--inline` selector back to `.tc-help--inline`.
-- Added a focused Phase 38D.1 guard for buffer-storage compare spacing.
-
-
-## Phase 38D.3 — Buffer Storage Compare Spacing Hard Fix
-
-- Hardened Pufferspeicher comparison section spacing with both flex-gap and adjacent-card margin fallback.
-- Covers current `.buffer-compare-sections` markup and older direct-child compare card markup.
-- Bumped service-worker cache name to force CSS/JS invalidation for installed/mobile clients.
-- Added `test:phase38d3` guard for spacing CSS and cache invalidation.
-
-
-## Phase 38D.4 — Buffer Storage Compare Root Cause Fix
-
-- Root cause: compare-mode spacing depended on a dynamic island/generic alias path that could be neutralized after 38D alias cleanup and later partial CSS patches.
-- Fix: compare-mode now renders a dedicated stable wrapper with explicit grid section spacing and a data hook.
-- Guard: `test:phase38d4` verifies the renderer contract and CSS fallback.

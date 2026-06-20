@@ -88,33 +88,23 @@
 .wastewater-subselect > span { color: var(--color-muted); font-size: .78rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }.wastewater-line-selector { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
 .wastewater-line-selector button { scroll-snap-align: center; }
 .tc-collection-row__content { min-width: 0; overflow-wrap: anywhere; }
-.module-view[data-module='drinking-water'] .tc-accordion > summary,
-.module-view[data-module='drinking-water'] .tc-accordion__body,
-.module-view[data-module='drinking-water'] .saved-record-card { padding: var(--tc-gap); }
-.module-view[data-module='drinking-water'] .saved-record-list,
-.module-view[data-module='drinking-water'] .tc-accordion__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }
+.module-view[data-module='drinking-water'] .dw-save-dialog > summary,
+.module-view[data-module='drinking-water'] .dw-save-dialog__body,
+.module-view[data-module='drinking-water'] .dw-save-dialog__record { padding: var(--tc-gap); }
+.module-view[data-module='drinking-water'] .dw-save-dialog__list,
+.module-view[data-module='drinking-water'] .dw-save-dialog__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }
 .module-view[data-module='drinking-water'] .tc-consumer-row > div,
 .module-view[data-module='drinking-water'] .tc-fixture-row > div { display: grid; gap: 4px; min-width: 0; }
 
 /* Pressure holding / buffer storage -------------------------------------- */
-.module-view[data-module='pressure-holding'] .tc-help,
-.module-view[data-module='pressure-holding'] .tc-note,
-.module-view[data-module='buffer-storage'] .tc-help,
-.module-view[data-module='buffer-storage'] .tc-note { font-size: clamp(.78rem,2.5vw,.92rem); }
-.module-view[data-module='pressure-holding'] .tc-formula,
-.module-view[data-module='buffer-storage'] .tc-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }
+.module-view[data-module='pressure-holding'] .ph-help,
+.module-view[data-module='pressure-holding'] .ph-note,
+.module-view[data-module='buffer-storage'] .ph-help,
+.module-view[data-module='buffer-storage'] .ph-note { font-size: clamp(.78rem,2.5vw,.92rem); }
+.module-view[data-module='pressure-holding'] .ph-formula,
+.module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }
 .module-view[data-module='pressure-holding'] .inline-stat span { white-space: normal; font-size: clamp(.62rem,.72vw,.72rem); letter-spacing: .08em; }
 .module-view[data-module='pressure-holding'] .inline-stat strong { font-size: clamp(.8rem,.95vw,.95rem); line-height: 1.12; }
-.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] { display: grid; row-gap: var(--space-2); gap: var(--space-2); align-content: start; }
-.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] > .card,
-.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] > .tc-card,
-.module-view[data-module='buffer-storage'] .buffer-compare-sections > .card,
-.module-view[data-module='buffer-storage'] .buffer-compare-sections > .tc-card { margin: 0; }
-.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] > .card + .card,
-.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] > .tc-card + .tc-card,
-.module-view[data-module='buffer-storage'] .buffer-compare-sections > .card + .card,
-.module-view[data-module='buffer-storage'] .buffer-compare-sections > .tc-card + .tc-card { margin-top: var(--space-2) !important; }
-.module-view[data-module='buffer-storage'] .buffer-compare-sections { display: grid; row-gap: var(--space-2); gap: var(--space-2); align-content: start; }
 .buffer-input-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--tc-gap); align-items: end; }
 .buffer-input-grid--reserve { grid-template-columns: repeat(2,minmax(0,1fr)); }
 .buffer-input-grid > * { min-width: 0; }
@@ -181,32 +171,3 @@
   .wrg-group-grid .inline-stats { grid-template-columns: 1fr; }}
 
 @media (max-width: 480px) {}@media (max-width: 480px) {}
-
-/* Phase 38D.5: buffer compare card spacing owns a real flex stack contract.
-   This must survive dynamic re-rendering and legacy alias cleanup. */
-.module-view[data-module='buffer-storage'] .buffer-input-blocks,
-.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"],
-.module-view[data-module='buffer-storage'] .buffer-compare-sections {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: stretch !important;
-  gap: var(--space-2) !important;
-  row-gap: var(--space-2) !important;
-}
-.module-view[data-module='buffer-storage'] .buffer-input-blocks > .card,
-.module-view[data-module='buffer-storage'] .buffer-input-blocks > .tc-card,
-.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] > .card,
-.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] > .tc-card,
-.module-view[data-module='buffer-storage'] .buffer-compare-sections > .card,
-.module-view[data-module='buffer-storage'] .buffer-compare-sections > .tc-card {
-  flex: 0 0 auto !important;
-  margin-block: 0 !important;
-}
-.module-view[data-module='buffer-storage'] .buffer-input-blocks > .card + .card,
-.module-view[data-module='buffer-storage'] .buffer-input-blocks > .tc-card + .tc-card,
-.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] > .card + .card,
-.module-view[data-module='buffer-storage'] [data-buffer-dynamic="input-blocks"] > .tc-card + .tc-card,
-.module-view[data-module='buffer-storage'] .buffer-compare-sections > .card + .card,
-.module-view[data-module='buffer-storage'] .buffer-compare-sections > .tc-card + .tc-card {
-  margin-top: var(--space-2) !important;
-}

@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-06-20T13:56:10.990Z",
+  "generatedAt": "2026-06-20T15:00:30.479Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -42,9 +42,9 @@
     },
     {
       "file": "css/modules.css",
-      "important": 9,
+      "important": 0,
       "inlineStyleSelectors": 0,
-      "moduleScopedSelectors": 52
+      "moduleScopedSelectors": 27
     },
     {
       "file": "css/tokens.css",
@@ -103,47 +103,22 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 28,
+        "count": 3,
         "samples": [
           {
             "cssFile": "css/modules.css",
             "line": 102,
-            "text": ".module-view[data-module='buffer-storage'] .tc-help,"
+            "text": ".module-view[data-module='buffer-storage'] .ph-help,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 103,
-            "text": ".module-view[data-module='buffer-storage'] .tc-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
+            "text": ".module-view[data-module='buffer-storage'] .ph-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
           },
           {
             "cssFile": "css/modules.css",
             "line": 105,
-            "text": ".module-view[data-module='buffer-storage'] .tc-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 108,
-            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] { display: grid; row-gap: var(--space-2); gap: var(--space-2); align-content: start; }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 109,
-            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .card,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 110,
-            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .tc-card,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 111,
-            "text": ".module-view[data-module='buffer-storage'] .buffer-compare-sections > .card,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 112,
-            "text": ".module-view[data-module='buffer-storage'] .buffer-compare-sections > .tc-card { margin: 0; }"
+            "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
           }
         ]
       }
@@ -168,27 +143,27 @@
           {
             "cssFile": "css/modules.css",
             "line": 91,
-            "text": ".module-view[data-module='drinking-water'] .tc-accordion > summary,"
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog > summary,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 92,
-            "text": ".module-view[data-module='drinking-water'] .tc-accordion__body,"
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 93,
-            "text": ".module-view[data-module='drinking-water'] .saved-record-card { padding: var(--tc-gap); }"
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__record { padding: var(--tc-gap); }"
           },
           {
             "cssFile": "css/modules.css",
             "line": 94,
-            "text": ".module-view[data-module='drinking-water'] .saved-record-list,"
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__list,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 95,
-            "text": ".module-view[data-module='drinking-water'] .tc-accordion__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
           },
           {
             "cssFile": "css/modules.css",
@@ -214,17 +189,17 @@
           {
             "cssFile": "css/modules.css",
             "line": 100,
-            "text": ".module-view[data-module='pressure-holding'] .tc-help,"
+            "text": ".module-view[data-module='pressure-holding'] .ph-help,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 101,
-            "text": ".module-view[data-module='pressure-holding'] .tc-note,"
+            "text": ".module-view[data-module='pressure-holding'] .ph-note,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 104,
-            "text": ".module-view[data-module='pressure-holding'] .tc-formula,"
+            "text": ".module-view[data-module='pressure-holding'] .ph-formula,"
           },
           {
             "cssFile": "css/modules.css",
@@ -249,42 +224,42 @@
         "samples": [
           {
             "cssFile": "css/modules.css",
-            "line": 126,
+            "line": 116,
             "text": ".module-view[data-module='unit-converter'] #convertedValue,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 127,
+            "line": 117,
             "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 128,
+            "line": 118,
             "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 129,
+            "line": 119,
             "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 142,
+            "line": 132,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 143,
+            "line": 133,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 144,
+            "line": 134,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 145,
+            "line": 135,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
           }
         ]
@@ -333,12 +308,12 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 579,
+        "lineCount": 567,
         "controllerAddEventListeners": 0,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 28,
+        "moduleCssSelectors": 3,
         "hasPlatformDynamic": true,
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
@@ -353,47 +328,22 @@
           "area": "css-specialization",
           "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
           "evidence": {
-            "count": 28,
+            "count": 3,
             "samples": [
               {
                 "cssFile": "css/modules.css",
                 "line": 102,
-                "text": ".module-view[data-module='buffer-storage'] .tc-help,"
+                "text": ".module-view[data-module='buffer-storage'] .ph-help,"
               },
               {
                 "cssFile": "css/modules.css",
                 "line": 103,
-                "text": ".module-view[data-module='buffer-storage'] .tc-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
+                "text": ".module-view[data-module='buffer-storage'] .ph-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
               },
               {
                 "cssFile": "css/modules.css",
                 "line": 105,
-                "text": ".module-view[data-module='buffer-storage'] .tc-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 108,
-                "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] { display: grid; row-gap: var(--space-2); gap: var(--space-2); align-content: start; }"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 109,
-                "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .card,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 110,
-                "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .tc-card,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 111,
-                "text": ".module-view[data-module='buffer-storage'] .buffer-compare-sections > .card,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 112,
-                "text": ".module-view[data-module='buffer-storage'] .buffer-compare-sections > .tc-card { margin: 0; }"
+                "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
               }
             ]
           }
@@ -479,27 +429,27 @@
               {
                 "cssFile": "css/modules.css",
                 "line": 91,
-                "text": ".module-view[data-module='drinking-water'] .tc-accordion > summary,"
+                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog > summary,"
               },
               {
                 "cssFile": "css/modules.css",
                 "line": 92,
-                "text": ".module-view[data-module='drinking-water'] .tc-accordion__body,"
+                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body,"
               },
               {
                 "cssFile": "css/modules.css",
                 "line": 93,
-                "text": ".module-view[data-module='drinking-water'] .saved-record-card { padding: var(--tc-gap); }"
+                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__record { padding: var(--tc-gap); }"
               },
               {
                 "cssFile": "css/modules.css",
                 "line": 94,
-                "text": ".module-view[data-module='drinking-water'] .saved-record-list,"
+                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__list,"
               },
               {
                 "cssFile": "css/modules.css",
                 "line": 95,
-                "text": ".module-view[data-module='drinking-water'] .tc-accordion__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
+                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
               },
               {
                 "cssFile": "css/modules.css",
@@ -685,17 +635,17 @@
               {
                 "cssFile": "css/modules.css",
                 "line": 100,
-                "text": ".module-view[data-module='pressure-holding'] .tc-help,"
+                "text": ".module-view[data-module='pressure-holding'] .ph-help,"
               },
               {
                 "cssFile": "css/modules.css",
                 "line": 101,
-                "text": ".module-view[data-module='pressure-holding'] .tc-note,"
+                "text": ".module-view[data-module='pressure-holding'] .ph-note,"
               },
               {
                 "cssFile": "css/modules.css",
                 "line": 104,
-                "text": ".module-view[data-module='pressure-holding'] .tc-formula,"
+                "text": ".module-view[data-module='pressure-holding'] .ph-formula,"
               },
               {
                 "cssFile": "css/modules.css",
@@ -783,42 +733,42 @@
             "samples": [
               {
                 "cssFile": "css/modules.css",
-                "line": 126,
+                "line": 116,
                 "text": ".module-view[data-module='unit-converter'] #convertedValue,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 127,
+                "line": 117,
                 "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 128,
+                "line": 118,
                 "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 129,
+                "line": 119,
                 "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 142,
+                "line": 132,
                 "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 143,
+                "line": 133,
                 "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 144,
+                "line": 134,
                 "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 145,
+                "line": 135,
                 "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
               }
             ]
@@ -1102,47 +1052,22 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 28,
+        "count": 3,
         "samples": [
           {
             "cssFile": "css/modules.css",
             "line": 102,
-            "text": ".module-view[data-module='buffer-storage'] .tc-help,"
+            "text": ".module-view[data-module='buffer-storage'] .ph-help,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 103,
-            "text": ".module-view[data-module='buffer-storage'] .tc-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
+            "text": ".module-view[data-module='buffer-storage'] .ph-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
           },
           {
             "cssFile": "css/modules.css",
             "line": 105,
-            "text": ".module-view[data-module='buffer-storage'] .tc-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 108,
-            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] { display: grid; row-gap: var(--space-2); gap: var(--space-2); align-content: start; }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 109,
-            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .card,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 110,
-            "text": ".module-view[data-module='buffer-storage'] [data-buffer-dynamic=\"input-blocks\"] > .tc-card,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 111,
-            "text": ".module-view[data-module='buffer-storage'] .buffer-compare-sections > .card,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 112,
-            "text": ".module-view[data-module='buffer-storage'] .buffer-compare-sections > .tc-card { margin: 0; }"
+            "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
           }
         ]
       }
@@ -1167,27 +1092,27 @@
           {
             "cssFile": "css/modules.css",
             "line": 91,
-            "text": ".module-view[data-module='drinking-water'] .tc-accordion > summary,"
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog > summary,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 92,
-            "text": ".module-view[data-module='drinking-water'] .tc-accordion__body,"
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 93,
-            "text": ".module-view[data-module='drinking-water'] .saved-record-card { padding: var(--tc-gap); }"
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__record { padding: var(--tc-gap); }"
           },
           {
             "cssFile": "css/modules.css",
             "line": 94,
-            "text": ".module-view[data-module='drinking-water'] .saved-record-list,"
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__list,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 95,
-            "text": ".module-view[data-module='drinking-water'] .tc-accordion__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
+            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
           },
           {
             "cssFile": "css/modules.css",
@@ -1213,17 +1138,17 @@
           {
             "cssFile": "css/modules.css",
             "line": 100,
-            "text": ".module-view[data-module='pressure-holding'] .tc-help,"
+            "text": ".module-view[data-module='pressure-holding'] .ph-help,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 101,
-            "text": ".module-view[data-module='pressure-holding'] .tc-note,"
+            "text": ".module-view[data-module='pressure-holding'] .ph-note,"
           },
           {
             "cssFile": "css/modules.css",
             "line": 104,
-            "text": ".module-view[data-module='pressure-holding'] .tc-formula,"
+            "text": ".module-view[data-module='pressure-holding'] .ph-formula,"
           },
           {
             "cssFile": "css/modules.css",
@@ -1248,42 +1173,42 @@
         "samples": [
           {
             "cssFile": "css/modules.css",
-            "line": 126,
+            "line": 116,
             "text": ".module-view[data-module='unit-converter'] #convertedValue,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 127,
+            "line": 117,
             "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 128,
+            "line": 118,
             "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 129,
+            "line": 119,
             "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 142,
+            "line": 132,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 143,
+            "line": 133,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 144,
+            "line": 134,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 145,
+            "line": 135,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
           }
         ]

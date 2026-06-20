@@ -1,5 +1,5 @@
 const CACHE_NAME = 'techcalc-pro-1.3.0-rc.1';
-const CACHE_REVISION = 'phase38d5-buffer-compare-spacing';
+const CACHE_REVISION = 'phase38d6-buffer-compare-rollback';
 const ASSETS = [
   './',
   './index.html',
