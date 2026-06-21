@@ -1,3 +1,11 @@
+## Phase 39C — Service Worker Version Injection
+
+- Service-Worker-Cache-Name wird jetzt vom Precache-Generator aus `package.json` (`name` + `version`) abgeleitet.
+- `scripts/generate-precache-manifest.mjs --check` validiert nun Manifest und Cache-Version ohne Schreibzugriff.
+- Phase-37B.3-Service-Worker-Audit auf dynamische Paketversion statt hardkodierter RC-Version umgestellt.
+- Neuer Guard: `scripts/audit-service-worker-version-injection-phase39c.mjs` im Integration-Gate.
+- Keine Fachlogik geändert.
+
 
 ## Phase 38D.10 — Pufferspeicher Vergleich vollständig entfernt
 

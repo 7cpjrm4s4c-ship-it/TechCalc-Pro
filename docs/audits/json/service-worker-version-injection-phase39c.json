@@ -1,0 +1,28 @@
+{
+  "phase": "39C",
+  "name": "Service Worker Version Injection",
+  "status": "passed",
+  "expectedCacheName": "techcalc-pro-1.3.0-rc.1",
+  "checks": [
+    {
+      "id": "service-worker:cache-name-from-package-version",
+      "status": "passed",
+      "detail": "service-worker cache name matches package.json name and version"
+    },
+    {
+      "id": "generator:updates-cache-name",
+      "status": "passed",
+      "detail": "precache generator owns CACHE_NAME injection as well as ASSETS injection"
+    },
+    {
+      "id": "generator:check-mode-validates-cache-name",
+      "status": "passed",
+      "detail": "precache --check fails when service-worker cache name or manifest is stale"
+    },
+    {
+      "id": "integration:version-guard-covered",
+      "status": "passed",
+      "detail": "phase39c service-worker version guard is part of the consolidated integration gate"
+    }
+  ]
+}

@@ -52,7 +52,8 @@ check('offline-precache:no-stale-assets', staleAssets.length === 0, 'service wor
 check('offline-precache:all-js-modules', listFiles('js', file => file.endsWith('.js')).every(asset => cachedSet.has(asset)), 'all JavaScript modules are available after first install');
 check('offline-strategy:navigation-fallback', /event\.request\.mode === 'navigate'/.test(serviceWorker) && /caches\.match\('\.\/index\.html'\)/.test(serviceWorker), 'offline navigation falls back to cached shell');
 check('offline-strategy:cache-first-refresh', /cacheFirstWithRefresh/.test(serviceWorker) && /fetchFresh\(request\);/.test(serviceWorker), 'static assets use cache-first with background refresh');
-check('offline-update:versioned-cache', /const CACHE_NAME = 'techcalc-pro-1\.3\.0-rc\.1'/.test(serviceWorker), 'cache name is versioned for deterministic updates');
+const expectedCacheName = `${packageJson.name}-${packageJson.version}`;
+check('offline-update:versioned-cache', serviceWorker.includes(`const CACHE_NAME = '${expectedCacheName}';`), 'cache name is derived from package.json version for deterministic updates', { expectedCacheName });
 check('offline-update:skip-waiting', /self\.skipWaiting\(\)/.test(serviceWorker), 'new service worker activates immediately after install');
 check('offline-update:client-claim', /self\.clients\.claim\(\)/.test(serviceWorker), 'activated worker claims open clients');
 check('offline-update:post-message', /TECHCALC_CACHE_UPDATED/.test(serviceWorker), 'clients receive cache update notification');
