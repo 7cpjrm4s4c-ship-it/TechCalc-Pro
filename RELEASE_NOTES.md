@@ -1,3 +1,12 @@
+## Phase 39G — Service Worker Metadata Display Fix
+
+- Service-Worker-Revision wird jetzt automatisch aus `package.json` und dem aktuellen Release-Notes-Heading erzeugt.
+- Release-Notes-Parser unterstützt Phase-Headings ohne explizite Versionsnummer.
+- Versionsanzeige synchronisiert `data-app-version-current`, `#appVersion` und Feedback-Hidden-Input.
+- Phase-38D.10-Guard akzeptiert die generierte Service-Worker-Revision statt eines alten hardkodierten Revisionsstrings.
+- Keine Fachlogik geändert.
+
+
 ## Phase 39F — Feedback Offline Fallback
 
 - Feedback-Formular erkennt Offline-Zustand über `navigator.onLine` und ruft dann keinen Netzwerk-Submit auf.

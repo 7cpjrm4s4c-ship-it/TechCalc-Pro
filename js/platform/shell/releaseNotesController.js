@@ -15,9 +15,18 @@ export function parseReleaseNotes(markdown = '') {
   for (const rawLine of lines) {
     const line = rawLine.trim();
     if (!line) continue;
-    const heading = line.match(/^#{1,3}\s+(?:TechCalc\s+Pro\s+)?(?:Version\s+)?([0-9]+\.[0-9]+\.[0-9]+(?:[-.]rc\.?\d+)?)\s*(?:[-–]\s*(.*))?$/i);
+    const heading = line.match(/^#{1,3}\s+(.*)$/);
     if (heading) {
-      current = { version: heading[1], title: heading[2] || '', items: [] };
+      const text = heading[1].trim();
+      const versionHeading = text.match(/^(?:TechCalc\s+Pro\s+)?(?:Version\s+)?([0-9]+\.[0-9]+\.[0-9]+(?:[-.]rc\.?\d+)?)\s*(?:[·-–]\s*(.*))?$/i);
+      const phaseHeading = text.match(/^(Phase\s+\d+[A-Z]?(?:\.\d+)?)\s*(?:[·-–]\s*(.*))?$/i);
+      if (versionHeading) {
+        current = { version: versionHeading[1], title: versionHeading[2] || '', items: [] };
+      } else if (phaseHeading) {
+        current = { version: phaseHeading[1], title: phaseHeading[2] || '', items: [] };
+      } else {
+        current = { version: text, title: '', items: [] };
+      }
       notes.push(current);
       continue;
     }
@@ -57,6 +66,9 @@ export function initializeReleaseNotesController({
   releaseNotesControllerInitialized = true;
 
   if (versionHost) versionHost.textContent = appVersion;
+  const legacyVersionHost = document.getElementById('appVersion');
+  if (legacyVersionHost) legacyVersionHost.textContent = appVersion;
+  document.querySelectorAll?.('input[name="version"]').forEach(input => { input.value = appVersion; });
 
   return loadReleaseNotes({ appVersion, releaseNotesUrl, fallback, host, fetchImpl });
 }

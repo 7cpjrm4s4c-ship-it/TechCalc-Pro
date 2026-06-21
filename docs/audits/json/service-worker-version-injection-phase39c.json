@@ -3,6 +3,7 @@
   "name": "Service Worker Version Injection",
   "status": "passed",
   "expectedCacheName": "techcalc-pro-1.3.0-rc.1",
+  "expectedRevisionPrefix": "1.3.0-rc.1-",
   "checks": [
     {
       "id": "service-worker:cache-name-from-package-version",
@@ -13,6 +14,11 @@
       "id": "generator:updates-cache-name",
       "status": "passed",
       "detail": "precache generator owns CACHE_NAME injection as well as ASSETS injection"
+    },
+    {
+      "id": "service-worker:cache-revision-from-release-notes",
+      "status": "passed",
+      "detail": "service-worker revision includes package version and current release-notes heading"
     },
     {
       "id": "generator:check-mode-validates-cache-name",

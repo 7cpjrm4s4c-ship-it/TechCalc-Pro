@@ -55,6 +55,10 @@ const runtimeResult = calculate({ ...baselineState, calculationMode: 'runtime' }
 if (result.decisiveVolume !== runtimeResult.decisiveVolume) fail('legacy compare calculation must fall back to runtime');
 
 const sw = fs.readFileSync('service-worker.js', 'utf8');
-if (!/phase38d10-buffer-compare-code-removal/.test(sw)) fail('service worker revision was not bumped for compare removal');
+if (!/const CACHE_REVISION = '[^']+';/.test(sw)) fail('service worker revision declaration is missing');
+if (/phase38d10-buffer-compare-code-removal/.test(sw)) {
+  console.warn('Phase 38D.10 fixed revision is still present; newer builds should use generated release revision.');
+}
+if (!/const CACHE_REVISION = '[^']*1\.3\.0-rc\.1[^']*';/.test(sw)) fail('service worker revision must include the package version after generated revision injection');
 
 console.log('Phase 38D.10 buffer compare full removal guard passed.');

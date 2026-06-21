@@ -9,6 +9,7 @@ const generator = read('scripts/generate-precache-manifest.mjs');
 const integration = read('scripts/test-integration.mjs');
 
 const expectedCacheName = `${pkg.name}-${pkg.version}`;
+const expectedRevisionPrefix = `${pkg.version}-`;
 const checks = [];
 function check(id, passed, detail) {
   checks.push({ id, status: passed ? 'passed' : 'failed', detail });
@@ -22,8 +23,15 @@ check(
 
 check(
   'generator:updates-cache-name',
-  /function packageCacheName\(\)/.test(generator) && /replace\(\/const CACHE_NAME = '\[\^'\]\+';\//.test(generator),
+  generator.includes('function packageCacheName(') && generator.includes("source.replace(/const CACHE_NAME = '[^']+';/"),
   'precache generator owns CACHE_NAME injection as well as ASSETS injection'
+);
+
+
+check(
+  'service-worker:cache-revision-from-release-notes',
+  serviceWorker.includes(`const CACHE_REVISION = '${expectedRevisionPrefix}`),
+  'service-worker revision includes package version and current release-notes heading'
 );
 
 check(
@@ -43,6 +51,7 @@ const report = {
   name: 'Service Worker Version Injection',
   status: checks.every(item => item.status === 'passed') ? 'passed' : 'failed',
   expectedCacheName,
+  expectedRevisionPrefix,
   checks
 };
 
