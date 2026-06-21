@@ -1,8 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { transform } from 'esbuild';
 
 const root = process.cwd();
+const packageJsonPath = path.join(root, 'package.json');
 const outDir = path.join(root, 'dist');
 
 const COPY_ENTRIES = [
@@ -17,8 +19,8 @@ const COPY_ENTRIES = [
   'docs/legal'
 ];
 
-function exists(relativePath) {
-  return fs.existsSync(path.join(root, relativePath));
+function readPackageJson() {
+  return JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 }
 
 function copyEntry(relativePath) {
@@ -65,6 +67,34 @@ async function minifyFile(filePath) {
   fs.writeFileSync(filePath, result.code);
 }
 
+function hashFile(filePath) {
+  return createHash('sha256').update(fs.readFileSync(filePath)).digest('hex');
+}
+
+function artifactFiles() {
+  return walkFiles(outDir, file => true).map(file => path.relative(outDir, file).replaceAll(path.sep, '/'));
+}
+
+function writeBuildMetadata(minifiedFiles) {
+  const pkg = readPackageJson();
+  const files = artifactFiles();
+  const manifest = {
+    name: pkg.name,
+    version: pkg.version,
+    artifact: `${pkg.name}-${pkg.version}`,
+    buildPath: 'dist/',
+    generatedAt: new Date(0).toISOString(),
+    minification: {
+      tool: 'esbuild',
+      bundling: false,
+      files: minifiedFiles.map(file => path.relative(outDir, file).replaceAll(path.sep, '/')).sort()
+    },
+    files: files.map(file => ({ path: file, sha256: hashFile(path.join(outDir, file)) }))
+  };
+
+  fs.writeFileSync(path.join(outDir, 'build-info.json'), `${JSON.stringify(manifest, null, 2)}\n`);
+}
+
 fs.rmSync(outDir, { recursive: true, force: true });
 fs.mkdirSync(outDir, { recursive: true });
 
@@ -75,10 +105,13 @@ const minifyTargets = [
   ...walkFiles(path.join(outDir, 'css'), file => path.extname(file) === '.css')
 ];
 
-if (exists('service-worker.js')) {
-  minifyTargets.push(path.join(outDir, 'service-worker.js'));
+const serviceWorkerPath = path.join(outDir, 'service-worker.js');
+if (fs.existsSync(serviceWorkerPath)) {
+  minifyTargets.push(serviceWorkerPath);
 }
 
 for (const file of minifyTargets) await minifyFile(file);
+writeBuildMetadata(minifyTargets);
 
-console.log(`static assets minified to dist/ (${minifyTargets.length} files, no bundling)`);
+const pkg = readPackageJson();
+console.log(`${pkg.name}-${pkg.version} deploy artifact generated at dist/ (${minifyTargets.length} minified files, no bundling)`);

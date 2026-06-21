@@ -1,3 +1,12 @@
+
+## Phase 39B — Versioned Build Artifact Correction
+
+- `build:minified` now produces a deterministic `dist/` deploy artifact.
+- `dist/build-info.json` records package name, version, artifact id, minification mode and SHA-256 file manifest.
+- Added `netlify.toml` so Netlify builds with `npm run build:minified` and publishes `dist`.
+- Added `audit:artifacts` / `scripts/audit-versioned-build-artifact-phase39b.mjs`.
+- Added `.gitignore` entries for generated build and test artifacts.
+
 ## Phase 39C — Service Worker Version Injection
 
 - Service-Worker-Cache-Name wird jetzt vom Precache-Generator aus `package.json` (`name` + `version`) abgeleitet.

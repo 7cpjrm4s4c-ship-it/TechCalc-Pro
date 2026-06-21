@@ -12,7 +12,8 @@
     "serve:static": "node scripts/serve-static.mjs",
     "audit:imports": "node scripts/check-js-imports.mjs",
     "build:minified": "node scripts/generate-precache-manifest.mjs && node scripts/check-js-imports.mjs && node scripts/minify-static-assets.mjs",
-    "audit:scripts": "node scripts/audit-package-script-hygiene-phase39a.mjs"
+    "audit:scripts": "node scripts/audit-package-script-hygiene-phase39a.mjs",
+    "audit:artifacts": "node scripts/audit-versioned-build-artifact-phase39b.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.28.1"
