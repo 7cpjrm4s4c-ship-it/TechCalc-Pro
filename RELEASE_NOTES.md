@@ -351,3 +351,10 @@ Release-hardening status after Phase 31D:
 - Fixed Netlify dependency installation failure caused by internal Artifactory `resolved` URLs in `package-lock.json`.
 - Added `.npmrc` pinning installs to `https://registry.npmjs.org/`.
 - Added `test:phase38h` guard to block private/internal npm registry references in npm/Netlify config files.
+
+## Phase 39A — Release Script Hygiene
+
+- Removed phase-specific `test:phase*` npm scripts from `package.json`.
+- Added `scripts/audit-package-script-hygiene-phase39a.mjs` to prevent `test:phase*` scripts from regrowing.
+- Wired the script hygiene audit into the integration gate.
+- Kept historical phase audit files in `scripts/`; they remain callable directly by `node` and/or through the integration gate.

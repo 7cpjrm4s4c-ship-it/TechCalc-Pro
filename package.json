@@ -11,12 +11,8 @@
     "test:e2e": "playwright test",
     "serve:static": "node scripts/serve-static.mjs",
     "audit:imports": "node scripts/check-js-imports.mjs",
-    "test:phase38f": "node scripts/audit-esbuild-minification-phase38f.mjs",
     "build:minified": "node scripts/generate-precache-manifest.mjs && node scripts/check-js-imports.mjs && node scripts/minify-static-assets.mjs",
-    "test:phase38g": "node scripts/audit-release-package-hygiene-phase38g.mjs",
-    "test:phase38d9": "node scripts/audit-buffer-storage-remove-compare-phase38d9.mjs",
-    "test:phase38d10": "node scripts/audit-buffer-storage-remove-compare-phase38d10.mjs",
-    "test:phase38h": "node scripts/audit-netlify-npm-registry-phase38h.mjs"
+    "audit:scripts": "node scripts/audit-package-script-hygiene-phase39a.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.28.1"

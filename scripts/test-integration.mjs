@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 const commands = [
   ['node', ['scripts/generate-precache-manifest.mjs', '--check']],
   ['node', ['scripts/check-js-imports.mjs']],
+  ['node', ['scripts/audit-package-script-hygiene-phase39a.mjs']],
   ['node', ['scripts/audit-module-smoke-phase31c.mjs']],
   ['node', ['scripts/audit-platform-convergence-phase37a.mjs']],
   ['node', ['scripts/audit-browser-runtime-phase37b2.mjs']],
@@ -18,7 +19,8 @@ const commands = [
   ['node', ['scripts/audit-buffer-storage-remove-compare-phase38d10.mjs']],
   ['node', ['scripts/audit-low-end-mobile-rendering-phase38e.mjs']],
   ['node', ['scripts/audit-esbuild-minification-phase38f.mjs']],
-  ['node', ['scripts/audit-release-package-hygiene-phase38g.mjs']]
+  ['node', ['scripts/audit-release-package-hygiene-phase38g.mjs']],
+  ['node', ['scripts/audit-netlify-npm-registry-phase38h.mjs']]
 ];
 
 for (const [cmd, args] of commands) {
