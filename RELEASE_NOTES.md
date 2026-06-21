@@ -1,3 +1,11 @@
+## Phase 39F — Feedback Offline Fallback
+
+- Feedback-Formular erkennt Offline-Zustand über `navigator.onLine` und ruft dann keinen Netzwerk-Submit auf.
+- Feedback-Payloads werden bei Offline, fehlendem `fetch` oder fehlgeschlagenem Submit lokal unter `techcalc.feedback.offlineQueue.v1` zwischengespeichert.
+- Nutzer erhalten eine sichtbare Statusmeldung statt eines stillen Fehlers.
+- Ergänzt `audit:feedback-offline`, `scripts/audit-feedback-offline-fallback-phase39f.mjs` und `tests/platform-feedback-offline-fallback-phase39f.test.mjs` im Integration-Gate.
+- Keine Berechnungslogik geändert.
+
 
 ## Phase 39B — Versioned Build Artifact Correction
 

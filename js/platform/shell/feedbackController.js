@@ -1,17 +1,66 @@
 const DEFAULT_FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
+const FEEDBACK_OFFLINE_QUEUE_KEY = 'techcalc.feedback.offlineQueue.v1';
 
 let feedbackControllerInitialized = false;
+
+function getNavigatorOnline(navigatorRef) {
+  return !navigatorRef || typeof navigatorRef.onLine !== 'boolean' ? true : navigatorRef.onLine;
+}
+
+function formDataToObject(data) {
+  return Object.fromEntries(Array.from(data.entries()).map(([key, value]) => [key, String(value)]));
+}
+
+function readOfflineQueue(storage) {
+  if (!storage) return [];
+  try {
+    const value = storage.getItem(FEEDBACK_OFFLINE_QUEUE_KEY);
+    if (!value) return [];
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeOfflineQueue(storage, queue) {
+  if (!storage) return false;
+  try {
+    storage.setItem(FEEDBACK_OFFLINE_QUEUE_KEY, JSON.stringify(queue));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function saveOfflineFeedback(storage, payload, reason) {
+  const queue = readOfflineQueue(storage);
+  queue.push({
+    savedAt: new Date().toISOString(),
+    reason,
+    payload: formDataToObject(payload)
+  });
+  return writeOfflineQueue(storage, queue);
+}
 
 export function initializeFeedbackController({
   appVersion = '1.3.0-rc.1',
   endpoint = DEFAULT_FEEDBACK_ENDPOINT,
-  form = document.getElementById('feedbackForm'),
-  status = document.getElementById('feedbackStatus'),
-  submit = document.getElementById('feedbackSubmit'),
-  subject = document.getElementById('feedbackSubject'),
+  form = null,
+  status = null,
+  submit = null,
+  subject = null,
   getRoute = () => '',
-  fetchImpl = typeof fetch === 'function' ? fetch.bind(globalThis) : null
+  fetchImpl = typeof fetch === 'function' ? fetch.bind(globalThis) : null,
+  storage = typeof localStorage !== 'undefined' ? localStorage : null,
+  navigatorRef = typeof navigator !== 'undefined' ? navigator : null
 } = {}) {
+  const doc = typeof document !== 'undefined' ? document : null;
+  form = form || doc?.getElementById('feedbackForm') || null;
+  status = status || doc?.getElementById('feedbackStatus') || null;
+  submit = submit || doc?.getElementById('feedbackSubmit') || null;
+  subject = subject || doc?.getElementById('feedbackSubject') || null;
+
   if (feedbackControllerInitialized) return false;
   feedbackControllerInitialized = true;
   if (!form) return false;
@@ -26,9 +75,24 @@ export function initializeFeedbackController({
     const data = new FormData(form);
     data.set('version', appVersion);
     data.set('route', getRoute());
-    data.set('userAgent', navigator.userAgent || '');
+    data.set('userAgent', navigatorRef?.userAgent || '');
     data.set('timestamp', new Date().toISOString());
     return data;
+  }
+
+  function saveForLater(payload, reason) {
+    const saved = saveOfflineFeedback(storage, payload, reason);
+    if (saved) {
+      setStatus('Feedback wurde lokal zwischengespeichert. Bitte später mit Netz erneut senden.', 'pending');
+      return true;
+    }
+    setStatus('Feedback konnte nicht gesendet oder lokal gespeichert werden. Bitte kopiere die Nachricht und versuche es später erneut.', 'error');
+    return false;
+  }
+
+  const pendingCount = readOfflineQueue(storage).length;
+  if (pendingCount > 0) {
+    setStatus(`${pendingCount} Feedback-Entwurf(e) sind lokal zwischengespeichert. Bitte bei Netz erneut senden.`, 'pending');
   }
 
   form.addEventListener('submit', async event => {
@@ -36,8 +100,15 @@ export function initializeFeedbackController({
     setStatus('', '');
     if (!form.reportValidity()) return;
 
+    const payload = buildPayload();
+
+    if (!getNavigatorOnline(navigatorRef)) {
+      saveForLater(payload, 'offline');
+      return;
+    }
+
     if (!fetchImpl) {
-      setStatus('Feedback konnte nicht direkt gesendet werden. Bitte später erneut versuchen.', 'error');
+      saveForLater(payload, 'fetch-unavailable');
       return;
     }
 
@@ -50,7 +121,7 @@ export function initializeFeedbackController({
     try {
       const response = await fetchImpl(endpoint, {
         method: 'POST',
-        body: buildPayload(),
+        body: payload,
         headers: { Accept: 'application/json' }
       });
 
@@ -60,7 +131,7 @@ export function initializeFeedbackController({
       setStatus('Feedback wurde gesendet. Danke!', 'success');
     } catch (error) {
       console.error('Feedback konnte nicht gesendet werden:', error);
-      setStatus('Feedback konnte nicht direkt gesendet werden. Bitte später erneut versuchen.', 'error');
+      saveForLater(payload, 'send-failed');
     } finally {
       if (submit) {
         submit.disabled = false;
