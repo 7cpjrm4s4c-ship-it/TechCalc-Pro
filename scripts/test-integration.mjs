@@ -6,6 +6,7 @@ const commands = [
   ['node', ['scripts/audit-package-script-hygiene-phase39a.mjs']],
   ['node', ['scripts/audit-service-worker-version-injection-phase39c.mjs']],
   ['node', ['scripts/audit-core-module-preload-phase39d.mjs']],
+  ['node', ['scripts/audit-manifest-icons-phase39e.mjs']],
   ['node', ['scripts/audit-module-smoke-phase31c.mjs']],
   ['node', ['scripts/audit-platform-convergence-phase37a.mjs']],
   ['node', ['scripts/audit-browser-runtime-phase37b2.mjs']],

@@ -382,3 +382,10 @@ Release-hardening status after Phase 31D:
 - Kept ES module structure unchanged; no bundling introduced.
 - Added `scripts/audit-core-module-preload-phase39d.mjs` to the integration gate.
 
+
+## Phase 39E — Manifest Icon Correction
+
+- Split PWA manifest icon purposes into separate `any` and `maskable` entries.
+- Removed combined `purpose: "any maskable"` declarations from `manifest.json`.
+- Added `scripts/audit-manifest-icons-phase39e.mjs` and `audit:manifest-icons`.
+- Wired the manifest icon audit into the integration gate.
