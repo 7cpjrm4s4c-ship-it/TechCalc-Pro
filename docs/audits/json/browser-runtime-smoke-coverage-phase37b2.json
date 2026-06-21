@@ -2,7 +2,7 @@
   "phase": "37B.2",
   "name": "Browser Runtime Smoke Coverage Expansion",
   "status": "passed",
-  "generatedAt": "2026-06-21T07:30:08.553Z",
+  "generatedAt": "2026-06-21T13:38:27.140Z",
   "coverage": {
     "modules": 11,
     "scenarios": [

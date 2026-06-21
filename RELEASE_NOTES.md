@@ -375,3 +375,10 @@ Release-hardening status after Phase 31D:
 - Added `scripts/audit-package-script-hygiene-phase39a.mjs` to prevent `test:phase*` scripts from regrowing.
 - Wired the script hygiene audit into the integration gate.
 - Kept historical phase audit files in `scripts/`; they remain callable directly by `node` and/or through the integration gate.
+
+## Phase 39D — Core Module Preload
+
+- Added `rel="modulepreload"` hints for the critical app shell module graph.
+- Kept ES module structure unchanged; no bundling introduced.
+- Added `scripts/audit-core-module-preload-phase39d.mjs` to the integration gate.
+
