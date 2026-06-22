@@ -1,3 +1,103 @@
+# Version 1.3.0 — Official Deployment Metadata Fix
+
+Aktuelle Versionsanzeige wird aus der finalen `1.3.0`-Release-Notes-Quelle synchronisiert. Version-kritische App-Shell-Dateien werden im Service Worker network-first behandelt, damit alte `1.3.0-rc.1`-Caches die Anzeige nicht mehr überlagern.
+
+## Version 1.3.0 — Official Deployment
+
+- RC-Phase abgeschlossen und Version auf `1.3.0` finalisiert.
+- Service-Worker-Cache, App-Version, Feedback-Metadaten und Release-Notes-Anzeige auf `1.3.0` synchronisiert.
+- Netlify-Entwicklungspaket und neutrales Drittanbieter-Deploy-Artefakt werden getrennt ausgeliefert.
+- Release-Pfad: `npm ci` → `npm run build:minified` → Deployment von `dist/`.
+
+## Phase 39I — Button Accent Finalization
+
+- HX-Diagramm: `Diagramm leeren` nutzt jetzt die reguläre blaue Aktzentfläche statt Ghost/Grau.
+- Schmutzwasser: `Gegenstand hinzufügen` nutzt die reguläre Aktzentfläche.
+- Trinkwasser: `Verbraucher zur Nutzungseinheit hinzufügen` und `Verbraucher zur Gruppe hinzufügen` nutzen die reguläre Aktzentfläche.
+- Layout/DOM-Anordnung bleibt unverändert; es wurde nur die Button-Variante angepasst.
+
+## Phase 39H — RC UI/State Bugfixes
+
+- Trinkwasser-Draft-Verbraucher nutzen jetzt denselben Collection-/Mengenfeld-Layoutvertrag wie Schmutzwasser.
+- h,x gespeicherte Prozesse hydratisieren sichtbare Eingabefelder wieder direkt aus dem gespeicherten Snapshot.
+- h,x gespeicherte Prozessauswahl aktualisiert Prozessauswahl, Ergebnisliste und Diagramm sofort im dynamischen Pfad.
+- h,x „Diagramm leeren“ läuft nicht mehr in den reinen Saved-Records-Refresh, sondern leert auch Diagramm- und Ergebnis-Islands.
+- Ergänzt `audit:rc-ui-state` im Integration-Gate.
+- Keine Berechnungslogik geändert.
+
+
+## Phase 39G — Service Worker Metadata Display Fix
+
+- Service-Worker-Revision wird jetzt automatisch aus `package.json` und dem aktuellen Release-Notes-Heading erzeugt.
+- Release-Notes-Parser unterstützt Phase-Headings ohne explizite Versionsnummer.
+- Versionsanzeige synchronisiert `data-app-version-current`, `#appVersion` und Feedback-Hidden-Input.
+- Phase-38D.10-Guard akzeptiert die generierte Service-Worker-Revision statt eines alten hardkodierten Revisionsstrings.
+- Keine Fachlogik geändert.
+
+
+## Phase 39F — Feedback Offline Fallback
+
+- Feedback-Formular erkennt Offline-Zustand über `navigator.onLine` und ruft dann keinen Netzwerk-Submit auf.
+- Feedback-Payloads werden bei Offline, fehlendem `fetch` oder fehlgeschlagenem Submit lokal unter `techcalc.feedback.offlineQueue.v1` zwischengespeichert.
+- Nutzer erhalten eine sichtbare Statusmeldung statt eines stillen Fehlers.
+- Ergänzt `audit:feedback-offline`, `scripts/audit-feedback-offline-fallback-phase39f.mjs` und `tests/platform-feedback-offline-fallback-phase39f.test.mjs` im Integration-Gate.
+- Keine Berechnungslogik geändert.
+
+
+## Phase 39B — Versioned Build Artifact Correction
+
+- `build:minified` now produces a deterministic `dist/` deploy artifact.
+- `dist/build-info.json` records package name, version, artifact id, minification mode and SHA-256 file manifest.
+- Added `netlify.toml` so Netlify builds with `npm run build:minified` and publishes `dist`.
+- Added `audit:artifacts` / `scripts/audit-versioned-build-artifact-phase39b.mjs`.
+- Added `.gitignore` entries for generated build and test artifacts.
+
+## Phase 39C — Service Worker Version Injection
+
+- Service-Worker-Cache-Name wird jetzt vom Precache-Generator aus `package.json` (`name` + `version`) abgeleitet.
+- `scripts/generate-precache-manifest.mjs --check` validiert nun Manifest und Cache-Version ohne Schreibzugriff.
+- Phase-37B.3-Service-Worker-Audit auf dynamische Paketversion statt hardkodierter RC-Version umgestellt.
+- Neuer Guard: `scripts/audit-service-worker-version-injection-phase39c.mjs` im Integration-Gate.
+- Keine Fachlogik geändert.
+
+
+## Phase 38D.10 — Pufferspeicher Vergleich vollständig entfernt
+
+- Entfernt den Vergleich als auswählbare Berechnungsart vollständig aus dem Pufferspeicher-Pfad.
+- Erzwingt genau drei zulässige Berechnungsarten: Mindestlaufzeit, Abtauung, Wasservorlage.
+- Normalisiert alte gespeicherte `compare`-States weiterhin defensiv auf `runtime`.
+- Erhöht die Service-Worker-Revision, damit Mobile-Clients keine alte Switch-Struktur aus dem Cache behalten.
+- Ergänzt `test:phase38d10` gegen erneute Compare-Strukturen im Pufferspeicher-Modul.
+
+# Phase 38D.6 – Buffer Storage Compare Regression Rollback
+
+- Reverts the risky 38D visual alias cleanup for the Pufferspeicher render path to the last known good 38C contract.
+- Keeps 38E low-end rendering hardening, 38F optional esbuild minification and 38G package hygiene.
+- Bumps the service-worker cache name so mobile/PWA clients cannot continue using stale CSS/JS.
+
+## Phase 38E — Low-End Mobile Rendering Hardening
+
+- Moved active `backdrop-filter` / `-webkit-backdrop-filter` blur usage behind explicit `@supports` blocks.
+- Added opaque fallback backgrounds for cards, app header, safe-area header and module navigation.
+- Kept deliberate `backdrop-filter: none` guards for settings surfaces unchanged.
+- Added `scripts/audit-low-end-mobile-rendering-phase38e.mjs` to the integration gate.
+- Keine Fachlogik geändert.
+
+
+## Phase 38D — UI Alias Cleanup
+
+- Removed visual `dw-*` / `ph-*` class aliases from shared component CSS and module markup.
+- Kept semantic module data hooks such as `data-dw-*`, `data-ph-*` and h,x diagram-specific classes intact.
+- Added `scripts/audit-ui-alias-cleanup-phase38d.mjs` to the integration gate to prevent visual alias regressions before RC freeze.
+
+## 1.3.0-rc.1 · Phase 38B – Test Script Consolidation
+
+- `package.json` auf die RC-Standard-Gates `test`, `test:integration` und `test:e2e` reduziert.
+- Schneller lokaler Testlauf in `scripts/test-fast.mjs` ausgelagert.
+- Integrations-Gate in `scripts/test-integration.mjs` gebündelt.
+- Historische Phase-Tests bleiben im Repository, sind aber nicht mehr als einzelne npm-Standard-Scripts exponiert.
+- Phase-37-Audits auf die konsolidierte Script-Oberfläche angepasst.
+- Keine Fachlogik geändert.
 
 ## Phase 37F – AGB Integration
 
@@ -270,3 +370,73 @@ Release-hardening status after Phase 31D:
 - Zurück-zur-App-Link ergänzt (`../../index.html`).
 - Guard `test:phase37f1` ergänzt.
 
+## 1.3.0-rc.1 · Phase 38C – Accessibility / Viewport Fix
+
+- `user-scalable=no` aus dem App-Viewport entfernt.
+- `maximum-scale=1` entfernt, damit Browser-Zoom nicht künstlich begrenzt wird.
+- `width=device-width`, `initial-scale=1` und `viewport-fit=cover` bleiben erhalten.
+- Guard ergänzt: `tests/platform-viewport-accessibility-phase38c.test.mjs`.
+- Keine Änderung an Modul-, Berechnungs- oder Service-Worker-Logik.
+
+## Phase 38F — Optional esbuild Minification
+
+- Added `esbuild` as a development dependency.
+- Added `scripts/minify-static-assets.mjs` for static asset minification into `dist/`.
+- Preserved the existing ES-module file graph: no bundling, no import rewriting, no runtime path changes.
+- Added optional `npm run build:minified` so the deployable `dist/` artifact is generated after precache generation and import validation, while keeping the standard build path unchanged.
+- Added `scripts/audit-esbuild-minification-phase38f.mjs` and wired it into `npm run test:integration`.
+
+## Phase 38G — RC Package Hygiene Closure
+
+- Added a final release-package hygiene guard for RC-freeze readiness.
+- Blocks generated artifacts such as `dist/`, `node_modules/`, coverage output, browser reports, source maps and packaged archives from entering the source release ZIP.
+- Keeps optional esbuild minification explicit through `npm run build:minified`; the standard `npm run build` remains non-emitting.
+- Added `scripts/audit-release-package-hygiene-phase38g.mjs` and wired it into `npm run test:integration`.
+
+## Phase 38D.7 — Buffer Storage Compare Stack Root Fix
+
+- Fixes the persistent Pufferspeicher compare-mode card spacing regression at the renderer boundary.
+- `renderInputBlocks(vm)` now wraps compare-mode cards in a dedicated `.tc-stack.buffer-compare-stack`.
+- Adds explicit grid/gap ownership for `[data-buffer-dynamic="input-blocks"]` and `.buffer-compare-stack`.
+- Adds a margin fallback for adjacent compare cards and a static/render audit `test:phase38d7`.
+
+
+## Phase 38D.8 — Buffer Storage Compare Global Stack Fix
+
+- Moves the Pufferspeicher `input-blocks` dynamic island onto the global `.tc-stack` spacing contract.
+- Removes the module-specific compare spacing workaround from `css/modules.css`.
+- Compare mode again renders the three input cards as direct children of a globally spaced stack.
+- Adds `test:phase38d8` to prevent competing buffer compare spacing exceptions from returning.
+
+## Phase 38H — Netlify npm Registry Fix
+
+- Fixed Netlify dependency installation failure caused by internal Artifactory `resolved` URLs in `package-lock.json`.
+- Added `.npmrc` pinning installs to `https://registry.npmjs.org/`.
+- Added `test:phase38h` guard to block private/internal npm registry references in npm/Netlify config files.
+
+## Phase 39A — Release Script Hygiene
+
+- Removed phase-specific `test:phase*` npm scripts from `package.json`.
+- Added `scripts/audit-package-script-hygiene-phase39a.mjs` to prevent `test:phase*` scripts from regrowing.
+- Wired the script hygiene audit into the integration gate.
+- Kept historical phase audit files in `scripts/`; they remain callable directly by `node` and/or through the integration gate.
+
+## Phase 39D — Core Module Preload
+
+- Added `rel="modulepreload"` hints for the critical app shell module graph.
+- Kept ES module structure unchanged; no bundling introduced.
+- Added `scripts/audit-core-module-preload-phase39d.mjs` to the integration gate.
+
+
+## Phase 39E — Manifest Icon Correction
+
+- Split PWA manifest icon purposes into separate `any` and `maskable` entries.
+- Removed combined `purpose: "any maskable"` declarations from `manifest.json`.
+- Added `scripts/audit-manifest-icons-phase39e.mjs` and `audit:manifest-icons`.
+- Wired the manifest icon audit into the integration gate.
+
+## Version 1.3.0 Final Mobile Input Zoom Hardening
+
+- iOS/PWA input focus zoom prevention hardened.
+- Form controls now use explicit `16px !important` sizing including focus state.
+- Viewport accessibility remains unchanged; `user-scalable=no` is not reintroduced.

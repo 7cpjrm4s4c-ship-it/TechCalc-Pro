@@ -1,0 +1,13 @@
+{
+  "phase": "39B",
+  "name": "Versioned Build Artifact",
+  "status": "passed",
+  "artifact": "techcalc-pro-1.3.0-rc.1",
+  "files": 181,
+  "checks": [
+    "build:minified creates dist/",
+    "dist/build-info.json pins package name and version",
+    "dist/build-info.json contains sha256 file manifest",
+    "Netlify publishes dist/"
+  ]
+}

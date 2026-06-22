@@ -1,21 +1,15 @@
-const CACHE_NAME = 'techcalc-pro-1.3.0-rc.1';
+const CACHE_NAME = 'techcalc-pro-1.3.0';
+const CACHE_REVISION = '1.3.0-version-1-3-0-official-deployment-metadata-fix';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './RELEASE_NOTES.md',
-  './docs/legal/agb.html',
   './css/components.css',
   './css/layout.css',
   './css/modules.css',
   './css/tokens.css',
   './js/core/app.js',
-  './js/platform/shell/themeController.js',
-  './js/platform/shell/settingsController.js',
-  './js/platform/shell/releaseNotesController.js',
-  './js/platform/shell/feedbackController.js',
-  './js/platform/shell/serviceWorkerController.js',
-  './js/platform/shell/performanceController.js',
   './js/core/centralStore.js',
   './js/core/domUpdate.js',
   './js/core/eventDelegation.js',
@@ -171,6 +165,12 @@ const ASSETS = [
   './js/platform/moduleRuntime/index.js',
   './js/platform/resultRenderer/index.js',
   './js/platform/savedRecordModel/index.js',
+  './js/platform/shell/feedbackController.js',
+  './js/platform/shell/performanceController.js',
+  './js/platform/shell/releaseNotesController.js',
+  './js/platform/shell/serviceWorkerController.js',
+  './js/platform/shell/settingsController.js',
+  './js/platform/shell/themeController.js',
   './js/utils/calculations.js',
   './js/utils/pipes.js',
   './js/utils/units.js',
@@ -179,7 +179,8 @@ const ASSETS = [
   './assets/icons/icon-16.png',
   './assets/icons/icon-192.png',
   './assets/icons/icon-32.png',
-  './assets/icons/icon-512.png'
+  './assets/icons/icon-512.png',
+  './docs/legal/agb.html'
 ];
 
 self.addEventListener('install', event => {
@@ -193,7 +194,7 @@ self.addEventListener('activate', event => {
     await Promise.all(keys.map(key => key === CACHE_NAME ? null : caches.delete(key)));
     await self.clients.claim();
     const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    clients.forEach(client => client.postMessage({ type: 'TECHCALC_CACHE_UPDATED', cache: CACHE_NAME }));
+    clients.forEach(client => client.postMessage({ type: 'TECHCALC_CACHE_UPDATED', cache: CACHE_NAME, revision: CACHE_REVISION }));
   })());
 });
 
@@ -221,6 +222,15 @@ async function cacheFirstWithRefresh(request) {
   return caches.match('./index.html');
 }
 
+function isVersionCriticalAsset(requestUrl) {
+  return requestUrl.pathname.endsWith('/index.html')
+    || requestUrl.pathname.endsWith('/js/core/app.js')
+    || requestUrl.pathname.endsWith('/js/platform/shell/releaseNotesController.js')
+    || requestUrl.pathname.endsWith('/service-worker.js')
+    || requestUrl.pathname.endsWith('/RELEASE_NOTES.md')
+    || requestUrl.pathname.endsWith('/manifest.json');
+}
+
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
@@ -230,8 +240,9 @@ self.addEventListener('fetch', event => {
   const isNavigation = event.request.mode === 'navigate' || event.request.destination === 'document';
   const isReleaseNotes = requestUrl.pathname.endsWith('/RELEASE_NOTES.md') || requestUrl.pathname.endsWith('RELEASE_NOTES.md');
   const isServiceWorker = requestUrl.pathname.endsWith('/service-worker.js') || requestUrl.pathname.endsWith('service-worker.js');
+  const isVersionCritical = isVersionCriticalAsset(requestUrl);
 
-  if (isNavigation || isReleaseNotes || isServiceWorker) {
+  if (isNavigation || isReleaseNotes || isServiceWorker || isVersionCritical) {
     event.respondWith((async () => {
       const fresh = await fetchFresh(event.request);
       if (fresh) return fresh;

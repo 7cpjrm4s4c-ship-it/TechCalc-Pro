@@ -15,9 +15,18 @@ export function parseReleaseNotes(markdown = '') {
   for (const rawLine of lines) {
     const line = rawLine.trim();
     if (!line) continue;
-    const heading = line.match(/^#{1,3}\s+(?:TechCalc\s+Pro\s+)?(?:Version\s+)?([0-9]+\.[0-9]+\.[0-9]+(?:[-.]rc\.?\d+)?)\s*(?:[-–]\s*(.*))?$/i);
+    const heading = line.match(/^#{1,3}\s+(.*)$/);
     if (heading) {
-      current = { version: heading[1], title: heading[2] || '', items: [] };
+      const text = heading[1].trim();
+      const versionHeading = text.match(/^(?:TechCalc\s+Pro\s+)?(?:Version\s+)?([0-9]+\.[0-9]+\.[0-9]+(?:[-.]rc\.?\d+)?)\s*(?:[·-–]\s*(.*))?$/i);
+      const phaseHeading = text.match(/^(Phase\s+\d+[A-Z]?(?:\.\d+)?)\s*(?:[·-–]\s*(.*))?$/i);
+      if (versionHeading) {
+        current = { version: versionHeading[1], title: versionHeading[2] || '', items: [] };
+      } else if (phaseHeading) {
+        current = { version: phaseHeading[1], title: phaseHeading[2] || '', items: [] };
+      } else {
+        current = { version: text, title: '', items: [] };
+      }
       notes.push(current);
       continue;
     }
@@ -43,10 +52,29 @@ export function renderReleaseNotes(notes, host = document.getElementById('releas
   `).join('');
 }
 
+function latestSemanticVersion(notes = []) {
+  const versionPattern = /^([0-9]+\.[0-9]+\.[0-9]+)(?:\b|\s|[·-–])/;
+  for (const note of notes || []) {
+    const match = String(note?.version || '').match(versionPattern);
+    if (match) return match[1];
+  }
+  return '';
+}
+
+function syncDisplayedVersion(appVersion, notes = []) {
+  const displayVersion = latestSemanticVersion(notes) || appVersion;
+  const versionHost = document.querySelector?.('[data-app-version-current]');
+  if (versionHost) versionHost.textContent = displayVersion;
+  const legacyVersionHost = document.getElementById?.('appVersion');
+  if (legacyVersionHost) legacyVersionHost.textContent = displayVersion;
+  document.querySelectorAll?.('input[name="version"]').forEach(input => { input.value = displayVersion; });
+  return displayVersion;
+}
+
 let releaseNotesControllerInitialized = false;
 
 export function initializeReleaseNotesController({
-  appVersion = '1.3.0-rc.1',
+  appVersion = '1.3.0',
   releaseNotesUrl = './RELEASE_NOTES.md',
   versionHost = document.querySelector('[data-app-version-current]'),
   fallback = document.getElementById('releaseNotesFallback'),
@@ -56,13 +84,13 @@ export function initializeReleaseNotesController({
   if (releaseNotesControllerInitialized) return Promise.resolve(false);
   releaseNotesControllerInitialized = true;
 
-  if (versionHost) versionHost.textContent = appVersion;
+  syncDisplayedVersion(appVersion);
 
   return loadReleaseNotes({ appVersion, releaseNotesUrl, fallback, host, fetchImpl });
 }
 
 export async function loadReleaseNotes({
-  appVersion = '1.3.0-rc.1',
+  appVersion = '1.3.0',
   releaseNotesUrl = './RELEASE_NOTES.md',
   fallback = document.getElementById('releaseNotesFallback'),
   host = document.getElementById('releaseNotesDynamic'),
@@ -77,11 +105,17 @@ export async function loadReleaseNotes({
     });
     if (!response.ok) throw new Error(`Release Notes HTTP ${response.status}`);
     const markdown = await response.text();
-    renderReleaseNotes(parseReleaseNotes(markdown), host);
+    const notes = parseReleaseNotes(markdown);
+    syncDisplayedVersion(appVersion, notes);
+    renderReleaseNotes(notes, host);
     return true;
   } catch (error) {
     console.warn('Release Notes konnten nicht dynamisch geladen werden.', error);
-    if (fallback) renderReleaseNotes(parseReleaseNotes(fallback.textContent || ''), host);
+    if (fallback) {
+      const notes = parseReleaseNotes(fallback.textContent || '');
+      syncDisplayedVersion(appVersion, notes);
+      renderReleaseNotes(notes, host);
+    }
     return false;
   }
 }

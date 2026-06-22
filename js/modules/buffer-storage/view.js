@@ -45,7 +45,6 @@ export function renderReserveInputs(vm) {
 }
 
 export function renderInputBlocks(vm) {
-  if (vm.isCompareMode) return [renderRuntimeInputs(vm), renderDefrostInputs(vm), renderReserveInputs(vm)].join('');
   if (vm.isDefrostMode) return renderDefrostInputs(vm);
   if (vm.isReserveMode) return renderReserveInputs(vm);
   return renderRuntimeInputs(vm);
@@ -63,11 +62,11 @@ export function renderView(s) {
   const vm = createBufferStorageViewModel(s);
   const inputColumn = stack([
     card('Berechnungsart', stack([
-      `<div class="buffer-mode-tabs">${segmented('calculationMode', vm.bufferModeOptions, s.calculationMode, { accent: vm.accent })}</div>`,
+      `<div class="buffer-mode-tabs">${segmented('calculationMode', vm.bufferModeOptions, vm.state.calculationMode, { accent: vm.accent })}</div>`,
       '<p class="tc-help ph-help">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'
     ].join('')), vm.accent),
     card('Medium / Faktor', `<div data-buffer-dynamic="medium">${renderMediumContent(vm)}</div>`, vm.accent),
-    `<div data-buffer-dynamic="input-blocks">${renderInputBlocks(vm)}</div>`,
+    `<div class="tc-stack" data-buffer-dynamic="input-blocks">${renderInputBlocks(vm)}</div>`,
     `<div data-buffer-dynamic="saved-records">${renderSavedRecords(vm)}</div>`
   ].join(''));
 

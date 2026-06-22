@@ -51,7 +51,7 @@ export const wastewaterSchema = defineFormSchema({
     { key:'fixtureCustomName', label:'Bezeichnung', type:FIELD_TYPES.TEXT, placeholder:'z. B. Laborbecken', visibleWhen:isCustomFixture },
     { key:'fixtureCustomDu', label:'DU', type:FIELD_TYPES.DECIMAL, unit:'l/s', visibleWhen:isCustomFixture },
     { key:'fixtureCustomDn', label:'Mindest-DN', type:FIELD_TYPES.TEXT, placeholder:'DN 50', visibleWhen:isCustomFixture },
-    { key:'fixtureAdd', label:'Gegenstand hinzufügen', type:FIELD_TYPES.ACTION, text:'Gegenstand hinzufügen', collection:'fixtures', variant:'secondary' },
+    { key:'fixtureAdd', label:'Gegenstand hinzufügen', type:FIELD_TYPES.ACTION, text:'Gegenstand hinzufügen', collection:'fixtures', variant:'primary' },
     { key:'fixtures', label:'Erfasste Entwässerungsgegenstände', type:FIELD_TYPES.COLLECTION, collection:'fixtures', items:fixtureItems, emptyText:'Noch keine Entwässerungsgegenstände hinzugefügt.', quantityLabel:'Anzahl', quantityUnit:'Stk.' },
     { key:'continuousFlow', label:'Dauerabfluss Qc', type:FIELD_TYPES.DECIMAL, unit:'l/s' },
     { key:'pumpFlow', label:'Pumpenförderstrom Qp', type:FIELD_TYPES.DECIMAL, unit:'l/s' },

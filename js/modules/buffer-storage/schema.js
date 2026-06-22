@@ -6,8 +6,7 @@ export const bufferStorageSchema = defineFormSchema({
     { key: 'calculationMode', label: 'Berechnungsart', type: FIELD_TYPES.SEGMENT, options: [
       { value: 'runtime', label: 'Mindestlaufzeit' },
       { value: 'defrost', label: 'Abtauung' },
-      { value: 'reserve', label: 'Reserve' },
-      { value: 'compare', label: 'Vergleich' }
+      { value: 'reserve', label: 'Reserve' }
     ] },
     { key: 'mediumMode', label: 'Medium', type: FIELD_TYPES.SEGMENT, options: [
       { value: 'water', label: 'Wasser' },

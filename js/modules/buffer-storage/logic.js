@@ -41,53 +41,55 @@ export function factorFor(s){
 export function nextVolume(value){ return nextStandardVolume(value); }
 
 export function calculate(s){
-  const factor = factorFor(s);
-  const existing = Math.max(0, num(s.existingSystemVolumeL));
+  const calculationMode = ['runtime', 'defrost', 'reserve'].includes(s.calculationMode) ? s.calculationMode : 'runtime';
+  const state = { ...s, calculationMode };
+  const factor = factorFor(state);
+  const existing = Math.max(0, num(state.existingSystemVolumeL));
 
-  const qMax = num(s.qMaxKw);
-  const partLoadRaw = Math.max(0, num(s.partLoadFactor));
+  const qMax = num(state.qMaxKw);
+  const partLoadRaw = Math.max(0, num(state.partLoadFactor));
   const partLoad = partLoadRaw > 1 ? partLoadRaw / 100 : partLoadRaw;
-  const qLoad = Math.max(0, num(s.qLoadKw));
-  const runTime = Math.max(0, num(s.compressorRunTimeMin));
-  const dtReg = Math.max(0, num(s.controllerDeltaT));
+  const qLoad = Math.max(0, num(state.qLoadKw));
+  const runTime = Math.max(0, num(state.compressorRunTimeMin));
+  const dtReg = Math.max(0, num(state.controllerDeltaT));
   const runtimePower = Math.max(0, qMax * partLoad - qLoad);
   const runtimeSystemVolume = dtReg > 0 ? runtimePower * factor * runTime / dtReg : 0;
   const runtimeBufferVolume = Math.max(0, runtimeSystemVolume - existing);
 
-  const qConsumer = Math.max(0, num(s.qConsumerKw));
-  const qDefrost = Math.max(0, num(s.qDefrostKw));
-  const qHeating = Math.max(0, num(s.qHeatingCircuitKw));
-  const defrostTime = Math.max(0, num(s.maxDefrostTimeMin));
-  const dtHyd = Math.max(0, num(s.hydraulicDeltaT));
+  const qConsumer = Math.max(0, num(state.qConsumerKw));
+  const qDefrost = Math.max(0, num(state.qDefrostKw));
+  const qHeating = Math.max(0, num(state.qHeatingCircuitKw));
+  const defrostTime = Math.max(0, num(state.maxDefrostTimeMin));
+  const dtHyd = Math.max(0, num(state.hydraulicDeltaT));
   const defrostPower = Math.max(0, qConsumer + qDefrost - qHeating);
   const defrostSystemVolume = dtHyd > 0 ? defrostPower * factor * defrostTime / dtHyd : 0;
   const defrostBufferVolume = Math.max(0, defrostSystemVolume - existing);
 
-  const flow = Math.max(0, num(s.consumerFlowM3h));
-  const bridgeTime = Math.max(0, num(s.bridgeTimeMin));
+  const flow = Math.max(0, num(state.consumerFlowM3h));
+  const bridgeTime = Math.max(0, num(state.bridgeTimeMin));
   const reserveVolume = flow * bridgeTime * 1000 / 60;
 
-  const selectedByMode = s.calculationMode === 'defrost' ? defrostBufferVolume : s.calculationMode === 'reserve' ? reserveVolume : runtimeBufferVolume;
-  const decisive = s.calculationMode === 'compare' ? Math.max(runtimeBufferVolume, defrostBufferVolume, reserveVolume) : selectedByMode;
-  const decisiveSystem = s.calculationMode === 'defrost' ? defrostSystemVolume : s.calculationMode === 'reserve' ? reserveVolume : s.calculationMode === 'compare' ? Math.max(runtimeSystemVolume, defrostSystemVolume, reserveVolume) : runtimeSystemVolume;
+  const selectedByMode = calculationMode === 'defrost' ? defrostBufferVolume : calculationMode === 'reserve' ? reserveVolume : runtimeBufferVolume;
+  const decisive = selectedByMode;
+  const decisiveSystem = calculationMode === 'defrost' ? defrostSystemVolume : calculationMode === 'reserve' ? reserveVolume : runtimeSystemVolume;
 
   const warnings = [];
-  if(s.calculationMode === 'runtime' || s.calculationMode === 'compare'){
+  if(calculationMode === 'runtime'){
     if(qMax <= 0) warnings.push('Maximale Geräte-/Kälte- bzw. Heizleistung fehlt.');
     if(partLoad <= 0) warnings.push('Teillastfaktor der kleinsten Leistungsstufe fehlt.');
     if(partLoadRaw > 100) warnings.push('Teillastfaktor f ist größer als 100 %. Eingabe prüfen.');
     if(dtReg <= 0) warnings.push('ΔT Hydraulikkreislauf fehlt.');
     if(runtimePower <= 0 && qMax > 0) warnings.push('Konstante Lastabnahme ist größer/gleich der kleinsten Teillaststufe; Puffervolumen für Mindestlaufzeit wird 0 l.');
   }
-  if(s.calculationMode === 'defrost' || s.calculationMode === 'compare'){
+  if(calculationMode === 'defrost'){
     if(dtHyd <= 0) warnings.push('Hydraulische Temperaturdifferenz für den Abtaubetrieb fehlt.');
     if(defrostPower <= 0 && (qConsumer > 0 || qDefrost > 0)) warnings.push('Abtau-Leistungsbilanz ergibt kein zusätzliches Puffervolumen.');
   }
-  if(s.calculationMode === 'reserve' || s.calculationMode === 'compare'){
+  if(calculationMode === 'reserve'){
     if(flow <= 0) warnings.push('Volumenstrom der Verbraucher für die Wasservorlage fehlt.');
     if(bridgeTime <= 0) warnings.push('Überbrückungszeit für die Wasservorlage fehlt.');
   }
-  if(s.mediumMode !== 'water') warnings.push('Glykolbetrieb: Faktor wurde gemäß Tabelle der Berechnungsunterlage angepasst. Herstellerangaben prüfen.');
+  if(state.mediumMode !== 'water') warnings.push('Glykolbetrieb: Faktor wurde gemäß Tabelle der Berechnungsunterlage angepasst. Herstellerangaben prüfen.');
 
   return {
     factor,

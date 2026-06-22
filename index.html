@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#121922" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#121922" media="(prefers-color-scheme: light)">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,6 +14,13 @@
   <link rel="icon" type="image/png" sizes="16x16" href="./assets/icons/icon-16.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/icon-32.png">
   <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png">
+  <link rel="modulepreload" href="./js/core/app.js">
+  <link rel="modulepreload" href="./js/core/router.js">
+  <link rel="modulepreload" href="./js/core/registry.js">
+  <link rel="modulepreload" href="./js/core/navigation.js">
+  <link rel="modulepreload" href="./js/core/moduleLifecycleAdapter.js">
+  <link rel="modulepreload" href="./js/core/moduleRuntime.js">
+  <link rel="modulepreload" href="./js/core/projectStorage.js">
   <link rel="stylesheet" href="./css/tokens.css">
   <link rel="stylesheet" href="./css/layout.css">
   <link rel="stylesheet" href="./css/components.css">
@@ -116,7 +123,7 @@
         <details class="settings-submenu">
           <summary>Release Notes</summary>
           <div class="settings-submenu__content settings-form release-notes-panel">
-            <div class="settings-info-row"><span>Aktuelle Version</span><strong data-app-version-current>1.3.0-rc.1</strong></div>
+            <div class="settings-info-row"><span>Aktuelle Version</span><strong data-app-version-current>1.3.0</strong></div>
             <div id="releaseNotesDynamic">
               <p>Release Notes werden geladen …</p>
             </div>
@@ -146,7 +153,7 @@
               <label>Betreff<input id="feedbackSubject" name="subject" type="text" required value="TechCalc Pro Feedback"></label>
               <label>Nachricht<textarea id="feedbackMessage" name="message" required rows="6" placeholder="Feedback, Fehlerbeschreibung oder Verbesserungsvorschlag"></textarea></label>
               <input type="hidden" name="app" value="TechCalc Pro">
-              <input type="hidden" name="version" value="1.3.0-rc.1">
+              <input type="hidden" name="version" value="1.3.0">
               <div class="settings-actions">
                 <button class="mini-button mini-button--primary" id="feedbackSubmit" type="submit">Feedback senden</button>
               </div>
@@ -159,7 +166,7 @@
         <details class="settings-submenu">
           <summary>Rechtliches & App</summary>
           <div class="settings-submenu__content settings-form">
-            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.3.0-rc.1</strong></div>
+            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.3.0</strong></div>
             <a class="mini-button" href="./docs/legal/agb.html" target="_blank" rel="noopener">AGB öffnen</a>
             <button class="mini-button" type="button" disabled>Impressum vorbereiten</button>
           </div>

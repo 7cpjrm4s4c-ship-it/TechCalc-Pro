@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-06-17T16:13:00.554Z",
+  "generatedAt": "2026-06-22T15:43:25.864Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -12,7 +12,7 @@
   "modulesAudited": 11,
   "moduleScores": {
     "buffer-storage": 93,
-    "drinking-water": 86,
+    "drinking-water": 71,
     "heat-recovery": 100,
     "heating-cooling": 100,
     "hx-diagram": 100,
@@ -24,12 +24,13 @@
     "wastewater": 93
   },
   "riskCounts": {
+    "P1": 1,
     "P2": 6
   },
   "cssDebt": [
     {
       "file": "css/components.css",
-      "important": 0,
+      "important": 2,
       "inlineStyleSelectors": 0,
       "moduleScopedSelectors": 0
     },
@@ -65,6 +66,37 @@
     }
   ],
   "topFindings": [
+    {
+      "module": "drinking-water",
+      "priority": "P1",
+      "area": "event-boundary",
+      "message": "Event-Listener außerhalb controller.js gefunden.",
+      "evidence": {
+        "count": 4,
+        "samples": [
+          {
+            "file": "dynamicRenderer.js",
+            "line": 113,
+            "text": "window.addEventListener('touchstart', activate, { passive:true });"
+          },
+          {
+            "file": "dynamicRenderer.js",
+            "line": 114,
+            "text": "window.addEventListener('touchmove', activate, { passive:true });"
+          },
+          {
+            "file": "dynamicRenderer.js",
+            "line": 115,
+            "text": "window.addEventListener('touchend', release, { passive:true });"
+          },
+          {
+            "file": "dynamicRenderer.js",
+            "line": 116,
+            "text": "window.addEventListener('touchcancel', release, { passive:true });"
+          }
+        ]
+      }
+    },
     {
       "module": "buffer-storage",
       "priority": "P2",
@@ -192,42 +224,42 @@
         "samples": [
           {
             "cssFile": "css/modules.css",
-            "line": 116,
+            "line": 117,
             "text": ".module-view[data-module='unit-converter'] #convertedValue,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 117,
+            "line": 118,
             "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 118,
+            "line": 119,
             "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 119,
+            "line": 120,
             "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 132,
+            "line": 133,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 133,
+            "line": 134,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 134,
+            "line": 135,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 135,
+            "line": 136,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
           }
         ]
@@ -276,7 +308,7 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 567,
+        "lineCount": 581,
         "controllerAddEventListeners": 0,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
@@ -334,9 +366,9 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 1202,
+        "lineCount": 1233,
         "controllerAddEventListeners": 14,
-        "nonControllerAddEventListeners": 0,
+        "nonControllerAddEventListeners": 4,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
         "moduleCssSelectors": 7,
@@ -346,9 +378,39 @@
         "usesCentralSavedRecordController": false,
         "migrationStatusEntries": 0
       },
-      "score": 86,
-      "status": "platform-conformant-with-minor-debt",
+      "score": 71,
+      "status": "cleanup-required",
       "findings": [
+        {
+          "priority": "P1",
+          "area": "event-boundary",
+          "message": "Event-Listener außerhalb controller.js gefunden.",
+          "evidence": {
+            "count": 4,
+            "samples": [
+              {
+                "file": "dynamicRenderer.js",
+                "line": 113,
+                "text": "window.addEventListener('touchstart', activate, { passive:true });"
+              },
+              {
+                "file": "dynamicRenderer.js",
+                "line": 114,
+                "text": "window.addEventListener('touchmove', activate, { passive:true });"
+              },
+              {
+                "file": "dynamicRenderer.js",
+                "line": 115,
+                "text": "window.addEventListener('touchend', release, { passive:true });"
+              },
+              {
+                "file": "dynamicRenderer.js",
+                "line": 116,
+                "text": "window.addEventListener('touchcancel', release, { passive:true });"
+              }
+            ]
+          }
+        },
         {
           "priority": "P2",
           "area": "event-density",
@@ -486,7 +548,7 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 1127,
+        "lineCount": 1147,
         "controllerAddEventListeners": 5,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
@@ -671,42 +733,42 @@
             "samples": [
               {
                 "cssFile": "css/modules.css",
-                "line": 116,
+                "line": 117,
                 "text": ".module-view[data-module='unit-converter'] #convertedValue,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 117,
+                "line": 118,
                 "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 118,
+                "line": 119,
                 "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 119,
+                "line": 120,
                 "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 132,
+                "line": 133,
                 "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 133,
+                "line": 134,
                 "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 134,
+                "line": 135,
                 "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
               },
               {
                 "cssFile": "css/modules.css",
-                "line": 135,
+                "line": 136,
                 "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
               }
             ]
@@ -954,6 +1016,37 @@
   ],
   "riskRegister": [
     {
+      "module": "drinking-water",
+      "priority": "P1",
+      "area": "event-boundary",
+      "message": "Event-Listener außerhalb controller.js gefunden.",
+      "evidence": {
+        "count": 4,
+        "samples": [
+          {
+            "file": "dynamicRenderer.js",
+            "line": 113,
+            "text": "window.addEventListener('touchstart', activate, { passive:true });"
+          },
+          {
+            "file": "dynamicRenderer.js",
+            "line": 114,
+            "text": "window.addEventListener('touchmove', activate, { passive:true });"
+          },
+          {
+            "file": "dynamicRenderer.js",
+            "line": 115,
+            "text": "window.addEventListener('touchend', release, { passive:true });"
+          },
+          {
+            "file": "dynamicRenderer.js",
+            "line": 116,
+            "text": "window.addEventListener('touchcancel', release, { passive:true });"
+          }
+        ]
+      }
+    },
+    {
       "module": "buffer-storage",
       "priority": "P2",
       "area": "css-specialization",
@@ -1080,42 +1173,42 @@
         "samples": [
           {
             "cssFile": "css/modules.css",
-            "line": 116,
+            "line": 117,
             "text": ".module-view[data-module='unit-converter'] #convertedValue,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 117,
+            "line": 118,
             "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 118,
+            "line": 119,
             "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 119,
+            "line": 120,
             "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 132,
+            "line": 133,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 133,
+            "line": 134,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 134,
+            "line": 135,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
           },
           {
             "cssFile": "css/modules.css",
-            "line": 135,
+            "line": 136,
             "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
           }
         ]

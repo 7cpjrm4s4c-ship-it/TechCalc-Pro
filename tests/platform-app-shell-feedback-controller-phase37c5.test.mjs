@@ -53,7 +53,7 @@ let capturedPayload;
 
 const controller = await import('../js/platform/shell/feedbackController.js?phase37c5');
 const initialized = controller.initializeFeedbackController({
-  appVersion: '1.3.0-rc.1',
+  appVersion: '1.3.0',
   endpoint: 'https://example.invalid/feedback',
   form,
   status,
@@ -76,7 +76,7 @@ assert.equal(subject.value, 'TechCalc Pro Feedback', 'feedback subject should be
 assert.equal(status.dataset.type, 'success', 'successful feedback submission should set success status');
 assert.equal(submit.disabled, false, 'submit button should be re-enabled after submission');
 assert.equal(submit.textContent, 'Feedback senden', 'submit text should be restored after submission');
-assert.equal(capturedPayload.get('version'), '1.3.0-rc.1', 'feedback payload must include app version');
+assert.equal(capturedPayload.get('version'), '1.3.0', 'feedback payload must include app version');
 assert.equal(capturedPayload.get('route'), 'drinking-water', 'feedback payload must include current route');
 assert.equal(capturedPayload.get('userAgent'), 'Phase37C5-Test', 'feedback payload must include user agent');
 assert.ok(capturedPayload.get('timestamp'), 'feedback payload must include timestamp');

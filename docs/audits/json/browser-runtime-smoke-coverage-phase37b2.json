@@ -2,7 +2,7 @@
   "phase": "37B.2",
   "name": "Browser Runtime Smoke Coverage Expansion",
   "status": "passed",
-  "generatedAt": "2026-06-17T16:12:41.930Z",
+  "generatedAt": "2026-06-22T15:43:26.242Z",
   "coverage": {
     "modules": 11,
     "scenarios": [
@@ -117,14 +117,14 @@
       "detail": "service worker offline reload smoke is covered"
     },
     {
-      "id": "package-script:phase37b2",
+      "id": "package-script:integration-gate",
       "status": "passed",
-      "detail": "package exposes phase37b2 guard"
+      "detail": "package exposes consolidated integration guard"
     },
     {
-      "id": "package-script:e2e-phase37b2",
+      "id": "package-script:e2e-gate",
       "status": "passed",
-      "detail": "package exposes phase37b2 Playwright command"
+      "detail": "package exposes consolidated Playwright e2e command"
     }
   ]
 }

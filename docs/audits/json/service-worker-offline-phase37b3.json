@@ -2,13 +2,13 @@
   "phase": "37B.3",
   "name": "Service Worker Offline Runtime Hardening",
   "status": "passed",
-  "generatedAt": "2026-06-18T07:17:59.384Z",
+  "generatedAt": "2026-06-22T15:43:26.390Z",
   "assets": {
-    "required": 174,
-    "cached": 174,
+    "required": 180,
+    "cached": 180,
     "missing": 0,
     "stale": 0,
-    "jsModules": 160
+    "jsModules": 165
   },
   "checks": [
     {
@@ -41,7 +41,8 @@
     {
       "id": "offline-update:versioned-cache",
       "status": "passed",
-      "detail": "cache name is versioned for deterministic updates"
+      "detail": "cache name is derived from package.json version for deterministic updates",
+      "expectedCacheName": "techcalc-pro-1.3.0"
     },
     {
       "id": "offline-update:skip-waiting",
@@ -64,14 +65,14 @@
       "detail": "Playwright spec covers offline reload for all module routes"
     },
     {
-      "id": "package-script:phase37b3",
+      "id": "package-script:integration-gate",
       "status": "passed",
-      "detail": "package exposes phase37b3 guard"
+      "detail": "package exposes consolidated integration guard"
     },
     {
-      "id": "package-script:e2e-phase37b3",
+      "id": "package-script:e2e-gate",
       "status": "passed",
-      "detail": "package exposes phase37b3 Playwright command"
+      "detail": "package exposes consolidated Playwright e2e command"
     }
   ]
 }

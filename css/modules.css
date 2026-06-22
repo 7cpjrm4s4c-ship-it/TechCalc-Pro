@@ -108,6 +108,7 @@
 .buffer-input-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--tc-gap); align-items: end; }
 .buffer-input-grid--reserve { grid-template-columns: repeat(2,minmax(0,1fr)); }
 .buffer-input-grid > * { min-width: 0; }
+
 .buffer-help { grid-column: 1 / -1; }
 .buffer-mode-tabs .segmented { gap: 4px; padding: 5px; }
 .buffer-mode-tabs .segmented button { min-height: 34px; padding: 0 6px; font-size: clamp(10px,2.45vw,13px); letter-spacing: -.035em; line-height: 1.05; white-space: nowrap; }

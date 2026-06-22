@@ -4,6 +4,11 @@ import { state } from './state.js';
 import { calculate } from './logic.js';
 import { mediumLabel, modeLabel } from './results.js';
 
+function normalizeBufferStorageState(s = {}){
+  const calculationMode = ['runtime', 'defrost', 'reserve'].includes(s.calculationMode) ? s.calculationMode : 'runtime';
+  return { ...s, calculationMode };
+}
+
 export function savedBufferStats(item = {}){
   const res = item.result || {};
   return [
@@ -15,7 +20,8 @@ export function savedBufferStats(item = {}){
 }
 
 export function buildBufferRecord(currentState, result, items, id, name, existing = null){
-  const copy = { ...currentState };
+  const normalizedState = normalizeBufferStorageState(currentState);
+  const copy = { ...normalizedState };
   delete copy.savedBuffers;
   delete copy.savedCalculations;
   delete copy.activeBufferId;
@@ -29,10 +35,10 @@ export function buildBufferRecord(currentState, result, items, id, name, existin
     updatedAt: new Date().toISOString(),
     state: copy,
     result: {
-      mode: currentState.calculationMode,
+      mode: normalizedState.calculationMode,
       volume: result?.decisiveVolume,
       standard: result?.nextStandardVolume,
-      medium: mediumLabel(currentState)
+      medium: mediumLabel(normalizedState)
     }
   };
 }
@@ -41,7 +47,7 @@ export function savedBufferPatch(item, currentState = {}){
   const legacy = Array.isArray(currentState.savedCalculations) ? currentState.savedCalculations : [];
   const saved = Array.isArray(currentState.savedBuffers) && currentState.savedBuffers.length ? currentState.savedBuffers : legacy;
   return item?.state ? {
-    ...item.state,
+    ...normalizeBufferStorageState(item.state),
     savedBuffers: saved,
     activeBufferId: item.id,
     expandedBufferId: currentState.expandedBufferId || null,
@@ -74,7 +80,7 @@ export const bufferStorageSavedController = createLineSectionController({
 function normalizeBufferSnapshot(snapshot = {}){
   const legacy = Array.isArray(snapshot.savedCalculations) ? snapshot.savedCalculations : [];
   const saved = Array.isArray(snapshot.savedBuffers) && snapshot.savedBuffers.length ? snapshot.savedBuffers : legacy;
-  return { ...snapshot, savedBuffers: saved };
+  return normalizeBufferStorageState({ ...snapshot, savedBuffers: saved });
 }
 
 export function bufferSaveCard(s){

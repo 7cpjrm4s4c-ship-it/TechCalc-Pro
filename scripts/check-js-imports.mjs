@@ -4,7 +4,7 @@ import { spawn } from 'node:child_process';
 import os from 'node:os';
 
 const root = process.cwd();
-const skip = new Set(['node_modules']);
+const skip = new Set(['node_modules', 'dist']);
 
 function walk(dir) {
   return readdirSync(dir).flatMap(name => {

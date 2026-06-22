@@ -44,7 +44,7 @@ const sessionStorageRef = {
 
 const controller = await import('../js/platform/shell/serviceWorkerController.js?phase37c6');
 const initialized = controller.initializeServiceWorkerController({
-  appVersion: '1.3.0-rc.1',
+  appVersion: '1.3.0',
   navigatorRef,
   windowRef,
   sessionStorageRef
@@ -58,7 +58,7 @@ listeners.get('message')({ data: { type: 'TECHCALC_CACHE_UPDATED', cache: 'tc-ca
 assert.equal(sessionValues.get('techcalc-active-cache'), 'tc-cache', 'cache update message must be stored');
 
 await listeners.get('window:load')();
-assert.equal(registeredUrl, './service-worker.js?v=1.3.0-rc.1', 'service worker registration URL must include app version');
+assert.equal(registeredUrl, './service-worker.js?v=1.3.0', 'service worker registration URL must include app version');
 assert.equal(updateCalled, true, 'registration.update must be requested');
 assert.equal(controller.initializeServiceWorkerController({ navigatorRef, windowRef, sessionStorageRef }), false, 'controller must be idempotent');
 
