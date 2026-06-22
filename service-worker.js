@@ -1,5 +1,5 @@
 const CACHE_NAME = 'techcalc-pro-1.3.0';
-const CACHE_REVISION = '1.3.0-version-1-3-0-official-deployment';
+const CACHE_REVISION = '1.3.0-version-1-3-0-official-deployment-metadata-fix';
 const ASSETS = [
   './',
   './index.html',
@@ -222,6 +222,15 @@ async function cacheFirstWithRefresh(request) {
   return caches.match('./index.html');
 }
 
+function isVersionCriticalAsset(requestUrl) {
+  return requestUrl.pathname.endsWith('/index.html')
+    || requestUrl.pathname.endsWith('/js/core/app.js')
+    || requestUrl.pathname.endsWith('/js/platform/shell/releaseNotesController.js')
+    || requestUrl.pathname.endsWith('/service-worker.js')
+    || requestUrl.pathname.endsWith('/RELEASE_NOTES.md')
+    || requestUrl.pathname.endsWith('/manifest.json');
+}
+
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
@@ -231,8 +240,9 @@ self.addEventListener('fetch', event => {
   const isNavigation = event.request.mode === 'navigate' || event.request.destination === 'document';
   const isReleaseNotes = requestUrl.pathname.endsWith('/RELEASE_NOTES.md') || requestUrl.pathname.endsWith('RELEASE_NOTES.md');
   const isServiceWorker = requestUrl.pathname.endsWith('/service-worker.js') || requestUrl.pathname.endsWith('service-worker.js');
+  const isVersionCritical = isVersionCriticalAsset(requestUrl);
 
-  if (isNavigation || isReleaseNotes || isServiceWorker) {
+  if (isNavigation || isReleaseNotes || isServiceWorker || isVersionCritical) {
     event.respondWith((async () => {
       const fresh = await fetchFresh(event.request);
       if (fresh) return fresh;

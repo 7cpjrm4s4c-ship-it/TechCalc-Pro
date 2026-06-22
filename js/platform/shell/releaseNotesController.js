@@ -52,6 +52,25 @@ export function renderReleaseNotes(notes, host = document.getElementById('releas
   `).join('');
 }
 
+function latestSemanticVersion(notes = []) {
+  const versionPattern = /^([0-9]+\.[0-9]+\.[0-9]+)(?:\b|\s|[·-–])/;
+  for (const note of notes || []) {
+    const match = String(note?.version || '').match(versionPattern);
+    if (match) return match[1];
+  }
+  return '';
+}
+
+function syncDisplayedVersion(appVersion, notes = []) {
+  const displayVersion = latestSemanticVersion(notes) || appVersion;
+  const versionHost = document.querySelector?.('[data-app-version-current]');
+  if (versionHost) versionHost.textContent = displayVersion;
+  const legacyVersionHost = document.getElementById?.('appVersion');
+  if (legacyVersionHost) legacyVersionHost.textContent = displayVersion;
+  document.querySelectorAll?.('input[name="version"]').forEach(input => { input.value = displayVersion; });
+  return displayVersion;
+}
+
 let releaseNotesControllerInitialized = false;
 
 export function initializeReleaseNotesController({
@@ -65,10 +84,7 @@ export function initializeReleaseNotesController({
   if (releaseNotesControllerInitialized) return Promise.resolve(false);
   releaseNotesControllerInitialized = true;
 
-  if (versionHost) versionHost.textContent = appVersion;
-  const legacyVersionHost = document.getElementById('appVersion');
-  if (legacyVersionHost) legacyVersionHost.textContent = appVersion;
-  document.querySelectorAll?.('input[name="version"]').forEach(input => { input.value = appVersion; });
+  syncDisplayedVersion(appVersion);
 
   return loadReleaseNotes({ appVersion, releaseNotesUrl, fallback, host, fetchImpl });
 }
@@ -89,11 +105,17 @@ export async function loadReleaseNotes({
     });
     if (!response.ok) throw new Error(`Release Notes HTTP ${response.status}`);
     const markdown = await response.text();
-    renderReleaseNotes(parseReleaseNotes(markdown), host);
+    const notes = parseReleaseNotes(markdown);
+    syncDisplayedVersion(appVersion, notes);
+    renderReleaseNotes(notes, host);
     return true;
   } catch (error) {
     console.warn('Release Notes konnten nicht dynamisch geladen werden.', error);
-    if (fallback) renderReleaseNotes(parseReleaseNotes(fallback.textContent || ''), host);
+    if (fallback) {
+      const notes = parseReleaseNotes(fallback.textContent || '');
+      syncDisplayedVersion(appVersion, notes);
+      renderReleaseNotes(notes, host);
+    }
     return false;
   }
 }

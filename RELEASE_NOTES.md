@@ -1,3 +1,7 @@
+# Version 1.3.0 — Official Deployment Metadata Fix
+
+Aktuelle Versionsanzeige wird aus der finalen `1.3.0`-Release-Notes-Quelle synchronisiert. Version-kritische App-Shell-Dateien werden im Service Worker network-first behandelt, damit alte `1.3.0-rc.1`-Caches die Anzeige nicht mehr überlagern.
+
 ## Version 1.3.0 — Official Deployment
 
 - RC-Phase abgeschlossen und Version auf `1.3.0` finalisiert.
