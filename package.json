@@ -16,7 +16,8 @@
     "audit:artifacts": "node scripts/audit-versioned-build-artifact-phase39b.mjs",
     "audit:manifest-icons": "node scripts/audit-manifest-icons-phase39e.mjs",
     "audit:feedback-offline": "node scripts/audit-feedback-offline-fallback-phase39f.mjs",
-    "audit:rc-ui-state": "node scripts/audit-rc-ui-state-bugfix-phase39h.mjs"
+    "audit:rc-ui-state": "node scripts/audit-rc-ui-state-bugfix-phase39h.mjs",
+    "audit:button-accent": "node scripts/audit-button-accent-phase39i.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.28.1"

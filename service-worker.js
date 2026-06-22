@@ -1,5 +1,5 @@
 const CACHE_NAME = 'techcalc-pro-1.3.0-rc.1';
-const CACHE_REVISION = '1.3.0-rc.1-phase-39h-rc-ui-state-bugfixes';
+const CACHE_REVISION = '1.3.0-rc.1-phase-39i-button-accent-finalization';
 const ASSETS = [
   './',
   './index.html',

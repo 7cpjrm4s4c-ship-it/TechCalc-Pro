@@ -1,3 +1,10 @@
+## Phase 39I — Button Accent Finalization
+
+- HX-Diagramm: `Diagramm leeren` nutzt jetzt die reguläre blaue Aktzentfläche statt Ghost/Grau.
+- Schmutzwasser: `Gegenstand hinzufügen` nutzt die reguläre Aktzentfläche.
+- Trinkwasser: `Verbraucher zur Nutzungseinheit hinzufügen` und `Verbraucher zur Gruppe hinzufügen` nutzen die reguläre Aktzentfläche.
+- Layout/DOM-Anordnung bleibt unverändert; es wurde nur die Button-Variante angepasst.
+
 ## Phase 39H — RC UI/State Bugfixes
 
 - Trinkwasser-Draft-Verbraucher nutzen jetzt denselben Collection-/Mengenfeld-Layoutvertrag wie Schmutzwasser.

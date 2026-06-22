@@ -72,7 +72,7 @@ export function fixtureInputFields(s = {}) {
     fields.push(field({ id: 'fixtureCustomDu', label: 'DU', value: fmtInput(s.fixtureCustomDu, 1), unit: 'l/s' }));
     fields.push(field({ id: 'fixtureCustomDn', label: 'Mindest-DN', value: s.fixtureCustomDn || '', placeholder: 'DN 50', inputmode: 'text' }));
   }
-  fields.push(`<div class="field field--action"><label>&nbsp;</label><div class="control"><button type="button" class="action-button action-button--secondary" data-tc-action="platform:collection:add" data-collection="fixtures">Gegenstand hinzufügen</button></div></div>`);
+  fields.push(`<div class="field field--action"><label>&nbsp;</label><div class="control"><button type="button" class="action-button" data-tc-action="platform:collection:add" data-collection="fixtures">Gegenstand hinzufügen</button></div></div>`);
   return grid(fields.join(''), 2);
 }
 
