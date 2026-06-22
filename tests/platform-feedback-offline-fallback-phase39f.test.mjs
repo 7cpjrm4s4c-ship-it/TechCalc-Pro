@@ -41,7 +41,7 @@ const storage = createStorageMock();
 let fetchCalled = false;
 
 const initialized = controller.initializeFeedbackController({
-  appVersion: '1.3.0-rc.1',
+  appVersion: '1.3.0',
   form,
   status,
   submit,

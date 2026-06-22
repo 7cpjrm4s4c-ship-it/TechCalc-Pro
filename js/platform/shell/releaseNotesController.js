@@ -55,7 +55,7 @@ export function renderReleaseNotes(notes, host = document.getElementById('releas
 let releaseNotesControllerInitialized = false;
 
 export function initializeReleaseNotesController({
-  appVersion = '1.3.0-rc.1',
+  appVersion = '1.3.0',
   releaseNotesUrl = './RELEASE_NOTES.md',
   versionHost = document.querySelector('[data-app-version-current]'),
   fallback = document.getElementById('releaseNotesFallback'),
@@ -74,7 +74,7 @@ export function initializeReleaseNotesController({
 }
 
 export async function loadReleaseNotes({
-  appVersion = '1.3.0-rc.1',
+  appVersion = '1.3.0',
   releaseNotesUrl = './RELEASE_NOTES.md',
   fallback = document.getElementById('releaseNotesFallback'),
   host = document.getElementById('releaseNotesDynamic'),

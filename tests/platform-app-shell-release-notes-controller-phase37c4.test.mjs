@@ -26,7 +26,7 @@ assert.ok(appLines <= 370, `app.js should be reduced after release notes extract
 const store = new Map();
 const versionHost = { textContent: '' };
 const host = { innerHTML: '' };
-const fallback = { textContent: '# TechCalc Pro 1.3.0-rc.1 – Fallback\n- Offline notes' };
+const fallback = { textContent: '# TechCalc Pro 1.3.0 – Fallback\n- Offline notes' };
 
 globalThis.document = {
   getElementById(id) {
@@ -41,28 +41,28 @@ globalThis.document = {
 };
 
 const controller = await import('../js/platform/shell/releaseNotesController.js');
-const parsed = controller.parseReleaseNotes('# TechCalc Pro 1.3.0-rc.1 – Test\n- Erstes Item\n- Zweites Item');
+const parsed = controller.parseReleaseNotes('# TechCalc Pro 1.3.0 – Test\n- Erstes Item\n- Zweites Item');
 assert.equal(parsed.length, 1);
-assert.equal(parsed[0].version, '1.3.0-rc.1');
+assert.equal(parsed[0].version, '1.3.0');
 assert.equal(parsed[0].items.length, 2);
 
 controller.renderReleaseNotes(parsed, host);
-assert.ok(host.innerHTML.includes('1.3.0-rc.1'), 'rendered release notes should include version');
+assert.ok(host.innerHTML.includes('1.3.0'), 'rendered release notes should include version');
 assert.ok(host.innerHTML.includes('Erstes Item'), 'rendered release notes should include item text');
 
 await controller.loadReleaseNotes({
-  appVersion: '1.3.0-rc.1',
+  appVersion: '1.3.0',
   host,
   fallback,
   fetchImpl: async url => {
     store.set('url', url);
     return {
       ok: true,
-      async text() { return '# TechCalc Pro 1.3.0-rc.1 – Loaded\n- Loaded item'; }
+      async text() { return '# TechCalc Pro 1.3.0 – Loaded\n- Loaded item'; }
     };
   }
 });
-assert.ok(store.get('url').includes('v=1.3.0-rc.1'), 'release notes request must be versioned');
+assert.ok(store.get('url').includes('v=1.3.0'), 'release notes request must be versioned');
 assert.ok(host.innerHTML.includes('Loaded item'), 'dynamic release notes should render loaded items');
 
 console.log('Phase 37C.4 release notes controller extraction guard passed.');

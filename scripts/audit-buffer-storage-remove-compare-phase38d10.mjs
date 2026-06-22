@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 import { bufferStorageSchema } from '../js/modules/buffer-storage/schema.js';
 import { bufferModeOptions, createBufferStorageViewModel } from '../js/modules/buffer-storage/viewModel.js';
 import { renderInputBlocks, renderView } from '../js/modules/buffer-storage/view.js';
@@ -59,6 +60,6 @@ if (!/const CACHE_REVISION = '[^']+';/.test(sw)) fail('service worker revision d
 if (/phase38d10-buffer-compare-code-removal/.test(sw)) {
   console.warn('Phase 38D.10 fixed revision is still present; newer builds should use generated release revision.');
 }
-if (!/const CACHE_REVISION = '[^']*1\.3\.0-rc\.1[^']*';/.test(sw)) fail('service worker revision must include the package version after generated revision injection');
+if (!sw.includes(`const CACHE_REVISION = '${pkg.version}`)) fail('service worker revision must include the package version after generated revision injection');
 
 console.log('Phase 38D.10 buffer compare full removal guard passed.');

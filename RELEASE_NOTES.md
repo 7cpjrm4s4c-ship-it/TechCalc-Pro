@@ -1,3 +1,10 @@
+## Version 1.3.0 — Official Deployment
+
+- RC-Phase abgeschlossen und Version auf `1.3.0` finalisiert.
+- Service-Worker-Cache, App-Version, Feedback-Metadaten und Release-Notes-Anzeige auf `1.3.0` synchronisiert.
+- Netlify-Entwicklungspaket und neutrales Drittanbieter-Deploy-Artefakt werden getrennt ausgeliefert.
+- Release-Pfad: `npm ci` → `npm run build:minified` → Deployment von `dist/`.
+
 ## Phase 39I — Button Accent Finalization
 
 - HX-Diagramm: `Diagramm leeren` nutzt jetzt die reguläre blaue Aktzentfläche statt Ghost/Grau.
