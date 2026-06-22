@@ -95,6 +95,22 @@ function withHxScrollFreeze(root, enabled, mutation) {
   return result;
 }
 
+function syncHxFormFields(root, snapshot = {}) {
+  if (!root?.querySelector) return;
+  const fields = ['tempC', 'rhPercent', 'targetTempC', 'targetRhPercent'];
+  fields.forEach(field => {
+    const el = root.querySelector(`[data-field="${field}"]`);
+    if (!el || document.activeElement === el) return;
+    const next = String(snapshot?.[field] ?? '');
+    if (el.value !== next) el.value = next;
+  });
+  const nameEl = root.querySelector('#hxProcessName');
+  if (nameEl && document.activeElement !== nameEl) {
+    const nextName = String(snapshot?.label ?? '');
+    if (nameEl.value !== nextName) nameEl.value = nextName;
+  }
+}
+
 export function syncSavedProcessControls(root, snapshot = {}) {
   hxProcessController?.updateControls?.(root, snapshot);
 }
@@ -105,6 +121,16 @@ export function renderDynamicSections(root, snapshot = {}, meta = {}) {
   const changed = Array.isArray(meta?.changed) ? meta.changed : [];
   const savedStructural = /^(line:|saved:|hx:line:)/.test(action)
     || changed.some(key => ['savedProcesses', 'processes', 'activeProcessId', 'expandedProcessId', 'label'].includes(key));
+
+  const updateAllLiveIslands = () => {
+    syncHxFormFields(root, snapshot);
+    const vm = createHxRenderModel(snapshot);
+    setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.process}"]`, renderProcessSelection(vm));
+    setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.results}"]`, renderResults(vm));
+    setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.diagram}"]`, renderDiagram(vm));
+    syncSavedProcessControls(root, snapshot);
+    return true;
+  };
 
   if (savedStructural) {
     return withHxScrollFreeze(root, true, () => {
@@ -119,16 +145,10 @@ export function renderDynamicSections(root, snapshot = {}, meta = {}) {
         setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`, renderSavedProcesses(vm));
       }
 
-      return true;
+      return updateAllLiveIslands();
     });
   }
 
-  const vm = createHxRenderModel(snapshot);
-  setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.process}"]`, renderProcessSelection(vm));
-  setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.results}"]`, renderResults(vm));
-  setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.diagram}"]`, renderDiagram(vm));
-  syncSavedProcessControls(root, snapshot);
-
-  return true;
+  return updateAllLiveIslands();
 }
 

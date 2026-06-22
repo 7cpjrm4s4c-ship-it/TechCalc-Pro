@@ -7,10 +7,10 @@ import { isSameId } from '../../core/savedRecords.js';
 
 export function draftConsumerList(items, type, waterHeatingMode = 'central') {
   if (!items?.length) return '<div class="empty-state empty-state--compact">Noch keine Verbraucher ausgewählt</div>';
-  return `<div class="tc-consumer-list">${items.map((c, index) => `<div class="tc-consumer-row tc-consumer-row--editable">
+  return `<div class="tc-consumer-list">${items.map((c, index) => `<div class="tc-consumer-row tc-collection-row tc-consumer-row--editable">
     <div><strong>${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr, 2)} l/s je Verbraucher · ${esc(consumerModeSuffix(c, waterHeatingMode))}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div>
-    <label class="mini-edit-field"><span>Anzahl</span><input type="number" min="0" step="1" value="${esc(c.count)}" data-dw-draft-count="${esc(type)}" data-index="${index}" inputmode="numeric"></label>
-    <button type="button" data-dw-remove-draft="${esc(type)}" data-index="${index}" aria-label="Verbraucher entfernen">×</button>
+    <label class="tc-quantity-field"><span>Anzahl</span><input type="number" min="0" step="1" value="${esc(c.count)}" data-dw-draft-count="${esc(type)}" data-index="${index}" inputmode="numeric"></label>
+    <button type="button" class="mini-button mini-button--danger" data-dw-remove-draft="${esc(type)}" data-index="${index}" aria-label="Verbraucher entfernen">×</button>
   </div>`).join('')}</div>`;
 }
 

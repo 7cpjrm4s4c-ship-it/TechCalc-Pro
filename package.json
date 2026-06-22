@@ -15,7 +15,8 @@
     "audit:scripts": "node scripts/audit-package-script-hygiene-phase39a.mjs",
     "audit:artifacts": "node scripts/audit-versioned-build-artifact-phase39b.mjs",
     "audit:manifest-icons": "node scripts/audit-manifest-icons-phase39e.mjs",
-    "audit:feedback-offline": "node scripts/audit-feedback-offline-fallback-phase39f.mjs"
+    "audit:feedback-offline": "node scripts/audit-feedback-offline-fallback-phase39f.mjs",
+    "audit:rc-ui-state": "node scripts/audit-rc-ui-state-bugfix-phase39h.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.28.1"

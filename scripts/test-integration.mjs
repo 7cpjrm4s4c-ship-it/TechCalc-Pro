@@ -8,6 +8,7 @@ const commands = [
   ['node', ['scripts/audit-core-module-preload-phase39d.mjs']],
   ['node', ['scripts/audit-manifest-icons-phase39e.mjs']],
   ['node', ['scripts/audit-feedback-offline-fallback-phase39f.mjs']],
+  ['node', ['scripts/audit-rc-ui-state-bugfix-phase39h.mjs']],
   ['node', ['tests/platform-feedback-offline-fallback-phase39f.test.mjs']],
   ['node', ['scripts/audit-module-smoke-phase31c.mjs']],
   ['node', ['scripts/audit-platform-convergence-phase37a.mjs']],

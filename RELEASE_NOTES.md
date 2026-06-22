@@ -1,3 +1,13 @@
+## Phase 39H — RC UI/State Bugfixes
+
+- Trinkwasser-Draft-Verbraucher nutzen jetzt denselben Collection-/Mengenfeld-Layoutvertrag wie Schmutzwasser.
+- h,x gespeicherte Prozesse hydratisieren sichtbare Eingabefelder wieder direkt aus dem gespeicherten Snapshot.
+- h,x gespeicherte Prozessauswahl aktualisiert Prozessauswahl, Ergebnisliste und Diagramm sofort im dynamischen Pfad.
+- h,x „Diagramm leeren“ läuft nicht mehr in den reinen Saved-Records-Refresh, sondern leert auch Diagramm- und Ergebnis-Islands.
+- Ergänzt `audit:rc-ui-state` im Integration-Gate.
+- Keine Berechnungslogik geändert.
+
+
 ## Phase 39G — Service Worker Metadata Display Fix
 
 - Service-Worker-Revision wird jetzt automatisch aus `package.json` und dem aktuellen Release-Notes-Heading erzeugt.
