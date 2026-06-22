@@ -434,3 +434,9 @@ Release-hardening status after Phase 31D:
 - Removed combined `purpose: "any maskable"` declarations from `manifest.json`.
 - Added `scripts/audit-manifest-icons-phase39e.mjs` and `audit:manifest-icons`.
 - Wired the manifest icon audit into the integration gate.
+
+## Version 1.3.0 Final Mobile Input Zoom Hardening
+
+- iOS/PWA input focus zoom prevention hardened.
+- Form controls now use explicit `16px !important` sizing including focus state.
+- Viewport accessibility remains unchanged; `user-scalable=no` is not reintroduced.
