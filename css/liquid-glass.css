@@ -1,0 +1,123 @@
+/* TechCalc Pro 1.3.1 Beta 1 — additive Liquid Glass UI layer.
+   Eigene TechCalc-Pro-Styles; keine Apple-Assets. */
+:root {
+  --tcp-glass-bg: linear-gradient(135deg, rgba(255,255,255,.145), rgba(255,255,255,.052));
+  --tcp-glass-bg-strong: linear-gradient(135deg, rgba(255,255,255,.19), rgba(255,255,255,.075));
+  --tcp-glass-border: rgba(255,255,255,.22);
+  --tcp-glass-highlight: rgba(255,255,255,.42);
+  --tcp-glass-shadow: 0 18px 54px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.24);
+  --tcp-glass-blur: 24px;
+  --tcp-icon-size: 18px;
+}
+
+.app-header.glass-surface,
+.module-nav,
+.card,
+.tc-card,
+.result-card,
+.settings-panel,
+.overflow-menu,
+.saved-record-card,
+.line-section-card {
+  background: var(--tcp-glass-bg);
+  border-color: var(--tcp-glass-border);
+  box-shadow: var(--tcp-glass-shadow);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .app-header.glass-surface,
+  .module-nav,
+  .card,
+  .tc-card,
+  .result-card,
+  .settings-panel,
+  .overflow-menu,
+  .saved-record-card,
+  .line-section-card {
+    -webkit-backdrop-filter: blur(var(--tcp-glass-blur)) saturate(150%);
+    backdrop-filter: blur(var(--tcp-glass-blur)) saturate(150%);
+  }
+}
+
+.card,
+.tc-card,
+.result-card,
+.saved-record-card,
+.line-section-card { position: relative; overflow: hidden; }
+.card::before,
+.tc-card::before,
+.result-card::before,
+.saved-record-card::before,
+.line-section-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--tcp-glass-highlight), transparent);
+  pointer-events: none;
+}
+
+.module-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: rgba(255,255,255,.045);
+}
+.module-tab::before,
+.overflow-menu__item::before {
+  content: '';
+  width: var(--tcp-icon-size);
+  height: var(--tcp-icon-size);
+  flex: 0 0 var(--tcp-icon-size);
+  background: currentColor;
+  opacity: .9;
+  -webkit-mask: var(--tcp-module-icon) center / contain no-repeat;
+  mask: var(--tcp-module-icon) center / contain no-repeat;
+}
+.module-tab--overflow::before { content: none; }
+.module-tab.is-active,
+.module-tab.is-overflow-active {
+  background: var(--tcp-glass-bg-strong);
+  box-shadow: inset 0 -3px 0 currentColor, 0 10px 28px rgba(53,170,255,.12);
+}
+.overflow-menu__item {
+  display: grid;
+  grid-template-columns: auto minmax(0,1fr);
+  align-items: center;
+  column-gap: 10px;
+}
+.overflow-menu__item small { grid-column: 2; }
+[data-module-id="heating-cooling"] { --tcp-module-icon: url('../assets/icons/modules/heating-cooling.svg'); }
+[data-module-id="pipe-sizing"] { --tcp-module-icon: url('../assets/icons/modules/pipe-sizing.svg'); }
+[data-module-id="pressure-holding"] { --tcp-module-icon: url('../assets/icons/modules/pressure-holding.svg'); }
+[data-module-id="drinking-water"] { --tcp-module-icon: url('../assets/icons/modules/drinking-water.svg'); }
+[data-module-id="wastewater"] { --tcp-module-icon: url('../assets/icons/modules/wastewater.svg'); }
+[data-module-id="rainwater"] { --tcp-module-icon: url('../assets/icons/modules/rainwater.svg'); }
+[data-module-id="ventilation"] { --tcp-module-icon: url('../assets/icons/modules/ventilation.svg'); }
+[data-module-id="heat-recovery"] { --tcp-module-icon: url('../assets/icons/modules/heat-recovery.svg'); }
+[data-module-id="hx-diagram"] { --tcp-module-icon: url('../assets/icons/modules/hx-diagram.svg'); }
+[data-module-id="buffer-storage"] { --tcp-module-icon: url('../assets/icons/modules/buffer-storage.svg'); }
+[data-module-id="unit-converter"] { --tcp-module-icon: url('../assets/icons/modules/unit-converter.svg'); }
+
+@media (max-width: 760px) {
+  :root { --tcp-icon-size: 17px; }
+  .module-tab { gap: 4px; font-size: clamp(10px, 2.5vw, 12px); padding-inline: 3px; }
+  .module-tab::before { width: 16px; height: 16px; flex-basis: 16px; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .app-header.glass-surface,
+  .module-nav,
+  .card,
+  .tc-card,
+  .result-card,
+  .settings-panel,
+  .overflow-menu,
+  .saved-record-card,
+  .line-section-card {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(18,25,34,.96);
+  }
+}

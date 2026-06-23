@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.0';
-const CACHE_REVISION = '1.3.0-version-1-3-0-mobile-feedback-zoom-scope-correction';
+const CACHE_NAME = 'techcalc-pro-1.3.1-beta.1';
+const CACHE_REVISION = '1.3.1-beta.1-version-1-3-1-beta-1-liquid-glass-design-system-baseline';
 const ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const ASSETS = [
   './RELEASE_NOTES.md',
   './css/components.css',
   './css/layout.css',
+  './css/liquid-glass.css',
   './css/modules.css',
   './css/tokens.css',
   './js/core/app.js',
@@ -180,6 +181,17 @@ const ASSETS = [
   './assets/icons/icon-192.png',
   './assets/icons/icon-32.png',
   './assets/icons/icon-512.png',
+  './assets/icons/modules/buffer-storage.svg',
+  './assets/icons/modules/drinking-water.svg',
+  './assets/icons/modules/heat-recovery.svg',
+  './assets/icons/modules/heating-cooling.svg',
+  './assets/icons/modules/hx-diagram.svg',
+  './assets/icons/modules/pipe-sizing.svg',
+  './assets/icons/modules/pressure-holding.svg',
+  './assets/icons/modules/rainwater.svg',
+  './assets/icons/modules/unit-converter.svg',
+  './assets/icons/modules/ventilation.svg',
+  './assets/icons/modules/wastewater.svg',
   './docs/legal/agb.html'
 ];
 

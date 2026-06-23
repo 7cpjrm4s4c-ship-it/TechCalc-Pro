@@ -3,10 +3,10 @@
   "name": "Automated Precache Manifest",
   "status": "passed",
   "assets": {
-    "total": 180,
+    "total": 192,
     "js": 165,
-    "css": 4,
-    "icons": 6,
+    "css": 5,
+    "icons": 17,
     "missing": 0,
     "staleRuntime": 0
   },

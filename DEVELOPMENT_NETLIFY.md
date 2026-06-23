@@ -1,4 +1,4 @@
-# TechCalc Pro 1.3.0 — Netlify Development Package
+# TechCalc Pro 1.3.1 Beta 1 — Netlify Development Package
 
 This package contains the full source tree for continued development and Netlify-based preview/deployment.
 
@@ -43,4 +43,4 @@ Netlify must deploy the generated `dist/` directory, not the repository root.
 
 ## Release version
 
-Official release: `1.3.0`
+Beta release: `1.3.1-beta.1`

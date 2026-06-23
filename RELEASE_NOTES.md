@@ -1,3 +1,11 @@
+## Version 1.3.1 Beta 1 — Liquid Glass Design System Baseline
+
+- Neue Beta-Linie 1.3.1 eröffnet; Beta-Nummer läuft ab jetzt pro ZIP-Artefakt mit.
+- Eigenes TechCalc-Pro-Modul-Iconset als SVG ergänzt; keine Apple-Systemicons oder Apple-App-Assets enthalten.
+- Liquid-Glass-Stylesheet als additive Designsystem-Schicht ergänzt und in die App-Shell eingebunden.
+- Aktuelle Entwicklungsbasis aus `1.3.0-development-netlify-v5-updated` übernommen, inklusive angepasster AGB in `docs/legal/agb.html`.
+- Service-Worker-Cache und Precaching auf `1.3.1-beta.1` synchronisiert.
+
 ## Version 1.3.0 — Mobile Feedback Zoom Scope Correction
 
 - iOS/PWA Input-Zoom-Fix auf das Feedback-Formular begrenzt.
