@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-06-23T21:03:10.043Z",
+  "generatedAt": "2026-06-23T21:23:59.137Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -86,12 +86,17 @@
       "area": "event-boundary",
       "message": "Event-Listener außerhalb controller.js gefunden.",
       "evidence": {
-        "count": 1,
+        "count": 2,
         "samples": [
           {
             "file": "index.js",
-            "line": 129,
+            "line": 172,
             "text": "button.addEventListener('click', () => navigate(button.dataset.dashboardModule));"
+          },
+          {
+            "file": "index.js",
+            "line": 175,
+            "text": "button.addEventListener('click', () => {"
           }
         ]
       }
@@ -106,7 +111,7 @@
         "samples": [
           {
             "file": "index.js",
-            "line": 136,
+            "line": 194,
             "text": "root.innerHTML = renderDashboard();"
           }
         ]
@@ -423,9 +428,9 @@
         "state.js"
       ],
       "metrics": {
-        "lineCount": 175,
+        "lineCount": 236,
         "controllerAddEventListeners": 0,
-        "nonControllerAddEventListeners": 1,
+        "nonControllerAddEventListeners": 2,
         "directDomMutationsOutsideRenderer": 1,
         "viewDomQueries": 0,
         "moduleCssSelectors": 0,
@@ -455,12 +460,17 @@
           "area": "event-boundary",
           "message": "Event-Listener außerhalb controller.js gefunden.",
           "evidence": {
-            "count": 1,
+            "count": 2,
             "samples": [
               {
                 "file": "index.js",
-                "line": 129,
+                "line": 172,
                 "text": "button.addEventListener('click', () => navigate(button.dataset.dashboardModule));"
+              },
+              {
+                "file": "index.js",
+                "line": 175,
+                "text": "button.addEventListener('click', () => {"
               }
             ]
           }
@@ -474,7 +484,7 @@
             "samples": [
               {
                 "file": "index.js",
-                "line": 136,
+                "line": 194,
                 "text": "root.innerHTML = renderDashboard();"
               }
             ]
@@ -1181,12 +1191,17 @@
       "area": "event-boundary",
       "message": "Event-Listener außerhalb controller.js gefunden.",
       "evidence": {
-        "count": 1,
+        "count": 2,
         "samples": [
           {
             "file": "index.js",
-            "line": 129,
+            "line": 172,
             "text": "button.addEventListener('click', () => navigate(button.dataset.dashboardModule));"
+          },
+          {
+            "file": "index.js",
+            "line": 175,
+            "text": "button.addEventListener('click', () => {"
           }
         ]
       }
@@ -1201,7 +1216,7 @@
         "samples": [
           {
             "file": "index.js",
-            "line": 136,
+            "line": 194,
             "text": "root.innerHTML = renderDashboard();"
           }
         ]

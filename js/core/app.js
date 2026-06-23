@@ -24,7 +24,7 @@ import { initializeFeedbackController } from '../platform/shell/feedbackControll
 import { initializeServiceWorkerController } from '../platform/shell/serviceWorkerController.js';
 import { initializePerformanceController, markPerformance, measurePerformance, startPerformanceSpan } from '../platform/shell/performanceController.js';
 
-const APP_VERSION = '1.3.1-beta.2';
+const APP_VERSION = '1.3.1-beta.3';
 initializePerformanceController({ appVersion: APP_VERSION });
 const appInitStartMark = markPerformance('app:init:start', { appVersion: APP_VERSION });
 
@@ -240,7 +240,7 @@ function render(id){
   if (!modules.get(id)) return Promise.resolve(false);
   const finish = startPerformanceSpan('module:switch', { moduleId: id });
   return Promise.resolve(moduleRuntime.mount(id))
-    .then(result => { finish({ moduleId: id, status: 'ok' }); return result; })
+    .then(result => { document.body.dataset.route = id; finish({ moduleId: id, status: 'ok' }); return result; })
     .catch(error => { finish({ moduleId: id, status: 'error', error: error?.message || String(error) }); throw error; });
 }
 initRouter(render);

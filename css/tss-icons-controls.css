@@ -130,3 +130,47 @@ button:active,
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) .tss-select-pill { color: var(--color-text); background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); }
 }
+
+/* Beta 3: weniger Glas, bessere Lesbarkeit fuer Dropdowns, Accordions und Eingabefelder. */
+select:not([multiple]),
+input,
+textarea,
+.settings-submenu > summary,
+.settings-submenu__content,
+.tc-input,
+.tc-select {
+  color: #f5f8ff;
+}
+
+:root:not([data-theme='light']) select:not([multiple]),
+:root[data-theme='dark'] select:not([multiple]) {
+  background-color: #182536 !important;
+  background-image: url('../assets/icons/tss/chevron-down.svg') !important;
+  border-color: rgba(170, 190, 220, .34) !important;
+  color: #f5f8ff !important;
+  box-shadow: none !important;
+}
+
+:root:not([data-theme='light']) select:not([multiple]) option,
+:root[data-theme='dark'] select:not([multiple]) option {
+  background: #111d2c;
+  color: #f5f8ff;
+}
+
+:root:not([data-theme='light']) .settings-submenu,
+:root[data-theme='dark'] .settings-submenu,
+:root:not([data-theme='light']) details,
+:root[data-theme='dark'] details {
+  background: rgba(17, 29, 44, .92);
+  border-color: rgba(170, 190, 220, .24);
+}
+
+:root:not([data-theme='light']) .settings-submenu > summary,
+:root[data-theme='dark'] .settings-submenu > summary {
+  color: #f5f8ff;
+}
+
+:root:not([data-theme='light']) .settings-submenu__content,
+:root[data-theme='dark'] .settings-submenu__content {
+  color: rgba(245,248,255,.86);
+}

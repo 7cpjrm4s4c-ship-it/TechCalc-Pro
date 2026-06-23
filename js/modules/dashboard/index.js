@@ -17,6 +17,17 @@ const moduleIconMap = {
   rainwater: 'snowflake'
 };
 
+const accentMap = {
+  'drinking-water': 'blue',
+  'heating-cooling': 'red',
+  rainwater: 'blue',
+  ventilation: 'green',
+  'pipe-sizing': 'slate',
+  'pressure-holding': 'blue',
+  'hx-diagram': 'slate',
+  'unit-converter': 'slate'
+};
+
 function moduleIcon(id) {
   return moduleIconMap[id] || 'grid';
 }
@@ -25,101 +36,133 @@ function selectableModules() {
   return modules.all().filter(module => module.id !== config.id);
 }
 
-function renderQuickStart() {
-  return selectableModules().slice(0, 6).map(module => `
-    <button class="dashboard-module-card" type="button" data-dashboard-module="${esc(module.id)}" data-module-id="${esc(module.id)}" data-accent="${esc(module.accent)}">
-      <span class="tss-icon tss-icon--${moduleIcon(module.id)}" aria-hidden="true"></span>
-      <strong>${esc(module.shortTitle)}</strong>
+function moduleTitle(module) {
+  if (!module) return '';
+  if (module.id === 'heating-cooling') return 'Heizlast';
+  if (module.id === 'drinking-water') return 'Hydraulik';
+  if (module.id === 'pipe-sizing') return 'Rohrnetz';
+  if (module.id === 'rainwater') return 'Kühllast';
+  return module.shortTitle || module.title;
+}
+
+function moduleSubtitle(module) {
+  const subtitle = {
+    'drinking-water': 'Rohrnetz & Druck',
+    'heating-cooling': 'DIN EN 12831',
+    rainwater: 'VDI 2078 / 6007',
+    ventilation: 'DIN EN 16798',
+    'pipe-sizing': 'Dimensionierung',
+    'pressure-holding': 'Auslegung',
+    'hx-diagram': 'Diagramme',
+    'unit-converter': 'Einheiten'
+  };
+  return subtitle[module?.id] || module?.group || '';
+}
+
+function firstModuleId() {
+  return selectableModules()[0]?.id || 'heating-cooling';
+}
+
+function homeModules() {
+  const preferred = ['drinking-water', 'heating-cooling', 'rainwater', 'ventilation', 'pipe-sizing', 'pressure-holding', 'hx-diagram', 'unit-converter'];
+  const byId = new Map(selectableModules().map(module => [module.id, module]));
+  const ordered = preferred.map(id => byId.get(id)).filter(Boolean);
+  const rest = selectableModules().filter(module => !preferred.includes(module.id));
+  return [...ordered, ...rest];
+}
+
+function renderModuleTile(module, { favorite = false } = {}) {
+  const accent = accentMap[module.id] || 'blue';
+  return `
+    <button class="home-module-tile" type="button" data-dashboard-module="${esc(module.id)}" data-accent="${esc(accent)}">
+      ${favorite ? '<span class="home-favorite-star tss-icon tss-icon--star" aria-hidden="true"></span>' : ''}
+      <span class="home-module-icon tss-icon tss-icon--${moduleIcon(module.id)}" aria-hidden="true"></span>
+      <strong>${esc(moduleTitle(module))}</strong>
+      <small>${esc(moduleSubtitle(module))}</small>
     </button>
-  `).join('');
+  `;
+}
+
+function renderFavorites() {
+  return homeModules().slice(0, 4).map(module => renderModuleTile(module, { favorite: true })).join('');
+}
+
+function renderAllModules() {
+  return homeModules().slice(0, 8).map(module => renderModuleTile(module)).join('');
 }
 
 function renderRecent() {
   const rows = [
-    ['drinking-water', 'Wohnanlage Musterstraße', 'Trinkwasser · Version 3', '12.05.2025', '14:32'],
-    ['heating-cooling', 'Bürogebäude Nord', 'Heizlast · Version 5', '12.05.2025', '11:18'],
-    ['rainwater', 'Einkaufszentrum West', 'Regenwasser · Version 2', '11.05.2025', '16:45'],
-    ['ventilation', 'Produktionshalle Süd', 'Lüftung · Version 4', '10.05.2025', '09:27'],
-    ['pipe-sizing', 'Schulzentrum Mitte', 'Rohrnetz · Version 3', '09.05.2025', '15:12']
+    ['drinking-water', 'Wohnanlage Musterstraße', 'Hydraulik · Version 3', 'Heute, 14:32'],
+    ['heating-cooling', 'Bürogebäude Nord', 'Heizlast · Version 5', 'Heute, 11:18'],
+    ['rainwater', 'Einkaufszentrum West', 'Kühllast · Version 2', 'Gestern, 16:45'],
+    ['ventilation', 'Produktionshalle Süd', 'Lüftung · Version 4', 'Gestern, 09:27'],
+    ['pipe-sizing', 'Schulzentrum Mitte', 'Rohrnetz · Version 3', '09.05.2025, 15:12']
   ];
-  return rows.map(([id, title, meta, date, time]) => `
-    <button class="dashboard-list-row" type="button" data-dashboard-module="${esc(id)}" data-module-id="${esc(id)}">
-      <span class="tss-icon tss-icon--${moduleIcon(id)}" aria-hidden="true"></span>
-      <span><strong>${esc(title)}</strong><small>${esc(meta)}</small></span>
-      <time>${esc(date)}<br>${esc(time)}</time>
-      <span class="tss-icon tss-icon--ellipsis" aria-hidden="true"></span>
+  return rows.map(([id, title, meta, time]) => `
+    <button class="home-recent-row" type="button" data-dashboard-module="${esc(id)}">
+      <span class="home-recent-icon tss-icon tss-icon--${moduleIcon(id)}" aria-hidden="true"></span>
+      <span class="home-recent-main"><strong>${esc(title)}</strong><small>${esc(meta)}</small></span>
+      <time>${esc(time)}</time>
+      <span class="tss-icon tss-icon--chevron-right" aria-hidden="true"></span>
     </button>
   `).join('');
 }
 
-function renderStatsLegend() {
-  const rows = [
-    ['Hydraulik', '32 (25%)'], ['Heizlast', '28 (22%)'], ['Kühllast', '24 (19%)'],
-    ['Lüftung', '22 (17%)'], ['Rohrnetz', '14 (11%)'], ['Pumpen', '8 (6%)']
+function renderBottomNav() {
+  const items = [
+    ['dashboard', 'Start', 'grid'],
+    ['projects', 'Projekte', 'folder'],
+    ['unit-converter', 'Berechnungen', 'calculator'],
+    ['settings', 'Einstellungen', 'gear']
   ];
-  return rows.map(([label, value]) => `<li><span></span>${esc(label)}<strong>${esc(value)}</strong></li>`).join('');
+  return items.map(([id, label, icon]) => `
+    <button class="home-bottom-item ${id === 'dashboard' ? 'is-active' : ''}" type="button" data-home-action="${esc(id)}">
+      <span class="tss-icon tss-icon--${esc(icon)}" aria-hidden="true"></span>
+      <span>${esc(label)}</span>
+    </button>
+  `).join('');
 }
 
 function renderDashboard() {
   return `
-    <section class="dashboard-shell span-12" aria-labelledby="dashboardTitle">
-      <div class="dashboard-head">
+    <section class="home-shell span-12" aria-labelledby="homeTitle">
+      <div class="home-topbar">
         <div>
-          <h1 id="dashboardTitle">Dashboard</h1>
+          <h1 id="homeTitle">Start</h1>
           <p>Übersicht & Schnellzugriff</p>
         </div>
-        <div class="dashboard-search" role="search">
-          <input type="search" placeholder="Suche…" aria-label="Dashboard durchsuchen">
-          <span class="tss-icon tss-icon--magnifyingglass" aria-hidden="true"></span>
+        <div class="home-top-actions">
+          <button class="home-circle-button" type="button" aria-label="Suchen"><span class="tss-icon tss-icon--magnifyingglass" aria-hidden="true"></span></button>
+          <button class="home-circle-button" type="button" aria-label="Weitere Optionen"><span class="tss-icon tss-icon--ellipsis" aria-hidden="true"></span></button>
         </div>
       </div>
 
-      <div class="dashboard-actions" aria-label="Schnellaktionen">
-        <button class="dashboard-action-card dashboard-action-card--primary" type="button" data-dashboard-module="heating-cooling"><span class="tss-icon tss-icon--plus" aria-hidden="true"></span><strong>Neues Projekt</strong></button>
-        <button class="dashboard-action-card" type="button"><span class="tss-icon tss-icon--folder" aria-hidden="true"></span><strong>Projekt öffnen</strong></button>
-        <button class="dashboard-action-card" type="button" data-dashboard-module="unit-converter"><span class="tss-icon tss-icon--calculator" aria-hidden="true"></span><strong>Berechnung</strong></button>
-        <button class="dashboard-action-card" type="button" data-dashboard-module="hx-diagram"><span class="tss-icon tss-icon--chart" aria-hidden="true"></span><strong>Diagramme</strong></button>
-        <button class="dashboard-action-card" type="button"><span class="tss-icon tss-icon--doc" aria-hidden="true"></span><strong>Vorlagen</strong></button>
+      <div class="home-search" role="search">
+        <span class="tss-icon tss-icon--magnifyingglass" aria-hidden="true"></span>
+        <input type="search" placeholder="Suche…" aria-label="Startseite durchsuchen">
       </div>
 
-      <div class="dashboard-grid">
-        <article class="dashboard-panel dashboard-panel--recent">
-          <header><span class="tss-icon tss-icon--clock" aria-hidden="true"></span><h2>Zuletzt verwendet</h2></header>
-          <div class="dashboard-list">${renderRecent()}</div>
-          <button class="dashboard-link" type="button">Alle Projekte anzeigen <span class="tss-icon tss-icon--chevron-right" aria-hidden="true"></span></button>
-        </article>
+      <section class="home-section home-section--favorites" aria-labelledby="homeFavoritesTitle">
+        <header class="home-section-head"><h2 id="homeFavoritesTitle">Favoriten</h2><button type="button">Bearbeiten</button></header>
+        <div class="home-favorites-strip">${renderFavorites()}</div>
+      </section>
 
-        <article class="dashboard-panel dashboard-panel--quick">
-          <header><span class="tss-icon tss-icon--bolt" aria-hidden="true"></span><h2>Schnellstart</h2></header>
-          <div class="dashboard-module-grid">${renderQuickStart()}</div>
-          <button class="dashboard-link" type="button">Alle Module <span class="tss-icon tss-icon--chevron-right" aria-hidden="true"></span></button>
-        </article>
+      <section class="home-section" aria-labelledby="homeRecentTitle">
+        <header class="home-section-head"><h2 id="homeRecentTitle">Zuletzt verwendet</h2><button type="button">Alle anzeigen</button></header>
+        <div class="home-recent-list">${renderRecent()}</div>
+      </section>
 
-        <article class="dashboard-panel dashboard-panel--stats">
-          <header><span class="tss-icon tss-icon--chart" aria-hidden="true"></span><h2>Berechnungsstatistik</h2><button class="tss-select-pill" type="button">Diese Woche <span class="tss-icon tss-icon--chevron-down" aria-hidden="true"></span></button></header>
-          <div class="dashboard-donut" aria-label="128 Berechnungen"><strong>128</strong><span>Berechnungen</span></div>
-          <ul class="dashboard-legend">${renderStatsLegend()}</ul>
-          <button class="dashboard-link" type="button">Statistik öffnen <span class="tss-icon tss-icon--chevron-right" aria-hidden="true"></span></button>
-        </article>
+      <section class="home-section" aria-labelledby="homeModulesTitle">
+        <header class="home-section-head"><h2 id="homeModulesTitle">Alle Module</h2><button type="button">Alle anzeigen</button></header>
+        <div class="home-module-grid">${renderAllModules()}</div>
+      </section>
 
-        <article class="dashboard-panel dashboard-panel--status">
-          <header><span class="tss-icon tss-icon--checkmark-circle" aria-hidden="true"></span><h2>Systemstatus</h2></header>
-          <p>Alle Systeme funktionieren einwandfrei.</p>
-          <dl class="dashboard-status-list"><div><dt>Berechnungsengine</dt><dd>Online</dd></div><div><dt>Datenbank</dt><dd>Online</dd></div><div><dt>Lizenzstatus</dt><dd>Aktiv</dd></div><div><dt>Updates</dt><dd>Aktuell</dd></div></dl>
-        </article>
-
-        <article class="dashboard-panel dashboard-panel--tasks">
-          <header><span class="tss-icon tss-icon--bell" aria-hidden="true"></span><h2>Hinweise & Aufgaben</h2></header>
-          <div class="dashboard-task"><span class="tss-icon tss-icon--warning" aria-hidden="true"></span><strong>Wartung empfohlen</strong><small>Datenbankwartung in 7 Tagen fällig.</small><span class="tss-icon tss-icon--chevron-right"></span></div>
-          <div class="dashboard-task"><span class="tss-icon tss-icon--info" aria-hidden="true"></span><strong>Update verfügbar</strong><small>Version 1.3.1 Beta 2 ist verfügbar.</small><span class="tss-icon tss-icon--chevron-right"></span></div>
-          <div class="dashboard-task"><span class="tss-icon tss-icon--checkmark-circle" aria-hidden="true"></span><strong>Backup erfolgreich</strong><small>Letztes Backup: Heute, 02:15 Uhr</small><span class="tss-icon tss-icon--chevron-right"></span></div>
-        </article>
-
-        <article class="dashboard-panel dashboard-panel--favorites">
-          <header><span class="tss-icon tss-icon--star" aria-hidden="true"></span><h2>Favoriten</h2></header>
-          <div class="dashboard-list dashboard-list--compact">${renderRecent().replaceAll('Wohnanlage Musterstraße','Hydraulik Standard').replaceAll('Bürogebäude Nord','Heizlast DIN EN 12831').replaceAll('Einkaufszentrum West','Kühllast VDI 2078').replaceAll('Produktionshalle Süd','Rohrnetz Trinkwasser').split('</button>').slice(0,4).join('</button>')}</button></div>
-        </article>
+      <div class="home-new-project-wrap">
+        <button class="home-new-project" type="button" data-dashboard-module="${esc(firstModuleId())}"><span class="tss-icon tss-icon--plus" aria-hidden="true"></span> Neues Projekt</button>
       </div>
+
+      <nav class="home-bottom-nav" aria-label="Startseiten-Navigation">${renderBottomNav()}</nav>
     </section>
   `;
 }
@@ -128,6 +171,21 @@ function bind(root) {
   root.querySelectorAll('[data-dashboard-module]').forEach(button => {
     button.addEventListener('click', () => navigate(button.dataset.dashboardModule));
   });
+  root.querySelectorAll('[data-home-action]').forEach(button => {
+    button.addEventListener('click', () => {
+      const action = button.dataset.homeAction;
+      if (action === 'dashboard') return;
+      if (action === 'settings') {
+        document.getElementById('settingsButton')?.click();
+        return;
+      }
+      if (action === 'projects') {
+        document.getElementById('openProjectButton')?.click();
+        return;
+      }
+      navigate(action);
+    });
+  });
 }
 
 export default {
@@ -135,7 +193,10 @@ export default {
   mount(root) {
     root.innerHTML = renderDashboard();
     root.dataset.activeModuleId = config.id;
+    document.body.dataset.route = config.id;
     bind(root);
-    return () => {};
+    return () => {
+      if (document.body.dataset.route === config.id) delete document.body.dataset.route;
+    };
   }
 };

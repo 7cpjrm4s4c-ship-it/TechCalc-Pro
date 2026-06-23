@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.1-beta.2';
-const CACHE_REVISION = '1.3.1-beta.2-version-1-3-1-beta-2-dashboard-tss-system-icons-ui-controls';
+const CACHE_NAME = 'techcalc-pro-1.3.1-beta.3';
+const CACHE_REVISION = '1.3.1-beta.3-version-1-3-1-beta-3';
 const ASSETS = [
   './',
   './index.html',
