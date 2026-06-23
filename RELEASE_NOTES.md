@@ -1,3 +1,11 @@
+## Version 1.3.1 Beta 2 — Dashboard / TSS System Icons / UI Controls
+
+- Neues Dashboard-Modul als Startseite ergänzt.
+- Eigenes TechCalc Symbol System (TSS) für Systemicons, Chevrons, Aktionen, Status und Modul-Schnellzugriffe ergänzt.
+- iOS-inspirierte UI-Control-Schicht für Dropdowns, Buttons, Accordions und Touch-Animationen umgesetzt.
+- App-Icon, Markenname und bestehender Header bleiben unverändert.
+- Kein zusätzliches Hamburger-Menü im Dashboard-Layout.
+
 ## Version 1.3.1 Beta 1 — Liquid Glass Design System Baseline
 
 - Neue Beta-Linie 1.3.1 eröffnet; Beta-Nummer läuft ab jetzt pro ZIP-Artefakt mit.

@@ -1,0 +1,132 @@
+/* TechCalc Symbol System — eigene iOS-inspirierte Systemicons und Controls. */
+:root {
+  --tss-icon-stroke: 2;
+  --tss-control-size: 44px;
+  --tss-control-radius: 16px;
+  --tss-control-bg: linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,255,255,.055));
+  --tss-control-border: rgba(255,255,255,.22);
+  --tss-control-shadow: 0 12px 28px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.34);
+  --tss-blue: #2f7fff;
+  --tss-red: #ff3b4f;
+  --tss-green: #24b26b;
+  --tss-yellow: #ffb340;
+}
+
+.tss-icon,
+.tss-button::before,
+select:not([multiple]) {
+  --tss-icon-url: var(--tss-icon-chevron-down);
+}
+
+.tss-icon {
+  width: 22px;
+  height: 22px;
+  display: inline-block;
+  flex: 0 0 auto;
+  color: currentColor;
+  background: currentColor;
+  -webkit-mask: var(--tss-icon-url) center / contain no-repeat;
+  mask: var(--tss-icon-url) center / contain no-repeat;
+  vertical-align: -.22em;
+}
+
+.tss-icon--chevron-down { --tss-icon-url: url('../assets/icons/tss/chevron-down.svg'); }
+.tss-icon--chevron-up { --tss-icon-url: url('../assets/icons/tss/chevron-up.svg'); }
+.tss-icon--chevron-left { --tss-icon-url: url('../assets/icons/tss/chevron-left.svg'); }
+.tss-icon--chevron-right { --tss-icon-url: url('../assets/icons/tss/chevron-right.svg'); }
+.tss-icon--xmark { --tss-icon-url: url('../assets/icons/tss/xmark.svg'); }
+.tss-icon--trash { --tss-icon-url: url('../assets/icons/tss/trash.svg'); }
+.tss-icon--plus { --tss-icon-url: url('../assets/icons/tss/plus.svg'); }
+.tss-icon--pencil { --tss-icon-url: url('../assets/icons/tss/pencil.svg'); }
+.tss-icon--arrow-clockwise { --tss-icon-url: url('../assets/icons/tss/arrow-clockwise.svg'); }
+.tss-icon--magnifyingglass { --tss-icon-url: url('../assets/icons/tss/magnifyingglass.svg'); }
+.tss-icon--share { --tss-icon-url: url('../assets/icons/tss/share.svg'); }
+.tss-icon--ellipsis { --tss-icon-url: url('../assets/icons/tss/ellipsis.svg'); }
+.tss-icon--gear { --tss-icon-url: url('../assets/icons/tss/gear.svg'); }
+.tss-icon--info { --tss-icon-url: url('../assets/icons/tss/info.svg'); }
+.tss-icon--warning { --tss-icon-url: url('../assets/icons/tss/warning.svg'); }
+.tss-icon--checkmark-circle { --tss-icon-url: url('../assets/icons/tss/checkmark-circle.svg'); }
+.tss-icon--sliders { --tss-icon-url: url('../assets/icons/tss/sliders.svg'); }
+.tss-icon--drop { --tss-icon-url: url('../assets/icons/tss/drop.svg'); }
+.tss-icon--thermometer { --tss-icon-url: url('../assets/icons/tss/thermometer.svg'); }
+.tss-icon--snowflake { --tss-icon-url: url('../assets/icons/tss/snowflake.svg'); }
+.tss-icon--waves { --tss-icon-url: url('../assets/icons/tss/waves.svg'); }
+.tss-icon--chart { --tss-icon-url: url('../assets/icons/tss/chart.svg'); }
+.tss-icon--grid { --tss-icon-url: url('../assets/icons/tss/grid.svg'); }
+.tss-icon--folder { --tss-icon-url: url('../assets/icons/tss/folder.svg'); }
+.tss-icon--calculator { --tss-icon-url: url('../assets/icons/tss/calculator.svg'); }
+.tss-icon--doc { --tss-icon-url: url('../assets/icons/tss/doc.svg'); }
+.tss-icon--clock { --tss-icon-url: url('../assets/icons/tss/clock.svg'); }
+.tss-icon--bolt { --tss-icon-url: url('../assets/icons/tss/bolt.svg'); }
+.tss-icon--bell { --tss-icon-url: url('../assets/icons/tss/bell.svg'); }
+.tss-icon--star { --tss-icon-url: url('../assets/icons/tss/star.svg'); }
+.tss-icon--pipe { --tss-icon-url: url('../assets/icons/tss/pipe.svg'); }
+.tss-icon--gauge { --tss-icon-url: url('../assets/icons/tss/gauge.svg'); }
+.tss-icon--cylinder { --tss-icon-url: url('../assets/icons/tss/cylinder.svg'); }
+.tss-icon--cube { --tss-icon-url: url('../assets/icons/tss/cube.svg'); }
+
+select:not([multiple]) {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 42px !important;
+  background-image: url('../assets/icons/tss/chevron-down.svg'), var(--tcp-glass-bg, linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.04)));
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 14px center, center;
+  background-size: 16px 16px, auto;
+}
+
+button,
+.mini-button,
+.icon-button,
+.module-tab,
+.dashboard-action-card,
+.dashboard-module-card,
+.dashboard-list-row,
+.dashboard-link {
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease, background .18s ease, border-color .18s ease;
+}
+button:active,
+.mini-button:active,
+.icon-button:active,
+.module-tab:active,
+.dashboard-action-card:active,
+.dashboard-module-card:active,
+.dashboard-list-row:active {
+  transform: scale(.97);
+}
+
+.icon-button,
+.mini-button {
+  border-radius: var(--tss-control-radius);
+}
+
+.settings-submenu > summary::after {
+  content: '' !important;
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  -webkit-mask: url('../assets/icons/tss/chevron-down.svg') center / contain no-repeat;
+  mask: url('../assets/icons/tss/chevron-down.svg') center / contain no-repeat;
+  transform: rotate(0deg) !important;
+  transition: transform .22s cubic-bezier(.34,1.56,.64,1);
+}
+.settings-submenu[open] > summary::after,
+.settings-submenu.is-open > summary::after { transform: rotate(180deg) !important; }
+
+.tss-select-pill {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(70,85,110,.18);
+  border-radius: 14px;
+  background: rgba(255,255,255,.48);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #16233a;
+  box-shadow: 0 10px 22px rgba(31,48,76,.08), inset 0 1px 0 rgba(255,255,255,.7);
+}
+
+:root[data-theme='dark'] .tss-select-pill { color: var(--color-text); background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .tss-select-pill { color: var(--color-text); background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); }
+}

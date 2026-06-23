@@ -1,6 +1,6 @@
 import { modules } from './registry.js';
 
-const DEFAULT_ROUTE = 'heating-cooling';
+const DEFAULT_ROUTE = 'dashboard';
 const HASH_PREFIX = '#/';
 let renderCallback = () => Promise.resolve(false);
 let activeRouteId = '';

@@ -1,14 +1,14 @@
 {
   "phase": "31C",
   "title": "Module smoke test audit",
-  "generatedAt": "2026-06-23T16:41:52.002Z",
+  "generatedAt": "2026-06-23T21:03:09.918Z",
   "central": {
     "enterTab": true,
     "scroll": true,
     "reset": true
   },
-  "moduleCount": 11,
-  "passed": 11,
+  "moduleCount": 12,
+  "passed": 12,
   "review": 0,
   "modules": [
     {
@@ -38,6 +38,38 @@
         "decimalOrTextCount": 0,
         "hasImmediateCommit": false,
         "hasUnitLabels": true
+      },
+      "checks": {
+        "inputs": true,
+        "savedRecords": true,
+        "enterTab": true,
+        "scroll": true,
+        "results": true,
+        "reset": true,
+        "unitSwitch": true
+      },
+      "status": "pass"
+    },
+    {
+      "module": "dashboard",
+      "files": [
+        "config.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js"
+      ],
+      "missingRequired": [],
+      "optionalRuntimeFilesPresent": [],
+      "schema": {
+        "fieldCount": 1,
+        "groupCount": 1,
+        "inputFieldCount": 1,
+        "selectOrSegmentCount": 0,
+        "decimalOrTextCount": 1,
+        "hasImmediateCommit": true,
+        "hasUnitLabels": false
       },
       "checks": {
         "inputs": true,

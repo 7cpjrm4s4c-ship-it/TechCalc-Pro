@@ -1,6 +1,7 @@
 import { modules } from './registry.js';
 import { initRouter, currentRoute, navigate } from './router.js';
 import { renderNavigation, renderQuickAccessSettings } from './navigation.js';
+import dashboardConfig from '../modules/dashboard/config.js';
 import heatingCoolingConfig from '../modules/heating-cooling/config.js';
 import ventilationConfig from '../modules/ventilation/config.js';
 import pipeSizingConfig from '../modules/pipe-sizing/config.js';
@@ -23,11 +24,12 @@ import { initializeFeedbackController } from '../platform/shell/feedbackControll
 import { initializeServiceWorkerController } from '../platform/shell/serviceWorkerController.js';
 import { initializePerformanceController, markPerformance, measurePerformance, startPerformanceSpan } from '../platform/shell/performanceController.js';
 
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.3.1-beta.2';
 initializePerformanceController({ appVersion: APP_VERSION });
 const appInitStartMark = markPerformance('app:init:start', { appVersion: APP_VERSION });
 
 const lazyModules = [
+  { config: dashboardConfig, path: '../modules/dashboard/index.js' },
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
   { config: ventilationConfig, path: '../modules/ventilation/index.js' },
   { config: pressureHoldingConfig, path: '../modules/pressure-holding/index.js' },

@@ -2,16 +2,17 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-06-23T16:41:52.172Z",
+  "generatedAt": "2026-06-23T21:03:10.043Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
     "pressure-holding",
     "buffer-storage"
   ],
-  "modulesAudited": 11,
+  "modulesAudited": 12,
   "moduleScores": {
     "buffer-storage": 93,
+    "dashboard": 48,
     "drinking-water": 71,
     "heat-recovery": 100,
     "heating-cooling": 100,
@@ -24,8 +25,8 @@
     "wastewater": 93
   },
   "riskCounts": {
-    "P1": 1,
-    "P2": 6
+    "P1": 4,
+    "P2": 7
   },
   "cssDebt": [
     {
@@ -66,6 +67,51 @@
     }
   ],
   "topFindings": [
+    {
+      "module": "dashboard",
+      "priority": "P1",
+      "area": "module-contract",
+      "message": "Pflichtdateien fehlen: controller.js, viewModel.js, view.js",
+      "evidence": {
+        "missing": [
+          "controller.js",
+          "viewModel.js",
+          "view.js"
+        ]
+      }
+    },
+    {
+      "module": "dashboard",
+      "priority": "P1",
+      "area": "event-boundary",
+      "message": "Event-Listener außerhalb controller.js gefunden.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "file": "index.js",
+            "line": 129,
+            "text": "button.addEventListener('click', () => navigate(button.dataset.dashboardModule));"
+          }
+        ]
+      }
+    },
+    {
+      "module": "dashboard",
+      "priority": "P1",
+      "area": "render-boundary",
+      "message": "Direkte DOM-HTML-Mutationen außerhalb erlaubter Renderer-Boundaries gefunden.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "file": "index.js",
+            "line": 136,
+            "text": "root.innerHTML = renderDashboard();"
+          }
+        ]
+      }
+    },
     {
       "module": "drinking-water",
       "priority": "P1",
@@ -119,6 +165,21 @@
             "cssFile": "css/modules.css",
             "line": 105,
             "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
+          }
+        ]
+      }
+    },
+    {
+      "module": "dashboard",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 12,
+            "text": "migrationStatus: 'platform',"
           }
         ]
       }
@@ -344,6 +405,91 @@
                 "cssFile": "css/modules.css",
                 "line": 105,
                 "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "module": "dashboard",
+      "reference": false,
+      "files": [
+        "config.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js"
+      ],
+      "metrics": {
+        "lineCount": 175,
+        "controllerAddEventListeners": 0,
+        "nonControllerAddEventListeners": 1,
+        "directDomMutationsOutsideRenderer": 1,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": false,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 1
+      },
+      "score": 48,
+      "status": "priority-cleanup-required",
+      "findings": [
+        {
+          "priority": "P1",
+          "area": "module-contract",
+          "message": "Pflichtdateien fehlen: controller.js, viewModel.js, view.js",
+          "evidence": {
+            "missing": [
+              "controller.js",
+              "viewModel.js",
+              "view.js"
+            ]
+          }
+        },
+        {
+          "priority": "P1",
+          "area": "event-boundary",
+          "message": "Event-Listener außerhalb controller.js gefunden.",
+          "evidence": {
+            "count": 1,
+            "samples": [
+              {
+                "file": "index.js",
+                "line": 129,
+                "text": "button.addEventListener('click', () => navigate(button.dataset.dashboardModule));"
+              }
+            ]
+          }
+        },
+        {
+          "priority": "P1",
+          "area": "render-boundary",
+          "message": "Direkte DOM-HTML-Mutationen außerhalb erlaubter Renderer-Boundaries gefunden.",
+          "evidence": {
+            "count": 1,
+            "samples": [
+              {
+                "file": "index.js",
+                "line": 136,
+                "text": "root.innerHTML = renderDashboard();"
+              }
+            ]
+          }
+        },
+        {
+          "priority": "P2",
+          "area": "runtime-metadata",
+          "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+          "evidence": {
+            "count": 1,
+            "samples": [
+              {
+                "line": 12,
+                "text": "migrationStatus: 'platform',"
               }
             ]
           }
@@ -903,6 +1049,7 @@
         "js/core/app.js",
         "js/core/preferences.js",
         "js/core/projectStorage.js",
+        "js/modules/dashboard/index.js",
         "js/modules/heat-recovery/logic.js",
         "js/modules/ventilation/config.js",
         "js/modules/ventilation/logic.js",
@@ -1016,6 +1163,51 @@
   ],
   "riskRegister": [
     {
+      "module": "dashboard",
+      "priority": "P1",
+      "area": "module-contract",
+      "message": "Pflichtdateien fehlen: controller.js, viewModel.js, view.js",
+      "evidence": {
+        "missing": [
+          "controller.js",
+          "viewModel.js",
+          "view.js"
+        ]
+      }
+    },
+    {
+      "module": "dashboard",
+      "priority": "P1",
+      "area": "event-boundary",
+      "message": "Event-Listener außerhalb controller.js gefunden.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "file": "index.js",
+            "line": 129,
+            "text": "button.addEventListener('click', () => navigate(button.dataset.dashboardModule));"
+          }
+        ]
+      }
+    },
+    {
+      "module": "dashboard",
+      "priority": "P1",
+      "area": "render-boundary",
+      "message": "Direkte DOM-HTML-Mutationen außerhalb erlaubter Renderer-Boundaries gefunden.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "file": "index.js",
+            "line": 136,
+            "text": "root.innerHTML = renderDashboard();"
+          }
+        ]
+      }
+    },
+    {
       "module": "drinking-water",
       "priority": "P1",
       "area": "event-boundary",
@@ -1068,6 +1260,21 @@
             "cssFile": "css/modules.css",
             "line": 105,
             "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
+          }
+        ]
+      }
+    },
+    {
+      "module": "dashboard",
+      "priority": "P2",
+      "area": "runtime-metadata",
+      "message": "migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.",
+      "evidence": {
+        "count": 1,
+        "samples": [
+          {
+            "line": 12,
+            "text": "migrationStatus: 'platform',"
           }
         ]
       }
