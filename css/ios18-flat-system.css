@@ -1,4 +1,4 @@
-/* TechCalc Pro 1.3.1 Beta 5 — global iOS-18-flat design contract.
+/* TechCalc Pro 1.3.1 Beta 6 — global iOS-18-flat design contract.
    Ziel: hoher Kontrast, klare Flaechen, keine schweren Liquid-Glass-Effekte. */
 :root {
   --ios18-bg: #07111d;
@@ -246,10 +246,10 @@ textarea::placeholder { color: rgba(218,228,244,.48) !important; -webkit-text-fi
   box-shadow: 0 0 0 1px rgba(47,140,255,.30), 0 10px 22px rgba(47,140,255,.12) !important;
 }
 
-/* Beta 5: Dashboard entfernt. Globales Design bleibt iOS-18-flat. */
+/* Beta 6: Dashboard entfernt. Globales Design bleibt iOS-18-flat. */
 
 
-/* Beta 5: globaler Flat-Design-Kontrast fuer alle Berechnungsmodule. */
+/* Beta 6: globaler Flat-Design-Kontrast fuer alle Berechnungsmodule. */
 .module-shell,
 .module-section,
 .card,
@@ -286,4 +286,141 @@ details > summary {
 .saved-record-card__toggle,
 .theme-switch__option {
   forced-color-adjust: auto;
+}
+
+/* TechCalc Pro 1.3.1 Beta 6 — dezentes globales Modul-Akzentsystem.
+   Heizung = rot, Kälte = blau, alle übrigen Module = cyan.
+   Ergebnisbereiche bleiben neutral. */
+:root {
+  --module-accent-cyan: #45c7d8;
+  --module-accent-blue: #4f91df;
+  --module-accent-red: #df6a72;
+  --module-accent: var(--module-accent-cyan);
+  --module-accent-soft: color-mix(in srgb, var(--module-accent) 18%, transparent);
+  --module-accent-border: color-mix(in srgb, var(--module-accent) 48%, var(--ios18-border));
+  --result-border-neutral: rgba(154,174,202,.28);
+  --result-border-neutral-strong: rgba(185,205,232,.36);
+}
+
+/* Default: cyan for all modules. */
+.module-view,
+.module-view[data-module],
+[data-module] {
+  --module-accent: var(--module-accent-cyan);
+  --module-accent-soft: color-mix(in srgb, var(--module-accent) 14%, transparent);
+  --module-accent-border: color-mix(in srgb, var(--module-accent) 42%, var(--ios18-border));
+}
+
+/* Heiz-/Kuehlmodul: active operating mode controls the accent. */
+.module-view[data-module="heating-cooling"] {
+  --module-accent: var(--module-accent-red);
+}
+.module-view[data-module="heating-cooling"]:has([data-segment="mode"][data-value="cooling"].is-active) {
+  --module-accent: var(--module-accent-blue);
+}
+.module-view[data-module="heating-cooling"]:has([data-segment="mode"][data-value="heating"].is-active) {
+  --module-accent: var(--module-accent-red);
+}
+
+/* Module with internal heating/cooling switches retain the same logic where visible. */
+.module-view:has([data-segment="mode"][data-value="cooling"].is-active),
+.module-view:has([data-segment="systemType"][data-value="cooling"].is-active) {
+  --module-accent: var(--module-accent-blue);
+}
+.module-view:has([data-segment="mode"][data-value="heating"].is-active),
+.module-view:has([data-segment="systemType"][data-value="heating"].is-active) {
+  --module-accent: var(--module-accent-red);
+}
+.module-view:not([data-module="heating-cooling"]):not(:has([data-segment="mode"][data-value="cooling"].is-active)):not(:has([data-segment="mode"][data-value="heating"].is-active)):not(:has([data-segment="systemType"][data-value="cooling"].is-active)):not(:has([data-segment="systemType"][data-value="heating"].is-active)) {
+  --module-accent: var(--module-accent-cyan);
+}
+
+/* Segment switches / toggle-like controls. Theme switch is intentionally excluded. */
+.module-view .segmented button.is-active,
+.module-view .segmented--blue button.is-active,
+.module-view .segmented--cyan button.is-active,
+.module-view .segmented--orange button.is-active,
+.module-view .segmented--green button.is-active,
+.module-view .segmented--purple button.is-active {
+  background: color-mix(in srgb, var(--module-accent) 78%, #122034) !important;
+  border-color: var(--module-accent-border) !important;
+  color: #fff !important;
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--module-accent) 72%, transparent) !important;
+}
+.module-view .segmented,
+.module-view .segmented--blue,
+.module-view .segmented--cyan,
+.module-view .segmented--orange,
+.module-view .segmented--green,
+.module-view .segmented--purple {
+  border-color: color-mix(in srgb, var(--module-accent) 22%, var(--ios18-border)) !important;
+}
+
+/* Eingabe- und Auswahlfelder erhalten die dezente Modul-Umrandung. */
+.module-view .field .control,
+.module-view .tc-field .control,
+.module-view .field input,
+.module-view .field select,
+.module-view .field textarea,
+.module-view .tc-add-row input,
+.module-view .tc-add-row select,
+.module-view .dw-add-row input,
+.module-view .dw-add-row select,
+.module-view .mini-edit-field input,
+.module-view .project-select-card select {
+  border-color: var(--module-accent-border) !important;
+}
+.module-view .control:focus-within,
+.module-view input:focus,
+.module-view select:focus,
+.module-view textarea:focus {
+  border-color: color-mix(in srgb, var(--module-accent) 72%, #ffffff 8%) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--module-accent) 18%, transparent) !important;
+  outline: none !important;
+}
+
+/* Karten mit Eingabecharakter bekommen nur einen leichten farbigen Rand. */
+.module-view .card:not(.result-card),
+.module-view .tc-card:not(.result-card),
+.module-view .tc-accordion,
+.module-view .dw-accordion,
+.module-view .line-section-card:not(.line-section-card--result),
+.module-view .saved-record-card:not(.saved-record-card--result) {
+  border-color: color-mix(in srgb, var(--module-accent) 20%, var(--ios18-border)) !important;
+}
+
+/* Ergebnis-/Ausgabebereiche immer neutral halten. */
+.module-view .result-card,
+.module-view [data-hc-dynamic="result"],
+.module-view .result-list,
+.module-view .result-row,
+.module-view .tc-result-item,
+.module-view .inline-stat,
+.module-view .pipe-dimension-card,
+.module-view .hx-process,
+.module-view .hx-history__row,
+.module-view .main-result,
+.module-view .recommendation-card,
+.module-view .result-table,
+.module-view .tc-warning,
+.module-view .ph-warning,
+.module-view [data-result],
+.module-view [class*="result"] {
+  border-color: var(--result-border-neutral) !important;
+  box-shadow: none !important;
+}
+.module-view .result-card:focus-within,
+.module-view .tc-result-item:focus-within,
+.module-view .inline-stat:focus-within,
+.module-view [class*="result"]:focus-within {
+  border-color: var(--result-border-neutral-strong) !important;
+  box-shadow: none !important;
+}
+
+/* Navigation may stay blue; module context should not recolor the app shell. */
+.app-header,
+.module-nav,
+.theme-switch,
+.theme-switch__option.is-active {
+  --module-accent: var(--ios18-blue);
 }
