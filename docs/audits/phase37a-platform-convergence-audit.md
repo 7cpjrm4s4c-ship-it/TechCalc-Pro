@@ -4,9 +4,9 @@ Ziel: alle Module gegen die Referenzarchitektur Heizung, Lüftung, Druckhaltung 
 
 ## Executive Summary
 
-- Geprüfte Module: 12
-- P1-Findings: 4
-- P2-Findings: 7
+- Geprüfte Module: 11
+- P1-Findings: 1
+- P2-Findings: 6
 - Unbenutzte Utility-Export-Kandidaten: 2
 
 ## Modul-Scorecard
@@ -14,7 +14,6 @@ Ziel: alle Module gegen die Referenzarchitektur Heizung, Lüftung, Druckhaltung 
 | Modul | Score | Status | P1 | P2 |
 |---|---:|---|---:|---:|
 | buffer-storage * | 93 | reference-aligned | 0 | 1 |
-| dashboard | 48 | priority-cleanup-required | 3 | 1 |
 | drinking-water | 71 | cleanup-required | 1 | 2 |
 | heat-recovery | 100 | reference-aligned | 0 | 0 |
 | heating-cooling * | 100 | reference-aligned | 0 | 0 |
@@ -30,17 +29,13 @@ Ziel: alle Module gegen die Referenzarchitektur Heizung, Lüftung, Druckhaltung 
 
 ## Wichtigste Cleanup-Felder
 
-1. **P1 · dashboard · module-contract** — Pflichtdateien fehlen: controller.js, viewModel.js, view.js
-2. **P1 · dashboard · event-boundary** — Event-Listener außerhalb controller.js gefunden.
-3. **P1 · dashboard · render-boundary** — Direkte DOM-HTML-Mutationen außerhalb erlaubter Renderer-Boundaries gefunden.
-4. **P1 · drinking-water · event-boundary** — Event-Listener außerhalb controller.js gefunden.
-5. **P2 · buffer-storage · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-6. **P2 · dashboard · runtime-metadata** — migrationStatus-Breadcrumbs sind noch im Runtime-Config-Objekt.
-7. **P2 · drinking-water · event-density** — Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.
-8. **P2 · drinking-water · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-9. **P2 · pressure-holding · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-10. **P2 · unit-converter · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-11. **P2 · wastewater · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+1. **P1 · drinking-water · event-boundary** — Event-Listener außerhalb controller.js gefunden.
+2. **P2 · buffer-storage · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+3. **P2 · drinking-water · event-density** — Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.
+4. **P2 · drinking-water · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+5. **P2 · pressure-holding · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+6. **P2 · unit-converter · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+7. **P2 · wastewater · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
 
 ## CSS-Gate
 

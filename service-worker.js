@@ -1,12 +1,11 @@
-const CACHE_NAME = 'techcalc-pro-1.3.1-beta.4';
-const CACHE_REVISION = '1.3.1-beta.4-techcalc-pro-1-3-1-beta-4';
+const CACHE_NAME = 'techcalc-pro-1.3.1-beta.5';
+const CACHE_REVISION = '1.3.1-beta.5-techcalc-pro-1-3-1-beta-5';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './RELEASE_NOTES.md',
   './css/components.css',
-  './css/dashboard.css',
   './css/ios18-flat-system.css',
   './css/layout.css',
   './css/liquid-glass.css',
@@ -61,12 +60,6 @@ const ASSETS = [
   './js/modules/buffer-storage/state.js',
   './js/modules/buffer-storage/view.js',
   './js/modules/buffer-storage/viewModel.js',
-  './js/modules/dashboard/config.js',
-  './js/modules/dashboard/index.js',
-  './js/modules/dashboard/logic.js',
-  './js/modules/dashboard/results.js',
-  './js/modules/dashboard/schema.js',
-  './js/modules/dashboard/state.js',
   './js/modules/drinking-water/config.js',
   './js/modules/drinking-water/controller.js',
   './js/modules/drinking-water/dynamicRenderer.js',

@@ -3,9 +3,9 @@
   --tss-icon-stroke: 2;
   --tss-control-size: 44px;
   --tss-control-radius: 16px;
-  --tss-control-bg: linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,255,255,.055));
-  --tss-control-border: rgba(255,255,255,.22);
-  --tss-control-shadow: 0 12px 28px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.34);
+  --tss-control-bg: #162536;
+  --tss-control-border: rgba(154,174,202,.28);
+  --tss-control-shadow: none;
   --tss-blue: #2f7fff;
   --tss-red: #ff3b4f;
   --tss-green: #24b26b;
@@ -69,10 +69,10 @@ select:not([multiple]) {
   appearance: none;
   -webkit-appearance: none;
   padding-right: 42px !important;
-  background-image: url('../assets/icons/tss/chevron-down.svg'), var(--tcp-glass-bg, linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.04)));
-  background-repeat: no-repeat, no-repeat;
-  background-position: right 14px center, center;
-  background-size: 16px 16px, auto;
+  background-image: url('../assets/icons/tss/chevron-down.svg');
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px 16px;
 }
 
 button,

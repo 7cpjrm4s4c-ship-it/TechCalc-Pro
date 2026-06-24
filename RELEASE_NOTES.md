@@ -1,4 +1,4 @@
-# TechCalc Pro 1.3.1 Beta 4
+# TechCalc Pro 1.3.1 Beta 5
 
 - Globales iOS-18-Flat-Design als verbindlicher App-Kontraststandard ergänzt.
 - Liquid-Glass-Overrides für Module, Accordions, Dropdowns, Eingabefelder, Karten und Ergebnisflächen zurückgenommen.
@@ -7,13 +7,13 @@
 
 
 
-## Version 1.3.1 Beta 4
+## Version 1.3.1 Beta 5
 - Dashboard als feste Startseite beim App-Start etabliert.
 - Mobile Home-Ansicht mit Favoriten, zuletzt verwendeten Projekten, Alle-Module-Kacheln und zentralem „Neues Projekt“-Button umgesetzt.
 - Bestehendes App-Logo und bestehender Header/Schriftzug unverändert beibehalten.
 - Mobile Modul-Navigation auf der Startseite ausgeblendet, um doppelte Navigation und Überlagerungen zu verhindern.
 - Liquid-Glass-Anteil reduziert; Controls, Dropdowns und Accordion-Flächen auf kontrastreicheren iOS-Flat-Look umgestellt.
-## Version 1.3.1 Beta 4 — Dashboard / TSS System Icons / UI Controls
+## Version 1.3.1 Beta 5 — Dashboard / TSS System Icons / UI Controls
 
 - Neues Dashboard-Modul als Startseite ergänzt.
 - Eigenes TechCalc Symbol System (TSS) für Systemicons, Chevrons, Aktionen, Status und Modul-Schnellzugriffe ergänzt.

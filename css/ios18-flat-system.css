@@ -1,4 +1,4 @@
-/* TechCalc Pro 1.3.1 Beta 4 — global iOS-18-flat design contract.
+/* TechCalc Pro 1.3.1 Beta 5 — global iOS-18-flat design contract.
    Ziel: hoher Kontrast, klare Flaechen, keine schweren Liquid-Glass-Effekte. */
 :root {
   --ios18-bg: #07111d;
@@ -75,10 +75,7 @@ body,
 .tc-card::before,
 .result-card::before,
 .saved-record-card::before,
-.line-section-card::before,
-.home-module-tile::before,
-.home-recent-row::before,
-.home-bottom-nav::before { content: none !important; }
+.line-section-card::before { content: none !important; }
 
 /* Header remains current brand variant, but flatter. */
 .app-header,
@@ -186,8 +183,7 @@ textarea::placeholder { color: rgba(218,228,244,.48) !important; -webkit-text-fi
 /* Buttons. */
 .action-button,
 .tc-action,
-.mini-button,
-.sign-toggle {
+.mini-button {
   background: #162536 !important;
   border-color: var(--ios18-border) !important;
   color: var(--ios18-text) !important;
@@ -230,7 +226,6 @@ textarea::placeholder { color: rgba(218,228,244,.48) !important; -webkit-text-fi
 
 /* Results / lists. */
 .result-row,
-.home-recent-row,
 .line-section-card__meta,
 .saved-record-card__meta { border-color: rgba(154,174,202,.18) !important; }
 .inline-stat,
@@ -251,24 +246,44 @@ textarea::placeholder { color: rgba(218,228,244,.48) !important; -webkit-text-fi
   box-shadow: 0 0 0 1px rgba(47,140,255,.30), 0 10px 22px rgba(47,140,255,.12) !important;
 }
 
-/* Dashboard takes the same global contrast values. */
-body[data-route="dashboard"] .app-shell {
-  background: radial-gradient(circle at 50% -10%, rgba(47,140,255,.16), transparent 34%), var(--ios18-bg) !important;
-}
-.home-shell { color: var(--ios18-text) !important; }
-.home-module-tile,
-.home-recent-list,
-.home-bottom-nav,
-.home-circle-button,
-.home-search {
+/* Beta 5: Dashboard entfernt. Globales Design bleibt iOS-18-flat. */
+
+
+/* Beta 5: globaler Flat-Design-Kontrast fuer alle Berechnungsmodule. */
+.module-shell,
+.module-section,
+.card,
+.tc-card,
+.result-card,
+.tc-accordion,
+.dw-accordion,
+.settings-submenu,
+.saved-record-card,
+.line-section-card,
+.hx-card,
+.ph-card {
   background: var(--ios18-surface) !important;
-  border-color: var(--ios18-border) !important;
+  border: 1px solid var(--ios18-border) !important;
   box-shadow: var(--ios18-shadow-soft) !important;
 }
-.home-module-tile strong,
-.home-recent-main strong,
-.home-section-head h2 { color: var(--ios18-text) !important; }
-.home-module-tile small,
-.home-recent-main small,
-.home-recent-row time,
-.home-topbar p { color: var(--ios18-muted) !important; }
+
+.tc-accordion > summary,
+.dw-accordion > summary,
+details > summary {
+  min-height: 48px;
+  color: var(--ios18-text) !important;
+}
+
+.tc-accordion__body,
+.dw-accordion__body,
+.settings-submenu__content {
+  color: var(--ios18-muted) !important;
+}
+
+/* Akzentfarben der Switches/Toggles bleiben modul- oder komponentenspezifisch erhalten. */
+.sign-toggle,
+.line-section-card__toggle,
+.saved-record-card__toggle,
+.theme-switch__option {
+  forced-color-adjust: auto;
+}
