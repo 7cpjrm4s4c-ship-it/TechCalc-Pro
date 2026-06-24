@@ -19,7 +19,8 @@ const DEFAULT_PROJECT = {
   client: '',
   project: '',
   projectNo: '',
-  engineer: ''
+  engineer: '',
+  companyLogo: ''
 };
 
 function readProject() {
@@ -37,7 +38,8 @@ function collectProjectFormValues() {
     client: document.getElementById('pdfClient')?.value || '',
     project: document.getElementById('pdfProject')?.value || '',
     projectNo: document.getElementById('pdfProjectNo')?.value || '',
-    engineer: document.getElementById('pdfEngineer')?.value || ''
+    engineer: document.getElementById('pdfEngineer')?.value || '',
+    companyLogo: readStoredCompanyLogo()
   };
 }
 
@@ -82,6 +84,7 @@ function initProjectSettings() {
   bindProjectInput('pdfProject', 'project');
   bindProjectInput('pdfProjectNo', 'projectNo');
   bindProjectInput('pdfEngineer', 'engineer');
+  bindCompanyLogoInput();
 
 
   document.getElementById('saveProjectButton')?.addEventListener('click', async event => {
@@ -126,8 +129,63 @@ function hydrateProjectForm(data = {}) {
   setInputValue('pdfProjectNo', data.projectNo);
   setInputValue('pdfEngineer', data.engineer);
   setInputValue('pdfDate', data.date);
-  const file = document.getElementById('pdfLogo');
+  hydrateCompanyLogoStatus(data.companyLogo || readStoredCompanyLogo());
+  const file = document.getElementById('pdfCompanyLogo');
   if (file) file.value = '';
+}
+
+
+function readStoredCompanyLogo() {
+  return getProjectMeta().companyLogo || '';
+}
+
+function hydrateCompanyLogoStatus(dataUrl = '') {
+  const status = document.getElementById('pdfCompanyLogoStatus');
+  if (!status) return;
+  status.textContent = dataUrl ? 'Firmenlogo fuer PDF hinterlegt' : 'Kein Firmenlogo hinterlegt';
+}
+
+function bindCompanyLogoInput() {
+  const input = document.getElementById('pdfCompanyLogo');
+  const clearButton = document.getElementById('clearPdfCompanyLogo');
+
+  if (input && input.dataset.bound !== 'true') {
+    input.dataset.bound = 'true';
+    input.addEventListener('change', () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      if (!/^image\/(png|jpeg|webp|svg\+xml)$/i.test(file.type)) {
+        alert('Bitte PNG, JPG, WebP oder SVG als Firmenlogo auswaehlen.');
+        input.value = '';
+        return;
+      }
+      if (file.size > 750 * 1024) {
+        alert('Das Firmenlogo ist zu gross. Bitte eine Datei bis maximal 750 KB verwenden.');
+        input.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = String(reader.result || '');
+        setProjectMeta({ companyLogo: dataUrl });
+        hydrateCompanyLogoStatus(dataUrl);
+      };
+      reader.onerror = () => alert('Firmenlogo konnte nicht gelesen werden.');
+      reader.readAsDataURL(file);
+    });
+  }
+
+  if (clearButton && clearButton.dataset.bound !== 'true') {
+    clearButton.dataset.bound = 'true';
+    clearButton.addEventListener('click', event => {
+      event.preventDefault();
+      setProjectMeta({ companyLogo: '' });
+      hydrateCompanyLogoStatus('');
+      if (input) input.value = '';
+    });
+  }
+
+  hydrateCompanyLogoStatus(readStoredCompanyLogo());
 }
 
 function textOf(node) {
@@ -299,8 +357,9 @@ function buildPrintableHtml(project, moduleData) {
     const title = sectionTitle(section.title).replace(/Parameter/g, 'Bezeichnung');
     const mode = /prozessablauf/i.test(title) ? 'process' : 'standard';
     const rows = section.rows.map(row => row.slice(0, 3).map(cell => sanitizeText(cell).replace(/^Sättigung$/i, 'Adiabate Befeuchtung').replace(/Parameter/g, 'Bezeichnung')));
-    return `<section class="tcp-section"><h2>${esc(title)}</h2><div class="tcp-rule"></div>${tableHtml(rows, mode)}</section>`;
+    return `<section class="tcp-section"><h2>${esc(title)}</h2>${tableHtml(rows, mode)}</section>`;
   }).join('');
+  const logoHtml = project.companyLogo ? `<img class="tcp-company-logo" src="${esc(project.companyLogo)}" alt="Firmenlogo">` : `<div class="tcp-company-logo tcp-company-logo--empty">Firmenlogo</div>`;
 
   return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>TechCalc Pro - ${esc(moduleData.shortTitle)}</title>${PRINT_STYLE}</head><body>
     <div class="tcp-toolbar">
@@ -311,89 +370,80 @@ function buildPrintableHtml(project, moduleData) {
       <header class="tcp-header">
         <div class="tcp-brand">
           <img class="tcp-brand-icon" src="${esc(appIconUrl)}" alt="">
-          <div class="tcp-brand-text">
-            <strong>TechCalc Pro</strong>
-            <span>HLSK Quick Tools</span>
-          </div>
+          <div class="tcp-brand-text"><strong>TechCalc Pro</strong><span>HLSK Quick Tools</span></div>
         </div>
-        <div class="tcp-module-name">${esc(sanitizeText(moduleData.title))}</div>
-        <div class="tcp-print-date"><span>Druckdatum</span><strong>${esc(printDate)}</strong></div>
+        <div class="tcp-document-title"><strong>Berechnungsprotokoll</strong><span>${esc(sanitizeText(moduleData.title))} - ${esc(printDate)}</span></div>
+        <div class="tcp-logo-slot">${logoHtml}</div>
       </header>
       <section class="tcp-project-data">
-        <div class="tcp-project-row"><span>Sachbearbeiter:</span><strong>${metaValue(project.engineer)}</strong><span>Auftraggeber:</span><strong>${metaValue(project.client)}</strong></div>
-        <div class="tcp-project-row"><span>Projektbezeichnung:</span><strong>${metaValue(project.project)}</strong><span>Unsere Projektnummer:</span><strong>${metaValue(project.projectNo)}</strong></div>
+        <div><span>Projekt</span><strong>${metaValue(project.project)}</strong></div>
+        <div><span>Projektnr.</span><strong>${metaValue(project.projectNo)}</strong></div>
+        <div><span>Auftraggeber</span><strong>${metaValue(project.client)}</strong></div>
+        <div><span>Sachbearbeiter</span><strong>${metaValue(project.engineer)}</strong></div>
       </section>
-      <section class="tcp-title-block">
-        <h1>Berechnungsprotokoll</h1>
-        <p>Modul: ${esc(sanitizeText(moduleData.title))}</p>
-      </section>
-      ${sections}
+      <div class="tcp-sections">${sections}</div>
       ${printableChart(moduleData.chartSvg)}
     </main>
-    <footer class="tcp-footer"><span>TechCalc Pro</span><span>HLSK Quick Tools</span><span>${esc(moduleData.shortTitle)}</span></footer>
+    <footer class="tcp-footer"><span>TechCalc Pro</span><span>${esc(sanitizeText(moduleData.title))}</span><span>${esc(printDate)}</span></footer>
   </body></html>`;
 }
 
 const PRINT_STYLE = `<style>
     .tcp-toolbar, .tcp-close, .tcp-print { display: none; }
-    @page { size: A4; margin: 12mm 12mm 13mm 12mm; }
+    @page { size: A4; margin: 8mm 8mm 10mm 8mm; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: #fff; color: #111827; font-family: Arial, Helvetica, sans-serif; font-size: 8.3pt; line-height: 1.22; }
+    body { margin: 0; background: #fff; color: #111827; font-family: Arial, Helvetica, sans-serif; font-size: 7.35pt; line-height: 1.14; }
     .tcp-page { width: 100%; }
-    .tcp-header { display: grid; grid-template-columns: minmax(45mm, 1fr) minmax(42mm, 1fr) minmax(28mm, 1fr); gap: 5mm; align-items: center; min-height: 16mm; padding-bottom: 3.5mm; border-bottom: 1px solid #D1D5DB; }
-    .tcp-brand { display: inline-flex; align-items: center; gap: 3mm; min-width: 0; }
-    .tcp-brand-icon { width: 10mm; height: 10mm; border-radius: 2.2mm; object-fit: contain; flex: 0 0 auto; }
-    .tcp-brand-text { display: grid; gap: .5mm; min-width: 0; }
-    .tcp-brand-text strong { color: #111827; font-size: 12.5pt; line-height: 1; font-weight: 800; letter-spacing: -0.02em; }
-    .tcp-brand-text span { color: #4B5563; font-size: 7.5pt; line-height: 1; text-transform: uppercase; letter-spacing: .17em; font-weight: 600; }
-    .tcp-module-name { color: #111827; font-size: 10.2pt; line-height: 1.12; font-weight: 800; text-align: center; text-transform: uppercase; letter-spacing: .035em; }
-    .tcp-print-date { display: grid; gap: .7mm; justify-items: end; color: #111827; text-align: right; }
-    .tcp-print-date span { color: #6B7280; font-size: 7.5pt; text-transform: uppercase; letter-spacing: .11em; font-weight: 700; }
-    .tcp-print-date strong { font-size: 9.6pt; font-weight: 800; }
-    .tcp-project-data { margin-top: 3.6mm; padding: 2.2mm 2.8mm; background: #F9FAFB; border: 0.5px solid #D1D5DB; color: #111827; font-size: 8.2pt; line-height: 1.32; }
-    .tcp-project-row { display: grid; grid-template-columns: 27mm minmax(38mm, 1fr) 33mm minmax(38mm, 1fr); gap: 2mm 3mm; align-items: baseline; }
-    .tcp-project-row + .tcp-project-row { margin-top: 1.25mm; }
-    .tcp-project-data span { color: #4B5563; font-weight: 700; text-align: right; white-space: nowrap; }
-    .tcp-project-data strong { color: #111827; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
-    .tcp-title-block { margin: 4.5mm 0 4.2mm; }
-    .tcp-title-block h1 { margin: 0; font-size: 15pt; line-height: 1.04; font-weight: 700; color: #111827; letter-spacing: -0.02em; }
-    .tcp-title-block p { margin: 1.3mm 0 0; color: #4B5563; font-size: 9pt; font-weight: 600; }
-    .tcp-section { margin: 0 0 4.2mm; break-inside: avoid; }
-    .tcp-section h2 { margin: 0 0 1.15mm; font-size: 9.6pt; line-height: 1.08; font-weight: 700; color: #007EA7; text-transform: uppercase; letter-spacing: .035em; }
-    .tcp-rule { height: 1px; background: #D1D5DB; margin-bottom: 2.1mm; }
-    .tcp-table { width: 100%; border-collapse: collapse; table-layout: auto; font-size: 7.9pt; }
-    .tcp-table col.tcp-col-label { width: 1%; }
-    .tcp-table col.tcp-col-num { width: 1%; }
+    .tcp-header { display: grid; grid-template-columns: 48mm 1fr 34mm; gap: 4mm; align-items: center; min-height: 14mm; padding-bottom: 2.2mm; border-bottom: .55px solid #CBD5E1; }
+    .tcp-brand { display: inline-flex; align-items: center; gap: 2.4mm; min-width: 0; }
+    .tcp-brand-icon { width: 8.2mm; height: 8.2mm; border-radius: 1.8mm; object-fit: contain; flex: 0 0 auto; }
+    .tcp-brand-text { display: grid; gap: .45mm; min-width: 0; }
+    .tcp-brand-text strong { color: #111827; font-size: 10.6pt; line-height: 1; font-weight: 800; letter-spacing: -.02em; }
+    .tcp-brand-text span { color: #64748B; font-size: 6.15pt; line-height: 1; text-transform: uppercase; letter-spacing: .16em; font-weight: 700; }
+    .tcp-document-title { text-align: center; display: grid; gap: .8mm; }
+    .tcp-document-title strong { color: #111827; font-size: 12.4pt; line-height: 1; font-weight: 800; letter-spacing: -.02em; }
+    .tcp-document-title span { color: #475569; font-size: 7.2pt; line-height: 1.1; font-weight: 700; text-transform: uppercase; letter-spacing: .055em; }
+    .tcp-logo-slot { min-height: 12mm; display: flex; align-items: center; justify-content: flex-end; overflow: hidden; }
+    .tcp-company-logo { max-width: 34mm; max-height: 13mm; object-fit: contain; display: block; }
+    .tcp-company-logo--empty { width: 30mm; height: 11mm; border: .5px dashed #CBD5E1; color: #94A3B8; font-size: 6pt; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; align-items: center; justify-content: center; }
+    .tcp-project-data { margin: 2.2mm 0 2.7mm; padding: 1.6mm 2mm; background: #F8FAFC; border: .45px solid #CBD5E1; display: grid; grid-template-columns: 1.2fr .78fr 1fr .9fr; gap: 1.5mm 2.5mm; }
+    .tcp-project-data div { display: grid; grid-template-columns: auto 1fr; gap: 1.2mm; min-width: 0; align-items: baseline; }
+    .tcp-project-data span { color: #64748B; font-size: 6.55pt; font-weight: 800; text-transform: uppercase; letter-spacing: .055em; white-space: nowrap; }
+    .tcp-project-data strong { color: #111827; font-size: 7.25pt; font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+    .tcp-sections { column-count: 2; column-gap: 5mm; column-fill: auto; }
+    .tcp-section { display: inline-block; width: 100%; margin: 0 0 2.8mm; break-inside: avoid; page-break-inside: avoid; }
+    .tcp-section h2 { margin: 0; padding: 1.05mm 1.4mm; background: #EAF3F8; border: .5px solid #BBD2DE; border-bottom: 0; color: #075985; font-size: 7.2pt; line-height: 1.05; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+    .tcp-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 6.85pt; }
+    .tcp-table col.tcp-col-label { width: 45%; }
+    .tcp-table col.tcp-col-num { width: 13mm; }
     .tcp-table col.tcp-col-value { width: auto; }
-    .tcp-table col.tcp-col-unit { width: 1%; }
-    .tcp-table col.tcp-col-process { width: 25%; }
+    .tcp-table col.tcp-col-unit { width: 18mm; }
+    .tcp-table col.tcp-col-process { width: 34%; }
     .tcp-table col.tcp-col-description { width: auto; }
-    .tcp-table th, .tcp-table td { border: 0.5px solid #D1D5DB; padding: 1.8px 3.4px; vertical-align: top; }
-    .tcp-table th { background: #F3F4F6; color: #111827; font-weight: 700; }
+    .tcp-table th, .tcp-table td { border: .42px solid #CBD5E1; padding: 1.25px 2.4px; vertical-align: top; }
+    .tcp-table th { background: #F1F5F9; color: #334155; font-weight: 800; font-size: 6.35pt; text-transform: uppercase; letter-spacing: .03em; }
     .tcp-table td { color: #111827; }
-    .tcp-table .tcp-label-cell { text-align: left; white-space: nowrap; width: 1%; }
-    .tcp-table .tcp-value-cell { text-align: right; width: auto; min-width: 70mm; overflow-wrap: anywhere; }
-    .tcp-table .tcp-value-text { text-align: left; white-space: normal; }
-    .tcp-table .tcp-unit-cell { text-align: right; white-space: nowrap; width: 1%; }
-    .tcp-table th:nth-child(1), .tcp-table td:nth-child(1) { text-align: left; }
-    .tcp-table th:nth-child(2), .tcp-table td:nth-child(2) { width: auto; min-width: 70mm; }
-    .tcp-table th:nth-child(3), .tcp-table td:nth-child(3) { text-align: right; white-space: nowrap; width: 1%; }
-    .tcp-table--numbered th:nth-child(1), .tcp-table--numbered td:nth-child(1), .tcp-table--process th:nth-child(1), .tcp-table--process td:nth-child(1) { text-align: right; white-space: nowrap; width: 1%; }
-    .tcp-table--process th:nth-child(2), .tcp-table--process td:nth-child(2) { text-align: left; white-space: nowrap; min-width: 30mm; }
-    .tcp-table--process th:nth-child(3), .tcp-table--process td:nth-child(3) { text-align: left; white-space: normal; min-width: 95mm; width: auto; }
-    .tcp-diagram-section { break-inside: avoid; }
-    .tcp-diagram { width: 100%; border: 0.5px solid #D1D5DB; padding: 3.5mm; background: #fff; overflow: hidden; }
+    .tcp-table .tcp-label-cell { text-align: left; overflow-wrap: anywhere; }
+    .tcp-table .tcp-value-cell { text-align: right; overflow-wrap: anywhere; font-weight: 700; }
+    .tcp-table .tcp-value-text { text-align: left; font-weight: 600; }
+    .tcp-table .tcp-unit-cell { text-align: right; white-space: nowrap; color: #475569; }
+    .tcp-table--numbered th:nth-child(1), .tcp-table--numbered td:nth-child(1), .tcp-table--process th:nth-child(1), .tcp-table--process td:nth-child(1) { text-align: right; white-space: nowrap; }
+    .tcp-table--process th:nth-child(2), .tcp-table--process td:nth-child(2), .tcp-table--process th:nth-child(3), .tcp-table--process td:nth-child(3) { text-align: left; white-space: normal; }
+    .tcp-diagram-section { margin-top: 3mm; break-inside: avoid; page-break-inside: avoid; }
+    .tcp-diagram-section h2 { margin: 0; padding: 1.05mm 1.4mm; background: #EAF3F8; border: .5px solid #BBD2DE; border-bottom: 0; color: #075985; font-size: 7.2pt; line-height: 1.05; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+    .tcp-rule { display: none; }
+    .tcp-diagram { width: 100%; border: .5px solid #CBD5E1; padding: 2mm; background: #fff; overflow: hidden; }
     .tcp-diagram svg { width: 100%; height: auto; display: block; background: #fff; }
-    .tcp-diagram .hx-chart-bg { fill: #fff !important; stroke: #D1D5DB !important; }
-    .tcp-diagram .hx-grid-line { stroke: #E5E7EB !important; stroke-width: 1 !important; }
+    .tcp-diagram .hx-chart-bg { fill: #fff !important; stroke: #CBD5E1 !important; }
+    .tcp-diagram .hx-grid-line { stroke: #E2E8F0 !important; stroke-width: 1 !important; }
     .tcp-diagram .hx-axis-label, .tcp-diagram .hx-title, .tcp-diagram .hx-rh-label { fill: #111827 !important; font-family: Arial, Helvetica, sans-serif !important; }
     .tcp-diagram .hx-rh { fill: none !important; stroke: #94A3B8 !important; stroke-width: 1.1 !important; opacity: .9 !important; }
     .tcp-diagram .hx-rh-100 { stroke: #111827 !important; stroke-width: 2 !important; }
     .tcp-diagram .hx-state-path { fill: none !important; stroke: #F97316 !important; stroke-width: 3 !important; }
     .tcp-diagram .hx-point circle { fill: #fff !important; stroke: #F97316 !important; stroke-width: 2.5 !important; }
     .tcp-diagram .hx-point text { fill: #111827 !important; font-weight: 700 !important; font-family: Arial, Helvetica, sans-serif !important; }
-    .tcp-footer { position: fixed; bottom: 5.5mm; left: 12mm; right: 12mm; display: flex; justify-content: space-between; border-top: 1px solid #D1D5DB; padding-top: 1.8mm; color: #6B7280; font-size: 7.6pt; }
-    @media screen { body { background: #e5e7eb; padding: calc(66px + env(safe-area-inset-top)) 18px 18px; } .tcp-toolbar { position: fixed; z-index: 9999; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: calc(10px + env(safe-area-inset-top)) 14px 10px; background: rgba(255,255,255,.94); border-bottom: 1px solid #CBD5E1; box-shadow: 0 10px 34px rgba(15,23,42,.14); } .tcp-close, .tcp-print { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 999px; background: #fff; color: #111827; font: 700 14px Arial, Helvetica, sans-serif; } .tcp-print { background: #007EA7; border-color: #007EA7; color: #fff; } .tcp-page { max-width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 12mm; box-shadow: 0 18px 70px rgba(0,0,0,.18); } .tcp-footer { display: none; } }
+    .tcp-footer { position: fixed; bottom: 4mm; left: 8mm; right: 8mm; display: flex; justify-content: space-between; border-top: .5px solid #CBD5E1; padding-top: 1.2mm; color: #64748B; font-size: 6.25pt; }
+    @media screen { body { background: #e5e7eb; padding: calc(66px + env(safe-area-inset-top)) 18px 18px; } .tcp-toolbar { position: fixed; z-index: 9999; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: calc(10px + env(safe-area-inset-top)) 14px 10px; background: rgba(255,255,255,.94); border-bottom: 1px solid #CBD5E1; box-shadow: 0 10px 34px rgba(15,23,42,.14); } .tcp-close, .tcp-print { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 999px; background: #fff; color: #111827; font: 700 14px Arial, Helvetica, sans-serif; } .tcp-print { background: #007EA7; border-color: #007EA7; color: #fff; } .tcp-page { max-width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 8mm; box-shadow: 0 18px 70px rgba(0,0,0,.18); } .tcp-footer { display: none; } }
     @media print { .tcp-toolbar, .tcp-close, .tcp-print { display: none !important; } }
   </style>`;
 

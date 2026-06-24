@@ -1,4 +1,12 @@
-# TechCalc Pro 1.3.1 Beta 6 — Netlify Development Package
+## Version 1.3.1 Beta 7 - PDF Compact Export Layout
+
+- UI-Designentwicklung aus Beta 2-6 nicht uebernommen; Ausgangsbasis ist wieder die stabile 1.3.0-Entwicklungsbasis.
+- PDF-Export kompakter aufgebaut: reduzierter Seitenrand, kompakter Header, zweispaltige Abschnittsdarstellung und kleinere Tabellenabstaende.
+- Projektbezogene Firmenlogo-Integration fuer den PDF-Header oben rechts ergaenzt.
+- Projektdatei speichert das PDF-Firmenlogo optional als Data-URL mit.
+- AGB-Seite technisch an bestehende Qualitaets-Gates fuer Kontakt, Gueltigkeitsdatum und Ruecknavigation angeglichen.
+
+# TechCalc Pro 1.3.0 — Netlify Development Package
 
 This package contains the full source tree for continued development and Netlify-based preview/deployment.
 
@@ -43,4 +51,4 @@ Netlify must deploy the generated `dist/` directory, not the repository root.
 
 ## Release version
 
-Beta release: `1.3.1-beta.6`
+Official release: `1.3.0`

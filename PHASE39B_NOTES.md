@@ -1,3 +1,11 @@
+## Version 1.3.1 Beta 7 - PDF Compact Export Layout
+
+- UI-Designentwicklung aus Beta 2-6 nicht uebernommen; Ausgangsbasis ist wieder die stabile 1.3.0-Entwicklungsbasis.
+- PDF-Export kompakter aufgebaut: reduzierter Seitenrand, kompakter Header, zweispaltige Abschnittsdarstellung und kleinere Tabellenabstaende.
+- Projektbezogene Firmenlogo-Integration fuer den PDF-Header oben rechts ergaenzt.
+- Projektdatei speichert das PDF-Firmenlogo optional als Data-URL mit.
+- AGB-Seite technisch an bestehende Qualitaets-Gates fuer Kontakt, Gueltigkeitsdatum und Ruecknavigation angeglichen.
+
 # Phase 39B — Versioned Build Artifact
 
 Status: implemented on top of the current 39C source state.
@@ -17,10 +25,3 @@ Validation:
 - `npm run test:integration`
 - `npm run build`
 - `npm run build:minified`
-
-
-# Phase 39C — Dashboard / TSS Icons / UI Controls
-
-- Dashboard-Startseite unter Version 1.3.1 Beta 6 ergänzt.
-- Systemicons und UI Controls als eigene SVG/CSS-Schicht umgesetzt.
-- Bestehendes Logo und Header-Branding unverändert belassen.

@@ -1,44 +1,10 @@
-# TechCalc Pro 1.3.1 Beta 6
+## Version 1.3.1 Beta 7 - PDF Compact Export Layout
 
-## Version 1.3.1 Beta 6 — Global Accent System
-
-- Dezente Modul-Akzentfarben global definiert.
-- Heizung nutzt Rot, Kälte Blau, alle übrigen Module Cyan.
-- Segment-/Switch-Controls übernehmen die jeweilige Modulfarbe.
-- Eingabe- und Auswahlfelder erhalten eine dezente gleichfarbige Umrandung.
-- Ergebnisfelder bleiben neutral gerahmt.
-- iOS-18-Flat-Design bleibt die globale visuelle Basis.
-
----
-
-- Globales iOS-18-Flat-Design als verbindlicher App-Kontraststandard ergänzt.
-- Liquid-Glass-Overrides für Module, Accordions, Dropdowns, Eingabefelder, Karten und Ergebnisflächen zurückgenommen.
-- Mobile Startseite optimiert: drei Kacheln pro Displaybreite, kompaktere Modul-Kacheln und direkte Modul-Verknüpfung.
-- Dashboard bleibt feste Startseite beim App-Start; App-Logo und bestehender Schriftzug bleiben unverändert.
-
-
-
-## Version 1.3.1 Beta 6
-- Dashboard als feste Startseite beim App-Start etabliert.
-- Mobile Home-Ansicht mit Favoriten, zuletzt verwendeten Projekten, Alle-Module-Kacheln und zentralem „Neues Projekt“-Button umgesetzt.
-- Bestehendes App-Logo und bestehender Header/Schriftzug unverändert beibehalten.
-- Mobile Modul-Navigation auf der Startseite ausgeblendet, um doppelte Navigation und Überlagerungen zu verhindern.
-- Liquid-Glass-Anteil reduziert; Controls, Dropdowns und Accordion-Flächen auf kontrastreicheren iOS-Flat-Look umgestellt.
-## Version 1.3.1 Beta 6 — Dashboard / TSS System Icons / UI Controls
-
-- Neues Dashboard-Modul als Startseite ergänzt.
-- Eigenes TechCalc Symbol System (TSS) für Systemicons, Chevrons, Aktionen, Status und Modul-Schnellzugriffe ergänzt.
-- iOS-inspirierte UI-Control-Schicht für Dropdowns, Buttons, Accordions und Touch-Animationen umgesetzt.
-- App-Icon, Markenname und bestehender Header bleiben unverändert.
-- Kein zusätzliches Hamburger-Menü im Dashboard-Layout.
-
-## Version 1.3.1 Beta 1 — Liquid Glass Design System Baseline
-
-- Neue Beta-Linie 1.3.1 eröffnet; Beta-Nummer läuft ab jetzt pro ZIP-Artefakt mit.
-- Eigenes TechCalc-Pro-Modul-Iconset als SVG ergänzt; keine Apple-Systemicons oder Apple-App-Assets enthalten.
-- Liquid-Glass-Stylesheet als additive Designsystem-Schicht ergänzt und in die App-Shell eingebunden.
-- Aktuelle Entwicklungsbasis aus `1.3.0-development-netlify-v5-updated` übernommen, inklusive angepasster AGB in `docs/legal/agb.html`.
-- Service-Worker-Cache und Precaching auf `1.3.1-beta.1` synchronisiert.
+- UI-Designentwicklung aus Beta 2-6 nicht uebernommen; Ausgangsbasis ist wieder die stabile 1.3.0-Entwicklungsbasis.
+- PDF-Export kompakter aufgebaut: reduzierter Seitenrand, kompakter Header, zweispaltige Abschnittsdarstellung und kleinere Tabellenabstaende.
+- Projektbezogene Firmenlogo-Integration fuer den PDF-Header oben rechts ergaenzt.
+- Projektdatei speichert das PDF-Firmenlogo optional als Data-URL mit.
+- AGB-Seite technisch an bestehende Qualitaets-Gates fuer Kontakt, Gueltigkeitsdatum und Ruecknavigation angeglichen.
 
 ## Version 1.3.0 — Mobile Feedback Zoom Scope Correction
 
