@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.1-beta.3';
-const CACHE_REVISION = '1.3.1-beta.3-version-1-3-1-beta-3';
+const CACHE_NAME = 'techcalc-pro-1.3.1-beta.4';
+const CACHE_REVISION = '1.3.1-beta.4-techcalc-pro-1-3-1-beta-4';
 const ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const ASSETS = [
   './RELEASE_NOTES.md',
   './css/components.css',
   './css/dashboard.css',
+  './css/ios18-flat-system.css',
   './css/layout.css',
   './css/liquid-glass.css',
   './css/modules.css',

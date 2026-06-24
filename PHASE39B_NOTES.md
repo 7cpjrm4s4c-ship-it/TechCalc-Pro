@@ -21,6 +21,6 @@ Validation:
 
 # Phase 39C — Dashboard / TSS Icons / UI Controls
 
-- Dashboard-Startseite unter Version 1.3.1 Beta 3 ergänzt.
+- Dashboard-Startseite unter Version 1.3.1 Beta 4 ergänzt.
 - Systemicons und UI Controls als eigene SVG/CSS-Schicht umgesetzt.
 - Bestehendes Logo und Header-Branding unverändert belassen.

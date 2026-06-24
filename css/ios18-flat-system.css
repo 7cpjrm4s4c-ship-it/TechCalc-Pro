@@ -1,0 +1,274 @@
+/* TechCalc Pro 1.3.1 Beta 4 — global iOS-18-flat design contract.
+   Ziel: hoher Kontrast, klare Flaechen, keine schweren Liquid-Glass-Effekte. */
+:root {
+  --ios18-bg: #07111d;
+  --ios18-bg-2: #0b1624;
+  --ios18-surface: #111d2c;
+  --ios18-surface-2: #162536;
+  --ios18-surface-3: #1b2a3d;
+  --ios18-border: rgba(154,174,202,.28);
+  --ios18-border-strong: rgba(185,205,232,.42);
+  --ios18-text: #f5f8ff;
+  --ios18-muted: rgba(218,228,244,.70);
+  --ios18-dim: rgba(190,204,224,.52);
+  --ios18-blue: #2f8cff;
+  --ios18-green: #41c673;
+  --ios18-red: #ff4b5e;
+  --ios18-yellow: #ffb340;
+  --ios18-shadow: 0 12px 28px rgba(0,0,0,.26);
+  --ios18-shadow-soft: 0 8px 18px rgba(0,0,0,.18);
+  --color-bg-0: var(--ios18-bg);
+  --color-bg-1: var(--ios18-bg-2);
+  --color-surface: var(--ios18-surface);
+  --color-surface-strong: var(--ios18-surface-2);
+  --color-surface-soft: #101a28;
+  --color-border: var(--ios18-border);
+  --color-border-strong: var(--ios18-border-strong);
+  --color-text: var(--ios18-text);
+  --color-muted: var(--ios18-muted);
+  --color-dim: var(--ios18-dim);
+  --shadow-glass: var(--ios18-shadow);
+  --header-glass-bg: rgba(18,25,34,.96);
+}
+
+html,
+body,
+.app-shell {
+  background: radial-gradient(circle at 48% -6%, rgba(47,140,255,.16), transparent 32%), var(--ios18-bg) !important;
+}
+
+/* Global surfaces: flat, readable, no backdrop blur. */
+.glass-surface,
+.app-header.glass-surface,
+.module-nav,
+.card,
+.tc-card,
+.result-card,
+.settings-panel,
+.overflow-menu,
+.saved-record-card,
+.line-section-card,
+.tc-accordion,
+.dw-accordion,
+.settings-submenu,
+.inline-stat,
+.tc-result-item,
+.tc-item,
+.tc-consumer-row,
+.tc-fixture-row,
+.dw-consumer-row,
+.dw-fixture-row,
+.ph-saved-item,
+.project-select-card,
+.release-note,
+.settings-row,
+.settings-check,
+.settings-info-row {
+  background: var(--ios18-surface) !important;
+  background-image: none !important;
+  border-color: var(--ios18-border) !important;
+  box-shadow: var(--ios18-shadow-soft) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.card::before,
+.tc-card::before,
+.result-card::before,
+.saved-record-card::before,
+.line-section-card::before,
+.home-module-tile::before,
+.home-recent-row::before,
+.home-bottom-nav::before { content: none !important; }
+
+/* Header remains current brand variant, but flatter. */
+.app-header,
+.app-header.glass-surface,
+.app-header.is-scrolled,
+.app-header.glass-surface.is-scrolled {
+  background: rgba(18,25,34,.96) !important;
+  border-bottom: 1px solid rgba(154,174,202,.16) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.24) !important;
+}
+.brand__icon { box-shadow: none !important; }
+
+/* Module nav and tabs. */
+.module-tab {
+  background: #101a28 !important;
+  color: var(--ios18-muted) !important;
+  border-right-color: rgba(154,174,202,.18) !important;
+}
+.module-tab:hover,
+.module-tab.is-active,
+.module-tab.is-overflow-active {
+  color: var(--ios18-blue) !important;
+  background: #162536 !important;
+  box-shadow: inset 0 -3px 0 var(--ios18-blue) !important;
+}
+
+/* Forms / controls: high contrast. */
+.control,
+.tc-control,
+.settings-form input[type="text"],
+.settings-form input[type="email"],
+.settings-form input[type="file"],
+.settings-form textarea,
+.tc-add-row input,
+.tc-add-row select,
+.dw-add-row input,
+.dw-add-row select,
+.tc-quantity-field input,
+.mini-edit-field input,
+.project-select-card select,
+select:not([multiple]),
+input,
+textarea {
+  background: var(--ios18-surface-2) !important;
+  background-image: none !important;
+  border-color: var(--ios18-border-strong) !important;
+  color: var(--ios18-text) !important;
+  -webkit-text-fill-color: var(--ios18-text);
+  box-shadow: none !important;
+}
+select:not([multiple]) {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 42px !important;
+  background-color: var(--ios18-surface-2) !important;
+  background-image: url('../assets/icons/tss/chevron-down.svg') !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
+  background-size: 16px 16px !important;
+}
+select option,
+select optgroup {
+  background: #111d2c !important;
+  color: #f5f8ff !important;
+}
+.control input::placeholder,
+.settings-form input::placeholder,
+textarea::placeholder { color: rgba(218,228,244,.48) !important; -webkit-text-fill-color: rgba(218,228,244,.48); }
+.unit,
+.field label,
+.tc-field__label,
+.settings-field__label,
+.settings-form label,
+.card__title,
+.tc-card__title,
+.result-row span,
+.inline-stat span,
+.tc-result-item span,
+.tc-card__subtitle,
+.tc-note,
+.tc-help,
+.ph-help,
+.ph-note,
+.dw-note,
+.settings-hint { color: var(--ios18-muted) !important; }
+
+/* Accordions: flat iOS style. */
+.tc-accordion > summary,
+.dw-accordion > summary,
+.settings-submenu > summary,
+.settings-submenu__content,
+.tc-accordion__body,
+.dw-accordion__body {
+  background: var(--ios18-surface) !important;
+  color: var(--ios18-text) !important;
+  border-color: rgba(154,174,202,.20) !important;
+}
+.tc-accordion[open] > summary,
+.dw-accordion[open] > summary,
+.settings-submenu[open] > summary,
+.settings-submenu.is-open > summary {
+  background: var(--ios18-surface-2) !important;
+}
+
+/* Buttons. */
+.action-button,
+.tc-action,
+.mini-button,
+.sign-toggle {
+  background: #162536 !important;
+  border-color: var(--ios18-border) !important;
+  color: var(--ios18-text) !important;
+  box-shadow: none !important;
+}
+.action-button,
+.tc-action,
+.mini-button--primary {
+  background: linear-gradient(180deg, #3394ff, #0869f0) !important;
+  border-color: rgba(47,140,255,.70) !important;
+  color: #fff !important;
+}
+.tc-action--ghost,
+.action-button--secondary,
+.mini-button:not(.mini-button--primary):not(.mini-button--danger) {
+  background: #162536 !important;
+  color: var(--ios18-muted) !important;
+}
+.mini-button--danger,
+.line-section-card__delete,
+.saved-record-card__delete,
+.dw-delete-button {
+  background: rgba(255,75,94,.16) !important;
+  border-color: rgba(255,75,94,.56) !important;
+  color: #ffb8c0 !important;
+}
+.segmented,
+.theme-switch {
+  background: #0f1926 !important;
+  border-color: var(--ios18-border) !important;
+  box-shadow: none !important;
+}
+.segmented button.is-active,
+.theme-switch__option.is-active {
+  background: var(--ios18-blue) !important;
+  border-color: var(--ios18-blue) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+/* Results / lists. */
+.result-row,
+.home-recent-row,
+.line-section-card__meta,
+.saved-record-card__meta { border-color: rgba(154,174,202,.18) !important; }
+.inline-stat,
+.tc-result-item,
+.pipe-dimension-card,
+.hx-process,
+.hx-history__row,
+.tc-warning,
+.ph-warning {
+  background: #162536 !important;
+  border-color: rgba(154,174,202,.22) !important;
+}
+.line-section-card.is-active,
+.ph-saved-item.is-active,
+.saved-record-card.is-active,
+.dw-saved-row.is-active {
+  border-color: rgba(47,140,255,.75) !important;
+  box-shadow: 0 0 0 1px rgba(47,140,255,.30), 0 10px 22px rgba(47,140,255,.12) !important;
+}
+
+/* Dashboard takes the same global contrast values. */
+body[data-route="dashboard"] .app-shell {
+  background: radial-gradient(circle at 50% -10%, rgba(47,140,255,.16), transparent 34%), var(--ios18-bg) !important;
+}
+.home-shell { color: var(--ios18-text) !important; }
+.home-module-tile,
+.home-recent-list,
+.home-bottom-nav,
+.home-circle-button,
+.home-search {
+  background: var(--ios18-surface) !important;
+  border-color: var(--ios18-border) !important;
+  box-shadow: var(--ios18-shadow-soft) !important;
+}
+.home-module-tile strong,
+.home-recent-main strong,
+.home-section-head h2 { color: var(--ios18-text) !important; }
+.home-module-tile small,
+.home-recent-main small,
+.home-recent-row time,
+.home-topbar p { color: var(--ios18-muted) !important; }

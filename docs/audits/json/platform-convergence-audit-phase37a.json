@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-06-23T21:23:59.137Z",
+  "generatedAt": "2026-06-24T03:37:58.168Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -90,12 +90,12 @@
         "samples": [
           {
             "file": "index.js",
-            "line": 172,
+            "line": 173,
             "text": "button.addEventListener('click', () => navigate(button.dataset.dashboardModule));"
           },
           {
             "file": "index.js",
-            "line": 175,
+            "line": 176,
             "text": "button.addEventListener('click', () => {"
           }
         ]
@@ -111,7 +111,7 @@
         "samples": [
           {
             "file": "index.js",
-            "line": 194,
+            "line": 195,
             "text": "root.innerHTML = renderDashboard();"
           }
         ]
@@ -428,7 +428,7 @@
         "state.js"
       ],
       "metrics": {
-        "lineCount": 236,
+        "lineCount": 237,
         "controllerAddEventListeners": 0,
         "nonControllerAddEventListeners": 2,
         "directDomMutationsOutsideRenderer": 1,
@@ -464,12 +464,12 @@
             "samples": [
               {
                 "file": "index.js",
-                "line": 172,
+                "line": 173,
                 "text": "button.addEventListener('click', () => navigate(button.dataset.dashboardModule));"
               },
               {
                 "file": "index.js",
-                "line": 175,
+                "line": 176,
                 "text": "button.addEventListener('click', () => {"
               }
             ]
@@ -484,7 +484,7 @@
             "samples": [
               {
                 "file": "index.js",
-                "line": 194,
+                "line": 195,
                 "text": "root.innerHTML = renderDashboard();"
               }
             ]
@@ -1195,12 +1195,12 @@
         "samples": [
           {
             "file": "index.js",
-            "line": 172,
+            "line": 173,
             "text": "button.addEventListener('click', () => navigate(button.dataset.dashboardModule));"
           },
           {
             "file": "index.js",
-            "line": 175,
+            "line": 176,
             "text": "button.addEventListener('click', () => {"
           }
         ]
@@ -1216,7 +1216,7 @@
         "samples": [
           {
             "file": "index.js",
-            "line": 194,
+            "line": 195,
             "text": "root.innerHTML = renderDashboard();"
           }
         ]

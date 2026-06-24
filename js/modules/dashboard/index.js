@@ -71,14 +71,15 @@ function homeModules() {
   return [...ordered, ...rest];
 }
 
-function renderModuleTile(module, { favorite = false } = {}) {
+function renderModuleTile(module, { favorite = false, compact = false } = {}) {
   const accent = accentMap[module.id] || 'blue';
+  const compactClass = compact ? ' home-module-tile--compact' : '';
   return `
-    <button class="home-module-tile" type="button" data-dashboard-module="${esc(module.id)}" data-accent="${esc(accent)}">
+    <button class="home-module-tile${compactClass}" type="button" data-dashboard-module="${esc(module.id)}" data-module-id="${esc(module.id)}" data-accent="${esc(accent)}" aria-label="${esc(moduleTitle(module))} öffnen">
       ${favorite ? '<span class="home-favorite-star tss-icon tss-icon--star" aria-hidden="true"></span>' : ''}
       <span class="home-module-icon tss-icon tss-icon--${moduleIcon(module.id)}" aria-hidden="true"></span>
-      <strong>${esc(moduleTitle(module))}</strong>
-      <small>${esc(moduleSubtitle(module))}</small>
+      <span class="home-module-copy"><strong>${esc(moduleTitle(module))}</strong><small>${esc(moduleSubtitle(module))}</small></span>
+      ${compact ? '<span class="home-module-chevron tss-icon tss-icon--chevron-right" aria-hidden="true"></span>' : ''}
     </button>
   `;
 }
@@ -88,7 +89,7 @@ function renderFavorites() {
 }
 
 function renderAllModules() {
-  return homeModules().slice(0, 8).map(module => renderModuleTile(module)).join('');
+  return homeModules().slice(0, 8).map(module => renderModuleTile(module, { compact: true })).join('');
 }
 
 function renderRecent() {
@@ -113,7 +114,7 @@ function renderBottomNav() {
   const items = [
     ['dashboard', 'Start', 'grid'],
     ['projects', 'Projekte', 'folder'],
-    ['unit-converter', 'Berechnungen', 'calculator'],
+    [firstModuleId(), 'Berechnungen', 'calculator'],
     ['settings', 'Einstellungen', 'gear']
   ];
   return items.map(([id, label, icon]) => `
