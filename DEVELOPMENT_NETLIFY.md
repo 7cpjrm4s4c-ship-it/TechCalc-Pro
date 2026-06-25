@@ -1,4 +1,8 @@
-## Version 1.3.1 Beta 10 - PDF Line Sections Only Layout
+## Version 1.3.1 Beta 11 - PDF Line Detail Card Layout
+
+- PDF-Leitungsabschnitte als kompakte Detailkarten mit gespeicherten Abschnittsnamen.
+- Redundante Bezeichnung-Zeile im Detailblock entfernt.
+- Key-Value-Raster nutzt die Seitenbreite effizienter.
 
 - UI-Designentwicklung aus Beta 2-6 nicht uebernommen; Ausgangsbasis ist wieder die stabile 1.3.0-Entwicklungsbasis.
 - PDF-Export kompakter aufgebaut: reduzierter Seitenrand, kompakter Header, zweispaltige Abschnittsdarstellung und kleinere Tabellenabstaende.

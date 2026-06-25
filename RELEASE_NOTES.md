@@ -1,9 +1,11 @@
-## Version 1.3.1 Beta 10 - PDF Line Sections Only Layout
+## Version 1.3.1 Beta 11 - PDF Line Detail Card Layout
 
 - PDF-Kopfbereich bleibt unveraendert.
-- Zweispaltige Ergebnis-/Eingabebloecke bleiben erhalten.
-- Leitungsabschnitte werden nun als vollstaendige Detailbloecke statt als reine Uebersichtstabelle ausgegeben.
-- Automatischer Seitenumbruch / break-inside fuer Abschnittsbloecke optimiert.
+- Projektinformationen bleiben direkt unter dem Kopfbereich.
+- Leitungsabschnitte werden als kompakte Detailkarten ausgegeben.
+- Gespeicherte Abschnittsnamen stehen in der Abschnittsueberschrift.
+- Die redundante Bezeichnung-Zeile innerhalb der Detaildaten wurde entfernt.
+- Detailwerte eines Leitungsabschnitts werden zweispaltig als Key-Value-Raster gesetzt, um den freien Mittelbereich besser zu nutzen.
 - Firmenlogo-Integration oben rechts bleibt erhalten.
 
 

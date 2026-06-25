@@ -424,7 +424,16 @@ function lineDetailBlocksHtml(rows = []) {
 
   return `<div class="tcp-line-details">${items.map((item, index) => {
     const heading = `Leitungsabschnitt ${index + 1}${item.title && !/^leitungsabschnitt\s+\d+$/i.test(item.title) ? ` - ${item.title}` : ''}`;
-    return `<article class="tcp-line-detail"><h3>${esc(heading)}</h3>${tableHtml(item.rows, 'standard')}</article>`;
+    const detailRows = item.rows.filter(row => normalizeKey(row?.[0] || '') !== 'bezeichnung');
+    const rowsHtml = detailRows.map(row => {
+      const label = sanitizeText(row?.[0] || '');
+      const value = sanitizeText(row?.[1] || '');
+      const unit = sanitizeText(row?.[2] || '');
+      const combinedValue = [value, unit].filter(Boolean).join(' ');
+      if (!label && !combinedValue) return '';
+      return `<div class="tcp-line-kv"><span>${esc(label || '-')}</span><strong>${esc(combinedValue || '-')}</strong></div>`;
+    }).join('');
+    return `<article class="tcp-line-detail"><h3>${esc(heading)}</h3><div class="tcp-line-kv-grid">${rowsHtml}</div></article>`;
   }).join('')}</div>`;
 }
 function printableChart(svg) {
@@ -527,11 +536,14 @@ const PRINT_STYLE = `<style>
     .tcp-table--lines th:first-child { text-align: left; }
     .tcp-table--lines .tcp-line-name { text-align: left; font-weight: 700; overflow-wrap: anywhere; }
     .tcp-table--lines .tcp-line-value { text-align: right; white-space: nowrap; }
-    .tcp-line-details { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2.4mm 4mm; align-items: start; }
-    .tcp-line-detail { break-inside: avoid; page-break-inside: avoid; }
-    .tcp-line-detail h3 { margin: 0; padding: .9mm 1.2mm; background: #F8FAFC; border: .45px solid #CBD5E1; border-bottom: 0; color: #1E293B; font-size: 6.95pt; line-height: 1.05; font-weight: 800; overflow-wrap: anywhere; }
-    .tcp-line-detail .tcp-table { font-size: 6.55pt; }
-    .tcp-line-detail .tcp-table th, .tcp-line-detail .tcp-table td { padding: 1.1px 2.2px; }
+    .tcp-line-details { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.4mm; align-items: start; }
+    .tcp-line-detail { border: .55px solid #CBD5E1; break-inside: avoid; page-break-inside: avoid; }
+    .tcp-line-detail h3 { margin: 0; padding: 1.05mm 1.4mm; background: #F8FAFC; border-bottom: .45px solid #CBD5E1; color: #0F172A; font-size: 7.2pt; line-height: 1.05; font-weight: 800; overflow-wrap: anywhere; }
+    .tcp-line-kv-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 4mm; row-gap: 0; padding: .6mm 1.2mm 1mm; }
+    .tcp-line-kv { display: grid; grid-template-columns: minmax(24mm, .92fr) minmax(0, 1fr); gap: 1.4mm; align-items: baseline; min-height: 3.8mm; padding: .55mm 0; border-bottom: .35px solid #E2E8F0; }
+    .tcp-line-kv:nth-last-child(1), .tcp-line-kv:nth-last-child(2):nth-child(odd) { border-bottom: 0; }
+    .tcp-line-kv span { color: #475569; font-size: 6.45pt; font-weight: 700; overflow-wrap: anywhere; }
+    .tcp-line-kv strong { color: #111827; font-size: 6.8pt; font-weight: 800; text-align: right; overflow-wrap: anywhere; }
     .tcp-diagram-section { margin-top: 3mm; break-inside: avoid; page-break-inside: avoid; }
     .tcp-diagram-section h2 { margin: 0; padding: 1.05mm 1.4mm; background: #EAF3F8; border: .5px solid #BBD2DE; border-bottom: 0; color: #075985; font-size: 7.2pt; line-height: 1.05; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
     .tcp-rule { display: none; }
@@ -548,7 +560,7 @@ const PRINT_STYLE = `<style>
     .tcp-footer { position: fixed; bottom: 4mm; left: 8mm; right: 8mm; display: flex; justify-content: space-between; border-top: .5px solid #CBD5E1; padding-top: 1.2mm; color: #64748B; font-size: 6.25pt; }
     @media screen { body { background: #e5e7eb; padding: calc(66px + env(safe-area-inset-top)) 18px 18px; } .tcp-toolbar { position: fixed; z-index: 9999; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: calc(10px + env(safe-area-inset-top)) 14px 10px; background: rgba(255,255,255,.94); border-bottom: 1px solid #CBD5E1; box-shadow: 0 10px 34px rgba(15,23,42,.14); } .tcp-close, .tcp-print { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 999px; background: #fff; color: #111827; font: 700 14px Arial, Helvetica, sans-serif; } .tcp-print { background: #007EA7; border-color: #007EA7; color: #fff; } .tcp-page { max-width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 8mm; box-shadow: 0 18px 70px rgba(0,0,0,.18); } .tcp-footer { display: none; } }
     @media print { .tcp-toolbar, .tcp-close, .tcp-print { display: none !important; } }
-    @media screen and (max-width: 820px) { .tcp-sections { grid-template-columns: 1fr; } .tcp-section--wide { grid-column: auto; } .tcp-line-details { grid-template-columns: 1fr; } }
+    @media screen and (max-width: 820px) { .tcp-sections { grid-template-columns: 1fr; } .tcp-section--wide { grid-column: auto; } .tcp-line-kv-grid { grid-template-columns: 1fr; } }
   </style>`;
 
 function openPrintWindow(project, moduleData) {
