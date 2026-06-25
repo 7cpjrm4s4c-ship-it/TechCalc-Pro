@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.1-beta.11';
-const CACHE_REVISION = '1.3.1-beta.11-version-1-3-1-beta-11-pdf-line-detail-card-layout';
+const CACHE_NAME = 'techcalc-pro-1.3.1-beta.12';
+const CACHE_REVISION = '1.3.1-beta.12-version-1-3-1-beta-12-pdf-line-detail-layout-balance';
 const ASSETS = [
   './',
   './index.html',

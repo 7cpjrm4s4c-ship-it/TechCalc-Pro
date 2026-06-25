@@ -423,7 +423,7 @@ function lineDetailBlocksHtml(rows = []) {
   if (!items.length) return tableHtml(rows, 'standard');
 
   return `<div class="tcp-line-details">${items.map((item, index) => {
-    const heading = `Leitungsabschnitt ${index + 1}${item.title && !/^leitungsabschnitt\s+\d+$/i.test(item.title) ? ` - ${item.title}` : ''}`;
+    const heading = item.title && !/^leitungsabschnitt\s+\d+$/i.test(item.title) ? item.title : `Leitungsabschnitt ${index + 1}`;
     const detailRows = item.rows.filter(row => normalizeKey(row?.[0] || '') !== 'bezeichnung');
     const rowsHtml = detailRows.map(row => {
       const label = sanitizeText(row?.[0] || '');
@@ -484,7 +484,7 @@ function buildPrintableHtml(project, moduleData) {
       <div class="tcp-sections">${sections}</div>
       ${printableChart(moduleData.chartSvg)}
     </main>
-    <footer class="tcp-footer"><span>TechCalc Pro</span><span>${esc(sanitizeText(moduleData.title))}</span><span>${esc(printDate)}</span></footer>
+    <footer class="tcp-footer"><span>TechCalc Pro</span><span>${esc(sanitizeText(moduleData.title))}</span><span>Seite</span></footer>
   </body></html>`;
 }
 
@@ -492,7 +492,7 @@ const PRINT_STYLE = `<style>
     .tcp-toolbar, .tcp-close, .tcp-print { display: none; }
     @page { size: A4; margin: 8mm 8mm 10mm 8mm; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: #fff; color: #111827; font-family: Arial, Helvetica, sans-serif; font-size: 7.35pt; line-height: 1.14; }
+    body { margin: 0; background: #fff; color: #111827; font-family: Arial, Helvetica, sans-serif; font-size: 7.2pt; line-height: 1.13; }
     .tcp-page { width: 100%; }
     .tcp-header { display: grid; grid-template-columns: 48mm 1fr 34mm; gap: 4mm; align-items: center; min-height: 14mm; padding-bottom: 2.2mm; border-bottom: .55px solid #CBD5E1; }
     .tcp-brand { display: inline-flex; align-items: center; gap: 2.4mm; min-width: 0; }
@@ -536,14 +536,14 @@ const PRINT_STYLE = `<style>
     .tcp-table--lines th:first-child { text-align: left; }
     .tcp-table--lines .tcp-line-name { text-align: left; font-weight: 700; overflow-wrap: anywhere; }
     .tcp-table--lines .tcp-line-value { text-align: right; white-space: nowrap; }
-    .tcp-line-details { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.4mm; align-items: start; }
+    .tcp-line-details { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.2mm; align-items: start; }
     .tcp-line-detail { border: .55px solid #CBD5E1; break-inside: avoid; page-break-inside: avoid; }
-    .tcp-line-detail h3 { margin: 0; padding: 1.05mm 1.4mm; background: #F8FAFC; border-bottom: .45px solid #CBD5E1; color: #0F172A; font-size: 7.2pt; line-height: 1.05; font-weight: 800; overflow-wrap: anywhere; }
-    .tcp-line-kv-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 4mm; row-gap: 0; padding: .6mm 1.2mm 1mm; }
-    .tcp-line-kv { display: grid; grid-template-columns: minmax(24mm, .92fr) minmax(0, 1fr); gap: 1.4mm; align-items: baseline; min-height: 3.8mm; padding: .55mm 0; border-bottom: .35px solid #E2E8F0; }
+    .tcp-line-detail h3 { margin: 0; padding: .9mm 1.3mm; background: #F8FAFC; border-bottom: .45px solid #CBD5E1; color: #0F172A; font-size: 7.2pt; line-height: 1.05; font-weight: 800; overflow-wrap: anywhere; }
+    .tcp-line-kv-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 4mm; row-gap: 0; padding: .55mm 1.1mm .8mm; }
+    .tcp-line-kv { display: grid; grid-template-columns: minmax(23mm, .9fr) minmax(0, 1fr); gap: 1.35mm; align-items: baseline; min-height: 3.45mm; padding: .42mm 0; border-bottom: .35px solid #E2E8F0; }
     .tcp-line-kv:nth-last-child(1), .tcp-line-kv:nth-last-child(2):nth-child(odd) { border-bottom: 0; }
-    .tcp-line-kv span { color: #475569; font-size: 6.45pt; font-weight: 700; overflow-wrap: anywhere; }
-    .tcp-line-kv strong { color: #111827; font-size: 6.8pt; font-weight: 800; text-align: right; overflow-wrap: anywhere; }
+    .tcp-line-kv span { color: #475569; font-size: 6.35pt; font-weight: 700; overflow-wrap: anywhere; }
+    .tcp-line-kv strong { color: #111827; font-size: 6.65pt; font-weight: 800; text-align: right; overflow-wrap: anywhere; }
     .tcp-diagram-section { margin-top: 3mm; break-inside: avoid; page-break-inside: avoid; }
     .tcp-diagram-section h2 { margin: 0; padding: 1.05mm 1.4mm; background: #EAF3F8; border: .5px solid #BBD2DE; border-bottom: 0; color: #075985; font-size: 7.2pt; line-height: 1.05; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
     .tcp-rule { display: none; }

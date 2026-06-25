@@ -1,4 +1,11 @@
-## Version 1.3.1 Beta 11 - PDF Line Detail Card Layout
+## Version 1.3.1 Beta 12 - PDF Line Detail Layout Balance
+
+- PDF-Leitungsabschnitte zeigen nur noch den gespeicherten Abschnittsnamen als Überschrift.
+- Datenpunkte der Leitungsabschnitte werden gleichmäßiger auf zwei Spalten verteilt.
+- Abschnittsblöcke sind kompakter, sodass ca. 3-4 Leitungsabschnitte pro A4-Seite möglich sind.
+- Footer ohne Datumswiederholung, da das Datum bereits im Header steht.
+
+## Version 1.3.1 Beta 12 - PDF Line Detail Card Layout
 
 - PDF-Kopfbereich bleibt unveraendert.
 - Projektinformationen bleiben direkt unter dem Kopfbereich.

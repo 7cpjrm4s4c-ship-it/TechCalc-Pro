@@ -1,4 +1,4 @@
-## Version 1.3.1 Beta 11 - PDF Line Detail Card Layout
+## Version 1.3.1 Beta 12 - PDF Line Detail Card Layout
 
 - PDF-Leitungsabschnitte als kompakte Detailkarten mit gespeicherten Abschnittsnamen.
 - Redundante Bezeichnung-Zeile im Detailblock entfernt.
