@@ -1,4 +1,4 @@
-## Version 1.3.1 Beta 7 - PDF Compact Export Layout
+## Version 1.3.1 Beta 8 - PDF Two-Column Report Layout
 
 - UI-Designentwicklung aus Beta 2-6 nicht uebernommen; Ausgangsbasis ist wieder die stabile 1.3.0-Entwicklungsbasis.
 - PDF-Export kompakter aufgebaut: reduzierter Seitenrand, kompakter Header, zweispaltige Abschnittsdarstellung und kleinere Tabellenabstaende.

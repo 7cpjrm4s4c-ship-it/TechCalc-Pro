@@ -343,6 +343,78 @@ function tableHtml(rows, mode = 'standard') {
   return `<table class="${tableClass}">${colgroup}${head}${body}</table>`;
 }
 
+
+function isLineSectionTitle(title = '') {
+  return /leitungsabschnitt|rohrauslegung|speicher|gespeicherte/i.test(sanitizeText(title));
+}
+
+function normalizeKey(label = '') {
+  return sanitizeText(label).toLowerCase()
+    .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function compactLineSectionRows(rows = []) {
+  const items = [];
+  let item = {};
+
+  function hasData(entry) {
+    return Object.values(entry).some(value => sanitizeText(value));
+  }
+
+  function pushItem() {
+    if (!hasData(item)) return;
+    const index = items.length + 1;
+    items.push([
+      item.name || String(index),
+      item.power || '-',
+      item.massFlow || '-',
+      item.volumeFlow || '-',
+      item.dimension || '-',
+      item.velocity || '-',
+      item.pressureLoss || '-'
+    ]);
+    item = {};
+  }
+
+  rows.forEach(row => {
+    const label = sanitizeText(row?.[0] || '');
+    const value = sanitizeText(row?.[1] || '');
+    const unit = sanitizeText(row?.[2] || '');
+    const key = normalizeKey(label);
+    const displayValue = [value, unit].filter(Boolean).join(' ');
+
+    if ((key === 'bezeichnung' && hasData(item)) || (key === 'leistung' && item.power)) {
+      pushItem();
+    }
+
+    if (key === 'bezeichnung') item.name = value || item.name;
+    else if (key === 'leistung') item.power = displayValue || item.power;
+    else if (key === 'massenstrom') item.massFlow = displayValue || item.massFlow;
+    else if (key === 'volumenstrom') item.volumeFlow = displayValue || item.volumeFlow;
+    else if (key === 'rohrdimension' || key === 'empfohlene dimension') item.dimension = value || displayValue || item.dimension;
+    else if (key === 'geschwindigkeit') item.velocity = displayValue || item.velocity;
+    else if (key === 'druckverlust') item.pressureLoss = displayValue || item.pressureLoss;
+  });
+
+  pushItem();
+  return items.length ? items : rows;
+}
+
+function compactLinesTableHtml(rows = []) {
+  const finalRows = compactLineSectionRows(rows).map(row => {
+    const clone = [...row].map(cell => sanitizeText(cell));
+    while (clone.length < 7) clone.push('-');
+    return clone.slice(0, 7);
+  });
+  const header = ['Abschnitt', 'Q', 'm', 'V', 'DN', 'v', 'dp'];
+  const colgroup = '<colgroup><col class="tcp-col-line-name"><col><col><col><col><col><col></colgroup>';
+  const head = `<thead><tr>${header.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead>`;
+  const body = `<tbody>${finalRows.map(row => `<tr>${row.map((cell, index) => `<td class="${index === 0 ? 'tcp-line-name' : 'tcp-line-value'}">${esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  return `<table class="tcp-table tcp-table--lines">${colgroup}${head}${body}</table>`;
+}
+
 function printableChart(svg) {
   if (!svg) return '';
   return `<section class="tcp-section tcp-diagram-section"><h2>h,x-Diagramm</h2><div class="tcp-rule"></div><div class="tcp-diagram">${svg}</div></section>`;
@@ -357,7 +429,9 @@ function buildPrintableHtml(project, moduleData) {
     const title = sectionTitle(section.title).replace(/Parameter/g, 'Bezeichnung');
     const mode = /prozessablauf/i.test(title) ? 'process' : 'standard';
     const rows = section.rows.map(row => row.slice(0, 3).map(cell => sanitizeText(cell).replace(/^Sättigung$/i, 'Adiabate Befeuchtung').replace(/Parameter/g, 'Bezeichnung')));
-    return `<section class="tcp-section"><h2>${esc(title)}</h2>${tableHtml(rows, mode)}</section>`;
+    const isWide = isLineSectionTitle(title);
+    const table = isWide ? compactLinesTableHtml(rows) : tableHtml(rows, mode);
+    return `<section class="tcp-section${isWide ? ' tcp-section--wide' : ''}"><h2>${esc(title)}</h2>${table}</section>`;
   }).join('');
   const logoHtml = project.companyLogo ? `<img class="tcp-company-logo" src="${esc(project.companyLogo)}" alt="Firmenlogo">` : `<div class="tcp-company-logo tcp-company-logo--empty">Firmenlogo</div>`;
 
@@ -410,8 +484,9 @@ const PRINT_STYLE = `<style>
     .tcp-project-data div { display: grid; grid-template-columns: auto 1fr; gap: 1.2mm; min-width: 0; align-items: baseline; }
     .tcp-project-data span { color: #64748B; font-size: 6.55pt; font-weight: 800; text-transform: uppercase; letter-spacing: .055em; white-space: nowrap; }
     .tcp-project-data strong { color: #111827; font-size: 7.25pt; font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
-    .tcp-sections { column-count: 2; column-gap: 5mm; column-fill: auto; }
-    .tcp-section { display: inline-block; width: 100%; margin: 0 0 2.8mm; break-inside: avoid; page-break-inside: avoid; }
+    .tcp-sections { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2.8mm 5mm; align-items: start; }
+    .tcp-section { display: block; width: 100%; margin: 0; break-inside: avoid; page-break-inside: avoid; }
+    .tcp-section--wide { grid-column: 1 / -1; }
     .tcp-section h2 { margin: 0; padding: 1.05mm 1.4mm; background: #EAF3F8; border: .5px solid #BBD2DE; border-bottom: 0; color: #075985; font-size: 7.2pt; line-height: 1.05; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
     .tcp-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 6.85pt; }
     .tcp-table col.tcp-col-label { width: 45%; }
@@ -420,6 +495,7 @@ const PRINT_STYLE = `<style>
     .tcp-table col.tcp-col-unit { width: 18mm; }
     .tcp-table col.tcp-col-process { width: 34%; }
     .tcp-table col.tcp-col-description { width: auto; }
+    .tcp-table col.tcp-col-line-name { width: 32mm; }
     .tcp-table th, .tcp-table td { border: .42px solid #CBD5E1; padding: 1.25px 2.4px; vertical-align: top; }
     .tcp-table th { background: #F1F5F9; color: #334155; font-weight: 800; font-size: 6.35pt; text-transform: uppercase; letter-spacing: .03em; }
     .tcp-table td { color: #111827; }
@@ -429,6 +505,11 @@ const PRINT_STYLE = `<style>
     .tcp-table .tcp-unit-cell { text-align: right; white-space: nowrap; color: #475569; }
     .tcp-table--numbered th:nth-child(1), .tcp-table--numbered td:nth-child(1), .tcp-table--process th:nth-child(1), .tcp-table--process td:nth-child(1) { text-align: right; white-space: nowrap; }
     .tcp-table--process th:nth-child(2), .tcp-table--process td:nth-child(2), .tcp-table--process th:nth-child(3), .tcp-table--process td:nth-child(3) { text-align: left; white-space: normal; }
+    .tcp-table--lines { font-size: 6.55pt; table-layout: fixed; }
+    .tcp-table--lines th { text-align: right; }
+    .tcp-table--lines th:first-child { text-align: left; }
+    .tcp-table--lines .tcp-line-name { text-align: left; font-weight: 700; overflow-wrap: anywhere; }
+    .tcp-table--lines .tcp-line-value { text-align: right; white-space: nowrap; }
     .tcp-diagram-section { margin-top: 3mm; break-inside: avoid; page-break-inside: avoid; }
     .tcp-diagram-section h2 { margin: 0; padding: 1.05mm 1.4mm; background: #EAF3F8; border: .5px solid #BBD2DE; border-bottom: 0; color: #075985; font-size: 7.2pt; line-height: 1.05; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
     .tcp-rule { display: none; }
@@ -445,6 +526,7 @@ const PRINT_STYLE = `<style>
     .tcp-footer { position: fixed; bottom: 4mm; left: 8mm; right: 8mm; display: flex; justify-content: space-between; border-top: .5px solid #CBD5E1; padding-top: 1.2mm; color: #64748B; font-size: 6.25pt; }
     @media screen { body { background: #e5e7eb; padding: calc(66px + env(safe-area-inset-top)) 18px 18px; } .tcp-toolbar { position: fixed; z-index: 9999; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: calc(10px + env(safe-area-inset-top)) 14px 10px; background: rgba(255,255,255,.94); border-bottom: 1px solid #CBD5E1; box-shadow: 0 10px 34px rgba(15,23,42,.14); } .tcp-close, .tcp-print { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 999px; background: #fff; color: #111827; font: 700 14px Arial, Helvetica, sans-serif; } .tcp-print { background: #007EA7; border-color: #007EA7; color: #fff; } .tcp-page { max-width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 8mm; box-shadow: 0 18px 70px rgba(0,0,0,.18); } .tcp-footer { display: none; } }
     @media print { .tcp-toolbar, .tcp-close, .tcp-print { display: none !important; } }
+    @media screen and (max-width: 820px) { .tcp-sections { grid-template-columns: 1fr; } .tcp-section--wide { grid-column: auto; } }
   </style>`;
 
 function openPrintWindow(project, moduleData) {
