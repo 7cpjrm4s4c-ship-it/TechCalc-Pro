@@ -1,4 +1,4 @@
-## Version 1.3.1 Beta 9 - PDF Line Section Detail Layout
+## Version 1.3.1 Beta 10 - PDF Line Sections Only Layout
 
 - PDF-Kopfbereich bleibt unveraendert.
 - Zweispaltige Ergebnis-/Eingabebloecke bleiben erhalten.

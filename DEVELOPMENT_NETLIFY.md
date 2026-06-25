@@ -1,4 +1,4 @@
-## Version 1.3.1 Beta 9 - PDF Line Section Detail Layout
+## Version 1.3.1 Beta 10 - PDF Line Sections Only Layout
 
 - UI-Designentwicklung aus Beta 2-6 nicht uebernommen; Ausgangsbasis ist wieder die stabile 1.3.0-Entwicklungsbasis.
 - PDF-Export kompakter aufgebaut: reduzierter Seitenrand, kompakter Header, zweispaltige Abschnittsdarstellung und kleinere Tabellenabstaende.

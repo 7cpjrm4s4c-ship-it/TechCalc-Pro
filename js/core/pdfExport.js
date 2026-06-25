@@ -228,7 +228,25 @@ function extractCardRows(card) {
     if (label || value) rows.push([label, value, unit, '']);
   });
 
+  card.querySelectorAll(':scope .saved-record-card, :scope [data-saved-record-card], :scope [data-line-card]').forEach((record, index) => {
+    const title = textOf(record.querySelector('.saved-record-card__title strong, .line-section-card__title strong'))
+      || textOf(record.querySelector('.saved-record-card__title, .line-section-card__title'))
+      || sanitizeText(record.getAttribute('aria-label') || '')
+      || `Leitungsabschnitt ${index + 1}`;
+    if (title) rows.push(['Bezeichnung', title, '', '']);
+    record.querySelectorAll(':scope .inline-stat').forEach(stat => {
+      const label = textOf(stat.querySelector('span'));
+      const strong = stat.querySelector('strong');
+      const small = strong?.querySelector('small');
+      const raw = textOf(strong);
+      const unit = small ? textOf(small) : '';
+      const value = unit ? raw.replace(unit, '').trim() : raw;
+      if (label || value) rows.push([label, value, unit, '']);
+    });
+  });
+
   card.querySelectorAll(':scope .inline-stat').forEach(stat => {
+    if (stat.closest('.saved-record-card, [data-saved-record-card], [data-line-card]')) return;
     const label = textOf(stat.querySelector('span'));
     const strong = stat.querySelector('strong');
     const small = strong?.querySelector('small');
@@ -419,7 +437,12 @@ function buildPrintableHtml(project, moduleData) {
   const appIconUrl = new URL('./assets/icons/icon-192.png', window.location.href).href;
   const metaValue = value => esc(sanitizeText(value) || '-');
 
-  const sections = moduleData.sections.map(section => {
+  const hasLineSections = moduleData.sections.some(section => isLineSectionTitle(sectionTitle(section.title)));
+  const printableSections = hasLineSections
+    ? moduleData.sections.filter(section => isLineSectionTitle(sectionTitle(section.title)))
+    : moduleData.sections;
+
+  const sections = printableSections.map(section => {
     const title = sectionTitle(section.title).replace(/Parameter/g, 'Bezeichnung');
     const mode = /prozessablauf/i.test(title) ? 'process' : 'standard';
     const rows = section.rows.map(row => row.slice(0, 3).map(cell => sanitizeText(cell).replace(/^Sättigung$/i, 'Adiabate Befeuchtung').replace(/Parameter/g, 'Bezeichnung')));
