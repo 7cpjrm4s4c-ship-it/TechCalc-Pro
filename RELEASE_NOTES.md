@@ -1,4 +1,11 @@
-## Version 1.3.1 Beta 8 - PDF Two-Column Report Layout
+## Version 1.3.1 Beta 9 - PDF Line Section Detail Layout
+
+- PDF-Kopfbereich bleibt unveraendert.
+- Zweispaltige Ergebnis-/Eingabebloecke bleiben erhalten.
+- Leitungsabschnitte werden nun als vollstaendige Detailbloecke statt als reine Uebersichtstabelle ausgegeben.
+- Automatischer Seitenumbruch / break-inside fuer Abschnittsbloecke optimiert.
+- Firmenlogo-Integration oben rechts bleibt erhalten.
+
 
 - UI-Designentwicklung aus Beta 2-6 nicht uebernommen; Ausgangsbasis ist wieder die stabile 1.3.0-Entwicklungsbasis.
 - PDF-Export kompakter aufgebaut: reduzierter Seitenrand, kompakter Header, zweispaltige Abschnittsdarstellung und kleinere Tabellenabstaende.
