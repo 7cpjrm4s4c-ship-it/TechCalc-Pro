@@ -484,7 +484,6 @@ function buildPrintableHtml(project, moduleData) {
       <div class="tcp-sections">${sections}</div>
       ${printableChart(moduleData.chartSvg)}
     </main>
-    <footer class="tcp-footer"><span>TechCalc Pro</span><span>${esc(sanitizeText(moduleData.title))}</span><span>Seite</span></footer>
   </body></html>`;
 }
 
@@ -557,8 +556,7 @@ const PRINT_STYLE = `<style>
     .tcp-diagram .hx-state-path { fill: none !important; stroke: #F97316 !important; stroke-width: 3 !important; }
     .tcp-diagram .hx-point circle { fill: #fff !important; stroke: #F97316 !important; stroke-width: 2.5 !important; }
     .tcp-diagram .hx-point text { fill: #111827 !important; font-weight: 700 !important; font-family: Arial, Helvetica, sans-serif !important; }
-    .tcp-footer { position: fixed; bottom: 4mm; left: 8mm; right: 8mm; display: flex; justify-content: space-between; border-top: .5px solid #CBD5E1; padding-top: 1.2mm; color: #64748B; font-size: 6.25pt; }
-    @media screen { body { background: #e5e7eb; padding: calc(66px + env(safe-area-inset-top)) 18px 18px; } .tcp-toolbar { position: fixed; z-index: 9999; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: calc(10px + env(safe-area-inset-top)) 14px 10px; background: rgba(255,255,255,.94); border-bottom: 1px solid #CBD5E1; box-shadow: 0 10px 34px rgba(15,23,42,.14); } .tcp-close, .tcp-print { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 999px; background: #fff; color: #111827; font: 700 14px Arial, Helvetica, sans-serif; } .tcp-print { background: #007EA7; border-color: #007EA7; color: #fff; } .tcp-page { max-width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 8mm; box-shadow: 0 18px 70px rgba(0,0,0,.18); } .tcp-footer { display: none; } }
+    @media screen { body { background: #e5e7eb; padding: calc(66px + env(safe-area-inset-top)) 18px 18px; } .tcp-toolbar { position: fixed; z-index: 9999; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: calc(10px + env(safe-area-inset-top)) 14px 10px; background: rgba(255,255,255,.94); border-bottom: 1px solid #CBD5E1; box-shadow: 0 10px 34px rgba(15,23,42,.14); } .tcp-close, .tcp-print { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 999px; background: #fff; color: #111827; font: 700 14px Arial, Helvetica, sans-serif; } .tcp-print { background: #007EA7; border-color: #007EA7; color: #fff; } .tcp-page { max-width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 8mm; box-shadow: 0 18px 70px rgba(0,0,0,.18); } }
     @media print { .tcp-toolbar, .tcp-close, .tcp-print { display: none !important; } }
     @media screen and (max-width: 820px) { .tcp-sections { grid-template-columns: 1fr; } .tcp-section--wide { grid-column: auto; } .tcp-line-kv-grid { grid-template-columns: 1fr; } }
   </style>`;

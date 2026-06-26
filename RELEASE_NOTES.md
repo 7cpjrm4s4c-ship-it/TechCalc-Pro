@@ -1,11 +1,11 @@
-## Version 1.3.1 Beta 12 - PDF Line Detail Layout Balance
+## Version 1.3.1 Beta 13 - Global PDF Template Footer Cleanup
 
 - PDF-Leitungsabschnitte zeigen nur noch den gespeicherten Abschnittsnamen als Überschrift.
 - Datenpunkte der Leitungsabschnitte werden gleichmäßiger auf zwei Spalten verteilt.
 - Abschnittsblöcke sind kompakter, sodass ca. 3-4 Leitungsabschnitte pro A4-Seite möglich sind.
 - Footer ohne Datumswiederholung, da das Datum bereits im Header steht.
 
-## Version 1.3.1 Beta 12 - PDF Line Detail Card Layout
+## Version 1.3.1 Beta 13 - Global PDF Template Footer Cleanup
 
 - PDF-Kopfbereich bleibt unveraendert.
 - Projektinformationen bleiben direkt unter dem Kopfbereich.

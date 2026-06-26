@@ -1,4 +1,4 @@
-## Version 1.3.1 Beta 12 - PDF Line Detail Card Layout
+## Version 1.3.1 Beta 13 - Global PDF Template Footer Cleanup
 
 - PDF-Leitungsabschnitte als kompakte Detailkarten mit gespeicherten Abschnittsnamen.
 - Redundante Bezeichnung-Zeile im Detailblock entfernt.
