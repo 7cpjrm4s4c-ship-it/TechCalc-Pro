@@ -1,4 +1,4 @@
-## Version 1.3.1 Beta 14 - Native PDF Engine Foundation
+## Version 1.3.1 Beta 15 - Global PDF Report Template
 
 
 ### PDF Export

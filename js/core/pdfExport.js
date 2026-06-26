@@ -1,6 +1,7 @@
 import { currentRoute } from './router.js';
 import { esc } from './renderer.js';
 import { getProjectMeta, setProjectMeta, downloadProjectFile, readProjectFile, applyProjectData, getOpenedFileName, saveSessionSnapshot } from './projectStorage.js';
+import { PDF_PAGE, PDF_THEME } from './pdf/reportTheme.js';
 
 
 function sanitizeText(value = '') {
@@ -449,18 +450,6 @@ function reportSections(moduleData) {
   });
 }
 
-const PDF_PT_PER_MM = 72 / 25.4;
-const PDF_PAGE = { width: 595.28, height: 841.89 };
-const PDF_THEME = {
-  margin: 8 * PDF_PT_PER_MM,
-  text: [17, 24, 39],
-  muted: [100, 116, 139],
-  line: [203, 213, 225],
-  soft: [248, 250, 252],
-  accentBg: [234, 243, 248],
-  accent: [7, 89, 133]
-};
-
 function pdfHexText(value = '') {
   const text = sanitizeText(value);
   const bytes = [0xFE, 0xFF];
@@ -502,7 +491,7 @@ function rgb(values) {
   return values.map(value => pdfNumber(value / 255)).join(' ');
 }
 
-class NativePdfReport {
+class GlobalPdfReport {
   constructor() {
     this.pages = [];
     this.addPage();
@@ -719,7 +708,7 @@ function pdfFileName(moduleData) {
 }
 
 function downloadNativePdf(project, moduleData) {
-  const report = new NativePdfReport();
+  const report = new GlobalPdfReport();
   const blob = report.build(project, moduleData);
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');

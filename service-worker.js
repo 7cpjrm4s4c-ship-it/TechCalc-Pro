@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.1-beta.14';
-const CACHE_REVISION = '1.3.1-beta.14-version-1-3-1-beta-14-native-pdf-engine-foundation';
+const CACHE_NAME = 'techcalc-pro-1.3.1-beta.15';
+const CACHE_REVISION = '1.3.1-beta.15-version-1-3-1-beta-15-global-pdf-report-template';
 const ASSETS = [
   './',
   './index.html',
@@ -26,6 +26,7 @@ const ASSETS = [
   './js/core/navigation.js',
   './js/core/numberService.js',
   './js/core/numbers.js',
+  './js/core/pdf/reportTheme.js',
   './js/core/pdfExport.js',
   './js/core/platformLifecycle.js',
   './js/core/platformPolicy.js',

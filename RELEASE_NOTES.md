@@ -1,4 +1,4 @@
-## Version 1.3.1 Beta 14 - Native PDF Engine Foundation
+## Version 1.3.1 Beta 15 - Global PDF Report Template
 
 
 ### PDF Export
@@ -14,7 +14,7 @@
 - Abschnittsblöcke sind kompakter, sodass ca. 3-4 Leitungsabschnitte pro A4-Seite möglich sind.
 - Footer ohne Datumswiederholung, da das Datum bereits im Header steht.
 
-## Version 1.3.1 Beta 14 - Native PDF Engine Foundation
+## Version 1.3.1 Beta 15 - Global PDF Report Template
 
 - PDF-Kopfbereich bleibt unveraendert.
 - Projektinformationen bleiben direkt unter dem Kopfbereich.
