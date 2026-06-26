@@ -1,4 +1,13 @@
-## Version 1.3.1 Beta 13 - Global PDF Template Footer Cleanup
+## Version 1.3.1 Beta 14 - Native PDF Engine Foundation
+
+
+### PDF Export
+- Browserdruck entfernt und durch native PDF-Erzeugung ersetzt.
+- Keine Browser-URL, kein Browser-Datum und keine Browser-Uhrzeit mehr im PDF-Footer.
+- Einheitliche A4-Seiten mit zentralem Report-Template.
+- Footer reduziert auf dezente Seitenzahl unten rechts.
+- Leitungsabschnitte bleiben kompakt und zweispaltig aufgebaut.
+
 
 - PDF-Leitungsabschnitte als kompakte Detailkarten mit gespeicherten Abschnittsnamen.
 - Redundante Bezeichnung-Zeile im Detailblock entfernt.

@@ -436,157 +436,299 @@ function lineDetailBlocksHtml(rows = []) {
     return `<article class="tcp-line-detail"><h3>${esc(heading)}</h3><div class="tcp-line-kv-grid">${rowsHtml}</div></article>`;
   }).join('')}</div>`;
 }
-function printableChart(svg) {
-  if (!svg) return '';
-  return `<section class="tcp-section tcp-diagram-section"><h2>h,x-Diagramm</h2><div class="tcp-rule"></div><div class="tcp-diagram">${svg}</div></section>`;
-}
 
-function buildPrintableHtml(project, moduleData) {
-  const printDate = new Date().toLocaleDateString('de-DE');
-  const appIconUrl = new URL('./assets/icons/icon-192.png', window.location.href).href;
-  const metaValue = value => esc(sanitizeText(value) || '-');
-
+function reportSections(moduleData) {
   const hasLineSections = moduleData.sections.some(section => isLineSectionTitle(sectionTitle(section.title)));
   const printableSections = hasLineSections
     ? moduleData.sections.filter(section => isLineSectionTitle(sectionTitle(section.title)))
     : moduleData.sections;
-
-  const sections = printableSections.map(section => {
+  return printableSections.map(section => {
     const title = sectionTitle(section.title).replace(/Parameter/g, 'Bezeichnung');
-    const mode = /prozessablauf/i.test(title) ? 'process' : 'standard';
     const rows = section.rows.map(row => row.slice(0, 3).map(cell => sanitizeText(cell).replace(/^Sättigung$/i, 'Adiabate Befeuchtung').replace(/Parameter/g, 'Bezeichnung')));
-    const isWide = isLineSectionTitle(title);
-    const table = isWide ? lineDetailBlocksHtml(rows) : tableHtml(rows, mode);
-    return `<section class="tcp-section${isWide ? ' tcp-section--wide' : ''}"><h2>${esc(title)}</h2>${table}</section>`;
-  }).join('');
-  const logoHtml = project.companyLogo ? `<img class="tcp-company-logo" src="${esc(project.companyLogo)}" alt="Firmenlogo">` : `<div class="tcp-company-logo tcp-company-logo--empty">Firmenlogo</div>`;
-
-  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>TechCalc Pro - ${esc(moduleData.shortTitle)}</title>${PRINT_STYLE}</head><body>
-    <div class="tcp-toolbar">
-      <button class="tcp-close" type="button" onclick="try{ if (window.opener) { window.opener.focus(); window.close(); return; } }catch(e){} if (history.length > 1) { history.back(); } else { window.close(); }">Zurück zur App</button>
-      <button class="tcp-print" type="button" onclick="window.print()">PDF speichern / drucken</button>
-    </div>
-    <main class="tcp-page">
-      <header class="tcp-header">
-        <div class="tcp-brand">
-          <img class="tcp-brand-icon" src="${esc(appIconUrl)}" alt="">
-          <div class="tcp-brand-text"><strong>TechCalc Pro</strong><span>HLSK Quick Tools</span></div>
-        </div>
-        <div class="tcp-document-title"><strong>Berechnungsprotokoll</strong><span>${esc(sanitizeText(moduleData.title))} - ${esc(printDate)}</span></div>
-        <div class="tcp-logo-slot">${logoHtml}</div>
-      </header>
-      <section class="tcp-project-data">
-        <div><span>Projekt</span><strong>${metaValue(project.project)}</strong></div>
-        <div><span>Projektnr.</span><strong>${metaValue(project.projectNo)}</strong></div>
-        <div><span>Auftraggeber</span><strong>${metaValue(project.client)}</strong></div>
-        <div><span>Sachbearbeiter</span><strong>${metaValue(project.engineer)}</strong></div>
-      </section>
-      <div class="tcp-sections">${sections}</div>
-      ${printableChart(moduleData.chartSvg)}
-    </main>
-  </body></html>`;
+    return { title, rows, isLineSection: isLineSectionTitle(title) };
+  });
 }
 
-const PRINT_STYLE = `<style>
-    .tcp-toolbar, .tcp-close, .tcp-print { display: none; }
-    @page { size: A4; margin: 8mm 8mm 10mm 8mm; }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: #fff; color: #111827; font-family: Arial, Helvetica, sans-serif; font-size: 7.2pt; line-height: 1.13; }
-    .tcp-page { width: 100%; }
-    .tcp-header { display: grid; grid-template-columns: 48mm 1fr 34mm; gap: 4mm; align-items: center; min-height: 14mm; padding-bottom: 2.2mm; border-bottom: .55px solid #CBD5E1; }
-    .tcp-brand { display: inline-flex; align-items: center; gap: 2.4mm; min-width: 0; }
-    .tcp-brand-icon { width: 8.2mm; height: 8.2mm; border-radius: 1.8mm; object-fit: contain; flex: 0 0 auto; }
-    .tcp-brand-text { display: grid; gap: .45mm; min-width: 0; }
-    .tcp-brand-text strong { color: #111827; font-size: 10.6pt; line-height: 1; font-weight: 800; letter-spacing: -.02em; }
-    .tcp-brand-text span { color: #64748B; font-size: 6.15pt; line-height: 1; text-transform: uppercase; letter-spacing: .16em; font-weight: 700; }
-    .tcp-document-title { text-align: center; display: grid; gap: .8mm; }
-    .tcp-document-title strong { color: #111827; font-size: 12.4pt; line-height: 1; font-weight: 800; letter-spacing: -.02em; }
-    .tcp-document-title span { color: #475569; font-size: 7.2pt; line-height: 1.1; font-weight: 700; text-transform: uppercase; letter-spacing: .055em; }
-    .tcp-logo-slot { min-height: 12mm; display: flex; align-items: center; justify-content: flex-end; overflow: hidden; }
-    .tcp-company-logo { max-width: 34mm; max-height: 13mm; object-fit: contain; display: block; }
-    .tcp-company-logo--empty { width: 30mm; height: 11mm; border: .5px dashed #CBD5E1; color: #94A3B8; font-size: 6pt; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; align-items: center; justify-content: center; }
-    .tcp-project-data { margin: 2.2mm 0 2.7mm; padding: 1.6mm 2mm; background: #F8FAFC; border: .45px solid #CBD5E1; display: grid; grid-template-columns: 1.2fr .78fr 1fr .9fr; gap: 1.5mm 2.5mm; }
-    .tcp-project-data div { display: grid; grid-template-columns: auto 1fr; gap: 1.2mm; min-width: 0; align-items: baseline; }
-    .tcp-project-data span { color: #64748B; font-size: 6.55pt; font-weight: 800; text-transform: uppercase; letter-spacing: .055em; white-space: nowrap; }
-    .tcp-project-data strong { color: #111827; font-size: 7.25pt; font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
-    .tcp-sections { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2.8mm 5mm; align-items: start; }
-    .tcp-section { display: block; width: 100%; margin: 0; break-inside: avoid; page-break-inside: avoid; }
-    .tcp-section--wide { grid-column: 1 / -1; }
-    .tcp-section h2 { margin: 0; padding: 1.05mm 1.4mm; background: #EAF3F8; border: .5px solid #BBD2DE; border-bottom: 0; color: #075985; font-size: 7.2pt; line-height: 1.05; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
-    .tcp-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 6.85pt; }
-    .tcp-table col.tcp-col-label { width: 45%; }
-    .tcp-table col.tcp-col-num { width: 13mm; }
-    .tcp-table col.tcp-col-value { width: auto; }
-    .tcp-table col.tcp-col-unit { width: 18mm; }
-    .tcp-table col.tcp-col-process { width: 34%; }
-    .tcp-table col.tcp-col-description { width: auto; }
-    .tcp-table col.tcp-col-line-name { width: 32mm; }
-    .tcp-table th, .tcp-table td { border: .42px solid #CBD5E1; padding: 1.25px 2.4px; vertical-align: top; }
-    .tcp-table th { background: #F1F5F9; color: #334155; font-weight: 800; font-size: 6.35pt; text-transform: uppercase; letter-spacing: .03em; }
-    .tcp-table td { color: #111827; }
-    .tcp-table .tcp-label-cell { text-align: left; overflow-wrap: anywhere; }
-    .tcp-table .tcp-value-cell { text-align: right; overflow-wrap: anywhere; font-weight: 700; }
-    .tcp-table .tcp-value-text { text-align: left; font-weight: 600; }
-    .tcp-table .tcp-unit-cell { text-align: right; white-space: nowrap; color: #475569; }
-    .tcp-table--numbered th:nth-child(1), .tcp-table--numbered td:nth-child(1), .tcp-table--process th:nth-child(1), .tcp-table--process td:nth-child(1) { text-align: right; white-space: nowrap; }
-    .tcp-table--process th:nth-child(2), .tcp-table--process td:nth-child(2), .tcp-table--process th:nth-child(3), .tcp-table--process td:nth-child(3) { text-align: left; white-space: normal; }
-    .tcp-table--lines { font-size: 6.55pt; table-layout: fixed; }
-    .tcp-table--lines th { text-align: right; }
-    .tcp-table--lines th:first-child { text-align: left; }
-    .tcp-table--lines .tcp-line-name { text-align: left; font-weight: 700; overflow-wrap: anywhere; }
-    .tcp-table--lines .tcp-line-value { text-align: right; white-space: nowrap; }
-    .tcp-line-details { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.2mm; align-items: start; }
-    .tcp-line-detail { border: .55px solid #CBD5E1; break-inside: avoid; page-break-inside: avoid; }
-    .tcp-line-detail h3 { margin: 0; padding: .9mm 1.3mm; background: #F8FAFC; border-bottom: .45px solid #CBD5E1; color: #0F172A; font-size: 7.2pt; line-height: 1.05; font-weight: 800; overflow-wrap: anywhere; }
-    .tcp-line-kv-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 4mm; row-gap: 0; padding: .55mm 1.1mm .8mm; }
-    .tcp-line-kv { display: grid; grid-template-columns: minmax(23mm, .9fr) minmax(0, 1fr); gap: 1.35mm; align-items: baseline; min-height: 3.45mm; padding: .42mm 0; border-bottom: .35px solid #E2E8F0; }
-    .tcp-line-kv:nth-last-child(1), .tcp-line-kv:nth-last-child(2):nth-child(odd) { border-bottom: 0; }
-    .tcp-line-kv span { color: #475569; font-size: 6.35pt; font-weight: 700; overflow-wrap: anywhere; }
-    .tcp-line-kv strong { color: #111827; font-size: 6.65pt; font-weight: 800; text-align: right; overflow-wrap: anywhere; }
-    .tcp-diagram-section { margin-top: 3mm; break-inside: avoid; page-break-inside: avoid; }
-    .tcp-diagram-section h2 { margin: 0; padding: 1.05mm 1.4mm; background: #EAF3F8; border: .5px solid #BBD2DE; border-bottom: 0; color: #075985; font-size: 7.2pt; line-height: 1.05; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
-    .tcp-rule { display: none; }
-    .tcp-diagram { width: 100%; border: .5px solid #CBD5E1; padding: 2mm; background: #fff; overflow: hidden; }
-    .tcp-diagram svg { width: 100%; height: auto; display: block; background: #fff; }
-    .tcp-diagram .hx-chart-bg { fill: #fff !important; stroke: #CBD5E1 !important; }
-    .tcp-diagram .hx-grid-line { stroke: #E2E8F0 !important; stroke-width: 1 !important; }
-    .tcp-diagram .hx-axis-label, .tcp-diagram .hx-title, .tcp-diagram .hx-rh-label { fill: #111827 !important; font-family: Arial, Helvetica, sans-serif !important; }
-    .tcp-diagram .hx-rh { fill: none !important; stroke: #94A3B8 !important; stroke-width: 1.1 !important; opacity: .9 !important; }
-    .tcp-diagram .hx-rh-100 { stroke: #111827 !important; stroke-width: 2 !important; }
-    .tcp-diagram .hx-state-path { fill: none !important; stroke: #F97316 !important; stroke-width: 3 !important; }
-    .tcp-diagram .hx-point circle { fill: #fff !important; stroke: #F97316 !important; stroke-width: 2.5 !important; }
-    .tcp-diagram .hx-point text { fill: #111827 !important; font-weight: 700 !important; font-family: Arial, Helvetica, sans-serif !important; }
-    @media screen { body { background: #e5e7eb; padding: calc(66px + env(safe-area-inset-top)) 18px 18px; } .tcp-toolbar { position: fixed; z-index: 9999; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: calc(10px + env(safe-area-inset-top)) 14px 10px; background: rgba(255,255,255,.94); border-bottom: 1px solid #CBD5E1; box-shadow: 0 10px 34px rgba(15,23,42,.14); } .tcp-close, .tcp-print { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 999px; background: #fff; color: #111827; font: 700 14px Arial, Helvetica, sans-serif; } .tcp-print { background: #007EA7; border-color: #007EA7; color: #fff; } .tcp-page { max-width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 8mm; box-shadow: 0 18px 70px rgba(0,0,0,.18); } }
-    @media print { .tcp-toolbar, .tcp-close, .tcp-print { display: none !important; } }
-    @media screen and (max-width: 820px) { .tcp-sections { grid-template-columns: 1fr; } .tcp-section--wide { grid-column: auto; } .tcp-line-kv-grid { grid-template-columns: 1fr; } }
-  </style>`;
+const PDF_PT_PER_MM = 72 / 25.4;
+const PDF_PAGE = { width: 595.28, height: 841.89 };
+const PDF_THEME = {
+  margin: 8 * PDF_PT_PER_MM,
+  text: [17, 24, 39],
+  muted: [100, 116, 139],
+  line: [203, 213, 225],
+  soft: [248, 250, 252],
+  accentBg: [234, 243, 248],
+  accent: [7, 89, 133]
+};
 
-function openPrintWindow(project, moduleData) {
-  const html = buildPrintableHtml(project, moduleData);
-  const win = window.open('about:blank', '_blank');
+function pdfHexText(value = '') {
+  const text = sanitizeText(value);
+  const bytes = [0xFE, 0xFF];
+  for (const ch of text) {
+    const code = ch.codePointAt(0);
+    if (code > 0xFFFF) continue;
+    bytes.push((code >> 8) & 0xFF, code & 0xFF);
+  }
+  return `<${bytes.map(byte => byte.toString(16).padStart(2, '0')).join('').toUpperCase()}>`;
+}
 
-  if (!win) {
-    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.target = '_blank';
-    link.rel = 'noopener';
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 15000);
-    return;
+function pdfNumber(value) {
+  return Number(value).toFixed(2).replace(/\.00$/, '').replace(/0$/, '');
+}
+
+function estimateTextWidth(text, size = 8) {
+  return sanitizeText(text).length * size * 0.48;
+}
+
+function splitPdfText(text, maxWidth, size = 8) {
+  const words = sanitizeText(text).split(/\s+/).filter(Boolean);
+  if (!words.length) return [''];
+  const lines = [];
+  let line = '';
+  words.forEach(word => {
+    const candidate = line ? `${line} ${word}` : word;
+    if (estimateTextWidth(candidate, size) <= maxWidth || !line) {
+      line = candidate;
+    } else {
+      lines.push(line);
+      line = word;
+    }
+  });
+  if (line) lines.push(line);
+  return lines;
+}
+
+function rgb(values) {
+  return values.map(value => pdfNumber(value / 255)).join(' ');
+}
+
+class NativePdfReport {
+  constructor() {
+    this.pages = [];
+    this.addPage();
   }
 
-  try {
-    win.document.open('text/html', 'replace');
-    win.document.write(html);
-    win.document.close();
-    win.focus();
-  } catch (error) {
-    console.error('PDF-Export fehlgeschlagen.', error);
-    try { win.close(); } catch {}
-    alert('PDF-Export konnte nicht erstellt werden. Bitte Browser-Konsole prüfen.');
+  addPage() {
+    this.page = [];
+    this.pages.push(this.page);
+    this.cursorY = PDF_THEME.margin;
   }
+
+  cmd(command) {
+    this.page.push(command);
+  }
+
+  y(topY) {
+    return PDF_PAGE.height - topY;
+  }
+
+  color(values, stroke = false) {
+    this.cmd(`${rgb(values)} ${stroke ? 'RG' : 'rg'}`);
+  }
+
+  text(value, x, y, { size = 8, font = 'F1', color = PDF_THEME.text, align = 'left', maxWidth = null } = {}) {
+    const lines = maxWidth ? splitPdfText(value, maxWidth, size) : [sanitizeText(value)];
+    lines.forEach((line, index) => {
+      const lineY = y + index * size * 1.18;
+      let lineX = x;
+      if (align === 'center') lineX = x - estimateTextWidth(line, size) / 2;
+      if (align === 'right') lineX = x - estimateTextWidth(line, size);
+      this.color(color);
+      this.cmd(`BT /${font} ${pdfNumber(size)} Tf ${pdfNumber(lineX)} ${pdfNumber(this.y(lineY))} Td ${pdfHexText(line)} Tj ET`);
+    });
+    return lines.length * size * 1.18;
+  }
+
+  line(x1, y1, x2, y2, color = PDF_THEME.line, width = 0.5) {
+    this.color(color, true);
+    this.cmd(`${pdfNumber(width)} w ${pdfNumber(x1)} ${pdfNumber(this.y(y1))} m ${pdfNumber(x2)} ${pdfNumber(this.y(y2))} l S`);
+  }
+
+  rect(x, y, w, h, { fill = null, stroke = PDF_THEME.line, width = 0.5 } = {}) {
+    if (fill) this.color(fill);
+    if (stroke) this.color(stroke, true);
+    this.cmd(`${pdfNumber(width)} w ${pdfNumber(x)} ${pdfNumber(this.y(y + h))} ${pdfNumber(w)} ${pdfNumber(h)} re ${fill && stroke ? 'B' : fill ? 'f' : 'S'}`);
+  }
+
+  ensureSpace(requiredHeight) {
+    const bottomLimit = PDF_PAGE.height - PDF_THEME.margin - 14;
+    if (this.cursorY + requiredHeight > bottomLimit) this.addPage();
+  }
+
+  header(project, moduleData, date) {
+    const m = PDF_THEME.margin;
+    const right = PDF_PAGE.width - m;
+    const titleX = PDF_PAGE.width / 2;
+    const logoX = right - 96;
+
+    this.text('TechCalc Pro', m + 25, m + 8, { size: 10.6, font: 'F2' });
+    this.text('HLSK QUICK TOOLS', m + 25, m + 19, { size: 6.2, font: 'F2', color: PDF_THEME.muted });
+    this.rect(m, m + 1, 21, 21, { fill: [15, 23, 42], stroke: [30, 41, 59], width: 0.6 });
+    this.text('TCP', m + 10.5, m + 14.5, { size: 6.3, font: 'F2', color: [255, 255, 255], align: 'center' });
+
+    this.text('Berechnungsprotokoll', titleX, m + 6, { size: 12.4, font: 'F2', align: 'center' });
+    this.text(`${moduleData.title} - ${date}`, titleX, m + 18, { size: 7.2, font: 'F2', color: [71, 85, 105], align: 'center' });
+
+    this.rect(logoX, m, 96, 28, { fill: null, stroke: [203, 213, 225], width: 0.5 });
+    this.text(project.companyLogo ? 'FIRMENLOGO HINTERLEGT' : 'FIRMENLOGO', logoX + 48, m + 17, { size: 6.3, font: 'F2', color: [148, 163, 184], align: 'center' });
+    this.line(m, m + 34, right, m + 34, PDF_THEME.line, 0.55);
+    this.cursorY = m + 39;
+  }
+
+  projectData(project) {
+    const m = PDF_THEME.margin;
+    const w = PDF_PAGE.width - m * 2;
+    const h = 19;
+    this.rect(m, this.cursorY, w, h, { fill: PDF_THEME.soft, stroke: PDF_THEME.line, width: 0.45 });
+    const labels = [
+      ['PROJEKT', project.project],
+      ['PROJEKTNR.', project.projectNo],
+      ['AUFTRAGGEBER', project.client],
+      ['SACHBEARBEITER', project.engineer]
+    ];
+    const colW = w / 4;
+    labels.forEach(([label, value], index) => {
+      const x = m + index * colW + 4;
+      this.text(label, x, this.cursorY + 7, { size: 6.4, font: 'F2', color: PDF_THEME.muted });
+      this.text(value || '-', x + 40, this.cursorY + 7, { size: 7.2, font: 'F2', maxWidth: colW - 45 });
+    });
+    this.cursorY += h + 8;
+  }
+
+  sectionTitle(title) {
+    const m = PDF_THEME.margin;
+    this.text(title, m, this.cursorY, { size: 8.2, font: 'F2', color: PDF_THEME.accent });
+    this.cursorY += 9;
+  }
+
+  lineBlock(item) {
+    const detailRows = item.rows.filter(row => normalizeKey(row?.[0] || '') !== 'bezeichnung');
+    const columns = [[], []];
+    detailRows.forEach((row, index) => columns[index % 2].push(row));
+    const rowHeight = 12;
+    const bodyRows = Math.max(columns[0].length, columns[1].length);
+    const blockHeight = 18 + bodyRows * rowHeight + 8;
+    this.ensureSpace(blockHeight);
+
+    const m = PDF_THEME.margin;
+    const w = PDF_PAGE.width - m * 2;
+    const y0 = this.cursorY;
+    this.rect(m, y0, w, blockHeight - 4, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.55 });
+    this.rect(m, y0, w, 16, { fill: PDF_THEME.soft, stroke: PDF_THEME.line, width: 0.45 });
+    this.text(item.title || 'Abschnitt', m + 5, y0 + 10.5, { size: 7.4, font: 'F2', maxWidth: w - 10 });
+
+    const colGap = 20;
+    const colW = (w - 10 - colGap) / 2;
+    const labelW = colW * 0.48;
+    columns.forEach((column, colIndex) => {
+      const x = m + 5 + colIndex * (colW + colGap);
+      column.forEach((row, rowIndex) => {
+        const y = y0 + 24 + rowIndex * rowHeight;
+        const label = sanitizeText(row?.[0] || '-');
+        const value = [sanitizeText(row?.[1] || ''), sanitizeText(row?.[2] || '')].filter(Boolean).join(' ') || '-';
+        this.text(label, x, y, { size: 6.5, font: 'F2', color: [71, 85, 105], maxWidth: labelW });
+        this.text(value, x + labelW + 4, y, { size: 6.8, font: 'F2', align: 'right', maxWidth: colW - labelW - 4 });
+        this.line(x, y + 3.3, x + colW, y + 3.3, [226, 232, 240], 0.35);
+      });
+    });
+    this.cursorY += blockHeight;
+  }
+
+  standardSection(section) {
+    const rows = section.rows.filter(row => row.some(cell => sanitizeText(cell)));
+    const rowHeight = 12;
+    const blockHeight = 18 + rows.length * rowHeight + 8;
+    this.ensureSpace(blockHeight);
+    this.sectionTitle(section.title);
+    const m = PDF_THEME.margin;
+    const w = PDF_PAGE.width - m * 2;
+    rows.forEach(row => {
+      const y = this.cursorY;
+      const label = sanitizeText(row?.[0] || '-');
+      const value = [sanitizeText(row?.[1] || ''), sanitizeText(row?.[2] || '')].filter(Boolean).join(' ') || '-';
+      this.text(label, m + 3, y, { size: 6.7, font: 'F2', color: [71, 85, 105], maxWidth: w * 0.44 });
+      this.text(value, m + w - 3, y, { size: 6.9, font: 'F2', align: 'right', maxWidth: w * 0.5 });
+      this.line(m, y + 3.3, m + w, y + 3.3, [226, 232, 240], 0.35);
+      this.cursorY += rowHeight;
+    });
+    this.cursorY += 4;
+  }
+
+  footer() {
+    const total = this.pages.length;
+    this.pages.forEach((page, index) => {
+      this.page = page;
+      this.text(`Seite ${index + 1} von ${total}`, PDF_PAGE.width - PDF_THEME.margin, PDF_PAGE.height - 6, { size: 6.5, font: 'F1', color: PDF_THEME.muted, align: 'right' });
+    });
+  }
+
+  build(project, moduleData) {
+    const date = new Date().toLocaleDateString('de-DE');
+    this.header(project, moduleData, date);
+    this.projectData(project);
+    const sections = reportSections(moduleData);
+    const lineSections = sections.filter(section => section.isLineSection);
+    if (lineSections.length) {
+      this.sectionTitle('LEITUNGSABSCHNITTE');
+      lineSections.forEach(section => {
+        lineSectionItems(section.rows).forEach(item => this.lineBlock(item));
+      });
+    } else {
+      sections.forEach(section => this.standardSection(section));
+    }
+    this.footer();
+    return this.output();
+  }
+
+  output() {
+    const objects = [];
+    const addObject = value => { objects.push(value); return objects.length; };
+    const fontRegularId = addObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
+    const fontBoldId = addObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+    const pageIds = [];
+    const contentIds = [];
+    this.pages.forEach(page => {
+      const stream = page.join('\n');
+      contentIds.push(addObject(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`));
+    });
+    const pagesIdPlaceholder = objects.length + this.pages.length + 1;
+    this.pages.forEach((page, index) => {
+      pageIds.push(addObject(`<< /Type /Page /Parent ${pagesIdPlaceholder} 0 R /MediaBox [0 0 ${PDF_PAGE.width} ${PDF_PAGE.height}] /Resources << /Font << /F1 ${fontRegularId} 0 R /F2 ${fontBoldId} 0 R >> >> /Contents ${contentIds[index]} 0 R >>`));
+    });
+    const pagesId = addObject(`<< /Type /Pages /Kids [${pageIds.map(id => `${id} 0 R`).join(' ')}] /Count ${pageIds.length} >>`);
+    const catalogId = addObject(`<< /Type /Catalog /Pages ${pagesId} 0 R >>`);
+    const chunks = ['%PDF-1.4\n'];
+    const offsets = [0];
+    objects.forEach((object, index) => {
+      offsets.push(chunks.join('').length);
+      chunks.push(`${index + 1} 0 obj\n${object}\nendobj\n`);
+    });
+    const xrefOffset = chunks.join('').length;
+    chunks.push(`xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`);
+    for (let i = 1; i <= objects.length; i += 1) {
+      chunks.push(`${String(offsets[i]).padStart(10, '0')} 00000 n \n`);
+    }
+    chunks.push(`trailer\n<< /Size ${objects.length + 1} /Root ${catalogId} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`);
+    return new Blob(chunks, { type: 'application/pdf' });
+  }
+}
+
+function pdfFileName(moduleData) {
+  const safeTitle = sanitizeText(moduleData.shortTitle || moduleData.title || 'Berechnung').replace(/[^a-z0-9äöüß -]+/gi, '').trim() || 'Berechnung';
+  return `TechCalc Pro - ${safeTitle}.pdf`;
+}
+
+function downloadNativePdf(project, moduleData) {
+  const report = new NativePdfReport();
+  const blob = report.build(project, moduleData);
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = pdfFileName(moduleData);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 15000);
 }
 
 export function initPdfExport({ modules, currentRoute: routeGetter } = {}) {
@@ -600,7 +742,7 @@ export function initPdfExport({ modules, currentRoute: routeGetter } = {}) {
       const project = saveProject(collectProjectFormValues());
       saveSessionSnapshot();
       const moduleData = collectCurrentModule(modules, routeGetter);
-      openPrintWindow(project, moduleData);
+      downloadNativePdf(project, moduleData);
     } catch (error) {
       console.error('PDF-Export fehlgeschlagen.', error);
       alert('PDF-Export konnte nicht erstellt werden. Bitte Browser-Konsole prüfen.');

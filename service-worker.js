@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.1-beta.13';
-const CACHE_REVISION = '1.3.1-beta.13-version-1-3-1-beta-13-global-pdf-template-footer-cleanup';
+const CACHE_NAME = 'techcalc-pro-1.3.1-beta.14';
+const CACHE_REVISION = '1.3.1-beta.14-version-1-3-1-beta-14-native-pdf-engine-foundation';
 const ASSETS = [
   './',
   './index.html',
