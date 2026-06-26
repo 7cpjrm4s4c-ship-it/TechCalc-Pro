@@ -15,4 +15,4 @@ export const PDF_THEME = {
   accent: [7, 89, 133]
 };
 
-export const REPORT_TEMPLATE_VERSION = 'global-report-template-1';
+export const REPORT_TEMPLATE_VERSION = 'global-report-template-2-paginator';

@@ -1,4 +1,4 @@
-## Version 1.3.1 Beta 15 - Global PDF Report Template
+## Version 1.3.1 Beta 16 - PDF Layout Engine
 
 
 ### PDF Export
