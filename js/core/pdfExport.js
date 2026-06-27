@@ -186,10 +186,12 @@ function bindCompanyLogoInput() {
         return;
       }
       const reader = new FileReader();
-      reader.onload = () => {
+      reader.onload = async () => {
         const dataUrl = String(reader.result || '');
-        setProjectMeta({ companyLogo: dataUrl });
-        hydrateCompanyLogoStatus(dataUrl);
+        const normalizedLogo = await normalizeImageToJpeg(dataUrl, { maxWidth: 900, maxHeight: 360, quality: 0.9 });
+        const storedLogo = normalizedLogo?.dataUrl || dataUrl;
+        setProjectMeta({ ...collectProjectFormValues(), companyLogo: storedLogo });
+        hydrateCompanyLogoStatus(storedLogo);
       };
       reader.onerror = () => alert('Firmenlogo konnte nicht gelesen werden.');
       reader.readAsDataURL(file);
@@ -539,8 +541,51 @@ function distributeRowsBalanced(rows = []) {
   return { columns, heights };
 }
 
+
+function imageElementFromSource(source) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('Bild konnte nicht geladen werden.'));
+    img.crossOrigin = 'anonymous';
+    img.src = source;
+  });
+}
+
+async function normalizeImageToJpeg(source, { maxWidth = 512, maxHeight = 256, quality = 0.88 } = {}) {
+  if (!source) return null;
+  try {
+    const img = await imageElementFromSource(source);
+    const scale = Math.min(1, maxWidth / Math.max(1, img.naturalWidth || img.width), maxHeight / Math.max(1, img.naturalHeight || img.height));
+    const width = Math.max(1, Math.round((img.naturalWidth || img.width) * scale));
+    const height = Math.max(1, Math.round((img.naturalHeight || img.height) * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(img, 0, 0, width, height);
+    return { dataUrl: canvas.toDataURL('image/jpeg', quality), width, height };
+  } catch (error) {
+    console.warn('PDF-Bild konnte nicht vorbereitet werden.', error);
+    return null;
+  }
+}
+
+function parseJpegDataUrl(image) {
+  if (!image?.dataUrl || !/^data:image\/jpeg;base64,/i.test(image.dataUrl)) return null;
+  const base64 = image.dataUrl.split(',')[1] || '';
+  const binary = atob(base64);
+  return { width: image.width, height: image.height, binary };
+}
+
 class GlobalPdfReport {
-  constructor() {
+  constructor(images = {}) {
+    this.images = images;
+    this.imageResources = [];
+    if (images.appIcon) this.imageResources.push({ key: 'appIcon', name: 'ImAppIcon', image: images.appIcon });
+    if (images.companyLogo) this.imageResources.push({ key: 'companyLogo', name: 'ImCompanyLogo', image: images.companyLogo });
     this.pages = [];
     this.addPage();
   }
@@ -587,6 +632,12 @@ class GlobalPdfReport {
     this.cmd(`${pdfNumber(width)} w ${pdfNumber(x)} ${pdfNumber(this.y(y + h))} ${pdfNumber(w)} ${pdfNumber(h)} re ${fill && stroke ? 'B' : fill ? 'f' : 'S'}`);
   }
 
+  drawImage(resourceName, x, y, w, h) {
+    if (!resourceName) return false;
+    this.cmd(`q ${pdfNumber(w)} 0 0 ${pdfNumber(h)} ${pdfNumber(x)} ${pdfNumber(this.y(y + h))} cm /${resourceName} Do Q`);
+    return true;
+  }
+
   contentBottom() {
     return PDF_PAGE.height - PDF_THEME.margin - 18;
   }
@@ -606,20 +657,23 @@ class GlobalPdfReport {
 
     this.text('TechCalc Pro', m + 25, m + 8, { size: 10.6, font: 'F2' });
     this.text('HLSK QUICK TOOLS', m + 25, m + 19, { size: 6.2, font: 'F2', color: PDF_THEME.muted });
-    this.rect(m, m + 1, 21, 21, { fill: [15, 23, 42], stroke: [30, 41, 59], width: 0.6 });
-    this.text('TCP', m + 10.5, m + 14.5, { size: 6.3, font: 'F2', color: [255, 255, 255], align: 'center' });
+    if (!this.drawImage('ImAppIcon', m, m + 1, 21, 21)) {
+      this.rect(m, m + 1, 21, 21, { fill: [15, 23, 42], stroke: [30, 41, 59], width: 0.6 });
+      this.text('TCP', m + 10.5, m + 14.5, { size: 6.3, font: 'F2', color: [255, 255, 255], align: 'center' });
+    }
 
     this.text('Berechnungsprotokoll', titleX, m + 6, { size: 12.4, font: 'F2', align: 'center' });
     this.text(`${moduleData.title} - ${date}`, titleX, m + 18, { size: 7.2, font: 'F2', color: [71, 85, 105], align: 'center' });
 
     this.rect(logoX, m, 96, 28, { fill: null, stroke: [203, 213, 225], width: 0.5 });
-    if (project.companyLogo) {
-      this.text('FIRMENLOGO', logoX + 48, m + 9, { size: 6.2, font: 'F2', color: [148, 163, 184], align: 'center' });
+    if (this.images.companyLogo) {
+      const imgRatio = this.images.companyLogo.width / Math.max(1, this.images.companyLogo.height);
+      let imgW = 86;
+      let imgH = imgW / imgRatio;
+      if (imgH > 22) { imgH = 22; imgW = imgH * imgRatio; }
+      this.drawImage('ImCompanyLogo', logoX + (96 - imgW) / 2, m + (28 - imgH) / 2, imgW, imgH);
     } else {
       this.text('FIRMENLOGO', logoX + 48, m + 17, { size: 6.3, font: 'F2', color: [148, 163, 184], align: 'center' });
-    }
-    if (project.companyName) {
-      this.text(project.companyName, logoX + 48, m + 18.5, { size: 6.3, font: 'F2', color: PDF_THEME.text, align: 'center', maxWidth: 88 });
     }
     this.line(m, m + 34, right, m + 34, PDF_THEME.line, 0.55);
     this.cursorY = m + 39;
@@ -639,8 +693,8 @@ class GlobalPdfReport {
     const colW = w / 4;
     labels.forEach(([label, value], index) => {
       const x = m + index * colW + 4;
-      this.text(label, x, this.cursorY + 7, { size: 6.4, font: 'F2', color: PDF_THEME.muted });
-      this.text(value || '-', x + 40, this.cursorY + 7, { size: 7.2, font: 'F2', maxWidth: colW - 45 });
+      this.text(label, x, this.cursorY + 6.4, { size: 6.1, font: 'F2', color: PDF_THEME.muted, maxWidth: colW - 8 });
+      this.text(value || '-', x, this.cursorY + 14.3, { size: 7.2, font: 'F2', maxWidth: colW - 8 });
     });
     this.cursorY += h + 8;
   }
@@ -780,6 +834,15 @@ class GlobalPdfReport {
     const addObject = value => { objects.push(value); return objects.length; };
     const fontRegularId = addObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
     const fontBoldId = addObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+    const imageObjectIds = new Map();
+    this.imageResources.forEach(resource => {
+      const image = parseJpegDataUrl(resource.image);
+      if (!image) return;
+      const id = addObject(`<< /Type /XObject /Subtype /Image /Width ${image.width} /Height ${image.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${image.binary.length} >>\nstream\n${image.binary}\nendstream`);
+      imageObjectIds.set(resource.name, id);
+    });
+    const xObjectEntries = [...imageObjectIds.entries()].map(([name, id]) => `/${name} ${id} 0 R`).join(' ');
+    const xObjectResource = xObjectEntries ? `/XObject << ${xObjectEntries} >>` : '';
     const pageIds = [];
     const contentIds = [];
     this.pages.forEach(page => {
@@ -788,7 +851,7 @@ class GlobalPdfReport {
     });
     const pagesIdPlaceholder = objects.length + this.pages.length + 1;
     this.pages.forEach((page, index) => {
-      pageIds.push(addObject(`<< /Type /Page /Parent ${pagesIdPlaceholder} 0 R /MediaBox [0 0 ${PDF_PAGE.width} ${PDF_PAGE.height}] /Resources << /Font << /F1 ${fontRegularId} 0 R /F2 ${fontBoldId} 0 R >> >> /Contents ${contentIds[index]} 0 R >>`));
+      pageIds.push(addObject(`<< /Type /Page /Parent ${pagesIdPlaceholder} 0 R /MediaBox [0 0 ${PDF_PAGE.width} ${PDF_PAGE.height}] /Resources << /Font << /F1 ${fontRegularId} 0 R /F2 ${fontBoldId} 0 R >> ${xObjectResource} >> /Contents ${contentIds[index]} 0 R >>`));
     });
     const pagesId = addObject(`<< /Type /Pages /Kids [${pageIds.map(id => `${id} 0 R`).join(' ')}] /Count ${pageIds.length} >>`);
     const catalogId = addObject(`<< /Type /Catalog /Pages ${pagesId} 0 R >>`);
@@ -813,8 +876,11 @@ function pdfFileName(moduleData) {
   return `TechCalc Pro - ${safeTitle}.pdf`;
 }
 
-function downloadNativePdf(project, moduleData) {
-  const report = new GlobalPdfReport();
+async function downloadNativePdf(project, moduleData) {
+  const appIconUrl = new URL('./assets/icons/icon-192.png', window.location.href).href;
+  const appIcon = await normalizeImageToJpeg(appIconUrl, { maxWidth: 256, maxHeight: 256, quality: 0.92 });
+  const companyLogo = await normalizeImageToJpeg(project.companyLogo, { maxWidth: 900, maxHeight: 360, quality: 0.9 });
+  const report = new GlobalPdfReport({ appIcon, companyLogo });
   const blob = report.build(project, moduleData);
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -831,13 +897,13 @@ export function initPdfExport({ modules, currentRoute: routeGetter } = {}) {
   const exportButton = document.getElementById('exportPdfButton');
   if (!exportButton || exportButton.dataset.bound === 'true') return;
   exportButton.dataset.bound = 'true';
-  exportButton.addEventListener('click', event => {
+  exportButton.addEventListener('click', async event => {
     event.preventDefault();
     try {
       const project = saveProject(collectProjectFormValues());
       saveSessionSnapshot();
       const moduleData = collectCurrentModule(modules, routeGetter);
-      downloadNativePdf(project, moduleData);
+      await downloadNativePdf(project, moduleData);
     } catch (error) {
       console.error('PDF-Export fehlgeschlagen.', error);
       alert('PDF-Export konnte nicht erstellt werden. Bitte Browser-Konsole prüfen.');

@@ -1129,3 +1129,13 @@ html {
 .feedback-form textarea:focus {
   font-size: 16px !important;
 }
+
+/* 1.3.1 Beta 19: prevent iOS focus zoom in project/PDF settings forms. */
+.settings-form input,
+.settings-form textarea,
+.settings-form select,
+.settings-form input:focus,
+.settings-form textarea:focus,
+.settings-form select:focus {
+  font-size: 16px !important;
+}
