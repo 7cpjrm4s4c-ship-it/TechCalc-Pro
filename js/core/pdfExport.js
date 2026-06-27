@@ -21,7 +21,12 @@ const DEFAULT_PROJECT = {
   project: '',
   projectNo: '',
   engineer: '',
-  companyLogo: ''
+  companyLogo: '',
+  companyName: '',
+  companyAddress: '',
+  documentVersion: '',
+  checkedBy: '',
+  approvedBy: ''
 };
 
 function readProject() {
@@ -40,7 +45,12 @@ function collectProjectFormValues() {
     project: document.getElementById('pdfProject')?.value || '',
     projectNo: document.getElementById('pdfProjectNo')?.value || '',
     engineer: document.getElementById('pdfEngineer')?.value || '',
-    companyLogo: readStoredCompanyLogo()
+    companyLogo: readStoredCompanyLogo(),
+    companyName: document.getElementById('pdfCompanyName')?.value || '',
+    companyAddress: document.getElementById('pdfCompanyAddress')?.value || '',
+    documentVersion: document.getElementById('pdfDocumentVersion')?.value || '',
+    checkedBy: document.getElementById('pdfCheckedBy')?.value || '',
+    approvedBy: document.getElementById('pdfApprovedBy')?.value || ''
   };
 }
 
@@ -85,6 +95,11 @@ function initProjectSettings() {
   bindProjectInput('pdfProject', 'project');
   bindProjectInput('pdfProjectNo', 'projectNo');
   bindProjectInput('pdfEngineer', 'engineer');
+  bindProjectInput('pdfCompanyName', 'companyName');
+  bindProjectInput('pdfCompanyAddress', 'companyAddress');
+  bindProjectInput('pdfDocumentVersion', 'documentVersion');
+  bindProjectInput('pdfCheckedBy', 'checkedBy');
+  bindProjectInput('pdfApprovedBy', 'approvedBy');
   bindCompanyLogoInput();
 
 
@@ -129,6 +144,11 @@ function hydrateProjectForm(data = {}) {
   setInputValue('pdfProject', data.project);
   setInputValue('pdfProjectNo', data.projectNo);
   setInputValue('pdfEngineer', data.engineer);
+  setInputValue('pdfCompanyName', data.companyName);
+  setInputValue('pdfCompanyAddress', data.companyAddress);
+  setInputValue('pdfDocumentVersion', data.documentVersion);
+  setInputValue('pdfCheckedBy', data.checkedBy);
+  setInputValue('pdfApprovedBy', data.approvedBy);
   setInputValue('pdfDate', data.date);
   hydrateCompanyLogoStatus(data.companyLogo || readStoredCompanyLogo());
   const file = document.getElementById('pdfCompanyLogo');
@@ -583,7 +603,14 @@ class GlobalPdfReport {
     this.text(`${moduleData.title} - ${date}`, titleX, m + 18, { size: 7.2, font: 'F2', color: [71, 85, 105], align: 'center' });
 
     this.rect(logoX, m, 96, 28, { fill: null, stroke: [203, 213, 225], width: 0.5 });
-    this.text(project.companyLogo ? 'FIRMENLOGO HINTERLEGT' : 'FIRMENLOGO', logoX + 48, m + 17, { size: 6.3, font: 'F2', color: [148, 163, 184], align: 'center' });
+    if (project.companyLogo) {
+      this.text('FIRMENLOGO', logoX + 48, m + 9, { size: 6.2, font: 'F2', color: [148, 163, 184], align: 'center' });
+    } else {
+      this.text('FIRMENLOGO', logoX + 48, m + 17, { size: 6.3, font: 'F2', color: [148, 163, 184], align: 'center' });
+    }
+    if (project.companyName) {
+      this.text(project.companyName, logoX + 48, m + 18.5, { size: 6.3, font: 'F2', color: PDF_THEME.text, align: 'center', maxWidth: 88 });
+    }
     this.line(m, m + 34, right, m + 34, PDF_THEME.line, 0.55);
     this.cursorY = m + 39;
   }
@@ -667,6 +694,49 @@ class GlobalPdfReport {
     this.cursorY += 4;
   }
 
+  corporateBlock(project, moduleData) {
+    const hasCorporate = [project.companyName, project.companyAddress, project.documentVersion, project.checkedBy, project.approvedBy].some(value => sanitizeText(value));
+    if (!hasCorporate) return;
+
+    const m = PDF_THEME.margin;
+    const w = PDF_PAGE.width - m * 2;
+    const blockHeight = 58;
+    this.ensureSpace(blockHeight + 6);
+
+    const y0 = this.cursorY + 4;
+    this.rect(m, y0, w, blockHeight, { fill: PDF_THEME.soft, stroke: PDF_THEME.line, width: 0.45 });
+    this.text('DOKUMENT / CORPORATE DESIGN', m + 5, y0 + 8.5, { size: 6.6, font: 'F2', color: PDF_THEME.accent });
+
+    const leftX = m + 5;
+    const midX = m + w * 0.48;
+    const rightX = m + w * 0.72;
+    const baseY = y0 + 20;
+
+    this.text('Firma', leftX, baseY, { size: 6.1, font: 'F2', color: PDF_THEME.muted });
+    this.text(project.companyName || '-', leftX + 36, baseY, { size: 6.6, font: 'F2', maxWidth: w * 0.36 });
+    this.text('Anschrift', leftX, baseY + 12, { size: 6.1, font: 'F2', color: PDF_THEME.muted });
+    this.text(project.companyAddress || '-', leftX + 36, baseY + 12, { size: 6.4, font: 'F1', maxWidth: w * 0.36 });
+
+    this.text('Dokumentversion', midX, baseY, { size: 6.1, font: 'F2', color: PDF_THEME.muted });
+    this.text(project.documentVersion || '-', midX + 58, baseY, { size: 6.6, font: 'F2', maxWidth: 72 });
+    this.text('Modul', midX, baseY + 12, { size: 6.1, font: 'F2', color: PDF_THEME.muted });
+    this.text(moduleData.shortTitle || moduleData.title || '-', midX + 58, baseY + 12, { size: 6.4, font: 'F1', maxWidth: 72 });
+
+    this.text('Geprüft', rightX, baseY, { size: 6.1, font: 'F2', color: PDF_THEME.muted });
+    this.text(project.checkedBy || '-', rightX + 35, baseY, { size: 6.6, font: 'F2', maxWidth: 80 });
+    this.text('Freigabe', rightX, baseY + 12, { size: 6.1, font: 'F2', color: PDF_THEME.muted });
+    this.text(project.approvedBy || '-', rightX + 35, baseY + 12, { size: 6.6, font: 'F2', maxWidth: 80 });
+
+    const qrSize = 26;
+    const qrX = m + w - qrSize - 5;
+    const qrY = y0 + blockHeight - qrSize - 5;
+    this.rect(qrX, qrY, qrSize, qrSize, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
+    this.text('QR', qrX + qrSize / 2, qrY + 16.5, { size: 7.5, font: 'F2', color: [148, 163, 184], align: 'center' });
+    this.text('optional', qrX + qrSize / 2, qrY + 23.5, { size: 4.7, font: 'F1', color: [148, 163, 184], align: 'center' });
+
+    this.cursorY = y0 + blockHeight + 6;
+  }
+
   footer() {
     const total = this.pages.length;
     this.pages.forEach((page, index) => {
@@ -690,6 +760,7 @@ class GlobalPdfReport {
     } else {
       sections.forEach(section => this.standardSection(section));
     }
+    this.corporateBlock(project, moduleData);
     this.footer();
     return this.output();
   }

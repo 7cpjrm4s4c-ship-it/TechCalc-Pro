@@ -1,4 +1,4 @@
-## Version 1.3.1 Beta 16 - PDF Layout Engine
+## Version 1.3.1 Beta 17 - PDF Corporate Design
 
 
 ### PDF Export
