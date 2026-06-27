@@ -1,4 +1,10 @@
-## Version 1.3.1 Beta 17 - PDF Corporate Design
+## Version 1.3.1 Beta 18 - PDF Encoding Fix
+
+- Native PDF text encoding corrected from UTF-16 hex strings to WinAnsi hex strings.
+- Removes visible `þÿ` artefacts before labels and values in generated PDFs.
+- Keeps native PDF export without browser headers/footers.
+
+## Version 1.3.1 Beta 18 - PDF Corporate Design
 
 
 ### PDF Export
@@ -14,7 +20,7 @@
 - Abschnittsblöcke sind kompakter, sodass ca. 3-4 Leitungsabschnitte pro A4-Seite möglich sind.
 - Footer ohne Datumswiederholung, da das Datum bereits im Header steht.
 
-## Version 1.3.1 Beta 17 - PDF Corporate Design
+## Version 1.3.1 Beta 18 - PDF Corporate Design
 
 - PDF-Kopfbereich bleibt unveraendert.
 - Projektinformationen bleiben direkt unter dem Kopfbereich.

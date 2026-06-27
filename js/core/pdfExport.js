@@ -470,14 +470,24 @@ function reportSections(moduleData) {
   });
 }
 
+function winAnsiByteForChar(ch) {
+  const code = ch.codePointAt(0);
+  const fallback = {
+    '€': 0x80, '‚': 0x82, 'ƒ': 0x83, '„': 0x84, '…': 0x85, '†': 0x86, '‡': 0x87,
+    'ˆ': 0x88, '‰': 0x89, 'Š': 0x8A, '‹': 0x8B, 'Œ': 0x8C, 'Ž': 0x8E,
+    '‘': 0x91, '’': 0x92, '“': 0x93, '”': 0x94, '•': 0x95, '–': 0x96, '—': 0x97,
+    '˜': 0x98, '™': 0x99, 'š': 0x9A, '›': 0x9B, 'œ': 0x9C, 'ž': 0x9E, 'Ÿ': 0x9F
+  };
+  if (fallback[ch]) return fallback[ch];
+  if (code >= 0x20 && code <= 0x7E) return code;
+  if (code >= 0xA0 && code <= 0xFF) return code;
+  return 0x3F;
+}
+
 function pdfHexText(value = '') {
   const text = sanitizeText(value);
-  const bytes = [0xFE, 0xFF];
-  for (const ch of text) {
-    const code = ch.codePointAt(0);
-    if (code > 0xFFFF) continue;
-    bytes.push((code >> 8) & 0xFF, code & 0xFF);
-  }
+  const bytes = [];
+  for (const ch of text) bytes.push(winAnsiByteForChar(ch));
   return `<${bytes.map(byte => byte.toString(16).padStart(2, '0')).join('').toUpperCase()}>`;
 }
 
