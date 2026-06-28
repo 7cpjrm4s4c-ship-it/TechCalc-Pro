@@ -204,7 +204,11 @@ function bindCompanyLogoInput() {
       const reader = new FileReader();
       reader.onload = async () => {
         const dataUrl = String(reader.result || '');
-        const normalizedLogo = await normalizeImageToJpeg(dataUrl, { maxWidth: 900, maxHeight: 360, quality: 0.9 });
+        // Rohdaten sofort speichern, damit das Logo auch dann erhalten bleibt,
+        // wenn die JPEG-Normalisierung auf einzelnen Mobilbrowsern fehlschlägt.
+        persistCompanyLogo(dataUrl);
+        hydrateCompanyLogoStatus(dataUrl);
+        const normalizedLogo = await normalizeImageToJpeg(dataUrl, { maxWidth: 1200, maxHeight: 520, quality: 0.92 });
         const storedLogo = normalizedLogo?.dataUrl || dataUrl;
         persistCompanyLogo(storedLogo);
         setProjectMeta({ ...collectProjectFormValues(), companyLogo: storedLogo });
@@ -564,7 +568,9 @@ function imageElementFromSource(source) {
     const img = new Image();
     img.onload = () => resolve(img);
     img.onerror = () => reject(new Error('Bild konnte nicht geladen werden.'));
-    img.crossOrigin = 'anonymous';
+    // Wichtig: crossOrigin darf bei data:-URLs und lokalen App-Assets nicht gesetzt werden.
+    // iOS/Safari kann solche Bilder sonst nicht zuverlässig in Canvas/PDF übernehmen.
+    if (/^https?:/i.test(String(source || ''))) img.crossOrigin = 'anonymous';
     img.src = source;
   });
 }
@@ -670,7 +676,9 @@ class GlobalPdfReport {
     const m = PDF_THEME.margin;
     const right = PDF_PAGE.width - m;
     const titleX = PDF_PAGE.width / 2;
-    const logoX = right - 96;
+    const logoW = 104;
+    const logoH = 42;
+    const logoX = right - logoW;
 
     this.text('TechCalc Pro', m + 25, m + 8, { size: 10.6, font: 'F2' });
     this.text('HLSK QUICK TOOLS', m + 25, m + 19, { size: 6.2, font: 'F2', color: PDF_THEME.muted });
@@ -682,18 +690,18 @@ class GlobalPdfReport {
     this.text('Berechnungsprotokoll', titleX, m + 6, { size: 12.4, font: 'F2', align: 'center' });
     this.text(`${moduleData.title} - ${date}`, titleX, m + 18, { size: 7.2, font: 'F2', color: [71, 85, 105], align: 'center' });
 
-    this.rect(logoX, m, 96, 28, { fill: null, stroke: [203, 213, 225], width: 0.5 });
+    this.rect(logoX, m, logoW, logoH, { fill: null, stroke: [203, 213, 225], width: 0.5 });
     if (this.images.companyLogo) {
       const imgRatio = this.images.companyLogo.width / Math.max(1, this.images.companyLogo.height);
-      let imgW = 86;
+      let imgW = logoW - 12;
       let imgH = imgW / imgRatio;
-      if (imgH > 22) { imgH = 22; imgW = imgH * imgRatio; }
-      this.drawImage('ImCompanyLogo', logoX + (96 - imgW) / 2, m + (28 - imgH) / 2, imgW, imgH);
+      if (imgH > logoH - 8) { imgH = logoH - 8; imgW = imgH * imgRatio; }
+      this.drawImage('ImCompanyLogo', logoX + (logoW - imgW) / 2, m + (logoH - imgH) / 2, imgW, imgH);
     } else {
-      this.text('FIRMENLOGO', logoX + 48, m + 17, { size: 6.3, font: 'F2', color: [148, 163, 184], align: 'center' });
+      this.text('FIRMENLOGO', logoX + logoW / 2, m + logoH / 2 + 2, { size: 6.3, font: 'F2', color: [148, 163, 184], align: 'center' });
     }
-    this.line(m, m + 34, right, m + 34, PDF_THEME.line, 0.55);
-    this.cursorY = m + 39;
+    this.line(m, m + logoH + 6, right, m + logoH + 6, PDF_THEME.line, 0.55);
+    this.cursorY = m + logoH + 11;
   }
 
   projectData(project) {

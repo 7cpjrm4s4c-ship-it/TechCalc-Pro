@@ -1,4 +1,8 @@
-## Version 1.3.1 Beta 20 - PDF Corporate Design
+## Version 1.3.1 Beta 21 - PDF Logo Persistence Fix
+
+Basis: 1.3.1 Beta 20. Fokus: Firmenlogo-Speicherung, Bildrendering und Logo-Slot-Hoehe im PDF.
+
+## Version 1.3.1 Beta 21 - PDF Corporate Design
 
 
 ### PDF Export

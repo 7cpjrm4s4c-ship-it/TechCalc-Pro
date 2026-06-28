@@ -2,7 +2,7 @@
   "phase": "37B.3",
   "name": "Service Worker Offline Runtime Hardening",
   "status": "passed",
-  "generatedAt": "2026-06-27T19:19:36.904Z",
+  "generatedAt": "2026-06-28T05:58:14.783Z",
   "assets": {
     "required": 181,
     "cached": 181,
@@ -42,7 +42,7 @@
       "id": "offline-update:versioned-cache",
       "status": "passed",
       "detail": "cache name is derived from package.json version for deterministic updates",
-      "expectedCacheName": "techcalc-pro-1.3.1-beta.20"
+      "expectedCacheName": "techcalc-pro-1.3.1-beta.21"
     },
     {
       "id": "offline-update:skip-waiting",

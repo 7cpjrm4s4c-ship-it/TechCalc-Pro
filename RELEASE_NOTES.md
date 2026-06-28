@@ -1,4 +1,10 @@
-## Version 1.3.1 Beta 20 - PDF Logo & Projekteinstellungen Fix
+## Version 1.3.1 Beta 21 - PDF Logo Persistence Fix
+
+- Firmenlogo-Speicherung robuster gemacht.
+- PDF-Bildnormalisierung fuer iOS/Safari korrigiert.
+- Firmenlogo-Bereich im PDF in der Hoehe vergroessert.
+
+## Version 1.3.1 Beta 21 - PDF Logo & Projekteinstellungen Fix
 
 - iOS-Zoomschutz für Projektinformationen/PDF-Einstellungen ergänzt.
 - Firmenlogo-Upload wird als PDF-kompatibles Bild gespeichert und im PDF ausgegeben.
@@ -6,13 +12,13 @@
 - TechCalc-Pro-App-Logo wird im nativen PDF-Export als Bild ausgegeben.
 - Projektinformationen im PDF sauber ausgerichtet.
 
-## Version 1.3.1 Beta 20 - PDF Encoding Fix
+## Version 1.3.1 Beta 21 - PDF Encoding Fix
 
 - Native PDF text encoding corrected from UTF-16 hex strings to WinAnsi hex strings.
 - Removes visible `þÿ` artefacts before labels and values in generated PDFs.
 - Keeps native PDF export without browser headers/footers.
 
-## Version 1.3.1 Beta 20 - PDF Corporate Design
+## Version 1.3.1 Beta 21 - PDF Corporate Design
 
 
 ### PDF Export
@@ -28,7 +34,7 @@
 - Abschnittsblöcke sind kompakter, sodass ca. 3-4 Leitungsabschnitte pro A4-Seite möglich sind.
 - Footer ohne Datumswiederholung, da das Datum bereits im Header steht.
 
-## Version 1.3.1 Beta 20 - PDF Corporate Design
+## Version 1.3.1 Beta 21 - PDF Corporate Design
 
 - PDF-Kopfbereich bleibt unveraendert.
 - Projektinformationen bleiben direkt unter dem Kopfbereich.
