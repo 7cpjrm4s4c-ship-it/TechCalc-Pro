@@ -1,4 +1,4 @@
-## Version 1.3.1 Beta 19 - PDF Corporate Design
+## Version 1.3.1 Beta 20 - PDF Corporate Design
 
 
 ### PDF Export
