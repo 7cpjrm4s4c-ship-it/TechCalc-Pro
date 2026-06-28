@@ -570,6 +570,50 @@ function distributeRowsBalanced(rows = []) {
   return { columns, heights };
 }
 
+function pairedRowsForPdf(rows = []) {
+  const cleanRows = rows
+    .filter(row => normalizeKey(row?.[0] || '') !== 'bezeichnung')
+    .filter(row => row.some(cell => sanitizeText(cell)));
+
+  const preferredOrder = [
+    'leistung',
+    'massenstrom',
+    'volumenstrom',
+    'temperaturdifferenz',
+    'waermetraeger',
+    'rohrdimension',
+    'rohrabmessung',
+    'werkstoff',
+    'geschwindigkeit',
+    'druckverlust'
+  ];
+
+  const rank = row => {
+    const key = normalizeKey(row?.[0] || '');
+    const index = preferredOrder.indexOf(key);
+    return index === -1 ? preferredOrder.length + cleanRows.indexOf(row) : index;
+  };
+
+  const ordered = [...cleanRows].sort((a, b) => rank(a) - rank(b));
+  const leftCount = Math.ceil(ordered.length / 2);
+  const left = ordered.slice(0, leftCount);
+  const right = ordered.slice(leftCount);
+  const pairCount = Math.max(left.length, right.length);
+  const pairs = [];
+
+  for (let index = 0; index < pairCount; index += 1) {
+    pairs.push([left[index] || null, right[index] || null]);
+  }
+
+  return pairs;
+}
+
+function pdfRowValue(row) {
+  if (!row) return '';
+  const value = sanitizeText(row?.[1] || '');
+  const unit = sanitizeText(row?.[2] || '');
+  return [value, unit].filter(Boolean).join(' ') || '-';
+}
 
 function imageElementFromSource(source) {
   return new Promise((resolve, reject) => {
@@ -740,35 +784,45 @@ class GlobalPdfReport {
   }
 
   lineBlock(item, groupTitle = 'LEITUNGSABSCHNITTE') {
-    const detailRows = item.rows.filter(row => normalizeKey(row?.[0] || '') !== 'bezeichnung');
-    const { columns, heights } = distributeRowsBalanced(detailRows);
-    const blockHeight = Math.max(42, 24 + Math.max(heights[0], heights[1]) + 8);
-    this.ensureSpace(blockHeight, { repeatTitle: groupTitle });
+    const pairs = pairedRowsForPdf(item.rows);
+    const rowHeight = 12.2;
+    const headerHeight = 16;
+    const topPad = 6;
+    const bottomPad = 7;
+    const blockHeight = headerHeight + topPad + Math.max(1, pairs.length) * rowHeight + bottomPad;
+    this.ensureSpace(blockHeight + 2, { repeatTitle: groupTitle });
 
     const m = PDF_THEME.margin;
     const w = PDF_PAGE.width - m * 2;
     const y0 = this.cursorY;
-    this.rect(m, y0, w, blockHeight - 4, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.55 });
-    this.rect(m, y0, w, 16, { fill: PDF_THEME.soft, stroke: PDF_THEME.line, width: 0.45 });
+    const bodyTop = y0 + headerHeight + topPad;
+
+    this.rect(m, y0, w, blockHeight, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.55 });
+    this.rect(m, y0, w, headerHeight, { fill: PDF_THEME.soft, stroke: PDF_THEME.line, width: 0.45 });
     this.text(item.title || 'Abschnitt', m + 5, y0 + 10.5, { size: 7.4, font: 'F2', maxWidth: w - 10 });
 
-    const colGap = 20;
-    const colW = (w - 10 - colGap) / 2;
-    const labelW = colW * 0.48;
-    columns.forEach((column, colIndex) => {
-      const x = m + 5 + colIndex * (colW + colGap);
-      let rowY = y0 + 24;
-      column.forEach(row => {
-        const rowHeight = rowHeightForPdfRow(row, colW - labelW - 4);
+    const innerX = m + 5;
+    const innerW = w - 10;
+    const gap = 20;
+    const pairW = (innerW - gap) / 2;
+    const labelW = 116;
+    const valueW = pairW - labelW;
+
+    pairs.forEach((pair, index) => {
+      const rowY = bodyTop + index * rowHeight;
+      this.line(innerX, rowY + rowHeight - 2.1, innerX + innerW, rowY + rowHeight - 2.1, [226, 232, 240], 0.32);
+
+      pair.forEach((row, pairIndex) => {
+        if (!row) return;
+        const x = innerX + pairIndex * (pairW + gap);
         const label = sanitizeText(row?.[0] || '-');
-        const value = [sanitizeText(row?.[1] || ''), sanitizeText(row?.[2] || '')].filter(Boolean).join(' ') || '-';
-        this.text(label, x, rowY, { size: 6.5, font: 'F2', color: [71, 85, 105], maxWidth: labelW });
-        this.text(value, x + colW, rowY, { size: 6.8, font: 'F2', align: 'right', maxWidth: colW - labelW - 4 });
-        this.line(x, rowY + rowHeight - 2.7, x + colW, rowY + rowHeight - 2.7, [226, 232, 240], 0.35);
-        rowY += rowHeight;
+        const value = pdfRowValue(row).replace(/ - /g, ' × ');
+        this.text(label, x, rowY + 7.4, { size: 6.55, font: 'F2', color: [71, 85, 105], maxWidth: labelW - 4 });
+        this.text(value, x + pairW, rowY + 7.4, { size: 6.75, font: 'F2', align: 'right', maxWidth: valueW });
       });
     });
-    this.cursorY += blockHeight;
+
+    this.cursorY += blockHeight + 6;
   }
 
   standardSection(section) {
