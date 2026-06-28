@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.1-beta.21';
-const CACHE_REVISION = '1.3.1-beta.21-version-1-3-1-beta-21-pdf-logo-persistence-fix';
+const CACHE_NAME = 'techcalc-pro-1.3.1-beta.22';
+const CACHE_REVISION = '1.3.1-beta.22-version-1-3-1-beta-22-pdf-logo-persistence-fix';
 const ASSETS = [
   './',
   './index.html',

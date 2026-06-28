@@ -18,13 +18,41 @@ const DEFAULT_META = {
   client: '',
   project: '',
   projectNo: '',
-  engineer: ''
+  engineer: '',
+  companyLogo: '',
+  companyLogoName: '',
+  companyName: '',
+  companyAddress: '',
+  documentVersion: '',
+  checkedBy: '',
+  approvedBy: ''
 };
+
+const SESSION_SNAPSHOT_KEY = 'techcalc-session-snapshot';
+const PDF_COMPANY_LOGO_STORAGE_KEY = 'techcalc-pdf-company-logo';
+const PDF_COMPANY_LOGO_NAME_STORAGE_KEY = 'techcalc-pdf-company-logo-name';
 
 let projectMeta = { ...DEFAULT_META };
 let openedFileName = '';
 
-const SESSION_SNAPSHOT_KEY = 'techcalc-session-snapshot';
+function readPersistentPdfLogo() {
+  try { return localStorage.getItem(PDF_COMPANY_LOGO_STORAGE_KEY) || ''; } catch { return ''; }
+}
+
+function readPersistentPdfLogoName() {
+  try { return localStorage.getItem(PDF_COMPANY_LOGO_NAME_STORAGE_KEY) || ''; } catch { return ''; }
+}
+
+function persistPdfLogo(logo = '', name = '') {
+  try {
+    if (logo) localStorage.setItem(PDF_COMPANY_LOGO_STORAGE_KEY, logo);
+    else localStorage.removeItem(PDF_COMPANY_LOGO_STORAGE_KEY);
+    if (name) localStorage.setItem(PDF_COMPANY_LOGO_NAME_STORAGE_KEY, name);
+    else if (!logo) localStorage.removeItem(PDF_COMPANY_LOGO_NAME_STORAGE_KEY);
+  } catch (error) {
+    console.warn('Firmenlogo konnte nicht dauerhaft gespeichert werden.', error);
+  }
+}
 
 export function saveSessionSnapshot() {
   try {
@@ -55,16 +83,27 @@ function clone(value) {
 }
 
 export function getProjectMeta() {
-  return { ...projectMeta };
+  const fallbackLogo = projectMeta.companyLogo || readPersistentPdfLogo();
+  const fallbackLogoName = projectMeta.companyLogoName || readPersistentPdfLogoName();
+  return { ...DEFAULT_META, ...projectMeta, companyLogo: fallbackLogo, companyLogoName: fallbackLogoName };
 }
 
 export function setProjectMeta(next = {}) {
-  projectMeta = { ...projectMeta, ...next };
+  const hasCompanyLogo = Object.prototype.hasOwnProperty.call(next, 'companyLogo');
+  const hasCompanyLogoName = Object.prototype.hasOwnProperty.call(next, 'companyLogoName');
+  const merged = { ...projectMeta, ...next };
+  if (!hasCompanyLogo && projectMeta.companyLogo) merged.companyLogo = projectMeta.companyLogo;
+  if (!hasCompanyLogoName && projectMeta.companyLogoName) merged.companyLogoName = projectMeta.companyLogoName;
+  projectMeta = { ...DEFAULT_META, ...merged };
+  if (hasCompanyLogo || hasCompanyLogoName) {
+    persistPdfLogo(projectMeta.companyLogo || '', projectMeta.companyLogoName || '');
+  }
   return getProjectMeta();
 }
 
 export function resetProjectMeta() {
   projectMeta = { ...DEFAULT_META };
+  persistPdfLogo('', '');
   openedFileName = '';
 }
 
@@ -136,7 +175,9 @@ export function collectProjectData() {
 
 export function applyProjectData(data = {}, { fileName = '' } = {}) {
   const modules = data.modules || {};
-  setProjectMeta(data.meta || {});
+  const incomingMeta = { ...DEFAULT_META, ...(data.meta || {}) };
+  setProjectMeta(incomingMeta);
+  if (incomingMeta.companyLogo) persistPdfLogo(incomingMeta.companyLogo, incomingMeta.companyLogoName || '');
   openedFileName = fileName || openedFileName;
 
   if (modules['pressure-holding']?.state) pressureHoldingState.replace(modules['pressure-holding'].state, { notify: false });

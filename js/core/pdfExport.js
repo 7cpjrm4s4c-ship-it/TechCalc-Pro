@@ -50,6 +50,7 @@ function collectProjectFormValues() {
     projectNo: document.getElementById('pdfProjectNo')?.value || '',
     engineer: document.getElementById('pdfEngineer')?.value || '',
     companyLogo: readStoredCompanyLogo(),
+    companyLogoName: readStoredCompanyLogoName(),
     companyName: document.getElementById('pdfCompanyName')?.value || '',
     companyAddress: document.getElementById('pdfCompanyAddress')?.value || '',
     documentVersion: document.getElementById('pdfDocumentVersion')?.value || '',
@@ -154,9 +155,7 @@ function hydrateProjectForm(data = {}) {
   setInputValue('pdfCheckedBy', data.checkedBy);
   setInputValue('pdfApprovedBy', data.approvedBy);
   setInputValue('pdfDate', data.date);
-  hydrateCompanyLogoStatus(data.companyLogo || readStoredCompanyLogo());
-  const file = document.getElementById('pdfCompanyLogo');
-  if (file) file.value = '';
+  hydrateCompanyLogoStatus(data.companyLogo || readStoredCompanyLogo(), data.companyLogoName || readStoredCompanyLogoName());
 }
 
 
@@ -166,20 +165,28 @@ function readStoredCompanyLogo() {
   try { return localStorage.getItem(PDF_COMPANY_LOGO_STORAGE_KEY) || ''; } catch { return ''; }
 }
 
-function persistCompanyLogo(dataUrl = '') {
-  setProjectMeta({ companyLogo: dataUrl });
+function readStoredCompanyLogoName() {
+  const metaName = getProjectMeta().companyLogoName || '';
+  if (metaName) return metaName;
+  try { return localStorage.getItem(`${PDF_COMPANY_LOGO_STORAGE_KEY}-name`) || ''; } catch { return ''; }
+}
+
+function persistCompanyLogo(dataUrl = '', fileName = '') {
+  setProjectMeta({ companyLogo: dataUrl, companyLogoName: fileName });
   try {
     if (dataUrl) localStorage.setItem(PDF_COMPANY_LOGO_STORAGE_KEY, dataUrl);
     else localStorage.removeItem(PDF_COMPANY_LOGO_STORAGE_KEY);
+    if (fileName) localStorage.setItem(`${PDF_COMPANY_LOGO_STORAGE_KEY}-name`, fileName);
+    else if (!dataUrl) localStorage.removeItem(`${PDF_COMPANY_LOGO_STORAGE_KEY}-name`);
   } catch (error) {
     console.warn('Firmenlogo konnte nicht dauerhaft gespeichert werden.', error);
   }
 }
 
-function hydrateCompanyLogoStatus(dataUrl = '') {
+function hydrateCompanyLogoStatus(dataUrl = '', fileName = '') {
   const status = document.getElementById('pdfCompanyLogoStatus');
   if (!status) return;
-  status.textContent = dataUrl ? 'Firmenlogo fuer PDF hinterlegt' : 'Kein Firmenlogo hinterlegt';
+  status.textContent = dataUrl ? `Firmenlogo fuer PDF hinterlegt${fileName ? `: ${fileName}` : ''}` : 'Kein Firmenlogo hinterlegt';
 }
 
 function bindCompanyLogoInput() {
@@ -204,15 +211,16 @@ function bindCompanyLogoInput() {
       const reader = new FileReader();
       reader.onload = async () => {
         const dataUrl = String(reader.result || '');
+        const fileName = file.name || 'Firmenlogo';
         // Rohdaten sofort speichern, damit das Logo auch dann erhalten bleibt,
         // wenn die JPEG-Normalisierung auf einzelnen Mobilbrowsern fehlschlägt.
-        persistCompanyLogo(dataUrl);
-        hydrateCompanyLogoStatus(dataUrl);
+        persistCompanyLogo(dataUrl, fileName);
+        hydrateCompanyLogoStatus(dataUrl, fileName);
         const normalizedLogo = await normalizeImageToJpeg(dataUrl, { maxWidth: 1200, maxHeight: 520, quality: 0.92 });
         const storedLogo = normalizedLogo?.dataUrl || dataUrl;
-        persistCompanyLogo(storedLogo);
-        setProjectMeta({ ...collectProjectFormValues(), companyLogo: storedLogo });
-        hydrateCompanyLogoStatus(storedLogo);
+        persistCompanyLogo(storedLogo, fileName);
+        setProjectMeta({ ...collectProjectFormValues(), companyLogo: storedLogo, companyLogoName: fileName });
+        hydrateCompanyLogoStatus(storedLogo, fileName);
       };
       reader.onerror = () => alert('Firmenlogo konnte nicht gelesen werden.');
       reader.readAsDataURL(file);
@@ -223,13 +231,13 @@ function bindCompanyLogoInput() {
     clearButton.dataset.bound = 'true';
     clearButton.addEventListener('click', event => {
       event.preventDefault();
-      persistCompanyLogo('');
-      hydrateCompanyLogoStatus('');
+      persistCompanyLogo('', '');
+      hydrateCompanyLogoStatus('', '');
       if (input) input.value = '';
     });
   }
 
-  hydrateCompanyLogoStatus(readStoredCompanyLogo());
+  hydrateCompanyLogoStatus(readStoredCompanyLogo(), readStoredCompanyLogoName());
 }
 
 function textOf(node) {
@@ -920,7 +928,7 @@ export function initPdfExport({ modules, currentRoute: routeGetter } = {}) {
   exportButton.addEventListener('click', async event => {
     event.preventDefault();
     try {
-      const project = saveProject(collectProjectFormValues());
+      const project = saveProject({ ...collectProjectFormValues(), companyLogo: readStoredCompanyLogo(), companyLogoName: readStoredCompanyLogoName() });
       saveSessionSnapshot();
       const moduleData = collectCurrentModule(modules, routeGetter);
       await downloadNativePdf(project, moduleData);
