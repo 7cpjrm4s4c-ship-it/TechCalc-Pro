@@ -155,7 +155,10 @@ function hydrateProjectForm(data = {}) {
   setInputValue('pdfCheckedBy', data.checkedBy);
   setInputValue('pdfApprovedBy', data.approvedBy);
   setInputValue('pdfDate', data.date);
-  hydrateCompanyLogoStatus(data.companyLogo || readStoredCompanyLogo(), data.companyLogoName || readStoredCompanyLogoName());
+  const logo = data.companyLogo || readStoredCompanyLogo();
+  const logoName = data.companyLogoName || readStoredCompanyLogoName();
+  if (logo) persistCompanyLogo(logo, logoName);
+  hydrateCompanyLogoStatus(logo, logoName);
 }
 
 
@@ -183,10 +186,44 @@ function persistCompanyLogo(dataUrl = '', fileName = '') {
   }
 }
 
+function ensureCompanyLogoPreview() {
+  let preview = document.getElementById('pdfCompanyLogoPreview');
+  const input = document.getElementById('pdfCompanyLogo');
+  if (!preview && input?.parentElement) {
+    preview = document.createElement('div');
+    preview.id = 'pdfCompanyLogoPreview';
+    preview.className = 'settings-logo-preview is-empty';
+    preview.setAttribute('aria-live', 'polite');
+    input.parentElement.insertAdjacentElement('afterend', preview);
+  }
+  return preview;
+}
+
 function hydrateCompanyLogoStatus(dataUrl = '', fileName = '') {
   const status = document.getElementById('pdfCompanyLogoStatus');
-  if (!status) return;
-  status.textContent = dataUrl ? `Firmenlogo fuer PDF hinterlegt${fileName ? `: ${fileName}` : ''}` : 'Kein Firmenlogo hinterlegt';
+  const preview = ensureCompanyLogoPreview();
+  const displayName = fileName || 'gespeichertes Firmenlogo';
+
+  if (status) {
+    status.textContent = dataUrl ? `Firmenlogo für PDF hinterlegt: ${displayName}` : 'Kein Firmenlogo hinterlegt';
+  }
+
+  if (!preview) return;
+  preview.classList.toggle('is-empty', !dataUrl);
+  preview.replaceChildren();
+  if (!dataUrl) {
+    const empty = document.createElement('span');
+    empty.textContent = 'Kein Firmenlogo hinterlegt';
+    preview.appendChild(empty);
+    return;
+  }
+
+  const img = document.createElement('img');
+  img.src = dataUrl;
+  img.alt = 'Hinterlegtes Firmenlogo';
+  const text = document.createElement('span');
+  text.textContent = displayName;
+  preview.append(img, text);
 }
 
 function bindCompanyLogoInput() {

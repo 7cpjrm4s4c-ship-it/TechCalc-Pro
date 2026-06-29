@@ -25,3 +25,10 @@ Validation:
 - `npm run test:integration`
 - `npm run build`
 - `npm run build:minified`
+
+
+## 1.3.1 Beta 29
+
+- Logo-Wiederherstellung in der Projekteinstellungs-UI korrigiert.
+- Logo-Vorschau für geladene Projektdateien ergänzt.
+- Dateiinput bleibt aus Browser-Sicherheitsgründen leer, die App zeigt Status/Vorschau separat.

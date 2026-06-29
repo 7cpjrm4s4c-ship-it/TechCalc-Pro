@@ -1,4 +1,4 @@
-## Version 1.3.1 Beta 28 - TCProj Logo Persistenz
+## Version 1.3.1 Beta 29 - Logo-Wiederherstellung UI
 
 - Neues Projektformat `.tcproj` als JSON-basierte Projektdatei eingeführt.
 - Firmenlogo wird direkt als Data-URL in der Projektdatei gespeichert.

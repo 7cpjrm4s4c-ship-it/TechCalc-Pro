@@ -1139,3 +1139,41 @@ html {
 .settings-form select:focus {
   font-size: 16px !important;
 }
+
+
+.settings-logo-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 4.25rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-strong, rgba(148, 163, 184, 0.35));
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.22);
+  color: var(--text-muted, #94a3b8);
+  overflow: hidden;
+}
+.settings-logo-preview img {
+  max-width: 6.75rem;
+  max-height: 3.25rem;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  flex: 0 0 auto;
+  border-radius: 0.35rem;
+  background: rgba(255,255,255,0.92);
+}
+.settings-logo-preview span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.settings-logo-preview.is-empty {
+  min-height: 3rem;
+}
+.settings-logo-preview.is-empty img {
+  display: none;
+}

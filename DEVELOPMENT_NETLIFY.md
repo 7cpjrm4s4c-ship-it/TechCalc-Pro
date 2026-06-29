@@ -1,4 +1,4 @@
-## Version 1.3.1 Beta 28 - TCProj Logo Persistenz
+## Version 1.3.1 Beta 29 - Logo-Wiederherstellung UI
 
 - Projektdatei-Input ohne restriktiven accept-Filter, damit .tcp-Dateien auf iOS auswählbar sind.
 - TCP-Import stellt Firmenlogo-Assets robuster aus assets/company-logo.* oder project.assets.companyLogo wieder her.
