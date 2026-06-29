@@ -307,7 +307,9 @@ function buildTcpProjectBlob(data = {}) {
   if (logo) {
     const path = `assets/${logo.name}`;
     files[path] = logo.bytes;
-    project.meta.companyLogo = '';
+    // Das Firmenlogo bleibt zusätzlich als Data-URL in project.json erhalten.
+    // Der Asset-Eintrag ist das primäre .tcp-Dateiformat; die Data-URL ist der robuste
+    // Fallback für Browser/Plattformen, die ZIP-Assets oder MIME-Zuordnungen anders behandeln.
     project.meta.companyLogoAsset = path;
     project.meta.companyLogoMime = logo.mime;
     project.meta.companyLogoName = project.meta.companyLogoName || logo.name;

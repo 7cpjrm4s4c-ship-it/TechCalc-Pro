@@ -1,4 +1,4 @@
-## Version 1.3.1 Beta 26 - iOS TCP Picker und Logo Asset Restore
+## Version 1.3.1 Beta 27 - TCP Logo Fallback Persistenz
 
 - Projektdatei-Input ohne restriktiven accept-Filter, damit .tcp-Dateien auf iOS auswählbar sind.
 - TCP-Import stellt Firmenlogo-Assets robuster aus assets/company-logo.* oder project.assets.companyLogo wieder her.

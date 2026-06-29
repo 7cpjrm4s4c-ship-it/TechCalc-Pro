@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.1-beta.26';
-const CACHE_REVISION = '1.3.1-beta.26-version-1-3-1-beta-26-ios-tcp-picker-und-logo-asset-restore';
+const CACHE_NAME = 'techcalc-pro-1.3.1-beta.27';
+const CACHE_REVISION = '1.3.1-beta.27-version-1-3-1-beta-27-tcp-logo-fallback-persistenz';
 const ASSETS = [
   './',
   './index.html',
