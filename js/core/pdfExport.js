@@ -198,8 +198,10 @@ function bindCompanyLogoInput() {
     input.addEventListener('change', () => {
       const file = input.files?.[0];
       if (!file) return;
-      if (!/^image\/(png|jpeg|webp|svg\+xml)$/i.test(file.type)) {
-        alert('Bitte PNG, JPG, WebP oder SVG als Firmenlogo auswaehlen.');
+      const fileNameLower = String(file.name || '').toLowerCase();
+      const allowedLogoType = /^image\/(png|jpeg|webp)$/i.test(file.type) || /\.(png|jpe?g|webp)$/i.test(fileNameLower);
+      if (!allowedLogoType) {
+        alert('Bitte PNG, JPG, JPEG oder WebP als Firmenlogo auswaehlen. SVG/SVP wird aus Sicherheitsgruenden nicht unterstuetzt.');
         input.value = '';
         return;
       }

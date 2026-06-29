@@ -148,7 +148,7 @@ function dataUrlToAsset(dataUrl = '', fallbackName = 'company-logo') {
   } else {
     bytes = encodeUtf8(decodeURIComponent(encoded));
   }
-  const extension = mime.includes('svg') ? 'svg' : mime.includes('webp') ? 'webp' : mime.includes('png') ? 'png' : mime.includes('jpeg') || mime.includes('jpg') ? 'jpg' : 'bin';
+  const extension = mime.includes('webp') ? 'webp' : mime.includes('png') ? 'png' : mime.includes('jpeg') || mime.includes('jpg') ? 'jpg' : 'bin';
   const safeName = String(fallbackName || `company-logo.${extension}`).replace(/[^a-z0-9äöüß._-]+/gi, '-').replace(/^-|-$/g, '') || `company-logo.${extension}`;
   const name = /\.[a-z0-9]+$/i.test(safeName) ? safeName : `${safeName}.${extension}`;
   return { name, mime, bytes };
@@ -166,7 +166,6 @@ function bytesToDataUrl(bytes, mime = 'application/octet-stream') {
 
 function mimeFromFileName(name = '') {
   const lower = String(name || '').toLowerCase();
-  if (lower.endsWith('.svg')) return 'image/svg+xml';
   if (lower.endsWith('.webp')) return 'image/webp';
   if (lower.endsWith('.png')) return 'image/png';
   if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg';
@@ -178,7 +177,7 @@ function findTcpLogoAsset(files = {}, meta = {}, project = {}) {
   if (meta.companyLogoAsset) candidates.push(meta.companyLogoAsset);
   if (project.assets?.companyLogo?.path) candidates.push(project.assets.companyLogo.path);
   if (project.assets?.companyLogo?.name) candidates.push(`assets/${project.assets.companyLogo.name}`);
-  candidates.push('assets/company-logo.png', 'assets/company-logo.jpg', 'assets/company-logo.jpeg', 'assets/company-logo.webp', 'assets/company-logo.svg');
+  candidates.push('assets/company-logo.png', 'assets/company-logo.jpg', 'assets/company-logo.jpeg', 'assets/company-logo.webp');
 
   const fileNames = Object.keys(files);
   for (const candidate of candidates) {
@@ -189,8 +188,8 @@ function findTcpLogoAsset(files = {}, meta = {}, project = {}) {
     if (insensitive) return insensitive;
   }
 
-  return fileNames.find(name => /(^|\/)assets\/.*\.(png|jpe?g|webp|svg)$/i.test(name))
-    || fileNames.find(name => /(^|\/).*company.*logo.*\.(png|jpe?g|webp|svg)$/i.test(name))
+  return fileNames.find(name => /(^|\/)assets\/.*\.(png|jpe?g|webp)$/i.test(name))
+    || fileNames.find(name => /(^|\/).*company.*logo.*\.(png|jpe?g|webp)$/i.test(name))
     || '';
 }
 
@@ -317,6 +316,25 @@ function buildTcpProjectBlob(data = {}) {
   }
   files['project.json'] = JSON.stringify(project, null, 2);
   return createTcpArchive(files);
+}
+
+function buildTcprojProjectBlob(data = {}) {
+  const project = clone(data);
+  project.format = 'techcalc-project';
+  project.container = 'tcproj-json';
+  project.version = Math.max(3, Number(project.version || 1));
+  project.assets = project.assets || {};
+  const logoDataUrl = project.meta?.companyLogo || '';
+  const logoName = project.meta?.companyLogoName || '';
+  const logoMime = project.meta?.companyLogoMime || (logoDataUrl.match(/^data:([^;,]+)/)?.[1] || '');
+  if (logoDataUrl) {
+    project.assets.companyLogo = {
+      name: logoName || 'company-logo',
+      mime: logoMime || 'image/jpeg',
+      dataUrl: logoDataUrl
+    };
+  }
+  return new Blob([JSON.stringify(project, null, 2)], { type: 'application/vnd.techcalc.project+json' });
 }
 
 export function getProjectMeta() {
@@ -469,8 +487,8 @@ export async function downloadProjectFile() {
   const meta = data.meta || {};
   const base = [meta.projectNo, meta.project, meta.client].filter(Boolean).join('-') || 'techcalc-projekt';
   const safe = base.toLowerCase().replace(/[^a-z0-9äöüß_-]+/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'techcalc-projekt';
-  const fileName = `${safe}.tcp`;
-  const blob = buildTcpProjectBlob(data);
+  const fileName = `${safe}.tcproj`;
+  const blob = buildTcprojProjectBlob(data);
 
   if (typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function') {
     try {
@@ -478,7 +496,7 @@ export async function downloadProjectFile() {
         suggestedName: fileName,
         types: [{
           description: 'TechCalc Projektdatei',
-          accept: { 'application/vnd.techcalc.project': ['.tcp'], 'application/json': ['.techcalc.json', '.json'] }
+          accept: { 'application/vnd.techcalc.project+json': ['.tcproj'], 'application/json': ['.json'] }
         }]
       });
       const writable = await handle.createWritable();
@@ -531,6 +549,13 @@ export async function readProjectFile(file) {
   const parsed = JSON.parse(text);
   if (!parsed || parsed.format !== 'techcalc-project') {
     throw new Error('Die Datei ist kein gültiges TechCalc-Projekt.');
+  }
+  const assetLogo = parsed.assets?.companyLogo;
+  if (assetLogo?.dataUrl) {
+    parsed.meta = parsed.meta || {};
+    parsed.meta.companyLogo = parsed.meta.companyLogo || assetLogo.dataUrl;
+    parsed.meta.companyLogoName = parsed.meta.companyLogoName || assetLogo.name || 'company-logo';
+    parsed.meta.companyLogoMime = parsed.meta.companyLogoMime || assetLogo.mime || '';
   }
   return clone(parsed);
 }

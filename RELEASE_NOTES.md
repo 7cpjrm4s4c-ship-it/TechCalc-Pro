@@ -1,8 +1,9 @@
-## Version 1.3.1 Beta 27 - TCP Logo Fallback Persistenz
+## Version 1.3.1 Beta 28 - TCProj Logo Persistenz
 
-- Projektdatei-Input ohne restriktiven accept-Filter, damit .tcp-Dateien auf iOS auswählbar sind.
-- TCP-Import stellt Firmenlogo-Assets robuster aus assets/company-logo.* oder project.assets.companyLogo wieder her.
-- JPG/JPEG/PNG/WebP/SVG werden beim Laden als Data-URL rekonstruiert.
+- Neues Projektformat `.tcproj` als JSON-basierte Projektdatei eingeführt.
+- Firmenlogo wird direkt als Data-URL in der Projektdatei gespeichert.
+- `.tcp` bleibt nur als Legacy-Import erhalten; neue Speicherungen erzeugen `.tcproj`.
+- SVG/SVP als Firmenlogo aus Sicherheitsgründen entfernt. Erlaubt: PNG, JPG/JPEG, WebP.
 
 ## Version 1.3.1 Beta 25 - TCP Import Stabilisierung und PDF Logo Header
 
