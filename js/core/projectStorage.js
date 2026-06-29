@@ -163,6 +163,37 @@ function bytesToDataUrl(bytes, mime = 'application/octet-stream') {
   return `data:${mime};base64,${btoa(binary)}`;
 }
 
+
+function mimeFromFileName(name = '') {
+  const lower = String(name || '').toLowerCase();
+  if (lower.endsWith('.svg')) return 'image/svg+xml';
+  if (lower.endsWith('.webp')) return 'image/webp';
+  if (lower.endsWith('.png')) return 'image/png';
+  if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg';
+  return 'application/octet-stream';
+}
+
+function findTcpLogoAsset(files = {}, meta = {}, project = {}) {
+  const candidates = [];
+  if (meta.companyLogoAsset) candidates.push(meta.companyLogoAsset);
+  if (project.assets?.companyLogo?.path) candidates.push(project.assets.companyLogo.path);
+  if (project.assets?.companyLogo?.name) candidates.push(`assets/${project.assets.companyLogo.name}`);
+  candidates.push('assets/company-logo.png', 'assets/company-logo.jpg', 'assets/company-logo.jpeg', 'assets/company-logo.webp', 'assets/company-logo.svg');
+
+  const fileNames = Object.keys(files);
+  for (const candidate of candidates) {
+    const exact = fileNames.find(name => name === candidate);
+    if (exact) return exact;
+    const normalizedCandidate = String(candidate || '').replace(/^\.\//, '').toLowerCase();
+    const insensitive = fileNames.find(name => name.replace(/^\.\//, '').toLowerCase() === normalizedCandidate);
+    if (insensitive) return insensitive;
+  }
+
+  return fileNames.find(name => /(^|\/)assets\/.*\.(png|jpe?g|webp|svg)$/i.test(name))
+    || fileNames.find(name => /(^|\/).*company.*logo.*\.(png|jpe?g|webp|svg)$/i.test(name))
+    || '';
+}
+
 function createTcpArchive(files = {}) {
   const localParts = [];
   const centralParts = [];
@@ -252,9 +283,14 @@ async function readTcpArchive(file) {
   if (!projectJsonPath) throw new Error('Die TCP-Projektdatei enthält keine project.json.');
   const project = JSON.parse(decodeUtf8(files[projectJsonPath]));
   const meta = project.meta || {};
-  const assetPath = meta.companyLogoAsset || '';
+  const assetPath = findTcpLogoAsset(files, meta, project);
   if (assetPath && files[assetPath]) {
-    meta.companyLogo = bytesToDataUrl(files[assetPath], meta.companyLogoMime || 'application/octet-stream');
+    const assetMeta = project.assets?.companyLogo || {};
+    const mime = meta.companyLogoMime || assetMeta.mime || mimeFromFileName(assetPath);
+    meta.companyLogo = bytesToDataUrl(files[assetPath], mime);
+    meta.companyLogoAsset = assetPath;
+    meta.companyLogoMime = mime;
+    meta.companyLogoName = meta.companyLogoName || assetMeta.name || assetPath.split('/').pop() || 'company-logo';
   }
   project.meta = meta;
   return project;

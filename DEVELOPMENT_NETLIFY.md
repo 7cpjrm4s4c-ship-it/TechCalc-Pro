@@ -1,3 +1,9 @@
+## Version 1.3.1 Beta 26 - iOS TCP Picker und Logo Asset Restore
+
+- Projektdatei-Input ohne restriktiven accept-Filter, damit .tcp-Dateien auf iOS auswählbar sind.
+- TCP-Import stellt Firmenlogo-Assets robuster aus assets/company-logo.* oder project.assets.companyLogo wieder her.
+- JPG/JPEG/PNG/WebP/SVG werden beim Laden als Data-URL rekonstruiert.
+
 ## Version 1.3.1 Beta 25 - TCP Import Stabilisierung und PDF Logo Header
 
 - TCP-Dateiformat robuster beim Laden.
