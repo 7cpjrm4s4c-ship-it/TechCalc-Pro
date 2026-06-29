@@ -248,8 +248,9 @@ async function readTcpArchive(file) {
     offset = dataEnd;
   }
 
-  if (!files['project.json']) throw new Error('Die TCP-Projektdatei enthält keine project.json.');
-  const project = JSON.parse(decodeUtf8(files['project.json']));
+  const projectJsonPath = files['project.json'] ? 'project.json' : Object.keys(files).find(name => /(^|\/)project\.json$/i.test(name));
+  if (!projectJsonPath) throw new Error('Die TCP-Projektdatei enthält keine project.json.');
+  const project = JSON.parse(decodeUtf8(files[projectJsonPath]));
   const meta = project.meta || {};
   const assetPath = meta.companyLogoAsset || '';
   if (assetPath && files[assetPath]) {
@@ -467,9 +468,21 @@ export async function downloadProjectFile() {
   return true;
 }
 
+async function looksLikeZipArchive(file) {
+  if (!file || typeof file.slice !== 'function') return false;
+  try {
+    const signature = new Uint8Array(await file.slice(0, 4).arrayBuffer());
+    return signature[0] === 0x50 && signature[1] === 0x4B && signature[2] === 0x03 && signature[3] === 0x04;
+  } catch {
+    return false;
+  }
+}
+
 export async function readProjectFile(file) {
-  const isTcp = /\.tcp$/i.test(file?.name || '');
-  if (isTcp) {
+  const name = file?.name || '';
+  const isTcp = /\.tcp$/i.test(name);
+  const isZipBackedProject = isTcp || await looksLikeZipArchive(file);
+  if (isZipBackedProject) {
     const parsed = await readTcpArchive(file);
     if (!parsed || parsed.format !== 'techcalc-project') {
       throw new Error('Die Datei ist kein gültiges TechCalc-Projekt.');

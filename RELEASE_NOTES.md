@@ -1,4 +1,11 @@
-## Version 1.3.1 Beta 24 - TCP Projektformat
+## Version 1.3.1 Beta 25 - TCP Import Stabilisierung und PDF Logo Header
+
+- `.tcp` Projektdateien werden jetzt auch anhand der ZIP-Signatur erkannt, nicht nur anhand der Dateiendung.
+- TCP-Import sucht `project.json` robuster im Container.
+- Rahmen und Platzhalter im Firmenlogo-Bereich des PDF-Headers entfernt.
+- Firmenlogo wird ohne Box zentriert und skaliert.
+
+## Version 1.3.1 Beta 25 - TCP Projektformat
 
 - Neues portables Projektformat `.tcp` eingeführt.
 - Projektdateien werden als ZIP-Container mit `project.json` und `assets/` gespeichert.
@@ -6,20 +13,20 @@
 - Bestehende `.json`/`.techcalc.json`-Projektdateien bleiben importierbar.
 - Neue Speicherfunktion erzeugt standardmäßig `.tcp`.
 
-## Version 1.3.1 Beta 24 - PDF Leitungsabschnitt Raster
+## Version 1.3.1 Beta 25 - PDF Leitungsabschnitt Raster
 
 - Gespeicherte Leitungsabschnitte im PDF auf festes zweispaltiges Tabellenraster umgestellt.
 - Werte und Linien sind nun sauber ausgerichtet.
 - Abschnittsblöcke bleiben kompakt, mit Zielgröße 3-4 Abschnitte pro Seite.
 - Logo-Speicherung aus Beta 22 bleibt erhalten.
 
-## Version 1.3.1 Beta 24 - PDF Logo Persistence Fix
+## Version 1.3.1 Beta 25 - PDF Logo Persistence Fix
 
 - Firmenlogo-Speicherung robuster gemacht.
 - PDF-Bildnormalisierung fuer iOS/Safari korrigiert.
 - Firmenlogo-Bereich im PDF in der Hoehe vergroessert.
 
-## Version 1.3.1 Beta 24 - PDF Logo & Projekteinstellungen Fix
+## Version 1.3.1 Beta 25 - PDF Logo & Projekteinstellungen Fix
 
 - iOS-Zoomschutz für Projektinformationen/PDF-Einstellungen ergänzt.
 - Firmenlogo-Upload wird als PDF-kompatibles Bild gespeichert und im PDF ausgegeben.
@@ -27,13 +34,13 @@
 - TechCalc-Pro-App-Logo wird im nativen PDF-Export als Bild ausgegeben.
 - Projektinformationen im PDF sauber ausgerichtet.
 
-## Version 1.3.1 Beta 24 - PDF Encoding Fix
+## Version 1.3.1 Beta 25 - PDF Encoding Fix
 
 - Native PDF text encoding corrected from UTF-16 hex strings to WinAnsi hex strings.
 - Removes visible `þÿ` artefacts before labels and values in generated PDFs.
 - Keeps native PDF export without browser headers/footers.
 
-## Version 1.3.1 Beta 24 - PDF Corporate Design
+## Version 1.3.1 Beta 25 - PDF Corporate Design
 
 
 ### PDF Export
@@ -49,7 +56,7 @@
 - Abschnittsblöcke sind kompakter, sodass ca. 3-4 Leitungsabschnitte pro A4-Seite möglich sind.
 - Footer ohne Datumswiederholung, da das Datum bereits im Header steht.
 
-## Version 1.3.1 Beta 24 - PDF Corporate Design
+## Version 1.3.1 Beta 25 - PDF Corporate Design
 
 - PDF-Kopfbereich bleibt unveraendert.
 - Projektinformationen bleiben direkt unter dem Kopfbereich.

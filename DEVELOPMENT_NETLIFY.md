@@ -1,12 +1,17 @@
-## Version 1.3.1 Beta 24 - PDF Leitungsabschnitt Raster
+## Version 1.3.1 Beta 25 - TCP Import Stabilisierung und PDF Logo Header
+
+- TCP-Dateiformat robuster beim Laden.
+- Firmenlogo im PDF-Header ohne Rahmen/Platzhalter.
+
+## Version 1.3.1 Beta 25 - PDF Leitungsabschnitt Raster
 
 Basis: 1.3.1 Beta 22. Fokus: professionelle Ausrichtung gespeicherter Einträge im nativen PDF-Export.
 
-## Version 1.3.1 Beta 24 - PDF Logo Persistence Fix
+## Version 1.3.1 Beta 25 - PDF Logo Persistence Fix
 
 Basis: 1.3.1 Beta 20. Fokus: Firmenlogo-Speicherung, Bildrendering und Logo-Slot-Hoehe im PDF.
 
-## Version 1.3.1 Beta 24 - PDF Corporate Design
+## Version 1.3.1 Beta 25 - PDF Corporate Design
 
 
 ### PDF Export

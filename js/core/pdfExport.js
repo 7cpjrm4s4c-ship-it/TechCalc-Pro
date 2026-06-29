@@ -742,15 +742,12 @@ class GlobalPdfReport {
     this.text('Berechnungsprotokoll', titleX, m + 6, { size: 12.4, font: 'F2', align: 'center' });
     this.text(`${moduleData.title} - ${date}`, titleX, m + 18, { size: 7.2, font: 'F2', color: [71, 85, 105], align: 'center' });
 
-    this.rect(logoX, m, logoW, logoH, { fill: null, stroke: [203, 213, 225], width: 0.5 });
     if (this.images.companyLogo) {
       const imgRatio = this.images.companyLogo.width / Math.max(1, this.images.companyLogo.height);
-      let imgW = logoW - 12;
+      let imgW = logoW;
       let imgH = imgW / imgRatio;
-      if (imgH > logoH - 8) { imgH = logoH - 8; imgW = imgH * imgRatio; }
+      if (imgH > logoH) { imgH = logoH; imgW = imgH * imgRatio; }
       this.drawImage('ImCompanyLogo', logoX + (logoW - imgW) / 2, m + (logoH - imgH) / 2, imgW, imgH);
-    } else {
-      this.text('FIRMENLOGO', logoX + logoW / 2, m + logoH / 2 + 2, { size: 6.3, font: 'F2', color: [148, 163, 184], align: 'center' });
     }
     this.line(m, m + logoH + 6, right, m + logoH + 6, PDF_THEME.line, 0.55);
     this.cursorY = m + logoH + 11;
