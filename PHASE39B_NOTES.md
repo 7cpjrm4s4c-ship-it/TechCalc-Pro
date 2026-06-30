@@ -27,8 +27,12 @@ Validation:
 - `npm run build:minified`
 
 
-## 1.3.1 Beta 31
+## 1.3.1 RC 2
 
 - Logo-Wiederherstellung in der Projekteinstellungs-UI korrigiert.
 - Logo-Vorschau für geladene Projektdateien ergänzt.
 - Dateiinput bleibt aus Browser-Sicherheitsgründen leer, die App zeigt Status/Vorschau separat.
+
+## 1.3.1 RC 2
+
+RC-1C.1: PDF-Engine-Refactoring und Korrekturen für Trinkwasser, h,x-Diagramm, WRG, Schmutzwasser, Pufferspeicher und Einheiten. Keine Feature-Erweiterung, nur Release-Stabilisierung.

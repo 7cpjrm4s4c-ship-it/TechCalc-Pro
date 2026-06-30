@@ -1,4 +1,4 @@
-# TechCalc Pro 1.3.1 Beta 31 – Security Re-Audit Follow-up
+# TechCalc Pro 1.3.1 RC 2 – Security Re-Audit Follow-up
 
 ## Umgesetzt
 
