@@ -6,7 +6,8 @@ const commands = [
   ['node', ['tests/platform-policy.test.mjs']],
   ['node', ['tests/module-contract.test.mjs']],
   ['node', ['tests/saved-record-interaction.test.mjs']],
-  ['node', ['tests/input-confirmation.test.mjs']]
+  ['node', ['tests/input-confirmation.test.mjs']],
+  ['node', ['tests/service-worker-update-flow.test.mjs']]
 ];
 
 for (const [cmd, args] of commands) {

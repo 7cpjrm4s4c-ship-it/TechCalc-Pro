@@ -99,6 +99,13 @@ export function initializeFeedbackController({
     event.preventDefault();
     setStatus('', '');
     if (!form.reportValidity()) return;
+    const honeypot = String(new FormData(form).get('_gotcha') || '').trim();
+    if (honeypot) {
+      setStatus('Feedback wurde verarbeitet. Danke!', 'success');
+      form.reset();
+      if (subject) subject.value = 'TechCalc Pro Feedback';
+      return;
+    }
 
     const payload = buildPayload();
 

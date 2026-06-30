@@ -27,7 +27,7 @@ Validation:
 - `npm run build:minified`
 
 
-## 1.3.1 Beta 30
+## 1.3.1 Beta 31
 
 - Logo-Wiederherstellung in der Projekteinstellungs-UI korrigiert.
 - Logo-Vorschau für geladene Projektdateien ergänzt.

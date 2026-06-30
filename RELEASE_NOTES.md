@@ -1,4 +1,11 @@
-# TechCalc Pro 1.3.1 Beta 30
+# TechCalc Pro 1.3.1 Beta 31
+
+## Version 1.3.1 Beta 31 - Security Re-Audit Follow-up
+
+- Service-Worker-Update-Flow repariert: neue Versionen werden per Update-Hinweis aktiviert und anschließend sauber neu geladen.
+- Feedback-Formular um Honeypot-Feld ergänzt; Bots werden clientseitig abgefangen.
+- Re-Audit-Dokumentation ergänzt.
+- CSP/Security-Header, SVG/SVP-Ausschluss und Logo-Größenlimit bleiben aktiv.
 
 ## Security Hardening
 
@@ -9,7 +16,7 @@
 - Logo-Groessenlimit auf 500 KB gesetzt.
 - Service Worker aktiviert neue Versionen nicht mehr per `skipWaiting()` ohne explizite Nachricht.
 
-## Version 1.3.1 Beta 30 - Logo-Wiederherstellung UI
+## Version 1.3.1 Beta 31 - Logo-Wiederherstellung UI
 
 - Neues Projektformat `.tcproj` als JSON-basierte Projektdatei eingeführt.
 - Firmenlogo wird direkt als Data-URL in der Projektdatei gespeichert.

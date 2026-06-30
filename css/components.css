@@ -1177,3 +1177,55 @@ html {
 .settings-logo-preview.is-empty img {
   display: none;
 }
+
+.tc-update-banner {
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
+  bottom: calc(92px + env(safe-area-inset-bottom));
+  z-index: 4000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--border-strong) 70%, transparent);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--surface-elevated) 94%, transparent);
+  box-shadow: var(--shadow-elevated);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.tc-update-banner[hidden] { display: none; }
+
+.tc-update-banner__button,
+.tc-update-banner__dismiss {
+  min-height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--accent-cyan);
+  background: color-mix(in srgb, var(--accent-cyan) 18%, transparent);
+  color: var(--text-primary);
+  font: inherit;
+  padding: 0 12px;
+}
+
+.tc-update-banner__dismiss {
+  width: 36px;
+  padding: 0;
+  border-color: var(--border-strong);
+  background: transparent;
+  font-size: 20px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
