@@ -1,4 +1,15 @@
-## Version 1.3.1 Beta 29 - Logo-Wiederherstellung UI
+# TechCalc Pro 1.3.1 Beta 30
+
+## Security Hardening
+
+- Content Security Policy und Security-Header fuer Netlify ergaenzt.
+- Inline-Debug-Bootstrap aus der Produktions-HTML entfernt.
+- SVG/SVP-Logos bleiben ausgeschlossen; zulaessig sind PNG, JPG/JPEG und WebP.
+- Logo-Upload prueft MIME-Type, Dateiendung und Datei-Signatur.
+- Logo-Groessenlimit auf 500 KB gesetzt.
+- Service Worker aktiviert neue Versionen nicht mehr per `skipWaiting()` ohne explizite Nachricht.
+
+## Version 1.3.1 Beta 30 - Logo-Wiederherstellung UI
 
 - Neues Projektformat `.tcproj` als JSON-basierte Projektdatei eingeführt.
 - Firmenlogo wird direkt als Data-URL in der Projektdatei gespeichert.

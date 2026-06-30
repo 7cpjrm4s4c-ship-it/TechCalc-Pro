@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.1-beta.29';
-const CACHE_REVISION = '1.3.1-beta.29-version-1-3-1-beta-29-logo-wiederherstellung-ui';
+const CACHE_NAME = 'techcalc-pro-1.3.1-beta.30';
+const CACHE_REVISION = '1.3.1-beta.30-techcalc-pro-1-3-1-beta-30';
 const ASSETS = [
   './',
   './index.html',
@@ -185,8 +185,11 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', event => {
-  self.skipWaiting();
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+});
+
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {

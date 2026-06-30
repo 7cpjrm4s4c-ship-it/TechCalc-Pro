@@ -16,6 +16,9 @@ function sanitizeText(value = '') {
 }
 
 
+const MAX_COMPANY_LOGO_FILE_SIZE = 500 * 1024;
+const MAX_COMPANY_LOGO_DATA_URL_SIZE = 700000;
+
 const DEFAULT_PROJECT = {
   client: '',
   project: '',
@@ -226,30 +229,52 @@ function hydrateCompanyLogoStatus(dataUrl = '', fileName = '') {
   preview.append(img, text);
 }
 
+async function isAllowedRasterLogoFile(file) {
+  if (!file) return false;
+  const name = String(file.name || '').toLowerCase();
+  const extensionAllowed = /\.(png|jpe?g|webp)$/i.test(name);
+  const mimeAllowed = /^image\/(png|jpeg|webp)$/i.test(String(file.type || ''));
+  if (!extensionAllowed || !mimeAllowed) return false;
+
+  try {
+    const bytes = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+    const isJpeg = bytes[0] === 0xFF && bytes[1] === 0xD8 && bytes[2] === 0xFF;
+    const isPng = bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47 && bytes[4] === 0x0D && bytes[5] === 0x0A && bytes[6] === 0x1A && bytes[7] === 0x0A;
+    const isWebp = bytes.length >= 12 && String.fromCharCode(...bytes.slice(0, 4)) === 'RIFF' && String.fromCharCode(...bytes.slice(8, 12)) === 'WEBP';
+    return isJpeg || isPng || isWebp;
+  } catch {
+    return false;
+  }
+}
+
 function bindCompanyLogoInput() {
   const input = document.getElementById('pdfCompanyLogo');
   const clearButton = document.getElementById('clearPdfCompanyLogo');
 
   if (input && input.dataset.bound !== 'true') {
     input.dataset.bound = 'true';
-    input.addEventListener('change', () => {
+    input.addEventListener('change', async () => {
       const file = input.files?.[0];
       if (!file) return;
-      const fileNameLower = String(file.name || '').toLowerCase();
-      const allowedLogoType = /^image\/(png|jpeg|webp)$/i.test(file.type) || /\.(png|jpe?g|webp)$/i.test(fileNameLower);
+      const allowedLogoType = await isAllowedRasterLogoFile(file);
       if (!allowedLogoType) {
-        alert('Bitte PNG, JPG, JPEG oder WebP als Firmenlogo auswaehlen. SVG/SVP wird aus Sicherheitsgruenden nicht unterstuetzt.');
+        alert('Bitte nur PNG, JPG/JPEG oder WebP als Firmenlogo auswaehlen. SVG/SVP wird aus Sicherheitsgruenden nicht unterstuetzt.');
         input.value = '';
         return;
       }
-      if (file.size > 750 * 1024) {
-        alert('Das Firmenlogo ist zu gross. Bitte eine Datei bis maximal 750 KB verwenden.');
+      if (file.size > MAX_COMPANY_LOGO_FILE_SIZE) {
+        alert('Das Firmenlogo ist zu gross. Bitte eine Datei bis maximal 500 KB verwenden.');
         input.value = '';
         return;
       }
       const reader = new FileReader();
       reader.onload = async () => {
         const dataUrl = String(reader.result || '');
+        if (dataUrl.length > MAX_COMPANY_LOGO_DATA_URL_SIZE) {
+          alert('Das Firmenlogo ist zu gross. Bitte eine kleinere PNG-, JPG- oder WebP-Datei verwenden.');
+          input.value = '';
+          return;
+        }
         const fileName = file.name || 'Firmenlogo';
         // Rohdaten sofort speichern, damit das Logo auch dann erhalten bleibt,
         // wenn die JPEG-Normalisierung auf einzelnen Mobilbrowsern fehlschlägt.
