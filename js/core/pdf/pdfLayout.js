@@ -40,26 +40,31 @@ function pdfValueForRow(row = []) {
 }
 
 function tableColumns(x, width) {
+  // One central grid for every report table: label/value | label/value.
+  // The value columns have fixed right anchors so every value, text and unit
+  // ends on the same vertical reference edge across all modules.
   const gap = PDF_THEME.table.gap;
   const available = width - gap;
-  const leftW = available * 0.5;
-  const rightW = available * 0.5;
-  const labelLeftW = leftW * PDF_GRID.labelLeftRatio / (PDF_GRID.labelLeftRatio + PDF_GRID.valueLeftRatio);
-  const valueLeftW = leftW - labelLeftW;
-  const labelRightW = rightW * PDF_GRID.labelRightRatio / (PDF_GRID.labelRightRatio + PDF_GRID.valueRightRatio);
-  const valueRightW = rightW - labelRightW;
+  const halfW = available / 2;
+  const labelLeftW = halfW * PDF_GRID.labelLeftRatio / (PDF_GRID.labelLeftRatio + PDF_GRID.valueLeftRatio);
+  const valueLeftW = halfW - labelLeftW;
+  const labelRightW = halfW * PDF_GRID.labelRightRatio / (PDF_GRID.labelRightRatio + PDF_GRID.valueRightRatio);
+  const valueRightW = halfW - labelRightW;
+  const leftValueRightX = x + halfW;
+  const rightLabelX = x + halfW + gap;
+  const rightValueRightX = x + width;
   return {
     left: {
       labelX: x,
-      labelW: labelLeftW,
-      valueRightX: x + labelLeftW + valueLeftW,
-      valueW: valueLeftW - 4
+      labelW: labelLeftW - 4,
+      valueRightX: leftValueRightX,
+      valueW: valueLeftW - 6
     },
     right: {
-      labelX: x + leftW + gap,
-      labelW: labelRightW,
-      valueRightX: x + leftW + gap + labelRightW + valueRightW,
-      valueW: valueRightW - 4
+      labelX: rightLabelX,
+      labelW: labelRightW - 4,
+      valueRightX: rightValueRightX,
+      valueW: valueRightW - 6
     },
     rowLineEnd: x + width
   };
@@ -81,7 +86,7 @@ function pairRowHeight(pair, columns, { labelSize = PDF_THEME.table.labelSize, v
     const valueLines = splitPdfText(pdfValueForRow(row), col.valueW, valueSize).length;
     lines = Math.max(lines, labelLines, valueLines);
   });
-  return Math.max(PDF_THEME.table.rowMinHeight, lines * 7.4 + PDF_THEME.table.rowPaddingTop + PDF_THEME.table.rowPaddingBottom);
+  return Math.max(PDF_THEME.table.rowMinHeight, lines * 8.0 + PDF_THEME.table.rowPaddingTop + PDF_THEME.table.rowPaddingBottom);
 }
 
 function drawPairedRow(report, pair, x, y, width, rowHeight, { labelSize = PDF_THEME.table.labelSize, valueSize = PDF_THEME.table.valueSize } = {}) {
@@ -89,7 +94,7 @@ function drawPairedRow(report, pair, x, y, width, rowHeight, { labelSize = PDF_T
   pair.forEach((row, index) => {
     if (!row) return;
     const col = index === 0 ? columns.left : columns.right;
-    const baseline = y + PDF_THEME.table.rowPaddingTop + 4.6;
+    const baseline = y + PDF_THEME.table.rowPaddingTop + 5.0;
     report.text(row?.[0] || '-', col.labelX, baseline, {
       size: labelSize,
       font: 'F2',
@@ -263,7 +268,7 @@ export class GlobalPdfReport {
     const boxW = w;
     const pad = PDF_THEME.chart.padding;
     const imageAspect = this.images.chartImage.width / Math.max(1, this.images.chartImage.height);
-    const naturalBoxH = (boxW - pad * 2) / Math.max(1.15, Math.min(imageAspect, 2.25)) + pad * 2;
+    const naturalBoxH = (boxW - pad * 2) / Math.max(1.35, Math.min(imageAspect, 4.35)) + pad * 2;
     const desiredH = Math.min(PDF_THEME.chart.maxHeight, Math.max(PDF_THEME.chart.minHeight, naturalBoxH));
     const ratio = Math.min((boxW - pad * 2) / this.images.chartImage.width, (desiredH - pad * 2) / this.images.chartImage.height);
     const imgW = this.images.chartImage.width * ratio;
@@ -271,7 +276,7 @@ export class GlobalPdfReport {
     this.ensureSpace(desiredH + 26, { repeatTitle: 'h,x-Diagramm' });
     this.sectionTitle('h,x-Diagramm');
     this.rect(m, this.cursorY, boxW, desiredH, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
-    this.drawImage('ImChart', m + (boxW - imgW) / 2, this.cursorY + (desiredH - imgH) / 2, imgW, imgH);
+    this.drawImage('ImChart', m + (boxW - imgW) / 2, this.cursorY + pad + (desiredH - pad * 2 - imgH) / 2, imgW, imgH);
     this.cursorY += desiredH + 8;
   }
 

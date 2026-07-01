@@ -25,8 +25,8 @@ function cropCanvasToContent(sourceCanvas, { padding = 18, threshold = 246 } = {
   const cropW = Math.max(1, maxX - minX + 1);
   const cropH = Math.max(1, maxY - minY + 1);
   // Avoid pathological ultra-wide chart captures by keeping enough vertical context.
-  if (cropW / Math.max(1, cropH) > 5.5) {
-    const targetH = Math.min(height, Math.round(cropW / 3.2));
+  if (cropW / Math.max(1, cropH) > 4.2) {
+    const targetH = Math.min(height, Math.round(cropW / 2.7));
     const centerY = Math.round((minY + maxY) / 2);
     minY = Math.max(0, Math.min(height - targetH, centerY - Math.floor(targetH / 2)));
     maxY = Math.min(height - 1, minY + targetH - 1);
@@ -85,9 +85,8 @@ export async function canvasToJpeg(canvas, { maxWidth = 1200, maxHeight = 700, q
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
     ctx.drawImage(canvas, 0, 0, width, height);
-    // Preserve the full chart canvas. Cropping can turn wide h,x charts into
-    // a narrow strip and create excessive vertical whitespace in the report.
-    return { dataUrl: out.toDataURL('image/jpeg', quality), width: out.width, height: out.height };
+    const cropped = cropCanvasToContent(out, { padding: 16, threshold: 252 });
+    return { dataUrl: cropped.toDataURL('image/jpeg', quality), width: cropped.width, height: cropped.height };
   } catch (error) {
     console.warn('PDF-Canvas konnte nicht gerendert werden.', error);
     return null;
@@ -138,9 +137,8 @@ export async function svgToJpeg(svgMarkup, { maxWidth = 1400, maxHeight = 960, q
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
     ctx.drawImage(img, 0, 0, width, height);
-    // Preserve the complete SVG viewBox so the h,x diagram keeps its intended
-    // vertical proportion and process points remain visible.
-    return { dataUrl: canvas.toDataURL('image/jpeg', quality), width: canvas.width, height: canvas.height };
+    const cropped = cropCanvasToContent(canvas, { padding: 16, threshold: 252 });
+    return { dataUrl: cropped.toDataURL('image/jpeg', quality), width: cropped.width, height: cropped.height };
   } catch (error) {
     console.warn('PDF-SVG konnte nicht gerendert werden.', error);
     return null;
