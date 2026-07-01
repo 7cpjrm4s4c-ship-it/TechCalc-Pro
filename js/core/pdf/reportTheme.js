@@ -26,8 +26,8 @@ export const PDF_THEME = {
   },
   chart: {
     maxWidth: 548,
-    maxHeight: 260,
-    minHeight: 180,
+    maxHeight: 330,
+    minHeight: 250,
     padding: 6
   }
 };
@@ -39,4 +39,4 @@ export const PDF_GRID = {
   valueRightRatio: 0.255
 };
 
-export const REPORT_TEMPLATE_VERSION = 'global-report-template-3-rc5-fixed-grid';
+export const REPORT_TEMPLATE_VERSION = 'global-report-template-4-rc6-final-grid';

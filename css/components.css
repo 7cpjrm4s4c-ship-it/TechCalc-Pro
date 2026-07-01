@@ -1189,11 +1189,11 @@ html {
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  border: 1px solid color-mix(in srgb, var(--accent-cyan) 58%, var(--border-strong));
+  border: 1px solid #38d5ff;
   border-radius: 20px;
-  background: color-mix(in srgb, #111827 94%, var(--surface-elevated));
-  box-shadow: 0 18px 42px rgba(0,0,0,.42), 0 0 0 1px rgba(255,255,255,.08) inset;
-  color: #fff;
+  background: #07111f;
+  box-shadow: 0 18px 42px rgba(0,0,0,.58), 0 0 0 1px rgba(255,255,255,.10) inset;
+  color: #ffffff;
   font-weight: 800;
   line-height: 1.18;
 }
@@ -1206,19 +1206,23 @@ html {
 .tc-update-banner__dismiss {
   min-height: 36px;
   border-radius: 999px;
-  border: 1px solid var(--accent-cyan);
-  background: color-mix(in srgb, var(--accent-cyan) 18%, transparent);
-  color: #fff;
+  border: 1px solid #67e8f9;
+  background: #0e7490;
+  color: #ffffff;
   font: inherit;
   padding: 0 12px;
+}
+
+.tc-update-banner__button:disabled {
+  opacity: .8;
 }
 
 .tc-update-banner__dismiss {
   width: 36px;
   padding: 0;
-  border-color: var(--border-strong);
-  background: rgba(255,255,255,.08);
-  color: #fff;
+  border-color: #ffffff;
+  background: #1f2937;
+  color: #ffffff;
   font-size: 20px;
 }
 

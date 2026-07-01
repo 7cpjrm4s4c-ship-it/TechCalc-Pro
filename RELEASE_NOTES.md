@@ -1,4 +1,4 @@
-# TechCalc Pro 1.3.1 RC 5
+# TechCalc Pro 1.3.1 RC 6
 
 - PDF-Raster für Heiz/Kälte, Trinkwasser und WRG stabilisiert.
 - Lange Werte werden kontrolliert mehrzeilig gesetzt statt in Nachbarspalten zu laufen.
@@ -39,7 +39,7 @@ Keine neuen Features. Diese Version enthält ausschließlich PDF-Stabilisierung,
 ## Phase 38F
 - Esbuild-Minification-Audit bleibt für RC-Builds dokumentiert.
 
-## 1.3.1-rc.5
+## 1.3.1-rc.6
 
 - PDF Layout Engine zentralisiert: feste 4-Spalten-Matrix für alle Module.
 - Gerade Wertspalten verwenden eine feste rechte Bezugskante.

@@ -65,6 +65,13 @@ function tableColumns(x, width) {
   };
 }
 
+function drawRightAlignedValue(report, value, rightX, y, { size = PDF_THEME.table.valueSize, maxWidth = 96, color = PDF_THEME.table.valueColor, font = 'F4', lineHeight = 1.15 } = {}) {
+  // Values in all even columns share a fixed right-side anchor. Wrapping is
+  // performed before drawing; every continuation line keeps the exact same
+  // reference edge so numbers, text and units align module-wide.
+  report.text(value, rightX, y, { size, font, color, align: 'right', maxWidth, lineHeight });
+}
+
 function pairRowHeight(pair, columns, { labelSize = PDF_THEME.table.labelSize, valueSize = PDF_THEME.table.valueSize } = {}) {
   let lines = 1;
   pair.forEach((row, index) => {
@@ -90,11 +97,8 @@ function drawPairedRow(report, pair, x, y, width, rowHeight, { labelSize = PDF_T
       maxWidth: col.labelW - 4,
       lineHeight: 1.15
     });
-    report.text(pdfValueForRow(row), col.valueRightX, baseline, {
+    drawRightAlignedValue(report, pdfValueForRow(row), col.valueRightX, baseline, {
       size: valueSize,
-      font: 'F4',
-      color: PDF_THEME.table.valueColor,
-      align: 'right',
       maxWidth: col.valueW,
       lineHeight: 1.15
     });
@@ -257,13 +261,15 @@ export class GlobalPdfReport {
     const m = PDF_THEME.margin;
     const w = PDF_PAGE.width - m * 2;
     const boxW = w;
-    const desiredH = Math.min(PDF_THEME.chart.maxHeight, Math.max(PDF_THEME.chart.minHeight, boxW * 0.42));
     const pad = PDF_THEME.chart.padding;
+    const imageAspect = this.images.chartImage.width / Math.max(1, this.images.chartImage.height);
+    const naturalBoxH = (boxW - pad * 2) / Math.max(1.15, Math.min(imageAspect, 2.25)) + pad * 2;
+    const desiredH = Math.min(PDF_THEME.chart.maxHeight, Math.max(PDF_THEME.chart.minHeight, naturalBoxH));
     const ratio = Math.min((boxW - pad * 2) / this.images.chartImage.width, (desiredH - pad * 2) / this.images.chartImage.height);
     const imgW = this.images.chartImage.width * ratio;
     const imgH = this.images.chartImage.height * ratio;
+    this.ensureSpace(desiredH + 26, { repeatTitle: 'h,x-Diagramm' });
     this.sectionTitle('h,x-Diagramm');
-    this.ensureSpace(desiredH + 10, { repeatTitle: 'h,x-Diagramm' });
     this.rect(m, this.cursorY, boxW, desiredH, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
     this.drawImage('ImChart', m + (boxW - imgW) / 2, this.cursorY + (desiredH - imgH) / 2, imgW, imgH);
     this.cursorY += desiredH + 8;
