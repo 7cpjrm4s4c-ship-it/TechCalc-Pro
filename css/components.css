@@ -1180,22 +1180,25 @@ html {
 
 .tc-update-banner {
   position: fixed;
-  left: max(16px, env(safe-area-inset-left));
-  right: max(16px, env(safe-area-inset-right));
-  bottom: calc(92px + env(safe-area-inset-bottom));
+  left: max(18px, env(safe-area-inset-left));
+  right: max(18px, env(safe-area-inset-right));
+  bottom: calc(112px + env(safe-area-inset-bottom));
   z-index: 4000;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
-  padding: 12px 14px;
-  border: 1px solid color-mix(in srgb, var(--border-strong) 70%, transparent);
-  border-radius: 18px;
-  background: color-mix(in srgb, var(--surface-elevated) 94%, transparent);
-  box-shadow: var(--shadow-elevated);
-  color: var(--text-primary);
-  font-weight: 700;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--accent-cyan) 58%, var(--border-strong));
+  border-radius: 20px;
+  background: color-mix(in srgb, #111827 94%, var(--surface-elevated));
+  box-shadow: 0 18px 42px rgba(0,0,0,.42), 0 0 0 1px rgba(255,255,255,.08) inset;
+  color: #fff;
+  font-weight: 800;
+  line-height: 1.18;
 }
+
+.tc-update-banner span { min-width: 0; }
 
 .tc-update-banner[hidden] { display: none; }
 
@@ -1205,7 +1208,7 @@ html {
   border-radius: 999px;
   border: 1px solid var(--accent-cyan);
   background: color-mix(in srgb, var(--accent-cyan) 18%, transparent);
-  color: var(--text-primary);
+  color: #fff;
   font: inherit;
   padding: 0 12px;
 }
@@ -1214,7 +1217,8 @@ html {
   width: 36px;
   padding: 0;
   border-color: var(--border-strong);
-  background: transparent;
+  background: rgba(255,255,255,.08);
+  color: #fff;
   font-size: 20px;
 }
 

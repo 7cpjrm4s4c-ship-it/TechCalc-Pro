@@ -38,5 +38,5 @@ Validation:
 RC-1C.1: PDF-Engine-Refactoring und Korrekturen für Trinkwasser, h,x-Diagramm, WRG, Schmutzwasser, Pufferspeicher und Einheiten. Keine Feature-Erweiterung, nur Release-Stabilisierung.
 
 
-## 1.3.1 RC 3
+## 1.3.1 RC 4
 - RC-1C PDF-Layout-Korrekturen: Spaltenausrichtung, lange Texte, h,x-Diagramm-Vorbereitung, WRG/Trinkwasser-Layout.

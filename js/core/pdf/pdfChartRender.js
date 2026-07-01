@@ -49,7 +49,7 @@ export async function canvasToJpeg(canvas, { maxWidth = 1200, maxHeight = 700, q
   }
 }
 
-export async function svgToJpeg(svgMarkup, { maxWidth = 1200, maxHeight = 760, quality = 0.9 } = {}) {
+export async function svgToJpeg(svgMarkup, { maxWidth = 1400, maxHeight = 960, quality = 0.92 } = {}) {
   if (!svgMarkup) return null;
   try {
     let markup = String(svgMarkup || '');
@@ -57,12 +57,30 @@ export async function svgToJpeg(svgMarkup, { maxWidth = 1200, maxHeight = 760, q
     const viewBox = markup.match(/viewBox=["']([^"']+)["']/i)?.[1]?.split(/\s+/).map(Number) || [];
     const vbW = Number.isFinite(viewBox[2]) ? viewBox[2] : maxWidth;
     const vbH = Number.isFinite(viewBox[3]) ? viewBox[3] : maxHeight;
-    if (!/\swidth=/.test(markup)) markup = markup.replace('<svg', `<svg width="${vbW}"`);
-    if (!/\sheight=/.test(markup)) markup = markup.replace('<svg', `<svg height="${vbH}"`);
-    const blob = new Blob([markup], { type: 'image/svg+xml;charset=utf-8' });
+    markup = markup.replace(/<svg([^>]*)>/i, (match, attrs) => {
+      let nextAttrs = attrs;
+      if (!/\swidth=/.test(nextAttrs)) nextAttrs += ` width="${vbW}"`;
+      if (!/\sheight=/.test(nextAttrs)) nextAttrs += ` height="${vbH}"`;
+      return `<svg${nextAttrs}>`;
+    });
+    const chartStyle = `
+      <style>
+        .hx-chart-bg{fill:#ffffff;stroke:#CBD5E1;stroke-width:1.2;}
+        .hx-grid-line{stroke:#E2E8F0;stroke-width:1;}
+        .hx-axis-label,.hx-title,.hx-rh-label{fill:#111827;font-family:Arial,Helvetica,sans-serif;font-size:11px;}
+        .hx-title{font-size:13px;font-weight:700;}
+        .hx-rh{fill:none;stroke:#94A3B8;stroke-width:1.2;opacity:.9;}
+        .hx-rh-100{stroke:#111827;stroke-width:2;}
+        .hx-state-path{fill:none;stroke:#F97316;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;}
+        .hx-point circle{fill:#ffffff;stroke:#F97316;stroke-width:2.6;}
+        .hx-point text{fill:#111827;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;}
+      </style>`;
+    markup = markup.replace(/<svg([^>]*)>/i, match => `${match}${chartStyle}`);
+    const svgText = `<?xml version="1.0" encoding="UTF-8"?>${markup}`;
+    const blob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-    const img = await imageElementFromSource(url);
-    URL.revokeObjectURL(url);
+    let img;
+    try { img = await imageElementFromSource(url); } finally { URL.revokeObjectURL(url); }
     const sourceW = img.naturalWidth || img.width || vbW || maxWidth;
     const sourceH = img.naturalHeight || img.height || vbH || maxHeight;
     const scale = Math.min(1, maxWidth / Math.max(1, sourceW), maxHeight / Math.max(1, sourceH));

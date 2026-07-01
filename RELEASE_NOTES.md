@@ -1,4 +1,4 @@
-# TechCalc Pro 1.3.1 RC 3
+# TechCalc Pro 1.3.1 RC 4
 
 - PDF-Raster für Heiz/Kälte, Trinkwasser und WRG stabilisiert.
 - Lange Werte werden kontrolliert mehrzeilig gesetzt statt in Nachbarspalten zu laufen.

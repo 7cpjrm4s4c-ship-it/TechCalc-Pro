@@ -44,7 +44,7 @@ function pairRowHeight(pair, labelWidth, valueWidth, { labelSize = 6.25, valueSi
     const valueLines = splitPdfText(pdfValueForRow(row), valueWidth, valueSize).length;
     lines = Math.max(lines, labelLines, valueLines);
   });
-  return Math.max(12.2, lines * 8.2 + 4.2);
+  return Math.max(12.2, lines * 7.7 + 4.4);
 }
 
 function drawPairedRow(report, pair, x, y, pairWidth, gap, labelWidth, valueWidth, rowHeight, { labelSize = 6.25, valueSize = 6.45 } = {}) {
@@ -54,7 +54,7 @@ function drawPairedRow(report, pair, x, y, pairWidth, gap, labelWidth, valueWidt
     const label = sanitizeText(row?.[0] || '-');
     const value = pdfValueForRow(row);
     report.text(label, pairX, y + 7.2, { size: labelSize, font: 'F2', color: [71, 85, 105], maxWidth: labelWidth });
-    report.text(value, pairX + pairWidth, y + 7.2, { size: valueSize, font: 'F2', align: 'right', maxWidth: valueWidth });
+    report.text(value, pairX + pairWidth - 2, y + 7.2, { size: valueSize, font: 'F2', align: 'right', maxWidth: valueWidth });
   });
 }
 
@@ -164,8 +164,8 @@ export class GlobalPdfReport {
     const innerW = w - 10;
     const gap = 22;
     const pairW = (innerW - gap) / 2;
-    const labelW = 118;
-    const valueW = pairW - labelW;
+    const labelW = 120;
+    const valueW = pairW - labelW - 2;
     const rowHeights = pairs.map(pair => pairRowHeight(pair, labelW - 4, valueW, { labelSize: 6.2, valueSize: 6.45 }));
     const headerHeight = 18;
     const topPad = 4.5;
@@ -199,8 +199,8 @@ export class GlobalPdfReport {
     const innerW = w - 6;
     const gap = 22;
     const pairW = (innerW - gap) / 2;
-    const labelW = 122;
-    const valueW = pairW - labelW;
+    const labelW = 120;
+    const valueW = pairW - labelW - 2;
     const rowHeights = pairs.map(pair => pairRowHeight(pair, labelW - 4, valueW, { labelSize: 6.15, valueSize: 6.35 }));
     const blockHeight = 4 + rowHeights.reduce((sum, h) => sum + h, 0) + 3;
     this.ensureSpace(blockHeight + 2, { repeatTitle: section.title });
@@ -220,14 +220,14 @@ export class GlobalPdfReport {
     if (!this.images.chartImage) return;
     const m = PDF_THEME.margin;
     const w = PDF_PAGE.width - m * 2;
-    const ratio = Math.min(w / this.images.chartImage.width, 280 / this.images.chartImage.height);
+    const ratio = Math.min(w / this.images.chartImage.width, 360 / this.images.chartImage.height);
     const imgW = this.images.chartImage.width * ratio;
     const imgH = this.images.chartImage.height * ratio;
     this.sectionTitle('h,x-Diagramm');
-    this.ensureSpace(imgH + 8, { repeatTitle: 'h,x-Diagramm' });
-    this.rect(m, this.cursorY, w, imgH + 8, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
-    this.drawImage('ImChart', m + (w - imgW) / 2, this.cursorY + 4, imgW, imgH);
-    this.cursorY += imgH + 14;
+    this.ensureSpace(imgH + 10, { repeatTitle: 'h,x-Diagramm' });
+    this.rect(m, this.cursorY, w, imgH + 10, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
+    this.drawImage('ImChart', m + (w - imgW) / 2, this.cursorY + 5, imgW, imgH);
+    this.cursorY += imgH + 16;
   }
 
   corporateBlock(project, moduleData) {

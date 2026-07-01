@@ -58,9 +58,24 @@ export function pdfNumber(value) {
 }
 
 export function estimateTextWidth(text, size = 8) {
-  // Conservative width approximation for Helvetica. The previous factor was too
-  // optimistic and allowed long technical values to run over fixed PDF columns.
-  return sanitizeText(text).length * size * 0.56;
+  // Approximate Helvetica widths. A single length factor made right-aligned
+  // values drift visibly between numbers, units and long German labels. This
+  // table keeps the PDF value columns optically aligned without embedding fonts.
+  const widths = {
+    ' ': 0.28, '.': 0.28, ',': 0.28, ':': 0.28, ';': 0.28, '-': 0.33, '/': 0.28,
+    '(': 0.33, ')': 0.33, '[': 0.33, ']': 0.33, '+': 0.58, '=': 0.58,
+    '0': 0.56, '1': 0.56, '2': 0.56, '3': 0.56, '4': 0.56,
+    '5': 0.56, '6': 0.56, '7': 0.56, '8': 0.56, '9': 0.56,
+    'i': 0.22, 'j': 0.22, 'l': 0.22, 'I': 0.28, 't': 0.28, 'f': 0.30, 'r': 0.33,
+    'm': 0.83, 'w': 0.72, 'M': 0.83, 'W': 0.94,
+    'A': 0.67, 'B': 0.67, 'C': 0.72, 'D': 0.72, 'E': 0.67, 'F': 0.61, 'G': 0.78,
+    'H': 0.72, 'J': 0.50, 'K': 0.67, 'L': 0.56, 'N': 0.72, 'O': 0.78, 'P': 0.67,
+    'Q': 0.78, 'R': 0.72, 'S': 0.67, 'T': 0.61, 'U': 0.72, 'V': 0.67, 'X': 0.67,
+    'Y': 0.67, 'Z': 0.61
+  };
+  let total = 0;
+  for (const ch of sanitizeText(text)) total += widths[ch] ?? (/[a-zäöüß]/.test(ch) ? 0.50 : 0.56);
+  return total * size;
 }
 
 function splitLongToken(token, maxWidth, size) {
