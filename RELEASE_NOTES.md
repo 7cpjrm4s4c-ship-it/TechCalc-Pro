@@ -60,3 +60,11 @@ Keine neuen Features. Diese Version enthält ausschließlich PDF-Stabilisierung,
 ## 1.3.1-rc.10.2
 
 - RC.10A: iOS-Dateiauswahl korrigiert. Der versteckte Projekt-Import-Input verwendet kein restriktives `accept` mehr, weil iOS Files unbekannte Custom-Endungen wie `.tcproj` dadurch ausgraut. Die Dateitypprüfung bleibt vollständig im Parser erhalten.
+
+## 1.3.1-rc.12 – Code Freeze
+
+- Versionierung, Service Worker Cache und Precache-Revision auf RC.12 synchronisiert.
+- Runtime-Code auf verbliebene Debug-Ausgaben geprüft.
+- Fast- und Integration-Gate erfolgreich ausgeführt.
+- RC.10 Projektdatei- und RC.11 PDF-Regressionen erneut bestätigt.
+
