@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { GlobalPdfReport } from '../js/core/pdf/pdfLayout.js';
 import { sanitizeText, splitPdfText } from '../js/core/pdf/pdfText.js';
 import { PDF_PAGE, PDF_THEME, REPORT_TEMPLATE_VERSION } from '../js/core/pdf/reportTheme.js';
+import { reportSections } from '../js/core/pdf/pdfDataMapping.js';
 
 const longRows = Array.from({ length: 96 }, (_, index) => [
   `Sehr langer Tabellenparameter ${index + 1} mit Umlauten äöü und Sonderzeichen`,
@@ -30,9 +31,32 @@ const project = {
   approvedBy: 'SVP Engineering'
 };
 
-assert.equal(REPORT_TEMPLATE_VERSION, 'global-report-template-8-rc11-pixel-perfect-qa');
+assert.equal(REPORT_TEMPLATE_VERSION, 'global-report-template-9-rc11-1-pdf-table-dedupe');
 assert.equal(sanitizeText('m³/h ± Δp → µ-Wert Ø 18 × 1,0'), 'm3/h +/- Deltap -> u-Wert DN 18 x 1,0');
 assert.ok(splitPdfText('A'.repeat(180), 42, 6.25).length > 1, 'long tokens must be wrapped');
+
+const hxSections = reportSections({
+  id: 'hx-diagram',
+  title: 'h,x-Diagramm',
+  sections: [{
+    title: 'Berechnete Zustandspunkte',
+    rows: [
+      ['1 Ausgang', 'Theta32,00 °C | Phi39 % | x11,87 g/kg | h62,59 kJ/kg', '', ''],
+      ['2 Taupunkt', 'Theta16,71 °C | Phi100 % | x11,87 g/kg | h46,87 kJ/kg', '', '']
+    ]
+  }, {
+    title: 'Gespeicherte Prozesse',
+    rows: [
+      ['Bezeichnung', '-', '', ''],
+      ['Bezeichnung', 'Test Winter', '', ''],
+      ['Prozess', 'Erhitzen + adiabate befeuchten', '', '']
+    ]
+  }]
+});
+assert.equal(hxSections[0].rows[0][0], '1 Ausgang');
+assert.ok(!/^1$/.test(hxSections[0].rows[0][0]), 'h,x point index must not be emitted as standalone label');
+assert.equal(hxSections[1].rows[1][0], 'Bezeichnung 2');
+
 
 const report = new GlobalPdfReport();
 const blob = report.build(project, moduleData);

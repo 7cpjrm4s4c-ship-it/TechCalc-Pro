@@ -49,7 +49,7 @@ Keine neuen Features. Diese Version enthält ausschließlich PDF-Stabilisierung,
 
 
 
-## 1.3.1-rc.11
+## 1.3.1-rc.11.1
 
 - RC.11 PDF Engine Pixel Perfect QA.
 - Seitenumbruch-Guard gegen verwaiste Abschnittstitel ergänzt.

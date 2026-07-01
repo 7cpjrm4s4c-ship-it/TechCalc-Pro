@@ -56,9 +56,10 @@ export function extractCardRows(card) {
   });
 
   card.querySelectorAll(':scope .hx-process-step').forEach((step, index) => {
-    const label = textOf(step.querySelector('strong')) || String(index + 1);
+    const rawLabel = textOf(step.querySelector('strong')) || `Punkt ${index + 1}`;
+    const normalizedLabel = rawLabel.match(/^\d+\s+/) ? rawLabel : `${index + 1} ${rawLabel}`;
     const values = [...step.querySelectorAll('span')].map(textOf).join(' | ');
-    rows.push([String(index + 1), label, values, '']);
+    rows.push([normalizedLabel, values, '', '']);
   });
 
   card.querySelectorAll(':scope .pipe-dimension-card').forEach((dim, index) => {
@@ -156,13 +157,29 @@ export function lineSectionItems(rows = []) {
   return items;
 }
 
+function normalizePdfRows(rows = [], title = '') {
+  const normalizedTitle = normalizeKey(title);
+  const seenGenericLabels = new Map();
+  return rows
+    .map(row => row.slice(0, 3).map(cell => sanitizeText(cell).replace(/^Sättigung$/i, 'Adiabate Befeuchtung').replace(/Parameter/g, 'Bezeichnung')))
+    .map(row => {
+      const key = normalizeKey(row?.[0] || '');
+      if (normalizedTitle.includes('gespeicherte') && key === 'bezeichnung') {
+        const count = (seenGenericLabels.get(key) || 0) + 1;
+        seenGenericLabels.set(key, count);
+        return [count === 1 ? 'Bezeichnung' : `Bezeichnung ${count}`, row?.[1] || '', row?.[2] || ''];
+      }
+      return row;
+    });
+}
+
 export function reportSections(moduleData) {
   const isHxDiagram = /hx|h,x/i.test(`${moduleData.id || ''} ${moduleData.title || ''}`);
   const hasLineSections = !isHxDiagram && moduleData.sections.some(section => isLineSectionTitle(sectionTitle(section.title)));
   const printableSections = hasLineSections ? moduleData.sections.filter(section => isLineSectionTitle(sectionTitle(section.title))) : moduleData.sections;
   return printableSections.map(section => {
     const title = sectionTitle(section.title).replace(/Parameter/g, 'Bezeichnung');
-    const rows = section.rows.map(row => row.slice(0, 3).map(cell => sanitizeText(cell).replace(/^Sättigung$/i, 'Adiabate Befeuchtung').replace(/Parameter/g, 'Bezeichnung')));
+    const rows = normalizePdfRows(section.rows, title);
     return { title, rows, isLineSection: isLineSectionTitle(title) };
   });
 }

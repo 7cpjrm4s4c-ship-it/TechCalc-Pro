@@ -17,4 +17,4 @@ RC.11 stabilisiert die bestehende PDF Engine. Es wurden keine neuen Fachfunktion
 
 - `npm test` bestanden.
 - `npm run test:integration` bestanden.
-- Service-Worker-Precache ist auf `1.3.1-rc.11` synchronisiert.
+- Service-Worker-Precache ist auf `1.3.1-rc.11.1` synchronisiert.

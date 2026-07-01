@@ -265,7 +265,7 @@ export class GlobalPdfReport {
         endIndex += 1;
       }
       const blockHeight = headerHeight + topPad + segmentHeight + bottomPad;
-      this.ensureSpace(blockHeight + 2, { repeatTitle: groupTitle });
+      this.ensureSpace(blockHeight + 2);
       const y0 = this.cursorY;
       const bodyTop = y0 + headerHeight + topPad;
       this.rect(m, y0, w, blockHeight, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.55 });
@@ -299,7 +299,7 @@ export class GlobalPdfReport {
     let continued = false;
     while (index < pairs.length) {
       const title = continued ? `${section.title} (Fortsetzung)` : section.title;
-      this.ensureSpace(sectionTitleHeight(title) + 24, { repeatTitle: section.title });
+      this.ensureSpace(sectionTitleHeight(title) + 24);
       this.sectionTitle(title);
       const available = Math.max(36, this.contentBottom() - this.cursorY - 7);
       let segmentHeight = 0;
@@ -309,7 +309,7 @@ export class GlobalPdfReport {
         endIndex += 1;
       }
       const blockHeight = 4 + segmentHeight + 4;
-      this.ensureSpace(blockHeight + 2, { repeatTitle: section.title });
+      this.ensureSpace(blockHeight + 2);
       const y0 = this.cursorY;
       this.rect(m, y0, w, blockHeight, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
       let rowY = y0 + 4;
@@ -337,7 +337,7 @@ export class GlobalPdfReport {
     const ratio = Math.min((boxW - pad * 2) / imageW, (desiredH - pad * 2) / imageH);
     const imgW = imageW * ratio;
     const imgH = imageH * ratio;
-    this.ensureSpace(desiredH + 30, { repeatTitle: 'h,x-Diagramm' });
+    this.ensureSpace(desiredH + 30);
     this.sectionTitle('h,x-Diagramm');
     this.rect(m, this.cursorY, boxW, desiredH, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
     // Preserve aspect ratio exactly; center inside a fixed chart frame so the diagram is never vertically compressed or cropped.
