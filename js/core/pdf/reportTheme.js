@@ -43,4 +43,4 @@ export const PDF_GRID = {
   valueRightRatio: 0.23
 };
 
-export const REPORT_TEMPLATE_VERSION = 'global-report-template-7-rc9-alignment-pagination-chart';
+export const REPORT_TEMPLATE_VERSION = 'global-report-template-8-rc11-pixel-perfect-qa';

@@ -49,6 +49,14 @@ Keine neuen Features. Diese Version enthält ausschließlich PDF-Stabilisierung,
 
 
 
+## 1.3.1-rc.11
+
+- RC.11 PDF Engine Pixel Perfect QA.
+- Seitenumbruch-Guard gegen verwaiste Abschnittstitel ergänzt.
+- Dynamische Höhen für Projekt- und Corporate-Blöcke stabilisiert.
+- Sonderzeichen-Normalisierung für technische PDF-Werte erweitert.
+- PDF-Layout-Regressionsgate ergänzt.
+
 ## 1.3.1-rc.10.2
 
 - RC.10A: iOS-Dateiauswahl korrigiert. Der versteckte Projekt-Import-Input verwendet kein restriktives `accept` mehr, weil iOS Files unbekannte Custom-Endungen wie `.tcproj` dadurch ausgraut. Die Dateitypprüfung bleibt vollständig im Parser erhalten.
