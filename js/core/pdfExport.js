@@ -64,6 +64,40 @@ function updateOpenedProjectLabel() {
   label.textContent = name ? `Geöffnet: ${name}` : 'Kein externes Projekt geöffnet';
 }
 
+async function applySelectedProjectFile(file) {
+  if (!file) return false;
+  const data = await readProjectFile(file);
+  applyProjectData(data, { fileName: file.name || 'TechCalc Projektdatei' });
+  hydrateProjectForm(readProject());
+  updateOpenedProjectLabel();
+  return true;
+}
+
+async function openProjectWithNativePicker() {
+  if (typeof window === 'undefined' || typeof window.showOpenFilePicker !== 'function') return false;
+  try {
+    const [handle] = await window.showOpenFilePicker({
+      multiple: false,
+      excludeAcceptAllOption: false,
+      types: [{
+        description: 'TechCalc Projektdateien',
+        accept: {
+          'application/json': ['.tcproj', '.json'],
+          'application/vnd.techcalc.project+json': ['.tcproj'],
+          'application/vnd.techcalc.project': ['.tcp']
+        }
+      }]
+    });
+    const file = await handle.getFile();
+    await applySelectedProjectFile(file);
+    return true;
+  } catch (error) {
+    if (error?.name === 'AbortError') return true;
+    console.warn('Native Projekt-Dateiauswahl nicht verfügbar, verwende Input-Fallback.', error);
+    return false;
+  }
+}
+
 function readStoredCompanyLogo() {
   const metaLogo = getProjectMeta().companyLogo || '';
   if (metaLogo) return metaLogo;
@@ -224,18 +258,21 @@ function initProjectSettings() {
     const saved = await downloadProjectFile();
     if (saved) flashProjectSaved();
   });
-  document.getElementById('openProjectButton')?.addEventListener('click', event => {
+  document.getElementById('openProjectButton')?.addEventListener('click', async event => {
     event.preventDefault();
-    document.getElementById('openProjectFile')?.click();
+    try {
+      const openedNative = await openProjectWithNativePicker();
+      if (!openedNative) document.getElementById('openProjectFile')?.click();
+    } catch (error) {
+      console.error('Projekt konnte nicht geöffnet werden.', error);
+      alert(error.message || 'Projekt konnte nicht geöffnet werden.');
+    }
   });
   document.getElementById('openProjectFile')?.addEventListener('change', async event => {
     const file = event.target.files?.[0];
     if (!file) return;
     try {
-      const data = await readProjectFile(file);
-      applyProjectData(data, { fileName: file.name });
-      hydrateProjectForm(readProject());
-      updateOpenedProjectLabel();
+      await applySelectedProjectFile(file);
     } catch (error) {
       console.error('Projekt konnte nicht geöffnet werden.', error);
       alert(error.message || 'Projekt konnte nicht geöffnet werden.');

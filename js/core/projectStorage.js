@@ -534,11 +534,20 @@ async function looksLikeZipArchive(file) {
   }
 }
 
+export const PROJECT_FILE_EXTENSIONS = ['.tcproj', '.json', '.tcp'];
+
 function normalizeProjectFileExtension(name = '') {
-  const lower = String(name || '').toLowerCase();
+  const lower = String(name || '').toLowerCase().trim();
   if (lower.endsWith('.tcproj')) return 'tcproj';
   if (lower.endsWith('.json')) return 'json';
   if (lower.endsWith('.tcp')) return 'tcp';
+  return '';
+}
+
+function normalizeProjectFileType(type = '') {
+  const lower = String(type || '').toLowerCase().trim();
+  if (lower === 'application/vnd.techcalc.project' || lower === 'application/zip') return 'tcp';
+  if (lower === 'application/vnd.techcalc.project+json' || lower === 'application/json' || lower === 'text/json') return 'json';
   return '';
 }
 
@@ -554,28 +563,32 @@ function hydrateEmbeddedProjectAssets(parsed = {}) {
 }
 
 function validateProjectPayload(parsed) {
-  if (!parsed || parsed.format !== 'techcalc-project') {
+  if (parsed?.project && typeof parsed.project === 'object') parsed = parsed.project;
+  if (!parsed || typeof parsed !== 'object' || parsed.format !== 'techcalc-project') {
     throw new Error('Die Datei ist kein gültiges TechCalc-Projekt.');
   }
+  parsed.meta = parsed.meta && typeof parsed.meta === 'object' ? parsed.meta : {};
+  parsed.modules = parsed.modules && typeof parsed.modules === 'object' ? parsed.modules : {};
   return parsed;
 }
 
 export async function readProjectFile(file) {
   const name = file?.name || '';
-  const extension = normalizeProjectFileExtension(name);
+  const extension = normalizeProjectFileExtension(name) || normalizeProjectFileType(file?.type);
   const isZipBackedProject = extension === 'tcp' || await looksLikeZipArchive(file);
 
-  if (!extension && !isZipBackedProject) {
+  if (!file || (!extension && !isZipBackedProject)) {
     throw new Error('Bitte eine TechCalc-Projektdatei mit der Endung .tcproj, .json oder .tcp auswählen.');
   }
 
   if (isZipBackedProject) {
-    const parsed = validateProjectPayload(await readTcpArchive(file));
+    const parsed = hydrateEmbeddedProjectAssets(validateProjectPayload(await readTcpArchive(file)));
     return clone(parsed);
   }
 
   try {
-    const text = await file.text();
+    const text = String(await file.text()).replace(/^\uFEFF/, '').trim();
+    if (!text) throw new SyntaxError('empty project file');
     const parsed = hydrateEmbeddedProjectAssets(validateProjectPayload(JSON.parse(text)));
     return clone(parsed);
   } catch (error) {

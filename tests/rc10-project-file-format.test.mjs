@@ -41,6 +41,15 @@ assert.equal(tcproj.modules['hx-diagram'].state.savedRecords[0].name, 'Diagramm'
 const legacyJson = await readProjectFile(makeFile('legacy.json', JSON.stringify(project), 'application/json'));
 assert.equal(legacyJson.meta.companyLogoName, 'logo.png', '.json import must preserve legacy embedded logo metadata');
 
+const mimeOnlyTcproj = await readProjectFile(makeFile('', JSON.stringify(project), 'application/vnd.techcalc.project+json'));
+assert.equal(mimeOnlyTcproj.format, 'techcalc-project', 'native picker files without usable names must still open by MIME type');
+
+const bomTcproj = await readProjectFile(makeFile('bom.tcproj', `\uFEFF${JSON.stringify(project)}`, ''));
+assert.equal(bomTcproj.meta.projectNo, 'RC10-001', '.tcproj reader must tolerate UTF-8 BOM');
+
+const wrappedTcproj = await readProjectFile(makeFile('wrapped.tcproj', JSON.stringify({ project }), ''));
+assert.equal(wrappedTcproj.format, 'techcalc-project', 'wrapped project envelopes must be accepted for legacy exports');
+
 await assert.rejects(
   () => readProjectFile(makeFile('invalid.txt', JSON.stringify(project), 'text/plain')),
   /\.tcproj, \.json oder \.tcp/
