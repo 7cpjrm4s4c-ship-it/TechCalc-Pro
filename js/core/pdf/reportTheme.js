@@ -16,9 +16,9 @@ export const PDF_THEME = {
   accent: [7, 89, 133],
   table: {
     gap: 18,
-    rowMinHeight: 14.2,
-    rowPaddingTop: 4.8,
-    rowPaddingBottom: 4.6,
+    rowMinHeight: 15.8,
+    rowPaddingTop: 5.2,
+    rowPaddingBottom: 5.0,
     labelSize: 6.15,
     valueSize: 6.35,
     labelColor: [71, 85, 105],
@@ -26,17 +26,18 @@ export const PDF_THEME = {
   },
   chart: {
     maxWidth: 548,
-    maxHeight: 250,
-    minHeight: 118,
+    maxHeight: 330,
+    minHeight: 260,
+    fixedHeight: 320,
     padding: 6,
   }
 };
 
 export const PDF_GRID = {
-  labelLeftRatio: 0.30,
-  valueLeftRatio: 0.20,
-  labelRightRatio: 0.30,
-  valueRightRatio: 0.20
+  labelLeftRatio: 0.27,
+  valueLeftRatio: 0.23,
+  labelRightRatio: 0.27,
+  valueRightRatio: 0.23
 };
 
-export const REPORT_TEMPLATE_VERSION = 'global-report-template-5-rc7-fixed-anchors';
+export const REPORT_TEMPLATE_VERSION = 'global-report-template-6-rc8-final-grid';

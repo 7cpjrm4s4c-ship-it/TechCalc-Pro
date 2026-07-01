@@ -56,15 +56,15 @@ function tableColumns(x, width) {
   return {
     left: {
       labelX: x,
-      labelW: labelLeftW - 4,
-      valueRightX: leftValueRightX,
-      valueW: valueLeftW - 6
+      labelW: Math.max(72, labelLeftW - 5),
+      valueRightX: leftValueRightX - 2,
+      valueW: Math.max(108, valueLeftW - 6)
     },
     right: {
       labelX: rightLabelX,
-      labelW: labelRightW - 4,
-      valueRightX: rightValueRightX,
-      valueW: valueRightW - 6
+      labelW: Math.max(72, labelRightW - 5),
+      valueRightX: rightValueRightX - 2,
+      valueW: Math.max(108, valueRightW - 6)
     },
     rowLineEnd: x + width
   };
@@ -86,7 +86,7 @@ function pairRowHeight(pair, columns, { labelSize = PDF_THEME.table.labelSize, v
     const valueLines = splitPdfText(pdfValueForRow(row), col.valueW, valueSize).length;
     lines = Math.max(lines, labelLines, valueLines);
   });
-  return Math.max(PDF_THEME.table.rowMinHeight, lines * 8.0 + PDF_THEME.table.rowPaddingTop + PDF_THEME.table.rowPaddingBottom);
+  return Math.max(PDF_THEME.table.rowMinHeight, lines * Math.max(labelSize, valueSize) * 1.22 + PDF_THEME.table.rowPaddingTop + PDF_THEME.table.rowPaddingBottom);
 }
 
 function drawPairedRow(report, pair, x, y, width, rowHeight, { labelSize = PDF_THEME.table.labelSize, valueSize = PDF_THEME.table.valueSize } = {}) {
@@ -94,7 +94,8 @@ function drawPairedRow(report, pair, x, y, width, rowHeight, { labelSize = PDF_T
   pair.forEach((row, index) => {
     if (!row) return;
     const col = index === 0 ? columns.left : columns.right;
-    const baseline = y + PDF_THEME.table.rowPaddingTop + 5.0;
+    const lineBox = Math.max(labelSize, valueSize) * 1.18;
+    const baseline = y + Math.max(PDF_THEME.table.rowPaddingTop + 4.8, (rowHeight - lineBox) / 2 + 5.0);
     report.text(row?.[0] || '-', col.labelX, baseline, {
       size: labelSize,
       font: 'F2',
@@ -267,15 +268,16 @@ export class GlobalPdfReport {
     const w = PDF_PAGE.width - m * 2;
     const boxW = w;
     const pad = PDF_THEME.chart.padding;
-    const imageAspect = this.images.chartImage.width / Math.max(1, this.images.chartImage.height);
-    const naturalBoxH = (boxW - pad * 2) / Math.max(1.35, Math.min(imageAspect, 4.35)) + pad * 2;
-    const desiredH = Math.min(PDF_THEME.chart.maxHeight, Math.max(PDF_THEME.chart.minHeight, naturalBoxH));
-    const ratio = Math.min((boxW - pad * 2) / this.images.chartImage.width, (desiredH - pad * 2) / this.images.chartImage.height);
-    const imgW = this.images.chartImage.width * ratio;
-    const imgH = this.images.chartImage.height * ratio;
-    this.ensureSpace(desiredH + 26, { repeatTitle: 'h,x-Diagramm' });
+    const desiredH = PDF_THEME.chart.fixedHeight || Math.min(PDF_THEME.chart.maxHeight, Math.max(PDF_THEME.chart.minHeight, boxW * 0.58));
+    const imageW = Math.max(1, this.images.chartImage.width || boxW);
+    const imageH = Math.max(1, this.images.chartImage.height || desiredH);
+    const ratio = Math.min((boxW - pad * 2) / imageW, (desiredH - pad * 2) / imageH);
+    const imgW = imageW * ratio;
+    const imgH = imageH * ratio;
+    this.ensureSpace(desiredH + 30, { repeatTitle: 'h,x-Diagramm' });
     this.sectionTitle('h,x-Diagramm');
     this.rect(m, this.cursorY, boxW, desiredH, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
+    // Preserve aspect ratio exactly; center inside a fixed chart frame so the diagram is never vertically compressed or cropped.
     this.drawImage('ImChart', m + (boxW - imgW) / 2, this.cursorY + pad + (desiredH - pad * 2 - imgH) / 2, imgW, imgH);
     this.cursorY += desiredH + 8;
   }

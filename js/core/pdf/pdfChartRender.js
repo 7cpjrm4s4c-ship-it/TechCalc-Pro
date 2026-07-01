@@ -85,8 +85,7 @@ export async function canvasToJpeg(canvas, { maxWidth = 1200, maxHeight = 700, q
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
     ctx.drawImage(canvas, 0, 0, width, height);
-    const cropped = cropCanvasToContent(out, { padding: 16, threshold: 252 });
-    return { dataUrl: cropped.toDataURL('image/jpeg', quality), width: cropped.width, height: cropped.height };
+    return { dataUrl: out.toDataURL('image/jpeg', quality), width: out.width, height: out.height };
   } catch (error) {
     console.warn('PDF-Canvas konnte nicht gerendert werden.', error);
     return null;
@@ -137,8 +136,7 @@ export async function svgToJpeg(svgMarkup, { maxWidth = 1400, maxHeight = 960, q
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
     ctx.drawImage(img, 0, 0, width, height);
-    const cropped = cropCanvasToContent(canvas, { padding: 16, threshold: 252 });
-    return { dataUrl: cropped.toDataURL('image/jpeg', quality), width: cropped.width, height: cropped.height };
+    return { dataUrl: canvas.toDataURL('image/jpeg', quality), width: canvas.width, height: canvas.height };
   } catch (error) {
     console.warn('PDF-SVG konnte nicht gerendert werden.', error);
     return null;
