@@ -1,60 +1,103 @@
-import { PDF_PAGE, PDF_THEME } from './reportTheme.js';
+import { PDF_PAGE, PDF_THEME, PDF_GRID } from './reportTheme.js';
 import { reportSections, lineSectionItems } from './pdfDataMapping.js';
 import { parseJpegDataUrl } from './pdfChartRender.js';
-import { sanitizeText, normalizeKey, pdfHexText, pdfNumber, estimateTextWidth, splitPdfText, rgb, rowHeightForPdfRow, pdfRowValue } from './pdfText.js';
+import { sanitizeText, normalizeKey, pdfHexText, pdfNumber, estimateTextWidth, splitPdfText, rgb, pdfRowValue } from './pdfText.js';
+
+function cleanRows(rows = []) {
+  return rows
+    .filter(row => normalizeKey(row?.[0] || '') !== 'bezeichnung')
+    .filter(row => row.some(cell => sanitizeText(cell)));
+}
 
 function pairedRowsForPdf(rows = []) {
-  const cleanRows = rows.filter(row => normalizeKey(row?.[0] || '') !== 'bezeichnung').filter(row => row.some(cell => sanitizeText(cell)));
-  const preferredOrder = ['leistung','massenstrom','volumenstrom','temperaturdifferenz','waermetraeger','rohrdimension','rohrabmessung','werkstoff','geschwindigkeit','druckverlust'];
+  const rowsClean = cleanRows(rows);
+  const preferredOrder = [
+    'leistung', 'massenstrom', 'volumenstrom', 'temperaturdifferenz', 'waermetraeger',
+    'rohrdimension', 'rohrabmessung', 'werkstoff', 'geschwindigkeit', 'druckverlust'
+  ];
   const rank = row => {
     const key = normalizeKey(row?.[0] || '');
     const index = preferredOrder.indexOf(key);
-    return index === -1 ? preferredOrder.length + cleanRows.indexOf(row) : index;
+    return index === -1 ? preferredOrder.length + rowsClean.indexOf(row) : index;
   };
-  const ordered = [...cleanRows].sort((a, b) => rank(a) - rank(b));
-  const leftCount = Math.ceil(ordered.length / 2);
-  const left = ordered.slice(0, leftCount);
-  const right = ordered.slice(leftCount);
-  const pairCount = Math.max(left.length, right.length);
-  const pairs = [];
-  for (let index = 0; index < pairCount; index += 1) pairs.push([left[index] || null, right[index] || null]);
-  return pairs;
+  const ordered = [...rowsClean].sort((a, b) => rank(a) - rank(b));
+  return pairSequentialRows(ordered);
 }
 
-function fourColumnPairs(rows = []) {
-  const cleanRows = rows.filter(row => row.some(cell => sanitizeText(cell)));
-  const leftCount = Math.ceil(cleanRows.length / 2);
-  const left = cleanRows.slice(0, leftCount);
-  const right = cleanRows.slice(leftCount);
+function pairSequentialRows(rows = []) {
+  const leftCount = Math.ceil(rows.length / 2);
+  const left = rows.slice(0, leftCount);
+  const right = rows.slice(leftCount);
   const pairs = [];
-  for (let index = 0; index < Math.max(left.length, right.length); index += 1) pairs.push([left[index] || null, right[index] || null]);
+  for (let index = 0; index < Math.max(left.length, right.length); index += 1) {
+    pairs.push([left[index] || null, right[index] || null]);
+  }
   return pairs;
 }
-
 
 function pdfValueForRow(row = []) {
   return pdfRowValue(row).replace(/ - /g, ' x ');
 }
 
-function pairRowHeight(pair, labelWidth, valueWidth, { labelSize = 6.25, valueSize = 6.45 } = {}) {
-  let lines = 1;
-  pair.forEach(row => {
-    if (!row) return;
-    const labelLines = splitPdfText(row?.[0] || '-', labelWidth, labelSize).length;
-    const valueLines = splitPdfText(pdfValueForRow(row), valueWidth, valueSize).length;
-    lines = Math.max(lines, labelLines, valueLines);
-  });
-  return Math.max(12.2, lines * 7.7 + 4.4);
+function tableColumns(x, width) {
+  const gap = PDF_THEME.table.gap;
+  const available = width - gap;
+  const leftW = available * 0.5;
+  const rightW = available * 0.5;
+  const labelLeftW = leftW * PDF_GRID.labelLeftRatio / (PDF_GRID.labelLeftRatio + PDF_GRID.valueLeftRatio);
+  const valueLeftW = leftW - labelLeftW;
+  const labelRightW = rightW * PDF_GRID.labelRightRatio / (PDF_GRID.labelRightRatio + PDF_GRID.valueRightRatio);
+  const valueRightW = rightW - labelRightW;
+  return {
+    left: {
+      labelX: x,
+      labelW: labelLeftW,
+      valueRightX: x + labelLeftW + valueLeftW,
+      valueW: valueLeftW - 4
+    },
+    right: {
+      labelX: x + leftW + gap,
+      labelW: labelRightW,
+      valueRightX: x + leftW + gap + labelRightW + valueRightW,
+      valueW: valueRightW - 4
+    },
+    rowLineEnd: x + width
+  };
 }
 
-function drawPairedRow(report, pair, x, y, pairWidth, gap, labelWidth, valueWidth, rowHeight, { labelSize = 6.25, valueSize = 6.45 } = {}) {
-  pair.forEach((row, pairIndex) => {
+function pairRowHeight(pair, columns, { labelSize = PDF_THEME.table.labelSize, valueSize = PDF_THEME.table.valueSize } = {}) {
+  let lines = 1;
+  pair.forEach((row, index) => {
     if (!row) return;
-    const pairX = x + pairIndex * (pairWidth + gap);
-    const label = sanitizeText(row?.[0] || '-');
-    const value = pdfValueForRow(row);
-    report.text(label, pairX, y + 7.2, { size: labelSize, font: 'F2', color: [71, 85, 105], maxWidth: labelWidth });
-    report.text(value, pairX + pairWidth - 2, y + 7.2, { size: valueSize, font: 'F2', align: 'right', maxWidth: valueWidth });
+    const col = index === 0 ? columns.left : columns.right;
+    const labelLines = splitPdfText(row?.[0] || '-', col.labelW - 4, labelSize).length;
+    const valueLines = splitPdfText(pdfValueForRow(row), col.valueW, valueSize).length;
+    lines = Math.max(lines, labelLines, valueLines);
+  });
+  return Math.max(PDF_THEME.table.rowMinHeight, lines * 7.4 + PDF_THEME.table.rowPaddingTop + PDF_THEME.table.rowPaddingBottom);
+}
+
+function drawPairedRow(report, pair, x, y, width, rowHeight, { labelSize = PDF_THEME.table.labelSize, valueSize = PDF_THEME.table.valueSize } = {}) {
+  const columns = tableColumns(x, width);
+  pair.forEach((row, index) => {
+    if (!row) return;
+    const col = index === 0 ? columns.left : columns.right;
+    const baseline = y + PDF_THEME.table.rowPaddingTop + 4.6;
+    report.text(row?.[0] || '-', col.labelX, baseline, {
+      size: labelSize,
+      font: 'F2',
+      color: PDF_THEME.table.labelColor,
+      maxWidth: col.labelW - 4,
+      lineHeight: 1.15
+    });
+    report.text(pdfValueForRow(row), col.valueRightX, baseline, {
+      size: valueSize,
+      font: 'F4',
+      color: PDF_THEME.table.valueColor,
+      align: 'right',
+      maxWidth: col.valueW,
+      lineHeight: 1.15
+    });
   });
 }
 
@@ -74,17 +117,17 @@ export class GlobalPdfReport {
   y(topY) { return PDF_PAGE.height - topY; }
   color(values, stroke = false) { this.cmd(`${rgb(values)} ${stroke ? 'RG' : 'rg'}`); }
 
-  text(value, x, y, { size = 8, font = 'F1', color = PDF_THEME.text, align = 'left', maxWidth = null } = {}) {
+  text(value, x, y, { size = 8, font = 'F1', color = PDF_THEME.text, align = 'left', maxWidth = null, lineHeight = 1.18 } = {}) {
     const lines = maxWidth ? splitPdfText(value, maxWidth, size) : [sanitizeText(value)];
     lines.forEach((line, index) => {
-      const lineY = y + index * size * 1.18;
+      const lineY = y + index * size * lineHeight;
       let lineX = x;
-      if (align === 'center') lineX = x - estimateTextWidth(line, size) / 2;
-      if (align === 'right') lineX = x - estimateTextWidth(line, size);
+      if (align === 'center') lineX = x - estimateTextWidth(line, size, font) / 2;
+      if (align === 'right') lineX = x - estimateTextWidth(line, size, font);
       this.color(color);
       this.cmd(`BT /${font} ${pdfNumber(size)} Tf ${pdfNumber(lineX)} ${pdfNumber(this.y(lineY))} Td ${pdfHexText(line)} Tj ET`);
     });
-    return lines.length * size * 1.18;
+    return lines.length * size * lineHeight;
   }
 
   line(x1, y1, x2, y2, color = PDF_THEME.line, width = 0.5) {
@@ -162,11 +205,8 @@ export class GlobalPdfReport {
     const w = PDF_PAGE.width - m * 2;
     const innerX = m + 5;
     const innerW = w - 10;
-    const gap = 22;
-    const pairW = (innerW - gap) / 2;
-    const labelW = 120;
-    const valueW = pairW - labelW - 2;
-    const rowHeights = pairs.map(pair => pairRowHeight(pair, labelW - 4, valueW, { labelSize: 6.2, valueSize: 6.45 }));
+    const columns = tableColumns(innerX, innerW);
+    const rowHeights = pairs.map(pair => pairRowHeight(pair, columns, { labelSize: 6.2, valueSize: 6.35 }));
     const headerHeight = 18;
     const topPad = 4.5;
     const bottomPad = 5.5;
@@ -180,8 +220,8 @@ export class GlobalPdfReport {
     let rowY = bodyTop;
     pairs.forEach((pair, index) => {
       const h = rowHeights[index];
-      this.line(innerX, rowY + h - 2.1, innerX + innerW, rowY + h - 2.1, [226, 232, 240], 0.32);
-      drawPairedRow(this, pair, innerX, rowY, pairW, gap, labelW - 4, valueW, h, { labelSize: 6.2, valueSize: 6.45 });
+      this.line(innerX, rowY + h - 2.1, innerX + innerW, rowY + h - 2.1, PDF_THEME.rowLine, 0.32);
+      drawPairedRow(this, pair, innerX, rowY, innerW, h, { labelSize: 6.2, valueSize: 6.35 });
       rowY += h;
     });
     this.cursorY += blockHeight + 6;
@@ -191,26 +231,22 @@ export class GlobalPdfReport {
     const rows = section.rows.filter(row => row.some(cell => sanitizeText(cell)));
     if (!rows.length) return;
     this.sectionTitle(section.title);
-    const pairs = fourColumnPairs(rows);
+    const pairs = pairSequentialRows(rows);
     const m = PDF_THEME.margin;
     const w = PDF_PAGE.width - m * 2;
-    const x0 = m;
-    const innerX = x0 + 3;
-    const innerW = w - 6;
-    const gap = 22;
-    const pairW = (innerW - gap) / 2;
-    const labelW = 120;
-    const valueW = pairW - labelW - 2;
-    const rowHeights = pairs.map(pair => pairRowHeight(pair, labelW - 4, valueW, { labelSize: 6.15, valueSize: 6.35 }));
-    const blockHeight = 4 + rowHeights.reduce((sum, h) => sum + h, 0) + 3;
+    const innerX = m + 5;
+    const innerW = w - 10;
+    const columns = tableColumns(innerX, innerW);
+    const rowHeights = pairs.map(pair => pairRowHeight(pair, columns, { labelSize: 6.1, valueSize: 6.25 }));
+    const blockHeight = 4 + rowHeights.reduce((sum, h) => sum + h, 0) + 4;
     this.ensureSpace(blockHeight + 2, { repeatTitle: section.title });
     const y0 = this.cursorY;
     this.rect(m, y0, w, blockHeight, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
     let rowY = y0 + 4;
     pairs.forEach((pair, index) => {
       const h = rowHeights[index];
-      this.line(innerX, rowY + h - 2, innerX + innerW, rowY + h - 2, [226, 232, 240], 0.3);
-      drawPairedRow(this, pair, innerX, rowY, pairW, gap, labelW - 4, valueW, h, { labelSize: 6.15, valueSize: 6.35 });
+      this.line(innerX, rowY + h - 2, innerX + innerW, rowY + h - 2, PDF_THEME.rowLine, 0.3);
+      drawPairedRow(this, pair, innerX, rowY, innerW, h, { labelSize: 6.1, valueSize: 6.25 });
       rowY += h;
     });
     this.cursorY += blockHeight + 5;
@@ -220,14 +256,17 @@ export class GlobalPdfReport {
     if (!this.images.chartImage) return;
     const m = PDF_THEME.margin;
     const w = PDF_PAGE.width - m * 2;
-    const ratio = Math.min(w / this.images.chartImage.width, 360 / this.images.chartImage.height);
+    const boxW = w;
+    const desiredH = Math.min(PDF_THEME.chart.maxHeight, Math.max(PDF_THEME.chart.minHeight, boxW * 0.42));
+    const pad = PDF_THEME.chart.padding;
+    const ratio = Math.min((boxW - pad * 2) / this.images.chartImage.width, (desiredH - pad * 2) / this.images.chartImage.height);
     const imgW = this.images.chartImage.width * ratio;
     const imgH = this.images.chartImage.height * ratio;
     this.sectionTitle('h,x-Diagramm');
-    this.ensureSpace(imgH + 10, { repeatTitle: 'h,x-Diagramm' });
-    this.rect(m, this.cursorY, w, imgH + 10, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
-    this.drawImage('ImChart', m + (w - imgW) / 2, this.cursorY + 5, imgW, imgH);
-    this.cursorY += imgH + 16;
+    this.ensureSpace(desiredH + 10, { repeatTitle: 'h,x-Diagramm' });
+    this.rect(m, this.cursorY, boxW, desiredH, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
+    this.drawImage('ImChart', m + (boxW - imgW) / 2, this.cursorY + (desiredH - imgH) / 2, imgW, imgH);
+    this.cursorY += desiredH + 8;
   }
 
   corporateBlock(project, moduleData) {
@@ -292,6 +331,8 @@ export class GlobalPdfReport {
     const addObject = value => { objects.push(value); return objects.length; };
     const fontRegularId = addObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
     const fontBoldId = addObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+    const fontMonoId = addObject('<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>');
+    const fontMonoBoldId = addObject('<< /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold /Encoding /WinAnsiEncoding >>');
     const imageObjectIds = new Map();
     this.imageResources.forEach(resource => {
       const image = parseJpegDataUrl(resource.image);
@@ -308,7 +349,7 @@ export class GlobalPdfReport {
       contentIds.push(addObject(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`));
     });
     const pagesIdPlaceholder = objects.length + this.pages.length + 1;
-    this.pages.forEach((page, index) => pageIds.push(addObject(`<< /Type /Page /Parent ${pagesIdPlaceholder} 0 R /MediaBox [0 0 ${PDF_PAGE.width} ${PDF_PAGE.height}] /Resources << /Font << /F1 ${fontRegularId} 0 R /F2 ${fontBoldId} 0 R >> ${xObjectResource} >> /Contents ${contentIds[index]} 0 R >>`)));
+    this.pages.forEach((page, index) => pageIds.push(addObject(`<< /Type /Page /Parent ${pagesIdPlaceholder} 0 R /MediaBox [0 0 ${PDF_PAGE.width} ${PDF_PAGE.height}] /Resources << /Font << /F1 ${fontRegularId} 0 R /F2 ${fontBoldId} 0 R /F3 ${fontMonoId} 0 R /F4 ${fontMonoBoldId} 0 R >> ${xObjectResource} >> /Contents ${contentIds[index]} 0 R >>`)));
     const pagesId = addObject(`<< /Type /Pages /Kids [${pageIds.map(id => `${id} 0 R`).join(' ')}] /Count ${pageIds.length} >>`);
     const catalogId = addObject(`<< /Type /Catalog /Pages ${pagesId} 0 R >>`);
     const chunks = ['%PDF-1.4\n'];

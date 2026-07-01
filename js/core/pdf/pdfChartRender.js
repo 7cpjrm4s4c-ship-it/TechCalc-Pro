@@ -1,3 +1,46 @@
+
+function cropCanvasToContent(sourceCanvas, { padding = 18, threshold = 246 } = {}) {
+  const width = sourceCanvas.width;
+  const height = sourceCanvas.height;
+  const ctx = sourceCanvas.getContext('2d');
+  const data = ctx.getImageData(0, 0, width, height).data;
+  let minX = width, minY = height, maxX = -1, maxY = -1;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const i = (y * width + x) * 4;
+      const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+      if (a > 20 && (r < threshold || g < threshold || b < threshold)) {
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+    }
+  }
+  if (maxX < minX || maxY < minY) return sourceCanvas;
+  minX = Math.max(0, minX - padding);
+  minY = Math.max(0, minY - padding);
+  maxX = Math.min(width - 1, maxX + padding);
+  maxY = Math.min(height - 1, maxY + padding);
+  const cropW = Math.max(1, maxX - minX + 1);
+  const cropH = Math.max(1, maxY - minY + 1);
+  // Avoid pathological ultra-wide chart captures by keeping enough vertical context.
+  if (cropW / Math.max(1, cropH) > 5.5) {
+    const targetH = Math.min(height, Math.round(cropW / 3.2));
+    const centerY = Math.round((minY + maxY) / 2);
+    minY = Math.max(0, Math.min(height - targetH, centerY - Math.floor(targetH / 2)));
+    maxY = Math.min(height - 1, minY + targetH - 1);
+  }
+  const out = document.createElement('canvas');
+  out.width = Math.max(1, maxX - minX + 1);
+  out.height = Math.max(1, maxY - minY + 1);
+  const outCtx = out.getContext('2d');
+  outCtx.fillStyle = '#ffffff';
+  outCtx.fillRect(0, 0, out.width, out.height);
+  outCtx.drawImage(sourceCanvas, minX, minY, out.width, out.height, 0, 0, out.width, out.height);
+  return out;
+}
+
 export function imageElementFromSource(source) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -42,7 +85,8 @@ export async function canvasToJpeg(canvas, { maxWidth = 1200, maxHeight = 700, q
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
     ctx.drawImage(canvas, 0, 0, width, height);
-    return { dataUrl: out.toDataURL('image/jpeg', quality), width, height };
+    const cropped = cropCanvasToContent(out, { padding: 20 });
+    return { dataUrl: cropped.toDataURL('image/jpeg', quality), width: cropped.width, height: cropped.height };
   } catch (error) {
     console.warn('PDF-Canvas konnte nicht gerendert werden.', error);
     return null;
@@ -93,7 +137,8 @@ export async function svgToJpeg(svgMarkup, { maxWidth = 1400, maxHeight = 960, q
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
     ctx.drawImage(img, 0, 0, width, height);
-    return { dataUrl: canvas.toDataURL('image/jpeg', quality), width, height };
+    const cropped = cropCanvasToContent(canvas, { padding: 20 });
+    return { dataUrl: cropped.toDataURL('image/jpeg', quality), width: cropped.width, height: cropped.height };
   } catch (error) {
     console.warn('PDF-SVG konnte nicht gerendert werden.', error);
     return null;

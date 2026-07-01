@@ -57,7 +57,8 @@ export function pdfNumber(value) {
   return Number(value).toFixed(2).replace(/\.00$/, '').replace(/0$/, '');
 }
 
-export function estimateTextWidth(text, size = 8) {
+export function estimateTextWidth(text, size = 8, font = 'F1') {
+  if (font === 'F3' || font === 'F4') return sanitizeText(text).length * size * 0.6;
   // Approximate Helvetica widths. A single length factor made right-aligned
   // values drift visibly between numbers, units and long German labels. This
   // table keeps the PDF value columns optically aligned without embedding fonts.
