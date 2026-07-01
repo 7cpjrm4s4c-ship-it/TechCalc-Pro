@@ -47,3 +47,8 @@ Keine neuen Features. Diese Version enthält ausschließlich PDF-Stabilisierung,
 - h,x-Diagramm-Captures werden beschnitten und in eine feste Diagramm-Box eingepasst.
 - PDF-Theme-Konfiguration für Raster, Zeilenhöhe und Diagrammflächen ergänzt.
 
+
+
+## 1.3.1-rc.10.2
+
+- RC.10A: iOS-Dateiauswahl korrigiert. Der versteckte Projekt-Import-Input verwendet kein restriktives `accept` mehr, weil iOS Files unbekannte Custom-Endungen wie `.tcproj` dadurch ausgraut. Die Dateitypprüfung bleibt vollständig im Parser erhalten.

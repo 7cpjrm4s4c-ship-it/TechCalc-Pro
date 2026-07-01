@@ -55,4 +55,9 @@ await assert.rejects(
   /\.tcproj, \.json oder \.tcp/
 );
 
+
+const indexHtml = await import('node:fs/promises').then(fs => fs.readFile(new URL('../index.html', import.meta.url), 'utf8'));
+assert.match(indexHtml, /<input[^>]+id="openProjectFile"[^>]+type="file"[^>]*>/, 'project file input must exist');
+assert.doesNotMatch(indexHtml, /id="openProjectFile"[^>]+accept=/, 'iOS Files greys out custom .tcproj extensions when accept is restrictive; runtime validation must replace accept filtering');
+
 console.log('RC.10 project file format regression ok');
