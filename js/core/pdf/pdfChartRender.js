@@ -52,13 +52,22 @@ export async function canvasToJpeg(canvas, { maxWidth = 1200, maxHeight = 700, q
 export async function svgToJpeg(svgMarkup, { maxWidth = 1200, maxHeight = 760, quality = 0.9 } = {}) {
   if (!svgMarkup) return null;
   try {
-    const blob = new Blob([svgMarkup], { type: 'image/svg+xml;charset=utf-8' });
+    let markup = String(svgMarkup || '');
+    if (!/xmlns=/.test(markup)) markup = markup.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+    const viewBox = markup.match(/viewBox=["']([^"']+)["']/i)?.[1]?.split(/\s+/).map(Number) || [];
+    const vbW = Number.isFinite(viewBox[2]) ? viewBox[2] : maxWidth;
+    const vbH = Number.isFinite(viewBox[3]) ? viewBox[3] : maxHeight;
+    if (!/\swidth=/.test(markup)) markup = markup.replace('<svg', `<svg width="${vbW}"`);
+    if (!/\sheight=/.test(markup)) markup = markup.replace('<svg', `<svg height="${vbH}"`);
+    const blob = new Blob([markup], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const img = await imageElementFromSource(url);
     URL.revokeObjectURL(url);
-    const scale = Math.min(1, maxWidth / Math.max(1, img.naturalWidth || img.width), maxHeight / Math.max(1, img.naturalHeight || img.height));
-    const width = Math.max(1, Math.round((img.naturalWidth || img.width || maxWidth) * scale));
-    const height = Math.max(1, Math.round((img.naturalHeight || img.height || maxHeight) * scale));
+    const sourceW = img.naturalWidth || img.width || vbW || maxWidth;
+    const sourceH = img.naturalHeight || img.height || vbH || maxHeight;
+    const scale = Math.min(1, maxWidth / Math.max(1, sourceW), maxHeight / Math.max(1, sourceH));
+    const width = Math.max(1, Math.round(sourceW * scale));
+    const height = Math.max(1, Math.round(sourceH * scale));
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;

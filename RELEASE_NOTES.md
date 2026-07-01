@@ -1,3 +1,10 @@
+# TechCalc Pro 1.3.1 RC 3
+
+- PDF-Raster für Heiz/Kälte, Trinkwasser und WRG stabilisiert.
+- Lange Werte werden kontrolliert mehrzeilig gesetzt statt in Nachbarspalten zu laufen.
+- h,x-Diagramm-Export robuster vorbereitet.
+- RC-1C-Korrekturen für professionelle PDF-Ausrichtung.
+
 # TechCalc Pro 1.3.1 RC 2
 
 ## RC-1C.1 – PDF-Korrekturen und PDF-Engine-Refactoring
@@ -23,3 +30,11 @@ Die bisherige monolithische `js/core/pdfExport.js` wurde aufgeteilt:
 
 ### RC-Regeln
 Keine neuen Features. Diese Version enthält ausschließlich PDF-Stabilisierung, Fehlerkorrekturen und Wartbarkeitsverbesserungen im Rahmen von RC-1C.
+
+
+## Phase 37E – RC Closure
+- Release-Candidate-Closure-Audit bleibt für RC-Builds dokumentiert.
+
+
+## Phase 38F
+- Esbuild-Minification-Audit bleibt für RC-Builds dokumentiert.

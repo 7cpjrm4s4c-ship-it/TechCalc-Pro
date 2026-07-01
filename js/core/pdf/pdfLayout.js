@@ -31,6 +31,33 @@ function fourColumnPairs(rows = []) {
   return pairs;
 }
 
+
+function pdfValueForRow(row = []) {
+  return pdfRowValue(row).replace(/ - /g, ' x ');
+}
+
+function pairRowHeight(pair, labelWidth, valueWidth, { labelSize = 6.25, valueSize = 6.45 } = {}) {
+  let lines = 1;
+  pair.forEach(row => {
+    if (!row) return;
+    const labelLines = splitPdfText(row?.[0] || '-', labelWidth, labelSize).length;
+    const valueLines = splitPdfText(pdfValueForRow(row), valueWidth, valueSize).length;
+    lines = Math.max(lines, labelLines, valueLines);
+  });
+  return Math.max(12.2, lines * 8.2 + 4.2);
+}
+
+function drawPairedRow(report, pair, x, y, pairWidth, gap, labelWidth, valueWidth, rowHeight, { labelSize = 6.25, valueSize = 6.45 } = {}) {
+  pair.forEach((row, pairIndex) => {
+    if (!row) return;
+    const pairX = x + pairIndex * (pairWidth + gap);
+    const label = sanitizeText(row?.[0] || '-');
+    const value = pdfValueForRow(row);
+    report.text(label, pairX, y + 7.2, { size: labelSize, font: 'F2', color: [71, 85, 105], maxWidth: labelWidth });
+    report.text(value, pairX + pairWidth, y + 7.2, { size: valueSize, font: 'F2', align: 'right', maxWidth: valueWidth });
+  });
+}
+
 export class GlobalPdfReport {
   constructor(images = {}) {
     this.images = images;
@@ -131,36 +158,31 @@ export class GlobalPdfReport {
 
   lineBlock(item, groupTitle = '') {
     const pairs = pairedRowsForPdf(item.rows);
-    const headerHeight = 18;
-    const rowHeight = 13.1;
-    const topPad = 5;
-    const bottomPad = 6;
-    const blockHeight = headerHeight + topPad + Math.max(1, pairs.length) * rowHeight + bottomPad;
-    this.ensureSpace(blockHeight + 2, { repeatTitle: groupTitle });
     const m = PDF_THEME.margin;
     const w = PDF_PAGE.width - m * 2;
+    const innerX = m + 5;
+    const innerW = w - 10;
+    const gap = 22;
+    const pairW = (innerW - gap) / 2;
+    const labelW = 118;
+    const valueW = pairW - labelW;
+    const rowHeights = pairs.map(pair => pairRowHeight(pair, labelW - 4, valueW, { labelSize: 6.2, valueSize: 6.45 }));
+    const headerHeight = 18;
+    const topPad = 4.5;
+    const bottomPad = 5.5;
+    const blockHeight = headerHeight + topPad + rowHeights.reduce((sum, h) => sum + h, 0) + bottomPad;
+    this.ensureSpace(blockHeight + 2, { repeatTitle: groupTitle });
     const y0 = this.cursorY;
     const bodyTop = y0 + headerHeight + topPad;
     this.rect(m, y0, w, blockHeight, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.55 });
     this.rect(m, y0, w, headerHeight, { fill: PDF_THEME.soft, stroke: PDF_THEME.line, width: 0.45 });
     this.text(item.title || 'Abschnitt', m + 5, y0 + 11.2, { size: 7.8, font: 'F2', maxWidth: w - 10 });
-    const innerX = m + 5;
-    const innerW = w - 10;
-    const gap = 20;
-    const pairW = (innerW - gap) / 2;
-    const labelW = 130;
-    const valueW = pairW - labelW;
+    let rowY = bodyTop;
     pairs.forEach((pair, index) => {
-      const rowY = bodyTop + index * rowHeight;
-      this.line(innerX, rowY + rowHeight - 2.1, innerX + innerW, rowY + rowHeight - 2.1, [226, 232, 240], 0.32);
-      pair.forEach((row, pairIndex) => {
-        if (!row) return;
-        const x = innerX + pairIndex * (pairW + gap);
-        const label = sanitizeText(row?.[0] || '-');
-        const value = pdfRowValue(row).replace(/ - /g, ' x ');
-        this.text(label, x, rowY + 7.8, { size: 6.25, font: 'F2', color: [71, 85, 105], maxWidth: labelW - 4 });
-        this.text(value, x + pairW, rowY + 7.8, { size: 6.5, font: 'F2', align: 'right', maxWidth: valueW });
-      });
+      const h = rowHeights[index];
+      this.line(innerX, rowY + h - 2.1, innerX + innerW, rowY + h - 2.1, [226, 232, 240], 0.32);
+      drawPairedRow(this, pair, innerX, rowY, pairW, gap, labelW - 4, valueW, h, { labelSize: 6.2, valueSize: 6.45 });
+      rowY += h;
     });
     this.cursorY += blockHeight + 6;
   }
@@ -172,30 +194,24 @@ export class GlobalPdfReport {
     const pairs = fourColumnPairs(rows);
     const m = PDF_THEME.margin;
     const w = PDF_PAGE.width - m * 2;
-    const rowHeight = 12.2;
-    const headerHeight = 1;
-    const blockHeight = headerHeight + pairs.length * rowHeight + 4;
-    this.ensureSpace(blockHeight + 2, { repeatTitle: section.title });
     const x0 = m;
     const innerX = x0 + 3;
     const innerW = w - 6;
-    const gap = 20;
+    const gap = 22;
     const pairW = (innerW - gap) / 2;
-    const labelW = 132;
+    const labelW = 122;
     const valueW = pairW - labelW;
+    const rowHeights = pairs.map(pair => pairRowHeight(pair, labelW - 4, valueW, { labelSize: 6.15, valueSize: 6.35 }));
+    const blockHeight = 4 + rowHeights.reduce((sum, h) => sum + h, 0) + 3;
+    this.ensureSpace(blockHeight + 2, { repeatTitle: section.title });
     const y0 = this.cursorY;
     this.rect(m, y0, w, blockHeight, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
+    let rowY = y0 + 4;
     pairs.forEach((pair, index) => {
-      const rowY = y0 + 4 + index * rowHeight;
-      this.line(innerX, rowY + rowHeight - 2, innerX + innerW, rowY + rowHeight - 2, [226, 232, 240], 0.3);
-      pair.forEach((row, pairIndex) => {
-        if (!row) return;
-        const x = innerX + pairIndex * (pairW + gap);
-        const label = sanitizeText(row?.[0] || '-');
-        const value = pdfRowValue(row).replace(/ - /g, ' x ');
-        this.text(label, x, rowY + 7.2, { size: 6.25, font: 'F2', color: [71, 85, 105], maxWidth: labelW - 4 });
-        this.text(value, x + pairW, rowY + 7.2, { size: 6.45, font: 'F2', align: 'right', maxWidth: valueW });
-      });
+      const h = rowHeights[index];
+      this.line(innerX, rowY + h - 2, innerX + innerW, rowY + h - 2, [226, 232, 240], 0.3);
+      drawPairedRow(this, pair, innerX, rowY, pairW, gap, labelW - 4, valueW, h, { labelSize: 6.15, valueSize: 6.35 });
+      rowY += h;
     });
     this.cursorY += blockHeight + 5;
   }
@@ -254,14 +270,18 @@ export class GlobalPdfReport {
     this.projectData(project);
     const sections = reportSections(moduleData);
     const lineSections = sections.filter(section => section.isLineSection);
-    if (lineSections.length) {
+    const isHxDiagram = /hx|h,x/i.test(`${moduleData.id || ''} ${moduleData.title || ''}`);
+    if (isHxDiagram) {
+      this.chartBlock();
+      sections.forEach(section => this.standardSection(section));
+    } else if (lineSections.length) {
       const lineGroupTitle = 'LEITUNGSABSCHNITTE';
       this.sectionTitle(lineGroupTitle);
       lineSections.forEach(section => lineSectionItems(section.rows).forEach(item => this.lineBlock(item, lineGroupTitle)));
     } else {
       sections.forEach(section => this.standardSection(section));
     }
-    this.chartBlock();
+    if (!isHxDiagram) this.chartBlock();
     this.corporateBlock(project, moduleData);
     this.footer();
     return this.output();

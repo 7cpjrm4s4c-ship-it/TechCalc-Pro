@@ -58,7 +58,27 @@ export function pdfNumber(value) {
 }
 
 export function estimateTextWidth(text, size = 8) {
-  return sanitizeText(text).length * size * 0.48;
+  // Conservative width approximation for Helvetica. The previous factor was too
+  // optimistic and allowed long technical values to run over fixed PDF columns.
+  return sanitizeText(text).length * size * 0.56;
+}
+
+function splitLongToken(token, maxWidth, size) {
+  const clean = sanitizeText(token);
+  if (estimateTextWidth(clean, size) <= maxWidth) return [clean];
+  const chunks = [];
+  let current = '';
+  for (const ch of clean) {
+    const next = current + ch;
+    if (current && estimateTextWidth(next, size) > maxWidth) {
+      chunks.push(current);
+      current = ch;
+    } else {
+      current = next;
+    }
+  }
+  if (current) chunks.push(current);
+  return chunks;
 }
 
 export function splitPdfText(text, maxWidth, size = 8) {
@@ -67,9 +87,12 @@ export function splitPdfText(text, maxWidth, size = 8) {
   const lines = [];
   let line = '';
   words.forEach(word => {
-    const candidate = line ? `${line} ${word}` : word;
-    if (estimateTextWidth(candidate, size) <= maxWidth || !line) line = candidate;
-    else { lines.push(line); line = word; }
+    const wordParts = splitLongToken(word, maxWidth, size);
+    wordParts.forEach(part => {
+      const candidate = line ? `${line} ${part}` : part;
+      if (estimateTextWidth(candidate, size) <= maxWidth || !line) line = candidate;
+      else { lines.push(line); line = part; }
+    });
   });
   if (line) lines.push(line);
   return lines;

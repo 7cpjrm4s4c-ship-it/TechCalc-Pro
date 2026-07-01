@@ -88,7 +88,7 @@ export function collectCurrentModule(modulesRef, routeGetter) {
     if (!title) return;
     const rows = extractCardRows(card);
     if (isChartCard(card)) {
-      const svg = card.querySelector('svg');
+      const svg = card.querySelector('svg.hx-chart, .hx-chart svg, svg');
       const canvas = card.querySelector('canvas');
       chartSvg = svg ? svg.outerHTML : chartSvg;
       chartCanvas = canvas || chartCanvas;
@@ -97,6 +97,12 @@ export function collectCurrentModule(modulesRef, routeGetter) {
     }
     if (rows.length) sections.push({ title, rows });
   });
+
+  if (!chartSvg) {
+    const svg = app?.querySelector?.('svg.hx-chart, .hx-chart svg');
+    chartSvg = svg ? svg.outerHTML : '';
+  }
+  if (!chartCanvas) chartCanvas = app?.querySelector?.('.hx-chart canvas, canvas.hx-chart') || null;
 
   return {
     id,
@@ -151,7 +157,8 @@ export function lineSectionItems(rows = []) {
 }
 
 export function reportSections(moduleData) {
-  const hasLineSections = moduleData.sections.some(section => isLineSectionTitle(sectionTitle(section.title)));
+  const isHxDiagram = /hx|h,x/i.test(`${moduleData.id || ''} ${moduleData.title || ''}`);
+  const hasLineSections = !isHxDiagram && moduleData.sections.some(section => isLineSectionTitle(sectionTitle(section.title)));
   const printableSections = hasLineSections ? moduleData.sections.filter(section => isLineSectionTitle(sectionTitle(section.title))) : moduleData.sections;
   return printableSections.map(section => {
     const title = sectionTitle(section.title).replace(/Parameter/g, 'Bezeichnung');
