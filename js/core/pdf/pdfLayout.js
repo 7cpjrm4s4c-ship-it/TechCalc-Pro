@@ -40,31 +40,30 @@ function pdfValueForRow(row = []) {
 }
 
 function tableColumns(x, width) {
-  // One central grid for every report table: label/value | label/value.
-  // The value columns have fixed right anchors so every value, text and unit
-  // ends on the same vertical reference edge across all modules.
+  // RC.9: one immutable four-column grid for every module.  The even
+  // columns are not computed per row; they use fixed right anchors inside
+  // the two half-width cells.  This is the central reference edge requested
+  // for all values, units, text, formulas and special-character fallbacks.
   const gap = PDF_THEME.table.gap;
   const available = width - gap;
   const halfW = available / 2;
-  const labelLeftW = halfW * PDF_GRID.labelLeftRatio / (PDF_GRID.labelLeftRatio + PDF_GRID.valueLeftRatio);
-  const valueLeftW = halfW - labelLeftW;
-  const labelRightW = halfW * PDF_GRID.labelRightRatio / (PDF_GRID.labelRightRatio + PDF_GRID.valueRightRatio);
-  const valueRightW = halfW - labelRightW;
-  const leftValueRightX = x + halfW;
+  const valueW = Math.min(PDF_THEME.table.valueColumnWidth, Math.max(112, halfW * 0.48));
+  const labelW = Math.max(74, halfW - valueW - PDF_THEME.table.cellGap);
+  const leftValueRightX = x + halfW - PDF_THEME.table.valueRightInset;
   const rightLabelX = x + halfW + gap;
-  const rightValueRightX = x + width;
+  const rightValueRightX = x + width - PDF_THEME.table.valueRightInset;
   return {
     left: {
       labelX: x,
-      labelW: Math.max(72, labelLeftW - 5),
-      valueRightX: leftValueRightX - 2,
-      valueW: Math.max(108, valueLeftW - 6)
+      labelW,
+      valueRightX: leftValueRightX,
+      valueW
     },
     right: {
       labelX: rightLabelX,
-      labelW: Math.max(72, labelRightW - 5),
-      valueRightX: rightValueRightX - 2,
-      valueW: Math.max(108, valueRightW - 6)
+      labelW,
+      valueRightX: rightValueRightX,
+      valueW
     },
     rowLineEnd: x + width
   };
@@ -94,19 +93,25 @@ function drawPairedRow(report, pair, x, y, width, rowHeight, { labelSize = PDF_T
   pair.forEach((row, index) => {
     if (!row) return;
     const col = index === 0 ? columns.left : columns.right;
-    const lineBox = Math.max(labelSize, valueSize) * 1.18;
-    const baseline = y + Math.max(PDF_THEME.table.rowPaddingTop + 4.8, (rowHeight - lineBox) / 2 + 5.0);
-    report.text(row?.[0] || '-', col.labelX, baseline, {
+    const labelLineHeight = 1.15;
+    const valueLineHeight = 1.15;
+    const labelLines = splitPdfText(row?.[0] || '-', col.labelW - 4, labelSize).length;
+    const valueLines = splitPdfText(pdfValueForRow(row), col.valueW, valueSize).length;
+    const labelBlockH = Math.max(labelSize, labelLines * labelSize * labelLineHeight);
+    const valueBlockH = Math.max(valueSize, valueLines * valueSize * valueLineHeight);
+    const labelBaseline = y + Math.max(PDF_THEME.table.rowPaddingTop + labelSize, (rowHeight - labelBlockH) / 2 + labelSize);
+    const valueBaseline = y + Math.max(PDF_THEME.table.rowPaddingTop + valueSize, (rowHeight - valueBlockH) / 2 + valueSize);
+    report.text(row?.[0] || '-', col.labelX, labelBaseline, {
       size: labelSize,
       font: 'F2',
       color: PDF_THEME.table.labelColor,
       maxWidth: col.labelW - 4,
-      lineHeight: 1.15
+      lineHeight: labelLineHeight
     });
-    drawRightAlignedValue(report, pdfValueForRow(row), col.valueRightX, baseline, {
+    drawRightAlignedValue(report, pdfValueForRow(row), col.valueRightX, valueBaseline, {
       size: valueSize,
       maxWidth: col.valueW,
-      lineHeight: 1.15
+      lineHeight: valueLineHeight
     });
   });
 }
@@ -268,7 +273,7 @@ export class GlobalPdfReport {
     const w = PDF_PAGE.width - m * 2;
     const boxW = w;
     const pad = PDF_THEME.chart.padding;
-    const desiredH = PDF_THEME.chart.fixedHeight || Math.min(PDF_THEME.chart.maxHeight, Math.max(PDF_THEME.chart.minHeight, boxW * 0.58));
+    const desiredH = PDF_THEME.chart.fixedHeight || Math.min(PDF_THEME.chart.maxHeight, Math.max(PDF_THEME.chart.minHeight, boxW * 0.64));
     const imageW = Math.max(1, this.images.chartImage.width || boxW);
     const imageH = Math.max(1, this.images.chartImage.height || desiredH);
     const ratio = Math.min((boxW - pad * 2) / imageW, (desiredH - pad * 2) / imageH);

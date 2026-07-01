@@ -39,7 +39,7 @@ Keine neuen Features. Diese Version enthält ausschließlich PDF-Stabilisierung,
 ## Phase 38F
 - Esbuild-Minification-Audit bleibt für RC-Builds dokumentiert.
 
-## 1.3.1-rc.8
+## 1.3.1-rc.9
 
 - PDF Layout Engine zentralisiert: feste 4-Spalten-Matrix für alle Module.
 - Gerade Wertspalten verwenden eine feste rechte Bezugskante.

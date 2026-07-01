@@ -16,19 +16,22 @@ export const PDF_THEME = {
   accent: [7, 89, 133],
   table: {
     gap: 18,
-    rowMinHeight: 15.8,
-    rowPaddingTop: 5.2,
-    rowPaddingBottom: 5.0,
+    rowMinHeight: 17.2,
+    rowPaddingTop: 5.8,
+    rowPaddingBottom: 5.6,
     labelSize: 6.15,
-    valueSize: 6.35,
+    valueSize: 6.25,
     labelColor: [71, 85, 105],
-    valueColor: [17, 24, 39]
+    valueColor: [17, 24, 39],
+    valueColumnWidth: 126,
+    cellGap: 8,
+    valueRightInset: 2.5
   },
   chart: {
     maxWidth: 548,
-    maxHeight: 330,
-    minHeight: 260,
-    fixedHeight: 320,
+    maxHeight: 390,
+    minHeight: 310,
+    fixedHeight: 360,
     padding: 6,
   }
 };
@@ -40,4 +43,4 @@ export const PDF_GRID = {
   valueRightRatio: 0.23
 };
 
-export const REPORT_TEMPLATE_VERSION = 'global-report-template-6-rc8-final-grid';
+export const REPORT_TEMPLATE_VERSION = 'global-report-template-7-rc9-alignment-pagination-chart';
