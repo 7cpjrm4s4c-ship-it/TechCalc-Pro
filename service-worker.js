@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.1-rc.9';
-const CACHE_REVISION = '1.3.1-rc.9-techcalc-pro-1-3-1-rc-6';
+const CACHE_NAME = 'techcalc-pro-1.3.1-rc.10';
+const CACHE_REVISION = '1.3.1-rc.10-techcalc-pro-1-3-1-rc-6';
 const ASSETS = [
   './',
   './index.html',

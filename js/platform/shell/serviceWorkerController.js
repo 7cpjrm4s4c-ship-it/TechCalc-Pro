@@ -2,6 +2,7 @@ import { markPerformance, startPerformanceSpan } from './performanceController.j
 
 let serviceWorkerControllerInitialized = false;
 let reloadOnControllerChange = false;
+let activeWaitingWorker = null;
 
 export const DEFAULT_CACHE_UPDATED_TYPE = 'TECHCALC_CACHE_UPDATED';
 
@@ -13,48 +14,50 @@ function defaultRegisterUrl(appVersion = '') {
 
 function ensureUpdateBanner(windowRef, documentRef, waitingWorker) {
   if (!documentRef?.body || !waitingWorker) return;
+  activeWaitingWorker = waitingWorker;
 
   let banner = documentRef.getElementById('techcalcUpdateBanner');
   if (!banner) {
     banner = documentRef.createElement('div');
     banner.id = 'techcalcUpdateBanner';
     banner.className = 'tc-update-banner';
-    banner.setAttribute('role', 'status');
-    banner.setAttribute('aria-live', 'polite');
+    banner.setAttribute('role', 'alert');
+    banner.setAttribute('aria-live', 'assertive');
     banner.innerHTML = `
-      <span>Neue Version verfügbar.</span>
+      <span>Neue Version verfügbar. Bitte aktualisieren, um die aktuelle App-Version zu verwenden.</span>
       <button type="button" class="tc-update-banner__button">Aktualisieren</button>
-      <button type="button" class="tc-update-banner__dismiss" aria-label="Update-Hinweis schließen">×</button>
     `;
     documentRef.body.appendChild(banner);
   }
 
   const updateButton = banner.querySelector('.tc-update-banner__button');
-  const dismissButton = banner.querySelector('.tc-update-banner__dismiss');
-
-  updateButton?.addEventListener('click', () => {
-    reloadOnControllerChange = true;
-    try {
-      waitingWorker.postMessage({ type: 'SKIP_WAITING' });
-      updateButton.disabled = true;
-      updateButton.textContent = 'Aktualisiere …';
-    } catch (error) {
-      console.warn('Service worker update could not be activated:', error);
-      windowRef.location.reload();
-    }
-  }, { once: true });
-
-  dismissButton?.addEventListener('click', () => {
-    banner.remove();
-  }, { once: true });
+  if (updateButton) {
+    updateButton.disabled = false;
+    updateButton.textContent = 'Aktualisieren';
+    updateButton.onclick = () => {
+      reloadOnControllerChange = true;
+      try {
+        activeWaitingWorker?.postMessage({ type: 'SKIP_WAITING' });
+        updateButton.disabled = true;
+        updateButton.textContent = 'Aktualisiere …';
+      } catch (error) {
+        console.warn('Service worker update could not be activated:', error);
+        windowRef.location.reload();
+      }
+    };
+  }
 
   banner.hidden = false;
+}
+
+function hasControlledPage(windowRef) {
+  return Boolean(windowRef.navigator?.serviceWorker?.controller);
 }
 
 function watchRegistration(registration, windowRef, documentRef) {
   if (!registration) return;
 
-  if (registration.waiting && windowRef.navigator?.serviceWorker?.controller) {
+  if (registration.waiting && hasControlledPage(windowRef)) {
     ensureUpdateBanner(windowRef, documentRef, registration.waiting);
   }
 
@@ -63,7 +66,7 @@ function watchRegistration(registration, windowRef, documentRef) {
     if (!newWorker) return;
 
     newWorker.addEventListener?.('statechange', () => {
-      if (newWorker.state === 'installed' && windowRef.navigator?.serviceWorker?.controller) {
+      if (newWorker.state === 'installed' && hasControlledPage(windowRef)) {
         markPerformance('service-worker:update-available');
         ensureUpdateBanner(windowRef, documentRef, newWorker);
       }
@@ -101,10 +104,14 @@ export function initializeServiceWorkerController(options = {}) {
     const finishRegistration = startPerformanceSpan('service-worker:register', { registerUrl });
     navigatorRef.serviceWorker
       .register(registerUrl)
-      .then(registration => {
+      .then(async registration => {
         finishRegistration({ status: 'ok' });
         watchRegistration(registration, windowRef, documentRef);
-        return registration?.update?.();
+        await registration?.update?.();
+        if (registration?.waiting && hasControlledPage(windowRef)) {
+          ensureUpdateBanner(windowRef, documentRef, registration.waiting);
+        }
+        return registration;
       })
       .catch(error => {
         finishRegistration({ status: 'error', error: error?.message || String(error) });

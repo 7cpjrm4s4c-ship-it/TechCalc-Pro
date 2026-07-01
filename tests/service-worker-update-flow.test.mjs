@@ -39,10 +39,8 @@ const documentRef = {
       '.tc-update-banner__button': {
         disabled: false,
         textContent: 'Aktualisieren',
+        onclick: null,
         addEventListener(type, handler) { add(nodeListeners, `button:${type}`, handler); }
-      },
-      '.tc-update-banner__dismiss': {
-        addEventListener(type, handler) { add(nodeListeners, `dismiss:${type}`, handler); }
       }
     };
     return {
@@ -54,7 +52,7 @@ const documentRef = {
       set innerHTML(value) { this._innerHTML = value; },
       get innerHTML() { return this._innerHTML || ''; },
       querySelector(selector) { return nodes[selector] || null; },
-      clickUpdate() { emit(nodeListeners, 'button:click', {}); }
+      clickUpdate() { nodes['.tc-update-banner__button'].onclick?.({}); }
     };
   }
 };
@@ -81,6 +79,7 @@ await Promise.resolve();
 assert.match(registeredUrl, /service-worker\.js\?v=test/);
 assert.ok(body.appended, 'update banner should be appended when a waiting worker exists');
 assert.equal(body.appended.hidden, false);
+assert.ok(!body.appended.innerHTML.includes('tc-update-banner__dismiss'), 'update banner must not be dismissible before installation');
 body.appended.clickUpdate();
 assert.deepEqual(postedMessage, { type: 'SKIP_WAITING' });
 emit(controllerListeners, 'controllerchange', {});

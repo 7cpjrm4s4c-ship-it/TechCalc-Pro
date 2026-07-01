@@ -534,22 +534,15 @@ async function looksLikeZipArchive(file) {
   }
 }
 
-export async function readProjectFile(file) {
-  const name = file?.name || '';
-  const isTcp = /\.tcp$/i.test(name);
-  const isZipBackedProject = isTcp || await looksLikeZipArchive(file);
-  if (isZipBackedProject) {
-    const parsed = await readTcpArchive(file);
-    if (!parsed || parsed.format !== 'techcalc-project') {
-      throw new Error('Die Datei ist kein gültiges TechCalc-Projekt.');
-    }
-    return clone(parsed);
-  }
-  const text = await file.text();
-  const parsed = JSON.parse(text);
-  if (!parsed || parsed.format !== 'techcalc-project') {
-    throw new Error('Die Datei ist kein gültiges TechCalc-Projekt.');
-  }
+function normalizeProjectFileExtension(name = '') {
+  const lower = String(name || '').toLowerCase();
+  if (lower.endsWith('.tcproj')) return 'tcproj';
+  if (lower.endsWith('.json')) return 'json';
+  if (lower.endsWith('.tcp')) return 'tcp';
+  return '';
+}
+
+function hydrateEmbeddedProjectAssets(parsed = {}) {
   const assetLogo = parsed.assets?.companyLogo;
   if (assetLogo?.dataUrl) {
     parsed.meta = parsed.meta || {};
@@ -557,5 +550,38 @@ export async function readProjectFile(file) {
     parsed.meta.companyLogoName = parsed.meta.companyLogoName || assetLogo.name || 'company-logo';
     parsed.meta.companyLogoMime = parsed.meta.companyLogoMime || assetLogo.mime || '';
   }
-  return clone(parsed);
+  return parsed;
+}
+
+function validateProjectPayload(parsed) {
+  if (!parsed || parsed.format !== 'techcalc-project') {
+    throw new Error('Die Datei ist kein gültiges TechCalc-Projekt.');
+  }
+  return parsed;
+}
+
+export async function readProjectFile(file) {
+  const name = file?.name || '';
+  const extension = normalizeProjectFileExtension(name);
+  const isZipBackedProject = extension === 'tcp' || await looksLikeZipArchive(file);
+
+  if (!extension && !isZipBackedProject) {
+    throw new Error('Bitte eine TechCalc-Projektdatei mit der Endung .tcproj, .json oder .tcp auswählen.');
+  }
+
+  if (isZipBackedProject) {
+    const parsed = validateProjectPayload(await readTcpArchive(file));
+    return clone(parsed);
+  }
+
+  try {
+    const text = await file.text();
+    const parsed = hydrateEmbeddedProjectAssets(validateProjectPayload(JSON.parse(text)));
+    return clone(parsed);
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error('Die Projektdatei konnte nicht gelesen werden. Erwartet wird eine gültige .tcproj- oder .json-Projektdatei.');
+    }
+    throw error;
+  }
 }
