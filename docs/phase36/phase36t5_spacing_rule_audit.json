@@ -1,5 +1,5 @@
 {
-  "basis": "techcalc-pro-1.3.2-dev.1-rc.1-phase36t4-rainwater-inner-card-spacing-audit.zip",
+  "basis": "techcalc-pro-1.3.2-dev.2-rc.1-phase36t4-rainwater-inner-card-spacing-audit.zip",
   "relevant_rules": [
     {
       "selector": ".card__body, .tc-card__body, .result-card__body",

@@ -1,11 +1,18 @@
-## 1.3.2-dev.1 – Release Notes UI
+## 1.3.2-dev.2 – Central UI Tokens & Light Theme Foundation
+
+- Light Theme auf zentrale Tokens fuer Hintergrund, Flaechen, Rahmen, Typografie, Radien, Schatten und Akzentfarben gehoben.
+- Header-Menue, Einstellungen, weitere Module, Accordions und Dropdowns im Light Mode auf helles zentrales UI-System gestellt.
+- Akzentfarben verstaerkt, Fokuszustaende und aktive Elemente kontrastreicher dargestellt.
+- Dark/System funktional unveraendert belassen.
+
+## 1.3.2-dev.2 – Release Notes UI
 
 - Release Notes werden chronologisch absteigend sortiert.
 - Neueste Änderung steht immer zuerst.
 - Doppelte und verschachtelte Zwischenüberschriften werden nicht mehr als eigene Release-Cards angezeigt.
 - Card-Abstände folgen dem globalen Standardraster.
 
-## 1.3.2-dev.1 – Code Freeze
+## 1.3.2-dev.2 – Code Freeze
 
 - Versionierung, Service Worker Cache und Precache-Revision auf RC.12 synchronisiert.
 - Runtime-Code auf verbliebene Debug-Ausgaben geprüft.

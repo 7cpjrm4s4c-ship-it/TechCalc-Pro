@@ -1,8 +1,8 @@
-# TechCalc Pro Modulvertrag 1.3.2-dev.1
+# TechCalc Pro Modulvertrag 1.3.2-dev.2
 
 ## Ziel
 
-Ab 1.3.2-dev.1 ist die App die Plattform. Module liefern fachliche Beschreibung und Berechnungslogik, aber keine eigenen UI-Regeln.
+Ab 1.3.2-dev.2 ist die App die Plattform. Module liefern fachliche Beschreibung und Berechnungslogik, aber keine eigenen UI-Regeln.
 
 ## Verbindliche Modulstruktur
 

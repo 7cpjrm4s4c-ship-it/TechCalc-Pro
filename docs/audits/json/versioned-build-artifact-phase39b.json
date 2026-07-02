@@ -2,7 +2,7 @@
   "phase": "39B",
   "name": "Versioned Build Artifact",
   "status": "passed",
-  "artifact": "techcalc-pro-1.3.2-dev.1-rc.1",
+  "artifact": "techcalc-pro-1.3.2-dev.2-rc.1",
   "files": 181,
   "checks": [
     "build:minified creates dist/",

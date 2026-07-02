@@ -1,6 +1,6 @@
 # Phase 36T.1 – Rainwater Layout Audit
 
-Basis: `techcalc-pro-1.3.2-dev.1-rc.1-phase36s3-platform-navigation-parity.zip`
+Basis: `techcalc-pro-1.3.2-dev.2-rc.1-phase36s3-platform-navigation-parity.zip`
 
 ## Kurzbefund
 

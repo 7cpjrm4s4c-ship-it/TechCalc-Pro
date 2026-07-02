@@ -1,8 +1,8 @@
-# Migration Summary 1.3.2-dev.1
+# Migration Summary 1.3.2-dev.2
 
 ## Objective
 
-Version 1.3.2-dev.1 moved TechCalc Pro from module-specific implementation patterns toward a shared platform runtime. The work focused on maintainability, consistent UX, repeatable quality gates and release readiness.
+Version 1.3.2-dev.2 moved TechCalc Pro from module-specific implementation patterns toward a shared platform runtime. The work focused on maintainability, consistent UX, repeatable quality gates and release readiness.
 
 ## Architecture Outcomes
 
@@ -52,4 +52,4 @@ The platform baseline covers the following active modules:
 
 ## Post-Release Direction
 
-After `1.3.2-dev.1-rc.1`, only bugfixes, regression fixes and documentation corrections should enter the release branch. New features and larger refactorings should wait until after the 1.3.2-dev.1 release.
+After `1.3.2-dev.2-rc.1`, only bugfixes, regression fixes and documentation corrections should enter the release branch. New features and larger refactorings should wait until after the 1.3.2-dev.2 release.

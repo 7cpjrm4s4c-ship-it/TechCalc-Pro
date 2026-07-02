@@ -180,3 +180,46 @@ canvas {
   --section-gap: var(--tc-gap);
 }
 
+
+/* 1.3.2A — Central UI Tokens & Light Theme Foundation
+   Light receives its own complete token set. Dark/System behavior is left unchanged. */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --tc-light-bg: #f4f1ea;
+  --tc-light-bg-elevated: #fbfaf7;
+  --tc-light-surface: #ffffff;
+  --tc-light-surface-soft: #f2f0eb;
+  --tc-light-field: #efeeeb;
+  --tc-light-border: #c8c3b8;
+  --tc-light-border-strong: #a8a193;
+  --tc-light-text: #17202c;
+  --tc-light-muted: #4b5563;
+  --tc-light-dim: #687386;
+
+  --color-bg-0: var(--tc-light-bg);
+  --color-bg-1: var(--tc-light-bg-elevated);
+  --color-surface: var(--tc-light-surface);
+  --color-surface-strong: var(--tc-light-surface);
+  --color-surface-soft: var(--tc-light-surface-soft);
+  --color-border: color-mix(in srgb, var(--tc-light-border) 78%, transparent);
+  --color-border-strong: var(--tc-light-border-strong);
+  --color-text: var(--tc-light-text);
+  --color-muted: var(--tc-light-muted);
+  --color-dim: var(--tc-light-dim);
+
+  --accent-blue: #0072ce;
+  --accent-cyan: #008fb8;
+  --accent-orange: #d96b1f;
+  --accent-green: #087f5b;
+  --accent-purple: #6d5bd0;
+  --tc-accent-soft: rgba(0,114,206,.14);
+  --tc-accent-border: rgba(0,114,206,.55);
+
+  --tc-radius-base: 14px;
+  --tc-radius-card: 18px;
+  --tc-card-padding: 12px;
+  --tc-gap: 12px;
+  --shadow-glass: 0 1px 0 rgba(255,255,255,.85) inset, 0 10px 28px rgba(63,54,39,.08);
+  --shadow-active: 0 0 0 2px rgba(0,114,206,.42), 0 0 0 5px rgba(0,114,206,.14);
+  --header-glass-bg: var(--tc-light-bg-elevated);
+}

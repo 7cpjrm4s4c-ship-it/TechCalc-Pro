@@ -1,11 +1,11 @@
-# TechCalc Pro 1.3.2-dev.1 Release Notes
+# TechCalc Pro 1.3.2-dev.2 Release Notes
 
 Status: Release-stabilized baseline after Phase 31D  
-Target: 1.3.2-dev.1 release candidate stream
+Target: 1.3.2-dev.2 release candidate stream
 
 ## Executive Summary
 
-TechCalc Pro 1.3.2-dev.1 is the platform consolidation release. The central objective was not a single feature, but the migration from module-local behavior and legacy UI handling toward a consistent platform runtime for calculation modules.
+TechCalc Pro 1.3.2-dev.2 is the platform consolidation release. The central objective was not a single feature, but the migration from module-local behavior and legacy UI handling toward a consistent platform runtime for calculation modules.
 
 The release hardens the application around shared contracts for rendering, saved records, input confirmation, focus behavior, scrolling, module mounting, auditability and documentation structure.
 
@@ -72,8 +72,8 @@ Phase 31C module smoke result: 11/11 modules passed the structural smoke audit.
 
 Known limitations are tracked separately in:
 
-- `docs/release/KNOWN_LIMITATIONS_1.3.2-dev.1.md`
+- `docs/release/KNOWN_LIMITATIONS_1.3.2-dev.2.md`
 
 ## Release Recommendation
 
-After Phase 31D, the project is ready for Phase 31E: release-candidate marking as `1.3.2-dev.1-rc.1`, assuming the local browser smoke test confirms the same behavior as the automated gates.
+After Phase 31D, the project is ready for Phase 31E: release-candidate marking as `1.3.2-dev.2-rc.1`, assuming the local browser smoke test confirms the same behavior as the automated gates.

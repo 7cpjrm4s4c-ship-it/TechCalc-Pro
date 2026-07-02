@@ -1,5 +1,5 @@
 {
-  "basis": "techcalc-pro-1.3.2-dev.1-rc.1-phase36v2-hx-platform-focus-targets.zip",
+  "basis": "techcalc-pro-1.3.2-dev.2-rc.1-phase36v2-hx-platform-focus-targets.zip",
   "focus_current_accepts_platform_focus": true,
   "event_pipeline_handles_segment_keydown": true,
   "event_pipeline_preserves_platform_focus": true,

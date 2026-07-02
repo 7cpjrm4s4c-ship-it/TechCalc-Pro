@@ -1,6 +1,6 @@
 # Phase 36U.2A – Wastewater CSS Inventory
 
-Basis: `techcalc-pro-1.3.2-dev.1-rc.1-phase36u1-wastewater-dynamic-wrapper-stack.zip`
+Basis: `techcalc-pro-1.3.2-dev.2-rc.1-phase36u1-wastewater-dynamic-wrapper-stack.zip`
 
 ## Kurzbefund
 

@@ -1,4 +1,4 @@
-# TechCalc Pro 1.3.2-dev.1 Plattform-Refactor
+# TechCalc Pro 1.3.2-dev.2 Plattform-Refactor
 
 ## Ziel
 
@@ -159,4 +159,4 @@ Neu hinzugekommen:
 - `js/core/quality/appHealth.js`
 - `docs/QUALITY_GATES_1_3_0.md`
 
-Damit ist 1.3.2-dev.1 nicht nur ein Architekturumbau, sondern eine belastbare Release-Basis.
+Damit ist 1.3.2-dev.2 nicht nur ein Architekturumbau, sondern eine belastbare Release-Basis.

@@ -29,4 +29,4 @@ Phase 37E schließt die Stabilisierungsrunde nach Phase 37A–37D ab. Der Fokus 
 
 ## Bewertung
 
-Phase 37 ist releasefähig abgeschlossen. Die verbleibenden nächsten Schritte sind keine Stabilisierungsblocker mehr, sondern RC-/Release-Prozessschritte: finaler manueller Mobile-Test, Hosting-Deploy, Cache-Update-Test und Tagging von `1.3.2-dev.1-rc.1`.
+Phase 37 ist releasefähig abgeschlossen. Die verbleibenden nächsten Schritte sind keine Stabilisierungsblocker mehr, sondern RC-/Release-Prozessschritte: finaler manueller Mobile-Test, Hosting-Deploy, Cache-Update-Test und Tagging von `1.3.2-dev.2-rc.1`.

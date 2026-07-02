@@ -18,19 +18,19 @@ Key sections: Ziel; Ergebnis; Stabilisierungsaenderungen; 1. Release-Gate-Skript
 
 ### Phase  31C MODULE SMOKE TEST
 
-Release-Hardening vor `1.3.2-dev.1-rc.1`: alle elf Produktionsmodule werden gegen die zentrale Plattform-UX geprüft. `npm run test:module-smoke` meldet: Phase 31C module smoke audit: 11/11 pass, 0 review Audit-Artefakte gehören nicht ins Projekt-Root. Der neue Report liegt unter:
+Release-Hardening vor `1.3.2-dev.2-rc.1`: alle elf Produktionsmodule werden gegen die zentrale Plattform-UX geprüft. `npm run test:module-smoke` meldet: Phase 31C module smoke audit: 11/11 pass, 0 review Audit-Artefakte gehören nicht ins Projekt-Root. Der neue Report liegt unter:
 
 Key sections: Ziel; Geprüfte Kriterien; Ergebnis; Geprüfte Module; Audit-Ablage.
 
 ### Phase  31D RELEASE NOTES CHANGELOG
 
-Die 1.3.2-dev.1-Arbeit wurde releasefähig zusammengefasst und unter `docs/` dokumentiert. Phase 31D verändert keine Runtime-Logik. Die Phase ist dokumentations- und release-orientiert. Empfehlung: Weiter mit Phase 31E und Markierung von `1.3.2-dev.1-rc.1`, nachdem der Browser-Smoke-Test bestätigt wurde.
+Die 1.3.2-dev.2-Arbeit wurde releasefähig zusammengefasst und unter `docs/` dokumentiert. Phase 31D verändert keine Runtime-Logik. Die Phase ist dokumentations- und release-orientiert. Empfehlung: Weiter mit Phase 31E und Markierung von `1.3.2-dev.2-rc.1`, nachdem der Browser-Smoke-Test bestätigt wurde.
 
 Key sections: Ziel; Erstellt / aktualisiert; Inhaltliche Abdeckung; Release-Entscheidung.
 
 ### Phase  31E RELEASE CANDIDATE
 
-Markierung des stabilisierten 1.3.x-Standes als Release Candidate `1.3.2-dev.1-rc.1` nach Abschluss von Runtime Review, lokalem Build-/Testlauf, modulweisem Smoke Audit und Release-Dokumentation. Phase 31E ist abgeschlossen. Der Stand ist als `1.3.2-dev.1-rc.1` markiert und darf bis zur finalen Freigabe nur noch Bugfixes, Regression-Fixes, Dokumentationskorrekturen und notwendige Test-/Audit-Korrekturen erhalten.
+Markierung des stabilisierten 1.3.x-Standes als Release Candidate `1.3.2-dev.2-rc.1` nach Abschluss von Runtime Review, lokalem Build-/Testlauf, modulweisem Smoke Audit und Release-Dokumentation. Phase 31E ist abgeschlossen. Der Stand ist als `1.3.2-dev.2-rc.1` markiert und darf bis zur finalen Freigabe nur noch Bugfixes, Regression-Fixes, Dokumentationskorrekturen und notwendige Test-/Audit-Korrekturen erhalten.
 
 Key sections: Ziel; Umsetzung; Quality Gate; Entscheidung.
 

@@ -1,6 +1,6 @@
-# Changelog 1.3.2-dev.1
+# Changelog 1.3.2-dev.2
 
-## 1.3.2-dev.1 - Platform Consolidation Release
+## 1.3.2-dev.2 - Platform Consolidation Release
 
 ### Added
 
@@ -37,7 +37,7 @@
 
 ### Documentation
 
-- Added consolidated release notes for 1.3.2-dev.1.
-- Added migration summary for 1.3.2-dev.1.
-- Added known limitations for 1.3.2-dev.1.
+- Added consolidated release notes for 1.3.2-dev.2.
+- Added migration summary for 1.3.2-dev.2.
+- Added known limitations for 1.3.2-dev.2.
 - Added Phase 31D release documentation summary.
