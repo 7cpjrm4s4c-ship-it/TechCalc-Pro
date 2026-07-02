@@ -1,6 +1,6 @@
 import { validateFormSchema, readSchemaDefaults } from './formSchema.js';
 
-export const MODULE_CONTRACT_VERSION = '1.3.0';
+export const MODULE_CONTRACT_VERSION = '1.3.2-dev.1';
 
 export const MODULE_CAPABILITIES = Object.freeze({
   LEGACY_MOUNT: 'legacyMount',

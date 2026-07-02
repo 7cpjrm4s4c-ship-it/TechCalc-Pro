@@ -1,5 +1,5 @@
 export const performanceBudget = Object.freeze({
-  version: '1.3.0-phase5',
+  version: '1.3.2-dev.1-phase5',
   maxInitialBlockingMs: 150,
   maxModuleMountMs: 80,
   maxRouteRenderMs: 120,

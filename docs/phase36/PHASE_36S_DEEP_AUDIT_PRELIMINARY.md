@@ -1,6 +1,6 @@
 # Phase 36S – Deep Audit Tab/Enter + Spacing
 
-Basis: `techcalc-pro-1.3.0-rc.1-phase36q5a-focus-details-auto-open.zip`
+Basis: `techcalc-pro-1.3.2-dev.1-rc.1-phase36q5a-focus-details-auto-open.zip`
 ## 1. Modulvergleich Event-/Focus-Pfade
 ### js/modules/heating-cooling
 - `bindCentralEventPipeline`: False

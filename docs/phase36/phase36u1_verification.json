@@ -1,5 +1,5 @@
 {
-  "basis": "techcalc-pro-1.3.0-rc.1-phase36t6-rainwater-dynamic-wrapper-stack.zip",
+  "basis": "techcalc-pro-1.3.2-dev.1-rc.1-phase36t6-rainwater-dynamic-wrapper-stack.zip",
   "wastewater_css_exceptions_existing": {
     "css/components.css": [
       "[data-ww-dynamic=\"additional-flows\"]",

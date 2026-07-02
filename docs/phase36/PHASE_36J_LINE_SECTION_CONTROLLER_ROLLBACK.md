@@ -8,7 +8,7 @@ Damit ist der gemeinsame `platform/lineSectionController` als Fix-Hebel zu riska
 Der gemeinsame `js/platform/lineSectionController/index.js` wurde aus dem Stand vor 36A.4 wiederhergestellt.
 
 Referenzpaket:
-`techcalc-pro-1.3.0-rc.1-phase36a3-rainwater-dynamic-renderer.zip`
+`techcalc-pro-1.3.2-dev.1-rc.1-phase36a3-rainwater-dynamic-renderer.zip`
 
 ## Bewusst beibehalten
 Die Architektur-Bereinigung in Regenwasser/Schmutzwasser bleibt bestehen:

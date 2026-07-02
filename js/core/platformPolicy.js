@@ -1,5 +1,5 @@
 export const platformPolicy = Object.freeze({
-  version: '1.3.0',
+  version: '1.3.2-dev.1',
   principle: 'Design follows Funktion',
   moduleMayOwn: Object.freeze([
     'fachliche Berechnungslogik',

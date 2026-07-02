@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-06-12T18:12:04.965Z",
-  "contractTarget": "1.3.0",
+  "contractTarget": "1.3.2-dev.1",
   "modules": [
     {
       "module": "buffer-storage",

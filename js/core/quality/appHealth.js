@@ -2,7 +2,7 @@ import { performanceBudget } from './performanceBudget.js';
 import { platformPolicy } from '../platformPolicy.js';
 
 export const appHealthChecks = Object.freeze({
-  version: '1.3.0-phase5',
+  version: '1.3.2-dev.1-phase5',
   checks: Object.freeze([
     'module-contract',
     'number-locale-regression',

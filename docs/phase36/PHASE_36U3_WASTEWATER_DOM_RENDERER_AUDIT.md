@@ -1,6 +1,6 @@
 # Phase 36U.3 – Wastewater DOM-/Renderer-Audit
 
-Basis: `techcalc-pro-1.3.0-rc.1-phase36v1-hx-field-action-dynamic-path.zip`
+Basis: `techcalc-pro-1.3.2-dev.1-rc.1-phase36v1-hx-field-action-dynamic-path.zip`
 
 ## Ziel
 

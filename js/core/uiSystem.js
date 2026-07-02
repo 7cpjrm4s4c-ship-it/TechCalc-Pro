@@ -1,7 +1,7 @@
 import { esc, card } from './renderer.js';
 
 export const uiSystem = Object.freeze({
-  version: '1.3.0-phase3',
+  version: '1.3.2-dev.1-phase3',
   prefix: 'tc-',
   primitives: Object.freeze([
     'tc-stack',

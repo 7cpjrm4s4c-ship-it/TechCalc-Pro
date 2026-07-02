@@ -1,11 +1,11 @@
-# Release Candidate 1.3.0-rc.1
+# Release Candidate 1.3.2-dev.1-rc.1
 
 Date: 2026-06-11
 Phase: 31E - Release Candidate
 
 ## Decision
 
-TechCalc Pro is marked as `1.3.0-rc.1` after completion of the Phase 31 release-hardening block.
+TechCalc Pro is marked as `1.3.2-dev.1-rc.1` after completion of the Phase 31 release-hardening block.
 
 ## Included gates
 
@@ -16,14 +16,14 @@ TechCalc Pro is marked as `1.3.0-rc.1` after completion of the Phase 31 release-
 
 ## Release freeze rules
 
-Allowed after `1.3.0-rc.1`:
+Allowed after `1.3.2-dev.1-rc.1`:
 
 - Bug fixes
 - Regression fixes
 - Documentation corrections
 - Test or audit fixes needed to keep the release gate reproducible
 
-Not allowed before final `1.3.0` unless explicitly approved:
+Not allowed before final `1.3.2-dev.1` unless explicitly approved:
 
 - New feature migrations
 - Large refactorings
@@ -33,7 +33,7 @@ Not allowed before final `1.3.0` unless explicitly approved:
 
 ## Manual RC checklist
 
-Before promoting `1.3.0-rc.1` to final `1.3.0`, confirm in the browser:
+Before promoting `1.3.2-dev.1-rc.1` to final `1.3.2-dev.1`, confirm in the browser:
 
 - App loads without console errors.
 - Navigation between all modules works.

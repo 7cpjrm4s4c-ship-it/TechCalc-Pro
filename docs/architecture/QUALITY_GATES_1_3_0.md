@@ -1,4 +1,4 @@
-# TechCalc Pro 1.3.0 - Quality Gates / Marktreife
+# TechCalc Pro 1.3.2-dev.1 - Quality Gates / Marktreife
 
 Phase 5 macht aus dem Refactor eine belastbare Release-Basis. Ziel ist nicht mehr nur Funktion, sondern reproduzierbare Qualitaet bei jeder Aenderung.
 
@@ -20,7 +20,7 @@ Der Quality Gate fuehrt aus:
 ## Harte Produktregeln
 
 - Neue Module duerfen keine eigenen CSS- oder UI-Komponenten einfuehren.
-- Neue Module muessen den Modulvertrag 1.3.0 verwenden.
+- Neue Module muessen den Modulvertrag 1.3.2-dev.1 verwenden.
 - Zahlen werden ausschliesslich ueber `numberService` verarbeitet.
 - Saved Records und Scroll-Verhalten werden zentral gesteuert.
 - Lazy Loading bleibt Pflicht fuer Module, PDF Export und schwere Tabellen.
@@ -39,7 +39,7 @@ Diese Werte sind bewusst streng, damit die App auch mobil stabil bleibt.
 
 ## Bekannte Migration Debt
 
-Der UI-Audit meldet in Phase 5 weiterhin Legacy-Klassen wie `dw-*`, `ph-*`, `hx-*`, `rainwater-*` und `wastewater-*`. Das ist fuer bestehende Module noch toleriert, aber ab 1.3.0 gilt:
+Der UI-Audit meldet in Phase 5 weiterhin Legacy-Klassen wie `dw-*`, `ph-*`, `hx-*`, `rainwater-*` und `wastewater-*`. Das ist fuer bestehende Module noch toleriert, aber ab 1.3.2-dev.1 gilt:
 
 - Keine neuen modulbezogenen Klassen.
 - Jede Modulmigration muss die Trefferzahl senken.
