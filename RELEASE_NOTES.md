@@ -1,3 +1,7 @@
+## 1.3.2-dev.6 – Module Accent Token System
+
+Light Theme Modul-Akzentfarben zentralisiert: Heizung Orange, Kälte Cyan, Pufferspeicher/Druckhaltung/Rohr Blau, WRG/Mischluft und h,x Türkis, Trinkwasser/Regenwasser/Schmutzwasser Grün. Aktive Toggle-Flächen verwenden nun dieselbe Akzentfamilie wie die Rahmen; Textfarbe bleibt global dunkel.
+
 ## 1.3.2-dev.5 – Light Theme Accent & Surface Completion
 
 - Aktive Segment-Buttons, Tabs, Fokus- und Hover-Zustaende verwenden im Light Mode wieder die jeweilige Modul-Akzentfarbe statt pauschal Blau.

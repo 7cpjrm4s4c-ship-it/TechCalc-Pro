@@ -23,7 +23,7 @@ import { initializeFeedbackController } from '../platform/shell/feedbackControll
 import { initializeServiceWorkerController } from '../platform/shell/serviceWorkerController.js';
 import { initializePerformanceController, markPerformance, measurePerformance, startPerformanceSpan } from '../platform/shell/performanceController.js';
 
-const APP_VERSION = '1.3.2-dev.5';
+const APP_VERSION = '1.3.2-dev.6';
 initializePerformanceController({ appVersion: APP_VERSION });
 const appInitStartMark = markPerformance('app:init:start', { appVersion: APP_VERSION });
 

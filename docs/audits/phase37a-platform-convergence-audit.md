@@ -41,7 +41,7 @@ Ziel: alle Module gegen die Referenzarchitektur Heizung, Lüftung, Druckhaltung 
 
 | Datei | !important | Modul-Selektoren |
 |---|---:|---:|
-| css/components.css | 222 | 0 |
+| css/components.css | 229 | 0 |
 | css/layout.css | 13 | 0 |
 | css/modules.css | 0 | 27 |
 | css/tokens.css | 1 | 0 |
