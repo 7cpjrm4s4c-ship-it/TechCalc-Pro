@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-07-02T12:13:14.010Z",
+  "generatedAt": "2026-07-02T16:28:55.448Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -30,13 +30,13 @@
   "cssDebt": [
     {
       "file": "css/components.css",
-      "important": 158,
+      "important": 204,
       "inlineStyleSelectors": 0,
       "moduleScopedSelectors": 0
     },
     {
       "file": "css/layout.css",
-      "important": 0,
+      "important": 13,
       "inlineStyleSelectors": 0,
       "moduleScopedSelectors": 0
     },

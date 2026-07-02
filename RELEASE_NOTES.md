@@ -1,3 +1,11 @@
+## 1.3.2-dev.4 – Layout & Navigation Foundation
+
+- Light-Theme-Layout fuer Header, Modulnavigation, Menue, Overflow und Settings zentralisiert.
+- Header- und Menueflaechen konsistent auf warmes helles App-Design gestellt.
+- Modulnavigation, aktive Tabs, Hover- und Fokuszustaende kontrastreicher vereinheitlicht.
+- Release-Notes- und Settings-Cards auf globale Abstaende, Radien und Flaechen gehoben.
+- Dark/System funktional unveraendert belassen.
+
 ## 1.3.2-dev.3 – Central Components Foundation
 
 - Light-Theme-Komponenten auf zentrale UI-Primitives konsolidiert.

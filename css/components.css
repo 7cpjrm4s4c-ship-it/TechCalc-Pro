@@ -1931,3 +1931,146 @@ html {
   border-color: color-mix(in srgb, var(--accent-blue) 48%, #ffffff) !important;
   color: #003f73 !important;
 }
+
+/* 1.3.2C — Layout & Navigation UI Consolidation
+   Light Theme only. Navigation, menu, release notes and dialog surfaces are centralized here. */
+:root[data-theme='light'] {
+  --tc-nav-tab-bg: transparent;
+  --tc-nav-tab-hover: rgba(0,105,189,.10);
+  --tc-nav-tab-active: rgba(0,105,189,.16);
+  --tc-nav-tab-text: var(--color-muted);
+  --tc-nav-tab-text-active: #003f73;
+  --tc-menu-card-bg: var(--color-surface);
+  --tc-menu-card-hover: color-mix(in srgb, var(--accent-blue) 10%, #ffffff);
+  --tc-release-card-bg: var(--color-surface);
+}
+
+:root[data-theme='light'] .brand,
+:root[data-theme='light'] .brand__title,
+:root[data-theme='light'] .brand__subtitle,
+:root[data-theme='light'] .settings-panel__head,
+:root[data-theme='light'] .settings-panel__head strong {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme='light'] .brand__subtitle,
+:root[data-theme='light'] .settings-panel__head span {
+  color: var(--color-muted) !important;
+}
+
+:root[data-theme='light'] .module-tab {
+  background: var(--tc-nav-tab-bg) !important;
+  color: var(--tc-nav-tab-text) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme='light'] .module-tab:hover,
+:root[data-theme='light'] .module-tab:focus-visible {
+  background: var(--tc-nav-tab-hover) !important;
+  color: var(--color-text) !important;
+  border-color: color-mix(in srgb, var(--accent-blue) 34%, transparent) !important;
+}
+
+:root[data-theme='light'] .module-tab.is-active,
+:root[data-theme='light'] .module-tab.is-overflow-active,
+:root[data-theme='light'] .module-tab[aria-current='page'] {
+  background: var(--tc-nav-tab-active) !important;
+  color: var(--tc-nav-tab-text-active) !important;
+  border-color: var(--accent-blue) !important;
+  box-shadow: inset 0 -3px 0 var(--accent-blue) !important;
+}
+
+:root[data-theme='light'] .settings-panel,
+:root[data-theme='light'] .overflow-menu {
+  background: var(--tc-light-bg) !important;
+  color: var(--color-text) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--tc-radius-card) !important;
+  box-shadow: 0 18px 42px rgba(63,54,39,.18), 0 1px 0 rgba(255,255,255,.9) inset !important;
+}
+
+:root[data-theme='light'] .settings-panel__head,
+:root[data-theme='light'] .settings-panel__body,
+:root[data-theme='light'] .overflow-menu__list {
+  background: transparent !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme='light'] .settings-submenu,
+:root[data-theme='light'] .overflow-menu__card,
+:root[data-theme='light'] .overflow-menu__row,
+:root[data-theme='light'] .release-note-card,
+:root[data-theme='light'] .release-notes-panel .settings-info-row {
+  background: var(--tc-menu-card-bg) !important;
+  color: var(--color-text) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--tc-radius-card) !important;
+  box-shadow: var(--shadow-glass) !important;
+}
+
+:root[data-theme='light'] .settings-submenu + .settings-submenu,
+:root[data-theme='light'] .overflow-menu__card + .overflow-menu__card,
+:root[data-theme='light'] .overflow-menu__row + .overflow-menu__row,
+:root[data-theme='light'] .release-note-card + .release-note-card {
+  margin-top: var(--tc-gap) !important;
+}
+
+:root[data-theme='light'] .settings-submenu > summary {
+  background: var(--tc-light-surface-soft) !important;
+  color: var(--color-text) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  border-radius: calc(var(--tc-radius-card) - 1px) calc(var(--tc-radius-card) - 1px) 0 0 !important;
+}
+
+:root[data-theme='light'] .settings-submenu:not([open]) > summary {
+  border-bottom-color: transparent !important;
+  border-radius: calc(var(--tc-radius-card) - 1px) !important;
+}
+
+:root[data-theme='light'] .settings-submenu > summary:hover,
+:root[data-theme='light'] .overflow-menu__row:hover,
+:root[data-theme='light'] .overflow-menu button:hover {
+  background: var(--tc-menu-card-hover) !important;
+  color: var(--color-text) !important;
+  border-color: color-mix(in srgb, var(--accent-blue) 42%, var(--color-border)) !important;
+}
+
+:root[data-theme='light'] .settings-submenu__content,
+:root[data-theme='light'] .release-notes-panel,
+:root[data-theme='light'] .settings-form {
+  background: transparent !important;
+  color: var(--color-text) !important;
+  gap: var(--tc-gap) !important;
+}
+
+:root[data-theme='light'] .settings-info-row,
+:root[data-theme='light'] .settings-row,
+:root[data-theme='light'] .settings-check {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+
+:root[data-theme='light'] .settings-info-row span,
+:root[data-theme='light'] .release-note-card time,
+:root[data-theme='light'] .release-note-card small {
+  color: var(--color-muted) !important;
+}
+
+:root[data-theme='light'] .release-note-card h1,
+:root[data-theme='light'] .release-note-card h2,
+:root[data-theme='light'] .release-note-card h3,
+:root[data-theme='light'] .release-note-card strong {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme='light'] .release-note-card ul,
+:root[data-theme='light'] .release-note-card ol {
+  margin-block: var(--tc-gap) 0 !important;
+  padding-left: 1.25rem !important;
+}
+
+:root[data-theme='light'] .release-note-card li + li {
+  margin-top: 6px !important;
+}
