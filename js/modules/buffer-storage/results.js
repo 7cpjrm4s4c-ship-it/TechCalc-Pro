@@ -16,7 +16,7 @@ function valueOrDash(value, digits = 1){
   return Number.isFinite(Number(value)) && Number(value) > 0 ? fmt(value, digits) : '—';
 }
 
-export function buildBufferStorageResultModel(s, r, accent = 'cyan'){
+export function buildBufferStorageResultModel(s, r, accent = 'blue'){
   const warnings = Array.isArray(r?.warnings) ? r.warnings : [];
   const primaryValue = Number(r?.decisiveVolume) > 0 ? fmt(r.decisiveVolume, 1) : '—';
   const primaryUnit = Number(r?.decisiveVolume) > 0 ? 'Liter' : '';

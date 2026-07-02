@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.0';
-const CACHE_REVISION = '1.3.0-version-1-3-0-mobile-feedback-zoom-scope-correction';
+const CACHE_NAME = 'techcalc-pro-1.3.2-dev.8';
+const CACHE_REVISION = '1.3.2-dev.8-1-3-2-dev-8-light-theme-kontrast-und-akzentkorrektur';
 const ASSETS = [
   './',
   './index.html',
@@ -26,6 +26,11 @@ const ASSETS = [
   './js/core/navigation.js',
   './js/core/numberService.js',
   './js/core/numbers.js',
+  './js/core/pdf/pdfChartRender.js',
+  './js/core/pdf/pdfDataMapping.js',
+  './js/core/pdf/pdfLayout.js',
+  './js/core/pdf/pdfText.js',
+  './js/core/pdf/reportTheme.js',
   './js/core/pdfExport.js',
   './js/core/platformLifecycle.js',
   './js/core/platformPolicy.js',
@@ -184,8 +189,11 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', event => {
-  self.skipWaiting();
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+});
+
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {

@@ -40,7 +40,7 @@ export function createDrinkingWaterViewModel(s = {}, result = calculate(s, { inc
     result,
     savedUsageUnits: (result.usageUnits || []).filter(unit => !unit.transient),
     savedSingleGroups: (result.singleGroups || []).filter(group => !group.transient),
-    accent: 'blue',
+    accent: 'green',
     buildingOptions: BUILDING_TYPES.map(t => ({ value:t.id, label:t.label })),
     consumerOptions: consumerOptionsBase,
     waterHeating,

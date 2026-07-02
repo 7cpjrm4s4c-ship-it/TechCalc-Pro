@@ -265,3 +265,49 @@
   gap: var(--tc-gap);
 }
 
+
+/* 1.3.2C — Light Theme Layout & Navigation Foundation
+   Central layout/navigation rules only. Module internals continue to consume global components. */
+:root[data-theme='light'] {
+  --tc-shell-bg: var(--tc-light-bg);
+  --tc-shell-header-bg: var(--tc-light-bg-elevated);
+  --tc-shell-nav-bg: var(--tc-light-bg);
+  --tc-shell-menu-bg: var(--tc-light-bg);
+  --tc-shell-divider: var(--color-border);
+  --tc-shell-shadow: 0 1px 0 rgba(255,255,255,.86) inset, 0 10px 24px rgba(63,54,39,.08);
+}
+
+:root[data-theme='light'] .app-shell {
+  background: var(--tc-shell-bg) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme='light'] .app-header {
+  background: var(--tc-shell-header-bg) !important;
+  border-bottom: 1px solid var(--tc-shell-divider) !important;
+  box-shadow: var(--tc-shell-shadow) !important;
+}
+
+:root[data-theme='light'] .module-nav {
+  background: var(--tc-shell-nav-bg) !important;
+  border-bottom: 1px solid var(--tc-shell-divider) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.7) inset !important;
+}
+
+:root[data-theme='light'] .module-nav__track {
+  background: transparent !important;
+}
+
+@media (min-width: 768px) {
+  :root[data-theme='light'] .module-nav {
+    background: color-mix(in srgb, var(--tc-shell-nav-bg) 94%, #ffffff) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  :root[data-theme='light'] .module-nav {
+    background: color-mix(in srgb, var(--tc-light-bg-elevated) 96%, transparent) !important;
+    border: 1px solid var(--tc-shell-divider) !important;
+    box-shadow: 0 10px 28px rgba(63,54,39,.16) !important;
+  }
+}

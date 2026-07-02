@@ -1,3 +1,11 @@
+## Version 1.3.1 Beta 8 - PDF Two-Column Report Layout
+
+- UI-Designentwicklung aus Beta 2-6 nicht uebernommen; Ausgangsbasis ist wieder die stabile 1.3.2-dev.2-Entwicklungsbasis.
+- PDF-Export kompakter aufgebaut: reduzierter Seitenrand, kompakter Header, zweispaltige Abschnittsdarstellung und kleinere Tabellenabstaende.
+- Projektbezogene Firmenlogo-Integration fuer den PDF-Header oben rechts ergaenzt.
+- Projektdatei speichert das PDF-Firmenlogo optional als Data-URL mit.
+- AGB-Seite technisch an bestehende Qualitaets-Gates fuer Kontakt, Gueltigkeitsdatum und Ruecknavigation angeglichen.
+
 # Phase 39B — Versioned Build Artifact
 
 Status: implemented on top of the current 39C source state.
@@ -17,3 +25,25 @@ Validation:
 - `npm run test:integration`
 - `npm run build`
 - `npm run build:minified`
+
+
+## 1.3.1 RC 2
+
+- Logo-Wiederherstellung in der Projekteinstellungs-UI korrigiert.
+- Logo-Vorschau für geladene Projektdateien ergänzt.
+- Dateiinput bleibt aus Browser-Sicherheitsgründen leer, die App zeigt Status/Vorschau separat.
+
+## 1.3.1 RC 2
+
+RC-1C.1: PDF-Engine-Refactoring und Korrekturen für Trinkwasser, h,x-Diagramm, WRG, Schmutzwasser, Pufferspeicher und Einheiten. Keine Feature-Erweiterung, nur Release-Stabilisierung.
+
+
+## 1.3.2-dev.2
+- RC-1C PDF-Layout-Korrekturen: Spaltenausrichtung, lange Texte, h,x-Diagramm-Vorbereitung, WRG/Trinkwasser-Layout.
+
+
+## 1.3.2B – Central Components Foundation
+
+- Globale Light-Theme-Komponentenregeln für Cards, Controls, Buttons, Segment Controls, Accordions, Header-Menü und Overflow ergänzt.
+- Keine fachliche Modul-Logik geändert.
+- Dark/System Theme funktional unverändert.

@@ -18,13 +18,43 @@ const DEFAULT_META = {
   client: '',
   project: '',
   projectNo: '',
-  engineer: ''
+  engineer: '',
+  companyLogo: '',
+  companyLogoName: '',
+  companyLogoMime: '',
+  companyLogoAsset: '',
+  companyName: '',
+  companyAddress: '',
+  documentVersion: '',
+  checkedBy: '',
+  approvedBy: ''
 };
+
+const SESSION_SNAPSHOT_KEY = 'techcalc-session-snapshot';
+const PDF_COMPANY_LOGO_STORAGE_KEY = 'techcalc-pdf-company-logo';
+const PDF_COMPANY_LOGO_NAME_STORAGE_KEY = 'techcalc-pdf-company-logo-name';
 
 let projectMeta = { ...DEFAULT_META };
 let openedFileName = '';
 
-const SESSION_SNAPSHOT_KEY = 'techcalc-session-snapshot';
+function readPersistentPdfLogo() {
+  try { return localStorage.getItem(PDF_COMPANY_LOGO_STORAGE_KEY) || ''; } catch { return ''; }
+}
+
+function readPersistentPdfLogoName() {
+  try { return localStorage.getItem(PDF_COMPANY_LOGO_NAME_STORAGE_KEY) || ''; } catch { return ''; }
+}
+
+function persistPdfLogo(logo = '', name = '') {
+  try {
+    if (logo) localStorage.setItem(PDF_COMPANY_LOGO_STORAGE_KEY, logo);
+    else localStorage.removeItem(PDF_COMPANY_LOGO_STORAGE_KEY);
+    if (name) localStorage.setItem(PDF_COMPANY_LOGO_NAME_STORAGE_KEY, name);
+    else if (!logo) localStorage.removeItem(PDF_COMPANY_LOGO_NAME_STORAGE_KEY);
+  } catch (error) {
+    console.warn('Firmenlogo konnte nicht dauerhaft gespeichert werden.', error);
+  }
+}
 
 export function saveSessionSnapshot() {
   try {
@@ -54,17 +84,281 @@ function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+function crc32(bytes) {
+  if (!window.__techCalcCrcTable) {
+    window.__techCalcCrcTable = Array.from({ length: 256 }, (_, index) => {
+      let crc = index;
+      for (let bit = 0; bit < 8; bit += 1) crc = (crc & 1) ? (0xEDB88320 ^ (crc >>> 1)) : (crc >>> 1);
+      return crc >>> 0;
+    });
+  }
+  let crc = 0xFFFFFFFF;
+  for (let index = 0; index < bytes.length; index += 1) {
+    crc = window.__techCalcCrcTable[(crc ^ bytes[index]) & 0xFF] ^ (crc >>> 8);
+  }
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+function encodeUtf8(text = '') {
+  return new TextEncoder().encode(String(text));
+}
+
+function decodeUtf8(bytes) {
+  return new TextDecoder('utf-8').decode(bytes);
+}
+
+function writeU16(target, offset, value) {
+  target[offset] = value & 0xFF;
+  target[offset + 1] = (value >>> 8) & 0xFF;
+}
+
+function writeU32(target, offset, value) {
+  target[offset] = value & 0xFF;
+  target[offset + 1] = (value >>> 8) & 0xFF;
+  target[offset + 2] = (value >>> 16) & 0xFF;
+  target[offset + 3] = (value >>> 24) & 0xFF;
+}
+
+function readU16(view, offset) {
+  return view.getUint16(offset, true);
+}
+
+function readU32(view, offset) {
+  return view.getUint32(offset, true);
+}
+
+function concatBytes(parts) {
+  const total = parts.reduce((sum, part) => sum + part.length, 0);
+  const output = new Uint8Array(total);
+  let offset = 0;
+  parts.forEach(part => { output.set(part, offset); offset += part.length; });
+  return output;
+}
+
+function dataUrlToAsset(dataUrl = '', fallbackName = 'company-logo') {
+  const match = String(dataUrl).match(/^data:([^;,]+)(;base64)?,(.*)$/);
+  if (!match) return null;
+  const mime = match[1] || 'application/octet-stream';
+  const encoded = match[3] || '';
+  let bytes;
+  if (match[2]) {
+    const binary = atob(encoded);
+    bytes = new Uint8Array(binary.length);
+    for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+  } else {
+    bytes = encodeUtf8(decodeURIComponent(encoded));
+  }
+  const extension = mime.includes('webp') ? 'webp' : mime.includes('png') ? 'png' : mime.includes('jpeg') || mime.includes('jpg') ? 'jpg' : 'bin';
+  const safeName = String(fallbackName || `company-logo.${extension}`).replace(/[^a-z0-9äöüß._-]+/gi, '-').replace(/^-|-$/g, '') || `company-logo.${extension}`;
+  const name = /\.[a-z0-9]+$/i.test(safeName) ? safeName : `${safeName}.${extension}`;
+  return { name, mime, bytes };
+}
+
+function bytesToDataUrl(bytes, mime = 'application/octet-stream') {
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
+  }
+  return `data:${mime};base64,${btoa(binary)}`;
+}
+
+
+function mimeFromFileName(name = '') {
+  const lower = String(name || '').toLowerCase();
+  if (lower.endsWith('.webp')) return 'image/webp';
+  if (lower.endsWith('.png')) return 'image/png';
+  if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg';
+  return 'application/octet-stream';
+}
+
+function findTcpLogoAsset(files = {}, meta = {}, project = {}) {
+  const candidates = [];
+  if (meta.companyLogoAsset) candidates.push(meta.companyLogoAsset);
+  if (project.assets?.companyLogo?.path) candidates.push(project.assets.companyLogo.path);
+  if (project.assets?.companyLogo?.name) candidates.push(`assets/${project.assets.companyLogo.name}`);
+  candidates.push('assets/company-logo.png', 'assets/company-logo.jpg', 'assets/company-logo.jpeg', 'assets/company-logo.webp');
+
+  const fileNames = Object.keys(files);
+  for (const candidate of candidates) {
+    const exact = fileNames.find(name => name === candidate);
+    if (exact) return exact;
+    const normalizedCandidate = String(candidate || '').replace(/^\.\//, '').toLowerCase();
+    const insensitive = fileNames.find(name => name.replace(/^\.\//, '').toLowerCase() === normalizedCandidate);
+    if (insensitive) return insensitive;
+  }
+
+  return fileNames.find(name => /(^|\/)assets\/.*\.(png|jpe?g|webp)$/i.test(name))
+    || fileNames.find(name => /(^|\/).*company.*logo.*\.(png|jpe?g|webp)$/i.test(name))
+    || '';
+}
+
+function createTcpArchive(files = {}) {
+  const localParts = [];
+  const centralParts = [];
+  let offset = 0;
+
+  Object.entries(files).forEach(([name, content]) => {
+    const nameBytes = encodeUtf8(name);
+    const data = content instanceof Uint8Array ? content : encodeUtf8(content);
+    const crc = crc32(data);
+    const local = new Uint8Array(30 + nameBytes.length);
+    writeU32(local, 0, 0x04034B50);
+    writeU16(local, 4, 20);
+    writeU16(local, 6, 0x0800);
+    writeU16(local, 8, 0);
+    writeU16(local, 10, 0);
+    writeU16(local, 12, 0);
+    writeU32(local, 14, crc);
+    writeU32(local, 18, data.length);
+    writeU32(local, 22, data.length);
+    writeU16(local, 26, nameBytes.length);
+    writeU16(local, 28, 0);
+    local.set(nameBytes, 30);
+    localParts.push(local, data);
+
+    const central = new Uint8Array(46 + nameBytes.length);
+    writeU32(central, 0, 0x02014B50);
+    writeU16(central, 4, 20);
+    writeU16(central, 6, 20);
+    writeU16(central, 8, 0x0800);
+    writeU16(central, 10, 0);
+    writeU16(central, 12, 0);
+    writeU16(central, 14, 0);
+    writeU32(central, 16, crc);
+    writeU32(central, 20, data.length);
+    writeU32(central, 24, data.length);
+    writeU16(central, 28, nameBytes.length);
+    writeU16(central, 30, 0);
+    writeU16(central, 32, 0);
+    writeU16(central, 34, 0);
+    writeU16(central, 36, 0);
+    writeU32(central, 38, 0);
+    writeU32(central, 42, offset);
+    central.set(nameBytes, 46);
+    centralParts.push(central);
+
+    offset += local.length + data.length;
+  });
+
+  const centralStart = offset;
+  const centralDirectory = concatBytes(centralParts);
+  const end = new Uint8Array(22);
+  writeU32(end, 0, 0x06054B50);
+  writeU16(end, 4, 0);
+  writeU16(end, 6, 0);
+  writeU16(end, 8, centralParts.length);
+  writeU16(end, 10, centralParts.length);
+  writeU32(end, 12, centralDirectory.length);
+  writeU32(end, 16, centralStart);
+  writeU16(end, 20, 0);
+
+  return new Blob([...localParts, centralDirectory, end], { type: 'application/vnd.techcalc.project' });
+}
+
+async function readTcpArchive(file) {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const files = {};
+  let offset = 0;
+
+  while (offset + 30 <= bytes.length && readU32(view, offset) === 0x04034B50) {
+    const flags = readU16(view, offset + 6);
+    const method = readU16(view, offset + 8);
+    if (method !== 0) throw new Error('Dieses TechCalc-Projekt verwendet eine nicht unterstützte ZIP-Kompression.');
+    if (flags & 0x0008) throw new Error('Dieses TechCalc-Projekt verwendet ein nicht unterstütztes ZIP-Datenformat.');
+    const compressedSize = readU32(view, offset + 18);
+    const fileNameLength = readU16(view, offset + 26);
+    const extraLength = readU16(view, offset + 28);
+    const nameStart = offset + 30;
+    const name = decodeUtf8(bytes.subarray(nameStart, nameStart + fileNameLength));
+    const dataStart = nameStart + fileNameLength + extraLength;
+    const dataEnd = dataStart + compressedSize;
+    files[name] = bytes.subarray(dataStart, dataEnd);
+    offset = dataEnd;
+  }
+
+  const projectJsonPath = files['project.json'] ? 'project.json' : Object.keys(files).find(name => /(^|\/)project\.json$/i.test(name));
+  if (!projectJsonPath) throw new Error('Die TCP-Projektdatei enthält keine project.json.');
+  const project = JSON.parse(decodeUtf8(files[projectJsonPath]));
+  const meta = project.meta || {};
+  const assetPath = findTcpLogoAsset(files, meta, project);
+  if (assetPath && files[assetPath]) {
+    const assetMeta = project.assets?.companyLogo || {};
+    const mime = meta.companyLogoMime || assetMeta.mime || mimeFromFileName(assetPath);
+    meta.companyLogo = bytesToDataUrl(files[assetPath], mime);
+    meta.companyLogoAsset = assetPath;
+    meta.companyLogoMime = mime;
+    meta.companyLogoName = meta.companyLogoName || assetMeta.name || assetPath.split('/').pop() || 'company-logo';
+  }
+  project.meta = meta;
+  return project;
+}
+
+function buildTcpProjectBlob(data = {}) {
+  const project = clone(data);
+  project.format = 'techcalc-project';
+  project.container = 'tcp-zip';
+  project.version = Math.max(2, Number(project.version || 1));
+  project.assets = project.assets || {};
+  const files = {};
+  const logo = dataUrlToAsset(project.meta?.companyLogo || '', project.meta?.companyLogoName || 'company-logo');
+  if (logo) {
+    const path = `assets/${logo.name}`;
+    files[path] = logo.bytes;
+    // Das Firmenlogo bleibt zusätzlich als Data-URL in project.json erhalten.
+    // Der Asset-Eintrag ist das primäre .tcp-Dateiformat; die Data-URL ist der robuste
+    // Fallback für Browser/Plattformen, die ZIP-Assets oder MIME-Zuordnungen anders behandeln.
+    project.meta.companyLogoAsset = path;
+    project.meta.companyLogoMime = logo.mime;
+    project.meta.companyLogoName = project.meta.companyLogoName || logo.name;
+    project.assets.companyLogo = { path, name: project.meta.companyLogoName, mime: logo.mime, size: logo.bytes.length };
+  }
+  files['project.json'] = JSON.stringify(project, null, 2);
+  return createTcpArchive(files);
+}
+
+function buildTcprojProjectBlob(data = {}) {
+  const project = clone(data);
+  project.format = 'techcalc-project';
+  project.container = 'tcproj-json';
+  project.version = Math.max(3, Number(project.version || 1));
+  project.assets = project.assets || {};
+  const logoDataUrl = project.meta?.companyLogo || '';
+  const logoName = project.meta?.companyLogoName || '';
+  const logoMime = project.meta?.companyLogoMime || (logoDataUrl.match(/^data:([^;,]+)/)?.[1] || '');
+  if (logoDataUrl) {
+    project.assets.companyLogo = {
+      name: logoName || 'company-logo',
+      mime: logoMime || 'image/jpeg',
+      dataUrl: logoDataUrl
+    };
+  }
+  return new Blob([JSON.stringify(project, null, 2)], { type: 'application/vnd.techcalc.project+json' });
+}
+
 export function getProjectMeta() {
-  return { ...projectMeta };
+  const fallbackLogo = projectMeta.companyLogo || readPersistentPdfLogo();
+  const fallbackLogoName = projectMeta.companyLogoName || readPersistentPdfLogoName();
+  return { ...DEFAULT_META, ...projectMeta, companyLogo: fallbackLogo, companyLogoName: fallbackLogoName };
 }
 
 export function setProjectMeta(next = {}) {
-  projectMeta = { ...projectMeta, ...next };
+  const hasCompanyLogo = Object.prototype.hasOwnProperty.call(next, 'companyLogo');
+  const hasCompanyLogoName = Object.prototype.hasOwnProperty.call(next, 'companyLogoName');
+  const merged = { ...projectMeta, ...next };
+  if (!hasCompanyLogo && projectMeta.companyLogo) merged.companyLogo = projectMeta.companyLogo;
+  if (!hasCompanyLogoName && projectMeta.companyLogoName) merged.companyLogoName = projectMeta.companyLogoName;
+  projectMeta = { ...DEFAULT_META, ...merged };
+  if (hasCompanyLogo || hasCompanyLogoName) {
+    persistPdfLogo(projectMeta.companyLogo || '', projectMeta.companyLogoName || '');
+  }
   return getProjectMeta();
 }
 
 export function resetProjectMeta() {
   projectMeta = { ...DEFAULT_META };
+  persistPdfLogo('', '');
   openedFileName = '';
 }
 
@@ -136,7 +430,9 @@ export function collectProjectData() {
 
 export function applyProjectData(data = {}, { fileName = '' } = {}) {
   const modules = data.modules || {};
-  setProjectMeta(data.meta || {});
+  const incomingMeta = { ...DEFAULT_META, ...(data.meta || {}) };
+  setProjectMeta(incomingMeta);
+  if (incomingMeta.companyLogo) persistPdfLogo(incomingMeta.companyLogo, incomingMeta.companyLogoName || '');
   openedFileName = fileName || openedFileName;
 
   if (modules['pressure-holding']?.state) pressureHoldingState.replace(modules['pressure-holding'].state, { notify: false });
@@ -191,8 +487,8 @@ export async function downloadProjectFile() {
   const meta = data.meta || {};
   const base = [meta.projectNo, meta.project, meta.client].filter(Boolean).join('-') || 'techcalc-projekt';
   const safe = base.toLowerCase().replace(/[^a-z0-9äöüß_-]+/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'techcalc-projekt';
-  const fileName = `${safe}.techcalc.json`;
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json;charset=utf-8' });
+  const fileName = `${safe}.tcproj`;
+  const blob = buildTcprojProjectBlob(data);
 
   if (typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function') {
     try {
@@ -200,7 +496,7 @@ export async function downloadProjectFile() {
         suggestedName: fileName,
         types: [{
           description: 'TechCalc Projektdatei',
-          accept: { 'application/json': ['.techcalc.json', '.json'] }
+          accept: { 'application/vnd.techcalc.project+json': ['.tcproj'], 'application/json': ['.json'] }
         }]
       });
       const writable = await handle.createWritable();
@@ -223,14 +519,82 @@ export async function downloadProjectFile() {
   link.click();
   link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 2000);
+  openedFileName = fileName;
+  document.dispatchEvent(new CustomEvent('techcalc-project-saved', { detail: { fileName: openedFileName } }));
   return true;
 }
 
-export async function readProjectFile(file) {
-  const text = await file.text();
-  const parsed = JSON.parse(text);
-  if (!parsed || parsed.format !== 'techcalc-project') {
+async function looksLikeZipArchive(file) {
+  if (!file || typeof file.slice !== 'function') return false;
+  try {
+    const signature = new Uint8Array(await file.slice(0, 4).arrayBuffer());
+    return signature[0] === 0x50 && signature[1] === 0x4B && signature[2] === 0x03 && signature[3] === 0x04;
+  } catch {
+    return false;
+  }
+}
+
+export const PROJECT_FILE_EXTENSIONS = ['.tcproj', '.json', '.tcp'];
+
+function normalizeProjectFileExtension(name = '') {
+  const lower = String(name || '').toLowerCase().trim();
+  if (lower.endsWith('.tcproj')) return 'tcproj';
+  if (lower.endsWith('.json')) return 'json';
+  if (lower.endsWith('.tcp')) return 'tcp';
+  return '';
+}
+
+function normalizeProjectFileType(type = '') {
+  const lower = String(type || '').toLowerCase().trim();
+  if (lower === 'application/vnd.techcalc.project' || lower === 'application/zip') return 'tcp';
+  if (lower === 'application/vnd.techcalc.project+json' || lower === 'application/json' || lower === 'text/json') return 'json';
+  return '';
+}
+
+function hydrateEmbeddedProjectAssets(parsed = {}) {
+  const assetLogo = parsed.assets?.companyLogo;
+  if (assetLogo?.dataUrl) {
+    parsed.meta = parsed.meta || {};
+    parsed.meta.companyLogo = parsed.meta.companyLogo || assetLogo.dataUrl;
+    parsed.meta.companyLogoName = parsed.meta.companyLogoName || assetLogo.name || 'company-logo';
+    parsed.meta.companyLogoMime = parsed.meta.companyLogoMime || assetLogo.mime || '';
+  }
+  return parsed;
+}
+
+function validateProjectPayload(parsed) {
+  if (parsed?.project && typeof parsed.project === 'object') parsed = parsed.project;
+  if (!parsed || typeof parsed !== 'object' || parsed.format !== 'techcalc-project') {
     throw new Error('Die Datei ist kein gültiges TechCalc-Projekt.');
   }
-  return clone(parsed);
+  parsed.meta = parsed.meta && typeof parsed.meta === 'object' ? parsed.meta : {};
+  parsed.modules = parsed.modules && typeof parsed.modules === 'object' ? parsed.modules : {};
+  return parsed;
+}
+
+export async function readProjectFile(file) {
+  const name = file?.name || '';
+  const extension = normalizeProjectFileExtension(name) || normalizeProjectFileType(file?.type);
+  const isZipBackedProject = extension === 'tcp' || await looksLikeZipArchive(file);
+
+  if (!file || (!extension && !isZipBackedProject)) {
+    throw new Error('Bitte eine TechCalc-Projektdatei mit der Endung .tcproj, .json oder .tcp auswählen.');
+  }
+
+  if (isZipBackedProject) {
+    const parsed = hydrateEmbeddedProjectAssets(validateProjectPayload(await readTcpArchive(file)));
+    return clone(parsed);
+  }
+
+  try {
+    const text = String(await file.text()).replace(/^\uFEFF/, '').trim();
+    if (!text) throw new SyntaxError('empty project file');
+    const parsed = hydrateEmbeddedProjectAssets(validateProjectPayload(JSON.parse(text)));
+    return clone(parsed);
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error('Die Projektdatei konnte nicht gelesen werden. Erwartet wird eine gültige .tcproj- oder .json-Projektdatei.');
+    }
+    throw error;
+  }
 }

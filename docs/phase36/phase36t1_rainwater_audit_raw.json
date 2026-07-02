@@ -1,5 +1,5 @@
 {
-  "basis": "techcalc-pro-1.3.0-rc.1-phase36s3-platform-navigation-parity.zip",
+  "basis": "techcalc-pro-1.3.2-dev.2-rc.1-phase36s3-platform-navigation-parity.zip",
   "rain_selectors": [
     {
       "selector": "/* Wastewater / rainwater / drinking water -------------------------------- */ .rainwater-result-list, .wastewater-fixtures, .wastewater-fixture__main, .wastewater-fixture__custom, .wastewater-compact-list, .wastewater-line-hints",

@@ -44,7 +44,7 @@ function saveOfflineFeedback(storage, payload, reason) {
 }
 
 export function initializeFeedbackController({
-  appVersion = '1.3.0',
+  appVersion = '1.3.2-dev.8',
   endpoint = DEFAULT_FEEDBACK_ENDPOINT,
   form = null,
   status = null,
@@ -99,6 +99,13 @@ export function initializeFeedbackController({
     event.preventDefault();
     setStatus('', '');
     if (!form.reportValidity()) return;
+    const honeypot = String(new FormData(form).get('_gotcha') || '').trim();
+    if (honeypot) {
+      setStatus('Feedback wurde verarbeitet. Danke!', 'success');
+      form.reset();
+      if (subject) subject.value = 'TechCalc Pro Feedback';
+      return;
+    }
 
     const payload = buildPayload();
 

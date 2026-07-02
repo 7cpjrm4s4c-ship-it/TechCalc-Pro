@@ -1,7 +1,7 @@
 # Phase 36L – Aktueller Stand mit LineSectionController und Icons
 
 ## Basis
-`techcalc-pro-1.3.0-rc.1-phase36k-hx-saved-process-rows-only.zip`
+`techcalc-pro-1.3.2-dev.2-rc.1-phase36k-hx-saved-process-rows-only.zip`
 
 ## Eingefügt
 - `js/platform/lineSectionController/index.js` aus der hochgeladenen aktuellen Datei
