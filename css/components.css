@@ -609,9 +609,13 @@ body.settings-open #settingsPanel * { pointer-events: auto; }
 #settingsButton { position: relative; z-index: 1201; pointer-events: auto; }
 
 /* Release notes / feedback ---------------------------------------------- */
-.release-note { display: grid; gap: 4px; padding: var(--tc-gap); border: 1px solid rgba(255,255,255,.14); border-radius: var(--radius-md); background: linear-gradient(145deg, rgb(37,43,53), rgb(28,34,43)); }
-.release-note strong { color: var(--color-text); }
-.release-note small { color: var(--color-muted); line-height: 1.4; }
+#releaseNotesDynamic { display: grid; gap: var(--tc-gap); }
+.release-note { display: grid; gap: 8px; padding: var(--tc-gap); border: 1px solid rgba(255,255,255,.14); border-radius: var(--radius-md); background: linear-gradient(145deg, rgb(37,43,53), rgb(28,34,43)); }
+.release-note__header { display: flex; align-items: center; justify-content: space-between; gap: var(--tc-gap); }
+.release-note__version, .release-note__title { color: var(--color-text); }
+.release-note__version { color: var(--accent-blue, #35aaff); }
+.release-note__badge { flex: 0 0 auto; border: 1px solid rgba(53,170,255,.22); border-radius: var(--radius-pill); background: rgba(53,170,255,.12); color: var(--accent-blue, #35aaff); padding: 3px 10px; font-size: 12px; font-weight: 900; }
+.release-note small { color: var(--color-muted); line-height: 1.45; }
 #feedbackStatus[data-type="success"] { color: var(--accent-green, #63d471); }
 #feedbackStatus[data-type="error"] { color: var(--accent-red, #ff6b6b); }
 #feedbackStatus[data-type="pending"] { color: var(--accent-blue, #35aaff); }

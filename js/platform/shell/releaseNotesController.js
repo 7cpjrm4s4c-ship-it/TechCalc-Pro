@@ -7,6 +7,39 @@ function escapeHtml(value = '') {
   }[char]));
 }
 
+function normalizeReleaseVersion(value = '') {
+  return String(value || '')
+    .replace(/\s+RC\s*/i, '-rc.')
+    .replace(/-rc(\d+)/i, '-rc.$1')
+    .toLowerCase();
+}
+
+function releaseSortKey(note = {}) {
+  const raw = normalizeReleaseVersion(note.version);
+  const match = raw.match(/^(\d+)\.(\d+)\.(\d+)(?:-rc\.(\d+))?$/i);
+  if (!match) return [0, 0, 0, -1];
+  return [Number(match[1]), Number(match[2]), Number(match[3]), match[4] ? Number(match[4]) : 9999];
+}
+
+function compareReleaseNotesDesc(a, b) {
+  const ak = releaseSortKey(a);
+  const bk = releaseSortKey(b);
+  for (let i = 0; i < Math.max(ak.length, bk.length); i += 1) {
+    if ((bk[i] || 0) !== (ak[i] || 0)) return (bk[i] || 0) - (ak[i] || 0);
+  }
+  return 0;
+}
+
+function dedupeReleaseNotes(notes = []) {
+  const seen = new Set();
+  return notes.filter(note => {
+    const key = normalizeReleaseVersion(note.version);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 export function parseReleaseNotes(markdown = '') {
   const lines = String(markdown || '').split(/\r?\n/);
   const notes = [];
@@ -14,20 +47,25 @@ export function parseReleaseNotes(markdown = '') {
 
   for (const rawLine of lines) {
     const line = rawLine.trim();
-    if (!line) continue;
+    if (!line || /^<!--.*-->$/.test(line)) continue;
     const heading = line.match(/^#{1,3}\s+(.*)$/);
     if (heading) {
       const text = heading[1].trim();
-      const versionHeading = text.match(/^(?:TechCalc\s+Pro\s+)?(?:Version\s+)?([0-9]+\.[0-9]+\.[0-9]+(?:[-.]rc\.?\d+)?)\s*(?:[·-–]\s*(.*))?$/i);
-      const phaseHeading = text.match(/^(Phase\s+\d+[A-Z]?(?:\.\d+)?)\s*(?:[·-–]\s*(.*))?$/i);
+      const versionHeading = text.match(/^(?:TechCalc\s+Pro\s+)?(?:Version\s+)?([0-9]+\.[0-9]+\.[0-9]+(?:\s+RC\s*\d+|[-.]rc\.?\d+)?)\s*(?:[·\-–]\s*(.*))?$/i);
+      const phaseHeading = text.match(/^(Phase\s+\d+[A-Z]?(?:\.\d+)?)\s*(?:[·\-–]\s*(.*))?$/i);
       if (versionHeading) {
-        current = { version: versionHeading[1], title: versionHeading[2] || '', items: [] };
+        current = {
+          version: normalizeReleaseVersion(versionHeading[1]),
+          title: versionHeading[2] || '',
+          items: []
+        };
+        notes.push(current);
       } else if (phaseHeading) {
         current = { version: phaseHeading[1], title: phaseHeading[2] || '', items: [] };
-      } else {
-        current = { version: text, title: '', items: [] };
+        notes.push(current);
+      } else if (current) {
+        current.items.push(text);
       }
-      notes.push(current);
       continue;
     }
     if (!current) continue;
@@ -35,7 +73,7 @@ export function parseReleaseNotes(markdown = '') {
     if (item && !item.startsWith('#')) current.items.push(item);
   }
 
-  return notes;
+  return dedupeReleaseNotes(notes).sort(compareReleaseNotesDesc);
 }
 
 export function renderReleaseNotes(notes, host = document.getElementById('releaseNotesDynamic')) {
@@ -44,11 +82,15 @@ export function renderReleaseNotes(notes, host = document.getElementById('releas
     host.innerHTML = '<p>Release Notes konnten nicht geladen werden.</p>';
     return;
   }
-  host.innerHTML = notes.slice(0, 18).map(note => `
-    <div class="release-note">
-      <strong>${escapeHtml(note.version)}${note.title ? ` · ${escapeHtml(note.title)}` : ''}</strong>
+  host.innerHTML = notes.slice(0, 18).map((note, index) => `
+    <article class="release-note${index === 0 ? ' is-current' : ''}">
+      <div class="release-note__header">
+        <strong class="release-note__version">${escapeHtml(note.version)}</strong>
+        ${index === 0 ? '<span class="release-note__badge">Aktuell</span>' : ''}
+      </div>
+      ${note.title ? `<strong class="release-note__title">${escapeHtml(note.title)}</strong>` : ''}
       <small>${escapeHtml(note.items.slice(0, 4).join(' '))}</small>
-    </div>
+    </article>
   `).join('');
 }
 
