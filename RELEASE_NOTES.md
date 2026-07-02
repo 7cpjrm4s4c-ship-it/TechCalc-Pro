@@ -1,3 +1,7 @@
+## 1.3.2-dev.7 – Light Theme Module Rollout
+
+Light Theme weiter zentralisiert: Modul-Akzentfarben werden nun über Module-Root-Tokens an Cards, Navigation, Segment-Controls, Fokuszustände, Accordions und Aktionsflächen vererbt. Textfarbe bleibt global dunkel. Pattern-/Schraffurflächen wurden für Menüs und Accordion-Flächen vollflächig abgesichert. Dark/System bleiben unverändert.
+
 ## 1.3.2-dev.6 – Module Accent Token System
 
 Light Theme Modul-Akzentfarben zentralisiert: Heizung Orange, Kälte Cyan, Pufferspeicher/Druckhaltung/Rohr Blau, WRG/Mischluft und h,x Türkis, Trinkwasser/Regenwasser/Schmutzwasser Grün. Aktive Toggle-Flächen verwenden nun dieselbe Akzentfamilie wie die Rahmen; Textfarbe bleibt global dunkel.

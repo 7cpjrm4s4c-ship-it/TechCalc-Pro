@@ -2265,3 +2265,142 @@ html {
 :root[data-theme='light'] .module-tab[aria-current='page'] {
   color: var(--color-text) !important;
 }
+
+/* 1.3.2F — Light Theme Module Rollout & Accessibility Pass
+   Module roots now define the active accent token centrally. Components consume the root token.
+   Text remains global dark; accent colors are used only for orientation, borders, focus and active states. */
+:root[data-theme='light'] .module-view,
+:root[data-theme='light'] .module-content,
+:root[data-theme='light'] .app-main {
+  --tc-active-accent: var(--accent-blue);
+  --tc-active-accent-soft: color-mix(in srgb, var(--tc-active-accent) 18%, #ffffff);
+  --tc-active-accent-hover: color-mix(in srgb, var(--tc-active-accent) 11%, #ffffff);
+  --tc-active-accent-border: color-mix(in srgb, var(--tc-active-accent) 66%, var(--color-border));
+}
+
+:root[data-theme='light'] .module-view[data-module='heating-cooling'] { --tc-active-accent: var(--tc-accent-heating); }
+:root[data-theme='light'] .module-view[data-module='ventilation'],
+:root[data-theme='light'] .module-view[data-module='heat-recovery'],
+:root[data-theme='light'] .module-view[data-module='hx-diagram'] { --tc-active-accent: var(--tc-accent-air); }
+:root[data-theme='light'] .module-view[data-module='buffer-storage'],
+:root[data-theme='light'] .module-view[data-module='pressure-holding'],
+:root[data-theme='light'] .module-view[data-module='pipe-sizing'] { --tc-active-accent: var(--tc-accent-pipe); }
+:root[data-theme='light'] .module-view[data-module='drinking-water'],
+:root[data-theme='light'] .module-view[data-module='rainwater'],
+:root[data-theme='light'] .module-view[data-module='wastewater'] { --tc-active-accent: var(--tc-accent-water); }
+
+:root[data-theme='light'] [data-module-id='heating-cooling'],
+:root[data-theme='light'] [data-accent='orange'] { --tc-active-accent: var(--tc-accent-heating); }
+:root[data-theme='light'] [data-module-id='ventilation'],
+:root[data-theme='light'] [data-module-id='heat-recovery'],
+:root[data-theme='light'] [data-module-id='hx-diagram'],
+:root[data-theme='light'] [data-accent='cyan'] { --tc-active-accent: var(--tc-accent-air); }
+:root[data-theme='light'] [data-module-id='buffer-storage'],
+:root[data-theme='light'] [data-module-id='pressure-holding'],
+:root[data-theme='light'] [data-module-id='pipe-sizing'],
+:root[data-theme='light'] [data-accent='blue'] { --tc-active-accent: var(--tc-accent-pipe); }
+:root[data-theme='light'] [data-module-id='drinking-water'],
+:root[data-theme='light'] [data-module-id='rainwater'],
+:root[data-theme='light'] [data-module-id='wastewater'],
+:root[data-theme='light'] [data-accent='green'] { --tc-active-accent: var(--tc-accent-water); }
+
+:root[data-theme='light'] .card--accent-orange,
+:root[data-theme='light'] .card--accent-cyan,
+:root[data-theme='light'] .card--accent-blue,
+:root[data-theme='light'] .card--accent-green,
+:root[data-theme='light'] .card--accent-purple {
+  border-color: var(--tc-active-accent-border) !important;
+}
+
+:root[data-theme='light'] .module-view .segmented,
+:root[data-theme='light'] .module-view .theme-switch,
+:root[data-theme='light'] .module-view .control:focus-within,
+:root[data-theme='light'] .module-view .tc-control:focus-within {
+  border-color: var(--tc-active-accent-border) !important;
+}
+
+:root[data-theme='light'] .segmented button.is-active,
+:root[data-theme='light'] .theme-switch__option.is-active,
+:root[data-theme='light'] .module-tab.is-active,
+:root[data-theme='light'] .module-tab.is-overflow-active {
+  background: var(--tc-active-accent-soft) !important;
+  border-color: var(--tc-active-accent) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme='light'] .module-tab.is-active,
+:root[data-theme='light'] .module-tab.is-overflow-active {
+  box-shadow: inset 0 -3px 0 var(--tc-active-accent) !important;
+}
+
+@media (max-width: 767px) {
+  :root[data-theme='light'] .module-tab.is-active::before,
+  :root[data-theme='light'] .module-tab.is-overflow-active::before {
+    background: var(--tc-active-accent-soft) !important;
+    border-color: var(--tc-active-accent) !important;
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--tc-active-accent) 24%, transparent),
+      0 0 0 3px color-mix(in srgb, var(--tc-active-accent) 14%, transparent) !important;
+  }
+}
+
+:root[data-theme='light'] .settings-submenu,
+:root[data-theme='light'] .tc-accordion,
+:root[data-theme='light'] .dw-accordion,
+:root[data-theme='light'] .overflow-menu__row,
+:root[data-theme='light'] .saved-record-card,
+:root[data-theme='light'] .line-section-card {
+  background-color: var(--color-surface) !important;
+  background-image: var(--tc-light-pattern) !important;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+}
+
+:root[data-theme='light'] .settings-submenu > summary,
+:root[data-theme='light'] .tc-accordion > summary,
+:root[data-theme='light'] .dw-accordion > summary {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+:root[data-theme='light'] .settings-submenu > summary::after,
+:root[data-theme='light'] .tc-accordion > summary::after,
+:root[data-theme='light'] .dw-accordion > summary::after,
+:root[data-theme='light'] .overflow-menu__quick,
+:root[data-theme='light'] .mini-button[data-action],
+:root[data-theme='light'] .tc-action,
+:root[data-theme='light'] .action-button {
+  color: var(--tc-active-accent) !important;
+}
+
+:root[data-theme='light'] .primary-button,
+:root[data-theme='light'] .tc-button--primary,
+:root[data-theme='light'] button[type='submit'] {
+  background: #2f3338 !important;
+  border-color: #2f3338 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme='light'] .tc-note,
+:root[data-theme='light'] .tc-help,
+:root[data-theme='light'] .ph-help,
+:root[data-theme='light'] .ph-note,
+:root[data-theme='light'] .dw-note,
+:root[data-theme='light'] .settings-hint,
+:root[data-theme='light'] .card__title,
+:root[data-theme='light'] .tc-card__title,
+:root[data-theme='light'] .field label,
+:root[data-theme='light'] .unit {
+  color: var(--color-muted) !important;
+}
+
+:root[data-theme='light'] .card,
+:root[data-theme='light'] .tc-card,
+:root[data-theme='light'] .control,
+:root[data-theme='light'] .segmented,
+:root[data-theme='light'] .settings-submenu,
+:root[data-theme='light'] .tc-accordion,
+:root[data-theme='light'] .dw-accordion {
+  color: var(--color-text) !important;
+}
