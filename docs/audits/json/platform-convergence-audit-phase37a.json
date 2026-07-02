@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-07-02T19:42:11.530Z",
+  "generatedAt": "2026-07-02T20:20:00.338Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -30,9 +30,9 @@
   "cssDebt": [
     {
       "file": "css/components.css",
-      "important": 285,
+      "important": 321,
       "inlineStyleSelectors": 0,
-      "moduleScopedSelectors": 10
+      "moduleScopedSelectors": 20
     },
     {
       "file": "css/layout.css",
@@ -103,11 +103,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 4,
+        "count": 5,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2285,
+            "text": ":root[data-theme='light'] .module-view[data-module='buffer-storage'],"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2621,
             "text": ":root[data-theme='light'] .module-view[data-module='buffer-storage'],"
           },
           {
@@ -143,11 +148,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 8,
+        "count": 9,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2288,
+            "text": ":root[data-theme='light'] .module-view[data-module='drinking-water'],"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2624,
             "text": ":root[data-theme='light'] .module-view[data-module='drinking-water'],"
           },
           {
@@ -179,11 +189,6 @@
             "cssFile": "css/modules.css",
             "line": 96,
             "text": ".module-view[data-module='drinking-water'] .tc-consumer-row > div,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 97,
-            "text": ".module-view[data-module='drinking-water'] .tc-fixture-row > div { display: grid; gap: 4px; min-width: 0; }"
           }
         ]
       }
@@ -194,11 +199,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 1,
+        "count": 2,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2283,
+            "text": ":root[data-theme='light'] .module-view[data-module='heat-recovery'],"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2619,
             "text": ":root[data-theme='light'] .module-view[data-module='heat-recovery'],"
           }
         ]
@@ -210,11 +220,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 1,
+        "count": 2,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2281,
+            "text": ":root[data-theme='light'] .module-view[data-module='heating-cooling'] { --tc-active-accent: var(--tc-accent-heating); }"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2617,
             "text": ":root[data-theme='light'] .module-view[data-module='heating-cooling'] { --tc-active-accent: var(--tc-accent-heating); }"
           }
         ]
@@ -226,11 +241,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 1,
+        "count": 2,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2284,
+            "text": ":root[data-theme='light'] .module-view[data-module='hx-diagram'] { --tc-active-accent: var(--tc-accent-air); }"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2620,
             "text": ":root[data-theme='light'] .module-view[data-module='hx-diagram'] { --tc-active-accent: var(--tc-accent-air); }"
           }
         ]
@@ -242,11 +262,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 1,
+        "count": 2,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2287,
+            "text": ":root[data-theme='light'] .module-view[data-module='pipe-sizing'] { --tc-active-accent: var(--tc-accent-pipe); }"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2623,
             "text": ":root[data-theme='light'] .module-view[data-module='pipe-sizing'] { --tc-active-accent: var(--tc-accent-pipe); }"
           }
         ]
@@ -258,11 +283,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 6,
+        "count": 7,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2286,
+            "text": ":root[data-theme='light'] .module-view[data-module='pressure-holding'],"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2622,
             "text": ":root[data-theme='light'] .module-view[data-module='pressure-holding'],"
           },
           {
@@ -299,11 +329,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 1,
+        "count": 2,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2289,
+            "text": ":root[data-theme='light'] .module-view[data-module='rainwater'],"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2625,
             "text": ":root[data-theme='light'] .module-view[data-module='rainwater'],"
           }
         ]
@@ -366,11 +401,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 1,
+        "count": 2,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2282,
+            "text": ":root[data-theme='light'] .module-view[data-module='ventilation'],"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2618,
             "text": ":root[data-theme='light'] .module-view[data-module='ventilation'],"
           }
         ]
@@ -382,11 +422,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 4,
+        "count": 5,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2290,
+            "text": ":root[data-theme='light'] .module-view[data-module='wastewater'] { --tc-active-accent: var(--tc-accent-water); }"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2626,
             "text": ":root[data-theme='light'] .module-view[data-module='wastewater'] { --tc-active-accent: var(--tc-accent-water); }"
           },
           {
@@ -429,7 +474,7 @@
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 4,
+        "moduleCssSelectors": 5,
         "hasPlatformDynamic": true,
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
@@ -444,11 +489,16 @@
           "area": "css-specialization",
           "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
           "evidence": {
-            "count": 4,
+            "count": 5,
             "samples": [
               {
                 "cssFile": "css/components.css",
                 "line": 2285,
+                "text": ":root[data-theme='light'] .module-view[data-module='buffer-storage'],"
+              },
+              {
+                "cssFile": "css/components.css",
+                "line": 2621,
                 "text": ":root[data-theme='light'] .module-view[data-module='buffer-storage'],"
               },
               {
@@ -492,7 +542,7 @@
         "nonControllerAddEventListeners": 4,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 8,
+        "moduleCssSelectors": 9,
         "hasPlatformDynamic": false,
         "hasLocalDynamic": true,
         "hasLegacyCollection": false,
@@ -545,11 +595,16 @@
           "area": "css-specialization",
           "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
           "evidence": {
-            "count": 8,
+            "count": 9,
             "samples": [
               {
                 "cssFile": "css/components.css",
                 "line": 2288,
+                "text": ":root[data-theme='light'] .module-view[data-module='drinking-water'],"
+              },
+              {
+                "cssFile": "css/components.css",
+                "line": 2624,
                 "text": ":root[data-theme='light'] .module-view[data-module='drinking-water'],"
               },
               {
@@ -581,11 +636,6 @@
                 "cssFile": "css/modules.css",
                 "line": 96,
                 "text": ".module-view[data-module='drinking-water'] .tc-consumer-row > div,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 97,
-                "text": ".module-view[data-module='drinking-water'] .tc-fixture-row > div { display: grid; gap: 4px; min-width: 0; }"
               }
             ]
           }
@@ -613,7 +663,7 @@
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 1,
+        "moduleCssSelectors": 2,
         "hasPlatformDynamic": false,
         "hasLocalDynamic": true,
         "hasLegacyCollection": false,
@@ -628,11 +678,16 @@
           "area": "css-specialization",
           "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
           "evidence": {
-            "count": 1,
+            "count": 2,
             "samples": [
               {
                 "cssFile": "css/components.css",
                 "line": 2283,
+                "text": ":root[data-theme='light'] .module-view[data-module='heat-recovery'],"
+              },
+              {
+                "cssFile": "css/components.css",
+                "line": 2619,
                 "text": ":root[data-theme='light'] .module-view[data-module='heat-recovery'],"
               }
             ]
@@ -660,7 +715,7 @@
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 1,
+        "moduleCssSelectors": 2,
         "hasPlatformDynamic": true,
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
@@ -675,11 +730,16 @@
           "area": "css-specialization",
           "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
           "evidence": {
-            "count": 1,
+            "count": 2,
             "samples": [
               {
                 "cssFile": "css/components.css",
                 "line": 2281,
+                "text": ":root[data-theme='light'] .module-view[data-module='heating-cooling'] { --tc-active-accent: var(--tc-accent-heating); }"
+              },
+              {
+                "cssFile": "css/components.css",
+                "line": 2617,
                 "text": ":root[data-theme='light'] .module-view[data-module='heating-cooling'] { --tc-active-accent: var(--tc-accent-heating); }"
               }
             ]
@@ -711,7 +771,7 @@
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 1,
+        "moduleCssSelectors": 2,
         "hasPlatformDynamic": false,
         "hasLocalDynamic": true,
         "hasLegacyCollection": false,
@@ -726,11 +786,16 @@
           "area": "css-specialization",
           "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
           "evidence": {
-            "count": 1,
+            "count": 2,
             "samples": [
               {
                 "cssFile": "css/components.css",
                 "line": 2284,
+                "text": ":root[data-theme='light'] .module-view[data-module='hx-diagram'] { --tc-active-accent: var(--tc-accent-air); }"
+              },
+              {
+                "cssFile": "css/components.css",
+                "line": 2620,
                 "text": ":root[data-theme='light'] .module-view[data-module='hx-diagram'] { --tc-active-accent: var(--tc-accent-air); }"
               }
             ]
@@ -758,7 +823,7 @@
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 1,
+        "moduleCssSelectors": 2,
         "hasPlatformDynamic": true,
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
@@ -773,11 +838,16 @@
           "area": "css-specialization",
           "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
           "evidence": {
-            "count": 1,
+            "count": 2,
             "samples": [
               {
                 "cssFile": "css/components.css",
                 "line": 2287,
+                "text": ":root[data-theme='light'] .module-view[data-module='pipe-sizing'] { --tc-active-accent: var(--tc-accent-pipe); }"
+              },
+              {
+                "cssFile": "css/components.css",
+                "line": 2623,
                 "text": ":root[data-theme='light'] .module-view[data-module='pipe-sizing'] { --tc-active-accent: var(--tc-accent-pipe); }"
               }
             ]
@@ -805,7 +875,7 @@
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 6,
+        "moduleCssSelectors": 7,
         "hasPlatformDynamic": true,
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
@@ -820,11 +890,16 @@
           "area": "css-specialization",
           "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
           "evidence": {
-            "count": 6,
+            "count": 7,
             "samples": [
               {
                 "cssFile": "css/components.css",
                 "line": 2286,
+                "text": ":root[data-theme='light'] .module-view[data-module='pressure-holding'],"
+              },
+              {
+                "cssFile": "css/components.css",
+                "line": 2622,
                 "text": ":root[data-theme='light'] .module-view[data-module='pressure-holding'],"
               },
               {
@@ -878,7 +953,7 @@
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 1,
+        "moduleCssSelectors": 2,
         "hasPlatformDynamic": true,
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
@@ -893,11 +968,16 @@
           "area": "css-specialization",
           "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
           "evidence": {
-            "count": 1,
+            "count": 2,
             "samples": [
               {
                 "cssFile": "css/components.css",
                 "line": 2289,
+                "text": ":root[data-theme='light'] .module-view[data-module='rainwater'],"
+              },
+              {
+                "cssFile": "css/components.css",
+                "line": 2625,
                 "text": ":root[data-theme='light'] .module-view[data-module='rainwater'],"
               }
             ]
@@ -1007,7 +1087,7 @@
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 1,
+        "moduleCssSelectors": 2,
         "hasPlatformDynamic": false,
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
@@ -1022,11 +1102,16 @@
           "area": "css-specialization",
           "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
           "evidence": {
-            "count": 1,
+            "count": 2,
             "samples": [
               {
                 "cssFile": "css/components.css",
                 "line": 2282,
+                "text": ":root[data-theme='light'] .module-view[data-module='ventilation'],"
+              },
+              {
+                "cssFile": "css/components.css",
+                "line": 2618,
                 "text": ":root[data-theme='light'] .module-view[data-module='ventilation'],"
               }
             ]
@@ -1056,7 +1141,7 @@
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 4,
+        "moduleCssSelectors": 5,
         "hasPlatformDynamic": true,
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
@@ -1071,11 +1156,16 @@
           "area": "css-specialization",
           "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
           "evidence": {
-            "count": 4,
+            "count": 5,
             "samples": [
               {
                 "cssFile": "css/components.css",
                 "line": 2290,
+                "text": ":root[data-theme='light'] .module-view[data-module='wastewater'] { --tc-active-accent: var(--tc-accent-water); }"
+              },
+              {
+                "cssFile": "css/components.css",
+                "line": 2626,
                 "text": ":root[data-theme='light'] .module-view[data-module='wastewater'] { --tc-active-accent: var(--tc-accent-water); }"
               },
               {
@@ -1283,11 +1373,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 4,
+        "count": 5,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2285,
+            "text": ":root[data-theme='light'] .module-view[data-module='buffer-storage'],"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2621,
             "text": ":root[data-theme='light'] .module-view[data-module='buffer-storage'],"
           },
           {
@@ -1323,11 +1418,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 8,
+        "count": 9,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2288,
+            "text": ":root[data-theme='light'] .module-view[data-module='drinking-water'],"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2624,
             "text": ":root[data-theme='light'] .module-view[data-module='drinking-water'],"
           },
           {
@@ -1359,11 +1459,6 @@
             "cssFile": "css/modules.css",
             "line": 96,
             "text": ".module-view[data-module='drinking-water'] .tc-consumer-row > div,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 97,
-            "text": ".module-view[data-module='drinking-water'] .tc-fixture-row > div { display: grid; gap: 4px; min-width: 0; }"
           }
         ]
       }
@@ -1374,11 +1469,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 1,
+        "count": 2,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2283,
+            "text": ":root[data-theme='light'] .module-view[data-module='heat-recovery'],"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2619,
             "text": ":root[data-theme='light'] .module-view[data-module='heat-recovery'],"
           }
         ]
@@ -1390,11 +1490,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 1,
+        "count": 2,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2281,
+            "text": ":root[data-theme='light'] .module-view[data-module='heating-cooling'] { --tc-active-accent: var(--tc-accent-heating); }"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2617,
             "text": ":root[data-theme='light'] .module-view[data-module='heating-cooling'] { --tc-active-accent: var(--tc-accent-heating); }"
           }
         ]
@@ -1406,11 +1511,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 1,
+        "count": 2,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2284,
+            "text": ":root[data-theme='light'] .module-view[data-module='hx-diagram'] { --tc-active-accent: var(--tc-accent-air); }"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2620,
             "text": ":root[data-theme='light'] .module-view[data-module='hx-diagram'] { --tc-active-accent: var(--tc-accent-air); }"
           }
         ]
@@ -1422,11 +1532,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 1,
+        "count": 2,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2287,
+            "text": ":root[data-theme='light'] .module-view[data-module='pipe-sizing'] { --tc-active-accent: var(--tc-accent-pipe); }"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2623,
             "text": ":root[data-theme='light'] .module-view[data-module='pipe-sizing'] { --tc-active-accent: var(--tc-accent-pipe); }"
           }
         ]
@@ -1438,11 +1553,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 6,
+        "count": 7,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2286,
+            "text": ":root[data-theme='light'] .module-view[data-module='pressure-holding'],"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2622,
             "text": ":root[data-theme='light'] .module-view[data-module='pressure-holding'],"
           },
           {
@@ -1479,11 +1599,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 1,
+        "count": 2,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2289,
+            "text": ":root[data-theme='light'] .module-view[data-module='rainwater'],"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2625,
             "text": ":root[data-theme='light'] .module-view[data-module='rainwater'],"
           }
         ]
@@ -1546,11 +1671,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 1,
+        "count": 2,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2282,
+            "text": ":root[data-theme='light'] .module-view[data-module='ventilation'],"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2618,
             "text": ":root[data-theme='light'] .module-view[data-module='ventilation'],"
           }
         ]
@@ -1562,11 +1692,16 @@
       "area": "css-specialization",
       "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
       "evidence": {
-        "count": 4,
+        "count": 5,
         "samples": [
           {
             "cssFile": "css/components.css",
             "line": 2290,
+            "text": ":root[data-theme='light'] .module-view[data-module='wastewater'] { --tc-active-accent: var(--tc-accent-water); }"
+          },
+          {
+            "cssFile": "css/components.css",
+            "line": 2626,
             "text": ":root[data-theme='light'] .module-view[data-module='wastewater'] { --tc-active-accent: var(--tc-accent-water); }"
           },
           {

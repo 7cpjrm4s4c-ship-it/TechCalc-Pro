@@ -1,4 +1,4 @@
-## 1.3.2-dev.8 – Light Theme Kontrast- und Akzentkorrektur
+## 1.3.2-dev.9 – Light Theme Kontrast- und Akzentkorrektur
 - Toggle-Füllungen werden im Light Theme wieder aus derselben Modul-Akzentfarbe wie der Rahmen abgeleitet.
 - Release-Notes-Cards im Einstellungsmenü verwenden ausschließlich helle Light-Theme-Flächen.
 - Textfarben im Light Theme wurden global auf dunkles Anthrazit und gedämpftes Grau normalisiert.

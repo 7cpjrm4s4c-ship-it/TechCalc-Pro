@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.2-dev.8';
-const CACHE_REVISION = '1.3.2-dev.8-1-3-2-dev-8-light-theme-kontrast-und-akzentkorrektur';
+const CACHE_NAME = 'techcalc-pro-1.3.2-dev.9';
+const CACHE_REVISION = '1.3.2-dev.9-1-3-2-dev-9-light-theme-kontrast-und-akzentkorrektur';
 const ASSETS = [
   './',
   './index.html',
