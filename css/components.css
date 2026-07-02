@@ -2404,3 +2404,178 @@ html {
 :root[data-theme='light'] .dw-accordion {
   color: var(--color-text) !important;
 }
+
+/* 1.3.2G — Light Theme Contrast & Accent Recovery
+   Finalizes Light Theme component inheritance after module-accent rollout.
+   The active segment fill now always derives from the same module accent as the border.
+   Release notes and menu content use Light surfaces only. Text remains global dark/gray. */
+:root[data-theme='light'] {
+  --tc-active-accent: var(--accent-blue);
+  --tc-active-accent-soft: color-mix(in srgb, var(--tc-active-accent) 17%, #ffffff);
+  --tc-active-accent-hover: color-mix(in srgb, var(--tc-active-accent) 10%, #ffffff);
+  --tc-active-accent-border: color-mix(in srgb, var(--tc-active-accent) 72%, var(--color-border));
+  --tc-light-release-bg: var(--color-surface);
+  --tc-light-release-bg-soft: color-mix(in srgb, var(--tc-light-bg) 82%, #ffffff);
+}
+
+:root[data-theme='light'] .segmented--orange,
+:root[data-theme='light'] .card--accent-orange,
+:root[data-theme='light'] [data-accent='orange'] { --tc-active-accent: var(--tc-accent-heating); }
+
+:root[data-theme='light'] .segmented--cyan,
+:root[data-theme='light'] .card--accent-cyan,
+:root[data-theme='light'] [data-accent='cyan'] { --tc-active-accent: var(--tc-accent-air); }
+
+:root[data-theme='light'] .segmented--blue,
+:root[data-theme='light'] .card--accent-blue,
+:root[data-theme='light'] [data-accent='blue'] { --tc-active-accent: var(--tc-accent-pipe); }
+
+:root[data-theme='light'] .segmented--green,
+:root[data-theme='light'] .card--accent-green,
+:root[data-theme='light'] [data-accent='green'] { --tc-active-accent: var(--tc-accent-water); }
+
+:root[data-theme='light'] .segmented--purple,
+:root[data-theme='light'] .card--accent-purple,
+:root[data-theme='light'] [data-accent='purple'] { --tc-active-accent: var(--tc-accent-pressure); }
+
+:root[data-theme='light'] .module-view .segmented,
+:root[data-theme='light'] .segmented {
+  border-color: var(--tc-active-accent-border) !important;
+  background: color-mix(in srgb, var(--color-surface-soft) 78%, #ffffff) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme='light'] .segmented button,
+:root[data-theme='light'] .segment-button,
+:root[data-theme='light'] .tc-segment-button,
+:root[data-theme='light'] .theme-switch__option {
+  color: var(--color-text) !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+}
+
+:root[data-theme='light'] .segmented button.is-active,
+:root[data-theme='light'] .segmented--orange button.is-active,
+:root[data-theme='light'] .segmented--cyan button.is-active,
+:root[data-theme='light'] .segmented--blue button.is-active,
+:root[data-theme='light'] .segmented--green button.is-active,
+:root[data-theme='light'] .segmented--purple button.is-active,
+:root[data-theme='light'] .segment-button.is-active,
+:root[data-theme='light'] .tc-segment-button.is-active,
+:root[data-theme='light'] .theme-switch__option.is-active,
+:root[data-theme='light'] .theme-switch__option[aria-pressed='true'] {
+  background: var(--tc-active-accent-soft) !important;
+  border-color: var(--tc-active-accent) !important;
+  color: var(--color-text) !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--tc-active-accent) 28%, transparent),
+    0 0 0 3px color-mix(in srgb, var(--tc-active-accent) 14%, transparent) !important;
+}
+
+:root[data-theme='light'] .segmented button:hover,
+:root[data-theme='light'] .segment-button:hover,
+:root[data-theme='light'] .tc-segment-button:hover,
+:root[data-theme='light'] .theme-switch__option:hover {
+  background: var(--tc-active-accent-hover) !important;
+  color: var(--color-text) !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+}
+
+:root[data-theme='light'] .settings-submenu,
+:root[data-theme='light'] .settings-submenu[open],
+:root[data-theme='light'] .settings-submenu__content,
+:root[data-theme='light'] .settings-form,
+:root[data-theme='light'] .release-notes-panel,
+:root[data-theme='light'] #releaseNotesDynamic {
+  background-color: transparent !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme='light'] .release-note,
+:root[data-theme='light'] .release-note-card,
+:root[data-theme='light'] #releaseNotesDynamic > article,
+:root[data-theme='light'] .release-notes-panel .settings-info-row {
+  background: var(--tc-light-release-bg) !important;
+  background-image: none !important;
+  color: var(--color-text) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--tc-radius-card) !important;
+  box-shadow: var(--shadow-glass) !important;
+}
+
+:root[data-theme='light'] .release-note.is-current,
+:root[data-theme='light'] #releaseNotesDynamic > article.is-current {
+  border-color: var(--tc-active-accent-border) !important;
+  background: var(--tc-light-release-bg-soft) !important;
+}
+
+:root[data-theme='light'] .release-note__version,
+:root[data-theme='light'] .release-note__title,
+:root[data-theme='light'] .release-note strong,
+:root[data-theme='light'] .release-note-card strong,
+:root[data-theme='light'] .release-note-card h1,
+:root[data-theme='light'] .release-note-card h2,
+:root[data-theme='light'] .release-note-card h3 {
+  color: var(--color-text) !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+}
+
+:root[data-theme='light'] .release-note small,
+:root[data-theme='light'] .release-note-card small,
+:root[data-theme='light'] .release-note-card time,
+:root[data-theme='light'] .settings-info-row span {
+  color: var(--color-muted) !important;
+  -webkit-text-fill-color: var(--color-muted) !important;
+}
+
+:root[data-theme='light'] .release-note__badge {
+  background: var(--tc-active-accent-soft) !important;
+  border-color: var(--tc-active-accent) !important;
+  color: var(--color-text) !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+}
+
+:root[data-theme='light'] .card,
+:root[data-theme='light'] .tc-card,
+:root[data-theme='light'] .result-card,
+:root[data-theme='light'] .settings-panel,
+:root[data-theme='light'] .settings-panel *,
+:root[data-theme='light'] .overflow-menu,
+:root[data-theme='light'] .overflow-menu *,
+:root[data-theme='light'] .module-content,
+:root[data-theme='light'] .module-content * {
+  color: inherit;
+}
+
+:root[data-theme='light'] .module-content,
+:root[data-theme='light'] .settings-panel,
+:root[data-theme='light'] .overflow-menu,
+:root[data-theme='light'] .card,
+:root[data-theme='light'] .tc-card,
+:root[data-theme='light'] .result-card,
+:root[data-theme='light'] .control,
+:root[data-theme='light'] .tc-control,
+:root[data-theme='light'] input,
+:root[data-theme='light'] select,
+:root[data-theme='light'] textarea,
+:root[data-theme='light'] button {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme='light'] .muted,
+:root[data-theme='light'] small,
+:root[data-theme='light'] .subtitle,
+:root[data-theme='light'] .brand__subtitle,
+:root[data-theme='light'] .card__title,
+:root[data-theme='light'] .tc-card__title,
+:root[data-theme='light'] .field label,
+:root[data-theme='light'] .unit,
+:root[data-theme='light'] .tc-note,
+:root[data-theme='light'] .tc-help,
+:root[data-theme='light'] .ph-help,
+:root[data-theme='light'] .ph-note,
+:root[data-theme='light'] .dw-note,
+:root[data-theme='light'] .settings-hint {
+  color: var(--color-muted) !important;
+  -webkit-text-fill-color: var(--color-muted) !important;
+}

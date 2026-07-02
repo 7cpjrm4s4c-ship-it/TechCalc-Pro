@@ -1,3 +1,9 @@
+## 1.3.2-dev.8 – Light Theme Kontrast- und Akzentkorrektur
+- Toggle-Füllungen werden im Light Theme wieder aus derselben Modul-Akzentfarbe wie der Rahmen abgeleitet.
+- Release-Notes-Cards im Einstellungsmenü verwenden ausschließlich helle Light-Theme-Flächen.
+- Textfarben im Light Theme wurden global auf dunkles Anthrazit und gedämpftes Grau normalisiert.
+- Dark/System bleiben unverändert.
+
 ## 1.3.2-dev.7 – Light Theme Module Rollout
 
 Light Theme weiter zentralisiert: Modul-Akzentfarben werden nun über Module-Root-Tokens an Cards, Navigation, Segment-Controls, Fokuszustände, Accordions und Aktionsflächen vererbt. Textfarbe bleibt global dunkel. Pattern-/Schraffurflächen wurden für Menüs und Accordion-Flächen vollflächig abgesichert. Dark/System bleiben unverändert.
