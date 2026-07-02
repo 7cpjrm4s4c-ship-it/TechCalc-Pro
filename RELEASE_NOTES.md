@@ -1,3 +1,11 @@
+## 1.3.2-dev.5 – Light Theme Accent & Surface Completion
+
+- Aktive Segment-Buttons, Tabs, Fokus- und Hover-Zustaende verwenden im Light Mode wieder die jeweilige Modul-Akzentfarbe statt pauschal Blau.
+- Heizung/Orange wird in Switches und aktiven Auswahlzustaenden konsistent zur Card-Rahmenfarbe dargestellt.
+- Header-Menue, Settings-Panel, Modul-Auswahl und Trinkwasser-Accordions erhalten vollflaechige helle Pattern-/Schraffur-Hintergruende.
+- Dropdown-/Accordion-Pfeile bleiben kontrastreich und folgen dem zentralen Accent-System.
+- Dark/System funktional unveraendert belassen.
+
 ## 1.3.2-dev.4 – Layout & Navigation Foundation
 
 - Light-Theme-Layout fuer Header, Modulnavigation, Menue, Overflow und Settings zentralisiert.

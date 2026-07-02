@@ -2074,3 +2074,114 @@ html {
 :root[data-theme='light'] .release-note-card li + li {
   margin-top: 6px !important;
 }
+
+/* 1.3.2D — Light Theme Accent & Surface Completion
+   Central fix: active UI controls now consume the active module accent instead of forcing blue.
+   Patterned light surfaces are applied as full-container backgrounds for menus and accordions. */
+:root[data-theme='light'] {
+  --tc-light-pattern:
+    linear-gradient(145deg,
+      rgba(255,255,255,.82) 0%,
+      rgba(255,255,255,.82) 48%,
+      rgba(232,226,215,.50) 48%,
+      rgba(232,226,215,.50) 100%);
+  --tc-active-accent: var(--accent-blue);
+  --tc-active-accent-soft: color-mix(in srgb, var(--tc-active-accent) 18%, #ffffff);
+  --tc-active-accent-hover: color-mix(in srgb, var(--tc-active-accent) 12%, #ffffff);
+  --tc-active-accent-text: color-mix(in srgb, var(--tc-active-accent) 55%, #0f172a);
+  --tc-active-accent-border: color-mix(in srgb, var(--tc-active-accent) 72%, var(--color-border));
+}
+
+:root[data-theme='light'] .card--accent-orange,
+:root[data-theme='light'] .segmented--orange,
+:root[data-theme='light'] [data-accent='orange'] { --tc-active-accent: var(--accent-orange); }
+:root[data-theme='light'] .card--accent-cyan,
+:root[data-theme='light'] .segmented--cyan,
+:root[data-theme='light'] [data-accent='cyan'] { --tc-active-accent: var(--accent-cyan); }
+:root[data-theme='light'] .card--accent-blue,
+:root[data-theme='light'] .segmented--blue,
+:root[data-theme='light'] [data-accent='blue'] { --tc-active-accent: var(--accent-blue); }
+:root[data-theme='light'] .card--accent-green,
+:root[data-theme='light'] .segmented--green,
+:root[data-theme='light'] [data-accent='green'] { --tc-active-accent: var(--accent-green); }
+:root[data-theme='light'] .card--accent-purple,
+:root[data-theme='light'] .segmented--purple,
+:root[data-theme='light'] [data-accent='purple'] { --tc-active-accent: var(--accent-purple); }
+
+:root[data-theme='light'] .module-tab.is-active,
+:root[data-theme='light'] .module-tab.is-overflow-active,
+:root[data-theme='light'] .module-tab[aria-current='page'] {
+  background: color-mix(in srgb, var(--tc-active-accent) 16%, #ffffff) !important;
+  color: var(--tc-active-accent-text) !important;
+  border-color: var(--tc-active-accent) !important;
+  box-shadow: inset 0 -3px 0 var(--tc-active-accent) !important;
+}
+
+:root[data-theme='light'] .module-tab:hover,
+:root[data-theme='light'] .module-tab:focus-visible,
+:root[data-theme='light'] .overflow-menu__row:hover,
+:root[data-theme='light'] .overflow-menu button:hover,
+:root[data-theme='light'] .overflow-menu__row.is-active {
+  background: var(--tc-active-accent-hover) !important;
+  border-color: var(--tc-active-accent-border) !important;
+}
+
+:root[data-theme='light'] .segmented button:hover,
+:root[data-theme='light'] .theme-switch__option:hover {
+  background: var(--tc-active-accent-hover) !important;
+}
+
+:root[data-theme='light'] .segmented button.is-active,
+:root[data-theme='light'] .segmented--orange button.is-active,
+:root[data-theme='light'] .segmented--cyan button.is-active,
+:root[data-theme='light'] .segmented--blue button.is-active,
+:root[data-theme='light'] .segmented--green button.is-active,
+:root[data-theme='light'] .segmented--purple button.is-active {
+  background: var(--tc-active-accent-soft) !important;
+  border-color: var(--tc-active-accent) !important;
+  color: var(--tc-active-accent-text) !important;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--tc-active-accent) 22%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--tc-active-accent) 18%, transparent) !important;
+}
+
+:root[data-theme='light'] .control:focus-within,
+:root[data-theme='light'] .tc-control:focus-within,
+:root[data-theme='light'] .settings-form input:focus,
+:root[data-theme='light'] .settings-form textarea:focus,
+:root[data-theme='light'] .settings-form select:focus,
+:root[data-theme='light'] .project-select-card select:focus-visible,
+:root[data-theme='light'] .action-button:focus-visible,
+:root[data-theme='light'] .tc-action:focus-visible,
+:root[data-theme='light'] .mini-button:focus-visible,
+:root[data-theme='light'] .icon-button:focus-visible {
+  border-color: var(--tc-active-accent) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--tc-active-accent) 38%, transparent), 0 0 0 5px color-mix(in srgb, var(--tc-active-accent) 12%, transparent) !important;
+}
+
+:root[data-theme='light'] .settings-submenu,
+:root[data-theme='light'] .settings-submenu > summary,
+:root[data-theme='light'] .settings-submenu__content,
+:root[data-theme='light'] .tc-accordion,
+:root[data-theme='light'] .tc-accordion > summary,
+:root[data-theme='light'] .tc-accordion__body,
+:root[data-theme='light'] .dw-accordion,
+:root[data-theme='light'] .dw-accordion > summary,
+:root[data-theme='light'] .dw-accordion__body,
+:root[data-theme='light'] .overflow-menu,
+:root[data-theme='light'] .overflow-menu__card,
+:root[data-theme='light'] .overflow-menu__list,
+:root[data-theme='light'] .settings-panel,
+:root[data-theme='light'] .settings-panel__head,
+:root[data-theme='light'] .settings-panel__body {
+  background-image: var(--tc-light-pattern) !important;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+  background-position: center stretch !important;
+}
+
+:root[data-theme='light'] .settings-submenu > summary::after,
+:root[data-theme='light'] .tc-accordion > summary::after,
+:root[data-theme='light'] .dw-accordion > summary::after {
+  color: var(--tc-active-accent) !important;
+}
