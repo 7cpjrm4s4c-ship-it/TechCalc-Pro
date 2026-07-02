@@ -1,3 +1,11 @@
+## 1.3.2-dev.3 – Central Components Foundation
+
+- Light-Theme-Komponenten auf zentrale UI-Primitives konsolidiert.
+- Buttons, Segment Controls, Inputs, Selects, Cards, Accordions, Header-Menü und Modul-Auswahl über globale Tokens nachgeschärft.
+- Akzentfarben im Light Mode kräftiger und barriereärmer gesetzt.
+- Dunkle Light-Mode-Restflächen in Menü, Overflow und Accordions entfernt.
+- Dark/System funktional unverändert belassen.
+
 ## 1.3.2-dev.2 – Central UI Tokens & Light Theme Foundation
 
 - Light Theme auf zentrale Tokens fuer Hintergrund, Flaechen, Rahmen, Typografie, Radien, Schatten und Akzentfarben gehoben.

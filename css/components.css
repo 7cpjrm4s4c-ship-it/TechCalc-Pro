@@ -1633,3 +1633,301 @@ html {
     box-shadow: 0 8px 26px rgba(63,54,39,.16);
   }
 }
+
+/* 1.3.2B — Central Components Foundation
+   Global component hardening for Light Theme only. Dark/System remain unchanged. */
+:root[data-theme='light'] {
+  --tc-component-bg: var(--tc-light-surface);
+  --tc-component-bg-soft: var(--tc-light-surface-soft);
+  --tc-component-field: var(--tc-light-field);
+  --tc-component-border: var(--color-border);
+  --tc-component-border-strong: var(--color-border-strong);
+  --tc-component-text: var(--color-text);
+  --tc-component-muted: var(--color-muted);
+  --tc-button-primary-bg: #0069bd;
+  --tc-button-primary-bg-hover: #005aa3;
+  --tc-button-secondary-bg: #f7f6f2;
+  --tc-button-secondary-border: #a8a193;
+  --tc-button-danger: #b42318;
+  --tc-control-shadow: 0 1px 0 rgba(255,255,255,.9) inset;
+}
+
+:root[data-theme='light'] .app-shell,
+:root[data-theme='light'] .app-main,
+:root[data-theme='light'] .module-content {
+  background: transparent !important;
+  color: var(--tc-component-text) !important;
+}
+
+:root[data-theme='light'] .glass-surface,
+:root[data-theme='light'] .card,
+:root[data-theme='light'] .tc-card,
+:root[data-theme='light'] .result-card,
+:root[data-theme='light'] .settings-panel,
+:root[data-theme='light'] .overflow-menu,
+:root[data-theme='light'] .overflow-menu__card,
+:root[data-theme='light'] .line-section-card,
+:root[data-theme='light'] .saved-record-card,
+:root[data-theme='light'] .ph-saved-item,
+:root[data-theme='light'] .tc-item,
+:root[data-theme='light'] .tc-consumer-row,
+:root[data-theme='light'] .tc-fixture-row,
+:root[data-theme='light'] .dw-consumer-row,
+:root[data-theme='light'] .dw-fixture-row,
+:root[data-theme='light'] .inline-stat,
+:root[data-theme='light'] .tc-result-item,
+:root[data-theme='light'] .pipe-dimension-card {
+  background: var(--tc-component-bg) !important;
+  color: var(--tc-component-text) !important;
+  border: 1px solid var(--tc-component-border) !important;
+  border-radius: var(--tc-radius-card) !important;
+  box-shadow: var(--shadow-glass) !important;
+}
+
+:root[data-theme='light'] .card,
+:root[data-theme='light'] .tc-card,
+:root[data-theme='light'] .result-card,
+:root[data-theme='light'] .line-section-card,
+:root[data-theme='light'] .saved-record-card,
+:root[data-theme='light'] .ph-saved-item {
+  padding: var(--tc-card-padding) !important;
+  gap: var(--tc-gap) !important;
+}
+
+:root[data-theme='light'] .card--accent-orange { border-color: color-mix(in srgb, var(--accent-orange) 58%, var(--tc-component-border)) !important; }
+:root[data-theme='light'] .card--accent-cyan { border-color: color-mix(in srgb, var(--accent-cyan) 58%, var(--tc-component-border)) !important; }
+:root[data-theme='light'] .card--accent-blue { border-color: color-mix(in srgb, var(--accent-blue) 64%, var(--tc-component-border)) !important; }
+:root[data-theme='light'] .card--accent-green { border-color: color-mix(in srgb, var(--accent-green) 58%, var(--tc-component-border)) !important; }
+:root[data-theme='light'] .card--accent-purple { border-color: color-mix(in srgb, var(--accent-purple) 58%, var(--tc-component-border)) !important; }
+
+:root[data-theme='light'] .control,
+:root[data-theme='light'] .tc-control {
+  min-height: var(--tc-control-height) !important;
+  background: var(--tc-component-field) !important;
+  border: 1px solid var(--tc-component-border-strong) !important;
+  border-radius: var(--tc-radius-base) !important;
+  box-shadow: var(--tc-control-shadow) !important;
+  color: var(--tc-component-text) !important;
+}
+
+:root[data-theme='light'] .control input,
+:root[data-theme='light'] .control select,
+:root[data-theme='light'] .tc-control input,
+:root[data-theme='light'] .tc-control select,
+:root[data-theme='light'] .settings-form input,
+:root[data-theme='light'] .settings-form textarea,
+:root[data-theme='light'] .settings-form select,
+:root[data-theme='light'] .tc-add-row input,
+:root[data-theme='light'] .tc-add-row select,
+:root[data-theme='light'] .dw-add-row input,
+:root[data-theme='light'] .dw-add-row select,
+:root[data-theme='light'] .project-select-card select {
+  background: transparent !important;
+  color: var(--tc-component-text) !important;
+  border-color: var(--tc-component-border-strong) !important;
+  -webkit-text-fill-color: var(--tc-component-text);
+}
+
+:root[data-theme='light'] .settings-form input,
+:root[data-theme='light'] .settings-form textarea,
+:root[data-theme='light'] .settings-form select,
+:root[data-theme='light'] .tc-add-row input,
+:root[data-theme='light'] .tc-add-row select,
+:root[data-theme='light'] .dw-add-row input,
+:root[data-theme='light'] .dw-add-row select,
+:root[data-theme='light'] .project-select-card select {
+  background: var(--tc-component-field) !important;
+  border: 1px solid var(--tc-component-border-strong) !important;
+  border-radius: var(--tc-radius-base) !important;
+  min-height: var(--tc-control-height) !important;
+  padding-inline: var(--tc-control-padding-x) !important;
+  box-shadow: var(--tc-control-shadow) !important;
+}
+
+:root[data-theme='light'] .unit,
+:root[data-theme='light'] .unit-select,
+:root[data-theme='light'] .control .unit-select {
+  background: color-mix(in srgb, var(--tc-component-field) 82%, #ffffff) !important;
+  color: var(--tc-component-text) !important;
+  border-color: var(--tc-component-border-strong) !important;
+  color-scheme: light !important;
+}
+
+:root[data-theme='light'] .control:focus-within,
+:root[data-theme='light'] .tc-control:focus-within,
+:root[data-theme='light'] .settings-form input:focus,
+:root[data-theme='light'] .settings-form textarea:focus,
+:root[data-theme='light'] .settings-form select:focus,
+:root[data-theme='light'] .project-select-card select:focus-visible,
+:root[data-theme='light'] .theme-switch__option:focus-visible,
+:root[data-theme='light'] .action-button:focus-visible,
+:root[data-theme='light'] .tc-action:focus-visible,
+:root[data-theme='light'] .mini-button:focus-visible,
+:root[data-theme='light'] .icon-button:focus-visible {
+  border-color: var(--accent-blue) !important;
+  box-shadow: var(--shadow-active) !important;
+  outline: 0 !important;
+}
+
+:root[data-theme='light'] .action-button,
+:root[data-theme='light'] .tc-action,
+:root[data-theme='light'] .mini-button,
+:root[data-theme='light'] .sign-toggle,
+:root[data-theme='light'] .overflow-menu__quick,
+:root[data-theme='light'] .theme-switch__option,
+:root[data-theme='light'] .segmented button {
+  border-radius: var(--tc-radius-pill) !important;
+  font-weight: 900 !important;
+}
+
+:root[data-theme='light'] .action-button,
+:root[data-theme='light'] .tc-action,
+:root[data-theme='light'] .mini-button--primary,
+:root[data-theme='light'] .primary-button,
+:root[data-theme='light'] .tc-button--primary,
+:root[data-theme='light'] button[type='submit'] {
+  background: var(--tc-button-primary-bg) !important;
+  border-color: var(--tc-button-primary-bg) !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme='light'] .action-button:hover,
+:root[data-theme='light'] .tc-action:hover,
+:root[data-theme='light'] .mini-button--primary:hover,
+:root[data-theme='light'] .primary-button:hover,
+:root[data-theme='light'] .tc-button--primary:hover,
+:root[data-theme='light'] button[type='submit']:hover {
+  background: var(--tc-button-primary-bg-hover) !important;
+  border-color: var(--tc-button-primary-bg-hover) !important;
+}
+
+:root[data-theme='light'] .tc-action--ghost,
+:root[data-theme='light'] .action-button--secondary,
+:root[data-theme='light'] .mini-button,
+:root[data-theme='light'] .icon-button,
+:root[data-theme='light'] .theme-switch,
+:root[data-theme='light'] .segmented,
+:root[data-theme='light'] .sign-toggle {
+  background: var(--tc-button-secondary-bg) !important;
+  border-color: var(--tc-button-secondary-border) !important;
+  color: var(--tc-component-text) !important;
+}
+
+:root[data-theme='light'] .action-button[disabled],
+:root[data-theme='light'] .tc-action[disabled],
+:root[data-theme='light'] .mini-button:disabled {
+  background: #e6e2d9 !important;
+  border-color: #c8c3b8 !important;
+  color: #6b7280 !important;
+  opacity: 1 !important;
+}
+
+:root[data-theme='light'] .mini-button--danger,
+:root[data-theme='light'] .line-section-card__delete,
+:root[data-theme='light'] .saved-record-card__delete,
+:root[data-theme='light'] .dw-delete-button {
+  background: #fff5f5 !important;
+  border-color: #f1a5a5 !important;
+  color: var(--tc-button-danger) !important;
+}
+
+:root[data-theme='light'] .segmented,
+:root[data-theme='light'] .theme-switch {
+  padding: 5px !important;
+  gap: 5px !important;
+  background: var(--tc-component-field) !important;
+  border: 1px solid var(--tc-component-border-strong) !important;
+  border-radius: var(--tc-radius-pill) !important;
+}
+
+:root[data-theme='light'] .segmented button,
+:root[data-theme='light'] .theme-switch__option {
+  color: var(--tc-component-muted) !important;
+  background: transparent !important;
+  border-color: transparent !important;
+}
+
+:root[data-theme='light'] .segmented button:hover,
+:root[data-theme='light'] .theme-switch__option:hover {
+  color: var(--tc-component-text) !important;
+  background: rgba(0,105,189,.10) !important;
+}
+
+:root[data-theme='light'] .segmented button.is-active,
+:root[data-theme='light'] .theme-switch__option.is-active,
+:root[data-theme='light'] .theme-switch__option[aria-pressed='true'],
+:root[data-theme='light'] .segmented--orange button.is-active,
+:root[data-theme='light'] .segmented--cyan button.is-active,
+:root[data-theme='light'] .segmented--blue button.is-active,
+:root[data-theme='light'] .segmented--purple button.is-active {
+  background: color-mix(in srgb, var(--accent-blue) 22%, #ffffff) !important;
+  border-color: var(--accent-blue) !important;
+  color: #0b3157 !important;
+  box-shadow: inset 0 0 0 1px rgba(0,105,189,.18) !important;
+}
+
+:root[data-theme='light'] .settings-submenu,
+:root[data-theme='light'] .tc-accordion,
+:root[data-theme='light'] .dw-accordion {
+  background: var(--tc-component-bg) !important;
+  border: 1px solid var(--tc-component-border) !important;
+  border-radius: var(--tc-radius-card) !important;
+  overflow: hidden !important;
+}
+
+:root[data-theme='light'] .settings-submenu > summary,
+:root[data-theme='light'] .tc-accordion > summary,
+:root[data-theme='light'] .dw-accordion > summary {
+  background: var(--tc-component-bg-soft) !important;
+  color: var(--tc-component-text) !important;
+  border-bottom: 1px solid var(--tc-component-border) !important;
+  min-height: 46px !important;
+}
+
+:root[data-theme='light'] .settings-submenu[open] > summary,
+:root[data-theme='light'] .tc-accordion[open] > summary,
+:root[data-theme='light'] .dw-accordion[open] > summary {
+  background: color-mix(in srgb, var(--tc-component-bg-soft) 82%, #ffffff) !important;
+}
+
+:root[data-theme='light'] .settings-submenu__content,
+:root[data-theme='light'] .tc-accordion__body,
+:root[data-theme='light'] .dw-accordion__body {
+  background: var(--tc-light-bg-elevated) !important;
+  color: var(--tc-component-text) !important;
+  padding: var(--tc-card-padding) !important;
+}
+
+:root[data-theme='light'] .overflow-menu,
+:root[data-theme='light'] .overflow-menu__card,
+:root[data-theme='light'] .overflow-menu__list {
+  background: var(--tc-light-bg) !important;
+  color: var(--tc-component-text) !important;
+}
+
+:root[data-theme='light'] .overflow-menu__row,
+:root[data-theme='light'] .overflow-menu__item,
+:root[data-theme='light'] .overflow-menu button {
+  background: var(--tc-component-bg) !important;
+  color: var(--tc-component-text) !important;
+  border-color: var(--tc-component-border) !important;
+}
+
+:root[data-theme='light'] .overflow-menu button:hover,
+:root[data-theme='light'] .overflow-menu__row.is-active {
+  background: color-mix(in srgb, var(--accent-blue) 12%, #ffffff) !important;
+  border-color: var(--accent-blue) !important;
+}
+
+:root[data-theme='light'] .result-row,
+:root[data-theme='light'] .main-result,
+:root[data-theme='light'] .pipe-result-head {
+  border-color: var(--tc-component-border) !important;
+}
+
+:root[data-theme='light'] .badge,
+:root[data-theme='light'] .pipe-dimension-card__head small {
+  background: color-mix(in srgb, var(--accent-blue) 16%, #ffffff) !important;
+  border-color: color-mix(in srgb, var(--accent-blue) 48%, #ffffff) !important;
+  color: #003f73 !important;
+}

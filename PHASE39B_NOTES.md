@@ -40,3 +40,10 @@ RC-1C.1: PDF-Engine-Refactoring und Korrekturen für Trinkwasser, h,x-Diagramm, 
 
 ## 1.3.2-dev.2
 - RC-1C PDF-Layout-Korrekturen: Spaltenausrichtung, lange Texte, h,x-Diagramm-Vorbereitung, WRG/Trinkwasser-Layout.
+
+
+## 1.3.2B – Central Components Foundation
+
+- Globale Light-Theme-Komponentenregeln für Cards, Controls, Buttons, Segment Controls, Accordions, Header-Menü und Overflow ergänzt.
+- Keine fachliche Modul-Logik geändert.
+- Dark/System Theme funktional unverändert.

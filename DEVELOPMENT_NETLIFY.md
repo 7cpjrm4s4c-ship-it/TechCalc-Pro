@@ -18,3 +18,10 @@ Schwerpunkt dieses Builds ist RC-1C.1: PDF-Qualität und Wartbarkeit der PDF-Eng
 ## 1.3.1-rc.9
 
 - PDF-Layout-Engine: feste Wertspalten-Anker, erhöhtes Zeilenraster, h,x-Diagramm-Cropping und Seitenverhältnis weiter stabilisiert.
+
+
+## 1.3.2B – Central Components Foundation
+
+- Globale Light-Theme-Komponentenregeln für Cards, Controls, Buttons, Segment Controls, Accordions, Header-Menü und Overflow ergänzt.
+- Keine fachliche Modul-Logik geändert.
+- Dark/System Theme funktional unverändert.
