@@ -1,3 +1,7 @@
+## 1.3.2-dev.10 – CSS-System entrümpelt
+
+Components-CSS wurde in zentrale, wartbare Dateien aufgeteilt: Core, Controls, Collections, Settings/Release Notes, Legacy Contracts, Light Theme, Module Accent Tokens und Guards. Neue UI-Regeln sollen nicht mehr an components.css angehängt werden. Dark/System bleiben unverändert.
+
 ## 1.3.2-dev.9 – Light Theme Kontrast- und Akzentkorrektur
 - Toggle-Füllungen werden im Light Theme wieder aus derselben Modul-Akzentfarbe wie der Rahmen abgeleitet.
 - Release-Notes-Cards im Einstellungsmenü verwenden ausschließlich helle Light-Theme-Flächen.

@@ -1,0 +1,503 @@
+/* TechCalc Pro 1.3.2 CSS System — Legacy compatibility contracts kept isolated for controlled migration.
+   Source: split from former components.css during dev.10 cleanup. */
+
+/* Shared editable collection row contract. Kept in components because Schmutzwasser,
+   Trinkwasser and future collection modules use the same quantity/delete geometry. */
+.tc-collection-row.tc-consumer-row--editable {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 82px 38px;
+  column-gap: var(--tc-gap);
+  align-items: center;
+}
+.tc-collection-row__content {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.tc-collection-row.tc-consumer-row--editable .tc-quantity-field {
+  width: 82px;
+  min-width: 82px;
+  max-width: 82px;
+  justify-self: end;
+}
+.tc-collection-row.tc-consumer-row--editable > button {
+  width: 38px;
+  min-width: 38px;
+  height: 34px;
+  justify-self: end;
+}
+
+@media (max-width: 768px) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+}
+
+/* Phase 35A: RC retest UI contract hardening.
+   Keep spacing, menu sizing and result rows globally consistent after 34D rebuild. */
+.module-content,
+.module-content > *,
+.tc-stack,
+.card,
+.tc-card,
+.card__body,
+.tc-card__body,
+.result-card__body,
+.result-list,
+.result-groups,
+.inline-stats,
+.line-section-list,
+.saved-record-list,
+[data-platform-dynamic],
+[data-pipe-dynamic],
+[data-ph-dynamic],
+[data-buffer-dynamic],
+[data-hx-dynamic],
+[data-dw-dynamic] {
+  gap: var(--tc-gap);
+}
+
+.card,
+.tc-card,
+.result-card,
+.line-section-card,
+.saved-record-card,
+.ph-saved-item,
+.pipe-dimension-card,
+.inline-stat,
+.result-row,
+.main-result {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.card__body,
+.tc-card__body,
+.result-card__body,
+.line-section-card__body,
+.saved-record-card__body,
+[data-platform-dynamic],
+[data-buffer-dynamic="result"],
+[data-hx-dynamic="results"],
+[data-ph-dynamic="result"],
+[data-pipe-dynamic="result"] {
+  display: grid;
+  gap: var(--tc-gap);
+  align-content: start;
+}
+
+.inline-stat,
+.main-result,
+.pipe-result-head,
+.tc-result-item {
+  padding: var(--tc-gap);
+  border-radius: var(--radius-md);
+}
+
+.result-row > *,
+.inline-stat > *,
+.main-result > *,
+.pipe-result-head > *,
+.tc-result-item > * {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.sign-toggle {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.overflow-menu,
+.overflow-menu:not([hidden]) {
+  height: auto;
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.overflow-menu__card,
+.overflow-menu__list {
+  min-height: 0;
+  height: auto;
+  max-height: none;
+}
+
+.overflow-menu__row,
+.overflow-menu__item,
+.overflow-menu button {
+  min-height: auto;
+  height: auto;
+  white-space: normal;
+  overflow: visible;
+}
+
+.overflow-menu__item span,
+.overflow-menu__item small {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+@media (max-width: 767px) {
+  .overflow-menu,
+  .overflow-menu:not([hidden]) {
+    max-height: min(68dvh, calc(100dvh - var(--bottom-nav-h) - 58px));
+    overflow-y: auto;
+  }
+
+  .overflow-menu__row {
+    min-height: auto;
+  }
+}
+
+/* Phase 35C: menu cards and overflow panels must grow or scroll with content. */
+.overflow-menu,
+.module-menu,
+.module-menu__card,
+.menu-card,
+.quick-access-card {
+  min-height: 0;
+  height: auto;
+  max-height: min(72vh, 560px);
+}
+.overflow-menu,
+.module-menu {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.overflow-menu__item,
+.module-menu__item,
+.menu-card,
+.quick-access-card {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+.overflow-menu__item span,
+.overflow-menu__item small,
+.module-menu__item span,
+.module-menu__item small,
+.menu-card *,
+.quick-access-card * {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Phase 35E: main overflow menu cards must size to content and scroll on small screens. */
+.overflow-menu,
+.overflow-menu__card,
+.overflow-menu__list {
+  min-height: 0;
+}
+.overflow-menu {
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.overflow-menu__card {
+  align-content: start;
+}
+.overflow-menu__row,
+.overflow-menu .overflow-menu__item {
+  min-height: auto;
+  height: auto;
+}
+.overflow-menu__item,
+.overflow-menu__item span,
+.overflow-menu__item small,
+.overflow-menu__head,
+.overflow-menu__empty {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 767px) {
+  .overflow-menu:not([hidden]) {
+    max-height: min(68dvh, calc(100dvh - var(--bottom-nav-h, 76px) - 120px));
+    overflow-y: auto;
+  }
+}
+
+/* Phase 36A.7: visible mobile debug card */
+.tc-debug-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.tc-debug-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.tc-debug-event {
+  border: 1px solid var(--tc-border, rgba(148, 163, 184, .35));
+  border-radius: var(--tc-radius-sm, 10px);
+  padding: 10px;
+  background: var(--tc-surface-muted, rgba(148, 163, 184, .08));
+}
+
+.tc-debug-head,
+.tc-debug-row {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.tc-debug-row span {
+  opacity: .72;
+}
+
+.tc-debug-row strong {
+  text-align: right;
+  word-break: break-word;
+}
+
+/* Phase 36A.7.1: visible debug toggle */
+.tc-debug-actions .action-button[disabled] {
+  opacity: .55;
+  pointer-events: none;
+}
+
+/* Phase 36Q.4: global card spacing contract */
+.module-content {
+  gap: var(--tc-gap);
+}
+
+.module-content > .span-4,
+.module-content > .span-6,
+.module-content > .span-8,
+.module-content > .span-12 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tc-gap);
+  min-width: 0;
+}
+
+.tc-stack,
+.tc-stack--section,
+.card__body,
+.tc-card__body,
+.result-card__body {
+  gap: var(--tc-gap);
+}/* Do not stack vertical margins inside card bodies; spacing is gap-owned. */
+.card__body > *,
+.tc-card__body > *,
+.result-card__body > *,
+.tc-stack > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}/* Phase 36S.1: result-row spacing is owned by .result-list gap */
+.result-list > .result-row,
+.tc-result-list > .result-row {
+  padding: 0;
+}
+
+/* Phase 36T.5: global mobile compact contract for dense forms/results */
+@media (max-width: 767px) {
+  .field,
+  .tc-field,
+  .settings-field {
+    gap: calc(var(--tc-gap) * .5);
+  }
+
+  .form-grid,
+  .tc-fields,
+  .card__body,
+  .tc-card__body,
+  .result-card__body {
+    gap: calc(var(--tc-gap) * .75);
+  }
+
+  .result-list,
+  .tc-result-list {
+    gap: calc(var(--tc-gap) * .75);
+  }
+
+  .result-row {
+    min-height: 0;
+    gap: calc(var(--tc-gap) * .5);
+    padding: 0;
+  }
+
+  .main-result {
+    gap: calc(var(--tc-gap) * .5);
+    padding-top: calc(var(--tc-gap) * .5);
+    padding-bottom: calc(var(--tc-gap) * .5);
+  }
+
+  .inline-stats {
+    gap: calc(var(--tc-gap) * .75);
+  }
+
+  .inline-stat,
+  .tc-result-item {
+    padding: calc(var(--tc-gap) * .75);
+  }
+}
+
+/* Phase 36U.2C: global editable collection row contract */
+:root {
+  --tc-collection-quantity-width: 96px;
+  --tc-collection-action-width: 42px;
+  --tc-collection-action-height: 34px;
+}
+
+.tc-collection-row.tc-consumer-row--editable {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--tc-collection-quantity-width) var(--tc-collection-action-width);
+  column-gap: var(--tc-gap);
+  align-items: center;
+}
+
+.tc-collection-row.tc-consumer-row--editable .tc-quantity-field {
+  width: var(--tc-collection-quantity-width);
+  min-width: var(--tc-collection-quantity-width);
+  max-width: var(--tc-collection-quantity-width);
+  justify-self: end;
+}
+
+.tc-collection-row.tc-consumer-row--editable > button {
+  width: var(--tc-collection-action-width);
+  min-width: var(--tc-collection-action-width);
+  height: var(--tc-collection-action-height);
+  justify-self: end;
+}
+
+/* Phase 37C.4C: Settings drawer opaque surface hardening */
+:root[data-theme='light'] .settings-submenu__content { background: linear-gradient(145deg, rgba(255,253,248,.99), rgba(241,237,228,.98)); color: #17202c; border-color: rgba(68,76,88,.22); }
+
+/* 1.3.2-dev.1 mobile feedback zoom prevention: scope the 16px iOS focus guard to the feedback form only. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.feedback-form input,
+.feedback-form textarea,
+.feedback-form input:focus,
+.feedback-form textarea:focus {
+  font-size: 16px !important;
+}
+
+/* 1.3.1 Beta 19: prevent iOS focus zoom in project/PDF settings forms. */
+.settings-form input,
+.settings-form textarea,
+.settings-form select,
+.settings-form input:focus,
+.settings-form textarea:focus,
+.settings-form select:focus {
+  font-size: 16px !important;
+}
+
+
+.settings-logo-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 4.25rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-strong, rgba(148, 163, 184, 0.35));
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.22);
+  color: var(--text-muted, #94a3b8);
+  overflow: hidden;
+}
+.settings-logo-preview img {
+  max-width: 6.75rem;
+  max-height: 3.25rem;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  flex: 0 0 auto;
+  border-radius: 0.35rem;
+  background: rgba(255,255,255,0.92);
+}
+.settings-logo-preview span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.settings-logo-preview.is-empty {
+  min-height: 3rem;
+}
+.settings-logo-preview.is-empty img {
+  display: none;
+}
+
+.tc-update-banner {
+  position: fixed;
+  left: max(18px, env(safe-area-inset-left));
+  right: max(18px, env(safe-area-inset-right));
+  bottom: calc(112px + env(safe-area-inset-bottom));
+  z-index: 4000;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid #38d5ff;
+  border-radius: 20px;
+  background: #07111f;
+  box-shadow: 0 18px 42px rgba(0,0,0,.58), 0 0 0 1px rgba(255,255,255,.10) inset;
+  color: #ffffff;
+  font-weight: 800;
+  line-height: 1.18;
+}
+
+.tc-update-banner span { min-width: 0; }
+
+.tc-update-banner[hidden] { display: none; }
+
+.tc-update-banner__button,
+.tc-update-banner__dismiss {
+  min-height: 36px;
+  border-radius: 999px;
+  border: 1px solid #67e8f9;
+  background: #0e7490;
+  color: #ffffff;
+  font: inherit;
+  padding: 0 12px;
+}
+
+.tc-update-banner__button:disabled {
+  opacity: .8;
+}
+
+.tc-update-banner__dismiss {
+  width: 36px;
+  padding: 0;
+  border-color: #ffffff;
+  background: #1f2937;
+  color: #ffffff;
+  font-size: 20px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+

@@ -1,13 +1,25 @@
-const CACHE_NAME = 'techcalc-pro-1.3.2-dev.9';
-const CACHE_REVISION = '1.3.2-dev.9-1-3-2-dev-9-light-theme-kontrast-und-akzentkorrektur';
+const CACHE_NAME = 'techcalc-pro-1.3.2-dev.10';
+const CACHE_REVISION = '1.3.2-dev.10-1-3-2-dev-10-css-system-entruempelt';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './RELEASE_NOTES.md',
+  './css/components-collections.css',
+  './css/components-controls.css',
+  './css/components-core.css',
+  './css/components-legacy-contracts.css',
+  './css/components-settings-release.css',
+  './css/components-system.css',
   './css/components.css',
+  './css/layout-navigation-theme.css',
   './css/layout.css',
+  './css/module-accent-tokens.css',
   './css/modules.css',
+  './css/theme-light-guards.css',
+  './css/theme-light-rollout.css',
+  './css/theme-light-surfaces.css',
+  './css/theme-light.css',
   './css/tokens.css',
   './js/core/app.js',
   './js/core/centralStore.js',
