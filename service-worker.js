@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.2-dev.12';
-const CACHE_REVISION = '1.3.2-dev.12-1-3-2-dev-12-zentraler-speicher-edit-modus';
+const CACHE_NAME = 'techcalc-pro-1.3.2-dev.13';
+const CACHE_REVISION = '1.3.2-dev.13-1-3-2-dev-13-speicher-edit-modus-sync';
 const ASSETS = [
   './',
   './index.html',
@@ -56,6 +56,7 @@ const ASSETS = [
   './js/core/renderer.js',
   './js/core/resultRenderer.js',
   './js/core/router.js',
+  './js/core/saveEditModeSync.js',
   './js/core/savedCalculationController.js',
   './js/core/savedRecordController.js',
   './js/core/savedRecords.js',

@@ -1,3 +1,11 @@
+## 1.3.2-dev.13 – Speicher-/Edit-Modus Sync
+
+- Zentraler Sync für Speicher-/Aktualisieren-Buttons ergänzt.
+- Ohne aktive Auswahl bleibt nur Speichern aktiv.
+- Mit aktiver Auswahl bleibt nur Aktualisieren aktiv.
+- Dynamische Listen-Updates und Selected-State werden appweit nachgeführt.
+- Keine Dark-/System-Theme-Änderungen.
+
 ## 1.3.2-dev.12 – Zentraler Speicher-/Edit-Modus
 
 Gespeicherte Einträge folgen nun appweit einem klaren Edit-Workflow: ohne aktive Auswahl ist nur „Speichern“ aktiv, bei aktiver Auswahl nur „Aktualisieren“. Die Guard-Logik liegt zentral im Saved-Record-/Line-Section-System und schützt zusätzlich gegen konkurrierende Action-Handler.
