@@ -72,6 +72,27 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .field--readonly .control--readonly { justify-content: space-between; padding-left: var(--tc-control-padding-x); }
 .field--readonly .control--readonly strong { color: var(--color-text); font-size: 16px; font-weight: 900; }
 
+
+/* Field action contract ----------------------------------------------------
+   Action-only fields must not render the surrounding control shell.
+   This keeps add-item actions consistent in Light, Dark and System themes. */
+.field--action .control,
+.field--action .tc-control,
+.field:has(> label:empty) .control:has(> .action-button:only-child),
+.field:has(> label:empty) .tc-control:has(> .action-button:only-child) {
+  min-height: auto;
+  padding: 0;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.field--action .control > .action-button,
+.field--action .tc-control > .action-button {
+  width: auto;
+  min-width: min(100%, 260px);
+}
+
 /* Buttons / toggles ------------------------------------------------------- */
 .action-button,
 .tc-action,
