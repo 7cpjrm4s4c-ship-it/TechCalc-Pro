@@ -1,4 +1,4 @@
-/* TechCalc Pro 1.3.2-dev.19 — Light Theme final conflict guard.
+/* TechCalc Pro 1.3.2-dev.21 — Light Theme final conflict guard.
    Loaded last. This is intentionally small and semantic: it neutralizes remaining legacy
    component/module overrides without changing Dark/System behavior. */
 
@@ -200,4 +200,50 @@
 :root[data-theme='light'] .field--action .tc-control > .action-button {
   width: auto !important;
   min-width: min(100%, 260px) !important;
+}
+
+
+/* 1.3.2-dev.21 — Final Light Theme component contract.
+   This is intentionally loaded last and protects the token system against legacy component
+   selectors that may still be present during the CSS migration. */
+:root[data-theme='light'] .segmented button.is-active,
+:root[data-theme='light'] .segment-button.is-active,
+:root[data-theme='light'] .tc-segment-button.is-active,
+:root[data-theme='light'] .theme-switch__option.is-active,
+:root[data-theme='light'] .theme-switch__option[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--tc-active-accent) 18%, #ffffff) !important;
+  border-color: var(--tc-active-accent) !important;
+  color: var(--tc-final-text) !important;
+  -webkit-text-fill-color: var(--tc-final-text) !important;
+}
+
+:root[data-theme='light'] .result-card,
+:root[data-theme='light'] .inline-stat,
+:root[data-theme='light'] .tc-result-item {
+  color: var(--tc-final-text) !important;
+  -webkit-text-fill-color: var(--tc-final-text) !important;
+}
+
+:root[data-theme='light'] .card--accent-orange,
+:root[data-theme='light'] .card--accent-cyan,
+:root[data-theme='light'] .card--accent-blue,
+:root[data-theme='light'] .card--accent-green,
+:root[data-theme='light'] .card--accent-purple,
+:root[data-theme='light'] [data-accent='orange'],
+:root[data-theme='light'] [data-accent='cyan'],
+:root[data-theme='light'] [data-accent='blue'],
+:root[data-theme='light'] [data-accent='green'],
+:root[data-theme='light'] [data-accent='purple'] {
+  border-color: color-mix(in srgb, var(--tc-final-accent) 72%, var(--color-border)) !important;
+}
+
+:root[data-theme='light'] .field--action .control,
+:root[data-theme='light'] .field--action .tc-control,
+:root[data-theme='light'] .field:has(> .control > .action-button:only-child) > .control,
+:root[data-theme='light'] .field:has(> .tc-control > .action-button:only-child) > .tc-control {
+  min-height: auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
 }

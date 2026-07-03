@@ -1,3 +1,7 @@
+## 1.3.2-dev.21 – Light Theme Contract Hardening
+
+Finaler Komponentenvertrag für das Light Theme ergänzt. Toggle-Füllungen, Buttonzustände, Result-Cards und Action-Felder werden über zentrale Accent- und Surface-Tokens abgesichert.
+
 ## 1.3.2-dev.20 – Dark Theme Action-Field Guard
 
 Schmutzwasser-Action-Felder zentralisiert: Der Button „Gegenstand hinzufügen“ rendert nun auch im Dark/System Theme ohne umgebende Control-Card. Komponentenregel gilt themeübergreifend; Light/Dark/System bleiben konsistent.
