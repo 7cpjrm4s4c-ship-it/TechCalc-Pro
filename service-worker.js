@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.2-dev.13';
-const CACHE_REVISION = '1.3.2-dev.13-1-3-2-dev-13-speicher-edit-modus-sync';
+const CACHE_NAME = 'techcalc-pro-1.3.2-dev.14';
+const CACHE_REVISION = '1.3.2-dev.14-1-3-2-dev-14-light-save-edit-state-guard';
 const ASSETS = [
   './',
   './index.html',

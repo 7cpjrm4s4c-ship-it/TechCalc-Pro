@@ -11,21 +11,37 @@ const UPDATE_SELECTORS = [
 ].join(',');
 
 function hasActiveRecord(panel) {
-  return Boolean(panel?.querySelector?.(
-    '.saved-record-card.is-active, .line-section-card.is-active, [data-saved-record-card].is-active, [data-line-card].is-active'
+  if (!panel?.querySelector) return false;
+  return Boolean(panel.querySelector(
+    [
+      '.saved-record-card.is-active',
+      '.line-section-card.is-active',
+      '[data-saved-record-card].is-active',
+      '[data-line-card].is-active',
+      '.saved-record-card[aria-current=\"true\"]',
+      '.line-section-card[aria-current=\"true\"]',
+      '.saved-record-card[aria-selected=\"true\"]',
+      '.line-section-card[aria-selected=\"true\"]',
+      '[data-selected=\"true\"].saved-record-card',
+      '[data-selected=\"true\"].line-section-card'
+    ].join(',')
   ));
+}
+
+function actionButtons(actions, explicitSelectors, fallbackPattern) {
+  const explicit = [...actions.querySelectorAll(explicitSelectors)];
+  if (explicit.length) return explicit;
+  return [...actions.querySelectorAll('button')].filter(button => fallbackPattern.test((button.textContent || '').trim()));
 }
 
 function setDisabled(button, disabled) {
   if (!button) return;
-  button.disabled = Boolean(disabled);
-  if (disabled) {
-    button.setAttribute('disabled', '');
-    button.setAttribute('aria-disabled', 'true');
-  } else {
-    button.removeAttribute('disabled');
-    button.setAttribute('aria-disabled', 'false');
-  }
+  const isDisabled = Boolean(disabled);
+  button.disabled = isDisabled;
+  button.toggleAttribute('disabled', isDisabled);
+  button.setAttribute('aria-disabled', String(isDisabled));
+  button.classList.toggle('is-disabled', isDisabled);
+  button.classList.toggle('is-enabled', !isDisabled);
 }
 
 export function syncSaveEditMode(root = document) {
@@ -33,8 +49,9 @@ export function syncSaveEditMode(root = document) {
   scope.querySelectorAll('.tc-save-actions').forEach(actions => {
     const panel = actions.closest('.tc-saved-record-panel, .card, .tc-card, section, article') || actions.parentElement;
     const active = hasActiveRecord(panel);
-    actions.querySelectorAll(SAVE_SELECTORS).forEach(button => setDisabled(button, active));
-    actions.querySelectorAll(UPDATE_SELECTORS).forEach(button => setDisabled(button, !active));
+    actions.dataset.editMode = active ? 'edit' : 'create';
+    actionButtons(actions, SAVE_SELECTORS, /^Speichern$/i).forEach(button => setDisabled(button, active));
+    actionButtons(actions, UPDATE_SELECTORS, /^Aktualisieren$/i).forEach(button => setDisabled(button, !active));
   });
 }
 
@@ -61,7 +78,7 @@ export function initializeSaveEditModeSync(root = document) {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ['class', 'disabled', 'aria-disabled', 'data-saved-record-id', 'data-line-select']
+      attributeFilter: ['class', 'disabled', 'aria-disabled', 'aria-current', 'aria-selected', 'data-selected', 'data-saved-record-id', 'data-line-select']
     });
   }
 

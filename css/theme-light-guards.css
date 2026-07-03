@@ -469,3 +469,30 @@
   filter: none !important;
   box-shadow: none !important;
 }
+
+/* 1.3.2-dev.14: final light-theme save/edit button state guard.
+   This deliberately targets disabled attributes, aria-disabled and the central
+   JS class so no component-level action-button rule can make disabled actions
+   look active in Light Mode. */
+:root[data-theme='light'] .tc-save-actions .action-button[disabled],
+:root[data-theme='light'] .tc-save-actions .action-button:disabled,
+:root[data-theme='light'] .tc-save-actions .action-button[aria-disabled='true'],
+:root[data-theme='light'] .tc-save-actions .action-button.is-disabled {
+  background: var(--tc-button-disabled-bg) !important;
+  border-color: var(--tc-button-disabled-border) !important;
+  color: var(--tc-button-disabled-text) !important;
+  -webkit-text-fill-color: var(--tc-button-disabled-text) !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+  cursor: not-allowed !important;
+}
+
+:root[data-theme='light'] .tc-save-actions .action-button:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled),
+:root[data-theme='light'] .tc-save-actions .action-button.is-enabled {
+  background: var(--tc-button-accent-bg) !important;
+  border-color: var(--tc-button-accent-border) !important;
+  color: var(--tc-light-text) !important;
+  -webkit-text-fill-color: var(--tc-light-text) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc-active-accent) 18%, transparent) !important;
+}

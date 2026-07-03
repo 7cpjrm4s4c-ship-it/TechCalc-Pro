@@ -1,3 +1,7 @@
+## 1.3.2-dev.14 – Light Save/Edit State Guard
+
+Detaillierte Bereinigung der Light-Theme-Speicherzustände. Speichern/Aktualisieren werden zentral per disabled, aria-disabled und Guard-Klasse synchronisiert. Light-Theme-Button-Regeln können deaktivierte Speicheraktionen nicht mehr als aktive Aktionen darstellen. Dark/System bleiben unverändert.
+
 ## 1.3.2-dev.13 – Speicher-/Edit-Modus Sync
 
 - Zentraler Sync für Speicher-/Aktualisieren-Buttons ergänzt.
