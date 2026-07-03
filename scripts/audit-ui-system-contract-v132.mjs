@@ -34,7 +34,8 @@ const requiredCss = [
   './css/modules-pressure-buffer.css',
   './css/modules-unit.css',
   './css/modules-light-overrides.css',
-  './css/modules-responsive.css'
+  './css/modules-responsive.css',
+  './css/theme-light-final.css'
 ];
 const index = read('index.html');
 for (const href of requiredCss) {

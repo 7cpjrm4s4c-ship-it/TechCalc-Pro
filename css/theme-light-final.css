@@ -1,0 +1,110 @@
+/* TechCalc Pro 1.3.2-dev.18 — Light Theme final conflict guard.
+   Loaded last. This is intentionally small and semantic: it neutralizes remaining legacy
+   component/module overrides without changing Dark/System behavior. */
+
+:root[data-theme='light'] {
+  --tc-final-text: var(--tc-light-text, #17202c);
+  --tc-final-muted: var(--tc-light-muted, #4b5563);
+  --tc-final-border: var(--color-border);
+  --tc-final-surface: var(--color-surface);
+  --tc-final-field: var(--tc-light-field);
+  --tc-final-accent: var(--tc-active-accent, var(--accent-blue));
+  --tc-final-accent-soft: color-mix(in srgb, var(--tc-final-accent) 18%, #ffffff);
+  --tc-final-accent-hover: color-mix(in srgb, var(--tc-final-accent) 24%, #ffffff);
+}
+
+:root[data-theme='light'] .card--accent-orange,
+:root[data-theme='light'] .segmented--orange,
+:root[data-theme='light'] [data-accent='orange'] { --tc-final-accent: var(--tc-accent-heating); --tc-active-accent: var(--tc-accent-heating); }
+:root[data-theme='light'] .card--accent-cyan,
+:root[data-theme='light'] .segmented--cyan,
+:root[data-theme='light'] [data-accent='cyan'] { --tc-final-accent: var(--tc-accent-air); --tc-active-accent: var(--tc-accent-air); }
+:root[data-theme='light'] .card--accent-blue,
+:root[data-theme='light'] .segmented--blue,
+:root[data-theme='light'] [data-accent='blue'] { --tc-final-accent: var(--tc-accent-pipe); --tc-active-accent: var(--tc-accent-pipe); }
+:root[data-theme='light'] .card--accent-green,
+:root[data-theme='light'] .segmented--green,
+:root[data-theme='light'] [data-accent='green'] { --tc-final-accent: var(--tc-accent-water); --tc-active-accent: var(--tc-accent-water); }
+:root[data-theme='light'] .card--accent-purple,
+:root[data-theme='light'] .segmented--purple,
+:root[data-theme='light'] [data-accent='purple'] { --tc-final-accent: var(--tc-accent-pressure); --tc-active-accent: var(--tc-accent-pressure); }
+
+:root[data-theme='light'] .module-view,
+:root[data-theme='light'] .settings-panel,
+:root[data-theme='light'] .settings-panel *,
+:root[data-theme='light'] .release-note,
+:root[data-theme='light'] .release-note *,
+:root[data-theme='light'] .overflow-menu,
+:root[data-theme='light'] .overflow-menu *,
+:root[data-theme='light'] .card,
+:root[data-theme='light'] .tc-card,
+:root[data-theme='light'] .result-card,
+:root[data-theme='light'] .saved-record-card,
+:root[data-theme='light'] .line-section-card,
+:root[data-theme='light'] .ph-saved-item {
+  color: var(--tc-final-text) !important;
+  -webkit-text-fill-color: var(--tc-final-text) !important;
+}
+
+:root[data-theme='light'] small,
+:root[data-theme='light'] .muted,
+:root[data-theme='light'] .hint,
+:root[data-theme='light'] .release-note__meta,
+:root[data-theme='light'] .overflow-menu__item small,
+:root[data-theme='light'] .result-row span,
+:root[data-theme='light'] .inline-stat span {
+  color: var(--tc-final-muted) !important;
+  -webkit-text-fill-color: var(--tc-final-muted) !important;
+}
+
+:root[data-theme='light'] .settings-panel,
+:root[data-theme='light'] .settings-panel__head,
+:root[data-theme='light'] .settings-panel__body,
+:root[data-theme='light'] .release-note,
+:root[data-theme='light'] .overflow-menu,
+:root[data-theme='light'] .overflow-menu__card,
+:root[data-theme='light'] .overflow-menu__row {
+  background: var(--tc-final-surface) !important;
+  border-color: var(--tc-final-border) !important;
+}
+
+:root[data-theme='light'] .segmented button.is-active,
+:root[data-theme='light'] .segment-button.is-active,
+:root[data-theme='light'] .tc-segment-button.is-active,
+:root[data-theme='light'] .theme-switch__option.is-active,
+:root[data-theme='light'] .theme-switch__option[aria-pressed='true'] {
+  background: var(--tc-final-accent-soft) !important;
+  border-color: var(--tc-final-accent) !important;
+  color: var(--tc-final-text) !important;
+  -webkit-text-fill-color: var(--tc-final-text) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc-final-accent) 24%, transparent) !important;
+}
+
+:root[data-theme='light'] .action-button:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled),
+:root[data-theme='light'] .tc-action:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled),
+:root[data-theme='light'] .primary-button:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled),
+:root[data-theme='light'] .tc-button--primary:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled) {
+  background: var(--tc-final-accent-soft) !important;
+  border-color: var(--tc-final-accent) !important;
+  color: var(--tc-final-text) !important;
+  -webkit-text-fill-color: var(--tc-final-text) !important;
+}
+
+:root[data-theme='light'] .action-button:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled):hover,
+:root[data-theme='light'] .tc-action:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled):hover,
+:root[data-theme='light'] .primary-button:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled):hover,
+:root[data-theme='light'] .tc-button--primary:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled):hover {
+  background: var(--tc-final-accent-hover) !important;
+}
+
+:root[data-theme='light'] button[disabled],
+:root[data-theme='light'] button:disabled,
+:root[data-theme='light'] button[aria-disabled='true'],
+:root[data-theme='light'] button.is-disabled {
+  background: var(--tc-button-disabled-bg) !important;
+  border-color: var(--tc-button-disabled-border) !important;
+  color: var(--tc-button-disabled-text) !important;
+  -webkit-text-fill-color: var(--tc-button-disabled-text) !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+}

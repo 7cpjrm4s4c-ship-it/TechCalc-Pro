@@ -1,3 +1,11 @@
+## 1.3.2-dev.18 – Light Theme Finalisierung
+
+- App-Status-Komponenten aus Legacy-CSS ausgelagert
+- letzter Light-Theme-Conflict-Guard ergänzt
+- Textfarben für Release Notes, Menüs und Modulflächen zentral abgesichert
+- aktive Toggles und Buttons folgen erneut ausschließlich Modul-Akzenttokens
+- deaktivierte Buttons im Light Mode final normalisiert
+
 ## 1.3.2-dev.17 – CSS-System Härtung
 
 Light Theme Button-Regeln weiter zentralisiert. Konkurrierende vollflächige Primary-Button-Regeln in Light-Theme-, Rollout-, Contrast- und Komponenten-Dateien auf tokenisierte Soft-Accent-Regeln umgestellt. Neuer CSS-Härtungs-Audit verhindert erneute Save/Edit- und Light-Button-Konflikte außerhalb der zentralen Komponenten.

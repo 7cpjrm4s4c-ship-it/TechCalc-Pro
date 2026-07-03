@@ -19,7 +19,7 @@ for (const file of cssFiles) {
   }
 }
 
-const lightButtonFiles = ['css/theme-light.css', 'css/theme-light-rollout.css', 'css/theme-light-contrast.css', 'css/components-system.css', 'css/components-save-manager.css'];
+const lightButtonFiles = ['css/theme-light.css', 'css/theme-light-rollout.css', 'css/theme-light-contrast.css', 'css/components-system.css', 'css/components-save-manager.css', 'css/theme-light-final.css'];
 for (const file of lightButtonFiles) {
   const source = read(file);
   const buttonBlocks = [...source.matchAll(/:root\[data-theme='light'\][^{]*(?:\.action-button|\.tc-action|\.primary-button|\.tc-button--primary|button\[type='submit'\])[^{]*\{[^}]*\}/g)];

@@ -1,10 +1,11 @@
-const CACHE_NAME = 'techcalc-pro-1.3.2-dev.17';
-const CACHE_REVISION = '1.3.2-dev.17-1-3-2-dev-17-css-system-haertung';
+const CACHE_NAME = 'techcalc-pro-1.3.2-dev.18';
+const CACHE_REVISION = '1.3.2-dev.18-1-3-2-dev-18-light-theme-finalisierung';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './RELEASE_NOTES.md',
+  './css/components-app-status.css',
   './css/components-collections.css',
   './css/components-controls.css',
   './css/components-core.css',
@@ -26,6 +27,7 @@ const ASSETS = [
   './css/modules-wrg.css',
   './css/modules.css',
   './css/theme-light-contrast.css',
+  './css/theme-light-final.css',
   './css/theme-light-guards.css',
   './css/theme-light-rollout.css',
   './css/theme-light-surfaces.css',

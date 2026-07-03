@@ -55,3 +55,11 @@ RC-1C.1: PDF-Engine-Refactoring und Korrekturen für Trinkwasser, h,x-Diagramm, 
 - `scripts/audit-css-system-hardening-v132.mjs` ergänzt.
 - Integration-Gate erweitert, damit neue konkurrierende Save/Edit- oder Light-Button-Regeln auffallen.
 
+
+
+## 1.3.2-dev.18 – Light Theme Finalisierung
+
+- `components-app-status.css` für Update-Banner, Logo-Vorschau und Status-Hilfsklassen ergänzt.
+- `theme-light-final.css` als letzter kleiner Conflict-Guard eingeführt.
+- Appweite Light-Theme-Textfarben, Release-Notes-Flächen, Overflow-Menüs, Toggles, Buttons und Disabled-States zentral abgesichert.
+- Legacy-CSS um die ausgelagerten App-Status-Regeln reduziert.
