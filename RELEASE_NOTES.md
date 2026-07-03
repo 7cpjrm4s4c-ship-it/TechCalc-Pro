@@ -1,3 +1,7 @@
+## 1.3.2-dev.12 – Zentraler Speicher-/Edit-Modus
+
+Gespeicherte Einträge folgen nun appweit einem klaren Edit-Workflow: ohne aktive Auswahl ist nur „Speichern“ aktiv, bei aktiver Auswahl nur „Aktualisieren“. Die Guard-Logik liegt zentral im Saved-Record-/Line-Section-System und schützt zusätzlich gegen konkurrierende Action-Handler.
+
 ## 1.3.2-dev.11 – CSS-System entrümpelt
 
 Components-CSS wurde in zentrale, wartbare Dateien aufgeteilt: Core, Controls, Collections, Settings/Release Notes, Legacy Contracts, Light Theme, Module Accent Tokens und Guards. Neue UI-Regeln sollen nicht mehr an components.css angehängt werden. Dark/System bleiben unverändert.

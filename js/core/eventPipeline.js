@@ -80,6 +80,7 @@ function resolveActionHandler(root, action, options = {}) {
 
 function dispatchAction(root, state, actionEl, event, options = {}) {
   if (!actionEl || !root?.contains?.(actionEl)) return false;
+  if (actionEl.disabled || actionEl.getAttribute?.('aria-disabled') === 'true') return false;
   const action = actionEl.dataset.tcAction || actionEl.dataset.action;
   if (!action) return false;
 

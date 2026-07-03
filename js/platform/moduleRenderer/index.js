@@ -26,8 +26,8 @@ function renderSavedRecords(model = {}, accent = 'blue') {
     namePlaceholder: model.namePlaceholder || '',
     addAction: model.addAction || 'line:save',
     updateAction: model.updateAction || 'line:update',
-    addDisabled: Boolean(model.addDisabled),
-    updateDisabled: Boolean(model.updateDisabled),
+    addDisabled: Boolean(model.addDisabled || model.activeId),
+    updateDisabled: Boolean(model.updateDisabled || !model.activeId),
     listHtml: `<div ${model.dynamicAttr || 'data-platform-dynamic="saved-record-list"'}>${listHtml}</div>`,
     accent: model.accent || accent
   });
