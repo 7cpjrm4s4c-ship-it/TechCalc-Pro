@@ -1,4 +1,9 @@
-## 1.3.2-dev.14 – Light Save/Edit State Guard
+
+## 1.3.2-dev.15
+
+Light Theme Härtung: Speichern/Aktualisieren erhält einen zentralen Edit-Mode-Vertrag. Visuelle Button-Zustände werden im Light Mode aus `data-edit-mode` und `data-save-mode-role` abgeleitet, damit Modul- oder Komponentenregeln die Speicherlogik nicht mehr überzeichnen.
+
+## 1.3.2-dev.15 – Light Save/Edit State Guard
 
 Detaillierte Bereinigung der Light-Theme-Speicherzustände. Speichern/Aktualisieren werden zentral per disabled, aria-disabled und Guard-Klasse synchronisiert. Light-Theme-Button-Regeln können deaktivierte Speicheraktionen nicht mehr als aktive Aktionen darstellen. Dark/System bleiben unverändert.
 

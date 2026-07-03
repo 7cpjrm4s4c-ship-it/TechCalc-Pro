@@ -1,13 +1,18 @@
 const SAVE_SELECTORS = [
   '[data-line-save]',
   '[data-dw-add-unit]',
-  '[data-dw-add-single]'
+  '[data-dw-add-single]',
+  '[data-tc-action$=":save"]',
+  '[data-tc-action$=":add"]',
+  '[data-tc-action*="save"]'
 ].join(',');
 
 const UPDATE_SELECTORS = [
   '[data-line-update]',
   '[data-dw-update-unit]',
-  '[data-dw-update-single]'
+  '[data-dw-update-single]',
+  '[data-tc-action$=":update"]',
+  '[data-tc-action*="update"]'
 ].join(',');
 
 function hasActiveRecord(panel) {
@@ -34,6 +39,11 @@ function actionButtons(actions, explicitSelectors, fallbackPattern) {
   return [...actions.querySelectorAll('button')].filter(button => fallbackPattern.test((button.textContent || '').trim()));
 }
 
+function setButtonRole(button, role) {
+  if (!button) return;
+  button.dataset.saveModeRole = role;
+}
+
 function setDisabled(button, disabled) {
   if (!button) return;
   const isDisabled = Boolean(disabled);
@@ -42,7 +52,9 @@ function setDisabled(button, disabled) {
   button.setAttribute('aria-disabled', String(isDisabled));
   button.classList.toggle('is-disabled', isDisabled);
   button.classList.toggle('is-enabled', !isDisabled);
+  button.dataset.enabled = String(!isDisabled);
 }
+
 
 export function syncSaveEditMode(root = document) {
   const scope = root?.querySelectorAll ? root : document;
@@ -50,8 +62,10 @@ export function syncSaveEditMode(root = document) {
     const panel = actions.closest('.tc-saved-record-panel, .card, .tc-card, section, article') || actions.parentElement;
     const active = hasActiveRecord(panel);
     actions.dataset.editMode = active ? 'edit' : 'create';
-    actionButtons(actions, SAVE_SELECTORS, /^Speichern$/i).forEach(button => setDisabled(button, active));
-    actionButtons(actions, UPDATE_SELECTORS, /^Aktualisieren$/i).forEach(button => setDisabled(button, !active));
+    const saveButtons = actionButtons(actions, SAVE_SELECTORS, /^Speichern$/i);
+    const updateButtons = actionButtons(actions, UPDATE_SELECTORS, /^Aktualisieren$/i);
+    saveButtons.forEach(button => { setButtonRole(button, 'save'); setDisabled(button, active); });
+    updateButtons.forEach(button => { setButtonRole(button, 'update'); setDisabled(button, !active); });
   });
 }
 
