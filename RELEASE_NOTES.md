@@ -1,3 +1,6 @@
+## 1.3.2-dev.16 – UI-System Abschlussbereinigung
+
+Die letzten vier UI-System-Punkte wurden abgearbeitet: Modul-CSS ist in fokussierte Layout-/Domain-Dateien aufgeteilt, Light-Theme-Kontrastregeln und Save/Edit-State sind getrennt, Komponenten-Aggregate bleiben nur noch Stubs, und ein neuer UI-System-Audit schützt gegen neue modulinterne Komponenten-/Inline-Styles. Dark/System bleiben unverändert.
 
 ## 1.3.2-dev.15
 

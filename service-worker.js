@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.2-dev.15';
-const CACHE_REVISION = '1.3.2-dev.15-1-3-2-dev-15';
+const CACHE_NAME = 'techcalc-pro-1.3.2-dev.16';
+const CACHE_REVISION = '1.3.2-dev.16-1-3-2-dev-16-ui-system-abschlussbereinigung';
 const ASSETS = [
   './',
   './index.html',
@@ -9,13 +9,23 @@ const ASSETS = [
   './css/components-controls.css',
   './css/components-core.css',
   './css/components-legacy-contracts.css',
+  './css/components-save-manager.css',
   './css/components-settings-release.css',
   './css/components-system.css',
   './css/components.css',
   './css/layout-navigation-theme.css',
   './css/layout.css',
   './css/module-accent-tokens.css',
+  './css/modules-base.css',
+  './css/modules-hx.css',
+  './css/modules-light-overrides.css',
+  './css/modules-pipe.css',
+  './css/modules-pressure-buffer.css',
+  './css/modules-responsive.css',
+  './css/modules-unit.css',
+  './css/modules-wrg.css',
   './css/modules.css',
+  './css/theme-light-contrast.css',
   './css/theme-light-guards.css',
   './css/theme-light-rollout.css',
   './css/theme-light-surfaces.css',

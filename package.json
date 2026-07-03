@@ -1,6 +1,6 @@
 {
   "name": "techcalc-pro",
-  "version": "1.3.2-dev.15",
+  "version": "1.3.2-dev.16",
   "private": true,
   "type": "module",
   "scripts": {
@@ -17,7 +17,8 @@
     "audit:manifest-icons": "node scripts/audit-manifest-icons-phase39e.mjs",
     "audit:feedback-offline": "node scripts/audit-feedback-offline-fallback-phase39f.mjs",
     "audit:rc-ui-state": "node scripts/audit-rc-ui-state-bugfix-phase39h.mjs",
-    "audit:button-accent": "node scripts/audit-button-accent-phase39i.mjs"
+    "audit:button-accent": "node scripts/audit-button-accent-phase39i.mjs",
+    "audit:ui-system": "node scripts/audit-ui-system-contract-v132.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.28.1"

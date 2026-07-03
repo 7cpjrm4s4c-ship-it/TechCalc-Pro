@@ -1,0 +1,10 @@
+/* Phase 34C: Module exceptions only. Module-specific layout exceptions only.
+   Global component geometry (cards, fields, controls, buttons, saved records, result rows)
+   lives in components.css. This file may define only module-specific layouts, charts,
+   domain widgets and responsive exceptions that cannot be represented by tc-* primitives. */
+
+.module-view { grid-column: span 12; animation: moduleIn .22s var(--ease); }
+@keyframes moduleIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.module-head { display: none; }
+.module-content { grid-column: span 12; }
+.module-content > * { margin-block: 0; }
