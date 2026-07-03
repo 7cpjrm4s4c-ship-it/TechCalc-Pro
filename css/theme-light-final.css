@@ -1,4 +1,4 @@
-/* TechCalc Pro 1.3.2-dev.18 — Light Theme final conflict guard.
+/* TechCalc Pro 1.3.2-dev.19 — Light Theme final conflict guard.
    Loaded last. This is intentionally small and semantic: it neutralizes remaining legacy
    component/module overrides without changing Dark/System behavior. */
 
@@ -107,4 +107,97 @@
   -webkit-text-fill-color: var(--tc-button-disabled-text) !important;
   box-shadow: none !important;
   opacity: 1 !important;
+}
+
+/* 1.3.2-dev.19 — Light Theme accent inheritance regression guard.
+   Loaded last: all Light active fills and card borders derive from the exact same module accent
+   as their border. Also removes the decorative control/card shell around single add-action buttons. */
+:root[data-theme='light'] .module-view[data-module='heating-cooling'] { --tc-final-accent: var(--tc-accent-heating); --tc-active-accent: var(--tc-accent-heating); }
+:root[data-theme='light'] .module-view[data-module='ventilation'],
+:root[data-theme='light'] .module-view[data-module='heat-recovery'],
+:root[data-theme='light'] .module-view[data-module='hx-diagram'] { --tc-final-accent: var(--tc-accent-air); --tc-active-accent: var(--tc-accent-air); }
+:root[data-theme='light'] .module-view[data-module='buffer-storage'],
+:root[data-theme='light'] .module-view[data-module='pressure-holding'],
+:root[data-theme='light'] .module-view[data-module='pipe-sizing'] { --tc-final-accent: var(--tc-accent-pipe); --tc-active-accent: var(--tc-accent-pipe); }
+:root[data-theme='light'] .module-view[data-module='drinking-water'],
+:root[data-theme='light'] .module-view[data-module='rainwater'],
+:root[data-theme='light'] .module-view[data-module='wastewater'] { --tc-final-accent: var(--tc-accent-water); --tc-active-accent: var(--tc-accent-water); }
+
+:root[data-theme='light'] .card--accent-orange,
+:root[data-theme='light'] .segmented--orange,
+:root[data-theme='light'] [data-accent='orange'] { --tc-final-accent: var(--tc-accent-heating); --tc-active-accent: var(--tc-accent-heating); }
+:root[data-theme='light'] .card--accent-cyan,
+:root[data-theme='light'] .segmented--cyan,
+:root[data-theme='light'] [data-accent='cyan'] { --tc-final-accent: var(--tc-accent-air); --tc-active-accent: var(--tc-accent-air); }
+:root[data-theme='light'] .card--accent-blue,
+:root[data-theme='light'] .segmented--blue,
+:root[data-theme='light'] [data-accent='blue'] { --tc-final-accent: var(--tc-accent-pipe); --tc-active-accent: var(--tc-accent-pipe); }
+:root[data-theme='light'] .card--accent-green,
+:root[data-theme='light'] .segmented--green,
+:root[data-theme='light'] [data-accent='green'] { --tc-final-accent: var(--tc-accent-water); --tc-active-accent: var(--tc-accent-water); }
+:root[data-theme='light'] .card--accent-purple,
+:root[data-theme='light'] .segmented--purple,
+:root[data-theme='light'] [data-accent='purple'] { --tc-final-accent: var(--tc-accent-pressure); --tc-active-accent: var(--tc-accent-pressure); }
+
+:root[data-theme='light'] .card--accent-orange,
+:root[data-theme='light'] .card--accent-cyan,
+:root[data-theme='light'] .card--accent-blue,
+:root[data-theme='light'] .card--accent-green,
+:root[data-theme='light'] .card--accent-purple,
+:root[data-theme='light'] .result-card.card--accent-orange,
+:root[data-theme='light'] .result-card.card--accent-cyan,
+:root[data-theme='light'] .result-card.card--accent-blue,
+:root[data-theme='light'] .result-card.card--accent-green,
+:root[data-theme='light'] .result-card.card--accent-purple {
+  border-color: color-mix(in srgb, var(--tc-final-accent) 72%, var(--color-border)) !important;
+}
+
+:root[data-theme='light'] .segmented,
+:root[data-theme='light'] .theme-switch {
+  border-color: color-mix(in srgb, var(--tc-active-accent) 72%, var(--color-border)) !important;
+}
+
+:root[data-theme='light'] .segmented button.is-active,
+:root[data-theme='light'] .segment-button.is-active,
+:root[data-theme='light'] .tc-segment-button.is-active,
+:root[data-theme='light'] .theme-switch__option.is-active,
+:root[data-theme='light'] .theme-switch__option[aria-pressed='true'],
+:root[data-theme='light'] .segmented button.is-active::before,
+:root[data-theme='light'] .segmented button.is-active::after,
+:root[data-theme='light'] .segment-button.is-active::before,
+:root[data-theme='light'] .segment-button.is-active::after,
+:root[data-theme='light'] .tc-segment-button.is-active::before,
+:root[data-theme='light'] .tc-segment-button.is-active::after {
+  background: color-mix(in srgb, var(--tc-active-accent) 18%, #ffffff) !important;
+  border-color: var(--tc-active-accent) !important;
+  color: var(--tc-final-text) !important;
+  -webkit-text-fill-color: var(--tc-final-text) !important;
+}
+
+:root[data-theme='light'] .action-button:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled),
+:root[data-theme='light'] .tc-action:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled),
+:root[data-theme='light'] .primary-button:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled),
+:root[data-theme='light'] .tc-button--primary:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled),
+:root[data-theme='light'] .mini-button--primary:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled) {
+  background: color-mix(in srgb, var(--tc-final-accent) 18%, #ffffff) !important;
+  border-color: var(--tc-final-accent) !important;
+  color: var(--tc-final-text) !important;
+  -webkit-text-fill-color: var(--tc-final-text) !important;
+}
+
+:root[data-theme='light'] .field--action .control,
+:root[data-theme='light'] .field--action .tc-control,
+:root[data-theme='light'] .field:has(> label:empty) .control:has(> .action-button:only-child),
+:root[data-theme='light'] .field:has(> label:empty) .tc-control:has(> .action-button:only-child) {
+  min-height: auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme='light'] .field--action .control > .action-button,
+:root[data-theme='light'] .field--action .tc-control > .action-button {
+  width: auto !important;
+  min-width: min(100%, 260px) !important;
 }

@@ -1,4 +1,4 @@
-## 1.3.2-dev.18 – Light Theme Finalisierung
+## 1.3.2-dev.19 – Light Theme Finalisierung
 
 - App-Status-Komponenten aus Legacy-CSS ausgelagert
 - letzter Light-Theme-Conflict-Guard ergänzt
