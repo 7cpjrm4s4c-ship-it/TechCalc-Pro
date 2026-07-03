@@ -1,3 +1,7 @@
+## 1.3.2-dev.17 – CSS-System Härtung
+
+Light Theme Button-Regeln weiter zentralisiert. Konkurrierende vollflächige Primary-Button-Regeln in Light-Theme-, Rollout-, Contrast- und Komponenten-Dateien auf tokenisierte Soft-Accent-Regeln umgestellt. Neuer CSS-Härtungs-Audit verhindert erneute Save/Edit- und Light-Button-Konflikte außerhalb der zentralen Komponenten.
+
 ## 1.3.2-dev.16 – UI-System Abschlussbereinigung
 
 Die letzten vier UI-System-Punkte wurden abgearbeitet: Modul-CSS ist in fokussierte Layout-/Domain-Dateien aufgeteilt, Light-Theme-Kontrastregeln und Save/Edit-State sind getrennt, Komponenten-Aggregate bleiben nur noch Stubs, und ein neuer UI-System-Audit schützt gegen neue modulinterne Komponenten-/Inline-Styles. Dark/System bleiben unverändert.

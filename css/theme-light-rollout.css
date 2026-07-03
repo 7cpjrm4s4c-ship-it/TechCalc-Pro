@@ -112,9 +112,10 @@
 :root[data-theme='light'] .primary-button,
 :root[data-theme='light'] .tc-button--primary,
 :root[data-theme='light'] button[type='submit'] {
-  background: #2f3338 !important;
-  border-color: #2f3338 !important;
-  color: #ffffff !important;
+  background: var(--tc-button-accent-bg, var(--tc-accent-soft)) !important;
+  border-color: var(--tc-button-accent-border, var(--tc-active-accent)) !important;
+  color: var(--tc-light-text) !important;
+  -webkit-text-fill-color: var(--tc-light-text) !important;
 }
 
 :root[data-theme='light'] .tc-note,

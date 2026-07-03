@@ -104,9 +104,10 @@
 :root[data-theme='light'] .primary-button,
 :root[data-theme='light'] .tc-button--primary,
 :root[data-theme='light'] button[type='submit'] {
-  background: #333333;
-  color: #ffffff;
-  border-color: #333333;
+  background: var(--tc-button-accent-bg, var(--tc-accent-soft));
+  color: var(--tc-light-text);
+  -webkit-text-fill-color: var(--tc-light-text);
+  border-color: var(--tc-button-accent-border, var(--tc-active-accent));
 }
 :root[data-theme='light'] .mini-button,
 :root[data-theme='light'] .icon-button,
@@ -334,9 +335,10 @@
 :root[data-theme='light'] .tc-button--primary,
 :root[data-theme='light'] .mini-button--primary,
 :root[data-theme='light'] button[type='submit'] {
-  background: var(--accent-blue) !important;
-  color: #ffffff !important;
-  border-color: var(--accent-blue) !important;
+  background: var(--tc-button-accent-bg, var(--tc-accent-soft)) !important;
+  color: var(--tc-light-text) !important;
+  -webkit-text-fill-color: var(--tc-light-text) !important;
+  border-color: var(--tc-button-accent-border, var(--tc-active-accent)) !important;
 }
 
 :root[data-theme='light'] .mini-button,

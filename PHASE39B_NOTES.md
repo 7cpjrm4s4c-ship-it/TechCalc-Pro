@@ -47,3 +47,11 @@ RC-1C.1: PDF-Engine-Refactoring und Korrekturen für Trinkwasser, h,x-Diagramm, 
 - Globale Light-Theme-Komponentenregeln für Cards, Controls, Buttons, Segment Controls, Accordions, Header-Menü und Overflow ergänzt.
 - Keine fachliche Modul-Logik geändert.
 - Dark/System Theme funktional unverändert.
+
+## 1.3.2-dev.17 – CSS-System Härtung
+
+- Light-Mode Primary-/Action-Buttons auf tokenisierte Soft-Accent-Regeln konsolidiert.
+- Vollflächige Dunkel-/Blau-Button-Overrides in Light-Theme-Pfaden entschärft.
+- `scripts/audit-css-system-hardening-v132.mjs` ergänzt.
+- Integration-Gate erweitert, damit neue konkurrierende Save/Edit- oder Light-Button-Regeln auffallen.
+

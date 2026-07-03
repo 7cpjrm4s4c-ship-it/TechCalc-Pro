@@ -153,9 +153,10 @@
 :root[data-theme='light'] .primary-button,
 :root[data-theme='light'] .tc-button--primary,
 :root[data-theme='light'] button[type='submit'] {
-  background: var(--tc-button-primary-bg) !important;
-  border-color: var(--tc-button-primary-bg) !important;
-  color: #ffffff !important;
+  background: var(--tc-button-accent-bg, var(--tc-accent-soft)) !important;
+  border-color: var(--tc-button-accent-border, var(--tc-active-accent)) !important;
+  color: var(--tc-light-text) !important;
+  -webkit-text-fill-color: var(--tc-light-text) !important;
 }
 
 :root[data-theme='light'] .action-button:hover,
@@ -164,8 +165,8 @@
 :root[data-theme='light'] .primary-button:hover,
 :root[data-theme='light'] .tc-button--primary:hover,
 :root[data-theme='light'] button[type='submit']:hover {
-  background: var(--tc-button-primary-bg-hover) !important;
-  border-color: var(--tc-button-primary-bg-hover) !important;
+  background: var(--tc-button-accent-bg-hover, var(--tc-accent-soft)) !important;
+  border-color: var(--tc-button-accent-border, var(--tc-active-accent)) !important;
 }
 
 :root[data-theme='light'] .tc-action--ghost,

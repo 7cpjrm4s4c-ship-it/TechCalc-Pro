@@ -358,6 +358,6 @@
 :root[data-theme='light'] .primary-button,
 :root[data-theme='light'] .tc-button--primary,
 :root[data-theme='light'] button[type='submit'] {
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
+  color: var(--tc-light-text) !important;
+  -webkit-text-fill-color: var(--tc-light-text) !important;
 }

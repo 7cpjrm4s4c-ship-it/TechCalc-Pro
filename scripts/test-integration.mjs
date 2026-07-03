@@ -11,6 +11,7 @@ const commands = [
   ['node', ['scripts/audit-rc-ui-state-bugfix-phase39h.mjs']],
   ['node', ['scripts/audit-button-accent-phase39i.mjs']],
   ['node', ['scripts/audit-ui-system-contract-v132.mjs']],
+  ['node', ['scripts/audit-css-system-hardening-v132.mjs']],
   ['node', ['tests/platform-feedback-offline-fallback-phase39f.test.mjs']],
   ['node', ['scripts/audit-module-smoke-phase31c.mjs']],
   ['node', ['scripts/audit-platform-convergence-phase37a.mjs']],
