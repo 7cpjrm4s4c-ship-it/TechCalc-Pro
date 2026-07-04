@@ -367,3 +367,43 @@
   opacity: 1 !important;
   cursor: not-allowed !important;
 }
+
+/* 1.3.2-dev.23 — Theme regression fix.
+   Separates module accent tokens from global save/update UI tokens.
+   Kälte uses cyan; WRG/Mischluft/h,x keep turquoise via the existing air token. */
+:root[data-theme='light'] {
+  --tc-ui-primary-accent: var(--tc-accent-pipe, #0072ce);
+  --tc-ui-primary-bg: color-mix(in srgb, var(--tc-ui-primary-accent) 16%, #ffffff);
+  --tc-ui-primary-bg-hover: color-mix(in srgb, var(--tc-ui-primary-accent) 24%, #ffffff);
+  --tc-ui-primary-bg-pressed: color-mix(in srgb, var(--tc-ui-primary-accent) 30%, #ffffff);
+  --tc-ui-primary-border: var(--tc-ui-primary-accent);
+}
+
+/* Heating/cooling is a two-accent module: the current Betriebsart owns the local module accent. */
+:root[data-theme='light'] .module-view[data-module='heating-cooling'][data-hc-mode='orange'] {
+  --tc-contract-accent: var(--tc-accent-heating) !important;
+  --tc-final-accent: var(--tc-accent-heating) !important;
+  --tc-active-accent: var(--tc-accent-heating) !important;
+}
+:root[data-theme='light'] .module-view[data-module='heating-cooling'][data-hc-mode='cyan'] {
+  --tc-contract-accent: var(--tc-accent-cooling) !important;
+  --tc-final-accent: var(--tc-accent-cooling) !important;
+  --tc-active-accent: var(--tc-accent-cooling) !important;
+}
+:root[data-theme='light'] .module-view[data-module='heating-cooling'][data-hc-mode='cyan'] .card--accent-cyan,
+:root[data-theme='light'] .module-view[data-module='heating-cooling'][data-hc-mode='cyan'] .segmented--cyan,
+:root[data-theme='light'] .module-view[data-module='heating-cooling'][data-hc-mode='cyan'] [data-accent='cyan'] {
+  --tc-contract-accent: var(--tc-accent-cooling) !important;
+  --tc-final-accent: var(--tc-accent-cooling) !important;
+  --tc-active-accent: var(--tc-accent-cooling) !important;
+  --tc-selected-record-border: var(--tc-accent-cooling) !important;
+}
+
+/* Air and h,x retain turquoise; the cooling override above is scoped to heating-cooling only. */
+:root[data-theme='light'] .module-view[data-module='ventilation'],
+:root[data-theme='light'] .module-view[data-module='heat-recovery'],
+:root[data-theme='light'] .module-view[data-module='hx-diagram'] {
+  --tc-contract-accent: var(--tc-accent-air) !important;
+  --tc-final-accent: var(--tc-accent-air) !important;
+  --tc-active-accent: var(--tc-accent-air) !important;
+}
