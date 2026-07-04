@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.2-dev.23';
-const CACHE_REVISION = '1.3.2-dev.23-1-3-2-dev-23-theme-regression-fix';
+const CACHE_NAME = 'techcalc-pro-1.3.2-dev.24';
+const CACHE_REVISION = '1.3.2-dev.24-1-3-2-dev-24-module-prozessfarben-fix';
 const ASSETS = [
   './',
   './index.html',

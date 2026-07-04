@@ -1,3 +1,10 @@
+## 1.3.2-dev.24 – Module-/Prozessfarben Fix
+
+- Modulidentität und Prozesszustand im Theme-Vertrag getrennt.
+- Lüftung bleibt als Modul Türkis; Heizleistung nutzt Orange und Kühlleistung/Kälte nutzt Cyan.
+- Heizung/Kälte-Prozessumschaltung im Light Theme korrigiert.
+- Einheiten-Modul auf blaue Modul-/Navigationsfarbe synchronisiert.
+
 ## 1.3.2-dev.23 – Theme Regression Fix
 
 - Kälte-Akzent im Light Theme wieder eindeutig auf Cyan gesetzt.

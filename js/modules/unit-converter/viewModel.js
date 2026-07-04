@@ -31,7 +31,7 @@ export function conversionContent(s = {}) {
   ].join(''));
 }
 
-export function resultContent(s = {}, accent = 'green') {
+export function resultContent(s = {}, accent = 'blue') {
   const { from, to } = normalizeUnitSelection(s);
   return renderResultModel(buildUnitConverterResultModel({ ...s, from, to }, accent), accent);
 }
@@ -42,6 +42,6 @@ export function createUnitConverterViewModel(s = {}) {
   return {
     ...normalized,
     conversionHtml: conversionContent(normalizedState),
-    resultHtml: resultContent(normalizedState, 'green')
+    resultHtml: resultContent(normalizedState, 'blue')
   };
 }
