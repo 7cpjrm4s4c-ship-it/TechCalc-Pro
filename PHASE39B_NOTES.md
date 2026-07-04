@@ -63,3 +63,11 @@ RC-1C.1: PDF-Engine-Refactoring und Korrekturen für Trinkwasser, h,x-Diagramm, 
 - `theme-light-final.css` als letzter kleiner Conflict-Guard eingeführt.
 - Appweite Light-Theme-Textfarben, Release-Notes-Flächen, Overflow-Menüs, Toggles, Buttons und Disabled-States zentral abgesichert.
 - Legacy-CSS um die ausgelagerten App-Status-Regeln reduziert.
+
+## 1.3.2-dev.22 – Final UI Hardening
+
+- Theme-/Komponentenvertrag fuer Light, Dark und System weiter gehaertet.
+- Modul-Sonderregeln werden durch zentrale Tokens und Guards abgefangen.
+- Save/Edit-, Action-Field-, Toggle- und Result-Card-Regeln bleiben zentralisiert.
+- Keine fachliche Berechnungslogik geaendert.
+
