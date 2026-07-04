@@ -1,4 +1,9 @@
-## 1.3.2-dev.28 – Theme Matrix Audit
+## 1.3.2-dev.29 – UI Polish
+
+- Zentrale Typografie-/Spacing-Polish-Regeln ergänzt.
+- Fokuszustände appweit vereinheitlicht.
+- Touch-Zielgrößen und Card-Radien final abgesichert.
+- Keine fachlichen Änderungen.
 
 - Vollständiger Theme-Audit über Light, Dark und System ergänzt.
 - Verbindliche Farbmatrix für Modulfarben und Prozessfarben als Audit abgesichert.

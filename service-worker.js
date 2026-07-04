@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.2-dev.28';
-const CACHE_REVISION = '1.3.2-dev.28-1-3-2-dev-28-theme-matrix-audit';
+const CACHE_NAME = 'techcalc-pro-1.3.2-dev.29';
+const CACHE_REVISION = '1.3.2-dev.29-1-3-2-dev-29-ui-polish';
 const ASSETS = [
   './',
   './index.html',
@@ -10,6 +10,7 @@ const ASSETS = [
   './css/components-controls.css',
   './css/components-core.css',
   './css/components-legacy-contracts.css',
+  './css/components-polish.css',
   './css/components-save-manager.css',
   './css/components-settings-release.css',
   './css/components-system.css',
