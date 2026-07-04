@@ -1,3 +1,11 @@
+## 1.3.2-dev.25 – Dark Accent Resolver Fix
+
+- Dark/System Accent-Resolver an Light-Vertrag angeglichen.
+- Kälte/Kühlleistung verwendet wieder Cyan statt Neutralgrau.
+- Sanitärmodule verwenden Grün auch für aktive Toggles, nicht nur Card-Rahmen.
+- Heizleistung bleibt Orange, Lüftung/WRG/h,x bleiben Türkis.
+- Keine Fachlogik geändert.
+
 ## 1.3.2-dev.24 – Module-/Prozessfarben Fix
 
 - Modulidentität und Prozesszustand im Theme-Vertrag getrennt.
