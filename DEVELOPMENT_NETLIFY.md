@@ -1,3 +1,7 @@
+# TechCalc Pro 1.3.2-dev.28
+
+Theme Matrix Audit: Light/Dark/System Farbmatrix, Modul-/Prozessfarben und globale Save/Edit-Buttons auditiert.
+
 # TechCalc Pro 1.3.1 RC 6 – Development / Netlify
 
 Basis: 1.3.1 Beta 31
