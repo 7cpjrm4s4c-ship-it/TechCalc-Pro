@@ -1,10 +1,3 @@
-## 1.3.2-dev.27 – Final Theme Contract Audit
-
-- Modulidentität, Prozessfarbe und globale UI-Farbe abschließend getrennt.
-- Heizung/Kälte/Lüftung-Prozessfarben gegen Light/Dark/System abgesichert.
-- Sanitär-Grün, Druckhaltung/Pufferspeicher-Blau und Einheiten-Blau final geprüft.
-- Speichern/Aktualisieren bleiben globale UI-Buttons und erben keine Modulfarbe.
-
 ## 1.3.2-dev.26 – Dark Accent Resolver Fix
 
 - Dark/System Accent-Resolver an Light-Vertrag angeglichen.
