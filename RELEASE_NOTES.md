@@ -1,3 +1,11 @@
+## 1.3.2-dev.30 – Regression & UX Stabilization
+
+- Safe-Area/Initial-Layout stabilisiert; weiße Start-/Rückkehr-Streifen werden durch zentrale Viewport-Synchronisierung verhindert.
+- iOS-Input-Zoom global gehärtet: Inputs, Selects und Textareas erzwingen im mobilen Layout mindestens 16px Schriftgröße.
+- Scrollsprünge bei gespeicherten Inhalten in Pufferspeicher, Regenwasser, WRG/Mischluft und h,x-Diagramm weiter stabilisiert.
+- Settings-/Hauptmenü-Markierung füllt die komplette Accordion-Card statt nur den Header.
+- Keine fachliche Berechnungslogik geändert.
+
 ## 1.3.2-dev.29 – UI Polish
 
 - Zentrale Typografie-/Spacing-Polish-Regeln ergänzt.

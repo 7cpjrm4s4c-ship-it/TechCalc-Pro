@@ -1,4 +1,4 @@
-# TechCalc Pro 1.3.2-dev.29
+# TechCalc Pro 1.3.2-dev.30
 
 ## UI Polish
 

@@ -174,3 +174,77 @@ export const PlatformScrollManager = Object.freeze({
   preserveSavedRecordMutation,
   preserveModuleSwitchScroll
 });
+
+const GLOBAL_SAVED_ACTION_SELECTOR = [
+  '[data-line-select]',
+  '[data-line-delete]',
+  '[data-line-toggle]',
+  '[data-saved-load]',
+  '[data-saved-delete]',
+  '[data-saved-toggle]',
+  '[data-buffer-select]',
+  '[data-rainwater-select]',
+  '[data-wrg-select]',
+  '[data-hx-select]',
+  '[data-hx-delete]',
+  '[data-line-card]',
+  '[data-saved-record-card]',
+  '.saved-record-card',
+  '.line-section-card'
+].join(',');
+
+function scheduleStableRestore(snapshot, options = {}) {
+  if (!snapshot) return;
+  const frames = Math.max(0, Number(options.frames ?? 12));
+  const delays = Array.isArray(options.delays) ? options.delays : [0, 16, 48, 120, 260, 520, 900];
+  const restore = () => restorePosition(snapshot, { behavior: 'auto' });
+  delays.forEach(delay => setTimeout(restore, delay));
+  let remaining = frames;
+  const frame = () => {
+    restore();
+    remaining -= 1;
+    if (remaining > 0) requestAnimationFrame?.(frame);
+  };
+  if (remaining > 0) requestAnimationFrame?.(frame);
+}
+
+export function initializeGlobalSavedRecordScrollStability(root = document) {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+  const host = root || document;
+  if (host.__tcGlobalSavedScrollStabilityBound) return;
+  host.__tcGlobalSavedScrollStabilityBound = true;
+  let snapshot = null;
+  let point = null;
+  const capture = event => {
+    const target = event.target?.closest?.(GLOBAL_SAVED_ACTION_SELECTOR);
+    if (!target) return;
+    snapshot = capturePosition();
+    const source = event.touches?.[0] || event.changedTouches?.[0] || event;
+    point = { x: Number(source?.clientX || 0), y: Number(source?.clientY || 0) };
+  };
+  const cancelOnMove = event => {
+    if (!snapshot || !point) return;
+    const source = event.touches?.[0] || event.changedTouches?.[0] || event;
+    const dx = Math.abs(Number(source?.clientX || 0) - point.x);
+    const dy = Math.abs(Number(source?.clientY || 0) - point.y);
+    if (dx > 10 || dy > 10) {
+      snapshot = null;
+      point = null;
+    }
+  };
+  const restore = event => {
+    if (!snapshot) return;
+    const target = event.target?.closest?.(GLOBAL_SAVED_ACTION_SELECTOR);
+    if (!target) return;
+    const keep = snapshot;
+    snapshot = null;
+    point = null;
+    scheduleStableRestore(keep);
+  };
+  host.addEventListener('pointerdown', capture, true);
+  host.addEventListener('touchstart', capture, { capture: true, passive: true });
+  host.addEventListener('pointermove', cancelOnMove, { capture: true, passive: true });
+  host.addEventListener('touchmove', cancelOnMove, { capture: true, passive: true });
+  host.addEventListener('click', restore, true);
+  host.addEventListener('pointerup', restore, true);
+}
