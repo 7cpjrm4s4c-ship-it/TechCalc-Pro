@@ -1,5 +1,10 @@
-# TechCalc Pro 1.3.2-dev.30
+# TechCalc Pro 1.3.2-dev.31
 
 Development Netlify build.
 
-Schwerpunkt: UI Polish nach Theme-Audit.
+Schwerpunkt: Deep Legacy Stability Cleanup.
+
+- Trinkwasser Tab-/Enter-Navigation zentral gehärtet.
+- Gespeicherte Inhalte gegen Scrollsprünge erweitert stabilisiert.
+- Safe-Area-/Initial-Layout-Streifen weiter abgesichert.
+- Light-Header-Trennstrich entfernt.

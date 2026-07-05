@@ -1,7 +1,9 @@
-# TechCalc Pro 1.3.2-dev.30
+# TechCalc Pro 1.3.2-dev.31
 
-## UI Polish
+## Deep Legacy Stability Cleanup
 
-- components-polish.css ergänzt.
-- Typografie, Fokuszustände, Touch-Zielgrößen und Card-Radien zentral abgesichert.
-- Theme-/Modulfarbvertrag bleibt unverändert.
+- Zentrale Tab-/Enter-Navigation akzeptiert jetzt auch legacy-nahe Formularfelder ohne `data-field`.
+- Scroll-Stability-Presets für gespeicherte Inhalte verlängert und auf WRG/Mischluft, Pufferspeicher, Regenwasser und h,x erweitert.
+- Safe-Area- und Header-Surface im Light Theme final synchronisiert; Header-Trennstrich entfernt.
+- Input-Zoom-Guard erneut auf alle mobilen Formularfelder erweitert.
+- Keine fachliche Berechnungslogik geändert.

@@ -26,7 +26,7 @@ import { initializeSaveEditModeSync } from './saveEditModeSync.js';
 import { initializeLayoutStabilityController } from '../platform/shell/layoutStabilityController.js';
 import { initializeGlobalSavedRecordScrollStability } from './scrollManager.js';
 
-const APP_VERSION = '1.3.2-dev.30';
+const APP_VERSION = '1.3.2-dev.31';
 initializeLayoutStabilityController();
 initializeGlobalSavedRecordScrollStability(document);
 initializePerformanceController({ appVersion: APP_VERSION });

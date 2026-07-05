@@ -84,7 +84,7 @@ export function createLineSectionController({
         memory = next;
         state.set({ [listKey]: next, ...patch }, { action });
       };
-      return PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(commit));
+      return PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(commit, { frames: 22, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800] }));
     };
 
     const shouldSkipDuplicateAction = action => {
@@ -131,11 +131,11 @@ export function createLineSectionController({
       const item = read().find(entry => isSameId(entry.id, id));
       if (!item) return;
       if (isSameId(state.get()?.[activeIdKey], id)) {
-        PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' })));
+        PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' }), { frames: 22, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800] }));
         return;
       }
       const hydrated = hydrateRecord?.({ item, currentState: state.get() }) || {};
-      PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' })));
+      PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' }), { frames: 22, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800] }));
     };
 
     const deleteLine = id => {
@@ -153,7 +153,7 @@ export function createLineSectionController({
       if (!id) return;
       const currentExpanded = state.get()?.[expandedIdKey];
       const willOpen = !isSameId(currentExpanded, id);
-      PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' })));
+      PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' }), { frames: 22, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800] }));
     };
 
     registerCentralActions(root, {

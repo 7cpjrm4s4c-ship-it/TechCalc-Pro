@@ -891,3 +891,133 @@ body {
   scroll-margin-top: calc(var(--header-h) + var(--space-3));
   scroll-margin-bottom: calc(var(--bottom-nav-h) + var(--space-4));
 }
+/* TechCalc Pro 1.3.2-dev.31 — Deep Legacy Stability Cleanup
+   Final viewport/safe-area hardening, global input zoom guard and header/menu polish. */
+
+:root {
+  --color-bg: var(--color-bg-0, #020509);
+  --tc-safe-top-bg: var(--header-glass-bg, var(--color-bg));
+  --tc-safe-bottom-bg: var(--color-bg);
+}
+
+:root[data-theme='light'] {
+  --color-bg: var(--tc-light-bg, #f7f3ea);
+  --tc-safe-top-bg: #ffffff;
+  --tc-safe-bottom-bg: var(--tc-light-bg, #f7f3ea);
+}
+
+html,
+body,
+.app-shell {
+  background-color: var(--color-bg) !important;
+}
+
+html {
+  min-height: 100%;
+  min-height: var(--tc-viewport-height, 100dvh) !important;
+  overflow-x: clip !important;
+  overscroll-behavior: none;
+}
+
+body {
+  min-height: 100%;
+  min-height: var(--tc-viewport-height, 100dvh) !important;
+  overflow-x: clip !important;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: none;
+}
+
+body::before,
+.app-header::before {
+  background: var(--tc-safe-top-bg) !important;
+  background-color: var(--tc-safe-top-bg) !important;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: max(env(safe-area-inset-bottom, 0px), 0px);
+  background: var(--tc-safe-bottom-bg);
+  pointer-events: none;
+  z-index: 38;
+}
+
+/* Header and safe area must read as one surface in light mode. */
+:root[data-theme='light'] .app-header,
+:root[data-theme='light'] .app-header.glass-surface,
+:root[data-theme='light'] .app-header.is-scrolled,
+:root[data-theme='light'] .app-header.glass-surface.is-scrolled {
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+}
+
+:root[data-theme='light'] .app-header::before {
+  box-shadow: none !important;
+}
+
+@media (max-width: 767px) {
+  .app-shell {
+    min-height: var(--tc-viewport-height, 100dvh) !important;
+    padding-top: calc(var(--header-h) + env(safe-area-inset-top, 0px)) !important;
+  }
+
+  .app-main {
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+  }
+
+  /* Prevent first-paint desktop nav/divider stripes on iOS before dynamic layout settles. */
+  .module-nav {
+    border-top-color: var(--color-border, transparent) !important;
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+  }
+
+  :root[data-theme='light'] .module-nav {
+    border-top-color: var(--color-border, rgba(31,41,55,.18)) !important;
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+  }
+
+  input,
+  select,
+  textarea,
+  .control input,
+  .control select,
+  .control textarea,
+  .tc-quantity-field input,
+  .settings-form input,
+  .settings-form select,
+  .settings-form textarea,
+  .unit-select {
+    font-size: 16px !important;
+    line-height: 1.25 !important;
+    -webkit-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+  }
+}
+
+/* Settings active/open state fills the whole details card and never only a partial strip. */
+:root[data-theme='light'] .settings-submenu[open],
+:root[data-theme='light'] .settings-submenu.is-open,
+:root[data-theme='light'] .settings-submenu:focus-within {
+  background: linear-gradient(145deg,
+    color-mix(in srgb, var(--accent-blue, #2b80d7) 13%, #ffffff),
+    color-mix(in srgb, var(--accent-blue, #2b80d7) 8%, var(--tc-light-bg-elevated, #f7f3ea))) !important;
+  background-clip: padding-box !important;
+}
+
+:root[data-theme='light'] .settings-submenu[open] > summary,
+:root[data-theme='light'] .settings-submenu.is-open > summary,
+:root[data-theme='light'] .settings-submenu:focus-within > summary,
+:root[data-theme='light'] .settings-submenu[open] > .settings-submenu__content,
+:root[data-theme='light'] .settings-submenu.is-open > .settings-submenu__content,
+:root[data-theme='light'] .settings-submenu:focus-within > .settings-submenu__content {
+  background: transparent !important;
+  box-shadow: none !important;
+}

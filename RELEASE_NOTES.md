@@ -1,4 +1,4 @@
-## 1.3.2-dev.30 – Regression & UX Stabilization
+## 1.3.2-dev.31 – Deep Legacy Stability Cleanup
 
 - Safe-Area/Initial-Layout stabilisiert; weiße Start-/Rückkehr-Streifen werden durch zentrale Viewport-Synchronisierung verhindert.
 - iOS-Input-Zoom global gehärtet: Inputs, Selects und Textareas erzwingen im mobilen Layout mindestens 16px Schriftgröße.

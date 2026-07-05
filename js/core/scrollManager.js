@@ -3,7 +3,7 @@ import { preserveViewport as preserveRendererViewport } from './renderer.js';
 export const SCROLL_STABILITY_PRESETS = Object.freeze({
   default: Object.freeze({ frames: 6, blurActive: false, delays: [0, 40, 120] }),
   action: Object.freeze({ frames: 6, blurActive: false, delays: [0, 40, 100, 220] }),
-  savedRecord: Object.freeze({ frames: 8, blurActive: false, delays: [0, 40, 100, 220] })
+  savedRecord: Object.freeze({ frames: 18, blurActive: false, delays: [0, 16, 40, 100, 220, 420, 800, 1200] })
 });
 
 export function preserveScroll(action, preset = 'default', overrides = {}) {
@@ -21,8 +21,8 @@ export function preserveSavedRecordScroll(action, overrides = {}) {
 
 export function preserveSavedRecordMutation(action, overrides = {}) {
   return runWithoutScrollJump(action, {
-    frames: 8,
-    delays: [0, 40, 100, 220, 420],
+    frames: 18,
+    delays: [0, 16, 40, 100, 220, 420, 800, 1200],
     ...overrides
   });
 }
@@ -183,20 +183,27 @@ const GLOBAL_SAVED_ACTION_SELECTOR = [
   '[data-saved-delete]',
   '[data-saved-toggle]',
   '[data-buffer-select]',
+  '[data-buffer-dynamic]',
   '[data-rainwater-select]',
+  '[data-rw-dynamic]',
   '[data-wrg-select]',
+  '[data-wrg-dynamic]',
   '[data-hx-select]',
   '[data-hx-delete]',
+  '[data-hx-dynamic]',
   '[data-line-card]',
   '[data-saved-record-card]',
   '.saved-record-card',
-  '.line-section-card'
+  '.line-section-card',
+  '.tc-saved-record-panel',
+  '[data-line-dynamic]',
+  '[data-hc-dynamic]'
 ].join(',');
 
 function scheduleStableRestore(snapshot, options = {}) {
   if (!snapshot) return;
-  const frames = Math.max(0, Number(options.frames ?? 12));
-  const delays = Array.isArray(options.delays) ? options.delays : [0, 16, 48, 120, 260, 520, 900];
+  const frames = Math.max(0, Number(options.frames ?? 22));
+  const delays = Array.isArray(options.delays) ? options.delays : [0, 16, 40, 100, 220, 420, 800, 1200, 1800];
   const restore = () => restorePosition(snapshot, { behavior: 'auto' });
   delays.forEach(delay => setTimeout(restore, delay));
   let remaining = frames;

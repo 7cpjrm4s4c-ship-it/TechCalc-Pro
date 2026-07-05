@@ -1,4 +1,4 @@
-/* TechCalc Pro 1.3.2-dev.30 — viewport/safe-area stabilization. */
+/* TechCalc Pro 1.3.2-dev.31 — viewport/safe-area stabilization. */
 
 function setViewportVars() {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
