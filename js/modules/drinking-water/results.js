@@ -59,7 +59,7 @@ export function singleStats(group = {}){
   ];
 }
 
-export function buildDrinkingWaterResultModel(s = {}, r = {}, accent = 'green'){
+export function buildDrinkingWaterResultModel(s = {}, r = {}, accent = 'blue'){
   return {
     primary: {
       title: s.waterHeatingMode === 'decentral' ? 'Ergebnis — Trinkwasser dezentral' : 'Ergebnis — Trinkwasser zentral',
@@ -107,7 +107,7 @@ export function buildDrinkingWaterResultModel(s = {}, r = {}, accent = 'green'){
 }
 
 
-export function renderDrinkingWaterResultModel(model, accent = 'green'){
+export function renderDrinkingWaterResultModel(model, accent = 'blue'){
   return renderResultModel(model, accent);
 }
 

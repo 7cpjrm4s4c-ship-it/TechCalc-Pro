@@ -5,7 +5,7 @@ export default defineModuleConfig({
   title: 'Druckhaltung',
   shortTitle: 'Druck',
   group: 'HLK-Anlagen',
-  accent: 'blue',
+  accent: 'purple',
   order: 15,
   defaultVisible: false,
 

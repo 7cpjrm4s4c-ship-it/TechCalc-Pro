@@ -1,56 +1,11 @@
-## 1.3.2-dev.9 – Light Theme Kontrast- und Akzentkorrektur
-- Toggle-Füllungen werden im Light Theme wieder aus derselben Modul-Akzentfarbe wie der Rahmen abgeleitet.
-- Release-Notes-Cards im Einstellungsmenü verwenden ausschließlich helle Light-Theme-Flächen.
-- Textfarben im Light Theme wurden global auf dunkles Anthrazit und gedämpftes Grau normalisiert.
-- Dark/System bleiben unverändert.
-
-## 1.3.2-dev.7 – Light Theme Module Rollout
-
-Light Theme weiter zentralisiert: Modul-Akzentfarben werden nun über Module-Root-Tokens an Cards, Navigation, Segment-Controls, Fokuszustände, Accordions und Aktionsflächen vererbt. Textfarbe bleibt global dunkel. Pattern-/Schraffurflächen wurden für Menüs und Accordion-Flächen vollflächig abgesichert. Dark/System bleiben unverändert.
-
-## 1.3.2-dev.6 – Module Accent Token System
-
-Light Theme Modul-Akzentfarben zentralisiert: Heizung Orange, Kälte Cyan, Pufferspeicher/Druckhaltung/Rohr Blau, WRG/Mischluft und h,x Türkis, Trinkwasser/Regenwasser/Schmutzwasser Grün. Aktive Toggle-Flächen verwenden nun dieselbe Akzentfamilie wie die Rahmen; Textfarbe bleibt global dunkel.
-
-## 1.3.2-dev.5 – Light Theme Accent & Surface Completion
-
-- Aktive Segment-Buttons, Tabs, Fokus- und Hover-Zustaende verwenden im Light Mode wieder die jeweilige Modul-Akzentfarbe statt pauschal Blau.
-- Heizung/Orange wird in Switches und aktiven Auswahlzustaenden konsistent zur Card-Rahmenfarbe dargestellt.
-- Header-Menue, Settings-Panel, Modul-Auswahl und Trinkwasser-Accordions erhalten vollflaechige helle Pattern-/Schraffur-Hintergruende.
-- Dropdown-/Accordion-Pfeile bleiben kontrastreich und folgen dem zentralen Accent-System.
-- Dark/System funktional unveraendert belassen.
-
-## 1.3.2-dev.4 – Layout & Navigation Foundation
-
-- Light-Theme-Layout fuer Header, Modulnavigation, Menue, Overflow und Settings zentralisiert.
-- Header- und Menueflaechen konsistent auf warmes helles App-Design gestellt.
-- Modulnavigation, aktive Tabs, Hover- und Fokuszustaende kontrastreicher vereinheitlicht.
-- Release-Notes- und Settings-Cards auf globale Abstaende, Radien und Flaechen gehoben.
-- Dark/System funktional unveraendert belassen.
-
-## 1.3.2-dev.3 – Central Components Foundation
-
-- Light-Theme-Komponenten auf zentrale UI-Primitives konsolidiert.
-- Buttons, Segment Controls, Inputs, Selects, Cards, Accordions, Header-Menü und Modul-Auswahl über globale Tokens nachgeschärft.
-- Akzentfarben im Light Mode kräftiger und barriereärmer gesetzt.
-- Dunkle Light-Mode-Restflächen in Menü, Overflow und Accordions entfernt.
-- Dark/System funktional unverändert belassen.
-
-## 1.3.2-dev.2 – Central UI Tokens & Light Theme Foundation
-
-- Light Theme auf zentrale Tokens fuer Hintergrund, Flaechen, Rahmen, Typografie, Radien, Schatten und Akzentfarben gehoben.
-- Header-Menue, Einstellungen, weitere Module, Accordions und Dropdowns im Light Mode auf helles zentrales UI-System gestellt.
-- Akzentfarben verstaerkt, Fokuszustaende und aktive Elemente kontrastreicher dargestellt.
-- Dark/System funktional unveraendert belassen.
-
-## 1.3.2-dev.2 – Release Notes UI
+## 1.3.1-rc.12.1 – Release Notes UI
 
 - Release Notes werden chronologisch absteigend sortiert.
 - Neueste Änderung steht immer zuerst.
 - Doppelte und verschachtelte Zwischenüberschriften werden nicht mehr als eigene Release-Cards angezeigt.
 - Card-Abstände folgen dem globalen Standardraster.
 
-## 1.3.2-dev.2 – Code Freeze
+## 1.3.1-rc.12 – Code Freeze
 
 - Versionierung, Service Worker Cache und Precache-Revision auf RC.12 synchronisiert.
 - Runtime-Code auf verbliebene Debug-Ausgaben geprüft.
