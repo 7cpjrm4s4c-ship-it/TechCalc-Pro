@@ -1,4 +1,4 @@
-## 1.3.2-dev.26 – Dark Accent Resolver Fix
+## 1.3.2-dev.25 – Dark Accent Resolver Fix
 
 - Dark/System Accent-Resolver an Light-Vertrag angeglichen.
 - Kälte/Kühlleistung verwendet wieder Cyan statt Neutralgrau.
