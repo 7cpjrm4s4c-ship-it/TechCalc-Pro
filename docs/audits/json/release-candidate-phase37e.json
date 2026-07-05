@@ -2,7 +2,7 @@
   "phase": "37E",
   "title": "Release Candidate Closure Audit",
   "status": "pass",
-  "checkedAt": "2026-07-03T16:31:43.395Z",
+  "checkedAt": "2026-07-02T20:20:00.593Z",
   "checks": [
     {
       "id": "required-files",
@@ -13,7 +13,7 @@
       "id": "app-shell-size",
       "pass": true,
       "detail": {
-        "appLines": 308,
+        "appLines": 306,
         "max": 320
       }
     },

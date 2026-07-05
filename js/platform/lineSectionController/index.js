@@ -96,9 +96,7 @@ export function createLineSectionController({
       return false;
     };
 
-    const saveCurrent = ({ root: actionRoot, element } = {}) => {
-      if (element?.disabled || element?.getAttribute?.('aria-disabled') === 'true') return;
-      if (state.get()?.[activeIdKey]) return;
+    const saveCurrent = ({ root: actionRoot } = {}) => {
       if (shouldSkipDuplicateAction('line:save')) return;
       const host = actionRoot || root;
       const name = host.querySelector(`#${nameInputId}`)?.value?.trim() || '';
@@ -110,9 +108,7 @@ export function createLineSectionController({
       persist([item, ...items], { [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, 'line:save');
     };
 
-    const updateCurrent = ({ root: actionRoot, element } = {}) => {
-      if (element?.disabled || element?.getAttribute?.('aria-disabled') === 'true') return;
-      if (!state.get()?.[activeIdKey]) return;
+    const updateCurrent = ({ root: actionRoot } = {}) => {
       if (shouldSkipDuplicateAction('line:update')) return;
       const host = actionRoot || root;
       const currentState = state.get();

@@ -22,9 +22,8 @@ import { initializeReleaseNotesController } from '../platform/shell/releaseNotes
 import { initializeFeedbackController } from '../platform/shell/feedbackController.js';
 import { initializeServiceWorkerController } from '../platform/shell/serviceWorkerController.js';
 import { initializePerformanceController, markPerformance, measurePerformance, startPerformanceSpan } from '../platform/shell/performanceController.js';
-import { initializeSaveEditModeSync } from './saveEditModeSync.js';
 
-const APP_VERSION = '1.3.2-dev.15';
+const APP_VERSION = '1.3.2-dev.8';
 initializePerformanceController({ appVersion: APP_VERSION });
 const appInitStartMark = markPerformance('app:init:start', { appVersion: APP_VERSION });
 
@@ -301,7 +300,6 @@ function updateHeaderTransparency(){
 trackGlobalEventListener(window, 'scroll', updateHeaderTransparency, { passive: true });
 updateHeaderTransparency();
 
-initializeSaveEditModeSync(document);
 initializeServiceWorkerController({ appVersion: APP_VERSION });
 const appInitEndMark = markPerformance('app:init:end', { appVersion: APP_VERSION });
 measurePerformance('app:init', appInitStartMark, appInitEndMark, { appVersion: APP_VERSION });

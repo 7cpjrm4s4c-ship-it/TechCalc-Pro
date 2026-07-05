@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const cssFiles = ['css/components.css', 'css/components-core.css', 'css/components-settings-release.css', 'css/components-system.css', 'css/layout-navigation-theme.css', 'css/layout.css', 'css/module-accent-tokens.css', 'css/theme-light.css', 'css/theme-light-guards.css', 'css/theme-light-rollout.css', 'css/theme-light-surfaces.css', 'css/tokens.css'];
+const cssFiles = ['css/components.css', 'css/layout.css', 'css/tokens.css'];
 const supportPattern = /@supports\s*\(\(-webkit-backdrop-filter:\s*blur\(1px\)\)\s*or\s*\(backdrop-filter:\s*blur\(1px\)\)\)/;
 
 function assert(condition, message) {
@@ -42,7 +42,7 @@ for (const file of cssFiles) {
   }
 }
 
-const components = readFileSync('css/components-core.css', 'utf8');
+const components = readFileSync('css/components.css', 'utf8');
 const layout = readFileSync('css/layout.css', 'utf8');
 const tokens = readFileSync('css/tokens.css', 'utf8');
 
