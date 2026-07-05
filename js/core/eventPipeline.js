@@ -80,6 +80,7 @@ function resolveActionHandler(root, action, options = {}) {
 
 function dispatchAction(root, state, actionEl, event, options = {}) {
   if (!actionEl || !root?.contains?.(actionEl)) return false;
+  if (actionEl.disabled || actionEl.getAttribute?.('aria-disabled') === 'true') return false;
   const action = actionEl.dataset.tcAction || actionEl.dataset.action;
   if (!action) return false;
 
@@ -198,7 +199,7 @@ function wasPointerActionSuppressed(root) {
 
 
 function navigatePlatformField(root, current, event) {
-  if (!root || !current?.matches?.('[data-field]')) return false;
+  if (!root || !current?.matches?.('[data-field], [data-platform-focus], input, textarea, select')) return false;
   return handlePlatformFieldNavigation(root, current, event, { select: true, defer: false });
 }
 
@@ -302,24 +303,23 @@ export function bindCentralEventPipeline(root, state, options = {}) {
       return;
     }
 
-    const el = event.target?.closest?.('input[data-field], textarea[data-field], select[data-field]');
+    const el = event.target?.closest?.('input:not([type="hidden"]), textarea, select, [data-platform-focus]');
     if (!el || !root.contains(el) || (event.key !== 'Enter' && event.key !== 'Tab')) return;
     const action = event.key === 'Tab' ? 'field:tab' : 'field:enter';
     event.preventDefault();
-    // Compatibility note for phase11d audit: field:enter historically used
-    // commitElementField(state, el, { action, notify: true, root }) for immediate calculation.
-    // RC 35C: keyboard navigation must move focus before any notifying render can
-    // replace the current input. Commit silently, move focus, then refresh after
-    // the browser has applied focus. This is required for custom dynamic modules
-    // like h,x and Trinkwasser.
-    commitElementField(state, el, { action, notify: false, root });
-    hasDeferredInput = false;
+    // Dev.31: central keyboard navigation is now field-class based, not only
+    // data-field based. Drinking-water draft quantity inputs and legacy module
+    // controls can therefore participate without owning local Tab/Enter code.
+    if (el.matches?.('[data-field]')) {
+      commitElementField(state, el, { action, notify: false, root });
+      hasDeferredInput = false;
+    }
     const moved = navigatePlatformField(root, el, event);
     notifyCommit({ action, element: el, moved });
     const refresh = () => {
       const active = document.activeElement;
-      const keep = active && root.contains(active) && active.matches?.('[data-field], [data-platform-focus]');
-      preserveFocusDuring(root, () => state.set({}, { action: `${action}:refresh`, notify: true }), { restoreFocus: keep });
+      const keep = active && root.contains(active) && active.matches?.('[data-field], [data-platform-focus], input, textarea, select');
+      if (el.matches?.('[data-field]')) preserveFocusDuring(root, () => state.set({}, { action: `${action}:refresh`, notify: true }), { restoreFocus: keep });
     };
     if (typeof requestAnimationFrame === 'function') requestAnimationFrame(refresh);
     else setTimeout(refresh, 0);

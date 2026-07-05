@@ -12,6 +12,12 @@ const PLATFORM_FIELD_SELECTOR = [
   'input[data-field]:not([type="hidden"]):not([disabled])',
   'textarea[data-field]:not([disabled])',
   'select[data-field]:not([disabled])',
+  // Dev.31: legacy module controls that still do not carry data-field must not
+  // break the central mobile Tab/Enter contract. Restrict this to real form
+  // controls and keep buttons/links out of field traversal.
+  'input:not([type="hidden"]):not([disabled]):not([data-skip-platform-focus])',
+  'textarea:not([disabled]):not([data-skip-platform-focus])',
+  'select:not([disabled]):not([data-skip-platform-focus])',
   '[data-platform-focus]:not([disabled])'
 ].join(',');
 
@@ -168,9 +174,9 @@ export function captureActiveField(root = document, options = {}) {
   const active = typeof document !== 'undefined' ? document.activeElement : null;
   if (!active || active === document.body) return null;
   if (root?.contains && !root.contains(active)) return null;
-  const field = active.closest?.('[data-field]') || active;
-  if (!field?.matches?.('[data-field]')) return null;
-  const key = field.dataset.field || field.id || field.name || null;
+  const field = active.closest?.('[data-field], input, textarea, select, [data-platform-focus]') || active;
+  if (!field?.matches?.('[data-field], input, textarea, select, [data-platform-focus]')) return null;
+  const key = field.dataset.field || field.id || field.name || field.dataset.platformFocus || null;
   if (!key) return null;
   const fields = getPlatformFields(root);
   const index = fields.indexOf(field);
@@ -188,8 +194,8 @@ export function captureActiveField(root = document, options = {}) {
 function findFieldBySnapshot(root, snapshot) {
   if (!root?.querySelector || !snapshot) return null;
   const escaped = cssEscape(snapshot.key);
-  const byKey = root.querySelector(`[data-field="${escaped}"], [id="${escaped}"], [name="${escaped}"]`);
-  if (byKey && byKey.matches?.('[data-field]') && !byKey.disabled && isElementVisible(byKey)) return byKey;
+  const byKey = root.querySelector(`[data-field="${escaped}"], [id="${escaped}"], [name="${escaped}"], [data-platform-focus="${escaped}"]`);
+  if (byKey && byKey.matches?.('[data-field], input, textarea, select, [data-platform-focus]') && !byKey.disabled && isElementVisible(byKey)) return byKey;
   const fields = getPlatformFields(root);
   if (snapshot.index >= 0 && fields[snapshot.index]) return fields[snapshot.index];
   return null;

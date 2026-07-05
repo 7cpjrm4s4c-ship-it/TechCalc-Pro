@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-07-02T05:26:42.251Z",
+  "generatedAt": "2026-07-05T15:16:56.313Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -11,32 +11,32 @@
   ],
   "modulesAudited": 11,
   "moduleScores": {
-    "buffer-storage": 93,
-    "drinking-water": 71,
+    "buffer-storage": 100,
+    "drinking-water": 78,
     "heat-recovery": 100,
     "heating-cooling": 100,
     "hx-diagram": 100,
     "pipe-sizing": 100,
-    "pressure-holding": 93,
+    "pressure-holding": 100,
     "rainwater": 100,
-    "unit-converter": 93,
+    "unit-converter": 100,
     "ventilation": 100,
-    "wastewater": 93
+    "wastewater": 100
   },
   "riskCounts": {
     "P1": 1,
-    "P2": 6
+    "P2": 1
   },
   "cssDebt": [
     {
       "file": "css/components.css",
-      "important": 11,
+      "important": 0,
       "inlineStyleSelectors": 0,
       "moduleScopedSelectors": 0
     },
     {
       "file": "css/layout.css",
-      "important": 0,
+      "important": 13,
       "inlineStyleSelectors": 0,
       "moduleScopedSelectors": 0
     },
@@ -44,7 +44,7 @@
       "file": "css/modules.css",
       "important": 0,
       "inlineStyleSelectors": 0,
-      "moduleScopedSelectors": 27
+      "moduleScopedSelectors": 0
     },
     {
       "file": "css/tokens.css",
@@ -98,197 +98,12 @@
       }
     },
     {
-      "module": "buffer-storage",
-      "priority": "P2",
-      "area": "css-specialization",
-      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
-      "evidence": {
-        "count": 3,
-        "samples": [
-          {
-            "cssFile": "css/modules.css",
-            "line": 102,
-            "text": ".module-view[data-module='buffer-storage'] .ph-help,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 103,
-            "text": ".module-view[data-module='buffer-storage'] .ph-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 105,
-            "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
-          }
-        ]
-      }
-    },
-    {
       "module": "drinking-water",
       "priority": "P2",
       "area": "event-density",
       "message": "Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.",
       "evidence": {
         "addEventListener": 14
-      }
-    },
-    {
-      "module": "drinking-water",
-      "priority": "P2",
-      "area": "css-specialization",
-      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
-      "evidence": {
-        "count": 7,
-        "samples": [
-          {
-            "cssFile": "css/modules.css",
-            "line": 91,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog > summary,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 92,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 93,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__record { padding: var(--tc-gap); }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 94,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__list,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 95,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 96,
-            "text": ".module-view[data-module='drinking-water'] .tc-consumer-row > div,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 97,
-            "text": ".module-view[data-module='drinking-water'] .tc-fixture-row > div { display: grid; gap: 4px; min-width: 0; }"
-          }
-        ]
-      }
-    },
-    {
-      "module": "pressure-holding",
-      "priority": "P2",
-      "area": "css-specialization",
-      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
-      "evidence": {
-        "count": 5,
-        "samples": [
-          {
-            "cssFile": "css/modules.css",
-            "line": 100,
-            "text": ".module-view[data-module='pressure-holding'] .ph-help,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 101,
-            "text": ".module-view[data-module='pressure-holding'] .ph-note,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 104,
-            "text": ".module-view[data-module='pressure-holding'] .ph-formula,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 106,
-            "text": ".module-view[data-module='pressure-holding'] .inline-stat span { white-space: normal; font-size: clamp(.62rem,.72vw,.72rem); letter-spacing: .08em; }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 107,
-            "text": ".module-view[data-module='pressure-holding'] .inline-stat strong { font-size: clamp(.8rem,.95vw,.95rem); line-height: 1.12; }"
-          }
-        ]
-      }
-    },
-    {
-      "module": "unit-converter",
-      "priority": "P2",
-      "area": "css-specialization",
-      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
-      "evidence": {
-        "count": 8,
-        "samples": [
-          {
-            "cssFile": "css/modules.css",
-            "line": 117,
-            "text": ".module-view[data-module='unit-converter'] #convertedValue,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 118,
-            "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 119,
-            "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 120,
-            "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 133,
-            "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 134,
-            "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 135,
-            "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 136,
-            "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
-          }
-        ]
-      }
-    },
-    {
-      "module": "wastewater",
-      "priority": "P2",
-      "area": "css-specialization",
-      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
-      "evidence": {
-        "count": 3,
-        "samples": [
-          {
-            "cssFile": "css/modules.css",
-            "line": 87,
-            "text": ".pipe-dimension-card--green .pipe-bar span { background: #25d96a; }.wastewater-subselect { display: grid; gap: var(--tc-gap); }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 88,
-            "text": ".wastewater-subselect > span { color: var(--color-muted); font-size: .78rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }.wastewater-line-selector { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 89,
-            "text": ".wastewater-line-selector button { scroll-snap-align: center; }"
-          }
-        ]
       }
     }
   ],
@@ -313,42 +128,16 @@
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 3,
+        "moduleCssSelectors": 0,
         "hasPlatformDynamic": true,
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
         "usesCentralSavedRecordController": false,
         "migrationStatusEntries": 0
       },
-      "score": 93,
+      "score": 100,
       "status": "reference-aligned",
-      "findings": [
-        {
-          "priority": "P2",
-          "area": "css-specialization",
-          "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
-          "evidence": {
-            "count": 3,
-            "samples": [
-              {
-                "cssFile": "css/modules.css",
-                "line": 102,
-                "text": ".module-view[data-module='buffer-storage'] .ph-help,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 103,
-                "text": ".module-view[data-module='buffer-storage'] .ph-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 105,
-                "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
-              }
-            ]
-          }
-        }
-      ]
+      "findings": []
     },
     {
       "module": "drinking-water",
@@ -371,15 +160,15 @@
         "nonControllerAddEventListeners": 4,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 7,
+        "moduleCssSelectors": 0,
         "hasPlatformDynamic": false,
         "hasLocalDynamic": true,
         "hasLegacyCollection": false,
         "usesCentralSavedRecordController": false,
         "migrationStatusEntries": 0
       },
-      "score": 71,
-      "status": "cleanup-required",
+      "score": 78,
+      "status": "platform-conformant-with-minor-debt",
       "findings": [
         {
           "priority": "P1",
@@ -418,51 +207,6 @@
           "evidence": {
             "addEventListener": 14
           }
-        },
-        {
-          "priority": "P2",
-          "area": "css-specialization",
-          "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
-          "evidence": {
-            "count": 7,
-            "samples": [
-              {
-                "cssFile": "css/modules.css",
-                "line": 91,
-                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog > summary,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 92,
-                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 93,
-                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__record { padding: var(--tc-gap); }"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 94,
-                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__list,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 95,
-                "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 96,
-                "text": ".module-view[data-module='drinking-water'] .tc-consumer-row > div,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 97,
-                "text": ".module-view[data-module='drinking-water'] .tc-fixture-row > div { display: grid; gap: 4px; min-width: 0; }"
-              }
-            ]
-          }
         }
       ]
     },
@@ -482,7 +226,7 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 751,
+        "lineCount": 750,
         "controllerAddEventListeners": 1,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
@@ -548,7 +292,7 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 1147,
+        "lineCount": 1092,
         "controllerAddEventListeners": 5,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
@@ -615,52 +359,16 @@
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 5,
+        "moduleCssSelectors": 0,
         "hasPlatformDynamic": true,
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
         "usesCentralSavedRecordController": false,
         "migrationStatusEntries": 0
       },
-      "score": 93,
+      "score": 100,
       "status": "reference-aligned",
-      "findings": [
-        {
-          "priority": "P2",
-          "area": "css-specialization",
-          "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
-          "evidence": {
-            "count": 5,
-            "samples": [
-              {
-                "cssFile": "css/modules.css",
-                "line": 100,
-                "text": ".module-view[data-module='pressure-holding'] .ph-help,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 101,
-                "text": ".module-view[data-module='pressure-holding'] .ph-note,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 104,
-                "text": ".module-view[data-module='pressure-holding'] .ph-formula,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 106,
-                "text": ".module-view[data-module='pressure-holding'] .inline-stat span { white-space: normal; font-size: clamp(.62rem,.72vw,.72rem); letter-spacing: .08em; }"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 107,
-                "text": ".module-view[data-module='pressure-holding'] .inline-stat strong { font-size: clamp(.8rem,.95vw,.95rem); line-height: 1.12; }"
-              }
-            ]
-          }
-        }
-      ]
+      "findings": []
     },
     {
       "module": "rainwater",
@@ -714,67 +422,16 @@
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 8,
+        "moduleCssSelectors": 0,
         "hasPlatformDynamic": true,
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
         "usesCentralSavedRecordController": false,
         "migrationStatusEntries": 0
       },
-      "score": 93,
+      "score": 100,
       "status": "reference-aligned",
-      "findings": [
-        {
-          "priority": "P2",
-          "area": "css-specialization",
-          "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
-          "evidence": {
-            "count": 8,
-            "samples": [
-              {
-                "cssFile": "css/modules.css",
-                "line": 117,
-                "text": ".module-view[data-module='unit-converter'] #convertedValue,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 118,
-                "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 119,
-                "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 120,
-                "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 133,
-                "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 134,
-                "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 135,
-                "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 136,
-                "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
-              }
-            ]
-          }
-        }
-      ]
+      "findings": []
     },
     {
       "module": "ventilation",
@@ -791,7 +448,7 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 463,
+        "lineCount": 464,
         "controllerAddEventListeners": 0,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
@@ -829,42 +486,16 @@
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
-        "moduleCssSelectors": 3,
+        "moduleCssSelectors": 0,
         "hasPlatformDynamic": true,
         "hasLocalDynamic": false,
         "hasLegacyCollection": false,
         "usesCentralSavedRecordController": false,
         "migrationStatusEntries": 0
       },
-      "score": 93,
+      "score": 100,
       "status": "reference-aligned",
-      "findings": [
-        {
-          "priority": "P2",
-          "area": "css-specialization",
-          "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
-          "evidence": {
-            "count": 3,
-            "samples": [
-              {
-                "cssFile": "css/modules.css",
-                "line": 87,
-                "text": ".pipe-dimension-card--green .pipe-bar span { background: #25d96a; }.wastewater-subselect { display: grid; gap: var(--tc-gap); }"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 88,
-                "text": ".wastewater-subselect > span { color: var(--color-muted); font-size: .78rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }.wastewater-line-selector { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }"
-              },
-              {
-                "cssFile": "css/modules.css",
-                "line": 89,
-                "text": ".wastewater-line-selector button { scroll-snap-align: center; }"
-              }
-            ]
-          }
-        }
-      ]
+      "findings": []
     }
   ],
   "utilityUsage": [
@@ -1046,197 +677,12 @@
       }
     },
     {
-      "module": "buffer-storage",
-      "priority": "P2",
-      "area": "css-specialization",
-      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
-      "evidence": {
-        "count": 3,
-        "samples": [
-          {
-            "cssFile": "css/modules.css",
-            "line": 102,
-            "text": ".module-view[data-module='buffer-storage'] .ph-help,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 103,
-            "text": ".module-view[data-module='buffer-storage'] .ph-note { font-size: clamp(.78rem,2.5vw,.92rem); }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 105,
-            "text": ".module-view[data-module='buffer-storage'] .ph-formula { font-size: clamp(.82rem,3vw,1rem); line-height: 1.35; }"
-          }
-        ]
-      }
-    },
-    {
       "module": "drinking-water",
       "priority": "P2",
       "area": "event-density",
       "message": "Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.",
       "evidence": {
         "addEventListener": 14
-      }
-    },
-    {
-      "module": "drinking-water",
-      "priority": "P2",
-      "area": "css-specialization",
-      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
-      "evidence": {
-        "count": 7,
-        "samples": [
-          {
-            "cssFile": "css/modules.css",
-            "line": 91,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog > summary,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 92,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 93,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__record { padding: var(--tc-gap); }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 94,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__list,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 95,
-            "text": ".module-view[data-module='drinking-water'] .dw-save-dialog__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 96,
-            "text": ".module-view[data-module='drinking-water'] .tc-consumer-row > div,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 97,
-            "text": ".module-view[data-module='drinking-water'] .tc-fixture-row > div { display: grid; gap: 4px; min-width: 0; }"
-          }
-        ]
-      }
-    },
-    {
-      "module": "pressure-holding",
-      "priority": "P2",
-      "area": "css-specialization",
-      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
-      "evidence": {
-        "count": 5,
-        "samples": [
-          {
-            "cssFile": "css/modules.css",
-            "line": 100,
-            "text": ".module-view[data-module='pressure-holding'] .ph-help,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 101,
-            "text": ".module-view[data-module='pressure-holding'] .ph-note,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 104,
-            "text": ".module-view[data-module='pressure-holding'] .ph-formula,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 106,
-            "text": ".module-view[data-module='pressure-holding'] .inline-stat span { white-space: normal; font-size: clamp(.62rem,.72vw,.72rem); letter-spacing: .08em; }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 107,
-            "text": ".module-view[data-module='pressure-holding'] .inline-stat strong { font-size: clamp(.8rem,.95vw,.95rem); line-height: 1.12; }"
-          }
-        ]
-      }
-    },
-    {
-      "module": "unit-converter",
-      "priority": "P2",
-      "area": "css-specialization",
-      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
-      "evidence": {
-        "count": 8,
-        "samples": [
-          {
-            "cssFile": "css/modules.css",
-            "line": 117,
-            "text": ".module-view[data-module='unit-converter'] #convertedValue,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 118,
-            "text": ".module-view[data-module='unit-converter'] #convertedValue:disabled,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 119,
-            "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 120,
-            "text": ".module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 133,
-            "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 134,
-            "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 135,
-            "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 136,
-            "text": ":root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }"
-          }
-        ]
-      }
-    },
-    {
-      "module": "wastewater",
-      "priority": "P2",
-      "area": "css-specialization",
-      "message": "Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.",
-      "evidence": {
-        "count": 3,
-        "samples": [
-          {
-            "cssFile": "css/modules.css",
-            "line": 87,
-            "text": ".pipe-dimension-card--green .pipe-bar span { background: #25d96a; }.wastewater-subselect { display: grid; gap: var(--tc-gap); }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 88,
-            "text": ".wastewater-subselect > span { color: var(--color-muted); font-size: .78rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }.wastewater-line-selector { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }"
-          },
-          {
-            "cssFile": "css/modules.css",
-            "line": 89,
-            "text": ".wastewater-line-selector button { scroll-snap-align: center; }"
-          }
-        ]
       }
     }
   ]

@@ -1,11 +1,172 @@
-## 1.3.1-rc.12.1 – Release Notes UI
+## 1.3.2-dev.35 – Scroll Diagnostics Build
+
+- Scroll-Telemetrie für mobile Scrollsprünge ergänzt
+- Instrumentiert `scrollIntoView`, `window.scrollTo`, `Element.scrollTo`, `HTMLElement.focus`, `focusin`, `click`, `pointerdown`, `keydown` und `scroll`
+- Keine UI-/CSS-Fixes; reine Diagnose auf Basis von dev.34
+
+## 1.3.2-dev.35 – Cleanup / Stability Fix
+
+Dev.30/31 additive stability CSS removed from the precache and the final light theme file. Safe-area/header/divider handling was centralized again. Settings accordion blue active fill was removed. Saved-record mutations no longer restore focus during structural list updates, reducing scroll jumps in WRG/Mischluft, Pufferspeicher, Regenwasser and h,x-Diagramm. iOS input zoom guard remains global.
+
+## 1.3.2-dev.35 – Deep Legacy Stability Cleanup
+
+- Safe-Area/Initial-Layout stabilisiert; weiße Start-/Rückkehr-Streifen werden durch zentrale Viewport-Synchronisierung verhindert.
+- iOS-Input-Zoom global gehärtet: Inputs, Selects und Textareas erzwingen im mobilen Layout mindestens 16px Schriftgröße.
+- Scrollsprünge bei gespeicherten Inhalten in Pufferspeicher, Regenwasser, WRG/Mischluft und h,x-Diagramm weiter stabilisiert.
+- Settings-/Hauptmenü-Markierung füllt die komplette Accordion-Card statt nur den Header.
+- Keine fachliche Berechnungslogik geändert.
+
+## 1.3.2-dev.29 – UI Polish
+
+- Zentrale Typografie-/Spacing-Polish-Regeln ergänzt.
+- Fokuszustände appweit vereinheitlicht.
+- Touch-Zielgrößen und Card-Radien final abgesichert.
+- Keine fachlichen Änderungen.
+
+- Vollständiger Theme-Audit über Light, Dark und System ergänzt.
+- Verbindliche Farbmatrix für Modulfarben und Prozessfarben als Audit abgesichert.
+- Kälte/Cyan, Lüftung/WRG/h,x/Türkis, Sanitär/Grün und Druckhaltung/Pufferspeicher/Blau werden gegen Konfiguration und CSS-Vertrag geprüft.
+- Speichern/Aktualisieren bleiben globale UI-Buttons und werden gegen Modulfarben-Vererbung abgesichert.
+- Keine fachliche Modul-Logik geändert.
+
+## 1.3.2-dev.27 – Final Theme Contract Audit
+
+- Modulidentität, Prozessfarbe und globale UI-Farbe abschließend getrennt.
+- Heizung/Kälte/Lüftung-Prozessfarben gegen Light/Dark/System abgesichert.
+- Sanitär-Grün, Druckhaltung/Pufferspeicher-Blau und Einheiten-Blau final geprüft.
+- Speichern/Aktualisieren bleiben globale UI-Buttons und erben keine Modulfarbe.
+
+## 1.3.2-dev.26 – Dark Accent Resolver Fix
+
+- Dark/System Accent-Resolver an Light-Vertrag angeglichen.
+- Kälte/Kühlleistung verwendet wieder Cyan statt Neutralgrau.
+- Sanitärmodule verwenden Grün auch für aktive Toggles, nicht nur Card-Rahmen.
+- Heizleistung bleibt Orange, Lüftung/WRG/h,x bleiben Türkis.
+- Keine Fachlogik geändert.
+
+## 1.3.2-dev.24 – Module-/Prozessfarben Fix
+
+- Modulidentität und Prozesszustand im Theme-Vertrag getrennt.
+- Lüftung bleibt als Modul Türkis; Heizleistung nutzt Orange und Kühlleistung/Kälte nutzt Cyan.
+- Heizung/Kälte-Prozessumschaltung im Light Theme korrigiert.
+- Einheiten-Modul auf blaue Modul-/Navigationsfarbe synchronisiert.
+
+## 1.3.2-dev.23 – Theme Regression Fix
+
+- Kälte-Akzent im Light Theme wieder eindeutig auf Cyan gesetzt.
+- Speichern-/Aktualisieren-Buttons von Modul-Akzenten entkoppelt.
+- Globale UI-Primärtokens für Save/Edit-Aktionen ergänzt.
+- WRG/Mischluft und h,x bleiben auf Türkis.
+
+## 1.3.2-dev.22 – Final UI Hardening
+
+- Light/Dark/System-Komponentenvertrag final gehärtet.
+- Modul-Akzente, aktive Controls, Result-Cards und Action-Felder werden zentral über Tokens abgesichert.
+- Verbliebene Light-Theme-Konfliktregeln in einen finalen Contract-Block überführt.
+- Theme-Audit erweitert, damit neue konkurrierende Modul-Sonderregeln auffallen.
+- Keine fachliche Modul-Logik geändert.
+
+## 1.3.2-dev.21 – Light Theme Contract Hardening
+
+Finaler Komponentenvertrag für das Light Theme ergänzt. Toggle-Füllungen, Buttonzustände, Result-Cards und Action-Felder werden über zentrale Accent- und Surface-Tokens abgesichert.
+
+## 1.3.2-dev.20 – Dark Theme Action-Field Guard
+
+Schmutzwasser-Action-Felder zentralisiert: Der Button „Gegenstand hinzufügen“ rendert nun auch im Dark/System Theme ohne umgebende Control-Card. Komponentenregel gilt themeübergreifend; Light/Dark/System bleiben konsistent.
+
+## 1.3.2-dev.19 – Light Theme Finalisierung
+
+- App-Status-Komponenten aus Legacy-CSS ausgelagert
+- letzter Light-Theme-Conflict-Guard ergänzt
+- Textfarben für Release Notes, Menüs und Modulflächen zentral abgesichert
+- aktive Toggles und Buttons folgen erneut ausschließlich Modul-Akzenttokens
+- deaktivierte Buttons im Light Mode final normalisiert
+
+## 1.3.2-dev.17 – CSS-System Härtung
+
+Light Theme Button-Regeln weiter zentralisiert. Konkurrierende vollflächige Primary-Button-Regeln in Light-Theme-, Rollout-, Contrast- und Komponenten-Dateien auf tokenisierte Soft-Accent-Regeln umgestellt. Neuer CSS-Härtungs-Audit verhindert erneute Save/Edit- und Light-Button-Konflikte außerhalb der zentralen Komponenten.
+
+## 1.3.2-dev.16 – UI-System Abschlussbereinigung
+
+Die letzten vier UI-System-Punkte wurden abgearbeitet: Modul-CSS ist in fokussierte Layout-/Domain-Dateien aufgeteilt, Light-Theme-Kontrastregeln und Save/Edit-State sind getrennt, Komponenten-Aggregate bleiben nur noch Stubs, und ein neuer UI-System-Audit schützt gegen neue modulinterne Komponenten-/Inline-Styles. Dark/System bleiben unverändert.
+
+## 1.3.2-dev.15
+
+Light Theme Härtung: Speichern/Aktualisieren erhält einen zentralen Edit-Mode-Vertrag. Visuelle Button-Zustände werden im Light Mode aus `data-edit-mode` und `data-save-mode-role` abgeleitet, damit Modul- oder Komponentenregeln die Speicherlogik nicht mehr überzeichnen.
+
+## 1.3.2-dev.15 – Light Save/Edit State Guard
+
+Detaillierte Bereinigung der Light-Theme-Speicherzustände. Speichern/Aktualisieren werden zentral per disabled, aria-disabled und Guard-Klasse synchronisiert. Light-Theme-Button-Regeln können deaktivierte Speicheraktionen nicht mehr als aktive Aktionen darstellen. Dark/System bleiben unverändert.
+
+## 1.3.2-dev.13 – Speicher-/Edit-Modus Sync
+
+- Zentraler Sync für Speicher-/Aktualisieren-Buttons ergänzt.
+- Ohne aktive Auswahl bleibt nur Speichern aktiv.
+- Mit aktiver Auswahl bleibt nur Aktualisieren aktiv.
+- Dynamische Listen-Updates und Selected-State werden appweit nachgeführt.
+- Keine Dark-/System-Theme-Änderungen.
+
+## 1.3.2-dev.12 – Zentraler Speicher-/Edit-Modus
+
+Gespeicherte Einträge folgen nun appweit einem klaren Edit-Workflow: ohne aktive Auswahl ist nur „Speichern“ aktiv, bei aktiver Auswahl nur „Aktualisieren“. Die Guard-Logik liegt zentral im Saved-Record-/Line-Section-System und schützt zusätzlich gegen konkurrierende Action-Handler.
+
+## 1.3.2-dev.11 – CSS-System entrümpelt
+
+Components-CSS wurde in zentrale, wartbare Dateien aufgeteilt: Core, Controls, Collections, Settings/Release Notes, Legacy Contracts, Light Theme, Module Accent Tokens und Guards. Neue UI-Regeln sollen nicht mehr an components.css angehängt werden. Dark/System bleiben unverändert.
+
+## 1.3.2-dev.9 – Light Theme Kontrast- und Akzentkorrektur
+- Toggle-Füllungen werden im Light Theme wieder aus derselben Modul-Akzentfarbe wie der Rahmen abgeleitet.
+- Release-Notes-Cards im Einstellungsmenü verwenden ausschließlich helle Light-Theme-Flächen.
+- Textfarben im Light Theme wurden global auf dunkles Anthrazit und gedämpftes Grau normalisiert.
+- Dark/System bleiben unverändert.
+
+## 1.3.2-dev.7 – Light Theme Module Rollout
+
+Light Theme weiter zentralisiert: Modul-Akzentfarben werden nun über Module-Root-Tokens an Cards, Navigation, Segment-Controls, Fokuszustände, Accordions und Aktionsflächen vererbt. Textfarbe bleibt global dunkel. Pattern-/Schraffurflächen wurden für Menüs und Accordion-Flächen vollflächig abgesichert. Dark/System bleiben unverändert.
+
+## 1.3.2-dev.6 – Module Accent Token System
+
+Light Theme Modul-Akzentfarben zentralisiert: Heizung Orange, Kälte Cyan, Pufferspeicher/Druckhaltung/Rohr Blau, WRG/Mischluft und h,x Türkis, Trinkwasser/Regenwasser/Schmutzwasser Grün. Aktive Toggle-Flächen verwenden nun dieselbe Akzentfamilie wie die Rahmen; Textfarbe bleibt global dunkel.
+
+## 1.3.2-dev.5 – Light Theme Accent & Surface Completion
+
+- Aktive Segment-Buttons, Tabs, Fokus- und Hover-Zustaende verwenden im Light Mode wieder die jeweilige Modul-Akzentfarbe statt pauschal Blau.
+- Heizung/Orange wird in Switches und aktiven Auswahlzustaenden konsistent zur Card-Rahmenfarbe dargestellt.
+- Header-Menue, Settings-Panel, Modul-Auswahl und Trinkwasser-Accordions erhalten vollflaechige helle Pattern-/Schraffur-Hintergruende.
+- Dropdown-/Accordion-Pfeile bleiben kontrastreich und folgen dem zentralen Accent-System.
+- Dark/System funktional unveraendert belassen.
+
+## 1.3.2-dev.4 – Layout & Navigation Foundation
+
+- Light-Theme-Layout fuer Header, Modulnavigation, Menue, Overflow und Settings zentralisiert.
+- Header- und Menueflaechen konsistent auf warmes helles App-Design gestellt.
+- Modulnavigation, aktive Tabs, Hover- und Fokuszustaende kontrastreicher vereinheitlicht.
+- Release-Notes- und Settings-Cards auf globale Abstaende, Radien und Flaechen gehoben.
+- Dark/System funktional unveraendert belassen.
+
+## 1.3.2-dev.3 – Central Components Foundation
+
+- Light-Theme-Komponenten auf zentrale UI-Primitives konsolidiert.
+- Buttons, Segment Controls, Inputs, Selects, Cards, Accordions, Header-Menü und Modul-Auswahl über globale Tokens nachgeschärft.
+- Akzentfarben im Light Mode kräftiger und barriereärmer gesetzt.
+- Dunkle Light-Mode-Restflächen in Menü, Overflow und Accordions entfernt.
+- Dark/System funktional unverändert belassen.
+
+## 1.3.2-dev.2 – Central UI Tokens & Light Theme Foundation
+
+- Light Theme auf zentrale Tokens fuer Hintergrund, Flaechen, Rahmen, Typografie, Radien, Schatten und Akzentfarben gehoben.
+- Header-Menue, Einstellungen, weitere Module, Accordions und Dropdowns im Light Mode auf helles zentrales UI-System gestellt.
+- Akzentfarben verstaerkt, Fokuszustaende und aktive Elemente kontrastreicher dargestellt.
+- Dark/System funktional unveraendert belassen.
+
+## 1.3.2-dev.2 – Release Notes UI
 
 - Release Notes werden chronologisch absteigend sortiert.
 - Neueste Änderung steht immer zuerst.
 - Doppelte und verschachtelte Zwischenüberschriften werden nicht mehr als eigene Release-Cards angezeigt.
 - Card-Abstände folgen dem globalen Standardraster.
 
-## 1.3.1-rc.12 – Code Freeze
+## 1.3.2-dev.2 – Code Freeze
 
 - Versionierung, Service Worker Cache und Precache-Revision auf RC.12 synchronisiert.
 - Runtime-Code auf verbliebene Debug-Ausgaben geprüft.

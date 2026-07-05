@@ -6,44 +6,39 @@ Ziel: alle Module gegen die Referenzarchitektur Heizung, Lüftung, Druckhaltung 
 
 - Geprüfte Module: 11
 - P1-Findings: 1
-- P2-Findings: 6
+- P2-Findings: 1
 - Unbenutzte Utility-Export-Kandidaten: 2
 
 ## Modul-Scorecard
 
 | Modul | Score | Status | P1 | P2 |
 |---|---:|---|---:|---:|
-| buffer-storage * | 93 | reference-aligned | 0 | 1 |
-| drinking-water | 71 | cleanup-required | 1 | 2 |
+| buffer-storage * | 100 | reference-aligned | 0 | 0 |
+| drinking-water | 78 | platform-conformant-with-minor-debt | 1 | 1 |
 | heat-recovery | 100 | reference-aligned | 0 | 0 |
 | heating-cooling * | 100 | reference-aligned | 0 | 0 |
 | hx-diagram | 100 | reference-aligned | 0 | 0 |
 | pipe-sizing | 100 | reference-aligned | 0 | 0 |
-| pressure-holding * | 93 | reference-aligned | 0 | 1 |
+| pressure-holding * | 100 | reference-aligned | 0 | 0 |
 | rainwater | 100 | reference-aligned | 0 | 0 |
-| unit-converter | 93 | reference-aligned | 0 | 1 |
+| unit-converter | 100 | reference-aligned | 0 | 0 |
 | ventilation * | 100 | reference-aligned | 0 | 0 |
-| wastewater | 93 | reference-aligned | 0 | 1 |
+| wastewater | 100 | reference-aligned | 0 | 0 |
 
 \* Referenzmodul.
 
 ## Wichtigste Cleanup-Felder
 
 1. **P1 · drinking-water · event-boundary** — Event-Listener außerhalb controller.js gefunden.
-2. **P2 · buffer-storage · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-3. **P2 · drinking-water · event-density** — Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.
-4. **P2 · drinking-water · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-5. **P2 · pressure-holding · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-6. **P2 · unit-converter · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
-7. **P2 · wastewater · css-specialization** — Modulspezifische CSS-Selektoren gefunden; gegen globale Tokens/Komponenten prüfen.
+2. **P2 · drinking-water · event-density** — Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.
 
 ## CSS-Gate
 
 | Datei | !important | Modul-Selektoren |
 |---|---:|---:|
-| css/components.css | 11 | 0 |
-| css/layout.css | 0 | 0 |
-| css/modules.css | 0 | 27 |
+| css/components.css | 0 | 0 |
+| css/layout.css | 13 | 0 |
+| css/modules.css | 0 | 0 |
 | css/tokens.css | 1 | 0 |
 
 ## Utility-Kandidaten für Phase 37B

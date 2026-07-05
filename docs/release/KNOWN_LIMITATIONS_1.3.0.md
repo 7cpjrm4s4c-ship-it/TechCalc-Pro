@@ -1,4 +1,4 @@
-# Known Limitations 1.3.0
+# Known Limitations 1.3.2-dev.2
 
 ## Scope
 
@@ -12,7 +12,7 @@ Automated gates cover imports, structural runtime checks and module smoke contra
 
 ### Compatibility Facades Remain Intentionally Present
 
-Some compatibility files remain by design to protect migrated modules during the 1.3.0 release window. They should not be removed before the release candidate unless a dedicated regression pass proves they are unnecessary.
+Some compatibility files remain by design to protect migrated modules during the 1.3.2-dev.2 release window. They should not be removed before the release candidate unless a dedicated regression pass proves they are unnecessary.
 
 Examples:
 

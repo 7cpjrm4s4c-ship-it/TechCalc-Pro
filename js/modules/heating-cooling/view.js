@@ -21,7 +21,7 @@ export function createHeatingCoolingView({ config, calculate, lineSectionControl
   function view(s) {
     const active = activeCalculationState(s);
     const r = calculate(active);
-    const accent = s.mode === 'cooling' ? 'cyan' : 'orange';
+    const accent = s.mode === 'cooling' ? 'cooling' : 'orange';
     const modeLabel = s.mode === 'cooling' ? 'Kälte' : 'Heizung';
 
     const mediumCard = card('Medium', stack([
@@ -50,7 +50,7 @@ export function createHeatingCoolingView({ config, calculate, lineSectionControl
     return renderModuleShell(config, `
       <div class="span-6">${inputColumn}</div>
       <div class="span-6">${stack([`<div data-hc-dynamic="pipe-recommendation">${renderPipeRecommendation(s, r)}</div>`, lineSectionController.renderCard(s)].join(''))}</div>
-    `);
+    `).replace('<section class="module-view"', `<section class="module-view" data-hc-mode="${accent}" data-process-accent="${accent}"`);
   }
 
   const dynamicRenderers = {

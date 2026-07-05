@@ -1,7 +1,6 @@
 import { card, stack } from '../../core/renderer.js';
 import { registerCentralActions } from '../../core/eventPipeline.js';
 import { preserveSavedRecordMutation } from '../../core/scrollManager.js';
-import { PlatformFocusManager } from '../../core/focusManager.js';
 import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
 
 function escapeAttribute(value) {
@@ -84,7 +83,7 @@ export function createLineSectionController({
         memory = next;
         state.set({ [listKey]: next, ...patch }, { action });
       };
-      return PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(commit));
+      return preserveSavedRecordMutation(commit);
     };
 
     const shouldSkipDuplicateAction = action => {
@@ -96,7 +95,9 @@ export function createLineSectionController({
       return false;
     };
 
-    const saveCurrent = ({ root: actionRoot } = {}) => {
+    const saveCurrent = ({ root: actionRoot, element } = {}) => {
+      if (element?.disabled || element?.getAttribute?.('aria-disabled') === 'true') return;
+      if (state.get()?.[activeIdKey]) return;
       if (shouldSkipDuplicateAction('line:save')) return;
       const host = actionRoot || root;
       const name = host.querySelector(`#${nameInputId}`)?.value?.trim() || '';
@@ -108,7 +109,9 @@ export function createLineSectionController({
       persist([item, ...items], { [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, 'line:save');
     };
 
-    const updateCurrent = ({ root: actionRoot } = {}) => {
+    const updateCurrent = ({ root: actionRoot, element } = {}) => {
+      if (element?.disabled || element?.getAttribute?.('aria-disabled') === 'true') return;
+      if (!state.get()?.[activeIdKey]) return;
       if (shouldSkipDuplicateAction('line:update')) return;
       const host = actionRoot || root;
       const currentState = state.get();
@@ -127,11 +130,11 @@ export function createLineSectionController({
       const item = read().find(entry => isSameId(entry.id, id));
       if (!item) return;
       if (isSameId(state.get()?.[activeIdKey], id)) {
-        PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' })));
+        preserveSavedRecordMutation(() => state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' }));
         return;
       }
       const hydrated = hydrateRecord?.({ item, currentState: state.get() }) || {};
-      PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' })));
+      preserveSavedRecordMutation(() => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' }));
     };
 
     const deleteLine = id => {
@@ -149,7 +152,7 @@ export function createLineSectionController({
       if (!id) return;
       const currentExpanded = state.get()?.[expandedIdKey];
       const willOpen = !isSameId(currentExpanded, id);
-      PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' })));
+      preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' }));
     };
 
     registerCentralActions(root, {

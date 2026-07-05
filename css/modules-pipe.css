@@ -1,0 +1,29 @@
+/* Pipe sizing ------------------------------------------------------------- */
+.pipe-result-head { display: flex; align-items: center; gap: var(--tc-gap); padding-bottom: var(--tc-gap); border-bottom: 1px solid rgba(255,255,255,.10); }
+.pipe-result-head span { color: var(--color-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1.4px; font-weight: 900; }
+.pipe-result-head strong { color: var(--color-text); font-size: clamp(24px,3vw,34px); line-height: 1; font-weight: 900; }
+.pipe-dimension-list { display: grid; gap: var(--tc-gap); align-items: stretch; }
+.pipe-dimension-card { display: grid; gap: var(--tc-gap); padding: var(--tc-gap); border: 1px solid rgba(255,255,255,.10); border-radius: var(--radius-md); background: rgba(255,255,255,.035); overflow: hidden; }
+.pipe-dimension-card.is-recommended { border-color: rgba(53,170,255,.50); background: rgba(53,170,255,.07); }
+.pipe-dimension-card--green { border-color: rgba(38,215,111,.35); }
+.pipe-dimension-card--yellow { border-color: rgba(255,211,77,.45); }
+.pipe-dimension-card--red { border-color: rgba(255,75,75,.45); }
+.pipe-dimension-card__head { display: flex; align-items: center; justify-content: space-between; gap: var(--tc-gap); color: var(--color-muted); font-size: 10px; font-weight: 900; letter-spacing: 1.2px; text-transform: uppercase; }
+.pipe-dimension-card__head small { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 6px; background: rgba(53,170,255,.25); color: #9bd8ff; }
+.pipe-dimension-card > strong { color: var(--color-text); font-size: 22px; line-height: 1; font-weight: 900; }
+.pipe-dimension-card__meta { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--tc-gap); color: var(--color-muted); font-size: 12px; font-weight: 800; }
+.pipe-bar { height: 5px; border-radius: 99px; background: rgba(255,255,255,.10); overflow: hidden; }
+.pipe-bar span { display: block; height: 100%; border-radius: inherit; }
+.pipe-dimension-card--red .pipe-bar span { background: #ff3b49; }
+.pipe-dimension-card--yellow .pipe-bar span { background: #ffd34d; }
+.pipe-dimension-card--green .pipe-bar span { background: #25d96a; }.wastewater-subselect { display: grid; gap: var(--tc-gap); }
+.wastewater-subselect > span { color: var(--color-muted); font-size: .78rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }.wastewater-line-selector { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+.wastewater-line-selector button { scroll-snap-align: center; }
+.tc-collection-row__content { min-width: 0; overflow-wrap: anywhere; }
+.module-view[data-module='drinking-water'] .dw-save-dialog > summary,
+.module-view[data-module='drinking-water'] .dw-save-dialog__body,
+.module-view[data-module='drinking-water'] .dw-save-dialog__record { padding: var(--tc-gap); }
+.module-view[data-module='drinking-water'] .dw-save-dialog__list,
+.module-view[data-module='drinking-water'] .dw-save-dialog__body .tc-consumer-list { display: flex; flex-direction: column; gap: var(--tc-gap); }
+.module-view[data-module='drinking-water'] .tc-consumer-row > div,
+.module-view[data-module='drinking-water'] .tc-fixture-row > div { display: grid; gap: 4px; min-width: 0; }

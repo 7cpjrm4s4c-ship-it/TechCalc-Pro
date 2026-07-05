@@ -1,6 +1,6 @@
 # Phase 36T.4 – Rainwater Inner-Card Spacing Audit
 
-Basis: `techcalc-pro-1.3.0-rc.1-phase36t3-rainwater-zero-css-exceptions.zip`
+Basis: `techcalc-pro-1.3.2-dev.2-rc.1-phase36t3-rainwater-zero-css-exceptions.zip`
 
 ## Ergebnis
 
