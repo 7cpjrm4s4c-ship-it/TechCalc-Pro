@@ -1,7 +1,3 @@
-# TechCalc Pro 1.3.2-dev.28
-
-Theme Matrix Audit: Light/Dark/System Farbmatrix, Modul-/Prozessfarben und globale Save/Edit-Buttons auditiert.
-
 ## Version 1.3.1 Beta 8 - PDF Two-Column Report Layout
 
 - UI-Designentwicklung aus Beta 2-6 nicht uebernommen; Ausgangsbasis ist wieder die stabile 1.3.2-dev.2-Entwicklungsbasis.

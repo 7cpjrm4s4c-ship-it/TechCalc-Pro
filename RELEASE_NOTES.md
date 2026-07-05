@@ -1,11 +1,3 @@
-## 1.3.2-dev.28 – Theme Matrix Audit
-
-- Vollständiger Theme-Audit über Light, Dark und System ergänzt.
-- Verbindliche Farbmatrix für Modulfarben und Prozessfarben als Audit abgesichert.
-- Kälte/Cyan, Lüftung/WRG/h,x/Türkis, Sanitär/Grün und Druckhaltung/Pufferspeicher/Blau werden gegen Konfiguration und CSS-Vertrag geprüft.
-- Speichern/Aktualisieren bleiben globale UI-Buttons und werden gegen Modulfarben-Vererbung abgesichert.
-- Keine fachliche Modul-Logik geändert.
-
 ## 1.3.2-dev.27 – Final Theme Contract Audit
 
 - Modulidentität, Prozessfarbe und globale UI-Farbe abschließend getrennt.
