@@ -2,12 +2,13 @@ import { calculate } from './logic.js';
 import { createHeatRecoveryViewModel } from './viewModel.js';
 import { renderModeCard, renderInputs, renderOutputs, renderSavedRecords } from './view.js';
 import { esc } from '../../core/renderer.js';
+import { preserveFocusDuring } from '../../core/focusManager.js';
 
 function setIslandInner(root, selector, html){
   const island = root?.querySelector?.(selector);
   if (!island) return false;
   const next = String(html ?? '');
-  if (island.innerHTML !== next) island.innerHTML = next;
+  if (island.innerHTML !== next) preserveFocusDuring(root, () => { island.innerHTML = next; }, { skipSelect: true });
   return true;
 }
 

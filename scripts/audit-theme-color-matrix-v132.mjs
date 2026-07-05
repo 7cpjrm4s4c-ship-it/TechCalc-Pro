@@ -86,7 +86,7 @@ for (const marker of [
   if (!saveCss.includes(marker)) fail(`save manager missing global UI contract marker ${marker}`);
 }
 
-if (!index.includes('1.3.2-dev.34')) fail('index release notes/current version must be updated to 1.3.2-dev.34');
+if (!index.includes('1.3.2-dev.28')) fail('index release notes/current version must be updated to 1.3.2-dev.28');
 
 if (process.exitCode) process.exit(process.exitCode);
 console.log('Theme color matrix audit ok');

@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.2-dev.34';
-const CACHE_REVISION = '1.3.2-dev.34-1-3-2-dev-34-cleanup-stability-fix';
+const CACHE_NAME = 'techcalc-pro-1.3.2-dev.28';
+const CACHE_REVISION = '1.3.2-dev.28-1-3-2-dev-28-theme-matrix-audit';
 const ASSETS = [
   './',
   './index.html',
@@ -10,7 +10,6 @@ const ASSETS = [
   './css/components-controls.css',
   './css/components-core.css',
   './css/components-legacy-contracts.css',
-  './css/components-polish.css',
   './css/components-save-manager.css',
   './css/components-settings-release.css',
   './css/components-system.css',
@@ -197,7 +196,6 @@ const ASSETS = [
   './js/platform/resultRenderer/index.js',
   './js/platform/savedRecordModel/index.js',
   './js/platform/shell/feedbackController.js',
-  './js/platform/shell/layoutStabilityController.js',
   './js/platform/shell/performanceController.js',
   './js/platform/shell/releaseNotesController.js',
   './js/platform/shell/serviceWorkerController.js',

@@ -4,7 +4,7 @@ import { snapshotViewport, restoreViewportStable, isMobileViewport } from './ren
 import { startPerformanceSpan } from '../platform/shell/performanceController.js';
 
 const FIELD_ACTION_RE = /^(field:input|field:change|field:blur|field:enter|input:confirm|surface:confirm|segment:select|binding:)/;
-const STRUCTURAL_ACTION_RE = /^(record:|delete|reset|replace|module:)/;
+const STRUCTURAL_ACTION_RE = /^(saved:|line:|record:|delete|reset|replace|module:)/;
 
 
 function clampViewportToDocumentEnd() {
@@ -29,9 +29,6 @@ function actionFrom(meta = {}) {
 function shouldPreserveScroll(meta = {}) {
   const action = actionFrom(meta);
   if (!action || action === 'initial') return false;
-  // Dev.34: saved/line record actions are dynamic island mutations.
-  // Do not run global scroll restoration here; it conflicts with iOS scroll anchoring.
-  if (/^(saved:|line:)/.test(action)) return false;
   if (STRUCTURAL_ACTION_RE.test(action)) return true;
   // Field and segment commits should keep focus stable but must not fight the
   // browser's own input/keyboard scrolling, especially on mobile browsers.
@@ -70,7 +67,7 @@ export function createRenderCoordinator(root, options = {}) {
     const html = view(snapshot);
     const renderKey = renderKeyFor(snapshot, html);
     const preserve = didInitialRender && shouldPreserveScroll(meta);
-    const viewport = preserve ? snapshotViewport({ positionOnly: true }) : null;
+    const viewport = preserve ? snapshotViewport({ anchor: document.activeElement }) : null;
     const previousMinHeight = root.style.minHeight;
     const previousOverflowAnchor = root.style.overflowAnchor;
     const previousHeight = root.getBoundingClientRect?.().height || 0;
@@ -92,7 +89,7 @@ export function createRenderCoordinator(root, options = {}) {
 
     if (preserve) {
       restoreViewportStable(viewport, isMobileViewport()
-        ? { frames: 2, delays: [16, 64] }
+        ? { frames: 4, delays: [16, 64, 180] }
         : { frames: 2, delays: [32] });
       requestAnimationFrame(() => {
         if (!isCurrent()) return;

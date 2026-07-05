@@ -1,8 +1,77 @@
-# TechCalc Pro 1.3.2-dev.34
+# TechCalc Pro 1.3.2-dev.28
 
-## Phase 39B – Deep Scroll/Card Cleanup
+Theme Matrix Audit: Light/Dark/System Farbmatrix, Modul-/Prozessfarben und globale Save/Edit-Buttons auditiert.
 
-- Saved/Line-Scroll-Restore-Ketten zentral entfernt.
-- h,x Saved-Process-Renderer auf minimale Listenaktualisierung reduziert.
-- Light-Card-Rahmen per zentralem Inset-Frame gehärtet.
-- Keine neue Stability-CSS-Datei.
+## Version 1.3.1 Beta 8 - PDF Two-Column Report Layout
+
+- UI-Designentwicklung aus Beta 2-6 nicht uebernommen; Ausgangsbasis ist wieder die stabile 1.3.2-dev.2-Entwicklungsbasis.
+- PDF-Export kompakter aufgebaut: reduzierter Seitenrand, kompakter Header, zweispaltige Abschnittsdarstellung und kleinere Tabellenabstaende.
+- Projektbezogene Firmenlogo-Integration fuer den PDF-Header oben rechts ergaenzt.
+- Projektdatei speichert das PDF-Firmenlogo optional als Data-URL mit.
+- AGB-Seite technisch an bestehende Qualitaets-Gates fuer Kontakt, Gueltigkeitsdatum und Ruecknavigation angeglichen.
+
+# Phase 39B — Versioned Build Artifact
+
+Status: implemented on top of the current 39C source state.
+
+Release contract:
+
+1. `npm run build` remains a source validation path and does not create deploy output.
+2. `npm run build:minified` is the deploy build. It recreates `dist/` from scratch.
+3. Netlify uses `npm run build:minified` and publishes only `dist/`.
+4. `dist/build-info.json` is generated with package name, package version, artifact id, minification metadata and SHA-256 file manifest.
+5. Generated artifacts remain excluded from source validation and source packages via `.gitignore`, `check-js-imports` skip rules and package hygiene guards.
+
+Validation:
+
+- `audit:artifacts`
+- `npm test`
+- `npm run test:integration`
+- `npm run build`
+- `npm run build:minified`
+
+
+## 1.3.1 RC 2
+
+- Logo-Wiederherstellung in der Projekteinstellungs-UI korrigiert.
+- Logo-Vorschau für geladene Projektdateien ergänzt.
+- Dateiinput bleibt aus Browser-Sicherheitsgründen leer, die App zeigt Status/Vorschau separat.
+
+## 1.3.1 RC 2
+
+RC-1C.1: PDF-Engine-Refactoring und Korrekturen für Trinkwasser, h,x-Diagramm, WRG, Schmutzwasser, Pufferspeicher und Einheiten. Keine Feature-Erweiterung, nur Release-Stabilisierung.
+
+
+## 1.3.2-dev.2
+- RC-1C PDF-Layout-Korrekturen: Spaltenausrichtung, lange Texte, h,x-Diagramm-Vorbereitung, WRG/Trinkwasser-Layout.
+
+
+## 1.3.2B – Central Components Foundation
+
+- Globale Light-Theme-Komponentenregeln für Cards, Controls, Buttons, Segment Controls, Accordions, Header-Menü und Overflow ergänzt.
+- Keine fachliche Modul-Logik geändert.
+- Dark/System Theme funktional unverändert.
+
+## 1.3.2-dev.17 – CSS-System Härtung
+
+- Light-Mode Primary-/Action-Buttons auf tokenisierte Soft-Accent-Regeln konsolidiert.
+- Vollflächige Dunkel-/Blau-Button-Overrides in Light-Theme-Pfaden entschärft.
+- `scripts/audit-css-system-hardening-v132.mjs` ergänzt.
+- Integration-Gate erweitert, damit neue konkurrierende Save/Edit- oder Light-Button-Regeln auffallen.
+
+
+
+## 1.3.2-dev.19 – Light Theme Finalisierung
+
+- `components-app-status.css` für Update-Banner, Logo-Vorschau und Status-Hilfsklassen ergänzt.
+- `theme-light-final.css` als letzter kleiner Conflict-Guard eingeführt.
+- Appweite Light-Theme-Textfarben, Release-Notes-Flächen, Overflow-Menüs, Toggles, Buttons und Disabled-States zentral abgesichert.
+- Legacy-CSS um die ausgelagerten App-Status-Regeln reduziert.
+
+## 1.3.2-dev.22 – Final UI Hardening
+
+- Theme-/Komponentenvertrag fuer Light, Dark und System weiter gehaertet.
+- Modul-Sonderregeln werden durch zentrale Tokens und Guards abgefangen.
+- Save/Edit-, Action-Field-, Toggle- und Result-Card-Regeln bleiben zentralisiert.
+- Keine fachliche Berechnungslogik geaendert.
+
