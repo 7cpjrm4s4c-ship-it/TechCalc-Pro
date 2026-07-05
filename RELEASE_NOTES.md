@@ -1,14 +1,16 @@
-## 1.3.2-dev.35 – Scroll Diagnostics Build
+## 1.3.2-dev.36 – Scroll Pipeline Isolation
 
-- Scroll-Telemetrie für mobile Scrollsprünge ergänzt
-- Instrumentiert `scrollIntoView`, `window.scrollTo`, `Element.scrollTo`, `HTMLElement.focus`, `focusin`, `click`, `pointerdown`, `keydown` und `scroll`
-- Keine UI-/CSS-Fixes; reine Diagnose auf Basis von dev.34
+- Phase-36-Dokumentation und Scroll-Audit erneut abgeglichen.
+- h,x Saved-Aktionen bleiben konsequent rows-only.
+- Pufferspeicher, Regenwasser und WRG/Mischluft aktualisieren bei Saved-Aktionen nur noch Controls/Rows.
+- Globale Saved-Scroll-Restore-Kette entfernt, um nachgelagerte Snapbacks zu vermeiden.
+- Keine neue CSS-Hotfix-Datei angelegt.
 
-## 1.3.2-dev.35 – Cleanup / Stability Fix
+## 1.3.2-dev.36 – Cleanup / Stability Fix
 
 Dev.30/31 additive stability CSS removed from the precache and the final light theme file. Safe-area/header/divider handling was centralized again. Settings accordion blue active fill was removed. Saved-record mutations no longer restore focus during structural list updates, reducing scroll jumps in WRG/Mischluft, Pufferspeicher, Regenwasser and h,x-Diagramm. iOS input zoom guard remains global.
 
-## 1.3.2-dev.35 – Deep Legacy Stability Cleanup
+## 1.3.2-dev.36 – Deep Legacy Stability Cleanup
 
 - Safe-Area/Initial-Layout stabilisiert; weiße Start-/Rückkehr-Streifen werden durch zentrale Viewport-Synchronisierung verhindert.
 - iOS-Input-Zoom global gehärtet: Inputs, Selects und Textareas erzwingen im mobilen Layout mindestens 16px Schriftgröße.

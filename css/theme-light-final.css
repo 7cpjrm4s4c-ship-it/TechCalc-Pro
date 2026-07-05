@@ -959,7 +959,7 @@ body::after,
 }
 
 
-/* 1.3.2-dev.34 — Light card frame + scroll cleanup contract.
+/* 1.3.2-dev.36 — Light card frame + scroll cleanup contract.
    Use an inset frame so top/bottom borders remain visible even when neighboring
    sections, sticky header/nav or background layers overlap the outer border. */
 :root[data-theme='light'] .card,

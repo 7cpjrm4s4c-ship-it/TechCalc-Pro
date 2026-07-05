@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.2-dev.35';
-const CACHE_REVISION = '1.3.2-dev.35-1-3-2-dev-35-scroll-diagnostics-build';
+const CACHE_NAME = 'techcalc-pro-1.3.2-dev.36';
+const CACHE_REVISION = '1.3.2-dev.36-1-3-2-dev-36-scroll-pipeline-isolation';
 const ASSETS = [
   './',
   './index.html',
@@ -75,7 +75,6 @@ const ASSETS = [
   './js/core/savedRecords.js',
   './js/core/schemaModuleMount.js',
   './js/core/schemaRenderer.js',
-  './js/core/scrollDiagnostics.js',
   './js/core/scrollManager.js',
   './js/core/state.js',
   './js/core/stateBinding.js',

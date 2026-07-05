@@ -70,6 +70,11 @@ function hasAnyChanged(changed = [], keys = []) {
   return keys.some(key => changed.includes(key));
 }
 
+function isSavedOnlyAction(action = '', changed = [], savedKeys = []) {
+  const a = String(action || '');
+  return /^(line:|saved:|buffer:|hx:line:)/.test(a) || hasAnyChanged(changed, savedKeys);
+}
+
 export function createHeatingCoolingDynamicRenderer(options = {}) {
   const {
     calculate,
@@ -217,6 +222,20 @@ export function createVentilationDynamicRenderer(options = {}) {
     const lineStructural = /^(line:|saved:)/.test(action);
     const appStructural = /^(record:|module:|replace|reset)/.test(action);
 
+    if (lineStructural && !appStructural) {
+      // 1.3.2-dev.36: Saved-record actions must not rebuild result/formula/air islands.
+      // Those islands can change height above the saved-card and create mobile scroll jumps.
+      setInputValue(root, key(s, 'PowerW'), fmtInput(active.powerW, 2));
+      setInputValue(root, key(s, 'VolumeFlowM3h'), fmtInput(active.volumeFlowM3h, 2));
+      setInputValue(root, key(s, 'DeltaT'), fmtInput(active.deltaT, 2));
+      setInputValue(root, key(s, 'SupplyTemp'), fmtInput(active.supplyTemp, 2));
+      setInputValue(root, key(s, 'RoomTemp'), fmtInput(active.roomTemp, 2));
+      lineSectionController?.updateControls?.(root, s);
+      setInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
+      root.__tcVentilationDynamic = { mode: s.mode, prefix: currentPrefix, calcTarget: active.calcTarget, savedOnly: true };
+      return;
+    }
+
     if (root?.dataset) root.dataset.processAccent = processAccent;
     updateCardAccent(root, '[data-vent-dynamic="temperatures"]', moduleAccent);
     updateCardAccent(root, '[data-vent-dynamic="mode-segment"]', processAccent);
@@ -272,7 +291,8 @@ export function createPressureHoldingDynamicRenderer(options = {}) {
     renderPressureFields,
     renderHoldingOptions,
     renderSavedPanel,
-    renderResult
+    renderResult,
+    lineSectionController
   } = options;
 
   if (typeof calculate !== 'function') throw new Error('createPressureHoldingDynamicRenderer requires calculate');
@@ -455,7 +475,8 @@ export function createBufferStorageDynamicRenderer(options = {}) {
     renderMedium,
     renderInputBlocks,
     renderSavedPanel,
-    renderResult
+    renderResult,
+    lineSectionController
   } = options;
 
   if (typeof calculate !== 'function') throw new Error('createBufferStorageDynamicRenderer requires calculate');
@@ -495,6 +516,30 @@ export function createBufferStorageDynamicRenderer(options = {}) {
     const savedStructural = /^(saved:|buffer:)/.test(action) || hasAnyChanged(changed, savedFields);
     const inputStructural = appStructural || hasAnyChanged(changed, inputStructuralFields) || previous.calculationMode !== s.calculationMode;
     const mediumStructural = appStructural || hasAnyChanged(changed, mediumStructuralFields) || previous.mediumMode !== s.mediumMode || previous.glycolType !== s.glycolType;
+
+    if (savedStructural && !appStructural) {
+      // 1.3.2-dev.36: Keep input/result islands mounted on saved-record actions.
+      // Selection/delete updates only the saved rows and save/update controls.
+      syncFields(root, s);
+      if (typeof renderSavedPanel === 'function') {
+        const rows = lineSectionController?.renderRows?.(s);
+        if (typeof rows === 'string') {
+          setIslandInner(root, '[data-buffer-dynamic="saved-records"] [data-line-dynamic="line-sections"]', rows);
+        } else {
+          setIslandInner(root, '[data-buffer-dynamic="saved-records"]', renderSavedPanel(s, r, 'cyan'));
+        }
+      }
+      root.__tcBufferStorageDynamic = {
+        calculationMode: s.calculationMode,
+        mediumMode: s.mediumMode,
+        glycolType: s.glycolType,
+        glycolConcentration: s.glycolConcentration,
+        activeBufferId: s.activeBufferId,
+        expandedBufferId: s.expandedBufferId,
+        savedOnly: true
+      };
+      return;
+    }
 
     if (mediumStructural && typeof renderMedium === 'function') {
       setIslandInner(root, '[data-buffer-dynamic="medium"]', renderMedium(s, r, 'cyan'));
@@ -567,6 +612,24 @@ export function createRainwaterDynamicRenderer(options = {}) {
       || previous.drainSize !== s.drainSize
       || previous.emergencyType !== s.emergencyType
       || previous.areaType !== s.areaType;
+
+    if (savedStructural && !appStructural && !surfaceModeChanged && !selectionHydrationChanged) {
+      // 1.3.2-dev.36: Saved-record actions update only controls and saved rows.
+      // Result/form re-rendering was identified in Phase 36 as a layout-shift source.
+      lineSectionController?.updateControls?.(root, s);
+      setIslandInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
+      root.__tcRainwaterDynamic = {
+        activeSurfaceId: s.activeSurfaceId,
+        expandedSurfaceResultId: s.expandedSurfaceResultId,
+        surfacesLength: Array.isArray(s.surfaces) ? s.surfaces.length : 0,
+        surfaceMode: s.surfaceMode,
+        drainSize: s.drainSize,
+        emergencyType: s.emergencyType,
+        areaType: s.areaType,
+        savedOnly: true
+      };
+      return;
+    }
 
     // Keep form island stable for saved-record actions. Re-render form when the
     // domain itself is structurally changed, the calculation mode changes, or a

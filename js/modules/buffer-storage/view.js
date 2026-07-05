@@ -4,7 +4,7 @@ import { card, field, grid, inlineStats, renderModuleShell, segmented, selectFie
 import { createBufferStorageDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { renderResultModel } from '../../platform/resultRenderer/index.js';
 import { createBufferStorageViewModel } from './viewModel.js';
-import { bufferSaveCard } from './controller.js';
+import { bufferSaveCard, bufferStorageSavedController } from './controller.js';
 
 function renderFieldGrid(fields = [], modifier = '') {
   return `<div class="buffer-input-grid ${modifier}">${fields.map(item => field(item)).join('')}</div>`;
@@ -84,7 +84,8 @@ const bufferStorageDynamicRenderer = createBufferStorageDynamicRenderer({
   renderMedium: renderWithViewModel(renderMediumContent),
   renderInputBlocks: renderWithViewModel(renderInputBlocks),
   renderSavedPanel: renderWithViewModel(renderSavedRecords),
-  renderResult: renderWithViewModel(renderResultContent)
+  renderResult: renderWithViewModel(renderResultContent),
+  lineSectionController: bufferStorageSavedController
 });
 
 export function updateBufferStorageDynamic(root, s, meta = {}) {

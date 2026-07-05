@@ -24,13 +24,9 @@ import { initializeServiceWorkerController } from '../platform/shell/serviceWork
 import { initializePerformanceController, markPerformance, measurePerformance, startPerformanceSpan } from '../platform/shell/performanceController.js';
 import { initializeSaveEditModeSync } from './saveEditModeSync.js';
 import { initializeLayoutStabilityController } from '../platform/shell/layoutStabilityController.js';
-import { initializeGlobalSavedRecordScrollStability } from './scrollManager.js';
-import { initializeScrollDiagnostics } from './scrollDiagnostics.js';
 
-const APP_VERSION = '1.3.2-dev.35';
-initializeScrollDiagnostics({ force: true, version: APP_VERSION });
+const APP_VERSION = '1.3.2-dev.36';
 initializeLayoutStabilityController();
-initializeGlobalSavedRecordScrollStability(document);
 initializePerformanceController({ appVersion: APP_VERSION });
 const appInitStartMark = markPerformance('app:init:start', { appVersion: APP_VERSION });
 
