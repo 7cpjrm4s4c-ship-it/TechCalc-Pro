@@ -57,7 +57,7 @@ RC-1C.1: PDF-Engine-Refactoring und Korrekturen für Trinkwasser, h,x-Diagramm, 
 
 
 
-## 1.3.2-dev.19 – Light Theme Finalisierung
+## 1.3.2-dev.18 – Light Theme Finalisierung
 
 - `components-app-status.css` für Update-Banner, Logo-Vorschau und Status-Hilfsklassen ergänzt.
 - `theme-light-final.css` als letzter kleiner Conflict-Guard eingeführt.
