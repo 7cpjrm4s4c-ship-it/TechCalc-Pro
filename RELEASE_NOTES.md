@@ -1,3 +1,7 @@
+## 1.3.2-dev.32 – Cleanup / Stability Fix
+
+Dev.30/31 additive stability CSS removed from the precache and the final light theme file. Safe-area/header/divider handling was centralized again. Settings accordion blue active fill was removed. Saved-record mutations no longer restore focus during structural list updates, reducing scroll jumps in WRG/Mischluft, Pufferspeicher, Regenwasser and h,x-Diagramm. iOS input zoom guard remains global.
+
 ## 1.3.2-dev.31 – Deep Legacy Stability Cleanup
 
 - Safe-Area/Initial-Layout stabilisiert; weiße Start-/Rückkehr-Streifen werden durch zentrale Viewport-Synchronisierung verhindert.

@@ -1,7 +1,6 @@
 import { card, stack } from '../../core/renderer.js';
 import { registerCentralActions } from '../../core/eventPipeline.js';
 import { preserveSavedRecordMutation } from '../../core/scrollManager.js';
-import { PlatformFocusManager } from '../../core/focusManager.js';
 import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
 
 function escapeAttribute(value) {
@@ -84,7 +83,7 @@ export function createLineSectionController({
         memory = next;
         state.set({ [listKey]: next, ...patch }, { action });
       };
-      return PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(commit, { frames: 22, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800] }));
+      return preserveSavedRecordMutation(commit, { frames: 28, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800, 2400] });
     };
 
     const shouldSkipDuplicateAction = action => {
@@ -131,11 +130,11 @@ export function createLineSectionController({
       const item = read().find(entry => isSameId(entry.id, id));
       if (!item) return;
       if (isSameId(state.get()?.[activeIdKey], id)) {
-        PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' }), { frames: 22, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800] }));
+        preserveSavedRecordMutation(() => state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' }), { frames: 28, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800, 2400] });
         return;
       }
       const hydrated = hydrateRecord?.({ item, currentState: state.get() }) || {};
-      PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' }), { frames: 22, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800] }));
+      preserveSavedRecordMutation(() => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' }), { frames: 28, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800, 2400] });
     };
 
     const deleteLine = id => {
@@ -153,7 +152,7 @@ export function createLineSectionController({
       if (!id) return;
       const currentExpanded = state.get()?.[expandedIdKey];
       const willOpen = !isSameId(currentExpanded, id);
-      PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' }), { frames: 22, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800] }));
+      preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' }), { frames: 28, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800, 2400] });
     };
 
     registerCentralActions(root, {

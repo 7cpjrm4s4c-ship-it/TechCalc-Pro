@@ -1,5 +1,6 @@
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { registerCentralActions } from '../../core/eventPipeline.js';
+import { preserveSavedRecordMutation } from '../../core/scrollManager.js';
 import { toggleNumericSign } from '../../core/renderer.js';
 import { state, normalizeSavedProcesses, clearLegacyPoints } from './state.js';
 import { calculate } from './logic.js';
@@ -119,9 +120,7 @@ function bindHxProcessActionOverrides(rootEl) {
     'saved:delete': ({ element, root }) => {
       const id = element?.getAttribute?.('data-line-delete') || element?.closest?.('[data-line-delete]')?.getAttribute?.('data-line-delete');
       if (id) {
-        const scroll = captureHxActionScroll(root || rootEl);
-        deleteSavedProcessById(id);
-        restoreHxActionScroll(scroll);
+        preserveSavedRecordMutation(() => deleteSavedProcessById(id), { frames: 28, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800, 2400] });
       }
     }
   });

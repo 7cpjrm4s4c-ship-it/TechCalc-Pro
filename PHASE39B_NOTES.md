@@ -1,4 +1,4 @@
-# TechCalc Pro 1.3.2-dev.31
+# TechCalc Pro 1.3.2-dev.32
 
 ## Deep Legacy Stability Cleanup
 
