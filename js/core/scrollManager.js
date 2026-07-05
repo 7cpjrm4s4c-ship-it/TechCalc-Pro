@@ -16,15 +16,15 @@ export function preserveActionScroll(action, overrides = {}) {
 }
 
 export function preserveSavedRecordScroll(action, overrides = {}) {
-  return preserveScroll(action, 'savedRecord', overrides);
+  // Dev.34: saved-record actions must not force window.scrollTo.
+  // On iOS the delayed restore chain caused visible jumps after selection/delete.
+  // Module renderers now update only the affected island; native scroll anchoring remains authoritative.
+  return action?.();
 }
 
 export function preserveSavedRecordMutation(action, overrides = {}) {
-  return runWithoutScrollJump(action, {
-    frames: 4,
-    delays: [0, 16, 40, 100],
-    ...overrides
-  });
+  // Dev.34: no delayed restore chain for saved-record mutations.
+  return action?.();
 }
 
 

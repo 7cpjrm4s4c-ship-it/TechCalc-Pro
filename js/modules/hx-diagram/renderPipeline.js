@@ -102,19 +102,24 @@ export function renderDynamicSections(root, snapshot = {}, meta = {}) {
   };
 
   if (savedStructural) {
+    // Dev.34: saved-process actions must not rebuild diagram/result/input islands.
+    // Rebuilding large sections changed document height and caused mobile scroll jumps.
     return withHxScrollFreeze(root, true, () => {
+      syncHxFormFields(root, snapshot);
       syncSavedProcessControls(root, snapshot);
 
       const rowsHost = root.querySelector?.(`[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"] [data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`);
       if (rowsHost) {
         const nextRows = hxProcessController.renderRows(snapshot);
-        if (rowsHost.innerHTML !== nextRows) preserveFocusDuring(root, () => { rowsHost.innerHTML = nextRows; }, { skipSelect: true });
+        if (rowsHost.innerHTML !== nextRows) rowsHost.innerHTML = nextRows;
       } else {
         const vm = createHxRenderModel(snapshot);
-        setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`, renderSavedProcesses(vm));
+        const host = root.querySelector?.(`[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`);
+        const next = renderSavedProcesses(vm);
+        if (host && host.innerHTML !== next) host.innerHTML = next;
       }
 
-      return updateAllLiveIslands();
+      return true;
     });
   }
 

@@ -957,3 +957,30 @@ body::after,
   overflow-anchor: none !important;
   scroll-behavior: auto !important;
 }
+
+
+/* 1.3.2-dev.34 — Light card frame + scroll cleanup contract.
+   Use an inset frame so top/bottom borders remain visible even when neighboring
+   sections, sticky header/nav or background layers overlap the outer border. */
+:root[data-theme='light'] .card,
+:root[data-theme='light'] .tc-card,
+:root[data-theme='light'] .result-card {
+  --tc-card-frame-color: color-mix(in srgb, var(--tc-contract-accent, var(--tc-final-accent, var(--accent-blue))) 72%, var(--color-border));
+  border: 1px solid var(--tc-card-frame-color) !important;
+  box-shadow: inset 0 0 0 1px var(--tc-card-frame-color) !important;
+  background-clip: padding-box !important;
+  isolation: isolate;
+}
+:root[data-theme='light'] .card--accent-orange { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-heating) 72%, var(--color-border)); }
+:root[data-theme='light'] .card--accent-cyan,
+:root[data-theme='light'] .card--accent-cooling { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-cooling, var(--tc-accent-air)) 72%, var(--color-border)); }
+:root[data-theme='light'] .card--accent-blue { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-pipe) 72%, var(--color-border)); }
+:root[data-theme='light'] .card--accent-green { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-water) 72%, var(--color-border)); }
+:root[data-theme='light'] .card--accent-purple { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-pressure) 72%, var(--color-border)); }
+:root[data-theme='light'] .card > .card__title,
+:root[data-theme='light'] .card > .card__body,
+:root[data-theme='light'] .tc-card > *,
+:root[data-theme='light'] .result-card > * {
+  position: relative;
+  z-index: 1;
+}
