@@ -237,3 +237,10 @@ Light Theme Modul-Akzentfarben zentralisiert: Heizung Orange, Kälte Cyan, Puffe
 <!-- Phase 37E RC Closure audit retained. -->
 
 <!-- Phase 38F esbuild minification audit retained. -->
+## 1.3.2-dev.36-phase42b
+
+- Phase 42B abgeschlossen: Saved-/Selection-/Render-/Scroll-Vertraege abgeglichen
+- Keine Runtime-Codeaenderungen
+- h,x Outlet-Vertrag dokumentiert
+- Regenwasser Precommit-/Hydration-Vertrag eingeordnet
+- Modulpriorisierung fuer 42C/42D festgelegt

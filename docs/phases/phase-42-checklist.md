@@ -12,12 +12,12 @@
 
 ## 42B – Contract Reconciliation
 
-- [ ] `savedRecordController` und `lineSectionController` Vertrag vergleichen
-- [ ] Action-Namen und State-Patches normalisieren
-- [ ] Zielverhalten fuer Save/Edit/Selection dokumentieren
-- [ ] h,x Outlet-Vertrag dokumentieren
-- [ ] Regenwasser Precommit-/Hydration-Vertrag dokumentieren
-- [ ] Scroll-Stabilitaetsvertrag als bestehende Regel konsolidieren
+- [x] `savedRecordController` und `lineSectionController` Vertrag vergleichen
+- [x] Action-Namen und State-Patches normalisieren
+- [x] Zielverhalten fuer Save/Edit/Selection dokumentieren
+- [x] h,x Outlet-Vertrag dokumentieren
+- [x] Regenwasser Precommit-/Hydration-Vertrag dokumentieren
+- [x] Scroll-Stabilitaetsvertrag als bestehende Regel konsolidieren
 
 ## 42C – Legacy Removal Plan
 

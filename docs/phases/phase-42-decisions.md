@@ -54,3 +54,14 @@ Regenwasser enthaelt historisch notwendige Capture-/Precommit-Sonderlogik. Diese
 
 Phase-42-Ergebnisse werden nicht als neue lose Root- oder Unterordnernotizen abgelegt. Zusammenfassung, Audit, Entscheidungen und Checkliste werden unter `docs/phases/` gepflegt.
 
+## Entscheidung 8 – 42B Vertragsauslegung
+
+`lineSectionController`, `moduleRuntime.savedConfig` und `savedRecordController` bleiben zentrale Plattformwege. Sie duerfen aber nicht parallel fuer dasselbe Modul und dieselben Saved-Aktionen konkurrieren. Pro Modul ist ein primaerer zentraler Pfad festzulegen.
+
+## Entscheidung 9 – h,x Outlet-Vertrag
+
+h,x Saved-Aktionen duerfen nicht dauerhaft rows-only bleiben. Inputs, Saved Rows, Prozessauswahl, Ergebnisblock und Diagramm muessen synchron bleiben. Die Stabilitaet wird ueber differenzielle, layoutstabile Outlet-Updates erreicht, nicht durch Auslassen fachlich notwendiger Render-Schritte.
+
+## Entscheidung 10 – Scroll-Stabilitaet ohne Restore-Ketten
+
+Lange globale oder lokale Scroll-Restore-Ketten sind nicht Zielarchitektur. Scroll-Stabilitaet wird primaer durch minimale DOM-Updates, stabile Anchors und das Entfernen konkurrierender Legacy-Handler erreicht.
