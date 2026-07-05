@@ -83,7 +83,7 @@ export function createLineSectionController({
         memory = next;
         state.set({ [listKey]: next, ...patch }, { action });
       };
-      return preserveSavedRecordMutation(commit, { frames: 28, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800, 2400] });
+      return preserveSavedRecordMutation(commit);
     };
 
     const shouldSkipDuplicateAction = action => {
@@ -130,11 +130,11 @@ export function createLineSectionController({
       const item = read().find(entry => isSameId(entry.id, id));
       if (!item) return;
       if (isSameId(state.get()?.[activeIdKey], id)) {
-        preserveSavedRecordMutation(() => state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' }), { frames: 28, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800, 2400] });
+        preserveSavedRecordMutation(() => state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' }));
         return;
       }
       const hydrated = hydrateRecord?.({ item, currentState: state.get() }) || {};
-      preserveSavedRecordMutation(() => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' }), { frames: 28, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800, 2400] });
+      preserveSavedRecordMutation(() => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' }));
     };
 
     const deleteLine = id => {
@@ -152,7 +152,7 @@ export function createLineSectionController({
       if (!id) return;
       const currentExpanded = state.get()?.[expandedIdKey];
       const willOpen = !isSameId(currentExpanded, id);
-      preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' }), { frames: 28, delays: [0, 16, 40, 100, 220, 420, 800, 1200, 1800, 2400] });
+      preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' }));
     };
 
     registerCentralActions(root, {

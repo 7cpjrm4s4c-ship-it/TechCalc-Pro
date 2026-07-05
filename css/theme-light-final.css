@@ -914,3 +914,46 @@ body::after,
   scroll-margin-top: calc(var(--header-h) + var(--space-3));
   scroll-margin-bottom: calc(var(--bottom-nav-h) + var(--space-4));
 }
+
+/* 1.3.2-dev.33 — Light card frame and scroll-cleanup finalization.
+   Keep frame rendering in the owning Light theme file; no additive stability stylesheet. */
+:root[data-theme='light'] .card,
+:root[data-theme='light'] .tc-card,
+:root[data-theme='light'] .result-card,
+:root[data-theme='light'] .line-section-card,
+:root[data-theme='light'] .saved-record-card,
+:root[data-theme='light'] .ph-saved-item,
+:root[data-theme='light'] .tc-saved-record-panel {
+  position: relative;
+  overflow: hidden;
+  border-style: solid !important;
+  border-width: 1px !important;
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+  background-clip: padding-box;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc-final-accent, var(--tc-active-accent, var(--accent-blue))) 18%, transparent) !important;
+}
+:root[data-theme='light'] .card--accent-orange,
+:root[data-theme='light'] .result-card.card--accent-orange { border-color: color-mix(in srgb, var(--tc-accent-heating) 72%, var(--color-border)) !important; }
+:root[data-theme='light'] .card--accent-cyan,
+:root[data-theme='light'] .result-card.card--accent-cyan { border-color: color-mix(in srgb, var(--tc-accent-air) 72%, var(--color-border)) !important; }
+:root[data-theme='light'] .card--accent-cooling,
+:root[data-theme='light'] .result-card.card--accent-cooling { border-color: color-mix(in srgb, var(--tc-accent-cooling, var(--tc-color-cooling)) 72%, var(--color-border)) !important; }
+:root[data-theme='light'] .card--accent-blue,
+:root[data-theme='light'] .result-card.card--accent-blue { border-color: color-mix(in srgb, var(--tc-accent-pipe) 72%, var(--color-border)) !important; }
+:root[data-theme='light'] .card--accent-green,
+:root[data-theme='light'] .result-card.card--accent-green { border-color: color-mix(in srgb, var(--tc-accent-water) 72%, var(--color-border)) !important; }
+:root[data-theme='light'] .card--accent-purple,
+:root[data-theme='light'] .result-card.card--accent-purple { border-color: color-mix(in srgb, var(--tc-accent-pressure) 72%, var(--color-border)) !important; }
+:root[data-theme='light'] .module-view,
+:root[data-theme='light'] .module-content,
+:root[data-theme='light'] .saved-record-list,
+:root[data-theme='light'] .line-section-list,
+:root[data-theme='light'] .tc-saved-record-panel,
+:root[data-theme='light'] [data-buffer-dynamic='saved-records'],
+:root[data-theme='light'] [data-rainwater-dynamic='surfaces'],
+:root[data-theme='light'] [data-wrg-dynamic='rlt-devices'],
+:root[data-theme='light'] [data-hx-dynamic='saved-processes'] {
+  overflow-anchor: none !important;
+  scroll-behavior: auto !important;
+}

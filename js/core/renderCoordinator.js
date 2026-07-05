@@ -67,7 +67,7 @@ export function createRenderCoordinator(root, options = {}) {
     const html = view(snapshot);
     const renderKey = renderKeyFor(snapshot, html);
     const preserve = didInitialRender && shouldPreserveScroll(meta);
-    const viewport = preserve ? snapshotViewport({ anchor: document.activeElement }) : null;
+    const viewport = preserve ? snapshotViewport({ positionOnly: true }) : null;
     const previousMinHeight = root.style.minHeight;
     const previousOverflowAnchor = root.style.overflowAnchor;
     const previousHeight = root.getBoundingClientRect?.().height || 0;
@@ -89,7 +89,7 @@ export function createRenderCoordinator(root, options = {}) {
 
     if (preserve) {
       restoreViewportStable(viewport, isMobileViewport()
-        ? { frames: 4, delays: [16, 64, 180] }
+        ? { frames: 2, delays: [16, 64] }
         : { frames: 2, delays: [32] });
       requestAnimationFrame(() => {
         if (!isCurrent()) return;

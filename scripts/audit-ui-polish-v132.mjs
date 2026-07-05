@@ -12,7 +12,7 @@ const index = read('index.html');
 const css = read('css/components-polish.css');
 const pkg = JSON.parse(read('package.json'));
 
-if (pkg.version !== '1.3.2-dev.32') fail('package.json version must be 1.3.2-dev.32');
+if (pkg.version !== '1.3.2-dev.33') fail('package.json version must be 1.3.2-dev.33');
 if (!index.includes('./css/components-polish.css')) fail('components-polish.css must be loaded by index.html');
 if (index.indexOf('./css/components-polish.css') > index.indexOf('./css/theme-light-final.css')) {
   fail('components-polish.css must be loaded before theme-light-final.css so the final theme guard remains last');

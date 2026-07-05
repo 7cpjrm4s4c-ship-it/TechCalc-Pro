@@ -58,41 +58,10 @@ function setInner(root, selector, html) {
   return true;
 }
 
-function captureHxScroll(root) {
-  const scroller = root?.closest?.('.app-main, .main, main, .module-scroll, .module-view') || document.scrollingElement || document.documentElement;
-  return {
-    scroller,
-    top: scroller?.scrollTop ?? 0,
-    left: scroller?.scrollLeft ?? 0,
-    winX: window.scrollX || 0,
-    winY: window.scrollY || 0
-  };
-}
-
-function restoreHxScroll(snapshot) {
-  if (!snapshot) return;
-  const apply = () => {
-    try {
-      if (snapshot.scroller) {
-        snapshot.scroller.scrollTop = snapshot.top;
-        snapshot.scroller.scrollLeft = snapshot.left;
-      }
-      window.scrollTo(snapshot.winX, snapshot.winY);
-    } catch { /* scroll restore only */ }
-  };
-  apply();
-  requestAnimationFrame(apply);
-  setTimeout(apply, 40);
-  setTimeout(apply, 120);
-  setTimeout(apply, 260);
-}
-
 function withHxScrollFreeze(root, enabled, mutation) {
-  if (!enabled) return mutation();
-  const snapshot = captureHxScroll(root);
-  const result = mutation();
-  restoreHxScroll(snapshot);
-  return result;
+  // Dev.33: local h,x scroll freezing caused delayed snap-backs.
+  // Structural scroll stability is owned centrally by scrollManager/renderCoordinator.
+  return mutation();
 }
 
 function syncHxFormFields(root, snapshot = {}) {
