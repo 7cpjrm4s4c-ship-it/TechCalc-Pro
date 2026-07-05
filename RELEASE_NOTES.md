@@ -1,7 +1,3 @@
-## 1.3.2-dev.20 – Dark Theme Action-Field Guard
-
-Schmutzwasser-Action-Felder zentralisiert: Der Button „Gegenstand hinzufügen“ rendert nun auch im Dark/System Theme ohne umgebende Control-Card. Komponentenregel gilt themeübergreifend; Light/Dark/System bleiben konsistent.
-
 ## 1.3.2-dev.19 – Light Theme Finalisierung
 
 - App-Status-Komponenten aus Legacy-CSS ausgelagert
