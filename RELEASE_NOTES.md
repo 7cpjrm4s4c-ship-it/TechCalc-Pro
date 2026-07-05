@@ -1,11 +1,3 @@
-## 1.3.2-dev.22 – Final UI Hardening
-
-- Light/Dark/System-Komponentenvertrag final gehärtet.
-- Modul-Akzente, aktive Controls, Result-Cards und Action-Felder werden zentral über Tokens abgesichert.
-- Verbliebene Light-Theme-Konfliktregeln in einen finalen Contract-Block überführt.
-- Theme-Audit erweitert, damit neue konkurrierende Modul-Sonderregeln auffallen.
-- Keine fachliche Modul-Logik geändert.
-
 ## 1.3.2-dev.21 – Light Theme Contract Hardening
 
 Finaler Komponentenvertrag für das Light Theme ergänzt. Toggle-Füllungen, Buttonzustände, Result-Cards und Action-Felder werden über zentrale Accent- und Surface-Tokens abgesichert.

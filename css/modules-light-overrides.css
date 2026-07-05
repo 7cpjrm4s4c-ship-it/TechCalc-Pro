@@ -1,16 +1,14 @@
-/* Light theme module refinements -----------------------------------------
-   Only module-specific rendering details live here. Shared surfaces, controls,
-   cards and text colors are owned by components/theme contract files. */
-:root[data-theme='light'] .hx-chart-bg { fill: var(--tc-hx-chart-bg, #40464d); stroke: color-mix(in srgb, var(--tc-accent-air) 42%, transparent); }
+/* Light theme module refinements ----------------------------------------- */
+:root[data-theme='light'] .hx-chart-bg { fill: #40464d; stroke: rgba(34,184,214,.42); }
 :root[data-theme='light'] .hx-grid-line { stroke: rgba(255,255,255,.16); }
 :root[data-theme='light'] .hx-axis-label,
 :root[data-theme='light'] .hx-rh-label,
-:root[data-theme='light'] .hx-title { fill: var(--tc-hx-label-light, #f8fafc); paint-order: stroke fill; stroke: rgba(15,23,42,.65); stroke-width: 2px; stroke-linejoin: round; }
+:root[data-theme='light'] .hx-title { fill: #f8fafc; paint-order: stroke fill; stroke: rgba(15,23,42,.65); stroke-width: 2px; stroke-linejoin: round; }
 :root[data-theme='light'] .hx-rh-100 { stroke: rgba(255,255,255,.92); }
 :root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue,
 :root[data-theme='light'] .module-view[data-module='unit-converter'] #convertedValue:disabled,
 :root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input,
-:root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--tc-contract-text, var(--tc-light-text)); -webkit-text-fill-color: var(--tc-contract-text, var(--tc-light-text)); }
+:root[data-theme='light'] .module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: #111827; -webkit-text-fill-color: #111827; }
 :root[data-theme='light'] .unit-all-values .result-row span,
-:root[data-theme='light'] .unit-all-values .result-row small { color: var(--tc-contract-muted, var(--tc-light-muted)); }
-:root[data-theme='light'] .unit-all-values .result-row strong { color: var(--tc-contract-muted, var(--tc-light-muted)); }
+:root[data-theme='light'] .unit-all-values .result-row small { color: #6b7280; }
+:root[data-theme='light'] .unit-all-values .result-row strong { color: #4b5563; }

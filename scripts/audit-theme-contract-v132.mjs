@@ -27,10 +27,8 @@ for (const marker of [
 const finalCss = read('css/theme-light-final.css');
 for (const marker of [
   '1.3.2-dev.21 — Final Light Theme component contract',
-  '1.3.2-dev.22 — Final UI Hardening contract',
   'background: color-mix(in srgb, var(--tc-active-accent) 18%, #ffffff) !important;',
   'border-color: var(--tc-active-accent) !important;',
-  '--tc-contract-accent',
   '.field:has(> .control > .action-button:only-child) > .control'
 ]) {
   if (!finalCss.includes(marker)) fail(`theme-light-final.css missing final contract marker ${marker}`);
