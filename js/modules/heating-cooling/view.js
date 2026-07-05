@@ -50,7 +50,7 @@ export function createHeatingCoolingView({ config, calculate, lineSectionControl
     return renderModuleShell(config, `
       <div class="span-6">${inputColumn}</div>
       <div class="span-6">${stack([`<div data-hc-dynamic="pipe-recommendation">${renderPipeRecommendation(s, r)}</div>`, lineSectionController.renderCard(s)].join(''))}</div>
-    `).replace('<section class="module-view"', `<section class="module-view" data-hc-mode="${accent}"`);
+    `);
   }
 
   const dynamicRenderers = {

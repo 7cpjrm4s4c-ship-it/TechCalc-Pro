@@ -1,10 +1,3 @@
-## 1.3.2-dev.23 – Theme Regression Fix
-
-- Kälte-Akzent im Light Theme wieder eindeutig auf Cyan gesetzt.
-- Speichern-/Aktualisieren-Buttons von Modul-Akzenten entkoppelt.
-- Globale UI-Primärtokens für Save/Edit-Aktionen ergänzt.
-- WRG/Mischluft und h,x bleiben auf Türkis.
-
 ## 1.3.2-dev.22 – Final UI Hardening
 
 - Light/Dark/System-Komponentenvertrag final gehärtet.

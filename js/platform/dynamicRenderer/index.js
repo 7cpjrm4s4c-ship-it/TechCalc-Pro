@@ -97,7 +97,6 @@ export function createHeatingCoolingDynamicRenderer(options = {}) {
     const active = activeCalculationState(s);
     const r = calculate(active);
     const accent = s.mode === 'cooling' ? 'cyan' : 'orange';
-    if (root?.dataset) root.dataset.hcMode = accent;
     const modeLabel = s.mode === 'cooling' ? 'Kälte' : 'Heizung';
     const previous = root.__tcHeatingCoolingDynamic || {};
     const previousPrefix = previous.prefix || 'heating';
