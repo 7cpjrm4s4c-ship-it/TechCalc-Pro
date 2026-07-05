@@ -116,7 +116,7 @@ export function derivedDeltaT(active = {}) {
 }
 
 export function ventilationAccent(s = {}) {
-  return s.mode === 'cooling' ? 'cooling' : 'orange';
+  return s.mode === 'cooling' ? 'cyan' : 'orange';
 }
 
 export function ventilationModeLabel(s = {}) {

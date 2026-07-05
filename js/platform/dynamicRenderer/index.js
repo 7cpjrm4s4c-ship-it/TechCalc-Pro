@@ -96,7 +96,7 @@ export function createHeatingCoolingDynamicRenderer(options = {}) {
   function update(root, s = {}, meta = {}) {
     const active = activeCalculationState(s);
     const r = calculate(active);
-    const accent = s.mode === 'cooling' ? 'cooling' : 'orange';
+    const accent = s.mode === 'cooling' ? 'cyan' : 'orange';
     if (root?.dataset) root.dataset.hcMode = accent;
     const modeLabel = s.mode === 'cooling' ? 'Kälte' : 'Heizung';
     const previous = root.__tcHeatingCoolingDynamic || {};
@@ -203,9 +203,7 @@ export function createVentilationDynamicRenderer(options = {}) {
   function update(root, s = {}, meta = {}) {
     const active = activeCalculationState(s);
     const r = calculate(active);
-    const processAccent = s.mode === 'cooling' ? 'cooling' : 'orange';
-    const moduleAccent = 'cyan';
-    const accent = processAccent;
+    const accent = s.mode === 'cooling' ? 'cyan' : 'orange';
     const modeLabel = s.mode === 'cooling' ? 'Kälte' : 'Heizung';
     const previous = root.__tcVentilationDynamic || {};
     const previousPrefix = previous.prefix || 'heating';
@@ -217,21 +215,20 @@ export function createVentilationDynamicRenderer(options = {}) {
     const lineStructural = /^(line:|saved:)/.test(action);
     const appStructural = /^(record:|module:|replace|reset)/.test(action);
 
-    if (root?.dataset) root.dataset.processAccent = processAccent;
-    updateCardAccent(root, '[data-vent-dynamic="temperatures"]', moduleAccent);
-    updateCardAccent(root, '[data-vent-dynamic="mode-segment"]', processAccent);
-    updateCardAccent(root, '[data-vent-dynamic="target-segment"]', processAccent);
+    updateCardAccent(root, '[data-vent-dynamic="temperatures"]', accent);
+    updateCardAccent(root, '[data-vent-dynamic="mode-segment"]', accent);
+    updateCardAccent(root, '[data-vent-dynamic="target-segment"]', accent);
     updateSegment(root, 'mode', s.mode);
 
     if (modeChanged) {
-      setInner(root, '[data-vent-dynamic="temperatures"]', renderTemperatures(s, r, active, moduleAccent));
-      setInner(root, '[data-vent-dynamic="mode-segment"]', renderModeSegment(s, r, active, processAccent));
+      setInner(root, '[data-vent-dynamic="temperatures"]', renderTemperatures(s, r, active, accent));
+      setInner(root, '[data-vent-dynamic="mode-segment"]', renderModeSegment(s, r, active, accent));
       setCardTitle(root, '[data-vent-dynamic="target-segment"]', `${modeLabel} — Eingaben`);
     }
 
     if (modeChanged || targetChanged) {
-      setInner(root, '[data-vent-dynamic="target-segment"]', renderTargetSegment(s, r, active, processAccent));
-      setInner(root, '[data-vent-dynamic="input-fields"]', renderInputFields(s, r, active, processAccent));
+      setInner(root, '[data-vent-dynamic="target-segment"]', renderTargetSegment(s, r, active, accent));
+      setInner(root, '[data-vent-dynamic="input-fields"]', renderInputFields(s, r, active, accent));
     } else {
       updateSegment(root, key(s, 'CalcTarget'), active.calcTarget);
       setInputValue(root, key(s, 'PowerW'), fmtInput(active.powerW, 2));
@@ -244,8 +241,8 @@ export function createVentilationDynamicRenderer(options = {}) {
     setInputValue(root, key(s, 'SupplyTemp'), fmtInput(active.supplyTemp, 2));
     setInputValue(root, key(s, 'RoomTemp'), fmtInput(active.roomTemp, 2));
 
-    setInner(root, '[data-vent-dynamic="result"]', renderResult(s, r, active, processAccent));
-    setInner(root, '[data-vent-dynamic="air-stats"]', renderAirStats(s, r, active, moduleAccent));
+    setInner(root, '[data-vent-dynamic="result"]', renderResult(s, r, active, accent));
+    setInner(root, '[data-vent-dynamic="air-stats"]', renderAirStats(s, r, active, accent));
     setInner(root, '[data-vent-dynamic="formula"]', renderFormula(s, r, active, accent));
 
     if (lineStructural || appStructural || hasAnyChanged(changed, ['ventLineSections', 'activeVentLineSectionId', 'activeVentLineSectionName', 'expandedVentLineSectionId'])) {

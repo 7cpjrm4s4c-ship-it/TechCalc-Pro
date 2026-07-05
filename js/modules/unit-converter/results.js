@@ -33,7 +33,7 @@ export function unitConverterAllValueRows(s = {}) {
   }));
 }
 
-export function buildUnitConverterResultModel(s = {}, accent = 'blue') {
+export function buildUnitConverterResultModel(s = {}, accent = 'green') {
   const { from, to } = normalizeUnitSelection(s);
   return {
     groups: [

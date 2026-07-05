@@ -88,22 +88,21 @@ export function createVentilationView(config, calculate, lineSectionController) 
   return function view(s) {
     const active = activeCalculationState(s);
     const r = calculate(active);
-    const processAccent = ventilationAccent(s);
-    const moduleAccent = 'cyan';
+    const accent = ventilationAccent(s);
     const modeLabel = ventilationModeLabel(s);
 
     const inputColumn = stack([
-      card('Temperaturen', `<div data-vent-dynamic="temperatures">${temperatureFields(s, active)}</div>`, moduleAccent),
-      card('Betriebsart', `<div data-vent-dynamic="mode-segment">${renderModeSegment(s, processAccent)}</div>`, processAccent, { compact: true }),
+      card('Temperaturen', `<div data-vent-dynamic="temperatures">${temperatureFields(s, active)}</div>`, accent),
+      card('Betriebsart', `<div data-vent-dynamic="mode-segment">${renderModeSegment(s, accent)}</div>`, accent, { compact: true }),
       card(`${modeLabel} — Eingaben`, stack([
-        `<div data-vent-dynamic="target-segment">${renderTargetSegment(s, active, processAccent)}</div>`,
+        `<div data-vent-dynamic="target-segment">${renderTargetSegment(s, active, accent)}</div>`,
         `<div data-vent-dynamic="input-fields">${grid(inputFields(s, active).join(''), 2)}</div>`
-      ].join('')), processAccent),
+      ].join('')), accent),
       `<div class="formula" data-vent-dynamic="formula">${ventilationFormulaText(r)}</div>`
     ].join(''));
 
     const outputColumn = stack([
-      `<div data-vent-dynamic="result">${renderVentilationResult(s, r, active, processAccent)}</div>`,
+      `<div data-vent-dynamic="result">${renderVentilationResult(s, r, active, accent)}</div>`,
       `<div data-vent-dynamic="air-stats">${renderAirStats(r)}</div>`,
       lineSectionController.renderCard(s)
     ].join(''));
@@ -111,6 +110,6 @@ export function createVentilationView(config, calculate, lineSectionController) 
     return renderModuleShell(config, `
       <div class="span-6">${inputColumn}</div>
       <div class="span-6">${outputColumn}</div>
-    `).replace('<section class="module-view"', `<section class="module-view" data-process-accent="${processAccent}"`);
+    `);
   };
 }
