@@ -1,3 +1,11 @@
+
+## 1.3.2-dev.36 Phase 42E.1 – Central Keyboard Navigation Contract
+
+- Zentraler Focus-Graph für Tab/Shift+Tab/Enter/Shift+Enter erweitert.
+- Speichern-/Aktualisieren-Controls, Segments und Saved-Cards in die Keyboard-Navigation eingebunden.
+- Collection-Input-Handler führen nach Enter-Commit wieder in den zentralen Navigationsvertrag zurück.
+- Keine neuen CSS-Hotfix-Dateien.
+
 ## 1.3.2-dev.36-phase42d – Reference Contract Migration
 
 - Phase 42D auf Basis von 42C umgesetzt.

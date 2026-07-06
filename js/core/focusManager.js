@@ -8,18 +8,24 @@ const FOCUSABLE_SELECTOR = [
   '[contenteditable="true"]'
 ].join(',');
 
-const PLATFORM_FIELD_SELECTOR = [
-  'input[data-field]:not([type="hidden"]):not([disabled])',
-  'textarea[data-field]:not([disabled])',
-  'select[data-field]:not([disabled])',
-  // Dev.31: legacy module controls that still do not carry data-field must not
-  // break the central mobile Tab/Enter contract. Restrict this to real form
-  // controls and keep buttons/links out of field traversal.
+// Phase 42E.1: one central keyboard traversal contract. Form fields remain
+// first-class citizens, but action controls that belong to a module workflow
+// (save/update, segments, saved cards and explicit platform focus controls) are
+// part of the same focus graph. This prevents Enter/Tab from dead-ending in the
+// save panel while avoiding global navigation/header buttons.
+const KEYBOARD_NAV_SELECTOR = [
   'input:not([type="hidden"]):not([disabled]):not([data-skip-platform-focus])',
   'textarea:not([disabled]):not([data-skip-platform-focus])',
   'select:not([disabled]):not([data-skip-platform-focus])',
-  '[data-platform-focus]:not([disabled])'
+  '.tc-save-actions button:not([disabled])',
+  '[data-segment]:not([disabled])',
+  '[data-saved-record-card]:not([aria-disabled="true"])',
+  '[data-line-card]:not([aria-disabled="true"])',
+  '[data-platform-focus]:not([disabled])',
+  '[tabindex]:not([tabindex="-1"]):not([disabled]):not([data-skip-platform-focus])'
 ].join(',');
+
+const PLATFORM_FIELD_SELECTOR = KEYBOARD_NAV_SELECTOR;
 
 function isElementVisible(element) {
   if (!element) return false;
@@ -95,7 +101,16 @@ export function getFocusableElements(root = document, selector = FOCUSABLE_SELEC
 
 export function getPlatformFields(root = document) {
   if (!root?.querySelectorAll) return [];
-  return [...root.querySelectorAll(PLATFORM_FIELD_SELECTOR)].filter(isPlatformFieldReachable);
+  const seen = new Set();
+  return [...root.querySelectorAll(PLATFORM_FIELD_SELECTOR)].filter(element => {
+    if (seen.has(element)) return false;
+    seen.add(element);
+    return isPlatformFieldReachable(element);
+  });
+}
+
+export function isPlatformNavigationElement(element) {
+  return Boolean(element?.matches?.(KEYBOARD_NAV_SELECTOR));
 }
 
 export function focusNext(root, current, options = {}) {
@@ -104,7 +119,8 @@ export function focusNext(root, current, options = {}) {
   const index = fields.indexOf(current);
   const direction = options.direction === 'previous' ? -1 : 1;
   const nextIndex = index >= 0 ? index + direction : 0;
-  const next = fields[nextIndex];
+  const normalizedIndex = options.wrap === false ? nextIndex : (nextIndex + fields.length) % fields.length;
+  const next = fields[normalizedIndex];
   if (!next) return false;
 
   const applyFocus = () => {
@@ -132,7 +148,7 @@ export function shouldHandleTabNavigation(event) {
 }
 
 export function focusByEnter(root, current, options = {}) {
-  if (!current?.matches?.('[data-field], [data-platform-focus]')) return false;
+  if (!isPlatformNavigationElement(current)) return false;
   const direction = options.direction || (options.event?.shiftKey ? 'previous' : 'next');
   return focusNext(root, current, {
     direction: direction === 'previous' ? 'previous' : 'next',
@@ -148,7 +164,7 @@ export function handleEnterNavigation(root, current, event, options = {}) {
 }
 
 export function focusByTab(root, current, options = {}) {
-  if (!current?.matches?.('[data-field], [data-platform-focus]')) return false;
+  if (!isPlatformNavigationElement(current)) return false;
   const direction = options.direction || (options.event?.shiftKey ? 'previous' : 'next');
   return focusNext(root, current, {
     direction: direction === 'previous' ? 'previous' : 'next',
@@ -174,8 +190,8 @@ export function captureActiveField(root = document, options = {}) {
   const active = typeof document !== 'undefined' ? document.activeElement : null;
   if (!active || active === document.body) return null;
   if (root?.contains && !root.contains(active)) return null;
-  const field = active.closest?.('[data-field], input, textarea, select, [data-platform-focus]') || active;
-  if (!field?.matches?.('[data-field], input, textarea, select, [data-platform-focus]')) return null;
+  const field = active.closest?.(KEYBOARD_NAV_SELECTOR) || active;
+  if (!isPlatformNavigationElement(field)) return null;
   const key = field.dataset.field || field.id || field.name || field.dataset.platformFocus || null;
   if (!key) return null;
   const fields = getPlatformFields(root);
@@ -195,7 +211,7 @@ function findFieldBySnapshot(root, snapshot) {
   if (!root?.querySelector || !snapshot) return null;
   const escaped = cssEscape(snapshot.key);
   const byKey = root.querySelector(`[data-field="${escaped}"], [id="${escaped}"], [name="${escaped}"], [data-platform-focus="${escaped}"]`);
-  if (byKey && byKey.matches?.('[data-field], input, textarea, select, [data-platform-focus]') && !byKey.disabled && isElementVisible(byKey)) return byKey;
+  if (byKey && isPlatformNavigationElement(byKey) && !byKey.disabled && isElementVisible(byKey)) return byKey;
   const fields = getPlatformFields(root);
   if (snapshot.index >= 0 && fields[snapshot.index]) return fields[snapshot.index];
   return null;
@@ -245,6 +261,7 @@ export const PlatformFocusManager = Object.freeze({
   blurActiveElement,
   getFocusableElements,
   getPlatformFields,
+  isPlatformNavigationElement,
   focusNext,
   shouldHandleEnterNavigation,
   shouldHandleTabNavigation,

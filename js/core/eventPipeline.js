@@ -1,4 +1,4 @@
-import { handlePlatformFieldNavigation, preserveFocusDuring } from './focusManager.js';
+import { handlePlatformFieldNavigation, isPlatformNavigationElement, preserveFocusDuring } from './focusManager.js';
 import { markCommittedAction } from './formActions.js';
 const DEFAULT_INTERACTIVE_SELECTOR = '[data-field], input, select, textarea, button, a, summary, [role="button"], [data-line-card], [data-saved-record-card], .saved-record-card, .segmented, [data-tc-action]';
 
@@ -303,8 +303,10 @@ export function bindCentralEventPipeline(root, state, options = {}) {
       return;
     }
 
-    const el = event.target?.closest?.('input:not([type="hidden"]), textarea, select, [data-platform-focus]');
+    const el = event.target?.closest?.('input:not([type="hidden"]), textarea, select, button, [data-segment], [data-line-card], [data-saved-record-card], [data-platform-focus], [tabindex]');
     if (!el || !root.contains(el) || (event.key !== 'Enter' && event.key !== 'Tab')) return;
+    if (!isPlatformNavigationElement(el)) return;
+    if (event.key === 'Enter' && el.matches?.('button, [data-tc-action], [data-action], [data-segment], [data-line-card], [data-saved-record-card]')) return;
     const action = event.key === 'Tab' ? 'field:tab' : 'field:enter';
     event.preventDefault();
     // Dev.31: central keyboard navigation is now field-class based, not only
@@ -318,7 +320,7 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     notifyCommit({ action, element: el, moved });
     const refresh = () => {
       const active = document.activeElement;
-      const keep = active && root.contains(active) && active.matches?.('[data-field], [data-platform-focus], input, textarea, select');
+      const keep = active && root.contains(active) && isPlatformNavigationElement(active);
       if (el.matches?.('[data-field]')) preserveFocusDuring(root, () => state.set({}, { action: `${action}:refresh`, notify: true }), { restoreFocus: keep });
     };
     if (typeof requestAnimationFrame === 'function') requestAnimationFrame(refresh);
