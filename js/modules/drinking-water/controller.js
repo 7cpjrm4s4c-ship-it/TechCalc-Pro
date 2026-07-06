@@ -312,23 +312,21 @@ export function bindDrinkingWaterActions(root) {
   installWaterHeatingModeSegmentBridge(root);
   if (root.__tcDrinkingWaterActionsBound) return;
   root.__tcDrinkingWaterActionsBound = true;
-  root.addEventListener('input', event => {
-    const el = event.target.closest('[data-field]');
-    if (!el || !root.contains(el)) return;
-    state.set({ [el.dataset.field]: el.value }, { action:'dw:input', notify:false });
-  });
-
+  // Phase 42E.5: standard data-field input/change/blur commits are owned by
+  // the central event pipeline. The former Trinkwasser-local field listeners
+  // rebuilt the whole input island during native blur/change on mobile browsers.
+  // That replaced the next tapped input before it could receive focus, so users
+  // had to tap a second time. Keep only the Trinkwasser-specific draft-count
+  // collection input here and leave ordinary form fields to the central contract.
   root.addEventListener('change', event => {
     const draftCount = event.target.closest('[data-dw-draft-count]');
     if (draftCount && root.contains(draftCount)) {
       updateDraftCount(draftCount.dataset.dwDraftCount, draftCount.dataset.index, draftCount.value);
-      refreshDrinkingWater(root);
-      return;
-    }
-    const field = event.target.closest('[data-field]');
-    if (field && root.contains(field)) {
-      state.set({ [field.dataset.field]: field.value }, { action:'dw:change', notify:false });
-      refreshDrinkingWater(root);
+      const result = root.querySelector('[data-dw-dynamic="result"]');
+      if (result) {
+        const vm = createDrinkingWaterViewModel(state.get());
+        safeReplaceContent(result, renderResultCard(vm));
+      }
       return;
     }
     updateAccordionState(event);

@@ -41,6 +41,7 @@
 - [x] 42E.2 Legacy-Keyboard-Handler entfernt und dokumentiert
 - [x] 42E.3 Keyboard-Regression-Guard ergaenzt
 - [x] 42E.4 Phase-42-Dokumente konsolidiert
+- [x] 42E.5 Trinkwasser-Mobile-Input-Vertrag geprueft und korrigiert
 - [x] Regressionen dokumentiert
 - [x] Tests/Gates dokumentiert
 - [ ] RC-Faehigkeit final bewerten

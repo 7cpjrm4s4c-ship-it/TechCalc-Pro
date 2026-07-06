@@ -1,3 +1,11 @@
+### 1.3.2-dev.36 Phase 42E.5
+
+- Trinkwasser-Mobile-Input-Contract korrigiert.
+- Lokale Trinkwasser-`input`-/`change`-Listener fuer normale `[data-field]` Felder entfernt.
+- Field-Commits ersetzen den Trinkwasser-Input-Island nicht mehr.
+- Draft-Count bleibt als Trinkwasser-spezifischer Collection-Adapter erhalten.
+- Keine CSS-Hotfix-Datei und keine neuen Keyboard-Regeln.
+
 ### 1.3.2-dev.36 Phase 42E.4
 
 - Phase-42-Dokumentation konsolidiert.

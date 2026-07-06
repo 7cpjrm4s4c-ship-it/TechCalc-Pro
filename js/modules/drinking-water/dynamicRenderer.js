@@ -132,8 +132,14 @@ function updateDrinkingWaterDynamicUnsafe(root, s, meta = {}){
   const action = String(meta.action || '');
   const initial = !root.__tcDrinkingWaterDynamic;
   const inputAction = /^(dw:|line:|saved:)/.test(action);
+  const fieldCommitAction = /^(field:|input:confirm|binding:)/.test(action);
 
-  if (initial || inputAction || !changed.length || hasAnyChanged(changed, INPUT_KEYS)) {
+  // Phase 42E.5: field commits must not rebuild the Trinkwasser input island.
+  // On mobile, native blur/change fires while the next tap is still being
+  // resolved; replacing the input card at that moment drops the tap target and
+  // forces a second tap. Structural Trinkwasser actions still render the input
+  // island, field commits only synchronize current DOM values below.
+  if (initial || inputAction || (!fieldCommitAction && (!changed.length || hasAnyChanged(changed, INPUT_KEYS)))) {
     setIslandInner(root, '[data-dw-dynamic="input"]', renderInputCard(vm));
   }
   const shouldRenderResult = initial || !changed.length || hasAnyChanged(changed, RESULT_KEYS);

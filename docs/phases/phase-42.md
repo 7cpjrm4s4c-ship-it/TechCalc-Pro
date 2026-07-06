@@ -93,9 +93,9 @@ Ergebnisdatei:
 42C hat Runtime-Code geaendert, aber keine neuen Architekturregeln eingefuehrt. Entfernt bzw. aufgeloest wurden vor allem fruehe Saved-Selection-Pointerpfade und Full-Card-Rebuilds in Dynamic-Renderern. Der bestehende Line-Section- und Outlet-Vertrag bleibt massgeblich.
 
 
-## Konsolidierter Stand nach 42E.4
+## Konsolidierter Stand nach 42E.5
 
-- Phase 42A bis 42E.4 sind abgeschlossen.
+- Phase 42A bis 42E.5 sind abgeschlossen.
 - Save/Edit/Selection nutzt den bestaetigten zentralen Vertrag.
 - Scroll-Stabilitaet wird ueber zentrale Anchors und minimale DOM-Mutationen erreicht, nicht ueber lokale Restore-Ketten.
 - h,x bleibt nur beim Renderziel ein Sonderfall; der Save-/Selection-Vertrag bleibt zentral.
@@ -104,3 +104,14 @@ Ergebnisdatei:
 - Neue CSS-Hotfixdateien oder additive Stability-Schichten sind fuer Phase-42-Themen nicht zulaessig.
 
 Verbindliche Detaildokumente sind die `phase-42*` Dateien in `docs/phases/`.
+
+
+### 42E.5 – Mobile Input Contract Audit
+
+Status: abgeschlossen.
+
+Ergebnisdatei:
+
+- `docs/phases/phase-42e5-mobile-input-contract-audit.md`
+
+42E.5 bestaetigt, dass mobile Trinkwasser-Eingabefehler nicht durch den zentralen KeyboardController verursacht wurden. Die Ursache war ein lokaler Standard-Field-Listener im Trinkwasser-Modul, der waehrend nativer `blur`-/`change`-Abläufe den Input-Island neu gerendert hat. Normale `[data-field]` Eingaben gehoeren jetzt wieder ausschliesslich dem zentralen Event-/Input-Vertrag; Trinkwasser-spezifisch bleiben nur Collection-/Draft-Controls.
