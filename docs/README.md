@@ -14,3 +14,7 @@ Phase 30C reorganizes project documentation so operational files remain in the p
 ## Root policy
 
 The project root should contain runtime/build files only. New phase notes, audit results and cleanup reports should be written under `docs/` unless they are required by the application at runtime.
+
+## Phase 42 Architecture Consolidation
+
+The authoritative architecture consolidation documents are located in `docs/phases/phase-42*.md`. Root-level phase notes are not used as the source of truth.

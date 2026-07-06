@@ -1,7 +1,7 @@
 # Phase 42 – Architectural Consolidation
 
 Version basis: `1.3.2-dev.36`
-Status: Phase 42A–42E.4 completed as architectural consolidation baseline
+Status: abgeschlossen bis Phase 42E.6
 
 ## Ziel
 
@@ -34,84 +34,39 @@ Referenz-/Sondermodul:
 
 Das h,x-Modul ist der einzige aktuelle Fall mit Diagramm, Prozessauswahl und Ergebnisblock als gekoppelte Ausgabeinseln. Es darf deshalb nicht wie ein reines Saved-Record-Modul behandelt werden. Saved-Selection muss Inputs, Prozessauswahl, Ergebnisblock und Diagramm synchronisieren, ohne unnoetige strukturelle Rebuilds oberhalb der Saved-Card zu erzwingen.
 
+### Keyboard/Focus
+
+Tab, Shift+Tab, Enter und Shift+Enter werden zentral gesteuert. Module duerfen keine eigene Tab-/Enter-Reihenfolge etablieren. Collection-Inputs werden zentral ueber die Event-Pipeline committed.
+
+### Mobile Input
+
+Standard-Field-Commits duerfen aktive oder naechstangetippte Eingabeelemente nicht durch Card-/Island-Rebuilds ersetzen. Trinkwasser wurde in 42E.5 als Referenzfall fuer diesen mobilen Input-Vertrag bereinigt.
+
 ## Teilphasen
 
-### 42A – Dokumentations- und Vertragsaudit
+| Phase | Status | Ergebnisdatei |
+| --- | --- | --- |
+| 42A – Dokumentations- und Vertragsaudit | abgeschlossen | `phase-42-audit.md` |
+| 42B – Contract Reconciliation | abgeschlossen | `phase-42b-contract-reconciliation.md` |
+| 42C – Legacy Removal | abgeschlossen | `phase-42c-legacy-removal.md` |
+| 42D – Reference Contract Migration | abgeschlossen | `phase-42d-reference-contract-migration.md` |
+| 42E.1 – Keyboard Navigation Contract | abgeschlossen | `phase-42e1-keyboard-navigation-contract.md` |
+| 42E.2 – Legacy Keyboard Handler Removal | abgeschlossen | `phase-42e2-legacy-keyboard-handler-removal.md` |
+| 42E.3 – Keyboard Regression Guard | abgeschlossen | `phase-42e3-keyboard-regression.md` |
+| 42E.4 – Documentation Consolidation | abgeschlossen | `phase-42e4-documentation-consolidation.md` |
+| 42E.5 – Mobile Input Contract Audit | abgeschlossen | `phase-42e5-mobile-input-contract-audit.md` |
+| 42E.6 – Architecture Cleanup and Closure | abgeschlossen | `phase-42e6-architecture-cleanup.md` |
 
-Status: abgeschlossen.
+## Konsolidierter Stand
 
-Ergebnisdateien:
-
-- `docs/phases/phase-42-audit.md`
-- `docs/phases/phase-42-decisions.md`
-- `docs/phases/phase-42-checklist.md`
-
-In 42A wurden keine Runtime-Dateien geaendert.
-
-### 42B – Legacy-Vertrag identifizieren und Zielvertrag festlegen
-
-Noch offen. Grundlage ist das 42A-Audit.
-
-### 42C – Legacy Removal
-
-Noch offen. Erst nach Freigabe von 42B.
-
-### 42D – Modulweise Konsolidierung
-
-Noch offen. Reihenfolge wird nach 42B festgelegt.
-
-## Aktuelle Leitentscheidung aus 42A
-
-Der zentrale Vertrag existiert bereits. Phase 42 darf ihn nicht durch einen neuen Vertrag ersetzen. Die naechsten Schritte muessen die noch vorhandenen Legacy-Pfade gegen diesen Vertrag aufloesen:
-
-- `savedCalculationController` / `savedRecordController`
-- `lineSectionController`
-- `eventPipeline`
-- `scrollManager`
-- modulare Dynamic-Renderer
-
-
-
-### 42B – Contract Reconciliation
-
-Status: abgeschlossen.
-
-Ergebnisdatei:
-
-- `docs/phases/phase-42b-contract-reconciliation.md`
-
-42B hat keine Runtime-Dateien geaendert. Ergebnis ist die verbindliche Auslegung der bestehenden Saved-/Selection-/Render-/Scroll-Vertraege fuer 42C.
-
-### 42C – Legacy Removal
-
-Status: abgeschlossen.
-
-Ergebnisdatei:
-
-- `docs/phases/phase-42c-legacy-removal.md`
-
-42C hat Runtime-Code geaendert, aber keine neuen Architekturregeln eingefuehrt. Entfernt bzw. aufgeloest wurden vor allem fruehe Saved-Selection-Pointerpfade und Full-Card-Rebuilds in Dynamic-Renderern. Der bestehende Line-Section- und Outlet-Vertrag bleibt massgeblich.
-
-
-## Konsolidierter Stand nach 42E.5
-
-- Phase 42A bis 42E.5 sind abgeschlossen.
 - Save/Edit/Selection nutzt den bestaetigten zentralen Vertrag.
 - Scroll-Stabilitaet wird ueber zentrale Anchors und minimale DOM-Mutationen erreicht, nicht ueber lokale Restore-Ketten.
 - h,x bleibt nur beim Renderziel ein Sonderfall; der Save-/Selection-Vertrag bleibt zentral.
 - Keyboard-/Focus-Navigation wird zentral ueber Event-Pipeline und Focus-Graph gesteuert.
+- Trinkwasser-Standardfelder laufen wieder ueber den zentralen Mobile-Input-Vertrag.
 - `npm run audit:keyboard-contract` ist Bestandteil des Integration-Gates.
 - Neue CSS-Hotfixdateien oder additive Stability-Schichten sind fuer Phase-42-Themen nicht zulaessig.
 
-Verbindliche Detaildokumente sind die `phase-42*` Dateien in `docs/phases/`.
+## Naechster Schritt
 
-
-### 42E.5 – Mobile Input Contract Audit
-
-Status: abgeschlossen.
-
-Ergebnisdatei:
-
-- `docs/phases/phase-42e5-mobile-input-contract-audit.md`
-
-42E.5 bestaetigt, dass mobile Trinkwasser-Eingabefehler nicht durch den zentralen KeyboardController verursacht wurden. Die Ursache war ein lokaler Standard-Field-Listener im Trinkwasser-Modul, der waehrend nativer `blur`-/`change`-Abläufe den Input-Island neu gerendert hat. Normale `[data-field]` Eingaben gehoeren jetzt wieder ausschliesslich dem zentralen Event-/Input-Vertrag; Trinkwasser-spezifisch bleiben nur Collection-/Draft-Controls.
+Phase 42 ist abgeschlossen. Die naechste Phase kann sich auf RC-Vorbereitung, gezielte Regression oder Release-Candidate-Haertung stuetzen, darf aber keine neuen Parallelvertraege fuer Save, Selection, Render, Scroll, Keyboard, Mobile Input oder Theme einfuehren.

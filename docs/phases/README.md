@@ -31,3 +31,10 @@ Phase 42 ist als konsolidierte Architekturphase dokumentiert. Relevante Dateien:
 - `phase-42e2-legacy-keyboard-handler-removal.md` – Legacy Keyboard Removal
 - `phase-42e3-keyboard-regression.md` – Keyboard Regression Guard
 - `phase-42e4-documentation-consolidation.md` – Dokumentationskonsolidierung
+
+- `phase-42e5-mobile-input-contract-audit.md` – Mobile Input Contract Audit
+- `phase-42e6-architecture-cleanup.md` – Architekturabschluss und Root-Notiz-Bereinigung
+
+## Archived root notes
+
+- `phase-39.md` – archivierte Phase-39B-Root-Notiz und Verweis auf Build-Artefakt-Hygiene.

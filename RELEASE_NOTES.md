@@ -1,3 +1,10 @@
+### 1.3.2-dev.36 Phase 42E.6
+
+- Phase 42 Architekturabschluss dokumentiert.
+- Root-Datei `PHASE39B_NOTES.md` entfernt und historisch unter `docs/phases/phase-39.md` eingeordnet.
+- `phase-42.md` als finale Hauptreferenz bereinigt.
+- Keine Runtime-/CSS-/Modulmechanismen geaendert.
+
 ### 1.3.2-dev.36 Phase 42E.5
 
 - Trinkwasser-Mobile-Input-Contract korrigiert.
