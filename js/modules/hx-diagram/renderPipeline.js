@@ -102,18 +102,27 @@ export function renderDynamicSections(root, snapshot = {}, meta = {}) {
   };
 
   if (savedStructural) {
-    // Dev.34: saved-process actions must not rebuild diagram/result/input islands.
-    // Rebuilding large sections changed document height and caused mobile scroll jumps.
+    // Phase 42C: h,x saved selection is not rows-only. The selected process must
+    // hydrate inputs and refresh process/results/diagram outlets. The legacy
+    // scroll-freeze chain remains removed; stability is achieved by named outlet
+    // diffing via setInner and by updating rows without replacing the full module.
     return withHxScrollFreeze(root, true, () => {
       syncHxFormFields(root, snapshot);
+      const vm = createHxRenderModel(snapshot);
+      setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.process}"]`, renderProcessSelection(vm));
+      setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.results}"]`, renderResults(vm));
+      setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.diagram}"]`, renderDiagram(vm));
       syncSavedProcessControls(root, snapshot);
 
-      const rowsHost = root.querySelector?.(`[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"] [data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`);
+      const rowsHost = root.querySelector?.(`[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"] .saved-record-list`)
+        || root.querySelector?.(`[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"] .empty-state`);
+      const nextRows = hxProcessController.renderRows(snapshot);
       if (rowsHost) {
-        const nextRows = hxProcessController.renderRows(snapshot);
-        if (rowsHost.innerHTML !== nextRows) rowsHost.innerHTML = nextRows;
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = nextRows;
+        const nextNode = wrapper.firstElementChild;
+        if (nextNode && rowsHost.outerHTML !== nextNode.outerHTML) rowsHost.replaceWith(nextNode);
       } else {
-        const vm = createHxRenderModel(snapshot);
         const host = root.querySelector?.(`[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`);
         const next = renderSavedProcesses(vm);
         if (host && host.innerHTML !== next) host.innerHTML = next;

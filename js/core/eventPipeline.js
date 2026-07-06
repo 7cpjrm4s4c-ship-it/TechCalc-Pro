@@ -394,6 +394,8 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     }
   };
 
+  const SAVED_SELECTION_ACTIONS = new Set(['saved:load', 'saved:delete', 'saved:toggle', 'line:select', 'line:delete', 'line:toggle', 'line:deselect']);
+
   const onPointerAction = event => {
     const actionEl = event.target?.closest?.('[data-tc-action], [data-action]');
     const action = actionEl?.dataset?.tcAction || actionEl?.dataset?.action;
@@ -404,6 +406,15 @@ export function bindCentralEventPipeline(root, state, options = {}) {
       event?.stopImmediatePropagation?.();
       return true;
     }
+
+    // Phase 42C: Saved-selection actions are not structural blur workarounds.
+    // Executing them during pointerdown/touchend mutates DOM while the browser is
+    // still resolving the tap target and can trigger scroll anchoring jumps on
+    // mobile browsers. Let the click/key activation path own saved load/delete/
+    // toggle actions. Save/update remain early actions because they must commit
+    // before focused input blur can replace the tapped button.
+    if (SAVED_SELECTION_ACTIONS.has(String(action))) return false;
+
     if (wasPointerActionHandled(root, action)) {
       event?.preventDefault?.();
       event?.stopPropagation?.();

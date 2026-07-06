@@ -81,3 +81,13 @@ Ergebnisdatei:
 - `docs/phases/phase-42b-contract-reconciliation.md`
 
 42B hat keine Runtime-Dateien geaendert. Ergebnis ist die verbindliche Auslegung der bestehenden Saved-/Selection-/Render-/Scroll-Vertraege fuer 42C.
+
+### 42C – Legacy Removal
+
+Status: abgeschlossen.
+
+Ergebnisdatei:
+
+- `docs/phases/phase-42c-legacy-removal.md`
+
+42C hat Runtime-Code geaendert, aber keine neuen Architekturregeln eingefuehrt. Entfernt bzw. aufgeloest wurden vor allem fruehe Saved-Selection-Pointerpfade und Full-Card-Rebuilds in Dynamic-Renderern. Der bestehende Line-Section- und Outlet-Vertrag bleibt massgeblich.

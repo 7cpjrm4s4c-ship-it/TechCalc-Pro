@@ -21,9 +21,9 @@
 
 ## 42C – Legacy Removal Plan
 
-- [ ] lokale Scroll-Fixes identifizieren
-- [ ] lokale Saved-Handler identifizieren
-- [ ] lokale Focus-/Keydown-Handler identifizieren
+- [x] lokale Scroll-Fixes identifizieren
+- [x] lokale Saved-Handler identifizieren
+- [x] lokale Focus-/Keydown-Handler identifizieren
 - [ ] direkte `innerHTML`-Dynamic-Rebuilds in kritischen Modulen bewerten
 - [ ] modulbezogene CSS-/UI-Sonderregeln gegen zentrale UI-Regeln pruefen
 

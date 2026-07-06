@@ -160,23 +160,9 @@ export function bindSavedRecordList(root, {
     return true;
   };
 
-  bindScopedOnce(root, `${key}:early`, 'pointerdown', event => {
-    const candidate = event.target?.closest?.(`[${loadAttr}], [${toggleAttr}], [${deleteAttr}], [data-line-card], [data-saved-record-card]`);
-    if (!candidate || !root.contains(candidate)) return;
-    const id = candidate.getAttribute?.(loadAttr) || candidate.getAttribute?.(toggleAttr) || candidate.getAttribute?.(deleteAttr) || candidate.dataset?.savedRecordId || '';
-    const action = candidate.hasAttribute?.(deleteAttr) ? 'delete' : candidate.hasAttribute?.(toggleAttr) ? 'toggle' : 'load';
-    const now = Date.now();
-    const last = root.__tcSavedRecordEarlyAction || {};
-    const earlyKey = `${action}:${id}`;
-    if (last.key === earlyKey && now - Number(last.at || 0) < 450) {
-      event.preventDefault();
-      event.stopPropagation();
-      event.stopImmediatePropagation?.();
-      return;
-    }
-    root.__tcSavedRecordEarlyAction = { key: earlyKey, at: now };
-    handleActivation(event);
-  }, true);
+  // Phase 42C: no pointerdown activation for saved records. The click and
+  // keyboard paths below are the single activation contract. Early DOM mutation
+  // during touch/pointer resolution was a legacy scroll-jump source.
 
   bindScopedOnce(root, key, 'click', event => {
     const candidate = event.target?.closest?.(`[${loadAttr}], [${toggleAttr}], [${deleteAttr}], [data-line-card], [data-saved-record-card]`);

@@ -69,8 +69,36 @@ export function createLineSectionController({
     if (nameInput && document.activeElement !== nameInput) nameInput.value = snapshot?.[nameKey] || '';
     const saveButton = root?.querySelector?.('[data-line-save]');
     const updateButton = root?.querySelector?.('[data-line-update]');
-    if (saveButton) saveButton.disabled = Boolean(snapshot?.[activeIdKey]);
-    if (updateButton) updateButton.disabled = !snapshot?.[activeIdKey];
+    if (saveButton) {
+      saveButton.disabled = Boolean(snapshot?.[activeIdKey]);
+      saveButton.setAttribute('aria-disabled', String(Boolean(snapshot?.[activeIdKey])));
+    }
+    if (updateButton) {
+      updateButton.disabled = !snapshot?.[activeIdKey];
+      updateButton.setAttribute('aria-disabled', String(!snapshot?.[activeIdKey]));
+    }
+  };
+
+  const findRowsHost = root => {
+    if (!root?.querySelector) return null;
+    return root.querySelector(`[${dynamicDataAttr}="${dynamicAttr}"] .saved-record-list`)
+      || root.querySelector(`[${dynamicDataAttr}="${dynamicAttr}"] .empty-state`)
+      || root.querySelector(`[${dynamicDataAttr}="${dynamicAttr}"]`);
+  };
+
+  const updateRows = (root, snapshot = state?.get?.() || {}) => {
+    const host = findRowsHost(root);
+    if (!host) return false;
+    const next = renderRows(snapshot);
+    if (host.matches?.('.saved-record-list, .empty-state')) {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = next;
+      const nextNode = wrapper.firstElementChild;
+      if (nextNode && host.outerHTML !== nextNode.outerHTML) host.replaceWith(nextNode);
+      return true;
+    }
+    if (host.innerHTML !== next) host.innerHTML = next;
+    return true;
   };
 
   const bind = root => {
@@ -164,7 +192,7 @@ export function createLineSectionController({
     });
   };
 
-  return { read, write, renderRows, renderCard, updateControls, bind };
+  return { read, write, renderRows, renderCard, updateControls, updateRows, bind };
 }
 
 export default createLineSectionController;

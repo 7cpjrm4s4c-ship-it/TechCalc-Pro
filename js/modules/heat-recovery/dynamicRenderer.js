@@ -46,6 +46,38 @@ function syncFields(root, s = {}){
   ].forEach(key => setInputValue(root, key, s[key] ?? ''));
 }
 
+function updateSavedRows(root, html){
+  const host = root?.querySelector?.('[data-wrg-dynamic="rlt-devices"] .saved-record-list')
+    || root?.querySelector?.('[data-wrg-dynamic="rlt-devices"] .empty-state')
+    || root?.querySelector?.('[data-wrg-dynamic="rlt-devices"]');
+  if (!host) return false;
+  const next = String(html ?? '');
+  if (host.matches?.('.saved-record-list, .empty-state')) {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = next;
+    const nextNode = wrapper.firstElementChild;
+    if (nextNode && host.outerHTML !== nextNode.outerHTML) host.replaceWith(nextNode);
+    return true;
+  }
+  if (host.innerHTML !== next) host.innerHTML = next;
+  return true;
+}
+
+function syncSavedControls(root, s = {}){
+  const nameInput = root?.querySelector?.('#activeRltDeviceName');
+  if (nameInput && document.activeElement !== nameInput) nameInput.value = s.activeRltDeviceName || '';
+  const saveButton = root?.querySelector?.('[data-line-save]');
+  const updateButton = root?.querySelector?.('[data-line-update]');
+  if (saveButton) {
+    saveButton.disabled = Boolean(s.activeRltDeviceId);
+    saveButton.setAttribute('aria-disabled', String(Boolean(s.activeRltDeviceId)));
+  }
+  if (updateButton) {
+    updateButton.disabled = !s.activeRltDeviceId;
+    updateButton.setAttribute('aria-disabled', String(!s.activeRltDeviceId));
+  }
+}
+
 export function updateHeatRecoveryDynamic(root, s, meta = {}) {
   const vm = createHeatRecoveryViewModel(s, calculate(s));
   const changed = Array.isArray(meta.changed) ? meta.changed : [];
@@ -61,7 +93,13 @@ export function updateHeatRecoveryDynamic(root, s, meta = {}) {
   }
 
   setIslandInner(root, '[data-wrg-dynamic="outputs"]', renderOutputs(vm));
-  if (savedStructural) setIslandInner(root, '[data-wrg-dynamic="rlt-devices"]', renderSavedRecords(vm));
+  if (savedStructural) {
+    syncSavedControls(root, s);
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = renderSavedRecords(vm);
+    const rows = wrapper.querySelector?.('.saved-record-list, .empty-state')?.outerHTML || '';
+    if (!updateSavedRows(root, rows)) setIslandInner(root, '[data-wrg-dynamic="rlt-devices"]', renderSavedRecords(vm));
+  }
   syncFields(root, s);
   root.__tcHeatRecoveryDynamic = { mode: s.mode, activeRltDeviceId: s.activeRltDeviceId, expandedRltDeviceId: s.expandedRltDeviceId };
 }
