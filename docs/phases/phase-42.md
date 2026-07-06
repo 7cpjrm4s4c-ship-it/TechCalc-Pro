@@ -1,7 +1,7 @@
 # Phase 42 – Architectural Consolidation
 
 Version basis: `1.3.2-dev.36`
-Status: Phase 42A completed as documentation/audit-only baseline
+Status: Phase 42A–42E.4 completed as architectural consolidation baseline
 
 ## Ziel
 
@@ -91,3 +91,16 @@ Ergebnisdatei:
 - `docs/phases/phase-42c-legacy-removal.md`
 
 42C hat Runtime-Code geaendert, aber keine neuen Architekturregeln eingefuehrt. Entfernt bzw. aufgeloest wurden vor allem fruehe Saved-Selection-Pointerpfade und Full-Card-Rebuilds in Dynamic-Renderern. Der bestehende Line-Section- und Outlet-Vertrag bleibt massgeblich.
+
+
+## Konsolidierter Stand nach 42E.4
+
+- Phase 42A bis 42E.4 sind abgeschlossen.
+- Save/Edit/Selection nutzt den bestaetigten zentralen Vertrag.
+- Scroll-Stabilitaet wird ueber zentrale Anchors und minimale DOM-Mutationen erreicht, nicht ueber lokale Restore-Ketten.
+- h,x bleibt nur beim Renderziel ein Sonderfall; der Save-/Selection-Vertrag bleibt zentral.
+- Keyboard-/Focus-Navigation wird zentral ueber Event-Pipeline und Focus-Graph gesteuert.
+- `npm run audit:keyboard-contract` ist Bestandteil des Integration-Gates.
+- Neue CSS-Hotfixdateien oder additive Stability-Schichten sind fuer Phase-42-Themen nicht zulaessig.
+
+Verbindliche Detaildokumente sind die `phase-42*` Dateien in `docs/phases/`.

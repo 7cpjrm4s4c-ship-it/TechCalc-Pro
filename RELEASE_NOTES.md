@@ -1,3 +1,10 @@
+### 1.3.2-dev.36 Phase 42E.4
+
+- Phase-42-Dokumentation konsolidiert.
+- Hauptuebersicht, Checkliste und Phasen-README aktualisiert.
+- Bestaetigte Save-/Selection-/Render-/Scroll-/Keyboard-Vertraege als Referenzstand zusammengefasst.
+- Keine Runtime-/CSS-Codeaenderungen.
+
 
 ### 1.3.2-dev.36 Phase 42E.3
 

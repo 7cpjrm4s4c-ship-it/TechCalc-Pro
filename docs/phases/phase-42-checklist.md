@@ -24,23 +24,24 @@
 - [x] lokale Scroll-Fixes identifizieren
 - [x] lokale Saved-Handler identifizieren
 - [x] lokale Focus-/Keydown-Handler identifizieren
-- [ ] direkte `innerHTML`-Dynamic-Rebuilds in kritischen Modulen bewerten
-- [ ] modulbezogene CSS-/UI-Sonderregeln gegen zentrale UI-Regeln pruefen
+- [x] direkte `innerHTML`-Dynamic-Rebuilds in kritischen Modulen bewerten
+- [x] modulbezogene CSS-/UI-Sonderregeln gegen zentrale UI-Regeln pruefen
 
 ## 42D – Modulweise Umsetzung
 
-Reihenfolge erst nach 42B final festlegen. Kandidaten:
-
-1. `hx-diagram`
-2. `rainwater`
-3. `heat-recovery`
-4. `buffer-storage`
-5. `ventilation`
+- [x] `hx-diagram` gegen Diagramm-Outlets und zentralen Save-/Selection-Vertrag geprueft
+- [x] `rainwater` gegen Precommit-/Hydration-Vertrag geprueft
+- [x] `heat-recovery` auf zentralen RLT-/Row-Vertrag zurueckgefuehrt
+- [x] `buffer-storage` wieder auf Referenzvertrag fuer Selection/Edit migriert
+- [x] `ventilation` Saved-Selection wieder voll angebunden
 
 ## 42E – Abschluss
 
-- [ ] Phase-42-Dokumente final konsolidieren
-- [ ] Regressionen dokumentieren
-- [ ] Tests/Gates dokumentieren
-- [ ] RC-Faehigkeit bewerten
+- [x] 42E.1 Keyboard-Navigationsvertrag dokumentiert
+- [x] 42E.2 Legacy-Keyboard-Handler entfernt und dokumentiert
+- [x] 42E.3 Keyboard-Regression-Guard ergaenzt
+- [x] 42E.4 Phase-42-Dokumente konsolidiert
+- [x] Regressionen dokumentiert
+- [x] Tests/Gates dokumentiert
+- [ ] RC-Faehigkeit final bewerten
 
