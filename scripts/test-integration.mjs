@@ -14,6 +14,7 @@ const commands = [
   ['node', ['scripts/audit-css-system-hardening-v132.mjs']],
   ['node', ['scripts/audit-theme-contract-v132.mjs']],
   ['node', ['scripts/audit-theme-color-matrix-v132.mjs']],
+  ['node', ['scripts/audit-keyboard-contract-phase42e3.mjs']],
   ['node', ['scripts/audit-ui-polish-v132.mjs']],
   ['node', ['tests/platform-feedback-offline-fallback-phase39f.test.mjs']],
   ['node', ['scripts/audit-module-smoke-phase31c.mjs']],

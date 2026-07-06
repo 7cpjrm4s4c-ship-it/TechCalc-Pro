@@ -1,4 +1,11 @@
 
+### 1.3.2-dev.36 Phase 42E.3
+
+- Keyboard-Regression-Guard ergänzt.
+- Zentralen Tab-/Enter-Vertrag statisch gegen lokale Modul-Handler abgesichert.
+- Integration-Gate um Keyboard-Contract-Audit erweitert.
+- Keine Runtime-/CSS-Hotfix-Schicht ergänzt.
+
 ## 1.3.2-dev.36 Phase 42E.2 – Legacy Keyboard Handler Removal
 
 - Zentrale Keyboard-Navigation weiter konsolidiert.

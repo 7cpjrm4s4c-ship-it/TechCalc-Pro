@@ -1,5 +1,5 @@
 const CACHE_NAME = 'techcalc-pro-1.3.2-dev.36';
-const CACHE_REVISION = '1.3.2-dev.36-1-3-2-dev-36-phase-42e-2-legacy-keyboard-handler-removal';
+const CACHE_REVISION = '1.3.2-dev.36-1-3-2-dev-36-phase-42e-3';
 const ASSETS = [
   './',
   './index.html',

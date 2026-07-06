@@ -21,7 +21,8 @@
     "audit:ui-system": "node scripts/audit-ui-system-contract-v132.mjs",
     "audit:css-hardening": "node scripts/audit-css-system-hardening-v132.mjs",
     "audit:theme-contract": "node scripts/audit-theme-contract-v132.mjs",
-    "audit:theme-matrix": "node scripts/audit-theme-color-matrix-v132.mjs"
+    "audit:theme-matrix": "node scripts/audit-theme-color-matrix-v132.mjs",
+    "audit:keyboard-contract": "node scripts/audit-keyboard-contract-phase42e3.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.28.1"
