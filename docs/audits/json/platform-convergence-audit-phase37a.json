@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-07-06T10:37:34.539Z",
+  "generatedAt": "2026-07-06T16:37:40.183Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -103,7 +103,7 @@
       "area": "event-density",
       "message": "Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.",
       "evidence": {
-        "addEventListener": 14
+        "addEventListener": 13
       }
     }
   ],
@@ -155,8 +155,8 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 1233,
-        "controllerAddEventListeners": 14,
+        "lineCount": 1227,
+        "controllerAddEventListeners": 13,
         "nonControllerAddEventListeners": 4,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
@@ -205,7 +205,7 @@
           "area": "event-density",
           "message": "Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.",
           "evidence": {
-            "addEventListener": 14
+            "addEventListener": 13
           }
         }
       ]
@@ -481,8 +481,8 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 841,
-        "controllerAddEventListeners": 4,
+        "lineCount": 833,
+        "controllerAddEventListeners": 3,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
         "viewDomQueries": 0,
@@ -682,7 +682,7 @@
       "area": "event-density",
       "message": "Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.",
       "evidence": {
-        "addEventListener": 14
+        "addEventListener": 13
       }
     }
   ]

@@ -7,7 +7,7 @@ import { createSavedRecord, savedRecordReducer } from '../../core/savedRecordCon
 // uses the Heizung/Kälte-compatible direct binding to avoid duplicate mobile events.
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { preserveScroll as keepScroll, preserveSavedRecordMutation, PlatformScrollManager } from '../../core/scrollManager.js';
-import { handlePlatformFieldNavigation, PlatformFocusManager } from '../../core/focusManager.js';
+import { PlatformFocusManager } from '../../core/focusManager.js';
 import { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved, renderPlatformSaved } from '../moduleRenderer/index.js';
 import { getRenderScheduler } from '../../core/renderScheduler.js';
 import { startPerformanceSpan } from '../shell/performanceController.js';
@@ -224,14 +224,6 @@ function bindCollections(root, state, collectionConfig = {}) {
       if (Object.keys(patch).length) activeState.set(patch, { action: cfg.commitAction || `platform:collection:${name}:commit`, notify: true });
     };
     root.addEventListener('blur', commit, true);
-    root.addEventListener('keydown', event => {
-      if (event.key !== 'Enter') return;
-      const input = event.target?.closest?.('[data-collection-input]');
-      if (!input || !root.contains(input)) return;
-      event.preventDefault();
-      commit(event);
-      handlePlatformFieldNavigation(root, input, event, { select: true, defer: false, preventDefault: false });
-    }, true);
   }
   const addCollectionItem = ({ element, root }) => {
     const name = element?.dataset?.collection;

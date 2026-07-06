@@ -148,12 +148,6 @@ function installNavigationPersistenceGuard(root) {
     scheduleRelease();
   }, true);
 
-  root.addEventListener('keydown', event => {
-    if (event.key !== 'Enter' && event.key !== 'Escape') return;
-    if (!event.target?.closest?.('input[data-field], textarea[data-field]')) return;
-    scheduleRelease();
-  }, true);
-
   const viewport = typeof window !== 'undefined' ? window.visualViewport : null;
   if (viewport && !root.__tcDrinkingWaterVisualViewportGuardBound) {
     root.__tcDrinkingWaterVisualViewportGuardBound = true;

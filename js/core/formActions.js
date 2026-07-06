@@ -1,5 +1,4 @@
 import { numberService } from './numberService.js';
-import { handlePlatformFieldNavigation } from './focusManager.js';
 
 export function fieldSelector(key) {
   const safe = String(key || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
@@ -87,11 +86,4 @@ export function bindLiveCollectionInput(root, selector, { state, getItems, setIt
     event.stopPropagation();
     commit(input, true);
   }, true);
-  root.addEventListener('keydown', event => {
-    const input = event.target.closest(selector);
-    if (!input || event.key !== 'Enter') return;
-    event.preventDefault();
-    commit(input, true);
-    handlePlatformFieldNavigation(root, input, event, { select: true, defer: false, preventDefault: false });
-  });
 }

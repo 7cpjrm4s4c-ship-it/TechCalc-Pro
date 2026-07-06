@@ -198,6 +198,31 @@ function wasPointerActionSuppressed(root) {
 }
 
 
+
+function commitPlatformCollectionInput(root, input, notify = true) {
+  if (!root?.contains?.(input) || !input?.dataset?.collectionInput) return false;
+  const context = root.__tcPlatformCollectionContext;
+  const collections = context?.collections || {};
+  const state = context?.state;
+  const name = input.dataset.collectionInput;
+  const cfg = collections[name];
+  if (!state?.set || !cfg || typeof cfg.patchInput !== 'function') return false;
+  const patch = cfg.patchInput({
+    id: input.dataset.collectionId,
+    field: input.dataset.collectionField,
+    value: input.value,
+    current: typeof state.get === 'function' ? state.get() : {},
+    element: input,
+    root
+  }) || {};
+  if (!Object.keys(patch).length) return false;
+  state.set(patch, {
+    action: notify ? (cfg.commitAction || `platform:collection:${name}:commit`) : (cfg.inputAction || `platform:collection:${name}:input`),
+    notify
+  });
+  return true;
+}
+
 function navigatePlatformField(root, current, event) {
   if (!root || !current?.matches?.('[data-field], [data-platform-focus], input, textarea, select')) return false;
   return handlePlatformFieldNavigation(root, current, event, { select: true, defer: false });
@@ -312,7 +337,10 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     // Dev.31: central keyboard navigation is now field-class based, not only
     // data-field based. Drinking-water draft quantity inputs and legacy module
     // controls can therefore participate without owning local Tab/Enter code.
-    if (el.matches?.('[data-field]')) {
+    if (el.matches?.('[data-collection-input]')) {
+      commitPlatformCollectionInput(root, el, true);
+      hasDeferredInput = false;
+    } else if (el.matches?.('[data-field]')) {
       commitElementField(state, el, { action, notify: false, root });
       hasDeferredInput = false;
     }

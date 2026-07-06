@@ -7,7 +7,6 @@ import { createStateSnapshot, hydrateStateRecord } from '../../platform/savedRec
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { commitAllFields } from '../../core/eventPipeline.js';
-import { handlePlatformFieldNavigation } from '../../core/focusManager.js';
 import { PlatformScrollManager } from '../../core/scrollManager.js';
 
 const numericFields = new Set(['fixtureQuantity','fixtureCustomDu','kValue','fillRatio','slopeCmM','pipeLengthM','heightDifferenceM','bends90','continuousFlow','pumpFlow','rainFlow']);
@@ -103,7 +102,8 @@ export function bindWastewaterCollections(root) {
       delete: deleteFixture
     }
   };
-  root.__tcWastewaterCollectionContext = { collections: collectionConfig, state };
+  root.__tcPlatformCollectionContext = { collections: collectionConfig, state };
+  root.__tcWastewaterCollectionContext = root.__tcPlatformCollectionContext;
 
   if (!root.__tcWastewaterCollectionInputBound) {
     root.__tcWastewaterCollectionInputBound = true;
@@ -116,14 +116,6 @@ export function bindWastewaterCollections(root) {
     };
     root.addEventListener('input', event => commitQuantity(event, false), true);
     root.addEventListener('blur', event => commitQuantity(event, true), true);
-    root.addEventListener('keydown', event => {
-      if (event.key !== 'Enter') return;
-      const input = event.target?.closest?.('[data-collection-input="fixtures"]');
-      if (!input || !root.contains(input)) return;
-      event.preventDefault();
-      commitQuantity(event, true);
-      handlePlatformFieldNavigation(root, input, event, { select: true, defer: false, preventDefault: false });
-    }, true);
   }
 
   const add = ({ element, event } = {}) => {

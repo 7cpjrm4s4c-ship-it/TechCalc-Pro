@@ -1,4 +1,12 @@
 
+## 1.3.2-dev.36 Phase 42E.2 – Legacy Keyboard Handler Removal
+
+- Zentrale Keyboard-Navigation weiter konsolidiert.
+- Collection-Inputs werden beim Enter zentral über die Event-Pipeline committed.
+- Legacy-Keyboard-Handler in Trinkwasser, Schmutzwasser, moduleRuntime und formActions entfernt.
+- Keine neue CSS-Hotfix-Datei.
+
+
 ## 1.3.2-dev.36 Phase 42E.1 – Central Keyboard Navigation Contract
 
 - Zentraler Focus-Graph für Tab/Shift+Tab/Enter/Shift+Enter erweitert.
