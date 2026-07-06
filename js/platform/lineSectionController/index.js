@@ -86,6 +86,30 @@ export function createLineSectionController({
       || root.querySelector(`[${dynamicDataAttr}="${dynamicAttr}"]`);
   };
 
+  const findSavedAnchor = root => {
+    if (!root?.querySelector || typeof window === 'undefined') return null;
+    const host = root.querySelector(`[${dynamicDataAttr}="${dynamicAttr}"]`);
+    return host?.closest?.('.card') || host || null;
+  };
+
+  const preserveSavedAnchor = (root, mutation) => {
+    const anchor = findSavedAnchor(root);
+    if (!anchor?.getBoundingClientRect || typeof window === 'undefined') return mutation?.();
+    const before = anchor.getBoundingClientRect().top;
+    const result = mutation?.();
+    const correct = () => {
+      if (!anchor.isConnected) return;
+      const after = anchor.getBoundingClientRect().top;
+      const delta = after - before;
+      if (Math.abs(delta) > 1 && typeof window.scrollBy === 'function') {
+        window.scrollBy({ left: 0, top: delta, behavior: 'auto' });
+      }
+    };
+    correct();
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(correct);
+    return result;
+  };
+
   const updateRows = (root, snapshot = state?.get?.() || {}) => {
     const host = findRowsHost(root);
     if (!host) return false;
@@ -107,10 +131,10 @@ export function createLineSectionController({
 
     const persist = (items, patch = {}, action = 'line:update') => {
       const next = Array.isArray(items) ? [...items] : [];
-      const commit = () => {
+      const commit = () => preserveSavedAnchor(root, () => {
         memory = next;
         state.set({ [listKey]: next, ...patch }, { action });
-      };
+      });
       return preserveSavedRecordMutation(commit);
     };
 
@@ -158,11 +182,11 @@ export function createLineSectionController({
       const item = read().find(entry => isSameId(entry.id, id));
       if (!item) return;
       if (isSameId(state.get()?.[activeIdKey], id)) {
-        preserveSavedRecordMutation(() => state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' }));
+        preserveSavedRecordMutation(() => preserveSavedAnchor(root, () => state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' })));
         return;
       }
       const hydrated = hydrateRecord?.({ item, currentState: state.get() }) || {};
-      preserveSavedRecordMutation(() => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' }));
+      preserveSavedRecordMutation(() => preserveSavedAnchor(root, () => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' })));
     };
 
     const deleteLine = id => {
@@ -180,7 +204,7 @@ export function createLineSectionController({
       if (!id) return;
       const currentExpanded = state.get()?.[expandedIdKey];
       const willOpen = !isSameId(currentExpanded, id);
-      preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' }));
+      preserveSavedRecordMutation(() => preserveSavedAnchor(root, () => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' })));
     };
 
     registerCentralActions(root, {

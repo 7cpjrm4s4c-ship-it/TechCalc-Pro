@@ -1,5 +1,5 @@
 const CACHE_NAME = 'techcalc-pro-1.3.2-dev.36';
-const CACHE_REVISION = '1.3.2-dev.36-1-3-2-dev-36-scroll-pipeline-isolation';
+const CACHE_REVISION = '1.3.2-dev.36-1-3-2-dev-36-phase42d-reference-contract-migration';
 const ASSETS = [
   './',
   './index.html',

@@ -2,7 +2,7 @@
   "phase": "37B.3",
   "name": "Service Worker Offline Runtime Hardening",
   "status": "passed",
-  "generatedAt": "2026-07-05T20:11:57.874Z",
+  "generatedAt": "2026-07-06T06:26:15.349Z",
   "assets": {
     "required": 212,
     "cached": 212,

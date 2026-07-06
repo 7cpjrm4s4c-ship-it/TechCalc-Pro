@@ -2,6 +2,7 @@ import { calculate } from './logic.js';
 import { createHeatRecoveryViewModel } from './viewModel.js';
 import { renderModeCard, renderInputs, renderOutputs, renderSavedRecords } from './view.js';
 import { esc } from '../../core/renderer.js';
+import { rltDeviceController } from './controller.js';
 
 function setIslandInner(root, selector, html){
   const island = root?.querySelector?.(selector);
@@ -94,11 +95,14 @@ export function updateHeatRecoveryDynamic(root, s, meta = {}) {
 
   setIslandInner(root, '[data-wrg-dynamic="outputs"]', renderOutputs(vm));
   if (savedStructural) {
-    syncSavedControls(root, s);
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = renderSavedRecords(vm);
-    const rows = wrapper.querySelector?.('.saved-record-list, .empty-state')?.outerHTML || '';
-    if (!updateSavedRows(root, rows)) setIslandInner(root, '[data-wrg-dynamic="rlt-devices"]', renderSavedRecords(vm));
+    rltDeviceController?.updateControls?.(root, s);
+    if (!rltDeviceController?.updateRows?.(root, s)) {
+      syncSavedControls(root, s);
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = renderSavedRecords(vm);
+      const rows = wrapper.querySelector?.('.saved-record-list, .empty-state')?.outerHTML || '';
+      if (!updateSavedRows(root, rows)) setIslandInner(root, '[data-wrg-dynamic="rlt-devices"]', renderSavedRecords(vm));
+    }
   }
   syncFields(root, s);
   root.__tcHeatRecoveryDynamic = { mode: s.mode, activeRltDeviceId: s.activeRltDeviceId, expandedRltDeviceId: s.expandedRltDeviceId };

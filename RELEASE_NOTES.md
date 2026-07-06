@@ -1,3 +1,12 @@
+## 1.3.2-dev.36-phase42d – Reference Contract Migration
+
+- Phase 42D auf Basis von 42C umgesetzt.
+- LineSectionController nutzt zentralen Saved-Anchor statt globaler Scroll-Restore-Ketten.
+- Lüftung und Pufferspeicher wieder auf vollen Referenzvertrag fuer Saved-Selection migriert.
+- Regenwasser-Fallback bereinigt und Selection-Hydration eingegrenzt.
+- WRG/Mischluft nutzt fuer Saved-Rows primaer den zentralen RLT-Controller.
+- Keine neuen CSS-Hotfixdateien.
+
 ## 1.3.2-dev.36 – Scroll Pipeline Isolation
 
 - Phase-36-Dokumentation und Scroll-Audit erneut abgeglichen.

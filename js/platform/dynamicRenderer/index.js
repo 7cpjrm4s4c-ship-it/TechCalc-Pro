@@ -168,7 +168,9 @@ export function createHeatingCoolingDynamicRenderer(options = {}) {
 
     if (lineStructural || appStructural || hasAnyChanged(changed, ['lineSections', 'activeLineSectionId', 'activeLineSectionName', 'expandedLineSectionId'])) {
       lineSectionController?.updateControls?.(root, s);
-      setInner(root, '[data-hc-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
+      if (!lineSectionController?.updateRows?.(root, s)) {
+        setInner(root, '[data-hc-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
+      }
     }
 
     root.__tcHeatingCoolingDynamic = {
@@ -222,19 +224,10 @@ export function createVentilationDynamicRenderer(options = {}) {
     const lineStructural = /^(line:|saved:)/.test(action);
     const appStructural = /^(record:|module:|replace|reset)/.test(action);
 
-    if (lineStructural && !appStructural) {
-      // 1.3.2-dev.36: Saved-record actions must not rebuild result/formula/air islands.
-      // Those islands can change height above the saved-card and create mobile scroll jumps.
-      setInputValue(root, key(s, 'PowerW'), fmtInput(active.powerW, 2));
-      setInputValue(root, key(s, 'VolumeFlowM3h'), fmtInput(active.volumeFlowM3h, 2));
-      setInputValue(root, key(s, 'DeltaT'), fmtInput(active.deltaT, 2));
-      setInputValue(root, key(s, 'SupplyTemp'), fmtInput(active.supplyTemp, 2));
-      setInputValue(root, key(s, 'RoomTemp'), fmtInput(active.roomTemp, 2));
-      lineSectionController?.updateControls?.(root, s);
-      setInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
-      root.__tcVentilationDynamic = { mode: s.mode, prefix: currentPrefix, calcTarget: active.calcTarget, savedOnly: true };
-      return;
-    }
+    // Phase 42D: Saved selections use the same structural update contract as
+    // the reference modules. If mode/target changed through hydration, the
+    // visible input/segment islands are refreshed; otherwise fields are synced
+    // in place and rows are updated by the central LineSectionController.
 
     if (root?.dataset) root.dataset.processAccent = processAccent;
     updateCardAccent(root, '[data-vent-dynamic="temperatures"]', moduleAccent);
@@ -269,7 +262,9 @@ export function createVentilationDynamicRenderer(options = {}) {
 
     if (lineStructural || appStructural || hasAnyChanged(changed, ['ventLineSections', 'activeVentLineSectionId', 'activeVentLineSectionName', 'expandedVentLineSectionId'])) {
       lineSectionController?.updateControls?.(root, s);
-      setInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
+      if (!lineSectionController?.updateRows?.(root, s)) {
+        setInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
+      }
     }
 
     root.__tcVentilationDynamic = {
@@ -517,27 +512,10 @@ export function createBufferStorageDynamicRenderer(options = {}) {
     const inputStructural = appStructural || hasAnyChanged(changed, inputStructuralFields) || previous.calculationMode !== s.calculationMode;
     const mediumStructural = appStructural || hasAnyChanged(changed, mediumStructuralFields) || previous.mediumMode !== s.mediumMode || previous.glycolType !== s.glycolType;
 
-    if (savedStructural && !appStructural) {
-      // Phase 42C: saved selection must hydrate inputs and current result, but
-      // must not replace the whole saved card. The central line-section
-      // controller owns controls and row markup.
-      syncFields(root, s);
-      lineSectionController?.updateControls?.(root, s);
-      if (!lineSectionController?.updateRows?.(root, s) && typeof renderSavedPanel === 'function') {
-        setIslandInner(root, '[data-buffer-dynamic="saved-records"]', renderSavedPanel(s, r, 'cyan'));
-      }
-      setIslandInner(root, '[data-buffer-dynamic="result"]', renderResult(s, r, 'cyan'));
-      root.__tcBufferStorageDynamic = {
-        calculationMode: s.calculationMode,
-        mediumMode: s.mediumMode,
-        glycolType: s.glycolType,
-        glycolConcentration: s.glycolConcentration,
-        activeBufferId: s.activeBufferId,
-        expandedBufferId: s.expandedBufferId,
-        savedOnly: true
-      };
-      return;
-    }
+    // Phase 42D: Saved selections follow the reference render contract.
+    // Structural input/medium islands are refreshed when hydration changes their
+    // controlling fields; saved rows are synchronized below through the central
+    // controller instead of replacing the full saved card.
 
     if (mediumStructural && typeof renderMedium === 'function') {
       setIslandInner(root, '[data-buffer-dynamic="medium"]', renderMedium(s, r, 'cyan'));
@@ -547,8 +525,11 @@ export function createBufferStorageDynamicRenderer(options = {}) {
       setIslandInner(root, '[data-buffer-dynamic="input-blocks"]', renderInputBlocks(s, r, 'cyan'));
     }
 
-    if (savedStructural && typeof renderSavedPanel === 'function') {
-      setIslandInner(root, '[data-buffer-dynamic="saved-records"]', renderSavedPanel(s, r, 'cyan'));
+    if (savedStructural) {
+      lineSectionController?.updateControls?.(root, s);
+      if (!lineSectionController?.updateRows?.(root, s) && typeof renderSavedPanel === 'function') {
+        setIslandInner(root, '[data-buffer-dynamic="saved-records"]', renderSavedPanel(s, r, 'cyan'));
+      }
     }
 
     syncFields(root, s);
@@ -612,11 +593,15 @@ export function createRainwaterDynamicRenderer(options = {}) {
       || previous.areaType !== s.areaType;
 
     if (savedStructural && !appStructural && !surfaceModeChanged && !selectionHydrationChanged) {
-      // Phase 42C: Regenwasser keeps the form island stable for plain saved
-      // select/delete/toggle, but still synchronizes controls, rows and result.
+      // Phase 42D: Plain saved select/deselect may need input hydration. The
+      // central anchor contract keeps the saved card stable while the form
+      // island is refreshed only for selection state changes, not for toggles.
+      if (/^(line:select|line:deselect|saved:load)$/.test(action) && typeof renderForm === 'function') {
+        setIslandInner(root, '[data-rw-dynamic="form"]', renderForm(s, r));
+      }
       lineSectionController?.updateControls?.(root, s);
       if (!lineSectionController?.updateRows?.(root, s)) {
-        if (!lineSectionController?.updateRows?.(root, s)) setIslandInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
+        setIslandInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
       }
       setIslandInner(root, '[data-rw-dynamic="result"]', renderResult(s, r));
       root.__tcRainwaterDynamic = {
