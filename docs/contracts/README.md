@@ -1,10 +1,10 @@
 # Architecture Contracts
 
-Status: Phase 43A structure baseline
+Status: Phase 43C baseline
 
-Dieser Ordner enthaelt die langfristigen Architekturvertraege von TechCalc Pro. Die Detailvertraege werden in Phase 43B aus den bestaetigten Phase-42-Ergebnissen konsolidiert.
+Dieser Ordner enthaelt die langfristigen Architekturvertraege von TechCalc Pro. Contracts beschreiben dauerhaft gueltige Regeln. Phasendokumente beschreiben, wann und wie diese Regeln eingefuehrt oder bestaetigt wurden.
 
-## Geplante Contracts
+## Aktive Contracts
 
 - `keyboard-contract.md`
 - `save-contract.md`
@@ -16,6 +16,6 @@ Dieser Ordner enthaelt die langfristigen Architekturvertraege von TechCalc Pro. 
 - `module-contract.md`
 - `pdf-contract.md`
 
-## Regel
+## Verbindlichkeit
 
-Contracts beschreiben dauerhaft gueltige Architekturregeln. Phasendokumente beschreiben die Umsetzung zu einem Zeitpunkt. Bei Konflikt gilt der aktuell bestaetigte Contract.
+Bei Konflikt zwischen alter Phase, alter Notiz und aktuellem Contract gilt der aktuelle Contract. Neue Architekturaenderungen muessen den betroffenen Contract zuerst pruefen und bei Bedarf aktualisieren.

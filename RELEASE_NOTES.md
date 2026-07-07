@@ -1,3 +1,10 @@
+### 1.3.2-dev.36 Phase 43C
+
+- Dauerhafte Architekturvertraege unter `docs/contracts/` angelegt.
+- Keyboard, Save/Edit, Selection, Render, State, Event, Theme, Module und PDF als aktive Contracts dokumentiert.
+- Phase-42-Entscheidungen aus historischen Phasendokumenten in langfristige Contract-Dateien ueberfuehrt.
+- Keine Runtime-/CSS-/Modulmechanismen geaendert.
+
 ### 1.3.2-dev.36 Phase 43B
 
 - Repository- und Dokumentationsstruktur bereinigt.
