@@ -1,3 +1,10 @@
+### 1.3.2-dev.36 Phase 43A
+
+- Engineering-Baseline gestartet.
+- `docs/engineering/` fuer Branching, Commits, Review, Regression, Release und Testing eingefuehrt.
+- `docs/contracts/` und `docs/adr/` als dauerhafte Architekturorte vorbereitet.
+- Keine Runtime-/CSS-/Modulmechanismen geaendert.
+
 ### 1.3.2-dev.36 Phase 42E.6
 
 - Phase 42 Architekturabschluss dokumentiert.

@@ -18,3 +18,7 @@ The project root should contain runtime/build files only. New phase notes, audit
 ## Phase 42 Architecture Consolidation
 
 The authoritative architecture consolidation documents are located in `docs/phases/phase-42*.md`. Root-level phase notes are not used as the source of truth.
+
+## Engineering Baseline
+
+Ab Phase 43 werden Entwicklungsstandards unter `docs/engineering/`, dauerhafte Architekturvertraege unter `docs/contracts/` und Architecture Decision Records unter `docs/adr/` gepflegt.

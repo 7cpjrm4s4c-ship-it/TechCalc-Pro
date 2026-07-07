@@ -38,3 +38,8 @@ Phase 42 ist als konsolidierte Architekturphase dokumentiert. Relevante Dateien:
 ## Archived root notes
 
 - `phase-39.md` – archivierte Phase-39B-Root-Notiz und Verweis auf Build-Artefakt-Hygiene.
+
+## Phase 43 – Engineering Baseline
+
+- `phase-43.md` – Hauptuebersicht Engineering Baseline.
+- `phase-43a-engineering-standards.md` – Engineering Standards und Prozessbaseline.
