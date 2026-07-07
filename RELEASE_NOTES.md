@@ -325,3 +325,4 @@ Light Theme Modul-Akzentfarben zentralisiert: Heizung Orange, Kälte Cyan, Puffe
 - h,x Outlet-Vertrag dokumentiert
 - Regenwasser Precommit-/Hydration-Vertrag eingeordnet
 - Modulpriorisierung fuer 42C/42D festgelegt
+- 1.3.2-dev.36 Phase 43E.1: Workspace-/Module-Außenrahmen in Light/Dark entfernt; Card- und Control-Rahmen bleiben unverändert.

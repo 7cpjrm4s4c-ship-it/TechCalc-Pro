@@ -56,3 +56,10 @@ Phase 43 etabliert eine dauerhafte Engineering-Baseline fuer TechCalc Pro. Nach 
 - Der zentrale Focus-Graph umfasst jetzt alle Modul-Buttons innerhalb des Modul-Roots, nicht nur `.tc-save-actions`.
 - Dadurch kann Tab/Shift+Tab/Enter/Shift+Enter nicht mehr an Trinkwasser-spezifischen Action-Buttons aus dem zentralen Vertrag herausfallen.
 - Globale Navigation/Header bleiben ausgeschlossen, weil der Focus-Graph pro Modul-Root gebunden wird.
+
+## 43E.1 – Workspace Outer Frame Cleanup
+
+Status: abgeschlossen.
+
+Der visuelle Rahmen auf den übergeordneten Workspace-/Module-Containern wurde entfernt. Layout-Container wie `app-main`, `module-view`, `module-content`, `tc-grid` und `grid-12` dürfen keine eigenen Rahmen, Outlines oder Shadows rendern. Sichtbare Rahmen bleiben ausschließlich den echten UI-Komponenten vorbehalten: Cards, Controls, Navigation und Fokuszuständen auf bedienbaren Elementen.
+

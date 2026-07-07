@@ -830,9 +830,9 @@ body::after,
 .app-main,
 .module-content,
 .module-view {
-  border-top: 0 !important;
-  border-bottom: 0 !important;
-  box-shadow: none;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
 }
 @media (max-width: 767px) {
   .app-shell {
@@ -984,3 +984,31 @@ body::after,
   position: relative;
   z-index: 1;
 }
+
+/* Phase 43E.1 — Workspace outer frame cleanup.
+   Module/workspace containers are layout primitives and must not render their own visual frame.
+   Cards, controls and navigation keep their dedicated borders/focus states. */
+.app-main,
+.module-view,
+.module-content,
+.tc-grid,
+.grid-12 {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+.app-main:focus,
+.app-main:focus-visible,
+.module-view:focus,
+.module-view:focus-visible,
+.module-content:focus,
+.module-content:focus-visible,
+.tc-grid:focus,
+.tc-grid:focus-visible,
+.grid-12:focus,
+.grid-12:focus-visible {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
