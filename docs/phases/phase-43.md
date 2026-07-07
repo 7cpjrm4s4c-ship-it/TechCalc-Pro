@@ -49,3 +49,10 @@ Phase 43 etabliert eine dauerhafte Engineering-Baseline fuer TechCalc Pro. Nach 
 - Keyboard, Save/Edit, Selection, Render, State, Event, Theme, Module und PDF als aktive Contracts dokumentiert.
 - Phase-42-Erkenntnisse aus historischen Phasendokumenten in langfristige Contract-Dateien ueberfuehrt.
 - Keine Runtime-/CSS-/Modulmechanismen geaendert.
+
+## Phase 43E - Trinkwasser Keyboard Regression Fix
+
+- Trinkwasser-Regression aus Phase 42E.5 nachgezogen.
+- Der zentrale Focus-Graph umfasst jetzt alle Modul-Buttons innerhalb des Modul-Roots, nicht nur `.tc-save-actions`.
+- Dadurch kann Tab/Shift+Tab/Enter/Shift+Enter nicht mehr an Trinkwasser-spezifischen Action-Buttons aus dem zentralen Vertrag herausfallen.
+- Globale Navigation/Header bleiben ausgeschlossen, weil der Focus-Graph pro Modul-Root gebunden wird.

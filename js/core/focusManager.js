@@ -10,14 +10,14 @@ const FOCUSABLE_SELECTOR = [
 
 // Phase 42E.1: one central keyboard traversal contract. Form fields remain
 // first-class citizens, but action controls that belong to a module workflow
-// (save/update, segments, saved cards and explicit platform focus controls) are
-// part of the same focus graph. This prevents Enter/Tab from dead-ending in the
-// save panel while avoiding global navigation/header buttons.
+// (save/update, module action buttons, segments, saved cards and explicit
+// platform focus controls) are part of the same focus graph. The graph is bound
+// per module root, so global navigation/header buttons remain outside it.
 const KEYBOARD_NAV_SELECTOR = [
   'input:not([type="hidden"]):not([disabled]):not([data-skip-platform-focus])',
   'textarea:not([disabled]):not([data-skip-platform-focus])',
   'select:not([disabled]):not([data-skip-platform-focus])',
-  '.tc-save-actions button:not([disabled])',
+  'button:not([disabled]):not([data-skip-platform-focus])',
   '[data-segment]:not([disabled])',
   '[data-saved-record-card]:not([aria-disabled="true"])',
   '[data-line-card]:not([aria-disabled="true"])',

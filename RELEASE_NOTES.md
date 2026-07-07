@@ -1,3 +1,9 @@
+### 1.3.2-dev.36 Phase 43E
+
+- Trinkwasser Tab-/Enter-Navigation nach Phase 42E.5 repariert.
+- Zentrale Keyboard-Navigation umfasst nun normale Modul-Action-Buttons innerhalb des Modul-Roots.
+- Keyboard-Contract-Audit erweitert, damit Modul-Buttons nicht aus dem Focus-Graph herausfallen.
+
 ### 1.3.2-dev.36 Phase 43C
 
 - Dauerhafte Architekturvertraege unter `docs/contracts/` angelegt.

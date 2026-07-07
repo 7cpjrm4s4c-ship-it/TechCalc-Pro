@@ -18,8 +18,9 @@ Tab-, Shift+Tab-, Enter- und Shift+Enter-Navigation werden zentral gesteuert. Ke
 3. Enter committed Feldwerte und navigiert zum naechsten Element.
 4. Shift+Enter navigiert zum vorherigen Element.
 5. Tab und Shift+Tab folgen dem zentralen Focus-Graph.
-6. Speichern-/Aktualisieren-Controls, Saved-Cards, Segment Controls und Collection-Inputs sind Teil des zentralen Focus-Graph.
-7. Collection-Inputs werden zentral ueber die Event-Pipeline committed.
+6. Speichern-/Aktualisieren-Controls, Modul-Action-Buttons, Saved-Cards, Segment Controls und Collection-Inputs sind Teil des zentralen Focus-Graph.
+7. Normale Modul-Buttons duerfen den Focus-Graph nicht verlassen; sie koennen per `data-skip-platform-focus` dokumentiert ausgeschlossen werden.
+8. Collection-Inputs werden zentral ueber die Event-Pipeline committed.
 
 ## Ausnahmen
 

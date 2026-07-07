@@ -87,7 +87,8 @@ const requiredFocusSnippets = [
   'focusNext',
   'handlePlatformFieldNavigation',
   '[data-saved-record-card]',
-  '[data-platform-focus]'
+  '[data-platform-focus]',
+  'button:not([disabled]):not([data-skip-platform-focus])'
 ];
 for (const snippet of requiredFocusSnippets) {
   if (!focusManager.includes(snippet)) {
