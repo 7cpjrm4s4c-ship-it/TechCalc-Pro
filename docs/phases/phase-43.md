@@ -12,9 +12,10 @@ Phase 43 etabliert eine dauerhafte Engineering-Baseline fuer TechCalc Pro. Nach 
 | Phase | Ziel | Status |
 | --- | --- | --- |
 | 43A – Engineering Standards | Entwicklungsprozess, Branching, Commits, Review, Regression, Release | abgeschlossen |
-| 43B – Architecture Contracts | dauerhafte Contracts aus Phase 42 herausloesen | geplant |
-| 43C – Engineering Audits | automatisierte Guards fuer Architekturregeln erweitern | geplant |
-| 43D – RC Baseline | Release-Candidate-Gates fuer 1.3.2 definieren und pruefen | geplant |
+| 43B – Repository Cleanup | Root- und Dokumentationsstruktur bereinigen | abgeschlossen |
+| 43C – Architecture Contracts | dauerhafte Contracts aus Phase 42 herausloesen | geplant |
+| 43D – Engineering Audits | automatisierte Guards fuer Architekturregeln erweitern | geplant |
+| 43E – RC Baseline | Release-Candidate-Gates fuer 1.3.2 definieren und pruefen | geplant |
 
 ## Grundregeln ab Phase 43
 
@@ -31,4 +32,13 @@ Phase 43 etabliert eine dauerhafte Engineering-Baseline fuer TechCalc Pro. Nach 
 - `docs/contracts/` als langfristiger Contract-Ort vorbereitet.
 - `docs/adr/` fuer Architecture Decision Records vorbereitet.
 - Engineering Guide, Branch-Strategie, Commit-Konvention, Review-, Regression-, Release- und Testing-Checklisten angelegt.
+- Keine Runtime-/CSS-/Modulmechanismen geaendert.
+
+
+## Ergebnis von 43B
+
+- Top-level `docs/` von detaillierten Legacy-Phase-Ordnern bereinigt.
+- Phase-36-/Phase-38-Detailartefakte nach `docs/archive/legacy-phase-docs/` verschoben.
+- Phase-40-/Phase-41-Dateien unter `docs/phases/` eingeordnet.
+- Archiv-README ergänzt.
 - Keine Runtime-/CSS-/Modulmechanismen geaendert.

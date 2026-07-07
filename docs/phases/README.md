@@ -43,3 +43,15 @@ Phase 42 ist als konsolidierte Architekturphase dokumentiert. Relevante Dateien:
 
 - `phase-43.md` – Hauptuebersicht Engineering Baseline.
 - `phase-43a-engineering-standards.md` – Engineering Standards und Prozessbaseline.
+- `phase-43b-repository-cleanup.md` – Repository- und Dokumentationsbereinigung.
+
+
+## Phase 40/41
+
+- `phase-40-rc11-pdf-pixel-perfect-qa.md` – RC.11 PDF Pixel Perfect QA.
+- `phase-40-project-format.md` – Projektdateiformat und `.tcproj`-Vertrag.
+- `phase-41-rc12-code-freeze.md` – RC.12 Code Freeze.
+
+## Archived detailed phase artefacts
+
+Detaillierte Phase-36-, Phase-38- und einzelne historische Zwischenartefakte wurden in Phase 43B nach `docs/archive/legacy-phase-docs/` verschoben. Die aktiven Zusammenfassungen bleiben unter `docs/phases/`.

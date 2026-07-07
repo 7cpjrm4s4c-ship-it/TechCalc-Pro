@@ -1,3 +1,10 @@
+### 1.3.2-dev.36 Phase 43B
+
+- Repository- und Dokumentationsstruktur bereinigt.
+- Detaillierte Phase-36-/Phase-38-Artefakte nach `docs/archive/legacy-phase-docs/` verschoben.
+- Phase-40-/Phase-41-Dokumente unter `docs/phases/` eingeordnet.
+- Keine Runtime-/CSS-/Modulmechanismen geaendert.
+
 ### 1.3.2-dev.36 Phase 43A
 
 - Engineering-Baseline gestartet.
