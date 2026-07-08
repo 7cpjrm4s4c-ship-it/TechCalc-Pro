@@ -11,6 +11,8 @@ const fail = message => {
 const finalCss = read('css/theme-light-final.css');
 const moduleTokens = read('css/module-accent-tokens.css');
 const index = read('index.html');
+const pkg = JSON.parse(read('package.json'));
+const expectedVersion = pkg.version;
 
 const requiredCssMarkers = [
   ['heating canonical token', '--tc-color-heating: #d96b1f'],
@@ -86,7 +88,7 @@ for (const marker of [
   if (!saveCss.includes(marker)) fail(`save manager missing global UI contract marker ${marker}`);
 }
 
-if (!index.includes('1.3.2-dev.38')) fail('index release notes/current version must be updated to 1.3.2-dev.38');
+if (!index.includes(expectedVersion)) fail(`index release notes/current version must be updated to ${expectedVersion}`);
 
 if (process.exitCode) process.exit(process.exitCode);
 console.log('Theme color matrix audit ok');

@@ -1,3 +1,10 @@
+### 1.3.2-rc.1 Release Candidate
+
+- Gate 10 nach Phase 44B/44B.5 fachlich geschlossen.
+- Browser-Konsole geprüft: keine JavaScript Runtime Errors, keine TypeError/ReferenceError, keine unhandled Promise Rejections sichtbar.
+- Formspree-Feedback funktioniert; Spam-Einstufung bei Chrome/Formspree als externer Zustellhinweis dokumentiert.
+- RC-Paket aus bereinigtem Development-Stand ohne dist/, node_modules/, Cache- oder Report-Artefakte erstellt.
+
 ### 1.3.2-dev.38 Phase 44B.5 – Browser Compliance
 
 - Content Security Policy explizit um `frame-src` und `child-src` für Netlify Preview/Toolbar ergänzt.
