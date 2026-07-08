@@ -410,9 +410,21 @@ function pickFields(source = {}, fields = []) {
 const HEAT_RECOVERY_FIELDS = ['wrgVolumeFlowM3h', 'outdoorTemp', 'outdoorRh', 'extractTemp', 'extractRh', 'efficiency', 'bypassPercent', 'activeRltDeviceId', 'activeRltDeviceName', 'expandedRltDeviceId', 'savedRltDevices'];
 const MIXED_AIR_FIELDS = ['mixingOutdoorVolumeFlowM3h', 'mixingOutdoorTemp', 'mixingOutdoorRh', 'mixingRecircVolumeFlowM3h', 'mixingRecircTemp', 'mixingRecircRh', 'activeMixedAirId', 'activeMixedAirName', 'expandedMixedAirId', 'savedMixedAirStates'];
 
+function hasLegacyMixedAirFields(source = {}) {
+  return MIXED_AIR_FIELDS.some(field => field !== 'savedMixedAirStates' && Object.prototype.hasOwnProperty.call(source || {}, field));
+}
+
 function isLegacyMixedAirRecord(item = {}) {
-  const mode = String(item.mode || item.state?.mode || item.inputState?.mode || '').toLowerCase();
-  return mode.includes('misch') || mode.includes('mixing') || mode === 'mix';
+  const inputState = item.inputState && typeof item.inputState === 'object' ? item.inputState : {};
+  const recordState = item.state && typeof item.state === 'object' ? item.state : {};
+  const mode = String(item.mode || recordState.mode || inputState.mode || '').toLowerCase();
+  if (mode.includes('misch') || mode.includes('mixing') || mode === 'mix') return true;
+
+  // Phase 45C.2: early 1.3.2 projects can contain Mischluft saved records
+  // without a reliable mode label. In that case the persisted input field set is
+  // the stable discriminator. WRG records never own mixingOutdoor*/mixingRecirc*
+  // fields, so they must be migrated to the dedicated mixed-air record store.
+  return hasLegacyMixedAirFields(inputState) || hasLegacyMixedAirFields(recordState) || hasLegacyMixedAirFields(item);
 }
 
 function normalizeLegacyMixedAirRecord(item = {}) {

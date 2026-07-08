@@ -1,11 +1,12 @@
 
-## 1.3.3-dev.4 – Phase 45C.1 Project Lifecycle Integration
+## 1.3.3-dev.5 – Phase 45C.2 Legacy Saved Records Migration
 
-- Mischluft-Modul vollständig in Speichern/Laden/Saved-Record-Workflow eingebunden.
-- Legacy-Migration für alte WRG/Mischluft-Projekte erweitert.
-- Regressionstest für Mischluft-Projektlebenszyklus ergänzt.
+- Legacy-Saved-Records-Migration für WRG/Mischluft ergänzt.
+- Mischluft-Records ohne zuverlässiges Mode-Label werden über Mischluft-Felder erkannt.
+- WRG-Saved-Records und Mischluft-Saved-Records werden beim Laden alter Projekte getrennt.
+- Regressionstest `phase45c2-legacy-saved-records-migration.test.mjs` ergänzt.
 
-### 1.3.3-dev.4 Phase 45C – Modulsplitting Implementierung
+### 1.3.3-dev.5 Phase 45C – Modulsplitting Implementierung
 
 - Kombimodul fachlich getrennt: `heat-recovery` bleibt Wärmerückgewinnung, `mixed-air` ist neues Mischluft-Modul.
 - Altprojekt-Migration ergänzt: Mischluftfelder aus historischen `heat-recovery`-States werden in `mixed-air` übernommen.
@@ -375,3 +376,11 @@ Light Theme Modul-Akzentfarben zentralisiert: Heizung Orange, Kälte Cyan, Puffe
 - Regenwasser Precommit-/Hydration-Vertrag eingeordnet
 - Modulpriorisierung fuer 42C/42D festgelegt
 - 1.3.2-dev.36 Phase 43E.1: Workspace-/Module-Außenrahmen in Light/Dark entfernt; Card- und Control-Rahmen bleiben unverändert.
+
+
+## 1.3.3-dev.5 – Phase 45C.2
+
+- Legacy-Saved-Records-Migration für WRG/Mischluft ergänzt.
+- Mischluft-Records ohne zuverlässiges Mode-Label werden über Mischluft-Felder erkannt.
+- WRG-Saved-Records und Mischluft-Saved-Records werden beim Laden alter Projekte getrennt.
+- Regressionstest `phase45c2-legacy-saved-records-migration.test.mjs` ergänzt.
