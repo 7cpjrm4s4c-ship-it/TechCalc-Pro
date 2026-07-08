@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.3-dev.1';
-const CACHE_REVISION = '1.3.3-dev.1-1-3-3-dev-1-phase-45a-modulsplitting-analyse';
+const CACHE_NAME = 'techcalc-pro-1.3.3-dev.2';
+const CACHE_REVISION = '1.3.3-dev.2-1-3-3-dev-2-phase-45b-modulsplitting-design-review';
 const ASSETS = [
   './',
   './index.html',

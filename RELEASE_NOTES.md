@@ -1,3 +1,11 @@
+### 1.3.3-dev.2 Phase 45B – Modulsplitting Design Review
+
+- Zielarchitektur für Trennung von WRG und Mischluft festgelegt.
+- Modul-IDs entschieden: `heat-recovery` bleibt WRG, `mixed-air` wird neues Mischluft-Modul.
+- ADR-0006 und WRG/Mischluft-Splitting-Contract ergänzt.
+- Migrations-, PDF-/Export- und Regressionserwartungen für 45C/45D definiert.
+- Keine funktionalen Änderungen an App, Berechnungslogik, Persistenz, PDF, PWA oder UI.
+
 ### 1.3.3-dev.1 Phase 45A – Modulsplitting-Analyse
 
 - Version 1.3.2 fachlich abgeschlossen und 1.3.3 als Modulsplitting-Stream gestartet.
