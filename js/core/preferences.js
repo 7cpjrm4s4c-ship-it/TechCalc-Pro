@@ -1,3 +1,4 @@
+import { logger } from './logger.js';
 const STORAGE_KEY = 'techcalc-preferences';
 
 const defaults = {
@@ -15,7 +16,7 @@ function readStoredPreferences() {
     const parsed = JSON.parse(raw);
     return parsed && typeof parsed === 'object' ? parsed : {};
   } catch (error) {
-    console.warn('Einstellungen konnten nicht geladen werden.', error);
+    logger.warn('Einstellungen konnten nicht geladen werden.', error, { module: 'preferences' });
     return {};
   }
 }
@@ -24,7 +25,7 @@ function writeStoredPreferences(next) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   } catch (error) {
-    console.warn('Einstellungen konnten nicht gespeichert werden.', error);
+    logger.warn('Einstellungen konnten nicht gespeichert werden.', error, { module: 'preferences' });
   }
 }
 

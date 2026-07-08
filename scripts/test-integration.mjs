@@ -33,7 +33,9 @@ const commands = [
   ['node', ['scripts/audit-low-end-mobile-rendering-phase38e.mjs']],
   ['node', ['scripts/audit-esbuild-minification-phase38f.mjs']],
   ['node', ['scripts/audit-release-package-hygiene-phase38g.mjs']],
-  ['node', ['scripts/audit-netlify-npm-registry-phase38h.mjs']]
+  ['node', ['scripts/audit-netlify-npm-registry-phase38h.mjs']],
+  ['node', ['scripts/audit-cleanup-phase44b.mjs']],
+  ['node', ['scripts/audit-runtime-diagnostics-phase44b4.mjs']]
 ];
 
 for (const [cmd, args] of commands) {

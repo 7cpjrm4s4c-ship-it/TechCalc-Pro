@@ -2,7 +2,7 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-07-07T10:46:07.516Z",
+  "generatedAt": "2026-07-07T20:13:07.129Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
@@ -471,7 +471,6 @@
         "config.js",
         "controller.js",
         "index.js",
-        "lineModel.js",
         "logic.js",
         "results.js",
         "schema.js",
@@ -481,7 +480,7 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 833,
+        "lineCount": 816,
         "controllerAddEventListeners": 3,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
@@ -537,7 +536,6 @@
         "js/modules/heat-recovery/logic.js",
         "js/modules/ventilation/config.js",
         "js/modules/ventilation/logic.js",
-        "js/modules/wastewater/lineModel.js",
         "js/modules/wastewater/logic.js"
       ]
     },

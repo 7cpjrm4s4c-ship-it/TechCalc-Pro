@@ -1,3 +1,4 @@
+import { logger } from '../../core/logger.js';
 import { trackGlobalEventListener } from '../../core/eventManager.js';
 
 const SETTINGS_UI_STORAGE_KEY = 'techcalc-settings-ui';
@@ -9,7 +10,7 @@ function readStorageJson(key, fallback = {}) {
     const parsed = JSON.parse(raw);
     return parsed && typeof parsed === 'object' ? parsed : fallback;
   } catch (error) {
-    console.warn('Gespeicherte UI-Einstellungen konnten nicht geladen werden.', error);
+    logger.warn('Gespeicherte UI-Einstellungen konnten nicht geladen werden.', error, { module: 'settings' });
     return fallback;
   }
 }
@@ -18,7 +19,7 @@ function writeStorageJson(key, value) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
-    console.warn('UI-Einstellungen konnten nicht gespeichert werden.', error);
+    logger.warn('UI-Einstellungen konnten nicht gespeichert werden.', error, { module: 'settings' });
   }
 }
 

@@ -1,3 +1,4 @@
+import { logger } from '../../core/logger.js';
 import { markPerformance, startPerformanceSpan } from './performanceController.js';
 
 let serviceWorkerControllerInitialized = false;
@@ -41,7 +42,7 @@ function ensureUpdateBanner(windowRef, documentRef, waitingWorker) {
         updateButton.disabled = true;
         updateButton.textContent = 'Aktualisiere …';
       } catch (error) {
-        console.warn('Service worker update could not be activated:', error);
+        logger.warn('Service worker update could not be activated.', error, { module: 'service-worker' });
         windowRef.location.reload();
       }
     };
@@ -115,7 +116,7 @@ export function initializeServiceWorkerController(options = {}) {
       })
       .catch(error => {
         finishRegistration({ status: 'error', error: error?.message || String(error) });
-        console.warn('Service worker registration failed:', error);
+        logger.warn('Service worker registration failed.', error, { module: 'service-worker' });
       });
   });
 

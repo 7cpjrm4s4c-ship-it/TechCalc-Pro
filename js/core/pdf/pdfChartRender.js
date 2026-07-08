@@ -1,3 +1,4 @@
+import { logger } from '../logger.js';
 
 function cropCanvasToContent(sourceCanvas, { padding = 18, threshold = 246 } = {}) {
   const width = sourceCanvas.width;
@@ -72,7 +73,7 @@ export async function normalizeImageToJpeg(source, { maxWidth = 512, maxHeight =
     ctx.drawImage(img, 0, 0, width, height);
     return { dataUrl: canvas.toDataURL('image/jpeg', quality), width, height };
   } catch (error) {
-    console.warn('PDF-Bild konnte nicht vorbereitet werden.', error);
+    logger.warn('PDF-Bild konnte nicht vorbereitet werden.', error, { module: 'pdf-chart' });
     return null;
   }
 }
@@ -93,7 +94,7 @@ export async function canvasToJpeg(canvas, { maxWidth = 1200, maxHeight = 700, q
     const cropped = cropCanvasToContent(out, { padding: 22, threshold: 248 });
     return { dataUrl: cropped.toDataURL('image/jpeg', quality), width: cropped.width, height: cropped.height };
   } catch (error) {
-    console.warn('PDF-Canvas konnte nicht gerendert werden.', error);
+    logger.warn('PDF-Canvas konnte nicht gerendert werden.', error, { module: 'pdf-chart' });
     return null;
   }
 }
@@ -145,7 +146,7 @@ export async function svgToJpeg(svgMarkup, { maxWidth = 1400, maxHeight = 960, q
     const cropped = cropCanvasToContent(canvas, { padding: 24, threshold: 248 });
     return { dataUrl: cropped.toDataURL('image/jpeg', quality), width: cropped.width, height: cropped.height };
   } catch (error) {
-    console.warn('PDF-SVG konnte nicht gerendert werden.', error);
+    logger.warn('PDF-SVG konnte nicht gerendert werden.', error, { module: 'pdf-chart' });
     return null;
   }
 }

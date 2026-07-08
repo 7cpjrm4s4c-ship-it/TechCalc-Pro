@@ -1,3 +1,4 @@
+import { logger } from '../../core/logger.js';
 function escapeHtml(value = '') {
   return String(value).replace(/[&<>"]/g, char => ({
     '&': '&amp;',
@@ -152,7 +153,7 @@ export async function loadReleaseNotes({
     renderReleaseNotes(notes, host);
     return true;
   } catch (error) {
-    console.warn('Release Notes konnten nicht dynamisch geladen werden.', error);
+    logger.warn('Release Notes konnten nicht dynamisch geladen werden.', error, { module: 'release-notes' });
     if (fallback) {
       const notes = parseReleaseNotes(fallback.textContent || '');
       syncDisplayedVersion(appVersion, notes);

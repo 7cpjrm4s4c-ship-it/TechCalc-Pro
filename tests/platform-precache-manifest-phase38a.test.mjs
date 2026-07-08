@@ -52,7 +52,7 @@ assert.deepEqual(missingAssets, [], 'generated precache manifest must include ev
 assert.deepEqual(staleRuntimeAssets, [], 'generated precache manifest must not keep stale JS/CSS entries');
 assert.equal(assets.length, assetSet.size, 'generated precache manifest must not contain duplicate assets');
 assert.match(read('package.json'), /"precache": "node scripts\/generate-precache-manifest\.mjs"/);
-assert.match(read('package.json'), /"build": "node scripts\/generate-precache-manifest\.mjs && node scripts\/check-js-imports\.mjs"/);
+assert.match(read('package.json'), /"build": "node scripts\/generate-precache-manifest\.mjs && node scripts\/check-js-imports\.mjs(?: && node scripts\/audit-cleanup-phase44b\.mjs)?(?: && node scripts\/audit-runtime-diagnostics-phase44b4\.mjs)?"/);
 
 const report = {
   phase: '38A',

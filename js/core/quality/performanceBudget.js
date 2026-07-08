@@ -1,3 +1,4 @@
+import { logger } from '../logger.js';
 export const performanceBudget = Object.freeze({
   version: '1.3.2-dev.2-phase5',
   maxInitialBlockingMs: 150,
@@ -21,7 +22,7 @@ export function measureBudget(name, fn, { budgetMs = performanceBudget.maxModule
   const end = api?.now?.() ?? Date.now();
   const durationMs = end - start;
   if (warn && durationMs > budgetMs) {
-    console.warn(`[TechCalc Budget] ${name} dauerte ${durationMs.toFixed(1)} ms, Budget ${budgetMs} ms.`);
+    logger.warn(`${name} dauerte ${durationMs.toFixed(1)} ms, Budget ${budgetMs} ms.`, undefined, { module: 'performance-budget' });
   }
   return { value, durationMs, withinBudget: durationMs <= budgetMs };
 }

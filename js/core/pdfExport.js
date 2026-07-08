@@ -1,3 +1,4 @@
+import { logger } from './logger.js';
 import { getProjectMeta, setProjectMeta, downloadProjectFile, readProjectFile, applyProjectData, getOpenedFileName, saveSessionSnapshot } from './projectStorage.js';
 import { collectCurrentModule, pdfFileName } from './pdf/pdfDataMapping.js';
 import { GlobalPdfReport } from './pdf/pdfLayout.js';
@@ -93,7 +94,7 @@ async function openProjectWithNativePicker() {
     return true;
   } catch (error) {
     if (error?.name === 'AbortError') return true;
-    console.warn('Native Projekt-Dateiauswahl nicht verfügbar, verwende Input-Fallback.', error);
+    logger.warn('Native Projekt-Dateiauswahl nicht verfügbar, verwende Input-Fallback.', error, { module: 'project-file' });
     return false;
   }
 }
@@ -117,7 +118,7 @@ function persistCompanyLogo(dataUrl = '', fileName = '') {
     else localStorage.removeItem(PDF_COMPANY_LOGO_STORAGE_KEY);
     if (fileName) localStorage.setItem(`${PDF_COMPANY_LOGO_STORAGE_KEY}-name`, fileName);
     else if (!dataUrl) localStorage.removeItem(`${PDF_COMPANY_LOGO_STORAGE_KEY}-name`);
-  } catch (error) { console.warn('Firmenlogo konnte nicht dauerhaft gespeichert werden.', error); }
+  } catch (error) { logger.warn('Firmenlogo konnte nicht dauerhaft gespeichert werden.', error, { module: 'project-storage' }); }
 }
 
 function ensureCompanyLogoPreview() {
@@ -264,7 +265,7 @@ function initProjectSettings() {
       const openedNative = await openProjectWithNativePicker();
       if (!openedNative) document.getElementById('openProjectFile')?.click();
     } catch (error) {
-      console.error('Projekt konnte nicht geöffnet werden.', error);
+      logger.error('Projekt konnte nicht geöffnet werden.', error, { module: 'project-file' });
       alert(error.message || 'Projekt konnte nicht geöffnet werden.');
     }
   });
@@ -274,7 +275,7 @@ function initProjectSettings() {
     try {
       await applySelectedProjectFile(file);
     } catch (error) {
-      console.error('Projekt konnte nicht geöffnet werden.', error);
+      logger.error('Projekt konnte nicht geöffnet werden.', error, { module: 'project-file' });
       alert(error.message || 'Projekt konnte nicht geöffnet werden.');
     } finally { event.target.value = ''; }
   });
@@ -313,7 +314,7 @@ export function initPdfExport({ modules, currentRoute: routeGetter } = {}) {
       const moduleData = collectCurrentModule(modules, routeGetter);
       await downloadNativePdf(project, moduleData);
     } catch (error) {
-      console.error('PDF-Export fehlgeschlagen.', error);
+      logger.error('PDF-Export fehlgeschlagen.', error, { module: 'pdf-export' });
       alert('PDF-Export konnte nicht erstellt werden. Bitte Browser-Konsole prüfen.');
     }
   });

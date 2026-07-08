@@ -1,3 +1,4 @@
+import { logger } from './logger.js';
 import { state as heatingCoolingState } from '../modules/heating-cooling/state.js';
 import { readLineSections, writeLineSections } from '../modules/heating-cooling/index.js';
 import { state as ventilationState } from '../modules/ventilation/state.js';
@@ -52,7 +53,7 @@ function persistPdfLogo(logo = '', name = '') {
     if (name) localStorage.setItem(PDF_COMPANY_LOGO_NAME_STORAGE_KEY, name);
     else if (!logo) localStorage.removeItem(PDF_COMPANY_LOGO_NAME_STORAGE_KEY);
   } catch (error) {
-    console.warn('Firmenlogo konnte nicht dauerhaft gespeichert werden.', error);
+    logger.warn('Firmenlogo konnte nicht dauerhaft gespeichert werden.', error, { module: 'project-storage' });
   }
 }
 
@@ -61,7 +62,7 @@ export function saveSessionSnapshot() {
     sessionStorage.setItem(SESSION_SNAPSHOT_KEY, JSON.stringify(collectProjectData()));
     return true;
   } catch (error) {
-    console.warn('Session-Sicherung konnte nicht geschrieben werden.', error);
+    logger.warn('Session-Sicherung konnte nicht geschrieben werden.', error, { module: 'project-storage' });
     return false;
   }
 }
@@ -74,7 +75,7 @@ export function restoreSessionSnapshot(options = {}) {
     applyProjectData(data, { fileName: options.fileName || openedFileName });
     return true;
   } catch (error) {
-    console.warn('Session-Sicherung konnte nicht wiederhergestellt werden.', error);
+    logger.warn('Session-Sicherung konnte nicht wiederhergestellt werden.', error, { module: 'project-storage' });
     return false;
   }
 }
@@ -507,7 +508,7 @@ export async function downloadProjectFile() {
       return true;
     } catch (error) {
       if (error?.name === 'AbortError') return false;
-      console.warn('Dateiauswahl nicht verfügbar, Projekt wird als Download gespeichert.', error);
+      logger.warn('Dateiauswahl nicht verfügbar, Projekt wird als Download gespeichert.', error, { module: 'project-storage' });
     }
   }
 

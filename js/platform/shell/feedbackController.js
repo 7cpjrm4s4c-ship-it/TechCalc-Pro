@@ -1,3 +1,4 @@
+import { logger } from '../../core/logger.js';
 const DEFAULT_FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
 const FEEDBACK_OFFLINE_QUEUE_KEY = 'techcalc.feedback.offlineQueue.v1';
 
@@ -137,7 +138,7 @@ export function initializeFeedbackController({
       if (subject) subject.value = 'TechCalc Pro Feedback';
       setStatus('Feedback wurde gesendet. Danke!', 'success');
     } catch (error) {
-      console.error('Feedback konnte nicht gesendet werden:', error);
+      logger.error('Feedback konnte nicht gesendet werden.', error, { module: 'feedback' });
       saveForLater(payload, 'send-failed');
     } finally {
       if (submit) {

@@ -1,7 +1,7 @@
 {
   "phase": "31C",
   "title": "Module smoke test audit",
-  "generatedAt": "2026-07-07T10:46:07.406Z",
+  "generatedAt": "2026-07-07T20:13:06.997Z",
   "central": {
     "enterTab": true,
     "scroll": true,
@@ -417,7 +417,6 @@
         "config.js",
         "controller.js",
         "index.js",
-        "lineModel.js",
         "logic.js",
         "results.js",
         "schema.js",

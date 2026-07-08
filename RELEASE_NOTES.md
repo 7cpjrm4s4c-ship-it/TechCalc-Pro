@@ -1,3 +1,10 @@
+### 1.3.2-dev.37 Phase 44B – Performance & Cleanup
+
+- Gate 10 als Phase 44B umgesetzt: Dead-Code-/Duplicate-Audit, Build-Verifikation und Runtime-Diagnostics.
+- Entfernt: nicht referenzierter Debug-Panel-Code und altes Wastewater-LineModel ohne Runtime-, Registry- oder aktuelle Dokumentationsbindung.
+- Zentraler Logger `js/core/logger.js` eingeführt; Runtime-Warnungen und Fehler laufen nicht mehr direkt über verstreute `console.*`-Aufrufe.
+- Build-Gate erweitert um Cleanup- und Runtime-Diagnostics-Audits.
+
 ### 1.3.2-dev.36 Phase 43E
 
 - Trinkwasser Tab-/Enter-Navigation nach Phase 42E.5 repariert.

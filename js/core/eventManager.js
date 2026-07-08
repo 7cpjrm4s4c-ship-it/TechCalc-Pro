@@ -1,3 +1,4 @@
+import { logger } from './logger.js';
 const registry = new Set();
 
 function normalizeOptions(options) {
@@ -43,7 +44,7 @@ export function createEventScope(name = 'platform-event-scope') {
     dispose() {
       while (cleanups.length) {
         try { cleanups.pop()?.(); } catch (error) {
-          console.warn(`Event-Scope ${name} konnte nicht vollständig bereinigt werden.`, error);
+          logger.warn(`Event-Scope ${name} konnte nicht vollständig bereinigt werden.`, error, { module: 'event-manager' });
         }
       }
     },

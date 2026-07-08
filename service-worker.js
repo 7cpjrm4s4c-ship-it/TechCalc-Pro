@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.2-dev.36';
-const CACHE_REVISION = '1.3.2-dev.36-1-3-2-dev-36-phase-43e';
+const CACHE_NAME = 'techcalc-pro-1.3.2-dev.37';
+const CACHE_REVISION = '1.3.2-dev.37-1-3-2-dev-37-phase-44b-performance-cleanup';
 const ASSETS = [
   './',
   './index.html',
@@ -43,6 +43,7 @@ const ASSETS = [
   './js/core/focusManager.js',
   './js/core/formActions.js',
   './js/core/formSchema.js',
+  './js/core/logger.js',
   './js/core/moduleContract.js',
   './js/core/moduleDefinition.js',
   './js/core/moduleLifecycleAdapter.js',
@@ -179,7 +180,6 @@ const ASSETS = [
   './js/modules/wastewater/config.js',
   './js/modules/wastewater/controller.js',
   './js/modules/wastewater/index.js',
-  './js/modules/wastewater/lineModel.js',
   './js/modules/wastewater/logic.js',
   './js/modules/wastewater/results.js',
   './js/modules/wastewater/schema.js',
@@ -189,7 +189,6 @@ const ASSETS = [
   './js/modules/wastewater/viewModel.js',
   './js/platform/collectionModel/index.js',
   './js/platform/collectionRenderer/index.js',
-  './js/platform/debugPanel/index.js',
   './js/platform/dynamicRenderer/index.js',
   './js/platform/lineSectionController/index.js',
   './js/platform/moduleRenderer/index.js',

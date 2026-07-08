@@ -1,3 +1,4 @@
+import { logger } from './logger.js';
 import { modules } from './registry.js';
 import { initRouter, currentRoute, navigate } from './router.js';
 import { renderNavigation, renderQuickAccessSettings } from './navigation.js';
@@ -25,7 +26,7 @@ import { initializePerformanceController, markPerformance, measurePerformance, s
 import { initializeSaveEditModeSync } from './saveEditModeSync.js';
 import { initializeLayoutStabilityController } from '../platform/shell/layoutStabilityController.js';
 
-const APP_VERSION = '1.3.2-dev.36';
+const APP_VERSION = '1.3.2-dev.37';
 initializeLayoutStabilityController();
 initializePerformanceController({ appVersion: APP_VERSION });
 const appInitStartMark = markPerformance('app:init:start', { appVersion: APP_VERSION });
@@ -68,7 +69,7 @@ function preloadLazyModule(config, path) {
   if (!config?.id || preloadedModuleIds.has(config.id)) return;
   preloadedModuleIds.add(config.id);
   loadLazyModule(config, path).catch(error => {
-    console.warn(`Modul konnte nicht vorgeladen werden: ${config.id}`, error);
+    logger.warn(`Modul konnte nicht vorgeladen werden: ${config.id}`, error, { module: 'app' });
   });
 }
 
@@ -259,7 +260,7 @@ function ensurePdfExport() {
       .then(({ initPdfExport }) => initPdfExport({ modules, currentRoute }))
       .catch(error => {
         pdfExportReady = null;
-        console.error('PDF export initialization failed:', error);
+        logger.error('PDF export initialization failed.', error, { module: 'pdf-export' });
       });
   }
   return pdfExportReady;
