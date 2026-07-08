@@ -1,3 +1,10 @@
+### 1.3.2-dev.38 Phase 44B.5 – Browser Compliance
+
+- Content Security Policy explizit um `frame-src` und `child-src` für Netlify Preview/Toolbar ergänzt.
+- Deprecated `mobile-web-app-capable` bleibt aus dem App-Shell-HTML entfernt; iOS-Standalone erfolgt über Apple-Meta und Web App Manifest.
+- Browser-Compliance-Audit ergänzt und in `lint` eingebunden.
+- Phasenstandard Analyse → Design Review → Implementierung → Regression → Dokumentation als verbindlicher Ablauf dokumentiert.
+
 ### 1.3.2-dev.37 Phase 44B – Performance & Cleanup
 
 - Gate 10 als Phase 44B umgesetzt: Dead-Code-/Duplicate-Audit, Build-Verifikation und Runtime-Diagnostics.

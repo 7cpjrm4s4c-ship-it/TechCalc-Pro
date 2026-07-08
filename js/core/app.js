@@ -26,7 +26,7 @@ import { initializePerformanceController, markPerformance, measurePerformance, s
 import { initializeSaveEditModeSync } from './saveEditModeSync.js';
 import { initializeLayoutStabilityController } from '../platform/shell/layoutStabilityController.js';
 
-const APP_VERSION = '1.3.2-dev.37';
+const APP_VERSION = '1.3.2-dev.38';
 initializeLayoutStabilityController();
 initializePerformanceController({ appVersion: APP_VERSION });
 const appInitStartMark = markPerformance('app:init:start', { appVersion: APP_VERSION });
