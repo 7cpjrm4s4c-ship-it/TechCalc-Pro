@@ -1,6 +1,7 @@
 import { calculate } from './logic.js';
 import { createMixedAirViewModel } from './viewModel.js';
 import { renderOutputs } from './view.js';
+import { mixedAirController, mixedAirSaveCard } from './controller.js';
 import { esc } from '../../core/renderer.js';
 
 function setIslandInner(root, selector, html){
@@ -25,7 +26,8 @@ function syncFields(root, s = {}){
     'mixingOutdoorRh',
     'mixingRecircVolumeFlowM3h',
     'mixingRecircTemp',
-    'mixingRecircRh'
+    'mixingRecircRh',
+    'activeMixedAirName'
   ].forEach(key => setInputValue(root, key, s[key] ?? ''));
 }
 
@@ -36,6 +38,13 @@ export function updateMixedAirDynamic(root, s, meta = {}) {
     setIslandInner(root, '[data-mixed-air-dynamic="formula"]', esc(vm.formula));
   }
   setIslandInner(root, '[data-mixed-air-dynamic="outputs"]', renderOutputs(vm));
+  const savedChanged = changed.some(key => ['savedMixedAirStates','activeMixedAirId','activeMixedAirName','expandedMixedAirId'].includes(key));
+  if (savedChanged) {
+    mixedAirController.updateControls(root, s);
+    if (!mixedAirController.updateRows(root, s)) {
+      setIslandInner(root, '[data-mixed-air-dynamic="saved-panel"]', mixedAirSaveCard(s));
+    }
+  }
   syncFields(root, s);
 }
 

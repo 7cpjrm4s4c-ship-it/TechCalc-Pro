@@ -1,4 +1,11 @@
-### 1.3.3-dev.3 Phase 45C – Modulsplitting Implementierung
+
+## 1.3.3-dev.4 – Phase 45C.1 Project Lifecycle Integration
+
+- Mischluft-Modul vollständig in Speichern/Laden/Saved-Record-Workflow eingebunden.
+- Legacy-Migration für alte WRG/Mischluft-Projekte erweitert.
+- Regressionstest für Mischluft-Projektlebenszyklus ergänzt.
+
+### 1.3.3-dev.4 Phase 45C – Modulsplitting Implementierung
 
 - Kombimodul fachlich getrennt: `heat-recovery` bleibt Wärmerückgewinnung, `mixed-air` ist neues Mischluft-Modul.
 - Altprojekt-Migration ergänzt: Mischluftfelder aus historischen `heat-recovery`-States werden in `mixed-air` übernommen.

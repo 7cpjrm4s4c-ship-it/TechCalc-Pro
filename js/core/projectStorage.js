@@ -408,13 +408,34 @@ function pickFields(source = {}, fields = []) {
 }
 
 const HEAT_RECOVERY_FIELDS = ['wrgVolumeFlowM3h', 'outdoorTemp', 'outdoorRh', 'extractTemp', 'extractRh', 'efficiency', 'bypassPercent', 'activeRltDeviceId', 'activeRltDeviceName', 'expandedRltDeviceId', 'savedRltDevices'];
-const MIXED_AIR_FIELDS = ['mixingOutdoorVolumeFlowM3h', 'mixingOutdoorTemp', 'mixingOutdoorRh', 'mixingRecircVolumeFlowM3h', 'mixingRecircTemp', 'mixingRecircRh'];
+const MIXED_AIR_FIELDS = ['mixingOutdoorVolumeFlowM3h', 'mixingOutdoorTemp', 'mixingOutdoorRh', 'mixingRecircVolumeFlowM3h', 'mixingRecircTemp', 'mixingRecircRh', 'activeMixedAirId', 'activeMixedAirName', 'expandedMixedAirId', 'savedMixedAirStates'];
+
+function isLegacyMixedAirRecord(item = {}) {
+  const mode = String(item.mode || item.state?.mode || item.inputState?.mode || '').toLowerCase();
+  return mode.includes('misch') || mode.includes('mixing') || mode === 'mix';
+}
+
+function normalizeLegacyMixedAirRecord(item = {}) {
+  const inputState = pickFields(item.inputState || item.state || item, MIXED_AIR_FIELDS);
+  const id = item.id || `mixed-air-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  return {
+    ...item,
+    id,
+    name: item.name || 'Mischluft',
+    mode: 'Mischluft',
+    state: inputState,
+    inputState
+  };
+}
 
 function splitLegacyHeatRecoveryProjectModule(moduleData = {}) {
   const normalized = normalizeHeatRecoveryProjectModule(moduleData);
+  const rltDevices = Array.isArray(normalized.rltDevices) ? normalized.rltDevices : [];
+  const mixedAirRecords = rltDevices.filter(isLegacyMixedAirRecord).map(normalizeLegacyMixedAirRecord);
+  const heatRecoveryRecords = rltDevices.filter(item => !isLegacyMixedAirRecord(item));
   return {
-    heatRecovery: { state: pickFields(normalized.state, HEAT_RECOVERY_FIELDS), rltDevices: normalized.rltDevices },
-    mixedAir: { state: pickFields(normalized.state, MIXED_AIR_FIELDS) }
+    heatRecovery: { state: pickFields(normalized.state, HEAT_RECOVERY_FIELDS), rltDevices: heatRecoveryRecords },
+    mixedAir: { state: { ...pickFields(normalized.state, MIXED_AIR_FIELDS), ...(mixedAirRecords.length ? { savedMixedAirStates: mixedAirRecords } : {}) } }
   };
 }
 
@@ -457,6 +478,8 @@ export function collectProjectData() {
 
 export function applyProjectData(data = {}, { fileName = '' } = {}) {
   const modules = data.modules || {};
+  const legacyHeatRecoveryModule = modules['heat-recovery'] || modules.wrg || modules['wrg-mixed-air'];
+  const incomingMixedAirModule = modules['mixed-air'] || modules.mixedAir || modules['mixed-air-calculation'];
   const incomingMeta = { ...DEFAULT_META, ...(data.meta || {}) };
   setProjectMeta(incomingMeta);
   if (incomingMeta.companyLogo) persistPdfLogo(incomingMeta.companyLogo, incomingMeta.companyLogoName || '');
@@ -471,14 +494,14 @@ export function applyProjectData(data = {}, { fileName = '' } = {}) {
   ventilationLineSectionController.write(modules.ventilation?.lineSections || []);
   if (modules['pipe-sizing']?.state) pipeSizingState.replace(modules['pipe-sizing'].state, { notify: false });
   if (modules['unit-converter']?.state) unitConverterState.replace(modules['unit-converter'].state, { notify: false });
-  if (modules['heat-recovery']) {
-    const splitModule = splitLegacyHeatRecoveryProjectModule(modules['heat-recovery']);
+  if (legacyHeatRecoveryModule) {
+    const splitModule = splitLegacyHeatRecoveryProjectModule(legacyHeatRecoveryModule);
     heatRecoveryState.replace(splitModule.heatRecovery.state, { notify: false });
     rltDeviceController.write(splitModule.heatRecovery.rltDevices);
-    const mixedAirModule = normalizeMixedAirProjectModule(modules['mixed-air'], splitModule.mixedAir);
+    const mixedAirModule = normalizeMixedAirProjectModule(incomingMixedAirModule, splitModule.mixedAir);
     if (Object.keys(mixedAirModule.state).length) mixedAirState.replace(mixedAirModule.state, { notify: false });
-  } else if (modules['mixed-air']) {
-    const mixedAirModule = normalizeMixedAirProjectModule(modules['mixed-air']);
+  } else if (incomingMixedAirModule) {
+    const mixedAirModule = normalizeMixedAirProjectModule(incomingMixedAirModule);
     if (Object.keys(mixedAirModule.state).length) mixedAirState.replace(mixedAirModule.state, { notify: false });
   }
   if (modules['hx-diagram']?.state) hxDiagramState.replace(modules['hx-diagram'].state, { notify: false });

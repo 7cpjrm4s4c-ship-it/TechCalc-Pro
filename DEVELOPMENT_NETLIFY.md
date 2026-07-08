@@ -1,4 +1,4 @@
-# TechCalc Pro 1.3.3-dev.3
+# TechCalc Pro 1.3.3-dev.4
 
 Entwicklungsstand für Version 1.3.3 – Phase 45C.
 

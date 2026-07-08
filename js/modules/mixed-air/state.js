@@ -6,7 +6,11 @@ export const state = createModuleState({
   mixingOutdoorRh: '',
   mixingRecircVolumeFlowM3h: '',
   mixingRecircTemp: '',
-  mixingRecircRh: ''
+  mixingRecircRh: '',
+  activeMixedAirId: null,
+  activeMixedAirName: '',
+  expandedMixedAirId: null,
+  savedMixedAirStates: []
 });
 
 export default state;

@@ -2,6 +2,7 @@ import config from './config.js';
 import { card, field, renderModuleShell, stack, grid, signedTempField, esc } from '../../core/renderer.js';
 import { renderResultModel } from '../../platform/resultRenderer/index.js';
 import { createMixedAirViewModel } from './viewModel.js';
+import { mixedAirSaveCard } from './controller.js';
 
 function airInputCard(group, accent = 'cyan') {
   const rows = [];
@@ -32,7 +33,7 @@ export function renderView(s) {
   const vm = createMixedAirViewModel(s);
   const body = stack([
     `<div class="wrg-desktop-split">
-      <div class="wrg-desktop-split__input tc-stack"><div data-mixed-air-dynamic="inputs">${renderInputs(vm)}</div><div data-mixed-air-dynamic="formula" class="formula">${esc(vm.formula)}</div></div>
+      <div class="wrg-desktop-split__input tc-stack"><div data-mixed-air-dynamic="inputs">${renderInputs(vm)}</div><div data-mixed-air-dynamic="saved-panel">${mixedAirSaveCard(s)}</div><div data-mixed-air-dynamic="formula" class="formula">${esc(vm.formula)}</div></div>
       <div class="wrg-desktop-split__output tc-stack"><div data-mixed-air-dynamic="outputs">${renderOutputs(vm)}</div></div>
     </div>`
   ].join(''));

@@ -10,7 +10,8 @@ const commands = [
   ['node', ['tests/service-worker-update-flow.test.mjs']],
   ['node', ['tests/rc10-project-file-format.test.mjs']],
   ['node', ['tests/rc11-pdf-pixel-perfect.test.mjs']],
-  ['node', ['tests/phase45c-modulsplitting-implementation.test.mjs']]
+  ['node', ['tests/phase45c-modulsplitting-implementation.test.mjs']],
+  ['node', ['tests/phase45c1-project-lifecycle-integration.test.mjs']]
 ];
 
 for (const [cmd, args] of commands) {
