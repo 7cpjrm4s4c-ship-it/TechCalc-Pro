@@ -4,9 +4,9 @@ Ziel: alle Module gegen die Referenzarchitektur Heizung, Lüftung, Druckhaltung 
 
 ## Executive Summary
 
-- Geprüfte Module: 11
+- Geprüfte Module: 12
 - P1-Findings: 1
-- P2-Findings: 1
+- P2-Findings: 2
 - Unbenutzte Utility-Export-Kandidaten: 2
 
 ## Modul-Scorecard
@@ -18,6 +18,7 @@ Ziel: alle Module gegen die Referenzarchitektur Heizung, Lüftung, Druckhaltung 
 | heat-recovery | 100 | reference-aligned | 0 | 0 |
 | heating-cooling * | 100 | reference-aligned | 0 | 0 |
 | hx-diagram | 100 | reference-aligned | 0 | 0 |
+| mixed-air | 93 | reference-aligned | 0 | 1 |
 | pipe-sizing | 100 | reference-aligned | 0 | 0 |
 | pressure-holding * | 100 | reference-aligned | 0 | 0 |
 | rainwater | 100 | reference-aligned | 0 | 0 |
@@ -31,6 +32,7 @@ Ziel: alle Module gegen die Referenzarchitektur Heizung, Lüftung, Druckhaltung 
 
 1. **P1 · drinking-water · event-boundary** — Event-Listener außerhalb controller.js gefunden.
 2. **P2 · drinking-water · event-density** — Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.
+3. **P2 · mixed-air · dynamic-renderer** — Lokaler dynamicRenderer.js-Pfad vorhanden; gegen Plattform-Factory prüfen.
 
 ## CSS-Gate
 

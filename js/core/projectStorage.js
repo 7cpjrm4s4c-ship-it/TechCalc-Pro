@@ -6,6 +6,7 @@ import { ventilationLineSectionController } from '../modules/ventilation/control
 import { state as pipeSizingState } from '../modules/pipe-sizing/state.js';
 import { state as unitConverterState } from '../modules/unit-converter/state.js';
 import { state as heatRecoveryState } from '../modules/heat-recovery/state.js';
+import { state as mixedAirState } from '../modules/mixed-air/state.js';
 import { rltDeviceController } from '../modules/heat-recovery/controller.js';
 import { state as hxDiagramState } from '../modules/hx-diagram/state.js';
 import { state as drinkingWaterState } from '../modules/drinking-water/state.js';
@@ -399,6 +400,30 @@ function normalizeHeatRecoveryProjectModule(moduleData = {}) {
   };
 }
 
+function pickFields(source = {}, fields = []) {
+  return fields.reduce((acc, field) => {
+    if (Object.prototype.hasOwnProperty.call(source, field)) acc[field] = source[field];
+    return acc;
+  }, {});
+}
+
+const HEAT_RECOVERY_FIELDS = ['wrgVolumeFlowM3h', 'outdoorTemp', 'outdoorRh', 'extractTemp', 'extractRh', 'efficiency', 'bypassPercent', 'activeRltDeviceId', 'activeRltDeviceName', 'expandedRltDeviceId', 'savedRltDevices'];
+const MIXED_AIR_FIELDS = ['mixingOutdoorVolumeFlowM3h', 'mixingOutdoorTemp', 'mixingOutdoorRh', 'mixingRecircVolumeFlowM3h', 'mixingRecircTemp', 'mixingRecircRh'];
+
+function splitLegacyHeatRecoveryProjectModule(moduleData = {}) {
+  const normalized = normalizeHeatRecoveryProjectModule(moduleData);
+  return {
+    heatRecovery: { state: pickFields(normalized.state, HEAT_RECOVERY_FIELDS), rltDevices: normalized.rltDevices },
+    mixedAir: { state: pickFields(normalized.state, MIXED_AIR_FIELDS) }
+  };
+}
+
+function normalizeMixedAirProjectModule(moduleData = {}, legacyModule = null) {
+  const moduleState = moduleData?.state && typeof moduleData.state === 'object' ? moduleData.state : {};
+  const legacyState = legacyModule?.state && typeof legacyModule.state === 'object' ? legacyModule.state : {};
+  return { state: pickFields({ ...legacyState, ...moduleState }, MIXED_AIR_FIELDS) };
+}
+
 export function collectProjectData() {
   return {
     app: 'TechCalc Pro',
@@ -417,6 +442,7 @@ export function collectProjectData() {
       'pipe-sizing': { state: pipeSizingState.get() },
       'unit-converter': { state: unitConverterState.get() },
       'heat-recovery': { state: heatRecoveryState.get(), rltDevices: rltDeviceController.read() },
+      'mixed-air': { state: mixedAirState.get() },
       'hx-diagram': { state: hxDiagramState.get() },
       'drinking-water': {
         state: drinkingWaterState.get(),
@@ -446,9 +472,14 @@ export function applyProjectData(data = {}, { fileName = '' } = {}) {
   if (modules['pipe-sizing']?.state) pipeSizingState.replace(modules['pipe-sizing'].state, { notify: false });
   if (modules['unit-converter']?.state) unitConverterState.replace(modules['unit-converter'].state, { notify: false });
   if (modules['heat-recovery']) {
-    const heatRecoveryModule = normalizeHeatRecoveryProjectModule(modules['heat-recovery']);
-    heatRecoveryState.replace(heatRecoveryModule.state, { notify: false });
-    rltDeviceController.write(heatRecoveryModule.rltDevices);
+    const splitModule = splitLegacyHeatRecoveryProjectModule(modules['heat-recovery']);
+    heatRecoveryState.replace(splitModule.heatRecovery.state, { notify: false });
+    rltDeviceController.write(splitModule.heatRecovery.rltDevices);
+    const mixedAirModule = normalizeMixedAirProjectModule(modules['mixed-air'], splitModule.mixedAir);
+    if (Object.keys(mixedAirModule.state).length) mixedAirState.replace(mixedAirModule.state, { notify: false });
+  } else if (modules['mixed-air']) {
+    const mixedAirModule = normalizeMixedAirProjectModule(modules['mixed-air']);
+    if (Object.keys(mixedAirModule.state).length) mixedAirState.replace(mixedAirModule.state, { notify: false });
   }
   if (modules['hx-diagram']?.state) hxDiagramState.replace(modules['hx-diagram'].state, { notify: false });
   if (modules['drinking-water']) {
@@ -475,6 +506,7 @@ export function resetAllSessionData() {
   unitConverterState.reset();
   heatRecoveryState.reset();
   rltDeviceController.write([]);
+  mixedAirState.reset();
   hxDiagramState.reset();
   drinkingWaterState.reset();
   wastewaterState.reset();

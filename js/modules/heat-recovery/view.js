@@ -1,9 +1,8 @@
 import config from './config.js';
-import { card, field, segmented, renderModuleShell, stack, grid, signedTempField, esc } from '../../core/renderer.js';
+import { card, field, renderModuleShell, stack, grid, signedTempField, esc } from '../../core/renderer.js';
 import { renderResultModel } from '../../platform/resultRenderer/index.js';
 import { createHeatRecoveryViewModel } from './viewModel.js';
 import { rltDeviceCard } from './controller.js';
-
 
 function airInputCard(group, accent = 'cyan') {
   const rows = [];
@@ -13,10 +12,6 @@ function airInputCard(group, accent = 'cyan') {
     field(group.rh)
   ].join(''), 2));
   return card(group.title, stack(rows.join('')), accent);
-}
-
-export function renderModeCard(vm){
-  return card('Berechnungsart', segmented('mode', vm.modeOptions, vm.state.mode, { accent: vm.accent }), vm.accent, { compact: true });
 }
 
 export function renderWrgInputCard(vm) {
@@ -29,15 +24,8 @@ export function renderWrgInputCard(vm) {
   </div>`, vm.accent);
 }
 
-export function renderMixingInputCard(vm) {
-  return card('Mischluft — Eingaben', `<div class="wrg-group-grid">
-    ${airInputCard(vm.mixing.outdoor, vm.accent)}
-    ${airInputCard(vm.mixing.recirc, vm.accent)}
-  </div>`, vm.accent);
-}
-
 export function renderInputs(vm){
-  return vm.isMixing ? renderMixingInputCard(vm) : renderWrgInputCard(vm);
+  return renderWrgInputCard(vm);
 }
 
 export function renderOutputs(vm){
@@ -51,7 +39,6 @@ export function renderSavedRecords(vm){
 export function renderView(s) {
   const vm = createHeatRecoveryViewModel(s);
   const body = stack([
-    `<div data-wrg-dynamic="mode">${renderModeCard(vm)}</div>`,
     `<div class="wrg-desktop-split">
       <div class="wrg-desktop-split__input tc-stack"><div data-wrg-dynamic="inputs">${renderInputs(vm)}</div><div data-wrg-dynamic="rlt-devices">${renderSavedRecords(vm)}</div><div data-wrg-dynamic="formula" class="formula">${esc(vm.formula)}</div></div>
       <div class="wrg-desktop-split__output tc-stack"><div data-wrg-dynamic="outputs">${renderOutputs(vm)}</div></div>
@@ -60,6 +47,5 @@ export function renderView(s) {
 
   return renderModuleShell(config, `<div class="span-12">${body}</div>`);
 }
-
 
 export default renderView;

@@ -7,6 +7,7 @@ import ventilationConfig from '../modules/ventilation/config.js';
 import pipeSizingConfig from '../modules/pipe-sizing/config.js';
 import unitConverterConfig from '../modules/unit-converter/config.js';
 import heatRecoveryConfig from '../modules/heat-recovery/config.js';
+import mixedAirConfig from '../modules/mixed-air/config.js';
 import hxDiagramConfig from '../modules/hx-diagram/config.js';
 import drinkingWaterConfig from '../modules/drinking-water/config.js';
 import pressureHoldingConfig from '../modules/pressure-holding/config.js';
@@ -26,7 +27,7 @@ import { initializePerformanceController, markPerformance, measurePerformance, s
 import { initializeSaveEditModeSync } from './saveEditModeSync.js';
 import { initializeLayoutStabilityController } from '../platform/shell/layoutStabilityController.js';
 
-const APP_VERSION = '1.3.2-rc.1';
+const APP_VERSION = '1.3.3-dev.3';
 initializeLayoutStabilityController();
 initializePerformanceController({ appVersion: APP_VERSION });
 const appInitStartMark = markPerformance('app:init:start', { appVersion: APP_VERSION });
@@ -37,6 +38,7 @@ const lazyModules = [
   { config: pressureHoldingConfig, path: '../modules/pressure-holding/index.js' },
   { config: bufferStorageConfig, path: '../modules/buffer-storage/index.js' },
   { config: heatRecoveryConfig, path: '../modules/heat-recovery/index.js' },
+  { config: mixedAirConfig, path: '../modules/mixed-air/index.js' },
   { config: hxDiagramConfig, path: '../modules/hx-diagram/index.js' },
   { config: pipeSizingConfig, path: '../modules/pipe-sizing/index.js' },
   { config: unitConverterConfig, path: '../modules/unit-converter/index.js' },

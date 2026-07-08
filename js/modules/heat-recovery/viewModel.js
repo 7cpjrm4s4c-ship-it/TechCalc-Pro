@@ -5,8 +5,7 @@ import { buildHeatRecoveryResultModel, formulaText, modeLabel } from './results.
 export const HEAT_RECOVERY_ACCENT = 'cyan';
 
 export const modeOptions = [
-  { value: 'wrg', label: 'WRG' },
-  { value: 'mixing', label: 'Mischluft' }
+  { value: 'wrg', label: 'WRG' }
 ];
 
 function fieldModel(id, label, value, unit, extra = {}){
@@ -33,37 +32,18 @@ export function wrgInputGroups(s = {}){
   };
 }
 
-export function mixingInputGroups(s = {}){
-  return {
-    outdoor: {
-      title: 'Außenluft',
-      volume: fieldModel('mixingOutdoorVolumeFlowM3h', 'Volumenstrom V̇', s.mixingOutdoorVolumeFlowM3h, 'm³/h'),
-      temp: fieldModel('mixingOutdoorTemp', 'Temperatur', s.mixingOutdoorTemp, '°C', { signed: true }),
-      rh: fieldModel('mixingOutdoorRh', 'rel. Feuchte', s.mixingOutdoorRh, '%')
-    },
-    recirc: {
-      title: 'Umluft / Raumluft',
-      volume: fieldModel('mixingRecircVolumeFlowM3h', 'Volumenstrom V̇', s.mixingRecircVolumeFlowM3h, 'm³/h'),
-      temp: fieldModel('mixingRecircTemp', 'Temperatur', s.mixingRecircTemp, '°C'),
-      rh: fieldModel('mixingRecircRh', 'rel. Feuchte', s.mixingRecircRh, '%')
-    }
-  };
-}
-
 export function createHeatRecoveryViewModel(s = {}, r = calculate(s), accent = HEAT_RECOVERY_ACCENT){
-  const isMixing = s.mode === 'mixing';
   return {
     state: s,
     result: r,
     accent,
-    isMixing,
-    isWrg: !isMixing,
+    isMixing: false,
+    isWrg: true,
     modeOptions,
-    modeLabel: modeLabel(s.mode),
-    formula: formulaText(s),
-    resultModel: buildHeatRecoveryResultModel(s, r, accent),
-    wrg: wrgInputGroups(s),
-    mixing: mixingInputGroups(s)
+    modeLabel: modeLabel('wrg'),
+    formula: formulaText({ ...s, mode: 'wrg' }),
+    resultModel: buildHeatRecoveryResultModel({ ...s, mode: 'wrg' }, r, accent),
+    wrg: wrgInputGroups(s)
   };
 }
 

@@ -2,20 +2,21 @@
   "phase": "37A",
   "name": "Platform Convergence Audit",
   "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
-  "generatedAt": "2026-07-08T14:24:15.632Z",
+  "generatedAt": "2026-07-08T14:53:47.814Z",
   "referenceModules": [
     "heating-cooling",
     "ventilation",
     "pressure-holding",
     "buffer-storage"
   ],
-  "modulesAudited": 11,
+  "modulesAudited": 12,
   "moduleScores": {
     "buffer-storage": 100,
     "drinking-water": 78,
     "heat-recovery": 100,
     "heating-cooling": 100,
     "hx-diagram": 100,
+    "mixed-air": 93,
     "pipe-sizing": 100,
     "pressure-holding": 100,
     "rainwater": 100,
@@ -25,7 +26,7 @@
   },
   "riskCounts": {
     "P1": 1,
-    "P2": 1
+    "P2": 2
   },
   "cssDebt": [
     {
@@ -104,6 +105,15 @@
       "message": "Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.",
       "evidence": {
         "addEventListener": 12
+      }
+    },
+    {
+      "module": "mixed-air",
+      "priority": "P2",
+      "area": "dynamic-renderer",
+      "message": "Lokaler dynamicRenderer.js-Pfad vorhanden; gegen Plattform-Factory prüfen.",
+      "evidence": {
+        "file": "js/modules/mixed-air/dynamicRenderer.js"
       }
     }
   ],
@@ -226,7 +236,7 @@
         "viewModel.js"
       ],
       "metrics": {
-        "lineCount": 792,
+        "lineCount": 728,
         "controllerAddEventListeners": 1,
         "nonControllerAddEventListeners": 0,
         "directDomMutationsOutsideRenderer": 0,
@@ -307,6 +317,47 @@
       "score": 100,
       "status": "reference-aligned",
       "findings": []
+    },
+    {
+      "module": "mixed-air",
+      "reference": false,
+      "files": [
+        "config.js",
+        "controller.js",
+        "dynamicRenderer.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 247,
+        "controllerAddEventListeners": 1,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": false,
+        "hasLocalDynamic": true,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 0
+      },
+      "score": 93,
+      "status": "reference-aligned",
+      "findings": [
+        {
+          "priority": "P2",
+          "area": "dynamic-renderer",
+          "message": "Lokaler dynamicRenderer.js-Pfad vorhanden; gegen Plattform-Factory prüfen.",
+          "evidence": {
+            "file": "js/modules/mixed-air/dynamicRenderer.js"
+          }
+        }
+      ]
     },
     {
       "module": "pipe-sizing",
@@ -593,6 +644,7 @@
         "js/modules/heating-cooling/view.js",
         "js/modules/heating-cooling/viewModel.js",
         "js/modules/hx-diagram/formRenderer.js",
+        "js/modules/mixed-air/viewModel.js",
         "js/modules/pressure-holding/index.js",
         "js/modules/pressure-holding/viewModel.js",
         "js/modules/rainwater/schema.js",
@@ -681,6 +733,15 @@
       "message": "Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.",
       "evidence": {
         "addEventListener": 12
+      }
+    },
+    {
+      "module": "mixed-air",
+      "priority": "P2",
+      "area": "dynamic-renderer",
+      "message": "Lokaler dynamicRenderer.js-Pfad vorhanden; gegen Plattform-Factory prüfen.",
+      "evidence": {
+        "file": "js/modules/mixed-air/dynamicRenderer.js"
       }
     }
   ]

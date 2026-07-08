@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.3.3-dev.2';
-const CACHE_REVISION = '1.3.3-dev.2-1-3-3-dev-2-phase-45b-modulsplitting-design-review';
+const CACHE_NAME = 'techcalc-pro-1.3.3-dev.3';
+const CACHE_REVISION = '1.3.3-dev.3-1-3-3-dev-3-phase-45c-modulsplitting-implementierung';
 const ASSETS = [
   './',
   './index.html',
@@ -131,6 +131,16 @@ const ASSETS = [
   './js/modules/hx-diagram/state.js',
   './js/modules/hx-diagram/view.js',
   './js/modules/hx-diagram/viewModel.js',
+  './js/modules/mixed-air/config.js',
+  './js/modules/mixed-air/controller.js',
+  './js/modules/mixed-air/dynamicRenderer.js',
+  './js/modules/mixed-air/index.js',
+  './js/modules/mixed-air/logic.js',
+  './js/modules/mixed-air/results.js',
+  './js/modules/mixed-air/schema.js',
+  './js/modules/mixed-air/state.js',
+  './js/modules/mixed-air/view.js',
+  './js/modules/mixed-air/viewModel.js',
   './js/modules/pipe-sizing/config.js',
   './js/modules/pipe-sizing/controller.js',
   './js/modules/pipe-sizing/index.js',

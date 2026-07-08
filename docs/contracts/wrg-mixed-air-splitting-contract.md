@@ -85,3 +85,12 @@ Phase 45C/45D muss mindestens prüfen:
 6. Import/Export `.tcproj`.
 7. Offline-Start nach Service-Worker-Cachewechsel.
 8. Desktop Chrome, Edge, Firefox; iOS Safari/PWA; Windows PWA.
+
+## Phase 45C Implementierungsstatus
+
+Der Split ist ab `1.3.3-dev.3` technisch aktiv:
+
+- `heat-recovery` rendert und berechnet ausschließlich Wärmerückgewinnung.
+- `mixed-air` rendert und berechnet ausschließlich Mischluft.
+- Projektdateien enthalten beide Modulschlüssel separat.
+- Altprojekte mit Mischluftwerten im historischen `heat-recovery`-State werden beim Import auf `mixed-air` migriert.

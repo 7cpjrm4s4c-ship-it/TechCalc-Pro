@@ -1,14 +1,14 @@
 {
   "phase": "31C",
   "title": "Module smoke test audit",
-  "generatedAt": "2026-07-08T14:24:15.520Z",
+  "generatedAt": "2026-07-08T14:53:47.650Z",
   "central": {
     "enterTab": true,
     "scroll": true,
     "reset": true
   },
-  "moduleCount": 11,
-  "passed": 11,
+  "moduleCount": 12,
+  "passed": 12,
   "review": 0,
   "modules": [
     {
@@ -113,9 +113,9 @@
         "dynamicRenderer.js"
       ],
       "schema": {
-        "fieldCount": 15,
-        "groupCount": 4,
-        "inputFieldCount": 15,
+        "fieldCount": 8,
+        "groupCount": 2,
+        "inputFieldCount": 8,
         "selectOrSegmentCount": 0,
         "decimalOrTextCount": 0,
         "hasImmediateCommit": false,
@@ -182,6 +182,47 @@
         "index.js",
         "logic.js",
         "renderPipeline.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "missingRequired": [],
+      "optionalRuntimeFilesPresent": [
+        "controller.js",
+        "view.js",
+        "viewModel.js",
+        "dynamicRenderer.js"
+      ],
+      "schema": {
+        "fieldCount": 6,
+        "groupCount": 2,
+        "inputFieldCount": 6,
+        "selectOrSegmentCount": 0,
+        "decimalOrTextCount": 0,
+        "hasImmediateCommit": false,
+        "hasUnitLabels": true
+      },
+      "checks": {
+        "inputs": true,
+        "savedRecords": true,
+        "enterTab": true,
+        "scroll": true,
+        "results": true,
+        "reset": true,
+        "unitSwitch": true
+      },
+      "status": "pass"
+    },
+    {
+      "module": "mixed-air",
+      "files": [
+        "config.js",
+        "controller.js",
+        "dynamicRenderer.js",
+        "index.js",
+        "logic.js",
         "results.js",
         "schema.js",
         "state.js",

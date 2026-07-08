@@ -1,3 +1,9 @@
+### 1.3.3-dev.3 Phase 45C – Modulsplitting Implementierung
+
+- Kombimodul fachlich getrennt: `heat-recovery` bleibt Wärmerückgewinnung, `mixed-air` ist neues Mischluft-Modul.
+- Altprojekt-Migration ergänzt: Mischluftfelder aus historischen `heat-recovery`-States werden in `mixed-air` übernommen.
+- Navigation, Lazy-Loading, Project Storage und Runtime-Verträge auf getrennte Module erweitert.
+
 ### 1.3.3-dev.2 Phase 45B – Modulsplitting Design Review
 
 - Zielarchitektur für Trennung von WRG und Mischluft festgelegt.
