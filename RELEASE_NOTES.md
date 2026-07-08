@@ -1,3 +1,10 @@
+### 1.3.3-dev.1 Phase 45A – Modulsplitting-Analyse
+
+- Version 1.3.2 fachlich abgeschlossen und 1.3.3 als Modulsplitting-Stream gestartet.
+- Bestehendes Kombimodul `heat-recovery` hinsichtlich WRG-/Mischluft-Kopplung analysiert.
+- Trennschnitt, Risiken, Aufwand und notwendige Regressionen dokumentiert.
+- Keine funktionalen Änderungen an App, Berechnungslogik, Persistenz, PDF, PWA oder UI.
+
 ### 1.3.2-rc.1 Release Candidate
 
 - Gate 10 nach Phase 44B/44B.5 fachlich geschlossen.
