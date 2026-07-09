@@ -47,7 +47,7 @@ export function pressureHoldingFormulaRows(s = {}) {
   ];
 }
 
-export function buildPressureHoldingResultModel(s = {}, r = {}, accent = 'purple') {
+export function buildPressureHoldingResultModel(s = {}, r = {}, accent = 'blue') {
   return {
     primary: {
       title: 'Ergebnis Druckhaltung',

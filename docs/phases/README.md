@@ -7,3 +7,72 @@ Phase 37B.4 consolidated the historical phase notes. Each phase is now represent
 - `phase-06.md` ... `phase-37.md`
 - one file per phase family
 - release notes remain the chronological top-level overview
+
+
+## Current consolidation
+
+- `phase-42.md` – Architectural Consolidation baseline and status.
+- `phase-42-audit.md` – Documentation-first audit for Phase 42A.
+- `phase-42-decisions.md` – Accepted decisions derived from existing contracts.
+- `phase-42-checklist.md` – Phase 42 execution checklist.
+
+## Phase 42 – Architectural Consolidation
+
+Phase 42 ist als konsolidierte Architekturphase dokumentiert. Relevante Dateien:
+
+- `phase-42.md` – Hauptuebersicht und Arbeitsvertrag
+- `phase-42-audit.md` – 42A Dokumentationsaudit
+- `phase-42-decisions.md` – bindende Entscheidungen
+- `phase-42-checklist.md` – Ausfuehrungsstatus
+- `phase-42b-contract-reconciliation.md` – Vertragsabgleich
+- `phase-42c-legacy-removal.md` – Legacy Removal
+- `phase-42d-reference-contract-migration.md` – Referenzvertragsmigration
+- `phase-42e1-keyboard-navigation-contract.md` – Keyboard-Vertrag
+- `phase-42e2-legacy-keyboard-handler-removal.md` – Legacy Keyboard Removal
+- `phase-42e3-keyboard-regression.md` – Keyboard Regression Guard
+- `phase-42e4-documentation-consolidation.md` – Dokumentationskonsolidierung
+
+- `phase-42e5-mobile-input-contract-audit.md` – Mobile Input Contract Audit
+- `phase-42e6-architecture-cleanup.md` – Architekturabschluss und Root-Notiz-Bereinigung
+
+## Archived root notes
+
+- `phase-39.md` – archivierte Phase-39B-Root-Notiz und Verweis auf Build-Artefakt-Hygiene.
+
+## Phase 43 – Engineering Baseline
+
+- `phase-43.md` – Hauptuebersicht Engineering Baseline.
+- `phase-43a-engineering-standards.md` – Engineering Standards und Prozessbaseline.
+- `phase-43b-repository-cleanup.md` – Repository- und Dokumentationsbereinigung.
+
+
+## Phase 40/41
+
+- `phase-40-rc11-pdf-pixel-perfect-qa.md` – RC.11 PDF Pixel Perfect QA.
+- `phase-40-project-format.md` – Projektdateiformat und `.tcproj`-Vertrag.
+- `phase-41-rc12-code-freeze.md` – RC.12 Code Freeze.
+
+## Archived detailed phase artefacts
+
+Detaillierte Phase-36-, Phase-38- und einzelne historische Zwischenartefakte wurden in Phase 43B nach `docs/archive/legacy-phase-docs/` verschoben. Die aktiven Zusammenfassungen bleiben unter `docs/phases/`.
+
+## Phase 45 – Version 1.3.3 Modulsplitting
+
+- `phase-45a-modulsplitting-analysis.md` – Analyse des Trennschnitts zwischen Wärmerückgewinnung und Mischluft.
+- `phase-45b-modulsplitting-design-review.md` – Zielarchitektur, Modul-IDs und Splitting-Vertrag.
+- `phase-45c-modulsplitting-implementation.md` – technische Umsetzung der Modultrennung.
+- `phase-45c1-project-lifecycle-integration.md` – Save-/Load-/Dirty-State-Integration des Mischluft-Moduls.
+- `phase-45c2-legacy-saved-records-migration.md` – Migration gespeicherter Legacy-Mischluft-Records.
+- `phase-45d-regression.md` – Regressionsabschluss ohne festgestellte Regressionen.
+- `phase-45e1-documentation-cleanup.md` – Dokumentationsbereinigung und Aktualisierung des Modulvertrags.
+- `phase-45e2-documentation-consolidation-quality-manual.md` – Konsolidierung der Phasendokumentation und Einführung des Quality Manuals.
+
+## Phase documentation rule
+
+Ab Phase 45E.2 gilt: Jede neue Phase erhält eine eigene Abschlussdokumentation. Dauerhafte Qualitätsregeln werden im Quality Manual gepflegt. Detail- oder Patchdokumente sind zulässig, müssen aber im Phasenindex verlinkt sein und dürfen keine widersprüchliche aktive Referenz erzeugen.
+
+- `phase-45e3-documentation-minimization.md` – Documentation Minimization.
+
+- `phase-45e4-module-contract-finalization.md` – Module Contract Finalization.
+- `phase-45e5-architecture-review.md` – Architecture Review.
+- `phase-45e6-release-preparation.md` – Release Preparation.

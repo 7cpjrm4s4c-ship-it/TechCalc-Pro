@@ -67,7 +67,7 @@ export const bufferStorageSavedController = createLineSectionController({
   nameInputId: 'plantName',
   namePlaceholder: 'z. B. Kaltwassersatz BT A',
   emptyText: 'Noch keine Pufferspeicher-Berechnungen gespeichert.',
-  accent: 'cyan',
+  accent: 'blue',
   dynamicAttr: 'saved-records',
   dynamicDataAttr: 'data-buffer-dynamic',
   title: item => item.name || 'Pufferspeicher',

@@ -1,3 +1,4 @@
+import { logger } from './logger.js';
 import { modules } from './registry.js';
 import { initRouter, currentRoute, navigate } from './router.js';
 import { renderNavigation, renderQuickAccessSettings } from './navigation.js';
@@ -6,6 +7,7 @@ import ventilationConfig from '../modules/ventilation/config.js';
 import pipeSizingConfig from '../modules/pipe-sizing/config.js';
 import unitConverterConfig from '../modules/unit-converter/config.js';
 import heatRecoveryConfig from '../modules/heat-recovery/config.js';
+import mixedAirConfig from '../modules/mixed-air/config.js';
 import hxDiagramConfig from '../modules/hx-diagram/config.js';
 import drinkingWaterConfig from '../modules/drinking-water/config.js';
 import pressureHoldingConfig from '../modules/pressure-holding/config.js';
@@ -22,8 +24,11 @@ import { initializeReleaseNotesController } from '../platform/shell/releaseNotes
 import { initializeFeedbackController } from '../platform/shell/feedbackController.js';
 import { initializeServiceWorkerController } from '../platform/shell/serviceWorkerController.js';
 import { initializePerformanceController, markPerformance, measurePerformance, startPerformanceSpan } from '../platform/shell/performanceController.js';
+import { initializeSaveEditModeSync } from './saveEditModeSync.js';
+import { initializeLayoutStabilityController } from '../platform/shell/layoutStabilityController.js';
 
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.3.3-dev.4';
+initializeLayoutStabilityController();
 initializePerformanceController({ appVersion: APP_VERSION });
 const appInitStartMark = markPerformance('app:init:start', { appVersion: APP_VERSION });
 
@@ -33,6 +38,7 @@ const lazyModules = [
   { config: pressureHoldingConfig, path: '../modules/pressure-holding/index.js' },
   { config: bufferStorageConfig, path: '../modules/buffer-storage/index.js' },
   { config: heatRecoveryConfig, path: '../modules/heat-recovery/index.js' },
+  { config: mixedAirConfig, path: '../modules/mixed-air/index.js' },
   { config: hxDiagramConfig, path: '../modules/hx-diagram/index.js' },
   { config: pipeSizingConfig, path: '../modules/pipe-sizing/index.js' },
   { config: unitConverterConfig, path: '../modules/unit-converter/index.js' },
@@ -65,7 +71,7 @@ function preloadLazyModule(config, path) {
   if (!config?.id || preloadedModuleIds.has(config.id)) return;
   preloadedModuleIds.add(config.id);
   loadLazyModule(config, path).catch(error => {
-    console.warn(`Modul konnte nicht vorgeladen werden: ${config.id}`, error);
+    logger.warn(`Modul konnte nicht vorgeladen werden: ${config.id}`, error, { module: 'app' });
   });
 }
 
@@ -256,7 +262,7 @@ function ensurePdfExport() {
       .then(({ initPdfExport }) => initPdfExport({ modules, currentRoute }))
       .catch(error => {
         pdfExportReady = null;
-        console.error('PDF export initialization failed:', error);
+        logger.error('PDF export initialization failed.', error, { module: 'pdf-export' });
       });
   }
   return pdfExportReady;
@@ -300,6 +306,7 @@ function updateHeaderTransparency(){
 trackGlobalEventListener(window, 'scroll', updateHeaderTransparency, { passive: true });
 updateHeaderTransparency();
 
+initializeSaveEditModeSync(document);
 initializeServiceWorkerController({ appVersion: APP_VERSION });
 const appInitEndMark = markPerformance('app:init:end', { appVersion: APP_VERSION });
 measurePerformance('app:init', appInitStartMark, appInitEndMark, { appVersion: APP_VERSION });

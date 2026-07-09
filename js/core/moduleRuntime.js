@@ -1,3 +1,4 @@
+import { logger } from './logger.js';
 import { hardResetModuleRoot } from './moduleLifecycleAdapter.js';
 import { preserveModuleSwitchScroll } from './scrollManager.js';
 import { restoreFocus as restorePlatformFocus } from './focusManager.js';
@@ -34,7 +35,7 @@ function runCleanup(cleanup) {
     else if (typeof cleanup?.destroy === 'function') cleanup.destroy();
     else if (typeof cleanup?.unmount === 'function') cleanup.unmount();
   } catch (error) {
-    console.warn('Modul-Cleanup konnte nicht vollständig ausgeführt werden.', error);
+    logger.warn('Modul-Cleanup konnte nicht vollständig ausgeführt werden.', error, { module: 'module-runtime' });
   }
 }
 
@@ -94,7 +95,7 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
   async function unmount(nextModuleId) {
     await beforeUnmount(nextModuleId);
     try { activeCleanup?.(); } catch (error) {
-      console.warn('Aktives Modul konnte nicht vollständig verlassen werden.', error);
+      logger.warn('Aktives Modul konnte nicht vollständig verlassen werden.', error, { module: 'module-runtime' });
     }
     activeCleanup = noop;
     clearRuntimeCleanups();
@@ -146,7 +147,7 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
   async function failMount(moduleId, token, error) {
     clearLoadingTimer();
     if (!isCurrent(token)) return false;
-    console.error(`Modul konnte nicht geladen werden: ${moduleId}`, error);
+    logger.error(`Modul konnte nicht geladen werden: ${moduleId}`, error, { module: 'module-runtime' });
     root.__tcLastHtml = '';
     root.innerHTML = '<div class="module-error card">Modul konnte nicht geladen werden.</div>';
     root.removeAttribute('aria-busy');

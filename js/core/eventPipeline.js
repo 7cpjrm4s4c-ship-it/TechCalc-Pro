@@ -1,4 +1,4 @@
-import { handlePlatformFieldNavigation, preserveFocusDuring } from './focusManager.js';
+import { handlePlatformFieldNavigation, isPlatformNavigationElement, preserveFocusDuring } from './focusManager.js';
 import { markCommittedAction } from './formActions.js';
 const DEFAULT_INTERACTIVE_SELECTOR = '[data-field], input, select, textarea, button, a, summary, [role="button"], [data-line-card], [data-saved-record-card], .saved-record-card, .segmented, [data-tc-action]';
 
@@ -80,6 +80,7 @@ function resolveActionHandler(root, action, options = {}) {
 
 function dispatchAction(root, state, actionEl, event, options = {}) {
   if (!actionEl || !root?.contains?.(actionEl)) return false;
+  if (actionEl.disabled || actionEl.getAttribute?.('aria-disabled') === 'true') return false;
   const action = actionEl.dataset.tcAction || actionEl.dataset.action;
   if (!action) return false;
 
@@ -197,8 +198,33 @@ function wasPointerActionSuppressed(root) {
 }
 
 
+
+function commitPlatformCollectionInput(root, input, notify = true) {
+  if (!root?.contains?.(input) || !input?.dataset?.collectionInput) return false;
+  const context = root.__tcPlatformCollectionContext;
+  const collections = context?.collections || {};
+  const state = context?.state;
+  const name = input.dataset.collectionInput;
+  const cfg = collections[name];
+  if (!state?.set || !cfg || typeof cfg.patchInput !== 'function') return false;
+  const patch = cfg.patchInput({
+    id: input.dataset.collectionId,
+    field: input.dataset.collectionField,
+    value: input.value,
+    current: typeof state.get === 'function' ? state.get() : {},
+    element: input,
+    root
+  }) || {};
+  if (!Object.keys(patch).length) return false;
+  state.set(patch, {
+    action: notify ? (cfg.commitAction || `platform:collection:${name}:commit`) : (cfg.inputAction || `platform:collection:${name}:input`),
+    notify
+  });
+  return true;
+}
+
 function navigatePlatformField(root, current, event) {
-  if (!root || !current?.matches?.('[data-field]')) return false;
+  if (!root || !current?.matches?.('[data-field], [data-platform-focus], input, textarea, select')) return false;
   return handlePlatformFieldNavigation(root, current, event, { select: true, defer: false });
 }
 
@@ -302,24 +328,28 @@ export function bindCentralEventPipeline(root, state, options = {}) {
       return;
     }
 
-    const el = event.target?.closest?.('input[data-field], textarea[data-field], select[data-field]');
+    const el = event.target?.closest?.('input:not([type="hidden"]), textarea, select, button, [data-segment], [data-line-card], [data-saved-record-card], [data-platform-focus], [tabindex]');
     if (!el || !root.contains(el) || (event.key !== 'Enter' && event.key !== 'Tab')) return;
+    if (!isPlatformNavigationElement(el)) return;
+    if (event.key === 'Enter' && el.matches?.('button, [data-tc-action], [data-action], [data-segment], [data-line-card], [data-saved-record-card]')) return;
     const action = event.key === 'Tab' ? 'field:tab' : 'field:enter';
     event.preventDefault();
-    // Compatibility note for phase11d audit: field:enter historically used
-    // commitElementField(state, el, { action, notify: true, root }) for immediate calculation.
-    // RC 35C: keyboard navigation must move focus before any notifying render can
-    // replace the current input. Commit silently, move focus, then refresh after
-    // the browser has applied focus. This is required for custom dynamic modules
-    // like h,x and Trinkwasser.
-    commitElementField(state, el, { action, notify: false, root });
-    hasDeferredInput = false;
+    // Dev.31: central keyboard navigation is now field-class based, not only
+    // data-field based. Drinking-water draft quantity inputs and legacy module
+    // controls can therefore participate without owning local Tab/Enter code.
+    if (el.matches?.('[data-collection-input]')) {
+      commitPlatformCollectionInput(root, el, true);
+      hasDeferredInput = false;
+    } else if (el.matches?.('[data-field]')) {
+      commitElementField(state, el, { action, notify: false, root });
+      hasDeferredInput = false;
+    }
     const moved = navigatePlatformField(root, el, event);
     notifyCommit({ action, element: el, moved });
     const refresh = () => {
       const active = document.activeElement;
-      const keep = active && root.contains(active) && active.matches?.('[data-field], [data-platform-focus]');
-      preserveFocusDuring(root, () => state.set({}, { action: `${action}:refresh`, notify: true }), { restoreFocus: keep });
+      const keep = active && root.contains(active) && isPlatformNavigationElement(active);
+      if (el.matches?.('[data-field]')) preserveFocusDuring(root, () => state.set({}, { action: `${action}:refresh`, notify: true }), { restoreFocus: keep });
     };
     if (typeof requestAnimationFrame === 'function') requestAnimationFrame(refresh);
     else setTimeout(refresh, 0);
@@ -394,6 +424,8 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     }
   };
 
+  const SAVED_SELECTION_ACTIONS = new Set(['saved:load', 'saved:delete', 'saved:toggle', 'line:select', 'line:delete', 'line:toggle', 'line:deselect']);
+
   const onPointerAction = event => {
     const actionEl = event.target?.closest?.('[data-tc-action], [data-action]');
     const action = actionEl?.dataset?.tcAction || actionEl?.dataset?.action;
@@ -404,6 +436,15 @@ export function bindCentralEventPipeline(root, state, options = {}) {
       event?.stopImmediatePropagation?.();
       return true;
     }
+
+    // Phase 42C: Saved-selection actions are not structural blur workarounds.
+    // Executing them during pointerdown/touchend mutates DOM while the browser is
+    // still resolving the tap target and can trigger scroll anchoring jumps on
+    // mobile browsers. Let the click/key activation path own saved load/delete/
+    // toggle actions. Save/update remain early actions because they must commit
+    // before focused input blur can replace the tapped button.
+    if (SAVED_SELECTION_ACTIONS.has(String(action))) return false;
+
     if (wasPointerActionHandled(root, action)) {
       event?.preventDefault?.();
       event?.stopPropagation?.();

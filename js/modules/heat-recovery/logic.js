@@ -74,7 +74,7 @@ function pointFromTempHumidity(volumeFlowM3h, tempC, wKgKg, referenceMassFlowKgh
   };
 }
 
-function calculateWrg(s) {
+export function calculateWrg(s = {}) {
   const systemVolumeFlowM3h = Math.max(0, num(s.wrgVolumeFlowM3h));
   const outdoor = airPoint(systemVolumeFlowM3h, s.outdoorTemp, s.outdoorRh);
   const extract = airPoint(systemVolumeFlowM3h, s.extractTemp, s.extractRh);
@@ -137,7 +137,7 @@ function calculateWrg(s) {
   };
 }
 
-function calculateMixing(s) {
+export function calculateMixing(s = {}) {
   const outdoor = airPoint(s.mixingOutdoorVolumeFlowM3h, s.mixingOutdoorTemp, s.mixingOutdoorRh);
   const recirc = airPoint(s.mixingRecircVolumeFlowM3h, s.mixingRecircTemp, s.mixingRecircRh);
 
@@ -175,6 +175,6 @@ function calculateMixing(s) {
   };
 }
 
-export function calculate(s) {
-  return (s.mode || 'wrg') === 'mixing' ? calculateMixing(s) : calculateWrg(s);
+export function calculate(s = {}) {
+  return calculateWrg(s);
 }

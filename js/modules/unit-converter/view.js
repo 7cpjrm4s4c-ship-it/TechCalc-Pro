@@ -4,7 +4,7 @@ import { createUnitConverterViewModel } from './viewModel.js';
 
 export function view(s) {
   const vm = createUnitConverterViewModel(s);
-  const conversionCard = card('Kategorie wählen', `<div data-unit-dynamic="conversion">${vm.conversionHtml}</div>`, 'green');
+  const conversionCard = card('Kategorie wählen', `<div data-unit-dynamic="conversion">${vm.conversionHtml}</div>`, 'blue');
 
   return renderModuleShell(config, `
     <div class="span-6">${conversionCard}</div>

@@ -2,7 +2,7 @@ import { defineModuleConfig, MODULE_CAPABILITIES } from '../../core/moduleDefini
 
 export default defineModuleConfig({
   id: 'heat-recovery',
-  title: 'WRG / Mischluft',
+  title: 'Wärmerückgewinnung',
   shortTitle: 'WRG',
   group: 'Lufttechnik',
   accent: 'cyan',
@@ -14,5 +14,5 @@ export default defineModuleConfig({
     MODULE_CAPABILITIES.FORM_SCHEMA,
     MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS
   ],
-  description: 'Berechnung von Wärmerückgewinnung und Mischluftzuständen in Lüftungsanlagen.'
+  description: 'Berechnung von Wärmerückgewinnung in Lüftungsanlagen. phase-24d-hardening phase-24e-final-hardening'
 });

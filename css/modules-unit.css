@@ -1,0 +1,9 @@
+/* Unit converter ---------------------------------------------------------- */
+.module-view[data-module='unit-converter'] #convertedValue,
+.module-view[data-module='unit-converter'] #convertedValue:disabled,
+.module-view[data-module='unit-converter'] .field:has(#convertedValue) input,
+.module-view[data-module='unit-converter'] .field:has(#convertedValue) input:disabled { color: var(--color-text); opacity: 1; -webkit-text-fill-color: var(--color-text); font-weight: 800; }
+.unit-all-values .result-list { gap: 2px; }
+.unit-all-values .result-row { min-height: 34px; padding-block: 4px; }
+.unit-all-values .result-row span { font-size: 15px; font-weight: 500; color: var(--color-muted); }
+.unit-all-values .result-row strong { font-size: 16px; font-weight: 650; color: var(--color-muted); }

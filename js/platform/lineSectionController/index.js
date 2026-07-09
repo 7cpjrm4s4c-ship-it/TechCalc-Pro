@@ -1,7 +1,6 @@
 import { card, stack } from '../../core/renderer.js';
 import { registerCentralActions } from '../../core/eventPipeline.js';
 import { preserveSavedRecordMutation } from '../../core/scrollManager.js';
-import { PlatformFocusManager } from '../../core/focusManager.js';
 import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
 
 function escapeAttribute(value) {
@@ -70,8 +69,60 @@ export function createLineSectionController({
     if (nameInput && document.activeElement !== nameInput) nameInput.value = snapshot?.[nameKey] || '';
     const saveButton = root?.querySelector?.('[data-line-save]');
     const updateButton = root?.querySelector?.('[data-line-update]');
-    if (saveButton) saveButton.disabled = Boolean(snapshot?.[activeIdKey]);
-    if (updateButton) updateButton.disabled = !snapshot?.[activeIdKey];
+    if (saveButton) {
+      saveButton.disabled = Boolean(snapshot?.[activeIdKey]);
+      saveButton.setAttribute('aria-disabled', String(Boolean(snapshot?.[activeIdKey])));
+    }
+    if (updateButton) {
+      updateButton.disabled = !snapshot?.[activeIdKey];
+      updateButton.setAttribute('aria-disabled', String(!snapshot?.[activeIdKey]));
+    }
+  };
+
+  const findRowsHost = root => {
+    if (!root?.querySelector) return null;
+    return root.querySelector(`[${dynamicDataAttr}="${dynamicAttr}"] .saved-record-list`)
+      || root.querySelector(`[${dynamicDataAttr}="${dynamicAttr}"] .empty-state`)
+      || root.querySelector(`[${dynamicDataAttr}="${dynamicAttr}"]`);
+  };
+
+  const findSavedAnchor = root => {
+    if (!root?.querySelector || typeof window === 'undefined') return null;
+    const host = root.querySelector(`[${dynamicDataAttr}="${dynamicAttr}"]`);
+    return host?.closest?.('.card') || host || null;
+  };
+
+  const preserveSavedAnchor = (root, mutation) => {
+    const anchor = findSavedAnchor(root);
+    if (!anchor?.getBoundingClientRect || typeof window === 'undefined') return mutation?.();
+    const before = anchor.getBoundingClientRect().top;
+    const result = mutation?.();
+    const correct = () => {
+      if (!anchor.isConnected) return;
+      const after = anchor.getBoundingClientRect().top;
+      const delta = after - before;
+      if (Math.abs(delta) > 1 && typeof window.scrollBy === 'function') {
+        window.scrollBy({ left: 0, top: delta, behavior: 'auto' });
+      }
+    };
+    correct();
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(correct);
+    return result;
+  };
+
+  const updateRows = (root, snapshot = state?.get?.() || {}) => {
+    const host = findRowsHost(root);
+    if (!host) return false;
+    const next = renderRows(snapshot);
+    if (host.matches?.('.saved-record-list, .empty-state')) {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = next;
+      const nextNode = wrapper.firstElementChild;
+      if (nextNode && host.outerHTML !== nextNode.outerHTML) host.replaceWith(nextNode);
+      return true;
+    }
+    if (host.innerHTML !== next) host.innerHTML = next;
+    return true;
   };
 
   const bind = root => {
@@ -80,11 +131,11 @@ export function createLineSectionController({
 
     const persist = (items, patch = {}, action = 'line:update') => {
       const next = Array.isArray(items) ? [...items] : [];
-      const commit = () => {
+      const commit = () => preserveSavedAnchor(root, () => {
         memory = next;
         state.set({ [listKey]: next, ...patch }, { action });
-      };
-      return PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(commit));
+      });
+      return preserveSavedRecordMutation(commit);
     };
 
     const shouldSkipDuplicateAction = action => {
@@ -96,7 +147,9 @@ export function createLineSectionController({
       return false;
     };
 
-    const saveCurrent = ({ root: actionRoot } = {}) => {
+    const saveCurrent = ({ root: actionRoot, element } = {}) => {
+      if (element?.disabled || element?.getAttribute?.('aria-disabled') === 'true') return;
+      if (state.get()?.[activeIdKey]) return;
       if (shouldSkipDuplicateAction('line:save')) return;
       const host = actionRoot || root;
       const name = host.querySelector(`#${nameInputId}`)?.value?.trim() || '';
@@ -108,7 +161,9 @@ export function createLineSectionController({
       persist([item, ...items], { [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, 'line:save');
     };
 
-    const updateCurrent = ({ root: actionRoot } = {}) => {
+    const updateCurrent = ({ root: actionRoot, element } = {}) => {
+      if (element?.disabled || element?.getAttribute?.('aria-disabled') === 'true') return;
+      if (!state.get()?.[activeIdKey]) return;
       if (shouldSkipDuplicateAction('line:update')) return;
       const host = actionRoot || root;
       const currentState = state.get();
@@ -127,11 +182,11 @@ export function createLineSectionController({
       const item = read().find(entry => isSameId(entry.id, id));
       if (!item) return;
       if (isSameId(state.get()?.[activeIdKey], id)) {
-        PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' })));
+        preserveSavedRecordMutation(() => preserveSavedAnchor(root, () => state.set({ [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:deselect' })));
         return;
       }
       const hydrated = hydrateRecord?.({ item, currentState: state.get() }) || {};
-      PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' })));
+      preserveSavedRecordMutation(() => preserveSavedAnchor(root, () => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' })));
     };
 
     const deleteLine = id => {
@@ -149,7 +204,7 @@ export function createLineSectionController({
       if (!id) return;
       const currentExpanded = state.get()?.[expandedIdKey];
       const willOpen = !isSameId(currentExpanded, id);
-      PlatformFocusManager.preserveFocusDuring(root, () => preserveSavedRecordMutation(() => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' })));
+      preserveSavedRecordMutation(() => preserveSavedAnchor(root, () => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' })));
     };
 
     registerCentralActions(root, {
@@ -161,7 +216,7 @@ export function createLineSectionController({
     });
   };
 
-  return { read, write, renderRows, renderCard, updateControls, bind };
+  return { read, write, renderRows, renderCard, updateControls, updateRows, bind };
 }
 
 export default createLineSectionController;

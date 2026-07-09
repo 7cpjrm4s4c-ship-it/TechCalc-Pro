@@ -86,10 +86,4 @@ export function bindLiveCollectionInput(root, selector, { state, getItems, setIt
     event.stopPropagation();
     commit(input, true);
   }, true);
-  root.addEventListener('keydown', event => {
-    const input = event.target.closest(selector);
-    if (!input || event.key !== 'Enter') return;
-    event.preventDefault();
-    commit(input, true);
-  });
 }

@@ -1,9 +1,0 @@
-{
-  "phase": "11D",
-  "centralEventPipeline": true,
-  "stateBindingFallbackDisabledWhenCentralPipelineActive": true,
-  "segmentActionMarkers": true,
-  "savedActionMarkers": true,
-  "commitLifecycleEvent": true,
-  "nextStep": "Phase 11E: migrate remaining module-specific adapters to registered central actions."
-}

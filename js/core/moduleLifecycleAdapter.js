@@ -1,3 +1,4 @@
+import { logger } from './logger.js';
 const CLEANUP_KEYS = [
   '__tcCentralEventPipelineCleanup',
   '__tcRainwaterLookupHydrationCleanup',
@@ -10,7 +11,7 @@ function runCleanupTask(task) {
     else if (typeof task?.destroy === 'function') task.destroy();
     else if (typeof task?.unmount === 'function') task.unmount();
   } catch (error) {
-    console.warn('Modul-Lifecycle-Cleanup konnte nicht vollständig ausgeführt werden.', error);
+    logger.warn('Modul-Lifecycle-Cleanup konnte nicht vollständig ausgeführt werden.', error, { module: 'module-lifecycle' });
   }
 }
 

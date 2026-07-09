@@ -5,7 +5,7 @@ export default defineModuleConfig({
   title: 'Pufferspeicher',
   shortTitle: 'Puffer',
   group: 'HLK-Anlagen',
-  accent: 'cyan',
+  accent: 'blue',
   order: 16,
   defaultVisible: false,
 

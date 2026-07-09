@@ -1,3 +1,4 @@
+import { logger } from '../../core/logger.js';
 const DEFAULT_FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
 const FEEDBACK_OFFLINE_QUEUE_KEY = 'techcalc.feedback.offlineQueue.v1';
 
@@ -44,7 +45,7 @@ function saveOfflineFeedback(storage, payload, reason) {
 }
 
 export function initializeFeedbackController({
-  appVersion = '1.3.0',
+  appVersion = '1.3.3-rc.1',
   endpoint = DEFAULT_FEEDBACK_ENDPOINT,
   form = null,
   status = null,
@@ -99,6 +100,13 @@ export function initializeFeedbackController({
     event.preventDefault();
     setStatus('', '');
     if (!form.reportValidity()) return;
+    const honeypot = String(new FormData(form).get('_gotcha') || '').trim();
+    if (honeypot) {
+      setStatus('Feedback wurde verarbeitet. Danke!', 'success');
+      form.reset();
+      if (subject) subject.value = 'TechCalc Pro Feedback';
+      return;
+    }
 
     const payload = buildPayload();
 
@@ -130,7 +138,7 @@ export function initializeFeedbackController({
       if (subject) subject.value = 'TechCalc Pro Feedback';
       setStatus('Feedback wurde gesendet. Danke!', 'success');
     } catch (error) {
-      console.error('Feedback konnte nicht gesendet werden:', error);
+      logger.error('Feedback konnte nicht gesendet werden.', error, { module: 'feedback' });
       saveForLater(payload, 'send-failed');
     } finally {
       if (submit) {

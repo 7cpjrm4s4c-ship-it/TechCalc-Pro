@@ -1,0 +1,95 @@
+/* TechCalc Pro 1.3.2 CSS System — App status components.
+   Extracted from legacy contracts during dev.18 so release/update/status UI is centrally tokenized. */
+
+.settings-logo-preview {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  min-height: 4.25rem;
+  padding: .75rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--tc-radius-card);
+  background: var(--color-surface-soft);
+  color: var(--color-muted);
+  overflow: hidden;
+}
+
+.settings-logo-preview img {
+  max-width: 6.75rem;
+  max-height: 3.25rem;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  flex: 0 0 auto;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-strong);
+}
+
+.settings-logo-preview span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: .875rem;
+  font-weight: 700;
+}
+
+.settings-logo-preview.is-empty { min-height: 3rem; }
+.settings-logo-preview.is-empty img { display: none; }
+
+.tc-update-banner {
+  position: fixed;
+  left: max(18px, env(safe-area-inset-left));
+  right: max(18px, env(safe-area-inset-right));
+  bottom: calc(112px + env(safe-area-inset-bottom));
+  z-index: 4000;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--accent-cyan);
+  border-radius: var(--tc-radius-card);
+  background: var(--color-surface-strong);
+  box-shadow: var(--shadow-glass);
+  color: var(--color-text);
+  font-weight: 800;
+  line-height: 1.18;
+}
+
+.tc-update-banner span { min-width: 0; }
+.tc-update-banner[hidden] { display: none; }
+
+.tc-update-banner__button,
+.tc-update-banner__dismiss {
+  min-height: 36px;
+  border-radius: var(--tc-radius-pill);
+  border: 1px solid var(--accent-cyan);
+  background: color-mix(in srgb, var(--accent-cyan) 18%, var(--color-surface));
+  color: var(--color-text);
+  font: inherit;
+  padding: 0 12px;
+}
+
+.tc-update-banner__button:disabled { opacity: .8; }
+
+.tc-update-banner__dismiss {
+  width: 36px;
+  padding: 0;
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-soft);
+  color: var(--color-text);
+  font-size: 20px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}

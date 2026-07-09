@@ -58,41 +58,10 @@ function setInner(root, selector, html) {
   return true;
 }
 
-function captureHxScroll(root) {
-  const scroller = root?.closest?.('.app-main, .main, main, .module-scroll, .module-view') || document.scrollingElement || document.documentElement;
-  return {
-    scroller,
-    top: scroller?.scrollTop ?? 0,
-    left: scroller?.scrollLeft ?? 0,
-    winX: window.scrollX || 0,
-    winY: window.scrollY || 0
-  };
-}
-
-function restoreHxScroll(snapshot) {
-  if (!snapshot) return;
-  const apply = () => {
-    try {
-      if (snapshot.scroller) {
-        snapshot.scroller.scrollTop = snapshot.top;
-        snapshot.scroller.scrollLeft = snapshot.left;
-      }
-      window.scrollTo(snapshot.winX, snapshot.winY);
-    } catch { /* scroll restore only */ }
-  };
-  apply();
-  requestAnimationFrame(apply);
-  setTimeout(apply, 40);
-  setTimeout(apply, 120);
-  setTimeout(apply, 260);
-}
-
 function withHxScrollFreeze(root, enabled, mutation) {
-  if (!enabled) return mutation();
-  const snapshot = captureHxScroll(root);
-  const result = mutation();
-  restoreHxScroll(snapshot);
-  return result;
+  // Dev.33: local h,x scroll freezing caused delayed snap-backs.
+  // Structural scroll stability is owned centrally by scrollManager/renderCoordinator.
+  return mutation();
 }
 
 function syncHxFormFields(root, snapshot = {}) {
@@ -133,19 +102,33 @@ export function renderDynamicSections(root, snapshot = {}, meta = {}) {
   };
 
   if (savedStructural) {
+    // Phase 42C: h,x saved selection is not rows-only. The selected process must
+    // hydrate inputs and refresh process/results/diagram outlets. The legacy
+    // scroll-freeze chain remains removed; stability is achieved by named outlet
+    // diffing via setInner and by updating rows without replacing the full module.
     return withHxScrollFreeze(root, true, () => {
+      syncHxFormFields(root, snapshot);
+      const vm = createHxRenderModel(snapshot);
+      setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.process}"]`, renderProcessSelection(vm));
+      setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.results}"]`, renderResults(vm));
+      setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.diagram}"]`, renderDiagram(vm));
       syncSavedProcessControls(root, snapshot);
 
-      const rowsHost = root.querySelector?.(`[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"] [data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`);
+      const rowsHost = root.querySelector?.(`[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"] .saved-record-list`)
+        || root.querySelector?.(`[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"] .empty-state`);
+      const nextRows = hxProcessController.renderRows(snapshot);
       if (rowsHost) {
-        const nextRows = hxProcessController.renderRows(snapshot);
-        if (rowsHost.innerHTML !== nextRows) preserveFocusDuring(root, () => { rowsHost.innerHTML = nextRows; }, { skipSelect: true });
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = nextRows;
+        const nextNode = wrapper.firstElementChild;
+        if (nextNode && rowsHost.outerHTML !== nextNode.outerHTML) rowsHost.replaceWith(nextNode);
       } else {
-        const vm = createHxRenderModel(snapshot);
-        setInner(root, `[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`, renderSavedProcesses(vm));
+        const host = root.querySelector?.(`[data-hx-dynamic="${HX_DYNAMIC.savedProcesses}"]`);
+        const next = renderSavedProcesses(vm);
+        if (host && host.innerHTML !== next) host.innerHTML = next;
       }
 
-      return updateAllLiveIslands();
+      return true;
     });
   }
 

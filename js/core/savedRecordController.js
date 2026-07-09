@@ -135,6 +135,9 @@ export function bindSavedRecordWorkflow(root, {
   bindScopedOnce(root, key, 'click', event => {
     const saveButton = closest(root, event.target, saveSelector);
     if (saveButton) {
+      if (saveButton.disabled || saveButton.getAttribute?.('aria-disabled') === 'true') return;
+      const currentMode = state.get?.() || {};
+      if (currentMode?.[activeIdKey]) return;
       event.preventDefault();
       event.stopPropagation();
       markCommittedAction(root);
@@ -154,6 +157,9 @@ export function bindSavedRecordWorkflow(root, {
 
     const updateButton = closest(root, event.target, updateSelector);
     if (updateButton) {
+      if (updateButton.disabled || updateButton.getAttribute?.('aria-disabled') === 'true') return;
+      const currentMode = state.get?.() || {};
+      if (!currentMode?.[activeIdKey]) return;
       event.preventDefault();
       event.stopPropagation();
       markCommittedAction(root);
@@ -260,9 +266,9 @@ export function createSavedRecordActions({
   };
 
   const save = () => {
-    beforeCreate?.({ root, state });
     const current = requireContext();
-    if (!current) return;
+    if (!current || current?.[activeIdKey]) return;
+    beforeCreate?.({ root, state });
     const run = () => {
       const latest = state.get() || current;
       const record = createSavedRecord({
@@ -286,9 +292,9 @@ export function createSavedRecordActions({
   };
 
   const update = () => {
-    beforeUpdate?.({ root, state });
     const current = requireContext();
-    if (!current) return;
+    if (!current || !current?.[activeIdKey]) return;
+    beforeUpdate?.({ root, state });
     const run = () => {
       const latest = state.get() || current;
       const id = latest[activeIdKey];

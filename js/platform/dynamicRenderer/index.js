@@ -70,6 +70,11 @@ function hasAnyChanged(changed = [], keys = []) {
   return keys.some(key => changed.includes(key));
 }
 
+function isSavedOnlyAction(action = '', changed = [], savedKeys = []) {
+  const a = String(action || '');
+  return /^(line:|saved:|buffer:|hx:line:)/.test(a) || hasAnyChanged(changed, savedKeys);
+}
+
 export function createHeatingCoolingDynamicRenderer(options = {}) {
   const {
     calculate,
@@ -96,7 +101,8 @@ export function createHeatingCoolingDynamicRenderer(options = {}) {
   function update(root, s = {}, meta = {}) {
     const active = activeCalculationState(s);
     const r = calculate(active);
-    const accent = s.mode === 'cooling' ? 'cyan' : 'orange';
+    const accent = s.mode === 'cooling' ? 'cooling' : 'orange';
+    if (root?.dataset) root.dataset.hcMode = accent;
     const modeLabel = s.mode === 'cooling' ? 'Kälte' : 'Heizung';
     const previous = root.__tcHeatingCoolingDynamic || {};
     const previousPrefix = previous.prefix || 'heating';
@@ -162,7 +168,9 @@ export function createHeatingCoolingDynamicRenderer(options = {}) {
 
     if (lineStructural || appStructural || hasAnyChanged(changed, ['lineSections', 'activeLineSectionId', 'activeLineSectionName', 'expandedLineSectionId'])) {
       lineSectionController?.updateControls?.(root, s);
-      setInner(root, '[data-hc-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
+      if (!lineSectionController?.updateRows?.(root, s)) {
+        setInner(root, '[data-hc-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
+      }
     }
 
     root.__tcHeatingCoolingDynamic = {
@@ -202,7 +210,9 @@ export function createVentilationDynamicRenderer(options = {}) {
   function update(root, s = {}, meta = {}) {
     const active = activeCalculationState(s);
     const r = calculate(active);
-    const accent = s.mode === 'cooling' ? 'cyan' : 'orange';
+    const processAccent = s.mode === 'cooling' ? 'cooling' : 'orange';
+    const moduleAccent = 'cyan';
+    const accent = processAccent;
     const modeLabel = s.mode === 'cooling' ? 'Kälte' : 'Heizung';
     const previous = root.__tcVentilationDynamic || {};
     const previousPrefix = previous.prefix || 'heating';
@@ -214,20 +224,26 @@ export function createVentilationDynamicRenderer(options = {}) {
     const lineStructural = /^(line:|saved:)/.test(action);
     const appStructural = /^(record:|module:|replace|reset)/.test(action);
 
-    updateCardAccent(root, '[data-vent-dynamic="temperatures"]', accent);
-    updateCardAccent(root, '[data-vent-dynamic="mode-segment"]', accent);
-    updateCardAccent(root, '[data-vent-dynamic="target-segment"]', accent);
+    // Phase 42D: Saved selections use the same structural update contract as
+    // the reference modules. If mode/target changed through hydration, the
+    // visible input/segment islands are refreshed; otherwise fields are synced
+    // in place and rows are updated by the central LineSectionController.
+
+    if (root?.dataset) root.dataset.processAccent = processAccent;
+    updateCardAccent(root, '[data-vent-dynamic="temperatures"]', moduleAccent);
+    updateCardAccent(root, '[data-vent-dynamic="mode-segment"]', processAccent);
+    updateCardAccent(root, '[data-vent-dynamic="target-segment"]', processAccent);
     updateSegment(root, 'mode', s.mode);
 
     if (modeChanged) {
-      setInner(root, '[data-vent-dynamic="temperatures"]', renderTemperatures(s, r, active, accent));
-      setInner(root, '[data-vent-dynamic="mode-segment"]', renderModeSegment(s, r, active, accent));
+      setInner(root, '[data-vent-dynamic="temperatures"]', renderTemperatures(s, r, active, moduleAccent));
+      setInner(root, '[data-vent-dynamic="mode-segment"]', renderModeSegment(s, r, active, processAccent));
       setCardTitle(root, '[data-vent-dynamic="target-segment"]', `${modeLabel} — Eingaben`);
     }
 
     if (modeChanged || targetChanged) {
-      setInner(root, '[data-vent-dynamic="target-segment"]', renderTargetSegment(s, r, active, accent));
-      setInner(root, '[data-vent-dynamic="input-fields"]', renderInputFields(s, r, active, accent));
+      setInner(root, '[data-vent-dynamic="target-segment"]', renderTargetSegment(s, r, active, processAccent));
+      setInner(root, '[data-vent-dynamic="input-fields"]', renderInputFields(s, r, active, processAccent));
     } else {
       updateSegment(root, key(s, 'CalcTarget'), active.calcTarget);
       setInputValue(root, key(s, 'PowerW'), fmtInput(active.powerW, 2));
@@ -240,13 +256,15 @@ export function createVentilationDynamicRenderer(options = {}) {
     setInputValue(root, key(s, 'SupplyTemp'), fmtInput(active.supplyTemp, 2));
     setInputValue(root, key(s, 'RoomTemp'), fmtInput(active.roomTemp, 2));
 
-    setInner(root, '[data-vent-dynamic="result"]', renderResult(s, r, active, accent));
-    setInner(root, '[data-vent-dynamic="air-stats"]', renderAirStats(s, r, active, accent));
+    setInner(root, '[data-vent-dynamic="result"]', renderResult(s, r, active, processAccent));
+    setInner(root, '[data-vent-dynamic="air-stats"]', renderAirStats(s, r, active, moduleAccent));
     setInner(root, '[data-vent-dynamic="formula"]', renderFormula(s, r, active, accent));
 
     if (lineStructural || appStructural || hasAnyChanged(changed, ['ventLineSections', 'activeVentLineSectionId', 'activeVentLineSectionName', 'expandedVentLineSectionId'])) {
       lineSectionController?.updateControls?.(root, s);
-      setInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
+      if (!lineSectionController?.updateRows?.(root, s)) {
+        setInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
+      }
     }
 
     root.__tcVentilationDynamic = {
@@ -268,7 +286,8 @@ export function createPressureHoldingDynamicRenderer(options = {}) {
     renderPressureFields,
     renderHoldingOptions,
     renderSavedPanel,
-    renderResult
+    renderResult,
+    lineSectionController
   } = options;
 
   if (typeof calculate !== 'function') throw new Error('createPressureHoldingDynamicRenderer requires calculate');
@@ -451,7 +470,8 @@ export function createBufferStorageDynamicRenderer(options = {}) {
     renderMedium,
     renderInputBlocks,
     renderSavedPanel,
-    renderResult
+    renderResult,
+    lineSectionController
   } = options;
 
   if (typeof calculate !== 'function') throw new Error('createBufferStorageDynamicRenderer requires calculate');
@@ -492,6 +512,11 @@ export function createBufferStorageDynamicRenderer(options = {}) {
     const inputStructural = appStructural || hasAnyChanged(changed, inputStructuralFields) || previous.calculationMode !== s.calculationMode;
     const mediumStructural = appStructural || hasAnyChanged(changed, mediumStructuralFields) || previous.mediumMode !== s.mediumMode || previous.glycolType !== s.glycolType;
 
+    // Phase 42D: Saved selections follow the reference render contract.
+    // Structural input/medium islands are refreshed when hydration changes their
+    // controlling fields; saved rows are synchronized below through the central
+    // controller instead of replacing the full saved card.
+
     if (mediumStructural && typeof renderMedium === 'function') {
       setIslandInner(root, '[data-buffer-dynamic="medium"]', renderMedium(s, r, 'cyan'));
     }
@@ -500,8 +525,11 @@ export function createBufferStorageDynamicRenderer(options = {}) {
       setIslandInner(root, '[data-buffer-dynamic="input-blocks"]', renderInputBlocks(s, r, 'cyan'));
     }
 
-    if (savedStructural && typeof renderSavedPanel === 'function') {
-      setIslandInner(root, '[data-buffer-dynamic="saved-records"]', renderSavedPanel(s, r, 'cyan'));
+    if (savedStructural) {
+      lineSectionController?.updateControls?.(root, s);
+      if (!lineSectionController?.updateRows?.(root, s) && typeof renderSavedPanel === 'function') {
+        setIslandInner(root, '[data-buffer-dynamic="saved-records"]', renderSavedPanel(s, r, 'cyan'));
+      }
     }
 
     syncFields(root, s);
@@ -564,6 +592,31 @@ export function createRainwaterDynamicRenderer(options = {}) {
       || previous.emergencyType !== s.emergencyType
       || previous.areaType !== s.areaType;
 
+    if (savedStructural && !appStructural && !surfaceModeChanged && !selectionHydrationChanged) {
+      // Phase 42D: Plain saved select/deselect may need input hydration. The
+      // central anchor contract keeps the saved card stable while the form
+      // island is refreshed only for selection state changes, not for toggles.
+      if (/^(line:select|line:deselect|saved:load)$/.test(action) && typeof renderForm === 'function') {
+        setIslandInner(root, '[data-rw-dynamic="form"]', renderForm(s, r));
+      }
+      lineSectionController?.updateControls?.(root, s);
+      if (!lineSectionController?.updateRows?.(root, s)) {
+        setIslandInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
+      }
+      setIslandInner(root, '[data-rw-dynamic="result"]', renderResult(s, r));
+      root.__tcRainwaterDynamic = {
+        activeSurfaceId: s.activeSurfaceId,
+        expandedSurfaceResultId: s.expandedSurfaceResultId,
+        surfacesLength: Array.isArray(s.surfaces) ? s.surfaces.length : 0,
+        surfaceMode: s.surfaceMode,
+        drainSize: s.drainSize,
+        emergencyType: s.emergencyType,
+        areaType: s.areaType,
+        savedOnly: true
+      };
+      return;
+    }
+
     // Keep form island stable for saved-record actions. Re-render form when the
     // domain itself is structurally changed, the calculation mode changes, or a
     // lookup/selection change affects dependent visible fields and readonly values.
@@ -575,7 +628,7 @@ export function createRainwaterDynamicRenderer(options = {}) {
 
     if (savedStructural) {
       lineSectionController?.updateControls?.(root, s);
-      setIslandInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
+      if (!lineSectionController?.updateRows?.(root, s)) setIslandInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
     }
 
     root.__tcRainwaterDynamic = {
@@ -631,7 +684,7 @@ export function createWastewaterDynamicRenderer(options = {}) {
 
     if (savedStructural || appStructural) {
       lineSectionController?.updateControls?.(root, s);
-      setIslandInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
+      if (!lineSectionController?.updateRows?.(root, s)) setIslandInner(root, '[data-line-dynamic="line-sections"]', lineSectionController?.renderRows?.(s) || '');
     }
 
     root.__tcWastewaterDynamic = {

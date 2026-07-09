@@ -67,7 +67,7 @@ export const pressureHoldingSavedController = createLineSectionController({
   nameInputId: 'plantName',
   namePlaceholder: 'z. B. Heizzentrale BT A',
   emptyText: 'Noch keine Anlagen gespeichert.',
-  accent: 'purple',
+  accent: 'blue',
   dynamicAttr: 'saved-records',
   dynamicDataAttr: 'data-ph-dynamic',
   title: item => item.name || 'Anlage',

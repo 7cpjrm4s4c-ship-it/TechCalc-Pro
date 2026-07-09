@@ -1,46 +1,15 @@
-# TechCalc Pro 1.3.0 — Netlify Development Package
+# TechCalc Pro – Development / Release Candidate
 
-This package contains the full source tree for continued development and Netlify-based preview/deployment.
+Aktueller Stand: 1.3.3-rc.1 – Release Candidate.
 
-## Requirements
+## Inhalt
 
-- Node.js 22 or newer recommended
-- npm
+- Basis: 1.3.3-dev.10 / Phase 45E.5 Architecture Review.
+- Phase 45E.6 Release Preparation nachgezogen.
+- WRG/Mischluft-Modulsplitting vollständig enthalten.
+- Legacy-Projektmigration für historische WRG-/Mischluft-Daten und Saved Records enthalten.
+- Dokumentation konsolidiert: QM, Modulvertrag, Architecture Baseline, Changelog, Migration Guide und RC-Checkliste.
 
-## Install
+## Build
 
-```bash
-npm ci
-```
-
-## Local validation
-
-```bash
-npm test
-npm run test:integration
-npm run build
-npm run build:minified
-```
-
-## Netlify deployment
-
-Netlify uses `netlify.toml`:
-
-```toml
-[build]
-  command = "npm run build:minified"
-  publish = "dist"
-```
-
-Netlify must deploy the generated `dist/` directory, not the repository root.
-
-## Package policy
-
-- `dist/` is generated and must not be committed.
-- `node_modules/` is generated and must not be committed.
-- `.npmrc` points to the public npm registry.
-- Service-worker cache metadata is generated from `package.json` and `RELEASE_NOTES.md`.
-
-## Release version
-
-Official release: `1.3.0`
+Dieses ZIP ist für Netlify-Hosting und weitere RC-Prüfung vorgesehen. Es enthält keinen `dist/`-Ordner und kein `node_modules/`.

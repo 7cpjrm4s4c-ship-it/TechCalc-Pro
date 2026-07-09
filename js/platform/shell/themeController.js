@@ -1,3 +1,4 @@
+import { logger } from '../../core/logger.js';
 const THEME_STORAGE_KEY = 'techcalc-theme-mode';
 const SUPPORTED_THEME_MODES = new Set(['dark', 'light', 'system']);
 
@@ -5,7 +6,7 @@ function getSafeStorageValue(storage, key) {
   try {
     return storage?.getItem(key) || '';
   } catch (error) {
-    console.warn('Theme-Einstellung konnte nicht gelesen werden.', error);
+    logger.warn('Theme-Einstellung konnte nicht gelesen werden.', error, { module: 'theme' });
     return '';
   }
 }
@@ -14,7 +15,7 @@ function setSafeStorageValue(storage, key, value) {
   try {
     storage?.setItem(key, value);
   } catch (error) {
-    console.warn('Theme-Einstellung konnte nicht gespeichert werden.', error);
+    logger.warn('Theme-Einstellung konnte nicht gespeichert werden.', error, { module: 'theme' });
   }
 }
 

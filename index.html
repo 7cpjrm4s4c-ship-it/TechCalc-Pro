@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#121922" media="(prefers-color-scheme: dark)">
-  <meta name="theme-color" content="#121922" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="description" content="TechCalc Pro - modulare HLSK Quick Tools für Sanitär, Heizung, Lüftung und Klimatechnik.">
@@ -22,20 +22,32 @@
   <link rel="modulepreload" href="./js/core/moduleRuntime.js">
   <link rel="modulepreload" href="./js/core/projectStorage.js">
   <link rel="stylesheet" href="./css/tokens.css">
+  <link rel="stylesheet" href="./css/module-accent-tokens.css">
   <link rel="stylesheet" href="./css/layout.css">
-  <link rel="stylesheet" href="./css/components.css">
-  <link rel="stylesheet" href="./css/modules.css">
-<script>
-  (function(){
-    try {
-      var debug = /(?:\?|&)debug=1(?:&|$)/.test(location.search) || location.hash.indexOf('debug') >= 0;
-      if (debug) {
-        window.__TC_DEBUG_CARD__ = true;
-        window.__TC_DEBUG_LINE_SECTION__ = true;
-      }
-    } catch(e) {}
-  })();
-</script>
+  <link rel="stylesheet" href="./css/components-core.css">
+  <link rel="stylesheet" href="./css/components-controls.css">
+  <link rel="stylesheet" href="./css/components-collections.css">
+  <link rel="stylesheet" href="./css/components-settings-release.css">
+  <link rel="stylesheet" href="./css/components-app-status.css">
+  <link rel="stylesheet" href="./css/components-legacy-contracts.css">
+  <link rel="stylesheet" href="./css/components-system.css">
+  <link rel="stylesheet" href="./css/layout-navigation-theme.css">
+  <link rel="stylesheet" href="./css/theme-light.css">
+  <link rel="stylesheet" href="./css/theme-light-surfaces.css">
+  <link rel="stylesheet" href="./css/theme-light-rollout.css">
+  <link rel="stylesheet" href="./css/theme-light-contrast.css">
+  <link rel="stylesheet" href="./css/components-save-manager.css">
+  <link rel="stylesheet" href="./css/modules-base.css">
+  <link rel="stylesheet" href="./css/modules-hx.css">
+  <link rel="stylesheet" href="./css/modules-wrg.css">
+  <link rel="stylesheet" href="./css/modules-pipe.css">
+  <link rel="stylesheet" href="./css/modules-pressure-buffer.css">
+  <link rel="stylesheet" href="./css/modules-unit.css">
+  <link rel="stylesheet" href="./css/modules-light-overrides.css">
+  <link rel="stylesheet" href="./css/modules-responsive.css">
+  <link rel="stylesheet" href="./css/components-polish.css">
+  <link rel="stylesheet" href="./css/theme-light-final.css">
+
 
 </head>
 <body>
@@ -85,13 +97,22 @@
             <div class="settings-actions settings-actions--split">
               <button class="mini-button mini-button--primary" id="saveProjectButton" type="button">Projekt speichern</button>
               <button class="mini-button" id="openProjectButton" type="button">Projekt öffnen</button>
-              <input id="openProjectFile" class="visually-hidden" type="file" accept="application/json,.json,.techcalc">
+              <input id="openProjectFile" class="visually-hidden" type="file" >
             </div>
             <div id="projectFileLabel" class="settings-hint" aria-live="polite">Kein externes Projekt geöffnet</div>
             <label>Auftraggeber<input id="pdfClient" type="text" autocomplete="organization" placeholder="z. B. Muster GmbH"></label>
             <label>Projektbezeichnung<input id="pdfProject" type="text" placeholder="z. B. Neubau Bürogebäude Nord"></label>
             <label>Projektnummer<input id="pdfProjectNo" type="text" placeholder="z. B. 2025-041"></label>
             <label>Sachbearbeiter<input id="pdfEngineer" type="text" placeholder="z. B. Max Mustermann"></label>
+            <label>Firmenlogo fuer PDF<input id="pdfCompanyLogo" type="file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"></label>
+            <div id="pdfCompanyLogoPreview" class="settings-logo-preview is-empty" aria-live="polite"><span>Kein Firmenlogo hinterlegt</span></div>
+            <label>Firmenname im PDF<input id="pdfCompanyName" type="text" autocomplete="organization" placeholder="z. B. Muster Ingenieure GmbH"></label>
+            <label>Firmenanschrift im PDF<textarea id="pdfCompanyAddress" rows="3" placeholder="Straße, PLZ Ort, Telefon, E-Mail"></textarea></label>
+            <label>Dokumentversion<input id="pdfDocumentVersion" type="text" placeholder="z. B. Vorabzug, Rev. 01 oder A"></label>
+            <label>Geprüft von<input id="pdfCheckedBy" type="text" placeholder="optional"></label>
+            <label>Freigegeben von<input id="pdfApprovedBy" type="text" placeholder="optional"></label>
+            <div class="settings-actions"><button class="mini-button" id="clearPdfCompanyLogo" type="button">PDF-Logo entfernen</button></div>
+            <div id="pdfCompanyLogoStatus" class="settings-hint" aria-live="polite">Kein Firmenlogo hinterlegt</div>
           </div>
         </details>
 
@@ -123,23 +144,35 @@
         <details class="settings-submenu">
           <summary>Release Notes</summary>
           <div class="settings-submenu__content settings-form release-notes-panel">
-            <div class="settings-info-row"><span>Aktuelle Version</span><strong data-app-version-current>1.3.0</strong></div>
+            <div class="settings-info-row"><span>Aktuelle Version</span><strong data-app-version-current>1.3.3-rc.1</strong></div>
             <div id="releaseNotesDynamic">
               <p>Release Notes werden geladen …</p>
             </div>
             <script type="text/plain" id="releaseNotesFallback">
-## Version 1.3.0 - Plattform-Refactor Phase 3
-- Zentrale tc-* UI-Primitives fuer Listen, Accordions, Hinweise, Hilfetexte, Formeln und Objektzeilen.
-- Bestehende Modulklassen bleiben nur noch als Legacy-Aliasse und werden schrittweise abgebaut.
-- UI-System-Dokumentation und Audit-Script fuer modulbezogene Legacy-Klassen ergänzt.
-- Regenwasser, Schmutzwasser, Trinkwasser, Druckhaltung und Pufferspeicher nutzen zentrale UI-Klassen.
+## Version 1.3.3-rc.1 - Release Candidate
+Phase 45E.4 bis 45E.6 nachgezogen: Modulvertrag finalisiert, Architecture Baseline 1.3.3 bestätigt, Architecture Review dokumentiert und Release Preparation mit Changelog, Migrationsleitfaden und RC-Checkliste ergänzt.
 
-## Version 1.2.16 - Release Notes / Link-State Hotfix
-- Release Notes im Menü auf den aktuellen Stand gebracht.
-- Regenwasser-Status wird vor dem Öffnen externer KOSTRA/OpenKo-Links gesichert.
-- Mobile Schnellzugriffe werden dauerhaft gespeichert.
-- Eingestellte Werte, markierte Flächen und Flächenliste bleiben nach Rückkehr aus externen Links erhalten.
-            </script>
+## Version 1.3.3-dev.8 - Documentation Minimization
+Historische Audit-Rohdaten und alte Zwischenartefakte aus dem aktiven Development-ZIP entfernt. `docs/audits/AUDIT_HISTORY.md` und `docs/archive/ARCHIVE_MANIFEST.md` als konsolidierte Nachweise ergänzt.
+
+## Version 1.3.3-dev.5 - Legacy Saved Records Migration
+Legacy-Projekte trennen WRG- und Mischluft-Saved-Records anhand von Modus und Mischluft-Feldstruktur. Mischluft-Einträge werden beim Laden nach `mixed-air` migriert, WRG-Einträge bleiben in `heat-recovery`.
+
+## Version 1.3.2-rc.1 - Release Candidate
+Gate 10 nach Phase 44B/44B.5 fachlich geschlossen. Browser-Konsole geprüft: keine JavaScript Runtime Errors, keine TypeError/ReferenceError, keine unhandled Promise Rejections sichtbar.
+
+## Version 1.3.2-dev.27 - Module-/Prozessfarben Fix
+Modulidentität und Prozesszustand getrennt: Lüftung bleibt Türkis, Heizleistung nutzt Orange und Kühlleistung/Kälte Cyan. Einheiten-Navigation auf Modul-Blau korrigiert.
+
+## Version 1.3.2-dev.23 - Theme Regression Fix
+Kälte-Token im Light Theme wieder auf Cyan gesetzt. Speichern-/Aktualisieren-Buttons vollständig von Modul-Akzenten entkoppelt und auf globale UI-Primärtokens zurückgeführt.
+
+## Version 1.3.2-dev.22 - Final UI Hardening
+Light/Dark/System-Komponentenvertrag final gehärtet: Modul-Akzente, aktive Controls, Result-Cards, Action-Felder und Save/Edit-Zustände werden zentral über Tokens abgesichert. Neue Audits verhindern konkurrierende Modul-Sonderregeln.
+
+## Version 1.3.2-dev.21 - Speicher-/Edit-Modus Sync
+Speicher-Dialog zentral nachgeschärft: Save-/Update-Zustände werden nach dynamischen Listen-Updates und aktiver Datensatz-Auswahl synchronisiert. Konkurrierende Modul-/Render-Zustände werden durch einen zentralen Guard übersteuert.
+</script>
           </div>
         </details>
 
@@ -152,8 +185,9 @@
               <label>E-Mail optional<input id="feedbackEmail" name="email" type="email" autocomplete="email" placeholder="name@example.com"></label>
               <label>Betreff<input id="feedbackSubject" name="subject" type="text" required value="TechCalc Pro Feedback"></label>
               <label>Nachricht<textarea id="feedbackMessage" name="message" required rows="6" placeholder="Feedback, Fehlerbeschreibung oder Verbesserungsvorschlag"></textarea></label>
+              <input class="visually-hidden" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
               <input type="hidden" name="app" value="TechCalc Pro">
-              <input type="hidden" name="version" value="1.3.0">
+              <input type="hidden" name="version" value="1.3.3-rc.1">
               <div class="settings-actions">
                 <button class="mini-button mini-button--primary" id="feedbackSubmit" type="submit">Feedback senden</button>
               </div>
@@ -166,7 +200,7 @@
         <details class="settings-submenu">
           <summary>Rechtliches & App</summary>
           <div class="settings-submenu__content settings-form">
-            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.3.0</strong></div>
+            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.3.3-rc.1</strong></div>
             <a class="mini-button" href="./docs/legal/agb.html" target="_blank" rel="noopener">AGB öffnen</a>
             <button class="mini-button" type="button" disabled>Impressum vorbereiten</button>
           </div>

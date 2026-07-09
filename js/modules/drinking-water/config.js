@@ -5,7 +5,7 @@ export default defineModuleConfig({
   title: 'Trinkwasserberechnung',
   shortTitle: 'Trinkwasser',
   group: 'Sanitärtechnik',
-  accent: 'blue',
+  accent: 'green',
   order: 35,
   defaultVisible: false,
 

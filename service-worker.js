@@ -1,13 +1,38 @@
-const CACHE_NAME = 'techcalc-pro-1.3.0';
-const CACHE_REVISION = '1.3.0-version-1-3-0-mobile-feedback-zoom-scope-correction';
+const CACHE_NAME = 'techcalc-pro-1.3.3-rc.1';
+const CACHE_REVISION = '1.3.3-rc.1-1-3-3-rc-1-release-candidate';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './RELEASE_NOTES.md',
+  './css/components-app-status.css',
+  './css/components-collections.css',
+  './css/components-controls.css',
+  './css/components-core.css',
+  './css/components-legacy-contracts.css',
+  './css/components-polish.css',
+  './css/components-save-manager.css',
+  './css/components-settings-release.css',
+  './css/components-system.css',
   './css/components.css',
+  './css/layout-navigation-theme.css',
   './css/layout.css',
+  './css/module-accent-tokens.css',
+  './css/modules-base.css',
+  './css/modules-hx.css',
+  './css/modules-light-overrides.css',
+  './css/modules-pipe.css',
+  './css/modules-pressure-buffer.css',
+  './css/modules-responsive.css',
+  './css/modules-unit.css',
+  './css/modules-wrg.css',
   './css/modules.css',
+  './css/theme-light-contrast.css',
+  './css/theme-light-final.css',
+  './css/theme-light-guards.css',
+  './css/theme-light-rollout.css',
+  './css/theme-light-surfaces.css',
+  './css/theme-light.css',
   './css/tokens.css',
   './js/core/app.js',
   './js/core/centralStore.js',
@@ -18,6 +43,7 @@ const ASSETS = [
   './js/core/focusManager.js',
   './js/core/formActions.js',
   './js/core/formSchema.js',
+  './js/core/logger.js',
   './js/core/moduleContract.js',
   './js/core/moduleDefinition.js',
   './js/core/moduleLifecycleAdapter.js',
@@ -26,6 +52,11 @@ const ASSETS = [
   './js/core/navigation.js',
   './js/core/numberService.js',
   './js/core/numbers.js',
+  './js/core/pdf/pdfChartRender.js',
+  './js/core/pdf/pdfDataMapping.js',
+  './js/core/pdf/pdfLayout.js',
+  './js/core/pdf/pdfText.js',
+  './js/core/pdf/reportTheme.js',
   './js/core/pdfExport.js',
   './js/core/platformLifecycle.js',
   './js/core/platformPolicy.js',
@@ -39,6 +70,7 @@ const ASSETS = [
   './js/core/renderer.js',
   './js/core/resultRenderer.js',
   './js/core/router.js',
+  './js/core/saveEditModeSync.js',
   './js/core/savedCalculationController.js',
   './js/core/savedRecordController.js',
   './js/core/savedRecords.js',
@@ -99,6 +131,16 @@ const ASSETS = [
   './js/modules/hx-diagram/state.js',
   './js/modules/hx-diagram/view.js',
   './js/modules/hx-diagram/viewModel.js',
+  './js/modules/mixed-air/config.js',
+  './js/modules/mixed-air/controller.js',
+  './js/modules/mixed-air/dynamicRenderer.js',
+  './js/modules/mixed-air/index.js',
+  './js/modules/mixed-air/logic.js',
+  './js/modules/mixed-air/results.js',
+  './js/modules/mixed-air/schema.js',
+  './js/modules/mixed-air/state.js',
+  './js/modules/mixed-air/view.js',
+  './js/modules/mixed-air/viewModel.js',
   './js/modules/pipe-sizing/config.js',
   './js/modules/pipe-sizing/controller.js',
   './js/modules/pipe-sizing/index.js',
@@ -148,7 +190,6 @@ const ASSETS = [
   './js/modules/wastewater/config.js',
   './js/modules/wastewater/controller.js',
   './js/modules/wastewater/index.js',
-  './js/modules/wastewater/lineModel.js',
   './js/modules/wastewater/logic.js',
   './js/modules/wastewater/results.js',
   './js/modules/wastewater/schema.js',
@@ -158,7 +199,6 @@ const ASSETS = [
   './js/modules/wastewater/viewModel.js',
   './js/platform/collectionModel/index.js',
   './js/platform/collectionRenderer/index.js',
-  './js/platform/debugPanel/index.js',
   './js/platform/dynamicRenderer/index.js',
   './js/platform/lineSectionController/index.js',
   './js/platform/moduleRenderer/index.js',
@@ -166,6 +206,7 @@ const ASSETS = [
   './js/platform/resultRenderer/index.js',
   './js/platform/savedRecordModel/index.js',
   './js/platform/shell/feedbackController.js',
+  './js/platform/shell/layoutStabilityController.js',
   './js/platform/shell/performanceController.js',
   './js/platform/shell/releaseNotesController.js',
   './js/platform/shell/serviceWorkerController.js',
@@ -184,8 +225,11 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', event => {
-  self.skipWaiting();
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+});
+
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {

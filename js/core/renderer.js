@@ -111,7 +111,7 @@ export function isMobileViewport() {
 
 export function snapshotViewport(options = {}) {
   const doc = document.scrollingElement || document.documentElement;
-  const anchor = options.anchor || findViewportAnchor(options.event?.target) || findViewportAnchor(document.activeElement);
+  const anchor = options.positionOnly === true ? null : (options.anchor || findViewportAnchor(options.event?.target) || findViewportAnchor(document.activeElement));
   const anchorInfo = getAnchorSnapshot(anchor);
   return {
     x: window.scrollX || doc.scrollLeft || 0,

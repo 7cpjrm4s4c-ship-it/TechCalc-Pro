@@ -224,13 +224,6 @@ function bindCollections(root, state, collectionConfig = {}) {
       if (Object.keys(patch).length) activeState.set(patch, { action: cfg.commitAction || `platform:collection:${name}:commit`, notify: true });
     };
     root.addEventListener('blur', commit, true);
-    root.addEventListener('keydown', event => {
-      if (event.key !== 'Enter') return;
-      const input = event.target?.closest?.('[data-collection-input]');
-      if (!input || !root.contains(input)) return;
-      event.preventDefault();
-      commit(event);
-    }, true);
   }
   const addCollectionItem = ({ element, root }) => {
     const name = element?.dataset?.collection;
