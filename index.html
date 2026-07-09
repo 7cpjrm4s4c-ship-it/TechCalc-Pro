@@ -144,34 +144,32 @@
         <details class="settings-submenu">
           <summary>Release Notes</summary>
           <div class="settings-submenu__content settings-form release-notes-panel">
-            <div class="settings-info-row"><span>Aktuelle Version</span><strong data-app-version-current>1.3.3-rc.1</strong></div>
+            <div class="settings-info-row"><span>Aktuelle Version</span><strong data-app-version-current>1.3.4-dev.1</strong></div>
             <div id="releaseNotesDynamic">
               <p>Release Notes werden geladen …</p>
             </div>
             <script type="text/plain" id="releaseNotesFallback">
-## Version 1.3.3-rc.1 - Release Candidate
-Phase 45E.4 bis 45E.6 nachgezogen: Modulvertrag finalisiert, Architecture Baseline 1.3.3 bestätigt, Architecture Review dokumentiert und Release Preparation mit Changelog, Migrationsleitfaden und RC-Checkliste ergänzt.
+## Version 1.3.3 - Final Release
 
-## Version 1.3.3-dev.8 - Documentation Minimization
-Historische Audit-Rohdaten und alte Zwischenartefakte aus dem aktiven Development-ZIP entfernt. `docs/audits/AUDIT_HISTORY.md` und `docs/archive/ARCHIVE_MANIFEST.md` als konsolidierte Nachweise ergänzt.
+TechCalc Pro 1.3.3 ist freigegeben.
 
-## Version 1.3.3-dev.5 - Legacy Saved Records Migration
-Legacy-Projekte trennen WRG- und Mischluft-Saved-Records anhand von Modus und Mischluft-Feldstruktur. Mischluft-Einträge werden beim Laden nach `mixed-air` migriert, WRG-Einträge bleiben in `heat-recovery`.
+### Neu
+- Wärmerückgewinnung und Mischluft sind in eigenständige Fachmodule getrennt.
+- Bestehende Projekte werden ohne Datenverlust migriert.
+- Gespeicherte Mischluft-Datensätze werden korrekt dem neuen Mischluft-Modul zugeordnet.
+- Projektlebenszyklus für Mischluft vollständig integriert: Eingabe, Berechnung, Speichern, Laden, PDF und Export.
+- Dokumentation, Modulverträge, Quality Manual und Architecture Baseline konsolidiert.
 
-## Version 1.3.2-rc.1 - Release Candidate
-Gate 10 nach Phase 44B/44B.5 fachlich geschlossen. Browser-Konsole geprüft: keine JavaScript Runtime Errors, keine TypeError/ReferenceError, keine unhandled Promise Rejections sichtbar.
+### Verbesserungen
+- Release Notes zeigen künftig keine `dev.x`-Zwischenstände mehr in der App.
+- Dokumentationsstruktur deutlich reduziert und bereinigt.
+- Architektur- und Qualitätsreferenzen für künftige Versionen vereinheitlicht.
 
-## Version 1.3.2-dev.27 - Module-/Prozessfarben Fix
-Modulidentität und Prozesszustand getrennt: Lüftung bleibt Türkis, Heizleistung nutzt Orange und Kühlleistung/Kälte Cyan. Einheiten-Navigation auf Modul-Blau korrigiert.
+### Behoben
+- Mischluft-Speicherdialog ergänzt.
+- Legacy-Mischluft-Records werden beim Laden alter Projekte korrekt migriert.
+- Veraltete Release-Notes-Einträge aus der App-Ansicht entfernt.
 
-## Version 1.3.2-dev.23 - Theme Regression Fix
-Kälte-Token im Light Theme wieder auf Cyan gesetzt. Speichern-/Aktualisieren-Buttons vollständig von Modul-Akzenten entkoppelt und auf globale UI-Primärtokens zurückgeführt.
-
-## Version 1.3.2-dev.22 - Final UI Hardening
-Light/Dark/System-Komponentenvertrag final gehärtet: Modul-Akzente, aktive Controls, Result-Cards, Action-Felder und Save/Edit-Zustände werden zentral über Tokens abgesichert. Neue Audits verhindern konkurrierende Modul-Sonderregeln.
-
-## Version 1.3.2-dev.21 - Speicher-/Edit-Modus Sync
-Speicher-Dialog zentral nachgeschärft: Save-/Update-Zustände werden nach dynamischen Listen-Updates und aktiver Datensatz-Auswahl synchronisiert. Konkurrierende Modul-/Render-Zustände werden durch einen zentralen Guard übersteuert.
 </script>
           </div>
         </details>
@@ -187,7 +185,7 @@ Speicher-Dialog zentral nachgeschärft: Save-/Update-Zustände werden nach dynam
               <label>Nachricht<textarea id="feedbackMessage" name="message" required rows="6" placeholder="Feedback, Fehlerbeschreibung oder Verbesserungsvorschlag"></textarea></label>
               <input class="visually-hidden" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
               <input type="hidden" name="app" value="TechCalc Pro">
-              <input type="hidden" name="version" value="1.3.3-rc.1">
+              <input type="hidden" name="version" value="1.3.4-dev.1">
               <div class="settings-actions">
                 <button class="mini-button mini-button--primary" id="feedbackSubmit" type="submit">Feedback senden</button>
               </div>
@@ -200,7 +198,7 @@ Speicher-Dialog zentral nachgeschärft: Save-/Update-Zustände werden nach dynam
         <details class="settings-submenu">
           <summary>Rechtliches & App</summary>
           <div class="settings-submenu__content settings-form">
-            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.3.3-rc.1</strong></div>
+            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.3.4-dev.1</strong></div>
             <a class="mini-button" href="./docs/legal/agb.html" target="_blank" rel="noopener">AGB öffnen</a>
             <button class="mini-button" type="button" disabled>Impressum vorbereiten</button>
           </div>

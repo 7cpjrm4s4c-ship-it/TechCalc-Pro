@@ -52,3 +52,7 @@ Der Projekt-Root enthält nur runtime-, build- oder release-relevante Dateien. N
 ## Minimierungsregel
 
 Das aktive Development-ZIP enthält nur noch Dokumente mit aktuellem Referenzwert oder zwingendem Nachvollziehbarkeitswert: QM, Contracts, ADRs, Phasen, Release-/Migrationsunterlagen, Engineering-Standards und kompakte Archiv-/Audit-Indizes. Historische Rohdaten, JSON-Prüfberichte, CSS-Zwischenstände und alte Einzel-Audits werden nicht mehr mit ausgeliefert.
+
+## Aktueller Entwicklungsstand
+
+- 1.3.4-dev.1 / Phase 46A: Toolchain Cleanup & Consolidation

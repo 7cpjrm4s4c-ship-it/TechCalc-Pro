@@ -9,7 +9,7 @@ assert.equal(audit.status, 'pass');
 assert.equal(audit.checks.every(check => check.pass), true, 'all Phase 37E checks must pass');
 
 const releaseNotes = readFileSync('RELEASE_NOTES.md', 'utf8');
-assert.match(releaseNotes, /Phase 37E/);
-assert.match(releaseNotes, /RC Closure/);
+assert.match(releaseNotes, /Version 1\.3\.3/);
+assert.match(releaseNotes, /Final Release/);
 
-console.log('Phase 37E release candidate guard passed.');
+console.log('Phase 37E release candidate guard passed with current public release notes.');

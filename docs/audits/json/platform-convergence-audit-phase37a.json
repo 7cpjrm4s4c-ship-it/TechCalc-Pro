@@ -1,0 +1,749 @@
+{
+  "phase": "37A",
+  "name": "Platform Convergence Audit",
+  "generatedBy": "scripts/audit-platform-convergence-phase37a.mjs",
+  "generatedAt": "2026-07-09T13:52:23.054Z",
+  "referenceModules": [
+    "heating-cooling",
+    "ventilation",
+    "pressure-holding",
+    "buffer-storage"
+  ],
+  "modulesAudited": 12,
+  "moduleScores": {
+    "buffer-storage": 100,
+    "drinking-water": 78,
+    "heat-recovery": 100,
+    "heating-cooling": 100,
+    "hx-diagram": 100,
+    "mixed-air": 93,
+    "pipe-sizing": 100,
+    "pressure-holding": 100,
+    "rainwater": 100,
+    "unit-converter": 100,
+    "ventilation": 100,
+    "wastewater": 100
+  },
+  "riskCounts": {
+    "P1": 1,
+    "P2": 2
+  },
+  "cssDebt": [
+    {
+      "file": "css/components.css",
+      "important": 0,
+      "inlineStyleSelectors": 0,
+      "moduleScopedSelectors": 0
+    },
+    {
+      "file": "css/layout.css",
+      "important": 13,
+      "inlineStyleSelectors": 0,
+      "moduleScopedSelectors": 0
+    },
+    {
+      "file": "css/modules.css",
+      "important": 0,
+      "inlineStyleSelectors": 0,
+      "moduleScopedSelectors": 0
+    },
+    {
+      "file": "css/tokens.css",
+      "important": 1,
+      "inlineStyleSelectors": 0,
+      "moduleScopedSelectors": 0
+    }
+  ],
+  "unusedUtilityExports": [
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "getMedium",
+      "consumers": []
+    },
+    {
+      "file": "js/utils/pipes.js",
+      "symbol": "dnTable",
+      "consumers": []
+    }
+  ],
+  "topFindings": [
+    {
+      "module": "drinking-water",
+      "priority": "P1",
+      "area": "event-boundary",
+      "message": "Event-Listener außerhalb controller.js gefunden.",
+      "evidence": {
+        "count": 4,
+        "samples": [
+          {
+            "file": "dynamicRenderer.js",
+            "line": 113,
+            "text": "window.addEventListener('touchstart', activate, { passive:true });"
+          },
+          {
+            "file": "dynamicRenderer.js",
+            "line": 114,
+            "text": "window.addEventListener('touchmove', activate, { passive:true });"
+          },
+          {
+            "file": "dynamicRenderer.js",
+            "line": 115,
+            "text": "window.addEventListener('touchend', release, { passive:true });"
+          },
+          {
+            "file": "dynamicRenderer.js",
+            "line": 116,
+            "text": "window.addEventListener('touchcancel', release, { passive:true });"
+          }
+        ]
+      }
+    },
+    {
+      "module": "drinking-water",
+      "priority": "P2",
+      "area": "event-density",
+      "message": "Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.",
+      "evidence": {
+        "addEventListener": 12
+      }
+    },
+    {
+      "module": "mixed-air",
+      "priority": "P2",
+      "area": "dynamic-renderer",
+      "message": "Lokaler dynamicRenderer.js-Pfad vorhanden; gegen Plattform-Factory prüfen.",
+      "evidence": {
+        "file": "js/modules/mixed-air/dynamicRenderer.js"
+      }
+    }
+  ],
+  "modules": [
+    {
+      "module": "buffer-storage",
+      "reference": true,
+      "files": [
+        "config.js",
+        "controller.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 582,
+        "controllerAddEventListeners": 0,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": true,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 0
+      },
+      "score": 100,
+      "status": "reference-aligned",
+      "findings": []
+    },
+    {
+      "module": "drinking-water",
+      "reference": false,
+      "files": [
+        "config.js",
+        "controller.js",
+        "dynamicRenderer.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 1231,
+        "controllerAddEventListeners": 12,
+        "nonControllerAddEventListeners": 4,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": false,
+        "hasLocalDynamic": true,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 0
+      },
+      "score": 78,
+      "status": "platform-conformant-with-minor-debt",
+      "findings": [
+        {
+          "priority": "P1",
+          "area": "event-boundary",
+          "message": "Event-Listener außerhalb controller.js gefunden.",
+          "evidence": {
+            "count": 4,
+            "samples": [
+              {
+                "file": "dynamicRenderer.js",
+                "line": 113,
+                "text": "window.addEventListener('touchstart', activate, { passive:true });"
+              },
+              {
+                "file": "dynamicRenderer.js",
+                "line": 114,
+                "text": "window.addEventListener('touchmove', activate, { passive:true });"
+              },
+              {
+                "file": "dynamicRenderer.js",
+                "line": 115,
+                "text": "window.addEventListener('touchend', release, { passive:true });"
+              },
+              {
+                "file": "dynamicRenderer.js",
+                "line": 116,
+                "text": "window.addEventListener('touchcancel', release, { passive:true });"
+              }
+            ]
+          }
+        },
+        {
+          "priority": "P2",
+          "area": "event-density",
+          "message": "Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.",
+          "evidence": {
+            "addEventListener": 12
+          }
+        }
+      ]
+    },
+    {
+      "module": "heat-recovery",
+      "reference": false,
+      "files": [
+        "config.js",
+        "controller.js",
+        "dynamicRenderer.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 728,
+        "controllerAddEventListeners": 1,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": false,
+        "hasLocalDynamic": true,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 0
+      },
+      "score": 100,
+      "status": "reference-aligned",
+      "findings": []
+    },
+    {
+      "module": "heating-cooling",
+      "reference": true,
+      "files": [
+        "config.js",
+        "controller.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 593,
+        "controllerAddEventListeners": 0,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": true,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 0
+      },
+      "score": 100,
+      "status": "reference-aligned",
+      "findings": []
+    },
+    {
+      "module": "hx-diagram",
+      "reference": false,
+      "files": [
+        "config.js",
+        "controller.js",
+        "diagramRenderer.js",
+        "dynamicRenderer.js",
+        "formRenderer.js",
+        "index.js",
+        "logic.js",
+        "renderPipeline.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 1101,
+        "controllerAddEventListeners": 5,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": false,
+        "hasLocalDynamic": true,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 0
+      },
+      "score": 100,
+      "status": "reference-aligned",
+      "findings": []
+    },
+    {
+      "module": "mixed-air",
+      "reference": false,
+      "files": [
+        "config.js",
+        "controller.js",
+        "dynamicRenderer.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 345,
+        "controllerAddEventListeners": 1,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": false,
+        "hasLocalDynamic": true,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 0
+      },
+      "score": 93,
+      "status": "reference-aligned",
+      "findings": [
+        {
+          "priority": "P2",
+          "area": "dynamic-renderer",
+          "message": "Lokaler dynamicRenderer.js-Pfad vorhanden; gegen Plattform-Factory prüfen.",
+          "evidence": {
+            "file": "js/modules/mixed-air/dynamicRenderer.js"
+          }
+        }
+      ]
+    },
+    {
+      "module": "pipe-sizing",
+      "reference": false,
+      "files": [
+        "config.js",
+        "controller.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 328,
+        "controllerAddEventListeners": 0,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": true,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 0
+      },
+      "score": 100,
+      "status": "reference-aligned",
+      "findings": []
+    },
+    {
+      "module": "pressure-holding",
+      "reference": true,
+      "files": [
+        "config.js",
+        "controller.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 467,
+        "controllerAddEventListeners": 0,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": true,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 0
+      },
+      "score": 100,
+      "status": "reference-aligned",
+      "findings": []
+    },
+    {
+      "module": "rainwater",
+      "reference": false,
+      "files": [
+        "config.js",
+        "controller.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "tables.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 1003,
+        "controllerAddEventListeners": 2,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": true,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 0
+      },
+      "score": 100,
+      "status": "reference-aligned",
+      "findings": []
+    },
+    {
+      "module": "unit-converter",
+      "reference": false,
+      "files": [
+        "config.js",
+        "controller.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 197,
+        "controllerAddEventListeners": 0,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": true,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 0
+      },
+      "score": 100,
+      "status": "reference-aligned",
+      "findings": []
+    },
+    {
+      "module": "ventilation",
+      "reference": true,
+      "files": [
+        "config.js",
+        "controller.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 464,
+        "controllerAddEventListeners": 0,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": false,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 0
+      },
+      "score": 100,
+      "status": "reference-aligned",
+      "findings": []
+    },
+    {
+      "module": "wastewater",
+      "reference": false,
+      "files": [
+        "config.js",
+        "controller.js",
+        "index.js",
+        "logic.js",
+        "results.js",
+        "schema.js",
+        "state.js",
+        "tables.js",
+        "view.js",
+        "viewModel.js"
+      ],
+      "metrics": {
+        "lineCount": 816,
+        "controllerAddEventListeners": 3,
+        "nonControllerAddEventListeners": 0,
+        "directDomMutationsOutsideRenderer": 0,
+        "viewDomQueries": 0,
+        "moduleCssSelectors": 0,
+        "hasPlatformDynamic": true,
+        "hasLocalDynamic": false,
+        "hasLegacyCollection": false,
+        "usesCentralSavedRecordController": false,
+        "migrationStatusEntries": 0
+      },
+      "score": 100,
+      "status": "reference-aligned",
+      "findings": []
+    }
+  ],
+  "utilityUsage": [
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "MEDIA",
+      "consumers": [
+        "js/modules/heating-cooling/controller.js",
+        "js/modules/heating-cooling/schema.js",
+        "js/modules/heating-cooling/view.js"
+      ]
+    },
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "getMedium",
+      "consumers": []
+    },
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "heatingCooling",
+      "consumers": [
+        "js/modules/heating-cooling/logic.js"
+      ]
+    },
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "airDensity",
+      "consumers": [
+        "js/modules/heat-recovery/logic.js"
+      ]
+    },
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "ventilation",
+      "consumers": [
+        "js/core/app.js",
+        "js/core/preferences.js",
+        "js/core/projectStorage.js",
+        "js/modules/heat-recovery/logic.js",
+        "js/modules/ventilation/config.js",
+        "js/modules/ventilation/logic.js",
+        "js/modules/wastewater/logic.js"
+      ]
+    },
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "num",
+      "consumers": [
+        "js/modules/buffer-storage/logic.js",
+        "js/modules/drinking-water/logic.js",
+        "js/modules/heat-recovery/logic.js",
+        "js/modules/hx-diagram/logic.js",
+        "js/modules/pressure-holding/logic.js"
+      ]
+    },
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "fmt",
+      "consumers": [
+        "js/modules/buffer-storage/controller.js",
+        "js/modules/buffer-storage/results.js",
+        "js/modules/buffer-storage/viewModel.js",
+        "js/modules/drinking-water/results.js",
+        "js/modules/drinking-water/view.js",
+        "js/modules/drinking-water/viewModel.js",
+        "js/modules/heat-recovery/results.js",
+        "js/modules/heating-cooling/controller.js",
+        "js/modules/heating-cooling/results.js",
+        "js/modules/heating-cooling/schema.js",
+        "js/modules/heating-cooling/view.js",
+        "js/modules/mixed-air/controller.js",
+        "js/modules/pipe-sizing/controller.js",
+        "js/modules/pipe-sizing/results.js",
+        "js/modules/pressure-holding/controller.js",
+        "js/modules/pressure-holding/results.js",
+        "js/modules/rainwater/results.js",
+        "js/modules/rainwater/schema.js",
+        "js/modules/unit-converter/index.js",
+        "js/modules/unit-converter/results.js",
+        "js/modules/unit-converter/viewModel.js",
+        "js/modules/ventilation/results.js",
+        "js/modules/ventilation/viewModel.js",
+        "js/modules/wastewater/results.js",
+        "js/modules/wastewater/schema.js",
+        "js/platform/dynamicRenderer/index.js"
+      ]
+    },
+    {
+      "file": "js/utils/calculations.js",
+      "symbol": "fmtInput",
+      "consumers": [
+        "js/modules/buffer-storage/viewModel.js",
+        "js/modules/drinking-water/view.js",
+        "js/modules/heat-recovery/viewModel.js",
+        "js/modules/heating-cooling/controller.js",
+        "js/modules/heating-cooling/index.js",
+        "js/modules/heating-cooling/view.js",
+        "js/modules/heating-cooling/viewModel.js",
+        "js/modules/hx-diagram/formRenderer.js",
+        "js/modules/mixed-air/viewModel.js",
+        "js/modules/pressure-holding/index.js",
+        "js/modules/pressure-holding/viewModel.js",
+        "js/modules/rainwater/schema.js",
+        "js/modules/ventilation/controller.js",
+        "js/modules/ventilation/view.js",
+        "js/modules/wastewater/schema.js",
+        "js/modules/wastewater/viewModel.js",
+        "js/platform/dynamicRenderer/index.js"
+      ]
+    },
+    {
+      "file": "js/utils/pipes.js",
+      "symbol": "pipeSystems",
+      "consumers": [
+        "js/modules/heating-cooling/schema.js",
+        "js/modules/heating-cooling/view.js",
+        "js/modules/pipe-sizing/viewModel.js"
+      ]
+    },
+    {
+      "file": "js/utils/pipes.js",
+      "symbol": "dnTable",
+      "consumers": []
+    },
+    {
+      "file": "js/utils/pipes.js",
+      "symbol": "recommendPipe",
+      "consumers": [
+        "js/modules/heating-cooling/logic.js",
+        "js/modules/pipe-sizing/logic.js"
+      ]
+    },
+    {
+      "file": "js/utils/units.js",
+      "symbol": "unitCategories",
+      "consumers": [
+        "js/modules/unit-converter/logic.js",
+        "js/modules/unit-converter/results.js",
+        "js/modules/unit-converter/viewModel.js"
+      ]
+    },
+    {
+      "file": "js/utils/units.js",
+      "symbol": "convert",
+      "consumers": [
+        "js/modules/unit-converter/logic.js"
+      ]
+    }
+  ],
+  "riskRegister": [
+    {
+      "module": "drinking-water",
+      "priority": "P1",
+      "area": "event-boundary",
+      "message": "Event-Listener außerhalb controller.js gefunden.",
+      "evidence": {
+        "count": 4,
+        "samples": [
+          {
+            "file": "dynamicRenderer.js",
+            "line": 113,
+            "text": "window.addEventListener('touchstart', activate, { passive:true });"
+          },
+          {
+            "file": "dynamicRenderer.js",
+            "line": 114,
+            "text": "window.addEventListener('touchmove', activate, { passive:true });"
+          },
+          {
+            "file": "dynamicRenderer.js",
+            "line": 115,
+            "text": "window.addEventListener('touchend', release, { passive:true });"
+          },
+          {
+            "file": "dynamicRenderer.js",
+            "line": 116,
+            "text": "window.addEventListener('touchcancel', release, { passive:true });"
+          }
+        ]
+      }
+    },
+    {
+      "module": "drinking-water",
+      "priority": "P2",
+      "area": "event-density",
+      "message": "Controller enthält hohe lokale Listener-Dichte; Delegation gegen EventPipeline prüfen.",
+      "evidence": {
+        "addEventListener": 12
+      }
+    },
+    {
+      "module": "mixed-air",
+      "priority": "P2",
+      "area": "dynamic-renderer",
+      "message": "Lokaler dynamicRenderer.js-Pfad vorhanden; gegen Plattform-Factory prüfen.",
+      "evidence": {
+        "file": "js/modules/mixed-air/dynamicRenderer.js"
+      }
+    }
+  ]
+}
