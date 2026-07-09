@@ -416,3 +416,7 @@ Light Theme Modul-Akzentfarben zentralisiert: Heizung Orange, Kälte Cyan, Puffe
 - Dokumentationsindex, Audit-README und Phasenindex aktualisiert.
 - Modulvertrag auf QM-Referenzen erweitert.
 - Keine fachlichen Anwendungscode-Änderungen.
+
+
+## 1.3.3-rc.1 Preparation
+Release preparation completed.
