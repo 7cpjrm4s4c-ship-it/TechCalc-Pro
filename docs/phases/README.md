@@ -55,3 +55,17 @@ Phase 42 ist als konsolidierte Architekturphase dokumentiert. Relevante Dateien:
 ## Archived detailed phase artefacts
 
 Detaillierte Phase-36-, Phase-38- und einzelne historische Zwischenartefakte wurden in Phase 43B nach `docs/archive/legacy-phase-docs/` verschoben. Die aktiven Zusammenfassungen bleiben unter `docs/phases/`.
+
+## Phase 45 – Version 1.3.3 Modulsplitting
+
+- `phase-45a-modulsplitting-analysis.md` – Analyse des Trennschnitts zwischen Wärmerückgewinnung und Mischluft.
+- `phase-45b-modulsplitting-design-review.md` – Zielarchitektur, Modul-IDs und Splitting-Vertrag.
+- `phase-45c-modulsplitting-implementation.md` – technische Umsetzung der Modultrennung.
+- `phase-45c1-project-lifecycle-integration.md` – Save-/Load-/Dirty-State-Integration des Mischluft-Moduls.
+- `phase-45c2-legacy-saved-records-migration.md` – Migration gespeicherter Legacy-Mischluft-Records.
+- `phase-45d-regression.md` – Regressionsabschluss ohne festgestellte Regressionen.
+- `phase-45e1-documentation-cleanup.md` – Dokumentationsbereinigung und Aktualisierung des Modulvertrags.
+
+## Phase documentation rule
+
+Ab Phase 45E.1 gilt: Jede neue Phase erhält eine eigene Abschlussdokumentation. Detail- oder Patchdokumente sind zulässig, müssen aber im Phasenindex verlinkt sein und dürfen keine widersprüchliche aktive Referenz erzeugen.
