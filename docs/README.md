@@ -1,6 +1,6 @@
 # TechCalc Pro Documentation Index
 
-Status: aktualisiert in Version 1.3.3-dev.7 / Phase 45E.2
+Status: aktualisiert in Version 1.3.3-dev.8 / Phase 45E.3
 
 Dieser Index ist der zentrale Einstiegspunkt der Projektdokumentation. Ab Version 1.3.3 ist die Dokumentation nach Verantwortlichkeit getrennt: Phasen dokumentieren Historie, ADRs dokumentieren Entscheidungen, Contracts dokumentieren Schnittstellen, das Quality Manual dokumentiert dauerhafte Qualitätsstandards.
 
@@ -12,8 +12,8 @@ Dieser Index ist der zentrale Einstiegspunkt der Projektdokumentation. Ab Versio
 - `docs/adr/` – Architecture Decision Records.
 - `docs/engineering/` – Engineering Guide, Branching, Reviews, Release- und Testprozesse.
 - `docs/architecture/` – stabile Architekturgrundlagen mit historischem Referenzwert.
-- `docs/audits/` – historische Auditnachweise, JSON-Baselines und phasenbezogene Prüfprotokolle.
-- `docs/release/` und `docs/release-notes/` – Release- und Migrationsunterlagen.
+- `docs/audits/` – konsolidierte Audit-Historie; aktuelle Prüfkriterien liegen im QM.
+- `docs/release/` – Release- und Migrationsunterlagen.
 - `docs/archive/` – historische oder ersetzte Dokumente mit Nachvollziehbarkeitswert.
 - `docs/legal/` – rechtliche Dokumente.
 - `docs/security/` – sicherheitsbezogene Prüfstände.
@@ -46,4 +46,9 @@ Der Projekt-Root enthält nur runtime-, build- oder release-relevante Dateien. N
 - Jeder verbindliche Architekturvertrag liegt unter `docs/contracts/`.
 - Jede Architekturentscheidung besitzt eine ADR unter `docs/adr/`.
 - Dauerhafte Qualitätsanforderungen werden im QM gepflegt.
-- Historische Dokumente bleiben erhalten, werden aber nicht parallel als aktive Referenz weitergeführt.
+- Historische Detailartefakte werden nicht mehr vollständig im Development-ZIP mitgeführt; ihr Entfall ist im Archivmanifest dokumentiert.
+
+
+## Minimierungsregel
+
+Das aktive Development-ZIP enthält nur noch Dokumente mit aktuellem Referenzwert oder zwingendem Nachvollziehbarkeitswert: QM, Contracts, ADRs, Phasen, Release-/Migrationsunterlagen, Engineering-Standards und kompakte Archiv-/Audit-Indizes. Historische Rohdaten, JSON-Prüfberichte, CSS-Zwischenstände und alte Einzel-Audits werden nicht mehr mit ausgeliefert.

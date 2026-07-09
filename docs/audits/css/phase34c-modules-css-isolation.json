@@ -1,9 +1,0 @@
-{
-  "phase": "34C",
-  "componentsLines": 741,
-  "modulesLines": 220,
-  "modulesImportantCount": 0,
-  "forbiddenGlobalPrimitiveSelectorCount": 0,
-  "componentFileContainsModuleRules": false,
-  "status": "pass"
-}

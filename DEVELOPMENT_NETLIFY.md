@@ -1,8 +1,8 @@
 # TechCalc Pro – Development Netlify
 
-Aktueller Stand: 1.3.3-dev.7 – Phase 45E.2 Documentation Consolidation & Quality Manual.
+Aktueller Stand: 1.3.3-dev.8 – Phase 45E.3 Documentation Minimization.
 
-Entwicklungsstand für Version 1.3.3 – Phase 45E.2.
+Entwicklungsstand für Version 1.3.3 – Phase 45E.3.
 
 ## Inhalt
 

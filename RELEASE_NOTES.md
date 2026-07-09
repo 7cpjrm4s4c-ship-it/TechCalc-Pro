@@ -1,3 +1,11 @@
+## 1.3.3-dev.8 – Phase 45E.3 Documentation Minimization
+
+- Historische Audit-Rohdaten und alte Zwischenartefakte aus dem aktiven Development-ZIP entfernt.
+- `docs/audits/AUDIT_HISTORY.md` als konsolidierte Audit-Historie ergänzt.
+- `docs/archive/ARCHIVE_MANIFEST.md` als Nachweis der entfernten historischen Dateien ergänzt.
+- Dokumentationsindex und Audit-README auf minimale aktive Referenzstruktur aktualisiert.
+- Keine fachlichen Anwendungscode-Änderungen.
+
 ## 1.3.3-dev.7 – Phase 45E.2 Documentation Consolidation & Quality Manual
 
 - Quality Manual unter `docs/qm/` eingeführt.

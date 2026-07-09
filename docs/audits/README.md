@@ -1,12 +1,10 @@
-# Audit Archive
+# Audit History
 
-Status: historischer Nachweisbereich ab Version 1.3.3-dev.7
+Status: minimierter historischer Nachweisbereich ab Version 1.3.3-dev.8
 
-Dieser Ordner enthält historische Auditdateien, JSON-Baselines, Prüfprotokolle und phasenbezogene Nachweise. Die Dateien bleiben aus Gründen der Nachvollziehbarkeit erhalten.
+Dieser Ordner enthält keine Audit-Rohdaten mehr. Die bisherigen Einzel-Audits wurden in das Quality Manual und die konsolidierte Audit-Historie überführt.
 
 ## Aktive Qualitätsreferenz
-
-Der aktuelle Qualitätsstandard wird nicht mehr über einzelne Auditdateien definiert, sondern über das Quality Manual:
 
 - `docs/qm/QM-001-Quality-Manual.md`
 - `docs/qm/QM-004-Release-Gates.md`
@@ -14,6 +12,10 @@ Der aktuelle Qualitätsstandard wird nicht mehr über einzelne Auditdateien defi
 - `docs/qm/QM-006-Regression-Standard.md`
 - `docs/qm/QM-013-Test-Matrix.md`
 
+## Historischer Überblick
+
+- `docs/audits/AUDIT_HISTORY.md`
+
 ## Regel
 
-Neue Audits dürfen als Nachweis abgelegt werden, wenn sie einen konkreten Prüfstand dokumentieren. Dauerhafte Prüfkriterien werden im passenden QM-Kapitel gepflegt.
+Neue dauerhafte Prüfkriterien werden im passenden QM-Kapitel gepflegt. Einzelne Audit-Rohdaten werden nur noch temporär erzeugt und nicht standardmäßig im Development-ZIP ausgeliefert.
