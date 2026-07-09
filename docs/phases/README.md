@@ -72,3 +72,7 @@ Detaillierte Phase-36-, Phase-38- und einzelne historische Zwischenartefakte wur
 Ab Phase 45E.2 gilt: Jede neue Phase erhält eine eigene Abschlussdokumentation. Dauerhafte Qualitätsregeln werden im Quality Manual gepflegt. Detail- oder Patchdokumente sind zulässig, müssen aber im Phasenindex verlinkt sein und dürfen keine widersprüchliche aktive Referenz erzeugen.
 
 - `phase-45e3-documentation-minimization.md` – Documentation Minimization.
+
+- `phase-45e4-module-contract-finalization.md` – Module Contract Finalization.
+- `phase-45e5-architecture-review.md` – Architecture Review.
+- `phase-45e6-release-preparation.md` – Release Preparation.

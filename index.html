@@ -144,13 +144,22 @@
         <details class="settings-submenu">
           <summary>Release Notes</summary>
           <div class="settings-submenu__content settings-form release-notes-panel">
-            <div class="settings-info-row"><span>Aktuelle Version</span><strong data-app-version-current>1.3.3-dev.8</strong></div>
+            <div class="settings-info-row"><span>Aktuelle Version</span><strong data-app-version-current>1.3.3-rc.1</strong></div>
             <div id="releaseNotesDynamic">
               <p>Release Notes werden geladen …</p>
             </div>
             <script type="text/plain" id="releaseNotesFallback">
-## Version 1.3.3-dev.8 - Documentation Cleanup
-Legacy-Projekte trennen WRG- und Mischluft-Saved-Records jetzt anhand von Modus und Mischluft-Feldstruktur. Mischluft-Einträge werden beim Laden nach `mixed-air` migriert, WRG-Einträge bleiben in `heat-recovery`.
+## Version 1.3.3-rc.1 - Release Candidate
+Phase 45E.4 bis 45E.6 nachgezogen: Modulvertrag finalisiert, Architecture Baseline 1.3.3 bestätigt, Architecture Review dokumentiert und Release Preparation mit Changelog, Migrationsleitfaden und RC-Checkliste ergänzt.
+
+## Version 1.3.3-dev.8 - Documentation Minimization
+Historische Audit-Rohdaten und alte Zwischenartefakte aus dem aktiven Development-ZIP entfernt. `docs/audits/AUDIT_HISTORY.md` und `docs/archive/ARCHIVE_MANIFEST.md` als konsolidierte Nachweise ergänzt.
+
+## Version 1.3.3-dev.5 - Legacy Saved Records Migration
+Legacy-Projekte trennen WRG- und Mischluft-Saved-Records anhand von Modus und Mischluft-Feldstruktur. Mischluft-Einträge werden beim Laden nach `mixed-air` migriert, WRG-Einträge bleiben in `heat-recovery`.
+
+## Version 1.3.2-rc.1 - Release Candidate
+Gate 10 nach Phase 44B/44B.5 fachlich geschlossen. Browser-Konsole geprüft: keine JavaScript Runtime Errors, keine TypeError/ReferenceError, keine unhandled Promise Rejections sichtbar.
 
 ## Version 1.3.2-dev.27 - Module-/Prozessfarben Fix
 Modulidentität und Prozesszustand getrennt: Lüftung bleibt Türkis, Heizleistung nutzt Orange und Kühlleistung/Kälte Cyan. Einheiten-Navigation auf Modul-Blau korrigiert.
@@ -163,19 +172,7 @@ Light/Dark/System-Komponentenvertrag final gehärtet: Modul-Akzente, aktive Cont
 
 ## Version 1.3.2-dev.21 - Speicher-/Edit-Modus Sync
 Speicher-Dialog zentral nachgeschärft: Save-/Update-Zustände werden nach dynamischen Listen-Updates und aktiver Datensatz-Auswahl synchronisiert. Konkurrierende Modul-/Render-Zustände werden durch einen zentralen Guard übersteuert.
-
-## Version 1.3.2-dev.12 - CSS System Cleanup
-- Zentrale tc-* UI-Primitives fuer Listen, Accordions, Hinweise, Hilfetexte, Formeln und Objektzeilen.
-- Bestehende Modulklassen bleiben nur noch als Legacy-Aliasse und werden schrittweise abgebaut.
-- UI-System-Dokumentation und Audit-Script fuer modulbezogene Legacy-Klassen ergänzt.
-- Regenwasser, Schmutzwasser, Trinkwasser, Druckhaltung und Pufferspeicher nutzen zentrale UI-Klassen.
-
-## Version 1.2.16 - Release Notes / Link-State Hotfix
-- Release Notes im Menü auf den aktuellen Stand gebracht.
-- Regenwasser-Status wird vor dem Öffnen externer KOSTRA/OpenKo-Links gesichert.
-- Mobile Schnellzugriffe werden dauerhaft gespeichert.
-- Eingestellte Werte, markierte Flächen und Flächenliste bleiben nach Rückkehr aus externen Links erhalten.
-            </script>
+</script>
           </div>
         </details>
 
@@ -190,7 +187,7 @@ Speicher-Dialog zentral nachgeschärft: Save-/Update-Zustände werden nach dynam
               <label>Nachricht<textarea id="feedbackMessage" name="message" required rows="6" placeholder="Feedback, Fehlerbeschreibung oder Verbesserungsvorschlag"></textarea></label>
               <input class="visually-hidden" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
               <input type="hidden" name="app" value="TechCalc Pro">
-              <input type="hidden" name="version" value="1.3.3-dev.8">
+              <input type="hidden" name="version" value="1.3.3-rc.1">
               <div class="settings-actions">
                 <button class="mini-button mini-button--primary" id="feedbackSubmit" type="submit">Feedback senden</button>
               </div>
@@ -203,7 +200,7 @@ Speicher-Dialog zentral nachgeschärft: Save-/Update-Zustände werden nach dynam
         <details class="settings-submenu">
           <summary>Rechtliches & App</summary>
           <div class="settings-submenu__content settings-form">
-            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.3.3-dev.8</strong></div>
+            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.3.3-rc.1</strong></div>
             <a class="mini-button" href="./docs/legal/agb.html" target="_blank" rel="noopener">AGB öffnen</a>
             <button class="mini-button" type="button" disabled>Impressum vorbereiten</button>
           </div>

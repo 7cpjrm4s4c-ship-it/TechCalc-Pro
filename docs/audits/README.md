@@ -1,6 +1,6 @@
 # Audit History
 
-Status: minimierter historischer Nachweisbereich ab Version 1.3.3-dev.8
+Status: minimierter historischer Nachweisbereich ab Version 1.3.3-rc.1
 
 Dieser Ordner enthält keine Audit-Rohdaten mehr. Die bisherigen Einzel-Audits wurden in das Quality Manual und die konsolidierte Audit-Historie überführt.
 

@@ -1,6 +1,6 @@
 # Runtime Compatibility Entrypoints
 
-Status: verbindlich ab Version 1.3.3-dev.8 / Phase 45E.3
+Status: verbindlich ab Version 1.3.3-rc.1 / Phase 45E.6
 
 Dieses Dokument hält bewusst erhaltene Core-Dateien fest, die nicht in jedem Fall über statische Imports erreichbar sind oder als Kompatibilitäts-/Audit-Entrypoints bestehen. Sie dürfen nicht allein aufgrund fehlender statischer Inbound-Imports entfernt werden.
 

@@ -1,7 +1,7 @@
 # Module Contract
 
-Status: verbindlich ab Version 1.3.3-dev.7  
-Letzte Aktualisierung: Phase 45E.2 Documentation Consolidation & Quality Manual
+Status: verbindlich ab Version 1.3.3-rc.1  
+Letzte Aktualisierung: Phase 45E.4 Module Contract Finalization
 
 ## Ziel
 
@@ -72,6 +72,24 @@ Das frühere kombinierte WRG-/Mischluft-Modul ist seit Version 1.3.3 getrennt:
 - Mischluft-Records dürfen nach Migration nicht im WRG-Speicher verbleiben.
 
 Detailreferenz: `docs/contracts/wrg-mixed-air-splitting-contract.md`
+
+
+## Modulverantwortlichkeiten 1.3.3
+
+| Modul-ID | Verantwortung | Persistenz / Records | PDF / Export | Besondere Regeln |
+|---|---|---|---|---|
+| `heating-cooling` | Leistung, Massenstrom und Temperaturdifferenz für Heizung/Kälte | eigener State und Saved Records | Ergebniswerte und Berechnungsgrundlagen | Prozessfarbe getrennt von Modulidentität |
+| `pressure-holding` | Druckhaltung und Anlagenparameter | eigener State und Saved Records | Druckhaltungs-Ergebnisse | keine Kopplung an Pufferspeicher |
+| `buffer-storage` | Pufferspeicher-Dimensionierung | eigener State und Saved Records | Speicherergebnisse | keine Vergleichs-/Altlogik im aktiven Pfad |
+| `ventilation` | Luftbehandlung und RLT-Basisfunktionen | eigener State | PDF über definierte Ergebnisdaten | keine Vermischung mit WRG/Mischluft-Records |
+| `heat-recovery` | Wärmerückgewinnung/RLT-Geräte | eigene WRG-Records | WRG-spezifische Ergebnisse | keine Mischluft-Records |
+| `mixed-air` | Mischluft aus Außenluft/Umluft | eigene Mischluft-Records | Mischluft-Ergebnisse | eigene Save-/Load-/Migration-Anbindung |
+| `hx-diagram` | h,x-Diagramm und Zustandsvisualisierung | eigener Diagrammzustand | Diagramm-/Zustandsausgabe | Canvas/Diagrammlogik bleibt gekapselt |
+| `drinking-water` | Trinkwasserberechnungen | eigener State | Trinkwasser-Ergebnisse | Referenz für mobile Eingabe-/Keyboard-Verträge |
+| `wastewater` | Abwasserberechnungen | eigener State | Abwasser-Ergebnisse | kein Legacy-LineModel im aktiven Pfad |
+| `rainwater` | Regenwasser/KOSTRA-Kontext | eigener State und Flächenlisten | Regenwasser-Ergebnisse | externe Links sichern State vor Navigation |
+| `pipe-sizing` | Rohrdimensionierung | Leitungsabschnitte und Materialzustand | Rohrtabellen/Dimensionen | Modulfarben folgen Modulvertrag |
+| `unit-converter` | Einheitenumrechnung | temporärer/konvertierbarer State | kein Pflicht-PDF | keine Fachmodul-Persistenz vermischen |
 
 ## Referenzmodule
 

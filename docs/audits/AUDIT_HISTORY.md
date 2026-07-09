@@ -1,6 +1,6 @@
 # Consolidated Audit History
 
-Status: konsolidiert in Version 1.3.3-dev.8 / Phase 45E.3
+Status: konsolidiert in Version 1.3.3-rc.1 / Phase 45E.6
 
 Dieses Dokument ersetzt die bisherige Sammlung einzelner Audit-Rohdateien im aktiven Projektpaket. Der aktuelle Qualitaetsstandard ist verbindlich im Quality Manual (`docs/qm/`) beschrieben. Historische Auditdetails werden nicht mehr einzeln ausgeliefert.
 

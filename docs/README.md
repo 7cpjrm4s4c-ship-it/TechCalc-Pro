@@ -1,6 +1,6 @@
 # TechCalc Pro Documentation Index
 
-Status: aktualisiert in Version 1.3.3-dev.8 / Phase 45E.3
+Status: aktualisiert in Version 1.3.3-rc.1 / Phase 45E.6
 
 Dieser Index ist der zentrale Einstiegspunkt der Projektdokumentation. Ab Version 1.3.3 ist die Dokumentation nach Verantwortlichkeit getrennt: Phasen dokumentieren Historie, ADRs dokumentieren Entscheidungen, Contracts dokumentieren Schnittstellen, das Quality Manual dokumentiert dauerhafte Qualitätsstandards.
 
