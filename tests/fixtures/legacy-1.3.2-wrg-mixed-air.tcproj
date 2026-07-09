@@ -1,0 +1,59 @@
+{
+  "app": "TechCalc Pro",
+  "format": "techcalc-project",
+  "version": 1,
+  "savedAt": "2026-07-09T00:00:00.000Z",
+  "meta": {
+    "client": "E2E Legacy Kunde",
+    "project": "Legacy WRG Mischluft Migration",
+    "projectNo": "46D-LEGACY",
+    "engineer": "TechCalc QA"
+  },
+  "modules": {
+    "heat-recovery": {
+      "state": {
+        "wrgVolumeFlowM3h": "3500",
+        "outdoorTemp": "-5",
+        "outdoorRh": "80",
+        "extractTemp": "22",
+        "extractRh": "45",
+        "efficiency": "75",
+        "bypassPercent": "0",
+        "mixingOutdoorVolumeFlowM3h": "1000",
+        "mixingOutdoorTemp": "-8",
+        "mixingOutdoorRh": "85",
+        "mixingRecircVolumeFlowM3h": "2000",
+        "mixingRecircTemp": "22",
+        "mixingRecircRh": "45",
+        "savedRltDevices": [
+          {
+            "id": "legacy-wrg-1",
+            "name": "WRG Bestand",
+            "mode": "WRG",
+            "state": {
+              "wrgVolumeFlowM3h": "3500",
+              "outdoorTemp": "-5",
+              "outdoorRh": "80",
+              "extractTemp": "22",
+              "extractRh": "45",
+              "efficiency": "75",
+              "bypassPercent": "0"
+            }
+          },
+          {
+            "id": "legacy-mixed-air-1",
+            "name": "Mischluft Bestand",
+            "state": {
+              "mixingOutdoorVolumeFlowM3h": "1000",
+              "mixingOutdoorTemp": "-8",
+              "mixingOutdoorRh": "85",
+              "mixingRecircVolumeFlowM3h": "2000",
+              "mixingRecircTemp": "22",
+              "mixingRecircRh": "45"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

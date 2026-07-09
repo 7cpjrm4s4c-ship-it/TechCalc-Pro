@@ -20,3 +20,36 @@ Status: verbindlich ab Version 1.3.3-dev.7
 ## Manuelle Tests
 
 Manuelle Tests sind zulässig, wenn Browser-, iOS-, Windows- oder PWA-Verhalten nicht vollständig automatisiert abbildbar ist. Ergebnisse müssen in Phasen- oder Release-Dokumentation nachvollziehbar festgehalten werden.
+
+
+## Toolchain-Hygiene ab Phase 46A
+
+Das aktive Verzeichnis `scripts/` darf nur Skripte enthalten, die über `package.json` oder `scripts/test-integration.mjs` erreichbar sind.
+
+Verbindliche Regel:
+
+- neue Audit-Skripte müssen entweder in die Pipeline eingebunden oder nach Abschluss der Phase entfernt werden
+- historische Audit-Skripte verbleiben nicht im aktiven Tooling-Pfad
+- `npm run lint` führt `audit:toolchain` aus und blockiert unverdrahtete Skripte
+
+Standard-Gates:
+
+- `npm run lint`
+- `npm test`
+- `npm run test:integration`
+- `npm run build`
+- `npm run build:minified`
+
+
+## E2E-Erweiterung ab Phase 46D
+
+Die Playwright-Suite deckt zusätzlich zum Browser-Runtime-Smoke die folgenden kritischen Browserpfade ab:
+
+- Mischluft-Berechnung und gespeicherte Mischluft-Records
+- Legacy-Migration von WRG/Mischluft-Projekten aus Version 1.3.2
+- Projekt-Download als `.tcproj`
+- PDF-Export aus dem Mischluft-Modul
+
+Der statische Audit `audit:e2e-coverage` ist Bestandteil von `npm run lint` und verhindert, dass diese Kernabdeckung unbeabsichtigt entfernt wird.
+
+Für die tatsächliche Browserausführung von `npm run test:e2e` müssen die Playwright-Browser-Binaries einmalig mit `npx playwright install` bereitgestellt werden.

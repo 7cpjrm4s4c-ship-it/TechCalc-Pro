@@ -1,12 +1,6 @@
 import { logger } from '../../core/logger.js';
-function escapeHtml(value = '') {
-  return String(value).replace(/[&<>"]/g, char => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;'
-  }[char]));
-}
+import { esc as escapeHtml } from '../../core/renderer.js';
+
 
 function normalizeReleaseVersion(value = '') {
   return String(value || '')
@@ -80,19 +74,58 @@ export function parseReleaseNotes(markdown = '') {
 export function renderReleaseNotes(notes, host = document.getElementById('releaseNotesDynamic')) {
   if (!host) return;
   if (!notes?.length) {
-    host.innerHTML = '<p>Release Notes konnten nicht geladen werden.</p>';
+    replaceReleaseNotes(host, [createReleaseElement('p', {}, 'Release Notes konnten nicht geladen werden.')]);
     return;
   }
-  host.innerHTML = notes.slice(0, 18).map((note, index) => `
-    <article class="release-note${index === 0 ? ' is-current' : ''}">
-      <div class="release-note__header">
-        <strong class="release-note__version">${escapeHtml(note.version)}</strong>
-        ${index === 0 ? '<span class="release-note__badge">Aktuell</span>' : ''}
-      </div>
-      ${note.title ? `<strong class="release-note__title">${escapeHtml(note.title)}</strong>` : ''}
-      <small>${escapeHtml(note.items.slice(0, 4).join(' '))}</small>
-    </article>
-  `).join('');
+
+  const elements = notes.slice(0, 18).map((note, index) => {
+    const article = createReleaseElement('article', {
+      className: `release-note${index === 0 ? ' is-current' : ''}`
+    });
+
+    const header = createReleaseElement('div', { className: 'release-note__header' });
+    header.append(
+      createReleaseElement('strong', { className: 'release-note__version' }, note.version),
+      ...(index === 0 ? [createReleaseElement('span', { className: 'release-note__badge' }, 'Aktuell')] : [])
+    );
+    article.append(header);
+
+    if (note.title) {
+      article.append(createReleaseElement('strong', { className: 'release-note__title' }, note.title));
+    }
+
+    article.append(createReleaseElement('small', {}, note.items.slice(0, 4).join(' ')));
+    return article;
+  });
+
+  replaceReleaseNotes(host, elements);
+}
+
+function createReleaseElement(tagName, attributes = {}, text = '') {
+  if (typeof document !== 'undefined' && typeof document.createElement === 'function') {
+    const element = document.createElement(tagName);
+    if (attributes.className) element.className = attributes.className;
+    if (text) element.textContent = String(text);
+    return element;
+  }
+
+  const children = [];
+  return {
+    append(...nodes) { children.push(...nodes.filter(Boolean)); },
+    get outerHTML() {
+      const classAttr = attributes.className ? ` class="${escapeHtml(attributes.className)}"` : '';
+      const childHtml = children.map(child => child?.outerHTML || child?.__tcHtml || '').join('');
+      return `<${tagName}${classAttr}>${escapeHtml(text)}${childHtml}</${tagName}>`;
+    }
+  };
+}
+
+function replaceReleaseNotes(host, elements = []) {
+  if (typeof host.replaceChildren === 'function' && elements.every(element => !element.__tcHtml)) {
+    host.replaceChildren(...elements);
+    return;
+  }
+  host.innerHTML = elements.map(element => element.__tcHtml || element.outerHTML || '').join('');
 }
 
 function latestSemanticVersion(notes = []) {
@@ -117,7 +150,7 @@ function syncDisplayedVersion(appVersion, notes = []) {
 let releaseNotesControllerInitialized = false;
 
 export function initializeReleaseNotesController({
-  appVersion = '1.3.3-rc.1',
+  appVersion = '1.3.4',
   releaseNotesUrl = './RELEASE_NOTES.md',
   versionHost = document.querySelector('[data-app-version-current]'),
   fallback = document.getElementById('releaseNotesFallback'),
@@ -133,7 +166,7 @@ export function initializeReleaseNotesController({
 }
 
 export async function loadReleaseNotes({
-  appVersion = '1.3.3-rc.1',
+  appVersion = '1.3.4',
   releaseNotesUrl = './RELEASE_NOTES.md',
   fallback = document.getElementById('releaseNotesFallback'),
   host = document.getElementById('releaseNotesDynamic'),
