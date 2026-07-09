@@ -1,8 +1,8 @@
 # TechCalc Pro – Development Netlify
 
-Aktueller Stand: 1.3.3-dev.6 – Phase 45E.1 Documentation Cleanup.
+Aktueller Stand: 1.3.3-dev.7 – Phase 45E.2 Documentation Consolidation & Quality Manual.
 
-Entwicklungsstand für Version 1.3.3 – Phase 45C.
+Entwicklungsstand für Version 1.3.3 – Phase 45E.2.
 
 ## Inhalt
 
@@ -28,3 +28,7 @@ Dieses Development-ZIP ist für Netlify-Hosting und weitere Entwicklung vorgeseh
 ## 1.3.3-dev.6 – Phase 45E.1
 
 Documentation Cleanup, Phase-45D-Abschlussdokument und Aktualisierung des Modulvertrags auf Stand 1.3.3. Keine Anwendungscode-Änderungen.
+
+## 1.3.3-dev.7 – Phase 45E.2
+
+Documentation Consolidation & Quality Management Foundation. Introduces `docs/qm/` as the active quality reference and marks `docs/audits/` as historical evidence. No functional application code changes.

@@ -1,3 +1,11 @@
+## 1.3.3-dev.7 – Phase 45E.2 Documentation Consolidation & Quality Manual
+
+- Quality Manual unter `docs/qm/` eingeführt.
+- Bisherige Auditlandschaft als historischen Nachweisbereich konsolidiert.
+- Dokumentationsindex, Audit-README und Phasenindex aktualisiert.
+- Modulvertrag auf QM-Referenzen erweitert.
+- Keine fachlichen Anwendungscode-Änderungen.
+
 ## 1.3.3-dev.6 – Phase 45E.1 Documentation Cleanup
 
 - Phase-45D-Regressionsdokument ergänzt.
@@ -392,3 +400,11 @@ Light Theme Modul-Akzentfarben zentralisiert: Heizung Orange, Kälte Cyan, Puffe
 - Mischluft-Records ohne zuverlässiges Mode-Label werden über Mischluft-Felder erkannt.
 - WRG-Saved-Records und Mischluft-Saved-Records werden beim Laden alter Projekte getrennt.
 - Regressionstest `phase45c2-legacy-saved-records-migration.test.mjs` ergänzt.
+
+## 1.3.3-dev.7 – Phase 45E.2 Documentation Consolidation & Quality Manual
+
+- Quality Manual unter `docs/qm/` eingeführt.
+- Bisherige Auditlandschaft als historischen Nachweisbereich konsolidiert.
+- Dokumentationsindex, Audit-README und Phasenindex aktualisiert.
+- Modulvertrag auf QM-Referenzen erweitert.
+- Keine fachlichen Anwendungscode-Änderungen.

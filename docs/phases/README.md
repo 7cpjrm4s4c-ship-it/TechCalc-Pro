@@ -65,7 +65,8 @@ Detaillierte Phase-36-, Phase-38- und einzelne historische Zwischenartefakte wur
 - `phase-45c2-legacy-saved-records-migration.md` – Migration gespeicherter Legacy-Mischluft-Records.
 - `phase-45d-regression.md` – Regressionsabschluss ohne festgestellte Regressionen.
 - `phase-45e1-documentation-cleanup.md` – Dokumentationsbereinigung und Aktualisierung des Modulvertrags.
+- `phase-45e2-documentation-consolidation-quality-manual.md` – Konsolidierung der Phasendokumentation und Einführung des Quality Manuals.
 
 ## Phase documentation rule
 
-Ab Phase 45E.1 gilt: Jede neue Phase erhält eine eigene Abschlussdokumentation. Detail- oder Patchdokumente sind zulässig, müssen aber im Phasenindex verlinkt sein und dürfen keine widersprüchliche aktive Referenz erzeugen.
+Ab Phase 45E.2 gilt: Jede neue Phase erhält eine eigene Abschlussdokumentation. Dauerhafte Qualitätsregeln werden im Quality Manual gepflegt. Detail- oder Patchdokumente sind zulässig, müssen aber im Phasenindex verlinkt sein und dürfen keine widersprüchliche aktive Referenz erzeugen.

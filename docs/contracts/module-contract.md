@@ -1,7 +1,7 @@
 # Module Contract
 
-Status: verbindlich ab Version 1.3.3-dev.6  
-Letzte Aktualisierung: Phase 45E.1 Documentation Cleanup
+Status: verbindlich ab Version 1.3.3-dev.7  
+Letzte Aktualisierung: Phase 45E.2 Documentation Consolidation & Quality Manual
 
 ## Ziel
 
@@ -115,3 +115,6 @@ Eine Moduländerung gilt erst als abgeschlossen, wenn erfüllt ist:
 - `docs/contracts/wrg-mixed-air-splitting-contract.md`
 - `docs/adr/ADR-0005-phase-change-control.md`
 - `docs/adr/ADR-0006-wrg-mixed-air-module-splitting.md`
+- `docs/qm/QM-003-Architecture-Rules.md`
+- `docs/qm/QM-006-Regression-Standard.md`
+- `docs/qm/QM-012-Documentation-Standard.md`

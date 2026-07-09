@@ -1,49 +1,49 @@
 # TechCalc Pro Documentation Index
 
-Dieser Index beschreibt die aktive Dokumentationsstruktur von TechCalc Pro. Die Dokumentation ist ab Version 1.3.3 so organisiert, dass Phasen, Verträge, ADRs, Audits und historische Artefakte eindeutig getrennt sind.
+Status: aktualisiert in Version 1.3.3-dev.7 / Phase 45E.2
 
-## Structure
+Dieser Index ist der zentrale Einstiegspunkt der Projektdokumentation. Ab Version 1.3.3 ist die Dokumentation nach Verantwortlichkeit getrennt: Phasen dokumentieren Historie, ADRs dokumentieren Entscheidungen, Contracts dokumentieren Schnittstellen, das Quality Manual dokumentiert dauerhafte Qualitätsstandards.
 
-- `docs/phases/` - aktive Phasendokumentation. Jede neue Phase besitzt genau eine nachvollziehbare Abschlussdokumentation.
-- `docs/engineering/` - engineering standards, branch strategy, review and release process.
-- `docs/contracts/` - verbindliche Architektur- und Modulverträge. Der aktuelle Modulvertrag ist `docs/contracts/module-contract.md`.
-- `docs/adr/` - Architecture Decision Records.
-- `docs/audits/json/` - generated audit JSON baselines and scorecards.
-- `docs/audits/reports/` - text-based audit artefacts and legacy cleanup reports.
-- `docs/architecture/` - ältere stabile Architekturgrundlagen und Qualitätstore, sofern sie noch Referenzwert besitzen.
-- `docs/release-notes/` - release notes that are not required in the root.
-- `docs/archive/` - historical root-level phase documents, detailed legacy phase notes and deprecated migration artefacts.
+## Aktive Struktur
 
-## Root policy
+- `docs/qm/` – zentrale Qualitätsreferenz und konsolidierte Audit-/Gate-Standards.
+- `docs/phases/` – nachvollziehbare Phasendokumentation des Projektwegs.
+- `docs/contracts/` – verbindliche Architektur-, Modul- und Plattformverträge.
+- `docs/adr/` – Architecture Decision Records.
+- `docs/engineering/` – Engineering Guide, Branching, Reviews, Release- und Testprozesse.
+- `docs/architecture/` – stabile Architekturgrundlagen mit historischem Referenzwert.
+- `docs/audits/` – historische Auditnachweise, JSON-Baselines und phasenbezogene Prüfprotokolle.
+- `docs/release/` und `docs/release-notes/` – Release- und Migrationsunterlagen.
+- `docs/archive/` – historische oder ersetzte Dokumente mit Nachvollziehbarkeitswert.
+- `docs/legal/` – rechtliche Dokumente.
+- `docs/security/` – sicherheitsbezogene Prüfstände.
 
-The project root should contain runtime/build files only. New phase notes, audit results and cleanup reports should be written under `docs/` unless they are required by the application at runtime. Detailed historical notes that are no longer active references belong in `docs/archive/`, not in the root or top-level `docs/` directory.
+## Maßgebliche Referenzen für 1.3.3
 
-## Phase 42 Architecture Consolidation
-
-The authoritative architecture consolidation documents are located in `docs/phases/phase-42*.md`. Root-level phase notes are not used as the source of truth.
-
-## Engineering Baseline
-
-Ab Phase 43 werden Entwicklungsstandards unter `docs/engineering/`, dauerhafte Architekturvertraege unter `docs/contracts/` und Architecture Decision Records unter `docs/adr/` gepflegt.
-
-
-## Phase 43B Repository Cleanup
-
-Phase 43B moved detailed legacy phase artefacts out of top-level `docs/` folders into `docs/archive/legacy-phase-docs/`. Active phase summaries remain under `docs/phases/`.
-
-## Current 1.3.3 reference
-
-Für Version 1.3.3 sind folgende Dokumente maßgeblich:
-
+- `docs/qm/QM-001-Quality-Manual.md` – zentrale Qualitätsreferenz.
 - `docs/contracts/module-contract.md` – aktueller Modulvertrag und Modulbestand.
 - `docs/contracts/wrg-mixed-air-splitting-contract.md` – Detailvertrag für Wärmerückgewinnung/Mischluft.
+- `docs/adr/ADR-0005-phase-change-control.md` – verbindlicher Phasenprozess.
 - `docs/adr/ADR-0006-wrg-mixed-air-module-splitting.md` – Architekturentscheidung zum Modulsplitting.
-- `docs/phases/phase-45a-modulsplitting-analysis.md` bis `docs/phases/phase-45e1-documentation-cleanup.md` – vollständiger Weg der Version 1.3.3.
+- `docs/phases/phase-45a-modulsplitting-analysis.md` bis `docs/phases/phase-45e2-documentation-consolidation-quality-manual.md` – vollständiger Weg von Version 1.3.3.
 
-## Documentation quality rules
+## Dokumentationsphilosophie
+
+- Phasen beantworten: Was wurde geändert?
+- ADRs beantworten: Warum wurde so entschieden?
+- Contracts beantworten: Wie arbeiten Module und Plattform zusammen?
+- QM beantwortet: Welche Qualitätsregeln gelten dauerhaft?
+- Audits beantworten: Welcher historische Nachweis wurde zu einem Zeitpunkt erbracht?
+
+## Root Policy
+
+Der Projekt-Root enthält nur runtime-, build- oder release-relevante Dateien. Neue Phasen-, Audit-, QM- oder Architekturunterlagen werden unter `docs/` gepflegt.
+
+## Qualitätsregeln
 
 - Ein Thema hat genau eine aktive Referenz.
-- Jede Phase besitzt eine Phasendokumentation unter `docs/phases/`.
+- Jede neue Phase besitzt eine Phasendokumentation unter `docs/phases/`.
 - Jeder verbindliche Architekturvertrag liegt unter `docs/contracts/`.
-- Historische Dokumente bleiben unter `docs/archive/`, wenn sie Nachvollziehbarkeitswert besitzen.
-- Veraltete Inhalte werden nicht parallel als aktive Referenz weitergeführt.
+- Jede Architekturentscheidung besitzt eine ADR unter `docs/adr/`.
+- Dauerhafte Qualitätsanforderungen werden im QM gepflegt.
+- Historische Dokumente bleiben erhalten, werden aber nicht parallel als aktive Referenz weitergeführt.
