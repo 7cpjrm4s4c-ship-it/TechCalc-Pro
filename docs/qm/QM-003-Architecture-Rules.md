@@ -27,3 +27,7 @@ Detailvertrag: `docs/contracts/wrg-mixed-air-splitting-contract.md`.
 - UI-only-Migration ohne Persistenz- und Record-Migration,
 - globale Sonderlogik ohne Contract-Verankerung,
 - ungetestete dynamische Registrierung.
+
+## DOM-Sink-Regel ab Phase 46B
+
+Runtime-Code darf neue HTML-/Code-Sinks nur nach expliziter Architekturfreigabe einführen. `innerHTML` ist auf dokumentierte Renderpfade begrenzt und wird durch `scripts/audit-dom-sinks-phase46b.mjs` geprüft. `insertAdjacentHTML`, `outerHTML`-Assignments, `document.write`, `eval` und `new Function` sind im Runtime-Code verboten.

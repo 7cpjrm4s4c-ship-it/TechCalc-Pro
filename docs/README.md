@@ -56,3 +56,4 @@ Das aktive Development-ZIP enthält nur noch Dokumente mit aktuellem Referenzwer
 ## Aktueller Entwicklungsstand
 
 - 1.3.4-dev.1 / Phase 46A: Toolchain Cleanup & Consolidation
+- 1.3.4-dev.2 / Phase 46B: Security Hardening

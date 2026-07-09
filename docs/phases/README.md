@@ -77,3 +77,5 @@ Ab Phase 45E.2 gilt: Jede neue Phase erhält eine eigene Abschlussdokumentation.
 - `phase-45e5-architecture-review.md` – Architecture Review.
 - `phase-45e6-release-preparation.md` – Release Preparation.
 - [Phase 46A – Toolchain Cleanup & Consolidation](phase-46a-toolchain-cleanup.md)
+
+- [Phase 46B – Security Hardening](phase-46b-security-hardening.md)
