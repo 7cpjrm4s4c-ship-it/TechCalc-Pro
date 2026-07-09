@@ -1,6 +1,6 @@
 {
   "name": "techcalc-pro",
-  "version": "1.3.4-dev.2",
+  "version": "1.3.4-dev.3",
   "private": true,
   "type": "module",
   "scripts": {
@@ -26,10 +26,11 @@
     "audit:cleanup": "node scripts/audit-cleanup-phase44b.mjs",
     "audit:runtime-diagnostics": "node scripts/audit-runtime-diagnostics-phase44b4.mjs",
     "build:verify": "npm ci && npm run lint && npm test && npm run test:integration && npm run build",
-    "lint": "node scripts/check-js-imports.mjs && node scripts/audit-cleanup-phase44b.mjs && node scripts/audit-runtime-diagnostics-phase44b4.mjs && node scripts/audit-browser-compliance-phase44b5.mjs && node scripts/audit-toolchain-cleanup-phase46a.mjs && node scripts/audit-dom-sinks-phase46b.mjs",
+    "lint": "node scripts/check-js-imports.mjs && node scripts/audit-cleanup-phase44b.mjs && node scripts/audit-runtime-diagnostics-phase44b4.mjs && node scripts/audit-browser-compliance-phase44b5.mjs && node scripts/audit-toolchain-cleanup-phase46a.mjs && node scripts/audit-dom-sinks-phase46b.mjs && node scripts/audit-accessibility-phase46c.mjs",
     "audit:browser-compliance": "node scripts/audit-browser-compliance-phase44b5.mjs",
     "audit:toolchain": "node scripts/audit-toolchain-cleanup-phase46a.mjs",
-    "audit:dom-sinks": "node scripts/audit-dom-sinks-phase46b.mjs"
+    "audit:dom-sinks": "node scripts/audit-dom-sinks-phase46b.mjs",
+    "audit:accessibility": "node scripts/audit-accessibility-phase46c.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.28.1"

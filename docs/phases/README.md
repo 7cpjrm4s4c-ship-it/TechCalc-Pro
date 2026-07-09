@@ -79,3 +79,5 @@ Ab Phase 45E.2 gilt: Jede neue Phase erhält eine eigene Abschlussdokumentation.
 - [Phase 46A – Toolchain Cleanup & Consolidation](phase-46a-toolchain-cleanup.md)
 
 - [Phase 46B – Security Hardening](phase-46b-security-hardening.md)
+
+- `phase-46c-accessibility-baseline.md` – Accessibility Baseline (WCAG 2.1 AA Zielniveau und statischer Audit).

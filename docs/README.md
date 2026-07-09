@@ -57,3 +57,4 @@ Das aktive Development-ZIP enthält nur noch Dokumente mit aktuellem Referenzwer
 
 - 1.3.4-dev.1 / Phase 46A: Toolchain Cleanup & Consolidation
 - 1.3.4-dev.2 / Phase 46B: Security Hardening
+- 1.3.4-dev.3 / Phase 46C: Accessibility Baseline
