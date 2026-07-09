@@ -144,11 +144,33 @@
         <details class="settings-submenu">
           <summary>Release Notes</summary>
           <div class="settings-submenu__content settings-form release-notes-panel">
-            <div class="settings-info-row"><span>Aktuelle Version</span><strong data-app-version-current>1.3.4-dev.4</strong></div>
+            <div class="settings-info-row"><span>Aktuelle Version</span><strong data-app-version-current>1.3.4</strong></div>
             <div id="releaseNotesDynamic">
               <p>Release Notes werden geladen …</p>
             </div>
             <script type="text/plain" id="releaseNotesFallback">
+## Version 1.3.4 - Final Release
+
+TechCalc Pro 1.3.4 ist freigegeben.
+
+### Neu
+- Toolchain bereinigt und auf aktive Build-/Audit-Skripte reduziert.
+- Security-Hardening mit abgeschlossenem DOM-Sink-/innerHTML-Audit ergänzt.
+- Accessibility-Baseline auf WCAG 2.1 AA als internes Zielniveau festgelegt.
+- E2E-Abdeckung für Mischluft, Legacy-Migration, Projektverwaltung und PDF-Export erweitert.
+
+### Verbesserungen
+- Release Notes zeigen weiterhin nur Final Releases, Release Candidates und Hotfixes – keine `dev.x`-Zwischenstände.
+- Qualitätsprüfungen für Toolchain, DOM-Sinks, Accessibility und E2E-Coverage sind in `npm run lint` integriert.
+- Projektstruktur weiter reduziert und bereinigt.
+- Entwicklungs- und Deployment-Pakete sind wieder als getrennte Release-Artefakte verfügbar.
+
+### Behoben
+- Verwaiste Toolchain-Skripte wurden entfernt oder konsolidiert.
+- Offener innerHTML-/DOM-Sink-Audit aus früheren Versionen wurde abgeschlossen.
+- Accessibility-Zielniveau und statische Prüfung wurden nachgezogen.
+- E2E-Lücke für den neuen Mischluft-Workflow wurde geschlossen.
+
 ## Version 1.3.3 - Final Release
 
 TechCalc Pro 1.3.3 ist freigegeben.
@@ -185,7 +207,7 @@ TechCalc Pro 1.3.3 ist freigegeben.
               <label>Nachricht<textarea id="feedbackMessage" name="message" required rows="6" placeholder="Feedback, Fehlerbeschreibung oder Verbesserungsvorschlag"></textarea></label>
               <input class="visually-hidden" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
               <input type="hidden" name="app" value="TechCalc Pro">
-              <input type="hidden" name="version" value="1.3.4-dev.4">
+              <input type="hidden" name="version" value="1.3.4">
               <div class="settings-actions">
                 <button class="mini-button mini-button--primary" id="feedbackSubmit" type="submit">Feedback senden</button>
               </div>
@@ -198,7 +220,7 @@ TechCalc Pro 1.3.3 ist freigegeben.
         <details class="settings-submenu">
           <summary>Rechtliches & App</summary>
           <div class="settings-submenu__content settings-form">
-            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.3.4-dev.4</strong></div>
+            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.3.4</strong></div>
             <a class="mini-button" href="./docs/legal/agb.html" target="_blank" rel="noopener">AGB öffnen</a>
             <button class="mini-button" type="button" disabled>Impressum vorbereiten</button>
           </div>

@@ -45,7 +45,7 @@ function saveOfflineFeedback(storage, payload, reason) {
 }
 
 export function initializeFeedbackController({
-  appVersion = '1.3.4-dev.4',
+  appVersion = '1.3.4',
   endpoint = DEFAULT_FEEDBACK_ENDPOINT,
   form = null,
   status = null,
