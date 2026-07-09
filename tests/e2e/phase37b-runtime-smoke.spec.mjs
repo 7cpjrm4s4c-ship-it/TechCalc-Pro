@@ -6,9 +6,11 @@ const MODULE_IDS = [
   'pressure-holding',
   'buffer-storage',
   'heat-recovery',
+  'mixed-air',
   'hx-diagram',
   'pipe-sizing',
   'unit-converter',
+  'mixed-air',
   'drinking-water',
   'wastewater',
   'rainwater'
@@ -20,6 +22,7 @@ const SAVED_RECORD_MODULE_IDS = [
   'pressure-holding',
   'buffer-storage',
   'pipe-sizing',
+  'mixed-air',
   'drinking-water',
   'wastewater',
   'rainwater'
@@ -31,6 +34,7 @@ const DYNAMIC_RENDERER_MODULE_IDS = [
   'buffer-storage',
   'pipe-sizing',
   'unit-converter',
+  'mixed-air',
   'drinking-water',
   'wastewater',
   'rainwater'

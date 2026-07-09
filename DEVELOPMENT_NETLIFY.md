@@ -1,6 +1,6 @@
 # TechCalc Pro – Development / Netlify
 
-Aktueller Stand: 1.3.4-dev.3 – Phase 46C Accessibility Baseline.
+Aktueller Stand: 1.3.4-dev.4 – Phase 46C Accessibility Baseline.
 
 ## Inhalt
 
@@ -27,9 +27,17 @@ Dieses ZIP ist für Netlify-Hosting und weitere Entwicklung vorgesehen. Es enth�
 - `scripts/audit-dom-sinks-phase46b.mjs` in `npm run lint` eingebunden.
 - Security-Hardening-Dokumentation ergänzt.
 
-## 1.3.4-dev.3 – Phase 46C Accessibility Baseline
+## 1.3.4-dev.4 – Phase 46C Accessibility Baseline
 
 - WCAG 2.1 AA als internes Accessibility-Zielniveau im QM festgelegt.
 - Statischer Accessibility-Audit ergänzt und in `npm run lint` eingebunden.
 - Zugänglicher Name für den Projektdatei-Input ergänzt.
 - Phase-46C-Dokumentation ergänzt.
+
+## 1.3.4-dev.4 – Phase 46D E2E Expansion
+
+- Basis: 1.3.4-dev.3 / Phase 46C Accessibility Baseline.
+- Playwright-Abdeckung um Mischluft-Workflow erweitert.
+- Legacy-Projektmigration 1.3.2 → 1.3.4 im E2E-Pfad abgedeckt.
+- Projekt- und PDF-Download für Mischluft als E2E-Workflow ergänzt.
+- Statischer E2E-Coverage-Audit in `npm run lint` eingebunden.

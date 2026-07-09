@@ -39,3 +39,17 @@ Standard-Gates:
 - `npm run test:integration`
 - `npm run build`
 - `npm run build:minified`
+
+
+## E2E-Erweiterung ab Phase 46D
+
+Die Playwright-Suite deckt zusätzlich zum Browser-Runtime-Smoke die folgenden kritischen Browserpfade ab:
+
+- Mischluft-Berechnung und gespeicherte Mischluft-Records
+- Legacy-Migration von WRG/Mischluft-Projekten aus Version 1.3.2
+- Projekt-Download als `.tcproj`
+- PDF-Export aus dem Mischluft-Modul
+
+Der statische Audit `audit:e2e-coverage` ist Bestandteil von `npm run lint` und verhindert, dass diese Kernabdeckung unbeabsichtigt entfernt wird.
+
+Für die tatsächliche Browserausführung von `npm run test:e2e` müssen die Playwright-Browser-Binaries einmalig mit `npx playwright install` bereitgestellt werden.
