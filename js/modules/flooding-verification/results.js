@@ -12,11 +12,7 @@ export function results(state = {}, result = {}) {
   return {
     primary: {
       title: 'Leitungs- und Abflussnachweis',
-      primary: {
-        label: 'Erforderlicher Regenwasserabfluss Qᵣ',
-        value: fmt(result.requiredRainFlowLs, 2),
-        unit: 'l/s'
-      },
+      primary: { label: 'Erforderlicher Regenwasserabfluss Qᵣ', value: fmt(result.requiredRainFlowLs, 2), unit: 'l/s' },
       rows: [
         { label: 'Betriebsart', value: modeLabel(result.dischargeMode) },
         { label: 'Verfügbarer Abfluss', value: result.availableFlowLs > 0 ? fmt(result.availableFlowLs, 2) : '—', unit: result.availableFlowLs > 0 ? 'l/s' : '' },
@@ -32,7 +28,7 @@ export function results(state = {}, result = {}) {
         title: 'Leitungsdaten',
         rows: [
           { label: 'Nennweite', value: discharge.dn || '—' },
-          { label: 'Gefälle', value: discharge.slopePermille != null ? fmt(discharge.slopePermille, 0) : '—', unit: discharge.slopePermille != null ? '‰' : '' },
+          { label: 'Gefälle', value: discharge.slopePercent != null ? fmt(discharge.slopePercent, 1) : '—', unit: discharge.slopePercent != null ? '%' : '' },
           { label: 'Vollfüllungsabfluss Qvoll', value: discharge.qFullLs > 0 ? fmt(discharge.qFullLs, 2) : '—', unit: discharge.qFullLs > 0 ? 'l/s' : '' },
           { label: 'Behördliche Begrenzung', value: discharge.qLimitLs > 0 ? fmt(discharge.qLimitLs, 2) : '—', unit: discharge.qLimitLs > 0 ? 'l/s' : '' },
           { label: 'Fließgeschwindigkeit', value: discharge.velocityMs > 0 ? fmt(discharge.velocityMs, 2) : '—', unit: discharge.velocityMs > 0 ? 'm/s' : '' },
@@ -53,12 +49,7 @@ export function results(state = {}, result = {}) {
         accent: 'green'
       }
     ],
-    notices: [{
-      title: 'Phase 47C.4',
-      messages: Array.isArray(result.warnings) ? result.warnings : [],
-      accent: 'green',
-      emptyText: 'Leitungs- und Abflussnachweis ist vollständig und valide.'
-    }]
+    notices: [{ title: 'Phase 47C.4.1', messages: Array.isArray(result.warnings) ? result.warnings : [], accent: 'green', emptyText: 'Leitungs- und Abflussnachweis ist vollständig und valide.' }]
   };
 }
 
