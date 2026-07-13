@@ -1,7 +1,7 @@
 # Phase 47B – Architecture Review Überflutungsnachweis
 
 Version: 1.4.0-dev.1  
-Status: abgeschlossen; fachlich erweitert durch Phase 47B.1  
+Status: abgeschlossen  
 Datum: 2026-07-11
 
 ## Ausgangslage
@@ -116,8 +116,3 @@ Phase 47C ist freigegeben unter folgenden Bedingungen:
 - Berechnungslogik vor UI mit Referenztests implementieren,
 - Projektmigration und PDF nicht nachgelagert improvisieren,
 - Regression des Moduls `rainwater` bleibt Pflicht.
-
-
-## Nachtrag
-
-Die Scope-Aussagen zu manuellem `Qvoll`, DWA-A 117 und fehlender Datenübernahme wurden durch Phase 47B.1 und ADR-0008 ersetzt.

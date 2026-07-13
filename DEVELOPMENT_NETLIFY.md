@@ -1,12 +1,14 @@
-# Development Netlify Build
+# TechCalc Pro Development Netlify
 
-Aktueller Stand: 1.4.0-dev.2 – Phase 47B.1 Contract Extension.
+Aktueller Stand: 1.4.0-dev.1 – Phase 47B Architecture Review.
 
-Dieser Build enthält die verbindliche Vertrags- und Architekturgrundlage für Phase 47C:
+## Inhalt
 
-- erweiterter Contract Überflutungs- und Rückhaltenachweis,
-- ADR-0008 zur Leitungs-, DWA-A-117-, PDF- und Snapshot-Import-Architektur,
-- Phasendokumentation 47B.1,
-- aktualisierte Versions- und Releaseinformationen.
+- Basis: Release 1.3.4
+- neuer verbindlicher Contract für das Modul Überflutungsnachweis
+- ADR-0007 und Architekturprüfung Phase 47B
+- keine Fachimplementierung des neuen Moduls in diesem Build
 
-Eine Fachimplementierung des neuen Moduls ist noch nicht enthalten.
+## Nächster Schritt
+
+Phase 47C implementiert das Modul ausschließlich auf Basis der freigegebenen Architektur und des Contracts.

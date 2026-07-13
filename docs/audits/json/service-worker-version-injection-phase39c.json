@@ -2,8 +2,8 @@
   "phase": "39C",
   "name": "Service Worker Version Injection",
   "status": "passed",
-  "expectedCacheName": "techcalc-pro-1.4.0-dev.2",
-  "expectedRevisionPrefix": "1.4.0-dev.2-",
+  "expectedCacheName": "techcalc-pro-1.4.0-dev.1",
+  "expectedRevisionPrefix": "1.4.0-dev.1-",
   "checks": [
     {
       "id": "service-worker:cache-name-from-package-version",
