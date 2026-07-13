@@ -1,5 +1,9 @@
 import * as base from './projectStorageBase.js';
-import { state as floodingVerificationState } from '../modules/flooding-verification/state.js';
+import {
+  appendProjectModuleStates,
+  applyProjectModuleStates,
+  resetProjectModuleStates
+} from './projectModuleStateAdapters.js';
 
 export * from './projectStorageBase.js';
 
@@ -10,26 +14,18 @@ function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-function withFloodingModule(data = {}) {
-  const project = clone(data);
-  project.modules = project.modules || {};
-  project.modules['flooding-verification'] = { state: floodingVerificationState.get() };
-  return project;
-}
-
 export function collectProjectData() {
-  return withFloodingModule(base.collectProjectData());
+  return appendProjectModuleStates(base.collectProjectData());
 }
 
 export function applyProjectData(data = {}, options = {}) {
   base.applyProjectData(data, options);
-  const incoming = data?.modules?.['flooding-verification']?.state;
-  if (incoming) floodingVerificationState.replace(incoming, { notify: false });
+  applyProjectModuleStates(data);
 }
 
 export function resetAllSessionData() {
   base.resetAllSessionData();
-  floodingVerificationState.reset();
+  resetProjectModuleStates();
 }
 
 export function saveSessionSnapshot() {
