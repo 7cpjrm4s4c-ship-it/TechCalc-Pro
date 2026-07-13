@@ -15,7 +15,8 @@ const dischargeModeOptions = [
   { value: 'authority-discharge-limit', label: 'Begrenzung' }
 ];
 const dnOptions = dnOrder.map(value => ({ value, label: value }));
-const slopeOptions = [0.2,0.3,0.4,0.5,0.6,0.7,0.8,1.0,1.5,2.0,3.0,5.0].map(value => ({ value: String(value).replace('.', ','), label: `${String(value).replace('.', ',')} %` }));
+const slopeOptions = [0.2,0.3,0.4,0.5,0.6,0.7,0.8,1.0,1.5,2.0,3.0,5.0]
+  .map(value => ({ value: String(value).replace('.', ','), label: `${String(value).replace('.', ',')} %` }));
 const tableMode = state => ['table-existing-pipe', 'table-size-pipe'].includes(state.dischargeMode);
 const existingPipeMode = state => state.dischargeMode === 'table-existing-pipe';
 const manualFlowMode = state => state.dischargeMode === 'manual-full-flow';
@@ -32,7 +33,6 @@ export function surfaceCollectionItems(state = {}) {
 export const floodingVerificationSchema = defineFormSchema({
   fields: [
     { key: 'projectName', label: 'Bezeichnung', type: FIELD_TYPES.TEXT, placeholder: 'z. B. Grundstück Musterstraße 1' },
-    { key: 'calculationMode', label: 'Nachweisart', type: FIELD_TYPES.SEGMENT, options: [{ value: 'flooding', label: 'Überflutung' }, { value: 'retention', label: 'Rückhaltung' }], accent: 'green', action: 'platform:segment:calculationMode' },
     { key: 'surfaceCategory', label: 'Flächengruppe', type: FIELD_TYPES.SEGMENT, options: categoryOptions, accent: 'green', action: 'platform:segment:surfaceCategory' },
     { key: 'surfaceName', label: 'Bezeichnung', type: FIELD_TYPES.TEXT, placeholder: 'z. B. Dachfläche Nord' },
     { key: 'surfaceAreaType', label: 'Flächenart', type: FIELD_TYPES.SELECT, options: areaOptions, commit: 'immediate', lookup: true },
@@ -60,7 +60,7 @@ export const floodingVerificationSchema = defineFormSchema({
     { key: 'durationNotice', label: 'Automatische Regendauer', type: FIELD_TYPES.NOTICE, text: 'Die automatische Zuordnung folgt ausschließlich der im Contract dokumentierten DIN-Zuordnung auf Basis von Geländeneigung und befestigtem Flächenanteil.', tone: 'compact' },
     { key: 'dischargeMode', label: 'Betriebsart', type: FIELD_TYPES.SEGMENT, options: dischargeModeOptions, accent: 'green', action: 'platform:segment:dischargeMode' },
     { key: 'pipeNominalDiameterDn', label: 'Nennweite', type: FIELD_TYPES.SELECT, options: dnOptions, visibleWhen: existingPipeMode },
-    { key: 'pipeSlopePermille', label: 'Gefälle', type: FIELD_TYPES.SELECT, options: slopeOptions, commit: 'immediate', visibleWhen: tableMode },
+    { key: 'pipeSlopePercent', label: 'Gefälle', type: FIELD_TYPES.SELECT, options: slopeOptions, commit: 'immediate', visibleWhen: tableMode },
     { key: 'manualFullFlowLs', label: 'Vollfüllungsabfluss Qvoll', type: FIELD_TYPES.DECIMAL, unit: 'l/s', visibleWhen: manualFlowMode },
     { key: 'manualFullFlowSource', label: 'Quelle / Nachweis', type: FIELD_TYPES.TEXT, visibleWhen: manualFlowMode },
     { key: 'authorityLimitLs', label: 'Maximale Einleitungsmenge', type: FIELD_TYPES.DECIMAL, unit: 'l/s', visibleWhen: authorityMode },
@@ -71,14 +71,14 @@ export const floodingVerificationSchema = defineFormSchema({
     { key: 'dischargeNotice', label: 'Tabellenzuordnung', type: FIELD_TYPES.NOTICE, text: 'Tabellenwerte werden nur für exakt hinterlegte Gefälle in Prozent verwendet. Es erfolgt keine stille Interpolation.', tone: 'compact', visibleWhen: tableMode }
   ],
   groups: [
-    { title: 'Projekt', fields: ['projectName', 'calculationMode'], columns: 2, accent: 'green' },
+    { title: 'Projekt', fields: ['projectName'], columns: 1, accent: 'green' },
     { title: 'Flächen erfassen', fields: ['surfaceCategory', 'surfaceName', 'surfaceAreaType', 'surfaceArea', 'surfaceCs', 'surfaceCm', 'surfaceAdd'], columns: 2, accent: 'green' },
     { title: 'Dach- und Grundstücksflächen', fields: ['surfaces'], columns: 1, accent: 'green' },
     { title: 'Snapshot-Import Regenwasser', fields: ['rainwaterImport', 'importStatus'], columns: 1, accent: 'green' },
     { title: 'Regenspenden', fields: ['rainR2Duration5', 'rainR2Duration10', 'rainR2Duration15', 'rainR30Duration5', 'rainR30Duration10', 'rainR30Duration15', 'rainR100Duration5'], columns: 2, accent: 'green', actions: [{ label: 'KOSTRA / OpenKo Daten öffnen', href: KOSTRA_URL, variant: 'secondary' }] },
     { title: 'Quellenangaben Regendaten', fields: ['rainSourceDataset', 'rainSourceLocation', 'rainSourceVersion'], columns: 2, accent: 'green' },
     { title: 'Gelände und Regendauer', fields: ['meanSlopePercent', 'rainDurationMode', 'manualRainDuration', 'manualRainDurationReason', 'durationNotice'], columns: 2, accent: 'green' },
-    { title: 'Leitungs- und Abflussnachweis', fields: ['dischargeMode', 'pipeNominalDiameterDn', 'pipeSlopePermille', 'manualFullFlowLs', 'manualFullFlowSource', 'authorityLimitLs', 'authorityName', 'authorityReference', 'authorityDate', 'authoritySourceNote', 'dischargeNotice'], columns: 2, accent: 'green' }
+    { title: 'Leitungs- und Abflussnachweis', fields: ['dischargeMode', 'pipeNominalDiameterDn', 'pipeSlopePercent', 'manualFullFlowLs', 'manualFullFlowSource', 'authorityLimitLs', 'authorityName', 'authorityReference', 'authorityDate', 'authoritySourceNote', 'dischargeNotice'], columns: 2, accent: 'green' }
   ]
 });
 
