@@ -1,5 +1,5 @@
 import { state as rainwaterState } from '../modules/rainwater/state.js';
-import { areaTypes } from '../modules/rainwater/tables.js';
+import { areaTypes } from './rainwaterDomainTables.js';
 
 const clone = value => typeof structuredClone === 'function'
   ? structuredClone(value)
