@@ -13,10 +13,30 @@ const numericFields = [
 const id = prefix => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 const number = value => Number(String(value ?? '').replace(',', '.'));
 const normalized = value => canonicalGermanNumberInput(value);
+const ADD_DEBOUNCE_MS = 600;
+let lastSurfaceAdd = { fingerprint: '', at: 0 };
 
 function defaultsForType(typeId) {
   const type = typeById.get(typeId) || typeById.get('custom') || {};
   return { surfaceCs: String(type.cs ?? '').replace('.', ','), surfaceCm: String(type.cm ?? '').replace('.', ',') };
+}
+
+export function surfaceDraftFingerprint(current = {}) {
+  return [
+    String(current.surfaceCategory || 'roof'),
+    String(current.surfaceName || '').trim(),
+    String(current.surfaceAreaType || 'custom'),
+    normalized(current.surfaceArea),
+    normalized(current.surfaceCs),
+    normalized(current.surfaceCm)
+  ].join('|');
+}
+
+export function shouldAcceptSurfaceAdd(current = {}, now = Date.now()) {
+  const fingerprint = surfaceDraftFingerprint(current);
+  if (fingerprint === lastSurfaceAdd.fingerprint && now - lastSurfaceAdd.at < ADD_DEBOUNCE_MS) return false;
+  lastSurfaceAdd = { fingerprint, at: now };
+  return true;
 }
 
 function addSurface({ current = {} } = {}) {
@@ -26,6 +46,8 @@ function addSurface({ current = {} } = {}) {
   if (!(area > 0) || !(cs >= 0 && cs <= 1) || !(cm >= 0 && cm <= 1)) {
     return { importStatus: 'Fläche muss größer 0 m² sein; Cₛ und Cₘ müssen zwischen 0 und 1 liegen.' };
   }
+  if (!shouldAcceptSurfaceAdd(current)) return {};
+
   const record = {
     id: id('flood-surface'),
     name: String(current.surfaceName || '').trim() || `Fläche ${(current.surfaces || []).length + 1}`,
