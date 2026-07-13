@@ -1,6 +1,6 @@
 # ADR-0007: Architektur des Moduls Überflutungsnachweis
 
-Status: Angenommen  
+Status: Angenommen; erweitert durch ADR-0008  
 Datum: 2026-07-11  
 Phase: 47B
 
@@ -30,3 +30,8 @@ Ein Collection-Modell bildet heterogene Grundstücke verlustfrei ab und verhinde
 - Gleichung 21 erfordert Regenspenden für 5, 10 und 15 Minuten.
 - PDF- und Regressionstests müssen lange Flächenlisten abdecken.
 - Eine spätere Verknüpfung mit Regenwasser oder Rohrdimensionierung benötigt einen neuen Contract-Review.
+
+
+## Nachtrag Phase 47B.1
+
+Die Entscheidung Nr. 8 und die dortige Scope-Abgrenzung wurden durch ADR-0008 erweitert. Die unabhängige Modulgrenze bleibt bestehen; Flächendaten dürfen nun über einen expliziten Deep-Copy-Snapshot-Adapter übernommen werden.
