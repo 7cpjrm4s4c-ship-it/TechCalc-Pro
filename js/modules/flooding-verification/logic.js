@@ -47,18 +47,28 @@ function validateRainInputs(state = {}, duration = 10) {
   return required.filter(([, value]) => !(value > 0)).map(([label]) => `${label} muss größer 0 sein.`);
 }
 
+export function resolvePipeSlopePercent(stateOrValue = {}) {
+  if (stateOrValue && typeof stateOrValue === 'object') {
+    const canonical = toNumber(stateOrValue.pipeSlopePercent);
+    if (Number.isFinite(canonical) && canonical > 0) return canonical;
+    const legacy = toNumber(stateOrValue.pipeSlopePermille);
+    return Number.isFinite(legacy) && legacy > 0 ? legacy / 10 : NaN;
+  }
+  const value = toNumber(stateOrValue);
+  return Number.isFinite(value) && value > 0 ? value : NaN;
+}
+
 export function tableSlopePercent(value) {
-  const raw = toNumber(value);
-  if (!Number.isFinite(raw)) return NaN;
-  return raw > 5 ? raw / 10 : raw;
+  return resolvePipeSlopePercent(value);
 }
 
 export function tableSlopeFromPermille(value) {
-  return tableSlopePercent(value);
+  const legacy = toNumber(value);
+  return Number.isFinite(legacy) ? legacy / 10 : NaN;
 }
 
 export function lookupFullFlow(dn, slopePercent) {
-  const slope = tableSlopePercent(slopePercent);
+  const slope = resolvePipeSlopePercent(slopePercent);
   const row = (hydraulicTables['1.0'] || []).find(item => Math.abs(Number(item.slope) - slope) < 1e-9);
   const qFullLs = row?.values?.[dn];
   if (!(qFullLs > 0)) return null;
@@ -66,13 +76,15 @@ export function lookupFullFlow(dn, slopePercent) {
   const diameterM = diameterMm / 1000;
   const crossSectionM2 = Math.PI * diameterM * diameterM / 4;
   const velocityMs = crossSectionM2 > 0 ? (qFullLs / 1000) / crossSectionM2 : 0;
-  return { dn, slopePercent: slope, slopePermille: slope * 10, qFullLs, velocityMs, tableReference: 'DIN 1986-100 Tabelle A.5', lookupMode: 'exact' };
+  return { dn, slopePercent: slope, qFullLs, velocityMs, tableReference: 'DIN 1986-100 Tabelle A.5', lookupMode: 'exact' };
 }
 
 export function sizePipe(requiredFlowLs, slopePercent) {
+  const required = Number(requiredFlowLs);
+  if (!(required > 0)) return null;
   for (const dn of dnOrder) {
     const candidate = lookupFullFlow(dn, slopePercent);
-    if (candidate && candidate.qFullLs >= requiredFlowLs) return candidate;
+    if (candidate && candidate.qFullLs >= required) return candidate;
   }
   return null;
 }
@@ -99,16 +111,18 @@ export function calculate(state = {}) {
   const rD2 = rainValue(state, 2, governingDurationMinutes);
   const weightedCsArea = weighted('cs');
   const requiredRainFlowLs = rD2 > 0 ? rD2 * weightedCsArea / 10000 : 0;
+  const slopePercent = resolvePipeSlopePercent(state);
 
   const dischargeMode = VALID_DISCHARGE_MODES.has(state.dischargeMode) ? state.dischargeMode : 'table-existing-pipe';
   let discharge = null;
   const dischargeErrors = [];
   if (dischargeMode === 'table-existing-pipe') {
-    discharge = lookupFullFlow(state.pipeNominalDiameterDn, state.pipeSlopePermille);
+    discharge = lookupFullFlow(state.pipeNominalDiameterDn, slopePercent);
     if (!discharge) dischargeErrors.push('Für die gewählte Kombination aus DN und Gefälle ist kein exakter Tabellenwert hinterlegt.');
   } else if (dischargeMode === 'table-size-pipe') {
-    discharge = sizePipe(requiredRainFlowLs, state.pipeSlopePermille);
-    if (!discharge) dischargeErrors.push('Für das gewählte Gefälle konnte innerhalb des Tabellenumfangs keine ausreichende Nennweite bestimmt werden.');
+    if (!(requiredRainFlowLs > 0)) dischargeErrors.push('Für die Dimensionierung muss zunächst ein erforderlicher Regenwasserabfluss größer 0 vorliegen.');
+    else discharge = sizePipe(requiredRainFlowLs, slopePercent);
+    if (requiredRainFlowLs > 0 && !discharge) dischargeErrors.push('Für das gewählte Gefälle konnte innerhalb des Tabellenumfangs keine ausreichende Nennweite bestimmt werden.');
   } else if (dischargeMode === 'manual-full-flow') {
     const qFullLs = toNumber(state.manualFullFlowLs);
     if (!(qFullLs > 0)) dischargeErrors.push('Der manuell vorgegebene Vollfüllungsabfluss muss größer 0 sein.');
@@ -130,7 +144,7 @@ export function calculate(state = {}) {
     averageCm: totalArea > 0 ? weighted('cm') / totalArea : 0, duplicateSourceCount: new Set(duplicateSources).size,
     automaticDurationMinutes, governingDurationMinutes, durationSource: manualValid ? 'manual' : 'automatic', manualDurationRequested: manualRequested, manualDurationValid: manualValid,
     rain: Object.freeze({ r2: Object.freeze({ 5: rainValue(state, 2, 5), 10: rainValue(state, 2, 10), 15: rainValue(state, 2, 15) }), r30: Object.freeze({ 5: rainValue(state, 30, 5), 10: rainValue(state, 30, 10), 15: rainValue(state, 30, 15) }), r100Duration5: rainValue(state, 100, 5), source: Object.freeze({ dataset: String(state.rainSourceDataset || '').trim(), location: String(state.rainSourceLocation || '').trim(), version: String(state.rainSourceVersion || '').trim(), entryMode: state.rainEntryMode || 'manual' }) }),
-    requiredRainFlowLs, dischargeMode, discharge: discharge ? Object.freeze(discharge) : null, availableFlowLs, utilizationPercent,
+    requiredRainFlowLs, dischargeMode, slopePercent, discharge: discharge ? Object.freeze(discharge) : null, availableFlowLs, utilizationPercent,
     dischargeAdequate: availableFlowLs > 0 && availableFlowLs >= requiredRainFlowLs,
     rainInputValid: rainErrors.length === 0,
     calculationAvailable: rainErrors.length === 0 && dischargeErrors.length === 0 && valid.length > 0,
