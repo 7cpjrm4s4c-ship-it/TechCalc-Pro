@@ -60,3 +60,6 @@ Das aktive Development-ZIP enthält nur noch Dokumente mit aktuellem Referenzwer
 - 1.3.4-dev.3 / Phase 46C: Accessibility Baseline
 
 - 1.3.4-dev.4 / Phase 46D: E2E Expansion
+
+- 1.4.0-dev.1 / Phase 47B: Architecture Review Überflutungsnachweis
+- 1.4.0-dev.2 / Phase 47B.1: Contract Extension für Leitungsnachweis, DWA-A 117, Behörden-PDF und Flächen-Snapshot-Import

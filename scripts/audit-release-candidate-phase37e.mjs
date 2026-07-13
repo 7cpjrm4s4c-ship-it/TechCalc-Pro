@@ -58,7 +58,7 @@ const checks = [
   { id: 'shell-controllers-precached', pass: shellControllers.every(item => item.exists && item.precached), detail: shellControllers },
   { id: 'debug-logs-removed', pass: debugHits.length === 0, detail: debugHits.slice(0, 20) },
   { id: 'consolidated-test-gates-present', pass: missingScripts.length === 0, detail: missingScripts },
-  { id: 'release-notes-current', pass: releaseNotes.includes('Version 1.3.3') || releaseNotes.includes('1.3.3'), detail: 'RELEASE_NOTES.md contains current public release entry' }
+  { id: 'release-notes-current', pass: releaseNotes.includes(`Version ${packageJson.version}`) || releaseNotes.includes(packageJson.version), detail: 'RELEASE_NOTES.md contains package version entry' }
 ];
 
 const report = {

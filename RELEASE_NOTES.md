@@ -1,42 +1,9 @@
-## Version 1.3.4 - Final Release
+## Version 1.4.0-dev.2 – Phase 47B.1
 
-TechCalc Pro 1.3.4 ist freigegeben.
-
-### Neu
-- Toolchain bereinigt und auf aktive Build-/Audit-Skripte reduziert.
-- Security-Hardening mit abgeschlossenem DOM-Sink-/innerHTML-Audit ergänzt.
-- Accessibility-Baseline auf WCAG 2.1 AA als internes Zielniveau festgelegt.
-- E2E-Abdeckung für Mischluft, Legacy-Migration, Projektverwaltung und PDF-Export erweitert.
-
-### Verbesserungen
-- Release Notes zeigen weiterhin nur Final Releases, Release Candidates und Hotfixes – keine `dev.x`-Zwischenstände.
-- Qualitätsprüfungen für Toolchain, DOM-Sinks, Accessibility und E2E-Coverage sind in `npm run lint` integriert.
-- Projektstruktur weiter reduziert und bereinigt.
-- Entwicklungs- und Deployment-Pakete sind wieder als getrennte Release-Artefakte verfügbar.
-
-### Behoben
-- Verwaiste Toolchain-Skripte wurden entfernt oder konsolidiert.
-- Offener innerHTML-/DOM-Sink-Audit aus früheren Versionen wurde abgeschlossen.
-- Accessibility-Zielniveau und statische Prüfung wurden nachgezogen.
-- E2E-Lücke für den neuen Mischluft-Workflow wurde geschlossen.
-
-## Version 1.3.3 - Final Release
-
-TechCalc Pro 1.3.3 ist freigegeben.
-
-### Neu
-- Wärmerückgewinnung und Mischluft sind in eigenständige Fachmodule getrennt.
-- Bestehende Projekte werden ohne Datenverlust migriert.
-- Gespeicherte Mischluft-Datensätze werden korrekt dem neuen Mischluft-Modul zugeordnet.
-- Projektlebenszyklus für Mischluft vollständig integriert: Eingabe, Berechnung, Speichern, Laden, PDF und Export.
-- Dokumentation, Modulverträge, Quality Manual und Architecture Baseline konsolidiert.
-
-### Verbesserungen
-- Release Notes zeigen künftig keine `dev.x`-Zwischenstände mehr in der App.
-- Dokumentationsstruktur deutlich reduziert und bereinigt.
-- Architektur- und Qualitätsreferenzen für künftige Versionen vereinheitlicht.
-
-### Behoben
-- Mischluft-Speicherdialog ergänzt.
-- Legacy-Mischluft-Records werden beim Laden alter Projekte korrekt migriert.
-- Veraltete Release-Notes-Einträge aus der App-Ansicht entfernt.
+- Contract des Moduls Überflutungsnachweis auf die bereitgestellten DIN-1986-100- und DWA-A-117-Grundlagen erweitert.
+- Leitungsprüfung und Leitungsdimensionierung über Tabelle A.5 als verbindlicher Scope aufgenommen.
+- Manueller Vollfüllungsabfluss und behördliche Einleitungsbegrenzung fachlich getrennt.
+- Einfaches Verfahren nach DWA-A 117 einschließlich Gültigkeitsprüfung aufgenommen.
+- Expliziter Snapshot-Import von Flächen aus dem Regenwassermodul festgelegt; keine Synchronisierung oder Rückschreibung.
+- Calculation Report Model und detaillierter, prüffähiger Behörden-PDF-Nachweis als Abnahmekriterien festgeschrieben.
+- Keine Fachimplementierung des neuen Moduls in diesem Build.

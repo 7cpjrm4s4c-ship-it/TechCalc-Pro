@@ -23,6 +23,7 @@ Der Modulvertrag definiert, wie Fachmodule in TechCalc Pro an die Plattform ange
 | `rainwater` | Regenwasser | aktiv |
 | `pipe-sizing` | Rohrdimensionierung | aktiv |
 | `unit-converter` | Einheitenumrechner | aktiv |
+| `flooding-verification` | Überflutungsnachweis | geplant für 1.4.0, Architektur freigegeben |
 
 ## Verbindliche Modulregeln
 
@@ -90,6 +91,7 @@ Detailreferenz: `docs/contracts/wrg-mixed-air-splitting-contract.md`
 | `rainwater` | Regenwasser/KOSTRA-Kontext | eigener State und Flächenlisten | Regenwasser-Ergebnisse | externe Links sichern State vor Navigation |
 | `pipe-sizing` | Rohrdimensionierung | Leitungsabschnitte und Materialzustand | Rohrtabellen/Dimensionen | Modulfarben folgen Modulvertrag |
 | `unit-converter` | Einheitenumrechnung | temporärer/konvertierbarer State | kein Pflicht-PDF | keine Fachmodul-Persistenz vermischen |
+| `flooding-verification` | Überflutungsnachweis mit heterogenen Teilflächen | eigener State und eigene Records | Berechnungsgrundlagen, Flächenliste und maßgebendes Rückhaltevolumen | gemeinsame Flächen-Card; keine direkte Kopplung an Regenwasser |
 
 ## Referenzmodule
 
@@ -131,6 +133,7 @@ Eine Moduländerung gilt erst als abgeschlossen, wenn erfüllt ist:
 - `docs/contracts/keyboard-contract.md`
 - `docs/contracts/selection-contract.md`
 - `docs/contracts/wrg-mixed-air-splitting-contract.md`
+- `docs/contracts/flooding-verification-contract.md`
 - `docs/adr/ADR-0005-phase-change-control.md`
 - `docs/adr/ADR-0006-wrg-mixed-air-module-splitting.md`
 - `docs/qm/QM-003-Architecture-Rules.md`

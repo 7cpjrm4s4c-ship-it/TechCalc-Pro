@@ -88,8 +88,8 @@ if (precacheCount < 100) {
 }
 
 const releaseNotes = readFileSync(path.join(root, 'RELEASE_NOTES.md'), 'utf8');
-if (!releaseNotes.includes('Version 1.3.3')) {
-  fail('release notes must include current public release entry');
+if (!releaseNotes.includes(`Version ${packageJson.version}`)) {
+  fail('release notes must include package version entry');
 }
 
 console.log('Phase 38G release package hygiene ok');
