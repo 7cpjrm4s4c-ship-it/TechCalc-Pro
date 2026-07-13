@@ -1,4 +1,4 @@
-import { areaTypes, hydraulicTables, dnOrder } from '../rainwater/tables.js';
+import { areaTypes, hydraulicTables, dnOrder } from '../../shared/rainwaterDomainTables.js';
 
 const toNumber = value => Number(String(value ?? '').replace(',', '.'));
 const typeById = new Map(areaTypes.map(item => [item.id, item]));
