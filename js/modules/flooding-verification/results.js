@@ -1,52 +1,63 @@
 const fmt = (value, digits = 1) => Number(value || 0).toLocaleString('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 
+const modeLabel = mode => ({
+  'table-existing-pipe': 'Vorhandene Leitung prüfen',
+  'table-size-pipe': 'Leitung dimensionieren',
+  'manual-full-flow': 'Vollfüllungsabfluss manuell',
+  'authority-discharge-limit': 'Behördliche Einleitungsbegrenzung'
+}[mode] || 'Leitungsnachweis');
+
 export function results(state = {}, result = {}) {
+  const discharge = result.discharge || {};
   return {
     primary: {
-      title: 'Regendauer und Flächenübersicht',
+      title: 'Leitungs- und Abflussnachweis',
       primary: {
-        label: 'Maßgebende Regendauer',
-        value: String(result.governingDurationMinutes || 10),
-        unit: 'min'
+        label: 'Erforderlicher Regenwasserabfluss Qᵣ',
+        value: fmt(result.requiredRainFlowLs, 2),
+        unit: 'l/s'
       },
       rows: [
-        { label: 'Automatisch ermittelt', value: String(result.automaticDurationMinutes || 10), unit: 'min' },
-        { label: 'Verwendete Quelle', value: result.durationSource === 'manual' ? 'manueller Override' : 'automatische DIN-Zuordnung' },
-        { label: 'Befestigter Flächenanteil', value: fmt((result.sealedShare || 0) * 100, 1), unit: '%' },
-        { label: 'Gesamtfläche', value: fmt(result.totalArea, 1), unit: 'm²' },
-        { label: 'Dachflächen', value: fmt(result.roofArea, 1), unit: 'm²' },
-        { label: 'Grundstücksflächen', value: fmt(result.propertyArea, 1), unit: 'm²' }
+        { label: 'Betriebsart', value: modeLabel(result.dischargeMode) },
+        { label: 'Verfügbarer Abfluss', value: result.availableFlowLs > 0 ? fmt(result.availableFlowLs, 2) : '—', unit: result.availableFlowLs > 0 ? 'l/s' : '' },
+        { label: 'Auslastung', value: result.availableFlowLs > 0 ? fmt(result.utilizationPercent, 1) : '—', unit: result.availableFlowLs > 0 ? '%' : '' },
+        { label: 'Nachweis', value: result.dischargeAdequate ? 'ausreichend' : 'nicht ausreichend / unvollständig' },
+        { label: 'Maßgebende Regendauer', value: String(result.governingDurationMinutes || 10), unit: 'min' },
+        { label: 'Befestigter Flächenanteil', value: fmt((result.sealedShare || 0) * 100, 1), unit: '%' }
       ],
       accent: 'green'
     },
     groups: [
       {
-        title: 'Regenspenden der verwendeten Dauer',
+        title: 'Leitungsdaten',
         rows: [
-          { label: `r(${result.governingDurationMinutes || 10},2)`, value: fmt(result.rain?.r2?.[result.governingDurationMinutes] || 0, 1), unit: 'l/(s·ha)' },
-          { label: `r(${result.governingDurationMinutes || 10},30)`, value: fmt(result.rain?.r30?.[result.governingDurationMinutes] || 0, 1), unit: 'l/(s·ha)' },
-          { label: 'r(5,100) optional', value: result.rain?.r100Duration5 > 0 ? fmt(result.rain.r100Duration5, 1) : '—', unit: result.rain?.r100Duration5 > 0 ? 'l/(s·ha)' : '' },
-          { label: 'Regendaten vollständig', value: result.rainInputValid ? 'ja' : 'nein' }
+          { label: 'Nennweite', value: discharge.dn || '—' },
+          { label: 'Gefälle', value: discharge.slopePermille != null ? fmt(discharge.slopePermille, 0) : '—', unit: discharge.slopePermille != null ? '‰' : '' },
+          { label: 'Vollfüllungsabfluss Qvoll', value: discharge.qFullLs > 0 ? fmt(discharge.qFullLs, 2) : '—', unit: discharge.qFullLs > 0 ? 'l/s' : '' },
+          { label: 'Behördliche Begrenzung', value: discharge.qLimitLs > 0 ? fmt(discharge.qLimitLs, 2) : '—', unit: discharge.qLimitLs > 0 ? 'l/s' : '' },
+          { label: 'Fließgeschwindigkeit', value: discharge.velocityMs > 0 ? fmt(discharge.velocityMs, 2) : '—', unit: discharge.velocityMs > 0 ? 'm/s' : '' },
+          { label: 'Quelle', value: discharge.tableReference || '—' },
+          { label: 'Zuordnung', value: discharge.lookupMode === 'exact' ? 'exakter Tabellenwert' : discharge.lookupMode === 'manual' ? 'manuelle Vorgabe' : discharge.lookupMode === 'authority-limit' ? 'behördliche Vorgabe' : '—' }
         ],
         accent: 'green'
       },
       {
-        title: 'Summen für die spätere Berechnung',
+        title: 'Berechnungsgrundlagen',
         rows: [
+          { label: `r(${result.governingDurationMinutes || 10},2)`, value: fmt(result.rain?.r2?.[result.governingDurationMinutes] || 0, 1), unit: 'l/(s·ha)' },
           { label: 'Σ(A × Cₛ)', value: fmt(result.weightedCsArea, 2), unit: 'm²' },
-          { label: 'Σ(A × Cₘ)', value: fmt(result.weightedCmArea, 2), unit: 'm²' },
-          { label: 'gewichteter Cₛ', value: fmt(result.averageCs, 2) },
-          { label: 'gewichteter Cₘ', value: fmt(result.averageCm, 2) },
+          { label: 'Gesamtfläche', value: fmt(result.totalArea, 1), unit: 'm²' },
+          { label: 'Regendaten vollständig', value: result.rainInputValid ? 'ja' : 'nein' },
           { label: 'Schema-Version', value: String(result.schemaVersion || state.schemaVersion || 2) }
         ],
         accent: 'green'
       }
     ],
     notices: [{
-      title: 'Phase 47C.3',
+      title: 'Phase 47C.4',
       messages: Array.isArray(result.warnings) ? result.warnings : [],
       accent: 'green',
-      emptyText: 'Regenspenden und Regendauer sind vollständig und valide.'
+      emptyText: 'Leitungs- und Abflussnachweis ist vollständig und valide.'
     }]
   };
 }
