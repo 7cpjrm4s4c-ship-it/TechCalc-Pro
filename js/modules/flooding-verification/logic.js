@@ -1,8 +1,9 @@
-import { areaTypes } from '../rainwater/tables.js';
+import { areaTypes, hydraulicTables, dnOrder } from '../rainwater/tables.js';
 
 const toNumber = value => Number(String(value ?? '').replace(',', '.'));
 const typeById = new Map(areaTypes.map(item => [item.id, item]));
 const VALID_DURATIONS = new Set([5, 10, 15]);
+const VALID_DISCHARGE_MODES = new Set(['table-existing-pipe', 'table-size-pipe', 'manual-full-flow', 'authority-discharge-limit']);
 
 export function validateSurface(surface = {}) {
   const area = toNumber(surface.area);
@@ -46,6 +47,31 @@ function validateRainInputs(state = {}, duration = 10) {
   return required.filter(([, value]) => !(value > 0)).map(([label]) => `${label} muss größer 0 sein.`);
 }
 
+export function tableSlopeFromPermille(value) {
+  const permille = toNumber(value);
+  return Number.isFinite(permille) ? permille / 10 : NaN;
+}
+
+export function lookupFullFlow(dn, slopePermille) {
+  const slope = tableSlopeFromPermille(slopePermille);
+  const row = (hydraulicTables['1.0'] || []).find(item => Math.abs(Number(item.slope) - slope) < 1e-9);
+  const qFullLs = row?.values?.[dn];
+  if (!(qFullLs > 0)) return null;
+  const diameterMm = toNumber(String(dn).replace(/[^0-9.,]/g, ''));
+  const diameterM = diameterMm / 1000;
+  const crossSectionM2 = Math.PI * diameterM * diameterM / 4;
+  const velocityMs = crossSectionM2 > 0 ? (qFullLs / 1000) / crossSectionM2 : 0;
+  return { dn, slopePermille: toNumber(slopePermille), qFullLs, velocityMs, tableReference: 'DIN 1986-100 Tabelle A.5', lookupMode: 'exact' };
+}
+
+export function sizePipe(requiredFlowLs, slopePermille) {
+  for (const dn of dnOrder) {
+    const candidate = lookupFullFlow(dn, slopePermille);
+    if (candidate && candidate.qFullLs >= requiredFlowLs) return candidate;
+  }
+  return null;
+}
+
 export function calculate(state = {}) {
   const surfaces = Array.isArray(state.surfaces) ? state.surfaces : [];
   const validated = surfaces.map(surface => ({ surface, validation: validateSurface(surface) }));
@@ -64,9 +90,34 @@ export function calculate(state = {}) {
   const manualValid = manualRequested && VALID_DURATIONS.has(requestedManualDuration) && Boolean(manualReason);
   const governingDurationMinutes = manualValid ? requestedManualDuration : automaticDurationMinutes;
   const rainErrors = validateRainInputs(state, governingDurationMinutes);
+  const rD2 = rainValue(state, 2, governingDurationMinutes);
+  const weightedCsArea = weighted('cs');
+  const requiredRainFlowLs = rD2 > 0 ? rD2 * weightedCsArea / 10000 : 0;
+
+  const dischargeMode = VALID_DISCHARGE_MODES.has(state.dischargeMode) ? state.dischargeMode : 'table-existing-pipe';
+  let discharge = null;
+  const dischargeErrors = [];
+  if (dischargeMode === 'table-existing-pipe') {
+    discharge = lookupFullFlow(state.pipeNominalDiameterDn, state.pipeSlopePermille);
+    if (!discharge) dischargeErrors.push('Für die gewählte Kombination aus DN und Gefälle ist kein exakter Tabellenwert hinterlegt.');
+  } else if (dischargeMode === 'table-size-pipe') {
+    discharge = sizePipe(requiredRainFlowLs, state.pipeSlopePermille);
+    if (!discharge) dischargeErrors.push('Für das gewählte Gefälle konnte innerhalb des Tabellenumfangs keine ausreichende Nennweite bestimmt werden.');
+  } else if (dischargeMode === 'manual-full-flow') {
+    const qFullLs = toNumber(state.manualFullFlowLs);
+    if (!(qFullLs > 0)) dischargeErrors.push('Der manuell vorgegebene Vollfüllungsabfluss muss größer 0 sein.');
+    else discharge = { qFullLs, velocityMs: null, tableReference: String(state.manualFullFlowSource || '').trim() || 'Manuelle Vorgabe', lookupMode: 'manual', dn: null, slopePermille: null };
+  } else {
+    const qLimitLs = toNumber(state.authorityLimitLs);
+    if (!(qLimitLs > 0)) dischargeErrors.push('Die behördliche Einleitungsbegrenzung muss größer 0 sein.');
+    else discharge = { qLimitLs, qFullLs: null, velocityMs: null, tableReference: String(state.authorityReference || '').trim() || 'Behördliche Vorgabe', lookupMode: 'authority-limit', dn: null, slopePermille: null };
+  }
+
+  const availableFlowLs = dischargeMode === 'authority-discharge-limit' ? Number(discharge?.qLimitLs || 0) : Number(discharge?.qFullLs || 0);
+  const utilizationPercent = availableFlowLs > 0 ? requiredRainFlowLs / availableFlowLs * 100 : 0;
 
   return Object.freeze({
-    status: 'rain-duration-ready',
+    status: 'discharge-verification-ready',
     schemaVersion: Number(state.schemaVersion || 2),
     surfaceCount: surfaces.length,
     validSurfaceCount: valid.length,
@@ -76,9 +127,9 @@ export function calculate(state = {}) {
     totalArea,
     sealedArea,
     sealedShare,
-    weightedCsArea: weighted('cs'),
+    weightedCsArea,
     weightedCmArea: weighted('cm'),
-    averageCs: totalArea > 0 ? weighted('cs') / totalArea : 0,
+    averageCs: totalArea > 0 ? weightedCsArea / totalArea : 0,
     averageCm: totalArea > 0 ? weighted('cm') / totalArea : 0,
     duplicateSourceCount: new Set(duplicateSources).size,
     automaticDurationMinutes,
@@ -90,21 +141,23 @@ export function calculate(state = {}) {
       r2: Object.freeze({ 5: rainValue(state, 2, 5), 10: rainValue(state, 2, 10), 15: rainValue(state, 2, 15) }),
       r30: Object.freeze({ 5: rainValue(state, 30, 5), 10: rainValue(state, 30, 10), 15: rainValue(state, 30, 15) }),
       r100Duration5: rainValue(state, 100, 5),
-      source: Object.freeze({
-        dataset: String(state.rainSourceDataset || '').trim(),
-        location: String(state.rainSourceLocation || '').trim(),
-        version: String(state.rainSourceVersion || '').trim(),
-        entryMode: state.rainEntryMode || 'manual'
-      })
+      source: Object.freeze({ dataset: String(state.rainSourceDataset || '').trim(), location: String(state.rainSourceLocation || '').trim(), version: String(state.rainSourceVersion || '').trim(), entryMode: state.rainEntryMode || 'manual' })
     }),
+    requiredRainFlowLs,
+    dischargeMode,
+    discharge: discharge ? Object.freeze(discharge) : null,
+    availableFlowLs,
+    utilizationPercent,
+    dischargeAdequate: availableFlowLs > 0 && availableFlowLs >= requiredRainFlowLs,
     rainInputValid: rainErrors.length === 0,
-    calculationAvailable: false,
+    calculationAvailable: rainErrors.length === 0 && dischargeErrors.length === 0 && valid.length > 0,
     warnings: [
       ...(invalidCount ? [`${invalidCount} Fläche(n) sind ungültig und werden nicht summiert.`] : []),
       ...(duplicateSources.length ? ['Mehrfach importierte Quell-IDs wurden erkannt.'] : []),
       ...(manualRequested && !manualValid ? ['Die manuelle Regendauer ist erst mit einer zulässigen Dauer und einer Begründung wirksam. Bis dahin wird die automatische Dauer verwendet.'] : []),
       ...rainErrors,
-      'Die normative Fachberechnung wird in Phase 47C.4 bis 47C.6 ergänzt.'
+      ...dischargeErrors,
+      ...(availableFlowLs > 0 && availableFlowLs < requiredRainFlowLs ? ['Der verfügbare Abfluss ist kleiner als der erforderliche Regenwasserabfluss.'] : [])
     ]
   });
 }
