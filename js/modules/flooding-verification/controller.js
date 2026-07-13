@@ -4,7 +4,12 @@ import { readRainwaterSurfaceSnapshot } from '../../shared/rainwaterSurfaceSnaps
 import { deleteCollectionItem, patchCollectionItem } from '../../platform/collectionModel/index.js';
 
 const typeById = new Map(areaTypes.map(item => [item.id, item]));
-const numericFields = ['surfaceArea', 'surfaceCs', 'surfaceCm'];
+const numericFields = [
+  'surfaceArea', 'surfaceCs', 'surfaceCm', 'meanSlopePercent',
+  'rainR2Duration5', 'rainR2Duration10', 'rainR2Duration15',
+  'rainR30Duration5', 'rainR30Duration10', 'rainR30Duration15',
+  'rainR100Duration5'
+];
 const id = prefix => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 const number = value => Number(String(value ?? '').replace(',', '.'));
 const normalized = value => canonicalGermanNumberInput(value);
@@ -67,9 +72,16 @@ const controller = {
   segments: {
     fields: {
       calculationMode: { action: 'platform:segment:calculationMode', patch: value => ({ calculationMode: value }) },
+      rainDurationMode: {
+        action: 'platform:segment:rainDurationMode',
+        patch: value => ({
+          rainDurationMode: value === 'manual' ? 'manual' : 'automatic',
+          ...(value === 'automatic' ? { manualRainDurationReason: '' } : {})
+        })
+      },
       surfaceCategory: {
         action: 'platform:segment:surfaceCategory',
-        patch: (value, current) => ({ surfaceCategory: value, surfaceAreaType: value === 'property' ? 'concrete-asphalt' : 'metal-roof', ...defaultsForType(value === 'property' ? 'concrete-asphalt' : 'metal-roof') })
+        patch: value => ({ surfaceCategory: value, surfaceAreaType: value === 'property' ? 'concrete-asphalt' : 'metal-roof', ...defaultsForType(value === 'property' ? 'concrete-asphalt' : 'metal-roof') })
       }
     }
   },
