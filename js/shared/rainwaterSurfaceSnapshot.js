@@ -12,6 +12,8 @@ export function readRainwaterSurfaceSnapshot() {
   const surfaces = Array.isArray(source.surfaces) ? source.surfaces : [];
   return clone(surfaces.map((item, index) => {
     const type = typeById.get(item.areaType || item.typeId) || {};
+    const cs = item.customCs || item.cs || type.cs;
+    const cm = item.customCm || item.cm || type.cm;
     return {
       sourceModule: 'rainwater',
       sourceId: String(item.id || `rainwater-${index + 1}`),
@@ -19,8 +21,8 @@ export function readRainwaterSurfaceSnapshot() {
       category: String(item.surfaceMode || item.calculationType || '').toLowerCase() === 'property' ? 'property' : 'roof',
       areaType: String(item.areaType || item.typeId || 'custom'),
       area: String(item.areaSize || item.area || '0'),
-      cs: String(item.customCs || item.cs || type.cs ?? ''),
-      cm: String(item.customCm || item.cm || type.cm ?? '')
+      cs: String(cs ?? ''),
+      cm: String(cm ?? '')
     };
   }));
 }
