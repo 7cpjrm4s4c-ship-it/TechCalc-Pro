@@ -2,6 +2,7 @@ import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { areaTypes } from '../rainwater/tables.js';
 import { readRainwaterSurfaceSnapshot } from '../../shared/rainwaterSurfaceSnapshot.js';
 import { deleteCollectionItem, patchCollectionItem } from '../../platform/collectionModel/index.js';
+import { verificationSnapshot, hydrateVerification } from './savedRecords.js';
 
 const typeById = new Map(areaTypes.map(item => [item.id, item]));
 const numericFields = [
@@ -60,19 +61,12 @@ function saveSurface({ current = {} } = {}) {
   if (!shouldAcceptSurfaceAdd(current)) return {};
   const existing = (current.surfaces || []).find(item => String(item.id) === String(current.activeSurfaceId));
   const record = surfaceRecordFromDraft(current, existing?.id, existing);
-  const surfaces = existing
-    ? patchCollectionItem(current.surfaces || [], existing.id, record)
-    : [...(current.surfaces || []), record];
-  return {
-    surfaces,
-    surfaceName: '',
-    activeSurfaceId: null,
-    importStatus: `${record.name} wurde ${existing ? 'aktualisiert' : 'hinzugefügt'}.`
-  };
+  const surfaces = existing ? patchCollectionItem(current.surfaces || [], existing.id, record) : [...(current.surfaces || []), record];
+  return { surfaces, surfaceName: '', activeSurfaceId: null, importStatus: `${record.name} wurde ${existing ? 'aktualisiert' : 'hinzugefügt'}.` };
 }
 
 function patchSurface({ id: itemId, field, value, current = {} } = {}) {
-  const allowed = { area: 'area', name: 'name', category: 'category', areaType: 'areaType', cs: 'cs', cm: 'cm' };
+  const allowed = { quantity: 'area', area: 'area', name: 'name', category: 'category', areaType: 'areaType', cs: 'cs', cm: 'cm' };
   const target = allowed[field] || 'area';
   const patch = { [target]: ['area','cs','cm'].includes(target) ? normalized(value) : value };
   if (target === 'areaType') {
@@ -129,6 +123,17 @@ const controller = {
   collections: {
     surfaces: { add: saveSurface, patchInput: patchSurface, delete: deleteSurface, edit: editSurface },
     rainwaterImport: { add: importRainwater }
+  },
+  savedRecords: {
+    enabled: true,
+    listKey: 'savedVerifications',
+    activeIdKey: 'activeVerificationId',
+    expandedIdKey: 'expandedVerificationId',
+    nameKey: 'savedVerificationName',
+    recordPrefix: 'flooding-verification',
+    snapshot: verificationSnapshot,
+    hydrate: hydrateVerification,
+    attrs: { loadAttr: 'data-line-select', toggleAttr: 'data-line-toggle', deleteAttr: 'data-line-delete' }
   }
 };
 
