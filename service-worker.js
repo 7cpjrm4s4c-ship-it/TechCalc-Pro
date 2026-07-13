@@ -1,5 +1,5 @@
 const CACHE_NAME = 'techcalc-pro-1.4.0-dev.2';
-const CACHE_REVISION = '1.4.0-dev.2-version-1-4-0-dev-2-phase-47b-1';
+const CACHE_REVISION = '1.4.0-dev.2-phase-47c-4-3-platform-conformance';
 const ASSETS = [
   './',
   './index.html',
@@ -61,7 +61,9 @@ const ASSETS = [
   './js/core/platformLifecycle.js',
   './js/core/platformPolicy.js',
   './js/core/preferences.js',
+  './js/core/projectModuleStateAdapters.js',
   './js/core/projectStorage.js',
+  './js/core/projectStorageBase.js',
   './js/core/quality/appHealth.js',
   './js/core/quality/performanceBudget.js',
   './js/core/registry.js',
@@ -99,6 +101,14 @@ const ASSETS = [
   './js/modules/drinking-water/state.js',
   './js/modules/drinking-water/view.js',
   './js/modules/drinking-water/viewModel.js',
+  './js/modules/flooding-verification/config.js',
+  './js/modules/flooding-verification/controller.js',
+  './js/modules/flooding-verification/index.js',
+  './js/modules/flooding-verification/logic.js',
+  './js/modules/flooding-verification/results.js',
+  './js/modules/flooding-verification/savedRecords.js',
+  './js/modules/flooding-verification/schema.js',
+  './js/modules/flooding-verification/state.js',
   './js/modules/heat-recovery/config.js',
   './js/modules/heat-recovery/controller.js',
   './js/modules/heat-recovery/dynamicRenderer.js',
@@ -212,6 +222,8 @@ const ASSETS = [
   './js/platform/shell/serviceWorkerController.js',
   './js/platform/shell/settingsController.js',
   './js/platform/shell/themeController.js',
+  './js/shared/rainwaterDomainTables.js',
+  './js/shared/rainwaterSurfaceSnapshot.js',
   './js/utils/calculations.js',
   './js/utils/pipes.js',
   './js/utils/units.js',
