@@ -7,6 +7,12 @@ export const initialState = {
   featureEnabled: true,
   projectName: '',
   calculationMode: 'flooding',
+  surfaceCategory: 'roof',
+  surfaceName: '',
+  surfaceAreaType: 'metal-roof',
+  surfaceArea: '100',
+  surfaceCs: '1,0',
+  surfaceCm: '0,9',
   rainDurationMode: 'automatic',
   manualRainDuration: '5',
   rainIntensity5: '',
@@ -15,6 +21,7 @@ export const initialState = {
   activeSurfaceId: null,
   surfaces: [],
   importedRainwaterSnapshot: null,
+  importStatus: '',
   results: null
 };
 
