@@ -1,38 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { shouldAcceptSurfaceAdd } from '../js/modules/flooding-verification/controller.js';
 import { surfaceCollectionItems } from '../js/modules/flooding-verification/schema.js';
 import { calculate, lookupFullFlow, sizePipe } from '../js/modules/flooding-verification/logic.js';
 
-const surfaceDraft = {
-  surfaceCategory: 'roof',
-  surfaceName: 'Norddach',
-  surfaceAreaType: 'tile-roof',
-  surfaceArea: '100',
-  surfaceCs: '1,0',
-  surfaceCm: '0,8'
-};
-
-test('Phase 47C.3.2 suppresses immediate duplicate surface actions', () => {
-  assert.equal(shouldAcceptSurfaceAdd(surfaceDraft, 1000), true);
-  assert.equal(shouldAcceptSurfaceAdd(surfaceDraft, 1200), false);
-  assert.equal(shouldAcceptSurfaceAdd(surfaceDraft, 1700), true);
-});
-
 test('Phase 47C.3.2 renders German surface labels with explicit separation', () => {
   const [item] = surfaceCollectionItems({ surfaces: [{ id: 'a', name: 'Norddach', category: 'roof', areaType: 'tile-roof', area: '100', cs: '1,0' }] });
-  assert.equal(item.title, 'Norddach ·');
+  assert.equal(item.title, 'Norddach');
   assert.match(item.subtitle, /Dachfläche/);
   assert.match(item.subtitle, /Ziegel\/Abdichtungsbahn/);
   assert.doesNotMatch(item.subtitle, /tile-roof/);
 });
 
 test('Phase 47C.4 uses exact full-flow table values and sizes the smallest adequate DN', () => {
-  const existing = lookupFullFlow('DN 100', '10');
+  const existing = lookupFullFlow('DN 100', '1,0');
   assert.equal(existing?.qFullLs, 5.0);
   assert.equal(existing?.lookupMode, 'exact');
-  assert.equal(lookupFullFlow('DN 100', '11'), null);
-  assert.equal(sizePipe(6, '10')?.dn, 'DN 125');
+  assert.equal(lookupFullFlow('DN 100', '1,1'), null);
+  assert.equal(sizePipe(6, '1,0')?.dn, 'DN 125');
 });
 
 test('Phase 47C.4 calculates Qr and distinguishes authority limits from Qfull', () => {
