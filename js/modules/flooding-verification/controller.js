@@ -1,5 +1,5 @@
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
-import { areaTypes } from '../rainwater/tables.js';
+import { areaTypes } from '../../shared/rainwaterDomainTables.js';
 import { readRainwaterSurfaceSnapshot } from '../../shared/rainwaterSurfaceSnapshot.js';
 import { deleteCollectionItem, patchCollectionItem } from '../../platform/collectionModel/index.js';
 import { verificationSnapshot, hydrateVerification } from './savedRecords.js';
@@ -14,23 +14,10 @@ const numericFields = [
 const id = prefix => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 const number = value => Number(String(value ?? '').replace(',', '.'));
 const normalized = value => canonicalGermanNumberInput(value);
-const ADD_DEBOUNCE_MS = 600;
-let lastSurfaceAdd = { fingerprint: '', at: 0 };
 
 function defaultsForType(typeId) {
   const type = typeById.get(typeId) || typeById.get('custom') || {};
   return { surfaceCs: String(type.cs ?? '').replace('.', ','), surfaceCm: String(type.cm ?? '').replace('.', ',') };
-}
-
-export function surfaceDraftFingerprint(current = {}) {
-  return [current.activeSurfaceId || '', current.surfaceCategory || 'roof', String(current.surfaceName || '').trim(), current.surfaceAreaType || 'custom', normalized(current.surfaceArea), normalized(current.surfaceCs), normalized(current.surfaceCm)].join('|');
-}
-
-export function shouldAcceptSurfaceAdd(current = {}, now = Date.now()) {
-  const fingerprint = surfaceDraftFingerprint(current);
-  if (fingerprint === lastSurfaceAdd.fingerprint && now - lastSurfaceAdd.at < ADD_DEBOUNCE_MS) return false;
-  lastSurfaceAdd = { fingerprint, at: now };
-  return true;
 }
 
 function surfaceRecordFromDraft(current = {}, recordId = null, existing = null) {
@@ -57,18 +44,26 @@ function saveSurface({ current = {} } = {}) {
   const area = number(current.surfaceArea);
   const cs = number(current.surfaceCs);
   const cm = number(current.surfaceCm);
-  if (!(area > 0) || !(cs >= 0 && cs <= 1) || !(cm >= 0 && cm <= 1)) return { importStatus: 'Fläche muss größer 0 m² sein; Cₛ und Cₘ müssen zwischen 0 und 1 liegen.' };
-  if (!shouldAcceptSurfaceAdd(current)) return {};
+  if (!(area > 0) || !(cs >= 0 && cs <= 1) || !(cm >= 0 && cm <= 1)) {
+    return { importStatus: 'Fläche muss größer 0 m² sein; Cₛ und Cₘ müssen zwischen 0 und 1 liegen.' };
+  }
   const existing = (current.surfaces || []).find(item => String(item.id) === String(current.activeSurfaceId));
   const record = surfaceRecordFromDraft(current, existing?.id, existing);
-  const surfaces = existing ? patchCollectionItem(current.surfaces || [], existing.id, record) : [...(current.surfaces || []), record];
-  return { surfaces, surfaceName: '', activeSurfaceId: null, importStatus: `${record.name} wurde ${existing ? 'aktualisiert' : 'hinzugefügt'}.` };
+  const surfaces = existing
+    ? patchCollectionItem(current.surfaces || [], existing.id, record)
+    : [...(current.surfaces || []), record];
+  return {
+    surfaces,
+    surfaceName: '',
+    activeSurfaceId: null,
+    importStatus: `${record.name} wurde ${existing ? 'aktualisiert' : 'hinzugefügt'}.`
+  };
 }
 
 function patchSurface({ id: itemId, field, value, current = {} } = {}) {
   const allowed = { quantity: 'area', area: 'area', name: 'name', category: 'category', areaType: 'areaType', cs: 'cs', cm: 'cm' };
   const target = allowed[field] || 'area';
-  const patch = { [target]: ['area','cs','cm'].includes(target) ? normalized(value) : value };
+  const patch = { [target]: ['area', 'cs', 'cm'].includes(target) ? normalized(value) : value };
   if (target === 'areaType') {
     const type = typeById.get(value) || {};
     patch.cs = String(type.cs ?? '').replace('.', ',');
@@ -95,14 +90,19 @@ function editSurface({ id: itemId, current = {} } = {}) {
 }
 
 function deleteSurface({ id: itemId, current = {} } = {}) {
-  return { surfaces: deleteCollectionItem(current.surfaces || [], itemId), activeSurfaceId: current.activeSurfaceId === itemId ? null : current.activeSurfaceId };
+  return {
+    surfaces: deleteCollectionItem(current.surfaces || [], itemId),
+    activeSurfaceId: current.activeSurfaceId === itemId ? null : current.activeSurfaceId
+  };
 }
 
 function importRainwater({ current = {} } = {}) {
   const incoming = readRainwaterSurfaceSnapshot().filter(item => number(item.area) > 0);
   if (!incoming.length) return { importStatus: 'Im Regenwassermodul sind keine gültigen Flächen vorhanden.' };
   const existingSourceIds = new Set((current.surfaces || []).map(item => item.sourceId).filter(Boolean));
-  const imported = incoming.filter(item => !existingSourceIds.has(item.sourceId)).map(item => ({ ...item, id: id('rain-snapshot') }));
+  const imported = incoming
+    .filter(item => !existingSourceIds.has(item.sourceId))
+    .map(item => ({ ...item, id: id('rain-snapshot') }));
   const skipped = incoming.length - imported.length;
   return {
     surfaces: [...(current.surfaces || []), ...imported],
@@ -114,13 +114,31 @@ function importRainwater({ current = {} } = {}) {
 const controller = {
   normalizeFields: numericFields,
   segments: { fields: {
-    rainDurationMode: { action: 'platform:segment:rainDurationMode', patch: value => ({ rainDurationMode: value === 'manual' ? 'manual' : 'automatic', ...(value === 'automatic' ? { manualRainDurationReason: '' } : {}) }) },
+    rainDurationMode: {
+      action: 'platform:segment:rainDurationMode',
+      patch: value => ({
+        rainDurationMode: value === 'manual' ? 'manual' : 'automatic',
+        ...(value === 'automatic' ? { manualRainDurationReason: '' } : {})
+      })
+    },
     dischargeMode: { action: 'platform:segment:dischargeMode', patch: value => ({ dischargeMode: value }) },
-    surfaceCategory: { action: 'platform:segment:surfaceCategory', patch: value => ({ surfaceCategory: value, surfaceAreaType: value === 'property' ? 'concrete-asphalt' : 'metal-roof', ...defaultsForType(value === 'property' ? 'concrete-asphalt' : 'metal-roof') }) }
+    surfaceCategory: {
+      action: 'platform:segment:surfaceCategory',
+      patch: value => ({
+        surfaceCategory: value,
+        surfaceAreaType: value === 'property' ? 'concrete-asphalt' : 'metal-roof',
+        ...defaultsForType(value === 'property' ? 'concrete-asphalt' : 'metal-roof')
+      })
+    }
   }},
-  lookupHydration: { key: 'flooding:surface-type', fields: ['surfaceAreaType'], patch: (_field, current) => defaultsForType(current.surfaceAreaType) },
+  lookupHydration: {
+    key: 'flooding:surface-type',
+    fields: ['surfaceAreaType'],
+    patch: (_field, current) => defaultsForType(current.surfaceAreaType)
+  },
   collections: {
-    surfaces: { add: saveSurface, patchInput: patchSurface, delete: deleteSurface, edit: editSurface },
+    surfaces: { add: saveSurface, patchInput: patchSurface, delete: deleteSurface },
+    surfacesEdit: { add: ({ current = {}, element } = {}) => editSurface({ id: element?.dataset?.collectionId, current }) },
     rainwaterImport: { add: importRainwater }
   },
   savedRecords: {
