@@ -44,9 +44,15 @@ function saveSurface({ current = {} } = {}) {
   const area = number(current.surfaceArea);
   const cs = number(current.surfaceCs);
   const cm = number(current.surfaceCm);
+  const editing = Boolean(current.activeSurfaceId);
+
+  // A successful add clears the draft area. A second synthetic touch/click event
+  // therefore becomes a no-op instead of creating a duplicate record.
+  if (!editing && String(current.surfaceArea || '').trim() === '') return {};
   if (!(area > 0) || !(cs >= 0 && cs <= 1) || !(cm >= 0 && cm <= 1)) {
     return { importStatus: 'Fläche muss größer 0 m² sein; Cₛ und Cₘ müssen zwischen 0 und 1 liegen.' };
   }
+
   const existing = (current.surfaces || []).find(item => String(item.id) === String(current.activeSurfaceId));
   const record = surfaceRecordFromDraft(current, existing?.id, existing);
   const surfaces = existing
@@ -55,6 +61,7 @@ function saveSurface({ current = {} } = {}) {
   return {
     surfaces,
     surfaceName: '',
+    surfaceArea: existing ? record.area : '',
     activeSurfaceId: null,
     importStatus: `${record.name} wurde ${existing ? 'aktualisiert' : 'hinzugefügt'}.`
   };
@@ -76,7 +83,7 @@ function patchSurface({ id: itemId, field, value, current = {} } = {}) {
 
 function editSurface({ id: itemId, current = {} } = {}) {
   const item = (current.surfaces || []).find(entry => String(entry.id) === String(itemId));
-  if (!item) return {};
+  if (!item || String(current.activeSurfaceId || '') === String(item.id)) return {};
   return {
     activeSurfaceId: item.id,
     surfaceCategory: item.category || 'roof',
@@ -104,6 +111,9 @@ function importRainwater({ current = {} } = {}) {
     .filter(item => !existingSourceIds.has(item.sourceId))
     .map(item => ({ ...item, id: id('rain-snapshot') }));
   const skipped = incoming.length - imported.length;
+  if (!imported.length) {
+    return { importStatus: `${skipped} bereits importierte Fläche(n) erkannt. Es wurden keine lokalen Daten überschrieben.` };
+  }
   return {
     surfaces: [...(current.surfaces || []), ...imported],
     importedRainwaterSnapshot: { importedAt: new Date().toISOString(), sourceIds: incoming.map(item => item.sourceId) },
