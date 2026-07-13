@@ -39,6 +39,7 @@ export function hydrateVerification(item = {}, current = {}) {
 
 export function savedVerificationModel(state = {}) {
   const items = Array.isArray(state.savedVerifications) ? state.savedVerifications : [];
+  const editMode = Boolean(state.activeVerificationId);
   return {
     enabled: true,
     title: 'Gespeicherte Einträge',
@@ -48,6 +49,8 @@ export function savedVerificationModel(state = {}) {
     namePlaceholder: 'z. B. Grundstück Musterstraße 1',
     activeId: state.activeVerificationId,
     expandedId: state.expandedVerificationId,
+    addDisabled: editMode,
+    updateDisabled: !editMode,
     emptyText: 'Noch keine Einträge gespeichert.',
     accent: 'green',
     loadAttr: 'data-line-select',
