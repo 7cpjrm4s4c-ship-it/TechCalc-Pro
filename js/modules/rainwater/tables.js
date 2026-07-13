@@ -1,17 +1,17 @@
 export const areaTypes = [
-  { id:'metal-roof', name:'Dachfläche · Metall/Glas/Schiefer/Faserzement', cs:1.0, cm:0.9, group:'Dachflächen' },
-  { id:'tile-roof', name:'Dachfläche · Ziegel/Abdichtungsbahn', cs:1.0, cm:0.8, group:'Dachflächen' },
-  { id:'flat-gravel-roof', name:'Flachdach · Kies/Gründach > 3° oder 5 %', cs:0.8, cm:0.8, group:'Dachflächen' },
-  { id:'green-extensive-steep', name:'Extensivbegrünung > 5°', cs:0.7, cm:0.4, group:'Dachflächen' },
-  { id:'green-extensive-10', name:'Extensivbegrünung ≤ 5° ab 10 cm Aufbau', cs:0.4, cm:0.2, group:'Dachflächen' },
-  { id:'green-intensive', name:'Intensivbegrünung ≤ 5° ab 30 cm Aufbau', cs:0.2, cm:0.1, group:'Dachflächen' },
-  { id:'concrete-asphalt', name:'Beton/Asphalt', cs:1.0, cm:0.9, group:'Verkehrsflächen' },
-  { id:'paving-sealed', name:'Pflaster mit Fugenverguss', cs:1.0, cm:0.8, group:'Verkehrsflächen' },
-  { id:'paving-open', name:'Pflaster/Platten mit offenen Fugen', cs:0.7, cm:0.6, group:'Verkehrsflächen' },
-  { id:'gravel', name:'Lockerer Kiesbelag / Schotterrasen', cs:0.3, cm:0.2, group:'Verkehrsflächen' },
-  { id:'lawn-flat', name:'Rasenfläche · flaches Gelände', cs:0.2, cm:0.1, group:'Grünflächen' },
-  { id:'lawn-steep', name:'Rasenfläche · steiles Gelände', cs:0.3, cm:0.2, group:'Grünflächen' },
-  { id:'custom', name:'Freie Fläche / eigener Abflussbeiwert', cs:0, cm:0, custom:true, group:'Benutzerdefiniert' }
+  { id:'metal-roof', name:'Dachfläche · Metall/Glas/Schiefer/Faserzement', cs:1.0, cm:0.9, group:'Dachflächen', isSealed:true },
+  { id:'tile-roof', name:'Dachfläche · Ziegel/Abdichtungsbahn', cs:1.0, cm:0.8, group:'Dachflächen', isSealed:true },
+  { id:'flat-gravel-roof', name:'Flachdach · Kies/Gründach > 3° oder 5 %', cs:0.8, cm:0.8, group:'Dachflächen', isSealed:true },
+  { id:'green-extensive-steep', name:'Extensivbegrünung > 5°', cs:0.7, cm:0.4, group:'Dachflächen', isSealed:true },
+  { id:'green-extensive-10', name:'Extensivbegrünung ≤ 5° ab 10 cm Aufbau', cs:0.4, cm:0.2, group:'Dachflächen', isSealed:true },
+  { id:'green-intensive', name:'Intensivbegrünung ≤ 5° ab 30 cm Aufbau', cs:0.2, cm:0.1, group:'Dachflächen', isSealed:true },
+  { id:'concrete-asphalt', name:'Beton/Asphalt', cs:1.0, cm:0.9, group:'Verkehrsflächen', isSealed:true },
+  { id:'paving-sealed', name:'Pflaster mit Fugenverguss', cs:1.0, cm:0.8, group:'Verkehrsflächen', isSealed:true },
+  { id:'paving-open', name:'Pflaster/Platten mit offenen Fugen', cs:0.7, cm:0.6, group:'Verkehrsflächen', isSealed:true },
+  { id:'gravel', name:'Lockerer Kiesbelag / Schotterrasen', cs:0.3, cm:0.2, group:'Verkehrsflächen', isSealed:false },
+  { id:'lawn-flat', name:'Rasenfläche · flaches Gelände', cs:0.2, cm:0.1, group:'Grünflächen', isSealed:false },
+  { id:'lawn-steep', name:'Rasenfläche · steiles Gelände', cs:0.3, cm:0.2, group:'Grünflächen', isSealed:false },
+  { id:'custom', name:'Freie Fläche / eigener Abflussbeiwert', cs:0, cm:0, custom:true, group:'Benutzerdefiniert', isSealed:true }
 ];
 
 export const dnOrder = ['DN 70','DN 80','DN 90','DN 100','DN 125','DN 150','DN 200','DN 225','DN 250','DN 300'];
