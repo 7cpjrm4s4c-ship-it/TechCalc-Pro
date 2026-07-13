@@ -9,7 +9,7 @@ const numericFields = [
   'surfaceArea', 'surfaceCs', 'surfaceCm', 'meanSlopePercent',
   'rainR2Duration5', 'rainR2Duration10', 'rainR2Duration15',
   'rainR30Duration5', 'rainR30Duration10', 'rainR30Duration15',
-  'rainR100Duration5', 'pipeSlopePermille', 'manualFullFlowLs', 'authorityLimitLs'
+  'rainR100Duration5', 'pipeSlopePercent', 'manualFullFlowLs', 'authorityLimitLs'
 ];
 const id = prefix => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 const number = value => Number(String(value ?? '').replace(',', '.'));
@@ -114,7 +114,6 @@ function importRainwater({ current = {} } = {}) {
 const controller = {
   normalizeFields: numericFields,
   segments: { fields: {
-    calculationMode: { action: 'platform:segment:calculationMode', patch: value => ({ calculationMode: value }) },
     rainDurationMode: { action: 'platform:segment:rainDurationMode', patch: value => ({ rainDurationMode: value === 'manual' ? 'manual' : 'automatic', ...(value === 'automatic' ? { manualRainDurationReason: '' } : {}) }) },
     dischargeMode: { action: 'platform:segment:dischargeMode', patch: value => ({ dischargeMode: value }) },
     surfaceCategory: { action: 'platform:segment:surfaceCategory', patch: value => ({ surfaceCategory: value, surfaceAreaType: value === 'property' ? 'concrete-asphalt' : 'metal-roof', ...defaultsForType(value === 'property' ? 'concrete-asphalt' : 'metal-roof') }) }
