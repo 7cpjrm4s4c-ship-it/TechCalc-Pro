@@ -30,7 +30,7 @@ export const initialState = {
   rainEntryMode: 'manual',
   dischargeMode: 'table-existing-pipe',
   pipeNominalDiameterDn: 'DN 100',
-  pipeSlopePermille: '10',
+  pipeSlopePermille: '1,0',
   manualFullFlowLs: '',
   manualFullFlowSource: '',
   authorityLimitLs: '',
@@ -42,6 +42,10 @@ export const initialState = {
   surfaces: [],
   importedRainwaterSnapshot: null,
   importStatus: '',
+  savedVerifications: [],
+  activeVerificationId: null,
+  expandedVerificationId: null,
+  savedVerificationName: '',
   results: null
 };
 
