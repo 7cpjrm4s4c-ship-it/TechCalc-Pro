@@ -6,22 +6,22 @@ const VALID_DURATIONS = new Set([5, 10, 15]);
 const VALID_DISCHARGE_MODES = new Set(['table-existing-pipe', 'table-size-pipe', 'manual-full-flow', 'authority-discharge-limit']);
 
 export function validateSurface(surface = {}) {
-  const area = toNumber(surface.area);
-  const cs = toNumber(surface.cs);
-  const cm = toNumber(surface.cm);
+  const area = toNumber(surface.area ?? surface.areaM2 ?? surface.areaSize);
+  const cs = toNumber(surface.cs ?? surface.runoffCoefficientCs);
+  const cm = toNumber(surface.cm ?? surface.meanRunoffCoefficientCm);
   const errors = [];
   if (!(area > 0)) errors.push('Fläche muss größer 0 m² sein.');
   if (!(cs >= 0 && cs <= 1)) errors.push('Cₛ muss zwischen 0 und 1 liegen.');
   if (!(cm >= 0 && cm <= 1)) errors.push('Cₘ muss zwischen 0 und 1 liegen.');
-  if (!['roof', 'property'].includes(surface.category)) errors.push('Flächengruppe ist ungültig.');
+  if (!['roof', 'property'].includes(surface.category ?? surface.group)) errors.push('Flächengruppe ist ungültig.');
   return { valid: errors.length === 0, errors, area, cs, cm };
 }
 
 export function isSealedSurface(surface = {}) {
   if (typeof surface.isSealed === 'boolean') return surface.isSealed;
-  const type = typeById.get(surface.areaType);
+  const type = typeById.get(surface.areaType ?? surface.surfaceType);
   if (typeof type?.isSealed === 'boolean') return type.isSealed;
-  return surface.category === 'roof';
+  return (surface.category ?? surface.group) === 'roof';
 }
 
 export function automaticRainDuration(meanSlopePercent, sealedShare) {
@@ -47,13 +47,18 @@ function validateRainInputs(state = {}, duration = 10) {
   return required.filter(([, value]) => !(value > 0)).map(([label]) => `${label} muss größer 0 sein.`);
 }
 
-export function tableSlopeFromPermille(value) {
-  const permille = toNumber(value);
-  return Number.isFinite(permille) ? permille / 10 : NaN;
+export function tableSlopePercent(value) {
+  const raw = toNumber(value);
+  if (!Number.isFinite(raw)) return NaN;
+  return raw > 5 ? raw / 10 : raw;
 }
 
-export function lookupFullFlow(dn, slopePermille) {
-  const slope = tableSlopeFromPermille(slopePermille);
+export function tableSlopeFromPermille(value) {
+  return tableSlopePercent(value);
+}
+
+export function lookupFullFlow(dn, slopePercent) {
+  const slope = tableSlopePercent(slopePercent);
   const row = (hydraulicTables['1.0'] || []).find(item => Math.abs(Number(item.slope) - slope) < 1e-9);
   const qFullLs = row?.values?.[dn];
   if (!(qFullLs > 0)) return null;
@@ -61,12 +66,12 @@ export function lookupFullFlow(dn, slopePermille) {
   const diameterM = diameterMm / 1000;
   const crossSectionM2 = Math.PI * diameterM * diameterM / 4;
   const velocityMs = crossSectionM2 > 0 ? (qFullLs / 1000) / crossSectionM2 : 0;
-  return { dn, slopePermille: toNumber(slopePermille), qFullLs, velocityMs, tableReference: 'DIN 1986-100 Tabelle A.5', lookupMode: 'exact' };
+  return { dn, slopePercent: slope, slopePermille: slope * 10, qFullLs, velocityMs, tableReference: 'DIN 1986-100 Tabelle A.5', lookupMode: 'exact' };
 }
 
-export function sizePipe(requiredFlowLs, slopePermille) {
+export function sizePipe(requiredFlowLs, slopePercent) {
   for (const dn of dnOrder) {
-    const candidate = lookupFullFlow(dn, slopePermille);
+    const candidate = lookupFullFlow(dn, slopePercent);
     if (candidate && candidate.qFullLs >= requiredFlowLs) return candidate;
   }
   return null;
@@ -76,7 +81,8 @@ export function calculate(state = {}) {
   const surfaces = Array.isArray(state.surfaces) ? state.surfaces : [];
   const validated = surfaces.map(surface => ({ surface, validation: validateSurface(surface) }));
   const valid = validated.filter(item => item.validation.valid);
-  const sum = category => valid.filter(item => item.surface.category === category).reduce((acc, item) => acc + item.validation.area, 0);
+  const categoryOf = surface => surface.category ?? surface.group;
+  const sum = category => valid.filter(item => categoryOf(item.surface) === category).reduce((acc, item) => acc + item.validation.area, 0);
   const weighted = key => valid.reduce((acc, item) => acc + item.validation.area * item.validation[key], 0);
   const totalArea = valid.reduce((acc, item) => acc + item.validation.area, 0);
   const sealedArea = valid.reduce((acc, item) => acc + (isSealedSurface(item.surface) ? item.validation.area : 0), 0);
@@ -106,48 +112,25 @@ export function calculate(state = {}) {
   } else if (dischargeMode === 'manual-full-flow') {
     const qFullLs = toNumber(state.manualFullFlowLs);
     if (!(qFullLs > 0)) dischargeErrors.push('Der manuell vorgegebene Vollfüllungsabfluss muss größer 0 sein.');
-    else discharge = { qFullLs, velocityMs: null, tableReference: String(state.manualFullFlowSource || '').trim() || 'Manuelle Vorgabe', lookupMode: 'manual', dn: null, slopePermille: null };
+    else discharge = { qFullLs, velocityMs: null, tableReference: String(state.manualFullFlowSource || '').trim() || 'Manuelle Vorgabe', lookupMode: 'manual', dn: null, slopePercent: null };
   } else {
     const qLimitLs = toNumber(state.authorityLimitLs);
     if (!(qLimitLs > 0)) dischargeErrors.push('Die behördliche Einleitungsbegrenzung muss größer 0 sein.');
-    else discharge = { qLimitLs, qFullLs: null, velocityMs: null, tableReference: String(state.authorityReference || '').trim() || 'Behördliche Vorgabe', lookupMode: 'authority-limit', dn: null, slopePermille: null };
+    else discharge = { qLimitLs, qFullLs: null, velocityMs: null, tableReference: String(state.authorityReference || '').trim() || 'Behördliche Vorgabe', lookupMode: 'authority-limit', dn: null, slopePercent: null };
   }
 
   const availableFlowLs = dischargeMode === 'authority-discharge-limit' ? Number(discharge?.qLimitLs || 0) : Number(discharge?.qFullLs || 0);
   const utilizationPercent = availableFlowLs > 0 ? requiredRainFlowLs / availableFlowLs * 100 : 0;
 
   return Object.freeze({
-    status: 'discharge-verification-ready',
-    schemaVersion: Number(state.schemaVersion || 2),
-    surfaceCount: surfaces.length,
-    validSurfaceCount: valid.length,
-    invalidSurfaceCount: invalidCount,
-    roofArea: sum('roof'),
-    propertyArea: sum('property'),
-    totalArea,
-    sealedArea,
-    sealedShare,
-    weightedCsArea,
-    weightedCmArea: weighted('cm'),
-    averageCs: totalArea > 0 ? weightedCsArea / totalArea : 0,
-    averageCm: totalArea > 0 ? weighted('cm') / totalArea : 0,
-    duplicateSourceCount: new Set(duplicateSources).size,
-    automaticDurationMinutes,
-    governingDurationMinutes,
-    durationSource: manualValid ? 'manual' : 'automatic',
-    manualDurationRequested: manualRequested,
-    manualDurationValid: manualValid,
-    rain: Object.freeze({
-      r2: Object.freeze({ 5: rainValue(state, 2, 5), 10: rainValue(state, 2, 10), 15: rainValue(state, 2, 15) }),
-      r30: Object.freeze({ 5: rainValue(state, 30, 5), 10: rainValue(state, 30, 10), 15: rainValue(state, 30, 15) }),
-      r100Duration5: rainValue(state, 100, 5),
-      source: Object.freeze({ dataset: String(state.rainSourceDataset || '').trim(), location: String(state.rainSourceLocation || '').trim(), version: String(state.rainSourceVersion || '').trim(), entryMode: state.rainEntryMode || 'manual' })
-    }),
-    requiredRainFlowLs,
-    dischargeMode,
-    discharge: discharge ? Object.freeze(discharge) : null,
-    availableFlowLs,
-    utilizationPercent,
+    status: 'discharge-verification-ready', schemaVersion: Number(state.schemaVersion || 2),
+    surfaceCount: surfaces.length, validSurfaceCount: valid.length, invalidSurfaceCount: invalidCount,
+    roofArea: sum('roof'), propertyArea: sum('property'), totalArea, sealedArea, sealedShare,
+    weightedCsArea, weightedCmArea: weighted('cm'), averageCs: totalArea > 0 ? weightedCsArea / totalArea : 0,
+    averageCm: totalArea > 0 ? weighted('cm') / totalArea : 0, duplicateSourceCount: new Set(duplicateSources).size,
+    automaticDurationMinutes, governingDurationMinutes, durationSource: manualValid ? 'manual' : 'automatic', manualDurationRequested: manualRequested, manualDurationValid: manualValid,
+    rain: Object.freeze({ r2: Object.freeze({ 5: rainValue(state, 2, 5), 10: rainValue(state, 2, 10), 15: rainValue(state, 2, 15) }), r30: Object.freeze({ 5: rainValue(state, 30, 5), 10: rainValue(state, 30, 10), 15: rainValue(state, 30, 15) }), r100Duration5: rainValue(state, 100, 5), source: Object.freeze({ dataset: String(state.rainSourceDataset || '').trim(), location: String(state.rainSourceLocation || '').trim(), version: String(state.rainSourceVersion || '').trim(), entryMode: state.rainEntryMode || 'manual' }) }),
+    requiredRainFlowLs, dischargeMode, discharge: discharge ? Object.freeze(discharge) : null, availableFlowLs, utilizationPercent,
     dischargeAdequate: availableFlowLs > 0 && availableFlowLs >= requiredRainFlowLs,
     rainInputValid: rainErrors.length === 0,
     calculationAvailable: rainErrors.length === 0 && dischargeErrors.length === 0 && valid.length > 0,
@@ -155,8 +138,7 @@ export function calculate(state = {}) {
       ...(invalidCount ? [`${invalidCount} Fläche(n) sind ungültig und werden nicht summiert.`] : []),
       ...(duplicateSources.length ? ['Mehrfach importierte Quell-IDs wurden erkannt.'] : []),
       ...(manualRequested && !manualValid ? ['Die manuelle Regendauer ist erst mit einer zulässigen Dauer und einer Begründung wirksam. Bis dahin wird die automatische Dauer verwendet.'] : []),
-      ...rainErrors,
-      ...dischargeErrors,
+      ...rainErrors, ...dischargeErrors,
       ...(availableFlowLs > 0 && availableFlowLs < requiredRainFlowLs ? ['Der verfügbare Abfluss ist kleiner als der erforderliche Regenwasserabfluss.'] : [])
     ]
   });
