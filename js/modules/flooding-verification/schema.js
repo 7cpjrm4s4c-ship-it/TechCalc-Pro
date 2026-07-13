@@ -1,6 +1,5 @@
 import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
 import { areaTypes, dnOrder } from '../../shared/rainwaterDomainTables.js';
-import { hasRainwaterSurfaceSnapshot } from '../../shared/rainwaterSurfaceSnapshot.js';
 
 const KOSTRA_URL = 'https://www.openko.de';
 const areaOptions = areaTypes.map(item => ({ value: item.id, label: item.name }));
@@ -46,8 +45,8 @@ export const floodingVerificationSchema = defineFormSchema({
     { key: 'surfaceCm', label: 'Mittlerer Abflussbeiwert Cₘ', type: FIELD_TYPES.DECIMAL },
     { key: 'surfaceAdd', label: state => state.activeSurfaceId ? 'Fläche aktualisieren' : 'Fläche hinzufügen', type: FIELD_TYPES.ACTION, text: state => state.activeSurfaceId ? 'Fläche aktualisieren' : 'Fläche hinzufügen', collection: 'surfaces', variant: 'primary' },
     { key: 'surfaces', label: 'Erfasste Flächen', type: FIELD_TYPES.COLLECTION, collection: 'surfaces', editCollection: 'surfacesEdit', items: surfaceCollectionItems, emptyText: 'Noch keine Dach- oder Grundstücksflächen erfasst.', quantityLabel: 'Fläche', quantityUnit: 'm²', editable: true, editLabel: 'Fläche vollständig bearbeiten' },
-    { key: 'rainwaterImport', label: 'Aus Regenwasser übernehmen', type: FIELD_TYPES.ACTION, text: 'Flächen-Snapshot importieren', collection: 'rainwaterImport', variant: 'secondary', disabled: () => !hasRainwaterSurfaceSnapshot() },
-    { key: 'importStatus', label: 'Importstatus', type: FIELD_TYPES.NOTICE, text: state => state.importStatus || 'Der Import erzeugt unabhängige Deep-Copy-Flächen. Bestehende lokale Änderungen werden nicht überschrieben.', tone: 'compact' },
+    { key: 'rainwaterImport', label: 'Aus Regenwasser übernehmen', type: FIELD_TYPES.ACTION, text: 'Flächen-Snapshot importieren', collection: 'rainwaterImport', variant: 'primary' },
+    { key: 'importStatus', label: 'Importstatus', type: FIELD_TYPES.NOTICE, text: state => state.importStatus || 'Der Import prüft beim Auslösen die aktuell im Regenwassermodul gespeicherten Flächen und erzeugt unabhängige Deep-Copy-Datensätze.', tone: 'compact' },
     { key: 'rainR2Duration5', label: 'r(5,2)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)' },
     { key: 'rainR2Duration10', label: 'r(10,2)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)' },
     { key: 'rainR2Duration15', label: 'r(15,2)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)' },
@@ -58,7 +57,7 @@ export const floodingVerificationSchema = defineFormSchema({
     { key: 'rainSourceDataset', label: 'Datensatz', type: FIELD_TYPES.TEXT, placeholder: 'z. B. KOSTRA-DWD' },
     { key: 'rainSourceLocation', label: 'Raster / Ort', type: FIELD_TYPES.TEXT, placeholder: 'Rasterzelle oder Standort' },
     { key: 'rainSourceVersion', label: 'Datenversion', type: FIELD_TYPES.TEXT, placeholder: 'z. B. KOSTRA-DWD 2020' },
-    { key: 'meanSlopePercent', label: 'Mittlere Geländeneigung', type: FIELD_TYPES.DECIMAL, unit: '%' },
+    { key: 'meanSlopePercent', label: 'Mittlere Geländeneigung', type: FIELD_TYPES.DECIMAL, unit: '%', commit: 'immediate' },
     { key: 'rainDurationMode', label: 'Regendauer', type: FIELD_TYPES.SEGMENT, options: durationModeOptions, accent: 'green', action: 'platform:segment:rainDurationMode' },
     { key: 'manualRainDuration', label: 'Manuell verwendete Dauer', type: FIELD_TYPES.SELECT, options: durationOptions, commit: 'immediate', visibleWhen: state => state.rainDurationMode === 'manual' },
     { key: 'manualRainDurationReason', label: 'Begründung der Abweichung', type: FIELD_TYPES.TEXT, placeholder: 'Fachliche Begründung', visibleWhen: state => state.rainDurationMode === 'manual' },
