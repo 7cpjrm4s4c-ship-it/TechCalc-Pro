@@ -1,5 +1,5 @@
 import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
-import { areaTypes, dnOrder } from '../rainwater/tables.js';
+import { areaTypes, dnOrder } from '../../shared/rainwaterDomainTables.js';
 import { hasRainwaterSurfaceSnapshot } from '../../shared/rainwaterSurfaceSnapshot.js';
 
 const KOSTRA_URL = 'https://www.openko.de';
@@ -26,7 +26,12 @@ export function surfaceCollectionItems(state = {}) {
   return (Array.isArray(state.surfaces) ? state.surfaces : []).map(item => {
     const categoryLabel = item.category === 'property' ? 'Grundstücksfläche' : 'Dachfläche';
     const areaTypeLabel = areaTypeById.get(item.areaType)?.name || 'Freie Fläche';
-    return { id: item.id, title: item.name || 'Fläche', quantity: item.area, subtitle: `${categoryLabel} · Cₛ ${String(item.cs).replace('.', ',')} · ${areaTypeLabel}` };
+    return {
+      id: item.id,
+      title: item.name || 'Fläche',
+      quantity: item.area,
+      subtitle: `${categoryLabel} · Cₛ ${String(item.cs).replace('.', ',')} · ${areaTypeLabel}`
+    };
   });
 }
 
@@ -40,7 +45,7 @@ export const floodingVerificationSchema = defineFormSchema({
     { key: 'surfaceCs', label: 'Spitzenabflussbeiwert Cₛ', type: FIELD_TYPES.DECIMAL },
     { key: 'surfaceCm', label: 'Mittlerer Abflussbeiwert Cₘ', type: FIELD_TYPES.DECIMAL },
     { key: 'surfaceAdd', label: state => state.activeSurfaceId ? 'Fläche aktualisieren' : 'Fläche hinzufügen', type: FIELD_TYPES.ACTION, text: state => state.activeSurfaceId ? 'Fläche aktualisieren' : 'Fläche hinzufügen', collection: 'surfaces', variant: 'primary' },
-    { key: 'surfaces', label: 'Erfasste Flächen', type: FIELD_TYPES.COLLECTION, collection: 'surfaces', items: surfaceCollectionItems, emptyText: 'Noch keine Dach- oder Grundstücksflächen erfasst.', quantityLabel: 'Fläche', quantityUnit: 'm²', editable: true, editLabel: 'Fläche vollständig bearbeiten' },
+    { key: 'surfaces', label: 'Erfasste Flächen', type: FIELD_TYPES.COLLECTION, collection: 'surfaces', editCollection: 'surfacesEdit', items: surfaceCollectionItems, emptyText: 'Noch keine Dach- oder Grundstücksflächen erfasst.', quantityLabel: 'Fläche', quantityUnit: 'm²', editable: true, editLabel: 'Fläche vollständig bearbeiten' },
     { key: 'rainwaterImport', label: 'Aus Regenwasser übernehmen', type: FIELD_TYPES.ACTION, text: 'Flächen-Snapshot importieren', collection: 'rainwaterImport', variant: 'secondary', disabled: () => !hasRainwaterSurfaceSnapshot() },
     { key: 'importStatus', label: 'Importstatus', type: FIELD_TYPES.NOTICE, text: state => state.importStatus || 'Der Import erzeugt unabhängige Deep-Copy-Flächen. Bestehende lokale Änderungen werden nicht überschrieben.', tone: 'compact' },
     { key: 'rainR2Duration5', label: 'r(5,2)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)' },
