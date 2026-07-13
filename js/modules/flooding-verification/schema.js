@@ -1,5 +1,6 @@
 import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
 import { areaTypes, dnOrder } from '../rainwater/tables.js';
+import { hasRainwaterSurfaceSnapshot } from '../../shared/rainwaterSurfaceSnapshot.js';
 
 const KOSTRA_URL = 'https://www.openko.de';
 const areaOptions = areaTypes.map(item => ({ value: item.id, label: item.name }));
@@ -8,13 +9,13 @@ const categoryOptions = [{ value: 'roof', label: 'Dachfläche' }, { value: 'prop
 const durationModeOptions = [{ value: 'automatic', label: 'Automatisch' }, { value: 'manual', label: 'Manuell' }];
 const durationOptions = [{ value: '5', label: '5 min' }, { value: '10', label: '10 min' }, { value: '15', label: '15 min' }];
 const dischargeModeOptions = [
-  { value: 'table-existing-pipe', label: 'Leitung prüfen' },
-  { value: 'table-size-pipe', label: 'Leitung dimensionieren' },
+  { value: 'table-existing-pipe', label: 'Prüfen' },
+  { value: 'table-size-pipe', label: 'Dimensionieren' },
   { value: 'manual-full-flow', label: 'Qvoll manuell' },
-  { value: 'authority-discharge-limit', label: 'Einleitungsbegrenzung' }
+  { value: 'authority-discharge-limit', label: 'Begrenzung' }
 ];
 const dnOptions = dnOrder.map(value => ({ value, label: value }));
-const slopeOptions = [2,3,4,5,6,7,8,10,15,20,30,50].map(value => ({ value: String(value), label: `${value} ‰` }));
+const slopeOptions = [0.2,0.3,0.4,0.5,0.6,0.7,0.8,1.0,1.5,2.0,3.0,5.0].map(value => ({ value: String(value).replace('.', ','), label: `${String(value).replace('.', ',')} %` }));
 const tableMode = state => ['table-existing-pipe', 'table-size-pipe'].includes(state.dischargeMode);
 const existingPipeMode = state => state.dischargeMode === 'table-existing-pipe';
 const manualFlowMode = state => state.dischargeMode === 'manual-full-flow';
@@ -24,7 +25,7 @@ export function surfaceCollectionItems(state = {}) {
   return (Array.isArray(state.surfaces) ? state.surfaces : []).map(item => {
     const categoryLabel = item.category === 'property' ? 'Grundstücksfläche' : 'Dachfläche';
     const areaTypeLabel = areaTypeById.get(item.areaType)?.name || 'Freie Fläche';
-    return { id: item.id, title: `${item.name || 'Fläche'} ·`, quantity: item.area, subtitle: `${categoryLabel} · Cₛ ${String(item.cs).replace('.', ',')} · ${areaTypeLabel}` };
+    return { id: item.id, title: item.name || 'Fläche', quantity: item.area, subtitle: `${categoryLabel} · Cₛ ${String(item.cs).replace('.', ',')} · ${areaTypeLabel}` };
   });
 }
 
@@ -38,9 +39,9 @@ export const floodingVerificationSchema = defineFormSchema({
     { key: 'surfaceArea', label: 'Fläche A', type: FIELD_TYPES.DECIMAL, unit: 'm²', default: '100' },
     { key: 'surfaceCs', label: 'Spitzenabflussbeiwert Cₛ', type: FIELD_TYPES.DECIMAL },
     { key: 'surfaceCm', label: 'Mittlerer Abflussbeiwert Cₘ', type: FIELD_TYPES.DECIMAL },
-    { key: 'surfaceAdd', label: 'Fläche hinzufügen', type: FIELD_TYPES.ACTION, text: 'Fläche hinzufügen', collection: 'surfaces', variant: 'primary' },
-    { key: 'surfaces', label: 'Erfasste Flächen', type: FIELD_TYPES.COLLECTION, collection: 'surfaces', items: surfaceCollectionItems, emptyText: 'Noch keine Dach- oder Grundstücksflächen erfasst.', quantityLabel: 'Fläche', quantityUnit: 'm²' },
-    { key: 'rainwaterImport', label: 'Aus Regenwasser übernehmen', type: FIELD_TYPES.ACTION, text: 'Flächen-Snapshot importieren', collection: 'rainwaterImport', variant: 'secondary' },
+    { key: 'surfaceAdd', label: state => state.activeSurfaceId ? 'Fläche aktualisieren' : 'Fläche hinzufügen', type: FIELD_TYPES.ACTION, text: state => state.activeSurfaceId ? 'Fläche aktualisieren' : 'Fläche hinzufügen', collection: 'surfaces', variant: 'primary' },
+    { key: 'surfaces', label: 'Erfasste Flächen', type: FIELD_TYPES.COLLECTION, collection: 'surfaces', items: surfaceCollectionItems, emptyText: 'Noch keine Dach- oder Grundstücksflächen erfasst.', quantityLabel: 'Fläche', quantityUnit: 'm²', editable: true, editLabel: 'Fläche vollständig bearbeiten' },
+    { key: 'rainwaterImport', label: 'Aus Regenwasser übernehmen', type: FIELD_TYPES.ACTION, text: 'Flächen-Snapshot importieren', collection: 'rainwaterImport', variant: 'secondary', disabled: () => !hasRainwaterSurfaceSnapshot() },
     { key: 'importStatus', label: 'Importstatus', type: FIELD_TYPES.NOTICE, text: state => state.importStatus || 'Der Import erzeugt unabhängige Deep-Copy-Flächen. Bestehende lokale Änderungen werden nicht überschrieben.', tone: 'compact' },
     { key: 'rainR2Duration5', label: 'r(5,2)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)' },
     { key: 'rainR2Duration10', label: 'r(10,2)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)' },
@@ -67,7 +68,7 @@ export const floodingVerificationSchema = defineFormSchema({
     { key: 'authorityReference', label: 'Aktenzeichen / Referenz', type: FIELD_TYPES.TEXT, visibleWhen: authorityMode },
     { key: 'authorityDate', label: 'Datum', type: FIELD_TYPES.TEXT, placeholder: 'TT.MM.JJJJ', visibleWhen: authorityMode },
     { key: 'authoritySourceNote', label: 'Begründung / Quellenhinweis', type: FIELD_TYPES.TEXT, visibleWhen: authorityMode },
-    { key: 'dischargeNotice', label: 'Tabellenzuordnung', type: FIELD_TYPES.NOTICE, text: 'Tabellenwerte werden nur für exakt hinterlegte Gefälle verwendet. Es erfolgt keine stille Interpolation.', tone: 'compact', visibleWhen: tableMode }
+    { key: 'dischargeNotice', label: 'Tabellenzuordnung', type: FIELD_TYPES.NOTICE, text: 'Tabellenwerte werden nur für exakt hinterlegte Gefälle in Prozent verwendet. Es erfolgt keine stille Interpolation.', tone: 'compact', visibleWhen: tableMode }
   ],
   groups: [
     { title: 'Projekt', fields: ['projectName', 'calculationMode'], columns: 2, accent: 'green' },
