@@ -53,7 +53,7 @@ export function results(state = {}, result = {}) {
     {
       title: 'Gleichung (20)',
       rows: [
-        { label: 'Regendauer D', value: equation20.valid ? String(equation20.durationMinutes) : '—', unit: equation20.valid ? 'min' : '' },
+        { label: 'Regendauer D der Gleichung (20)', value: equation20.valid ? String(equation20.durationMinutes) : '—', unit: equation20.valid ? 'min' : '' },
         { label: `r(${equation20.durationMinutes || result.governingDurationMinutes || 'D'},30)`, value: equation20.valid ? fmt(equation20.rain30, 1) : '—', unit: equation20.valid ? 'l/(s·ha)' : '' },
         { label: `r(${equation20.durationMinutes || result.governingDurationMinutes || 'D'},2)`, value: equation20.valid ? fmt(equation20.rain2, 1) : '—', unit: equation20.valid ? 'l/(s·ha)' : '' },
         { label: 'Gesamtfläche Ages', value: fmt(equation20.totalAreaM2 || result.totalArea, 1), unit: 'm²' },
@@ -66,7 +66,7 @@ export function results(state = {}, result = {}) {
     {
       title: 'Gleichung (21) – Dauerstufenvergleich',
       rows: equation21.map(item => ({
-        label: `${item.durationMinutes} min · r(${item.durationMinutes},30) ${fmt(item.rain30, 1)} l/(s·ha)`,
+        label: `${item.durationMinutes} min · r(${item.durationMinutes},30) ${fmt(item.rain30, 1)} l/(s·ha)${item.durationMinutes === equation21Governing.durationMinutes ? ' · maßgebend' : ''}`,
         value: item.valid ? fmt(item.valueM3, 2) : '—',
         unit: item.valid ? 'm³' : ''
       })),
@@ -76,8 +76,9 @@ export function results(state = {}, result = {}) {
       title: 'Berechnungsgrundlagen',
       rows: [
         { label: 'Mittlere Geländeneigung', value: fmt(state.meanSlopePercent, 1), unit: '%' },
-        { label: 'Automatische Regendauer', value: String(result.automaticDurationMinutes || '—'), unit: 'min' },
-        { label: 'Verwendete Regendauer', value: String(result.governingDurationMinutes || '—'), unit: 'min' },
+        { label: 'Automatische Regendauer für Gleichung (20)', value: String(result.automaticDurationMinutes || '—'), unit: 'min' },
+        { label: 'Verwendete Regendauer für Gleichung (20)', value: String(result.governingDurationMinutes || '—'), unit: 'min' },
+        { label: 'Maßgebende Dauerstufe Gleichung (21)', value: equation21Governing.valid ? String(equation21Governing.durationMinutes) : '—', unit: equation21Governing.valid ? 'min' : '' },
         { label: 'Befestigte Fläche', value: fmt(result.sealedArea, 1), unit: 'm²' },
         { label: 'Befestigter Flächenanteil', value: fmt((result.sealedShare || 0) * 100, 1), unit: '%' },
         { label: 'Kritische Fläche', value: fmt(result.criticalArea, 1), unit: 'm²' },
@@ -94,6 +95,7 @@ export function results(state = {}, result = {}) {
       title: 'DWA-A 117 – Anwendungsprüfung',
       rows: [
         { label: 'Status', value: applicability.statusLabel },
+        { label: 'Berechnung durchgeführt', value: retention.calculated ? 'ja' : 'nein' },
         { label: 'Uneingeschränkt anwendbar', value: applicability.unrestricted ? 'ja' : 'nein' },
         { label: 'Einzugsgebietsfläche', value: applicability.catchmentAreaHa != null ? fmt(applicability.catchmentAreaHa, 3) : '—', unit: applicability.catchmentAreaHa != null ? 'ha' : '' },
         { label: 'Fließzeit', value: applicability.flowTimeMinutes != null ? fmt(applicability.flowTimeMinutes, 1) : '—', unit: applicability.flowTimeMinutes != null ? 'min' : '' },
@@ -108,11 +110,11 @@ export function results(state = {}, result = {}) {
   if (retention.active) {
     groups.push({
       title: 'DWA-A 117 – Dauerstufenvergleich',
-      rows: retentionComparison.rows.map(item => ({
+      rows: retentionComparison.rows.length ? retentionComparison.rows.map(item => ({
         label: `${item.durationMinutes} min · r ${fmt(item.rainIntensityLsHa, 1)} l/(s·ha)${item.isGoverning ? ' · maßgebend' : ''}`,
         value: item.valid ? fmt(item.volumeM3, 2) : '—',
         unit: item.valid ? 'm³' : ''
-      })),
+      })) : [{ label: 'Status', value: 'Pflichtwerte oder Regenspenden fehlen' }],
       accent: 'green'
     });
     groups.push({
@@ -142,15 +144,17 @@ export function results(state = {}, result = {}) {
     primary: {
       title: 'Überflutungsnachweis',
       primary: {
-        label: 'Maßgebendes Rückhaltevolumen',
+        label: 'Maßgebendes Rückhaltevolumen nach DIN-Vergleich',
         value: result.floodingCalculationAvailable && governing.valueM3 != null ? fmt(governing.valueM3, 2) : '—',
         unit: result.floodingCalculationAvailable ? 'm³' : ''
       },
       rows: [
         { label: 'Maßgebende Gleichung', value: result.floodingCalculationAvailable ? floodingSourceLabel(governing.source) : 'unvollständig' },
-        { label: 'Maßgebende Dauer', value: result.floodingCalculationAvailable ? String(governing.durationMinutes || '—') : '—', unit: result.floodingCalculationAvailable ? 'min' : '' },
+        { label: 'Regendauer Gleichung (20)', value: equation20.valid ? String(equation20.durationMinutes) : '—', unit: equation20.valid ? 'min' : '' },
+        { label: 'Maßgebende Dauer Gleichung (21)', value: equation21Governing.valid ? String(equation21Governing.durationMinutes) : '—', unit: equation21Governing.valid ? 'min' : '' },
         { label: 'Gleichung (20)', value: equation20.valid ? fmt(equation20.valueM3, 2) : '—', unit: equation20.valid ? 'm³' : '' },
         { label: 'Gleichung (21), Maximum', value: equation21Governing.valid ? fmt(equation21Governing.valueM3, 2) : '—', unit: equation21Governing.valid ? 'm³' : '' },
+        { label: 'DWA-A 117', value: retention.active ? (retention.calculated ? `${fmt(retention.governing?.volumeM3 || 0, 2)} m³` : 'unvollständig') : 'nicht erforderlich' },
         { label: 'Kritischer Flächenanteil', value: fmt((result.criticalShare || 0) * 100, 1), unit: '%' }
       ],
       accent: 'green'
@@ -160,7 +164,7 @@ export function results(state = {}, result = {}) {
       title: 'Hinweise und Diagnose',
       messages: diagnosticMessages,
       accent: 'green',
-      emptyText: 'Überflutungsnachweis, Dauerstufenvergleich und Anwendungsprüfung sind vollständig und valide.'
+      emptyText: 'Überflutungsnachweis, DWA-A-117-Berechnung und Dauerstufenvergleich sind vollständig und valide.'
     }]
   };
 }
