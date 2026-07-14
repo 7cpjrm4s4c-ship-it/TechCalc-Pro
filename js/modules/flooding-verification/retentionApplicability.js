@@ -46,7 +46,6 @@ export function evaluateDwa117Applicability({
   if (!(n > 0)) missing.push('Überschreitungshäufigkeit n');
   if (!(qDr >= 0)) missing.push('Regenanteil der Drosselabflussspende qDr,R,u');
   if (!(fz > 0)) missing.push('Zuschlagsfaktor fz');
-  if (!(fA > 0)) missing.push('Abminderungsfaktor fA');
 
   if (missing.length) {
     return Object.freeze({
@@ -104,6 +103,23 @@ export function evaluateDwa117Applicability({
 
   const hardFailures = checks.filter(check => check.severity === 'hard' && !check.passed);
   const empiricalFailures = checks.filter(check => check.severity === 'empirical' && !check.passed);
+  const factorMissingInsideDomain = empiricalFailures.length === 0 && !(fA > 0);
+
+  if (factorMissingInsideDomain) {
+    return Object.freeze({
+      active: true,
+      status: 'incomplete',
+      statusLabel: STATUS_LABELS.incomplete,
+      unrestricted: false,
+      catchmentAreaHa: area,
+      flowTimeMinutes: flowTime,
+      recurrenceFrequencyPerYear: n,
+      throttleRainShareLsHa: qDr,
+      checks: Object.freeze(checks.map(check => Object.freeze(check))),
+      messages: Object.freeze(['Der Abminderungsfaktor fA konnte trotz gültiger Eingangsgrößen nicht bestimmt werden.'])
+    });
+  }
+
   const status = hardFailures.length
     ? 'long-term-simulation-required'
     : empiricalFailures.length
