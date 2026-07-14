@@ -7,6 +7,8 @@ const modeLabel = mode => ({
   'authority-discharge-limit': 'Einleitungsbegrenzung'
 }[mode] || 'Leitungsnachweis');
 
+const floodingLabel = source => source === 'equation-20' ? 'Gl. (20)' : source === 'equation-21' ? 'Gl. (21)' : 'unvollständig';
+
 export function verificationSnapshot(current = {}, result = {}) {
   const state = clone(current);
   delete state.savedVerifications;
@@ -22,7 +24,13 @@ export function verificationSnapshot(current = {}, result = {}) {
       dischargeAdequate: result.dischargeAdequate,
       dischargeMode: result.dischargeMode,
       totalArea: result.totalArea,
-      surfaceCount: result.surfaceCount
+      surfaceCount: result.surfaceCount,
+      floodingCalculationAvailable: result.floodingCalculationAvailable,
+      governingFloodingVolumeM3: result.flooding?.governing?.valueM3,
+      governingFloodingSource: result.flooding?.governing?.source,
+      governingFloodingDurationMinutes: result.flooding?.governing?.durationMinutes,
+      equation20VolumeM3: result.flooding?.equation20?.valueM3,
+      equation21VolumeM3: result.flooding?.equation21Governing?.valueM3
     }
   };
 }
@@ -62,8 +70,9 @@ export function savedVerificationModel(state = {}) {
       subtitle: `${modeLabel(item.result?.dischargeMode)} · ${Number(item.result?.totalArea || 0).toLocaleString('de-DE')} m²`,
       stats: [
         { label: 'Qr', value: Number(item.result?.requiredRainFlowLs || 0).toLocaleString('de-DE', { maximumFractionDigits: 2 }), unit: 'l/s' },
-        { label: 'Flächen', value: String(item.result?.surfaceCount || 0) },
-        { label: 'Nachweis', value: item.result?.dischargeAdequate ? 'ausreichend' : 'nicht ausreichend' }
+        { label: 'VRück', value: item.result?.floodingCalculationAvailable ? Number(item.result?.governingFloodingVolumeM3 || 0).toLocaleString('de-DE', { maximumFractionDigits: 2 }) : '—', unit: item.result?.floodingCalculationAvailable ? 'm³' : '' },
+        { label: 'Maßgebend', value: floodingLabel(item.result?.governingFloodingSource) },
+        { label: 'Flächen', value: String(item.result?.surfaceCount || 0) }
       ]
     }))
   };
