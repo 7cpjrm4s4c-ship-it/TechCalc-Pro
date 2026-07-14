@@ -111,10 +111,16 @@ export function bindFloodingController(root, state, lineSectionController) {
     }
   });
   root.__tcFloodingLookupCleanup?.();
-  root.__tcFloodingLookupCleanup = registerPipelineCommitHandler(root, 'flooding:surface-type', event => {
-    if (event?.detail?.field !== 'surfaceAreaType') return;
-    const patch = defaultsForType(state.get().surfaceAreaType);
-    state.set(patch, { action: 'flooding:surface-type', notify: true });
+  root.__tcFloodingLookupCleanup = registerPipelineCommitHandler(root, 'flooding:governing-inputs', event => {
+    const field = event?.detail?.field;
+    if (field === 'surfaceAreaType') {
+      const patch = defaultsForType(state.get().surfaceAreaType);
+      state.set(patch, { action: 'flooding:surface-type', notify: true });
+      return;
+    }
+    if (field === 'meanSlopePercent' && event?.detail?.notify === false) {
+      state.set({}, { action: 'flooding:mean-slope:refresh', notify: true });
+    }
   });
 }
 
