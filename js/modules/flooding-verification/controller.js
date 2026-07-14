@@ -1,8 +1,8 @@
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
+import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../../core/eventPipeline.js';
+import { createRecordId } from '../../core/savedRecords.js';
 import { areaTypes } from '../../shared/rainwaterDomainTables.js';
 import { readRainwaterSurfaceSnapshot } from '../../shared/rainwaterSurfaceSnapshot.js';
-import { deleteCollectionItem, patchCollectionItem } from '../../platform/collectionModel/index.js';
-import { verificationSnapshot, hydrateVerification } from './savedRecords.js';
 
 const typeById = new Map(areaTypes.map(item => [item.id, item]));
 const numericFields = [
@@ -11,7 +11,6 @@ const numericFields = [
   'rainR30Duration5', 'rainR30Duration10', 'rainR30Duration15',
   'rainR100Duration5', 'pipeSlopePercent', 'manualFullFlowLs', 'authorityLimitLs'
 ];
-const id = prefix => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 const number = value => Number(String(value ?? '').replace(',', '.'));
 const normalized = value => canonicalGermanNumberInput(value);
 
@@ -20,17 +19,25 @@ function defaultsForType(typeId) {
   return { surfaceCs: String(type.cs ?? '').replace('.', ','), surfaceCm: String(type.cm ?? '').replace('.', ',') };
 }
 
-function surfaceRecordFromDraft(current = {}, recordId = null, existing = null) {
-  const type = typeById.get(current.surfaceAreaType) || {};
+function validSurfaceDraft(current = {}) {
+  const area = number(current.surfaceArea);
+  const cs = number(current.surfaceCs);
+  const cm = number(current.surfaceCm);
+  return area > 0 && cs >= 0 && cs <= 1 && cm >= 0 && cm <= 1;
+}
+
+export function buildFloodingSurfaceRecord({ currentState = {}, id, name, existing = null } = {}) {
+  if (!validSurfaceDraft(currentState)) return null;
+  const type = typeById.get(currentState.surfaceAreaType) || {};
   return {
     ...(existing || {}),
-    id: recordId || id('flood-surface'),
-    name: String(current.surfaceName || '').trim() || existing?.name || `Fläche ${(current.surfaces || []).length + 1}`,
-    category: current.surfaceCategory === 'property' ? 'property' : 'roof',
-    areaType: current.surfaceAreaType || 'custom',
-    area: normalized(current.surfaceArea),
-    cs: normalized(current.surfaceCs),
-    cm: normalized(current.surfaceCm),
+    id: id || existing?.id || createRecordId('flood-surface'),
+    name: String(name || currentState.surfaceName || existing?.name || '').trim() || `Fläche ${(currentState.surfaces || []).length + 1}`,
+    category: currentState.surfaceCategory === 'property' ? 'property' : 'roof',
+    areaType: currentState.surfaceAreaType || 'custom',
+    area: normalized(currentState.surfaceArea),
+    cs: normalized(currentState.surfaceCs),
+    cm: normalized(currentState.surfaceCm),
     sourceModule: existing?.sourceModule || 'flooding-verification',
     sourceId: existing?.sourceId || null,
     origin: existing?.origin || 'manual',
@@ -40,54 +47,11 @@ function surfaceRecordFromDraft(current = {}, recordId = null, existing = null) 
   };
 }
 
-function saveSurface({ current = {} } = {}) {
-  const area = number(current.surfaceArea);
-  const cs = number(current.surfaceCs);
-  const cm = number(current.surfaceCm);
-  const editing = Boolean(current.activeSurfaceId);
-
-  // A successful add clears the draft area. A second synthetic touch/click event
-  // therefore becomes a no-op instead of creating a duplicate record.
-  if (!editing && String(current.surfaceArea || '').trim() === '') return {};
-  if (!(area > 0) || !(cs >= 0 && cs <= 1) || !(cm >= 0 && cm <= 1)) {
-    return { importStatus: 'Fläche muss größer 0 m² sein; Cₛ und Cₘ müssen zwischen 0 und 1 liegen.' };
-  }
-
-  const existing = (current.surfaces || []).find(item => String(item.id) === String(current.activeSurfaceId));
-  const record = surfaceRecordFromDraft(current, existing?.id, existing);
-  const surfaces = existing
-    ? patchCollectionItem(current.surfaces || [], existing.id, record)
-    : [...(current.surfaces || []), record];
+export function hydrateFloodingSurfaceRecord({ item = {} } = {}) {
   return {
-    surfaces,
-    surfaceName: '',
-    surfaceArea: existing ? record.area : '',
-    activeSurfaceId: null,
-    importStatus: `${record.name} wurde ${existing ? 'aktualisiert' : 'hinzugefügt'}.`
-  };
-}
-
-function patchSurface({ id: itemId, field, value, current = {} } = {}) {
-  const allowed = { quantity: 'area', area: 'area', name: 'name', category: 'category', areaType: 'areaType', cs: 'cs', cm: 'cm' };
-  const target = allowed[field] || 'area';
-  const patch = { [target]: ['area', 'cs', 'cm'].includes(target) ? normalized(value) : value };
-  if (target === 'areaType') {
-    const type = typeById.get(value) || {};
-    patch.cs = String(type.cs ?? '').replace('.', ',');
-    patch.cm = String(type.cm ?? '').replace('.', ',');
-    patch.isSealed = Boolean(type.isSealed);
-  }
-  patch.modifiedAfterImport = true;
-  return { surfaces: patchCollectionItem(current.surfaces || [], itemId, patch) };
-}
-
-function editSurface({ id: itemId, current = {} } = {}) {
-  const item = (current.surfaces || []).find(entry => String(entry.id) === String(itemId));
-  if (!item || String(current.activeSurfaceId || '') === String(item.id)) return {};
-  return {
-    activeSurfaceId: item.id,
-    surfaceCategory: item.category || 'roof',
+    activeSurfaceId: item.id || null,
     surfaceName: item.name || '',
+    surfaceCategory: item.category || 'roof',
     surfaceAreaType: item.areaType || 'custom',
     surfaceArea: item.area || '',
     surfaceCs: item.cs || '',
@@ -96,73 +60,67 @@ function editSurface({ id: itemId, current = {} } = {}) {
   };
 }
 
-function deleteSurface({ id: itemId, current = {} } = {}) {
+export function floodingSurfaceSubtitle(item = {}) {
+  const category = item.category === 'property' ? 'Grundstücksfläche' : 'Dachfläche';
+  const type = typeById.get(item.areaType)?.name || 'Freie Fläche';
+  return `${category} · ${type}`;
+}
+
+export function floodingSurfaceStats(item = {}) {
+  return [
+    { label: 'Fläche', value: String(item.area || '0').replace('.', ','), unit: 'm²' },
+    { label: 'Cₛ', value: String(item.cs ?? '').replace('.', ',') },
+    { label: 'Cₘ', value: String(item.cm ?? '').replace('.', ',') }
+  ];
+}
+
+export function importRainwater({ current = {} } = {}) {
+  const incoming = readRainwaterSurfaceSnapshot()
+    .filter(item => item.category === 'roof' && number(item.area) > 0);
+  if (!incoming.length) return { importStatus: 'Im Regenwassermodul sind keine gültigen Dachflächen vorhanden.' };
+  const existingSourceIds = new Set((current.surfaces || []).map(item => item.sourceId).filter(Boolean));
+  const usedIds = new Set((current.surfaces || []).map(item => String(item.id)));
+  const imported = incoming
+    .filter(item => !existingSourceIds.has(item.sourceId))
+    .map(item => {
+      let id = createRecordId('rain-snapshot');
+      while (usedIds.has(String(id))) id = createRecordId('rain-snapshot');
+      usedIds.add(String(id));
+      return { ...item, id };
+    });
+  const skipped = incoming.length - imported.length;
+  if (!imported.length) return { importStatus: skipped ? 'Alle Dachflächen wurden bereits importiert.' : 'Keine neuen Dachflächen vorhanden.' };
   return {
-    surfaces: deleteCollectionItem(current.surfaces || [], itemId),
-    activeSurfaceId: current.activeSurfaceId === itemId ? null : current.activeSurfaceId
+    surfaces: [...imported, ...(current.surfaces || [])],
+    importedRainwaterSnapshot: { importedAt: new Date().toISOString(), sourceIds: incoming.map(item => item.sourceId) },
+    importStatus: `${imported.length} Dachfläche(n) importiert${skipped ? `, ${skipped} Duplikat(e) übersprungen` : ''}.`
   };
 }
 
-function importRainwater({ current = {} } = {}) {
-  const incoming = readRainwaterSurfaceSnapshot().filter(item => number(item.area) > 0);
-  if (!incoming.length) return { importStatus: 'Im Regenwassermodul sind keine gültigen Flächen vorhanden.' };
-  const existingSourceIds = new Set((current.surfaces || []).map(item => item.sourceId).filter(Boolean));
-  const imported = incoming
-    .filter(item => !existingSourceIds.has(item.sourceId))
-    .map(item => ({ ...item, id: id('rain-snapshot') }));
-  const skipped = incoming.length - imported.length;
-  if (!imported.length) {
-    return { importStatus: `${skipped} bereits importierte Fläche(n) erkannt. Es wurden keine lokalen Daten überschrieben.` };
-  }
-  return {
-    surfaces: [...(current.surfaces || []), ...imported],
-    importedRainwaterSnapshot: { importedAt: new Date().toISOString(), sourceIds: incoming.map(item => item.sourceId) },
-    importStatus: `${imported.length} Fläche(n) importiert${skipped ? `, ${skipped} Duplikat(e) übersprungen` : ''}. Lokale Daten bleiben unabhängig.`
-  };
+export function bindFloodingController(root, state, lineSectionController) {
+  lineSectionController?.bind?.(root);
+  registerCentralActions(root, {
+    'flooding:import-roofs': ({ root: actionRoot } = {}) => {
+      commitAllFields(actionRoot || root, state, { action: 'flooding:import-roofs:precommit', notify: false });
+      const patch = importRainwater({ current: state.get() });
+      if (Object.keys(patch).length) state.set(patch, { action: 'flooding:import-roofs', notify: true });
+    }
+  });
+  root.__tcFloodingLookupCleanup?.();
+  root.__tcFloodingLookupCleanup = registerPipelineCommitHandler(root, 'flooding:surface-type', event => {
+    if (event?.detail?.field !== 'surfaceAreaType') return;
+    const patch = defaultsForType(state.get().surfaceAreaType);
+    state.set(patch, { action: 'flooding:surface-type', notify: true });
+  });
 }
 
 const controller = {
   normalizeFields: numericFields,
   segments: { fields: {
-    rainDurationMode: {
-      action: 'platform:segment:rainDurationMode',
-      patch: value => ({
-        rainDurationMode: value === 'manual' ? 'manual' : 'automatic',
-        ...(value === 'automatic' ? { manualRainDurationReason: '' } : {})
-      })
-    },
+    rainDurationMode: { action: 'platform:segment:rainDurationMode', patch: value => ({ rainDurationMode: value === 'manual' ? 'manual' : 'automatic', ...(value === 'automatic' ? { manualRainDurationReason: '' } : {}) }) },
     dischargeMode: { action: 'platform:segment:dischargeMode', patch: value => ({ dischargeMode: value }) },
-    surfaceCategory: {
-      action: 'platform:segment:surfaceCategory',
-      patch: value => ({
-        surfaceCategory: value,
-        surfaceAreaType: value === 'property' ? 'concrete-asphalt' : 'metal-roof',
-        ...defaultsForType(value === 'property' ? 'concrete-asphalt' : 'metal-roof')
-      })
-    }
-  }},
-  lookupHydration: {
-    key: 'flooding:surface-type',
-    fields: ['surfaceAreaType'],
-    patch: (_field, current) => defaultsForType(current.surfaceAreaType)
-  },
-  collections: {
-    surfaces: { add: saveSurface, patchInput: patchSurface, delete: deleteSurface },
-    surfacesEdit: { add: ({ current = {}, element } = {}) => editSurface({ id: element?.dataset?.collectionId, current }) },
-    rainwaterImport: { add: importRainwater }
-  },
-  savedRecords: {
-    enabled: true,
-    listKey: 'savedVerifications',
-    activeIdKey: 'activeVerificationId',
-    expandedIdKey: 'expandedVerificationId',
-    nameKey: 'savedVerificationName',
-    recordPrefix: 'flooding-verification',
-    snapshot: verificationSnapshot,
-    hydrate: hydrateVerification,
-    attrs: { loadAttr: 'data-line-select', toggleAttr: 'data-line-toggle', deleteAttr: 'data-line-delete' }
-  }
+    surfaceCategory: { action: 'platform:segment:surfaceCategory', patch: value => ({ surfaceCategory: value, surfaceAreaType: value === 'property' ? 'concrete-asphalt' : 'metal-roof', ...defaultsForType(value === 'property' ? 'concrete-asphalt' : 'metal-roof') }) }
+  }}
 };
 
-export { editSurface, importRainwater, saveSurface };
 export default controller;
