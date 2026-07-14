@@ -4,16 +4,36 @@ import { surchargeFactorFromRiskClass, calculateReductionFactorFa } from './rete
 const compact = value => String(value ?? '').trim();
 const toNumber = value => Number(String(value ?? '').replace(',', '.'));
 
+function positive(value) {
+  const number = toNumber(value);
+  return Number.isFinite(number) && number > 0 ? value : null;
+}
+
 export function buildRetentionRainByDuration(state = {}) {
   const existing = state.retentionRainByDuration && typeof state.retentionRainByDuration === 'object'
     ? state.retentionRainByDuration
     : {};
-  return Object.freeze({
-    ...existing,
-    ...(compact(state.retentionRainDuration5) ? { 5: state.retentionRainDuration5 } : {}),
-    ...(compact(state.retentionRainDuration10) ? { 10: state.retentionRainDuration10 } : {}),
-    ...(compact(state.retentionRainDuration15) ? { 15: state.retentionRainDuration15 } : {})
-  });
+  const recurrence = toNumber(state.retentionRecurrenceFrequencyPerYear);
+  const usesTwoYearRain = Math.abs(recurrence - 0.5) < 1e-9;
+  const manual = {
+    5: positive(state.retentionRainDuration5),
+    10: positive(state.retentionRainDuration10),
+    15: positive(state.retentionRainDuration15)
+  };
+  const automatic = usesTwoYearRain
+    ? {
+        5: positive(state.rainR2Duration5),
+        10: positive(state.rainR2Duration10),
+        15: positive(state.rainR2Duration15)
+      }
+    : {};
+
+  const merged = {};
+  for (const duration of [5, 10, 15]) {
+    const value = manual[duration] ?? automatic[duration] ?? positive(existing[duration]);
+    if (value != null) merged[duration] = value;
+  }
+  return Object.freeze(merged);
 }
 
 function weightedCmAreaM2(state = {}) {
@@ -41,6 +61,7 @@ export function deriveRetentionFactors(state = {}) {
     surchargeFactorFz,
     reductionFactorFa: reduction.value,
     reductionFactorValid: reduction.valid,
+    reductionFactorWithinDomain: reduction.withinDomain,
     reductionFactorSource: reduction.source,
     throttleRainShareLsHa
   });
@@ -49,25 +70,43 @@ export function deriveRetentionFactors(state = {}) {
 export function calculate(state = {}) {
   const authorityMode = state.dischargeMode === 'authority-discharge-limit';
   const factors = deriveRetentionFactors(state);
+  const retentionRainByDuration = buildRetentionRainByDuration(state);
   const adaptedState = {
     ...state,
     retentionEnabled: authorityMode,
-    retentionRainByDuration: buildRetentionRainByDuration(state),
+    retentionRainByDuration,
     retentionSurchargeFactorFz: factors.surchargeFactorFz,
     retentionReductionFactorFa: factors.reductionFactorFa ?? ''
   };
   const base = calculateBase(adaptedState);
   const warnings = Array.isArray(base.warnings)
-    ? base.warnings.filter(message => message !== 'Bei behördlicher Einleitungsbegrenzung ist zusätzlich der Rückhaltenachweis nach DWA-A 117 zu führen.')
+    ? base.warnings.filter(message => {
+        if (message === 'Bei behördlicher Einleitungsbegrenzung ist zusätzlich der Rückhaltenachweis nach DWA-A 117 zu führen.') return false;
+        if (!factors.reductionFactorWithinDomain && message === 'Der Abminderungsfaktor fA muss größer 0 sein.') return false;
+        return true;
+      })
     : [];
+
+  if (authorityMode && !factors.reductionFactorWithinDomain) {
+    warnings.push('Der Abminderungsfaktor fA kann nicht normativ bestimmt werden, weil tf, qDr,R,u oder n außerhalb des Gültigkeitsbereichs von DWA-A 117 Anhang B liegen. Das einfache Verfahren ist nicht uneingeschränkt anwendbar.');
+  }
+
   return Object.freeze({
     ...base,
     retention: Object.freeze({
       ...(base.retention || {}),
+      rainByDuration: retentionRainByDuration,
+      surchargeFactorFz: factors.surchargeFactorFz,
+      reductionFactorFa: factors.reductionFactorFa,
+      reductionFactorValid: factors.reductionFactorValid,
+      reductionFactorWithinDomain: factors.reductionFactorWithinDomain,
       factorSource: Object.freeze({
         surcharge: 'DWA-A 117 Tabelle 2',
         reduction: factors.reductionFactorSource,
-        riskClass: state.retentionRiskClass || 'medium'
+        riskClass: state.retentionRiskClass || 'medium',
+        rain: Math.abs(toNumber(state.retentionRecurrenceFrequencyPerYear) - 0.5) < 1e-9
+          ? 'KOSTRA r(D,2) automatisch übernommen'
+          : 'projektspezifische KOSTRA-Regenspenden r(D,n)'
       })
     }),
     warnings: Object.freeze(warnings)
