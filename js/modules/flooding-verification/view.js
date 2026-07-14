@@ -15,11 +15,11 @@ export function createFloodingVerificationView({ config, calculate, results, lin
   function view(state = {}) {
     const result = calculate(state);
     const inputColumn = stack([
-      `<div data-flooding-dynamic="surface-form">${renderSurfaceForm(state, result)}</div>`,
-      `<div data-flooding-dynamic="surface-records">${lineSectionController.renderCard(state)}</div>`,
-      `<div data-flooding-dynamic="calculation-form">${renderCalculationForm(state, result)}</div>`
+      `<div class="tc-stack" data-flooding-dynamic="surface-form">${renderSurfaceForm(state, result)}</div>`,
+      `<div class="tc-stack" data-flooding-dynamic="surface-records">${lineSectionController.renderCard(state)}</div>`,
+      `<div class="tc-stack" data-flooding-dynamic="calculation-form">${renderCalculationForm(state, result)}</div>`
     ].join(''));
-    const outputColumn = `<div data-flooding-dynamic="result">${renderResult(state, result)}</div>`;
+    const outputColumn = `<div class="tc-stack" data-flooding-dynamic="result">${renderResult(state, result)}</div>`;
     return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6">${outputColumn}</div>`);
   }
 
