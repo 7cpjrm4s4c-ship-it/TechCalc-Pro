@@ -64,13 +64,24 @@ export const floodingCalculationSchema = defineFormSchema({
     { key: 'authorityReference', label: 'Aktenzeichen / Referenz', type: FIELD_TYPES.TEXT, visibleWhen: authorityMode },
     { key: 'authorityDate', label: 'Datum', type: FIELD_TYPES.TEXT, placeholder: 'TT.MM.JJJJ', visibleWhen: authorityMode },
     { key: 'authoritySourceNote', label: 'Begründung / Quellenhinweis', type: FIELD_TYPES.TEXT, visibleWhen: authorityMode },
-    { key: 'dischargeNotice', label: 'Tabellenzuordnung', type: FIELD_TYPES.NOTICE, text: 'Tabellenwerte werden nur für exakt hinterlegte Gefälle in Prozent verwendet. Es erfolgt keine stille Interpolation.', tone: 'compact', visibleWhen: tableMode }
+    { key: 'dischargeNotice', label: 'Tabellenzuordnung', type: FIELD_TYPES.NOTICE, text: 'Tabellenwerte werden nur für exakt hinterlegte Gefälle in Prozent verwendet. Es erfolgt keine stille Interpolation.', tone: 'compact', visibleWhen: tableMode },
+    { key: 'retentionRecurrenceFrequencyPerYear', label: 'Überschreitungshäufigkeit n', type: FIELD_TYPES.DECIMAL, unit: '1/a', visibleWhen: authorityMode },
+    { key: 'retentionFlowTimeMinutes', label: 'Fließzeit tf', type: FIELD_TYPES.DECIMAL, unit: 'min', visibleWhen: authorityMode },
+    { key: 'retentionSurchargeFactorFz', label: 'Zuschlagsfaktor fz', type: FIELD_TYPES.DECIMAL, visibleWhen: authorityMode },
+    { key: 'retentionReductionFactorFa', label: 'Abminderungsfaktor fA', type: FIELD_TYPES.DECIMAL, visibleWhen: authorityMode },
+    { key: 'retentionDryWeatherFlowLs', label: 'Trockenwetterabfluss', type: FIELD_TYPES.DECIMAL, unit: 'l/s', visibleWhen: authorityMode },
+    { key: 'retentionUpstreamThrottleFlowLs', label: 'Vorgeschalteter Drosselabfluss', type: FIELD_TYPES.DECIMAL, unit: 'l/s', visibleWhen: authorityMode },
+    { key: 'retentionRainDuration5', label: 'r(5,n)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)', visibleWhen: authorityMode },
+    { key: 'retentionRainDuration10', label: 'r(10,n)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)', visibleWhen: authorityMode },
+    { key: 'retentionRainDuration15', label: 'r(15,n)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)', visibleWhen: authorityMode },
+    { key: 'retentionNotice', label: 'DWA-A 117', type: FIELD_TYPES.NOTICE, text: 'Bei behördlicher Einleitungsbegrenzung wird der einfache Rückhalteraumnachweis automatisch aktiviert. Die Berechnung startet, sobald alle Pflichtwerte und geprüften Regenspenden vorliegen.', tone: 'compact', visibleWhen: authorityMode }
   ],
   groups: [
     { title: 'Regenspenden', fields: ['rainR2Duration5', 'rainR2Duration10', 'rainR2Duration15', 'rainR30Duration5', 'rainR30Duration10', 'rainR30Duration15', 'rainR100Duration5'], columns: 2, accent: 'green', actions: [{ label: 'KOSTRA / OpenKo Daten öffnen', href: KOSTRA_URL, variant: 'secondary' }] },
     { title: 'Quellenangaben Regendaten', fields: ['rainSourceDataset', 'rainSourceLocation', 'rainSourceVersion'], columns: 2, accent: 'green' },
     { title: 'Gelände und Regendauer', fields: ['meanSlopePercent', 'rainDurationMode', 'manualRainDuration', 'manualRainDurationReason', 'durationNotice'], columns: 2, accent: 'green' },
-    { title: 'Leitungs- und Abflussnachweis', fields: ['dischargeMode', 'pipeNominalDiameterDn', 'pipeSlopePercent', 'manualFullFlowLs', 'manualFullFlowSource', 'authorityLimitLs', 'authorityName', 'authorityReference', 'authorityDate', 'authoritySourceNote', 'dischargeNotice'], columns: 2, accent: 'green' }
+    { title: 'Leitungs- und Abflussnachweis', fields: ['dischargeMode', 'pipeNominalDiameterDn', 'pipeSlopePercent', 'manualFullFlowLs', 'manualFullFlowSource', 'authorityLimitLs', 'authorityName', 'authorityReference', 'authorityDate', 'authoritySourceNote', 'dischargeNotice'], columns: 2, accent: 'green' },
+    { title: 'Rückhalteraumnachweis nach DWA-A 117', fields: ['retentionRecurrenceFrequencyPerYear', 'retentionFlowTimeMinutes', 'retentionSurchargeFactorFz', 'retentionReductionFactorFa', 'retentionDryWeatherFlowLs', 'retentionUpstreamThrottleFlowLs', 'retentionRainDuration5', 'retentionRainDuration10', 'retentionRainDuration15', 'retentionNotice'], columns: 2, accent: 'green', visibleWhen: authorityMode }
   ]
 });
 
