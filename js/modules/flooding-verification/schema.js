@@ -3,7 +3,6 @@ import { areaTypes, dnOrder } from '../../shared/rainwaterDomainTables.js';
 
 const KOSTRA_URL = 'https://www.openko.de';
 const areaOptions = areaTypes.map(item => ({ value: item.id, label: item.name }));
-const areaTypeById = new Map(areaTypes.map(item => [item.id, item]));
 const categoryOptions = [{ value: 'roof', label: 'Dachfläche' }, { value: 'property', label: 'Grundstücksfläche' }];
 const durationModeOptions = [{ value: 'automatic', label: 'Automatisch' }, { value: 'manual', label: 'Manuell' }];
 const durationOptions = [{ value: '5', label: '5 min' }, { value: '10', label: '10 min' }, { value: '15', label: '15 min' }];
@@ -21,32 +20,25 @@ const existingPipeMode = state => state.dischargeMode === 'table-existing-pipe';
 const manualFlowMode = state => state.dischargeMode === 'manual-full-flow';
 const authorityMode = state => state.dischargeMode === 'authority-discharge-limit';
 
-export function surfaceCollectionItems(state = {}) {
-  return (Array.isArray(state.surfaces) ? state.surfaces : []).map(item => {
-    const categoryLabel = item.category === 'property' ? 'Grundstücksfläche' : 'Dachfläche';
-    const areaTypeLabel = areaTypeById.get(item.areaType)?.name || 'Freie Fläche';
-    return {
-      id: item.id,
-      title: item.name || 'Fläche',
-      quantity: item.area,
-      subtitle: `${categoryLabel} · Cₛ ${String(item.cs).replace('.', ',')} · ${areaTypeLabel}`
-    };
-  });
-}
-
-export const floodingVerificationSchema = defineFormSchema({
+export const floodingSurfaceSchema = defineFormSchema({
   fields: [
     { key: 'projectName', label: 'Bezeichnung', type: FIELD_TYPES.TEXT, placeholder: 'z. B. Grundstück Musterstraße 1' },
     { key: 'surfaceCategory', label: 'Flächengruppe', type: FIELD_TYPES.SEGMENT, options: categoryOptions, accent: 'green', action: 'platform:segment:surfaceCategory' },
-    { key: 'surfaceName', label: 'Bezeichnung', type: FIELD_TYPES.TEXT, placeholder: 'z. B. Dachfläche Nord' },
     { key: 'surfaceAreaType', label: 'Flächenart', type: FIELD_TYPES.SELECT, options: areaOptions, commit: 'immediate', lookup: true },
     { key: 'surfaceArea', label: 'Fläche A', type: FIELD_TYPES.DECIMAL, unit: 'm²', default: '100' },
     { key: 'surfaceCs', label: 'Spitzenabflussbeiwert Cₛ', type: FIELD_TYPES.DECIMAL },
     { key: 'surfaceCm', label: 'Mittlerer Abflussbeiwert Cₘ', type: FIELD_TYPES.DECIMAL },
-    { key: 'surfaceAdd', label: state => state.activeSurfaceId ? 'Fläche aktualisieren' : 'Fläche hinzufügen', type: FIELD_TYPES.ACTION, text: state => state.activeSurfaceId ? 'Fläche aktualisieren' : 'Fläche hinzufügen', collection: 'surfaces', variant: 'primary' },
-    { key: 'surfaces', label: 'Erfasste Flächen', type: FIELD_TYPES.COLLECTION, collection: 'surfaces', editCollection: 'surfacesEdit', items: surfaceCollectionItems, emptyText: 'Noch keine Dach- oder Grundstücksflächen erfasst.', quantityLabel: 'Fläche', quantityUnit: 'm²', editable: true, editLabel: 'Fläche vollständig bearbeiten' },
-    { key: 'rainwaterImport', label: 'Aus Regenwasser übernehmen', type: FIELD_TYPES.ACTION, text: 'Flächen-Snapshot importieren', collection: 'rainwaterImport', variant: 'primary' },
-    { key: 'importStatus', label: 'Importstatus', type: FIELD_TYPES.NOTICE, text: state => state.importStatus || 'Der Import prüft beim Auslösen die aktuell im Regenwassermodul gespeicherten Flächen und erzeugt unabhängige Deep-Copy-Datensätze.', tone: 'compact' },
+    { key: 'rainwaterImport', label: 'Dachflächen aus Regenwasser', type: FIELD_TYPES.ACTION, text: 'Dachflächen importieren', action: 'flooding:import-roofs', variant: 'primary' },
+    { key: 'importStatus', label: 'Importstatus', type: FIELD_TYPES.NOTICE, text: state => state.importStatus || 'Der Import legt unabhängige Dachflächen im zentralen Flächenspeicher ab.', tone: 'compact' }
+  ],
+  groups: [
+    { title: 'Projekt', fields: ['projectName'], columns: 1, accent: 'green' },
+    { title: 'Flächen erfassen', fields: ['surfaceCategory', 'surfaceAreaType', 'surfaceArea', 'surfaceCs', 'surfaceCm', 'rainwaterImport', 'importStatus'], columns: 2, accent: 'green' }
+  ]
+});
+
+export const floodingCalculationSchema = defineFormSchema({
+  fields: [
     { key: 'rainR2Duration5', label: 'r(5,2)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)' },
     { key: 'rainR2Duration10', label: 'r(10,2)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)' },
     { key: 'rainR2Duration15', label: 'r(15,2)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)' },
@@ -61,7 +53,7 @@ export const floodingVerificationSchema = defineFormSchema({
     { key: 'rainDurationMode', label: 'Regendauer', type: FIELD_TYPES.SEGMENT, options: durationModeOptions, accent: 'green', action: 'platform:segment:rainDurationMode' },
     { key: 'manualRainDuration', label: 'Manuell verwendete Dauer', type: FIELD_TYPES.SELECT, options: durationOptions, commit: 'immediate', visibleWhen: state => state.rainDurationMode === 'manual' },
     { key: 'manualRainDurationReason', label: 'Begründung der Abweichung', type: FIELD_TYPES.TEXT, placeholder: 'Fachliche Begründung', visibleWhen: state => state.rainDurationMode === 'manual' },
-    { key: 'durationNotice', label: 'Automatische Regendauer', type: FIELD_TYPES.NOTICE, text: 'Die automatische Zuordnung folgt ausschließlich der im Contract dokumentierten DIN-Zuordnung auf Basis von Geländeneigung und befestigtem Flächenanteil.', tone: 'compact' },
+    { key: 'durationNotice', label: 'Automatische Regendauer', type: FIELD_TYPES.NOTICE, text: 'Die automatische Zuordnung folgt der dokumentierten DIN-Zuordnung auf Basis von Geländeneigung und befestigtem Flächenanteil.', tone: 'compact' },
     { key: 'dischargeMode', label: 'Betriebsart', type: FIELD_TYPES.SEGMENT, options: dischargeModeOptions, accent: 'green', action: 'platform:segment:dischargeMode' },
     { key: 'pipeNominalDiameterDn', label: 'Nennweite', type: FIELD_TYPES.SELECT, options: dnOptions, visibleWhen: existingPipeMode },
     { key: 'pipeSlopePercent', label: 'Gefälle', type: FIELD_TYPES.SELECT, options: slopeOptions, commit: 'immediate', visibleWhen: tableMode },
@@ -75,10 +67,6 @@ export const floodingVerificationSchema = defineFormSchema({
     { key: 'dischargeNotice', label: 'Tabellenzuordnung', type: FIELD_TYPES.NOTICE, text: 'Tabellenwerte werden nur für exakt hinterlegte Gefälle in Prozent verwendet. Es erfolgt keine stille Interpolation.', tone: 'compact', visibleWhen: tableMode }
   ],
   groups: [
-    { title: 'Projekt', fields: ['projectName'], columns: 1, accent: 'green' },
-    { title: 'Flächen erfassen', fields: ['surfaceCategory', 'surfaceName', 'surfaceAreaType', 'surfaceArea', 'surfaceCs', 'surfaceCm', 'surfaceAdd'], columns: 2, accent: 'green' },
-    { title: 'Dach- und Grundstücksflächen', fields: ['surfaces'], columns: 1, accent: 'green' },
-    { title: 'Snapshot-Import Regenwasser', fields: ['rainwaterImport', 'importStatus'], columns: 1, accent: 'green' },
     { title: 'Regenspenden', fields: ['rainR2Duration5', 'rainR2Duration10', 'rainR2Duration15', 'rainR30Duration5', 'rainR30Duration10', 'rainR30Duration15', 'rainR100Duration5'], columns: 2, accent: 'green', actions: [{ label: 'KOSTRA / OpenKo Daten öffnen', href: KOSTRA_URL, variant: 'secondary' }] },
     { title: 'Quellenangaben Regendaten', fields: ['rainSourceDataset', 'rainSourceLocation', 'rainSourceVersion'], columns: 2, accent: 'green' },
     { title: 'Gelände und Regendauer', fields: ['meanSlopePercent', 'rainDurationMode', 'manualRainDuration', 'manualRainDurationReason', 'durationNotice'], columns: 2, accent: 'green' },
@@ -86,4 +74,5 @@ export const floodingVerificationSchema = defineFormSchema({
   ]
 });
 
+export const floodingVerificationSchema = floodingCalculationSchema;
 export default floodingVerificationSchema;
