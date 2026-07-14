@@ -1,4 +1,5 @@
 import { evaluateDwa117Applicability } from './retentionApplicability.js';
+import { buildRetentionDurationComparison } from './retentionDurationComparison.js';
 
 const fmt = (value, digits = 1) => Number(value || 0).toLocaleString('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 
@@ -32,6 +33,7 @@ export function results(state = {}, result = {}) {
     surchargeFactorFz: state.retentionSurchargeFactorFz,
     reductionFactorFa: state.retentionReductionFactorFa
   });
+  const retentionComparison = buildRetentionDurationComparison(retention.durationResults || []);
 
   const groups = [
     {
@@ -103,9 +105,37 @@ export function results(state = {}, result = {}) {
     });
   }
 
+  if (retention.active) {
+    groups.push({
+      title: 'DWA-A 117 – Dauerstufenvergleich',
+      rows: retentionComparison.rows.map(item => ({
+        label: `${item.durationMinutes} min · r ${fmt(item.rainIntensityLsHa, 1)} l/(s·ha)${item.isGoverning ? ' · maßgebend' : ''}`,
+        value: item.valid ? fmt(item.volumeM3, 2) : '—',
+        unit: item.valid ? 'm³' : ''
+      })),
+      accent: 'green'
+    });
+    groups.push({
+      title: 'DWA-A 117 – Maßgebende Dauerstufe',
+      rows: [
+        { label: 'Dauerstufen geprüft', value: String(retentionComparison.durationCount) },
+        { label: 'Dauerstufen gültig', value: String(retentionComparison.validDurationCount) },
+        { label: 'Maßgebende Dauer', value: retentionComparison.governing ? String(retentionComparison.governing.durationMinutes) : '—', unit: retentionComparison.governing ? 'min' : '' },
+        { label: 'Regenspende r(D,n)', value: retentionComparison.governing ? fmt(retentionComparison.governing.rainIntensityLsHa, 1) : '—', unit: retentionComparison.governing ? 'l/(s·ha)' : '' },
+        { label: 'qDr,R,u', value: retentionComparison.governing ? fmt(retentionComparison.governing.throttleRainShareLsHa, 2) : '—', unit: retentionComparison.governing ? 'l/(s·ha)' : '' },
+        { label: 'Zuschlagsfaktor fz', value: retentionComparison.governing ? fmt(retentionComparison.governing.surchargeFactorFz, 3) : '—' },
+        { label: 'Abminderungsfaktor fA', value: retentionComparison.governing ? fmt(retentionComparison.governing.reductionFactorFa, 3) : '—' },
+        { label: 'Spezifisches Speichervolumen Vs,u', value: retentionComparison.governing ? fmt(retentionComparison.governing.specificStorageM3Ha, 2) : '—', unit: retentionComparison.governing ? 'm³/ha' : '' },
+        { label: 'Maßgebendes Rückhaltevolumen', value: retentionComparison.governing ? fmt(retentionComparison.governing.volumeM3, 2) : '—', unit: retentionComparison.governing ? 'm³' : '' }
+      ],
+      accent: 'green'
+    });
+  }
+
   const diagnosticMessages = [
     ...(Array.isArray(result.warnings) ? result.warnings : []),
-    ...applicability.messages
+    ...applicability.messages,
+    ...retentionComparison.messages
   ];
 
   return {
