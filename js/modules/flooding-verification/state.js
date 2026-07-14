@@ -38,7 +38,7 @@ export const initialState = {
   authorityDate: '',
   authoritySourceNote: '',
   retentionEnabled: false,
-  retentionRecurrenceFrequencyPerYear: '',
+  retentionRecurrenceFrequencyPerYear: '0,5',
   retentionFlowTimeMinutes: '',
   retentionRiskClass: 'medium',
   retentionSurchargeFactorFz: '',
