@@ -38,6 +38,7 @@ export const initialState = {
   authorityDate: '',
   authoritySourceNote: '',
   activeSurfaceId: null,
+  expandedSurfaceId: null,
   surfaces: [],
   importedRainwaterSnapshot: null,
   importStatus: '',
