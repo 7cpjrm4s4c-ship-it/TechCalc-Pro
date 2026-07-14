@@ -29,6 +29,9 @@ function validSurfaceDraft(current = {}) {
 export function buildFloodingSurfaceRecord({ currentState = {}, id, name, existing = null } = {}) {
   if (!validSurfaceDraft(currentState)) return null;
   const type = typeById.get(currentState.surfaceAreaType) || {};
+  const resolvedIsSealed = typeof type.isSealed === 'boolean'
+    ? type.isSealed
+    : Boolean(existing?.isSealed ?? (currentState.surfaceCategory === 'roof'));
   return {
     ...(existing || {}),
     id: id || existing?.id || createRecordId('flood-surface'),
@@ -43,7 +46,7 @@ export function buildFloodingSurfaceRecord({ currentState = {}, id, name, existi
     origin: existing?.origin || 'manual',
     coefficientSource: existing?.coefficientSource || (type.custom ? 'manual' : 'preset'),
     modifiedAfterImport: existing?.sourceModule === 'rainwater' ? true : Boolean(existing?.modifiedAfterImport),
-    isSealed: typeof existing?.isSealed === 'boolean' ? existing.isSealed : Boolean(type.isSealed)
+    isSealed: resolvedIsSealed
   };
 }
 
@@ -75,16 +78,20 @@ export function floodingSurfaceStats(item = {}) {
 }
 
 export function importRainwater({ current = {} } = {}) {
-  const incoming = readRainwaterSurfaceSnapshot().filter(item => item.category === 'roof' && number(item.area) > 0);
+  const incoming = readRainwaterSurfaceSnapshot()
+    .filter(item => item.category === 'roof' && number(item.area) > 0);
   if (!incoming.length) return { importStatus: 'Im Regenwassermodul sind keine gültigen Dachflächen vorhanden.' };
   const existingSourceIds = new Set((current.surfaces || []).map(item => item.sourceId).filter(Boolean));
   const usedIds = new Set((current.surfaces || []).map(item => String(item.id)));
-  const imported = incoming.filter(item => !existingSourceIds.has(item.sourceId)).map(item => {
-    let id = createRecordId('rain-snapshot');
-    while (usedIds.has(String(id))) id = createRecordId('rain-snapshot');
-    usedIds.add(String(id));
-    return { ...item, id };
-  });
+  const imported = incoming
+    .filter(item => !existingSourceIds.has(item.sourceId))
+    .map(item => {
+      let id = createRecordId('rain-snapshot');
+      while (usedIds.has(String(id))) id = createRecordId('rain-snapshot');
+      usedIds.add(String(id));
+      const type = typeById.get(item.areaType) || {};
+      return { ...item, id, isSealed: typeof type.isSealed === 'boolean' ? type.isSealed : Boolean(item.isSealed) };
+    });
   const skipped = incoming.length - imported.length;
   if (!imported.length) return { importStatus: skipped ? 'Alle Dachflächen wurden bereits importiert.' : 'Keine neuen Dachflächen vorhanden.' };
   return {
@@ -96,23 +103,7 @@ export function importRainwater({ current = {} } = {}) {
 
 export function bindFloodingController(root, state, lineSectionController) {
   lineSectionController?.bind?.(root);
-  const segmentHandler = field => ({ element } = {}) => {
-    const value = element?.dataset?.value;
-    if (value === undefined) return;
-    let patch = { [field]: value };
-    if (field === 'surfaceCategory') {
-      const category = value === 'property' ? 'property' : 'roof';
-      const typeId = category === 'property' ? 'concrete-asphalt' : 'metal-roof';
-      patch = { surfaceCategory: category, surfaceAreaType: typeId, ...defaultsForType(typeId) };
-    } else if (field === 'rainDurationMode') {
-      patch = { rainDurationMode: value === 'manual' ? 'manual' : 'automatic', ...(value === 'automatic' ? { manualRainDurationReason: '' } : {}) };
-    }
-    state.set(patch, { action: `platform:segment:${field}`, notify: true });
-  };
   registerCentralActions(root, {
-    'platform:segment:surfaceCategory': segmentHandler('surfaceCategory'),
-    'platform:segment:rainDurationMode': segmentHandler('rainDurationMode'),
-    'platform:segment:dischargeMode': segmentHandler('dischargeMode'),
     'flooding:import-roofs': ({ root: actionRoot } = {}) => {
       commitAllFields(actionRoot || root, state, { action: 'flooding:import-roofs:precommit', notify: false });
       const patch = importRainwater({ current: state.get() });
@@ -127,5 +118,13 @@ export function bindFloodingController(root, state, lineSectionController) {
   });
 }
 
-const controller = { normalizeFields: numericFields };
+const controller = {
+  normalizeFields: numericFields,
+  segments: { fields: {
+    rainDurationMode: { action: 'platform:segment:rainDurationMode', patch: value => ({ rainDurationMode: value === 'manual' ? 'manual' : 'automatic', ...(value === 'automatic' ? { manualRainDurationReason: '' } : {}) }) },
+    dischargeMode: { action: 'platform:segment:dischargeMode', patch: value => ({ dischargeMode: value }) },
+    surfaceCategory: { action: 'platform:segment:surfaceCategory', patch: value => ({ surfaceCategory: value, surfaceAreaType: value === 'property' ? 'concrete-asphalt' : 'metal-roof', ...defaultsForType(value === 'property' ? 'concrete-asphalt' : 'metal-roof') }) }
+  }}
+};
+
 export default controller;
