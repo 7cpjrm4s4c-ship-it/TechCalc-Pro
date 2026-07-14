@@ -53,7 +53,7 @@ export const floodingCalculationSchema = defineFormSchema({
     { key: 'rainDurationMode', label: 'Regendauer', type: FIELD_TYPES.SEGMENT, options: durationModeOptions, accent: 'green', action: 'platform:segment:rainDurationMode' },
     { key: 'manualRainDuration', label: 'Manuell verwendete Dauer', type: FIELD_TYPES.SELECT, options: durationOptions, commit: 'immediate', visibleWhen: state => state.rainDurationMode === 'manual' },
     { key: 'manualRainDurationReason', label: 'Begründung der Abweichung', type: FIELD_TYPES.TEXT, placeholder: 'Fachliche Begründung', visibleWhen: state => state.rainDurationMode === 'manual' },
-    { key: 'durationNotice', label: 'Automatische Regendauer', type: FIELD_TYPES.NOTICE, text: 'Die automatische Zuordnung folgt der dokumentierten DIN-Zuordnung auf Basis von Geländeneigung und befestigtem Flächenanteil.', tone: 'compact' },
+    { key: 'durationNotice', label: 'Automatische Regendauer', type: FIELD_TYPES.NOTICE, text: 'Die Zuordnung verwendet die mittlere Geländeneigung und den Anteil aller als befestigt klassifizierten Dach- und Grundstücksflächen an der erfassten Gesamtfläche.', tone: 'compact' },
     { key: 'dischargeMode', label: 'Betriebsart', type: FIELD_TYPES.SEGMENT, options: dischargeModeOptions, accent: 'green', action: 'platform:segment:dischargeMode' },
     { key: 'pipeNominalDiameterDn', label: 'Nennweite', type: FIELD_TYPES.SELECT, options: dnOptions, visibleWhen: existingPipeMode },
     { key: 'pipeSlopePercent', label: 'Gefälle', type: FIELD_TYPES.SELECT, options: slopeOptions, commit: 'immediate', visibleWhen: tableMode },
