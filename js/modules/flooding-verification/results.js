@@ -30,8 +30,8 @@ export function results(state = {}, result = {}) {
     flowTimeMinutes: state.retentionFlowTimeMinutes,
     recurrenceFrequencyPerYear: state.retentionRecurrenceFrequencyPerYear,
     throttleRainShareLsHa: retention.throttleRainShareLsHa,
-    surchargeFactorFz: state.retentionSurchargeFactorFz,
-    reductionFactorFa: state.retentionReductionFactorFa
+    surchargeFactorFz: retention.surchargeFactorFz,
+    reductionFactorFa: retention.reductionFactorFa
   });
   const retentionComparison = buildRetentionDurationComparison(retention.durationResults || []);
 
@@ -101,6 +101,8 @@ export function results(state = {}, result = {}) {
         { label: 'Fließzeit', value: applicability.flowTimeMinutes != null ? fmt(applicability.flowTimeMinutes, 1) : '—', unit: applicability.flowTimeMinutes != null ? 'min' : '' },
         { label: 'Überschreitungshäufigkeit n', value: applicability.recurrenceFrequencyPerYear != null ? fmt(applicability.recurrenceFrequencyPerYear, 2) : '—', unit: applicability.recurrenceFrequencyPerYear != null ? '1/a' : '' },
         { label: 'qDr,R,u', value: applicability.throttleRainShareLsHa != null ? fmt(applicability.throttleRainShareLsHa, 2) : '—', unit: applicability.throttleRainShareLsHa != null ? 'l/(s·ha)' : '' },
+        { label: 'Zuschlagsfaktor fz', value: retention.surchargeFactorFz > 0 ? fmt(retention.surchargeFactorFz, 2) : '—' },
+        { label: 'Abminderungsfaktor fA', value: retention.reductionFactorFa > 0 ? fmt(retention.reductionFactorFa, 3) : '—' },
         ...applicability.checks.map(check => ({ label: check.label, value: check.passed ? 'erfüllt' : 'nicht erfüllt' }))
       ],
       accent: 'green'
@@ -114,7 +116,7 @@ export function results(state = {}, result = {}) {
         label: `${item.durationMinutes} min · r ${fmt(item.rainIntensityLsHa, 1)} l/(s·ha)${item.isGoverning ? ' · maßgebend' : ''}`,
         value: item.valid ? fmt(item.volumeM3, 2) : '—',
         unit: item.valid ? 'm³' : ''
-      })) : [{ label: 'Status', value: 'Pflichtwerte oder Regenspenden fehlen' }],
+      })) : [{ label: 'Status', value: 'Bemessungshäufigkeit, Fließzeit oder Regenspenden fehlen beziehungsweise fA liegt außerhalb des Gültigkeitsbereichs.' }],
       accent: 'green'
     });
     groups.push({
