@@ -23,7 +23,12 @@ export function createFloodingDynamicRenderer({ calculate, renderSurfaceForm, re
       || hasAny(changed, [
         'rainDurationMode', 'manualRainDuration', 'manualRainDurationReason',
         'meanSlopePercent', 'surfaces', 'dischargeMode', 'pipeNominalDiameterDn',
-        'pipeSlopePercent', 'manualFullFlowLs', 'authorityLimitLs'
+        'pipeSlopePercent', 'manualFullFlowLs', 'authorityLimitLs',
+        'retentionRecurrenceFrequencyPerYear', 'retentionRiskClass',
+        'retentionFlowTimeMinutes', 'retentionDryWeatherFlowLs',
+        'retentionUpstreamThrottleFlowLs', 'retentionRainDuration5',
+        'retentionRainDuration10', 'retentionRainDuration15',
+        'rainR2Duration5', 'rainR2Duration10', 'rainR2Duration15'
       ]);
 
     if (surfaceStructural) {
