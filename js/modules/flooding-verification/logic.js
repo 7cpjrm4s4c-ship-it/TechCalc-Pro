@@ -138,6 +138,80 @@ function maxDurationResult(results = []) {
   return valid.reduce((max, item) => item.valueM3 > max.valueM3 ? item : max, valid[0]);
 }
 
+function normalizeRetentionRainSeries(series = {}) {
+  return Object.entries(series || {})
+    .map(([duration, rain]) => ({ durationMinutes: Number(duration), rainIntensityLsHa: toNumber(rain) }))
+    .filter(item => item.durationMinutes > 0 && Number.isFinite(item.rainIntensityLsHa))
+    .sort((a, b) => a.durationMinutes - b.durationMinutes);
+}
+
+export function calculateDwa117Duration({ durationMinutes, rainIntensityLsHa, throttleRainShareLsHa, surchargeFactorFz, reductionFactorFa, effectiveAreaHa } = {}) {
+  const duration = Number(durationMinutes);
+  const rain = Number(rainIntensityLsHa);
+  const throttle = Number(throttleRainShareLsHa);
+  const fz = Number(surchargeFactorFz);
+  const fA = Number(reductionFactorFa);
+  const au = Number(effectiveAreaHa);
+  const valid = duration > 0 && rain > 0 && throttle >= 0 && fz > 0 && fA > 0 && au > 0;
+  if (!valid) {
+    return Object.freeze({ durationMinutes: duration || 0, rainIntensityLsHa: rain || 0, throttleRainShareLsHa: throttle || 0, surchargeFactorFz: fz || 0, reductionFactorFa: fA || 0, effectiveAreaHa: au || 0, specificStorageM3Ha: 0, volumeM3: 0, rawSpecificStorageM3Ha: null, rawVolumeM3: null, clampedToZero: false, valid: false });
+  }
+  const rawSpecificStorageM3Ha = (rain - throttle) * duration * fz * fA * 0.06;
+  const rawVolumeM3 = rawSpecificStorageM3Ha * au;
+  const clampedToZero = rawSpecificStorageM3Ha < 0 || rawVolumeM3 < 0;
+  return Object.freeze({
+    durationMinutes: duration,
+    rainIntensityLsHa: rain,
+    throttleRainShareLsHa: throttle,
+    surchargeFactorFz: fz,
+    reductionFactorFa: fA,
+    effectiveAreaHa: au,
+    rawSpecificStorageM3Ha,
+    specificStorageM3Ha: Math.max(0, rawSpecificStorageM3Ha),
+    rawVolumeM3,
+    volumeM3: Math.max(0, rawVolumeM3),
+    clampedToZero,
+    valid: Number.isFinite(rawSpecificStorageM3Ha) && Number.isFinite(rawVolumeM3)
+  });
+}
+
+export function calculateDwa117SimpleProcedure({ enabled = false, dischargeMode = '', authorityLimitLs = 0, weightedCmAreaM2 = 0, dryWeatherFlowLs = 0, upstreamThrottleFlowLs = 0, surchargeFactorFz = 0, reductionFactorFa = 0, rainByDuration = {} } = {}) {
+  const active = Boolean(enabled) && dischargeMode === 'authority-discharge-limit';
+  const effectiveAreaHa = Number(weightedCmAreaM2) / 10000;
+  const authority = Number(authorityLimitLs);
+  const dryWeather = Number(dryWeatherFlowLs);
+  const upstreamThrottle = Number(upstreamThrottleFlowLs);
+  const availableRainThrottleLs = authority - dryWeather - upstreamThrottle;
+  const throttleRainShareLsHa = effectiveAreaHa > 0 ? availableRainThrottleLs / effectiveAreaHa : NaN;
+  const rainSeries = normalizeRetentionRainSeries(rainByDuration);
+  const errors = [];
+  if (active && !(effectiveAreaHa > 0)) errors.push('Die abflusswirksame Fläche Au muss größer 0 ha sein.');
+  if (active && !(authority > 0)) errors.push('Die behördliche Einleitungsbegrenzung muss größer 0 l/s sein.');
+  if (active && !(availableRainThrottleLs >= 0)) errors.push('Der für Regenabfluss verfügbare Drosselabfluss ist negativ.');
+  if (active && !(Number(surchargeFactorFz) > 0)) errors.push('Der Zuschlagsfaktor fz muss größer 0 sein.');
+  if (active && !(Number(reductionFactorFa) > 0)) errors.push('Der Abminderungsfaktor fA muss größer 0 sein.');
+  if (active && !rainSeries.length) errors.push('Für das einfache Verfahren sind geprüfte Regenspenden je Dauerstufe erforderlich.');
+  const durationResults = active && !errors.length
+    ? rainSeries.map(item => calculateDwa117Duration({ ...item, throttleRainShareLsHa, surchargeFactorFz: Number(surchargeFactorFz), reductionFactorFa: Number(reductionFactorFa), effectiveAreaHa }))
+    : [];
+  const governing = maxDurationResult(durationResults.map(item => ({ ...item, valueM3: item.volumeM3 })));
+  return Object.freeze({
+    active,
+    calculated: active && errors.length === 0 && durationResults.length > 0,
+    effectiveAreaHa,
+    authorityLimitLs: authority,
+    dryWeatherFlowLs: dryWeather,
+    upstreamThrottleFlowLs: upstreamThrottle,
+    availableRainThrottleLs,
+    throttleRainShareLsHa: Number.isFinite(throttleRainShareLsHa) ? throttleRainShareLsHa : null,
+    surchargeFactorFz: Number(surchargeFactorFz) || 0,
+    reductionFactorFa: Number(reductionFactorFa) || 0,
+    durationResults: Object.freeze(durationResults),
+    governing: governing ? Object.freeze({ ...governing, volumeM3: governing.valueM3 }) : null,
+    errors: Object.freeze(errors)
+  });
+}
+
 export function calculate(state = {}) {
   const surfaces = Array.isArray(state.surfaces) ? state.surfaces : [];
   const validated = surfaces.map(surface => ({ surface, validation: validateSurface(surface) }));
@@ -161,6 +235,7 @@ export function calculate(state = {}) {
   const rainErrors = validateRainInputs(state, governingDurationMinutes);
   const rD2 = rainValue(state, 2, governingDurationMinutes);
   const weightedCsArea = weighted('cs');
+  const weightedCmArea = weighted('cm');
   const requiredRainFlowLs = rD2 > 0 ? rD2 * weightedCsArea / 10000 : 0;
   const slopePercent = resolvePipeSlopePercent(state);
 
@@ -187,27 +262,14 @@ export function calculate(state = {}) {
   const availableFlowLs = dischargeMode === 'authority-discharge-limit' ? Number(discharge?.qLimitLs || 0) : Number(discharge?.qFullLs || 0);
   const utilizationPercent = availableFlowLs > 0 ? requiredRainFlowLs / availableFlowLs * 100 : 0;
 
-  const equation20 = calculateFloodingEquation20({
-    durationMinutes: governingDurationMinutes,
-    rain30: rainValue(state, 30, governingDurationMinutes),
-    rain2: rD2,
-    totalAreaM2: totalArea,
-    weightedCsAreaM2: weightedCsArea
-  });
-  const equation21ByDuration = FLOODING_DURATIONS.map(durationMinutes => calculateFloodingEquation21({
-    durationMinutes,
-    rain30: rainValue(state, 30, durationMinutes),
-    totalAreaM2: totalArea,
-    dischargeLs: availableFlowLs
-  }));
+  const equation20 = calculateFloodingEquation20({ durationMinutes: governingDurationMinutes, rain30: rainValue(state, 30, governingDurationMinutes), rain2: rD2, totalAreaM2: totalArea, weightedCsAreaM2: weightedCsArea });
+  const equation21ByDuration = FLOODING_DURATIONS.map(durationMinutes => calculateFloodingEquation21({ durationMinutes, rain30: rainValue(state, 30, durationMinutes), totalAreaM2: totalArea, dischargeLs: availableFlowLs }));
   const equation21Governing = maxDurationResult(equation21ByDuration);
   const floodingCandidates = [
     equation20.valid ? { source: 'equation-20', durationMinutes: equation20.durationMinutes, valueM3: equation20.valueM3 } : null,
     equation21Governing ? { source: 'equation-21', durationMinutes: equation21Governing.durationMinutes, valueM3: equation21Governing.valueM3 } : null
   ].filter(Boolean);
-  const governingFlooding = floodingCandidates.length
-    ? floodingCandidates.reduce((max, item) => item.valueM3 > max.valueM3 ? item : max, floodingCandidates[0])
-    : null;
+  const governingFlooding = floodingCandidates.length ? floodingCandidates.reduce((max, item) => item.valueM3 > max.valueM3 ? item : max, floodingCandidates[0]) : null;
   const floodingWarnings = [
     ...(equation20.clampedToZero ? ['Gleichung (20) ergab rechnerisch ein negatives Volumen und wurde auf 0 m³ begrenzt.'] : []),
     ...equation21ByDuration.filter(item => item.clampedToZero).map(item => `Gleichung (21) für ${item.durationMinutes} min ergab rechnerisch ein negatives Volumen und wurde auf 0 m³ begrenzt.`),
@@ -215,23 +277,30 @@ export function calculate(state = {}) {
     ...(dischargeMode === 'authority-discharge-limit' ? ['Bei behördlicher Einleitungsbegrenzung ist zusätzlich der Rückhaltenachweis nach DWA-A 117 zu führen.'] : [])
   ];
 
+  const retention = calculateDwa117SimpleProcedure({
+    enabled: state.retentionEnabled,
+    dischargeMode,
+    authorityLimitLs: toNumber(state.authorityLimitLs),
+    weightedCmAreaM2: weightedCmArea,
+    dryWeatherFlowLs: toNumber(state.retentionDryWeatherFlowLs),
+    upstreamThrottleFlowLs: toNumber(state.retentionUpstreamThrottleFlowLs),
+    surchargeFactorFz: toNumber(state.retentionSurchargeFactorFz),
+    reductionFactorFa: toNumber(state.retentionReductionFactorFa),
+    rainByDuration: state.retentionRainByDuration
+  });
+
   return Object.freeze({
     status: 'flooding-verification-ready', schemaVersion: Number(state.schemaVersion || 2),
     surfaceCount: surfaces.length, validSurfaceCount: valid.length, invalidSurfaceCount: invalidCount,
     roofArea: sum('roof'), propertyArea: sum('property'), totalArea, sealedArea, sealedShare, criticalArea, criticalShare,
-    weightedCsArea, weightedCmArea: weighted('cm'), averageCs: totalArea > 0 ? weightedCsArea / totalArea : 0,
-    averageCm: totalArea > 0 ? weighted('cm') / totalArea : 0, duplicateSourceCount: new Set(duplicateSources).size,
+    weightedCsArea, weightedCmArea, averageCs: totalArea > 0 ? weightedCsArea / totalArea : 0,
+    averageCm: totalArea > 0 ? weightedCmArea / totalArea : 0, duplicateSourceCount: new Set(duplicateSources).size,
     automaticDurationMinutes, governingDurationMinutes, durationSource: manualValid ? 'manual' : 'automatic', manualDurationRequested: manualRequested, manualDurationValid: manualValid,
     rain: Object.freeze({ r2: Object.freeze({ 5: rainValue(state, 2, 5), 10: rainValue(state, 2, 10), 15: rainValue(state, 2, 15) }), r30: Object.freeze({ 5: rainValue(state, 30, 5), 10: rainValue(state, 30, 10), 15: rainValue(state, 30, 15) }), r100Duration5: rainValue(state, 100, 5), source: Object.freeze({ dataset: String(state.rainSourceDataset || '').trim(), location: String(state.rainSourceLocation || '').trim(), version: String(state.rainSourceVersion || '').trim(), entryMode: state.rainEntryMode || 'manual' }) }),
     requiredRainFlowLs, dischargeMode, slopePercent, discharge: discharge ? Object.freeze(discharge) : null, availableFlowLs, utilizationPercent,
     dischargeAdequate: availableFlowLs > 0 && availableFlowLs >= requiredRainFlowLs,
-    flooding: Object.freeze({
-      equation20,
-      equation21ByDuration: Object.freeze(equation21ByDuration),
-      equation21Governing: equation21Governing ? Object.freeze(equation21Governing) : null,
-      governing: governingFlooding ? Object.freeze(governingFlooding) : null,
-      dischargeSource: dischargeMode === 'authority-discharge-limit' ? 'authority-limit' : discharge?.lookupMode || null
-    }),
+    flooding: Object.freeze({ equation20, equation21ByDuration: Object.freeze(equation21ByDuration), equation21Governing: equation21Governing ? Object.freeze(equation21Governing) : null, governing: governingFlooding ? Object.freeze(governingFlooding) : null, dischargeSource: dischargeMode === 'authority-discharge-limit' ? 'authority-limit' : discharge?.lookupMode || null }),
+    retention,
     rainInputValid: rainErrors.length === 0,
     calculationAvailable: rainErrors.length === 0 && dischargeErrors.length === 0 && valid.length > 0,
     floodingCalculationAvailable: rainErrors.length === 0 && dischargeErrors.length === 0 && valid.length > 0 && equation20.valid && Boolean(equation21Governing),
@@ -240,6 +309,7 @@ export function calculate(state = {}) {
       ...(duplicateSources.length ? ['Mehrfach importierte Quell-IDs wurden erkannt.'] : []),
       ...(manualRequested && !manualValid ? ['Die manuelle Regendauer ist erst mit einer zulässigen Dauer und einer Begründung wirksam. Bis dahin wird die automatische Dauer verwendet.'] : []),
       ...rainErrors, ...dischargeErrors, ...floodingWarnings,
+      ...(retention.active ? retention.errors : []),
       ...(availableFlowLs > 0 && availableFlowLs < requiredRainFlowLs ? ['Der verfügbare Abfluss ist kleiner als der erforderliche Regenwasserabfluss.'] : [])
     ]
   });
