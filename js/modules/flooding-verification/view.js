@@ -1,0 +1,29 @@
+import { renderModuleShell, stack } from '../../core/renderer.js';
+import { renderFormSchema } from '../../core/formSchema.js';
+import { renderResultModel } from '../../platform/resultRenderer/index.js';
+import { floodingSurfaceSchema, floodingCalculationSchema } from './schema.js';
+
+export function createFloodingVerificationView({ config, calculate, results, lineSectionController } = {}) {
+  if (!config || typeof calculate !== 'function' || typeof results !== 'function' || !lineSectionController) {
+    throw new Error('createFloodingVerificationView requires config, calculate, results and lineSectionController');
+  }
+
+  const renderSurfaceForm = (state, result) => renderFormSchema(floodingSurfaceSchema, state, { title: 'Flächen', accent: 'green', result });
+  const renderCalculationForm = (state, result) => renderFormSchema(floodingCalculationSchema, state, { title: 'Nachweis', accent: 'green', result });
+  const renderResult = (state, result) => renderResultModel(results(state, result), 'green');
+
+  function view(state = {}) {
+    const result = calculate(state);
+    const inputColumn = stack([
+      `<div data-flooding-dynamic="surface-form">${renderSurfaceForm(state, result)}</div>`,
+      `<div data-flooding-dynamic="surface-records">${lineSectionController.renderCard(state)}</div>`,
+      `<div data-flooding-dynamic="calculation-form">${renderCalculationForm(state, result)}</div>`
+    ].join(''));
+    const outputColumn = `<div data-flooding-dynamic="result">${renderResult(state, result)}</div>`;
+    return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6">${outputColumn}</div>`);
+  }
+
+  return { view, renderSurfaceForm, renderCalculationForm, renderResult };
+}
+
+export default createFloodingVerificationView;
