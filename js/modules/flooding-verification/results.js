@@ -18,8 +18,9 @@ export function results(state = {}, result = {}) {
         { label: 'Verfügbarer Abfluss', value: result.availableFlowLs > 0 ? fmt(result.availableFlowLs, 2) : '—', unit: result.availableFlowLs > 0 ? 'l/s' : '' },
         { label: 'Auslastung', value: result.availableFlowLs > 0 ? fmt(result.utilizationPercent, 1) : '—', unit: result.availableFlowLs > 0 ? '%' : '' },
         { label: 'Nachweis', value: result.dischargeAdequate ? 'ausreichend' : 'nicht ausreichend / unvollständig' },
+        { label: 'Mittlere Geländeneigung', value: fmt(state.meanSlopePercent, 1), unit: '%' },
         { label: 'Maßgebende Regendauer', value: String(result.governingDurationMinutes || 10), unit: 'min' },
-        { label: 'Befestigter Flächenanteil', value: fmt((result.sealedShare || 0) * 100, 1), unit: '%' }
+        { label: 'Befestigter Flächenanteil (Dach + Grundstück)', value: fmt((result.sealedShare || 0) * 100, 1), unit: '%' }
       ],
       accent: 'green'
     },
@@ -42,6 +43,7 @@ export function results(state = {}, result = {}) {
         rows: [
           { label: `r(${result.governingDurationMinutes || 10},2)`, value: fmt(result.rain?.r2?.[result.governingDurationMinutes] || 0, 1), unit: 'l/(s·ha)' },
           { label: 'Σ(A × Cₛ)', value: fmt(result.weightedCsArea, 2), unit: 'm²' },
+          { label: 'Befestigte Fläche', value: fmt(result.sealedArea, 1), unit: 'm²' },
           { label: 'Gesamtfläche', value: fmt(result.totalArea, 1), unit: 'm²' },
           { label: 'Regendaten vollständig', value: result.rainInputValid ? 'ja' : 'nein' },
           { label: 'Schema-Version', value: String(result.schemaVersion || state.schemaVersion || 2) }
@@ -49,7 +51,7 @@ export function results(state = {}, result = {}) {
         accent: 'green'
       }
     ],
-    notices: [{ title: 'Phase 47C.4.1', messages: Array.isArray(result.warnings) ? result.warnings : [], accent: 'green', emptyText: 'Leitungs- und Abflussnachweis ist vollständig und valide.' }]
+    notices: [{ title: 'Phase 47C.4.5', messages: Array.isArray(result.warnings) ? result.warnings : [], accent: 'green', emptyText: 'Leitungs- und Abflussnachweis ist vollständig und valide.' }]
   };
 }
 
