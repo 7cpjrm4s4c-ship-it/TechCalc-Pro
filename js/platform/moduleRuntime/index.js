@@ -99,10 +99,6 @@ function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
     event?.stopPropagation?.();
     event?.stopImmediatePropagation?.();
 
-    // Heizung/Kälte parity: segment changes are store-first and render-immediate.
-    // Mobile Safari can leave click/touchend work pending until the next input
-    // confirmation. Committing on the earliest reliable interaction keeps schema
-    // labels, visibility and dependent fields in sync with the active segment.
     if (last.key === dedupeKey && now - Number(last.at || 0) < 350) {
       setSegmentVisual(root, field, patch?.[field] ?? value);
       return true;
@@ -116,11 +112,6 @@ function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
       preserveScroll(() => state.set(patch, { action, notify: true }));
     }
 
-    // Platform dynamic-update contract: schema-dependent segment changes must
-    // rebuild the form/result islands immediately, just like Heizung/Kälte does
-    // with its named dynamic containers. This avoids stale labels/visibleWhen
-    // state on mobile browsers where the normal async render can be delayed
-    // until the next field commit.
     if (typeof dynamicOptions.dynamicUpdate === 'function') {
       dynamicOptions.dynamicUpdate({ action, field, value: patch?.[field] ?? value, patch, reason: 'segment' });
     }
@@ -135,7 +126,6 @@ function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
       if (typeof dynamicOptions.dynamicUpdate === 'function') dynamicOptions.dynamicUpdate({ action: `${action}:settled-timeout`, field, value: patch?.[field] ?? value, patch, reason: 'segment:settled-timeout' });
       scheduler?.flushNow?.(`${action}:settled-timeout`);
     }, 0);
-    finishDynamic({ status: 'ok' });
     return true;
   };
 
@@ -145,16 +135,6 @@ function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
     handlers[action] = ({ element, event }) => commit(element, event);
   });
 
-  // Direct segment bridge: the generic event pipeline processes segments on
-  // pointerup/touchend/click. Reference modules with schema-dependent segments
-  // need the same immediate dynamic update behaviour as Heizung/Kälte, so we
-  // commit configured platform segments already on pointerdown/touchstart.
-  //
-  // Important: the bridge itself may only be bound once per stable module root,
-  // but the active module context must be refreshed after every mount/re-render.
-  // Otherwise the listener keeps the old `fields`/`state` closure from the first
-  // platform module mounted into that root. That was the Regenwasser startup bug:
-  // the first surfaceMode tap only became effective after a later field commit.
   if (root) {
     root.__tcPlatformSegmentContext = { fields, commit };
     if (!root.__tcPlatformSegmentDirectBound) {
@@ -189,7 +169,6 @@ function bindLookupHydration(root, state, lookupConfig = {}) {
     patchFieldDomValues(root, patch, array(lookupConfig.hydrateDomFields?.[field]));
   });
 }
-
 
 function bindCollections(root, state, collectionConfig = {}) {
   const collections = collectionConfig.collections || collectionConfig;
@@ -255,9 +234,6 @@ function bindCollections(root, state, collectionConfig = {}) {
     if (typeof cfg.add === 'function' && cfg.addAction) actions[cfg.addAction] = addCollectionItem;
   });
 
-  // RC visual retest hardening: collection add buttons must work even while a
-  // mobile keyboard is still open. Native blur can otherwise trigger a render
-  // before the final click reaches the button, making the first tap appear dead.
   root.__tcPlatformCollectionActionContext = { actions };
   if (!root.__tcPlatformCollectionActionDirectBound) {
     root.__tcPlatformCollectionActionDirectBound = true;
@@ -269,8 +245,10 @@ function bindCollections(root, state, collectionConfig = {}) {
       if (typeof handler !== 'function') return;
       const now = Date.now();
       const last = root.__tcPlatformCollectionLastAction || {};
-      const key = `${action}:${element.dataset.collection || ''}:${element.dataset.collectionId || ''}:${event.type}`;
-      if (last.key === key && now - Number(last.at || 0) < 350) {
+      // One physical interaction can produce pointerdown, touchstart, mousedown and click.
+      // The event type is intentionally excluded so all of them share one dedupe key.
+      const key = `${action}:${element.dataset.collection || ''}:${element.dataset.collectionId || ''}`;
+      if (last.key === key && now - Number(last.at || 0) < 650) {
         event.preventDefault?.();
         event.stopPropagation?.();
         event.stopImmediatePropagation?.();
@@ -413,8 +391,6 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     preserveSavedRecordMutation(() => setReduced(current, { action: 'toggle-expanded', id }, 'line:toggle'), { anchor, event });
   });
 
-  // Heizung/Kälte parity: saved-record panels are controlled exclusively by the
-  // central action map. No module-specific capture listener, bridge, or legacy add/update path is registered here.
   root.__tcPlatformSavedRecordContext = null;
   root.__tcPlatformSavedRecordBridge = null;
   return {
@@ -536,13 +512,6 @@ export function createPlatformModule(definition = {}) {
     const reason = String(meta?.reason || '');
     const isSegmentUpdate = reason.startsWith('segment') || action.startsWith('platform:segment:') || action === 'segment:select';
 
-    // Phase 17C.14: segment changes are schema-structural. They can alter labels,
-    // visibleWhen fields, select captions and entire cards. Updating only the
-    // form/side islands was still too weak on mobile Safari because the old
-    // event target could survive visually until the next confirmed input.
-    // Heizung/Kälte solves this by synchronously replacing named dynamic areas;
-    // the platform equivalent is a synchronous full platform-view rebuild for
-    // segment commits, followed by rebinding the platform action map.
     if (isSegmentUpdate) {
       preservePlatformUx(root, () => {
         const nextView = view(runtimeState.get());
