@@ -3,6 +3,7 @@ import { areaTypes, hydraulicTables, dnOrder } from '../../shared/rainwaterDomai
 const toNumber = value => Number(String(value ?? '').replace(',', '.'));
 const typeById = new Map(areaTypes.map(item => [item.id, item]));
 const VALID_DURATIONS = new Set([5, 10, 15]);
+const FLOODING_DURATIONS = Object.freeze([5, 10, 15]);
 const VALID_DISCHARGE_MODES = new Set(['table-existing-pipe', 'table-size-pipe', 'manual-full-flow', 'authority-discharge-limit']);
 
 export function validateSurface(surface = {}) {
@@ -22,6 +23,12 @@ export function isSealedSurface(surface = {}) {
   const type = typeById.get(surface.areaType ?? surface.surfaceType);
   if (typeof type?.isSealed === 'boolean') return type.isSealed;
   return (surface.category ?? surface.group) === 'roof';
+}
+
+export function isCriticalSurface(surface = {}) {
+  if ((surface.category ?? surface.group) === 'roof') return true;
+  if (typeof surface.isNotSafelyFloodable === 'boolean') return surface.isNotSafelyFloodable;
+  return isSealedSurface(surface);
 }
 
 export function automaticRainDuration(meanSlopePercent, sealedShare) {
@@ -89,6 +96,48 @@ export function sizePipe(requiredFlowLs, slopePercent) {
   return null;
 }
 
+function finiteNonNegative(rawValue) {
+  const raw = Number(rawValue);
+  const finite = Number.isFinite(raw);
+  return {
+    rawValueM3: finite ? raw : null,
+    valueM3: finite ? Math.max(0, raw) : 0,
+    clampedToZero: finite && raw < 0,
+    valid: finite
+  };
+}
+
+export function calculateFloodingEquation20({ durationMinutes, rain30, rain2, totalAreaM2, weightedCsAreaM2 } = {}) {
+  const duration = Number(durationMinutes);
+  const r30 = Number(rain30);
+  const r2 = Number(rain2);
+  const totalArea = Number(totalAreaM2);
+  const weightedCsArea = Number(weightedCsAreaM2);
+  if (!(duration > 0) || !(r30 > 0) || !(r2 > 0) || !(totalArea > 0) || !(weightedCsArea >= 0)) {
+    return Object.freeze({ durationMinutes: duration || 0, rain30: r30 || 0, rain2: r2 || 0, totalAreaM2: totalArea || 0, weightedCsAreaM2: weightedCsArea || 0, rawValueM3: null, valueM3: 0, clampedToZero: false, valid: false });
+  }
+  const rawValueM3 = (r30 * totalArea - r2 * weightedCsArea) * duration * 60 / (10000 * 1000);
+  return Object.freeze({ durationMinutes: duration, rain30: r30, rain2: r2, totalAreaM2: totalArea, weightedCsAreaM2: weightedCsArea, ...finiteNonNegative(rawValueM3) });
+}
+
+export function calculateFloodingEquation21({ durationMinutes, rain30, totalAreaM2, dischargeLs } = {}) {
+  const duration = Number(durationMinutes);
+  const r30 = Number(rain30);
+  const totalArea = Number(totalAreaM2);
+  const qOut = Number(dischargeLs);
+  if (!(duration > 0) || !(r30 > 0) || !(totalArea > 0) || !(qOut >= 0)) {
+    return Object.freeze({ durationMinutes: duration || 0, rain30: r30 || 0, totalAreaM2: totalArea || 0, dischargeLs: qOut || 0, rawValueM3: null, valueM3: 0, clampedToZero: false, valid: false });
+  }
+  const rawValueM3 = (r30 * totalArea / 10000 - qOut) * duration * 60 / 1000;
+  return Object.freeze({ durationMinutes: duration, rain30: r30, totalAreaM2: totalArea, dischargeLs: qOut, ...finiteNonNegative(rawValueM3) });
+}
+
+function maxDurationResult(results = []) {
+  const valid = results.filter(item => item?.valid && Number.isFinite(item.valueM3));
+  if (!valid.length) return null;
+  return valid.reduce((max, item) => item.valueM3 > max.valueM3 ? item : max, valid[0]);
+}
+
 export function calculate(state = {}) {
   const surfaces = Array.isArray(state.surfaces) ? state.surfaces : [];
   const validated = surfaces.map(surface => ({ surface, validation: validateSurface(surface) }));
@@ -98,7 +147,9 @@ export function calculate(state = {}) {
   const weighted = key => valid.reduce((acc, item) => acc + item.validation.area * item.validation[key], 0);
   const totalArea = valid.reduce((acc, item) => acc + item.validation.area, 0);
   const sealedArea = valid.reduce((acc, item) => acc + (isSealedSurface(item.surface) ? item.validation.area : 0), 0);
+  const criticalArea = valid.reduce((acc, item) => acc + (isCriticalSurface(item.surface) ? item.validation.area : 0), 0);
   const sealedShare = totalArea > 0 ? sealedArea / totalArea : 0;
+  const criticalShare = totalArea > 0 ? criticalArea / totalArea : 0;
   const invalidCount = validated.length - valid.length;
   const duplicateSources = surfaces.map(item => item.sourceId).filter(Boolean).filter((value, index, all) => all.indexOf(value) !== index);
   const automaticDurationMinutes = automaticRainDuration(state.meanSlopePercent, sealedShare);
@@ -136,23 +187,59 @@ export function calculate(state = {}) {
   const availableFlowLs = dischargeMode === 'authority-discharge-limit' ? Number(discharge?.qLimitLs || 0) : Number(discharge?.qFullLs || 0);
   const utilizationPercent = availableFlowLs > 0 ? requiredRainFlowLs / availableFlowLs * 100 : 0;
 
+  const equation20 = calculateFloodingEquation20({
+    durationMinutes: governingDurationMinutes,
+    rain30: rainValue(state, 30, governingDurationMinutes),
+    rain2: rD2,
+    totalAreaM2: totalArea,
+    weightedCsAreaM2: weightedCsArea
+  });
+  const equation21ByDuration = FLOODING_DURATIONS.map(durationMinutes => calculateFloodingEquation21({
+    durationMinutes,
+    rain30: rainValue(state, 30, durationMinutes),
+    totalAreaM2: totalArea,
+    dischargeLs: availableFlowLs
+  }));
+  const equation21Governing = maxDurationResult(equation21ByDuration);
+  const floodingCandidates = [
+    equation20.valid ? { source: 'equation-20', durationMinutes: equation20.durationMinutes, valueM3: equation20.valueM3 } : null,
+    equation21Governing ? { source: 'equation-21', durationMinutes: equation21Governing.durationMinutes, valueM3: equation21Governing.valueM3 } : null
+  ].filter(Boolean);
+  const governingFlooding = floodingCandidates.length
+    ? floodingCandidates.reduce((max, item) => item.valueM3 > max.valueM3 ? item : max, floodingCandidates[0])
+    : null;
+  const floodingWarnings = [
+    ...(equation20.clampedToZero ? ['Gleichung (20) ergab rechnerisch ein negatives Volumen und wurde auf 0 m³ begrenzt.'] : []),
+    ...equation21ByDuration.filter(item => item.clampedToZero).map(item => `Gleichung (21) für ${item.durationMinutes} min ergab rechnerisch ein negatives Volumen und wurde auf 0 m³ begrenzt.`),
+    ...(criticalShare > 0.7 ? ['Der kritische Flächenanteil liegt über 70 %. Die zusätzliche Prüfung der Notentwässerung mit r(5,100) ist erforderlich.'] : []),
+    ...(dischargeMode === 'authority-discharge-limit' ? ['Bei behördlicher Einleitungsbegrenzung ist zusätzlich der Rückhaltenachweis nach DWA-A 117 zu führen.'] : [])
+  ];
+
   return Object.freeze({
-    status: 'discharge-verification-ready', schemaVersion: Number(state.schemaVersion || 2),
+    status: 'flooding-verification-ready', schemaVersion: Number(state.schemaVersion || 2),
     surfaceCount: surfaces.length, validSurfaceCount: valid.length, invalidSurfaceCount: invalidCount,
-    roofArea: sum('roof'), propertyArea: sum('property'), totalArea, sealedArea, sealedShare,
+    roofArea: sum('roof'), propertyArea: sum('property'), totalArea, sealedArea, sealedShare, criticalArea, criticalShare,
     weightedCsArea, weightedCmArea: weighted('cm'), averageCs: totalArea > 0 ? weightedCsArea / totalArea : 0,
     averageCm: totalArea > 0 ? weighted('cm') / totalArea : 0, duplicateSourceCount: new Set(duplicateSources).size,
     automaticDurationMinutes, governingDurationMinutes, durationSource: manualValid ? 'manual' : 'automatic', manualDurationRequested: manualRequested, manualDurationValid: manualValid,
     rain: Object.freeze({ r2: Object.freeze({ 5: rainValue(state, 2, 5), 10: rainValue(state, 2, 10), 15: rainValue(state, 2, 15) }), r30: Object.freeze({ 5: rainValue(state, 30, 5), 10: rainValue(state, 30, 10), 15: rainValue(state, 30, 15) }), r100Duration5: rainValue(state, 100, 5), source: Object.freeze({ dataset: String(state.rainSourceDataset || '').trim(), location: String(state.rainSourceLocation || '').trim(), version: String(state.rainSourceVersion || '').trim(), entryMode: state.rainEntryMode || 'manual' }) }),
     requiredRainFlowLs, dischargeMode, slopePercent, discharge: discharge ? Object.freeze(discharge) : null, availableFlowLs, utilizationPercent,
     dischargeAdequate: availableFlowLs > 0 && availableFlowLs >= requiredRainFlowLs,
+    flooding: Object.freeze({
+      equation20,
+      equation21ByDuration: Object.freeze(equation21ByDuration),
+      equation21Governing: equation21Governing ? Object.freeze(equation21Governing) : null,
+      governing: governingFlooding ? Object.freeze(governingFlooding) : null,
+      dischargeSource: dischargeMode === 'authority-discharge-limit' ? 'authority-limit' : discharge?.lookupMode || null
+    }),
     rainInputValid: rainErrors.length === 0,
     calculationAvailable: rainErrors.length === 0 && dischargeErrors.length === 0 && valid.length > 0,
+    floodingCalculationAvailable: rainErrors.length === 0 && dischargeErrors.length === 0 && valid.length > 0 && equation20.valid && Boolean(equation21Governing),
     warnings: [
       ...(invalidCount ? [`${invalidCount} Fläche(n) sind ungültig und werden nicht summiert.`] : []),
       ...(duplicateSources.length ? ['Mehrfach importierte Quell-IDs wurden erkannt.'] : []),
       ...(manualRequested && !manualValid ? ['Die manuelle Regendauer ist erst mit einer zulässigen Dauer und einer Begründung wirksam. Bis dahin wird die automatische Dauer verwendet.'] : []),
-      ...rainErrors, ...dischargeErrors,
+      ...rainErrors, ...dischargeErrors, ...floodingWarnings,
       ...(availableFlowLs > 0 && availableFlowLs < requiredRainFlowLs ? ['Der verfügbare Abfluss ist kleiner als der erforderliche Regenwasserabfluss.'] : [])
     ]
   });
