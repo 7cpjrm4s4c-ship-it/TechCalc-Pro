@@ -20,7 +20,11 @@ export function createFloodingDynamicRenderer({ calculate, renderSurfaceForm, re
       || hasAny(changed, ['surfaces', 'activeSurfaceId', 'expandedSurfaceId', 'surfaceCategory', 'surfaceAreaType', 'surfaceCs', 'surfaceCm', 'importStatus']);
     const calculationStructural = action.startsWith('platform:segment:rainDurationMode')
       || action.startsWith('platform:segment:dischargeMode')
-      || hasAny(changed, ['rainDurationMode', 'dischargeMode']);
+      || hasAny(changed, [
+        'rainDurationMode', 'manualRainDuration', 'manualRainDurationReason',
+        'meanSlopePercent', 'surfaces', 'dischargeMode', 'pipeNominalDiameterDn',
+        'pipeSlopePercent', 'manualFullFlowLs', 'authorityLimitLs'
+      ]);
 
     if (surfaceStructural) {
       setIsland(root, '[data-flooding-dynamic="surface-form"]', renderSurfaceForm(state, result));
