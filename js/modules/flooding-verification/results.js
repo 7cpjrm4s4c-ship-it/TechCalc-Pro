@@ -1,5 +1,6 @@
 import { evaluateDwa117Applicability } from './retentionApplicability.js';
 import { buildRetentionDurationComparison } from './retentionDurationComparison.js';
+import { buildFloodingDiagnosticModel } from './diagnosticModel.js';
 
 const fmt = (value, digits = 1) => Number(value || 0).toLocaleString('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 
@@ -15,34 +16,6 @@ const floodingSourceLabel = source => ({
   'equation-21': 'Gleichung (21)'
 }[source] || '—');
 
-const normalizeDiagnostic = item => {
-  if (item && typeof item === 'object') return { severity: item.severity || 'hint', text: item.text || item.message || '' };
-  const text = String(item || '');
-  const severity = /(muss|fehlt|ungültig|unvollständig|nicht erfüllt)/i.test(text)
-    ? 'error'
-    : /(außerhalb|überschritten|kleiner|größer|begrenzt|Vorbemessung)/i.test(text)
-      ? 'warning'
-      : 'hint';
-  return { severity, text };
-};
-
-const diagnosticCards = items => {
-  const normalized = items.map(normalizeDiagnostic).filter(item => item.text);
-  const definitions = [
-    ['error', 'Fehler', 'Fehler'],
-    ['warning', 'Warnungen', 'Warnung'],
-    ['hint', 'Hinweise', 'Hinweis']
-  ];
-  return definitions
-    .map(([severity, title, prefix]) => ({
-      title,
-      prefix,
-      accent: 'green',
-      messages: normalized.filter(item => item.severity === severity).map(item => ({ prefix, text: item.text }))
-    }))
-    .filter(card => card.messages.length);
-};
-
 export function results(state = {}, result = {}) {
   const discharge = result.discharge || {};
   const flooding = result.flooding || {};
@@ -51,6 +24,7 @@ export function results(state = {}, result = {}) {
   const equation20 = flooding.equation20 || {};
   const equation21 = Array.isArray(flooding.equation21ByDuration) ? flooding.equation21ByDuration : [];
   const equation21Governing = flooding.equation21Governing || {};
+  const governing = flooding.governing || {};
   const applicability = evaluateDwa117Applicability({
     enabled: retention.active,
     dischargeMode: result.dischargeMode,
@@ -62,11 +36,23 @@ export function results(state = {}, result = {}) {
     reductionFactorFa: retention.reductionFactorFa
   });
   const retentionComparison = buildRetentionDurationComparison(retention.durationResults || []);
-  const governing = flooding.governing || {};
+  const diagnostic = buildFloodingDiagnosticModel({ result, applicability, retentionComparison });
   const applicationChecks = applicability.checks.filter(check => check.group === 'application-domain');
   const faChecks = applicability.checks.filter(check => check.group === 'fa-validity');
 
   const groups = [
+    {
+      title: 'Nachweisstatus',
+      rows: [
+        { label: 'Status', value: diagnostic.statusLabel },
+        { label: 'Bewertung', value: diagnostic.statusReason },
+        { label: 'Fehler', value: String(diagnostic.counts.errors) },
+        { label: 'Warnungen', value: String(diagnostic.counts.warnings) },
+        { label: 'Empfehlungen', value: String(diagnostic.counts.recommendations) },
+        { label: 'Hinweise', value: String(diagnostic.counts.hints) }
+      ],
+      accent: 'green'
+    },
     {
       title: 'Leitungs- und Abflussnachweis',
       rows: [
@@ -179,14 +165,9 @@ export function results(state = {}, result = {}) {
     });
   }
 
-  const diagnostics = [
-    ...(Array.isArray(result.warnings) ? result.warnings : []),
-    ...(applicability.diagnostics || applicability.messages || []),
-    ...(retentionComparison.diagnostics || retentionComparison.messages || [])
-  ];
   const dwaDuration = retentionComparison.governing?.durationMinutes;
-
   return {
+    diagnostic,
     primary: {
       title: 'Bemessungsvolumen',
       primary: {
@@ -207,7 +188,7 @@ export function results(state = {}, result = {}) {
       accent: 'green'
     },
     groups,
-    notices: diagnosticCards(diagnostics)
+    notices: diagnostic.notices
   };
 }
 
