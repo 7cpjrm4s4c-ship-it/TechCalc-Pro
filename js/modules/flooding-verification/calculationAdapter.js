@@ -1,7 +1,6 @@
 import { calculate as calculateBase } from './logic.js';
 import { surchargeFactorFromRiskClass, calculateReductionFactorFa } from './retentionFactors.js';
 
-const compact = value => String(value ?? '').trim();
 const toNumber = value => Number(String(value ?? '').replace(',', '.'));
 
 function positive(value) {
@@ -9,31 +8,52 @@ function positive(value) {
   return Number.isFinite(number) && number > 0 ? value : null;
 }
 
-export function buildRetentionRainByDuration(state = {}) {
+function completeRain(values = {}) {
+  return [5, 10, 15].every(duration => positive(values[duration]) != null);
+}
+
+export function resolveRetentionRainInput(state = {}) {
   const existing = state.retentionRainByDuration && typeof state.retentionRainByDuration === 'object'
     ? state.retentionRainByDuration
     : {};
-  const recurrence = toNumber(state.retentionRecurrenceFrequencyPerYear);
-  const usesTwoYearRain = Math.abs(recurrence - 0.5) < 1e-9;
+  const requestedRecurrence = toNumber(state.retentionRecurrenceFrequencyPerYear);
   const manual = {
     5: positive(state.retentionRainDuration5),
     10: positive(state.retentionRainDuration10),
     15: positive(state.retentionRainDuration15)
   };
-  const automatic = usesTwoYearRain
-    ? {
-        5: positive(state.rainR2Duration5),
-        10: positive(state.rainR2Duration10),
-        15: positive(state.rainR2Duration15)
-      }
-    : {};
+  const twoYear = {
+    5: positive(state.rainR2Duration5),
+    10: positive(state.rainR2Duration10),
+    15: positive(state.rainR2Duration15)
+  };
+  const hasManualSet = completeRain(manual);
+  const hasTwoYearSet = completeRain(twoYear);
+  const usesTwoYearRain = Math.abs(requestedRecurrence - 0.5) < 1e-9;
+  const automaticTwoYearFallback = !hasManualSet && hasTwoYearSet;
+  const effectiveRecurrence = automaticTwoYearFallback ? 0.5 : requestedRecurrence;
 
   const merged = {};
   for (const duration of [5, 10, 15]) {
-    const value = manual[duration] ?? automatic[duration] ?? positive(existing[duration]);
+    const value = manual[duration]
+      ?? ((usesTwoYearRain || automaticTwoYearFallback) ? twoYear[duration] : null)
+      ?? positive(existing[duration]);
     if (value != null) merged[duration] = value;
   }
-  return Object.freeze(merged);
+
+  return Object.freeze({
+    rainByDuration: Object.freeze(merged),
+    requestedRecurrence,
+    effectiveRecurrence,
+    automaticTwoYearFallback,
+    source: automaticTwoYearFallback || usesTwoYearRain
+      ? 'KOSTRA r(D,2) automatisch übernommen'
+      : 'projektspezifische KOSTRA-Regenspenden r(D,n)'
+  });
+}
+
+export function buildRetentionRainByDuration(state = {}) {
+  return resolveRetentionRainInput(state).rainByDuration;
 }
 
 function weightedCmAreaM2(state = {}) {
@@ -63,50 +83,26 @@ export function deriveRetentionFactors(state = {}) {
     reductionFactorValid: reduction.valid,
     reductionFactorWithinDomain: reduction.withinDomain,
     reductionFactorSource: reduction.source,
-    throttleRainShareLsHa
-  });
-}
-
-export function deriveCombinedStorage(base = {}, authorityMode = false) {
-  const dinVolumeM3 = Number(base.flooding?.governing?.valueM3);
-  const dwaCalculated = Boolean(base.retention?.calculated);
-  const dwaVolumeM3 = dwaCalculated ? Number(base.retention?.governing?.volumeM3) : NaN;
-  const validDin = Number.isFinite(dinVolumeM3) && dinVolumeM3 >= 0;
-  const validDwa = Number.isFinite(dwaVolumeM3) && dwaVolumeM3 >= 0;
-
-  let planningVolumeM3 = validDin ? dinVolumeM3 : null;
-  let governingSource = validDin ? 'din-1986-100' : 'unavailable';
-
-  if (authorityMode && validDwa) {
-    if (!validDin || dwaVolumeM3 > dinVolumeM3) {
-      planningVolumeM3 = dwaVolumeM3;
-      governingSource = 'dwa-a-117';
-    } else if (Math.abs(dwaVolumeM3 - dinVolumeM3) < 1e-9) {
-      governingSource = 'both';
-    }
-  }
-
-  return Object.freeze({
-    requiresDinCheck: true,
-    requiresDwaCheck: authorityMode,
-    dinVolumeM3: validDin ? dinVolumeM3 : null,
-    dwaVolumeM3: validDwa ? dwaVolumeM3 : null,
-    planningVolumeM3,
-    governingSource,
-    rule: authorityMode
-      ? 'Für denselben Speicher ist der größere nachgewiesene Volumenbedarf anzusetzen; die Volumina werden nicht addiert.'
-      : 'Maßgebend ist der Überflutungsnachweis nach DIN 1986-100.'
+    throttleRainShareLsHa,
+    dryWeatherFlowLs,
+    upstreamThrottleFlowLs
   });
 }
 
 export function calculate(state = {}) {
   const authorityMode = state.dischargeMode === 'authority-discharge-limit';
-  const factors = deriveRetentionFactors(state);
-  const retentionRainByDuration = buildRetentionRainByDuration(state);
-  const adaptedState = {
+  const rainInput = resolveRetentionRainInput(state);
+  const factorState = {
     ...state,
+    retentionRecurrenceFrequencyPerYear: Number.isFinite(rainInput.effectiveRecurrence)
+      ? String(rainInput.effectiveRecurrence).replace('.', ',')
+      : state.retentionRecurrenceFrequencyPerYear
+  };
+  const factors = deriveRetentionFactors(factorState);
+  const adaptedState = {
+    ...factorState,
     retentionEnabled: authorityMode,
-    retentionRainByDuration,
+    retentionRainByDuration: rainInput.rainByDuration,
     retentionSurchargeFactorFz: factors.surchargeFactorFz,
     retentionReductionFactorFa: factors.reductionFactorFa ?? ''
   };
@@ -122,26 +118,29 @@ export function calculate(state = {}) {
   if (authorityMode && !factors.reductionFactorWithinDomain) {
     warnings.push('Der Abminderungsfaktor fA kann nicht normativ bestimmt werden, weil tf, qDr,R,u oder n außerhalb des Gültigkeitsbereichs von DWA-A 117 Anhang B liegen. Das einfache Verfahren ist nicht uneingeschränkt anwendbar.');
   }
-
-  const combinedStorage = deriveCombinedStorage(base, authorityMode);
+  if (authorityMode && rainInput.automaticTwoYearFallback) {
+    warnings.push('Für den DWA-A-117-Nachweis werden mangels projektspezifischer r(D,n)-Werte automatisch die vorhandenen r(D,2)-Werte mit n = 0,5/a verwendet.');
+  }
 
   return Object.freeze({
     ...base,
-    combinedStorage,
     retention: Object.freeze({
       ...(base.retention || {}),
-      rainByDuration: retentionRainByDuration,
+      rainByDuration: rainInput.rainByDuration,
+      requestedRecurrenceFrequencyPerYear: rainInput.requestedRecurrence,
+      effectiveRecurrenceFrequencyPerYear: rainInput.effectiveRecurrence,
+      automaticTwoYearFallback: rainInput.automaticTwoYearFallback,
       surchargeFactorFz: factors.surchargeFactorFz,
       reductionFactorFa: factors.reductionFactorFa,
       reductionFactorValid: factors.reductionFactorValid,
       reductionFactorWithinDomain: factors.reductionFactorWithinDomain,
+      dryWeatherFlowLs: factors.dryWeatherFlowLs,
+      upstreamThrottleFlowLs: factors.upstreamThrottleFlowLs,
       factorSource: Object.freeze({
         surcharge: 'DWA-A 117 Tabelle 2',
         reduction: factors.reductionFactorSource,
         riskClass: state.retentionRiskClass || 'medium',
-        rain: Math.abs(toNumber(state.retentionRecurrenceFrequencyPerYear) - 0.5) < 1e-9
-          ? 'KOSTRA r(D,2) automatisch übernommen'
-          : 'projektspezifische KOSTRA-Regenspenden r(D,n)'
+        rain: rainInput.source
       })
     }),
     warnings: Object.freeze(warnings)
