@@ -22,6 +22,7 @@ test('incomplete calculation prioritizes errors and recommendations', () => {
   assert.equal(model.status, 'incomplete');
   assert.equal(model.messages.errors.length, 1);
   assert.equal(model.messages.recommendations.length, 1);
+  assert.ok(model.statusReason.includes('Regenspenden fehlen.'));
   assert.deepEqual(model.notices.map(item => item.title), ['Fehler', 'Empfehlungen']);
 });
 
@@ -32,6 +33,7 @@ test('outside domain produces normative status and recommendation', () => {
     retentionComparison: { messages: [] }
   });
   assert.equal(model.status, 'incomplete');
+  assert.ok(model.statusReason.includes('Anwendungsgrenze nicht erfüllt.'));
   assert.ok(model.messages.recommendations.some(item => item.text.includes('Langzeitsimulation')));
 });
 
@@ -43,7 +45,24 @@ test('diagnostics are deduplicated and sorted by priority', () => {
   });
   assert.equal(model.messages.hints.length, 1);
   assert.equal(model.messages.warnings.length, 1);
+  assert.equal(model.status, 'complete-with-warnings');
+  assert.ok(model.statusReason.includes('Der Wert ist überschritten.'));
   assert.deepEqual(model.notices.map(item => item.title), ['Warnungen', 'Hinweise']);
+});
+
+test('multiple warnings are summarized without hiding additional diagnostics', () => {
+  const model = buildFloodingDiagnosticModel({
+    result: {
+      combinedStorage: { status: 'complete' },
+      warnings: ['Warnung eins.', 'Warnung zwei.', 'Warnung drei.']
+    },
+    applicability: { status: 'applicable', messages: [] },
+    retentionComparison: { messages: [] }
+  });
+  assert.ok(model.statusReason.includes('Warnung eins.'));
+  assert.ok(model.statusReason.includes('Warnung zwei.'));
+  assert.ok(model.statusReason.includes('Weitere 1 Meldung(en)'));
+  assert.equal(model.messages.warnings.length, 3);
 });
 
 test('critical share creates a planning recommendation', () => {
