@@ -1,6 +1,7 @@
 import { evaluateDwa117Applicability } from './retentionApplicability.js';
 import { buildRetentionDurationComparison } from './retentionDurationComparison.js';
 import { buildFloodingDiagnosticModel } from './diagnosticModel.js';
+import { buildFloodingInterpretationModel } from './interpretationModel.js';
 
 const fmt = (value, digits = 1) => Number(value || 0).toLocaleString('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 
@@ -37,10 +38,22 @@ export function results(state = {}, result = {}) {
   });
   const retentionComparison = buildRetentionDurationComparison(retention.durationResults || []);
   const diagnostic = buildFloodingDiagnosticModel({ result, applicability, retentionComparison });
+  const interpretation = buildFloodingInterpretationModel({ result, applicability });
   const applicationChecks = applicability.checks.filter(check => check.group === 'application-domain');
   const faChecks = applicability.checks.filter(check => check.group === 'fa-validity');
 
   const groups = [
+    {
+      title: 'Planerische Interpretation',
+      rows: [
+        { label: 'Planerische Zusammenfassung', value: interpretation.summary },
+        { label: 'Leitungsnachweis', value: interpretation.discharge },
+        { label: 'DWA-A 117', value: interpretation.dwa },
+        { label: 'Normative Aussage', value: interpretation.normative },
+        { label: 'Handlungsempfehlung', value: interpretation.recommendation }
+      ],
+      accent: 'green'
+    },
     {
       title: 'Nachweisstatus',
       rows: [
@@ -168,6 +181,7 @@ export function results(state = {}, result = {}) {
   const dwaDuration = retentionComparison.governing?.durationMinutes;
   return {
     diagnostic,
+    interpretation,
     primary: {
       title: 'Bemessungsvolumen',
       primary: {
