@@ -89,15 +89,13 @@ export function deriveRetentionFactors(state = {}) {
   });
 }
 
-export function buildCombinedStorageResult(base = {}, retention = {}) {
-  const dinValue = base.floodingCalculationAvailable
-    ? Number(base.flooding?.governing?.valueM3)
-    : NaN;
-  const dwaValue = retention.calculated
-    ? Number(retention.governing?.volumeM3)
-    : NaN;
+export function deriveCombinedStorage(result = {}, authorityMode = false) {
+  const dinValue = Number(result.flooding?.governing?.valueM3);
+  const dwaValue = Number(result.retention?.governing?.volumeM3);
   const dinVolumeM3 = Number.isFinite(dinValue) && dinValue >= 0 ? dinValue : null;
-  const dwaVolumeM3 = Number.isFinite(dwaValue) && dwaValue >= 0 ? dwaValue : null;
+  const dwaAvailable = Boolean(authorityMode && result.retention?.calculated);
+  const dwaVolumeM3 = dwaAvailable && Number.isFinite(dwaValue) && dwaValue >= 0 ? dwaValue : null;
+  const requiresDwaCheck = Boolean(authorityMode);
 
   if (dinVolumeM3 == null && dwaVolumeM3 == null) {
     return Object.freeze({
@@ -105,6 +103,7 @@ export function buildCombinedStorageResult(base = {}, retention = {}) {
       dinVolumeM3,
       dwaVolumeM3,
       governingSource: 'unavailable',
+      requiresDwaCheck,
       rule: 'Bemessungswert erst nach vollständigem DIN- und gegebenenfalls DWA-Nachweis verfügbar.'
     });
   }
@@ -116,6 +115,7 @@ export function buildCombinedStorageResult(base = {}, retention = {}) {
       dinVolumeM3,
       dwaVolumeM3,
       governingSource: equal ? 'both' : (dinVolumeM3 > dwaVolumeM3 ? 'din-1986-100' : 'dwa-a-117'),
+      requiresDwaCheck,
       rule: 'Für einen gemeinsamen Speicher ist der größere Volumenbedarf aus DIN 1986-100 und DWA-A 117 anzusetzen; die Volumina werden nicht addiert.'
     });
   }
@@ -125,10 +125,18 @@ export function buildCombinedStorageResult(base = {}, retention = {}) {
     dinVolumeM3,
     dwaVolumeM3,
     governingSource: dinVolumeM3 != null ? 'din-1986-100' : 'dwa-a-117',
+    requiresDwaCheck,
     rule: dinVolumeM3 != null
-      ? 'DIN-Bemessungswert; der DWA-A-117-Nachweis ist noch nicht vollständig.'
+      ? (requiresDwaCheck ? 'DIN-Bemessungswert; der DWA-A-117-Nachweis ist noch nicht vollständig.' : 'DIN-Bemessungswert ist maßgebend.')
       : 'DWA-A-117-Bemessungswert; der DIN-Nachweis ist noch nicht vollständig.'
   });
+}
+
+export function buildCombinedStorageResult(base = {}, retention = {}, authorityMode = false) {
+  return deriveCombinedStorage({
+    ...base,
+    retention
+  }, authorityMode);
 }
 
 export function calculate(state = {}) {
@@ -186,7 +194,7 @@ export function calculate(state = {}) {
   return Object.freeze({
     ...base,
     retention,
-    combinedStorage: buildCombinedStorageResult(base, retention),
+    combinedStorage: buildCombinedStorageResult(base, retention, authorityMode),
     warnings: Object.freeze(warnings)
   });
 }
