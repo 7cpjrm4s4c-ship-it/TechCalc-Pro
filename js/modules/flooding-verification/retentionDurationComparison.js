@@ -48,7 +48,7 @@ export function buildRetentionDurationComparison(durationResults = []) {
     });
   });
 
-  const messages = [
+  const diagnostics = [
     ...rows.filter(item => item.status === 'invalid').map(item => Object.freeze({ severity: 'error', text: `Die Dauerstufe ${item.durationMinutes} min ist unvollständig oder ungültig.` })),
     ...rows.filter(item => item.status === 'clamped-to-zero').map(item => Object.freeze({ severity: 'warning', text: `Die Dauerstufe ${item.durationMinutes} min ergab einen negativen Rohwert und wurde auf 0 m³ begrenzt.` }))
   ];
@@ -69,7 +69,8 @@ export function buildRetentionDurationComparison(durationResults = []) {
       status: 'governing',
       statusLabel: STATUS_LABELS.governing
     }) : null,
-    messages: Object.freeze(messages)
+    diagnostics: Object.freeze(diagnostics),
+    messages: Object.freeze(diagnostics.map(item => item.text))
   });
 }
 
