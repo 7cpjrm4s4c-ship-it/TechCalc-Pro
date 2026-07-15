@@ -1,5 +1,12 @@
 const finite = value => Number.isFinite(Number(value)) ? Number(value) : null;
 
+const STATUS_LABELS = Object.freeze({
+  invalid: 'ungültig',
+  'clamped-to-zero': 'auf 0 m³ begrenzt',
+  valid: 'gültig',
+  governing: 'maßgebend'
+});
+
 export function buildRetentionDurationComparison(durationResults = []) {
   const normalized = (Array.isArray(durationResults) ? durationResults : [])
     .map(item => ({
@@ -22,17 +29,28 @@ export function buildRetentionDurationComparison(durationResults = []) {
   const governing = validByVolume[0] || null;
   const rankByDuration = new Map(validByVolume.map((item, index) => [item.durationMinutes, index + 1]));
 
-  const rows = normalized.map(item => Object.freeze({
-    ...item,
-    rank: item.valid ? rankByDuration.get(item.durationMinutes) : null,
-    isGoverning: Boolean(governing && item.valid && item.durationMinutes === governing.durationMinutes && item.volumeM3 === governing.volumeM3),
-    differenceToMaximumM3: item.valid && governing ? governing.volumeM3 - item.volumeM3 : null,
-    status: !item.valid ? 'invalid' : item.clampedToZero ? 'clamped-to-zero' : 'valid'
-  }));
+  const rows = normalized.map(item => {
+    const isGoverning = Boolean(governing && item.valid && item.durationMinutes === governing.durationMinutes && item.volumeM3 === governing.volumeM3);
+    const status = !item.valid
+      ? 'invalid'
+      : item.clampedToZero
+        ? 'clamped-to-zero'
+        : isGoverning
+          ? 'governing'
+          : 'valid';
+    return Object.freeze({
+      ...item,
+      rank: item.valid ? rankByDuration.get(item.durationMinutes) : null,
+      isGoverning,
+      differenceToMaximumM3: item.valid && governing ? governing.volumeM3 - item.volumeM3 : null,
+      status,
+      statusLabel: STATUS_LABELS[status]
+    });
+  });
 
   const messages = [
-    ...rows.filter(item => item.status === 'invalid').map(item => `Die Dauerstufe ${item.durationMinutes} min ist unvollständig oder ungültig.`),
-    ...rows.filter(item => item.status === 'clamped-to-zero').map(item => `Die Dauerstufe ${item.durationMinutes} min ergab einen negativen Rohwert und wurde auf 0 m³ begrenzt.`)
+    ...rows.filter(item => item.status === 'invalid').map(item => Object.freeze({ severity: 'error', text: `Die Dauerstufe ${item.durationMinutes} min ist unvollständig oder ungültig.` })),
+    ...rows.filter(item => item.status === 'clamped-to-zero').map(item => Object.freeze({ severity: 'warning', text: `Die Dauerstufe ${item.durationMinutes} min ergab einen negativen Rohwert und wurde auf 0 m³ begrenzt.` }))
   ];
 
   return Object.freeze({
@@ -47,7 +65,9 @@ export function buildRetentionDurationComparison(durationResults = []) {
       surchargeFactorFz: governing.surchargeFactorFz,
       reductionFactorFa: governing.reductionFactorFa,
       specificStorageM3Ha: governing.specificStorageM3Ha,
-      volumeM3: governing.volumeM3
+      volumeM3: governing.volumeM3,
+      status: 'governing',
+      statusLabel: STATUS_LABELS.governing
     }) : null,
     messages: Object.freeze(messages)
   });
