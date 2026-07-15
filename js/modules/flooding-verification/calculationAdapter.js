@@ -67,6 +67,38 @@ export function deriveRetentionFactors(state = {}) {
   });
 }
 
+function deriveCombinedStorage(base = {}, authorityMode = false) {
+  const dinVolumeM3 = Number(base.flooding?.governing?.valueM3);
+  const dwaCalculated = Boolean(base.retention?.calculated);
+  const dwaVolumeM3 = dwaCalculated ? Number(base.retention?.governing?.volumeM3) : NaN;
+  const validDin = Number.isFinite(dinVolumeM3) && dinVolumeM3 >= 0;
+  const validDwa = Number.isFinite(dwaVolumeM3) && dwaVolumeM3 >= 0;
+
+  let planningVolumeM3 = validDin ? dinVolumeM3 : null;
+  let governingSource = validDin ? 'din-1986-100' : 'unavailable';
+
+  if (authorityMode && validDwa) {
+    if (!validDin || dwaVolumeM3 > dinVolumeM3) {
+      planningVolumeM3 = dwaVolumeM3;
+      governingSource = 'dwa-a-117';
+    } else if (Math.abs(dwaVolumeM3 - dinVolumeM3) < 1e-9) {
+      governingSource = 'both';
+    }
+  }
+
+  return Object.freeze({
+    requiresDinCheck: true,
+    requiresDwaCheck: authorityMode,
+    dinVolumeM3: validDin ? dinVolumeM3 : null,
+    dwaVolumeM3: validDwa ? dwaVolumeM3 : null,
+    planningVolumeM3,
+    governingSource,
+    rule: authorityMode
+      ? 'Für denselben Speicher ist der größere nachgewiesene Volumenbedarf anzusetzen; die Volumina werden nicht addiert.'
+      : 'Maßgebend ist der Überflutungsnachweis nach DIN 1986-100.'
+  });
+}
+
 export function calculate(state = {}) {
   const authorityMode = state.dischargeMode === 'authority-discharge-limit';
   const factors = deriveRetentionFactors(state);
@@ -91,8 +123,11 @@ export function calculate(state = {}) {
     warnings.push('Der Abminderungsfaktor fA kann nicht normativ bestimmt werden, weil tf, qDr,R,u oder n außerhalb des Gültigkeitsbereichs von DWA-A 117 Anhang B liegen. Das einfache Verfahren ist nicht uneingeschränkt anwendbar.');
   }
 
+  const combinedStorage = deriveCombinedStorage(base, authorityMode);
+
   return Object.freeze({
     ...base,
+    combinedStorage,
     retention: Object.freeze({
       ...(base.retention || {}),
       rainByDuration: retentionRainByDuration,
