@@ -41,8 +41,8 @@ export const floodingSurfaceSchema = defineFormSchema({
     { key: 'surfaceArea', label: 'Fläche A', type: FIELD_TYPES.DECIMAL, unit: 'm²', default: '100' },
     { key: 'surfaceCs', label: 'Spitzenabflussbeiwert Cₛ', type: FIELD_TYPES.DECIMAL },
     { key: 'surfaceCm', label: 'Mittlerer Abflussbeiwert Cₘ', type: FIELD_TYPES.DECIMAL },
-    { key: 'rainwaterImport', label: 'Dachflächen aus Regenwasser', type: FIELD_TYPES.ACTION, text: 'Dachflächen importieren', action: 'flooding:import-roofs', variant: 'primary' },
-    { key: 'importStatus', label: 'Importstatus', type: FIELD_TYPES.NOTICE, text: state => state.importStatus || 'Der Import legt unabhängige Dachflächen im zentralen Flächenspeicher ab.', tone: 'compact' }
+    { key: 'rainwaterImport', label: 'Flächen aus Regenwasser', type: FIELD_TYPES.ACTION, text: 'Flächen importieren', action: 'flooding:import-roofs', variant: 'primary' },
+    { key: 'importStatus', label: 'Importstatus', type: FIELD_TYPES.NOTICE, text: state => state.importStatus || 'Der Import legt unabhängige Kopien aller gespeicherten Regenwasserflächen im zentralen Flächenspeicher ab. Lokal bearbeitete Kopien werden nicht überschrieben.', tone: 'compact' }
   ],
   groups: [
     { title: 'Projekt', fields: ['projectName'], columns: 1, accent: 'green' },
