@@ -67,7 +67,7 @@ export function deriveRetentionFactors(state = {}) {
   });
 }
 
-function deriveCombinedStorage(base = {}, authorityMode = false) {
+export function deriveCombinedStorage(base = {}, authorityMode = false) {
   const dinVolumeM3 = Number(base.flooding?.governing?.valueM3);
   const dwaCalculated = Boolean(base.retention?.calculated);
   const dwaVolumeM3 = dwaCalculated ? Number(base.retention?.governing?.volumeM3) : NaN;
