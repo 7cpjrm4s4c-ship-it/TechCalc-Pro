@@ -15,13 +15,6 @@ const floodingSourceLabel = source => ({
   'equation-21': 'Gleichung (21)'
 }[source] || '—');
 
-const planningSourceLabel = source => ({
-  'din-1986-100': 'Überflutungsnachweis nach DIN 1986-100',
-  'dwa-a-117': 'Rückhalteraumnachweis nach DWA-A 117',
-  both: 'beide Nachweise gleich groß',
-  unavailable: 'unvollständig'
-}[source] || 'unvollständig');
-
 export function results(state = {}, result = {}) {
   const discharge = result.discharge || {};
   const flooding = result.flooding || {};
@@ -36,7 +29,7 @@ export function results(state = {}, result = {}) {
     dischargeMode: result.dischargeMode,
     catchmentAreaHa: Number(result.totalArea || 0) / 10000,
     flowTimeMinutes: state.retentionFlowTimeMinutes,
-    recurrenceFrequencyPerYear: state.retentionRecurrenceFrequencyPerYear,
+    recurrenceFrequencyPerYear: retention.effectiveRecurrenceFrequencyPerYear ?? state.retentionRecurrenceFrequencyPerYear,
     throttleRainShareLsHa: retention.throttleRainShareLsHa,
     surchargeFactorFz: retention.surchargeFactorFz,
     reductionFactorFa: retention.reductionFactorFa
@@ -149,6 +142,7 @@ export function results(state = {}, result = {}) {
     ...applicability.messages,
     ...retentionComparison.messages
   ];
+  const dwaDuration = retentionComparison.governing?.durationMinutes;
 
   return {
     primary: {
@@ -159,13 +153,12 @@ export function results(state = {}, result = {}) {
         unit: combinedStorage.planningVolumeM3 != null ? 'm³' : ''
       },
       rows: [
-        { label: 'Maßgebender Nachweis', value: planningSourceLabel(combinedStorage.governingSource) },
-        { label: 'DIN 1986-100 – maßgebendes Volumen', value: combinedStorage.dinVolumeM3 != null ? fmt(combinedStorage.dinVolumeM3, 2) : '—', unit: combinedStorage.dinVolumeM3 != null ? 'm³' : '' },
-        { label: 'DWA-A 117 – maßgebendes Volumen', value: combinedStorage.dwaVolumeM3 != null ? fmt(combinedStorage.dwaVolumeM3, 2) : (retention.active ? 'unvollständig' : 'nicht erforderlich'), unit: combinedStorage.dwaVolumeM3 != null ? 'm³' : '' },
-        { label: 'Bemessungsregel', value: combinedStorage.rule || '—' },
-        { label: 'Maßgebende Gleichung DIN', value: result.floodingCalculationAvailable ? floodingSourceLabel(governing.source) : 'unvollständig' },
-        { label: 'Regendauer Gleichung (20)', value: equation20.valid ? String(equation20.durationMinutes) : '—', unit: equation20.valid ? 'min' : '' },
-        { label: 'Maßgebende Dauer Gleichung (21)', value: equation21Governing.valid ? String(equation21Governing.durationMinutes) : '—', unit: equation21Governing.valid ? 'min' : '' },
+        { label: 'Maßgebender Nachweis', value: combinedStorage.governingLabel || 'Nachweis unvollständig' },
+        { label: 'DIN 1986-100', value: combinedStorage.dinVolumeM3 != null ? fmt(combinedStorage.dinVolumeM3, 2) : '—', unit: combinedStorage.dinVolumeM3 != null ? 'm³' : '' },
+        { label: 'DWA-A 117', value: combinedStorage.dwaVolumeM3 != null ? fmt(combinedStorage.dwaVolumeM3, 2) : (retention.active ? 'unvollständig' : 'nicht erforderlich'), unit: combinedStorage.dwaVolumeM3 != null ? 'm³' : '' },
+        { label: 'Begründung', value: combinedStorage.governingReason || 'Die Nachweise sind noch nicht vollständig.' },
+        { label: 'Maßgebende Regendauer DIN', value: equation20.valid ? String(equation20.durationMinutes) : '—', unit: equation20.valid ? 'min' : '' },
+        { label: 'Maßgebende Dauer DWA', value: dwaDuration != null ? String(dwaDuration) : '—', unit: dwaDuration != null ? 'min' : '' },
         { label: 'Kritischer Flächenanteil', value: fmt((result.criticalShare || 0) * 100, 1), unit: '%' }
       ],
       accent: 'green'
