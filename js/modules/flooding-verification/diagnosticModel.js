@@ -18,6 +18,13 @@ function normalize(items = []) {
     .sort((a, b) => PRIORITY[a.severity] - PRIORITY[b.severity]);
 }
 
+const summarize = (entries, fallback) => {
+  if (!entries.length) return fallback;
+  const visible = entries.slice(0, 2).map(item => item.text);
+  const suffix = entries.length > visible.length ? ` Weitere ${entries.length - visible.length} Meldung(en) sind im Diagnosebereich aufgeführt.` : '';
+  return `${visible.join(' ')}${suffix}`;
+};
+
 export function buildFloodingDiagnosticModel({ result = {}, applicability = {}, retentionComparison = {} } = {}) {
   const combined = result.combinedStorage || {};
   const sourceMessages = [
@@ -52,10 +59,10 @@ export function buildFloodingDiagnosticModel({ result = {}, applicability = {}, 
   const statusReason = status === 'complete'
     ? 'Alle erforderlichen Nachweise sind vollständig und innerhalb der dokumentierten Anwendungsgrenzen.'
     : status === 'outside-domain'
-      ? 'Mindestens eine Anwendungsgrenze des einfachen Verfahrens ist überschritten.'
+      ? summarize([...errors, ...warnings], 'Mindestens eine Anwendungsgrenze des einfachen Verfahrens ist überschritten.')
       : status === 'complete-with-warnings'
-        ? 'Ein Planungswert liegt vor; ergänzende Hinweise oder Prüfungen sind zu beachten.'
-        : 'Mindestens ein erforderlicher Nachweis oder Eingabeblock ist noch nicht vollständig.';
+        ? summarize(warnings, 'Ein Planungswert liegt vor; ergänzende Hinweise oder Prüfungen sind zu beachten.')
+        : summarize(errors, 'Mindestens ein erforderlicher Nachweis oder Eingabeblock ist noch nicht vollständig.');
 
   const notices = [
     ['error', 'Fehler', 'Fehler', errors],
