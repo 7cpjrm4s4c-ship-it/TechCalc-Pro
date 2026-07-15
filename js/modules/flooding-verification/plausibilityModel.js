@@ -3,6 +3,8 @@ const number = value => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+const PRIORITY = Object.freeze({ error: 0, warning: 1, recommendation: 2, hint: 3 });
+
 const issue = (code, severity, text, recommendation) => Object.freeze({
   code,
   severity,
@@ -90,7 +92,7 @@ export function buildFloodingPlausibilityModel({ result = {}, applicability = {}
     issues.push(issue('RAIN_SOURCE_INCOMPLETE', 'recommendation', 'Die Regenspenden sind vorhanden, aber die Quellenangaben sind nicht vollständig dokumentiert.', 'Datensatz, Raster beziehungsweise Ort und Datenversion ergänzen.'));
   }
 
-  const sorted = [...issues].sort((a, b) => ({ error: 0, warning: 1, recommendation: 2, hint: 3 }[a.severity] - ({ error: 0, warning: 1, recommendation: 2, hint: 3 }[b.severity]));
+  const sorted = [...issues].sort((a, b) => PRIORITY[a.severity] - PRIORITY[b.severity]);
   const counts = Object.freeze({
     errors: sorted.filter(item => item.severity === 'error').length,
     warnings: sorted.filter(item => item.severity === 'warning').length,
