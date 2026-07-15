@@ -32,6 +32,9 @@ const tableMode = state => ['table-existing-pipe', 'table-size-pipe'].includes(s
 const existingPipeMode = state => state.dischargeMode === 'table-existing-pipe';
 const manualFlowMode = state => state.dischargeMode === 'manual-full-flow';
 const authorityMode = state => state.dischargeMode === 'authority-discharge-limit';
+const retentionAfterHtml = state => authorityMode(state)
+  ? '<div class="empty-state empty-state--compact">Der Rückhalteraumnachweis ist bei behördlicher Einleitungsbegrenzung automatisch aktiv. n ist eine projektspezifische Bemessungsvorgabe; fz und fA werden automatisch nach DWA-A 117 bestimmt. Trockenwetterabfluss und vorgeschalteter Drosselabfluss sind nur einzutragen, wenn diese Abflüsse im konkreten Projekt vorhanden sind; andernfalls bleiben beide Werte 0 l/s.</div>'
+  : '';
 
 export const floodingSurfaceSchema = defineFormSchema({
   fields: [
@@ -81,21 +84,20 @@ export const floodingCalculationSchema = defineFormSchema({
     { key: 'retentionRecurrenceFrequencyPerYear', label: 'Bemessungshäufigkeit n', type: FIELD_TYPES.SELECT, options: recurrenceOptions, commit: 'immediate', visibleWhen: authorityMode },
     { key: 'retentionRiskClass', label: 'Risikomaß', type: FIELD_TYPES.SELECT, options: riskOptions, commit: 'immediate', visibleWhen: authorityMode },
     { key: 'retentionFlowTimeMinutes', label: 'Fließzeit tf', type: FIELD_TYPES.DECIMAL, unit: 'min', commit: 'immediate', visibleWhen: authorityMode },
-    { key: 'retentionAutomaticFz', label: 'Zuschlagsfaktor fz', type: FIELD_TYPES.NOTICE, text: state => `Automatisch aus Risikomaß: ${String(surchargeFactorFromRiskClass(state.retentionRiskClass)).replace('.', ',')}`, tone: 'compact', visibleWhen: authorityMode },
-    { key: 'retentionAutomaticFa', label: 'Abminderungsfaktor fA', type: FIELD_TYPES.NOTICE, text: 'Automatische Berechnung nach DWA-A 117, Anhang B, aus tf, qDr,R,u und n. Der berechnete Wert wird im Ergebnis ausgewiesen.', tone: 'compact', visibleWhen: authorityMode },
-    { key: 'retentionDryWeatherFlowLs', label: 'Trockenwetterabfluss', type: FIELD_TYPES.DECIMAL, unit: 'l/s', visibleWhen: authorityMode },
-    { key: 'retentionUpstreamThrottleFlowLs', label: 'Vorgeschalteter Drosselabfluss', type: FIELD_TYPES.DECIMAL, unit: 'l/s', visibleWhen: authorityMode },
+    { key: 'retentionAutomaticFz', label: 'Zuschlagsfaktor fz', type: FIELD_TYPES.NOTICE, text: state => `Zuschlagsfaktor fz automatisch aus Risikomaß: fz = ${String(surchargeFactorFromRiskClass(state.retentionRiskClass)).replace('.', ',')}`, tone: 'compact', visibleWhen: authorityMode },
+    { key: 'retentionAutomaticFa', label: 'Abminderungsfaktor fA', type: FIELD_TYPES.NOTICE, text: 'Abminderungsfaktor fA: automatische Berechnung nach DWA-A 117, Anhang B, aus tf, qDr,R,u und n. Der berechnete Wert wird im Ergebnis ausgewiesen.', tone: 'compact', visibleWhen: authorityMode },
+    { key: 'retentionDryWeatherFlowLs', label: 'Trockenwetterabfluss (optional)', type: FIELD_TYPES.DECIMAL, unit: 'l/s', visibleWhen: authorityMode },
+    { key: 'retentionUpstreamThrottleFlowLs', label: 'Vorgeschalteter Drosselabfluss (optional)', type: FIELD_TYPES.DECIMAL, unit: 'l/s', visibleWhen: authorityMode },
     { key: 'retentionRainDuration5', label: 'r(5,n)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)', visibleWhen: authorityMode },
     { key: 'retentionRainDuration10', label: 'r(10,n)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)', visibleWhen: authorityMode },
-    { key: 'retentionRainDuration15', label: 'r(15,n)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)', visibleWhen: authorityMode },
-    { key: 'retentionNotice', label: 'DWA-A 117', type: FIELD_TYPES.NOTICE, text: 'Der Rückhalteraumnachweis ist bei behördlicher Einleitungsbegrenzung automatisch aktiv. n ist eine projektspezifische Bemessungsvorgabe; fz und fA werden automatisch nach DWA-A 117 bestimmt.', tone: 'compact', visibleWhen: authorityMode }
+    { key: 'retentionRainDuration15', label: 'r(15,n)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)', visibleWhen: authorityMode }
   ],
   groups: [
     { title: 'Regenspenden', fields: ['rainR2Duration5', 'rainR2Duration10', 'rainR2Duration15', 'rainR30Duration5', 'rainR30Duration10', 'rainR30Duration15', 'rainR100Duration5'], columns: 2, accent: 'green', actions: [{ label: 'KOSTRA / OpenKo Daten öffnen', href: KOSTRA_URL, variant: 'secondary' }] },
     { title: 'Quellenangaben Regendaten', fields: ['rainSourceDataset', 'rainSourceLocation', 'rainSourceVersion'], columns: 2, accent: 'green' },
     { title: 'Gelände und Regendauer', fields: ['meanSlopePercent', 'rainDurationMode', 'manualRainDuration', 'manualRainDurationReason', 'durationNotice'], columns: 2, accent: 'green' },
     { title: 'Leitungs- und Abflussnachweis', fields: ['dischargeMode', 'pipeNominalDiameterDn', 'pipeSlopePercent', 'manualFullFlowLs', 'manualFullFlowSource', 'authorityLimitLs', 'authorityName', 'authorityReference', 'authorityDate', 'authoritySourceNote', 'dischargeNotice'], columns: 2, accent: 'green' },
-    { title: 'Rückhalteraumnachweis nach DWA-A 117', fields: ['retentionRecurrenceFrequencyPerYear', 'retentionRiskClass', 'retentionFlowTimeMinutes', 'retentionAutomaticFz', 'retentionAutomaticFa', 'retentionDryWeatherFlowLs', 'retentionUpstreamThrottleFlowLs', 'retentionRainDuration5', 'retentionRainDuration10', 'retentionRainDuration15', 'retentionNotice'], columns: 2, accent: 'green', visibleWhen: authorityMode }
+    { title: 'Rückhalteraumnachweis nach DWA-A 117', fields: ['retentionRecurrenceFrequencyPerYear', 'retentionRiskClass', 'retentionFlowTimeMinutes', 'retentionAutomaticFz', 'retentionAutomaticFa', 'retentionDryWeatherFlowLs', 'retentionUpstreamThrottleFlowLs', 'retentionRainDuration5', 'retentionRainDuration10', 'retentionRainDuration15'], columns: 2, accent: 'green', visibleWhen: authorityMode, afterHtml: retentionAfterHtml }
   ]
 });
 
