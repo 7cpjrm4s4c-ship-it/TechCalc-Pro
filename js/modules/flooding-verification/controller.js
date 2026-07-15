@@ -77,27 +77,69 @@ export function floodingSurfaceStats(item = {}) {
   ];
 }
 
+function importedSurfaceFromSnapshot(item, id) {
+  const type = typeById.get(item.areaType) || {};
+  return {
+    ...item,
+    id,
+    sourceModule: 'rainwater',
+    origin: 'imported',
+    coefficientSource: 'imported',
+    modifiedAfterImport: false,
+    importedAt: new Date().toISOString(),
+    isSealed: typeof type.isSealed === 'boolean' ? type.isSealed : Boolean(item.isSealed)
+  };
+}
+
 export function importRainwater({ current = {} } = {}) {
-  const incoming = readRainwaterSurfaceSnapshot()
-    .filter(item => item.category === 'roof' && number(item.area) > 0);
-  if (!incoming.length) return { importStatus: 'Im Regenwassermodul sind keine gültigen Dachflächen vorhanden.' };
-  const existingSourceIds = new Set((current.surfaces || []).map(item => item.sourceId).filter(Boolean));
-  const usedIds = new Set((current.surfaces || []).map(item => String(item.id)));
-  const imported = incoming
-    .filter(item => !existingSourceIds.has(item.sourceId))
-    .map(item => {
+  const incoming = readRainwaterSurfaceSnapshot().filter(item => number(item.area) > 0);
+  if (!incoming.length) return { importStatus: 'Im Regenwassermodul sind keine gültigen Flächen vorhanden.' };
+
+  const existing = Array.isArray(current.surfaces) ? current.surfaces : [];
+  const bySourceId = new Map(existing.filter(item => item.sourceId).map(item => [String(item.sourceId), item]));
+  const usedIds = new Set(existing.map(item => String(item.id)));
+  const incomingSourceIds = new Set(incoming.map(item => String(item.sourceId)));
+  let added = 0;
+  let updated = 0;
+  let conflicts = 0;
+
+  const replacements = new Map();
+  const additions = [];
+
+  for (const item of incoming) {
+    const sourceId = String(item.sourceId);
+    const local = bySourceId.get(sourceId);
+    if (!local) {
       let id = createRecordId('rain-snapshot');
       while (usedIds.has(String(id))) id = createRecordId('rain-snapshot');
       usedIds.add(String(id));
-      const type = typeById.get(item.areaType) || {};
-      return { ...item, id, isSealed: typeof type.isSealed === 'boolean' ? type.isSealed : Boolean(item.isSealed) };
-    });
-  const skipped = incoming.length - imported.length;
-  if (!imported.length) return { importStatus: skipped ? 'Alle Dachflächen wurden bereits importiert.' : 'Keine neuen Dachflächen vorhanden.' };
+      additions.push(importedSurfaceFromSnapshot(item, id));
+      added += 1;
+      continue;
+    }
+    if (local.modifiedAfterImport) {
+      conflicts += 1;
+      continue;
+    }
+    replacements.set(String(local.id), importedSurfaceFromSnapshot(item, local.id));
+    updated += 1;
+  }
+
+  const nextExisting = existing.map(item => replacements.get(String(item.id)) || item);
+  const nextSurfaces = [...additions, ...nextExisting];
+  const statusParts = [];
+  if (added) statusParts.push(`${added} Fläche(n) ergänzt`);
+  if (updated) statusParts.push(`${updated} Fläche(n) aktualisiert`);
+  if (conflicts) statusParts.push(`${conflicts} lokal bearbeitete Fläche(n) nicht überschrieben`);
+  if (!statusParts.length) statusParts.push('Alle Flächen sind bereits aktuell');
+
   return {
-    surfaces: [...imported, ...(current.surfaces || [])],
-    importedRainwaterSnapshot: { importedAt: new Date().toISOString(), sourceIds: incoming.map(item => item.sourceId) },
-    importStatus: `${imported.length} Dachfläche(n) importiert${skipped ? `, ${skipped} Duplikat(e) übersprungen` : ''}.`
+    surfaces: nextSurfaces,
+    importedRainwaterSnapshot: {
+      importedAt: new Date().toISOString(),
+      sourceIds: [...incomingSourceIds]
+    },
+    importStatus: `${statusParts.join(', ')}.`
   };
 }
 
