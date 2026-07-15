@@ -89,46 +89,138 @@ export function deriveRetentionFactors(state = {}) {
   });
 }
 
+function storageValue(value) {
+  const number = Number(value);
+  return Number.isFinite(number) && number >= 0 ? number : null;
+}
+
+function combinedStorageModel({
+  planningVolumeM3,
+  dinVolumeM3,
+  dwaVolumeM3,
+  governingSource,
+  governingLabel,
+  governingReason,
+  status,
+  rule,
+  requiresDwaCheck
+}) {
+  return Object.freeze({
+    planningVolumeM3,
+    dinVolumeM3,
+    dwaVolumeM3,
+    governingSource,
+    governingLabel,
+    governingReason,
+    status,
+    rule,
+    requiresDwaCheck
+  });
+}
+
 export function deriveCombinedStorage(result = {}, authorityMode = false) {
-  const dinValue = Number(result.flooding?.governing?.valueM3);
-  const dwaValue = Number(result.retention?.governing?.volumeM3);
-  const dinVolumeM3 = Number.isFinite(dinValue) && dinValue >= 0 ? dinValue : null;
-  const dwaAvailable = Boolean(authorityMode && result.retention?.calculated);
-  const dwaVolumeM3 = dwaAvailable && Number.isFinite(dwaValue) && dwaValue >= 0 ? dwaValue : null;
+  const dinVolumeM3 = storageValue(result.flooding?.governing?.valueM3);
+  const dwaCalculated = Boolean(authorityMode && result.retention?.calculated);
+  const dwaVolumeM3 = dwaCalculated ? storageValue(result.retention?.governing?.volumeM3) : null;
   const requiresDwaCheck = Boolean(authorityMode);
 
+  if (!requiresDwaCheck) {
+    if (dinVolumeM3 == null) {
+      return combinedStorageModel({
+        planningVolumeM3: null,
+        dinVolumeM3,
+        dwaVolumeM3: null,
+        governingSource: 'unavailable',
+        governingLabel: 'Nachweis unvollständig',
+        governingReason: 'Der DIN-Überflutungsnachweis ist noch nicht vollständig. Ein planerischer Bemessungswert kann noch nicht ausgegeben werden.',
+        status: 'incomplete',
+        rule: 'Für diese Betriebsart ist kein Rückhalteraumnachweis nach DWA-A 117 erforderlich.',
+        requiresDwaCheck
+      });
+    }
+    return combinedStorageModel({
+      planningVolumeM3: dinVolumeM3,
+      dinVolumeM3,
+      dwaVolumeM3: null,
+      governingSource: 'din-1986-100',
+      governingLabel: 'DIN 1986-100',
+      governingReason: 'Für diese Betriebsart ist kein zusätzlicher Rückhalteraumnachweis nach DWA-A 117 erforderlich. Das DIN-Bemessungsvolumen ist für die Planung anzusetzen.',
+      status: 'din-only',
+      rule: 'DWA-A 117 nicht erforderlich; DIN 1986-100 ist maßgebend.',
+      requiresDwaCheck
+    });
+  }
+
   if (dinVolumeM3 == null && dwaVolumeM3 == null) {
-    return Object.freeze({
+    return combinedStorageModel({
       planningVolumeM3: null,
       dinVolumeM3,
       dwaVolumeM3,
       governingSource: 'unavailable',
-      requiresDwaCheck,
-      rule: 'Bemessungswert erst nach vollständigem DIN- und gegebenenfalls DWA-Nachweis verfügbar.'
+      governingLabel: 'Nachweis unvollständig',
+      governingReason: 'DIN- und DWA-A-117-Nachweis sind noch nicht vollständig. Ein planerischer Bemessungswert kann noch nicht ausgegeben werden.',
+      status: 'incomplete',
+      rule: 'Bemessungswert erst nach vollständigem DIN- und DWA-A-117-Nachweis verfügbar.',
+      requiresDwaCheck
     });
   }
 
-  if (dinVolumeM3 != null && dwaVolumeM3 != null) {
-    const equal = Math.abs(dinVolumeM3 - dwaVolumeM3) < 1e-9;
-    return Object.freeze({
-      planningVolumeM3: Math.max(dinVolumeM3, dwaVolumeM3),
+  if (dinVolumeM3 != null && dwaVolumeM3 == null) {
+    return combinedStorageModel({
+      planningVolumeM3: dinVolumeM3,
       dinVolumeM3,
       dwaVolumeM3,
-      governingSource: equal ? 'both' : (dinVolumeM3 > dwaVolumeM3 ? 'din-1986-100' : 'dwa-a-117'),
-      requiresDwaCheck,
-      rule: 'Für einen gemeinsamen Speicher ist der größere Volumenbedarf aus DIN 1986-100 und DWA-A 117 anzusetzen; die Volumina werden nicht addiert.'
+      governingSource: 'din-1986-100',
+      governingLabel: 'DIN 1986-100 – DWA-A 117 noch offen',
+      governingReason: 'Der DIN-Überflutungsnachweis ist vollständig. Der zusätzlich erforderliche DWA-A-117-Nachweis ist noch offen; der angezeigte Wert ist daher noch nicht abschließend.',
+      status: 'pending-dwa',
+      rule: 'Vorläufiger DIN-Bemessungswert; DWA-A 117 muss noch abgeschlossen werden.',
+      requiresDwaCheck
     });
   }
 
-  return Object.freeze({
-    planningVolumeM3: dinVolumeM3 ?? dwaVolumeM3,
+  if (dinVolumeM3 == null && dwaVolumeM3 != null) {
+    return combinedStorageModel({
+      planningVolumeM3: dwaVolumeM3,
+      dinVolumeM3,
+      dwaVolumeM3,
+      governingSource: 'dwa-a-117',
+      governingLabel: 'DWA-A 117 – DIN noch offen',
+      governingReason: 'Der DWA-A-117-Rückhalteraumnachweis ist vollständig. Der DIN-Überflutungsnachweis ist noch offen; der angezeigte Wert ist daher noch nicht abschließend.',
+      status: 'pending-din',
+      rule: 'Vorläufiger DWA-A-117-Bemessungswert; DIN 1986-100 muss noch abgeschlossen werden.',
+      requiresDwaCheck
+    });
+  }
+
+  const equal = Math.abs(dinVolumeM3 - dwaVolumeM3) < 1e-9;
+  if (equal) {
+    return combinedStorageModel({
+      planningVolumeM3: dinVolumeM3,
+      dinVolumeM3,
+      dwaVolumeM3,
+      governingSource: 'both',
+      governingLabel: 'DIN 1986-100 und DWA-A 117',
+      governingReason: 'Beide Nachweisverfahren führen zum gleichen erforderlichen Speichervolumen.',
+      status: 'complete',
+      rule: 'Beide Nachweise ergeben denselben Bemessungswert; die Volumina werden nicht addiert.',
+      requiresDwaCheck
+    });
+  }
+
+  const dinGoverns = dinVolumeM3 > dwaVolumeM3;
+  return combinedStorageModel({
+    planningVolumeM3: Math.max(dinVolumeM3, dwaVolumeM3),
     dinVolumeM3,
     dwaVolumeM3,
-    governingSource: dinVolumeM3 != null ? 'din-1986-100' : 'dwa-a-117',
-    requiresDwaCheck,
-    rule: dinVolumeM3 != null
-      ? (requiresDwaCheck ? 'DIN-Bemessungswert; der DWA-A-117-Nachweis ist noch nicht vollständig.' : 'DIN-Bemessungswert ist maßgebend.')
-      : 'DWA-A-117-Bemessungswert; der DIN-Nachweis ist noch nicht vollständig.'
+    governingSource: dinGoverns ? 'din-1986-100' : 'dwa-a-117',
+    governingLabel: dinGoverns ? 'DIN 1986-100' : 'DWA-A 117',
+    governingReason: dinGoverns
+      ? 'Das nach DIN 1986-100 erforderliche Speichervolumen ist größer als das Ergebnis nach DWA-A 117. Für die Planung ist daher das DIN-Bemessungsvolumen anzusetzen.'
+      : 'Der Rückhalteraumnachweis nach DWA-A 117 ergibt das größere erforderliche Speichervolumen. Dieses ist für die Planung maßgebend.',
+    status: 'complete',
+    rule: 'Für einen gemeinsamen Speicher ist der größere Volumenbedarf aus DIN 1986-100 und DWA-A 117 anzusetzen; die Volumina werden nicht addiert.',
+    requiresDwaCheck
   });
 }
 
