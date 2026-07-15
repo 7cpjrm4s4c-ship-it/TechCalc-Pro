@@ -13,8 +13,12 @@ const displayValue = (current, derived, fallback = '') => {
 export function buildCalculationDisplayState(state = {}, result = {}) {
   const retention = result.retention || {};
   const rain = retention.rainByDuration || {};
+  const effectiveRecurrence = retention.effectiveRecurrenceFrequencyPerYear;
   return {
     ...state,
+    retentionRecurrenceFrequencyPerYear: Number.isFinite(Number(effectiveRecurrence))
+      ? String(effectiveRecurrence).replace('.', ',')
+      : state.retentionRecurrenceFrequencyPerYear,
     retentionDryWeatherFlowLs: displayValue(state.retentionDryWeatherFlowLs, retention.dryWeatherFlowLs, '0'),
     retentionUpstreamThrottleFlowLs: displayValue(state.retentionUpstreamThrottleFlowLs, retention.upstreamThrottleFlowLs, '0'),
     retentionRainDuration5: displayValue(state.retentionRainDuration5, rain[5]),
