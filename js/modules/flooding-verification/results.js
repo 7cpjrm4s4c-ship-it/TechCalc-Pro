@@ -15,6 +15,34 @@ const floodingSourceLabel = source => ({
   'equation-21': 'Gleichung (21)'
 }[source] || '—');
 
+const normalizeDiagnostic = item => {
+  if (item && typeof item === 'object') return { severity: item.severity || 'hint', text: item.text || item.message || '' };
+  const text = String(item || '');
+  const severity = /(muss|fehlt|ungültig|unvollständig|nicht erfüllt)/i.test(text)
+    ? 'error'
+    : /(außerhalb|überschritten|kleiner|größer|begrenzt|Vorbemessung)/i.test(text)
+      ? 'warning'
+      : 'hint';
+  return { severity, text };
+};
+
+const diagnosticCards = items => {
+  const normalized = items.map(normalizeDiagnostic).filter(item => item.text);
+  const definitions = [
+    ['error', 'Fehler', 'Fehler'],
+    ['warning', 'Warnungen', 'Warnung'],
+    ['hint', 'Hinweise', 'Hinweis']
+  ];
+  return definitions
+    .map(([severity, title, prefix]) => ({
+      title,
+      prefix,
+      accent: 'green',
+      messages: normalized.filter(item => item.severity === severity).map(item => ({ prefix, text: item.text }))
+    }))
+    .filter(card => card.messages.length);
+};
+
 export function results(state = {}, result = {}) {
   const discharge = result.discharge || {};
   const flooding = result.flooding || {};
@@ -23,7 +51,6 @@ export function results(state = {}, result = {}) {
   const equation20 = flooding.equation20 || {};
   const equation21 = Array.isArray(flooding.equation21ByDuration) ? flooding.equation21ByDuration : [];
   const equation21Governing = flooding.equation21Governing || {};
-  const governing = flooding.governing || {};
   const applicability = evaluateDwa117Applicability({
     enabled: retention.active,
     dischargeMode: result.dischargeMode,
@@ -35,6 +62,9 @@ export function results(state = {}, result = {}) {
     reductionFactorFa: retention.reductionFactorFa
   });
   const retentionComparison = buildRetentionDurationComparison(retention.durationResults || []);
+  const governing = flooding.governing || {};
+  const applicationChecks = applicability.checks.filter(check => check.group === 'application-domain');
+  const faChecks = applicability.checks.filter(check => check.group === 'fa-validity');
 
   const groups = [
     {
@@ -94,17 +124,33 @@ export function results(state = {}, result = {}) {
   if (applicability.active) {
     groups.push({
       title: 'DWA-A 117 – Anwendungsprüfung',
-      rows: [
-        { label: 'Status', value: applicability.statusLabel },
-        { label: 'Berechnung durchgeführt', value: retention.calculated ? 'ja' : 'nein' },
-        { label: 'Uneingeschränkt anwendbar', value: applicability.unrestricted ? 'ja' : 'nein' },
-        { label: 'Einzugsgebietsfläche', value: applicability.catchmentAreaHa != null ? fmt(applicability.catchmentAreaHa, 3) : '—', unit: applicability.catchmentAreaHa != null ? 'ha' : '' },
-        { label: 'Fließzeit', value: applicability.flowTimeMinutes != null ? fmt(applicability.flowTimeMinutes, 1) : '—', unit: applicability.flowTimeMinutes != null ? 'min' : '' },
-        { label: 'Überschreitungshäufigkeit n', value: applicability.recurrenceFrequencyPerYear != null ? fmt(applicability.recurrenceFrequencyPerYear, 2) : '—', unit: applicability.recurrenceFrequencyPerYear != null ? '1/a' : '' },
-        { label: 'qDr,R,u', value: applicability.throttleRainShareLsHa != null ? fmt(applicability.throttleRainShareLsHa, 2) : '—', unit: applicability.throttleRainShareLsHa != null ? 'l/(s·ha)' : '' },
-        { label: 'Zuschlagsfaktor fz', value: retention.surchargeFactorFz > 0 ? fmt(retention.surchargeFactorFz, 2) : '—' },
-        { label: 'Abminderungsfaktor fA', value: retention.reductionFactorFa > 0 ? fmt(retention.reductionFactorFa, 3) : '—' },
-        ...applicability.checks.map(check => ({ label: check.label, value: check.passed ? 'erfüllt' : 'nicht erfüllt' }))
+      groups: [
+        {
+          title: 'Anwendungsbereich',
+          rows: [
+            { label: 'Status', value: applicability.statusLabel },
+            { label: 'Einzugsgebietsfläche', value: applicability.catchmentAreaHa != null ? fmt(applicability.catchmentAreaHa, 3) : '—', unit: applicability.catchmentAreaHa != null ? 'ha' : '' },
+            { label: 'Fließzeit', value: applicability.flowTimeMinutes != null ? fmt(applicability.flowTimeMinutes, 1) : '—', unit: applicability.flowTimeMinutes != null ? 'min' : '' },
+            { label: 'Überschreitungshäufigkeit n', value: applicability.recurrenceFrequencyPerYear != null ? fmt(applicability.recurrenceFrequencyPerYear, 2) : '—', unit: applicability.recurrenceFrequencyPerYear != null ? '1/a' : '' },
+            { label: 'qDr,R,u', value: applicability.throttleRainShareLsHa != null ? fmt(applicability.throttleRainShareLsHa, 2) : '—', unit: applicability.throttleRainShareLsHa != null ? 'l/(s·ha)' : '' },
+            ...applicationChecks.map(check => ({ label: check.label, value: check.passed ? 'erfüllt' : 'nicht erfüllt' }))
+          ]
+        },
+        {
+          title: 'Gültigkeit fA',
+          rows: [
+            { label: 'Abminderungsfaktor fA', value: retention.reductionFactorFa > 0 ? fmt(retention.reductionFactorFa, 3) : '—' },
+            ...faChecks.map(check => ({ label: check.label, value: check.passed ? 'erfüllt' : 'nicht erfüllt' }))
+          ]
+        },
+        {
+          title: 'Berechnung',
+          rows: [
+            { label: 'Berechnung durchgeführt', value: retention.calculated ? 'ja' : 'nein' },
+            { label: 'Uneingeschränkt anwendbar', value: applicability.unrestricted ? 'ja' : 'nein' },
+            { label: 'Zuschlagsfaktor fz', value: retention.surchargeFactorFz > 0 ? fmt(retention.surchargeFactorFz, 2) : '—' }
+          ]
+        }
       ],
       accent: 'green'
     });
@@ -114,33 +160,29 @@ export function results(state = {}, result = {}) {
     groups.push({
       title: 'DWA-A 117 – Dauerstufenvergleich',
       rows: retentionComparison.rows.length ? retentionComparison.rows.map(item => ({
-        label: `${item.durationMinutes} min · r ${fmt(item.rainIntensityLsHa, 1)} l/(s·ha)${item.isGoverning ? ' · maßgebend' : ''}`,
+        label: `${item.durationMinutes} min · r ${item.rainIntensityLsHa != null ? fmt(item.rainIntensityLsHa, 1) : '—'} l/(s·ha) · Vs,u ${item.specificStorageM3Ha != null ? fmt(item.specificStorageM3Ha, 2) : '—'} m³/ha · ${item.statusLabel}`,
         value: item.valid ? fmt(item.volumeM3, 2) : '—',
         unit: item.valid ? 'm³' : ''
-      })) : [{ label: 'Status', value: 'Bemessungshäufigkeit, Fließzeit oder Regenspenden fehlen beziehungsweise fA liegt außerhalb des Gültigkeitsbereichs.' }],
+      })) : [{ label: 'Status', value: 'Dauerstufenvergleich unvollständig' }],
       accent: 'green'
     });
     groups.push({
       title: 'DWA-A 117 – Maßgebende Dauerstufe',
       rows: [
-        { label: 'Dauerstufen geprüft', value: String(retentionComparison.durationCount) },
-        { label: 'Dauerstufen gültig', value: String(retentionComparison.validDurationCount) },
         { label: 'Maßgebende Dauer', value: retentionComparison.governing ? String(retentionComparison.governing.durationMinutes) : '—', unit: retentionComparison.governing ? 'min' : '' },
         { label: 'Regenspende r(D,n)', value: retentionComparison.governing ? fmt(retentionComparison.governing.rainIntensityLsHa, 1) : '—', unit: retentionComparison.governing ? 'l/(s·ha)' : '' },
-        { label: 'qDr,R,u', value: retentionComparison.governing ? fmt(retentionComparison.governing.throttleRainShareLsHa, 2) : '—', unit: retentionComparison.governing ? 'l/(s·ha)' : '' },
-        { label: 'Zuschlagsfaktor fz', value: retentionComparison.governing ? fmt(retentionComparison.governing.surchargeFactorFz, 3) : '—' },
-        { label: 'Abminderungsfaktor fA', value: retentionComparison.governing ? fmt(retentionComparison.governing.reductionFactorFa, 3) : '—' },
         { label: 'Spezifisches Speichervolumen Vs,u', value: retentionComparison.governing ? fmt(retentionComparison.governing.specificStorageM3Ha, 2) : '—', unit: retentionComparison.governing ? 'm³/ha' : '' },
-        { label: 'Maßgebendes Rückhaltevolumen', value: retentionComparison.governing ? fmt(retentionComparison.governing.volumeM3, 2) : '—', unit: retentionComparison.governing ? 'm³' : '' }
+        { label: 'Maßgebendes Rückhaltevolumen', value: retentionComparison.governing ? fmt(retentionComparison.governing.volumeM3, 2) : '—', unit: retentionComparison.governing ? 'm³' : '' },
+        { label: 'Status', value: retentionComparison.governing?.statusLabel || 'unvollständig' }
       ],
       accent: 'green'
     });
   }
 
-  const diagnosticMessages = [
+  const diagnostics = [
     ...(Array.isArray(result.warnings) ? result.warnings : []),
-    ...applicability.messages,
-    ...retentionComparison.messages
+    ...(applicability.diagnostics || applicability.messages || []),
+    ...(retentionComparison.diagnostics || retentionComparison.messages || [])
   ];
   const dwaDuration = retentionComparison.governing?.durationMinutes;
 
@@ -157,6 +199,7 @@ export function results(state = {}, result = {}) {
         { label: 'DIN 1986-100', value: combinedStorage.dinVolumeM3 != null ? fmt(combinedStorage.dinVolumeM3, 2) : '—', unit: combinedStorage.dinVolumeM3 != null ? 'm³' : '' },
         { label: 'DWA-A 117', value: combinedStorage.dwaVolumeM3 != null ? fmt(combinedStorage.dwaVolumeM3, 2) : (retention.active ? 'unvollständig' : 'nicht erforderlich'), unit: combinedStorage.dwaVolumeM3 != null ? 'm³' : '' },
         { label: 'Begründung', value: combinedStorage.governingReason || 'Die Nachweise sind noch nicht vollständig.' },
+        { label: 'Maßgebende Gleichung DIN', value: floodingSourceLabel(governing.source) },
         { label: 'Maßgebende Regendauer DIN', value: equation20.valid ? String(equation20.durationMinutes) : '—', unit: equation20.valid ? 'min' : '' },
         { label: 'Maßgebende Dauer DWA', value: dwaDuration != null ? String(dwaDuration) : '—', unit: dwaDuration != null ? 'min' : '' },
         { label: 'Kritischer Flächenanteil', value: fmt((result.criticalShare || 0) * 100, 1), unit: '%' }
@@ -164,12 +207,7 @@ export function results(state = {}, result = {}) {
       accent: 'green'
     },
     groups,
-    notices: [{
-      title: 'Hinweise und Diagnose',
-      messages: diagnosticMessages,
-      accent: 'green',
-      emptyText: 'Überflutungsnachweis, DWA-A-117-Berechnung und Dauerstufenvergleich sind vollständig und valide.'
-    }]
+    notices: diagnosticCards(diagnostics)
   };
 }
 
