@@ -89,6 +89,48 @@ export function deriveRetentionFactors(state = {}) {
   });
 }
 
+export function buildCombinedStorageResult(base = {}, retention = {}) {
+  const dinValue = base.floodingCalculationAvailable
+    ? Number(base.flooding?.governing?.valueM3)
+    : NaN;
+  const dwaValue = retention.calculated
+    ? Number(retention.governing?.volumeM3)
+    : NaN;
+  const dinVolumeM3 = Number.isFinite(dinValue) && dinValue >= 0 ? dinValue : null;
+  const dwaVolumeM3 = Number.isFinite(dwaValue) && dwaValue >= 0 ? dwaValue : null;
+
+  if (dinVolumeM3 == null && dwaVolumeM3 == null) {
+    return Object.freeze({
+      planningVolumeM3: null,
+      dinVolumeM3,
+      dwaVolumeM3,
+      governingSource: 'unavailable',
+      rule: 'Bemessungswert erst nach vollständigem DIN- und gegebenenfalls DWA-Nachweis verfügbar.'
+    });
+  }
+
+  if (dinVolumeM3 != null && dwaVolumeM3 != null) {
+    const equal = Math.abs(dinVolumeM3 - dwaVolumeM3) < 1e-9;
+    return Object.freeze({
+      planningVolumeM3: Math.max(dinVolumeM3, dwaVolumeM3),
+      dinVolumeM3,
+      dwaVolumeM3,
+      governingSource: equal ? 'both' : (dinVolumeM3 > dwaVolumeM3 ? 'din-1986-100' : 'dwa-a-117'),
+      rule: 'Für einen gemeinsamen Speicher ist der größere Volumenbedarf aus DIN 1986-100 und DWA-A 117 anzusetzen; die Volumina werden nicht addiert.'
+    });
+  }
+
+  return Object.freeze({
+    planningVolumeM3: dinVolumeM3 ?? dwaVolumeM3,
+    dinVolumeM3,
+    dwaVolumeM3,
+    governingSource: dinVolumeM3 != null ? 'din-1986-100' : 'dwa-a-117',
+    rule: dinVolumeM3 != null
+      ? 'DIN-Bemessungswert; der DWA-A-117-Nachweis ist noch nicht vollständig.'
+      : 'DWA-A-117-Bemessungswert; der DIN-Nachweis ist noch nicht vollständig.'
+  });
+}
+
 export function calculate(state = {}) {
   const authorityMode = state.dischargeMode === 'authority-discharge-limit';
   const rainInput = resolveRetentionRainInput(state);
@@ -107,6 +149,25 @@ export function calculate(state = {}) {
     retentionReductionFactorFa: factors.reductionFactorFa ?? ''
   };
   const base = calculateBase(adaptedState);
+  const retention = Object.freeze({
+    ...(base.retention || {}),
+    rainByDuration: rainInput.rainByDuration,
+    requestedRecurrenceFrequencyPerYear: rainInput.requestedRecurrence,
+    effectiveRecurrenceFrequencyPerYear: rainInput.effectiveRecurrence,
+    automaticTwoYearFallback: rainInput.automaticTwoYearFallback,
+    surchargeFactorFz: factors.surchargeFactorFz,
+    reductionFactorFa: factors.reductionFactorFa,
+    reductionFactorValid: factors.reductionFactorValid,
+    reductionFactorWithinDomain: factors.reductionFactorWithinDomain,
+    dryWeatherFlowLs: factors.dryWeatherFlowLs,
+    upstreamThrottleFlowLs: factors.upstreamThrottleFlowLs,
+    factorSource: Object.freeze({
+      surcharge: 'DWA-A 117 Tabelle 2',
+      reduction: factors.reductionFactorSource,
+      riskClass: state.retentionRiskClass || 'medium',
+      rain: rainInput.source
+    })
+  });
   const warnings = Array.isArray(base.warnings)
     ? base.warnings.filter(message => {
         if (message === 'Bei behördlicher Einleitungsbegrenzung ist zusätzlich der Rückhaltenachweis nach DWA-A 117 zu führen.') return false;
@@ -124,25 +185,8 @@ export function calculate(state = {}) {
 
   return Object.freeze({
     ...base,
-    retention: Object.freeze({
-      ...(base.retention || {}),
-      rainByDuration: rainInput.rainByDuration,
-      requestedRecurrenceFrequencyPerYear: rainInput.requestedRecurrence,
-      effectiveRecurrenceFrequencyPerYear: rainInput.effectiveRecurrence,
-      automaticTwoYearFallback: rainInput.automaticTwoYearFallback,
-      surchargeFactorFz: factors.surchargeFactorFz,
-      reductionFactorFa: factors.reductionFactorFa,
-      reductionFactorValid: factors.reductionFactorValid,
-      reductionFactorWithinDomain: factors.reductionFactorWithinDomain,
-      dryWeatherFlowLs: factors.dryWeatherFlowLs,
-      upstreamThrottleFlowLs: factors.upstreamThrottleFlowLs,
-      factorSource: Object.freeze({
-        surcharge: 'DWA-A 117 Tabelle 2',
-        reduction: factors.reductionFactorSource,
-        riskClass: state.retentionRiskClass || 'medium',
-        rain: rainInput.source
-      })
-    }),
+    retention,
+    combinedStorage: buildCombinedStorageResult(base, retention),
     warnings: Object.freeze(warnings)
   });
 }
