@@ -1,3 +1,5 @@
+import { buildFloodingPlausibilityModel } from './plausibilityModel.js';
+
 const PRIORITY = Object.freeze({ error: 0, warning: 1, recommendation: 2, hint: 3 });
 
 const textOf = item => String(item?.text || item?.message || item || '').trim();
@@ -27,10 +29,12 @@ const summarize = (entries, fallback) => {
 
 export function buildFloodingDiagnosticModel({ result = {}, applicability = {}, retentionComparison = {} } = {}) {
   const combined = result.combinedStorage || {};
+  const plausibility = buildFloodingPlausibilityModel({ result, applicability });
   const sourceMessages = [
     ...(Array.isArray(result.warnings) ? result.warnings : []),
     ...(applicability.diagnostics || applicability.messages || []),
-    ...(retentionComparison.diagnostics || retentionComparison.messages || [])
+    ...(retentionComparison.diagnostics || retentionComparison.messages || []),
+    ...plausibility.messages
   ];
   const messages = normalize(sourceMessages);
 
@@ -57,12 +61,12 @@ export function buildFloodingDiagnosticModel({ result = {}, applicability = {}, 
     complete: 'Berechnung erfolgreich'
   })[status];
   const statusReason = status === 'complete'
-    ? 'Alle erforderlichen Nachweise sind vollständig und innerhalb der dokumentierten Anwendungsgrenzen.'
+    ? 'Alle erforderlichen Nachweise sind vollständig, plausibel und innerhalb der dokumentierten Anwendungsgrenzen.'
     : status === 'outside-domain'
       ? summarize([...errors, ...warnings], 'Mindestens eine Anwendungsgrenze des einfachen Verfahrens ist überschritten.')
       : status === 'complete-with-warnings'
-        ? summarize(warnings, 'Ein Planungswert liegt vor; ergänzende Hinweise oder Prüfungen sind zu beachten.')
-        : summarize(errors, 'Mindestens ein erforderlicher Nachweis oder Eingabeblock ist noch nicht vollständig.');
+        ? summarize(warnings, 'Ein Planungswert liegt vor; ergänzende Plausibilitätsprüfungen sind zu beachten.')
+        : summarize(errors, 'Mindestens ein erforderlicher Nachweis, Eingabeblock oder Plausibilitätscheck ist noch nicht vollständig erfüllt.');
 
   const notices = [
     ['error', 'Fehler', 'Fehler', errors],
@@ -80,6 +84,7 @@ export function buildFloodingDiagnosticModel({ result = {}, applicability = {}, 
     status,
     statusLabel,
     statusReason,
+    plausibility,
     counts: Object.freeze({ errors: errors.length, warnings: warnings.length, recommendations: recommendations.length, hints: hints.length }),
     messages: Object.freeze({ errors: Object.freeze(errors), warnings: Object.freeze(warnings), recommendations: Object.freeze(recommendations), hints: Object.freeze(hints) }),
     notices: Object.freeze(notices)
