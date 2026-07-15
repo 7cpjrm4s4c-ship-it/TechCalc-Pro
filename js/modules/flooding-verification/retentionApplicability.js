@@ -11,6 +11,9 @@ const STATUS_LABELS = Object.freeze({
   'long-term-simulation-required': 'Langzeitsimulation erforderlich'
 });
 
+const freezeChecks = checks => Object.freeze(checks.map(check => Object.freeze(check)));
+const freezeMessages = messages => Object.freeze(messages.map(message => Object.freeze(message)));
+
 export function evaluateDwa117Applicability({
   enabled = false,
   dischargeMode = '',
@@ -58,44 +61,50 @@ export function evaluateDwa117Applicability({
       recurrenceFrequencyPerYear: n,
       throttleRainShareLsHa: qDr,
       checks: Object.freeze([]),
-      messages: Object.freeze([`Für die Anwendungsprüfung fehlen: ${missing.join(', ')}.`])
+      messages: freezeMessages([{ severity: 'error', text: `Für die Anwendungsprüfung fehlen: ${missing.join(', ')}.` }])
     });
   }
 
   const checks = [
     {
       key: 'catchment-or-flow-time',
+      group: 'application-domain',
       label: 'Einzugsgebiet ≤ 200 ha oder Fließzeit ≤ 15 min',
       passed: area <= 200 || flowTime <= 15,
       severity: 'hard'
     },
     {
       key: 'recurrence-minimum',
+      group: 'application-domain',
       label: 'Überschreitungshäufigkeit n ≥ 0,1/a',
       passed: n >= 0.1,
       severity: 'hard'
     },
     {
       key: 'throttle-minimum',
+      group: 'application-domain',
       label: 'qDr,R,u ≥ 2 l/(s·ha)',
       passed: qDr >= 2,
       severity: 'hard'
     },
     {
       key: 'fa-flow-time-domain',
-      label: 'fA-Gültigkeit: 0 ≤ tf ≤ 30 min',
+      group: 'fa-validity',
+      label: '0 ≤ tf ≤ 30 min',
       passed: flowTime >= 0 && flowTime <= 30,
       severity: 'empirical'
     },
     {
       key: 'fa-throttle-domain',
-      label: 'fA-Gültigkeit: 2 ≤ qDr,R,u ≤ 40 l/(s·ha)',
+      group: 'fa-validity',
+      label: '2 ≤ qDr,R,u ≤ 40 l/(s·ha)',
       passed: qDr >= 2 && qDr <= 40,
       severity: 'empirical'
     },
     {
       key: 'fa-frequency-domain',
-      label: 'fA-Gültigkeit: 0,1 ≤ n ≤ 1,0/a',
+      group: 'fa-validity',
+      label: '0,1 ≤ n ≤ 1,0/a',
       passed: n >= 0.1 && n <= 1,
       severity: 'empirical'
     }
@@ -115,8 +124,8 @@ export function evaluateDwa117Applicability({
       flowTimeMinutes: flowTime,
       recurrenceFrequencyPerYear: n,
       throttleRainShareLsHa: qDr,
-      checks: Object.freeze(checks.map(check => Object.freeze(check))),
-      messages: Object.freeze(['Der Abminderungsfaktor fA konnte trotz gültiger Eingangsgrößen nicht bestimmt werden.'])
+      checks: freezeChecks(checks),
+      messages: freezeMessages([{ severity: 'error', text: 'Der Abminderungsfaktor fA konnte trotz gültiger Eingangsgrößen nicht bestimmt werden.' }])
     });
   }
 
@@ -127,8 +136,8 @@ export function evaluateDwa117Applicability({
       : 'applicable';
 
   const messages = [
-    ...hardFailures.map(check => `${check.label} ist nicht erfüllt.`),
-    ...empiricalFailures.map(check => `${check.label} ist überschritten; das einfache Verfahren ist nur zur Vorbemessung zu verwenden.`)
+    ...hardFailures.map(check => ({ severity: 'error', text: `${check.label} ist nicht erfüllt.` })),
+    ...empiricalFailures.map(check => ({ severity: 'warning', text: `${check.label} ist überschritten; das einfache Verfahren ist nur zur Vorbemessung zu verwenden.` }))
   ];
 
   return Object.freeze({
@@ -140,8 +149,8 @@ export function evaluateDwa117Applicability({
     flowTimeMinutes: flowTime,
     recurrenceFrequencyPerYear: n,
     throttleRainShareLsHa: qDr,
-    checks: Object.freeze(checks.map(check => Object.freeze(check))),
-    messages: Object.freeze(messages)
+    checks: freezeChecks(checks),
+    messages: freezeMessages(messages)
   });
 }
 
