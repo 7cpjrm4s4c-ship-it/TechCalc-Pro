@@ -3,7 +3,13 @@ import { areaTypes, dnOrder } from '../../shared/rainwaterDomainTables.js';
 import { surchargeFactorFromRiskClass } from './retentionFactors.js';
 
 const KOSTRA_URL = 'https://www.openko.de';
-const areaOptions = areaTypes.map(item => ({ value: item.id, label: item.name }));
+const splitIndex = areaTypes.findIndex(item => item.id === 'concrete-asphalt');
+const customAreaTypes = areaTypes.filter(item => item.custom);
+const roofAreaTypes = areaTypes.filter((item, index) => !item.custom && (splitIndex < 0 || index < splitIndex));
+const propertyAreaTypes = areaTypes.filter((item, index) => !item.custom && (splitIndex < 0 || index >= splitIndex));
+const areaOptionsForCategory = category => (category === 'property' ? propertyAreaTypes : roofAreaTypes)
+  .concat(customAreaTypes)
+  .map(item => ({ value: item.id, label: item.name }));
 const categoryOptions = [{ value: 'roof', label: 'Dachfläche' }, { value: 'property', label: 'Grundstücksfläche' }];
 const durationModeOptions = [{ value: 'automatic', label: 'Automatisch' }, { value: 'manual', label: 'Manuell' }];
 const durationOptions = [{ value: '5', label: '5 min' }, { value: '10', label: '10 min' }, { value: '15', label: '15 min' }];
@@ -32,15 +38,13 @@ const tableMode = state => ['table-existing-pipe', 'table-size-pipe'].includes(s
 const existingPipeMode = state => state.dischargeMode === 'table-existing-pipe';
 const manualFlowMode = state => state.dischargeMode === 'manual-full-flow';
 const authorityMode = state => state.dischargeMode === 'authority-discharge-limit';
-const retentionAfterHtml = state => authorityMode(state)
-  ? '<div class="empty-state empty-state--compact">Der Rückhalteraumnachweis ist bei behördlicher Einleitungsbegrenzung automatisch aktiv. n ist eine projektspezifische Bemessungsvorgabe; fz und fA werden automatisch nach DWA-A 117 bestimmt. Trockenwetterabfluss und vorgeschalteter Drosselabfluss sind nur einzutragen, wenn diese Abflüsse im konkreten Projekt vorhanden sind; andernfalls bleiben beide Werte 0 l/s.</div>'
-  : '';
+const retentionScopeNotice = 'Der Rückhalteraumnachweis ist bei behördlicher Einleitungsbegrenzung automatisch aktiv. n ist eine projektspezifische Bemessungsvorgabe; fz und fA werden automatisch nach DWA-A 117 bestimmt. Trockenwetterabfluss und vorgeschalteter Drosselabfluss sind nur einzutragen, wenn diese Abflüsse im konkreten Projekt vorhanden sind; andernfalls bleiben beide Werte 0 l/s.';
 
 export const floodingSurfaceSchema = defineFormSchema({
   fields: [
     { key: 'projectName', label: 'Bezeichnung', type: FIELD_TYPES.TEXT, placeholder: 'z. B. Grundstück Musterstraße 1' },
     { key: 'surfaceCategory', label: 'Flächengruppe', type: FIELD_TYPES.SEGMENT, options: categoryOptions, accent: 'green', action: 'platform:segment:surfaceCategory' },
-    { key: 'surfaceAreaType', label: 'Flächenart', type: FIELD_TYPES.SELECT, options: areaOptions, commit: 'immediate', lookup: true },
+    { key: 'surfaceAreaType', label: 'Flächenart', type: FIELD_TYPES.SELECT, options: state => areaOptionsForCategory(state.surfaceCategory || 'roof'), commit: 'immediate', lookup: true },
     { key: 'surfaceArea', label: 'Fläche A', type: FIELD_TYPES.DECIMAL, unit: 'm²', default: '100' },
     { key: 'surfaceCs', label: 'Spitzenabflussbeiwert Cₛ', type: FIELD_TYPES.DECIMAL },
     { key: 'surfaceCm', label: 'Mittlerer Abflussbeiwert Cₘ', type: FIELD_TYPES.DECIMAL },
@@ -90,14 +94,15 @@ export const floodingCalculationSchema = defineFormSchema({
     { key: 'retentionUpstreamThrottleFlowLs', label: 'Vorgeschalteter Drosselabfluss (optional)', type: FIELD_TYPES.DECIMAL, unit: 'l/s', visibleWhen: authorityMode },
     { key: 'retentionRainDuration5', label: 'r(5,n)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)', visibleWhen: authorityMode },
     { key: 'retentionRainDuration10', label: 'r(10,n)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)', visibleWhen: authorityMode },
-    { key: 'retentionRainDuration15', label: 'r(15,n)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)', visibleWhen: authorityMode }
+    { key: 'retentionRainDuration15', label: 'r(15,n)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)', visibleWhen: authorityMode },
+    { key: 'retentionScopeNotice', label: 'Hinweis DWA-A 117', type: FIELD_TYPES.NOTICE, text: retentionScopeNotice, tone: 'compact', visibleWhen: authorityMode }
   ],
   groups: [
     { title: 'Regenspenden', fields: ['rainR2Duration5', 'rainR2Duration10', 'rainR2Duration15', 'rainR30Duration5', 'rainR30Duration10', 'rainR30Duration15', 'rainR100Duration5'], columns: 2, accent: 'green', actions: [{ label: 'KOSTRA / OpenKo Daten öffnen', href: KOSTRA_URL, variant: 'secondary' }] },
     { title: 'Quellenangaben Regendaten', fields: ['rainSourceDataset', 'rainSourceLocation', 'rainSourceVersion'], columns: 2, accent: 'green' },
     { title: 'Gelände und Regendauer', fields: ['meanSlopePercent', 'rainDurationMode', 'manualRainDuration', 'manualRainDurationReason', 'durationNotice'], columns: 2, accent: 'green' },
     { title: 'Leitungs- und Abflussnachweis', fields: ['dischargeMode', 'pipeNominalDiameterDn', 'pipeSlopePercent', 'manualFullFlowLs', 'manualFullFlowSource', 'authorityLimitLs', 'authorityName', 'authorityReference', 'authorityDate', 'authoritySourceNote', 'dischargeNotice'], columns: 2, accent: 'green' },
-    { title: 'Rückhalteraumnachweis nach DWA-A 117', fields: ['retentionRecurrenceFrequencyPerYear', 'retentionRiskClass', 'retentionFlowTimeMinutes', 'retentionAutomaticFz', 'retentionAutomaticFa', 'retentionDryWeatherFlowLs', 'retentionUpstreamThrottleFlowLs', 'retentionRainDuration5', 'retentionRainDuration10', 'retentionRainDuration15'], columns: 2, accent: 'green', visibleWhen: authorityMode, afterHtml: retentionAfterHtml }
+    { title: 'Rückhalteraumnachweis nach DWA-A 117', fields: ['retentionRecurrenceFrequencyPerYear', 'retentionRiskClass', 'retentionFlowTimeMinutes', 'retentionAutomaticFz', 'retentionAutomaticFa', 'retentionDryWeatherFlowLs', 'retentionUpstreamThrottleFlowLs', 'retentionRainDuration5', 'retentionRainDuration10', 'retentionRainDuration15', 'retentionScopeNotice'], columns: 2, accent: 'green', visibleWhen: authorityMode }
   ]
 });
 
