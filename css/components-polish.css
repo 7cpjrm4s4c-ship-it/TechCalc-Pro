@@ -135,6 +135,20 @@ textarea:focus-visible,
   gap: var(--tc-gap);
 }
 
+/* Form-schema contract: explanatory content and actions describe the whole
+   field group and therefore span every configured schema column. */
+.tc-fields > .empty-state,
+.tc-fields > .tc-action-row,
+.tc-fields > .inline-stats {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+.tc-fields > .tc-action-row {
+  display: flex;
+  align-items: center;
+}
+
 /* German copy contract: preserve complete words and let the browser use the
    document language (html[lang="de"]) for orthographically correct hyphenation. */
 .card :where(p, span, strong, small, label, li, td, th, h1, h2, h3, h4),
