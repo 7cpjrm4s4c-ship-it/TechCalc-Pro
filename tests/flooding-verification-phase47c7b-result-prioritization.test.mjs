@@ -75,6 +75,17 @@ test('47C.7B groups applicability, compacts governing result and prioritizes dia
   assert.equal(governingGroup.rows.length, 5);
   assert.equal(governingGroup.rows.find(row => row.label === 'Status').value, 'maßgebend');
 
+  assert.equal(model.primary.rows.length, 8);
+  assert.deepEqual(model.primary.rows.slice(0, 5).map(row => row.label), [
+    'Maßgebender Nachweis',
+    'DIN 1986-100',
+    'DWA-A 117',
+    'Maßgebende Gleichung DIN',
+    'Maßgebende Regendauer DIN'
+  ]);
+  assert.equal(model.primary.rows.at(-1).label, 'Begründung');
+  assert.equal(model.primary.rows.at(-1).span, 3);
+
   assert.deepEqual(model.notices.map(notice => notice.title), ['Warnungen']);
   assert.equal(model.notices[0].messages[0].prefix, 'Warnung');
 });
