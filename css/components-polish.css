@@ -19,6 +19,8 @@
   --tc-focus-ring-strong: 0 0 0 1px var(--tc-active-accent, var(--accent-blue)), var(--tc-focus-ring);
   --tc-touch-target-min: 44px;
   --tc-card-title-gap: calc(var(--tc-gap) * 0.5);
+  --tc-card-content-gap: var(--tc-gap);
+  --tc-card-stack-gap: var(--tc-gap);
   --tc-result-row-min-height: 48px;
   --tc-result-row-padding-block: calc(var(--tc-gap) * 0.75);
   --tc-result-label-column: minmax(180px, 42%);
@@ -93,6 +95,29 @@ label,
 .settings-submenu,
 .release-note {
   border-radius: var(--tc-radius-card);
+}
+
+/* Central card rhythm: title-to-content spacing is deliberately tighter than
+   the spacing between independent content blocks and sibling cards. */
+.card,
+.tc-card,
+.result-card {
+  gap: var(--tc-card-title-gap);
+}
+
+.card__body,
+.tc-card__body,
+.result-card__body {
+  gap: var(--tc-card-content-gap);
+}
+
+.tc-stack,
+.tc-stack--section,
+.module-content > .span-4,
+.module-content > .span-6,
+.module-content > .span-8,
+.module-content > .span-12 {
+  gap: var(--tc-card-stack-gap);
 }
 
 .card > :first-child,
@@ -209,10 +234,17 @@ label,
   line-height: var(--tc-result-copy-line-height);
 }
 
-/* Result groups may contain nested result cards. They use the same vertical
-   rhythm as top-level cards instead of collapsing into each other. */
-.result-group > .card + .card {
-  margin-top: var(--tc-gap);
+/* Nested result cards participate in the same grid rhythm as top-level cards.
+   Grid gap covers table-to-card and card-to-card spacing without ad-hoc margins. */
+.result-group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--tc-card-stack-gap);
+  min-width: 0;
+}
+
+.result-group > .card {
+  margin: 0;
 }
 
 .module-nav__track,
