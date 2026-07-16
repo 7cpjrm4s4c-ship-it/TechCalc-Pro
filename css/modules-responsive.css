@@ -9,12 +9,16 @@
   .module-view[data-module="flooding-verification"] .inline-stats {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
-  .module-view[data-module="flooding-verification"] .inline-stats > .inline-stat:nth-child(4) {
+  .module-view[data-module="flooding-verification"] .inline-stats > .inline-stat--span-3 {
     grid-column: span 3;
   }
   .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-row {
-    grid-template-columns: minmax(210px, 28%) minmax(0, 1fr);
+    grid-template-columns: 220px minmax(0, 1fr);
     align-items: start;
+  }
+  .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-row > span,
+  .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-row > strong {
+    min-width: 0;
   }
   .module-view[data-module="flooding-verification"] .result-group--nachweisstatus .result-row {
     grid-template-columns: max-content minmax(0, 1fr);
