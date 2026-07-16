@@ -13,7 +13,7 @@
     grid-column: span 3;
   }
   .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-list {
-    --interpretation-label-width: 280px;
+    --interpretation-label-width: 200px;
   }
   .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-row {
     grid-template-columns: var(--interpretation-label-width) minmax(0, 1fr);
