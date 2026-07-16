@@ -26,7 +26,8 @@ const tests = [
   'tests/flooding-verification-phase47c7c-diagnostics.test.mjs',
   'tests/flooding-verification-phase47c7d-interpretation.test.mjs',
   'tests/flooding-verification-phase47c7e-plausibility.test.mjs',
-  'tests/flooding-verification-phase47c7f-regression-gate.test.mjs'
+  'tests/flooding-verification-phase47c7f-regression-gate.test.mjs',
+  'tests/flooding-verification-phase47c81-ui-harmonization.test.mjs'
 ];
 
 for (const file of tests) {
