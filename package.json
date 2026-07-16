@@ -10,6 +10,7 @@
     "test:flooding": "node scripts/test-flooding-verification-phase47c.mjs",
     "test:integration": "node scripts/test-integration.mjs",
     "test:e2e": "playwright test",
+    "test:visual:flooding": "playwright test tests/e2e/flooding-verification-visual-regression.spec.mjs",
     "serve:static": "node scripts/serve-static.mjs",
     "audit:imports": "node scripts/check-js-imports.mjs",
     "build:minified": "node scripts/generate-precache-manifest.mjs && node scripts/check-js-imports.mjs && node scripts/minify-static-assets.mjs",
