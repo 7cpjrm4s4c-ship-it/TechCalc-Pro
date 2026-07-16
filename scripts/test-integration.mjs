@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 const commands = [
   ['node', ['scripts/generate-precache-manifest.mjs', '--check']],
   ['node', ['scripts/check-js-imports.mjs']],
+  ['node', ['scripts/test-flooding-verification-phase47c.mjs']],
   ['node', ['scripts/audit-package-script-hygiene-phase39a.mjs']],
   ['node', ['scripts/audit-service-worker-version-injection-phase39c.mjs']],
   ['node', ['scripts/audit-core-module-preload-phase39d.mjs']],
