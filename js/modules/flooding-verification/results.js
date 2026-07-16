@@ -17,6 +17,26 @@ const floodingSourceLabel = source => ({
   'equation-21': 'Gleichung (21)'
 }[source] || '—');
 
+const RESULT_GROUP_ORDER = Object.freeze([
+  'Planerische Interpretation',
+  'Leitungs- und Abflussnachweis',
+  'Nachweisstatus',
+  'Gleichung (20)',
+  'Gleichung (21) – Dauerstufenvergleich',
+  'Berechnungsgrundlagen',
+  'DWA-A 117 – Anwendungsprüfung',
+  'DWA-A 117 – Dauerstufenvergleich',
+  'DWA-A 117 – Maßgebende Dauerstufe'
+]);
+
+const orderResultGroups = groups => [...groups].sort((left, right) => {
+  const leftIndex = RESULT_GROUP_ORDER.indexOf(left.title);
+  const rightIndex = RESULT_GROUP_ORDER.indexOf(right.title);
+  const normalizedLeft = leftIndex < 0 ? Number.MAX_SAFE_INTEGER : leftIndex;
+  const normalizedRight = rightIndex < 0 ? Number.MAX_SAFE_INTEGER : rightIndex;
+  return normalizedLeft - normalizedRight;
+});
+
 export function results(state = {}, result = {}) {
   const discharge = result.discharge || {};
   const flooding = result.flooding || {};
@@ -201,7 +221,7 @@ export function results(state = {}, result = {}) {
       ],
       accent: 'green'
     },
-    groups,
+    groups: orderResultGroups(groups),
     notices: diagnostic.notices
   };
 }
