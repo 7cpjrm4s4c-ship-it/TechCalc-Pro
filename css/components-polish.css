@@ -100,6 +100,12 @@ label,
   gap: var(--tc-gap);
 }
 
+/* Result groups may contain nested result cards. They use the same vertical
+   rhythm as top-level cards instead of collapsing into each other. */
+.result-group > .card + .card {
+  margin-top: var(--tc-gap);
+}
+
 .module-nav__track,
 .bottom-nav,
 .quick-nav,
