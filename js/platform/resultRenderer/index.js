@@ -1,7 +1,16 @@
-import { card, mainResult, resultRows, esc } from '../../core/renderer.js';
+import { card, resultRows, esc } from '../../core/renderer.js';
 
 function list(value) {
   return Array.isArray(value) ? value.filter(Boolean) : (value ? [value] : []);
+}
+
+function slug(value = '') {
+  return String(value)
+    .toLocaleLowerCase('de-DE')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
 }
 
 function normalizeRow(row = {}) {
@@ -9,7 +18,9 @@ function normalizeRow(row = {}) {
   return {
     label: row.label || row.title || '',
     value: row.value ?? row.result ?? '—',
-    unit: row.unit || ''
+    unit: row.unit || '',
+    className: row.className || '',
+    span: Number(row.span || 1)
   };
 }
 
@@ -17,20 +28,39 @@ export function normalizeResultRows(rows = []) {
   return list(rows).map(normalizeRow);
 }
 
+function renderPrimaryDetails(rows = []) {
+  return `<div class="inline-stats">${rows.map(row => {
+    const classes = ['inline-stat'];
+    if (row.className) classes.push(...String(row.className).split(/\s+/).filter(Boolean));
+    if (row.span > 1) classes.push(`inline-stat--span-${Math.min(5, row.span)}`);
+    return `<div class="${classes.map(esc).join(' ')}"><span>${esc(row.label)}</span><strong>${esc(row.value ?? '—')}${row.unit ? ` <small>${esc(row.unit)}</small>` : ''}</strong></div>`;
+  }).join('')}</div>`;
+}
+
 export function renderResultCard({ title = 'Ergebnis', primary = null, rows = [], accent = 'blue' } = {}) {
-  if (primary) return mainResult(title, primary, normalizeResultRows(rows), accent);
-  return card(title, resultRows(normalizeResultRows(rows)), accent);
+  const normalizedRows = normalizeResultRows(rows);
+  if (primary) {
+    const body = `<div class="main-result"><span>${esc(primary.label || '')}</span><strong>${esc(primary.value ?? '—')}${primary.unit ? ` <small>${esc(primary.unit)}</small>` : ''}</strong></div>${renderPrimaryDetails(normalizedRows)}`;
+    return card(title, body, accent);
+  }
+  return card(title, resultRows(normalizedRows), accent);
 }
 
 export function renderResultTable(rows = []) {
-  return resultRows(normalizeResultRows(rows));
+  const normalizedRows = normalizeResultRows(rows);
+  return `<div class="result-list">${normalizedRows.map(row => {
+    const classes = ['result-row'];
+    if (row.className) classes.push(...String(row.className).split(/\s+/).filter(Boolean));
+    return `<div class="${classes.map(esc).join(' ')}"><span>${esc(row.label)}</span><strong>${esc(row.value ?? '—')}${row.unit ? ` <small>${esc(row.unit)}</small>` : ''}</strong></div>`;
+  }).join('')}</div>`;
 }
 
 export function renderResultGroup({ title = 'Details', rows = [], groups = [], html = '', bodyHtml = '', customHtml = '', accent = 'blue' } = {}) {
   const nested = list(groups).map(group => renderResultGroup({ accent, ...group })).join('');
   const table = rows?.length ? renderResultTable(rows) : '';
   const extraHtml = String(html || bodyHtml || customHtml || '');
-  return card(title, `${table}${extraHtml}${nested}`, accent);
+  const groupSlug = slug(title);
+  return card(title, `<div class="result-group result-group--${esc(groupSlug)}">${table}${extraHtml}${nested}</div>`, accent);
 }
 
 export function renderStatsGroup({ title = 'Details', rows = [], accent = 'blue', compact = false } = {}) {
