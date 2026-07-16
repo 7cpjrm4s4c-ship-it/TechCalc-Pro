@@ -142,13 +142,11 @@ export function recommendPipe({ massFlowKgh, volumeFlowM3h, flowValue, flowUnit 
       system,
       noDimension: true,
       candidates,
-      recommendation: null
+      maxPressurePam: Number(maxPressurePam) || 100,
+      highest: candidates[candidates.length - 1] || null
     };
   }
-  return {
-    system,
-    noDimension: false,
-    candidates,
-    recommendation: current
-  };
+  const smaller = candidates[current.index - 1] || null;
+  const larger = candidates[current.index + 1] || null;
+  return { ...current, smaller, larger, candidates, maxPressurePam: Number(maxPressurePam) || 100 };
 }
