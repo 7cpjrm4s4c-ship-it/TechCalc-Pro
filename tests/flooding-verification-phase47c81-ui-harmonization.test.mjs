@@ -35,3 +35,9 @@ test('central schema layout makes notices, actions and stats full width', () => 
   assert.match(css, /\.tc-fields\s*>\s*\.inline-stats/);
   assert.match(css, /grid-column:\s*1\s*\/\s*-1/);
 });
+
+test('nested result cards retain the global vertical card spacing', () => {
+  const css = readFileSync(new URL('../css/components-polish.css', import.meta.url), 'utf8');
+  assert.match(css, /\.result-group\s*>\s*\.card\s*\+\s*\.card/);
+  assert.match(css, /margin-top:\s*var\(--tc-gap\)/);
+});
