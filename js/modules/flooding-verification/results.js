@@ -193,11 +193,11 @@ export function results(state = {}, result = {}) {
         { label: 'Maßgebender Nachweis', value: combinedStorage.governingLabel || 'Nachweis unvollständig' },
         { label: 'DIN 1986-100', value: combinedStorage.dinVolumeM3 != null ? fmt(combinedStorage.dinVolumeM3, 2) : '—', unit: combinedStorage.dinVolumeM3 != null ? 'm³' : '' },
         { label: 'DWA-A 117', value: combinedStorage.dwaVolumeM3 != null ? fmt(combinedStorage.dwaVolumeM3, 2) : (retention.active ? 'unvollständig' : 'nicht erforderlich'), unit: combinedStorage.dwaVolumeM3 != null ? 'm³' : '' },
-        { label: 'Begründung', value: combinedStorage.governingReason || 'Die Nachweise sind noch nicht vollständig.' },
         { label: 'Maßgebende Gleichung DIN', value: floodingSourceLabel(governing.source) },
         { label: 'Maßgebende Regendauer DIN', value: equation20.valid ? String(equation20.durationMinutes) : '—', unit: equation20.valid ? 'min' : '' },
         { label: 'Maßgebende Dauer DWA', value: dwaDuration != null ? String(dwaDuration) : '—', unit: dwaDuration != null ? 'min' : '' },
-        { label: 'Kritischer Flächenanteil', value: fmt((result.criticalShare || 0) * 100, 1), unit: '%' }
+        { label: 'Kritischer Flächenanteil', value: fmt((result.criticalShare || 0) * 100, 1), unit: '%' },
+        { label: 'Begründung', value: combinedStorage.governingReason || 'Die Nachweise sind noch nicht vollständig.', span: 3 }
       ],
       accent: 'green'
     },
