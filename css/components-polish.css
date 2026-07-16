@@ -13,6 +13,10 @@
   --tc-focus-ring-strong: 0 0 0 1px var(--tc-active-accent, var(--accent-blue)), var(--tc-focus-ring);
   --tc-touch-target-min: 44px;
   --tc-card-title-gap: calc(var(--tc-gap) * 0.5);
+  --tc-result-row-min-height: 48px;
+  --tc-result-row-padding-block: calc(var(--tc-gap) * 0.75);
+  --tc-result-label-column: minmax(180px, 42%);
+  --tc-result-row-divider: color-mix(in srgb, var(--color-border) 72%, transparent);
 }
 
 body {
@@ -98,6 +102,49 @@ label,
 .line-section-card,
 .ph-saved-item {
   gap: var(--tc-gap);
+}
+
+/* Central result-table contract: every result card uses the same row geometry,
+   spacing, divider and value alignment. Module-specific result groups may only
+   override the label-column token when their content requires it. */
+.result-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+
+.result-row {
+  display: grid;
+  grid-template-columns: var(--tc-result-label-column) minmax(0, 1fr);
+  align-items: center;
+  min-height: var(--tc-result-row-min-height);
+  padding-block: var(--tc-result-row-padding-block);
+  border-bottom: 1px solid var(--tc-result-row-divider);
+}
+
+.result-row:first-child { padding-top: 0; }
+.result-row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.result-row > span {
+  color: var(--color-muted);
+  line-height: var(--tc-line-height-body);
+}
+
+.result-row > strong {
+  min-width: 0;
+  justify-self: end;
+  text-align: right;
+  line-height: var(--tc-line-height-body);
+  font-variant-numeric: tabular-nums;
+}
+
+.result-row > strong small {
+  font-size: inherit;
+  font-weight: inherit;
+  white-space: nowrap;
 }
 
 /* Result groups may contain nested result cards. They use the same vertical
@@ -191,10 +238,23 @@ pre,
   word-break: normal;
 }
 
+@media (max-width: 767px) {
+  .result-row {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .result-row > strong {
+    justify-self: start;
+    text-align: left;
+  }
+}
+
 @media (max-width: 520px) {
   :root {
     --tc-font-size-base: 0.94rem;
     --tc-touch-target-min: 46px;
+    --tc-result-row-min-height: 52px;
   }
 
   .card,
