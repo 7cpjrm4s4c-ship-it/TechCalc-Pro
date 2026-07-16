@@ -135,6 +135,42 @@ textarea:focus-visible,
   gap: var(--tc-gap);
 }
 
+/* German copy contract: preserve complete words and let the browser use the
+   document language (html[lang="de"]) for orthographically correct hyphenation. */
+.card :where(p, span, strong, small, label, li, td, th, h1, h2, h3, h4),
+.tc-card :where(p, span, strong, small, label, li, td, th, h1, h2, h3, h4),
+.result-card :where(p, span, strong, small, label, li, td, th, h1, h2, h3, h4),
+.result-row :where(span, strong, small),
+.inline-stat :where(span, strong, small),
+.main-result :where(span, strong, small),
+.saved-record-card :where(p, span, strong, small, label),
+.line-section-card :where(p, span, strong, small, label),
+.tc-warning :where(span, strong),
+.empty-state,
+.tc-note,
+.tc-help,
+.ph-help,
+.ph-note,
+.dw-note,
+.settings-hint {
+  overflow-wrap: normal;
+  word-break: normal;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+input,
+textarea,
+select,
+button,
+code,
+pre,
+.unit {
+  -webkit-hyphens: none;
+  hyphens: none;
+  word-break: normal;
+}
+
 @media (max-width: 520px) {
   :root {
     --tc-font-size-base: 0.94rem;
