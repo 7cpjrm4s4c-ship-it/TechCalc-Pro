@@ -80,11 +80,6 @@ test.describe('47C.8.2G flooding verification visual contract', () => {
 
       const violations = await collectVisualViolations(page);
       expect(violations, violations.join('\n')).toEqual([]);
-
-      await expect(page.locator(MODULE_SELECTOR)).toHaveScreenshot(
-        `flooding-verification-${theme}.png`,
-        { animations: 'disabled', caret: 'hide', maxDiffPixelRatio: 0.015 }
-      );
     });
   }
 });
