@@ -12,11 +12,18 @@
   .module-view[data-module="flooding-verification"] .inline-stats > .inline-stat--span-3 {
     grid-column: span 3;
   }
+  .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-list {
+    --interpretation-label-width: 280px;
+  }
   .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-row {
-    grid-template-columns: 220px minmax(0, 1fr);
+    grid-template-columns: var(--interpretation-label-width) minmax(0, 1fr);
     align-items: start;
   }
-  .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-row > span,
+  .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-row > span {
+    width: var(--interpretation-label-width);
+    min-width: var(--interpretation-label-width);
+    max-width: var(--interpretation-label-width);
+  }
   .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-row > strong {
     min-width: 0;
   }
@@ -60,6 +67,11 @@
   .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-row,
   .module-view[data-module="flooding-verification"] .result-group--nachweisstatus .result-row {
     grid-template-columns: 1fr;
+  }
+  .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-row > span {
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
   }
   .module-view[data-module="flooding-verification"] .result-group--nachweisstatus .result-row > span {
     white-space: normal;
