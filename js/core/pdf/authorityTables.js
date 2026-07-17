@@ -22,7 +22,7 @@ function table(report, { title, headers, rows, widths, rowHeight = 25, headerHei
   const absoluteWidths = widths.map(value => totalWidth * value);
   const titleHeight = 18;
   const blockHeight = titleHeight + headerHeight + rows.length * rowHeight + 8;
-  report.ensureSpace(blockHeight + 4, { repeatTitle: title });
+  report.ensureSpace(blockHeight + 4);
   report.sectionTitle(title);
   const y0 = report.cursorY;
 
