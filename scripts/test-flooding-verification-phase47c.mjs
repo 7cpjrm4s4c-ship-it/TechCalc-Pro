@@ -39,7 +39,8 @@ const tests = [
   'tests/flooding-verification-phase47c9b-report-dto.test.mjs',
   'tests/flooding-verification-phase47c9c-authority-pdf-sections.test.mjs',
   'tests/flooding-verification-phase47c9d-authority-table-layout.test.mjs',
-  'tests/flooding-verification-phase47c9d-pdf-export-runtime.test.mjs'
+  'tests/flooding-verification-phase47c9d-pdf-export-runtime.test.mjs',
+  'tests/flooding-verification-phase47c10a-cover-page.test.mjs'
 ];
 
 for (const file of tests) {
