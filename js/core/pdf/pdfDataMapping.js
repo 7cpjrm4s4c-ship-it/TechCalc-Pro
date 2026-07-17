@@ -20,12 +20,14 @@ function unitOfField(field) {
 
 export function extractCardRows(card) {
   const rows = [];
+
   card.querySelectorAll(':scope .field').forEach(field => {
     const label = textOf(field.querySelector('label'));
     const value = valueOfField(field);
     const unit = unitOfField(field);
     if (label || value || unit) rows.push([label, value, unit, '']);
   });
+
   card.querySelectorAll(':scope .main-result, :scope .inline-stat, :scope .result-row').forEach(result => {
     if (result.closest('.saved-record-card, [data-saved-record-card], [data-line-card]')) return;
     const label = textOf(result.querySelector('span'));
@@ -36,6 +38,7 @@ export function extractCardRows(card) {
     const value = unit ? raw.replace(unit, '').trim() : raw;
     if (label || value) rows.push([label, value, unit, '']);
   });
+
   card.querySelectorAll(':scope .saved-record-card, :scope [data-saved-record-card], :scope [data-line-card]').forEach((record, index) => {
     const title = textOf(record.querySelector('.saved-record-card__title strong, .line-section-card__title strong'))
       || textOf(record.querySelector('.saved-record-card__title, .line-section-card__title'))
@@ -52,17 +55,20 @@ export function extractCardRows(card) {
       if (label || value) rows.push([label, value, unit, '']);
     });
   });
+
   card.querySelectorAll(':scope .hx-process-step').forEach((step, index) => {
     const rawLabel = textOf(step.querySelector('strong')) || `Punkt ${index + 1}`;
     const normalizedLabel = rawLabel.match(/^\d+\s+/) ? rawLabel : `${index + 1} ${rawLabel}`;
     const values = [...step.querySelectorAll('span')].map(textOf).join(' | ');
     rows.push([normalizedLabel, values, '', '']);
   });
+
   card.querySelectorAll(':scope .pipe-dimension-card').forEach((dim, index) => {
     const title = textOf(dim.querySelector('strong')) || `Dimension ${index + 1}`;
     const meta = textOf(dim.querySelector('.pipe-dimension-card__meta'));
     rows.push([title, meta, '', '']);
   });
+
   return rows;
 }
 
@@ -76,6 +82,7 @@ function collectLegacyDomModule(module, id) {
   const sections = [];
   let chartSvg = '';
   let chartCanvas = null;
+
   cards.forEach(card => {
     const title = textOf(card.querySelector(':scope > .card__title'));
     if (!title) return;
@@ -90,11 +97,13 @@ function collectLegacyDomModule(module, id) {
     }
     if (rows.length) sections.push({ title, rows });
   });
+
   if (!chartSvg) {
     const svg = app?.querySelector?.('svg.hx-chart, .hx-chart svg');
     chartSvg = svg ? svg.outerHTML : '';
   }
   if (!chartCanvas) chartCanvas = app?.querySelector?.('.hx-chart canvas, canvas.hx-chart') || null;
+
   return {
     id,
     title: module?.title || module?.config?.title || id || 'Modul',
@@ -107,16 +116,27 @@ function collectLegacyDomModule(module, id) {
   };
 }
 
+function resolveRuntimeModule(registryEntry) {
+  return registryEntry?.module?.loadedModule
+    || registryEntry?.module
+    || registryEntry?.loadedModule
+    || registryEntry;
+}
+
 export function collectCurrentModule(modulesRef, routeGetter) {
   const id = typeof routeGetter === 'function' ? routeGetter() : currentRoute();
-  const module = modulesRef?.get?.(id);
-  if (typeof module?.report === 'function') {
-    const reportDto = module.report(module.state?.get?.() || {});
+  const registryEntry = modulesRef?.get?.(id);
+  const module = resolveRuntimeModule(registryEntry);
+  const report = module?.report || registryEntry?.report;
+  const state = module?.state || registryEntry?.state;
+
+  if (typeof report === 'function') {
+    const reportDto = report(state?.get?.() || {});
     if (!reportDto || typeof reportDto !== 'object') throw new Error(`Report-Adapter für ${id} lieferte kein gültiges DTO.`);
     return {
       id,
-      title: module?.title || module?.config?.title || reportDto.metadata?.moduleTitle || id || 'Modul',
-      shortTitle: module?.shortTitle || module?.title || module?.config?.shortTitle || reportDto.metadata?.moduleTitle || id || 'Modul',
+      title: registryEntry?.title || module?.title || module?.config?.title || reportDto.metadata?.moduleTitle || id || 'Modul',
+      shortTitle: registryEntry?.shortTitle || module?.shortTitle || module?.title || module?.config?.shortTitle || reportDto.metadata?.moduleTitle || id || 'Modul',
       sections: [],
       chartSvg: '',
       chartCanvas: null,
@@ -124,7 +144,7 @@ export function collectCurrentModule(modulesRef, routeGetter) {
       reportSource: 'typed-dto'
     };
   }
-  return collectLegacyDomModule(module, id);
+  return collectLegacyDomModule(registryEntry || module, id);
 }
 
 export function sectionTitle(title) {
@@ -150,6 +170,7 @@ export function lineSectionItems(rows = []) {
     current = [];
     title = '';
   };
+
   rows.forEach(row => {
     const label = sanitizeText(row?.[0] || '');
     const value = sanitizeText(row?.[1] || '');
