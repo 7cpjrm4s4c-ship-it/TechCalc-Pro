@@ -6,18 +6,22 @@ export const FLOODING_REPORT_DTO_VERSION = 1;
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 const array = value => Array.isArray(value) ? value : [];
 const object = value => value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+const finite = value => Number.isFinite(Number(value)) ? Number(value) : null;
 
 function mapSurface(surface = {}, index = 0) {
+  const areaM2 = finite(surface.area ?? surface.areaM2 ?? surface.areaSize);
+  const runoffCoefficientCs = finite(surface.cs ?? surface.runoffCoefficientCs);
+  const meanRunoffCoefficientCm = finite(surface.cm ?? surface.meanRunoffCoefficientCm);
   return Object.freeze({
     id: surface.id ?? null,
     name: surface.name || surface.surfaceName || `Fläche ${index + 1}`,
     category: surface.category || surface.surfaceCategory || '',
     areaType: surface.areaType || surface.surfaceAreaType || '',
-    areaM2: surface.area ?? surface.areaM2 ?? surface.areaSize ?? null,
-    runoffCoefficientCs: surface.cs ?? surface.runoffCoefficientCs ?? null,
-    meanRunoffCoefficientCm: surface.cm ?? surface.meanRunoffCoefficientCm ?? null,
-    weightedCsAreaM2: surface.weightedCsAreaM2 ?? null,
-    weightedCmAreaM2: surface.weightedCmAreaM2 ?? null,
+    areaM2,
+    runoffCoefficientCs,
+    meanRunoffCoefficientCm,
+    weightedCsAreaM2: finite(surface.weightedCsAreaM2) ?? (areaM2 != null && runoffCoefficientCs != null ? areaM2 * runoffCoefficientCs : null),
+    weightedCmAreaM2: finite(surface.weightedCmAreaM2) ?? (areaM2 != null && meanRunoffCoefficientCm != null ? areaM2 * meanRunoffCoefficientCm : null),
     source: surface.source || surface.origin || 'local',
     imported: Boolean(surface.imported || surface.source === 'rainwater'),
     snapshot: clone(surface.snapshot || null)
@@ -65,7 +69,7 @@ export function buildFloodingReportDto({ state = {}, calculation = {}, resultMod
       generatedAt
     },
     projectReference: {
-      projectName: state.projectName || '',
+      projectName: state.projectName || state.project || '',
       authorityName: state.authorityName || '',
       authorityReference: state.authorityReference || '',
       authorityDate: state.authorityDate || '',
