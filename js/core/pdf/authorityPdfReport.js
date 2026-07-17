@@ -1,5 +1,6 @@
 import { buildAuthorityCoverPage } from './authorityCoverPage.js';
 import { buildAuthorityExecutiveSummary } from './authorityExecutiveSummary.js';
+import { renderAuthorityCharts } from './authorityCharts.js';
 import {
   authorityTableKind,
   renderDurationTable,
@@ -23,11 +24,11 @@ function formatNumber(value, digits = 2) {
 }
 
 function formatVolume(value) {
-  return Number.isFinite(Number(value)) ? `${formatNumber(value)} m3` : '—';
+  return Number.isFinite(Number(value)) ? `${formatNumber(value)} m³` : '—';
 }
 
 function formatArea(value) {
-  return Number.isFinite(Number(value)) ? `${formatNumber(value)} m2` : '—';
+  return Number.isFinite(Number(value)) ? `${formatNumber(value)} m²` : '—';
 }
 
 function formatDuration(value) {
@@ -165,6 +166,7 @@ export function installAuthorityCoverPage(GlobalPdfReport) {
 
     const originalProjectData = this.projectData;
     const originalStandardSection = this.standardSection;
+    const originalCorporateBlock = this.corporateBlock;
     this.projectData = function projectDataWithExecutiveSummary(projectData) {
       originalProjectData.call(this, projectData);
       renderAuthorityExecutiveSummary(this, moduleData);
@@ -172,11 +174,16 @@ export function installAuthorityCoverPage(GlobalPdfReport) {
     this.standardSection = function authorityAwareStandardSection(section) {
       if (!renderAuthorityTable(this, section, moduleData.reportDto)) originalStandardSection.call(this, section);
     };
+    this.corporateBlock = function corporateBlockWithAuthorityCharts(projectData, currentModuleData) {
+      renderAuthorityCharts(this, moduleData.reportDto);
+      originalCorporateBlock.call(this, projectData, currentModuleData);
+    };
     try {
       return originalBuild.call(this, project, moduleData);
     } finally {
       this.projectData = originalProjectData;
       this.standardSection = originalStandardSection;
+      this.corporateBlock = originalCorporateBlock;
     }
   };
   Object.defineProperty(GlobalPdfReport.prototype, '__tcAuthorityCoverInstalled', { value: true });
