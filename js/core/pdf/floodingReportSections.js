@@ -9,6 +9,46 @@ const fmt = (value, kind = 'generic', options = {}) => value == null || value ==
 const row = (label, value, unit = '') => [label, text(value), unit];
 const numericRow = (label, value, kind, unit = '') => [label, fmt(value, kind), value == null || value === '' ? '' : unit];
 
+const ENUM_LABELS = Object.freeze({
+  complete: 'vollständig',
+  incomplete: 'unvollständig',
+  manual: 'manuelle Eingabe',
+  automatic: 'automatische Ermittlung',
+  'authority-discharge-limit': 'behördliche Einleitungsbegrenzung',
+  'pipe-capacity': 'Rohrleistungsnachweis',
+  'equation-20': 'DIN 1986-100, Gleichung (20)',
+  'equation-21': 'DIN 1986-100, Gleichung (21)',
+  local: 'manuelle Eingabe im Überflutungsnachweis',
+  rainwater: 'Übernahme aus dem Regenwassermodul'
+});
+
+const SURFACE_TYPE_LABELS = Object.freeze({
+  'green-extensive-steep': 'Extensiv begrüntes Steildach',
+  'green-extensive-flat': 'Extensiv begrüntes Flachdach',
+  'green-intensive': 'Intensiv begrüntes Dach',
+  'lawn-flat': 'Rasenfläche, geringe Neigung',
+  'lawn-steep': 'Rasenfläche, starke Neigung',
+  'paving-sealed': 'Vollständig versiegelte Pflasterfläche',
+  'paving-permeable': 'Wasserdurchlässige Pflasterfläche',
+  roof: 'Dachfläche',
+  yard: 'Hoffläche'
+});
+
+function label(value, dictionary = ENUM_LABELS) {
+  const key = String(value ?? '').trim();
+  return dictionary[key] || key || '—';
+}
+
+function localDateTime(value) {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return text(value);
+  return new Intl.DateTimeFormat('de-DE', {
+    dateStyle: 'medium',
+    timeStyle: 'medium'
+  }).format(date);
+}
+
 function summarySection(dto) {
   const summary = object(dto.summary);
   return {
@@ -18,7 +58,7 @@ function summarySection(dto) {
       row('Maßgebender Nachweis', summary.governingLabel || 'Nachweis unvollständig'),
       numericRow('DIN 1986-100', summary.dinVolumeM3, 'volume', 'm³'),
       numericRow('DWA-A 117', summary.dwaVolumeM3, 'volume', 'm³'),
-      row('Nachweisstatus', summary.status),
+      row('Nachweisstatus', label(summary.status)),
       row('Begründung', summary.governingReason),
       row('Bemessungsregel', summary.rule)
     ]
@@ -44,7 +84,7 @@ function projectReferenceSection(dto) {
   return {
     title: '3. Projekt- und Behördenreferenz',
     rows: [
-      row('Projektbezeichnung im Modul', project.projectName),
+      row('Projektbezeichnung', project.projectName || 'siehe Dokumentkopf'),
       row('Behörde / Netzbetreiber', project.authorityName),
       row('Aktenzeichen / Referenz', project.authorityReference),
       row('Datum der Vorgabe', project.authorityDate),
@@ -53,30 +93,35 @@ function projectReferenceSection(dto) {
   };
 }
 
+function surfaceSummary(surface) {
+  const type = label(surface.areaType || surface.category || 'Fläche', SURFACE_TYPE_LABELS);
+  const source = surface.imported ? 'Übernahme aus dem Regenwassermodul' : label(surface.source || 'local');
+  const details = [
+    type,
+    `A = ${fmt(surface.areaM2, 'area')} m²`,
+    `Cₛ = ${fmt(surface.runoffCoefficientCs, 'factor')}`,
+    `Cₘ = ${fmt(surface.meanRunoffCoefficientCm, 'factor')}`,
+    `A × Cₛ = ${fmt(surface.weightedCsAreaM2, 'area')} m²`,
+    source
+  ];
+  return details.join(' · ');
+}
+
 function surfacesSection(dto) {
   const surfaces = array(dto.surfaces);
-  const rows = surfaces.flatMap((surface, index) => {
-    const prefix = `${index + 1}. ${surface.name || `Fläche ${index + 1}`}`;
-    return [
-      row(prefix, surface.areaType || surface.category || 'Fläche'),
-      numericRow(`${prefix} · Fläche`, surface.areaM2, 'area', 'm²'),
-      numericRow(`${prefix} · Abflussbeiwert Cₛ`, surface.runoffCoefficientCs, 'factor'),
-      numericRow(`${prefix} · Mittlerer Abflussbeiwert Cₘ`, surface.meanRunoffCoefficientCm, 'factor'),
-      numericRow(`${prefix} · A × Cₛ`, surface.weightedCsAreaM2, 'area', 'm²'),
-      row(`${prefix} · Datenherkunft`, surface.imported ? 'Regenwassermodul / Snapshot' : (surface.source || 'lokale Eingabe'))
-    ];
-  });
   return {
     title: `4. Flächenübersicht (${surfaces.length})`,
-    rows: rows.length ? rows : [row('Status', 'Keine Flächen vorhanden')]
+    rows: surfaces.length
+      ? surfaces.map((surface, index) => row(`${index + 1}. ${surface.name || `Fläche ${index + 1}`}`, surfaceSummary(surface)))
+      : [row('Status', 'Keine Flächen vorhanden')]
   };
 }
 
 function rainfallSection(dto) {
   const rainfall = object(dto.rainfall);
   const rows = [
-    row('Eingabemodus', rainfall.entryMode),
-    row('Regendauermodus', rainfall.durationMode),
+    row('Eingabemodus', label(rainfall.entryMode)),
+    row('Regendauermodus', label(rainfall.durationMode)),
     numericRow('Automatisch ermittelte Regendauer', rainfall.automaticDurationMinutes, 'duration', 'min'),
     numericRow('Verwendete Regendauer', rainfall.governingDurationMinutes, 'duration', 'min'),
     row('Begründung manueller Dauer', rainfall.manualDurationReason),
@@ -98,7 +143,7 @@ function hydraulicsSection(dto) {
   return {
     title: '6. Leitungs- und Abflussnachweis',
     rows: [
-      row('Betriebsart', hydraulics.dischargeMode),
+      row('Betriebsart', label(hydraulics.dischargeMode)),
       numericRow('Erforderlicher Regenwasserabfluss Qᵣ', hydraulics.requiredRainFlowLs, 'flow', 'l/s'),
       numericRow('Verfügbarer Abfluss Qab', hydraulics.availableFlowLs, 'flow', 'l/s'),
       numericRow('Auslastung', hydraulics.utilizationPercent, 'percent', '%'),
@@ -138,7 +183,7 @@ function dinSections(dto) {
     title: '8. DIN 1986-100 – Gleichung (21), Dauerstufenvergleich',
     rows: [
       ...durationRows,
-      row('Maßgebende Gleichung', governing.source),
+      row('Maßgebende Gleichung', label(governing.source)),
       numericRow('Maßgebende Regendauer', governing.durationMinutes ?? equation21Governing.durationMinutes, 'duration', 'min'),
       numericRow('Maßgebendes DIN-Volumen', governing.valueM3, 'volume', 'm³')
     ]
@@ -187,14 +232,14 @@ function diagnosticsSection(dto) {
   return {
     title: '11. Diagnosen, Warnungen und Empfehlungen',
     rows: [
-      row('Gesamtstatus', diagnostics.statusLabel || diagnostics.status),
+      row('Gesamtstatus', diagnostics.statusLabel || label(diagnostics.status)),
       row('Bewertung', diagnostics.statusReason),
       numericRow('Fehler', counts.errors, 'integer'),
       numericRow('Warnungen', counts.warnings, 'integer'),
       numericRow('Empfehlungen', counts.recommendations, 'integer'),
       numericRow('Hinweise', counts.hints, 'integer'),
       ...items.flatMap((item, index) => [
-        row(`${index + 1}. ${item.title || item.code || item.type}`, item.message),
+        row(`${index + 1}. ${item.title || item.code || label(item.type)}`, item.message),
         ...(item.recommendation ? [row(`${index + 1}. Empfehlung`, item.recommendation)] : [])
       ])
     ]
@@ -212,7 +257,7 @@ function sourcesSection(dto) {
       row('Modul', metadata.moduleTitle),
       row('Modul-Schema', metadata.schemaVersion),
       row('TechCalc-Pro-Version', metadata.appVersion),
-      row('Berechnungszeitpunkt', metadata.generatedAt),
+      row('Berechnungszeitpunkt', localDateTime(metadata.generatedAt)),
       ...sources.map(source => row(source.title || source.id, [source.role, source.version].filter(Boolean).join(' · ')))
     ]
   };
