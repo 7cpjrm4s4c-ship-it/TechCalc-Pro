@@ -1,6 +1,7 @@
 import { buildAuthorityCoverPage } from './authorityCoverPage.js';
 import { buildAuthorityExecutiveSummary } from './authorityExecutiveSummary.js';
 import { renderAuthorityCharts } from './authorityCharts.js';
+import { renderAuthorityCorporateBlock } from './authorityCorporateBlock.js';
 import {
   addAuthorityTocPrelude,
   recordAuthorityTocEntry,
@@ -193,7 +194,7 @@ export function installAuthorityCoverPage(GlobalPdfReport) {
     };
     this.corporateBlock = function corporateBlockWithAuthorityCharts(projectData, currentModuleData) {
       renderAuthorityCharts(this, moduleData.reportDto);
-      originalCorporateBlock.call(this, projectData, currentModuleData);
+      renderAuthorityCorporateBlock(this, projectData, currentModuleData);
     };
     this.footer = function footerWithAuthorityToc() {
       renderAuthorityTableOfContents(this, tocPageIndex, tocEntries, moduleData);
