@@ -88,21 +88,33 @@ if (currentRouteConfig) preloadLazyModule(currentRouteConfig.config, currentRout
 
 function registerLazyModule({ config, path, module: eagerModule }) {
   if (eagerModule) {
-    modules.register({ config, mount: createModuleLifecycleAdapter(config.id, eagerModule.mount) });
+    modules.register({ config, ...eagerModule, mount: createModuleLifecycleAdapter(config.id, eagerModule.mount) });
     return;
   }
-  modules.register({
+
+  // The registry stores a frozen normalized wrapper but intentionally retains
+  // this mutable source object under `module`. Once lazy loading completes we
+  // publish the real module contract here so cross-cutting services such as
+  // typed PDF reporting can access state/report after the active module mounts.
+  const registration = {
     config,
+    loadedModule: null,
     async mount(root) {
       const renderToken = root?.dataset?.renderToken || '';
-      const module = await loadLazyModule(config, path);
+      const loadedModule = await loadLazyModule(config, path);
+      registration.loadedModule = loadedModule;
+      registration.state = loadedModule?.state;
+      registration.report = loadedModule?.report;
+      registration.calculate = loadedModule?.calculate;
+      registration.results = loadedModule?.results;
       if (renderToken && root?.dataset?.renderToken !== renderToken) return () => {};
-      if (!module || typeof module.mount !== 'function') {
+      if (!loadedModule || typeof loadedModule.mount !== 'function') {
         throw new Error(`Modul ${config.id} konnte nicht initialisiert werden.`);
       }
-      return createModuleLifecycleAdapter(config.id, module.mount)(root);
+      return createModuleLifecycleAdapter(config.id, loadedModule.mount)(root);
     }
-  });
+  };
+  modules.register(registration);
 }
 
 lazyModules.forEach(registerLazyModule);
