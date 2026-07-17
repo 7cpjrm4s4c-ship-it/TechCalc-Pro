@@ -2,6 +2,11 @@ import { buildAuthorityCoverPage } from './authorityCoverPage.js';
 import { buildAuthorityExecutiveSummary } from './authorityExecutiveSummary.js';
 import { renderAuthorityCharts } from './authorityCharts.js';
 import {
+  addAuthorityTocPrelude,
+  recordAuthorityTocEntry,
+  renderAuthorityTableOfContents
+} from './authorityTableOfContents.js';
+import {
   authorityTableKind,
   renderDurationTable,
   renderRainfallTable,
@@ -161,15 +166,27 @@ export function installAuthorityCoverPage(GlobalPdfReport) {
   const originalBuild = GlobalPdfReport.prototype.build;
   GlobalPdfReport.prototype.build = function buildWithAuthorityCover(project, moduleData) {
     if (!isFloodingAuthorityReport(moduleData)) return originalBuild.call(this, project, moduleData);
+
     renderAuthorityCoverPage(this, project, moduleData);
     this.addPage();
+    const tocPageIndex = this.pages.length - 1;
+    this.addPage();
 
+    const tocEntries = [];
     const originalProjectData = this.projectData;
     const originalStandardSection = this.standardSection;
     const originalCorporateBlock = this.corporateBlock;
+    const originalSectionTitle = this.sectionTitle;
+    const originalFooter = this.footer;
+
     this.projectData = function projectDataWithExecutiveSummary(projectData) {
       originalProjectData.call(this, projectData);
+      addAuthorityTocPrelude(tocEntries, this.pages.length);
       renderAuthorityExecutiveSummary(this, moduleData);
+    };
+    this.sectionTitle = function sectionTitleWithToc(title) {
+      recordAuthorityTocEntry(tocEntries, title, this.pages.length);
+      return originalSectionTitle.call(this, title);
     };
     this.standardSection = function authorityAwareStandardSection(section) {
       if (!renderAuthorityTable(this, section, moduleData.reportDto)) originalStandardSection.call(this, section);
@@ -178,12 +195,19 @@ export function installAuthorityCoverPage(GlobalPdfReport) {
       renderAuthorityCharts(this, moduleData.reportDto);
       originalCorporateBlock.call(this, projectData, currentModuleData);
     };
+    this.footer = function footerWithAuthorityToc() {
+      renderAuthorityTableOfContents(this, tocPageIndex, tocEntries, moduleData);
+      return originalFooter.call(this);
+    };
+
     try {
       return originalBuild.call(this, project, moduleData);
     } finally {
       this.projectData = originalProjectData;
       this.standardSection = originalStandardSection;
       this.corporateBlock = originalCorporateBlock;
+      this.sectionTitle = originalSectionTitle;
+      this.footer = originalFooter;
     }
   };
   Object.defineProperty(GlobalPdfReport.prototype, '__tcAuthorityCoverInstalled', { value: true });
