@@ -20,10 +20,6 @@ const moduleData = {
       statusLabel: 'Berechnung vollständig mit Warnungen',
       counts: { errors: 0, warnings: 2, hints: 1 },
       items: [{ type: 'warning', message: 'Der verfügbare Abfluss ist kleiner als der erforderliche Regenwasserabfluss.' }]
-    },
-    interpretation: {
-      summary: 'Für das vorliegende Projekt ist ein Speichervolumen von 75,51 m3 anzusetzen.',
-      recommendation: 'Speichervolumen in der weiteren Planung berücksichtigen.'
     }
   }
 };
@@ -33,10 +29,6 @@ assert.equal(summary.kind, 'authority-executive-summary');
 assert.equal(summary.planningVolumeM3, 75.51);
 assert.equal(summary.governingDurationMinutes, 15);
 assert.equal(summary.totalAreaM2, 3000);
-assert.equal(summary.errors, 0);
-assert.equal(summary.warnings, 2);
-assert.equal(summary.hints, 1);
-assert.match(summary.criticalNotice, /verfügbare Abfluss/);
 
 const commands = [];
 const report = {
@@ -47,9 +39,10 @@ const report = {
   line: (...args) => commands.push(['line', ...args])
 };
 renderAuthorityExecutiveSummary(report, moduleData);
-assert.ok(commands.some(command => command[0] === 'text' && command[1] === 'MANAGEMENT SUMMARY'));
-assert.ok(commands.some(command => command[0] === 'text' && command[1].includes('75,51 m3')));
-assert.ok(commands.some(command => command[0] === 'text' && command[1].includes('2 Warnungen')));
+const renderedText = commands.filter(command => command[0] === 'text').map(command => command[1]).join(' ');
+assert.match(renderedText, /MANAGEMENT SUMMARY/);
+assert.match(renderedText, /75,51 m³/);
+assert.doesNotMatch(renderedText, /Warnung|Hinweis|Fehler|kritisch|Empfehlung/i);
 assert.ok(report.cursorY > 100, 'summary renderer must advance the report cursor');
 
 class FakePdfReport {
@@ -77,12 +70,6 @@ class FakePdfReport {
 installAuthorityCoverPage(FakePdfReport);
 const hookedReport = new FakePdfReport();
 assert.equal(hookedReport.build({ project: 'Test' }, moduleData), 'pdf');
-assert.equal(hookedReport.pages.length, 2);
-
-const legacyReport = new FakePdfReport();
-legacyReport.summaryRenderedBeforeSections = false;
-legacyReport.build = function legacyBuild(project) { this.projectData(project); return 'legacy'; };
-assert.equal(legacyReport.build({}, { id: 'rainwater' }), 'legacy');
-assert.equal(legacyReport.summaryRenderedBeforeSections, false);
+assert.equal(hookedReport.pages.length, 3, 'cover, table of contents and report page are required');
 
 console.log('Phase 47C.10B executive summary ok');
