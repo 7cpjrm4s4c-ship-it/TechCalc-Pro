@@ -3,6 +3,7 @@ import schema from './schema.js';
 import { state, initialState } from './state.js';
 import { calculate } from './calculationAdapter.js';
 import { results } from './results.js';
+import { buildFloodingReportDto } from './reportAdapter.js';
 import controller, {
   buildFloodingSurfaceRecord,
   hydrateFloodingSurfaceRecord,
@@ -50,6 +51,12 @@ function bindFloodingPlatform(root) {
   bindFloodingController(root, state, surfaceController);
 }
 
+function report(snapshot = state.get()) {
+  const calculation = calculate(snapshot);
+  const resultModel = results(snapshot, calculation);
+  return buildFloodingReportDto({ state: snapshot, calculation, resultModel });
+}
+
 export default createPlatformModule({
   config,
   schema,
@@ -57,6 +64,7 @@ export default createPlatformModule({
   initialState,
   calculate,
   results,
+  report,
   controller,
   view: floodingView.view,
   bind: bindFloodingPlatform,
