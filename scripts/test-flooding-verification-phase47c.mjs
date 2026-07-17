@@ -35,7 +35,8 @@ const tests = [
   'tests/flooding-verification-phase47c82e-card-spacing.test.mjs',
   'tests/flooding-verification-phase47c82f-responsive-audit.test.mjs',
   'tests/flooding-verification-phase47c82g-visual-regression-gate.test.mjs',
-  'tests/flooding-verification-phase47c9a-pdf-architecture-review.test.mjs'
+  'tests/flooding-verification-phase47c9a-pdf-architecture-review.test.mjs',
+  'tests/flooding-verification-phase47c9b-report-dto.test.mjs'
 ];
 
 for (const file of tests) {
