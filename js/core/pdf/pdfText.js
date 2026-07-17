@@ -1,9 +1,20 @@
-export function sanitizeText(value = '') {
+export function applyEngineeringTypography(value = '') {
   return String(value ?? '')
+    .replace(/\bl\s*\/\s*\(s\s*\*\s*ha\)/gi, 'l/(s·ha)')
+    .replace(/\bl\s*\/\s*\(s\s*[·x×]\s*ha\)/gi, 'l/(s·ha)')
+    .replace(/\bm3\s*\/\s*ha\b/gi, 'm³/ha')
+    .replace(/\bm3\s*\/\s*h\b/gi, 'm³/h')
+    .replace(/\bkg\s*\/\s*m3\b/gi, 'kg/m³')
+    .replace(/\bm2\b/gi, 'm²')
+    .replace(/\bm3\b/gi, 'm³')
+    .replace(/\bA\s*[x*]\s*C(s)?\b/g, (_match, suffix) => `A × C${suffix || ''}`)
+    .replace(/\bA\s*·\s*C(s)?\b/g, (_match, suffix) => `A × C${suffix || ''}`);
+}
+
+export function sanitizeText(value = '') {
+  return applyEngineeringTypography(String(value ?? ''))
     .replace(/[\uFEFF\uFFFD]/g, '')
     .replace(/[‐‑‒–—―]/g, '-')
-    .replace(/[×]/g, 'x')
-    .replace(/[·•]/g, '*')
     .replace(/[Θϑ]/g, 'Theta')
     .replace(/[Φφ]/g, 'Phi')
     .replace(/[ρ]/g, 'rho')
@@ -31,8 +42,6 @@ export function sanitizeText(value = '') {
     .replace(/[≤]/g, '<=')
     .replace(/[≥]/g, '>=')
     .replace(/[≈]/g, '~')
-    .replace(/[³]/g, '3')
-    .replace(/[²]/g, '2')
     .replace(/[¹]/g, '1')
     .replace(/\u00A0/g, ' ')
     .replace(/[\u0000-\u001F\u007F]/g, ' ')
@@ -43,6 +52,7 @@ export function sanitizeText(value = '') {
 export function normalizeKey(label = '') {
   return sanitizeText(label).toLowerCase()
     .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+    .replace(/[²]/g, '2').replace(/[³]/g, '3').replace(/[×·]/g, ' ')
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
 }
@@ -74,12 +84,10 @@ export function pdfNumber(value) {
 
 export function estimateTextWidth(text, size = 8, font = 'F1') {
   if (font === 'F3' || font === 'F4') return sanitizeText(text).length * size * 0.6;
-  // Approximate Helvetica widths. A single length factor made right-aligned
-  // values drift visibly between numbers, units and long German labels. This
-  // table keeps the PDF value columns optically aligned without embedding fonts.
   const widths = {
     ' ': 0.28, '.': 0.28, ',': 0.28, ':': 0.28, ';': 0.28, '-': 0.33, '/': 0.28,
     '(': 0.33, ')': 0.33, '[': 0.33, ']': 0.33, '+': 0.58, '=': 0.58,
+    '·': 0.28, '×': 0.58, '²': 0.40, '³': 0.40,
     '0': 0.56, '1': 0.56, '2': 0.56, '3': 0.56, '4': 0.56,
     '5': 0.56, '6': 0.56, '7': 0.56, '8': 0.56, '9': 0.56,
     'i': 0.22, 'j': 0.22, 'l': 0.22, 'I': 0.28, 't': 0.28, 'f': 0.30, 'r': 0.33,
@@ -135,7 +143,7 @@ export function rgb(values) {
 
 export function isNumericText(value) {
   const normalized = sanitizeText(value).replace(/\s+/g, '');
-  return normalized !== '' && /^[-+]?\d+(?:[.,]\d+)?(?:%|°C|K|l\/s|m3\/h|kg\/h|kg\/m3|Pa\/m|m\/s|kW)?$/i.test(normalized);
+  return normalized !== '' && /^[-+]?\d+(?:[.,]\d+)?(?:%|°C|K|l\/s|m³\/h|kg\/h|kg\/m³|Pa\/m|m\/s|kW)?$/i.test(normalized);
 }
 
 export function pdfRowValue(row) {
