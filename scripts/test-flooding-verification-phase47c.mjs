@@ -46,7 +46,8 @@ const tests = [
   'tests/flooding-verification-phase47c10d-engineering-typography.test.mjs',
   'tests/flooding-verification-phase47c10e-authority-charts.test.mjs',
   'tests/flooding-verification-phase47c10f-table-of-contents.test.mjs',
-  'tests/flooding-verification-phase47c10g-corporate-flow.test.mjs'
+  'tests/flooding-verification-phase47c10g-corporate-flow.test.mjs',
+  'tests/flooding-verification-phase47c11-authority-finalization.test.mjs'
 ];
 
 for (const file of tests) {
