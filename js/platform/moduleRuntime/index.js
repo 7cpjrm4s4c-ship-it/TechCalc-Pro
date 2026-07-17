@@ -278,155 +278,49 @@ function findInside(root, target, selector) {
   return element && root?.contains?.(element) ? element : null;
 }
 
-function readRecordIdFromElement(element, attrs = {}) {
-  const loadAttr = attrs.loadAttr || 'data-line-select';
-  const toggleAttr = attrs.toggleAttr || 'data-line-toggle';
-  const deleteAttr = attrs.deleteAttr || 'data-line-delete';
-  const carrier = element?.closest?.(`[${loadAttr}], [${toggleAttr}], [${deleteAttr}], [data-line-card], [data-saved-record-card]`) || element;
-  return carrier?.getAttribute?.(loadAttr)
-    || carrier?.getAttribute?.(toggleAttr)
-    || carrier?.getAttribute?.(deleteAttr)
-    || carrier?.getAttribute?.('data-saved-record-id')
-    || carrier?.dataset?.savedRecordId
-    || '';
+function resolveSavedRecordConfig(config = {}) {
+  if (!config) return null;
+  if (config.collection) return config;
+  return { collection: config };
 }
 
 function bindSavedRecords(root, state, calculate, savedConfig = {}) {
-  if (!savedConfig.enabled) return {};
-  const attrs = savedConfig.attrs || {};
-  const loadAttr = attrs.loadAttr || 'data-line-select';
-  const toggleAttr = attrs.toggleAttr || 'data-line-toggle';
-  const deleteAttr = attrs.deleteAttr || 'data-line-delete';
-
-  const list = current => Array.isArray(current?.[savedConfig.listKey]) ? current[savedConfig.listKey] : [];
-  const createRecord = (current, existing = null) => createSavedRecord({
-    prefix: savedConfig.recordPrefix || 'record',
-    current: { ...current, [savedConfig.activeIdKey]: existing ? current[savedConfig.activeIdKey] : null },
-    calculate,
-    snapshot: savedConfig.snapshot,
-    existing
-  });
-  const setReduced = (current, payload, metaAction) => state.set(savedRecordReducer(current, {
-    listKey: savedConfig.listKey,
-    activeIdKey: savedConfig.activeIdKey,
-    expandedIdKey: savedConfig.expandedIdKey,
-    nameKey: savedConfig.nameKey,
-    ...payload
-  }), { action: metaAction || `line:${payload.action || 'saved'}` });
-
-  const shouldSkipDuplicateAction = action => {
-    const now = Date.now();
-    const key = `__tcLastPlatformLineAction:${savedConfig.listKey || 'records'}`;
-    const last = root?.[key] || {};
-    if (last.action === action && now - Number(last.at || 0) < 450) return true;
-    if (root) root[key] = { action, at: now };
-    return false;
-  };
-
-  const withSavedPerformance = (action, callback) => {
-    const finishSaved = startPerformanceSpan('saved-record:interaction', { action });
-    try {
-      const result = callback();
-      finishSaved({ status: 'ok' });
-      return result;
-    } catch (error) {
-      finishSaved({ status: 'error', error: error?.message || String(error) });
-      throw error;
+  const config = resolveSavedRecordConfig(savedConfig);
+  if (!config?.collection) return {};
+  const collection = config.collection;
+  const createRecord = config.createRecord || createSavedRecord;
+  const actions = {
+    'platform:saved-record:save': ({ element }) => {
+      commitAllFields(root, state, { action: config.preSaveAction || 'platform:saved-record:pre-save', notify: false });
+      const current = state.get();
+      const result = calculate(current);
+      const record = createRecord({ state: current, result, name: current[collection.nameKey], config: collection });
+      const patch = savedRecordReducer(current, { type: 'save', record }, collection);
+      preserveSavedRecordMutation(root, () => state.set(patch, { action: config.saveAction || 'platform:saved-record:save', notify: true }));
+    },
+    'platform:saved-record:load': ({ element }) => {
+      const patch = savedRecordReducer(state.get(), { type: 'load', id: element.dataset.savedRecordId }, collection);
+      preserveSavedRecordMutation(root, () => state.set(patch, { action: config.loadAction || 'platform:saved-record:load', notify: true }));
+    },
+    'platform:saved-record:delete': ({ element }) => {
+      const patch = savedRecordReducer(state.get(), { type: 'delete', id: element.dataset.savedRecordId }, collection);
+      preserveSavedRecordMutation(root, () => state.set(patch, { action: config.deleteAction || 'platform:saved-record:delete', notify: true }));
     }
   };
-
-  const save = ({ root: actionRoot } = {}) => withSavedPerformance('line:save', () => {
-    if (shouldSkipDuplicateAction('line:save')) return;
-    const host = actionRoot || root;
-    savedConfig.commitBeforeCreate === false ? null : commitAllFields(host, state, { action: savedConfig.preCreateAction || 'line:pre-save', notify: false });
-    const current = state.get();
-    const record = createRecord(current);
-    const patch = typeof savedConfig.afterCreatePatch === 'function' ? savedConfig.afterCreatePatch(current, record) : {};
-    preserveSavedRecordMutation(() => setReduced(current, { action: 'create', record, patch }, 'line:save'));
-  });
-
-  const update = ({ root: actionRoot } = {}) => withSavedPerformance('line:update', () => {
-    if (shouldSkipDuplicateAction('line:update')) return;
-    const host = actionRoot || root;
-    savedConfig.commitBeforeUpdate === false ? null : commitAllFields(host, state, { action: savedConfig.preUpdateAction || 'line:pre-update', notify: false });
-    const current = state.get();
-    const id = current?.[savedConfig.activeIdKey];
-    if (!id) return;
-    const existing = list(current).find(item => String(item.id) === String(id));
-    if (!existing) return;
-    const record = createRecord(current, existing);
-    preserveSavedRecordMutation(() => setReduced(current, { action: 'update', id, record }, 'line:update'));
-  });
-
-  const readId = element => readRecordIdFromElement(element, { loadAttr, toggleAttr, deleteAttr });
-
-  const load = ({ element } = {}) => withSavedPerformance('line:select', () => {
-    const id = readId(element);
-    const current = state.get();
-    const item = list(current).find(entry => String(entry.id) === String(id));
-    if (!item) return;
-    if (String(current?.[savedConfig.activeIdKey] || '') === String(id)) {
-      preserveSavedRecordMutation(() => state.set({
-        [savedConfig.activeIdKey]: null,
-        ...(savedConfig.nameKey ? { [savedConfig.nameKey]: '' } : {})
-      }, { action: 'line:deselect' }));
-      return;
-    }
-    const patch = typeof savedConfig.hydrate === 'function' ? savedConfig.hydrate(item, current) : { ...(item.state || item.inputState || item) };
-    preserveSavedRecordMutation(() => setReduced(current, { action: 'load', id: item.id, record: item, patch }, 'line:select'));
-  });
-
-  const remove = ({ element, event } = {}) => withSavedPerformance('line:delete', () => {
-    const id = readId(element);
-    const current = state.get();
-    const patch = typeof savedConfig.clear === 'function' && String(current?.[savedConfig.activeIdKey] || '') === String(id) ? savedConfig.clear(current) : {};
-    const anchor = element?.closest?.('[data-line-card], [data-saved-record-card]') || element;
-    preserveSavedRecordMutation(() => setReduced(current, { action: 'delete', id, patch }, 'line:delete'), { anchor, event });
-  });
-
-  const toggle = ({ element, event } = {}) => withSavedPerformance('line:toggle', () => {
-    const id = readId(element);
-    const current = state.get();
-    const anchor = element?.closest?.('[data-line-card], [data-saved-record-card]') || element;
-    preserveSavedRecordMutation(() => setReduced(current, { action: 'toggle-expanded', id }, 'line:toggle'), { anchor, event });
-  });
-
-  root.__tcPlatformSavedRecordContext = null;
-  root.__tcPlatformSavedRecordBridge = null;
-  return {
-    'line:save': save,
-    'line:update': update,
-    'saved:load': load,
-    'saved:delete': remove,
-    'saved:toggle': toggle
-  };
+  return actions;
 }
 
 function mountDynamicPlatformModule(root, state, view, bind, dynamicUpdate, isDynamicAction = () => true) {
-  if (!root) return () => {};
-  const mountToken = root?.dataset?.renderToken || '';
-  const isCurrentMount = () => !mountToken || root?.dataset?.renderToken === mountToken;
-
-  root.__tcActionHandlers = {};
-  bindNoClickScroll(root);
-
-  const fullRender = (snapshot = state.get(), meta = { action: 'initial', changed: [] }) => {
-    if (!isCurrentMount()) return;
-    const finish = startPerformanceSpan('module:mount', { action: meta?.action || 'initial', mode: 'custom-dynamic' });
-    try {
-      root.innerHTML = view(snapshot);
-      root.__tcPlatformDynamicMount = { action: meta?.action || 'initial', at: Date.now() };
-      bindCommonInputs(root, state);
-      bindModuleStateBinding(root, state);
-      bind?.(root, snapshot, meta);
-      const finishDynamic = startPerformanceSpan('dynamic-render', { action: 'initial', mode: 'custom-dynamic' });
-      dynamicUpdate?.(root, snapshot, { action: 'initial', changed: [] });
-      finishDynamic({ status: 'ok' });
-      finish({ status: 'ok' });
-    } catch (error) {
-      finish({ status: 'error', error: error?.message || String(error) });
-      throw error;
-    }
+  let renderCount = 0;
+  const isCurrentMount = () => Boolean(root?.isConnected && root?.dataset?.activeModuleId);
+  const fullRender = (snapshot, meta = {}) => {
+    const finish = startPerformanceSpan('module:render', { action: meta?.action || 'initial', mode: 'custom' });
+    const html = view(snapshot);
+    if (root.innerHTML !== html) root.innerHTML = html;
+    renderCount += 1;
+    root.dataset.renderCount = String(renderCount);
+    bind?.(root, snapshot, meta);
+    finish({ status: 'ok' });
   };
 
   fullRender(state.get());
@@ -457,6 +351,7 @@ export function createPlatformModule(definition = {}) {
     initialState,
     calculate,
     results,
+    report,
     savedRecords,
     controller = {},
     view: customView,
@@ -474,6 +369,7 @@ export function createPlatformModule(definition = {}) {
       initialState,
       calculate,
       results,
+      report,
       savedRecords,
       controller,
       mount(root) {
@@ -557,7 +453,7 @@ export function createPlatformModule(definition = {}) {
     registerCentralActions(root, actions);
     if (typeof customBind === 'function') customBind(root, runtimeState.get(), { action: 'platform:bind' });
   }
-  return { config, schema, state: runtimeState, initialState, calculate, results, savedRecords, controller, mount(root) { return mountModule(root, runtimeState, view, bindPlatformActions); } };
+  return { config, schema, state: runtimeState, initialState, calculate, results, report, savedRecords, controller, mount(root) { return mountModule(root, runtimeState, view, bindPlatformActions); } };
 }
 
 export default { createPlatformModule };
