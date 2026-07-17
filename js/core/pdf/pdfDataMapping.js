@@ -75,9 +75,7 @@ function isChartCard(card) {
   return Boolean(card.querySelector('.hx-chart, svg, canvas')) && /diagramm/i.test(textOf(card.querySelector('.card__title')));
 }
 
-export function collectCurrentModule(modulesRef, routeGetter) {
-  const id = typeof routeGetter === 'function' ? routeGetter() : currentRoute();
-  const module = modulesRef?.get?.(id);
+function collectLegacyDomModule(module, id) {
   const app = document.getElementById('app');
   const cards = [...(app?.querySelectorAll('.card') || [])];
   const sections = [];
@@ -111,8 +109,30 @@ export function collectCurrentModule(modulesRef, routeGetter) {
     shortTitle: module?.shortTitle || module?.title || id || 'Modul',
     sections,
     chartSvg,
-    chartCanvas
+    chartCanvas,
+    reportDto: null,
+    reportSource: 'legacy-dom'
   };
+}
+
+export function collectCurrentModule(modulesRef, routeGetter) {
+  const id = typeof routeGetter === 'function' ? routeGetter() : currentRoute();
+  const module = modulesRef?.get?.(id);
+  if (typeof module?.report === 'function') {
+    const reportDto = module.report(module.state?.get?.() || {});
+    if (!reportDto || typeof reportDto !== 'object') throw new Error(`Report-Adapter für ${id} lieferte kein gültiges DTO.`);
+    return {
+      id,
+      title: module?.title || module?.config?.title || reportDto.metadata?.moduleTitle || id || 'Modul',
+      shortTitle: module?.shortTitle || module?.title || module?.config?.shortTitle || reportDto.metadata?.moduleTitle || id || 'Modul',
+      sections: [],
+      chartSvg: '',
+      chartCanvas: null,
+      reportDto,
+      reportSource: 'typed-dto'
+    };
+  }
+  return collectLegacyDomModule(module, id);
 }
 
 export function sectionTitle(title) {
