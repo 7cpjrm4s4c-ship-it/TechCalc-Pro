@@ -2,6 +2,7 @@ import { buildAuthorityCoverPage } from './authorityCoverPage.js';
 import { buildAuthorityExecutiveSummary } from './authorityExecutiveSummary.js';
 import { renderAuthorityCharts } from './authorityCharts.js';
 import { renderAuthorityCorporateBlock } from './authorityCorporateBlock.js';
+import { applyAuthorityReportPolicy } from './authorityReportPolicy.js';
 import {
   addAuthorityTocPrelude,
   recordAuthorityTocEntry,
@@ -39,6 +40,11 @@ function formatArea(value) {
 
 function formatDuration(value) {
   return Number.isFinite(Number(value)) ? `${formatNumber(value, 0)} min` : '—';
+}
+
+function visibleCoverValue(value) {
+  const normalized = String(value ?? '').trim();
+  return normalized && normalized !== '-' && normalized !== '—';
 }
 
 export function renderAuthorityCoverPage(report, project, moduleData) {
@@ -86,20 +92,25 @@ export function renderAuthorityCoverPage(report, project, moduleData) {
     ['Aktenzeichen / Referenz', cover.authorityReference],
     ['Dokumentversion', cover.documentVersion],
     ['Ausgabedatum', cover.date]
-  ];
-  report.rect(m + 12, dataY - 10, dataWidth + 20, rows.length * rowHeight + 20, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.55 });
+  ].filter(([, value]) => visibleCoverValue(value));
+  const dataHeight = rows.length * rowHeight + 20;
+  report.rect(m + 12, dataY - 10, dataWidth + 20, dataHeight, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.55 });
   rows.forEach(([label, value], index) => {
     const y = dataY + index * rowHeight;
     if (index) report.line(m + 20, y - 9, right - 20, y - 9, PDF_THEME.rowLine, 0.3);
     report.text(label, labelX, y + 7, { size: 6.4, font: 'F2', color: PDF_THEME.muted, maxWidth: 118 });
-    report.text(value || '—', valueX, y + 7, { size: 7.2, font: 'F2', maxWidth: right - valueX - 24 });
+    report.text(value, valueX, y + 7, { size: 7.2, font: 'F2', maxWidth: right - valueX - 24 });
   });
 
   const approvalY = 708;
   report.line(m, approvalY, right, approvalY, PDF_THEME.line, 0.55);
   report.text(cover.companyName, m, approvalY + 18, { size: 7, font: 'F2', maxWidth: 170 });
-  report.text(`Geprüft: ${cover.checkedBy}`, center, approvalY + 18, { size: 6.6, font: 'F1', align: 'center', maxWidth: 150 });
-  report.text(`Freigabe: ${cover.approvedBy}`, right, approvalY + 18, { size: 6.6, font: 'F1', align: 'right', maxWidth: 150 });
+  if (visibleCoverValue(cover.checkedBy)) {
+    report.text(`Geprüft: ${cover.checkedBy}`, center, approvalY + 18, { size: 6.6, font: 'F1', align: 'center', maxWidth: 150 });
+  }
+  if (visibleCoverValue(cover.approvedBy)) {
+    report.text(`Freigabe: ${cover.approvedBy}`, right, approvalY + 18, { size: 6.6, font: 'F1', align: 'right', maxWidth: 150 });
+  }
 }
 
 export function renderAuthorityExecutiveSummary(report, moduleData) {
@@ -108,8 +119,7 @@ export function renderAuthorityExecutiveSummary(report, moduleData) {
   const width = PDF_PAGE.width - m * 2;
   const heroHeight = 62;
   const metricHeight = 45;
-  const narrativeHeight = summary.criticalNotice ? 94 : 72;
-  const totalHeight = 20 + heroHeight + 7 + metricHeight + 7 + narrativeHeight + 8;
+  const totalHeight = 20 + heroHeight + 7 + metricHeight + 8;
 
   report.ensureSpace(totalHeight + 8, { repeatTitle: 'MANAGEMENT SUMMARY' });
   const startY = report.cursorY;
@@ -119,8 +129,7 @@ export function renderAuthorityExecutiveSummary(report, moduleData) {
   report.rect(m, heroY, width, heroHeight, { fill: PDF_THEME.soft, stroke: PDF_THEME.line, width: 0.65 });
   report.text('PLANERISCH ANZUSETZENDES SPEICHERVOLUMEN', m + 12, heroY + 17, { size: 6.4, font: 'F2', color: PDF_THEME.muted });
   report.text(formatVolume(summary.planningVolumeM3), m + 12, heroY + 45, { size: 19, font: 'F2', color: PDF_THEME.accent });
-  report.text(`Maßgebend: ${summary.governingLabel}`, m + width - 12, heroY + 22, { size: 7.1, font: 'F2', align: 'right', maxWidth: 190 });
-  report.text(summary.statusLabel, m + width - 12, heroY + 42, { size: 7.4, font: 'F2', align: 'right', maxWidth: 190 });
+  report.text(`Maßgebend: ${summary.governingLabel}`, m + width - 12, heroY + 33, { size: 7.4, font: 'F2', align: 'right', maxWidth: 190 });
 
   const metricY = heroY + heroHeight + 7;
   const gap = 6;
@@ -137,17 +146,6 @@ export function renderAuthorityExecutiveSummary(report, moduleData) {
     report.text(label, x + 6, metricY + 13, { size: 5.6, font: 'F2', color: PDF_THEME.muted, maxWidth: metricWidth - 12 });
     report.text(value, x + 6, metricY + 31, { size: 8.2, font: 'F2', maxWidth: metricWidth - 12 });
   });
-
-  const narrativeY = metricY + metricHeight + 7;
-  report.rect(m, narrativeY, width, narrativeHeight, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
-  const statusText = `Status: ${summary.errors} Fehler · ${summary.warnings} Warnungen · ${summary.hints} Hinweise`;
-  report.text(statusText, m + 8, narrativeY + 13, { size: 6.5, font: 'F2', color: PDF_THEME.muted, maxWidth: width - 16 });
-  report.text(summary.statement, m + 8, narrativeY + 31, { size: 6.9, font: 'F2', maxWidth: width - 16, lineHeight: 1.18 });
-  report.text(`Empfehlung: ${summary.recommendation}`, m + 8, narrativeY + 52, { size: 6.6, font: 'F1', maxWidth: width - 16, lineHeight: 1.18 });
-  if (summary.criticalNotice) {
-    report.line(m + 8, narrativeY + 69, m + width - 8, narrativeY + 69, PDF_THEME.rowLine, 0.35);
-    report.text(`Kritischer Hinweis: ${summary.criticalNotice}`, m + 8, narrativeY + 82, { size: 6.5, font: 'F2', color: PDF_THEME.accent, maxWidth: width - 16, lineHeight: 1.16 });
-  }
 
   report.cursorY = startY + totalHeight;
 }
@@ -190,7 +188,11 @@ export function installAuthorityCoverPage(GlobalPdfReport) {
       return originalSectionTitle.call(this, title);
     };
     this.standardSection = function authorityAwareStandardSection(section) {
-      if (!renderAuthorityTable(this, section, moduleData.reportDto)) originalStandardSection.call(this, section);
+      const publicSection = applyAuthorityReportPolicy(section, moduleData.reportDto);
+      if (!publicSection?.rows?.length) return;
+      if (!renderAuthorityTable(this, publicSection, moduleData.reportDto)) {
+        originalStandardSection.call(this, publicSection);
+      }
     };
     this.corporateBlock = function corporateBlockWithAuthorityCharts(projectData, currentModuleData) {
       renderAuthorityCharts(this, moduleData.reportDto);
