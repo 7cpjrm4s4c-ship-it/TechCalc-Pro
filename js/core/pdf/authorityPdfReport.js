@@ -1,5 +1,11 @@
 import { buildAuthorityCoverPage } from './authorityCoverPage.js';
 import { buildAuthorityExecutiveSummary } from './authorityExecutiveSummary.js';
+import {
+  authorityTableKind,
+  renderDurationTable,
+  renderRainfallTable,
+  renderSurfaceTable
+} from './authorityTables.js';
 import { PDF_PAGE, PDF_THEME } from './reportTheme.js';
 
 export function isFloodingAuthorityReport(moduleData = {}) {
@@ -93,7 +99,6 @@ export function renderAuthorityExecutiveSummary(report, moduleData) {
   const summary = buildAuthorityExecutiveSummary(moduleData);
   const m = PDF_THEME.margin;
   const width = PDF_PAGE.width - m * 2;
-  const y = report.cursorY;
   const heroHeight = 62;
   const metricHeight = 45;
   const narrativeHeight = summary.criticalNotice ? 94 : 72;
@@ -140,6 +145,16 @@ export function renderAuthorityExecutiveSummary(report, moduleData) {
   report.cursorY = startY + totalHeight;
 }
 
+function renderAuthorityTable(report, section, dto) {
+  const kind = authorityTableKind(section?.title || '');
+  if (kind === 'surfaces') renderSurfaceTable(report, dto);
+  else if (kind === 'rainfall') renderRainfallTable(report, dto);
+  else if (kind === 'din-duration') renderDurationTable(report, dto, 'din');
+  else if (kind === 'dwa-duration') renderDurationTable(report, dto, 'dwa');
+  else return false;
+  return true;
+}
+
 export function installAuthorityCoverPage(GlobalPdfReport) {
   if (!GlobalPdfReport?.prototype || GlobalPdfReport.prototype.__tcAuthorityCoverInstalled) return false;
   const originalBuild = GlobalPdfReport.prototype.build;
@@ -149,14 +164,19 @@ export function installAuthorityCoverPage(GlobalPdfReport) {
     this.addPage();
 
     const originalProjectData = this.projectData;
+    const originalStandardSection = this.standardSection;
     this.projectData = function projectDataWithExecutiveSummary(projectData) {
       originalProjectData.call(this, projectData);
       renderAuthorityExecutiveSummary(this, moduleData);
+    };
+    this.standardSection = function authorityAwareStandardSection(section) {
+      if (!renderAuthorityTable(this, section, moduleData.reportDto)) originalStandardSection.call(this, section);
     };
     try {
       return originalBuild.call(this, project, moduleData);
     } finally {
       this.projectData = originalProjectData;
+      this.standardSection = originalStandardSection;
     }
   };
   Object.defineProperty(GlobalPdfReport.prototype, '__tcAuthorityCoverInstalled', { value: true });
