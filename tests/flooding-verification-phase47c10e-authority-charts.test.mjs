@@ -51,7 +51,7 @@ const report = new FakeReport();
 assert.equal(renderAuthorityCharts(report, dto), true);
 assert.ok(report.ensureCalls.length >= 1, 'Diagrammblock muss Seitenraum reservieren.');
 assert.ok(report.rects.length >= 12, 'Rahmen und Balken müssen als PDF-Vektoren gerendert werden.');
-assert.match(report.texts.join(' '), /13\. Diagramme/);
+assert.match(report.texts.join(' '), /12\. Diagramme/);
 assert.match(report.texts.join(' '), /DIN 1986-100/);
 assert.match(report.texts.join(' '), /DWA-A 117/);
 assert.match(report.texts.join(' '), /75,51 m³/);
