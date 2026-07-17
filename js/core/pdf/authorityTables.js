@@ -65,7 +65,7 @@ export function renderSurfaceTable(report, dto = {}) {
   ]);
   table(report, {
     title: `4. Flächenübersicht (${rows.length})`,
-    headers: ['Nr.', 'Bezeichnung', 'Flächenart', 'A [m2]', 'Cs', 'A · Cs [m2]'],
+    headers: ['Nr.', 'Bezeichnung', 'Flächenart', 'A [m²]', 'Cₛ', 'A × Cₛ [m²]'],
     rows,
     widths: [0.06, 0.21, 0.31, 0.14, 0.11, 0.17],
     rowHeight: 30
@@ -73,7 +73,12 @@ export function renderSurfaceTable(report, dto = {}) {
 }
 
 function durationValue(entry = {}) {
-  return entry.volumeM3 ?? entry.storageVolumeM3 ?? entry.resultM3 ?? entry.volume ?? null;
+  return entry.valueM3
+    ?? entry.volumeM3
+    ?? entry.storageVolumeM3
+    ?? entry.resultM3
+    ?? entry.volume
+    ?? null;
 }
 
 function durationMinutes(entry = {}) {
@@ -90,8 +95,8 @@ export function renderDurationTable(report, dto = {}, kind = 'din') {
     const governingMark = finite(duration) && finite(governingDuration) && Number(duration) === Number(governingDuration);
     return [
       finite(duration) ? `${number(duration, 0)} min` : '—',
-      finite(durationValue(entry)) ? `${number(durationValue(entry))} m3` : '—',
-      governingMark ? 'maßgebend' : ''
+      finite(durationValue(entry)) ? `${number(durationValue(entry))} m³` : '—',
+      governingMark ? 'maßgebend' : '—'
     ];
   });
   table(report, {
