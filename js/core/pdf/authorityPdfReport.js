@@ -1,4 +1,5 @@
 import { buildAuthorityCoverPage } from './authorityCoverPage.js';
+import { buildAuthorityExecutiveSummary } from './authorityExecutiveSummary.js';
 import { PDF_PAGE, PDF_THEME } from './reportTheme.js';
 
 export function isFloodingAuthorityReport(moduleData = {}) {
@@ -7,12 +8,24 @@ export function isFloodingAuthorityReport(moduleData = {}) {
     && moduleData.reportDto;
 }
 
-function formatVolume(value) {
+function formatNumber(value, digits = 2) {
   if (!Number.isFinite(Number(value))) return '—';
-  return `${new Intl.NumberFormat('de-DE', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(Number(value))} m3`;
+  return new Intl.NumberFormat('de-DE', {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits
+  }).format(Number(value));
+}
+
+function formatVolume(value) {
+  return Number.isFinite(Number(value)) ? `${formatNumber(value)} m3` : '—';
+}
+
+function formatArea(value) {
+  return Number.isFinite(Number(value)) ? `${formatNumber(value)} m2` : '—';
+}
+
+function formatDuration(value) {
+  return Number.isFinite(Number(value)) ? `${formatNumber(value, 0)} min` : '—';
 }
 
 export function renderAuthorityCoverPage(report, project, moduleData) {
@@ -76,6 +89,57 @@ export function renderAuthorityCoverPage(report, project, moduleData) {
   report.text(`Freigabe: ${cover.approvedBy}`, right, approvalY + 18, { size: 6.6, font: 'F1', align: 'right', maxWidth: 150 });
 }
 
+export function renderAuthorityExecutiveSummary(report, moduleData) {
+  const summary = buildAuthorityExecutiveSummary(moduleData);
+  const m = PDF_THEME.margin;
+  const width = PDF_PAGE.width - m * 2;
+  const y = report.cursorY;
+  const heroHeight = 62;
+  const metricHeight = 45;
+  const narrativeHeight = summary.criticalNotice ? 94 : 72;
+  const totalHeight = 20 + heroHeight + 7 + metricHeight + 7 + narrativeHeight + 8;
+
+  report.ensureSpace(totalHeight + 8, { repeatTitle: 'MANAGEMENT SUMMARY' });
+  const startY = report.cursorY;
+  report.text('MANAGEMENT SUMMARY', m, startY + 7, { size: 8.6, font: 'F2', color: PDF_THEME.accent });
+
+  const heroY = startY + 18;
+  report.rect(m, heroY, width, heroHeight, { fill: PDF_THEME.soft, stroke: PDF_THEME.line, width: 0.65 });
+  report.text('PLANERISCH ANZUSETZENDES SPEICHERVOLUMEN', m + 12, heroY + 17, { size: 6.4, font: 'F2', color: PDF_THEME.muted });
+  report.text(formatVolume(summary.planningVolumeM3), m + 12, heroY + 45, { size: 19, font: 'F2', color: PDF_THEME.accent });
+  report.text(`Maßgebend: ${summary.governingLabel}`, m + width - 12, heroY + 22, { size: 7.1, font: 'F2', align: 'right', maxWidth: 190 });
+  report.text(summary.statusLabel, m + width - 12, heroY + 42, { size: 7.4, font: 'F2', align: 'right', maxWidth: 190 });
+
+  const metricY = heroY + heroHeight + 7;
+  const gap = 6;
+  const metricWidth = (width - gap * 3) / 4;
+  const metrics = [
+    ['BEMESSUNGSDAUER', formatDuration(summary.governingDurationMinutes)],
+    ['GESAMTFLÄCHE', formatArea(summary.totalAreaM2)],
+    ['DIN-VOLUMEN', formatVolume(summary.dinVolumeM3)],
+    ['DWA-VOLUMEN', formatVolume(summary.dwaVolumeM3)]
+  ];
+  metrics.forEach(([label, value], index) => {
+    const x = m + index * (metricWidth + gap);
+    report.rect(x, metricY, metricWidth, metricHeight, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
+    report.text(label, x + 6, metricY + 13, { size: 5.6, font: 'F2', color: PDF_THEME.muted, maxWidth: metricWidth - 12 });
+    report.text(value, x + 6, metricY + 31, { size: 8.2, font: 'F2', maxWidth: metricWidth - 12 });
+  });
+
+  const narrativeY = metricY + metricHeight + 7;
+  report.rect(m, narrativeY, width, narrativeHeight, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
+  const statusText = `Status: ${summary.errors} Fehler · ${summary.warnings} Warnungen · ${summary.hints} Hinweise`;
+  report.text(statusText, m + 8, narrativeY + 13, { size: 6.5, font: 'F2', color: PDF_THEME.muted, maxWidth: width - 16 });
+  report.text(summary.statement, m + 8, narrativeY + 31, { size: 6.9, font: 'F2', maxWidth: width - 16, lineHeight: 1.18 });
+  report.text(`Empfehlung: ${summary.recommendation}`, m + 8, narrativeY + 52, { size: 6.6, font: 'F1', maxWidth: width - 16, lineHeight: 1.18 });
+  if (summary.criticalNotice) {
+    report.line(m + 8, narrativeY + 69, m + width - 8, narrativeY + 69, PDF_THEME.rowLine, 0.35);
+    report.text(`Kritischer Hinweis: ${summary.criticalNotice}`, m + 8, narrativeY + 82, { size: 6.5, font: 'F2', color: PDF_THEME.accent, maxWidth: width - 16, lineHeight: 1.16 });
+  }
+
+  report.cursorY = startY + totalHeight;
+}
+
 export function installAuthorityCoverPage(GlobalPdfReport) {
   if (!GlobalPdfReport?.prototype || GlobalPdfReport.prototype.__tcAuthorityCoverInstalled) return false;
   const originalBuild = GlobalPdfReport.prototype.build;
@@ -83,7 +147,17 @@ export function installAuthorityCoverPage(GlobalPdfReport) {
     if (!isFloodingAuthorityReport(moduleData)) return originalBuild.call(this, project, moduleData);
     renderAuthorityCoverPage(this, project, moduleData);
     this.addPage();
-    return originalBuild.call(this, project, moduleData);
+
+    const originalProjectData = this.projectData;
+    this.projectData = function projectDataWithExecutiveSummary(projectData) {
+      originalProjectData.call(this, projectData);
+      renderAuthorityExecutiveSummary(this, moduleData);
+    };
+    try {
+      return originalBuild.call(this, project, moduleData);
+    } finally {
+      this.projectData = originalProjectData;
+    }
   };
   Object.defineProperty(GlobalPdfReport.prototype, '__tcAuthorityCoverInstalled', { value: true });
   return true;
