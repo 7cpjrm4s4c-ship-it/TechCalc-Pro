@@ -1,5 +1,22 @@
 import { logger } from '../logger.js';
 
+let authorityCoverInstallPromise = null;
+
+async function ensureAuthorityCoverInstalled() {
+  if (!authorityCoverInstallPromise) {
+    authorityCoverInstallPromise = Promise.all([
+      import('./pdfLayout.js'),
+      import('./authorityPdfReport.js')
+    ]).then(([layout, authority]) => authority.installAuthorityCoverPage(layout.GlobalPdfReport))
+      .catch(error => {
+        authorityCoverInstallPromise = null;
+        logger.warn('PDF-Deckblatt konnte nicht initialisiert werden.', error, { module: 'pdf-cover' });
+        return false;
+      });
+  }
+  return authorityCoverInstallPromise;
+}
+
 function cropCanvasToContent(sourceCanvas, { padding = 18, threshold = 246 } = {}) {
   const width = sourceCanvas.width;
   const height = sourceCanvas.height;
@@ -25,10 +42,6 @@ function cropCanvasToContent(sourceCanvas, { padding = 18, threshold = 246 } = {
   maxY = Math.min(height - 1, maxY + padding);
   let cropW = Math.max(1, maxX - minX + 1);
   let cropH = Math.max(1, maxY - minY + 1);
-  // RC.9: h,x screenshots often contain a very wide DOM box.  Remove side
-  // whitespace aggressively enough that the PDF can use vertical space without
-  // distorting the chart.  The crop is centred and only activates for extreme
-  // aspect ratios.
   const maxAspect = 1.9;
   if (cropW / Math.max(1, cropH) > maxAspect) {
     const targetW = Math.max(1, Math.round(cropH * maxAspect));
@@ -58,6 +71,7 @@ export function imageElementFromSource(source) {
 }
 
 export async function normalizeImageToJpeg(source, { maxWidth = 512, maxHeight = 256, quality = 0.88 } = {}) {
+  await ensureAuthorityCoverInstalled();
   if (!source) return null;
   try {
     const img = await imageElementFromSource(source);
