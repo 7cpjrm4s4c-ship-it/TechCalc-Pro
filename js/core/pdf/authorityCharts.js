@@ -101,7 +101,7 @@ export function renderAuthorityCharts(report, dto = {}) {
   const totalHeight = 18 + chartHeight + gap + comparisonHeight + 8;
 
   report.ensureSpace(totalHeight + 8);
-  report.sectionTitle('12. Diagramme');
+  report.sectionTitle('11. Diagramme');
   const startY = report.cursorY;
 
   if (model.din.length) drawBarChart(report, {
