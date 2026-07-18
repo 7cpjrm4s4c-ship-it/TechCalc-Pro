@@ -28,12 +28,13 @@ function durationSeries(entries = [], governing = {}) {
     }))
     .filter(item => item.value != null);
   const maximum = mapped.length ? Math.max(...mapped.map(item => item.value)) : null;
+  const maximumCount = maximum == null ? 0 : mapped.filter(item => Math.abs(item.value - maximum) < 1e-9).length;
   return mapped.map(item => Object.freeze({
     label: item.label,
     value: item.value,
     governing: maximum != null
       && Math.abs(item.value - maximum) < 1e-9
-      && (!finite(governingDuration) || item.duration === Number(governingDuration) || mapped.filter(candidate => Math.abs(candidate.value - maximum) < 1e-9).length === 1)
+      && (!finite(governingDuration) || item.duration === Number(governingDuration) || maximumCount === 1)
   }));
 }
 
@@ -48,7 +49,7 @@ export function buildAuthorityChartModel(dto = {}) {
   return Object.freeze({ din, dwa, comparison });
 }
 
-function drawBarChart(report, { title, series, x, y, width, height }) {
+function drawBarChart(report, { title, series, x, y, width, height, accentFill = false }) {
   const padding = { top: 25, right: 12, bottom: 35, left: 36 };
   const plotX = x + padding.left;
   const plotY = y + padding.top;
@@ -71,12 +72,18 @@ function drawBarChart(report, { title, series, x, y, width, height }) {
   series.forEach((item, index) => {
     const centerX = plotX + slotW * (index + 0.5);
     const barX = centerX - barW / 2;
-    const normalizedValue = Math.max(0, item.value);
+    const normalizedValue = Math.max(0, Number(item.value));
     const barH = normalizedValue === 0 ? 1.5 : Math.max(1.5, (normalizedValue / max) * plotH);
     const barY = plotY + plotH - barH;
-    const fill = item.governing ? PDF_THEME.accent : PDF_THEME.muted;
+    const fill = accentFill && item.governing ? PDF_THEME.accent : PDF_THEME.muted;
+
     report.rect(barX, barY, barW, barH, { fill, stroke: null, width: 0 });
-    report.text(`${number(item.value)} m³`, centerX, Math.max(plotY + 7, barY - 4), { size: 5.5, font: 'F2', align: 'center', maxWidth: Math.max(slotW, barW) });
+    if (item.governing && !accentFill) {
+      report.line(barX, barY, barX + barW, barY, PDF_THEME.accent, 1.4);
+      report.line(barX, barY, barX, barY + barH, PDF_THEME.accent, 0.7);
+      report.line(barX + barW, barY, barX + barW, barY + barH, PDF_THEME.accent, 0.7);
+    }
+    report.text(`${number(item.value)} m³`, centerX, Math.max(plotY + 7, barY - 4), { size: 5.5, font: 'F2', color: item.governing ? PDF_THEME.accent : PDF_THEME.text, align: 'center', maxWidth: Math.max(slotW, barW) });
     report.text(item.label, centerX, plotY + plotH + 13, { size: 5.5, font: item.governing ? 'F2' : 'F1', color: item.governing ? PDF_THEME.accent : PDF_THEME.text, align: 'center', maxWidth: slotW });
   });
 }
@@ -93,7 +100,7 @@ export function renderAuthorityCharts(report, dto = {}) {
   const comparisonHeight = 155;
   const totalHeight = 18 + chartHeight + gap + comparisonHeight + 8;
 
-  report.ensureSpace(totalHeight + 8, { repeatTitle: '12. Diagramme' });
+  report.ensureSpace(totalHeight + 8);
   report.sectionTitle('12. Diagramme');
   const startY = report.cursorY;
 
@@ -121,7 +128,8 @@ export function renderAuthorityCharts(report, dto = {}) {
     x: m,
     y: comparisonY,
     width,
-    height: comparisonHeight
+    height: comparisonHeight,
+    accentFill: true
   });
 
   report.cursorY = comparisonY + comparisonHeight + 8;
