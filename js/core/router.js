@@ -1,6 +1,7 @@
 import { modules } from './registry.js';
+import { loadPreferences } from './preferences.js';
 
-const DEFAULT_ROUTE = 'heating-cooling';
+const FALLBACK_ROUTE = 'heating-cooling';
 const HASH_PREFIX = '#/';
 let renderCallback = () => Promise.resolve(false);
 let activeRouteId = '';
@@ -9,6 +10,19 @@ let navigationVersion = 0;
 
 function appRoot() {
   return typeof document !== 'undefined' ? document.getElementById('app') : null;
+}
+
+function preferredStartRoute() {
+  const preferred = loadPreferences().mobileQuickAccess || [];
+  return preferred.find(id => modules.get(id))
+    || (modules.get(FALLBACK_ROUTE) ? FALLBACK_ROUTE : modules.all()[0]?.id);
+}
+
+function resetViewportAfterModuleChange(previousRouteId, nextRouteId) {
+  if (!nextRouteId || previousRouteId === nextRouteId || typeof window === 'undefined') return;
+  const scroll = () => window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  if (typeof window.requestAnimationFrame === 'function') window.requestAnimationFrame(scroll);
+  else scroll();
 }
 
 function isMountedRoute(id) {
@@ -74,15 +88,19 @@ export async function navigate(id, options = {}) {
     window.history.replaceState({ moduleId: id, version: navigationVersion }, '', `${window.location.pathname}${window.location.search}${targetHash}`);
   }
 
+  const previousRouteId = activeRouteId;
   const rendered = await Promise.resolve(renderCallback(id));
-  if (rendered) activeRouteId = id;
+  if (rendered) {
+    activeRouteId = id;
+    resetViewportAfterModuleChange(previousRouteId, id);
+  }
   return rendered;
 }
 
 export function currentRoute() {
   const id = getRouteFromHash() || requestedRouteId || activeRouteId;
   if (modules.get(id)) return id;
-  return modules.get(DEFAULT_ROUTE) ? DEFAULT_ROUTE : modules.all()[0]?.id;
+  return preferredStartRoute();
 }
 
 export function getRouteFromHash() {
@@ -108,8 +126,12 @@ function normalizeHashAndRender(routeId, options = {}) {
 
   if (isMountedRoute(routeId) || isPendingRoute(routeId)) return Promise.resolve(true);
 
+  const previousRouteId = activeRouteId;
   return Promise.resolve(renderCallback(routeId)).then(rendered => {
-    if (rendered) activeRouteId = routeId;
+    if (rendered) {
+      activeRouteId = routeId;
+      resetViewportAfterModuleChange(previousRouteId, routeId);
+    }
     return rendered;
   });
 }
@@ -119,8 +141,12 @@ function replaceHash(routeId) {
   window.history.replaceState({ moduleId: routeId, version: navigationVersion }, '', path);
   requestedRouteId = routeId;
   if (isMountedRoute(routeId) || isPendingRoute(routeId)) return Promise.resolve(true);
+  const previousRouteId = activeRouteId;
   return Promise.resolve(renderCallback(routeId)).then(rendered => {
-    if (rendered) activeRouteId = routeId;
+    if (rendered) {
+      activeRouteId = routeId;
+      resetViewportAfterModuleChange(previousRouteId, routeId);
+    }
     return rendered;
   });
 }
