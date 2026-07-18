@@ -9,7 +9,7 @@ export default defineConfig({
   expect: { timeout: 5_000 },
   fullyParallel: false,
   retries: process.env.CI ? 1 : 0,
-  reporter: [['list'], ['html', { open: 'never', outputFolder: 'docs/audits/playwright-report-phase37b' }]],
+  reporter: [['list'], ['html', { open: 'never', outputFolder: 'docs/audits/playwright-report-phase47d' }]],
   use: {
     baseURL: BASE_URL,
     trace: 'retain-on-failure',
@@ -24,6 +24,9 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox-desktop', use: { ...devices['Desktop Firefox'] } },
+    { name: 'chromium-tablet', use: { ...devices['Galaxy Tab S4'] } },
+    { name: 'chromium-mobile', use: { ...devices['Pixel 7'] } },
     { name: 'webkit-tablet', use: { ...devices['iPad Pro 11'] } },
     { name: 'webkit-mobile', use: { ...devices['iPhone 13'] } }
   ]
