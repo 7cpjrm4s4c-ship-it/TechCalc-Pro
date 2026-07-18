@@ -64,6 +64,23 @@ test('setzt beim Modulwechsel alle relevanten Scrollhosts nach oben', async ({ p
   }))).toEqual({ windowY: 0, rootY: 0, bodyY: 0, appY: 0 });
 });
 
+test('behält die vertikale Position nach dem Mount ohne verzögerten Nachsprung', async ({ page }) => {
+  await openApp(page);
+  await page.evaluate(() => window.scrollTo(0, 700));
+
+  const button = await firstAlternativeModuleButton(page);
+  await expect(button).toBeVisible();
+  await button.click();
+  await expect.poll(() => page.evaluate(() => document.getElementById('app')?.dataset.activeModuleId || '')).not.toBe('flooding-verification');
+
+  const samples = [];
+  for (const delay of [0, 50, 140, 300, 600]) {
+    if (delay) await page.waitForTimeout(delay - (samples.at(-1)?.delay || 0));
+    samples.push({ delay, value: await page.evaluate(() => window.scrollY) });
+  }
+  expect(samples.map(sample => sample.value), JSON.stringify(samples)).toEqual([0, 0, 0, 0, 0]);
+});
+
 test('schließt beim Beenden des Hauptmenüs alle Menü-Cards', async ({ page }) => {
   await openApp(page);
   await page.locator('#settingsButton').click();
