@@ -1,4 +1,5 @@
 import { PDF_PAGE, PDF_THEME } from './reportTheme.js';
+import { isDwaVerificationRequired } from './authorityReportScope.js';
 
 const finite = value => Number.isFinite(Number(value));
 const CHART_HEADROOM_FACTOR = 1.1;
@@ -39,13 +40,18 @@ function durationSeries(entries = [], governing = {}) {
 }
 
 export function buildAuthorityChartModel(dto = {}) {
+  const dwaRequired = isDwaVerificationRequired(dto);
   const din = durationSeries(dto.durationComparison?.din || [], dto.floodingVerification?.equation21Governing || {});
-  const dwa = durationSeries(dto.durationComparison?.dwa || [], dto.retentionVerification?.governing || {});
+  const dwa = dwaRequired
+    ? durationSeries(dto.durationComparison?.dwa || [], dto.retentionVerification?.governing || {})
+    : [];
   const governingSource = String(dto.summary?.governingSource || '').toLowerCase();
-  const comparison = [
-    { label: 'DIN 1986-100', value: finite(dto.summary?.dinVolumeM3) ? Number(dto.summary.dinVolumeM3) : null, governing: governingSource.includes('din') || /DIN/i.test(dto.summary?.governingLabel || '') },
-    { label: 'DWA-A 117', value: finite(dto.summary?.dwaVolumeM3) ? Number(dto.summary.dwaVolumeM3) : null, governing: governingSource.includes('dwa') || /DWA/i.test(dto.summary?.governingLabel || '') }
-  ].filter(item => item.value != null);
+  const comparison = dwaRequired
+    ? [
+        { label: 'DIN 1986-100', value: finite(dto.summary?.dinVolumeM3) ? Number(dto.summary.dinVolumeM3) : null, governing: governingSource.includes('din') || /DIN/i.test(dto.summary?.governingLabel || '') },
+        { label: 'DWA-A 117', value: finite(dto.summary?.dwaVolumeM3) ? Number(dto.summary.dwaVolumeM3) : null, governing: governingSource.includes('dwa') || /DWA/i.test(dto.summary?.governingLabel || '') }
+      ].filter(item => item.value != null)
+    : [];
   return Object.freeze({ din, dwa, comparison });
 }
 
@@ -98,10 +104,12 @@ export function renderAuthorityCharts(report, dto = {}) {
   const half = (width - gap) / 2;
   const chartHeight = 170;
   const comparisonHeight = 155;
-  const totalHeight = 18 + chartHeight + gap + comparisonHeight + 8;
+  const hasDwa = model.dwa.length > 0;
+  const hasComparison = model.comparison.length > 0;
+  const totalHeight = 18 + chartHeight + (hasComparison ? gap + comparisonHeight : 0) + 8;
 
   report.ensureSpace(totalHeight + 8);
-  report.sectionTitle('11. Diagramme');
+  report.sectionTitle(hasDwa ? '11. Diagramme' : '8. Diagramme');
   const startY = report.cursorY;
 
   if (model.din.length) drawBarChart(report, {
@@ -109,10 +117,10 @@ export function renderAuthorityCharts(report, dto = {}) {
     series: model.din,
     x: m,
     y: startY,
-    width: half,
+    width: hasDwa ? half : width,
     height: chartHeight
   });
-  if (model.dwa.length) drawBarChart(report, {
+  if (hasDwa) drawBarChart(report, {
     title: 'DWA-A 117 – Dauerstufenvergleich',
     series: model.dwa,
     x: m + half + gap,
@@ -121,17 +129,20 @@ export function renderAuthorityCharts(report, dto = {}) {
     height: chartHeight
   });
 
-  const comparisonY = startY + chartHeight + gap;
-  if (model.comparison.length) drawBarChart(report, {
-    title: 'Vergleich der maßgebenden Speichervolumina',
-    series: model.comparison,
-    x: m,
-    y: comparisonY,
-    width,
-    height: comparisonHeight
-  });
-
-  report.cursorY = comparisonY + comparisonHeight + 8;
+  if (hasComparison) {
+    const comparisonY = startY + chartHeight + gap;
+    drawBarChart(report, {
+      title: 'Vergleich der maßgebenden Speichervolumina',
+      series: model.comparison,
+      x: m,
+      y: comparisonY,
+      width,
+      height: comparisonHeight
+    });
+    report.cursorY = comparisonY + comparisonHeight + 8;
+  } else {
+    report.cursorY = startY + chartHeight + 8;
+  }
   return true;
 }
 
