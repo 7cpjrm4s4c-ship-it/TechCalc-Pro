@@ -34,18 +34,18 @@ export function renderAuthorityTableOfContents(report, pageIndex, entries = [], 
   const right = PDF_PAGE.width - m;
   const width = PDF_PAGE.width - m * 2;
 
-  if (report.images?.appIcon) report.drawImage('ImAppIcon', m, m, 30, 30);
-  report.text('TechCalc Pro', m + 37, m + 12, { size: 11.2, font: 'F2' });
-  report.text('HLSK QUICK TOOLS', m + 37, m + 24, { size: 5.9, font: 'F2', color: PDF_THEME.muted });
+  if (report.images?.appIcon) report.drawImage('ImAppIcon', m, m, 38, 38);
+  report.text('TechCalc Pro', m + 46, m + 15, { size: 13, font: 'F2' });
+  report.text('HLSK QUICK TOOLS', m + 46, m + 29, { size: 6.4, font: 'F2', color: PDF_THEME.muted });
 
   if (report.images?.companyLogo) {
     const img = report.images.companyLogo;
-    const ratio = Math.min(96 / img.width, 34 / img.height);
+    const ratio = Math.min(120 / img.width, 56 / img.height);
     const logoWidth = img.width * ratio;
     const logoHeight = img.height * ratio;
     report.drawImage('ImCompanyLogo', right - logoWidth, m, logoWidth, logoHeight);
   } else {
-    report.text(moduleData.title || moduleData.shortTitle || 'Überflutungsnachweis', right, m + 18, {
+    report.text(moduleData.title || moduleData.shortTitle || 'Überflutungsnachweis', right, m + 24, {
       size: 7.2,
       font: 'F2',
       color: PDF_THEME.muted,
@@ -53,11 +53,11 @@ export function renderAuthorityTableOfContents(report, pageIndex, entries = [], 
       maxWidth: 210
     });
   }
-  report.line(m, m + 48, right, m + 48, PDF_THEME.line, 0.7);
+  report.line(m, m + 66, right, m + 66, PDF_THEME.line, 0.8);
 
-  report.text('INHALTSVERZEICHNIS', m, m + 91, { size: 8, font: 'F2', color: PDF_THEME.accent });
+  report.text('INHALTSVERZEICHNIS', m, m + 108, { size: 8, font: 'F2', color: PDF_THEME.accent });
 
-  const startY = m + 132;
+  const startY = m + 149;
   const rowHeight = 31;
   entries.forEach((entry, index) => {
     const y = startY + index * rowHeight;
