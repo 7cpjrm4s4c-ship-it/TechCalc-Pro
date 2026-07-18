@@ -3,6 +3,23 @@ import { PDF_PAGE, PDF_THEME } from './reportTheme.js';
 const finite = value => Number.isFinite(Number(value));
 const text = value => String(value ?? '').trim() || '—';
 
+const SURFACE_TYPE_LABELS = Object.freeze({
+  'green-extensive-steep': 'Extensiv begrüntes Steildach',
+  'green-extensive-flat': 'Extensiv begrüntes Flachdach',
+  'green-intensive': 'Intensiv begrüntes Dach',
+  'lawn-flat': 'Rasenfläche, geringe Neigung',
+  'lawn-steep': 'Rasenfläche, starke Neigung',
+  'paving-sealed': 'Vollständig versiegelte Pflasterfläche',
+  'paving-permeable': 'Wasserdurchlässige Pflasterfläche',
+  roof: 'Dachfläche',
+  yard: 'Hoffläche'
+});
+
+function surfaceTypeLabel(value) {
+  const key = String(value ?? '').trim();
+  return SURFACE_TYPE_LABELS[key] || key || 'Fläche';
+}
+
 function number(value, digits = 2) {
   if (!finite(value)) return '—';
   return new Intl.NumberFormat('de-DE', {
@@ -57,8 +74,8 @@ export function renderSurfaceTable(report, dto = {}) {
   const surfaces = Array.isArray(dto.surfaces) ? dto.surfaces : [];
   const rows = surfaces.map((surface, index) => [
     String(index + 1),
-    text(surface.name),
-    text(surface.areaType || surface.category),
+    text(surface.name || `Fläche ${index + 1}`),
+    surfaceTypeLabel(surface.areaType || surface.category),
     finite(surface.areaM2) ? number(surface.areaM2) : '—',
     finite(surface.runoffCoefficientCs) ? number(surface.runoffCoefficientCs) : '—',
     finite(surface.weightedCsAreaM2) ? number(surface.weightedCsAreaM2) : '—'
