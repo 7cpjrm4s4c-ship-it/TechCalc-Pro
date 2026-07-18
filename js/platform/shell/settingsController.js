@@ -77,6 +77,12 @@ export function initializeSettingsController({
     });
   }
 
+  function clearPersistedOpenSubmenu() {
+    const current = readStorageJson(SETTINGS_UI_STORAGE_KEY, {});
+    const { openSubmenu, ...rest } = current;
+    writeStorageJson(SETTINGS_UI_STORAGE_KEY, rest);
+  }
+
   function restoreSettingsUiState() {
     const state = readStorageJson(SETTINGS_UI_STORAGE_KEY, {});
     if (!settingsPanel) return;
@@ -105,7 +111,6 @@ export function initializeSettingsController({
     if (!body || !details || !body.contains(details)) return;
 
     const summary = details.querySelector('summary') || details;
-    const bodyTop = body.getBoundingClientRect().top;
     const targetTop = details.offsetTop - body.offsetTop - 8;
 
     if (mode === 'start') {
@@ -126,8 +131,6 @@ export function initializeSettingsController({
     if (topOverflow > 0) body.scrollBy({ top: -topOverflow, left: 0, behavior: 'auto' });
     else if (bottomOverflow > 0) body.scrollBy({ top: bottomOverflow, left: 0, behavior: 'auto' });
 
-    // Some hosted preview overlays sit above the viewport bottom. Re-check after
-    // the browser has resolved details height and fonts.
     requestAnimationFrame(() => {
       const nextBodyRect = body.getBoundingClientRect();
       const nextDetailsRect = details.getBoundingClientRect();
@@ -160,6 +163,9 @@ export function initializeSettingsController({
       return;
     }
 
+    closeAllSubmenus();
+    clearPersistedOpenSubmenu();
+    settingsBody?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     settingsPanel.classList.remove('is-open');
     settingsPanel.hidden = true;
     settingsPanel.setAttribute('hidden', '');
@@ -171,7 +177,6 @@ export function initializeSettingsController({
     }
   }
 
-  // Defensive cleanup in case an older cached build left the app locked.
   settingsPanel?.classList.remove('is-open');
   unlockPageScroll();
   setSettingsOpen(false);
@@ -218,7 +223,6 @@ export function initializeSettingsController({
     if (event.key === 'Escape') setSettingsOpen(false);
   });
 
-  // iOS/Safari: lock the app background; only the drawer body is scrollable.
   trackGlobalEventListener(document, 'touchmove', event => {
     if (!isSettingsOpen()) return;
     const panel = event.target.closest('#settingsPanel');
