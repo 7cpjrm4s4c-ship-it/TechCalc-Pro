@@ -3,8 +3,10 @@
    lives in components.css. This file may define only module-specific layouts, charts,
    domain widgets and responsive exceptions that cannot be represented by tc-* primitives. */
 
-.module-view { grid-column: span 12; animation: moduleIn .22s var(--ease); }
-@keyframes moduleIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+/* Module geometry must be stable from the first visible frame. A previous
+   translateY entrance animation made the upper spacing appear to load late. */
+.module-view { grid-column: span 12; animation: moduleIn .14s linear; }
+@keyframes moduleIn { from { opacity: 0; } to { opacity: 1; } }
 .module-head { display: none; }
 .module-content { grid-column: span 12; }
 .module-content > * { margin-block: 0; }
