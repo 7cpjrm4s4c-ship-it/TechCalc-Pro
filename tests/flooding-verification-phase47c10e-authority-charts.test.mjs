@@ -50,12 +50,21 @@ class FakeReport {
 const report = new FakeReport();
 assert.equal(renderAuthorityCharts(report, dto), true);
 assert.ok(report.ensureCalls.length >= 1, 'Diagrammblock muss Seitenraum reservieren.');
+assert.equal(report.ensureCalls[0].options, undefined, 'Die Seitenreservierung darf keinen doppelten Fortsetzungstitel erzeugen.');
 assert.ok(report.rects.length >= 12, 'Rahmen und Balken müssen als PDF-Vektoren gerendert werden.');
 assert.match(report.texts.join(' '), /12\. Diagramme/);
 assert.match(report.texts.join(' '), /DIN 1986-100/);
 assert.match(report.texts.join(' '), /DWA-A 117/);
 assert.match(report.texts.join(' '), /75,51 m³/);
 assert.ok(report.cursorY > 400, 'Cursor muss hinter den Diagrammblock verschoben werden.');
+
+const durationBarRects = report.rects.filter(args => args[2] <= 24 && args[3] > 1);
+assert.equal(durationBarRects.length >= 6, true, 'Alle DIN- und DWA-Dauerstufen müssen als Balken gerendert werden.');
+const dinBars = durationBarRects.slice(0, 3);
+const dwaBars = durationBarRects.slice(3, 6);
+assert.ok(dinBars[2][3] > dinBars[1][3] && dinBars[1][3] > dinBars[0][3], 'DIN-Balkenhöhen müssen den Volumina folgen.');
+assert.ok(dwaBars[2][3] > dwaBars[1][3] && dwaBars[1][3] > dwaBars[0][3], 'DWA-Balkenhöhen müssen den Volumina folgen.');
+assert.ok(report.lines.length >= 12, 'Maßgebende Dauerstufen müssen ohne Änderung der Balkenhöhe konturiert werden.');
 
 const emptyReport = new FakeReport();
 assert.equal(renderAuthorityCharts(emptyReport, {}), false);
