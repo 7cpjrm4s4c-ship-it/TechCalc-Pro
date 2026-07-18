@@ -1,6 +1,7 @@
 import { PDF_PAGE, PDF_THEME } from './reportTheme.js';
 
 const finite = value => Number.isFinite(Number(value));
+const CHART_HEADROOM_FACTOR = 1.1;
 
 function number(value, digits = 2) {
   if (!finite(value)) return '—';
@@ -28,13 +29,12 @@ function durationSeries(entries = [], governing = {}) {
     }))
     .filter(item => item.value != null);
   const maximum = mapped.length ? Math.max(...mapped.map(item => item.value)) : null;
-  const maximumCount = maximum == null ? 0 : mapped.filter(item => Math.abs(item.value - maximum) < 1e-9).length;
   return mapped.map(item => Object.freeze({
     label: item.label,
     value: item.value,
     governing: maximum != null
       && Math.abs(item.value - maximum) < 1e-9
-      && (!finite(governingDuration) || item.duration === Number(governingDuration) || maximumCount === 1)
+      && (!finite(governingDuration) || item.duration === Number(governingDuration) || mapped.filter(candidate => Math.abs(candidate.value - maximum) < 1e-9).length === 1)
   }));
 }
 
@@ -49,13 +49,18 @@ export function buildAuthorityChartModel(dto = {}) {
   return Object.freeze({ din, dwa, comparison });
 }
 
+export function authorityChartScaleMaximum(series = []) {
+  const dataMaximum = Math.max(1, ...series.map(item => Math.max(0, Number(item?.value) || 0)));
+  return dataMaximum * CHART_HEADROOM_FACTOR;
+}
+
 function drawBarChart(report, { title, series, x, y, width, height, accentFill = false }) {
   const padding = { top: 25, right: 12, bottom: 35, left: 36 };
   const plotX = x + padding.left;
   const plotY = y + padding.top;
   const plotW = width - padding.left - padding.right;
   const plotH = height - padding.top - padding.bottom;
-  const max = Math.max(1, ...series.map(item => Math.max(0, item.value || 0)));
+  const scaleMaximum = authorityChartScaleMaximum(series);
   const count = Math.max(1, series.length);
   const slotW = plotW / count;
   const barW = Math.max(2, Math.min(24, slotW * 0.62));
@@ -66,14 +71,14 @@ function drawBarChart(report, { title, series, x, y, width, height, accentFill =
   [0, 0.5, 1].forEach(factor => {
     const lineY = plotY + plotH - plotH * factor;
     report.line(plotX, lineY, plotX + plotW, lineY, PDF_THEME.rowLine, 0.3);
-    report.text(`${number(max * factor, factor === 0 ? 0 : 1)} m³`, plotX - 5, lineY + 2, { size: 5.2, font: 'F1', color: PDF_THEME.muted, align: 'right', maxWidth: 31 });
+    report.text(`${number(scaleMaximum * factor, factor === 0 ? 0 : 1)} m³`, plotX - 5, lineY + 2, { size: 5.2, font: 'F1', color: PDF_THEME.muted, align: 'right', maxWidth: 31 });
   });
 
   series.forEach((item, index) => {
     const centerX = plotX + slotW * (index + 0.5);
     const barX = centerX - barW / 2;
     const normalizedValue = Math.max(0, Number(item.value));
-    const barH = normalizedValue === 0 ? 1.5 : Math.max(1.5, (normalizedValue / max) * plotH);
+    const barH = normalizedValue === 0 ? 1.5 : Math.max(1.5, (normalizedValue / scaleMaximum) * plotH);
     const barY = plotY + plotH - barH;
     const fill = accentFill && item.governing ? PDF_THEME.accent : PDF_THEME.muted;
 
