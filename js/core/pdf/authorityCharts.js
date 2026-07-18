@@ -46,9 +46,10 @@ function drawBarChart(report, { title, series, x, y, width, height }) {
   const plotY = y + padding.top;
   const plotW = width - padding.left - padding.right;
   const plotH = height - padding.top - padding.bottom;
-  const max = Math.max(1, ...series.map(item => item.value || 0));
-  const gap = Math.max(8, plotW * 0.05);
-  const barW = Math.max(18, (plotW - gap * (series.length + 1)) / Math.max(1, series.length));
+  const max = Math.max(1, ...series.map(item => Math.max(0, item.value || 0)));
+  const count = Math.max(1, series.length);
+  const slotW = plotW / count;
+  const barW = Math.max(2, Math.min(24, slotW * 0.62));
 
   report.rect(x, y, width, height, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.5 });
   report.text(title, x + 8, y + 13, { size: 7.2, font: 'F2', color: PDF_THEME.accent, maxWidth: width - 16 });
@@ -60,13 +61,15 @@ function drawBarChart(report, { title, series, x, y, width, height }) {
   });
 
   series.forEach((item, index) => {
-    const barX = plotX + gap + index * (barW + gap);
-    const barH = Math.max(1.5, (item.value / max) * plotH);
+    const centerX = plotX + slotW * (index + 0.5);
+    const barX = centerX - barW / 2;
+    const normalizedValue = Math.max(0, item.value);
+    const barH = normalizedValue === 0 ? 1.5 : Math.max(1.5, (normalizedValue / max) * plotH);
     const barY = plotY + plotH - barH;
     const fill = item.governing ? PDF_THEME.accent : PDF_THEME.muted;
     report.rect(barX, barY, barW, barH, { fill, stroke: null, width: 0 });
-    report.text(`${number(item.value)} m³`, barX + barW / 2, Math.max(plotY + 7, barY - 4), { size: 5.5, font: 'F2', align: 'center', maxWidth: barW + gap });
-    report.text(item.label, barX + barW / 2, plotY + plotH + 13, { size: 5.5, font: item.governing ? 'F2' : 'F1', color: item.governing ? PDF_THEME.accent : PDF_THEME.text, align: 'center', maxWidth: barW + gap });
+    report.text(`${number(item.value)} m³`, centerX, Math.max(plotY + 7, barY - 4), { size: 5.5, font: 'F2', align: 'center', maxWidth: Math.max(slotW, barW) });
+    report.text(item.label, centerX, plotY + plotH + 13, { size: 5.5, font: item.governing ? 'F2' : 'F1', color: item.governing ? PDF_THEME.accent : PDF_THEME.text, align: 'center', maxWidth: slotW });
   });
 }
 
