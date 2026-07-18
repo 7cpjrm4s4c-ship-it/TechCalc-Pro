@@ -46,9 +46,9 @@ function hydraulicsSection(section, dto = {}) {
 }
 
 function sourcesSection(section) {
-  const rows = compactRows(section.rows).filter(row => /\b(?:DIN|DWA)\b/i.test(labelOf(row)));
+  const rows = compactRows(section.rows).filter(row => /\b(?:DIN|DWA|KOSTRA(?:-DWD)?)\b/i.test(labelOf(row)));
   return rows.length
-    ? { ...section, title: '11. Verwendete Regelwerke', rows }
+    ? { ...section, title: '11. Verwendete Regelwerke und Datengrundlagen', rows }
     : null;
 }
 
