@@ -1,5 +1,6 @@
 import { logger } from '../../core/logger.js';
 import { trackGlobalEventListener } from '../../core/eventManager.js';
+import { initializeUnsavedWorkGuard } from '../../core/unsavedWorkGuard.js';
 
 const SETTINGS_UI_STORAGE_KEY = 'techcalc-settings-ui';
 
@@ -31,6 +32,7 @@ export function initializeSettingsController({
   closeSettings = document.getElementById('closeSettings'),
   ensurePdfExport = () => Promise.resolve()
 } = {}) {
+  initializeUnsavedWorkGuard();
   if (settingsControllerInitialized) return;
   settingsControllerInitialized = true;
 
