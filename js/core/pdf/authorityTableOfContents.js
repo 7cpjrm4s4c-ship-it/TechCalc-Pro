@@ -37,25 +37,27 @@ export function renderAuthorityTableOfContents(report, pageIndex, entries = [], 
   if (report.images?.appIcon) report.drawImage('ImAppIcon', m, m, 30, 30);
   report.text('TechCalc Pro', m + 37, m + 12, { size: 11.2, font: 'F2' });
   report.text('HLSK QUICK TOOLS', m + 37, m + 24, { size: 5.9, font: 'F2', color: PDF_THEME.muted });
-  report.text(moduleData.title || moduleData.shortTitle || 'Überflutungsnachweis', right, m + 18, {
-    size: 7.2,
-    font: 'F2',
-    color: PDF_THEME.muted,
-    align: 'right',
-    maxWidth: 210
-  });
+
+  if (report.images?.companyLogo) {
+    const img = report.images.companyLogo;
+    const ratio = Math.min(96 / img.width, 34 / img.height);
+    const logoWidth = img.width * ratio;
+    const logoHeight = img.height * ratio;
+    report.drawImage('ImCompanyLogo', right - logoWidth, m, logoWidth, logoHeight);
+  } else {
+    report.text(moduleData.title || moduleData.shortTitle || 'Überflutungsnachweis', right, m + 18, {
+      size: 7.2,
+      font: 'F2',
+      color: PDF_THEME.muted,
+      align: 'right',
+      maxWidth: 210
+    });
+  }
   report.line(m, m + 48, right, m + 48, PDF_THEME.line, 0.7);
 
   report.text('INHALTSVERZEICHNIS', m, m + 91, { size: 8, font: 'F2', color: PDF_THEME.accent });
-  report.text('Dokumentstruktur und Kapitelübersicht', m, m + 119, { size: 19, font: 'F2', maxWidth: width });
-  report.text('Die Seitenangaben werden aus den tatsächlichen Kapitelstarts des erzeugten Dokuments übernommen.', m, m + 141, {
-    size: 7,
-    font: 'F1',
-    color: PDF_THEME.muted,
-    maxWidth: width
-  });
 
-  const startY = m + 184;
+  const startY = m + 132;
   const rowHeight = 31;
   entries.forEach((entry, index) => {
     const y = startY + index * rowHeight;
@@ -72,11 +74,6 @@ export function renderAuthorityTableOfContents(report, pageIndex, entries = [], 
 
   const endY = startY + entries.length * rowHeight + 10;
   report.line(m, endY, right, endY, PDF_THEME.line, 0.55);
-  report.text(`${entries.filter(entry => entry.chapter > 0).length} Fachkapitel`, m, endY + 17, {
-    size: 6.4,
-    font: 'F2',
-    color: PDF_THEME.muted
-  });
 
   report.page = previousPage;
   report.cursorY = previousCursorY;
