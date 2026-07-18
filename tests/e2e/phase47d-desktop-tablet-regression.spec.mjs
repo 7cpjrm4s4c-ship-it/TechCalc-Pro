@@ -81,6 +81,28 @@ test('behält die vertikale Position nach dem Mount ohne verzögerten Nachsprung
   expect(samples.map(sample => sample.value), JSON.stringify(samples)).toEqual([0, 0, 0, 0, 0]);
 });
 
+test('verschiebt die Moduloberkante während der Einblendung nicht', async ({ page }) => {
+  await openApp(page);
+  const button = await firstAlternativeModuleButton(page);
+  await expect(button).toBeVisible();
+  await button.click();
+  await expect.poll(() => page.evaluate(() => document.querySelector('#app .module-view')?.getBoundingClientRect().top ?? null)).not.toBeNull();
+
+  const positions = [];
+  for (const delay of [0, 30, 80, 160, 260]) {
+    if (delay) await page.waitForTimeout(delay - (positions.at(-1)?.delay || 0));
+    positions.push({
+      delay,
+      top: await page.evaluate(() => document.querySelector('#app .module-view')?.getBoundingClientRect().top ?? null),
+      transform: await page.evaluate(() => getComputedStyle(document.querySelector('#app .module-view')).transform)
+    });
+  }
+
+  const tops = positions.map(sample => sample.top);
+  expect(Math.max(...tops) - Math.min(...tops), JSON.stringify(positions)).toBeLessThanOrEqual(0.5);
+  expect(positions.every(sample => sample.transform === 'none'), JSON.stringify(positions)).toBe(true);
+});
+
 test('schließt beim Beenden des Hauptmenüs alle Menü-Cards', async ({ page }) => {
   await openApp(page);
   await page.locator('#settingsButton').click();
