@@ -17,6 +17,8 @@ import {
 } from './authorityTables.js';
 import { PDF_PAGE, PDF_THEME } from './reportTheme.js';
 
+const EXECUTIVE_SUMMARY_TITLE = 'ZUSAMMENFASSUNG';
+
 export function isFloodingAuthorityReport(moduleData = {}) {
   return moduleData.id === 'flooding-verification'
     && moduleData.reportSource === 'typed-dto'
@@ -87,9 +89,9 @@ export function renderAuthorityExecutiveSummary(report, moduleData) {
   const metricHeight = 45;
   const totalHeight = 20 + heroHeight + 7 + metricHeight + 8;
 
-  report.ensureSpace(totalHeight + 8, { repeatTitle: 'MANAGEMENT SUMMARY' });
+  report.ensureSpace(totalHeight + 8, { repeatTitle: EXECUTIVE_SUMMARY_TITLE });
   const startY = report.cursorY;
-  report.text('MANAGEMENT SUMMARY', m, startY + 7, { size: 8.6, font: 'F2', color: PDF_THEME.accent });
+  report.text(EXECUTIVE_SUMMARY_TITLE, m, startY + 7, { size: 8.6, font: 'F2', color: PDF_THEME.accent });
 
   const heroY = startY + 18;
   report.rect(m, heroY, width, heroHeight, { fill: PDF_THEME.soft, stroke: PDF_THEME.line, width: 0.65 });
