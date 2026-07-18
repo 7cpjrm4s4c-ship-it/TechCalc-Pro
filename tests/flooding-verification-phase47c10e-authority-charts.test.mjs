@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { buildAuthorityChartModel, renderAuthorityCharts } from '../js/core/pdf/authorityCharts.js';
+import { authorityChartScaleMaximum, buildAuthorityChartModel, renderAuthorityCharts } from '../js/core/pdf/authorityCharts.js';
 
 const dto = {
   summary: {
@@ -31,6 +31,8 @@ assert.equal(model.din[2].governing, true);
 assert.equal(model.dwa[2].governing, true);
 assert.equal(model.comparison[0].governing, true);
 assert.equal(model.comparison[1].governing, false);
+assert.ok(authorityChartScaleMaximum(model.din) > 75.51, 'Die Achsenskalierung muss oberhalb des Datenmaximums liegen.');
+assert.ok(authorityChartScaleMaximum(model.dwa) > 15.4, 'Auch kleine Diagramme benötigen eine Skalenreserve.');
 
 class FakeReport {
   constructor() {
@@ -64,6 +66,8 @@ const dinBars = durationBarRects.slice(0, 3);
 const dwaBars = durationBarRects.slice(3, 6);
 assert.ok(dinBars[2][3] > dinBars[1][3] && dinBars[1][3] > dinBars[0][3], 'DIN-Balkenhöhen müssen den Volumina folgen.');
 assert.ok(dwaBars[2][3] > dwaBars[1][3] && dwaBars[1][3] > dwaBars[0][3], 'DWA-Balkenhöhen müssen den Volumina folgen.');
+assert.ok(dinBars[2][3] < 110, 'Der größte DIN-Balken darf die obere Plotgrenze nicht exakt berühren.');
+assert.ok(dwaBars[2][3] < 110, 'Der größte DWA-Balken darf die obere Plotgrenze nicht exakt berühren.');
 assert.ok(report.lines.length >= 12, 'Maßgebende Dauerstufen müssen ohne Änderung der Balkenhöhe konturiert werden.');
 
 const emptyReport = new FakeReport();
