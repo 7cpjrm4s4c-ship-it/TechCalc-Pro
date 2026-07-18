@@ -25,9 +25,9 @@ Finalisierung der PDF-Engine des Überflutungsnachweises als verbindliche Refere
 
 ### 47C.12D – Quellen und Dokumentinformation
 
-- Quellenkapitel enthält ausschließlich verwendete DIN- und DWA-Regelwerke.
+- Quellenkapitel enthält ausschließlich tatsächlich verwendete Regelwerke und die KOSTRA-DWD-Datengrundlage.
 - Implementierungs- und DTO-Metadaten werden nicht mehr im Behördenbericht ausgegeben.
-- Dokumentinformation auf Firma, Dokumentversion und Ausgabedatum reduziert.
+- Dokumentinformation enthält Firma, Dokumentversion, Modul und Ausgabedatum.
 - Das Ausgabedatum enthält keine Uhrzeit.
 
 ### 47C.12E – Diagramm-Engine
@@ -35,7 +35,22 @@ Finalisierung der PDF-Engine des Überflutungsnachweises als verbindliche Refere
 - Balkenbreiten werden aus gleich großen Plot-Slots berechnet.
 - Balken bleiben unabhängig von der Anzahl der Dauerstufen innerhalb der Plotfläche.
 - Jeder vorhandene numerische Wert erzeugt einen sichtbaren Balken; Nullwerte erhalten eine minimale sichtbare Höhe.
+- Ganzzahlige PDF-Koordinaten mit Endnullen werden verlustfrei serialisiert.
+- Alle Balken verwenden dieselbe rahmenlose Geometrie; maßgebende Werte werden ausschließlich über die Akzentfarbe hervorgehoben.
+
+### 47C.12F – Final QA
+
+- Der finale Referenzexport wurde über fünf Seiten visuell geprüft.
+- Deckblatt, Inhaltsverzeichnis, Tabellen, Fortsetzungsüberschriften, Diagramme, Dokumentinformation und Fußzeilen sind ohne Überlagerung oder Beschnitt.
+- Die öffentliche Kapitelnummerierung ist nach dem Entfernen interner Kapitel wieder lückenlos von 1 bis 11.
+- Inhaltsverzeichnis und tatsächliche Seitennummern werden aus derselben öffentlichen Kapitelstruktur erzeugt.
+- PDF-Preflight: fünf Seiten, unverschlüsselt, technisch lesbar, keine XFA-Struktur und kein Scan-Dokument.
+- Der Phase-47C-Regressionslauf enthält die Review-Korrekturen und ein eigenes 47C.12F-Nummerierungs-Gate.
+
+## Version-1.0-Referenz
+
+Mit erfolgreichem Repository-Gate und erfolgreichem Deploy-Preview gilt die Authority-PDF-Engine des Überflutungsnachweises als **PDF-Engine Version 1.0**. Diese Fassung ist die verbindliche visuelle und strukturelle Ausgangsbasis für weitere technische Berichtsmodule. Änderungen an Deckblatt, Inhaltsverzeichnis, Tabellenraster, Diagrammstil, Dokumentinformation oder Kapitelpolitik erfordern danach eine explizite Versionierung und visuelle Regression.
 
 ## QA-Status
 
-Die Implementierung ist auf dem Feature-Branch enthalten. Die endgültige Freigabe und das Einfrieren als PDF-Engine 1.0 setzen einen erfolgreichen Deploy-Preview, die vollständigen Repository-Gates und eine visuelle Prüfung des final erzeugten PDF voraus.
+Die fachliche und visuelle Abnahme des finalen Exports ist erfolgt. Die technische Freigabe wird abgeschlossen, sobald der Head-Commit die vollständigen Repository-Gates und den Deploy-Preview erfolgreich durchlaufen hat.
