@@ -2,8 +2,15 @@ import { execFileSync } from 'node:child_process';
 
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
-console.log('> node tests/phase47d-regression-contract.test.mjs');
-execFileSync(process.execPath, ['tests/phase47d-regression-contract.test.mjs'], { stdio: 'inherit' });
+const contractTests = [
+  'tests/phase47d-regression-contract.test.mjs',
+  'tests/phase47d-shell-behavior-adjustments.test.mjs'
+];
+
+for (const file of contractTests) {
+  console.log(`> node ${file}`);
+  execFileSync(process.execPath, [file], { stdio: 'inherit' });
+}
 
 const commands = [
   ['run', 'lint'],
