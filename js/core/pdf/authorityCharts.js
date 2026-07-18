@@ -20,22 +20,30 @@ function volumeM3(entry = {}) {
 
 function durationSeries(entries = [], governing = {}) {
   const governingDuration = durationMinutes(governing);
-  return entries
+  const mapped = entries
     .map(entry => ({
+      duration: finite(durationMinutes(entry)) ? Number(durationMinutes(entry)) : null,
       label: finite(durationMinutes(entry)) ? `${number(durationMinutes(entry), 0)} min` : '—',
-      value: finite(volumeM3(entry)) ? Number(volumeM3(entry)) : null,
-      governing: finite(durationMinutes(entry)) && finite(governingDuration)
-        && Number(durationMinutes(entry)) === Number(governingDuration)
+      value: finite(volumeM3(entry)) ? Math.max(0, Number(volumeM3(entry))) : null
     }))
     .filter(item => item.value != null);
+  const maximum = mapped.length ? Math.max(...mapped.map(item => item.value)) : null;
+  return mapped.map(item => Object.freeze({
+    label: item.label,
+    value: item.value,
+    governing: maximum != null
+      && Math.abs(item.value - maximum) < 1e-9
+      && (!finite(governingDuration) || item.duration === Number(governingDuration) || mapped.filter(candidate => Math.abs(candidate.value - maximum) < 1e-9).length === 1)
+  }));
 }
 
 export function buildAuthorityChartModel(dto = {}) {
   const din = durationSeries(dto.durationComparison?.din || [], dto.floodingVerification?.equation21Governing || {});
   const dwa = durationSeries(dto.durationComparison?.dwa || [], dto.retentionVerification?.governing || {});
+  const governingSource = String(dto.summary?.governingSource || '').toLowerCase();
   const comparison = [
-    { label: 'DIN 1986-100', value: finite(dto.summary?.dinVolumeM3) ? Number(dto.summary.dinVolumeM3) : null, governing: dto.summary?.governingSource === 'din' || /DIN/i.test(dto.summary?.governingLabel || '') },
-    { label: 'DWA-A 117', value: finite(dto.summary?.dwaVolumeM3) ? Number(dto.summary.dwaVolumeM3) : null, governing: dto.summary?.governingSource === 'dwa' || /DWA/i.test(dto.summary?.governingLabel || '') }
+    { label: 'DIN 1986-100', value: finite(dto.summary?.dinVolumeM3) ? Number(dto.summary.dinVolumeM3) : null, governing: governingSource.includes('din') || /DIN/i.test(dto.summary?.governingLabel || '') },
+    { label: 'DWA-A 117', value: finite(dto.summary?.dwaVolumeM3) ? Number(dto.summary.dwaVolumeM3) : null, governing: governingSource.includes('dwa') || /DWA/i.test(dto.summary?.governingLabel || '') }
   ].filter(item => item.value != null);
   return Object.freeze({ din, dwa, comparison });
 }
