@@ -32,7 +32,7 @@ const tests = [
   'tests/flooding-verification-phase47c82b-result-table-layout.test.mjs',
   'tests/flooding-verification-phase47c82c-numeric-formatting.test.mjs',
   'tests/flooding-verification-phase47c82d-typography.test.mjs',
-  'tests/flooding-verification-phase47c82e-card-spacing.test.mjs',
+  'tests/flooding-verification-phase47c82e-card-spacing-audit.test.mjs',
   'tests/flooding-verification-phase47c82f-responsive-audit.test.mjs',
   'tests/flooding-verification-phase47c82g-visual-regression-gate.test.mjs',
   'tests/flooding-verification-phase47c9a-pdf-architecture-review.test.mjs',
@@ -50,7 +50,8 @@ const tests = [
   'tests/flooding-verification-phase47c11-authority-finalization.test.mjs',
   'tests/flooding-verification-phase47c12-review-fixes.test.mjs',
   'tests/flooding-verification-phase47c12f-final-qa.test.mjs',
-  'tests/flooding-verification-phase47d-conditional-dwa-pdf.test.mjs'
+  'tests/flooding-verification-phase47d-conditional-dwa-pdf.test.mjs',
+  'tests/flooding-verification-phase47d-german-pdf-labels.test.mjs'
 ];
 
 for (const file of tests) {
