@@ -42,11 +42,6 @@ function formatDuration(value) {
   return Number.isFinite(Number(value)) ? `${formatNumber(value, 0)} min` : '—';
 }
 
-function visibleCoverValue(value) {
-  const normalized = String(value ?? '').trim();
-  return normalized && normalized !== '-' && normalized !== '—';
-}
-
 export function renderAuthorityCoverPage(report, project, moduleData) {
   const cover = buildAuthorityCoverPage({ project, moduleData });
   const m = PDF_THEME.margin;
@@ -67,50 +62,19 @@ export function renderAuthorityCoverPage(report, project, moduleData) {
   }
 
   report.line(m, m + 66, right, m + 66, PDF_THEME.line, 0.8);
-  report.text(cover.eyebrow, center, 150, { size: 8, font: 'F2', color: PDF_THEME.accent, align: 'center' });
-  report.text(cover.title, center, 185, { size: 25, font: 'F2', align: 'center', maxWidth: width - 70, lineHeight: 1.1 });
-  report.text(cover.subtitle, center, 225, { size: 10, font: 'F1', color: PDF_THEME.muted, align: 'center' });
-  report.text('DIN 1986-100  ·  DWA-A 117', center, 250, { size: 8.4, font: 'F2', color: PDF_THEME.accent, align: 'center' });
-
-  const resultY = 300;
-  report.rect(m + 62, resultY, width - 124, 92, { fill: PDF_THEME.soft, stroke: PDF_THEME.line, width: 0.7 });
-  report.text('PLANERISCH ANZUSETZENDES SPEICHERVOLUMEN', center, resultY + 22, { size: 6.8, font: 'F2', color: PDF_THEME.muted, align: 'center' });
-  report.text(formatVolume(cover.planningVolume), center, resultY + 56, { size: 22, font: 'F2', color: PDF_THEME.accent, align: 'center' });
-  report.text(`Maßgebender Nachweis: ${cover.governingVerification}`, center, resultY + 77, { size: 7.6, font: 'F2', align: 'center', maxWidth: width - 150 });
-
-  const dataY = 440;
-  const rowHeight = 29;
-  const labelX = m + 22;
-  const valueX = m + 155;
-  const dataWidth = width - 44;
-  const rows = [
-    ['Projekt', cover.project],
-    ['Projektnummer', cover.projectNo],
-    ['Auftraggeber', cover.client],
-    ['Sachbearbeitung', cover.engineer],
-    ['Behörde / Netzbetreiber', cover.authority],
-    ['Aktenzeichen / Referenz', cover.authorityReference],
-    ['Dokumentversion', cover.documentVersion],
-    ['Ausgabedatum', cover.date]
-  ].filter(([, value]) => visibleCoverValue(value));
-  const dataHeight = rows.length * rowHeight + 20;
-  report.rect(m + 12, dataY - 10, dataWidth + 20, dataHeight, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.55 });
-  rows.forEach(([label, value], index) => {
-    const y = dataY + index * rowHeight;
-    if (index) report.line(m + 20, y - 9, right - 20, y - 9, PDF_THEME.rowLine, 0.3);
-    report.text(label, labelX, y + 7, { size: 6.4, font: 'F2', color: PDF_THEME.muted, maxWidth: 118 });
-    report.text(value, valueX, y + 7, { size: 7.2, font: 'F2', maxWidth: right - valueX - 24 });
+  report.text(cover.eyebrow, center, 250, {
+    size: 9,
+    font: 'F2',
+    color: PDF_THEME.accent,
+    align: 'center'
   });
-
-  const approvalY = 708;
-  report.line(m, approvalY, right, approvalY, PDF_THEME.line, 0.55);
-  report.text(cover.companyName, m, approvalY + 18, { size: 7, font: 'F2', maxWidth: 170 });
-  if (visibleCoverValue(cover.checkedBy)) {
-    report.text(`Geprüft: ${cover.checkedBy}`, center, approvalY + 18, { size: 6.6, font: 'F1', align: 'center', maxWidth: 150 });
-  }
-  if (visibleCoverValue(cover.approvedBy)) {
-    report.text(`Freigabe: ${cover.approvedBy}`, right, approvalY + 18, { size: 6.6, font: 'F1', align: 'right', maxWidth: 150 });
-  }
+  report.text(cover.title, center, 292, {
+    size: 27,
+    font: 'F2',
+    align: 'center',
+    maxWidth: width - 70,
+    lineHeight: 1.1
+  });
 }
 
 export function renderAuthorityExecutiveSummary(report, moduleData) {
