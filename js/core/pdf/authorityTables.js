@@ -1,23 +1,28 @@
+import { areaTypes } from '../../shared/rainwaterDomainTables.js';
 import { PDF_PAGE, PDF_THEME } from './reportTheme.js';
 
 const finite = value => Number.isFinite(Number(value));
 const text = value => String(value ?? '').trim() || '—';
 
-const SURFACE_TYPE_LABELS = Object.freeze({
-  'green-extensive-steep': 'Extensiv begrüntes Steildach',
-  'green-extensive-flat': 'Extensiv begrüntes Flachdach',
-  'green-intensive': 'Intensiv begrüntes Dach',
-  'lawn-flat': 'Rasenfläche, geringe Neigung',
-  'lawn-steep': 'Rasenfläche, starke Neigung',
-  'paving-sealed': 'Vollständig versiegelte Pflasterfläche',
+const DOMAIN_SURFACE_TYPE_LABELS = Object.fromEntries(
+  areaTypes.map(areaType => [areaType.id, areaType.name])
+);
+
+const LEGACY_SURFACE_TYPE_LABELS = Object.freeze({
+  'green-extensive-flat': 'Extensivbegrünung ≤ 5°',
   'paving-permeable': 'Wasserdurchlässige Pflasterfläche',
   roof: 'Dachfläche',
   yard: 'Hoffläche'
 });
 
-function surfaceTypeLabel(value) {
+const SURFACE_TYPE_LABELS = Object.freeze({
+  ...DOMAIN_SURFACE_TYPE_LABELS,
+  ...LEGACY_SURFACE_TYPE_LABELS
+});
+
+export function surfaceTypeLabel(value) {
   const key = String(value ?? '').trim();
-  return SURFACE_TYPE_LABELS[key] || key || 'Fläche';
+  return SURFACE_TYPE_LABELS[key] || 'Freie Fläche / eigener Abflussbeiwert';
 }
 
 function number(value, digits = 2) {
