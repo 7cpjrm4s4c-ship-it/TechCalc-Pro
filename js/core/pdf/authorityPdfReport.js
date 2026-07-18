@@ -3,6 +3,7 @@ import { buildAuthorityExecutiveSummary } from './authorityExecutiveSummary.js';
 import { renderAuthorityCharts } from './authorityCharts.js';
 import { renderAuthorityCorporateBlock } from './authorityCorporateBlock.js';
 import { applyAuthorityReportPolicy } from './authorityReportPolicy.js';
+import { isDwaVerificationRequired } from './authorityReportScope.js';
 import {
   addAuthorityTocPrelude,
   recordAuthorityTocEntry,
@@ -79,6 +80,7 @@ export function renderAuthorityCoverPage(report, project, moduleData) {
 
 export function renderAuthorityExecutiveSummary(report, moduleData) {
   const summary = buildAuthorityExecutiveSummary(moduleData);
+  const dwaRequired = isDwaVerificationRequired(moduleData.reportDto);
   const m = PDF_THEME.margin;
   const width = PDF_PAGE.width - m * 2;
   const heroHeight = 62;
@@ -97,13 +99,13 @@ export function renderAuthorityExecutiveSummary(report, moduleData) {
 
   const metricY = heroY + heroHeight + 7;
   const gap = 6;
-  const metricWidth = (width - gap * 3) / 4;
   const metrics = [
     ['BEMESSUNGSDAUER', formatDuration(summary.governingDurationMinutes)],
     ['GESAMTFLÄCHE', formatArea(summary.totalAreaM2)],
-    ['DIN-VOLUMEN', formatVolume(summary.dinVolumeM3)],
-    ['DWA-VOLUMEN', formatVolume(summary.dwaVolumeM3)]
+    ['DIN-VOLUMEN', formatVolume(summary.dinVolumeM3)]
   ];
+  if (dwaRequired) metrics.push(['DWA-VOLUMEN', formatVolume(summary.dwaVolumeM3)]);
+  const metricWidth = (width - gap * (metrics.length - 1)) / metrics.length;
   metrics.forEach(([label, value], index) => {
     const x = m + index * (metricWidth + gap);
     report.rect(x, metricY, metricWidth, metricHeight, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
