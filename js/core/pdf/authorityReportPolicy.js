@@ -45,9 +45,17 @@ function hydraulicsSection(section, dto = {}) {
   };
 }
 
+function sourcesSection(section) {
+  const rows = compactRows(section.rows).filter(row => /\b(?:DIN|DWA)\b/i.test(labelOf(row)));
+  return rows.length
+    ? { ...section, title: '11. Verwendete Regelwerke', rows }
+    : null;
+}
+
 /**
- * Final public-report policy. Internal diagnostics remain available in the app
- * and DTO, but are intentionally excluded from the authority PDF.
+ * Final public-report policy. Internal diagnostics and implementation metadata
+ * remain available in the app and DTO, but are intentionally excluded from the
+ * authority PDF.
  */
 export function applyAuthorityReportPolicy(section, dto = {}) {
   const title = clean(section?.title);
@@ -57,9 +65,7 @@ export function applyAuthorityReportPolicy(section, dto = {}) {
   if (/^2\.\s*Planerische Interpretation/i.test(title)) return interpretationSection(section);
   if (/^3\.\s*Projekt- und Behördenreferenz/i.test(title)) return projectReferenceSection(section);
   if (/^6\.\s*Leitungs- und Abflussnachweis/i.test(title)) return hydraulicsSection(section, dto);
-  if (/^12\.\s*Quellen, Versionen und Nachweisidentität/i.test(title)) {
-    return { ...section, title: title.replace(/^12\./, '11.') };
-  }
+  if (/^12\.\s*Quellen, Versionen und Nachweisidentität/i.test(title)) return sourcesSection(section);
   return section;
 }
 
