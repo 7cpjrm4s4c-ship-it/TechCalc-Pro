@@ -19,6 +19,7 @@ export function buildAuthorityCorporateData(project = {}, moduleData = {}) {
   return Object.freeze({
     company: clean(project.companyName) || '—',
     documentVersion: clean(project.documentVersion) || clean(metadata.appVersion) || '—',
+    module: clean(moduleData.shortTitle) || clean(moduleData.title) || clean(metadata.moduleTitle) || 'Überflutungsnachweis',
     generatedAt: formatDate(metadata.generatedAt),
     checkedBy: clean(project.checkedBy),
     approvedBy: clean(project.approvedBy)
@@ -37,11 +38,11 @@ export function renderAuthorityCorporateBlock(report, project = {}, moduleData =
   report.rect(m, y, width, height, { fill: PDF_THEME.soft, stroke: PDF_THEME.line, width: 0.45 });
   report.text('DOKUMENTINFORMATION', m + 7, y + 10, { size: 6.2, font: 'F2', color: PDF_THEME.accent });
 
-  const columnGap = 12;
-  const colWidth = (width - 14 - columnGap * 2) / 3;
-  const columns = [0, 1, 2].map(index => m + 7 + index * (colWidth + columnGap));
-  const labels = ['Firma', 'Dokumentversion', 'Ausgabedatum'];
-  const values = [data.company, data.documentVersion, data.generatedAt];
+  const columnGap = 10;
+  const colWidth = (width - 14 - columnGap * 3) / 4;
+  const columns = [0, 1, 2, 3].map(index => m + 7 + index * (colWidth + columnGap));
+  const labels = ['Firma', 'Dokumentversion', 'Modul', 'Ausgabedatum'];
+  const values = [data.company, data.documentVersion, data.module, data.generatedAt];
 
   labels.forEach((label, index) => {
     const x = columns[index];
