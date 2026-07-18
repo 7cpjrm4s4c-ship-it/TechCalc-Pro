@@ -80,7 +80,9 @@ export function pdfHexText(value = '') {
 }
 
 export function pdfNumber(value) {
-  return Number(value).toFixed(2).replace(/\.00$/, '').replace(/0$/, '');
+  const number = Number(value);
+  if (!Number.isFinite(number)) return '0';
+  return number.toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
 }
 
 export function estimateTextWidth(text, size = 8, font = 'F1') {
@@ -121,42 +123,34 @@ function splitLongToken(token, maxWidth, size) {
   return chunks;
 }
 
-export function splitPdfText(text, maxWidth, size = 8) {
-  const words = sanitizeText(text).split(/\s+/).filter(Boolean);
-  if (!words.length) return [''];
+export function splitPdfText(value = '', maxWidth = 200, size = 8) {
+  const text = sanitizeText(value);
+  if (!text) return [''];
+  const words = text.split(' ');
   const lines = [];
-  let line = '';
-  words.forEach(word => {
-    const wordParts = splitLongToken(word, maxWidth, size);
-    wordParts.forEach(part => {
-      const candidate = line ? `${line} ${part}` : part;
-      if (estimateTextWidth(candidate, size) <= maxWidth || !line) line = candidate;
-      else { lines.push(line); line = part; }
-    });
-  });
-  if (line) lines.push(line);
-  return lines;
+  let current = '';
+  for (const word of words) {
+    const parts = splitLongToken(word, maxWidth, size);
+    for (const part of parts) {
+      const candidate = current ? `${current} ${part}` : part;
+      if (current && estimateTextWidth(candidate, size) > maxWidth) {
+        lines.push(current);
+        current = part;
+      } else {
+        current = candidate;
+      }
+    }
+  }
+  if (current) lines.push(current);
+  return lines.length ? lines : [''];
 }
 
-export function rgb(values) {
-  return values.map(value => pdfNumber(value / 255)).join(' ');
+export function rgb(values = [0, 0, 0]) {
+  return values.map(value => pdfNumber(Number(value) / 255)).join(' ');
 }
 
-export function isNumericText(value) {
-  const normalized = sanitizeText(value).replace(/\s+/g, '');
-  return normalized !== '' && /^[-+]?\d+(?:[.,]\d+)?(?:%|°C|K|l\/s|m³\/h|kg\/h|kg\/m³|Pa\/m|m\/s|kW)?$/i.test(normalized);
-}
-
-export function pdfRowValue(row) {
-  if (!row) return '';
-  const value = sanitizeText(row?.[1] || '');
-  const unit = sanitizeText(row?.[2] || '');
-  return [value, unit].filter(Boolean).join(' ') || '-';
-}
-
-export function rowHeightForPdfRow(row, valueWidth = 110) {
-  const labelLines = splitPdfText(row?.[0] || '', 130, 6.4).length;
-  const value = [sanitizeText(row?.[1] || ''), sanitizeText(row?.[2] || '')].filter(Boolean).join(' ');
-  const valueLines = splitPdfText(value, valueWidth, 6.7).length;
-  return Math.max(12, Math.max(labelLines, valueLines) * 8.1 + 3.5);
+export function pdfRowValue(row = []) {
+  const value = sanitizeText(row?.[1] ?? '');
+  const unit = sanitizeText(row?.[2] ?? '');
+  return [value, unit].filter(Boolean).join(' ');
 }
