@@ -6,12 +6,17 @@ export const FLOODING_REPORT_DTO_VERSION = 1;
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 const array = value => Array.isArray(value) ? value : [];
 const object = value => value && typeof value === 'object' && !Array.isArray(value) ? value : {};
-const finite = value => Number.isFinite(Number(value)) ? Number(value) : null;
+const finite = value => {
+  if (value == null || String(value).trim() === '') return null;
+  const normalized = typeof value === 'string' ? value.replace(',', '.') : value;
+  const number = Number(normalized);
+  return Number.isFinite(number) ? number : null;
+};
 
 function mapSurface(surface = {}, index = 0) {
-  const areaM2 = finite(surface.area ?? surface.areaM2 ?? surface.areaSize);
-  const runoffCoefficientCs = finite(surface.cs ?? surface.runoffCoefficientCs);
-  const meanRunoffCoefficientCm = finite(surface.cm ?? surface.meanRunoffCoefficientCm);
+  const areaM2 = finite(surface.area ?? surface.areaM2 ?? surface.areaSize ?? surface.surfaceArea);
+  const runoffCoefficientCs = finite(surface.cs ?? surface.runoffCoefficientCs ?? surface.surfaceCs);
+  const meanRunoffCoefficientCm = finite(surface.cm ?? surface.meanRunoffCoefficientCm ?? surface.surfaceCm);
   return Object.freeze({
     id: surface.id ?? null,
     name: surface.name || surface.surfaceName || `Fläche ${index + 1}`,
