@@ -21,15 +21,38 @@ Das Gate führt in dieser Reihenfolge aus:
 5. reproduzierbaren Build,
 6. Playwright-E2E-Matrix.
 
+## Desktop-/Tablet-Teilgate
+
+```bash
+npm run test:e2e:desktop-tablet
+```
+
+Das Teilgate läuft ausschließlich in:
+
+- `chromium-desktop`,
+- `firefox-desktop`,
+- `chromium-tablet`,
+- `webkit-tablet`.
+
+Geprüft werden:
+
+- Start mit dem obersten Modul der gespeicherten Moduleinstellungen,
+- vollständiger Scroll-Reset beim Modulwechsel,
+- Schließen aller Cards beim Beenden des Hauptmenüs,
+- nativer Verlassen-Hinweis nach einer fachlichen Eingabe,
+- horizontal überlauffreie Darstellung auf Desktop und Tablet.
+
+Der Test `tests/e2e/phase47d-desktop-tablet-regression.spec.mjs` ist die automatisierte Evidenz. Reale Windows-, macOS- und iPadOS-Geräte bleiben ergänzend erforderlich.
+
 ## Automatisierte Browser- und Viewportmatrix
 
 | Playwright-Projekt | Engine | Zielklasse | Status |
 | --- | --- | --- | --- |
-| `chromium-desktop` | Chromium | Desktop / Chrome-Basis | konfiguriert, Ausführung erforderlich |
-| `firefox-desktop` | Firefox | Desktop / Firefox | konfiguriert, Ausführung erforderlich |
-| `chromium-tablet` | Chromium | Android-Tablet | konfiguriert, Ausführung erforderlich |
+| `chromium-desktop` | Chromium | Desktop / Chrome-Basis | Desktop-/Tablet-Teilgate eingerichtet, Ausführung erforderlich |
+| `firefox-desktop` | Firefox | Desktop / Firefox | Desktop-/Tablet-Teilgate eingerichtet, Ausführung erforderlich |
+| `chromium-tablet` | Chromium | Android-Tablet | Desktop-/Tablet-Teilgate eingerichtet, Ausführung erforderlich |
 | `chromium-mobile` | Chromium | Android-Smartphone | konfiguriert, Ausführung erforderlich |
-| `webkit-tablet` | WebKit | iPad-Klasse | konfiguriert, Ausführung erforderlich |
+| `webkit-tablet` | WebKit | iPad-Klasse | Desktop-/Tablet-Teilgate eingerichtet, Ausführung erforderlich |
 | `webkit-mobile` | WebKit | iPhone-Klasse | konfiguriert, Ausführung erforderlich |
 
 Playwright-WebKit ist ein automatisierter Engine-Nachweis, ersetzt aber keinen abschließenden Test auf realem iOS/iPadOS/macOS Safari.
@@ -39,12 +62,12 @@ Playwright-WebKit ist ein automatisierter Engine-Nachweis, ersetzt aber keinen a
 | Prüfbereich | Automatisierte Evidenz | Ergänzende manuelle Evidenz | Freigabestatus |
 | --- | --- | --- | --- |
 | Fachberechnung und definierte Referenzfälle | Phase-47C-Fachtests, DIN-/DWA-Dauerstufen- und kombinierte Speichertests | fachliche Gegenrechnung der freigegebenen Referenzfälle | offen bis Gate und Gegenrechnung protokolliert sind |
-| Save/Edit/Load und Dirty-State | Saved-Record-, Lifecycle-, Projekt-Storage- und Modulzustandstests | Interaktionsprüfung im Deploy Preview | offen |
+| Save/Edit/Load und Dirty-State | Saved-Record-, Lifecycle-, Projekt-Storage-, Modulzustands- und Desktop-/Tablet-E2E-Tests | Interaktionsprüfung im Deploy Preview | offen bis Teilgate ausgeführt ist |
 | Projektimport und -export | Projektdateiformat-, Storage- und Integrationsprüfungen | Import/Export einer realen `.tcproj`-Datei | offen |
 | Migration älterer Projekte | Legacy-Saved-Records- und Projektmigrationsprüfungen | Stichprobe mit archiviertem Projektstand | offen |
 | PDF und Mehrseitigkeit | Authority-PDF-, Pagination-, TOC-, Diagramm-, Scope- und PDF-Serialisierungstests | visueller Referenzexport über fünf Seiten; zusätzlicher Export ohne DWA bei unbeschränkter Einleitung erforderlich | Referenzexport 47C.12F akzeptiert; bedingter DWA-Export nach finalem Head offen |
 | Light/Dark/System | Theme-Audits und visuelle Flooding-E2E-Prüfungen | Sichtprüfung der drei Modi | offen |
-| Smartphone, Tablet, Desktop | sechs Playwright-Projekte | reale Touch- und Desktopgeräte | iOS-Smartphone manuell positiv bestätigt; Tablet und Desktop offen |
+| Smartphone, Tablet, Desktop | sechs Playwright-Projekte und dediziertes Desktop-/Tablet-Teilgate | reale Touch- und Desktopgeräte | iOS-Smartphone manuell positiv bestätigt; Desktop-/Tablet-Ausführung offen |
 | iOS/iPadOS/macOS/Windows | WebKit-/Chromium-/Firefox-Engine-Nachweise | reale Geräte und Betriebssysteme | iOS manuell durch Anwender bestätigt; iPadOS, macOS und Windows offen |
 | Chrome, Edge, Firefox, Safari | Chromium, Firefox und WebKit | Edge und reale Safari-Versionen | iOS Safari manuell positiv bestätigt; übrige reale Browser offen |
 | Offlinebetrieb und Cachewechsel | Service-Worker-, Offline-, Precache- und Update-Flow-Tests | installierte PWA mit Versionswechsel | offen |
@@ -59,7 +82,7 @@ Der DWA-A-117-Nachweis ist im Behörden-PDF ausschließlich enthalten, wenn `hyd
 - die DWA-A-117-Anwendungs- und Parameterprüfung,
 - der DWA-A-117-Dauerstufenvergleich,
 - DWA-Zeilen in Ergebniszusammenfassung und Quellen,
-- die DWA-Kennzahl im Management Summary,
+- die DWA-Kennzahl in der Zusammenfassung,
 - das DWA-Diagramm und der DIN-/DWA-Vergleich.
 
 Der DIN-1986-100-Nachweis und sein Dauerstufendiagramm bleiben vollständig erhalten. Die öffentliche Kapitelnummerierung bleibt lückenlos.
@@ -82,6 +105,7 @@ Je Kombination sind mindestens Modulstart, Eingabe, Berechnung, Save/Edit/Load, 
 Phase 47D ist abgeschlossen, wenn:
 
 - `npm run build:verify:phase47d` erfolgreich ausgeführt und protokolliert wurde,
+- `npm run test:e2e:desktop-tablet` in allen vier Zielprojekten erfolgreich ausgeführt wurde,
 - alle fachlichen Referenzfälle mit Sollwerten bestanden sind,
 - der finale PDF-Export nach dem letzten Head visuell bestätigt wurde,
 - die reale Plattformmatrix ohne kritische oder hohe Befunde abgeschlossen ist,
@@ -91,4 +115,4 @@ Phase 47D ist abgeschlossen, wenn:
 
 ## Aktueller Status
 
-Die konsolidierte Teststruktur, die erweiterte automatisierte Browsermatrix und die bedingte DWA-PDF-Ausgabe sind implementiert. Die App wurde auf iOS durch den Anwender ohne Auffälligkeiten bestätigt. Eine vollständige 47D-Freigabe ist noch nicht erteilt, da die Ausführung des Gesamt-Gates, der visuelle PDF-Nachweis für den Fall ohne DWA sowie die übrige reale Geräte-/OS-Matrix als Evidenz ausstehen.
+Die konsolidierte Teststruktur, die erweiterte automatisierte Browsermatrix, das Desktop-/Tablet-Teilgate und die bedingte DWA-PDF-Ausgabe sind implementiert. Die App wurde auf iOS durch den Anwender ohne Auffälligkeiten bestätigt. Eine vollständige 47D-Freigabe ist noch nicht erteilt, da die tatsächliche Ausführung des Desktop-/Tablet-Teilgates und des Gesamt-Gates, der visuelle PDF-Nachweis für den Fall ohne DWA sowie die übrige reale Geräte-/OS-Matrix als Evidenz ausstehen.
