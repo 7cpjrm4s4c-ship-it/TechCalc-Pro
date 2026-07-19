@@ -1,0 +1,70 @@
+/* Global module spacing contract.
+   Module styles may define columns and responsive placement, but not the
+   vertical rhythm between sibling cards. */
+
+#app,
+#app .module-view,
+#app .module-content {
+  overflow-anchor: none;
+}
+
+#app .module-view {
+  --tc-module-card-gap: var(--tc-card-stack-gap, var(--tc-gap));
+  row-gap: var(--tc-module-card-gap) !important;
+}
+
+#app .module-content {
+  row-gap: var(--tc-module-card-gap) !important;
+}
+
+/* Cards never contribute an additional external vertical margin. */
+#app .module-view :is(
+  .card,
+  .tc-card,
+  .result-card,
+  .saved-record-card,
+  .line-section-card,
+  .ph-saved-item
+) {
+  margin-block: 0 !important;
+}
+
+/* A wrapper that directly owns cards must not add its own gap. The sibling
+   rule below is the single source of the visible vertical distance. */
+#app .module-view :is(div, section, article, form):has(> :is(
+  .card,
+  .tc-card,
+  .result-card,
+  .saved-record-card,
+  .line-section-card,
+  .ph-saved-item
+)) {
+  row-gap: 0 !important;
+  gap: 0 !important;
+}
+
+#app .module-view :is(
+  .card,
+  .tc-card,
+  .result-card,
+  .saved-record-card,
+  .line-section-card,
+  .ph-saved-item
+) + :is(
+  .card,
+  .tc-card,
+  .result-card,
+  .saved-record-card,
+  .line-section-card,
+  .ph-saved-item
+) {
+  margin-top: var(--tc-module-card-gap) !important;
+}
+
+/* Nested column wrappers are also normalized when their direct children are
+   card-bearing wrappers rather than cards themselves. */
+#app .module-view :is(.tc-stack, .tc-stack--section, .hx-layout__left, .hx-layout__right,
+  .wrg-flow-column, .wrg-desktop-split__input, .wrg-desktop-split__output) {
+  row-gap: var(--tc-module-card-gap) !important;
+  gap: var(--tc-module-card-gap) !important;
+}
