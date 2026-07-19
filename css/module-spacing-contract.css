@@ -1,6 +1,7 @@
-/* Global module spacing contract.
-   Module adapters expose only the actual outer card stacks and their direct
-   layout items. Internal card geometry remains owned by the global components. */
+/* Global module layout contract.
+   Every module exposes exactly one outer root stack. Module-specific styles may
+   define columns and internal component layouts, but never the vertical rhythm
+   between top-level module sections. */
 
 :root {
   --tc-module-card-gap: var(--tc-card-stack-gap, var(--tc-gap));
@@ -16,15 +17,19 @@
   animation: none !important;
 }
 
-/* The central contract changes only the vertical distance between adapter
-   items. Horizontal grid spacing, columns and internal component gaps remain
-   untouched. */
-#app .tc-module-card-stack {
+/* Single source of truth for top-level module spacing. */
+#app .tc-module-root-stack {
   row-gap: var(--tc-module-card-gap) !important;
 }
 
-/* Adapter items must not add a second vertical distance through legacy margins.
-   This applies equally to cards and to explicit intermediate layout wrappers. */
-#app .tc-module-card-stack > .tc-module-card-stack__item {
+/* Top-level layout sections must not add legacy outer margins. Internal card,
+   form, result, chart and process spacing remains untouched. */
+#app .tc-module-root-stack > * {
   margin-block: 0 !important;
+}
+
+/* Standard explicit vertical stacks use the same global rhythm. These are
+   authored layout primitives, not runtime-discovered containers. */
+#app :is(.tc-stack, .tc-stack--section) {
+  row-gap: var(--tc-module-card-gap);
 }
