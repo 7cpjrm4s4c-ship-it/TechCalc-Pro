@@ -1,6 +1,10 @@
 /* Global module spacing contract.
-   Module styles may define columns and responsive placement, but not the
-   vertical rhythm between sibling cards. */
+   Modules expose their card-bearing stacks through the runtime adapter.
+   Only those explicit adapter classes receive the shared sibling spacing. */
+
+:root {
+  --tc-module-card-gap: var(--tc-card-stack-gap, var(--tc-gap));
+}
 
 #app,
 #app .module-view,
@@ -8,63 +12,30 @@
   overflow-anchor: none;
 }
 
+/* No entrance animation may change perceived module geometry. */
 #app .module-view {
-  --tc-module-card-gap: var(--tc-card-stack-gap, var(--tc-gap));
+  animation: none !important;
+}
+
+/* The adapter owns only spacing between independent card items. It does not
+   change grids, columns, internal card layout, field gaps or component padding. */
+#app .tc-module-card-stack {
   row-gap: var(--tc-module-card-gap) !important;
 }
 
-#app .module-content {
-  row-gap: var(--tc-module-card-gap) !important;
-}
-
-/* Cards never contribute an additional external vertical margin. */
-#app .module-view :is(
-  .card,
-  .tc-card,
-  .result-card,
-  .saved-record-card,
-  .line-section-card,
-  .ph-saved-item
-) {
-  margin-block: 0 !important;
-}
-
-/* A wrapper that directly owns cards must not add its own gap. The sibling
-   rule below is the single source of the visible vertical distance. */
-#app .module-view :is(div, section, article, form):has(> :is(
-  .card,
-  .tc-card,
-  .result-card,
-  .saved-record-card,
-  .line-section-card,
-  .ph-saved-item
-)) {
-  row-gap: 0 !important;
-  gap: 0 !important;
-}
-
-#app .module-view :is(
-  .card,
-  .tc-card,
-  .result-card,
-  .saved-record-card,
-  .line-section-card,
-  .ph-saved-item
-) + :is(
-  .card,
-  .tc-card,
-  .result-card,
-  .saved-record-card,
-  .line-section-card,
-  .ph-saved-item
-) {
-  margin-top: var(--tc-module-card-gap) !important;
-}
-
-/* Nested column wrappers are also normalized when their direct children are
-   card-bearing wrappers rather than cards themselves. */
-#app .module-view :is(.tc-stack, .tc-stack--section, .hx-layout__left, .hx-layout__right,
-  .wrg-flow-column, .wrg-desktop-split__input, .wrg-desktop-split__output) {
-  row-gap: var(--tc-module-card-gap) !important;
+#app .tc-module-card-stack.tc-stack,
+#app .tc-module-card-stack.tc-stack--section,
+#app .tc-module-card-stack.hx-layout__left,
+#app .tc-module-card-stack.hx-layout__right,
+#app .tc-module-card-stack.wrg-flow-column,
+#app .tc-module-card-stack.wrg-desktop-split__input,
+#app .tc-module-card-stack.wrg-desktop-split__output,
+#app .tc-module-card-stack.pipe-dimension-list,
+#app .tc-module-card-stack.result-group {
   gap: var(--tc-module-card-gap) !important;
+}
+
+/* Direct card items never add a second external vertical distance. */
+#app .tc-module-card-stack > .tc-module-card-stack__item {
+  margin-block: 0 !important;
 }
