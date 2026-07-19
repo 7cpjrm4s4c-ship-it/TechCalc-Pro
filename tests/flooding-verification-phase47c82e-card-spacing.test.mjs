@@ -9,9 +9,27 @@ const hxView = readFileSync(new URL('../js/modules/hx-diagram/view.js', import.m
 const wrgView = readFileSync(new URL('../js/modules/heat-recovery/view.js', import.meta.url), 'utf8');
 const mixedAirView = readFileSync(new URL('../js/modules/mixed-air/view.js', import.meta.url), 'utf8');
 const floodingView = readFileSync(new URL('../js/modules/flooding-verification/view.js', import.meta.url), 'utf8');
+const pressureHoldingView = readFileSync(new URL('../js/modules/pressure-holding/view.js', import.meta.url), 'utf8');
+const bufferStorageView = readFileSync(new URL('../js/modules/buffer-storage/view.js', import.meta.url), 'utf8');
+const pipeSizingView = readFileSync(new URL('../js/modules/pipe-sizing/view.js', import.meta.url), 'utf8');
+const drinkingWaterView = readFileSync(new URL('../js/modules/drinking-water/view.js', import.meta.url), 'utf8');
+const wastewaterView = readFileSync(new URL('../js/modules/wastewater/view.js', import.meta.url), 'utf8');
+const rainwaterView = readFileSync(new URL('../js/modules/rainwater/view.js', import.meta.url), 'utf8');
 const moduleRuntime = readFileSync(new URL('../js/core/moduleRuntime.js', import.meta.url), 'utf8');
 
-const migratedViews = [platformView, hxView, wrgView, mixedAirView, floodingView];
+const migratedViews = [
+  platformView,
+  hxView,
+  wrgView,
+  mixedAirView,
+  floodingView,
+  pressureHoldingView,
+  bufferStorageView,
+  pipeSizingView,
+  drinkingWaterView,
+  wastewaterView,
+  rainwaterView
+];
 
 test('central card spacing tokens separate title, content and sibling rhythms', () => {
   assert.match(polishCss, /--tc-card-title-gap:\s*calc\(var\(--tc-gap\)\s*\*\s*0\.5\)/);
