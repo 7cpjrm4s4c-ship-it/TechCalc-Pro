@@ -12,10 +12,10 @@ export function view(s){
     card('Anlagenvolumen', `<div data-ph-dynamic="volume-fields">${vm.volumeFieldsHtml}</div>`, 'purple'),
     card('Temperaturen / Stoffwerte', `<div data-ph-dynamic="temperature-fields">${vm.temperatureFieldsHtml}</div>`, 'purple'),
     card('Druckdaten', `<div data-ph-dynamic="pressure-fields">${vm.pressureFieldsHtml}</div>`, 'purple'),
-    `<div data-ph-dynamic="saved-records">${vm.savedRecordsHtml}</div>`
+    `<div class="tc-module-section" data-ph-dynamic="saved-records">${vm.savedRecordsHtml}</div>`
   ].join(''));
 
-  return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6" data-ph-dynamic="result">${vm.resultHtml}</div>`);
+  return renderModuleShell(config, `<div class="tc-module-layout tc-module-layout--2"><div class="tc-module-column">${inputColumn}</div><div class="tc-module-column"><div class="tc-module-section" data-ph-dynamic="result">${vm.resultHtml}</div></div></div>`);
 }
 
 export default view;
