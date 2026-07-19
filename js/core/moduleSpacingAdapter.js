@@ -7,74 +7,92 @@ const CARD_SELECTOR = [
   '.ph-saved-item'
 ].join(',');
 
-const BASE_STACK_SELECTORS = Object.freeze([
-  '.module-content',
-  '.tc-stack',
-  '.tc-stack--section',
-  '.card-grid',
-  '.result-group'
+const BASE_STACK_ADAPTERS = Object.freeze([
+  { selector: '.module-content', mode: 'card-bearing-items' },
+  { selector: '.tc-stack', mode: 'all-items' },
+  { selector: '.tc-stack--section', mode: 'all-items' },
+  { selector: '.card-grid', mode: 'all-items' },
+  { selector: '.result-group', mode: 'all-items' }
 ]);
 
-const MODULE_STACK_SELECTORS = Object.freeze({
+const MODULE_STACK_ADAPTERS = Object.freeze({
   'heating-cooling': [],
   ventilation: [],
-  'pressure-holding': ['.ph-saved-list'],
-  'buffer-storage': ['.buffer-saved-list'],
-  'heat-recovery': ['.wrg-flow-column', '.wrg-desktop-split__input', '.wrg-desktop-split__output'],
-  'mixed-air': ['.wrg-flow-column', '.wrg-desktop-split__input', '.wrg-desktop-split__output'],
-  'hx-diagram': ['.hx-layout__left', '.hx-layout__right', '.hx-process-path', '.hx-history'],
-  'pipe-sizing': ['.pipe-dimension-list'],
+  'pressure-holding': [{ selector: '.ph-saved-list', mode: 'all-items' }],
+  'buffer-storage': [{ selector: '.buffer-saved-list', mode: 'all-items' }],
+  'heat-recovery': [
+    { selector: '.wrg-flow-column', mode: 'all-items' },
+    { selector: '.wrg-desktop-split__input', mode: 'all-items' },
+    { selector: '.wrg-desktop-split__output', mode: 'all-items' }
+  ],
+  'mixed-air': [
+    { selector: '.wrg-flow-column', mode: 'all-items' },
+    { selector: '.wrg-desktop-split__input', mode: 'all-items' },
+    { selector: '.wrg-desktop-split__output', mode: 'all-items' }
+  ],
+  'hx-diagram': [
+    { selector: '.hx-layout__left', mode: 'all-items' },
+    { selector: '.hx-layout__right', mode: 'all-items' },
+    { selector: '.hx-process-path', mode: 'all-items' },
+    { selector: '.hx-history', mode: 'all-items' }
+  ],
+  'pipe-sizing': [{ selector: '.pipe-dimension-list', mode: 'all-items' }],
   'unit-converter': [],
-  'drinking-water': ['.dw-save-dialog__list', '.dw-save-dialog__body .tc-consumer-list'],
+  'drinking-water': [
+    { selector: '.dw-save-dialog__list', mode: 'all-items' },
+    { selector: '.dw-save-dialog__body .tc-consumer-list', mode: 'all-items' }
+  ],
   wastewater: [],
   rainwater: [],
-  'flooding-verification': ['.result-group']
+  'flooding-verification': [{ selector: '.result-group', mode: 'all-items' }]
 });
 
-function directCardChildren(container) {
+function isHidden(element) {
+  return Boolean(element?.hidden || element?.getAttribute?.('aria-hidden') === 'true');
+}
+
+function isCardBearingItem(element) {
+  if (!element || isHidden(element)) return false;
+  return Boolean(element.matches?.(CARD_SELECTOR) || element.querySelector?.(CARD_SELECTOR));
+}
+
+function directItems(container, mode) {
   if (!container?.children) return [];
-  return [...container.children].filter(child => child.matches?.(CARD_SELECTOR));
+  const children = [...container.children].filter(child => !isHidden(child));
+  if (mode === 'card-bearing-items') return children.filter(isCardBearingItem);
+  return children;
 }
 
-function hasCardBearingChild(container) {
-  if (!container?.children) return false;
-  return [...container.children].some(child =>
-    child.matches?.(CARD_SELECTOR) || directCardChildren(child).length > 0
-  );
-}
-
-function adaptContainer(container) {
-  if (!container) return false;
-  const directCards = directCardChildren(container);
-  if (directCards.length < 2 && !hasCardBearingChild(container)) return false;
+function adaptContainer(container, mode) {
+  const items = directItems(container, mode);
+  if (items.length < 2) return false;
   container.classList.add('tc-module-card-stack');
-  directCards.forEach(card => card.classList.add('tc-module-card-stack__item'));
+  items.forEach(item => item.classList.add('tc-module-card-stack__item'));
   return true;
+}
+
+function clearAdapterClasses(root) {
+  root.querySelectorAll('.tc-module-card-stack, .tc-module-card-stack__item').forEach(element => {
+    element.classList.remove('tc-module-card-stack', 'tc-module-card-stack__item');
+  });
 }
 
 export function applyModuleSpacingAdapter(root, moduleId) {
   if (!root?.querySelectorAll) return () => {};
 
-  root.querySelectorAll('.tc-module-card-stack, .tc-module-card-stack__item').forEach(element => {
-    element.classList.remove('tc-module-card-stack', 'tc-module-card-stack__item');
-  });
-
-  const selectors = [...BASE_STACK_SELECTORS, ...(MODULE_STACK_SELECTORS[moduleId] || [])];
+  clearAdapterClasses(root);
+  const adapters = [...BASE_STACK_ADAPTERS, ...(MODULE_STACK_ADAPTERS[moduleId] || [])];
   const seen = new Set();
 
-  for (const selector of selectors) {
-    root.querySelectorAll(selector).forEach(container => {
+  for (const adapter of adapters) {
+    root.querySelectorAll(adapter.selector).forEach(container => {
       if (seen.has(container)) return;
       seen.add(container);
-      adaptContainer(container);
+      adaptContainer(container, adapter.mode);
     });
   }
 
-  return () => {
-    root.querySelectorAll('.tc-module-card-stack, .tc-module-card-stack__item').forEach(element => {
-      element.classList.remove('tc-module-card-stack', 'tc-module-card-stack__item');
-    });
-  };
+  return () => clearAdapterClasses(root);
 }
 
-export const MODULE_SPACING_ADAPTERS = MODULE_STACK_SELECTORS;
+export const MODULE_SPACING_ADAPTERS = MODULE_STACK_ADAPTERS;
