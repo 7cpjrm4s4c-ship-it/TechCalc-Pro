@@ -73,8 +73,15 @@
   .hx-history__row { grid-template-columns: 1fr auto; }
   .hx-history__row--process { grid-template-columns: 1fr; }
   .hx-history__values { grid-column: 1 / -1; justify-content: flex-start; }
+
+  /* Mobile module adapter: WRG and mixed-air cards must form independent
+     vertical stacks. Keeping two grid columns couples row heights and creates
+     large apparent gaps below the shorter card. */
   .wrg-flow-layout,
-  .wrg-group-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .wrg-group-grid,
+  .wrg-desktop-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .wrg-flow-layout .tc-fields,
   .wrg-group-grid .tc-fields { grid-template-columns: 1fr; }
   .wrg-flow-layout .inline-stats,
