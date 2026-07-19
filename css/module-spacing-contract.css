@@ -1,6 +1,6 @@
 /* Global module spacing contract.
-   Modules expose their card-bearing stacks through the runtime adapter.
-   Only those explicit adapter classes receive the shared sibling spacing. */
+   Module adapters expose only the actual outer card stacks and their direct
+   layout items. Internal card geometry remains owned by the global components. */
 
 :root {
   --tc-module-card-gap: var(--tc-card-stack-gap, var(--tc-gap));
@@ -12,30 +12,19 @@
   overflow-anchor: none;
 }
 
-/* No entrance animation may change perceived module geometry. */
 #app .module-view {
   animation: none !important;
 }
 
-/* The adapter owns only spacing between independent card items. It does not
-   change grids, columns, internal card layout, field gaps or component padding. */
+/* The central contract changes only the vertical distance between adapter
+   items. Horizontal grid spacing, columns and internal component gaps remain
+   untouched. */
 #app .tc-module-card-stack {
   row-gap: var(--tc-module-card-gap) !important;
 }
 
-#app .tc-module-card-stack.tc-stack,
-#app .tc-module-card-stack.tc-stack--section,
-#app .tc-module-card-stack.hx-layout__left,
-#app .tc-module-card-stack.hx-layout__right,
-#app .tc-module-card-stack.wrg-flow-column,
-#app .tc-module-card-stack.wrg-desktop-split__input,
-#app .tc-module-card-stack.wrg-desktop-split__output,
-#app .tc-module-card-stack.pipe-dimension-list,
-#app .tc-module-card-stack.result-group {
-  gap: var(--tc-module-card-gap) !important;
-}
-
-/* Direct card items never add a second external vertical distance. */
+/* Adapter items must not add a second vertical distance through legacy margins.
+   This applies equally to cards and to explicit intermediate layout wrappers. */
 #app .tc-module-card-stack > .tc-module-card-stack__item {
   margin-block: 0 !important;
 }
