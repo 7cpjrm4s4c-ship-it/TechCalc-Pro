@@ -1,6 +1,6 @@
 import { logger } from './logger.js';
 import { hardResetModuleRoot } from './moduleLifecycleAdapter.js';
-import { applyModuleSpacingAdapter } from './moduleSpacingAdapter.js';
+import { applyModuleRootLayout } from './moduleLayoutContract.js';
 import { restoreFocus as restorePlatformFocus } from './focusManager.js';
 
 const DEFAULT_MOUNT_TIMEOUT_MS = 7000;
@@ -148,7 +148,7 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
   async function afterMount(moduleId, token) {
     clearLoadingTimer();
     if (!isCurrent(token)) return false;
-    normalizeHookResult(applyModuleSpacingAdapter(root, moduleId), activeRuntimeCleanups);
+    normalizeHookResult(applyModuleRootLayout(root, moduleId), activeRuntimeCleanups);
     root.dataset.activeModuleId = moduleId;
     delete root.dataset.pendingModuleId;
     root.removeAttribute('aria-busy');
