@@ -28,6 +28,36 @@
   margin-block: 0 !important;
 }
 
+/* Explicit module-layout adapters. A layout is one root-stack section; each
+   column owns an independent vertical card stack. */
+#app .tc-module-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--tc-module-card-gap);
+  min-width: 0;
+  align-items: start;
+}
+
+#app .tc-module-column,
+#app .tc-module-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tc-module-card-gap);
+  min-width: 0;
+  margin-block: 0;
+}
+
+#app .tc-module-column > *,
+#app .tc-module-section > * {
+  margin-block: 0;
+}
+
+@media (min-width: 1024px) {
+  #app .tc-module-layout--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* Standard explicit vertical stacks use the same global rhythm. These are
    authored layout primitives, not runtime-discovered containers. */
 #app :is(.tc-stack, .tc-stack--section) {
