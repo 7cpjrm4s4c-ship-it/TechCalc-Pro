@@ -66,15 +66,13 @@ export function renderView(s) {
       '<p class="tc-help ph-help">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'
     ].join('')), vm.accent),
     card('Medium / Faktor', `<div data-buffer-dynamic="medium">${renderMediumContent(vm)}</div>`, vm.accent),
-    `<div class="tc-stack" data-buffer-dynamic="input-blocks">${renderInputBlocks(vm)}</div>`,
-    `<div data-buffer-dynamic="saved-records">${renderSavedRecords(vm)}</div>`
+    `<div class="tc-module-section tc-stack" data-buffer-dynamic="input-blocks">${renderInputBlocks(vm)}</div>`,
+    `<div class="tc-module-section" data-buffer-dynamic="saved-records">${renderSavedRecords(vm)}</div>`
   ].join(''));
 
-  const resultColumn = stack([
-    `<div data-buffer-dynamic="result">${renderResultContent(vm)}</div>`
-  ].join(''));
+  const resultColumn = `<div class="tc-module-section" data-buffer-dynamic="result">${renderResultContent(vm)}</div>`;
 
-  return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6">${resultColumn}</div>`);
+  return renderModuleShell(config, `<div class="tc-module-layout tc-module-layout--2"><div class="tc-module-column">${inputColumn}</div><div class="tc-module-column">${resultColumn}</div></div>`);
 }
 
 const renderWithViewModel = renderer => (s, r) => renderer(createBufferStorageViewModel(s, r));
@@ -95,6 +93,5 @@ export function updateBufferStorageDynamic(root, s, meta = {}) {
 export function isDynamicBufferStorageAction(meta = {}) {
   return String(meta.action || '') !== 'initial';
 }
-
 
 export default renderView;
