@@ -120,6 +120,28 @@ label,
   gap: var(--tc-card-stack-gap);
 }
 
+/* Global module card-stack contract. Module styles may define columns and
+   responsive placement, but never their own vertical rhythm between cards. */
+.module-view,
+.module-content {
+  row-gap: var(--tc-card-stack-gap) !important;
+}
+
+.module-view :where(.tc-stack, .tc-stack--section, .card-grid, .form-grid, .result-group),
+.module-view :where(*) :has(> .card),
+.module-view :where(*) :has(> .tc-card),
+.module-view :where(*) :has(> .result-card) {
+  row-gap: var(--tc-card-stack-gap) !important;
+}
+
+.module-view :where(.card, .tc-card, .result-card, .saved-record-card, .line-section-card, .ph-saved-item) {
+  margin-block: 0 !important;
+}
+
+.module-view :where(.card, .tc-card, .result-card) + :where(.card, .tc-card, .result-card) {
+  margin-block-start: 0 !important;
+}
+
 .card > :first-child,
 .tc-card > :first-child,
 .result-card > :first-child,
