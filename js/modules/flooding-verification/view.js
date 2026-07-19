@@ -1,4 +1,4 @@
-import { renderModuleShell, stack } from '../../core/renderer.js';
+import { renderModuleShell } from '../../core/renderer.js';
 import { renderFormSchema } from '../../core/formSchema.js';
 import { renderResultModel } from '../../platform/resultRenderer/index.js';
 import { floodingSurfaceSchema, floodingCalculationSchema } from './schema.js';
@@ -38,13 +38,7 @@ export function createFloodingVerificationView({ config, calculate, results, lin
 
   function view(state = {}) {
     const result = calculate(state);
-    const inputColumn = stack([
-      `<div class="tc-stack" data-flooding-dynamic="surface-form">${renderSurfaceForm(state, result)}</div>`,
-      `<div class="tc-stack" data-flooding-dynamic="surface-records">${lineSectionController.renderCard(state)}</div>`,
-      `<div class="tc-stack" data-flooding-dynamic="calculation-form">${renderCalculationForm(state, result)}</div>`
-    ].join(''));
-    const outputColumn = `<div class="tc-stack" data-flooding-dynamic="result">${renderResult(state, result)}</div>`;
-    return renderModuleShell(config, `<div class="span-6">${inputColumn}</div><div class="span-6">${outputColumn}</div>`);
+    return renderModuleShell(config, `<div class="tc-module-layout tc-module-layout--2"><div class="tc-module-column"><div class="tc-module-section" data-flooding-dynamic="surface-form">${renderSurfaceForm(state, result)}</div><div class="tc-module-section" data-flooding-dynamic="surface-records">${lineSectionController.renderCard(state)}</div><div class="tc-module-section" data-flooding-dynamic="calculation-form">${renderCalculationForm(state, result)}</div></div><div class="tc-module-column"><div class="tc-module-section" data-flooding-dynamic="result">${renderResult(state, result)}</div></div></div>`);
   }
 
   return { view, renderSurfaceForm, renderCalculationForm, renderResult };
