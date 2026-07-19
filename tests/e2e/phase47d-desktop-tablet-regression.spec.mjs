@@ -103,6 +103,41 @@ test('verschiebt die Moduloberkante während der Einblendung nicht', async ({ pa
   expect(positions.every(sample => sample.transform === 'none'), JSON.stringify(positions)).toBe(true);
 });
 
+test('verwendet für direkte Card-Geschwister ausschließlich den zentralen vertikalen Abstand', async ({ page }) => {
+  await openApp(page);
+  const moduleIds = await page.locator('[data-module-id]').evaluateAll(elements =>
+    [...new Set(elements.map(element => element.dataset.moduleId).filter(Boolean))]
+  );
+  const violations = [];
+
+  for (const moduleId of moduleIds) {
+    await page.evaluate(id => { window.location.hash = `#/${id}`; }, moduleId);
+    await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', moduleId);
+
+    const moduleViolations = await page.locator('#app').evaluate((root, id) => {
+      const expected = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tc-card-stack-gap'));
+      const cardClasses = ['card', 'tc-card', 'result-card'];
+      const rows = [];
+      root.querySelectorAll('.module-view, .module-content, .tc-stack, .tc-stack--section, .card-grid, .form-grid, .result-group').forEach(container => {
+        const cards = [...container.children].filter(element =>
+          cardClasses.some(className => element.classList.contains(className)) && element.getBoundingClientRect().height > 0
+        );
+        for (let index = 1; index < cards.length; index += 1) {
+          const previous = cards[index - 1].getBoundingClientRect();
+          const current = cards[index].getBoundingClientRect();
+          if (current.top < previous.bottom) continue;
+          const distance = current.top - previous.bottom;
+          if (Math.abs(distance - expected) > 1) rows.push({ id, distance, expected, className: container.className });
+        }
+      });
+      return rows;
+    }, moduleId);
+    violations.push(...moduleViolations);
+  }
+
+  expect(violations, JSON.stringify(violations, null, 2)).toEqual([]);
+});
+
 test('schließt beim Beenden des Hauptmenüs alle Menü-Cards', async ({ page }) => {
   await openApp(page);
   await page.locator('#settingsButton').click();
