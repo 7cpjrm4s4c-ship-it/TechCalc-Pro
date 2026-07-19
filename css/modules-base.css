@@ -1,12 +1,12 @@
+@import url('./module-spacing-contract.css');
+
 /* Phase 34C: Module exceptions only. Module-specific layout exceptions only.
    Global component geometry (cards, fields, controls, buttons, saved records, result rows)
    lives in components.css. This file may define only module-specific layouts, charts,
    domain widgets and responsive exceptions that cannot be represented by tc-* primitives. */
 
-/* Module geometry must be stable from the first visible frame. A previous
-   translateY entrance animation made the upper spacing appear to load late. */
-.module-view { grid-column: span 12; animation: moduleIn .14s linear; }
-@keyframes moduleIn { from { opacity: 0; } to { opacity: 1; } }
+/* Module geometry and opacity are stable from the first visible frame. */
+.module-view { grid-column: span 12; animation: none; }
 .module-head { display: none; }
 .module-content { grid-column: span 12; }
 .module-content > * { margin-block: 0; }
