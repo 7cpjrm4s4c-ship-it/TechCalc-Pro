@@ -77,9 +77,7 @@ function clearAdapterClasses(root) {
   });
 }
 
-export function applyModuleSpacingAdapter(root, moduleId) {
-  if (!root?.querySelectorAll) return () => {};
-
+function applyAdapters(root, moduleId) {
   clearAdapterClasses(root);
   const adapters = [...BASE_STACK_ADAPTERS, ...(MODULE_STACK_ADAPTERS[moduleId] || [])];
   const seen = new Set();
@@ -91,8 +89,47 @@ export function applyModuleSpacingAdapter(root, moduleId) {
       adaptContainer(container, adapter.mode);
     });
   }
+}
 
-  return () => clearAdapterClasses(root);
+export function applyModuleSpacingAdapter(root, moduleId) {
+  if (!root?.querySelectorAll) return () => {};
+
+  let frameId = 0;
+  let disposed = false;
+  const schedule = typeof requestAnimationFrame === 'function'
+    ? requestAnimationFrame
+    : callback => globalThis.setTimeout(callback, 0);
+  const cancel = typeof cancelAnimationFrame === 'function'
+    ? cancelAnimationFrame
+    : id => globalThis.clearTimeout(id);
+
+  const scheduleApply = () => {
+    if (disposed || frameId) return;
+    frameId = schedule(() => {
+      frameId = 0;
+      if (!disposed) applyAdapters(root, moduleId);
+    });
+  };
+
+  applyAdapters(root, moduleId);
+
+  const observer = typeof MutationObserver !== 'undefined'
+    ? new MutationObserver(records => {
+        if (records.some(record => record.type === 'childList' && (record.addedNodes.length || record.removedNodes.length))) {
+          scheduleApply();
+        }
+      })
+    : null;
+
+  observer?.observe(root, { childList: true, subtree: true });
+
+  return () => {
+    disposed = true;
+    observer?.disconnect();
+    if (frameId) cancel(frameId);
+    frameId = 0;
+    clearAdapterClasses(root);
+  };
 }
 
 export const MODULE_SPACING_ADAPTERS = MODULE_STACK_ADAPTERS;
