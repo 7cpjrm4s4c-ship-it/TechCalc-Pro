@@ -26,19 +26,19 @@ export function renderInputs(vm){
 }
 
 export function renderOutputs(vm){
-  return stack(renderResultModel(vm.resultModel, vm.accent));
+  return renderResultModel(vm.resultModel, vm.accent);
 }
 
 export function renderView(s) {
   const vm = createMixedAirViewModel(s);
-  const body = stack([
-    `<div class="wrg-desktop-split">
-      <div class="wrg-desktop-split__input tc-stack"><div data-mixed-air-dynamic="inputs">${renderInputs(vm)}</div><div data-mixed-air-dynamic="saved-panel">${mixedAirSaveCard(s)}</div><div data-mixed-air-dynamic="formula" class="formula">${esc(vm.formula)}</div></div>
-      <div class="wrg-desktop-split__output tc-stack"><div data-mixed-air-dynamic="outputs">${renderOutputs(vm)}</div></div>
-    </div>`
-  ].join(''));
-
-  return renderModuleShell(config, `<div class="span-12">${body}</div>`);
+  return renderModuleShell(config, `<div class="tc-module-layout tc-module-layout--2 wrg-desktop-split">
+    <div class="tc-module-column wrg-desktop-split__input">
+      <div class="tc-module-section" data-mixed-air-dynamic="inputs">${renderInputs(vm)}</div>
+      <div class="tc-module-section" data-mixed-air-dynamic="saved-panel">${mixedAirSaveCard(s)}</div>
+      <div class="tc-module-section formula" data-mixed-air-dynamic="formula">${esc(vm.formula)}</div>
+    </div>
+    <div class="tc-module-column wrg-desktop-split__output"><div class="tc-module-section" data-mixed-air-dynamic="outputs">${renderOutputs(vm)}</div></div>
+  </div>`);
 }
 
 export default renderView;
