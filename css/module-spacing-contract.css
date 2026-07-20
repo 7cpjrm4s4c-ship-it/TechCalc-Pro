@@ -15,10 +15,17 @@
 
 #app .module-view {
   animation: none !important;
+  width: 100%;
+  min-width: 0;
 }
 
-/* Single source of truth for top-level module spacing. */
-#app .tc-module-root-stack {
+/* The shell owns the outer stack and always spans the complete host grid. */
+#app .module-view > .tc-module-root-stack {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  justify-self: stretch;
   row-gap: var(--tc-module-card-gap) !important;
 }
 
@@ -26,16 +33,20 @@
    form, result, chart and process spacing remains untouched. */
 #app .tc-module-root-stack > * {
   margin-block: 0 !important;
+  min-width: 0;
 }
 
-/* Explicit module-layout adapters. A layout is one root-stack section; each
-   column owns an independent vertical card stack. */
+/* Explicit inner module layouts. This class is reserved for content groups and
+   must never be applied to .module-view itself. */
 #app .tc-module-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--tc-module-card-gap);
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
   align-items: start;
+  justify-self: stretch;
 }
 
 #app .tc-module-column,
@@ -43,6 +54,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--tc-module-card-gap);
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
   margin-block: 0;
 }
@@ -50,6 +63,7 @@
 #app .tc-module-column > *,
 #app .tc-module-section > * {
   margin-block: 0;
+  min-width: 0;
 }
 
 @media (min-width: 1024px) {
