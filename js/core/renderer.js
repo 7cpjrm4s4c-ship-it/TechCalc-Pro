@@ -76,7 +76,6 @@ export function segmented(name, options, value, settings = {}) {
   return `<div class="segmented${accent}" role="tablist">${options.map(o => `<button type="button" data-tc-action="${esc(action)}" data-segment="${esc(name)}" data-value="${esc(o.value)}" class="${o.value === value ? 'is-active' : ''}">${esc(o.label)}</button>`).join('')}</div>`;
 }
 
-
 export function inlineStats(items) {
   return `<div class="inline-stats">${items.map(item => `<div class="inline-stat"><span>${esc(item.label)}</span><strong>${esc(item.value ?? '—')}${item.unit ? ` <small>${esc(item.unit)}</small>` : ''}</strong></div>`).join('')}</div>`;
 }
@@ -100,7 +99,6 @@ export function resultCard(title, rows, accent = 'blue') {
 export function emptyCard(title, message, accent = 'blue') {
   return card(title, `<div class="empty-state">${message}</div>`, accent);
 }
-
 
 export function isMobileViewport() {
   return Boolean(
@@ -186,11 +184,7 @@ function stableNthOfType(element, selector) {
 
 export function shouldPreserveViewportForClick(target) {
   if (!target || !target.closest) return true;
-  // Textfelder dürfen beim Fokussieren natürlich in den sichtbaren Bereich scrollen.
   if (target.closest('input, textarea, select, [contenteditable="true"]')) return false;
-  // Interaktive Elemente werden gezielt ueber die jeweilige Aktion stabilisiert.
-  // Die globale Klick-Restaurierung darf diese Aktionen nicht uebersteuern, sonst entstehen
-  // verzögerte Rueckspruenge nach dem eigentlichen State-Render.
   if (target.closest('a[href], button, summary, details, [role="button"], [data-line-card], [data-saved-record-card], .saved-record-card, [data-allow-scroll]')) return false;
   return true;
 }
@@ -252,8 +246,6 @@ export function bindNoClickScroll(root) {
 export function preserveViewport(action, { frames = 3, blurActive = false, delays = [40, 120], anchor = null, event = null } = {}) {
   const mobile = isMobileViewport();
   const snapshot = snapshotViewport({ anchor: anchor || findViewportAnchor(event?.target), event });
-  // Auf mobilen Browsern verursacht blur() bei geöffneter Bildschirmtastatur oft den größten Viewport-Sprung.
-  // Deshalb wird dort nicht aktiv geblurt; Fokus wird über safeReplaceContent mit preventScroll restauriert.
   if (blurActive && !mobile) {
     try { document.activeElement?.blur?.(); } catch { /* ignore */ }
   }
@@ -269,7 +261,7 @@ function uniqueDelays(values) {
 
 export function renderModuleShell(module, inner) {
   return `<section class="module-view" data-module="${esc(module.id)}">
-    <div class="module-content">${inner}</div>
+    <div class="module-content tc-module-root-stack" data-module-layout="${esc(module.id)}">${inner}</div>
   </section>`;
 }
 
@@ -304,8 +296,6 @@ function bindCommittedInteractionGuard(root) {
 }
 
 export function bindCommonInputs(root, state) {
-  // hasUnrenderedInput, renderCommittedInput(), confirmBySurfaceTouch and event.key !== 'Enter' are now owned by the central event pipeline.
   bindCommittedInteractionGuard(root);
   bindCentralEventPipeline(root, state, { renderOnBlur: true });
 }
-
