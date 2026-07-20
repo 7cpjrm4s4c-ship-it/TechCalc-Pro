@@ -32,6 +32,12 @@ assert.match(layoutCss, /#app\s*>\s*\.module-view\s*\{[^}]*grid-column:\s*1\s*\/
   '.module-view must span the complete #app grid');
 assert.match(layoutCss, /\.tc-module-layout--2\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s,
   'desktop two-column layouts must use resilient equal-width tracks');
+assert.match(layoutCss, /\.formula,[\s\S]*?\.empty-state,[\s\S]*?\.result-group[\s\S]*?margin-block:\s*0\s*!important/s,
+  'formula, note, empty and result blocks must be neutral stack items');
+assert.match(layoutCss, /\[data-platform-dynamic\],[\s\S]*?\[data-unit-dynamic\][\s\S]*?margin-block:\s*0\s*!important/s,
+  'dynamic islands must not introduce outer margins after calculation');
+assert.match(layoutCss, /\.tc-module-section\)\s*>\s*:is\(\.tc-help,\s*\.ph-help\)\s*\{[^}]*margin-top:\s*0\s*!important/s,
+  'help text inside authored stacks must use parent gap instead of top margins');
 
 for (const path of moduleViews) {
   const source = read(path);
@@ -43,4 +49,4 @@ for (const path of moduleViews) {
     `${path} must declare explicit independent columns`);
 }
 
-console.log(`Module layout contract audit passed for ${moduleViews.length} render paths.`);
+console.log(`Module layout and spacing contract audit passed for ${moduleViews.length} render paths.`);
