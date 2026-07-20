@@ -72,6 +72,57 @@
   min-width: 0;
 }
 
+/* Spacing finish: all authored module blocks participate as neutral stack
+   items. Their internal padding and typography remain component-owned. */
+#app .module-view :is(
+  .card,
+  .tc-card,
+  .result-card,
+  .formula,
+  .tc-note,
+  .tc-help,
+  .ph-help,
+  .ph-note,
+  .dw-note,
+  .empty-state,
+  .main-result,
+  .inline-stats,
+  .result-group,
+  .saved-record-list,
+  .line-section-list
+) {
+  margin-block: 0 !important;
+}
+
+/* Dynamic islands are layout-transparent stack items. Content appearing after
+   a calculation must not introduce a second outer spacing system. */
+#app .module-view :is(
+  [data-platform-dynamic],
+  [data-hc-dynamic],
+  [data-vent-dynamic],
+  [data-pipe-dynamic],
+  [data-ph-dynamic],
+  [data-buffer-dynamic],
+  [data-hx-dynamic],
+  [data-dw-dynamic],
+  [data-ww-dynamic],
+  [data-rw-dynamic],
+  [data-flooding-dynamic],
+  [data-wrg-dynamic],
+  [data-mixed-air-dynamic],
+  [data-unit-dynamic]
+) {
+  min-width: 0;
+  max-width: 100%;
+  margin-block: 0 !important;
+}
+
+/* Help text previously carried a component-level top margin. Inside an
+   authored stack the parent gap is the sole source of separation. */
+#app .module-view :is(.tc-stack, .tc-stack--section, .tc-module-column, .tc-module-section) > :is(.tc-help, .ph-help) {
+  margin-top: 0 !important;
+}
+
 @media (min-width: 1024px) {
   #app .tc-module-layout--2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
