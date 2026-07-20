@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const packageJson = JSON.parse(read('package.json'));
+const packageLock = JSON.parse(read('package-lock.json'));
 const indexHtml = read('index.html');
 const releaseNotes = read('docs/releases/1.4.0.md');
 
@@ -10,6 +11,10 @@ const currentVersion = packageJson.version;
 const allowedPreRelease = /^1\.4\.0-(?:dev\.\d+|rc\.\d+)$/;
 assert.ok(currentVersion === '1.4.0' || allowedPreRelease.test(currentVersion),
   `package version must target 1.4.0, got ${currentVersion}`);
+assert.equal(packageLock.version, currentVersion,
+  'package-lock.json top-level version must match package.json');
+assert.equal(packageLock.packages?.['']?.version, currentVersion,
+  'package-lock.json root package version must match package.json');
 
 const escapedVersion = currentVersion.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const visibleVersionMatches = indexHtml.match(new RegExp(escapedVersion, 'g')) || [];
