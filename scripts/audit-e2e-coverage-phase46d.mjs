@@ -5,6 +5,7 @@ const root = process.cwd();
 const requiredFiles = [
   'tests/e2e/phase37b-runtime-smoke.spec.mjs',
   'tests/e2e/phase46d-mixed-air-workflow.spec.mjs',
+  'tests/e2e/module-layout-contract.spec.mjs',
   'tests/fixtures/legacy-1.3.2-wrg-mixed-air.tcproj'
 ];
 
@@ -28,6 +29,20 @@ const requiredPatterns = [
 ];
 for (const [pattern, label] of requiredPatterns) {
   if (!pattern.test(mixedAirSpec)) failures.push(`missing ${label}`);
+}
+
+const layoutSpec = fs.readFileSync(path.join(root, 'tests/e2e/module-layout-contract.spec.mjs'), 'utf8');
+const layoutPatterns = [
+  [/discoverModuleIds/, 'all-module discovery'],
+  [/viewportWidth\s*>?=\s*1024/, 'desktop breakpoint assertion'],
+  [/tc-module-root-stack/, 'root-stack assertion'],
+  [/tc-module-column/, 'independent column assertion'],
+  [/stackViolations/, 'central spacing assertion'],
+  [/documentOverflow/, 'document overflow assertion'],
+  [/mutateFirstEditableControl/, 'post-calculation layout assertion']
+];
+for (const [pattern, label] of layoutPatterns) {
+  if (!pattern.test(layoutSpec)) failures.push(`module layout regression missing ${label}`);
 }
 
 const fixture = JSON.parse(fs.readFileSync(path.join(root, 'tests/fixtures/legacy-1.3.2-wrg-mixed-air.tcproj'), 'utf8'));
