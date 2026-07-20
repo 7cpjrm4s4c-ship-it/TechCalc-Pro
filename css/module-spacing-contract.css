@@ -13,13 +13,18 @@
   overflow-anchor: none;
 }
 
-#app .module-view {
-  animation: none !important;
+/* .module-view is the direct grid item of #app.grid-12. It must span the host
+   grid before any inner module widths can resolve correctly. */
+#app > .module-view {
+  grid-column: 1 / -1;
   width: 100%;
+  max-width: 100%;
   min-width: 0;
+  justify-self: stretch;
+  animation: none !important;
 }
 
-/* The shell owns the outer stack and always spans the complete host grid. */
+/* The shell owns the outer stack and always spans the complete module grid. */
 #app .module-view > .tc-module-root-stack {
   grid-column: 1 / -1;
   width: 100%;
@@ -40,6 +45,7 @@
    must never be applied to .module-view itself. */
 #app .tc-module-layout {
   display: grid;
+  grid-column: 1 / -1;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--tc-module-card-gap);
   width: 100%;
