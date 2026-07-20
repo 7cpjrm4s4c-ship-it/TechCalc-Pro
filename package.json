@@ -11,6 +11,7 @@
     "test:integration": "node scripts/test-integration.mjs",
     "test:e2e": "playwright test",
     "test:e2e:desktop-tablet": "playwright test tests/e2e/phase47d-desktop-tablet-regression.spec.mjs --project=chromium-desktop --project=firefox-desktop --project=chromium-tablet --project=webkit-tablet",
+    "test:e2e:module-layout": "playwright test tests/e2e/module-layout-contract.spec.mjs",
     "test:visual:flooding": "playwright test tests/e2e/flooding-verification-visual-regression.spec.mjs",
     "test:phase47d": "node scripts/test-phase47d-regression.mjs",
     "serve:static": "node scripts/serve-static.mjs",
