@@ -99,18 +99,20 @@ export function createVentilationView(config, calculate, lineSectionController) 
         `<div data-vent-dynamic="target-segment">${renderTargetSegment(s, active, processAccent)}</div>`,
         `<div data-vent-dynamic="input-fields">${grid(inputFields(s, active).join(''), 2)}</div>`
       ].join('')), processAccent),
-      `<div class="formula" data-vent-dynamic="formula">${ventilationFormulaText(r)}</div>`
+      `<div class="formula tc-module-section" data-vent-dynamic="formula">${ventilationFormulaText(r)}</div>`
     ].join(''));
 
     const outputColumn = stack([
-      `<div data-vent-dynamic="result">${renderVentilationResult(s, r, active, processAccent)}</div>`,
-      `<div data-vent-dynamic="air-stats">${renderAirStats(r)}</div>`,
-      lineSectionController.renderCard(s)
+      `<div class="tc-module-section" data-vent-dynamic="result">${renderVentilationResult(s, r, active, processAccent)}</div>`,
+      `<div class="tc-module-section" data-vent-dynamic="air-stats">${renderAirStats(r)}</div>`,
+      `<div class="tc-module-section">${lineSectionController.renderCard(s)}</div>`
     ].join(''));
 
     return renderModuleShell(config, `
-      <div class="span-6">${inputColumn}</div>
-      <div class="span-6">${outputColumn}</div>
+      <div class="tc-module-layout tc-module-layout--2">
+        <div class="tc-module-column">${inputColumn}</div>
+        <div class="tc-module-column">${outputColumn}</div>
+      </div>
     `).replace('<section class="module-view"', `<section class="module-view" data-process-accent="${processAccent}"`);
   };
 }
