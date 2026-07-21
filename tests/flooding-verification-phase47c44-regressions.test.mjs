@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import schema from '../js/modules/flooding-verification/schema.js';
-import { saveSurface, editSurface } from '../js/modules/flooding-verification/controller.js';
+import {
+  buildFloodingSurfaceRecord,
+  hydrateFloodingSurfaceRecord
+} from '../js/modules/flooding-verification/controller.js';
 import { calculate } from '../js/modules/flooding-verification/logic.js';
 import { savedVerificationModel } from '../js/modules/flooding-verification/savedRecords.js';
 
@@ -11,20 +14,40 @@ const draft = {
   surfaceArea: '100', surfaceCs: '1,0', surfaceCm: '0,8'
 };
 
-test('47C.4.4 successful surface add clears the draft and suppresses a synthetic second activation', () => {
-  const first = saveSurface({ current: draft });
-  assert.equal(first.surfaces.length, 1);
-  assert.equal(first.surfaceArea, '');
-  const second = saveSurface({ current: { ...draft, ...first } });
-  assert.deepEqual(second, {});
+test('47C.4.4 valid surface drafts build a normalized saved record', () => {
+  const record = buildFloodingSurfaceRecord({
+    currentState: draft,
+    id: 'surface-1'
+  });
+
+  assert.equal(record.id, 'surface-1');
+  assert.equal(record.name, 'Norddach');
+  assert.equal(record.category, 'roof');
+  assert.equal(record.areaType, 'tile-roof');
+  assert.equal(record.area, '100');
+  assert.equal(record.cs, '1,0');
+  assert.equal(record.cm, '0,8');
+  assert.equal(record.origin, 'manual');
+
+  assert.equal(buildFloodingSurfaceRecord({
+    currentState: { ...draft, surfaceArea: '' }
+  }), null);
 });
 
-test('47C.4.4 stored surfaces hydrate the editor', () => {
-  const surface = { id: 'surface-1', category: 'property', name: 'Hof', areaType: 'concrete-asphalt', area: '80', cs: '1,0', cm: '0,9' };
-  const patch = editSurface({ id: surface.id, current: { surfaces: [surface], activeSurfaceId: null } });
+test('47C.4.4 stored surfaces hydrate the complete editor state', () => {
+  const surface = {
+    id: 'surface-1', category: 'property', name: 'Hof',
+    areaType: 'concrete-asphalt', area: '80', cs: '1,0', cm: '0,9'
+  };
+  const patch = hydrateFloodingSurfaceRecord({ item: surface });
+
   assert.equal(patch.activeSurfaceId, surface.id);
   assert.equal(patch.surfaceName, 'Hof');
+  assert.equal(patch.surfaceCategory, 'property');
+  assert.equal(patch.surfaceAreaType, 'concrete-asphalt');
   assert.equal(patch.surfaceArea, '80');
+  assert.equal(patch.surfaceCs, '1,0');
+  assert.equal(patch.surfaceCm, '0,9');
 });
 
 test('47C.4.4 mean slope is an immediate field and changes the automatic duration', () => {
