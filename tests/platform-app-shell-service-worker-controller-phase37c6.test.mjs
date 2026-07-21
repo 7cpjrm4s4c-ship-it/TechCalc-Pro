@@ -7,7 +7,8 @@ const appSource = fs.readFileSync(path.join(root, 'js/core/app.js'), 'utf8');
 const controllerPath = path.join(root, 'js/platform/shell/serviceWorkerController.js');
 const controllerSource = fs.readFileSync(controllerPath, 'utf8');
 const serviceWorkerSource = fs.readFileSync(path.join(root, 'service-worker.js'), 'utf8');
-const serviceWorkerImport = "import { initializeServiceWorkerController } from '../platform/shell/" + 'serviceWorkerController.js' + "';";
+const serviceWorkerModulePath = ['..', 'platform', 'shell', 'serviceWorkerController.js'].join('/');
+const serviceWorkerImport = `import { initializeServiceWorkerController } from '${serviceWorkerModulePath}';`;
 
 assert.ok(fs.existsSync(controllerPath), 'serviceWorkerController.js must exist');
 assert.ok(appSource.includes(serviceWorkerImport), 'app.js must import service worker controller');
