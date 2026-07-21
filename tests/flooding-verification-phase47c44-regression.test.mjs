@@ -55,6 +55,6 @@ test('Phase 47C.4.4 uses the central line-section saved-record adapter', () => {
 
 test('Phase 47C.4.4 deduplicates collection actions independent of event type', () => {
   const runtime = fs.readFileSync(new URL('../js/platform/moduleRuntime/index.js', import.meta.url), 'utf8');
-  assert.match(runtime, /event type is intentionally excluded/);
-  assert.doesNotMatch(runtime, /collectionId \|\| ''\}:\$\{event\.type\}/);
+  assert.match(runtime, /const key = `\$\{action\}:\$\{element\.dataset\.collection \|\| ''\}:\$\{element\.dataset\.collectionId \|\| ''\}`/);
+  assert.doesNotMatch(runtime, /const key = `[^`]*\$\{event\.type\}[^`]*`/);
 });
