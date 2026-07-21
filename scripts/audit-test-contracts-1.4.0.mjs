@@ -71,6 +71,25 @@ function importedBindings(clause) {
   return names;
 }
 
+const staleFloodingContracts = [
+  {
+    pattern: /assert\.match\([^;\n]*\/(?:surfacesEdit|saveSurface|editSurface|surfaceCollectionItems)\//,
+    message: 'positively asserts a removed module-local flooding controller path'
+  },
+  {
+    pattern: /assert\.match\([^;\n]*\/event type is intentionally excluded\//,
+    message: 'asserts a removed implementation comment instead of the collection dedupe contract'
+  },
+  {
+    pattern: /assert\.deepEqual\([^;\n]*schema\.groups\[0\]\.fields\s*,\s*\['projectName'\]\s*\)/,
+    message: 'asserts the obsolete flooding schema group contract'
+  },
+  {
+    pattern: /assert\.match\([^;\n]*\/Dachflächen importieren\//,
+    message: 'asserts the obsolete flooding import label'
+  }
+];
+
 const testFiles = walk(testsRoot).filter(file => /\.(?:mjs|js)$/.test(file));
 for (const testFile of testFiles) {
   const source = fs.readFileSync(testFile, 'utf8');
@@ -90,6 +109,12 @@ for (const testFile of testFiles) {
   for (const match of source.matchAll(/\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g)) {
     const specifier = match[1];
     if (specifier.startsWith('.') && !resolveImport(testFile, specifier)) failures.push(`${relative(testFile)} dynamically imports missing module ${specifier}`);
+  }
+
+  if (/flooding|phase47c/i.test(path.basename(testFile))) {
+    for (const contract of staleFloodingContracts) {
+      if (contract.pattern.test(source)) failures.push(`${relative(testFile)} ${contract.message}`);
+    }
   }
 }
 
