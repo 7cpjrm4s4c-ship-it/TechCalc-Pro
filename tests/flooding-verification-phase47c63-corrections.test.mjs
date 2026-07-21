@@ -36,19 +36,35 @@ test('flat DWA rain inputs are mapped to the canonical duration model', () => {
   assert.deepEqual(buildRetentionRainByDuration(authorityState), { 5: '420', 10: '300', 15: '240' });
 });
 
-test('result model labels equation 20 and equation 21 durations separately', () => {
+test('result model separates equation 20 from the equation 21 duration comparison', () => {
   const result = calculate(authorityState);
   const model = results(authorityState, result);
-  const labels = model.primary.rows.map(row => row.label);
-  assert.ok(labels.includes('Regendauer Gleichung (20)'));
-  assert.ok(labels.includes('Maßgebende Dauer Gleichung (21)'));
-  assert.ok(!labels.includes('Maßgebende Dauer'));
+  const equation20 = model.groups.find(group => group.title === 'Gleichung (20)');
+  const equation21 = model.groups.find(group => group.title === 'Gleichung (21) – Dauerstufenvergleich');
+  const foundations = model.groups.find(group => group.title === 'Berechnungsgrundlagen');
+
+  assert.ok(equation20);
+  assert.ok(equation20.rows.some(row => row.label === 'Regendauer D der Gleichung (20)'));
+  assert.ok(equation21);
+  assert.ok(equation21.rows.length > 0);
+  assert.ok(foundations.rows.some(row => row.label === 'Maßgebende Dauerstufe Gleichung (21)'));
+  assert.ok(!model.primary.rows.some(row => row.label === 'Maßgebende Dauer'));
 });
 
-test('incomplete DWA input remains active and reports concrete missing values', () => {
-  const result = calculate({ ...authorityState, retentionSurchargeFactorFz: '', retentionRainDuration5: '', retentionRainDuration10: '', retentionRainDuration15: '' });
+test('automatic factors and r(D,2) fallback keep authority-mode retention calculable', () => {
+  const result = calculate({
+    ...authorityState,
+    retentionSurchargeFactorFz: '',
+    retentionRainDuration5: '',
+    retentionRainDuration10: '',
+    retentionRainDuration15: ''
+  });
+
   assert.equal(result.retention.active, true);
-  assert.equal(result.retention.calculated, false);
-  assert.ok(result.retention.errors.some(message => message.includes('Zuschlagsfaktor')));
-  assert.ok(result.retention.errors.some(message => message.includes('Regenspenden')));
+  assert.equal(result.retention.calculated, true);
+  assert.equal(result.retention.automaticTwoYearFallback, true);
+  assert.ok(result.retention.surchargeFactorFz > 0);
+  assert.deepEqual(result.retention.rainByDuration, { 5: '300', 10: '210', 15: '160' });
+  assert.ok(!result.retention.errors.some(message => message.includes('Zuschlagsfaktor')));
+  assert.ok(!result.retention.errors.some(message => message.includes('Regenspenden')));
 });
