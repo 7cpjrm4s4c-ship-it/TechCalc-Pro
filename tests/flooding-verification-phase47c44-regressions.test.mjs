@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import schema from '../js/modules/flooding-verification/schema.js';
+import schema, { floodingSurfaceSchema } from '../js/modules/flooding-verification/schema.js';
 import {
   buildFloodingSurfaceRecord,
   hydrateFloodingSurfaceRecord
@@ -14,7 +14,7 @@ const draft = {
   surfaceArea: '100', surfaceCs: '1,0', surfaceCm: '0,8'
 };
 
-test('47C.4.4 valid surface drafts build a normalized saved record', () => {
+test('47C.4.4 valid surface drafts build a canonical saved record', () => {
   const record = buildFloodingSurfaceRecord({
     currentState: draft,
     id: 'surface-1'
@@ -25,7 +25,7 @@ test('47C.4.4 valid surface drafts build a normalized saved record', () => {
   assert.equal(record.category, 'roof');
   assert.equal(record.areaType, 'tile-roof');
   assert.equal(record.area, '100');
-  assert.equal(record.cs, '1,0');
+  assert.equal(record.cs, '1');
   assert.equal(record.cm, '0,8');
   assert.equal(record.origin, 'manual');
 
@@ -37,7 +37,7 @@ test('47C.4.4 valid surface drafts build a normalized saved record', () => {
 test('47C.4.4 stored surfaces hydrate the complete editor state', () => {
   const surface = {
     id: 'surface-1', category: 'property', name: 'Hof',
-    areaType: 'concrete-asphalt', area: '80', cs: '1,0', cm: '0,9'
+    areaType: 'concrete-asphalt', area: '80', cs: '1', cm: '0,9'
   };
   const patch = hydrateFloodingSurfaceRecord({ item: surface });
 
@@ -46,7 +46,7 @@ test('47C.4.4 stored surfaces hydrate the complete editor state', () => {
   assert.equal(patch.surfaceCategory, 'property');
   assert.equal(patch.surfaceAreaType, 'concrete-asphalt');
   assert.equal(patch.surfaceArea, '80');
-  assert.equal(patch.surfaceCs, '1,0');
+  assert.equal(patch.surfaceCs, '1');
   assert.equal(patch.surfaceCm, '0,9');
 });
 
@@ -64,10 +64,13 @@ test('47C.4.4 mean slope is an immediate field and changes the automatic duratio
   assert.equal(calculate({ ...base, meanSlopePercent: '2,0' }).governingDurationMinutes, 10);
 });
 
-test('47C.4.4 snapshot action is visibly enabled and saved mode controls are explicit', () => {
-  const snapshot = schema.fields.find(item => item.key === 'rainwaterImport');
+test('47C.4.4 snapshot action and saved-record mode follow the current contracts', () => {
+  const snapshot = floodingSurfaceSchema.fields.find(item => item.key === 'rainwaterImport');
+  assert.ok(snapshot);
   assert.equal(snapshot.disabled, undefined);
   assert.equal(snapshot.variant, 'primary');
+  assert.equal(snapshot.action, 'flooding:import-roofs');
+
   assert.equal(savedVerificationModel({ activeVerificationId: null }).addDisabled, false);
   assert.equal(savedVerificationModel({ activeVerificationId: null }).updateDisabled, true);
   assert.equal(savedVerificationModel({ activeVerificationId: 'saved-1' }).addDisabled, true);
