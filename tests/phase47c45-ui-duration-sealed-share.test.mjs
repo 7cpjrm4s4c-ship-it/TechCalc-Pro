@@ -7,10 +7,13 @@ import { buildFloodingSurfaceRecord } from '../js/modules/flooding-verification/
 const viewSource = fs.readFileSync(new URL('../js/modules/flooding-verification/view.js', import.meta.url), 'utf8');
 const schemaSource = fs.readFileSync(new URL('../js/modules/flooding-verification/schema.js', import.meta.url), 'utf8');
 
-test('Phase 47C.4.5 uses central stack spacing for every dynamic island', () => {
-  assert.match(viewSource, /class="tc-stack" data-flooding-dynamic="surface-form"/);
-  assert.match(viewSource, /class="tc-stack" data-flooding-dynamic="calculation-form"/);
-  assert.match(viewSource, /class="tc-stack" data-flooding-dynamic="result"/);
+test('Phase 47C.4.5 uses the central module layout for every dynamic island', () => {
+  assert.match(viewSource, /class="tc-module-layout tc-module-layout--2"/);
+  assert.match(viewSource, /class="tc-module-column"/);
+  for (const island of ['surface-form', 'surface-records', 'calculation-form', 'result']) {
+    assert.match(viewSource, new RegExp(`class="tc-module-section" data-flooding-dynamic="${island}"`));
+  }
+  assert.doesNotMatch(viewSource, /class="tc-stack" data-flooding-dynamic=/);
 });
 
 test('Phase 47C.4.5 applies documented duration thresholds', () => {
