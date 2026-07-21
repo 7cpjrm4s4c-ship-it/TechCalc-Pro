@@ -45,6 +45,7 @@ test('does not relabel out-of-domain fA as a missing input', () => {
     reductionFactorFa: factors.reductionFactorFa
   });
   assert.equal(applicability.status, 'preliminary-only');
-  assert.ok(applicability.messages.some(message => message.includes('fA-Gültigkeit')));
+  assert.ok(applicability.checks.some(check => check.group === 'fa-validity' && !check.passed));
+  assert.ok(applicability.diagnostics.some(diagnostic => diagnostic.severity === 'warning'));
   assert.ok(applicability.messages.every(message => !message.includes('fehlen: Abminderungsfaktor')));
 });
