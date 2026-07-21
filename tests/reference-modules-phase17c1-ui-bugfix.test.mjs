@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import wastewater from '../js/modules/wastewater/index.js';
 import rainwater from '../js/modules/rainwater/index.js';
-import { view as rainwaterView } from '../js/modules/rainwater/view.js';
+import createRainwaterView from '../js/modules/rainwater/view.js';
 import { renderFormSchema } from '../js/core/formSchema.js';
 
 const savedRecordsSource = readFileSync(new URL('../js/core/savedRecords.js', import.meta.url), 'utf8');
@@ -27,6 +27,10 @@ assert.match(cssSource, /tc-collection-row\.tc-consumer-row--editable[\s\S]*grid
 
 assert.match(savedRecordsSource, /data-saved-record-id="\$\{esc\(item\.id\)\}"/, 'Saved cards must expose an explicit platform record id.');
 assert.match(savedRecordsSource, /\$\{toggleAttr\}="\$\{esc\(item\.id\)\}"/, 'Saved-card toggles must carry the record id for robust mobile selection.');
+
+const { view: rainwaterView } = createRainwaterView({
+  lineSectionController: { renderCard: () => '' }
+});
 
 function renderRainwater(state) {
   return rainwaterView(state);
