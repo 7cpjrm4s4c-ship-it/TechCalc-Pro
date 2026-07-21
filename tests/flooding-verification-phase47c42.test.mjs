@@ -36,5 +36,13 @@ test('47C.4.2 calculates dimensioning from the visible percent value', () => {
 
 test('47C.4.2 removes the misleading flooding-retention mode switch', () => {
   assert.equal(schema.fields.some(field => field.key === 'calculationMode'), false);
-  assert.deepEqual(schema.groups[0].fields, ['projectName']);
+  assert.deepEqual(schema.groups[0].fields, [
+    'rainR2Duration5',
+    'rainR2Duration10',
+    'rainR2Duration15',
+    'rainR30Duration5',
+    'rainR30Duration10',
+    'rainR30Duration15',
+    'rainR100Duration5'
+  ]);
 });
