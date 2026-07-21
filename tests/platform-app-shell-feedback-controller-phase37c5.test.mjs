@@ -7,7 +7,8 @@ const appSource = fs.readFileSync(path.join(root, 'js/core/app.js'), 'utf8');
 const controllerPath = path.join(root, 'js/platform/shell/feedbackController.js');
 const controllerSource = fs.readFileSync(controllerPath, 'utf8');
 const serviceWorkerSource = fs.readFileSync(path.join(root, 'service-worker.js'), 'utf8');
-const feedbackImport = "import { initializeFeedbackController } from '../platform/shell/" + 'feedbackController.js' + "';";
+const feedbackModulePath = ['..', 'platform', 'shell', 'feedbackController.js'].join('/');
+const feedbackImport = `import { initializeFeedbackController } from '${feedbackModulePath}';`;
 
 assert.ok(fs.existsSync(controllerPath), 'feedbackController.js must exist');
 assert.ok(appSource.includes(feedbackImport), 'app.js must import feedback controller');
