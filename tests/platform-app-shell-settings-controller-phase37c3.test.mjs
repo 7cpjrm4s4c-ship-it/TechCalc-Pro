@@ -7,7 +7,8 @@ const appSource = fs.readFileSync(path.join(root, 'js/core/app.js'), 'utf8');
 const controllerPath = path.join(root, 'js/platform/shell/settingsController.js');
 const controllerSource = fs.readFileSync(controllerPath, 'utf8');
 const serviceWorkerSource = fs.readFileSync(path.join(root, 'service-worker.js'), 'utf8');
-const settingsImport = "import { initializeSettingsController } from '../platform/shell/" + 'settingsController.js' + "';";
+const settingsModulePath = ['..', 'platform', 'shell', 'settingsController.js'].join('/');
+const settingsImport = `import { initializeSettingsController } from '${settingsModulePath}';`;
 
 assert.ok(fs.existsSync(controllerPath), 'settingsController.js must exist');
 assert.ok(appSource.includes(settingsImport), 'app.js must import settings controller');
