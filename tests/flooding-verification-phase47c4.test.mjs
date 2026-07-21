@@ -1,14 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { surfaceCollectionItems } from '../js/modules/flooding-verification/schema.js';
+import { floodingSurfaceSubtitle } from '../js/modules/flooding-verification/controller.js';
 import { calculate, lookupFullFlow, sizePipe } from '../js/modules/flooding-verification/logic.js';
 
 test('Phase 47C.3.2 renders German surface labels with explicit separation', () => {
-  const [item] = surfaceCollectionItems({ surfaces: [{ id: 'a', name: 'Norddach', category: 'roof', areaType: 'tile-roof', area: '100', cs: '1,0' }] });
-  assert.equal(item.title, 'Norddach');
-  assert.match(item.subtitle, /Dachfläche/);
-  assert.match(item.subtitle, /Ziegel\/Abdichtungsbahn/);
-  assert.doesNotMatch(item.subtitle, /tile-roof/);
+  const item = { id: 'a', name: 'Norddach', category: 'roof', areaType: 'tile-roof', area: '100', cs: '1,0' };
+  const subtitle = floodingSurfaceSubtitle(item);
+  assert.equal(item.name, 'Norddach');
+  assert.match(subtitle, /Dachfläche/);
+  assert.match(subtitle, /Ziegel\/Abdichtungsbahn/);
+  assert.doesNotMatch(subtitle, /tile-roof/);
 });
 
 test('Phase 47C.4 uses exact full-flow table values and sizes the smallest adequate DN', () => {
