@@ -49,7 +49,7 @@ test('Phase 47C.4.4 uses the central line-section saved-record adapter', () => {
   const schema = fs.readFileSync(new URL('../js/modules/flooding-verification/schema.js', import.meta.url), 'utf8');
   assert.match(index, /createLineSectionController/);
   assert.match(index, /cardTitle: 'Gespeicherte Flächen'/);
-  assert.match(schema, /Dachflächen importieren/);
+  assert.match(schema, /text: 'Flächen importieren'/);
   assert.doesNotMatch(schema, /FIELD_TYPES\.COLLECTION/);
 });
 
