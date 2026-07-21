@@ -27,7 +27,7 @@ test('imported surfaces participate in the hydraulic calculation', () => {
 
 test('pipe slope is interpreted and reported in percent', () => {
   assert.equal(tableSlopePercent('1,0'), 1);
-  assert.equal(tableSlopePercent('10'), 1);
+  assert.equal(tableSlopePercent('10'), 10);
   assert.equal(lookupFullFlow('DN 125', '1,0')?.slopePercent, 1);
 });
 
