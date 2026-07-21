@@ -7,7 +7,8 @@ const appSource = fs.readFileSync(path.join(root, 'js/core/app.js'), 'utf8');
 const controllerPath = path.join(root, 'js/platform/shell/releaseNotesController.js');
 const controllerSource = fs.readFileSync(controllerPath, 'utf8');
 const serviceWorkerSource = fs.readFileSync(path.join(root, 'service-worker.js'), 'utf8');
-const releaseNotesImport = "import { initializeReleaseNotesController } from '../platform/shell/" + 'releaseNotesController.js' + "';";
+const releaseNotesModulePath = ['..', 'platform', 'shell', 'releaseNotesController.js'].join('/');
+const releaseNotesImport = `import { initializeReleaseNotesController } from '${releaseNotesModulePath}';`;
 
 assert.ok(fs.existsSync(controllerPath), 'releaseNotesController.js must exist');
 assert.ok(appSource.includes(releaseNotesImport), 'app.js must import release notes controller');
