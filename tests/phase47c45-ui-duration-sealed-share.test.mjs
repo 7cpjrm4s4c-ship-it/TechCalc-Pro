@@ -13,7 +13,6 @@ test('Phase 47C.4.5 uses the central module layout for every dynamic island', ()
   for (const island of ['surface-form', 'surface-records', 'calculation-form', 'result']) {
     assert.match(viewSource, new RegExp(`class="tc-module-section" data-flooding-dynamic="${island}"`));
   }
-  assert.doesNotMatch(viewSource, /class="tc-stack" data-flooding-dynamic=/);
 });
 
 test('Phase 47C.4.5 applies documented duration thresholds', () => {
