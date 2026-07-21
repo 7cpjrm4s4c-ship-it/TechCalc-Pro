@@ -3,8 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {
   buildFloodingSurfaceRecord,
-  hydrateFloodingSurfaceRecord,
-  importRainwater
+  hydrateFloodingSurfaceRecord
 } from '../js/modules/flooding-verification/controller.js';
 import { deleteCollectionItem } from '../js/platform/collectionModel/index.js';
 
@@ -30,16 +29,19 @@ test('Phase 47C.4.4 hydrates the complete surface editor', () => {
   }});
   assert.equal(patch.activeSurfaceId, 'surface-a');
   assert.equal(patch.surfaceCategory, 'property');
+  assert.equal(patch.surfaceAreaType, 'concrete-asphalt');
   assert.equal(patch.surfaceArea, '250');
   assert.equal(patch.surfaceCs, '1,0');
   assert.equal(patch.surfaceCm, '0,9');
 });
 
-test('Phase 47C.4.4 imports only roof records into the saved-surface list', () => {
+test('Phase 47C.4.4 imports valid rainwater records with upsert and conflict handling', () => {
   const source = fs.readFileSync(new URL('../js/modules/flooding-verification/controller.js', import.meta.url), 'utf8');
-  assert.match(source, /item\.category === 'roof'/);
+  assert.match(source, /readRainwaterSurfaceSnapshot\(\)\.filter\(item => number\(item\.area\) > 0\)/);
   assert.match(source, /createRecordId\('rain-snapshot'\)/);
-  assert.match(source, /surfaces: \[\.\.\.imported, \.\.\.\(current\.surfaces \|\| \[\]\)\]/);
+  assert.match(source, /const replacements = new Map\(\)/);
+  assert.match(source, /if \(local\.modifiedAfterImport\)/);
+  assert.match(source, /const nextSurfaces = \[\.\.\.additions, \.\.\.nextExisting\]/);
 });
 
 test('Phase 47C.4.4 uses the central line-section saved-record adapter', () => {
