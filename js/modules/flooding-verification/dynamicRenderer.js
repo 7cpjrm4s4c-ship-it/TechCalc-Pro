@@ -1,9 +1,9 @@
-function setIsland(root, selector, html) {
+import { safeReplaceContent } from '../../core/domUpdate.js';
+
+function setIsland(root, selector, content) {
   const host = root?.querySelector?.(selector);
   if (!host) return false;
-  const next = String(html ?? '');
-  if (host.innerHTML !== next) host.innerHTML = next;
-  return true;
+  return safeReplaceContent(host, content);
 }
 
 function hasAny(changed = [], keys = []) {
