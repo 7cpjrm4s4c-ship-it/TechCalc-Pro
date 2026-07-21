@@ -10,7 +10,6 @@ const schema = read('js/modules/flooding-verification/schema.js');
 const logic = read('js/modules/flooding-verification/logic.js');
 const projectStorage = read('js/core/projectStorage.js');
 const projectAdapters = read('js/core/projectModuleStateAdapters.js');
-const collectionRenderer = read('js/platform/collectionRenderer/index.js');
 const rainwaterTables = read('js/modules/rainwater/tables.js');
 
 test('47C.4.3 has no module-local event or debounce path', () => {
@@ -27,10 +26,12 @@ test('47C.4.3 consumes shared domain tables instead of another module', () => {
   assert.match(rainwaterTables, /shared\/rainwaterDomainTables/);
 });
 
-test('47C.4.3 routes editing through the central collection action contract', () => {
-  assert.match(collectionRenderer, /platform:collection:add/);
-  assert.match(collectionRenderer, /editCollection/);
-  assert.match(controller, /surfacesEdit/);
+test('47C.4.3 routes surface editing through the central line-section controller', () => {
+  assert.match(index, /createLineSectionController/);
+  assert.match(index, /listKey: 'surfaces'/);
+  assert.match(index, /hydrateRecord: args => hydrateFloodingSurfaceRecord\(args\)/);
+  assert.match(controller, /lineSectionController\?\.bind\?\.\(root\)/);
+  assert.doesNotMatch(controller, /surfacesEdit|saveSurface|editSurface/);
 });
 
 test('47C.4.3 keeps project storage generic', () => {
