@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { calculate, lookupFullFlow, tableSlopePercent } from '../js/modules/flooding-verification/logic.js';
-import { surfaceCollectionItems } from '../js/modules/flooding-verification/schema.js';
+import { floodingSurfaceSubtitle } from '../js/modules/flooding-verification/controller.js';
 import { verificationSnapshot, hydrateVerification, savedVerificationModel } from '../js/modules/flooding-verification/savedRecords.js';
 
 const imported = {
@@ -32,9 +32,9 @@ test('pipe slope is interpreted and reported in percent', () => {
 });
 
 test('collection labels remain German and separated', () => {
-  const [item] = surfaceCollectionItems({ surfaces: [{ ...imported, name: 'Innenhof' }] });
-  assert.equal(item.title, 'Innenhof');
-  assert.match(item.subtitle, /^Grundstücksfläche · Cₛ 0,2 · Beton\/Asphalt$/);
+  const item = { ...imported, name: 'Innenhof' };
+  assert.equal(item.name, 'Innenhof');
+  assert.equal(floodingSurfaceSubtitle(item), 'Grundstücksfläche · Beton/Asphalt');
 });
 
 test('saved verification snapshot keeps all surfaces and can be hydrated', () => {
