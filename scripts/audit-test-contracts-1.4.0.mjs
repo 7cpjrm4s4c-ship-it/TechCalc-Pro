@@ -87,6 +87,14 @@ const staleFloodingContracts = [
   {
     pattern: /assert\.match\([^;\n]*\/Dachflächen importieren\//,
     message: 'asserts the obsolete flooding import label'
+  },
+  {
+    pattern: /tc-stack[^\n]*data-flooding-dynamic|data-flooding-dynamic[^\n]*tc-stack/,
+    message: 'asserts the obsolete flooding stack layout instead of the module-section contract'
+  },
+  {
+    pattern: /schema\.fields\.find\([^\n]*rainwaterImport/,
+    message: 'looks up the surface import action in the obsolete aggregate schema field list'
   }
 ];
 
