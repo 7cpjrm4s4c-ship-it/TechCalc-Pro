@@ -1,8 +1,11 @@
 import fs from 'node:fs';
+import path from 'node:path';
 
-const controller = fs.readFileSync('js/modules/heating-cooling/controller.js', 'utf8');
-const view = fs.readFileSync('js/modules/heating-cooling/view.js', 'utf8');
-const viewModel = fs.readFileSync('js/modules/heating-cooling/viewModel.js', 'utf8');
+const modulePath = fileName => path.join('js', 'modules', 'heating-cooling', fileName);
+const controller = fs.readFileSync(modulePath('controller.js'), 'utf8');
+const view = fs.readFileSync(modulePath('view.js'), 'utf8');
+const viewModel = fs.readFileSync(modulePath('viewModel.js'), 'utf8');
+const viewModelImport = `import { inputFields } from '${['.', 'viewModel.js'].join('/')}';`;
 
 if (controller.includes("from '../../core/renderer.js'")) {
   throw new Error('controller.js must not import renderer primitives after 18D.2');
@@ -12,7 +15,7 @@ if (/function\s+(massFlowField|powerField)\b/.test(controller) || /export\s+func
   throw new Error('field composition must live in viewModel.js, not controller.js');
 }
 
-if (!view.includes("import { inputFields } from './viewModel.js';")) {
+if (!view.includes(viewModelImport)) {
   throw new Error('view.js must import inputFields from viewModel.js');
 }
 
