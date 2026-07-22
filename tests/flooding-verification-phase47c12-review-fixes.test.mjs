@@ -50,8 +50,10 @@ const sourceSection = applyAuthorityReportPolicy({
     ['KOSTRA-DWD 2020', 'Regenspenden · 2020', ''],
     ['Report-Version', '1', '']
   ]
+}, {
+  hydraulics: { dischargeMode: 'authority-discharge-limit' }
 });
-assert.equal(sourceSection.title, '11. Verwendete Regelwerke und Datengrundlagen');
+assert.equal(sourceSection.title, '10. Verwendete Regelwerke und Datengrundlagen');
 assert.deepEqual(sourceSection.rows.map(row => row[0]), ['DIN 1986-100', 'DWA-A 117', 'KOSTRA-DWD 2020']);
 
 const documentInfo = buildAuthorityCorporateData({}, { reportDto: dto });
