@@ -40,7 +40,13 @@ check('keyboard-navigation-smoke', /Enter/.test(spec) && /Tab/.test(spec) && /hx
 check('mobile-nav-smoke', /mobile nav swipe/.test(spec) && /setViewportSize/.test(spec), 'mobile nav gesture smoke is covered');
 check('scroll-lock-smoke', /settings panel locks and restores scroll/.test(spec), 'settings scroll lock smoke is covered');
 check('offline-sw-smoke', /service worker registers/.test(spec) && /setOffline\(true\)/.test(spec), 'service worker offline reload smoke is covered');
-check('package-script:integration-gate', packageJson.scripts?.['test:integration'] === 'node scripts/test-integration.mjs', 'package exposes consolidated integration guard');
+
+const integrationCommand = String(packageJson.scripts?.['test:integration'] || '').trim();
+check(
+  'package-script:integration-gate',
+  /(?:^|&&\s*)node scripts\/test-integration\.mjs$/.test(integrationCommand),
+  'package exposes consolidated integration guard, optionally preceded by contract audits'
+);
 check('package-script:e2e-gate', packageJson.scripts?.['test:e2e'] === 'playwright test', 'package exposes consolidated Playwright e2e command');
 
 const report = {
