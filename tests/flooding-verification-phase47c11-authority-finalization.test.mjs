@@ -51,7 +51,7 @@ const hydraulics = applyAuthorityReportPolicy({
     ['Behördliche Einleitungsbegrenzung', '1,00', 'l/s']
   ]
 }, dto);
-assert.equal(hydraulics.title, '6. Behördliche Einleitungsrandbedingung');
+assert.equal(hydraulics.title, '5. Behördliche Einleitungsrandbedingung');
 assert.deepEqual(hydraulics.rows.map(row => row[0]), [
   'Betriebsart',
   'Quelle Qab',
@@ -68,7 +68,7 @@ const sources = applyAuthorityReportPolicy({
   title: '12. Quellen, Versionen und Nachweisidentität',
   rows: [['DIN 1986-100', 'Überflutungsnachweis', '']]
 }, dto);
-assert.match(sources.title, /^11\./);
+assert.equal(sources.title, '10. Verwendete Regelwerke und Datengrundlagen');
 
 const emptyReference = applyAuthorityReportPolicy({
   title: '3. Projekt- und Behördenreferenz',
