@@ -200,6 +200,7 @@ export function results(state = {}, result = {}) {
   }
 
   const dwaDuration = retentionComparison.governing?.durationMinutes;
+  const planningValueAvailable = diagnostic.status !== 'incomplete' && combinedStorage.planningVolumeM3 != null;
   return {
     diagnostic,
     interpretation,
@@ -207,8 +208,8 @@ export function results(state = {}, result = {}) {
       title: 'Bemessungsvolumen',
       primary: {
         label: 'Planerisch anzusetzendes Speichervolumen',
-        value: combinedStorage.planningVolumeM3 != null ? fmt(combinedStorage.planningVolumeM3, 'volume') : '—',
-        unit: combinedStorage.planningVolumeM3 != null ? 'm³' : ''
+        value: planningValueAvailable ? fmt(combinedStorage.planningVolumeM3, 'volume') : '—',
+        unit: planningValueAvailable ? 'm³' : ''
       },
       rows: [
         { label: 'Maßgebender Nachweis', value: combinedStorage.governingLabel || 'Nachweis unvollständig' },
