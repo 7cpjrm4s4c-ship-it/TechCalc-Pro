@@ -18,12 +18,19 @@ const cover = buildAuthorityCoverPage({
   moduleData
 });
 
-assert.equal(cover.kind, 'authority-cover');
-assert.equal(cover.project, 'Test Projekt');
-assert.equal(cover.planningVolume, 75.51);
-assert.equal(cover.governingVerification, 'DIN 1986-100');
-assert.equal(cover.authority, 'Stadtentwässerung');
+assert.deepEqual(cover, {
+  kind: 'authority-cover',
+  eyebrow: 'TECHNISCHER NACHWEIS',
+  title: 'Überflutungsnachweis'
+});
+assert.equal(Object.isFrozen(cover), true);
 assert.equal(isFloodingAuthorityReport(moduleData), moduleData.reportDto);
+
+const metadataFallback = buildAuthorityCoverPage({
+  moduleData: { reportDto: { metadata: { moduleTitle: 'Behördennachweis' } } }
+});
+assert.equal(metadataFallback.title, 'Behördennachweis');
+assert.equal(buildAuthorityCoverPage().title, 'Überflutungsnachweis');
 
 class FakePdfReport {
   constructor() {
@@ -45,12 +52,12 @@ assert.equal(installAuthorityCoverPage(FakePdfReport), true);
 assert.equal(installAuthorityCoverPage(FakePdfReport), false, 'installation must be idempotent');
 const report = new FakePdfReport();
 assert.equal(report.build({ project: 'Test Projekt' }, moduleData), 'pdf');
-assert.equal(report.addPageCalls, 1, 'cover must be followed by a dedicated report page');
-assert.equal(report.pages.length, 2, 'cover and report must be separate pages');
+assert.equal(report.addPageCalls, 2, 'cover and table of contents must be followed by a dedicated report page');
+assert.equal(report.pages.length, 3, 'cover, table of contents and report must be separate pages');
 assert.equal(report.originalBuildCalls, 1);
 
 const legacy = new FakePdfReport();
 legacy.build({}, { id: 'rainwater', reportSource: 'legacy-dom' });
 assert.equal(legacy.addPageCalls, 0, 'other reports must retain the existing layout');
 
-console.log('Phase 47C.10A authority cover page ok');
+console.log('Phase 47C.10A minimal authority cover page ok');
