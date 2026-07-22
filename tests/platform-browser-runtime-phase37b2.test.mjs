@@ -20,7 +20,8 @@ assert.equal(report.phase, '37B.2');
 assert.equal(report.status, 'passed');
 assert.equal(report.coverage.modules, 11);
 assert.deepEqual(report.coverage.scenarios, [
-  'module-route-mount',
+  'preferred-module-start',
+  'post-boot-module-route-mount',
   'saved-record-controls',
   'dynamic-renderer-field-commit',
   'enter-tab-navigation',
@@ -35,6 +36,9 @@ assert.match(spec, /collectRuntimeErrors\(page\)/);
 assert.match(spec, /isKnownExternalNoise\(message\)/);
 assert.match(spec, /DYNAMIC_RENDERER_MODULE_IDS/);
 assert.match(spec, /SAVED_RECORD_MODULE_IDS/);
+assert.match(spec, /async function ensureAppBooted\(page\)/);
+assert.match(spec, /await ensureAppBooted\(page\);[\s\S]*window\.location\.hash/);
+assert.doesNotMatch(spec, /page\.goto\(`?\.\/?#\//, 'runtime smoke must not use a hash as the initial app-start contract');
 assert.doesNotMatch(spec, /expect\(errors\)\.toEqual\(\[\]\);\s*\}\);\s*\n\s*test\('boots shell/s, 'runtime error assertion must stay inside each smoke scenario, not only the first one');
 
 console.log('phase37b2 browser runtime smoke expansion guard ok');
