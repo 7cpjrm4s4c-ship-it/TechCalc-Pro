@@ -23,7 +23,15 @@ const document = prepareAuthorityDocument(sections, { contentHeight: 180, width:
 assert.equal(document.totalRows, 622);
 assert.equal(document.largeDocument, true);
 assert.ok(document.pageCount > 10);
-assert.equal(validateRepeatedHeaders(document.pages), true);
+
+for (const section of sections) {
+  const sectionPages = document.pages.filter(page =>
+    page.title === section.title || page.title === `${section.title} (Fortsetzung)`
+  );
+  assert.ok(sectionPages.length >= 1, `Abschnitt ${section.title} muss mindestens eine Seite erzeugen.`);
+  assert.equal(validateRepeatedHeaders(sectionPages), true, `Header-Wiederholung muss innerhalb von ${section.title} gültig sein.`);
+}
+
 assert.ok(document.pages.slice(1).some(page => page.title.includes('(Fortsetzung)')));
 assert.ok(document.pages.every(page => page.rows.length <= 250));
 assert.ok(document.pages.every(page => page.header.columns.join('|') === 'Bezeichnung|Wert|Einheit'));
