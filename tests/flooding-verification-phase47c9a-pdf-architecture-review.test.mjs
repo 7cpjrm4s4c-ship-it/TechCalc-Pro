@@ -20,7 +20,7 @@ test('47C.9A documents typed DTO precedence and legacy DOM fallback', () => {
   assert.match(review, /Typed Report DTO statt Modul-DOM-Scraping/);
   assert.match(review, /legacy[-\s]?fallback/i);
   assert.match(review, /Keine Neuberechnung im Reporting/);
-  assert.match(review, /reportAdapter\.js ab 47C\.9B/);
+  assert.match(review, /`?reportAdapter\.js`?\s+ab\s+47C\.9B/);
   assert.match(review, /pdfDataMapping\.js/);
   assert.match(review, /pdfLayout\.js/);
 });
