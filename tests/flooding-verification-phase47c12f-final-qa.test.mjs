@@ -31,9 +31,28 @@ const expected = [
 
 assert.deepEqual(titles.map(authorityPublicChapterTitle), expected);
 
+function rowsFor(title) {
+  if (/Ergebniszusammenfassung/i.test(title)) {
+    return [['Planerisch anzusetzendes Speichervolumen', '75,51', 'm³']];
+  }
+  if (/Planerische Interpretation/i.test(title)) {
+    return [['Normative Aussage', 'Der größere Wert ist maßgebend.', '']];
+  }
+  if (/Leitungs- und Abflussnachweis/i.test(title)) {
+    return [
+      ['Betriebsart', 'behördliche Einleitungsbegrenzung', ''],
+      ['Behördliche Einleitungsbegrenzung', '1,00', 'l/s']
+    ];
+  }
+  if (/Quellen, Versionen und Nachweisidentität/i.test(title)) {
+    return [['DIN 1986-100', 'Überflutungsnachweis'], ['KOSTRA-DWD', 'Regenspenden']];
+  }
+  return [['Prüfwert', 'vorhanden', '']];
+}
+
 const publicSections = titles.map(title => applyAuthorityReportPolicy({
   title,
-  rows: [['DIN 1986-100', 'Überflutungsnachweis'], ['KOSTRA-DWD', 'Regenspenden']]
+  rows: rowsFor(title)
 }, { hydraulics: { dischargeMode: 'authority-discharge-limit' } })).filter(Boolean);
 
 const chapterNumbers = publicSections
