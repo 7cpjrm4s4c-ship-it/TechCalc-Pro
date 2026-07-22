@@ -173,7 +173,7 @@ test.describe('Phase 37B browser runtime smoke', () => {
     if (browserName === 'webkit') {
       await expect.poll(() => page.evaluate(() => document.body.style.position)).toBe('');
     } else {
-      await expect.poll(() => page.evaluate(() => Math.abs(window.scrollY - before))).toBeLessThanOrEqual(4);
+      await expect.poll(() => page.evaluate(expected => Math.abs(window.scrollY - expected), before)).toBeLessThanOrEqual(4);
     }
     expect(errors).toEqual([]);
   });
