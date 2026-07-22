@@ -57,11 +57,10 @@ export function initRouter(onRoute) {
   window.addEventListener('hashchange', handleRouteChange);
   window.addEventListener('popstate', handleRouteChange);
 
-  // A valid deep link is an explicit navigation request and therefore has
-  // precedence over persisted quick-access preferences. Missing or unknown
-  // hashes fall back to the configured preferred start route.
-  const hashRoute = getRouteFromHash();
-  const initialRoute = modules.get(hashRoute) ? hashRoute : preferredStartRoute();
+  // A fresh app start and a browser reload always use the first valid module
+  // from the persisted module settings. A historical hash is normalized to
+  // that preference; hash navigation remains available after boot.
+  const initialRoute = preferredStartRoute();
   activeRouteId = '';
   requestedRouteId = initialRoute;
   replaceHash(initialRoute);
