@@ -1,3 +1,8 @@
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
+
+const FAILURE_REPORT_PATH = 'test-results/playwright-ci-failures.txt';
+
 export default class PlaywrightCiFailureReporter {
   constructor() {
     this.failures = [];
@@ -24,16 +29,24 @@ export default class PlaywrightCiFailureReporter {
   }
 
   onEnd(result) {
+    const lines = [];
+
     if (!this.failures.length) {
-      console.log(`Playwright CI summary: ${result.status}`);
-      return;
+      lines.push(`Playwright CI summary: ${result.status}`);
+    } else {
+      lines.push(`Playwright CI failures: ${this.failures.length}`);
+      for (const [index, failure] of this.failures.entries()) {
+        lines.push('', `[${index + 1}] ${failure.projectName} :: ${failure.title}`);
+        lines.push(`    ${failure.location}`);
+        if (failure.errors) lines.push(failure.errors);
+      }
     }
 
-    console.error(`Playwright CI failures: ${this.failures.length}`);
-    for (const [index, failure] of this.failures.entries()) {
-      console.error(`\n[${index + 1}] ${failure.projectName} :: ${failure.title}`);
-      console.error(`    ${failure.location}`);
-      if (failure.errors) console.error(failure.errors);
-    }
+    const report = `${lines.join('\n')}\n`;
+    mkdirSync(dirname(FAILURE_REPORT_PATH), { recursive: true });
+    writeFileSync(FAILURE_REPORT_PATH, report, 'utf8');
+
+    if (this.failures.length) console.error(report);
+    else console.log(report.trimEnd());
   }
 }
