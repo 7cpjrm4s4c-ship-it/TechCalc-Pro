@@ -9,6 +9,9 @@ const dto = {
     governingLabel: 'DIN 1986-100',
     governingSource: 'din'
   },
+  hydraulics: {
+    dischargeMode: 'authority-discharge-limit'
+  },
   durationComparison: {
     din: [
       { durationMinutes: 5, valueM3: 51 },
