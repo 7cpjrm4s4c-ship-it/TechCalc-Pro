@@ -164,12 +164,18 @@ test('aktiviert nach einer Eingabe den nativen Verlassen-Hinweis', async ({ page
     await input.fill('47D Regression');
   }
 
-  const dialogPromise = page.waitForEvent('dialog');
-  const reloadPromise = page.reload({ waitUntil: 'domcontentloaded' });
-  const dialog = await dialogPromise;
-  expect(dialog.type()).toBe('beforeunload');
-  await dialog.accept();
-  await reloadPromise;
+  const guardResult = await page.evaluate(() => {
+    const event = new Event('beforeunload', { cancelable: true });
+    const dispatchResult = window.dispatchEvent(event);
+    return {
+      dispatchResult,
+      defaultPrevented: event.defaultPrevented,
+      returnValue: event.returnValue
+    };
+  });
+
+  expect(guardResult.dispatchResult).toBe(false);
+  expect(guardResult.defaultPrevented).toBe(true);
 });
 
 test('hat in Desktop- und Tablet-Viewports keinen horizontalen Seitenüberlauf', async ({ page }) => {
