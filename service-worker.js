@@ -99,6 +99,7 @@ const ASSETS = [
   './js/core/state.js',
   './js/core/stateBinding.js',
   './js/core/uiSystem.js',
+  './js/core/unsavedWorkGuard.js',
   './js/modules/buffer-storage/config.js',
   './js/modules/buffer-storage/controller.js',
   './js/modules/buffer-storage/index.js',
