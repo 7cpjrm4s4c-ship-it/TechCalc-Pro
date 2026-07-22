@@ -134,3 +134,11 @@
 #app :is(.tc-stack, .tc-stack--section) {
   row-gap: var(--tc-module-card-gap) !important;
 }
+
+/* Drinking-water still has legacy stack declarations in older component CSS.
+   This module-scoped guard has intentionally higher specificity so the central
+   spacing contract remains authoritative across all themes and viewports. */
+#app .module-view[data-module='drinking-water'] .tc-stack {
+  gap: var(--tc-module-card-gap) !important;
+  row-gap: var(--tc-module-card-gap) !important;
+}
