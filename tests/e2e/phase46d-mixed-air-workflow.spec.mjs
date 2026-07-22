@@ -15,8 +15,15 @@ function collectRuntimeErrors(page) {
   return errors;
 }
 
+async function ensureAppBooted(page) {
+  if (page.url() === 'about:blank') await page.goto('./');
+  await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', /.+/, { timeout: 10_000 });
+  await expect(page.locator('#app')).not.toHaveAttribute('aria-busy', /true/);
+}
+
 async function gotoModule(page, moduleId) {
-  await page.goto(`./#/${moduleId}`);
+  await ensureAppBooted(page);
+  await page.evaluate(id => { window.location.hash = `#/${id}`; }, moduleId);
   await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', moduleId, { timeout: 10_000 });
   await expect(page.locator('#app')).not.toHaveAttribute('aria-busy', /true/);
 }
