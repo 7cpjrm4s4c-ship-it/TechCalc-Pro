@@ -69,8 +69,9 @@ export function buildFloodingPlausibilityModel({ result = {}, applicability = {}
   }
 
   const utilization = number(result.utilizationPercent);
-  if (utilization != null && utilization > 1000) {
-    issues.push(issue('EXTREME_DISCHARGE_UTILIZATION', 'warning', `Die hydraulische Auslastung beträgt ${utilization.toLocaleString('de-DE', { maximumFractionDigits: 1 })} % und ist außergewöhnlich hoch.`, 'Einleitungsbegrenzung, Ableitungssystem und Speicherkonzept gemeinsam plausibilisieren.'));
+  const capacityBasedDischarge = result.dischargeMode !== 'authority-discharge-limit';
+  if (capacityBasedDischarge && utilization != null && utilization > 1000) {
+    issues.push(issue('EXTREME_DISCHARGE_UTILIZATION', 'warning', `Die hydraulische Auslastung beträgt ${utilization.toLocaleString('de-DE', { maximumFractionDigits: 1 })} % und ist außergewöhnlich hoch.`, 'Ableitungssystem und Speicherkonzept gemeinsam plausibilisieren.'));
   }
 
   const equation20Raw = number(result.flooding?.equation20?.rawValueM3);
