@@ -46,13 +46,16 @@ async function fillMixedAirReferenceValues(page) {
   }
 }
 
-async function openPdfSettings(page) {
-  await page.locator('#settingsButton').click();
-  await expect(page.locator('#settingsPanel')).toHaveClass(/is-open/);
-  const pdfDetails = page.locator('#settingsPanel details').filter({ hasText: /PDF-Export/ }).first();
-  if (!(await pdfDetails.evaluate(node => node.open))) {
-    await pdfDetails.locator('summary').click();
+async function openSettingsSection(page, title) {
+  const panel = page.locator('#settingsPanel');
+  if (!(await panel.evaluate(node => node.classList.contains('is-open')))) {
+    await page.locator('#settingsButton').click();
+    await expect(panel).toHaveClass(/is-open/);
   }
+  const details = panel.locator('details').filter({ hasText: title }).first();
+  if (!(await details.evaluate(node => node.open))) await details.locator('summary').click();
+  await expect(details).toHaveAttribute('open', '');
+  return details;
 }
 
 test.describe('Phase 46D mixed-air E2E coverage', () => {
@@ -91,15 +94,15 @@ test.describe('Phase 46D mixed-air E2E coverage', () => {
     const errors = collectRuntimeErrors(page);
     await gotoModule(page, 'mixed-air');
     await fillMixedAirReferenceValues(page);
-
     await page.evaluate(() => { window.showSaveFilePicker = undefined; });
 
+    await openSettingsSection(page, /Projekteinstellungen/);
     const projectDownload = page.waitForEvent('download');
     await expect(page.locator('#saveProjectButton')).toBeVisible();
     await page.locator('#saveProjectButton').click();
     await expect((await projectDownload).suggestedFilename()).toMatch(/\.tcproj$/);
 
-    await openPdfSettings(page);
+    await openSettingsSection(page, /PDF-Export/);
     const pdfDownload = page.waitForEvent('download');
     await expect(page.locator('#exportPdfButton')).toBeVisible();
     await page.locator('#exportPdfButton').click();
