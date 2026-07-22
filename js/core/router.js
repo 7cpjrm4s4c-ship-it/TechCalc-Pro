@@ -57,10 +57,11 @@ export function initRouter(onRoute) {
   window.addEventListener('hashchange', handleRouteChange);
   window.addEventListener('popstate', handleRouteChange);
 
-  // A fresh app start and a browser reload always use the first module from the
-  // persisted module settings. Historical hashes must not pin the app to the
-  // former default module.
-  const initialRoute = preferredStartRoute();
+  // A valid deep link is an explicit navigation request and therefore has
+  // precedence over persisted quick-access preferences. Missing or unknown
+  // hashes fall back to the configured preferred start route.
+  const hashRoute = getRouteFromHash();
+  const initialRoute = modules.get(hashRoute) ? hashRoute : preferredStartRoute();
   activeRouteId = '';
   requestedRouteId = initialRoute;
   replaceHash(initialRoute);
