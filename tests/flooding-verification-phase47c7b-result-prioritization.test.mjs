@@ -86,6 +86,8 @@ test('47C.7B groups applicability, compacts governing result and prioritizes dia
   assert.equal(model.primary.rows.at(-1).label, 'Begründung');
   assert.equal(model.primary.rows.at(-1).span, 3);
 
-  assert.deepEqual(model.notices.map(notice => notice.title), ['Warnungen']);
+  assert.deepEqual(model.notices.map(notice => notice.title), ['Warnungen', 'Empfehlungen']);
   assert.equal(model.notices[0].messages[0].prefix, 'Warnung');
+  assert.equal(model.notices[1].messages[0].prefix, 'Empfehlung');
+  assert.ok(model.notices[1].messages.some(message => message.text.includes('Notentwässerung')));
 });
