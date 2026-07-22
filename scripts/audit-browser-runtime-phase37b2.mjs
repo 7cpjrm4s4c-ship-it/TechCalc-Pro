@@ -31,6 +31,8 @@ for (const moduleId of moduleIds) {
   check(`route:${moduleId}`, spec.includes(`'${moduleId}'`), `E2E route smoke includes ${moduleId}`);
 }
 
+check('navigation:boot-before-hash', /async function ensureAppBooted\(page\)/.test(spec) && /await ensureAppBooted\(page\);[\s\S]*window\.location\.hash/.test(spec), 'module route smoke boots the preferred start module before hash navigation');
+check('navigation:no-direct-hash-boot', !/page\.goto\(`?\.\/?#\//.test(spec), 'runtime smoke does not treat a hash as the initial app-start contract');
 check('console-filter:external-only', /function isKnownExternalNoise\(message\)/.test(spec) && /cdn\\\.segment\\\.com/.test(spec), 'known non-app browser noise is explicitly filtered');
 check('console-guard:pageerror', /page\.on\('pageerror'/.test(spec), 'uncaught page errors are collected');
 check('console-guard:error-console', /message\.type\(\) === 'error'/.test(spec), 'console errors are collected');
@@ -57,7 +59,8 @@ const report = {
   coverage: {
     modules: moduleIds.length,
     scenarios: [
-      'module-route-mount',
+      'preferred-module-start',
+      'post-boot-module-route-mount',
       'saved-record-controls',
       'dynamic-renderer-field-commit',
       'enter-tab-navigation',
