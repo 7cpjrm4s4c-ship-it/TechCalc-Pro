@@ -55,7 +55,7 @@ const surfaces = new FakeReport();
 renderSurfaceTable(surfaces, dto);
 assert.equal(surfaces.sectionTitles[0], '4. Flächenübersicht (2)');
 assert.ok(surfaces.textCalls.some(([value]) => value === 'Flachdach'));
-assert.ok(surfaces.textCalls.some(([value]) => value === 'A · Cs [m2]'));
+assert.ok(surfaces.textCalls.some(([value]) => value === 'A × Cₛ [m²]'));
 assert.ok(surfaces.rectCalls.length >= 2);
 
 const rainfall = new FakeReport();
@@ -65,12 +65,12 @@ assert.ok(rainfall.textCalls.some(([value]) => value === '371,00'));
 
 const din = new FakeReport();
 renderDurationTable(din, dto, 'din');
-assert.ok(din.textCalls.some(([value]) => value === '75,51 m3'));
+assert.ok(din.textCalls.some(([value]) => value === '75,51 m³'));
 assert.ok(din.textCalls.some(([value]) => value === 'maßgebend'));
 
 const dwa = new FakeReport();
 renderDurationTable(dwa, dto, 'dwa');
-assert.ok(dwa.textCalls.some(([value]) => value === '15,40 m3'));
+assert.ok(dwa.textCalls.some(([value]) => value === '15,40 m³'));
 assert.ok(dwa.textCalls.some(([value]) => value === 'maßgebend'));
 
 console.log('Phase 47C.10C professional authority tables ok');
