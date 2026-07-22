@@ -1,14 +1,18 @@
 import { buildFloodingPlausibilityModel } from './plausibilityModel.js';
 
 const PRIORITY = Object.freeze({ error: 0, warning: 1, recommendation: 2, hint: 3 });
+const SEVERITIES = Object.freeze(new Set(Object.keys(PRIORITY)));
 
 const textOf = item => String(item?.text || item?.message || item || '').trim();
 
 function inferSeverity(item) {
-  if (item && typeof item === 'object' && PRIORITY[item.severity] != null) return item.severity;
+  const explicitSeverity = item && typeof item === 'object' ? item.severity : null;
+  if (SEVERITIES.has(explicitSeverity)) return explicitSeverity;
+
   const text = textOf(item);
-  if (/(muss|fehlt|ungültig|unvollständig|nicht erfüllt)/i.test(text)) return 'error';
-  if (/(außerhalb|überschritten|kleiner|größer|begrenzt|Vorbemessung)/i.test(text)) return 'warning';
+  if (/^fehler\b/i.test(text) || /(muss|fehlt|ungültig|unvollständig|nicht erfüllt)/i.test(text)) return 'error';
+  if (/^warnung\b/i.test(text) || /(außerhalb|überschritten|kleiner|größer|begrenzt|Vorbemessung)/i.test(text)) return 'warning';
+  if (/^empfehlung\b/i.test(text)) return 'recommendation';
   return 'hint';
 }
 
@@ -16,7 +20,11 @@ function normalize(items = []) {
   const seen = new Set();
   return (Array.isArray(items) ? items : [items])
     .map(item => ({ severity: inferSeverity(item), text: textOf(item) }))
-    .filter(item => item.text && !seen.has(item.text) && seen.add(item.text))
+    .filter(item => {
+      if (!item.text || seen.has(item.text)) return false;
+      seen.add(item.text);
+      return true;
+    })
     .sort((a, b) => PRIORITY[a.severity] - PRIORITY[b.severity]);
 }
 
