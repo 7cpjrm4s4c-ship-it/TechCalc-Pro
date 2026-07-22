@@ -40,7 +40,7 @@ const report = {
 };
 renderAuthorityExecutiveSummary(report, moduleData);
 const renderedText = commands.filter(command => command[0] === 'text').map(command => command[1]).join(' ');
-assert.match(renderedText, /MANAGEMENT SUMMARY/);
+assert.match(renderedText, /ZUSAMMENFASSUNG/);
 assert.match(renderedText, /75,51 m³/);
 assert.doesNotMatch(renderedText, /Warnung|Hinweis|Fehler|kritisch|Empfehlung/i);
 assert.ok(report.cursorY > 100, 'summary renderer must advance the report cursor');
@@ -54,7 +54,7 @@ class FakePdfReport {
     this.summaryRenderedBeforeSections = false;
   }
   addPage() { this.pages.push([]); this.page = this.pages.at(-1); this.cursorY = 30; }
-  text(value) { if (value === 'MANAGEMENT SUMMARY') this.summaryRenderedBeforeSections = true; }
+  text(value) { if (value === 'ZUSAMMENFASSUNG') this.summaryRenderedBeforeSections = true; }
   line() {}
   rect() {}
   drawImage() {}
