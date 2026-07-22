@@ -61,7 +61,7 @@ test.describe('Phase 46D mixed-air E2E coverage', () => {
     await gotoModule(page, 'mixed-air');
 
     await fillMixedAirReferenceValues(page);
-    await page.locator('[data-field="activeMixedAirName"]').fill('Mischluft E2E');
+    await page.locator('#activeMixedAirName').fill('Mischluft E2E');
     await page.getByRole('button', { name: /^Speichern$/ }).click();
 
     await expect(page.locator('#app')).toContainText('Mischluft E2E');
@@ -91,15 +91,17 @@ test.describe('Phase 46D mixed-air E2E coverage', () => {
     const errors = collectRuntimeErrors(page);
     await gotoModule(page, 'mixed-air');
     await fillMixedAirReferenceValues(page);
-    await openPdfSettings(page);
 
     await page.evaluate(() => { window.showSaveFilePicker = undefined; });
 
     const projectDownload = page.waitForEvent('download');
+    await expect(page.locator('#saveProjectButton')).toBeVisible();
     await page.locator('#saveProjectButton').click();
     await expect((await projectDownload).suggestedFilename()).toMatch(/\.tcproj$/);
 
+    await openPdfSettings(page);
     const pdfDownload = page.waitForEvent('download');
+    await expect(page.locator('#exportPdfButton')).toBeVisible();
     await page.locator('#exportPdfButton').click();
     await expect((await pdfDownload).suggestedFilename()).toMatch(/\.pdf$/);
     expect(errors).toEqual([]);
