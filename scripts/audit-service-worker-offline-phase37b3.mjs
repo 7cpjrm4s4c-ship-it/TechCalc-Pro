@@ -58,7 +58,12 @@ check('offline-update:skip-waiting', /self\.skipWaiting\(\)/.test(serviceWorker)
 check('offline-update:client-claim', /self\.clients\.claim\(\)/.test(serviceWorker), 'activated worker claims open clients');
 check('offline-update:post-message', /TECHCALC_CACHE_UPDATED/.test(serviceWorker), 'clients receive cache update notification');
 check('e2e:offline-all-module-reload', /offline reload keeps every module route available/.test(e2eSpec) && /for \(const moduleId of MODULE_IDS\)/.test(e2eSpec), 'Playwright spec covers offline reload for all module routes');
-check('package-script:integration-gate', packageJson.scripts?.['test:integration'] === 'node scripts/test-integration.mjs', 'package exposes consolidated integration guard');
+const integrationCommand = String(packageJson.scripts?.['test:integration'] || '').trim();
+check(
+  'package-script:integration-gate',
+  /(?:^|&&\s*)node scripts\/test-integration\.mjs$/.test(integrationCommand),
+  'package exposes consolidated integration guard, optionally preceded by contract audits'
+);
 check('package-script:e2e-gate', packageJson.scripts?.['test:e2e'] === 'playwright test', 'package exposes consolidated Playwright e2e command');
 
 const report = {
