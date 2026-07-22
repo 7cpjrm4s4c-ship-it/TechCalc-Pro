@@ -49,6 +49,15 @@ jobs:
       - name: Playwright-Tests ausführen
         run: npm run test:e2e
 
+      - name: Kompakten Playwright-Fehlerbericht speichern
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-ci-failures
+          path: test-results/playwright-ci-failures.txt
+          retention-days: 30
+          if-no-files-found: error
+
       - name: Playwright-Bericht speichern
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v5
