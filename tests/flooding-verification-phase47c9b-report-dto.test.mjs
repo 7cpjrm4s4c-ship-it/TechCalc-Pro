@@ -63,7 +63,8 @@ test('platform and PDF mapper prefer registered typed report DTOs with legacy fa
   assert.match(runtime, /report,/);
   assert.match(moduleIndex, /buildFloodingReportDto/);
   assert.match(moduleIndex, /report,/);
-  assert.match(mapper, /typeof module\?\.report === 'function'/);
+  assert.match(mapper, /const report = module\?\.report \|\| registryEntry\?\.report/);
+  assert.match(mapper, /typeof report === 'function'/);
   assert.match(mapper, /reportSource: 'typed-dto'/);
   assert.match(mapper, /reportSource: 'legacy-dom'/);
 });
