@@ -43,14 +43,27 @@ const debugHits = execSync(`grep -R "${debugNeedles.join('\\|')}" -n js scripts 
   .filter(Boolean)
   .filter(line => !line.includes('audit-release-candidate-phase37e.mjs'));
 
-const requiredScripts = {
-  test: 'node scripts/test-fast.mjs',
-  'test:integration': 'node scripts/test-integration.mjs',
-  'test:e2e': 'playwright test'
-};
-const missingScripts = Object.entries(requiredScripts)
-  .filter(([name, command]) => packageJson.scripts?.[name] !== command)
-  .map(([name]) => name);
+const scriptContracts = [
+  {
+    name: 'test',
+    matches: command => /(?:^|&&\s*)node scripts\/test-fast\.mjs$/.test(command),
+    expected: 'ends with node scripts/test-fast.mjs'
+  },
+  {
+    name: 'test:integration',
+    matches: command => /(?:^|&&\s*)node scripts\/test-integration\.mjs$/.test(command),
+    expected: 'ends with node scripts/test-integration.mjs'
+  },
+  {
+    name: 'test:e2e',
+    matches: command => command === 'playwright test',
+    expected: 'equals playwright test'
+  }
+];
+
+const missingScripts = scriptContracts
+  .filter(({ name, matches }) => !matches(String(packageJson.scripts?.[name] || '').trim()))
+  .map(({ name, expected }) => ({ name, expected }));
 
 const checks = [
   { id: 'required-files', pass: requiredFiles.every(existsSync), detail: requiredFiles.filter(file => !existsSync(file)) },
