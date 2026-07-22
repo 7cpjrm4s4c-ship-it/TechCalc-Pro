@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { prepareAuthorityDocument } from '../js/core/pdf/authorityLargeDocument.js';
 import { authorityColumnModel } from '../js/core/pdf/authorityTableLayout.js';
-import { validateRepeatedHeaders } from '../js/core/pdf/authorityHeaderPolicy.js';
 import { highlightToken } from '../js/core/pdf/authorityHighlightPolicy.js';
 
 const rows = Array.from({ length: 620 }, (_, index) => [
@@ -23,18 +22,18 @@ const document = prepareAuthorityDocument(sections, { contentHeight: 180, width:
 assert.equal(document.totalRows, 622);
 assert.equal(document.largeDocument, true);
 assert.ok(document.pageCount > 10);
-
-for (const section of sections) {
-  const sectionPages = document.pages.filter(page =>
-    page.title === section.title || page.title === `${section.title} (Fortsetzung)`
-  );
-  assert.ok(sectionPages.length >= 1, `Abschnitt ${section.title} muss mindestens eine Seite erzeugen.`);
-  assert.equal(validateRepeatedHeaders(sectionPages), true, `Header-Wiederholung muss innerhalb von ${section.title} gültig sein.`);
-}
-
-assert.ok(document.pages.slice(1).some(page => page.title.includes('(Fortsetzung)')));
-assert.ok(document.pages.every(page => page.rows.length <= 250));
+assert.ok(document.pages.every(page => page.header.repeat === true));
 assert.ok(document.pages.every(page => page.header.columns.join('|') === 'Bezeichnung|Wert|Einheit'));
+assert.ok(document.pages.every(page => page.rows.length <= 250));
+
+const continuationPages = document.pages.filter(page => page.continued === true);
+assert.ok(continuationPages.length > 0, 'Große Tabellen müssen Fortsetzungsseiten erzeugen.');
+assert.ok(continuationPages.every(page => page.title.endsWith('(Fortsetzung)')));
+
+const sectionStartPages = document.pages.filter(page => page.continued === false);
+assert.equal(sectionStartPages.length, sections.length, 'Jeder Tabellenabschnitt muss mit einer eigenen Startseite beginnen.');
+assert.deepEqual(sectionStartPages.map(page => page.title), sections.map(section => section.title));
+
 assert.equal(highlightToken('Maßgebendes DIN-Volumen', '24,50'), 'governing-value');
 assert.equal(highlightToken('Warnungen', '2'), 'warning');
 assert.equal(highlightToken('Handlungsempfehlung', 'Prüfen'), 'recommendation');
