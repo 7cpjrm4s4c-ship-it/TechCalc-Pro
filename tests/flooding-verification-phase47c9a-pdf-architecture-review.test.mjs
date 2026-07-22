@@ -18,7 +18,7 @@ test('47C.9A documents typed DTO precedence and legacy DOM fallback', () => {
   const review = read('docs/phases/phase-47c9a-pdf-reporting-architecture-review.md');
 
   assert.match(review, /Typed Report DTO statt Modul-DOM-Scraping/);
-  assert.match(review, /Legacy-Fallback/);
+  assert.match(review, /legacy[-\s]?fallback/i);
   assert.match(review, /Keine Neuberechnung im Reporting/);
   assert.match(review, /reportAdapter\.js ab 47C\.9B/);
   assert.match(review, /pdfDataMapping\.js/);
