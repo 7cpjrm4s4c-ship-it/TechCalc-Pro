@@ -13,10 +13,12 @@ export function authorityHeaderForPage(page = {}) {
 }
 
 export function validateRepeatedHeaders(pages = []) {
-  return pages.every((page, index) => {
+  return pages.every(page => {
     const header = authorityHeaderForPage(page);
-    if (!header.repeat || header.columns.length !== 3) return false;
-    return index === 0 || page.continued === true;
+    if (!header.repeat || header.columns.length !== AUTHORITY_HEADER_LABELS.length) return false;
+    if (!header.columns.every((column, index) => column === AUTHORITY_HEADER_LABELS[index])) return false;
+    if (header.continued !== Boolean(page.continued)) return false;
+    return !header.continued || /\(Fortsetzung\)$/.test(header.title);
   });
 }
 
