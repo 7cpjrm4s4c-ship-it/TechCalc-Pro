@@ -132,5 +132,5 @@
 /* Standard explicit vertical stacks use the same global rhythm. These are
    authored layout primitives, not runtime-discovered containers. */
 #app :is(.tc-stack, .tc-stack--section) {
-  row-gap: var(--tc-module-card-gap);
+  row-gap: var(--tc-module-card-gap) !important;
 }
