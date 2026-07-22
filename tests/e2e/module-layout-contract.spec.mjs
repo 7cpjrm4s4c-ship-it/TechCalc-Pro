@@ -80,6 +80,9 @@ async function measureLayout(page) {
       }
     });
 
+    const viewLeftInset = viewRect && appRect ? viewRect.left - appRect.left : 0;
+    const viewRightInset = viewRect && appRect ? appRect.right - viewRect.right : 0;
+
     return {
       viewportWidth,
       expectedGap,
@@ -91,8 +94,8 @@ async function measureLayout(page) {
       rootWidth: rootRect?.width || 0,
       layoutWidth: layoutRect?.width || 0,
       appWidth: appRect?.width || 0,
-      viewLeft: viewRect?.left || 0,
-      appLeft: appRect?.left || 0,
+      viewLeftInset,
+      viewRightInset,
       columnRects: columns.map(column => {
         const box = column.getBoundingClientRect();
         return { left: box.left, top: box.top, width: box.width };
@@ -111,8 +114,10 @@ function assertLayout(measurement, context) {
   expect(measurement.layoutExists, context).toBe(true);
   expect(measurement.columnCount, context).toBeGreaterThanOrEqual(1);
 
-  expect(Math.abs(measurement.viewLeft - measurement.appLeft), context).toBeLessThanOrEqual(2);
-  expect(Math.abs(measurement.viewWidth - measurement.appWidth), context).toBeLessThanOrEqual(2);
+  expect(measurement.viewLeftInset, context).toBeGreaterThanOrEqual(0);
+  expect(measurement.viewRightInset, context).toBeGreaterThanOrEqual(0);
+  expect(Math.abs(measurement.viewLeftInset - measurement.viewRightInset), context).toBeLessThanOrEqual(2);
+  expect(Math.abs(measurement.viewWidth + measurement.viewLeftInset + measurement.viewRightInset - measurement.appWidth), context).toBeLessThanOrEqual(2);
   expect(Math.abs(measurement.rootWidth - measurement.viewWidth), context).toBeLessThanOrEqual(2);
   expect(Math.abs(measurement.layoutWidth - measurement.rootWidth), context).toBeLessThanOrEqual(2);
 
