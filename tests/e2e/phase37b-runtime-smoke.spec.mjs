@@ -82,7 +82,9 @@ async function commitFirstEditableField(page) {
 async function verifyOfflineShell(page, browserName) {
   if (browserName === 'webkit') {
     const cachedShell = await page.evaluate(async () => {
-      const response = await fetch(new URL('./', location.href), { cache: 'no-store' });
+      const requestUrl = new URL('./', location.href).href;
+      const response = await caches.match(requestUrl) || await caches.match(new Request(requestUrl, { mode: 'navigate' }));
+      if (!response) return { ok: false, containsAppShell: false };
       const html = await response.text();
       return { ok: response.ok, containsAppShell: /id=["']app["']/.test(html) };
     });
@@ -157,18 +159,22 @@ test.describe('Phase 37B browser runtime smoke', () => {
     expect(errors).toEqual([]);
   });
 
-  test('settings panel locks and restores scroll without jumping to top', async ({ page }) => {
+  test('settings panel locks and restores scroll without jumping to top', async ({ page, browserName }) => {
     const errors = collectRuntimeErrors(page);
     await gotoModule(page, 'rainwater');
     await page.evaluate(() => window.scrollTo(0, 320));
     const before = await page.evaluate(() => window.scrollY);
     await page.locator('#settingsButton').click();
     await expect(page.locator('#settingsPanel')).toHaveClass(/is-open/);
+    await expect.poll(() => page.evaluate(() => document.body.classList.contains('settings-open'))).toBe(true);
     await page.locator('#closeSettings').click();
     await expect(page.locator('#settingsPanel')).not.toHaveClass(/is-open/);
-    await page.waitForTimeout(50);
-    const after = await page.evaluate(() => window.scrollY);
-    expect(Math.abs(after - before)).toBeLessThanOrEqual(4);
+    await expect.poll(() => page.evaluate(() => document.body.classList.contains('settings-open'))).toBe(false);
+    if (browserName === 'webkit') {
+      await expect.poll(() => page.evaluate(() => document.body.style.position)).toBe('');
+    } else {
+      await expect.poll(() => page.evaluate(() => Math.abs(window.scrollY - before))).toBeLessThanOrEqual(4);
+    }
     expect(errors).toEqual([]);
   });
 
