@@ -10,7 +10,7 @@ function inferSeverity(item) {
   if (SEVERITIES.has(explicitSeverity)) return explicitSeverity;
 
   const text = textOf(item);
-  if (/^fehler\b/i.test(text) || /(muss|fehlt|ungültig|unvollständig|nicht erfüllt)/i.test(text)) return 'error';
+  if (/^fehler\b/i.test(text) || /(muss|fehl(?:t|en|end(?:e|er|es|en)?)|ungültig|unvollständig|nicht erfüllt)/i.test(text)) return 'error';
   if (/^warnung\b/i.test(text) || /(außerhalb|überschritten|kleiner|größer|begrenzt|Vorbemessung)/i.test(text)) return 'warning';
   if (/^empfehlung\b/i.test(text)) return 'recommendation';
   return 'hint';
