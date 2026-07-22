@@ -76,7 +76,15 @@ assert.equal(sections.length, 12, 'Behördennachweis muss zwölf definierte Kapi
 assert.deepEqual(sections.map(section => section.title.split('.')[0]), ['1','2','3','4','5','6','7','8','9','10','11','12']);
 assert.match(sections[0].title, /Ergebniszusammenfassung/);
 assert.match(sections[3].title, /Flächenübersicht \(205\)/);
-assert.ok(sections[3].rows.length >= 205 * 6, 'Große Flächenlisten müssen vollständig gemappt werden.');
+assert.equal(sections[3].rows.length, 205, 'Große Flächenlisten müssen vollständig und kompakt mit einer Berichtszeile je Fläche gemappt werden.');
+const firstSurfaceRow = sections[3].rows[0].join(' ');
+assert.match(firstSurfaceRow, /Fläche 1/);
+assert.match(firstSurfaceRow, /Dachfläche/);
+assert.match(firstSurfaceRow, /A =/);
+assert.match(firstSurfaceRow, /Cₛ =/);
+assert.match(firstSurfaceRow, /Cₘ =/);
+assert.match(firstSurfaceRow, /A × Cₛ =/);
+assert.match(firstSurfaceRow, /Regenwassermodul/);
 assert.ok(sections[9].rows.length >= 101, 'Große DWA-Dauerstufenlisten müssen vollständig gemappt werden.');
 assert.match(sections[11].rows.map(row => row.join(' ')).join(' '), /DIN 1986-100/);
 assert.doesNotThrow(() => JSON.stringify(sections));
