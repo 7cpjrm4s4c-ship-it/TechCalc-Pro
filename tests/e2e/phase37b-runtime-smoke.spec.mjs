@@ -85,8 +85,9 @@ test.describe('Phase 37B browser runtime smoke', () => {
 
     for (const moduleId of SAVED_RECORD_MODULE_IDS) {
       await gotoModule(page, moduleId);
-      await expect(page.locator('#app')).toContainText(/speichern|gespeichert|Eintrag|Fläche|Objekt|Gruppe/i);
-      await expect(page.locator('button, [role="button"]').filter({ hasText: /Speichern/i }).first()).toBeVisible();
+      const activeModule = page.locator('#app .module-view:visible');
+      await expect(activeModule).toContainText(/speichern|gespeichert|Eintrag|Fläche|Objekt|Gruppe/i);
+      await expect(activeModule.locator('button:visible, [role="button"]:visible').filter({ hasText: /Speichern/i }).first()).toBeVisible();
     }
 
     expect(errors).toEqual([]);
@@ -199,5 +200,4 @@ test.describe('Phase 37B browser runtime smoke', () => {
 
     expect(errors).toEqual([]);
   });
-
 });
