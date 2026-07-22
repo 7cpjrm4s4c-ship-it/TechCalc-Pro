@@ -54,8 +54,15 @@ function collectRuntimeErrors(page) {
   return errors;
 }
 
+async function ensureAppBooted(page) {
+  if (page.url() === 'about:blank') await page.goto('./');
+  await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', /.+/, { timeout: 10_000 });
+  await expect(page.locator('#app')).not.toHaveAttribute('aria-busy', /true/);
+}
+
 async function gotoModule(page, moduleId) {
-  await page.goto(`./#/${moduleId}`);
+  await ensureAppBooted(page);
+  await page.evaluate(id => { window.location.hash = `#/${id}`; }, moduleId);
   await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', moduleId, { timeout: 10_000 });
   await expect(page.locator('#app')).not.toHaveAttribute('aria-busy', /true/);
 }
@@ -172,6 +179,7 @@ test.describe('Phase 37B browser runtime smoke', () => {
     await context.setOffline(true);
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.locator('#app')).toBeVisible();
+    await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', /.+/, { timeout: 10_000 });
     await context.setOffline(false);
     expect(errors).toEqual([]);
   });
@@ -191,8 +199,10 @@ test.describe('Phase 37B browser runtime smoke', () => {
     expect(hasServiceWorker).toBe(true);
 
     await context.setOffline(true);
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', /.+/, { timeout: 10_000 });
     for (const moduleId of MODULE_IDS) {
-      await page.goto(`./#/${moduleId}`, { waitUntil: 'domcontentloaded' });
+      await page.evaluate(id => { window.location.hash = `#/${id}`; }, moduleId);
       await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', moduleId, { timeout: 10_000 });
       await expect(page.locator('#app')).toBeVisible();
     }
