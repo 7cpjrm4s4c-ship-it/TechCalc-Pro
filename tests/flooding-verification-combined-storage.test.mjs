@@ -65,9 +65,11 @@ assert.equal(incomplete.planningVolumeM3, null);
 assert.equal(incomplete.status, 'incomplete');
 assert.equal(incomplete.governingSource, 'unavailable');
 
-const model = results({}, {
+const model = results({ retentionFlowTimeMinutes: '5' }, {
   combinedStorage: dinGoverns,
   floodingCalculationAvailable: true,
+  rainInputValid: true,
+  totalArea: 5800,
   flooding: {
     governing: { source: 'equation-21', valueM3: 143.23 },
     equation20: { valid: true, durationMinutes: 10, valueM3: 100.5 },
@@ -77,6 +79,10 @@ const model = results({}, {
   retention: {
     active: true,
     calculated: true,
+    effectiveRecurrenceFrequencyPerYear: 0.5,
+    throttleRainShareLsHa: 8.62,
+    surchargeFactorFz: 1.1,
+    reductionFactorFa: 0.9,
     governing: { durationMinutes: 15, volumeM3: 16.59 },
     durationResults: [{ durationMinutes: 15, rainIntensityLsHa: 161, volumeM3: 16.59, valid: true }]
   },
