@@ -4,7 +4,13 @@ const THEMES = ['dark', 'light', 'system'];
 const MODULE_SELECTOR = '.module-view[data-module="flooding-verification"]';
 
 async function openFloodingVerification(page) {
-  await page.goto('/#/flooding-verification');
+  await page.addInitScript(() => {
+    localStorage.setItem('techcalc-preferences', JSON.stringify({
+      mobileQuickAccess: ['flooding-verification', 'heating-cooling', 'ventilation', 'pipe-sizing']
+    }));
+  });
+  await page.goto('/');
+  await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', 'flooding-verification');
   await expect(page.locator(MODULE_SELECTOR)).toBeVisible();
   await page.waitForLoadState('networkidle');
 }
