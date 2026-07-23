@@ -1,0 +1,118 @@
+name: Finalize Release 1.4.0
+
+on:
+  push:
+    branches:
+      - release/1.4.0
+
+permissions:
+  contents: write
+
+jobs:
+  finalize-release:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: release/1.4.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Finalize version metadata
+        shell: bash
+        run: |
+          npm version 1.4.0 --no-git-tag-version
+          python3 - <<'PY'
+          from pathlib import Path
+
+          index = Path('index.html')
+          text = index.read_text(encoding='utf-8')
+          text = text.replace('1.4.0-dev.2', '1.4.0')
+          text = text.replace('## Version 1.4.0 – Phase 47B.1', '## Version 1.4.0 – Final Release')
+          text = text.replace(
+              'Architecture Review für das neue Modul Überflutungsnachweis abgeschlossen. Noch keine Fachimplementierung enthalten.',
+              'TechCalc Pro 1.4.0 ist freigegeben. Der Überflutungs- und Rückhaltenachweis ist vollständig integriert.'
+          )
+          index.write_text(text, encoding='utf-8')
+
+          notes = Path('RELEASE_NOTES.md')
+          text = notes.read_text(encoding='utf-8')
+          text = text.replace('## Version 1.4.0-dev.2 – Phase 47B.1', '## Version 1.4.0 – Final Release', 1)
+          text = text.replace(
+              'Die Fach-, Architektur-, PDF-, Plattform- und Qualitätsarbeiten der Phase 47 sind vollständig abgeschlossen und für den Merge freigegeben. Das finale Versioning auf `1.4.0` erfolgt gemäß Releaseprozess nach dem Merge.',
+              'TechCalc Pro 1.4.0 ist als Produktionsversion freigegeben. Der Überflutungs- und Rückhaltenachweis sowie alle zugehörigen Qualitäts-, Plattform- und PDF-Arbeiten sind abgeschlossen.'
+          )
+          text = text.replace(
+              'Phase 47 ist abgeschlossen. PR #12 ist nach erfolgreichem Workflow auf dem finalen Dokumentations-Head zum Merge freigegeben.',
+              'TechCalc Pro 1.4.0 ist für den produktiven Einsatz freigegeben.'
+          )
+          notes.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Generate production precache
+        run: npm run precache
+
+      - name: Verify complete release gate
+        run: npm run release:verify
+
+      - name: Build deployment archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist/development dist/neutral
+          rsync -a ./ dist/development/ \
+            --exclude '.git/' \
+            --exclude 'node_modules/' \
+            --exclude 'dist/' \
+            --exclude 'test-results/' \
+            --exclude 'playwright-report/'
+          rsync -a ./ dist/neutral/ \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude 'node_modules/' \
+            --exclude 'dist/' \
+            --exclude 'tests/' \
+            --exclude 'scripts/' \
+            --exclude 'test-results/' \
+            --exclude 'playwright-report/' \
+            --exclude 'package.json' \
+            --exclude 'package-lock.json' \
+            --exclude 'playwright.config.mjs' \
+            --exclude 'docs/audits/' \
+            --exclude 'docs/phases/' \
+            --exclude 'docs/releases/' \
+            --exclude 'docs/contracts/' \
+            --exclude 'docs/architecture/'
+          (cd dist/development && zip -qr ../techcalc-pro-1.4.0-development-netlify.zip .)
+          (cd dist/neutral && zip -qr ../techcalc-pro-1.4.0-neutral-deploy.zip .)
+
+      - name: Upload deployment archives
+        uses: actions/upload-artifact@v4
+        with:
+          name: techcalc-pro-1.4.0-deployments
+          path: |
+            dist/techcalc-pro-1.4.0-development-netlify.zip
+            dist/techcalc-pro-1.4.0-neutral-deploy.zip
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit finalized release state
+        shell: bash
+        run: |
+          rm -f .github/workflows/finalize-release-1.4.0.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package.json package-lock.json index.html RELEASE_NOTES.md service-worker.js .github/workflows/finalize-release-1.4.0.yml
+          git commit -m 'release: finalize TechCalc Pro 1.4.0'
+          git push origin HEAD:release/1.4.0
