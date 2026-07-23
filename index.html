@@ -48,8 +48,6 @@
   <link rel="stylesheet" href="./css/components-polish.css">
   <link rel="stylesheet" href="./css/module-spacing-contract.css">
   <link rel="stylesheet" href="./css/theme-light-final.css">
-
-
 </head>
 <body>
   <div class="app-shell">
@@ -66,20 +64,16 @@
         <span></span><span></span><span></span>
       </button>
     </header>
-
     <nav class="module-nav" aria-label="Module">
       <div class="module-nav__track" id="primaryNav"></div>
       <div class="overflow-menu glass-surface" id="overflowMenu" hidden></div>
     </nav>
-
     <main class="app-main grid-12" id="app" tabindex="-1"></main>
-
     <aside class="settings-panel glass-surface" id="settingsPanel" hidden>
       <div class="settings-panel__head">
         <strong>Einstellungen</strong>
         <button class="mini-button" id="closeSettings" type="button">Schließen</button>
       </div>
-
       <div class="settings-panel__body">
         <details class="settings-submenu">
           <summary>PDF-Export</summary>
@@ -90,7 +84,6 @@
             </div>
           </div>
         </details>
-
         <details class="settings-submenu">
           <summary>Projekteinstellungen</summary>
           <div class="settings-submenu__content settings-form" id="projectPdfSettings">
@@ -116,7 +109,6 @@
             <div id="pdfCompanyLogoStatus" class="settings-hint" aria-live="polite">Kein Firmenlogo hinterlegt</div>
           </div>
         </details>
-
         <details class="settings-submenu">
           <summary>Moduleinstellungen</summary>
           <div class="settings-submenu__content">
@@ -125,7 +117,6 @@
             <div id="quickAccessSettings" class="settings-list"></div>
           </div>
         </details>
-
         <details class="settings-submenu">
           <summary>Darstellung</summary>
           <div class="settings-submenu__content settings-form">
@@ -140,31 +131,29 @@
             </div>
           </div>
         </details>
-
-
         <details class="settings-submenu">
           <summary>Release Notes</summary>
           <div class="settings-submenu__content settings-form release-notes-panel">
-            <div class="settings-info-row"><span>Aktuelle Version</span><strong data-app-version-current>1.4.0-dev.2</strong></div>
+            <div class="settings-info-row"><span>Aktuelle Version</span><strong data-app-version-current>1.4.0</strong></div>
             <div id="releaseNotesDynamic">
               <p>Release Notes werden geladen …</p>
             </div>
             <script type="text/plain" id="releaseNotesFallback">
-## Version 1.4.0-dev.2 – Phase 47B.1
+## Version 1.4.0 – Final Release
 
-Architecture Review für das neue Modul Überflutungsnachweis abgeschlossen. Noch keine Fachimplementierung enthalten.
+TechCalc Pro 1.4.0 ist freigegeben. Der Überflutungs- und Rückhaltenachweis ist vollständig integriert.
 
 ### Neu
-- Toolchain bereinigt und auf aktive Build-/Audit-Skripte reduziert.
-- Security-Hardening mit abgeschlossenem DOM-Sink-/innerHTML-Audit ergänzt.
-- Accessibility-Baseline auf WCAG 2.1 AA als internes Zielniveau festgelegt.
-- E2E-Abdeckung für Mischluft, Legacy-Migration, Projektverwaltung und PDF-Export erweitert.
+- Überflutungs- und Rückhaltenachweis als eigenständiges Fachmodul vollständig integriert.
+- DIN-1986-100-Nachweis, bedingte DWA-A-117-Rückhaltebemessung und Dauerstufenvergleich ergänzt.
+- Flächen-Snapshot-Import aus dem Regenwassermodul ohne Rückschreibung umgesetzt.
+- Professionelle Diagnostik, Plausibilitätsprüfung und Ergebnisinterpretation ergänzt.
+- Behörden-PDF mit Deckblatt, Inhaltsverzeichnis, Tabellen, Diagrammen und Pagination fertiggestellt.
 
 ### Verbesserungen
-- Release Notes zeigen weiterhin nur Final Releases, Release Candidates und Hotfixes – keine `dev.x`-Zwischenstände.
-- Qualitätsprüfungen für Toolchain, DOM-Sinks, Accessibility und E2E-Coverage sind in `npm run lint` integriert.
-- Projektstruktur weiter reduziert und bereinigt.
-- Entwicklungs- und Deployment-Pakete sind wieder als getrennte Release-Artefakte verfügbar.
+- Zentraler Modul-, Layout- und Spacing-Vertrag über alle Module vereinheitlicht.
+- Browser-, Viewport-, Theme-, Offline-, Projekt- und PDF-Regression erweitert.
+- Mischluft-, WRG- und Legacy-Projektlebenszyklus stabilisiert.
 
 ### Behoben
 - Verwaiste Toolchain-Skripte wurden entfernt oder konsolidiert.
@@ -192,11 +181,9 @@ TechCalc Pro 1.3.3 ist freigegeben.
 - Mischluft-Speicherdialog ergänzt.
 - Legacy-Mischluft-Records werden beim Laden alter Projekte korrekt migriert.
 - Veraltete Release-Notes-Einträge aus der App-Ansicht entfernt.
-
-</script>
+            </script>
           </div>
         </details>
-
         <details class="settings-submenu">
           <summary>Feedback senden</summary>
           <div class="settings-submenu__content settings-form">
@@ -208,7 +195,7 @@ TechCalc Pro 1.3.3 ist freigegeben.
               <label>Nachricht<textarea id="feedbackMessage" name="message" required rows="6" placeholder="Feedback, Fehlerbeschreibung oder Verbesserungsvorschlag"></textarea></label>
               <input class="visually-hidden" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
               <input type="hidden" name="app" value="TechCalc Pro">
-              <input type="hidden" name="version" value="1.4.0-dev.2">
+              <input type="hidden" name="version" value="1.4.0">
               <div class="settings-actions">
                 <button class="mini-button mini-button--primary" id="feedbackSubmit" type="submit">Feedback senden</button>
               </div>
@@ -216,11 +203,10 @@ TechCalc Pro 1.3.3 ist freigegeben.
             </form>
           </div>
         </details>
-
         <details class="settings-submenu">
           <summary>Rechtliches & App</summary>
           <div class="settings-submenu__content settings-form">
-            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.4.0-dev.2</strong></div>
+            <div class="settings-info-row"><span>Version</span><strong id="appVersion">1.4.0</strong></div>
             <a class="mini-button" href="./docs/legal/agb.html" target="_blank" rel="noopener">AGB öffnen</a>
             <button class="mini-button" type="button" disabled>Impressum vorbereiten</button>
           </div>
