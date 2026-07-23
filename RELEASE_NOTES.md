@@ -1,4 +1,8 @@
-## Version 1.4.0 – Phase 47 abgeschlossen
+## Version 1.4.0-dev.2 – Phase 47B.1
+
+### Phase 47 abgeschlossen
+
+Die Fach-, Architektur-, PDF-, Plattform- und Qualitätsarbeiten der Phase 47 sind vollständig abgeschlossen und für den Merge freigegeben. Das finale Versioning auf `1.4.0` erfolgt gemäß Releaseprozess nach dem Merge.
 
 ### Neu
 - Überflutungs- und Rückhaltenachweis als eigenständiges Fachmodul vollständig integriert.
