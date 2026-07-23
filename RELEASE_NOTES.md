@@ -1,8 +1,8 @@
-## Version 1.4.0-dev.2 – Phase 47B.1
+## Version 1.4.0 – Final Release
 
-### Phase 47 abgeschlossen
+### Freigabe
 
-Die Fach-, Architektur-, PDF-, Plattform- und Qualitätsarbeiten der Phase 47 sind vollständig abgeschlossen und für den Merge freigegeben. Das finale Versioning auf `1.4.0` erfolgt gemäß Releaseprozess nach dem Merge.
+TechCalc Pro 1.4.0 ist als Produktionsversion freigegeben. Der Überflutungs- und Rückhaltenachweis sowie alle zugehörigen Qualitäts-, Plattform- und PDF-Arbeiten sind abgeschlossen.
 
 ### Neu
 - Überflutungs- und Rückhaltenachweis als eigenständiges Fachmodul vollständig integriert.
@@ -22,5 +22,5 @@ Die Fach-, Architektur-, PDF-, Plattform- und Qualitätsarbeiten der Phase 47 si
 - Enterprise-/QM-Freigabe am 23.07.2026 erteilt.
 - Keine offenen blockierenden Befunde.
 
-### Freigabe
-Phase 47 ist abgeschlossen. PR #12 ist nach erfolgreichem Workflow auf dem finalen Dokumentations-Head zum Merge freigegeben.
+### Produktionsstatus
+TechCalc Pro 1.4.0 ist für den produktiven Einsatz freigegeben.
