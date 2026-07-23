@@ -28,6 +28,16 @@ async function gotoModule(page, moduleId) {
   await expect(page.locator('#app')).not.toHaveAttribute('aria-busy', /true/);
 }
 
+async function commitFieldValue(page, field, value) {
+  const selector = `[data-field="${field}"]`;
+  const input = page.locator(selector).first();
+  await expect(input).toBeVisible();
+  await input.fill(value);
+  await input.dispatchEvent('change');
+  await expect(page.locator(selector).first()).toHaveValue(value);
+  await expect(page.locator('#app')).not.toHaveAttribute('aria-busy', /true/);
+}
+
 async function fillMixedAirReferenceValues(page) {
   const values = {
     mixingOutdoorVolumeFlowM3h: '1000',
@@ -39,11 +49,11 @@ async function fillMixedAirReferenceValues(page) {
   };
 
   for (const [field, value] of Object.entries(values)) {
-    const input = page.locator(`[data-field="${field}"]`).first();
-    await expect(input).toBeVisible();
-    await input.fill(value);
-    await input.press('Tab');
+    await commitFieldValue(page, field, value);
   }
+
+  await expect(page.locator('[data-field="mixingRecircRh"]').first()).toHaveValue('45');
+  await expect(page.locator('#app')).not.toContainText(/NaN\s*%/);
 }
 
 async function openSettingsSection(page, title) {
@@ -64,8 +74,10 @@ test.describe('Phase 46D mixed-air E2E coverage', () => {
     await gotoModule(page, 'mixed-air');
 
     await fillMixedAirReferenceValues(page);
-    await page.locator('#activeMixedAirName').fill('Mischluft E2E');
-    await page.getByRole('button', { name: /^Speichern$/ }).click();
+    const nameInput = page.locator('#activeMixedAirName');
+    await nameInput.fill('Mischluft E2E');
+    await expect(nameInput).toHaveValue('Mischluft E2E');
+    await page.locator('[data-line-save]').click();
 
     await expect(page.locator('#app')).toContainText('Mischluft E2E');
     await expect(page.locator('#app')).toContainText(/m³\/h|Mischluft/i);
