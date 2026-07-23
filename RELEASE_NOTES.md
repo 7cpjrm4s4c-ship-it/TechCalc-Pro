@@ -1,9 +1,22 @@
-## Version 1.4.0-dev.2 – Phase 47B.1
+## Version 1.4.0 – Phase 47 abgeschlossen
 
-- Contract des Moduls Überflutungsnachweis auf die bereitgestellten DIN-1986-100- und DWA-A-117-Grundlagen erweitert.
-- Leitungsprüfung und Leitungsdimensionierung über Tabelle A.5 als verbindlicher Scope aufgenommen.
-- Manueller Vollfüllungsabfluss und behördliche Einleitungsbegrenzung fachlich getrennt.
-- Einfaches Verfahren nach DWA-A 117 einschließlich Gültigkeitsprüfung aufgenommen.
-- Expliziter Snapshot-Import von Flächen aus dem Regenwassermodul festgelegt; keine Synchronisierung oder Rückschreibung.
-- Calculation Report Model und detaillierter, prüffähiger Behörden-PDF-Nachweis als Abnahmekriterien festgeschrieben.
-- Keine Fachimplementierung des neuen Moduls in diesem Build.
+### Neu
+- Überflutungs- und Rückhaltenachweis als eigenständiges Fachmodul vollständig integriert.
+- DIN-1986-100-Nachweis, bedingte DWA-A-117-Rückhaltebemessung und Dauerstufenvergleich ergänzt.
+- Flächen-Snapshot-Import aus dem Regenwassermodul ohne Rückschreibung umgesetzt.
+- Professionelle Diagnostik, Plausibilitätsprüfung und Ergebnisinterpretation ergänzt.
+- Behörden-PDF mit Deckblatt, Inhaltsverzeichnis, Tabellen, Diagrammen und Pagination fertiggestellt.
+
+### Verbesserungen
+- Zentraler Modul-, Layout- und Spacing-Vertrag über alle Module vereinheitlicht.
+- Browser-, Viewport-, Theme-, Offline-, Projekt- und PDF-Regression erweitert.
+- Mischluft-, WRG- und Legacy-Projektlebenszyklus stabilisiert.
+
+### Qualitätsstatus
+- GitHub Actions `Playwright Tests` Run #193 erfolgreich.
+- Automatisierte und manuelle Phase-47-Gates vollständig bestanden.
+- Enterprise-/QM-Freigabe am 23.07.2026 erteilt.
+- Keine offenen blockierenden Befunde.
+
+### Freigabe
+Phase 47 ist abgeschlossen. PR #12 ist nach erfolgreichem Workflow auf dem finalen Dokumentations-Head zum Merge freigegeben.
