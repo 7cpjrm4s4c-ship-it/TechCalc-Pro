@@ -14,11 +14,16 @@ export function renderCollectionItem(item = {}, definition = {}, collection = ''
   const qtyLabel = definition.quantityLabel || 'Anzahl';
   const qtyUnit = definition.quantityUnit || '';
   const deleteLabel = definition.deleteLabel || 'Eintrag entfernen';
+  const editLabel = definition.editLabel || 'Eintrag bearbeiten';
   const editableQuantity = definition.editableQuantity !== false;
+  const editable = definition.editable === true;
   const deletable = definition.deletable !== false;
-  const qtyHtml = editableQuantity ? `<label class="mini-edit-field tc-quantity-field"><span>${esc(qtyLabel)}</span><input type="number" min="0" step="1" value="${esc(qty)}" data-collection-input="${esc(collection)}" data-collection-field="quantity" data-collection-id="${esc(id)}" inputmode="numeric">${qtyUnit ? `<small>${esc(qtyUnit)}</small>` : ''}</label>` : '';
-  const deleteHtml = deletable ? `<button type="button" data-tc-action="platform:collection:delete" data-collection="${esc(collection)}" data-collection-id="${esc(id)}" aria-label="${esc(deleteLabel)}">×</button>` : '';
-  return `<div class="tc-collection-row tc-consumer-row tc-consumer-row--editable" data-collection-row="${esc(collection)}" data-record-id="${esc(id)}"><div class="tc-collection-row__content"><strong>${esc(title)}</strong>${subtitle ? `<span>${esc(subtitle)}</span>` : ''}</div>${qtyHtml}${deleteHtml}</div>`;
+  const editCollection = definition.editCollection || `${collection}Edit`;
+  const editAction = definition.editAction || 'platform:collection:add';
+  const qtyHtml = editableQuantity ? `<label class="mini-edit-field tc-quantity-field"><span>${esc(qtyLabel)}</span><input type="number" min="0" step="any" value="${esc(qty)}" data-collection-input="${esc(collection)}" data-collection-field="quantity" data-collection-id="${esc(id)}" inputmode="decimal">${qtyUnit ? `<small>${esc(qtyUnit)}</small>` : ''}</label>` : '';
+  const editHtml = editable ? `<button type="button" class="line-section-card__toggle saved-record-card__toggle" data-tc-action="${esc(editAction)}" data-collection="${esc(editCollection)}" data-collection-id="${esc(id)}" aria-label="${esc(editLabel)}"><span aria-hidden="true">✎</span></button>` : '';
+  const deleteHtml = deletable ? `<button type="button" class="line-section-card__delete saved-record-card__delete" data-tc-action="platform:collection:delete" data-collection="${esc(collection)}" data-collection-id="${esc(id)}" aria-label="${esc(deleteLabel)}"><span aria-hidden="true">×</span></button>` : '';
+  return `<div class="tc-collection-row tc-consumer-row tc-consumer-row--editable" data-collection-row="${esc(collection)}" data-record-id="${esc(id)}"><div class="tc-collection-row__content"><strong>${esc(title)}</strong>${subtitle ? `<span>${esc(subtitle)}</span>` : ''}</div>${qtyHtml}${editHtml}${deleteHtml}</div>`;
 }
 
 export function renderCollection(definition = {}, state = {}, context = {}) {

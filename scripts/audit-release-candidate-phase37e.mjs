@@ -43,14 +43,27 @@ const debugHits = execSync(`grep -R "${debugNeedles.join('\\|')}" -n js scripts 
   .filter(Boolean)
   .filter(line => !line.includes('audit-release-candidate-phase37e.mjs'));
 
-const requiredScripts = {
-  test: 'node scripts/test-fast.mjs',
-  'test:integration': 'node scripts/test-integration.mjs',
-  'test:e2e': 'playwright test'
-};
-const missingScripts = Object.entries(requiredScripts)
-  .filter(([name, command]) => packageJson.scripts?.[name] !== command)
-  .map(([name]) => name);
+const scriptContracts = [
+  {
+    name: 'test',
+    matches: command => /(?:^|&&\s*)node scripts\/test-fast\.mjs$/.test(command),
+    expected: 'ends with node scripts/test-fast.mjs'
+  },
+  {
+    name: 'test:integration',
+    matches: command => /(?:^|&&\s*)node scripts\/test-integration\.mjs$/.test(command),
+    expected: 'ends with node scripts/test-integration.mjs'
+  },
+  {
+    name: 'test:e2e',
+    matches: command => command === 'playwright test',
+    expected: 'equals playwright test'
+  }
+];
+
+const missingScripts = scriptContracts
+  .filter(({ name, matches }) => !matches(String(packageJson.scripts?.[name] || '').trim()))
+  .map(({ name, expected }) => ({ name, expected }));
 
 const checks = [
   { id: 'required-files', pass: requiredFiles.every(existsSync), detail: requiredFiles.filter(file => !existsSync(file)) },
@@ -58,7 +71,7 @@ const checks = [
   { id: 'shell-controllers-precached', pass: shellControllers.every(item => item.exists && item.precached), detail: shellControllers },
   { id: 'debug-logs-removed', pass: debugHits.length === 0, detail: debugHits.slice(0, 20) },
   { id: 'consolidated-test-gates-present', pass: missingScripts.length === 0, detail: missingScripts },
-  { id: 'release-notes-current', pass: releaseNotes.includes('Version 1.3.3') || releaseNotes.includes('1.3.3'), detail: 'RELEASE_NOTES.md contains current public release entry' }
+  { id: 'release-notes-current', pass: releaseNotes.includes(`Version ${packageJson.version}`) || releaseNotes.includes(packageJson.version), detail: 'RELEASE_NOTES.md contains package version entry' }
 ];
 
 const report = {

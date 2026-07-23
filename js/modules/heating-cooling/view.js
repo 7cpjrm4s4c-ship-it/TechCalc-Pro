@@ -43,19 +43,26 @@ export function createHeatingCoolingView({ config, calculate, lineSectionControl
         ], active.calcTarget, { accent })}</div>`,
         `<div data-hc-dynamic="input-fields">${grid(inputFields(s, active).join(''), 2)}</div>`
       ].join('')), accent),
-      `<div data-hc-dynamic="result">${renderResultModel(buildHeatingCoolingResultModel(active, r, accent), accent)}</div>`,
-      `<div class="formula" data-hc-dynamic="formula">Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)</div>`
+      `<div class="tc-module-section" data-hc-dynamic="result">${renderResultModel(buildHeatingCoolingResultModel(active, r, accent), accent)}</div>`,
+      `<div class="formula tc-module-section" data-hc-dynamic="formula">Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)</div>`
+    ].join(''));
+
+    const outputColumn = stack([
+      `<div class="tc-module-section" data-hc-dynamic="pipe-recommendation">${renderPipeRecommendation(s, r)}</div>`,
+      `<div class="tc-module-section">${lineSectionController.renderCard(s)}</div>`
     ].join(''));
 
     return renderModuleShell(config, `
-      <div class="span-6">${inputColumn}</div>
-      <div class="span-6">${stack([`<div data-hc-dynamic="pipe-recommendation">${renderPipeRecommendation(s, r)}</div>`, lineSectionController.renderCard(s)].join(''))}</div>
+      <div class="tc-module-layout tc-module-layout--2">
+        <div class="tc-module-column">${inputColumn}</div>
+        <div class="tc-module-column">${outputColumn}</div>
+      </div>
     `).replace('<section class="module-view"', `<section class="module-view" data-hc-mode="${accent}" data-process-accent="${accent}"`);
   }
 
   const dynamicRenderers = {
     renderMediumStats: (_s, r) => renderResultTable(mediumRows(r.medium)),
-    renderModeSegment: (s, _r, _active, accent) => segmented('mode', [
+    renderModeSegment: (s, _r, active, accent) => segmented('mode', [
       { value: 'heating', label: '● Heizung' },
       { value: 'cooling', label: '● Kälte' }
     ], s.mode, { accent }),

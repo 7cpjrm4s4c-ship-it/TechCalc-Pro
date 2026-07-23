@@ -15,9 +15,26 @@ function collectRuntimeErrors(page) {
   return errors;
 }
 
+async function ensureAppBooted(page) {
+  if (page.url() === 'about:blank') await page.goto('./');
+  await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', /.+/, { timeout: 10_000 });
+  await expect(page.locator('#app')).not.toHaveAttribute('aria-busy', /true/);
+}
+
 async function gotoModule(page, moduleId) {
-  await page.goto(`./#/${moduleId}`);
+  await ensureAppBooted(page);
+  await page.evaluate(id => { window.location.hash = `#/${id}`; }, moduleId);
   await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', moduleId, { timeout: 10_000 });
+  await expect(page.locator('#app')).not.toHaveAttribute('aria-busy', /true/);
+}
+
+async function commitFieldValue(page, field, value) {
+  const selector = `[data-field="${field}"]`;
+  const input = page.locator(selector).first();
+  await expect(input).toBeVisible();
+  await input.fill(value);
+  await input.dispatchEvent('change');
+  await expect(page.locator(selector).first()).toHaveValue(value);
   await expect(page.locator('#app')).not.toHaveAttribute('aria-busy', /true/);
 }
 
@@ -32,20 +49,23 @@ async function fillMixedAirReferenceValues(page) {
   };
 
   for (const [field, value] of Object.entries(values)) {
-    const input = page.locator(`[data-field="${field}"]`).first();
-    await expect(input).toBeVisible();
-    await input.fill(value);
-    await input.press('Tab');
+    await commitFieldValue(page, field, value);
   }
+
+  await expect(page.locator('[data-field="mixingRecircRh"]').first()).toHaveValue('45');
+  await expect(page.locator('#app')).not.toContainText(/NaN\s*%/);
 }
 
-async function openPdfSettings(page) {
-  await page.locator('#settingsButton').click();
-  await expect(page.locator('#settingsPanel')).toHaveClass(/is-open/);
-  const pdfDetails = page.locator('#settingsPanel details').filter({ hasText: /PDF-Export/ }).first();
-  if (!(await pdfDetails.evaluate(node => node.open))) {
-    await pdfDetails.locator('summary').click();
+async function openSettingsSection(page, title) {
+  const panel = page.locator('#settingsPanel');
+  if (!(await panel.evaluate(node => node.classList.contains('is-open')))) {
+    await page.locator('#settingsButton').click();
+    await expect(panel).toHaveClass(/is-open/);
   }
+  const details = panel.locator('details').filter({ hasText: title }).first();
+  if (!(await details.evaluate(node => node.open))) await details.locator('summary').click();
+  await expect(details).toHaveAttribute('open', '');
+  return details;
 }
 
 test.describe('Phase 46D mixed-air E2E coverage', () => {
@@ -54,8 +74,10 @@ test.describe('Phase 46D mixed-air E2E coverage', () => {
     await gotoModule(page, 'mixed-air');
 
     await fillMixedAirReferenceValues(page);
-    await page.locator('[data-field="activeMixedAirName"]').fill('Mischluft E2E');
-    await page.getByRole('button', { name: /^Speichern$/ }).click();
+    const nameInput = page.locator('#activeMixedAirName');
+    await nameInput.fill('Mischluft E2E');
+    await expect(nameInput).toHaveValue('Mischluft E2E');
+    await page.locator('[data-line-save]').click();
 
     await expect(page.locator('#app')).toContainText('Mischluft E2E');
     await expect(page.locator('#app')).toContainText(/m³\/h|Mischluft/i);
@@ -84,15 +106,17 @@ test.describe('Phase 46D mixed-air E2E coverage', () => {
     const errors = collectRuntimeErrors(page);
     await gotoModule(page, 'mixed-air');
     await fillMixedAirReferenceValues(page);
-    await openPdfSettings(page);
-
     await page.evaluate(() => { window.showSaveFilePicker = undefined; });
 
+    await openSettingsSection(page, /Projekteinstellungen/);
     const projectDownload = page.waitForEvent('download');
+    await expect(page.locator('#saveProjectButton')).toBeVisible();
     await page.locator('#saveProjectButton').click();
     await expect((await projectDownload).suggestedFilename()).toMatch(/\.tcproj$/);
 
+    await openSettingsSection(page, /PDF-Export/);
     const pdfDownload = page.waitForEvent('download');
+    await expect(page.locator('#exportPdfButton')).toBeVisible();
     await page.locator('#exportPdfButton').click();
     await expect((await pdfDownload).suggestedFilename()).toMatch(/\.pdf$/);
     expect(errors).toEqual([]);

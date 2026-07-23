@@ -14,6 +14,7 @@ import pressureHoldingConfig from '../modules/pressure-holding/config.js';
 import bufferStorageConfig from '../modules/buffer-storage/config.js';
 import wastewaterConfig from '../modules/wastewater/config.js';
 import rainwaterConfig from '../modules/rainwater/config.js';
+import floodingVerificationConfig from '../modules/flooding-verification/config.js';
 import { restoreSessionSnapshot, saveSessionSnapshot } from './projectStorage.js';
 import { createModuleLifecycleAdapter } from './moduleLifecycleAdapter.js';
 import { createModuleRuntime } from './moduleRuntime.js';
@@ -27,7 +28,7 @@ import { initializePerformanceController, markPerformance, measurePerformance, s
 import { initializeSaveEditModeSync } from './saveEditModeSync.js';
 import { initializeLayoutStabilityController } from '../platform/shell/layoutStabilityController.js';
 
-const APP_VERSION = '1.3.4';
+const APP_VERSION = '1.4.0-dev.2';
 initializeLayoutStabilityController();
 initializePerformanceController({ appVersion: APP_VERSION });
 const appInitStartMark = markPerformance('app:init:start', { appVersion: APP_VERSION });
@@ -45,6 +46,7 @@ const lazyModules = [
   { config: drinkingWaterConfig, path: '../modules/drinking-water/index.js' },
   { config: wastewaterConfig, path: '../modules/wastewater/index.js' },
   { config: rainwaterConfig, path: '../modules/rainwater/index.js' },
+  { config: floodingVerificationConfig, path: '../modules/flooding-verification/index.js' }
 ];
 
 const moduleCache = new Map();
@@ -86,28 +88,36 @@ if (currentRouteConfig) preloadLazyModule(currentRouteConfig.config, currentRout
 
 function registerLazyModule({ config, path, module: eagerModule }) {
   if (eagerModule) {
-    modules.register({ config, mount: createModuleLifecycleAdapter(config.id, eagerModule.mount) });
+    modules.register({ config, ...eagerModule, mount: createModuleLifecycleAdapter(config.id, eagerModule.mount) });
     return;
   }
 
-  modules.register({
+  // The registry stores a frozen normalized wrapper but intentionally retains
+  // this mutable source object under `module`. Once lazy loading completes we
+  // publish the real module contract here so cross-cutting services such as
+  // typed PDF reporting can access state/report after the active module mounts.
+  const registration = {
     config,
+    loadedModule: null,
     async mount(root) {
       const renderToken = root?.dataset?.renderToken || '';
-      const module = await loadLazyModule(config, path);
-      if (renderToken && root?.dataset?.renderToken !== renderToken) {
-        return () => {};
-      }
-      if (!module || typeof module.mount !== 'function') {
+      const loadedModule = await loadLazyModule(config, path);
+      registration.loadedModule = loadedModule;
+      registration.state = loadedModule?.state;
+      registration.report = loadedModule?.report;
+      registration.calculate = loadedModule?.calculate;
+      registration.results = loadedModule?.results;
+      if (renderToken && root?.dataset?.renderToken !== renderToken) return () => {};
+      if (!loadedModule || typeof loadedModule.mount !== 'function') {
         throw new Error(`Modul ${config.id} konnte nicht initialisiert werden.`);
       }
-      return createModuleLifecycleAdapter(config.id, module.mount)(root);
+      return createModuleLifecycleAdapter(config.id, loadedModule.mount)(root);
     }
-  });
+  };
+  modules.register(registration);
 }
 
 lazyModules.forEach(registerLazyModule);
-
 restoreSessionSnapshot();
 trackGlobalEventListener(window, 'pageshow', event => {
   if (event.persisted) restoreSessionSnapshot();
@@ -127,10 +137,8 @@ trackGlobalEventListener(document, 'click', event => {
   if (!link) return;
   const href = link.getAttribute('href') || '';
   const target = link.getAttribute('target') || '';
-  const external = target === '_blank' || /^https?:\/\//i.test(href);
-  if (external) persistSessionBeforeLeaving();
+  if (target === '_blank' || /^https?:\/\//i.test(href)) persistSessionBeforeLeaving();
 }, { capture: true });
-
 
 const NAV_INTERACTIVE_SELECTOR = '.module-nav [data-module-id], #overflowMenu [data-module-id]';
 const NAV_MOVE_TOLERANCE_PX = 10;
@@ -156,7 +164,6 @@ function commitGlobalModuleNav(button, event) {
   event?.preventDefault?.();
   event?.stopPropagation?.();
   event?.stopImmediatePropagation?.();
-
   const overflow = document.getElementById('overflowMenu');
   if (overflow) overflow.hidden = true;
   if (isMountedActive || isPendingActive) return true;
@@ -202,10 +209,6 @@ function onGlobalNavPointerUp(event) {
     return;
   }
   navPointerGesture = null;
-  // Deliberately do not navigate on pointerup. The click event is the single
-  // route-change entry point for mouse, touch and keyboard activation. Keeping
-  // pointerup passive prevents a route from being marked active before the
-  // module content mount has actually completed.
 }
 
 function onGlobalNavClick(event) {
@@ -228,7 +231,6 @@ trackGlobalEventListener(document, 'pointercancel', onGlobalNavPointerCancel, tr
 trackGlobalEventListener(document, 'pointerup', onGlobalNavPointerUp, true);
 trackGlobalEventListener(document, 'click', onGlobalNavClick, true);
 
-
 const app = document.getElementById('app');
 const moduleRuntime = createModuleRuntime({
   root: app,
@@ -240,20 +242,18 @@ const moduleRuntime = createModuleRuntime({
   loadingDelayMs: 180
 });
 
-function render(id){
+function render(id) {
   if (!modules.get(id)) return Promise.resolve(false);
   const finish = startPerformanceSpan('module:switch', { moduleId: id });
   return Promise.resolve(moduleRuntime.mount(id))
     .then(result => { finish({ moduleId: id, status: 'ok' }); return result; })
     .catch(error => { finish({ moduleId: id, status: 'error', error: error?.message || String(error) }); throw error; });
 }
+
 initRouter(render);
 renderQuickAccessSettings();
 scheduleLazyModulePreload();
-
-trackGlobalEventListener(document, 'techcalc-project-loaded', () => {
-  render(currentRoute());
-});
+trackGlobalEventListener(document, 'techcalc-project-loaded', () => render(currentRoute()));
 
 let pdfExportReady;
 function ensurePdfExport() {
@@ -278,34 +278,20 @@ trackGlobalEventListener(window, 'resize', () => {
 }, { passive: true });
 
 const settingsPanel = document.getElementById('settingsPanel');
-
 initializeThemeController({ root: settingsPanel || document });
-
-initializeFeedbackController({
-  appVersion: APP_VERSION,
-  getRoute: currentRoute
-});
-
+initializeFeedbackController({ appVersion: APP_VERSION, getRoute: currentRoute });
 initializeReleaseNotesController({ appVersion: APP_VERSION });
-
-// Bind PDF export and project actions as soon as the app is ready.
-// The menu may be opened and a button tapped before lazy initialization has finished.
-if ('requestIdleCallback' in window) {
-  requestIdleCallback(() => ensurePdfExport());
-} else {
-  setTimeout(() => ensurePdfExport(), 0);
-}
-
+if ('requestIdleCallback' in window) requestIdleCallback(() => ensurePdfExport());
+else setTimeout(() => ensurePdfExport(), 0);
 initializeSettingsController({ settingsPanel, ensurePdfExport });
 
 const header = document.querySelector('.app-header');
-function updateHeaderTransparency(){
+function updateHeaderTransparency() {
   if (!header) return;
   header.classList.toggle('is-scrolled', window.scrollY > 8);
 }
 trackGlobalEventListener(window, 'scroll', updateHeaderTransparency, { passive: true });
 updateHeaderTransparency();
-
 initializeSaveEditModeSync(document);
 initializeServiceWorkerController({ appVersion: APP_VERSION });
 const appInitEndMark = markPerformance('app:init:end', { appVersion: APP_VERSION });

@@ -5,14 +5,63 @@
   .wrg-desktop-split { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
   .wrg-desktop-split__input,
   .wrg-desktop-split__output { display: flex; flex-direction: column; gap: var(--tc-gap); }
+
+  .module-view[data-module="flooding-verification"] .inline-stats {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .module-view[data-module="flooding-verification"] .inline-stats > .inline-stat--span-3 {
+    grid-column: span 3;
+  }
+  .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-list,
+  .module-view[data-module="flooding-verification"] .result-group--nachweisstatus .result-list {
+    --result-label-width: 200px;
+  }
+  .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-row,
+  .module-view[data-module="flooding-verification"] .result-group--nachweisstatus .result-row {
+    grid-template-columns: var(--result-label-width) minmax(0, 1fr);
+    align-items: start;
+  }
+  .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-row > span,
+  .module-view[data-module="flooding-verification"] .result-group--nachweisstatus .result-row > span {
+    width: var(--result-label-width);
+    min-width: var(--result-label-width);
+    max-width: var(--result-label-width);
+  }
+  .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-row > strong,
+  .module-view[data-module="flooding-verification"] .result-group--nachweisstatus .result-row > strong {
+    min-width: 0;
+  }
+  .module-view[data-module="flooding-verification"] .result-group--nachweisstatus .result-row > strong {
+    text-align: right;
+    justify-self: stretch;
+  }
 }
 
 @media (max-width: 1320px) {
   .buffer-input-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 
+@media (min-width: 768px) and (max-width: 1023px) {
+  .module-view[data-module="flooding-verification"] .inline-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .module-view[data-module="flooding-verification"] .inline-stats > .inline-stat--span-3 {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 1023px) {
   .hx-layout { grid-template-columns: 1fr; }
+
+  .module-view[data-module="flooding-verification"] .result-group,
+  .module-view[data-module="flooding-verification"] .result-list,
+  .module-view[data-module="flooding-verification"] .result-row,
+  .module-view[data-module="flooding-verification"] .inline-stat,
+  .module-view[data-module="flooding-verification"] .card,
+  .module-view[data-module="flooding-verification"] .card__body {
+    min-width: 0;
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 767px) {
@@ -24,11 +73,52 @@
   .hx-history__row { grid-template-columns: 1fr auto; }
   .hx-history__row--process { grid-template-columns: 1fr; }
   .hx-history__values { grid-column: 1 / -1; justify-content: flex-start; }
+
+  /* Mobile module adapter: WRG and mixed-air cards must form independent
+     vertical stacks. Keeping two grid columns couples row heights and creates
+     large apparent gaps below the shorter card. */
   .wrg-flow-layout,
-  .wrg-group-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .wrg-group-grid,
+  .wrg-desktop-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .wrg-flow-layout .tc-fields,
   .wrg-group-grid .tc-fields { grid-template-columns: 1fr; }
   .wrg-flow-layout .inline-stats,
-  .wrg-group-grid .inline-stats { grid-template-columns: 1fr; }}
+  .wrg-group-grid .inline-stats { grid-template-columns: 1fr; }
 
-@media (max-width: 480px) {}@media (max-width: 480px) {}
+  .module-view[data-module="flooding-verification"] .inline-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .module-view[data-module="flooding-verification"] .inline-stats > .inline-stat--span-3 {
+    grid-column: auto;
+  }
+  .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-row,
+  .module-view[data-module="flooding-verification"] .result-group--nachweisstatus .result-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .module-view[data-module="flooding-verification"] .result-group--planerische-interpretation .result-row > span,
+  .module-view[data-module="flooding-verification"] .result-group--nachweisstatus .result-row > span {
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .module-view[data-module="flooding-verification"] .result-row > strong,
+  .module-view[data-module="flooding-verification"] .result-group--nachweisstatus .result-row > strong {
+    width: 100%;
+    min-width: 0;
+    justify-self: start;
+    text-align: left;
+    overflow-wrap: normal;
+    word-break: normal;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .module-view[data-module="flooding-verification"] .card,
+  .module-view[data-module="flooding-verification"] .inline-stat {
+    width: 100%;
+  }
+}

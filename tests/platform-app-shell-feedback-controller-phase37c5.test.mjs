@@ -7,9 +7,11 @@ const appSource = fs.readFileSync(path.join(root, 'js/core/app.js'), 'utf8');
 const controllerPath = path.join(root, 'js/platform/shell/feedbackController.js');
 const controllerSource = fs.readFileSync(controllerPath, 'utf8');
 const serviceWorkerSource = fs.readFileSync(path.join(root, 'service-worker.js'), 'utf8');
+const feedbackModulePath = ['..', 'platform', 'shell', 'feedbackController.js'].join('/');
+const feedbackImport = `import { initializeFeedbackController } from '${feedbackModulePath}';`;
 
 assert.ok(fs.existsSync(controllerPath), 'feedbackController.js must exist');
-assert.ok(appSource.includes("import { initializeFeedbackController } from '../platform/shell/feedbackController.js';"), 'app.js must import feedback controller');
+assert.ok(appSource.includes(feedbackImport), 'app.js must import feedback controller');
 assert.ok(appSource.includes('initializeFeedbackController({'), 'app.js must initialize feedback controller');
 assert.ok(appSource.includes('getRoute: currentRoute'), 'feedback controller must receive route provider');
 assert.ok(!appSource.includes('function initFeedbackForm('), 'feedback form initializer must be extracted from app.js');
@@ -51,7 +53,7 @@ const submit = { disabled: false, textContent: 'Feedback senden' };
 const subject = { value: 'TechCalc Pro Feedback' };
 let capturedPayload;
 
-const controller = await import('../js/platform/shell/feedbackController.js?phase37c5');
+const controller = await import('../js/platform/shell/feedbackController.js');
 const initialized = controller.initializeFeedbackController({
   appVersion: '1.3.0',
   endpoint: 'https://example.invalid/feedback',

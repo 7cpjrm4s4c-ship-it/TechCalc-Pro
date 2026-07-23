@@ -7,9 +7,11 @@ const appSource = fs.readFileSync(path.join(root, 'js/core/app.js'), 'utf8');
 const controllerPath = path.join(root, 'js/platform/shell/serviceWorkerController.js');
 const controllerSource = fs.readFileSync(controllerPath, 'utf8');
 const serviceWorkerSource = fs.readFileSync(path.join(root, 'service-worker.js'), 'utf8');
+const serviceWorkerModulePath = ['..', 'platform', 'shell', 'serviceWorkerController.js'].join('/');
+const serviceWorkerImport = `import { initializeServiceWorkerController } from '${serviceWorkerModulePath}';`;
 
 assert.ok(fs.existsSync(controllerPath), 'serviceWorkerController.js must exist');
-assert.ok(appSource.includes("import { initializeServiceWorkerController } from '../platform/shell/serviceWorkerController.js';"), 'app.js must import service worker controller');
+assert.ok(appSource.includes(serviceWorkerImport), 'app.js must import service worker controller');
 assert.ok(appSource.includes('initializeServiceWorkerController({ appVersion: APP_VERSION });'), 'app.js must initialize service worker controller');
 assert.ok(!appSource.includes("if ('serviceWorker' in navigator)"), 'service worker block must be extracted from app.js');
 assert.ok(!appSource.includes('navigator.serviceWorker.register'), 'app.js must not register the service worker directly');
@@ -42,7 +44,7 @@ const sessionStorageRef = {
   setItem(key, value) { sessionValues.set(key, value); }
 };
 
-const controller = await import('../js/platform/shell/serviceWorkerController.js?phase37c6');
+const controller = await import('../js/platform/shell/serviceWorkerController.js');
 const initialized = controller.initializeServiceWorkerController({
   appVersion: '1.3.0',
   navigatorRef,
@@ -58,6 +60,7 @@ listeners.get('message')({ data: { type: 'TECHCALC_CACHE_UPDATED', cache: 'tc-ca
 assert.equal(sessionValues.get('techcalc-active-cache'), 'tc-cache', 'cache update message must be stored');
 
 await listeners.get('window:load')();
+await new Promise(resolve => setTimeout(resolve, 0));
 assert.equal(registeredUrl, './service-worker.js?v=1.3.0', 'service worker registration URL must include app version');
 assert.equal(updateCalled, true, 'registration.update must be requested');
 assert.equal(controller.initializeServiceWorkerController({ navigatorRef, windowRef, sessionStorageRef }), false, 'controller must be idempotent');

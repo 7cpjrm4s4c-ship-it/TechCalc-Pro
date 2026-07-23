@@ -1,5 +1,4 @@
 import { readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
 
 const scriptsDir = new URL('../scripts/', import.meta.url);
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
@@ -20,7 +19,14 @@ for (const command of Object.values(pkg.scripts || {})) {
   collectFromText(command);
 }
 
-collectFromText(readFileSync(new URL('../scripts/test-integration.mjs', import.meta.url), 'utf8'));
+const referenceSources = [
+  '../scripts/test-integration.mjs',
+  '../playwright.config.mjs'
+];
+
+for (const source of referenceSources) {
+  collectFromText(readFileSync(new URL(source, import.meta.url), 'utf8'));
+}
 
 referenced.add('audit-toolchain-cleanup-phase46a.mjs');
 
@@ -34,7 +40,7 @@ if (missing.length > 0) {
 }
 
 if (unused.length > 0) {
-  console.error('Unused scripts found. Either wire them into package.json/test-integration or remove them:');
+  console.error('Unused scripts found. Either wire them into package.json, test-integration or a supported tool configuration, or remove them:');
   for (const name of unused.sort()) console.error(`- ${name}`);
   process.exit(1);
 }

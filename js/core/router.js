@@ -1,6 +1,7 @@
 import { modules } from './registry.js';
+import { loadPreferences } from './preferences.js';
 
-const DEFAULT_ROUTE = 'heating-cooling';
+const FALLBACK_ROUTE = 'heating-cooling';
 const HASH_PREFIX = '#/';
 let renderCallback = () => Promise.resolve(false);
 let activeRouteId = '';
@@ -9,6 +10,36 @@ let navigationVersion = 0;
 
 function appRoot() {
   return typeof document !== 'undefined' ? document.getElementById('app') : null;
+}
+
+export function preferredStartRoute() {
+  const preferred = loadPreferences().mobileQuickAccess || [];
+  return preferred.find(id => modules.get(id))
+    || (modules.get(FALLBACK_ROUTE) ? FALLBACK_ROUTE : modules.all()[0]?.id);
+}
+
+function resetScrollHosts() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+  const root = appRoot();
+  if (root) root.scrollTop = 0;
+  document.querySelectorAll('.app-main, [data-module-scroll], .module-view, .module-content').forEach(element => {
+    element.scrollTop = 0;
+    element.scrollLeft = 0;
+  });
+}
+
+function resetViewportAfterModuleChange(previousRouteId, nextRouteId) {
+  if (!nextRouteId || previousRouteId === nextRouteId || typeof window === 'undefined') return;
+  resetScrollHosts();
+  const repeat = () => {
+    resetScrollHosts();
+    window.requestAnimationFrame?.(resetScrollHosts);
+  };
+  if (typeof window.requestAnimationFrame === 'function') window.requestAnimationFrame(repeat);
+  else window.setTimeout(resetScrollHosts, 0);
 }
 
 function isMountedRoute(id) {
@@ -26,31 +57,23 @@ export function initRouter(onRoute) {
   window.addEventListener('hashchange', handleRouteChange);
   window.addEventListener('popstate', handleRouteChange);
 
-  const initialRoute = currentRoute();
-  activeRouteId = initialRoute;
+  // A fresh app start and a browser reload always use the first valid module
+  // from the persisted module settings. A historical hash is normalized to
+  // that preference; hash navigation remains available after boot.
+  const initialRoute = preferredStartRoute();
+  activeRouteId = '';
   requestedRouteId = initialRoute;
-
-  if (!window.location.hash) {
-    replaceHash(initialRoute);
-    return;
-  }
-
-  normalizeHashAndRender(initialRoute, { source: 'init' });
+  replaceHash(initialRoute);
 }
 
 export async function navigate(id, options = {}) {
   if (!modules.get(id)) return false;
 
-  const root = appRoot();
   const targetHash = `${HASH_PREFIX}${id}`;
   const currentHash = window.location.hash || '';
   const mounted = isMountedRoute(id);
   const pending = isPendingRoute(id);
 
-  // Global same-module guard. A second tap/click on the active module must never
-  // start a new mount or show the loading placeholder. Modules such as Heizung,
-  // Lueftung and Trinkwasser already behaved like stable mounted views; this
-  // rule makes that behavior the router default for every module.
   if (!options.forceRender && (mounted || pending)) {
     if (currentHash !== targetHash) {
       const path = `${window.location.pathname}${window.location.search}${targetHash}`;
@@ -63,10 +86,6 @@ export async function navigate(id, options = {}) {
   navigationVersion += 1;
   requestedRouteId = id;
 
-  // App-internal navigation has exactly one content-render path. Touch, mouse,
-  // overflow menu and programmatic navigation all call this function directly.
-  // The content render is awaited so navigation state and module content cannot
-  // diverge into the broken state "button active, old module still visible".
   if (currentHash !== targetHash) {
     const path = `${window.location.pathname}${window.location.search}${targetHash}`;
     window.history.pushState({ moduleId: id, version: navigationVersion }, '', path);
@@ -74,15 +93,20 @@ export async function navigate(id, options = {}) {
     window.history.replaceState({ moduleId: id, version: navigationVersion }, '', `${window.location.pathname}${window.location.search}${targetHash}`);
   }
 
+  const previousRouteId = activeRouteId;
+  resetViewportAfterModuleChange(previousRouteId, id);
   const rendered = await Promise.resolve(renderCallback(id));
-  if (rendered) activeRouteId = id;
+  if (rendered) {
+    activeRouteId = id;
+    resetViewportAfterModuleChange(previousRouteId, id);
+  }
   return rendered;
 }
 
 export function currentRoute() {
   const id = getRouteFromHash() || requestedRouteId || activeRouteId;
   if (modules.get(id)) return id;
-  return modules.get(DEFAULT_ROUTE) ? DEFAULT_ROUTE : modules.all()[0]?.id;
+  return preferredStartRoute();
 }
 
 export function getRouteFromHash() {
@@ -108,8 +132,13 @@ function normalizeHashAndRender(routeId, options = {}) {
 
   if (isMountedRoute(routeId) || isPendingRoute(routeId)) return Promise.resolve(true);
 
+  const previousRouteId = activeRouteId;
+  resetViewportAfterModuleChange(previousRouteId, routeId);
   return Promise.resolve(renderCallback(routeId)).then(rendered => {
-    if (rendered) activeRouteId = routeId;
+    if (rendered) {
+      activeRouteId = routeId;
+      resetViewportAfterModuleChange(previousRouteId, routeId);
+    }
     return rendered;
   });
 }
@@ -119,8 +148,13 @@ function replaceHash(routeId) {
   window.history.replaceState({ moduleId: routeId, version: navigationVersion }, '', path);
   requestedRouteId = routeId;
   if (isMountedRoute(routeId) || isPendingRoute(routeId)) return Promise.resolve(true);
+  const previousRouteId = activeRouteId;
+  resetViewportAfterModuleChange(previousRouteId, routeId);
   return Promise.resolve(renderCallback(routeId)).then(rendered => {
-    if (rendered) activeRouteId = routeId;
+    if (rendered) {
+      activeRouteId = routeId;
+      resetViewportAfterModuleChange(previousRouteId, routeId);
+    }
     return rendered;
   });
 }

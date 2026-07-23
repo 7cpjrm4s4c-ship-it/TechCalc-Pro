@@ -2,6 +2,15 @@ import { defineConfig, devices } from '@playwright/test';
 
 const PORT = Number(process.env.PLAYWRIGHT_PORT || 4173);
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || `http://127.0.0.1:${PORT}`;
+const reporters = process.env.CI
+  ? [
+      ['./scripts/playwright-ci-failure-reporter.mjs'],
+      ['html', { open: 'never', outputFolder: 'docs/audits/playwright-report-phase47d' }]
+    ]
+  : [
+      ['list'],
+      ['html', { open: 'never', outputFolder: 'docs/audits/playwright-report-phase47d' }]
+    ];
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -9,7 +18,7 @@ export default defineConfig({
   expect: { timeout: 5_000 },
   fullyParallel: false,
   retries: process.env.CI ? 1 : 0,
-  reporter: [['list'], ['html', { open: 'never', outputFolder: 'docs/audits/playwright-report-phase37b' }]],
+  reporter: reporters,
   use: {
     baseURL: BASE_URL,
     trace: 'retain-on-failure',
@@ -24,6 +33,10 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox-desktop', use: { ...devices['Desktop Firefox'] } },
+    { name: 'chromium-tablet', use: { ...devices['Galaxy Tab S4'] } },
+    { name: 'chromium-mobile', use: { ...devices['Pixel 7'] } },
+    { name: 'webkit-tablet', use: { ...devices['iPad Pro 11'] } },
     { name: 'webkit-mobile', use: { ...devices['iPhone 13'] } }
   ]
 });

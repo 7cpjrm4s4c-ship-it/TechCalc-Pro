@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import rainwater from '../js/modules/rainwater/index.js';
-import { view as rainwaterView } from '../js/modules/rainwater/view.js';
+import createRainwaterView from '../js/modules/rainwater/view.js';
+
+const { view: rainwaterView } = createRainwaterView({
+  lineSectionController: { renderCard: () => '' }
+});
 
 function render(snapshot) {
   return rainwaterView(snapshot);

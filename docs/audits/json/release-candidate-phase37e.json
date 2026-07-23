@@ -2,7 +2,7 @@
   "phase": "37E",
   "title": "Release Candidate Closure Audit",
   "status": "pass",
-  "checkedAt": "2026-07-09T19:59:11.393Z",
+  "checkedAt": "2026-07-13T08:14:55.478Z",
   "checks": [
     {
       "id": "required-files",
@@ -66,7 +66,7 @@
     {
       "id": "release-notes-current",
       "pass": true,
-      "detail": "RELEASE_NOTES.md contains current public release entry"
+      "detail": "RELEASE_NOTES.md contains package version entry"
     }
   ]
 }

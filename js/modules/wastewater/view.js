@@ -45,13 +45,13 @@ export function createWastewaterView(config, calculate, lineSectionController) {
       lineSectionController.renderCard(s)
     ].join(''));
 
-    const outputColumn = stack([
-      `<div class="tc-stack" data-ww-dynamic="result">${renderWastewaterResult(s, r)}</div>`
-    ].join(''));
+    const outputColumn = `<div class="tc-module-section tc-stack" data-ww-dynamic="result">${renderWastewaterResult(s, r)}</div>`;
 
     return renderModuleShell(config, `
-      <div class="span-6">${inputColumn}</div>
-      <div class="span-6">${outputColumn}</div>
+      <div class="tc-module-layout tc-module-layout--2">
+        <div class="tc-module-column">${inputColumn}</div>
+        <div class="tc-module-column">${outputColumn}</div>
+      </div>
     `);
   }
 

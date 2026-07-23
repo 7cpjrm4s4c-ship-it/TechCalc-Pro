@@ -1,0 +1,149 @@
+/* Global module layout contract.
+   Every module exposes exactly one outer root stack. Module-specific styles may
+   define columns and internal component layouts, but never the vertical rhythm
+   between top-level module sections. */
+
+:root {
+  --tc-module-card-gap: var(--tc-card-stack-gap, var(--tc-gap));
+}
+
+#app,
+#app .module-view,
+#app .module-content {
+  overflow-anchor: none;
+}
+
+/* .module-view is the direct grid item of #app.grid-12. It must span the host
+   grid before any inner module widths can resolve correctly. */
+#app > .module-view {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  justify-self: stretch;
+  animation: none !important;
+}
+
+/* The shell owns the outer stack and always spans the complete module grid. */
+#app .module-view > .tc-module-root-stack {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  justify-self: stretch;
+  row-gap: var(--tc-module-card-gap) !important;
+}
+
+/* Top-level layout sections must not add legacy outer margins. Internal card,
+   form, result, chart and process spacing remains untouched. */
+#app .tc-module-root-stack > * {
+  margin-block: 0 !important;
+  min-width: 0;
+}
+
+/* Explicit inner module layouts. This class is reserved for content groups and
+   must never be applied to .module-view itself. */
+#app .tc-module-layout {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--tc-module-card-gap);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  align-items: start;
+  justify-self: stretch;
+}
+
+#app .tc-module-column,
+#app .tc-module-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tc-module-card-gap);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin-block: 0;
+}
+
+#app .tc-module-column > *,
+#app .tc-module-section > * {
+  margin-block: 0;
+  min-width: 0;
+}
+
+/* Spacing finish: all authored module blocks participate as neutral stack
+   items. Their internal padding and typography remain component-owned. */
+#app .module-view :is(
+  .card,
+  .tc-card,
+  .result-card,
+  .formula,
+  .tc-note,
+  .tc-help,
+  .ph-help,
+  .ph-note,
+  .dw-note,
+  .empty-state,
+  .main-result,
+  .inline-stats,
+  .result-group,
+  .saved-record-list,
+  .line-section-list
+) {
+  margin-block: 0 !important;
+}
+
+/* Dynamic islands are layout-transparent stack items. Content appearing after
+   a calculation must not introduce a second outer spacing system. */
+#app .module-view :is(
+  [data-platform-dynamic],
+  [data-hc-dynamic],
+  [data-vent-dynamic],
+  [data-pipe-dynamic],
+  [data-ph-dynamic],
+  [data-buffer-dynamic],
+  [data-hx-dynamic],
+  [data-dw-dynamic],
+  [data-ww-dynamic],
+  [data-rw-dynamic],
+  [data-flooding-dynamic],
+  [data-wrg-dynamic],
+  [data-mixed-air-dynamic],
+  [data-unit-dynamic]
+) {
+  min-width: 0;
+  max-width: 100%;
+  margin-block: 0 !important;
+}
+
+/* Help text previously carried a component-level top margin. Inside an
+   authored stack the parent gap is the sole source of separation. */
+#app .module-view :is(.tc-stack, .tc-stack--section, .tc-module-column, .tc-module-section) > :is(.tc-help, .ph-help) {
+  margin-top: 0 !important;
+}
+
+@media (min-width: 1024px) {
+  #app .tc-module-layout--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Standard explicit vertical stacks use the same global rhythm. These are
+   authored layout primitives, not runtime-discovered containers. Direct child
+   margins are neutralized so spacing is contributed exactly once by the parent. */
+#app :is(.tc-stack, .tc-stack--section) {
+  row-gap: var(--tc-module-card-gap) !important;
+}
+
+#app :is(.tc-stack, .tc-stack--section) > * {
+  margin-block: 0 !important;
+}
+
+/* Drinking-water still has legacy stack declarations in older component CSS.
+   This module-scoped guard has intentionally higher specificity so the central
+   spacing contract remains authoritative across all themes and viewports. */
+#app .module-view[data-module='drinking-water'] .tc-stack {
+  gap: var(--tc-module-card-gap) !important;
+  row-gap: var(--tc-module-card-gap) !important;
+}

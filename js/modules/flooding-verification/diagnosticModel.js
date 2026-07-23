@@ -1,0 +1,102 @@
+import { buildFloodingPlausibilityModel } from './plausibilityModel.js';
+
+const PRIORITY = Object.freeze({ error: 0, warning: 1, recommendation: 2, hint: 3 });
+const SEVERITIES = Object.freeze(new Set(Object.keys(PRIORITY)));
+
+const textOf = item => String(item?.text || item?.message || item || '').trim();
+
+function inferSeverity(item) {
+  const explicitSeverity = item && typeof item === 'object' ? item.severity : null;
+  if (SEVERITIES.has(explicitSeverity)) return explicitSeverity;
+
+  const text = textOf(item);
+  if (/^fehler\b/i.test(text) || /(muss|fehl(?:t|en|end(?:e|er|es|en)?)|ungültig|unvollständig|nicht erfüllt)/i.test(text)) return 'error';
+  if (/^warnung\b/i.test(text) || /(außerhalb|überschritten|kleiner|größer|begrenzt|Vorbemessung)/i.test(text)) return 'warning';
+  if (/^empfehlung\b/i.test(text)) return 'recommendation';
+  return 'hint';
+}
+
+function normalize(items = []) {
+  const seen = new Set();
+  return (Array.isArray(items) ? items : [items])
+    .map(item => ({ severity: inferSeverity(item), text: textOf(item) }))
+    .filter(item => {
+      if (!item.text || seen.has(item.text)) return false;
+      seen.add(item.text);
+      return true;
+    })
+    .sort((a, b) => PRIORITY[a.severity] - PRIORITY[b.severity]);
+}
+
+const summarize = (entries, fallback) => {
+  if (!entries.length) return fallback;
+  const visible = entries.slice(0, 2).map(item => item.text);
+  const suffix = entries.length > visible.length ? ` Weitere ${entries.length - visible.length} Meldung(en) sind im Diagnosebereich aufgeführt.` : '';
+  return `${visible.join(' ')}${suffix}`;
+};
+
+export function buildFloodingDiagnosticModel({ result = {}, applicability = {}, retentionComparison = {} } = {}) {
+  const combined = result.combinedStorage || {};
+  const plausibility = buildFloodingPlausibilityModel({ result, applicability });
+  const sourceMessages = [
+    ...(Array.isArray(result.warnings) ? result.warnings : []),
+    ...(applicability.diagnostics || applicability.messages || []),
+    ...(retentionComparison.diagnostics || retentionComparison.messages || []),
+    ...plausibility.messages
+  ];
+  const messages = normalize(sourceMessages);
+
+  if (combined.status === 'pending-dwa') messages.push({ severity: 'recommendation', text: 'Den Rückhalteraumnachweis nach DWA-A 117 vervollständigen, bevor der Planungswert freigegeben wird.' });
+  if (combined.status === 'pending-din') messages.push({ severity: 'recommendation', text: 'Den Überflutungsnachweis nach DIN 1986-100 vervollständigen, bevor der Planungswert freigegeben wird.' });
+  if (combined.status === 'incomplete') messages.push({ severity: 'recommendation', text: 'Fehlende Flächen-, Regen- oder Abflussdaten ergänzen und den Nachweis erneut prüfen.' });
+  if (applicability.status === 'preliminary-only') messages.push({ severity: 'recommendation', text: 'Das Ergebnis nur zur Vorbemessung verwenden und die weitere Planung mit der zuständigen Stelle abstimmen.' });
+  if (applicability.status === 'long-term-simulation-required') messages.push({ severity: 'recommendation', text: 'Eine Langzeitsimulation durchführen; das einfache Verfahren ist für den endgültigen Nachweis nicht ausreichend.' });
+  if (Number(result.criticalShare || 0) > 0.7) messages.push({ severity: 'recommendation', text: 'Die Notentwässerung wegen des kritischen Flächenanteils über 70 % zusätzlich prüfen.' });
+
+  const deduplicated = normalize(messages);
+  const errors = deduplicated.filter(item => item.severity === 'error');
+  const warnings = deduplicated.filter(item => item.severity === 'warning');
+  const recommendations = deduplicated.filter(item => item.severity === 'recommendation');
+  const hints = deduplicated.filter(item => item.severity === 'hint');
+
+  const outsideDomain = ['preliminary-only', 'long-term-simulation-required'].includes(applicability.status);
+  const incomplete = ['incomplete', 'pending-dwa', 'pending-din'].includes(combined.status) || errors.length > 0;
+  const status = incomplete ? 'incomplete' : outsideDomain ? 'outside-domain' : warnings.length ? 'complete-with-warnings' : 'complete';
+  const statusLabel = ({
+    incomplete: 'Berechnung unvollständig',
+    'outside-domain': 'Normbereich verlassen',
+    'complete-with-warnings': 'Berechnung vollständig mit Warnungen',
+    complete: 'Berechnung erfolgreich'
+  })[status];
+  const statusReason = status === 'complete'
+    ? 'Alle erforderlichen Nachweise sind vollständig, plausibel und innerhalb der dokumentierten Anwendungsgrenzen.'
+    : status === 'outside-domain'
+      ? summarize([...errors, ...warnings], 'Mindestens eine Anwendungsgrenze des einfachen Verfahrens ist überschritten.')
+      : status === 'complete-with-warnings'
+        ? summarize(warnings, 'Ein Planungswert liegt vor; ergänzende Plausibilitätsprüfungen sind zu beachten.')
+        : summarize(errors, 'Mindestens ein erforderlicher Nachweis, Eingabeblock oder Plausibilitätscheck ist noch nicht vollständig erfüllt.');
+
+  const notices = [
+    ['error', 'Fehler', 'Fehler', errors],
+    ['warning', 'Warnungen', 'Warnung', warnings],
+    ['recommendation', 'Empfehlungen', 'Empfehlung', recommendations],
+    ['hint', 'Hinweise', 'Hinweis', hints]
+  ].filter(([, , , entries]) => entries.length).map(([, title, prefix, entries]) => Object.freeze({
+    title,
+    prefix,
+    accent: 'green',
+    messages: Object.freeze(entries.map(item => Object.freeze({ prefix, text: item.text })))
+  }));
+
+  return Object.freeze({
+    status,
+    statusLabel,
+    statusReason,
+    plausibility,
+    counts: Object.freeze({ errors: errors.length, warnings: warnings.length, recommendations: recommendations.length, hints: hints.length }),
+    messages: Object.freeze({ errors: Object.freeze(errors), warnings: Object.freeze(warnings), recommendations: Object.freeze(recommendations), hints: Object.freeze(hints) }),
+    notices: Object.freeze(notices)
+  });
+}
+
+export default buildFloodingDiagnosticModel;

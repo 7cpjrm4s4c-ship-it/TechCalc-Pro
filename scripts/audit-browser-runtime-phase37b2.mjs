@@ -31,6 +31,8 @@ for (const moduleId of moduleIds) {
   check(`route:${moduleId}`, spec.includes(`'${moduleId}'`), `E2E route smoke includes ${moduleId}`);
 }
 
+check('navigation:boot-before-hash', /async function ensureAppBooted\(page\)/.test(spec) && /await ensureAppBooted\(page\);[\s\S]*window\.location\.hash/.test(spec), 'module route smoke boots the preferred start module before hash navigation');
+check('navigation:no-direct-hash-boot', !/page\.goto\(`?\.\/?#\//.test(spec), 'runtime smoke does not treat a hash as the initial app-start contract');
 check('console-filter:external-only', /function isKnownExternalNoise\(message\)/.test(spec) && /cdn\\\.segment\\\.com/.test(spec), 'known non-app browser noise is explicitly filtered');
 check('console-guard:pageerror', /page\.on\('pageerror'/.test(spec), 'uncaught page errors are collected');
 check('console-guard:error-console', /message\.type\(\) === 'error'/.test(spec), 'console errors are collected');
@@ -40,7 +42,13 @@ check('keyboard-navigation-smoke', /Enter/.test(spec) && /Tab/.test(spec) && /hx
 check('mobile-nav-smoke', /mobile nav swipe/.test(spec) && /setViewportSize/.test(spec), 'mobile nav gesture smoke is covered');
 check('scroll-lock-smoke', /settings panel locks and restores scroll/.test(spec), 'settings scroll lock smoke is covered');
 check('offline-sw-smoke', /service worker registers/.test(spec) && /setOffline\(true\)/.test(spec), 'service worker offline reload smoke is covered');
-check('package-script:integration-gate', packageJson.scripts?.['test:integration'] === 'node scripts/test-integration.mjs', 'package exposes consolidated integration guard');
+
+const integrationCommand = String(packageJson.scripts?.['test:integration'] || '').trim();
+check(
+  'package-script:integration-gate',
+  /(?:^|&&\s*)node scripts\/test-integration\.mjs$/.test(integrationCommand),
+  'package exposes consolidated integration guard, optionally preceded by contract audits'
+);
 check('package-script:e2e-gate', packageJson.scripts?.['test:e2e'] === 'playwright test', 'package exposes consolidated Playwright e2e command');
 
 const report = {
@@ -51,7 +59,8 @@ const report = {
   coverage: {
     modules: moduleIds.length,
     scenarios: [
-      'module-route-mount',
+      'preferred-module-start',
+      'post-boot-module-route-mount',
       'saved-record-controls',
       'dynamic-renderer-field-commit',
       'enter-tab-navigation',

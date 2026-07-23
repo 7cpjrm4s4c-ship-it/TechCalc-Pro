@@ -14,7 +14,6 @@ export function draftConsumerList(items, type, waterHeatingMode = 'central') {
   </div>`).join('')}</div>`;
 }
 
-
 export function renderUsageUnitRows(units = [], snapshot = {}, waterHeatingMode = 'central') {
   if (!units.length) return '<div class="empty-state empty-state--compact">Noch keine Nutzungseinheit angelegt</div>';
   const activeId = snapshot.activeUnitId;
@@ -111,8 +110,10 @@ export function renderResultCard(vm){
 export function renderView(s) {
   const vm = createDrinkingWaterViewModel(s);
   return renderModuleShell(config, `
-    <div class="span-6" data-dw-dynamic="input">${renderInputCard(vm)}</div>
-    <div class="span-6" data-dw-dynamic="result">${renderResultCard(vm)}</div>
+    <div class="tc-module-layout tc-module-layout--2">
+      <div class="tc-module-column"><div class="tc-module-section" data-dw-dynamic="input">${renderInputCard(vm)}</div></div>
+      <div class="tc-module-column"><div class="tc-module-section" data-dw-dynamic="result">${renderResultCard(vm)}</div></div>
+    </div>
   `);
 }
 

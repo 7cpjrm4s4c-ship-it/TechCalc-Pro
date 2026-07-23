@@ -1,4 +1,4 @@
-import { renderModuleShell, stack } from '../../core/renderer.js';
+import { renderModuleShell } from '../../core/renderer.js';
 import { renderFormSchema } from '../../core/formSchema.js';
 import { renderSavedRecordPanel, renderSavedRecordList } from '../../core/savedRecords.js';
 import { renderResultModel } from '../resultRenderer/index.js';
@@ -56,7 +56,7 @@ export function renderPlatformModuleView({ config, schema, state, result, result
   const form = renderPlatformForm({ config, schema, state, result });
   const saved = renderPlatformSaved({ config, savedRecords });
   const side = renderPlatformResults({ config, resultModel });
-  return renderModuleShell(config, `<div class="span-6 tc-stack" data-platform-dynamic="form-saved"><div data-platform-dynamic="form">${form}</div><div data-platform-dynamic="saved-records">${saved}</div></div><div class="span-6" data-platform-dynamic="result-saved">${side}</div>`);
+  return renderModuleShell(config, `<div class="tc-module-layout tc-module-layout--2"><div class="tc-module-column" data-platform-dynamic="form-saved"><div class="tc-module-section" data-platform-dynamic="form">${form}</div><div class="tc-module-section" data-platform-dynamic="saved-records">${saved}</div></div><div class="tc-module-column" data-platform-dynamic="result-saved">${side}</div></div>`);
 }
 
 export default { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved };

@@ -1,42 +1,26 @@
-## Version 1.3.4 - Final Release
+## Version 1.4.0-dev.2 – Phase 47B.1
 
-TechCalc Pro 1.3.4 ist freigegeben.
+### Phase 47 abgeschlossen
 
-### Neu
-- Toolchain bereinigt und auf aktive Build-/Audit-Skripte reduziert.
-- Security-Hardening mit abgeschlossenem DOM-Sink-/innerHTML-Audit ergänzt.
-- Accessibility-Baseline auf WCAG 2.1 AA als internes Zielniveau festgelegt.
-- E2E-Abdeckung für Mischluft, Legacy-Migration, Projektverwaltung und PDF-Export erweitert.
-
-### Verbesserungen
-- Release Notes zeigen weiterhin nur Final Releases, Release Candidates und Hotfixes – keine `dev.x`-Zwischenstände.
-- Qualitätsprüfungen für Toolchain, DOM-Sinks, Accessibility und E2E-Coverage sind in `npm run lint` integriert.
-- Projektstruktur weiter reduziert und bereinigt.
-- Entwicklungs- und Deployment-Pakete sind wieder als getrennte Release-Artefakte verfügbar.
-
-### Behoben
-- Verwaiste Toolchain-Skripte wurden entfernt oder konsolidiert.
-- Offener innerHTML-/DOM-Sink-Audit aus früheren Versionen wurde abgeschlossen.
-- Accessibility-Zielniveau und statische Prüfung wurden nachgezogen.
-- E2E-Lücke für den neuen Mischluft-Workflow wurde geschlossen.
-
-## Version 1.3.3 - Final Release
-
-TechCalc Pro 1.3.3 ist freigegeben.
+Die Fach-, Architektur-, PDF-, Plattform- und Qualitätsarbeiten der Phase 47 sind vollständig abgeschlossen und für den Merge freigegeben. Das finale Versioning auf `1.4.0` erfolgt gemäß Releaseprozess nach dem Merge.
 
 ### Neu
-- Wärmerückgewinnung und Mischluft sind in eigenständige Fachmodule getrennt.
-- Bestehende Projekte werden ohne Datenverlust migriert.
-- Gespeicherte Mischluft-Datensätze werden korrekt dem neuen Mischluft-Modul zugeordnet.
-- Projektlebenszyklus für Mischluft vollständig integriert: Eingabe, Berechnung, Speichern, Laden, PDF und Export.
-- Dokumentation, Modulverträge, Quality Manual und Architecture Baseline konsolidiert.
+- Überflutungs- und Rückhaltenachweis als eigenständiges Fachmodul vollständig integriert.
+- DIN-1986-100-Nachweis, bedingte DWA-A-117-Rückhaltebemessung und Dauerstufenvergleich ergänzt.
+- Flächen-Snapshot-Import aus dem Regenwassermodul ohne Rückschreibung umgesetzt.
+- Professionelle Diagnostik, Plausibilitätsprüfung und Ergebnisinterpretation ergänzt.
+- Behörden-PDF mit Deckblatt, Inhaltsverzeichnis, Tabellen, Diagrammen und Pagination fertiggestellt.
 
 ### Verbesserungen
-- Release Notes zeigen künftig keine `dev.x`-Zwischenstände mehr in der App.
-- Dokumentationsstruktur deutlich reduziert und bereinigt.
-- Architektur- und Qualitätsreferenzen für künftige Versionen vereinheitlicht.
+- Zentraler Modul-, Layout- und Spacing-Vertrag über alle Module vereinheitlicht.
+- Browser-, Viewport-, Theme-, Offline-, Projekt- und PDF-Regression erweitert.
+- Mischluft-, WRG- und Legacy-Projektlebenszyklus stabilisiert.
 
-### Behoben
-- Mischluft-Speicherdialog ergänzt.
-- Legacy-Mischluft-Records werden beim Laden alter Projekte korrekt migriert.
-- Veraltete Release-Notes-Einträge aus der App-Ansicht entfernt.
+### Qualitätsstatus
+- GitHub Actions `Playwright Tests` Run #193 erfolgreich.
+- Automatisierte und manuelle Phase-47-Gates vollständig bestanden.
+- Enterprise-/QM-Freigabe am 23.07.2026 erteilt.
+- Keine offenen blockierenden Befunde.
+
+### Freigabe
+Phase 47 ist abgeschlossen. PR #12 ist nach erfolgreichem Workflow auf dem finalen Dokumentations-Head zum Merge freigegeben.

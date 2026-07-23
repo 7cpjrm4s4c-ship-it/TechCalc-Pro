@@ -1,6 +1,6 @@
 import { logger } from './logger.js';
 import { hardResetModuleRoot } from './moduleLifecycleAdapter.js';
-import { preserveModuleSwitchScroll } from './scrollManager.js';
+import { applyModuleRootLayout } from './moduleLayoutContract.js';
 import { restoreFocus as restorePlatformFocus } from './focusManager.js';
 
 const DEFAULT_MOUNT_TIMEOUT_MS = 7000;
@@ -49,6 +49,23 @@ function withTimeout(promise, timeoutMs, message) {
     .finally(() => {
       if (timeoutId) globalThis.clearTimeout(timeoutId);
     });
+}
+
+function resetModuleScroll(root) {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+  const reset = target => {
+    if (!target) return;
+    if (typeof target.scrollTo === 'function') target.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    else {
+      target.scrollTop = 0;
+      target.scrollLeft = 0;
+    }
+  };
+  reset(window);
+  reset(document.scrollingElement);
+  reset(document.documentElement);
+  reset(document.body);
+  reset(root);
 }
 
 export function createModuleRuntime({ root, modules, renderNavigation, loadingView, loadingDelayMs = DEFAULT_LOADING_DELAY_MS } = {}) {
@@ -131,16 +148,22 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
   async function afterMount(moduleId, token) {
     clearLoadingTimer();
     if (!isCurrent(token)) return false;
+    normalizeHookResult(applyModuleRootLayout(root, moduleId), activeRuntimeCleanups);
     root.dataset.activeModuleId = moduleId;
     delete root.dataset.pendingModuleId;
     root.removeAttribute('aria-busy');
     activeModuleId = moduleId;
+    resetModuleScroll(root);
     renderNavigation?.(moduleId);
     root.dispatchEvent(new CustomEvent('techcalc:module-mounted', {
       bubbles: false,
       detail: { moduleId, token }
     }));
     restorePlatformFocus(root, { select: false });
+    const scheduleFrame = typeof requestAnimationFrame === 'function'
+      ? requestAnimationFrame
+      : callback => globalThis.setTimeout(callback, 0);
+    scheduleFrame(() => resetModuleScroll(root));
     return true;
   }
 
@@ -156,46 +179,41 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
   }
 
   async function mount(moduleId, options = {}) {
-    return preserveModuleSwitchScroll(async () => {
-      const module = modules.get(moduleId);
-      if (!module) return false;
+    const module = modules.get(moduleId);
+    if (!module) return false;
 
-      const token = ++renderToken;
-      await unmount(moduleId);
-      await prepareMount(moduleId, token);
+    const token = ++renderToken;
+    resetModuleScroll(root);
+    await unmount(moduleId);
+    await prepareMount(moduleId, token);
 
-      const runtimeContext = Object.freeze({
-        moduleId,
-        token,
-        startedAt: now(),
-        addCleanup(cleanup) { normalizeHookResult(cleanup, activeRuntimeCleanups); },
-        isCurrent() { return isCurrent(token); }
-      });
-
-      try {
-        const cleanup = await withTimeout(
-          module.mount(root, runtimeContext),
-          options.timeoutMs ?? DEFAULT_MOUNT_TIMEOUT_MS,
-          `Modul ${moduleId} konnte nicht vollständig gemountet werden.`
-        );
-
-        if (!isCurrent(token)) {
-          normalizeHookResult(cleanup, activeRuntimeCleanups);
-          clearRuntimeCleanups();
-          return false;
-        }
-
-        activeCleanup = typeof cleanup === 'function' ? cleanup : noop;
-        if (cleanup && typeof cleanup !== 'function') normalizeHookResult(cleanup, activeRuntimeCleanups);
-        return afterMount(moduleId, token);
-      } catch (error) {
-        return failMount(moduleId, token, error);
-      }
-    }, {
-      reason: 'module-runtime-switch',
-      frames: 10,
-      delays: [0, 40, 120, 260, 520]
+    const runtimeContext = Object.freeze({
+      moduleId,
+      token,
+      startedAt: now(),
+      addCleanup(cleanup) { normalizeHookResult(cleanup, activeRuntimeCleanups); },
+      isCurrent() { return isCurrent(token); }
     });
+
+    try {
+      const cleanup = await withTimeout(
+        module.mount(root, runtimeContext),
+        options.timeoutMs ?? DEFAULT_MOUNT_TIMEOUT_MS,
+        `Modul ${moduleId} konnte nicht vollständig gemountet werden.`
+      );
+
+      if (!isCurrent(token)) {
+        normalizeHookResult(cleanup, activeRuntimeCleanups);
+        clearRuntimeCleanups();
+        return false;
+      }
+
+      activeCleanup = typeof cleanup === 'function' ? cleanup : noop;
+      if (cleanup && typeof cleanup !== 'function') normalizeHookResult(cleanup, activeRuntimeCleanups);
+      return afterMount(moduleId, token);
+    } catch (error) {
+      return failMount(moduleId, token, error);
+    }
   }
 
   function dispose() {

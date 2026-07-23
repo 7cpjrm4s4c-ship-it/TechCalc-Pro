@@ -2,10 +2,24 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 
 const renderer = fs.readFileSync('js/core/renderer.js', 'utf8');
-assert.match(renderer, /hasUnrenderedInput/, 'Common inputs must track unrendered input state.');
-assert.match(renderer, /renderCommittedInput\(\)/, 'Common inputs must render after committed input.');
-assert.match(renderer, /confirmBySurfaceTouch/, 'Common inputs must support touch/click confirmation outside fields.');
-assert.match(renderer, /event\.key !== 'Enter'/, 'Common inputs must confirm calculations with Enter.');
+assert.match(renderer, /bindCentralEventPipeline\(root, state, \{ renderOnBlur: true \}\)/,
+  'Common inputs must delegate confirmation behavior to the central event pipeline.');
+
+const eventPipeline = fs.readFileSync('js/core/eventPipeline.js', 'utf8');
+assert.match(eventPipeline, /let hasDeferredInput = false/,
+  'Central input handling must track deferred, not-yet-rendered input state.');
+assert.match(eventPipeline, /const renderDeferred = \(force = false\) =>/,
+  'Central input handling must render deferred input after confirmation.');
+assert.match(eventPipeline, /const confirmSurface = event =>/,
+  'Central input handling must support touch and click confirmation outside interactive fields.');
+assert.match(eventPipeline, /event\.key !== 'Enter' && event\.key !== 'Tab'/,
+  'Central input handling must confirm and navigate inputs with Enter and Tab.');
+assert.match(eventPipeline, /add\(root, 'touchstart',[\s\S]*confirmSurface\(event\)/,
+  'Touch interactions outside fields must confirm deferred input.');
+assert.match(eventPipeline, /add\(root, 'pointerdown',[\s\S]*confirmSurface\(event\)/,
+  'Pointer interactions outside fields must confirm deferred input.');
+assert.match(eventPipeline, /add\(root, 'click', confirmSurface, true\)/,
+  'Click interactions outside fields must confirm deferred input.');
 
 const rainwaterLogic = fs.readFileSync('js/modules/rainwater/logic.js', 'utf8');
 assert.match(rainwaterLogic, /surfaceRowsWithCurrentDraft/, 'Rainwater must calculate current input without requiring saved surfaces.');

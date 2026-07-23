@@ -1,5 +1,6 @@
 import { currentRoute } from '../router.js';
 import { sanitizeText, normalizeKey } from './pdfText.js';
+import { buildFloodingReportSections } from './floodingReportSections.js';
 
 function textOf(node) { return sanitizeText(node?.textContent || ''); }
 
@@ -75,9 +76,7 @@ function isChartCard(card) {
   return Boolean(card.querySelector('.hx-chart, svg, canvas')) && /diagramm/i.test(textOf(card.querySelector('.card__title')));
 }
 
-export function collectCurrentModule(modulesRef, routeGetter) {
-  const id = typeof routeGetter === 'function' ? routeGetter() : currentRoute();
-  const module = modulesRef?.get?.(id);
+function collectLegacyDomModule(module, id) {
   const app = document.getElementById('app');
   const cards = [...(app?.querySelectorAll('.card') || [])];
   const sections = [];
@@ -111,8 +110,41 @@ export function collectCurrentModule(modulesRef, routeGetter) {
     shortTitle: module?.shortTitle || module?.title || id || 'Modul',
     sections,
     chartSvg,
-    chartCanvas
+    chartCanvas,
+    reportDto: null,
+    reportSource: 'legacy-dom'
   };
+}
+
+function resolveRuntimeModule(registryEntry) {
+  return registryEntry?.module?.loadedModule
+    || registryEntry?.module
+    || registryEntry?.loadedModule
+    || registryEntry;
+}
+
+export function collectCurrentModule(modulesRef, routeGetter) {
+  const id = typeof routeGetter === 'function' ? routeGetter() : currentRoute();
+  const registryEntry = modulesRef?.get?.(id);
+  const module = resolveRuntimeModule(registryEntry);
+  const report = module?.report || registryEntry?.report;
+  const state = module?.state || registryEntry?.state;
+
+  if (typeof report === 'function') {
+    const reportDto = report(state?.get?.() || {});
+    if (!reportDto || typeof reportDto !== 'object') throw new Error(`Report-Adapter für ${id} lieferte kein gültiges DTO.`);
+    return {
+      id,
+      title: registryEntry?.title || module?.title || module?.config?.title || reportDto.metadata?.moduleTitle || id || 'Modul',
+      shortTitle: registryEntry?.shortTitle || module?.shortTitle || module?.title || module?.config?.shortTitle || reportDto.metadata?.moduleTitle || id || 'Modul',
+      sections: [],
+      chartSvg: '',
+      chartCanvas: null,
+      reportDto,
+      reportSource: 'typed-dto'
+    };
+  }
+  return collectLegacyDomModule(registryEntry || module, id);
 }
 
 export function sectionTitle(title) {
@@ -174,9 +206,16 @@ function normalizePdfRows(rows = [], title = '') {
 }
 
 export function reportSections(moduleData) {
+  if (moduleData?.reportSource === 'typed-dto' && moduleData.reportDto) {
+    return buildFloodingReportSections(moduleData.reportDto).map(section => ({
+      ...section,
+      rows: normalizePdfRows(section.rows, section.title)
+    }));
+  }
+  const sections = Array.isArray(moduleData?.sections) ? moduleData.sections : [];
   const isHxDiagram = /hx|h,x/i.test(`${moduleData.id || ''} ${moduleData.title || ''}`);
-  const hasLineSections = !isHxDiagram && moduleData.sections.some(section => isLineSectionTitle(sectionTitle(section.title)));
-  const printableSections = hasLineSections ? moduleData.sections.filter(section => isLineSectionTitle(sectionTitle(section.title))) : moduleData.sections;
+  const hasLineSections = !isHxDiagram && sections.some(section => isLineSectionTitle(sectionTitle(section.title)));
+  const printableSections = hasLineSections ? sections.filter(section => isLineSectionTitle(sectionTitle(section.title))) : sections;
   return printableSections.map(section => {
     const title = sectionTitle(section.title).replace(/Parameter/g, 'Bezeichnung');
     const rows = normalizePdfRows(section.rows, title);
