@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "auditId": "phase47-final-release-gate",
+  "phase": "47",
+  "date": "2026-07-23",
+  "status": "passed",
+  "releaseDecision": "go-for-merge",
+  "pullRequest": 12,
+  "validatedHead": "ab4c805a65931031d25a0cd32123baafeca85f59",
+  "workflow": {
+    "name": "Playwright Tests",
+    "runNumber": 193,
+    "conclusion": "success"
+  },
+  "automatedGates": {
+    "lintAndStaticAudits": "passed",
+    "unitTests": "passed",
+    "floodingDomainTests": "passed",
+    "integrationTests": "passed",
+    "build": "passed",
+    "playwrightMatrix": "passed"
+  },
+  "manualGates": {
+    "domainReferenceChecks": "passed",
+    "pdfWithDwa": "passed",
+    "pdfWithoutDwa": "passed",
+    "projectImportExportMigration": "passed",
+    "themesAndViewports": "passed",
+    "realPlatformAndBrowserMatrix": "passed",
+    "offlineCacheAndUpdate": "passed",
+    "accessibilityKeyboardAndTouch": "passed",
+    "registeredModuleSmoke": "passed"
+  },
+  "approval": {
+    "source": "explicit user and product owner approval",
+    "date": "2026-07-23",
+    "statement": "Alle Checks wurden als bestanden freigegeben; die Abschlussdokumentation von Phase 47 darf erfolgen."
+  },
+  "openBlockingFindings": [],
+  "postMergeOperations": [
+    "production deploy",
+    "production smoke test",
+    "final release versioning if published immediately",
+    "tag v1.4.0",
+    "GitHub release"
+  ]
+}
