@@ -130,9 +130,14 @@
 }
 
 /* Standard explicit vertical stacks use the same global rhythm. These are
-   authored layout primitives, not runtime-discovered containers. */
+   authored layout primitives, not runtime-discovered containers. Direct child
+   margins are neutralized so spacing is contributed exactly once by the parent. */
 #app :is(.tc-stack, .tc-stack--section) {
   row-gap: var(--tc-module-card-gap) !important;
+}
+
+#app :is(.tc-stack, .tc-stack--section) > * {
+  margin-block: 0 !important;
 }
 
 /* Drinking-water still has legacy stack declarations in older component CSS.
