@@ -6,6 +6,7 @@ const WATER_HEAT_CAPACITY_KJ_KGK = 4.19;
 const STEAM_HEAT_KJ_KG = 2501;
 const MIN_COIL_APPROACH_K = 3;
 const HUMIDITY_RATIO_EPSILON = 1e-7;
+const AIR_VOLUMETRIC_HEAT_CAPACITY_WH_M3K = 0.34;
 
 export function hxFmt(value, decimals = 2) {
   const n = Number(value);
@@ -53,12 +54,10 @@ function segmentRole(process, index, pathLength) {
   return 'heater';
 }
 
-function sensibleHeatingPowerKw(dryAirMassKgS, previous, current) {
+function sensibleHeatingPowerKw(volumeM3h, previous, current) {
   const deltaTempK = current.tempC - previous.tempC;
-  if (!(deltaTempK > 0)) return 0;
-  const averageHumidityRatio = (previous.humidityRatio + current.humidityRatio) / 2;
-  const moistAirHeatCapacityKjKgK = 1.006 + (1.86 * averageHumidityRatio);
-  return dryAirMassKgS * moistAirHeatCapacityKjKgK * deltaTempK;
+  if (!(volumeM3h > 0) || !(deltaTempK > 0)) return 0;
+  return (volumeM3h * AIR_VOLUMETRIC_HEAT_CAPACITY_WH_M3K * deltaTempK) / 1000;
 }
 
 function equipmentSizing(state = {}, path = [], process = '') {
@@ -84,7 +83,7 @@ function equipmentSizing(state = {}, path = [], process = '') {
     const isSensibleHeating = current.tempC > previous.tempC && Math.abs(deltaW) <= HUMIDITY_RATIO_EPSILON;
 
     if (isSensibleHeating) {
-      const segmentPowerKw = sensibleHeatingPowerKw(dryAirMassKgS, previous, current);
+      const segmentPowerKw = sensibleHeatingPowerKw(volumeM3h, previous, current);
       heatingKw += segmentPowerKw;
       const role = segmentRole(process, index, path.length);
       if (role === 'preheater') preheaterKw += segmentPowerKw;
@@ -212,6 +211,6 @@ export function hxProcessStats(item = {}) {
     { label: 'Start', value: first ? `${hxFmt(first.tempC, 2)} °C / ${hxFmt(first.rhPercent, 0)} %` : '—' },
     { label: 'Ziel', value: last ? `${hxFmt(last.tempC, 2)} °C / ${hxFmt(last.rhPercent, 0)} %` : '—' },
     { label: 'x Ziel', value: last ? hxFmt(last.humidityRatioGkg, 2) : '—', unit: last ? 'g/kg' : '' },
-    { label: 'h Ziel', value: last ? hxFmt(last.enthalpyKjKg, 2) : '—', unit: last ? 'kJ/kg' : '' }
+    { label: 'h Ziel', value: last ? hxFmt(last.entthalpyKjKg, 2) : '—', unit: last ? 'kJ/kg' : '' }
   ];
 }
