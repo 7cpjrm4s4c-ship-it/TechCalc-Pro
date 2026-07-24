@@ -49,4 +49,8 @@ for (const path of moduleViews) {
     `${path} must declare explicit independent columns`);
 }
 
+const pipeSizingView = read('js/modules/pipe-sizing/view.js');
+assert.doesNotMatch(pipeSizingView, /DIN EN 10255|DIN EN 10220|≤\s*DN50|≥\s*DN65/,
+  'pipe-sizing must not expose a static steel-only norm hint in the material-independent layout');
+
 console.log(`Module layout and spacing contract audit passed for ${moduleViews.length} render paths.`);
