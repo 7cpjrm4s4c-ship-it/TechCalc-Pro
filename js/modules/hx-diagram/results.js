@@ -110,7 +110,7 @@ function equipmentSizing(state = {}, path = [], process = '') {
 
   const rows = [
     { label: 'Luftmenge', value: hxFmt(volumeM3h, 0), unit: 'm³/h' },
-    { label: 'Trockenluft-Massenstrom', value: hxFmt(dryAirMassKgS, 3), unit: 'kg/s' }
+    { label: 'Trockenluft-Massenstrom', value: hxFmt(dryAirMassKgS * 3600, 2), unit: 'kg/h' }
   ];
 
   if (process === 'adiabatic') {
@@ -130,8 +130,8 @@ function equipmentSizing(state = {}, path = [], process = '') {
 
   const heatingWater = waterFlowM3h(heatingKw, state.heatingSupplyTempC, state.heatingReturnTempC);
   const coolingWater = waterFlowM3h(coolingKw, state.coolingSupplyTempC, state.coolingReturnTempC);
-  if (Number.isFinite(heatingWater)) rows.push({ label: 'Heizwasser-Volumenstrom', value: hxFmt(heatingWater, 3), unit: 'm³/h' });
-  if (Number.isFinite(coolingWater)) rows.push({ label: 'Kühlwasser-Volumenstrom', value: hxFmt(coolingWater, 3), unit: 'm³/h' });
+  if (Number.isFinite(heatingWater)) rows.push({ label: 'Heizwasser-Volumenstrom', value: hxFmt(heatingWater, 2), unit: 'm³/h' });
+  if (Number.isFinite(coolingWater)) rows.push({ label: 'Kühlwasser-Volumenstrom', value: hxFmt(coolingWater, 2), unit: 'm³/h' });
   return { rows, messages: [...new Set(messages)] };
 }
 
