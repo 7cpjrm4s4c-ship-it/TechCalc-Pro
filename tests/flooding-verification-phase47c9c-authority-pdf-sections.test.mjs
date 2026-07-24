@@ -5,7 +5,7 @@ import { buildFloodingReportSections } from '../js/core/pdf/floodingReportSectio
 const surfaces = Array.from({ length: 205 }, (_, index) => ({
   id: `surface-${index + 1}`,
   name: `Fläche ${index + 1}`,
-  areaType: 'Dachfläche',
+  areaType: index === 0 ? 'green-extensive-10' : index === 1 ? 'metal-roof' : 'Dachfläche',
   areaM2: 100 + index,
   runoffCoefficientCs: 1,
   meanRunoffCoefficientCm: 0.9,
@@ -79,12 +79,16 @@ assert.match(sections[3].title, /Flächenübersicht \(205\)/);
 assert.equal(sections[3].rows.length, 205, 'Große Flächenlisten müssen vollständig und kompakt mit einer Berichtszeile je Fläche gemappt werden.');
 const firstSurfaceRow = sections[3].rows[0].join(' ');
 assert.match(firstSurfaceRow, /Fläche 1/);
-assert.match(firstSurfaceRow, /Dachfläche/);
+assert.match(firstSurfaceRow, /Extensivbegrünung ≤ 5° ab 10 cm Aufbau/);
 assert.match(firstSurfaceRow, /A =/);
 assert.match(firstSurfaceRow, /Cₛ =/);
 assert.match(firstSurfaceRow, /Cₘ =/);
 assert.match(firstSurfaceRow, /A × Cₛ =/);
 assert.match(firstSurfaceRow, /Regenwassermodul/);
+const secondSurfaceRow = sections[3].rows[1].join(' ');
+assert.match(secondSurfaceRow, /Dachfläche · Metall\/Glas\/Schiefer\/Faserzement/);
+assert.doesNotMatch(firstSurfaceRow, /green-extensive-10/);
+assert.doesNotMatch(secondSurfaceRow, /metal-roof/);
 assert.ok(sections[9].rows.length >= 101, 'Große DWA-Dauerstufenlisten müssen vollständig gemappt werden.');
 assert.match(sections[11].rows.map(row => row.join(' ')).join(' '), /DIN 1986-100/);
 assert.doesNotThrow(() => JSON.stringify(sections));
