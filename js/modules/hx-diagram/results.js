@@ -1,5 +1,9 @@
 import { esc } from '../../core/renderer.js';
 import { renderResultModel } from '../../platform/resultRenderer/index.js';
+import { parseNumber } from '../../core/numberService.js';
+
+const WATER_HEAT_CAPACITY_KJ_KGK = 4.19;
+const STEAM_HEAT_KJ_KG = 2501;
 
 export function hxFmt(value, decimals = 2) {
   const n = Number(value);
@@ -28,29 +32,71 @@ function processPathHtml(points = []) {
   </div>`).join('')}</div>`;
 }
 
+function validNumber(value) {
+  return String(value ?? '').trim() !== '' ? parseNumber(value, { fallback: Number.NaN }) : Number.NaN;
+}
+
+function waterFlowM3h(powerKw, supplyTempC, returnTempC) {
+  const deltaK = Math.abs(validNumber(supplyTempC) - validNumber(returnTempC));
+  if (!(powerKw > 0) || !(deltaK > 0)) return Number.NaN;
+  return (powerKw / (WATER_HEAT_CAPACITY_KJ_KGK * deltaK)) * 3.6;
+}
+
+function equipmentRows(state = {}, path = []) {
+  const volumeM3h = validNumber(state.airVolumeM3h);
+  const start = path[0];
+  if (!(volumeM3h > 0) || !start) return [];
+
+  const dryAirMassKgS = (volumeM3h / 3600) * start.densityKgm3 / (1 + start.humidityRatio);
+  let heatingKw = 0;
+  let coolingKw = 0;
+  let humidifierKgH = 0;
+
+  for (let index = 1; index < path.length; index += 1) {
+    const previous = path[index - 1];
+    const current = path[index];
+    const deltaH = current.enthalpyKjKg - previous.enthalpyKjKg;
+    const deltaW = current.humidityRatio - previous.humidityRatio;
+    if (deltaH > 0) heatingKw += dryAirMassKgS * deltaH;
+    if (deltaH < 0) coolingKw += dryAirMassKgS * Math.abs(deltaH);
+    if (deltaW > 0) humidifierKgH += dryAirMassKgS * deltaW * 3600;
+  }
+
+  const rows = [
+    { label: 'Luftmenge', value: hxFmt(volumeM3h, 0), unit: 'm³/h' },
+    { label: 'Trockenluft-Massenstrom', value: hxFmt(dryAirMassKgS, 3), unit: 'kg/s' },
+    { label: 'Erhitzerleistung', value: hxFmt(heatingKw, 2), unit: 'kW' },
+    { label: 'Kühlerleistung', value: hxFmt(coolingKw, 2), unit: 'kW' },
+    { label: 'Befeuchterleistung', value: hxFmt(humidifierKgH, 2), unit: 'kg/h' },
+    { label: 'Dampfleistung äquivalent', value: hxFmt((humidifierKgH / 3600) * STEAM_HEAT_KJ_KG, 2), unit: 'kW' }
+  ];
+
+  const heatingWater = waterFlowM3h(heatingKw, state.heatingSupplyTempC, state.heatingReturnTempC);
+  const coolingWater = waterFlowM3h(coolingKw, state.coolingSupplyTempC, state.coolingReturnTempC);
+  if (Number.isFinite(heatingWater)) rows.push({ label: 'Heizwasser-Volumenstrom', value: hxFmt(heatingWater, 3), unit: 'm³/h' });
+  if (Number.isFinite(coolingWater)) rows.push({ label: 'Kühlwasser-Volumenstrom', value: hxFmt(coolingWater, 3), unit: 'm³/h' });
+  return rows;
+}
+
 export function buildHxResultModel(vm = {}, accent = 'cyan') {
   const r = vm.result || {};
   const activePath = Array.isArray(vm.activePath) ? vm.activePath : [];
 
   if (!activePath.length) {
-    return {
-      groups: [{
-        title: 'Automatische Zustandsänderung',
-        html: '<div class="empty-state">Zustandsänderung wählen oder gespeicherten Prozess auswählen</div>',
-        accent
-      }]
-    };
+    return { groups: [{ title: 'Automatische Zustandsänderung', html: '<div class="empty-state">Zustandsänderung wählen oder gespeicherten Prozess auswählen</div>', accent }] };
   }
 
   const start = activePath[0];
   const end = activePath[activePath.length - 1];
   const targetReached = vm.targetReached !== false;
-  const notices = targetReached ? [] : [{
-    title: 'Plausibilität',
-    messages: ['Zielzustand wird mit dem gewählten Prozess nicht erreicht.'],
-    prefix: 'Hinweis',
-    accent
-  }];
+  const notices = targetReached ? [] : [{ title: 'Plausibilität', messages: ['Zielzustand wird mit dem gewählten Prozess nicht erreicht.'], prefix: 'Hinweis', accent }];
+  const groups = [
+    { title: 'Berechnete Zustandspunkte', html: processPathHtml(activePath), accent },
+    { title: 'Ausgang', rows: pointRows(start), accent },
+    { title: 'Ziel', rows: pointRows(end), accent }
+  ];
+  const sizingRows = equipmentRows(vm.state, activePath);
+  if (sizingRows.length) groups.unshift({ title: 'Erhitzer, Kühler und Befeuchter', rows: sizingRows, accent });
 
   return {
     primary: {
@@ -64,23 +110,7 @@ export function buildHxResultModel(vm = {}, accent = 'cyan') {
       ],
       accent
     },
-    groups: [
-      {
-        title: 'Berechnete Zustandspunkte',
-        html: processPathHtml(activePath),
-        accent
-      },
-      {
-        title: 'Ausgang',
-        rows: pointRows(start),
-        accent
-      },
-      {
-        title: 'Ziel',
-        rows: pointRows(end),
-        accent
-      }
-    ],
+    groups,
     notices
   };
 }
@@ -100,10 +130,15 @@ export function buildHxProcessRecord(currentState = {}, result = {}, items = [],
     processLabel: result.changeType || existing?.processLabel || 'Prozess',
     input: {
       label: String(name || currentState.label || existing?.input?.label || ''),
+      airVolumeM3h: String(currentState.airVolumeM3h ?? ''),
       tempC: String(currentState.tempC ?? ''),
       rhPercent: String(currentState.rhPercent ?? ''),
       targetTempC: String(currentState.targetTempC ?? ''),
       targetRhPercent: String(currentState.targetRhPercent ?? ''),
+      heatingSupplyTempC: String(currentState.heatingSupplyTempC ?? ''),
+      heatingReturnTempC: String(currentState.heatingReturnTempC ?? ''),
+      coolingSupplyTempC: String(currentState.coolingSupplyTempC ?? ''),
+      coolingReturnTempC: String(currentState.coolingReturnTempC ?? ''),
       process: result.selectedProcess || currentState.process || existing?.input?.process || 'heat'
     },
     path: processPath,
