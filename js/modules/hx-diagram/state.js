@@ -22,7 +22,6 @@ export function saveProcesses(processes) {
   state.set({ savedProcesses: next, processes: next }, { notify: false });
 }
 
-
 export function makeProcessRecord({ input, result, id = null, existing = null }) {
   const recordId = id || input.activeProcessId || existing?.id || createId();
   return {
@@ -32,10 +31,15 @@ export function makeProcessRecord({ input, result, id = null, existing = null })
     processLabel: result.changeType,
     input: {
       label: String(input.label || existing?.input?.label || 'Zustand'),
+      airVolumeM3h: String(input.airVolumeM3h ?? ''),
       tempC: String(input.tempC ?? ''),
       rhPercent: String(input.rhPercent ?? ''),
       targetTempC: String(input.targetTempC ?? ''),
       targetRhPercent: String(input.targetRhPercent ?? ''),
+      heatingSupplyTempC: String(input.heatingSupplyTempC ?? ''),
+      heatingReturnTempC: String(input.heatingReturnTempC ?? ''),
+      coolingSupplyTempC: String(input.coolingSupplyTempC ?? ''),
+      coolingReturnTempC: String(input.coolingReturnTempC ?? ''),
       process: result.selectedProcess || input.process || existing?.input?.process || 'heat'
     },
     path: result.processPath,
@@ -47,10 +51,15 @@ export function makeProcessRecord({ input, result, id = null, existing = null })
 export function clearLegacyPoints() { /* no persistent legacy data */ }
 
 export const state = createModuleState({
+  airVolumeM3h: '',
   tempC: '',
   rhPercent: '',
   targetTempC: '',
   targetRhPercent: '',
+  heatingSupplyTempC: '',
+  heatingReturnTempC: '',
+  coolingSupplyTempC: '',
+  coolingReturnTempC: '',
   process: 'heat',
   activeProcessId: null,
   activePath: [],
