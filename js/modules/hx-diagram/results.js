@@ -211,6 +211,6 @@ export function hxProcessStats(item = {}) {
     { label: 'Start', value: first ? `${hxFmt(first.tempC, 2)} °C / ${hxFmt(first.rhPercent, 0)} %` : '—' },
     { label: 'Ziel', value: last ? `${hxFmt(last.tempC, 2)} °C / ${hxFmt(last.rhPercent, 0)} %` : '—' },
     { label: 'x Ziel', value: last ? hxFmt(last.humidityRatioGkg, 2) : '—', unit: last ? 'g/kg' : '' },
-    { label: 'h Ziel', value: last ? hxFmt(last.entthalpyKjKg, 2) : '—', unit: last ? 'kJ/kg' : '' }
+    { label: 'h Ziel', value: last ? hxFmt(last.enthalpyKjKg, 2) : '—', unit: last ? 'kJ/kg' : '' }
   ];
 }
