@@ -1,12 +1,13 @@
 import { esc } from '../../core/renderer.js';
 import { renderResultModel } from '../../platform/resultRenderer/index.js';
 import { parseNumber } from '../../core/numberService.js';
+import { airDensity } from '../../utils/calculations.js';
 
 const WATER_HEAT_CAPACITY_KJ_KGK = 4.19;
 const STEAM_HEAT_KJ_KG = 2501;
+const AIR_HEAT_CAPACITY_KJ_KGK = 1.005;
 const MIN_COIL_APPROACH_K = 3;
 const HUMIDITY_RATIO_EPSILON = 1e-7;
-const AIR_VOLUMETRIC_HEAT_CAPACITY_WH_M3K = 0.34;
 
 export function hxFmt(value, decimals = 2) {
   const n = Number(value);
@@ -57,7 +58,10 @@ function segmentRole(process, index, pathLength) {
 function sensibleHeatingPowerKw(volumeM3h, previous, current) {
   const deltaTempK = current.tempC - previous.tempC;
   if (!(volumeM3h > 0) || !(deltaTempK > 0)) return 0;
-  return (volumeM3h * AIR_VOLUMETRIC_HEAT_CAPACITY_WH_M3K * deltaTempK) / 1000;
+
+  const meanAirTempC = (previous.tempC + current.tempC) / 2;
+  const airMassFlowKgS = (volumeM3h * airDensity(meanAirTempC)) / 3600;
+  return airMassFlowKgS * AIR_HEAT_CAPACITY_KJ_KGK * deltaTempK;
 }
 
 function equipmentSizing(state = {}, path = [], process = '') {
