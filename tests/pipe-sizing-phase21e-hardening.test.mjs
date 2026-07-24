@@ -27,6 +27,8 @@ assert.match(state, /expandedPipeId:\s*null/, 'state must include expandedPipeId
 assert.match(view, /data-pipe-dynamic="input"/, 'view must expose input dynamic island');
 assert.match(view, /data-pipe-dynamic="saved-records"/, 'view must expose saved-records dynamic island');
 assert.match(view, /data-pipe-dynamic="result"/, 'view must expose result dynamic island');
+assert.doesNotMatch(view, /DIN EN 10255|DIN EN 10220|≤\s*DN50|≥\s*DN65/,
+  'pipe-sizing must not render a static steel-specific norm hint for other materials');
 assert.match(results, /pipeDimensionCardsHtml/, 'result model must preserve dimension comparison cards');
 assert.match(results, /pipe-dimension-card/, 'dimension comparison cards must remain rendered as cards');
 assert.match(dynamicRenderer, /const savedFields = \['savedPipes', 'activePipeId', 'expandedPipeId'\]/, 'saved dynamic updates must be structural only for saved list and active/expanded ids');
