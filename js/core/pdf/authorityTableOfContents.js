@@ -18,7 +18,7 @@ export function recordAuthorityTocEntry(entries = [], title = '', pageNumber = n
 export function addAuthorityTocPrelude(entries = [], pageNumber = null) {
   if (!Number.isFinite(Number(pageNumber))) return false;
   if (entries.some(entry => entry.chapter === 0)) return false;
-  entries.push(Object.freeze({ chapter: 0, title: 'Management Summary', pageNumber: Number(pageNumber) }));
+  entries.push(Object.freeze({ chapter: 0, title: 'Zusammenfassung', pageNumber: Number(pageNumber) }));
   entries.sort((a, b) => a.chapter - b.chapter);
   return true;
 }
