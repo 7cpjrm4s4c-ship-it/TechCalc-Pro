@@ -5,6 +5,7 @@ import { parseNumber } from '../../core/numberService.js';
 const WATER_HEAT_CAPACITY_KJ_KGK = 4.19;
 const STEAM_HEAT_KJ_KG = 2501;
 const MIN_COIL_APPROACH_K = 3;
+const HUMIDITY_RATIO_EPSILON = 1e-7;
 
 export function hxFmt(value, decimals = 2) {
   const n = Number(value);
@@ -43,13 +44,21 @@ function waterFlowM3h(powerKw, supplyTempC, returnTempC) {
   return (powerKw / (WATER_HEAT_CAPACITY_KJ_KGK * deltaK)) * 3.6;
 }
 
-function segmentRole(process, current, index, pathLength) {
+function segmentRole(process, index, pathLength) {
   if (process === 'adiabatic') {
     if (index === 1) return 'preheater';
     if (index === pathLength - 1) return 'reheater';
   }
   if (process === 'cool-dehumidify' && index === pathLength - 1) return 'reheater';
-  return current.enthalpyKjKg >= 0 ? 'heater' : 'coil';
+  return 'heater';
+}
+
+function sensibleHeatingPowerKw(dryAirMassKgS, previous, current) {
+  const deltaTempK = current.tempC - previous.tempC;
+  if (!(deltaTempK > 0)) return 0;
+  const averageHumidityRatio = (previous.humidityRatio + current.humidityRatio) / 2;
+  const moistAirHeatCapacityKjKgK = 1.006 + (1.86 * averageHumidityRatio);
+  return dryAirMassKgS * moistAirHeatCapacityKjKgK * deltaTempK;
 }
 
 function equipmentSizing(state = {}, path = [], process = '') {
@@ -72,11 +81,12 @@ function equipmentSizing(state = {}, path = [], process = '') {
     const current = path[index];
     const deltaH = current.enthalpyKjKg - previous.enthalpyKjKg;
     const deltaW = current.humidityRatio - previous.humidityRatio;
-    const segmentPowerKw = dryAirMassKgS * Math.abs(deltaH);
+    const isSensibleHeating = current.tempC > previous.tempC && Math.abs(deltaW) <= HUMIDITY_RATIO_EPSILON;
 
-    if (deltaH > 0) {
+    if (isSensibleHeating) {
+      const segmentPowerKw = sensibleHeatingPowerKw(dryAirMassKgS, previous, current);
       heatingKw += segmentPowerKw;
-      const role = segmentRole(process, current, index, path.length);
+      const role = segmentRole(process, index, path.length);
       if (role === 'preheater') preheaterKw += segmentPowerKw;
       if (role === 'reheater') reheaterKw += segmentPowerKw;
       if (Number.isFinite(heatingSupplyTempC) && heatingSupplyTempC < current.tempC + MIN_COIL_APPROACH_K) {
@@ -85,6 +95,7 @@ function equipmentSizing(state = {}, path = [], process = '') {
     }
 
     if (deltaH < 0) {
+      const segmentPowerKw = dryAirMassKgS * Math.abs(deltaH);
       coolingKw += segmentPowerKw;
       if (Number.isFinite(coolingSupplyTempC) && coolingSupplyTempC > current.tempC - MIN_COIL_APPROACH_K) {
         messages.push(`${current.label || `Kühlregister ${index}`}: Kühlungs-Vorlauftemperatur darf höchstens ${hxFmt(current.tempC - MIN_COIL_APPROACH_K, 1)} °C betragen (${MIN_COIL_APPROACH_K} K unter der Lufttemperatur). Die Systemtemperatur ist für den gewünschten Zielzustand nicht ausreichend.`);
