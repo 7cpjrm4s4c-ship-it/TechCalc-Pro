@@ -1,4 +1,5 @@
 import { formatEngineeringNumber } from '../numberService.js';
+import { areaTypes } from '../../shared/rainwaterDomainTables.js';
 
 const array = value => Array.isArray(value) ? value : [];
 const object = value => value && typeof value === 'object' && !Array.isArray(value) ? value : {};
@@ -23,15 +24,12 @@ const ENUM_LABELS = Object.freeze({
 });
 
 const SURFACE_TYPE_LABELS = Object.freeze({
-  'green-extensive-steep': 'Extensiv begrüntes Steildach',
-  'green-extensive-flat': 'Extensiv begrüntes Flachdach',
-  'green-intensive': 'Intensiv begrüntes Dach',
-  'lawn-flat': 'Rasenfläche, geringe Neigung',
-  'lawn-steep': 'Rasenfläche, starke Neigung',
-  'paving-sealed': 'Vollständig versiegelte Pflasterfläche',
+  ...Object.fromEntries(areaTypes.map(areaType => [areaType.id, areaType.name])),
+  'green-extensive-flat': 'Extensivbegrünung ≤ 5°',
   'paving-permeable': 'Wasserdurchlässige Pflasterfläche',
   roof: 'Dachfläche',
-  yard: 'Hoffläche'
+  yard: 'Hoffläche',
+  property: 'Grundstücksfläche'
 });
 
 function label(value, dictionary = ENUM_LABELS) {
