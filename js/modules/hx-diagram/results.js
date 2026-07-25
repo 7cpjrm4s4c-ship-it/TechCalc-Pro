@@ -1,5 +1,13 @@
 import { esc } from '../../core/renderer.js';
 import { renderResultModel } from '../../platform/resultRenderer/index.js';
+import { parseNumber } from '../../core/numberService.js';
+import { airDensity } from '../../utils/calculations.js';
+
+const WATER_HEAT_CAPACITY_KJ_KGK = 4.19;
+const STEAM_HEAT_KJ_KG = 2501;
+const AIR_HEAT_CAPACITY_KJ_KGK = 1.005;
+const MIN_COIL_APPROACH_K = 3;
+const HUMIDITY_RATIO_EPSILON = 1e-7;
 
 export function hxFmt(value, decimals = 2) {
   const n = Number(value);
@@ -28,29 +36,125 @@ function processPathHtml(points = []) {
   </div>`).join('')}</div>`;
 }
 
+function validNumber(value) {
+  return String(value ?? '').trim() !== '' ? parseNumber(value, { fallback: Number.NaN }) : Number.NaN;
+}
+
+function waterFlowM3h(powerKw, supplyTempC, returnTempC) {
+  const deltaK = Math.abs(validNumber(supplyTempC) - validNumber(returnTempC));
+  if (!(powerKw > 0) || !(deltaK > 0)) return Number.NaN;
+  return (powerKw / (WATER_HEAT_CAPACITY_KJ_KGK * deltaK)) * 3.6;
+}
+
+function segmentRole(process, index, pathLength) {
+  if (process === 'adiabatic') {
+    if (index === 1) return 'preheater';
+    if (index === pathLength - 1) return 'reheater';
+  }
+  if (process === 'cool-dehumidify' && index === pathLength - 1) return 'reheater';
+  return 'heater';
+}
+
+function sensibleHeatingPowerKw(volumeM3h, previous, current) {
+  const deltaTempK = current.tempC - previous.tempC;
+  if (!(volumeM3h > 0) || !(deltaTempK > 0)) return 0;
+
+  const meanAirTempC = (previous.tempC + current.tempC) / 2;
+  const airMassFlowKgS = (volumeM3h * airDensity(meanAirTempC)) / 3600;
+  return airMassFlowKgS * AIR_HEAT_CAPACITY_KJ_KGK * deltaTempK;
+}
+
+function equipmentSizing(state = {}, path = [], process = '') {
+  const volumeM3h = validNumber(state.airVolumeM3h);
+  const start = path[0];
+  if (!(volumeM3h > 0) || !start) return { rows: [], messages: [] };
+
+  const dryAirMassKgS = (volumeM3h / 3600) * start.densityKgm3 / (1 + start.humidityRatio);
+  const heatingSupplyTempC = validNumber(state.heatingSupplyTempC);
+  const coolingSupplyTempC = validNumber(state.coolingSupplyTempC);
+  let heatingKw = 0;
+  let preheaterKw = 0;
+  let reheaterKw = 0;
+  let coolingKw = 0;
+  let humidifierKgH = 0;
+  const messages = [];
+
+  for (let index = 1; index < path.length; index += 1) {
+    const previous = path[index - 1];
+    const current = path[index];
+    const deltaH = current.enthalpyKjKg - previous.enthalpyKjKg;
+    const deltaW = current.humidityRatio - previous.humidityRatio;
+    const isSensibleHeating = current.tempC > previous.tempC && Math.abs(deltaW) <= HUMIDITY_RATIO_EPSILON;
+
+    if (isSensibleHeating) {
+      const segmentPowerKw = sensibleHeatingPowerKw(volumeM3h, previous, current);
+      heatingKw += segmentPowerKw;
+      const role = segmentRole(process, index, path.length);
+      if (role === 'preheater') preheaterKw += segmentPowerKw;
+      if (role === 'reheater') reheaterKw += segmentPowerKw;
+      if (Number.isFinite(heatingSupplyTempC) && heatingSupplyTempC < current.tempC + MIN_COIL_APPROACH_K) {
+        messages.push(`${current.label || `Heizregister ${index}`}: Heizungs-Vorlauftemperatur muss mindestens ${hxFmt(current.tempC + MIN_COIL_APPROACH_K, 1)} °C betragen (${MIN_COIL_APPROACH_K} K über der Lufttemperatur).`);
+      }
+    }
+
+    if (deltaH < 0) {
+      const segmentPowerKw = dryAirMassKgS * Math.abs(deltaH);
+      coolingKw += segmentPowerKw;
+      if (Number.isFinite(coolingSupplyTempC) && coolingSupplyTempC > current.tempC - MIN_COIL_APPROACH_K) {
+        messages.push(`${current.label || `Kühlregister ${index}`}: Kühlungs-Vorlauftemperatur darf höchstens ${hxFmt(current.tempC - MIN_COIL_APPROACH_K, 1)} °C betragen (${MIN_COIL_APPROACH_K} K unter der Lufttemperatur). Die Systemtemperatur ist für den gewünschten Zielzustand nicht ausreichend.`);
+      }
+    }
+
+    if (deltaW > 0) humidifierKgH += dryAirMassKgS * deltaW * 3600;
+  }
+
+  const rows = [
+    { label: 'Luftmenge', value: hxFmt(volumeM3h, 0), unit: 'm³/h' },
+    { label: 'Trockenluft-Massenstrom', value: hxFmt(dryAirMassKgS * 3600, 2), unit: 'kg/h' }
+  ];
+
+  if (process === 'adiabatic') {
+    rows.push(
+      { label: 'Vorerhitzerleistung', value: hxFmt(preheaterKw, 2), unit: 'kW' },
+      { label: 'Nacherhitzerleistung', value: hxFmt(reheaterKw, 2), unit: 'kW' }
+    );
+  } else {
+    rows.push({ label: 'Erhitzerleistung', value: hxFmt(heatingKw, 2), unit: 'kW' });
+  }
+
+  rows.push(
+    { label: 'Kühlerleistung', value: hxFmt(coolingKw, 2), unit: 'kW' },
+    { label: 'Befeuchterleistung', value: hxFmt(humidifierKgH, 2), unit: 'kg/h' },
+    { label: 'Dampfleistung äquivalent', value: hxFmt((humidifierKgH / 3600) * STEAM_HEAT_KJ_KG, 2), unit: 'kW' }
+  );
+
+  const heatingWater = waterFlowM3h(heatingKw, state.heatingSupplyTempC, state.heatingReturnTempC);
+  const coolingWater = waterFlowM3h(coolingKw, state.coolingSupplyTempC, state.coolingReturnTempC);
+  if (Number.isFinite(heatingWater)) rows.push({ label: 'Heizwasser-Volumenstrom', value: hxFmt(heatingWater, 2), unit: 'm³/h' });
+  if (Number.isFinite(coolingWater)) rows.push({ label: 'Kühlwasser-Volumenstrom', value: hxFmt(coolingWater, 2), unit: 'm³/h' });
+  return { rows, messages: [...new Set(messages)] };
+}
+
 export function buildHxResultModel(vm = {}, accent = 'cyan') {
   const r = vm.result || {};
   const activePath = Array.isArray(vm.activePath) ? vm.activePath : [];
 
   if (!activePath.length) {
-    return {
-      groups: [{
-        title: 'Automatische Zustandsänderung',
-        html: '<div class="empty-state">Zustandsänderung wählen oder gespeicherten Prozess auswählen</div>',
-        accent
-      }]
-    };
+    return { groups: [{ title: 'Automatische Zustandsänderung', html: '<div class="empty-state">Zustandsänderung wählen oder gespeicherten Prozess auswählen</div>', accent }] };
   }
 
   const start = activePath[0];
   const end = activePath[activePath.length - 1];
   const targetReached = vm.targetReached !== false;
-  const notices = targetReached ? [] : [{
-    title: 'Plausibilität',
-    messages: ['Zielzustand wird mit dem gewählten Prozess nicht erreicht.'],
-    prefix: 'Hinweis',
-    accent
-  }];
+  const notices = targetReached ? [] : [{ title: 'Plausibilität', messages: ['Zielzustand wird mit dem gewählten Prozess nicht erreicht.'], prefix: 'Hinweis', accent }];
+  const groups = [
+    { title: 'Berechnete Zustandspunkte', html: processPathHtml(activePath), accent },
+    { title: 'Ausgang', rows: pointRows(start), accent },
+    { title: 'Ziel', rows: pointRows(end), accent }
+  ];
+  const sizing = equipmentSizing(vm.state, activePath, r.selectedProcess || vm.state?.process || '');
+  if (sizing.rows.length) groups.unshift({ title: 'Erhitzer, Kühler und Befeuchter', rows: sizing.rows, accent });
+  if (sizing.messages.length) notices.push({ title: 'Systemtemperaturen', messages: sizing.messages, prefix: 'Hinweis', accent });
 
   return {
     primary: {
@@ -64,23 +168,7 @@ export function buildHxResultModel(vm = {}, accent = 'cyan') {
       ],
       accent
     },
-    groups: [
-      {
-        title: 'Berechnete Zustandspunkte',
-        html: processPathHtml(activePath),
-        accent
-      },
-      {
-        title: 'Ausgang',
-        rows: pointRows(start),
-        accent
-      },
-      {
-        title: 'Ziel',
-        rows: pointRows(end),
-        accent
-      }
-    ],
+    groups,
     notices
   };
 }
@@ -100,10 +188,15 @@ export function buildHxProcessRecord(currentState = {}, result = {}, items = [],
     processLabel: result.changeType || existing?.processLabel || 'Prozess',
     input: {
       label: String(name || currentState.label || existing?.input?.label || ''),
+      airVolumeM3h: String(currentState.airVolumeM3h ?? ''),
       tempC: String(currentState.tempC ?? ''),
       rhPercent: String(currentState.rhPercent ?? ''),
       targetTempC: String(currentState.targetTempC ?? ''),
       targetRhPercent: String(currentState.targetRhPercent ?? ''),
+      heatingSupplyTempC: String(currentState.heatingSupplyTempC ?? ''),
+      heatingReturnTempC: String(currentState.heatingReturnTempC ?? ''),
+      coolingSupplyTempC: String(currentState.coolingSupplyTempC ?? ''),
+      coolingReturnTempC: String(currentState.coolingReturnTempC ?? ''),
       process: result.selectedProcess || currentState.process || existing?.input?.process || 'heat'
     },
     path: processPath,
