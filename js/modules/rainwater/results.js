@@ -59,7 +59,9 @@ function primaryRows(s, r) {
     { label:'Ablaufdimension', value:selectedValue(s, r, 'drainSize', r.drainSize || '—') },
     { label:'Abläufe', value:selectedValue(s, r, 'requiredDrains', r.requiredDrains), unit:'Stk.' }
   ];
-  if (mode === 'roof') rows.splice(4, 0,
+  const manufacturer = selectedValue(s, r, 'drainManufacturer', r.drainManufacturer || '');
+  if (manufacturer) rows.splice(4, 0, { label:'Hersteller / Produkt', value:manufacturer });
+  if (mode === 'roof') rows.splice(manufacturer ? 5 : 4, 0,
     { label:'DN Fallleitung', value:r.stackSelection?.dn || surface?.stackSelection?.dn || '—' },
     { label:'Notabfluss Qnot', value:fmt(surface?.qNot ?? r.qNot ?? 0,2), unit:'l/s' }
   );
