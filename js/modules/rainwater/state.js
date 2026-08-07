@@ -23,6 +23,7 @@ export const initialState = {
   fillRatio: '0.7',
   slopeCmM: '1,0',
   drainSize: 'DN 100',
+  drainManufacturer: '',
   drainSizeManual: 'DN 100',
   drainCapacity: '4,5',
   drainHead: '35',
