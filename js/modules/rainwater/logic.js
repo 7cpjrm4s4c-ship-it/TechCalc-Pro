@@ -17,7 +17,7 @@ function getRainForMode(source, mode) {
 }
 
 function currentDrainSettings(source = {}, fallback = {}) {
-  const selection = source.drainSize || fallback.drainSize || 'DN 100';
+  const selection = source.drainSelection || source.drainSize || fallback.drainSelection || fallback.drainSize || 'DN 100';
   if (selection === 'manufacturer') {
     return {
       manufacturer: source.drainManufacturer ?? fallback.drainManufacturer ?? '',
@@ -115,6 +115,7 @@ function surfaceRows(state) {
       effectiveCm: area * cm,
       requiredDrains: itemRequiredDrains,
       qPerStack: itemQPerStack,
+      drainSelection: source.drainSize || drain.dn,
       drainManufacturer: drain.manufacturer,
       drainManufacturerDefined: drain.manufacturerDefined,
       drainSize: drain.dn,
