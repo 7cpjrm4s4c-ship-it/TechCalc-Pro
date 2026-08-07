@@ -1,3 +1,15 @@
+## Nächste Entwicklungsphase – Herstellerspezifische Regenwassereinläufe
+
+### Neu
+- Auswahl „Herstellerangaben“ als letzter Eintrag bei Dacheinläufen und Hoftöpfen ergänzt.
+- Freie Eingabe von Hersteller/Produkt, DN, Abflusswert und Anstauhöhe ermöglicht.
+- Herstellerwerte werden in Berechnung, Ergebnisdarstellung und gespeicherten Regenflächen durchgängig erhalten.
+
+### Qualität
+- Bestehende Standardvorwahlen bleiben rückwärtskompatibel.
+- Unvollständige Herstellerdaten werden durch Plausibilitätshinweise kenntlich gemacht.
+- Automatisierte Regressionstests für Auswahl, Berechnung und Leerzustand ergänzt.
+
 ## Version 1.4.0 – Final Release
 
 ### Freigabe
