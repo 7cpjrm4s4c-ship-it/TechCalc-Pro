@@ -29,6 +29,8 @@ const activeRainValue = state => mode(state) === 'property'
   ? (state.propertyRainIntensity || state.rainIntensity || '300')
   : (state.roofRainIntensity || state.rainIntensity || '300');
 const drainLabel = state => mode(state) === 'property' ? 'Vorwahl Hoftopf' : 'Vorwahl Dacheinlauf';
+const MANUFACTURER_DRAIN = 'manufacturer';
+const isManufacturerDrain = state => state.drainSize === MANUFACTURER_DRAIN;
 const selectedDrainPreset = state => roofDrainTable.find(item => item.dn === (state.drainSize || 'DN 100')) || roofDrainTable.find(item => item.dn === 'DN 100') || roofDrainTable[0];
 const fmtDecimalInput = (value, digits = 1) => {
   if (value === '' || value === null || value === undefined) return '';
@@ -37,7 +39,9 @@ const fmtDecimalInput = (value, digits = 1) => {
   return n.toLocaleString('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 };
 
-const drainOptions = roofDrainTable.map(item => ({ value:item.dn, label:`${item.dn} · ${String(item.capacity).replace('.', ',')} l/s · ${item.head} mm Anstauhöhe` }));
+const drainOptions = roofDrainTable
+  .map(item => ({ value:item.dn, label:`${item.dn} · ${String(item.capacity).replace('.', ',')} l/s · ${item.head} mm Anstauhöhe` }))
+  .concat({ value:MANUFACTURER_DRAIN, label:'Herstellerangaben' });
 const emergencyTypeOptions = [
   { value:'rect', label:'Rechteckiger Notüberlauf' },
   { value:'round', label:'Runder Notüberlauf' },
@@ -51,9 +55,10 @@ export const rainwaterSchema = defineFormSchema({
     { key:'propertyRainIntensity', label:rainLabel, type:FIELD_TYPES.DECIMAL, unit:'l/(s·ha)', format:(_, s) => fmtInput(activeRainValue(s), 1), visibleWhen:s => activeRainField(s) === 'propertyRainIntensity' },
     { key:'rainHundredIntensity', label:'Regenspende r(5,100)', type:FIELD_TYPES.DECIMAL, unit:'l/(s·ha)', default:'500' },
     { key:'drainSize', label:drainLabel, type:FIELD_TYPES.SELECT, options:drainOptions, default:'DN 100', commit:'immediate', lookup:true },
-    { key:'drainSizeManual', label:'DN manuell', type:FIELD_TYPES.TEXT, placeholder:'DN 100', format:(value, s) => value || s.drainSize || selectedDrainPreset(s)?.dn || 'DN 100' },
-    { key:'drainCapacity', label:'Abflusswert', type:FIELD_TYPES.DECIMAL, unit:'l/s', readonly:true, format:(value, s) => fmtInput(value || selectedDrainPreset(s)?.capacity, 1) },
-    { key:'drainHead', label:'Anstauhöhe', type:FIELD_TYPES.DECIMAL, unit:'mm', readonly:true, format:(value, s) => fmtInput(value || selectedDrainPreset(s)?.head, 0) },
+    { key:'drainManufacturer', label:'Hersteller / Produkt', type:FIELD_TYPES.TEXT, placeholder:'z. B. Hersteller, Typ', visibleWhen:isManufacturerDrain },
+    { key:'drainSizeManual', label:'DN', type:FIELD_TYPES.TEXT, placeholder:'z. B. DN 100', readonly:s => !isManufacturerDrain(s), format:(value, s) => isManufacturerDrain(s) ? (value || '') : (value || s.drainSize || selectedDrainPreset(s)?.dn || 'DN 100') },
+    { key:'drainCapacity', label:'Abflusswert', type:FIELD_TYPES.DECIMAL, unit:'l/s', readonly:s => !isManufacturerDrain(s), placeholder:'Herstellerwert', format:(value, s) => fmtInput(isManufacturerDrain(s) ? value : (value || selectedDrainPreset(s)?.capacity), 1) },
+    { key:'drainHead', label:'Anstauhöhe', type:FIELD_TYPES.DECIMAL, unit:'mm', readonly:s => !isManufacturerDrain(s), placeholder:'Herstellerwert', format:(value, s) => fmtInput(isManufacturerDrain(s) ? value : (value || selectedDrainPreset(s)?.head), 0) },
     { key:'stackCount', label:'Anzahl Fallleitungen', type:FIELD_TYPES.INTEGER, unit:'Stk.', visibleWhen:s => mode(s) === 'roof' },
     { key:'emergencyType', label:'Art Notentwässerung', type:FIELD_TYPES.SELECT, options:emergencyTypeOptions, commit:'immediate', lookup:true, visibleWhen:s => mode(s) === 'roof' },
     { key:'emergencyHead', label:'Druckhöhe / Anstauhöhe', type:FIELD_TYPES.DECIMAL, unit:'mm', default:'35', visibleWhen:s => mode(s) === 'roof' },
@@ -75,7 +80,7 @@ export const rainwaterSchema = defineFormSchema({
   groups: [
     { title:'Berechnungsbereich', fields:['surfaceMode'], columns:1, accent:'green' },
     { title:'Regenspende', fields:['roofRainIntensity','propertyRainIntensity','rainHundredIntensity'], columns:2, accent:'green', actions:[{ label:'KOSTRA / OpenKo Daten öffnen', href:KOSTRA_URL, variant:'secondary' }] },
-    { title:'Dacheinläufe / Hoftöpfe', fields:['drainSize','drainSizeManual','drainCapacity','drainHead','stackCount'], columns:2, accent:'green' },
+    { title:'Dacheinläufe / Hoftöpfe', fields:['drainSize','drainManufacturer','drainSizeManual','drainCapacity','drainHead','stackCount'], columns:2, accent:'green' },
     { title:'Notentwässerung', fields:['emergencyType','emergencyHead','emergencyWidth','emergencyDiameter','emergencyManufacturerDn','emergencyCapacity','emergencySafetyFactor','emergencyInfo'], columns:2, accent:'green' },
     { title:'Regenfläche', fields:['areaType','areaSize','areaCoefficients','customCs','customCm'], columns:2, accent:'green' }
   ]
