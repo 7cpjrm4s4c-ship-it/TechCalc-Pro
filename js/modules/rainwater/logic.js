@@ -17,11 +17,21 @@ function getRainForMode(source, mode) {
 }
 
 function currentDrainSettings(source = {}, fallback = {}) {
-  const preset = getDrainByDn(source.drainSize || fallback.drainSize || 'DN 100');
+  const selection = source.drainSize || fallback.drainSize || 'DN 100';
+  if (selection === 'manufacturer') {
+    return {
+      manufacturer: source.drainManufacturer ?? fallback.drainManufacturer ?? '',
+      dn: source.drainSizeManual ?? fallback.drainSizeManual ?? '',
+      capacity: toNumber(source.drainCapacity ?? fallback.drainCapacity),
+      head: toNumber(source.drainHead ?? fallback.drainHead),
+      manufacturerDefined: true
+    };
+  }
+  const preset = getDrainByDn(selection);
   const dn = source.drainSizeManual || source.drainSize || fallback.drainSizeManual || fallback.drainSize || preset?.dn || 'DN 100';
   const capacity = toNumber(source.drainCapacity || fallback.drainCapacity || preset?.capacity || fallback.roofDrainCapacity);
   const head = toNumber(source.drainHead || fallback.drainHead || preset?.head);
-  return { dn, capacity, head };
+  return { manufacturer: '', dn, capacity, head, manufacturerDefined: false };
 }
 
 
@@ -105,6 +115,8 @@ function surfaceRows(state) {
       effectiveCm: area * cm,
       requiredDrains: itemRequiredDrains,
       qPerStack: itemQPerStack,
+      drainManufacturer: drain.manufacturer,
+      drainManufacturerDefined: drain.manufacturerDefined,
       drainSize: drain.dn,
       drainCapacity: drain.capacity,
       drainHead: drain.head,
@@ -138,6 +150,9 @@ function validate(state, r) {
   if (!r.selectedSurface) warnings.push('Keine Fläche erfasst. Bitte eine Fläche eingeben oder gespeicherte Fläche auswählen.');
   if ((r.selectedSurface?.qr || 0) <= 0) warnings.push('Qr ist 0 l/s. Regenspende, Fläche und Abflussbeiwert prüfen.');
   if (drain.capacity <= 0) warnings.push(`${mode === 'property' ? 'Abflussvermögen des Hoftopfs' : 'Abflussvermögen des Dacheinlaufs'} eingeben.`);
+  if (drain.manufacturerDefined && !String(drain.manufacturer || '').trim()) warnings.push('Hersteller / Produkt des Einlaufs eingeben.');
+  if (drain.manufacturerDefined && !String(drain.dn || '').trim()) warnings.push('Hersteller-DN des Einlaufs eingeben.');
+  if (drain.manufacturerDefined && drain.head <= 0) warnings.push('Hersteller-Anstauhöhe des Einlaufs eingeben.');
   if (mode === 'roof' && stackCount < 1) warnings.push('Anzahl Fallleitungen muss mindestens 1 betragen.');
   warnings.push(`Regenspende ${mode === 'property' ? 'r(5,2)' : 'r(5,5)'} und r(5,100) standortbezogen über KOSTRA/OpenKo ermitteln und manuell eintragen.`);
   if (mode === 'roof') warnings.push('Notentwässerung als Vorbemessung berücksichtigt. Überflutungsnachweis und Rückhalteraumbemessung sind nicht Bestandteil dieser Berechnung.');
@@ -165,6 +180,7 @@ function draftSurfaceRow(state) {
       propertyRainIntensity: state.propertyRainIntensity,
       rainHundredIntensity: state.rainHundredIntensity,
       drainSize: state.drainSize,
+      drainManufacturer: state.drainManufacturer,
       drainSizeManual: state.drainSizeManual,
       drainCapacity: state.drainCapacity,
       drainHead: state.drainHead,
@@ -228,6 +244,8 @@ export function calculate(state) {
     qr,
     qNot: emergency.qNot || 0,
     emergency,
+    drainManufacturer: drain.manufacturer,
+    drainManufacturerDefined: drain.manufacturerDefined,
     drainSize: drain.dn,
     drainHead: drain.head,
     drainCapacity: drain.capacity,
