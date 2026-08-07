@@ -1,5 +1,5 @@
 const CACHE_NAME = 'techcalc-pro-1.4.0';
-const CACHE_REVISION = '1.4.0-version-1-4-0-final-release';
+const CACHE_REVISION = '1.4.0-naechste-entwicklungsphase-herstellerspezifische-regenwassereinlaeufe';
 const ASSETS = [
   './',
   './index.html',
