@@ -20,10 +20,18 @@ function patchLookupDefaults(patch = {}, base = {}) {
   const next = { ...patch };
   const drainSize = next.drainSize || base.drainSize;
   if (Object.prototype.hasOwnProperty.call(patch, 'drainSize')) {
-    const preset = roofDrainTable.find(item => item.dn === drainSize) || roofDrainTable.find(item => item.dn === 'DN 100') || roofDrainTable[0];
-    next.drainSizeManual = preset?.dn || drainSize || 'DN 100';
-    next.drainCapacity = preset?.capacity != null ? String(preset.capacity).replace('.', ',') : '';
-    next.drainHead = preset?.head != null ? String(preset.head) : '';
+    if (drainSize === 'manufacturer') {
+      next.drainManufacturer = '';
+      next.drainSizeManual = '';
+      next.drainCapacity = '';
+      next.drainHead = '';
+    } else {
+      const preset = roofDrainTable.find(item => item.dn === drainSize) || roofDrainTable.find(item => item.dn === 'DN 100') || roofDrainTable[0];
+      next.drainManufacturer = '';
+      next.drainSizeManual = preset?.dn || drainSize || 'DN 100';
+      next.drainCapacity = preset?.capacity != null ? String(preset.capacity).replace('.', ',') : '';
+      next.drainHead = preset?.head != null ? String(preset.head) : '';
+    }
   }
   if (Object.prototype.hasOwnProperty.call(patch, 'emergencyType')) {
     const type = next.emergencyType || base.emergencyType || 'rect';
@@ -99,6 +107,7 @@ function surfacePatchFromState(current = {}) {
     propertyRainIntensity: normalizeSurfaceFieldValue('propertyRainIntensity', current.propertyRainIntensity),
     rainHundredIntensity: normalizeSurfaceFieldValue('rainHundredIntensity', current.rainHundredIntensity),
     drainSize: current.drainSize,
+    drainManufacturer: current.drainManufacturer,
     drainSizeManual: current.drainSizeManual,
     drainCapacity: normalizeSurfaceFieldValue('drainCapacity', current.drainCapacity),
     drainHead: normalizeSurfaceFieldValue('drainHead', current.drainHead),
@@ -172,6 +181,7 @@ export function statePatchFromSurface(item = {}, current = {}) {
     propertyRainIntensity: hydrated.propertyRainIntensity || source.propertyRainIntensity || '300',
     rainHundredIntensity: hydrated.rainHundredIntensity || source.rainHundredIntensity || '500',
     drainSize: hydrated.drainSize || source.drainSize || 'DN 100',
+    drainManufacturer: hydrated.drainManufacturer || source.drainManufacturer || '',
     drainSizeManual: hydrated.drainSizeManual || source.drainSizeManual || '',
     drainCapacity: hydrated.drainCapacity || source.drainCapacity || '',
     drainHead: hydrated.drainHead || source.drainHead || '',
@@ -201,6 +211,7 @@ export function clearSurfaceEditorPatch(current = {}) {
     customCs: '',
     customCm: '',
     drainSize: 'DN 100',
+    drainManufacturer: '',
     drainSizeManual: '',
     drainCapacity: '',
     drainHead: '',
