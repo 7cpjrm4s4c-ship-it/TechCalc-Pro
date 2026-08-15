@@ -8,6 +8,7 @@ const commands = [
   ['node', ['tests/saved-record-interaction.test.mjs']],
   ['node', ['tests/input-confirmation.test.mjs']],
   ['node', ['tests/rainwater-manufacturer-drains.test.mjs']],
+  ['node', ['tests/unit-converter-btu-per-hour.test.mjs']],
   ['node', ['tests/service-worker-update-flow.test.mjs']],
   ['node', ['tests/rc10-project-file-format.test.mjs']],
   ['node', ['tests/rc11-pdf-pixel-perfect.test.mjs']],

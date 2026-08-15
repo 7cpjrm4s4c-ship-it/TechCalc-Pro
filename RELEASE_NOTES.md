@@ -1,14 +1,16 @@
-## Nächste Entwicklungsphase – Herstellerspezifische Regenwassereinläufe
+## Nächste Entwicklungsphase – Regenwassereinläufe und BTU/h-Leistungseinheit
 
 ### Neu
 - Auswahl „Herstellerangaben“ als letzter Eintrag bei Dacheinläufen und Hoftöpfen ergänzt.
 - Freie Eingabe von Hersteller/Produkt, DN, Abflusswert und Anstauhöhe ermöglicht.
 - Herstellerwerte werden in Berechnung, Ergebnisdarstellung und gespeicherten Regenflächen durchgängig erhalten.
+- Leistungseinheit `BTU/h` mit dem Umrechnungsfaktor `1 BTU/h = 0,2930710701722 W` im Einheitenrechner ergänzt.
 
 ### Qualität
 - Bestehende Standardvorwahlen bleiben rückwärtskompatibel.
 - Unvollständige Herstellerdaten werden durch Plausibilitätshinweise kenntlich gemacht.
 - Automatisierte Regressionstests für Auswahl, Berechnung und Leerzustand ergänzt.
+- Vorwärts- und Rückwärtsumrechnung sowie Anzeige von `BTU/h` sind automatisiert abgesichert.
 
 ## Version 1.4.0 – Final Release
 

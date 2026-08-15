@@ -1,6 +1,6 @@
 export const unitCategories = {
   pressure: { label:'🔵 Druck', base:'Pa', units:{ Pa:1, kPa:1000, bar:100000, mbar:100, mWs:9806.65 } },
-  power: { label:'🔥 Leistung', base:'W', units:{ W:1, kW:1000, MW:1000000, 'J/h':1/3600, 'kJ/h':1000/3600 } },
+  power: { label:'🔥 Leistung', base:'W', units:{ W:1, kW:1000, MW:1000000, 'J/h':1/3600, 'kJ/h':1000/3600, 'BTU/h':0.2930710701722 } },
   energy: { label:'🔋 Energie', base:'J', units:{ J:1, kJ:1000, Wh:3600, kWh:3600000, MWh:3600000000, MJ:1000000 } },
   flow: { label:'💧 Volumenstrom', base:'m³/h', units:{ 'm³/h':1, 'm³/min':60, 'm³/s':3600, 'l/h':0.001, 'l/min':0.06, 'l/s':3.6 } },
   weight: { label:'⚖️ Gewicht', base:'kg', units:{ g:.001, kg:1, t:1000, lb:.45359237 } },
