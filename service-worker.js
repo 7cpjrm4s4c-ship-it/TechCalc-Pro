@@ -1,5 +1,5 @@
 const CACHE_NAME = 'techcalc-pro-1.4.0';
-const CACHE_REVISION = '1.4.0-naechste-entwicklungsphase-herstellerspezifische-regenwassereinlaeufe';
+const CACHE_REVISION = '1.4.0-naechste-entwicklungsphase-regenwassereinlaeufe-und-btu-h-leistungseinheit';
 const ASSETS = [
   './',
   './index.html',
