@@ -15,7 +15,8 @@
 ### Behoben
 - Dampf- und adiabate Befeuchtung erzeugen bei einem gegenüber dem Ausgangszustand niedrigeren Zielfeuchtegehalt keine physikalisch unmögliche negative Befeuchtung mehr.
 - In diesem Fall zeigt das Diagramm ausschließlich die mögliche Beheizungskennlinie und den Hinweis „Befeuchtung nicht möglich“.
-- Die Fallback-Kennlinie und beide Befeuchtungsvarianten sind durch einen automatisierten Regressionstest abgesichert.
+- „Kühlen + entfeuchten“ erzeugt bei einem höheren Zielfeuchtegehalt keine physikalisch unmögliche Befeuchtung mehr; dargestellt werden ausschließlich die mögliche Kühlkennlinie und der Hinweis „Entfeuchtung nicht möglich“.
+- Die Fallback-Kennlinien sowie die zulässigen und unzulässigen Be- und Entfeuchtungsvarianten sind durch einen automatisierten Regressionstest abgesichert.
 
 ## Version 1.4.0 – Final Release
 

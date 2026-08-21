@@ -54,4 +54,53 @@ assert.equal(possible.effectiveProcess, 'steam');
 assert.equal(possible.processPath.length, 3);
 assert.equal(possible.targetReached, true);
 
-console.log('h,x negative humidification regression ok');
+const impossibleDehumidification = calculate({
+  tempC: 26,
+  rhPercent: 30,
+  targetTempC: 20,
+  targetRhPercent: 60,
+  airVolumeM3h: 1000,
+  process: 'cool-dehumidify'
+});
+assert.equal(impossibleDehumidification.selectedProcess, 'cool-dehumidify');
+assert.equal(impossibleDehumidification.effectiveProcess, 'cool', 'an impossible dehumidification must fall back to sensible cooling');
+assert.equal(impossibleDehumidification.processIssue, 'dehumidification-not-possible');
+assert.equal(impossibleDehumidification.targetReached, false);
+assert.equal(impossibleDehumidification.processPath.length, 2, 'only the physically possible cooling path may be displayed');
+assert.ok(
+  impossibleDehumidification.processPath.every(point => Math.abs(point.humidityRatio - impossibleDehumidification.current.humidityRatio) <= 1e-7),
+  'the fallback cooling path must keep the humidity ratio constant'
+);
+assert.ok(
+  impossibleDehumidification.processPath.every(point => point.humidityRatio <= impossibleDehumidification.current.humidityRatio + 1e-7),
+  'the path must not contain humidification'
+);
+
+const dehumidificationChart = chartCard(
+  impossibleDehumidification.processPath,
+  impossibleDehumidification.targetReached,
+  impossibleDehumidification.processIssue
+);
+assert.match(dehumidificationChart, /Entfeuchtung nicht möglich/);
+assert.doesNotMatch(dehumidificationChart, /Zielzustand wird nicht erreicht/);
+
+const dehumidificationModel = buildHxResultModel({
+  state: { airVolumeM3h: 1000, process: 'cool-dehumidify' },
+  result: impossibleDehumidification,
+  activePath: impossibleDehumidification.processPath,
+  targetReached: impossibleDehumidification.targetReached
+});
+assert.deepEqual(dehumidificationModel.notices[0].messages, ['Entfeuchtung nicht möglich']);
+assert.equal(dehumidificationModel.primary.primary.value, 'Kühlen');
+
+const possibleDehumidification = calculate({
+  tempC: 26,
+  rhPercent: 70,
+  targetTempC: 20,
+  targetRhPercent: 45,
+  process: 'cool-dehumidify'
+});
+assert.equal(possibleDehumidification.processIssue, null, 'valid dehumidification must remain unchanged');
+assert.equal(possibleDehumidification.effectiveProcess, 'cool-dehumidify');
+
+console.log('h,x impossible humidification and dehumidification regression ok');

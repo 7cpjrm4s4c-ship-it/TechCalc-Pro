@@ -246,7 +246,11 @@ export function calculate(input) {
   const humidificationSelected = selectedProcess === 'adiabatic' || selectedProcess === 'steam';
   const humidificationImpossible = humidificationSelected
     && target.humidityRatio < current.humidityRatio - HUMIDIFICATION_EPSILON_KG_KG;
-  const effectiveProcess = humidificationImpossible ? 'heat' : selectedProcess;
+  const dehumidificationImpossible = selectedProcess === 'cool-dehumidify'
+    && target.humidityRatio > current.humidityRatio + HUMIDIFICATION_EPSILON_KG_KG;
+  const effectiveProcess = humidificationImpossible
+    ? 'heat'
+    : dehumidificationImpossible ? 'cool' : selectedProcess;
   const processPath = buildProcessPath(current, target, effectiveProcess);
   const processEnd = processPath[processPath.length - 1] || current;
   const targetReached = pointReached(processEnd, target);
@@ -266,7 +270,9 @@ export function calculate(input) {
     changeType,
     selectedProcess,
     effectiveProcess,
-    processIssue: humidificationImpossible ? 'humidification-not-possible' : null,
+    processIssue: humidificationImpossible
+      ? 'humidification-not-possible'
+      : dehumidificationImpossible ? 'dehumidification-not-possible' : null,
     processPath,
     delta,
     points

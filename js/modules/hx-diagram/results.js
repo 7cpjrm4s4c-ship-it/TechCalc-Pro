@@ -149,6 +149,8 @@ export function buildHxResultModel(vm = {}, accent = 'cyan') {
   const processIssue = r.processIssue;
   const targetNotice = processIssue === 'humidification-not-possible'
     ? 'Befeuchtung nicht möglich'
+    : processIssue === 'dehumidification-not-possible'
+      ? 'Entfeuchtung nicht möglich'
     : 'Zielzustand wird mit dem gewählten Prozess nicht erreicht.';
   const notices = targetReached ? [] : [{ title: 'Plausibilität', messages: [targetNotice], prefix: 'Hinweis', accent }];
   const groups = [
