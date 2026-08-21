@@ -1,6 +1,7 @@
 import { parseNumber } from '../../core/numberService.js';
 
 const P_ATM_PA = 101325;
+const HUMIDIFICATION_EPSILON_KG_KG = 1e-7;
 
 function num(value, fallback = 0) {
   return parseNumber(value, { fallback });
@@ -242,10 +243,18 @@ export function calculate(input) {
     rhPercent: input.targetRhPercent
   });
   const selectedProcess = input.process || 'heat';
-  const processPath = buildProcessPath(current, target, selectedProcess);
+  const humidificationSelected = selectedProcess === 'adiabatic' || selectedProcess === 'steam';
+  const humidificationImpossible = humidificationSelected
+    && target.humidityRatio < current.humidityRatio - HUMIDIFICATION_EPSILON_KG_KG;
+  const dehumidificationImpossible = selectedProcess === 'cool-dehumidify'
+    && target.humidityRatio > current.humidityRatio + HUMIDIFICATION_EPSILON_KG_KG;
+  const effectiveProcess = humidificationImpossible
+    ? 'heat'
+    : dehumidificationImpossible ? 'cool' : selectedProcess;
+  const processPath = buildProcessPath(current, target, effectiveProcess);
   const processEnd = processPath[processPath.length - 1] || current;
   const targetReached = pointReached(processEnd, target);
-  const changeType = processLabel(selectedProcess);
+  const changeType = processLabel(effectiveProcess);
   const delta = {
     tempK: processEnd.tempC - current.tempC,
     humidityGkg: processEnd.humidityRatioGkg - current.humidityRatioGkg,
@@ -253,5 +262,19 @@ export function calculate(input) {
     rhPercent: processEnd.rhPercent - current.rhPercent
   };
   const points = (input.points ?? []).map(point => calculatePoint(point));
-  return { current, target, processEnd, targetReached, changeType, selectedProcess, processPath, delta, points };
+  return {
+    current,
+    target,
+    processEnd,
+    targetReached,
+    changeType,
+    selectedProcess,
+    effectiveProcess,
+    processIssue: humidificationImpossible
+      ? 'humidification-not-possible'
+      : dehumidificationImpossible ? 'dehumidification-not-possible' : null,
+    processPath,
+    delta,
+    points
+  };
 }

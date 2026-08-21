@@ -146,13 +146,19 @@ export function buildHxResultModel(vm = {}, accent = 'cyan') {
   const start = activePath[0];
   const end = activePath[activePath.length - 1];
   const targetReached = vm.targetReached !== false;
-  const notices = targetReached ? [] : [{ title: 'Plausibilität', messages: ['Zielzustand wird mit dem gewählten Prozess nicht erreicht.'], prefix: 'Hinweis', accent }];
+  const processIssue = r.processIssue;
+  const targetNotice = processIssue === 'humidification-not-possible'
+    ? 'Befeuchtung nicht möglich'
+    : processIssue === 'dehumidification-not-possible'
+      ? 'Entfeuchtung nicht möglich'
+    : 'Zielzustand wird mit dem gewählten Prozess nicht erreicht.';
+  const notices = targetReached ? [] : [{ title: 'Plausibilität', messages: [targetNotice], prefix: 'Hinweis', accent }];
   const groups = [
     { title: 'Berechnete Zustandspunkte', html: processPathHtml(activePath), accent },
     { title: 'Ausgang', rows: pointRows(start), accent },
     { title: 'Ziel', rows: pointRows(end), accent }
   ];
-  const sizing = equipmentSizing(vm.state, activePath, r.selectedProcess || vm.state?.process || '');
+  const sizing = equipmentSizing(vm.state, activePath, r.effectiveProcess || r.selectedProcess || vm.state?.process || '');
   if (sizing.rows.length) groups.unshift({ title: 'Erhitzer, Kühler und Befeuchter', rows: sizing.rows, accent });
   if (sizing.messages.length) notices.push({ title: 'Systemtemperaturen', messages: sizing.messages, prefix: 'Hinweis', accent });
 
