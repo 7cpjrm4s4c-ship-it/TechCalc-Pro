@@ -1,4 +1,4 @@
-## Nächste Entwicklungsphase – Regenwassereinläufe und BTU/h-Leistungseinheit
+## Nächste Entwicklungsphase – Regenwassereinläufe, BTU/h und h,x-Diagramm
 
 ### Neu
 - Auswahl „Herstellerangaben“ als letzter Eintrag bei Dacheinläufen und Hoftöpfen ergänzt.
@@ -11,6 +11,11 @@
 - Unvollständige Herstellerdaten werden durch Plausibilitätshinweise kenntlich gemacht.
 - Automatisierte Regressionstests für Auswahl, Berechnung und Leerzustand ergänzt.
 - Vorwärts- und Rückwärtsumrechnung sowie Anzeige von `BTU/h` sind automatisiert abgesichert.
+
+### Behoben
+- Dampf- und adiabate Befeuchtung erzeugen bei einem gegenüber dem Ausgangszustand niedrigeren Zielfeuchtegehalt keine physikalisch unmögliche negative Befeuchtung mehr.
+- In diesem Fall zeigt das Diagramm ausschließlich die mögliche Beheizungskennlinie und den Hinweis „Befeuchtung nicht möglich“.
+- Die Fallback-Kennlinie und beide Befeuchtungsvarianten sind durch einen automatisierten Regressionstest abgesichert.
 
 ## Version 1.4.0 – Final Release
 

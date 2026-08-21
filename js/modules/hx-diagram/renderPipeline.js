@@ -42,7 +42,7 @@ export function renderResults(snapshotOrVm = {}) {
 
 export function renderDiagram(snapshotOrVm = {}) {
   const vm = snapshotOrVm?.activePath ? snapshotOrVm : createHxRenderModel(snapshotOrVm);
-  return chartCard(vm.activePath, vm.targetReached);
+  return chartCard(vm.activePath, vm.targetReached, vm.result?.processIssue);
 }
 
 export function renderSavedProcesses(snapshotOrVm = {}) {
@@ -134,4 +134,3 @@ export function renderDynamicSections(root, snapshot = {}, meta = {}) {
 
   return updateAllLiveIslands();
 }
-

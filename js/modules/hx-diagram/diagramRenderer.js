@@ -78,7 +78,10 @@ export function renderHxSvg(points = []) {
   </svg>`;
 }
 
-export function chartCard(activePath, targetReached = true) {
-  const warning = targetReached ? '' : '<div class="hx-target-warning">Zielzustand wird nicht erreicht!</div>';
+export function chartCard(activePath, targetReached = true, processIssue = null) {
+  const warningText = processIssue === 'humidification-not-possible'
+    ? 'Befeuchtung nicht möglich'
+    : 'Zielzustand wird nicht erreicht!';
+  const warning = targetReached ? '' : `<div class="hx-target-warning">${warningText}</div>`;
   return card('h,x-Diagramm', `<div class="hx-chart-wrap">${renderHxSvg(activePath)}</div>${warning}<div class="formula">Näherung bei Luftdruck 1.013 hPa · x horizontal · θt vertikal</div>`, 'cyan');
 }
