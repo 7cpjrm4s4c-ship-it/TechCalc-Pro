@@ -15,6 +15,7 @@ import bufferStorageConfig from '../modules/buffer-storage/config.js';
 import wastewaterConfig from '../modules/wastewater/config.js';
 import rainwaterConfig from '../modules/rainwater/config.js';
 import floodingVerificationConfig from '../modules/flooding-verification/config.js';
+import fGasesCheckConfig from '../modules/f-gases-check/config.js';
 import { restoreSessionSnapshot, saveSessionSnapshot } from './projectStorage.js';
 import { createModuleLifecycleAdapter } from './moduleLifecycleAdapter.js';
 import { createModuleRuntime } from './moduleRuntime.js';
@@ -46,7 +47,8 @@ const lazyModules = [
   { config: drinkingWaterConfig, path: '../modules/drinking-water/index.js' },
   { config: wastewaterConfig, path: '../modules/wastewater/index.js' },
   { config: rainwaterConfig, path: '../modules/rainwater/index.js' },
-  { config: floodingVerificationConfig, path: '../modules/flooding-verification/index.js' }
+  { config: floodingVerificationConfig, path: '../modules/flooding-verification/index.js' },
+  { config: fGasesCheckConfig, path: '../modules/f-gases-check/index.js' }
 ];
 
 const moduleCache = new Map();
