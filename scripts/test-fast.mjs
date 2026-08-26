@@ -1,5 +1,4 @@
 import { execFileSync } from 'node:child_process';
-
 const commands = [
   ['node', ['scripts/check-js-imports.mjs']],
   ['node', ['tests/number-service.test.mjs']],
@@ -8,6 +7,7 @@ const commands = [
   ['node', ['tests/saved-record-interaction.test.mjs']],
   ['node', ['tests/input-confirmation.test.mjs']],
   ['node', ['tests/hx-negative-humidification.test.mjs']],
+  ['node', ['tests/hx-enthalpy-power.test.mjs']],
   ['node', ['tests/rainwater-manufacturer-drains.test.mjs']],
   ['node', ['tests/unit-converter-btu-per-hour.test.mjs']],
   ['node', ['tests/service-worker-update-flow.test.mjs']],
@@ -17,7 +17,6 @@ const commands = [
   ['node', ['tests/phase45c1-project-lifecycle-integration.test.mjs']],
   ['node', ['tests/phase45c2-legacy-saved-records-migration.test.mjs']]
 ];
-
 for (const [cmd, args] of commands) {
   console.log(`> ${cmd} ${args.join(' ')}`);
   execFileSync(cmd, args, { stdio: 'inherit' });
