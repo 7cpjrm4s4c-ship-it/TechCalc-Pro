@@ -3,7 +3,6 @@ import { renderResultModel } from '../../platform/resultRenderer/index.js';
 import { parseNumber } from '../../core/numberService.js';
 
 const WATER_HEAT_CAPACITY_KJ_KGK = 4.19;
-const STEAM_HEAT_KJ_KG = 2501;
 const MIN_COIL_APPROACH_K = 3;
 const HUMIDITY_RATIO_EPSILON = 1e-7;
 export function hxFmt(value, decimals = 2) {
@@ -60,6 +59,7 @@ function equipmentSizing(state = {}, path = [], process = '') {
   let reheaterKw = 0;
   let coolingKw = 0;
   let humidifierKgH = 0;
+  let evaporatorKw = 0;
   const messages = [];
   for (let index = 1; index < path.length; index += 1) {
     const previous = path[index - 1];
@@ -84,7 +84,10 @@ function equipmentSizing(state = {}, path = [], process = '') {
         messages.push(`${current.label || `Kühlregister ${index}`}: Kühlungs-Vorlauftemperatur darf höchstens ${hxFmt(current.tempC - MIN_COIL_APPROACH_K, 1)} °C betragen (${MIN_COIL_APPROACH_K} K unter der Lufttemperatur). Die Systemtemperatur ist für den gewünschten Zielzustand nicht ausreichend.`);
       }
     }
-    if (deltaW > 0) humidifierKgH += dryAirMassKgS * deltaW * 3600;
+    if (deltaW > 0) {
+      humidifierKgH += dryAirMassKgS * deltaW * 3600;
+      if (deltaH > 0) evaporatorKw += dryAirMassKgS * deltaH;
+    }
   }
 
   const rows = [
@@ -102,7 +105,7 @@ function equipmentSizing(state = {}, path = [], process = '') {
   rows.push(
     { label: 'Kühlerleistung', value: hxFmt(coolingKw, 2), unit: 'kW' },
     { label: 'Befeuchterleistung', value: hxFmt(humidifierKgH, 2), unit: 'kg/h' },
-    { label: 'Dampfleistung äquivalent', value: hxFmt((humidifierKgH / 3600) * STEAM_HEAT_KJ_KG, 2), unit: 'kW' }
+    { label: 'Verdampferleistung', value: hxFmt(evaporatorKw, 2), unit: 'kW' }
   );
   const heatingWater = waterFlowM3h(heatingKw, state.heatingSupplyTempC, state.heatingReturnTempC);
   const coolingWater = waterFlowM3h(coolingKw, state.coolingSupplyTempC, state.coolingReturnTempC);
