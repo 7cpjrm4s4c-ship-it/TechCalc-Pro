@@ -1,6 +1,7 @@
 import { currentRoute } from '../router.js';
 import { sanitizeText, normalizeKey } from './pdfText.js';
 import { buildFloodingReportSections } from './floodingReportSections.js';
+import { buildRainwaterReportSections } from './rainwaterReportSections.js';
 
 function textOf(node) { return sanitizeText(node?.textContent || ''); }
 
@@ -92,7 +93,7 @@ function collectLegacyDomModule(module, id) {
       const canvas = card.querySelector('canvas');
       chartSvg = svg ? svg.outerHTML : chartSvg;
       chartCanvas = canvas || chartCanvas;
-      if (rows.length) sections.push({ title: `${title} - Prozesspunkte`, rows });
+      if (rows.length) sections.push({ title: `${title} – Prozesspunkte`, rows });
       return;
     }
     if (rows.length) sections.push({ title, rows });
@@ -207,7 +208,12 @@ function normalizePdfRows(rows = [], title = '') {
 
 export function reportSections(moduleData) {
   if (moduleData?.reportSource === 'typed-dto' && moduleData.reportDto) {
-    return buildFloodingReportSections(moduleData.reportDto).map(section => ({
+    const dtoType = moduleData.reportDto.metadata?.dtoType;
+    const sections = dtoType === 'techcalc.rainwater.report'
+      ? buildRainwaterReportSections(moduleData.reportDto)
+      : buildFloodingReportSections(moduleData.reportDto);
+
+    return sections.map(section => ({
       ...section,
       rows: normalizePdfRows(section.rows, section.title)
     }));
