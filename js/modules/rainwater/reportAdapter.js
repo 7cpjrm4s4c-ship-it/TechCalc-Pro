@@ -16,7 +16,7 @@ function mapSurface(surface = {}, index = 0) {
     mode: surface.surfaceMode || '',
     areaType: surface.areaType || surface.base?.id || '',
     areaTypeLabel: surface.base?.name || '',
-    areaM2 : finite(surface.area),
+    areaM2: finite(surface.area),
     runoffCoefficientCs: finite(surface.cs),
     meanRunoffCoefficientCm: finite(surface.cm),
     designRainIntensity: finite(surface.rdt),
@@ -58,8 +58,12 @@ function mapSurface(surface = {}, index = 0) {
   });
 }
 
+function isSavedSurface(surface = {}) {
+  return !surface.transient && String(surface.id ?? '') !== '__current_input__';
+}
+
 export function buildRainwaterReportDto({ state = {}, calculation = {}, generatedAt = new Date().toISOString() } = {}) {
-  const surfaces = array(calculation.surfaces).map(mapSurface);
+  const surfaces = array(calculation.surfaces).filter(isSavedSurface).map(mapSurface);
   return Object.freeze({
     metadata: {
       dtoType: 'techcalc.rainwater.report',
