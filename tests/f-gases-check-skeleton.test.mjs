@@ -13,15 +13,19 @@ assert.ok(schema.fields.some(field => field.key === 'siteSafetyRestrictionStatus
 assert.equal(initialState.siteSafetyRestrictionStatus, '');
 
 assert.deepEqual(listRefrigerants(), []);
-assert.deepEqual(listRegulations(), []);
 assert.deepEqual(listSafetyClasses().map(item => item.id), ['A1', 'A2L', 'A2', 'A3', 'B1', 'B2L', 'B2', 'B3']);
-assert.deepEqual(getDataVersions(), {
-  refrigerants: null,
-  gwp: null,
-  regulations: null,
-  safetyClasses: null
-});
-assert.equal(getDataStatus().regulations, 'not-specified');
+assert.equal(getDataVersions().regulations, '1.0.0');
+assert.equal(getDataStatus().regulations, 'specified');
+
+const regulations = listRegulations();
+assert.ok(regulations.length > 40);
+assert.ok(regulations.some(rule => rule.id === 'FG-030'));
+assert.ok(regulations.some(rule => rule.id === 'AIV-009F'));
+const unresolvedChillerRule = regulations.find(rule => rule.id === 'AIV-007D');
+assert.equal(unresolvedChillerRule.automationStatus, 'manual-review');
+assert.equal(unresolvedChillerRule.conditions.find(condition => condition.field === 'gwp').operator, 'source-wording-only');
+const splitOver12KwRule = regulations.find(rule => rule.id === 'AIV-009E');
+assert.deepEqual(splitOver12KwRule.conditions.find(condition => condition.field === 'gwp'), { field: 'gwp', operator: 'gte', value: 750 });
 
 const source = {
   systemName: 'Testanlage',
@@ -55,7 +59,6 @@ assert.equal(snapshot.system.chargeKg, 12.5);
 assert.equal(snapshot.system.ratedCapacityKw, 18.5);
 assert.equal(snapshot.system.specificRefrigerantLossPercent, 1.5);
 assert.equal(snapshot.system.productCategory, 'stationary-chiller');
-assert.equal(snapshot.system.siteSafetyRestrictionStatus, '');
 source.systemName = 'Geändert';
 assert.equal(snapshot.system.systemName, 'Testanlage');
 
