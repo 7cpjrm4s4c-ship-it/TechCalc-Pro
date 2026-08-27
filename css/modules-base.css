@@ -10,3 +10,13 @@
 .module-head { display: none; }
 .module-content { grid-column: span 12; }
 .module-content > * { margin-block: 0; }
+
+/* F-Gases: keep the unit-bearing decimal control optically identical to sibling selects. */
+.module-view[data-module="f-gases-check"] [data-schema-field-wrapper="specificRefrigerantLossPercent"] .control {
+  height: var(--tc-control-height);
+  min-height: var(--tc-control-height);
+}
+.module-view[data-module="f-gases-check"] [data-schema-field-wrapper="specificRefrigerantLossPercent"] .control > input {
+  height: calc(var(--tc-control-height) - 2px);
+  min-height: calc(var(--tc-control-height) - 2px);
+}

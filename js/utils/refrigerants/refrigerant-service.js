@@ -6,7 +6,6 @@ import REGULATION_DATASET from './regulations.js';
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 const normalizeIdentifier = value => String(value ?? '').trim().toLowerCase();
 const UNKNOWN = Symbol('unknown');
-
 function finiteNumber(value) {
   if (value == null || String(value).trim() === '') return null;
   const number = Number(typeof value === 'string' ? value.replace(',', '.') : value);
@@ -45,7 +44,7 @@ function deriveGasType(refrigerant) {
   return Object.freeze(types);
 }
 function evaluateException(exception, context) {
-  const booleanStatus = (field) => context[field] === '' || context[field] == null ? UNKNOWN : context[field] === 'yes';
+  const booleanStatus = field => context[field] === '' || context[field] == null ? UNKNOWN : context[field] === 'yes';
   switch (exception) {
     case 'site-safety': return booleanStatus('siteSafetyRestrictionStatus');
     case 'national-safety-standard': return booleanStatus('nationalSafetyStandardRestrictionStatus');
@@ -106,7 +105,6 @@ function deriveLeakCheck(context) {
   const isAnnexI = context.gasScope.includes('annex-i');
   const isAnnexII = context.gasScope.includes('annex-ii-group-1');
   if (!isAnnexI && !isAnnexII) return Object.freeze({ required: false, intervalMonths: null, leakDetectionRequired: false, status: 'not-applicable' });
-
   let scopeApplies = false;
   if (context.installationType === 'stationary') scopeApplies = ['refrigeration', 'air-conditioning', 'heat-pump'].includes(context.applicationType);
   if (context.installationType === 'mobile') {
@@ -117,18 +115,14 @@ function deriveLeakCheck(context) {
     }
   }
   if (!scopeApplies) return Object.freeze({ required: false, intervalMonths: null, leakDetectionRequired: false, status: context.installationType ? 'not-applicable' : 'incomplete' });
-
   const co2 = finiteNumber(context.co2EquivalentTonnes);
   const kg = finiteNumber(context.chargeKg);
   if ((isAnnexI && co2 == null) || (isAnnexII && kg == null)) return Object.freeze({ required: null, intervalMonths: null, leakDetectionRequired: null, status: 'incomplete' });
-
   const thresholdReached = (isAnnexI && co2 >= 5) || (isAnnexII && kg >= 1);
   if (!thresholdReached) return Object.freeze({ required: false, intervalMonths: null, leakDetectionRequired: false, status: 'not-required' });
-
   const hermetic = context.hermeticallySealedStatus === 'yes' && context.hermeticallySealedLabelStatus === 'yes';
   const hermeticExempt = hermetic && ((isAnnexI && co2 < 10) || (isAnnexII && kg < 2));
   if (hermeticExempt) return Object.freeze({ required: false, intervalMonths: null, leakDetectionRequired: false, status: 'exception-applies' });
-
   const intervals = [];
   if (isAnnexI) intervals.push(co2 >= 500 ? 3 : co2 >= 50 ? 6 : 12);
   if (isAnnexII) intervals.push(kg >= 100 ? 3 : kg >= 10 ? 6 : 12);
@@ -158,7 +152,6 @@ function deriveApplicableAnnexIvBan(context) {
   if (!confirmed) return Object.freeze({ status: 'none', date: null, ruleId: null });
   return Object.freeze({ status: 'resolved', date: confirmed.date, ruleId: confirmed.ruleId });
 }
-
 export function createRegulatoryContext(snapshot = {}) {
   const refrigerant = findRefrigerant(snapshot.refrigerantId);
   const gwp = getGwp(snapshot.refrigerantId);
@@ -178,7 +171,11 @@ export function createRegulatoryContext(snapshot = {}) {
   };
   const placed = validDate(withBan.placedOnMarketDate);
   const banDate = validDate(withBan.applicableAnnexIvBanDate);
-  withBan.annexIvCompliance = ban.status === 'resolved' && placed != null && banDate != null ? (placed >= banDate ? 'non-compliant' : 'compliant') : '';
+  withBan.annexIvCompliance = ban.status === 'none'
+    ? 'compliant'
+    : ban.status === 'resolved' && placed != null && banDate != null
+      ? (placed >= banDate ? 'non-compliant' : 'compliant')
+      : '';
   const leakCheck = deriveLeakCheck(withBan);
   withBan.leakCheckRequired = leakCheck.required;
   withBan.leakCheckIntervalMonths = leakCheck.intervalMonths;
@@ -186,7 +183,6 @@ export function createRegulatoryContext(snapshot = {}) {
   withBan.leakCheckStatus = leakCheck.status;
   return Object.freeze(withBan);
 }
-
 export function evaluateRegulations(context = {}) {
   return REGULATION_DATASET.rules.map(rule => {
     const dateStatus = evaluateRuleDate(rule, context.assessmentDate);
@@ -204,7 +200,6 @@ export function evaluateRegulations(context = {}) {
     return Object.freeze({ rule: clone(rule), status: 'matched', reasons: Object.freeze([]) });
   });
 }
-
 export function getDataVersions() { return Object.freeze({ refrigerants: REFRIGERANT_DATASET.version, gwp: GWP_DATASET.version, regulations: REGULATION_DATASET.version, safetyClasses: SAFETY_CLASS_DATASET.version }); }
 export function getDataStatus() { return Object.freeze({ refrigerants: REFRIGERANT_DATASET.status, gwp: GWP_DATASET.status, regulations: REGULATION_DATASET.status, safetyClasses: SAFETY_CLASS_DATASET.status }); }
 export function listRefrigerants() { return clone(REFRIGERANT_DATASET.items) ?? []; }
@@ -221,5 +216,4 @@ export function getApplicableRegulations(context = {}) {
   if (!context || Object.keys(context).length === 0) return listRegulations();
   return evaluateRegulations(context).filter(entry => ['matched', 'exception-applies', 'matched-with-unresolved-exception', 'manual-review'].includes(entry.status)).map(entry => clone(entry.rule));
 }
-
 export default Object.freeze({ getDataVersions, getDataStatus, listRefrigerants, getRefrigerant, getGwp, listSafetyClasses, getSafetyClass, listRegulations, createRegulatoryContext, evaluateRegulations, getApplicableRegulations });

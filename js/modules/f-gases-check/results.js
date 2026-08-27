@@ -15,6 +15,19 @@ const STATUS_LABELS = Object.freeze({
   'requirements-identified': 'Pflichten ermittelt'
 });
 
+const REASON_LABELS = Object.freeze({
+  'assessment-date': 'Bewertungsdatum',
+  assessmentDate: 'Bewertungsdatum',
+  placedOnMarketDate: 'Datum des erstmaligen Inverkehrbringens',
+  ratedCapacityKw: 'Nennleistung',
+  refrigerantOrigin: 'Herkunft des Servicekältemittels',
+  siteSafetyRestrictionStatus: 'standortbezogene Sicherheitsanforderung',
+  nationalSafetyStandardRestrictionStatus: 'nationale Sicherheitsnorm',
+  coolingBelowMinus50Status: 'Kühlung unter −50 °C',
+  cascadePrimaryCircuitStatus: 'Kaskaden-Primärkreislauf',
+  annexIvCompliance: 'Anhang-IV-Konformität'
+});
+
 export const formatFGasesStatus = value => STATUS_LABELS[value] || value || '—';
 const fmt = (value, digits = 2) => value == null || !Number.isFinite(Number(value)) ? '—' : Number(value).toLocaleString('de-DE', { maximumFractionDigits: digits });
 const boolLabel = value => value === true ? 'ja' : value === false ? 'nein' : '—';
@@ -50,10 +63,7 @@ function originLabel(value) {
 }
 
 function serviceScenarioRows(details = {}) {
-  return (details.originScenarios || []).map(item => ({
-    label: `Servicekältemittel: ${originLabel(item.refrigerantOrigin)}`,
-    value: serviceLabel({ status: item.status })
-  }));
+  return (details.originScenarios || []).map(item => ({ label: `Servicekältemittel: ${originLabel(item.refrigerantOrigin)}`, value: serviceLabel({ status: item.status }) }));
 }
 
 function obligationRows(items = []) {
@@ -70,13 +80,28 @@ function obligationRows(items = []) {
   });
 }
 
-function dataReferenceRows(result = {}) {
-  const versions = result.dataVersions || {};
+function dataReferenceRows() {
   return [
-    { label: 'Kältemitteldaten – Quelle', value: `Umweltbundesamt – Treibhauspotentiale (GWP) ausgewählter Verbindungen und Gemische, Stand März 2026${versions.refrigerants ? ` · interner Datenstand ${versions.refrigerants}` : ''}` },
-    { label: 'GWP-Daten – Rechtsbezug', value: `Verordnung (EU) 2024/573 und UBA-Datenstand März 2026${versions.gwp ? ` · interner Datenstand ${versions.gwp}` : ''}` },
-    { label: 'Rechtsgrundlagen', value: `Verordnung (EU) 2024/573; Chemikaliengesetz (ChemG); Chemikalien-Klimaschutzverordnung (ChemKlimaschutzV)${versions.regulations ? ` · interner Rechtsdatenstand ${versions.regulations}` : ''}` }
+    { label: 'Kältemitteldaten – Quelle', value: 'Umweltbundesamt – Treibhauspotentiale (GWP) ausgewählter Verbindungen und Gemische, Stand März 2026' },
+    { label: 'GWP-Daten – Rechtsbezug', value: 'Verordnung (EU) 2024/573 und Umweltbundesamt, Datenstand März 2026' },
+    { label: 'Rechtsgrundlagen', value: 'Verordnung (EU) 2024/573; Chemikaliengesetz (ChemG); Chemikalien-Klimaschutzverordnung (ChemKlimaschutzV)' }
   ];
+}
+
+function unresolvedMessages(entries = []) {
+  const seen = new Set();
+  const messages = [];
+  for (const entry of entries) {
+    const reasons = entry.reasons?.length ? entry.reasons : ['unbekannte Voraussetzung'];
+    const labels = reasons.map(reason => REASON_LABELS[reason] || reason).join(', ');
+    const source = entry.rule?.legalSource || entry.rule?.id || 'Regel';
+    const message = `${source}: offen wegen ${labels}.`;
+    if (!seen.has(message)) {
+      seen.add(message);
+      messages.push(message);
+    }
+  }
+  return messages;
 }
 
 export function buildFGasesResultModel(state = {}, result = {}) {
@@ -89,7 +114,7 @@ export function buildFGasesResultModel(state = {}, result = {}) {
   const unresolved = allEvaluations.filter(entry => entry.status === 'unresolved');
   const notices = [];
   if (manualRules.length) notices.push({ title: 'Manuelle Rechtsprüfung', messages: [`Nicht automatisch entscheidbar: ${manualRules.join(', ')}`], prefix: 'Hinweis' });
-  if (unresolved.length) notices.push({ title: 'Unvollständige Bewertung', messages: ['Für einzelne Regeln fehlen rechtlich erforderliche Angaben. Fehlende Angaben werden nicht als Freigabe gewertet.'], prefix: 'Hinweis' });
+  if (unresolved.length) notices.push({ title: 'Unvollständige Bewertung', messages: unresolvedMessages(unresolved), prefix: 'Hinweis' });
 
   return {
     primary: {
@@ -118,7 +143,7 @@ export function buildFGasesResultModel(state = {}, result = {}) {
           { label: 'GWP nach F-Gas-Verordnung', value: result.gwp ?? '—' },
           { label: 'Füllmenge', value: fmt(result.chargeKg, 3), unit: 'kg' },
           { label: 'CO₂-Äquivalent', value: fmt(result.co2EquivalentTonnes, 3), unit: 't' },
-          ...dataReferenceRows(result)
+          ...dataReferenceRows()
         ]
       },
       {
