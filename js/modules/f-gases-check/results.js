@@ -19,12 +19,28 @@ const INPUT_FIELD_LABELS = Object.freeze({
   assessmentDate: 'Bewertungsdatum', placedOnMarketDate: 'Erstmaliges Inverkehrbringen', installedAtSiteDate: 'Errichtung am Aufstellungsort', applicationType: 'Anlagenart', installationType: 'Aufstellung', mobileEquipmentType: 'Art der mobilen Einrichtung', productCategory: 'Produkt-/Anlagenkategorie', constructionType: 'Bauform', splitType: 'Split-Systemart', ratedCapacityKw: 'Nennleistung', refrigerantId: 'Kältemittel', chargeKg: 'Füllmenge', plannedActivity: 'Aktuell zu prüfende Tätigkeit', refrigerantOrigin: 'Herkunft des Servicekältemittels', preChargedStatus: 'Einrichtung vorbefüllt', leakDetectionSystemStatus: 'Leckage-Erkennungssystem vorhanden', hermeticallySealedStatus: 'Hermetisch geschlossen', hermeticallySealedLabelStatus: 'Als hermetisch geschlossen gekennzeichnet', coolingBelowMinus50Status: 'Kühlung von Erzeugnissen unter −50 °C', siteSafetyRestrictionStatus: 'Standortbezogene Sicherheitsanforderung verhindert niedrigeres GWP', nationalSafetyStandardRestrictionStatus: 'Nationale Sicherheitsnorm verhindert Alternative', cascadePrimaryCircuitStatus: 'Primärer Kältemittelkreislauf eines Kaskadensystems', specificRefrigerantLossPercent: 'Spezifischer Kältemittelverlust', personCertificationStatus: 'Sachkunde der natürlichen Person', companyCertificationStatus: 'Unternehmenszertifikat'
 });
 
+const CORE_REQUIRED_FIELDS = Object.freeze(['assessmentDate', 'applicationType', 'installationType', 'productCategory', 'constructionType', 'ratedCapacityKw', 'refrigerantId', 'chargeKg', 'placedOnMarketDate']);
+const DATE_FIELDS = new Set(['assessmentDate', 'placedOnMarketDate', 'installedAtSiteDate']);
 const DERIVED_FIELD_LABELS = Object.freeze({ gwp: 'GWP des ausgewählten Kältemittels', co2EquivalentTonnes: 'CO₂-Äquivalent', gasScope: 'Stoffklassifikation des Kältemittels', gasType: 'Kältemittelart', leakCheckRequired: 'abgeleitete Dichtheitskontrollpflicht', leakCheckIntervalMonths: 'abgeleitetes Prüfintervall der Dichtheitskontrolle', leakDetectionRequired: 'abgeleitete Pflicht zum Leckage-Erkennungssystem', annexIvCompliance: 'abgeleitete Anhang-IV-Konformität' });
 
 export const formatFGasesStatus = value => STATUS_LABELS[value] || value || '—';
 const fmt = (value, digits = 2) => value == null || !Number.isFinite(Number(value)) ? '—' : Number(value).toLocaleString('de-DE', { maximumFractionDigits: digits });
 const boolLabel = value => value === true ? 'ja' : value === false ? 'nein' : '—';
-const hasValue = value => value !== undefined && value !== null && value !== '';
+const hasValue = value => value !== undefined && value !== null && String(value).trim() !== '';
+
+function validDateInput(value) {
+  const raw = String(value ?? '').trim();
+  let day; let month; let year;
+  let match = raw.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if (match) [, day, month, year] = match;
+  else {
+    match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!match) return false;
+    [, year, month, day] = match;
+  }
+  const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+  return date.getUTCFullYear() === Number(year) && date.getUTCMonth() === Number(month) - 1 && date.getUTCDate() === Number(day);
+}
 
 function legalSourceLabel(source = '') {
   const value = String(source);
@@ -90,29 +106,55 @@ function dataReferenceRows() {
   ];
 }
 
-function unresolvedInputMessages(entries = [], state = {}, context = {}) {
-  const fields = new Map();
-  for (const entry of entries) {
-    for (const reason of entry.reasons || []) {
-      const normalizedReason = reason === 'assessment-date' ? 'assessmentDate' : reason;
-      const isInput = Boolean(INPUT_FIELD_LABELS[normalizedReason]);
-      const isDerived = Boolean(DERIVED_FIELD_LABELS[normalizedReason]);
-      if (!isInput && !isDerived) continue;
-      if (isInput && hasValue(state[normalizedReason])) continue;
-      if (isDerived && hasValue(context[normalizedReason])) continue;
-      if (!fields.has(normalizedReason)) fields.set(normalizedReason, { isInput, sources: new Set() });
-      fields.get(normalizedReason).sources.add(legalSourceLabel(entry.rule?.legalSource || entry.rule?.id || 'Regel'));
+function collectInputIssues(state = {}, result = {}) {
+  const issues = new Map();
+  const add = (field, source = '', reason = 'required') => {
+    if (!INPUT_FIELD_LABELS[field]) return;
+    if (!issues.has(field)) issues.set(field, { field, reason, sources: new Set() });
+    if (source) issues.get(field).sources.add(legalSourceLabel(source));
+    if (reason === 'invalid') issues.get(field).reason = 'invalid';
+  };
+
+  for (const field of CORE_REQUIRED_FIELDS) {
+    if (!hasValue(state[field])) add(field);
+    else if (DATE_FIELDS.has(field) && !validDateInput(state[field])) add(field, '', 'invalid');
+  }
+
+  const allEvaluations = [...(result.regulationEvaluation || []), ...(result.lifecycleRegulationEvaluation || [])];
+  for (const entry of allEvaluations.filter(item => item.status === 'unresolved')) {
+    for (const rawReason of entry.reasons || []) {
+      const field = rawReason === 'assessment-date' ? 'assessmentDate' : rawReason;
+      if (!INPUT_FIELD_LABELS[field]) continue;
+      if (!hasValue(state[field])) add(field, entry.rule?.legalSource || entry.rule?.id);
+      else if (DATE_FIELDS.has(field) && !validDateInput(state[field])) add(field, entry.rule?.legalSource || entry.rule?.id, 'invalid');
     }
   }
 
-  return [...fields.entries()].map(([field, detail]) => {
-    if (detail.isInput) {
-      if (field === 'assessmentDate') return 'Bitte Eingabefeld „Bewertungsdatum“ ausfüllen. Das Datum wird für die zeitbezogene Prüfung der anwendbaren Rechtsregeln benötigt.';
-      const sources = [...detail.sources].join('; ');
-      return `Bitte Eingabefeld „${INPUT_FIELD_LABELS[field]}“ ausfüllen.${sources ? ` Betroffene Rechtsgrundlage${detail.sources.size > 1 ? 'n' : ''}: ${sources}.` : ''}`;
-    }
-    const sources = [...detail.sources].join('; ');
-    return `Die ${DERIVED_FIELD_LABELS[field]} kann noch nicht bestimmt werden. Bitte die dafür erforderlichen Anlagen- und Kältemittelangaben prüfen.${sources ? ` Betroffene Rechtsgrundlage${detail.sources.size > 1 ? 'n' : ''}: ${sources}.` : ''}`;
+  const lossDuty = (result.operatorDutyDetails?.obligations || []).find(item => item.type === 'specific-refrigerant-loss');
+  if (lossDuty?.status === 'applies' && !hasValue(state.specificRefrigerantLossPercent)) add('specificRefrigerantLossPercent', 'DE-CHEMKLIMA:§2(1)');
+  if (lossDuty?.status === 'incomplete') {
+    if (!hasValue(state.chargeKg)) add('chargeKg', 'DE-CHEMKLIMA:§2(1)');
+    if (!hasValue(state.installedAtSiteDate)) add('installedAtSiteDate', 'DE-CHEMKLIMA:§2(1)');
+  }
+
+  if (result.checks?.service === 'incomplete' && !hasValue(state.refrigerantOrigin)) add('refrigerantOrigin', 'EU-FGAS:Art.13(3)');
+  if (result.checks?.certification === 'incomplete') {
+    const matched = new Set((result.lifecycleRegulationEvaluation || []).filter(entry => ['matched', 'matched-with-unresolved-exception'].includes(entry.status)).map(entry => entry.rule?.id));
+    if ((matched.has('FG-050') || matched.has('FG-053') || matched.has('FG-054')) && !hasValue(state.personCertificationStatus)) add('personCertificationStatus', 'EU-FGAS:Art.10+DE-CHEMKLIMA:§5');
+    if (matched.has('FG-051') && !hasValue(state.companyCertificationStatus)) add('companyCertificationStatus', 'EU-FGAS:Art.10+DE-CHEMKLIMA:§10');
+  }
+
+  return [...issues.values()];
+}
+
+function inputIssueMessages(issues = []) {
+  return issues.map(issue => {
+    const label = INPUT_FIELD_LABELS[issue.field];
+    const sources = [...issue.sources];
+    if (issue.reason === 'invalid' && DATE_FIELDS.has(issue.field)) return `Bitte Eingabefeld „${label}“ im Format TT.MM.JJJJ ausfüllen.`;
+    if (issue.field === 'assessmentDate') return 'Bitte Eingabefeld „Bewertungsdatum“ ausfüllen. Das Datum wird für die zeitbezogene Prüfung der anwendbaren Rechtsregeln benötigt.';
+    const sourceText = sources.length ? ` Rechtsgrundlage${sources.length > 1 ? 'n' : ''}: ${sources.join('; ')}.` : '';
+    return `Bitte Eingabefeld „${label}“ ausfüllen.${sourceText}`;
   });
 }
 
@@ -123,11 +165,10 @@ export function buildFGasesResultModel(state = {}, result = {}) {
   const duties = result.operatorDutyDetails || {};
   const allEvaluations = [...(result.regulationEvaluation || []), ...(result.lifecycleRegulationEvaluation || [])];
   const manualRules = [...new Set(allEvaluations.filter(entry => entry.status === 'manual-review').map(entry => entry.rule?.legalSource || entry.rule?.id).filter(Boolean))];
-  const unresolved = allEvaluations.filter(entry => entry.status === 'unresolved');
-  const unresolvedMessages = unresolvedInputMessages(unresolved, state, result.regulatoryContext || {});
+  const inputIssues = collectInputIssues(state, result);
   const notices = [];
   if (manualRules.length) notices.push({ title: 'Manuelle Rechtsprüfung', messages: [`Nicht automatisch entscheidbar: ${manualRules.map(legalSourceLabel).join(', ')}`], prefix: 'Hinweis' });
-  if (unresolvedMessages.length) notices.push({ title: 'Unvollständige Bewertung', messages: unresolvedMessages, prefix: 'Hinweis' });
+  if (inputIssues.length) notices.push({ title: 'Unvollständige Bewertung', messages: inputIssueMessages(inputIssues), prefix: 'Hinweis' });
 
   return {
     primary: {
