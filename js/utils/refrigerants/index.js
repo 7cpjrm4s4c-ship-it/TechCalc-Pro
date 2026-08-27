@@ -7,5 +7,7 @@ export {
   listSafetyClasses,
   getSafetyClass,
   listRegulations,
+  createRegulatoryContext,
+  evaluateRegulations,
   getApplicableRegulations
 } from './refrigerant-service.js';
