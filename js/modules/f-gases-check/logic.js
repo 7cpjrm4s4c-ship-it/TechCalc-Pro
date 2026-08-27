@@ -127,9 +127,14 @@ function aggregateOperatorDuties(snapshot, context, evaluations) {
   if (matchedIds.has('FG-052')) obligations.push({ id: 'FG-052', type: 'contractor-certification' });
   if (matchedIds.has('FG-053')) obligations.push({ id: 'FG-053', type: 'certified-person-for-leak-check' });
   if (matchedIds.has('FG-054')) obligations.push({ id: 'FG-054', type: 'certified-person-for-recovery' });
-  if ((matchedIds.has('FG-053') || matchedIds.has('FG-054')) && snapshot.personCertificationStatus === 'not-verified') nonCompliant = true;
-  if ((matchedIds.has('FG-053') || matchedIds.has('FG-054')) && !snapshot.personCertificationStatus) incomplete = true;
-  if (matchedIds.has('FG-052') && snapshot.companyCertificationStatus === 'not-verified' && snapshot.personCertificationStatus === 'not-verified') nonCompliant = true;
+
+  const personRequired = matchedIds.has('FG-053') || matchedIds.has('FG-054');
+  const companyRequired = matchedIds.has('FG-052');
+  if (personRequired && snapshot.personCertificationStatus === 'not-verified') nonCompliant = true;
+  if (personRequired && !snapshot.personCertificationStatus) incomplete = true;
+  if (companyRequired && snapshot.companyCertificationStatus === 'not-verified') nonCompliant = true;
+  if (companyRequired && !snapshot.companyCertificationStatus) incomplete = true;
+
   return { status: nonCompliant ? 'non-compliant' : incomplete ? 'incomplete' : obligations.length ? 'requirements-identified' : 'not-applicable', obligations };
 }
 
