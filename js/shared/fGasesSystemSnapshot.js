@@ -1,6 +1,6 @@
 import { getDataVersions } from '../utils/refrigerants/index.js';
 
-export const F_GASES_SYSTEM_SNAPSHOT_VERSION = 1;
+export const F_GASES_SYSTEM_SNAPSHOT_VERSION = 2;
 
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 
@@ -13,11 +13,28 @@ export function createFGasesSystemSnapshot(state = {}, { generatedAt = new Date(
     dataVersions: clone(state.dataVersions ?? getDataVersions()),
     system: {
       systemName: state.systemName || '',
-      systemType: state.systemType || '',
+      applicationType: state.applicationType || '',
+      installationType: state.installationType || '',
+      productCategory: state.productCategory || '',
       constructionType: state.constructionType || '',
       performanceRange: state.performanceRange || '',
+      ratedCapacityKw: state.ratedCapacityKw === '' || state.ratedCapacityKw == null ? null : Number(state.ratedCapacityKw),
       refrigerantId: state.refrigerantId || '',
-      chargeKg: state.chargeKg === '' || state.chargeKg == null ? null : Number(state.chargeKg)
+      chargeKg: state.chargeKg === '' || state.chargeKg == null ? null : Number(state.chargeKg),
+      assessmentDate: state.assessmentDate || '',
+      placedOnMarketDate: state.placedOnMarketDate || '',
+      plannedActivity: state.plannedActivity || '',
+      refrigerantOrigin: state.refrigerantOrigin || '',
+      leakDetectionSystemStatus: state.leakDetectionSystemStatus || '',
+      hermeticallySealedStatus: state.hermeticallySealedStatus || '',
+      hermeticallySealedLabelStatus: state.hermeticallySealedLabelStatus || '',
+      coolingBelowMinus50Status: state.coolingBelowMinus50Status || '',
+      siteSafetyRestrictionStatus: state.siteSafetyRestrictionStatus || '',
+      nationalSafetyStandardRestrictionStatus: state.nationalSafetyStandardRestrictionStatus || '',
+      cascadePrimaryCircuitStatus: state.cascadePrimaryCircuitStatus || '',
+      specificRefrigerantLossPercent: state.specificRefrigerantLossPercent === '' || state.specificRefrigerantLossPercent == null ? null : Number(state.specificRefrigerantLossPercent),
+      personCertificationStatus: state.personCertificationStatus || '',
+      companyCertificationStatus: state.companyCertificationStatus || ''
     }
   };
 

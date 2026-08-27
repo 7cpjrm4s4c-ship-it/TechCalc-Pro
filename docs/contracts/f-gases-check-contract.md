@@ -38,6 +38,30 @@ Nicht enthalten sind EN-378-Berechnungen, zulässige Füllmengen nach EN 378, Ra
 4. Fachlogik bleibt von der UI getrennt.
 5. Es werden keine direkten Zugriffe auf interne Zustände anderer Fachmodule eingeführt.
 
+## Eingabe- und State-Modell
+
+Der fachliche Modulzustand ist ab Schema-Version 2 auf die Regelmatrix `docs/engineering/f-gases-rule-matrix.md` ausgerichtet. Er enthält nur Eingaben, die für mindestens eine der dort dokumentierten Prüfgruppen erforderlich sind.
+
+Mindestens erfasst werden:
+
+- Anlagenart und Aufstellung,
+- konkrete Produkt-/Anlagenkategorie aus dem Kälte-/Klima-/Wärmepumpen-Kernscope von Anhang IV,
+- Bauform und Nennleistung,
+- Kältemittel und Füllmenge,
+- Bewertungsdatum und Datum des erstmaligen Inverkehrbringens,
+- zu prüfende Tätigkeit und Herkunft des Servicekältemittels,
+- Status des Leckage-Erkennungssystems,
+- hermetischer Verschluss und zugehörige Kennzeichnung,
+- Kühlung von Erzeugnissen unter -50 °C,
+- Standort- bzw. nationale Sicherheitsanforderung,
+- Kaskaden-Primärkreislauf,
+- spezifischer Kältemittelverlust,
+- Sachkunde- und Unternehmenszertifizierungsstatus.
+
+Rechtlich relevante Ja-/Nein-Eigenschaften verwenden einen dreistufigen Zustand (`yes`, `no`, nicht angegeben), damit fehlende Informationen nicht implizit als `false` bewertet werden.
+
+Die State-Version ist unabhängig von den Datenversionen für Kältemittel, GWP und Rechtsdaten. Änderungen am fachlichen State-Contract erhöhen die Schema-Version; Änderungen an Rechts- oder Stoffdaten erhöhen ausschließlich deren jeweilige Datenversion.
+
 ## Kältemittelplattform
 
 Die gemeinsame Plattformkomponente liegt unter `js/utils/refrigerants/` und besteht aus:
