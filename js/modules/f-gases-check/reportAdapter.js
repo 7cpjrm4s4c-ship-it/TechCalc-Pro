@@ -1,10 +1,13 @@
 import config from './config.js';
 import { F_GASES_SCHEMA_VERSION } from './state.js';
 import { createFGasesSystemSnapshot } from '../../shared/fGasesSystemSnapshot.js';
+import { buildFGasesResultModel } from './results.js';
 
-export const F_GASES_REPORT_DTO_VERSION = 1;
+export const F_GASES_REPORT_DTO_VERSION = 2;
+const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 
 export function buildFGasesReportDto({ state = {}, calculation = {}, generatedAt = new Date().toISOString() } = {}) {
+  const resultModel = buildFGasesResultModel(state, calculation);
   return Object.freeze({
     metadata: {
       dtoType: 'techcalc.f-gases-check.report',
@@ -15,13 +18,32 @@ export function buildFGasesReportDto({ state = {}, calculation = {}, generatedAt
       generatedAt
     },
     systemSnapshot: createFGasesSystemSnapshot(state, { generatedAt }),
-    result: {
+    summary: {
       status: calculation.status || 'not-specified',
       gwp: calculation.gwp ?? null,
+      chargeKg: calculation.chargeKg ?? null,
       co2EquivalentTonnes: calculation.co2EquivalentTonnes ?? null,
-      checks: { ...(calculation.checks || {}) }
+      checks: clone(calculation.checks || {})
     },
-    dataVersions: { ...(calculation.dataVersions || state.dataVersions || {}) }
+    leakCheck: clone(calculation.leakCheckDetails || {}),
+    documentation: clone(calculation.documentationDetails || {}),
+    operatorDuties: clone(calculation.operatorDutyDetails || {}),
+    applicableRegulations: clone((calculation.applicableRegulations || []).map(rule => ({
+      id: rule.id,
+      legalSource: rule.legalSource,
+      validFrom: rule.validFrom,
+      validUntil: rule.validUntil || null,
+      messageKey: rule.messageKey
+    }))),
+    resultGroups: clone(resultModel.groups || []),
+    notices: clone(resultModel.notices || []),
+    dataVersions: clone(calculation.dataVersions || state.dataVersions || {}),
+    sources: [
+      { id: 'EU-FGAS', title: 'Verordnung (EU) 2024/573', role: 'EU-Rechtsgrundlage' },
+      { id: 'DE-CHEMG', title: 'Chemikaliengesetz in der für Version 1.5.0 dokumentierten Fassung', role: 'Deutsche Ergänzung' },
+      { id: 'DE-CHEMKLIMA', title: 'Chemikalien-Klimaschutzverordnung', role: 'Deutsche Durchführung' },
+      { id: 'UBA-GWP-2026-03', title: 'UBA Treibhauspotentiale, Stand März 2026', role: 'GWP-Daten' }
+    ]
   });
 }
 
