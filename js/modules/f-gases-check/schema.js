@@ -5,25 +5,20 @@ const yesNoUnknownOptions = Object.freeze([option('', 'Nicht angegeben'), option
 const applicationTypeOptions = Object.freeze([option('refrigeration', 'Kälteanlage'), option('air-conditioning', 'Klimaanlage'), option('heat-pump', 'Wärmepumpe')]);
 const installationTypeOptions = Object.freeze([option('stationary', 'Ortsfest'), option('mobile', 'Mobil')]);
 const mobileEquipmentTypeOptions = Object.freeze([
-  option('', 'Nicht angegeben'),
-  option('refrigerated-truck-trailer', 'Kühllastkraftfahrzeug / Kühlanhänger'),
+  option('', 'Nicht angegeben'), option('refrigerated-truck-trailer', 'Kühllastkraftfahrzeug / Kühlanhänger'),
   option('light-refrigerated-intermodal-rail', 'Leichtes Kühlfahrzeug / intermodaler Container / Eisenbahnkühlwaggon'),
   option('mobile-ac-heat-pump-heavy-etc', 'Mobile Klima-/Wärmepumpe in schwerem Nutzfahrzeug, Lieferwagen, mobiler Maschine, Zug oder Luftfahrzeug')
 ]);
 const productCategoryOptions = Object.freeze([
-  option('household-refrigerator-freezer', 'Haushaltskühl-/Gefriergerät'),
-  option('commercial-self-contained-refrigerator-freezer', 'Gewerbliches in sich geschlossenes Kühl-/Gefriergerät'),
-  option('self-contained-refrigeration-system', 'In sich geschlossene Kälteanlage'),
-  option('other-refrigeration-system', 'Sonstige Kälteanlage'),
-  option('centralized-commercial-refrigeration-system', 'Mehrteilige zentralisierte gewerbliche Kälteanlage'),
-  option('stationary-chiller', 'Ortsfester Kühler'),
-  option('self-contained-ac-heat-pump', 'In sich geschlossenes Klima-/Wärmepumpensystem'),
-  option('split-ac-heat-pump', 'Split-Klima-/Wärmepumpensystem'),
+  option('household-refrigerator-freezer', 'Haushaltskühl-/Gefriergerät'), option('commercial-self-contained-refrigerator-freezer', 'Gewerbliches in sich geschlossenes Kühl-/Gefriergerät'),
+  option('self-contained-refrigeration-system', 'In sich geschlossene Kälteanlage'), option('other-refrigeration-system', 'Sonstige Kälteanlage'),
+  option('centralized-commercial-refrigeration-system', 'Mehrteilige zentralisierte gewerbliche Kälteanlage'), option('stationary-chiller', 'Ortsfester Kühler'),
+  option('self-contained-ac-heat-pump', 'In sich geschlossenes Klima-/Wärmepumpensystem'), option('split-ac-heat-pump', 'Split-Klima-/Wärmepumpensystem'),
   option('direct-evaporation-system', 'Nichtgeschlossenes Direktverdampfungssystem')
 ]);
 const constructionTypeOptions = Object.freeze([
-  option('self-contained', 'In sich geschlossen'), option('portable', 'Tragbar / steckerfertig'), option('monoblock', 'Monoblock'),
-  option('split', 'Split'), option('mono-split', 'Mono-Split'), option('centralized', 'Zentralisiert'), option('cascade', 'Kaskadensystem'), option('other', 'Sonstige Bauform')
+  option('self-contained', 'In sich geschlossen'), option('portable', 'Tragbar / steckerfertig'), option('monoblock', 'Monoblock'), option('split', 'Split'),
+  option('mono-split', 'Mono-Split'), option('centralized', 'Zentralisiert'), option('cascade', 'Kaskadensystem'), option('other', 'Sonstige Bauform')
 ]);
 const splitTypeOptions = Object.freeze([option('', 'Nicht angegeben'), option('air-water', 'Luft-Wasser'), option('air-air', 'Luft-Luft'), option('other', 'Sonstiges Split-System')]);
 const plannedActivityOptions = Object.freeze([
@@ -33,6 +28,7 @@ const plannedActivityOptions = Object.freeze([
 const refrigerantOriginOptions = Object.freeze([option('', 'Nicht angegeben'), option('new', 'Neu'), option('reclaimed', 'Aufgearbeitet'), option('recycled', 'Recycelt')]);
 const certificationStatusOptions = Object.freeze([option('', 'Nicht geprüft'), option('verified', 'Nachgewiesen'), option('not-verified', 'Nicht nachgewiesen'), option('not-applicable', 'Nicht anwendbar')]);
 const isSplitSystem = state => ['split', 'mono-split'].includes(state?.constructionType) || state?.productCategory === 'split-ac-heat-pump';
+const isStockAssessment = state => state?.plannedActivity !== 'installation';
 
 function formatGermanDateInput(value) {
   const raw = String(value ?? '').trim();
@@ -41,7 +37,7 @@ function formatGermanDateInput(value) {
 }
 
 const schema = defineFormSchema({
-  version: 4,
+  version: 5,
   fields: [
     { key: 'systemName', label: 'Anlagenbezeichnung', type: FIELD_TYPES.TEXT },
     { key: 'applicationType', label: 'Anlagenart', type: FIELD_TYPES.SELECT, options: applicationTypeOptions },
@@ -55,9 +51,9 @@ const schema = defineFormSchema({
     { key: 'ratedCapacityKw', label: 'Nennleistung', type: FIELD_TYPES.DECIMAL, unit: 'kW' },
     { key: 'refrigerantId', label: 'Kältemittel', type: FIELD_TYPES.SELECT, options: [] },
     { key: 'chargeKg', label: 'Füllmenge', type: FIELD_TYPES.DECIMAL, unit: 'kg' },
-    { key: 'assessmentDate', label: 'Bewertungsdatum', type: FIELD_TYPES.TEXT, placeholder: 'TT.MM.JJJJ', format: formatGermanDateInput },
     { key: 'placedOnMarketDate', label: 'Erstmaliges Inverkehrbringen', type: FIELD_TYPES.TEXT, placeholder: 'TT.MM.JJJJ', format: formatGermanDateInput },
-    { key: 'installedAtSiteDate', label: 'Errichtung am Aufstellungsort', type: FIELD_TYPES.TEXT, placeholder: 'TT.MM.JJJJ', format: formatGermanDateInput },
+    { key: 'commissioningDate', label: 'Erstmalige Inbetriebnahme', type: FIELD_TYPES.TEXT, placeholder: 'TT.MM.JJJJ', format: formatGermanDateInput },
+    { key: 'stockAssessmentDate', label: 'Prüfdatum der Bestandsanlage', type: FIELD_TYPES.TEXT, placeholder: 'TT.MM.JJJJ', format: formatGermanDateInput, visibleWhen: isStockAssessment },
     { key: 'plannedActivity', label: 'Aktuell zu prüfende Tätigkeit', type: FIELD_TYPES.SELECT, options: plannedActivityOptions },
     { key: 'refrigerantOrigin', label: 'Herkunft des Servicekältemittels', type: FIELD_TYPES.SELECT, options: refrigerantOriginOptions },
     { key: 'preChargedStatus', label: 'Einrichtung vorbefüllt', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
@@ -75,7 +71,7 @@ const schema = defineFormSchema({
   groups: [
     { title: 'Anlage', fields: ['systemName', 'applicationType', 'installationType', 'mobileEquipmentType', 'productCategory', 'constructionType', 'splitType', 'performanceRange', 'performanceRangeInfo', 'ratedCapacityKw'], columns: 2, accent: 'blue' },
     { title: 'Kältemittel', fields: ['refrigerantId', 'chargeKg'], columns: 2, accent: 'blue' },
-    { title: 'Bewertungszeitpunkt und Tätigkeit', fields: ['assessmentDate', 'placedOnMarketDate', 'installedAtSiteDate', 'plannedActivity', 'refrigerantOrigin', 'preChargedStatus'], columns: 2, accent: 'blue' },
+    { title: 'Zeitliche Bewertungsgrundlage und Tätigkeit', fields: ['placedOnMarketDate', 'commissioningDate', 'stockAssessmentDate', 'plannedActivity', 'refrigerantOrigin', 'preChargedStatus'], columns: 2, accent: 'blue' },
     { title: 'Regelrelevante Eigenschaften', fields: ['leakDetectionSystemStatus', 'hermeticallySealedStatus', 'hermeticallySealedLabelStatus', 'coolingBelowMinus50Status', 'siteSafetyRestrictionStatus', 'nationalSafetyStandardRestrictionStatus', 'cascadePrimaryCircuitStatus', 'specificRefrigerantLossPercent'], columns: 2, accent: 'blue' },
     { title: 'Zertifizierung', fields: ['personCertificationStatus', 'companyCertificationStatus'], columns: 2, accent: 'blue' }
   ]

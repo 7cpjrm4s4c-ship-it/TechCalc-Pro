@@ -1,7 +1,7 @@
 import { createModuleState } from '../../core/state.js';
 import { getDataVersions } from '../../utils/refrigerants/index.js';
 
-export const F_GASES_SCHEMA_VERSION = 4;
+export const F_GASES_SCHEMA_VERSION = 5;
 
 export const initialState = Object.freeze({
   schemaVersion: F_GASES_SCHEMA_VERSION,
@@ -16,9 +16,9 @@ export const initialState = Object.freeze({
   ratedCapacityKw: '',
   refrigerantId: '',
   chargeKg: '',
-  assessmentDate: '',
   placedOnMarketDate: '',
-  installedAtSiteDate: '',
+  commissioningDate: '',
+  stockAssessmentDate: '',
   plannedActivity: '',
   refrigerantOrigin: '',
   preChargedStatus: '',
@@ -40,5 +40,4 @@ export const initialState = Object.freeze({
 });
 
 export const state = createModuleState(initialState, { moduleId: 'f-gases-check' });
-
 export default state;
