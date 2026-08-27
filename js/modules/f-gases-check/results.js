@@ -16,48 +16,28 @@ const STATUS_LABELS = Object.freeze({
 });
 
 const INPUT_FIELD_LABELS = Object.freeze({
-  assessmentDate: 'Bewertungsdatum',
-  placedOnMarketDate: 'Erstmaliges Inverkehrbringen',
-  installedAtSiteDate: 'Errichtung am Aufstellungsort',
-  applicationType: 'Anlagenart',
-  installationType: 'Aufstellung',
-  mobileEquipmentType: 'Art der mobilen Einrichtung',
-  productCategory: 'Produkt-/Anlagenkategorie',
-  constructionType: 'Bauform',
-  splitType: 'Split-Systemart',
-  ratedCapacityKw: 'Nennleistung',
-  refrigerantId: 'Kältemittel',
-  chargeKg: 'Füllmenge',
-  plannedActivity: 'Aktuell zu prüfende Tätigkeit',
-  refrigerantOrigin: 'Herkunft des Servicekältemittels',
-  preChargedStatus: 'Einrichtung vorbefüllt',
-  leakDetectionSystemStatus: 'Leckage-Erkennungssystem vorhanden',
-  hermeticallySealedStatus: 'Hermetisch geschlossen',
-  hermeticallySealedLabelStatus: 'Als hermetisch geschlossen gekennzeichnet',
-  coolingBelowMinus50Status: 'Kühlung von Erzeugnissen unter −50 °C',
-  siteSafetyRestrictionStatus: 'Standortbezogene Sicherheitsanforderung verhindert niedrigeres GWP',
-  nationalSafetyStandardRestrictionStatus: 'Nationale Sicherheitsnorm verhindert Alternative',
-  cascadePrimaryCircuitStatus: 'Primärer Kältemittelkreislauf eines Kaskadensystems',
-  specificRefrigerantLossPercent: 'Spezifischer Kältemittelverlust',
-  personCertificationStatus: 'Sachkunde der natürlichen Person',
-  companyCertificationStatus: 'Unternehmenszertifikat'
+  assessmentDate: 'Bewertungsdatum', placedOnMarketDate: 'Erstmaliges Inverkehrbringen', installedAtSiteDate: 'Errichtung am Aufstellungsort', applicationType: 'Anlagenart', installationType: 'Aufstellung', mobileEquipmentType: 'Art der mobilen Einrichtung', productCategory: 'Produkt-/Anlagenkategorie', constructionType: 'Bauform', splitType: 'Split-Systemart', ratedCapacityKw: 'Nennleistung', refrigerantId: 'Kältemittel', chargeKg: 'Füllmenge', plannedActivity: 'Aktuell zu prüfende Tätigkeit', refrigerantOrigin: 'Herkunft des Servicekältemittels', preChargedStatus: 'Einrichtung vorbefüllt', leakDetectionSystemStatus: 'Leckage-Erkennungssystem vorhanden', hermeticallySealedStatus: 'Hermetisch geschlossen', hermeticallySealedLabelStatus: 'Als hermetisch geschlossen gekennzeichnet', coolingBelowMinus50Status: 'Kühlung von Erzeugnissen unter −50 °C', siteSafetyRestrictionStatus: 'Standortbezogene Sicherheitsanforderung verhindert niedrigeres GWP', nationalSafetyStandardRestrictionStatus: 'Nationale Sicherheitsnorm verhindert Alternative', cascadePrimaryCircuitStatus: 'Primärer Kältemittelkreislauf eines Kaskadensystems', specificRefrigerantLossPercent: 'Spezifischer Kältemittelverlust', personCertificationStatus: 'Sachkunde der natürlichen Person', companyCertificationStatus: 'Unternehmenszertifikat'
 });
 
-const DERIVED_FIELD_LABELS = Object.freeze({
-  gwp: 'GWP des ausgewählten Kältemittels',
-  co2EquivalentTonnes: 'CO₂-Äquivalent',
-  gasScope: 'Stoffklassifikation des Kältemittels',
-  gasType: 'Kältemittelart',
-  leakCheckRequired: 'abgeleitete Dichtheitskontrollpflicht',
-  leakCheckIntervalMonths: 'abgeleitetes Prüfintervall der Dichtheitskontrolle',
-  leakDetectionRequired: 'abgeleitete Pflicht zum Leckage-Erkennungssystem',
-  annexIvCompliance: 'abgeleitete Anhang-IV-Konformität'
-});
+const DERIVED_FIELD_LABELS = Object.freeze({ gwp: 'GWP des ausgewählten Kältemittels', co2EquivalentTonnes: 'CO₂-Äquivalent', gasScope: 'Stoffklassifikation des Kältemittels', gasType: 'Kältemittelart', leakCheckRequired: 'abgeleitete Dichtheitskontrollpflicht', leakCheckIntervalMonths: 'abgeleitetes Prüfintervall der Dichtheitskontrolle', leakDetectionRequired: 'abgeleitete Pflicht zum Leckage-Erkennungssystem', annexIvCompliance: 'abgeleitete Anhang-IV-Konformität' });
 
 export const formatFGasesStatus = value => STATUS_LABELS[value] || value || '—';
 const fmt = (value, digits = 2) => value == null || !Number.isFinite(Number(value)) ? '—' : Number(value).toLocaleString('de-DE', { maximumFractionDigits: digits });
 const boolLabel = value => value === true ? 'ja' : value === false ? 'nein' : '—';
 const hasValue = value => value !== undefined && value !== null && value !== '';
+
+function legalSourceLabel(source = '') {
+  const value = String(source);
+  let match = value.match(/^EU-FGAS:Art\.(\d+)(?:\((\d+)\))?$/);
+  if (match) return `Verordnung (EU) 2024/573, Art. ${match[1]}${match[2] ? ` Abs. ${match[2]}` : ''}`;
+  match = value.match(/^DE-CHEMKLIMA:§(\d+)(?:\((\d+)\))?$/);
+  if (match) return `Chemikalien-Klimaschutzverordnung (ChemKlimaschutzV), § ${match[1]}${match[2] ? ` Abs. ${match[2]}` : ''}`;
+  match = value.match(/^DE-CHEMG:§([\w]+)(?:\((\d+)\))?$/);
+  if (match) return `Chemikaliengesetz (ChemG), § ${match[1]}${match[2] ? ` Abs. ${match[2]}` : ''}`;
+  if (value.includes('EU-FGAS:Art.10+DE-CHEMKLIMA:§5')) return 'Verordnung (EU) 2024/573, Art. 10; Chemikalien-Klimaschutzverordnung (ChemKlimaschutzV), § 5';
+  if (value.includes('EU-FGAS:Art.10+DE-CHEMKLIMA:§10')) return 'Verordnung (EU) 2024/573, Art. 10; Chemikalien-Klimaschutzverordnung (ChemKlimaschutzV), § 10';
+  return value;
+}
 
 function placingOnMarketLabel(status) {
   if (status === 'prohibited') return 'Inverkehrbringen unzulässig';
@@ -85,13 +65,8 @@ function leakCheckLabel(leak = {}) {
   return 'Dichtheitskontrolle nicht bewertet';
 }
 
-function originLabel(value) {
-  return ({ new: 'neu', reclaimed: 'aufgearbeitet', recycled: 'recycelt' }[value] || value || '—');
-}
-
-function serviceScenarioRows(details = {}) {
-  return (details.originScenarios || []).map(item => ({ label: `Servicekältemittel: ${originLabel(item.refrigerantOrigin)}`, value: serviceLabel({ status: item.status }) }));
-}
+function originLabel(value) { return ({ new: 'neu', reclaimed: 'aufgearbeitet', recycled: 'recycelt' }[value] || value || '—'); }
+function serviceScenarioRows(details = {}) { return (details.originScenarios || []).map(item => ({ label: `Servicekältemittel: ${originLabel(item.refrigerantOrigin)}`, value: serviceLabel({ status: item.status }) })); }
 
 function obligationRows(items = []) {
   return items.map(item => {
@@ -116,25 +91,29 @@ function dataReferenceRows() {
 }
 
 function unresolvedInputMessages(entries = [], state = {}, context = {}) {
-  const seen = new Set();
-  const messages = [];
+  const fields = new Map();
   for (const entry of entries) {
     for (const reason of entry.reasons || []) {
       const normalizedReason = reason === 'assessment-date' ? 'assessmentDate' : reason;
-      if (INPUT_FIELD_LABELS[normalizedReason]) {
-        if (hasValue(state[normalizedReason])) continue;
-        const message = `Bitte Eingabefeld „${INPUT_FIELD_LABELS[normalizedReason]}“ ausfüllen. Rechtsgrundlage: ${entry.rule?.legalSource || entry.rule?.id || 'Regel'}.`;
-        if (!seen.has(message)) { seen.add(message); messages.push(message); }
-        continue;
-      }
-      if (DERIVED_FIELD_LABELS[normalizedReason]) {
-        if (hasValue(context[normalizedReason])) continue;
-        const message = `Die ${DERIVED_FIELD_LABELS[normalizedReason]} kann noch nicht bestimmt werden. Bitte die dafür erforderlichen Anlagen- und Kältemittelangaben prüfen. Rechtsgrundlage: ${entry.rule?.legalSource || entry.rule?.id || 'Regel'}.`;
-        if (!seen.has(message)) { seen.add(message); messages.push(message); }
-      }
+      const isInput = Boolean(INPUT_FIELD_LABELS[normalizedReason]);
+      const isDerived = Boolean(DERIVED_FIELD_LABELS[normalizedReason]);
+      if (!isInput && !isDerived) continue;
+      if (isInput && hasValue(state[normalizedReason])) continue;
+      if (isDerived && hasValue(context[normalizedReason])) continue;
+      if (!fields.has(normalizedReason)) fields.set(normalizedReason, { isInput, sources: new Set() });
+      fields.get(normalizedReason).sources.add(legalSourceLabel(entry.rule?.legalSource || entry.rule?.id || 'Regel'));
     }
   }
-  return messages;
+
+  return [...fields.entries()].map(([field, detail]) => {
+    if (detail.isInput) {
+      if (field === 'assessmentDate') return 'Bitte Eingabefeld „Bewertungsdatum“ ausfüllen. Das Datum wird für die zeitbezogene Prüfung der anwendbaren Rechtsregeln benötigt.';
+      const sources = [...detail.sources].join('; ');
+      return `Bitte Eingabefeld „${INPUT_FIELD_LABELS[field]}“ ausfüllen.${sources ? ` Betroffene Rechtsgrundlage${detail.sources.size > 1 ? 'n' : ''}: ${sources}.` : ''}`;
+    }
+    const sources = [...detail.sources].join('; ');
+    return `Die ${DERIVED_FIELD_LABELS[field]} kann noch nicht bestimmt werden. Bitte die dafür erforderlichen Anlagen- und Kältemittelangaben prüfen.${sources ? ` Betroffene Rechtsgrundlage${detail.sources.size > 1 ? 'n' : ''}: ${sources}.` : ''}`;
+  });
 }
 
 export function buildFGasesResultModel(state = {}, result = {}) {
@@ -147,7 +126,7 @@ export function buildFGasesResultModel(state = {}, result = {}) {
   const unresolved = allEvaluations.filter(entry => entry.status === 'unresolved');
   const unresolvedMessages = unresolvedInputMessages(unresolved, state, result.regulatoryContext || {});
   const notices = [];
-  if (manualRules.length) notices.push({ title: 'Manuelle Rechtsprüfung', messages: [`Nicht automatisch entscheidbar: ${manualRules.join(', ')}`], prefix: 'Hinweis' });
+  if (manualRules.length) notices.push({ title: 'Manuelle Rechtsprüfung', messages: [`Nicht automatisch entscheidbar: ${manualRules.map(legalSourceLabel).join(', ')}`], prefix: 'Hinweis' });
   if (unresolvedMessages.length) notices.push({ title: 'Unvollständige Bewertung', messages: unresolvedMessages, prefix: 'Hinweis' });
 
   return {
@@ -163,39 +142,10 @@ export function buildFGasesResultModel(state = {}, result = {}) {
       ]
     },
     groups: [
-      {
-        title: 'Bewertungsumfang',
-        rows: [
-          { label: 'Prüfmodell', value: 'Vollständige Anlagenprüfung über Installation, Wartung/Instandhaltung, Reparatur, Dichtheitskontrolle, Rückgewinnung und Außerbetriebnahme' },
-          { label: 'Aktuell ausgewählte Tätigkeit', value: state.plannedActivity || '—' }
-        ]
-      },
-      {
-        title: 'Kältemittel und Klimawirkung',
-        rows: [
-          { label: 'Kältemittel', value: result.refrigerant?.name || state.refrigerantId || '—' },
-          { label: 'GWP nach F-Gas-Verordnung', value: result.gwp ?? '—' },
-          { label: 'Füllmenge', value: fmt(result.chargeKg, 3), unit: 'kg' },
-          { label: 'CO₂-Äquivalent', value: fmt(result.co2EquivalentTonnes, 3), unit: 't' },
-          ...dataReferenceRows()
-        ]
-      },
-      {
-        title: 'Wartung und Instandhaltung',
-        rows: [
-          { label: 'Gesamtbewertung', value: serviceLabel(service) },
-          ...serviceScenarioRows(service)
-        ]
-      },
-      {
-        title: 'Dichtheitskontrolle',
-        rows: [
-          { label: 'Bewertung', value: leakCheckLabel(leak) },
-          { label: 'Erforderlich', value: boolLabel(leak.required) },
-          { label: 'Prüfintervall', value: leak.intervalMonths ?? '—', unit: leak.intervalMonths ? 'Monate' : '' },
-          { label: 'Leckage-Erkennungssystem verpflichtend', value: boolLabel(leak.leakDetectionRequired) }
-        ]
-      },
+      { title: 'Bewertungsumfang', rows: [{ label: 'Prüfmodell', value: 'Vollständige Anlagenprüfung über Installation, Wartung/Instandhaltung, Reparatur, Dichtheitskontrolle, Rückgewinnung und Außerbetriebnahme' }, { label: 'Aktuell ausgewählte Tätigkeit', value: state.plannedActivity || '—' }] },
+      { title: 'Kältemittel und Klimawirkung', rows: [{ label: 'Kältemittel', value: result.refrigerant?.name || state.refrigerantId || '—' }, { label: 'GWP nach F-Gas-Verordnung', value: result.gwp ?? '—' }, { label: 'Füllmenge', value: fmt(result.chargeKg, 3), unit: 'kg' }, { label: 'CO₂-Äquivalent', value: fmt(result.co2EquivalentTonnes, 3), unit: 't' }, ...dataReferenceRows()] },
+      { title: 'Wartung und Instandhaltung', rows: [{ label: 'Gesamtbewertung', value: serviceLabel(service) }, ...serviceScenarioRows(service)] },
+      { title: 'Dichtheitskontrolle', rows: [{ label: 'Bewertung', value: leakCheckLabel(leak) }, { label: 'Erforderlich', value: boolLabel(leak.required) }, { label: 'Prüfintervall', value: leak.intervalMonths ?? '—', unit: leak.intervalMonths ? 'Monate' : '' }, { label: 'Leckage-Erkennungssystem verpflichtend', value: boolLabel(leak.leakDetectionRequired) }] },
       { title: 'Dokumentationspflichten', rows: obligationRows(docs.obligations || []).length ? obligationRows(docs.obligations || []) : [{ label: 'Status', value: formatFGasesStatus(docs.status) }] },
       { title: 'Betreiberpflichten', rows: obligationRows(duties.obligations || []).length ? obligationRows(duties.obligations || []) : [{ label: 'Status', value: formatFGasesStatus(duties.status) }] }
     ],

@@ -34,6 +34,12 @@ const refrigerantOriginOptions = Object.freeze([option('', 'Nicht angegeben'), o
 const certificationStatusOptions = Object.freeze([option('', 'Nicht geprüft'), option('verified', 'Nachgewiesen'), option('not-verified', 'Nicht nachgewiesen'), option('not-applicable', 'Nicht anwendbar')]);
 const isSplitSystem = state => ['split', 'mono-split'].includes(state?.constructionType) || state?.productCategory === 'split-ac-heat-pump';
 
+function formatGermanDateInput(value) {
+  const raw = String(value ?? '').trim();
+  const iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return iso ? `${iso[3]}.${iso[2]}.${iso[1]}` : raw;
+}
+
 const schema = defineFormSchema({
   version: 4,
   fields: [
@@ -49,9 +55,9 @@ const schema = defineFormSchema({
     { key: 'ratedCapacityKw', label: 'Nennleistung', type: FIELD_TYPES.DECIMAL, unit: 'kW' },
     { key: 'refrigerantId', label: 'Kältemittel', type: FIELD_TYPES.SELECT, options: [] },
     { key: 'chargeKg', label: 'Füllmenge', type: FIELD_TYPES.DECIMAL, unit: 'kg' },
-    { key: 'assessmentDate', label: 'Bewertungsdatum', type: FIELD_TYPES.TEXT, placeholder: 'JJJJ-MM-TT' },
-    { key: 'placedOnMarketDate', label: 'Erstmaliges Inverkehrbringen', type: FIELD_TYPES.TEXT, placeholder: 'JJJJ-MM-TT' },
-    { key: 'installedAtSiteDate', label: 'Errichtung am Aufstellungsort', type: FIELD_TYPES.TEXT, placeholder: 'JJJJ-MM-TT' },
+    { key: 'assessmentDate', label: 'Bewertungsdatum', type: FIELD_TYPES.TEXT, placeholder: 'TT.MM.JJJJ', inputmode: 'numeric', format: formatGermanDateInput },
+    { key: 'placedOnMarketDate', label: 'Erstmaliges Inverkehrbringen', type: FIELD_TYPES.TEXT, placeholder: 'TT.MM.JJJJ', inputmode: 'numeric', format: formatGermanDateInput },
+    { key: 'installedAtSiteDate', label: 'Errichtung am Aufstellungsort', type: FIELD_TYPES.TEXT, placeholder: 'TT.MM.JJJJ', inputmode: 'numeric', format: formatGermanDateInput },
     { key: 'plannedActivity', label: 'Aktuell zu prüfende Tätigkeit', type: FIELD_TYPES.SELECT, options: plannedActivityOptions },
     { key: 'refrigerantOrigin', label: 'Herkunft des Servicekältemittels', type: FIELD_TYPES.SELECT, options: refrigerantOriginOptions },
     { key: 'preChargedStatus', label: 'Einrichtung vorbefüllt', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },

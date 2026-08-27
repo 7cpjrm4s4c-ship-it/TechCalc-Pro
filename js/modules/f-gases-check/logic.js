@@ -2,12 +2,30 @@ import { createRegulatoryContext, evaluateRegulations, getDataStatus, getDataVer
 
 const LIFECYCLE_ACTIVITIES = Object.freeze(['installation', 'maintenance', 'repair', 'leak-check', 'recovery', 'decommissioning']);
 const SERVICE_ORIGINS = Object.freeze(['new', 'reclaimed', 'recycled']);
+const DATE_FIELDS = Object.freeze(['assessmentDate', 'placedOnMarketDate', 'installedAtSiteDate']);
 
 const finiteNumber = value => {
   if (value == null || String(value).trim() === '') return null;
   const number = Number(typeof value === 'string' ? value.replace(',', '.') : value);
   return Number.isFinite(number) ? number : null;
 };
+
+function normalizeDateValue(value) {
+  const raw = String(value ?? '').trim();
+  const german = raw.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if (!german) return raw;
+  const [, day, month, year] = german;
+  const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+  if (date.getUTCFullYear() !== Number(year) || date.getUTCMonth() !== Number(month) - 1 || date.getUTCDate() !== Number(day)) return raw;
+  return `${year}-${month}-${day}`;
+}
+
+function normalizeRegulatorySnapshot(snapshot = {}) {
+  const normalized = { ...snapshot };
+  for (const key of DATE_FIELDS) normalized[key] = normalizeDateValue(snapshot[key]);
+  return normalized;
+}
+
 const active = (evaluations, category) => evaluations.filter(entry => entry.rule.categories?.includes(category) && !['inactive', 'not-matched'].includes(entry.status));
 
 function aggregatePlacingOnMarket(snapshot, evaluations) {
@@ -38,12 +56,7 @@ function buildServiceDetails(snapshot, evaluations) {
     const context = createRegulatoryContext({ ...snapshot, plannedActivity: 'maintenance', refrigerantOrigin });
     return Object.freeze({ refrigerantOrigin, status: aggregateService(evaluateRegulations(context)) });
   });
-  return Object.freeze({
-    status,
-    assessedForLifecycle: true,
-    selectedRefrigerantOrigin: snapshot.refrigerantOrigin || '',
-    originScenarios: Object.freeze(originScenarios)
-  });
+  return Object.freeze({ status, assessedForLifecycle: true, selectedRefrigerantOrigin: snapshot.refrigerantOrigin || '', originScenarios: Object.freeze(originScenarios) });
 }
 
 function lifecycleEvaluations(snapshot) {
@@ -130,16 +143,17 @@ function uniqueApplicableRegulations(...evaluationSets) {
 }
 
 export function calculate(snapshot = {}) {
-  const refrigerant = getRefrigerant(snapshot.refrigerantId);
-  const gwp = getGwp(snapshot.refrigerantId);
-  const chargeKg = finiteNumber(snapshot.chargeKg);
-  const context = createRegulatoryContext(snapshot);
+  const normalizedSnapshot = normalizeRegulatorySnapshot(snapshot);
+  const refrigerant = getRefrigerant(normalizedSnapshot.refrigerantId);
+  const gwp = getGwp(normalizedSnapshot.refrigerantId);
+  const chargeKg = finiteNumber(normalizedSnapshot.chargeKg);
+  const context = createRegulatoryContext(normalizedSnapshot);
   const evaluations = evaluateRegulations(context);
-  const lifecycleRegulationEvaluation = lifecycleEvaluations(snapshot);
-  const serviceDetails = buildServiceDetails(snapshot, evaluations);
+  const lifecycleRegulationEvaluation = lifecycleEvaluations(normalizedSnapshot);
+  const serviceDetails = buildServiceDetails(normalizedSnapshot, evaluations);
   const leakCheckDetails = aggregateLeakCheck(context);
   const documentationDetails = aggregateDocumentation(context, evaluations);
-  const operatorDutyDetails = aggregateOperatorDuties(snapshot, context, lifecycleRegulationEvaluation);
+  const operatorDutyDetails = aggregateOperatorDuties(normalizedSnapshot, context, lifecycleRegulationEvaluation);
   return Object.freeze({
     status: chargeKg != null && gwp != null ? 'calculated' : 'not-specified',
     refrigerant,
@@ -158,11 +172,11 @@ export function calculate(snapshot = {}) {
     documentationDetails,
     operatorDutyDetails,
     checks: Object.freeze({
-      placingOnMarket: aggregatePlacingOnMarket(snapshot, evaluations),
+      placingOnMarket: aggregatePlacingOnMarket(normalizedSnapshot, evaluations),
       service: serviceDetails.status,
       leakCheck: leakCheckDetails.status,
       documentation: documentationDetails.status,
-      certification: aggregateCertification(snapshot, lifecycleRegulationEvaluation),
+      certification: aggregateCertification(normalizedSnapshot, lifecycleRegulationEvaluation),
       operatorDuties: operatorDutyDetails.status
     })
   });
