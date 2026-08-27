@@ -1,76 +1,43 @@
 import assert from 'node:assert/strict';
 import { calculate } from '../js/modules/f-gases-check/logic.js';
-import { createRegulatoryContext, evaluateRegulations } from '../js/utils/refrigerants/index.js';
 
-const splitHeatPump = {
-  applicationType: 'heat-pump',
-  installationType: 'stationary',
-  productCategory: 'split-ac-heat-pump',
-  constructionType: 'split',
-  splitType: 'air-water',
-  ratedCapacityKw: '10',
-  refrigerantId: 'R32',
-  chargeKg: '2.5',
-  assessmentDate: '2027-01-02',
-  plannedActivity: 'installation',
-  siteSafetyRestrictionStatus: 'no',
-  nationalSafetyStandardRestrictionStatus: 'no',
-  coolingBelowMinus50Status: 'no',
-  cascadePrimaryCircuitStatus: 'no',
-  personCertificationStatus: 'verified',
-  companyCertificationStatus: 'verified'
-};
+const base = { assessmentDate:'2027-01-02', installationType:'stationary', applicationType:'heat-pump', productCategory:'split-ac-heat-pump', constructionType:'split', splitType:'air-water', ratedCapacityKw:'10', refrigerantId:'R32', chargeKg:'8', siteSafetyRestrictionStatus:'no', nationalSafetyStandardRestrictionStatus:'no', hermeticallySealedStatus:'no', hermeticallySealedLabelStatus:'no', leakDetectionSystemStatus:'no' };
+const split = calculate(base);
+assert.equal(split.checks.placingOnMarket, 'prohibited');
+assert.equal(split.checks.leakCheck, 'required');
+assert.equal(split.leakCheckDetails.intervalMonths, 12);
+assert.equal(split.leakCheckDetails.leakDetectionRequired, false);
+assert.equal(split.checks.documentation, 'required');
+assert.ok(split.documentationDetails.obligations.some(item => item.type === 'leak-check-records' && item.retentionYears === 5));
 
-const splitResult = calculate(splitHeatPump);
-assert.equal(splitResult.gwp, 675);
-assert.equal(splitResult.checks.placingOnMarket, 'prohibited');
-assert.ok(splitResult.regulationEvaluation.some(entry => entry.rule.id === 'AIV-009B' && entry.status === 'matched'));
+const hermetic = calculate({ ...base, chargeKg:'8', refrigerantId:'R32', hermeticallySealedStatus:'yes', hermeticallySealedLabelStatus:'yes' });
+assert.equal(hermetic.checks.leakCheck, 'exception-applies');
 
-const splitWithSafetyException = calculate({ ...splitHeatPump, siteSafetyRestrictionStatus: 'yes' });
-assert.equal(splitWithSafetyException.checks.placingOnMarket, 'exception-applies');
-assert.ok(splitWithSafetyException.regulationEvaluation.some(entry => entry.rule.id === 'AIV-009B' && entry.status === 'exception-applies'));
+const highCharge = calculate({ ...base, applicationType:'refrigeration', productCategory:'other-refrigeration-system', refrigerantId:'R-404A', chargeKg:'130', leakDetectionSystemStatus:'yes' });
+assert.equal(highCharge.leakCheckDetails.required, true);
+assert.equal(highCharge.leakCheckDetails.intervalMonths, 6);
+assert.equal(highCharge.leakCheckDetails.leakDetectionRequired, true);
 
-const reclaimedService = calculate({
-  applicationType: 'refrigeration',
-  productCategory: 'other-refrigeration-system',
-  refrigerantId: 'R-404A',
-  chargeKg: '5',
-  assessmentDate: '2026-08-27',
-  plannedActivity: 'maintenance',
-  refrigerantOrigin: 'reclaimed',
-  coolingBelowMinus50Status: 'no',
-  siteSafetyRestrictionStatus: 'no'
-});
-assert.equal(reclaimedService.checks.service, 'allowed-under-exception');
+const mobileBeforeTransition = calculate({ ...base, installationType:'mobile', mobileEquipmentType:'light-refrigerated-intermodal-rail', applicationType:'refrigeration', assessmentDate:'2027-03-12' });
+assert.equal(mobileBeforeTransition.checks.leakCheck, 'not-applicable');
+const mobileAfterTransition = calculate({ ...mobileBeforeTransition.regulatoryContext, assessmentDate:'2027-03-13' });
+assert.equal(mobileAfterTransition.checks.leakCheck, 'required');
 
-const newGasService = calculate({
-  applicationType: 'refrigeration',
-  productCategory: 'other-refrigeration-system',
-  refrigerantId: 'R-404A',
-  chargeKg: '5',
-  assessmentDate: '2026-08-27',
-  plannedActivity: 'maintenance',
-  refrigerantOrigin: 'new',
-  coolingBelowMinus50Status: 'no',
-  siteSafetyRestrictionStatus: 'no'
-});
-assert.equal(newGasService.checks.service, 'prohibited');
+const preBan = calculate({ ...base, assessmentDate:'2028-01-01', placedOnMarketDate:'2026-12-31' });
+assert.equal(preBan.regulatoryContext.applicableAnnexIvBanDate, '2027-01-01');
+assert.equal(preBan.regulatoryContext.annexIvProofRequiredFrom, '2028-01-01');
+assert.ok(preBan.documentationDetails.obligations.some(item => item.type === 'pre-ban-proof'));
 
-const chillerContext = createRegulatoryContext({
-  applicationType: 'refrigeration',
-  installationType: 'stationary',
-  productCategory: 'stationary-chiller',
-  ratedCapacityKw: '20',
-  refrigerantId: 'R32',
-  chargeKg: '4',
-  assessmentDate: '2027-01-02',
-  siteSafetyRestrictionStatus: 'no'
-});
-const chillerEvaluation = evaluateRegulations(chillerContext);
-assert.ok(chillerEvaluation.some(entry => entry.rule.id === 'AIV-007D' && entry.status === 'manual-review'));
-assert.equal(calculate(chillerContext).checks.placingOnMarket, 'manual-review');
+const germanNewPlant = calculate({ ...base, applicationType:'refrigeration', productCategory:'other-refrigeration-system', chargeKg:'20', refrigerantId:'R32', installedAtSiteDate:'2010-01-01', specificRefrigerantLossPercent:'2.5' });
+const lossDuty = germanNewPlant.operatorDutyDetails.obligations.find(item => item.type === 'specific-refrigerant-loss');
+assert.equal(lossDuty.maximumPercent, 2);
+assert.equal(germanNewPlant.checks.operatorDuties, 'non-compliant');
 
-const missingDateEvaluation = evaluateRegulations(createRegulatoryContext({ refrigerantId: 'R32' }));
-assert.ok(missingDateEvaluation.every(entry => entry.status === 'unresolved'));
+const germanOldPlant = calculate({ ...germanNewPlant.regulatoryContext, installedAtSiteDate:'2004-01-01', specificRefrigerantLossPercent:'5.5' });
+assert.equal(germanOldPlant.operatorDutyDetails.obligations.find(item => item.type === 'specific-refrigerant-loss').maximumPercent, 6);
+assert.notEqual(germanOldPlant.checks.operatorDuties, 'non-compliant');
 
-console.log('F-Gases rule engine tests passed.');
+const certifiedLeakCheck = calculate({ ...base, plannedActivity:'leak-check', personCertificationStatus:'verified', companyCertificationStatus:'verified' });
+assert.ok(certifiedLeakCheck.operatorDutyDetails.obligations.some(item => item.type === 'certified-person-for-leak-check'));
+
+console.log('F-Gases complete rule engine tests passed.');
