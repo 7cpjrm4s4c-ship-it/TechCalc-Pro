@@ -1,5 +1,8 @@
 import { createRegulatoryContext, evaluateRegulations, getDataStatus, getDataVersions, getGwp, getRefrigerant } from '../../utils/refrigerants/index.js';
 
+const LIFECYCLE_ACTIVITIES = Object.freeze(['installation', 'maintenance', 'repair', 'leak-check', 'recovery', 'decommissioning']);
+const SERVICE_ORIGINS = Object.freeze(['new', 'reclaimed', 'recycled']);
+
 const finiteNumber = value => {
   if (value == null || String(value).trim() === '') return null;
   const number = Number(typeof value === 'string' ? value.replace(',', '.') : value);
@@ -16,14 +19,42 @@ function aggregatePlacingOnMarket(snapshot, evaluations) {
   if (relevant.some(entry => entry.status === 'exception-applies')) return 'exception-applies';
   return 'no-prohibition-found';
 }
-function aggregateService(snapshot, evaluations) {
-  if (!['maintenance', 'repair'].includes(snapshot.plannedActivity)) return 'not-applicable';
+
+function aggregateService(evaluations) {
   const relevant = active(evaluations, 'service');
-  if (relevant.some(entry => entry.status === 'matched' && entry.rule.effect === 'service-exception')) return 'allowed-under-exception';
-  if (relevant.some(entry => entry.status === 'matched' && entry.rule.effect === 'service-prohibited')) return 'prohibited';
-  if (relevant.some(entry => ['unresolved', 'matched-with-unresolved-exception', 'manual-review'].includes(entry.status))) return 'incomplete';
+  const exceptionMatched = relevant.some(entry => entry.status === 'matched' && entry.rule.effect === 'service-exception');
+  const prohibitionMatched = relevant.some(entry => entry.status === 'matched' && entry.rule.effect === 'service-prohibited');
+  const unresolved = relevant.some(entry => ['unresolved', 'matched-with-unresolved-exception', 'manual-review'].includes(entry.status));
+  if (exceptionMatched) return 'allowed-under-exception';
+  if (prohibitionMatched && unresolved) return 'incomplete';
+  if (prohibitionMatched) return 'prohibited';
+  if (unresolved) return 'incomplete';
   return 'no-prohibition-found';
 }
+
+function buildServiceDetails(snapshot, evaluations) {
+  const status = aggregateService(evaluations);
+  const originScenarios = SERVICE_ORIGINS.map(refrigerantOrigin => {
+    const context = createRegulatoryContext({ ...snapshot, plannedActivity: 'maintenance', refrigerantOrigin });
+    return Object.freeze({ refrigerantOrigin, status: aggregateService(evaluateRegulations(context)) });
+  });
+  return Object.freeze({
+    status,
+    assessedForLifecycle: true,
+    selectedRefrigerantOrigin: snapshot.refrigerantOrigin || '',
+    originScenarios: Object.freeze(originScenarios)
+  });
+}
+
+function lifecycleEvaluations(snapshot) {
+  return LIFECYCLE_ACTIVITIES.flatMap(plannedActivity => {
+    const context = createRegulatoryContext({ ...snapshot, plannedActivity });
+    return evaluateRegulations(context)
+      .filter(entry => entry.rule.categories?.includes('certification') || entry.rule.categories?.includes('operator-duty'))
+      .map(entry => Object.freeze({ ...entry, lifecycleActivity: plannedActivity }));
+  });
+}
+
 function aggregateCertification(snapshot, evaluations) {
   const relevant = active(evaluations, 'certification');
   if (!relevant.length) return 'not-applicable';
@@ -34,6 +65,7 @@ function aggregateCertification(snapshot, evaluations) {
   if ((!personRequired || snapshot.personCertificationStatus === 'verified') && (!companyRequired || snapshot.companyCertificationStatus === 'verified')) return 'verified';
   return 'not-applicable';
 }
+
 function germanyLossLimit(context) {
   if (context.installationType !== 'stationary' || !['refrigeration', 'air-conditioning', 'heat-pump'].includes(context.applicationType)) return null;
   if (!context.gasScope.includes('annex-i') && !context.gasScope.includes('annex-ii-group-1')) return null;
@@ -48,9 +80,11 @@ function germanyLossLimit(context) {
   if (installed > Date.parse('2005-06-30T00:00:00Z')) return { status: 'applies', maximumPercent: [6, 4, 2][band] };
   return { status: 'applies', maximumPercent: [8, 6, 4][band] };
 }
+
 function aggregateLeakCheck(context) {
   return { status: context.leakCheckStatus, required: context.leakCheckRequired, intervalMonths: context.leakCheckIntervalMonths, leakDetectionRequired: context.leakDetectionRequired };
 }
+
 function aggregateDocumentation(context, evaluations) {
   const obligations = [];
   if (context.leakCheckRequired === true) obligations.push({ id: 'FG-020', type: 'leak-check-records', retentionYears: 5 });
@@ -61,6 +95,7 @@ function aggregateDocumentation(context, evaluations) {
   const unresolved = evaluations.some(entry => entry.rule.categories?.includes('documentation') && entry.status === 'unresolved');
   return { status: obligations.length ? 'required' : unresolved ? 'incomplete' : 'not-required', obligations };
 }
+
 function aggregateOperatorDuties(snapshot, context, evaluations) {
   const obligations = [];
   let nonCompliant = false;
@@ -85,24 +120,50 @@ function aggregateOperatorDuties(snapshot, context, evaluations) {
   return { status: nonCompliant ? 'non-compliant' : incomplete ? 'incomplete' : obligations.length ? 'requirements-identified' : 'not-applicable', obligations };
 }
 
+function uniqueApplicableRegulations(...evaluationSets) {
+  const map = new Map();
+  for (const entry of evaluationSets.flat()) {
+    if (!['matched', 'exception-applies', 'matched-with-unresolved-exception', 'manual-review'].includes(entry.status)) continue;
+    if (!map.has(entry.rule.id)) map.set(entry.rule.id, entry.rule);
+  }
+  return [...map.values()];
+}
+
 export function calculate(snapshot = {}) {
   const refrigerant = getRefrigerant(snapshot.refrigerantId);
   const gwp = getGwp(snapshot.refrigerantId);
   const chargeKg = finiteNumber(snapshot.chargeKg);
   const context = createRegulatoryContext(snapshot);
   const evaluations = evaluateRegulations(context);
+  const lifecycleRegulationEvaluation = lifecycleEvaluations(snapshot);
+  const serviceDetails = buildServiceDetails(snapshot, evaluations);
   const leakCheckDetails = aggregateLeakCheck(context);
   const documentationDetails = aggregateDocumentation(context, evaluations);
-  const operatorDutyDetails = aggregateOperatorDuties(snapshot, context, evaluations);
+  const operatorDutyDetails = aggregateOperatorDuties(snapshot, context, lifecycleRegulationEvaluation);
   return Object.freeze({
-    status: chargeKg != null && gwp != null ? 'calculated' : 'not-specified', refrigerant, gwp, chargeKg,
-    co2EquivalentTonnes: context.co2EquivalentTonnes, regulatoryContext: context, regulationEvaluation: evaluations,
-    applicableRegulations: evaluations.filter(entry => ['matched', 'exception-applies', 'matched-with-unresolved-exception', 'manual-review'].includes(entry.status)).map(entry => entry.rule),
-    dataStatus: getDataStatus(), dataVersions: getDataVersions(), leakCheckDetails, documentationDetails, operatorDutyDetails,
+    status: chargeKg != null && gwp != null ? 'calculated' : 'not-specified',
+    refrigerant,
+    gwp,
+    chargeKg,
+    co2EquivalentTonnes: context.co2EquivalentTonnes,
+    regulatoryContext: context,
+    regulationEvaluation: evaluations,
+    lifecycleRegulationEvaluation,
+    lifecycleActivities: LIFECYCLE_ACTIVITIES,
+    applicableRegulations: uniqueApplicableRegulations(evaluations, lifecycleRegulationEvaluation),
+    dataStatus: getDataStatus(),
+    dataVersions: getDataVersions(),
+    serviceDetails,
+    leakCheckDetails,
+    documentationDetails,
+    operatorDutyDetails,
     checks: Object.freeze({
-      placingOnMarket: aggregatePlacingOnMarket(snapshot, evaluations), service: aggregateService(snapshot, evaluations),
-      leakCheck: leakCheckDetails.status, documentation: documentationDetails.status,
-      certification: aggregateCertification(snapshot, evaluations), operatorDuties: operatorDutyDetails.status
+      placingOnMarket: aggregatePlacingOnMarket(snapshot, evaluations),
+      service: serviceDetails.status,
+      leakCheck: leakCheckDetails.status,
+      documentation: documentationDetails.status,
+      certification: aggregateCertification(snapshot, lifecycleRegulationEvaluation),
+      operatorDuties: operatorDutyDetails.status
     })
   });
 }

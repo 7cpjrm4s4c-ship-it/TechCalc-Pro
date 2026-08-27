@@ -32,6 +32,7 @@ const plannedActivityOptions = Object.freeze([
 ]);
 const refrigerantOriginOptions = Object.freeze([option('', 'Nicht angegeben'), option('new', 'Neu'), option('reclaimed', 'Aufgearbeitet'), option('recycled', 'Recycelt')]);
 const certificationStatusOptions = Object.freeze([option('', 'Nicht geprüft'), option('verified', 'Nachgewiesen'), option('not-verified', 'Nicht nachgewiesen'), option('not-applicable', 'Nicht anwendbar')]);
+const isSplitSystem = state => ['split', 'mono-split'].includes(state?.constructionType) || state?.productCategory === 'split-ac-heat-pump';
 
 const schema = defineFormSchema({
   version: 4,
@@ -39,33 +40,34 @@ const schema = defineFormSchema({
     { key: 'systemName', label: 'Anlagenbezeichnung', type: FIELD_TYPES.TEXT },
     { key: 'applicationType', label: 'Anlagenart', type: FIELD_TYPES.SELECT, options: applicationTypeOptions },
     { key: 'installationType', label: 'Aufstellung', type: FIELD_TYPES.SELECT, options: installationTypeOptions },
-    { key: 'mobileEquipmentType', label: 'Art der mobilen Einrichtung', type: FIELD_TYPES.SELECT, options: mobileEquipmentTypeOptions },
+    { key: 'mobileEquipmentType', label: 'Art der mobilen Einrichtung', type: FIELD_TYPES.SELECT, options: mobileEquipmentTypeOptions, visibleWhen: { installationType: 'mobile' } },
     { key: 'productCategory', label: 'Produkt-/Anlagenkategorie', type: FIELD_TYPES.SELECT, options: productCategoryOptions },
     { key: 'constructionType', label: 'Bauform', type: FIELD_TYPES.SELECT, options: constructionTypeOptions },
-    { key: 'splitType', label: 'Split-Systemart', type: FIELD_TYPES.SELECT, options: splitTypeOptions },
-    { key: 'performanceRange', label: 'Leistungsbereich', type: FIELD_TYPES.TEXT },
+    { key: 'splitType', label: 'Split-Systemart', type: FIELD_TYPES.SELECT, options: splitTypeOptions, visibleWhen: isSplitSystem },
+    { key: 'performanceRange', label: 'Leistungsbereich (optional)', type: FIELD_TYPES.TEXT, placeholder: 'z. B. 12–50 kW; nur zur Dokumentation' },
+    { key: 'performanceRangeInfo', label: 'Hinweis zum Leistungsbereich', type: FIELD_TYPES.NOTICE, text: 'Der Leistungsbereich ist eine optionale Dokumentationsangabe. Für die regulatorische Prüfung der Leistungsgrenzen wird ausschließlich die Nennleistung in kW verwendet.', tone: 'compact' },
     { key: 'ratedCapacityKw', label: 'Nennleistung', type: FIELD_TYPES.DECIMAL, unit: 'kW' },
     { key: 'refrigerantId', label: 'Kältemittel', type: FIELD_TYPES.SELECT, options: [] },
     { key: 'chargeKg', label: 'Füllmenge', type: FIELD_TYPES.DECIMAL, unit: 'kg' },
     { key: 'assessmentDate', label: 'Bewertungsdatum', type: FIELD_TYPES.TEXT, placeholder: 'JJJJ-MM-TT' },
     { key: 'placedOnMarketDate', label: 'Erstmaliges Inverkehrbringen', type: FIELD_TYPES.TEXT, placeholder: 'JJJJ-MM-TT' },
     { key: 'installedAtSiteDate', label: 'Errichtung am Aufstellungsort', type: FIELD_TYPES.TEXT, placeholder: 'JJJJ-MM-TT' },
-    { key: 'plannedActivity', label: 'Zu prüfende Tätigkeit', type: FIELD_TYPES.SELECT, options: plannedActivityOptions },
-    { key: 'refrigerantOrigin', label: 'Herkunft Servicekältemittel', type: FIELD_TYPES.SELECT, options: refrigerantOriginOptions },
+    { key: 'plannedActivity', label: 'Aktuell zu prüfende Tätigkeit', type: FIELD_TYPES.SELECT, options: plannedActivityOptions },
+    { key: 'refrigerantOrigin', label: 'Herkunft des Servicekältemittels', type: FIELD_TYPES.SELECT, options: refrigerantOriginOptions },
     { key: 'preChargedStatus', label: 'Einrichtung vorbefüllt', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
     { key: 'leakDetectionSystemStatus', label: 'Leckage-Erkennungssystem vorhanden', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
     { key: 'hermeticallySealedStatus', label: 'Hermetisch geschlossen', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
     { key: 'hermeticallySealedLabelStatus', label: 'Als hermetisch geschlossen gekennzeichnet', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
-    { key: 'coolingBelowMinus50Status', label: 'Kühlung von Erzeugnissen unter -50 °C', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
-    { key: 'siteSafetyRestrictionStatus', label: 'Standort-Sicherheitsanforderung verhindert niedrigeres GWP', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
+    { key: 'coolingBelowMinus50Status', label: 'Kühlung von Erzeugnissen unter −50 °C', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
+    { key: 'siteSafetyRestrictionStatus', label: 'Standortbezogene Sicherheitsanforderung verhindert niedrigeres GWP', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
     { key: 'nationalSafetyStandardRestrictionStatus', label: 'Nationale Sicherheitsnorm verhindert Alternative', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
     { key: 'cascadePrimaryCircuitStatus', label: 'Primärer Kältemittelkreislauf eines Kaskadensystems', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
     { key: 'specificRefrigerantLossPercent', label: 'Spezifischer Kältemittelverlust', type: FIELD_TYPES.DECIMAL, unit: '%' },
-    { key: 'personCertificationStatus', label: 'Sachkunde natürliche Person', type: FIELD_TYPES.SELECT, options: certificationStatusOptions },
+    { key: 'personCertificationStatus', label: 'Sachkunde der natürlichen Person', type: FIELD_TYPES.SELECT, options: certificationStatusOptions },
     { key: 'companyCertificationStatus', label: 'Unternehmenszertifikat', type: FIELD_TYPES.SELECT, options: certificationStatusOptions }
   ],
   groups: [
-    { title: 'Anlage', fields: ['systemName', 'applicationType', 'installationType', 'mobileEquipmentType', 'productCategory', 'constructionType', 'splitType', 'performanceRange', 'ratedCapacityKw'], columns: 2, accent: 'blue' },
+    { title: 'Anlage', fields: ['systemName', 'applicationType', 'installationType', 'mobileEquipmentType', 'productCategory', 'constructionType', 'splitType', 'performanceRange', 'performanceRangeInfo', 'ratedCapacityKw'], columns: 2, accent: 'blue' },
     { title: 'Kältemittel', fields: ['refrigerantId', 'chargeKg'], columns: 2, accent: 'blue' },
     { title: 'Bewertungszeitpunkt und Tätigkeit', fields: ['assessmentDate', 'placedOnMarketDate', 'installedAtSiteDate', 'plannedActivity', 'refrigerantOrigin', 'preChargedStatus'], columns: 2, accent: 'blue' },
     { title: 'Regelrelevante Eigenschaften', fields: ['leakDetectionSystemStatus', 'hermeticallySealedStatus', 'hermeticallySealedLabelStatus', 'coolingBelowMinus50Status', 'siteSafetyRestrictionStatus', 'nationalSafetyStandardRestrictionStatus', 'cascadePrimaryCircuitStatus', 'specificRefrigerantLossPercent'], columns: 2, accent: 'blue' },

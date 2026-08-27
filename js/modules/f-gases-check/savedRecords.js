@@ -1,4 +1,5 @@
 import { createFGasesSystemSnapshot } from '../../shared/fGasesSystemSnapshot.js';
+import { formatFGasesStatus } from './results.js';
 
 const CONTROL_KEYS = new Set(['savedSystems', 'activeSavedSystemId', 'expandedSavedSystemId', 'savedSystemName']);
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
@@ -55,8 +56,8 @@ export function buildFGasesSavedRecordsModel(state = {}) {
       title: item.name || item.title || 'F-Gase-Anlage',
       subtitle: [item.resultSummary?.refrigerantName || item.resultSummary?.refrigerantId, item.resultSummary?.chargeKg != null ? `${item.resultSummary.chargeKg} kg` : ''].filter(Boolean).join(' · '),
       stats: [
-        { label: 'Inverkehrbringen', value: item.resultSummary?.checks?.placingOnMarket || '—' },
-        { label: 'Service', value: item.resultSummary?.checks?.service || '—' }
+        { label: 'Inverkehrbringen', value: formatFGasesStatus(item.resultSummary?.checks?.placingOnMarket) },
+        { label: 'Wartung / Instandhaltung', value: formatFGasesStatus(item.resultSummary?.checks?.service) }
       ]
     }))
   };
