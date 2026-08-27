@@ -21,11 +21,54 @@ const STATUS = Object.freeze({
   verified: 'nachgewiesen',
   'required-not-verified': 'erforderlich, nicht nachgewiesen',
   'non-compliant': 'Anforderung nicht erfüllt',
-  'requirements-identified': 'Pflichten ermittelt'
+  'requirements-identified': 'Pflichten erfüllt'
 });
 const status = value => STATUS[value] || value || '—';
 const LABELS = Object.freeze({ refrigeration: 'Kälteanlage', 'air-conditioning': 'Klimaanlage', 'heat-pump': 'Wärmepumpe', stationary: 'ortsfest', mobile: 'mobil', 'air-water': 'Luft-Wasser', 'air-air': 'Luft-Luft', split: 'Split', 'mono-split': 'Mono-Split', monoblock: 'Monoblock', 'self-contained': 'in sich geschlossen', portable: 'tragbar / steckerfertig', centralized: 'zentralisiert', cascade: 'Kaskadensystem' });
 const label = value => LABELS[value] || value || '—';
+
+const OBLIGATION_LABELS = Object.freeze({
+  'leak-check-records': 'Aufzeichnungen zu Dichtheitskontrollen',
+  'pre-ban-proof': 'Nachweis für vor dem Verbotsdatum in Verkehr gebrachte Erzeugnisse',
+  'german-pre-ban-declaration': 'Erklärung für vor dem Verbotsdatum in Verkehr gebrachte Erzeugnisse',
+  'specific-refrigerant-loss': 'Grenzwert für den spezifischen Kältemittelverlust',
+  'access-to-detachable-connections': 'Zugang zu lösbaren Verbindungen sicherstellen',
+  'contractor-certification': 'Zertifizierung bzw. Sachkunde des beauftragten Unternehmens prüfen',
+  'certified-person-for-leak-check': 'Dichtheitskontrolle durch sachkundige Person',
+  'certified-person-for-recovery': 'Rückgewinnung durch sachkundige Person'
+});
+
+const OBLIGATION_LEGAL = Object.freeze({
+  'FG-020': 'Verordnung (EU) 2024/573, Art. 7',
+  'FG-045': 'Verordnung (EU) 2024/573, Art. 11 Abs. 1',
+  'FG-046': 'Chemikaliengesetz (ChemG), § 12i Abs. 2',
+  'FG-060': 'Chemikalien-Klimaschutzverordnung (ChemKlimaschutzV), § 2 Abs. 1',
+  'FG-063': 'Chemikalien-Klimaschutzverordnung (ChemKlimaschutzV), § 2 Abs. 2',
+  'FG-052': 'Chemikalien-Klimaschutzverordnung (ChemKlimaschutzV), § 14 Abs. 1',
+  'FG-053': 'Chemikalien-Klimaschutzverordnung (ChemKlimaschutzV), § 14 Abs. 2',
+  'FG-054': 'Chemikalien-Klimaschutzverordnung (ChemKlimaschutzV), § 14 Abs. 3'
+});
+
+function legalSourceLabel(source = '') {
+  const value = String(source);
+  let match = value.match(/^EU-FGAS:Art\.(\d+)(?:\((\d+)\))?$/);
+  if (match) return `Verordnung (EU) 2024/573, Art. ${match[1]}${match[2] ? ` Abs. ${match[2]}` : ''}`;
+  match = value.match(/^EU-FGAS:AnnexIV\((0*\d+)\)$/);
+  if (match) return `Verordnung (EU) 2024/573, Anhang IV Nr. ${Number(match[1])}`;
+  match = value.match(/^DE-CHEMKLIMA:§(\d+)(?:\((\d+)\))?$/);
+  if (match) return `Chemikalien-Klimaschutzverordnung (ChemKlimaschutzV), § ${match[1]}${match[2] ? ` Abs. ${match[2]}` : ''}`;
+  match = value.match(/^DE-CHEMG:§([\w]+)(?:\((\d+)\))?$/);
+  if (match) return `Chemikaliengesetz (ChemG), § ${match[1]}${match[2] ? ` Abs. ${match[2]}` : ''}`;
+  if (value.includes('EU-FGAS:Art.10+DE-CHEMKLIMA:§5')) return 'Verordnung (EU) 2024/573, Art. 10; Chemikalien-Klimaschutzverordnung (ChemKlimaschutzV), § 5';
+  if (value.includes('EU-FGAS:Art.10+DE-CHEMKLIMA:§10')) return 'Verordnung (EU) 2024/573, Art. 10; Chemikalien-Klimaschutzverordnung (ChemKlimaschutzV), § 10';
+  return value;
+}
+
+function formatDateOnly(value) {
+  const raw = String(value || '');
+  const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return match ? `${match[3]}.${match[2]}.${match[1]}` : text(value);
+}
 
 function summarySection(dto) {
   const checks = object(dto.summary?.checks);
@@ -45,19 +88,32 @@ function leakSection(dto) {
 }
 function obligationsSection(title, payload, startIndex) {
   const obligations = array(payload?.obligations);
-  const rows = obligations.length ? obligations.map((item, index) => row(`${index + 1}. ${item.id || 'Pflicht'}`, [item.type, item.maximumPercent != null ? `Grenzwert ${item.maximumPercent} %` : '', item.retentionYears != null ? `Aufbewahrung ${item.retentionYears} Jahre` : '', item.requiredFrom ? `erforderlich ab ${item.requiredFrom}` : '', item.applicableBanDate ? `Verbotsdatum ${item.applicableBanDate}` : ''].filter(Boolean).join(' · ') || 'erforderlich')) : [row('Status', status(payload?.status))];
+  const rows = obligations.length ? obligations.map((item, index) => {
+    const details = [];
+    if (item.maximumPercent != null) details.push(`Grenzwert: ${item.maximumPercent} %`);
+    if (item.retentionYears != null) details.push(`Aufbewahrung: ${item.retentionYears} Jahre`);
+    if (item.requiredFrom) details.push(`erforderlich ab ${formatDateOnly(item.requiredFrom)}`);
+    if (item.applicableBanDate) details.push(`Verbotsdatum: ${formatDateOnly(item.applicableBanDate)}`);
+    details.push(OBLIGATION_LEGAL[item.id] || 'Rechtsgrundlage siehe angewendete Rechtsregeln');
+    return row(`${index + 1}. ${OBLIGATION_LABELS[item.type] || 'Regulatorische Pflicht'}`, details.join(' · '));
+  }) : [row('Status', status(payload?.status))];
   return { title: `${startIndex}. ${title}`, rows };
 }
 function regulationsSection(dto) {
   const rules = array(dto.applicableRegulations);
-  return { title: '7. Angewendete Rechtsregeln', rows: rules.length ? rules.map(rule => row(rule.id, [rule.legalSource, rule.validFrom ? `ab ${rule.validFrom}` : '', rule.validUntil ? `bis ${rule.validUntil}` : ''].filter(Boolean).join(' · '))) : [row('Status', 'Keine automatisch anwendbare Regelreferenz ermittelt')] };
+  return {
+    title: '7. Angewendete Rechtsregeln',
+    rows: rules.length
+      ? rules.map(rule => row(rule.id, [legalSourceLabel(rule.legalSource), rule.validFrom ? `gültig ab ${formatDateOnly(rule.validFrom)}` : '', rule.validUntil ? `bis ${formatDateOnly(rule.validUntil)}` : ''].filter(Boolean).join(' · ')))
+      : [row('Status', 'Keine automatisch anwendbare Regelreferenz ermittelt')]
+  };
 }
 function sourcesSection(dto) {
   const metadata = object(dto.metadata);
   return {
     title: '8. Quellen und Berichtserstellung',
     rows: [
-      row('Erzeugt am', metadata.generatedAt),
+      row('Erzeugt am', formatDateOnly(metadata.generatedAt)),
       ...array(dto.sources).map(source => row(source.title || source.id, source.role || source.id))
     ]
   };

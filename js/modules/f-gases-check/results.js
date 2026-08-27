@@ -12,25 +12,52 @@ const STATUS_LABELS = Object.freeze({
   verified: 'nachgewiesen',
   'required-not-verified': 'erforderlich, nicht nachgewiesen',
   'non-compliant': 'Anforderung nicht erfüllt',
-  'requirements-identified': 'Pflichten ermittelt'
+  'requirements-identified': 'Pflichten erfüllt'
 });
 
-const REASON_LABELS = Object.freeze({
-  'assessment-date': 'Bewertungsdatum',
+const INPUT_FIELD_LABELS = Object.freeze({
   assessmentDate: 'Bewertungsdatum',
-  placedOnMarketDate: 'Datum des erstmaligen Inverkehrbringens',
+  placedOnMarketDate: 'Erstmaliges Inverkehrbringen',
+  installedAtSiteDate: 'Errichtung am Aufstellungsort',
+  applicationType: 'Anlagenart',
+  installationType: 'Aufstellung',
+  mobileEquipmentType: 'Art der mobilen Einrichtung',
+  productCategory: 'Produkt-/Anlagenkategorie',
+  constructionType: 'Bauform',
+  splitType: 'Split-Systemart',
   ratedCapacityKw: 'Nennleistung',
+  refrigerantId: 'Kältemittel',
+  chargeKg: 'Füllmenge',
+  plannedActivity: 'Aktuell zu prüfende Tätigkeit',
   refrigerantOrigin: 'Herkunft des Servicekältemittels',
-  siteSafetyRestrictionStatus: 'standortbezogene Sicherheitsanforderung',
-  nationalSafetyStandardRestrictionStatus: 'nationale Sicherheitsnorm',
-  coolingBelowMinus50Status: 'Kühlung unter −50 °C',
-  cascadePrimaryCircuitStatus: 'Kaskaden-Primärkreislauf',
-  annexIvCompliance: 'Anhang-IV-Konformität'
+  preChargedStatus: 'Einrichtung vorbefüllt',
+  leakDetectionSystemStatus: 'Leckage-Erkennungssystem vorhanden',
+  hermeticallySealedStatus: 'Hermetisch geschlossen',
+  hermeticallySealedLabelStatus: 'Als hermetisch geschlossen gekennzeichnet',
+  coolingBelowMinus50Status: 'Kühlung von Erzeugnissen unter −50 °C',
+  siteSafetyRestrictionStatus: 'Standortbezogene Sicherheitsanforderung verhindert niedrigeres GWP',
+  nationalSafetyStandardRestrictionStatus: 'Nationale Sicherheitsnorm verhindert Alternative',
+  cascadePrimaryCircuitStatus: 'Primärer Kältemittelkreislauf eines Kaskadensystems',
+  specificRefrigerantLossPercent: 'Spezifischer Kältemittelverlust',
+  personCertificationStatus: 'Sachkunde der natürlichen Person',
+  companyCertificationStatus: 'Unternehmenszertifikat'
+});
+
+const DERIVED_FIELD_LABELS = Object.freeze({
+  gwp: 'GWP des ausgewählten Kältemittels',
+  co2EquivalentTonnes: 'CO₂-Äquivalent',
+  gasScope: 'Stoffklassifikation des Kältemittels',
+  gasType: 'Kältemittelart',
+  leakCheckRequired: 'abgeleitete Dichtheitskontrollpflicht',
+  leakCheckIntervalMonths: 'abgeleitetes Prüfintervall der Dichtheitskontrolle',
+  leakDetectionRequired: 'abgeleitete Pflicht zum Leckage-Erkennungssystem',
+  annexIvCompliance: 'abgeleitete Anhang-IV-Konformität'
 });
 
 export const formatFGasesStatus = value => STATUS_LABELS[value] || value || '—';
 const fmt = (value, digits = 2) => value == null || !Number.isFinite(Number(value)) ? '—' : Number(value).toLocaleString('de-DE', { maximumFractionDigits: digits });
 const boolLabel = value => value === true ? 'ja' : value === false ? 'nein' : '—';
+const hasValue = value => value !== undefined && value !== null && value !== '';
 
 function placingOnMarketLabel(status) {
   if (status === 'prohibited') return 'Inverkehrbringen unzulässig';
@@ -88,17 +115,23 @@ function dataReferenceRows() {
   ];
 }
 
-function unresolvedMessages(entries = []) {
+function unresolvedInputMessages(entries = [], state = {}, context = {}) {
   const seen = new Set();
   const messages = [];
   for (const entry of entries) {
-    const reasons = entry.reasons?.length ? entry.reasons : ['unbekannte Voraussetzung'];
-    const labels = reasons.map(reason => REASON_LABELS[reason] || reason).join(', ');
-    const source = entry.rule?.legalSource || entry.rule?.id || 'Regel';
-    const message = `${source}: offen wegen ${labels}.`;
-    if (!seen.has(message)) {
-      seen.add(message);
-      messages.push(message);
+    for (const reason of entry.reasons || []) {
+      const normalizedReason = reason === 'assessment-date' ? 'assessmentDate' : reason;
+      if (INPUT_FIELD_LABELS[normalizedReason]) {
+        if (hasValue(state[normalizedReason])) continue;
+        const message = `Bitte Eingabefeld „${INPUT_FIELD_LABELS[normalizedReason]}“ ausfüllen. Rechtsgrundlage: ${entry.rule?.legalSource || entry.rule?.id || 'Regel'}.`;
+        if (!seen.has(message)) { seen.add(message); messages.push(message); }
+        continue;
+      }
+      if (DERIVED_FIELD_LABELS[normalizedReason]) {
+        if (hasValue(context[normalizedReason])) continue;
+        const message = `Die ${DERIVED_FIELD_LABELS[normalizedReason]} kann noch nicht bestimmt werden. Bitte die dafür erforderlichen Anlagen- und Kältemittelangaben prüfen. Rechtsgrundlage: ${entry.rule?.legalSource || entry.rule?.id || 'Regel'}.`;
+        if (!seen.has(message)) { seen.add(message); messages.push(message); }
+      }
     }
   }
   return messages;
@@ -112,9 +145,10 @@ export function buildFGasesResultModel(state = {}, result = {}) {
   const allEvaluations = [...(result.regulationEvaluation || []), ...(result.lifecycleRegulationEvaluation || [])];
   const manualRules = [...new Set(allEvaluations.filter(entry => entry.status === 'manual-review').map(entry => entry.rule?.legalSource || entry.rule?.id).filter(Boolean))];
   const unresolved = allEvaluations.filter(entry => entry.status === 'unresolved');
+  const unresolvedMessages = unresolvedInputMessages(unresolved, state, result.regulatoryContext || {});
   const notices = [];
   if (manualRules.length) notices.push({ title: 'Manuelle Rechtsprüfung', messages: [`Nicht automatisch entscheidbar: ${manualRules.join(', ')}`], prefix: 'Hinweis' });
-  if (unresolved.length) notices.push({ title: 'Unvollständige Bewertung', messages: unresolvedMessages(unresolved), prefix: 'Hinweis' });
+  if (unresolvedMessages.length) notices.push({ title: 'Unvollständige Bewertung', messages: unresolvedMessages, prefix: 'Hinweis' });
 
   return {
     primary: {

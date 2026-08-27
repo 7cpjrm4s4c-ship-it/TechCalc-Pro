@@ -11,6 +11,16 @@
 .module-content { grid-column: span 12; }
 .module-content > * { margin-block: 0; }
 
+/* F-Gases: align the two controls in the final row of the regulatory-properties grid. */
+@media (min-width: 721px) {
+  .module-view[data-module="f-gases-check"] [data-schema-field-wrapper="cascadePrimaryCircuitStatus"] > label,
+  .module-view[data-module="f-gases-check"] [data-schema-field-wrapper="specificRefrigerantLossPercent"] > label {
+    min-height: 2.5em;
+    display: flex;
+    align-items: flex-end;
+  }
+}
+
 /* F-Gases: keep the unit-bearing decimal control optically identical to sibling selects. */
 .module-view[data-module="f-gases-check"] [data-schema-field-wrapper="specificRefrigerantLossPercent"] .control {
   height: var(--tc-control-height);
