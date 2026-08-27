@@ -65,6 +65,8 @@ Jede regulatorische Regel besitzt mindestens:
 
 Regeldefinitionen bleiben datengetrieben. Programmlogik wertet die Regeln aus, erfindet jedoch keine regulatorischen Inhalte.
 
+Die fachliche Regelreferenz für Version 1.5.0 ist in `docs/engineering/f-gases-rule-matrix.md` dokumentiert. Die dortige vollständige Zerlegung von Anhang IV der Verordnung (EU) 2024/573 ist vor der produktiven Befüllung von `regulations.js` zu berücksichtigen. Nicht als verifiziert/freigegeben markierte Vergleichsoperatoren oder Rechtsdetails dürfen nicht in Produktivregeln übernommen werden.
+
 ## Datenversionierung
 
 Mindestens folgende Datenbestände besitzen einen eigenständigen Versionsstand:
@@ -116,6 +118,7 @@ Bis dahin gilt für nicht belegte fachliche Inhalte: Nicht spezifiziert.
 - `docs/contracts/render-contract.md`
 - `docs/contracts/pdf-contract.md`
 - `docs/adr/ADR-0009-f-gases-refrigerant-platform.md`
+- `docs/engineering/f-gases-rule-matrix.md`
 - `js/core/registry.js`
 - `js/core/app.js`
 - `js/platform/moduleRuntime/index.js`
