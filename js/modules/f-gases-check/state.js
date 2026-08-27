@@ -32,6 +32,10 @@ export const initialState = Object.freeze({
   specificRefrigerantLossPercent: '',
   personCertificationStatus: '',
   companyCertificationStatus: '',
+  savedSystems: Object.freeze([]),
+  activeSavedSystemId: null,
+  expandedSavedSystemId: null,
+  savedSystemName: '',
   dataVersions: getDataVersions()
 });
 
