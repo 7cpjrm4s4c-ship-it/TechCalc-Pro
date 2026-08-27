@@ -40,6 +40,13 @@ const constructionTypeOptions = Object.freeze([
   Object.freeze({ value: 'other', label: 'Sonstige Bauform' })
 ]);
 
+const splitTypeOptions = Object.freeze([
+  Object.freeze({ value: '', label: 'Nicht angegeben' }),
+  Object.freeze({ value: 'air-water', label: 'Luft-Wasser' }),
+  Object.freeze({ value: 'air-air', label: 'Luft-Luft' }),
+  Object.freeze({ value: 'other', label: 'Sonstiges Split-System' })
+]);
+
 const plannedActivityOptions = Object.freeze([
   Object.freeze({ value: 'installation', label: 'Installation' }),
   Object.freeze({ value: 'maintenance', label: 'Wartung / Instandhaltung' }),
@@ -64,13 +71,14 @@ const certificationStatusOptions = Object.freeze([
 ]);
 
 const schema = defineFormSchema({
-  version: 2,
+  version: 3,
   fields: [
     { key: 'systemName', label: 'Anlagenbezeichnung', type: FIELD_TYPES.TEXT },
     { key: 'applicationType', label: 'Anlagenart', type: FIELD_TYPES.SELECT, options: applicationTypeOptions },
     { key: 'installationType', label: 'Aufstellung', type: FIELD_TYPES.SELECT, options: installationTypeOptions },
     { key: 'productCategory', label: 'Produkt-/Anlagenkategorie', type: FIELD_TYPES.SELECT, options: productCategoryOptions },
     { key: 'constructionType', label: 'Bauform', type: FIELD_TYPES.SELECT, options: constructionTypeOptions },
+    { key: 'splitType', label: 'Split-Systemart', type: FIELD_TYPES.SELECT, options: splitTypeOptions },
     { key: 'performanceRange', label: 'Leistungsbereich', type: FIELD_TYPES.TEXT },
     { key: 'ratedCapacityKw', label: 'Nennleistung', type: FIELD_TYPES.DECIMAL, unit: 'kW' },
     { key: 'refrigerantId', label: 'Kältemittel', type: FIELD_TYPES.SELECT, options: [] },
@@ -79,6 +87,7 @@ const schema = defineFormSchema({
     { key: 'placedOnMarketDate', label: 'Erstmaliges Inverkehrbringen', type: FIELD_TYPES.TEXT, placeholder: 'JJJJ-MM-TT' },
     { key: 'plannedActivity', label: 'Zu prüfende Tätigkeit', type: FIELD_TYPES.SELECT, options: plannedActivityOptions },
     { key: 'refrigerantOrigin', label: 'Herkunft Servicekältemittel', type: FIELD_TYPES.SELECT, options: refrigerantOriginOptions },
+    { key: 'preChargedStatus', label: 'Einrichtung vorbefüllt', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
     { key: 'leakDetectionSystemStatus', label: 'Leckage-Erkennungssystem vorhanden', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
     { key: 'hermeticallySealedStatus', label: 'Hermetisch geschlossen', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
     { key: 'hermeticallySealedLabelStatus', label: 'Als hermetisch geschlossen gekennzeichnet', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
@@ -91,9 +100,9 @@ const schema = defineFormSchema({
     { key: 'companyCertificationStatus', label: 'Unternehmenszertifikat', type: FIELD_TYPES.SELECT, options: certificationStatusOptions }
   ],
   groups: [
-    { title: 'Anlage', fields: ['systemName', 'applicationType', 'installationType', 'productCategory', 'constructionType', 'performanceRange', 'ratedCapacityKw'], columns: 2, accent: 'blue' },
+    { title: 'Anlage', fields: ['systemName', 'applicationType', 'installationType', 'productCategory', 'constructionType', 'splitType', 'performanceRange', 'ratedCapacityKw'], columns: 2, accent: 'blue' },
     { title: 'Kältemittel', fields: ['refrigerantId', 'chargeKg'], columns: 2, accent: 'blue' },
-    { title: 'Bewertungszeitpunkt und Tätigkeit', fields: ['assessmentDate', 'placedOnMarketDate', 'plannedActivity', 'refrigerantOrigin'], columns: 2, accent: 'blue' },
+    { title: 'Bewertungszeitpunkt und Tätigkeit', fields: ['assessmentDate', 'placedOnMarketDate', 'plannedActivity', 'refrigerantOrigin', 'preChargedStatus'], columns: 2, accent: 'blue' },
     { title: 'Regelrelevante Eigenschaften', fields: ['leakDetectionSystemStatus', 'hermeticallySealedStatus', 'hermeticallySealedLabelStatus', 'coolingBelowMinus50Status', 'siteSafetyRestrictionStatus', 'nationalSafetyStandardRestrictionStatus', 'cascadePrimaryCircuitStatus', 'specificRefrigerantLossPercent'], columns: 2, accent: 'blue' },
     { title: 'Zertifizierung', fields: ['personCertificationStatus', 'companyCertificationStatus'], columns: 2, accent: 'blue' }
   ]

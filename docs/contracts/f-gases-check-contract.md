@@ -1,7 +1,7 @@
 # F-Gases Check Contract
 
 Status: Verbindliche Implementierungsgrundlage für Version 1.5.0  
-Datum: 2026-08-26
+Datum: 2026-08-27
 
 ## Ziel
 
@@ -40,23 +40,11 @@ Nicht enthalten sind EN-378-Berechnungen, zulässige Füllmengen nach EN 378, Ra
 
 ## Eingabe- und State-Modell
 
-Der fachliche Modulzustand ist ab Schema-Version 2 auf die Regelmatrix `docs/engineering/f-gases-rule-matrix.md` ausgerichtet. Er enthält nur Eingaben, die für mindestens eine der dort dokumentierten Prüfgruppen erforderlich sind.
+Der fachliche Modulzustand ist ab Schema-Version 3 auf die Regelmatrix `docs/engineering/f-gases-rule-matrix.md` ausgerichtet. Er enthält nur Eingaben, die für mindestens eine der dort dokumentierten Prüfgruppen erforderlich sind.
 
-Mindestens erfasst werden:
+Zusätzlich zu den bisherigen Eingaben werden `splitType` für die Unterscheidung Luft-Wasser/Luft-Luft nach Anhang IV Nummer 9 und `preChargedStatus` für die Prüfung vorbefüllter Einrichtungen nach Artikel 19 beziehungsweise § 12k ChemG geführt.
 
-- Anlagenart und Aufstellung,
-- konkrete Produkt-/Anlagenkategorie aus dem Kälte-/Klima-/Wärmepumpen-Kernscope von Anhang IV,
-- Bauform und Nennleistung,
-- Kältemittel und Füllmenge,
-- Bewertungsdatum und Datum des erstmaligen Inverkehrbringens,
-- zu prüfende Tätigkeit und Herkunft des Servicekältemittels,
-- Status des Leckage-Erkennungssystems,
-- hermetischer Verschluss und zugehörige Kennzeichnung,
-- Kühlung von Erzeugnissen unter -50 °C,
-- Standort- bzw. nationale Sicherheitsanforderung,
-- Kaskaden-Primärkreislauf,
-- spezifischer Kältemittelverlust,
-- Sachkunde- und Unternehmenszertifizierungsstatus.
+Von der Rule-Engine abgeleitete Werte wie GWP, Stoffklassifikation, CO2-Äquivalent, Dichtheitskontrollpflicht und Anhang-IV-Konformität werden nicht als redundante Benutzereingaben gespeichert.
 
 Rechtlich relevante Ja-/Nein-Eigenschaften verwenden einen dreistufigen Zustand (`yes`, `no`, nicht angegeben), damit fehlende Informationen nicht implizit als `false` bewertet werden.
 
@@ -75,41 +63,25 @@ Die gemeinsame Plattformkomponente liegt unter `js/utils/refrigerants/` und best
 
 Direkte Imports von `refrigerants.js`, `gwp.js`, `safety-classes.js` oder `regulations.js` aus einem Fachmodul sind unzulässig.
 
+Der Stoff HFKW-32 wird mit der gebräuchlichen Kältemittelbezeichnung `R32` beziehungsweise `R-32` als Alias geführt. Es entsteht kein redundanter zweiter Stoffdatensatz; Alias-Auflösung erfolgt ausschließlich über die öffentliche Service-API.
+
 ## Regeldaten
 
-Jede regulatorische Regel besitzt mindestens:
+Jede regulatorische Regel besitzt mindestens ID, Rechtsquelle, Versionsstand, Gültigkeitsdatum, Kategorien, Bedingungen und Meldungsschlüssel. Regeldefinitionen bleiben datengetrieben. Programmlogik wertet die Regeln aus, erfindet jedoch keine regulatorischen Inhalte.
 
-- ID
-- Rechtsquelle
-- Versionsstand
-- Gültigkeitsdatum
-- Kategorien
-- Bedingungen
-- Meldungsschlüssel
-
-Regeldefinitionen bleiben datengetrieben. Programmlogik wertet die Regeln aus, erfindet jedoch keine regulatorischen Inhalte.
-
-Die fachliche Regelreferenz für Version 1.5.0 ist in `docs/engineering/f-gases-rule-matrix.md` dokumentiert. Die dortige vollständige Zerlegung von Anhang IV der Verordnung (EU) 2024/573 ist vor der produktiven Befüllung von `regulations.js` zu berücksichtigen. Nicht als verifiziert/freigegeben markierte Vergleichsoperatoren oder Rechtsdetails dürfen nicht in Produktivregeln übernommen werden.
+Die fachliche Regelreferenz für Version 1.5.0 ist in `docs/engineering/f-gases-rule-matrix.md` dokumentiert. Nicht als verifiziert/freigegeben markierte Vergleichsoperatoren oder Rechtsdetails dürfen nicht in Produktivregeln übernommen werden.
 
 ## Datenversionierung
 
-Mindestens folgende Datenbestände besitzen einen eigenständigen Versionsstand:
-
-- Kältemitteldaten
-- GWP-Daten
-- Rechtsdaten
-
-Gespeicherte Anlagen-Snapshots enthalten die verwendeten Datenversionen.
+Mindestens Kältemitteldaten, GWP-Daten und Rechtsdaten besitzen einen eigenständigen Versionsstand. Gespeicherte Anlagen-Snapshots enthalten die verwendeten Datenversionen.
 
 ## Snapshot-Vertrag
 
-Der F-Gase-Check erzeugt einen versionierten, serialisierbaren Anlagen-Snapshot. Dieser enthält mindestens die für die spätere Übergabe benötigten Anlagendaten, Kältemittel, Füllmenge und die verwendeten Datenversionen.
-
-Der Snapshot ist eine unabhängige Kopie. Nachträgliche Änderungen im F-Gase-Check dürfen bereits erzeugte Snapshots nicht rückwirkend verändern. Ein späterer EN-378-Sicherheitscheck darf ausschließlich den Snapshot importieren und nicht auf den internen State von `f-gases-check` zugreifen.
+Der F-Gase-Check erzeugt einen versionierten, serialisierbaren Anlagen-Snapshot. Der Snapshot ist eine unabhängige Kopie. Nachträgliche Änderungen im F-Gase-Check dürfen bereits erzeugte Snapshots nicht rückwirkend verändern. Ein späterer EN-378-Sicherheitscheck darf ausschließlich den Snapshot importieren und nicht auf den internen State von `f-gases-check` zugreifen.
 
 ## PDF-Vertrag
 
-Der Ergebnisbericht nutzt die bestehende zentrale PDF-Infrastruktur. Modulbezogene PDF-Ausgabe wird über den vorhandenen Report-/PDF-Contract angebunden; eine zweite PDF-Engine oder ein paralleler Exportpfad wird nicht eingeführt.
+Der Ergebnisbericht nutzt die bestehende zentrale PDF-Infrastruktur. Eine zweite PDF-Engine oder ein paralleler Exportpfad wird nicht eingeführt.
 
 ## Persistenz
 
@@ -117,22 +89,7 @@ Saved Records und Projektpersistenz verwenden die bestehende Plattforminfrastruk
 
 ## Qualitäts- und Testanforderungen
 
-Vor Freigabe müssen mindestens erfolgreich sein:
-
-- `npm test`
-- `npm run test:integration`
-- `npm run build`
-- relevante E2E- beziehungsweise manuelle Prüfungen für PWA, Mobile Input, Keyboard, PDF und Layout
-- Modul-Contract- und Architekturprüfungen
-- Regression der bestehenden Module
-
-Zusätzlich sind Referenztests für CO2-Äquivalent, Regelbewertung, Datenversionierung, Snapshot-Unabhängigkeit und PDF-Reportmodell erforderlich.
-
-## Fachliche Datenfreigabe
-
-Die konkrete Befüllung von `gwp.js` und `regulations.js` ist erst zulässig, wenn die verwendeten Werte, Rechtsquellen, Gültigkeitsstände und Aktualisierungsdaten nachvollziehbar belegt und für Version 1.5.0 freigegeben sind.
-
-Bis dahin gilt für nicht belegte fachliche Inhalte: Nicht spezifiziert.
+Vor Freigabe müssen mindestens `npm test`, `npm run test:integration`, `npm run build`, relevante E2E-/manuelle Prüfungen, Modul-Contract- und Architekturprüfungen sowie Regressionen erfolgreich sein.
 
 ## Referenzen
 
@@ -143,8 +100,4 @@ Bis dahin gilt für nicht belegte fachliche Inhalte: Nicht spezifiziert.
 - `docs/contracts/pdf-contract.md`
 - `docs/adr/ADR-0009-f-gases-refrigerant-platform.md`
 - `docs/engineering/f-gases-rule-matrix.md`
-- `js/core/registry.js`
-- `js/core/app.js`
-- `js/platform/moduleRuntime/index.js`
-- `js/platform/savedRecordModel/index.js`
-- `js/shared/rainwaterSurfaceSnapshot.js`
+- `docs/engineering/f-gases-refrigerant-data.md`

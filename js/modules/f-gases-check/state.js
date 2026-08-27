@@ -1,7 +1,7 @@
 import { createModuleState } from '../../core/state.js';
 import { getDataVersions } from '../../utils/refrigerants/index.js';
 
-export const F_GASES_SCHEMA_VERSION = 2;
+export const F_GASES_SCHEMA_VERSION = 3;
 
 export const initialState = Object.freeze({
   schemaVersion: F_GASES_SCHEMA_VERSION,
@@ -10,6 +10,7 @@ export const initialState = Object.freeze({
   installationType: '',
   productCategory: '',
   constructionType: '',
+  splitType: '',
   performanceRange: '',
   ratedCapacityKw: '',
   refrigerantId: '',
@@ -18,6 +19,7 @@ export const initialState = Object.freeze({
   placedOnMarketDate: '',
   plannedActivity: '',
   refrigerantOrigin: '',
+  preChargedStatus: '',
   leakDetectionSystemStatus: '',
   hermeticallySealedStatus: '',
   hermeticallySealedLabelStatus: '',

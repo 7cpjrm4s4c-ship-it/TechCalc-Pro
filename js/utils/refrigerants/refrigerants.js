@@ -12,9 +12,10 @@ const hfcHfoBlend = Object.freeze({ fluorinatedGreenhouseGas: true, hfc: true, a
 const nonFgas = Object.freeze({ fluorinatedGreenhouseGas: false, hfc: false, annexIGroup1Content: false, annexIIGroup1Content: false });
 
 const component = (refrigerantId, massPercent) => Object.freeze({ refrigerantId, massPercent });
-const refrigerant = ({ id, name = id, group, regulatory, components = [] }) => Object.freeze({
+const refrigerant = ({ id, name = id, aliases = [], group, regulatory, components = [] }) => Object.freeze({
   id,
   name,
+  aliases: Object.freeze(aliases),
   group,
   odp: null,
   safetyClassRef: null,
@@ -24,13 +25,13 @@ const refrigerant = ({ id, name = id, group, regulatory, components = [] }) => O
 });
 
 export const REFRIGERANT_DATASET = Object.freeze({
-  version: '1.0.0',
+  version: '1.1.0',
   source,
   updatedAt: '2026-08-27',
   status: 'specified',
   scope: 'TechCalc Pro 1.5.0 core refrigerants from the provided UBA March 2026 source',
   items: Object.freeze([
-    refrigerant({ id: 'HFKW-32', name: 'Difluormethan', group: 'HFKW', regulatory: annexIGroup1 }),
+    refrigerant({ id: 'HFKW-32', name: 'R32 (Difluormethan)', aliases: ['R32', 'R-32'], group: 'HFKW', regulatory: annexIGroup1 }),
     refrigerant({ id: 'HFKW-125', name: 'Pentafluorethan', group: 'HFKW', regulatory: annexIGroup1 }),
     refrigerant({ id: 'HFKW-134a', name: '1,1,1,2-Tetrafluorethan', group: 'HFKW', regulatory: annexIGroup1 }),
     refrigerant({ id: 'HFKW-143a', name: '1,1,1-Trifluorethan', group: 'HFKW', regulatory: annexIGroup1 }),

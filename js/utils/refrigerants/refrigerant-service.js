@@ -4,6 +4,16 @@ import SAFETY_CLASS_DATASET from './safety-classes.js';
 import REGULATION_DATASET from './regulations.js';
 
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
+const normalizeIdentifier = value => String(value ?? '').trim().toLowerCase();
+
+function findRefrigerant(identifier) {
+  const normalized = normalizeIdentifier(identifier);
+  if (!normalized) return null;
+  return REFRIGERANT_DATASET.items.find(entry => {
+    if (normalizeIdentifier(entry.id) === normalized || normalizeIdentifier(entry.name) === normalized) return true;
+    return Array.isArray(entry.aliases) && entry.aliases.some(alias => normalizeIdentifier(alias) === normalized);
+  }) ?? null;
+}
 
 export function getDataVersions() {
   return Object.freeze({
@@ -28,14 +38,14 @@ export function listRefrigerants() {
 }
 
 export function getRefrigerant(refrigerantId) {
-  if (!refrigerantId) return null;
-  const item = REFRIGERANT_DATASET.items.find(entry => entry.id === refrigerantId || entry.name === refrigerantId);
-  return clone(item ?? null);
+  return clone(findRefrigerant(refrigerantId));
 }
 
 export function getGwp(refrigerantId) {
-  if (!refrigerantId) return null;
-  const entry = GWP_DATASET.items.find(item => item.refrigerantId === refrigerantId || item.id === refrigerantId);
+  const refrigerant = findRefrigerant(refrigerantId);
+  const canonicalId = refrigerant?.gwpRef || refrigerant?.id || refrigerantId;
+  if (!canonicalId) return null;
+  const entry = GWP_DATASET.items.find(item => item.refrigerantId === canonicalId || item.id === canonicalId);
   return entry?.value ?? null;
 }
 

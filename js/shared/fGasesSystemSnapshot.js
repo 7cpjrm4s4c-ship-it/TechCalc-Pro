@@ -1,6 +1,6 @@
 import { getDataVersions } from '../utils/refrigerants/index.js';
 
-export const F_GASES_SYSTEM_SNAPSHOT_VERSION = 2;
+export const F_GASES_SYSTEM_SNAPSHOT_VERSION = 3;
 
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 
@@ -17,6 +17,7 @@ export function createFGasesSystemSnapshot(state = {}, { generatedAt = new Date(
       installationType: state.installationType || '',
       productCategory: state.productCategory || '',
       constructionType: state.constructionType || '',
+      splitType: state.splitType || '',
       performanceRange: state.performanceRange || '',
       ratedCapacityKw: state.ratedCapacityKw === '' || state.ratedCapacityKw == null ? null : Number(state.ratedCapacityKw),
       refrigerantId: state.refrigerantId || '',
@@ -25,6 +26,7 @@ export function createFGasesSystemSnapshot(state = {}, { generatedAt = new Date(
       placedOnMarketDate: state.placedOnMarketDate || '',
       plannedActivity: state.plannedActivity || '',
       refrigerantOrigin: state.refrigerantOrigin || '',
+      preChargedStatus: state.preChargedStatus || '',
       leakDetectionSystemStatus: state.leakDetectionSystemStatus || '',
       hermeticallySealedStatus: state.hermeticallySealedStatus || '',
       hermeticallySealedLabelStatus: state.hermeticallySealedLabelStatus || '',
