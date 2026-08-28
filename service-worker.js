@@ -23,7 +23,7 @@ const ASSETS = [
   './css/modules-hx.css',
   './css/modules-light-overrides.css',
   './css/modules-pipe.css',
-  './css/modules/pressure-buffer.css',
+  './css/modules-pressure-buffer.css',
   './css/modules-responsive.css',
   './css/modules-unit.css',
   './css/modules-wrg.css',
