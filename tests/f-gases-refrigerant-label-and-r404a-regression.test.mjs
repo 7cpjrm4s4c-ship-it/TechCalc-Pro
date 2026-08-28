@@ -3,6 +3,7 @@ import { calculate } from '../js/modules/f-gases-check/logic.js';
 import { buildFGasesResultModel } from '../js/modules/f-gases-check/results.js';
 import { formatRefrigerantLabel, getRefrigerant } from '../js/utils/refrigerants/index.js';
 
+assert.equal(formatRefrigerantLabel(null), '');
 assert.equal(formatRefrigerantLabel(getRefrigerant('HFKW-134a')), 'R134a');
 assert.equal(formatRefrigerantLabel(getRefrigerant('HFKW-125')), 'R125');
 assert.equal(formatRefrigerantLabel(getRefrigerant('R-404A')), 'R404A');
@@ -36,4 +37,7 @@ const model = buildFGasesResultModel(state, result);
 assert.equal(model.groups.find(group => group.title === 'Kältemittel und Klimawirkung').rows.find(row => row.label === 'Kältemittel').value, 'R404A');
 assert.equal(model.primary.rows.find(row => row.label === 'Wartung / Instandhaltung').value, 'Serviceverbot vorhanden');
 
-console.log('F-Gases refrigerant labels and R404A legal-date regression passed.');
+const emptyStateResult = buildFGasesResultModel({}, calculate({}));
+assert.equal(emptyStateResult.groups.find(group => group.title === 'Kältemittel und Klimawirkung').rows.find(row => row.label === 'Kältemittel').value, '—');
+
+console.log('F-Gases refrigerant labels, initial empty state and R404A legal-date regression passed.');
