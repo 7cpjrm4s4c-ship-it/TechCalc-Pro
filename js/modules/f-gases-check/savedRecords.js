@@ -20,6 +20,7 @@ export function hydrateFGasesSavedRecord(item = {}) {
   const inputState = clone(item.inputState) || {};
   if (!inputState.commissioningDate && inputState.installedAtSiteDate) inputState.commissioningDate = inputState.installedAtSiteDate;
   if (!inputState.stockAssessmentDate && inputState.assessmentDate) inputState.stockAssessmentDate = inputState.assessmentDate;
+  if (!inputState.plannedActivity) inputState.plannedActivity = 'installation';
   delete inputState.installedAtSiteDate;
   delete inputState.assessmentDate;
   return { ...inputState, schemaVersion: Math.max(Number(inputState.schemaVersion) || 0, 5), savedSystemName: item.name || item.title || '' };

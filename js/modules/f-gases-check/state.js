@@ -19,7 +19,7 @@ export const initialState = Object.freeze({
   placedOnMarketDate: '',
   commissioningDate: '',
   stockAssessmentDate: '',
-  plannedActivity: '',
+  plannedActivity: 'installation',
   refrigerantOrigin: '',
   preChargedStatus: '',
   leakDetectionSystemStatus: '',

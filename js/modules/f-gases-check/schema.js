@@ -34,7 +34,7 @@ const plannedActivityOptions = Object.freeze([
 const refrigerantOriginOptions = Object.freeze([option('', 'Nicht angegeben'), option('new', 'Neu'), option('reclaimed', 'Aufgearbeitet'), option('recycled', 'Recycelt')]);
 const certificationStatusOptions = Object.freeze([option('', 'Nicht geprüft'), option('verified', 'Nachgewiesen'), option('not-verified', 'Nicht nachgewiesen'), option('not-applicable', 'Nicht anwendbar')]);
 const isSplitSystem = state => ['split', 'mono-split'].includes(state?.constructionType) || state?.productCategory === 'split-ac-heat-pump';
-const isStockAssessment = state => state?.plannedActivity !== 'installation';
+const isStockAssessment = state => Boolean(state?.plannedActivity && state.plannedActivity !== 'installation');
 
 function formatGermanDateInput(value) {
   const raw = String(value ?? '').trim();
