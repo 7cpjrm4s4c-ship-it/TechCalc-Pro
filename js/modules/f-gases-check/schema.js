@@ -2,18 +2,24 @@ import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
 
 const option = (value, label) => Object.freeze({ value, label });
 const yesNoUnknownOptions = Object.freeze([option('', 'Nicht angegeben'), option('yes', 'Ja'), option('no', 'Nein')]);
+const hermeticProofOptions = Object.freeze([option('', 'Nicht angegeben'), option('yes', 'Nachgewiesen'), option('no', 'Nicht nachgewiesen')]);
 const applicationTypeOptions = Object.freeze([option('refrigeration', 'Kälteanlage'), option('air-conditioning', 'Klimaanlage'), option('heat-pump', 'Wärmepumpe')]);
 const installationTypeOptions = Object.freeze([option('stationary', 'Ortsfest'), option('mobile', 'Mobil')]);
 const mobileEquipmentTypeOptions = Object.freeze([
-  option('', 'Nicht angegeben'), option('refrigerated-truck-trailer', 'Kühllastkraftfahrzeug / Kühlanhänger'),
+  option('', 'Nicht angegeben'),
+  option('refrigerated-truck-trailer', 'Kühllastkraftfahrzeug / Kühlanhänger'),
   option('light-refrigerated-intermodal-rail', 'Leichtes Kühlfahrzeug / intermodaler Container / Eisenbahnkühlwaggon'),
   option('mobile-ac-heat-pump-heavy-etc', 'Mobile Klima-/Wärmepumpe in schwerem Nutzfahrzeug, Lieferwagen, mobiler Maschine, Zug oder Luftfahrzeug')
 ]);
 const productCategoryOptions = Object.freeze([
-  option('household-refrigerator-freezer', 'Haushaltskühl-/Gefriergerät'), option('commercial-self-contained-refrigerator-freezer', 'Gewerbliches in sich geschlossenes Kühl-/Gefriergerät'),
-  option('self-contained-refrigeration-system', 'In sich geschlossene Kälteanlage'), option('other-refrigeration-system', 'Sonstige Kälteanlage'),
-  option('centralized-commercial-refrigeration-system', 'Mehrteilige zentralisierte gewerbliche Kälteanlage'), option('stationary-chiller', 'Ortsfester Kühler'),
-  option('self-contained-ac-heat-pump', 'In sich geschlossenes Klima-/Wärmepumpensystem'), option('split-ac-heat-pump', 'Split-Klima-/Wärmepumpensystem'),
+  option('household-refrigerator-freezer', 'Haushaltskühl-/Gefriergerät'),
+  option('commercial-self-contained-refrigerator-freezer', 'Gewerbliches in sich geschlossenes Kühl-/Gefriergerät'),
+  option('self-contained-refrigeration-system', 'In sich geschlossene Kälteanlage'),
+  option('other-refrigeration-system', 'Sonstige Kälteanlage'),
+  option('centralized-commercial-refrigeration-system', 'Mehrteilige zentralisierte gewerbliche Kälteanlage'),
+  option('stationary-chiller', 'Ortsfester Kühler'),
+  option('self-contained-ac-heat-pump', 'In sich geschlossenes Klima-/Wärmepumpensystem'),
+  option('split-ac-heat-pump', 'Split-Klima-/Wärmepumpensystem'),
   option('direct-evaporation-system', 'Nichtgeschlossenes Direktverdampfungssystem')
 ]);
 const constructionTypeOptions = Object.freeze([
@@ -58,8 +64,8 @@ const schema = defineFormSchema({
     { key: 'refrigerantOrigin', label: 'Herkunft des Servicekältemittels', type: FIELD_TYPES.SELECT, options: refrigerantOriginOptions },
     { key: 'preChargedStatus', label: 'Einrichtung vorbefüllt', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
     { key: 'leakDetectionSystemStatus', label: 'Leckage-Erkennungssystem vorhanden', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
-    { key: 'hermeticallySealedStatus', label: 'Hermetisch geschlossen', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
-    { key: 'hermeticallySealedLabelStatus', label: 'Als hermetisch geschlossen gekennzeichnet', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
+    { key: 'hermeticallySealedStatus', label: 'Hermetisch geschlossene Einrichtung nach Art. 3 Nr. 9 VO (EU) 2024/573', type: FIELD_TYPES.SELECT, options: hermeticProofOptions },
+    { key: 'hermeticallySealedLabelStatus', label: 'Als hermetisch geschlossene Einrichtung gekennzeichnet', type: FIELD_TYPES.SELECT, options: hermeticProofOptions },
     { key: 'coolingBelowMinus50Status', label: 'Kühlung von Erzeugnissen unter −50 °C', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
     { key: 'siteSafetyRestrictionStatus', label: 'Standortbezogene Sicherheitsanforderung verhindert niedrigeres GWP', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
     { key: 'nationalSafetyStandardRestrictionStatus', label: 'Nationale Sicherheitsnorm verhindert Alternative', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },

@@ -52,14 +52,7 @@ function quotaAvailability(snapshot, evaluations, refrigerantOrigin = 'new') {
   if (!Number.isFinite(year)) return null;
   const period = (entry.rule.effect.schedule || []).find(item => year >= item.from && (item.to == null || year <= item.to));
   if (!period) return null;
-  return Object.freeze({
-    status: period.maxTonnesCo2e === 0 ? 'quota-zero' : 'quota-limited',
-    year,
-    from: period.from,
-    to: period.to,
-    maxTonnesCo2e: period.maxTonnesCo2e,
-    legalSource: entry.rule.legalSource
-  });
+  return Object.freeze({ status: period.maxTonnesCo2e === 0 ? 'quota-zero' : 'quota-limited', year, from: period.from, to: period.to, maxTonnesCo2e: period.maxTonnesCo2e, legalSource: entry.rule.legalSource });
 }
 function buildServiceDetails(snapshot, evaluations) {
   const status = aggregateService(evaluations);
@@ -90,7 +83,9 @@ function aggregateCertification(snapshot, evaluations) {
 function germanyLossLimit(context) {
   if (context.installationType !== 'stationary' || !['refrigeration', 'air-conditioning', 'heat-pump'].includes(context.applicationType)) return null;
   if (!context.gasScope.includes('annex-i') && !context.gasScope.includes('annex-ii-group-1')) return null;
-  if (context.hermeticallySealedStatus === 'yes' && context.hermeticallySealedLabelStatus === 'yes') return { status: 'exception-applies', maximumPercent: null };
+  if (context.hermeticallySealedStatus === 'yes' && context.hermeticallySealedLabelStatus === 'yes') {
+    return { status: 'exception-applies', maximumPercent: null, legalSource: 'DE-CHEMKLIMA:§2(3)', exceptionReason: 'hermetically-sealed-and-labelled' };
+  }
   const charge = finiteNumber(context.chargeKg);
   if (charge == null) return { status: 'incomplete', maximumPercent: null };
   if (context.applicationType === 'refrigeration' && context.constructionType === 'self-contained' && charge >= 3) return { status: 'applies', maximumPercent: 1 };
@@ -118,7 +113,7 @@ function aggregateOperatorDuties(snapshot, context, evaluations) {
   let incomplete = false;
   const lossLimit = germanyLossLimit(context);
   if (lossLimit) {
-    obligations.push({ id: 'FG-060', type: 'specific-refrigerant-loss', maximumPercent: lossLimit.maximumPercent, status: lossLimit.status });
+    obligations.push({ id: 'FG-060', type: 'specific-refrigerant-loss', maximumPercent: lossLimit.maximumPercent, status: lossLimit.status, legalSource: lossLimit.legalSource || 'DE-CHEMKLIMA:§2(1)', exceptionReason: lossLimit.exceptionReason || null });
     if (lossLimit.status === 'applies') {
       const actual = finiteNumber(snapshot.specificRefrigerantLossPercent);
       if (actual == null) incomplete = true;

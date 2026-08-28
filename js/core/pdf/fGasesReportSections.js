@@ -68,8 +68,20 @@ function documentationSection(payload) {
 }
 function operatorSection(payload) {
   const obligations = array(payload?.obligations);
-  const rows = obligations.length ? obligations.map(item => { const details = []; if (item.maximumPercent != null) details.push(`${item.maximumPercent} %`); details.push(OBLIGATION_LEGAL[item.id] || 'Rechtsgrundlage siehe Abschnitt 7'); return row(OBLIGATION_LABELS[item.type] || 'Regulatorische Pflicht', details.join(' · ')); }) : [row('Status', status(payload?.status))];
-  return { title: '6. Betreiberpflichten', rows };
+  const rows = [];
+  for (const item of obligations) {
+    if (item.type === 'specific-refrigerant-loss' && item.status === 'exception-applies' && item.exceptionReason === 'hermetically-sealed-and-labelled') {
+      rows.push(row('Maximal zulässiger spezifischer Kältemittelverlust', '§ 2 Abs. 1 nicht anwendbar'));
+      rows.push(row('Begründung', 'Hermetisch geschlossene und entsprechend gekennzeichnete Einrichtung'));
+      rows.push(row('Rechtsgrundlage', '§ 2 Abs. 3 ChemKlimaschutzV'));
+      continue;
+    }
+    const details = [];
+    if (item.maximumPercent != null) details.push(`${item.maximumPercent} %`);
+    details.push(OBLIGATION_LEGAL[item.id] || 'Rechtsgrundlage siehe Abschnitt 7');
+    rows.push(row(OBLIGATION_LABELS[item.type] || 'Regulatorische Pflicht', details.join(' · ')));
+  }
+  return { title: '6. Betreiberpflichten', rows: rows.length ? rows : [row('Status', status(payload?.status))] };
 }
 function regulationsSection(dto) {
   const rules = array(dto.applicableRegulations);
