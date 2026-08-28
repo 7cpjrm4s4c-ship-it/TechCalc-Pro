@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+
+const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
+const packageJson = JSON.parse(read('package.json'));
+const packageLock = JSON.parse(read('package-lock.json'));
+const manifest = JSON.parse(read('manifest.json'));
+const versionSource = read('js/core/version.js');
+const appSource = read('js/core/app.js');
+const floodingReportAdapter = read('js/modules/flooding-verification/reportAdapter.js');
+const releaseNotesController = read('js/platform/shell/releaseNotesController.js');
+const indexHtml = read('index.html');
+const serviceWorker = read('service-worker.js');
+const releaseNotes = read(`docs/releases/${packageJson.version}.md`);
+const currentVersion = packageJson.version;
+const escapedVersion = currentVersion.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+assert.match(currentVersion, /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/, 'package.json version must be valid semver');
+assert.equal(packageLock.version, currentVersion, 'package-lock top-level version must match package.json');
+assert.equal(packageLock.packages?.['']?.version, currentVersion, 'package-lock root package version must match package.json');
+assert.equal(manifest.version, currentVersion, 'manifest version must be derived from package.json');
+assert.match(versionSource, new RegExp(`APP_VERSION\\s*=\\s*['"]${escapedVersion}['"]`), 'generated APP_VERSION must match package.json');
+assert.match(appSource, new RegExp(`const APP_VERSION = ['"]${escapedVersion}['"]; \/\/ generated from package\\.json`), 'app runtime version must be synchronized from package.json');
+assert.match(floodingReportAdapter, new RegExp(`appVersion:\\s*['"]${escapedVersion}['"]`), 'flooding report metadata must match package version');
+assert.doesNotMatch(floodingReportAdapter, /appVersion:\s*['"]\d+\.\d+\.\d+-dev\./, 'flooding report must not contain a development app version');
+assert.doesNotMatch(releaseNotesController, /appVersion\s*=\s*['"](?!1\.5\.0['"])[^'"]+['"]/, 'release notes defaults must be synchronized');
+for (const marker of ['data-app-version-current', 'name="version"', 'id="appVersion"']) assert.match(indexHtml, new RegExp(`${marker}[\\s\\S]{0,80}${escapedVersion}|${escapedVersion}[\\s\\S]{0,80}${marker}`), `index version marker ${marker} must match package version`);
+assert.match(serviceWorker, new RegExp(`CACHE_NAME\\s*=\\s*['"]techcalc-pro-${escapedVersion}['"]`), 'service-worker cache must match package version');
+assert.match(serviceWorker, new RegExp(`CACHE_REVISION\\s*=\\s*['"]${escapedVersion}-`), 'service-worker revision must start with package version');
+assert.match(serviceWorker, /['"]\.\/js\/core\/version\.js['"]/, 'central version module must be precached');
+assert.match(releaseNotes, new RegExp(`^# TechCalc Pro ${escapedVersion}$`, 'm'), 'release notes must match package version');
+assert.doesNotMatch(releaseNotes, /Phase\s+\d+/i, 'public release notes must not contain internal phase labels');
+assert.doesNotMatch(releaseNotes, /dev\.\d+/i, 'public release notes must not contain development build labels');
+for (const script of ['version:sync', 'version:check', 'lint', 'test', 'test:f-gases', 'test:flooding', 'test:integration', 'build', 'precache:check', 'test:e2e:desktop-tablet', 'test:e2e:module-layout', 'test:visual:flooding']) assert.ok(packageJson.scripts?.[script], `package.json missing release gate script ${script}`);
+console.log(`TechCalc Pro ${currentVersion} release-readiness metadata audit passed.`);

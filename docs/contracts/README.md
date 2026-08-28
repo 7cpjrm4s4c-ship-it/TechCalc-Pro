@@ -1,6 +1,6 @@
 # Architecture Contracts
 
-Status: Phase 43C baseline
+Status: TechCalc Pro 1.5.0 baseline
 
 Dieser Ordner enthaelt die langfristigen Architekturvertraege von TechCalc Pro. Contracts beschreiben dauerhaft gueltige Regeln. Phasendokumente beschreiben, wann und wie diese Regeln eingefuehrt oder bestaetigt wurden.
 
@@ -15,6 +15,9 @@ Dieser Ordner enthaelt die langfristigen Architekturvertraege von TechCalc Pro. 
 - `theme-contract.md`
 - `module-contract.md`
 - `pdf-contract.md`
+- `f-gases-check-contract.md`
+- `flooding-verification-contract.md`
+- `release-version-contract.md`
 
 ## Verbindlichkeit
 
