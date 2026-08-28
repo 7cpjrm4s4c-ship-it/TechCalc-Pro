@@ -33,7 +33,15 @@ const project = {
 
 assert.equal(REPORT_TEMPLATE_VERSION, 'global-report-template-9-rc11-1-pdf-table-dedupe');
 assert.equal(sanitizeText('m³/h ± Δp → µ-Wert Ø 18 × 1,0'), 'm³/h +/- Deltap -> u-Wert DN 18 × 1,0');
-assert.ok(splitPdfText('A'.repeat(180), 42, 6.25).length > 1, 'long tokens must be wrapped');
+const unbreakableToken = 'A'.repeat(180);
+assert.deepEqual(
+  splitPdfText(unbreakableToken, 42, 6.25),
+  [unbreakableToken],
+  'unbreakable words must stay intact instead of being split at arbitrary characters'
+);
+const semanticTokenLines = splitPdfText('sehr-langer/technischer-bezeichner', 42, 6.25);
+assert.ok(semanticTokenLines.length > 1, 'long technical tokens must wrap at semantic separators');
+assert.ok(semanticTokenLines.every(line => line.length > 1), 'semantic wrapping must not emit isolated characters');
 
 const hxSections = reportSections({
   id: 'hx-diagram',
