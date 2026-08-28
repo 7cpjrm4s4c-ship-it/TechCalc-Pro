@@ -1,38 +1,7 @@
 import { restoreFocus as restorePlatformFocus } from './focusManager.js';
 
-const KEYBOARD_SELECT_RESTORE_WINDOW_MS = 350;
-let keyboardSelectSnapshot = null;
-
 function stableKey(element) {
   return element?.id || element?.dataset?.field || element?.name || null;
-}
-
-function rememberKeyboardSelect(event) {
-  const select = event?.target?.closest?.('select');
-  if (!select) return;
-  keyboardSelectSnapshot = {
-    element: select,
-    key: stableKey(select),
-    at: Date.now()
-  };
-}
-
-function clearKeyboardSelectSnapshot() {
-  keyboardSelectSnapshot = null;
-}
-
-function recentKeyboardSelect(root, active) {
-  const snapshot = keyboardSelectSnapshot;
-  if (!snapshot?.key || Date.now() - snapshot.at > KEYBOARD_SELECT_RESTORE_WINDOW_MS) return null;
-  if (!root?.contains?.(snapshot.element)) return null;
-  if (active && active !== document.body && active !== snapshot.element) return null;
-  return snapshot;
-}
-
-if (typeof document !== 'undefined' && document?.addEventListener) {
-  document.addEventListener('keydown', rememberKeyboardSelect, true);
-  document.addEventListener('pointerdown', clearKeyboardSelectSnapshot, true);
-  document.addEventListener('touchstart', clearKeyboardSelectSnapshot, true);
 }
 
 export function safeReplaceContent(root, html, options = {}) {
@@ -48,8 +17,7 @@ export function safeReplaceContent(root, html, options = {}) {
 
   const active = document.activeElement;
   const activeKey = active && root.contains(active) ? stableKey(active) : null;
-  const keyboardSelect = recentKeyboardSelect(root, active);
-  const focusKey = activeKey || keyboardSelect?.key || null;
+  const allowSelectRestore = active?.tagName === 'SELECT';
   const selection = captureSelection(active, root);
 
   try {
@@ -70,10 +38,9 @@ export function safeReplaceContent(root, html, options = {}) {
     root.__tcReplacingContent = false;
   }
 
-  if (options.restoreFocus !== false && focusKey) {
-    restoreFocus(root, focusKey, selection, { allowSelect: Boolean(keyboardSelect) });
+  if (options.restoreFocus !== false && activeKey) {
+    restoreFocus(root, activeKey, selection, { allowSelect: allowSelectRestore });
   }
-  if (keyboardSelect) clearKeyboardSelectSnapshot();
   return true;
 }
 
@@ -91,10 +58,10 @@ function restoreFocus(root, key, selection, options = {}) {
   const selector = `[id="${cssEscape(key)}"], [data-field="${cssEscape(key)}"], [name="${cssEscape(key)}"]`;
   const next = root.querySelector(selector);
   if (!next || next.disabled) return;
-  // Native select focus restoration remains disabled for pointer/touch-driven
-  // commits because mobile Safari/Chrome can reopen the picker after a render.
-  // A recent keyboard interaction on the same select is safe to restore and is
-  // required to keep the central Tab/Enter traversal chain intact.
+  // Pointer/touch-driven select commits blur the native control before rendering
+  // and therefore do not reach this branch. A select that is still the active
+  // element belongs to the keyboard traversal path and must retain focus across
+  // the structural render.
   if (next.tagName === 'SELECT' && options.allowSelect !== true) return;
   try {
     restorePlatformFocus(next);
