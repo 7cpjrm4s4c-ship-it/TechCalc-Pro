@@ -5,12 +5,12 @@ import { calculate } from './logic.js';
 import { buildFGasesResultModel } from './results.js';
 import { buildFGasesReportDto } from './reportAdapter.js';
 import { buildFGasesSavedRecord, hydrateFGasesSavedRecord, buildFGasesSavedRecordsModel } from './savedRecords.js';
-import { listRefrigerants } from '../../utils/refrigerants/index.js';
+import { formatRefrigerantLabel, listRefrigerants } from '../../utils/refrigerants/index.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 
 const refrigerantOptions = Object.freeze([
   Object.freeze({ value: '', label: 'Bitte wählen' }),
-  ...listRefrigerants().map(item => Object.freeze({ value: item.id, label: item.name || item.id }))
+  ...listRefrigerants().map(item => Object.freeze({ value: item.id, label: formatRefrigerantLabel(item) || item.id }))
 ]);
 
 const runtimeSchema = Object.freeze({

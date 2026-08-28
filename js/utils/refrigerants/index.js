@@ -11,3 +11,4 @@ export {
   evaluateRegulations,
   getApplicableRegulations
 } from './refrigerant-service.js';
+export { formatRefrigerantLabel } from './refrigerant-label.js';
