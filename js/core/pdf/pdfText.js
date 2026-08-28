@@ -10,7 +10,6 @@ export function applyEngineeringTypography(value = '') {
     .replace(/\bA\s*[x*]\s*C(s)?\b/g, (_match, suffix) => `A × C${suffix || ''}`)
     .replace(/\bA\s*·\s*C(s)?\b/g, (_match, suffix) => `A × C${suffix || ''}`);
 }
-
 export function sanitizeText(value = '') {
   return applyEngineeringTypography(String(value ?? ''))
     .replace(/[\uFEFF\uFFFD]/g, '')
@@ -48,7 +47,6 @@ export function sanitizeText(value = '') {
     .replace(/\s+/g, ' ')
     .trim();
 }
-
 export function normalizeKey(label = '') {
   return sanitizeText(label).toLowerCase()
     .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
@@ -56,7 +54,6 @@ export function normalizeKey(label = '') {
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
 }
-
 export function winAnsiByteForChar(ch) {
   const code = ch.codePointAt(0);
   const fallback = {
@@ -71,7 +68,6 @@ export function winAnsiByteForChar(ch) {
   if (code >= 0xA0 && code <= 0xFF) return code;
   return 0x20;
 }
-
 export function pdfHexText(value = '') {
   const text = sanitizeText(value);
   const bytes = [];
@@ -84,7 +80,6 @@ export function pdfNumber(value) {
   if (!Number.isFinite(number)) return '0';
   return number.toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
 }
-
 export function estimateTextWidth(text, size = 8, font = 'F1') {
   if (font === 'F3' || font === 'F4') return sanitizeText(text).length * size * 0.6;
   const widths = {
@@ -104,15 +99,14 @@ export function estimateTextWidth(text, size = 8, font = 'F1') {
   for (const ch of sanitizeText(text)) total += widths[ch] ?? (/[a-zäöüß]/.test(ch) ? 0.50 : 0.56);
   return total * size;
 }
-
-function splitLongToken(token, maxWidth, size) {
+function splitLongToken(token, maxWidth, size, font = 'F1') {
   const clean = sanitizeText(token);
-  if (estimateTextWidth(clean, size) <= maxWidth) return [clean];
+  if (estimateTextWidth(clean, size, font) <= maxWidth) return [clean];
   const chunks = [];
   let current = '';
   for (const ch of clean) {
     const next = current + ch;
-    if (current && estimateTextWidth(next, size) > maxWidth) {
+    if (current && estimateTextWidth(next, size, font) > maxWidth) {
       chunks.push(current);
       current = ch;
     } else {
@@ -122,18 +116,17 @@ function splitLongToken(token, maxWidth, size) {
   if (current) chunks.push(current);
   return chunks;
 }
-
-export function splitPdfText(value = '', maxWidth = 200, size = 8) {
+export function splitPdfText(value = '', maxWidth = 200, size = 8, font = 'F1') {
   const text = sanitizeText(value);
   if (!text) return [''];
   const words = text.split(' ');
   const lines = [];
   let current = '';
   for (const word of words) {
-    const parts = splitLongToken(word, maxWidth, size);
+    const parts = splitLongToken(word, maxWidth, size, font);
     for (const part of parts) {
       const candidate = current ? `${current} ${part}` : part;
-      if (current && estimateTextWidth(candidate, size) > maxWidth) {
+      if (current && estimateTextWidth(candidate, size, font) > maxWidth) {
         lines.push(current);
         current = part;
       } else {
@@ -144,7 +137,6 @@ export function splitPdfText(value = '', maxWidth = 200, size = 8) {
   if (current) lines.push(current);
   return lines.length ? lines : [''];
 }
-
 export function rgb(values = [0, 0, 0]) {
   return values.map(value => pdfNumber(Number(value) / 255)).join(' ');
 }

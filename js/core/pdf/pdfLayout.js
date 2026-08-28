@@ -2,7 +2,6 @@ import { PDF_PAGE, PDF_THEME, PDF_GRID } from './reportTheme.js';
 import { reportSections, lineSectionItems } from './pdfDataMapping.js';
 import { parseJpegDataUrl } from './pdfChartRender.js';
 import { sanitizeText, normalizeKey, pdfHexText, pdfNumber, estimateTextWidth, splitPdfText, rgb, pdfRowValue } from './pdfText.js';
-
 function cleanRows(rows = []) {
   return rows
     .filter(row => normalizeKey(row?.[0] || '') !== 'bezeichnung')
@@ -71,21 +70,21 @@ function drawRightAlignedValue(report, value, rightX, y, { size = PDF_THEME.tabl
 }
 function sectionTitleHeight(title) {
   const width = PDF_PAGE.width - PDF_THEME.margin * 2;
-  const lines = splitPdfText(title, width, 8.4).length;
+  const lines = splitPdfText(title, width, 8.4, 'F2').length;
   return 6 + Math.max(11, lines * 8.4 * 1.18 + 3);
 }
 function dynamicProjectDataHeight(project, columnWidth) {
   const values = [project.project, project.projectNo, project.client, project.engineer];
-  const valueLines = values.map(value => splitPdfText(value || '-', columnWidth, 6.8).length);
+  const valueLines = values.map(value => splitPdfText(value || '-', columnWidth, 6.8, 'F2').length);
   return Math.max(20, 13 + Math.max(...valueLines) * 6.8 * 1.18 + 4);
 }
 function dynamicCorporateBlockHeight(project, moduleData, width) {
-  const addressLines = splitPdfText(project.companyAddress || '-', width * 0.36, 6.4).length;
-  const companyLines = splitPdfText(project.companyName || '-', width * 0.36, 6.6).length;
-  const versionLines = splitPdfText(project.documentVersion || '-', 72, 6.6).length;
-  const moduleLines = splitPdfText(moduleData.shortTitle || moduleData.title || '-', 72, 6.4).length;
-  const checkedLines = splitPdfText(project.checkedBy || '-', 80, 6.6).length;
-  const approvedLines = splitPdfText(project.approvedBy || '-', 80, 6.6).length;
+  const addressLines = splitPdfText(project.companyAddress || '-', width * 0.36, 6.4, 'F1').length;
+  const companyLines = splitPdfText(project.companyName || '-', width * 0.36, 6.6, 'F2').length;
+  const versionLines = splitPdfText(project.documentVersion || '-', 72, 6.6, 'F2').length;
+  const moduleLines = splitPdfText(moduleData.shortTitle || moduleData.title || '-', 72, 6.4, 'F1').length;
+  const checkedLines = splitPdfText(project.checkedBy || '-', 80, 6.6, 'F2').length;
+  const approvedLines = splitPdfText(project.approvedBy || '-', 80, 6.6, 'F2').length;
   const leftH = 20 + companyLines * 6.6 * 1.18 + 5 + addressLines * 6.4 * 1.18;
   const midH = 20 + versionLines * 6.6 * 1.18 + 5 + moduleLines * 6.4 * 1.18;
   const rightH = 20 + checkedLines * 6.6 * 1.18 + 5 + approvedLines * 6.6 * 1.18;
@@ -96,8 +95,8 @@ function pairRowHeight(pair, columns, { labelSize = PDF_THEME.table.labelSize, v
   pair.forEach((row, index) => {
     if (!row) return;
     const col = index === 0 ? columns.left : columns.right;
-    const labelLines = splitPdfText(row?.[0] || '-', col.labelW - 4, labelSize).length;
-    const valueLines = splitPdfText(pdfValueForRow(row), col.valueW, valueSize).length;
+    const labelLines = splitPdfText(row?.[0] || '-', col.labelW - 4, labelSize, 'F2').length;
+    const valueLines = splitPdfText(pdfValueForRow(row), col.valueW, valueSize, 'F4').length;
     lines = Math.max(lines, labelLines, valueLines);
   });
   return Math.max(PDF_THEME.table.rowMinHeight, lines * Math.max(labelSize, valueSize) * 1.22 + PDF_THEME.table.rowPaddingTop + PDF_THEME.table.rowPaddingBottom);
@@ -109,8 +108,8 @@ function drawPairedRow(report, pair, x, y, width, rowHeight, { labelSize = PDF_T
     const col = index === 0 ? columns.left : columns.right;
     const labelLineHeight = 1.15;
     const valueLineHeight = 1.15;
-    const labelLines = splitPdfText(row?.[0] || '-', col.labelW - 4, labelSize).length;
-    const valueLines = splitPdfText(pdfValueForRow(row), col.valueW, valueSize).length;
+    const labelLines = splitPdfText(row?.[0] || '-', col.labelW - 4, labelSize, 'F2').length;
+    const valueLines = splitPdfText(pdfValueForRow(row), col.valueW, valueSize, 'F4').length;
     const labelBlockH = Math.max(labelSize, labelLines * labelSize * labelLineHeight);
     const valueBlockH = Math.max(valueSize, valueLines * valueSize * valueLineHeight);
     const labelBaseline = y + Math.max(PDF_THEME.table.rowPaddingTop + labelSize, (rowHeight - labelBlockH) / 2 + labelSize);
@@ -144,7 +143,7 @@ export class GlobalPdfReport {
   y(topY) { return PDF_PAGE.height - topY; }
   color(values, stroke = false) { this.cmd(`${rgb(values)} ${stroke ? 'RG' : 'rg'}`); }
   text(value, x, y, { size = 8, font = 'F1', color = PDF_THEME.text, align = 'left', maxWidth = null, lineHeight = 1.18 } = {}) {
-    const lines = maxWidth ? splitPdfText(value, maxWidth, size) : [sanitizeText(value)];
+    const lines = maxWidth ? splitPdfText(value, maxWidth, size, font) : [sanitizeText(value)];
     lines.forEach((line, index) => {
       const lineY = y + index * size * lineHeight;
       let lineX = x;
