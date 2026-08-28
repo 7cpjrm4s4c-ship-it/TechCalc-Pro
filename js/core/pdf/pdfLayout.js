@@ -37,45 +37,36 @@ function pdfValueForRow(row = []) {
   return pdfRowValue(row).replace(/ - /g, ' x ');
 }
 function tableColumns(x, width) {
-  // RC.9: one immutable four-column grid for every module.  The even
-  // columns are not computed per row; they use fixed right anchors inside
-  // the two half-width cells.  This is the central reference edge requested
-  // for all values, units, text, formulas and special-character fallbacks.
+  // One immutable four-column grid for every report section:
+  // label | value | label | value. Labels are left-aligned, values use
+  // fixed right anchors. The shared ratios keep all sections visually calm.
   const gap = PDF_THEME.table.gap;
-  const available = width - gap;
-  const halfW = available / 2;
-  const valueW = Math.min(PDF_THEME.table.valueColumnWidth, Math.max(112, halfW * 0.48));
-  const labelW = Math.max(74, halfW - valueW - PDF_THEME.table.cellGap);
-  const leftValueRightX = x + halfW - PDF_THEME.table.valueRightInset;
-  const rightLabelX = x + halfW + gap;
+  const cellGap = PDF_THEME.table.cellGap;
+  const available = width - gap - cellGap * 2;
+  const labelLeftW = available * PDF_GRID.labelLeftRatio;
+  const valueLeftW = available * PDF_GRID.valueLeftRatio;
+  const labelRightW = available * PDF_GRID.labelRightRatio;
+  const valueRightW = available * PDF_GRID.valueRightRatio;
+  const leftValueRightX = x + labelLeftW + cellGap + valueLeftW - PDF_THEME.table.valueRightInset;
+  const rightLabelX = x + labelLeftW + cellGap + valueLeftW + gap;
   const rightValueRightX = x + width - PDF_THEME.table.valueRightInset;
   return {
     left: {
       labelX: x,
-      labelW,
+      labelW: labelLeftW,
       valueRightX: leftValueRightX,
-      valueW
+      valueW: valueLeftW
     },
     right: {
       labelX: rightLabelX,
-      labelW,
+      labelW: labelRightW,
       valueRightX: rightValueRightX,
-      valueW
+      valueW: valueRightW
     },
     rowLineEnd: x + width
   };
 }
-function singleColumnLayout(x, width) {
-  const gap = PDF_THEME.table.cellGap;
-  const labelW = Math.max(128, Math.min(188, width * 0.34));
-  const valueX = x + labelW + gap;
-  const valueW = Math.max(120, width - labelW - gap);
-  return { labelX: x, labelW, valueX, valueW, rowLineEnd: x + width };
-}
 function drawRightAlignedValue(report, value, rightX, y, { size = PDF_THEME.table.valueSize, maxWidth = 96, color = PDF_THEME.table.valueColor, font = 'F4', lineHeight = 1.15 } = {}) {
-  // Values in all even columns share a fixed right-side anchor. Wrapping is
-  // performed before drawing; every continuation line keeps the exact same
-  // reference edge so numbers, text and units align module-wide.
   report.text(value, rightX, y, { size, font, color, align: 'right', maxWidth, lineHeight });
 }
 function sectionTitleHeight(title) {
@@ -111,12 +102,6 @@ function pairRowHeight(pair, columns, { labelSize = PDF_THEME.table.labelSize, v
   });
   return Math.max(PDF_THEME.table.rowMinHeight, lines * Math.max(labelSize, valueSize) * 1.22 + PDF_THEME.table.rowPaddingTop + PDF_THEME.table.rowPaddingBottom);
 }
-function singleRowHeight(row, columns, { labelSize = PDF_THEME.table.labelSize, valueSize = PDF_THEME.table.valueSize } = {}) {
-  const labelLines = splitPdfText(row?.[0] || '-', columns.labelW - 4, labelSize).length;
-  const valueLines = splitPdfText(pdfValueForRow(row), columns.valueW - 4, valueSize).length;
-  const lines = Math.max(1, labelLines, valueLines);
-  return Math.max(PDF_THEME.table.rowMinHeight, lines * Math.max(labelSize, valueSize) * 1.22 + PDF_THEME.table.rowPaddingTop + PDF_THEME.table.rowPaddingBottom);
-}
 function drawPairedRow(report, pair, x, y, width, rowHeight, { labelSize = PDF_THEME.table.labelSize, valueSize = PDF_THEME.table.valueSize } = {}) {
   const columns = tableColumns(x, width);
   pair.forEach((row, index) => {
@@ -142,31 +127,6 @@ function drawPairedRow(report, pair, x, y, width, rowHeight, { labelSize = PDF_T
       maxWidth: col.valueW,
       lineHeight: valueLineHeight
     });
-  });
-}
-function drawSingleRow(report, row, x, y, width, rowHeight, { labelSize = PDF_THEME.table.labelSize, valueSize = PDF_THEME.table.valueSize } = {}) {
-  const columns = singleColumnLayout(x, width);
-  const labelLineHeight = 1.15;
-  const valueLineHeight = 1.15;
-  const labelLines = splitPdfText(row?.[0] || '-', columns.labelW - 4, labelSize).length;
-  const valueLines = splitPdfText(pdfValueForRow(row), columns.valueW - 4, valueSize).length;
-  const labelBlockH = Math.max(labelSize, labelLines * labelSize * labelLineHeight);
-  const valueBlockH = Math.max(valueSize, valueLines * valueSize * valueLineHeight);
-  const labelBaseline = y + Math.max(PDF_THEME.table.rowPaddingTop + labelSize, (rowHeight - labelBlockH) / 2 + labelSize);
-  const valueBaseline = y + Math.max(PDF_THEME.table.rowPaddingTop + valueSize, (rowHeight - valueBlockH) / 2 + valueSize);
-  report.text(row?.[0] || '-', columns.labelX, labelBaseline, {
-    size: labelSize,
-    font: 'F2',
-    color: PDF_THEME.table.labelColor,
-    maxWidth: columns.labelW - 4,
-    lineHeight: labelLineHeight
-  });
-  report.text(pdfValueForRow(row), columns.valueX, valueBaseline, {
-    size: valueSize,
-    font: 'F1',
-    color: PDF_THEME.table.valueColor,
-    maxWidth: columns.valueW - 4,
-    lineHeight: valueLineHeight
   });
 }
 export class GlobalPdfReport {
@@ -306,26 +266,23 @@ export class GlobalPdfReport {
   standardSection(section) {
     const rows = section.rows.filter(row => row.some(cell => sanitizeText(cell)));
     if (!rows.length) return;
-    const singleColumn = section.singleColumn === true;
-    const entries = singleColumn ? rows : pairSequentialRows(rows);
+    const pairs = pairSequentialRows(rows);
     const m = PDF_THEME.margin;
     const w = PDF_PAGE.width - m * 2;
     const innerX = m + 5;
     const innerW = w - 10;
-    const columns = singleColumn ? singleColumnLayout(innerX, innerW) : tableColumns(innerX, innerW);
-    const rowHeights = entries.map(entry => singleColumn
-      ? singleRowHeight(entry, columns, { labelSize: 6.1, valueSize: 6.25 })
-      : pairRowHeight(entry, columns, { labelSize: 6.1, valueSize: 6.25 }));
+    const columns = tableColumns(innerX, innerW);
+    const rowHeights = pairs.map(pair => pairRowHeight(pair, columns, { labelSize: 6.1, valueSize: 6.25 }));
     let index = 0;
     let continued = false;
-    while (index < entries.length) {
+    while (index < pairs.length) {
       const title = continued ? `${section.title} (Fortsetzung)` : section.title;
       this.ensureSpace(sectionTitleHeight(title) + 24);
       this.sectionTitle(title);
       const available = Math.max(36, this.contentBottom() - this.cursorY - 7);
       let segmentHeight = 0;
       let endIndex = index;
-      while (endIndex < entries.length && (4 + segmentHeight + rowHeights[endIndex] + 4 <= available || endIndex === index)) {
+      while (endIndex < pairs.length && (4 + segmentHeight + rowHeights[endIndex] + 4 <= available || endIndex === index)) {
         segmentHeight += rowHeights[endIndex];
         endIndex += 1;
       }
@@ -337,8 +294,7 @@ export class GlobalPdfReport {
       for (let rowIndex = index; rowIndex < endIndex; rowIndex += 1) {
         const h = rowHeights[rowIndex];
         this.line(innerX, rowY + h - 2, innerX + innerW, rowY + h - 2, PDF_THEME.rowLine, 0.3);
-        if (singleColumn) drawSingleRow(this, entries[rowIndex], innerX, rowY, innerW, h, { labelSize: 6.1, valueSize: 6.25 });
-        else drawPairedRow(this, entries[rowIndex], innerX, rowY, innerW, h, { labelSize: 6.1, valueSize: 6.25 });
+        drawPairedRow(this, pairs[rowIndex], innerX, rowY, innerW, h, { labelSize: 6.1, valueSize: 6.25 });
         rowY += h;
       }
       this.cursorY += blockHeight + 5;
@@ -361,7 +317,6 @@ export class GlobalPdfReport {
     this.ensureSpace(desiredH + 30);
     this.sectionTitle('h,x-Diagramm');
     this.rect(m, this.cursorY, boxW, desiredH, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
-    // Preserve aspect ratio exactly; center inside a fixed chart frame so the diagram is never vertically compressed or cropped.
     this.drawImage('ImChart', m + (boxW - imgW) / 2, this.cursorY + pad + (desiredH - pad * 2 - imgH) / 2, imgW, imgH);
     this.cursorY += desiredH + 8;
   }
