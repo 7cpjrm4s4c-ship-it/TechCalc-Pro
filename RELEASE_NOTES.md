@@ -1,27 +1,26 @@
-## Nächste Entwicklungsphase – Regenwassereinläufe, BTU/h und h,x-Diagramm
+## Version 1.5.0 – F-Gase-Check
 
 ### Neu
-- Auswahl „Herstellerangaben“ als letzter Eintrag bei Dacheinläufen und Hoftöpfen ergänzt.
-- Freie Eingabe von Hersteller/Produkt, DN, Abflusswert und Anstauhöhe ermöglicht.
-- Herstellerwerte werden in Berechnung, Ergebnisdarstellung und gespeicherten Regenflächen durchgängig erhalten.
-- Leistungseinheit `BTU/h` mit dem Umrechnungsfaktor `1 BTU/h = 0,2930710701722 W` im Einheitenrechner ergänzt.
+- F-Gase-Check für Kälte-, Klima- und Wärmepumpenanlagen integriert.
+- Gemeinsame Kältemittelplattform mit GWP-, Sicherheitsklassen- und regulatorischen Daten ergänzt.
+- Regulatorische Prüfung für Inverkehrbringen, Service, Dichtheitskontrolle, Leckage-Erkennung, Dokumentation, Zertifizierung und Betreiberpflichten ergänzt.
+- Versionierte Anlagen-Snapshots, Saved Records und PDF-Ausgabe integriert.
 
-### Qualität
-- Bestehende Standardvorwahlen bleiben rückwärtskompatibel.
-- Unvollständige Herstellerdaten werden durch Plausibilitätshinweise kenntlich gemacht.
-- Automatisierte Regressionstests für Auswahl, Berechnung und Leerzustand ergänzt.
-- Vorwärts- und Rückwärtsumrechnung sowie Anzeige von `BTU/h` sind automatisiert abgesichert.
+### Verbesserungen
+- Regulatorische Zeitbezüge für Inverkehrbringen, Inbetriebnahme und Bestandsprüfung getrennt.
+- Kältemittel werden bevorzugt mit R-Bezeichnungen dargestellt.
+- PDF-Tabellen verwenden zentral ein einheitliches Vier-Spalten-Raster mit mehrzeiligem Umbruch.
+- Zentraler PDF-Textumbruch verhindert willkürliche Einzelbuchstaben-Trennungen.
+- Tastaturnavigation bei Select-Feldern über dynamische Renderzyklen stabilisiert.
 
 ### Behoben
-- Dampf- und adiabate Befeuchtung erzeugen bei einem gegenüber dem Ausgangszustand niedrigeren Zielfeuchtegehalt keine physikalisch unmögliche negative Befeuchtung mehr.
-- In diesem Fall zeigt das Diagramm ausschließlich die mögliche Beheizungskennlinie und den Hinweis „Befeuchtung nicht möglich“.
-- „Kühlen + entfeuchten“ erzeugt bei einem höheren Zielfeuchtegehalt keine physikalisch unmögliche Befeuchtung mehr; dargestellt werden ausschließlich die mögliche Kühlkennlinie und der Hinweis „Entfeuchtung nicht möglich“.
-- Die Fallback-Kennlinien sowie die zulässigen und unzulässigen Be- und Entfeuchtungsvarianten sind durch einen automatisierten Regressionstest abgesichert.
+- Leere Kältemittelzustände können das F-Gase-Modul nicht mehr beim Laden abbrechen.
+- Hermetische Ausnahme nach § 2 Abs. 3 ChemKlimaschutzV wird nur bei erfülltem Status und Kennzeichnung angewendet.
+- Service- und Quotenhinweise sind fachlich getrennt und konsistent beschriftet.
 
 ## Version 1.4.0 – Final Release
 
 ### Freigabe
-
 TechCalc Pro 1.4.0 ist als Produktionsversion freigegeben. Der Überflutungs- und Rückhaltenachweis sowie alle zugehörigen Qualitäts-, Plattform- und PDF-Arbeiten sind abgeschlossen.
 
 ### Neu
@@ -35,12 +34,3 @@ TechCalc Pro 1.4.0 ist als Produktionsversion freigegeben. Der Überflutungs- un
 - Zentraler Modul-, Layout- und Spacing-Vertrag über alle Module vereinheitlicht.
 - Browser-, Viewport-, Theme-, Offline-, Projekt- und PDF-Regression erweitert.
 - Mischluft-, WRG- und Legacy-Projektlebenszyklus stabilisiert.
-
-### Qualitätsstatus
-- GitHub Actions `Playwright Tests` Run #193 erfolgreich.
-- Automatisierte und manuelle Phase-47-Gates vollständig bestanden.
-- Enterprise-/QM-Freigabe am 23.07.2026 erteilt.
-- Keine offenen blockierenden Befunde.
-
-### Produktionsstatus
-TechCalc Pro 1.4.0 ist für den produktiven Einsatz freigegeben.
