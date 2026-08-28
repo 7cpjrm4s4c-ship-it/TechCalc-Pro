@@ -99,18 +99,26 @@ export function estimateTextWidth(text, size = 8, font = 'F1') {
   for (const ch of sanitizeText(text)) total += widths[ch] ?? (/[a-zäöüß]/.test(ch) ? 0.50 : 0.56);
   return total * size;
 }
+function splitAtSemanticSeparators(token) {
+  const clean = sanitizeText(token);
+  if (!clean) return [''];
+  const parts = clean.match(/[^/·-]+[/·-]?/g);
+  return parts?.filter(Boolean) || [clean];
+}
 function splitLongToken(token, maxWidth, size, font = 'F1') {
   const clean = sanitizeText(token);
   if (estimateTextWidth(clean, size, font) <= maxWidth) return [clean];
+  const semanticParts = splitAtSemanticSeparators(clean);
+  if (semanticParts.length === 1) return [clean];
   const chunks = [];
   let current = '';
-  for (const ch of clean) {
-    const next = current + ch;
-    if (current && estimateTextWidth(next, size, font) > maxWidth) {
+  for (const part of semanticParts) {
+    const candidate = current + part;
+    if (current && estimateTextWidth(candidate, size, font) > maxWidth) {
       chunks.push(current);
-      current = ch;
+      current = part;
     } else {
-      current = next;
+      current = candidate;
     }
   }
   if (current) chunks.push(current);
