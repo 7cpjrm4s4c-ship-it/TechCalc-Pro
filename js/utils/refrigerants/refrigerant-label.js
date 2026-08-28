@@ -7,10 +7,11 @@ function normalizeRDesignation(value = '') {
 }
 
 export function formatRefrigerantLabel(refrigerant = {}) {
-  const designation = normalizeRDesignation(refrigerant.id);
-  if (!designation) return refrigerant.name || '';
-  if (refrigerant.regulatory?.fluorinatedGreenhouseGas === false && refrigerant.name) {
-    return `${designation} (${refrigerant.name})`;
+  const item = refrigerant && typeof refrigerant === 'object' ? refrigerant : {};
+  const designation = normalizeRDesignation(item.id);
+  if (!designation) return item.name || '';
+  if (item.regulatory?.fluorinatedGreenhouseGas === false && item.name) {
+    return `${designation} (${item.name})`;
   }
   return designation;
 }
