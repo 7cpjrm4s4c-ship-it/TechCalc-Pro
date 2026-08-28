@@ -1,33 +1,21 @@
 import { formatEngineeringNumber } from '../numberService.js';
-
 const array = value => Array.isArray(value) ? value : [];
 const object = value => value && typeof value === 'object' && !Array.isArray(value) ? value : {};
 const text = value => value == null || value === '' ? '—' : String(value);
 const fmt = (value, kind = 'generic') => value == null || value === '' ? '—' : formatEngineeringNumber(value, kind);
 const row = (label, value, unit = '') => [label, text(value), unit];
 const num = (label, value, kind, unit = '') => [label, fmt(value, kind), value == null || value === '' ? '' : unit];
-
-const STATUS = Object.freeze({
-  prohibited: 'unzulässig', 'exception-applies': 'Ausnahme anwendbar', 'no-prohibition-found': 'keine Beschränkung ermittelt', 'manual-review': 'manuelle Rechtsprüfung erforderlich', incomplete: 'Angaben unvollständig', 'not-specified': 'nicht bewertet', 'not-applicable': 'nicht anwendbar', 'allowed-under-exception': 'unter gesetzlicher Ausnahme zulässig', required: 'erforderlich', 'not-required': 'nicht erforderlich', verified: 'nachgewiesen', 'required-not-verified': 'erforderlich, nicht nachgewiesen', 'non-compliant': 'Anforderung nicht erfüllt', 'requirements-identified': 'Pflichten erfüllt'
-});
+const STATUS = Object.freeze({ prohibited: 'unzulässig', 'exception-applies': 'Ausnahme anwendbar', 'no-prohibition-found': 'keine Beschränkung ermittelt', 'manual-review': 'manuelle Rechtsprüfung erforderlich', incomplete: 'Angaben unvollständig', 'not-specified': 'nicht bewertet', 'not-applicable': 'nicht anwendbar', 'allowed-under-exception': 'unter gesetzlicher Ausnahme zulässig', required: 'erforderlich', 'not-required': 'nicht erforderlich', verified: 'nachgewiesen', 'required-not-verified': 'erforderlich, nicht nachgewiesen', 'non-compliant': 'Anforderung nicht erfüllt', 'requirements-identified': 'Pflichten erfüllt' });
 const status = value => STATUS[value] || value || '—';
-
-const LABELS = Object.freeze({
-  refrigeration: 'Kälteanlage', 'air-conditioning': 'Klimaanlage', 'heat-pump': 'Wärmepumpe', stationary: 'ortsfest', mobile: 'mobil', 'air-water': 'Luft-Wasser', 'air-air': 'Luft-Luft', split: 'Split', 'mono-split': 'Mono-Split', monoblock: 'Monoblock', 'self-contained': 'in sich geschlossen', portable: 'tragbar / steckerfertig', centralized: 'zentralisiert', cascade: 'Kaskadensystem', other: 'sonstige Bauform', installation: 'Installation', maintenance: 'Wartung / Instandhaltung', repair: 'Reparatur', 'leak-check': 'Dichtheitskontrolle', recovery: 'Rückgewinnung', decommissioning: 'Außerbetriebnahme', 'household-refrigerator-freezer': 'Haushaltskühl-/Gefriergerät', 'commercial-self-contained-refrigerator-freezer': 'Gewerbliches in sich geschlossenes Kühl-/Gefriergerät', 'self-contained-refrigeration-system': 'In sich geschlossene Kälteanlage', 'other-refrigeration-system': 'Sonstige Kälteanlage', 'centralized-commercial-refrigeration-system': 'Mehrteilige zentralisierte gewerbliche Kälteanlage', 'stationary-chiller': 'Ortsfester Kühler', 'self-contained-ac-heat-pump': 'In sich geschlossenes Klima-/Wärmepumpensystem', 'split-ac-heat-pump': 'Split-Klima-/Wärmepumpensystem', 'direct-evaporation-system': 'Nichtgeschlossenes Direktverdampfungssystem', 'refrigerated-truck-trailer': 'Kühllastkraftfahrzeug / Kühlanhänger', 'light-refrigerated-intermodal-rail': 'Leichtes Kühlfahrzeug / intermodaler Container / Eisenbahnkühlwaggon', 'mobile-ac-heat-pump-heavy-etc': 'Mobile Klima-/Wärmepumpe in Nutzfahrzeug, mobiler Maschine, Zug oder Luftfahrzeug'
-});
+const LABELS = Object.freeze({ refrigeration: 'Kälteanlage', 'air-conditioning': 'Klimaanlage', 'heat-pump': 'Wärmepumpe', stationary: 'ortsfest', mobile: 'mobil', 'air-water': 'Luft-Wasser', 'air-air': 'Luft-Luft', split: 'Split', 'mono-split': 'Mono-Split', monoblock: 'Monoblock', 'self-contained': 'in sich geschlossen', portable: 'tragbar / steckerfertig', centralized: 'zentralisiert', cascade: 'Kaskadensystem', other: 'sonstige Bauform', installation: 'Installation', maintenance: 'Wartung / Instandhaltung', repair: 'Reparatur', 'leak-check': 'Dichtheitskontrolle', recovery: 'Rückgewinnung', decommissioning: 'Außerbetriebnahme', 'household-refrigerator-freezer': 'Haushaltskühl-/Gefriergerät', 'commercial-self-contained-refrigerator-freezer': 'Gewerbliches in sich geschlossenes Kühl-/Gefriergerät', 'self-contained-refrigeration-system': 'In sich geschlossene Kälteanlage', 'other-refrigeration-system': 'Sonstige Kälteanlage', 'centralized-commercial-refrigeration-system': 'Mehrteilige zentralisierte gewerbliche Kälteanlage', 'stationary-chiller': 'Ortsfester Kühler', 'self-contained-ac-heat-pump': 'In sich geschlossenes Klima-/Wärmepumpensystem', 'split-ac-heat-pump': 'Split-Klima-/Wärmepumpensystem', 'direct-evaporation-system': 'Nichtgeschlossenes Direktverdampfungssystem' });
 const label = value => LABELS[value] || value || '—';
-
-const OBLIGATION_LABELS = Object.freeze({
-  'leak-check-records': 'Aufzeichnungen zu Dichtheitskontrollen', 'pre-ban-proof': 'Nachweis für vor dem Verbotsdatum in Verkehr gebrachte Erzeugnisse', 'german-pre-ban-declaration': 'Erklärung für vor dem Verbotsdatum in Verkehr gebrachte Erzeugnisse', 'specific-refrigerant-loss': 'Grenzwert für den spezifischen Kältemittelverlust', 'access-to-detachable-connections': 'Zugang zu lösbaren Verbindungen sicherstellen', 'contractor-certification': 'Zertifizierung bzw. Sachkunde des beauftragten Unternehmens prüfen', 'certified-person-for-leak-check': 'Dichtheitskontrolle durch sachkundige Person', 'certified-person-for-recovery': 'Rückgewinnung durch sachkundige Person'
-});
-const OBLIGATION_LEGAL = Object.freeze({
-  'FG-020': 'Art. 7 VO (EU) 2024/573', 'FG-045': 'Art. 11 Abs. 1 VO (EU) 2024/573', 'FG-046': '§ 12i Abs. 2 ChemG', 'FG-060': '§ 2 Abs. 1 ChemKlimaschutzV', 'FG-063': '§ 2 Abs. 2 ChemKlimaschutzV', 'FG-052': '§ 14 Abs. 1 ChemKlimaschutzV', 'FG-053': '§ 14 Abs. 2 ChemKlimaschutzV', 'FG-054': '§ 14 Abs. 3 ChemKlimaschutzV'
-});
-
+const OBLIGATION_LABELS = Object.freeze({ 'leak-check-records': 'Aufzeichnungen zu Dichtheitskontrollen', 'pre-ban-proof': 'Nachweis für vor dem Verbotsdatum in Verkehr gebrachte Erzeugnisse', 'german-pre-ban-declaration': 'Erklärung für vor dem Verbotsdatum in Verkehr gebrachte Erzeugnisse', 'specific-refrigerant-loss': 'Grenzwert für den spezifischen Kältemittelverlust', 'access-to-detachable-connections': 'Zugang zu lösbaren Verbindungen sicherstellen', 'contractor-certification': 'Zertifizierung bzw. Sachkunde des beauftragten Unternehmens prüfen', 'certified-person-for-leak-check': 'Dichtheitskontrolle durch sachkundige Person', 'certified-person-for-recovery': 'Rückgewinnung durch sachkundige Person' });
+const OBLIGATION_LEGAL = Object.freeze({ 'FG-020': 'Art. 7 VO (EU) 2024/573', 'FG-045': 'Art. 11 Abs. 1 VO (EU) 2024/573', 'FG-046': '§ 12i Abs. 2 ChemG', 'FG-060': '§ 2 Abs. 1 ChemKlimaschutzV', 'FG-063': '§ 2 Abs. 2 ChemKlimaschutzV', 'FG-052': '§ 14 Abs. 1 ChemKlimaschutzV', 'FG-053': '§ 14 Abs. 2 ChemKlimaschutzV', 'FG-054': '§ 14 Abs. 3 ChemKlimaschutzV' });
 function legalSourceLabel(source = '') {
   const value = String(source);
   let match = value.match(/^EU-FGAS:Art\.(\d+)(?:\((\d+)\))?$/);
   if (match) return `Art. ${match[1]}${match[2] ? ` Abs. ${match[2]}` : ''} VO (EU) 2024/573`;
+  if (value === 'EU-FGAS:Art.17+AnnexVII') return 'Art. 17 i. V. m. Anhang VII VO (EU) 2024/573';
   match = value.match(/^EU-FGAS:AnnexIV\((0*\d+)\)$/);
   if (match) return `Anhang IV Nr. ${Number(match[1])} VO (EU) 2024/573`;
   match = value.match(/^DE-CHEMKLIMA:§(\d+)(?:\((\d+)\))?$/);
@@ -38,82 +26,58 @@ function legalSourceLabel(source = '') {
   if (value.includes('EU-FGAS:Art.10+DE-CHEMKLIMA:§10')) return 'Art. 10 VO (EU) 2024/573; § 10 ChemKlimaschutzV';
   return value;
 }
-
 function formatDateOnly(value) {
   const raw = String(value || '');
   let match = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (match) return `${match[3]}.${match[2]}.${match[1]}`;
   match = raw.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
-  if (match) return raw;
-  return text(value);
+  return match ? raw : text(value);
 }
-
+function serviceSummary(service, fallback) {
+  if (service?.status === 'prohibited') return 'Service/Wartung unzulässig';
+  if (service?.status === 'allowed-under-exception') return 'nur unter gesetzlicher Ausnahme zulässig';
+  if (service?.status === 'no-prohibition-found' && service?.marketAvailability) return 'kein direktes Serviceverbot; HFKW-Beschaffung quotenbegrenzt';
+  return status(fallback);
+}
 function summarySection(dto) {
   const checks = object(dto.summary?.checks);
-  return { title: '1. Regulatorische Ergebnisübersicht', rows: [row('Inverkehrbringen', status(checks.placingOnMarket)), row('Wartung / Instandhaltung', status(checks.service)), row('Dichtheitskontrolle', status(checks.leakCheck)), row('Dokumentation', status(checks.documentation)), row('Zertifizierung', status(checks.certification)), row('Betreiberpflichten', status(checks.operatorDuties))] };
+  return { title: '1. Regulatorische Ergebnisübersicht', rows: [row('Inverkehrbringen', status(checks.placingOnMarket)), row('Wartung / Instandhaltung', serviceSummary(dto.service, checks.service)), row('Dichtheitskontrolle', status(checks.leakCheck)), row('Dokumentation', status(checks.documentation)), row('Zertifizierung', status(checks.certification)), row('Betreiberpflichten', status(checks.operatorDuties))] };
 }
-
 function systemSection(dto) {
   const system = object(dto.systemSnapshot?.system);
-  const rows = [row('Anlagenbezeichnung', system.systemName), row('Anlagenart', label(system.applicationType)), row('Aufstellung', label(system.installationType)), row('Produkt-/Anlagenkategorie', label(system.productCategory)), row('Bauform', label(system.constructionType)), row('Split-Systemart', label(system.splitType)), num('Nennleistung', system.ratedCapacityKw, 'power', 'kW'), row('Bewertungsdatum', formatDateOnly(system.assessmentDate)), row('Erstmaliges Inverkehrbringen', formatDateOnly(system.placedOnMarketDate)), row('Errichtung am Aufstellungsort', formatDateOnly(system.installedAtSiteDate)), row('Zu prüfende Tätigkeit', label(system.plannedActivity))];
-  if (system.installationType === 'mobile') rows.push(row('Art der mobilen Einrichtung', label(system.mobileEquipmentType)));
-  return { title: '2. Anlage und Bewertungsgrundlage', rows };
+  const rows = [row('Anlagenbezeichnung', system.systemName), row('Anlagenart', label(system.applicationType)), row('Aufstellung', label(system.installationType)), row('Produkt-/Anlagenkategorie', label(system.productCategory)), row('Bauform', label(system.constructionType)), row('Split-Systemart', label(system.splitType)), num('Nennleistung', system.ratedCapacityKw, 'power', 'kW'), row('Erstmaliges Inverkehrbringen', formatDateOnly(system.placedOnMarketDate)), row('Erstmalige Inbetriebnahme', formatDateOnly(system.commissioningDate))];
+  if (system.stockAssessmentDate) rows.push(row('Prüfdatum der Bestandsanlage', formatDateOnly(system.stockAssessmentDate)));
+  rows.push(row('Zu prüfende Tätigkeit', label(system.plannedActivity)));
+  return { title: '2. Anlage und zeitliche Bewertungsgrundlage', rows };
 }
-
-function refrigerantSection(dto) {
-  const summary = object(dto.summary);
-  return { title: '3. Kältemittel und CO₂-Äquivalent', rows: [row('Kältemittel', object(dto.systemSnapshot?.system).refrigerantId), num('GWP nach F-Gas-Verordnung', summary.gwp, 'generic'), num('Füllmenge', summary.chargeKg, 'mass', 'kg'), num('CO₂-Äquivalent', summary.co2EquivalentTonnes, 'generic', 't')] };
-}
-
-function leakSection(dto) {
-  const leak = object(dto.leakCheck);
-  return { title: '4. Dichtheitskontrolle und Leckage-Erkennung', rows: [row('Dichtheitskontrolle erforderlich', leak.required === true ? 'ja' : leak.required === false ? 'nein' : '—'), num('Prüfintervall', leak.intervalMonths, 'integer', 'Monate'), row('Leckage-Erkennungssystem verpflichtend', leak.leakDetectionRequired === true ? 'ja' : leak.leakDetectionRequired === false ? 'nein' : '—'), row('Status', status(leak.status))] };
-}
-
+function refrigerantSection(dto) { const summary = object(dto.summary); return { title: '3. Kältemittel und CO₂-Äquivalent', rows: [row('Kältemittel', object(dto.systemSnapshot?.system).refrigerantId), num('GWP nach F-Gas-Verordnung', summary.gwp, 'generic'), num('Füllmenge', summary.chargeKg, 'mass', 'kg'), num('CO₂-Äquivalent', summary.co2EquivalentTonnes, 'generic', 't')] }; }
+function leakSection(dto) { const leak = object(dto.leakCheck); return { title: '4. Dichtheitskontrolle und Leckage-Erkennung', rows: [row('Dichtheitskontrolle erforderlich', leak.required === true ? 'ja' : leak.required === false ? 'nein' : '—'), num('Prüfintervall', leak.intervalMonths, 'integer', 'Monate'), row('Leckage-Erkennungssystem verpflichtend', leak.leakDetectionRequired === true ? 'ja' : leak.leakDetectionRequired === false ? 'nein' : '—'), row('Status', status(leak.status))] }; }
 function documentationSection(payload) {
   const obligations = array(payload?.obligations);
   if (!obligations.length) return { title: '5. Dokumentationspflichten', rows: [row('Status', status(payload?.status))] };
   const rows = [];
   obligations.forEach(item => {
     const obligation = OBLIGATION_LABELS[item.type] || 'Regulatorische Pflicht';
-    if (item.type === 'leak-check-records') {
-      rows.push(row(obligation, item.retentionYears != null ? `${item.retentionYears} Jahre` : 'erforderlich'));
-      rows.push(row('Rechtsgrundlage', OBLIGATION_LEGAL[item.id] || 'siehe Abschnitt 7'));
-      return;
-    }
+    if (item.type === 'leak-check-records') { rows.push(row(obligation, item.retentionYears != null ? `${item.retentionYears} Jahre` : 'erforderlich')); rows.push(row('Rechtsgrundlage', OBLIGATION_LEGAL[item.id] || 'siehe Abschnitt 7')); return; }
     const details = [];
     if (item.requiredFrom) details.push(`ab ${formatDateOnly(item.requiredFrom)}`);
     if (item.applicableBanDate) details.push(`Verbotsdatum ${formatDateOnly(item.applicableBanDate)}`);
-    rows.push(row(obligation, details.join(' · ') || 'erforderlich'));
-    rows.push(row('Rechtsgrundlage', OBLIGATION_LEGAL[item.id] || 'siehe Abschnitt 7'));
+    rows.push(row(obligation, details.join(' · ') || 'erforderlich')); rows.push(row('Rechtsgrundlage', OBLIGATION_LEGAL[item.id] || 'siehe Abschnitt 7'));
   });
   return { title: '5. Dokumentationspflichten', rows };
 }
-
 function operatorSection(payload) {
   const obligations = array(payload?.obligations);
-  const rows = obligations.length ? obligations.map(item => {
-    const details = [];
-    if (item.maximumPercent != null) details.push(`${item.maximumPercent} %`);
-    details.push(OBLIGATION_LEGAL[item.id] || 'Rechtsgrundlage siehe Abschnitt 7');
-    return row(OBLIGATION_LABELS[item.type] || 'Regulatorische Pflicht', details.join(' · '));
-  }) : [row('Status', status(payload?.status))];
+  const rows = obligations.length ? obligations.map(item => { const details = []; if (item.maximumPercent != null) details.push(`${item.maximumPercent} %`); details.push(OBLIGATION_LEGAL[item.id] || 'Rechtsgrundlage siehe Abschnitt 7'); return row(OBLIGATION_LABELS[item.type] || 'Regulatorische Pflicht', details.join(' · ')); }) : [row('Status', status(payload?.status))];
   return { title: '6. Betreiberpflichten', rows };
 }
-
 function regulationsSection(dto) {
   const rules = array(dto.applicableRegulations);
   return { title: '7. Angewendete Rechtsgrundlagen', rows: rules.length ? rules.map(rule => row(legalSourceLabel(rule.legalSource), [rule.validFrom ? `gültig ab ${formatDateOnly(rule.validFrom)}` : '', rule.validUntil ? `bis ${formatDateOnly(rule.validUntil)}` : ''].filter(Boolean).join(' · ') || 'anwendbar')) : [row('Status', 'Keine automatisch anwendbare Rechtsgrundlage ermittelt')] };
 }
-
-function sourcesSection(dto) {
-  const metadata = object(dto.metadata);
-  return { title: '8. Quellen und Berichtserstellung', rows: [row('Erzeugt am', formatDateOnly(metadata.generatedAt)), ...array(dto.sources).map(source => row(source.title || source.id, source.role || source.id))] };
-}
-
+function sourcesSection(dto) { const metadata = object(dto.metadata); return { title: '8. Quellen und Berichtserstellung', rows: [row('Erzeugt am', formatDateOnly(metadata.generatedAt)), ...array(dto.sources).map(source => row(source.title || source.id, source.role || source.id))] }; }
 export function buildFGasesReportSections(dto = {}) {
   if (object(dto.metadata).dtoType !== 'techcalc.f-gases-check.report') return [];
   return [summarySection(dto), systemSection(dto), refrigerantSection(dto), leakSection(dto), documentationSection(dto.documentation), operatorSection(dto.operatorDuties), regulationsSection(dto), sourcesSection(dto)].map(section => ({ ...section, isLineSection: false }));
 }
-
 export default buildFGasesReportSections;
