@@ -8,7 +8,6 @@ function cleanRows(rows = []) {
     .filter(row => normalizeKey(row?.[0] || '') !== 'bezeichnung')
     .filter(row => row.some(cell => sanitizeText(cell)));
 }
-
 function pairedRowsForPdf(rows = []) {
   const rowsClean = cleanRows(rows);
   const preferredOrder = [
@@ -23,7 +22,6 @@ function pairedRowsForPdf(rows = []) {
   const ordered = [...rowsClean].sort((a, b) => rank(a) - rank(b));
   return pairSequentialRows(ordered);
 }
-
 function pairSequentialRows(rows = []) {
   const leftCount = Math.ceil(rows.length / 2);
   const left = rows.slice(0, leftCount);
@@ -38,7 +36,6 @@ function pairSequentialRows(rows = []) {
 function pdfValueForRow(row = []) {
   return pdfRowValue(row).replace(/ - /g, ' x ');
 }
-
 function tableColumns(x, width) {
   // RC.9: one immutable four-column grid for every module.  The even
   // columns are not computed per row; they use fixed right anchors inside
@@ -68,26 +65,29 @@ function tableColumns(x, width) {
     rowLineEnd: x + width
   };
 }
-
+function singleColumnLayout(x, width) {
+  const gap = PDF_THEME.table.cellGap;
+  const labelW = Math.max(128, Math.min(188, width * 0.34));
+  const valueX = x + labelW + gap;
+  const valueW = Math.max(120, width - labelW - gap);
+  return { labelX: x, labelW, valueX, valueW, rowLineEnd: x + width };
+}
 function drawRightAlignedValue(report, value, rightX, y, { size = PDF_THEME.table.valueSize, maxWidth = 96, color = PDF_THEME.table.valueColor, font = 'F4', lineHeight = 1.15 } = {}) {
   // Values in all even columns share a fixed right-side anchor. Wrapping is
   // performed before drawing; every continuation line keeps the exact same
   // reference edge so numbers, text and units align module-wide.
   report.text(value, rightX, y, { size, font, color, align: 'right', maxWidth, lineHeight });
 }
-
 function sectionTitleHeight(title) {
   const width = PDF_PAGE.width - PDF_THEME.margin * 2;
   const lines = splitPdfText(title, width, 8.4).length;
   return 6 + Math.max(11, lines * 8.4 * 1.18 + 3);
 }
-
 function dynamicProjectDataHeight(project, columnWidth) {
   const values = [project.project, project.projectNo, project.client, project.engineer];
   const valueLines = values.map(value => splitPdfText(value || '-', columnWidth, 6.8).length);
   return Math.max(20, 13 + Math.max(...valueLines) * 6.8 * 1.18 + 4);
 }
-
 function dynamicCorporateBlockHeight(project, moduleData, width) {
   const addressLines = splitPdfText(project.companyAddress || '-', width * 0.36, 6.4).length;
   const companyLines = splitPdfText(project.companyName || '-', width * 0.36, 6.6).length;
@@ -100,7 +100,6 @@ function dynamicCorporateBlockHeight(project, moduleData, width) {
   const rightH = 20 + checkedLines * 6.6 * 1.18 + 5 + approvedLines * 6.6 * 1.18;
   return Math.max(58, Math.ceil(Math.max(leftH, midH, rightH) + 14));
 }
-
 function pairRowHeight(pair, columns, { labelSize = PDF_THEME.table.labelSize, valueSize = PDF_THEME.table.valueSize } = {}) {
   let lines = 1;
   pair.forEach((row, index) => {
@@ -112,7 +111,12 @@ function pairRowHeight(pair, columns, { labelSize = PDF_THEME.table.labelSize, v
   });
   return Math.max(PDF_THEME.table.rowMinHeight, lines * Math.max(labelSize, valueSize) * 1.22 + PDF_THEME.table.rowPaddingTop + PDF_THEME.table.rowPaddingBottom);
 }
-
+function singleRowHeight(row, columns, { labelSize = PDF_THEME.table.labelSize, valueSize = PDF_THEME.table.valueSize } = {}) {
+  const labelLines = splitPdfText(row?.[0] || '-', columns.labelW - 4, labelSize).length;
+  const valueLines = splitPdfText(pdfValueForRow(row), columns.valueW - 4, valueSize).length;
+  const lines = Math.max(1, labelLines, valueLines);
+  return Math.max(PDF_THEME.table.rowMinHeight, lines * Math.max(labelSize, valueSize) * 1.22 + PDF_THEME.table.rowPaddingTop + PDF_THEME.table.rowPaddingBottom);
+}
 function drawPairedRow(report, pair, x, y, width, rowHeight, { labelSize = PDF_THEME.table.labelSize, valueSize = PDF_THEME.table.valueSize } = {}) {
   const columns = tableColumns(x, width);
   pair.forEach((row, index) => {
@@ -140,7 +144,31 @@ function drawPairedRow(report, pair, x, y, width, rowHeight, { labelSize = PDF_T
     });
   });
 }
-
+function drawSingleRow(report, row, x, y, width, rowHeight, { labelSize = PDF_THEME.table.labelSize, valueSize = PDF_THEME.table.valueSize } = {}) {
+  const columns = singleColumnLayout(x, width);
+  const labelLineHeight = 1.15;
+  const valueLineHeight = 1.15;
+  const labelLines = splitPdfText(row?.[0] || '-', columns.labelW - 4, labelSize).length;
+  const valueLines = splitPdfText(pdfValueForRow(row), columns.valueW - 4, valueSize).length;
+  const labelBlockH = Math.max(labelSize, labelLines * labelSize * labelLineHeight);
+  const valueBlockH = Math.max(valueSize, valueLines * valueSize * valueLineHeight);
+  const labelBaseline = y + Math.max(PDF_THEME.table.rowPaddingTop + labelSize, (rowHeight - labelBlockH) / 2 + labelSize);
+  const valueBaseline = y + Math.max(PDF_THEME.table.rowPaddingTop + valueSize, (rowHeight - valueBlockH) / 2 + valueSize);
+  report.text(row?.[0] || '-', columns.labelX, labelBaseline, {
+    size: labelSize,
+    font: 'F2',
+    color: PDF_THEME.table.labelColor,
+    maxWidth: columns.labelW - 4,
+    lineHeight: labelLineHeight
+  });
+  report.text(pdfValueForRow(row), columns.valueX, valueBaseline, {
+    size: valueSize,
+    font: 'F1',
+    color: PDF_THEME.table.valueColor,
+    maxWidth: columns.valueW - 4,
+    lineHeight: valueLineHeight
+  });
+}
 export class GlobalPdfReport {
   constructor(images = {}) {
     this.images = images;
@@ -151,12 +179,10 @@ export class GlobalPdfReport {
     this.pages = [];
     this.addPage();
   }
-
   addPage() { this.page = []; this.pages.push(this.page); this.cursorY = PDF_THEME.margin; }
   cmd(command) { this.page.push(command); }
   y(topY) { return PDF_PAGE.height - topY; }
   color(values, stroke = false) { this.cmd(`${rgb(values)} ${stroke ? 'RG' : 'rg'}`); }
-
   text(value, x, y, { size = 8, font = 'F1', color = PDF_THEME.text, align = 'left', maxWidth = null, lineHeight = 1.18 } = {}) {
     const lines = maxWidth ? splitPdfText(value, maxWidth, size) : [sanitizeText(value)];
     lines.forEach((line, index) => {
@@ -169,24 +195,20 @@ export class GlobalPdfReport {
     });
     return lines.length * size * lineHeight;
   }
-
   line(x1, y1, x2, y2, color = PDF_THEME.line, width = 0.5) {
     this.color(color, true);
     this.cmd(`${pdfNumber(width)} w ${pdfNumber(x1)} ${pdfNumber(this.y(y1))} m ${pdfNumber(x2)} ${pdfNumber(this.y(y2))} l S`);
   }
-
   rect(x, y, w, h, { fill = null, stroke = PDF_THEME.line, width = 0.5 } = {}) {
     if (fill) this.color(fill);
     if (stroke) this.color(stroke, true);
     this.cmd(`${pdfNumber(width)} w ${pdfNumber(x)} ${pdfNumber(this.y(y + h))} ${pdfNumber(w)} ${pdfNumber(h)} re ${fill && stroke ? 'B' : fill ? 'f' : 'S'}`);
   }
-
   drawImage(resourceName, x, y, w, h) {
     if (!resourceName) return false;
     this.cmd(`q ${pdfNumber(w)} 0 0 ${pdfNumber(h)} ${pdfNumber(x)} ${pdfNumber(this.y(y + h))} cm /${resourceName} Do Q`);
     return true;
   }
-
   contentBottom() { return PDF_PAGE.height - PDF_THEME.margin - 18; }
   ensureSpace(requiredHeight, { repeatTitle = '' } = {}) {
     if (this.cursorY + requiredHeight <= this.contentBottom()) return false;
@@ -194,17 +216,17 @@ export class GlobalPdfReport {
     if (repeatTitle) this.sectionTitle(`${repeatTitle} (Fortsetzung)`);
     return true;
   }
-
   header(project, moduleData, date) {
     const m = PDF_THEME.margin;
     const right = PDF_PAGE.width - m;
     const titleX = PDF_PAGE.width / 2;
     const logoW = 104;
     const logoH = 52;
+    const reportHeading = sanitizeText(moduleData?.reportDto?.metadata?.reportHeading || moduleData?.reportHeading || 'Berechnungsprotokoll');
     if (this.images.appIcon) this.drawImage('ImAppIcon', m, this.cursorY + 4, 26, 26);
     this.text('TechCalc Pro', m + 31, this.cursorY + 13, { size: 10.2, font: 'F2' });
     this.text('HLSK QUICK TOOLS', m + 31, this.cursorY + 24, { size: 5.8, font: 'F2', color: PDF_THEME.muted });
-    this.text('Berechnungsprotokoll', titleX, this.cursorY + 10, { size: 14, font: 'F2', align: 'center' });
+    this.text(reportHeading, titleX, this.cursorY + 10, { size: 14, font: 'F2', align: 'center', maxWidth: 180 });
     this.text(`${moduleData.title || moduleData.shortTitle || 'Modul'} - ${date}`, titleX, this.cursorY + 25, { size: 7.2, font: 'F2', color: PDF_THEME.muted, align: 'center', maxWidth: 180 });
     if (this.images.companyLogo) {
       const img = this.images.companyLogo;
@@ -217,7 +239,6 @@ export class GlobalPdfReport {
     this.line(m, this.cursorY, right, this.cursorY, PDF_THEME.line, 0.6);
     this.cursorY += 6;
   }
-
   projectData(project) {
     const m = PDF_THEME.margin;
     const w = PDF_PAGE.width - m * 2;
@@ -235,13 +256,11 @@ export class GlobalPdfReport {
     });
     this.cursorY += blockHeight + 4;
   }
-
   sectionTitle(title) {
     this.ensureSpace(18);
     this.text(title, PDF_THEME.margin, this.cursorY + 5, { size: 8.4, font: 'F2', color: PDF_THEME.accent, maxWidth: PDF_PAGE.width - PDF_THEME.margin * 2 });
     this.cursorY += 11;
   }
-
   lineBlock(item, groupTitle = '') {
     const pairs = pairedRowsForPdf(item.rows);
     if (!pairs.length) return;
@@ -284,27 +303,29 @@ export class GlobalPdfReport {
       continued = true;
     }
   }
-
   standardSection(section) {
     const rows = section.rows.filter(row => row.some(cell => sanitizeText(cell)));
     if (!rows.length) return;
-    const pairs = pairSequentialRows(rows);
+    const singleColumn = section.singleColumn === true;
+    const entries = singleColumn ? rows : pairSequentialRows(rows);
     const m = PDF_THEME.margin;
     const w = PDF_PAGE.width - m * 2;
     const innerX = m + 5;
     const innerW = w - 10;
-    const columns = tableColumns(innerX, innerW);
-    const rowHeights = pairs.map(pair => pairRowHeight(pair, columns, { labelSize: 6.1, valueSize: 6.25 }));
+    const columns = singleColumn ? singleColumnLayout(innerX, innerW) : tableColumns(innerX, innerW);
+    const rowHeights = entries.map(entry => singleColumn
+      ? singleRowHeight(entry, columns, { labelSize: 6.1, valueSize: 6.25 })
+      : pairRowHeight(entry, columns, { labelSize: 6.1, valueSize: 6.25 }));
     let index = 0;
     let continued = false;
-    while (index < pairs.length) {
+    while (index < entries.length) {
       const title = continued ? `${section.title} (Fortsetzung)` : section.title;
       this.ensureSpace(sectionTitleHeight(title) + 24);
       this.sectionTitle(title);
       const available = Math.max(36, this.contentBottom() - this.cursorY - 7);
       let segmentHeight = 0;
       let endIndex = index;
-      while (endIndex < pairs.length && (4 + segmentHeight + rowHeights[endIndex] + 4 <= available || endIndex === index)) {
+      while (endIndex < entries.length && (4 + segmentHeight + rowHeights[endIndex] + 4 <= available || endIndex === index)) {
         segmentHeight += rowHeights[endIndex];
         endIndex += 1;
       }
@@ -316,7 +337,8 @@ export class GlobalPdfReport {
       for (let rowIndex = index; rowIndex < endIndex; rowIndex += 1) {
         const h = rowHeights[rowIndex];
         this.line(innerX, rowY + h - 2, innerX + innerW, rowY + h - 2, PDF_THEME.rowLine, 0.3);
-        drawPairedRow(this, pairs[rowIndex], innerX, rowY, innerW, h, { labelSize: 6.1, valueSize: 6.25 });
+        if (singleColumn) drawSingleRow(this, entries[rowIndex], innerX, rowY, innerW, h, { labelSize: 6.1, valueSize: 6.25 });
+        else drawPairedRow(this, entries[rowIndex], innerX, rowY, innerW, h, { labelSize: 6.1, valueSize: 6.25 });
         rowY += h;
       }
       this.cursorY += blockHeight + 5;
@@ -324,7 +346,6 @@ export class GlobalPdfReport {
       continued = true;
     }
   }
-
   chartBlock() {
     if (!this.images.chartImage) return;
     const m = PDF_THEME.margin;
@@ -344,7 +365,6 @@ export class GlobalPdfReport {
     this.drawImage('ImChart', m + (boxW - imgW) / 2, this.cursorY + pad + (desiredH - pad * 2 - imgH) / 2, imgW, imgH);
     this.cursorY += desiredH + 8;
   }
-
   corporateBlock(project, moduleData) {
     const hasCorporate = [project.companyName, project.companyAddress, project.documentVersion, project.checkedBy, project.approvedBy].some(value => sanitizeText(value));
     if (!hasCorporate) return;
@@ -370,7 +390,6 @@ export class GlobalPdfReport {
     this.text(project.approvedBy || '-', rightX + 35, baseY + 12, { size: 6.6, font: 'F2', maxWidth: 80 });
     this.cursorY = y0 + blockHeight + 6;
   }
-
   footer() {
     const total = this.pages.length;
     this.pages.forEach((page, index) => {
@@ -378,7 +397,6 @@ export class GlobalPdfReport {
       this.text(`Seite ${index + 1} von ${total}`, PDF_PAGE.width - PDF_THEME.margin, PDF_PAGE.height - 6, { size: 6.5, font: 'F1', color: PDF_THEME.muted, align: 'right' });
     });
   }
-
   build(project, moduleData) {
     const date = new Date().toLocaleDateString('de-DE');
     this.header(project, moduleData, date);
@@ -402,7 +420,6 @@ export class GlobalPdfReport {
     this.footer();
     return this.output();
   }
-
   output() {
     const objects = [];
     const addObject = value => { objects.push(value); return objects.length; };
