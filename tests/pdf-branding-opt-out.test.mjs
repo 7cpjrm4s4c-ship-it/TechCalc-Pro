@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { GlobalPdfReport } from '../js/core/pdf/pdfLayout.js';
 
 class HeaderCaptureReport extends GlobalPdfReport {
@@ -30,5 +31,10 @@ assert.ok(!optedOutReport.textValues.includes('HLSK QUICK TOOLS'), 'TechCalc sub
 assert.ok(!optedOutReport.imageNames.includes('ImAppIcon'), 'TechCalc icon must be omitted after opt-out');
 assert.ok(optedOutReport.imageNames.includes('ImCompanyLogo'), 'company logo must remain visible after TechCalc opt-out');
 assert.ok(optedOutReport.textValues.includes('Berechnungsprotokoll'), 'report heading must remain visible after TechCalc opt-out');
+
+const controlsCss = fs.readFileSync(new URL('../css/components-controls.css', import.meta.url), 'utf8');
+assert.match(controlsCss, /#pdfShowTechCalcBranding\s*\{[^}]*appearance:\s*none/s, 'branding checkbox must render as a toggle switch');
+assert.match(controlsCss, /#pdfShowTechCalcBranding:checked::before[^}]*translateX\(20px\)/s, 'toggle knob must move for the enabled state');
+assert.match(controlsCss, /#pdfShowTechCalcBranding:focus-visible/, 'toggle switch must retain a keyboard focus state');
 
 console.log('PDF branding opt-out contract passed.');

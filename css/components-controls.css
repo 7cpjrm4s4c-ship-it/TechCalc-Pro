@@ -1,6 +1,5 @@
 /* TechCalc Pro 1.3.2 CSS System — Fields, controls, buttons, toggles and result primitives.
    Source: split from former components.css during dev.10 cleanup. */
-
 /* Fields / controls ------------------------------------------------------- */
 .field,
 .tc-field,
@@ -16,7 +15,6 @@
   text-transform: uppercase;
   letter-spacing: 1.3px;
 }
-
 .control,
 .tc-control {
   display: flex;
@@ -72,7 +70,6 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .field--readonly .control--readonly { justify-content: space-between; padding-left: var(--tc-control-padding-x); }
 .field--readonly .control--readonly strong { color: var(--color-text); font-size: 16px; font-weight: 900; }
 
-
 /* Field action contract ----------------------------------------------------
    Action-only fields must not render the surrounding control shell.
    This keeps add-item actions consistent in Light, Dark and System themes. */
@@ -88,7 +85,6 @@ select option:checked { background-color: #1f3347; color: #fff; }
   border-color: transparent;
   box-shadow: none;
 }
-
 .field--action .control > .action-button,
 .field--action .tc-control > .action-button,
 .field > .control > .action-button:only-child,
@@ -96,7 +92,6 @@ select option:checked { background-color: #1f3347; color: #fff; }
   width: auto;
   min-width: min(100%, 260px);
 }
-
 /* Buttons / toggles ------------------------------------------------------- */
 .action-button,
 .tc-action,
@@ -130,7 +125,6 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .sign-toggle:focus-visible { background: rgba(45,176,255,.16); outline: 0; }
 .sign-toggle[tabindex='-1'] { user-select: none; }
 .tc-action-link { display: flex; align-items: center; justify-content: center; text-align: center; width: 100%; }
-
 .segmented,
 .theme-switch {
   display: grid;
@@ -152,7 +146,38 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .segmented--cyan button.is-active { background: linear-gradient(135deg, rgba(53,229,255,.32), rgba(53,170,255,.12)); border-color: rgba(53,229,255,.58); }
 .segmented--blue button.is-active { background: linear-gradient(135deg, rgba(53,170,255,.32), rgba(53,170,255,.10)); border-color: rgba(53,170,255,.58); }
 .segmented--purple button.is-active { border-color: var(--accent-purple); box-shadow: inset 0 -3px 0 var(--accent-purple); }
-
+#pdfShowTechCalcBranding {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex: 0 0 auto;
+  width: 48px;
+  height: 28px;
+  margin: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--tc-radius-pill);
+  background: rgba(255,255,255,.10);
+  cursor: pointer;
+  transition: background .18s var(--ease), border-color .18s var(--ease), box-shadow .18s var(--ease);
+}
+#pdfShowTechCalcBranding::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-text);
+  box-shadow: 0 2px 6px rgba(0,0,0,.28);
+  transition: transform .18s var(--ease), background .18s var(--ease);
+}
+#pdfShowTechCalcBranding:checked {
+  border-color: rgba(53,170,255,.68);
+  background: linear-gradient(135deg, rgba(53,170,255,.82), rgba(53,170,255,.48));
+}
+#pdfShowTechCalcBranding:checked::before { transform: translateX(20px); background: #fff; }
+#pdfShowTechCalcBranding:focus-visible { outline: 0; box-shadow: var(--shadow-active); border-color: var(--accent-blue); }
 /* Results ---------------------------------------------------------------- */
 .result-list,
 .tc-result-list,
@@ -168,7 +193,6 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .dw-consumer-list,
 .dw-fixture-list,
 .ph-saved-list { display: grid; gap: var(--tc-gap); min-width: 0; }
-
 .result-row {
   display: flex;
   justify-content: space-between;
@@ -181,7 +205,6 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .result-row span { color: var(--color-muted); }
 .result-row strong { color: var(--color-text); font-size: 18px; line-height: 1.2; text-align: left; white-space: normal; }
 .result-row small { font-size: .85em; color: var(--color-text); }
-
 .inline-stats { grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); align-items: stretch; }
 .inline-stat,
 .tc-result-item {
@@ -198,7 +221,6 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .inline-stat strong,
 .tc-result-item strong { color: var(--color-text); font-size: 13px; line-height: 1.2; font-weight: 900; white-space: normal; }
 .inline-stat small { font-size: .82em; }
-
 .main-result { display: grid; gap: 4px; padding: var(--tc-gap) 0; border-bottom: 1px solid rgba(255,255,255,.10); }
 .main-result span { color: var(--color-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1.4px; font-weight: 900; }
 .main-result strong { color: var(--color-text); font-size: clamp(24px,3vw,36px); line-height: 1.05; font-weight: 900; text-align: left; }
@@ -216,4 +238,3 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .traffic--yellow { background: #ffd34d; color: #ffd34d; }
 .traffic--red { background: #ff4b4b; color: #ff4b4b; }
 .traffic--none { background: var(--color-dim); color: var(--color-dim); }
-
