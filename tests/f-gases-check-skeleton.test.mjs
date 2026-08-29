@@ -17,7 +17,7 @@ assert.deepEqual(listSafetyClasses().map(item => item.id), ['A1', 'A2L', 'A2', '
 assert.deepEqual(getDataVersions(), {
   refrigerants: '1.1.0',
   gwp: '1.0.0',
-  regulations: '1.0.0',
+  regulations: '1.0.2',
   safetyClasses: null
 });
 assert.equal(getDataStatus().refrigerants, 'specified');
