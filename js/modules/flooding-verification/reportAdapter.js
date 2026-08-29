@@ -2,7 +2,6 @@ import config from './config.js';
 import { FLOODING_VERIFICATION_SCHEMA_VERSION } from './state.js';
 
 export const FLOODING_REPORT_DTO_VERSION = 1;
-
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 const array = value => Array.isArray(value) ? value : [];
 const object = value => value && typeof value === 'object' && !Array.isArray(value) ? value : {};
@@ -12,7 +11,6 @@ const finite = value => {
   const number = Number(normalized);
   return Number.isFinite(number) ? number : null;
 };
-
 function mapSurface(surface = {}, index = 0) {
   const areaM2 = finite(surface.area ?? surface.areaM2 ?? surface.areaSize ?? surface.surfaceArea);
   const runoffCoefficientCs = finite(surface.cs ?? surface.runoffCoefficientCs ?? surface.surfaceCs);
@@ -32,7 +30,6 @@ function mapSurface(surface = {}, index = 0) {
     snapshot: clone(surface.snapshot || null)
   });
 }
-
 function mapDiagnostics(resultModel = {}) {
   const diagnostic = object(resultModel.diagnostic);
   const items = array(diagnostic.items || resultModel.diagnostics).map(item => Object.freeze({
@@ -50,7 +47,6 @@ function mapDiagnostics(resultModel = {}) {
     items: Object.freeze(items)
   });
 }
-
 /**
  * Builds the module-owned, layout-neutral report DTO.
  * The adapter maps existing state/calculation/result models only. It does not
@@ -62,7 +58,6 @@ export function buildFloodingReportDto({ state = {}, calculation = {}, resultMod
   const combinedStorage = object(calculation.combinedStorage);
   const discharge = object(calculation.discharge);
   const interpretation = object(resultModel.interpretation);
-
   const dto = {
     metadata: {
       dtoType: 'techcalc.flooding-verification.report',
@@ -70,7 +65,7 @@ export function buildFloodingReportDto({ state = {}, calculation = {}, resultMod
       moduleId: config.id || 'flooding-verification',
       moduleTitle: config.title || 'Überflutungsnachweis',
       schemaVersion: calculation.schemaVersion || state.schemaVersion || FLOODING_VERIFICATION_SCHEMA_VERSION,
-      appVersion: '1.4.0-dev.2',
+      appVersion: '1.5.0',
       generatedAt
     },
     projectReference: {
@@ -160,7 +155,6 @@ export function buildFloodingReportDto({ state = {}, calculation = {}, resultMod
       { id: 'KOSTRA-DWD', title: state.rainSourceDataset || 'KOSTRA-DWD', role: 'Regenspenden', version: state.rainSourceVersion || '' }
     ]
   };
-
   return Object.freeze(dto);
 }
 

@@ -34,12 +34,10 @@ jobs:
       - name: Playwright-Browser installieren
         run: npx playwright install --with-deps
 
-      - name: Release-Artefakte synchronisieren
-        run: npm run precache
-
       - name: Versions- und Release-Verträge prüfen
         run: |
           npm run version:check
+          npm run precache:check
           npm run audit:release-readiness
 
       - name: Statische Prüfungen

@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-
 const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const packageJson = JSON.parse(read('package.json'));
 const packageLock = JSON.parse(read('package-lock.json'));
@@ -14,7 +13,6 @@ const serviceWorker = read('service-worker.js');
 const releaseNotes = read(`docs/releases/${packageJson.version}.md`);
 const currentVersion = packageJson.version;
 const escapedVersion = currentVersion.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
 assert.match(currentVersion, /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/, 'package.json version must be valid semver');
 assert.equal(packageLock.version, currentVersion, 'package-lock top-level version must match package.json');
 assert.equal(packageLock.packages?.['']?.version, currentVersion, 'package-lock root package version must match package.json');
@@ -23,7 +21,7 @@ assert.match(versionSource, new RegExp(`APP_VERSION\\s*=\\s*['"]${escapedVersion
 assert.match(appSource, new RegExp(`const APP_VERSION = ['"]${escapedVersion}['"]; \/\/ generated from package\\.json`), 'app runtime version must be synchronized from package.json');
 assert.match(floodingReportAdapter, new RegExp(`appVersion:\\s*['"]${escapedVersion}['"]`), 'flooding report metadata must match package version');
 assert.doesNotMatch(floodingReportAdapter, /appVersion:\s*['"]\d+\.\d+\.\d+-dev\./, 'flooding report must not contain a development app version');
-assert.doesNotMatch(releaseNotesController, /appVersion\s*=\s*['"](?!1\.5\.0['"])[^'"]+['"]/, 'release notes defaults must be synchronized');
+assert.doesNotMatch(releaseNotesController, new RegExp(`appVersion\\s*=\\s*['"](?!${escapedVersion}['"])[^'"]+['"]`), 'release notes defaults must be synchronized');
 for (const marker of ['data-app-version-current', 'name="version"', 'id="appVersion"']) assert.match(indexHtml, new RegExp(`${marker}[\\s\\S]{0,80}${escapedVersion}|${escapedVersion}[\\s\\S]{0,80}${marker}`), `index version marker ${marker} must match package version`);
 assert.match(serviceWorker, new RegExp(`CACHE_NAME\\s*=\\s*['"]techcalc-pro-${escapedVersion}['"]`), 'service-worker cache must match package version');
 assert.match(serviceWorker, new RegExp(`CACHE_REVISION\\s*=\\s*['"]${escapedVersion}-`), 'service-worker revision must start with package version');

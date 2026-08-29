@@ -28,12 +28,10 @@ import { initializeServiceWorkerController } from '../platform/shell/serviceWork
 import { initializePerformanceController, markPerformance, measurePerformance, startPerformanceSpan } from '../platform/shell/performanceController.js';
 import { initializeSaveEditModeSync } from './saveEditModeSync.js';
 import { initializeLayoutStabilityController } from '../platform/shell/layoutStabilityController.js';
-
-const APP_VERSION = '1.4.0-dev.2';
+const APP_VERSION = '1.5.0'; // generated from package.json
 initializeLayoutStabilityController();
 initializePerformanceController({ appVersion: APP_VERSION });
 const appInitStartMark = markPerformance('app:init:start', { appVersion: APP_VERSION });
-
 const lazyModules = [
   { config: heatingCoolingConfig, path: '../modules/heating-cooling/index.js' },
   { config: ventilationConfig, path: '../modules/ventilation/index.js' },
@@ -50,10 +48,8 @@ const lazyModules = [
   { config: floodingVerificationConfig, path: '../modules/flooding-verification/index.js' },
   { config: fGasesCheckConfig, path: '../modules/f-gases-check/index.js' }
 ];
-
 const moduleCache = new Map();
 const preloadedModuleIds = new Set();
-
 function loadLazyModule(config, path) {
   let loaded = moduleCache.get(config.id);
   if (!loaded) {
@@ -70,7 +66,6 @@ function loadLazyModule(config, path) {
   }
   return loaded;
 }
-
 function preloadLazyModule(config, path) {
   if (!config?.id || preloadedModuleIds.has(config.id)) return;
   preloadedModuleIds.add(config.id);
@@ -78,7 +73,6 @@ function preloadLazyModule(config, path) {
     logger.warn(`Modul konnte nicht vorgeladen werden: ${config.id}`, error, { module: 'app' });
   });
 }
-
 function scheduleLazyModulePreload() {
   const preload = () => lazyModules.forEach(({ config, path }) => preloadLazyModule(config, path));
   if ('requestIdleCallback' in window) window.requestIdleCallback(preload, { timeout: 1500 });
@@ -87,13 +81,11 @@ function scheduleLazyModulePreload() {
 
 const currentRouteConfig = lazyModules.find(({ config }) => config.id === currentRoute());
 if (currentRouteConfig) preloadLazyModule(currentRouteConfig.config, currentRouteConfig.path);
-
 function registerLazyModule({ config, path, module: eagerModule }) {
   if (eagerModule) {
     modules.register({ config, ...eagerModule, mount: createModuleLifecycleAdapter(config.id, eagerModule.mount) });
     return;
   }
-
   // The registry stores a frozen normalized wrapper but intentionally retains
   // this mutable source object under `module`. Once lazy loading completes we
   // publish the real module contract here so cross-cutting services such as
@@ -118,7 +110,6 @@ function registerLazyModule({ config, path, module: eagerModule }) {
   };
   modules.register(registration);
 }
-
 lazyModules.forEach(registerLazyModule);
 restoreSessionSnapshot();
 trackGlobalEventListener(window, 'pageshow', event => {
@@ -128,7 +119,6 @@ trackGlobalEventListener(window, 'pageshow', event => {
 function persistSessionBeforeLeaving() {
   saveSessionSnapshot();
 }
-
 trackGlobalEventListener(window, 'pagehide', persistSessionBeforeLeaving, { capture: true });
 trackGlobalEventListener(window, 'beforeunload', persistSessionBeforeLeaving, { capture: true });
 trackGlobalEventListener(document, 'visibilitychange', () => {
@@ -141,7 +131,6 @@ trackGlobalEventListener(document, 'click', event => {
   const target = link.getAttribute('target') || '';
   if (target === '_blank' || /^https?:\/\//i.test(href)) persistSessionBeforeLeaving();
 }, { capture: true });
-
 const NAV_INTERACTIVE_SELECTOR = '.module-nav [data-module-id], #overflowMenu [data-module-id]';
 const NAV_MOVE_TOLERANCE_PX = 10;
 let navPointerGesture = null;
@@ -156,7 +145,6 @@ function navPoint(event) {
 function moduleNavButtonFromEvent(event) {
   return event.target?.closest?.(NAV_INTERACTIVE_SELECTOR) || null;
 }
-
 function commitGlobalModuleNav(button, event) {
   if (!button?.dataset?.moduleId) return false;
   const id = button.dataset.moduleId;
@@ -172,7 +160,6 @@ function commitGlobalModuleNav(button, event) {
   navigate(id);
   return true;
 }
-
 function onGlobalNavPointerDown(event) {
   const button = moduleNavButtonFromEvent(event);
   if (!button) return;
@@ -180,7 +167,6 @@ function onGlobalNavPointerDown(event) {
   navPointerGesture = point ? { ...point, button, moved: false } : null;
   navLastTapWasScroll = false;
 }
-
 function onGlobalNavPointerMove(event) {
   if (!navPointerGesture) return;
   if (navPointerGesture.pointerId !== undefined && event.pointerId !== undefined && navPointerGesture.pointerId !== event.pointerId) return;
@@ -194,7 +180,6 @@ function onGlobalNavPointerMove(event) {
     navLastTapAt = Date.now();
   }
 }
-
 function onGlobalNavPointerCancel() {
   navPointerGesture = null;
   navLastTapWasScroll = true;
@@ -212,7 +197,6 @@ function onGlobalNavPointerUp(event) {
   }
   navPointerGesture = null;
 }
-
 function onGlobalNavClick(event) {
   const button = moduleNavButtonFromEvent(event);
   if (!button) return;
@@ -226,13 +210,11 @@ function onGlobalNavClick(event) {
   navLastTapWasScroll = false;
   commitGlobalModuleNav(button, event);
 }
-
 trackGlobalEventListener(document, 'pointerdown', onGlobalNavPointerDown, true);
 trackGlobalEventListener(document, 'pointermove', onGlobalNavPointerMove, { capture: true, passive: true });
 trackGlobalEventListener(document, 'pointercancel', onGlobalNavPointerCancel, true);
 trackGlobalEventListener(document, 'pointerup', onGlobalNavPointerUp, true);
 trackGlobalEventListener(document, 'click', onGlobalNavClick, true);
-
 const app = document.getElementById('app');
 const moduleRuntime = createModuleRuntime({
   root: app,
@@ -243,7 +225,6 @@ const moduleRuntime = createModuleRuntime({
   },
   loadingDelayMs: 180
 });
-
 function render(id) {
   if (!modules.get(id)) return Promise.resolve(false);
   const finish = startPerformanceSpan('module:switch', { moduleId: id });
@@ -251,12 +232,10 @@ function render(id) {
     .then(result => { finish({ moduleId: id, status: 'ok' }); return result; })
     .catch(error => { finish({ moduleId: id, status: 'error', error: error?.message || String(error) }); throw error; });
 }
-
 initRouter(render);
 renderQuickAccessSettings();
 scheduleLazyModulePreload();
 trackGlobalEventListener(document, 'techcalc-project-loaded', () => render(currentRoute()));
-
 let pdfExportReady;
 function ensurePdfExport() {
   if (!pdfExportReady) {
@@ -269,7 +248,6 @@ function ensurePdfExport() {
   }
   return pdfExportReady;
 }
-
 let resizeRaf = 0;
 trackGlobalEventListener(window, 'resize', () => {
   if (resizeRaf) return;
@@ -278,7 +256,6 @@ trackGlobalEventListener(window, 'resize', () => {
     renderNavigation(currentRoute());
   });
 }, { passive: true });
-
 const settingsPanel = document.getElementById('settingsPanel');
 initializeThemeController({ root: settingsPanel || document });
 initializeFeedbackController({ appVersion: APP_VERSION, getRoute: currentRoute });
@@ -286,7 +263,6 @@ initializeReleaseNotesController({ appVersion: APP_VERSION });
 if ('requestIdleCallback' in window) requestIdleCallback(() => ensurePdfExport());
 else setTimeout(() => ensurePdfExport(), 0);
 initializeSettingsController({ settingsPanel, ensurePdfExport });
-
 const header = document.querySelector('.app-header');
 function updateHeaderTransparency() {
   if (!header) return;

@@ -1,7 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const packageJsonPath = path.join(root, 'package.json');
 const packageLockPath = path.join(root, 'package-lock.json');
@@ -12,7 +11,6 @@ const floodingReportPath = path.join(root, 'js/modules/flooding-verification/rep
 const releaseNotesControllerPath = path.join(root, 'js/platform/shell/releaseNotesController.js');
 const indexPath = path.join(root, 'index.html');
 const SEMVER = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
-
 function readJson(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
 function stableJson(value) { return `${JSON.stringify(value, null, 2)}\n`; }
 function versionModule(version) {
@@ -33,7 +31,19 @@ function syncRuntimeVersion(file, transform, check, changes) {
   const source = fs.readFileSync(file, 'utf8');
   syncFile(file, transform(source), check, changes);
 }
-
+function syncPackageLock(version, check, changes) {
+  const source = fs.readFileSync(packageLockPath, 'utf8');
+  const packageLock = JSON.parse(source);
+  if (!packageLock.packages?.['']) throw new Error('package-lock.json is missing the root package entry');
+  let nextSource = source;
+  if (packageLock.version !== version) {
+    nextSource = replaceRequired(nextSource, /("version"\s*:\s*")[^"]+("\s*,)/, `$1${version}$2`, 'package-lock top-level version');
+  }
+  if (packageLock.packages[''].version !== version) {
+    nextSource = replaceRequired(nextSource, /("packages"\s*:\s*\{\s*""\s*:\s*\{[\s\S]*?"version"\s*:\s*")[^"]+("\s*,)/, `$1${version}$2`, 'package-lock root package version');
+  }
+  syncFile(packageLockPath, nextSource, check, changes);
+}
 export function syncReleaseVersion({ check = false } = {}) {
   const pkg = readJson(packageJsonPath);
   const version = String(pkg.version || '').trim();
@@ -44,13 +54,7 @@ export function syncReleaseVersion({ check = false } = {}) {
   const manifest = readJson(manifestPath);
   manifest.version = version;
   syncFile(manifestPath, stableJson(manifest), check, changes);
-
-  const packageLock = readJson(packageLockPath);
-  packageLock.version = version;
-  if (!packageLock.packages?.['']) throw new Error('package-lock.json is missing the root package entry');
-  packageLock.packages[''].version = version;
-  syncFile(packageLockPath, stableJson(packageLock), check, changes);
-
+  syncPackageLock(version, check, changes);
   syncRuntimeVersion(appPath, source => replaceRequired(source, /const APP_VERSION = '[^']+';(?: \/\/ generated from package\.json)?/, `const APP_VERSION = '${version}'; // generated from package.json`, 'app runtime version'), check, changes);
   syncRuntimeVersion(floodingReportPath, source => replaceRequired(source, /appVersion:\s*'[^']+'/m, `appVersion: '${version}'`, 'flooding PDF app version'), check, changes);
   syncRuntimeVersion(releaseNotesControllerPath, source => source.replace(/appVersion = '[^']+'/g, `appVersion = '${version}'`), check, changes);
@@ -58,11 +62,9 @@ export function syncReleaseVersion({ check = false } = {}) {
     .replace(/(<strong data-app-version-current>)[^<]*(<\/strong>)/, `$1${version}$2`)
     .replace(/(<input type="hidden" name="version" value=")[^"]*(">)/, `$1${version}$2`)
     .replace(/(<strong id="appVersion">)[^<]*(<\/strong>)/, `$1${version}$2`), check, changes);
-
   if (check && changes.length) throw new Error(`Release version is not synchronized from package.json: ${changes.join(', ')}. Run npm run version:sync.`);
   return Object.freeze({ version, changes: Object.freeze([...changes]) });
 }
-
 const invokedDirectly = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (invokedDirectly) {
   try {

@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.4.0';
-const CACHE_REVISION = '1.4.0-naechste-entwicklungsphase-regenwassereinlaeufe-btu-h-und-h-x-diagramm';
+const CACHE_NAME = 'techcalc-pro-1.5.0';
+const CACHE_REVISION = '1.5.0-version-1-5-0-f-gase-check';
 const ASSETS = [
   './',
   './index.html',
@@ -102,6 +102,7 @@ const ASSETS = [
   './js/core/stateBinding.js',
   './js/core/uiSystem.js',
   './js/core/unsavedWorkGuard.js',
+  './js/core/version.js',
   './js/modules/buffer-storage/config.js',
   './js/modules/buffer-storage/controller.js',
   './js/modules/buffer-storage/index.js',
@@ -283,7 +284,6 @@ const ASSETS = [
   './assets/icons/icon-512.png',
   './docs/legal/agb.html'
 ];
-
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
 });
@@ -291,7 +291,6 @@ self.addEventListener('install', event => {
 self.addEventListener('message', event => {
   if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
-
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
@@ -301,7 +300,6 @@ self.addEventListener('activate', event => {
     clients.forEach(client => client.postMessage({ type: 'TECHCALC_CACHE_UPDATED', cache: CACHE_NAME, revision: CACHE_REVISION }));
   })());
 });
-
 async function fetchFresh(request) {
   try {
     const response = await fetch(request, { cache: 'no-store' });
@@ -314,7 +312,6 @@ async function fetchFresh(request) {
     return null;
   }
 }
-
 async function cacheFirstWithRefresh(request) {
   const cached = await caches.match(request);
   if (cached) {
@@ -325,7 +322,6 @@ async function cacheFirstWithRefresh(request) {
   if (response) return response;
   return caches.match('./index.html');
 }
-
 function isVersionCriticalAsset(requestUrl) {
   return requestUrl.pathname.endsWith('/index.html')
     || requestUrl.pathname.endsWith('/js/core/app.js')
@@ -334,18 +330,15 @@ function isVersionCriticalAsset(requestUrl) {
     || requestUrl.pathname.endsWith('/RELEASE_NOTES.md')
     || requestUrl.pathname.endsWith('/manifest.json');
 }
-
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
   const requestUrl = new URL(event.request.url);
   if (requestUrl.origin !== self.location.origin) return;
-
   const isNavigation = event.request.mode === 'navigate' || event.request.destination === 'document';
   const isReleaseNotes = requestUrl.pathname.endsWith('/RELEASE_NOTES.md') || requestUrl.pathname.endsWith('RELEASE_NOTES.md');
   const isServiceWorker = requestUrl.pathname.endsWith('/service-worker.js') || requestUrl.pathname.endsWith('service-worker.js');
   const isVersionCritical = isVersionCriticalAsset(requestUrl);
-
   if (isNavigation || isReleaseNotes || isServiceWorker || isVersionCritical) {
     event.respondWith((async () => {
       const fresh = await fetchFresh(event.request);

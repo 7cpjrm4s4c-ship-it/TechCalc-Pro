@@ -8,14 +8,12 @@ function normalizeReleaseVersion(value = '') {
     .replace(/-rc(\d+)/i, '-rc.$1')
     .toLowerCase();
 }
-
 function releaseSortKey(note = {}) {
   const raw = normalizeReleaseVersion(note.version);
   const match = raw.match(/^(\d+)\.(\d+)\.(\d+)(?:-rc\.(\d+))?$/i);
   if (!match) return [0, 0, 0, -1];
   return [Number(match[1]), Number(match[2]), Number(match[3]), match[4] ? Number(match[4]) : 9999];
 }
-
 function compareReleaseNotesDesc(a, b) {
   const ak = releaseSortKey(a);
   const bk = releaseSortKey(b);
@@ -34,12 +32,10 @@ function dedupeReleaseNotes(notes = []) {
     return true;
   });
 }
-
 export function parseReleaseNotes(markdown = '') {
   const lines = String(markdown || '').split(/\r?\n/);
   const notes = [];
   let current = null;
-
   for (const rawLine of lines) {
     const line = rawLine.trim();
     if (!line || /^<!--.*-->$/.test(line)) continue;
@@ -67,7 +63,6 @@ export function parseReleaseNotes(markdown = '') {
     const item = line.replace(/^[-*]\s+/, '').trim();
     if (item && !item.startsWith('#')) current.items.push(item);
   }
-
   return dedupeReleaseNotes(notes).sort(compareReleaseNotesDesc);
 }
 
@@ -77,12 +72,10 @@ export function renderReleaseNotes(notes, host = document.getElementById('releas
     replaceReleaseNotes(host, [createReleaseElement('p', {}, 'Release Notes konnten nicht geladen werden.')]);
     return;
   }
-
   const elements = notes.slice(0, 18).map((note, index) => {
     const article = createReleaseElement('article', {
       className: `release-note${index === 0 ? ' is-current' : ''}`
     });
-
     const header = createReleaseElement('div', { className: 'release-note__header' });
     header.append(
       createReleaseElement('strong', { className: 'release-note__version' }, note.version),
@@ -93,14 +86,12 @@ export function renderReleaseNotes(notes, host = document.getElementById('releas
     if (note.title) {
       article.append(createReleaseElement('strong', { className: 'release-note__title' }, note.title));
     }
-
     article.append(createReleaseElement('small', {}, note.items.slice(0, 4).join(' ')));
     return article;
   });
 
   replaceReleaseNotes(host, elements);
 }
-
 function createReleaseElement(tagName, attributes = {}, text = '') {
   if (typeof document !== 'undefined' && typeof document.createElement === 'function') {
     const element = document.createElement(tagName);
@@ -108,7 +99,6 @@ function createReleaseElement(tagName, attributes = {}, text = '') {
     if (text) element.textContent = String(text);
     return element;
   }
-
   const children = [];
   return {
     append(...nodes) { children.push(...nodes.filter(Boolean)); },
@@ -119,7 +109,6 @@ function createReleaseElement(tagName, attributes = {}, text = '') {
     }
   };
 }
-
 function replaceReleaseNotes(host, elements = []) {
   if (typeof host.replaceChildren === 'function' && elements.every(element => !element.__tcHtml)) {
     host.replaceChildren(...elements);
@@ -127,7 +116,6 @@ function replaceReleaseNotes(host, elements = []) {
   }
   host.innerHTML = elements.map(element => element.__tcHtml || element.outerHTML || '').join('');
 }
-
 function latestSemanticVersion(notes = []) {
   const versionPattern = /^([0-9]+\.[0-9]+\.[0-9]+)(?:\b|\s|[·-–])/;
   for (const note of notes || []) {
@@ -136,7 +124,6 @@ function latestSemanticVersion(notes = []) {
   }
   return '';
 }
-
 function syncDisplayedVersion(appVersion, notes = []) {
   const displayVersion = latestSemanticVersion(notes) || appVersion;
   const versionHost = document.querySelector?.('[data-app-version-current]');
@@ -146,11 +133,9 @@ function syncDisplayedVersion(appVersion, notes = []) {
   document.querySelectorAll?.('input[name="version"]').forEach(input => { input.value = displayVersion; });
   return displayVersion;
 }
-
 let releaseNotesControllerInitialized = false;
-
 export function initializeReleaseNotesController({
-  appVersion = '1.4.0-dev.2',
+  appVersion = '1.5.0',
   releaseNotesUrl = './RELEASE_NOTES.md',
   versionHost = document.querySelector('[data-app-version-current]'),
   fallback = document.getElementById('releaseNotesFallback'),
@@ -159,14 +144,12 @@ export function initializeReleaseNotesController({
 } = {}) {
   if (releaseNotesControllerInitialized) return Promise.resolve(false);
   releaseNotesControllerInitialized = true;
-
   syncDisplayedVersion(appVersion);
 
   return loadReleaseNotes({ appVersion, releaseNotesUrl, fallback, host, fetchImpl });
 }
-
 export async function loadReleaseNotes({
-  appVersion = '1.4.0-dev.2',
+  appVersion = '1.5.0',
   releaseNotesUrl = './RELEASE_NOTES.md',
   fallback = document.getElementById('releaseNotesFallback'),
   host = document.getElementById('releaseNotesDynamic'),
@@ -195,5 +178,4 @@ export async function loadReleaseNotes({
     return false;
   }
 }
-
 export default initializeReleaseNotesController;
