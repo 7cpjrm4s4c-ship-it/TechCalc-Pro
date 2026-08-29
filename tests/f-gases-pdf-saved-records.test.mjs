@@ -32,7 +32,7 @@ const sections = buildFGasesReportSections(dto);
 assert.equal(sections.length, 8);
 assert.equal(sections[0].title, '1. Regulatorische Ergebnisübersicht');
 assert.ok(sections.some(section => section.title.includes('Dichtheitskontrolle')));
-assert.ok(sections.some(section => section.rows.some(row => row[0] === 'Rechtsdaten')));
+assert.ok(sections.some(section => section.rows.some(row => row[0] === 'Verordnung (EU) 2024/573')));
 const mapped = reportSections({ reportSource: 'typed-dto', reportDto: dto });
 assert.equal(mapped.length, 8);
 assert.equal(mapped[0].title, '1. Regulatorische Ergebnisübersicht');
