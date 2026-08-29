@@ -16,7 +16,6 @@ import {
   renderSurfaceTable
 } from './authorityTables.js';
 import { PDF_PAGE, PDF_THEME } from './reportTheme.js';
-
 const EXECUTIVE_SUMMARY_TITLE = 'ZUSAMMENFASSUNG';
 
 export function isFloodingAuthorityReport(moduleData = {}) {
@@ -32,7 +31,6 @@ function formatNumber(value, digits = 2) {
     maximumFractionDigits: digits
   }).format(Number(value));
 }
-
 function formatVolume(value) {
   return Number.isFinite(Number(value)) ? `${formatNumber(value)} m³` : '—';
 }
@@ -44,18 +42,18 @@ function formatArea(value) {
 function formatDuration(value) {
   return Number.isFinite(Number(value)) ? `${formatNumber(value, 0)} min` : '—';
 }
-
 export function renderAuthorityCoverPage(report, project, moduleData) {
   const cover = buildAuthorityCoverPage({ project, moduleData });
   const m = PDF_THEME.margin;
   const right = PDF_PAGE.width - m;
   const width = PDF_PAGE.width - m * 2;
   const center = PDF_PAGE.width / 2;
-
-  if (report.images.appIcon) report.drawImage('ImAppIcon', m, m, 38, 38);
-  report.text('TechCalc Pro', m + 46, m + 15, { size: 13, font: 'F2' });
-  report.text('HLSK QUICK TOOLS', m + 46, m + 29, { size: 6.4, font: 'F2', color: PDF_THEME.muted });
-
+  const showTechCalcBranding = project?.showTechCalcBranding !== false;
+  if (showTechCalcBranding) {
+    if (report.images.appIcon) report.drawImage('ImAppIcon', m, m, 38, 38);
+    report.text('TechCalc Pro', m + 46, m + 15, { size: 13, font: 'F2' });
+    report.text('HLSK QUICK TOOLS', m + 46, m + 29, { size: 6.4, font: 'F2', color: PDF_THEME.muted });
+  }
   if (report.images.companyLogo) {
     const img = report.images.companyLogo;
     const ratio = Math.min(120 / img.width, 56 / img.height);
@@ -63,7 +61,6 @@ export function renderAuthorityCoverPage(report, project, moduleData) {
     const logoHeight = img.height * ratio;
     report.drawImage('ImCompanyLogo', right - logoWidth, m, logoWidth, logoHeight);
   }
-
   report.line(m, m + 66, right, m + 66, PDF_THEME.line, 0.8);
   report.text(cover.eyebrow, center, 250, {
     size: 9,
@@ -79,7 +76,6 @@ export function renderAuthorityCoverPage(report, project, moduleData) {
     lineHeight: 1.1
   });
 }
-
 export function renderAuthorityExecutiveSummary(report, moduleData) {
   const summary = buildAuthorityExecutiveSummary(moduleData);
   const dwaRequired = isDwaVerificationRequired(moduleData.reportDto);
@@ -88,17 +84,14 @@ export function renderAuthorityExecutiveSummary(report, moduleData) {
   const heroHeight = 62;
   const metricHeight = 45;
   const totalHeight = 20 + heroHeight + 7 + metricHeight + 8;
-
   report.ensureSpace(totalHeight + 8, { repeatTitle: EXECUTIVE_SUMMARY_TITLE });
   const startY = report.cursorY;
   report.text(EXECUTIVE_SUMMARY_TITLE, m, startY + 7, { size: 8.6, font: 'F2', color: PDF_THEME.accent });
-
   const heroY = startY + 18;
   report.rect(m, heroY, width, heroHeight, { fill: PDF_THEME.soft, stroke: PDF_THEME.line, width: 0.65 });
   report.text('PLANERISCH ANZUSETZENDES SPEICHERVOLUMEN', m + 12, heroY + 17, { size: 6.4, font: 'F2', color: PDF_THEME.muted });
   report.text(formatVolume(summary.planningVolumeM3), m + 12, heroY + 45, { size: 19, font: 'F2', color: PDF_THEME.accent });
   report.text(`Maßgebend: ${summary.governingLabel}`, m + width - 12, heroY + 33, { size: 7.4, font: 'F2', align: 'right', maxWidth: 190 });
-
   const metricY = heroY + heroHeight + 7;
   const gap = 6;
   const metrics = [
@@ -114,7 +107,6 @@ export function renderAuthorityExecutiveSummary(report, moduleData) {
     report.text(label, x + 6, metricY + 13, { size: 5.6, font: 'F2', color: PDF_THEME.muted, maxWidth: metricWidth - 12 });
     report.text(value, x + 6, metricY + 31, { size: 8.2, font: 'F2', maxWidth: metricWidth - 12 });
   });
-
   report.cursorY = startY + totalHeight;
 }
 
@@ -127,13 +119,11 @@ function renderAuthorityTable(report, section, dto) {
   else return false;
   return true;
 }
-
 export function installAuthorityCoverPage(GlobalPdfReport) {
   if (!GlobalPdfReport?.prototype || GlobalPdfReport.prototype.__tcAuthorityCoverInstalled) return false;
   const originalBuild = GlobalPdfReport.prototype.build;
   GlobalPdfReport.prototype.build = function buildWithAuthorityCover(project, moduleData) {
     if (!isFloodingAuthorityReport(moduleData)) return originalBuild.call(this, project, moduleData);
-
     renderAuthorityCoverPage(this, project, moduleData);
     this.addPage();
     const tocPageIndex = this.pages.length - 1;
@@ -145,7 +135,6 @@ export function installAuthorityCoverPage(GlobalPdfReport) {
     const originalCorporateBlock = this.corporateBlock;
     const originalSectionTitle = this.sectionTitle;
     const originalFooter = this.footer;
-
     this.projectData = function projectDataWithExecutiveSummary(projectData) {
       originalProjectData.call(this, projectData);
       addAuthorityTocPrelude(tocEntries, this.pages.length);
@@ -167,10 +156,9 @@ export function installAuthorityCoverPage(GlobalPdfReport) {
       renderAuthorityCorporateBlock(this, projectData, currentModuleData);
     };
     this.footer = function footerWithAuthorityToc() {
-      renderAuthorityTableOfContents(this, tocPageIndex, tocEntries, moduleData);
+      renderAuthorityTableOfContents(this, tocPageIndex, tocEntries, moduleData, project);
       return originalFooter.call(this);
     };
-
     try {
       return originalBuild.call(this, project, moduleData);
     } finally {

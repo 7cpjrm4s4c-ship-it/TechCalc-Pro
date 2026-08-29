@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { buildAuthorityCoverPage } from '../js/core/pdf/authorityCoverPage.js';
-import { installAuthorityCoverPage, isFloodingAuthorityReport } from '../js/core/pdf/authorityPdfReport.js';
-
+import { installAuthorityCoverPage, isFloodingAuthorityReport, renderAuthorityCoverPage } from '../js/core/pdf/authorityPdfReport.js';
 const moduleData = {
   id: 'flooding-verification',
   title: 'Überflutungsnachweis',
@@ -12,7 +11,6 @@ const moduleData = {
     metadata: { appVersion: '1.4.0-dev.2', generatedAt: '2026-07-17T12:00:00.000Z' }
   }
 };
-
 const cover = buildAuthorityCoverPage({
   project: { project: 'Test Projekt', projectNo: '12345', client: 'Test', engineer: 'Planer' },
   moduleData
@@ -25,12 +23,33 @@ assert.deepEqual(cover, {
 });
 assert.equal(Object.isFrozen(cover), true);
 assert.equal(isFloodingAuthorityReport(moduleData), moduleData.reportDto);
-
 const metadataFallback = buildAuthorityCoverPage({
   moduleData: { reportDto: { metadata: { moduleTitle: 'Behördennachweis' } } }
 });
 assert.equal(metadataFallback.title, 'Behördennachweis');
 assert.equal(buildAuthorityCoverPage().title, 'Überflutungsnachweis');
+
+class CoverCaptureReport {
+  constructor() {
+    this.images = { appIcon: { width: 1, height: 1 }, companyLogo: { width: 2, height: 1 } };
+    this.texts = [];
+    this.imagesDrawn = [];
+  }
+  text(value) { this.texts.push(String(value)); }
+  line() {}
+  drawImage(name) { this.imagesDrawn.push(name); }
+}
+const brandedCover = new CoverCaptureReport();
+renderAuthorityCoverPage(brandedCover, {}, moduleData);
+assert.ok(brandedCover.texts.includes('TechCalc Pro'));
+assert.ok(brandedCover.texts.includes('HLSK QUICK TOOLS'));
+assert.ok(brandedCover.imagesDrawn.includes('ImAppIcon'));
+const unbrandedCover = new CoverCaptureReport();
+renderAuthorityCoverPage(unbrandedCover, { showTechCalcBranding: false }, moduleData);
+assert.ok(!unbrandedCover.texts.includes('TechCalc Pro'), 'cover must omit TechCalc product name after opt-out');
+assert.ok(!unbrandedCover.texts.includes('HLSK QUICK TOOLS'), 'cover must omit TechCalc subtitle after opt-out');
+assert.ok(!unbrandedCover.imagesDrawn.includes('ImAppIcon'), 'cover must omit TechCalc icon after opt-out');
+assert.ok(unbrandedCover.imagesDrawn.includes('ImCompanyLogo'), 'cover must keep the company logo independent from TechCalc branding');
 
 class FakePdfReport {
   constructor() {
@@ -47,7 +66,6 @@ class FakePdfReport {
   drawImage() {}
   build() { this.originalBuildCalls += 1; return 'pdf'; }
 }
-
 assert.equal(installAuthorityCoverPage(FakePdfReport), true);
 assert.equal(installAuthorityCoverPage(FakePdfReport), false, 'installation must be idempotent');
 const report = new FakePdfReport();
@@ -55,7 +73,6 @@ assert.equal(report.build({ project: 'Test Projekt' }, moduleData), 'pdf');
 assert.equal(report.addPageCalls, 2, 'cover and table of contents must be followed by a dedicated report page');
 assert.equal(report.pages.length, 3, 'cover, table of contents and report must be separate pages');
 assert.equal(report.originalBuildCalls, 1);
-
 const legacy = new FakePdfReport();
 legacy.build({}, { id: 'rainwater', reportSource: 'legacy-dom' });
 assert.equal(legacy.addPageCalls, 0, 'other reports must retain the existing layout');
