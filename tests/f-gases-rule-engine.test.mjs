@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { calculate } from '../js/modules/f-gases-check/logic.js';
 
-const base = { assessmentDate:'2027-01-02', installationType:'stationary', applicationType:'heat-pump', productCategory:'split-ac-heat-pump', constructionType:'split', splitType:'air-water', ratedCapacityKw:'10', refrigerantId:'R32', chargeKg:'8', siteSafetyRestrictionStatus:'no', nationalSafetyStandardRestrictionStatus:'no', hermeticallySealedStatus:'no', hermeticallySealedLabelStatus:'no', leakDetectionSystemStatus:'no' };
-const split = calculate({ ...base, plannedActivity: 'installation', refrigerantOrigin: 'new' });
+const base = { assessmentDate:'2027-01-02', placedOnMarketDate:'2027-01-02', installationType:'stationary', applicationType:'heat-pump', productCategory:'split-ac-heat-pump', constructionType:'split', splitType:'air-water', ratedCapacityKw:'10', refrigerantId:'R32', chargeKg:'8', siteSafetyRestrictionStatus:'no', nationalSafetyStandardRestrictionStatus:'no', hermeticallySealedStatus:'no', hermeticallySealedLabelStatus:'no', leakDetectionSystemStatus:'no' };
+const split = calculate({ ...base, commissioningDate:'2027-01-02', plannedActivity: 'installation', refrigerantOrigin: 'new' });
 assert.equal(split.checks.placingOnMarket, 'prohibited');
 assert.equal(split.checks.service, 'no-prohibition-found');
 assert.equal(split.checks.leakCheck, 'required');
@@ -36,11 +36,11 @@ const lossDuty = germanNewPlant.operatorDutyDetails.obligations.find(item => ite
 assert.equal(lossDuty.maximumPercent, 2);
 assert.equal(germanNewPlant.checks.operatorDuties, 'non-compliant');
 
-const germanOldPlant = calculate({ ...germanNewPlant.regulatoryContext, installedAtSiteDate:'2004-01-01', specificRefrigerantLossPercent:'5.5' });
+const germanOldPlant = calculate({ ...germanNewPlant.regulatoryContext, installedAtSiteDate:'2004-01-01', commissioningDate:'2004-01-01', specificRefrigerantLossPercent:'5.5' });
 assert.equal(germanOldPlant.operatorDutyDetails.obligations.find(item => item.type === 'specific-refrigerant-loss').maximumPercent, 6);
 assert.notEqual(germanOldPlant.checks.operatorDuties, 'non-compliant');
 
-const installationWithHighGwp = calculate({ ...base, applicationType:'refrigeration', productCategory:'other-refrigeration-system', refrigerantId:'R-404A', assessmentDate:'2026-08-27', plannedActivity:'installation', refrigerantOrigin:'new' });
+const installationWithHighGwp = calculate({ ...base, applicationType:'refrigeration', productCategory:'other-refrigeration-system', refrigerantId:'R-404A', assessmentDate:'2026-08-27', placedOnMarketDate:'2026-08-27', commissioningDate:'2026-08-27', plannedActivity:'installation', refrigerantOrigin:'new' });
 assert.equal(installationWithHighGwp.checks.service, 'prohibited');
 assert.equal(installationWithHighGwp.serviceDetails.originScenarios.find(item => item.refrigerantOrigin === 'reclaimed').status, 'allowed-under-exception');
 assert.equal(installationWithHighGwp.serviceDetails.originScenarios.find(item => item.refrigerantOrigin === 'recycled').status, 'allowed-under-exception');
@@ -48,7 +48,7 @@ assert.equal(installationWithHighGwp.serviceDetails.originScenarios.find(item =>
 const missingServiceOrigin = calculate({ ...installationWithHighGwp.regulatoryContext, refrigerantOrigin:'' });
 assert.equal(missingServiceOrigin.checks.service, 'incomplete');
 
-const lifecycleCertification = calculate({ ...base, plannedActivity:'installation', personCertificationStatus:'not-verified', companyCertificationStatus:'not-verified' });
+const lifecycleCertification = calculate({ ...base, commissioningDate:'2027-01-02', plannedActivity:'installation', personCertificationStatus:'not-verified', companyCertificationStatus:'not-verified' });
 assert.equal(lifecycleCertification.checks.certification, 'required-not-verified');
 assert.ok(lifecycleCertification.operatorDutyDetails.obligations.some(item => item.type === 'certified-person-for-leak-check'));
 assert.ok(lifecycleCertification.operatorDutyDetails.obligations.some(item => item.type === 'certified-person-for-recovery'));
