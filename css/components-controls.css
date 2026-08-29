@@ -145,33 +145,38 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .segmented--cyan button.is-active { background: linear-gradient(135deg, rgba(53,229,255,.32), rgba(53,170,255,.12)); border-color: rgba(53,229,255,.58); }
 .segmented--blue button.is-active { background: linear-gradient(135deg, rgba(53,170,255,.32), rgba(53,170,255,.10)); border-color: rgba(53,170,255,.58); }
 .segmented--purple button.is-active { border-color: var(--accent-purple); box-shadow: inset 0 -3px 0 var(--accent-purple); }
+/* The PDF branding checkbox is intentionally rendered as an iOS-style switch.
+   !important protects its compact geometry from the final mobile/light-theme input guards. */
 #pdfShowTechCalcBranding {
-  appearance: none;
-  -webkit-appearance: none;
-  flex: 0 0 51px;
-  width: 51px;
-  min-width: 51px;
-  max-width: 51px;
-  height: 31px;
-  min-height: 31px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  box-sizing: border-box;
-  background-color: #636366;
-  background-image: radial-gradient(circle at 15.5px 50%, #fff 0 13px, transparent 13.5px);
-  background-repeat: no-repeat;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  flex: 0 0 51px !important;
+  width: 51px !important;
+  min-width: 51px !important;
+  max-width: 51px !important;
+  height: 31px !important;
+  min-height: 31px !important;
+  max-height: 31px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  box-sizing: border-box !important;
+  background: #636366 radial-gradient(circle at 15.5px 50%, #fff 0 13px, transparent 13.5px) no-repeat !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08) !important;
   cursor: pointer;
-  transition: background-color .18s var(--ease), background-position .18s var(--ease), box-shadow .18s var(--ease);
+  transition: background-color .18s var(--ease), box-shadow .18s var(--ease);
 }
-#pdfShowTechCalcBranding:checked {
-  background-color: var(--accent-blue, #35aaff);
-  background-image: radial-gradient(circle at calc(100% - 15.5px) 50%, #fff 0 13px, transparent 13.5px);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.10);
+:root[data-theme='light'] #pdfShowTechCalcBranding {
+  background: #e9e9ea radial-gradient(circle at 15.5px 50%, #fff 0 13px, transparent 13.5px) no-repeat !important;
+  box-shadow: inset 0 0 0 1px #c7c7cc !important;
 }
-#pdfShowTechCalcBranding:focus-visible { outline: 0; box-shadow: var(--shadow-active); }
+#pdfShowTechCalcBranding:checked,
+:root[data-theme='light'] #pdfShowTechCalcBranding:checked {
+  background: var(--tc-color-ui-primary, var(--accent-blue, #35aaff)) radial-gradient(circle at calc(100% - 15.5px) 50%, #fff 0 13px, transparent 13.5px) no-repeat !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.10) !important;
+}
+#pdfShowTechCalcBranding:focus-visible { outline: 0 !important; box-shadow: var(--shadow-active) !important; }
 /* Results ---------------------------------------------------------------- */
 .result-list,
 .tc-result-list,

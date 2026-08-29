@@ -33,9 +33,10 @@ assert.ok(optedOutReport.imageNames.includes('ImCompanyLogo'), 'company logo mus
 assert.ok(optedOutReport.textValues.includes('Berechnungsprotokoll'), 'report heading must remain visible after TechCalc opt-out');
 
 const controlsCss = fs.readFileSync(new URL('../css/components-controls.css', import.meta.url), 'utf8');
-assert.match(controlsCss, /#pdfShowTechCalcBranding\s*\{[^}]*width:\s*51px[^}]*height:\s*31px/s, 'branding control must use iOS switch proportions');
-assert.match(controlsCss, /background-image:\s*radial-gradient\(circle at 15\.5px 50%/, 'off state must render the iOS-style white thumb on the left');
-assert.match(controlsCss, /#pdfShowTechCalcBranding:checked\s*\{[^}]*background-color:\s*var\(--accent-blue[^}]*circle at calc\(100% - 15\.5px\) 50%/s, 'enabled state must move the thumb to the right');
+assert.match(controlsCss, /#pdfShowTechCalcBranding\s*\{[^}]*width:\s*51px\s*!important[^}]*height:\s*31px\s*!important/s, 'branding control must keep iOS switch proportions across mobile theme guards');
+assert.match(controlsCss, /background:\s*#636366\s+radial-gradient\(circle at 15\.5px 50%[^;]+!important/, 'dark off state must render the iOS-style track and white thumb');
+assert.match(controlsCss, /:root\[data-theme='light'\]\s+#pdfShowTechCalcBranding\s*\{[^}]*background:\s*#e9e9ea\s+radial-gradient\(circle at 15\.5px 50%[^;]+!important/s, 'light off state must use the iOS light-gray track');
+assert.match(controlsCss, /#pdfShowTechCalcBranding:checked,[\s\S]*circle at calc\(100% - 15\.5px\) 50%[^;]+!important/, 'enabled state must move the thumb to the right');
 assert.doesNotMatch(controlsCss, /#pdfShowTechCalcBranding::before/, 'switch must not depend on pseudo-elements on a replaced checkbox control');
 assert.match(controlsCss, /#pdfShowTechCalcBranding:focus-visible/, 'toggle switch must retain a keyboard focus state');
 
