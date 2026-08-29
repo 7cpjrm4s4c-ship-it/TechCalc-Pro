@@ -33,8 +33,10 @@ assert.ok(optedOutReport.imageNames.includes('ImCompanyLogo'), 'company logo mus
 assert.ok(optedOutReport.textValues.includes('Berechnungsprotokoll'), 'report heading must remain visible after TechCalc opt-out');
 
 const controlsCss = fs.readFileSync(new URL('../css/components-controls.css', import.meta.url), 'utf8');
-assert.match(controlsCss, /#pdfShowTechCalcBranding\s*\{[^}]*appearance:\s*none/s, 'branding checkbox must render as a toggle switch');
-assert.match(controlsCss, /#pdfShowTechCalcBranding:checked::before[^}]*translateX\(20px\)/s, 'toggle knob must move for the enabled state');
+assert.match(controlsCss, /#pdfShowTechCalcBranding\s*\{[^}]*width:\s*51px[^}]*height:\s*31px/s, 'branding control must use iOS switch proportions');
+assert.match(controlsCss, /background-image:\s*radial-gradient\(circle at 15\.5px 50%/, 'off state must render the iOS-style white thumb on the left');
+assert.match(controlsCss, /#pdfShowTechCalcBranding:checked\s*\{[^}]*background-color:\s*var\(--accent-blue[^}]*circle at calc\(100% - 15\.5px\) 50%/s, 'enabled state must move the thumb to the right');
+assert.doesNotMatch(controlsCss, /#pdfShowTechCalcBranding::before/, 'switch must not depend on pseudo-elements on a replaced checkbox control');
 assert.match(controlsCss, /#pdfShowTechCalcBranding:focus-visible/, 'toggle switch must retain a keyboard focus state');
 
 console.log('PDF branding opt-out contract passed.');

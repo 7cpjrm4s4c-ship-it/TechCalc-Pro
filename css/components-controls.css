@@ -69,7 +69,6 @@ select optgroup { background-color: #121820; color: #eef4ff; }
 select option:checked { background-color: #1f3347; color: #fff; }
 .field--readonly .control--readonly { justify-content: space-between; padding-left: var(--tc-control-padding-x); }
 .field--readonly .control--readonly strong { color: var(--color-text); font-size: 16px; font-weight: 900; }
-
 /* Field action contract ----------------------------------------------------
    Action-only fields must not render the surrounding control shell.
    This keeps add-item actions consistent in Light, Dark and System themes. */
@@ -149,35 +148,30 @@ select option:checked { background-color: #1f3347; color: #fff; }
 #pdfShowTechCalcBranding {
   appearance: none;
   -webkit-appearance: none;
-  position: relative;
-  flex: 0 0 auto;
-  width: 48px;
-  height: 28px;
+  flex: 0 0 51px;
+  width: 51px;
+  min-width: 51px;
+  max-width: 51px;
+  height: 31px;
+  min-height: 31px;
   margin: 0;
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--tc-radius-pill);
-  background: rgba(255,255,255,.10);
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  box-sizing: border-box;
+  background-color: #636366;
+  background-image: radial-gradient(circle at 15.5px 50%, #fff 0 13px, transparent 13.5px);
+  background-repeat: no-repeat;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
   cursor: pointer;
-  transition: background .18s var(--ease), border-color .18s var(--ease), box-shadow .18s var(--ease);
-}
-#pdfShowTechCalcBranding::before {
-  content: '';
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--color-text);
-  box-shadow: 0 2px 6px rgba(0,0,0,.28);
-  transition: transform .18s var(--ease), background .18s var(--ease);
+  transition: background-color .18s var(--ease), background-position .18s var(--ease), box-shadow .18s var(--ease);
 }
 #pdfShowTechCalcBranding:checked {
-  border-color: rgba(53,170,255,.68);
-  background: linear-gradient(135deg, rgba(53,170,255,.82), rgba(53,170,255,.48));
+  background-color: var(--accent-blue, #35aaff);
+  background-image: radial-gradient(circle at calc(100% - 15.5px) 50%, #fff 0 13px, transparent 13.5px);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.10);
 }
-#pdfShowTechCalcBranding:checked::before { transform: translateX(20px); background: #fff; }
-#pdfShowTechCalcBranding:focus-visible { outline: 0; box-shadow: var(--shadow-active); border-color: var(--accent-blue); }
+#pdfShowTechCalcBranding:focus-visible { outline: 0; box-shadow: var(--shadow-active); }
 /* Results ---------------------------------------------------------------- */
 .result-list,
 .tc-result-list,
