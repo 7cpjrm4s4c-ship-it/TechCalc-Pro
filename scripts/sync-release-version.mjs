@@ -51,7 +51,7 @@ export function syncReleaseVersion({ check = false } = {}) {
   packageLock.packages[''].version = version;
   syncFile(packageLockPath, stableJson(packageLock), check, changes);
 
-  syncRuntimeVersion(appPath, source => replaceRequired(source, /const APP_VERSION = '[^']+';/, `const APP_VERSION = '${version}'; // generated from package.json`, 'app runtime version'), check, changes);
+  syncRuntimeVersion(appPath, source => replaceRequired(source, /const APP_VERSION = '[^']+';(?: \/\/ generated from package\.json)?/, `const APP_VERSION = '${version}'; // generated from package.json`, 'app runtime version'), check, changes);
   syncRuntimeVersion(floodingReportPath, source => replaceRequired(source, /appVersion:\s*'[^']+'/m, `appVersion: '${version}'`, 'flooding PDF app version'), check, changes);
   syncRuntimeVersion(releaseNotesControllerPath, source => source.replace(/appVersion = '[^']+'/g, `appVersion = '${version}'`), check, changes);
   syncRuntimeVersion(indexPath, source => source
