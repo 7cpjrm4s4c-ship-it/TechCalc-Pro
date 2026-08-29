@@ -1,3 +1,15 @@
+## Version 1.5.1 – PDF-Branding
+
+### Neu
+- TechCalc-Pro-Branding kann in den Projekteinstellungen für den PDF-Export gezielt ein- oder ausgeblendet werden.
+- Die Einstellung ist standardmäßig aktiviert und wird projektbezogen gespeichert; bestehende Projekte behalten damit das bisherige PDF-Verhalten.
+
+### Verbesserungen
+- Bei deaktiviertem Branding werden TechCalc-Pro-Icon, Produktname und „HLSK QUICK TOOLS“ durchgängig aus dem PDF entfernt – einschließlich Deckblatt und Inhaltsverzeichnis des Überflutungsnachweises.
+- Das Firmenlogo bleibt unabhängig von der TechCalc-Pro-Branding-Option im PDF erhalten.
+- Die Branding-Option wird als kompakter iOS-orientierter Toggle-Switch dargestellt und ist für Light und Dark Mode abgestimmt.
+- Tastaturfokus und bestehende Bedienbarkeit der PDF-Einstellungen bleiben erhalten.
+
 ## Version 1.5.0 – F-Gase-Check
 
 ### Neu
