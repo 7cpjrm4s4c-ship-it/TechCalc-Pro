@@ -5,8 +5,8 @@ import { calculate } from '../js/modules/f-gases-check/logic.js';
 import { createFGasesSystemSnapshot, F_GASES_SYSTEM_SNAPSHOT_VERSION } from '../js/shared/fGasesSystemSnapshot.js';
 import { getDataStatus, getDataVersions, getGwp, getRefrigerant, listRefrigerants, listRegulations, listSafetyClasses } from '../js/utils/refrigerants/index.js';
 
-assert.equal(F_GASES_SCHEMA_VERSION, 3);
-assert.equal(schema.version, 3);
+assert.equal(F_GASES_SCHEMA_VERSION, 5);
+assert.equal(schema.version, 5);
 assert.ok(schema.fields.some(field => field.key === 'splitType'));
 assert.ok(schema.fields.some(field => field.key === 'preChargedStatus'));
 assert.equal(initialState.splitType, '');
@@ -65,7 +65,7 @@ const source = {
   dataVersions: getDataVersions()
 };
 const snapshot = createFGasesSystemSnapshot(source, { generatedAt: '2026-08-27T00:00:00.000Z' });
-assert.equal(F_GASES_SYSTEM_SNAPSHOT_VERSION, 3);
+assert.equal(F_GASES_SYSTEM_SNAPSHOT_VERSION, 5);
 assert.equal(snapshot.system.splitType, 'air-water');
 assert.equal(snapshot.system.preChargedStatus, 'yes');
 assert.equal(snapshot.system.refrigerantId, 'R32');
