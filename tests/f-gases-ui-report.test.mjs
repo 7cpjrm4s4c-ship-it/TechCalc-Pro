@@ -29,7 +29,7 @@ assert.equal(savedModel.items[0].stats[0].value, 'unzulässig');
 assert.notEqual(savedModel.items[0].stats[1].value, 'not-applicable');
 
 const dto = buildFGasesReportDto({ state, calculation, generatedAt: '2027-01-02T12:00:00.000Z' });
-assert.equal(F_GASES_REPORT_DTO_VERSION, 2);
+assert.equal(F_GASES_REPORT_DTO_VERSION, 3);
 assert.equal(dto.metadata.dtoType, 'techcalc.f-gases-check.report');
 assert.equal(dto.summary.gwp, 675);
 assert.equal(dto.summary.co2EquivalentTonnes, 5.4);
