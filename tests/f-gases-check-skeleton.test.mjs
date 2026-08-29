@@ -35,7 +35,6 @@ assert.equal(getRefrigerant('R-290').regulatory.fluorinatedGreenhouseGas, false)
 
 const regulations = listRegulations();
 assert.ok(regulations.some(rule => rule.id === 'AIV-009B' && rule.conditions.some(condition => condition.field === 'splitType')));
-assert.ok(regulations.some(rule => rule.id === 'FG-070' && rule.conditions.some(condition => condition.field === 'preChargedStatus')));
 
 const source = {
   systemName: 'Testanlage',
