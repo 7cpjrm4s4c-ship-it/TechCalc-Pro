@@ -75,6 +75,6 @@ const result = calculate({ refrigerantId: 'R32', chargeKg: '2,5' });
 assert.equal(result.status, 'calculated');
 assert.equal(result.gwp, 675);
 assert.equal(result.co2EquivalentTonnes, 1.6875);
-assert.equal(result.checks.service, 'not-specified');
+assert.equal(result.checks.service, 'incomplete');
 
 console.log('F-Gases skeleton tests passed.');
