@@ -28,7 +28,7 @@ import { initializeServiceWorkerController } from '../platform/shell/serviceWork
 import { initializePerformanceController, markPerformance, measurePerformance, startPerformanceSpan } from '../platform/shell/performanceController.js';
 import { initializeSaveEditModeSync } from './saveEditModeSync.js';
 import { initializeLayoutStabilityController } from '../platform/shell/layoutStabilityController.js';
-const APP_VERSION = '1.5.0'; // generated from package.json
+const APP_VERSION = '1.5.1'; // generated from package.json
 initializeLayoutStabilityController();
 initializePerformanceController({ appVersion: APP_VERSION });
 const appInitStartMark = markPerformance('app:init:start', { appVersion: APP_VERSION });

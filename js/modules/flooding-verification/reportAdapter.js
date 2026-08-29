@@ -65,7 +65,7 @@ export function buildFloodingReportDto({ state = {}, calculation = {}, resultMod
       moduleId: config.id || 'flooding-verification',
       moduleTitle: config.title || 'Überflutungsnachweis',
       schemaVersion: calculation.schemaVersion || state.schemaVersion || FLOODING_VERIFICATION_SCHEMA_VERSION,
-      appVersion: '1.5.0',
+      appVersion: '1.5.1',
       generatedAt
     },
     projectReference: {

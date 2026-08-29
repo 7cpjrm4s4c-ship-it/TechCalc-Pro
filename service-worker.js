@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.5.0';
-const CACHE_REVISION = '1.5.0-version-1-5-0-f-gase-check';
+const CACHE_NAME = 'techcalc-pro-1.5.1';
+const CACHE_REVISION = '1.5.1-version-1-5-1-pdf-branding';
 const ASSETS = [
   './',
   './index.html',
