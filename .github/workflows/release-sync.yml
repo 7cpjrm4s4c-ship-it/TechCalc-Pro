@@ -1,0 +1,64 @@
+name: Release Artifact Sync
+
+on:
+  push:
+    paths:
+      - package.json
+      - RELEASE_NOTES.md
+      - scripts/sync-release-version.mjs
+      - scripts/generate-precache-manifest.mjs
+      - .github/workflows/release-sync.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-sync-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    name: Synchronize release artifacts
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 1
+
+      - name: Node.js installieren
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Abhängigkeiten installieren
+        run: npm ci
+
+      - name: Release-Artefakte synchronisieren
+        run: |
+          npm run version:sync
+          npm run precache
+
+      - name: Synchronisierung prüfen
+        run: |
+          npm run version:check
+          npm run precache:check
+          npm run audit:release-readiness
+
+      - name: Generierte Artefakte einchecken
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "Release artifacts are already synchronized."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json manifest.json js/core/version.js js/core/app.js js/modules/flooding-verification/reportAdapter.js js/platform/shell/releaseNotesController.js index.html service-worker.js
+          git commit -m "build: sync release artifacts"
+          git push origin "HEAD:${{ github.ref_name }}"
