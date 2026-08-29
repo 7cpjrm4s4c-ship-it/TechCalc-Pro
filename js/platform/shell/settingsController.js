@@ -1,9 +1,10 @@
 import { logger } from '../../core/logger.js';
 import { trackGlobalEventListener } from '../../core/eventManager.js';
 import { initializeUnsavedWorkGuard } from '../../core/unsavedWorkGuard.js';
+import { getProjectMeta, setProjectMeta } from '../../core/projectStorage.js';
 
 const SETTINGS_UI_STORAGE_KEY = 'techcalc-settings-ui';
-
+const PDF_BRANDING_SETTING_ID = 'pdfShowTechCalcBranding';
 function readStorageJson(key, fallback = {}) {
   try {
     const raw = localStorage.getItem(key);
@@ -15,7 +16,6 @@ function readStorageJson(key, fallback = {}) {
     return fallback;
   }
 }
-
 function writeStorageJson(key, value) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
@@ -23,9 +23,33 @@ function writeStorageJson(key, value) {
     logger.warn('UI-Einstellungen konnten nicht gespeichert werden.', error, { module: 'settings' });
   }
 }
+function ensurePdfBrandingSetting(settingsPanel) {
+  const projectSettings = settingsPanel?.querySelector('#projectPdfSettings');
+  if (!projectSettings) return;
+  let input = document.getElementById(PDF_BRANDING_SETTING_ID);
+  if (!input) {
+    const label = document.createElement('label');
+    label.className = 'settings-check';
+    const text = document.createElement('span');
+    text.textContent = 'TechCalc Pro im PDF anzeigen';
+    input = document.createElement('input');
+    input.id = PDF_BRANDING_SETTING_ID;
+    input.type = 'checkbox';
+    input.setAttribute('aria-label', 'TechCalc Pro Branding im PDF anzeigen');
+    label.append(text, input);
+    const companyLogoField = document.getElementById('pdfCompanyLogo')?.closest('label');
+    projectSettings.insertBefore(label, companyLogoField || null);
+  }
+  const hydrate = () => { input.checked = getProjectMeta().showTechCalcBranding !== false; };
+  if (input.dataset.bound !== 'true') {
+    input.dataset.bound = 'true';
+    input.addEventListener('change', () => setProjectMeta({ showTechCalcBranding: input.checked }));
+    document.addEventListener('techcalc-project-loaded', hydrate);
+  }
+  hydrate();
+}
 
 let settingsControllerInitialized = false;
-
 export function initializeSettingsController({
   settingsButton = document.getElementById('settingsButton'),
   settingsPanel = document.getElementById('settingsPanel'),
@@ -35,7 +59,7 @@ export function initializeSettingsController({
   initializeUnsavedWorkGuard();
   if (settingsControllerInitialized) return;
   settingsControllerInitialized = true;
-
+  ensurePdfBrandingSetting(settingsPanel);
   const settingsBody = settingsPanel?.querySelector('.settings-panel__body');
   let settingsScrollY = 0;
   let lastFocusedElement = null;
@@ -43,7 +67,6 @@ export function initializeSettingsController({
   function isSettingsOpen() {
     return Boolean(settingsPanel?.classList.contains('is-open'));
   }
-
   function lockPageScroll() {
     settingsScrollY = window.scrollY || document.documentElement.scrollTop || 0;
     document.documentElement.classList.add('settings-open');
@@ -54,7 +77,6 @@ export function initializeSettingsController({
     document.body.style.right = '0';
     document.body.style.width = '100%';
   }
-
   function unlockPageScroll() {
     document.documentElement.classList.remove('settings-open');
     document.body.classList.remove('settings-open');
@@ -65,7 +87,6 @@ export function initializeSettingsController({
     document.body.style.width = '';
     window.scrollTo(0, settingsScrollY || 0);
   }
-
   function setSubmenuOpenState(details, open) {
     if (!details) return;
     details.open = Boolean(open);
@@ -78,13 +99,11 @@ export function initializeSettingsController({
       if (details !== except) setSubmenuOpenState(details, false);
     });
   }
-
   function clearPersistedOpenSubmenu() {
     const current = readStorageJson(SETTINGS_UI_STORAGE_KEY, {});
     const { openSubmenu, ...rest } = current;
     writeStorageJson(SETTINGS_UI_STORAGE_KEY, rest);
   }
-
   function restoreSettingsUiState() {
     const state = readStorageJson(SETTINGS_UI_STORAGE_KEY, {});
     if (!settingsPanel) return;
@@ -92,7 +111,6 @@ export function initializeSettingsController({
       setSubmenuOpenState(details, details.dataset.settingsIndex === state.openSubmenu);
     });
   }
-
   function saveSettingsOpenSubmenu(details) {
     const current = readStorageJson(SETTINGS_UI_STORAGE_KEY, {});
     if (!details?.open) {
@@ -107,7 +125,6 @@ export function initializeSettingsController({
       openSubmenu: details.dataset.settingsIndex
     });
   }
-
   function scrollSubmenuIntoView(details, mode = 'nearest') {
     const body = settingsBody;
     if (!body || !details || !body.contains(details)) return;
@@ -119,20 +136,17 @@ export function initializeSettingsController({
       body.scrollTo({ top: Math.max(0, targetTop), left: 0, behavior: 'auto' });
       return;
     }
-
     const bodyRect = body.getBoundingClientRect();
     const detailsRect = details.getBoundingClientRect();
     const summaryRect = summary.getBoundingClientRect();
     const topOverflow = bodyRect.top - summaryRect.top + 8;
     const bottomOverflow = detailsRect.bottom - bodyRect.bottom + 24;
-
     if (details.offsetHeight >= body.clientHeight) {
       body.scrollTo({ top: Math.max(0, targetTop), left: 0, behavior: 'auto' });
       return;
     }
     if (topOverflow > 0) body.scrollBy({ top: -topOverflow, left: 0, behavior: 'auto' });
     else if (bottomOverflow > 0) body.scrollBy({ top: bottomOverflow, left: 0, behavior: 'auto' });
-
     requestAnimationFrame(() => {
       const nextBodyRect = body.getBoundingClientRect();
       const nextDetailsRect = details.getBoundingClientRect();
@@ -145,7 +159,6 @@ export function initializeSettingsController({
 
   function setSettingsOpen(open) {
     if (!settingsPanel || !settingsButton) return;
-
     if (open) {
       restoreSettingsUiState();
       lastFocusedElement = document.activeElement;
@@ -164,7 +177,6 @@ export function initializeSettingsController({
       });
       return;
     }
-
     closeAllSubmenus();
     clearPersistedOpenSubmenu();
     settingsBody?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -178,7 +190,6 @@ export function initializeSettingsController({
       lastFocusedElement.focus({ preventScroll: true });
     }
   }
-
   settingsPanel?.classList.remove('is-open');
   unlockPageScroll();
   setSettingsOpen(false);
@@ -198,11 +209,9 @@ export function initializeSettingsController({
   settingsPanel?.addEventListener('click', event => {
     event.stopPropagation();
   });
-
   settingsPanel?.querySelectorAll('.settings-submenu').forEach((details, index) => {
     details.dataset.settingsIndex = String(index);
   });
-
   settingsPanel?.querySelectorAll('.settings-submenu').forEach(details => {
     details.classList.toggle('is-open', details.open);
     details.setAttribute('aria-expanded', String(Boolean(details.open)));
@@ -214,7 +223,6 @@ export function initializeSettingsController({
       requestAnimationFrame(() => scrollSubmenuIntoView(details, 'nearest'));
     });
   });
-
   trackGlobalEventListener(document, 'click', event => {
     if (!isSettingsOpen()) return;
     if (event.target.closest('#settingsButton') || event.target.closest('#settingsPanel')) return;
@@ -224,7 +232,6 @@ export function initializeSettingsController({
   trackGlobalEventListener(document, 'keydown', event => {
     if (event.key === 'Escape') setSettingsOpen(false);
   });
-
   trackGlobalEventListener(document, 'touchmove', event => {
     if (!isSettingsOpen()) return;
     const panel = event.target.closest('#settingsPanel');

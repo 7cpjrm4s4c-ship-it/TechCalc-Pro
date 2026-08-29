@@ -31,7 +31,6 @@ function pairSequentialRows(rows = []) {
   }
   return pairs;
 }
-
 function pdfValueForRow(row = []) {
   return pdfRowValue(row).replace(/ - /g, ' x ');
 }
@@ -182,9 +181,12 @@ export class GlobalPdfReport {
     const logoW = 104;
     const logoH = 52;
     const reportHeading = sanitizeText(moduleData?.reportDto?.metadata?.reportHeading || moduleData?.reportHeading || 'Berechnungsprotokoll');
-    if (this.images.appIcon) this.drawImage('ImAppIcon', m, this.cursorY + 4, 26, 26);
-    this.text('TechCalc Pro', m + 31, this.cursorY + 13, { size: 10.2, font: 'F2' });
-    this.text('HLSK QUICK TOOLS', m + 31, this.cursorY + 24, { size: 5.8, font: 'F2', color: PDF_THEME.muted });
+    const showTechCalcBranding = project?.showTechCalcBranding !== false;
+    if (showTechCalcBranding) {
+      if (this.images.appIcon) this.drawImage('ImAppIcon', m, this.cursorY + 4, 26, 26);
+      this.text('TechCalc Pro', m + 31, this.cursorY + 13, { size: 10.2, font: 'F2' });
+      this.text('HLSK QUICK TOOLS', m + 31, this.cursorY + 24, { size: 5.8, font: 'F2', color: PDF_THEME.muted });
+    }
     this.text(reportHeading, titleX, this.cursorY + 10, { size: 14, font: 'F2', align: 'center', maxWidth: 180 });
     this.text(`${moduleData.title || moduleData.shortTitle || 'Modul'} - ${date}`, titleX, this.cursorY + 25, { size: 7.2, font: 'F2', color: PDF_THEME.muted, align: 'center', maxWidth: 180 });
     if (this.images.companyLogo) {
