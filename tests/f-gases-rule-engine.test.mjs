@@ -21,9 +21,9 @@ assert.equal(highCharge.leakCheckDetails.required, true);
 assert.equal(highCharge.leakCheckDetails.intervalMonths, 6);
 assert.equal(highCharge.leakCheckDetails.leakDetectionRequired, true);
 
-const mobileBeforeTransition = calculate({ ...base, installationType:'mobile', mobileEquipmentType:'light-refrigerated-intermodal-rail', applicationType:'refrigeration', assessmentDate:'2027-03-12' });
+const mobileBeforeTransition = calculate({ ...base, installationType:'mobile', mobileEquipmentType:'light-refrigerated-intermodal-rail', applicationType:'refrigeration', stockAssessmentDate:'2027-03-12' });
 assert.equal(mobileBeforeTransition.checks.leakCheck, 'not-applicable');
-const mobileAfterTransition = calculate({ ...mobileBeforeTransition.regulatoryContext, assessmentDate:'2027-03-13' });
+const mobileAfterTransition = calculate({ ...mobileBeforeTransition.regulatoryContext, stockAssessmentDate:'2027-03-13' });
 assert.equal(mobileAfterTransition.checks.leakCheck, 'required');
 
 const preBan = calculate({ ...base, assessmentDate:'2028-01-01', placedOnMarketDate:'2026-12-31' });
