@@ -3,7 +3,7 @@ import { sanitizeText, normalizeKey } from './pdfText.js';
 import { buildFloodingReportSections } from './floodingReportSections.js';
 import { buildRainwaterReportSections } from './rainwaterReportSections.js';
 import { buildFGasesReportSections } from './fGasesReportSections.js';
-
+import { buildGenericReportSections } from './genericReportSections.js';
 function textOf(node) { return sanitizeText(node?.textContent || ''); }
 function valueOfField(field) {
   const control = field.querySelector('input, select, textarea');
@@ -17,7 +17,6 @@ function unitOfField(field) {
   const unit = field.querySelector('.unit:not(.unit-select)');
   return unit ? textOf(unit) : '';
 }
-
 export function extractCardRows(card) {
   const rows = [];
   card.querySelectorAll(':scope .field').forEach(field => {
@@ -65,7 +64,6 @@ export function extractCardRows(card) {
   });
   return rows;
 }
-
 function isChartCard(card) {
   return Boolean(card.querySelector('.hx-chart, svg, canvas')) && /diagramm/i.test(textOf(card.querySelector('.card__title')));
 }
@@ -177,14 +175,16 @@ function normalizePdfRows(rows = [], title = '') {
       return row;
     });
 }
+function buildTypedDtoReportSections(reportDto = {}) {
+  const dtoType = reportDto.metadata?.dtoType;
+  if (dtoType === 'techcalc.rainwater.report') return buildRainwaterReportSections(reportDto);
+  if (dtoType === 'techcalc.f-gases-check.report') return buildFGasesReportSections(reportDto);
+  if (dtoType === 'techcalc.flooding-verification.report') return buildFloodingReportSections(reportDto);
+  return buildGenericReportSections(reportDto);
+}
 export function reportSections(moduleData) {
   if (moduleData?.reportSource === 'typed-dto' && moduleData.reportDto) {
-    const dtoType = moduleData.reportDto.metadata?.dtoType;
-    const sections = dtoType === 'techcalc.rainwater.report'
-      ? buildRainwaterReportSections(moduleData.reportDto)
-      : dtoType === 'techcalc.f-gases-check.report'
-        ? buildFGasesReportSections(moduleData.reportDto)
-        : buildFloodingReportSections(moduleData.reportDto);
+    const sections = buildTypedDtoReportSections(moduleData.reportDto);
     return sections.map(section => ({ ...section, rows: normalizePdfRows(section.rows, section.title) }));
   }
   const sections = Array.isArray(moduleData?.sections) ? moduleData.sections : [];
