@@ -39,7 +39,13 @@ export function buildEN378SafetyCheckReportDto({
     }),
     summary: {
       status: calculation.status || 'incomplete',
-      inputComplete: Boolean(calculation.inputComplete)
+      inputComplete: Boolean(calculation.inputComplete),
+      inputIssues: clone(calculation.inputValidation?.issues || [])
+    },
+    assessment: {
+      status: 'not-implemented',
+      requiredMeasures: clone(calculation.requiredMeasures || []),
+      notices: clone(calculation.notices || [])
     },
     resultGroups: clone(resultModel.groups || []),
     notices: clone(resultModel.notices || []),

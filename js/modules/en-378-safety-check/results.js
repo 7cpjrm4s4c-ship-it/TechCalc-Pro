@@ -8,8 +8,14 @@ const formatNumber = (value, digits = 2) => {
 
 const statusLabel = status => {
   if (status === 'ready-for-assessment') return 'Eingaben vollständig';
+  if (status === 'import-rejected') return 'Snapshot abgelehnt';
   return 'Eingaben unvollständig';
 };
+
+const issueRows = calculation => (calculation.inputValidation?.issues || []).map(issue => ({
+  label: 'Technische Validierung',
+  value: issue
+}));
 
 export function buildEN378SafetyCheckResultModel(currentState = {}, calculation = {}) {
   return {
@@ -44,6 +50,10 @@ export function buildEN378SafetyCheckResultModel(currentState = {}, calculation 
           { label: 'Maschinenraum', value: currentState.hasMachineryRoom || '–' },
           { label: 'Weitere Maßnahmen', value: currentState.additionalSafetyMeasures || '–' }
         ]
+      },
+      {
+        title: 'Technische Validierung',
+        rows: issueRows(calculation)
       }
     ],
     notices: calculation.notices || []
