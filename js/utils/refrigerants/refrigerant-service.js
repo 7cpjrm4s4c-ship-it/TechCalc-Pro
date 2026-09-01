@@ -2,7 +2,7 @@ import REFRIGERANT_DATASET from './refrigerants.js';
 import GWP_DATASET from './gwp.js';
 import SAFETY_CLASS_DATASET from './safety-classes.js';
 import REGULATION_DATASET from './regulations.js';
-
+import EN378_SAFETY_DATASET from './en378-safety-data.js';
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 const normalizeIdentifier = value => String(value ?? '').trim().toLowerCase();
 const UNKNOWN = Symbol('unknown');
@@ -27,6 +27,13 @@ function findRefrigerant(identifier) {
   const normalized = normalizeIdentifier(identifier);
   if (!normalized) return null;
   return REFRIGERANT_DATASET.items.find(entry => normalizeIdentifier(entry.id) === normalized || normalizeIdentifier(entry.name) === normalized || entry.aliases?.some(alias => normalizeIdentifier(alias) === normalized)) ?? null;
+}
+function findEN378SafetyData(identifier) {
+  const refrigerant = findRefrigerant(identifier);
+  const canonicalId = refrigerant?.id || identifier;
+  const normalized = normalizeIdentifier(canonicalId);
+  if (!normalized) return null;
+  return EN378_SAFETY_DATASET.items.find(entry => normalizeIdentifier(entry.refrigerantId) === normalized) ?? null;
 }
 function matchesScalarOrList(actual, expected) { return Array.isArray(actual) ? actual.includes(expected) : actual === expected; }
 function deriveGasScope(regulatory = {}) {
@@ -200,8 +207,8 @@ export function evaluateRegulations(context = {}) {
     return Object.freeze({ rule: clone(rule), status: 'matched', reasons: Object.freeze([]) });
   });
 }
-export function getDataVersions() { return Object.freeze({ refrigerants: REFRIGERANT_DATASET.version, gwp: GWP_DATASET.version, regulations: REGULATION_DATASET.version, safetyClasses: SAFETY_CLASS_DATASET.version }); }
-export function getDataStatus() { return Object.freeze({ refrigerants: REFRIGERANT_DATASET.status, gwp: GWP_DATASET.status, regulations: REGULATION_DATASET.status, safetyClasses: SAFETY_CLASS_DATASET.status }); }
+export function getDataVersions() { return Object.freeze({ refrigerants: REFRIGERANT_DATASET.version, gwp: GWP_DATASET.version, regulations: REGULATION_DATASET.version, safetyClasses: SAFETY_CLASS_DATASET.version, en378SafetyData: EN378_SAFETY_DATASET.version }); }
+export function getDataStatus() { return Object.freeze({ refrigerants: REFRIGERANT_DATASET.status, gwp: GWP_DATASET.status, regulations: REGULATION_DATASET.status, safetyClasses: SAFETY_CLASS_DATASET.status, en378SafetyData: EN378_SAFETY_DATASET.status }); }
 export function listRefrigerants() { return clone(REFRIGERANT_DATASET.items) ?? []; }
 export function getRefrigerant(refrigerantId) { return clone(findRefrigerant(refrigerantId)); }
 export function getGwp(refrigerantId) {
@@ -212,8 +219,10 @@ export function getGwp(refrigerantId) {
 export function listSafetyClasses() { return clone(SAFETY_CLASS_DATASET.items) ?? []; }
 export function getSafetyClass(id) { return clone(SAFETY_CLASS_DATASET.items.find(entry => entry.id === id) ?? null); }
 export function listRegulations() { return clone(REGULATION_DATASET.rules) ?? []; }
+export function listEN378SafetyData() { return clone(EN378_SAFETY_DATASET.items) ?? []; }
+export function getEN378SafetyData(refrigerantId) { return clone(findEN378SafetyData(refrigerantId)); }
 export function getApplicableRegulations(context = {}) {
   if (!context || Object.keys(context).length === 0) return listRegulations();
   return evaluateRegulations(context).filter(entry => ['matched', 'exception-applies', 'matched-with-unresolved-exception', 'manual-review'].includes(entry.status)).map(entry => clone(entry.rule));
 }
-export default Object.freeze({ getDataVersions, getDataStatus, listRefrigerants, getRefrigerant, getGwp, listSafetyClasses, getSafetyClass, listRegulations, createRegulatoryContext, evaluateRegulations, getApplicableRegulations });
+export default Object.freeze({ getDataVersions, getDataStatus, listRefrigerants, getRefrigerant, getGwp, listSafetyClasses, getSafetyClass, listRegulations, listEN378SafetyData, getEN378SafetyData, createRegulatoryContext, evaluateRegulations, getApplicableRegulations });
