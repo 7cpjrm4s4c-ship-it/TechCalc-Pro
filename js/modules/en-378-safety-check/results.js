@@ -24,6 +24,31 @@ const chargeLimitRows = calculation => {
   return rows;
 };
 
+const alternativeRiskRows = calculation => {
+  const assessment = calculation.alternativeRiskMeasuresAssessment || {};
+  if (!assessment.status || assessment.status === 'not-applicable') return [];
+  const details = assessment.details || {};
+  const rows = [
+    { label: 'Bewertung', value: statusLabel(assessment.status) },
+    { label: 'Erforderliche Mindestanzahl', value: formatNumber(assessment.requiredMeasureCount, 0) },
+    { label: 'Ausgewählte Maßnahmen', value: formatNumber(assessment.selectedMeasureCount, 0) },
+    { label: 'Maximaler C.3-Grenzwert', value: formatNumber(assessment.maximumChargeKg), unit: assessment.maximumChargeKg == null ? '' : 'kg' },
+    { label: 'Erforderliche freie Öffnungsfläche', value: formatNumber(details.openingAreaM2, 5), unit: details.openingAreaM2 == null ? '' : 'm²' },
+    { label: 'Vereinfachter mechanischer Luftstrom', value: formatNumber(details.mechanicalVentilationFlowM3h, 1), unit: details.mechanicalVentilationFlowM3h == null ? '' : 'm³/h' }
+  ];
+  if (Array.isArray(details.selectedMeasures) && details.selectedMeasures.length) {
+    rows.push({ label: 'Gewählte Maßnahmen', value: details.selectedMeasures.join(', ') });
+  }
+  for (const requirement of assessment.requirements || []) {
+    rows.push({
+      label: requirement.title || checkLabel(requirement.id),
+      value: `${statusLabel(requirement.status)}: ${requirement.measure || requirement.requirement || 'prüfen'}`,
+      unit: requirement.source?.sourceSection || ''
+    });
+  }
+  return rows;
+};
+
 const refrigerantSafetyRows = calculation => {
   const data = calculation.refrigerantSafetyData || {};
   return [
@@ -90,6 +115,7 @@ export function buildEN378SafetyCheckResultModel(currentState = {}, calculation 
     groups: [
       { title: 'Kältemittel-Sicherheitsdaten', rows: refrigerantSafetyRows(calculation) },
       { title: 'Füllmengenbewertung nach EN 378-1 Anhang C', rows: chargeLimitRows(calculation) },
+      { title: 'Alternative Vorkehrungen nach EN 378-1 C.3', rows: alternativeRiskRows(calculation) },
       {
         title: 'Aufstellung',
         rows: [
@@ -105,7 +131,7 @@ export function buildEN378SafetyCheckResultModel(currentState = {}, calculation 
       },
       ...plannerGuidanceGroups(calculation),
       { title: 'Technische Validierung', rows: issueRows(calculation) }
-    ],
+    ].filter(group => Array.isArray(group.rows) && group.rows.length > 0),
     notices: calculation.notices || []
   };
 }

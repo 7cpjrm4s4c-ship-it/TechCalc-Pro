@@ -7,6 +7,7 @@ import {
 } from '../js/modules/en-378-safety-check/alternativeRiskMeasures.js';
 import { assessChargeLimit } from '../js/modules/en-378-safety-check/chargeLimitCalculation.js';
 import { calculate } from '../js/modules/en-378-safety-check/logic.js';
+import { buildEN378SafetyCheckResultModel } from '../js/modules/en-378-safety-check/results.js';
 
 const baseState = {
   refrigerantId: 'R-32',
@@ -46,6 +47,13 @@ assert.equal(calculation.alternativeRiskMeasuresAssessment.status, 'passed');
 assert.equal(calculation.chargeLimitAssessment.status, 'passed');
 assert.equal(calculation.status, 'acceptable');
 assert.ok(calculation.plannerGuidance.confirmedItems.some(item => item.title.includes('alternative')));
+
+const resultModel = buildEN378SafetyCheckResultModel(baseState, calculation);
+const c3ResultGroup = resultModel.groups.find(group => group.title === 'Alternative Vorkehrungen nach EN 378-1 C.3');
+assert.ok(c3ResultGroup);
+assert.ok(c3ResultGroup.rows.some(row => row.label === 'Erforderliche Mindestanzahl' && row.value === '1'));
+assert.ok(c3ResultGroup.rows.some(row => row.label === 'Vereinfachter mechanischer Luftstrom' && row.value === '163,9'));
+assert.equal(JSON.stringify(c3ResultGroup).includes('hasMechanicalVentilation'), false);
 
 const deepestUndergroundState = {
   ...baseState,
