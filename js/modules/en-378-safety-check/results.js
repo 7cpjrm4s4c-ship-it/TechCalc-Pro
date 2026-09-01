@@ -1,3 +1,5 @@
+import { getPlannerGuidanceStatusLabel } from './plannerGuidance.js';
+
 const formatNumber = (value, digits = 2) => {
   if (!Number.isFinite(value)) return '–';
   return new Intl.NumberFormat('de-DE', {
@@ -48,16 +50,50 @@ const refrigerantSafetyRows = calculation => {
   ];
 };
 
-const installationRequirementRows = calculation => (calculation.installationSafetyAssessment?.requirements || []).map(item => ({
-  label: item.title || item.id,
-  value: item.status,
-  unit: item.measure || ''
-}));
+const plannerGuidanceSummaryRows = calculation => {
+  const guidance = calculation.plannerGuidance || {};
+  return [
+    { label: 'Leitfadenstatus', value: guidance.headline || statusLabel(calculation.status) },
+    { label: 'Zusammenfassung', value: guidance.summary || '–' },
+    { label: 'Maßnahmen / Planungspunkte', value: formatNumber(guidance.actionCount, 0) },
+    { label: 'Nicht erfüllte Punkte', value: formatNumber(guidance.failedCount, 0) },
+    { label: 'Offene Prüfpunkte', value: formatNumber(guidance.openPointCount, 0) }
+  ];
+};
 
-const requiredMeasureRows = calculation => (calculation.requiredMeasures || []).map((measure, index) => ({
-  label: `Maßnahme ${index + 1}`,
-  value: measure
-}));
+const plannerGuidanceGroups = calculation => {
+  const guidance = calculation.plannerGuidance || {};
+  const groups = [
+    {
+      title: 'Planer-Leitfaden – Zusammenfassung',
+      rows: plannerGuidanceSummaryRows(calculation)
+    }
+  ];
+
+  for (const group of guidance.groups || []) {
+    groups.push({
+      title: `Planer-Leitfaden – ${group.title}`,
+      rows: (group.items || []).map(item => ({
+        label: item.title || item.id,
+        value: `${getPlannerGuidanceStatusLabel(item.status)}: ${item.measure || item.requirement || 'prüfen'}`,
+        unit: item.sourceLabel || ''
+      }))
+    });
+  }
+
+  if (guidance.confirmedItems?.length) {
+    groups.push({
+      title: 'Planer-Leitfaden – Bestätigte Prüfpunkte',
+      rows: guidance.confirmedItems.map(item => ({
+        label: item.title || item.id,
+        value: `${getPlannerGuidanceStatusLabel(item.status)}: ${item.requirement || item.measure || 'bestätigt'}`,
+        unit: item.sourceLabel || ''
+      }))
+    });
+  }
+
+  return groups;
+};
 
 export function buildEN378SafetyCheckResultModel(currentState = {}, calculation = {}) {
   return {
@@ -91,14 +127,7 @@ export function buildEN378SafetyCheckResultModel(currentState = {}, calculation 
           { label: 'Lüftung', value: currentState.ventilationType || '–' }
         ]
       },
-      {
-        title: 'Sicherheitskomponenten nach EN 378-3',
-        rows: installationRequirementRows(calculation)
-      },
-      {
-        title: 'Planer-Leitfaden',
-        rows: requiredMeasureRows(calculation)
-      },
+      ...plannerGuidanceGroups(calculation),
       { title: 'Technische Validierung', rows: issueRows(calculation) }
     ],
     notices: calculation.notices || []

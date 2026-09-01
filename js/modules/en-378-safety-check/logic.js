@@ -1,6 +1,7 @@
 import { getDataVersions, getEN378SafetyData, getRefrigerant, getSafetyClass } from '../../utils/refrigerants/index.js';
 import { assessChargeLimit } from './chargeLimitCalculation.js';
 import { assessInstallationSafetyRequirements } from './installationSafetyRequirements.js';
+import { buildEN378PlannerGuidance } from './plannerGuidance.js';
 
 const numberOrNull = value => {
   if (value === '' || value == null) return null;
@@ -62,9 +63,16 @@ export function calculate(currentState = {}) {
   const hasImportError = currentState.importStatus === 'rejected';
   const chargeLimitAssessment = assessChargeLimit(currentState);
   const installationSafetyAssessment = assessInstallationSafetyRequirements(currentState, chargeLimitAssessment);
+  const status = deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, installationSafetyAssessment });
+  const plannerGuidance = buildEN378PlannerGuidance(currentState, {
+    status,
+    inputValidation,
+    chargeLimitAssessment,
+    installationSafetyAssessment
+  });
 
   return Object.freeze({
-    status: deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, installationSafetyAssessment }),
+    status,
     inputComplete: inputValidation.isValid,
     inputValidation,
     refrigerant: refrigerant ? Object.freeze({ ...refrigerant }) : null,
@@ -75,10 +83,8 @@ export function calculate(currentState = {}) {
     importedSnapshotVersion: currentState.importedSnapshotVersion || null,
     chargeLimitAssessment,
     installationSafetyAssessment,
-    requiredMeasures: Object.freeze([
-      ...(chargeLimitAssessment.requiredMeasures || []),
-      ...(installationSafetyAssessment.requiredMeasures || [])
-    ]),
+    plannerGuidance,
+    requiredMeasures: Object.freeze(plannerGuidance.requiredMeasures || []),
     notices: Object.freeze([]),
     dataVersions: currentState.dataVersions || getDataVersions()
   });

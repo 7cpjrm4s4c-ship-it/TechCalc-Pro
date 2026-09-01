@@ -67,7 +67,8 @@ assert.equal(calculation.chargeKg, 2.5);
 assert.equal(calculation.roomVolumeM3, 50);
 assert.equal(calculation.chargeLimitAssessment.status, 'passed');
 assert.equal(calculation.installationSafetyAssessment.status, 'passed');
-assert.ok(calculation.requiredMeasures.length > 0);
+assert.ok(calculation.plannerGuidance.groups.length > 0);
+assert.ok(calculation.plannerGuidance.requiredMeasures.length > 0);
 const report = buildEN378SafetyCheckReportDto({
   state: completeState,
   calculation,
@@ -78,6 +79,7 @@ assert.equal(report.metadata.dtoType, 'techcalc.en-378-safety-check.report');
 assert.equal(report.summary.status, 'acceptable');
 assert.equal(report.assessment.chargeLimit.status, 'passed');
 assert.equal(report.assessment.installationSafety.status, 'passed');
+assert.equal(report.assessment.plannerGuidance.status, 'acceptable');
 assert.doesNotThrow(() => JSON.stringify(report));
 
 const sections = reportSections({ reportSource: 'typed-dto', reportDto: report });
@@ -85,5 +87,6 @@ assert.ok(sections.length >= 4);
 assert.equal(sections[0].title, '1. Berichtszusammenfassung');
 assert.ok(sections.some(section => section.title.includes('Eingaben')));
 assert.ok(sections.some(section => section.rows.some(row => row[0] === 'Bewertung' && row[1] === 'acceptable')));
+assert.ok(sections.some(section => section.title.includes('Planer-Leitfaden')));
 
 console.log('EN 378 safety check technical tests passed.');

@@ -63,15 +63,18 @@ export function buildEN378SafetyCheckReportDto({
     summary: {
       status: calculation.status || 'incomplete',
       inputComplete: Boolean(calculation.inputComplete),
-      inputIssues: clone(calculation.inputValidation?.issues || [])
+      inputIssues: clone(calculation.inputValidation?.issues || []),
+      plannerGuidanceHeadline: calculation.plannerGuidance?.headline || ''
     },
     assessment: {
       status: calculation.status || 'not-assessed',
       chargeLimit: clone(calculation.chargeLimitAssessment || {}),
       installationSafety: clone(calculation.installationSafetyAssessment || {}),
+      plannerGuidance: clone(calculation.plannerGuidance || {}),
       requiredMeasures: clone(calculation.requiredMeasures || []),
       notices: clone(calculation.notices || [])
     },
+    plannerGuidance: clone(calculation.plannerGuidance || {}),
     resultGroups: clone(resultModel.groups || []),
     notices: clone(resultModel.notices || []),
     dataVersions: clone(calculation.dataVersions || state.dataVersions || {})
