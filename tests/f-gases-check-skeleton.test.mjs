@@ -18,7 +18,8 @@ assert.deepEqual(getDataVersions(), {
   refrigerants: '1.1.0',
   gwp: '1.0.0',
   regulations: '1.0.2',
-  safetyClasses: null
+  safetyClasses: null,
+  en378SafetyData: '1.0.0'
 });
 assert.equal(getDataStatus().refrigerants, 'specified');
 assert.equal(getDataStatus().gwp, 'specified');
