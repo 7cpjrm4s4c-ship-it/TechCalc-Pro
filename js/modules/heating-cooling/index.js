@@ -7,6 +7,7 @@ import { createLineSectionController } from '../../platform/lineSectionControlle
 import { createHeatingCoolingDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { createHeatingCoolingView } from './view.js';
+import { buildHeatingCoolingReportDto } from './reportAdapter.js';
 import {
   activeCalculationState,
   activeMassFlowUnit,
@@ -83,6 +84,17 @@ function bindHeatingCoolingPlatform(root) {
   lineSectionController.bind(root);
 }
 
+function report(snapshot = state.get()) {
+  const activeState = activeCalculationState(snapshot);
+  const lineSections = Array.isArray(snapshot.lineSections) ? snapshot.lineSections : readLineSections();
+  return buildHeatingCoolingReportDto({
+    state: snapshot,
+    activeState,
+    calculation: calculate(activeState),
+    lineSections
+  });
+}
+
 export default createPlatformModule({
   config,
   schema,
@@ -91,5 +103,6 @@ export default createPlatformModule({
   view,
   bind: bindHeatingCoolingPlatform,
   dynamicUpdate: updateHeatingCoolingDynamic,
-  isDynamicAction: isDynamicHeatingCoolingAction
+  isDynamicAction: isDynamicHeatingCoolingAction,
+  report
 });
