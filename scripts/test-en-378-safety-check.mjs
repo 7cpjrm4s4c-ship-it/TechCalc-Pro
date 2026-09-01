@@ -14,11 +14,7 @@ const validSnapshot = {
   generatedAt: '2026-08-31T00:00:00.000Z',
   moduleId: 'f-gases-check',
   dataVersions: { refrigerants: 'test', gwp: 'test', regulations: 'test' },
-  system: {
-    systemName: 'Testanlage',
-    refrigerantId: 'R32',
-    chargeKg: 2.5
-  }
+  system: { systemName: 'Testanlage', refrigerantId: 'R32', chargeKg: 2.5 }
 };
 assert.equal(canImportFGasesSystemSnapshot(validSnapshot), true);
 assert.deepEqual(validateFGasesSystemSnapshot(validSnapshot).errors, []);
@@ -69,11 +65,7 @@ assert.equal(calculation.chargeLimitAssessment.status, 'passed');
 assert.equal(calculation.installationSafetyAssessment.status, 'passed');
 assert.ok(calculation.plannerGuidance.groups.length > 0);
 assert.ok(calculation.plannerGuidance.requiredMeasures.length > 0);
-const report = buildEN378SafetyCheckReportDto({
-  state: completeState,
-  calculation,
-  generatedAt: '2026-08-31T00:00:00.000Z'
-});
+const report = buildEN378SafetyCheckReportDto({ state: completeState, calculation, generatedAt: '2026-08-31T00:00:00.000Z' });
 
 assert.equal(report.metadata.dtoType, 'techcalc.en-378-safety-check.report');
 assert.equal(report.summary.status, 'acceptable');
@@ -86,7 +78,7 @@ const sections = reportSections({ reportSource: 'typed-dto', reportDto: report }
 assert.ok(sections.length >= 4);
 assert.equal(sections[0].title, '1. Berichtszusammenfassung');
 assert.ok(sections.some(section => section.title.includes('Eingaben')));
-assert.ok(sections.some(section => section.rows.some(row => row[0] === 'Bewertung' && row[1] === 'acceptable')));
+assert.ok(sections.some(section => section.rows.some(row => row[0] === 'Bewertung' && ['acceptable', 'Anforderungen nach aktuellem Prüfstand erfüllt'].includes(row[1]))));
 assert.ok(sections.some(section => section.title.includes('Planer-Leitfaden')));
 
 console.log('EN 378 safety check technical tests passed.');

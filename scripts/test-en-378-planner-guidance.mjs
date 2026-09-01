@@ -40,7 +40,8 @@ assert.ok(calculation.plannerGuidance.requiredMeasures.some(measure => measure.i
 assert.ok(calculation.plannerGuidance.groups.some(group => group.id === 'ventilation'));
 assert.ok(calculation.plannerGuidance.groups.some(group => group.id === 'alarm'));
 assert.ok(calculation.plannerGuidance.groups.some(group => group.id === 'openPoints'));
-assert.ok(calculation.plannerGuidance.missingInputs.includes('hasEmergencyStopInside'));
+assert.ok(calculation.plannerGuidance.missingInputs.includes('Not-Aus innen'));
+assert.equal(JSON.stringify(calculation.plannerGuidance).includes('hasEmergencyStopInside'), false);
 
 const rebuiltGuidance = buildEN378PlannerGuidance(state, {
   status: calculation.status,
@@ -54,6 +55,7 @@ const resultModel = buildEN378SafetyCheckResultModel(state, calculation);
 assert.ok(resultModel.groups.some(group => group.title === 'Planer-Leitfaden – Zusammenfassung'));
 assert.ok(resultModel.groups.some(group => group.title === 'Planer-Leitfaden – Lüftung'));
 assert.ok(resultModel.groups.some(group => group.title === 'Planer-Leitfaden – Alarmierung'));
+assert.equal(JSON.stringify(resultModel).includes('not-assessed'), false);
 
 const report = buildEN378SafetyCheckReportDto({
   state,

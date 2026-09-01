@@ -6,6 +6,7 @@ import { buildEN378SafetyCheckResultModel } from './results.js';
 import { buildEN378SafetyCheckReportDto } from './reportAdapter.js';
 import { formatRefrigerantLabel, listRefrigerants } from '../../utils/refrigerants/index.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { bindFGasesSnapshotImport } from './importController.js';
 
 export { buildEN378StateFromFGasesSnapshot, canImportFGasesSystemSnapshot } from './snapshotImport.js';
 
@@ -31,6 +32,10 @@ function report(snapshot = state.get()) {
   });
 }
 
+function bind(root) {
+  bindFGasesSnapshotImport(root, state);
+}
+
 export default createPlatformModule({
   config,
   schema: runtimeSchema,
@@ -38,5 +43,6 @@ export default createPlatformModule({
   initialState,
   calculate,
   results: buildEN378SafetyCheckResultModel,
-  report
+  report,
+  bind
 });
