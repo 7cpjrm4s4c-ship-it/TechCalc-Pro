@@ -52,7 +52,10 @@ const completeState = {
   ventilationType: 'mechanical',
   hasGasWarningSystem: 'yes',
   hasMachineryRoom: 'no',
-  additionalSafetyMeasures: 'Keine EN-378-3-Komponentenbewertung im Test.'
+  hasDetector: 'yes',
+  hasAlarm: 'yes',
+  hasIndependentAlarmPower: 'yes',
+  additionalSafetyMeasures: 'Keine weiteren Maßnahmen im Test.'
 };
 const completeValidation = validateAssessmentInput(completeState);
 assert.equal(completeValidation.isValid, true);
@@ -63,7 +66,8 @@ assert.equal(calculation.inputComplete, true);
 assert.equal(calculation.chargeKg, 2.5);
 assert.equal(calculation.roomVolumeM3, 50);
 assert.equal(calculation.chargeLimitAssessment.status, 'passed');
-assert.deepEqual(calculation.requiredMeasures, []);
+assert.equal(calculation.installationSafetyAssessment.status, 'passed');
+assert.ok(calculation.requiredMeasures.length > 0);
 const report = buildEN378SafetyCheckReportDto({
   state: completeState,
   calculation,
@@ -72,14 +76,14 @@ const report = buildEN378SafetyCheckReportDto({
 
 assert.equal(report.metadata.dtoType, 'techcalc.en-378-safety-check.report');
 assert.equal(report.summary.status, 'acceptable');
-assert.equal(report.assessment.status, 'passed');
-assert.deepEqual(report.assessment.requiredMeasures, []);
+assert.equal(report.assessment.chargeLimit.status, 'passed');
+assert.equal(report.assessment.installationSafety.status, 'passed');
 assert.doesNotThrow(() => JSON.stringify(report));
 
 const sections = reportSections({ reportSource: 'typed-dto', reportDto: report });
 assert.ok(sections.length >= 4);
 assert.equal(sections[0].title, '1. Berichtszusammenfassung');
 assert.ok(sections.some(section => section.title.includes('Eingaben')));
-assert.ok(sections.some(section => section.rows.some(row => row[0] === 'Bewertung' && row[1] === 'passed')));
+assert.ok(sections.some(section => section.rows.some(row => row[0] === 'Bewertung' && row[1] === 'acceptable')));
 
 console.log('EN 378 safety check technical tests passed.');

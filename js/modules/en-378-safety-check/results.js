@@ -7,9 +7,9 @@ const formatNumber = (value, digits = 2) => {
 };
 
 const statusLabel = status => {
-  if (status === 'acceptable') return 'Füllmenge nach aktuellem Prüfstand akzeptabel';
+  if (status === 'acceptable') return 'Anforderungen nach aktuellem Prüfstand erfüllt';
   if (status === 'measures-required') return 'Maßnahmen / Anpassung erforderlich';
-  if (status === 'ready-for-assessment') return 'Eingaben vollständig, Fachbewertung teilweise offen';
+  if (status === 'ready-for-assessment') return 'Eingaben vollständig, einzelne Prüfpunkte offen';
   if (status === 'import-rejected') return 'Snapshot abgelehnt';
   return 'Eingaben unvollständig';
 };
@@ -27,16 +27,9 @@ const chargeLimitRows = calculation => {
   ];
 
   for (const check of assessment.checks || []) {
-    rows.push({
-      label: check.id,
-      value: check.status
-    });
+    rows.push({ label: check.id, value: check.status });
     if (Number.isFinite(check.maximumChargeKg)) {
-      rows.push({
-        label: `${check.id} – Grenzwert`,
-        value: formatNumber(check.maximumChargeKg),
-        unit: 'kg'
-      });
+      rows.push({ label: `${check.id} – Grenzwert`, value: formatNumber(check.maximumChargeKg), unit: 'kg' });
     }
   }
 
@@ -55,6 +48,17 @@ const refrigerantSafetyRows = calculation => {
   ];
 };
 
+const installationRequirementRows = calculation => (calculation.installationSafetyAssessment?.requirements || []).map(item => ({
+  label: item.title || item.id,
+  value: item.status,
+  unit: item.measure || ''
+}));
+
+const requiredMeasureRows = calculation => (calculation.requiredMeasures || []).map((measure, index) => ({
+  label: `Maßnahme ${index + 1}`,
+  value: measure
+}));
+
 export function buildEN378SafetyCheckResultModel(currentState = {}, calculation = {}) {
   return {
     primary: {
@@ -72,14 +76,8 @@ export function buildEN378SafetyCheckResultModel(currentState = {}, calculation 
       accent: 'blue'
     },
     groups: [
-      {
-        title: 'Kältemittel-Sicherheitsdaten',
-        rows: refrigerantSafetyRows(calculation)
-      },
-      {
-        title: 'Füllmengenbewertung nach EN 378-1 Anhang C',
-        rows: chargeLimitRows(calculation)
-      },
+      { title: 'Kältemittel-Sicherheitsdaten', rows: refrigerantSafetyRows(calculation) },
+      { title: 'Füllmengenbewertung nach EN 378-1 Anhang C', rows: chargeLimitRows(calculation) },
       {
         title: 'Aufstellung',
         rows: [
@@ -94,17 +92,14 @@ export function buildEN378SafetyCheckResultModel(currentState = {}, calculation 
         ]
       },
       {
-        title: 'Schutzmaßnahmen',
-        rows: [
-          { label: 'Gaswarnsystem', value: currentState.hasGasWarningSystem || '–' },
-          { label: 'Maschinenraum', value: currentState.hasMachineryRoom || '–' },
-          { label: 'Weitere Maßnahmen', value: currentState.additionalSafetyMeasures || '–' }
-        ]
+        title: 'Sicherheitskomponenten nach EN 378-3',
+        rows: installationRequirementRows(calculation)
       },
       {
-        title: 'Technische Validierung',
-        rows: issueRows(calculation)
-      }
+        title: 'Planer-Leitfaden',
+        rows: requiredMeasureRows(calculation)
+      },
+      { title: 'Technische Validierung', rows: issueRows(calculation) }
     ],
     notices: calculation.notices || []
   };

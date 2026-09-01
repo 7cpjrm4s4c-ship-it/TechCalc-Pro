@@ -32,6 +32,18 @@ export const initialState = Object.freeze({
   ventilationType: '',
   hasGasWarningSystem: '',
   hasMachineryRoom: '',
+  hasMechanicalVentilation: '',
+  hasEmergencyVentilation: '',
+  hasEmergencyStopInside: '',
+  hasEmergencyStopOutside: '',
+  hasEmergencyLighting: '',
+  hasDetector: '',
+  hasAlarm: '',
+  hasIndependentAlarmPower: '',
+  hasSafetyShutoffValves: '',
+  hasVentilationOpenings: '',
+  hasExplosionProtectedElectricalEquipment: '',
+  isOutdoorPublicAccessible: '',
   additionalSafetyMeasures: '',
   dataVersions: getDataVersions()
 });

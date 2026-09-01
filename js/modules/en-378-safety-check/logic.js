@@ -1,5 +1,6 @@
 import { getDataVersions, getEN378SafetyData, getRefrigerant, getSafetyClass } from '../../utils/refrigerants/index.js';
 import { assessChargeLimit } from './chargeLimitCalculation.js';
+import { assessInstallationSafetyRequirements } from './installationSafetyRequirements.js';
 
 const numberOrNull = value => {
   if (value === '' || value == null) return null;
@@ -43,11 +44,11 @@ export function hasRequiredAssessmentInput(currentState = {}) {
   return validateAssessmentInput(currentState).isValid;
 }
 
-function deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment }) {
+function deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, installationSafetyAssessment }) {
   if (hasImportError) return 'import-rejected';
   if (!inputValidation.isValid) return 'incomplete';
-  if (chargeLimitAssessment.status === 'failed') return 'measures-required';
-  if (chargeLimitAssessment.status === 'passed') return 'acceptable';
+  if (chargeLimitAssessment.status === 'failed' || installationSafetyAssessment.status === 'failed') return 'measures-required';
+  if (chargeLimitAssessment.status === 'passed' && installationSafetyAssessment.status === 'passed') return 'acceptable';
   return 'ready-for-assessment';
 }
 
@@ -60,9 +61,10 @@ export function calculate(currentState = {}) {
   const inputValidation = validateAssessmentInput(currentState);
   const hasImportError = currentState.importStatus === 'rejected';
   const chargeLimitAssessment = assessChargeLimit(currentState);
+  const installationSafetyAssessment = assessInstallationSafetyRequirements(currentState, chargeLimitAssessment);
 
   return Object.freeze({
-    status: deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment }),
+    status: deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, installationSafetyAssessment }),
     inputComplete: inputValidation.isValid,
     inputValidation,
     refrigerant: refrigerant ? Object.freeze({ ...refrigerant }) : null,
@@ -72,7 +74,11 @@ export function calculate(currentState = {}) {
     roomVolumeM3,
     importedSnapshotVersion: currentState.importedSnapshotVersion || null,
     chargeLimitAssessment,
-    requiredMeasures: Object.freeze(chargeLimitAssessment.requiredMeasures || []),
+    installationSafetyAssessment,
+    requiredMeasures: Object.freeze([
+      ...(chargeLimitAssessment.requiredMeasures || []),
+      ...(installationSafetyAssessment.requiredMeasures || [])
+    ]),
     notices: Object.freeze([]),
     dataVersions: currentState.dataVersions || getDataVersions()
   });

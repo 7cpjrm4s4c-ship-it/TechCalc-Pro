@@ -46,6 +46,18 @@ export function buildEN378SafetyCheckReportDto({
       ventilationType: state.ventilationType || '',
       hasGasWarningSystem: state.hasGasWarningSystem || '',
       hasMachineryRoom: state.hasMachineryRoom || '',
+      hasMechanicalVentilation: state.hasMechanicalVentilation || '',
+      hasEmergencyVentilation: state.hasEmergencyVentilation || '',
+      hasEmergencyStopOutside: state.hasEmergencyStopOutside || '',
+      hasEmergencyStopInside: state.hasEmergencyStopInside || '',
+      hasEmergencyLighting: state.hasEmergencyLighting || '',
+      hasDetector: state.hasDetector || '',
+      hasAlarm: state.hasAlarm || '',
+      hasIndependentAlarmPower: state.hasIndependentAlarmPower || '',
+      hasSafetyShutoffValves: state.hasSafetyShutoffValves || '',
+      hasVentilationOpenings: state.hasVentilationOpenings || '',
+      hasExplosionProtectedElectricalEquipment: state.hasExplosionProtectedElectricalEquipment || '',
+      isOutdoorPublicAccessible: state.isOutdoorPublicAccessible || '',
       additionalSafetyMeasures: state.additionalSafetyMeasures || ''
     }),
     summary: {
@@ -54,8 +66,9 @@ export function buildEN378SafetyCheckReportDto({
       inputIssues: clone(calculation.inputValidation?.issues || [])
     },
     assessment: {
-      status: calculation.chargeLimitAssessment?.status || 'not-assessed',
+      status: calculation.status || 'not-assessed',
       chargeLimit: clone(calculation.chargeLimitAssessment || {}),
+      installationSafety: clone(calculation.installationSafetyAssessment || {}),
       requiredMeasures: clone(calculation.requiredMeasures || []),
       notices: clone(calculation.notices || [])
     },
