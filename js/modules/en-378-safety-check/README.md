@@ -17,6 +17,7 @@ Der aktuelle Stand deckt die Kernbewertung für Planerinnen und Planer ab:
 - Füllmengenbewertung nach EN 378-1 Anhang C, Tabellen C.1 und C.2.
 - Bewertung alternativer Vorkehrungen nach EN 378-1 C.3 mit Bezug auf EN 378-3 Abschnitt 6 und Abschnitt 8.
 - Sicherheitsanforderungen für Aufstellort, Maschinenraum, Lüftung, Detektion, Alarmierung, Abschaltung, Warnhinweise und Sichtprüfung.
+- Plausibilitätsprüfung für widersprüchliche Kombinationen aus Aufstellort, Aufstellungsort-Klassifikation, Zugangsbereich und Lüftungsangaben.
 - Planer-Leitfaden mit deutschen Volltexten für erforderliche Maßnahmen und offene Angaben.
 - Eigene PDF-Ausgabe für den EN-378-Sicherheitsbericht.
 
@@ -33,6 +34,17 @@ Die Kategorie des Zugangsbereichs wird aus dem gewählten Zugangsbereich abgelei
 Die Kategorie muss in der Regel nicht zusätzlich ausgewählt werden. Bei alten gespeicherten Zuständen kann das Feld noch sichtbar werden, damit vorhandene Daten nicht verloren gehen.
 
 Für Anwendungen zum menschlichen Komfort werden Raumfläche, Montageart und die Angabe zur werkseitig dauerhaft geschlossenen Ausführung nur dann abgefragt, wenn diese Angaben für den gewählten Bewertungspfad erforderlich sind.
+
+## Plausibilitätsprüfung
+
+Das Modul prüft offensichtliche Widersprüche der Eingaben, bevor der Leitfaden als belastbar bewertet wird. Dazu gehören insbesondere:
+
+- Klasse II oder Klasse III ohne Maschinenraum beziehungsweise Außenaufstellung,
+- Klasse IV ohne Personen-Aufenthaltsbereich,
+- Maschinenraum mit allgemeinem oder beaufsichtigtem Zugang,
+- widersprüchliche Lüftungsangaben.
+
+Diese Prüfung ersetzt keine Fachplanung, verhindert aber widersprüchliche Grundannahmen im Bericht.
 
 ## Alternative Vorkehrungen nach C.3
 
@@ -62,6 +74,7 @@ npm run test:en378
 node scripts/test-en-378-refrigerant-coverage.mjs
 node scripts/test-en-378-alternative-risk-measures.mjs
 node scripts/test-en-378-contextual-inputs.mjs
+node scripts/test-en-378-state-consistency.mjs
 ```
 
 Release-Gates:

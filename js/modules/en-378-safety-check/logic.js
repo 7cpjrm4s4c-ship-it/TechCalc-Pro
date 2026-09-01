@@ -6,6 +6,7 @@ import {
   assessAlternativeRiskMeasures,
   mergeAlternativeRiskMeasuresAssessment
 } from './alternativeRiskMeasures.js';
+import { assessStateConsistency, mergeStateConsistencyAssessment } from './stateConsistency.js';
 import { buildEN378PlannerGuidance } from './plannerGuidance.js';
 
 const ACCESS_CATEGORY_BY_ACCESS_AREA = Object.freeze({
@@ -34,7 +35,8 @@ export function deriveAccessCategory(currentState = {}) {
 export function normalizeEN378AssessmentState(currentState = {}) {
   return Object.freeze({
     ...currentState,
-    accessCategory: deriveAccessCategory(currentState)
+    accessCategory: deriveAccessCategory(currentState),
+    hasMachineryRoom: currentState.installationLocation === 'machinery-room' ? 'yes' : currentState.hasMachineryRoom
   });
 }
 
@@ -124,7 +126,9 @@ export function calculate(currentState = {}) {
   const alternativeRiskMeasuresAssessment = assessAlternativeRiskMeasures(effectiveState, rawChargeLimitAssessment);
   const chargeLimitAssessment = applyAlternativeRiskMeasuresToChargeLimitAssessment(rawChargeLimitAssessment, alternativeRiskMeasuresAssessment, effectiveState);
   const baseInstallationSafetyAssessment = assessInstallationSafetyRequirements(effectiveState, rawChargeLimitAssessment);
-  const installationSafetyAssessment = mergeAlternativeRiskMeasuresAssessment(baseInstallationSafetyAssessment, alternativeRiskMeasuresAssessment);
+  const alternativeInstallationSafetyAssessment = mergeAlternativeRiskMeasuresAssessment(baseInstallationSafetyAssessment, alternativeRiskMeasuresAssessment);
+  const stateConsistencyAssessment = assessStateConsistency(effectiveState);
+  const installationSafetyAssessment = mergeStateConsistencyAssessment(alternativeInstallationSafetyAssessment, stateConsistencyAssessment);
   const status = deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, installationSafetyAssessment });
   const plannerGuidance = buildEN378PlannerGuidance(effectiveState, {
     status,
@@ -146,6 +150,7 @@ export function calculate(currentState = {}) {
     chargeLimitAssessment,
     rawChargeLimitAssessment,
     alternativeRiskMeasuresAssessment,
+    stateConsistencyAssessment,
     installationSafetyAssessment,
     plannerGuidance,
     requiredMeasures: Object.freeze(plannerGuidance.requiredMeasures || []),

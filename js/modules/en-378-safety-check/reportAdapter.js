@@ -73,6 +73,7 @@ export function buildEN378SafetyCheckReportDto({
       status: calculation.status || 'not-assessed',
       chargeLimit: clone(calculation.chargeLimitAssessment || {}),
       alternativeRiskMeasures: clone(calculation.alternativeRiskMeasuresAssessment || {}),
+      stateConsistency: clone(calculation.stateConsistencyAssessment || {}),
       installationSafety: clone(calculation.installationSafetyAssessment || {}),
       plannerGuidance: clone(calculation.plannerGuidance || {}),
       requiredMeasures: clone(calculation.requiredMeasures || []),

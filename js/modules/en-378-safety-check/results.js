@@ -49,6 +49,19 @@ const alternativeRiskRows = calculation => {
   return rows;
 };
 
+const consistencyRows = calculation => {
+  const assessment = calculation.stateConsistencyAssessment || {};
+  if (!assessment.requirements?.length) return [];
+  return [
+    { label: 'Bewertung', value: statusLabel(assessment.status) },
+    ...assessment.requirements.map(requirement => ({
+      label: requirement.title || checkLabel(requirement.id),
+      value: `${statusLabel(requirement.status)}: ${requirement.measure || requirement.requirement || 'prüfen'}`,
+      unit: requirement.source?.sourceSection || ''
+    }))
+  ];
+};
+
 const refrigerantSafetyRows = calculation => {
   const data = calculation.refrigerantSafetyData || {};
   return [
@@ -116,6 +129,7 @@ export function buildEN378SafetyCheckResultModel(currentState = {}, calculation 
       { title: 'Kältemittel-Sicherheitsdaten', rows: refrigerantSafetyRows(calculation) },
       { title: 'Füllmengenbewertung nach EN 378-1 Anhang C', rows: chargeLimitRows(calculation) },
       { title: 'Alternative Vorkehrungen nach EN 378-1 C.3', rows: alternativeRiskRows(calculation) },
+      { title: 'Plausibilitätsprüfung der Eingaben', rows: consistencyRows(calculation) },
       {
         title: 'Aufstellung',
         rows: [
