@@ -71,6 +71,7 @@ const ASSETS = [
   './js/core/pdf/en378ReportSections.js',
   './js/core/pdf/fGasesReportSections.js',
   './js/core/pdf/floodingReportSections.js',
+  './js/core/pdf/genericReportSections.js',
   './js/core/pdf/pdfChartRender.js',
   './js/core/pdf/pdfDataMapping.js',
   './js/core/pdf/pdfLayout.js',
