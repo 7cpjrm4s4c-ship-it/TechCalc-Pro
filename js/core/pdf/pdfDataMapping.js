@@ -5,6 +5,7 @@ import { buildRainwaterReportSections } from './rainwaterReportSections.js';
 import { buildFGasesReportSections } from './fGasesReportSections.js';
 import { buildEN378ReportSections } from './en378ReportSections.js';
 import { buildGenericReportSections } from './genericReportSections.js';
+
 function textOf(node) { return sanitizeText(node?.textContent || ''); }
 function valueOfField(field) {
   const control = field.querySelector('input, select, textarea');
@@ -180,13 +181,14 @@ function buildTypedDtoReportSections(reportDto = {}) {
   const dtoType = reportDto.metadata?.dtoType;
   if (dtoType === 'techcalc.rainwater.report') return buildRainwaterReportSections(reportDto);
   if (dtoType === 'techcalc.f-gases-check.report') return buildFGasesReportSections(reportDto);
-  if (dtoType === 'techcalc.flooding-verification.report') return buildFloodingReportSections(reportDto);
   if (dtoType === 'techcalc.en-378-safety-check.report') return buildEN378ReportSections(reportDto);
   return buildGenericReportSections(reportDto);
 }
 export function reportSections(moduleData) {
   if (moduleData?.reportSource === 'typed-dto' && moduleData.reportDto) {
-    const sections = buildTypedDtoReportSections(moduleData.reportDto);
+    const sections = moduleData.reportDto.metadata?.dtoType === 'techcalc.flooding-verification.report'
+      ? buildFloodingReportSections(moduleData.reportDto)
+      : buildTypedDtoReportSections(moduleData.reportDto);
     return sections.map(section => ({ ...section, rows: normalizePdfRows(section.rows, section.title) }));
   }
   const sections = Array.isArray(moduleData?.sections) ? moduleData.sections : [];
