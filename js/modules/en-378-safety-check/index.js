@@ -4,6 +4,11 @@ import { state, initialState } from './state.js';
 import { calculate } from './logic.js';
 import { buildEN378SafetyCheckResultModel } from './results.js';
 import { buildEN378SafetyCheckReportDto } from './reportAdapter.js';
+import {
+  buildEN378SavedRecord,
+  hydrateEN378SavedRecord,
+  buildEN378SavedRecordsModel
+} from './savedRecords.js';
 import { formatRefrigerantLabel, listRefrigerants } from '../../utils/refrigerants/index.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { bindFGasesSnapshotImport } from './importController.js';
@@ -36,6 +41,24 @@ function bind(root) {
   bindFGasesSnapshotImport(root, state);
 }
 
+const controller = Object.freeze({
+  savedRecords: Object.freeze({
+    enabled: true,
+    listKey: 'savedAssessments',
+    activeIdKey: 'activeSavedAssessmentId',
+    expandedIdKey: 'expandedSavedAssessmentId',
+    nameKey: 'savedAssessmentName',
+    recordPrefix: 'en-378-assessment',
+    attrs: Object.freeze({
+      loadAttr: 'data-saved-load',
+      toggleAttr: 'data-saved-toggle',
+      deleteAttr: 'data-saved-delete'
+    }),
+    snapshot: (current, result, existing) => buildEN378SavedRecord(current, result, existing),
+    hydrate: item => hydrateEN378SavedRecord(item)
+  })
+});
+
 export default createPlatformModule({
   config,
   schema: runtimeSchema,
@@ -44,5 +67,7 @@ export default createPlatformModule({
   calculate,
   results: buildEN378SafetyCheckResultModel,
   report,
+  savedRecords: snapshot => buildEN378SavedRecordsModel(snapshot),
+  controller,
   bind
 });

@@ -5,6 +5,10 @@ export const EN_378_SAFETY_CHECK_SCHEMA_VERSION = 1;
 
 export const initialState = Object.freeze({
   schemaVersion: EN_378_SAFETY_CHECK_SCHEMA_VERSION,
+  savedAssessments: Object.freeze([]),
+  activeSavedAssessmentId: '',
+  expandedSavedAssessmentId: '',
+  savedAssessmentName: '',
   importedSnapshot: null,
   importedSnapshotId: '',
   importedSnapshotVersion: '',
