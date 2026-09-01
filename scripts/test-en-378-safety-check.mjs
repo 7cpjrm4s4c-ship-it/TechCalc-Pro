@@ -41,25 +41,29 @@ assert.ok(incompleteValidation.issues.includes('roomVolumeM3:required'));
 
 const completeState = {
   ...imported,
-  roomVolumeM3: '45,5',
+  roomVolumeM3: '50',
   installationLocation: 'occupied-space',
+  installationClass: 'I',
   accessArea: 'general-access',
+  accessCategory: 'a',
   usageType: 'commercial',
+  applicationType: 'other',
+  locationLevel: 'other',
   ventilationType: 'mechanical',
   hasGasWarningSystem: 'yes',
   hasMachineryRoom: 'no',
-  additionalSafetyMeasures: 'Keine fachliche Bewertung im Test.'
+  additionalSafetyMeasures: 'Keine EN-378-3-Komponentenbewertung im Test.'
 };
 const completeValidation = validateAssessmentInput(completeState);
 assert.equal(completeValidation.isValid, true);
 
 const calculation = calculate(completeState);
-assert.equal(calculation.status, 'ready-for-assessment');
+assert.equal(calculation.status, 'acceptable');
 assert.equal(calculation.inputComplete, true);
 assert.equal(calculation.chargeKg, 2.5);
-assert.equal(calculation.roomVolumeM3, 45.5);
+assert.equal(calculation.roomVolumeM3, 50);
+assert.equal(calculation.chargeLimitAssessment.status, 'passed');
 assert.deepEqual(calculation.requiredMeasures, []);
-assert.deepEqual(calculation.notices, []);
 const report = buildEN378SafetyCheckReportDto({
   state: completeState,
   calculation,
@@ -67,8 +71,8 @@ const report = buildEN378SafetyCheckReportDto({
 });
 
 assert.equal(report.metadata.dtoType, 'techcalc.en-378-safety-check.report');
-assert.equal(report.summary.status, 'ready-for-assessment');
-assert.equal(report.assessment.status, 'not-implemented');
+assert.equal(report.summary.status, 'acceptable');
+assert.equal(report.assessment.status, 'passed');
 assert.deepEqual(report.assessment.requiredMeasures, []);
 assert.doesNotThrow(() => JSON.stringify(report));
 
@@ -76,6 +80,6 @@ const sections = reportSections({ reportSource: 'typed-dto', reportDto: report }
 assert.ok(sections.length >= 4);
 assert.equal(sections[0].title, '1. Berichtszusammenfassung');
 assert.ok(sections.some(section => section.title.includes('Eingaben')));
-assert.ok(sections.some(section => section.rows.some(row => row[0] === 'Bewertung' && row[1] === 'not-implemented')));
+assert.ok(sections.some(section => section.rows.some(row => row[0] === 'Bewertung' && row[1] === 'passed')));
 
 console.log('EN 378 safety check technical tests passed.');

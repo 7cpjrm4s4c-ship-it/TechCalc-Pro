@@ -1,4 +1,5 @@
-import { getDataVersions, getRefrigerant, getSafetyClass } from '../../utils/refrigerants/index.js';
+import { getDataVersions, getEN378SafetyData, getRefrigerant, getSafetyClass } from '../../utils/refrigerants/index.js';
+import { assessChargeLimit } from './chargeLimitCalculation.js';
 
 const numberOrNull = value => {
   if (value === '' || value == null) return null;
@@ -42,24 +43,36 @@ export function hasRequiredAssessmentInput(currentState = {}) {
   return validateAssessmentInput(currentState).isValid;
 }
 
+function deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment }) {
+  if (hasImportError) return 'import-rejected';
+  if (!inputValidation.isValid) return 'incomplete';
+  if (chargeLimitAssessment.status === 'failed') return 'measures-required';
+  if (chargeLimitAssessment.status === 'passed') return 'acceptable';
+  return 'ready-for-assessment';
+}
+
 export function calculate(currentState = {}) {
   const refrigerant = currentState.refrigerantId ? getRefrigerant(currentState.refrigerantId) : null;
   const safetyClass = refrigerant?.safetyClassRef ? getSafetyClass(refrigerant.safetyClassRef) : null;
+  const refrigerantSafetyData = currentState.refrigerantId ? getEN378SafetyData(currentState.refrigerantId) : null;
   const chargeKg = numberOrNull(currentState.chargeKg);
   const roomVolumeM3 = numberOrNull(currentState.roomVolumeM3);
   const inputValidation = validateAssessmentInput(currentState);
   const hasImportError = currentState.importStatus === 'rejected';
+  const chargeLimitAssessment = assessChargeLimit(currentState);
 
   return Object.freeze({
-    status: hasImportError ? 'import-rejected' : inputValidation.isValid ? 'ready-for-assessment' : 'incomplete',
+    status: deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment }),
     inputComplete: inputValidation.isValid,
     inputValidation,
     refrigerant: refrigerant ? Object.freeze({ ...refrigerant }) : null,
     safetyClass: safetyClass ? Object.freeze({ ...safetyClass }) : null,
+    refrigerantSafetyData: refrigerantSafetyData ? Object.freeze({ ...refrigerantSafetyData }) : null,
     chargeKg,
     roomVolumeM3,
     importedSnapshotVersion: currentState.importedSnapshotVersion || null,
-    requiredMeasures: Object.freeze([]),
+    chargeLimitAssessment,
+    requiredMeasures: Object.freeze(chargeLimitAssessment.requiredMeasures || []),
     notices: Object.freeze([]),
     dataVersions: currentState.dataVersions || getDataVersions()
   });
