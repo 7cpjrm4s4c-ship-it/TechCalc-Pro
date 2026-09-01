@@ -5,6 +5,10 @@ const clone = value => value == null ? value : JSON.parse(JSON.stringify(value))
 
 export const IMPORT_ACTION = 'en378:import-f-gases-snapshot';
 
+function recordId(item = {}, index = 0) {
+  return String(item.id ?? item.savedSystemId ?? item.snapshotId ?? index);
+}
+
 export function listFGasesSavedSystems() {
   const fgasesStore = getModuleStore('f-gases-check');
   const fgasesState = fgasesStore?.get?.() || {};
@@ -24,7 +28,7 @@ export function buildFGasesImportOptions() {
   return Object.freeze([
     Object.freeze({ value: '', label: systems.length ? 'Anlage auswählen' : 'Keine gespeicherte F-Gase-Anlage vorhanden' }),
     ...systems.map((item, index) => Object.freeze({
-      value: String(item.id || index),
+      value: recordId(item, index),
       label: item.name || item.title || `F-Gase-Anlage ${index + 1}`
     }))
   ]);
@@ -32,7 +36,7 @@ export function buildFGasesImportOptions() {
 
 export function getFGasesSavedSystemById(id) {
   const systems = listFGasesSavedSystems();
-  return systems.find((item, index) => String(item.id || index) === String(id || '')) || null;
+  return systems.find((item, index) => recordId(item, index) === String(id ?? '')) || null;
 }
 
 function selectImportCandidate(currentState = {}) {
@@ -41,6 +45,12 @@ function selectImportCandidate(currentState = {}) {
   if (selected) return selected;
   const systems = listFGasesSavedSystems();
   return systems.length === 1 ? systems[0] : null;
+}
+
+function selectedRecordId(candidate = {}) {
+  const systems = listFGasesSavedSystems();
+  const index = systems.indexOf(candidate);
+  return recordId(candidate, index < 0 ? 0 : index);
 }
 
 export function buildFGasesImportPatch(currentState = {}) {
@@ -56,14 +66,14 @@ export function buildFGasesImportPatch(currentState = {}) {
   const validation = validateFGasesSystemSnapshot(snapshot || {});
   if (!validation.isValid) {
     return Object.freeze({
-      fGasesSnapshotId: String(candidate.id || ''),
+      fGasesSnapshotId: selectedRecordId(candidate),
       importStatus: 'rejected',
       importErrors: Object.freeze(['Der gespeicherte Anlagenstand kann nicht importiert werden.'])
     });
   }
 
   return Object.freeze({
-    fGasesSnapshotId: String(candidate.id || ''),
+    fGasesSnapshotId: selectedRecordId(candidate),
     ...buildEN378StateFromFGasesSnapshot(clone(snapshot), currentState)
   });
 }

@@ -21,7 +21,6 @@ const numberOrNull = value => {
 
 const yes = value => value === true || value === 'yes';
 const no = value => value === false || value === 'no';
-const hasValue = value => value !== '' && value != null;
 const finiteOrNull = value => Number.isFinite(value) ? value : null;
 
 const C3_LIMITS_BY_STANDARD_NUMBER = Object.freeze({
@@ -46,11 +45,12 @@ function freezeResult(result) {
     ...result,
     missingInputs: Object.freeze(result.missingInputs || []),
     requirements: Object.freeze(result.requirements || []),
-    measures: Object.freeze(result.measures || [])
+    measures: Object.freeze(result.measures || []),
+    details: Object.freeze(result.details || {})
   });
 }
 
-function notAssessed(id, category, reason, source, missingInputs = []) {
+function notAssessed(id, category, reason, source, missingInputs = [], details = {}) {
   return freezeResult({
     id,
     category,
@@ -59,7 +59,8 @@ function notAssessed(id, category, reason, source, missingInputs = []) {
     source,
     maximumChargeKg: null,
     concentrationKgM3: null,
-    missingInputs
+    missingInputs,
+    details
   });
 }
 
@@ -75,7 +76,7 @@ function notApplicable(id, category, reason, source) {
   });
 }
 
-function assessedLimit({ id, category, chargeKg, maximumChargeKg, rule, source, requirements = [], measures = [] }) {
+function assessedLimit({ id, category, chargeKg, maximumChargeKg, rule, source, requirements = [], measures = [], details = {} }) {
   const limit = finiteOrNull(maximumChargeKg);
   const status = limit == null || chargeKg <= limit ? CHARGE_LIMIT_STATUS.PASSED : CHARGE_LIMIT_STATUS.FAILED;
   return freezeResult({
@@ -86,7 +87,8 @@ function assessedLimit({ id, category, chargeKg, maximumChargeKg, rule, source, 
     source,
     maximumChargeKg: limit,
     requirements,
-    measures
+    measures,
+    details
   });
 }
 
@@ -144,7 +146,6 @@ export function calculateFactorySealedChargeLimit({ lflKgM3, floorAreaM2 } = {})
 export function calculateMinimumFactorySealedFloorArea({ chargeKg, lflKgM3 } = {}) {
   const charge = numberOrNull(chargeKg);
   const lfl = numberOrNull(lflKgM3);
-
   if (charge == null || charge <= 0 || lfl == null || lfl <= 0) return null;
   return charge / (0.25 * lfl * 2.2);
 }
@@ -165,6 +166,17 @@ export function getToxicityConcentrationLimit(safetyData = {}) {
 
 function getC3Limits(safetyData = {}) {
   return C3_LIMITS_BY_STANDARD_NUMBER[safetyData.standardNumber] || null;
+}
+
+function c3Details(limits, concentration, firstThreshold, firstThresholdLabel) {
+  return Object.freeze({
+    rclKgM3: limits?.rclKgM3 ?? null,
+    qlmvKgM3: limits?.qlmvKgM3 ?? null,
+    qlavKgM3: limits?.qlavKgM3 ?? null,
+    concentrationKgM3: concentration ?? null,
+    firstThresholdKgM3: firstThreshold ?? null,
+    firstThresholdLabel: firstThresholdLabel || ''
+  });
 }
 
 function toxicityLimitByTableC1({ safetyData, chargeKg, roomVolumeM3, accessCategory, installationClass, locationLevel, occupantDensityBelowOnePer10m2, hasEmergencyExits, isPermanentlySealedSorptionSystem }) {
@@ -329,16 +341,23 @@ export function assessAlternativeRiskManagementC3({ safetyData, chargeKg, roomVo
   const deepest = locationLevel === 'deepest-underground';
   const firstThreshold = deepest ? limits.rclKgM3 : limits.qlmvKgM3;
   const firstThresholdLabel = deepest ? 'RCL' : 'QLMV';
+  const details = c3Details(limits, concentration, firstThreshold, firstThresholdLabel);
 
   if (concentration <= firstThreshold) {
-    return freezeResult({ id: 'charge-limit.alternative-risk-management', category: 'safetyMeasures', status: CHARGE_LIMIT_STATUS.PASSED, source: SOURCE_EN_378_1_C3, concentrationKgM3: concentration, rule: `concentration-not-above-${firstThresholdLabel.toLowerCase()}`, requirements: [`Konzentration liegt nicht über ${firstThresholdLabel}.`] });
+    return freezeResult({ id: 'charge-limit.alternative-risk-management', category: 'safetyMeasures', status: CHARGE_LIMIT_STATUS.PASSED, source: SOURCE_EN_378_1_C3, concentrationKgM3: concentration, rule: `concentration-not-above-${firstThresholdLabel.toLowerCase()}`, requirements: [`Konzentration liegt nicht über ${firstThresholdLabel}.`], details });
   }
   if (concentration <= limits.qlavKgM3) {
     const measureCount = deepest ? 2 : 1;
-    return freezeResult({ id: 'charge-limit.alternative-risk-management', category: 'safetyMeasures', status: CHARGE_LIMIT_STATUS.FAILED, source: SOURCE_EN_378_1_C3, concentrationKgM3: concentration, rule: deepest ? 'between-rcl-and-qlav' : 'between-qlmv-and-qlav', requirements: [`Mindestens ${measureCount} zusätzliche Sicherheitsmaßnahme(n) nach C.3 / EN 378-3 erforderlich.`], measures: ['Alternative Vorkehrungen nach EN 378-1 C.3 und EN 378-3 Abschnitt 6 prüfen.'] });
+    return freezeResult({ id: 'charge-limit.alternative-risk-management', category: 'safetyMeasures', status: CHARGE_LIMIT_STATUS.FAILED, source: SOURCE_EN_378_1_C3, concentrationKgM3: concentration, rule: deepest ? 'between-rcl-and-qlav' : 'between-qlmv-and-qlav', requirements: [`Mindestens ${measureCount} zusätzliche Sicherheitsmaßnahme(n) nach C.3 / EN 378-3 erforderlich.`], measures: ['Alternative Vorkehrungen nach EN 378-1 C.3 und EN 378-3 Abschnitt 6 prüfen.'], details });
   }
 
-  return freezeResult({ id: 'charge-limit.alternative-risk-management', category: 'safetyMeasures', status: CHARGE_LIMIT_STATUS.FAILED, source: SOURCE_EN_378_1_C3, concentrationKgM3: concentration, rule: 'concentration-above-qlav', requirements: ['Konzentration überschreitet QLAV; alternative Vorkehrungen reichen in diesem Pfad nicht aus.'], measures: ['Aufstellkonzept, Füllmenge oder Raumvolumen fachlich ändern.'] });
+  return freezeResult({ id: 'charge-limit.alternative-risk-management', category: 'safetyMeasures', status: CHARGE_LIMIT_STATUS.FAILED, source: SOURCE_EN_378_1_C3, concentrationKgM3: concentration, rule: 'concentration-above-qlav', requirements: ['Konzentration überschreitet QLAV; alternative Vorkehrungen reichen in diesem Pfad nicht aus.'], measures: ['Aufstellkonzept, Füllmenge oder Raumvolumen fachlich ändern.'], details });
+}
+
+function shouldIncludeC3Assessment(currentState, toxicity, flammability) {
+  return yes(currentState.usesAlternativeRiskManagement)
+    || toxicity.status === CHARGE_LIMIT_STATUS.FAILED
+    || flammability.status === CHARGE_LIMIT_STATUS.FAILED;
 }
 
 export function assessChargeLimit(currentState = {}) {
@@ -370,8 +389,9 @@ export function assessChargeLimit(currentState = {}) {
   const context = { ...currentState, safetyData, chargeKg, roomVolumeM3 };
   const toxicity = toxicityLimitByTableC1(context);
   const flammability = flammabilityLimitByTableC2(context);
-  const c3 = assessAlternativeRiskManagementC3(context);
-  const checks = [toxicity, flammability, c3];
+  const checks = shouldIncludeC3Assessment(currentState, toxicity, flammability)
+    ? [toxicity, flammability, assessAlternativeRiskManagementC3(context)]
+    : [toxicity, flammability];
   const assessedLimits = checks
     .filter(check => check.status !== CHARGE_LIMIT_STATUS.NOT_ASSESSED && check.status !== CHARGE_LIMIT_STATUS.NOT_APPLICABLE && !check.noLimit)
     .map(check => check.maximumChargeKg)

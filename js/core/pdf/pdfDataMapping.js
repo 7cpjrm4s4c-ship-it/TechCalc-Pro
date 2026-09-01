@@ -3,6 +3,7 @@ import { sanitizeText, normalizeKey } from './pdfText.js';
 import { buildFloodingReportSections } from './floodingReportSections.js';
 import { buildRainwaterReportSections } from './rainwaterReportSections.js';
 import { buildFGasesReportSections } from './fGasesReportSections.js';
+import { buildEN378ReportSections } from './en378ReportSections.js';
 import { buildGenericReportSections } from './genericReportSections.js';
 function textOf(node) { return sanitizeText(node?.textContent || ''); }
 function valueOfField(field) {
@@ -180,6 +181,7 @@ function buildTypedDtoReportSections(reportDto = {}) {
   if (dtoType === 'techcalc.rainwater.report') return buildRainwaterReportSections(reportDto);
   if (dtoType === 'techcalc.f-gases-check.report') return buildFGasesReportSections(reportDto);
   if (dtoType === 'techcalc.flooding-verification.report') return buildFloodingReportSections(reportDto);
+  if (dtoType === 'techcalc.en-378-safety-check.report') return buildEN378ReportSections(reportDto);
   return buildGenericReportSections(reportDto);
 }
 export function reportSections(moduleData) {
