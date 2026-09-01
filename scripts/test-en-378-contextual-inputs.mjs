@@ -9,7 +9,7 @@ const derivedAccessState = {
   chargeKg: '24.4',
   roomVolumeM3: '6000',
   installationLocation: 'technical-room',
-  installationClass: 'II',
+  installationClass: 'I',
   accessArea: 'authorized-access',
   usageType: 'industrial',
   applicationType: 'other',

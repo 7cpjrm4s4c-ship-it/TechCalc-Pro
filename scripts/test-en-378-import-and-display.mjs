@@ -63,7 +63,7 @@ const r513aCalculation = calculate({
   chargeKg: '24.4',
   roomVolumeM3: '6000',
   installationLocation: 'technical-room',
-  installationClass: 'II',
+  installationClass: 'I',
   accessArea: 'authorized-access',
   accessCategory: 'c',
   usageType: 'industrial',
