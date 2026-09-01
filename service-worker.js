@@ -122,6 +122,19 @@ const ASSETS = [
   './js/modules/drinking-water/state.js',
   './js/modules/drinking-water/view.js',
   './js/modules/drinking-water/viewModel.js',
+  './js/modules/en-378-safety-check/chargeLimitCalculation.js',
+  './js/modules/en-378-safety-check/config.js',
+  './js/modules/en-378-safety-check/displayLabels.js',
+  './js/modules/en-378-safety-check/importController.js',
+  './js/modules/en-378-safety-check/index.js',
+  './js/modules/en-378-safety-check/installationSafetyRequirements.js',
+  './js/modules/en-378-safety-check/logic.js',
+  './js/modules/en-378-safety-check/plannerGuidance.js',
+  './js/modules/en-378-safety-check/reportAdapter.js',
+  './js/modules/en-378-safety-check/results.js',
+  './js/modules/en-378-safety-check/schema.js',
+  './js/modules/en-378-safety-check/snapshotImport.js',
+  './js/modules/en-378-safety-check/state.js',
   './js/modules/f-gases-check/config.js',
   './js/modules/f-gases-check/index.js',
   './js/modules/f-gases-check/logic.js',
@@ -268,6 +281,7 @@ const ASSETS = [
   './js/shared/rainwaterSurfaceSnapshot.js',
   './js/utils/calculations.js',
   './js/utils/pipes.js',
+  './js/utils/refrigerants/en378-safety-data.js',
   './js/utils/refrigerants/gwp.js',
   './js/utils/refrigerants/index.js',
   './js/utils/refrigerants/refrigerant-label.js',
@@ -347,6 +361,5 @@ self.addEventListener('fetch', event => {
     })());
     return;
   }
-
   event.respondWith(cacheFirstWithRefresh(event.request));
 });
