@@ -30,7 +30,13 @@ const FIELD_LABELS = Object.freeze({
   hasEmergencyExits: 'Notausgänge',
   occupantDensityBelowOnePer10m2: 'Personendichte kleiner als eine Person je 10 Quadratmeter',
   usesAlternativeRiskManagement: 'alternative Vorkehrungen nach Anhang C.3',
-  isPermanentlySealedSorptionSystem: 'dauerhaft geschlossene Sorptionsanlage'
+  isPermanentlySealedSorptionSystem: 'dauerhaft geschlossene Sorptionsanlage',
+  qlmvKgM3: 'Grenzwert QLMV für Mindestlüftung',
+  qlavKgM3: 'Grenzwert QLAV für zusätzliche Lüftung',
+  rclKgM3: 'Kältemittel-Konzentrationsgrenzwert RCL',
+  lflKgM3: 'untere Explosionsgrenze LFL',
+  atelOdlKgM3: 'ATEL- oder ODL-Grenzwert',
+  practicalLimitKgM3: 'praktischer Grenzwert'
 });
 
 const STATUS_LABELS = Object.freeze({
@@ -53,7 +59,7 @@ const CHECK_LABELS = Object.freeze({
   'charge-limit.input': 'Füllmenge und Raumvolumen prüfen',
   'charge-limit.toxicity': 'toxizitätsbezogene Füllmengengrenze',
   'charge-limit.flammability': 'brennbarkeitsbezogene Füllmengengrenze',
-  'charge-limit.alternative-risk-management': 'alternative Vorkehrungen',
+  'charge-limit.alternative-risk-management': 'alternative Vorkehrungen nach Anhang C.3',
   'outdoor.prevent-refrigerant-entry': 'Austritt in Gebäudeöffnungen verhindern',
   'outdoor.ignition-sources': 'Zündquellen bei brennbaren Kältemitteln vermeiden',
   'occupied-space.sections-8-9': 'Personen-Aufenthaltsbereich bewerten',

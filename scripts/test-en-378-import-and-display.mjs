@@ -5,7 +5,7 @@ import { state as fGasesState } from '../js/modules/f-gases-check/state.js';
 import { buildFGasesImportOptions, buildFGasesImportPatch, hasAnyFGasesSavedSystem, hasMultipleFGasesSavedSystems } from '../js/modules/en-378-safety-check/importController.js';
 import { calculate } from '../js/modules/en-378-safety-check/logic.js';
 import { buildEN378SafetyCheckResultModel } from '../js/modules/en-378-safety-check/results.js';
-import { validationIssueLabel } from '../js/modules/en-378-safety-check/displayLabels.js';
+import { fieldLabel, validationIssueLabel } from '../js/modules/en-378-safety-check/displayLabels.js';
 
 fGasesState.set({
   savedSystems: [
@@ -25,6 +25,8 @@ fGasesState.set({
 assert.equal(hasAnyFGasesSavedSystem(), true);
 assert.equal(hasMultipleFGasesSavedSystems(), true);
 assert.equal(buildFGasesImportOptions().length, 3);
+assert.equal(fieldLabel('qlmvKgM3'), 'Grenzwert QLMV für Mindestlüftung');
+assert.equal(fieldLabel('qlavKgM3'), 'Grenzwert QLAV für zusätzliche Lüftung');
 
 const patch = buildFGasesImportPatch({ fGasesSnapshotId: 'system-1' });
 assert.equal(patch.importStatus, 'imported');
@@ -54,5 +56,23 @@ assert.equal(resultModel.primary.primary.value, 'Anforderungen nach aktuellem Pr
 assert.equal(validationIssueLabel('refrigerantId:required'), 'Kältemittel fehlt.');
 assert.equal(resultModel.groups.some(group => JSON.stringify(group).includes('not-assessed')), false);
 assert.equal(resultModel.groups.some(group => JSON.stringify(group).includes('refrigerantId:required')), false);
+
+const r513aCalculation = calculate({
+  refrigerantId: 'R-513A',
+  chargeKg: '24.4',
+  roomVolumeM3: '6000',
+  installationLocation: 'technical-room',
+  installationClass: 'II',
+  accessArea: 'authorized-access',
+  accessCategory: 'c',
+  usageType: 'industrial',
+  applicationType: 'other',
+  locationLevel: 'other',
+  ventilationType: 'mechanical',
+  usesAlternativeRiskManagement: 'no'
+});
+assert.equal(r513aCalculation.status, 'acceptable');
+assert.equal(r513aCalculation.plannerGuidance.missingInputs.includes('Grenzwert QLMV für Mindestlüftung'), false);
+assert.equal(r513aCalculation.plannerGuidance.missingInputs.includes('Grenzwert QLAV für zusätzliche Lüftung'), false);
 
 console.log('EN 378 import and display tests passed.');

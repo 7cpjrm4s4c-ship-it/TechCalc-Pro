@@ -10,6 +10,7 @@ const numberOrNull = value => {
 };
 
 const hasValue = value => String(value ?? '').trim().length > 0;
+const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 
 const addRequiredTextIssue = (issues, currentState, key) => {
   if (!hasValue(currentState[key])) issues.push(`${key}:required`);
@@ -45,6 +46,34 @@ export function hasRequiredAssessmentInput(currentState = {}) {
   return validateAssessmentInput(currentState).isValid;
 }
 
+function isOptionalC3OpenCheck(check = {}, currentState = {}) {
+  if (currentState.usesAlternativeRiskManagement === 'yes') return false;
+  if (check.id !== 'charge-limit.alternative-risk-management') return false;
+  if (check.status !== 'not-assessed') return false;
+  const missing = check.missingInputs || [];
+  return missing.includes('qlmvKgM3') || missing.includes('qlavKgM3');
+}
+
+function normalizeChargeLimitAssessment(assessment = {}, currentState = {}) {
+  const checks = assessment.checks || [];
+  const filteredChecks = checks.filter(check => !isOptionalC3OpenCheck(check, currentState));
+  if (filteredChecks.length === checks.length) return assessment;
+
+  const failedChecks = filteredChecks.filter(check => check.status === 'failed');
+  const openChecks = filteredChecks.filter(check => check.status === 'not-assessed');
+  const requiredMeasures = failedChecks.flatMap(check => check.measures || []);
+  const missingInputs = [...new Set(openChecks.flatMap(check => check.missingInputs || []))];
+  const status = failedChecks.length ? 'failed' : openChecks.length ? 'not-assessed' : 'passed';
+
+  return Object.freeze({
+    ...clone(assessment),
+    status,
+    checks: Object.freeze(filteredChecks.map(check => Object.freeze(check))),
+    requiredMeasures: Object.freeze([...new Set(requiredMeasures)]),
+    missingInputs: Object.freeze(missingInputs)
+  });
+}
+
 function deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, installationSafetyAssessment }) {
   if (hasImportError) return 'import-rejected';
   if (!inputValidation.isValid) return 'incomplete';
@@ -61,7 +90,7 @@ export function calculate(currentState = {}) {
   const roomVolumeM3 = numberOrNull(currentState.roomVolumeM3);
   const inputValidation = validateAssessmentInput(currentState);
   const hasImportError = currentState.importStatus === 'rejected';
-  const chargeLimitAssessment = assessChargeLimit(currentState);
+  const chargeLimitAssessment = normalizeChargeLimitAssessment(assessChargeLimit(currentState), currentState);
   const installationSafetyAssessment = assessInstallationSafetyRequirements(currentState, chargeLimitAssessment);
   const status = deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, installationSafetyAssessment });
   const plannerGuidance = buildEN378PlannerGuidance(currentState, {
