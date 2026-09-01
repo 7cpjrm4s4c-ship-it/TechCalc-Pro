@@ -30,6 +30,7 @@ assert.equal(fieldLabel('qlavKgM3'), 'Grenzwert QLAV für zusätzliche Lüftung'
 
 const patch = buildFGasesImportPatch({ fGasesSnapshotId: 'system-1' });
 assert.equal(patch.importStatus, 'imported');
+assert.equal(patch.importStatusMessage, 'Anlage wurde importiert. Die Angaben wurden als Kopie übernommen.');
 assert.equal(patch.importedSystemName, 'Wärmepumpe Dachzentrale');
 assert.equal(patch.refrigerantId, 'R-32');
 assert.equal(patch.chargeKg, '2.5');

@@ -38,7 +38,6 @@ const FIELD_LABELS = Object.freeze({
   atelOdlKgM3: 'ATEL- oder ODL-Grenzwert',
   practicalLimitKgM3: 'praktischer Grenzwert'
 });
-
 const STATUS_LABELS = Object.freeze({
   acceptable: 'Anforderungen nach aktuellem Prüfstand erfüllt',
   'measures-required': 'Maßnahmen oder Anpassungen erforderlich',
@@ -53,13 +52,20 @@ const STATUS_LABELS = Object.freeze({
   imported: 'importiert',
   rejected: 'abgelehnt'
 });
-
 const CHECK_LABELS = Object.freeze({
   'charge-limit.refrigerant-data': 'Kältemitteldaten nach EN 378 prüfen',
   'charge-limit.input': 'Füllmenge und Raumvolumen prüfen',
   'charge-limit.toxicity': 'toxizitätsbezogene Füllmengengrenze',
   'charge-limit.flammability': 'brennbarkeitsbezogene Füllmengengrenze',
   'charge-limit.alternative-risk-management': 'alternative Vorkehrungen nach Anhang C.3',
+  'alternative-precautions.minimum-measures': 'Mindestanzahl alternativer Vorkehrungen erfüllen',
+  'alternative-precautions.ventilation-openings': 'Verdünnungsöffnungen als alternative Vorkehrung',
+  'alternative-precautions.mechanical-ventilation': 'mechanische Lüftung als alternative Vorkehrung',
+  'alternative-precautions.shutoff-valves': 'Sicherheitsabsperrventile als alternative Vorkehrung',
+  'alternative-precautions.alarm': 'Alarmierung als alternative Vorkehrung',
+  'alternative-precautions.c3-assessment': 'alternative Vorkehrungen bewerten',
+  'alternative-precautions.c3-data': 'C.3-Grenzwerte ergänzen',
+  'alternative-precautions.qlav-exceeded': 'QLAV überschritten',
   'outdoor.prevent-refrigerant-entry': 'Austritt in Gebäudeöffnungen verhindern',
   'outdoor.ignition-sources': 'Zündquellen bei brennbaren Kältemitteln vermeiden',
   'occupied-space.sections-8-9': 'Personen-Aufenthaltsbereich bewerten',
@@ -79,7 +85,6 @@ const CHECK_LABELS = Object.freeze({
   'warning.outdoor-a3-b3-over-10kg': 'Außenanlage mit A3/B3 über 10 Kilogramm kennzeichnen',
   'handover.site-inspection': 'Sichtprüfung vor Übergabe durchführen'
 });
-
 const OPTION_LABELS = Object.freeze({
   '': 'nicht angegeben',
   yes: 'ja',
@@ -115,7 +120,6 @@ const OPTION_LABELS = Object.freeze({
   mechanical: 'mechanische Lüftung',
   none: 'keine gesicherte Lüftung'
 });
-
 export function fieldLabel(key) {
   return FIELD_LABELS[key] || String(key || 'Angabe');
 }
@@ -131,7 +135,6 @@ export function checkLabel(id) {
 export function optionLabel(value) {
   return OPTION_LABELS[value] || String(value || 'nicht angegeben');
 }
-
 export function validationIssueLabel(issue) {
   const [key, code] = String(issue || '').split(':');
   const label = fieldLabel(key);

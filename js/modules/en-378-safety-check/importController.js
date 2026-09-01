@@ -1,5 +1,6 @@
 import { getModuleStore } from '../../core/centralStore.js';
 import { buildEN378StateFromFGasesSnapshot, validateFGasesSystemSnapshot } from './snapshotImport.js';
+import { canAssessRefrigerantWithEN378 } from './refrigerantCoverage.js';
 
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 
@@ -58,7 +59,8 @@ export function buildFGasesImportPatch(currentState = {}) {
   if (!candidate) {
     return Object.freeze({
       importStatus: 'rejected',
-      importErrors: Object.freeze(['Es wurde keine gespeicherte F-Gase-Anlage ausgewählt.'])
+      importErrors: Object.freeze(['Es wurde keine gespeicherte F-Gase-Anlage ausgewählt.']),
+      importStatusMessage: 'Bitte wähle eine gespeicherte F-Gase-Anlage aus.'
     });
   }
 
@@ -68,13 +70,24 @@ export function buildFGasesImportPatch(currentState = {}) {
     return Object.freeze({
       fGasesSnapshotId: selectedRecordId(candidate),
       importStatus: 'rejected',
-      importErrors: Object.freeze(['Der gespeicherte Anlagenstand kann nicht importiert werden.'])
+      importErrors: Object.freeze(['Der gespeicherte Anlagenstand kann nicht importiert werden.']),
+      importStatusMessage: 'Der gespeicherte Anlagenstand kann nicht importiert werden. Bitte speichere die Anlage im F-Gase-Modul erneut.'
+    });
+  }
+
+  if (!canAssessRefrigerantWithEN378(snapshot.system?.refrigerantId)) {
+    return Object.freeze({
+      fGasesSnapshotId: selectedRecordId(candidate),
+      importStatus: 'rejected',
+      importErrors: Object.freeze(['Für das Kältemittel liegen keine EN-378-Sicherheitsdaten vor.']),
+      importStatusMessage: 'Für das Kältemittel der gespeicherten Anlage liegen keine EN-378-Sicherheitsdaten vor. Eine Bewertung ist damit nicht belastbar möglich.'
     });
   }
 
   return Object.freeze({
     fGasesSnapshotId: selectedRecordId(candidate),
-    ...buildEN378StateFromFGasesSnapshot(clone(snapshot), currentState)
+    ...buildEN378StateFromFGasesSnapshot(clone(snapshot), currentState),
+    importStatusMessage: 'Anlage wurde importiert. Die Angaben wurden als Kopie übernommen.'
   });
 }
 

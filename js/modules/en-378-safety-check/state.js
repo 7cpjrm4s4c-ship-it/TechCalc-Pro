@@ -11,6 +11,7 @@ export const initialState = Object.freeze({
   importedAt: '',
   importStatus: '',
   importErrors: Object.freeze([]),
+  importStatusMessage: '',
   fGasesSnapshotId: '',
   sourceModuleId: '',
   sourceModuleVersion: '',

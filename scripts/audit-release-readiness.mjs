@@ -29,5 +29,5 @@ assert.match(serviceWorker, /['"]\.\/js\/core\/version\.js['"]/, 'central versio
 assert.match(releaseNotes, new RegExp(`^# TechCalc Pro ${escapedVersion}$`, 'm'), 'release notes must match package version');
 assert.doesNotMatch(releaseNotes, /Phase\s+\d+/i, 'public release notes must not contain internal phase labels');
 assert.doesNotMatch(releaseNotes, /dev\.\d+/i, 'public release notes must not contain development build labels');
-for (const script of ['version:sync', 'version:check', 'lint', 'test', 'test:f-gases', 'test:flooding', 'test:integration', 'build', 'precache:check', 'test:e2e:desktop-tablet', 'test:e2e:module-layout', 'test:visual:flooding']) assert.ok(packageJson.scripts?.[script], `package.json missing release gate script ${script}`);
+for (const script of ['version:sync', 'version:check', 'lint', 'test', 'test:f-gases', 'test:en378', 'test:flooding', 'test:integration', 'build', 'precache:check', 'test:e2e:desktop-tablet', 'test:e2e:module-layout', 'test:visual:flooding']) assert.ok(packageJson.scripts?.[script], `package.json missing release gate script ${script}`);
 console.log(`TechCalc Pro ${currentVersion} release-readiness metadata audit passed.`);

@@ -3,19 +3,27 @@ import GWP_DATASET from './gwp.js';
 import SAFETY_CLASS_DATASET from './safety-classes.js';
 import REGULATION_DATASET from './regulations.js';
 import EN378_SAFETY_DATASET from './en378-safety-data.js';
+
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 const normalizeIdentifier = value => String(value ?? '').trim().toLowerCase();
+const normalizeSafetyIdentifier = value => normalizeIdentifier(value)
+  .replace(/\s+/g, '')
+  .replace(/-/g, '')
+  .replace(/^(r|hfkw|hfo)/, '');
 const UNKNOWN = Symbol('unknown');
+
 function finiteNumber(value) {
   if (value == null || String(value).trim() === '') return null;
   const number = Number(typeof value === 'string' ? value.replace(',', '.') : value);
   return Number.isFinite(number) ? number : null;
 }
+
 function validDate(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value ?? ''))) return null;
   const timestamp = Date.parse(`${value}T00:00:00Z`);
   return Number.isFinite(timestamp) ? timestamp : null;
 }
+
 function addYears(dateString, years) {
   const timestamp = validDate(dateString);
   if (timestamp == null) return null;
@@ -23,19 +31,40 @@ function addYears(dateString, years) {
   date.setUTCFullYear(date.getUTCFullYear() + years);
   return date.toISOString().slice(0, 10);
 }
+
 function findRefrigerant(identifier) {
   const normalized = normalizeIdentifier(identifier);
   if (!normalized) return null;
-  return REFRIGERANT_DATASET.items.find(entry => normalizeIdentifier(entry.id) === normalized || normalizeIdentifier(entry.name) === normalized || entry.aliases?.some(alias => normalizeIdentifier(alias) === normalized)) ?? null;
+  return REFRIGERANT_DATASET.items.find(entry => normalizeIdentifier(entry.id) === normalized
+    || normalizeIdentifier(entry.name) === normalized
+    || entry.aliases?.some(alias => normalizeIdentifier(alias) === normalized)) ?? null;
 }
-function findEN378SafetyData(identifier) {
+
+function buildSafetyIdentifierCandidates(identifier) {
   const refrigerant = findRefrigerant(identifier);
-  const canonicalId = refrigerant?.id || identifier;
-  const normalized = normalizeIdentifier(canonicalId);
-  if (!normalized) return null;
-  return EN378_SAFETY_DATASET.items.find(entry => normalizeIdentifier(entry.refrigerantId) === normalized) ?? null;
+  const values = [
+    identifier,
+    refrigerant?.id,
+    refrigerant?.name,
+    refrigerant?.gwpRef,
+    ...(refrigerant?.aliases || [])
+  ];
+  return new Set(values.map(normalizeSafetyIdentifier).filter(Boolean));
 }
-function matchesScalarOrList(actual, expected) { return Array.isArray(actual) ? actual.includes(expected) : actual === expected; }
+
+function findEN378SafetyData(identifier) {
+  const candidates = buildSafetyIdentifierCandidates(identifier);
+  if (!candidates.size) return null;
+  return EN378_SAFETY_DATASET.items.find(entry => [
+    entry.refrigerantId,
+    entry.standardNumber
+  ].some(value => candidates.has(normalizeSafetyIdentifier(value)))) ?? null;
+}
+
+function matchesScalarOrList(actual, expected) {
+  return Array.isArray(actual) ? actual.includes(expected) : actual === expected;
+}
+
 function deriveGasScope(regulatory = {}) {
   const tags = [];
   if (regulatory.fluorinatedGreenhouseGas) tags.push('fluorinated-greenhouse-gas');
@@ -44,12 +73,14 @@ function deriveGasScope(regulatory = {}) {
   if (regulatory.fluorinatedGreenhouseGas && !regulatory.hfc) tags.push('other-fluorinated-greenhouse-gas');
   return Object.freeze(tags);
 }
+
 function deriveGasType(refrigerant) {
   const types = [];
   if (refrigerant?.regulatory?.hfc) types.push('hfc');
   if (refrigerant?.group === 'FKW') types.push('pfc');
   return Object.freeze(types);
 }
+
 function evaluateException(exception, context) {
   const booleanStatus = field => context[field] === '' || context[field] == null ? UNKNOWN : context[field] === 'yes';
   switch (exception) {
@@ -57,18 +88,23 @@ function evaluateException(exception, context) {
     case 'national-safety-standard': return booleanStatus('nationalSafetyStandardRestrictionStatus');
     case 'cooling-below-minus-50': return booleanStatus('coolingBelowMinus50Status');
     case 'cascade-primary-circuit-below-1500': {
-      const active = booleanStatus('cascadePrimaryCircuitStatus'); if (active !== true) return active;
-      const gwp = finiteNumber(context.gwp); return gwp == null ? UNKNOWN : gwp < 1500;
+      const active = booleanStatus('cascadePrimaryCircuitStatus');
+      if (active !== true) return active;
+      const gwp = finiteNumber(context.gwp);
+      return gwp == null ? UNKNOWN : gwp < 1500;
     }
     case 'site-safety-max-gwp-750': {
-      const active = booleanStatus('siteSafetyRestrictionStatus'); if (active !== true) return active;
-      const gwp = finiteNumber(context.gwp); return gwp == null ? UNKNOWN : gwp <= 750;
+      const active = booleanStatus('siteSafetyRestrictionStatus');
+      if (active !== true) return active;
+      const gwp = finiteNumber(context.gwp);
+      return gwp == null ? UNKNOWN : gwp <= 750;
     }
     case 'military-equipment':
     case 'medical-use': return UNKNOWN;
     default: return UNKNOWN;
   }
 }
+
 function evaluateCondition(condition, context) {
   const actual = context[condition.field];
   const expected = condition.value;
@@ -78,21 +114,27 @@ function evaluateCondition(condition, context) {
     case 'in':
       if (actual === undefined || actual === null || actual === '' || !Array.isArray(expected)) return UNKNOWN;
       return Array.isArray(actual) ? actual.some(value => expected.includes(value)) : expected.includes(actual);
-    case 'lt': case 'lte': case 'gt': case 'gte': {
-      const numeric = finiteNumber(actual); if (numeric == null) return UNKNOWN;
+    case 'lt':
+    case 'lte':
+    case 'gt':
+    case 'gte': {
+      const numeric = finiteNumber(actual);
+      if (numeric == null) return UNKNOWN;
       if (condition.operator === 'lt') return numeric < expected;
       if (condition.operator === 'lte') return numeric <= expected;
       if (condition.operator === 'gt') return numeric > expected;
       return numeric >= expected;
     }
     case 'before-applicable-ban-date': {
-      const date = validDate(actual); const ban = validDate(context.applicableAnnexIvBanDate);
+      const date = validDate(actual);
+      const ban = validDate(context.applicableAnnexIvBanDate);
       if (context.applicableAnnexIvBanDateStatus === 'none') return false;
       if (date == null || ban == null) return UNKNOWN;
       return date < ban;
     }
     case 'on-or-after-one-year-after-applicable-ban-date': {
-      const assessment = validDate(actual); const proofFrom = validDate(context.annexIvProofRequiredFrom);
+      const assessment = validDate(actual);
+      const proofFrom = validDate(context.annexIvProofRequiredFrom);
       if (context.applicableAnnexIvBanDateStatus === 'none') return false;
       if (assessment == null || proofFrom == null) return UNKNOWN;
       return assessment >= proofFrom;
@@ -101,13 +143,17 @@ function evaluateCondition(condition, context) {
     default: return UNKNOWN;
   }
 }
+
 function evaluateRuleDate(rule, assessmentDate) {
-  const assessment = validDate(assessmentDate); if (assessment == null) return UNKNOWN;
-  const from = validDate(rule.validFrom); const until = validDate(rule.validUntil);
+  const assessment = validDate(assessmentDate);
+  if (assessment == null) return UNKNOWN;
+  const from = validDate(rule.validFrom);
+  const until = validDate(rule.validUntil);
   if (from != null && assessment < from) return false;
   if (until != null && assessment > until) return false;
   return true;
 }
+
 function deriveLeakCheck(context) {
   const isAnnexI = context.gasScope.includes('annex-i');
   const isAnnexII = context.gasScope.includes('annex-ii-group-1');
@@ -138,6 +184,7 @@ function deriveLeakCheck(context) {
   const leakDetectionRequired = context.installationType === 'stationary' && ((isAnnexI && co2 >= 500) || (isAnnexII && kg >= 100));
   return Object.freeze({ required: true, intervalMonths, leakDetectionRequired, status: 'required' });
 }
+
 function deriveApplicableAnnexIvBan(context) {
   const candidates = [];
   const unresolved = [];
@@ -145,10 +192,16 @@ function deriveApplicableAnnexIvBan(context) {
     const results = rule.conditions.map(condition => evaluateCondition(condition, context));
     if (results.some(result => result === false)) continue;
     const date = rule.validFrom;
-    if (results.some(result => result === UNKNOWN) || rule.automationStatus === 'manual-review') { unresolved.push({ date, ruleId: rule.id }); continue; }
+    if (results.some(result => result === UNKNOWN) || rule.automationStatus === 'manual-review') {
+      unresolved.push({ date, ruleId: rule.id });
+      continue;
+    }
     const exceptions = (rule.exceptions || []).map(exception => evaluateException(exception, context));
     if (exceptions.some(result => result === true)) continue;
-    if (exceptions.some(result => result === UNKNOWN)) { unresolved.push({ date, ruleId: rule.id }); continue; }
+    if (exceptions.some(result => result === UNKNOWN)) {
+      unresolved.push({ date, ruleId: rule.id });
+      continue;
+    }
     candidates.push({ date, ruleId: rule.id });
   }
   candidates.sort((a, b) => String(a.date).localeCompare(String(b.date)));
@@ -159,14 +212,20 @@ function deriveApplicableAnnexIvBan(context) {
   if (!confirmed) return Object.freeze({ status: 'none', date: null, ruleId: null });
   return Object.freeze({ status: 'resolved', date: confirmed.date, ruleId: confirmed.ruleId });
 }
+
 export function createRegulatoryContext(snapshot = {}) {
   const refrigerant = findRefrigerant(snapshot.refrigerantId);
   const gwp = getGwp(snapshot.refrigerantId);
   const chargeKg = finiteNumber(snapshot.chargeKg);
   const base = {
-    ...clone(snapshot), refrigerantId: refrigerant?.id || snapshot.refrigerantId || '', refrigerant, gwp, chargeKg,
+    ...clone(snapshot),
+    refrigerantId: refrigerant?.id || snapshot.refrigerantId || '',
+    refrigerant,
+    gwp,
+    chargeKg,
     co2EquivalentTonnes: chargeKg != null && gwp != null ? (chargeKg * gwp) / 1000 : null,
-    gasScope: deriveGasScope(refrigerant?.regulatory), gasType: deriveGasType(refrigerant)
+    gasScope: deriveGasScope(refrigerant?.regulatory),
+    gasType: deriveGasType(refrigerant)
   };
   const ban = deriveApplicableAnnexIvBan(base);
   const withBan = {
@@ -190,6 +249,7 @@ export function createRegulatoryContext(snapshot = {}) {
   withBan.leakCheckStatus = leakCheck.status;
   return Object.freeze(withBan);
 }
+
 export function evaluateRegulations(context = {}) {
   return REGULATION_DATASET.rules.map(rule => {
     const dateStatus = evaluateRuleDate(rule, context.assessmentDate);
@@ -207,22 +267,59 @@ export function evaluateRegulations(context = {}) {
     return Object.freeze({ rule: clone(rule), status: 'matched', reasons: Object.freeze([]) });
   });
 }
-export function getDataVersions() { return Object.freeze({ refrigerants: REFRIGERANT_DATASET.version, gwp: GWP_DATASET.version, regulations: REGULATION_DATASET.version, safetyClasses: SAFETY_CLASS_DATASET.version, en378SafetyData: EN378_SAFETY_DATASET.version }); }
-export function getDataStatus() { return Object.freeze({ refrigerants: REFRIGERANT_DATASET.status, gwp: GWP_DATASET.status, regulations: REGULATION_DATASET.status, safetyClasses: SAFETY_CLASS_DATASET.status, en378SafetyData: EN378_SAFETY_DATASET.status }); }
+
+export function getDataVersions() {
+  return Object.freeze({
+    refrigerants: REFRIGERANT_DATASET.version,
+    gwp: GWP_DATASET.version,
+    regulations: REGULATION_DATASET.version,
+    safetyClasses: SAFETY_CLASS_DATASET.version,
+    en378SafetyData: EN378_SAFETY_DATASET.version
+  });
+}
+
+export function getDataStatus() {
+  return Object.freeze({
+    refrigerants: REFRIGERANT_DATASET.status,
+    gwp: GWP_DATASET.status,
+    regulations: REGULATION_DATASET.status,
+    safetyClasses: SAFETY_CLASS_DATASET.status,
+    en378SafetyData: EN378_SAFETY_DATASET.status
+  });
+}
+
 export function listRefrigerants() { return clone(REFRIGERANT_DATASET.items) ?? []; }
 export function getRefrigerant(refrigerantId) { return clone(findRefrigerant(refrigerantId)); }
 export function getGwp(refrigerantId) {
-  const refrigerant = findRefrigerant(refrigerantId); const canonicalId = refrigerant?.gwpRef || refrigerant?.id || refrigerantId;
+  const refrigerant = findRefrigerant(refrigerantId);
+  const canonicalId = refrigerant?.gwpRef || refrigerant?.id || refrigerantId;
   if (!canonicalId) return null;
   return GWP_DATASET.items.find(item => item.refrigerantId === canonicalId || item.id === canonicalId)?.value ?? null;
 }
 export function listSafetyClasses() { return clone(SAFETY_CLASS_DATASET.items) ?? []; }
 export function getSafetyClass(id) { return clone(SAFETY_CLASS_DATASET.items.find(entry => entry.id === id) ?? null); }
 export function listRegulations() { return clone(REGULATION_DATASET.rules) ?? []; }
-export function listEN378SafetyData() { return clone(EN378_SAFETY_DATASET.items) ?? []; }
-export function getEN378SafetyData(refrigerantId) { return clone(findEN378SafetyData(refrigerantId)); }
 export function getApplicableRegulations(context = {}) {
   if (!context || Object.keys(context).length === 0) return listRegulations();
-  return evaluateRegulations(context).filter(entry => ['matched', 'exception-applies', 'matched-with-unresolved-exception', 'manual-review'].includes(entry.status)).map(entry => clone(entry.rule));
+  return evaluateRegulations(context)
+    .filter(entry => ['matched', 'exception-applies', 'matched-with-unresolved-exception', 'manual-review'].includes(entry.status))
+    .map(entry => clone(entry.rule));
 }
-export default Object.freeze({ getDataVersions, getDataStatus, listRefrigerants, getRefrigerant, getGwp, listSafetyClasses, getSafetyClass, listRegulations, listEN378SafetyData, getEN378SafetyData, createRegulatoryContext, evaluateRegulations, getApplicableRegulations });
+export function listEN378SafetyData() { return clone(EN378_SAFETY_DATASET.items) ?? []; }
+export function getEN378SafetyData(refrigerantId) { return clone(findEN378SafetyData(refrigerantId)); }
+
+export default Object.freeze({
+  getDataVersions,
+  getDataStatus,
+  listRefrigerants,
+  getRefrigerant,
+  getGwp,
+  listSafetyClasses,
+  getSafetyClass,
+  listRegulations,
+  createRegulatoryContext,
+  evaluateRegulations,
+  getApplicableRegulations,
+  listEN378SafetyData,
+  getEN378SafetyData
+});

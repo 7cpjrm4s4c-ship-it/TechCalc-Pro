@@ -1,152 +1,60 @@
 # EN 378 Sicherheitscheck
 
-## Zweck
+Das Modul bewertet einen importierten Anlagenstand aus dem F-Gase-Check für die sicherheitstechnische Betrachtung nach EN 378.
 
-Dieses Modul bereitet den sicherheitstechnischen EN-378-Sicherheitscheck für TechCalc Pro Version 1.6.0 vor.
+## Modulgrenze
 
-Der aktuelle Stand enthält ausschließlich technische Modulstruktur, Snapshot-Import, Eingabevalidierung, Ergebnisaufbereitung, Report-DTO und Tests. Normative EN-378-Fachlogik ist noch nicht implementiert.
+Das Modul enthält ausschließlich sicherheitstechnische Bewertungen. Regulatorische Prüfungen der F-Gase-Verordnung bleiben im Modul `f-gases-check`.
 
-## Zielbild
+Der Datenaustausch erfolgt über versionierte Snapshots. Importierte Daten werden als Kopie übernommen. Nachträgliche Änderungen am F-Gase-Anlagenstand ändern bestehende EN-378-Bewertungen nicht automatisch.
 
-Das Modul soll Planerinnen und Planern einen klaren Leitfaden für den gewählten Aufstellort liefern:
+## Fachliche Abdeckung
 
-- welche Anforderungen der Aufstellort besitzt,
-- welche Sicherheitskomponenten erforderlich sind,
-- welche Maßnahmen umzusetzen sind,
-- welche Angaben für eine Bewertung noch fehlen,
-- welche Prüfpunkte nicht anwendbar sind.
+Der aktuelle Stand deckt die Kernbewertung für Planerinnen und Planer ab:
 
-Das Modul ersetzt keine vollständige Fachplanung und keine vollständige Normprüfung. Es konzentriert sich auf schnelle, praxisnahe Entscheidungsunterstützung für den Aufstellraum und die dort erforderlichen Sicherheitsmaßnahmen.
+- Import von Anlage, Kältemittel und Füllmenge aus gespeicherten F-Gase-Anlagenständen.
+- Kältemittel-Sicherheitsdaten nach EN 378-1 Anhang E für den TechCalc-Pro-Kältemittelstamm.
+- Füllmengenbewertung nach EN 378-1 Anhang C, Tabellen C.1 und C.2.
+- Bewertung alternativer Vorkehrungen nach EN 378-1 C.3 mit Bezug auf EN 378-3 Abschnitt 6 und Abschnitt 8.
+- Sicherheitsanforderungen für Aufstellort, Maschinenraum, Lüftung, Detektion, Alarmierung, Abschaltung, Warnhinweise und Sichtprüfung.
+- Planer-Leitfaden mit deutschen Volltexten für erforderliche Maßnahmen und offene Angaben.
+- Eigene PDF-Ausgabe für den EN-378-Sicherheitsbericht.
 
-## Fachlicher Scope
+## Alternative Vorkehrungen nach C.3
 
-### Kernquellen
+Der C.3-Pfad wird nur bewertet, wenn alternative Vorkehrungen vorgesehen sind oder wenn eine Grenzwertüberschreitung diesen Pfad erforderlich macht.
 
-Die spätere Fachlogik wird auf die für den Aufstellraum relevanten Inhalte begrenzt:
+Das Modul ermittelt:
 
-- EN 378-1: Kältemitteldaten, Sicherheitsklassen, Konzentrationsgrenzwerte, Füllmengenlogik, Aufstellort- und Zugangskategorien.
-- EN 378-3: Aufstellort, Personenbereich, Maschinenraum, Lüftung, Detektion, Alarmierung, Abschaltung und Schutzmaßnahmen.
+- ob keine, eine oder zwei zusätzliche Maßnahmen erforderlich sind,
+- welche Maßnahmen ausgewählt wurden,
+- ob die Mindestanzahl erfüllt ist,
+- die erforderliche freie Öffnungsfläche für Verdünnungsöffnungen,
+- den vereinfachten mechanischen Luftstrom nach Q = 10 / RCL,
+- ob ausgewählte Absperrventile, Detektion und Alarmierung vollständig abgesichert sind.
 
-### Eingeschränkt berücksichtigte Quellen
+## UI- und Berichtsvorgaben
 
-EN 378-2 wird grundsätzlich nicht als Kernquelle des Moduls verwendet, da dieser Teil überwiegend Anforderungen an Gerätehersteller, Konstruktion, Herstellung und Prüfung beschreibt.
+Sichtbare Oberfläche und PDF-Bericht verwenden deutsche Volltexte. Interne Schlüssel, technische Statuswerte oder Feldnamen dürfen nicht in UI oder PDF erscheinen.
 
-Inhalte aus EN 378-2 werden nur berücksichtigt, wenn sie einen direkten Bezug haben zu:
+Lange deutsche Texte werden wortweise beziehungsweise mit zulässiger Silbentrennung umbrochen. Eine Trennung einzelner Buchstaben ist nicht zulässig.
 
-- Aufstellraum,
-- Aufstellbedingungen,
-- erforderlichen Sicherheitskomponenten,
-- notwendigen Schutzmaßnahmen am Installationsort.
+## Qualitätsnachweise
 
-### Ausgeschlossene Quellen
+Relevante Tests:
 
-DIN EN ISO 5149-4 / EN 378-4 ist nicht Teil der Kernbewertung dieses Moduls.
-
-Nicht umgesetzt werden daraus insbesondere:
-
-- Betriebsprozesse,
-- Wartungsprozesse,
-- Instandsetzung,
-- Rückgewinnung,
-- Wiederverwendung,
-- Entsorgung,
-- Kältemittelwechsel,
-- Serviceprozesse.
-
-Diese Themen gehören nicht zur Kernbewertung des Aufstellraumes und der benötigten Sicherheitskomponenten.
-
-## Abgrenzung zum F-Gase-Check
-
-Das Modul enthält keine regulatorischen Prüfungen der F-Gase-Verordnung. Regulatorische Inhalte bleiben im Modul `f-gases-check`.
-
-Das Modul greift nicht direkt auf interne Zustände des F-Gase-Checks zu. Der Datenaustausch erfolgt über eine Kopie eines versionierten F-Gase-System-Snapshots.
-
-## Import
-
-Unterstützter Snapshot-Typ:
-
-```text
-techcalc.f-gases.system
+```bash
+npm run test:en378
+node scripts/test-en-378-refrigerant-coverage.mjs
+node scripts/test-en-378-alternative-risk-measures.mjs
 ```
 
-Der Import prüft technisch:
+Release-Gates:
 
-- Snapshot-Typ,
-- Snapshot-Version,
-- vorhandenes `system`-Objekt,
-- vorhandenes Kältemittel,
-- positive Füllmenge.
-
-Importierte Daten werden kopiert. Spätere Änderungen an der Ursprungsanlage verändern die EN-378-Moduldaten nicht automatisch.
-
-## Eingaben
-
-Der technische Mindestumfang umfasst:
-
-- importierte Anlage,
-- Kältemittel,
-- Füllmenge,
-- Raumvolumen,
-- Aufstellort,
-- Zugangsbereich,
-- Nutzung,
-- Lüftung,
-- Gaswarnsystem,
-- Maschinenraum,
-- weitere Sicherheitsmaßnahmen.
-
-## Geplante Prüfkategorien
-
-Die spätere Bewertung soll planungsorientiert nach klaren Kategorien aufgebaut werden:
-
-- `refrigerant`: Kältemittel, Sicherheitsklasse und relevante Grenzwerte,
-- `chargeLimit`: Füllmenge, Raumvolumen und Konzentrationsbewertung,
-- `location`: Aufstellort und Aufstellbedingungen,
-- `occupancy`: Zugang, Nutzung und Personenbereich,
-- `ventilation`: natürliche oder mechanische Lüftung,
-- `machineryRoom`: Anforderungen an Maschinenräume,
-- `detection`: Gasdetektion,
-- `alarm`: Warnung und Alarmierung,
-- `emergencyControl`: Abschaltung und Notfunktionen,
-- `safetyMeasures`: erforderliche Schutzmaßnahmen,
-- `guidance`: zusammenfassender Planerleitfaden.
-
-## Noch nicht implementiert
-
-Folgende Inhalte sind bewusst nicht enthalten:
-
-- zulässige Füllmengen nach EN 378,
-- normative Grenzwerttabellen,
-- sicherheitstechnische Konformitätsbewertung,
-- Ableitung notwendiger Schutzmaßnahmen,
-- Lüftungsanforderungen,
-- Gaswarnsystem-Erforderlichkeit,
-- Maschinenraum-Bewertung,
-- finale Planerempfehlung.
-
-Diese Punkte benötigen gesicherte Fachlogik und dürfen nicht spekulativ ergänzt werden.
-
-## Nicht-Ziele
-
-Das Modul bewertet nicht:
-
-- Herstelleranforderungen,
-- Bauteilauslegung,
-- Druckgeräteauslegung,
-- Druckfestigkeitsprüfung,
-- Produktions- oder Herstellerkennzeichnung,
-- Betreiberpflichten aus der F-Gase-Verordnung,
-- Wartung und Instandsetzung,
-- Rückgewinnung und Entsorgung,
-- Kältemittelwechsel,
-- Serviceprozesse.
-
-## Tests
-
-Der fokussierte technische Test liegt unter:
-
-```text
-scripts/test-en-378-safety-check.mjs
+```bash
+npm run version:check
+npm run precache:check
+npm run audit:release-readiness
+npm run lint
+npm test
 ```
-
-Der Test prüft Snapshot-Import, defensive Validierung, Eingabevalidierung, Report-DTO und serialisierbare Modulgrenzen ohne EN-378-Fachbewertung.

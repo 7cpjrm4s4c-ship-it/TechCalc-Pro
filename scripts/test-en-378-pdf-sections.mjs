@@ -7,6 +7,7 @@ import { buildEN378SafetyCheckReportDto } from '../js/modules/en-378-safety-chec
 
 const state = {
   importedSystemName: 'Wärmepumpe Dachzentrale',
+  importStatusMessage: 'Anlage wurde importiert. Die Angaben wurden als Kopie übernommen.',
   refrigerantId: 'R-32',
   chargeKg: '2.5',
   roomVolumeM3: '50',
@@ -31,9 +32,9 @@ const sections = buildEN378ReportSections(dto);
 const mappedSections = reportSections({ reportSource: 'typed-dto', reportDto: dto });
 const serialized = JSON.stringify(mappedSections);
 
-assert.ok(sections.length >= 8);
+assert.ok(sections.length >= 9);
 assert.equal(sections[0].title, '1. Berichtszusammenfassung');
-assert.ok(mappedSections.some(section => section.title === '6. Planer-Leitfaden'));
+assert.ok(mappedSections.some(section => section.title === '7. Planer-Leitfaden'));
 assert.equal(serialized.includes('not-assessed'), false);
 assert.equal(serialized.includes('refrigerantId'), false);
 assert.equal(serialized.includes('chargeKg'), false);
@@ -41,5 +42,6 @@ assert.equal(serialized.includes('roomVolumeM3'), false);
 assert.equal(serialized.includes('qlmvKgM3'), false);
 assert.ok(serialized.includes('Anforderungen nach aktuellem Prüfstand erfüllt'));
 assert.ok(serialized.includes('Kältemittel'));
+assert.ok(serialized.includes('Alternative Vorkehrungen'));
 
 console.log('EN 378 PDF section tests passed.');

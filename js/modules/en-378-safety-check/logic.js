@@ -1,6 +1,11 @@
 import { getDataVersions, getEN378SafetyData, getRefrigerant, getSafetyClass } from '../../utils/refrigerants/index.js';
 import { assessChargeLimit } from './chargeLimitCalculation.js';
 import { assessInstallationSafetyRequirements } from './installationSafetyRequirements.js';
+import {
+  applyAlternativeRiskMeasuresToChargeLimitAssessment,
+  assessAlternativeRiskMeasures,
+  mergeAlternativeRiskMeasuresAssessment
+} from './alternativeRiskMeasures.js';
 import { buildEN378PlannerGuidance } from './plannerGuidance.js';
 
 const numberOrNull = value => {
@@ -15,7 +20,6 @@ const clone = value => value == null ? value : JSON.parse(JSON.stringify(value))
 const addRequiredTextIssue = (issues, currentState, key) => {
   if (!hasValue(currentState[key])) issues.push(`${key}:required`);
 };
-
 const addPositiveNumberIssue = (issues, currentState, key) => {
   const value = numberOrNull(currentState[key]);
   if (value === null) {
@@ -27,7 +31,6 @@ const addPositiveNumberIssue = (issues, currentState, key) => {
 
 export function validateAssessmentInput(currentState = {}) {
   const issues = [];
-
   addRequiredTextIssue(issues, currentState, 'refrigerantId');
   addPositiveNumberIssue(issues, currentState, 'chargeKg');
   addPositiveNumberIssue(issues, currentState, 'roomVolumeM3');
@@ -35,7 +38,6 @@ export function validateAssessmentInput(currentState = {}) {
   addRequiredTextIssue(issues, currentState, 'accessArea');
   addRequiredTextIssue(issues, currentState, 'usageType');
   addRequiredTextIssue(issues, currentState, 'ventilationType');
-
   return Object.freeze({
     isValid: issues.length === 0,
     issues: Object.freeze(issues)
@@ -53,18 +55,15 @@ function isOptionalC3OpenCheck(check = {}, currentState = {}) {
   const missing = check.missingInputs || [];
   return missing.includes('qlmvKgM3') || missing.includes('qlavKgM3');
 }
-
 function normalizeChargeLimitAssessment(assessment = {}, currentState = {}) {
   const checks = assessment.checks || [];
   const filteredChecks = checks.filter(check => !isOptionalC3OpenCheck(check, currentState));
   if (filteredChecks.length === checks.length) return assessment;
-
   const failedChecks = filteredChecks.filter(check => check.status === 'failed');
   const openChecks = filteredChecks.filter(check => check.status === 'not-assessed');
   const requiredMeasures = failedChecks.flatMap(check => check.measures || []);
   const missingInputs = [...new Set(openChecks.flatMap(check => check.missingInputs || []))];
   const status = failedChecks.length ? 'failed' : openChecks.length ? 'not-assessed' : 'passed';
-
   return Object.freeze({
     ...clone(assessment),
     status,
@@ -73,7 +72,6 @@ function normalizeChargeLimitAssessment(assessment = {}, currentState = {}) {
     missingInputs: Object.freeze(missingInputs)
   });
 }
-
 function deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, installationSafetyAssessment }) {
   if (hasImportError) return 'import-rejected';
   if (!inputValidation.isValid) return 'incomplete';
@@ -90,8 +88,11 @@ export function calculate(currentState = {}) {
   const roomVolumeM3 = numberOrNull(currentState.roomVolumeM3);
   const inputValidation = validateAssessmentInput(currentState);
   const hasImportError = currentState.importStatus === 'rejected';
-  const chargeLimitAssessment = normalizeChargeLimitAssessment(assessChargeLimit(currentState), currentState);
-  const installationSafetyAssessment = assessInstallationSafetyRequirements(currentState, chargeLimitAssessment);
+  const rawChargeLimitAssessment = normalizeChargeLimitAssessment(assessChargeLimit(currentState), currentState);
+  const alternativeRiskMeasuresAssessment = assessAlternativeRiskMeasures(currentState, rawChargeLimitAssessment);
+  const chargeLimitAssessment = applyAlternativeRiskMeasuresToChargeLimitAssessment(rawChargeLimitAssessment, alternativeRiskMeasuresAssessment, currentState);
+  const baseInstallationSafetyAssessment = assessInstallationSafetyRequirements(currentState, rawChargeLimitAssessment);
+  const installationSafetyAssessment = mergeAlternativeRiskMeasuresAssessment(baseInstallationSafetyAssessment, alternativeRiskMeasuresAssessment);
   const status = deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, installationSafetyAssessment });
   const plannerGuidance = buildEN378PlannerGuidance(currentState, {
     status,
@@ -99,7 +100,6 @@ export function calculate(currentState = {}) {
     chargeLimitAssessment,
     installationSafetyAssessment
   });
-
   return Object.freeze({
     status,
     inputComplete: inputValidation.isValid,
@@ -111,6 +111,8 @@ export function calculate(currentState = {}) {
     roomVolumeM3,
     importedSnapshotVersion: currentState.importedSnapshotVersion || null,
     chargeLimitAssessment,
+    rawChargeLimitAssessment,
+    alternativeRiskMeasuresAssessment,
     installationSafetyAssessment,
     plannerGuidance,
     requiredMeasures: Object.freeze(plannerGuidance.requiredMeasures || []),
@@ -118,5 +120,4 @@ export function calculate(currentState = {}) {
     dataVersions: currentState.dataVersions || getDataVersions()
   });
 }
-
 export default calculate;

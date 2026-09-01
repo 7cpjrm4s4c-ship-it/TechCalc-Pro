@@ -26,6 +26,8 @@ export function buildEN378SafetyCheckReportDto({
     importedSnapshot: clone(state.importedSnapshot),
     input: clone({
       importedSystemName: state.importedSystemName || '',
+      importStatus: state.importStatus || '',
+      importStatusMessage: state.importStatusMessage || '',
       refrigerantId: state.refrigerantId || '',
       chargeKg: calculation.chargeKg ?? null,
       roomVolumeM3: calculation.roomVolumeM3 ?? null,
@@ -69,6 +71,7 @@ export function buildEN378SafetyCheckReportDto({
     assessment: {
       status: calculation.status || 'not-assessed',
       chargeLimit: clone(calculation.chargeLimitAssessment || {}),
+      alternativeRiskMeasures: clone(calculation.alternativeRiskMeasuresAssessment || {}),
       installationSafety: clone(calculation.installationSafetyAssessment || {}),
       plannerGuidance: clone(calculation.plannerGuidance || {}),
       requiredMeasures: clone(calculation.requiredMeasures || []),
