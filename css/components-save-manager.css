@@ -13,7 +13,6 @@
   --tc-selected-record-border: var(--tc-active-accent);
   --tc-selected-record-shadow: 0 0 0 1px color-mix(in srgb, var(--tc-active-accent) 26%, transparent), 0 10px 22px color-mix(in srgb, var(--tc-active-accent) 13%, transparent);
 }
-
 /* Saved-record selected state, generic across all modules. */
 :root[data-theme='light'] .line-section-card.is-active,
 :root[data-theme='light'] .saved-record-card.is-active,
@@ -36,7 +35,6 @@
   color: var(--tc-light-text) !important;
   -webkit-text-fill-color: var(--tc-light-text) !important;
 }
-
 :root[data-theme='light'] .line-section-card.is-active::before,
 :root[data-theme='light'] .saved-record-card.is-active::before,
 :root[data-theme='light'] .ph-saved-item.is-active::before,
@@ -51,13 +49,11 @@
   opacity: .95;
   pointer-events: none;
 }
-
 :root[data-theme='light'] .line-section-card.is-active .line-section-card__head,
 :root[data-theme='light'] .saved-record-card.is-active .saved-record-card__head,
 :root[data-theme='light'] .ph-saved-item.is-active .line-section-card__head {
   padding-left: 8px;
 }
-
 /* Primary actions: light fill, strong accent border, global dark text. */
 :root[data-theme='light'] .action-button:not(.action-button--secondary):not(.mini-button--danger),
 :root[data-theme='light'] .tc-action:not(.tc-action--ghost),
@@ -71,7 +67,6 @@
   -webkit-text-fill-color: var(--tc-light-text) !important;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc-active-accent) 18%, transparent) !important;
 }
-
 :root[data-theme='light'] .action-button:not(.action-button--secondary):not(.mini-button--danger):hover,
 :root[data-theme='light'] .tc-action:not(.tc-action--ghost):hover,
 :root[data-theme='light'] .primary-button:hover,
@@ -83,7 +78,6 @@
   color: var(--tc-light-text) !important;
   -webkit-text-fill-color: var(--tc-light-text) !important;
 }
-
 :root[data-theme='light'] .action-button:not(.action-button--secondary):not(.mini-button--danger):active,
 :root[data-theme='light'] .tc-action:not(.tc-action--ghost):active,
 :root[data-theme='light'] .primary-button:active,
@@ -92,7 +86,6 @@
 :root[data-theme='light'] button[type='submit']:active {
   background: var(--tc-button-accent-bg-pressed) !important;
 }
-
 :root[data-theme='light'] .action-button[disabled],
 :root[data-theme='light'] .tc-action[disabled],
 :root[data-theme='light'] .mini-button:disabled,
@@ -105,7 +98,6 @@
   filter: none !important;
   box-shadow: none !important;
 }
-
 /* 1.3.2-dev.15: final light-theme save/edit button state guard.
    This deliberately targets disabled attributes, aria-disabled and the central
    JS class so no component-level action-button rule can make disabled actions
@@ -123,7 +115,6 @@
   filter: none !important;
   cursor: not-allowed !important;
 }
-
 :root[data-theme='light'] .tc-save-actions .action-button:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled),
 :root[data-theme='light'] .tc-save-actions .action-button.is-enabled {
   background: var(--tc-button-accent-bg) !important;
@@ -132,7 +123,6 @@
   -webkit-text-fill-color: var(--tc-light-text) !important;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc-active-accent) 18%, transparent) !important;
 }
-
 /* 1.3.2-dev.15: Light Theme save/edit hardening.
    Uses the central edit-mode data contract as the final source for visual states.
    This protects Light Mode against module-level or component-level button rules. */
@@ -147,7 +137,6 @@
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc-active-accent) 18%, transparent) !important;
   cursor: pointer !important;
 }
-
 :root[data-theme='light'] .tc-save-actions[data-edit-mode='create'] .action-button[data-save-mode-role='update'],
 :root[data-theme='light'] .tc-save-actions[data-edit-mode='edit'] .action-button[data-save-mode-role='save'] {
   background: var(--tc-button-disabled-bg) !important;
@@ -159,7 +148,6 @@
   box-shadow: none !important;
   cursor: not-allowed !important;
 }
-
 :root[data-theme='light'] .tc-save-actions .action-button[disabled],
 :root[data-theme='light'] .tc-save-actions .action-button:disabled,
 :root[data-theme='light'] .tc-save-actions .action-button[aria-disabled='true'],
@@ -174,7 +162,6 @@
   box-shadow: none !important;
 }
 
-
 /* 1.3.2-dev.23 — Global save/update UI tokens.
    Save/edit actions are global UI controls and must not inherit module accents. */
 :root[data-theme='light'] {
@@ -184,7 +171,6 @@
   --tc-ui-primary-bg-pressed: color-mix(in srgb, var(--tc-ui-primary-accent) 30%, #ffffff);
   --tc-ui-primary-border: var(--tc-ui-primary-accent);
 }
-
 /* Save/update actions are global UI controls. They must not inherit module accents. */
 :root[data-theme='light'] .tc-save-actions .action-button:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled),
 :root[data-theme='light'] .tc-save-actions .action-button.is-enabled,
@@ -209,9 +195,6 @@
 :root[data-theme='light'] .tc-save-actions[data-edit-mode='edit'] .action-button[data-save-mode-role='update']:active {
   background: var(--tc-ui-primary-bg-pressed) !important;
 }
-
-
-
 /* 1.3.2-dev.27 — Final global save/update button isolation.
    Save/edit actions are global UI controls and must not inherit module accents. */
 :root[data-theme='light'] .tc-save-actions {
@@ -229,4 +212,80 @@
   color: var(--color-text, #111827) !important;
   -webkit-text-fill-color: var(--color-text, #111827) !important;
 }
+/* F-Gases saved-system state: component-specific Dark/System guard. */
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-saved-record-panel {
+  --tc-f-gases-saved-accent: var(--accent-blue, #35aaff);
+  --tc-f-gases-saved-button-bg: linear-gradient(135deg, color-mix(in srgb, var(--tc-f-gases-saved-accent) 26%, rgba(255, 255, 255, .05)), rgba(255, 255, 255, .035));
+  --tc-f-gases-saved-button-bg-hover: linear-gradient(135deg, color-mix(in srgb, var(--tc-f-gases-saved-accent) 34%, rgba(255, 255, 255, .05)), rgba(255, 255, 255, .055));
+  --tc-f-gases-saved-button-bg-pressed: linear-gradient(135deg, color-mix(in srgb, var(--tc-f-gases-saved-accent) 40%, rgba(255, 255, 255, .05)), rgba(255, 255, 255, .065));
+  --tc-f-gases-saved-button-border: color-mix(in srgb, var(--tc-f-gases-saved-accent) 68%, var(--color-border-strong, rgba(255, 255, 255, .28)));
+}
 
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .saved-record-card.is-active,
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] [data-saved-record-card].is-active {
+  position: relative;
+  border-color: color-mix(in srgb, var(--tc-f-gases-saved-accent) 72%, var(--color-border-strong, rgba(255, 255, 255, .28))) !important;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--tc-f-gases-saved-accent) 34%, transparent), 0 0 18px color-mix(in srgb, var(--tc-f-gases-saved-accent) 18%, transparent) !important;
+}
+
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .saved-record-card.is-active::before,
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] [data-saved-record-card].is-active::before {
+  content: '';
+  position: absolute;
+  inset: 10px auto 10px 8px;
+  width: 4px;
+  border-radius: 999px;
+  background: var(--tc-f-gases-saved-accent);
+  opacity: .95;
+  pointer-events: none;
+}
+
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .saved-record-card.is-active .saved-record-card__head {
+  padding-left: 8px;
+}
+
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions .action-button:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled),
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions .action-button.is-enabled,
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions[data-edit-mode='create'] .action-button[data-save-mode-role='save'],
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions[data-edit-mode='edit'] .action-button[data-save-mode-role='update'] {
+  background: var(--tc-f-gases-saved-button-bg) !important;
+  border-color: var(--tc-f-gases-saved-button-border) !important;
+  color: var(--color-text, #f8fafc) !important;
+  -webkit-text-fill-color: var(--color-text, #f8fafc) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc-f-gases-saved-accent) 22%, transparent) !important;
+  opacity: 1 !important;
+  filter: none !important;
+  cursor: pointer !important;
+}
+
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions .action-button:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled):hover,
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions .action-button.is-enabled:hover,
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions[data-edit-mode='create'] .action-button[data-save-mode-role='save']:hover,
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions[data-edit-mode='edit'] .action-button[data-save-mode-role='update']:hover {
+  background: var(--tc-f-gases-saved-button-bg-hover) !important;
+  border-color: var(--tc-f-gases-saved-button-border) !important;
+}
+
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions .action-button:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled):active,
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions .action-button.is-enabled:active,
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions[data-edit-mode='create'] .action-button[data-save-mode-role='save']:active,
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions[data-edit-mode='edit'] .action-button[data-save-mode-role='update']:active {
+  background: var(--tc-f-gases-saved-button-bg-pressed) !important;
+}
+
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions .action-button[disabled],
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions .action-button:disabled,
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions .action-button[aria-disabled='true'],
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions .action-button.is-disabled,
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions .action-button[data-enabled='false'],
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions[data-edit-mode='create'] .action-button[data-save-mode-role='update'],
+:root:not([data-theme='light']) .module-view[data-module='f-gases-check'] .tc-save-actions[data-edit-mode='edit'] .action-button[data-save-mode-role='save'] {
+  background: rgba(255, 255, 255, .035) !important;
+  border-color: rgba(255, 255, 255, .14) !important;
+  color: var(--color-muted, #8b929c) !important;
+  -webkit-text-fill-color: var(--color-muted, #8b929c) !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+  cursor: not-allowed !important;
+}
