@@ -74,12 +74,13 @@ const plannerGuidanceGroups = calculation => {
 };
 
 export function buildEN378SafetyCheckResultModel(currentState = {}, calculation = {}) {
+  const displayState = calculation.effectiveState || currentState;
   return {
     primary: {
       title: 'Bewertung',
       primary: { label: 'Status', value: statusLabel(calculation.status) },
       rows: [
-        { label: 'Kältemittel', value: currentState.refrigerantId || '–' },
+        { label: 'Kältemittel', value: displayState.refrigerantId || '–' },
         { label: 'Sicherheitsklasse', value: calculation.refrigerantSafetyData?.safetyClass || calculation.safetyClass?.id || '–' },
         { label: 'Füllmenge', value: formatNumber(calculation.chargeKg), unit: 'kg' },
         { label: 'Raumvolumen', value: formatNumber(calculation.roomVolumeM3), unit: 'm³' }
@@ -92,14 +93,14 @@ export function buildEN378SafetyCheckResultModel(currentState = {}, calculation 
       {
         title: 'Aufstellung',
         rows: [
-          { label: 'Aufstellort', value: optionLabel(currentState.installationLocation) },
-          { label: 'Aufstellungsort-Klassifikation', value: optionLabel(currentState.installationClass) },
-          { label: 'Zugangsbereich', value: optionLabel(currentState.accessArea) },
-          { label: 'Kategorie des Zugangsbereichs', value: optionLabel(currentState.accessCategory) },
-          { label: 'Nutzung', value: optionLabel(currentState.usageType) },
-          { label: 'Anwendungsart', value: optionLabel(currentState.applicationType) },
-          { label: 'Geschoss oder Lage', value: optionLabel(currentState.locationLevel) },
-          { label: 'Lüftung', value: optionLabel(currentState.ventilationType) }
+          { label: 'Aufstellort', value: optionLabel(displayState.installationLocation) },
+          { label: 'Aufstellungsort-Klassifikation', value: optionLabel(displayState.installationClass) },
+          { label: 'Zugangsbereich', value: optionLabel(displayState.accessArea) },
+          { label: 'Kategorie des Zugangsbereichs', value: optionLabel(displayState.accessCategory) },
+          { label: 'Nutzung', value: optionLabel(displayState.usageType) },
+          { label: 'Anwendungsart', value: optionLabel(displayState.applicationType) },
+          { label: 'Geschoss oder Lage', value: optionLabel(displayState.locationLevel) },
+          { label: 'Lüftung', value: optionLabel(displayState.ventilationType) }
         ]
       },
       ...plannerGuidanceGroups(calculation),

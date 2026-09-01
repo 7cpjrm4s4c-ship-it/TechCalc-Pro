@@ -8,6 +8,12 @@ import {
 } from './alternativeRiskMeasures.js';
 import { buildEN378PlannerGuidance } from './plannerGuidance.js';
 
+const ACCESS_CATEGORY_BY_ACCESS_AREA = Object.freeze({
+  'general-access': 'a',
+  'supervised-access': 'b',
+  'authorized-access': 'c'
+});
+
 const numberOrNull = value => {
   if (value === '' || value == null) return null;
   const parsed = Number(String(value).replace(',', '.'));
@@ -16,6 +22,21 @@ const numberOrNull = value => {
 
 const hasValue = value => String(value ?? '').trim().length > 0;
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
+const isHumanComfortApplication = state => state.applicationType === 'human-comfort';
+const requiresMountingType = state => isHumanComfortApplication(state) && state.isFactorySealed === 'no';
+
+export function deriveAccessCategory(currentState = {}) {
+  const derived = ACCESS_CATEGORY_BY_ACCESS_AREA[currentState.accessArea];
+  if (derived) return derived;
+  return hasValue(currentState.accessCategory) ? String(currentState.accessCategory) : '';
+}
+
+export function normalizeEN378AssessmentState(currentState = {}) {
+  return Object.freeze({
+    ...currentState,
+    accessCategory: deriveAccessCategory(currentState)
+  });
+}
 
 const addRequiredTextIssue = (issues, currentState, key) => {
   if (!hasValue(currentState[key])) issues.push(`${key}:required`);
@@ -30,17 +51,27 @@ const addPositiveNumberIssue = (issues, currentState, key) => {
 };
 
 export function validateAssessmentInput(currentState = {}) {
+  const effectiveState = normalizeEN378AssessmentState(currentState);
   const issues = [];
-  addRequiredTextIssue(issues, currentState, 'refrigerantId');
-  addPositiveNumberIssue(issues, currentState, 'chargeKg');
-  addPositiveNumberIssue(issues, currentState, 'roomVolumeM3');
-  addRequiredTextIssue(issues, currentState, 'installationLocation');
-  addRequiredTextIssue(issues, currentState, 'accessArea');
-  addRequiredTextIssue(issues, currentState, 'usageType');
-  addRequiredTextIssue(issues, currentState, 'ventilationType');
+
+  addRequiredTextIssue(issues, effectiveState, 'refrigerantId');
+  addPositiveNumberIssue(issues, effectiveState, 'chargeKg');
+  addPositiveNumberIssue(issues, effectiveState, 'roomVolumeM3');
+  addRequiredTextIssue(issues, effectiveState, 'installationLocation');
+  addRequiredTextIssue(issues, effectiveState, 'accessArea');
+  addRequiredTextIssue(issues, effectiveState, 'usageType');
+  addRequiredTextIssue(issues, effectiveState, 'ventilationType');
+
+  if (isHumanComfortApplication(effectiveState)) {
+    addPositiveNumberIssue(issues, effectiveState, 'floorAreaM2');
+    addRequiredTextIssue(issues, effectiveState, 'isFactorySealed');
+    if (requiresMountingType(effectiveState)) addRequiredTextIssue(issues, effectiveState, 'mountingType');
+  }
+
   return Object.freeze({
     isValid: issues.length === 0,
-    issues: Object.freeze(issues)
+    issues: Object.freeze(issues),
+    effectiveState
   });
 }
 
@@ -81,20 +112,21 @@ function deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, 
 }
 
 export function calculate(currentState = {}) {
-  const refrigerant = currentState.refrigerantId ? getRefrigerant(currentState.refrigerantId) : null;
+  const effectiveState = normalizeEN378AssessmentState(currentState);
+  const refrigerant = effectiveState.refrigerantId ? getRefrigerant(effectiveState.refrigerantId) : null;
   const safetyClass = refrigerant?.safetyClassRef ? getSafetyClass(refrigerant.safetyClassRef) : null;
-  const refrigerantSafetyData = currentState.refrigerantId ? getEN378SafetyData(currentState.refrigerantId) : null;
-  const chargeKg = numberOrNull(currentState.chargeKg);
-  const roomVolumeM3 = numberOrNull(currentState.roomVolumeM3);
-  const inputValidation = validateAssessmentInput(currentState);
-  const hasImportError = currentState.importStatus === 'rejected';
-  const rawChargeLimitAssessment = normalizeChargeLimitAssessment(assessChargeLimit(currentState), currentState);
-  const alternativeRiskMeasuresAssessment = assessAlternativeRiskMeasures(currentState, rawChargeLimitAssessment);
-  const chargeLimitAssessment = applyAlternativeRiskMeasuresToChargeLimitAssessment(rawChargeLimitAssessment, alternativeRiskMeasuresAssessment, currentState);
-  const baseInstallationSafetyAssessment = assessInstallationSafetyRequirements(currentState, rawChargeLimitAssessment);
+  const refrigerantSafetyData = effectiveState.refrigerantId ? getEN378SafetyData(effectiveState.refrigerantId) : null;
+  const chargeKg = numberOrNull(effectiveState.chargeKg);
+  const roomVolumeM3 = numberOrNull(effectiveState.roomVolumeM3);
+  const inputValidation = validateAssessmentInput(effectiveState);
+  const hasImportError = effectiveState.importStatus === 'rejected';
+  const rawChargeLimitAssessment = normalizeChargeLimitAssessment(assessChargeLimit(effectiveState), effectiveState);
+  const alternativeRiskMeasuresAssessment = assessAlternativeRiskMeasures(effectiveState, rawChargeLimitAssessment);
+  const chargeLimitAssessment = applyAlternativeRiskMeasuresToChargeLimitAssessment(rawChargeLimitAssessment, alternativeRiskMeasuresAssessment, effectiveState);
+  const baseInstallationSafetyAssessment = assessInstallationSafetyRequirements(effectiveState, rawChargeLimitAssessment);
   const installationSafetyAssessment = mergeAlternativeRiskMeasuresAssessment(baseInstallationSafetyAssessment, alternativeRiskMeasuresAssessment);
   const status = deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, installationSafetyAssessment });
-  const plannerGuidance = buildEN378PlannerGuidance(currentState, {
+  const plannerGuidance = buildEN378PlannerGuidance(effectiveState, {
     status,
     inputValidation,
     chargeLimitAssessment,
@@ -104,12 +136,13 @@ export function calculate(currentState = {}) {
     status,
     inputComplete: inputValidation.isValid,
     inputValidation,
+    effectiveState,
     refrigerant: refrigerant ? Object.freeze({ ...refrigerant }) : null,
     safetyClass: safetyClass ? Object.freeze({ ...safetyClass }) : null,
     refrigerantSafetyData: refrigerantSafetyData ? Object.freeze({ ...refrigerantSafetyData }) : null,
     chargeKg,
     roomVolumeM3,
-    importedSnapshotVersion: currentState.importedSnapshotVersion || null,
+    importedSnapshotVersion: effectiveState.importedSnapshotVersion || null,
     chargeLimitAssessment,
     rawChargeLimitAssessment,
     alternativeRiskMeasuresAssessment,
@@ -117,7 +150,7 @@ export function calculate(currentState = {}) {
     plannerGuidance,
     requiredMeasures: Object.freeze(plannerGuidance.requiredMeasures || []),
     notices: Object.freeze([]),
-    dataVersions: currentState.dataVersions || getDataVersions()
+    dataVersions: effectiveState.dataVersions || getDataVersions()
   });
 }
 export default calculate;

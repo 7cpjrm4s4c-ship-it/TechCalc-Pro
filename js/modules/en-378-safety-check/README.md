@@ -20,6 +20,20 @@ Der aktuelle Stand deckt die Kernbewertung für Planerinnen und Planer ab:
 - Planer-Leitfaden mit deutschen Volltexten für erforderliche Maßnahmen und offene Angaben.
 - Eigene PDF-Ausgabe für den EN-378-Sicherheitsbericht.
 
+## Eingabeführung
+
+Die Oberfläche zeigt nur die für den aktuellen Bewertungspfad relevanten Detailfelder an.
+
+Die Kategorie des Zugangsbereichs wird aus dem gewählten Zugangsbereich abgeleitet:
+
+- allgemeiner Zugang → Kategorie a,
+- beaufsichtigter Zugang → Kategorie b,
+- Zugang nur für unterwiesene oder befugte Personen → Kategorie c.
+
+Die Kategorie muss in der Regel nicht zusätzlich ausgewählt werden. Bei alten gespeicherten Zuständen kann das Feld noch sichtbar werden, damit vorhandene Daten nicht verloren gehen.
+
+Für Anwendungen zum menschlichen Komfort werden Raumfläche, Montageart und die Angabe zur werkseitig dauerhaft geschlossenen Ausführung nur dann abgefragt, wenn diese Angaben für den gewählten Bewertungspfad erforderlich sind.
+
 ## Alternative Vorkehrungen nach C.3
 
 Der C.3-Pfad wird nur bewertet, wenn alternative Vorkehrungen vorgesehen sind oder wenn eine Grenzwertüberschreitung diesen Pfad erforderlich macht.
@@ -47,6 +61,7 @@ Relevante Tests:
 npm run test:en378
 node scripts/test-en-378-refrigerant-coverage.mjs
 node scripts/test-en-378-alternative-risk-measures.mjs
+node scripts/test-en-378-contextual-inputs.mjs
 ```
 
 Release-Gates:
