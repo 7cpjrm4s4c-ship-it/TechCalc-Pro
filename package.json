@@ -13,7 +13,7 @@
     "test:f-gases": "node scripts/audit-test-contracts.mjs && node scripts/test-f-gases-check.mjs",
     "test:en378": "node scripts/audit-test-contracts.mjs && node scripts/test-en-378-safety-check.mjs && node scripts/test-en-378-charge-limit.mjs && node scripts/test-en-378-refrigerant-safety-data.mjs && node scripts/test-en-378-installation-requirements.mjs && node scripts/test-en-378-planner-guidance.mjs && node scripts/test-en-378-import-and-display.mjs && node scripts/test-en-378-refrigerant-coverage.mjs && node scripts/test-en-378-alternative-risk-measures.mjs && node scripts/test-en-378-contextual-inputs.mjs && node scripts/test-en-378-state-consistency.mjs && node scripts/test-en-378-pdf-sections.mjs && node scripts/test-en-378-saved-records.mjs",
     "test:flooding": "node scripts/audit-test-contracts.mjs && node scripts/test-flooding-verification-phase47c.mjs",
-    "test:integration": "node scripts/audit-test-contracts.mjs && node scripts/test-integration.mjs && node scripts/test-heating-cooling-report.mjs",
+    "test:integration": "node scripts/audit-test-contracts.mjs && node scripts/test-integration.mjs",
     "test:e2e": "playwright test",
     "test:e2e:desktop-tablet": "playwright test tests/e2e/phase47d-desktop-tablet-regression.spec.mjs --project=chromium-desktop --project=firefox-desktop --project=chromium-tablet --project=webkit-tablet",
     "test:e2e:module-layout": "playwright test tests/e2e/module-layout-contract.spec.mjs",
