@@ -8,6 +8,8 @@ Das Modul enthält ausschließlich sicherheitstechnische Bewertungen. Regulatori
 
 Der Datenaustausch erfolgt über versionierte Snapshots. Importierte Daten werden als Kopie übernommen. Nachträgliche Änderungen am F-Gase-Anlagenstand ändern bestehende EN-378-Bewertungen nicht automatisch.
 
+DIN EN ISO 5149-4-Bestandteile und herstellerorientierte Inhalte ohne direkten Bezug zum Aufstellraum gehören nicht zum Kernumfang dieses Moduls.
+
 ## Fachliche Abdeckung
 
 Der aktuelle Stand deckt die Kernbewertung für Planerinnen und Planer ab:
@@ -20,6 +22,7 @@ Der aktuelle Stand deckt die Kernbewertung für Planerinnen und Planer ab:
 - Plausibilitätsprüfung für widersprüchliche Kombinationen aus Aufstellort, Aufstellungsort-Klassifikation, Zugangsbereich und Lüftungsangaben.
 - Planer-Leitfaden mit deutschen Volltexten für erforderliche Maßnahmen und offene Angaben.
 - Eigene PDF-Ausgabe für den EN-378-Sicherheitsbericht.
+- Speichern, Laden und Löschen von EN-378-Bewertungen über den zentralen saved-record-Vertrag.
 
 ## Eingabeführung
 
@@ -65,6 +68,22 @@ Sichtbare Oberfläche und PDF-Bericht verwenden deutsche Volltexte. Interne Schl
 
 Lange deutsche Texte werden wortweise beziehungsweise mit zulässiger Silbentrennung umbrochen. Eine Trennung einzelner Buchstaben ist nicht zulässig.
 
+## Release-Readiness
+
+Die PR- und Release-Freigabe für Version 1.6.0 ist zusätzlich in `docs/releases/1.6.0-pr-readiness.md` dokumentiert.
+
+Vor Merge sind insbesondere manuell zu prüfen:
+
+- F-Gase-Anlage speichern,
+- EN 378 öffnen,
+- Anlage importieren,
+- Bewertung durchführen,
+- EN-378-Bewertung speichern,
+- gespeicherte Bewertung laden,
+- gespeicherte Bewertung löschen,
+- PDF erzeugen,
+- UI und PDF auf deutsche Volltexte prüfen.
+
 ## Qualitätsnachweise
 
 Relevante Tests:
@@ -83,6 +102,8 @@ Release-Gates:
 npm run version:check
 npm run precache:check
 npm run audit:release-readiness
+npm run audit:en378
 npm run lint
 npm test
+npm run release:verify
 ```
