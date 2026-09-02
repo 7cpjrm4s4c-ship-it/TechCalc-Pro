@@ -30,10 +30,25 @@ function createStateAdapter(id, moduleState, migrate = value => clone(value || {
   });
 }
 
+const fGasesCheckAdapter = createStateAdapter('f-gases-check', fGasesCheckState);
+const en378SafetyCheckAdapter = createStateAdapter('en-378-safety-check', en378SafetyCheckState);
+
+const floodingVerificationAdapter = Object.freeze({
+  id: 'flooding-verification',
+  read: () => ({ state: floodingVerificationState.get() }),
+  apply: moduleData => {
+    const incoming = moduleData?.state;
+    if (incoming && typeof incoming === 'object') {
+      floodingVerificationState.replace(migrateFloodingVerificationState(incoming), { notify: false });
+    }
+  },
+  reset: () => floodingVerificationState.reset()
+});
+
 const adapters = Object.freeze([
-  createStateAdapter('f-gases-check', fGasesCheckState),
-  createStateAdapter('en-378-safety-check', en378SafetyCheckState),
-  createStateAdapter('flooding-verification', floodingVerificationState, migrateFloodingVerificationState)
+  fGasesCheckAdapter,
+  en378SafetyCheckAdapter,
+  floodingVerificationAdapter
 ]);
 
 export function appendProjectModuleStates(data = {}) {
