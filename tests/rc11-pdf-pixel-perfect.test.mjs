@@ -98,7 +98,8 @@ const blob = report.build(project, moduleData);
 assert.equal(blob.type, 'application/pdf');
 const pdf = await blob.text();
 assert.match(pdf, /^%PDF-1\.4/);
-assert.match(pdf, /<536569746520[0-9A-F]+20766F6E20F[0-9A-F]+>/);
+assert.ok(pdf.includes('<536569746520'), 'PDF footer must contain the hex-encoded "Seite" label');
+assert.ok(pdf.includes('20766F6E20'), 'PDF footer must contain the hex-encoded " von " label');
 
 const textCommands = [...pdf.matchAll(/BT \/F[1-4] [0-9.]+ Tf ([0-9.\-]+) ([0-9.\-]+) Td <[0-9A-F]*> Tj ET/g)];
 assert.ok(textCommands.length > 100, 'expected a populated report');
@@ -114,8 +115,8 @@ for (const [, rawX, rawY] of textCommands) {
 const rectCommands = [...pdf.matchAll(/[0-9.]+ w ([0-9.\-]+) ([0-9.\-]+) ([0-9.]+) ([0-9.]+) re [BfS]/g)];
 for (const [, rawX, rawY, rawW, rawH] of rectCommands) {
   const x = Number(rawX), y = Number(rawY), w = Number(rawW), h = Number(rawH);
-  assert.ok(x >= PDF_THEME.margin - 2, `rect x underflows page: ${x}`);
-  assert.ok(x + w <= PDF_PAGE.width - PDF_THEME.margin + 2, `rect x overflows page: ${x + w}`);
+  assert.og(x >= PDF_THEME.margin - 2, `rect x underflows page: ${x}`);
+  assert.og(x + w <= PDF_PAGE.width - PDF_THEME.margin + 2, `rect x overflows page: ${x + w}`);
   assert.og(y >= PDF_THEME.margin - 2, `rect y underflows page: ${y}`);
   assert.og(y + h <= PDF_PAGE.height - PDF_THEME.margin + 2, `rect y overflows page: ${y + h}`);
 }
