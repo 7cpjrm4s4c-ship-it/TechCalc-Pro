@@ -1,11 +1,12 @@
 ## Version 1.6.1 – PDF Adapter Unification
 ### Verbesserungen
-- Die Typed-DTO-PDF-Abschnittserzeugung verwendet jetzt eine zentrale Builder-Registrierung.
-- Überflutungsnachweis, Regenwasser und F-Gase-Check laufen über denselben zentralen PDF-Dispatchpfad.
-- Der bisherige Sonderpfad für den Überflutungsnachweis wurde entfernt, ohne den Legacy-DOM-Fallback zu verändern.
+- Alle Module verwenden für den PDF-Export den zentralen Typed-DTO-Report-Adapter.
+- Die Typed-DTO-PDF-Abschnittserzeugung verwendet eine zentrale Builder-Registrierung mit generischem Fallback für typisierte Modul-DTOs ohne Speziallayout.
+- Überflutungsnachweis, Regenwasser, F-Gase-Check und EN 378 bleiben mit fachlichen PDF-Section-Buildern zentral registriert.
+- Der bisherige Legacy-DOM-PDF-Export wurde entfernt; fehlende Typed-DTO-Adapter werden nicht mehr stillschweigend über DOM-Auswertung ersetzt.
 ### Qualität
-- Regressionstest für die zentrale PDF-Engine-Dispatchlogik ergänzt und in das Fast-Test-Gate aufgenommen.
-
+- Der PDF-Export verwendet den vom Moduladapter zwischengespeicherten Berechnungs- und Ergebnisstand und stößt keine neue Fachberechnung an.
+- Regressionstest für die zentrale Typed-DTO-PDF-Engine ergänzt und in das Fast-Test-Gate aufgenommen.
 ## Version 1.6.0 – EN 378 Sicherheitscheck
 ### Neu
 - EN-378-Sicherheitscheck als eigenständiges Modul für die sicherheitstechnische Bewertung von Kälte-, Klima- und Wärmepumpenanlagen integriert.
@@ -24,7 +25,6 @@
 - Gespeicherte F-Gase-Anlagen-Snapshots werden nun in Projektdaten übernommen und nach dem Laden wieder bereitgestellt.
 - EN-378-Bewertungen behalten importierte Anlagenstände, gespeicherte Bewertungseinträge und PDF-Daten projektübergreifend bei.
 - Der bestehende Flooding-Projektadaptervertrag bleibt trotz zusätzlicher Moduladapter unverändert erhalten.
-
 ## Version 1.5.1 – PDF-Branding
 ### Neu
 - TechCalc-Pro-Branding kann in den Projekteinstellungen für den PDF-Export gezielt ein- oder ausgeblendet werden.
@@ -35,7 +35,6 @@
 - Die Branding-Option wird als kompakter iOS-orientierter Toggle-Switch dargestellt und ist für Light und Dark Mode abgestimmt.
 - Tastaturfokus und bestehende Bedienbarkeit der PDF-Einstellungen bleiben erhalten.
 ## Version 1.5.0 – F-Gase-Check
-
 ### Neu
 - F-Gase-Check für Kälte-, Klima- und Wärmepumpenanlagen integriert.
 - Gemeinsame Kältemittelplattform mit GWP-, Sicherheitsklassen- und regulatorischen Daten ergänzt.
@@ -51,7 +50,6 @@
 - Leere Kältemittelzustände können das F-Gase-Modul nicht mehr beim Laden abbrechen.
 - Hermetische Ausnahme nach § 2 Abs. 3 ChemKlimaschutzV wird nur bei erfülltem Status und Kennzeichnung angewendet.
 - Service- und Quotenhinweis sind fachlich getrennt und konsistent beschriftet.
-
 ## Version 1.4.0 – Final Release
 ### Freigabe
 TechCalc Pro 1.4.0 ist als Produktionsversion freigegeben. Der Überflutungs- und Rückhaltenachweis sowie alle zugehörigen Qualitäts-, Plattform- und PDF-Arbeiten sind abgeschlossen.

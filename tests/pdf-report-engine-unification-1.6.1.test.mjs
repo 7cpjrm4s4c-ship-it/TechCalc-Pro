@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const pdfDataMappingSource = read('js/core/pdf/pdfDataMapping.js');
+const typedDtoReportAdapterSource = read('js/core/typedDtoReportAdapter.js');
 const serviceWorkerSource = read('service-worker.js');
 const appSource = read('js/core/app.js');
 
@@ -31,6 +32,11 @@ assert.match(
 );
 assert.doesNotMatch(pdfDataMappingSource, /collectLegacyDomModule|extractCardRows|data-pdf-field|querySelector(All)?\(/, 'PDF data mapping must not contain legacy DOM export collectors');
 assert.doesNotMatch(pdfDataMappingSource, /reportSource:\s*'legacy-dom'/, 'legacy DOM report source must be removed');
+assert.doesNotMatch(
+  typedDtoReportAdapterSource.match(/function report[\s\S]*?\n  \}/)?.[0] || '',
+  /calculate\s*\(/,
+  'typed DTO report() must not trigger module calculations'
+);
 
 const expectedBuilderRegistry = {
   'techcalc.flooding-verification.report': 'buildFloodingReportSections',
@@ -61,6 +67,8 @@ for (const moduleIndexPath of moduleIndexPaths) {
   assert.doesNotMatch(source, /function\s+report[\s\S]*?calculate\s*\(/, `${moduleIndexPath} must not calculate inside report()`);
 }
 
+assert.match(read('js/modules/f-gases-check/reportAdapter.js'), /resultModel = null/, 'F-Gase report DTO must accept the cached result model');
+assert.match(read('js/modules/en-378-safety-check/reportAdapter.js'), /resultModel = null/, 'EN 378 report DTO must accept the cached result model');
 assert.match(appSource, /flooding-verification/);
 assert.match(appSource, /rainwater/);
 assert.match(appSource, /f-gases-check/);
