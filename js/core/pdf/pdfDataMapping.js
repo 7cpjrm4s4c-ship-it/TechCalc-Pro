@@ -6,7 +6,6 @@ import { buildFGasesReportSections } from './fGasesReportSections.js';
 import { buildEN378ReportSections } from './en378ReportSections.js';
 import { buildVentilationReportSections } from './ventilationReportSections.js';
 import { buildGenericReportSections } from './genericReportSections.js';
-
 function resolveRuntimeModule(registryEntry) {
   return registryEntry?.module?.loadedModule || registryEntry?.module || registryEntry?.loadedModule || registryEntry;
 }
@@ -16,31 +15,24 @@ function reportIdentity(id = '', reportDto = {}) {
 }
 
 function isSpecialReportHeadingModule(id = '', reportDto = {}) {
-  return /flooding-verification|hx|h,x|f-gases-check|en-378-safety-check/i.test(reportIdentity(id, reportDto));
+  return /flooding-verification|hx|h,x/i.test(reportIdentity(id, reportDto));
 }
 
 function specialReportHeading(id = '', reportDto = {}) {
   const identity = reportIdentity(id, reportDto);
   if (/f-gases-check|f-gases|f-gase/i.test(identity)) return 'Informationsblatt';
   if (/en-378-safety-check|en\s*378/i.test(identity)) return 'Sicherheitsdatenblatt';
-  return reportDto?.metadata?.reportHeading;
+  return '';
 }
 
 function normalizeCollectedReportDto(reportDto, id) {
-  if (isSpecialReportHeadingModule(id, reportDto)) {
-    return {
-      ...reportDto,
-      metadata: {
-        ...reportDto.metadata,
-        reportHeading: specialReportHeading(id, reportDto) || reportDto.metadata?.reportHeading
-      }
-    };
-  }
+  if (isSpecialReportHeadingModule(id, reportDto)) return reportDto;
+  const heading = specialReportHeading(id, reportDto) || 'Berechnungsprotokoll';
   return {
     ...reportDto,
     metadata: {
       ...reportDto.metadata,
-      reportHeading: 'Berechnungsprotokoll'
+      reportHeading: heading
     }
   };
 }
@@ -48,14 +40,12 @@ function normalizeCollectedReportDto(reportDto, id) {
 function isDesignationKey(key = '') {
   return key === 'bezeichnung' || /^bezeichnung\s*\d+$/.test(key);
 }
-
 export function collectCurrentModule(modulesRef, routeGetter) {
   const id = typeof routeGetter === 'function' ? routeGetter() : currentRoute();
   const registryEntry = modulesRef?.get?.(id);
   const module = resolveRuntimeModule(registryEntry);
   const report = module?.report || registryEntry?.report;
   const state = module?.state || registryEntry?.state;
-
   if (typeof report !== 'function') {
     throw new Error(`PDF-Report-Adapter für ${id || 'das aktuelle Modul'} fehlt. Legacy-DOM-Export ist deaktiviert.`);
   }
@@ -65,29 +55,25 @@ export function collectCurrentModule(modulesRef, routeGetter) {
   if (!reportDto || typeof reportDto !== 'object' || !reportDto.metadata?.dtoType) {
     throw new Error(`PDF-Report-Adapter für ${id || 'das aktuelle Modul'} lieferte kein gültiges Typed-DTO.`);
   }
-
   const normalizedReportDto = normalizeCollectedReportDto(reportDto, id);
-
   return {
     id,
     title: registryEntry?.title || module?.title || module?.config?.title || normalizedReportDto.metadata?.moduleTitle || id || 'Modul',
     shortTitle: registryEntry?.shortTitle || module?.shortTitle || module?.config?.shortTitle || normalizedReportDto.metadata?.moduleTitle || id || 'Modul',
     sections: [],
-    chartSvg: normalizedReportDto.chartSvg || normalizedReportDto.diagramSvg || '',
-    chartCanvas: normalizedReportDto.chartCanvas || null,
+    chartSvg: '',
+    chartCanvas: null,
     reportDto: normalizedReportDto,
     reportSource: 'typed-dto'
   };
 }
-
 export function sectionTitle(title) {
   const normalized = sanitizeText(title);
   if (/ergebnis\s*zusammenfassung/i.test(normalized)) return 'Zielzustand';
   return normalized;
 }
 
-export function isLineSectionTitle(title = '') { return /leitungsabschnitt|rohrauslegung/i.test(sanitizeText(title)); }
-
+export function isLineSectionTitle(title = '') { return /leitungsabschnitt|rohrauslegung|speicher|gespeicherte/i.test(sanitizeText(title)); }
 export function lineSectionItems(rows = []) {
   const items = [];
   let current = [];
@@ -118,7 +104,6 @@ export function lineSectionItems(rows = []) {
   if (!items.length && hasRows(rows)) items.push({ title: 'Leitungsabschnitt 1', rows });
   return items;
 }
-
 function normalizePdfRows(rows = [], title = '') {
   const normalizedTitle = normalizeKey(title);
   const seenGenericLabels = new Map();
@@ -134,7 +119,6 @@ function normalizePdfRows(rows = [], title = '') {
       return row;
     });
 }
-
 const typedReportSectionBuilders = Object.freeze({
   'techcalc.flooding-verification.report': buildFloodingReportSections,
   'techcalc.rainwater.report': buildRainwaterReportSections,
@@ -142,26 +126,18 @@ const typedReportSectionBuilders = Object.freeze({
   'techcalc.en-378-safety-check.report': buildEN378ReportSections,
   'techcalc.ventilation.report': buildVentilationReportSections
 });
-
 function buildTypedDtoReportSections(reportDto = {}) {
   const dtoType = reportDto.metadata?.dtoType;
   const buildSections = typedReportSectionBuilders[dtoType] || buildGenericReportSections;
   return buildSections(reportDto);
 }
-
 export function reportSections(moduleData) {
   if (moduleData?.reportSource !== 'typed-dto' || !moduleData.reportDto) {
     throw new Error('PDF-Export benötigt ein Typed-DTO. Legacy-DOM-Export ist deaktiviert.');
   }
-  let sections;
-  if (moduleData.reportDto?.metadata?.dtoType === 'techcalc.flooding-verification.report') {
-    sections = buildFloodingReportSections(moduleData.reportDto);
-  } else {
-    sections = buildTypedDtoReportSections(moduleData.reportDto);
-  }
+  const sections = buildTypedDtoReportSections(moduleData.reportDto);
   return sections.map(section => ({ ...section, rows: normalizePdfRows(section.rows, section.title) }));
 }
-
 export function pdfFileName(moduleData = {}) {
   const safeTitle = sanitizeText(moduleData.shortTitle || moduleData.title || 'Berechnung').replace(/[^a-z0-9äöüß -]+/gi, '').trim() || 'Berechnung';
   return `TechCalc Pro - ${safeTitle}.pdf`;
