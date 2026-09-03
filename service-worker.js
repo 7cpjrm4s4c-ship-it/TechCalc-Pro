@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.6.0';
-const CACHE_REVISION = '1.6.0-version-1-6-0-en-378-sicherheitscheck';
+const CACHE_NAME = 'techcalc-pro-1.6.1';
+const CACHE_REVISION = '1.6.1-version-1-6-1-pdf-adapter-unification';
 const ASSETS = [
   './',
   './index.html',
@@ -308,7 +308,6 @@ const ASSETS = [
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
 });
-
 self.addEventListener('message', event => {
   if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
