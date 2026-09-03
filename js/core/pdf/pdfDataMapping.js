@@ -6,132 +6,47 @@ import { buildFGasesReportSections } from './fGasesReportSections.js';
 import { buildEN378ReportSections } from './en378ReportSections.js';
 import { buildGenericReportSections } from './genericReportSections.js';
 
-function textOf(node) { return sanitizeText(node?.textContent || ''); }
-function valueOfField(field) {
-  const control = field.querySelector('input, select, textarea');
-  if (!control) return '';
-  if (control.matches('select')) return sanitizeText(control.selectedOptions?.[0]?.textContent || control.value);
-  return sanitizeText(control.value);
-}
-function unitOfField(field) {
-  const unitSelect = field.querySelector('.unit-select');
-  if (unitSelect) return sanitizeText(unitSelect.selectedOptions?.[0]?.textContent || unitSelect.value);
-  const unit = field.querySelector('.unit:not(.unit-select)');
-  return unit ? textOf(unit) : '';
-}
-export function extractCardRows(card) {
-  const rows = [];
-  card.querySelectorAll(':scope .field').forEach(field => {
-    const label = textOf(field.querySelector('label'));
-    const value = valueOfField(field);
-    const unit = unitOfField(field);
-    if (label || value || unit) rows.push([label, value, unit, '']);
-  });
-  card.querySelectorAll(':scope .main-result, :scope .inline-stat, :scope .result-row').forEach(result => {
-    if (result.closest('.saved-record-card, [data-saved-record-card], [data-line-card]')) return;
-    const label = textOf(result.querySelector('span'));
-    const strong = result.querySelector('strong');
-    const small = strong?.querySelector('small');
-    const raw = textOf(strong);
-    const unit = small ? textOf(small) : '';
-    const value = unit ? raw.replace(unit, '').trim() : raw;
-    if (label || value) rows.push([label, value, unit, '']);
-  });
-  card.querySelectorAll(':scope .saved-record-card, :scope [data-saved-record-card], :scope [data-line-card]').forEach((record, index) => {
-    const title = textOf(record.querySelector('.saved-record-card__title strong, .line-section-card__title strong'))
-      || textOf(record.querySelector('.saved-record-card__title, .line-section-card__title'))
-      || sanitizeText(record.getAttribute('aria-label') || '')
-      || `Leitungsabschnitt ${index + 1}`;
-    if (title) rows.push(['Bezeichnung', title, '', '']);
-    record.querySelectorAll(':scope .inline-stat, :scope .result-row').forEach(stat => {
-      const label = textOf(stat.querySelector('span'));
-      const strong = stat.querySelector('strong');
-      const small = strong?.querySelector('small');
-      const raw = textOf(strong);
-      const unit = small ? textOf(small) : '';
-      const value = unit ? raw.replace(unit, '').trim() : raw;
-      if (label || value) rows.push([label, value, unit, '']);
-    });
-  });
-  card.querySelectorAll(':scope .hx-process-step').forEach((step, index) => {
-    const rawLabel = textOf(step.querySelector('strong')) || `Punkt ${index + 1}`;
-    const normalizedLabel = rawLabel.match(/^\d+\s+/) ? rawLabel : `${index + 1} ${rawLabel}`;
-    const values = [...step.querySelectorAll('span')].map(textOf).join(' | ');
-    rows.push([normalizedLabel, values, '', '']);
-  });
-  card.querySelectorAll(':scope .pipe-dimension-card').forEach((dim, index) => {
-    const title = textOf(dim.querySelector('strong')) || `Dimension ${index + 1}`;
-    const meta = textOf(dim.querySelector('.pipe-dimension-card__meta'));
-    rows.push([title, meta, '', '']);
-  });
-  return rows;
-}
-function isChartCard(card) {
-  return Boolean(card.querySelector('.hx-chart, svg, canvas')) && /diagramm/i.test(textOf(card.querySelector('.card__title')));
-}
-function collectLegacyDomModule(module, id) {
-  const app = document.getElementById('app');
-  const cards = [...(app?.querySelectorAll('.card') || [])];
-  const sections = [];
-  let chartSvg = '';
-  let chartCanvas = null;
-  cards.forEach(card => {
-    const title = textOf(card.querySelector(':scope > .card__title'));
-    if (!title) return;
-    const rows = extractCardRows(card);
-    if (isChartCard(card)) {
-      const svg = card.querySelector('svg.hx-chart, .hx-chart svg, svg');
-      const canvas = card.querySelector('canvas');
-      chartSvg = svg ? svg.outerHTML : chartSvg;
-      chartCanvas = canvas || chartCanvas;
-      if (rows.length) sections.push({ title: `${title} – Prozesspunkte`, rows });
-      return;
-    }
-    if (rows.length) sections.push({ title, rows });
-  });
-  if (!chartSvg) {
-    const svg = app?.querySelector?.('svg.hx-chart, .hx-chart svg');
-    chartSvg = svg ? svg.outerHTML : '';
-  }
-  if (!chartCanvas) chartCanvas = app?.querySelector?.('.hx-chart canvas, canvas.hx-chart') || null;
-  return {
-    id,
-    title: module?.title || module?.config?.title || id || 'Modul',
-    shortTitle: module?.shortTitle || module?.title || id || 'Modul',
-    sections,
-    chartSvg,
-    chartCanvas,
-    reportDto: null,
-    reportSource: 'legacy-dom'
-  };
-}
 function resolveRuntimeModule(registryEntry) {
   return registryEntry?.module?.loadedModule || registryEntry?.module || registryEntry?.loadedModule || registryEntry;
 }
+
 export function collectCurrentModule(modulesRef, routeGetter) {
   const id = typeof routeGetter === 'function' ? routeGetter() : currentRoute();
   const registryEntry = modulesRef?.get?.(id);
   const module = resolveRuntimeModule(registryEntry);
   const report = module?.report || registryEntry?.report;
   const state = module?.state || registryEntry?.state;
-  if (typeof report === 'function') {
-    const reportDto = report(state?.get?.() || {});
-    if (!reportDto || typeof reportDto !== 'object') throw new Error(`Report-Adapter für ${id} lieferte kein gültiges DTO.`);
-    return {
-      id,
-      title: registryEntry?.title || module?.title || module?.config?.title || reportDto.metadata?.moduleTitle || id || 'Modul',
-      shortTitle: registryEntry?.shortTitle || module?.shortTitle || module?.title || module?.config?.shortTitle || reportDto.metadata?.moduleTitle || id || 'Modul',
-      sections: [], chartSvg: '', chartCanvas: null, reportDto, reportSource: 'typed-dto'
-    };
+
+  if (typeof report !== 'function') {
+    throw new Error(`PDF-Report-Adapter für ${id || 'das aktuelle Modul'} fehlt. Legacy-DOM-Export ist deaktiviert.`);
   }
-  return collectLegacyDomModule(registryEntry || module, id);
+
+  const snapshot = state?.get?.() || {};
+  const reportDto = report(snapshot);
+  if (!reportDto || typeof reportDto !== 'object' || !reportDto.metadata?.dtoType) {
+    throw new Error(`PDF-Report-Adapter für ${id || 'das aktuelle Modul'} lieferte kein gültiges Typed-DTO.`);
+  }
+
+  return {
+    id,
+    title: registryEntry?.title || module?.title || module?.config?.title || reportDto.metadata?.moduleTitle || id || 'Modul',
+    shortTitle: registryEntry?.shortTitle || module?.shortTitle || module?.config?.shortTitle || reportDto.metadata?.moduleTitle || id || 'Modul',
+    sections: [],
+    chartSvg: '',
+    chartCanvas: null,
+    reportDto,
+    reportSource: 'typed-dto'
+  };
 }
+
 export function sectionTitle(title) {
   const normalized = sanitizeText(title);
   if (/ergebnis\s*zusammenfassung/i.test(normalized)) return 'Zielzustand';
   return normalized;
 }
+
 export function isLineSectionTitle(title = '') { return /leitungsabschnitt|rohrauslegung|speicher|gespeicherte/i.test(sanitizeText(title)); }
+
 export function lineSectionItems(rows = []) {
   const items = [];
   let current = [];
@@ -162,6 +77,7 @@ export function lineSectionItems(rows = []) {
   if (!items.length && hasRows(rows)) items.push({ title: 'Leitungsabschnitt 1', rows });
   return items;
 }
+
 function normalizePdfRows(rows = [], title = '') {
   const normalizedTitle = normalizeKey(title);
   const seenGenericLabels = new Map();
@@ -177,33 +93,29 @@ function normalizePdfRows(rows = [], title = '') {
       return row;
     });
 }
+
 const typedReportSectionBuilders = Object.freeze({
   'techcalc.flooding-verification.report': buildFloodingReportSections,
   'techcalc.rainwater.report': buildRainwaterReportSections,
   'techcalc.f-gases-check.report': buildFGasesReportSections,
   'techcalc.en-378-safety-check.report': buildEN378ReportSections
 });
+
 function buildTypedDtoReportSections(reportDto = {}) {
   const dtoType = reportDto.metadata?.dtoType;
   const buildSections = typedReportSectionBuilders[dtoType] || buildGenericReportSections;
   return buildSections(reportDto);
 }
+
 export function reportSections(moduleData) {
-  if (moduleData?.reportSource === 'typed-dto' && moduleData.reportDto) {
-    const sections = buildTypedDtoReportSections(moduleData.reportDto);
-    return sections.map(section => ({ ...section, rows: normalizePdfRows(section.rows, section.title) }));
+  if (moduleData?.reportSource !== 'typed-dto' || !moduleData.reportDto) {
+    throw new Error('PDF-Export benötigt ein Typed-DTO. Legacy-DOM-Export ist deaktiviert.');
   }
-  const sections = Array.isArray(moduleData?.sections) ? moduleData.sections : [];
-  const isHxDiagram = /hx|h,x/i.test(`${moduleData.id || ''} ${moduleData.title || ''}`);
-  const hasLineSections = !isHxDiagram && sections.some(section => isLineSectionTitle(sectionTitle(section.title)));
-  const printableSections = hasLineSections ? sections.filter(section => isLineSectionTitle(sectionTitle(section.title))) : sections;
-  return printableSections.map(section => {
-    const title = sectionTitle(section.title).replace(/Parameter/g, 'Bezeichnung');
-    const rows = normalizePdfRows(section.rows, title);
-    return { title, rows, isLineSection: isLineSectionTitle(title) };
-  });
+  const sections = buildTypedDtoReportSections(moduleData.reportDto);
+  return sections.map(section => ({ ...section, rows: normalizePdfRows(section.rows, section.title) }));
 }
-export function pdfFileName(moduleData) {
+
+export function pdfFileName(moduleData = {}) {
   const safeTitle = sanitizeText(moduleData.shortTitle || moduleData.title || 'Berechnung').replace(/[^a-z0-9äöüß -]+/gi, '').trim() || 'Berechnung';
   return `TechCalc Pro - ${safeTitle}.pdf`;
 }

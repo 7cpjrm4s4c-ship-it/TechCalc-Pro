@@ -5,6 +5,7 @@ import { calculate } from './logic.js';
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { createWastewaterDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
 import {
   bindWastewaterCollections,
   buildWastewaterRecord,
@@ -14,6 +15,8 @@ import {
 } from './controller.js';
 import { createWastewaterView } from './view.js';
 
+const typedReportAdapter = createTypedDtoReportAdapter({ config, schema, state, calculate });
+const calculateForReport = typedReportAdapter.calculate;
 const lineSectionController = createLineSectionController({
   state,
   listKey: 'savedCalculations',
@@ -30,15 +33,14 @@ const lineSectionController = createLineSectionController({
   title: item => item.name || 'Berechnung',
   subtitle: wastewaterSavedSubtitle,
   stats: wastewaterSavedStats,
-  currentResult: () => calculate(state.get()),
+  currentResult: () => calculateForReport(state.get()),
   buildRecord: ({ currentState, result, items, id, name, existing }) => buildWastewaterRecord(currentState, result, items, id, name, existing),
   hydrateRecord: ({ item, currentState }) => hydrate(item, currentState)
 });
-
-const { view, dynamicRenderers } = createWastewaterView(config, calculate, lineSectionController);
+const { view, dynamicRenderers } = createWastewaterView(config, calculateForReport, lineSectionController);
 
 const wastewaterDynamicRenderer = createWastewaterDynamicRenderer({
-  calculate,
+  calculate: calculateForReport,
   lineSectionController,
   ...dynamicRenderers
 });
@@ -51,7 +53,6 @@ function isDynamicWastewaterAction(meta = {}) {
   const action = String(meta.action || '');
   return action !== 'initial';
 }
-
 function bindWastewaterPlatform(root) {
   lineSectionController.bind(root);
   bindWastewaterCollections(root);
@@ -62,9 +63,10 @@ export default createPlatformModule({
   schema,
   state,
   initialState,
-  calculate,
+  calculate: calculateForReport,
   view,
   bind: bindWastewaterPlatform,
   dynamicUpdate: updateWastewaterDynamic,
-  isDynamicAction: isDynamicWastewaterAction
+  isDynamicAction: isDynamicWastewaterAction,
+  report: typedReportAdapter.report
 });

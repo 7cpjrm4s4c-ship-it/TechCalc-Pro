@@ -7,7 +7,7 @@ import { buildFGasesReportDto } from './reportAdapter.js';
 import { buildFGasesSavedRecord, hydrateFGasesSavedRecord, buildFGasesSavedRecordsModel } from './savedRecords.js';
 import { formatRefrigerantLabel, listRefrigerants } from '../../utils/refrigerants/index.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
-
+import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
 const refrigerantOptions = Object.freeze([
   Object.freeze({ value: '', label: 'Bitte wählen' }),
   ...listRefrigerants().map(item => Object.freeze({ value: item.id, label: formatRefrigerantLabel(item) || item.id }))
@@ -19,11 +19,14 @@ const runtimeSchema = Object.freeze({
     ? Object.freeze({ ...field, options: refrigerantOptions })
     : field))
 });
-
-function report(snapshot = state.get()) {
-  return buildFGasesReportDto({ state: snapshot, calculation: calculate(snapshot) });
-}
-
+const typedReportAdapter = createTypedDtoReportAdapter({
+  config,
+  schema: runtimeSchema,
+  state,
+  calculate,
+  results: buildFGasesResultModel,
+  buildReportDto: buildFGasesReportDto
+});
 const controller = Object.freeze({
   savedRecords: Object.freeze({
     enabled: true,
@@ -41,15 +44,14 @@ const controller = Object.freeze({
     hydrate: item => hydrateFGasesSavedRecord(item)
   })
 });
-
 export default createPlatformModule({
   config,
   schema: runtimeSchema,
   state,
   initialState,
-  calculate,
+  calculate: typedReportAdapter.calculate,
   results: buildFGasesResultModel,
-  report,
+  report: typedReportAdapter.report,
   savedRecords: snapshot => buildFGasesSavedRecordsModel(snapshot),
   controller
 });

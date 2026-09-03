@@ -3,6 +3,7 @@ import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
 import { createPressureHoldingDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { fmtInput } from '../../utils/calculations.js';
 import { bindPressureHoldingActions, savedPlantsCard } from './controller.js';
@@ -15,8 +16,10 @@ import {
   resultContent
 } from './viewModel.js';
 
+const typedReportAdapter = createTypedDtoReportAdapter({ config, schema, state, calculate });
+const calculateForReport = typedReportAdapter.calculate;
 const pressureHoldingDynamicRenderer = createPressureHoldingDynamicRenderer({
-  calculate,
+  calculate: calculateForReport,
   fmtInput,
   renderBasis: basisContent,
   renderVolumeFields: volumeFieldsContent,
@@ -26,10 +29,14 @@ const pressureHoldingDynamicRenderer = createPressureHoldingDynamicRenderer({
   renderResult: resultContent
 });
 
-function updatePressureHoldingDynamic(root, s, meta = {}) {
-  pressureHoldingDynamicRenderer.update(root, s, meta);
+function renderTypedView(snapshot) {
+  calculateForReport(snapshot);
+  return view(snapshot);
 }
 
+function updatePressureHoldingDynamic(root, snapshot, meta = {}) {
+  pressureHoldingDynamicRenderer.update(root, snapshot, meta);
+}
 function isDynamicPressureHoldingAction(meta = {}) {
   return String(meta.action || '') !== 'initial';
 }
@@ -38,9 +45,10 @@ export default createPlatformModule({
   config,
   schema,
   state,
-  calculate,
-  view,
-  bind: root => bindPressureHoldingActions(root, { state, calculate }),
+  calculate: calculateForReport,
+  view: renderTypedView,
+  bind: root => bindPressureHoldingActions(root, { state, calculate: calculateForReport }),
   dynamicUpdate: updatePressureHoldingDynamic,
-  isDynamicAction: isDynamicPressureHoldingAction
+  isDynamicAction: isDynamicPressureHoldingAction,
+  report: typedReportAdapter.report
 });

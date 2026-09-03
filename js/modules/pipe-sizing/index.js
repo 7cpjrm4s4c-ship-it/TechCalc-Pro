@@ -3,33 +3,41 @@ import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
 import { createPipeSizingDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { bindPipeSizingActions, pipeSaveCard } from './controller.js';
 import { view } from './view.js';
 import { inputContent, resultContent } from './viewModel.js';
 
+const typedReportAdapter = createTypedDtoReportAdapter({ config, schema, state, calculate });
+const calculateForReport = typedReportAdapter.calculate;
 const pipeSizingDynamicRenderer = createPipeSizingDynamicRenderer({
-  calculate,
+  calculate: calculateForReport,
   renderInput: inputContent,
   renderSavedPanel: pipeSaveCard,
   renderResult: resultContent
 });
 
-function updatePipeSizingDynamic(root, s, meta = {}) {
-  pipeSizingDynamicRenderer.update(root, s, meta);
+function renderTypedView(snapshot) {
+  calculateForReport(snapshot);
+  return view(snapshot);
+}
+
+function updatePipeSizingDynamic(root, snapshot, meta = {}) {
+  pipeSizingDynamicRenderer.update(root, snapshot, meta);
 }
 
 function isDynamicPipeSizingAction(meta = {}) {
   return String(meta.action || '') !== 'initial';
 }
-
 export default createPlatformModule({
   config,
   schema,
   state,
-  calculate,
-  view,
+  calculate: calculateForReport,
+  view: renderTypedView,
   bind: bindPipeSizingActions,
   dynamicUpdate: updatePipeSizingDynamic,
-  isDynamicAction: isDynamicPipeSizingAction
+  isDynamicAction: isDynamicPipeSizingAction,
+  report: typedReportAdapter.report
 });
