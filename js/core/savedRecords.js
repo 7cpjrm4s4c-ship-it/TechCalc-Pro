@@ -8,7 +8,6 @@ export function createRecordId(prefix = 'record') {
   } catch { /* ignore */ }
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 }
-
 export function isSameId(a, b) {
   return String(a ?? '') === String(b ?? '');
 }
@@ -21,7 +20,6 @@ export function replaceRecord(items, id, nextRecord) {
 export function removeRecord(items, id) {
   return (Array.isArray(items) ? items : []).filter(item => !isSameId(item.id, id));
 }
-
 export function renderSavedRecordList(items = [], {
   activeId = null,
   expandedId = null,
@@ -70,12 +68,11 @@ export function renderSavedRecordPanel({
 } = {}) {
   const body = [
     `<div class="field"><label for="${esc(nameFieldId)}">${esc(nameLabel)}</label><div class="control"><input id="${esc(nameFieldId)}" data-field="${esc(nameFieldId)}" value="${esc(nameValue)}" placeholder="${esc(namePlaceholder)}" inputmode="text"></div></div>`,
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-tc-action="${esc(addAction)}" data-line-save ${addDisabled ? 'disabled' : ''}>${esc(addLabel)}</button><button type="button" class="action-button action-button--secondary" data-tc-action="${esc(updateAction)}" data-line-update ${updateDisabled ? 'disabled' : ''}>${esc(updateLabel)}</button></div>`,
+    `<div class="tc-save-actions"><button type="button" class="action-button" data-tc-action="${esc(addAction)}" data-line-save ${addDisabled ? 'disabled' : ''}>${esc(addLabel)}</button><button type="button" class="action-button" data-tc-action="${esc(updateAction)}" data-line-update ${updateDisabled ? 'disabled' : ''}>${esc(updateLabel)}</button></div>`,
     listHtml || `<div class="empty-state empty-state--compact">Noch keine Einträge gespeichert.</div>`
   ].join('');
   return `<section class="card card--${esc(accent)} tc-card tc-saved-record-panel"><div class="card__title tc-card__header">${esc(title)}</div><div class="card__body tc-card__body">${body}</div></section>`;
 }
-
 function bindScopedOnce(root, key, eventName, listener, options) {
   root.__tcSavedRecordBindings = root.__tcSavedRecordBindings || new Set();
   const bindingKey = `${key}:${eventName}`;
@@ -88,7 +85,6 @@ function closestAttr(target, attr, root) {
   const item = target?.closest?.(`[${attr}]`);
   return item && root.contains(item) ? item : null;
 }
-
 function shouldIgnoreLoad(event, toggleAttr, deleteAttr) {
   const target = event.target;
   return Boolean(
@@ -97,7 +93,6 @@ function shouldIgnoreLoad(event, toggleAttr, deleteAttr) {
     target?.closest?.('a[href], input, select, textarea, label')
   );
 }
-
 function activateLoad({ root, card, event, loadAttr, onLoad, preserveLoadScroll }) {
   const id = card.getAttribute(loadAttr);
   if (!id) return;
@@ -109,7 +104,6 @@ function activateLoad({ root, card, event, loadAttr, onLoad, preserveLoadScroll 
   if (preserveLoadScroll) preserveSavedRecordScroll(run, { anchor: card, event });
   else run();
 }
-
 export function bindSavedRecordList(root, {
   loadAttr = 'data-saved-load',
   toggleAttr = 'data-saved-toggle',
@@ -121,7 +115,6 @@ export function bindSavedRecordList(root, {
 } = {}) {
   if (!root) return;
   const key = `${loadAttr}|${toggleAttr}|${deleteAttr}`;
-
   const handleActivation = event => {
     const toggle = closestAttr(event.target, toggleAttr, root);
     if (toggle) {
@@ -143,7 +136,6 @@ export function bindSavedRecordList(root, {
       }, { anchor: card, event });
       return true;
     }
-
     const deleteButton = closestAttr(event.target, deleteAttr, root);
     if (deleteButton) {
       event.preventDefault();
@@ -153,7 +145,6 @@ export function bindSavedRecordList(root, {
       onDelete?.(deleteButton.getAttribute(deleteAttr), deleteButton, event);
       return true;
     }
-
     const card = closestAttr(event.target, loadAttr, root);
     if (!card || shouldIgnoreLoad(event, toggleAttr, deleteAttr)) return false;
     activateLoad({ root, card, event, loadAttr, onLoad, preserveLoadScroll });
@@ -185,7 +176,6 @@ export function bindSavedRecordList(root, {
     activateLoad({ root, card, event, loadAttr, onLoad, preserveLoadScroll });
   });
 }
-
 export function bindEditModeClear(root, {
   state,
   activeIdKey,
