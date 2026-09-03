@@ -1,0 +1,115 @@
+import { getModuleStore } from '../../core/centralStore.js';
+import { buildEN378StateFromFGasesSnapshot, validateFGasesSystemSnapshot } from './snapshotImport.js';
+import { canAssessRefrigerantWithEN378 } from './refrigerantCoverage.js';
+
+const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
+
+export const IMPORT_ACTION = 'en378:import-f-gases-snapshot';
+
+function recordId(item = {}, index = 0) {
+  return String(item.id ?? item.savedSystemId ?? item.snapshotId ?? index);
+}
+
+export function listFGasesSavedSystems() {
+  const fgasesStore = getModuleStore('f-gases-check');
+  const fgasesState = fgasesStore?.get?.() || {};
+  return Array.isArray(fgasesState.savedSystems) ? fgasesState.savedSystems : [];
+}
+
+export function hasAnyFGasesSavedSystem() {
+  return listFGasesSavedSystems().length > 0;
+}
+
+export function hasMultipleFGasesSavedSystems() {
+  return listFGasesSavedSystems().length > 1;
+}
+
+export function buildFGasesImportOptions() {
+  const systems = listFGasesSavedSystems();
+  return Object.freeze([
+    Object.freeze({ value: '', label: systems.length ? 'Anlage auswählen' : 'Keine gespeicherte F-Gase-Anlage vorhanden' }),
+    ...systems.map((item, index) => Object.freeze({
+      value: recordId(item, index),
+      label: item.name || item.title || `F-Gase-Anlage ${index + 1}`
+    }))
+  ]);
+}
+
+export function getFGasesSavedSystemById(id) {
+  const systems = listFGasesSavedSystems();
+  return systems.find((item, index) => recordId(item, index) === String(id ?? '')) || null;
+}
+
+function selectImportCandidate(currentState = {}) {
+  const selectedId = currentState.fGasesSnapshotId || '';
+  const selected = selectedId ? getFGasesSavedSystemById(selectedId) : null;
+  if (selected) return selected;
+  const systems = listFGasesSavedSystems();
+  return systems.length === 1 ? systems[0] : null;
+}
+
+function selectedRecordId(candidate = {}) {
+  const systems = listFGasesSavedSystems();
+  const index = systems.indexOf(candidate);
+  return recordId(candidate, index < 0 ? 0 : index);
+}
+
+export function buildFGasesImportPatch(currentState = {}) {
+  const candidate = selectImportCandidate(currentState);
+  if (!candidate) {
+    return Object.freeze({
+      importStatus: 'rejected',
+      importErrors: Object.freeze(['Es wurde keine gespeicherte F-Gase-Anlage ausgewählt.']),
+      importStatusMessage: 'Bitte wähle eine gespeicherte F-Gase-Anlage aus.'
+    });
+  }
+
+  const snapshot = candidate.systemSnapshot || candidate.importedSnapshot || candidate.snapshot || null;
+  const validation = validateFGasesSystemSnapshot(snapshot || {});
+  if (!validation.isValid) {
+    return Object.freeze({
+      fGasesSnapshotId: selectedRecordId(candidate),
+      importStatus: 'rejected',
+      importErrors: Object.freeze(['Der gespeicherte Anlagenstand kann nicht importiert werden.']),
+      importStatusMessage: 'Der gespeicherte Anlagenstand kann nicht importiert werden. Bitte speichere die Anlage im F-Gase-Modul erneut.'
+    });
+  }
+
+  if (!canAssessRefrigerantWithEN378(snapshot.system?.refrigerantId)) {
+    return Object.freeze({
+      fGasesSnapshotId: selectedRecordId(candidate),
+      importStatus: 'rejected',
+      importErrors: Object.freeze(['Für das Kältemittel liegen keine EN-378-Sicherheitsdaten vor.']),
+      importStatusMessage: 'Für das Kältemittel der gespeicherten Anlage liegen keine EN-378-Sicherheitsdaten vor. Eine Bewertung ist damit nicht belastbar möglich.'
+    });
+  }
+
+  return Object.freeze({
+    fGasesSnapshotId: selectedRecordId(candidate),
+    ...buildEN378StateFromFGasesSnapshot(clone(snapshot), currentState),
+    importStatusMessage: 'Anlage wurde importiert. Die Angaben wurden als Kopie übernommen.'
+  });
+}
+
+export function bindFGasesSnapshotImport(root, moduleState) {
+  if (!root || !moduleState?.set) return;
+  root.addEventListener('click', event => {
+    const button = event.target?.closest?.(`[data-tc-action="${IMPORT_ACTION}"]`);
+    if (!button || !root.contains(button)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const patch = buildFGasesImportPatch(moduleState.get?.() || {});
+    moduleState.set(patch, { action: IMPORT_ACTION, notify: true });
+  });
+}
+
+export default Object.freeze({
+  IMPORT_ACTION,
+  listFGasesSavedSystems,
+  hasAnyFGasesSavedSystem,
+  hasMultipleFGasesSavedSystems,
+  buildFGasesImportOptions,
+  getFGasesSavedSystemById,
+  buildFGasesImportPatch,
+  bindFGasesSnapshotImport
+});

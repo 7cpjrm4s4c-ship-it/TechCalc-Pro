@@ -13,6 +13,7 @@
   --tc-selected-record-border: var(--tc-active-accent);
   --tc-selected-record-shadow: 0 0 0 1px color-mix(in srgb, var(--tc-active-accent) 26%, transparent), 0 10px 22px color-mix(in srgb, var(--tc-active-accent) 13%, transparent);
 }
+
 /* Saved-record selected state, generic across all modules. */
 :root[data-theme='light'] .line-section-card.is-active,
 :root[data-theme='light'] .saved-record-card.is-active,
@@ -35,6 +36,7 @@
   color: var(--tc-light-text) !important;
   -webkit-text-fill-color: var(--tc-light-text) !important;
 }
+
 :root[data-theme='light'] .line-section-card.is-active::before,
 :root[data-theme='light'] .saved-record-card.is-active::before,
 :root[data-theme='light'] .ph-saved-item.is-active::before,
@@ -49,11 +51,13 @@
   opacity: .95;
   pointer-events: none;
 }
+
 :root[data-theme='light'] .line-section-card.is-active .line-section-card__head,
 :root[data-theme='light'] .saved-record-card.is-active .saved-record-card__head,
 :root[data-theme='light'] .ph-saved-item.is-active .line-section-card__head {
   padding-left: 8px;
 }
+
 /* Primary actions: light fill, strong accent border, global dark text. */
 :root[data-theme='light'] .action-button:not(.action-button--secondary):not(.mini-button--danger),
 :root[data-theme='light'] .tc-action:not(.tc-action--ghost),
@@ -67,6 +71,7 @@
   -webkit-text-fill-color: var(--tc-light-text) !important;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc-active-accent) 18%, transparent) !important;
 }
+
 :root[data-theme='light'] .action-button:not(.action-button--secondary):not(.mini-button--danger):hover,
 :root[data-theme='light'] .tc-action:not(.tc-action--ghost):hover,
 :root[data-theme='light'] .primary-button:hover,
@@ -78,6 +83,7 @@
   color: var(--tc-light-text) !important;
   -webkit-text-fill-color: var(--tc-light-text) !important;
 }
+
 :root[data-theme='light'] .action-button:not(.action-button--secondary):not(.mini-button--danger):active,
 :root[data-theme='light'] .tc-action:not(.tc-action--ghost):active,
 :root[data-theme='light'] .primary-button:active,
@@ -86,6 +92,7 @@
 :root[data-theme='light'] button[type='submit']:active {
   background: var(--tc-button-accent-bg-pressed) !important;
 }
+
 :root[data-theme='light'] .action-button[disabled],
 :root[data-theme='light'] .tc-action[disabled],
 :root[data-theme='light'] .mini-button:disabled,
@@ -98,6 +105,7 @@
   filter: none !important;
   box-shadow: none !important;
 }
+
 /* 1.3.2-dev.15: final light-theme save/edit button state guard.
    This deliberately targets disabled attributes, aria-disabled and the central
    JS class so no component-level action-button rule can make disabled actions
@@ -115,6 +123,7 @@
   filter: none !important;
   cursor: not-allowed !important;
 }
+
 :root[data-theme='light'] .tc-save-actions .action-button:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled),
 :root[data-theme='light'] .tc-save-actions .action-button.is-enabled {
   background: var(--tc-button-accent-bg) !important;
@@ -123,6 +132,7 @@
   -webkit-text-fill-color: var(--tc-light-text) !important;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc-active-accent) 18%, transparent) !important;
 }
+
 /* 1.3.2-dev.15: Light Theme save/edit hardening.
    Uses the central edit-mode data contract as the final source for visual states.
    This protects Light Mode against module-level or component-level button rules. */
@@ -137,6 +147,7 @@
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc-active-accent) 18%, transparent) !important;
   cursor: pointer !important;
 }
+
 :root[data-theme='light'] .tc-save-actions[data-edit-mode='create'] .action-button[data-save-mode-role='update'],
 :root[data-theme='light'] .tc-save-actions[data-edit-mode='edit'] .action-button[data-save-mode-role='save'] {
   background: var(--tc-button-disabled-bg) !important;
@@ -148,6 +159,7 @@
   box-shadow: none !important;
   cursor: not-allowed !important;
 }
+
 :root[data-theme='light'] .tc-save-actions .action-button[disabled],
 :root[data-theme='light'] .tc-save-actions .action-button:disabled,
 :root[data-theme='light'] .tc-save-actions .action-button[aria-disabled='true'],
@@ -162,6 +174,7 @@
   box-shadow: none !important;
 }
 
+
 /* 1.3.2-dev.23 — Global save/update UI tokens.
    Save/edit actions are global UI controls and must not inherit module accents. */
 :root[data-theme='light'] {
@@ -171,6 +184,7 @@
   --tc-ui-primary-bg-pressed: color-mix(in srgb, var(--tc-ui-primary-accent) 30%, #ffffff);
   --tc-ui-primary-border: var(--tc-ui-primary-accent);
 }
+
 /* Save/update actions are global UI controls. They must not inherit module accents. */
 :root[data-theme='light'] .tc-save-actions .action-button:not([disabled]):not(:disabled):not([aria-disabled='true']):not(.is-disabled),
 :root[data-theme='light'] .tc-save-actions .action-button.is-enabled,
@@ -195,6 +209,9 @@
 :root[data-theme='light'] .tc-save-actions[data-edit-mode='edit'] .action-button[data-save-mode-role='update']:active {
   background: var(--tc-ui-primary-bg-pressed) !important;
 }
+
+
+
 /* 1.3.2-dev.27 — Final global save/update button isolation.
    Save/edit actions are global UI controls and must not inherit module accents. */
 :root[data-theme='light'] .tc-save-actions {
@@ -212,3 +229,4 @@
   color: var(--color-text, #111827) !important;
   -webkit-text-fill-color: var(--color-text, #111827) !important;
 }
+

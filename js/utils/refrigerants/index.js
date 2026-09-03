@@ -9,6 +9,8 @@ export {
   listRegulations,
   createRegulatoryContext,
   evaluateRegulations,
-  getApplicableRegulations
+  getApplicableRegulations,
+  listEN378SafetyData,
+  getEN378SafetyData
 } from './refrigerant-service.js';
 export { formatRefrigerantLabel } from './refrigerant-label.js';

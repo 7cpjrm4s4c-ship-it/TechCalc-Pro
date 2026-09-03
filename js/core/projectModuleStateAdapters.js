@@ -1,3 +1,5 @@
+import { state as en378SafetyCheckState } from '../modules/en-378-safety-check/state.js';
+import { state as fGasesCheckState } from '../modules/f-gases-check/state.js';
 import { state as floodingVerificationState } from '../modules/flooding-verification/state.js';
 
 const clone = value => typeof structuredClone === 'function'
@@ -14,18 +16,39 @@ function migrateFloodingVerificationState(input = {}) {
   return next;
 }
 
-const adapters = Object.freeze([
-  Object.freeze({
-    id: 'flooding-verification',
-    read: () => ({ state: floodingVerificationState.get() }),
+function createStateAdapter(id, moduleState, migrate = value => clone(value || {})) {
+  return Object.freeze({
+    id,
+    read: () => ({ state: moduleState.get() }),
     apply: moduleData => {
       const incoming = moduleData?.state;
       if (incoming && typeof incoming === 'object') {
-        floodingVerificationState.replace(migrateFloodingVerificationState(incoming), { notify: false });
+        moduleState.replace(migrate(incoming), { notify: false });
       }
     },
-    reset: () => floodingVerificationState.reset()
-  })
+    reset: () => moduleState.reset()
+  });
+}
+
+const fGasesCheckAdapter = createStateAdapter('f-gases-check', fGasesCheckState);
+const en378SafetyCheckAdapter = createStateAdapter('en-378-safety-check', en378SafetyCheckState);
+
+const floodingVerificationAdapter = Object.freeze({
+  id: 'flooding-verification',
+  read: () => ({ state: floodingVerificationState.get() }),
+  apply: moduleData => {
+    const incoming = moduleData?.state;
+    if (incoming && typeof incoming === 'object') {
+      floodingVerificationState.replace(migrateFloodingVerificationState(incoming), { notify: false });
+    }
+  },
+  reset: () => floodingVerificationState.reset()
+});
+
+const adapters = Object.freeze([
+  fGasesCheckAdapter,
+  en378SafetyCheckAdapter,
+  floodingVerificationAdapter
 ]);
 
 export function appendProjectModuleStates(data = {}) {

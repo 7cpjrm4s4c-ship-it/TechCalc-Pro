@@ -30,3 +30,29 @@
   height: calc(var(--tc-control-height) - 2px);
   min-height: calc(var(--tc-control-height) - 2px);
 }
+
+/* EN 378: keep the import action visually in the upper right cell of the import card. */
+@media (min-width: 721px) {
+  .module-view[data-module="en-378-safety-check"] [data-schema-action="importFGasesSystem"] {
+    align-self: end;
+    justify-self: end;
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+.module-view[data-module="en-378-safety-check"] [data-schema-field-wrapper="importedSystemName"] input[readonly] {
+  font-family: inherit;
+  font-weight: 700;
+  opacity: 1;
+  -webkit-text-fill-color: currentColor;
+}
+
+/* EN 378: German guidance text must wrap by words or valid hyphenation, never letter-by-letter. */
+.module-view[data-module="en-378-safety-check"] .result-row *,
+.module-view[data-module="en-378-safety-check"] .inline-stat *,
+.module-view[data-module="en-378-safety-check"] .main-result * {
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
+}

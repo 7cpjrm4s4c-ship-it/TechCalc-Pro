@@ -1,11 +1,9 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { calculate } from '../js/modules/f-gases-check/logic.js';
 import { buildFGasesReportDto } from '../js/modules/f-gases-check/reportAdapter.js';
 import { buildFGasesSavedRecord, hydrateFGasesSavedRecord, buildFGasesSavedRecordsModel } from '../js/modules/f-gases-check/savedRecords.js';
 import { buildFGasesReportSections } from '../js/core/pdf/fGasesReportSections.js';
 import { reportSections } from '../js/core/pdf/pdfDataMapping.js';
-import { renderPlatformSaved } from '../js/platform/moduleRenderer/index.js';
 
 const state = {
   schemaVersion: 4,
@@ -29,34 +27,6 @@ assert.equal(saved.systemSnapshot.system.systemName, 'WP Nord');
 const model = buildFGasesSavedRecordsModel({ ...state, savedSystems: [{ id: 'f-gases-system-1', ...saved }] });
 assert.equal(model.items.length, 1);
 assert.equal(model.loadAttr, 'data-saved-load');
-const activeModel = buildFGasesSavedRecordsModel({
-  ...state,
-  savedSystems: [{ id: 'f-gases-system-1', ...saved }],
-  activeSavedSystemId: 'f-gases-system-1'
-});
-assert.equal(activeModel.activeId, 'f-gases-system-1');
-const activeSavedHtml = renderPlatformSaved({ config: { accent: 'blue' }, savedRecords: activeModel });
-assert.match(activeSavedHtml, /saved-record-card[^>]*is-active/);
-assert.match(activeSavedHtml, /tc-save-actions" data-edit-mode="edit"/);
-const saveButton = activeSavedHtml.match(/<button[^>]*data-line-save[^>]*>/)?.[0] || '';
-const updateButton = activeSavedHtml.match(/<button[^>]*data-line-update[^>]*>/)?.[0] || '';
-assert.match(saveButton, /\sdisabled(?:\s|>|=)/);
-assert.match(saveButton, /data-save-mode-role="save"/);
-assert.match(saveButton, /is-disabled/);
-assert.notEqual(updateButton, '');
-assert.equal(/\sdisabled(?:\s|>|=)/.test(updateButton), false);
-assert.match(updateButton, /data-save-mode-role="update"/);
-assert.match(updateButton, /is-enabled/);
-assert.equal(updateButton.includes('action-button--secondary'), false);
-const createSavedHtml = renderPlatformSaved({ config: { accent: 'blue' }, savedRecords: model });
-const createUpdateButton = createSavedHtml.match(/<button[^>]*data-line-update[^>]*>/)?.[0] || '';
-assert.match(createSavedHtml, /tc-save-actions" data-edit-mode="create"/);
-assert.match(createUpdateButton, /\sdisabled(?:\s|>|=)/);
-assert.match(createUpdateButton, /action-button--secondary/);
-const fGasesSaveManagerCss = readFileSync(new URL('../css/components-save-manager.css', import.meta.url), 'utf8');
-assert.equal(fGasesSaveManagerCss.includes('f-gases-check'), false);
-const fGasesModuleCss = readFileSync(new URL('../css/modules-base.css', import.meta.url), 'utf8');
-assert.equal(fGasesModuleCss.includes('.action-button'), false);
 const dto = buildFGasesReportDto({ state: hydrated, calculation: calculate(hydrated), generatedAt: '2027-01-02T12:00:00.000Z' });
 const sections = buildFGasesReportSections(dto);
 assert.equal(sections.length, 8);

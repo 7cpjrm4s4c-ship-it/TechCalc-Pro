@@ -14,6 +14,7 @@ const UPDATE_SELECTORS = [
   '[data-tc-action$=":update"]',
   '[data-tc-action*="update"]'
 ].join(',');
+
 function hasActiveRecord(panel) {
   if (!panel?.querySelector) return false;
   return Boolean(panel.querySelector(
@@ -22,15 +23,16 @@ function hasActiveRecord(panel) {
       '.line-section-card.is-active',
       '[data-saved-record-card].is-active',
       '[data-line-card].is-active',
-      '.saved-record-card[aria-current="true"]',
-      '.line-section-card[aria-current="true"]',
-      '.saved-record-card[aria-selected="true"]',
-      '.line-section-card[aria-selected="true"]',
-      '[data-selected="true"].saved-record-card',
-      '[data-selected="true"].line-section-card'
+      '.saved-record-card[aria-current=\"true\"]',
+      '.line-section-card[aria-current=\"true\"]',
+      '.saved-record-card[aria-selected=\"true\"]',
+      '.line-section-card[aria-selected=\"true\"]',
+      '[data-selected=\"true\"].saved-record-card',
+      '[data-selected=\"true\"].line-section-card'
     ].join(',')
   ));
 }
+
 function actionButtons(actions, explicitSelectors, fallbackPattern) {
   const explicit = [...actions.querySelectorAll(explicitSelectors)];
   if (explicit.length) return explicit;
@@ -41,7 +43,8 @@ function setButtonRole(button, role) {
   if (!button) return;
   button.dataset.saveModeRole = role;
 }
-function setDisabled(button, disabled, { secondaryWhenDisabled = false } = {}) {
+
+function setDisabled(button, disabled) {
   if (!button) return;
   const isDisabled = Boolean(disabled);
   button.disabled = isDisabled;
@@ -49,9 +52,9 @@ function setDisabled(button, disabled, { secondaryWhenDisabled = false } = {}) {
   button.setAttribute('aria-disabled', String(isDisabled));
   button.classList.toggle('is-disabled', isDisabled);
   button.classList.toggle('is-enabled', !isDisabled);
-  button.classList.toggle('action-button--secondary', secondaryWhenDisabled && isDisabled);
   button.dataset.enabled = String(!isDisabled);
 }
+
 
 export function syncSaveEditMode(root = document) {
   const scope = root?.querySelectorAll ? root : document;
@@ -62,9 +65,10 @@ export function syncSaveEditMode(root = document) {
     const saveButtons = actionButtons(actions, SAVE_SELECTORS, /^Speichern$/i);
     const updateButtons = actionButtons(actions, UPDATE_SELECTORS, /^Aktualisieren$/i);
     saveButtons.forEach(button => { setButtonRole(button, 'save'); setDisabled(button, active); });
-    updateButtons.forEach(button => { setButtonRole(button, 'update'); setDisabled(button, !active, { secondaryWhenDisabled: true }); });
+    updateButtons.forEach(button => { setButtonRole(button, 'update'); setDisabled(button, !active); });
   });
 }
+
 export function initializeSaveEditModeSync(root = document) {
   if (!root || root.__tcSaveEditModeSyncInitialized) return;
   root.__tcSaveEditModeSyncInitialized = true;
@@ -81,6 +85,7 @@ export function initializeSaveEditModeSync(root = document) {
   ['click', 'pointerup', 'keyup', 'change', 'input', 'techcalc-project-loaded'].forEach(eventName => {
     root.addEventListener?.(eventName, schedule, true);
   });
+
   if (typeof MutationObserver !== 'undefined') {
     const observer = new MutationObserver(schedule);
     observer.observe(root === document ? document.documentElement : root, {

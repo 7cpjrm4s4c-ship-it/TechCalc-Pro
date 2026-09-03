@@ -16,6 +16,7 @@ import wastewaterConfig from '../modules/wastewater/config.js';
 import rainwaterConfig from '../modules/rainwater/config.js';
 import floodingVerificationConfig from '../modules/flooding-verification/config.js';
 import fGasesCheckConfig from '../modules/f-gases-check/config.js';
+import en378SafetyCheckConfig from '../modules/en-378-safety-check/config.js';
 import { restoreSessionSnapshot, saveSessionSnapshot } from './projectStorage.js';
 import { createModuleLifecycleAdapter } from './moduleLifecycleAdapter.js';
 import { createModuleRuntime } from './moduleRuntime.js';
@@ -46,7 +47,8 @@ const lazyModules = [
   { config: wastewaterConfig, path: '../modules/wastewater/index.js' },
   { config: rainwaterConfig, path: '../modules/rainwater/index.js' },
   { config: floodingVerificationConfig, path: '../modules/flooding-verification/index.js' },
-  { config: fGasesCheckConfig, path: '../modules/f-gases-check/index.js' }
+  { config: fGasesCheckConfig, path: '../modules/f-gases-check/index.js' },
+  { config: en378SafetyCheckConfig, path: '../modules/en-378-safety-check/index.js' }
 ];
 const moduleCache = new Map();
 const preloadedModuleIds = new Set();
@@ -78,7 +80,6 @@ function scheduleLazyModulePreload() {
   if ('requestIdleCallback' in window) window.requestIdleCallback(preload, { timeout: 1500 });
   else window.setTimeout(preload, 250);
 }
-
 const currentRouteConfig = lazyModules.find(({ config }) => config.id === currentRoute());
 if (currentRouteConfig) preloadLazyModule(currentRouteConfig.config, currentRouteConfig.path);
 function registerLazyModule({ config, path, module: eagerModule }) {
@@ -115,7 +116,6 @@ restoreSessionSnapshot();
 trackGlobalEventListener(window, 'pageshow', event => {
   if (event.persisted) restoreSessionSnapshot();
 });
-
 function persistSessionBeforeLeaving() {
   saveSessionSnapshot();
 }
@@ -136,12 +136,10 @@ const NAV_MOVE_TOLERANCE_PX = 10;
 let navPointerGesture = null;
 let navLastTapWasScroll = false;
 let navLastTapAt = 0;
-
 function navPoint(event) {
   if (!event) return null;
   return { x: Number(event.clientX || 0), y: Number(event.clientY || 0), pointerId: event.pointerId };
 }
-
 function moduleNavButtonFromEvent(event) {
   return event.target?.closest?.(NAV_INTERACTIVE_SELECTOR) || null;
 }
@@ -185,7 +183,6 @@ function onGlobalNavPointerCancel() {
   navLastTapWasScroll = true;
   navLastTapAt = Date.now();
 }
-
 function onGlobalNavPointerUp(event) {
   const button = moduleNavButtonFromEvent(event);
   if (!button) return;
