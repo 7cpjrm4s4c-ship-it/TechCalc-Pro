@@ -4,6 +4,7 @@ import { buildFloodingReportSections } from './floodingReportSections.js';
 import { buildRainwaterReportSections } from './rainwaterReportSections.js';
 import { buildFGasesReportSections } from './fGasesReportSections.js';
 import { buildEN378ReportSections } from './en378ReportSections.js';
+import { buildVentilationReportSections } from './ventilationReportSections.js';
 import { buildGenericReportSections } from './genericReportSections.js';
 
 function resolveRuntimeModule(registryEntry) {
@@ -120,7 +121,8 @@ const typedReportSectionBuilders = Object.freeze({
   'techcalc.flooding-verification.report': buildFloodingReportSections,
   'techcalc.rainwater.report': buildRainwaterReportSections,
   'techcalc.f-gases-check.report': buildFGasesReportSections,
-  'techcalc.en-378-safety-check.report': buildEN378ReportSections
+  'techcalc.en-378-safety-check.report': buildEN378ReportSections,
+  'techcalc.ventilation.report': buildVentilationReportSections
 });
 
 function buildTypedDtoReportSections(reportDto = {}) {

@@ -12,8 +12,27 @@ import {
 } from './controller.js';
 import { activeCalculationState } from './viewModel.js';
 import { createVentilationView } from './view.js';
+import { buildVentilationReportDto } from './reportAdapter.js';
 
-const typedReportAdapter = createTypedDtoReportAdapter({ config, schema, state, calculate });
+const typedReportAdapter = createTypedDtoReportAdapter({
+  config,
+  schema,
+  state,
+  calculate,
+  buildReportDto: ({ state: snapshot, calculation, generatedAt } = {}) => {
+    const activeState = activeCalculationState(snapshot);
+    const lineSections = Array.isArray(snapshot?.ventLineSections)
+      ? snapshot.ventLineSections
+      : ventilationLineSectionController.read();
+    return buildVentilationReportDto({
+      state: snapshot,
+      activeState,
+      calculation,
+      lineSections,
+      generatedAt
+    });
+  }
+});
 const calculateForReport = typedReportAdapter.calculate;
 const view = createVentilationView(config, calculateForReport, ventilationLineSectionController);
 
