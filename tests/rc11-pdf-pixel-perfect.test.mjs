@@ -57,7 +57,7 @@ const project = {
 };
 
 assert.equal(REPORT_TEMPLATE_VERSION, 'global-report-template-9-rc11-1-pdf-table-dedupe');
-assert.equal(sanitizeText('m³/h ± Δp → ±K-Wert Ø 18 Õ 1,0'), 'm³/h +/- Deltap -> +/-K-Wert DN 18 Õ 1,0');
+assert.equal(sanitizeText('m³/h ± Δp → ±K-Wert Ø 18 × 1,0'), 'm³/h +/- Deltap -> +/-K-Wert DN 18 / 1,0');
 const unbreakableToken = 'A'.repeat(180);
 assert.deepEqual(
   splitPdfText(unbreakableToken, 42, 6.25),
@@ -75,8 +75,8 @@ const hxSections = reportSections(typedModuleData({
   sections: [{
     title: 'Berechnete Zustandspunkte',
     rows: [
-      ['1 Ausgang', 'Theta32,00  C | Phi39 % | x11,87 g/kg | h62,59 kJ/kg', '', ''],
-      ['1 Taupunkt', 'Theta16,71  C | Phi100 % | x11,87 g/kg | h46,87 kJ/kg', '', '']
+      ['1 Ausgang', 'Theta32,00 °C | Phi39 % | x11,87 g/kg | h62,59 kJ/kg', '', ''],
+      ['1 Taupunkt', 'Theta16,71 °C | Phi100 % | x11,87 g/kg | h46,87 kJ/kg', '', '']
     ]
   }, {
     title: 'Gespeicherte Prozesse',
@@ -115,10 +115,10 @@ for (const [, rawX, rawY] of textCommands) {
 const rectCommands = [...pdf.matchAll(/[0-9.]+ w ([0-9.\-]+) ([0-9.\-]+) ([0-9.]+) ([0-9.]+) re [BfS]/g)];
 for (const [, rawX, rawY, rawW, rawH] of rectCommands) {
   const x = Number(rawX), y = Number(rawY), w = Number(rawW), h = Number(rawH);
-  assert.og(x >= PDF_THEME.margin - 2, `rect x underflows page: ${x}`);
-  assert.og(x + w <= PDF_PAGE.width - PDF_THEME.margin + 2, `rect x overflows page: ${x + w}`);
-  assert.og(y >= PDF_THEME.margin - 2, `rect y underflows page: ${y}`);
-  assert.og(y + h <= PDF_PAGE.height - PDF_THEME.margin + 2, `rect y overflows page: ${y + h}`);
+  assert.ok(x >= PDF_THEME.margin - 2, `rect x underflows page: ${x}`);
+  assert.ok(x + w <= PDF_PAGE.width - PDF_THEME.margin + 2, `rect x overflows page: ${x + w}`);
+  assert.ok(y >= PDF_THEME.margin - 2, `rect y underflows page: ${y}`);
+  assert.ok(y + h <= PDF_PAGE.height - PDF_THEME.margin + 2, `rect y overflows page: ${y + h}`);
 }
 
 const imageCommands = [...pdf.matchAll(/q ([0-9.]+) 0 0 ([0-9.]+) ([0-9.\-]+) ([0-9.\-]+) cm \/Im[A-Za-z]+ Do Q/g)];
@@ -127,7 +127,7 @@ for (const [, rawW, rawH, rawX, rawY] of imageCommands) {
   assert.ok(w > 0 && h > 0, 'image dimensions must be positive');
   assert.ok(x >= PDF_THEME.margin - 2, `image x underflows page: ${x}`);
   assert.ok(x + w <= PDF_PAGE.width - PDF_THEME.margin + 2, `image x overflows page: ${x + w}`);
-  assert.og(y >= PDF_THEME.margin - 2, `image y underflows page: ${y}`);
+  assert.ok(y >= PDF_THEME.margin - 2, `image y underflows page: ${y}`);
   assert.ok(y + h <= PDF_PAGE.height - PDF_THEME.margin + 2, `image y overflows page: ${y + h}`);
 }
 
