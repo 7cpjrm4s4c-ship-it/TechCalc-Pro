@@ -1,3 +1,25 @@
+## Version 1.6.0 – EN 378 Sicherheitscheck
+
+### Neu
+- EN-378-Sicherheitscheck als eigenständiges Modul für die sicherheitstechnische Bewertung von Kälte-, Klima- und Wärmepumpenanlagen integriert.
+- Import gespeicherter Anlagen-Snapshots aus dem F-Gase-Check ergänzt; importierte Daten werden als Kopie in der EN-378-Bewertung verwendet.
+- Bewertung von Kältemittel, Füllmenge, Raumvolumen, Aufstellort, Zugangsbereich, Nutzung, Lüftung und Sicherheitsmaßnahmen ergänzt.
+- EN-378-Füllmengenbewertung nach Anhang C mit getrennten Prüfpfaden für Toxizität, Brennbarkeit und alternative Risikomaßnahmen integriert.
+- Planer-Leitfaden mit erforderlichen Maßnahmen, offenen Prüfpunkten und Hinweisen zur Aufstellung, Lüftung, Detektion, Alarmierung und Dokumentation ergänzt.
+- PDF-Bericht für EN-378-Bewertungen über den zentralen PDF-Reportpfad integriert.
+
+### Verbesserungen
+- Kältemittelplattform um EN-378-Sicherheitsdaten, praktische Grenzwerte, ATEL/ODL-, LFL-, QLMV- und QLAV-Daten erweitert.
+- Projektpersistenz für F-Gase-Anlagen-Snapshots und EN-378-Bewertungen über den zentralen Projektmodul-Adapter ergänzt.
+- Saved-record-Darstellung für F-Gase und EN 378 an den zentralen Renderer und die bestehenden UI-Zustände angeglichen.
+- Ausgaben in UI und PDF auf deutsche Volltextbezeichnungen ohne interne Schlüssel stabilisiert.
+- Mobile Darstellung und kontextabhängige Eingabebereiche für EN 378 verbessert.
+
+### Behoben
+- Gespeicherte F-Gase-Anlagen-Snapshots werden nun in Projektdaten übernommen und nach dem Laden wieder bereitgestellt.
+- EN-378-Bewertungen behalten importierte Anlagenstände, gespeicherte Bewertungseinträge und PDF-Daten projektübergreifend bei.
+- Der bestehende Flooding-Projektadaptervertrag bleibt trotz zusätzlicher Moduladapter unverändert erhalten.
+
 ## Version 1.5.1 – PDF-Branding
 
 ### Neu
@@ -28,7 +50,7 @@
 ### Behoben
 - Leere Kältemittelzustände können das F-Gase-Modul nicht mehr beim Laden abbrechen.
 - Hermetische Ausnahme nach § 2 Abs. 3 ChemKlimaschutzV wird nur bei erfülltem Status und Kennzeichnung angewendet.
-- Service- und Quotenhinweise sind fachlich getrennt und konsistent beschriftet.
+- Service- und Quotenhinweis sind fachlich getrennt und konsistent beschriftet.
 
 ## Version 1.4.0 – Final Release
 
