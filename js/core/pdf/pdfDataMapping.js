@@ -11,13 +11,31 @@ function resolveRuntimeModule(registryEntry) {
   return registryEntry?.module?.loadedModule || registryEntry?.module || registryEntry?.loadedModule || registryEntry;
 }
 
+function reportIdentity(id = '', reportDto = {}) {
+  return `${id || ''} ${reportDto?.metadata?.moduleId || ''} ${reportDto?.metadata?.moduleTitle || ''} ${reportDto?.metadata?.dtoType || ''}`;
+}
+
 function isSpecialReportHeadingModule(id = '', reportDto = {}) {
-  const identity = `${id || ''} ${reportDto?.metadata?.moduleId || ''} ${reportDto?.metadata?.moduleTitle || ''} ${reportDto?.metadata?.dtoType || ''}`;
-  return /flooding-verification|hx|h,x/i.test(identity);
+  return /flooding-verification|hx|h,x|f-gases-check|en-378-safety-check/i.test(reportIdentity(id, reportDto));
+}
+
+function specialReportHeading(id = '', reportDto = {}) {
+  const identity = reportIdentity(id, reportDto);
+  if (/f-gases-check|f-gases|f-gase/i.test(identity)) return 'Informationsblatt';
+  if (/en-378-safety-check|en\s*378/i.test(identity)) return 'Sicherheitsdatenblatt';
+  return reportDto?.metadata?.reportHeading;
 }
 
 function normalizeCollectedReportDto(reportDto, id) {
-  if (isSpecialReportHeadingModule(id, reportDto)) return reportDto;
+  if (isSpecialReportHeadingModule(id, reportDto)) {
+    return {
+      ...reportDto,
+      metadata: {
+        ...reportDto.metadata,
+        reportHeading: specialReportHeading(id, reportDto) || reportDto.metadata?.reportHeading
+      }
+    };
+  }
   return {
     ...reportDto,
     metadata: {
@@ -55,8 +73,8 @@ export function collectCurrentModule(modulesRef, routeGetter) {
     title: registryEntry?.title || module?.title || module?.config?.title || normalizedReportDto.metadata?.moduleTitle || id || 'Modul',
     shortTitle: registryEntry?.shortTitle || module?.shortTitle || module?.config?.shortTitle || normalizedReportDto.metadata?.moduleTitle || id || 'Modul',
     sections: [],
-    chartSvg: '',
-    chartCanvas: null,
+    chartSvg: normalizedReportDto.chartSvg || normalizedReportDto.diagramSvg || '',
+    chartCanvas: normalizedReportDto.chartCanvas || null,
     reportDto: normalizedReportDto,
     reportSource: 'typed-dto'
   };
@@ -68,7 +86,7 @@ export function sectionTitle(title) {
   return normalized;
 }
 
-export function isLineSectionTitle(title = '') { return /leitungsabschnitt|rohrauslegung|speicher|gespeicherte/i.test(sanitizeText(title)); }
+export function isLineSectionTitle(title = '') { return /leitungsabschnitt|rohrauslegung/i.test(sanitizeText(title)); }
 
 export function lineSectionItems(rows = []) {
   const items = [];
@@ -135,7 +153,12 @@ export function reportSections(moduleData) {
   if (moduleData?.reportSource !== 'typed-dto' || !moduleData.reportDto) {
     throw new Error('PDF-Export benötigt ein Typed-DTO. Legacy-DOM-Export ist deaktiviert.');
   }
-  const sections = buildTypedDtoReportSections(moduleData.reportDto);
+  let sections;
+  if (moduleData.reportDto?.metadata?.dtoType === 'techcalc.flooding-verification.report') {
+    sections = buildFloodingReportSections(moduleData.reportDto);
+  } else {
+    sections = buildTypedDtoReportSections(moduleData.reportDto);
+  }
   return sections.map(section => ({ ...section, rows: normalizePdfRows(section.rows, section.title) }));
 }
 
