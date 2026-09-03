@@ -50,6 +50,18 @@ export function renderSavedRecordList(items = [], {
   }).join('')}</div>`;
 }
 
+function renderActionClass(disabled, { secondaryWhenDisabled = false } = {}) {
+  const isDisabled = Boolean(disabled);
+  const classes = ['action-button'];
+  if (secondaryWhenDisabled && isDisabled) classes.push('action-button--secondary');
+  classes.push(isDisabled ? 'is-disabled' : 'is-enabled');
+  return classes.join(' ');
+}
+
+function renderDisabledAttributes(disabled) {
+  const isDisabled = Boolean(disabled);
+  return `aria-disabled="${isDisabled ? 'true' : 'false'}" data-enabled="${isDisabled ? 'false' : 'true'}"${isDisabled ? ' disabled' : ''}`;
+}
 
 export function renderSavedRecordPanel({
   title = 'Gespeicherte Einträge',
@@ -66,9 +78,12 @@ export function renderSavedRecordPanel({
   listHtml = '',
   accent = 'blue'
 } = {}) {
+  const isAddDisabled = Boolean(addDisabled);
+  const isUpdateDisabled = Boolean(updateDisabled);
+  const editMode = isUpdateDisabled ? 'create' : 'edit';
   const body = [
     `<div class="field"><label for="${esc(nameFieldId)}">${esc(nameLabel)}</label><div class="control"><input id="${esc(nameFieldId)}" data-field="${esc(nameFieldId)}" value="${esc(nameValue)}" placeholder="${esc(namePlaceholder)}" inputmode="text"></div></div>`,
-    `<div class="tc-save-actions"><button type="button" class="action-button" data-tc-action="${esc(addAction)}" data-line-save ${addDisabled ? 'disabled' : ''}>${esc(addLabel)}</button><button type="button" class="action-button" data-tc-action="${esc(updateAction)}" data-line-update ${updateDisabled ? 'disabled' : ''}>${esc(updateLabel)}</button></div>`,
+    `<div class="tc-save-actions" data-edit-mode="${editMode}"><button type="button" class="${renderActionClass(isAddDisabled)}" data-tc-action="${esc(addAction)}" data-save-mode-role="save" data-line-save ${renderDisabledAttributes(isAddDisabled)}>${esc(addLabel)}</button><button type="button" class="${renderActionClass(isUpdateDisabled, { secondaryWhenDisabled: true })}" data-tc-action="${esc(updateAction)}" data-save-mode-role="update" data-line-update ${renderDisabledAttributes(isUpdateDisabled)}>${esc(updateLabel)}</button></div>`,
     listHtml || `<div class="empty-state empty-state--compact">Noch keine Einträge gespeichert.</div>`
   ].join('');
   return `<section class="card card--${esc(accent)} tc-card tc-saved-record-panel"><div class="card__title tc-card__header">${esc(title)}</div><div class="card__body tc-card__body">${body}</div></section>`;
@@ -93,6 +108,7 @@ function shouldIgnoreLoad(event, toggleAttr, deleteAttr) {
     target?.closest?.('a[href], input, select, textarea, label')
   );
 }
+
 function activateLoad({ root, card, event, loadAttr, onLoad, preserveLoadScroll }) {
   const id = card.getAttribute(loadAttr);
   if (!id) return;
@@ -115,6 +131,7 @@ export function bindSavedRecordList(root, {
 } = {}) {
   if (!root) return;
   const key = `${loadAttr}|${toggleAttr}|${deleteAttr}`;
+
   const handleActivation = event => {
     const toggle = closestAttr(event.target, toggleAttr, root);
     if (toggle) {
@@ -136,6 +153,7 @@ export function bindSavedRecordList(root, {
       }, { anchor: card, event });
       return true;
     }
+
     const deleteButton = closestAttr(event.target, deleteAttr, root);
     if (deleteButton) {
       event.preventDefault();
@@ -145,6 +163,7 @@ export function bindSavedRecordList(root, {
       onDelete?.(deleteButton.getAttribute(deleteAttr), deleteButton, event);
       return true;
     }
+
     const card = closestAttr(event.target, loadAttr, root);
     if (!card || shouldIgnoreLoad(event, toggleAttr, deleteAttr)) return false;
     activateLoad({ root, card, event, loadAttr, onLoad, preserveLoadScroll });
