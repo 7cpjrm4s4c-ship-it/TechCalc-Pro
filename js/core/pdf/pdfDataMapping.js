@@ -1,207 +1,203 @@
 import { currentRoute } from '../router.js';
-import { sanitizeText, normalizeKey } from './pdfText.js';
 import { buildFloodingReportSections } from './floodingReportSections.js';
 import { buildRainwaterReportSections } from './rainwaterReportSections.js';
 import { buildFGasesReportSections } from './fGasesReportSections.js';
 import { buildEN378ReportSections } from './en378ReportSections.js';
 import { buildGenericReportSections } from './genericReportSections.js';
 
-function textOf(node) { return sanitizeText(node?.textContent || ''); }
-function valueOfField(field) {
-  const control = field.querySelector('input, select, textarea');
-  if (!control) return '';
-  if (control.matches('select')) return sanitizeText(control.selectedOptions?.[0]?.textContent || control.value);
-  return sanitizeText(control.value);
+const value = id => document.getElementById(id)?.value || '';
+const text = id => document.getElementById(id)?.textContent?.trim() || '';
+const num = id => {
+  const v = Number(value(id));
+  return Number.isFinite(v) ? v : '';
+};
+const legacyRows = [
+  ['Volumenstrom', () => text('flowResult'), 'm³/h'],
+  ['Leistung', () => text('powerResult'), 'kW'],
+  ['Temperaturdifferenz', () => text('deltaTResult'), 'K'],
+  ['Geschwindigkeit', () => text('velocityResult'), 'm/s'],
+  ['Druckverlust', () => text('pressureResult'), 'Pa'],
+  ['Speichervolumen', () => text('bufferResult'), 'l'],
+  ['Wassermenge', () => text('waterResult'), 'l/s'],
+  ['Regenwasser', () => text('rainResult'), 'l/s'],
+  ['Abwasser', () => text('wasteResult'), 'l/s'],
+  ['Einheiten', () => text('unitResult'), '']
+];
+
+function runtimeModuleFor(registration) {
+  if (!registration) return null;
+  const module = registration.module || registration.loadedModule || registration;
+  if (!module || typeof module !== 'object') return null;
+  return module;
 }
-function unitOfField(field) {
-  const unitSelect = field.querySelector('.unit-select');
-  if (unitSelect) return sanitizeText(unitSelect.selectedOptions?.[0]?.textContent || unitSelect.value);
-  const unit = field.querySelector('.unit:not(.unit-select)');
-  return unit ? textOf(unit) : '';
+
+function resolveModuleRegistration(modules, moduleId) {
+  if (!modules || !moduleId) return null;
+  if (typeof modules.get === 'function') return modules.get(moduleId);
+  if (typeof modules.find === 'function') return modules.find(module => module?.id === moduleId || module?.config?.id === moduleId) || null;
+  return null;
 }
-export function extractCardRows(card) {
-  const rows = [];
-  card.querySelectorAll(':scope .field').forEach(field => {
-    const label = textOf(field.querySelector('label'));
-    const value = valueOfField(field);
-    const unit = unitOfField(field);
-    if (label || value || unit) rows.push([label, value, unit, '']);
-  });
-  card.querySelectorAll(':scope .main-result, :scope .inline-stat, :scope .result-row').forEach(result => {
-    if (result.closest('.saved-record-card, [data-saved-record-card], [data-line-card]')) return;
-    const label = textOf(result.querySelector('span'));
-    const strong = result.querySelector('strong');
-    const small = strong?.querySelector('small');
-    const raw = textOf(strong);
-    const unit = small ? textOf(small) : '';
-    const value = unit ? raw.replace(unit, '').trim() : raw;
-    if (label || value) rows.push([label, value, unit, '']);
-  });
-  card.querySelectorAll(':scope .saved-record-card, :scope [data-saved-record-card], :scope [data-line-card]').forEach((record, index) => {
-    const title = textOf(record.querySelector('.saved-record-card__title strong, .line-section-card__title strong'))
-      || textOf(record.querySelector('.saved-record-card__title, .line-section-card__title'))
-      || sanitizeText(record.getAttribute('aria-label') || '')
-      || `Leitungsabschnitt ${index + 1}`;
-    if (title) rows.push(['Bezeichnung', title, '', '']);
-    record.querySelectorAll(':scope .inline-stat, :scope .result-row').forEach(stat => {
-      const label = textOf(stat.querySelector('span'));
-      const strong = stat.querySelector('strong');
-      const small = strong?.querySelector('small');
-      const raw = textOf(strong);
-      const unit = small ? textOf(small) : '';
-      const value = unit ? raw.replace(unit, '').trim() : raw;
-      if (label || value) rows.push([label, value, unit, '']);
-    });
-  });
-  card.querySelectorAll(':scope .hx-process-step').forEach((step, index) => {
-    const rawLabel = textOf(step.querySelector('strong')) || `Punkt ${index + 1}`;
-    const normalizedLabel = rawLabel.match(/^\d+\s+/) ? rawLabel : `${index + 1} ${rawLabel}`;
-    const values = [...step.querySelectorAll('span')].map(textOf).join(' | ');
-    rows.push([normalizedLabel, values, '', '']);
-  });
-  card.querySelectorAll(':scope .pipe-dimension-card').forEach((dim, index) => {
-    const title = textOf(dim.querySelector('strong')) || `Dimension ${index + 1}`;
-    const meta = textOf(dim.querySelector('.pipe-dimension-card__meta'));
-    rows.push([title, meta, '', '']);
-  });
-  return rows;
+
+function resolveReportProvider(registration) {
+  const candidates = [
+    registration,
+    registration?.module,
+    registration?.loadedModule,
+    runtimeModuleFor(registration)
+  ];
+  return candidates.find(candidate => typeof candidate?.report === 'function') || null;
 }
-function isChartCard(card) {
-  return Boolean(card.querySelector('.hx-chart, svg, canvas')) && /diagramm/i.test(textOf(card.querySelector('.card__title')));
-}
-function collectLegacyDomModule(module, id) {
-  const app = document.getElementById('app');
-  const cards = [...(app?.querySelectorAll('.card') || [])];
-  const sections = [];
-  let chartSvg = '';
-  let chartCanvas = null;
-  cards.forEach(card => {
-    const title = textOf(card.querySelector(':scope > .card__title'));
-    if (!title) return;
-    const rows = extractCardRows(card);
-    if (isChartCard(card)) {
-      const svg = card.querySelector('svg.hx-chart, .hx-chart svg, svg');
-      const canvas = card.querySelector('canvas');
-      chartSvg = svg ? svg.outerHTML : chartSvg;
-      chartCanvas = canvas || chartCanvas;
-      if (rows.length) sections.push({ title: `${title} – Prozesspunkte`, rows });
-      return;
-    }
-    if (rows.length) sections.push({ title, rows });
-  });
-  if (!chartSvg) {
-    const svg = app?.querySelector?.('svg.hx-chart, .hx-chart svg');
-    chartSvg = svg ? svg.outerHTML : '';
-  }
-  if (!chartCanvas) chartCanvas = app?.querySelector?.('.hx-chart canvas, canvas.hx-chart') || null;
+
+function legacyModuleData(modules, getRoute) {
+  const routeId = typeof getRoute === 'function' ? getRoute() : currentRoute();
+  const registration = resolveModuleRegistration(modules, routeId);
+  const module = runtimeModuleFor(registration);
+  const config = registration?.config || module?.config || {};
   return {
-    id,
-    title: module?.title || module?.config?.title || id || 'Modul',
-    shortTitle: module?.shortTitle || module?.title || id || 'Modul',
-    sections,
-    chartSvg,
-    chartCanvas,
-    reportDto: null,
+    id: config.id || routeId || 'module',
+    title: config.title || module?.title || document.querySelector('.module h1')?.textContent?.trim() || 'Modul',
+    shortTitle: config.shortTitle || config.title || module?.shortTitle || module?.title || routeId || 'Modul',
     reportSource: 'legacy-dom'
   };
 }
-function resolveRuntimeModule(registryEntry) {
-  return registryEntry?.module?.loadedModule || registryEntry?.module || registryEntry?.loadedModule || registryEntry;
-}
-export function collectCurrentModule(modulesRef, routeGetter) {
-  const id = typeof routeGetter === 'function' ? routeGetter() : currentRoute();
-  const registryEntry = modulesRef?.get?.(id);
-  const module = resolveRuntimeModule(registryEntry);
-  const report = module?.report || registryEntry?.report;
-  const state = module?.state || registryEntry?.state;
-  if (typeof report === 'function') {
-    const reportDto = report(state?.get?.() || {});
-    if (!reportDto || typeof reportDto !== 'object') throw new Error(`Report-Adapter für ${id} lieferte kein gültiges DTO.`);
-    return {
-      id,
-      title: registryEntry?.title || module?.title || module?.config?.title || reportDto.metadata?.moduleTitle || id || 'Modul',
-      shortTitle: registryEntry?.shortTitle || module?.shortTitle || module?.title || module?.config?.shortTitle || reportDto.metadata?.moduleTitle || id || 'Modul',
-      sections: [], chartSvg: '', chartCanvas: null, reportDto, reportSource: 'typed-dto'
-    };
-  }
-  return collectLegacyDomModule(registryEntry || module, id);
-}
-export function sectionTitle(title) {
-  const normalized = sanitizeText(title);
-  if (/ergebnis\s*zusammenfassung/i.test(normalized)) return 'Zielzustand';
-  return normalized;
-}
-export function isLineSectionTitle(title = '') { return /leitungsabschnitt|rohrauslegung|speicher|gespeicherte/i.test(sanitizeText(title)); }
-export function lineSectionItems(rows = []) {
-  const items = [];
-  let current = [];
-  let title = '';
-  const hasRows = entryRows => entryRows.some(row => row.some(cell => sanitizeText(cell)));
-  const pushCurrent = () => {
-    if (!hasRows(current)) return;
-    const index = items.length + 1;
-    const cleanTitle = sanitizeText(title) || `Leitungsabschnitt ${index}`;
-    items.push({ title: cleanTitle, rows: current });
-    current = [];
-    title = '';
-  };
-  rows.forEach(row => {
-    const label = sanitizeText(row?.[0] || '');
-    const value = sanitizeText(row?.[1] || '');
-    const unit = sanitizeText(row?.[2] || '');
-    const key = normalizeKey(label);
-    if ((key === 'bezeichnung' && current.length) || (key === 'leistung' && current.some(entry => normalizeKey(entry?.[0] || '') === 'leistung'))) pushCurrent();
-    if (key === 'bezeichnung') {
-      title = value || title;
-      if (value) current.push(['Bezeichnung', value, '']);
-      return;
-    }
-    if (label || value || unit) current.push([label, value, unit]);
-  });
-  pushCurrent();
-  if (!items.length && hasRows(rows)) items.push({ title: 'Leitungsabschnitt 1', rows });
-  return items;
-}
-function normalizePdfRows(rows = [], title = '') {
-  const normalizedTitle = normalizeKey(title);
-  const seenGenericLabels = new Map();
-  return rows
-    .map(row => row.slice(0, 3).map(cell => sanitizeText(cell).replace(/^Sättigung$/i, 'Adiabate Befeuchtung').replace(/Parameter/g, 'Bezeichnung')))
-    .map(row => {
-      const key = normalizeKey(row?.[0] || '');
-      if (normalizedTitle.includes('gespeicherte') && key === 'bezeichnung') {
-        const count = (seenGenericLabels.get(key) || 0) + 1;
-        seenGenericLabels.set(key, count);
-        return [count === 1 ? 'Bezeichnung' : `Bezeichnung ${count}`, row?.[1] || '', row?.[2] || ''];
+
+export function collectCurrentModule(modules, getRoute = currentRoute) {
+  const routeId = typeof getRoute === 'function' ? getRoute() : currentRoute();
+  const registration = resolveModuleRegistration(modules, routeId);
+  const module = runtimeModuleFor(registration);
+  const config = registration?.config || module?.config || {};
+  const reportProvider = resolveReportProvider(registration);
+  if (reportProvider) {
+    try {
+      const snapshot = typeof reportProvider.state?.get === 'function' ? reportProvider.state.get() : undefined;
+      const reportDto = reportProvider.report(snapshot);
+      if (reportDto && typeof reportDto === 'object') {
+        return {
+          id: config.id || reportDto.metadata?.moduleId || routeId || 'module',
+          title: config.title || reportDto.metadata?.moduleTitle || module?.title || routeId || 'Modul',
+          shortTitle: config.shortTitle || config.title || module?.shortTitle || module?.title || routeId || 'Modul',
+          reportSource: 'typed-dto',
+          reportDto
+        };
       }
-      return row;
-    });
+    } catch (error) {
+      console.warn('PDF report adapter failed, falling back to legacy DOM export.', error);
+    }
+  }
+  return legacyModuleData(modules, getRoute);
 }
+
+export function collectProject() {
+  return {
+    client: value('pdfClient') || 'Nicht angegeben',
+    project: value('pdfProject') || 'Aktuelles Projekt',
+    projectNo: value('pdfProjectNo') || '',
+    engineer: value('pdfEngineer') || '',
+    companyName: value('pdfCompanyName') || '',
+    companyAddress: value('pdfCompanyAddress') || '',
+    documentVersion: value('pdfDocumentVersion') || '',
+    checkedBy: value('pdfCheckedBy') || '',
+    approvedBy: value('pdfApprovedBy') || '',
+    logo: document.getElementById('pdfCompanyLogoPreview')?.dataset?.logo || ''
+  };
+}
+
+export function pdfFileName(project, moduleData) {
+  const base = [
+    project.project || 'TechCalc',
+    moduleData.shortTitle || moduleData.title || 'Modul',
+    new Date().toISOString().slice(0, 10)
+  ]
+    .filter(Boolean)
+    .join('_')
+    .replace(/[^a-z0-9äöüß_-]+/gi, '_');
+  return `${base}.pdf`;
+}
+
+function legacyResultRows() {
+  return legacyRows
+    .map(([label, get, unit]) => [label, get(), unit])
+    .filter(row => row[1] !== '' && row[1] != null);
+}
+
+function inputRows(moduleId) {
+  if (moduleId === 'heating-cooling') {
+    return [
+      ['Volumenstrom', num('flow'), 'm³/h'],
+      ['Temperaturspreizung', num('deltaT'), 'K']
+    ];
+  }
+  if (moduleId === 'ventilation') {
+    return [
+      ['Raumfläche', num('roomArea'), 'm²'],
+      ['Luftwechsel', num('airChange'), '1/h'],
+      ['Raumhöhe', num('roomHeight'), 'm']
+    ];
+  }
+  if (moduleId === 'pipe-sizing') {
+    return [
+      ['Volumenstrom', num('pipeFlow'), 'm³/h'],
+      ['Rohr DN', value('pipeDn'), ''],
+      ['Rohrlänge', num('pipeLength'), 'm']
+    ];
+  }
+  if (moduleId === 'pressure-holding') {
+    return [
+      ['Anlagenvolumen', num('systemVolume'), 'l'],
+      ['Temperatur min.', num('minTemp'), '°C'],
+      ['Temperatur max.', num('maxTemp'), '°C'],
+      ['Vordruck', num('prePressure'), 'bar']
+    ];
+  }
+  if (moduleId === 'buffer-storage') {
+    return [
+      ['Leistung', num('bufferPower'), 'kW'],
+      ['Laufzeit', num('bufferRuntime'), 'min'],
+      ['Spreizung', num('bufferDeltaT'), 'K']
+    ];
+  }
+  return Array.from(document.querySelectorAll('[data-pdf-field]')).map(el => [
+    el.getAttribute('data-pdf-label') || el.id || 'Eingabe',
+    el.value || el.textContent?.trim() || '',
+    el.getAttribute('data-pdf-unit') || ''
+  ]);
+}
+
+function normalizePdfRows(rows = [], sectionTitle = '') {
+  if (!Array.isArray(rows)) return [];
+  return rows
+    .map(row => {
+      if (Array.isArray(row)) return row;
+      if (row && typeof row === 'object') {
+        return [row.label || row.name || row.title || sectionTitle || 'Eintrag', row.value ?? row.text ?? '', row.unit || ''];
+      }
+      return ['Eintrag', row ?? '', ''];
+    })
+    .filter(row => row.some(cell => cell !== '' && cell != null));
+}
+
+const typedReportSectionBuilders = Object.freeze({
+  'techcalc.flooding-verification.report': buildFloodingReportSections,
+  'techcalc.rainwater.report': buildRainwaterReportSections,
+  'techcalc.f-gases-check.report': buildFGasesReportSections,
+  'techcalc.en-378-safety-check.report': buildEN378ReportSections
+});
+
 function buildTypedDtoReportSections(reportDto = {}) {
   const dtoType = reportDto.metadata?.dtoType;
-  if (dtoType === 'techcalc.rainwater.report') return buildRainwaterReportSections(reportDto);
-  if (dtoType === 'techcalc.f-gases-check.report') return buildFGasesReportSections(reportDto);
-  if (dtoType === 'techcalc.en-378-safety-check.report') return buildEN378ReportSections(reportDto);
-  return buildGenericReportSections(reportDto);
+  const buildSections = typedReportSectionBuilders[dtoType] || buildGenericReportSections;
+  return buildSections(reportDto);
 }
+
 export function reportSections(moduleData) {
   if (moduleData?.reportSource === 'typed-dto' && moduleData.reportDto) {
-    const sections = moduleData.reportDto.metadata?.dtoType === 'techcalc.flooding-verification.report'
-      ? buildFloodingReportSections(moduleData.reportDto)
-      : buildTypedDtoReportSections(moduleData.reportDto);
+    const sections = buildTypedDtoReportSections(moduleData.reportDto);
     return sections.map(section => ({ ...section, rows: normalizePdfRows(section.rows, section.title) }));
   }
-  const sections = Array.isArray(moduleData?.sections) ? moduleData.sections : [];
-  const isHxDiagram = /hx|h,x/i.test(`${moduleData.id || ''} ${moduleData.title || ''}`);
-  const hasLineSections = !isHxDiagram && sections.some(section => isLineSectionTitle(sectionTitle(section.title)));
-  const printableSections = hasLineSections ? sections.filter(section => isLineSectionTitle(sectionTitle(section.title))) : sections;
-  return printableSections.map(section => {
-    const title = sectionTitle(section.title).replace(/Parameter/g, 'Bezeichnung');
-    const rows = normalizePdfRows(section.rows, title);
-    return { title, rows, isLineSection: isLineSectionTitle(title) };
-  });
-}
-export function pdfFileName(moduleData) {
-  const safeTitle = sanitizeText(moduleData.shortTitle || moduleData.title || 'Berechnung').replace(/[^a-z0-9äöüß -]+/gi, '').trim() || 'Berechnung';
-  return `TechCalc Pro - ${safeTitle}.pdf`;
+  const inputs = inputRows(moduleData.id).filter(row => row[1] !== '' && row[1] != null);
+  const results = legacyResultRows();
+  return [
+    { title: 'Eingaben', rows: inputs.length ? inputs : [['Keine Eingaben erfasst', '', '']] },
+    { title: 'Ergebnisse', rows: results.length ? results : [['Keine Ergebnisse berechnet', '', '']] }
+  ];
 }
