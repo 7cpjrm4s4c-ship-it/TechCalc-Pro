@@ -17,7 +17,7 @@ function hasDisplayValue(value) {
 
 function labelFromKey(key = '') {
   return String(key || 'Wert')
-    .replace(/([a-zäöüß])([A-Z])/g, '$1 $2')
+    .replace(/([a-zäöüß0-9])([A-Z])/g, '$1 $2')
     .replace(/[-_]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
@@ -28,8 +28,24 @@ function valueToText(value) {
   if (value === true) return 'Ja';
   if (value === false) return 'Nein';
   if (value == null || value === '') return '';
-  if (Array.isArray(value)) return value.map(valueToText).filter(Boolean).join(', ');
-  if (typeof value === 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) {
+    if (!value.length) return '';
+    if (value.every(item => item == null || typeof item !== 'object')) {
+      return value.map(valueToText).filter(Boolean).join(', ');
+    }
+    return `${value.length} Einträge`;
+  }
+  if (typeof value === 'object') {
+    const preferred = value.label ?? value.name ?? value.title ?? value.value ?? value.text;
+    if (preferred !== undefined && preferred !== value) return valueToText(preferred);
+    const primitiveEntries = Object.entries(value)
+      .filter(([, entryValue]) => entryValue == null || typeof entryValue !== 'object')
+      .filter(([, entryValue]) => hasDisplayValue(entryValue));
+    if (!primitiveEntries.length) return '';
+    return primitiveEntries
+      .map(([key, entryValue]) => `${labelFromKey(key)}: ${valueToText(entryValue)}`)
+      .join(' · ');
+  }
   return String(value);
 }
 
@@ -86,15 +102,22 @@ function rowsFromObject(source = {}, prefix = '') {
   return Object.entries(object(source)).flatMap(([key, value]) => {
     if (!hasDisplayValue(value)) return [];
     const label = prefix ? `${prefix} ${labelFromKey(key)}` : labelFromKey(key);
-    if (value && typeof value === 'object' && !Array.isArray(value)) {
-      return rowsFromObject(value, label);
+    if (Array.isArray(value)) {
+      if (!value.length) return [];
+      if (value.every(item => item == null || typeof item !== 'object')) return [[label, valueToText(value), '']];
+      return [[label, `${value.length} Einträge`, '']];
+    }
+    if (value && typeof value === 'object') {
+      const nested = rowsFromObject(value, label);
+      if (nested.length) return nested;
+      return [];
     }
     return [[label, valueToText(value) || EMPTY_VALUE, '']];
   });
 }
 
 function rowsFromCard(card = {}) {
-  const fields = array(card.fields || card.rows || card.items).map(normalizeRow);
+  const fields = array(card.fields || card.rows || card.items).map(normalizeRow).filter(row => row.some(hasDisplayValue));
   if (fields.length) return fields;
   return rowsFromObject(card.values || card.data || card);
 }
@@ -112,7 +135,7 @@ function resultModelSections(resultModel) {
   if (Array.isArray(resultModel.groups)) return resultModel.groups.map(sectionFromCard);
   if (Array.isArray(resultModel.cards)) return resultModel.cards.map(sectionFromCard);
   if (resultModel.primary) return [sectionFromCard(resultModel.primary)];
-  return [{ title: 'Ergebnisse', rows: rowsFromObject(resultModel) }].filter(section => section.rows.length);
+  return [{ title: 'Ergebnis', rows: rowsFromObject(resultModel) }].filter(section => section.rows.length);
 }
 
 function calculationSections(calculation, calculationCached) {
@@ -128,6 +151,48 @@ function calculationSections(calculation, calculationCached) {
       ''
     ]]
   }];
+}
+
+function savedRecordBaseTitle(key = '') {
+  return labelFromKey(key)
+    .replace(/^Saved\s+/i, 'Gespeicherte ')
+    .replace(/\bPipes\b/i, 'Rohrauslegungen')
+    .replace(/\bBuffers\b/i, 'Pufferspeicher')
+    .replace(/\bPlants\b/i, 'Anlagen')
+    .replace(/\bCalculations\b/i, 'Berechnungen')
+    .replace(/\bLine Sections\b/i, 'Leitungsabschnitte')
+    .replace(/\bRecords\b/i, 'Records')
+    .trim();
+}
+
+function savedRecordTitle(record = {}, index = 0, key = '') {
+  const fallback = savedRecordBaseTitle(key).replace(/^Gespeicherte\s+/i, '').replace(/e?n$/i, '') || 'Record';
+  return valueToText(record.name ?? record.title ?? record.label ?? record.state?.name ?? record.state?.pipeName ?? record.state?.plantName ?? record.state?.bufferName) || `${fallback} ${index + 1}`;
+}
+
+function savedRecordRows(record = {}) {
+  if (Array.isArray(record.rows)) return record.rows.map(normalizeRow).filter(row => row.some(hasDisplayValue));
+  if (record.result && typeof record.result === 'object') {
+    const resultRows = rowsFromObject(record.result);
+    if (resultRows.length) return resultRows;
+  }
+  if (record.state && typeof record.state === 'object') {
+    const stateRows = rowsFromObject(record.state).filter(row => !/^Saved\s+/i.test(row[0] || '') && !/^Active\s+/i.test(row[0] || '') && !/^Expanded\s+/i.test(row[0] || ''));
+    if (stateRows.length) return stateRows;
+  }
+  return rowsFromObject(record).filter(row => !/^State\s+/i.test(row[0] || '') && !/^Result\s+/i.test(row[0] || ''));
+}
+
+function savedRecordSections(snapshot = {}) {
+  return Object.entries(object(snapshot)).flatMap(([key, value]) => {
+    if (!/^saved[A-Z].*s$/.test(key) || !Array.isArray(value) || !value.length) return [];
+    const baseTitle = savedRecordBaseTitle(key);
+    return value.map((record, index) => ({
+      title: `${baseTitle}: ${savedRecordTitle(record, index, key)}`,
+      rows: savedRecordRows(record),
+      isLineSection: true
+    })).filter(section => section.rows.length);
+  });
 }
 
 export function buildGenericModuleReportDto({
@@ -147,7 +212,8 @@ export function buildGenericModuleReportDto({
   const resultSections = resultModelSections(resultModel);
   const sections = [
     inputSection,
-    ...(resultSections.length ? resultSections : calculationSections(calculation, calculationCached))
+    ...(resultSections.length ? resultSections : calculationSections(calculation, calculationCached)),
+    ...savedRecordSections(state)
   ];
   return Object.freeze({
     metadata: Object.freeze({

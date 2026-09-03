@@ -8,8 +8,15 @@ import { createPipeSizingDynamicRenderer } from '../../platform/dynamicRenderer/
 import { bindPipeSizingActions, pipeSaveCard } from './controller.js';
 import { view } from './view.js';
 import { inputContent, resultContent } from './viewModel.js';
+import { buildPipeSizingResultModel } from './results.js';
 
-const typedReportAdapter = createTypedDtoReportAdapter({ config, schema, state, calculate });
+const typedReportAdapter = createTypedDtoReportAdapter({
+  config,
+  schema,
+  state,
+  calculate,
+  results: (snapshot, result) => buildPipeSizingResultModel(snapshot, result, 'blue')
+});
 const calculateForReport = typedReportAdapter.calculate;
 const pipeSizingDynamicRenderer = createPipeSizingDynamicRenderer({
   calculate: calculateForReport,
