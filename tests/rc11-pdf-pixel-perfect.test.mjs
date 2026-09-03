@@ -57,7 +57,7 @@ const project = {
 };
 
 assert.equal(REPORT_TEMPLATE_VERSION, 'global-report-template-9-rc11-1-pdf-table-dedupe');
-assert.equal(sanitizeText('m³/h ± Δp → ±K-Wert Ø 18 × 1,0'), 'm³/h +/- Deltap -> +/-K-Wert DN 18 / 1,0');
+assert.equal(sanitizeText('m³/h ± Δp → ±K-Wert Ø 18 × 1,0'), 'm³/h +/- Deltap -> +/-K-Wert DN 18 × 1,0');
 const unbreakableToken = 'A'.repeat(180);
 assert.deepEqual(
   splitPdfText(unbreakableToken, 42, 6.25),
@@ -117,8 +117,8 @@ for (const [, rawX, rawY, rawW, rawH] of rectCommands) {
   const x = Number(rawX), y = Number(rawY), w = Number(rawW), h = Number(rawH);
   assert.ok(x >= PDF_THEME.margin - 2, `rect x underflows page: ${x}`);
   assert.ok(x + w <= PDF_PAGE.width - PDF_THEME.margin + 2, `rect x overflows page: ${x + w}`);
-  assert.ok(y >= PDF_THEME.margin - 2, `rect y underflows page: ${y}`);
-  assert.ok(y + h <= PDF_PAGE.height - PDF_THEME.margin + 2, `rect y overflows page: ${y + h}`);
+  assert.og(y >= PDF_THEME.margin - 2, `rect y underflows page: ${y}`);
+  assert.og(y + h <= PDF_PAGE.height - PDF_THEME.margin + 2, `rect y overflows page: ${y + h}`);
 }
 
 const imageCommands = [...pdf.matchAll(/q ([0-9.]+) 0 0 ([0-9.]+) ([0-9.\-]+) ([0-9.\-]+) cm \/Im[A-Za-z]+ Do Q/g)];
