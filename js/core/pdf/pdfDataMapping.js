@@ -27,7 +27,7 @@ function normalizeCollectedReportDto(reportDto, id) {
 }
 
 function isDesignationKey(key = '') {
-  return key === 'bezeichnung' || /^bezeichnung\d+$/.test(key);
+  return key === 'bezeichnung' || /^bezeichnung\s*\d+$/.test(key);
 }
 
 export function collectCurrentModule(modulesRef, routeGetter) {
