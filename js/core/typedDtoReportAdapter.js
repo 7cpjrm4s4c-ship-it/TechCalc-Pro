@@ -6,6 +6,74 @@ const EMPTY_VALUE = '—';
 const array = value => Array.isArray(value) ? value : [];
 const object = value => value && typeof value === 'object' && !Array.isArray(value) ? value : {};
 
+const LABELS = Object.freeze({
+  section: 'Abschnitt',
+  system: 'Rohrsystem',
+  systemId: 'Rohrsystem',
+  systemLabel: 'Rohrsystem',
+  norm: 'Norm',
+  normSmall: 'Norm',
+  normLarge: 'Norm',
+  dn: 'Nennweite',
+  maxDn: 'Maximale Nennweite',
+  dimension: 'Rohrabmessung',
+  di: 'Innendurchmesser',
+  velocity: 'Geschwindigkeit',
+  pressureLoss: 'Druckverlust',
+  maxPressurePam: 'Maximaler Druckverlust',
+  volumeFlowM3h: 'Volumenstrom',
+  massFlowKgh: 'Massenstrom',
+  powerKw: 'Leistung',
+  deltaT: 'Temperaturdifferenz',
+  rho: 'Dichte',
+  cp: 'Spezifische Wärmekapazität',
+  factor: 'Faktor',
+  index: 'Tabellenindex',
+  roughness: 'Rauheit',
+  ratingKey: 'Bewertungsstufe',
+  ratingLabel: 'Bewertung',
+  noDimension: 'Dimensionierung möglich',
+  water: 'Wasser',
+  steel: 'Stahl',
+  pressureLossPaM: 'Druckverlust',
+  massFlow: 'Massenstrom',
+  volumeFlow: 'Volumenstrom',
+  temperatureDifference: 'Temperaturdifferenz'
+});
+
+const UNITS_BY_KEY = Object.freeze({
+  velocity: 'm/s',
+  pressureLoss: 'Pa/m',
+  pressureLossPaM: 'Pa/m',
+  maxPressurePam: 'Pa/m',
+  volumeFlowM3h: 'm³/h',
+  volumeFlow: 'm³/h',
+  massFlowKgh: 'kg/h',
+  massFlow: 'kg/h',
+  powerKw: 'kW',
+  deltaT: 'K',
+  temperatureDifference: 'K',
+  rho: 'kg/m³',
+  cp: 'kJ/(kg·K)',
+  di: 'mm',
+  roughness: 'mm'
+});
+
+const INTERNAL_KEYS = new Set([
+  'smaller',
+  'larger',
+  'dimensions',
+  'rating',
+  'state',
+  'result',
+  'savedPipes',
+  'savedBuffers',
+  'savedPlants',
+  'savedCalculations',
+  'activeSavedRecordId',
+  'expandedSavedRecordId'
+]);
+
 function clone(value) {
   if (value == null) return value;
   return JSON.parse(JSON.stringify(value));
@@ -15,13 +83,63 @@ function hasDisplayValue(value) {
   return value !== null && value !== undefined && value !== '';
 }
 
+function normalizeLookupKey(key = '') {
+  return String(key || '')
+    .replace(/[^a-zA-Z0-9äöüÄÖÜß]+/g, ' ')
+    .trim()
+    .replace(/\s+([a-zA-Z0-9äöüÄÖÜß])/g, (_, char) => char.toUpperCase())
+    .replace(/^./, char => char.toLowerCase());
+}
+
 function labelFromKey(key = '') {
+  const lookupKey = normalizeLookupKey(key);
+  if (LABELS[lookupKey]) return LABELS[lookupKey];
   return String(key || 'Wert')
     .replace(/([a-zäöüß0-9])([A-Z])/g, '$1 $2')
     .replace(/[-_]+/g, ' ')
+    .replace(/\bM3h\b/g, 'm³/h')
+    .replace(/\bKgh\b/g, 'kg/h')
+    .replace(/\bPam\b/g, 'Pa/m')
     .replace(/\s+/g, ' ')
     .trim()
     .replace(/^./, char => char.toUpperCase());
+}
+
+function normalizeUnit(unit = '') {
+  return String(unit || '')
+    .replace(/m3\/h|m³h|m3h/gi, 'm³/h')
+    .replace(/kg\/h|kgh/gi, 'kg/h')
+    .replace(/pa\/m|pam/gi, 'Pa/m')
+    .replace(/kw/g, 'kW')
+    .replace(/°c/gi, '°C')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function unitFromKey(key = '') {
+  return UNITS_BY_KEY[normalizeLookupKey(key)] || '';
+}
+
+function formatNumber(value, fractionDigits = 2) {
+  if (!Number.isFinite(value)) return '';
+  return new Intl.NumberFormat('de-DE', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: fractionDigits
+  }).format(value);
+}
+
+function shouldParseNumericString(value = '') {
+  const text = String(value).trim();
+  if (!/^-?\d+(?:\.\d+)?$/.test(text)) return false;
+  const fraction = text.split('.')[1] || '';
+  if (!fraction) return false;
+  return !(fraction.length === 3 && /^0+$/.test(fraction));
+}
+
+function formatScalar(value) {
+  if (typeof value === 'number') return formatNumber(value);
+  if (typeof value === 'string' && shouldParseNumericString(value)) return formatNumber(Number(value));
+  return String(value);
 }
 
 function valueToText(value) {
@@ -46,7 +164,7 @@ function valueToText(value) {
       .map(([key, entryValue]) => `${labelFromKey(key)}: ${valueToText(entryValue)}`)
       .join(' · ');
   }
-  return String(value);
+  return formatScalar(value);
 }
 
 function optionLabel(field = {}, value) {
@@ -81,38 +199,48 @@ function schemaInputRows(schema = {}, snapshot = {}) {
     .map(field => {
       const value = readFieldValue(field, snapshot);
       const text = optionLabel(field, value);
-      return [field.label || field.title || labelFromKey(field.name || field.id || field.key), text || EMPTY_VALUE, field.unit || ''];
+      return [field.label || field.title || labelFromKey(field.name || field.id || field.key), text || EMPTY_VALUE, normalizeUnit(field.unit || unitFromKey(field.name || field.id || field.key))];
     })
     .filter(row => row.some(hasDisplayValue));
 }
 
 function normalizeRow(row = []) {
-  if (Array.isArray(row)) return row.slice(0, 3).map(valueToText);
+  if (Array.isArray(row)) return row.slice(0, 3).map((cell, index) => index === 2 ? normalizeUnit(valueToText(cell)) : valueToText(cell));
   if (row && typeof row === 'object') {
+    const label = row.label ?? row.name ?? row.title ?? 'Eintrag';
     return [
-      valueToText(row.label ?? row.name ?? row.title ?? 'Eintrag'),
+      labelFromKey(label),
       valueToText(row.value ?? row.text ?? EMPTY_VALUE),
-      valueToText(row.unit ?? '')
+      normalizeUnit(row.unit ?? unitFromKey(label))
     ];
   }
   return ['Eintrag', valueToText(row), ''];
 }
 
+function shouldSkipObjectKey(key = '') {
+  return INTERNAL_KEYS.has(normalizeLookupKey(key));
+}
+
+function rowForPrimitive(key, value) {
+  return [labelFromKey(key), valueToText(value) || EMPTY_VALUE, normalizeUnit(unitFromKey(key))];
+}
+
 function rowsFromObject(source = {}, prefix = '') {
   return Object.entries(object(source)).flatMap(([key, value]) => {
-    if (!hasDisplayValue(value)) return [];
+    if (shouldSkipObjectKey(key) || !hasDisplayValue(value)) return [];
     const label = prefix ? `${prefix} ${labelFromKey(key)}` : labelFromKey(key);
     if (Array.isArray(value)) {
       if (!value.length) return [];
-      if (value.every(item => item == null || typeof item !== 'object')) return [[label, valueToText(value), '']];
-      return [[label, `${value.length} Einträge`, '']];
-    }
-    if (value && typeof value === 'object') {
-      const nested = rowsFromObject(value, label);
-      if (nested.length) return nested;
+      if (value.every(item => item == null || typeof item !== 'object')) return [[label, valueToText(value), normalizeUnit(unitFromKey(key))]];
       return [];
     }
-    return [[label, valueToText(value) || EMPTY_VALUE, '']];
+    if (value && typeof value === 'object') {
+      const preferred = value.label ?? value.name ?? value.title ?? value.value ?? value.text;
+      if (preferred !== undefined && preferred !== value) return [[label, valueToText(preferred), normalizeUnit(unitFromKey(key))]];
+      const nested = rowsFromObject(value, label);
+      return nested.length ? nested : [];
+    }
+    return [rowForPrimitive(key, value)];
   });
 }
 
@@ -154,6 +282,11 @@ function calculationSections(calculation, calculationCached) {
 }
 
 function savedRecordBaseTitle(key = '') {
+  const normalized = normalizeLookupKey(key);
+  if (normalized === 'savedPipes') return 'Leitungsabschnitt';
+  if (normalized === 'savedBuffers') return 'Pufferspeicher';
+  if (normalized === 'savedPlants') return 'Anlage';
+  if (normalized === 'savedCalculations') return 'Berechnung';
   return labelFromKey(key)
     .replace(/^Saved\s+/i, 'Gespeicherte ')
     .replace(/\bPipes\b/i, 'Rohrauslegungen')
@@ -166,30 +299,38 @@ function savedRecordBaseTitle(key = '') {
 }
 
 function savedRecordTitle(record = {}, index = 0, key = '') {
-  const fallback = savedRecordBaseTitle(key).replace(/^Gespeicherte\s+/i, '').replace(/e?n$/i, '') || 'Record';
-  return valueToText(record.name ?? record.title ?? record.label ?? record.state?.name ?? record.state?.pipeName ?? record.state?.plantName ?? record.state?.bufferName) || `${fallback} ${index + 1}`;
+  const state = object(record.state);
+  const result = object(record.result);
+  const namedTitle = valueToText(record.name ?? record.title ?? record.label ?? state.name ?? state.pipeName ?? state.plantName ?? state.bufferName);
+  if (namedTitle) return namedTitle;
+  const system = valueToText(result.system?.label ?? result.systemLabel ?? state.system?.label ?? state.systemLabel ?? state.system);
+  const dn = valueToText(result.dn ?? state.dn);
+  if (system && dn) return `${system}, DN ${dn}`;
+  const base = savedRecordBaseTitle(key) || 'Record';
+  return `${base} ${index + 1}`;
 }
 
-function savedRecordRows(record = {}) {
-  if (Array.isArray(record.rows)) return record.rows.map(normalizeRow).filter(row => row.some(hasDisplayValue));
+function savedRecordRows(record = {}, index = 0, key = '') {
+  const title = savedRecordTitle(record, index, key);
+  const titleRow = ['Bezeichnung', title, ''];
+  if (Array.isArray(record.rows)) return [titleRow, ...record.rows.map(normalizeRow).filter(row => row.some(hasDisplayValue))];
   if (record.result && typeof record.result === 'object') {
     const resultRows = rowsFromObject(record.result);
-    if (resultRows.length) return resultRows;
+    if (resultRows.length) return [titleRow, ...resultRows];
   }
   if (record.state && typeof record.state === 'object') {
     const stateRows = rowsFromObject(record.state).filter(row => !/^Saved\s+/i.test(row[0] || '') && !/^Active\s+/i.test(row[0] || '') && !/^Expanded\s+/i.test(row[0] || ''));
-    if (stateRows.length) return stateRows;
+    if (stateRows.length) return [titleRow, ...stateRows];
   }
-  return rowsFromObject(record).filter(row => !/^State\s+/i.test(row[0] || '') && !/^Result\s+/i.test(row[0] || ''));
+  return [titleRow, ...rowsFromObject(record).filter(row => !/^State\s+/i.test(row[0] || '') && !/^Result\s+/i.test(row[0] || ''))];
 }
 
 function savedRecordSections(snapshot = {}) {
   return Object.entries(object(snapshot)).flatMap(([key, value]) => {
     if (!/^saved[A-Z].*s$/.test(key) || !Array.isArray(value) || !value.length) return [];
-    const baseTitle = savedRecordBaseTitle(key);
     return value.map((record, index) => ({
-      title: `${baseTitle}: ${savedRecordTitle(record, index, key)}`,
-      rows: savedRecordRows(record),
+      title: savedRecordBaseTitle(key),
+      rows: savedRecordRows(record, index, key),
       isLineSection: true
     })).filter(section => section.rows.length);
   });
