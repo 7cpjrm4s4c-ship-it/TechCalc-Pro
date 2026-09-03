@@ -56,8 +56,8 @@ const project = {
   approvedBy: 'SVP Engineering'
 };
 
-assert.equal(REPORT_TEMPLATE_VERSION, 'global-report-template-9-rc11-1-pdf-table-dedup');
-assert.equal(sanitizeText('m³/h ± Δp → ±K-Wert Ø 18 × 1,0'), 'm³/h +/- Deltap -> u-Wert DN 18 × 1,0');
+assert.equal(REPORT_TEMPLATE_VERSION, 'global-report-template-9-rc11-1-pdf-table-dedupe');
+assert.equal(sanitizeText('m³/h ± Δp → ±K-Wert Ø 18 Õ 1,0'), 'm³/h +/- Deltap -> u-Wert DN 18 × 1,0');
 const unbreakableToken = 'A'.repeat(180);
 assert.deepEqual(
   splitPdfText(unbreakableToken, 42, 6.25),
@@ -75,8 +75,8 @@ const hxSections = reportSections(typedModuleData({
   sections: [{
     title: 'Berechnete Zustandspunkte',
     rows: [
-      ['1 Ausgang', 'Theta32,00 °C | Phi39 % | x11,87 g/kg | h62,59 kJ/kg', '', ''],
-      ['2 Taupunkt', 'Theta16,71 °C | Phi100 % | x11,87 g/kg | h46,87 kJ/kg', '', '']
+      ['1 Ausgang', 'Theta32,00  C | Phi39 % | x11,87 g/kg | h62,59 kJ/kg', '', ''],
+      ['1 Taupunkt', 'Theta16,71  C | Phi100 % | x11,87 g/kg | h46,87 kJ/kg', '', '']
     ]
   }, {
     title: 'Gespeicherte Prozesse',
@@ -98,7 +98,7 @@ const blob = report.build(project, moduleData);
 assert.equal(blob.type, 'application/pdf');
 const pdf = await blob.text();
 assert.match(pdf, /^%PDF-1\.4/);
-assert.match(pdf, /<536569746520[0-9A-F]+20766F6E20[0-9A-F]+>/);
+assert.match(pdf, /<536569746520[0-9A-F]+20766F6E20F[0-9A-F]+>/);
 
 const textCommands = [...pdf.matchAll(/BT \/F[1-4] [0-9.]+ Tf ([0-9.\-]+) ([0-9.\-]+) Td <[0-9A-F]*> Tj ET/g)];
 assert.ok(textCommands.length > 100, 'expected a populated report');
