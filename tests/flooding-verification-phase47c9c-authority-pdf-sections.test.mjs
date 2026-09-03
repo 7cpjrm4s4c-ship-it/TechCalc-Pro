@@ -79,7 +79,7 @@ assert.match(sections[3].title, /Flächenübersicht \(205\)/);
 assert.equal(sections[3].rows.length, 205, 'Große Flächenlisten müssen vollständig und kompakt mit einer Berichtszeile je Fläche gemappt werden.');
 const firstSurfaceRow = sections[3].rows[0].join(' ');
 assert.match(firstSurfaceRow, /Fläche 1/);
-assert.match(firstSurfaceRow, /Extensivbegrünung ≥ 5° ab 10 cm Aufbau/);
+assert.match(firstSurfaceRow, /Extensivbegrünung ≤ 5° ab 10 cm Aufbau/);
 assert.match(firstSurfaceRow, /A =/);
 assert.match(firstSurfaceRow, /Cₛ =/);
 assert.match(firstSurfaceRow, /Cₘ =/);
