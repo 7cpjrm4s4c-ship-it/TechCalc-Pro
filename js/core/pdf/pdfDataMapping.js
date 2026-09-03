@@ -10,6 +10,26 @@ function resolveRuntimeModule(registryEntry) {
   return registryEntry?.module?.loadedModule || registryEntry?.module || registryEntry?.loadedModule || registryEntry;
 }
 
+function isSpecialReportHeadingModule(id = '', reportDto = {}) {
+  const identity = `${id || ''} ${reportDto?.metadata?.moduleId || ''} ${reportDto?.metadata?.moduleTitle || ''} ${reportDto?.metadata?.dtoType || ''}`;
+  return /flooding-verification|hx|h,x/i.test(identity);
+}
+
+function normalizeCollectedReportDto(reportDto, id) {
+  if (isSpecialReportHeadingModule(id, reportDto)) return reportDto;
+  return {
+    ...reportDto,
+    metadata: {
+      ...reportDto.metadata,
+      reportHeading: 'Berechnungsprotokoll'
+    }
+  };
+}
+
+function isDesignationKey(key = '') {
+  return key === 'bezeichnung' || /^bezeichnung\d+$/.test(key);
+}
+
 export function collectCurrentModule(modulesRef, routeGetter) {
   const id = typeof routeGetter === 'function' ? routeGetter() : currentRoute();
   const registryEntry = modulesRef?.get?.(id);
@@ -27,14 +47,16 @@ export function collectCurrentModule(modulesRef, routeGetter) {
     throw new Error(`PDF-Report-Adapter für ${id || 'das aktuelle Modul'} lieferte kein gültiges Typed-DTO.`);
   }
 
+  const normalizedReportDto = normalizeCollectedReportDto(reportDto, id);
+
   return {
     id,
-    title: registryEntry?.title || module?.title || module?.config?.title || reportDto.metadata?.moduleTitle || id || 'Modul',
-    shortTitle: registryEntry?.shortTitle || module?.shortTitle || module?.config?.shortTitle || reportDto.metadata?.moduleTitle || id || 'Modul',
+    title: registryEntry?.title || module?.title || module?.config?.title || normalizedReportDto.metadata?.moduleTitle || id || 'Modul',
+    shortTitle: registryEntry?.shortTitle || module?.shortTitle || module?.config?.shortTitle || normalizedReportDto.metadata?.moduleTitle || id || 'Modul',
     sections: [],
     chartSvg: '',
     chartCanvas: null,
-    reportDto,
+    reportDto: normalizedReportDto,
     reportSource: 'typed-dto'
   };
 }
@@ -65,10 +87,10 @@ export function lineSectionItems(rows = []) {
     const value = sanitizeText(row?.[1] || '');
     const unit = sanitizeText(row?.[2] || '');
     const key = normalizeKey(label);
-    if ((key === 'bezeichnung' && current.length) || (key === 'leistung' && current.some(entry => normalizeKey(entry?.[0] || '') === 'leistung'))) pushCurrent();
-    if (key === 'bezeichnung') {
+    const isDesignation = isDesignationKey(key);
+    if ((isDesignation && current.length) || (key === 'leistung' && current.some(entry => normalizeKey(entry?.[0] || '') === 'leistung'))) pushCurrent();
+    if (isDesignation) {
       title = value || title;
-      if (value) current.push(['Bezeichnung', value, '']);
       return;
     }
     if (label || value || unit) current.push([label, value, unit]);
