@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { collectCurrentModule, lineSectionItems } from '../js/core/pdf/pdfDataMapping.js';
 
 const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const pdfDataMappingSource = read('js/core/pdf/pdfDataMapping.js');
@@ -59,6 +60,56 @@ assert.match(
   /typedReportSectionBuilders\[dtoType\] \|\| buildGenericReportSections/,
   'typed DTO dispatch must use the generic section builder for modules without specialized PDF sections'
 );
+
+const heatingReportDto = {
+  metadata: {
+    dtoType: 'techcalc.generic-module.report',
+    moduleId: 'heating-cooling',
+    moduleTitle: 'Heizung / Kälte',
+    reportHeading: 'Heizung / Kälte'
+  },
+  summary: {},
+  input: {},
+  sections: []
+};
+const collectedHeating = collectCurrentModule(new Map([[
+  'heating-cooling',
+  {
+    title: 'Heizung / Kälte',
+    report: () => heatingReportDto,
+    state: { get: () => ({}) }
+  }
+]]), () => 'heating-cooling');
+assert.equal(collectedHeating.reportDto.metadata.reportHeading, 'Berechnungsprotokoll');
+assert.equal(heatingReportDto.metadata.reportHeading, 'Heizung / Kälte', 'report DTO normalization must not mutate the module-owned DTO');
+
+const collectedFlooding = collectCurrentModule(new Map([[
+  'flooding-verification',
+  {
+    title: 'Überflutungsnachweis',
+    report: () => ({
+      metadata: {
+        dtoType: 'techcalc.flooding-verification.report',
+        moduleId: 'flooding-verification',
+        moduleTitle: 'Überflutungsnachweis',
+        reportHeading: 'Behördennachweis'
+      }
+    }),
+    state: { get: () => ({}) }
+  }
+]]), () => 'flooding-verification');
+assert.equal(collectedFlooding.reportDto.metadata.reportHeading, 'Behördennachweis');
+
+const lineItems = lineSectionItems([
+  ['Bezeichnung', 'Test Kälte', ''],
+  ['Leistung', '250', 'kW'],
+  ['Volumenstrom', '34,368', 'm³/h'],
+  ['Bezeichnung 2', 'Test Heizung', ''],
+  ['Leistung', '435,25', 'kW'],
+  ['Volumenstrom', '25', 'm³/h']
+]);
+assert.deepEqual(lineItems.map(item => item.title), ['Test Kälte', 'Test Heizung']);
+assert.deepEqual(lineItems.flatMap(item => item.rows).filter(row => /^Bezeichnung/i.test(row[0])), []);
 
 for (const moduleIndexPath of moduleIndexPaths) {
   const source = read(moduleIndexPath);
