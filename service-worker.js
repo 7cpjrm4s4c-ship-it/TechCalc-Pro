@@ -1,5 +1,5 @@
 const CACHE_NAME = 'techcalc-pro-1.6.1';
-const CACHE_REVISION = '1.6.1-version-1-6-1-typed-dto-adapter-unification';
+const CACHE_REVISION = '1.6.1-version-1-6-1-pdf-adapter-unification';
 const ASSETS = [
   './',
   './index.html',
