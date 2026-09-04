@@ -1,9 +1,23 @@
 import { logger } from '../../core/logger.js';
 import { trackGlobalEventListener } from '../../core/eventManager.js';
 import { initializeUnsavedWorkGuard } from '../../core/unsavedWorkGuard.js';
-import { getProjectMeta, setProjectMeta } from '../../core/projectStorage.js';
+
 const SETTINGS_UI_STORAGE_KEY = 'techcalc-settings-ui';
-const PDF_BRANDING_SETTING_ID = 'pdfShowTechCalcBranding';
+const CORPORATE_SETTINGS_FIELD_IDS = [
+  'pdfCompanyLogo',
+  'pdfCompanyName',
+  'pdfCompanyAddress',
+  'pdfDocumentVersion',
+  'pdfCheckedBy',
+  'pdfApprovedBy',
+  'pdfShowTechCalcBranding'
+];
+const CORPORATE_SETTINGS_AUXILIARY_IDS = [
+  'pdfCompanyLogoPreview',
+  'pdfCompanyLogoStatus',
+  'clearPdfCompanyLogo'
+];
+
 function readStorageJson(key, fallback = {}) {
   try {
     const raw = localStorage.getItem(key);
@@ -22,31 +36,25 @@ function writeStorageJson(key, value) {
     logger.warn('UI-Einstellungen konnten nicht gespeichert werden.', error, { module: 'settings' });
   }
 }
-function ensurePdfBrandingSetting(settingsPanel) {
+
+function removeSettingsControlById(id) {
+  const element = document.getElementById(id);
+  if (!element) return;
+  const removable = element.closest('label') || element.closest('.settings-actions') || element;
+  removable.remove();
+}
+
+function normalizeProjectSettingsPanel(settingsPanel) {
   const projectSettings = settingsPanel?.querySelector('#projectPdfSettings');
   if (!projectSettings) return;
-  let input = document.getElementById(PDF_BRANDING_SETTING_ID);
-  if (!input) {
-    const label = document.createElement('label');
-    label.className = 'settings-check';
-    const text = document.createElement('span');
-    text.textContent = 'TechCalc Pro im PDF anzeigen';
-    input = document.createElement('input');
-    input.id = PDF_BRANDING_SETTING_ID;
-    input.type = 'checkbox';
-    input.setAttribute('aria-label', 'TechCalc Pro Branding im PDF anzeigen');
-    label.append(text, input);
-    const companyLogoField = document.getElementById('pdfCompanyLogo')?.closest('label');
-    projectSettings.insertBefore(label, companyLogoField || null);
+  const description = projectSettings.querySelector('p');
+  if (description) {
+    description.textContent = 'Die Projektdaten gelten für die Kopfzeile der PDF-Ausgabe und für gespeicherte Projektdateien.';
   }
-  const hydrate = () => { input.checked = getProjectMeta().showTechCalcBranding !== false; };
-  if (input.dataset.bound !== 'true') {
-    input.dataset.bound = 'true';
-    input.addEventListener('change', () => setProjectMeta({ showTechCalcBranding: input.checked }));
-    document.addEventListener('techcalc-project-loaded', hydrate);
-  }
-  hydrate();
+  CORPORATE_SETTINGS_FIELD_IDS.forEach(removeSettingsControlById);
+  CORPORATE_SETTINGS_AUXILIARY_IDS.forEach(removeSettingsControlById);
 }
+
 let settingsControllerInitialized = false;
 export function initializeSettingsController({
   settingsButton = document.getElementById('settingsButton'),
@@ -57,7 +65,7 @@ export function initializeSettingsController({
   initializeUnsavedWorkGuard();
   if (settingsControllerInitialized) return;
   settingsControllerInitialized = true;
-  ensurePdfBrandingSetting(settingsPanel);
+  normalizeProjectSettingsPanel(settingsPanel);
   const settingsBody = settingsPanel?.querySelector('.settings-panel__body');
   let settingsScrollY = 0;
   let lastFocusedElement = null;
