@@ -7,6 +7,7 @@ import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js
 import { createPressureHoldingDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { fmtInput } from '../../utils/calculations.js';
 import { bindPressureHoldingActions, savedPlantsCard } from './controller.js';
+import { buildPressureHoldingResultModel } from './results.js';
 import { view } from './view.js';
 import {
   basisContent,
@@ -16,7 +17,13 @@ import {
   resultContent
 } from './viewModel.js';
 
-const typedReportAdapter = createTypedDtoReportAdapter({ config, schema, state, calculate });
+const typedReportAdapter = createTypedDtoReportAdapter({
+  config,
+  schema,
+  state,
+  calculate,
+  results: (snapshot, result) => buildPressureHoldingResultModel(snapshot, result)
+});
 const calculateForReport = typedReportAdapter.calculate;
 const pressureHoldingDynamicRenderer = createPressureHoldingDynamicRenderer({
   calculate: calculateForReport,
