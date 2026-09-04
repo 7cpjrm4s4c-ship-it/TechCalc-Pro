@@ -137,6 +137,8 @@ assert.deepEqual(printableHxSections(hxModuleData).map(section => section.chartI
 const pdfLayoutSource = readFileSync(new URL('../js/core/pdf/pdfLayout.js', import.meta.url), 'utf8');
 assert.match(pdfLayoutSource, /this\.standardSection\(section\);\s*this\.sectionChartBlock\(section, index\);/,
   'h,x PDF layout must render each saved record before its corresponding diagram');
+assert.match(pdfLayoutSource, /if \(index > 0\) \{\s*this\.addPage\(\);\s*this\.header\(project, moduleData, date\);\s*this\.projectData\(project\);\s*\}\s*this\.standardSection\(section\);\s*this\.sectionChartBlock\(section, index\);/,
+  'h,x PDF layout must start each saved process on its own report page');
 assert.doesNotMatch(pdfLayoutSource, /if \(isHxDiagram\) \{\s*this\.chartBlock\(\);\s*sections\.forEach\(section => this\.standardSection\(section\)\);/,
   'h,x PDF layout must not render one combined diagram block before all saved records');
 

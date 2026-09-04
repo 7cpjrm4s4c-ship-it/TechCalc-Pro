@@ -390,6 +390,11 @@ export class GlobalPdfReport {
       const hxSections = sections.filter(section => !isHxMetaSection(section));
       const printableSections = hxSections.length ? hxSections : sections;
       printableSections.forEach((section, index) => {
+        if (index > 0) {
+          this.addPage();
+          this.header(project, moduleData, date);
+          this.projectData(project);
+        }
         this.standardSection(section);
         this.sectionChartBlock(section, index);
       });
