@@ -53,11 +53,11 @@ function collectProjectFormValues() {
     showTechCalcBranding: readBrandingControlValue(),
     companyLogo: readStoredCompanyLogo(),
     companyLogoName: readStoredCompanyLogoName(),
-    companyName: document.getElementById('pdfCompanyName')?.value || '',
-    companyAddress: document.getElementById('pdfCompanyAddress')?.value || '',
-    documentVersion: document.getElementById('pdfDocumentVersion')?.value || '',
-    checkedBy: document.getElementById('pdfCheckedBy')?.value || '',
-    approvedBy: document.getElementById('pdfApprovedBy')?.value || ''
+    companyName: '',
+    companyAddress: '',
+    documentVersion: '',
+    checkedBy: '',
+    approvedBy: ''
   };
 }
 
@@ -228,11 +228,11 @@ function hydrateProjectForm(data = {}) {
   setInputValue('pdfProjectNo', data.projectNo);
   setInputValue('pdfEngineer', data.engineer);
   setCheckboxValue('pdfShowTechCalcBranding', data.showTechCalcBranding);
-  setInputValue('pdfCompanyName', data.companyName);
-  setInputValue('pdfCompanyAddress', data.companyAddress);
-  setInputValue('pdfDocumentVersion', data.documentVersion);
-  setInputValue('pdfCheckedBy', data.checkedBy);
-  setInputValue('pdfApprovedBy', data.approvedBy);
+  setInputValue('pdfCompanyName', '');
+  setInputValue('pdfCompanyAddress', '');
+  setInputValue('pdfDocumentVersion', '');
+  setInputValue('pdfCheckedBy', '');
+  setInputValue('pdfApprovedBy', '');
   setInputValue('pdfDate', data.date);
   const logo = data.companyLogo || readStoredCompanyLogo();
   const logoName = data.companyLogoName || readStoredCompanyLogoName();
