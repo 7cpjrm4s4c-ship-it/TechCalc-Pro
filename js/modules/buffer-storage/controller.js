@@ -1,5 +1,6 @@
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { fmt } from '../../utils/calculations.js';
+import { parseNumber } from '../../core/numberService.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { mediumLabel, modeLabel } from './results.js';
@@ -9,14 +10,29 @@ function normalizeBufferStorageState(s = {}){
   return { ...s, calculationMode };
 }
 
+function reportNumber(value){
+  if (value === '' || value === null || value === undefined) return NaN;
+  const numeric = typeof value === 'number' ? value : parseNumber(value, { fallback: NaN });
+  return Number.isFinite(numeric) ? numeric : NaN;
+}
+
+function formatReportNumber(value, unit = '', digits = 2){
+  const numeric = reportNumber(value);
+  if (!Number.isFinite(numeric)) return value ?? '—';
+  const text = fmt(numeric, digits);
+  if (unit === 'l' && Math.abs(numeric) >= 1000 && !String(text).includes(',')) {
+    return `${text},0`;
+  }
+  return text;
+}
+
 function valueRow(label, value, unit = '', digits = 2){
-  const numeric = Number(value);
-  const text = Number.isFinite(numeric) ? fmt(numeric, digits) : (value ?? '—');
+  const text = formatReportNumber(value, unit, digits);
   return [label, text || '—', unit];
 }
 
 function positiveRow(label, value, unit = '', digits = 2){
-  return Number(value) > 0 ? valueRow(label, value, unit, digits) : null;
+  return reportNumber(value) > 0 ? valueRow(label, value, unit, digits) : null;
 }
 
 function rowsForCalculationParameters(snapshot = {}){

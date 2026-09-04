@@ -10,6 +10,7 @@ const commands = [
   ['node', ['tests/hx-negative-humidification.test.mjs']],
   ['node', ['tests/hx-enthalpy-power.test.mjs']],
   ['node', ['tests/pressure-holding-pdf-saved-records.test.mjs']],
+  ['node', ['tests/buffer-storage-pdf-saved-records.test.mjs']],
   ['node', ['tests/rainwater-manufacturer-drains.test.mjs']],
   ['node', ['tests/unit-converter-btu-per-hour.test.mjs']],
   ['node', ['tests/service-worker-update-flow.test.mjs']],
