@@ -9,6 +9,78 @@ function normalizeBufferStorageState(s = {}){
   return { ...s, calculationMode };
 }
 
+function valueRow(label, value, unit = '', digits = 2){
+  const numeric = Number(value);
+  const text = Number.isFinite(numeric) ? fmt(numeric, digits) : (value ?? '—');
+  return [label, text || '—', unit];
+}
+
+function positiveRow(label, value, unit = '', digits = 2){
+  return Number(value) > 0 ? valueRow(label, value, unit, digits) : null;
+}
+
+function rowsForCalculationParameters(snapshot = {}){
+  const s = normalizeBufferStorageState(snapshot);
+  const rows = [
+    ['Berechnungsart', modeLabel(s.calculationMode), ''],
+    ['Medium', mediumLabel(s), '']
+  ];
+
+  if (s.mediumMode !== 'water') {
+    rows.push(
+      ['Glykolart', s.glycolType === 'propylene' ? 'Propylenglykol' : 'Ethylenglykol', ''],
+      valueRow('Glykolanteil', s.glycolConcentration, '%', 2)
+    );
+  }
+
+  if (s.calculationMode === 'runtime') {
+    rows.push(
+      valueRow('Maximale Leistung', s.qMaxKw, 'kW', 2),
+      valueRow('Teillastfaktor', s.partLoadFactor, '%', 2),
+      valueRow('Konstante Lastabnahme', s.qLoadKw, 'kW', 2),
+      valueRow('Mindestlaufzeit', s.compressorRunTimeMin, 'min', 2),
+      valueRow('Regelband', s.controllerDeltaT, 'K', 2),
+      valueRow('Vorhandenes Anlagenvolumen', s.existingSystemVolumeL, 'l', 2)
+    );
+  }
+
+  if (s.calculationMode === 'defrost') {
+    rows.push(
+      valueRow('Heizleistung aktive Verbraucher', s.qConsumerKw, 'kW', 2),
+      valueRow('Kälteleistung bei Abtauung', s.qDefrostKw, 'kW', 2),
+      valueRow('Heizleistung verbleibender Kreis', s.qHeatingCircuitKw, 'kW', 2),
+      valueRow('Maximale Abtauzeit', s.maxDefrostTimeMin, 'min', 2),
+      valueRow('Hydraulische Temperaturdifferenz', s.hydraulicDeltaT, 'K', 2),
+      valueRow('Vorhandenes Anlagenvolumen', s.existingSystemVolumeL, 'l', 2)
+    );
+  }
+
+  if (s.calculationMode === 'reserve') {
+    rows.push(
+      valueRow('Volumenstrom Verbraucher', s.consumerFlowM3h, 'm³/h', 2),
+      valueRow('Überbrückungszeit', s.bridgeTimeMin, 'min', 2)
+    );
+  }
+
+  return rows.filter(Boolean);
+}
+
+function rowsForCalculationResults(result = {}){
+  return [
+    valueRow('Berechnungsfaktor', result.factor, '', 2),
+    positiveRow('Leistungsanteil Mindestlaufzeit', result.runtimePower, 'kW', 2),
+    positiveRow('Systeminhalt Mindestlaufzeit', result.runtimeSystemVolume, 'l', 1),
+    positiveRow('Puffervolumen Mindestlaufzeit', result.runtimeBufferVolume, 'l', 1),
+    positiveRow('Leistungsbilanz Abtauung', result.defrostPower, 'kW', 2),
+    positiveRow('Systeminhalt Abtauung', result.defrostSystemVolume, 'l', 1),
+    positiveRow('Puffervolumen Abtauung', result.defrostBufferVolume, 'l', 1),
+    positiveRow('Wasservorlage', result.reserveVolume, 'l', 1),
+    positiveRow('Abgezogenes Anlagenvolumen', result.existingSystemVolume, 'l', 1),
+    valueRow('Erforderliches Pufferspeichervolumen', result.decisiveVolume, 'l', 1),
+    valueRow('Nächstes Normvolumen', result.nextStandardVolume, 'l', 0)
+  ].filter(Boolean);
+}
+
 export function savedBufferStats(item = {}){
   const res = item.result || {};
   return [
@@ -34,6 +106,10 @@ export function buildBufferRecord(currentState, result, items, id, name, existin
     createdAt: existing?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     state: copy,
+    rows: [
+      ...rowsForCalculationParameters(copy),
+      ...rowsForCalculationResults(result || {})
+    ],
     result: {
       mode: normalizedState.calculationMode,
       volume: result?.decisiveVolume,
