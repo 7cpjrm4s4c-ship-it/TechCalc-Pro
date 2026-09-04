@@ -8,6 +8,11 @@ function num(value) {
   return parseNumber(value, { fallback: 0 });
 }
 
+function integerReportText(value) {
+  const parsed = num(value);
+  return parsed ? String(Math.round(parsed)) : '';
+}
+
 function savedPlantStats(item = {}){
   const res = item.result || {};
   return [
@@ -32,8 +37,8 @@ function pressureResultRows(currentState = {}, result = {}) {
   const rows = [
     { label: 'Produkt', value: result.productLabel },
     { label: 'Ausgewähltes Volumen', value: result.selectedVolume, unit: 'l', digits: 2 },
-    { label: 'Standardvolumen', value: result.selectedStandardVolume, unit: 'l', digits: 0 },
-    { label: 'Anlagenvolumen', value: systemVolume, unit: 'l', digits: 0 },
+    { label: 'Standardvolumen', value: integerReportText(result.selectedStandardVolume), unit: 'l' },
+    { label: 'Anlagenvolumen', value: integerReportText(systemVolume), unit: 'l' },
     { label: 'Vordruck', value: result.p0, unit: 'bar', digits: 2 },
     { label: 'Mindestdruck', value: result.paMin, unit: 'bar', digits: 2 },
     { label: 'Enddruck', value: result.pe, unit: 'bar', digits: 2 },

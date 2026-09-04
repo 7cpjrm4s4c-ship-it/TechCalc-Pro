@@ -31,7 +31,8 @@ assert.equal(result.systemVolume, 16000, 'calculation must use 16.000 l as 16,00
 
 const record = buildPressureRecord(baseState, result, [], 'pressure-test', 'Test Heizung');
 assert.equal(record.result.systemVolume, 16000, 'saved pressure record must preserve the litre value used by the calculation');
-assert.ok(record.rows.some(row => row[0] === 'Anlagenvolumen' && row[1] === '16.000' && row[2] === 'l'));
+assert.ok(record.rows.some(row => row[0] === 'Anlagenvolumen' && row[1] === '16000' && row[2] === 'l'));
+assert.ok(record.rows.some(row => row[0] === 'Standardvolumen' && row[1] === '3000' && row[2] === 'l'));
 assert.ok(record.rows.some(row => row[0] === 'Ausdehnungskoeffizient'));
 assert.ok(record.rows.some(row => row[0] === 'Ausdehnungsvolumen'));
 assert.ok(record.rows.some(row => row[0] === 'Wasservorlage'));
@@ -50,6 +51,7 @@ const savedSection = sections.find(section => section.isLineSection && section.t
 assert.ok(savedSection, 'saved pressure records must be exported as line-section style report blocks');
 const rows = savedSection.rows;
 assert.ok(rows.some(row => row[0] === 'Anlagenvolumen' && row[1] === '16.000' && row[2] === 'l'));
+assert.ok(rows.some(row => row[0] === 'Standardvolumen' && row[1] === '3.000' && row[2] === 'l'));
 assert.ok(rows.some(row => row[0] === 'Ausdehnungskoeffizient'));
 assert.ok(rows.some(row => row[0] === 'Verdampfungsdruck'));
 assert.ok(rows.some(row => row[0] === 'Verwendeter statischer Druck'));
