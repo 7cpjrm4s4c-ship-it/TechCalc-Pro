@@ -13,9 +13,16 @@ import {
   wastewaterSavedStats,
   wastewaterSavedSubtitle
 } from './controller.js';
+import { results } from './results.js';
 import { createWastewaterView } from './view.js';
 
-const typedReportAdapter = createTypedDtoReportAdapter({ config, schema, state, calculate });
+const typedReportAdapter = createTypedDtoReportAdapter({
+  config,
+  schema,
+  state,
+  calculate,
+  results
+});
 const calculateForReport = typedReportAdapter.calculate;
 const lineSectionController = createLineSectionController({
   state,
