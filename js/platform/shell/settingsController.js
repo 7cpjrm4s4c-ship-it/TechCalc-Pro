@@ -3,19 +3,12 @@ import { trackGlobalEventListener } from '../../core/eventManager.js';
 import { initializeUnsavedWorkGuard } from '../../core/unsavedWorkGuard.js';
 
 const SETTINGS_UI_STORAGE_KEY = 'techcalc-settings-ui';
-const CORPORATE_SETTINGS_FIELD_IDS = [
-  'pdfCompanyLogo',
+const CORPORATE_BLOCK_FIELD_IDS = [
   'pdfCompanyName',
   'pdfCompanyAddress',
   'pdfDocumentVersion',
   'pdfCheckedBy',
-  'pdfApprovedBy',
-  'pdfShowTechCalcBranding'
-];
-const CORPORATE_SETTINGS_AUXILIARY_IDS = [
-  'pdfCompanyLogoPreview',
-  'pdfCompanyLogoStatus',
-  'clearPdfCompanyLogo'
+  'pdfApprovedBy'
 ];
 
 function readStorageJson(key, fallback = {}) {
@@ -44,15 +37,35 @@ function removeSettingsControlById(id) {
   removable.remove();
 }
 
+function ensureTechCalcBrandingControl(projectSettings) {
+  if (!projectSettings || document.getElementById('pdfShowTechCalcBranding')) return;
+  const input = document.createElement('input');
+  input.id = 'pdfShowTechCalcBranding';
+  input.type = 'checkbox';
+  input.checked = true;
+  input.setAttribute('aria-label', 'TechCalc-Branding im PDF anzeigen');
+
+  const label = document.createElement('label');
+  label.append('TechCalc-Branding im PDF anzeigen');
+  label.append(input);
+
+  const anchor = projectSettings.querySelector('#pdfCompanyLogoStatus')
+    || projectSettings.querySelector('#pdfCompanyLogoPreview')
+    || projectSettings.querySelector('#pdfCompanyLogo')?.closest('label')
+    || null;
+  if (anchor) anchor.insertAdjacentElement('afterend', label);
+  else projectSettings.append(label);
+}
+
 function normalizeProjectSettingsPanel(settingsPanel) {
   const projectSettings = settingsPanel?.querySelector('#projectPdfSettings');
   if (!projectSettings) return;
   const description = projectSettings.querySelector('p');
   if (description) {
-    description.textContent = 'Die Projektdaten gelten für die Kopfzeile der PDF-Ausgabe und für gespeicherte Projektdateien.';
+    description.textContent = 'Die Projektdaten gelten für die Kopfzeile der PDF-Ausgabe und für gespeicherte Projektdateien. Firmenlogo und TechCalc-Branding werden im PDF-Header gesteuert.';
   }
-  CORPORATE_SETTINGS_FIELD_IDS.forEach(removeSettingsControlById);
-  CORPORATE_SETTINGS_AUXILIARY_IDS.forEach(removeSettingsControlById);
+  CORPORATE_BLOCK_FIELD_IDS.forEach(removeSettingsControlById);
+  ensureTechCalcBrandingControl(projectSettings);
 }
 
 let settingsControllerInitialized = false;
