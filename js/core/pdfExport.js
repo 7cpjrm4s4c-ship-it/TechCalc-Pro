@@ -72,19 +72,6 @@ function saveProject(next = {}) {
   return normalized;
 }
 
-function projectForReport(project = {}) {
-  return {
-    ...DEFAULT_PROJECT,
-    ...project,
-    showTechCalcBranding: brandingEnabled(project.showTechCalcBranding),
-    companyName: '',
-    companyAddress: '',
-    documentVersion: '',
-    checkedBy: '',
-    approvedBy: ''
-  };
-}
-
 function flashProjectSaved(text = 'Projektdatei erstellt') {
   const button = document.getElementById('saveProjectButton');
   if (!button) return;
@@ -354,14 +341,13 @@ function initProjectSettings() {
 }
 
 async function downloadNativePdf(project, moduleData) {
-  const reportProject = projectForReport(project);
   const appIconUrl = new URL('./assets/icons/icon-192.png', window.location.href).href;
   const appIcon = await normalizeImageToJpeg(appIconUrl, { maxWidth: 256, maxHeight: 256, quality: 0.92 }) || createFallbackIconJpeg();
   const companyLogo = await normalizeImageToJpeg(project.companyLogo, { maxWidth: 900, maxHeight: 360, quality: 0.9 });
   const chartImage = await canvasToJpeg(moduleData.chartCanvas, { maxWidth: 1300, maxHeight: 820, quality: 0.9 })
     || await svgToJpeg(moduleData.chartSvg, { maxWidth: 1300, maxHeight: 820, quality: 0.9 });
   const report = new GlobalPdfReport({ appIcon, companyLogo, chartImage });
-  const blob = report.build(reportProject, moduleData);
+  const blob = report.build(project, moduleData);
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
