@@ -119,9 +119,11 @@ function fallbackSummary(reportDto = {}) {
 export function buildGenericReportSections(reportDto = {}) {
   const rawSections = providedSections(reportDto).filter(section => !isMetadataSection(section));
   const recordSections = rawSections.filter(section => isSavedOrRecordSection(section) || section.isLineSection || hasDesignation(sectionRows(section)));
-  const selectedSections = recordSections.length ? recordSections : rawSections;
+  const moduleId = normalizeKey(reportDto?.metadata?.moduleId || reportDto?.metadata?.moduleTitle || '');
+  const keepAllSections = /hx|h x/.test(moduleId);
+  const selectedSections = !keepAllSections && recordSections.length ? recordSections : rawSections;
   const sections = selectedSections
-    .map((section, index) => toSection(section, index, Boolean(recordSections.length)))
+    .map((section, index) => toSection(section, index, !keepAllSections && Boolean(recordSections.length)))
     .filter(section => section.rows.length);
   return sections.length ? sections : fallbackSummary(reportDto);
 }
