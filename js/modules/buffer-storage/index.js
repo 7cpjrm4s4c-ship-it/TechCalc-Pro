@@ -5,9 +5,16 @@ import { calculate } from './logic.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
 import { bindBufferStorageActions } from './controller.js';
+import { buildBufferStorageResultModel } from './results.js';
 import { isDynamicBufferStorageAction, renderView, updateBufferStorageDynamic } from './view.js';
 
-const typedReportAdapter = createTypedDtoReportAdapter({ config, schema, state, calculate });
+const typedReportAdapter = createTypedDtoReportAdapter({
+  config,
+  schema,
+  state,
+  calculate,
+  results: (snapshot, result) => buildBufferStorageResultModel(snapshot, result)
+});
 const calculateForReport = typedReportAdapter.calculate;
 
 function renderTypedView(snapshot) {
