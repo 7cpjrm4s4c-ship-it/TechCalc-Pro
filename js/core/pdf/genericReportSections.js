@@ -103,17 +103,30 @@ function toSection(section = {}, index = 0, forceLine = false) {
   };
 }
 
-function fallbackSummary(reportDto = {}) {
+function reportSummarySection(reportDto = {}) {
   const metadata = reportDto.metadata || {};
-  return [{
-    title: 'Bericht',
+  return {
+    title: '1. Berichtszusammenfassung',
     rows: [
       ['Bericht', metadata.reportHeading || 'Berechnungsprotokoll', ''],
       ['Modul', metadata.moduleTitle || '-', ''],
       ['Berichtsquelle', 'TechCalc Pro', '']
     ],
     isLineSection: false
-  }];
+  };
+}
+
+function inputSection(reportDto = {}) {
+  const rows = reportDto.input && typeof reportDto.input === 'object' ? rowsFromObject(reportDto.input) : [];
+  return {
+    title: '2. Eingaben',
+    rows,
+    isLineSection: false
+  };
+}
+
+function fallbackSummary(reportDto = {}) {
+  return [reportSummarySection(reportDto)];
 }
 
 export function buildGenericReportSections(reportDto = {}) {
@@ -125,5 +138,11 @@ export function buildGenericReportSections(reportDto = {}) {
   const sections = selectedSections
     .map((section, index) => toSection(section, index, !keepAllSections && Boolean(recordSections.length)))
     .filter(section => section.rows.length);
-  return sections.length ? sections : fallbackSummary(reportDto);
+
+  if (!sections.length) return fallbackSummary(reportDto);
+
+  const prefixedSections = [reportSummarySection(reportDto)];
+  const inputs = toSection(inputSection(reportDto), 1, false);
+  if (inputs.rows.length) prefixedSections.push(inputs);
+  return [...prefixedSections, ...sections];
 }
