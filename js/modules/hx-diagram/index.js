@@ -23,7 +23,6 @@ function hasValue(value) {
 function row(label, value, unit = '') {
   return hasValue(value) ? [label, fmtReportValue(value), unit] : null;
 }
-
 function hxProcessName(record = {}, index = 0) {
   return record.name || record.label || record.input?.label || `h,x-Prozess ${index + 1}`;
 }
@@ -42,7 +41,6 @@ function safeProcessLabel(value) {
     return fallback;
   }
 }
-
 function recordInput(record = {}, snapshot = {}) {
   return record.input || {
     label: record.name || snapshot.activeHxProcessName || snapshot.name,
@@ -58,15 +56,17 @@ function recordInput(record = {}, snapshot = {}) {
     process: snapshot.process || snapshot.selectedProcess
   };
 }
-
 function recordPath(record = {}, calculation = {}) {
   if (Array.isArray(record.path) && record.path.length) return record.path;
   if (Array.isArray(record.processPath) && record.processPath.length) return record.processPath;
+
+  const hasRecordData = record && typeof record === 'object' && Object.keys(record).length > 0;
+  if (hasRecordData) return [];
+
   if (Array.isArray(calculation.processPath) && calculation.processPath.length) return calculation.processPath;
   if (Array.isArray(calculation.path) && calculation.path.length) return calculation.path;
   return [];
 }
-
 function pointText(point = {}, index = 0) {
   const label = point.label || point.name || `Punkt ${index + 1}`;
   const temperature = point.tempC ?? point.temperatureC ?? point.temperature;
@@ -81,7 +81,6 @@ function pointText(point = {}, index = 0) {
   ].filter(Boolean);
   return `${label}: ${parts.join(' · ')}`;
 }
-
 function rowsForHxRecord(record = {}, index = 0, snapshot = {}, calculation = {}) {
   const input = recordInput(record, snapshot);
   const process = record.process || record.processLabel || input.process || snapshot.process || snapshot.selectedProcess || calculation.effectiveProcess;
@@ -100,40 +99,29 @@ function rowsForHxRecord(record = {}, index = 0, snapshot = {}, calculation = {}
     ...path.map((point, pointIndex) => [`Zustandspunkt ${pointIndex + 1}`, pointText(point, pointIndex), ''])
   ].filter(Boolean);
 }
-
-function escapeXml(value = '') {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;');
+function chartSvgForHxRecord(record = {}, calculation = {}) {
+  const path = recordPath(record, calculation);
+  return path.length ? renderHxSvg(path) : '';
 }
-
-function innerSvg(svg = '') {
-  const match = String(svg).match(/<svg\b[^>]*>([\s\S]*?)<\/svg>/i);
-  return match ? match[1] : '';
+function buildHxReportPayload(records = [], snapshot = {}, calculation = {}) {
+  const charts = [];
+  const sections = records.map((record, index) => {
+    const title = hxProcessName(record, index);
+    const svg = chartSvgForHxRecord(record, calculation);
+    const section = {
+      title,
+      isLineSection: false,
+      rows: rowsForHxRecord(record, index, snapshot, calculation)
+    };
+    if (svg) {
+      section.chartIndex = charts.length;
+      section.chartTitle = `${title} – h,x-Diagramm`;
+      charts.push({ title, svg });
+    }
+    return section;
+  });
+  return { charts, sections };
 }
-
-function combinedHxSvg(records = [], calculation = {}) {
-  const charts = records
-    .map((record, index) => ({
-      title: hxProcessName(record, index),
-      path: recordPath(record, calculation)
-    }))
-    .filter(chart => chart.path.length);
-  if (!charts.length) return '';
-  if (charts.length === 1) return renderHxSvg(charts[0].path);
-  const width = 820;
-  const panelHeight = 500;
-  const height = Math.max(panelHeight, charts.length * panelHeight);
-  const panels = charts.map((chart, index) => {
-    const svg = innerSvg(renderHxSvg(chart.path));
-    const offsetY = index * panelHeight;
-    return `<g transform="translate(0 ${offsetY})"><rect x="0" y="0" width="${width}" height="${panelHeight}" fill="#ffffff"/><text x="24" y="24" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1f2937">${escapeXml(chart.title)}</text><g transform="translate(0 30)">${svg}</g></g>`;
-  }).join('');
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${panels}</svg>`;
-}
-
 function currentHxRecord(snapshot = {}, calculation = {}) {
   return {
     name: snapshot.activeHxProcessName || snapshot.name || 'Aktueller Prozess',
@@ -142,14 +130,13 @@ function currentHxRecord(snapshot = {}, calculation = {}) {
     path: recordPath({}, calculation)
   };
 }
-
 function buildHxDiagramReportDto(context = {}) {
   const moduleConfig = context.config || config;
   const snapshot = context.state || {};
   const calculation = context.calculation || {};
   const saved = Array.isArray(snapshot.savedProcesses) ? snapshot.savedProcesses : [];
   const records = saved.length ? saved : [currentHxRecord(snapshot, calculation)];
-  const chartSvg = combinedHxSvg(records, calculation);
+  const { charts, sections } = buildHxReportPayload(records, snapshot, calculation);
   return {
     metadata: {
       dtoType: 'techcalc.generic-module.report',
@@ -159,15 +146,11 @@ function buildHxDiagramReportDto(context = {}) {
       reportHeading: 'h,x-Diagramm',
       generatedAt: context.generatedAt
     },
-    chartSvg,
-    sections: records.map((record, index) => ({
-      title: hxProcessName(record, index),
-      isLineSection: false,
-      rows: rowsForHxRecord(record, index, snapshot, calculation)
-    }))
+    chartSvg: charts[0]?.svg || '',
+    charts,
+    sections
   };
 }
-
 const typedReportAdapter = createTypedDtoReportAdapter({
   config,
   schema,
@@ -186,7 +169,6 @@ function updateTypedDynamic(root, snapshot, meta = {}) {
   calculateForReport(snapshot);
   updateHxDiagramDynamic(root, snapshot, meta);
 }
-
 export default createPlatformModule({
   config,
   schema,

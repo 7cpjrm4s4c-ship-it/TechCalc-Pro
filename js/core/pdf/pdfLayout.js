@@ -2,6 +2,7 @@ import { PDF_PAGE, PDF_THEME, PDF_GRID } from './reportTheme.js';
 import { reportSections, lineSectionItems } from './pdfDataMapping.js';
 import { parseJpegDataUrl } from './pdfChartRender.js';
 import { sanitizeText, normalizeKey, pdfHexText, pdfNumber, estimateTextWidth, splitPdfText, rgb, pdfRowValue } from './pdfText.js';
+
 function cleanRows(rows = []) {
   return rows
     .filter(row => normalizeKey(row?.[0] || '') !== 'bezeichnung')
@@ -33,6 +34,10 @@ function pairSequentialRows(rows = []) {
 }
 function pdfValueForRow(row = []) {
   return pdfRowValue(row).replace(/ - /g, ' x ');
+}
+function isHxMetaSection(section = {}) {
+  const key = normalizeKey(section?.title || '');
+  return /^(?:\d+\s*)?(berichtszusammenfassung|eingaben)$/.test(key);
 }
 function tableColumns(x, width) {
   // One immutable four-column grid for every report section:
@@ -130,9 +135,11 @@ function drawPairedRow(report, pair, x, y, width, rowHeight, { labelSize = PDF_T
 export class GlobalPdfReport {
   constructor(images = {}) {
     this.images = images;
+    this.chartImages = Array.isArray(images.chartImages) ? images.chartImages.filter(Boolean) : [];
     this.imageResources = [];
     if (images.appIcon) this.imageResources.push({ name: 'ImAppIcon', image: images.appIcon });
     if (images.companyLogo) this.imageResources.push({ name: 'ImCompanyLogo', image: images.companyLogo });
+    this.chartImages.forEach((image, index) => this.imageResources.push({ name: `ImChart${index + 1}`, image }));
     if (images.chartImage) this.imageResources.push({ name: 'ImChart', image: images.chartImage });
     this.pages = [];
     this.addPage();
@@ -303,23 +310,42 @@ export class GlobalPdfReport {
       continued = true;
     }
   }
-  chartBlock() {
-    if (!this.images.chartImage) return;
+  chartBlock(chartImage = this.images.chartImage, { resourceName = 'ImChart', title = 'h,x-Diagramm' } = {}) {
+    if (!chartImage) return;
     const m = PDF_THEME.margin;
     const w = PDF_PAGE.width - m * 2;
     const boxW = w;
     const pad = PDF_THEME.chart.padding;
     const desiredH = PDF_THEME.chart.fixedHeight || Math.min(PDF_THEME.chart.maxHeight, Math.max(PDF_THEME.chart.minHeight, boxW * 0.64));
-    const imageW = Math.max(1, this.images.chartImage.width || boxW);
-    const imageH = Math.max(1, this.images.chartImage.height || desiredH);
+    const imageW = Math.max(1, chartImage.width || boxW);
+    const imageH = Math.max(1, chartImage.height || desiredH);
     const ratio = Math.min((boxW - pad * 2) / imageW, (desiredH - pad * 2) / imageH);
     const imgW = imageW * ratio;
     const imgH = imageH * ratio;
     this.ensureSpace(desiredH + 30);
-    this.sectionTitle('h,x-Diagramm');
+    this.sectionTitle(title);
     this.rect(m, this.cursorY, boxW, desiredH, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
-    this.drawImage('ImChart', m + (boxW - imgW) / 2, this.cursorY + pad + (desiredH - pad * 2 - imgH) / 2, imgW, imgH);
+    this.drawImage(resourceName, m + (boxW - imgW) / 2, this.cursorY + pad + (desiredH - pad * 2 - imgH) / 2, imgW, imgH);
     this.cursorY += desiredH + 8;
+  }
+  sectionChartBlock(section = {}, fallbackIndex = 0) {
+    if (Number.isInteger(section.chartIndex)) {
+      const chartImage = this.chartImages[section.chartIndex];
+      if (!chartImage) return false;
+      this.chartBlock(chartImage, {
+        resourceName: `ImChart${section.chartIndex + 1}`,
+        title: section.chartTitle || `${section.title || 'h,x-Prozess'} – h,x-Diagramm`
+      });
+      return true;
+    }
+    if (!this.chartImages.length && fallbackIndex === 0 && this.images.chartImage) {
+      this.chartBlock(this.images.chartImage, {
+        resourceName: 'ImChart',
+        title: section.chartTitle || 'h,x-Diagramm'
+      });
+      return true;
+    }
+    return false;
   }
   corporateBlock(project, moduleData) {
     const hasCorporate = [project.companyName, project.companyAddress, project.documentVersion, project.checkedBy, project.approvedBy].some(value => sanitizeText(value));
@@ -361,8 +387,12 @@ export class GlobalPdfReport {
     const lineSections = sections.filter(section => section.isLineSection);
     const isHxDiagram = /hx|h,x/i.test(`${moduleData.id || ''} ${moduleData.title || ''}`);
     if (isHxDiagram) {
-      this.chartBlock();
-      sections.forEach(section => this.standardSection(section));
+      const hxSections = sections.filter(section => !isHxMetaSection(section));
+      const printableSections = hxSections.length ? hxSections : sections;
+      printableSections.forEach((section, index) => {
+        this.standardSection(section);
+        this.sectionChartBlock(section, index);
+      });
     } else if (lineSections.length) {
       const lineGroupTitle = 'LEITUNGSABSCHNITTE';
       this.ensureSpace(sectionTitleHeight(lineGroupTitle) + 44);
