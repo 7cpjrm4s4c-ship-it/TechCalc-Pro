@@ -6,12 +6,18 @@ import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
 import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
 import { createUnitConverterDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { fmt } from '../../utils/calculations.js';
-import { normalizeUnitSelection } from './results.js';
+import { normalizeUnitSelection, buildUnitConverterResultModel } from './results.js';
 import { conversionContent, resultContent } from './viewModel.js';
 import { view } from './view.js';
 import controller from './controller.js';
 
-const typedReportAdapter = createTypedDtoReportAdapter({ config, schema, state, calculate });
+const typedReportAdapter = createTypedDtoReportAdapter({
+  config,
+  schema,
+  state,
+  calculate,
+  results: snapshot => buildUnitConverterResultModel(snapshot)
+});
 const calculateForReport = typedReportAdapter.calculate;
 const unitConverterDynamicRenderer = createUnitConverterDynamicRenderer({
   calculate: calculateForReport,
