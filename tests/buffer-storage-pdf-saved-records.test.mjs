@@ -44,5 +44,9 @@ const rows = savedSection.rows;
 assert.ok(rows.some(row => row[0] === 'Puffervolumen Abtauung' && row[1] === '8.234' && row[2] === 'l'));
 assert.ok(rows.some(row => row[0] === 'Erforderliches Pufferspeichervolumen' && row[1] === '8.234' && row[2] === 'l'));
 assert.ok(rows.some(row => row[0] === 'Nächstes Normvolumen' && row[1] === '10.000' && row[2] === 'l'));
+assert.ok(rows.some(row => row[0] === 'Leistungsbilanz Abtauung' && row[1] === '230' && row[2] === 'kW'));
+assert.ok(!rows.some(row => row[0] === 'Wasservorlage'), 'Abtaubetrieb darf keine Wasservorlage-Ergebnisse ausgeben');
+assert.ok(!rows.some(row => row[0] === 'Systeminhalt Mindestlaufzeit'), 'Abtaubetrieb darf keine Mindestlaufzeit-Ergebnisse ausgeben');
+assert.ok(!rows.some(row => row[0] === 'Puffervolumen Mindestlaufzeit'), 'Abtaubetrieb darf keine Mindestlaufzeit-Ergebnisse ausgeben');
 
-console.log('buffer-storage saved-record PDF litre formatting ok');
+console.log('buffer-storage saved-record PDF litre formatting and mode-specific results ok');

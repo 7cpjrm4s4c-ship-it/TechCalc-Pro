@@ -10,6 +10,10 @@ function normalizeBufferStorageState(s = {}){
   return { ...s, calculationMode };
 }
 
+function normalizeMode(mode){
+  return ['runtime', 'defrost', 'reserve'].includes(mode) ? mode : 'runtime';
+}
+
 function reportNumber(value){
   if (value === '' || value === null || value === undefined) return NaN;
   const numeric = typeof value === 'number' ? value : parseNumber(value, { fallback: NaN });
@@ -81,20 +85,39 @@ function rowsForCalculationParameters(snapshot = {}){
   return rows.filter(Boolean);
 }
 
-function rowsForCalculationResults(result = {}){
-  return [
-    valueRow('Berechnungsfaktor', result.factor, '', 2),
-    positiveRow('Leistungsanteil Mindestlaufzeit', result.runtimePower, 'kW', 2),
-    positiveRow('Systeminhalt Mindestlaufzeit', result.runtimeSystemVolume, 'l', 1),
-    positiveRow('Puffervolumen Mindestlaufzeit', result.runtimeBufferVolume, 'l', 1),
-    positiveRow('Leistungsbilanz Abtauung', result.defrostPower, 'kW', 2),
-    positiveRow('Systeminhalt Abtauung', result.defrostSystemVolume, 'l', 1),
-    positiveRow('Puffervolumen Abtauung', result.defrostBufferVolume, 'l', 1),
-    positiveRow('Wasservorlage', result.reserveVolume, 'l', 1),
+function rowsForCalculationResults(result = {}, calculationMode = 'runtime'){
+  const mode = normalizeMode(calculationMode || result.mode);
+  const rows = [valueRow('Berechnungsfaktor', result.factor, '', 2)];
+
+  if (mode === 'runtime') {
+    rows.push(
+      positiveRow('Leistungsanteil Mindestlaufzeit', result.runtimePower, 'kW', 2),
+      positiveRow('Systeminhalt Mindestlaufzeit', result.runtimeSystemVolume, 'l', 1),
+      positiveRow('Puffervolumen Mindestlaufzeit', result.runtimeBufferVolume, 'l', 1)
+    );
+  }
+
+  if (mode === 'defrost') {
+    rows.push(
+      positiveRow('Leistungsbilanz Abtauung', result.defrostPower, 'kW', 2),
+      positiveRow('Systeminhalt Abtauung', result.defrostSystemVolume, 'l', 1),
+      positiveRow('Puffervolumen Abtauung', result.defrostBufferVolume, 'l', 1)
+    );
+  }
+
+  if (mode === 'reserve') {
+    rows.push(
+      positiveRow('Wasservorlage', result.reserveVolume, 'l', 1)
+    );
+  }
+
+  rows.push(
     positiveRow('Abgezogenes Anlagenvolumen', result.existingSystemVolume, 'l', 1),
     valueRow('Erforderliches Pufferspeichervolumen', result.decisiveVolume, 'l', 1),
     valueRow('Nächstes Normvolumen', result.nextStandardVolume, 'l', 0)
-  ].filter(Boolean);
+  );
+
+  return rows.filter(Boolean);
 }
 
 export function savedBufferStats(item = {}){
@@ -124,7 +147,7 @@ export function buildBufferRecord(currentState, result, items, id, name, existin
     state: copy,
     rows: [
       ...rowsForCalculationParameters(copy),
-      ...rowsForCalculationResults(result || {})
+      ...rowsForCalculationResults(result || {}, normalizedState.calculationMode)
     ],
     result: {
       mode: normalizedState.calculationMode,
