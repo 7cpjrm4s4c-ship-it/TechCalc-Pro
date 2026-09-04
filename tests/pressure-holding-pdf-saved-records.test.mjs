@@ -26,13 +26,22 @@ const baseState = {
   includeServitec: 'false'
 };
 
+function germanInteger(value) {
+  return new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(value);
+}
+
 const result = calculate(baseState);
 assert.equal(result.systemVolume, 16000, 'calculation must use 16.000 l as 16,000 litres');
+assert.ok(result.selectedStandardVolume > 0, 'calculation must determine a standard vessel volume');
+
+const expectedStandardRaw = String(Math.round(result.selectedStandardVolume));
+const expectedStandardPdf = germanInteger(result.selectedStandardVolume);
 
 const record = buildPressureRecord(baseState, result, [], 'pressure-test', 'Test Heizung');
 assert.equal(record.result.systemVolume, 16000, 'saved pressure record must preserve the litre value used by the calculation');
+assert.equal(record.result.selectedStandardVolume, result.selectedStandardVolume, 'saved pressure record must preserve the calculated standard vessel volume');
 assert.ok(record.rows.some(row => row[0] === 'Anlagenvolumen' && row[1] === '16000' && row[2] === 'l'));
-assert.ok(record.rows.some(row => row[0] === 'Standardvolumen' && row[1] === '3000' && row[2] === 'l'));
+assert.ok(record.rows.some(row => row[0] === 'Standardvolumen' && row[1] === expectedStandardRaw && row[2] === 'l'));
 assert.ok(record.rows.some(row => row[0] === 'Ausdehnungskoeffizient'));
 assert.ok(record.rows.some(row => row[0] === 'Ausdehnungsvolumen'));
 assert.ok(record.rows.some(row => row[0] === 'Wasservorlage'));
@@ -51,7 +60,7 @@ const savedSection = sections.find(section => section.isLineSection && section.t
 assert.ok(savedSection, 'saved pressure records must be exported as line-section style report blocks');
 const rows = savedSection.rows;
 assert.ok(rows.some(row => row[0] === 'Anlagenvolumen' && row[1] === '16.000' && row[2] === 'l'));
-assert.ok(rows.some(row => row[0] === 'Standardvolumen' && row[1] === '3.000' && row[2] === 'l'));
+assert.ok(rows.some(row => row[0] === 'Standardvolumen' && row[1] === expectedStandardPdf && row[2] === 'l'));
 assert.ok(rows.some(row => row[0] === 'Ausdehnungskoeffizient'));
 assert.ok(rows.some(row => row[0] === 'Verdampfungsdruck'));
 assert.ok(rows.some(row => row[0] === 'Verwendeter statischer Druck'));
