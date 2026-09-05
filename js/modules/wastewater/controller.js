@@ -151,7 +151,7 @@ function fixtureDisplayRows(fixtures = []) {
 }
 
 function calculationApproach(result = {}) {
-  return `Qww = K × √ΣDU = ${displayNumber(result.k, 2)} × √${displayNumber(result.sumDu, 2)} = ${displayNumber(result.qww, 2)} l/s; Qtot = Qww + Qc + Qp + Qr,a = ${displayNumber(result.qtot, 2)} l/s`;
+  return `Schmutzwasserabfluss Qww = K × Wurzel(ΣDU) = ${displayNumber(result.k, 2)} × Wurzel(${displayNumber(result.sumDu, 2)}) = ${displayNumber(result.qww, 2)} l/s; Gesamtabfluss Qtot = Qww + Qc + Qp + Qr,a = ${displayNumber(result.qtot, 2)} l/s`;
 }
 
 function wastewaterReportRows(current = {}, result = {}) {
