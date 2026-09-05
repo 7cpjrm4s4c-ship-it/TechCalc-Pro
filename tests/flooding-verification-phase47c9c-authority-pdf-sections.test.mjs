@@ -99,9 +99,12 @@ const mapperSource = fs.readFileSync(new URL('../js/core/pdf/pdfDataMapping.js',
 const layoutSource = fs.readFileSync(new URL('../js/core/pdf/pdfLayout.js', import.meta.url), 'utf8');
 assert.doesNotMatch(builderSource, /document\.|querySelector|innerHTML|canvas/i, 'Section Builder muss DOM-frei bleiben.');
 assert.match(builderSource, /formatEngineeringNumber/, 'Zahlenformatierung muss den zentralen Number-Service verwenden.');
-assert.match(mapperSource, /buildFloodingReportSections\(moduleData\.reportDto\)/, 'Typed DTO muss in zentrale PDF-Abschnitte überführt werden.');
-assert.match(mapperSource, /reportSource === 'typed-dto'/, 'Typed-DTO-Pfad muss explizit priorisiert werden.');
-assert.match(mapperSource, /collectLegacyDomModule/, 'Legacy-Fallback muss erhalten bleiben.');
+assert.match(mapperSource, /'techcalc\.flooding-verification\.report': buildFloodingReportSections/, 'Flooding Typed-DTO muss im zentralen PDF-Dispatcher registriert sein.');
+assert.match(mapperSource, /const buildSections = typedReportSectionBuilders\[dtoType\] \|\| buildGenericReportSections/, 'Typed-DTOs müssen über den zentralen PDF-Dispatcher in Abschnitte überführt werden.');
+assert.match(mapperSource, /buildSections\(reportDto\)/, 'Typed-DTO-Dispatcher muss das Report-DTO an den registrierten Section-Builder übergeben.');
+assert.match(mapperSource, /moduleData\?\.reportSource !== 'typed-dto'/, 'Typed-DTO-Pfad muss verbindlich geprüft werden.');
+assert.match(mapperSource, /Legacy-DOM-Export ist deaktiviert/, 'Legacy-DOM-Export muss deaktiviert bleiben.');
+assert.doesNotMatch(mapperSource, /collectLegacyDomModule/, 'Legacy-DOM-Fallback darf nicht wieder eingeführt werden.');
 assert.match(layoutSource, /\(Fortsetzung\)/, 'Mehrseitige Abschnitte müssen Fortsetzungsüberschriften erhalten.');
 assert.match(layoutSource, /Seite \$\{index \+ 1\} von \$\{total\}/, 'PDF muss Seitenzahlen enthalten.');
 

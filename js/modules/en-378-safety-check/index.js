@@ -11,8 +11,8 @@ import {
 } from './savedRecords.js';
 import { formatRefrigerantLabel, listRefrigerants } from '../../utils/refrigerants/index.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
 import { bindFGasesSnapshotImport } from './importController.js';
-
 export { buildEN378StateFromFGasesSnapshot, canImportFGasesSystemSnapshot } from './snapshotImport.js';
 
 const refrigerantOptions = Object.freeze([
@@ -22,25 +22,24 @@ const refrigerantOptions = Object.freeze([
     label: formatRefrigerantLabel(item) || item.id
   }))
 ]);
-
 const runtimeSchema = Object.freeze({
   ...schema,
   fields: Object.freeze(schema.fields.map(field => field.key === 'refrigerantId'
     ? Object.freeze({ ...field, options: refrigerantOptions })
     : field))
 });
-
-function report(snapshot = state.get()) {
-  return buildEN378SafetyCheckReportDto({
-    state: snapshot,
-    calculation: calculate(snapshot)
-  });
-}
+const typedReportAdapter = createTypedDtoReportAdapter({
+  config,
+  schema: runtimeSchema,
+  state,
+  calculate,
+  results: buildEN378SafetyCheckResultModel,
+  buildReportDto: buildEN378SafetyCheckReportDto
+});
 
 function bind(root) {
   bindFGasesSnapshotImport(root, state);
 }
-
 const controller = Object.freeze({
   savedRecords: Object.freeze({
     enabled: true,
@@ -58,15 +57,14 @@ const controller = Object.freeze({
     hydrate: item => hydrateEN378SavedRecord(item)
   })
 });
-
 export default createPlatformModule({
   config,
   schema: runtimeSchema,
   state,
   initialState,
-  calculate,
+  calculate: typedReportAdapter.calculate,
   results: buildEN378SafetyCheckResultModel,
-  report,
+  report: typedReportAdapter.report,
   savedRecords: snapshot => buildEN378SavedRecordsModel(snapshot),
   controller,
   bind

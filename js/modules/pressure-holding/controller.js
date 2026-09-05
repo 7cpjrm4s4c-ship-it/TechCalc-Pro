@@ -2,6 +2,16 @@ import { createLineSectionController } from '../../platform/lineSectionControlle
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { fmt } from '../../utils/calculations.js';
+import { parseNumber } from '../../core/numberService.js';
+
+function num(value) {
+  return parseNumber(value, { fallback: 0 });
+}
+
+function integerReportText(value) {
+  const parsed = num(value);
+  return parsed ? String(Math.round(parsed)) : '';
+}
 
 function savedPlantStats(item = {}){
   const res = item.result || {};
@@ -22,11 +32,39 @@ function savedPlantSubtitle(item = {}){
   ].filter(Boolean).join(' · ');
 }
 
+function pressureResultRows(currentState = {}, result = {}) {
+  const systemVolume = num(result.systemVolume) || num(currentState.systemVolumeL);
+  const rows = [
+    { label: 'Produkt', value: result.productLabel },
+    { label: 'Ausgewähltes Volumen', value: result.selectedVolume, unit: 'l', digits: 2 },
+    { label: 'Standardvolumen', value: integerReportText(result.selectedStandardVolume), unit: 'l' },
+    { label: 'Anlagenvolumen', value: integerReportText(systemVolume), unit: 'l' },
+    { label: 'Vordruck', value: result.p0, unit: 'bar', digits: 2 },
+    { label: 'Mindestdruck', value: result.paMin, unit: 'bar', digits: 2 },
+    { label: 'Enddruck', value: result.pe, unit: 'bar', digits: 2 },
+    { label: 'Ausdehnungskoeffizient', value: result.expansionPct, unit: '%', digits: 2 },
+    { label: 'Verdampfungsdruck', value: result.vaporPressure, unit: 'bar', digits: 2 },
+    { label: 'Verwendeter statischer Druck', value: result.staticPressure, unit: 'bar', digits: 2 },
+    { label: 'Ausdehnungsvolumen', value: result.ve, unit: 'l', digits: 2 },
+    { label: 'Wasservorlage', value: result.vv, unit: 'l', digits: 2 },
+    { label: 'Schließdruckdifferenz', value: result.asv, unit: 'bar', digits: 2 },
+    { label: 'Volumenfaktor', value: result.factor, digits: 2 }
+  ];
+  return rows
+    .filter(row => row.value !== undefined && row.value !== null && row.value !== '')
+    .map(row => [
+      row.label,
+      typeof row.value === 'number' ? fmt(row.value, row.digits ?? 2) : String(row.value),
+      row.unit || ''
+    ]);
+}
+
 export function buildPressureRecord(currentState = {}, result = {}, items = [], id, name, existing = null){
   const copy = { ...currentState };
   delete copy.savedPlants;
   delete copy.activePlantId;
   delete copy.expandedPlantId;
+  const systemVolume = num(result.systemVolume) || num(currentState.systemVolumeL);
   return {
     id,
     name: name || currentState.plantName?.trim() || existing?.name || `${currentState.holdingType === 'dynamic' ? (currentState.dynamicType === 'variomat' ? 'Variomat' : 'Reflexomat') : 'MAG'} ${items.length + 1}`,
@@ -40,8 +78,16 @@ export function buildPressureRecord(currentState = {}, result = {}, items = [], 
       p0: result.p0,
       paMin: result.paMin,
       pe: result.pe,
-      systemVolume: result.systemVolume
-    }
+      systemVolume,
+      expansionPct: result.expansionPct,
+      vaporPressure: result.vaporPressure,
+      staticPressure: result.staticPressure,
+      ve: result.ve,
+      vv: result.vv,
+      asv: result.asv,
+      factor: result.factor
+    },
+    rows: pressureResultRows(currentState, result)
   };
 }
 

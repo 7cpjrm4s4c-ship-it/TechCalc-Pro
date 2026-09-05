@@ -5,15 +5,14 @@ import { EN_378_SAFETY_CHECK_SCHEMA_VERSION } from './state.js';
 export const EN_378_SAFETY_CHECK_REPORT_DTO_VERSION = 1;
 
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
-
 export function buildEN378SafetyCheckReportDto({
   state = {},
   calculation = {},
+  resultModel = null,
   generatedAt = new Date().toISOString()
 } = {}) {
   const reportState = calculation.effectiveState || state;
-  const resultModel = buildEN378SafetyCheckResultModel(reportState, calculation);
-
+  const reportResultModel = resultModel || buildEN378SafetyCheckResultModel(reportState, calculation);
   return Object.freeze({
     metadata: {
       dtoType: 'techcalc.en-378-safety-check.report',
@@ -80,10 +79,9 @@ export function buildEN378SafetyCheckReportDto({
       notices: clone(calculation.notices || [])
     },
     plannerGuidance: clone(calculation.plannerGuidance || {}),
-    resultGroups: clone(resultModel.groups || []),
-    notices: clone(resultModel.notices || []),
+    resultGroups: clone(reportResultModel.groups || []),
+    notices: clone(reportResultModel.notices || []),
     dataVersions: clone(calculation.dataVersions || state.dataVersions || {})
   });
 }
-
 export default buildEN378SafetyCheckReportDto;

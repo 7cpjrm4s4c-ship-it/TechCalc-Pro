@@ -56,7 +56,7 @@ test('report adapter has no DOM, PDF drawing or duplicated calculation dependenc
   assert.doesNotMatch(source, /pdfLayout|GlobalPdfReport|calculateBase|retentionFactors/);
 });
 
-test('platform and PDF mapper prefer registered typed report DTOs with legacy fallback', () => {
+test('platform and PDF mapper require registered typed report DTOs without legacy DOM fallback', () => {
   const runtime = read('js/platform/moduleRuntime/index.js');
   const mapper = read('js/core/pdf/pdfDataMapping.js');
   const moduleIndex = read('js/modules/flooding-verification/index.js');
@@ -64,7 +64,8 @@ test('platform and PDF mapper prefer registered typed report DTOs with legacy fa
   assert.match(moduleIndex, /buildFloodingReportDto/);
   assert.match(moduleIndex, /report,/);
   assert.match(mapper, /const report = module\?\.report \|\| registryEntry\?\.report/);
-  assert.match(mapper, /typeof report === 'function'/);
+  assert.match(mapper, /typeof report !== 'function'/);
   assert.match(mapper, /reportSource: 'typed-dto'/);
-  assert.match(mapper, /reportSource: 'legacy-dom'/);
+  assert.match(mapper, /Legacy-DOM-Export ist deaktiviert/);
+  assert.doesNotMatch(mapper, /reportSource: 'legacy-dom'/);
 });

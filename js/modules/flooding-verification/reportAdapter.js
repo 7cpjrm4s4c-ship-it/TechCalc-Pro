@@ -1,6 +1,5 @@
 import config from './config.js';
 import { FLOODING_VERIFICATION_SCHEMA_VERSION } from './state.js';
-
 export const FLOODING_REPORT_DTO_VERSION = 1;
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 const array = value => Array.isArray(value) ? value : [];
@@ -65,7 +64,7 @@ export function buildFloodingReportDto({ state = {}, calculation = {}, resultMod
       moduleId: config.id || 'flooding-verification',
       moduleTitle: config.title || 'Überflutungsnachweis',
       schemaVersion: calculation.schemaVersion || state.schemaVersion || FLOODING_VERIFICATION_SCHEMA_VERSION,
-      appVersion: '1.6.0',
+      appVersion: '1.6.1',
       generatedAt
     },
     projectReference: {
@@ -157,5 +156,4 @@ export function buildFloodingReportDto({ state = {}, calculation = {}, resultMod
   };
   return Object.freeze(dto);
 }
-
 export default buildFloodingReportDto;

@@ -9,34 +9,65 @@ const MAX_COMPANY_LOGO_DATA_URL_SIZE = 700000;
 const PDF_COMPANY_LOGO_STORAGE_KEY = 'techcalc-pdf-company-logo';
 
 const DEFAULT_PROJECT = {
-  client: '', project: '', projectNo: '', engineer: '', companyLogo: '', companyLogoName: '',
-  companyName: '', companyAddress: '', documentVersion: '', checkedBy: '', approvedBy: ''
+  client: '',
+  project: '',
+  projectNo: '',
+  engineer: '',
+  showTechCalcBranding: true,
+  companyLogo: '',
+  companyLogoName: '',
+  companyName: '',
+  companyAddress: '',
+  documentVersion: '',
+  checkedBy: '',
+  approvedBy: '',
+  companyLogoMime: '',
+  companyLogoAsset: ''
 };
+function brandingEnabled(value) {
+  return value !== false && value !== 'false';
+}
 
-function readProject() { return { ...DEFAULT_PROJECT, ...getProjectMeta() }; }
+function readProject() {
+  const meta = getProjectMeta();
+  return {
+    ...DEFAULT_PROJECT,
+    ...meta,
+    showTechCalcBranding: brandingEnabled(meta.showTechCalcBranding)
+  };
+}
 
+function readBrandingControlValue() {
+  const control = document.getElementById('pdfShowTechCalcBranding');
+  if (!control) return brandingEnabled(getProjectMeta().showTechCalcBranding);
+  return Boolean(control.checked);
+}
 function collectProjectFormValues() {
   return {
     client: document.getElementById('pdfClient')?.value || '',
     project: document.getElementById('pdfProject')?.value || '',
     projectNo: document.getElementById('pdfProjectNo')?.value || '',
     engineer: document.getElementById('pdfEngineer')?.value || '',
+    showTechCalcBranding: readBrandingControlValue(),
     companyLogo: readStoredCompanyLogo(),
     companyLogoName: readStoredCompanyLogoName(),
-    companyName: document.getElementById('pdfCompanyName')?.value || '',
-    companyAddress: document.getElementById('pdfCompanyAddress')?.value || '',
-    documentVersion: document.getElementById('pdfDocumentVersion')?.value || '',
-    checkedBy: document.getElementById('pdfCheckedBy')?.value || '',
-    approvedBy: document.getElementById('pdfApprovedBy')?.value || ''
+    companyName: '',
+    companyAddress: '',
+    documentVersion: '',
+    checkedBy: '',
+    approvedBy: ''
   };
 }
-
 function saveProject(next = {}) {
   const saved = setProjectMeta({ ...collectProjectFormValues(), ...next });
-  hydrateProjectForm(saved);
-  return saved;
+  const normalized = {
+    ...DEFAULT_PROJECT,
+    ...saved,
+    showTechCalcBranding: brandingEnabled(saved.showTechCalcBranding)
+  };
+  hydrateProjectForm(normalized);
+  return normalized;
 }
-
 function flashProjectSaved(text = 'Projektdatei erstellt') {
   const button = document.getElementById('saveProjectButton');
   if (!button) return;
@@ -49,13 +80,25 @@ function flashProjectSaved(text = 'Projektdatei erstellt') {
   }, 1400);
 }
 
-function setInputValue(id, value) { const el = document.getElementById(id); if (el) el.value = value ?? ''; }
+function setInputValue(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value ?? '';
+}
+function setCheckboxValue(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.checked = brandingEnabled(value);
+}
 
 function bindProjectInput(id, key) {
   const el = document.getElementById(id);
   if (!el) return;
   el.addEventListener('input', () => setProjectMeta({ [key]: el.value }));
   el.addEventListener('change', () => setProjectMeta({ [key]: el.value }));
+}
+function bindProjectCheckbox(id, key) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('change', () => setProjectMeta({ [key]: Boolean(el.checked) }));
 }
 
 function updateOpenedProjectLabel() {
@@ -64,7 +107,6 @@ function updateOpenedProjectLabel() {
   const name = getOpenedFileName();
   label.textContent = name ? `Geöffnet: ${name}` : 'Kein externes Projekt geöffnet';
 }
-
 async function applySelectedProjectFile(file) {
   if (!file) return false;
   const data = await readProjectFile(file);
@@ -73,7 +115,6 @@ async function applySelectedProjectFile(file) {
   updateOpenedProjectLabel();
   return true;
 }
-
 async function openProjectWithNativePicker() {
   if (typeof window === 'undefined' || typeof window.showOpenFilePicker !== 'function') return false;
   try {
@@ -98,7 +139,6 @@ async function openProjectWithNativePicker() {
     return false;
   }
 }
-
 function readStoredCompanyLogo() {
   const metaLogo = getProjectMeta().companyLogo || '';
   if (metaLogo) return metaLogo;
@@ -110,7 +150,6 @@ function readStoredCompanyLogoName() {
   if (metaName) return metaName;
   try { return localStorage.getItem(`${PDF_COMPANY_LOGO_STORAGE_KEY}-name`) || ''; } catch { return ''; }
 }
-
 function persistCompanyLogo(dataUrl = '', fileName = '') {
   setProjectMeta({ companyLogo: dataUrl, companyLogoName: fileName });
   try {
@@ -118,9 +157,10 @@ function persistCompanyLogo(dataUrl = '', fileName = '') {
     else localStorage.removeItem(PDF_COMPANY_LOGO_STORAGE_KEY);
     if (fileName) localStorage.setItem(`${PDF_COMPANY_LOGO_STORAGE_KEY}-name`, fileName);
     else if (!dataUrl) localStorage.removeItem(`${PDF_COMPANY_LOGO_STORAGE_KEY}-name`);
-  } catch (error) { logger.warn('Firmenlogo konnte nicht dauerhaft gespeichert werden.', error, { module: 'project-storage' }); }
+  } catch (error) {
+    logger.warn('Firmenlogo konnte nicht dauerhaft gespeichert werden.', error, { module: 'project-storage' });
+  }
 }
-
 function ensureCompanyLogoPreview() {
   let preview = document.getElementById('pdfCompanyLogoPreview');
   const input = document.getElementById('pdfCompanyLogo');
@@ -133,7 +173,6 @@ function ensureCompanyLogoPreview() {
   }
   return preview;
 }
-
 function hydrateCompanyLogoStatus(dataUrl = '', fileName = '') {
   const status = document.getElementById('pdfCompanyLogoStatus');
   const preview = ensureCompanyLogoPreview();
@@ -155,7 +194,6 @@ function hydrateCompanyLogoStatus(dataUrl = '', fileName = '') {
   text.textContent = displayName;
   preview.append(img, text);
 }
-
 async function isAllowedRasterLogoFile(file) {
   if (!file) return false;
   const name = String(file.name || '').toLowerCase();
@@ -170,24 +208,23 @@ async function isAllowedRasterLogoFile(file) {
     return isJpeg || isPng || isWebp;
   } catch { return false; }
 }
-
 function hydrateProjectForm(data = {}) {
   setInputValue('pdfClient', data.client);
   setInputValue('pdfProject', data.project);
   setInputValue('pdfProjectNo', data.projectNo);
   setInputValue('pdfEngineer', data.engineer);
-  setInputValue('pdfCompanyName', data.companyName);
-  setInputValue('pdfCompanyAddress', data.companyAddress);
-  setInputValue('pdfDocumentVersion', data.documentVersion);
-  setInputValue('pdfCheckedBy', data.checkedBy);
-  setInputValue('pdfApprovedBy', data.approvedBy);
+  setCheckboxValue('pdfShowTechCalcBranding', data.showTechCalcBranding);
+  setInputValue('pdfCompanyName', '');
+  setInputValue('pdfCompanyAddress', '');
+  setInputValue('pdfDocumentVersion', '');
+  setInputValue('pdfCheckedBy', '');
+  setInputValue('pdfApprovedBy', '');
   setInputValue('pdfDate', data.date);
   const logo = data.companyLogo || readStoredCompanyLogo();
   const logoName = data.companyLogoName || readStoredCompanyLogoName();
   if (logo) persistCompanyLogo(logo, logoName);
   hydrateCompanyLogoStatus(logo, logoName);
 }
-
 function bindCompanyLogoInput() {
   const input = document.getElementById('pdfCompanyLogo');
   const clearButton = document.getElementById('clearPdfCompanyLogo');
@@ -238,15 +275,19 @@ function bindCompanyLogoInput() {
   }
   hydrateCompanyLogoStatus(readStoredCompanyLogo(), readStoredCompanyLogoName());
 }
-
 function initProjectSettings() {
-  if (window.__techCalcProjectSettingsBound) { hydrateProjectForm(readProject()); updateOpenedProjectLabel(); return; }
+  if (window.__techCalcProjectSettingsBound) {
+    hydrateProjectForm(readProject());
+    updateOpenedProjectLabel();
+    return;
+  }
   window.__techCalcProjectSettingsBound = true;
   hydrateProjectForm(readProject());
   bindProjectInput('pdfClient', 'client');
   bindProjectInput('pdfProject', 'project');
   bindProjectInput('pdfProjectNo', 'projectNo');
   bindProjectInput('pdfEngineer', 'engineer');
+  bindProjectCheckbox('pdfShowTechCalcBranding', 'showTechCalcBranding');
   bindProjectInput('pdfCompanyName', 'companyName');
   bindProjectInput('pdfCompanyAddress', 'companyAddress');
   bindProjectInput('pdfDocumentVersion', 'documentVersion');
@@ -282,14 +323,24 @@ function initProjectSettings() {
   document.addEventListener('techcalc-project-loaded', () => { hydrateProjectForm(readProject()); updateOpenedProjectLabel(); });
   updateOpenedProjectLabel();
 }
-
+async function chartImagesForReport(moduleData = {}) {
+  const charts = Array.isArray(moduleData.reportDto?.charts) ? moduleData.reportDto.charts : [];
+  const images = [];
+  for (const chart of charts) {
+    const image = await svgToJpeg(chart?.svg, { maxWidth: 1300, maxHeight: 820, quality: 0.9 });
+    if (image) images.push(image);
+  }
+  return images;
+}
 async function downloadNativePdf(project, moduleData) {
   const appIconUrl = new URL('./assets/icons/icon-192.png', window.location.href).href;
   const appIcon = await normalizeImageToJpeg(appIconUrl, { maxWidth: 256, maxHeight: 256, quality: 0.92 }) || createFallbackIconJpeg();
   const companyLogo = await normalizeImageToJpeg(project.companyLogo, { maxWidth: 900, maxHeight: 360, quality: 0.9 });
-  const chartImage = await canvasToJpeg(moduleData.chartCanvas, { maxWidth: 1300, maxHeight: 820, quality: 0.9 })
+  const chartImages = await chartImagesForReport(moduleData);
+  const chartImage = chartImages[0]
+    || await canvasToJpeg(moduleData.chartCanvas, { maxWidth: 1300, maxHeight: 820, quality: 0.9 })
     || await svgToJpeg(moduleData.chartSvg, { maxWidth: 1300, maxHeight: 820, quality: 0.9 });
-  const report = new GlobalPdfReport({ appIcon, companyLogo, chartImage });
+  const report = new GlobalPdfReport({ appIcon, companyLogo, chartImage, chartImages });
   const blob = report.build(project, moduleData);
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -300,7 +351,6 @@ async function downloadNativePdf(project, moduleData) {
   link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 15000);
 }
-
 export function initPdfExport({ modules, currentRoute: routeGetter } = {}) {
   initProjectSettings();
   const exportButton = document.getElementById('exportPdfButton');
@@ -309,7 +359,12 @@ export function initPdfExport({ modules, currentRoute: routeGetter } = {}) {
   exportButton.addEventListener('click', async event => {
     event.preventDefault();
     try {
-      const project = saveProject({ ...collectProjectFormValues(), companyLogo: readStoredCompanyLogo(), companyLogoName: readStoredCompanyLogoName() });
+      const project = saveProject({
+        ...collectProjectFormValues(),
+        companyLogo: readStoredCompanyLogo(),
+        companyLogoName: readStoredCompanyLogoName(),
+        showTechCalcBranding: readBrandingControlValue()
+      });
       saveSessionSnapshot();
       const moduleData = collectCurrentModule(modules, routeGetter);
       await downloadNativePdf(project, moduleData);

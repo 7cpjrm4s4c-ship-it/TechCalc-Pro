@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.6.0';
-const CACHE_REVISION = '1.6.0-version-1-6-0-en-378-sicherheitscheck';
+const CACHE_NAME = 'techcalc-pro-1.6.1';
+const CACHE_REVISION = '1.6.1-version-1-6-1-pdf-adapter-unification';
 const ASSETS = [
   './',
   './index.html',
@@ -78,6 +78,7 @@ const ASSETS = [
   './js/core/pdf/pdfText.js',
   './js/core/pdf/rainwaterReportSections.js',
   './js/core/pdf/reportTheme.js',
+  './js/core/pdf/ventilationReportSections.js',
   './js/core/pdfExport.js',
   './js/core/platformLifecycle.js',
   './js/core/platformPolicy.js',
@@ -102,6 +103,7 @@ const ASSETS = [
   './js/core/scrollManager.js',
   './js/core/state.js',
   './js/core/stateBinding.js',
+  './js/core/typedDtoReportAdapter.js',
   './js/core/uiSystem.js',
   './js/core/unsavedWorkGuard.js',
   './js/core/version.js',
@@ -253,6 +255,7 @@ const ASSETS = [
   './js/modules/ventilation/controller.js',
   './js/modules/ventilation/index.js',
   './js/modules/ventilation/logic.js',
+  './js/modules/ventilation/reportAdapter.js',
   './js/modules/ventilation/results.js',
   './js/modules/ventilation/schema.js',
   './js/modules/ventilation/state.js',
@@ -308,7 +311,6 @@ const ASSETS = [
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
 });
-
 self.addEventListener('message', event => {
   if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });

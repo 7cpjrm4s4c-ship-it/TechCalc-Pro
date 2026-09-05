@@ -1,7 +1,6 @@
 import { logger } from '../../core/logger.js';
 import { esc as escapeHtml } from '../../core/renderer.js';
 
-
 function normalizeReleaseVersion(value = '') {
   return String(value || '')
     .replace(/\s+RC\s*/i, '-rc.')
@@ -22,7 +21,6 @@ function compareReleaseNotesDesc(a, b) {
   }
   return 0;
 }
-
 function dedupeReleaseNotes(notes = []) {
   const seen = new Set();
   return notes.filter(note => {
@@ -65,7 +63,6 @@ export function parseReleaseNotes(markdown = '') {
   }
   return dedupeReleaseNotes(notes).sort(compareReleaseNotesDesc);
 }
-
 export function renderReleaseNotes(notes, host = document.getElementById('releaseNotesDynamic')) {
   if (!host) return;
   if (!notes?.length) {
@@ -82,14 +79,12 @@ export function renderReleaseNotes(notes, host = document.getElementById('releas
       ...(index === 0 ? [createReleaseElement('span', { className: 'release-note__badge' }, 'Aktuell')] : [])
     );
     article.append(header);
-
     if (note.title) {
       article.append(createReleaseElement('strong', { className: 'release-note__title' }, note.title));
     }
     article.append(createReleaseElement('small', {}, note.items.slice(0, 4).join(' ')));
     return article;
   });
-
   replaceReleaseNotes(host, elements);
 }
 function createReleaseElement(tagName, attributes = {}, text = '') {
@@ -135,7 +130,7 @@ function syncDisplayedVersion(appVersion, notes = []) {
 }
 let releaseNotesControllerInitialized = false;
 export function initializeReleaseNotesController({
-  appVersion = '1.6.0',
+  appVersion = '1.6.1',
   releaseNotesUrl = './RELEASE_NOTES.md',
   versionHost = document.querySelector('[data-app-version-current]'),
   fallback = document.getElementById('releaseNotesFallback'),
@@ -145,11 +140,10 @@ export function initializeReleaseNotesController({
   if (releaseNotesControllerInitialized) return Promise.resolve(false);
   releaseNotesControllerInitialized = true;
   syncDisplayedVersion(appVersion);
-
   return loadReleaseNotes({ appVersion, releaseNotesUrl, fallback, host, fetchImpl });
 }
 export async function loadReleaseNotes({
-  appVersion = '1.6.0',
+  appVersion = '1.6.1',
   releaseNotesUrl = './RELEASE_NOTES.md',
   fallback = document.getElementById('releaseNotesFallback'),
   host = document.getElementById('releaseNotesDynamic'),

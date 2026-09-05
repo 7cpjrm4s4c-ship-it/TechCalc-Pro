@@ -13,9 +13,19 @@ import controller, {
 } from './controller.js';
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
 import { createFloodingVerificationView } from './view.js';
 import { createFloodingDynamicRenderer } from './dynamicRenderer.js';
 
+const typedReportAdapter = createTypedDtoReportAdapter({
+  config,
+  schema,
+  state,
+  calculate,
+  results,
+  buildReportDto: buildFloodingReportDto
+});
+const calculateForReport = typedReportAdapter.calculate;
 const surfaceController = createLineSectionController({
   state,
   listKey: 'surfaces',
@@ -33,14 +43,13 @@ const surfaceController = createLineSectionController({
   title: item => item.name || 'Fläche',
   subtitle: floodingSurfaceSubtitle,
   stats: floodingSurfaceStats,
-  currentResult: () => calculate(state.get()),
+  currentResult: () => calculateForReport(state.get()),
   buildRecord: args => buildFloodingSurfaceRecord(args),
   hydrateRecord: args => hydrateFloodingSurfaceRecord(args)
 });
-
-const floodingView = createFloodingVerificationView({ config, calculate, results, lineSectionController: surfaceController });
+const floodingView = createFloodingVerificationView({ config, calculate: calculateForReport, results, lineSectionController: surfaceController });
 const floodingDynamicRenderer = createFloodingDynamicRenderer({
-  calculate,
+  calculate: calculateForReport,
   renderSurfaceForm: floodingView.renderSurfaceForm,
   renderCalculationForm: floodingView.renderCalculationForm,
   renderResult: floodingView.renderResult,
@@ -50,21 +59,14 @@ const floodingDynamicRenderer = createFloodingDynamicRenderer({
 function bindFloodingPlatform(root) {
   bindFloodingController(root, state, surfaceController);
 }
-
-function report(snapshot = state.get()) {
-  const calculation = calculate(snapshot);
-  const resultModel = results(snapshot, calculation);
-  return buildFloodingReportDto({ state: snapshot, calculation, resultModel });
-}
-
 export default createPlatformModule({
   config,
   schema,
   state,
   initialState,
-  calculate,
+  calculate: calculateForReport,
   results,
-  report,
+  report: typedReportAdapter.report,
   controller,
   view: floodingView.view,
   bind: bindFloodingPlatform,

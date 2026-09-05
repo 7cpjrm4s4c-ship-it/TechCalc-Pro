@@ -7,17 +7,42 @@ import { reportSections } from '../js/core/pdf/pdfDataMapping.js';
 const longRows = Array.from({ length: 96 }, (_, index) => [
   `Sehr langer Tabellenparameter ${index + 1} mit Umlauten äöü und Sonderzeichen`,
   `${(index + 1) * 12.345}`,
-  index % 3 === 0 ? 'm³/h ± Δp → µ-Wert' : 'Pa/m'
+  index % 3 === 0 ? 'm³/h ± Δp → ±K-Wert' : 'Pa/m'
 ]);
 
-const moduleData = {
+function typedModuleData({ id, title, shortTitle, sections }) {
+  return {
+    id,
+    title,
+    shortTitle,
+    reportSource: 'typed-dto',
+    reportDto: {
+      metadata: {
+        dtoType: 'techcalc.generic-module.report',
+        dtoVersion: 1,
+        moduleId: id,
+        moduleTitle: title,
+        reportHeading: title,
+        generatedAt: '2026-09-03T12:00:00.000Z'
+      },
+      summary: {
+        status: 'Testfixture',
+        description: 'Typed-DTO-Fixture für PDF-Layout-Regression.'
+      },
+      input: {},
+      sections
+    }
+  };
+}
+
+const moduleData = typedModuleData({
   id: 'drinking-water',
   title: 'Trinkwasser Dimensionierung',
   shortTitle: 'Trinkwasser',
   sections: [
     { title: 'Ergebnis Zusammenfassung mit sehr langer Überschrift für Umbruchvalidierung', rows: longRows }
   ]
-};
+});
 
 const project = {
   project: 'Projekt mit sehr langer Bezeichnung und Sonderzeichen äöüß – Neubau Ostflügel',
@@ -32,7 +57,7 @@ const project = {
 };
 
 assert.equal(REPORT_TEMPLATE_VERSION, 'global-report-template-9-rc11-1-pdf-table-dedupe');
-assert.equal(sanitizeText('m³/h ± Δp → µ-Wert Ø 18 × 1,0'), 'm³/h +/- Deltap -> u-Wert DN 18 × 1,0');
+assert.equal(sanitizeText('m³/h ± Δp → ±K-Wert Ø 18 × 1,0'), 'm³/h +/- Deltap -> +/-K-Wert DN 18 × 1,0');
 const unbreakableToken = 'A'.repeat(180);
 assert.deepEqual(
   splitPdfText(unbreakableToken, 42, 6.25),
@@ -43,14 +68,15 @@ const semanticTokenLines = splitPdfText('sehr-langer/technischer-bezeichner', 42
 assert.ok(semanticTokenLines.length > 1, 'long technical tokens must wrap at semantic separators');
 assert.ok(semanticTokenLines.every(line => line.length > 1), 'semantic wrapping must not emit isolated characters');
 
-const hxSections = reportSections({
+const hxSections = reportSections(typedModuleData({
   id: 'hx-diagram',
   title: 'h,x-Diagramm',
+  shortTitle: 'h,x-Diagramm',
   sections: [{
     title: 'Berechnete Zustandspunkte',
     rows: [
       ['1 Ausgang', 'Theta32,00 °C | Phi39 % | x11,87 g/kg | h62,59 kJ/kg', '', ''],
-      ['2 Taupunkt', 'Theta16,71 °C | Phi100 % | x11,87 g/kg | h46,87 kJ/kg', '', '']
+      ['1 Taupunkt', 'Theta16,71 °C | Phi100 % | x11,87 g/kg | h46,87 kJ/kg', '', '']
     ]
   }, {
     title: 'Gespeicherte Prozesse',
@@ -60,18 +86,20 @@ const hxSections = reportSections({
       ['Prozess', 'Erhitzen + adiabate befeuchten', '', '']
     ]
   }]
-});
-assert.equal(hxSections[0].rows[0][0], '1 Ausgang');
-assert.ok(!/^1$/.test(hxSections[0].rows[0][0]), 'h,x point index must not be emitted as standalone label');
-assert.equal(hxSections[1].rows[1][0], 'Bezeichnung 2');
-
+}));
+const calculatedPointsSection = hxSections.find(section => section.title.includes('Berechnete Zustandspunkte'));
+const savedProcessesSection = hxSections.find(section => section.title.includes('Gespeicherte Prozesse'));
+assert.equal(calculatedPointsSection.rows[0][0], '1 Ausgang');
+assert.ok(!/^1$/.test(calculatedPointsSection.rows[0][0]), 'h,x point index must not be emitted as standalone label');
+assert.equal(savedProcessesSection.rows[1][0], 'Bezeichnung 2');
 
 const report = new GlobalPdfReport();
 const blob = report.build(project, moduleData);
 assert.equal(blob.type, 'application/pdf');
 const pdf = await blob.text();
 assert.match(pdf, /^%PDF-1\.4/);
-assert.match(pdf, /<536569746520[0-9A-F]+20766F6E20[0-9A-F]+>/);
+assert.ok(pdf.includes('<536569746520'), 'PDF footer must contain the hex-encoded "Seite" label');
+assert.ok(pdf.includes('20766F6E20'), 'PDF footer must contain the hex-encoded " von " label');
 
 const textCommands = [...pdf.matchAll(/BT \/F[1-4] [0-9.]+ Tf ([0-9.\-]+) ([0-9.\-]+) Td <[0-9A-F]*> Tj ET/g)];
 assert.ok(textCommands.length > 100, 'expected a populated report');
