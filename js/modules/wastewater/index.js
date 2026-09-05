@@ -5,7 +5,7 @@ import { calculate } from './logic.js';
 import { createLineSectionController } from '../../platform/lineSectionController/index.js';
 import { createWastewaterDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
 import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
-import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
+import { createTypedDtoReportAdapter, buildGenericModuleReportDto } from '../../core/typedDtoReportAdapter.js';
 import {
   bindWastewaterCollections,
   buildWastewaterRecord,
@@ -16,12 +16,40 @@ import {
 import { results } from './results.js';
 import { createWastewaterView } from './view.js';
 
+function enrichedSavedCalculations(savedCalculations = []) {
+  return savedCalculations.map((record, index, items) => {
+    const recordState = record?.state && typeof record.state === 'object' ? record.state : record?.input;
+    if (!recordState || typeof recordState !== 'object') return record;
+    const result = calculate(recordState);
+    return buildWastewaterRecord(
+      recordState,
+      result,
+      items,
+      record.id || `wastewater-${index + 1}`,
+      record.name || record.title || recordState.name,
+      record
+    );
+  });
+}
+
+function buildWastewaterReportDto(context = {}) {
+  const snapshot = context.state || {};
+  return buildGenericModuleReportDto({
+    ...context,
+    state: {
+      ...snapshot,
+      savedCalculations: enrichedSavedCalculations(snapshot.savedCalculations || [])
+    }
+  });
+}
+
 const typedReportAdapter = createTypedDtoReportAdapter({
   config,
   schema,
   state,
   calculate,
-  results
+  results,
+  buildReportDto: buildWastewaterReportDto
 });
 const calculateForReport = typedReportAdapter.calculate;
 const lineSectionController = createLineSectionController({

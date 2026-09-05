@@ -27,9 +27,21 @@ const state = {
 };
 
 const result = calculate(state);
+const legacyRecord = {
+  name: 'Test Strang 1',
+  state,
+  result: { qtot: result.qtot, qww: result.qww, sumDu: result.sumDu, dn: result.selected?.dn, lineType: state.lineType },
+  rows: [
+    ['Qtot', String(result.qtot), ''],
+    ['Qww', String(result.qww), ''],
+    ['Sum Du', String(result.sumDu), ''],
+    ['Nennweite', result.selected?.dn, ''],
+    ['Line Type', state.lineType, '']
+  ]
+};
 const record = buildWastewaterRecord(state, result, [], 'wastewater-test', 'Test Strang 1');
 wastewaterModule.calculate(state);
-const dto = wastewaterModule.report({ ...state, savedCalculations: [record] });
+const dto = wastewaterModule.report({ ...state, savedCalculations: [legacyRecord, record] });
 const sections = reportSections({
   id: 'wastewater',
   title: 'Schmutzwasser',
@@ -49,6 +61,6 @@ assert.ok(rows.some(row => row[0] === 'Anschlusswert gesamt' && row[1] === '4' &
 assert.ok(rows.some(row => row[0] === 'Dimensionierungsansatz' && row[1].includes('Tabelle 8')));
 assert.ok(rows.some(row => row[0] === 'Berechnungsansatz' && row[1].includes('Qww = K × √ΣDU')));
 assert.ok(rows.some(row => row[0] === 'Ausgewählte Nennweite' && row[1] === 'DN 100'));
-assert.ok(!rows.some(row => /Qtot|Qww|Sum Du/.test(row[0])));
+assert.ok(!rows.some(row => ['Qtot', 'Qww', 'Sum Du', 'Line Type'].includes(row[0])));
 
 console.log('wastewater saved-record PDF content regression ok');
