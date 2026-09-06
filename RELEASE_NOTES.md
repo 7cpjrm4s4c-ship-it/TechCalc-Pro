@@ -1,12 +1,22 @@
-## Version 1.6.1 – PDF Adapter Unification
+## Version 1.6.1 – PDF-Export-Vereinheitlichung
 ### Verbesserungen
-- Alle Module verwenden für den PDF-Export den zentralen Typed-DTO-Report-Adapter.
-- Die Typed-DTO-PDF-Abschnittserzeugung verwendet eine zentrale Builder-Registrierung mit generischem Fallback für typisierte Modul-DTOs ohne Speziallayout.
-- Überflutungsnachweis, Regenwasser, F-Gase-Check und EN 378 bleiben mit fachlichen PDF-Section-Buildern zentral registriert.
-- Der bisherige Legacy-DOM-PDF-Export wurde entfernt; fehlende Typed-DTO-Adapter werden nicht mehr stillschweigend über DOM-Auswertung ersetzt.
+- Der PDF-Export der Berechnungsmodule läuft über die zentrale Typed-DTO-PDF-Engine.
+- Heizung/Kälte und Lüftung dienen als Referenz für den einheitlichen Protokollaufbau der allgemeinen Berechnungsmodule.
+- Rohrdimensionierung, Schmutzwasser, Regenwasser, Mischluft, Wärmerückgewinnung, Trinkwasser, Druckhaltung, Pufferspeicher, Einheitenumrechnung und h,x-Diagramm wurden an den einheitlichen PDF-Aufbau angeglichen.
+- Gespeicherte Datensätze werden als eigene Abschnitte mit deutschen Volltextbezeichnungen, einheitlicher Zahlenformatierung und passenden Einheiten ausgegeben.
+- h,x-Prozesse werden mit zugehörigem Diagramm je gespeichertem Prozess auf eigenen Seiten dargestellt.
+- F-Gase nutzt im PDF die Überschrift „Informationsblatt“, EN 378 die Überschrift „Sicherheitsdatenblatt“.
+- Firmenlogo und TechCalc-Branding-Opt-out bleiben erhalten; der nicht mehr benötigte Abschlussblock wurde aus den allgemeinen Berechnungsprotokollen entfernt.
+### Behoben
+- Englische Feldnamen, doppelte Rohdaten und technische Zwischenstrukturen wurden aus den berechnungsbezogenen PDF-Ausgaben entfernt.
+- Liter- und Tausenderwerte in Druckhaltung und Pufferspeicher werden korrekt formatiert.
+- Schmutzwasser- und Trinkwasserexporte enthalten die relevanten Berechnungs-, Dimensionierungs- und Einrichtungsgegenstandsangaben.
+- Abschnittsweise Seitenumbrüche reduzieren doppelte Fortsetzungsdarstellungen in mehrseitigen Protokollen.
 ### Qualität
+- Der bisherige Legacy-DOM-PDF-Export wurde entfernt beziehungsweise deaktiviert abgesichert.
 - Der PDF-Export verwendet den vom Moduladapter zwischengespeicherten Berechnungs- und Ergebnisstand und stößt keine neue Fachberechnung an.
-- Regressionstest für die zentrale Typed-DTO-PDF-Engine ergänzt und in das Fast-Test-Gate aufgenommen.
+- PDF-spezifische Regressionstests für gespeicherte Datensätze, Modulberichte, h,x-Diagramme, Druckhaltung, Pufferspeicher, Schmutzwasser und Trinkwasser wurden ergänzt oder erweitert.
+
 ## Version 1.6.0 – EN 378 Sicherheitscheck
 ### Neu
 - EN-378-Sicherheitscheck als eigenständiges Modul für die sicherheitstechnische Bewertung von Kälte-, Klima- und Wärmepumpenanlagen integriert.
