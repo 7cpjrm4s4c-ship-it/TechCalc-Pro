@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 
 import wastewaterModule from '../js/modules/wastewater/index.js';
 import { calculate } from '../js/modules/wastewater/logic.js';
@@ -40,6 +41,7 @@ const legacyRecord = {
     ['Line Type', state.lineType, '']
   ]
 };
+
 const record = buildWastewaterRecord(state, result, [], 'wastewater-test', 'Test Strang 1');
 wastewaterModule.calculate(state);
 const dto = wastewaterModule.report({ ...state, savedCalculations: [legacyRecord, record] });
@@ -52,6 +54,7 @@ const sections = reportSections({
 });
 const section = sections.find(item => item.isLineSection && item.title === 'Berechnung');
 assert.ok(section, 'gespeicherter Schmutzwasser-Record muss als eigener PDF-Abschnitt exportiert werden');
+
 const rows = section.rows;
 const blocks = lineSectionItems(rows);
 const blockTitles = blocks.map(item => item.title);
@@ -83,5 +86,22 @@ assert.ok(rows.some(row => row[0] === 'Berechnungsansatz' && row[1].includes('Sc
 assert.ok(rows.some(row => row[0] === 'Berechnungsansatz' && row[1].includes('Wurzel(Summe DU)')));
 assert.ok(rows.some(row => row[0] === 'Ausgewählte Nennweite' && row[1] === 'DN 100'));
 assert.ok(!rows.some(row => ['Qtot', 'Qww', 'Sum Du', 'Line Type'].includes(row[0])));
+
+const pdfLayoutSource = readFileSync(new URL('../js/core/pdf/pdfLayout.js', import.meta.url), 'utf8');
+assert.match(
+  pdfLayoutSource,
+  /const fullBlockHeight = headerHeight \+ topPad \+ sumHeights\(rowHeights\) \+ bottomPad \+ 2;/,
+  'PDF-Leitungsabschnitte müssen vor dem Split eine vollständige Abschnittshöhe bewerten'
+);
+assert.match(
+  pdfLayoutSource,
+  /const fullSectionHeight = sectionTitleHeight\(section\.title\) \+ 4 \+ sumHeights\(rowHeights\) \+ 4 \+ 5;/,
+  'PDF-Standardabschnitte müssen vor dem Split eine vollständige Abschnittshöhe bewerten'
+);
+assert.match(
+  pdfLayoutSource,
+  /fitsOnEmptyContentPage\(this, fullBlockHeight\) && this\.cursorY \+ fullBlockHeight > this\.contentBottom\(\)/,
+  'Abschnitte, die auf eine leere Seite passen, dürfen nicht am Seitenende angeschnitten werden'
+);
 
 console.log('wastewater saved-record PDF content regression ok');

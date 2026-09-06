@@ -2,7 +2,6 @@ import { PDF_PAGE, PDF_THEME, PDF_GRID } from './reportTheme.js';
 import { reportSections, lineSectionItems } from './pdfDataMapping.js';
 import { parseJpegDataUrl } from './pdfChartRender.js';
 import { sanitizeText, normalizeKey, pdfHexText, pdfNumber, estimateTextWidth, splitPdfText, rgb, pdfRowValue } from './pdfText.js';
-
 function cleanRows(rows = []) {
   return rows
     .filter(row => normalizeKey(row?.[0] || '') !== 'bezeichnung')
@@ -76,6 +75,12 @@ function sectionTitleHeight(title) {
   const width = PDF_PAGE.width - PDF_THEME.margin * 2;
   const lines = splitPdfText(title, width, 8.4, 'F2').length;
   return 6 + Math.max(11, lines * 8.4 * 1.18 + 3);
+}
+function sumHeights(heights = [], start = 0) {
+  return heights.slice(start).reduce((total, height) => total + height, 0);
+}
+function fitsOnEmptyContentPage(report, requiredHeight) {
+  return requiredHeight <= report.contentBottom() - PDF_THEME.margin;
 }
 function dynamicProjectDataHeight(project, columnWidth) {
   const values = [project.project, project.projectNo, project.client, project.engineer];
@@ -241,6 +246,10 @@ export class GlobalPdfReport {
     const headerHeight = 18;
     const topPad = 4.5;
     const bottomPad = 5.5;
+    const fullBlockHeight = headerHeight + topPad + sumHeights(rowHeights) + bottomPad + 2;
+    if (fitsOnEmptyContentPage(this, fullBlockHeight) && this.cursorY + fullBlockHeight > this.contentBottom()) {
+      this.addPage();
+    }
     let index = 0;
     let continued = false;
     while (index < pairs.length) {
@@ -252,7 +261,7 @@ export class GlobalPdfReport {
         endIndex += 1;
       }
       const blockHeight = headerHeight + topPad + segmentHeight + bottomPad;
-      this.ensureSpace(blockHeight + 2);
+      if (this.ensureSpace(blockHeight + 2) && fitsOnEmptyContentPage(this, blockHeight + 2)) continue;
       const y0 = this.cursorY;
       const bodyTop = y0 + headerHeight + topPad;
       this.rect(m, y0, w, blockHeight, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.55 });
@@ -281,11 +290,16 @@ export class GlobalPdfReport {
     const innerW = w - 10;
     const columns = tableColumns(innerX, innerW);
     const rowHeights = pairs.map(pair => pairRowHeight(pair, columns, { labelSize: 6.1, valueSize: 6.25 }));
+    const fullSectionHeight = sectionTitleHeight(section.title) + 4 + sumHeights(rowHeights) + 4 + 5;
+    if (fitsOnEmptyContentPage(this, fullSectionHeight) && this.cursorY + fullSectionHeight > this.contentBottom()) {
+      this.addPage();
+    }
     let index = 0;
     let continued = false;
     while (index < pairs.length) {
       const title = continued ? `${section.title} (Fortsetzung)` : section.title;
-      this.ensureSpace(sectionTitleHeight(title) + 24);
+      const titleReserve = sectionTitleHeight(title) + 24;
+      if (this.ensureSpace(titleReserve) && fitsOnEmptyContentPage(this, titleReserve)) continue;
       this.sectionTitle(title);
       const available = Math.max(36, this.contentBottom() - this.cursorY - 7);
       let segmentHeight = 0;
@@ -295,7 +309,7 @@ export class GlobalPdfReport {
         endIndex += 1;
       }
       const blockHeight = 4 + segmentHeight + 4;
-      this.ensureSpace(blockHeight + 2);
+      if (this.ensureSpace(blockHeight + 2) && fitsOnEmptyContentPage(this, blockHeight + 2 + sectionTitleHeight(title))) continue;
       const y0 = this.cursorY;
       this.rect(m, y0, w, blockHeight, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.45 });
       let rowY = y0 + 4;
