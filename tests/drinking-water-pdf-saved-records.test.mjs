@@ -70,6 +70,15 @@ assert.ok(rows.some(row => row[0] === 'Wasserzähler' && /^Q3 /.test(row[1])));
 assert.ok(rows.some(row => row[0] === 'Q3 Wasserzähler' && row[2] === 'm³/h'));
 assert.ok(!rows.some(row => row[1] === 'school'));
 
+const usageBlock = blocks.find(block => block.title === '3. WC Kern EG');
+const singleBlock = blocks.find(block => block.title === '4. Putzräume/Außenarmatur');
+assert.ok(usageBlock, 'Gespeicherte Nutzungseinheit muss ausgegeben werden');
+assert.ok(singleBlock, 'Gespeicherte Einzelverbrauchergruppe muss ausgegeben werden');
+for (const block of [usageBlock, singleBlock]) {
+  assert.ok(!block.rows.some(row => row[0] === 'Gebäude-/Nutzungsart'));
+  assert.ok(!block.rows.some(row => row[0] === 'Warmwasserbereitung'));
+}
+
 const summary = blocks.find(block => block.title === '5. Zusammenstellung Einrichtungsgegenstände');
 assert.ok(summary, 'Zusammenstellung der Einrichtungsgegenstände muss abschließend ausgegeben werden');
 const fixtureRows = summary.rows;

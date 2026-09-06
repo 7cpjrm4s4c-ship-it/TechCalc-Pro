@@ -141,12 +141,10 @@ function rowsWithReportTitle(title, rows = []) {
     ...rows.filter(item => item && item[0] !== 'Bezeichnung')
   ];
 }
-function rowsForUsageUnit(record = {}, index = 0, snapshot = {}, calculation = {}) {
+function rowsForUsageUnit(record = {}, index = 0) {
   const hasGl = hasValue(record.simultaneityFactor);
   return [
     ['Bezeichnung', record.name || record.label || `Nutzungseinheit ${index + 1}`, ''],
-    row('Gebäude-/Nutzungsart', selectedBuildingLabel(snapshot, calculation)),
-    row('Warmwasserbereitung', selectedWarmWaterLabel(snapshot, calculation)),
     row('Anzahl Einrichtungsgegenstände', record.consumerCount ?? countConsumers(record.consumers || []), '', 0),
     row('Installierter Summendurchfluss', record.rawFlow, 'l/s'),
     row('Wirksamer Summendurchfluss', record.sumFlow, 'l/s'),
@@ -159,8 +157,6 @@ function rowsForSingleConsumerGroup(record = {}, index = 0, snapshot = {}, calcu
   const consumers = Array.isArray(record.consumers) ? record.consumers : [];
   return [
     ['Bezeichnung', record.name || record.label || `Einzelverbrauchergruppe ${index + 1}`, ''],
-    row('Gebäude-/Nutzungsart', selectedBuildingLabel(snapshot, calculation)),
-    row('Warmwasserbereitung', selectedWarmWaterLabel(snapshot, calculation)),
     row('Anzahl Einrichtungsgegenstände', countConsumers(consumers), '', 0),
     row('Wirksamer Summendurchfluss Gruppe', singleGroupFlow(record, warmWaterMode), 'l/s'),
     row('Dauerverbraucher enthalten', yesNo(consumers.some(consumer => consumer.permanent))),
@@ -214,7 +210,7 @@ function buildDrinkingWaterReportDto(context = {}) {
     lineSection(`${sectionNumber++}. Dimensionierung Hauseinführung`, rowsForHouseConnection(calculation)),
     ...usageUnits.map((record, index) => lineSection(
       `${sectionNumber++}. ${record.name || record.label || `Nutzungseinheit ${index + 1}`}`,
-      rowsForUsageUnit(record, index, snapshot, calculation)
+      rowsForUsageUnit(record, index)
     )),
     ...singleGroups.map((record, index) => lineSection(
       `${sectionNumber++}. ${record.name || record.label || `Einzelverbrauchergruppe ${index + 1}`}`,
