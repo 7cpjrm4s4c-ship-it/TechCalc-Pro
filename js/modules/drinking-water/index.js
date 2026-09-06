@@ -66,9 +66,6 @@ function consumerFlow(consumer = {}) {
 function consumerPressure(consumer = {}) {
   return numeric(consumer.pmin ?? consumer.minimumFlowPressure ?? consumer.minimumPressure, 0);
 }
-function consumerTotalFlow(consumer = {}) {
-  return consumerCount(consumer) * consumerFlow(consumer);
-}
 function waterUseLabel(consumer = {}) {
   return consumer.hotWater ? 'mit Warmwasser' : 'nur Kaltwasser';
 }
@@ -124,10 +121,7 @@ function rowsFromFixtureSummary(snapshot = {}, calculation = {}) {
     consumerDetail(consumer),
     ''
   ]);
-  return [
-    ['Bezeichnung', 'Zusammenstellung Einrichtungsgegenstände', ''],
-    ...(rows.length ? rows : [['Status', 'Keine Einrichtungsgegenstände gespeichert', '']])
-  ];
+  return rows.length ? rows : [['Status', 'Keine Einrichtungsgegenstände gespeichert', '']];
 }
 function countConsumers(consumers = []) {
   return consumers.reduce((sum, consumer) => sum + consumerCount(consumer), 0);
@@ -140,6 +134,12 @@ function singleGroupFlow(group = {}, warmWaterMode = 'central') {
     const addonFlow = warmWaterMode === 'decentral' ? 0.05 * count : consumerFlow(consumer) * count;
     return sum + baseFlow + addonFlow;
   }, 0);
+}
+function rowsWithReportTitle(title, rows = []) {
+  return [
+    ['Bezeichnung', title, ''],
+    ...rows.filter(item => item && item[0] !== 'Bezeichnung')
+  ];
 }
 function rowsForUsageUnit(record = {}, index = 0, snapshot = {}, calculation = {}) {
   const hasGl = hasValue(record.simultaneityFactor);
@@ -195,12 +195,12 @@ function rowsForHouseConnection(calculation = {}) {
     row('Dimensionierungsansatz', 'vorläufig über Spitzendurchfluss')
   ].filter(Boolean);
 }
-function rowsForCurrentCalculation(snapshot = {}, calculation = {}) {
-  return [
-    ['Bezeichnung', snapshot.name || 'Aktuelle Trinkwasserberechnung', ''],
-    ...rowsForCalculationResult(snapshot, calculation).filter(item => item[0] !== 'Bezeichnung'),
-    ...rowsForHouseConnection(calculation).filter(item => item[0] !== 'Bezeichnung')
-  ];
+function lineSection(title, rows) {
+  return {
+    title: 'Trinkwasser',
+    isLineSection: true,
+    rows: rowsWithReportTitle(title, rows)
+  };
 }
 function buildDrinkingWaterReportDto(context = {}) {
   const moduleConfig = context.config || config;
@@ -208,40 +208,20 @@ function buildDrinkingWaterReportDto(context = {}) {
   const calculation = calculate(snapshot);
   const usageUnits = Array.isArray(calculation.usageUnits) ? calculation.usageUnits.filter(unit => !unit.transient) : [];
   const singleGroups = Array.isArray(calculation.singleGroups) ? calculation.singleGroups.filter(group => !group.transient) : [];
+  let sectionNumber = 1;
   const sections = [
-    ...usageUnits.map((record, index) => ({
-      title: 'Trinkwasser',
-      isLineSection: true,
-      rows: rowsForUsageUnit(record, index, snapshot, calculation)
-    })),
-    ...singleGroups.map((record, index) => ({
-      title: 'Trinkwasser',
-      isLineSection: true,
-      rows: rowsForSingleConsumerGroup(record, index, snapshot, calculation)
-    })),
-    {
-      title: 'Trinkwasser',
-      isLineSection: true,
-      rows: rowsForCalculationResult(snapshot, calculation)
-    },
-    {
-      title: 'Trinkwasser',
-      isLineSection: true,
-      rows: rowsForHouseConnection(calculation)
-    },
-    {
-      title: 'Trinkwasser',
-      isLineSection: true,
-      rows: rowsFromFixtureSummary(snapshot, calculation)
-    }
+    lineSection(`${sectionNumber++}. Berechnungsergebnisse`, rowsForCalculationResult(snapshot, calculation)),
+    lineSection(`${sectionNumber++}. Dimensionierung Hauseinführung`, rowsForHouseConnection(calculation)),
+    ...usageUnits.map((record, index) => lineSection(
+      `${sectionNumber++}. ${record.name || record.label || `Nutzungseinheit ${index + 1}`}`,
+      rowsForUsageUnit(record, index, snapshot, calculation)
+    )),
+    ...singleGroups.map((record, index) => lineSection(
+      `${sectionNumber++}. ${record.name || record.label || `Einzelverbrauchergruppe ${index + 1}`}`,
+      rowsForSingleConsumerGroup(record, index, snapshot, calculation)
+    )),
+    lineSection(`${sectionNumber++}. Zusammenstellung Einrichtungsgegenstände`, rowsFromFixtureSummary(snapshot, calculation))
   ];
-  if (!usageUnits.length && !singleGroups.length) {
-    sections.unshift({
-      title: 'Trinkwasser',
-      isLineSection: true,
-      rows: rowsForCurrentCalculation(snapshot, calculation)
-    });
-  }
   return {
     metadata: {
       dtoType: 'techcalc.generic-module.report',

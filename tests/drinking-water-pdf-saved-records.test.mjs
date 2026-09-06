@@ -53,11 +53,11 @@ const blocks = sections
 const blockTitles = blocks.map(block => block.title);
 
 assert.deepEqual(blockTitles, [
-  'WC Kern EG',
-  'Putzräume/Außenarmatur',
-  'Berechnungsergebnisse',
-  'Dimensionierung Hauseinführung',
-  'Zusammenstellung Einrichtungsgegenstände'
+  '1. Berechnungsergebnisse',
+  '2. Dimensionierung Hauseinführung',
+  '3. WC Kern EG',
+  '4. Putzräume/Außenarmatur',
+  '5. Zusammenstellung Einrichtungsgegenstände'
 ]);
 
 const rows = blocks.flatMap(block => block.rows);
@@ -70,8 +70,8 @@ assert.ok(rows.some(row => row[0] === 'Wasserzähler' && /^Q3 /.test(row[1])));
 assert.ok(rows.some(row => row[0] === 'Q3 Wasserzähler' && row[2] === 'm³/h'));
 assert.ok(!rows.some(row => row[1] === 'school'));
 
-const summary = blocks.find(block => block.title === 'Zusammenstellung Einrichtungsgegenstände');
-assert.ok(summary, 'Zusammenstellung der Einrichtungsgegenstände muss am Ende ausgegeben werden');
+const summary = blocks.find(block => block.title === '5. Zusammenstellung Einrichtungsgegenstände');
+assert.ok(summary, 'Zusammenstellung der Einrichtungsgegenstände muss abschließend ausgegeben werden');
 const fixtureRows = summary.rows;
 const spuelkasten = fixtureRows.find(row => row[0] === '1. Spülkasten');
 const urinal = fixtureRows.find(row => row[0] === '2. Urinal-Druckspüler');
