@@ -29,10 +29,24 @@ const moduleIndexPaths = [
 assert.match(
   pdfDataMappingSource,
   /PDF-Export benötigt ein Typed-DTO\. Legacy-DOM-Export ist deaktiviert\./,
-  'PDF export must reject non-typed module data instead of falling back to DOM scraping'
+  'PDF export must hard-reject non-typed module data instead of falling back to DOM scraping'
 );
-assert.doesNotMatch(pdfDataMappingSource, /collectLegacyDomModule|extractCardRows|data-pdf-field|querySelector(All)?\(/, 'PDF data mapping must not contain legacy DOM export collectors');
+assert.doesNotMatch(
+  pdfDataMappingSource,
+  /collectLegacyDomModule|extractCardRows|data-pdf-field|querySelector(All)?\(/,
+  'PDF data mapping must not contain legacy DOM export collectors'
+);
 assert.doesNotMatch(pdfDataMappingSource, /reportSource:\s*'legacy-dom'/, 'legacy DOM report source must be removed');
+assert.throws(
+  () => collectCurrentModule(new Map([[ 'missing-report', { title: 'Altmodul', state: { get: () => ({}) } } ]]), () => 'missing-report'),
+  /PDF-Report-Adapter.*fehlt.*Legacy-DOM-Export ist deaktiviert/,
+  'modules without typed report adapter must fail explicitly'
+);
+assert.throws(
+  () => collectCurrentModule(new Map([[ 'invalid-report', { title: 'Altmodul', state: { get: () => ({}) }, report: () => ({}) } ]]), () => 'invalid-report'),
+  /kein gültiges Typed-DTO/,
+  'invalid report adapters must not be accepted as legacy-compatible fallback data'
+);
 assert.doesNotMatch(
   typedDtoReportAdapterSource.match(/function report[\s\S]*?\n  \}/)?.[0] || '',
   /calculate\s*\(/,
@@ -43,15 +57,17 @@ const expectedBuilderRegistry = {
   'techcalc.flooding-verification.report': 'buildFloodingReportSections',
   'techcalc.rainwater.report': 'buildRainwaterReportSections',
   'techcalc.f-gases-check.report': 'buildFGasesReportSections',
-  'techcalc.en-378-safety-check.report': 'buildEN378ReportSections'
+  'techcalc.en-378-safety-check.report': 'buildEN378ReportSections',
+  'techcalc.ventilation.report': 'buildVentilationReportSections'
 };
 const registryMatch = pdfDataMappingSource.match(/const typedReportSectionBuilders = Object\.freeze\(\{([\s\S]*?)\}\);/);
 assert.ok(registryMatch, 'typed PDF report section builders must be registered centrally');
 const registrySource = registryMatch[1];
 for (const [dtoType, builderName] of Object.entries(expectedBuilderRegistry)) {
+  const escapedDtoType = dtoType.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   assert.match(
     registrySource,
-    new RegExp(`${dtoType.replaceAll('.', '\\.').replaceAll('-', '\\-')}': ${builderName}`),
+    new RegExp(`'${escapedDtoType}':\\s*${builderName}`),
     `${dtoType} must use the central typed PDF section registry`
   );
 }
@@ -115,11 +131,11 @@ for (const moduleIndexPath of moduleIndexPaths) {
   const source = read(moduleIndexPath);
   assert.match(source, /createTypedDtoReportAdapter/, `${moduleIndexPath} must use the central typed DTO report adapter`);
   assert.match(source, /report:\s*typedReportAdapter\.report/, `${moduleIndexPath} must expose the central typed DTO report function`);
-  assert.doesNotMatch(source, /function\s+report[\s\S]*?calculate\s*\(/, `${moduleIndexPath} must not calculate inside report()`);
+  assert.doesNotMatch(source, /function\s+report\s*\(/, `${moduleIndexPath} must not define a module-local legacy report wrapper`);
+  assert.doesNotMatch(source, /report:\s*report\b/, `${moduleIndexPath} must not expose a module-local legacy report wrapper`);
+  assert.doesNotMatch(source, /querySelector(All)?\(|data-pdf-field|legacy-dom|collectLegacy|GlobalPdfReport|new\s+jsPDF|downloadNativePdf/i, `${moduleIndexPath} must not contain legacy DOM/PDF export code`);
 }
 
-assert.match(read('js/modules/f-gases-check/reportAdapter.js'), /resultModel = null/, 'F-Gase report DTO must accept the cached result model');
-assert.match(read('js/modules/en-378-safety-check/reportAdapter.js'), /resultModel = null/, 'EN 378 report DTO must accept the cached result model');
 assert.match(appSource, /flooding-verification/);
 assert.match(appSource, /rainwater/);
 assert.match(appSource, /f-gases-check/);

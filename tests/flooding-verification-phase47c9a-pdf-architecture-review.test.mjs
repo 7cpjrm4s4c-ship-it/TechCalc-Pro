@@ -14,15 +14,16 @@ test('47C.9A keeps the global PDF engine as the single export and layout path', 
   assert.match(exportModule, /report\.build\(project, moduleData\)/);
 });
 
-test('47C.9A documents typed DTO precedence and legacy DOM fallback', () => {
+test('47C.9A documents typed DTO only and removed legacy DOM fallback', () => {
   const review = read('docs/phases/phase-47c9a-pdf-reporting-architecture-review.md');
 
   assert.match(review, /Typed Report DTO statt Modul-DOM-Scraping/);
-  assert.match(review, /legacy[-\s]?fallback/i);
+  assert.match(review, /Legacy-DOM-Fallback entfernt/);
   assert.match(review, /Keine Neuberechnung im Reporting/);
-  assert.match(review, /`?reportAdapter\.js`?\s+ab\s+47C\.9B/);
+  assert.match(review, /createTypedDtoReportAdapter/);
   assert.match(review, /pdfDataMapping\.js/);
   assert.match(review, /pdfLayout\.js/);
+  assert.doesNotMatch(review, /Legacy-DOM-Fallback\s+aktiv|DOM-Pfad\s+unverändert\s+aktiv|Fallback\s+für\s+Module\s+ohne\s+Report-Adapter/i);
 });
 
 test('47C.9A defines the complete authorities-report scope', () => {
