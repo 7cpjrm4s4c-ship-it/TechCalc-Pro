@@ -80,7 +80,7 @@ assert.ok(!rows.some(row => ['Entwässerungsgegenstand', 'Anzahl', 'Anschlusswer
 assert.ok(rows.some(row => row[0] === 'Summe Anschlusswerte' && row[1] === '12,8' && row[2] === 'DU'));
 assert.ok(rows.some(row => row[0] === 'Dimensionierungsansatz' && row[1].includes('Tabelle 8')));
 assert.ok(rows.some(row => row[0] === 'Berechnungsansatz' && row[1].includes('Schmutzwasserabfluss Qww')));
-assert.ok(rows.some(row => row[0] === 'Berechnungsansatz' && row[1].includes('Wurzel(ΣDU)')));
+assert.ok(rows.some(row => row[0] === 'Berechnungsansatz' && row[1].includes('Wurzel(Summe DU)')));
 assert.ok(rows.some(row => row[0] === 'Ausgewählte Nennweite' && row[1] === 'DN 100'));
 assert.ok(!rows.some(row => ['Qtot', 'Qww', 'Sum Du', 'Line Type'].includes(row[0])));
 
