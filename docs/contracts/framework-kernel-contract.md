@@ -106,21 +106,22 @@ Built-in catalog groups currently include:
 
 ## Reference module guard
 
-The first migrated reference module is:
+The migrated reference modules are:
 
 ```js
 js/modules/unit-converter
+js/modules/pipe-sizing
 ```
 
-The reference module must use central Core paths for app-wide dependencies and must not import directly from these legacy or platform implementation paths:
+Reference modules must use central Core paths for app-wide dependencies and must not import directly from these legacy or platform implementation paths:
 
 - `../../platform/`
 - `../../shared/`
 - `../../utils/`
 
-The reference module currently validates the following Core responsibilities:
+The reference modules currently validate the following Core responsibilities:
 
-- runtime access through `../../core/runtime/index.js`
+- runtime and dynamic renderer access through `../../core/runtime/index.js`
 - typed report adapter access through `../../core/typedDtoReportAdapter.js`
 - data access through `../../core/data/index.js`
 - number formatting through `../../core/numberService.js`

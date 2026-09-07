@@ -55,59 +55,121 @@ const requiredCoreExports = [
   './ux/index.js'
 ];
 
-const unitConverterFiles = [
-  'js/modules/unit-converter/config.js',
-  'js/modules/unit-converter/controller.js',
-  'js/modules/unit-converter/index.js',
-  'js/modules/unit-converter/logic.js',
-  'js/modules/unit-converter/results.js',
-  'js/modules/unit-converter/schema.js',
-  'js/modules/unit-converter/state.js',
-  'js/modules/unit-converter/view.js',
-  'js/modules/unit-converter/viewModel.js'
-];
-
 const forbiddenReferenceModuleImports = [
   '../../platform/',
   '../../shared/',
   '../../utils/'
 ];
 
-const requiredUnitConverterImports = [
+const referenceModules = [
   {
-    file: 'js/modules/unit-converter/index.js',
-    specifiers: [
-      '../../core/runtime/index.js',
-      '../../core/typedDtoReportAdapter.js',
-      '../../core/numberService.js'
+    id: 'unit-converter',
+    files: [
+      'js/modules/unit-converter/config.js',
+      'js/modules/unit-converter/controller.js',
+      'js/modules/unit-converter/index.js',
+      'js/modules/unit-converter/logic.js',
+      'js/modules/unit-converter/results.js',
+      'js/modules/unit-converter/schema.js',
+      'js/modules/unit-converter/state.js',
+      'js/modules/unit-converter/view.js',
+      'js/modules/unit-converter/viewModel.js'
+    ],
+    requiredImports: [
+      {
+        file: 'js/modules/unit-converter/index.js',
+        specifiers: [
+          '../../core/runtime/index.js',
+          '../../core/typedDtoReportAdapter.js',
+          '../../core/numberService.js'
+        ]
+      },
+      {
+        file: 'js/modules/unit-converter/logic.js',
+        specifiers: ['../../core/data/index.js']
+      },
+      {
+        file: 'js/modules/unit-converter/results.js',
+        specifiers: [
+          '../../core/data/index.js',
+          '../../core/numberService.js'
+        ]
+      },
+      {
+        file: 'js/modules/unit-converter/schema.js',
+        specifiers: ['../../core/formSchema.js']
+      },
+      {
+        file: 'js/modules/unit-converter/view.js',
+        specifiers: ['../../core/renderer.js']
+      },
+      {
+        file: 'js/modules/unit-converter/viewModel.js',
+        specifiers: [
+          '../../core/renderer.js',
+          '../../core/resultRenderer.js',
+          '../../core/data/index.js',
+          '../../core/numberService.js'
+        ]
+      }
     ]
   },
   {
-    file: 'js/modules/unit-converter/logic.js',
-    specifiers: ['../../core/data/index.js']
-  },
-  {
-    file: 'js/modules/unit-converter/results.js',
-    specifiers: [
-      '../../core/data/index.js',
-      '../../core/numberService.js'
-    ]
-  },
-  {
-    file: 'js/modules/unit-converter/schema.js',
-    specifiers: ['../../core/formSchema.js']
-  },
-  {
-    file: 'js/modules/unit-converter/view.js',
-    specifiers: ['../../core/renderer.js']
-  },
-  {
-    file: 'js/modules/unit-converter/viewModel.js',
-    specifiers: [
-      '../../core/renderer.js',
-      '../../core/resultRenderer.js',
-      '../../core/data/index.js',
-      '../../core/numberService.js'
+    id: 'pipe-sizing',
+    files: [
+      'js/modules/pipe-sizing/config.js',
+      'js/modules/pipe-sizing/controller.js',
+      'js/modules/pipe-sizing/index.js',
+      'js/modules/pipe-sizing/logic.js',
+      'js/modules/pipe-sizing/results.js',
+      'js/modules/pipe-sizing/schema.js',
+      'js/modules/pipe-sizing/state.js',
+      'js/modules/pipe-sizing/view.js',
+      'js/modules/pipe-sizing/viewModel.js'
+    ],
+    requiredImports: [
+      {
+        file: 'js/modules/pipe-sizing/controller.js',
+        specifiers: [
+          '../../core/runtime/index.js',
+          '../../core/numberService.js'
+        ]
+      },
+      {
+        file: 'js/modules/pipe-sizing/index.js',
+        specifiers: [
+          '../../core/runtime/index.js',
+          '../../core/typedDtoReportAdapter.js',
+          '../../core/numberService.js'
+        ]
+      },
+      {
+        file: 'js/modules/pipe-sizing/logic.js',
+        specifiers: ['../../core/data/index.js']
+      },
+      {
+        file: 'js/modules/pipe-sizing/results.js',
+        specifiers: [
+          '../../core/numberService.js',
+          '../../core/renderer.js'
+        ]
+      },
+      {
+        file: 'js/modules/pipe-sizing/schema.js',
+        specifiers: ['../../core/formSchema.js']
+      },
+      {
+        file: 'js/modules/pipe-sizing/view.js',
+        specifiers: ['../../core/renderer.js']
+      },
+      {
+        file: 'js/modules/pipe-sizing/viewModel.js',
+        specifiers: [
+          '../../core/renderer.js',
+          '../../core/resultRenderer.js',
+          '../../core/data/index.js'
+        ]
+      }
     ]
   }
 ];
@@ -190,22 +252,24 @@ for (const expectedSection of [
   }
 }
 
-for (const relativePath of unitConverterFiles) {
-  const source = readProjectFile(relativePath);
-  for (const forbiddenImport of forbiddenReferenceModuleImports) {
-    if (source.includes(`'${forbiddenImport}`) || source.includes(`"${forbiddenImport}`)) {
-      throw new Error(`Reference module unit-converter must not import ${forbiddenImport} from ${relativePath}`);
+for (const referenceModule of referenceModules) {
+  for (const relativePath of referenceModule.files) {
+    const source = readProjectFile(relativePath);
+    for (const forbiddenImport of forbiddenReferenceModuleImports) {
+      if (source.includes(`'${forbiddenImport}`) || source.includes(`"${forbiddenImport}`)) {
+        throw new Error(`Reference module ${referenceModule.id} must not import ${forbiddenImport} from ${relativePath}`);
+      }
     }
   }
-}
 
-for (const { file, specifiers } of requiredUnitConverterImports) {
-  for (const specifier of specifiers) {
-    assertFileContains(
-      file,
-      specifier,
-      `Reference module unit-converter must use ${specifier} in ${file}`
-    );
+  for (const { file, specifiers } of referenceModule.requiredImports) {
+    for (const specifier of specifiers) {
+      assertFileContains(
+        file,
+        specifier,
+        `Reference module ${referenceModule.id} must use ${specifier} in ${file}`
+      );
+    }
   }
 }
 
