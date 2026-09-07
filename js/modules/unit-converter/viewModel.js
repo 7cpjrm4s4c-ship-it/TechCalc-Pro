@@ -1,9 +1,9 @@
-import { field, selectField, stack } from '../../core/renderer.js';
-import { renderResultModel } from '../../platform/resultRenderer/index.js';
-import { unitCategories } from '../../utils/units.js';
-import { fmt } from '../../utils/calculations.js';
+import { field, selectField, stack, renderResultModel, formatNumber } from '../../core/ui/index.js';
+import { unitCategories } from '../../core/data/index.js';
 import { calculate } from './logic.js';
 import { buildUnitConverterResultModel, normalizeUnitSelection } from './results.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 export function conversionContent(s = {}) {
   const { units, from, to } = normalizeUnitSelection(s);
