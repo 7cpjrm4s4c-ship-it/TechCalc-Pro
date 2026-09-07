@@ -4,9 +4,9 @@ import {
   hydraulicTables,
   roofDrainTable,
   gutterCombinations
-} from './rainwater.js';
-import { pipeSystems, dnTable, recommendPipe } from './pipes.js';
-import { refrigerantService } from './refrigerants.js';
+} from '../core/data/rainwater.js';
+import { pipeSystems, dnTable, recommendPipe } from '../core/data/pipes.js';
+import { refrigerantService } from '../core/data/refrigerants.js';
 
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 const freezeCatalogEntry = entry => Object.freeze({ ...entry });

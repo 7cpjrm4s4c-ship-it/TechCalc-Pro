@@ -1,4 +1,1 @@
-export * from './catalog.js';
-export * from './rainwater.js';
-export * from './pipes.js';
-export * from './refrigerants.js';
+export * from '../core/data/index.js';

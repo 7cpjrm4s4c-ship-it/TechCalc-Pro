@@ -1,7 +1,1 @@
-export {
-  areaTypes,
-  dnOrder,
-  hydraulicTables,
-  roofDrainTable,
-  gutterCombinations
-} from '../shared/rainwaterDomainTables.js';
+export * from '../core/data/rainwater.js';

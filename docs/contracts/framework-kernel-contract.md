@@ -10,41 +10,55 @@ Authority: Repository First
 
 The internal neutral framework kernel defines central access points for recurring module responsibilities.
 
-Modules must use framework- and platform-provided services for app-wide concerns instead of reimplementing them locally.
+Modules must use core-provided services for app-wide concerns instead of reimplementing them locally.
 
 ---
 
-## Scope
+## Core first
 
-The framework kernel covers central contracts and service boundaries for:
-
-- module definition and contract helpers
-- module registration
-- module runtime and lifecycle integration
-- schema-based form rendering
-- result rendering
-- state binding
-- number parsing and formatting
-- saved records
-- PDF export access
-- platform module creation
-- centralized data access through `js/data`
-
-The framework kernel does not contain domain-specific module calculations.
-
----
-
-## Public framework entry point
-
-The framework entry point is:
+The canonical framework basis is:
 
 ```js
-js/framework/index.js
+js/core
 ```
 
-This file is an aggregation boundary only. It must not become the owner of data, UI, PDF, CSS, UX or domain logic.
+All app-wide responsibilities must be discoverable through `js/core` before feature modules are migrated.
 
-Modules may import from the framework entry point when they need a stable platform-level API. Modules should otherwise import from the narrowest central path that matches the needed responsibility.
+The framework entry point `js/framework/index.js` is only an aggregation facade over `js/core`. It must not own data, UI, PDF, CSS, UX, runtime or domain logic.
+
+---
+
+## Core responsibility paths
+
+| Concern | Canonical core path |
+|---|---|
+| Core overview | `js/core/index.js`, `js/core/appCore.js` |
+| Contracts and policies | `js/core/contracts` |
+| Data catalogs and lookup services | `js/core/data` |
+| Events | `js/core/events` |
+| PDF export | `js/core/pdf`, `js/core/pdfExport.js` |
+| Runtime, routing and navigation | `js/core/runtime` |
+| State | `js/core/state` |
+| Storage and saved records | `js/core/storage` |
+| Stylesheet manifest | `js/core/styles` |
+| UI rendering and primitives | `js/core/ui` |
+| UX policies and interaction helpers | `js/core/ux` |
+
+---
+
+## Module import rule
+
+Modules should import from the narrowest central core path that matches the required responsibility.
+
+Examples:
+
+```js
+import { dataCatalog } from '../../core/data/index.js';
+import { createPlatformModule } from '../../core/runtime/index.js';
+import { defineModuleDefinition } from '../../core/contracts/index.js';
+```
+
+Modules should not use broad framework imports when a narrow core path is sufficient.
 
 ---
 
@@ -53,12 +67,14 @@ Modules may import from the framework entry point when they need a stable platfo
 The canonical central data path is:
 
 ```js
-js/data
+js/core/data
 ```
 
-Data catalogs, shared data sets and data lookup services belong under `js/data`.
+`js/data` remains as a compatibility alias during migration.
 
-Existing data sources in `js/shared` and `js/utils` remain compatible during migration, but new modules must not create private copies of catalog data when a matching data entry exists under `js/data`.
+Data catalogs, shared data sets and data lookup services belong under `js/core/data`.
+
+Existing data sources in `js/shared` and `js/utils` remain compatible during migration, but new modules must not create private copies of catalog data when a matching data entry exists under `js/core/data`.
 
 ---
 
@@ -67,7 +83,7 @@ Existing data sources in `js/shared` and `js/utils` remain compatible during mig
 Centralized data access is provided by:
 
 ```js
-js/data/catalog.js
+js/core/data/catalog.js
 ```
 
 The catalog exposes registered data entries through stable catalog identifiers and read-only access methods.
@@ -77,25 +93,6 @@ Built-in catalog groups currently include:
 - rainwater area, hydraulic, roof drain and gutter data
 - pipe system and nominal diameter data
 - refrigerant, safety class, regulation and EN 378 safety data
-
----
-
-## Central responsibility paths
-
-App-wide concerns must stay in their dedicated central paths:
-
-| Concern | Central path |
-|---|---|
-| Data catalogs | `js/data` |
-| PDF export | `js/core/pdf` and `js/core/pdfExport.js` |
-| Module contracts | `js/core/moduleDefinition.js`, `js/core/moduleContract.js` |
-| Module runtime | `js/core/moduleRuntime.js`, `js/platform/moduleRuntime` |
-| Schema rendering | `js/core/schemaRenderer.js` |
-| Result rendering | `js/core/resultRenderer.js` |
-| Number parsing/formatting | `js/core/numberService.js` |
-| Saved records | `js/core/savedRecords.js`, `js/core/savedRecordController.js` |
-
-The framework entry point may expose these APIs, but ownership stays with the dedicated central path.
 
 ---
 
@@ -115,20 +112,22 @@ Central concerns stay outside feature modules:
 
 - rendering
 - lifecycle
+- routing and navigation
 - state binding
 - validation flow
 - saved records
 - PDF dispatch
 - data catalogs
 - number formatting and parsing
+- CSS and UX policies
 
 ---
 
 ## Compatibility
 
-This contract introduces an internal framework boundary without moving existing core files.
+This contract introduces a Core-first internal framework boundary without moving existing implementation files.
 
-Existing modules remain compatible. Migration to central paths can happen incrementally.
+Existing modules remain compatible. Migration to central core paths can happen incrementally.
 
 ---
 
