@@ -1,4 +1,4 @@
-import { defineFormSchema, FIELD_TYPES } from '../../core/ui/index.js';
+import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
 
 export const unitConverterSchema = defineFormSchema({
   fields: [
