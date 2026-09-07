@@ -1,4 +1,5 @@
-import { field, selectField, stack, renderResultModel, formatNumber } from '../../core/ui/index.js';
+import { field, selectField, stack, renderResultModel } from '../../core/ui/index.js';
+import { formatNumber } from '../../core/numberService.js';
 import { unitCategories } from '../../core/data/index.js';
 import { calculate } from './logic.js';
 import { buildUnitConverterResultModel, normalizeUnitSelection } from './results.js';
