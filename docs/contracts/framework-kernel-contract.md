@@ -104,6 +104,34 @@ Built-in catalog groups currently include:
 
 ---
 
+## Reference module guard
+
+The first migrated reference module is:
+
+```js
+js/modules/unit-converter
+```
+
+The reference module must use central Core paths for app-wide dependencies and must not import directly from these legacy or platform implementation paths:
+
+- `../../platform/`
+- `../../shared/`
+- `../../utils/`
+
+The reference module currently validates the following Core responsibilities:
+
+- runtime access through `../../core/runtime/index.js`
+- typed report adapter access through `../../core/typedDtoReportAdapter.js`
+- data access through `../../core/data/index.js`
+- number formatting through `../../core/numberService.js`
+- schema access through `../../core/formSchema.js`
+- base rendering through `../../core/renderer.js`
+- result rendering through `../../core/resultRenderer.js`
+
+This guard is enforced by `npm run audit:framework-kernel`.
+
+---
+
 ## Module responsibility
 
 A framework-oriented module should provide only module-specific concerns:

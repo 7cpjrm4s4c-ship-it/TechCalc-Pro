@@ -55,8 +55,72 @@ const requiredCoreExports = [
   './ux/index.js'
 ];
 
+const unitConverterFiles = [
+  'js/modules/unit-converter/config.js',
+  'js/modules/unit-converter/controller.js',
+  'js/modules/unit-converter/index.js',
+  'js/modules/unit-converter/logic.js',
+  'js/modules/unit-converter/results.js',
+  'js/modules/unit-converter/schema.js',
+  'js/modules/unit-converter/state.js',
+  'js/modules/unit-converter/view.js',
+  'js/modules/unit-converter/viewModel.js'
+];
+
+const forbiddenReferenceModuleImports = [
+  '../../platform/',
+  '../../shared/',
+  '../../utils/'
+];
+
+const requiredUnitConverterImports = [
+  {
+    file: 'js/modules/unit-converter/index.js',
+    specifiers: [
+      '../../core/runtime/index.js',
+      '../../core/typedDtoReportAdapter.js',
+      '../../core/numberService.js'
+    ]
+  },
+  {
+    file: 'js/modules/unit-converter/logic.js',
+    specifiers: ['../../core/data/index.js']
+  },
+  {
+    file: 'js/modules/unit-converter/results.js',
+    specifiers: [
+      '../../core/data/index.js',
+      '../../core/numberService.js'
+    ]
+  },
+  {
+    file: 'js/modules/unit-converter/schema.js',
+    specifiers: ['../../core/formSchema.js']
+  },
+  {
+    file: 'js/modules/unit-converter/view.js',
+    specifiers: ['../../core/renderer.js']
+  },
+  {
+    file: 'js/modules/unit-converter/viewModel.js',
+    specifiers: [
+      '../../core/renderer.js',
+      '../../core/resultRenderer.js',
+      '../../core/data/index.js',
+      '../../core/numberService.js'
+    ]
+  }
+];
+
 function readProjectFile(relativePath) {
   return fs.readFileSync(path.join(root, relativePath), 'utf8');
+}
+
+function assertFileContains(relativePath, expectedToken, message) {
+  const source = readProjectFile(relativePath);
+  if (!source.includes(expectedToken)) {
+    throw new Error(message || `${relativePath} is missing ${expectedToken}`);
+  }
 }
 
 for (const relativePath of requiredFiles) {
@@ -113,9 +177,35 @@ if (!frameworkDataCatalog.includes('../data/catalog.js')) {
 }
 
 const contract = readProjectFile('docs/contracts/framework-kernel-contract.md');
-for (const expectedSection of ['Core first', 'Core responsibility paths', 'Module import rule', 'Central data path', 'Module responsibility']) {
+for (const expectedSection of [
+  'Core first',
+  'Core responsibility paths',
+  'Module import rule',
+  'Central data path',
+  'Reference module guard',
+  'Module responsibility'
+]) {
   if (!contract.includes(expectedSection)) {
     throw new Error(`Framework kernel contract is missing section: ${expectedSection}`);
+  }
+}
+
+for (const relativePath of unitConverterFiles) {
+  const source = readProjectFile(relativePath);
+  for (const forbiddenImport of forbiddenReferenceModuleImports) {
+    if (source.includes(`'${forbiddenImport}`) || source.includes(`"${forbiddenImport}`)) {
+      throw new Error(`Reference module unit-converter must not import ${forbiddenImport} from ${relativePath}`);
+    }
+  }
+}
+
+for (const { file, specifiers } of requiredUnitConverterImports) {
+  for (const specifier of specifiers) {
+    assertFileContains(
+      file,
+      specifier,
+      `Reference module unit-converter must use ${specifier} in ${file}`
+    );
   }
 }
 
