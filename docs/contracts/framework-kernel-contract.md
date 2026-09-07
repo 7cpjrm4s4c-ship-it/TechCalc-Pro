@@ -72,6 +72,14 @@ js/core/data
 
 `js/data` remains as a compatibility alias during migration.
 
+The compatibility alias is intentionally limited to these documented files:
+
+- `js/data/index.js`
+- `js/data/pipes.js`
+- `js/data/rainwater.js`
+- `js/data/refrigerants.js`
+- `js/data/catalog.js`
+
 Data catalogs, shared data sets and data lookup services belong under `js/core/data`.
 
 Existing data sources in `js/shared` and `js/utils` remain compatible during migration, but new modules must not create private copies of catalog data when a matching data entry exists under `js/core/data`.
