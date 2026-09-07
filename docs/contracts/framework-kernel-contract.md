@@ -24,7 +24,7 @@ js/core
 
 All app-wide responsibilities must be discoverable through `js/core` before feature modules are migrated.
 
-The framework entry point `js/framework/index.js` is only an aggregation facade over `js/core`. It must not own data, UI, PDF, CSS, UX, runtime or domain logic.
+The framework entry point `js/framework/index.js` is an aggregation facade over `js/core` and documented compatibility aliases. It must not own data, UI, PDF, CSS, UX, runtime or domain logic.
 
 ---
 
@@ -72,7 +72,7 @@ js/core/data
 
 `js/data` remains as a compatibility alias during migration.
 
-The compatibility alias is intentionally limited to these documented files:
+The compatibility alias is intentionally limited to these documented and imported files:
 
 - `js/data/index.js`
 - `js/data/pipes.js`
