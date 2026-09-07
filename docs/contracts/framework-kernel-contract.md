@@ -111,6 +111,7 @@ The migrated reference modules are:
 ```js
 js/modules/unit-converter
 js/modules/pipe-sizing
+js/modules/pressure-holding
 ```
 
 Reference modules must use central Core paths for app-wide dependencies and must not import directly from these legacy or platform implementation paths:
@@ -124,7 +125,7 @@ The reference modules currently validate the following Core responsibilities:
 - runtime and dynamic renderer access through `../../core/runtime/index.js`
 - typed report adapter access through `../../core/typedDtoReportAdapter.js`
 - data access through `../../core/data/index.js`
-- number formatting through `../../core/numberService.js`
+- number formatting and parsing through `../../core/numberService.js`
 - schema access through `../../core/formSchema.js`
 - base rendering through `../../core/renderer.js`
 - result rendering through `../../core/resultRenderer.js`
