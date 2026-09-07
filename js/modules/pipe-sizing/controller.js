@@ -1,7 +1,9 @@
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { createLineSectionController } from '../../platform/lineSectionController/index.js';
-import { fmt } from '../../utils/calculations.js';
+import { createLineSectionController } from '../../core/runtime/index.js';
+import { formatNumber } from '../../core/numberService.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 export function savedPipeStats(item = {}){
   return [
