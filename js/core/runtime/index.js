@@ -10,5 +10,6 @@ export * from '../../platform/moduleRuntime/index.js';
 export { createLineSectionController } from '../../platform/lineSectionController/index.js';
 export {
   createPipeSizingDynamicRenderer,
+  createPressureHoldingDynamicRenderer,
   createUnitConverterDynamicRenderer
 } from '../../platform/dynamicRenderer/index.js';
