@@ -7,3 +7,4 @@ export * from '../registry.js';
 export * from '../router.js';
 export * from '../schemaModuleMount.js';
 export * from '../../platform/moduleRuntime/index.js';
+export { createUnitConverterDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
