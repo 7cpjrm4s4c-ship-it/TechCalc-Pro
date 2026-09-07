@@ -6,6 +6,11 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const requiredFiles = [
   'js/framework/index.js',
   'js/framework/dataCatalog.js',
+  'js/data/index.js',
+  'js/data/catalog.js',
+  'js/data/rainwater.js',
+  'js/data/pipes.js',
+  'js/data/refrigerants.js',
   'docs/contracts/framework-kernel-contract.md',
   'docs/architecture/ADR-0020-internal-neutral-framework.md'
 ];
@@ -22,7 +27,7 @@ const requiredFrameworkExports = [
   '../core/savedRecords.js',
   '../core/pdfExport.js',
   '../platform/moduleRuntime/index.js',
-  './dataCatalog.js'
+  '../data/index.js'
 ];
 
 function readProjectFile(relativePath) {
@@ -46,11 +51,11 @@ if (frameworkIndex.includes('../modules/')) {
   throw new Error('Framework kernel entry point must not import modules');
 }
 
-const dataCatalog = readProjectFile('js/framework/dataCatalog.js');
+const dataCatalog = readProjectFile('js/data/catalog.js');
 for (const expectedToken of [
   'defineDataCatalogEntry',
   'createDataCatalog',
-  'frameworkDataCatalog',
+  'dataCatalog',
   'rainwater.areaTypes',
   'pipes.systems',
   'refrigerants.items'
@@ -60,8 +65,13 @@ for (const expectedToken of [
   }
 }
 
+const frameworkDataCatalog = readProjectFile('js/framework/dataCatalog.js');
+if (!frameworkDataCatalog.includes("../data/catalog.js")) {
+  throw new Error('Framework data catalog must delegate to js/data/catalog.js');
+}
+
 const contract = readProjectFile('docs/contracts/framework-kernel-contract.md');
-for (const expectedSection of ['Public entry point', 'Data catalog contract', 'Module responsibility']) {
+for (const expectedSection of ['Public framework entry point', 'Central data path', 'Central responsibility paths', 'Module responsibility']) {
   if (!contract.includes(expectedSection)) {
     throw new Error(`Framework kernel contract is missing section: ${expectedSection}`);
   }

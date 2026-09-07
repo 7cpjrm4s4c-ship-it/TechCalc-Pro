@@ -8,15 +8,15 @@ Authority: Repository First
 
 ## Purpose
 
-The internal neutral framework kernel defines the central entry point for module implementation.
+The internal neutral framework kernel defines central access points for recurring module responsibilities.
 
-Modules must use framework-provided services for recurring platform tasks instead of reimplementing them locally.
+Modules must use framework- and platform-provided services for app-wide concerns instead of reimplementing them locally.
 
 ---
 
 ## Scope
 
-The framework kernel covers:
+The framework kernel covers central contracts and service boundaries for:
 
 - module definition and contract helpers
 - module registration
@@ -28,21 +28,37 @@ The framework kernel covers:
 - saved records
 - PDF export access
 - platform module creation
-- centralized data catalog access
+- centralized data access through `js/data`
 
 The framework kernel does not contain domain-specific module calculations.
 
 ---
 
-## Public entry point
+## Public framework entry point
 
-Modules and new platform code may import central framework APIs from:
+The framework entry point is:
 
 ```js
 js/framework/index.js
 ```
 
-Direct imports from `js/core`, `js/platform`, `js/shared` or `js/utils` remain valid for existing code, but new modules should prefer the framework entry point when the required API is exported there.
+This file is an aggregation boundary only. It must not become the owner of data, UI, PDF, CSS, UX or domain logic.
+
+Modules may import from the framework entry point when they need a stable platform-level API. Modules should otherwise import from the narrowest central path that matches the needed responsibility.
+
+---
+
+## Central data path
+
+The canonical central data path is:
+
+```js
+js/data
+```
+
+Data catalogs, shared data sets and data lookup services belong under `js/data`.
+
+Existing data sources in `js/shared` and `js/utils` remain compatible during migration, but new modules must not create private copies of catalog data when a matching data entry exists under `js/data`.
 
 ---
 
@@ -51,7 +67,7 @@ Direct imports from `js/core`, `js/platform`, `js/shared` or `js/utils` remain v
 Centralized data access is provided by:
 
 ```js
-js/framework/dataCatalog.js
+js/data/catalog.js
 ```
 
 The catalog exposes registered data entries through stable catalog identifiers and read-only access methods.
@@ -62,7 +78,24 @@ Built-in catalog groups currently include:
 - pipe system and nominal diameter data
 - refrigerant, safety class, regulation and EN 378 safety data
 
-Modules must not create private copies of catalog data when a matching framework catalog entry exists.
+---
+
+## Central responsibility paths
+
+App-wide concerns must stay in their dedicated central paths:
+
+| Concern | Central path |
+|---|---|
+| Data catalogs | `js/data` |
+| PDF export | `js/core/pdf` and `js/core/pdfExport.js` |
+| Module contracts | `js/core/moduleDefinition.js`, `js/core/moduleContract.js` |
+| Module runtime | `js/core/moduleRuntime.js`, `js/platform/moduleRuntime` |
+| Schema rendering | `js/core/schemaRenderer.js` |
+| Result rendering | `js/core/resultRenderer.js` |
+| Number parsing/formatting | `js/core/numberService.js` |
+| Saved records | `js/core/savedRecords.js`, `js/core/savedRecordController.js` |
+
+The framework entry point may expose these APIs, but ownership stays with the dedicated central path.
 
 ---
 
@@ -78,7 +111,7 @@ A framework-oriented module should provide only module-specific concerns:
 - report adapter
 - optional controller logic where required
 
-Central concerns stay in the framework:
+Central concerns stay outside feature modules:
 
 - rendering
 - lifecycle
@@ -95,7 +128,7 @@ Central concerns stay in the framework:
 
 This contract introduces an internal framework boundary without moving existing core files.
 
-Existing modules remain compatible. Migration to framework imports can happen incrementally.
+Existing modules remain compatible. Migration to central paths can happen incrementally.
 
 ---
 

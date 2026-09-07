@@ -13,4 +13,5 @@ export * from '../core/savedRecords.js';
 export * from '../core/savedRecordController.js';
 export * from '../core/pdfExport.js';
 export * from '../platform/moduleRuntime/index.js';
+export * from '../data/index.js';
 export * from './dataCatalog.js';
