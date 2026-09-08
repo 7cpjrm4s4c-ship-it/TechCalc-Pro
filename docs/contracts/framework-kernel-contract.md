@@ -115,6 +115,7 @@ js/modules/pressure-holding
 js/modules/heating-cooling
 js/modules/ventilation
 js/modules/buffer-storage
+js/modules/wastewater
 ```
 
 Reference modules must use central Core paths for app-wide dependencies and must not import directly from these legacy or platform implementation paths:
@@ -132,6 +133,7 @@ The reference modules currently validate the following Core responsibilities:
 - schema access through `../../core/formSchema.js`
 - base rendering through `../../core/renderer.js`
 - result rendering through `../../core/resultRenderer.js`
+- collection and saved-record access through `../../core/storage/index.js`
 
 This guard is enforced by `npm run audit:framework-kernel`.
 

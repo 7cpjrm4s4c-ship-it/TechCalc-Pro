@@ -121,6 +121,18 @@ const referenceModules = [
       required('buffer-storage/view.js', ['../../core/renderer.js', '../../core/runtime/index.js', '../../core/resultRenderer.js']),
       required('buffer-storage/viewModel.js', ['../../core/numberService.js'])
     ]
+  },
+  {
+    id: 'wastewater',
+    files: moduleFiles('wastewater'),
+    requiredImports: [
+      required('wastewater/controller.js', ['../../core/numbers.js', '../../core/formActions.js', '../../core/storage/index.js', '../../core/eventPipeline.js', '../../core/scrollManager.js']),
+      required('wastewater/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+      required('wastewater/results.js', ['../../core/numberService.js']),
+      required('wastewater/schema.js', ['../../core/formSchema.js', '../../core/numberService.js']),
+      required('wastewater/view.js', ['../../core/renderer.js', '../../core/resultRenderer.js']),
+      required('wastewater/viewModel.js', ['../../core/numberService.js', '../../core/renderer.js'])
+    ]
   }
 ];
 
