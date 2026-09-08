@@ -1,5 +1,7 @@
-import { fmt } from '../../utils/calculations.js';
+import { formatNumber } from '../../core/numberService.js';
 import { areaTypes } from './tables.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 const modeLabel = value => ({ roof:'Dachfläche', property:'Grundstücksfläche' }[value] || value);
 const drainLabel = mode => mode === 'property' ? 'Hoftöpfe' : 'Dacheinläufe';
