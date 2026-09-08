@@ -14,5 +14,6 @@ export {
   createPipeSizingDynamicRenderer,
   createPressureHoldingDynamicRenderer,
   createUnitConverterDynamicRenderer,
-  createVentilationDynamicRenderer
+  createVentilationDynamicRenderer,
+  createWastewaterDynamicRenderer
 } from '../../platform/dynamicRenderer/index.js';

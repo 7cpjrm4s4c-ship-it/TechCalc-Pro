@@ -5,4 +5,5 @@ export * from '../savedCalculationController.js';
 export * from '../savedRecordController.js';
 export * from '../savedRecords.js';
 export * from '../unsavedWorkGuard.js';
+export * from '../../platform/collectionModel/index.js';
 export * from '../../platform/savedRecordModel/index.js';

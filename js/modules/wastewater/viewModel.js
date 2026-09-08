@@ -1,7 +1,14 @@
-import { fmtInput } from '../../utils/calculations.js';
+import { parseNumber, toInputNumber } from '../../core/numberService.js';
 import { field, selectField, grid } from '../../core/renderer.js';
 import { fixtureTypes, usageTypes } from './tables.js';
 import { getFixture } from './logic.js';
+
+function fmtInput(value, digits = 2) {
+  if (value === '' || value === null || value === undefined) return '';
+  const n = parseNumber(value, { fallback: 0 });
+  if (!n) return String(value);
+  return toInputNumber(n, { maximumFractionDigits: digits });
+}
 
 const options = items => items.map(item => ({ value: item.value ?? item.id, label: item.label ?? item.name }));
 const fixtureOptions = fixtureTypes.map(item => ({ value: item.id, label: item.name }));
@@ -19,7 +26,6 @@ const lineTypeOptions = [
   { value: 'ground-inside', label: 'Grundleitung innen' },
   { value: 'ground-outside', label: 'Grundleitung außen' }
 ];
-
 export function usesFillRatio(s = {}) {
   return ['branch-vented', 'collector', 'ground-inside', 'ground-outside'].includes(s.lineType);
 }
@@ -35,7 +41,6 @@ export function showLength(s = {}) {
 export function showBends(s = {}) {
   return ['single-unvented', 'branch-unvented', 'branch-vented'].includes(s.lineType);
 }
-
 export function isCustomFixture(s = {}) {
   return Boolean(getFixture(s.fixtureType || 'washbasin')?.custom);
 }
@@ -49,7 +54,6 @@ export function usageFields(s = {}) {
   }
   return grid(fields.join(''), 2);
 }
-
 export function lineFields(s = {}) {
   const fields = [
     selectField({ id: 'lineType', label: 'Leitungsart', value: s.lineType, options: lineTypeOptions }),
@@ -61,7 +65,6 @@ export function lineFields(s = {}) {
   if (showBends(s)) fields.push(field({ id: 'bends90', label: '90°-Umlenkungen', value: fmtInput(s.bends90, 0), unit: 'Stk.', inputmode: 'numeric' }));
   return grid(fields.join(''), 2);
 }
-
 export function fixtureInputFields(s = {}) {
   const fields = [
     selectField({ id: 'fixtureType', label: 'Gegenstand hinzufügen', value: s.fixtureType, options: fixtureOptions }),
@@ -75,7 +78,6 @@ export function fixtureInputFields(s = {}) {
   fields.push(`<div class="field field--action"><label>&nbsp;</label><div class="control"><button type="button" class="action-button" data-tc-action="platform:collection:add" data-collection="fixtures">Gegenstand hinzufügen</button></div></div>`);
   return grid(fields.join(''), 2);
 }
-
 export function additionalFlowFields(s = {}) {
   return grid([
     field({ id: 'continuousFlow', label: 'Dauerabfluss Qc', value: fmtInput(s.continuousFlow, 2), unit: 'l/s' }),
@@ -84,7 +86,6 @@ export function additionalFlowFields(s = {}) {
     selectField({ id: 'hasWc', label: 'WC angeschlossen', value: s.hasWc, options: yesNoOptions })
   ].join(''), 2);
 }
-
 export function createWastewaterViewModel(s = {}, r = {}) {
   return {
     usageHtml: usageFields(s),

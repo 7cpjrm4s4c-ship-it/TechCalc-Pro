@@ -1,4 +1,6 @@
-import { fmt } from '../../utils/calculations.js';
+import { formatNumber } from '../../core/numberService.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 export const lineTypeLabel = value => ({
   'single-unvented': 'Einzelanschluss unbelüftet',
@@ -12,7 +14,6 @@ export const lineTypeLabel = value => ({
   'ground-full': 'Grundleitung außen',
   ventilation: 'Grundleitung außen'
 }[value] || value);
-
 const effectiveLineType = s => ['ground-full','ventilation'].includes(s.lineType) ? 'ground-outside' : s.lineType;
 const fillApplies = lineType => ['collector','ground-inside','ground-outside','branch-vented'].includes(lineType);
 

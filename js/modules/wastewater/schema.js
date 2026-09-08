@@ -1,7 +1,9 @@
 import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
-import { fmt, fmtInput } from '../../utils/calculations.js';
+import { formatNumber } from '../../core/numberService.js';
 import { fixtureTypes, usageTypes } from './tables.js';
 import { getFixture } from './logic.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 const fixtureOptions = fixtureTypes.map(item => ({ value: item.id, label: item.name }));
 const usageOptions = usageTypes.map(item => ({ value: item.value, label: item.label }));
@@ -18,14 +20,12 @@ const lineTypeOptions = [
   { value:'ground-inside', label:'Grundleitung innen' },
   { value:'ground-outside', label:'Grundleitung außen' }
 ];
-
 const isCustomFixture = s => getFixture(s.fixtureType || 'washbasin')?.custom;
 const usesFillRatio = s => ['branch-vented','collector','ground-inside','ground-outside'].includes(s.lineType);
 const usesBranchType = s => s.lineType === 'stack';
 const showLength = s => ['single-unvented','single-vented','branch-unvented'].includes(s.lineType);
 const showBends = s => ['single-unvented','branch-unvented','branch-vented'].includes(s.lineType);
 const usageK = s => usageTypes.find(item => item.value === s.usageType)?.k;
-
 function fixtureItems(state = {}, context = {}) {
   return (context.result?.fixtures || []).map(item => ({
     id: item.id,
@@ -34,7 +34,6 @@ function fixtureItems(state = {}, context = {}) {
     subtitle: `ΣDU ${fmt(item.totalDu,1)} l/s · DU/Stk. ${fmt(item.du,1)} l/s · Einzelanschluss ${item.dn || '—'}`
   }));
 }
-
 export const wastewaterSchema = defineFormSchema({
   fields: [
     { key:'usageType', label:'Nutzungsart', type:FIELD_TYPES.SELECT, options:usageOptions, commit:'immediate', lookup:true },
@@ -65,5 +64,4 @@ export const wastewaterSchema = defineFormSchema({
     { title:'Zusatzabflüsse', fields:['continuousFlow','pumpFlow','rainFlow','hasWc'], columns:2, accent:'green' }
   ]
 });
-
 export default wastewaterSchema;
