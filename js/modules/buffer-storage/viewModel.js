@@ -1,6 +1,14 @@
-import { fmt, fmtInput } from '../../utils/calculations.js';
+import { formatNumber, parseNumber } from '../../core/numberService.js';
 import { calculate } from './logic.js';
 import { buildBufferStorageResultModel, mediumLabel, modeLabel } from './results.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
+function fmtInput(value, digits = 2) {
+  if (value === '' || value === null || value === undefined) return '';
+  const parsed = parseNumber(value, { fallback: 0 });
+  if (!parsed) return String(value);
+  return formatNumber(parsed, { fallback: String(value), maximumFractionDigits: digits });
+}
 
 export const BUFFER_ACCENT = 'cyan';
 
