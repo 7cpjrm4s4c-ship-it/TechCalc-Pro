@@ -1,5 +1,5 @@
 import { renderFormSchema } from '../../core/formSchema.js';
-import { renderResultModel } from '../../platform/resultRenderer/index.js';
+import { renderResultModel } from '../../core/resultRenderer.js';
 import schema from './schema.js';
 import { buildRainwaterResultModel } from './results.js';
 

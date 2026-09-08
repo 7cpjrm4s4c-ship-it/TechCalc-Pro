@@ -13,6 +13,7 @@ export {
   createHeatingCoolingDynamicRenderer,
   createPipeSizingDynamicRenderer,
   createPressureHoldingDynamicRenderer,
+  createRainwaterDynamicRenderer,
   createUnitConverterDynamicRenderer,
   createVentilationDynamicRenderer,
   createWastewaterDynamicRenderer
