@@ -1,5 +1,6 @@
 import {
   normalizeResultRows,
+  renderRecommendationCard,
   renderResultCard,
   renderResultGroup,
   renderResultTable,
@@ -7,7 +8,13 @@ import {
   renderResultModel as platformRenderResultModel
 } from '../platform/resultRenderer/index.js';
 
-export { normalizeResultRows, renderResultCard, renderResultGroup, renderResultTable };
+export {
+  normalizeResultRows,
+  renderRecommendationCard,
+  renderResultCard,
+  renderResultGroup,
+  renderResultTable
+};
 
 export function renderPrimaryResultCard(title, primary = {}, rows = [], accent = 'blue') {
   return renderResultCard({ title, primary, rows, accent });

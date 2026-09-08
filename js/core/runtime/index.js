@@ -9,6 +9,7 @@ export * from '../schemaModuleMount.js';
 export * from '../../platform/moduleRuntime/index.js';
 export { createLineSectionController } from '../../platform/lineSectionController/index.js';
 export {
+  createHeatingCoolingDynamicRenderer,
   createPipeSizingDynamicRenderer,
   createPressureHoldingDynamicRenderer,
   createUnitConverterDynamicRenderer
