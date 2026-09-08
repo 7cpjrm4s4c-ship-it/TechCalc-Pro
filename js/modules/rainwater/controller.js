@@ -2,7 +2,7 @@ import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { getAreaType } from './logic.js';
 import { roofDrainTable } from './tables.js';
 import { normalizeAreaType, defaultAreaTypeForMode } from './schema.js';
-import { createStateSnapshot, hydrateStateRecord } from '../../platform/savedRecordModel/index.js';
+import { createStateSnapshot, hydrateStateRecord } from '../../core/storage/index.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 
