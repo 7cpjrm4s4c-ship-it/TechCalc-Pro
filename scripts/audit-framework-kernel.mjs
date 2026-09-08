@@ -96,6 +96,19 @@ const referenceModules = [
       required('heating-cooling/view.js', ['../../core/data/index.js', '../../core/numberService.js', '../../core/renderer.js', '../../core/resultRenderer.js']),
       required('heating-cooling/viewModel.js', ['../../core/renderer.js', '../../core/numberService.js'])
     ]
+  },
+  {
+    id: 'ventilation',
+    files: moduleFiles('ventilation', ['reportAdapter.js']),
+    requiredImports: [
+      required('ventilation/controller.js', ['../../core/runtime/index.js', '../../core/numberService.js', '../../core/renderer.js']),
+      required('ventilation/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+      required('ventilation/logic.js', ['../../core/data/index.js']),
+      required('ventilation/results.js', ['../../core/numberService.js']),
+      required('ventilation/schema.js', ['../../core/formSchema.js']),
+      required('ventilation/view.js', ['../../core/renderer.js', '../../core/numberService.js', '../../core/resultRenderer.js']),
+      required('ventilation/viewModel.js', ['../../core/numberService.js'])
+    ]
   }
 ];
 

@@ -113,6 +113,7 @@ js/modules/unit-converter
 js/modules/pipe-sizing
 js/modules/pressure-holding
 js/modules/heating-cooling
+js/modules/ventilation
 ```
 
 Reference modules must use central Core paths for app-wide dependencies and must not import directly from these legacy or platform implementation paths:
