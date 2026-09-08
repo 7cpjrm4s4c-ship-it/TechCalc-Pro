@@ -4,4 +4,4 @@ export {
   hydraulicTables,
   roofDrainTable,
   gutterCombinations
-} from '../../core/data/rainwater.js';
+} from '../../shared/rainwaterDomainTables.js';
