@@ -12,5 +12,6 @@ export {
   createHeatingCoolingDynamicRenderer,
   createPipeSizingDynamicRenderer,
   createPressureHoldingDynamicRenderer,
-  createUnitConverterDynamicRenderer
+  createUnitConverterDynamicRenderer,
+  createVentilationDynamicRenderer
 } from '../../platform/dynamicRenderer/index.js';
