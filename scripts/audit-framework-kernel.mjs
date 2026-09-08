@@ -109,6 +109,18 @@ const referenceModules = [
       required('ventilation/view.js', ['../../core/renderer.js', '../../core/numberService.js', '../../core/resultRenderer.js']),
       required('ventilation/viewModel.js', ['../../core/numberService.js'])
     ]
+  },
+  {
+    id: 'buffer-storage',
+    files: moduleFiles('buffer-storage'),
+    requiredImports: [
+      required('buffer-storage/controller.js', ['../../core/runtime/index.js', '../../core/numberService.js']),
+      required('buffer-storage/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+      required('buffer-storage/results.js', ['../../core/numberService.js']),
+      required('buffer-storage/schema.js', ['../../core/formSchema.js']),
+      required('buffer-storage/view.js', ['../../core/renderer.js', '../../core/runtime/index.js', '../../core/resultRenderer.js']),
+      required('buffer-storage/viewModel.js', ['../../core/numberService.js'])
+    ]
   }
 ];
 
