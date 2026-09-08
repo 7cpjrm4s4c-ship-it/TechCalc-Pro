@@ -83,11 +83,24 @@ const referenceModules = [
       required('pressure-holding/view.js', ['../../core/renderer.js']),
       required('pressure-holding/viewModel.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/numberService.js'])
     ]
+  },
+  {
+    id: 'heating-cooling',
+    files: moduleFiles('heating-cooling', ['reportAdapter.js']),
+    requiredImports: [
+      required('heating-cooling/controller.js', ['../../core/numberService.js', '../../core/data/index.js']),
+      required('heating-cooling/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/numberService.js']),
+      required('heating-cooling/logic.js', ['../../core/data/index.js']),
+      required('heating-cooling/results.js', ['../../core/numberService.js']),
+      required('heating-cooling/schema.js', ['../../core/formSchema.js', '../../core/data/index.js', '../../core/numberService.js']),
+      required('heating-cooling/view.js', ['../../core/data/index.js', '../../core/numberService.js', '../../core/renderer.js', '../../core/resultRenderer.js']),
+      required('heating-cooling/viewModel.js', ['../../core/renderer.js', '../../core/numberService.js'])
+    ]
   }
 ];
 
-function moduleFiles(moduleId) {
-  return ['config.js', 'controller.js', 'index.js', 'logic.js', 'results.js', 'schema.js', 'state.js', 'view.js', 'viewModel.js']
+function moduleFiles(moduleId, extraFiles = []) {
+  return ['config.js', 'controller.js', 'index.js', 'logic.js', 'results.js', 'schema.js', 'state.js', 'view.js', 'viewModel.js', ...extraFiles]
     .map(file => `js/modules/${moduleId}/${file}`);
 }
 

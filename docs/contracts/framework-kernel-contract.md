@@ -112,6 +112,7 @@ The migrated reference modules are:
 js/modules/unit-converter
 js/modules/pipe-sizing
 js/modules/pressure-holding
+js/modules/heating-cooling
 ```
 
 Reference modules must use central Core paths for app-wide dependencies and must not import directly from these legacy or platform implementation paths:
