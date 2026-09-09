@@ -1,6 +1,6 @@
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../../core/eventPipeline.js';
-import { createRecordId } from '../../core/savedRecords.js';
+import { createRecordId } from '../../core/storage/index.js';
 import { areaTypes } from '../../shared/rainwaterDomainTables.js';
 import { readRainwaterSurfaceSnapshot } from '../../shared/rainwaterSurfaceSnapshot.js';
 
