@@ -146,11 +146,29 @@ const referenceModules = [
       required('rainwater/view.js', ['../../core/renderer.js']),
       required('rainwater/viewModel.js', ['../../core/formSchema.js', '../../core/resultRenderer.js'])
     ]
+  },
+  {
+    id: 'flooding-verification',
+    files: moduleFiles('flooding-verification', [], ['viewModel.js']),
+    allowedLegacyImports: [
+      '../../shared/rainwaterDomainTables.js',
+      '../../shared/rainwaterSurfaceSnapshot.js'
+    ],
+    requiredImports: [
+      required('flooding-verification/controller.js', ['../../core/numbers.js', '../../core/eventPipeline.js', '../../core/storage/index.js']),
+      required('flooding-verification/dynamicRenderer.js', ['../../core/domUpdate.js']),
+      required('flooding-verification/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+      required('flooding-verification/results.js', ['../../core/numberService.js']),
+      required('flooding-verification/schema.js', ['../../core/formSchema.js']),
+      required('flooding-verification/view.js', ['../../core/renderer.js', '../../core/formSchema.js', '../../core/resultRenderer.js'])
+    ]
   }
 ];
 
-function moduleFiles(moduleId, extraFiles = []) {
+function moduleFiles(moduleId, extraFiles = [], excludedFiles = []) {
+  const excluded = new Set(excludedFiles);
   return ['config.js', 'controller.js', 'index.js', 'logic.js', 'results.js', 'schema.js', 'state.js', 'view.js', 'viewModel.js', ...extraFiles]
+    .filter(file => !excluded.has(file))
     .map(file => `js/modules/${moduleId}/${file}`);
 }
 
@@ -165,6 +183,16 @@ function readProjectFile(relativePath) {
 function assertFileContains(relativePath, expectedToken, message) {
   const source = readProjectFile(relativePath);
   if (!source.includes(expectedToken)) throw new Error(message || `${relativePath} is missing ${expectedToken}`);
+}
+
+function importSpecifiers(source) {
+  const specifiers = [];
+  const importOrExportFrom = /(?:import|export)\s+(?:[\s\S]*?\s+from\s+)?['"]([^'"]+)['"]/g;
+  let match;
+  while ((match = importOrExportFrom.exec(source))) {
+    specifiers.push(match[1]);
+  }
+  return specifiers;
 }
 
 for (const relativePath of requiredFiles) {
@@ -202,11 +230,15 @@ for (const expectedSection of ['Core first', 'Core responsibility paths', 'Modul
 }
 
 for (const referenceModule of referenceModules) {
+  const allowedLegacyImports = new Set(referenceModule.allowedLegacyImports || []);
   for (const relativePath of referenceModule.files) {
     const source = readProjectFile(relativePath);
-    for (const forbiddenImport of forbiddenReferenceModuleImports) {
-      if (source.includes(`'${forbiddenImport}`) || source.includes(`"${forbiddenImport}`)) {
-        throw new Error(`Reference module ${referenceModule.id} must not import ${forbiddenImport} from ${relativePath}`);
+    for (const specifier of importSpecifiers(source)) {
+      if (allowedLegacyImports.has(specifier)) continue;
+      for (const forbiddenImport of forbiddenReferenceModuleImports) {
+        if (specifier.startsWith(forbiddenImport)) {
+          throw new Error(`Reference module ${referenceModule.id} must not import ${specifier} from ${relativePath}`);
+        }
       }
     }
   }
@@ -222,6 +254,12 @@ assertFileContains(
   'js/modules/rainwater/tables.js',
   '../../shared/rainwaterDomainTables.js',
   'Rainwater tables must keep the Flooding-conformance shared domain table source until that contract is migrated.'
+);
+
+assertFileContains(
+  'js/modules/flooding-verification/controller.js',
+  '../../shared/rainwaterSurfaceSnapshot.js',
+  'Flooding verification must keep the Rainwater surface snapshot bridge until that contract is migrated.'
 );
 
 console.log('Framework kernel audit passed.');

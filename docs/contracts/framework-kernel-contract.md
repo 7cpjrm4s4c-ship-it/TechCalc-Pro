@@ -86,6 +86,8 @@ Existing data sources in `js/shared` and `js/utils` remain compatible during mig
 
 `js/modules/rainwater/tables.js` currently remains bound to `js/shared/rainwaterDomainTables.js` because the Flooding platform-conformance contract validates that shared domain-table source. This is a documented transitional exception and must not be expanded to new module-local data copies.
 
+`js/modules/flooding-verification` currently consumes the same Rainwater domain tables and the Rainwater surface snapshot bridge from `js/shared`. These imports are documented transitional exceptions for the existing Rainwater/Flooding contract and must remain limited to `js/shared/rainwaterDomainTables.js` and `js/shared/rainwaterSurfaceSnapshot.js` until that contract is migrated.
+
 ---
 
 ## Data catalog contract
@@ -119,13 +121,14 @@ js/modules/ventilation
 js/modules/buffer-storage
 js/modules/wastewater
 js/modules/rainwater
+js/modules/flooding-verification
 ```
 
 Reference modules must use central Core paths for app-wide dependencies and must not import directly from these legacy or platform implementation paths:
 
 - `../../platform/`
 - `../../utils/`
-- `../../shared/`, except the documented transitional `js/modules/rainwater/tables.js` to `../../shared/rainwaterDomainTables.js` domain-table source
+- `../../shared/`, except documented transitional Rainwater/Flooding domain-table and snapshot bridges
 
 The reference modules currently validate the following Core responsibilities:
 
@@ -136,7 +139,9 @@ The reference modules currently validate the following Core responsibilities:
 - schema access through `../../core/formSchema.js`
 - base rendering through `../../core/renderer.js`
 - result rendering through `../../core/resultRenderer.js`
-- collection and saved-record access through `../../core/storage/index.js`
+- collection, record identity and saved-record access through `../../core/storage/index.js`
+- central event pipeline access through `../../core/eventPipeline.js`
+- safe DOM update access through `../../core/domUpdate.js`
 
 This guard is enforced by `npm run audit:framework-kernel`.
 
