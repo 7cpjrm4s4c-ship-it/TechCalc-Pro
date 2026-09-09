@@ -1,4 +1,7 @@
-import { airDensity, num } from '../../utils/calculations.js';
+import { airDensity } from '../../core/data/index.js';
+import { parseNumber } from '../../core/numberService.js';
+
+const num = value => parseNumber(value, { fallback: 0 });
 
 const CP_AIR_KJ_KG_K = 1.005;
 const P_ATM_PA = 101325;
