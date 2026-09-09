@@ -133,6 +133,19 @@ const referenceModules = [
       required('wastewater/view.js', ['../../core/renderer.js', '../../core/resultRenderer.js']),
       required('wastewater/viewModel.js', ['../../core/numberService.js', '../../core/renderer.js'])
     ]
+  },
+  {
+    id: 'rainwater',
+    files: moduleFiles('rainwater'),
+    requiredImports: [
+      required('rainwater/controller.js', ['../../core/numbers.js', '../../core/storage/index.js']),
+      required('rainwater/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+      required('rainwater/logic.js', ['../../core/numberService.js']),
+      required('rainwater/results.js', ['../../core/numberService.js']),
+      required('rainwater/schema.js', ['../../core/formSchema.js', '../../core/numberService.js']),
+      required('rainwater/view.js', ['../../core/renderer.js']),
+      required('rainwater/viewModel.js', ['../../core/formSchema.js', '../../core/resultRenderer.js'])
+    ]
   }
 ];
 
@@ -204,5 +217,11 @@ for (const referenceModule of referenceModules) {
     }
   }
 }
+
+assertFileContains(
+  'js/modules/rainwater/tables.js',
+  '../../shared/rainwaterDomainTables.js',
+  'Rainwater tables must keep the Flooding-conformance shared domain table source until that contract is migrated.'
+);
 
 console.log('Framework kernel audit passed.');
