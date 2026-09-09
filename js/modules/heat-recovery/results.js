@@ -1,9 +1,10 @@
-import { fmt } from '../../utils/calculations.js';
+import { formatNumber } from '../../core/numberService.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 export function modeLabel(mode){
   return mode === 'mixing' ? 'Mischluft' : 'WRG';
 }
-
 export function formatAirPoint(point = {}, { includeVolume = false, includeMass = true } = {}){
   const rows = [];
   if (includeVolume) rows.push({ label: 'Volumenstrom V̇', value: fmt(point.volumeFlowM3h, 0), unit: 'm³/h' });
@@ -12,7 +13,6 @@ export function formatAirPoint(point = {}, { includeVolume = false, includeMass 
   rows.push({ label: 'rel. Feuchte', value: fmt(point.rhPercent, 0), unit: '%' });
   return rows;
 }
-
 export function formulaText(s = {}){
   return s.mode === 'mixing'
     ? 'Mischluft: x und h aus Außenluft + Umluft über Massenstromanteile'
@@ -22,7 +22,6 @@ export function formulaText(s = {}){
 export function buildHeatRecoveryResultModel(s = {}, r = {}, accent = 'cyan'){
   const isMixing = s.mode === 'mixing';
   const hasCondensation = Boolean(r?.hasCondensation);
-
   if (isMixing) {
     return {
       primary: {
@@ -78,7 +77,6 @@ export function buildHeatRecoveryResultModel(s = {}, r = {}, accent = 'cyan'){
       }] : []
     };
   }
-
   return {
     primary: {
       title: 'WRG-Leistung',
@@ -135,7 +133,6 @@ export function buildHeatRecoveryResultModel(s = {}, r = {}, accent = 'cyan'){
     }] : []
   };
 }
-
 export function buildRltDeviceRecord(currentState = {}, result = {}, items = [], id, name, existing = null){
   const isMixing = currentState.mode === 'mixing';
   const inputState = { ...currentState };
@@ -143,7 +140,6 @@ export function buildRltDeviceRecord(currentState = {}, result = {}, items = [],
   delete inputState.activeRltDeviceName;
   delete inputState.expandedRltDeviceId;
   delete inputState.savedRltDevices;
-
   return {
     id,
     name: name || currentState.activeRltDeviceName || existing?.name || `RLT-Gerät ${items.length + 1}`,
@@ -161,7 +157,6 @@ export function buildRltDeviceRecord(currentState = {}, result = {}, items = [],
     updatedAt: new Date().toISOString()
   };
 }
-
 export function rltDeviceStats(item = {}){
   return [
     { label: 'Berechnung', value: item.mode || '—' },
@@ -174,7 +169,6 @@ export function rltDeviceStats(item = {}){
     { label: 'Kondensation', value: item.condensation || '—' }
   ];
 }
-
 export function inferRltInputState(item = {}){
   const input = { ...(item.inputState || item.state || {}) };
   const label = String(item.mode || input.mode || '').toLowerCase();
