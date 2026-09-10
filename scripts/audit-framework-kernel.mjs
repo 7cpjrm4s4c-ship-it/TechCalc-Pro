@@ -46,8 +46,17 @@ const requiredCoreExports = [
 
 const forbiddenReferenceModuleImports = ['../../platform/', '../../shared/', '../../utils/'];
 
+const guard = (id, requiredImports, options = {}) => ({
+  id,
+  files: moduleFiles(id, options.extraFiles || [], options.excludedFiles || []),
+  requiredImports,
+  allowedLegacyImports: options.allowedLegacyImports || []
+});
+
+const required = (file, specifiers) => ({ file: `js/modules/${file}`, specifiers });
+
 const referenceModules = [
-  moduleGuard('unit-converter', [], [], [
+  guard('unit-converter', [
     required('unit-converter/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/numberService.js']),
     required('unit-converter/logic.js', ['../../core/data/index.js']),
     required('unit-converter/results.js', ['../../core/data/index.js', '../../core/numberService.js']),
@@ -55,7 +64,7 @@ const referenceModules = [
     required('unit-converter/view.js', ['../../core/renderer.js']),
     required('unit-converter/viewModel.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/data/index.js', '../../core/numberService.js'])
   ]),
-  moduleGuard('pipe-sizing', [], [], [
+  guard('pipe-sizing', [
     required('pipe-sizing/controller.js', ['../../core/runtime/index.js', '../../core/numberService.js']),
     required('pipe-sizing/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/numberService.js']),
     required('pipe-sizing/logic.js', ['../../core/data/index.js']),
@@ -64,7 +73,7 @@ const referenceModules = [
     required('pipe-sizing/view.js', ['../../core/renderer.js']),
     required('pipe-sizing/viewModel.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/data/index.js'])
   ]),
-  moduleGuard('pressure-holding', [], [], [
+  guard('pressure-holding', [
     required('pressure-holding/controller.js', ['../../core/runtime/index.js', '../../core/numberService.js']),
     required('pressure-holding/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/numberService.js']),
     required('pressure-holding/results.js', ['../../core/numberService.js']),
@@ -72,7 +81,7 @@ const referenceModules = [
     required('pressure-holding/view.js', ['../../core/renderer.js']),
     required('pressure-holding/viewModel.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/numberService.js'])
   ]),
-  moduleGuard('heating-cooling', ['reportAdapter.js'], [], [
+  guard('heating-cooling', [
     required('heating-cooling/controller.js', ['../../core/numberService.js', '../../core/data/index.js']),
     required('heating-cooling/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/numberService.js']),
     required('heating-cooling/logic.js', ['../../core/data/index.js']),
@@ -80,8 +89,8 @@ const referenceModules = [
     required('heating-cooling/schema.js', ['../../core/formSchema.js', '../../core/data/index.js', '../../core/numberService.js']),
     required('heating-cooling/view.js', ['../../core/data/index.js', '../../core/numberService.js', '../../core/renderer.js', '../../core/resultRenderer.js']),
     required('heating-cooling/viewModel.js', ['../../core/renderer.js', '../../core/numberService.js'])
-  ]),
-  moduleGuard('ventilation', ['reportAdapter.js'], [], [
+  ], { extraFiles: ['reportAdapter.js'] }),
+  guard('ventilation', [
     required('ventilation/controller.js', ['../../core/runtime/index.js', '../../core/numberService.js', '../../core/renderer.js']),
     required('ventilation/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('ventilation/logic.js', ['../../core/data/index.js']),
@@ -89,8 +98,8 @@ const referenceModules = [
     required('ventilation/schema.js', ['../../core/formSchema.js']),
     required('ventilation/view.js', ['../../core/renderer.js', '../../core/numberService.js', '../../core/resultRenderer.js']),
     required('ventilation/viewModel.js', ['../../core/numberService.js'])
-  ]),
-  moduleGuard('buffer-storage', [], [], [
+  ], { extraFiles: ['reportAdapter.js'] }),
+  guard('buffer-storage', [
     required('buffer-storage/controller.js', ['../../core/runtime/index.js', '../../core/numberService.js']),
     required('buffer-storage/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('buffer-storage/results.js', ['../../core/numberService.js']),
@@ -98,7 +107,7 @@ const referenceModules = [
     required('buffer-storage/view.js', ['../../core/renderer.js', '../../core/runtime/index.js', '../../core/resultRenderer.js']),
     required('buffer-storage/viewModel.js', ['../../core/numberService.js'])
   ]),
-  moduleGuard('wastewater', [], [], [
+  guard('wastewater', [
     required('wastewater/controller.js', ['../../core/numbers.js', '../../core/formActions.js', '../../core/storage/index.js', '../../core/eventPipeline.js', '../../core/scrollManager.js']),
     required('wastewater/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('wastewater/results.js', ['../../core/numberService.js']),
@@ -106,7 +115,7 @@ const referenceModules = [
     required('wastewater/view.js', ['../../core/renderer.js', '../../core/resultRenderer.js']),
     required('wastewater/viewModel.js', ['../../core/numberService.js', '../../core/renderer.js'])
   ]),
-  moduleGuard('rainwater', [], [], [
+  guard('rainwater', [
     required('rainwater/controller.js', ['../../core/numbers.js', '../../core/storage/index.js']),
     required('rainwater/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('rainwater/logic.js', ['../../core/numberService.js']),
@@ -115,15 +124,18 @@ const referenceModules = [
     required('rainwater/view.js', ['../../core/renderer.js']),
     required('rainwater/viewModel.js', ['../../core/formSchema.js', '../../core/resultRenderer.js'])
   ]),
-  moduleGuard('flooding-verification', [], ['viewModel.js'], [
+  guard('flooding-verification', [
     required('flooding-verification/controller.js', ['../../core/numbers.js', '../../core/eventPipeline.js', '../../core/storage/index.js']),
     required('flooding-verification/dynamicRenderer.js', ['../../core/domUpdate.js']),
     required('flooding-verification/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('flooding-verification/results.js', ['../../core/numberService.js']),
     required('flooding-verification/schema.js', ['../../core/formSchema.js']),
     required('flooding-verification/view.js', ['../../core/renderer.js', '../../core/formSchema.js', '../../core/resultRenderer.js'])
-  ], ['../../shared/rainwaterDomainTables.js', '../../shared/rainwaterSurfaceSnapshot.js']),
-  moduleGuard('heat-recovery', [], [], [
+  ], {
+    excludedFiles: ['viewModel.js'],
+    allowedLegacyImports: ['../../shared/rainwaterDomainTables.js', '../../shared/rainwaterSurfaceSnapshot.js']
+  }),
+  guard('heat-recovery', [
     required('heat-recovery/controller.js', ['../../core/runtime/index.js', '../../core/renderer.js']),
     required('heat-recovery/dynamicRenderer.js', ['../../core/renderer.js']),
     required('heat-recovery/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
@@ -132,22 +144,24 @@ const referenceModules = [
     required('heat-recovery/schema.js', ['../../core/formSchema.js']),
     required('heat-recovery/view.js', ['../../core/renderer.js', '../../core/resultRenderer.js']),
     required('heat-recovery/viewModel.js', ['../../core/numberService.js'])
+  ]),
+  guard('mixed-air', [
+    required('mixed-air/controller.js', ['../../core/runtime/index.js', '../../core/renderer.js', '../../core/numberService.js']),
+    required('mixed-air/dynamicRenderer.js', ['../../core/renderer.js']),
+    required('mixed-air/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('mixed-air/logic.js', ['../heat-recovery/logic.js']),
+    required('mixed-air/results.js', ['../heat-recovery/results.js']),
+    required('mixed-air/schema.js', ['../../core/formSchema.js']),
+    required('mixed-air/view.js', ['../../core/renderer.js', '../../core/resultRenderer.js']),
+    required('mixed-air/viewModel.js', ['../../core/numberService.js', '../heat-recovery/results.js'])
   ])
 ];
-
-function moduleGuard(id, extraFiles = [], excludedFiles = [], requiredImports = [], allowedLegacyImports = []) {
-  return { id, files: moduleFiles(id, extraFiles, excludedFiles), requiredImports, allowedLegacyImports };
-}
 
 function moduleFiles(moduleId, extraFiles = [], excludedFiles = []) {
   const excluded = new Set(excludedFiles);
   return ['config.js', 'controller.js', 'index.js', 'logic.js', 'results.js', 'schema.js', 'state.js', 'view.js', 'viewModel.js', ...extraFiles]
     .filter(file => !excluded.has(file))
     .map(file => `js/modules/${moduleId}/${file}`);
-}
-
-function required(file, specifiers) {
-  return { file: `js/modules/${file}`, specifiers };
 }
 
 function readProjectFile(relativePath) {
