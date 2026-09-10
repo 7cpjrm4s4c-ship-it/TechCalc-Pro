@@ -1,11 +1,10 @@
-import { createLineSectionController } from '../../platform/lineSectionController/index.js';
+import { createLineSectionController } from '../../core/runtime/index.js';
 import { registerCentralActions } from '../../core/eventPipeline.js';
 import { preserveSavedRecordMutation } from '../../core/scrollManager.js';
 import { toggleNumericSign } from '../../core/renderer.js';
 import { state, normalizeSavedProcesses, clearLegacyPoints } from './state.js';
 import { calculate } from './logic.js';
 import { buildHxProcessRecord, hxProcessStats } from './results.js';
-
 function clearGeneratedPath() {
   state.set({ activePath: [], points: [] }, { notify: false });
 }
@@ -19,12 +18,10 @@ function commitFieldValue(rootEl, id, value, action = 'hx:field-commit') {
   }
   state.set({ [id]: value, activePath: [], points: [] }, { action });
 }
-
 function normalizeProcessSnapshot(snapshot = {}) {
   const savedProcesses = normalizeSavedProcesses(snapshot);
   return { ...snapshot, savedProcesses, processes: savedProcesses };
 }
-
 function commitVisibleFields(rootEl) {
   if (!rootEl?.querySelectorAll) return;
   const patch = {};
@@ -37,11 +34,9 @@ function commitVisibleFields(rootEl) {
 function sameId(a, b) {
   return String(a ?? '') === String(b ?? '');
 }
-
 function readSavedProcessesFromState(snapshot = state.get()) {
   return normalizeSavedProcesses(snapshot).map(item => ({ ...item }));
 }
-
 export function updateActiveProcessFromDialog(rootEl) {
   commitVisibleFields(rootEl);
   const current = normalizeProcessSnapshot(state.get());
@@ -67,7 +62,6 @@ export function updateActiveProcessFromDialog(rootEl) {
   }, { action: 'hx:line:update' });
   return record;
 }
-
 export function deleteSavedProcessById(id) {
   const current = normalizeProcessSnapshot(state.get());
   const next = readSavedProcessesFromState(current).filter(item => !sameId(item.id, id));
@@ -84,7 +78,6 @@ export function deleteSavedProcessById(id) {
   }, { action: 'hx:line:delete' });
   return next;
 }
-
 function bindHxProcessActionOverrides(rootEl) {
   registerCentralActions(rootEl, {
     'hx:clear': ({ root }) => clearDiagram(root || rootEl),
@@ -97,7 +90,6 @@ function bindHxProcessActionOverrides(rootEl) {
     }
   });
 }
-
 export function savedProcessPatch(item, currentState = {}) {
   const normalized = normalizeProcessSnapshot(currentState);
   return {
@@ -112,7 +104,6 @@ export function savedProcessPatch(item, currentState = {}) {
     points: []
   };
 }
-
 export const hxProcessController = createLineSectionController({
   state,
   listKey: 'savedProcesses',
@@ -134,11 +125,9 @@ export const hxProcessController = createLineSectionController({
   buildRecord: ({ currentState, result, items, id, name, existing }) => buildHxProcessRecord(currentState, result, items, id, name, existing),
   hydrateRecord: ({ item, currentState }) => savedProcessPatch(item, currentState)
 });
-
 export function hxProcessCard(snapshot = {}) {
   return hxProcessController.renderCard(normalizeProcessSnapshot(snapshot));
 }
-
 function clearDiagram(rootEl = null) {
   clearLegacyPoints();
   const patch = {
@@ -161,14 +150,12 @@ function clearDiagram(rootEl = null) {
   }
   state.set(patch, { action: 'hx:clear' });
 }
-
 function shouldSkipDuplicateHxAction(rootEl, key) {
   const last = rootEl?.__tcHxImmediateAction || {};
   if (last.key === key && Date.now() - Number(last.at || 0) < 350) return true;
   if (rootEl) rootEl.__tcHxImmediateAction = { key, at: Date.now() };
   return false;
 }
-
 function handleHxSignToggle(rootEl, signButton, event) {
   if (!signButton || !rootEl?.contains?.(signButton)) return false;
   event?.preventDefault?.();
@@ -184,7 +171,6 @@ function handleHxSignToggle(rootEl, signButton, event) {
   // must change only the sign, not place a text selection into the field.
   return true;
 }
-
 function handleHxClear(rootEl, clearButton, event) {
   if (!clearButton || !rootEl?.contains?.(clearButton)) return false;
   event?.preventDefault?.();
@@ -198,7 +184,6 @@ function handleHxClear(rootEl, clearButton, event) {
 function bindHxDelegation(rootEl) {
   if (!rootEl || rootEl.__tcHxDiagramActionsBound) return;
   rootEl.__tcHxDiagramActionsBound = true;
-
   // RC 32A.3: mobile browsers dispatch blur/render before click after a virtual
   // keyboard interaction. Handle the two h,x toolbar actions at pointerdown so
   // the state mutation is not lost behind the subsequent structural render.
@@ -211,7 +196,6 @@ function bindHxDelegation(rootEl) {
   };
   rootEl.addEventListener('pointerdown', earlyAction, true);
   rootEl.addEventListener('touchstart', earlyAction, { capture: true, passive: false });
-
   rootEl.addEventListener('input', event => {
     const field = event.target?.closest?.('[data-field]');
     if (!field || !rootEl.contains(field)) return;
@@ -228,7 +212,6 @@ function bindHxDelegation(rootEl) {
 
   rootEl.addEventListener('click', event => {
     const target = event.target;
-
     const processButton = target.closest?.('[data-segment="process"]');
     if (processButton && rootEl.contains(processButton)) {
       event.preventDefault();
@@ -248,7 +231,6 @@ function bindHxDelegation(rootEl) {
       }, { action: 'hx:process' });
       return;
     }
-
     const signButton = target.closest?.('[data-hx-sign]');
     if (handleHxSignToggle(rootEl, signButton, event)) return;
 
@@ -256,7 +238,6 @@ function bindHxDelegation(rootEl) {
     if (handleHxClear(rootEl, clearButton, event)) return;
   }, true);
 }
-
 export function bindHxDiagramActions(rootEl) {
   const current = state.get();
   const normalized = normalizeProcessSnapshot(current);
@@ -267,4 +248,3 @@ export function bindHxDiagramActions(rootEl) {
   hxProcessController.bind(rootEl);
   bindHxProcessActionOverrides(rootEl);
 }
-
