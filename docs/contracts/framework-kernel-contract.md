@@ -122,6 +122,7 @@ js/modules/buffer-storage
 js/modules/wastewater
 js/modules/rainwater
 js/modules/flooding-verification
+js/modules/heat-recovery
 ```
 
 Reference modules must use central Core paths for app-wide dependencies and must not import directly from these legacy or platform implementation paths:
