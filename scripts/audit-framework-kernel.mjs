@@ -154,7 +154,17 @@ const referenceModules = [
     required('mixed-air/schema.js', ['../../core/formSchema.js']),
     required('mixed-air/view.js', ['../../core/renderer.js', '../../core/resultRenderer.js']),
     required('mixed-air/viewModel.js', ['../../core/numberService.js', '../heat-recovery/results.js'])
-  ])
+  ]),
+  guard('hx-diagram', [
+    required('hx-diagram/controller.js', ['../../core/runtime/index.js', '../../core/eventPipeline.js', '../../core/scrollManager.js', '../../core/renderer.js']),
+    required('hx-diagram/formRenderer.js', ['../../core/renderer.js', '../../core/numberService.js']),
+    required('hx-diagram/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('hx-diagram/logic.js', ['../../core/numberService.js']),
+    required('hx-diagram/renderPipeline.js', ['../../core/renderer.js', '../../core/numberService.js', '../../core/focusManager.js']),
+    required('hx-diagram/results.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/numberService.js']),
+    required('hx-diagram/schema.js', ['../../core/formSchema.js']),
+    required('hx-diagram/view.js', ['../../core/renderer.js'])
+  ], { extraFiles: ['diagramRenderer.js', 'formRenderer.js', 'renderPipeline.js'] })
 ];
 
 function moduleFiles(moduleId, extraFiles = [], excludedFiles = []) {

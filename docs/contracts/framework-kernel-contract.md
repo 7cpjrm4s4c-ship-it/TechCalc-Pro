@@ -126,6 +126,7 @@ js/modules/rainwater
 js/modules/flooding-verification
 js/modules/heat-recovery
 js/modules/mixed-air
+js/modules/hx-diagram
 ```
 
 Reference modules must use central Core paths for app-wide dependencies and must not import directly from these legacy or platform implementation paths:
@@ -145,6 +146,8 @@ The reference modules currently validate the following Core responsibilities:
 - result rendering through `../../core/resultRenderer.js`
 - collection, record identity and saved-record access through `../../core/storage/index.js`
 - central event pipeline access through `../../core/eventPipeline.js`
+- focus preservation access through `../../core/focusManager.js`
+- scroll stability access through `../../core/scrollManager.js`
 - safe DOM update access through `../../core/domUpdate.js`
 
 This guard is enforced by `npm run audit:framework-kernel`.
