@@ -1,4 +1,4 @@
-import { getEN378SafetyData, listRefrigerants } from '../../utils/refrigerants/index.js';
+import { getEN378SafetyData, listRefrigerants } from '../../core/data/index.js';
 
 export const EN_378_REFRIGERANT_COVERAGE_VERSION = 1;
 
