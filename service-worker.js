@@ -40,6 +40,7 @@ const ASSETS = [
   './js/core/centralStore.js',
   './js/core/contracts/index.js',
   './js/core/data/catalog.js',
+  './js/core/data/fGasesSystemSnapshot.js',
   './js/core/data/index.js',
   './js/core/data/pipes.js',
   './js/core/data/rainwater.js',
