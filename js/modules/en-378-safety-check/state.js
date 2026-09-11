@@ -1,5 +1,5 @@
 import { createModuleState } from '../../core/state.js';
-import { getDataVersions } from '../../utils/refrigerants/index.js';
+import { getDataVersions } from '../../core/data/index.js';
 
 export const EN_378_SAFETY_CHECK_SCHEMA_VERSION = 1;
 
