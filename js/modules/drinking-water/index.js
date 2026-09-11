@@ -2,7 +2,7 @@ import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createPlatformModule } from '../../core/runtime/index.js';
 import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
 import { bindDrinkingWaterActions } from './controller.js';
 import { renderView } from './view.js';
@@ -244,7 +244,6 @@ function renderTypedView(snapshot) {
   calculateForReport(snapshot);
   return renderView(snapshot);
 }
-
 function updateTypedDynamic(root, snapshot, meta = {}) {
   calculateForReport(snapshot);
   updateDrinkingWaterDynamic(root, snapshot, meta);
