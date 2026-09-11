@@ -1,5 +1,4 @@
-import { createFGasesSystemSnapshot } from '../../shared/fGasesSystemSnapshot.js';
-import { formatRefrigerantLabel } from '../../utils/refrigerants/index.js';
+import { createFGasesSystemSnapshot, formatRefrigerantLabel } from '../../core/data/index.js';
 import { formatFGasesStatus } from './results.js';
 
 const CONTROL_KEYS = new Set(['savedSystems', 'activeSavedSystemId', 'expandedSavedSystemId', 'savedSystemName']);
