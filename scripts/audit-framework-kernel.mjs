@@ -174,7 +174,31 @@ const referenceModules = [
     required('f-gases-check/savedRecords.js', ['../../core/data/index.js']),
     required('f-gases-check/schema.js', ['../../core/formSchema.js']),
     required('f-gases-check/view.js', ['../../core/data/index.js', '../../core/renderer.js', '../../core/formSchema.js', '../../core/resultRenderer.js'])
-  ], { extraFiles: ['reportAdapter.js', 'savedRecords.js'], excludedFiles: ['controller.js', 'viewModel.js'] })
+  ], { extraFiles: ['reportAdapter.js', 'savedRecords.js'], excludedFiles: ['controller.js', 'viewModel.js'] }),
+  guard('en-378-safety-check', [
+    required('en-378-safety-check/chargeLimitCalculation.js', ['../../core/data/index.js']),
+    required('en-378-safety-check/importController.js', ['../../core/centralStore.js']),
+    required('en-378-safety-check/index.js', ['../../core/data/index.js', '../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('en-378-safety-check/logic.js', ['../../core/data/index.js']),
+    required('en-378-safety-check/refrigerantCoverage.js', ['../../core/data/index.js']),
+    required('en-378-safety-check/schema.js', ['../../core/formSchema.js']),
+    required('en-378-safety-check/state.js', ['../../core/data/index.js'])
+  ], {
+    extraFiles: [
+      'alternativeRiskMeasures.js',
+      'chargeLimitCalculation.js',
+      'displayLabels.js',
+      'importController.js',
+      'installationSafetyRequirements.js',
+      'plannerGuidance.js',
+      'refrigerantCoverage.js',
+      'reportAdapter.js',
+      'savedRecords.js',
+      'snapshotImport.js',
+      'stateConsistency.js'
+    ],
+    excludedFiles: ['controller.js', 'view.js', 'viewModel.js']
+  })
 ];
 
 function moduleFiles(moduleId, extraFiles = [], excludedFiles = []) {
