@@ -10,6 +10,7 @@ const requiredFiles = [
   'js/core/contracts/index.js',
   'js/core/data/index.js',
   'js/core/data/catalog.js',
+  'js/core/data/fGasesSystemSnapshot.js',
   'js/core/data/rainwater.js',
   'js/core/data/pipes.js',
   'js/core/data/refrigerants.js',
@@ -164,7 +165,16 @@ const referenceModules = [
     required('hx-diagram/results.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/numberService.js']),
     required('hx-diagram/schema.js', ['../../core/formSchema.js']),
     required('hx-diagram/view.js', ['../../core/renderer.js'])
-  ], { extraFiles: ['diagramRenderer.js', 'formRenderer.js', 'renderPipeline.js'] })
+  ], { extraFiles: ['diagramRenderer.js', 'formRenderer.js', 'renderPipeline.js'] }),
+  guard('f-gases-check', [
+    required('f-gases-check/index.js', ['../../core/data/index.js', '../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('f-gases-check/logic.js', ['../../core/data/index.js']),
+    required('f-gases-check/reportAdapter.js', ['../../core/data/index.js']),
+    required('f-gases-check/results.js', ['../../core/data/index.js']),
+    required('f-gases-check/savedRecords.js', ['../../core/data/index.js']),
+    required('f-gases-check/schema.js', ['../../core/formSchema.js']),
+    required('f-gases-check/view.js', ['../../core/data/index.js', '../../core/renderer.js', '../../core/formSchema.js', '../../core/resultRenderer.js'])
+  ], { extraFiles: ['reportAdapter.js', 'savedRecords.js'], excludedFiles: ['controller.js', 'viewModel.js'] })
 ];
 
 function moduleFiles(moduleId, extraFiles = [], excludedFiles = []) {

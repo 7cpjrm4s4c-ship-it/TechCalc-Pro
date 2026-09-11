@@ -84,6 +84,8 @@ Data catalogs, shared data sets and data lookup services belong under `js/core/d
 
 Existing data sources in `js/shared` and `js/utils` remain compatible during migration, but new modules must not create private copies of catalog data when a matching data entry exists under `js/core/data`.
 
+`js/core/data/fGasesSystemSnapshot.js` exposes the existing F-Gase system snapshot implementation through the central data boundary. The snapshot implementation remains unchanged while `f-gases-check` consumes it through `js/core/data`.
+
 `js/modules/rainwater/tables.js` currently remains bound to `js/shared/rainwaterDomainTables.js` because the Flooding platform-conformance contract validates that shared domain-table source. This is a documented transitional exception and must not be expanded to new module-local data copies.
 
 `js/modules/flooding-verification` currently consumes the same Rainwater domain tables and the Rainwater surface snapshot bridge from `js/shared`. These imports are documented transitional exceptions for the existing Rainwater/Flooding contract and must remain limited to `js/shared/rainwaterDomainTables.js` and `js/shared/rainwaterSurfaceSnapshot.js` until that contract is migrated.
@@ -107,6 +109,7 @@ Built-in catalog groups currently include:
 - rainwater area, hydraulic, roof drain and gutter data
 - pipe system and nominal diameter data
 - refrigerant, safety class, regulation and EN 378 safety data
+- F-Gase system snapshot access through the core data boundary
 
 ---
 
@@ -127,6 +130,7 @@ js/modules/flooding-verification
 js/modules/heat-recovery
 js/modules/mixed-air
 js/modules/hx-diagram
+js/modules/f-gases-check
 ```
 
 Reference modules must use central Core paths for app-wide dependencies and must not import directly from these legacy or platform implementation paths:
