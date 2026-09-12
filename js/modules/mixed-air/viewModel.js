@@ -1,6 +1,6 @@
 import { formatNumber, parseNumber } from '../../core/numberService.js';
 import { calculate } from './logic.js';
-import { buildHeatRecoveryResultModel, formulaText, modeLabel } from '../heat-recovery/results.js';
+import { buildMixedAirResultModel, formulaText, modeLabel } from './results.js';
 
 export const MIXED_AIR_ACCENT = 'cyan';
 
@@ -42,7 +42,7 @@ export function createMixedAirViewModel(s = {}, r = calculate(s), accent = MIXED
     isWrg: false,
     modeLabel: modeLabel('mixing'),
     formula: formulaText(state),
-    resultModel: buildHeatRecoveryResultModel(state, r, accent),
+    resultModel: buildMixedAirResultModel(state, r, accent),
     mixing: mixingInputGroups(s)
   };
 }

@@ -16,6 +16,7 @@ const requiredFiles = [
   'js/core/data/refrigerants.js',
   'js/core/events/index.js',
   'js/core/hvacAir.js',
+  'js/core/hvacAirResults.js',
   'js/core/pdf/index.js',
   'js/core/runtime/index.js',
   'js/core/state/index.js',
@@ -31,14 +32,17 @@ const requiredFiles = [
   'docs/architecture/ADR-0020-internal-neutral-framework.md'
 ];
 
-const requiredCoreAreas = ['contracts', 'data', 'events', 'pdf', 'runtime', 'state', 'storage', 'styles', 'ui', 'ux'];
-const requiredCoreExports = [
-  './appCore.js', './contracts/index.js', './data/index.js', './events/index.js', './pdf/index.js',
-  './runtime/index.js', './state/index.js', './storage/index.js', './styles/index.js', './ui/index.js', './ux/index.js'
-];
 const forbiddenReferenceModuleImports = ['../../platform/', '../../shared/', '../../utils/'];
+const requiredCoreAreas = ['contracts', 'data', 'events', 'pdf', 'runtime', 'state', 'storage', 'styles', 'ui', 'ux'];
+const requiredCoreExports = ['./appCore.js', './contracts/index.js', './data/index.js', './events/index.js', './pdf/index.js', './runtime/index.js', './state/index.js', './storage/index.js', './styles/index.js', './ui/index.js', './ux/index.js'];
 
 const required = (file, specifiers) => ({ file: `js/modules/${file}`, specifiers });
+const moduleFiles = (moduleId, extraFiles = [], excludedFiles = []) => {
+  const excluded = new Set(excludedFiles);
+  return ['config.js', 'controller.js', 'index.js', 'logic.js', 'results.js', 'schema.js', 'state.js', 'view.js', 'viewModel.js', ...extraFiles]
+    .filter(file => !excluded.has(file))
+    .map(file => `js/modules/${moduleId}/${file}`);
+};
 const guard = (id, requiredImports, options = {}) => ({
   id,
   files: moduleFiles(id, options.extraFiles || [], options.excludedFiles || []),
@@ -130,7 +134,7 @@ const referenceModules = [
     required('heat-recovery/dynamicRenderer.js', ['../../core/renderer.js']),
     required('heat-recovery/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('heat-recovery/logic.js', ['../../core/hvacAir.js']),
-    required('heat-recovery/results.js', ['../../core/numberService.js']),
+    required('heat-recovery/results.js', ['../../core/hvacAirResults.js']),
     required('heat-recovery/schema.js', ['../../core/formSchema.js']),
     required('heat-recovery/view.js', ['../../core/renderer.js', '../../core/resultRenderer.js']),
     required('heat-recovery/viewModel.js', ['../../core/numberService.js'])
@@ -140,10 +144,10 @@ const referenceModules = [
     required('mixed-air/dynamicRenderer.js', ['../../core/renderer.js']),
     required('mixed-air/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('mixed-air/logic.js', ['../../core/hvacAir.js']),
-    required('mixed-air/results.js', ['../heat-recovery/results.js']),
+    required('mixed-air/results.js', ['../../core/hvacAirResults.js']),
     required('mixed-air/schema.js', ['../../core/formSchema.js']),
     required('mixed-air/view.js', ['../../core/renderer.js', '../../core/resultRenderer.js']),
-    required('mixed-air/viewModel.js', ['../../core/numberService.js', '../heat-recovery/results.js'])
+    required('mixed-air/viewModel.js', ['../../core/numberService.js', './results.js'])
   ]),
   guard('hx-diagram', [
     required('hx-diagram/controller.js', ['../../core/runtime/index.js', '../../core/eventPipeline.js', '../../core/scrollManager.js', '../../core/renderer.js']),
@@ -185,12 +189,6 @@ const referenceModules = [
   ], { extraFiles: ['dynamicRenderer.js'] })
 ];
 
-function moduleFiles(moduleId, extraFiles = [], excludedFiles = []) {
-  const excluded = new Set(excludedFiles);
-  return ['config.js', 'controller.js', 'index.js', 'logic.js', 'results.js', 'schema.js', 'state.js', 'view.js', 'viewModel.js', ...extraFiles]
-    .filter(file => !excluded.has(file))
-    .map(file => `js/modules/${moduleId}/${file}`);
-}
 function readProjectFile(relativePath) { return fs.readFileSync(path.join(root, relativePath), 'utf8'); }
 function assertFileContains(relativePath, expectedToken, message) {
   const source = readProjectFile(relativePath);

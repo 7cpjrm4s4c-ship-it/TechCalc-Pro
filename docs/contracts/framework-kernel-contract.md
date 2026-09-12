@@ -36,6 +36,7 @@ The framework entry point `js/framework/index.js` is an aggregation facade over 
 | Contracts and policies | `js/core/contracts` |
 | Data catalogs and lookup services | `js/core/data` |
 | HVAC air psychrometric and heat-recovery calculations | `js/core/hvacAir.js` |
+| HVAC air result mapping | `js/core/hvacAirResults.js` |
 | Events | `js/core/events` |
 | PDF export | `js/core/pdf`, `js/core/pdfExport.js` |
 | Runtime, routing and navigation | `js/core/runtime` |
@@ -91,7 +92,7 @@ Existing data sources in `js/shared` and `js/utils` remain compatible during mig
 
 `js/core/hvacAir.js` exposes the shared HVAC air calculation domain used by Heat-Recovery and Mixed-Air. Mixed-Air no longer consumes Heat-Recovery calculation logic directly.
 
-`js/modules/mixed-air` still reuses result mapping from `js/modules/heat-recovery/results.js`. This remaining result-mapping coupling is intentionally isolated and must be removed in the next migration step.
+`js/core/hvacAirResults.js` exposes the shared HVAC air result mapping used by Heat-Recovery and Mixed-Air. Mixed-Air no longer consumes Heat-Recovery result mapping directly.
 
 ---
 
@@ -143,12 +144,15 @@ Reference modules must use central Core paths for app-wide dependencies and must
 - `../../utils/`
 - `../../shared/`
 
+Reference modules must also avoid module-to-module imports for shared app-wide responsibilities when a Core path exists.
+
 The reference modules currently validate the following Core responsibilities:
 
 - runtime and dynamic renderer access through `../../core/runtime/index.js`
 - typed report adapter access through `../../core/typedDtoReportAdapter.js`
 - data access through `../../core/data/index.js` and `../../core/data/rainwater.js`
 - HVAC air calculation access through `../../core/hvacAir.js`
+- HVAC air result mapping access through `../../core/hvacAirResults.js`
 - central store access through `../../core/centralStore.js`
 - number formatting and parsing through `../../core/numberService.js` and `../../core/numbers.js`
 - schema access through `../../core/formSchema.js`
