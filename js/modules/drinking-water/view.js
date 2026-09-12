@@ -1,10 +1,9 @@
 import config from './config.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, esc } from '../../core/renderer.js';
-import { fmt, fmtInput } from '../../utils/calculations.js';
+import { fmt, fmtInput } from '../../core/numbers.js';
 import { createDrinkingWaterViewModel } from './viewModel.js';
 import { renderDrinkingWaterResultModel, consumerRows, unitStats, singleStats, consumerModeSuffix } from './results.js';
 import { isSameId } from '../../core/savedRecords.js';
-
 export function draftConsumerList(items, type, waterHeatingMode = 'central') {
   if (!items?.length) return '<div class="empty-state empty-state--compact">Noch keine Verbraucher ausgewählt</div>';
   return `<div class="tc-consumer-list">${items.map((c, index) => `<div class="tc-consumer-row tc-collection-row tc-consumer-row--editable">
@@ -13,7 +12,6 @@ export function draftConsumerList(items, type, waterHeatingMode = 'central') {
     <button type="button" class="mini-button mini-button--danger" data-dw-remove-draft="${esc(type)}" data-index="${index}" aria-label="Verbraucher entfernen">×</button>
   </div>`).join('')}</div>`;
 }
-
 export function renderUsageUnitRows(units = [], snapshot = {}, waterHeatingMode = 'central') {
   if (!units.length) return '<div class="empty-state empty-state--compact">Noch keine Nutzungseinheit angelegt</div>';
   const activeId = snapshot.activeUnitId;
@@ -30,7 +28,6 @@ export function renderUsageUnitRows(units = [], snapshot = {}, waterHeatingMode 
     </div>
   </article>`).join('')}</div>`;
 }
-
 export function renderSingleRows(groups = [], snapshot = {}, waterHeatingMode = 'central') {
   if (!groups.length) return '<div class="empty-state empty-state--compact">Noch keine Einzelverbraucher angelegt</div>';
   const activeId = snapshot.activeSingleId;
@@ -52,7 +49,6 @@ export function renderSingleRows(groups = [], snapshot = {}, waterHeatingMode = 
     </article>`;
   }).join('')}</div>`;
 }
-
 export function renderInputCard(vm) {
   const s = vm.state;
   const r = vm.result;
@@ -102,11 +98,9 @@ export function renderInputCard(vm) {
     ].join('')), vm.accent)
   ].join(''));
 }
-
 export function renderResultCard(vm){
   return stack(renderDrinkingWaterResultModel(vm.resultModel, vm.accent));
 }
-
 export function renderView(s) {
   const vm = createDrinkingWaterViewModel(s);
   return renderModuleShell(config, `
