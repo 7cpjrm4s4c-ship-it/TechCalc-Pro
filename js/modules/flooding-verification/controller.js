@@ -1,9 +1,8 @@
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../../core/eventPipeline.js';
 import { createRecordId } from '../../core/storage/index.js';
-import { areaTypes } from '../../shared/rainwaterDomainTables.js';
+import { areaTypes } from '../../core/data/rainwater.js';
 import { readRainwaterSurfaceSnapshot } from '../../shared/rainwaterSurfaceSnapshot.js';
-
 const typeById = new Map(areaTypes.map(item => [item.id, item]));
 const numericFields = [
   'surfaceArea', 'surfaceCs', 'surfaceCm', 'meanSlopePercent',
@@ -13,7 +12,6 @@ const numericFields = [
 ];
 const number = value => Number(String(value ?? '').replace(',', '.'));
 const normalized = value => canonicalGermanNumberInput(value);
-
 function defaultsForType(typeId) {
   const type = typeById.get(typeId) || typeById.get('custom') || {};
   return { surfaceCs: String(type.cs ?? '').replace('.', ','), surfaceCm: String(type.cm ?? '').replace('.', ',') };
@@ -25,7 +23,6 @@ function validSurfaceDraft(current = {}) {
   const cm = number(current.surfaceCm);
   return area > 0 && cs >= 0 && cs <= 1 && cm >= 0 && cm <= 1;
 }
-
 export function buildFloodingSurfaceRecord({ currentState = {}, id, name, existing = null } = {}) {
   if (!validSurfaceDraft(currentState)) return null;
   const type = typeById.get(currentState.surfaceAreaType) || {};
@@ -49,7 +46,6 @@ export function buildFloodingSurfaceRecord({ currentState = {}, id, name, existi
     isSealed: resolvedIsSealed
   };
 }
-
 export function hydrateFloodingSurfaceRecord({ item = {} } = {}) {
   return {
     activeSurfaceId: item.id || null,
@@ -62,13 +58,11 @@ export function hydrateFloodingSurfaceRecord({ item = {} } = {}) {
     importStatus: `${item.name || 'Fläche'} wird bearbeitet.`
   };
 }
-
 export function floodingSurfaceSubtitle(item = {}) {
   const category = item.category === 'property' ? 'Grundstücksfläche' : 'Dachfläche';
   const type = typeById.get(item.areaType)?.name || 'Freie Fläche';
   return `${category} · ${type}`;
 }
-
 export function floodingSurfaceStats(item = {}) {
   return [
     { label: 'Fläche', value: String(item.area || '0').replace('.', ','), unit: 'm²' },
@@ -76,7 +70,6 @@ export function floodingSurfaceStats(item = {}) {
     { label: 'Cₘ', value: String(item.cm ?? '').replace('.', ',') }
   ];
 }
-
 function importedSurfaceFromSnapshot(item, id) {
   const type = typeById.get(item.areaType) || {};
   return {
@@ -90,7 +83,6 @@ function importedSurfaceFromSnapshot(item, id) {
     isSealed: typeof type.isSealed === 'boolean' ? type.isSealed : Boolean(item.isSealed)
   };
 }
-
 export function importRainwater({ current = {} } = {}) {
   const incoming = readRainwaterSurfaceSnapshot().filter(item => number(item.area) > 0);
   if (!incoming.length) return { importStatus: 'Im Regenwassermodul sind keine gültigen Flächen vorhanden.' };
@@ -105,7 +97,6 @@ export function importRainwater({ current = {} } = {}) {
 
   const replacements = new Map();
   const additions = [];
-
   for (const item of incoming) {
     const sourceId = String(item.sourceId);
     const local = bySourceId.get(sourceId);
@@ -124,7 +115,6 @@ export function importRainwater({ current = {} } = {}) {
     replacements.set(String(local.id), importedSurfaceFromSnapshot(item, local.id));
     updated += 1;
   }
-
   const nextExisting = existing.map(item => replacements.get(String(item.id)) || item);
   const nextSurfaces = [...additions, ...nextExisting];
   const statusParts = [];
@@ -132,7 +122,6 @@ export function importRainwater({ current = {} } = {}) {
   if (updated) statusParts.push(`${updated} Fläche(n) aktualisiert`);
   if (conflicts) statusParts.push(`${conflicts} lokal bearbeitete Fläche(n) nicht überschrieben`);
   if (!statusParts.length) statusParts.push('Alle Flächen sind bereits aktuell');
-
   return {
     surfaces: nextSurfaces,
     importedRainwaterSnapshot: {
@@ -142,7 +131,6 @@ export function importRainwater({ current = {} } = {}) {
     importStatus: `${statusParts.join(', ')}.`
   };
 }
-
 export function bindFloodingController(root, state, lineSectionController) {
   lineSectionController?.bind?.(root);
   registerCentralActions(root, {
@@ -165,7 +153,6 @@ export function bindFloodingController(root, state, lineSectionController) {
     }
   });
 }
-
 const controller = {
   normalizeFields: numericFields,
   segments: { fields: {
@@ -174,5 +161,4 @@ const controller = {
     surfaceCategory: { action: 'platform:segment:surfaceCategory', patch: value => ({ surfaceCategory: value, surfaceAreaType: value === 'property' ? 'concrete-asphalt' : 'metal-roof', ...defaultsForType(value === 'property' ? 'concrete-asphalt' : 'metal-roof') }) }
   }}
 };
-
 export default controller;
