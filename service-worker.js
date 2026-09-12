@@ -53,6 +53,7 @@ const ASSETS = [
   './js/core/focusManager.js',
   './js/core/formActions.js',
   './js/core/formSchema.js',
+  './js/core/hvacAir.js',
   './js/core/index.js',
   './js/core/logger.js',
   './js/core/moduleContract.js',
