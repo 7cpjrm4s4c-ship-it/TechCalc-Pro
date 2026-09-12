@@ -183,10 +183,12 @@ const referenceModules = [
     required('drinking-water/controller.js', ['../../core/savedRecords.js', '../../core/domUpdate.js', '../../core/scrollManager.js']),
     required('drinking-water/dynamicRenderer.js', ['../../core/scrollManager.js', '../../core/focusManager.js']),
     required('drinking-water/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
-    required('drinking-water/logic.js', ['../../core/numberService.js']),
+    required('drinking-water/logic.js', ['../../core/numbers.js', '../../core/numberService.js']),
+    required('drinking-water/results.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/numbers.js']),
     required('drinking-water/schema.js', ['../../core/formSchema.js']),
-    required('drinking-water/view.js', ['../../core/renderer.js', '../../core/savedRecords.js'])
-  ], { extraFiles: ['dynamicRenderer.js'], allowedLegacyImports: ['../../utils/calculations.js'] })
+    required('drinking-water/view.js', ['../../core/renderer.js', '../../core/numbers.js', '../../core/savedRecords.js']),
+    required('drinking-water/viewModel.js', ['../../core/numbers.js'])
+  ], { extraFiles: ['dynamicRenderer.js'] })
 ];
 
 function moduleFiles(moduleId, extraFiles = [], excludedFiles = []) {
@@ -253,7 +255,5 @@ for (const referenceModule of referenceModules) {
 
 assertFileContains('js/modules/rainwater/tables.js', '../../shared/rainwaterDomainTables.js', 'Rainwater tables must keep the Flooding-conformance shared domain table source until that contract is migrated.');
 assertFileContains('js/modules/flooding-verification/controller.js', '../../shared/rainwaterSurfaceSnapshot.js', 'Flooding verification must keep the Rainwater surface snapshot bridge until that contract is migrated.');
-assertFileContains('js/modules/drinking-water/logic.js', '../../utils/calculations.js', 'Drinking water must keep the calculations bridge until the numeric helper contract is migrated.');
-assertFileContains('js/modules/drinking-water/view.js', '../../utils/calculations.js', 'Drinking water view must keep the calculations bridge until the numeric helper contract is migrated.');
 
 console.log('Framework kernel audit passed.');

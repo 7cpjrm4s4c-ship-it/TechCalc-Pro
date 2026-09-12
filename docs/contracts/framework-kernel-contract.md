@@ -92,8 +92,6 @@ Existing data sources in `js/shared` and `js/utils` remain compatible during mig
 
 `js/modules/mixed-air` currently reuses domain-specific calculation and result mapping from `js/modules/heat-recovery`. This is an existing WRG/Mischluft domain coupling and is not a legacy app-wide boundary. It must remain limited to `../heat-recovery/logic.js` and `../heat-recovery/results.js` until a dedicated shared HVAC air-domain core is introduced.
 
-`js/modules/drinking-water` currently keeps the existing numeric helper bridge `../../utils/calculations.js` in `logic.js`, `view.js` and `viewModel.js` while the module is guarded against direct platform and shared dependencies. This transitional exception is limited to the existing calculation-formatting helper path and must be removed when the numeric helper contract is migrated to Core.
-
 ---
 
 ## Data catalog contract
@@ -140,7 +138,7 @@ js/modules/drinking-water
 Reference modules must use central Core paths for app-wide dependencies and must not import directly from these legacy or platform implementation paths:
 
 - `../../platform/`
-- `../../utils/`, except the documented transitional Trinkwasser numeric helper bridge
+- `../../utils/`
 - `../../shared/`, except documented transitional Rainwater/Flooding domain-table and snapshot bridges
 
 The reference modules currently validate the following Core responsibilities:
@@ -149,7 +147,7 @@ The reference modules currently validate the following Core responsibilities:
 - typed report adapter access through `../../core/typedDtoReportAdapter.js`
 - data access through `../../core/data/index.js`
 - central store access through `../../core/centralStore.js`
-- number formatting and parsing through `../../core/numberService.js`
+- number formatting and parsing through `../../core/numberService.js` and `../../core/numbers.js`
 - schema access through `../../core/formSchema.js`
 - base rendering through `../../core/renderer.js`
 - result rendering through `../../core/resultRenderer.js`
