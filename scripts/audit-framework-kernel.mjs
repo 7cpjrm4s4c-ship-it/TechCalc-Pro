@@ -119,10 +119,11 @@ const referenceModules = [
     required('flooding-verification/controller.js', ['../../core/numbers.js', '../../core/eventPipeline.js', '../../core/storage/index.js']),
     required('flooding-verification/dynamicRenderer.js', ['../../core/domUpdate.js']),
     required('flooding-verification/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('flooding-verification/logic.js', ['../../core/data/rainwater.js']),
     required('flooding-verification/results.js', ['../../core/numberService.js']),
-    required('flooding-verification/schema.js', ['../../core/formSchema.js']),
+    required('flooding-verification/schema.js', ['../../core/formSchema.js', '../../core/data/rainwater.js']),
     required('flooding-verification/view.js', ['../../core/renderer.js', '../../core/formSchema.js', '../../core/resultRenderer.js'])
-  ], { excludedFiles: ['viewModel.js'], allowedLegacyImports: ['../../shared/rainwaterDomainTables.js', '../../shared/rainwaterSurfaceSnapshot.js'] }),
+  ], { excludedFiles: ['viewModel.js'], allowedLegacyImports: ['../../shared/rainwaterSurfaceSnapshot.js'] }),
   guard('heat-recovery', [
     required('heat-recovery/controller.js', ['../../core/runtime/index.js', '../../core/renderer.js']),
     required('heat-recovery/dynamicRenderer.js', ['../../core/renderer.js']),
@@ -189,9 +190,7 @@ function moduleFiles(moduleId, extraFiles = [], excludedFiles = []) {
     .filter(file => !excluded.has(file))
     .map(file => `js/modules/${moduleId}/${file}`);
 }
-function readProjectFile(relativePath) {
-  return fs.readFileSync(path.join(root, relativePath), 'utf8');
-}
+function readProjectFile(relativePath) { return fs.readFileSync(path.join(root, relativePath), 'utf8'); }
 function assertFileContains(relativePath, expectedToken, message) {
   const source = readProjectFile(relativePath);
   if (!source.includes(expectedToken)) throw new Error(message || `${relativePath} is missing ${expectedToken}`);

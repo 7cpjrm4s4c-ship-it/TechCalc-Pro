@@ -88,7 +88,7 @@ Existing data sources in `js/shared` and `js/utils` remain compatible during mig
 
 `js/modules/rainwater/tables.js` consumes Rainwater domain tables through `js/core/data/rainwater.js`. The implementation remains unchanged while the module no longer imports the shared Rainwater table source directly.
 
-`js/modules/flooding-verification` currently consumes the Rainwater domain tables and the Rainwater surface snapshot bridge from `js/shared`. These imports are documented transitional exceptions for the existing Rainwater/Flooding contract and must remain limited to `js/shared/rainwaterDomainTables.js` and `js/shared/rainwaterSurfaceSnapshot.js` until that contract is migrated.
+`js/modules/flooding-verification` consumes Rainwater domain tables through `js/core/data/rainwater.js`. The Rainwater surface snapshot bridge still remains in `js/shared/rainwaterSurfaceSnapshot.js` as a documented transitional exception until the snapshot contract is migrated.
 
 `js/modules/mixed-air` currently reuses domain-specific calculation and result mapping from `js/modules/heat-recovery`. This is an existing WRG/Mischluft domain coupling and is not a legacy app-wide boundary. It must remain limited to `../heat-recovery/logic.js` and `../heat-recovery/results.js` until a dedicated shared HVAC air-domain core is introduced.
 
@@ -139,7 +139,7 @@ Reference modules must use central Core paths for app-wide dependencies and must
 
 - `../../platform/`
 - `../../utils/`
-- `../../shared/`, except documented transitional Flooding domain-table and snapshot bridges
+- `../../shared/`, except the documented transitional Flooding surface snapshot bridge
 
 The reference modules currently validate the following Core responsibilities:
 
