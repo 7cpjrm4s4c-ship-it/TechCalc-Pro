@@ -44,17 +44,15 @@ const requiredCoreExports = [
   './ui/index.js',
   './ux/index.js'
 ];
-
 const forbiddenReferenceModuleImports = ['../../platform/', '../../shared/', '../../utils/'];
 
+const required = (file, specifiers) => ({ file: `js/modules/${file}`, specifiers });
 const guard = (id, requiredImports, options = {}) => ({
   id,
   files: moduleFiles(id, options.extraFiles || [], options.excludedFiles || []),
   requiredImports,
   allowedLegacyImports: options.allowedLegacyImports || []
 });
-
-const required = (file, specifiers) => ({ file: `js/modules/${file}`, specifiers });
 
 const referenceModules = [
   guard('unit-converter', [
@@ -132,10 +130,7 @@ const referenceModules = [
     required('flooding-verification/results.js', ['../../core/numberService.js']),
     required('flooding-verification/schema.js', ['../../core/formSchema.js']),
     required('flooding-verification/view.js', ['../../core/renderer.js', '../../core/formSchema.js', '../../core/resultRenderer.js'])
-  ], {
-    excludedFiles: ['viewModel.js'],
-    allowedLegacyImports: ['../../shared/rainwaterDomainTables.js', '../../shared/rainwaterSurfaceSnapshot.js']
-  }),
+  ], { excludedFiles: ['viewModel.js'], allowedLegacyImports: ['../../shared/rainwaterDomainTables.js', '../../shared/rainwaterSurfaceSnapshot.js'] }),
   guard('heat-recovery', [
     required('heat-recovery/controller.js', ['../../core/runtime/index.js', '../../core/renderer.js']),
     required('heat-recovery/dynamicRenderer.js', ['../../core/renderer.js']),
@@ -183,22 +178,15 @@ const referenceModules = [
     required('en-378-safety-check/refrigerantCoverage.js', ['../../core/data/index.js']),
     required('en-378-safety-check/schema.js', ['../../core/formSchema.js']),
     required('en-378-safety-check/state.js', ['../../core/data/index.js'])
-  ], {
-    extraFiles: [
-      'alternativeRiskMeasures.js',
-      'chargeLimitCalculation.js',
-      'displayLabels.js',
-      'importController.js',
-      'installationSafetyRequirements.js',
-      'plannerGuidance.js',
-      'refrigerantCoverage.js',
-      'reportAdapter.js',
-      'savedRecords.js',
-      'snapshotImport.js',
-      'stateConsistency.js'
-    ],
-    excludedFiles: ['controller.js', 'view.js', 'viewModel.js']
-  })
+  ], { extraFiles: ['alternativeRiskMeasures.js', 'chargeLimitCalculation.js', 'displayLabels.js', 'importController.js', 'installationSafetyRequirements.js', 'plannerGuidance.js', 'refrigerantCoverage.js', 'reportAdapter.js', 'savedRecords.js', 'snapshotImport.js', 'stateConsistency.js'], excludedFiles: ['controller.js', 'view.js', 'viewModel.js'] }),
+  guard('drinking-water', [
+    required('drinking-water/controller.js', ['../../core/savedRecords.js', '../../core/domUpdate.js', '../../core/scrollManager.js']),
+    required('drinking-water/dynamicRenderer.js', ['../../core/scrollManager.js', '../../core/focusManager.js']),
+    required('drinking-water/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('drinking-water/logic.js', ['../../core/numberService.js']),
+    required('drinking-water/schema.js', ['../../core/formSchema.js']),
+    required('drinking-water/view.js', ['../../core/renderer.js', '../../core/savedRecords.js'])
+  ], { extraFiles: ['dynamicRenderer.js'], allowedLegacyImports: ['../../utils/calculations.js'] })
 ];
 
 function moduleFiles(moduleId, extraFiles = [], excludedFiles = []) {
@@ -207,16 +195,13 @@ function moduleFiles(moduleId, extraFiles = [], excludedFiles = []) {
     .filter(file => !excluded.has(file))
     .map(file => `js/modules/${moduleId}/${file}`);
 }
-
 function readProjectFile(relativePath) {
   return fs.readFileSync(path.join(root, relativePath), 'utf8');
 }
-
 function assertFileContains(relativePath, expectedToken, message) {
   const source = readProjectFile(relativePath);
   if (!source.includes(expectedToken)) throw new Error(message || `${relativePath} is missing ${expectedToken}`);
 }
-
 function importSpecifiers(source) {
   const specifiers = [];
   const importOrExportFrom = /(?:import|export)\s+(?:[\s\S]*?\s+from\s+)?['"]([^'"]+)['"]/g;
@@ -228,32 +213,23 @@ function importSpecifiers(source) {
 for (const relativePath of requiredFiles) {
   if (!fs.existsSync(path.join(root, relativePath))) throw new Error(`Missing framework kernel file: ${relativePath}`);
 }
-
 const appCore = readProjectFile('js/core/appCore.js');
 for (const coreArea of requiredCoreAreas) {
   if (!appCore.includes(coreArea)) throw new Error(`Core area is not documented in appCore.js: ${coreArea}`);
 }
-
 const coreIndex = readProjectFile('js/core/index.js');
 for (const expectedExport of requiredCoreExports) {
   if (!coreIndex.includes(expectedExport)) throw new Error(`Core entry point does not export ${expectedExport}`);
 }
-
 const frameworkIndex = readProjectFile('js/framework/index.js');
 if (!frameworkIndex.includes('../core/index.js')) throw new Error('Framework entry point must delegate to js/core/index.js');
 if (frameworkIndex.includes('../modules/')) throw new Error('Framework entry point must not import modules');
-
 const dataCatalog = readProjectFile('js/data/catalog.js');
 for (const expectedToken of ['defineDataCatalogEntry', 'createDataCatalog', 'dataCatalog', 'rainwater.areaTypes', 'pipes.systems', 'refrigerants.items']) {
   if (!dataCatalog.includes(expectedToken)) throw new Error(`Data catalog contract is missing ${expectedToken}`);
 }
-
-const coreDataCatalog = readProjectFile('js/core/data/catalog.js');
-if (!coreDataCatalog.includes('../../data/catalog.js')) throw new Error('Core data catalog must expose the central catalog implementation');
-
-const frameworkDataCatalog = readProjectFile('js/framework/dataCatalog.js');
-if (!frameworkDataCatalog.includes('../data/catalog.js')) throw new Error('Framework data catalog must delegate to js/data/catalog.js');
-
+if (!readProjectFile('js/core/data/catalog.js').includes('../../data/catalog.js')) throw new Error('Core data catalog must expose the central catalog implementation');
+if (!readProjectFile('js/framework/dataCatalog.js').includes('../data/catalog.js')) throw new Error('Framework data catalog must delegate to js/data/catalog.js');
 const contract = readProjectFile('docs/contracts/framework-kernel-contract.md');
 for (const expectedSection of ['Core first', 'Core responsibility paths', 'Module import rule', 'Central data path', 'Reference module guard', 'Module responsibility']) {
   if (!contract.includes(expectedSection)) throw new Error(`Framework kernel contract is missing section: ${expectedSection}`);
@@ -266,29 +242,18 @@ for (const referenceModule of referenceModules) {
     for (const specifier of importSpecifiers(source)) {
       if (allowedLegacyImports.has(specifier)) continue;
       for (const forbiddenImport of forbiddenReferenceModuleImports) {
-        if (specifier.startsWith(forbiddenImport)) {
-          throw new Error(`Reference module ${referenceModule.id} must not import ${specifier} from ${relativePath}`);
-        }
+        if (specifier.startsWith(forbiddenImport)) throw new Error(`Reference module ${referenceModule.id} must not import ${specifier} from ${relativePath}`);
       }
     }
   }
   for (const { file, specifiers } of referenceModule.requiredImports) {
-    for (const specifier of specifiers) {
-      assertFileContains(file, specifier, `Reference module ${referenceModule.id} must use ${specifier} in ${file}`);
-    }
+    for (const specifier of specifiers) assertFileContains(file, specifier, `Reference module ${referenceModule.id} must use ${specifier} in ${file}`);
   }
 }
 
-assertFileContains(
-  'js/modules/rainwater/tables.js',
-  '../../shared/rainwaterDomainTables.js',
-  'Rainwater tables must keep the Flooding-conformance shared domain table source until that contract is migrated.'
-);
-
-assertFileContains(
-  'js/modules/flooding-verification/controller.js',
-  '../../shared/rainwaterSurfaceSnapshot.js',
-  'Flooding verification must keep the Rainwater surface snapshot bridge until that contract is migrated.'
-);
+assertFileContains('js/modules/rainwater/tables.js', '../../shared/rainwaterDomainTables.js', 'Rainwater tables must keep the Flooding-conformance shared domain table source until that contract is migrated.');
+assertFileContains('js/modules/flooding-verification/controller.js', '../../shared/rainwaterSurfaceSnapshot.js', 'Flooding verification must keep the Rainwater surface snapshot bridge until that contract is migrated.');
+assertFileContains('js/modules/drinking-water/logic.js', '../../utils/calculations.js', 'Drinking water must keep the calculations bridge until the numeric helper contract is migrated.');
+assertFileContains('js/modules/drinking-water/view.js', '../../utils/calculations.js', 'Drinking water view must keep the calculations bridge until the numeric helper contract is migrated.');
 
 console.log('Framework kernel audit passed.');
