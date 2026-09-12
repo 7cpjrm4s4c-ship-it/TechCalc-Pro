@@ -4,11 +4,11 @@ import {
   hydraulicTables,
   roofDrainTable,
   gutterCombinations
-} from '../../shared/rainwaterDomainTables.js';
+} from './rainwaterDomainTables.js';
 export {
   readRainwaterSurfaceSnapshot,
   hasRainwaterSurfaceSnapshot
-} from '../../shared/rainwaterSurfaceSnapshot.js';
+} from './rainwaterSurfaceSnapshot.js';
 
 export {
   areaTypes,
