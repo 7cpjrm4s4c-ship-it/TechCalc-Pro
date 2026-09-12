@@ -116,14 +116,14 @@ const referenceModules = [
     required('rainwater/viewModel.js', ['../../core/formSchema.js', '../../core/resultRenderer.js'])
   ], { extraFiles: ['tables.js'] }),
   guard('flooding-verification', [
-    required('flooding-verification/controller.js', ['../../core/numbers.js', '../../core/eventPipeline.js', '../../core/storage/index.js']),
+    required('flooding-verification/controller.js', ['../../core/numbers.js', '../../core/eventPipeline.js', '../../core/storage/index.js', '../../core/data/rainwater.js']),
     required('flooding-verification/dynamicRenderer.js', ['../../core/domUpdate.js']),
     required('flooding-verification/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('flooding-verification/logic.js', ['../../core/data/rainwater.js']),
     required('flooding-verification/results.js', ['../../core/numberService.js']),
     required('flooding-verification/schema.js', ['../../core/formSchema.js', '../../core/data/rainwater.js']),
     required('flooding-verification/view.js', ['../../core/renderer.js', '../../core/formSchema.js', '../../core/resultRenderer.js'])
-  ], { excludedFiles: ['viewModel.js'], allowedLegacyImports: ['../../shared/rainwaterSurfaceSnapshot.js'] }),
+  ], { excludedFiles: ['viewModel.js'] }),
   guard('heat-recovery', [
     required('heat-recovery/controller.js', ['../../core/runtime/index.js', '../../core/renderer.js']),
     required('heat-recovery/dynamicRenderer.js', ['../../core/renderer.js']),
@@ -238,7 +238,5 @@ for (const referenceModule of referenceModules) {
     for (const specifier of specifiers) assertFileContains(file, specifier, `Reference module ${referenceModule.id} must use ${specifier} in ${file}`);
   }
 }
-
-assertFileContains('js/modules/flooding-verification/controller.js', '../../shared/rainwaterSurfaceSnapshot.js', 'Flooding verification must keep the Rainwater surface snapshot bridge until that contract is migrated.');
 
 console.log('Framework kernel audit passed.');

@@ -19,8 +19,10 @@ test('47C.4.3 has no module-local event or debounce path', () => {
 });
 
 test('47C.4.3 consumes central domain tables instead of another module', () => {
+  assert.match(controller, /core\/data\/rainwater/);
   assert.match(schema, /core\/data\/rainwater/);
   assert.match(logic, /core\/data\/rainwater/);
+  assert.doesNotMatch(controller, /shared\/rainwaterDomainTables|shared\/rainwaterSurfaceSnapshot|modules\/rainwater|\.\.\/rainwater\/tables/);
   assert.doesNotMatch(schema, /shared\/rainwaterDomainTables|modules\/rainwater|\.\.\/rainwater\/tables/);
   assert.doesNotMatch(logic, /shared\/rainwaterDomainTables|modules\/rainwater|\.\.\/rainwater\/tables/);
   assert.match(rainwaterTables, /core\/data\/rainwater/);

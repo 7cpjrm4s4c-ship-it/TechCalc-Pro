@@ -1,8 +1,7 @@
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../../core/eventPipeline.js';
 import { createRecordId } from '../../core/storage/index.js';
-import { areaTypes } from '../../core/data/rainwater.js';
-import { readRainwaterSurfaceSnapshot } from '../../shared/rainwaterSurfaceSnapshot.js';
+import { areaTypes, readRainwaterSurfaceSnapshot } from '../../core/data/rainwater.js';
 const typeById = new Map(areaTypes.map(item => [item.id, item]));
 const numericFields = [
   'surfaceArea', 'surfaceCs', 'surfaceCm', 'meanSlopePercent',

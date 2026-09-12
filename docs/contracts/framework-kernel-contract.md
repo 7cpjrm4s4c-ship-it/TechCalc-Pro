@@ -82,13 +82,11 @@ The compatibility alias is intentionally limited to these documented and importe
 
 Data catalogs, shared data sets and data lookup services belong under `js/core/data`.
 
-Existing data sources in `js/shared` and `js/utils` remain compatible during migration, but new modules must not create private copies of catalog data when a matching data entry exists under `js/core/data`.
+Existing data sources in `js/shared` and `js/utils` remain compatible during migration, but reference modules must consume app-wide data through Core paths.
 
 `js/core/data/fGasesSystemSnapshot.js` exposes the existing F-Gase system snapshot implementation through the central data boundary. The snapshot implementation remains unchanged while `f-gases-check` consumes it through `js/core/data`.
 
-`js/modules/rainwater/tables.js` consumes Rainwater domain tables through `js/core/data/rainwater.js`. The implementation remains unchanged while the module no longer imports the shared Rainwater table source directly.
-
-`js/modules/flooding-verification` consumes Rainwater domain tables through `js/core/data/rainwater.js`. The Rainwater surface snapshot bridge still remains in `js/shared/rainwaterSurfaceSnapshot.js` as a documented transitional exception until the snapshot contract is migrated.
+`js/core/data/rainwater.js` exposes Rainwater domain tables and the Rainwater surface snapshot access through the central data boundary. Existing implementations remain unchanged while Rainwater and Flooding consume them through Core Data.
 
 `js/modules/mixed-air` currently reuses domain-specific calculation and result mapping from `js/modules/heat-recovery`. This is an existing WRG/Mischluft domain coupling and is not a legacy app-wide boundary. It must remain limited to `../heat-recovery/logic.js` and `../heat-recovery/results.js` until a dedicated shared HVAC air-domain core is introduced.
 
@@ -107,6 +105,7 @@ The catalog exposes registered data entries through stable catalog identifiers a
 Built-in catalog groups currently include:
 
 - rainwater area, hydraulic, roof drain and gutter data
+- rainwater surface snapshot access through the core data boundary
 - pipe system and nominal diameter data
 - refrigerant, safety class, regulation and EN 378 safety data
 - F-Gase system snapshot access through the core data boundary
@@ -139,7 +138,7 @@ Reference modules must use central Core paths for app-wide dependencies and must
 
 - `../../platform/`
 - `../../utils/`
-- `../../shared/`, except the documented transitional Flooding surface snapshot bridge
+- `../../shared/`
 
 The reference modules currently validate the following Core responsibilities:
 
