@@ -1,4 +1,4 @@
-import { areaTypes } from '../../shared/rainwaterDomainTables.js';
+import { areaTypes } from '../data/rainwater.js';
 import { PDF_PAGE, PDF_THEME } from './reportTheme.js';
 
 const finite = value => Number.isFinite(Number(value));
@@ -24,7 +24,6 @@ export function surfaceTypeLabel(value) {
   const key = String(value ?? '').trim();
   return SURFACE_TYPE_LABELS[key] || 'Freie Fläche / eigener Abflussbeiwert';
 }
-
 function number(value, digits = 2) {
   if (!finite(value)) return '—';
   return new Intl.NumberFormat('de-DE', {
@@ -37,7 +36,6 @@ function cell(report, value, x, y, width, { align = 'left', font = 'F1', size = 
   const anchor = align === 'right' ? x + width - 4 : x + 4;
   report.text(text(value), anchor, y, { size, font, color, align, maxWidth: width - 8, lineHeight: 1.12 });
 }
-
 function table(report, { title, headers, rows, widths, rowHeight = 25, headerHeight = 24 }) {
   const m = PDF_THEME.margin;
   const totalWidth = PDF_PAGE.width - m * 2;
@@ -74,7 +72,6 @@ function table(report, { title, headers, rows, widths, rowHeight = 25, headerHei
 
   report.cursorY = y0 + headerHeight + rows.length * rowHeight + 7;
 }
-
 export function renderSurfaceTable(report, dto = {}) {
   const surfaces = Array.isArray(dto.surfaces) ? dto.surfaces : [];
   const rows = surfaces.map((surface, index) => [
@@ -93,7 +90,6 @@ export function renderSurfaceTable(report, dto = {}) {
     rowHeight: 30
   });
 }
-
 function durationValue(entry = {}) {
   return entry.valueM3
     ?? entry.volumeM3
@@ -106,7 +102,6 @@ function durationValue(entry = {}) {
 function durationMinutes(entry = {}) {
   return entry.durationMinutes ?? entry.duration ?? entry.rainDurationMinutes ?? null;
 }
-
 export function renderDurationTable(report, dto = {}, kind = 'din') {
   const isDin = kind === 'din';
   const entries = isDin ? (dto.durationComparison?.din || []) : (dto.durationComparison?.dwa || []);
@@ -129,7 +124,6 @@ export function renderDurationTable(report, dto = {}, kind = 'din') {
     rowHeight: 25
   });
 }
-
 export function renderRainfallTable(report, dto = {}) {
   const rainfall = dto.rainfall || {};
   const durations = [5, 10, 15];
@@ -147,7 +141,6 @@ export function renderRainfallTable(report, dto = {}) {
     rowHeight: 25
   });
 }
-
 export function authorityTableKind(title = '') {
   if (/^4\.\s*Flächenübersicht/i.test(title)) return 'surfaces';
   if (/^5\.\s*Regendaten/i.test(title)) return 'rainfall';
