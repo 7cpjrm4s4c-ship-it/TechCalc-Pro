@@ -86,9 +86,9 @@ Existing data sources in `js/shared` and `js/utils` remain compatible during mig
 
 `js/core/data/fGasesSystemSnapshot.js` exposes the existing F-Gase system snapshot implementation through the central data boundary. The snapshot implementation remains unchanged while `f-gases-check` consumes it through `js/core/data`.
 
-`js/modules/rainwater/tables.js` currently remains bound to `js/shared/rainwaterDomainTables.js` because the Flooding platform-conformance contract validates that shared domain-table source. This is a documented transitional exception and must not be expanded to new module-local data copies.
+`js/modules/rainwater/tables.js` consumes Rainwater domain tables through `js/core/data/rainwater.js`. The implementation remains unchanged while the module no longer imports the shared Rainwater table source directly.
 
-`js/modules/flooding-verification` currently consumes the same Rainwater domain tables and the Rainwater surface snapshot bridge from `js/shared`. These imports are documented transitional exceptions for the existing Rainwater/Flooding contract and must remain limited to `js/shared/rainwaterDomainTables.js` and `js/shared/rainwaterSurfaceSnapshot.js` until that contract is migrated.
+`js/modules/flooding-verification` currently consumes the Rainwater domain tables and the Rainwater surface snapshot bridge from `js/shared`. These imports are documented transitional exceptions for the existing Rainwater/Flooding contract and must remain limited to `js/shared/rainwaterDomainTables.js` and `js/shared/rainwaterSurfaceSnapshot.js` until that contract is migrated.
 
 `js/modules/mixed-air` currently reuses domain-specific calculation and result mapping from `js/modules/heat-recovery`. This is an existing WRG/Mischluft domain coupling and is not a legacy app-wide boundary. It must remain limited to `../heat-recovery/logic.js` and `../heat-recovery/results.js` until a dedicated shared HVAC air-domain core is introduced.
 
@@ -139,13 +139,13 @@ Reference modules must use central Core paths for app-wide dependencies and must
 
 - `../../platform/`
 - `../../utils/`
-- `../../shared/`, except documented transitional Rainwater/Flooding domain-table and snapshot bridges
+- `../../shared/`, except documented transitional Flooding domain-table and snapshot bridges
 
 The reference modules currently validate the following Core responsibilities:
 
 - runtime and dynamic renderer access through `../../core/runtime/index.js`
 - typed report adapter access through `../../core/typedDtoReportAdapter.js`
-- data access through `../../core/data/index.js`
+- data access through `../../core/data/index.js` and `../../core/data/rainwater.js`
 - central store access through `../../core/centralStore.js`
 - number formatting and parsing through `../../core/numberService.js` and `../../core/numbers.js`
 - schema access through `../../core/formSchema.js`

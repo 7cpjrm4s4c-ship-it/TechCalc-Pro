@@ -32,17 +32,8 @@ const requiredFiles = [
 
 const requiredCoreAreas = ['contracts', 'data', 'events', 'pdf', 'runtime', 'state', 'storage', 'styles', 'ui', 'ux'];
 const requiredCoreExports = [
-  './appCore.js',
-  './contracts/index.js',
-  './data/index.js',
-  './events/index.js',
-  './pdf/index.js',
-  './runtime/index.js',
-  './state/index.js',
-  './storage/index.js',
-  './styles/index.js',
-  './ui/index.js',
-  './ux/index.js'
+  './appCore.js', './contracts/index.js', './data/index.js', './events/index.js', './pdf/index.js',
+  './runtime/index.js', './state/index.js', './storage/index.js', './styles/index.js', './ui/index.js', './ux/index.js'
 ];
 const forbiddenReferenceModuleImports = ['../../platform/', '../../shared/', '../../utils/'];
 
@@ -120,9 +111,10 @@ const referenceModules = [
     required('rainwater/logic.js', ['../../core/numberService.js']),
     required('rainwater/results.js', ['../../core/numberService.js']),
     required('rainwater/schema.js', ['../../core/formSchema.js', '../../core/numberService.js']),
+    required('rainwater/tables.js', ['../../core/data/rainwater.js']),
     required('rainwater/view.js', ['../../core/renderer.js']),
     required('rainwater/viewModel.js', ['../../core/formSchema.js', '../../core/resultRenderer.js'])
-  ]),
+  ], { extraFiles: ['tables.js'] }),
   guard('flooding-verification', [
     required('flooding-verification/controller.js', ['../../core/numbers.js', '../../core/eventPipeline.js', '../../core/storage/index.js']),
     required('flooding-verification/dynamicRenderer.js', ['../../core/domUpdate.js']),
@@ -215,26 +207,21 @@ function importSpecifiers(source) {
 for (const relativePath of requiredFiles) {
   if (!fs.existsSync(path.join(root, relativePath))) throw new Error(`Missing framework kernel file: ${relativePath}`);
 }
-const appCore = readProjectFile('js/core/appCore.js');
 for (const coreArea of requiredCoreAreas) {
-  if (!appCore.includes(coreArea)) throw new Error(`Core area is not documented in appCore.js: ${coreArea}`);
+  if (!readProjectFile('js/core/appCore.js').includes(coreArea)) throw new Error(`Core area is not documented in appCore.js: ${coreArea}`);
 }
-const coreIndex = readProjectFile('js/core/index.js');
 for (const expectedExport of requiredCoreExports) {
-  if (!coreIndex.includes(expectedExport)) throw new Error(`Core entry point does not export ${expectedExport}`);
+  if (!readProjectFile('js/core/index.js').includes(expectedExport)) throw new Error(`Core entry point does not export ${expectedExport}`);
 }
-const frameworkIndex = readProjectFile('js/framework/index.js');
-if (!frameworkIndex.includes('../core/index.js')) throw new Error('Framework entry point must delegate to js/core/index.js');
-if (frameworkIndex.includes('../modules/')) throw new Error('Framework entry point must not import modules');
-const dataCatalog = readProjectFile('js/data/catalog.js');
+if (!readProjectFile('js/framework/index.js').includes('../core/index.js')) throw new Error('Framework entry point must delegate to js/core/index.js');
+if (readProjectFile('js/framework/index.js').includes('../modules/')) throw new Error('Framework entry point must not import modules');
 for (const expectedToken of ['defineDataCatalogEntry', 'createDataCatalog', 'dataCatalog', 'rainwater.areaTypes', 'pipes.systems', 'refrigerants.items']) {
-  if (!dataCatalog.includes(expectedToken)) throw new Error(`Data catalog contract is missing ${expectedToken}`);
+  if (!readProjectFile('js/data/catalog.js').includes(expectedToken)) throw new Error(`Data catalog contract is missing ${expectedToken}`);
 }
 if (!readProjectFile('js/core/data/catalog.js').includes('../../data/catalog.js')) throw new Error('Core data catalog must expose the central catalog implementation');
 if (!readProjectFile('js/framework/dataCatalog.js').includes('../data/catalog.js')) throw new Error('Framework data catalog must delegate to js/data/catalog.js');
-const contract = readProjectFile('docs/contracts/framework-kernel-contract.md');
 for (const expectedSection of ['Core first', 'Core responsibility paths', 'Module import rule', 'Central data path', 'Reference module guard', 'Module responsibility']) {
-  if (!contract.includes(expectedSection)) throw new Error(`Framework kernel contract is missing section: ${expectedSection}`);
+  if (!readProjectFile('docs/contracts/framework-kernel-contract.md').includes(expectedSection)) throw new Error(`Framework kernel contract is missing section: ${expectedSection}`);
 }
 
 for (const referenceModule of referenceModules) {
@@ -253,7 +240,6 @@ for (const referenceModule of referenceModules) {
   }
 }
 
-assertFileContains('js/modules/rainwater/tables.js', '../../shared/rainwaterDomainTables.js', 'Rainwater tables must keep the Flooding-conformance shared domain table source until that contract is migrated.');
 assertFileContains('js/modules/flooding-verification/controller.js', '../../shared/rainwaterSurfaceSnapshot.js', 'Flooding verification must keep the Rainwater surface snapshot bridge until that contract is migrated.');
 
 console.log('Framework kernel audit passed.');

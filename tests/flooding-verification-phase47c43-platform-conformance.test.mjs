@@ -18,12 +18,12 @@ test('47C.4.3 has no module-local event or debounce path', () => {
   assert.doesNotMatch(controller, /addEventListener/);
 });
 
-test('47C.4.3 consumes shared domain tables instead of another module', () => {
+test('47C.4.3 consumes central domain tables instead of another module', () => {
   assert.match(schema, /shared\/rainwaterDomainTables/);
   assert.match(logic, /shared\/rainwaterDomainTables/);
   assert.doesNotMatch(schema, /modules\/rainwater|\.\.\/rainwater\/tables/);
   assert.doesNotMatch(logic, /modules\/rainwater|\.\.\/rainwater\/tables/);
-  assert.match(rainwaterTables, /shared\/rainwaterDomainTables/);
+  assert.match(rainwaterTables, /core\/data\/rainwater/);
 });
 
 test('47C.4.3 routes surface editing through the central line-section controller', () => {
