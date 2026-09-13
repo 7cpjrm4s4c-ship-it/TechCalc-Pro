@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 
-import { createFGasesSystemSnapshot } from '../js/shared/fGasesSystemSnapshot.js';
+import { createFGasesSystemSnapshot } from '../js/core/data/fGasesSystemSnapshot.js';
 import { state as fGasesState } from '../js/modules/f-gases-check/state.js';
 import { buildFGasesImportOptions, buildFGasesImportPatch, hasAnyFGasesSavedSystem, hasMultipleFGasesSavedSystems } from '../js/modules/en-378-safety-check/importController.js';
 import { calculate } from '../js/modules/en-378-safety-check/logic.js';
