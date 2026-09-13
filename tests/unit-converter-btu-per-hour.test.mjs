@@ -10,7 +10,7 @@ assert.equal(unitsFor('power').at(-1), 'BTU/h');
 
 assert.equal(convert('power', '1', 'BTU/h', 'W'), BTU_PER_HOUR_TO_WATT);
 assert.ok(Math.abs(convert('power', '1', 'W', 'BTU/h') - (1 / BTU_PER_HOUR_TO_WATT)) < 1e-12);
-assert.equal(convert('power', '1000', 'BTU/h', 'kW'), BTU_PER_HOUR_TO_WATTT);
+assert.equal(convert('power', '1000', 'BTU/h', 'kW'), BTU_PER_HOUR_TO_WATT);
 
 const normalized = normalizeUnitSelection({ category: 'power', from: 'BTU/h', to: 'W' });
 assert.equal(normalized.from, 'BTU/h');
