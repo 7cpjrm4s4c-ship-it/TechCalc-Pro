@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-
 import moduleDefinition from '../js/modules/en-378-safety-check/index.js';
 import schema from '../js/modules/en-378-safety-check/schema.js';
 import { initialState } from '../js/modules/en-378-safety-check/state.js';
@@ -9,15 +8,13 @@ import { calculate } from '../js/modules/en-378-safety-check/logic.js';
 import { buildEN378SafetyCheckResultModel } from '../js/modules/en-378-safety-check/results.js';
 import { buildEN378SafetyCheckReportDto } from '../js/modules/en-378-safety-check/reportAdapter.js';
 import { buildEN378ReportSections } from '../js/core/pdf/en378ReportSections.js';
-import { getEN378SafetyData, listEN378SafetyData, listRefrigerants } from '../js/utils/refrigerants/index.js';
-
+import { getEN378SafetyData, listEN378SafetyData, listRefrigerants } from '../js/core/data/refrigerants.js';
 const root = new URL('../', import.meta.url);
 const read = path => readFileSync(new URL(path, root), 'utf8');
 const exists = path => existsSync(new URL(path, root));
 const json = path => JSON.parse(read(path));
 const packageJson = json('package.json');
 const serviceWorker = read('service-worker.js');
-
 const EN378_RUNTIME_DIR = 'js/modules/en-378-safety-check';
 const REQUIRED_RUNTIME_FILES = Object.freeze([
   'alternativeRiskMeasures.js',
@@ -71,7 +68,6 @@ const RAW_UI_KEY_PATTERNS = Object.freeze([
   /hasVentilationOpenings/,
   /hasIndependentAlarmPower/
 ]);
-
 function runtimeFiles() {
   return readdirSync(new URL(`${EN378_RUNTIME_DIR}/`, root))
     .filter(file => file.endsWith('.js'))
@@ -84,7 +80,6 @@ function assertRuntimeStructure() {
   }
   assert.deepEqual(runtimeFiles(), [...REQUIRED_RUNTIME_FILES].sort(), 'EN 378 runtime file set must be explicit and reviewed');
 }
-
 function assertNoForbiddenRuntimeCoupling() {
   for (const file of runtimeFiles()) {
     const source = read(`${EN378_RUNTIME_DIR}/${file}`);
@@ -93,14 +88,12 @@ function assertNoForbiddenRuntimeCoupling() {
     assert.doesNotMatch(source, /document\.querySelector|document\.getElementById/, `${file} must not query the global document directly`);
   }
 }
-
 function assertServiceExports() {
   assert.equal(typeof getEN378SafetyData, 'function');
   assert.equal(typeof listEN378SafetyData, 'function');
   assert.ok(getEN378SafetyData('R-32'), 'R-32 safety data must be resolvable through central refrigerant service');
   assert.ok(Array.isArray(listEN378SafetyData()), 'EN 378 safety data list must be exposed through central refrigerant service');
 }
-
 function assertModuleContract() {
   assert.equal(moduleDefinition.config?.id, 'en-378-safety-check');
   assert.equal(typeof moduleDefinition.calculate, 'function');
@@ -115,13 +108,11 @@ function assertModuleContract() {
   assert.equal(typeof moduleDefinition.controller.savedRecords.snapshot, 'function');
   assert.equal(typeof moduleDefinition.controller.savedRecords.hydrate, 'function');
 }
-
 function assertSchemaStateConsistency() {
   const stateKeys = new Set(Object.keys(initialState));
   const schemaKeys = new Set(schema.fields.map(field => field.key));
   const groupKeys = schema.groups.flatMap(group => group.fields || []);
   const virtualTypes = new Set(['action', 'notice', 'stats', 'custom']);
-
   for (const key of groupKeys) assert.ok(schemaKeys.has(key), `schema group references missing field: ${key}`);
   for (const field of schema.fields) {
     if (virtualTypes.has(field.type)) continue;
@@ -131,14 +122,12 @@ function assertSchemaStateConsistency() {
     assert.ok(stateKeys.has(key), `saved-record state key missing: ${key}`);
   }
 }
-
 function assertPrecacheCoverage() {
   for (const file of REQUIRED_RUNTIME_FILES) {
     const asset = `./${EN378_RUNTIME_DIR}/${file}`;
     assert.ok(serviceWorker.includes(asset), `service-worker precache missing EN 378 asset: ${asset}`);
   }
 }
-
 function assertPackageGateCoverage() {
   assert.ok(packageJson.scripts['audit:en378']?.includes('audit-en-378-dependencies.mjs'), 'audit:en378 script must be present');
   assert.ok(packageJson.scripts.lint?.includes('npm run audit:en378'), 'lint must include audit:en378');
@@ -147,7 +136,6 @@ function assertPackageGateCoverage() {
     assert.ok(exists(`scripts/${testFile}`), `referenced EN 378 test file missing: ${testFile}`);
   }
 }
-
 function assertRefrigerantDataCoverage() {
   const unsupported = listRefrigerants()
     .filter(item => item.regulatory?.fluorinatedGreenhouseGas)
@@ -155,14 +143,12 @@ function assertRefrigerantDataCoverage() {
     .map(item => item.id);
   assert.deepEqual(unsupported, [], `EN 378 safety data missing for F-Gases refrigerants: ${unsupported.join(', ')}`);
 }
-
 function assertNoRawKeysInSerializableUiOutput(label, value) {
   const serialized = JSON.stringify(value);
   for (const pattern of RAW_UI_KEY_PATTERNS) {
     assert.doesNotMatch(serialized, pattern, `${label} exposes internal key/status: ${pattern}`);
   }
 }
-
 function assertUiAndPdfOutputCoverage() {
   const scenarios = [
     {
@@ -192,7 +178,6 @@ function assertUiAndPdfOutputCoverage() {
       }
     }
   ];
-
   for (const scenario of scenarios) {
     const calculation = calculate(scenario.state);
     const resultModel = buildEN378SafetyCheckResultModel(scenario.state, calculation);
@@ -202,7 +187,6 @@ function assertUiAndPdfOutputCoverage() {
     assertNoRawKeysInSerializableUiOutput(`${scenario.name} PDF sections`, pdfSections);
   }
 }
-
 assertRuntimeStructure();
 assertNoForbiddenRuntimeCoupling();
 assertServiceExports();
