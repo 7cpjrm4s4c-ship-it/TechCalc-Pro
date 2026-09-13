@@ -12,7 +12,7 @@ import {
   getToxicityConcentrationLimit
 } from '../js/modules/en-378-safety-check/chargeLimitCalculation.js';
 import { calculate } from '../js/modules/en-378-safety-check/logic.js';
-import { getEN378SafetyData } from '../js/utils/refrigerants/index.js';
+import { getEN378SafetyData } from '../js/core/data/refrigerants.js';
 
 const r32 = getEN378SafetyData('R-32');
 assert.equal(r32.safetyClass, 'A2L');
