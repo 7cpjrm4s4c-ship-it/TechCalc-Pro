@@ -4,4 +4,4 @@ export * from './pipes.js';
 export * from './refrigerants.js';
 export * from './fGasesSystemSnapshot.js';
 export { convert, unitCategories } from './units.js';
-export { MEDIA, airDensity, getMedium, heatingCooling, ventilation } from '../../utils/calculations.js';
+export { MEDIA, airDensity, getMedium, heatingCooling, ventilation } from './calculations.js';
