@@ -2,9 +2,7 @@ import config from './config.js';
 import schema from './schema.js';
 import { state, initialState } from './state.js';
 import { calculate } from './logic.js';
-import { createLineSectionController } from '../../platform/lineSectionController/index.js';
-import { createWastewaterDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
-import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createLineSectionController, createPlatformModule, createWastewaterDynamicRenderer } from '../../core/runtime/index.js';
 import { createTypedDtoReportAdapter, buildGenericModuleReportDto } from '../../core/typedDtoReportAdapter.js';
 import {
   bindWastewaterCollections,
@@ -15,7 +13,6 @@ import {
 } from './controller.js';
 import { results } from './results.js';
 import { createWastewaterView } from './view.js';
-
 function enrichedSavedCalculations(savedCalculations = []) {
   return savedCalculations.map((record, index, items) => {
     const recordState = record?.state && typeof record.state === 'object' ? record.state : record?.input;
@@ -31,7 +28,6 @@ function enrichedSavedCalculations(savedCalculations = []) {
     );
   });
 }
-
 function buildWastewaterReportDto(context = {}) {
   const snapshot = context.state || {};
   return buildGenericModuleReportDto({
@@ -42,7 +38,6 @@ function buildWastewaterReportDto(context = {}) {
     }
   });
 }
-
 const typedReportAdapter = createTypedDtoReportAdapter({
   config,
   schema,
@@ -73,7 +68,6 @@ const lineSectionController = createLineSectionController({
   hydrateRecord: ({ item, currentState }) => hydrate(item, currentState)
 });
 const { view, dynamicRenderers } = createWastewaterView(config, calculateForReport, lineSectionController);
-
 const wastewaterDynamicRenderer = createWastewaterDynamicRenderer({
   calculate: calculateForReport,
   lineSectionController,
@@ -92,7 +86,6 @@ function bindWastewaterPlatform(root) {
   lineSectionController.bind(root);
   bindWastewaterCollections(root);
 }
-
 export default createPlatformModule({
   config,
   schema,

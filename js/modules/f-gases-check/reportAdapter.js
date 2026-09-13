@@ -1,6 +1,6 @@
 import config from './config.js';
 import { F_GASES_SCHEMA_VERSION } from './state.js';
-import { createFGasesSystemSnapshot } from '../../shared/fGasesSystemSnapshot.js';
+import { createFGasesSystemSnapshot } from '../../core/data/index.js';
 import { buildFGasesResultModel } from './results.js';
 export const F_GASES_REPORT_DTO_VERSION = 3;
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));

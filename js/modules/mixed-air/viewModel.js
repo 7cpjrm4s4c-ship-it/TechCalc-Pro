@@ -1,8 +1,15 @@
-import { fmtInput } from '../../utils/calculations.js';
+import { formatNumber, parseNumber } from '../../core/numberService.js';
 import { calculate } from './logic.js';
-import { buildHeatRecoveryResultModel, formulaText, modeLabel } from '../heat-recovery/results.js';
+import { buildMixedAirResultModel, formulaText, modeLabel } from './results.js';
 
 export const MIXED_AIR_ACCENT = 'cyan';
+
+const fmtInput = (value, digits = 2) => {
+  if (value === '' || value === null || value === undefined) return '';
+  const n = parseNumber(value, { fallback: 0 });
+  if (!n) return String(value);
+  return formatNumber(n, { maximumFractionDigits: digits });
+};
 
 function fieldModel(id, label, value, unit, extra = {}){
   return { id, label, value: fmtInput(value, extra.digits ?? 2), unit, ...extra };
@@ -35,7 +42,7 @@ export function createMixedAirViewModel(s = {}, r = calculate(s), accent = MIXED
     isWrg: false,
     modeLabel: modeLabel('mixing'),
     formula: formulaText(state),
-    resultModel: buildHeatRecoveryResultModel(state, r, accent),
+    resultModel: buildMixedAirResultModel(state, r, accent),
     mixing: mixingInputGroups(s)
   };
 }

@@ -9,8 +9,8 @@ import {
   hydrateEN378SavedRecord,
   buildEN378SavedRecordsModel
 } from './savedRecords.js';
-import { formatRefrigerantLabel, listRefrigerants } from '../../utils/refrigerants/index.js';
-import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { formatRefrigerantLabel, listRefrigerants } from '../../core/data/index.js';
+import { createPlatformModule } from '../../core/runtime/index.js';
 import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
 import { bindFGasesSnapshotImport } from './importController.js';
 export { buildEN378StateFromFGasesSnapshot, canImportFGasesSystemSnapshot } from './snapshotImport.js';

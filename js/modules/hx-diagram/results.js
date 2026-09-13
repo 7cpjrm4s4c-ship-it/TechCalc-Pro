@@ -1,7 +1,6 @@
 import { esc } from '../../core/renderer.js';
-import { renderResultModel } from '../../platform/resultRenderer/index.js';
+import { renderResultModel } from '../../core/resultRenderer.js';
 import { parseNumber } from '../../core/numberService.js';
-
 const WATER_HEAT_CAPACITY_KJ_KGK = 4.19;
 const MIN_COIL_APPROACH_K = 3;
 const HUMIDITY_RATIO_EPSILON = 1e-7;

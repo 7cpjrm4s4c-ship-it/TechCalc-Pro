@@ -1,6 +1,6 @@
 import config from './config.js';
 import { card, field, renderModuleShell, stack, grid, signedTempField, esc } from '../../core/renderer.js';
-import { renderResultModel } from '../../platform/resultRenderer/index.js';
+import { renderResultModel } from '../../core/resultRenderer.js';
 import { createHeatRecoveryViewModel } from './viewModel.js';
 import { rltDeviceCard } from './controller.js';
 

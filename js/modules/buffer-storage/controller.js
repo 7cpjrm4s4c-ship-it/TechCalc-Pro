@@ -1,9 +1,10 @@
-import { createLineSectionController } from '../../platform/lineSectionController/index.js';
-import { fmt } from '../../utils/calculations.js';
-import { parseNumber } from '../../core/numberService.js';
+import { createLineSectionController } from '../../core/runtime/index.js';
+import { formatNumber, parseNumber } from '../../core/numberService.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { mediumLabel, modeLabel } from './results.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 function normalizeBufferStorageState(s = {}){
   const calculationMode = ['runtime', 'defrost', 'reserve'].includes(s.calculationMode) ? s.calculationMode : 'runtime';

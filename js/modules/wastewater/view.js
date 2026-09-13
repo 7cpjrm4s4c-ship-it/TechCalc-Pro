@@ -1,8 +1,7 @@
 import { card, renderModuleShell, stack, esc } from '../../core/renderer.js';
-import { renderResultModel } from '../../platform/resultRenderer/index.js';
+import { renderResultModel } from '../../core/resultRenderer.js';
 import { results } from './results.js';
 import { createWastewaterViewModel } from './viewModel.js';
-
 export function renderWastewaterFixtures(fixtures = []) {
   if (!Array.isArray(fixtures) || !fixtures.length) {
     return '<div class="empty-state">Noch keine Entwässerungsgegenstände hinzugefügt.</div>';
@@ -21,7 +20,6 @@ export function renderWastewaterFixtures(fixtures = []) {
     </div>
   `).join('')}</div>`;
 }
-
 export function renderWastewaterResult(s, r) {
   return renderResultModel(results(s, r), 'green');
 }
@@ -30,7 +28,6 @@ export function createWastewaterView(config, calculate, lineSectionController) {
   if (!config) throw new Error('createWastewaterView requires config');
   if (typeof calculate !== 'function') throw new Error('createWastewaterView requires calculate');
   if (!lineSectionController) throw new Error('createWastewaterView requires lineSectionController');
-
   function view(s) {
     const r = calculate(s);
     const vm = createWastewaterViewModel(s, r);
@@ -44,7 +41,6 @@ export function createWastewaterView(config, calculate, lineSectionController) {
       card('Zusatzabflüsse', `<div class="tc-stack" data-ww-dynamic="additional-flows">${vm.additionalFlowsHtml}</div>`, 'green'),
       lineSectionController.renderCard(s)
     ].join(''));
-
     const outputColumn = `<div class="tc-module-section tc-stack" data-ww-dynamic="result">${renderWastewaterResult(s, r)}</div>`;
 
     return renderModuleShell(config, `
@@ -59,7 +55,6 @@ export function createWastewaterView(config, calculate, lineSectionController) {
     renderResult: renderWastewaterResult,
     renderFixtures: renderWastewaterFixtures
   };
-
   return { view, dynamicRenderers };
 }
 

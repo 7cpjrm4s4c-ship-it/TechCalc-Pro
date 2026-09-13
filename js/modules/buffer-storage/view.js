@@ -1,8 +1,8 @@
 import config from './config.js';
 import { calculate } from './logic.js';
 import { card, field, grid, inlineStats, renderModuleShell, segmented, selectField, stack } from '../../core/renderer.js';
-import { createBufferStorageDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
-import { renderResultModel } from '../../platform/resultRenderer/index.js';
+import { createBufferStorageDynamicRenderer } from '../../core/runtime/index.js';
+import { renderResultModel } from '../../core/resultRenderer.js';
 import { createBufferStorageViewModel } from './viewModel.js';
 import { bufferSaveCard, bufferStorageSavedController } from './controller.js';
 

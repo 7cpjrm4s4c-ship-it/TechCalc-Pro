@@ -1,4 +1,6 @@
-import { fmt } from '../../utils/calculations.js';
+import { formatNumber } from '../../core/numberService.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 export function pressureHoldingPrimary(s = {}, r = {}) {
   if (s.holdingType === 'dynamic') {
@@ -14,7 +16,6 @@ export function pressureHoldingPrimary(s = {}, r = {}) {
     unit: r.vnMag > 0 ? 'Liter' : ''
   };
 }
-
 export function pressureHoldingDetailRows(s = {}, r = {}) {
   return [
     { label: s.holdingType === 'dynamic' ? 'Station / Gefäß' : 'Auswahl MAG', value: r.productLabel },
@@ -24,7 +25,6 @@ export function pressureHoldingDetailRows(s = {}, r = {}) {
     { label: 'Enddruck pₑ', value: fmt(r.pe, 2), unit: 'bar' }
   ];
 }
-
 export function pressureHoldingIntermediateRows(r = {}) {
   return [
     { label: 'Ausdehnungskoeffizient n', value: fmt(r.expansionPct, 2), unit: '%' },
@@ -36,7 +36,6 @@ export function pressureHoldingIntermediateRows(r = {}) {
     { label: 'Volumenfaktor MAG', value: fmt(r.factor, 2) }
   ];
 }
-
 export function pressureHoldingFormulaRows(s = {}) {
   return [
     { label: 'Druckniveau', value: `p₀ = pₛₜ + pD ${s.connectionType === 'pressure' ? '+ Δpₚ' : '+ 0,2 bar'} · pe = pSV − ASV` },
@@ -46,7 +45,6 @@ export function pressureHoldingFormulaRows(s = {}) {
       : { label: 'Dynamische Druckhaltung', value: 'Vn ≥ 1,1 × (Ve + VV) · pe ≥ p₀ + 0,3 bar + AD' }
   ];
 }
-
 export function buildPressureHoldingResultModel(s = {}, r = {}, accent = 'blue') {
   return {
     primary: {
@@ -77,7 +75,6 @@ export function buildPressureHoldingResultModel(s = {}, r = {}, accent = 'blue')
     ]
   };
 }
-
 export default {
   pressureHoldingPrimary,
   pressureHoldingDetailRows,

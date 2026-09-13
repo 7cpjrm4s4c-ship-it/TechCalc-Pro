@@ -2,7 +2,7 @@ import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
 import { calculate, processLabel } from './logic.js';
-import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createPlatformModule } from '../../core/runtime/index.js';
 import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
 import { bindHxDiagramActions } from './controller.js';
 import { renderHxSvg } from './diagramRenderer.js';
@@ -19,7 +19,6 @@ function fmtReportValue(value, digits = 2) {
 function hasValue(value) {
   return value !== undefined && value !== null && value !== '';
 }
-
 function row(label, value, unit = '') {
   return hasValue(value) ? [label, fmtReportValue(value), unit] : null;
 }
@@ -159,12 +158,10 @@ const typedReportAdapter = createTypedDtoReportAdapter({
   buildReportDto: buildHxDiagramReportDto
 });
 const calculateForReport = typedReportAdapter.calculate;
-
 function renderTypedView(snapshot) {
   calculateForReport(snapshot);
   return renderView(snapshot);
 }
-
 function updateTypedDynamic(root, snapshot, meta = {}) {
   calculateForReport(snapshot);
   updateHxDiagramDynamic(root, snapshot, meta);

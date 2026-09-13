@@ -11,8 +11,7 @@ import controller, {
   floodingSurfaceStats,
   bindFloodingController
 } from './controller.js';
-import { createLineSectionController } from '../../platform/lineSectionController/index.js';
-import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createLineSectionController, createPlatformModule } from '../../core/runtime/index.js';
 import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
 import { createFloodingVerificationView } from './view.js';
 import { createFloodingDynamicRenderer } from './dynamicRenderer.js';

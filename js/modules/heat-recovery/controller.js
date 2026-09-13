@@ -1,4 +1,4 @@
-import { createLineSectionController } from '../../platform/lineSectionController/index.js';
+import { createLineSectionController } from '../../core/runtime/index.js';
 import { toggleNumericSign } from '../../core/renderer.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';

@@ -3,4 +3,4 @@ export {
   formatAirPoint,
   formulaText,
   modeLabel
-} from '../heat-recovery/results.js';
+} from '../../core/hvacAirResults.js';

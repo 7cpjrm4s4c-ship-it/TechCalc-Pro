@@ -1,6 +1,13 @@
 import { card, field, stack, grid, signedTempField } from '../../core/renderer.js';
-import { fmtInput } from '../../utils/calculations.js';
+import { formatNumber, parseNumber } from '../../core/numberService.js';
 import { renderProcessSelection, HX_DYNAMIC } from './renderPipeline.js';
+
+const fmtInput = (value, digits = 2) => {
+  if (value === '' || value === null || value === undefined) return '';
+  const n = parseNumber(value, { fallback: 0 });
+  if (!n) return String(value);
+  return formatNumber(n, { maximumFractionDigits: digits });
+};
 
 export function renderHxInputCard(vm = {}) {
   const s = vm?.state || vm || {};

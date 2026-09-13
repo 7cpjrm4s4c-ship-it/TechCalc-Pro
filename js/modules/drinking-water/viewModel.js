@@ -1,5 +1,5 @@
 import { calculate, CONSUMERS, BUILDING_TYPES } from './logic.js';
-import { fmt } from '../../utils/calculations.js';
+import { fmt } from '../../core/numbers.js';
 import { buildDrinkingWaterResultModel } from './results.js';
 
 export function consumerOptions() {
@@ -31,7 +31,6 @@ export function waterHeatingUi(mode = 'central') {
     fixtureEmpty: decentralized ? 'Noch keine Einrichtungsgegenstände für die dezentrale Berechnung ausgewählt' : 'Noch keine Einrichtungsgegenstände für die zentrale Berechnung ausgewählt'
   };
 }
-
 export function createDrinkingWaterViewModel(s = {}, result = calculate(s, { includeDrafts:false })){
   const waterHeating = waterHeatingUi(s.waterHeatingMode);
   const consumerOptionsBase = consumerOptions();
@@ -47,5 +46,4 @@ export function createDrinkingWaterViewModel(s = {}, result = calculate(s, { inc
     resultModel: buildDrinkingWaterResultModel(s, result, 'blue')
   };
 }
-
 export default createDrinkingWaterViewModel;

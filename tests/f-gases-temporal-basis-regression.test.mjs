@@ -5,7 +5,7 @@ import { buildFGasesResultModel } from '../js/modules/f-gases-check/results.js';
 import { buildFGasesReportDto } from '../js/modules/f-gases-check/reportAdapter.js';
 import { buildFGasesReportSections } from '../js/core/pdf/fGasesReportSections.js';
 import { F_GASES_SCHEMA_VERSION } from '../js/modules/f-gases-check/state.js';
-import { createFGasesSystemSnapshot, F_GASES_SYSTEM_SNAPSHOT_VERSION } from '../js/shared/fGasesSystemSnapshot.js';
+import { createFGasesSystemSnapshot, F_GASES_SYSTEM_SNAPSHOT_VERSION } from '../js/core/data/fGasesSystemSnapshot.js';
 
 assert.equal(F_GASES_SCHEMA_VERSION, 5);
 assert.equal(F_GASES_SYSTEM_SNAPSHOT_VERSION, 5);

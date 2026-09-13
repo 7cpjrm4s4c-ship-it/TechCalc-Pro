@@ -1,6 +1,8 @@
-import { fmt } from '../../utils/calculations.js';
-import { unitCategories } from '../../utils/units.js';
+import { formatNumber } from '../../core/numberService.js';
+import { unitCategories } from '../../core/data/index.js';
 import { calculate, unitsFor } from './logic.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 export function normalizeUnitSelection(s = {}) {
   const units = unitsFor(s.category);

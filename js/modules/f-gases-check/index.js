@@ -5,8 +5,8 @@ import { calculate } from './logic.js';
 import { buildFGasesResultModel } from './results.js';
 import { buildFGasesReportDto } from './reportAdapter.js';
 import { buildFGasesSavedRecord, hydrateFGasesSavedRecord, buildFGasesSavedRecordsModel } from './savedRecords.js';
-import { formatRefrigerantLabel, listRefrigerants } from '../../utils/refrigerants/index.js';
-import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { formatRefrigerantLabel, listRefrigerants } from '../../core/data/index.js';
+import { createPlatformModule } from '../../core/runtime/index.js';
 import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
 const refrigerantOptions = Object.freeze([
   Object.freeze({ value: '', label: 'Bitte wählen' }),

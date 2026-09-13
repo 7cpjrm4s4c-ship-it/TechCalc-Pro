@@ -1,4 +1,4 @@
-import { getDataVersions } from '../utils/refrigerants/index.js';
+import { getDataVersions } from './refrigerants.js';
 
 export const F_GASES_SYSTEM_SNAPSHOT_VERSION = 5;
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
