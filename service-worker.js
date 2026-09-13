@@ -315,7 +315,6 @@ const ASSETS = [
   './js/platform/shell/settingsController.js',
   './js/platform/shell/themeController.js',
   './js/utils/calculations.js',
-  './js/utils/pipes.js',
   './js/utils/refrigerants/en378-safety-data.js',
   './js/utils/refrigerants/gwp.js',
   './js/utils/refrigerants/index.js',
