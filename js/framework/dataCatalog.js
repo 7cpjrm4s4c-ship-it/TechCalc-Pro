@@ -3,4 +3,4 @@ export {
   createDataCatalog,
   dataCatalog as frameworkDataCatalog,
   default
-} from '../data/catalog.js';
+} from '../core/data/catalog.js';

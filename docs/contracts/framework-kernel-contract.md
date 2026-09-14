@@ -13,7 +13,6 @@ The internal neutral framework kernel defines central access points for recurrin
 Modules must use core-provided services for app-wide concerns instead of reimplementing them locally.
 
 ---
-
 ## Core first
 
 The canonical framework basis is:
@@ -27,16 +26,12 @@ All app-wide responsibilities must be discoverable through `js/core` before feat
 The framework entry point `js/framework/index.js` is an aggregation facade over `js/core` and documented compatibility aliases. It must not own data, UI, PDF, CSS, UX, runtime or domain logic.
 
 ---
-
 ## Core responsibility paths
-
 | Concern | Canonical core path |
 |---|---|
 | Core overview | `js/core/index.js`, `js/core/appCore.js` |
 | Contracts and policies | `js/core/contracts` |
 | Data catalogs and lookup services | `js/core/data` |
-| HVAC air psychrometric and heat-recovery calculations | `js/core/hvacAir.js` |
-| HVAC air result mapping | `js/core/hvacAirResults.js` |
 | Events | `js/core/events` |
 | PDF export | `js/core/pdf`, `js/core/pdfExport.js` |
 | Runtime, routing and navigation | `js/core/runtime` |
@@ -45,9 +40,7 @@ The framework entry point `js/framework/index.js` is an aggregation facade over 
 | Stylesheet manifest | `js/core/styles` |
 | UI rendering and primitives | `js/core/ui` |
 | UX policies and interaction helpers | `js/core/ux` |
-
 ---
-
 ## Module import rule
 
 Modules should import from the narrowest central core path that matches the required responsibility.
@@ -63,7 +56,6 @@ import { defineModuleDefinition } from '../../core/contracts/index.js';
 Modules should not use broad framework imports when a narrow core path is sufficient.
 
 ---
-
 ## Central data path
 
 The canonical central data path is:
@@ -72,7 +64,7 @@ The canonical central data path is:
 js/core/data
 ```
 
-`js/data` remains as a compatibility alias during migration.
+`js/data` remains as a compatibility alias during migration. It must delegate to `js/core/data` and must not own catalog entries, lookup services or shared data implementations.
 
 The compatibility alias is intentionally limited to these documented and imported files:
 
@@ -84,21 +76,16 @@ The compatibility alias is intentionally limited to these documented and importe
 
 Data catalogs, shared data sets and data lookup services belong under `js/core/data`.
 
-Existing data sources in `js/shared` and `js/utils` remain compatible during migration, but reference modules must consume app-wide data through Core paths.
+The previous `js/shared` and `js/utils` data/helper compatibility paths have been removed after verified migration to `js/core/data`. Reference modules must consume app-wide data through Core paths.
 
-`js/core/data/fGasesSystemSnapshot.js` exposes the existing F-Gase system snapshot implementation through the central data boundary. The snapshot implementation remains unchanged while `f-gases-check` consumes it through `js/core/data`.
-
-`js/core/data/rainwater.js` exposes Rainwater domain tables and the Rainwater surface snapshot access through the central data boundary. Existing implementations remain unchanged while Rainwater and Flooding consume them through Core Data.
-
-`js/core/hvacAir.js` exposes the shared HVAC air calculation domain used by Heat-Recovery and Mixed-Air. Mixed-Air no longer consumes Heat-Recovery calculation logic directly.
-
-`js/core/hvacAirResults.js` exposes the shared HVAC air result mapping used by Heat-Recovery and Mixed-Air. Mixed-Air no longer consumes Heat-Recovery result mapping directly.
+`js/core/data/fGasesSystemSnapshot.js` exposes the F-Gase system snapshot implementation through the central data boundary. `f-gases-check` consumes it through `js/core/data`.
+`js/core/data/rainwater.js` exposes Rainwater domain tables and Rainwater surface snapshot access through the central data boundary. Rainwater and Flooding consume them through Core Data.
+`js/modules/mixed-air` currently reuses domain-specific calculation and result mapping from `js/modules/heat-recovery`. This is an existing WRG/Mischluft domain coupling and is not a legacy app-wide boundary. It must remain limited to `../heat-recovery/logic.js` and `../heat-recovery/results.js` until a dedicated shared HVAC air-domain core is introduced.
 
 ---
-
 ## Data catalog contract
 
-Centralized data access is provided by:
+Centralized data access is owned by:
 
 ```js
 js/core/data/catalog.js
@@ -106,16 +93,17 @@ js/core/data/catalog.js
 
 The catalog exposes registered data entries through stable catalog identifiers and read-only access methods.
 
+`js/data/catalog.js` is a compatibility alias to `js/core/data/catalog.js` and must not own built-in catalog entries.
+
+`js/framework/dataCatalog.js` is a framework facade to `js/core/data/catalog.js` and must not delegate through `js/data/catalog.js`.
+
 Built-in catalog groups currently include:
 
 - rainwater area, hydraulic, roof drain and gutter data
-- rainwater surface snapshot access through the core data boundary
 - pipe system and nominal diameter data
 - refrigerant, safety class, regulation and EN 378 safety data
-- F-Gase system snapshot access through the core data boundary
 
 ---
-
 ## Reference module guard
 
 The migrated reference modules are:
@@ -137,22 +125,16 @@ js/modules/f-gases-check
 js/modules/en-378-safety-check
 js/modules/drinking-water
 ```
-
 Reference modules must use central Core paths for app-wide dependencies and must not import directly from these legacy or platform implementation paths:
 
 - `../../platform/`
 - `../../utils/`
 - `../../shared/`
 
-Reference modules must also avoid module-to-module imports for shared app-wide responsibilities when a Core path exists.
-
 The reference modules currently validate the following Core responsibilities:
-
 - runtime and dynamic renderer access through `../../core/runtime/index.js`
 - typed report adapter access through `../../core/typedDtoReportAdapter.js`
 - data access through `../../core/data/index.js` and `../../core/data/rainwater.js`
-- HVAC air calculation access through `../../core/hvacAir.js`
-- HVAC air result mapping access through `../../core/hvacAirResults.js`
 - central store access through `../../core/centralStore.js`
 - number formatting and parsing through `../../core/numberService.js` and `../../core/numbers.js`
 - schema access through `../../core/formSchema.js`
@@ -163,11 +145,9 @@ The reference modules currently validate the following Core responsibilities:
 - focus preservation access through `../../core/focusManager.js`
 - scroll stability access through `../../core/scrollManager.js`
 - safe DOM update access through `../../core/domUpdate.js`
-
 This guard is enforced by `npm run audit:framework-kernel`.
 
 ---
-
 ## Module responsibility
 
 A framework-oriented module should provide only module-specific concerns:
@@ -194,12 +174,11 @@ Central concerns stay outside feature modules:
 - CSS and UX policies
 
 ---
-
 ## Compatibility
 
-This contract introduces a Core-first internal framework boundary without moving existing implementation files.
+This contract defines a Core-first internal framework boundary with documented compatibility aliases only where they still exist in the repository.
 
-Existing modules remain compatible. Migration to central core paths can happen incrementally.
+Existing modules remain compatible. Migration to central core paths can happen incrementally while compatibility aliases delegate back to Core ownership.
 
 ---
 
