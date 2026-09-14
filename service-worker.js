@@ -73,6 +73,7 @@ const ASSETS = [
   './js/core/moduleDefinition.js',
   './js/core/moduleLayoutContract.js',
   './js/core/moduleLifecycleAdapter.js',
+  './js/core/moduleRenderer.js',
   './js/core/moduleRuntime.js',
   './js/core/mount.js',
   './js/core/navigation.js',
