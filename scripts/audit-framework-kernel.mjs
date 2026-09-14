@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
 const requiredFiles = [
   'js/core/index.js',
   'js/core/appCore.js',
@@ -30,6 +31,7 @@ const requiredFiles = [
   'docs/contracts/framework-kernel-contract.md',
   'docs/architecture/ADR-0020-internal-neutral-framework.md'
 ];
+
 const forbiddenReferenceModuleImports = ['../../platform/', '../../shared/', '../../utils/'];
 const requiredCoreAreas = ['contracts', 'data', 'events', 'pdf', 'runtime', 'state', 'storage', 'styles', 'ui', 'ux'];
 const requiredCoreExports = ['./appCore.js', './contracts/index.js', './data/index.js', './events/index.js', './pdf/index.js', './runtime/index.js', './state/index.js', './storage/index.js', './styles/index.js', './ui/index.js', './ux/index.js'];
@@ -47,6 +49,7 @@ const guard = (id, requiredImports, options = {}) => ({
   requiredImports,
   allowedLegacyImports: options.allowedLegacyImports || []
 });
+
 const referenceModules = [
   guard('unit-converter', [
     required('unit-converter/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/numberService.js']),
@@ -130,8 +133,8 @@ const referenceModules = [
     required('heat-recovery/controller.js', ['../../core/runtime/index.js', '../../core/renderer.js']),
     required('heat-recovery/dynamicRenderer.js', ['../../core/renderer.js']),
     required('heat-recovery/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
-    required('heat-recovery/logic.js', ['../../core/data/index.js', '../../core/numberService.js']),
-    required('heat-recovery/results.js', ['../../core/numberService.js']),
+    required('heat-recovery/logic.js', ['../../core/hvacAir.js']),
+    required('heat-recovery/results.js', ['../../core/hvacAirResults.js']),
     required('heat-recovery/schema.js', ['../../core/formSchema.js']),
     required('heat-recovery/view.js', ['../../core/renderer.js', '../../core/resultRenderer.js']),
     required('heat-recovery/viewModel.js', ['../../core/numberService.js'])
@@ -140,11 +143,11 @@ const referenceModules = [
     required('mixed-air/controller.js', ['../../core/runtime/index.js', '../../core/renderer.js', '../../core/numberService.js']),
     required('mixed-air/dynamicRenderer.js', ['../../core/renderer.js']),
     required('mixed-air/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
-    required('mixed-air/logic.js', ['../heat-recovery/logic.js']),
-    required('mixed-air/results.js', ['../heat-recovery/results.js']),
+    required('mixed-air/logic.js', ['../../core/hvacAir.js']),
+    required('mixed-air/results.js', ['../../core/hvacAirResults.js']),
     required('mixed-air/schema.js', ['../../core/formSchema.js']),
     required('mixed-air/view.js', ['../../core/renderer.js', '../../core/resultRenderer.js']),
-    required('mixed-air/viewModel.js', ['../../core/numberService.js', '../heat-recovery/results.js'])
+    required('mixed-air/viewModel.js', ['../../core/numberService.js', './results.js'])
   ]),
   guard('hx-diagram', [
     required('hx-diagram/controller.js', ['../../core/runtime/index.js', '../../core/eventPipeline.js', '../../core/scrollManager.js', '../../core/renderer.js']),
@@ -186,11 +189,15 @@ const referenceModules = [
   ], { extraFiles: ['dynamicRenderer.js'] })
 ];
 
-function readProjectFile(relativePath) { return fs.readFileSync(path.join(root, relativePath), 'utf8'); }
+function readProjectFile(relativePath) {
+  return fs.readFileSync(path.join(root, relativePath), 'utf8');
+}
+
 function assertFileContains(relativePath, expectedToken, message) {
   const source = readProjectFile(relativePath);
   if (!source.includes(expectedToken)) throw new Error(message || `${relativePath} is missing ${expectedToken}`);
 }
+
 function importSpecifiers(source) {
   const specifiers = [];
   const importOrExportFrom = /(?:import|export)\s+(?:[\s\S]*?\s+from\s+)?['"]([^'"]+)['"]/g;
@@ -202,14 +209,18 @@ function importSpecifiers(source) {
 for (const relativePath of requiredFiles) {
   if (!fs.existsSync(path.join(root, relativePath))) throw new Error(`Missing framework kernel file: ${relativePath}`);
 }
+
 for (const coreArea of requiredCoreAreas) {
   if (!readProjectFile('js/core/appCore.js').includes(coreArea)) throw new Error(`Core area is not documented in appCore.js: ${coreArea}`);
 }
+
 for (const expectedExport of requiredCoreExports) {
   if (!readProjectFile('js/core/index.js').includes(expectedExport)) throw new Error(`Core entry point does not export ${expectedExport}`);
 }
+
 if (!readProjectFile('js/framework/index.js').includes('../core/index.js')) throw new Error('Framework entry point must delegate to js/core/index.js');
 if (readProjectFile('js/framework/index.js').includes('../modules/')) throw new Error('Framework entry point must not import modules');
+
 for (const expectedToken of ['defineDataCatalogEntry', 'createDataCatalog', 'dataCatalog', 'rainwater.areaTypes', 'pipes.systems', 'refrigerants.items']) {
   if (!readProjectFile('js/core/data/catalog.js').includes(expectedToken)) throw new Error(`Core data catalog contract is missing ${expectedToken}`);
 }
@@ -218,6 +229,7 @@ if (!readProjectFile('js/data/catalog.js').includes('../core/data/catalog.js')) 
 if (readProjectFile('js/data/catalog.js').includes('builtInCatalogEntries')) throw new Error('Data catalog compatibility alias must not own built-in catalog entries');
 if (!readProjectFile('js/framework/dataCatalog.js').includes('../core/data/catalog.js')) throw new Error('Framework data catalog must delegate to js/core/data/catalog.js');
 if (readProjectFile('js/framework/dataCatalog.js').includes('../data/catalog.js')) throw new Error('Framework data catalog must not delegate through js/data/catalog.js');
+
 for (const expectedSection of ['Core first', 'Core responsibility paths', 'Module import rule', 'Central data path', 'Reference module guard', 'Module responsibility']) {
   if (!readProjectFile('docs/contracts/framework-kernel-contract.md').includes(expectedSection)) throw new Error(`Framework kernel contract is missing section: ${expectedSection}`);
 }
@@ -225,6 +237,8 @@ for (const expectedSection of ['Core first', 'Core responsibility paths', 'Modul
 for (const referenceModule of referenceModules) {
   const allowedLegacyImports = new Set(referenceModule.allowedLegacyImports || []);
   for (const relativePath of referenceModule.files) {
+    const absolutePath = path.join(root, relativePath);
+    if (!fs.existsSync(absolutePath)) throw new Error(`Reference module ${referenceModule.id} file missing: ${relativePath}`);
     const source = readProjectFile(relativePath);
     for (const specifier of importSpecifiers(source)) {
       if (allowedLegacyImports.has(specifier)) continue;
@@ -233,6 +247,7 @@ for (const referenceModule of referenceModules) {
       }
     }
   }
+
   for (const { file, specifiers } of referenceModule.requiredImports) {
     for (const specifier of specifiers) assertFileContains(file, specifier, `Reference module ${referenceModule.id} must use ${specifier} in ${file}`);
   }
