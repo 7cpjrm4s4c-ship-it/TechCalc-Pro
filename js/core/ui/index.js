@@ -13,4 +13,3 @@ export * from '../uiSystem.js';
 export * from '../../platform/collectionRenderer/index.js';
 export * from '../../platform/dynamicRenderer/index.js';
 export * from '../../platform/moduleRenderer/index.js';
-export * from '../../platform/resultRenderer/index.js';
