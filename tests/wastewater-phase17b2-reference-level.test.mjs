@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import schema from '../js/modules/wastewater/schema.js';
 import wastewater from '../js/modules/wastewater/index.js';
-import { renderPlatformModuleView } from '../js/platform/moduleRenderer/index.js';
+import { renderPlatformModuleView } from '../js/core/moduleRenderer.js';
 
 const schemaSource = readFileSync(new URL('../js/modules/wastewater/schema.js', import.meta.url), 'utf8');
 const controllerSource = readFileSync(new URL('../js/modules/wastewater/controller.js', import.meta.url), 'utf8');
@@ -34,7 +34,7 @@ const html = renderPlatformModuleView({
   savedRecords: wastewater.savedRecords(state, result)
 });
 assert.match(html, /tc-collection-list/);
-assert.match(html, /ΣDU/);
+assert.match(html, /ØDN/);
 assert.match(html, /Waschbecken/);
 assert.doesNotMatch(html, /wastewater-|dw-consumer|platform:wastewater|collection:fixtures:add/);
 
