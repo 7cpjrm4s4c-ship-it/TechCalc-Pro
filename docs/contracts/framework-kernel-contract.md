@@ -23,7 +23,7 @@ js/core
 
 All app-wide responsibilities must be discoverable through `js/core` before feature modules are migrated.
 
-The framework entry point `js/framework/index.js` is an aggregation facade over `js/core` and documented compatibility aliases. It must not own data, UI, PDF, CSS, UX, runtime or domain logic.
+The framework entry point `js/framework/index.js` is an aggregation facade over `js/core` and framework-local facades such as `js/framework/dataCatalog.js`. It must not delegate through `js/data` and must not own data, UI, PDF, CSS, UX, runtime or domain logic.
 
 ---
 ## Core responsibility paths

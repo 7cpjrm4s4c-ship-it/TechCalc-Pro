@@ -219,6 +219,7 @@ for (const expectedExport of requiredCoreExports) {
 }
 
 if (!readProjectFile('js/framework/index.js').includes('../core/index.js')) throw new Error('Framework entry point must delegate to js/core/index.js');
+if (readProjectFile('js/framework/index.js').includes('../data/')) throw new Error('Framework entry point must not delegate through js/data');
 if (readProjectFile('js/framework/index.js').includes('../modules/')) throw new Error('Framework entry point must not import modules');
 
 for (const expectedToken of ['defineDataCatalogEntry', 'createDataCatalog', 'dataCatalog', 'rainwater.areaTypes', 'pipes.systems', 'refrigerants.items']) {
