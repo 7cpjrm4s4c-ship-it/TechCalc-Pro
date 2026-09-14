@@ -315,7 +315,6 @@ const ASSETS = [
   './js/platform/lineSectionController/index.js',
   './js/platform/moduleRenderer/index.js',
   './js/platform/moduleRuntime/index.js',
-  './js/platform/resultRenderer/index.js',
   './js/platform/savedRecordModel/index.js',
   './js/platform/shell/feedbackController.js',
   './js/platform/shell/layoutStabilityController.js',
