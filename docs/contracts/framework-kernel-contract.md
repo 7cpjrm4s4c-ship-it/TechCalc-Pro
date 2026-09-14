@@ -26,6 +26,32 @@ All app-wide responsibilities must be discoverable through `js/core` before feat
 The framework entry point `js/framework/index.js` is an aggregation facade over `js/core` and framework-local facades such as `js/framework/dataCatalog.js`. It must not delegate through `js/data` and must not own data, UI, PDF, CSS, UX, runtime or domain logic.
 
 ---
+## Core-only runtime target
+
+The final runtime application code target is intentionally narrow:
+
+```text
+js/core
+js/modules
+```
+
+`js/core` owns app-wide responsibilities: internal framework, runtime, shell, routing, UI primitives, rendering services, data, storage, PDF, styles, static app assets, number handling, events, UX policies and quality/runtime diagnostics.
+
+`js/modules` owns module-specific responsibilities only: module metadata, configuration, state, schema, calculation logic, result mapping, report adapters, saved-record adapters and optional controller/view code required by the module.
+
+The following paths are migration boundaries, not final runtime ownership locations:
+
+- `js/platform`
+- `js/framework`
+- `js/data`
+- root-level `css`
+- root-level `assets`
+
+They must shrink through isolated, reviewed migration steps. New app-wide runtime implementation must not be added to those migration boundaries.
+
+Root files, build scripts, tests, documentation, CI and deployment configuration remain outside `js/core` and `js/modules` because they are repository/tooling concerns, not runtime ownership areas.
+
+---
 ## Core responsibility paths
 | Concern | Canonical core path |
 |---|---|
@@ -35,9 +61,11 @@ The framework entry point `js/framework/index.js` is an aggregation facade over 
 | Events | `js/core/events` |
 | PDF export | `js/core/pdf`, `js/core/pdfExport.js` |
 | Runtime, routing and navigation | `js/core/runtime` |
+| Shell and app controllers | `js/core/shell` target path |
 | State | `js/core/state` |
 | Storage and saved records | `js/core/storage` |
-| Stylesheet manifest | `js/core/styles` |
+| Stylesheet manifest and app styles | `js/core/styles` target path |
+| Static app assets | `js/core/assets` target path |
 | UI rendering and primitives | `js/core/ui` |
 | UX policies and interaction helpers | `js/core/ux` |
 ---
@@ -81,6 +109,23 @@ The previous `js/shared` and `js/utils` data/helper compatibility paths have bee
 `js/core/data/fGasesSystemSnapshot.js` exposes the F-Gase system snapshot implementation through the central data boundary. `f-gases-check` consumes it through `js/core/data`.
 `js/core/data/rainwater.js` exposes Rainwater domain tables and Rainwater surface snapshot access through the central data boundary. Rainwater and Flooding consume them through Core Data.
 `js/modules/mixed-air` currently reuses domain-specific calculation and result mapping from `js/modules/heat-recovery`. This is an existing WRG/Mischluft domain coupling and is not a legacy app-wide boundary. It must remain limited to `../heat-recovery/logic.js` and `../heat-recovery/results.js` until a dedicated shared HVAC air-domain core is introduced.
+
+---
+## Platform migration boundary
+
+`js/platform` is still present as a historical implementation location for app-wide services. It is not the final owner for runtime framework implementation.
+
+Migration must proceed in small blocks, moving platform implementation behind existing Core entry points first and deleting obsolete platform files only after CI confirms no runtime, test, script, service-worker or documentation dependency remains.
+
+Preferred migration order:
+
+1. result rendering
+2. module rendering
+3. dynamic rendering
+4. module runtime
+5. collection and saved-record models
+6. line-section controller
+7. shell controllers
 
 ---
 ## Data catalog contract
@@ -172,6 +217,20 @@ Central concerns stay outside feature modules:
 - data catalogs
 - number formatting and parsing
 - CSS and UX policies
+
+---
+## App resource migration target
+
+Root-level `css` and `assets` are runtime application resources and should be migrated into Core-owned resource paths after platform implementation ownership is stabilized.
+
+Target ownership:
+
+```text
+css/*    → js/core/styles/*
+assets/* → js/core/assets/*
+```
+
+Moving these paths requires coordinated updates to `index.html`, `manifest.json`, `service-worker.js`, precache generation and browser/PWA audits. These moves must not be combined with platform or module runtime migrations.
 
 ---
 ## Compatibility
