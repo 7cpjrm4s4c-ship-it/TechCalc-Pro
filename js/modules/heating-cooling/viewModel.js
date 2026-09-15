@@ -1,5 +1,5 @@
-import { fmtInput } from '../../utils/calculations.js';
 import { field } from '../../core/renderer.js';
+import { formatNumber, parseNumber } from '../../core/numberService.js';
 import {
   activeCalculationState,
   activeMassFlowUnit,
@@ -7,6 +7,13 @@ import {
   formatMassFlowInput,
   key
 } from './controller.js';
+
+function fmtInput(value, digits = 2) {
+  if (value === '' || value === null || value === undefined) return '';
+  const parsed = parseNumber(value, { fallback: 0 });
+  if (!parsed) return String(value);
+  return formatNumber(parsed, { fallback: String(value), maximumFractionDigits: digits });
+}
 
 function massFlowField(s = {}) {
   const unit = activeMassFlowUnit(s);

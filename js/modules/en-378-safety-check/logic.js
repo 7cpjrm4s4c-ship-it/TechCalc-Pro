@@ -1,4 +1,4 @@
-import { getDataVersions, getEN378SafetyData, getRefrigerant, getSafetyClass } from '../../utils/refrigerants/index.js';
+import { getDataVersions, getEN378SafetyData, getRefrigerant, getSafetyClass } from '../../core/data/index.js';
 import { assessChargeLimit } from './chargeLimitCalculation.js';
 import { assessInstallationSafetyRequirements } from './installationSafetyRequirements.js';
 import {
@@ -8,7 +8,6 @@ import {
 } from './alternativeRiskMeasures.js';
 import { assessStateConsistency, mergeStateConsistencyAssessment } from './stateConsistency.js';
 import { buildEN378PlannerGuidance } from './plannerGuidance.js';
-
 const ACCESS_CATEGORY_BY_ACCESS_AREA = Object.freeze({
   'general-access': 'a',
   'supervised-access': 'b',
@@ -20,18 +19,15 @@ const numberOrNull = value => {
   const parsed = Number(String(value).replace(',', '.'));
   return Number.isFinite(parsed) ? parsed : null;
 };
-
 const hasValue = value => String(value ?? '').trim().length > 0;
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
 const isHumanComfortApplication = state => state.applicationType === 'human-comfort';
 const requiresMountingType = state => isHumanComfortApplication(state) && state.isFactorySealed === 'no';
-
 export function deriveAccessCategory(currentState = {}) {
   const derived = ACCESS_CATEGORY_BY_ACCESS_AREA[currentState.accessArea];
   if (derived) return derived;
   return hasValue(currentState.accessCategory) ? String(currentState.accessCategory) : '';
 }
-
 export function normalizeEN378AssessmentState(currentState = {}) {
   return Object.freeze({
     ...currentState,
@@ -39,7 +35,6 @@ export function normalizeEN378AssessmentState(currentState = {}) {
     hasMachineryRoom: currentState.installationLocation === 'machinery-room' ? 'yes' : currentState.hasMachineryRoom
   });
 }
-
 const addRequiredTextIssue = (issues, currentState, key) => {
   if (!hasValue(currentState[key])) issues.push(`${key}:required`);
 };
@@ -51,11 +46,9 @@ const addPositiveNumberIssue = (issues, currentState, key) => {
   }
   if (value <= 0) issues.push(`${key}:positive-number-required`);
 };
-
 export function validateAssessmentInput(currentState = {}) {
   const effectiveState = normalizeEN378AssessmentState(currentState);
   const issues = [];
-
   addRequiredTextIssue(issues, effectiveState, 'refrigerantId');
   addPositiveNumberIssue(issues, effectiveState, 'chargeKg');
   addPositiveNumberIssue(issues, effectiveState, 'roomVolumeM3');
@@ -63,7 +56,6 @@ export function validateAssessmentInput(currentState = {}) {
   addRequiredTextIssue(issues, effectiveState, 'accessArea');
   addRequiredTextIssue(issues, effectiveState, 'usageType');
   addRequiredTextIssue(issues, effectiveState, 'ventilationType');
-
   if (isHumanComfortApplication(effectiveState)) {
     addPositiveNumberIssue(issues, effectiveState, 'floorAreaM2');
     addRequiredTextIssue(issues, effectiveState, 'isFactorySealed');
@@ -76,11 +68,9 @@ export function validateAssessmentInput(currentState = {}) {
     effectiveState
   });
 }
-
 export function hasRequiredAssessmentInput(currentState = {}) {
   return validateAssessmentInput(currentState).isValid;
 }
-
 function isOptionalC3OpenCheck(check = {}, currentState = {}) {
   if (currentState.usesAlternativeRiskManagement === 'yes') return false;
   if (check.id !== 'charge-limit.alternative-risk-management') return false;
@@ -112,7 +102,6 @@ function deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, 
   if (chargeLimitAssessment.status === 'passed' && installationSafetyAssessment.status === 'passed') return 'acceptable';
   return 'ready-for-assessment';
 }
-
 export function calculate(currentState = {}) {
   const effectiveState = normalizeEN378AssessmentState(currentState);
   const refrigerant = effectiveState.refrigerantId ? getRefrigerant(effectiveState.refrigerantId) : null;

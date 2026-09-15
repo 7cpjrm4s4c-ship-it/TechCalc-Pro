@@ -1,6 +1,5 @@
-import { num } from '../../utils/calculations.js';
+import { num } from '../../core/numbers.js';
 import { parseNumber } from '../../core/numberService.js';
-
 export const CONSUMERS = [
   { id:'basin', label:'Waschtisch / Bidet', short:'Waschtisch / Bidet', vr:0.07, pmin:0.10, neGroup:'basin', hotWater:true },
   { id:'kitchenSink', label:'Küchenspüle', short:'Küchenspüle', vr:0.07, pmin:0.10, neGroup:'kitchenSink', hotWater:true },
@@ -16,7 +15,6 @@ export const CONSUMERS = [
   { id:'tapDn20', label:'Auslaufventil ohne Strahlregler DN 20', short:'Auslauf DN20', vr:0.50, pmin:0.05, neGroup:'tapDn20', hotWater:false },
   { id:'tapDn25', label:'Auslaufventil ohne Strahlregler DN 25', short:'Auslauf DN25', vr:1.00, pmin:0.05, neGroup:'tapDn25', hotWater:false }
 ];
-
 export const BUILDING_TYPES = [
   { id:'residential', label:'Wohngebäude / Nutzungseinheiten', a:1.48, b:0.19, c:0.94 },
   { id:'hotel', label:'Hotel', a:0.70, b:0.48, c:0.13 },
@@ -27,12 +25,10 @@ export const BUILDING_TYPES = [
 
 let usageUnitsMemory = [];
 let singleConsumersMemory = [];
-
 function clone(value) {
   if (typeof structuredClone === 'function') return structuredClone(value);
   return JSON.parse(JSON.stringify(value));
 }
-
 export function readUsageUnits() {
   return Array.isArray(usageUnitsMemory) ? clone(usageUnitsMemory) : [];
 }
@@ -41,10 +37,8 @@ export function readSingleConsumers() {
   return Array.isArray(singleConsumersMemory) ? clone(singleConsumersMemory) : [];
 }
 export function writeSingleConsumers(items) { singleConsumersMemory = Array.isArray(items) ? clone(items) : []; }
-
 export function consumerById(id) { return CONSUMERS.find(c => c.id === id) || CONSUMERS[0]; }
 export function buildingById(id) { return BUILDING_TYPES.find(b => b.id === id) || BUILDING_TYPES[0]; }
-
 export function createConsumer({ typeId, count = 1, name = '', permanent = false }) {
   const type = consumerById(typeId);
   return {
@@ -61,11 +55,9 @@ export function createConsumer({ typeId, count = 1, name = '', permanent = false
     createdAt: new Date().toISOString()
   };
 }
-
 function parseFactor(value) {
   return parseNumber(value, { fallback: 0 });
 }
-
 export function createUsageUnit({ name, consumer, consumers, simultaneityFactor = '' }) {
   const list = Array.isArray(consumers) && consumers.length ? consumers : consumer ? [consumer] : [];
   const gl = parseFactor(simultaneityFactor);
@@ -77,7 +69,6 @@ export function createUsageUnit({ name, consumer, consumers, simultaneityFactor 
     createdAt: new Date().toISOString()
   };
 }
-
 export function createSingleGroup({ name, consumers }) {
   const list = Array.isArray(consumers) && consumers.length ? consumers : [];
   return {
@@ -87,7 +78,6 @@ export function createSingleGroup({ name, consumers }) {
     createdAt: new Date().toISOString()
   };
 }
-
 function hotWaterAddon(consumer, mode, index = 0) {
   if (!consumer.hotWater) return [];
   if (mode === 'central') {
@@ -111,7 +101,6 @@ function hotWaterAddon(consumer, mode, index = 0) {
     decentralizedAddon:true
   }];
 }
-
 function unitEffectiveConsumers(unit, mode = 'central') {
   const gl = parseFactor(unit.simultaneityFactor);
   if (gl > 0 && gl < 1) {
@@ -155,7 +144,6 @@ function unitEffectiveConsumers(unit, mode = 'central') {
   });
   return effective;
 }
-
 export function summarizeUsageUnit(unit, warmWaterMode = 'central') {
   const effective = unitEffectiveConsumers(unit, warmWaterMode);
   const effectiveFlow = effective.reduce((sum, c) => sum + Number(c.vr || 0), 0);
@@ -170,7 +158,6 @@ export function summarizeUsageUnit(unit, warmWaterMode = 'central') {
     simultaneityFactor: unit.simultaneityFactor || ''
   };
 }
-
 function normalizeSingleGroups(items = []) {
   return items.map(item => {
     if (Array.isArray(item.consumers)) return item;
@@ -182,7 +169,6 @@ function normalizeSingleGroups(items = []) {
     };
   });
 }
-
 function expandConsumersForWarmWater(consumers, warmWaterMode) {
   const expanded = [];
   (consumers || []).forEach((consumer, index) => {
@@ -197,7 +183,6 @@ function simultaneity(building, sumVr) {
   const value = building.a * Math.pow(sumVr, building.b) - building.c;
   return Math.max(0, Math.min(sumVr, value));
 }
-
 function recommendHouseConnection(peakLs) {
   const flowM3h = peakLs * 3.6;
   const rows = [
@@ -213,7 +198,6 @@ function recommendHouseConnection(peakLs) {
   const match = rows.find(r => flowM3h <= r.limit) || rows[rows.length - 1];
   return { ...match, flowM3h };
 }
-
 function draftUsageUnitFromState(s = {}, includeCurrentControls = false) {
   const consumers = Array.isArray(s.unitDraftConsumers) && s.unitDraftConsumers.length
     ? s.unitDraftConsumers
@@ -225,7 +209,6 @@ function draftUsageUnitFromState(s = {}, includeCurrentControls = false) {
     simultaneityFactor: s.unitSimultaneityFactor
   });
 }
-
 function draftSingleGroupFromState(s = {}, includeCurrentControls = false) {
   const permanent = String(s.singlePermanent) === 'true';
   const consumers = Array.isArray(s.singleDraftConsumers) && s.singleDraftConsumers.length
@@ -237,7 +220,6 @@ function draftSingleGroupFromState(s = {}, includeCurrentControls = false) {
     consumers
   });
 }
-
 export function calculate(s = {}, options = {}) {
   const warmWaterMode = s.waterHeatingMode === 'decentral' ? 'decentral' : 'central';
   const centralWarmWater = warmWaterMode === 'central';
@@ -257,7 +239,6 @@ export function calculate(s = {}, options = {}) {
   });
   const singles = expandConsumersForWarmWater(singlesRaw, warmWaterMode);
   const building = buildingById(s.buildingType);
-
   const nePeakSum = units.reduce((sum, unit) => sum + unit.peakFlow, 0);
   const neSumFlow = units.reduce((sum, unit) => sum + unit.sumFlow, 0);
   const singleSumFlow = singles.reduce((sum, consumer) => sum + Number(consumer.vr || 0) * (Number(consumer.count) || 1), 0);

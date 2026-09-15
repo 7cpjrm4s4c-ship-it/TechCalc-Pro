@@ -1,11 +1,10 @@
-import { areaTypes, hydraulicTables, dnOrder } from '../../shared/rainwaterDomainTables.js';
+import { areaTypes, hydraulicTables, dnOrder } from '../../core/data/rainwater.js';
 
 const toNumber = value => Number(String(value ?? '').replace(',', '.'));
 const typeById = new Map(areaTypes.map(item => [item.id, item]));
 const VALID_DURATIONS = new Set([5, 10, 15]);
 const FLOODING_DURATIONS = Object.freeze([5, 10, 15]);
 const VALID_DISCHARGE_MODES = new Set(['table-existing-pipe', 'table-size-pipe', 'manual-full-flow', 'authority-discharge-limit']);
-
 export function validateSurface(surface = {}) {
   const area = toNumber(surface.area ?? surface.areaM2 ?? surface.areaSize);
   const cs = toNumber(surface.cs ?? surface.runoffCoefficientCs);
@@ -17,20 +16,17 @@ export function validateSurface(surface = {}) {
   if (!['roof', 'property'].includes(surface.category ?? surface.group)) errors.push('Flächengruppe ist ungültig.');
   return { valid: errors.length === 0, errors, area, cs, cm };
 }
-
 export function isSealedSurface(surface = {}) {
   if (typeof surface.isSealed === 'boolean') return surface.isSealed;
   const type = typeById.get(surface.areaType ?? surface.surfaceType);
   if (typeof type?.isSealed === 'boolean') return type.isSealed;
   return (surface.category ?? surface.group) === 'roof';
 }
-
 export function isCriticalSurface(surface = {}) {
   if ((surface.category ?? surface.group) === 'roof') return true;
   if (typeof surface.isNotSafelyFloodable === 'boolean') return surface.isNotSafelyFloodable;
   return isSealedSurface(surface);
 }
-
 export function automaticRainDuration(meanSlopePercent, sealedShare) {
   const slope = Math.max(0, toNumber(meanSlopePercent) || 0);
   const share = Math.min(1, Math.max(0, Number(sealedShare) || 0));
@@ -42,7 +38,6 @@ export function automaticRainDuration(meanSlopePercent, sealedShare) {
 function rainValue(state, recurrence, duration) {
   return toNumber(state[`rainR${recurrence}Duration${duration}`]);
 }
-
 function validateRainInputs(state = {}, duration = 10) {
   const required = [
     ['r(5,30)', rainValue(state, 30, 5)],
@@ -53,7 +48,6 @@ function validateRainInputs(state = {}, duration = 10) {
   ];
   return required.filter(([, value]) => !(value > 0)).map(([label]) => `${label} muss größer 0 sein.`);
 }
-
 export function resolvePipeSlopePercent(stateOrValue = {}) {
   if (stateOrValue && typeof stateOrValue === 'object') {
     const canonical = toNumber(stateOrValue.pipeSlopePercent);
@@ -64,7 +58,6 @@ export function resolvePipeSlopePercent(stateOrValue = {}) {
   const value = toNumber(stateOrValue);
   return Number.isFinite(value) && value > 0 ? value : NaN;
 }
-
 export function tableSlopePercent(value) {
   return resolvePipeSlopePercent(value);
 }
@@ -73,7 +66,6 @@ export function tableSlopeFromPermille(value) {
   const legacy = toNumber(value);
   return Number.isFinite(legacy) ? legacy / 10 : NaN;
 }
-
 export function lookupFullFlow(dn, slopePercent) {
   const slope = resolvePipeSlopePercent(slopePercent);
   const row = (hydraulicTables['1.0'] || []).find(item => Math.abs(Number(item.slope) - slope) < 1e-9);
@@ -85,7 +77,6 @@ export function lookupFullFlow(dn, slopePercent) {
   const velocityMs = crossSectionM2 > 0 ? (qFullLs / 1000) / crossSectionM2 : 0;
   return { dn, slopePercent: slope, qFullLs, velocityMs, tableReference: 'DIN 1986-100 Tabelle A.5', lookupMode: 'exact' };
 }
-
 export function sizePipe(requiredFlowLs, slopePercent) {
   const required = Number(requiredFlowLs);
   if (!(required > 0)) return null;
@@ -95,7 +86,6 @@ export function sizePipe(requiredFlowLs, slopePercent) {
   }
   return null;
 }
-
 function finiteNonNegative(rawValue) {
   const raw = Number(rawValue);
   const finite = Number.isFinite(raw);
@@ -106,7 +96,6 @@ function finiteNonNegative(rawValue) {
     valid: finite
   };
 }
-
 export function calculateFloodingEquation20({ durationMinutes, rain30, rain2, totalAreaM2, weightedCsAreaM2 } = {}) {
   const duration = Number(durationMinutes);
   const r30 = Number(rain30);
@@ -119,7 +108,6 @@ export function calculateFloodingEquation20({ durationMinutes, rain30, rain2, to
   const rawValueM3 = (r30 * totalArea - r2 * weightedCsArea) * duration * 60 / (10000 * 1000);
   return Object.freeze({ durationMinutes: duration, rain30: r30, rain2: r2, totalAreaM2: totalArea, weightedCsAreaM2: weightedCsArea, ...finiteNonNegative(rawValueM3) });
 }
-
 export function calculateFloodingEquation21({ durationMinutes, rain30, totalAreaM2, dischargeLs } = {}) {
   const duration = Number(durationMinutes);
   const r30 = Number(rain30);
@@ -131,20 +119,17 @@ export function calculateFloodingEquation21({ durationMinutes, rain30, totalArea
   const rawValueM3 = (r30 * totalArea / 10000 - qOut) * duration * 60 / 1000;
   return Object.freeze({ durationMinutes: duration, rain30: r30, totalAreaM2: totalArea, dischargeLs: qOut, ...finiteNonNegative(rawValueM3) });
 }
-
 function maxDurationResult(results = []) {
   const valid = results.filter(item => item?.valid && Number.isFinite(item.valueM3));
   if (!valid.length) return null;
   return valid.reduce((max, item) => item.valueM3 > max.valueM3 ? item : max, valid[0]);
 }
-
 function normalizeRetentionRainSeries(series = {}) {
   return Object.entries(series || {})
     .map(([duration, rain]) => ({ durationMinutes: Number(duration), rainIntensityLsHa: toNumber(rain) }))
     .filter(item => item.durationMinutes > 0 && Number.isFinite(item.rainIntensityLsHa))
     .sort((a, b) => a.durationMinutes - b.durationMinutes);
 }
-
 export function calculateDwa117Duration({ durationMinutes, rainIntensityLsHa, throttleRainShareLsHa, surchargeFactorFz, reductionFactorFa, effectiveAreaHa } = {}) {
   const duration = Number(durationMinutes);
   const rain = Number(rainIntensityLsHa);
@@ -174,7 +159,6 @@ export function calculateDwa117Duration({ durationMinutes, rainIntensityLsHa, th
     valid: Number.isFinite(rawSpecificStorageM3Ha) && Number.isFinite(rawVolumeM3)
   });
 }
-
 export function calculateDwa117SimpleProcedure({ enabled = false, dischargeMode = '', authorityLimitLs = 0, weightedCmAreaM2 = 0, dryWeatherFlowLs = 0, upstreamThrottleFlowLs = 0, surchargeFactorFz = 0, reductionFactorFa = 0, rainByDuration = {} } = {}) {
   const active = Boolean(enabled) && dischargeMode === 'authority-discharge-limit';
   const effectiveAreaHa = Number(weightedCmAreaM2) / 10000;
@@ -211,7 +195,6 @@ export function calculateDwa117SimpleProcedure({ enabled = false, dischargeMode 
     errors: Object.freeze(errors)
   });
 }
-
 export function calculate(state = {}) {
   const surfaces = Array.isArray(state.surfaces) ? state.surfaces : [];
   const validated = surfaces.map(surface => ({ surface, validation: validateSurface(surface) }));
@@ -238,7 +221,6 @@ export function calculate(state = {}) {
   const weightedCmArea = weighted('cm');
   const requiredRainFlowLs = rD2 > 0 ? rD2 * weightedCsArea / 10000 : 0;
   const slopePercent = resolvePipeSlopePercent(state);
-
   const dischargeMode = VALID_DISCHARGE_MODES.has(state.dischargeMode) ? state.dischargeMode : 'table-existing-pipe';
   let discharge = null;
   const dischargeErrors = [];
@@ -258,10 +240,8 @@ export function calculate(state = {}) {
     if (!(qLimitLs > 0)) dischargeErrors.push('Die behördliche Einleitungsbegrenzung muss größer 0 sein.');
     else discharge = { qLimitLs, qFullLs: null, velocityMs: null, tableReference: String(state.authorityReference || '').trim() || 'Behördliche Vorgabe', lookupMode: 'authority-limit', dn: null, slopePercent: null };
   }
-
   const availableFlowLs = dischargeMode === 'authority-discharge-limit' ? Number(discharge?.qLimitLs || 0) : Number(discharge?.qFullLs || 0);
   const utilizationPercent = availableFlowLs > 0 ? requiredRainFlowLs / availableFlowLs * 100 : 0;
-
   const equation20 = calculateFloodingEquation20({ durationMinutes: governingDurationMinutes, rain30: rainValue(state, 30, governingDurationMinutes), rain2: rD2, totalAreaM2: totalArea, weightedCsAreaM2: weightedCsArea });
   const equation21ByDuration = FLOODING_DURATIONS.map(durationMinutes => calculateFloodingEquation21({ durationMinutes, rain30: rainValue(state, 30, durationMinutes), totalAreaM2: totalArea, dischargeLs: availableFlowLs }));
   const equation21Governing = maxDurationResult(equation21ByDuration);
@@ -276,7 +256,6 @@ export function calculate(state = {}) {
     ...(criticalShare > 0.7 ? ['Der kritische Flächenanteil liegt über 70 %. Die zusätzliche Prüfung der Notentwässerung mit r(5,100) ist erforderlich.'] : []),
     ...(dischargeMode === 'authority-discharge-limit' ? ['Bei behördlicher Einleitungsbegrenzung ist zusätzlich der Rückhaltenachweis nach DWA-A 117 zu führen.'] : [])
   ];
-
   const retention = calculateDwa117SimpleProcedure({
     enabled: state.retentionEnabled,
     dischargeMode,
@@ -288,7 +267,6 @@ export function calculate(state = {}) {
     reductionFactorFa: toNumber(state.retentionReductionFactorFa),
     rainByDuration: state.retentionRainByDuration
   });
-
   return Object.freeze({
     status: 'flooding-verification-ready', schemaVersion: Number(state.schemaVersion || 2),
     surfaceCount: surfaces.length, validSurfaceCount: valid.length, invalidSurfaceCount: invalidCount,
@@ -314,5 +292,4 @@ export function calculate(state = {}) {
     ]
   });
 }
-
 export default calculate;

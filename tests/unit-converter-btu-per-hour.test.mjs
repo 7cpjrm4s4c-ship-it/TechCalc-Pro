@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { convert, unitCategories } from '../js/utils/units.js';
+import { convert, unitCategories } from '../js/core/data/units.js';
 import { unitsFor } from '../js/modules/unit-converter/logic.js';
 import { normalizeUnitSelection, unitConverterAllValueRows } from '../js/modules/unit-converter/results.js';
 

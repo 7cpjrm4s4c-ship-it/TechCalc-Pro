@@ -1,9 +1,9 @@
-import { createLineSectionController } from '../../platform/lineSectionController/index.js';
+import { createLineSectionController } from '../../core/runtime/index.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { fmt } from '../../utils/calculations.js';
-import { parseNumber } from '../../core/numberService.js';
+import { formatNumber, parseNumber } from '../../core/numberService.js';
 
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 function num(value) {
   return parseNumber(value, { fallback: 0 });
 }
@@ -12,7 +12,6 @@ function integerReportText(value) {
   const parsed = num(value);
   return parsed ? String(Math.round(parsed)) : '';
 }
-
 function savedPlantStats(item = {}){
   const res = item.result || {};
   return [
@@ -22,7 +21,6 @@ function savedPlantStats(item = {}){
     { label:'Enddruck pₑ', value:res.pe !== undefined ? fmt(res.pe,2) : '—', unit:res.pe !== undefined ? 'bar' : '' }
   ];
 }
-
 function savedPlantSubtitle(item = {}){
   const res = item.result || {};
   return [
@@ -31,7 +29,6 @@ function savedPlantSubtitle(item = {}){
     res.systemVolume ? `VA ${fmt(res.systemVolume,0)} l` : ''
   ].filter(Boolean).join(' · ');
 }
-
 function pressureResultRows(currentState = {}, result = {}) {
   const systemVolume = num(result.systemVolume) || num(currentState.systemVolumeL);
   const rows = [
@@ -58,7 +55,6 @@ function pressureResultRows(currentState = {}, result = {}) {
       row.unit || ''
     ]);
 }
-
 export function buildPressureRecord(currentState = {}, result = {}, items = [], id, name, existing = null){
   const copy = { ...currentState };
   delete copy.savedPlants;
@@ -90,7 +86,6 @@ export function buildPressureRecord(currentState = {}, result = {}, items = [], 
     rows: pressureResultRows(currentState, result)
   };
 }
-
 export function hydratePressureRecord(item = {}, current = {}){
   return item?.state ? {
     ...item.state,
@@ -100,7 +95,6 @@ export function hydratePressureRecord(item = {}, current = {}){
     plantName: item.name || item.state?.plantName || ''
   } : {};
 }
-
 export const pressureHoldingSavedController = createLineSectionController({
   state,
   listKey: 'savedPlants',
@@ -123,7 +117,6 @@ export const pressureHoldingSavedController = createLineSectionController({
   buildRecord: ({ currentState, result, items, id, name, existing }) => buildPressureRecord(currentState, result, items, id, name, existing),
   hydrateRecord: ({ item, currentState }) => hydratePressureRecord(item, currentState)
 });
-
 export function savedPlantsCard(s = {}){
   return pressureHoldingSavedController.renderCard(s);
 }

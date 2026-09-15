@@ -10,7 +10,7 @@ import {
 } from '../js/modules/en-378-safety-check/installationSafetyRequirements.js';
 import { calculate } from '../js/modules/en-378-safety-check/logic.js';
 import { buildEN378SafetyCheckReportDto } from '../js/modules/en-378-safety-check/reportAdapter.js';
-import { getEN378SafetyData } from '../js/utils/refrigerants/index.js';
+import { getEN378SafetyData } from '../js/core/data/refrigerants.js';
 
 const r32 = getEN378SafetyData('R-32');
 assert.deepEqual(calculateMachineryRoomEmergencyVentilationFlow(8), { flowM3s: 0.056, flowM3h: 201.6 });
@@ -23,7 +23,7 @@ const machineryRoomState = {
   chargeKg: '8',
   roomVolumeM3: '80',
   installationLocation: 'machinery-room',
-  installationClass: 'II',
+  installationClass: 'III',
   accessArea: 'authorized-access',
   accessCategory: 'c',
   usageType: 'industrial',

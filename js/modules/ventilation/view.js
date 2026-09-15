@@ -1,6 +1,6 @@
 import { card, field, segmented, renderModuleShell, stack, grid } from '../../core/renderer.js';
-import { fmtInput } from '../../utils/calculations.js';
-import { renderResultGroup, renderResultModel } from '../../platform/resultRenderer/index.js';
+import { formatNumber, parseNumber } from '../../core/numberService.js';
+import { renderResultGroup, renderResultModel } from '../../core/resultRenderer.js';
 import { airStatsRows, buildVentilationResultModel } from './results.js';
 import {
   activeCalculationState,
@@ -11,6 +11,15 @@ import {
   ventilationFormulaText,
   ventilationModeLabel
 } from './viewModel.js';
+
+function fmtInput(value, digits = 2) {
+  if (value === '' || value === null || value === undefined) return '';
+  const parsed = parseNumber(value, { fallback: 0 });
+  if (!parsed) return String(value);
+  return formatNumber(parsed, { fallback: String(value), maximumFractionDigits: digits });
+}
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 export function powerField(s) {
   const unit = activeValue(s, 'PowerUnit') || 'W';
@@ -40,14 +49,14 @@ export function derivedDeltaTField(s, active) {
 export function inputFields(s, active) {
   if (active.calcTarget === 'power') {
     return [
-      field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) }),
+      field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V˙', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) }),
       derivedDeltaTField(s, active)
     ];
   }
   if (active.calcTarget === 'volumeFlow') {
     return [powerField(s), derivedDeltaTField(s, active)];
   }
-  return [powerField(s), field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) })];
+  return [powerField(s), field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V˙', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) })];
 }
 
 export function temperatureFields(s, active) {
@@ -67,7 +76,7 @@ export function renderModeSegment(s, accent) {
 export function renderTargetSegment(s, active, accent) {
   return segmented(key(s, 'CalcTarget'), [
     { value: 'power', label: 'Q Leistung' },
-    { value: 'volumeFlow', label: 'V̇ Volumenstrom' },
+    { value: 'volumeFlow', label: 'V˙ Volumenstrom' },
     { value: 'deltaT', label: 'ΔT Temperatur' }
   ], active.calcTarget, { accent });
 }

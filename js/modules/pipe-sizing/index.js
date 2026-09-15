@@ -2,13 +2,15 @@ import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createPlatformModule, createPipeSizingDynamicRenderer } from '../../core/runtime/index.js';
 import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
-import { createPipeSizingDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
+import { formatNumber } from '../../core/numberService.js';
 import { bindPipeSizingActions, pipeSaveCard } from './controller.js';
 import { view } from './view.js';
 import { inputContent, resultContent } from './viewModel.js';
 import { buildPipeSizingResultModel } from './results.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 const typedReportAdapter = createTypedDtoReportAdapter({
   config,
@@ -20,6 +22,7 @@ const typedReportAdapter = createTypedDtoReportAdapter({
 const calculateForReport = typedReportAdapter.calculate;
 const pipeSizingDynamicRenderer = createPipeSizingDynamicRenderer({
   calculate: calculateForReport,
+  fmt,
   renderInput: inputContent,
   renderSavedPanel: pipeSaveCard,
   renderResult: resultContent

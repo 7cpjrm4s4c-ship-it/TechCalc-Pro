@@ -1,7 +1,6 @@
 import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
-import { areaTypes, dnOrder } from '../../shared/rainwaterDomainTables.js';
+import { areaTypes, dnOrder } from '../../core/data/rainwater.js';
 import { surchargeFactorFromRiskClass } from './retentionFactors.js';
-
 const KOSTRA_URL = 'https://www.openko.de';
 const splitIndex = areaTypes.findIndex(item => item.id === 'concrete-asphalt');
 const customAreaTypes = areaTypes.filter(item => item.custom);
@@ -39,7 +38,6 @@ const existingPipeMode = state => state.dischargeMode === 'table-existing-pipe';
 const manualFlowMode = state => state.dischargeMode === 'manual-full-flow';
 const authorityMode = state => state.dischargeMode === 'authority-discharge-limit';
 const retentionScopeNotice = 'Der Rückhalteraumnachweis ist bei behördlicher Einleitungsbegrenzung automatisch aktiv. n ist eine projektspezifische Bemessungsvorgabe; fz und fA werden automatisch nach DWA-A 117 bestimmt. Trockenwetterabfluss und vorgeschalteter Drosselabfluss sind nur einzutragen, wenn diese Abflüsse im konkreten Projekt vorhanden sind; andernfalls bleiben beide Werte 0 l/s.';
-
 export const floodingSurfaceSchema = defineFormSchema({
   fields: [
     { key: 'projectName', label: 'Bezeichnung', type: FIELD_TYPES.TEXT, placeholder: 'z. B. Grundstück Musterstraße 1' },
@@ -56,7 +54,6 @@ export const floodingSurfaceSchema = defineFormSchema({
     { title: 'Flächen erfassen', fields: ['surfaceCategory', 'surfaceAreaType', 'surfaceArea', 'surfaceCs', 'surfaceCm', 'rainwaterImport', 'importStatus'], columns: 2, accent: 'green' }
   ]
 });
-
 export const floodingCalculationSchema = defineFormSchema({
   fields: [
     { key: 'rainR2Duration5', label: 'r(5,2)', type: FIELD_TYPES.DECIMAL, unit: 'l/(s·ha)' },
@@ -105,6 +102,5 @@ export const floodingCalculationSchema = defineFormSchema({
     { title: 'Rückhalteraumnachweis nach DWA-A 117', fields: ['retentionRecurrenceFrequencyPerYear', 'retentionRiskClass', 'retentionFlowTimeMinutes', 'retentionAutomaticFz', 'retentionAutomaticFa', 'retentionDryWeatherFlowLs', 'retentionUpstreamThrottleFlowLs', 'retentionRainDuration5', 'retentionRainDuration10', 'retentionRainDuration15', 'retentionScopeNotice'], columns: 2, accent: 'green', visibleWhen: authorityMode }
   ]
 });
-
 export const floodingVerificationSchema = floodingCalculationSchema;
 export default floodingVerificationSchema;

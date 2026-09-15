@@ -6,7 +6,7 @@ import {
   getUnsupportedFGasesRefrigerants,
   listFGasesEN378Coverage
 } from '../js/modules/en-378-safety-check/refrigerantCoverage.js';
-import { getEN378SafetyData, listRefrigerants } from '../js/utils/refrigerants/index.js';
+import { getEN378SafetyData, listRefrigerants } from '../js/core/data/refrigerants.js';
 
 const coverage = listFGasesEN378Coverage();
 const refrigerants = listRefrigerants();

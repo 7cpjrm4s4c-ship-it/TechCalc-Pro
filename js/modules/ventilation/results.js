@@ -1,4 +1,6 @@
-import { fmt } from '../../utils/calculations.js';
+import { formatNumber } from '../../core/numberService.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 export function targetLabel(target) {
   return target === 'power' ? 'Leistung' : target === 'volumeFlow' ? 'Volumenstrom' : 'Temperaturspreizung';

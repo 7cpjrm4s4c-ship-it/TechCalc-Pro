@@ -2,10 +2,10 @@ import config from './config.js';
 import schema from './schema.js';
 import { calculate } from './logic.js';
 import { buildFGasesResultModel } from './results.js';
-import { listRefrigerants } from '../../utils/refrigerants/index.js';
+import { listRefrigerants } from '../../core/data/index.js';
 import { renderModuleShell } from '../../core/renderer.js';
 import { renderFormSchema } from '../../core/formSchema.js';
-import { renderResultModel } from '../../platform/resultRenderer/index.js';
+import { renderResultModel } from '../../core/resultRenderer.js';
 
 function schemaWithRefrigerants() {
   const options = [{ value: '', label: 'Bitte wählen' }, ...listRefrigerants().map(item => ({ value: item.id, label: item.name || item.id }))];

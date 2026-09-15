@@ -4,6 +4,8 @@ Status: minimierter historischer Nachweisbereich ab Version 1.3.3-rc.1
 
 Dieser Ordner enthält keine Audit-Rohdaten mehr. Die bisherigen Einzel-Audits wurden in das Quality Manual und die konsolidierte Audit-Historie überführt.
 
+Dauerhaft behalten wird nur kuratierte Audit- und Gate-Evidenz mit aktuellem Release-Bezug.
+
 ## Aktive Qualitätsreferenz
 
 - `docs/qm/QM-001-Quality-Manual.md`
@@ -15,6 +17,10 @@ Dieser Ordner enthält keine Audit-Rohdaten mehr. Die bisherigen Einzel-Audits w
 ## Historischer Überblick
 
 - `docs/audits/AUDIT_HISTORY.md`
+
+## Maschinenlesbare kuratierte Gate-Evidenz
+
+- `docs/audits/json/phase47-final-release-gate.json`
 
 ## Regel
 

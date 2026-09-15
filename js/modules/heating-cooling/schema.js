@@ -1,6 +1,8 @@
 import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
-import { MEDIA, fmt } from '../../utils/calculations.js';
-import { pipeSystems } from '../../utils/pipes.js';
+import { MEDIA, pipeSystems } from '../../core/data/index.js';
+import { formatNumber } from '../../core/numberService.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 const calcTargetOptions = [
   { value: 'power', label: 'Q Leistung' },

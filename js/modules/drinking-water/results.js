@@ -1,7 +1,6 @@
 import { inlineStats, esc } from '../../core/renderer.js';
-import { renderResultModel } from '../../platform/resultRenderer/index.js';
-import { fmt } from '../../utils/calculations.js';
-
+import { renderResultModel } from '../../core/resultRenderer.js';
+import { fmt } from '../../core/numbers.js';
 function hasStoredConsumers(r = {}) {
   return Boolean((r.usageUnits || []).length || (r.singleGroups || []).length || (r.rawSingles || []).length);
 }
@@ -11,17 +10,14 @@ function resultValue(r, value, digits = 2) {
 function resultUnit(r, unit = '') {
   return hasStoredConsumers(r) ? unit : '';
 }
-
 export function consumerModeSuffix(consumer = {}, waterHeatingMode = 'central') {
   if (!consumer.hotWater) return 'nur TWK';
   if (waterHeatingMode === 'decentral') return consumer.decentralizedAddon ? 'WW-Bereitung' : 'TWK + WW-Bereitung';
   return consumer.hotWaterClone ? 'TWW' : 'TWK/TWW';
 }
-
 export function consumerRows(consumers = [], waterHeatingMode = 'central') {
   return `<div class="tc-consumer-list">${consumers.map(c => `<div class="tc-consumer-row"><div><strong>${esc(c.count)} × ${esc(c.label)}</strong><span>${fmt(c.vr * c.count, 2)} l/s gesamt · ${fmt(c.vr,2)} l/s je Verbraucher · ${esc(consumerModeSuffix(c, waterHeatingMode))}${c.permanent ? ' · Dauerverbraucher' : ''}</span></div></div>`).join('')}</div>`;
 }
-
 export function selectedFixturesList(r, state = {}) {
   const aggregate = new Map();
   const add = (consumer) => {
@@ -37,7 +33,6 @@ export function selectedFixturesList(r, state = {}) {
   if (!rows.length) return `<div class="empty-state empty-state--compact">${esc(state.waterHeatingMode === 'decentral' ? 'Noch keine Einrichtungsgegenstände für die dezentrale Berechnung ausgewählt' : 'Noch keine Einrichtungsgegenstände für die zentrale Berechnung ausgewählt')}</div>`;
   return `<div class="tc-fixture-list">${rows.map(item => `<div class="tc-fixture-row"><strong>${esc(item.count)} × ${esc(item.label)}</strong>${item.permanent ? '<em>Dauerverbraucher</em>' : ''}</div>`).join('')}</div>`;
 }
-
 export function unitStats(unit = {}){
   return [
     { label:'Verbraucher', value: unit.consumerCount },
@@ -46,7 +41,6 @@ export function unitStats(unit = {}){
     { label:'Ansatz', value: unit.simultaneityFactor ? `GL ${fmt(unit.simultaneityFactor, 2)}` : '2 größte Entnahmestellen' }
   ];
 }
-
 export function singleStats(group = {}){
   const consumers = group.consumers || [];
   const count = consumers.reduce((sum, c) => sum + (Number(c.count) || 1), 0);
@@ -58,7 +52,6 @@ export function singleStats(group = {}){
     { label:'Dauerverbraucher', value: consumers.some(c => c.permanent) ? 'Ja' : 'Nein' }
   ];
 }
-
 export function buildDrinkingWaterResultModel(s = {}, r = {}, accent = 'green'){
   return {
     primary: {
@@ -105,7 +98,6 @@ export function buildDrinkingWaterResultModel(s = {}, r = {}, accent = 'green'){
     }]
   };
 }
-
 
 export function renderDrinkingWaterResultModel(model, accent = 'green'){
   return renderResultModel(model, accent);

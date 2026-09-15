@@ -1,6 +1,6 @@
 import { field, selectField, stack } from '../../core/renderer.js';
-import { renderResultModel } from '../../platform/resultRenderer/index.js';
-import { pipeSystems } from '../../utils/pipes.js';
+import { renderResultModel } from '../../core/resultRenderer.js';
+import { pipeSystems } from '../../core/data/index.js';
 import { buildPipeSizingResultModel } from './results.js';
 import { pipeSaveCard } from './controller.js';
 

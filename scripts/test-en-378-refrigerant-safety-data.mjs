@@ -6,7 +6,7 @@ import {
   getEN378SafetyData,
   listEN378SafetyData,
   listRefrigerants
-} from '../js/utils/refrigerants/index.js';
+} from '../js/core/data/refrigerants.js';
 
 const refrigerants = listRefrigerants();
 const safetyData = listEN378SafetyData();

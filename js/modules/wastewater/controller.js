@@ -3,18 +3,15 @@ import { readFieldValue, normalizeQuantityInput } from '../../core/formActions.j
 import { getFixture, toNumber } from './logic.js';
 import { usageTypes } from './tables.js';
 import { initialState } from './state.js';
-import { deleteCollectionItem, patchCollectionItem, upsertCollectionRecord } from '../../platform/collectionModel/index.js';
-import { createStateSnapshot, hydrateStateRecord } from '../../platform/savedRecordModel/index.js';
+import { deleteCollectionItem, patchCollectionItem, upsertCollectionRecord, createStateSnapshot, hydrateStateRecord } from '../../core/storage/index.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { commitAllFields } from '../../core/eventPipeline.js';
 import { PlatformScrollManager } from '../../core/scrollManager.js';
-
 const numericFields = new Set(['fixtureQuantity','fixtureCustomDu','kValue','fillRatio','slopeCmM','pipeLengthM','heightDifferenceM','bends90','continuousFlow','pumpFlow','rainFlow']);
 const normalizeNumeric = value => canonicalGermanNumberInput(value);
 const normalizedFixtureQuantity = value => Math.max(0, Math.round(normalizeQuantityInput(value, 1)) || 0);
 const fixtureKeyFields = ['typeId', 'customName', 'customDu', 'customDn'];
-
 function draftFromRoot(root, current = {}) {
   const typeId = readFieldValue(root, 'fixtureType', current.fixtureType || 'washbasin');
   const base = getFixture(typeId);
@@ -27,7 +24,6 @@ function draftFromRoot(root, current = {}) {
   }
   return record;
 }
-
 function addFixture({ current = {}, root } = {}) {
   const record = draftFromRoot(root, current);
   if (normalizedFixtureQuantity(record.quantity) <= 0) return {};
@@ -42,7 +38,6 @@ function addFixture({ current = {}, root } = {}) {
     fixtureCustomDn: ''
   };
 }
-
 function patchFixtureQuantity({ id, value, current = {} } = {}) {
   return { fixtures: patchCollectionItem(current.fixtures || [], id, { quantity: String(normalizedFixtureQuantity(value)) }) };
 }
@@ -50,7 +45,6 @@ function patchFixtureQuantity({ id, value, current = {} } = {}) {
 function deleteFixture({ id, current = {} } = {}) {
   return { fixtures: deleteCollectionItem(current.fixtures || [], id) };
 }
-
 export function snapshot(current = {}, result = {}) {
   return createStateSnapshot({
     current,
@@ -60,7 +54,6 @@ export function snapshot(current = {}, result = {}) {
     resultMapper: output => ({ qtot: output.qtot, qww: output.qww, sumDu: output.sumDu, dn: output.selected?.dn, lineType: current.lineType })
   });
 }
-
 export function hydrate(item = {}, current = {}) {
   const patch = hydrateStateRecord(item, { activeIdKey: 'activeCalculationId', nameKey: 'name' });
   return { ...patch, savedCalculations: current.savedCalculations || [] };
@@ -69,7 +62,6 @@ export function hydrate(item = {}, current = {}) {
 export function clear(current = {}) {
   return { ...initialState, savedCalculations: current.savedCalculations || [] };
 }
-
 export function wastewaterSavedStats(item = {}) {
   const result = item.result || {};
   return [
@@ -79,16 +71,14 @@ export function wastewaterSavedStats(item = {}) {
     { label: 'Dimension', value: result.dn || '—' }
   ];
 }
-
 export function wastewaterSavedSubtitle(item = {}) {
   const result = item.result || {};
   return [result.qtot !== undefined ? `${String(result.qtot).replace('.', ',')} l/s` : '', result.dn, result.lineType].filter(Boolean).join(' · ');
 }
-
 const LINE_TYPE_LABELS = Object.freeze({
-  'single-unvented': 'Einzelanschluss unbeflüftet',
+  'single-unvented': 'Einzelanschluss unbelüftet',
   'single-vented': 'Einzelanschluss belüftet',
-  'branch-unvented': 'Anschlussleitung unbeflüftet',
+  'branch-unvented': 'Anschlussleitung unbelüftet',
   'branch-vented': 'Anschlussleitung belüftet',
   stack: 'Fallleitung',
   collector: 'Sammelleitung',
@@ -126,7 +116,6 @@ function positiveRow(label, value, unit = '', digits = 2) {
 function lineTypeLabel(value) {
   return LINE_TYPE_LABELS[value] || value || '—';
 }
-
 function usageTypeLabel(current = {}) {
   const usage = usageTypes.find(item => item.value === current.usageType);
   return usage?.label || (current.usageType === 'custom' ? 'Benutzerdefinierte Abflusskennzahl' : '—');
@@ -140,7 +129,6 @@ function fixtureSummary(item = {}) {
     `Mindestnennweite ${item.dn || '—'}`
   ].join(' · ');
 }
-
 function fixtureDisplayRows(fixtures = []) {
   if (!fixtures.length) return [['Einrichtungsgegenstände', 'keine Gegenstände erfasst', '']];
   return fixtures.map((item, index) => [
@@ -149,11 +137,9 @@ function fixtureDisplayRows(fixtures = []) {
     ''
   ]);
 }
-
 function calculationApproach(result = {}) {
   return `Schmutzwasserabfluss Qww = K × Wurzel(Summe DU) = ${displayNumber(result.k, 2)} × Wurzel(${displayNumber(result.sumDu, 2)}) = ${displayNumber(result.qww, 2)} l/s; Gesamtabfluss Qtot = Qww + Qc + Qp + Qr,a = ${displayNumber(result.qtot, 2)} l/s`;
 }
-
 function wastewaterReportRows(current = {}, result = {}) {
   const baseRows = [
     ['Nutzungsart', usageTypeLabel(current), ''],
@@ -165,7 +151,6 @@ function wastewaterReportRows(current = {}, result = {}) {
   baseRows.push(row('Gefälle', current.slopeCmM, 'cm/m', 2));
   if (['single-unvented','single-vented','branch-unvented'].includes(current.lineType)) baseRows.push(row('Rohrlänge', current.pipeLengthM, 'm', 2));
   if (['single-unvented','branch-unvented','branch-vented'].includes(current.lineType)) baseRows.push(row('90°-Umlenkungen', current.bends90, 'Stk.', 0));
-
   const resultRows = [
     row('Summe Anschlusswerte', result.sumDu, 'DU', 2),
     row('Größter Einzelanschlusswert', result.largestDu, 'DU', 2),
@@ -183,7 +168,6 @@ function wastewaterReportRows(current = {}, result = {}) {
   if (Array.isArray(result.warnings) && result.warnings.length) {
     resultRows.push(['Hinweise', result.warnings.join(' · '), '']);
   }
-
   return [
     ...baseRows,
     ['Bezeichnung', 'Einrichtungsgegenstände', ''],
@@ -192,7 +176,6 @@ function wastewaterReportRows(current = {}, result = {}) {
     ...resultRows
   ].filter(Boolean);
 }
-
 export function buildWastewaterRecord(currentState = {}, result = {}, items = [], id, name, existing = null) {
   const record = snapshot({ ...currentState, activeCalculationId: null, name }, result);
   return {
@@ -212,7 +195,6 @@ export function buildWastewaterRecord(currentState = {}, result = {}, items = []
     updatedAt: new Date().toISOString()
   };
 }
-
 export function bindWastewaterCollections(root) {
   if (!root || !state?.set) return;
   const collectionConfig = {
@@ -280,7 +262,6 @@ export function bindWastewaterCollections(root) {
     root.addEventListener('pointerdown', direct, true);
   }
 }
-
 const structuralFields = new Set([
   'usageType',
   'lineType',
@@ -292,7 +273,6 @@ export function isDynamicWastewaterAction(meta = {}) {
   const action = String(meta.action || '');
   return action !== 'initial';
 }
-
 export default {
   lookupHydration: {
     key: 'platform:lookup-hydration',

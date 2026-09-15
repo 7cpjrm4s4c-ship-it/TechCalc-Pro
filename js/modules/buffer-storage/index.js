@@ -2,7 +2,7 @@ import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createPlatformModule } from '../../core/runtime/index.js';
 import { buildGenericModuleReportDto, createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
 import { bindBufferStorageActions, buildBufferRecord } from './controller.js';
 import { buildBufferStorageResultModel } from './results.js';

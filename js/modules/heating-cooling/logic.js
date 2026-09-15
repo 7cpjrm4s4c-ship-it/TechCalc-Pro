@@ -1,5 +1,4 @@
-import { heatingCooling } from '../../utils/calculations.js';
-import { recommendPipe } from '../../utils/pipes.js';
+import { heatingCooling, recommendPipe } from '../../core/data/index.js';
 export function calculate(s){
   const result = heatingCooling(s);
   return {

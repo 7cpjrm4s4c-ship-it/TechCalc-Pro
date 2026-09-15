@@ -1,10 +1,12 @@
-import { MEDIA, fmt, fmtInput } from '../../utils/calculations.js';
-import { pipeSystems } from '../../utils/pipes.js';
+import { MEDIA, pipeSystems } from '../../core/data/index.js';
+import { formatNumber, parseNumber } from '../../core/numberService.js';
 import { card, selectField, segmented, renderModuleShell, stack, grid } from '../../core/renderer.js';
-import { renderResultModel, renderResultTable, renderRecommendationCard } from '../../platform/resultRenderer/index.js';
+import { renderRecommendationCard, renderResultModel, renderResultTable } from '../../core/resultRenderer.js';
 import { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRows } from './results.js';
 import { activeCalculationState, key } from './controller.js';
 import { inputFields } from './viewModel.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 export function createHeatingCoolingView({ config, calculate, lineSectionController }) {
   if (!config) throw new Error('createHeatingCoolingView requires config');

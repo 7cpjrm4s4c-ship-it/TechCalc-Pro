@@ -1,5 +1,7 @@
-import { fmt } from '../../utils/calculations.js';
+import { formatNumber } from '../../core/numberService.js';
 import { esc } from '../../core/renderer.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 export function pipeSizingPrimary(r = {}) {
   if (!r) return null;
@@ -32,14 +34,13 @@ export function pipeDimensionRows(r = {}) {
   return [r.smaller, r, r.larger].filter(Boolean).map(item => {
     const isRecommended = item.dn === r.dn;
     const label = isRecommended ? 'Empfohlen' : (item.dn < r.dn ? 'Eine DN kleiner' : 'Eine DN größer');
-    const dimension = item.dimension ? `Ø ${item.dimension} mm` : `di ${fmt(item.di, 1)} mm`;
+    const dimension = item.dimension ? `dØ ${item.dimension} mm` : `di ${fmt(item.di, 1)} mm`;
     return {
       label: `${label} · DN ${item.dn}`,
       value: `${dimension} · v ${fmt(item.velocity)} m/s · Δp ${fmt(item.pressureLoss)} Pa/m`
     };
   });
 }
-
 
 export function pipeDimensionCardsHtml(r = {}) {
   if (!r || r.noDimension) return '';
@@ -51,7 +52,7 @@ export function pipeDimensionCardsHtml(r = {}) {
     const key = item.rating?.key || (ratio < 0.75 ? 'green' : ratio <= 1 ? 'yellow' : 'red');
     const isRecommended = item.dn === r.dn;
     const label = isRecommended ? 'Empfohlen' : (item.dn < r.dn ? 'Eine DN kleiner' : 'Eine DN größer');
-    const dimension = item.dimension ? `Ø ${item.dimension} mm` : `di ${fmt(item.di, 1)} mm`;
+    const dimension = item.dimension ? `dØ ${item.dimension} mm` : `di ${fmt(item.di, 1)} mm`;
     return `<div class="pipe-dimension-card pipe-dimension-card--${esc(key)}${isRecommended ? ' is-recommended' : ''}">
       <div class="pipe-dimension-card__head"><span>${esc(label)}</span>${isRecommended ? '<small>★</small>' : ''}</div>
       <strong>DN ${esc(item.dn)}</strong>

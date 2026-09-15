@@ -1,7 +1,10 @@
 import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
-import { fmt, fmtInput } from '../../utils/calculations.js';
+import { formatNumber, toInputNumber } from '../../core/numberService.js';
 import { toNumber } from './logic.js';
 import { areaTypes, roofDrainTable } from './tables.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
+const fmtInput = (value, digits = 1) => toInputNumber(value, { maximumFractionDigits: digits });
 
 const KOSTRA_URL = 'https://www.openko.de';
 const splitIndex = areaTypes.findIndex(item => item.id === 'concrete-asphalt');

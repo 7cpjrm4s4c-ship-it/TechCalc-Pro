@@ -2,11 +2,9 @@ import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { fmtInput } from '../../utils/calculations.js';
-import { createLineSectionController } from '../../platform/lineSectionController/index.js';
-import { createHeatingCoolingDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
-import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createHeatingCoolingDynamicRenderer, createLineSectionController, createPlatformModule } from '../../core/runtime/index.js';
 import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
+import { formatNumber, parseNumber } from '../../core/numberService.js';
 import { createHeatingCoolingView } from './view.js';
 import { buildHeatingCoolingReportDto } from './reportAdapter.js';
 import {
@@ -20,6 +18,13 @@ import {
   lineSectionStats,
   prefixFor
 } from './controller.js';
+
+function fmtInput(value, digits = 2) {
+  if (value === '' || value === null || value === undefined) return '';
+  const parsed = parseNumber(value, { fallback: 0 });
+  if (!parsed) return String(value);
+  return formatNumber(parsed, { fallback: String(value), maximumFractionDigits: digits });
+}
 
 const typedReportAdapter = createTypedDtoReportAdapter({
   config,

@@ -1,6 +1,5 @@
 import { formatEngineeringNumber } from '../numberService.js';
-import { areaTypes } from '../../shared/rainwaterDomainTables.js';
-
+import { areaTypes } from '../data/rainwater.js';
 const array = value => Array.isArray(value) ? value : [];
 const object = value => value && typeof value === 'object' && !Array.isArray(value) ? value : {};
 const text = value => value == null || value === '' ? '—' : String(value);
@@ -9,7 +8,6 @@ const fmt = (value, kind = 'generic', options = {}) => value == null || value ==
   : formatEngineeringNumber(value, kind, options);
 const row = (label, value, unit = '') => [label, text(value), unit];
 const numericRow = (label, value, kind, unit = '') => [label, fmt(value, kind), value == null || value === '' ? '' : unit];
-
 const ENUM_LABELS = Object.freeze({
   complete: 'vollständig',
   incomplete: 'unvollständig',
@@ -22,7 +20,6 @@ const ENUM_LABELS = Object.freeze({
   local: 'manuelle Eingabe im Überflutungsnachweis',
   rainwater: 'Übernahme aus dem Regenwassermodul'
 });
-
 const SURFACE_TYPE_LABELS = Object.freeze({
   ...Object.fromEntries(areaTypes.map(areaType => [areaType.id, areaType.name])),
   'green-extensive-flat': 'Extensivbegrünung ≤ 5°',
@@ -36,7 +33,6 @@ function label(value, dictionary = ENUM_LABELS) {
   const key = String(value ?? '').trim();
   return dictionary[key] || key || '—';
 }
-
 function localDateTime(value) {
   if (!value) return '—';
   const date = new Date(value);
@@ -46,7 +42,6 @@ function localDateTime(value) {
     timeStyle: 'medium'
   }).format(date);
 }
-
 function summarySection(dto) {
   const summary = object(dto.summary);
   return {
@@ -62,7 +57,6 @@ function summarySection(dto) {
     ]
   };
 }
-
 function interpretationSection(dto) {
   const interpretation = object(dto.interpretation);
   return {
@@ -76,7 +70,6 @@ function interpretationSection(dto) {
     ]
   };
 }
-
 function projectReferenceSection(dto) {
   const project = object(dto.projectReference);
   return {
@@ -90,7 +83,6 @@ function projectReferenceSection(dto) {
     ]
   };
 }
-
 function surfaceSummary(surface) {
   const type = label(surface.areaType || surface.category || 'Fläche', SURFACE_TYPE_LABELS);
   const source = surface.imported ? 'Übernahme aus dem Regenwassermodul' : label(surface.source || 'local');
@@ -104,7 +96,6 @@ function surfaceSummary(surface) {
   ];
   return details.join(' · ');
 }
-
 function surfacesSection(dto) {
   const surfaces = array(dto.surfaces);
   return {
@@ -114,7 +105,6 @@ function surfacesSection(dto) {
       : [row('Status', 'Keine Flächen vorhanden')]
   };
 }
-
 function rainfallSection(dto) {
   const rainfall = object(dto.rainfall);
   const rows = [
@@ -135,7 +125,6 @@ function rainfallSection(dto) {
   rows.push(numericRow('r(5,100)', object(rainfall.r100ByDuration)[5], 'rainIntensity', 'l/(s·ha)'));
   return { title: '5. Regendaten und Berechnungsgrundlagen', rows };
 }
-
 function hydraulicsSection(dto) {
   const hydraulics = object(dto.hydraulics);
   return {
@@ -153,7 +142,6 @@ function hydraulicsSection(dto) {
     ]
   };
 }
-
 function dinSections(dto) {
   const verification = object(dto.floodingVerification);
   const equation20 = object(verification.equation20);
@@ -188,7 +176,6 @@ function dinSections(dto) {
   };
   return [eq20, eq21];
 }
-
 function retentionSections(dto) {
   const retention = object(dto.retentionVerification);
   const governing = object(retention.governing);
@@ -222,7 +209,6 @@ function retentionSections(dto) {
   };
   return [parameters, comparison];
 }
-
 function diagnosticsSection(dto) {
   const diagnostics = object(dto.diagnostics);
   const counts = object(diagnostics.counts);
@@ -243,7 +229,6 @@ function diagnosticsSection(dto) {
     ]
   };
 }
-
 function sourcesSection(dto) {
   const metadata = object(dto.metadata);
   const sources = array(dto.sources);
@@ -260,7 +245,6 @@ function sourcesSection(dto) {
     ]
   };
 }
-
 export function buildFloodingReportSections(dto = {}) {
   if (object(dto.metadata).dtoType !== 'techcalc.flooding-verification.report') return [];
   return [
@@ -276,5 +260,4 @@ export function buildFloodingReportSections(dto = {}) {
     sourcesSection(dto)
   ].map(section => ({ ...section, isLineSection: false }));
 }
-
 export default buildFloodingReportSections;

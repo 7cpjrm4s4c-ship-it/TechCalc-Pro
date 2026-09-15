@@ -1,7 +1,7 @@
-import { parseNumber } from '../../core/numberService.js';
-import { fmt } from '../../utils/calculations.js';
+import { formatNumber, parseNumber } from '../../core/numberService.js';
 
 const MODE_PREFIX = { heating: 'heating', cooling: 'cooling' };
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 export function prefixFor(s = {}) { return MODE_PREFIX[s.mode] || 'heating'; }
 export function key(s = {}, name) { return `${prefixFor(s)}${name}`; }
@@ -124,5 +124,5 @@ export function ventilationModeLabel(s = {}) {
 }
 
 export function ventilationFormulaText(r = {}) {
-  return `Q = V̇ × (ρ × cₚ / 3,6) × ΔT / 1000 · Wärmewert = ${fmt(r.factor, 3)} Wh/(m³·K)`;
+  return `Q = V˙ × (ρ × cₚ / 3,6) × ΔT / 1000 · Wärmewert = ${fmt(r.factor, 3)} Wh/(m³·K)`;
 }

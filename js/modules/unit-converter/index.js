@@ -2,14 +2,15 @@ import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createPlatformModule, createUnitConverterDynamicRenderer } from '../../core/runtime/index.js';
 import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
-import { createUnitConverterDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
-import { fmt } from '../../utils/calculations.js';
+import { formatNumber } from '../../core/numberService.js';
 import { normalizeUnitSelection, buildUnitConverterResultModel } from './results.js';
 import { conversionContent, resultContent } from './viewModel.js';
 import { view } from './view.js';
 import controller from './controller.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 const typedReportAdapter = createTypedDtoReportAdapter({
   config,

@@ -1,8 +1,10 @@
-import { createLineSectionController } from '../../platform/lineSectionController/index.js';
+import { createLineSectionController } from '../../core/runtime/index.js';
 import { toggleNumericSign } from '../../core/renderer.js';
-import { fmt } from '../../utils/calculations.js';
+import { formatNumber } from '../../core/numberService.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 
 const MIXED_AIR_INPUT_FIELDS = [
   'mixingOutdoorVolumeFlowM3h',

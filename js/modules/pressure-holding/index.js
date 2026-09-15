@@ -2,10 +2,9 @@ import config from './config.js';
 import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { createPlatformModule } from '../../platform/moduleRuntime/index.js';
+import { createPlatformModule, createPressureHoldingDynamicRenderer } from '../../core/runtime/index.js';
 import { buildGenericModuleReportDto, createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
-import { createPressureHoldingDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
-import { fmtInput } from '../../utils/calculations.js';
+import { formatNumber, parseNumber } from '../../core/numberService.js';
 import { bindPressureHoldingActions, buildPressureRecord, savedPlantsCard } from './controller.js';
 import { buildPressureHoldingResultModel } from './results.js';
 import { view } from './view.js';
@@ -17,6 +16,12 @@ import {
   resultContent
 } from './viewModel.js';
 
+function fmtInput(value, digits = 2) {
+  if (value === '' || value === null || value === undefined) return '';
+  const parsed = parseNumber(value, { fallback: 0 });
+  if (!parsed) return String(value);
+  return formatNumber(parsed, { fallback: String(value), maximumFractionDigits: digits });
+}
 function normalizeSavedPressurePlants(snapshot = {}) {
   const savedPlants = Array.isArray(snapshot.savedPlants) ? snapshot.savedPlants : [];
   if (!savedPlants.length) return snapshot;
@@ -37,14 +42,12 @@ function normalizeSavedPressurePlants(snapshot = {}) {
     })
   };
 }
-
 function buildPressureHoldingReportDto(context = {}) {
   return buildGenericModuleReportDto({
     ...context,
     state: normalizeSavedPressurePlants(context.state)
   });
 }
-
 const typedReportAdapter = createTypedDtoReportAdapter({
   config,
   schema,
@@ -64,7 +67,6 @@ const pressureHoldingDynamicRenderer = createPressureHoldingDynamicRenderer({
   renderSavedPanel: savedPlantsCard,
   renderResult: resultContent
 });
-
 function renderTypedView(snapshot) {
   calculateForReport(snapshot);
   return view(snapshot);
@@ -76,7 +78,6 @@ function updatePressureHoldingDynamic(root, snapshot, meta = {}) {
 function isDynamicPressureHoldingAction(meta = {}) {
   return String(meta.action || '') !== 'initial';
 }
-
 export default createPlatformModule({
   config,
   schema,

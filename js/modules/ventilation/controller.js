@@ -1,6 +1,5 @@
-import { createLineSectionController } from '../../platform/lineSectionController/index.js';
-import { createVentilationDynamicRenderer } from '../../platform/dynamicRenderer/index.js';
-import { fmtInput } from '../../utils/calculations.js';
+import { createLineSectionController, createVentilationDynamicRenderer } from '../../core/runtime/index.js';
+import { formatNumber, parseNumber } from '../../core/numberService.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import {
@@ -21,6 +20,13 @@ import {
   temperatureFields
 } from './view.js';
 import { grid } from '../../core/renderer.js';
+
+function fmtInput(value, digits = 2) {
+  if (value === '' || value === null || value === undefined) return '';
+  const parsed = parseNumber(value, { fallback: 0 });
+  if (!parsed) return String(value);
+  return formatNumber(parsed, { fallback: String(value), maximumFractionDigits: digits });
+}
 
 export const ventilationLineSectionController = createLineSectionController({
   state,

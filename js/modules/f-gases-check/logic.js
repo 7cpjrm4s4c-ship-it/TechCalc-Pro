@@ -1,5 +1,4 @@
-import { createRegulatoryContext, evaluateRegulations, getDataStatus, getDataVersions, getGwp, getRefrigerant, listRegulations } from '../../utils/refrigerants/index.js';
-
+import { createRegulatoryContext, evaluateRegulations, getDataStatus, getDataVersions, getGwp, getRefrigerant, listRegulations } from '../../core/data/index.js';
 const LIFECYCLE_ACTIVITIES = Object.freeze(['installation', 'maintenance', 'repair', 'leak-check', 'recovery', 'decommissioning']);
 const SERVICE_ORIGINS = Object.freeze(['new', 'reclaimed', 'recycled']);
 const finiteNumber = value => {

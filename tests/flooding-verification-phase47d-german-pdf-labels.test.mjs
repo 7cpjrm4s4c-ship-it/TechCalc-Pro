@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { surfaceTypeLabel } from '../js/core/pdf/authorityTables.js';
-import { areaTypes } from '../js/shared/rainwaterDomainTables.js';
+import { areaTypes } from '../js/core/data/rainwater.js';
 
 for (const areaType of areaTypes) {
   assert.equal(
