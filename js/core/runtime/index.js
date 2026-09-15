@@ -7,7 +7,7 @@ export * from '../platformModuleRuntime.js';
 export * from '../registry.js';
 export * from '../router.js';
 export * from '../schemaModuleMount.js';
-export { createLineSectionController } from '../../platform/lineSectionController/index.js';
+export { createLineSectionController } from '../lineSectionController/index.js';
 export {
   createBufferStorageDynamicRenderer,
   createHeatingCoolingDynamicRenderer,

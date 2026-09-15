@@ -70,6 +70,7 @@ const ASSETS = [
   './js/core/hvacAir.js',
   './js/core/hvacAirResults.js',
   './js/core/index.js',
+  './js/core/lineSectionController/index.js',
   './js/core/logger.js',
   './js/core/moduleContract.js',
   './js/core/moduleDefinition.js',
