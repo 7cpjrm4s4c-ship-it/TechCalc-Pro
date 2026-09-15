@@ -8,6 +8,7 @@ const allowedInnerHtmlFiles = new Set([
   'js/core/domUpdate.js',
   'js/core/moduleRuntime.js',
   'js/core/navigation.js',
+  'js/core/platformModuleRuntime.js',
   'js/modules/drinking-water/dynamicRenderer.js',
   'js/modules/heat-recovery/dynamicRenderer.js',
   'js/modules/hx-diagram/renderPipeline.js',
