@@ -8,10 +8,9 @@ import { createSavedRecord, savedRecordReducer } from '../../core/savedRecordCon
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
 import { preserveScroll as keepScroll, preserveSavedRecordMutation, PlatformScrollManager } from '../../core/scrollManager.js';
 import { PlatformFocusManager } from '../../core/focusManager.js';
-import { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved, renderPlatformSaved } from '../moduleRenderer/index.js';
+import { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved, renderPlatformSaved } from '../../core/moduleRenderer.js';
 import { getRenderScheduler } from '../../core/renderScheduler.js';
 import { startPerformanceSpan } from '../shell/performanceController.js';
-
 const noop = () => {};
 const asFn = value => typeof value === 'function' ? value : noop;
 const array = value => Array.isArray(value) ? value : [];
@@ -26,7 +25,6 @@ function preservePlatformUx(root, action, options = {}) {
   });
   return PlatformFocusManager.preserveFocusDuring(root || document, run, { restoreFocus: true });
 }
-
 function createNormalizedState(state, fields = []) {
   const numericFields = Array.isArray(fields) ? fields : [];
   if (!numericFields.length || !state?.set) return state;
@@ -57,7 +55,6 @@ export function normalizeConfiguredFields(patch = {}, fields = []) {
     return acc;
   }, {});
 }
-
 function setSegmentVisual(root, field, value) {
   root?.querySelectorAll?.(`[data-segment="${field}"]`)?.forEach(button => {
     const active = String(button.dataset.value) === String(value);
@@ -65,7 +62,6 @@ function setSegmentVisual(root, field, value) {
     button.setAttribute('aria-selected', String(active));
   });
 }
-
 function patchFieldDomValue(root, field, value) {
   const el = root?.querySelector?.(`[data-field="${field}"]`);
   if (!el) return;
@@ -77,7 +73,6 @@ function patchFieldDomValues(root, patch = {}, fields = []) {
   const targetFields = fields.length ? fields : Object.keys(patch || {});
   targetFields.forEach(field => patchFieldDomValue(root, field, patch[field]));
 }
-
 function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
   const fields = segmentConfig.fields || {};
   const handlers = {};
@@ -275,7 +270,6 @@ function findInside(root, target, selector) {
   const element = target?.closest?.(selector);
   return element && root?.contains?.(element) ? element : null;
 }
-
 function readRecordIdFromElement(element, attrs = {}) {
   const loadAttr = attrs.loadAttr || 'data-line-select';
   const toggleAttr = attrs.toggleAttr || 'data-line-toggle';
@@ -288,7 +282,6 @@ function readRecordIdFromElement(element, attrs = {}) {
     || carrier?.dataset?.savedRecordId
     || '';
 }
-
 function bindSavedRecords(root, state, calculate, savedConfig = {}) {
   if (!savedConfig.enabled) return {};
   const attrs = savedConfig.attrs || {};
@@ -399,7 +392,6 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     'saved:toggle': toggle
   };
 }
-
 function mountDynamicPlatformModule(root, state, view, bind, dynamicUpdate, isDynamicAction = () => true) {
   if (!root) return () => {};
   const mountToken = root?.dataset?.renderToken || '';
@@ -504,7 +496,6 @@ export function createPlatformModule(definition = {}) {
   function view(snapshot) {
     return renderPlatformModuleView(buildRenderModel(snapshot));
   }
-
   function updateDynamicIslands(root, meta = {}) {
     if (!root) return false;
     const finishDynamic = startPerformanceSpan('dynamic-render', { action: meta?.action || 'dynamic', mode: 'platform', reason: meta?.reason || '', changed: meta?.changed || [] });
@@ -545,7 +536,6 @@ export function createPlatformModule(definition = {}) {
     });
     return true;
   }
-
   function bindPlatformActions(root) {
     const dynamicUpdate = meta => updateDynamicIslands(root, meta);
     const actions = {
