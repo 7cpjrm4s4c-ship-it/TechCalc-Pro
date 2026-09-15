@@ -14,9 +14,7 @@ const allowedInnerHtmlFiles = new Set([
   'js/modules/heat-recovery/dynamicRenderer.js',
   'js/modules/hx-diagram/renderPipeline.js',
   'js/modules/mixed-air/dynamicRenderer.js',
-  'js/platform/dynamicRenderer/index.js',
   'js/platform/lineSectionController/index.js',
-  'js/platform/moduleRuntime/index.js',
   'js/platform/shell/releaseNotesController.js',
   'js/platform/shell/serviceWorkerController.js'
 ]);

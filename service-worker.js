@@ -314,7 +314,6 @@ const ASSETS = [
   './js/modules/wastewater/view.js',
   './js/modules/wastewater/viewModel.js',
   './js/platform/collectionModel/index.js',
-  './js/platform/dynamicRenderer/index.js',
   './js/platform/lineSectionController/index.js',
   './js/platform/savedRecordModel/index.js',
   './js/platform/shell/feedbackController.js',
