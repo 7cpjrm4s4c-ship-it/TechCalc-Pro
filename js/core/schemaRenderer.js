@@ -1,7 +1,6 @@
 import { esc, card, grid, resultRows, segmented, inlineStats } from './renderer.js';
-import { renderCollection as renderPlatformCollection } from '../platform/collectionRenderer/index.js';
+import { renderCollection as renderPlatformCollection } from './collectionRenderer.js';
 import { numberService } from './numberService.js';
-
 
 const FIELD_TYPES = Object.freeze({
   TEXT: 'text',
@@ -23,13 +22,11 @@ const FIELD_TYPE_TO_INPUTMODE = Object.freeze({
   [FIELD_TYPES.DECIMAL]: 'decimal',
   [FIELD_TYPES.TEXT]: 'text'
 });
-
 function isVisible(def, state = {}) {
   if (typeof def.visibleWhen === 'function') return Boolean(def.visibleWhen(state));
   if (!def.visibleWhen || typeof def.visibleWhen !== 'object') return true;
   return Object.entries(def.visibleWhen).every(([key, expected]) => state?.[key] === expected);
 }
-
 function fieldValue(def, state = {}) {
   const raw = state?.[def.key] ?? def.default ?? '';
   if (typeof def.format === 'function') return def.format(raw, state);
@@ -40,7 +37,6 @@ function fieldValue(def, state = {}) {
 function resolve(value, state = {}, fallback = undefined) {
   return typeof value === 'function' ? value(state) : value ?? fallback;
 }
-
 function optionLabel(option = {}) {
   return option.label ?? option.name ?? option.value ?? '';
 }
@@ -56,14 +52,12 @@ function fieldOptions(def, state = {}) {
 function fieldUnit(def, state = {}) {
   return resolve(def.unit, state, '');
 }
-
 function attrs(attributes = {}) {
   return Object.entries(attributes || {})
     .filter(([, value]) => value !== false && value !== undefined && value !== null)
     .map(([key, value]) => value === true ? ` ${esc(key)}` : ` ${esc(key)}="${esc(value)}"`)
     .join('');
 }
-
 function renderSelect(def, state = {}) {
   const value = String(state?.[def.key] ?? def.default ?? '');
   const options = fieldOptions(def, state).map(option => {
@@ -80,23 +74,19 @@ function renderSelect(def, state = {}) {
   });
   return `<div class="field tc-field" data-schema-field-wrapper="${esc(def.key)}"><label for="${esc(def.key)}">${esc(fieldLabel(def, state))}</label><div class="control"><select id="${esc(def.key)}"${extra}>${options}</select></div></div>`;
 }
-
 function renderSegment(def, state = {}) {
   const value = resolve(def.value, state, state?.[def.key] ?? def.default ?? '');
   return `<div class="field field--segment tc-field" data-schema-field-wrapper="${esc(def.key)}"><label>${esc(fieldLabel(def, state))}</label>${segmented(def.key, fieldOptions(def, state), value, { accent: def.accent, action: def.action })}</div>`;
 }
-
 function renderReadonly(def, state = {}) {
   const value = typeof def.value === 'function' ? def.value(state) : fieldValue(def, state);
   const unit = fieldUnit(def, state);
   return `<div class="field field--readonly tc-field" data-schema-field-wrapper="${esc(def.key)}"><label>${esc(fieldLabel(def, state))}</label><div class="control"><output data-schema-output="${esc(def.key)}">${esc(value || '—')}</output>${unit ? `<span class="unit">${esc(unit)}</span>` : ''}</div></div>`;
 }
-
 function renderBoolean(def, state = {}) {
   const checked = Boolean(state?.[def.key] ?? def.default);
   return `<div class="field field--boolean tc-field" data-schema-field-wrapper="${esc(def.key)}"><label class="tc-checkbox"><input type="checkbox" data-field="${esc(def.key)}" data-schema-field="${esc(def.key)}" data-commit="immediate" ${checked ? 'checked' : ''}> <span>${esc(fieldLabel(def, state))}</span></label></div>`;
 }
-
 
 function renderNotice(def, state = {}) {
   const text = resolve(def.text, state, '');
@@ -105,7 +95,6 @@ function renderNotice(def, state = {}) {
   const modifier = tone ? ` empty-state--${esc(tone)}` : '';
   return `<div class="empty-state${modifier}" data-schema-notice="${esc(def.key)}">${esc(text)}</div>`;
 }
-
 function renderStats(def, state = {}) {
   const items = resolve(def.items, state, []) || [];
   if (!items.length) return '';
@@ -115,7 +104,6 @@ function renderStats(def, state = {}) {
     unit: resolve(item.unit, state, '')
   })));
 }
-
 function renderGroupAction(action = {}, state = {}) {
   const href = resolve(action.href, state, '');
   const label = resolve(action.label, state, '');
@@ -126,12 +114,10 @@ function renderGroupAction(action = {}, state = {}) {
     .join(' ');
   return `<a class="${esc(classes)}" href="${esc(href)}" target="${action.target ? esc(action.target) : '_blank'}" rel="${esc(action.rel || 'noopener')}">${esc(label)}</a>`;
 }
-
 function renderGroupActions(group = {}, state = {}) {
   const actions = Array.isArray(group.actions) ? group.actions : [];
   return actions.map(action => renderGroupAction(action, state)).filter(Boolean).join('');
 }
-
 
 function renderAction(def, state = {}) {
   const label = resolve(def.text || def.buttonLabel || def.label, state, 'Ausführen');
@@ -144,12 +130,10 @@ function renderAction(def, state = {}) {
   });
   return `<div class="tc-action-row" data-schema-action="${esc(def.key)}"><button type="button" class="action-button action-button--${esc(variant)}"${extra} ${disabled ? 'disabled' : ''}>${esc(label)}</button></div>`;
 }
-
 function renderCollection(def, state = {}, context = {}) {
   // Phase 17B.1 contract: renderPlatformCollection(def, state)
   return renderPlatformCollection(def, state, context);
 }
-
 
 function renderInput(def, state = {}) {
   const type = def.htmlType || 'text';
@@ -169,7 +153,6 @@ function renderInput(def, state = {}) {
   });
   return `<div class="field tc-field" data-schema-field-wrapper="${esc(def.key)}"><label for="${esc(def.key)}">${esc(fieldLabel(def, state))}</label><div class="control"><input id="${esc(def.key)}" type="${esc(type)}" inputmode="${esc(inputmode)}" value="${esc(value ?? '')}" placeholder="${esc(resolve(def.placeholder, state, def.type === FIELD_TYPES.TEXT ? '' : '0'))}"${extra}>${unitHtml}</div></div>`;
 }
-
 export function renderSchemaField(def, state = {}, context = {}) {
   if (!isVisible(def, state)) return '';
   const type = def.type || FIELD_TYPES.TEXT;
@@ -184,7 +167,6 @@ export function renderSchemaField(def, state = {}, context = {}) {
   if (type === FIELD_TYPES.READONLY) return renderReadonly(def, state);
   return renderInput(def, state);
 }
-
 export function renderSchemaForm(schema = {}, state = {}, options = {}) {
   const fieldMap = new Map((schema.fields || []).map(def => [def.key, def]));
   const fallback = { title: options.title || 'Eingaben', fields: (schema.fields || []).map(def => def.key), columns: 2 };
@@ -204,14 +186,12 @@ export function renderSchemaForm(schema = {}, state = {}, options = {}) {
     return card(group.title || options.title || 'Eingaben', content, group.accent || options.accent || 'blue');
   }).filter(Boolean).join('');
 }
-
 function resolveResultValue(row = {}, result = {}, state = {}) {
   if (typeof row.value === 'function') return row.value(result, state);
   if (row.key && result?.[row.key] !== undefined) return result[row.key];
   if (row.stateKey && state?.[row.stateKey] !== undefined) return state[row.stateKey];
   return row.default ?? '—';
 }
-
 export function renderSchemaResults(resultSchema = [], result = {}, options = {}) {
   const state = options.state || {};
   return (resultSchema || []).map(section => {
@@ -222,7 +202,6 @@ export function renderSchemaResults(resultSchema = [], result = {}, options = {}
     return card(section.title || 'Ergebnis', resultRows(rows), section.accent || options.accent || 'blue');
   }).filter(Boolean).join('');
 }
-
 export function createSchemaView(definition = {}) {
   return function schemaView(snapshot = {}) {
     const result = typeof definition.calculate === 'function' ? definition.calculate(snapshot) : {};
