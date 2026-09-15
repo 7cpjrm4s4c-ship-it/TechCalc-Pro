@@ -24,7 +24,7 @@ assert.equal(report.checks.every(item => item.status === 'passed'), true);
 const serviceWorker = read('service-worker.js');
 assert.match(serviceWorker, /'\.\/js\/core\/centralStore\.js'/);
 assert.match(serviceWorker, /'\.\/js\/core\/eventPipeline\.js'/);
-assert.match(serviceWorker, /'\.\/js\/platform\/dynamicRenderer\/index\.js'/);
+assert.match(serviceWorker, /'\.\/js\/core\/dynamicRenderer\.js'/);
 assert.match(serviceWorker, /'\.\/js\/modules\/drinking-water\/controller\.js'/);
 assert.match(serviceWorker, /'\.\/js\/modules\/rainwater\/controller\.js'/);
 assert.match(serviceWorker, /'\.\/js\/modules\/hx-diagram\/diagramRenderer\.js'/);
