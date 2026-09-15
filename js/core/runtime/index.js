@@ -17,4 +17,4 @@ export {
   createUnitConverterDynamicRenderer,
   createVentilationDynamicRenderer,
   createWastewaterDynamicRenderer
-} from '../../platform/dynamicRenderer/index.js';
+} from '../dynamicRenderer.js';

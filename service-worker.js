@@ -59,6 +59,7 @@ const ASSETS = [
   './js/core/data/refrigerants/safety-classes.js',
   './js/core/data/units.js',
   './js/core/domUpdate.js',
+  './js/core/dynamicRenderer.js',
   './js/core/eventDelegation.js',
   './js/core/eventManager.js',
   './js/core/eventPipeline.js',

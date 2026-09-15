@@ -1,5 +1,6 @@
 export * from '../collectionRenderer.js';
 export * from '../domUpdate.js';
+export * from '../dynamicRenderer.js';
 export * from '../formActions.js';
 export * from '../formSchema.js';
 export * from '../moduleRenderer.js';
@@ -12,4 +13,3 @@ export * from '../resultRenderer.js';
 export * from '../schemaRenderer.js';
 export * from '../typedDtoReportAdapter.js';
 export * from '../uiSystem.js';
-export * from '../../platform/dynamicRenderer/index.js';
