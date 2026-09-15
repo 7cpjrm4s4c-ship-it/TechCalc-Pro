@@ -108,6 +108,7 @@ const ASSETS = [
   './js/core/pdf/ventilationReportSections.js',
   './js/core/pdfExport.js',
   './js/core/platformLifecycle.js',
+  './js/core/platformModuleRuntime.js',
   './js/core/platformPolicy.js',
   './js/core/preferences.js',
   './js/core/projectModuleStateAdapters.js',
