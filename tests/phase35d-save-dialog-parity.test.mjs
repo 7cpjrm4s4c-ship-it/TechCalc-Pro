@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { savedPlantsCard } from '../js/modules/pressure-holding/controller.js';
-import { createLineSectionController } from '../js/platform/lineSectionController/index.js';
+import { createLineSectionController } from '../js/core/lineSectionController/index.js';
 
 const stateStub = snapshot => ({
   get: () => snapshot,
