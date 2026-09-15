@@ -315,7 +315,6 @@ const ASSETS = [
   './js/platform/collectionModel/index.js',
   './js/platform/dynamicRenderer/index.js',
   './js/platform/lineSectionController/index.js',
-  './js/platform/moduleRuntime/index.js',
   './js/platform/savedRecordModel/index.js',
   './js/platform/shell/feedbackController.js',
   './js/platform/shell/layoutStabilityController.js',
