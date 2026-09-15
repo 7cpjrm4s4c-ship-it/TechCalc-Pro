@@ -5,7 +5,7 @@ import {
   buildFloodingSurfaceRecord,
   hydrateFloodingSurfaceRecord
 } from '../js/modules/flooding-verification/controller.js';
-import { deleteCollectionItem } from '../js/platform/collectionModel/index.js';
+import { deleteCollectionItem } from '../js/core/collectionModel/index.js';
 
 const draft = {
   surfaces: [],
