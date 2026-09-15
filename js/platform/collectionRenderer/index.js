@@ -3,4 +3,4 @@ export {
   renderCollectionItem,
   renderCollectionEmpty,
   collectionRenderer as default
-} from '../../core/ui/index.js';
+} from '../../core/collectionRenderer.js';

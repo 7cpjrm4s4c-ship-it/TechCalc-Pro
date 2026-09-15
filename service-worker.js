@@ -38,6 +38,7 @@ const ASSETS = [
   './js/core/app.js',
   './js/core/appCore.js',
   './js/core/centralStore.js',
+  './js/core/collectionRenderer.js',
   './js/core/contracts/index.js',
   './js/core/data/calculations.js',
   './js/core/data/catalog.js',
