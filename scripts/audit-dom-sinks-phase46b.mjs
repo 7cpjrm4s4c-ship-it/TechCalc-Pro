@@ -6,6 +6,7 @@ const runtimeDirs = ['js'];
 
 const allowedInnerHtmlFiles = new Set([
   'js/core/domUpdate.js',
+  'js/core/dynamicRenderer.js',
   'js/core/moduleRuntime.js',
   'js/core/navigation.js',
   'js/core/platformModuleRuntime.js',
