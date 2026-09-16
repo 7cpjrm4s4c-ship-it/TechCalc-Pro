@@ -22,7 +22,7 @@ import { createModuleLifecycleAdapter } from './moduleLifecycleAdapter.js';
 import { createModuleRuntime } from './moduleRuntime.js';
 import { trackGlobalEventListener } from './eventManager.js';
 import { initializeThemeController } from './ux/themeController.js';
-import { initializeSettingsController } from '../platform/shell/settingsController.js';
+import { initializeSettingsController } from './ux/settingsController.js';
 import { initializeReleaseNotesController } from '../platform/shell/releaseNotesController.js';
 import { initializeFeedbackController } from '../platform/shell/feedbackController.js';
 import { initializeServiceWorkerController } from '../platform/shell/serviceWorkerController.js';
