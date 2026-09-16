@@ -21,7 +21,7 @@ import { restoreSessionSnapshot, saveSessionSnapshot } from './projectStorage.js
 import { createModuleLifecycleAdapter } from './moduleLifecycleAdapter.js';
 import { createModuleRuntime } from './moduleRuntime.js';
 import { trackGlobalEventListener } from './eventManager.js';
-import { initializeThemeController } from '../platform/shell/themeController.js';
+import { initializeThemeController } from './ux/themeController.js';
 import { initializeSettingsController } from '../platform/shell/settingsController.js';
 import { initializeReleaseNotesController } from '../platform/shell/releaseNotesController.js';
 import { initializeFeedbackController } from '../platform/shell/feedbackController.js';
