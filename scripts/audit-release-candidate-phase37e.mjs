@@ -9,10 +9,10 @@ const shellControllerFiles = [
   'js/core/ux/themeController.js',
   'js/core/ux/settingsController.js',
   'js/core/ux/layoutStabilityController.js',
+  'js/core/ux/performanceController.js',
   'js/platform/shell/releaseNotesController.js',
   'js/platform/shell/feedbackController.js',
-  'js/platform/shell/serviceWorkerController.js',
-  'js/platform/shell/performanceController.js'
+  'js/platform/shell/serviceWorkerController.js'
 ];
 
 const requiredFiles = [
