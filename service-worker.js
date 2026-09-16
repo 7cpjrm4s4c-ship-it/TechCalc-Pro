@@ -144,6 +144,7 @@ const ASSETS = [
   './js/core/uiSystem.js',
   './js/core/unsavedWorkGuard.js',
   './js/core/ux/index.js',
+  './js/core/ux/themeController.js',
   './js/core/version.js',
   './js/data/catalog.js',
   './js/data/index.js',

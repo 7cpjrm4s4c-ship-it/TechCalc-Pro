@@ -7,4 +7,4 @@ export * from '../../platform/shell/performanceController.js';
 export * from '../../platform/shell/releaseNotesController.js';
 export * from '../../platform/shell/serviceWorkerController.js';
 export * from '../../platform/shell/settingsController.js';
-export * from '../../platform/shell/themeController.js';
+export * from './themeController.js';
