@@ -2,7 +2,7 @@ export * from '../focusManager.js';
 export * from '../preferences.js';
 export * from '../scrollManager.js';
 export * from '../../platform/shell/feedbackController.js';
-export * from '../../platform/shell/layoutStabilityController.js';
+export * from './layoutStabilityController.js';
 export * from '../../platform/shell/performanceController.js';
 export * from '../../platform/shell/releaseNotesController.js';
 export * from '../../platform/shell/serviceWorkerController.js';
