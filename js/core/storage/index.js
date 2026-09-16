@@ -6,4 +6,4 @@ export * from '../savedRecordController.js';
 export * from '../savedRecords.js';
 export * from '../unsavedWorkGuard.js';
 export * from '../collectionModel/index.js';
-export * from '../../platform/savedRecordModel/index.js';
+export * from '../savedRecordModel/index.js';
