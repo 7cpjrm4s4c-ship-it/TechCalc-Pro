@@ -129,6 +129,7 @@ const ASSETS = [
   './js/core/saveEditModeSync.js',
   './js/core/savedCalculationController.js',
   './js/core/savedRecordController.js',
+  './js/core/savedRecordModel/index.js',
   './js/core/savedRecords.js',
   './js/core/schemaModuleMount.js',
   './js/core/schemaRenderer.js',
