@@ -320,7 +320,6 @@ const ASSETS = [
   './js/modules/wastewater/view.js',
   './js/modules/wastewater/viewModel.js',
   './js/platform/shell/feedbackController.js',
-  './js/platform/shell/layoutStabilityController.js',
   './js/platform/shell/performanceController.js',
   './js/platform/shell/releaseNotesController.js',
   './js/platform/shell/serviceWorkerController.js',
