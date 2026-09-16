@@ -323,7 +323,6 @@ const ASSETS = [
   './js/platform/shell/performanceController.js',
   './js/platform/shell/releaseNotesController.js',
   './js/platform/shell/serviceWorkerController.js',
-  './js/platform/shell/settingsController.js',
   './assets/icons/apple-touch-icon.png',
   './assets/icons/favicon.ico',
   './assets/icons/icon-16.png',
