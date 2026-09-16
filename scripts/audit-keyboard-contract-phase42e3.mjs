@@ -9,7 +9,7 @@ const CENTRAL_KEYBOARD_FILES = new Set([
   'js/core/focusManager.js',
   'js/core/stateBinding.js',
   'js/core/savedRecords.js',
-  'js/platform/shell/settingsController.js'
+  'js/core/ux/settingsController.js'
 ]);
 
 const ALLOWED_NON_KEYBOARD_KEY_PROPERTIES = new Set([
@@ -38,7 +38,7 @@ function walk(dir) {
 }
 
 function rel(path) {
-  return relative(root, path).replaceAll('\\\\', '/');
+  return relative(root, path).replaceAll('\\', '/');
 }
 
 const failures = [];
