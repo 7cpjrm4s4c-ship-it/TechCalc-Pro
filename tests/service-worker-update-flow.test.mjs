@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { initializeServiceWorkerController } from '../js/platform/shell/serviceWorkerController.js';
+import { initializeServiceWorkerController } from '../js/core/ux/serviceWorkerController.js';
 
 const listeners = new Map();
 const controllerListeners = new Map();

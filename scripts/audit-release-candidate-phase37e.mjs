@@ -12,7 +12,7 @@ const shellControllerFiles = [
   'js/core/ux/performanceController.js',
   'js/platform/shell/releaseNotesController.js',
   'js/platform/shell/feedbackController.js',
-  'js/platform/shell/serviceWorkerController.js'
+  'js/core/ux/serviceWorkerController.js'
 ];
 
 const requiredFiles = [
