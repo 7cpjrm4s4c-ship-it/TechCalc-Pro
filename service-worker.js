@@ -372,7 +372,7 @@ async function cacheFirstWithRefresh(request) {
 function isVersionCriticalAsset(requestUrl) {
   return requestUrl.pathname.endsWith('/index.html')
     || requestUrl.pathname.endsWith('/js/core/app.js')
-    || requestUrl.pathname.endsWith('/js/platform/shell/releaseNotesController.js')
+    || requestUrl.pathname.endsWith('/js/core/ux/releaseNotesController.js')
     || requestUrl.pathname.endsWith('/service-worker.js')
     || requestUrl.pathname.endsWith('/RELEASE_NOTES.md')
     || requestUrl.pathname.endsWith('/manifest.json');
