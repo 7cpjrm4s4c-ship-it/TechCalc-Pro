@@ -13,6 +13,11 @@ function defaultRegisterUrl(appVersion = '') {
   return `./service-worker.js${suffix}`;
 }
 
+function appendBannerChild(banner, child) {
+  if (typeof banner?.appendChild !== 'function' || !child) return;
+  banner.appendChild(child);
+}
+
 function ensureUpdateBanner(windowRef, documentRef, waitingWorker) {
   if (!documentRef?.body || !waitingWorker) return;
   activeWaitingWorker = waitingWorker;
@@ -33,7 +38,8 @@ function ensureUpdateBanner(windowRef, documentRef, waitingWorker) {
     button.className = 'tc-update-banner__button';
     button.textContent = 'Aktualisieren';
 
-    banner.append(message, button);
+    appendBannerChild(banner, message);
+    appendBannerChild(banner, button);
     documentRef.body.appendChild(banner);
   }
 
