@@ -15,8 +15,7 @@ const allowedInnerHtmlFiles = new Set([
   'js/modules/heat-recovery/dynamicRenderer.js',
   'js/modules/hx-diagram/renderPipeline.js',
   'js/modules/mixed-air/dynamicRenderer.js',
-  'js/core/ux/releaseNotesController.js',
-  'js/platform/shell/serviceWorkerController.js'
+  'js/core/ux/releaseNotesController.js'
 ]);
 
 const forbiddenSinkPatterns = [
