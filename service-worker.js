@@ -143,6 +143,7 @@ const ASSETS = [
   './js/core/ui/index.js',
   './js/core/uiSystem.js',
   './js/core/unsavedWorkGuard.js',
+  './js/core/ux/feedbackController.js',
   './js/core/ux/index.js',
   './js/core/ux/layoutStabilityController.js',
   './js/core/ux/performanceController.js',
