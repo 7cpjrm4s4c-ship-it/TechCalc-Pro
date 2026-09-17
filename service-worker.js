@@ -323,7 +323,6 @@ const ASSETS = [
   './js/modules/wastewater/viewModel.js',
   './js/platform/shell/feedbackController.js',
   './js/platform/shell/releaseNotesController.js',
-  './js/platform/shell/serviceWorkerController.js',
   './assets/icons/apple-touch-icon.png',
   './assets/icons/favicon.ico',
   './assets/icons/icon-16.png',
