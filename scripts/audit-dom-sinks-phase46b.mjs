@@ -15,7 +15,7 @@ const allowedInnerHtmlFiles = new Set([
   'js/modules/heat-recovery/dynamicRenderer.js',
   'js/modules/hx-diagram/renderPipeline.js',
   'js/modules/mixed-air/dynamicRenderer.js',
-  'js/platform/shell/releaseNotesController.js',
+  'js/core/ux/releaseNotesController.js',
   'js/platform/shell/serviceWorkerController.js'
 ]);
 
@@ -60,8 +60,8 @@ for (const file of files) {
   }
 }
 
-const releaseNotes = fs.readFileSync(path.join(root, 'js/platform/shell/releaseNotesController.js'), 'utf8');
-if (!releaseNotes.includes("import { esc as escapeHtml } from '../../core/renderer.js';")) {
+const releaseNotes = fs.readFileSync(path.join(root, 'js/core/ux/releaseNotesController.js'), 'utf8');
+if (!releaseNotes.includes("import { esc as escapeHtml } from '../renderer.js';")) {
   failures.push('releaseNotesController.js must use the shared HTML escaping helper.');
 }
 if (/host\.innerHTML\s*=\s*notes\.slice/.test(releaseNotes) || /notes\.slice\([^)]*\)\.map\([\s\S]{0,500}join\(''\)\s*;/.test(releaseNotes)) {
