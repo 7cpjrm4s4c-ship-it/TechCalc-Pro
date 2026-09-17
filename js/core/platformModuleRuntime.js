@@ -10,7 +10,7 @@ import { preserveScroll as keepScroll, preserveSavedRecordMutation, PlatformScro
 import { PlatformFocusManager } from './focusManager.js';
 import { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved, renderPlatformSaved } from './moduleRenderer.js';
 import { getRenderScheduler } from './renderScheduler.js';
-import { startPerformanceSpan } from '../platform/shell/performanceController.js';
+import { startPerformanceSpan } from './ux/performanceController.js';
 
 const noop = () => {};
 const asFn = value => typeof value === 'function' ? value : noop;
@@ -26,7 +26,6 @@ function preservePlatformUx(root, action, options = {}) {
   });
   return PlatformFocusManager.preserveFocusDuring(root || document, run, { restoreFocus: true });
 }
-
 function createNormalizedState(state, fields = []) {
   const numericFields = Array.isArray(fields) ? fields : [];
   if (!numericFields.length || !state?.set) return state;
@@ -48,7 +47,6 @@ function createNormalizedState(state, fields = []) {
     }
   };
 }
-
 export function normalizeConfiguredFields(patch = {}, fields = []) {
   if (!fields.length) return patch;
   const numeric = new Set(fields);
@@ -57,7 +55,6 @@ export function normalizeConfiguredFields(patch = {}, fields = []) {
     return acc;
   }, {});
 }
-
 function setSegmentVisual(root, field, value) {
   root?.querySelectorAll?.(`[data-segment="${field}"]`)?.forEach(button => {
     const active = String(button.dataset.value) === String(value);
@@ -65,7 +62,6 @@ function setSegmentVisual(root, field, value) {
     button.setAttribute('aria-selected', String(active));
   });
 }
-
 function patchFieldDomValue(root, field, value) {
   const el = root?.querySelector?.(`[data-field="${field}"]`);
   if (!el) return;
@@ -77,7 +73,6 @@ function patchFieldDomValues(root, patch = {}, fields = []) {
   const targetFields = fields.length ? fields : Object.keys(patch || {});
   targetFields.forEach(field => patchFieldDomValue(root, field, patch[field]));
 }
-
 function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
   const fields = segmentConfig.fields || {};
   const handlers = {};
@@ -115,7 +110,6 @@ function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
     if (typeof dynamicOptions.dynamicUpdate === 'function') {
       dynamicOptions.dynamicUpdate({ action, field, value: patch?.[field] ?? value, patch, reason: 'segment' });
     }
-
     const scheduler = getRenderScheduler(root);
     scheduler?.flushNow?.(action);
     if (typeof queueMicrotask === 'function') queueMicrotask(() => {
@@ -154,7 +148,6 @@ function bindSegments(root, state, segmentConfig = {}, dynamicOptions = {}) {
 
   return handlers;
 }
-
 function bindLookupHydration(root, state, lookupConfig = {}) {
   const fields = new Set(array(lookupConfig.fields));
   if (!fields.size || typeof lookupConfig.patch !== 'function') return;
@@ -169,7 +162,6 @@ function bindLookupHydration(root, state, lookupConfig = {}) {
     patchFieldDomValues(root, patch, array(lookupConfig.hydrateDomFields?.[field]));
   });
 }
-
 function bindCollections(root, state, collectionConfig = {}) {
   const collections = collectionConfig.collections || collectionConfig;
   if (!collections || !Object.keys(collections).length) return {};
@@ -266,7 +258,6 @@ function bindCollections(root, state, collectionConfig = {}) {
 
   return actions;
 }
-
 function readRecordIdFromElement(element, attrs = {}) {
   const loadAttr = attrs.loadAttr || 'data-line-select';
   const toggleAttr = attrs.toggleAttr || 'data-line-toggle';
@@ -279,7 +270,6 @@ function readRecordIdFromElement(element, attrs = {}) {
     || carrier?.dataset?.savedRecordId
     || '';
 }
-
 function bindSavedRecords(root, state, calculate, savedConfig = {}) {
   if (!savedConfig.enabled) return {};
   const attrs = savedConfig.attrs || {};
@@ -390,7 +380,6 @@ function bindSavedRecords(root, state, calculate, savedConfig = {}) {
     'saved:toggle': toggle
   };
 }
-
 function mountDynamicPlatformModule(root, state, view, bind, dynamicUpdate, isDynamicAction = () => true) {
   if (!root) return () => {};
   const mountToken = root?.dataset?.renderToken || '';
@@ -495,7 +484,6 @@ export function createPlatformModule(definition = {}) {
   function view(snapshot) {
     return renderPlatformModuleView(buildRenderModel(snapshot));
   }
-
   function updateDynamicIslands(root, meta = {}) {
     if (!root) return false;
     const finishDynamic = startPerformanceSpan('dynamic-render', { action: meta?.action || 'dynamic', mode: 'platform', reason: meta?.reason || '', changed: meta?.changed || [] });
@@ -536,7 +524,6 @@ export function createPlatformModule(definition = {}) {
     });
     return true;
   }
-
   function bindPlatformActions(root) {
     const dynamicUpdate = meta => updateDynamicIslands(root, meta);
     const actions = {
@@ -548,7 +535,6 @@ export function createPlatformModule(definition = {}) {
     registerCentralActions(root, actions);
     if (typeof customBind === 'function') customBind(root, runtimeState.get(), { action: 'platform:bind' });
   }
-
   return { config, schema, state: runtimeState, initialState, calculate, results, report, savedRecords, controller, mount(root) { return mountModule(root, runtimeState, view, bindPlatformActions); } };
 }
 
