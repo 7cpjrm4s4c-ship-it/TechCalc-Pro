@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const themeController = readFileSync('js/platform/shell/themeController.js', 'utf8');
+const themeController = readFileSync('js/core/ux/themeController.js', 'utf8');
 const renderer = readFileSync('js/core/renderer.js', 'utf8');
 const app = readFileSync('js/core/app.js', 'utf8');
 

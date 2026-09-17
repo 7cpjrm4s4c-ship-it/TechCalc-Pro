@@ -20,9 +20,9 @@ assert.ok(report.appJs.lines <= 320, `app.js should remain <= 320 lines, got ${r
 assert.equal(report.shell.requiredControllers.length, requiredControllers.length);
 
 for (const controller of requiredControllers) {
-  assert.ok(existsSync(`js/platform/shell/${controller}`), `${controller} must exist`);
-  assert.ok(app.includes(`../platform/shell/${controller}`), `${controller} must be imported by app.js`);
-  assert.ok(readFileSync('service-worker.js', 'utf8').includes(`./js/platform/shell/${controller}`), `${controller} must be precached`);
+  assert.ok(existsSync(`js/core/ux/${controller}`), `${controller} must exist`);
+  assert.ok(app.includes(`./ux/${controller}`), `${controller} must be imported by app.js`);
+  assert.ok(readFileSync('service-worker.js', 'utf8').includes(`./js/core/ux/${controller}`), `${controller} must be precached`);
 }
 
 for (const forbidden of [

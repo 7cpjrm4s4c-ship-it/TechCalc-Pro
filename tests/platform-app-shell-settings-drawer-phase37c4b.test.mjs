@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 
 const root = process.cwd();
 const css = fs.readFileSync(path.join(root, 'css/components.css'), 'utf8');
-const controller = fs.readFileSync(path.join(root, 'js/platform/shell/settingsController.js'), 'utf8');
+const controller = fs.readFileSync(path.join(root, 'js/core/ux/settingsController.js'), 'utf8');
 
 assert.match(css, /settings-submenu\[open\][\s\S]*settings-submenu\.is-open/, 'Settings accordion CSS must support native open and explicit is-open state.');
 assert.match(css, /settings-submenu\[open\][\s\S]*height:\s*auto/, 'Open settings submenu must use auto height.');

@@ -8,7 +8,7 @@ const manifestPath = path.join(root, 'manifest.json');
 const versionModulePath = path.join(root, 'js/core/version.js');
 const appPath = path.join(root, 'js/core/app.js');
 const floodingReportPath = path.join(root, 'js/modules/flooding-verification/reportAdapter.js');
-const releaseNotesControllerPath = path.join(root, 'js/platform/shell/releaseNotesController.js');
+const releaseNotesControllerPath = path.join(root, 'js/core/ux/releaseNotesController.js');
 const indexPath = path.join(root, 'index.html');
 const SEMVER = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
 function readJson(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }

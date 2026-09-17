@@ -4,10 +4,10 @@ import path from 'node:path';
 
 const root = process.cwd();
 const appSource = fs.readFileSync(path.join(root, 'js/core/app.js'), 'utf8');
-const controllerPath = path.join(root, 'js/platform/shell/settingsController.js');
+const controllerPath = path.join(root, 'js/core/ux/settingsController.js');
 const controllerSource = fs.readFileSync(controllerPath, 'utf8');
 const serviceWorkerSource = fs.readFileSync(path.join(root, 'service-worker.js'), 'utf8');
-const settingsModulePath = ['..', 'platform', 'shell', 'settingsController.js'].join('/');
+const settingsModulePath = './ux/settingsController.js';
 const settingsImport = `import { initializeSettingsController } from '${settingsModulePath}';`;
 
 assert.ok(fs.existsSync(controllerPath), 'settingsController.js must exist');
@@ -20,7 +20,7 @@ assert.ok(controllerSource.includes('function setSettingsOpen('), 'settings cont
 assert.ok(controllerSource.includes('function lockPageScroll('), 'settings controller must own page scroll lock');
 assert.ok(controllerSource.includes("trackGlobalEventListener(document, 'touchmove'"), 'settings controller must keep mobile background scroll lock');
 assert.ok(controllerSource.includes('let settingsControllerInitialized = false'), 'settings controller must be idempotent');
-assert.ok(serviceWorkerSource.includes("'./js/platform/shell/settingsController.js'"), 'service worker must precache settings controller');
+assert.ok(serviceWorkerSource.includes("'./js/core/ux/settingsController.js'"), 'service worker must precache settings controller');
 
 const appLines = appSource.split(/\r?\n/).length;
 assert.ok(appLines <= 430, `app.js should be reduced after settings extraction; got ${appLines} lines`);
