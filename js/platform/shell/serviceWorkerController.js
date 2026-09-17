@@ -1,5 +1,5 @@
 import { logger } from '../../core/logger.js';
-import { markPerformance, startPerformanceSpan } from './performanceController.js';
+import { markPerformance, startPerformanceSpan } from '../../core/ux/performanceController.js';
 
 let serviceWorkerControllerInitialized = false;
 let reloadOnControllerChange = false;
