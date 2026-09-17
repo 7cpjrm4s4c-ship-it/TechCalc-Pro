@@ -12,7 +12,7 @@ TechCalc Pro already provides central platform services for module registration,
 The PDF structure has been centralized before this ADR. Version 1.6.1 is the current baseline for starting the neutral framework transition.
 The next architectural step is to prepare `js/core` as the complete internal platform basis before migrating feature modules. The application remains TechCalc Pro. The framework is internal and repository-owned.
 
-After the reference-module migration and removal of `js/shared` and `js/utils`, the remaining runtime ownership ambiguity is concentrated in `js/platform`, `js/framework`, `js/data`, root-level `css` and root-level `assets`.
+After the reference-module migration and removal of `js/shared` and `js/utils`, the `js/platform` boundary has also been fully migrated and removed. The remaining runtime ownership ambiguity is concentrated in `js/framework`, `js/data`, root-level `css` and root-level `assets`.
 
 ---
 ## Decision
@@ -43,7 +43,7 @@ Keep `js/data` import paths compatible during migration. They are compatibility 
 
 The final runtime application code target is `js/core` plus `js/modules` only. App-wide implementation belongs in `js/core`; module-specific implementation belongs in `js/modules`.
 
-`js/platform`, `js/framework` and `js/data` are migration boundaries, not final ownership locations. They must be reduced through reviewed, CI-backed migration steps.
+`js/framework` and `js/data` remain migration boundaries, not final ownership locations. They must be reduced through reviewed, CI-backed migration steps. The former `js/platform` boundary has been fully migrated into Core and must not be reintroduced.
 
 Root-level `css` and `assets` are app runtime resources and should be moved into Core-owned resource paths after platform ownership is stabilized:
 
@@ -61,7 +61,7 @@ The Data Catalog ownership is Core-first: `js/core/data/catalog.js` owns the imp
 
 `js/shared` and `js/utils` have been removed after verified migration to Core data paths.
 
-`js/platform` still contains app-wide implementation and is the next migration boundary.
+`js/platform` has been fully migrated into `js/core` and removed. The framework kernel audit rejects any reintroduction of this legacy runtime boundary.
 
 ---
 ## Consequences
@@ -97,7 +97,7 @@ This ADR does not change calculation behavior.
 | Import churn | Medium | Keep existing imports valid through documented compatibility aliases and migrate incrementally. |
 | Core entry points become dumping grounds | Medium | Keep ownership separated by dedicated core responsibility paths. |
 | Data ownership ambiguity | Medium | Make `js/core/data` the canonical path for shared datasets and lookup services. |
-| Platform ownership ambiguity | Medium | Move one platform service family at a time behind existing Core entry points. |
+| Platform reintroduction | Low | The framework kernel audit rejects any recreated `js/platform` boundary. |
 | PWA/precache regression | Medium | Run `npm run precache:check`, browser compliance and build after every asset or CSS move. |
 | Regression in existing modules | Low | Preserve public exports and update ownership without changing calculation behavior. |
 
@@ -105,8 +105,7 @@ This ADR does not change calculation behavior.
 ## Follow-up work
 
 - run the framework kernel audit
-- migrate `js/platform/resultRenderer` behind Core ownership first
-- migrate remaining platform service families into `js/core` in isolated blocks
+- keep `js/platform` absent through the framework kernel audit
 - remove `js/framework` only after all consumers use Core paths or documented framework-local facades are no longer needed
 - remove `js/data` only after all compatibility consumers are migrated to Core data paths
 - migrate root-level `css` to Core styles after platform ownership is stabilized

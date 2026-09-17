@@ -39,15 +39,16 @@ js/modules
 
 `js/modules` owns module-specific responsibilities only: module metadata, configuration, state, schema, calculation logic, result mapping, report adapters, saved-record adapters and optional controller/view code required by the module.
 
-The following paths are migration boundaries, not final runtime ownership locations:
+The following paths remain migration boundaries, not final runtime ownership locations:
 
-- `js/platform`
 - `js/framework`
 - `js/data`
 - root-level `css`
 - root-level `assets`
 
 They must shrink through isolated, reviewed migration steps. New app-wide runtime implementation must not be added to those migration boundaries.
+
+The historical `js/platform` boundary has been fully migrated into `js/core` and removed. It must not be recreated.
 
 Root files, build scripts, tests, documentation, CI and deployment configuration remain outside `js/core` and `js/modules` because they are repository/tooling concerns, not runtime ownership areas.
 
@@ -61,7 +62,7 @@ Root files, build scripts, tests, documentation, CI and deployment configuration
 | Events | `js/core/events` |
 | PDF export | `js/core/pdf`, `js/core/pdfExport.js` |
 | Runtime, routing and navigation | `js/core/runtime` |
-| Shell and app controllers | `js/core/shell` target path |
+| Shell and app controllers | `js/core/ux` |
 | State | `js/core/state` |
 | Storage and saved records | `js/core/storage` |
 | Stylesheet manifest and app styles | `js/core/styles` target path |
@@ -113,21 +114,14 @@ The previous `js/shared` and `js/utils` data/helper compatibility paths have bee
 ---
 ## Platform migration boundary
 
-`js/platform` is still present as a historical implementation location for app-wide services. It is not the final owner for runtime framework implementation.
+The historical `js/platform` boundary has been fully migrated into Core and removed.
 
-Migration must proceed in small blocks, moving platform implementation behind existing Core entry points first and deleting obsolete platform files only after CI confirms no runtime, test, script, service-worker or documentation dependency remains.
+All app-wide runtime services and shell controllers now use canonical paths under `js/core`. Reintroducing `js/platform` is forbidden and enforced by `npm run audit:framework-kernel`.
 
-Preferred migration order:
-
-1. result rendering
-2. module rendering
-3. dynamic rendering
-4. module runtime
-5. collection and saved-record models
-6. line-section controller
-7. shell controllers
+The completed migration retained public behavior, service-worker precache consistency and release gates through isolated, CI-backed ownership changes.
 
 ---
+
 ## Data catalog contract
 
 Centralized data access is owned by:

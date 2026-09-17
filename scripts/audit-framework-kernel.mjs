@@ -210,6 +210,10 @@ for (const relativePath of requiredFiles) {
   if (!fs.existsSync(path.join(root, relativePath))) throw new Error(`Missing framework kernel file: ${relativePath}`);
 }
 
+if (fs.existsSync(path.join(root, 'js/platform'))) {
+  throw new Error('Legacy runtime boundary must remain removed: js/platform');
+}
+
 for (const coreArea of requiredCoreAreas) {
   if (!readProjectFile('js/core/appCore.js').includes(coreArea)) throw new Error(`Core area is not documented in appCore.js: ${coreArea}`);
 }
