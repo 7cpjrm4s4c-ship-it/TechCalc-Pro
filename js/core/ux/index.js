@@ -5,6 +5,6 @@ export * from '../../platform/shell/feedbackController.js';
 export * from './layoutStabilityController.js';
 export * from './performanceController.js';
 export * from '../../platform/shell/releaseNotesController.js';
-export * from '../../platform/shell/serviceWorkerController.js';
+export * from './serviceWorkerController.js';
 export * from './settingsController.js';
 export * from './themeController.js';

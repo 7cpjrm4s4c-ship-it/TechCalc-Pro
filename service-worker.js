@@ -146,6 +146,7 @@ const ASSETS = [
   './js/core/ux/index.js',
   './js/core/ux/layoutStabilityController.js',
   './js/core/ux/performanceController.js',
+  './js/core/ux/serviceWorkerController.js',
   './js/core/ux/settingsController.js',
   './js/core/ux/themeController.js',
   './js/core/version.js',
