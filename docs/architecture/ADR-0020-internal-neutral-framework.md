@@ -12,7 +12,7 @@ TechCalc Pro already provides central platform services for module registration,
 The PDF structure has been centralized before this ADR. Version 1.6.1 is the current baseline for starting the neutral framework transition.
 The next architectural step is to prepare `js/core` as the complete internal platform basis before migrating feature modules. The application remains TechCalc Pro. The framework is internal and repository-owned.
 
-After the reference-module migration and removal of `js/shared`, `js/utils` and `js/platform`, the unused `js/framework` compatibility facade has also been removed. The remaining runtime ownership ambiguity is concentrated in `js/data`, root-level `css` and root-level `assets`.
+After the reference-module migration, all JavaScript compatibility boundaries outside `js/core` and `js/modules` have been removed. The remaining runtime ownership ambiguity is limited to root-level `css` and root-level `assets`.
 
 ---
 ## Decision
@@ -36,13 +36,12 @@ Introduce `js/core/index.js` and `js/core/appCore.js` as the discoverable overvi
 
 Introduce `js/core/data` as the canonical central data path for shared datasets, data catalogs and data lookup services.
 
-Keep `js/data` import paths compatible during migration. They are compatibility aliases and must delegate to `js/core/data` when a matching Core API exists.
 
 `js/shared` and `js/utils` were temporary migration boundaries for legacy data/helper access. After verified migration they are no longer valid app-wide data targets for reference modules.
 
 The final runtime application code target is `js/core` plus `js/modules` only. App-wide implementation belongs in `js/core`; module-specific implementation belongs in `js/modules`.
 
-`js/data` remains a migration boundary, not a final ownership location. It must be reduced through reviewed, CI-backed migration steps. The former `js/platform` and `js/framework` boundaries have been removed and must not be reintroduced.
+The former `js/platform`, `js/framework` and `js/data` boundaries have been removed and must not be reintroduced. Runtime JavaScript now resides only in `js/core` and `js/modules`.
 
 Root-level `css` and `assets` are app runtime resources and should be moved into Core-owned resource paths after platform ownership is stabilized:
 
@@ -56,18 +55,18 @@ Tooling, tests, documentation, CI and deployment configuration remain outside th
 
 The Data Catalog ownership is Core-first: `js/core/data/catalog.js` owns the implementation.
 
-`js/data/catalog.js` is a compatibility facade to the Core catalog and must not own catalog entries.
+`js/data` has been removed after all consumers were confirmed on canonical `js/core/data` paths.
 
 `js/shared` and `js/utils` have been removed after verified migration to Core data paths.
 
-`js/platform` has been fully migrated into `js/core` and removed. The unused `js/framework` compatibility facade has also been removed. The framework kernel audit rejects any reintroduction of either legacy runtime boundary.
+`js/platform` has been fully migrated into `js/core` and removed. The unused `js/framework` and `js/data` compatibility facades have also been removed. The framework kernel audit rejects any reintroduction of these legacy runtime boundaries.
 
 ---
 ## Consequences
 
 New and migrated modules can use narrow central core paths instead of depending directly on scattered platform, shared and utility files.
 
-Existing modules remain compatible and can be migrated incrementally through documented compatibility aliases.
+Existing modules consume canonical Core paths without JavaScript compatibility aliases outside `js/core`.
 
 The Core-first framework boundary makes app-wide responsibilities discoverable before module migration begins.
 
@@ -93,7 +92,7 @@ This ADR does not change calculation behavior.
 
 | Risk | Assessment | Mitigation |
 |---|---|
-| Import churn | Medium | Keep existing imports valid through documented compatibility aliases and migrate incrementally. |
+| Import churn | Low | Canonical Core imports are enforced by the framework kernel audit. |
 | Core entry points become dumping grounds | Medium | Keep ownership separated by dedicated core responsibility paths. |
 | Data ownership ambiguity | Medium | Make `js/core/data` the canonical path for shared datasets and lookup services. |
 | Legacy boundary reintroduction | Low | The framework kernel audit rejects recreated `js/platform` and `js/framework` boundaries. |
@@ -104,8 +103,7 @@ This ADR does not change calculation behavior.
 ## Follow-up work
 
 - run the framework kernel audit
-- keep `js/platform` and `js/framework` absent through the framework kernel audit
-- remove `js/data` only after all compatibility consumers are migrated to Core data paths
+- keep `js/platform`, `js/framework` and `js/data` absent through the framework kernel audit
 - migrate root-level `css` to Core styles after platform ownership is stabilized
 - migrate root-level `assets` to Core assets after style migration is stable
 - add or tighten migration checks after each completed boundary removal

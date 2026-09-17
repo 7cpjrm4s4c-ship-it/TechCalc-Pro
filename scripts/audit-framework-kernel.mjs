@@ -24,8 +24,6 @@ const requiredFiles = [
   'js/core/styles/index.js',
   'js/core/ui/index.js',
   'js/core/ux/index.js',
-  'js/data/index.js',
-  'js/data/catalog.js',
   'docs/contracts/framework-kernel-contract.md',
   'docs/architecture/ADR-0020-internal-neutral-framework.md'
 ];
@@ -208,7 +206,7 @@ for (const relativePath of requiredFiles) {
   if (!fs.existsSync(path.join(root, relativePath))) throw new Error(`Missing framework kernel file: ${relativePath}`);
 }
 
-for (const legacyBoundary of ['js/platform', 'js/framework']) {
+for (const legacyBoundary of ['js/platform', 'js/framework', 'js/data']) {
   if (fs.existsSync(path.join(root, legacyBoundary))) {
     throw new Error(`Legacy runtime boundary must remain removed: ${legacyBoundary}`);
   }
@@ -226,9 +224,6 @@ for (const expectedExport of requiredCoreExports) {
 for (const expectedToken of ['defineDataCatalogEntry', 'createDataCatalog', 'dataCatalog', 'rainwater.areaTypes', 'pipes.systems', 'refrigerants.items']) {
   if (!readProjectFile('js/core/data/catalog.js').includes(expectedToken)) throw new Error(`Core data catalog contract is missing ${expectedToken}`);
 }
-if (readProjectFile('js/core/data/catalog.js').includes('../../data/catalog.js')) throw new Error('Core data catalog must own the central catalog implementation and must not delegate to js/data/catalog.js');
-if (!readProjectFile('js/data/catalog.js').includes('../core/data/catalog.js')) throw new Error('Data catalog compatibility alias must delegate to js/core/data/catalog.js');
-if (readProjectFile('js/data/catalog.js').includes('builtInCatalogEntries')) throw new Error('Data catalog compatibility alias must not own built-in catalog entries');
 
 for (const expectedSection of ['Core first', 'Core responsibility paths', 'Module import rule', 'Central data path', 'Reference module guard', 'Module responsibility']) {
   if (!readProjectFile('docs/contracts/framework-kernel-contract.md').includes(expectedSection)) throw new Error(`Framework kernel contract is missing section: ${expectedSection}`);

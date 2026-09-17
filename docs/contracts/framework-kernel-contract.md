@@ -41,13 +41,12 @@ js/modules
 
 The following paths remain migration boundaries, not final runtime ownership locations:
 
-- `js/data`
 - root-level `css`
 - root-level `assets`
 
 They must shrink through isolated, reviewed migration steps. New app-wide runtime implementation must not be added to those migration boundaries.
 
-The historical `js/platform` boundary and the unused `js/framework` compatibility facade have been removed. Neither path may be recreated.
+The historical `js/platform` boundary and the unused `js/framework` and `js/data` compatibility facades have been removed. None of these paths may be recreated.
 
 Root files, build scripts, tests, documentation, CI and deployment configuration remain outside `js/core` and `js/modules` because they are repository/tooling concerns, not runtime ownership areas.
 
@@ -92,17 +91,7 @@ The canonical central data path is:
 js/core/data
 ```
 
-`js/data` remains as a compatibility alias during migration. It must delegate to `js/core/data` and must not own catalog entries, lookup services or shared data implementations.
-
-The compatibility alias is intentionally limited to these documented and imported files:
-
-- `js/data/index.js`
-- `js/data/pipes.js`
-- `js/data/rainwater.js`
-- `js/data/refrigerants.js`
-- `js/data/catalog.js`
-
-Data catalogs, shared data sets and data lookup services belong under `js/core/data`.
+`js/data` has been removed after all consumers were migrated to canonical `js/core/data` paths. It must not be recreated.
 
 The previous `js/shared` and `js/utils` data/helper compatibility paths have been removed after verified migration to `js/core/data`. Reference modules must consume app-wide data through Core paths.
 
@@ -131,7 +120,6 @@ js/core/data/catalog.js
 
 The catalog exposes registered data entries through stable catalog identifiers and read-only access methods.
 
-`js/data/catalog.js` is a compatibility alias to `js/core/data/catalog.js` and must not own built-in catalog entries.
 
 
 Built-in catalog groups currently include:
@@ -227,9 +215,9 @@ Moving these paths requires coordinated updates to `index.html`, `manifest.json`
 ---
 ## Compatibility
 
-This contract defines a Core-first internal framework boundary with documented compatibility aliases only where they still exist in the repository.
+This contract defines a Core-first internal framework boundary without JavaScript compatibility paths outside `js/core` and `js/modules`.
 
-Existing modules remain compatible. Migration to central core paths can happen incrementally while compatibility aliases delegate back to Core ownership.
+Existing modules consume canonical Core paths directly.
 
 ---
 
