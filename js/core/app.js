@@ -25,7 +25,7 @@ import { initializeThemeController } from './ux/themeController.js';
 import { initializeSettingsController } from './ux/settingsController.js';
 import { initializeReleaseNotesController } from '../platform/shell/releaseNotesController.js';
 import { initializeFeedbackController } from '../platform/shell/feedbackController.js';
-import { initializeServiceWorkerController } from '../platform/shell/serviceWorkerController.js';
+import { initializeServiceWorkerController } from './ux/serviceWorkerController.js';
 import { initializePerformanceController, markPerformance, measurePerformance, startPerformanceSpan } from './ux/performanceController.js';
 import { initializeSaveEditModeSync } from './saveEditModeSync.js';
 import { initializeLayoutStabilityController } from './ux/layoutStabilityController.js';
