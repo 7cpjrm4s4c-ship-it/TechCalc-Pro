@@ -157,8 +157,6 @@ const ASSETS = [
   './js/data/pipes.js',
   './js/data/rainwater.js',
   './js/data/refrigerants.js',
-  './js/framework/dataCatalog.js',
-  './js/framework/index.js',
   './js/modules/buffer-storage/config.js',
   './js/modules/buffer-storage/controller.js',
   './js/modules/buffer-storage/index.js',

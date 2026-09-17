@@ -23,7 +23,7 @@ js/core
 
 All app-wide responsibilities must be discoverable through `js/core` before feature modules are migrated.
 
-The framework entry point `js/framework/index.js` is an aggregation facade over `js/core` and framework-local facades such as `js/framework/dataCatalog.js`. It must not delegate through `js/data` and must not own data, UI, PDF, CSS, UX, runtime or domain logic.
+The former `js/framework` compatibility facade was unused and has been removed. `js/core` is the only framework entry boundary.
 
 ---
 ## Core-only runtime target
@@ -41,14 +41,13 @@ js/modules
 
 The following paths remain migration boundaries, not final runtime ownership locations:
 
-- `js/framework`
 - `js/data`
 - root-level `css`
 - root-level `assets`
 
 They must shrink through isolated, reviewed migration steps. New app-wide runtime implementation must not be added to those migration boundaries.
 
-The historical `js/platform` boundary has been fully migrated into `js/core` and removed. It must not be recreated.
+The historical `js/platform` boundary and the unused `js/framework` compatibility facade have been removed. Neither path may be recreated.
 
 Root files, build scripts, tests, documentation, CI and deployment configuration remain outside `js/core` and `js/modules` because they are repository/tooling concerns, not runtime ownership areas.
 
@@ -134,7 +133,6 @@ The catalog exposes registered data entries through stable catalog identifiers a
 
 `js/data/catalog.js` is a compatibility alias to `js/core/data/catalog.js` and must not own built-in catalog entries.
 
-`js/framework/dataCatalog.js` is a framework facade to `js/core/data/catalog.js` and must not delegate through `js/data/catalog.js`.
 
 Built-in catalog groups currently include:
 
