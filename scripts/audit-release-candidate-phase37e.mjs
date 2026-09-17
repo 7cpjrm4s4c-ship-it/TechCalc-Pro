@@ -11,7 +11,7 @@ const shellControllerFiles = [
   'js/core/ux/layoutStabilityController.js',
   'js/core/ux/performanceController.js',
   'js/platform/shell/releaseNotesController.js',
-  'js/platform/shell/feedbackController.js',
+  'js/core/ux/feedbackController.js',
   'js/core/ux/serviceWorkerController.js'
 ];
 

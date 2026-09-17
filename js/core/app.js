@@ -24,7 +24,7 @@ import { trackGlobalEventListener } from './eventManager.js';
 import { initializeThemeController } from './ux/themeController.js';
 import { initializeSettingsController } from './ux/settingsController.js';
 import { initializeReleaseNotesController } from '../platform/shell/releaseNotesController.js';
-import { initializeFeedbackController } from '../platform/shell/feedbackController.js';
+import { initializeFeedbackController } from './ux/feedbackController.js';
 import { initializeServiceWorkerController } from './ux/serviceWorkerController.js';
 import { initializePerformanceController, markPerformance, measurePerformance, startPerformanceSpan } from './ux/performanceController.js';
 import { initializeSaveEditModeSync } from './saveEditModeSync.js';
