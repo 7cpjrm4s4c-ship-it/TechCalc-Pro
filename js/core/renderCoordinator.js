@@ -1,11 +1,10 @@
 import { safeReplaceContent } from './domUpdate.js';
 import { createRenderScheduler } from './renderScheduler.js';
 import { snapshotViewport, restoreViewportStable, isMobileViewport } from './renderer.js';
-import { startPerformanceSpan } from '../platform/shell/performanceController.js';
+import { startPerformanceSpan } from './ux/performanceController.js';
 
 const FIELD_ACTION_RE = /^(field:input|field:change|field:blur|field:enter|input:confirm|surface:confirm|segment:select|binding:)/;
 const STRUCTURAL_ACTION_RE = /^(record:|delete|reset|replace|module:)/;
-
 
 function clampViewportToDocumentEnd() {
   const doc = document.scrollingElement || document.documentElement;
@@ -15,7 +14,6 @@ function clampViewportToDocumentEnd() {
   const currentY = window.scrollY || doc.scrollTop || 0;
   if (currentY > maxY + 1) window.scrollTo(window.scrollX || doc.scrollLeft || 0, maxY);
 }
-
 function clampViewportStable() {
   requestAnimationFrame(clampViewportToDocumentEnd);
   setTimeout(clampViewportToDocumentEnd, 80);
@@ -25,7 +23,6 @@ function clampViewportStable() {
 function actionFrom(meta = {}) {
   return String(meta?.action || 'render');
 }
-
 function shouldPreserveScroll(meta = {}) {
   const action = actionFrom(meta);
   if (!action || action === 'initial') return false;
@@ -38,13 +35,11 @@ function shouldPreserveScroll(meta = {}) {
   if (FIELD_ACTION_RE.test(action)) return false;
   return true;
 }
-
 function renderKeyFor(stateSnapshot, html) {
   // html is already the concrete view output. Keeping the key simple avoids
   // expensive JSON snapshots while still suppressing equal DOM writes.
   return String(html ?? '');
 }
-
 export function createRenderCoordinator(root, options = {}) {
   if (!root) throw new Error('createRenderCoordinator requires a root element');
   const view = options.view;
@@ -52,7 +47,6 @@ export function createRenderCoordinator(root, options = {}) {
   const state = options.state;
   if (typeof view !== 'function') throw new Error('createRenderCoordinator requires a view function');
   if (!state?.get) throw new Error('createRenderCoordinator requires a module state');
-
   let didInitialRender = false;
   let lastRenderKey = '';
   let lastSnapshot = null;
@@ -60,7 +54,6 @@ export function createRenderCoordinator(root, options = {}) {
   let render;
 
   const isCurrent = () => !options.isCurrent || options.isCurrent();
-
   const run = ({ reason } = {}) => {
     if (!isCurrent()) return;
     const finishRender = startPerformanceSpan('render:commit', { action: currentMeta?.action || reason || 'render' });
@@ -74,7 +67,6 @@ export function createRenderCoordinator(root, options = {}) {
     const previousMinHeight = root.style.minHeight;
     const previousOverflowAnchor = root.style.overflowAnchor;
     const previousHeight = root.getBoundingClientRect?.().height || 0;
-
     if (preserve && previousHeight > 0) {
       root.style.minHeight = `${Math.ceil(previousHeight)}px`;
       root.style.overflowAnchor = 'none';
@@ -85,11 +77,9 @@ export function createRenderCoordinator(root, options = {}) {
     });
     if (changed) lastRenderKey = renderKey;
     lastSnapshot = snapshot;
-
     if (changed || !didInitialRender || options.afterEveryRender === true) {
       afterRender?.(root, snapshot, render, { changed, meta });
     }
-
     if (preserve) {
       restoreViewportStable(viewport, isMobileViewport()
         ? { frames: 2, delays: [16, 64] }
@@ -106,13 +96,11 @@ export function createRenderCoordinator(root, options = {}) {
     didInitialRender = true;
     finishRender({ status: 'ok', changed });
   };
-
   const scheduler = createRenderScheduler(root, run);
   render = (meta = {}) => {
     currentMeta = typeof meta === 'string' ? { action: meta } : { ...(meta || {}) };
     scheduler.schedule(currentMeta.action || 'module-state');
   };
-
   return {
     render,
     flush(meta = { action: 'initial' }) {
