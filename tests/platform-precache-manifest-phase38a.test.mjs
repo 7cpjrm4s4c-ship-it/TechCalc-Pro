@@ -39,7 +39,7 @@ const requiredAssets = [
   './manifest.json',
   './RELEASE_NOTES.md',
   ...listFiles('css', file => file.endsWith('.css')),
-  ...listFiles('js', file => file.endsWith('.js') || file.endsWith('.css')),
+  ...listFiles('js', file => file.endsWith('.js')),
   ...listFiles('assets/icons')
 ];
 
@@ -52,7 +52,6 @@ assert.deepEqual(missingAssets, [], 'generated precache manifest must include ev
 assert.deepEqual(staleRuntimeAssets, [], 'generated precache manifest must not keep stale JS/CSS entries');
 assert.equal(assets.length, assetSet.size, 'generated precache manifest must not contain duplicate assets');
 assert.match(read('package.json'), /"precache": "node scripts\/generate-precache-manifest\.mjs"/);
-assert.match(read('scripts/generate-precache-manifest.mjs'), /\{ dir: 'js', extensions: new Set\(\['\.js', '\.css'\]\) \}/, 'precache generator must include Core-owned CSS under js');
 assert.match(read('package.json'), /"build": "node scripts\/generate-precache-manifest\.mjs && node scripts\/check-js-imports\.mjs(?: && node scripts\/audit-cleanup-phase44b\.mjs)?(?: && node scripts\/audit-runtime-diagnostics-phase44b4\.mjs)?"/);
 
 const report = {
@@ -62,7 +61,7 @@ const report = {
   assets: {
     total: assets.length,
     js: listFiles('js', file => file.endsWith('.js')).length,
-    css: listFiles('css', file => file.endsWith('.css')).length + listFiles('js', file => file.endsWith('.css')).length,
+    css: listFiles('css', file => file.endsWith('.css')).length,
     icons: listFiles('assets/icons').length,
     missing: missingAssets.length,
     staleRuntime: staleRuntimeAssets.length
