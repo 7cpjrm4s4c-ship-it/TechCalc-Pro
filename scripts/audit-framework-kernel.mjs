@@ -1,29 +1,33 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { detectRuntimeLayout } from './runtime-layout.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const runtimeLayout = detectRuntimeLayout(root);
+const coreFile = relativePath => `${runtimeLayout.coreDir}/${relativePath}`;
+const moduleFile = relativePath => `${runtimeLayout.modulesDir}/${relativePath}`;
 
 const requiredFiles = [
-  'js/core/index.js',
-  'js/core/appCore.js',
-  'js/core/contracts/index.js',
-  'js/core/data/index.js',
-  'js/core/data/catalog.js',
-  'js/core/data/fGasesSystemSnapshot.js',
-  'js/core/data/rainwater.js',
-  'js/core/data/pipes.js',
-  'js/core/data/refrigerants.js',
-  'js/core/events/index.js',
-  'js/core/hvacAir.js',
-  'js/core/hvacAirResults.js',
-  'js/core/pdf/index.js',
-  'js/core/runtime/index.js',
-  'js/core/state/index.js',
-  'js/core/storage/index.js',
-  'js/core/styles/index.js',
-  'js/core/ui/index.js',
-  'js/core/ux/index.js',
+  coreFile('index.js'),
+  coreFile('appCore.js'),
+  coreFile('contracts/index.js'),
+  coreFile('data/index.js'),
+  coreFile('data/catalog.js'),
+  coreFile('data/fGasesSystemSnapshot.js'),
+  coreFile('data/rainwater.js'),
+  coreFile('data/pipes.js'),
+  coreFile('data/refrigerants.js'),
+  coreFile('events/index.js'),
+  coreFile('hvacAir.js'),
+  coreFile('hvacAirResults.js'),
+  coreFile('pdf/index.js'),
+  coreFile('runtime/index.js'),
+  coreFile('state/index.js'),
+  coreFile('storage/index.js'),
+  coreFile('styles/index.js'),
+  coreFile('ui/index.js'),
+  coreFile('ux/index.js'),
   'docs/contracts/framework-kernel-contract.md',
   'docs/architecture/ADR-0020-internal-neutral-framework.md',
   'docs/architecture/ADR-0021-root-runtime-layout.md'
@@ -33,12 +37,12 @@ const forbiddenReferenceModuleImports = ['../../platform/', '../../shared/', '..
 const requiredCoreAreas = ['contracts', 'data', 'events', 'pdf', 'runtime', 'state', 'storage', 'styles', 'ui', 'ux'];
 const requiredCoreExports = ['./appCore.js', './contracts/index.js', './data/index.js', './events/index.js', './pdf/index.js', './runtime/index.js', './state/index.js', './storage/index.js', './styles/index.js', './ui/index.js', './ux/index.js'];
 
-const required = (file, specifiers) => ({ file: `js/modules/${file}`, specifiers });
+const required = (file, specifiers) => ({ file: moduleFile(file), specifiers });
 const moduleFiles = (moduleId, extraFiles = [], excludedFiles = []) => {
   const excluded = new Set(excludedFiles);
   return ['config.js', 'controller.js', 'index.js', 'logic.js', 'results.js', 'schema.js', 'state.js', 'view.js', 'viewModel.js', ...extraFiles]
     .filter(file => !excluded.has(file))
-    .map(file => `js/modules/${moduleId}/${file}`);
+    .map(file => moduleFile(`${moduleId}/${file}`));
 };
 const guard = (id, requiredImports, options = {}) => ({
   id,
@@ -214,16 +218,16 @@ for (const legacyBoundary of ['js/platform', 'js/framework', 'js/data']) {
 }
 
 for (const coreArea of requiredCoreAreas) {
-  if (!readProjectFile('js/core/appCore.js').includes(coreArea)) throw new Error(`Core area is not documented in appCore.js: ${coreArea}`);
+  if (!readProjectFile(coreFile('appCore.js')).includes(coreArea)) throw new Error(`Core area is not documented in appCore.js: ${coreArea}`);
 }
 
 for (const expectedExport of requiredCoreExports) {
-  if (!readProjectFile('js/core/index.js').includes(expectedExport)) throw new Error(`Core entry point does not export ${expectedExport}`);
+  if (!readProjectFile(coreFile('index.js')).includes(expectedExport)) throw new Error(`Core entry point does not export ${expectedExport}`);
 }
 
 
 for (const expectedToken of ['defineDataCatalogEntry', 'createDataCatalog', 'dataCatalog', 'rainwater.areaTypes', 'pipes.systems', 'refrigerants.items']) {
-  if (!readProjectFile('js/core/data/catalog.js').includes(expectedToken)) throw new Error(`Core data catalog contract is missing ${expectedToken}`);
+  if (!readProjectFile(coreFile('data/catalog.js')).includes(expectedToken)) throw new Error(`Core data catalog contract is missing ${expectedToken}`);
 }
 
 for (const expectedSection of ['Core first', 'Core responsibility paths', 'Module import rule', 'Central data path', 'Reference module guard', 'Module responsibility', 'Static resources', 'Transition contract']) {

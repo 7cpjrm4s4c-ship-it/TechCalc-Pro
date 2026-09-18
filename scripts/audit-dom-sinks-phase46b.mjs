@@ -1,21 +1,24 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { detectRuntimeLayout } from './runtime-layout.mjs';
 
 const root = process.cwd();
-const runtimeDirs = ['js'];
+const runtimeLayout = detectRuntimeLayout(root);
+const coreFile = relativePath => `${runtimeLayout.coreDir}/${relativePath}`;
+const moduleFile = relativePath => `${runtimeLayout.modulesDir}/${relativePath}`;
 
 const allowedInnerHtmlFiles = new Set([
-  'js/core/domUpdate.js',
-  'js/core/dynamicRenderer.js',
-  'js/core/lineSectionController/index.js',
-  'js/core/moduleRuntime.js',
-  'js/core/navigation.js',
-  'js/core/platformModuleRuntime.js',
-  'js/modules/drinking-water/dynamicRenderer.js',
-  'js/modules/heat-recovery/dynamicRenderer.js',
-  'js/modules/hx-diagram/renderPipeline.js',
-  'js/modules/mixed-air/dynamicRenderer.js',
-  'js/core/ux/releaseNotesController.js'
+  coreFile('domUpdate.js'),
+  coreFile('dynamicRenderer.js'),
+  coreFile('lineSectionController/index.js'),
+  coreFile('moduleRuntime.js'),
+  coreFile('navigation.js'),
+  coreFile('platformModuleRuntime.js'),
+  moduleFile('drinking-water/dynamicRenderer.js'),
+  moduleFile('heat-recovery/dynamicRenderer.js'),
+  moduleFile('hx-diagram/renderPipeline.js'),
+  moduleFile('mixed-air/dynamicRenderer.js'),
+  coreFile('ux/releaseNotesController.js')
 ]);
 
 const forbiddenSinkPatterns = [
@@ -40,7 +43,7 @@ function rel(file) {
   return path.relative(root, file).replaceAll(path.sep, '/');
 }
 
-const files = runtimeDirs.flatMap(dir => walk(path.join(root, dir)));
+const files = runtimeLayout.runtimeDirs.flatMap(dir => walk(path.join(root, dir)));
 const failures = [];
 const innerHtmlFiles = [];
 
@@ -59,7 +62,7 @@ for (const file of files) {
   }
 }
 
-const releaseNotes = fs.readFileSync(path.join(root, 'js/core/ux/releaseNotesController.js'), 'utf8');
+const releaseNotes = fs.readFileSync(path.join(root, runtimeLayout.coreDir, 'ux/releaseNotesController.js'), 'utf8');
 if (!releaseNotes.includes("import { esc as escapeHtml } from '../renderer.js';")) {
   failures.push('releaseNotesController.js must use the shared HTML escaping helper.');
 }
