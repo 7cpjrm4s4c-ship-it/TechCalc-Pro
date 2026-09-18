@@ -5,7 +5,7 @@ import {
   applyProjectModuleStates,
   registeredProjectModuleIds,
   resetProjectModuleStates
-} from '../core/projectModuleStateAdapters.js';
+} from '../core/state/projectModuleStateAdapters.js';
 import { state as fGasesState } from '../modules/f-gases-check/state.js';
 import { state as en378State } from '../modules/en-378-safety-check/state.js';
 
