@@ -9,7 +9,7 @@ const index = read('modules/flooding-verification/index.js');
 const schema = read('modules/flooding-verification/schema.js');
 const logic = read('modules/flooding-verification/logic.js');
 const projectStorage = read('core/projectStorage.js');
-const projectAdapters = read('core/projectModuleStateAdapters.js');
+const projectAdapters = read('core/state/projectModuleStateAdapters.js');
 const rainwaterTables = read('modules/rainwater/tables.js');
 
 test('47C.4.3 has no module-local event or debounce path', () => {
