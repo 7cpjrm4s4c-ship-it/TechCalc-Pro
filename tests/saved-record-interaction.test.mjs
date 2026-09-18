@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 
 const renderer = readFileSync('core/renderer.js', 'utf8');
 const savedRecords = readFileSync('core/savedRecords.js', 'utf8');
-const savedController = readFileSync('core/savedCalculationController.js', 'utf8');
+const savedController = readFileSync('core/storage/savedCalculationController.js', 'utf8');
 const scrollManager = readFileSync('core/scrollManager.js', 'utf8');
 
 function assert(condition, message) {
