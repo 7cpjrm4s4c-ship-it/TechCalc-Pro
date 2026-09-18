@@ -21,15 +21,16 @@ const walk = (dir) => {
 };
 
 const files = runtimeLayout.runtimeDirs.flatMap(dir => walk(dir)).map(rel);
+const loggerRelativePath = `${runtimeLayout.coreDir}/diagnostics/logger.js`;
 const directConsole = [];
 for (const file of files) {
-  if (file === `${runtimeLayout.coreDir}/logger.js`) continue;
+  if (file === loggerRelativePath) continue;
   const content = fs.readFileSync(path.join(root, file), 'utf8');
   const matches = [...content.matchAll(/\bconsole\s*(?:\.|\[)/g)];
   if (matches.length) directConsole.push({ file, count: matches.length });
 }
 
-const loggerPath = path.join(root, runtimeLayout.coreDir, 'logger.js');
+const loggerPath = path.join(root, loggerRelativePath);
 const loggerContent = fs.readFileSync(loggerPath, 'utf8');
 const required = ['debug(message, details, meta)', 'info(message, details, meta)', 'warn(message, details, meta)', 'error(message, details, meta)', 'setLevel(level)'];
 const missing = required.filter((token) => !loggerContent.includes(token));
