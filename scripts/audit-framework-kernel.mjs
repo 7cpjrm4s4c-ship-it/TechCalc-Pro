@@ -12,6 +12,10 @@ const requiredFiles = [
   coreFile('index.js'),
   coreFile('appCore.js'),
   coreFile('contracts/index.js'),
+  coreFile('contracts/moduleContract.js'),
+  coreFile('contracts/moduleDefinition.js'),
+  coreFile('contracts/moduleLayoutContract.js'),
+  coreFile('contracts/platformPolicy.js'),
   coreFile('data/index.js'),
   coreFile('data/catalog.js'),
   coreFile('data/fGasesSystemSnapshot.js'),
@@ -253,6 +257,12 @@ for (const referenceModule of referenceModules) {
       }
     }
   }
+
+  assertFileContains(
+    moduleFile(`${referenceModule.id}/config.js`),
+    '../../core/contracts/index.js',
+    `Reference module ${referenceModule.id} must use the Core contracts entry point in its config.js`
+  );
 
   for (const { file, specifiers } of referenceModule.requiredImports) {
     for (const specifier of specifiers) assertFileContains(file, specifier, `Reference module ${referenceModule.id} must use ${specifier} in ${file}`);

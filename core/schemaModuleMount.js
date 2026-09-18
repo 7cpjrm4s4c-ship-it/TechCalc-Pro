@@ -1,7 +1,7 @@
 import { renderModuleShell } from './renderer.js';
 import { mountModule } from './mount.js';
 import { createSchemaView } from './schemaRenderer.js';
-import { defineModuleDefinition } from './moduleDefinition.js';
+import { defineModuleDefinition } from './contracts/index.js';
 
 export function createSchemaModule(definition) {
   const moduleDefinition = defineModuleDefinition(definition);

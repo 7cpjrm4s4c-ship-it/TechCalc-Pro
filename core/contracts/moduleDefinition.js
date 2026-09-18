@@ -1,4 +1,4 @@
-import { validateFormSchema, readSchemaDefaults } from './formSchema.js';
+import { validateFormSchema, readSchemaDefaults } from '../formSchema.js';
 
 export const MODULE_CONTRACT_VERSION = '1.3.0';
 

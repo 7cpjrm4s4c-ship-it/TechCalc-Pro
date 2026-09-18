@@ -1,4 +1,4 @@
-import { defineModuleConfig, MODULE_CAPABILITIES } from '../../core/moduleDefinition.js';
+import { defineModuleConfig, MODULE_CAPABILITIES } from '../../core/contracts/index.js';
 
 export default defineModuleConfig({
   id: 'hx-diagram',

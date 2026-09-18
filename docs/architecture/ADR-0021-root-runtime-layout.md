@@ -72,6 +72,14 @@ modules
 
 Runtime consumers, audits, tests, deployment tooling and the service-worker precache switched atomically with the directory relocation. The empty `js` boundary is removed; a dedicated audit gate will protect it from recreation after the migration is verified in CI.
 
+The internal responsibility migrations represented in this branch so far are:
+
+- `core/diagnostics`
+- `core/events`
+- `core/contracts`
+
+The remaining top-level Core implementations continue to migrate one responsibility family at a time.
+
 ## Consequences
 
 Moving both sibling trees together preserves most relative imports between modules and Core. For example, imports using `../../core/...` remain valid when `js/modules/<module>` becomes `modules/<module>`.

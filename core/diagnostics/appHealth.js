@@ -1,5 +1,5 @@
 import { performanceBudget } from './performanceBudget.js';
-import { platformPolicy } from '../platformPolicy.js';
+import { platformPolicy } from '../contracts/index.js';
 
 export const appHealthChecks = Object.freeze({
   version: '1.3.2-dev.2-phase5',

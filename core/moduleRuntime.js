@@ -1,6 +1,6 @@
 import { logger } from './logger.js';
 import { hardResetModuleRoot } from './moduleLifecycleAdapter.js';
-import { applyModuleRootLayout } from './moduleLayoutContract.js';
+import { applyModuleRootLayout } from './contracts/moduleLayoutContract.js';
 import { restoreFocus as restorePlatformFocus } from './focusManager.js';
 
 const DEFAULT_MOUNT_TIMEOUT_MS = 7000;

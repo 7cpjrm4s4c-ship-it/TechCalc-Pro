@@ -1,4 +1,4 @@
-import { assertModuleRegistrationContract, moduleContractSummary, MODULE_CONTRACT_VERSION } from './moduleDefinition.js';
+import { assertModuleRegistrationContract, moduleContractSummary, MODULE_CONTRACT_VERSION } from './contracts/index.js';
 
 const REQUIRED_META_FIELDS = ['id', 'title', 'shortTitle', 'group', 'accent'];
 
