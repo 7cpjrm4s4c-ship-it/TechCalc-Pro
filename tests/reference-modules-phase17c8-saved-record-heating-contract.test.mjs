@@ -6,7 +6,7 @@ const rainwaterController = readFileSync('modules/rainwater/controller.js', 'utf
 const rainwaterResults = readFileSync('modules/rainwater/results.js', 'utf8');
 const wastewaterController = readFileSync('modules/wastewater/controller.js', 'utf8');
 const wastewaterResults = readFileSync('modules/wastewater/results.js', 'utf8');
-const pipeline = readFileSync('core/eventPipeline.js', 'utf8');
+const pipeline = readFileSync('core/events/eventPipeline.js', 'utf8');
 const runtime = readFileSync('js/platform/moduleRuntime/index.js', 'utf8');
 
 assert.match(heating, /data-line-select/, 'baseline: Heizung/Kälte uses data-line-select.');

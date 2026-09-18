@@ -5,7 +5,7 @@ import path from 'node:path';
 const root = process.cwd();
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 
-const eventPipeline = read('core/eventPipeline.js');
+const eventPipeline = read('core/events/eventPipeline.js');
 const drinkingDynamic = read('modules/drinking-water/dynamicRenderer.js');
 
 assert.match(

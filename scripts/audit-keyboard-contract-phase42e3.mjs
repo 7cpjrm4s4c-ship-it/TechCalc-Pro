@@ -7,7 +7,7 @@ const { coreDir, modulesDir } = detectRuntimeLayout(root);
 const runtimeRoots = [join(root, coreDir), join(root, modulesDir)];
 
 const CENTRAL_KEYBOARD_FILES = new Set([
-  'core/eventPipeline.js',
+  'core/events/eventPipeline.js',
   'core/focusManager.js',
   'core/stateBinding.js',
   'core/savedRecords.js',
@@ -69,7 +69,7 @@ for (const file of runtimeRoots.flatMap(walk)) {
   }
 }
 
-const eventPipeline = readFileSync(join(root, 'core/eventPipeline.js'), 'utf8');
+const eventPipeline = readFileSync(join(root, 'core/events/eventPipeline.js'), 'utf8');
 const focusManager = readFileSync(join(root, 'core/focusManager.js'), 'utf8');
 
 const requiredEventPipelineSnippets = [
@@ -80,7 +80,7 @@ const requiredEventPipelineSnippets = [
 ];
 for (const snippet of requiredEventPipelineSnippets) {
   if (!eventPipeline.includes(snippet)) {
-    failures.push(`core/eventPipeline.js: missing required central keyboard contract snippet: ${snippet}`);
+    failures.push(`core/events/eventPipeline.js: missing required central keyboard contract snippet: ${snippet}`);
   }
 }
 

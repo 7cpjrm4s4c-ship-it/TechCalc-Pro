@@ -20,7 +20,7 @@ import en378SafetyCheckConfig from '../modules/en-378-safety-check/config.js';
 import { restoreSessionSnapshot, saveSessionSnapshot } from './projectStorage.js';
 import { createModuleLifecycleAdapter } from './moduleLifecycleAdapter.js';
 import { createModuleRuntime } from './moduleRuntime.js';
-import { trackGlobalEventListener } from './eventManager.js';
+import { trackGlobalEventListener } from './events/index.js';
 import { initializeThemeController } from './ux/themeController.js';
 import { initializeSettingsController } from './ux/settingsController.js';
 import { initializeReleaseNotesController } from './ux/releaseNotesController.js';

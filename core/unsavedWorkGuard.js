@@ -1,4 +1,4 @@
-import { trackGlobalEventListener } from './eventManager.js';
+import { trackGlobalEventListener } from './events/index.js';
 
 const EDITABLE_SELECTOR = [
   '#app input',

@@ -1,5 +1,5 @@
 import { createLineSectionController } from '../../core/runtime/index.js';
-import { registerCentralActions } from '../../core/eventPipeline.js';
+import { registerCentralActions } from '../../core/events/index.js';
 import { preserveSavedRecordMutation } from '../../core/scrollManager.js';
 import { toggleNumericSign } from '../../core/renderer.js';
 import { state, normalizeSavedProcesses, clearLegacyPoints } from './state.js';

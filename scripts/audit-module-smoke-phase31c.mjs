@@ -18,7 +18,7 @@ const expectedModules = fs.readdirSync(modulesRoot, { withFileTypes: true })
 
 const savedOptionalModules = new Set(['unit-converter']);
 const coreText = [
-  'core/eventPipeline.js',
+  'core/events/eventPipeline.js',
   'core/stateBinding.js',
   'core/scrollManager.js',
   'core/renderCoordinator.js',

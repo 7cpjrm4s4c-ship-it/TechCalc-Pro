@@ -38,7 +38,7 @@ assert.equal(vm.state.process, 'cool-dehumidify');
 assert.deepEqual(comparablePath(vm.activePath), comparablePath(expectedLivePath), 'selected saved process must render a live preview path from current state');
 assert.notDeepEqual(comparablePath(vm.activePath), comparablePath(stalePath), 'view model must not keep the old saved record path after process changes');
 
-const eventPipeline = fs.readFileSync(new URL('../core/eventPipeline.js', import.meta.url), 'utf8');
+const eventPipeline = fs.readFileSync(new URL('../core/events/eventPipeline.js', import.meta.url), 'utf8');
 assert.match(eventPipeline, /focusNextPlatformField/, 'central event pipeline must provide Enter-to-next-field focus handling');
 assert.match(eventPipeline, /field:enter/, 'central event pipeline must keep explicit Enter commits');
 assert.match(eventPipeline, /requestAnimationFrame\(applyFocus\)/, 'next focus must be deferred until after possible render work');

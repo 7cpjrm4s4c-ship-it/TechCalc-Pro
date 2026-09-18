@@ -22,6 +22,9 @@ const requiredFiles = [
   coreFile('diagnostics/appHealth.js'),
   coreFile('diagnostics/performanceBudget.js'),
   coreFile('events/index.js'),
+  coreFile('events/eventDelegation.js'),
+  coreFile('events/eventManager.js'),
+  coreFile('events/eventPipeline.js'),
   coreFile('hvacAir.js'),
   coreFile('hvacAirResults.js'),
   coreFile('pdf/index.js'),
@@ -107,7 +110,7 @@ const referenceModules = [
     required('buffer-storage/viewModel.js', ['../../core/numberService.js'])
   ]),
   guard('wastewater', [
-    required('wastewater/controller.js', ['../../core/numbers.js', '../../core/formActions.js', '../../core/storage/index.js', '../../core/eventPipeline.js', '../../core/scrollManager.js']),
+    required('wastewater/controller.js', ['../../core/numbers.js', '../../core/formActions.js', '../../core/storage/index.js', '../../core/events/index.js', '../../core/scrollManager.js']),
     required('wastewater/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('wastewater/results.js', ['../../core/numberService.js']),
     required('wastewater/schema.js', ['../../core/formSchema.js', '../../core/numberService.js']),
@@ -125,7 +128,7 @@ const referenceModules = [
     required('rainwater/viewModel.js', ['../../core/formSchema.js', '../../core/resultRenderer.js'])
   ], { extraFiles: ['tables.js'] }),
   guard('flooding-verification', [
-    required('flooding-verification/controller.js', ['../../core/numbers.js', '../../core/eventPipeline.js', '../../core/storage/index.js', '../../core/data/rainwater.js']),
+    required('flooding-verification/controller.js', ['../../core/numbers.js', '../../core/events/index.js', '../../core/storage/index.js', '../../core/data/rainwater.js']),
     required('flooding-verification/dynamicRenderer.js', ['../../core/domUpdate.js']),
     required('flooding-verification/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('flooding-verification/logic.js', ['../../core/data/rainwater.js']),
@@ -154,7 +157,7 @@ const referenceModules = [
     required('mixed-air/viewModel.js', ['../../core/numberService.js', './results.js'])
   ]),
   guard('hx-diagram', [
-    required('hx-diagram/controller.js', ['../../core/runtime/index.js', '../../core/eventPipeline.js', '../../core/scrollManager.js', '../../core/renderer.js']),
+    required('hx-diagram/controller.js', ['../../core/runtime/index.js', '../../core/events/index.js', '../../core/scrollManager.js', '../../core/renderer.js']),
     required('hx-diagram/formRenderer.js', ['../../core/renderer.js', '../../core/numberService.js']),
     required('hx-diagram/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('hx-diagram/logic.js', ['../../core/numberService.js']),

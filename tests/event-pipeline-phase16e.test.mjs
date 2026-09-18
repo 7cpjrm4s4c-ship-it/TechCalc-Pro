@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const eventPipeline = readFileSync('core/eventPipeline.js', 'utf8');
+const eventPipeline = readFileSync('core/events/eventPipeline.js', 'utf8');
 assert.match(eventPipeline, /export function registerPipelineCommitHandler/, 'eventPipeline must expose central commit hooks');
 assert.match(eventPipeline, /__tcCommitHandlers/, 'eventPipeline must keep commit hooks inside the platform');
 

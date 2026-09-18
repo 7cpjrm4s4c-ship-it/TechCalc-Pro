@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const runtime = readFileSync(new URL('../js/platform/moduleRuntime/index.js', import.meta.url), 'utf8');
-const pipeline = readFileSync(new URL('../core/eventPipeline.js', import.meta.url), 'utf8');
+const pipeline = readFileSync(new URL('../core/events/eventPipeline.js', import.meta.url), 'utf8');
 const heating = readFileSync(new URL('../modules/heating-cooling/index.js', import.meta.url), 'utf8');
 const rainwater = readFileSync(new URL('../modules/rainwater/controller.js', import.meta.url), 'utf8');
 const wastewater = readFileSync(new URL('../modules/wastewater/controller.js', import.meta.url), 'utf8');

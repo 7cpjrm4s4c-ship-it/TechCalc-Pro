@@ -1,5 +1,5 @@
 import { canonicalGermanNumberInput } from '../../core/numbers.js';
-import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../../core/eventPipeline.js';
+import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../../core/events/index.js';
 import { createRecordId } from '../../core/storage/index.js';
 import { areaTypes, readRainwaterSurfaceSnapshot } from '../../core/data/rainwater.js';
 const typeById = new Map(areaTypes.map(item => [item.id, item]));

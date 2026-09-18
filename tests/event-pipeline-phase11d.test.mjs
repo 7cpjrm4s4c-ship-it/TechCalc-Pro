@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 
-const pipeline = fs.readFileSync('core/eventPipeline.js', 'utf8');
+const pipeline = fs.readFileSync('core/events/eventPipeline.js', 'utf8');
 const binding = fs.readFileSync('core/stateBinding.js', 'utf8');
 const renderer = fs.readFileSync('core/renderer.js', 'utf8');
 const savedRecords = fs.readFileSync('core/savedRecords.js', 'utf8');

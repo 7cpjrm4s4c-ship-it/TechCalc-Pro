@@ -1,5 +1,5 @@
 import { card, stack } from '../../core/renderer.js';
-import { registerCentralActions } from '../../core/eventPipeline.js';
+import { registerCentralActions } from '../events/index.js';
 import { preserveSavedRecordMutation } from '../../core/scrollManager.js';
 import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
 

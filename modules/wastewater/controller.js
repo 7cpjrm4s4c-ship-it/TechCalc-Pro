@@ -6,7 +6,7 @@ import { initialState } from './state.js';
 import { deleteCollectionItem, patchCollectionItem, upsertCollectionRecord, createStateSnapshot, hydrateStateRecord } from '../../core/storage/index.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { commitAllFields } from '../../core/eventPipeline.js';
+import { commitAllFields } from '../../core/events/index.js';
 import { PlatformScrollManager } from '../../core/scrollManager.js';
 const numericFields = new Set(['fixtureQuantity','fixtureCustomDu','kValue','fillRatio','slopeCmM','pipeLengthM','heightDifferenceM','bends90','continuousFlow','pumpFlow','rainFlow']);
 const normalizeNumeric = value => canonicalGermanNumberInput(value);

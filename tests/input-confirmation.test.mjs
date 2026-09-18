@@ -5,7 +5,7 @@ const renderer = fs.readFileSync('core/renderer.js', 'utf8');
 assert.match(renderer, /bindCentralEventPipeline\(root, state, \{ renderOnBlur: true \}\)/,
   'Common inputs must delegate confirmation behavior to the central event pipeline.');
 
-const eventPipeline = fs.readFileSync('core/eventPipeline.js', 'utf8');
+const eventPipeline = fs.readFileSync('core/events/eventPipeline.js', 'utf8');
 assert.match(eventPipeline, /let hasDeferredInput = false/,
   'Central input handling must track deferred, not-yet-rendered input state.');
 assert.match(eventPipeline, /const renderDeferred = \(force = false\) =>/,

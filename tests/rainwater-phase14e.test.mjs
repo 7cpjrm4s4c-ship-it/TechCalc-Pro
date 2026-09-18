@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const rainwater = readFileSync(new URL('../modules/rainwater/index.js', import.meta.url), 'utf8');
 const controller = readFileSync(new URL('../modules/rainwater/controller.js', import.meta.url), 'utf8');
-const pipeline = readFileSync(new URL('../core/eventPipeline.js', import.meta.url), 'utf8');
+const pipeline = readFileSync(new URL('../core/events/eventPipeline.js', import.meta.url), 'utf8');
 const runtime = readFileSync(new URL('../js/platform/moduleRuntime/index.js', import.meta.url), 'utf8');
 const config = readFileSync(new URL('../modules/rainwater/config.js', import.meta.url), 'utf8');
 

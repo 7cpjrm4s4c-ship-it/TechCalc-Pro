@@ -5,7 +5,7 @@ const state = fs.readFileSync('core/state.js', 'utf8');
 assert.match(state, /createStore/, 'Module state must be backed by central store.');
 assert.match(state, /registerModuleStore/, 'Module stores must register centrally.');
 
-const pipeline = fs.readFileSync('core/eventPipeline.js', 'utf8');
+const pipeline = fs.readFileSync('core/events/eventPipeline.js', 'utf8');
 assert.match(pipeline, /bindCentralEventPipeline/, 'Central event pipeline must be available.');
 assert.match(pipeline, /field:change:immediate/, 'Select/change events must commit immediately.');
 assert.match(pipeline, /field:blur/, 'Input blur must commit through central pipeline.');

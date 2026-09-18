@@ -1,7 +1,7 @@
 import { mountModule } from './mount.js';
 import { bindCommonInputs, bindNoClickScroll } from './renderer.js';
 import { bindModuleStateBinding } from './stateBinding.js';
-import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from './eventPipeline.js';
+import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from './events/index.js';
 import { createSavedRecord, savedRecordReducer } from './savedRecordController.js';
 // createSavedRecordActions( remains the central action-factory contract; Phase 17C.9
 // uses the Heizung/Kälte-compatible direct binding to avoid duplicate mobile events.

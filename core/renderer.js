@@ -1,4 +1,4 @@
-import { bindCentralEventPipeline } from './eventPipeline.js';
+import { bindCentralEventPipeline } from './events/index.js';
 
 export function cssEscape(value) {
   const text = String(value ?? '');

@@ -6,7 +6,7 @@ Dieses Dokument hält bewusst erhaltene Core-Dateien fest, die nicht in jedem Fa
 
 ## Erhaltene Entrypoints
 
-- `js/core/eventDelegation.js` – historischer Event-Delegation-Adapter und Prüfanker für Event-System-Regressionen.
+- `core/events/eventDelegation.js` – zentraler Event-Delegation-Dienst und Prüfanker für Event-System-Regressionen.
 - `js/core/moduleContract.js` – Kompatibilitäts- und Contract-Entrypoint für ältere Plattform-/Auditpfade.
 - `js/core/pdfExport.js` – dynamisch geladener PDF-Export-Entrypoint aus `js/core/app.js`.
 - `js/core/platformLifecycle.js` – Plattform-Lifecycle-Kompatibilitätsdatei und Audit-Anker.

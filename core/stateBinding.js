@@ -1,4 +1,4 @@
-import { commitAllFields, commitElementField } from './eventPipeline.js';
+import { commitAllFields, commitElementField } from './events/index.js';
 import { handlePlatformFieldNavigation } from './focusManager.js';
 
 function closest(root, target, selector) {

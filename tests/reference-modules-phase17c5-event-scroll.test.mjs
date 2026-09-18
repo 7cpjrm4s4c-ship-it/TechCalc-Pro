@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const runtimeSource = readFileSync(new URL('../js/platform/moduleRuntime/index.js', import.meta.url), 'utf8');
-const eventPipelineSource = readFileSync(new URL('../core/eventPipeline.js', import.meta.url), 'utf8');
+const eventPipelineSource = readFileSync(new URL('../core/events/eventPipeline.js', import.meta.url), 'utf8');
 const coordinatorSource = readFileSync(new URL('../core/renderCoordinator.js', import.meta.url), 'utf8');
 
 assert.match(runtimeSource, /'line:save': save/, 'Saved-record save must be registered through the central Heizung/Kälte action map.');
