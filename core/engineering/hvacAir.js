@@ -1,5 +1,5 @@
-import { airDensity } from './data/index.js';
-import { parseNumber } from './numberService.js';
+import { airDensity } from '../data/index.js';
+import { parseNumber } from '../numberService.js';
 
 const num = value => parseNumber(value, { fallback: 0 });
 
@@ -19,7 +19,6 @@ function saturationPressurePa(tempC) {
   const b = t >= 0 ? 243.12 : 272.62;
   return 611.2 * Math.exp((a * t) / (b + t));
 }
-
 function humidityRatioKgKg(tempC, rhPercent) {
   const rh = clamp(rhPercent, 0, 100) / 100;
   const pv = Math.min(rh * saturationPressurePa(tempC), P_ATM_PA * 0.95);
@@ -34,7 +33,6 @@ function relativeHumidityPercent(tempC, wKgKg) {
 function enthalpyKjKg(tempC, wKgKg) {
   return 1.006 * tempC + wKgKg * (2501 + 1.86 * tempC);
 }
-
 function dryAirMassFlowKgh(volumeFlowM3h, tempC) {
   const rho = airDensity(tempC || 20);
   return Math.max(0, volumeFlowM3h || 0) * rho;

@@ -1,7 +1,6 @@
-import { formatNumber } from './numberService.js';
+import { formatNumber } from '../numberService.js';
 
 const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
-
 export function modeLabel(mode){
   return mode === 'mixing' ? 'Mischluft' : 'WRG';
 }
