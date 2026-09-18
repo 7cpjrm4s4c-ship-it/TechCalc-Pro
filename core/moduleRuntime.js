@@ -1,4 +1,4 @@
-import { logger } from './logger.js';
+import { logger } from './diagnostics/logger.js';
 import { hardResetModuleRoot } from './moduleLifecycleAdapter.js';
 import { applyModuleRootLayout } from './contracts/moduleLayoutContract.js';
 import { restoreFocus as restorePlatformFocus } from './focusManager.js';
