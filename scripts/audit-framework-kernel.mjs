@@ -7,7 +7,6 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const runtimeLayout = detectRuntimeLayout(root);
 const coreFile = relativePath => `${runtimeLayout.coreDir}/${relativePath}`;
 const moduleFile = relativePath => `${runtimeLayout.modulesDir}/${relativePath}`;
-
 const requiredFiles = [
   coreFile('index.js'),
   coreFile('appCore.js'),
@@ -29,8 +28,8 @@ const requiredFiles = [
   coreFile('events/eventDelegation.js'),
   coreFile('events/eventManager.js'),
   coreFile('events/eventPipeline.js'),
-  coreFile('hvacAir.js'),
-  coreFile('hvacAirResults.js'),
+  coreFile('engineering/hvacAir.js'),
+  coreFile('engineering/hvacAirResults.js'),
   coreFile('pdf/index.js'),
   coreFile('runtime/index.js'),
   coreFile('state/index.js'),
@@ -42,11 +41,9 @@ const requiredFiles = [
   'docs/architecture/ADR-0020-internal-neutral-framework.md',
   'docs/architecture/ADR-0021-root-runtime-layout.md'
 ];
-
 const forbiddenReferenceModuleImports = ['../../platform/', '../../shared/', '../../utils/'];
 const requiredCoreAreas = ['contracts', 'data', 'diagnostics', 'events', 'pdf', 'runtime', 'state', 'storage', 'styles', 'ui', 'ux'];
 const requiredCoreExports = ['./appCore.js', './contracts/index.js', './data/index.js', './diagnostics/index.js', './events/index.js', './pdf/index.js', './runtime/index.js', './state/index.js', './storage/index.js', './styles/index.js', './ui/index.js', './ux/index.js'];
-
 const required = (file, specifiers) => ({ file: moduleFile(file), specifiers });
 const moduleFiles = (moduleId, extraFiles = [], excludedFiles = []) => {
   const excluded = new Set(excludedFiles);
@@ -144,8 +141,8 @@ const referenceModules = [
     required('heat-recovery/controller.js', ['../../core/runtime/index.js', '../../core/renderer.js']),
     required('heat-recovery/dynamicRenderer.js', ['../../core/renderer.js']),
     required('heat-recovery/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
-    required('heat-recovery/logic.js', ['../../core/hvacAir.js']),
-    required('heat-recovery/results.js', ['../../core/hvacAirResults.js']),
+    required('heat-recovery/logic.js', ['../../core/engineering/hvacAir.js']),
+    required('heat-recovery/results.js', ['../../core/engineering/hvacAirResults.js']),
     required('heat-recovery/schema.js', ['../../core/formSchema.js']),
     required('heat-recovery/view.js', ['../../core/renderer.js', '../../core/resultRenderer.js']),
     required('heat-recovery/viewModel.js', ['../../core/numberService.js'])
@@ -154,8 +151,8 @@ const referenceModules = [
     required('mixed-air/controller.js', ['../../core/runtime/index.js', '../../core/renderer.js', '../../core/numberService.js']),
     required('mixed-air/dynamicRenderer.js', ['../../core/renderer.js']),
     required('mixed-air/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
-    required('mixed-air/logic.js', ['../../core/hvacAir.js']),
-    required('mixed-air/results.js', ['../../core/hvacAirResults.js']),
+    required('mixed-air/logic.js', ['../../core/engineering/hvacAir.js']),
+    required('mixed-air/results.js', ['../../core/engineering/hvacAirResults.js']),
     required('mixed-air/schema.js', ['../../core/formSchema.js']),
     required('mixed-air/view.js', ['../../core/renderer.js', '../../core/resultRenderer.js']),
     required('mixed-air/viewModel.js', ['../../core/numberService.js', './results.js'])
@@ -234,7 +231,6 @@ for (const coreArea of requiredCoreAreas) {
 for (const expectedExport of requiredCoreExports) {
   if (!readProjectFile(coreFile('index.js')).includes(expectedExport)) throw new Error(`Core entry point does not export ${expectedExport}`);
 }
-
 
 for (const expectedToken of ['defineDataCatalogEntry', 'createDataCatalog', 'dataCatalog', 'rainwater.areaTypes', 'pipes.systems', 'refrigerants.items']) {
   if (!readProjectFile(coreFile('data/catalog.js')).includes(expectedToken)) throw new Error(`Core data catalog contract is missing ${expectedToken}`);
