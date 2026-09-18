@@ -23,7 +23,7 @@ assert.equal(report.checks.every(item => item.status === 'passed'), true);
 
 const serviceWorker = read('service-worker.js');
 assert.match(serviceWorker, /'\.\/core\/centralStore\.js'/);
-assert.match(serviceWorker, /'\.\/core\/eventPipeline\.js'/);
+assert.match(serviceWorker, /'\.\/core\/events\/eventPipeline\.js'/);
 assert.match(serviceWorker, /'\.\/core\/dynamicRenderer\.js'/);
 assert.match(serviceWorker, /'\.\/modules\/drinking-water\/controller\.js'/);
 assert.match(serviceWorker, /'\.\/modules\/rainwater\/controller\.js'/);

@@ -10,7 +10,7 @@ const drinkingDynamic = read('modules/drinking-water/dynamicRenderer.js');
 
 assert.match(
   eventPipeline,
-  /import \{[^}]*preserveFocusDuring[^}]*\} from '\.\/focusManager\.js';/,
+  /import \{[^}]*preserveFocusDuring[^}]*\} from '\.\.\/focusManager\.js';/,
   'eventPipeline must import preserveFocusDuring from focusManager instead of referencing a missing global'
 );
 
