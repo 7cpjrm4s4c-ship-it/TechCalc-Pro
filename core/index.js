@@ -2,6 +2,7 @@ export * from './appCore.js';
 export * from './contracts/index.js';
 export * from './data/index.js';
 export * from './diagnostics/index.js';
+export * from './engineering/index.js';
 export * from './events/index.js';
 export * from './pdf/index.js';
 export * from './runtime/index.js';
