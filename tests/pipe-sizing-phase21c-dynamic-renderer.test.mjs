@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createPipeSizingDynamicRenderer } from '../core/dynamicRenderer.js';
+import { createPipeSizingDynamicRenderer } from '../core/ui/dynamicRenderer.js';
 
 const index = readFileSync('modules/pipe-sizing/index.js', 'utf8');
 const view = readFileSync('modules/pipe-sizing/view.js', 'utf8');
-const dynamicRenderer = readFileSync('core/dynamicRenderer.js', 'utf8');
+const dynamicRenderer = readFileSync('core/ui/dynamicRenderer.js', 'utf8');
 
 assert.equal(typeof createPipeSizingDynamicRenderer, 'function', 'core must export pipe-sizing dynamic renderer');
 assert.match(index, /createPipeSizingDynamicRenderer/, 'pipe-sizing must use the dynamic renderer');
