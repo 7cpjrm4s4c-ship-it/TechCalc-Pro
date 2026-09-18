@@ -1,6 +1,6 @@
 import { logger } from '../logger.js';
 import { trackGlobalEventListener } from '../events/index.js';
-import { initializeUnsavedWorkGuard } from '../unsavedWorkGuard.js';
+import { initializeUnsavedWorkGuard } from '../storage/unsavedWorkGuard.js';
 
 const SETTINGS_UI_STORAGE_KEY = 'techcalc-settings-ui';
 const CORPORATE_BLOCK_FIELD_IDS = [
