@@ -7,6 +7,10 @@ export const appCoreAreas = Object.freeze({
     path: 'core/data',
     responsibility: 'Central shared datasets, catalog access and lookup services'
   }),
+  diagnostics: Object.freeze({
+    path: 'core/diagnostics',
+    responsibility: 'Application health checks and performance budgets'
+  }),
   events: Object.freeze({
     path: 'core/events',
     responsibility: 'Event delegation, event management and event pipeline coordination'

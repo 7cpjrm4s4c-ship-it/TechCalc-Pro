@@ -18,6 +18,9 @@ const requiredFiles = [
   coreFile('data/rainwater.js'),
   coreFile('data/pipes.js'),
   coreFile('data/refrigerants.js'),
+  coreFile('diagnostics/index.js'),
+  coreFile('diagnostics/appHealth.js'),
+  coreFile('diagnostics/performanceBudget.js'),
   coreFile('events/index.js'),
   coreFile('hvacAir.js'),
   coreFile('hvacAirResults.js'),
@@ -34,8 +37,8 @@ const requiredFiles = [
 ];
 
 const forbiddenReferenceModuleImports = ['../../platform/', '../../shared/', '../../utils/'];
-const requiredCoreAreas = ['contracts', 'data', 'events', 'pdf', 'runtime', 'state', 'storage', 'styles', 'ui', 'ux'];
-const requiredCoreExports = ['./appCore.js', './contracts/index.js', './data/index.js', './events/index.js', './pdf/index.js', './runtime/index.js', './state/index.js', './storage/index.js', './styles/index.js', './ui/index.js', './ux/index.js'];
+const requiredCoreAreas = ['contracts', 'data', 'diagnostics', 'events', 'pdf', 'runtime', 'state', 'storage', 'styles', 'ui', 'ux'];
+const requiredCoreExports = ['./appCore.js', './contracts/index.js', './data/index.js', './diagnostics/index.js', './events/index.js', './pdf/index.js', './runtime/index.js', './state/index.js', './storage/index.js', './styles/index.js', './ui/index.js', './ux/index.js'];
 
 const required = (file, specifiers) => ({ file: moduleFile(file), specifiers });
 const moduleFiles = (moduleId, extraFiles = [], excludedFiles = []) => {
