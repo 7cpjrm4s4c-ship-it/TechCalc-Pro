@@ -1,4 +1,4 @@
-import { logger } from '../logger.js';
+import { logger } from '../diagnostics/logger.js';
 const registry = new Set();
 
 function normalizeOptions(options) {
