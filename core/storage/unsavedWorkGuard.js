@@ -1,4 +1,4 @@
-import { trackGlobalEventListener } from './events/index.js';
+import { trackGlobalEventListener } from '../events/index.js';
 
 const EDITABLE_SELECTOR = [
   '#app input',
@@ -18,7 +18,6 @@ const MUTATING_ACTION_SELECTOR = [
 
 let dirty = false;
 let initialized = false;
-
 export function hasUnsavedWork() {
   return dirty;
 }
@@ -34,7 +33,6 @@ export function clearUnsavedWork() {
 function isEditableChange(event) {
   return Boolean(event.target?.matches?.(EDITABLE_SELECTOR));
 }
-
 function isMutatingAction(event) {
   const action = event.target?.closest?.(MUTATING_ACTION_SELECTOR);
   if (!action) return false;
@@ -48,7 +46,6 @@ export function applyBeforeUnloadGuard(event) {
   event.returnValue = '';
   return '';
 }
-
 export function initializeUnsavedWorkGuard() {
   if (initialized || typeof window === 'undefined' || typeof document === 'undefined') return;
   initialized = true;
@@ -62,7 +59,6 @@ export function initializeUnsavedWorkGuard() {
   trackGlobalEventListener(document, 'click', event => {
     if (isMutatingAction(event)) markUnsavedWork();
   }, true);
-
   trackGlobalEventListener(document, 'techcalc-project-dirty', markUnsavedWork);
   trackGlobalEventListener(document, 'techcalc-project-saved', clearUnsavedWork);
   trackGlobalEventListener(document, 'techcalc-project-loaded', clearUnsavedWork);

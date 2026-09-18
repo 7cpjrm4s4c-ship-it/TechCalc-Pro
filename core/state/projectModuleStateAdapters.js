@@ -1,11 +1,10 @@
-import { state as en378SafetyCheckState } from '../modules/en-378-safety-check/state.js';
-import { state as fGasesCheckState } from '../modules/f-gases-check/state.js';
-import { state as floodingVerificationState } from '../modules/flooding-verification/state.js';
+import { state as en378SafetyCheckState } from '../../modules/en-378-safety-check/state.js';
+import { state as fGasesCheckState } from '../../modules/f-gases-check/state.js';
+import { state as floodingVerificationState } from '../../modules/flooding-verification/state.js';
 
 const clone = value => typeof structuredClone === 'function'
   ? structuredClone(value)
   : JSON.parse(JSON.stringify(value));
-
 function migrateFloodingVerificationState(input = {}) {
   const next = clone(input || {});
   if (!next.pipeSlopePercent && next.pipeSlopePermille) {
@@ -15,7 +14,6 @@ function migrateFloodingVerificationState(input = {}) {
   delete next.pipeSlopePermille;
   return next;
 }
-
 function createStateAdapter(id, moduleState, migrate = value => clone(value || {})) {
   return Object.freeze({
     id,
@@ -29,10 +27,8 @@ function createStateAdapter(id, moduleState, migrate = value => clone(value || {
     reset: () => moduleState.reset()
   });
 }
-
 const fGasesCheckAdapter = createStateAdapter('f-gases-check', fGasesCheckState);
 const en378SafetyCheckAdapter = createStateAdapter('en-378-safety-check', en378SafetyCheckState);
-
 const floodingVerificationAdapter = Object.freeze({
   id: 'flooding-verification',
   read: () => ({ state: floodingVerificationState.get() }),
@@ -44,7 +40,6 @@ const floodingVerificationAdapter = Object.freeze({
   },
   reset: () => floodingVerificationState.reset()
 });
-
 const adapters = Object.freeze([
   fGasesCheckAdapter,
   en378SafetyCheckAdapter,
@@ -59,7 +54,6 @@ export function appendProjectModuleStates(data = {}) {
   });
   return project;
 }
-
 export function applyProjectModuleStates(data = {}) {
   const modules = data?.modules && typeof data.modules === 'object' ? data.modules : {};
   adapters.forEach(adapter => adapter.apply(modules[adapter.id]));

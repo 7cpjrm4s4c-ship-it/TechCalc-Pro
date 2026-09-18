@@ -3,7 +3,7 @@ import {
   appendProjectModuleStates,
   applyProjectModuleStates,
   resetProjectModuleStates
-} from './projectModuleStateAdapters.js';
+} from './state/projectModuleStateAdapters.js';
 
 export * from './projectStorageBase.js';
 
@@ -13,7 +13,6 @@ function clone(value) {
   if (typeof structuredClone === 'function') return structuredClone(value);
   return JSON.parse(JSON.stringify(value));
 }
-
 export function collectProjectData() {
   return appendProjectModuleStates(base.collectProjectData());
 }
@@ -27,7 +26,6 @@ export function resetAllSessionData() {
   base.resetAllSessionData();
   resetProjectModuleStates();
 }
-
 export function saveSessionSnapshot() {
   try {
     sessionStorage.setItem(SESSION_SNAPSHOT_KEY, JSON.stringify(collectProjectData()));
@@ -47,7 +45,6 @@ export function restoreSessionSnapshot(options = {}) {
     return false;
   }
 }
-
 function buildTcprojProjectBlob(data = {}) {
   const project = clone(data);
   project.format = 'techcalc-project';
@@ -66,7 +63,6 @@ function buildTcprojProjectBlob(data = {}) {
   }
   return new Blob([JSON.stringify(project, null, 2)], { type: 'application/vnd.techcalc.project+json' });
 }
-
 export async function downloadProjectFile() {
   const data = collectProjectData();
   const meta = data.meta || {};
@@ -74,7 +70,6 @@ export async function downloadProjectFile() {
   const safe = baseName.toLowerCase().replace(/[^a-z0-9äöüß_-]+/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'techcalc-projekt';
   const fileName = `${safe}.tcproj`;
   const blob = buildTcprojProjectBlob(data);
-
   if (typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function') {
     try {
       const handle = await window.showSaveFilePicker({
@@ -93,7 +88,6 @@ export async function downloadProjectFile() {
       if (error?.name === 'AbortError') return false;
     }
   }
-
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
