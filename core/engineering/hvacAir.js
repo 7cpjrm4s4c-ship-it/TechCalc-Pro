@@ -1,5 +1,5 @@
 import { airDensity } from '../data/index.js';
-import { parseNumber } from '../ui/numberService.js';
+import { parseNumber } from '../numberService.js';
 
 const num = value => parseNumber(value, { fallback: 0 });
 
