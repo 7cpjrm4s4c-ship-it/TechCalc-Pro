@@ -1,8 +1,9 @@
 # ADR-0020: Internal Neutral Framework Kernel
 
-Status: Accepted
+Status: Superseded by ADR-0021
 Date: 2026-09-07
 Target release: 2.0.0
+Superseded: 2026-09-18
 
 ---
 ## Context

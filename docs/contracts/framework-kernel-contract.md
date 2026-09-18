@@ -3,76 +3,75 @@
 Status: Active
 Version target: 2.0.0
 Authority: Repository First
+Architecture decision: ADR-0021
 
 ---
 
 ## Purpose
 
-The internal neutral framework kernel defines central access points for recurring module responsibilities.
+The internal framework kernel defines central access points for recurring application responsibilities.
 
-Modules must use core-provided services for app-wide concerns instead of reimplementing them locally.
+Modules must use Core-provided services for app-wide concerns instead of reimplementing them locally.
 
----
 ## Core first
 
-The canonical framework basis is:
-
-```js
-js/core
-```
-
-All app-wide responsibilities must be discoverable through `js/core` before feature modules are migrated.
-
-The former `js/framework` compatibility facade was unused and has been removed. `js/core` is the only framework entry boundary.
-
----
-## Core-only runtime target
-
-The final runtime application code target is intentionally narrow:
+The canonical target framework basis is:
 
 ```text
-js/core
-js/modules
+core
 ```
 
-`js/core` owns app-wide responsibilities: internal framework, runtime, shell, routing, UI primitives, rendering services, data, storage, PDF, styles, static app assets, number handling, events, UX policies and quality/runtime diagnostics.
+The current `js/core` path is a temporary transition location until the coordinated Root-Level Runtime Layout migration is committed.
 
-`js/modules` owns module-specific responsibilities only: module metadata, configuration, state, schema, calculation logic, result mapping, report adapters, saved-record adapters and optional controller/view code required by the module.
+All app-wide responsibilities must remain discoverable through Core. No additional framework or platform facade may be introduced.
 
-The following paths remain migration boundaries, not final runtime ownership locations:
+## Core-only runtime target
 
-- root-level `css`
-- root-level `assets`
+The final runtime JavaScript target is intentionally narrow:
 
-They must shrink through isolated, reviewed migration steps. New app-wide runtime implementation must not be added to those migration boundaries.
+```text
+core
+modules
+```
 
-The historical `js/platform` boundary and the unused `js/framework` and `js/data` compatibility facades have been removed. None of these paths may be recreated.
+`core` owns app-wide responsibilities: bootstrap, runtime, routing, UI primitives, rendering, data, storage, PDF, number handling, events, UX policies and diagnostics.
 
-Root files, build scripts, tests, documentation, CI and deployment configuration remain outside `js/core` and `js/modules` because they are repository/tooling concerns, not runtime ownership areas.
+`modules` owns module-specific responsibilities: metadata, configuration, state, schema, calculation logic, result mapping, report adapters, saved-record adapters and module-specific controller or view code.
 
----
+Root-level `css` and `assets` remain canonical static-resource locations. They are not Core implementation directories.
+
+Scripts, tests, documentation, CI and deployment configuration remain outside the runtime target because they are repository concerns.
+
 ## Core responsibility paths
-| Concern | Canonical core path |
+
+| Concern | Canonical target path |
 |---|---|
-| Core overview | `js/core/index.js`, `js/core/appCore.js` |
-| Contracts and policies | `js/core/contracts` |
-| Data catalogs and lookup services | `js/core/data` |
-| Events | `js/core/events` |
-| PDF export | `js/core/pdf`, `js/core/pdfExport.js` |
-| Runtime, routing and navigation | `js/core/runtime` |
-| Shell and app controllers | `js/core/ux` |
-| State | `js/core/state` |
-| Storage and saved records | `js/core/storage` |
-| Stylesheet manifest and app styles | `js/core/styles` target path |
-| Static app assets | `js/core/assets` target path |
-| UI rendering and primitives | `js/core/ui` |
-| UX policies and interaction helpers | `js/core/ux` |
----
+| Bootstrap and Core overview | `core/app.js`, `core/index.js`, `core/version.js` |
+| Application composition and routing | `core/app` |
+| Contracts and policies | `core/contracts` |
+| Data catalogs and lookup services | `core/data` |
+| Diagnostics and logging | `core/diagnostics` |
+| Shared technical domain services | `core/domain` |
+| Events | `core/events` |
+| Forms and schema handling | `core/forms` |
+| PDF export | `core/pdf` |
+| Rendering | `core/rendering` |
+| Runtime and lifecycle | `core/runtime` |
+| State | `core/state` |
+| Storage and saved records | `core/storage` |
+| Stylesheet manifests and contracts | `core/styles` |
+| UI primitives and interaction services | `core/ui` |
+| UX and shell controllers | `core/ux` |
+| Physical stylesheets | `css` |
+| Static application resources | `assets` |
+
+`core/app.js`, `core/index.js` and `core/version.js` remain direct Core entry points. Other top-level Core files must be migrated into the responsibility paths in isolated, CI-backed steps after the outer directory move.
+
 ## Module import rule
 
-Modules should import from the narrowest central core path that matches the required responsibility.
+Modules must import from the narrowest Core path matching the required responsibility.
 
-Examples:
+The sibling relationship between `core` and `modules` preserves imports such as:
 
 ```js
 import { dataCatalog } from '../../core/data/index.js';
@@ -80,102 +79,39 @@ import { createPlatformModule } from '../../core/runtime/index.js';
 import { defineModuleDefinition } from '../../core/contracts/index.js';
 ```
 
-Modules should not use broad framework imports when a narrow core path is sufficient.
+Modules must not use broad compatibility facades when a narrow Core path is available.
 
----
 ## Central data path
 
-The canonical central data path is:
+The canonical target data path is:
 
-```js
-js/core/data
+```text
+core/data
 ```
 
-`js/data` has been removed after all consumers were migrated to canonical `js/core/data` paths. It must not be recreated.
+During transition it remains at `js/core/data`. The former `js/data`, `js/shared` and `js/utils` compatibility paths have been removed and must not be recreated.
 
-The previous `js/shared` and `js/utils` data/helper compatibility paths have been removed after verified migration to `js/core/data`. Reference modules must consume app-wide data through Core paths.
+Data catalogs, shared datasets and lookup services belong exclusively to Core Data.
 
-`js/core/data/fGasesSystemSnapshot.js` exposes the F-Gase system snapshot implementation through the central data boundary. `f-gases-check` consumes it through `js/core/data`.
-`js/core/data/rainwater.js` exposes Rainwater domain tables and Rainwater surface snapshot access through the central data boundary. Rainwater and Flooding consume them through Core Data.
-`js/modules/mixed-air` currently reuses domain-specific calculation and result mapping from `js/modules/heat-recovery`. This is an existing WRG/Mischluft domain coupling and is not a legacy app-wide boundary. It must remain limited to `../heat-recovery/logic.js` and `../heat-recovery/results.js` until a dedicated shared HVAC air-domain core is introduced.
-
----
-## Platform migration boundary
-
-The historical `js/platform` boundary has been fully migrated into Core and removed.
-
-All app-wide runtime services and shell controllers now use canonical paths under `js/core`. Reintroducing `js/platform` is forbidden and enforced by `npm run audit:framework-kernel`.
-
-The completed migration retained public behavior, service-worker precache consistency and release gates through isolated, CI-backed ownership changes.
-
----
-
-## Data catalog contract
-
-Centralized data access is owned by:
-
-```js
-js/core/data/catalog.js
-```
-
-The catalog exposes registered data entries through stable catalog identifiers and read-only access methods.
-
-
-
-Built-in catalog groups currently include:
-
-- rainwater area, hydraulic, roof drain and gutter data
-- pipe system and nominal diameter data
-- refrigerant, safety class, regulation and EN 378 safety data
-
----
 ## Reference module guard
 
-The migrated reference modules are:
+The reference modules are the 15 feature directories below target path `modules/`. Until the coordinated move they remain below `js/modules/`.
 
-```js
-js/modules/unit-converter
-js/modules/pipe-sizing
-js/modules/pressure-holding
-js/modules/heating-cooling
-js/modules/ventilation
-js/modules/buffer-storage
-js/modules/wastewater
-js/modules/rainwater
-js/modules/flooding-verification
-js/modules/heat-recovery
-js/modules/mixed-air
-js/modules/hx-diagram
-js/modules/f-gases-check
-js/modules/en-378-safety-check
-js/modules/drinking-water
-```
-Reference modules must use central Core paths for app-wide dependencies and must not import directly from these legacy or platform implementation paths:
+Reference modules must use central Core paths for app-wide dependencies and must not import directly from removed platform, shared or utility paths.
 
-- `../../platform/`
-- `../../utils/`
-- `../../shared/`
+The guard validates, among other responsibilities:
 
-The reference modules currently validate the following Core responsibilities:
-- runtime and dynamic renderer access through `../../core/runtime/index.js`
-- typed report adapter access through `../../core/typedDtoReportAdapter.js`
-- data access through `../../core/data/index.js` and `../../core/data/rainwater.js`
-- central store access through `../../core/centralStore.js`
-- number formatting and parsing through `../../core/numberService.js` and `../../core/numbers.js`
-- schema access through `../../core/formSchema.js`
-- base rendering through `../../core/renderer.js`
-- result rendering through `../../core/resultRenderer.js`
-- collection, record identity and saved-record access through `../../core/storage/index.js` and `../../core/savedRecords.js`
-- central event pipeline access through `../../core/eventPipeline.js`
-- focus preservation access through `../../core/focusManager.js`
-- scroll stability access through `../../core/scrollManager.js`
-- safe DOM update access through `../../core/domUpdate.js`
+- runtime through `../../core/runtime/index.js`
+- report adapters through Core
+- data through `../../core/data`
+- central state and storage through Core
+- rendering, schema, event, focus and scroll services through Core
+
 This guard is enforced by `npm run audit:framework-kernel`.
 
----
 ## Module responsibility
 
-A framework-oriented module should provide only module-specific concerns:
+A module may own only feature-specific concerns:
 
 - metadata and configuration
 - initial state
@@ -183,43 +119,40 @@ A framework-oriented module should provide only module-specific concerns:
 - calculation logic
 - result mapping
 - report adapter
-- optional controller logic where required
+- saved-record adapter
+- optional module-specific controller and view code
 
-Central concerns stay outside feature modules:
+App-wide rendering, lifecycle, routing, validation, storage, PDF dispatch, data catalogs, number handling, CSS policies and UX policies remain Core responsibilities.
 
-- rendering
-- lifecycle
-- routing and navigation
-- state binding
-- validation flow
-- saved records
-- PDF dispatch
-- data catalogs
-- number formatting and parsing
-- CSS and UX policies
+## Static resources
 
----
-## App resource migration target
-
-Root-level `css` and `assets` are runtime application resources and should be migrated into Core-owned resource paths after platform implementation ownership is stabilized.
-
-Target ownership:
+Physical stylesheet and asset ownership remains:
 
 ```text
-css/*    → js/core/styles/*
-assets/* → js/core/assets/*
+css/
+assets/
 ```
 
-Moving these paths requires coordinated updates to `index.html`, `manifest.json`, `service-worker.js`, precache generation and browser/PWA audits. These moves must not be combined with platform or module runtime migrations.
+`core/styles` may expose stylesheet manifests or contracts but must not contain physical application stylesheets. Moving `css` or `assets` into Core is outside the accepted architecture.
 
----
+## Transition contract
+
+The migration order is binding:
+
+1. Keep `css` and `assets` unchanged.
+2. Prepare import, audit and precache tooling for both current and target runtime paths.
+3. Move `js/core` to `core` and `js/modules` to `modules` in one coordinated commit.
+4. Verify lint, tests, version, precache, build, integration and visual behavior.
+5. Reorganize Core one responsibility family at a time.
+6. Remove the empty `js` boundary and forbid its recreation.
+
+The outer directory move and internal Core reorganization must not occur in the same commit.
+
 ## Compatibility
 
-This contract defines a Core-first internal framework boundary without JavaScript compatibility paths outside `js/core` and `js/modules`.
+The former `js/platform`, `js/framework`, `js/data`, `js/shared` and `js/utils` boundaries are removed.
 
-Existing modules consume canonical Core paths directly.
-
----
+The transitional `js/core` and `js/modules` locations are not compatibility APIs. They exist only until the coordinated root relocation.
 
 ## Review requirements
 
@@ -227,6 +160,7 @@ Changes to this contract require:
 
 - architecture review
 - affected module review
-- data catalog review when catalog APIs change
-- regression tests for migrated modules
+- data catalog review when data APIs change
+- regression tests for migrated paths
+- browser and offline verification
 - release readiness review before 2.0.0

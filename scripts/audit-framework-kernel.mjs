@@ -25,7 +25,8 @@ const requiredFiles = [
   'js/core/ui/index.js',
   'js/core/ux/index.js',
   'docs/contracts/framework-kernel-contract.md',
-  'docs/architecture/ADR-0020-internal-neutral-framework.md'
+  'docs/architecture/ADR-0020-internal-neutral-framework.md',
+  'docs/architecture/ADR-0021-root-runtime-layout.md'
 ];
 
 const forbiddenReferenceModuleImports = ['../../platform/', '../../shared/', '../../utils/'];
@@ -225,7 +226,7 @@ for (const expectedToken of ['defineDataCatalogEntry', 'createDataCatalog', 'dat
   if (!readProjectFile('js/core/data/catalog.js').includes(expectedToken)) throw new Error(`Core data catalog contract is missing ${expectedToken}`);
 }
 
-for (const expectedSection of ['Core first', 'Core responsibility paths', 'Module import rule', 'Central data path', 'Reference module guard', 'Module responsibility']) {
+for (const expectedSection of ['Core first', 'Core responsibility paths', 'Module import rule', 'Central data path', 'Reference module guard', 'Module responsibility', 'Static resources', 'Transition contract']) {
   if (!readProjectFile('docs/contracts/framework-kernel-contract.md').includes(expectedSection)) throw new Error(`Framework kernel contract is missing section: ${expectedSection}`);
 }
 
