@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import config from '../js/modules/hx-diagram/config.js';
-import { state } from '../js/modules/hx-diagram/state.js';
-import { calculate } from '../js/modules/hx-diagram/logic.js';
-import { createViewModel } from '../js/modules/hx-diagram/viewModel.js';
+import config from '../modules/hx-diagram/config.js';
+import { state } from '../modules/hx-diagram/state.js';
+import { calculate } from '../modules/hx-diagram/logic.js';
+import { createViewModel } from '../modules/hx-diagram/viewModel.js';
 
 const comparablePath = path => path.map(point => ({
   label: point.label,
@@ -38,7 +38,7 @@ assert.equal(vm.state.process, 'cool-dehumidify');
 assert.deepEqual(comparablePath(vm.activePath), comparablePath(expectedLivePath), 'selected saved process must render a live preview path from current state');
 assert.notDeepEqual(comparablePath(vm.activePath), comparablePath(stalePath), 'view model must not keep the old saved record path after process changes');
 
-const eventPipeline = fs.readFileSync(new URL('../js/core/eventPipeline.js', import.meta.url), 'utf8');
+const eventPipeline = fs.readFileSync(new URL('../core/eventPipeline.js', import.meta.url), 'utf8');
 assert.match(eventPipeline, /focusNextPlatformField/, 'central event pipeline must provide Enter-to-next-field focus handling');
 assert.match(eventPipeline, /field:enter/, 'central event pipeline must keep explicit Enter commits');
 assert.match(eventPipeline, /requestAnimationFrame\(applyFocus\)/, 'next focus must be deferred until after possible render work');

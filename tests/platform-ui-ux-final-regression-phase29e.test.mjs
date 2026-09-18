@@ -22,8 +22,8 @@ assert.ok(report.score >= 5);
 assert.ok(report.regressionMatrix.every(check => check.pass));
 assert.equal(report.nextPhase.id, '30A');
 
-const focusManager = fs.readFileSync('js/core/focusManager.js', 'utf8');
-const scrollManager = fs.readFileSync('js/core/scrollManager.js', 'utf8');
+const focusManager = fs.readFileSync('core/focusManager.js', 'utf8');
+const scrollManager = fs.readFileSync('core/scrollManager.js', 'utf8');
 const moduleRuntime = fs.readFileSync('js/platform/moduleRuntime/index.js', 'utf8');
 
 assert.match(focusManager, /handlePlatformFieldNavigation/);

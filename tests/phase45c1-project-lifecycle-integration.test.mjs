@@ -11,12 +11,12 @@ globalThis.sessionStorage = globalThis.localStorage;
 globalThis.document = { dispatchEvent() {}, activeElement: null };
 globalThis.CustomEvent = class CustomEvent { constructor(type, init = {}) { this.type = type; this.detail = init.detail; } };
 
-const { state: mixedAirState } = await import('../js/modules/mixed-air/state.js');
-const { calculate } = await import('../js/modules/mixed-air/logic.js');
-const { buildMixedAirRecord, hydrateMixedAirRecord, mixedAirSaveCard } = await import('../js/modules/mixed-air/controller.js');
-const { applyProjectData, collectProjectData, resetAllSessionData } = await import('../js/core/projectStorage.js');
+const { state: mixedAirState } = await import('../modules/mixed-air/state.js');
+const { calculate } = await import('../modules/mixed-air/logic.js');
+const { buildMixedAirRecord, hydrateMixedAirRecord, mixedAirSaveCard } = await import('../modules/mixed-air/controller.js');
+const { applyProjectData, collectProjectData, resetAllSessionData } = await import('../core/projectStorage.js');
 
-const mixedView = readFileSync('js/modules/mixed-air/view.js', 'utf8');
+const mixedView = readFileSync('modules/mixed-air/view.js', 'utf8');
 assert.match(mixedView, /data-mixed-air-dynamic="saved-panel"/, 'mixed-air renders a save panel island');
 assert.match(mixedAirSaveCard(mixedAirState.get()), /Mischluft speichern/, 'mixed-air exposes the save dialog/card');
 

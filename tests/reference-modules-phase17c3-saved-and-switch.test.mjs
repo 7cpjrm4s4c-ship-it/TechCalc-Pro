@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const runtimeSource = readFileSync(new URL('../js/platform/moduleRuntime/index.js', import.meta.url), 'utf8');
-const savedRecordsSource = readFileSync(new URL('../js/core/savedRecords.js', import.meta.url), 'utf8');
-const rainControllerSource = readFileSync(new URL('../js/modules/rainwater/controller.js', import.meta.url), 'utf8');
+const savedRecordsSource = readFileSync(new URL('../core/savedRecords.js', import.meta.url), 'utf8');
+const rainControllerSource = readFileSync(new URL('../modules/rainwater/controller.js', import.meta.url), 'utf8');
 
 assert.doesNotMatch(runtimeSource, /__tcPlatformSavedRecordDirectBinding/, 'Saved records must not use direct pointer bindings with stale module closures.');
 assert.match(runtimeSource, /'saved:load': \(\{ element, event \}\) => actions\.load/, 'Saved-record load must be routed through the central action map.');

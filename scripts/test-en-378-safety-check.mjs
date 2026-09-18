@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 
-import { reportSections } from '../js/core/pdf/pdfDataMapping.js';
-import { calculate, validateAssessmentInput } from '../js/modules/en-378-safety-check/logic.js';
-import { buildEN378SafetyCheckReportDto } from '../js/modules/en-378-safety-check/reportAdapter.js';
+import { reportSections } from '../core/pdf/pdfDataMapping.js';
+import { calculate, validateAssessmentInput } from '../modules/en-378-safety-check/logic.js';
+import { buildEN378SafetyCheckReportDto } from '../modules/en-378-safety-check/reportAdapter.js';
 import {
   buildEN378StateFromFGasesSnapshot,
   canImportFGasesSystemSnapshot,
   validateFGasesSystemSnapshot
-} from '../js/modules/en-378-safety-check/snapshotImport.js';
+} from '../modules/en-378-safety-check/snapshotImport.js';
 const validSnapshot = {
   snapshotType: 'techcalc.f-gases.system',
   snapshotVersion: 5,

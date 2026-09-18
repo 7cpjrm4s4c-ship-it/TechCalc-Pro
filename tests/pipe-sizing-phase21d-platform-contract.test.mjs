@@ -1,14 +1,14 @@
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 
-const index = readFileSync('js/modules/pipe-sizing/index.js', 'utf8');
-const controller = readFileSync('js/modules/pipe-sizing/controller.js', 'utf8');
-const viewModel = readFileSync('js/modules/pipe-sizing/viewModel.js', 'utf8');
-const view = readFileSync('js/modules/pipe-sizing/view.js', 'utf8');
-const config = readFileSync('js/modules/pipe-sizing/config.js', 'utf8');
+const index = readFileSync('modules/pipe-sizing/index.js', 'utf8');
+const controller = readFileSync('modules/pipe-sizing/controller.js', 'utf8');
+const viewModel = readFileSync('modules/pipe-sizing/viewModel.js', 'utf8');
+const view = readFileSync('modules/pipe-sizing/view.js', 'utf8');
+const config = readFileSync('modules/pipe-sizing/config.js', 'utf8');
 
 for (const file of ['controller.js', 'viewModel.js', 'view.js', 'results.js']) {
-  assert.ok(existsSync(`js/modules/pipe-sizing/${file}`), `pipe-sizing must expose ${file}`);
+  assert.ok(existsSync(`modules/pipe-sizing/${file}`), `pipe-sizing must expose ${file}`);
 }
 
 assert.match(index, /createPlatformModule/, 'index.js must remain the platform adapter');

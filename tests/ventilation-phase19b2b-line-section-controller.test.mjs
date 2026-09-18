@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const controllerSource = readFileSync(new URL('../js/modules/ventilation/controller.js', import.meta.url), 'utf8');
-const viewSource = readFileSync(new URL('../js/modules/ventilation/view.js', import.meta.url), 'utf8');
+const controllerSource = readFileSync(new URL('../modules/ventilation/controller.js', import.meta.url), 'utf8');
+const viewSource = readFileSync(new URL('../modules/ventilation/view.js', import.meta.url), 'utf8');
 const source = `${controllerSource}\n${viewSource}`;
-const stateSource = readFileSync(new URL('../js/modules/ventilation/state.js', import.meta.url), 'utf8');
+const stateSource = readFileSync(new URL('../modules/ventilation/state.js', import.meta.url), 'utf8');
 
 assert.match(source, /createLineSectionController\(\{/, 'ventilation uses shared line-section controller');
 assert.match(source, /listKey:\s*'ventLineSections'/, 'ventilation line sections are state-backed');

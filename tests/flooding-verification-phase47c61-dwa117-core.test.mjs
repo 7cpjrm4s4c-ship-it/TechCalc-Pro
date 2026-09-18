@@ -4,7 +4,7 @@ import {
   calculate,
   calculateDwa117Duration,
   calculateDwa117SimpleProcedure
-} from '../js/modules/flooding-verification/logic.js';
+} from '../modules/flooding-verification/logic.js';
 
 const closeTo = (actual, expected, tolerance = 1e-9) => {
   assert.ok(Math.abs(actual - expected) <= tolerance, `${actual} not within ${tolerance} of ${expected}`);

@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const eventPipeline = fs.readFileSync(new URL('../js/core/eventPipeline.js', import.meta.url), 'utf8');
-const drinkingWaterController = fs.readFileSync(new URL('../js/modules/drinking-water/controller.js', import.meta.url), 'utf8');
+const eventPipeline = fs.readFileSync(new URL('../core/eventPipeline.js', import.meta.url), 'utf8');
+const drinkingWaterController = fs.readFileSync(new URL('../modules/drinking-water/controller.js', import.meta.url), 'utf8');
 const components = fs.readFileSync(new URL('../css/components.css', import.meta.url), 'utf8');
 
 assert.match(eventPipeline, /import \{ markCommittedAction \} from '\.\/formActions\.js';/, 'central event pipeline must be able to mark action intent before blur');

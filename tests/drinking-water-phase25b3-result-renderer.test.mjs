@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const moduleDir = path.resolve('js/modules/drinking-water');
+const moduleDir = path.resolve('modules/drinking-water');
 const viewJs = fs.readFileSync(path.join(moduleDir, 'view.js'), 'utf8');
 const resultsJs = fs.readFileSync(path.join(moduleDir, 'results.js'), 'utf8');
 const configJs = fs.readFileSync(path.join(moduleDir, 'config.js'), 'utf8');
@@ -19,7 +19,7 @@ assert.ok(!resultsJs.includes("resultCard"), 'results.js must not use legacy res
 assert.ok(!resultsJs.includes("resultRows"), 'results.js must not use legacy resultRows directly');
 assert.ok(configJs.includes("phase-25b3-result-renderer-migration"), 'config migrationStatus must be updated');
 
-const { buildDrinkingWaterResultModel, renderDrinkingWaterResultModel } = await import('../js/modules/drinking-water/results.js');
+const { buildDrinkingWaterResultModel, renderDrinkingWaterResultModel } = await import('../modules/drinking-water/results.js');
 
 const emptyModel = buildDrinkingWaterResultModel({}, { usageUnits: [], singleGroups: [], rawSingles: [], house: {}, peakFlow: 0 }, 'blue');
 assert.equal(emptyModel.primary.primary.value, '—', 'empty startup result must stay blank');

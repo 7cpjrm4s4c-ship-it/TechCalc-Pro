@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { GlobalPdfReport } from '../js/core/pdf/pdfLayout.js';
+import { GlobalPdfReport } from '../core/pdf/pdfLayout.js';
 
 class HeaderCaptureReport extends GlobalPdfReport {
   constructor() {

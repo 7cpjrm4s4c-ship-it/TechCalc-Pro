@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import { resolveRetentionRainInput } from '../js/modules/flooding-verification/calculationAdapter.js';
-import { buildCalculationDisplayState } from '../js/modules/flooding-verification/view.js';
+import { resolveRetentionRainInput } from '../modules/flooding-verification/calculationAdapter.js';
+import { buildCalculationDisplayState } from '../modules/flooding-verification/view.js';
 
 const state = {
   retentionRecurrenceFrequencyPerYear: '1',

@@ -30,7 +30,7 @@ function createStorageMock() {
 
 globalThis.FormData = FormDataMock;
 
-const controller = await import('../js/core/ux/feedbackController.js');
+const controller = await import('../core/ux/feedbackController.js');
 const form = createFormMock([
   ['subject', 'Baustellenfeedback'],
   ['message', 'Offline erfasst']

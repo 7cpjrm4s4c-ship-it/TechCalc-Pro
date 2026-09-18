@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const moduleDir = new URL('../js/modules/drinking-water/', import.meta.url);
-const coreDir = new URL('../js/core/', import.meta.url);
+const moduleDir = new URL('../modules/drinking-water/', import.meta.url);
+const coreDir = new URL('../core/', import.meta.url);
 const readModule = name => fs.readFileSync(new URL(name, moduleDir), 'utf8');
 const readCore = name => fs.readFileSync(new URL(name, coreDir), 'utf8');
 

@@ -1,10 +1,10 @@
 import fs from 'node:fs';
 
 const checks = [
-  ['js/modules/hx-diagram/formRenderer.js', 'data-hx-clear', 'tc-action--ghost'],
-  ['js/modules/drinking-water/view.js', 'data-dw-draft-add="unit"', 'action-button--secondary'],
-  ['js/modules/drinking-water/view.js', 'data-dw-draft-add="single"', 'action-button--secondary'],
-  ['js/modules/wastewater/viewModel.js', 'data-collection="fixtures"', 'action-button--secondary'],
+  ['modules/hx-diagram/formRenderer.js', 'data-hx-clear', 'tc-action--ghost'],
+  ['modules/drinking-water/view.js', 'data-dw-draft-add="unit"', 'action-button--secondary'],
+  ['modules/drinking-water/view.js', 'data-dw-draft-add="single"', 'action-button--secondary'],
+  ['modules/wastewater/viewModel.js', 'data-collection="fixtures"', 'action-button--secondary'],
 ];
 
 let failed = false;

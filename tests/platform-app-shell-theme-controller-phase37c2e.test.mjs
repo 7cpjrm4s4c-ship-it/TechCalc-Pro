@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { commitAllFields } from '../js/core/eventPipeline.js';
+import { commitAllFields } from '../core/eventPipeline.js';
 
-const eventPipeline = readFileSync('js/core/eventPipeline.js', 'utf8');
+const eventPipeline = readFileSync('core/eventPipeline.js', 'utf8');
 
 assert.match(eventPipeline, /function isSameFieldValue\(a, b\)/, 'Event pipeline must compare field values before emitting surface commits.');
 assert.match(eventPipeline, /if \(!Object\.keys\(patch\)\.length\) return false;/, 'commitAllFields must reject no-op surface commits.');

@@ -1,15 +1,15 @@
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 
-const config = readFileSync('js/modules/unit-converter/config.js', 'utf8');
-const index = readFileSync('js/modules/unit-converter/index.js', 'utf8');
-const viewModel = readFileSync('js/modules/unit-converter/viewModel.js', 'utf8');
-const view = readFileSync('js/modules/unit-converter/view.js', 'utf8');
-const results = readFileSync('js/modules/unit-converter/results.js', 'utf8');
+const config = readFileSync('modules/unit-converter/config.js', 'utf8');
+const index = readFileSync('modules/unit-converter/index.js', 'utf8');
+const viewModel = readFileSync('modules/unit-converter/viewModel.js', 'utf8');
+const view = readFileSync('modules/unit-converter/view.js', 'utf8');
+const results = readFileSync('modules/unit-converter/results.js', 'utf8');
 const dynamicIndex = readFileSync('js/platform/dynamicRenderer/index.js', 'utf8');
 
 for (const file of ['config.js', 'schema.js', 'state.js', 'logic.js', 'results.js', 'viewModel.js', 'view.js', 'index.js']) {
-  assert.ok(existsSync(`js/modules/unit-converter/${file}`), `unit-converter contract file missing: ${file}`);
+  assert.ok(existsSync(`modules/unit-converter/${file}`), `unit-converter contract file missing: ${file}`);
 }
 
 assert.match(config, /phase-22e-hardening/, 'config must record phase 22E hardening');

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildCalculationDisplayState } from '../js/modules/flooding-verification/view.js';
+import { buildCalculationDisplayState } from '../modules/flooding-verification/view.js';
 
 test('automatic retention values hydrate the calculation form display state', () => {
   const state = {

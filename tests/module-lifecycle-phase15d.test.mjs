@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const appJs = readFileSync(new URL('../js/core/app.js', import.meta.url), 'utf8');
-const adapterJs = readFileSync(new URL('../js/core/moduleLifecycleAdapter.js', import.meta.url), 'utf8');
-const runtimeJs = readFileSync(new URL('../js/core/moduleRuntime.js', import.meta.url), 'utf8');
+const appJs = readFileSync(new URL('../core/app.js', import.meta.url), 'utf8');
+const adapterJs = readFileSync(new URL('../core/moduleLifecycleAdapter.js', import.meta.url), 'utf8');
+const runtimeJs = readFileSync(new URL('../core/moduleRuntime.js', import.meta.url), 'utf8');
 const source = appJs + runtimeJs;
 
 assert.match(appJs, /createModuleLifecycleAdapter/, 'App must route every module through the central lifecycle adapter.');

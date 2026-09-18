@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 
-import { calculate } from '../js/modules/hx-diagram/logic.js';
-import { chartCard } from '../js/modules/hx-diagram/diagramRenderer.js';
-import { buildHxResultModel } from '../js/modules/hx-diagram/results.js';
+import { calculate } from '../modules/hx-diagram/logic.js';
+import { chartCard } from '../modules/hx-diagram/diagramRenderer.js';
+import { buildHxResultModel } from '../modules/hx-diagram/results.js';
 
 const impossibleInput = {
   tempC: 20,

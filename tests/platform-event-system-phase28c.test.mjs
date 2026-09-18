@@ -1,18 +1,18 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { on, once, createEventScope, getActiveEventListenerCount } from '../js/core/eventManager.js';
+import { on, once, createEventScope, getActiveEventListenerCount } from '../core/eventManager.js';
 
 assert.equal(typeof on, 'function');
 assert.equal(typeof once, 'function');
 assert.equal(typeof createEventScope, 'function');
 assert.equal(typeof getActiveEventListenerCount, 'function');
 
-const appSource = fs.readFileSync(path.join(process.cwd(), 'js/core/app.js'), 'utf8');
+const appSource = fs.readFileSync(path.join(process.cwd(), 'core/app.js'), 'utf8');
 assert.match(appSource, /trackGlobalEventListener/);
 assert.match(appSource, /\.\/eventManager\.js/);
 
-const delegationSource = fs.readFileSync(path.join(process.cwd(), 'js/core/eventDelegation.js'), 'utf8');
+const delegationSource = fs.readFileSync(path.join(process.cwd(), 'core/eventDelegation.js'), 'utf8');
 assert.match(delegationSource, /createEventScope/);
 assert.match(delegationSource, /return on\(root, eventName, listener, options\)/);
 

@@ -4,8 +4,8 @@ import path from 'node:path';
 
 const root = process.cwd();
 const report = JSON.parse(fs.readFileSync(path.join(root, 'docs/audits/json/app-shell-theme-controller-phase37c2.json'), 'utf8'));
-const appSource = fs.readFileSync(path.join(root, 'js/core/app.js'), 'utf8');
-const controllerSource = fs.readFileSync(path.join(root, 'js/core/ux/themeController.js'), 'utf8');
+const appSource = fs.readFileSync(path.join(root, 'core/app.js'), 'utf8');
+const controllerSource = fs.readFileSync(path.join(root, 'core/ux/themeController.js'), 'utf8');
 
 assert.equal(report.phase, '37C.2');
 assert.equal(report.policy.runtimeBehaviorChanged, false);
@@ -60,7 +60,7 @@ globalThis.document = {
   }
 };
 
-const theme = await import('../js/core/ux/themeController.js');
+const theme = await import('../core/ux/themeController.js');
 assert.equal(theme.applyTheme('dark'), 'dark');
 assert.equal(rootElement.getAttribute('data-theme'), 'dark');
 assert.equal(store.get('local:techcalc-theme-mode'), 'dark');

@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import module from '../js/modules/heating-cooling/index.js';
-import config from '../js/modules/heating-cooling/config.js';
-import schema from '../js/modules/heating-cooling/schema.js';
+import module from '../modules/heating-cooling/index.js';
+import config from '../modules/heating-cooling/config.js';
+import schema from '../modules/heating-cooling/schema.js';
 
-const source = readFileSync(new URL('../js/modules/heating-cooling/index.js', import.meta.url), 'utf8');
-const viewSource = readFileSync(new URL('../js/modules/heating-cooling/view.js', import.meta.url), 'utf8');
+const source = readFileSync(new URL('../modules/heating-cooling/index.js', import.meta.url), 'utf8');
+const viewSource = readFileSync(new URL('../modules/heating-cooling/view.js', import.meta.url), 'utf8');
 const runtimeSource = readFileSync(new URL('../js/platform/moduleRuntime/index.js', import.meta.url), 'utf8');
 const dynamicRendererSource = readFileSync(new URL('../js/platform/dynamicRenderer/index.js', import.meta.url), 'utf8');
 

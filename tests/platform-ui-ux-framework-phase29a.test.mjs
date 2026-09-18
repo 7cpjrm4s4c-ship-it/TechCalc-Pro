@@ -36,9 +36,9 @@ for (const moduleName of ['rainwater', 'wastewater', 'hx-diagram', 'drinking-wat
 }
 
 for (const file of [
-  'js/core/scrollManager.js',
-  'js/core/focusManager.js',
-  'js/core/eventManager.js',
+  'core/scrollManager.js',
+  'core/focusManager.js',
+  'core/eventManager.js',
   'platform-verification-phase28d.json'
 ]) {
   assert.equal(fs.existsSync(path.join(root, file)), true, `${file} fehlt als 29A Voraussetzung.`);

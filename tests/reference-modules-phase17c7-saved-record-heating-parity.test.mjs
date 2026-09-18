@@ -2,10 +2,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const runtime = readFileSync(new URL('../js/platform/moduleRuntime/index.js', import.meta.url), 'utf8');
-const pipeline = readFileSync(new URL('../js/core/eventPipeline.js', import.meta.url), 'utf8');
-const heating = readFileSync(new URL('../js/modules/heating-cooling/index.js', import.meta.url), 'utf8');
-const rainwater = readFileSync(new URL('../js/modules/rainwater/controller.js', import.meta.url), 'utf8');
-const wastewater = readFileSync(new URL('../js/modules/wastewater/controller.js', import.meta.url), 'utf8');
+const pipeline = readFileSync(new URL('../core/eventPipeline.js', import.meta.url), 'utf8');
+const heating = readFileSync(new URL('../modules/heating-cooling/index.js', import.meta.url), 'utf8');
+const rainwater = readFileSync(new URL('../modules/rainwater/controller.js', import.meta.url), 'utf8');
+const wastewater = readFileSync(new URL('../modules/wastewater/controller.js', import.meta.url), 'utf8');
 
 assert.match(heating, /'saved:load'[\s\S]{0,160}loadLine/, 'baseline: Heizung/Kälte saved dialog must still use direct saved handlers.');
 assert.match(heating, /'saved:delete'[\s\S]{0,160}deleteLine/, 'baseline: Heizung/Kälte delete handler must still be direct.');

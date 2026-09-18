@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const rainwaterIndex = readFileSync('js/modules/rainwater/index.js', 'utf8');
-const rainwaterResults = readFileSync('js/modules/rainwater/results.js', 'utf8');
-const platformResults = readFileSync('js/core/resultRenderer.js', 'utf8');
+const rainwaterIndex = readFileSync('modules/rainwater/index.js', 'utf8');
+const rainwaterResults = readFileSync('modules/rainwater/results.js', 'utf8');
+const platformResults = readFileSync('core/resultRenderer.js', 'utf8');
 const moduleRenderer = readFileSync('js/platform/moduleRenderer/index.js', 'utf8');
 
 assert.match(platformResults, /export function renderResultModel/, 'platform resultRenderer must expose renderResultModel');

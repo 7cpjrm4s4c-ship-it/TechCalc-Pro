@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { applyAuthorityReportPolicy, authorityPublicChapterTitle } from '../js/core/pdf/authorityReportPolicy.js';
+import { applyAuthorityReportPolicy, authorityPublicChapterTitle } from '../core/pdf/authorityReportPolicy.js';
 
 const titles = [
   '1. Ergebniszusammenfassung',

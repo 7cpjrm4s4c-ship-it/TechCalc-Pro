@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
-import { readProjectFile } from '../js/core/projectStorage.js';
+import { readProjectFile } from '../core/projectStorage.js';
 import {
   appendProjectModuleStates,
   applyProjectModuleStates,
   registeredProjectModuleIds,
   resetProjectModuleStates
-} from '../js/core/projectModuleStateAdapters.js';
-import { state as fGasesState } from '../js/modules/f-gases-check/state.js';
-import { state as en378State } from '../js/modules/en-378-safety-check/state.js';
+} from '../core/projectModuleStateAdapters.js';
+import { state as fGasesState } from '../modules/f-gases-check/state.js';
+import { state as en378State } from '../modules/en-378-safety-check/state.js';
 
 const dataUrl = 'data:image/png;base64,aGVsbG8=';
 const project = {

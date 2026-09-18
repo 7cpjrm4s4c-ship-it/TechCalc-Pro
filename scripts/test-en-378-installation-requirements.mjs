@@ -1,16 +1,16 @@
 import assert from 'node:assert/strict';
 
-import { assessChargeLimit } from '../js/modules/en-378-safety-check/chargeLimitCalculation.js';
+import { assessChargeLimit } from '../modules/en-378-safety-check/chargeLimitCalculation.js';
 import {
   assessInstallationSafetyRequirements,
   calculateAlternativeMechanicalVentilationFlow,
   calculateDetectorPreset,
   calculateDilutionOpeningArea,
   calculateMachineryRoomEmergencyVentilationFlow
-} from '../js/modules/en-378-safety-check/installationSafetyRequirements.js';
-import { calculate } from '../js/modules/en-378-safety-check/logic.js';
-import { buildEN378SafetyCheckReportDto } from '../js/modules/en-378-safety-check/reportAdapter.js';
-import { getEN378SafetyData } from '../js/core/data/refrigerants.js';
+} from '../modules/en-378-safety-check/installationSafetyRequirements.js';
+import { calculate } from '../modules/en-378-safety-check/logic.js';
+import { buildEN378SafetyCheckReportDto } from '../modules/en-378-safety-check/reportAdapter.js';
+import { getEN378SafetyData } from '../core/data/refrigerants.js';
 
 const r32 = getEN378SafetyData('R-32');
 assert.deepEqual(calculateMachineryRoomEmergencyVentilationFlow(8), { flowM3s: 0.056, flowM3h: 201.6 });

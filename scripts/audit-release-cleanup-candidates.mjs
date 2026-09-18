@@ -73,8 +73,8 @@ function classify(candidate, refs) {
   if (!exists(candidate)) return 'deleted';
   if (!refs.length) return 'orphan-candidate';
   if (refs.every(ref => ref.file === 'service-worker.js')) return 'precache-only-candidate';
-  if (refs.every(ref => ref.file.startsWith('js/core/') || ref.file === 'service-worker.js')) return 'core-facade-implementation';
-  if (refs.some(ref => ref.file.startsWith('js/modules/'))) return 'module-runtime-reference';
+  if (refs.every(ref => ref.file.startsWith('core/') || ref.file === 'service-worker.js')) return 'core-facade-implementation';
+  if (refs.some(ref => ref.file.startsWith('modules/'))) return 'module-runtime-reference';
   if (refs.some(ref => ref.file.startsWith('tests/') || ref.file.startsWith('scripts/'))) return 'test-or-tooling-reference';
   return 'referenced';
 }

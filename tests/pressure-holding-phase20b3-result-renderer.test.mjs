@@ -2,12 +2,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildPressureHoldingResultModel } from '../js/modules/pressure-holding/results.js';
+import { buildPressureHoldingResultModel } from '../modules/pressure-holding/results.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const indexSource = fs.readFileSync(path.join(root, 'js/modules/pressure-holding/index.js'), 'utf8');
-const viewModelSource = fs.readFileSync(path.join(root, 'js/modules/pressure-holding/viewModel.js'), 'utf8');
-const resultsSource = fs.readFileSync(path.join(root, 'js/modules/pressure-holding/results.js'), 'utf8');
+const indexSource = fs.readFileSync(path.join(root, 'modules/pressure-holding/index.js'), 'utf8');
+const viewModelSource = fs.readFileSync(path.join(root, 'modules/pressure-holding/viewModel.js'), 'utf8');
+const resultsSource = fs.readFileSync(path.join(root, 'modules/pressure-holding/results.js'), 'utf8');
 
 assert.match(viewModelSource, /renderResultModel/);
 assert.match(viewModelSource, /buildPressureHoldingResultModel/);

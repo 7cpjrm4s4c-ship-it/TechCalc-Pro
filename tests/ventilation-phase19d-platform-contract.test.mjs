@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const indexSource = readFileSync('js/modules/ventilation/index.js', 'utf8');
-const controllerSource = readFileSync('js/modules/ventilation/controller.js', 'utf8');
-const viewModelSource = readFileSync('js/modules/ventilation/viewModel.js', 'utf8');
-const viewSource = readFileSync('js/modules/ventilation/view.js', 'utf8');
-const projectStorageSource = readFileSync('js/core/projectStorage.js', 'utf8');
-const configSource = readFileSync('js/modules/ventilation/config.js', 'utf8');
+const indexSource = readFileSync('modules/ventilation/index.js', 'utf8');
+const controllerSource = readFileSync('modules/ventilation/controller.js', 'utf8');
+const viewModelSource = readFileSync('modules/ventilation/viewModel.js', 'utf8');
+const viewSource = readFileSync('modules/ventilation/view.js', 'utf8');
+const projectStorageSource = readFileSync('core/projectStorage.js', 'utf8');
+const configSource = readFileSync('modules/ventilation/config.js', 'utf8');
 
 assert.match(configSource, /phase-19d-controller-viewmodel-view/, 'ventilation declares phase 19D contract split');
 assert.match(indexSource, /createPlatformModule\(\{/, 'index keeps only the platform module mount contract');

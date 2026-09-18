@@ -4,7 +4,7 @@ import {
   renderDurationTable,
   renderRainfallTable,
   renderSurfaceTable
-} from '../js/core/pdf/authorityTables.js';
+} from '../core/pdf/authorityTables.js';
 
 assert.equal(authorityTableKind('4. Flächenübersicht (3)'), 'surfaces');
 assert.equal(authorityTableKind('5. Regendaten und Berechnungsgrundlagen'), 'rainfall');

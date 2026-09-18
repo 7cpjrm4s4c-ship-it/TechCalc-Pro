@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import rainwater from '../js/modules/rainwater/index.js';
-import wastewater from '../js/modules/wastewater/index.js';
+import rainwater from '../modules/rainwater/index.js';
+import wastewater from '../modules/wastewater/index.js';
 
 const runtimeSource = fs.readFileSync('js/platform/moduleRuntime/index.js', 'utf8');
-const rainwaterController = fs.readFileSync('js/modules/rainwater/controller.js', 'utf8');
-const wastewaterController = fs.readFileSync('js/modules/wastewater/controller.js', 'utf8');
+const rainwaterController = fs.readFileSync('modules/rainwater/controller.js', 'utf8');
+const wastewaterController = fs.readFileSync('modules/wastewater/controller.js', 'utf8');
 
 assert.match(runtimeSource, /createNormalizedState/, 'Platform runtime must centrally normalize configured numeric fields.');
 assert.match(runtimeSource, /normalizeConfiguredFields\(patch, numericFields\)/, 'Runtime state.set must normalize configured fields before writing state.');

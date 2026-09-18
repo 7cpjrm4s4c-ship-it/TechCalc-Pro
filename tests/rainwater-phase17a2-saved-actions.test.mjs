@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const source = readFileSync(new URL('../js/modules/rainwater/index.js', import.meta.url), 'utf8');
+const source = readFileSync(new URL('../modules/rainwater/index.js', import.meta.url), 'utf8');
 const lineController = readFileSync(new URL('../js/platform/lineSectionController/index.js', import.meta.url), 'utf8');
-const controller = readFileSync(new URL('../js/modules/rainwater/controller.js', import.meta.url), 'utf8');
-const config = readFileSync(new URL('../js/modules/rainwater/config.js', import.meta.url), 'utf8');
+const controller = readFileSync(new URL('../modules/rainwater/controller.js', import.meta.url), 'utf8');
+const config = readFileSync(new URL('../modules/rainwater/config.js', import.meta.url), 'utf8');
 
 assert.match(controller, /createLineSectionController\s*\(/, 'Rainwater must use the central line-section saved-record controller.');
 assert.match(lineController, /'line:save'/, 'Rainwater save action must be owned by the central line-section controller.');

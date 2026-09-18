@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import config from '../js/modules/hx-diagram/config.js';
-import { chartCard, renderHxSvg, buildStateSegments } from '../js/modules/hx-diagram/diagramRenderer.js';
-import { calculate } from '../js/modules/hx-diagram/logic.js';
+import config from '../modules/hx-diagram/config.js';
+import { chartCard, renderHxSvg, buildStateSegments } from '../modules/hx-diagram/diagramRenderer.js';
+import { calculate } from '../modules/hx-diagram/logic.js';
 
-const base = 'js/modules/hx-diagram/';
+const base = 'modules/hx-diagram/';
 const view = fs.readFileSync(base + 'view.js', 'utf8');
 const diagram = fs.readFileSync(base + 'diagramRenderer.js', 'utf8');
 

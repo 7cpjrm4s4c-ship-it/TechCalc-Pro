@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const controllerPath = path.join(root, 'js/core/ux/feedbackController.js');
+const controllerPath = path.join(root, 'core/ux/feedbackController.js');
 const integrationPath = path.join(root, 'scripts/test-integration.mjs');
 const controllerSource = fs.readFileSync(controllerPath, 'utf8');
 const integrationSource = fs.readFileSync(integrationPath, 'utf8');

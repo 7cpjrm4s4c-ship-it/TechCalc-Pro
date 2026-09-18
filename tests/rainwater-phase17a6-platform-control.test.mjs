@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const schema = readFileSync('js/modules/rainwater/schema.js', 'utf8');
-const controller = readFileSync('js/modules/rainwater/controller.js', 'utf8');
-const results = readFileSync('js/modules/rainwater/results.js', 'utf8');
-const viewModel = readFileSync('js/modules/rainwater/viewModel.js', 'utf8');
-const schemaRenderer = readFileSync('js/core/schemaRenderer.js', 'utf8');
-const formSchema = readFileSync('js/core/formSchema.js', 'utf8');
+const schema = readFileSync('modules/rainwater/schema.js', 'utf8');
+const controller = readFileSync('modules/rainwater/controller.js', 'utf8');
+const results = readFileSync('modules/rainwater/results.js', 'utf8');
+const viewModel = readFileSync('modules/rainwater/viewModel.js', 'utf8');
+const schemaRenderer = readFileSync('core/schemaRenderer.js', 'utf8');
+const formSchema = readFileSync('core/formSchema.js', 'utf8');
 
 assert.doesNotMatch(schema, /FIELD_TYPES\.CUSTOM|inlineStats|afterHtml|<div class=|<a class=|esc\(/, 'Rainwater schema must not contain module-local mini HTML renderers.');
 assert.match(schema, /FIELD_TYPES\.NOTICE/, 'Rainwater notices must be described as platform schema data.');

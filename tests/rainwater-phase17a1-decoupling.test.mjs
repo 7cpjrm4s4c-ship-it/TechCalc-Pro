@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
-const source = fs.readFileSync('js/modules/rainwater/index.js', 'utf8');
-const saved = fs.readFileSync('js/core/savedRecords.js', 'utf8');
+const source = fs.readFileSync('modules/rainwater/index.js', 'utf8');
+const saved = fs.readFileSync('core/savedRecords.js', 'utf8');
 const moduleRenderer = fs.readFileSync('js/platform/moduleRenderer/index.js', 'utf8');
 
 if (!saved.includes('export function renderSavedRecordPanel')) {

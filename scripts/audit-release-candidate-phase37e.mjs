@@ -6,24 +6,24 @@ function read(path) {
 }
 
 const shellControllerFiles = [
-  'js/core/ux/themeController.js',
-  'js/core/ux/settingsController.js',
-  'js/core/ux/layoutStabilityController.js',
-  'js/core/ux/performanceController.js',
-  'js/core/ux/releaseNotesController.js',
-  'js/core/ux/feedbackController.js',
-  'js/core/ux/serviceWorkerController.js'
+  'core/ux/themeController.js',
+  'core/ux/settingsController.js',
+  'core/ux/layoutStabilityController.js',
+  'core/ux/performanceController.js',
+  'core/ux/releaseNotesController.js',
+  'core/ux/feedbackController.js',
+  'core/ux/serviceWorkerController.js'
 ];
 
 const requiredFiles = [
-  'js/core/app.js',
+  'core/app.js',
   ...shellControllerFiles,
   'docs/phases/phase-37.md',
   'docs/phases/phase37c-app-shell-decomposition.md',
   'docs/phases/phase37d-performance-observability-baseline.md'
 ];
 
-const appSource = read('js/core/app.js');
+const appSource = read('core/app.js');
 const appLines = appSource.split(/\r?\n/).length;
 const packageJson = JSON.parse(read('package.json'));
 const releaseNotes = read('RELEASE_NOTES.md');

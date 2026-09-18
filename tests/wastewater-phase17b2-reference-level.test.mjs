@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import schema from '../js/modules/wastewater/schema.js';
-import wastewater from '../js/modules/wastewater/index.js';
-import { renderPlatformModuleView } from '../js/core/moduleRenderer.js';
+import schema from '../modules/wastewater/schema.js';
+import wastewater from '../modules/wastewater/index.js';
+import { renderPlatformModuleView } from '../core/moduleRenderer.js';
 
-const schemaSource = readFileSync(new URL('../js/modules/wastewater/schema.js', import.meta.url), 'utf8');
-const controllerSource = readFileSync(new URL('../js/modules/wastewater/controller.js', import.meta.url), 'utf8');
-const schemaRendererSource = readFileSync(new URL('../js/core/schemaRenderer.js', import.meta.url), 'utf8');
+const schemaSource = readFileSync(new URL('../modules/wastewater/schema.js', import.meta.url), 'utf8');
+const controllerSource = readFileSync(new URL('../modules/wastewater/controller.js', import.meta.url), 'utf8');
+const schemaRendererSource = readFileSync(new URL('../core/schemaRenderer.js', import.meta.url), 'utf8');
 const collectionModelSource = readFileSync(new URL('../js/platform/collectionModel/index.js', import.meta.url), 'utf8');
 const savedRecordModelSource = readFileSync(new URL('../js/platform/savedRecordModel/index.js', import.meta.url), 'utf8');
 

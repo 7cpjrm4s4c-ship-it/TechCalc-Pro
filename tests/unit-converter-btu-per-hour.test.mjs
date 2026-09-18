@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import { convert, unitCategories } from '../js/core/data/units.js';
-import { unitsFor } from '../js/modules/unit-converter/logic.js';
-import { normalizeUnitSelection, unitConverterAllValueRows } from '../js/modules/unit-converter/results.js';
+import { convert, unitCategories } from '../core/data/units.js';
+import { unitsFor } from '../modules/unit-converter/logic.js';
+import { normalizeUnitSelection, unitConverterAllValueRows } from '../modules/unit-converter/results.js';
 
 const BTU_PER_HOUR_TO_WATT = 0.2930710701722;
 

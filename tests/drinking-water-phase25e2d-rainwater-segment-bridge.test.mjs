@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const controller = fs.readFileSync(new URL('../js/modules/drinking-water/controller.js', import.meta.url), 'utf8');
-const view = fs.readFileSync(new URL('../js/modules/drinking-water/view.js', import.meta.url), 'utf8');
-const schema = fs.readFileSync(new URL('../js/modules/drinking-water/schema.js', import.meta.url), 'utf8');
+const controller = fs.readFileSync(new URL('../modules/drinking-water/controller.js', import.meta.url), 'utf8');
+const view = fs.readFileSync(new URL('../modules/drinking-water/view.js', import.meta.url), 'utf8');
+const schema = fs.readFileSync(new URL('../modules/drinking-water/schema.js', import.meta.url), 'utf8');
 
 assert.match(schema, /action:\s*'platform:segment:waterHeatingMode'/, 'waterHeatingMode must expose the platform segment action like rainwater surfaceMode');
 assert.match(view, /action:'platform:segment:waterHeatingMode'/, 'rendered waterHeatingMode segment must use the platform segment action');

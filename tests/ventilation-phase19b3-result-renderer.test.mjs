@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const ventilationSource = readFileSync(new URL('../js/modules/ventilation/view.js', import.meta.url), 'utf8');
-const resultsSource = readFileSync(new URL('../js/modules/ventilation/results.js', import.meta.url), 'utf8');
-const configSource = readFileSync(new URL('../js/modules/ventilation/config.js', import.meta.url), 'utf8');
+const ventilationSource = readFileSync(new URL('../modules/ventilation/view.js', import.meta.url), 'utf8');
+const resultsSource = readFileSync(new URL('../modules/ventilation/results.js', import.meta.url), 'utf8');
+const configSource = readFileSync(new URL('../modules/ventilation/config.js', import.meta.url), 'utf8');
 
 assert.match(configSource, /phase-19b3-result-renderer/, 'ventilation declares phase 19B.3 result-renderer migration');
 assert.match(ventilationSource, /renderResultModel\(/, 'ventilation renders primary results through the platform result model renderer');

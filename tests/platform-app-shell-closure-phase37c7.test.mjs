@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
-const app = readFileSync('js/core/app.js', 'utf8');
+const app = readFileSync('core/app.js', 'utf8');
 const reportPath = 'docs/audits/json/app-shell-closure-phase37c7.json';
 
 const requiredControllers = [
@@ -20,9 +20,9 @@ assert.ok(report.appJs.lines <= 320, `app.js should remain <= 320 lines, got ${r
 assert.equal(report.shell.requiredControllers.length, requiredControllers.length);
 
 for (const controller of requiredControllers) {
-  assert.ok(existsSync(`js/core/ux/${controller}`), `${controller} must exist`);
+  assert.ok(existsSync(`core/ux/${controller}`), `${controller} must exist`);
   assert.ok(app.includes(`./ux/${controller}`), `${controller} must be imported by app.js`);
-  assert.ok(readFileSync('service-worker.js', 'utf8').includes(`./js/core/ux/${controller}`), `${controller} must be precached`);
+  assert.ok(readFileSync('service-worker.js', 'utf8').includes(`./core/ux/${controller}`), `${controller} must be precached`);
 }
 
 for (const forbidden of [

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import { calculate } from '../js/modules/f-gases-check/logic.js';
-import { buildFGasesResultModel } from '../js/modules/f-gases-check/results.js';
-import { formatRefrigerantLabel, getRefrigerant } from '../js/core/data/refrigerants.js';
+import { calculate } from '../modules/f-gases-check/logic.js';
+import { buildFGasesResultModel } from '../modules/f-gases-check/results.js';
+import { formatRefrigerantLabel, getRefrigerant } from '../core/data/refrigerants.js';
 
 assert.equal(formatRefrigerantLabel(null), '');
 assert.equal(formatRefrigerantLabel(getRefrigerant('HFKW-134a')), 'R134a');

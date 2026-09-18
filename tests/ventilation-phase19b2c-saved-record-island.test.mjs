@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const indexSource = readFileSync(new URL('../js/modules/ventilation/index.js', import.meta.url), 'utf8');
-const controllerSource = readFileSync(new URL('../js/modules/ventilation/controller.js', import.meta.url), 'utf8');
+const indexSource = readFileSync(new URL('../modules/ventilation/index.js', import.meta.url), 'utf8');
+const controllerSource = readFileSync(new URL('../modules/ventilation/controller.js', import.meta.url), 'utf8');
 const ventilationSource = `${indexSource}\n${controllerSource}`;
 const lineControllerSource = readFileSync(new URL('../js/platform/lineSectionController/index.js', import.meta.url), 'utf8');
 const dynamicRendererSource = readFileSync(new URL('../js/platform/dynamicRenderer/index.js', import.meta.url), 'utf8');
-const configSource = readFileSync(new URL('../js/modules/ventilation/config.js', import.meta.url), 'utf8');
+const configSource = readFileSync(new URL('../modules/ventilation/config.js', import.meta.url), 'utf8');
 
 assert.match(configSource, /phase-19b2c-saved-record-island/, 'ventilation declares phase 19B.2C saved-record-island migration');
 assert.match(ventilationSource, /createLineSectionController\(\{/, 'ventilation saved records are delegated to the platform line-section controller');

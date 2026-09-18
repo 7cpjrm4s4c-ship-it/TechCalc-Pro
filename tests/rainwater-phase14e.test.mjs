@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const rainwater = readFileSync(new URL('../js/modules/rainwater/index.js', import.meta.url), 'utf8');
-const controller = readFileSync(new URL('../js/modules/rainwater/controller.js', import.meta.url), 'utf8');
-const pipeline = readFileSync(new URL('../js/core/eventPipeline.js', import.meta.url), 'utf8');
+const rainwater = readFileSync(new URL('../modules/rainwater/index.js', import.meta.url), 'utf8');
+const controller = readFileSync(new URL('../modules/rainwater/controller.js', import.meta.url), 'utf8');
+const pipeline = readFileSync(new URL('../core/eventPipeline.js', import.meta.url), 'utf8');
 const runtime = readFileSync(new URL('../js/platform/moduleRuntime/index.js', import.meta.url), 'utf8');
-const config = readFileSync(new URL('../js/modules/rainwater/config.js', import.meta.url), 'utf8');
+const config = readFileSync(new URL('../modules/rainwater/config.js', import.meta.url), 'utf8');
 
 assert.doesNotMatch(rainwater, /card\('Flächen \/ Berechnung'/, 'Rainwater must not render the duplicate result-side area calculation card.');
 assert.doesNotMatch(controller, /deleteAttr:\s*'data-saved-delete'/, 'Rainwater must not redeclare platform default saved-record attributes.');

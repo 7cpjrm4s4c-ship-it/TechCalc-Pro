@@ -3,8 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const appSource = fs.readFileSync(path.join(root, 'js/core/app.js'), 'utf8');
-const controllerPath = path.join(root, 'js/core/ux/releaseNotesController.js');
+const appSource = fs.readFileSync(path.join(root, 'core/app.js'), 'utf8');
+const controllerPath = path.join(root, 'core/ux/releaseNotesController.js');
 const controllerSource = fs.readFileSync(controllerPath, 'utf8');
 const serviceWorkerSource = fs.readFileSync(path.join(root, 'service-worker.js'), 'utf8');
 const releaseNotesModulePath = './ux/releaseNotesController.js';
@@ -20,7 +20,7 @@ assert.ok(controllerSource.includes('export function parseReleaseNotes'), 'relea
 assert.ok(controllerSource.includes('export function renderReleaseNotes'), 'release notes controller must export renderer');
 assert.ok(controllerSource.includes('export function initializeReleaseNotesController'), 'release notes controller must export initializer');
 assert.ok(controllerSource.includes('let releaseNotesControllerInitialized = false'), 'release notes controller must be idempotent');
-assert.ok(serviceWorkerSource.includes("'./js/core/ux/releaseNotesController.js'"), 'service worker must precache release notes controller');
+assert.ok(serviceWorkerSource.includes("'./core/ux/releaseNotesController.js'"), 'service worker must precache release notes controller');
 
 const appLines = appSource.split(/\r?\n/).length;
 assert.ok(appLines <= 370, `app.js should be reduced after release notes extraction; got ${appLines} lines`);
@@ -42,7 +42,7 @@ globalThis.document = {
   }
 };
 
-const controller = await import('../js/core/ux/releaseNotesController.js');
+const controller = await import('../core/ux/releaseNotesController.js');
 const parsed = controller.parseReleaseNotes('# TechCalc Pro 1.3.0 – Test\n- Erstes Item\n- Zweites Item');
 assert.equal(parsed.length, 1);
 assert.equal(parsed[0].version, '1.3.0');

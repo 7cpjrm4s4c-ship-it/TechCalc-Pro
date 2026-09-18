@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import { buildAuthorityCoverPage } from '../js/core/pdf/authorityCoverPage.js';
-import { installAuthorityCoverPage, isFloodingAuthorityReport, renderAuthorityCoverPage } from '../js/core/pdf/authorityPdfReport.js';
+import { buildAuthorityCoverPage } from '../core/pdf/authorityCoverPage.js';
+import { installAuthorityCoverPage, isFloodingAuthorityReport, renderAuthorityCoverPage } from '../core/pdf/authorityPdfReport.js';
 const moduleData = {
   id: 'flooding-verification',
   title: 'Überflutungsnachweis',

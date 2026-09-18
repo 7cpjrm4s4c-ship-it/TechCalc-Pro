@@ -3,8 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const moduleIndex = fs.readFileSync(path.join(root, 'js/modules/heating-cooling/index.js'), 'utf8');
-const moduleView = fs.readFileSync(path.join(root, 'js/modules/heating-cooling/view.js'), 'utf8');
+const moduleIndex = fs.readFileSync(path.join(root, 'modules/heating-cooling/index.js'), 'utf8');
+const moduleView = fs.readFileSync(path.join(root, 'modules/heating-cooling/view.js'), 'utf8');
 
 assert.match(moduleIndex, /createPlatformModule\(/, 'Heizung/Kälte must keep the platform module runtime as the mount owner.');
 assert.match(moduleIndex, /createHeatingCoolingView\(/, 'Heizung/Kälte index should delegate ordered layout/view composition to view.js.');

@@ -1,29 +1,29 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { collectCurrentModule, lineSectionItems } from '../js/core/pdf/pdfDataMapping.js';
+import { collectCurrentModule, lineSectionItems } from '../core/pdf/pdfDataMapping.js';
 
 const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
-const pdfDataMappingSource = read('js/core/pdf/pdfDataMapping.js');
-const typedDtoReportAdapterSource = read('js/core/typedDtoReportAdapter.js');
+const pdfDataMappingSource = read('core/pdf/pdfDataMapping.js');
+const typedDtoReportAdapterSource = read('core/typedDtoReportAdapter.js');
 const serviceWorkerSource = read('service-worker.js');
-const appSource = read('js/core/app.js');
+const appSource = read('core/app.js');
 
 const moduleIndexPaths = [
-  'js/modules/heating-cooling/index.js',
-  'js/modules/ventilation/index.js',
-  'js/modules/pressure-holding/index.js',
-  'js/modules/buffer-storage/index.js',
-  'js/modules/heat-recovery/index.js',
-  'js/modules/mixed-air/index.js',
-  'js/modules/hx-diagram/index.js',
-  'js/modules/pipe-sizing/index.js',
-  'js/modules/unit-converter/index.js',
-  'js/modules/drinking-water/index.js',
-  'js/modules/wastewater/index.js',
-  'js/modules/rainwater/index.js',
-  'js/modules/flooding-verification/index.js',
-  'js/modules/f-gases-check/index.js',
-  'js/modules/en-378-safety-check/index.js'
+  'modules/heating-cooling/index.js',
+  'modules/ventilation/index.js',
+  'modules/pressure-holding/index.js',
+  'modules/buffer-storage/index.js',
+  'modules/heat-recovery/index.js',
+  'modules/mixed-air/index.js',
+  'modules/hx-diagram/index.js',
+  'modules/pipe-sizing/index.js',
+  'modules/unit-converter/index.js',
+  'modules/drinking-water/index.js',
+  'modules/wastewater/index.js',
+  'modules/rainwater/index.js',
+  'modules/flooding-verification/index.js',
+  'modules/f-gases-check/index.js',
+  'modules/en-378-safety-check/index.js'
 ];
 
 assert.match(
@@ -139,6 +139,6 @@ for (const moduleIndexPath of moduleIndexPaths) {
 assert.match(appSource, /flooding-verification/);
 assert.match(appSource, /rainwater/);
 assert.match(appSource, /f-gases-check/);
-assert.match(serviceWorkerSource, /\.\/js\/core\/typedDtoReportAdapter\.js/, 'typed DTO adapter must be precached with runtime assets');
+assert.match(serviceWorkerSource, /\.\/core\/typedDtoReportAdapter\.js/, 'typed DTO adapter must be precached with runtime assets');
 
 console.log('PDF report engine typed DTO unification 1.6.1 regression ok');

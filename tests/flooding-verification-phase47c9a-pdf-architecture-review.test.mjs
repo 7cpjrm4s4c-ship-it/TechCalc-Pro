@@ -5,8 +5,8 @@ import { readFileSync } from 'node:fs';
 const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 
 test('47C.9A keeps the global PDF engine as the single export and layout path', () => {
-  const app = read('js/core/app.js');
-  const exportModule = read('js/core/pdfExport.js');
+  const app = read('core/app.js');
+  const exportModule = read('core/pdfExport.js');
 
   assert.match(app, /import\('\.\/pdfExport\.js'\)/);
   assert.match(exportModule, /collectCurrentModule/);

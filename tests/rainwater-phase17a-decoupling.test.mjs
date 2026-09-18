@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const rainwater = readFileSync('js/modules/rainwater/index.js', 'utf8');
+const rainwater = readFileSync('modules/rainwater/index.js', 'utf8');
 const runtime = readFileSync('js/platform/moduleRuntime/index.js', 'utf8');
-const savedController = readFileSync('js/core/savedRecordController.js', 'utf8');
-const resultRenderer = readFileSync('js/core/resultRenderer.js', 'utf8');
+const savedController = readFileSync('core/savedRecordController.js', 'utf8');
+const resultRenderer = readFileSync('core/resultRenderer.js', 'utf8');
 const moduleRenderer = readFileSync('js/platform/moduleRenderer/index.js', 'utf8');
-const rainwaterResults = readFileSync('js/modules/rainwater/results.js', 'utf8');
+const rainwaterResults = readFileSync('modules/rainwater/results.js', 'utf8');
 
 assert.match(resultRenderer, /export function renderPrimaryResultCard/, 'platform result renderer must expose primary result cards');
 assert.match(resultRenderer, /export function renderNoticeCard/, 'platform result renderer must expose notice cards');

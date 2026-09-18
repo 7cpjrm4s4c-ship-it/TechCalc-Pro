@@ -3,8 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const appSource = fs.readFileSync(path.join(root, 'js/core/app.js'), 'utf8');
-const controllerPath = path.join(root, 'js/core/ux/feedbackController.js');
+const appSource = fs.readFileSync(path.join(root, 'core/app.js'), 'utf8');
+const controllerPath = path.join(root, 'core/ux/feedbackController.js');
 const controllerSource = fs.readFileSync(controllerPath, 'utf8');
 const serviceWorkerSource = fs.readFileSync(path.join(root, 'service-worker.js'), 'utf8');
 const feedbackModulePath = './ux/feedbackController.js';
@@ -20,7 +20,7 @@ assert.ok(!appSource.includes('function buildPayload()'), 'feedback payload buil
 assert.ok(controllerSource.includes('export function initializeFeedbackController'), 'feedback controller must export initializer');
 assert.ok(controllerSource.includes('let feedbackControllerInitialized = false'), 'feedback controller must be idempotent');
 assert.ok(controllerSource.includes('DEFAULT_FEEDBACK_ENDPOINT'), 'feedback endpoint default must live in feedback controller');
-assert.ok(serviceWorkerSource.includes("'./js/core/ux/feedbackController.js'"), 'service worker must precache feedback controller');
+assert.ok(serviceWorkerSource.includes("'./core/ux/feedbackController.js'"), 'service worker must precache feedback controller');
 
 const appLines = appSource.split(/\r?\n/).length;
 assert.ok(appLines <= 325, `app.js should be reduced after feedback extraction; got ${appLines} lines`);
@@ -53,7 +53,7 @@ const submit = { disabled: false, textContent: 'Feedback senden' };
 const subject = { value: 'TechCalc Pro Feedback' };
 let capturedPayload;
 
-const controller = await import('../js/core/ux/feedbackController.js');
+const controller = await import('../core/ux/feedbackController.js');
 const initialized = controller.initializeFeedbackController({
   appVersion: '1.3.0',
   endpoint: 'https://example.invalid/feedback',

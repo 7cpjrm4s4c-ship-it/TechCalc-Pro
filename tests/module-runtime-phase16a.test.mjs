@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { createModuleRuntime } from '../js/core/moduleRuntime.js';
+import { createModuleRuntime } from '../core/moduleRuntime.js';
 
 function createRoot() {
   const listeners = new Map();

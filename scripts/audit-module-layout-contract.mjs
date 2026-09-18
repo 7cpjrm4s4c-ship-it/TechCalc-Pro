@@ -5,23 +5,23 @@ const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'
 
 const indexHtml = read('index.html');
 const layoutCss = read('css/module-spacing-contract.css');
-const renderer = read('js/core/renderer.js');
+const renderer = read('core/renderer.js');
 
 const moduleViews = [
-  'js/core/moduleRenderer.js',
-  'js/modules/heating-cooling/view.js',
-  'js/modules/ventilation/view.js',
-  'js/modules/pipe-sizing/view.js',
-  'js/modules/unit-converter/view.js',
-  'js/modules/heat-recovery/view.js',
-  'js/modules/mixed-air/view.js',
-  'js/modules/hx-diagram/view.js',
-  'js/modules/drinking-water/view.js',
-  'js/modules/pressure-holding/view.js',
-  'js/modules/buffer-storage/view.js',
-  'js/modules/wastewater/view.js',
-  'js/modules/rainwater/view.js',
-  'js/modules/flooding-verification/view.js'
+  'core/moduleRenderer.js',
+  'modules/heating-cooling/view.js',
+  'modules/ventilation/view.js',
+  'modules/pipe-sizing/view.js',
+  'modules/unit-converter/view.js',
+  'modules/heat-recovery/view.js',
+  'modules/mixed-air/view.js',
+  'modules/hx-diagram/view.js',
+  'modules/drinking-water/view.js',
+  'modules/pressure-holding/view.js',
+  'modules/buffer-storage/view.js',
+  'modules/wastewater/view.js',
+  'modules/rainwater/view.js',
+  'modules/flooding-verification/view.js'
 ];
 
 assert.match(indexHtml, /<link rel="stylesheet" href="\.\/css\/module-spacing-contract\.css">/,
@@ -49,7 +49,7 @@ for (const path of moduleViews) {
     `${path} must declare explicit independent columns`);
 }
 
-const pipeSizingView = read('js/modules/pipe-sizing/view.js');
+const pipeSizingView = read('modules/pipe-sizing/view.js');
 assert.doesNotMatch(pipeSizingView, /DIN EN 10255|DIN EN 10220|≤\s*DN50|≥\s*DN65/,
   'pipe-sizing must not expose a static steel-only norm hint in the material-independent layout');
 

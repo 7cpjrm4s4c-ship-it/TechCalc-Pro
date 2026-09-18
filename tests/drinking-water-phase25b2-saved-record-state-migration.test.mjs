@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { state } from '../js/modules/drinking-water/state.js';
-import { createConsumer, createUsageUnit, createSingleGroup, readUsageUnits, writeUsageUnits, readSingleConsumers, writeSingleConsumers } from '../js/modules/drinking-water/logic.js';
-import { normalizeDrinkingWaterSavedState, hydrateDrinkingWaterSavedState } from '../js/modules/drinking-water/controller.js';
+import { state } from '../modules/drinking-water/state.js';
+import { createConsumer, createUsageUnit, createSingleGroup, readUsageUnits, writeUsageUnits, readSingleConsumers, writeSingleConsumers } from '../modules/drinking-water/logic.js';
+import { normalizeDrinkingWaterSavedState, hydrateDrinkingWaterSavedState } from '../modules/drinking-water/controller.js';
 
-const stateSource = readFileSync(new URL('../js/modules/drinking-water/state.js', import.meta.url), 'utf8');
-const controllerSource = readFileSync(new URL('../js/modules/drinking-water/controller.js', import.meta.url), 'utf8');
-const indexSource = readFileSync(new URL('../js/modules/drinking-water/index.js', import.meta.url), 'utf8');
+const stateSource = readFileSync(new URL('../modules/drinking-water/state.js', import.meta.url), 'utf8');
+const controllerSource = readFileSync(new URL('../modules/drinking-water/controller.js', import.meta.url), 'utf8');
+const indexSource = readFileSync(new URL('../modules/drinking-water/index.js', import.meta.url), 'utf8');
 
 assert.match(indexSource, /createPlatformModule/, 'Trinkwasser muss über createPlatformModule gemountet werden.');
 assert.match(stateSource, /savedUsageUnits/, 'Nutzungseinheiten müssen im State-Vertrag vorhanden sein.');

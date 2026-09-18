@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const index = readFileSync('js/modules/pressure-holding/index.js', 'utf8');
-const controller = readFileSync('js/modules/pressure-holding/controller.js', 'utf8');
-const state = readFileSync('js/modules/pressure-holding/state.js', 'utf8');
-const config = readFileSync('js/modules/pressure-holding/config.js', 'utf8');
+const index = readFileSync('modules/pressure-holding/index.js', 'utf8');
+const controller = readFileSync('modules/pressure-holding/controller.js', 'utf8');
+const state = readFileSync('modules/pressure-holding/state.js', 'utf8');
+const config = readFileSync('modules/pressure-holding/config.js', 'utf8');
 
 assert.match(controller, /createLineSectionController/, 'pressure-holding must use the central line-section saved-record controller');
 assert.match(controller, /pressureHoldingSavedController\.renderCard/, 'pressure-holding must render the controller-owned saved-record card');

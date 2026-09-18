@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const source = readFileSync(new URL('../js/modules/rainwater/index.js', import.meta.url), 'utf8');
-const controller = readFileSync(new URL('../js/modules/rainwater/controller.js', import.meta.url), 'utf8');
-const results = readFileSync(new URL('../js/modules/rainwater/results.js', import.meta.url), 'utf8');
+const source = readFileSync(new URL('../modules/rainwater/index.js', import.meta.url), 'utf8');
+const controller = readFileSync(new URL('../modules/rainwater/controller.js', import.meta.url), 'utf8');
+const results = readFileSync(new URL('../modules/rainwater/results.js', import.meta.url), 'utf8');
 
 assert.doesNotMatch(controller, /deleteAttr:\s*'data-saved-delete'/, 'Rainwater must use platform default saved-record delete attributes.');
 assert.match(controller, /surfaceMode:[\s\S]*patch:\s*modeDefaultsPatch/, 'Rainwater surfaceMode switch must be handled through platform segment config.');

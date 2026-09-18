@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import config from '../js/modules/hx-diagram/config.js';
-import { state } from '../js/modules/hx-diagram/state.js';
-import { createViewModel } from '../js/modules/hx-diagram/viewModel.js';
-import { buildHxResultModel, renderHxResultModel } from '../js/modules/hx-diagram/results.js';
-import { renderView } from '../js/modules/hx-diagram/view.js';
+import config from '../modules/hx-diagram/config.js';
+import { state } from '../modules/hx-diagram/state.js';
+import { createViewModel } from '../modules/hx-diagram/viewModel.js';
+import { buildHxResultModel, renderHxResultModel } from '../modules/hx-diagram/results.js';
+import { renderView } from '../modules/hx-diagram/view.js';
 
 assert.ok(['phase-26b3-result-renderer', 'phase-26b3a2-process-immediate-render', 'phase-26b3a3-enter-tab-navigation-and-live-diagram', 'phase-26c1-diagram-renderer-extraction', 'phase-26c2-single-render-pipeline', 'phase-26c3-view-purification', 'phase-26d-final-platform-cleanup'].includes(config.migrationStatus));
 
@@ -45,7 +45,7 @@ const viewHtml = renderView(state.get());
 assert.match(viewHtml, /Automatische Zustandsänderung/);
 assert.match(viewHtml, /h,x-Diagramm/);
 
-const viewSource = fs.readFileSync(new URL('../js/modules/hx-diagram/view.js', import.meta.url), 'utf8');
+const viewSource = fs.readFileSync(new URL('../modules/hx-diagram/view.js', import.meta.url), 'utf8');
 assert.doesNotMatch(viewSource, /mainResult/);
 assert.doesNotMatch(viewSource, /resultRows/);
 assert.doesNotMatch(viewSource, /readonlyStateCard/);

@@ -2,10 +2,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { transform } from 'esbuild';
+import { detectRuntimeLayout } from './runtime-layout.mjs';
 
 const root = process.cwd();
 const packageJsonPath = path.join(root, 'package.json');
 const outDir = path.join(root, 'dist');
+const { coreDir, modulesDir } = detectRuntimeLayout(root);
 
 const COPY_ENTRIES = [
   '_headers',
@@ -14,7 +16,8 @@ const COPY_ENTRIES = [
   'RELEASE_NOTES.md',
   'service-worker.js',
   'css',
-  'js',
+  coreDir,
+  modulesDir,
   'assets',
   'docs/legal'
 ];
@@ -101,7 +104,8 @@ fs.mkdirSync(outDir, { recursive: true });
 for (const entry of COPY_ENTRIES) copyEntry(entry);
 
 const minifyTargets = [
-  ...walkFiles(path.join(outDir, 'js'), file => path.extname(file) === '.js'),
+  ...walkFiles(path.join(outDir, coreDir), file => path.extname(file) === '.js'),
+  ...walkFiles(path.join(outDir, modulesDir), file => path.extname(file) === '.js'),
   ...walkFiles(path.join(outDir, 'css'), file => path.extname(file) === '.css')
 ];
 

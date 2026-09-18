@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs';
 
-const moduleSource = readFileSync('js/modules/heating-cooling/index.js', 'utf8');
-const viewSource = readFileSync('js/modules/heating-cooling/view.js', 'utf8');
-const pipelineSource = readFileSync('js/core/eventPipeline.js', 'utf8');
+const moduleSource = readFileSync('modules/heating-cooling/index.js', 'utf8');
+const viewSource = readFileSync('modules/heating-cooling/view.js', 'utf8');
+const pipelineSource = readFileSync('core/eventPipeline.js', 'utf8');
 const lineSectionSource = readFileSync('js/platform/lineSectionController/index.js', 'utf8');
 const runtimeSource = readFileSync('js/platform/moduleRuntime/index.js', 'utf8');
 const dynamicRendererSource = readFileSync('js/platform/dynamicRenderer/index.js', 'utf8');

@@ -4,13 +4,13 @@ import fs from 'node:fs';
 
 const read = path => fs.readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 
-const controller = read('js/modules/flooding-verification/controller.js');
-const index = read('js/modules/flooding-verification/index.js');
-const schema = read('js/modules/flooding-verification/schema.js');
-const logic = read('js/modules/flooding-verification/logic.js');
-const projectStorage = read('js/core/projectStorage.js');
-const projectAdapters = read('js/core/projectModuleStateAdapters.js');
-const rainwaterTables = read('js/modules/rainwater/tables.js');
+const controller = read('modules/flooding-verification/controller.js');
+const index = read('modules/flooding-verification/index.js');
+const schema = read('modules/flooding-verification/schema.js');
+const logic = read('modules/flooding-verification/logic.js');
+const projectStorage = read('core/projectStorage.js');
+const projectAdapters = read('core/projectModuleStateAdapters.js');
+const rainwaterTables = read('modules/rainwater/tables.js');
 
 test('47C.4.3 has no module-local event or debounce path', () => {
   assert.doesNotMatch(index, /addEventListener/);

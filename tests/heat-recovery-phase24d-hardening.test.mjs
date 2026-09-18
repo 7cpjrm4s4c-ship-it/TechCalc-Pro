@@ -1,14 +1,14 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { calculate } from '../js/modules/heat-recovery/logic.js';
-import { state } from '../js/modules/heat-recovery/state.js';
-import { buildRltDeviceRecord, inferRltInputState } from '../js/modules/heat-recovery/results.js';
-import { savedRltDevicePatch, rltDeviceController, rltDeviceCard } from '../js/modules/heat-recovery/controller.js';
-import { createHeatRecoveryViewModel } from '../js/modules/heat-recovery/viewModel.js';
+import { calculate } from '../modules/heat-recovery/logic.js';
+import { state } from '../modules/heat-recovery/state.js';
+import { buildRltDeviceRecord, inferRltInputState } from '../modules/heat-recovery/results.js';
+import { savedRltDevicePatch, rltDeviceController, rltDeviceCard } from '../modules/heat-recovery/controller.js';
+import { createHeatRecoveryViewModel } from '../modules/heat-recovery/viewModel.js';
 
-const base = new URL('../js/modules/heat-recovery/', import.meta.url);
+const base = new URL('../modules/heat-recovery/', import.meta.url);
 const read = file => readFileSync(new URL(file, base), 'utf8');
-const projectStorage = readFileSync('js/core/projectStorage.js', 'utf8');
+const projectStorage = readFileSync('core/projectStorage.js', 'utf8');
 
 assert.match(read('config.js'), /phase-24d-hardening/, 'phase 24D status is declared');
 assert.doesNotMatch(read('index.js'), /mountModule|renderModuleShell|querySelector|card\(|field\(|mainResult|resultCard|resultRows/, 'index remains a pure platform adapter');

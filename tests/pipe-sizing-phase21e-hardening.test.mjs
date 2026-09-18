@@ -1,17 +1,17 @@
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 
-const config = readFileSync('js/modules/pipe-sizing/config.js', 'utf8');
-const index = readFileSync('js/modules/pipe-sizing/index.js', 'utf8');
-const controller = readFileSync('js/modules/pipe-sizing/controller.js', 'utf8');
-const viewModel = readFileSync('js/modules/pipe-sizing/viewModel.js', 'utf8');
-const view = readFileSync('js/modules/pipe-sizing/view.js', 'utf8');
+const config = readFileSync('modules/pipe-sizing/config.js', 'utf8');
+const index = readFileSync('modules/pipe-sizing/index.js', 'utf8');
+const controller = readFileSync('modules/pipe-sizing/controller.js', 'utf8');
+const viewModel = readFileSync('modules/pipe-sizing/viewModel.js', 'utf8');
+const view = readFileSync('modules/pipe-sizing/view.js', 'utf8');
 const dynamicRenderer = readFileSync('js/platform/dynamicRenderer/index.js', 'utf8');
-const results = readFileSync('js/modules/pipe-sizing/results.js', 'utf8');
-const state = readFileSync('js/modules/pipe-sizing/state.js', 'utf8');
+const results = readFileSync('modules/pipe-sizing/results.js', 'utf8');
+const state = readFileSync('modules/pipe-sizing/state.js', 'utf8');
 
 for (const file of ['config.js', 'schema.js', 'state.js', 'logic.js', 'results.js', 'controller.js', 'viewModel.js', 'view.js', 'index.js']) {
-  assert.ok(existsSync(`js/modules/pipe-sizing/${file}`), `pipe-sizing platform contract must include ${file}`);
+  assert.ok(existsSync(`modules/pipe-sizing/${file}`), `pipe-sizing platform contract must include ${file}`);
 }
 
 assert.match(config, /phase-21e-hardening/, 'config must record phase 21E hardening');

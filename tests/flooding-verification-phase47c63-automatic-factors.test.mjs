@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { surchargeFactorFromRiskClass, calculateReductionFactorFa } from '../js/modules/flooding-verification/retentionFactors.js';
-import { buildRetentionRainByDuration, deriveRetentionFactors, calculate } from '../js/modules/flooding-verification/calculationAdapter.js';
+import { surchargeFactorFromRiskClass, calculateReductionFactorFa } from '../modules/flooding-verification/retentionFactors.js';
+import { buildRetentionRainByDuration, deriveRetentionFactors, calculate } from '../modules/flooding-verification/calculationAdapter.js';
 
 test('DWA-A 117 Tabelle 2 maps risk classes to fz', () => {
   assert.equal(surchargeFactorFromRiskClass('low'), 1.20);

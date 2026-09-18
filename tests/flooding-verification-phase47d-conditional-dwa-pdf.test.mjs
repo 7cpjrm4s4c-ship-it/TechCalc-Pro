@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import { buildAuthorityChartModel, renderAuthorityCharts } from '../js/core/pdf/authorityCharts.js';
-import { applyAuthorityReportPolicy } from '../js/core/pdf/authorityReportPolicy.js';
-import { isDwaVerificationRequired } from '../js/core/pdf/authorityReportScope.js';
+import { buildAuthorityChartModel, renderAuthorityCharts } from '../core/pdf/authorityCharts.js';
+import { applyAuthorityReportPolicy } from '../core/pdf/authorityReportPolicy.js';
+import { isDwaVerificationRequired } from '../core/pdf/authorityReportScope.js';
 
 const baseDto = {
   summary: {

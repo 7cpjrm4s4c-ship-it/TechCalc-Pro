@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { calculate, buildRetentionRainByDuration } from '../js/modules/flooding-verification/calculationAdapter.js';
-import { results } from '../js/modules/flooding-verification/results.js';
+import { calculate, buildRetentionRainByDuration } from '../modules/flooding-verification/calculationAdapter.js';
+import { results } from '../modules/flooding-verification/results.js';
 
 const authorityState = {
   schemaVersion: 2,

@@ -1,21 +1,21 @@
 import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import moduleDefinition from '../js/modules/en-378-safety-check/index.js';
-import schema from '../js/modules/en-378-safety-check/schema.js';
-import { initialState } from '../js/modules/en-378-safety-check/state.js';
-import { calculate } from '../js/modules/en-378-safety-check/logic.js';
-import { buildEN378SafetyCheckResultModel } from '../js/modules/en-378-safety-check/results.js';
-import { buildEN378SafetyCheckReportDto } from '../js/modules/en-378-safety-check/reportAdapter.js';
-import { buildEN378ReportSections } from '../js/core/pdf/en378ReportSections.js';
-import { getEN378SafetyData, listEN378SafetyData, listRefrigerants } from '../js/core/data/refrigerants.js';
+import moduleDefinition from '../modules/en-378-safety-check/index.js';
+import schema from '../modules/en-378-safety-check/schema.js';
+import { initialState } from '../modules/en-378-safety-check/state.js';
+import { calculate } from '../modules/en-378-safety-check/logic.js';
+import { buildEN378SafetyCheckResultModel } from '../modules/en-378-safety-check/results.js';
+import { buildEN378SafetyCheckReportDto } from '../modules/en-378-safety-check/reportAdapter.js';
+import { buildEN378ReportSections } from '../core/pdf/en378ReportSections.js';
+import { getEN378SafetyData, listEN378SafetyData, listRefrigerants } from '../core/data/refrigerants.js';
 const root = new URL('../', import.meta.url);
 const read = path => readFileSync(new URL(path, root), 'utf8');
 const exists = path => existsSync(new URL(path, root));
 const json = path => JSON.parse(read(path));
 const packageJson = json('package.json');
 const serviceWorker = read('service-worker.js');
-const EN378_RUNTIME_DIR = 'js/modules/en-378-safety-check';
+const EN378_RUNTIME_DIR = 'modules/en-378-safety-check';
 const REQUIRED_RUNTIME_FILES = Object.freeze([
   'alternativeRiskMeasures.js',
   'chargeLimitCalculation.js',

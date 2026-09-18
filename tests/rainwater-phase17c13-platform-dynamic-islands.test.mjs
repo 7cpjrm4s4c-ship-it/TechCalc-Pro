@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const runtime = readFileSync(new URL('../js/platform/moduleRuntime/index.js', import.meta.url), 'utf8');
 const renderer = readFileSync(new URL('../js/platform/moduleRenderer/index.js', import.meta.url), 'utf8');
-const rainController = readFileSync(new URL('../js/modules/rainwater/controller.js', import.meta.url), 'utf8');
+const rainController = readFileSync(new URL('../modules/rainwater/controller.js', import.meta.url), 'utf8');
 
 assert.match(renderer, /export function renderPlatformForm/, 'platform renderer must expose a reusable form island renderer.');
 assert.match(renderer, /export function renderPlatformResultsAndSaved/, 'platform renderer must expose a reusable result/saved island renderer.');

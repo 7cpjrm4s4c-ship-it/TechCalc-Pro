@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const source = readFileSync(new URL('../js/modules/ventilation/viewModel.js', import.meta.url), 'utf8');
-const configSource = readFileSync(new URL('../js/modules/ventilation/config.js', import.meta.url), 'utf8');
+const source = readFileSync(new URL('../modules/ventilation/viewModel.js', import.meta.url), 'utf8');
+const configSource = readFileSync(new URL('../modules/ventilation/config.js', import.meta.url), 'utf8');
 
-const { savedVentilationPatch } = await import('../js/modules/ventilation/viewModel.js');
+const { savedVentilationPatch } = await import('../modules/ventilation/viewModel.js');
 
 assert.match(configSource, /phase-19b2c-hydrator-final/, 'ventilation declares phase 19B.2C hydrator finalization');
 

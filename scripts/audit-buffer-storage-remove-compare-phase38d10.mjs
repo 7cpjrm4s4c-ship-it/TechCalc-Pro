@@ -1,10 +1,10 @@
 import fs from 'node:fs';
 const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-import { bufferStorageSchema } from '../js/modules/buffer-storage/schema.js';
-import { bufferModeOptions, createBufferStorageViewModel } from '../js/modules/buffer-storage/viewModel.js';
-import { renderInputBlocks, renderView } from '../js/modules/buffer-storage/view.js';
-import { calculate } from '../js/modules/buffer-storage/logic.js';
-import { state as bufferStorageState } from '../js/modules/buffer-storage/state.js';
+import { bufferStorageSchema } from '../modules/buffer-storage/schema.js';
+import { bufferModeOptions, createBufferStorageViewModel } from '../modules/buffer-storage/viewModel.js';
+import { renderInputBlocks, renderView } from '../modules/buffer-storage/view.js';
+import { calculate } from '../modules/buffer-storage/logic.js';
+import { state as bufferStorageState } from '../modules/buffer-storage/state.js';
 
 function fail(message) {
   console.error(`Phase 38D.10 buffer compare removal failed: ${message}`);
@@ -12,13 +12,13 @@ function fail(message) {
 }
 
 const sourceFiles = [
-  'js/modules/buffer-storage/schema.js',
-  'js/modules/buffer-storage/viewModel.js',
-  'js/modules/buffer-storage/view.js',
-  'js/modules/buffer-storage/logic.js',
-  'js/modules/buffer-storage/results.js',
-  'js/modules/buffer-storage/controller.js',
-  'js/modules/buffer-storage/state.js'
+  'modules/buffer-storage/schema.js',
+  'modules/buffer-storage/viewModel.js',
+  'modules/buffer-storage/view.js',
+  'modules/buffer-storage/logic.js',
+  'modules/buffer-storage/results.js',
+  'modules/buffer-storage/controller.js',
+  'modules/buffer-storage/state.js'
 ];
 
 for (const file of sourceFiles) {

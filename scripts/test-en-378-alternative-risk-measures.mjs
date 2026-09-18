@@ -4,10 +4,10 @@ import {
   assessAlternativeRiskMeasures,
   calculateDilutionOpeningArea,
   calculateSimplifiedMechanicalVentilationFlow
-} from '../js/modules/en-378-safety-check/alternativeRiskMeasures.js';
-import { assessChargeLimit } from '../js/modules/en-378-safety-check/chargeLimitCalculation.js';
-import { calculate } from '../js/modules/en-378-safety-check/logic.js';
-import { buildEN378SafetyCheckResultModel } from '../js/modules/en-378-safety-check/results.js';
+} from '../modules/en-378-safety-check/alternativeRiskMeasures.js';
+import { assessChargeLimit } from '../modules/en-378-safety-check/chargeLimitCalculation.js';
+import { calculate } from '../modules/en-378-safety-check/logic.js';
+import { buildEN378SafetyCheckResultModel } from '../modules/en-378-safety-check/results.js';
 
 const baseState = {
   refrigerantId: 'R-32',

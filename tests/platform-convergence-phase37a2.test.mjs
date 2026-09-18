@@ -27,7 +27,7 @@ const configs = [
 ];
 
 for (const name of configs) {
-  const source = readFileSync(`js/modules/${name}/config.js`, 'utf8');
+  const source = readFileSync(`modules/${name}/config.js`, 'utf8');
   assert.doesNotMatch(source, /migrationStatus\s*:/, `${name} config must not contain migrationStatus`);
   assert.match(source, /defineModuleConfig\s*\(/, `${name} config must keep defineModuleConfig contract`);
 }

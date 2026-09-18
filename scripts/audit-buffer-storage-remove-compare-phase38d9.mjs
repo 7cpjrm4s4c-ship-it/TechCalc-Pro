@@ -1,16 +1,16 @@
 import { readFileSync } from 'node:fs';
-import { calculate } from '../js/modules/buffer-storage/logic.js';
-import { createBufferStorageViewModel, bufferModeOptions } from '../js/modules/buffer-storage/viewModel.js';
-import { renderInputBlocks } from '../js/modules/buffer-storage/view.js';
+import { calculate } from '../modules/buffer-storage/logic.js';
+import { createBufferStorageViewModel, bufferModeOptions } from '../modules/buffer-storage/viewModel.js';
+import { renderInputBlocks } from '../modules/buffer-storage/view.js';
 
 function fail(message){
   console.error(`Phase 38D.9 failed: ${message}`);
   process.exit(1);
 }
 
-const view = readFileSync('js/modules/buffer-storage/view.js', 'utf8');
-const schema = readFileSync('js/modules/buffer-storage/schema.js', 'utf8');
-const viewModel = readFileSync('js/modules/buffer-storage/viewModel.js', 'utf8');
+const view = readFileSync('modules/buffer-storage/view.js', 'utf8');
+const schema = readFileSync('modules/buffer-storage/schema.js', 'utf8');
+const viewModel = readFileSync('modules/buffer-storage/viewModel.js', 'utf8');
 
 if (bufferModeOptions.some(option => option.value === 'compare')) fail('compare remains in bufferModeOptions');
 if (/value:\s*['"]compare['"]/.test(schema)) fail('compare remains in buffer-storage schema segment options');

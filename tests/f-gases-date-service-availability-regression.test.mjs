@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
-import schema from '../js/modules/f-gases-check/schema.js';
-import { initialState } from '../js/modules/f-gases-check/state.js';
-import { hydrateFGasesSavedRecord } from '../js/modules/f-gases-check/savedRecords.js';
-import { calculate } from '../js/modules/f-gases-check/logic.js';
-import { buildFGasesResultModel } from '../js/modules/f-gases-check/results.js';
+import schema from '../modules/f-gases-check/schema.js';
+import { initialState } from '../modules/f-gases-check/state.js';
+import { hydrateFGasesSavedRecord } from '../modules/f-gases-check/savedRecords.js';
+import { calculate } from '../modules/f-gases-check/logic.js';
+import { buildFGasesResultModel } from '../modules/f-gases-check/results.js';
 const stockField = schema.fields.find(field => field.key === 'stockAssessmentDate');
 assert.equal(initialState.plannedActivity, 'installation');
 assert.equal(stockField.visibleWhen({ plannedActivity: 'installation' }), false);

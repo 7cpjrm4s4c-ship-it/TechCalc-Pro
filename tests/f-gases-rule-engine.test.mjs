@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { calculate } from '../js/modules/f-gases-check/logic.js';
+import { calculate } from '../modules/f-gases-check/logic.js';
 
 const base = { assessmentDate:'2027-01-02', placedOnMarketDate:'2027-01-02', installationType:'stationary', applicationType:'heat-pump', productCategory:'split-ac-heat-pump', constructionType:'split', splitType:'air-water', ratedCapacityKw:'10', refrigerantId:'R32', chargeKg:'8', siteSafetyRestrictionStatus:'no', nationalSafetyStandardRestrictionStatus:'no', hermeticallySealedStatus:'no', hermeticallySealedLabelStatus:'no', leakDetectionSystemStatus:'no' };
 const split = calculate({ ...base, commissioningDate:'2027-01-02', plannedActivity: 'installation', refrigerantOrigin: 'new' });

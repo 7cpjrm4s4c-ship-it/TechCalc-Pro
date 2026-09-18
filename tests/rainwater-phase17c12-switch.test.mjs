@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import rainwater from '../js/modules/rainwater/index.js';
-import createRainwaterView from '../js/modules/rainwater/view.js';
+import rainwater from '../modules/rainwater/index.js';
+import createRainwaterView from '../modules/rainwater/view.js';
 
 const { view: rainwaterView } = createRainwaterView({
   lineSectionController: { renderCard: () => '' }
@@ -26,6 +26,6 @@ assert.doesNotMatch(html, /Regenspende r\(5,5\)/);
 assert.match(html, /Vorwahl Hoftopf/);
 assert.doesNotMatch(html, /Vorwahl Dacheinlauf/);
 
-const controllerSource = await import('node:fs').then(fs => fs.readFileSync(new URL('../js/modules/rainwater/controller.js', import.meta.url), 'utf8'));
+const controllerSource = await import('node:fs').then(fs => fs.readFileSync(new URL('../modules/rainwater/controller.js', import.meta.url), 'utf8'));
 assert.doesNotMatch(controllerSource, /domPatch/);
 assert.doesNotMatch(controllerSource, /querySelector/);

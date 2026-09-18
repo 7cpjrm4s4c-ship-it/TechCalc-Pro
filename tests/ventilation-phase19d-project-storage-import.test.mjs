@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 
-const projectStorage = await import('../js/core/projectStorage.js');
-const ventilationModule = await import('../js/modules/ventilation/index.js');
-const ventilationController = await import('../js/modules/ventilation/controller.js');
+const projectStorage = await import('../core/projectStorage.js');
+const ventilationModule = await import('../modules/ventilation/index.js');
+const ventilationController = await import('../modules/ventilation/controller.js');
 
 assert.equal(typeof projectStorage.collectProjectData, 'function', 'projectStorage must import cleanly and expose collectProjectData');
 assert.equal(typeof projectStorage.applyProjectData, 'function', 'projectStorage must import cleanly and expose applyProjectData');

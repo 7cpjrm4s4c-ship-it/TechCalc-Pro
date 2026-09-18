@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 
-import bufferStorageModule from '../js/modules/buffer-storage/index.js';
-import { calculate } from '../js/modules/buffer-storage/logic.js';
-import { buildBufferRecord } from '../js/modules/buffer-storage/controller.js';
-import { reportSections } from '../js/core/pdf/pdfDataMapping.js';
+import bufferStorageModule from '../modules/buffer-storage/index.js';
+import { calculate } from '../modules/buffer-storage/logic.js';
+import { buildBufferRecord } from '../modules/buffer-storage/controller.js';
+import { reportSections } from '../core/pdf/pdfDataMapping.js';
 
 const defrostState = {
   plantName: 'Test Abtau',

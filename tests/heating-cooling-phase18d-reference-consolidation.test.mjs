@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 
-const moduleSource = fs.readFileSync('js/modules/heating-cooling/index.js', 'utf8');
-const controllerSource = fs.readFileSync('js/modules/heating-cooling/controller.js', 'utf8');
-const configSource = fs.readFileSync('js/modules/heating-cooling/config.js', 'utf8');
+const moduleSource = fs.readFileSync('modules/heating-cooling/index.js', 'utf8');
+const controllerSource = fs.readFileSync('modules/heating-cooling/controller.js', 'utf8');
+const configSource = fs.readFileSync('modules/heating-cooling/config.js', 'utf8');
 
 assert.match(configSource, /phase-18d-reference-consolidation/, 'Phase 18D must be recorded in migration status.');
 assert.match(moduleSource, /from '\.\/controller\.js'/, 'heating/cooling index must import the consolidated controller helpers.');

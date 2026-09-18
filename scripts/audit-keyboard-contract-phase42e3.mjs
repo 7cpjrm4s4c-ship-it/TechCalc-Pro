@@ -1,21 +1,23 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { detectRuntimeLayout } from './runtime-layout.mjs';
 
 const root = new URL('..', import.meta.url).pathname;
-const jsRoot = join(root, 'js');
+const { coreDir, modulesDir } = detectRuntimeLayout(root);
+const runtimeRoots = [join(root, coreDir), join(root, modulesDir)];
 
 const CENTRAL_KEYBOARD_FILES = new Set([
-  'js/core/eventPipeline.js',
-  'js/core/focusManager.js',
-  'js/core/stateBinding.js',
-  'js/core/savedRecords.js',
-  'js/core/ux/settingsController.js'
+  'core/eventPipeline.js',
+  'core/focusManager.js',
+  'core/stateBinding.js',
+  'core/savedRecords.js',
+  'core/ux/settingsController.js'
 ]);
 
 const ALLOWED_NON_KEYBOARD_KEY_PROPERTIES = new Set([
   // Dedupe keys, not KeyboardEvent.key usage.
-  'js/modules/hx-diagram/controller.js',
-  'js/modules/wastewater/controller.js',
+  'modules/hx-diagram/controller.js',
+  'modules/wastewater/controller.js',
   'js/platform/moduleRuntime/index.js'
 ]);
 
@@ -43,7 +45,7 @@ function rel(path) {
 
 const failures = [];
 const warnings = [];
-for (const file of walk(jsRoot)) {
+for (const file of runtimeRoots.flatMap(walk)) {
   const fileRel = rel(file);
   const srcRaw = readFileSync(file, 'utf8');
   const src = srcRaw.replace(LINE_COMMENT_RE, '');
@@ -67,8 +69,8 @@ for (const file of walk(jsRoot)) {
   }
 }
 
-const eventPipeline = readFileSync(join(root, 'js/core/eventPipeline.js'), 'utf8');
-const focusManager = readFileSync(join(root, 'js/core/focusManager.js'), 'utf8');
+const eventPipeline = readFileSync(join(root, 'core/eventPipeline.js'), 'utf8');
+const focusManager = readFileSync(join(root, 'core/focusManager.js'), 'utf8');
 
 const requiredEventPipelineSnippets = [
   'handlePlatformFieldNavigation',
@@ -78,7 +80,7 @@ const requiredEventPipelineSnippets = [
 ];
 for (const snippet of requiredEventPipelineSnippets) {
   if (!eventPipeline.includes(snippet)) {
-    failures.push(`js/core/eventPipeline.js: missing required central keyboard contract snippet: ${snippet}`);
+    failures.push(`core/eventPipeline.js: missing required central keyboard contract snippet: ${snippet}`);
   }
 }
 
@@ -92,7 +94,7 @@ const requiredFocusSnippets = [
 ];
 for (const snippet of requiredFocusSnippets) {
   if (!focusManager.includes(snippet)) {
-    failures.push(`js/core/focusManager.js: missing required focus graph snippet: ${snippet}`);
+    failures.push(`core/focusManager.js: missing required focus graph snippet: ${snippet}`);
   }
 }
 

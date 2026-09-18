@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { automaticRainDuration, calculate } from '../js/modules/flooding-verification/logic.js';
-import { buildFloodingSurfaceRecord } from '../js/modules/flooding-verification/controller.js';
+import { automaticRainDuration, calculate } from '../modules/flooding-verification/logic.js';
+import { buildFloodingSurfaceRecord } from '../modules/flooding-verification/controller.js';
 
-const viewSource = fs.readFileSync(new URL('../js/modules/flooding-verification/view.js', import.meta.url), 'utf8');
-const schemaSource = fs.readFileSync(new URL('../js/modules/flooding-verification/schema.js', import.meta.url), 'utf8');
+const viewSource = fs.readFileSync(new URL('../modules/flooding-verification/view.js', import.meta.url), 'utf8');
+const schemaSource = fs.readFileSync(new URL('../modules/flooding-verification/schema.js', import.meta.url), 'utf8');
 
 test('Phase 47C.4.5 uses the central module layout for every dynamic island', () => {
   assert.match(viewSource, /class="tc-module-layout tc-module-layout--2"/);

@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 
-import { buildEN378ReportSections } from '../js/core/pdf/en378ReportSections.js';
-import { reportSections } from '../js/core/pdf/pdfDataMapping.js';
-import { calculate } from '../js/modules/en-378-safety-check/logic.js';
-import { buildEN378SafetyCheckReportDto } from '../js/modules/en-378-safety-check/reportAdapter.js';
+import { buildEN378ReportSections } from '../core/pdf/en378ReportSections.js';
+import { reportSections } from '../core/pdf/pdfDataMapping.js';
+import { calculate } from '../modules/en-378-safety-check/logic.js';
+import { buildEN378SafetyCheckReportDto } from '../modules/en-378-safety-check/reportAdapter.js';
 
 const state = {
   importedSystemName: 'Wärmepumpe Dachzentrale',

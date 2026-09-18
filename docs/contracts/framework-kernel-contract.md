@@ -21,7 +21,7 @@ The canonical target framework basis is:
 core
 ```
 
-The current `js/core` path is a temporary transition location until the coordinated Root-Level Runtime Layout migration is committed.
+The coordinated Root-Level Runtime Layout migration is complete. `core` is the active runtime location.
 
 All app-wide responsibilities must remain discoverable through Core. No additional framework or platform facade may be introduced.
 
@@ -89,13 +89,13 @@ The canonical target data path is:
 core/data
 ```
 
-During transition it remains at `js/core/data`. The former `js/data`, `js/shared` and `js/utils` compatibility paths have been removed and must not be recreated.
+The former `js/data`, `js/shared` and `js/utils` compatibility paths have been removed and must not be recreated.
 
 Data catalogs, shared datasets and lookup services belong exclusively to Core Data.
 
 ## Reference module guard
 
-The reference modules are the 15 feature directories below target path `modules/`. Until the coordinated move they remain below `js/modules/`.
+The reference modules are the 15 feature directories below `modules/`.
 
 Reference modules must use central Core paths for app-wide dependencies and must not import directly from removed platform, shared or utility paths.
 
@@ -152,7 +152,7 @@ The outer directory move and internal Core reorganization must not occur in the 
 
 The former `js/platform`, `js/framework`, `js/data`, `js/shared` and `js/utils` boundaries are removed.
 
-The transitional `js/core` and `js/modules` locations are not compatibility APIs. They exist only until the coordinated root relocation.
+The transitional `js/core` and `js/modules` locations have been removed and are not compatibility APIs.
 
 ## Review requirements
 

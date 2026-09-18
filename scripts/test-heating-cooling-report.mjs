@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 
-import { reportSections } from '../js/core/pdf/pdfDataMapping.js';
-import { calculate } from '../js/modules/heating-cooling/logic.js';
-import { buildHeatingCoolingReportDto } from '../js/modules/heating-cooling/reportAdapter.js';
+import { reportSections } from '../core/pdf/pdfDataMapping.js';
+import { calculate } from '../modules/heating-cooling/logic.js';
+import { buildHeatingCoolingReportDto } from '../modules/heating-cooling/reportAdapter.js';
 
 const state = {
   mode: 'heating',

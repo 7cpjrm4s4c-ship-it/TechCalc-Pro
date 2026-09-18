@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { createHeatingCoolingDynamicRenderer } from '../js/core/dynamicRenderer.js';
+import { createHeatingCoolingDynamicRenderer } from '../core/dynamicRenderer.js';
 
 function makeElement(name) {
   return {

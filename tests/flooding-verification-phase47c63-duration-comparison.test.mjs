@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildRetentionDurationComparison } from '../js/modules/flooding-verification/retentionDurationComparison.js';
+import { buildRetentionDurationComparison } from '../modules/flooding-verification/retentionDurationComparison.js';
 
 test('duration comparison sorts by duration and marks the maximum as governing', () => {
   const comparison = buildRetentionDurationComparison([

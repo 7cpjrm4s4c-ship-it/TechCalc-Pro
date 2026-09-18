@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 
-import moduleDefinition from '../js/modules/en-378-safety-check/index.js';
+import moduleDefinition from '../modules/en-378-safety-check/index.js';
 import {
   buildEN378SavedRecord,
   buildEN378SavedRecordsModel,
   hydrateEN378SavedRecord
-} from '../js/modules/en-378-safety-check/savedRecords.js';
-import { calculate } from '../js/modules/en-378-safety-check/logic.js';
-import { renderSavedRecordPanel } from '../js/core/savedRecords.js';
+} from '../modules/en-378-safety-check/savedRecords.js';
+import { calculate } from '../modules/en-378-safety-check/logic.js';
+import { renderSavedRecordPanel } from '../core/savedRecords.js';
 const state = {
   importedSystemName: 'Wärmepumpe Dachzentrale',
   refrigerantId: 'R-32',

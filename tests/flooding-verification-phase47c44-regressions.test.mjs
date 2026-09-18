@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import schema, { floodingSurfaceSchema } from '../js/modules/flooding-verification/schema.js';
+import schema, { floodingSurfaceSchema } from '../modules/flooding-verification/schema.js';
 import {
   buildFloodingSurfaceRecord,
   hydrateFloodingSurfaceRecord
-} from '../js/modules/flooding-verification/controller.js';
-import { calculate } from '../js/modules/flooding-verification/logic.js';
-import { savedVerificationModel } from '../js/modules/flooding-verification/savedRecords.js';
+} from '../modules/flooding-verification/controller.js';
+import { calculate } from '../modules/flooding-verification/logic.js';
+import { savedVerificationModel } from '../modules/flooding-verification/savedRecords.js';
 
 const draft = {
   surfaces: [], activeSurfaceId: null,

@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
-import schema from '../js/modules/f-gases-check/schema.js';
-import { initialState, F_GASES_SCHEMA_VERSION } from '../js/modules/f-gases-check/state.js';
-import { calculate } from '../js/modules/f-gases-check/logic.js';
-import { createFGasesSystemSnapshot, F_GASES_SYSTEM_SNAPSHOT_VERSION } from '../js/core/data/fGasesSystemSnapshot.js';
-import { getDataStatus, getDataVersions, getGwp, getRefrigerant, listRefrigerants, listRegulations, listSafetyClasses } from '../js/core/data/refrigerants.js';
+import schema from '../modules/f-gases-check/schema.js';
+import { initialState, F_GASES_SCHEMA_VERSION } from '../modules/f-gases-check/state.js';
+import { calculate } from '../modules/f-gases-check/logic.js';
+import { createFGasesSystemSnapshot, F_GASES_SYSTEM_SNAPSHOT_VERSION } from '../core/data/fGasesSystemSnapshot.js';
+import { getDataStatus, getDataVersions, getGwp, getRefrigerant, listRefrigerants, listRegulations, listSafetyClasses } from '../core/data/refrigerants.js';
 
 assert.equal(F_GASES_SCHEMA_VERSION, 5);
 assert.equal(schema.version, 5);

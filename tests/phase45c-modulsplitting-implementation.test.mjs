@@ -11,20 +11,20 @@ globalThis.sessionStorage = globalThis.localStorage;
 globalThis.document = { dispatchEvent() {} };
 globalThis.CustomEvent = class CustomEvent { constructor(type, init = {}) { this.type = type; this.detail = init.detail; } };
 
-const heatConfig = (await import('../js/modules/heat-recovery/config.js')).default;
-const mixedConfig = (await import('../js/modules/mixed-air/config.js')).default;
-const { calculate: calculateHeatRecovery } = await import('../js/modules/heat-recovery/logic.js');
-const { calculate: calculateMixedAir } = await import('../js/modules/mixed-air/logic.js');
-const { state: heatRecoveryState } = await import('../js/modules/heat-recovery/state.js');
-const { state: mixedAirState } = await import('../js/modules/mixed-air/state.js');
-const { applyProjectData, collectProjectData, resetAllSessionData } = await import('../js/core/projectStorage.js');
+const heatConfig = (await import('../modules/heat-recovery/config.js')).default;
+const mixedConfig = (await import('../modules/mixed-air/config.js')).default;
+const { calculate: calculateHeatRecovery } = await import('../modules/heat-recovery/logic.js');
+const { calculate: calculateMixedAir } = await import('../modules/mixed-air/logic.js');
+const { state: heatRecoveryState } = await import('../modules/heat-recovery/state.js');
+const { state: mixedAirState } = await import('../modules/mixed-air/state.js');
+const { applyProjectData, collectProjectData, resetAllSessionData } = await import('../core/projectStorage.js');
 
 assert.equal(heatConfig.id, 'heat-recovery');
 assert.equal(heatConfig.title, 'Wärmerückgewinnung');
 assert.equal(mixedConfig.id, 'mixed-air');
 assert.equal(mixedConfig.title, 'Mischluft');
 
-const appSource = readFileSync('js/core/app.js', 'utf8');
+const appSource = readFileSync('core/app.js', 'utf8');
 assert.match(appSource, /mixedAirConfig/, 'mixed-air is registered for lazy loading');
 assert.match(appSource, /\.\.\/modules\/mixed-air\/index\.js/, 'mixed-air module path is registered');
 

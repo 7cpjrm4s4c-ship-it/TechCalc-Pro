@@ -1,19 +1,19 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import module from '../js/modules/heat-recovery/index.js';
-import config from '../js/modules/heat-recovery/config.js';
-import schema from '../js/modules/heat-recovery/schema.js';
-import { state } from '../js/modules/heat-recovery/state.js';
-import { calculate } from '../js/modules/heat-recovery/logic.js';
-import { createHeatRecoveryViewModel } from '../js/modules/heat-recovery/viewModel.js';
-import { renderView, renderOutputs } from '../js/modules/heat-recovery/view.js';
-import { buildHeatRecoveryResultModel } from '../js/modules/heat-recovery/results.js';
-import { isDynamicHeatRecoveryAction, updateHeatRecoveryDynamic } from '../js/modules/heat-recovery/dynamicRenderer.js';
-import { rltDeviceController, rltDeviceCard, savedRltDevicePatch } from '../js/modules/heat-recovery/controller.js';
+import module from '../modules/heat-recovery/index.js';
+import config from '../modules/heat-recovery/config.js';
+import schema from '../modules/heat-recovery/schema.js';
+import { state } from '../modules/heat-recovery/state.js';
+import { calculate } from '../modules/heat-recovery/logic.js';
+import { createHeatRecoveryViewModel } from '../modules/heat-recovery/viewModel.js';
+import { renderView, renderOutputs } from '../modules/heat-recovery/view.js';
+import { buildHeatRecoveryResultModel } from '../modules/heat-recovery/results.js';
+import { isDynamicHeatRecoveryAction, updateHeatRecoveryDynamic } from '../modules/heat-recovery/dynamicRenderer.js';
+import { rltDeviceController, rltDeviceCard, savedRltDevicePatch } from '../modules/heat-recovery/controller.js';
 
-const base = new URL('../js/modules/heat-recovery/', import.meta.url);
+const base = new URL('../modules/heat-recovery/', import.meta.url);
 const read = file => readFileSync(new URL(file, base), 'utf8');
-const projectStorage = readFileSync('js/core/projectStorage.js', 'utf8');
+const projectStorage = readFileSync('core/projectStorage.js', 'utf8');
 
 assert.match(read('config.js'), /phase-24e-final-hardening/, 'phase 24E status is declared');
 assert.equal(config.id, 'heat-recovery', 'module config id remains stable');

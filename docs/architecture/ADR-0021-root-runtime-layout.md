@@ -61,16 +61,16 @@ The migration is split into two independently verified operations:
 
 The outer directory move and the internal Core reorganization must not be combined.
 
-## Transition state
+## Implementation state
 
-Until the coordinated directory move is committed, runtime files remain temporarily under:
+The coordinated directory move is complete. Runtime files now reside under:
 
 ```text
-js/core
-js/modules
+core
+modules
 ```
 
-Tooling and contracts may support the target paths before the move, but runtime consumers must switch atomically with the directory relocation. After the move, the empty `js` boundary must be removed and protected by an audit gate.
+Runtime consumers, audits, tests, deployment tooling and the service-worker precache switched atomically with the directory relocation. The empty `js` boundary is removed; a dedicated audit gate will protect it from recreation after the migration is verified in CI.
 
 ## Consequences
 
