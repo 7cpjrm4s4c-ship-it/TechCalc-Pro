@@ -1,8 +1,8 @@
-import { logger } from './diagnostics/logger.js';
-import { getProjectMeta, setProjectMeta, downloadProjectFile, readProjectFile, applyProjectData, getOpenedFileName, saveSessionSnapshot } from './projectStorage.js';
-import { collectCurrentModule, pdfFileName } from './pdf/pdfDataMapping.js';
-import { GlobalPdfReport } from './pdf/pdfLayout.js';
-import { normalizeImageToJpeg, svgToJpeg, canvasToJpeg, createFallbackIconJpeg } from './pdf/pdfChartRender.js';
+import { logger } from '../diagnostics/logger.js';
+import { getProjectMeta, setProjectMeta, downloadProjectFile, readProjectFile, applyProjectData, getOpenedFileName, saveSessionSnapshot } from '../projectStorage.js';
+import { collectCurrentModule, pdfFileName } from './pdfDataMapping.js';
+import { GlobalPdfReport } from './pdfLayout.js';
+import { normalizeImageToJpeg, svgToJpeg, canvasToJpeg, createFallbackIconJpeg } from './pdfChartRender.js';
 const MAX_COMPANY_LOGO_FILE_SIZE = 500 * 1024;
 const MAX_COMPANY_LOGO_DATA_URL_SIZE = 700000;
 const PDF_COMPANY_LOGO_STORAGE_KEY = 'techcalc-pdf-company-logo';
@@ -25,7 +25,6 @@ const DEFAULT_PROJECT = {
 function brandingEnabled(value) {
   return value !== false && value !== 'false';
 }
-
 function readProject() {
   const meta = getProjectMeta();
   return {
@@ -76,7 +75,6 @@ function flashProjectSaved(text = 'Projektdatei erstellt') {
     button.classList.remove('is-saved');
   }, 1400);
 }
-
 function setInputValue(id, value) {
   const el = document.getElementById(id);
   if (el) el.value = value ?? '';
@@ -85,7 +83,6 @@ function setCheckboxValue(id, value) {
   const el = document.getElementById(id);
   if (el) el.checked = brandingEnabled(value);
 }
-
 function bindProjectInput(id, key) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -97,7 +94,6 @@ function bindProjectCheckbox(id, key) {
   if (!el) return;
   el.addEventListener('change', () => setProjectMeta({ [key]: Boolean(el.checked) }));
 }
-
 function updateOpenedProjectLabel() {
   const label = document.getElementById('projectFileLabel');
   if (!label) return;

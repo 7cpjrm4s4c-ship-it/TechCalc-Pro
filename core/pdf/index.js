@@ -1,4 +1,4 @@
-export * from '../pdfExport.js';
+export * from './pdfExport.js';
 export * from './authorityCharts.js';
 export * from './authorityCorporateBlock.js';
 export * from './authorityCoverPage.js';
