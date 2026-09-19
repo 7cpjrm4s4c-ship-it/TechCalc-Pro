@@ -38,7 +38,7 @@ function saveOfflineFeedback(storage, payload, reason) {
   const queue = readOfflineQueue(storage);
   queue.push({
     savedAt: new Date().toISOString(),
-    reason),
+    reason,
     payload: formDataToObject(payload)
   });
   return writeOfflineQueue(storage, queue);
