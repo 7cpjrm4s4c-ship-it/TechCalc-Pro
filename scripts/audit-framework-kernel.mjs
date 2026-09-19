@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { detectRuntimeLayout } from './runtime-layout.mjs';
-
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const runtimeLayout = detectRuntimeLayout(root);
 const coreFile = relativePath => `${runtimeLayout.coreDir}/${relativePath}`;
@@ -162,7 +161,7 @@ const referenceModules = [
     required('hx-diagram/formRenderer.js', ['../../core/renderer.js', '../../core/numberService.js']),
     required('hx-diagram/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('hx-diagram/logic.js', ['../../core/numberService.js']),
-    required('hx-diagram/renderPipeline.js', ['../../core/renderer.js', '../../core/numberService.js', '../../core/focusManager.js']),
+    required('hx-diagram/renderPipeline.js', ['../../core/renderer.js', '../../core/numberService.js', '../../core/ux/focusManager.js']),
     required('hx-diagram/results.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/numberService.js']),
     required('hx-diagram/schema.js', ['../../core/formSchema.js']),
     required('hx-diagram/view.js', ['../../core/renderer.js'])
@@ -187,7 +186,7 @@ const referenceModules = [
   ], { extraFiles: ['alternativeRiskMeasures.js', 'chargeLimitCalculation.js', 'displayLabels.js', 'importController.js', 'installationSafetyRequirements.js', 'plannerGuidance.js', 'refrigerantCoverage.js', 'reportAdapter.js', 'savedRecords.js', 'snapshotImport.js', 'stateConsistency.js'], excludedFiles: ['controller.js', 'view.js', 'viewModel.js'] }),
   guard('drinking-water', [
     required('drinking-water/controller.js', ['../../core/savedRecords.js', '../../core/domUpdate.js', '../../core/scrollManager.js']),
-    required('drinking-water/dynamicRenderer.js', ['../../core/scrollManager.js', '../../core/focusManager.js']),
+    required('drinking-water/dynamicRenderer.js', ['../../core/scrollManager.js', '../../core/ux/focusManager.js']),
     required('drinking-water/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('drinking-water/logic.js', ['../../core/numbers.js', '../../core/numberService.js']),
     required('drinking-water/results.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/numbers.js']),
