@@ -3,11 +3,9 @@ import { getProjectMeta, setProjectMeta, downloadProjectFile, readProjectFile, a
 import { collectCurrentModule, pdfFileName } from './pdf/pdfDataMapping.js';
 import { GlobalPdfReport } from './pdf/pdfLayout.js';
 import { normalizeImageToJpeg, svgToJpeg, canvasToJpeg, createFallbackIconJpeg } from './pdf/pdfChartRender.js';
-
 const MAX_COMPANY_LOGO_FILE_SIZE = 500 * 1024;
 const MAX_COMPANY_LOGO_DATA_URL_SIZE = 700000;
 const PDF_COMPANY_LOGO_STORAGE_KEY = 'techcalc-pdf-company-logo';
-
 const DEFAULT_PROJECT = {
   client: '',
   project: '',
@@ -36,7 +34,6 @@ function readProject() {
     showTechCalcBranding: brandingEnabled(meta.showTechCalcBranding)
   };
 }
-
 function readBrandingControlValue() {
   const control = document.getElementById('pdfShowTechCalcBranding');
   if (!control) return brandingEnabled(getProjectMeta().showTechCalcBranding);
@@ -87,4 +84,289 @@ function setInputValue(id, value) {
 function setCheckboxValue(id, value) {
   const el = document.getElementById(id);
   if (el) el.checked = brandingEnabled(value);
+}
+
+function bindProjectInput(id, key) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', () => setProjectMeta({ [key]: el.value }));
+  el.addEventListener('change', () => setProjectMeta({ [key]: el.value }));
+}
+function bindProjectCheckbox(id, key) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('change', () => setProjectMeta({ [key]: Boolean(el.checked) }));
+}
+
+function updateOpenedProjectLabel() {
+  const label = document.getElementById('projectFileLabel');
+  if (!label) return;
+  const name = getOpenedFileName();
+  label.textContent = name ? `Geöffnet: ${name}` : 'Kein externes Projekt geöffnet';
+}
+async function applySelectedProjectFile(file) {
+  if (!file) return false;
+  const data = await readProjectFile(file);
+  applyProjectData(data, { fileName: file.name || 'TechCalc Projektdatei' });
+  hydrateProjectForm(readProject());
+  updateOpenedProjectLabel();
+  return true;
+}
+async function openProjectWithNativePicker() {
+  if (typeof window === 'undefined' || typeof window.showOpenFilePicker !== 'function') return false;
+  try {
+    const [handle] = await window.showOpenFilePicker({
+      multiple: false,
+      excludeAcceptAllOption: false,
+      types: [{
+        description: 'TechCalc Projektdateien',
+        accept: {
+          'application/json': ['.tcproj', '.json'],
+          'application/vnd.techcalc.project+json': ['.tcproj'],
+          'application/vnd.techcalc.project': ['.tcp']
+        }
+      }]
+    });
+    const file = await handle.getFile();
+    await applySelectedProjectFile(file);
+    return true;
+  } catch (error) {
+    if (error?.name === 'AbortError') return true;
+    logger.warn('Native Projekt-Dateiauswahl nicht verfügbar, verwende Input-Fallback.', error, { module: 'project-file' });
+    return false;
+  }
+}
+function readStoredCompanyLogo() {
+  const metaLogo = getProjectMeta().companyLogo || '';
+  if (metaLogo) return metaLogo;
+  try { return localStorage.getItem(PDF_COMPANY_LOGO_STORAGE_KEY) || ''; } catch { return ''; }
+}
+function readStoredCompanyLogoName() {
+  const metaName = getProjectMeta().companyLogoName || '';
+  if (metaName) return metaName;
+  try { return localStorage.getItem(`${PDF_COMPANY_LOGO_STORAGE_KEY}-name`) || ''; } catch { return ''; }
+}
+function persistCompanyLogo(dataUrl = '', fileName = '') {
+  setProjectMeta({ companyLogo: dataUrl, companyLogoName: fileName });
+  try {
+    if (dataUrl) localStorage.setItem(PDF_COMPANY_LOGO_STORAGE_KEY, dataUrl);
+    else localStorage.removeItem(PDF_COMPANY_LOGO_STORAGE_KEY);
+    if (fileName) localStorage.setItem(`${PDF_COMPANY_LOGO_STORAGE_KEY}-name`, fileName);
+    else if (!dataUrl) localStorage.removeItem(`${PDF_COMPANY_LOGO_STORAGE_KEY}-name`);
+  } catch (error) {
+    logger.warn('Firmenlogo konnte nicht dauerhaft gespeichert werden.', error, { module: 'project-storage' });
+  }
+}
+function ensureCompanyLogoPreview() {
+  let preview = document.getElementById('pdfCompanyLogoPreview');
+  const input = document.getElementById('pdfCompanyLogo');
+  if (!preview && input?.parentElement) {
+    preview = document.createElement('div');
+    preview.id = 'pdfCompanyLogoPreview';
+    preview.className = 'settings-logo-preview is-empty';
+    preview.setAttribute('aria-live', 'polite');
+    input.parentElement.insertAdjacentElement('afterend', preview);
+  }
+  return preview;
+}
+function hydrateCompanyLogoStatus(dataUrl = '', fileName = '') {
+  const status = document.getElementById('pdfCompanyLogoStatus');
+  const preview = ensureCompanyLogoPreview();
+  const displayName = fileName || 'gespeichertes Firmenlogo';
+  if (status) status.textContent = dataUrl ? `Firmenlogo für PDF hinterlegt: ${displayName}` : 'Kein Firmenlogo hinterlegt';
+  if (!preview) return;
+  preview.classList.toggle('is-empty', !dataUrl);
+  preview.replaceChildren();
+  if (!dataUrl) {
+    const empty = document.createElement('span');
+    empty.textContent = 'Kein Firmenlogo hinterlegt';
+    preview.appendChild(empty);
+    return;
+  }
+  const img = document.createElement('img');
+  img.src = dataUrl;
+  img.alt = 'Hinterlegtes Firmenlogo';
+  const text = document.createElement('span');
+  text.textContent = displayName;
+  preview.append(img, text);
+}
+async function isAllowedRasterLogoFile(file) {
+  if (!file) return false;
+  const name = String(file.name || '').toLowerCase();
+  const extensionAllowed = /\.(png|jpe?g|webp)$/i.test(name);
+  const mimeAllowed = /^image\/(png|jpeg|webp)$/i.test(String(file.type || ''));
+  if (!extensionAllowed || !mimeAllowed) return false;
+  try {
+    const bytes = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+    const isJpeg = bytes[0] === 0xFF && bytes[1] === 0xD8 && bytes[2] === 0xFF;
+    const isPng = bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47 && bytes[4] === 0x0D && bytes[5] === 0x0A && bytes[6] === 0x1A && bytes[7] === 0x0A;
+    const isWebp = bytes.length >= 12 && String.fromCharCode(...bytes.slice(0, 4)) === 'RIFF' && String.fromCharCode(...bytes.slice(8, 12)) === 'WEBP';
+    return isJpeg || isPng || isWebp;
+  } catch { return false; }
+}
+function hydrateProjectForm(data = {}) {
+  setInputValue('pdfClient', data.client);
+  setInputValue('pdfProject', data.project);
+  setInputValue('pdfProjectNo', data.projectNo);
+  setInputValue('pdfEngineer', data.engineer);
+  setCheckboxValue('pdfShowTechCalcBranding', data.showTechCalcBranding);
+  setInputValue('pdfCompanyName', '');
+  setInputValue('pdfCompanyAddress', '');
+  setInputValue('pdfDocumentVersion', '');
+  setInputValue('pdfCheckedBy', '');
+  setInputValue('pdfApprovedBy', '');
+  setInputValue('pdfDate', data.date);
+  const logo = data.companyLogo || readStoredCompanyLogo();
+  const logoName = data.companyLogoName || readStoredCompanyLogoName();
+  if (logo) persistCompanyLogo(logo, logoName);
+  hydrateCompanyLogoStatus(logo, logoName);
+}
+function bindCompanyLogoInput() {
+  const input = document.getElementById('pdfCompanyLogo');
+  const clearButton = document.getElementById('clearPdfCompanyLogo');
+  if (input && input.dataset.bound !== 'true') {
+    input.dataset.bound = 'true';
+    input.addEventListener('change', async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      if (!(await isAllowedRasterLogoFile(file))) {
+        alert('Bitte nur PNG, JPG/JPEG oder WebP als Firmenlogo auswählen. SVG/SVP wird aus Sicherheitsgründen nicht unterstützt.');
+        input.value = '';
+        return;
+      }
+      if (file.size > MAX_COMPANY_LOGO_FILE_SIZE) {
+        alert('Das Firmenlogo ist zu groß. Bitte eine Datei bis maximal 500 KB verwenden.');
+        input.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const dataUrl = String(reader.result || '');
+        if (dataUrl.length > MAX_COMPANY_LOGO_DATA_URL_SIZE) {
+          alert('Das Firmenlogo ist zu groß. Bitte eine kleinere PNG-, JPG- oder WebP-Datei verwenden.');
+          input.value = '';
+          return;
+        }
+        const fileName = file.name || 'Firmenlogo';
+        persistCompanyLogo(dataUrl, fileName);
+        hydrateCompanyLogoStatus(dataUrl, fileName);
+        const normalizedLogo = await normalizeImageToJpeg(dataUrl, { maxWidth: 1200, maxHeight: 520, quality: 0.92 });
+        const storedLogo = normalizedLogo?.dataUrl || dataUrl;
+        persistCompanyLogo(storedLogo, fileName);
+        setProjectMeta({ ...collectProjectFormValues(), companyLogo: storedLogo, companyLogoName: fileName });
+        hydrateCompanyLogoStatus(storedLogo, fileName);
+      };
+      reader.onerror = () => alert('Firmenlogo konnte nicht gelesen werden.');
+      reader.readAsDataURL(file);
+    });
+  }
+  if (clearButton && clearButton.dataset.bound !== 'true') {
+    clearButton.dataset.bound = 'true';
+    clearButton.addEventListener('click', event => {
+      event.preventDefault();
+      persistCompanyLogo('', '');
+      hydrateCompanyLogoStatus('', '');
+      if (input) input.value = '';
+    });
+  }
+  hydrateCompanyLogoStatus(readStoredCompanyLogo(), readStoredCompanyLogoName());
+}
+function initProjectSettings() {
+  if (window.__techCalcProjectSettingsBound) {
+    hydrateProjectForm(readProject());
+    updateOpenedProjectLabel();
+    return;
+  }
+  window.__techCalcProjectSettingsBound = true;
+  hydrateProjectForm(readProject());
+  bindProjectInput('pdfClient', 'client');
+  bindProjectInput('pdfProject', 'project');
+  bindProjectInput('pdfProjectNo', 'projectNo');
+  bindProjectInput('pdfEngineer', 'engineer');
+  bindProjectCheckbox('pdfShowTechCalcBranding', 'showTechCalcBranding');
+  bindProjectInput('pdfCompanyName', 'companyName');
+  bindProjectInput('pdfCompanyAddress', 'companyAddress');
+  bindProjectInput('pdfDocumentVersion', 'documentVersion');
+  bindProjectInput('pdfCheckedBy', 'checkedBy');
+  bindProjectInput('pdfApprovedBy', 'approvedBy');
+  bindCompanyLogoInput();
+  document.getElementById('saveProjectButton')?.addEventListener('click', async event => {
+    event.preventDefault();
+    setProjectMeta(collectProjectFormValues());
+    const saved = await downloadProjectFile();
+    if (saved) flashProjectSaved();
+  });
+  document.getElementById('openProjectButton')?.addEventListener('click', async event => {
+    event.preventDefault();
+    try {
+      const openedNative = await openProjectWithNativePicker();
+      if (!openedNative) document.getElementById('openProjectFile')?.click();
+    } catch (error) {
+      logger.error('Projekt konnte nicht geöffnet werden.', error, { module: 'project-file' });
+      alert(error.message || 'Projekt konnte nicht geöffnet werden.');
+    }
+  });
+  document.getElementById('openProjectFile')?.addEventListener('change', async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      await applySelectedProjectFile(file);
+    } catch (error) {
+      logger.error('Projekt konnte nicht geöffnet werden.', error, { module: 'project-file' });
+      alert(error.message || 'Projekt konnte nicht geöffnet werden.');
+    } finally { event.target.value = ''; }
+  });
+  document.addEventListener('techcalc-project-loaded', () => { hydrateProjectForm(readProject()); updateOpenedProjectLabel(); });
+  updateOpenedProjectLabel();
+}
+async function chartImagesForReport(moduleData = {}) {
+  const charts = Array.isArray(moduleData.reportDto?.charts) ? moduleData.reportDto.charts : [];
+  const images = [];
+  for (const chart of charts) {
+    const image = await svgToJpeg(chart?.svg, { maxWidth: 1300, maxHeight: 820, quality: 0.9 });
+    if (image) images.push(image);
+  }
+  return images;
+}
+async function downloadNativePdf(project, moduleData) {
+  const appIconUrl = new URL('./assets/icons/icon-192.png', window.location.href).href;
+  const appIcon = await normalizeImageToJpeg(appIconUrl, { maxWidth: 256, maxHeight: 256, quality: 0.92 }) || createFallbackIconJpeg();
+  const companyLogo = await normalizeImageToJpeg(project.companyLogo, { maxWidth: 900, maxHeight: 360, quality: 0.9 });
+  const chartImages = await chartImagesForReport(moduleData);
+  const chartImage = chartImages[0]
+    || await canvasToJpeg(moduleData.chartCanvas, { maxWidth: 1300, maxHeight: 820, quality: 0.9 })
+    || await svgToJpeg(moduleData.chartSvg, { maxWidth: 1300, maxHeight: 820, quality: 0.9 });
+  const report = new GlobalPdfReport({ appIcon, companyLogo, chartImage, chartImages });
+  const blob = report.build(project, moduleData);
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = pdfFileName(moduleData);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 15000);
+}
+export function initPdfExport({ modules, currentRoute: routeGetter } = {}) {
+  initProjectSettings();
+  const exportButton = document.getElementById('exportPdfButton');
+  if (!exportButton || exportButton.dataset.bound === 'true') return;
+  exportButton.dataset.bound = 'true';
+  exportButton.addEventListener('click', async event => {
+    event.preventDefault();
+    try {
+      const project = saveProject({
+        ...collectProjectFormValues(),
+        companyLogo: readStoredCompanyLogo(),
+        companyLogoName: readStoredCompanyLogoName(),
+        showTechCalcBranding: readBrandingControlValue()
+      });
+      saveSessionSnapshot();
+      const moduleData = collectCurrentModule(modules, routeGetter);
+      await downloadNativePdf(project, moduleData);
+    } catch (error) {
+      logger.error('PDF-Export fehlgeschlagen.', error, { module: 'pdf-export' });
+      alert('PDF-Export konnte nicht erstellt werden. Bitte Browser-Konsole prüfen.');
+    }
+  });
 }
