@@ -1,4 +1,4 @@
-import { logger } from '../logger.js';
+import { logger } from '../diagnostics/logger.js';
 import { markPerformance, startPerformanceSpan } from './performanceController.js';
 
 let serviceWorkerControllerInitialized = false;
