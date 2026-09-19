@@ -1,4 +1,4 @@
-import { logger } from '../logger.js';
+import { logger } from '../diagnostics/logger.js';
 import { esc as escapeHtml } from '../renderer.js';
 
 function normalizeReleaseVersion(value = '') {
