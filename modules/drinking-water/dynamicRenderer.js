@@ -1,12 +1,11 @@
 import { createDrinkingWaterViewModel } from './viewModel.js';
 import { renderInputCard, renderResultCard } from './view.js';
 import { preserveScroll } from '../../core/scrollManager.js';
-import { preserveFocusDuring } from '../../core/focusManager.js';
+import { preserveFocusDuring } from '../../core/ux/focusManager.js';
 
 function isDetachedNodeRace(error) {
   return error?.name === 'NotFoundError' || /no longer a child/i.test(String(error?.message || ''));
 }
-
 function setIslandInner(root, selector, html){
   const island = root?.querySelector?.(selector);
   if (!island || island.isConnected === false || root?.isConnected === false) return false;
@@ -25,14 +24,12 @@ function setIslandInner(root, selector, html){
   preserveFocusDuring(root, apply, { skipSelect: true });
   return true;
 }
-
 function setInputValue(root, fieldName, value){
   const el = root?.querySelector?.(`[data-field="${fieldName}"]`);
   if (!el || document.activeElement === el) return;
   const next = String(value ?? '');
   if (el.value !== next) el.value = next;
 }
-
 function updateSegment(root, name, value){
   root?.querySelectorAll?.(`[data-segment="${name}"]`)?.forEach(button => {
     const selected = String(button.dataset.value) === String(value);
@@ -40,7 +37,6 @@ function updateSegment(root, name, value){
     button.setAttribute('aria-selected', String(selected));
   });
 }
-
 function syncFields(root, s = {}){
   updateSegment(root, 'waterHeatingMode', s.waterHeatingMode);
   updateSegment(root, 'singlePermanent', String(s.singlePermanent));
@@ -59,7 +55,6 @@ function syncFields(root, s = {}){
 function hasAnyChanged(changed = [], keys = []){
   return changed.some(key => keys.includes(key));
 }
-
 const INPUT_KEYS = [
   'buildingType',
   'waterHeatingMode',
@@ -84,7 +79,6 @@ const INPUT_KEYS = [
   'uiSingleFormOpen',
   'uiSingleSavedOpen'
 ];
-
 const RESULT_KEYS = [
   'buildingType',
   'waterHeatingMode',
@@ -100,11 +94,9 @@ function shouldIgnoreSurfaceConfirm(meta = {}) {
   const changed = Array.isArray(meta.changed) ? meta.changed : [];
   return !hasAnyChanged(changed, DYNAMIC_KEYS);
 }
-
 function isDwTouchActive() {
   return typeof window !== 'undefined' && window.__tcDwActiveTouch === true;
 }
-
 function installDwTouchGuard() {
   if (typeof window === 'undefined' || window.__tcDwTouchGuardInstalled) return;
   window.__tcDwTouchGuardInstalled = true;
@@ -115,7 +107,6 @@ function installDwTouchGuard() {
   window.addEventListener('touchend', release, { passive:true });
   window.addEventListener('touchcancel', release, { passive:true });
 }
-
 export function updateDrinkingWaterDynamic(root, s, meta = {}){
   installDwTouchGuard();
   if (shouldIgnoreSurfaceConfirm(meta)) return false;
@@ -125,7 +116,6 @@ export function updateDrinkingWaterDynamic(root, s, meta = {}){
     { skipDuringActiveTouch: true }
   );
 }
-
 function updateDrinkingWaterDynamicUnsafe(root, s, meta = {}){
   const vm = createDrinkingWaterViewModel(s);
   const changed = Array.isArray(meta.changed) ? meta.changed : [];
@@ -133,7 +123,6 @@ function updateDrinkingWaterDynamicUnsafe(root, s, meta = {}){
   const initial = !root.__tcDrinkingWaterDynamic;
   const inputAction = /^(dw:|line:|saved:)/.test(action);
   const fieldCommitAction = /^(field:|input:confirm|binding:)/.test(action);
-
   // Phase 42E.5: field commits must not rebuild the Trinkwasser input island.
   // On mobile, native blur/change fires while the next tap is still being
   // resolved; replacing the input card at that moment drops the tap target and
@@ -146,7 +135,6 @@ function updateDrinkingWaterDynamicUnsafe(root, s, meta = {}){
   if (shouldRenderResult && !isDwTouchActive()) {
     setIslandInner(root, '[data-dw-dynamic="result"]', renderResultCard(vm));
   }
-
   syncFields(root, s);
   root.__tcDrinkingWaterDynamic = {
     at: Date.now(),
