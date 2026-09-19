@@ -1,4 +1,4 @@
-import { logger } from './diagnostics/logger.js';
+import { logger } from './logger.js';
 import { state as heatingCoolingState } from '../modules/heating-cooling/state.js';
 import { readLineSections, writeLineSections } from '../modules/heating-cooling/index.js';
 import { state as ventilationState } from '../modules/ventilation/state.js';
@@ -382,7 +382,8 @@ function normalizeDrinkingWaterProjectModule(moduleData = {}) {
   return {
     state: { ...cleanState, savedUsageUnits: usageUnits, savedSingleConsumers: singleConsumers },
     usageUnits,
-    singleConsumers  };
+    singleConsumers
+  };
 }
 
 function normalizeHeatRecoveryProjectModule(moduleData = {}) {
@@ -408,3 +409,260 @@ function pickFields(source = {}, fields = []) {
 
 const HEAT_RECOVERY_FIELDS = ['wrgVolumeFlowM3h', 'outdoorTemp', 'outdoorRh', 'extractTemp', 'extractRh', 'efficiency', 'bypassPercent', 'activeRltDeviceId', 'activeRltDeviceName', 'expandedRltDeviceId', 'savedRltDevices'];
 const MIXED_AIR_FIELDS = ['mixingOutdoorVolumeFlowM3h', 'mixingOutdoorTemp', 'mixingOutdoorRh', 'mixingRecircVolumeFlowM3h', 'mixingRecircTemp', 'mixingRecircRh', 'activeMixedAirId', 'activeMixedAirName', 'expandedMixedAirId', 'savedMixedAirStates'];
+
+function hasLegacyMixedAirFields(source = {}) {
+  return MIXED_AIR_FIELDS.some(field => field !== 'savedMixedAirStates' && Object.prototype.hasOwnProperty.call(source || {}, field));
+}
+
+function isLegacyMixedAirRecord(item = {}) {
+  const inputState = item.inputState && typeof item.inputState === 'object' ? item.inputState : {};
+  const recordState = item.state && typeof item.state === 'object' ? item.state : {};
+  const mode = String(item.mode || recordState.mode || inputState.mode || '').toLowerCase();
+  if (mode.includes('misch') || mode.includes('mixing') || mode === 'mix') return true;
+
+  // Phase 45C.2: early 1.3.2 projects can contain Mischluft saved records
+  // without a reliable mode label. In that case the persisted input field set is
+  // the stable discriminator. WRG records never own mixingOutdoor*/mixingRecirc*
+  // fields, so they must be migrated to the dedicated mixed-air record store.
+  return hasLegacyMixedAirFields(inputState) || hasLegacyMixedAirFields(recordState) || hasLegacyMixedAirFields(item);
+}
+
+function normalizeLegacyMixedAirRecord(item = {}) {
+  const inputState = pickFields(item.inputState || item.state || item, MIXED_AIR_FIELDS);
+  const id = item.id || `mixed-air-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  return {
+    ...item,
+    id,
+    name: item.name || 'Mischluft',
+    mode: 'Mischluft',
+    state: inputState,
+    inputState
+  };
+}
+
+function splitLegacyHeatRecoveryProjectModule(moduleData = {}) {
+  const normalized = normalizeHeatRecoveryProjectModule(moduleData);
+  const rltDevices = Array.isArray(normalized.rltDevices) ? normalized.rltDevices : [];
+  const mixedAirRecords = rltDevices.filter(isLegacyMixedAirRecord).map(normalizeLegacyMixedAirRecord);
+  const heatRecoveryRecords = rltDevices.filter(item => !isLegacyMixedAirRecord(item));
+  return {
+    heatRecovery: { state: pickFields(normalized.state, HEAT_RECOVERY_FIELDS), rltDevices: heatRecoveryRecords },
+    mixedAir: { state: { ...pickFields(normalized.state, MIXED_AIR_FIELDS), ...(mixedAirRecords.length ? { savedMixedAirStates: mixedAirRecords } : {}) } }
+  };
+}
+
+function normalizeMixedAirProjectModule(moduleData = {}, legacyModule = null) {
+  const moduleState = moduleData?.state && typeof moduleData.state === 'object' ? moduleData.state : {};
+  const legacyState = legacyModule?.state && typeof legacyModule.state === 'object' ? legacyModule.state : {};
+  return { state: pickFields({ ...legacyState, ...moduleState }, MIXED_AIR_FIELDS) };
+}
+
+export function collectProjectData() {
+  return {
+    app: 'TechCalc Pro',
+    format: 'techcalc-project',
+    version: 1,
+    savedAt: new Date().toISOString(),
+    meta: getProjectMeta(),
+    modules: {
+      'pressure-holding': { state: pressureHoldingState.get() },
+      'buffer-storage': { state: bufferStorageState.get() },
+      'heating-cooling': {
+        state: heatingCoolingState.get(),
+        lineSections: readLineSections()
+      },
+      ventilation: { state: ventilationState.get(), lineSections: ventilationLineSectionController.read() },
+      'pipe-sizing': { state: pipeSizingState.get() },
+      'unit-converter': { state: unitConverterState.get() },
+      'heat-recovery': { state: heatRecoveryState.get(), rltDevices: rltDeviceController.read() },
+      'mixed-air': { state: mixedAirState.get() },
+      'hx-diagram': { state: hxDiagramState.get() },
+      'drinking-water': {
+        state: drinkingWaterState.get(),
+        usageUnits: readUsageUnits(),
+        singleConsumers: readSingleConsumers()
+      },
+      wastewater: { state: wastewaterState.get() },
+      rainwater: { state: rainwaterState.get() }
+    }
+  };
+}
+
+export function applyProjectData(data = {}, { fileName = '' } = {}) {
+  const modules = data.modules || {};
+  const legacyHeatRecoveryModule = modules['heat-recovery'] || modules.wrg || modules['wrg-mixed-air'];
+  const incomingMixedAirModule = modules['mixed-air'] || modules.mixedAir || modules['mixed-air-calculation'];
+  const incomingMeta = { ...DEFAULT_META, ...(data.meta || {}) };
+  setProjectMeta(incomingMeta);
+  if (incomingMeta.companyLogo) persistPdfLogo(incomingMeta.companyLogo, incomingMeta.companyLogoName || '');
+  openedFileName = fileName || openedFileName;
+
+  if (modules['pressure-holding']?.state) pressureHoldingState.replace(modules['pressure-holding'].state, { notify: false });
+  if (modules['buffer-storage']?.state) bufferStorageState.replace(modules['buffer-storage'].state, { notify: false });
+  if (modules['heating-cooling']?.state) heatingCoolingState.replace(modules['heating-cooling'].state, { notify: false });
+  writeLineSections(modules['heating-cooling']?.lineSections || []);
+
+  if (modules.ventilation?.state) ventilationState.replace(modules.ventilation.state, { notify: false });
+  ventilationLineSectionController.write(modules.ventilation?.lineSections || []);
+  if (modules['pipe-sizing']?.state) pipeSizingState.replace(modules['pipe-sizing'].state, { notify: false });
+  if (modules['unit-converter']?.state) unitConverterState.replace(modules['unit-converter'].state, { notify: false });
+  if (legacyHeatRecoveryModule) {
+    const splitModule = splitLegacyHeatRecoveryProjectModule(legacyHeatRecoveryModule);
+    heatRecoveryState.replace(splitModule.heatRecovery.state, { notify: false });
+    rltDeviceController.write(splitModule.heatRecovery.rltDevices);
+    const mixedAirModule = normalizeMixedAirProjectModule(incomingMixedAirModule, splitModule.mixedAir);
+    if (Object.keys(mixedAirModule.state).length) mixedAirState.replace(mixedAirModule.state, { notify: false });
+  } else if (incomingMixedAirModule) {
+    const mixedAirModule = normalizeMixedAirProjectModule(incomingMixedAirModule);
+    if (Object.keys(mixedAirModule.state).length) mixedAirState.replace(mixedAirModule.state, { notify: false });
+  }
+  if (modules['hx-diagram']?.state) hxDiagramState.replace(modules['hx-diagram'].state, { notify: false });
+  if (modules['drinking-water']) {
+    const drinkingWaterModule = normalizeDrinkingWaterProjectModule(modules['drinking-water']);
+    drinkingWaterState.replace(drinkingWaterModule.state, { notify: false });
+    writeUsageUnits(drinkingWaterModule.usageUnits);
+    writeSingleConsumers(drinkingWaterModule.singleConsumers);
+  }
+  if (modules.wastewater?.state) wastewaterState.replace(modules.wastewater.state, { notify: false });
+  if (modules.rainwater?.state) rainwaterState.replace(modules.rainwater.state, { notify: false });
+
+  document.dispatchEvent(new CustomEvent('techcalc-project-loaded', { detail: { fileName: openedFileName } }));
+}
+
+export function resetAllSessionData() {
+  resetProjectMeta();
+  pressureHoldingState.reset();
+  bufferStorageState.reset();
+  heatingCoolingState.reset();
+  writeLineSections([]);
+  ventilationState.reset();
+  ventilationLineSectionController.write([]);
+  pipeSizingState.reset();
+  unitConverterState.reset();
+  heatRecoveryState.reset();
+  rltDeviceController.write([]);
+  mixedAirState.reset();
+  hxDiagramState.reset();
+  drinkingWaterState.reset();
+  wastewaterState.reset();
+  rainwaterState.reset();
+  writeUsageUnits([]);
+  writeSingleConsumers([]);
+}
+
+export async function downloadProjectFile() {
+  const data = collectProjectData();
+  const meta = data.meta || {};
+  const base = [meta.projectNo, meta.project, meta.client].filter(Boolean).join('-') || 'techcalc-projekt';
+  const safe = base.toLowerCase().replace(/[^a-z0-9äöüß_-]+/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'techcalc-projekt';
+  const fileName = `${safe}.tcproj`;
+  const blob = buildTcprojProjectBlob(data);
+
+  if (typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function') {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: fileName,
+        types: [{
+          description: 'TechCalc Projektdatei',
+          accept: { 'application/vnd.techcalc.project+json': ['.tcproj'], 'application/json': ['.json'] }
+        }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      openedFileName = handle.name || fileName;
+      document.dispatchEvent(new CustomEvent('techcalc-project-saved', { detail: { fileName: openedFileName } }));
+      return true;
+    } catch (error) {
+      if (error?.name === 'AbortError') return false;
+      logger.warn('Dateiauswahl nicht verfügbar, Projekt wird als Download gespeichert.', error, { module: 'project-storage' });
+    }
+  }
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  openedFileName = fileName;
+  document.dispatchEvent(new CustomEvent('techcalc-project-saved', { detail: { fileName: openedFileName } }));
+  return true;
+}
+
+async function looksLikeZipArchive(file) {
+  if (!file || typeof file.slice !== 'function') return false;
+  try {
+    const signature = new Uint8Array(await file.slice(0, 4).arrayBuffer());
+    return signature[0] === 0x50 && signature[1] === 0x4B && signature[2] === 0x03 && signature[3] === 0x04;
+  } catch {
+    return false;
+  }
+}
+
+export const PROJECT_FILE_EXTENSIONS = ['.tcproj', '.json', '.tcp'];
+
+function normalizeProjectFileExtension(name = '') {
+  const lower = String(name || '').toLowerCase().trim();
+  if (lower.endsWith('.tcproj')) return 'tcproj';
+  if (lower.endsWith('.json')) return 'json';
+  if (lower.endsWith('.tcp')) return 'tcp';
+  return '';
+}
+
+function normalizeProjectFileType(type = '') {
+  const lower = String(type || '').toLowerCase().trim();
+  if (lower === 'application/vnd.techcalc.project' || lower === 'application/zip') return 'tcp';
+  if (lower === 'application/vnd.techcalc.project+json' || lower === 'application/json' || lower === 'text/json') return 'json';
+  return '';
+}
+
+function hydrateEmbeddedProjectAssets(parsed = {}) {
+  const assetLogo = parsed.assets?.companyLogo;
+  if (assetLogo?.dataUrl) {
+    parsed.meta = parsed.meta || {};
+    parsed.meta.companyLogo = parsed.meta.companyLogo || assetLogo.dataUrl;
+    parsed.meta.companyLogoName = parsed.meta.companyLogoName || assetLogo.name || 'company-logo';
+    parsed.meta.companyLogoMime = parsed.meta.companyLogoMime || assetLogo.mime || '';
+  }
+  return parsed;
+}
+
+function validateProjectPayload(parsed) {
+  if (parsed?.project && typeof parsed.project === 'object') parsed = parsed.project;
+  if (!parsed || typeof parsed !== 'object' || parsed.format !== 'techcalc-project') {
+    throw new Error('Die Datei ist kein gültiges TechCalc-Projekt.');
+  }
+  parsed.meta = parsed.meta && typeof parsed.meta === 'object' ? parsed.meta : {};
+  parsed.modules = parsed.modules && typeof parsed.modules === 'object' ? parsed.modules : {};
+  return parsed;
+}
+
+export async function readProjectFile(file) {
+  const name = file?.name || '';
+  const extension = normalizeProjectFileExtension(name) || normalizeProjectFileType(file?.type);
+  const isZipBackedProject = extension === 'tcp' || await looksLikeZipArchive(file);
+
+  if (!file || (!extension && !isZipBackedProject)) {
+    throw new Error('Bitte eine TechCalc-Projektdatei mit der Endung .tcproj, .json oder .tcp auswählen.');
+  }
+
+  if (isZipBackedProject) {
+    const parsed = hydrateEmbeddedProjectAssets(validateProjectPayload(await readTcpArchive(file)));
+    return clone(parsed);
+  }
+
+  try {
+    const text = String(await file.text()).replace(/^\uFEFF/, '').trim();
+    if (!text) throw new SyntaxError('empty project file');
+    const parsed = hydrateEmbeddedProjectAssets(validateProjectPayload(JSON.parse(text)));
+    return clone(parsed);
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error('Die Projektdatei konnte nicht gelesen werden. Erwartet wird eine gültige .tcproj- oder .json-Projektdatei.');
+    }
+    throw error;
+  }
+}
