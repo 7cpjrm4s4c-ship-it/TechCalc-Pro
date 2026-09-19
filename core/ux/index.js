@@ -1,4 +1,4 @@
-export * from '../focusManager.js';
+export * from './focusManager.js';
 export * from '../preferences.js';
 export * from '../scrollManager.js';
 export * from './feedbackController.js';
