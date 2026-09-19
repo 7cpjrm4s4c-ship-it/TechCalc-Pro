@@ -1,4 +1,4 @@
-import { logger } from '../logger.js';
+import { logger } from '../diagnostics/logger.js';
 import { trackGlobalEventListener } from '../events/index.js';
 import { initializeUnsavedWorkGuard } from '../storage/unsavedWorkGuard.js';
 
