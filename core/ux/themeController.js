@@ -1,4 +1,4 @@
-import { logger } from '../logger.js';
+import { logger } from '../diagnostics/logger.js';
 
 const THEME_STORAGE_KEY = 'techcalc-theme-mode';
 const SUPPORTED_THEME_MODES = new Set(['dark', 'light', 'system']);
