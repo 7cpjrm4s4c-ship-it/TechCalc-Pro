@@ -1,7 +1,7 @@
 import { logger } from './diagnostics/logger.js';
 import { hardResetModuleRoot } from './moduleLifecycleAdapter.js';
 import { applyModuleRootLayout } from './contracts/moduleLayoutContract.js';
-import { restoreFocus as restorePlatformFocus } from './focusManager.js';
+import { restoreFocus as restorePlatformFocus } from './ux/focusManager.js';
 
 const DEFAULT_MOUNT_TIMEOUT_MS = 7000;
 const DEFAULT_LOADING_DELAY_MS = 120;
@@ -11,7 +11,6 @@ function now() {
 }
 
 function noop() {}
-
 function normalizeHookResult(cleanup, cleanups) {
   if (!cleanup) return;
   if (Array.isArray(cleanup)) {
@@ -27,7 +26,6 @@ function normalizeHookResult(cleanup, cleanups) {
     cleanups.push(cleanup);
   }
 }
-
 function runCleanup(cleanup) {
   try {
     if (typeof cleanup === 'function') cleanup();
@@ -38,7 +36,6 @@ function runCleanup(cleanup) {
     logger.warn('Modul-Cleanup konnte nicht vollständig ausgeführt werden.', error, { module: 'module-runtime' });
   }
 }
-
 function withTimeout(promise, timeoutMs, message) {
   let timeoutId = 0;
   const timeout = new Promise((_, reject) => {
@@ -50,7 +47,6 @@ function withTimeout(promise, timeoutMs, message) {
       if (timeoutId) globalThis.clearTimeout(timeoutId);
     });
 }
-
 function resetModuleScroll(root) {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
   const reset = target => {
@@ -67,7 +63,6 @@ function resetModuleScroll(root) {
   reset(document.body);
   reset(root);
 }
-
 export function createModuleRuntime({ root, modules, renderNavigation, loadingView, loadingDelayMs = DEFAULT_LOADING_DELAY_MS } = {}) {
   if (!root) throw new Error('ModuleRuntime benötigt einen App-Root.');
   if (!modules?.get) throw new Error('ModuleRuntime benötigt eine Modul-Registry.');
@@ -77,7 +72,6 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
   let activeModuleId = '';
   let activeRuntimeCleanups = [];
   let loadingTimer = 0;
-
   function isCurrent(token) {
     return token === renderToken && root.dataset?.renderToken === String(token);
   }
@@ -95,7 +89,6 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
       loadingTimer = 0;
     }
   }
-
   function resetRoot() {
     clearLoadingTimer();
     hardResetModuleRoot(root);
@@ -108,7 +101,6 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
       detail: { from: activeModuleId, to: nextModuleId }
     }));
   }
-
   async function unmount(nextModuleId) {
     await beforeUnmount(nextModuleId);
     try { activeCleanup?.(); } catch (error) {
@@ -122,7 +114,6 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
       detail: { from: activeModuleId, to: nextModuleId }
     }));
   }
-
   async function prepareMount(moduleId, token) {
     root.dataset.renderToken = String(token);
     root.setAttribute('aria-busy', 'true');
@@ -144,7 +135,6 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
       detail: { moduleId, token }
     }));
   }
-
   async function afterMount(moduleId, token) {
     clearLoadingTimer();
     if (!isCurrent(token)) return false;
@@ -166,7 +156,6 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
     scheduleFrame(() => resetModuleScroll(root));
     return true;
   }
-
   async function failMount(moduleId, token, error) {
     clearLoadingTimer();
     if (!isCurrent(token)) return false;
@@ -177,7 +166,6 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
     delete root.dataset.pendingModuleId;
     return false;
   }
-
   async function mount(moduleId, options = {}) {
     const module = modules.get(moduleId);
     if (!module) return false;
@@ -194,7 +182,6 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
       addCleanup(cleanup) { normalizeHookResult(cleanup, activeRuntimeCleanups); },
       isCurrent() { return isCurrent(token); }
     });
-
     try {
       const cleanup = await withTimeout(
         module.mount(root, runtimeContext),
@@ -207,7 +194,6 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
         clearRuntimeCleanups();
         return false;
       }
-
       activeCleanup = typeof cleanup === 'function' ? cleanup : noop;
       if (cleanup && typeof cleanup !== 'function') normalizeHookResult(cleanup, activeRuntimeCleanups);
       return afterMount(moduleId, token);
@@ -215,7 +201,6 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
       return failMount(moduleId, token, error);
     }
   }
-
   function dispose() {
     clearLoadingTimer();
     renderToken += 1;
