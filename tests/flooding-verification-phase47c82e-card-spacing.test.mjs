@@ -4,18 +4,18 @@ import { readFileSync } from 'node:fs';
 
 const polishCss = readFileSync(new URL('../css/components-polish.css', import.meta.url), 'utf8');
 const layoutCss = readFileSync(new URL('../css/module-spacing-contract.css', import.meta.url), 'utf8');
-const platformView = readFileSync(new URL('../js/platform/moduleRenderer/index.js', import.meta.url), 'utf8');
-const hxView = readFileSync(new URL('../js/modules/hx-diagram/view.js', import.meta.url), 'utf8');
-const wrgView = readFileSync(new URL('../js/modules/heat-recovery/view.js', import.meta.url), 'utf8');
-const mixedAirView = readFileSync(new URL('../js/modules/mixed-air/view.js', import.meta.url), 'utf8');
-const floodingView = readFileSync(new URL('../js/modules/flooding-verification/view.js', import.meta.url), 'utf8');
-const pressureHoldingView = readFileSync(new URL('../js/modules/pressure-holding/view.js', import.meta.url), 'utf8');
-const bufferStorageView = readFileSync(new URL('../js/modules/buffer-storage/view.js', import.meta.url), 'utf8');
-const pipeSizingView = readFileSync(new URL('../js/modules/pipe-sizing/view.js', import.meta.url), 'utf8');
-const drinkingWaterView = readFileSync(new URL('../js/modules/drinking-water/view.js', import.meta.url), 'utf8');
-const wastewaterView = readFileSync(new URL('../js/modules/wastewater/view.js', import.meta.url), 'utf8');
-const rainwaterView = readFileSync(new URL('../js/modules/rainwater/view.js', import.meta.url), 'utf8');
-const moduleRuntime = readFileSync(new URL('../js/core/moduleRuntime.js', import.meta.url), 'utf8');
+const platformView = readFileSync(new URL('../core/moduleRenderer.js', import.meta.url), 'utf8');
+const hxView = readFileSync(new URL('../modules/hx-diagram/view.js', import.meta.url), 'utf8');
+const wrgView = readFileSync(new URL('../modules/heat-recovery/view.js', import.meta.url), 'utf8');
+const mixedAirView = readFileSync(new URL('../modules/mixed-air/view.js', import.meta.url), 'utf8');
+const floodingView = readFileSync(new URL('../modules/flooding-verification/view.js', import.meta.url), 'utf8');
+const pressureHoldingView = readFileSync(new URL('../modules/pressure-holding/view.js', import.meta.url), 'utf8');
+const bufferStorageView = readFileSync(new URL('../modules/buffer-storage/view.js', import.meta.url), 'utf8');
+const pipeSizingView = readFileSync(new URL('../modules/pipe-sizing/view.js', import.meta.url), 'utf8');
+const drinkingWaterView = readFileSync(new URL('../modules/drinking-water/view.js', import.meta.url), 'utf8');
+const wastewaterView = readFileSync(new URL('../modules/wastewater/view.js', import.meta.url), 'utf8');
+const rainwaterView = readFileSync(new URL('../modules/rainwater/view.js', import.meta.url), 'utf8');
+const moduleRuntime = readFileSync(new URL('../core/moduleRuntime.js', import.meta.url), 'utf8');
 
 const migratedViews = [
   platformView,

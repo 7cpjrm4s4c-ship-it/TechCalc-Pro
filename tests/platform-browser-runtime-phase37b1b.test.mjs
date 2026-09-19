@@ -5,12 +5,12 @@ import path from 'node:path';
 const root = process.cwd();
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 
-const eventPipeline = read('js/core/eventPipeline.js');
-const drinkingDynamic = read('js/modules/drinking-water/dynamicRenderer.js');
+const eventPipeline = read('core/events/eventPipeline.js');
+const drinkingDynamic = read('modules/drinking-water/dynamicRenderer.js');
 
 assert.match(
   eventPipeline,
-  /import \{[^}]*preserveFocusDuring[^}]*\} from '\.\/focusManager\.js';/,
+  /import \{[^}]*preserveFocusDuring[^}]*\} from '\.\.\/focusManager\.js';/,
   'eventPipeline must import preserveFocusDuring from focusManager instead of referencing a missing global'
 );
 

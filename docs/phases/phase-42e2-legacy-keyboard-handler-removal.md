@@ -12,7 +12,7 @@ Der in Phase 42E.1 definierte zentrale Keyboard-/Focus-Vertrag bleibt die einzig
 
 ### Zentraler Vertrag erweitert
 
-`js/core/eventPipeline.js`
+`core/events/eventPipeline.js`
 
 - Collection-Inputs mit `data-collection-input` werden beim Enter zentral committed.
 - Die Navigation bleibt weiterhin über `handlePlatformFieldNavigation()` im zentralen Event-Pipeline-Pfad.
@@ -44,7 +44,7 @@ Der in Phase 42E.1 definierte zentrale Keyboard-/Focus-Vertrag bleibt die einzig
 
 ## Verbleibende zentrale Keyboard-Pfade
 
-- `js/core/eventPipeline.js` – primärer Keyboard-Vertrag
+- `core/events/eventPipeline.js` – primärer Keyboard-Vertrag
 - `js/core/stateBinding.js` – Fallback für Legacy-/Manual-Mounts ohne zentrale Pipeline
 - `js/core/savedRecords.js` – scoped Saved-Record-Aktivierung
 - `js/platform/shell/settingsController.js` – globaler Settings-Shortcut / Shell-Verhalten
@@ -56,4 +56,3 @@ Diese Pfade sind keine Modul-Sonderlogik.
 - `npm test` grün
 - `npm run test:integration` grün
 - `npm run build` grün
-

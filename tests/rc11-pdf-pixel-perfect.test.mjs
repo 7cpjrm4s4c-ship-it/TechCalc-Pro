@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
-import { GlobalPdfReport } from '../js/core/pdf/pdfLayout.js';
-import { sanitizeText, splitPdfText } from '../js/core/pdf/pdfText.js';
-import { PDF_PAGE, PDF_THEME, REPORT_TEMPLATE_VERSION } from '../js/core/pdf/reportTheme.js';
-import { reportSections } from '../js/core/pdf/pdfDataMapping.js';
+import { GlobalPdfReport } from '../core/pdf/pdfLayout.js';
+import { sanitizeText, splitPdfText } from '../core/pdf/pdfText.js';
+import { PDF_PAGE, PDF_THEME, REPORT_TEMPLATE_VERSION } from '../core/pdf/reportTheme.js';
+import { reportSections } from '../core/pdf/pdfDataMapping.js';
 
 const longRows = Array.from({ length: 96 }, (_, index) => [
   `Sehr langer Tabellenparameter ${index + 1} mit Umlauten äöü und Sonderzeichen`,

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 
-const base = new URL('../js/modules/heat-recovery/', import.meta.url);
+const base = new URL('../modules/heat-recovery/', import.meta.url);
 const read = file => readFileSync(new URL(file, base), 'utf8');
 
 for (const file of ['index.js', 'controller.js', 'view.js', 'viewModel.js', 'results.js', 'schema.js', 'state.js', 'logic.js', 'config.js']) {

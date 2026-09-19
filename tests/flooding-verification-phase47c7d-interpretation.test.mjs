@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildFloodingInterpretationModel } from '../js/modules/flooding-verification/interpretationModel.js';
-import results from '../js/modules/flooding-verification/results.js';
+import { buildFloodingInterpretationModel } from '../modules/flooding-verification/interpretationModel.js';
+import results from '../modules/flooding-verification/results.js';
 
 const applicable = { status: 'applicable' };
 

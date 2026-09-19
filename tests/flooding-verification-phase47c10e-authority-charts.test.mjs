@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import { authorityChartScaleMaximum, buildAuthorityChartModel, renderAuthorityCharts } from '../js/core/pdf/authorityCharts.js';
-import { PDF_THEME } from '../js/core/pdf/reportTheme.js';
+import { authorityChartScaleMaximum, buildAuthorityChartModel, renderAuthorityCharts } from '../core/pdf/authorityCharts.js';
+import { PDF_THEME } from '../core/pdf/reportTheme.js';
 
 const dto = {
   summary: {

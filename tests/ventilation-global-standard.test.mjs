@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import module from '../js/modules/ventilation/index.js';
-import config from '../js/modules/ventilation/config.js';
-import schema from '../js/modules/ventilation/schema.js';
+import module from '../modules/ventilation/index.js';
+import config from '../modules/ventilation/config.js';
+import schema from '../modules/ventilation/schema.js';
 
-const indexSource = readFileSync(new URL('../js/modules/ventilation/index.js', import.meta.url), 'utf8');
-const controllerSource = readFileSync(new URL('../js/modules/ventilation/controller.js', import.meta.url), 'utf8');
-const viewSource = readFileSync(new URL('../js/modules/ventilation/view.js', import.meta.url), 'utf8');
-const viewModelSource = readFileSync(new URL('../js/modules/ventilation/viewModel.js', import.meta.url), 'utf8');
+const indexSource = readFileSync(new URL('../modules/ventilation/index.js', import.meta.url), 'utf8');
+const controllerSource = readFileSync(new URL('../modules/ventilation/controller.js', import.meta.url), 'utf8');
+const viewSource = readFileSync(new URL('../modules/ventilation/view.js', import.meta.url), 'utf8');
+const viewModelSource = readFileSync(new URL('../modules/ventilation/viewModel.js', import.meta.url), 'utf8');
 const source = `${indexSource}\n${controllerSource}\n${viewSource}\n${viewModelSource}`;
 const dynamicRendererSource = readFileSync(new URL('../js/platform/dynamicRenderer/index.js', import.meta.url), 'utf8');
 const docs = readFileSync(new URL('../docs/phases/phase-13.md', import.meta.url), 'utf8');

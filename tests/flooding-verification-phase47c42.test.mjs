@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { calculate, lookupFullFlow, resolvePipeSlopePercent, sizePipe } from '../js/modules/flooding-verification/logic.js';
-import schema from '../js/modules/flooding-verification/schema.js';
+import { calculate, lookupFullFlow, resolvePipeSlopePercent, sizePipe } from '../modules/flooding-verification/logic.js';
+import schema from '../modules/flooding-verification/schema.js';
 
 test('47C.4.2 uses percent as the canonical pipe slope', () => {
   assert.equal(resolvePipeSlopePercent({ pipeSlopePercent: '1,0' }), 1);

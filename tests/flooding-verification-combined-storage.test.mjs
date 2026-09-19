@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import { deriveCombinedStorage } from '../js/modules/flooding-verification/calculationAdapter.js';
-import { results } from '../js/modules/flooding-verification/results.js';
+import { deriveCombinedStorage } from '../modules/flooding-verification/calculationAdapter.js';
+import { results } from '../modules/flooding-verification/results.js';
 
 const dinGoverns = deriveCombinedStorage({
   flooding: { governing: { valueM3: 143.23 } },

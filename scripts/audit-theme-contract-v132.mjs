@@ -45,7 +45,7 @@ for (const file of moduleCssFiles) {
   }
 }
 
-const wastewater = read('js/modules/wastewater/viewModel.js');
+const wastewater = read('modules/wastewater/viewModel.js');
 if (!wastewater.includes('field field--action')) fail('wastewater add action must use field--action wrapper');
 if (wastewater.includes('action-button--secondary') && wastewater.includes('Gegenstand hinzufügen')) {
   fail('wastewater add action must not use secondary button styling');

@@ -5,33 +5,37 @@ function read(path) {
   return readFileSync(path, 'utf8');
 }
 
+const shellControllerFiles = [
+  'core/ux/themeController.js',
+  'core/ux/settingsController.js',
+  'core/ux/layoutStabilityController.js',
+  'core/ux/performanceController.js',
+  'core/ux/releaseNotesController.js',
+  'core/ux/feedbackController.js',
+  'core/ux/serviceWorkerController.js'
+];
+
 const requiredFiles = [
-  'js/core/app.js',
-  'js/platform/shell/themeController.js',
-  'js/platform/shell/settingsController.js',
-  'js/platform/shell/releaseNotesController.js',
-  'js/platform/shell/feedbackController.js',
-  'js/platform/shell/serviceWorkerController.js',
-  'js/platform/shell/performanceController.js',
+  'core/app.js',
+  ...shellControllerFiles,
   'docs/phases/phase-37.md',
   'docs/phases/phase37c-app-shell-decomposition.md',
   'docs/phases/phase37d-performance-observability-baseline.md'
 ];
 
-const appSource = read('js/core/app.js');
+const appSource = read('core/app.js');
 const appLines = appSource.split(/\r?\n/).length;
 const packageJson = JSON.parse(read('package.json'));
 const releaseNotes = read('RELEASE_NOTES.md');
 const serviceWorker = read('service-worker.js');
 
-const shellControllers = requiredFiles
-  .filter(file => file.startsWith('js/platform/shell/'))
+const shellControllers = shellControllerFiles
   .map(file => ({ file, exists: existsSync(file), precached: serviceWorker.includes(file) }));
 
 const debugNeedles = [
   'DW_REFRESH',
   'DW_REFRESH_SOURCE',
-  'DW_DYNAMIC]',
+  'DW_DYNAMIC',
   'DW_SCROLL',
   'WINDOW_SCROLL',
   'TOUCH_MOVE',

@@ -15,10 +15,10 @@ globalThis.sessionStorage = {
 globalThis.document = { dispatchEvent() {} };
 globalThis.CustomEvent = class CustomEvent { constructor(type, init = {}) { this.type = type; this.detail = init.detail; } };
 
-const { applyProjectData, collectProjectData, resetAllSessionData } = await import('../js/core/projectStorage.js');
-const { state: heatRecoveryState } = await import('../js/modules/heat-recovery/state.js');
-const { state: mixedAirState } = await import('../js/modules/mixed-air/state.js');
-const { rltDeviceController } = await import('../js/modules/heat-recovery/controller.js');
+const { applyProjectData, collectProjectData, resetAllSessionData } = await import('../core/projectStorage.js');
+const { state: heatRecoveryState } = await import('../modules/heat-recovery/state.js');
+const { state: mixedAirState } = await import('../modules/mixed-air/state.js');
+const { rltDeviceController } = await import('../modules/heat-recovery/controller.js');
 
 resetAllSessionData();
 

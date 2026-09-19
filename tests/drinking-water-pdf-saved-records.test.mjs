@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 
-import drinkingWaterModule from '../js/modules/drinking-water/index.js';
-import { createConsumer, createSingleGroup, createUsageUnit } from '../js/modules/drinking-water/logic.js';
-import { lineSectionItems, reportSections } from '../js/core/pdf/pdfDataMapping.js';
+import drinkingWaterModule from '../modules/drinking-water/index.js';
+import { createConsumer, createSingleGroup, createUsageUnit } from '../modules/drinking-water/logic.js';
+import { lineSectionItems, reportSections } from '../core/pdf/pdfDataMapping.js';
 
 function fixture(typeId, count, patch = {}) {
   return {

@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
-import { ENGINEERING_NUMBER_FORMATS, formatEngineeringNumber } from '../js/core/numberService.js';
-import { results } from '../js/modules/flooding-verification/results.js';
+import { ENGINEERING_NUMBER_FORMATS, formatEngineeringNumber } from '../core/numberService.js';
+import { results } from '../modules/flooding-verification/results.js';
 
 test('central engineering profiles format technical quantities consistently in German', () => {
   assert.equal(formatEngineeringNumber(143.234, 'volume'), '143,23');
@@ -64,7 +64,7 @@ test('flooding result model uses central profiles for visible numeric output', (
 });
 
 test('flooding results contain no local number formatter', () => {
-  const source = readFileSync(new URL('../js/modules/flooding-verification/results.js', import.meta.url), 'utf8');
+  const source = readFileSync(new URL('../modules/flooding-verification/results.js', import.meta.url), 'utf8');
   assert.doesNotMatch(source, /\.toLocaleString\s*\(/);
   assert.doesNotMatch(source, /\.toFixed\s*\(/);
   assert.match(source, /formatEngineeringNumber/);

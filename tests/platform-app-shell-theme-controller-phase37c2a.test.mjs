@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const themeController = readFileSync('js/platform/shell/themeController.js', 'utf8');
-const renderer = readFileSync('js/core/renderer.js', 'utf8');
-const app = readFileSync('js/core/app.js', 'utf8');
+const themeController = readFileSync('core/ux/themeController.js', 'utf8');
+const renderer = readFileSync('core/renderer.js', 'utf8');
+const app = readFileSync('core/app.js', 'utf8');
 
 assert.match(themeController, /let\s+themeControllerInitialized\s*=\s*false/, 'ThemeController must have an idempotent initialization guard.');
 assert.match(themeController, /if\s*\(themeControllerInitialized\)\s*return/, 'ThemeController must not bind duplicate click listeners.');

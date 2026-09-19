@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 
-const moduleSource = fs.readFileSync('js/modules/heating-cooling/index.js', 'utf8');
-const configSource = fs.readFileSync('js/modules/heating-cooling/config.js', 'utf8');
-const schemaSource = fs.readFileSync('js/modules/heating-cooling/schema.js', 'utf8');
+const moduleSource = fs.readFileSync('modules/heating-cooling/index.js', 'utf8');
+const configSource = fs.readFileSync('modules/heating-cooling/config.js', 'utf8');
+const schemaSource = fs.readFileSync('modules/heating-cooling/schema.js', 'utf8');
 const dynamicRendererSource = fs.readFileSync('js/platform/dynamicRenderer/index.js', 'utf8');
 const lineSectionSource = fs.readFileSync('js/platform/lineSectionController/index.js', 'utf8');
 const runtimeSource = fs.readFileSync('js/platform/moduleRuntime/index.js', 'utf8');

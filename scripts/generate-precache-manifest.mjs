@@ -1,12 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { syncReleaseVersion } from './sync-release-version.mjs';
+import { detectRuntimeLayout } from './runtime-layout.mjs';
 
 const root = process.cwd();
 const serviceWorkerPath = path.join(root, 'service-worker.js');
 const packageJsonPath = path.join(root, 'package.json');
 const releaseNotesPath = path.join(root, 'RELEASE_NOTES.md');
 const checkMode = process.argv.includes('--check');
+const runtimeLayout = detectRuntimeLayout(root);
 
 syncReleaseVersion({ check: checkMode });
 
@@ -18,7 +20,7 @@ const STATIC_ASSETS = [
 ];
 const GENERATED_DIRS = [
   { dir: 'css', extensions: new Set(['.css']) },
-  { dir: 'js', extensions: new Set(['.js']) },
+  ...runtimeLayout.runtimeDirs.map(dir => ({ dir, extensions: new Set(['.js']) })),
   { dir: 'assets/icons', extensions: null },
   { dir: 'docs/legal', extensions: new Set(['.html']) }
 ];

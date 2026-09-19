@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const controller = readFileSync(new URL('../js/modules/rainwater/controller.js', import.meta.url), 'utf8');
-const results = readFileSync(new URL('../js/modules/rainwater/results.js', import.meta.url), 'utf8');
-const logic = readFileSync(new URL('../js/modules/rainwater/logic.js', import.meta.url), 'utf8');
-const router = readFileSync(new URL('../js/core/router.js', import.meta.url), 'utf8');
+const controller = readFileSync(new URL('../modules/rainwater/controller.js', import.meta.url), 'utf8');
+const results = readFileSync(new URL('../modules/rainwater/results.js', import.meta.url), 'utf8');
+const logic = readFileSync(new URL('../modules/rainwater/logic.js', import.meta.url), 'utf8');
+const router = readFileSync(new URL('../core/router.js', import.meta.url), 'utf8');
 
 assert.match(router, /Promise\.resolve\(renderCallback\(id\)\)/, 'Navigation must render the target route immediately, not only after hashchange.');
 assert.match(controller, /modeDefaultsPatch/, 'Rainwater surfaceMode switch must hydrate dependent mode defaults in one store patch.');

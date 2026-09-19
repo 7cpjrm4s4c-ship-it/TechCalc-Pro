@@ -1,19 +1,19 @@
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
-import module from '../js/modules/drinking-water/index.js';
-import config from '../js/modules/drinking-water/config.js';
-import schema from '../js/modules/drinking-water/schema.js';
-import { state } from '../js/modules/drinking-water/state.js';
-import { calculate, createConsumer, createUsageUnit, createSingleGroup, writeUsageUnits, writeSingleConsumers } from '../js/modules/drinking-water/logic.js';
-import { createDrinkingWaterViewModel } from '../js/modules/drinking-water/viewModel.js';
-import { renderView, renderInputCard, renderResultCard } from '../js/modules/drinking-water/view.js';
-import { buildDrinkingWaterResultModel, selectedFixturesList } from '../js/modules/drinking-water/results.js';
-import { isDynamicDrinkingWaterAction, updateDrinkingWaterDynamic } from '../js/modules/drinking-water/dynamicRenderer.js';
-import { normalizeDrinkingWaterSavedState, refreshDrinkingWater } from '../js/modules/drinking-water/controller.js';
+import module from '../modules/drinking-water/index.js';
+import config from '../modules/drinking-water/config.js';
+import schema from '../modules/drinking-water/schema.js';
+import { state } from '../modules/drinking-water/state.js';
+import { calculate, createConsumer, createUsageUnit, createSingleGroup, writeUsageUnits, writeSingleConsumers } from '../modules/drinking-water/logic.js';
+import { createDrinkingWaterViewModel } from '../modules/drinking-water/viewModel.js';
+import { renderView, renderInputCard, renderResultCard } from '../modules/drinking-water/view.js';
+import { buildDrinkingWaterResultModel, selectedFixturesList } from '../modules/drinking-water/results.js';
+import { isDynamicDrinkingWaterAction, updateDrinkingWaterDynamic } from '../modules/drinking-water/dynamicRenderer.js';
+import { normalizeDrinkingWaterSavedState, refreshDrinkingWater } from '../modules/drinking-water/controller.js';
 
-const base = new URL('../js/modules/drinking-water/', import.meta.url);
+const base = new URL('../modules/drinking-water/', import.meta.url);
 const read = file => readFileSync(new URL(file, base), 'utf8');
-const projectStorage = readFileSync('js/core/projectStorage.js', 'utf8');
+const projectStorage = readFileSync('core/projectStorage.js', 'utf8');
 
 assert.match(read('config.js'), /phase-25e-final-hardening/, 'phase 25E status is declared');
 assert.equal(config.id, 'drinking-water', 'module config id remains stable');
@@ -21,7 +21,7 @@ assert.equal(module.config.id, 'drinking-water', 'platform module exposes drinki
 assert.ok(Array.isArray(schema.fields), 'schema remains form-schema compatible');
 
 const expectedFiles = ['config.js','schema.js','state.js','logic.js','results.js','controller.js','viewModel.js','view.js','dynamicRenderer.js','index.js'];
-const files = new Set(readdirSync(new URL('../js/modules/drinking-water/', import.meta.url)));
+const files = new Set(readdirSync(new URL('../modules/drinking-water/', import.meta.url)));
 for (const file of expectedFiles) assert.ok(files.has(file), `${file} must exist`);
 
 const index = read('index.js');

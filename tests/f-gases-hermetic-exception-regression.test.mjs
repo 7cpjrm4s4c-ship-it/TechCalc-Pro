@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
-import schema from '../js/modules/f-gases-check/schema.js';
-import { calculate } from '../js/modules/f-gases-check/logic.js';
-import { buildFGasesResultModel } from '../js/modules/f-gases-check/results.js';
-import { buildFGasesReportDto } from '../js/modules/f-gases-check/reportAdapter.js';
-import { buildFGasesReportSections } from '../js/core/pdf/fGasesReportSections.js';
+import schema from '../modules/f-gases-check/schema.js';
+import { calculate } from '../modules/f-gases-check/logic.js';
+import { buildFGasesResultModel } from '../modules/f-gases-check/results.js';
+import { buildFGasesReportDto } from '../modules/f-gases-check/reportAdapter.js';
+import { buildFGasesReportSections } from '../core/pdf/fGasesReportSections.js';
 
 const hermeticField = schema.fields.find(field => field.key === 'hermeticallySealedStatus');
 assert.equal(hermeticField.label, 'Hermetisch geschlossene Einrichtung nach Art. 3 Nr. 9 VO (EU) 2024/573');

@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 
-const index = readFileSync('js/modules/unit-converter/index.js', 'utf8');
-const viewModel = readFileSync('js/modules/unit-converter/viewModel.js', 'utf8');
-const view = readFileSync('js/modules/unit-converter/view.js', 'utf8');
-const config = readFileSync('js/modules/unit-converter/config.js', 'utf8');
+const index = readFileSync('modules/unit-converter/index.js', 'utf8');
+const viewModel = readFileSync('modules/unit-converter/viewModel.js', 'utf8');
+const view = readFileSync('modules/unit-converter/view.js', 'utf8');
+const config = readFileSync('modules/unit-converter/config.js', 'utf8');
 
 for (const file of ['viewModel.js', 'view.js', 'results.js']) {
-  assert.ok(existsSync(`js/modules/unit-converter/${file}`), `unit-converter must expose ${file}`);
+  assert.ok(existsSync(`modules/unit-converter/${file}`), `unit-converter must expose ${file}`);
 }
 
 assert.match(index, /createPlatformModule/, 'index.js must remain the platform adapter');

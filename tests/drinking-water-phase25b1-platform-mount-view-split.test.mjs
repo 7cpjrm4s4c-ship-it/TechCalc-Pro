@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const base = 'js/modules/drinking-water/';
+const base = 'modules/drinking-water/';
 for (const file of ['index.js','controller.js','viewModel.js','view.js','results.js','dynamicRenderer.js','logic.js','schema.js','state.js','config.js']) {
   assert.ok(fs.existsSync(base + file), `missing ${file}`);
 }
@@ -29,7 +29,7 @@ assert.match(results, /buildDrinkingWaterResultModel/, 'results must build resul
 const dynamic = fs.readFileSync(base + 'dynamicRenderer.js', 'utf8');
 assert.match(dynamic, /updateDrinkingWaterDynamic/, 'dynamic renderer must be extracted');
 
-const mod = await import('../js/modules/drinking-water/index.js');
+const mod = await import('../modules/drinking-water/index.js');
 assert.equal(mod.default.config.id, 'drinking-water');
 assert.equal(typeof mod.default.mount, 'function');
 

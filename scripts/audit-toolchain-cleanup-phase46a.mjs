@@ -29,6 +29,7 @@ for (const source of referenceSources) {
 }
 
 referenced.add('audit-toolchain-cleanup-phase46a.mjs');
+referenced.add('runtime-layout.mjs');
 
 const unused = scriptFiles.filter((name) => !referenced.has(name));
 const missing = [...referenced].filter((name) => !scriptFiles.includes(name));

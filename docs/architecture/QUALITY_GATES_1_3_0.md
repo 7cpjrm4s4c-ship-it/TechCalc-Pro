@@ -27,7 +27,7 @@ Der Quality Gate fuehrt aus:
 
 ## Performance Budget
 
-Die Datei `js/core/quality/performanceBudget.js` definiert die Zielwerte:
+Die Datei `core/diagnostics/performanceBudget.js` definiert die Zielwerte:
 
 - Modul-Mount: maximal 80 ms
 - Route-Render: maximal 120 ms

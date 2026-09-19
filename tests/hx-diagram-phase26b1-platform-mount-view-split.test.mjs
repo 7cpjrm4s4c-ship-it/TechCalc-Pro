@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const base = 'js/modules/hx-diagram/';
+const base = 'modules/hx-diagram/';
 for (const file of ['index.js','controller.js','viewModel.js','view.js','results.js','dynamicRenderer.js','diagramRenderer.js','logic.js','schema.js','state.js','config.js']) {
   assert.ok(fs.existsSync(base + file), `missing ${file}`);
 }
@@ -35,7 +35,7 @@ assert.match(diagram, /renderHxSvg/, 'diagram renderer must own SVG rendering af
 assert.match(diagram, /buildStateSegments/, 'diagram renderer must own process path segment rendering after 26C.1');
 assert.match(diagram, /chartCard/, 'diagram renderer must expose chartCard after 26C.1');
 
-const mod = await import('../js/modules/hx-diagram/index.js');
+const mod = await import('../modules/hx-diagram/index.js');
 assert.equal(mod.default.config.id, 'hx-diagram');
 assert.equal(typeof mod.default.mount, 'function');
 

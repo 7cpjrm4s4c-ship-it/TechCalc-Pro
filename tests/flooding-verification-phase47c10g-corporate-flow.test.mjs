@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { buildAuthorityCorporateData, renderAuthorityCorporateBlock } from '../js/core/pdf/authorityCorporateBlock.js';
-import { renderSurfaceTable } from '../js/core/pdf/authorityTables.js';
+import { buildAuthorityCorporateData, renderAuthorityCorporateBlock } from '../core/pdf/authorityCorporateBlock.js';
+import { renderSurfaceTable } from '../core/pdf/authorityTables.js';
 
 const data = buildAuthorityCorporateData(
   { companyName: 'Scherr+Klimke AG' },
@@ -46,7 +46,7 @@ renderSurfaceTable(tableReport, { surfaces: [{ name: 'Dach', areaType: 'Dachflä
 assert.equal(tableReport.sectionTitles.length, 1, 'Tabellenüberschrift darf nach Seitenumbruch nicht doppelt erzeugt werden.');
 assert.equal(tableReport.ensureCalls[0].options, undefined, 'Authority-Tabelle darf keine zusätzliche Fortsetzungsüberschrift anfordern.');
 
-const integrationSource = fs.readFileSync(new URL('../js/core/pdf/authorityPdfReport.js', import.meta.url), 'utf8');
+const integrationSource = fs.readFileSync(new URL('../core/pdf/authorityPdfReport.js', import.meta.url), 'utf8');
 assert.match(integrationSource, /renderAuthorityCorporateBlock/);
 assert.doesNotMatch(integrationSource, /originalCorporateBlock\.call/);
 

@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const dynamicRenderer = readFileSync('js/modules/drinking-water/dynamicRenderer.js', 'utf8');
-const controller = readFileSync('js/modules/drinking-water/controller.js', 'utf8');
+const dynamicRenderer = readFileSync('modules/drinking-water/dynamicRenderer.js', 'utf8');
+const controller = readFileSync('modules/drinking-water/controller.js', 'utf8');
 
 assert.match(dynamicRenderer, /function shouldIgnoreSurfaceConfirm\(meta = \{\}\)/, 'Drinking-water dynamic renderer must define a surface-confirm guard.');
 assert.match(dynamicRenderer, /action !== 'surface:confirm'/, 'Surface-confirm guard must target surface:confirm only.');

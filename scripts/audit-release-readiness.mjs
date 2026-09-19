@@ -4,10 +4,10 @@ const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'
 const packageJson = JSON.parse(read('package.json'));
 const packageLock = JSON.parse(read('package-lock.json'));
 const manifest = JSON.parse(read('manifest.json'));
-const versionSource = read('js/core/version.js');
-const appSource = read('js/core/app.js');
-const floodingReportAdapter = read('js/modules/flooding-verification/reportAdapter.js');
-const releaseNotesController = read('js/platform/shell/releaseNotesController.js');
+const versionSource = read('core/version.js');
+const appSource = read('core/app.js');
+const floodingReportAdapter = read('modules/flooding-verification/reportAdapter.js');
+const releaseNotesController = read('core/ux/releaseNotesController.js');
 const indexHtml = read('index.html');
 const serviceWorker = read('service-worker.js');
 const releaseNotes = read(`docs/releases/${packageJson.version}.md`);
@@ -25,7 +25,7 @@ assert.doesNotMatch(releaseNotesController, new RegExp(`appVersion\\s*=\\s*['"](
 for (const marker of ['data-app-version-current', 'name="version"', 'id="appVersion"']) assert.match(indexHtml, new RegExp(`${marker}[\\s\\S]{0,80}${escapedVersion}|${escapedVersion}[\\s\\S]{0,80}${marker}`), `index version marker ${marker} must match package version`);
 assert.match(serviceWorker, new RegExp(`CACHE_NAME\\s*=\\s*['"]techcalc-pro-${escapedVersion}['"]`), 'service-worker cache must match package version');
 assert.match(serviceWorker, new RegExp(`CACHE_REVISION\\s*=\\s*['"]${escapedVersion}-`), 'service-worker revision must start with package version');
-assert.match(serviceWorker, /['"]\.\/js\/core\/version\.js['"]/, 'central version module must be precached');
+assert.match(serviceWorker, /['"]\.\/core\/version\.js['"]/, 'central version module must be precached');
 assert.match(releaseNotes, new RegExp(`^# TechCalc Pro ${escapedVersion}$`, 'm'), 'release notes must match package version');
 assert.doesNotMatch(releaseNotes, /Phase\s+\d+/i, 'public release notes must not contain internal phase labels');
 assert.doesNotMatch(releaseNotes, /dev\.\d+/i, 'public release notes must not contain development build labels');

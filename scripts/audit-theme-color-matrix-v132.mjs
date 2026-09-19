@@ -62,7 +62,7 @@ const moduleAccentExpectations = new Map([
 ]);
 
 for (const [moduleId, accent] of moduleAccentExpectations) {
-  const file = `js/modules/${moduleId}/config.js`;
+  const file = `modules/${moduleId}/config.js`;
   if (!fs.existsSync(path.join(root, file))) fail(`missing module config ${file}`);
   const source = read(file);
   const idRe = new RegExp(`id\\s*:\\s*['\"]${moduleId}['\"]`);
@@ -74,7 +74,7 @@ for (const marker of [
   "data-hc-mode=\"${accent}\" data-process-accent=\"${accent}\"",
   'data-process-accent="${processAccent}"'
 ]) {
-  const sources = [read('js/modules/heating-cooling/view.js'), read('js/modules/ventilation/view.js')].join('\n');
+  const sources = [read('modules/heating-cooling/view.js'), read('modules/ventilation/view.js')].join('\n');
   if (!sources.includes(marker)) fail(`process accent marker missing: ${marker}`);
 }
 

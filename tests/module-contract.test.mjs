@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import { readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { modules } from '../js/core/registry.js';
+import { modules } from '../core/registry.js';
 
-const modulesDir = new URL('../js/modules/', import.meta.url).pathname;
+const modulesDir = new URL('../modules/', import.meta.url).pathname;
 for (const name of readdirSync(modulesDir)) {
   const configPath = join(modulesDir, name, 'config.js');
   if (!existsSync(configPath)) continue;

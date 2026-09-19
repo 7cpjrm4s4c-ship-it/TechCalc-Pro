@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { pipeSystems } from '../js/utils/pipes.js';
+import { pipeSystems } from '../core/data/pipes.js';
 
 const copper = pipeSystems.find(system => system.id === 'copper');
 assert.ok(copper, 'Copper pipe system must exist.');

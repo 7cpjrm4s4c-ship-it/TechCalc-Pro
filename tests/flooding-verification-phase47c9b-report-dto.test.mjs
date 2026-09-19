@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
-import { buildFloodingReportDto, FLOODING_REPORT_DTO_VERSION } from '../js/modules/flooding-verification/reportAdapter.js';
+import { buildFloodingReportDto, FLOODING_REPORT_DTO_VERSION } from '../modules/flooding-verification/reportAdapter.js';
 
 const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 
@@ -51,15 +51,15 @@ test('report DTO is complete, deterministic and JSON serializable', () => {
 });
 
 test('report adapter has no DOM, PDF drawing or duplicated calculation dependency', () => {
-  const source = read('js/modules/flooding-verification/reportAdapter.js');
+  const source = read('modules/flooding-verification/reportAdapter.js');
   assert.doesNotMatch(source, /document\.|querySelector|window\.|canvas|innerHTML/);
   assert.doesNotMatch(source, /pdfLayout|GlobalPdfReport|calculateBase|retentionFactors/);
 });
 
 test('platform and PDF mapper require registered typed report DTOs without legacy DOM fallback', () => {
-  const runtime = read('js/platform/moduleRuntime/index.js');
-  const mapper = read('js/core/pdf/pdfDataMapping.js');
-  const moduleIndex = read('js/modules/flooding-verification/index.js');
+  const runtime = read('core/platformModuleRuntime.js');
+  const mapper = read('core/pdf/pdfDataMapping.js');
+  const moduleIndex = read('modules/flooding-verification/index.js');
   assert.match(runtime, /report,/);
   assert.match(moduleIndex, /buildFloodingReportDto/);
   assert.match(moduleIndex, /report,/);

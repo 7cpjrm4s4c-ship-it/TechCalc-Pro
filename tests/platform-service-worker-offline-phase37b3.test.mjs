@@ -22,12 +22,12 @@ assert.ok(report.assets.jsModules >= 150, 'expected full JS module runtime surfa
 assert.equal(report.checks.every(item => item.status === 'passed'), true);
 
 const serviceWorker = read('service-worker.js');
-assert.match(serviceWorker, /'\.\/js\/core\/centralStore\.js'/);
-assert.match(serviceWorker, /'\.\/js\/core\/eventPipeline\.js'/);
-assert.match(serviceWorker, /'\.\/js\/platform\/dynamicRenderer\/index\.js'/);
-assert.match(serviceWorker, /'\.\/js\/modules\/drinking-water\/controller\.js'/);
-assert.match(serviceWorker, /'\.\/js\/modules\/rainwater\/controller\.js'/);
-assert.match(serviceWorker, /'\.\/js\/modules\/hx-diagram\/diagramRenderer\.js'/);
+assert.match(serviceWorker, /'\.\/core\/centralStore\.js'/);
+assert.match(serviceWorker, /'\.\/core\/events\/eventPipeline\.js'/);
+assert.match(serviceWorker, /'\.\/core\/ui\/dynamicRenderer\.js'/);
+assert.match(serviceWorker, /'\.\/modules\/drinking-water\/controller\.js'/);
+assert.match(serviceWorker, /'\.\/modules\/rainwater\/controller\.js'/);
+assert.match(serviceWorker, /'\.\/modules\/hx-diagram\/diagramRenderer\.js'/);
 
 const e2eSpec = read('tests/e2e/phase37b-runtime-smoke.spec.mjs');
 assert.match(e2eSpec, /offline reload keeps every module route available/);

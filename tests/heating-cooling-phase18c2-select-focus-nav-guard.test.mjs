@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-const source = fs.readFileSync(new URL('../js/core/eventPipeline.js', import.meta.url), 'utf8');
+const source = fs.readFileSync(new URL('../core/events/eventPipeline.js', import.meta.url), 'utf8');
 
 if (!source.includes("const keyboardFieldSelector = 'input[data-field], textarea[data-field]';")) {
   throw new Error('Keyboard focus selector must exclude select[data-field]. Native select pickers must not hide the mobile nav.');

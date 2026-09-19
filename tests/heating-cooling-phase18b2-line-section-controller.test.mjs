@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const moduleSource = readFileSync('js/modules/heating-cooling/index.js', 'utf8');
+const moduleSource = readFileSync('modules/heating-cooling/index.js', 'utf8');
 const controllerSource = readFileSync('js/platform/lineSectionController/index.js', 'utf8');
 
 assert.match(controllerSource, /export function createLineSectionController/, 'platform must expose a generic line-section controller.');

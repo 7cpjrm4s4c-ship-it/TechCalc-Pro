@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 
-import { calculate, normalizeEN378AssessmentState } from '../js/modules/en-378-safety-check/logic.js';
-import { assessStateConsistency } from '../js/modules/en-378-safety-check/stateConsistency.js';
-import { buildEN378SafetyCheckResultModel } from '../js/modules/en-378-safety-check/results.js';
+import { calculate, normalizeEN378AssessmentState } from '../modules/en-378-safety-check/logic.js';
+import { assessStateConsistency } from '../modules/en-378-safety-check/stateConsistency.js';
+import { buildEN378SafetyCheckResultModel } from '../modules/en-378-safety-check/results.js';
 
 const baseState = {
   refrigerantId: 'R-513A',

@@ -1,13 +1,13 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 
-const config = fs.readFileSync('js/modules/unit-converter/config.js', 'utf8');
-const results = fs.readFileSync('js/modules/unit-converter/results.js', 'utf8');
+const config = fs.readFileSync('modules/unit-converter/config.js', 'utf8');
+const results = fs.readFileSync('modules/unit-converter/results.js', 'utf8');
 
 assert.match(config, /phase-22c1-result-cleanup/, 'migrationStatus must include phase-22c1-result-cleanup');
 assert.doesNotMatch(results, /title:\s*['"]Umrechnung['"]/, 'unit converter must not expose a separate Umrechnung result card');
 
-const { buildUnitConverterResultModel } = await import('../js/modules/unit-converter/results.js');
+const { buildUnitConverterResultModel } = await import('../modules/unit-converter/results.js');
 const model = buildUnitConverterResultModel({ category: 'pressure', value: '1', from: 'bar', to: 'kPa' }, 'green');
 assert.equal(model.primary, undefined, 'result model must omit primary conversion card');
 assert.equal(model.groups.length, 1, 'result model should only render the all-values card');

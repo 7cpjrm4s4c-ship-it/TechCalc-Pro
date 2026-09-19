@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildFloodingPlausibilityModel } from '../js/modules/flooding-verification/plausibilityModel.js';
-import { buildFloodingDiagnosticModel } from '../js/modules/flooding-verification/diagnosticModel.js';
+import { buildFloodingPlausibilityModel } from '../modules/flooding-verification/plausibilityModel.js';
+import { buildFloodingDiagnosticModel } from '../modules/flooding-verification/diagnosticModel.js';
 
 const baseResult = {
   combinedStorage: { status: 'complete' },

@@ -1,8 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { detectRuntimeLayout } from './runtime-layout.mjs';
 
 const root = process.cwd();
+const runtimeLayout = detectRuntimeLayout(root);
 const rel = (p) => path.relative(root, p).replaceAll(path.sep, '/');
 const walk = (dir) => {
   const start = path.join(root, dir);
@@ -21,9 +23,8 @@ const walk = (dir) => {
 };
 const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
 const exists = (f) => fs.existsSync(path.join(root, f));
-const jsFiles = walk('js').filter((f) => f.endsWith('.js'));
-const runtimeFiles = jsFiles;
-const sourceFiles = [...jsFiles, ...walk('scripts').filter((f) => f.endsWith('.mjs')), ...walk('tests').filter((f) => f.endsWith('.mjs'))];
+const runtimeFiles = runtimeLayout.runtimeDirs.flatMap(dir => walk(dir)).filter((f) => f.endsWith('.js'));
+const sourceFiles = [...runtimeFiles, ...walk('scripts').filter((f) => f.endsWith('.mjs')), ...walk('tests').filter((f) => f.endsWith('.mjs'))];
 const normalizeImport = (fromFile, specifier) => {
   if (!specifier.startsWith('.')) return null;
   const base = path.dirname(fromFile);
@@ -48,10 +49,10 @@ const packageScripts = Object.values(packageJson.scripts || {}).join('\n');
 const essential = new Set(['index.js','config.js','schema.js','state.js','logic.js','controller.js','view.js','viewModel.js','results.js','dynamicRenderer.js','diagramRenderer.js','formRenderer.js','tables.js']);
 const currentDocs = walk('docs').filter((f) => /\.(md|json)$/.test(f) && !f.includes('/archive/')).map((f) => [f, read(f)]);
 const candidates = runtimeFiles.filter((file) => {
-  if (file === 'js/core/app.js' || file === 'js/core/logger.js') return false;
-  if (file.includes('/modules/') && essential.has(path.basename(file))) return false;
+  if (file === `${runtimeLayout.coreDir}/app.js` || file === `${runtimeLayout.coreDir}/logger.js`) return false;
+  if (file.startsWith(`${runtimeLayout.modulesDir}/`) && essential.has(path.basename(file))) return false;
   if (inbound.get(file)?.size) return false;
-  if (html.includes(file) || html.includes(file.replace(/^js\//, './js/'))) return false;
+  if (html.includes(file) || html.includes(`./${file}`)) return false;
   if (packageScripts.includes(file)) return false;
   if (currentDocs.some(([, content]) => content.includes(file))) return false;
   return true;

@@ -5,10 +5,10 @@ import { readFileSync } from 'node:fs';
 const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 
 test('47C.9A keeps the global PDF engine as the single export and layout path', () => {
-  const app = read('js/core/app.js');
-  const exportModule = read('js/core/pdfExport.js');
+  const app = read('core/app.js');
+  const exportModule = read('core/pdf/pdfExport.js');
 
-  assert.match(app, /import\('\.\/pdfExport\.js'\)/);
+  assert.match(app, /import\('\.\/pdf\/index\.js'\)/);
   assert.match(exportModule, /collectCurrentModule/);
   assert.match(exportModule, /GlobalPdfReport/);
   assert.match(exportModule, /report\.build\(project, moduleData\)/);
@@ -39,8 +39,8 @@ test('47C.9A defines the complete authorities-report scope', () => {
     'retentionVerification',
     'comparisons',
     'diagnostics',
-    'interpretation',
-    'sources'
+   'interpretation',
+   'sources'
   ];
 
   requiredSections.forEach(section => assert.match(review, new RegExp(`\\b${section}\\b`)));

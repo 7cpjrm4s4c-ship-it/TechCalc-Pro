@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { automaticRainDuration, calculate } from '../js/modules/flooding-verification/logic.js';
+import { automaticRainDuration, calculate } from '../modules/flooding-verification/logic.js';
 
 test('Phase 47C.3 maps slope and sealed share to governing duration', () => {
   assert.equal(automaticRainDuration('0,5', 0.5), 15);

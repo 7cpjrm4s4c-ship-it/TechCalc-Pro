@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const source = readFileSync(new URL('../js/modules/rainwater/index.js', import.meta.url), 'utf8');
-const controller = readFileSync(new URL('../js/modules/rainwater/controller.js', import.meta.url), 'utf8');
+const source = readFileSync(new URL('../modules/rainwater/index.js', import.meta.url), 'utf8');
+const controller = readFileSync(new URL('../modules/rainwater/controller.js', import.meta.url), 'utf8');
 const runtime = readFileSync(new URL('../js/platform/moduleRuntime/index.js', import.meta.url), 'utf8');
-const state = readFileSync(new URL('../js/modules/rainwater/state.js', import.meta.url), 'utf8');
+const state = readFileSync(new URL('../modules/rainwater/state.js', import.meta.url), 'utf8');
 
 assert.match(source, /createPlatformModule/, 'Rainwater must be mounted through the platform module runtime.');
 assert.match(runtime, /registerCentralActions\(root, actions\)/, 'Platform runtime must register actions through the central event pipeline.');

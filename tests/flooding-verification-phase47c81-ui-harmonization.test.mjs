@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
-import { floodingSurfaceSchema, floodingCalculationSchema } from '../js/modules/flooding-verification/schema.js';
+import { floodingSurfaceSchema, floodingCalculationSchema } from '../modules/flooding-verification/schema.js';
 
 const field = (schema, key) => schema.fields.find(item => item.key === key);
 

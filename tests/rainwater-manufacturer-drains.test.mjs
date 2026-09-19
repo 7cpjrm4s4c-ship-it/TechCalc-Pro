@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import schema from '../js/modules/rainwater/schema.js';
-import controller from '../js/modules/rainwater/controller.js';
-import { calculate } from '../js/modules/rainwater/logic.js';
+import schema from '../modules/rainwater/schema.js';
+import controller from '../modules/rainwater/controller.js';
+import { calculate } from '../modules/rainwater/logic.js';
 
 const base = {
   surfaceMode: 'roof',

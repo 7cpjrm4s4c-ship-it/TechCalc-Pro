@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { createModuleRuntime } from '../js/core/moduleRuntime.js';
+import { createModuleRuntime } from '../core/moduleRuntime.js';
 
 function createRoot() {
   return {
@@ -27,7 +27,7 @@ assert.equal(await runtime.mount('fast'), true);
 assert.equal(fastRoot.innerHTML, '<section>Fast</section>');
 assert.equal(fastRoot.innerHTML.includes('Modul wird geladen'), false, 'fast mounts must not flash loading copy');
 
-const appSource = fs.readFileSync('js/core/app.js', 'utf8');
+const appSource = fs.readFileSync('core/app.js', 'utf8');
 assert.match(appSource, /scheduleLazyModulePreload\(\)/, 'lazy modules are preloaded after app boot');
 assert.match(appSource, /requestIdleCallback\(preload, \{ timeout: 1500 \}\)/, 'preload uses idle scheduling');
 assert.match(appSource, /#\{1,3\}/, 'release notes parser accepts root h1 release heading');

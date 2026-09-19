@@ -1,11 +1,13 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { detectRuntimeLayout } from './runtime-layout.mjs';
 
 const root = process.cwd();
+const { modulesDir, runtimeDirs } = detectRuntimeLayout(root);
 const rel = (p) => relative(root, p).replaceAll('\\', '/');
 const abs = (...p) => join(root, ...p);
 
-const modulesRoot = abs('js', 'modules');
+const modulesRoot = abs(modulesDir);
 const cssFiles = ['css/components.css', 'css/layout.css', 'css/modules.css', 'css/tokens.css'];
 const referenceModules = ['heating-cooling', 'ventilation', 'pressure-holding', 'buffer-storage'];
 const expectedModuleFiles = ['config.js', 'schema.js', 'state.js', 'logic.js', 'index.js', 'controller.js', 'viewModel.js', 'view.js', 'results.js'];
@@ -48,7 +50,7 @@ function risk(priority, area, message, evidence = {}) {
 }
 
 const modules = moduleNames().map(name => {
-  const dir = `js/modules/${name}`;
+  const dir = `modules/${name}`;
   const files = walk(dir).filter(file => file.endsWith('.js')).map(file => file.slice(dir.length + 1));
   const content = Object.fromEntries(files.map(file => [file, read(`${dir}/${file}`)]));
   const all = Object.values(content).join('\n');
@@ -113,7 +115,7 @@ const modules = moduleNames().map(name => {
   };
 });
 
-const jsFiles = walk('js').filter(file => file.endsWith('.js'));
+const jsFiles = runtimeDirs.flatMap(dir => walk(dir)).filter(file => file.endsWith('.js'));
 const runtimeCorpus = Object.fromEntries(jsFiles.map(file => [file, read(file)]));
 const utilityFiles = ['js/utils/calculations.js', 'js/utils/pipes.js', 'js/utils/units.js'];
 const exportedPattern = /export\s+(?:function|const|let|var|class)\s+([A-Za-z_$][\w$]*)|export\s*\{([^}]+)\}/g;

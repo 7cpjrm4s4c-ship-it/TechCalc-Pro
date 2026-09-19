@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const routerSource = readFileSync(new URL('../js/core/router.js', import.meta.url), 'utf8');
-const appSource = readFileSync(new URL('../js/core/app.js', import.meta.url), 'utf8');
+const routerSource = readFileSync(new URL('../core/router.js', import.meta.url), 'utf8');
+const appSource = readFileSync(new URL('../core/app.js', import.meta.url), 'utf8');
 
 assert.match(routerSource, /function isMountedRoute\(id\)/, 'router must detect already mounted modules centrally.');
 assert.match(routerSource, /function isPendingRoute\(id\)/, 'router must detect pending modules centrally.');

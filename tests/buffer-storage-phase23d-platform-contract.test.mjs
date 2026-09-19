@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const indexSource = readFileSync('js/modules/buffer-storage/index.js', 'utf8');
-const viewSource = readFileSync('js/modules/buffer-storage/view.js', 'utf8');
-const viewModelSource = readFileSync('js/modules/buffer-storage/viewModel.js', 'utf8');
-const controllerSource = readFileSync('js/modules/buffer-storage/controller.js', 'utf8');
-const resultsSource = readFileSync('js/modules/buffer-storage/results.js', 'utf8');
-const configSource = readFileSync('js/modules/buffer-storage/config.js', 'utf8');
+const indexSource = readFileSync('modules/buffer-storage/index.js', 'utf8');
+const viewSource = readFileSync('modules/buffer-storage/view.js', 'utf8');
+const viewModelSource = readFileSync('modules/buffer-storage/viewModel.js', 'utf8');
+const controllerSource = readFileSync('modules/buffer-storage/controller.js', 'utf8');
+const resultsSource = readFileSync('modules/buffer-storage/results.js', 'utf8');
+const configSource = readFileSync('modules/buffer-storage/config.js', 'utf8');
 
 assert.match(configSource, /phase-23d-platform-contract-finalization/, 'phase 23D status is declared');
 assert.match(indexSource, /createPlatformModule\(\{/, 'index remains the platform adapter');

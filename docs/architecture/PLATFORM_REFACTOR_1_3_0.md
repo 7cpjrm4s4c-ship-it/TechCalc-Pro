@@ -155,8 +155,8 @@ Neu hinzugekommen:
 - `tests/number-service.test.mjs`
 - `tests/module-contract.test.mjs`
 - `tests/platform-policy.test.mjs`
-- `js/core/quality/performanceBudget.js`
-- `js/core/quality/appHealth.js`
+- `core/diagnostics/performanceBudget.js`
+- `core/diagnostics/appHealth.js`
 - `docs/QUALITY_GATES_1_3_0.md`
 
 Damit ist 1.3.2-dev.2 nicht nur ein Architekturumbau, sondern eine belastbare Release-Basis.

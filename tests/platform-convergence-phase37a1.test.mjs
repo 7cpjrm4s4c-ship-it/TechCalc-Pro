@@ -13,8 +13,8 @@ assert.ok(rainwater, 'rainwater must be audited');
 assert.equal(rainwater.metrics.nonControllerAddEventListeners, 0, 'rainwater drain precommit must be owned by controller.js');
 assert.equal(rainwater.findings.some(item => item.area === 'event-boundary'), false, 'rainwater must not have an event-boundary finding');
 
-const rainwaterController = readFileSync('js/modules/rainwater/controller.js', 'utf8');
-const rainwaterIndex = readFileSync('js/modules/rainwater/index.js', 'utf8');
+const rainwaterController = readFileSync('modules/rainwater/controller.js', 'utf8');
+const rainwaterIndex = readFileSync('modules/rainwater/index.js', 'utf8');
 assert.match(rainwaterController, /export function bindRainwaterController/, 'rainwater controller must export bindRainwaterController');
 assert.match(rainwaterController, /rainwater:drainSize:precommit/, 'drain precommit action must be preserved');
 assert.doesNotMatch(rainwaterIndex, /addEventListener\s*\(/, 'rainwater index.js must not bind DOM listeners directly');

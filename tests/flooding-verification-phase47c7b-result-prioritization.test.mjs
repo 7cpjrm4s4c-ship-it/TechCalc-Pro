@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { results } from '../js/modules/flooding-verification/results.js';
-import { buildRetentionDurationComparison } from '../js/modules/flooding-verification/retentionDurationComparison.js';
+import { results } from '../modules/flooding-verification/results.js';
+import { buildRetentionDurationComparison } from '../modules/flooding-verification/retentionDurationComparison.js';
 
 const durationResults = [
   { durationMinutes: 5, rainIntensityLsHa: 323, throttleRainShareLsHa: 39.06, surchargeFactorFz: 1.2, reductionFactorFa: 0.984, specificStorageM3Ha: 100.55, volumeM3: 12.87, valid: true },

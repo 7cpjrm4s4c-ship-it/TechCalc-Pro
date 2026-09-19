@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const moduleDir = new URL('../js/modules/drinking-water/', import.meta.url);
+const moduleDir = new URL('../modules/drinking-water/', import.meta.url);
 const read = name => fs.readFileSync(new URL(name, moduleDir), 'utf8');
 
 const index = read('index.js');

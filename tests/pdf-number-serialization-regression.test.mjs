@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import { pdfNumber } from '../js/core/pdf/pdfText.js';
-import { GlobalPdfReport } from '../js/core/pdf/pdfLayout.js';
-import { renderAuthorityCharts } from '../js/core/pdf/authorityCharts.js';
+import { pdfNumber } from '../core/pdf/pdfText.js';
+import { GlobalPdfReport } from '../core/pdf/pdfLayout.js';
+import { renderAuthorityCharts } from '../core/pdf/authorityCharts.js';
 
 assert.equal(pdfNumber(110), '110');
 assert.equal(pdfNumber(100), '100');

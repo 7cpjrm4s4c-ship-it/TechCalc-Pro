@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 
-const moduleSource = fs.readFileSync('js/modules/ventilation/controller.js', 'utf8');
+const moduleSource = fs.readFileSync('modules/ventilation/controller.js', 'utf8');
 const dynamicRendererSource = fs.readFileSync('js/platform/dynamicRenderer/index.js', 'utf8');
-const configSource = fs.readFileSync('js/modules/ventilation/config.js', 'utf8');
+const configSource = fs.readFileSync('modules/ventilation/config.js', 'utf8');
 
 assert.match(configSource, /phase-19c-dynamic-renderer/, 'ventilation declares phase 19C dynamic-renderer migration');
 assert.match(dynamicRendererSource, /createVentilationDynamicRenderer/, 'platform dynamic renderer factory for ventilation must exist');

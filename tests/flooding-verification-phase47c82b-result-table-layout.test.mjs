@@ -3,7 +3,7 @@ import test from 'node:test';
 import { readFileSync } from 'node:fs';
 
 const css = readFileSync(new URL('../css/components-polish.css', import.meta.url), 'utf8');
-const renderer = readFileSync(new URL('../js/platform/resultRenderer/index.js', import.meta.url), 'utf8');
+const renderer = readFileSync(new URL('../core/resultRenderer.js', import.meta.url), 'utf8');
 
 test('central result renderer uses one result-list and result-row contract', () => {
   assert.match(renderer, /class="result-list"/);

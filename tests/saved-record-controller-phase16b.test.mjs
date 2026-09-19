@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const controller = readFileSync('js/core/savedRecordController.js', 'utf8');
-const savedCalculation = readFileSync('js/core/savedCalculationController.js', 'utf8');
-const pipe = readFileSync('js/modules/pipe-sizing/index.js', 'utf8');
-const pipeController = readFileSync('js/modules/pipe-sizing/controller.js', 'utf8');
+const controller = readFileSync('core/savedRecordController.js', 'utf8');
+const savedCalculation = readFileSync('core/savedCalculationController.js', 'utf8');
+const pipe = readFileSync('modules/pipe-sizing/index.js', 'utf8');
+const pipeController = readFileSync('modules/pipe-sizing/controller.js', 'utf8');
 const docs = readFileSync('docs/phases/phase-16.md', 'utf8');
 
 assert.match(controller, /export function bindSavedRecordWorkflow/, 'central saved-record workflow must exist');

@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const indexSource = fs.readFileSync('js/modules/pressure-holding/index.js', 'utf8');
-const controllerSource = fs.readFileSync('js/modules/pressure-holding/controller.js', 'utf8');
-const viewModelSource = fs.readFileSync('js/modules/pressure-holding/viewModel.js', 'utf8');
-const viewSource = fs.readFileSync('js/modules/pressure-holding/view.js', 'utf8');
-const configSource = fs.readFileSync('js/modules/pressure-holding/config.js', 'utf8');
+const indexSource = fs.readFileSync('modules/pressure-holding/index.js', 'utf8');
+const controllerSource = fs.readFileSync('modules/pressure-holding/controller.js', 'utf8');
+const viewModelSource = fs.readFileSync('modules/pressure-holding/viewModel.js', 'utf8');
+const viewSource = fs.readFileSync('modules/pressure-holding/view.js', 'utf8');
+const configSource = fs.readFileSync('modules/pressure-holding/config.js', 'utf8');
 
 assert.match(indexSource, /createPlatformModule\(\{/, 'index remains the platform adapter');
 assert.match(indexSource, /bind:\s*root\s*=>\s*bindPressureHoldingActions/, 'index delegates binding to controller');
@@ -24,10 +24,10 @@ assert.match(viewSource, /export function view/, 'view exports render function')
 assert.match(viewSource, /data-ph-dynamic="basis"/, 'view keeps dynamic island contract');
 assert.match(configSource, /phase-20d-platform-contract/, 'migration status contains 20D marker');
 
-const module = await import('../js/modules/pressure-holding/index.js');
-const controller = await import('../js/modules/pressure-holding/controller.js');
-const vm = await import('../js/modules/pressure-holding/viewModel.js');
-const view = await import('../js/modules/pressure-holding/view.js');
+const module = await import('../modules/pressure-holding/index.js');
+const controller = await import('../modules/pressure-holding/controller.js');
+const vm = await import('../modules/pressure-holding/viewModel.js');
+const view = await import('../modules/pressure-holding/view.js');
 
 assert.equal(typeof module.default.mount, 'function');
 assert.equal(typeof controller.bindPressureHoldingActions, 'function');

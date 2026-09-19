@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { buildRetentionRainByDuration, deriveRetentionFactors } from '../js/modules/flooding-verification/calculationAdapter.js';
-import { evaluateDwa117Applicability } from '../js/modules/flooding-verification/retentionApplicability.js';
+import { buildRetentionRainByDuration, deriveRetentionFactors } from '../modules/flooding-verification/calculationAdapter.js';
+import { evaluateDwa117Applicability } from '../modules/flooding-verification/retentionApplicability.js';
 
 const baseState = {
   retentionRecurrenceFrequencyPerYear: '0,5',

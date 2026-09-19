@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
-import schema from '../js/modules/f-gases-check/schema.js';
-import { calculate } from '../js/modules/f-gases-check/logic.js';
-import { buildFGasesResultModel } from '../js/modules/f-gases-check/results.js';
-import { buildFGasesReportDto } from '../js/modules/f-gases-check/reportAdapter.js';
-import { buildFGasesReportSections } from '../js/core/pdf/fGasesReportSections.js';
-import { F_GASES_SCHEMA_VERSION } from '../js/modules/f-gases-check/state.js';
-import { createFGasesSystemSnapshot, F_GASES_SYSTEM_SNAPSHOT_VERSION } from '../js/shared/fGasesSystemSnapshot.js';
+import schema from '../modules/f-gases-check/schema.js';
+import { calculate } from '../modules/f-gases-check/logic.js';
+import { buildFGasesResultModel } from '../modules/f-gases-check/results.js';
+import { buildFGasesReportDto } from '../modules/f-gases-check/reportAdapter.js';
+import { buildFGasesReportSections } from '../core/pdf/fGasesReportSections.js';
+import { F_GASES_SCHEMA_VERSION } from '../modules/f-gases-check/state.js';
+import { createFGasesSystemSnapshot, F_GASES_SYSTEM_SNAPSHOT_VERSION } from '../core/data/fGasesSystemSnapshot.js';
 
 assert.equal(F_GASES_SCHEMA_VERSION, 5);
 assert.equal(F_GASES_SYSTEM_SNAPSHOT_VERSION, 5);

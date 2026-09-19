@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import config from '../js/modules/hx-diagram/config.js';
-import { renderView } from '../js/modules/hx-diagram/view.js';
-import { renderHxInputCard } from '../js/modules/hx-diagram/formRenderer.js';
-import { createViewModel } from '../js/modules/hx-diagram/viewModel.js';
+import config from '../modules/hx-diagram/config.js';
+import { renderView } from '../modules/hx-diagram/view.js';
+import { renderHxInputCard } from '../modules/hx-diagram/formRenderer.js';
+import { createViewModel } from '../modules/hx-diagram/viewModel.js';
 
-const base = 'js/modules/hx-diagram/';
+const base = 'modules/hx-diagram/';
 const view = fs.readFileSync(base + 'view.js', 'utf8');
 const formRenderer = fs.readFileSync(base + 'formRenderer.js', 'utf8');
 

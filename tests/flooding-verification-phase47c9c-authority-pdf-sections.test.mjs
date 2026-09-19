@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { buildFloodingReportSections } from '../js/core/pdf/floodingReportSections.js';
+import { buildFloodingReportSections } from '../core/pdf/floodingReportSections.js';
 
 const surfaces = Array.from({ length: 205 }, (_, index) => ({
   id: `surface-${index + 1}`,
@@ -94,9 +94,9 @@ assert.match(sections[11].rows.map(row => row.join(' ')).join(' '), /DIN 1986-10
 assert.doesNotThrow(() => JSON.stringify(sections));
 assert.deepEqual(buildFloodingReportSections({ metadata: { dtoType: 'unknown' } }), []);
 
-const builderSource = fs.readFileSync(new URL('../js/core/pdf/floodingReportSections.js', import.meta.url), 'utf8');
-const mapperSource = fs.readFileSync(new URL('../js/core/pdf/pdfDataMapping.js', import.meta.url), 'utf8');
-const layoutSource = fs.readFileSync(new URL('../js/core/pdf/pdfLayout.js', import.meta.url), 'utf8');
+const builderSource = fs.readFileSync(new URL('../core/pdf/floodingReportSections.js', import.meta.url), 'utf8');
+const mapperSource = fs.readFileSync(new URL('../core/pdf/pdfDataMapping.js', import.meta.url), 'utf8');
+const layoutSource = fs.readFileSync(new URL('../core/pdf/pdfLayout.js', import.meta.url), 'utf8');
 assert.doesNotMatch(builderSource, /document\.|querySelector|innerHTML|canvas/i, 'Section Builder muss DOM-frei bleiben.');
 assert.match(builderSource, /formatEngineeringNumber/, 'Zahlenformatierung muss den zentralen Number-Service verwenden.');
 assert.match(mapperSource, /'techcalc\.flooding-verification\.report': buildFloodingReportSections/, 'Flooding Typed-DTO muss im zentralen PDF-Dispatcher registriert sein.');

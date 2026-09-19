@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const runtimeSource = readFileSync(new URL('../js/platform/moduleRuntime/index.js', import.meta.url), 'utf8');
 const cssSource = readFileSync(new URL('../css/components.css', import.meta.url), 'utf8');
-const savedRecordsSource = readFileSync(new URL('../js/core/savedRecords.js', import.meta.url), 'utf8');
+const savedRecordsSource = readFileSync(new URL('../core/savedRecords.js', import.meta.url), 'utf8');
 
 assert.match(runtimeSource, /const scheduler = getRenderScheduler\(root\)/, 'Segment changes must use the platform render scheduler.');
 assert.match(runtimeSource, /scheduler\?\.flushNow\?\.\(action\)/, 'Segment changes must flush the platform renderer immediately.');

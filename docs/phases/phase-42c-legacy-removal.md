@@ -23,7 +23,7 @@ Bearbeitete Schwerpunkte:
 
 Dateien:
 
-- `js/core/eventPipeline.js`
+- `core/events/eventPipeline.js`
 - `js/core/savedRecords.js`
 
 Befund aus 42B:

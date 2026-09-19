@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
-import { calculate } from '../js/modules/f-gases-check/logic.js';
-import schema from '../js/modules/f-gases-check/schema.js';
-import { buildFGasesResultModel } from '../js/modules/f-gases-check/results.js';
-import { buildFGasesReportDto } from '../js/modules/f-gases-check/reportAdapter.js';
-import { buildFGasesReportSections } from '../js/core/pdf/fGasesReportSections.js';
+import { calculate } from '../modules/f-gases-check/logic.js';
+import schema from '../modules/f-gases-check/schema.js';
+import { buildFGasesResultModel } from '../modules/f-gases-check/results.js';
+import { buildFGasesReportDto } from '../modules/f-gases-check/reportAdapter.js';
+import { buildFGasesReportSections } from '../core/pdf/fGasesReportSections.js';
 const completeExceptionCase = {
   schemaVersion: 5,
   systemName: 'Kaskadenanlage', applicationType: 'refrigeration', installationType: 'stationary', productCategory: 'self-contained-refrigeration-system', constructionType: 'cascade', ratedCapacityKw: '774',

@@ -2,9 +2,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { detectRuntimeLayout } from '../scripts/runtime-layout.mjs';
 
 const root = process.cwd();
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
+const runtimeLayout = detectRuntimeLayout(root);
 
 function listFiles(dir, predicate = () => true) {
   const base = path.join(root, dir);
@@ -39,13 +41,14 @@ const requiredAssets = [
   './manifest.json',
   './RELEASE_NOTES.md',
   ...listFiles('css', file => file.endsWith('.css')),
-  ...listFiles('js', file => file.endsWith('.js')),
+  ...runtimeLayout.runtimeDirs.flatMap(dir => listFiles(dir, file => file.endsWith('.js'))),
   ...listFiles('assets/icons')
 ];
 
 const missingAssets = requiredAssets.filter(asset => !assetSet.has(asset));
+const runtimeAssetPrefixes = ['./css/', ...runtimeLayout.runtimeDirs.map(dir => `./${dir}/`)];
 const staleRuntimeAssets = assets.filter(asset => (
-  (asset.startsWith('./js/') || asset.startsWith('./css/')) && !requiredAssets.includes(asset)
+  runtimeAssetPrefixes.some(prefix => asset.startsWith(prefix)) && !requiredAssets.includes(asset)
 ));
 
 assert.deepEqual(missingAssets, [], 'generated precache manifest must include every runtime JS/CSS/static shell asset');
@@ -60,7 +63,7 @@ const report = {
   status: 'passed',
   assets: {
     total: assets.length,
-    js: listFiles('js', file => file.endsWith('.js')).length,
+    js: runtimeLayout.runtimeDirs.flatMap(dir => listFiles(dir, file => file.endsWith('.js'))).length,
     css: listFiles('css', file => file.endsWith('.css')).length,
     icons: listFiles('assets/icons').length,
     missing: missingAssets.length,

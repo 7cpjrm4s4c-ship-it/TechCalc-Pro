@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRows } from '../js/modules/heating-cooling/results.js';
+import { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRows } from '../modules/heating-cooling/results.js';
 
-const indexSource = readFileSync('js/modules/heating-cooling/index.js', 'utf8');
-const viewSource = readFileSync('js/modules/heating-cooling/view.js', 'utf8');
-const resultsSource = readFileSync('js/modules/heating-cooling/results.js', 'utf8');
+const indexSource = readFileSync('modules/heating-cooling/index.js', 'utf8');
+const viewSource = readFileSync('modules/heating-cooling/view.js', 'utf8');
+const resultsSource = readFileSync('modules/heating-cooling/results.js', 'utf8');
 const platformRendererSource = readFileSync('js/platform/resultRenderer/index.js', 'utf8');
 
 assert.match(viewSource, /platform\/resultRenderer/, 'heating/cooling must render result areas through the platform result renderer.');

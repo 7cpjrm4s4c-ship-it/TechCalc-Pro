@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { calculate, lookupFullFlow, tableSlopePercent } from '../js/modules/flooding-verification/logic.js';
-import { floodingSurfaceSubtitle } from '../js/modules/flooding-verification/controller.js';
-import { verificationSnapshot, hydrateVerification, savedVerificationModel } from '../js/modules/flooding-verification/savedRecords.js';
+import { calculate, lookupFullFlow, tableSlopePercent } from '../modules/flooding-verification/logic.js';
+import { floodingSurfaceSubtitle } from '../modules/flooding-verification/controller.js';
+import { verificationSnapshot, hydrateVerification, savedVerificationModel } from '../modules/flooding-verification/savedRecords.js';
 
 const imported = {
   id: 'rain-1', sourceModule: 'rainwater', sourceId: 'source-1', origin: 'imported',

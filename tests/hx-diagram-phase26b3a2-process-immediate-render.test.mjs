@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
-import config from '../js/modules/hx-diagram/config.js';
-import { state } from '../js/modules/hx-diagram/state.js';
-import { calculate } from '../js/modules/hx-diagram/logic.js';
-import { createViewModel } from '../js/modules/hx-diagram/viewModel.js';
-import { isDynamicHxDiagramAction, updateHxDiagramDynamic } from '../js/modules/hx-diagram/dynamicRenderer.js';
+import config from '../modules/hx-diagram/config.js';
+import { state } from '../modules/hx-diagram/state.js';
+import { calculate } from '../modules/hx-diagram/logic.js';
+import { createViewModel } from '../modules/hx-diagram/viewModel.js';
+import { isDynamicHxDiagramAction, updateHxDiagramDynamic } from '../modules/hx-diagram/dynamicRenderer.js';
 
 const comparablePath = path => path.map(point => ({
   label: point.label,

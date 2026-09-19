@@ -3,7 +3,7 @@ import {
   addAuthorityTocPrelude,
   recordAuthorityTocEntry,
   renderAuthorityTableOfContents
-} from '../js/core/pdf/authorityTableOfContents.js';
+} from '../core/pdf/authorityTableOfContents.js';
 const entries = [];
 assert.equal(addAuthorityTocPrelude(entries, 3), true);
 assert.equal(addAuthorityTocPrelude(entries, 4), false, 'Zusammenfassung darf nur einmal erfasst werden.');

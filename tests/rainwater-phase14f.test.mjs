@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const rainwater = readFileSync(new URL('../js/modules/rainwater/index.js', import.meta.url), 'utf8');
+const rainwater = readFileSync(new URL('../modules/rainwater/index.js', import.meta.url), 'utf8');
 const moduleRenderer = readFileSync(new URL('../js/platform/moduleRenderer/index.js', import.meta.url), 'utf8');
-const controller = readFileSync(new URL('../js/modules/rainwater/controller.js', import.meta.url), 'utf8');
-const mount = readFileSync(new URL('../js/core/mount.js', import.meta.url), 'utf8');
+const controller = readFileSync(new URL('../modules/rainwater/controller.js', import.meta.url), 'utf8');
+const mount = readFileSync(new URL('../core/mount.js', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../css/components.css', import.meta.url), 'utf8');
 
 assert.match(mount, /root\.__tcActionHandlers = \{\}/, 'Module mounts must clear stale action handlers before rebinding the pipeline.');
