@@ -1,4 +1,4 @@
-import { logger } from './logger.js';
+import { logger } from './diagnostics/logger.js';
 import { modules } from './registry.js';
 import { initRouter, currentRoute, navigate } from './router.js';
 import { renderNavigation, renderQuickAccessSettings } from './navigation.js';
@@ -227,7 +227,7 @@ function render(id) {
   const finish = startPerformanceSpan('module:switch', { moduleId: id });
   return Promise.resolve(moduleRuntime.mount(id))
     .then(result => { finish({ moduleId: id, status: 'ok' }); return result; })
-    .catch(error => { finish({ moduleId: id, status: 'error', error: error?.message || String(error) }); throw error; });
+    .catch(error => { finish({ moduleId: id, status: 'error', error: error?.message || String(error)}); throw error; });
 }
 initRouter(render);
 renderQuickAccessSettings();
