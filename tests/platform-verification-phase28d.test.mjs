@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { PlatformScrollManager } from '../core/scrollManager.js';
-import { PlatformFocusManager } from '../core/focusManager.js';
+import { PlatformFocusManager } from '../core/ux/focusManager.js';
 import { createEventScope, getActiveEventListenerCount, snapshotEventListeners } from '../core/events/index.js';
 
 const root = process.cwd();
