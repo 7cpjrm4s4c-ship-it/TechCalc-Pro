@@ -1,4 +1,4 @@
-import { logger } from './logger.js';
+import { logger } from './diagnostics/logger.js';
 import { state as heatingCoolingState } from '../modules/heating-cooling/state.js';
 import { readLineSections, writeLineSections } from '../modules/heating-cooling/index.js';
 import { state as ventilationState } from '../modules/ventilation/state.js';
@@ -15,7 +15,6 @@ import { state as bufferStorageState } from '../modules/buffer-storage/state.js'
 import { state as wastewaterState } from '../modules/wastewater/state.js';
 import { state as rainwaterState } from '../modules/rainwater/state.js';
 import { readUsageUnits, writeUsageUnits, readSingleConsumers, writeSingleConsumers } from '../modules/drinking-water/logic.js';
-
 const DEFAULT_META = {
   client: '',
   project: '',
@@ -35,7 +34,6 @@ const DEFAULT_META = {
 const SESSION_SNAPSHOT_KEY = 'techcalc-session-snapshot';
 const PDF_COMPANY_LOGO_STORAGE_KEY = 'techcalc-pdf-company-logo';
 const PDF_COMPANY_LOGO_NAME_STORAGE_KEY = 'techcalc-pdf-company-logo-name';
-
 let projectMeta = { ...DEFAULT_META };
 let openedFileName = '';
 
@@ -46,7 +44,6 @@ function readPersistentPdfLogo() {
 function readPersistentPdfLogoName() {
   try { return localStorage.getItem(PDF_COMPANY_LOGO_NAME_STORAGE_KEY) || ''; } catch { return ''; }
 }
-
 function persistPdfLogo(logo = '', name = '') {
   try {
     if (logo) localStorage.setItem(PDF_COMPANY_LOGO_STORAGE_KEY, logo);
@@ -57,7 +54,6 @@ function persistPdfLogo(logo = '', name = '') {
     logger.warn('Firmenlogo konnte nicht dauerhaft gespeichert werden.', error, { module: 'project-storage' });
   }
 }
-
 export function saveSessionSnapshot() {
   try {
     sessionStorage.setItem(SESSION_SNAPSHOT_KEY, JSON.stringify(collectProjectData()));
@@ -67,7 +63,6 @@ export function saveSessionSnapshot() {
     return false;
   }
 }
-
 export function restoreSessionSnapshot(options = {}) {
   try {
     const raw = sessionStorage.getItem(SESSION_SNAPSHOT_KEY);
@@ -80,12 +75,10 @@ export function restoreSessionSnapshot(options = {}) {
     return false;
   }
 }
-
 function clone(value) {
   if (typeof structuredClone === 'function') return structuredClone(value);
   return JSON.parse(JSON.stringify(value));
 }
-
 function crc32(bytes) {
   if (!window.__techCalcCrcTable) {
     window.__techCalcCrcTable = Array.from({ length: 256 }, (_, index) => {
@@ -100,7 +93,6 @@ function crc32(bytes) {
   }
   return (crc ^ 0xFFFFFFFF) >>> 0;
 }
-
 function encodeUtf8(text = '') {
   return new TextEncoder().encode(String(text));
 }
@@ -136,7 +128,6 @@ function concatBytes(parts) {
   parts.forEach(part => { output.set(part, offset); offset += part.length; });
   return output;
 }
-
 function dataUrlToAsset(dataUrl = '', fallbackName = 'company-logo') {
   const match = String(dataUrl).match(/^data:([^;,]+)(;base64)?,(.*)$/);
   if (!match) return null;
@@ -155,7 +146,6 @@ function dataUrlToAsset(dataUrl = '', fallbackName = 'company-logo') {
   const name = /\.[a-z0-9]+$/i.test(safeName) ? safeName : `${safeName}.${extension}`;
   return { name, mime, bytes };
 }
-
 function bytesToDataUrl(bytes, mime = 'application/octet-stream') {
   let binary = '';
   const chunkSize = 0x8000;
@@ -164,7 +154,6 @@ function bytesToDataUrl(bytes, mime = 'application/octet-stream') {
   }
   return `data:${mime};base64,${btoa(binary)}`;
 }
-
 
 function mimeFromFileName(name = '') {
   const lower = String(name || '').toLowerCase();
@@ -199,7 +188,6 @@ function createTcpArchive(files = {}) {
   const localParts = [];
   const centralParts = [];
   let offset = 0;
-
   Object.entries(files).forEach(([name, content]) => {
     const nameBytes = encodeUtf8(name);
     const data = content instanceof Uint8Array ? content : encodeUtf8(content);
@@ -254,7 +242,6 @@ function createTcpArchive(files = {}) {
   writeU32(end, 12, centralDirectory.length);
   writeU32(end, 16, centralStart);
   writeU16(end, 20, 0);
-
   return new Blob([...localParts, centralDirectory, end], { type: 'application/vnd.techcalc.project' });
 }
 
@@ -263,7 +250,6 @@ async function readTcpArchive(file) {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const files = {};
   let offset = 0;
-
   while (offset + 30 <= bytes.length && readU32(view, offset) === 0x04034B50) {
     const flags = readU16(view, offset + 6);
     const method = readU16(view, offset + 8);
@@ -296,7 +282,6 @@ async function readTcpArchive(file) {
   project.meta = meta;
   return project;
 }
-
 function buildTcpProjectBlob(data = {}) {
   const project = clone(data);
   project.format = 'techcalc-project';
@@ -319,7 +304,6 @@ function buildTcpProjectBlob(data = {}) {
   files['project.json'] = JSON.stringify(project, null, 2);
   return createTcpArchive(files);
 }
-
 function buildTcprojProjectBlob(data = {}) {
   const project = clone(data);
   project.format = 'techcalc-project';
@@ -338,13 +322,11 @@ function buildTcprojProjectBlob(data = {}) {
   }
   return new Blob([JSON.stringify(project, null, 2)], { type: 'application/vnd.techcalc.project+json' });
 }
-
 export function getProjectMeta() {
   const fallbackLogo = projectMeta.companyLogo || readPersistentPdfLogo();
   const fallbackLogoName = projectMeta.companyLogoName || readPersistentPdfLogoName();
   return { ...DEFAULT_META, ...projectMeta, companyLogo: fallbackLogo, companyLogoName: fallbackLogoName };
 }
-
 export function setProjectMeta(next = {}) {
   const hasCompanyLogo = Object.prototype.hasOwnProperty.call(next, 'companyLogo');
   const hasCompanyLogoName = Object.prototype.hasOwnProperty.call(next, 'companyLogoName');
@@ -357,18 +339,14 @@ export function setProjectMeta(next = {}) {
   }
   return getProjectMeta();
 }
-
 export function resetProjectMeta() {
   projectMeta = { ...DEFAULT_META };
   persistPdfLogo('', '');
   openedFileName = '';
 }
-
 export function getOpenedFileName() {
   return openedFileName;
 }
-
-
 
 function normalizeDrinkingWaterProjectModule(moduleData = {}) {
   const moduleState = moduleData?.state && typeof moduleData.state === 'object' ? moduleData.state : {};
@@ -385,7 +363,6 @@ function normalizeDrinkingWaterProjectModule(moduleData = {}) {
     singleConsumers
   };
 }
-
 function normalizeHeatRecoveryProjectModule(moduleData = {}) {
   const moduleState = moduleData?.state && typeof moduleData.state === 'object' ? moduleData.state : {};
   const saved = Array.isArray(moduleData?.rltDevices)
@@ -399,34 +376,28 @@ function normalizeHeatRecoveryProjectModule(moduleData = {}) {
     rltDevices: saved
   };
 }
-
 function pickFields(source = {}, fields = []) {
   return fields.reduce((acc, field) => {
     if (Object.prototype.hasOwnProperty.call(source, field)) acc[field] = source[field];
     return acc;
   }, {});
 }
-
 const HEAT_RECOVERY_FIELDS = ['wrgVolumeFlowM3h', 'outdoorTemp', 'outdoorRh', 'extractTemp', 'extractRh', 'efficiency', 'bypassPercent', 'activeRltDeviceId', 'activeRltDeviceName', 'expandedRltDeviceId', 'savedRltDevices'];
 const MIXED_AIR_FIELDS = ['mixingOutdoorVolumeFlowM3h', 'mixingOutdoorTemp', 'mixingOutdoorRh', 'mixingRecircVolumeFlowM3h', 'mixingRecircTemp', 'mixingRecircRh', 'activeMixedAirId', 'activeMixedAirName', 'expandedMixedAirId', 'savedMixedAirStates'];
-
 function hasLegacyMixedAirFields(source = {}) {
   return MIXED_AIR_FIELDS.some(field => field !== 'savedMixedAirStates' && Object.prototype.hasOwnProperty.call(source || {}, field));
 }
-
 function isLegacyMixedAirRecord(item = {}) {
   const inputState = item.inputState && typeof item.inputState === 'object' ? item.inputState : {};
   const recordState = item.state && typeof item.state === 'object' ? item.state : {};
   const mode = String(item.mode || recordState.mode || inputState.mode || '').toLowerCase();
   if (mode.includes('misch') || mode.includes('mixing') || mode === 'mix') return true;
-
   // Phase 45C.2: early 1.3.2 projects can contain Mischluft saved records
   // without a reliable mode label. In that case the persisted input field set is
   // the stable discriminator. WRG records never own mixingOutdoor*/mixingRecirc*
   // fields, so they must be migrated to the dedicated mixed-air record store.
   return hasLegacyMixedAirFields(inputState) || hasLegacyMixedAirFields(recordState) || hasLegacyMixedAirFields(item);
 }
-
 function normalizeLegacyMixedAirRecord(item = {}) {
   const inputState = pickFields(item.inputState || item.state || item, MIXED_AIR_FIELDS);
   const id = item.id || `mixed-air-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
@@ -439,7 +410,6 @@ function normalizeLegacyMixedAirRecord(item = {}) {
     inputState
   };
 }
-
 function splitLegacyHeatRecoveryProjectModule(moduleData = {}) {
   const normalized = normalizeHeatRecoveryProjectModule(moduleData);
   const rltDevices = Array.isArray(normalized.rltDevices) ? normalized.rltDevices : [];
@@ -450,13 +420,11 @@ function splitLegacyHeatRecoveryProjectModule(moduleData = {}) {
     mixedAir: { state: { ...pickFields(normalized.state, MIXED_AIR_FIELDS), ...(mixedAirRecords.length ? { savedMixedAirStates: mixedAirRecords } : {}) } }
   };
 }
-
 function normalizeMixedAirProjectModule(moduleData = {}, legacyModule = null) {
   const moduleState = moduleData?.state && typeof moduleData.state === 'object' ? moduleData.state : {};
   const legacyState = legacyModule?.state && typeof legacyModule.state === 'object' ? legacyModule.state : {};
   return { state: pickFields({ ...legacyState, ...moduleState }, MIXED_AIR_FIELDS) };
 }
-
 export function collectProjectData() {
   return {
     app: 'TechCalc Pro',
@@ -487,7 +455,6 @@ export function collectProjectData() {
     }
   };
 }
-
 export function applyProjectData(data = {}, { fileName = '' } = {}) {
   const modules = data.modules || {};
   const legacyHeatRecoveryModule = modules['heat-recovery'] || modules.wrg || modules['wrg-mixed-air'];
@@ -528,7 +495,6 @@ export function applyProjectData(data = {}, { fileName = '' } = {}) {
 
   document.dispatchEvent(new CustomEvent('techcalc-project-loaded', { detail: { fileName: openedFileName } }));
 }
-
 export function resetAllSessionData() {
   resetProjectMeta();
   pressureHoldingState.reset();
@@ -549,7 +515,6 @@ export function resetAllSessionData() {
   writeUsageUnits([]);
   writeSingleConsumers([]);
 }
-
 export async function downloadProjectFile() {
   const data = collectProjectData();
   const meta = data.meta || {};
@@ -591,7 +556,6 @@ export async function downloadProjectFile() {
   document.dispatchEvent(new CustomEvent('techcalc-project-saved', { detail: { fileName: openedFileName } }));
   return true;
 }
-
 async function looksLikeZipArchive(file) {
   if (!file || typeof file.slice !== 'function') return false;
   try {
@@ -603,7 +567,6 @@ async function looksLikeZipArchive(file) {
 }
 
 export const PROJECT_FILE_EXTENSIONS = ['.tcproj', '.json', '.tcp'];
-
 function normalizeProjectFileExtension(name = '') {
   const lower = String(name || '').toLowerCase().trim();
   if (lower.endsWith('.tcproj')) return 'tcproj';
@@ -611,14 +574,12 @@ function normalizeProjectFileExtension(name = '') {
   if (lower.endsWith('.tcp')) return 'tcp';
   return '';
 }
-
 function normalizeProjectFileType(type = '') {
   const lower = String(type || '').toLowerCase().trim();
   if (lower === 'application/vnd.techcalc.project' || lower === 'application/zip') return 'tcp';
   if (lower === 'application/vnd.techcalc.project+json' || lower === 'application/json' || lower === 'text/json') return 'json';
   return '';
 }
-
 function hydrateEmbeddedProjectAssets(parsed = {}) {
   const assetLogo = parsed.assets?.companyLogo;
   if (assetLogo?.dataUrl) {
@@ -629,7 +590,6 @@ function hydrateEmbeddedProjectAssets(parsed = {}) {
   }
   return parsed;
 }
-
 function validateProjectPayload(parsed) {
   if (parsed?.project && typeof parsed.project === 'object') parsed = parsed.project;
   if (!parsed || typeof parsed !== 'object' || parsed.format !== 'techcalc-project') {
@@ -639,7 +599,6 @@ function validateProjectPayload(parsed) {
   parsed.modules = parsed.modules && typeof parsed.modules === 'object' ? parsed.modules : {};
   return parsed;
 }
-
 export async function readProjectFile(file) {
   const name = file?.name || '';
   const extension = normalizeProjectFileExtension(name) || normalizeProjectFileType(file?.type);
@@ -648,7 +607,6 @@ export async function readProjectFile(file) {
   if (!file || (!extension && !isZipBackedProject)) {
     throw new Error('Bitte eine TechCalc-Projektdatei mit der Endung .tcproj, .json oder .tcp auswählen.');
   }
-
   if (isZipBackedProject) {
     const parsed = hydrateEmbeddedProjectAssets(validateProjectPayload(await readTcpArchive(file)));
     return clone(parsed);
