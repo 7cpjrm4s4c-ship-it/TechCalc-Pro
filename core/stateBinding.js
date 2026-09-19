@@ -1,5 +1,5 @@
 import { commitAllFields, commitElementField } from './events/index.js';
-import { handlePlatformFieldNavigation } from './focusManager.js';
+import { handlePlatformFieldNavigation } from './ux/focusManager.js';
 
 function closest(root, target, selector) {
   const node = target?.closest?.(selector);
