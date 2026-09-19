@@ -236,7 +236,7 @@ trackGlobalEventListener(document, 'techcalc-project-loaded', () => render(curre
 let pdfExportReady;
 function ensurePdfExport() {
   if (!pdfExportReady) {
-    pdfExportReady = import('./pdfExport.js')
+    pdfExportReady = import('./pdf/index.js')
       .then(({ initPdfExport }) => initPdfExport({ modules, currentRoute }))
       .catch(error => {
         pdfExportReady = null;
