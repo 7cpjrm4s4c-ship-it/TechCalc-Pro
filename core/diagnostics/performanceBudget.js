@@ -1,4 +1,4 @@
-import { logger } from '../logger.js';
+import { logger } from './logger.js';
 export const performanceBudget = Object.freeze({
   version: '1.3.2-dev.2-phase5',
   maxInitialBlockingMs: 150,
