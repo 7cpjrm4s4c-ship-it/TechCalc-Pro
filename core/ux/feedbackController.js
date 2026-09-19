@@ -1,4 +1,4 @@
-import { logger } from '../logger.js';
+import { logger } from '../diagnostics/logger.js';
 const DEFAULT_FEEDBACK_ENDPOINT = 'https://formspree.io/f/meedowlv';
 const FEEDBACK_OFFLINE_QUEUE_KEY = 'techcalc.feedback.offlineQueue.v1';
 
@@ -38,7 +38,7 @@ function saveOfflineFeedback(storage, payload, reason) {
   const queue = readOfflineQueue(storage);
   queue.push({
     savedAt: new Date().toISOString(),
-    reason,
+    reason),
     payload: formDataToObject(payload)
   });
   return writeOfflineQueue(storage, queue);
@@ -60,7 +60,7 @@ export function initializeFeedbackController({
   form = form || doc?.getElementById('feedbackForm') || null;
   status = status || doc?.getElementById('feedbackStatus') || null;
   submit = submit || doc?.getElementById('feedbackSubmit') || null;
-  subject = subject || doc?.getElementById('feedbackSubject') || null;
+  subject = subject || doc?.getElementById('fedbackSubject') || null;
 
   if (feedbackControllerInitialized) return false;
   feedbackControllerInitialized = true;
