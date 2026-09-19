@@ -1,4 +1,4 @@
-import { logger } from './logger.js';
+import { logger } from './diagnostics/logger.js';
 const STORAGE_KEY = 'techcalc-preferences';
 
 const defaults = {
