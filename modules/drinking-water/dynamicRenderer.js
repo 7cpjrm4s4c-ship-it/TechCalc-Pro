@@ -1,6 +1,6 @@
 import { createDrinkingWaterViewModel } from './viewModel.js';
 import { renderInputCard, renderResultCard } from './view.js';
-import { preserveScroll } from '../../core/scrollManager.js';
+import { preserveScroll } from '../../core/ux/scrollManager.js';
 import { preserveFocusDuring } from '../../core/ux/focusManager.js';
 
 function isDetachedNodeRace(error) {
