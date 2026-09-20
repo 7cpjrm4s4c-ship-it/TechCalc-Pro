@@ -1,6 +1,6 @@
 import { modules } from './registry.js';
 import { currentRoute } from './router.js';
-import { loadPreferences, setMobileQuickAccess } from './preferences.js';
+import { loadPreferences, setMobileQuickAccess } from './ux/preferences.js';
 import { esc } from './renderer.js';
 
 const MOBILE_QUERY = '(max-width: 767px)';
@@ -9,14 +9,12 @@ export function renderNavigation(activeId = currentRoute()) {
   const nav = document.getElementById('primaryNav');
   const overflow = document.getElementById('overflowMenu');
   if (!nav || !overflow) return;
-
   const allModules = modules.all();
   const isMobile = matchMedia(MOBILE_QUERY).matches;
   const preferences = loadPreferences();
   const visibleIds = isMobile
     ? normalizeQuickAccess(preferences.mobileQuickAccess, allModules, 4)
     : normalizeQuickAccess(preferences.mobileQuickAccess, allModules, Math.max(1, calcDesktopSlots() - 1));
-
   const visibleModules = visibleIds.map(id => modules.get(id)).filter(Boolean);
   const overflowModules = allModules.filter(module => !visibleIds.includes(module.id));
   const activeInOverflow = overflowModules.some(module => module.id === activeId);
@@ -25,7 +23,6 @@ export function renderNavigation(activeId = currentRoute()) {
     ...visibleModules.map(module => renderTab(module, activeId)),
     renderOverflowButton(activeInOverflow, !overflow.hidden),
   ].join('');
-
   renderOverflowMenu(overflow, overflowModules, activeId, visibleIds, isMobile);
   bindPrimaryNav(nav, overflow);
 }
@@ -36,7 +33,6 @@ export function renderQuickAccessSettings() {
 
   const allModules = modules.all();
   const selectedIds = normalizeQuickAccess(loadPreferences().mobileQuickAccess, allModules, 4);
-
   host.innerHTML = `
     <div class="quick-access-list">
       ${selectedIds.map((id, index) => renderQuickAccessRow(modules.get(id), index, selectedIds.length)).join('')}
@@ -46,7 +42,6 @@ export function renderQuickAccessSettings() {
       ${allModules.map(module => renderQuickAccessToggle(module, selectedIds)).join('')}
     </div>
   `;
-
   host.querySelectorAll('[data-quick-remove]').forEach(button => {
     button.addEventListener('click', () => {
       const next = selectedIds.filter(id => id !== button.dataset.quickRemove);
@@ -59,7 +54,6 @@ export function renderQuickAccessSettings() {
     input.addEventListener('change', () => {
       const id = input.dataset.quickAdd;
       let next;
-
       if (input.checked) {
         next = selectedIds.includes(id)
           ? [...selectedIds]
@@ -72,7 +66,6 @@ export function renderQuickAccessSettings() {
       rerenderNavigationSettings();
     });
   });
-
   host.querySelectorAll('[data-quick-move]').forEach(button => {
     button.addEventListener('click', () => {
       const index = Number(button.dataset.index);
@@ -87,7 +80,6 @@ export function renderQuickAccessSettings() {
   });
 }
 
-
 function bindPrimaryNav(nav, overflow) {
   // Module buttons are handled once, globally, in app.js. Keeping navigation
   // itself passive prevents duplicate pointer/click flows that can mark a module
@@ -99,7 +91,6 @@ function bindPrimaryNav(nav, overflow) {
     overflow.hidden = !willOpen;
     event.currentTarget.setAttribute('aria-expanded', String(willOpen));
   });
-
   document.removeEventListener('click', closeOverflowOnOutsideClick);
   document.addEventListener('click', closeOverflowOnOutsideClick);
 }
@@ -109,12 +100,10 @@ function closeOverflowOnOutsideClick(event) {
   if (!overflow || overflow.hidden) return;
   if (!event.target.closest('.module-nav, #overflowMenu')) overflow.hidden = true;
 }
-
 function renderOverflowMenu(overflow, overflowModules, activeId, visibleIds, isMobile) {
   const content = overflowModules.length
     ? overflowModules.map(module => renderOverflowItem(module, activeId, isMobile)).join('')
     : '<div class="overflow-menu__empty">Alle Module sind in der Navigation sichtbar.</div>';
-
   overflow.innerHTML = `
     <div class="overflow-menu__card">
       <div class="overflow-menu__head">
@@ -126,7 +115,6 @@ function renderOverflowMenu(overflow, overflowModules, activeId, visibleIds, isM
       </div>
     </div>
   `;
-
   overflow.querySelectorAll('[data-set-quick]').forEach(button => {
     button.addEventListener('click', event => {
       event.preventDefault();
@@ -142,7 +130,6 @@ function renderOverflowMenu(overflow, overflowModules, activeId, visibleIds, isM
     });
   });
 }
-
 function normalizeQuickAccess(preferredIds, allModules, limit = 4) {
   const availableIds = allModules.map(module => module.id);
   const selected = [...new Set((preferredIds ?? []).filter(id => availableIds.includes(id)))];
@@ -158,7 +145,6 @@ function normalizeQuickAccess(preferredIds, allModules, limit = 4) {
 function fillToFour(ids, allModules) {
   return normalizeQuickAccess(ids, allModules, 4);
 }
-
 function renderTab(module, activeId) {
   return `
     <button class="module-tab ${module.id === activeId ? 'is-active' : ''}" data-module-id="${esc(module.id)}" data-accent="${esc(module.accent)}" type="button">
@@ -218,4 +204,3 @@ function rerenderNavigationSettings() {
 function calcDesktopSlots() {
   return Math.max(5, Math.floor(window.innerWidth / 340));
 }
-

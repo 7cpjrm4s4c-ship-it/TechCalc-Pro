@@ -1,4 +1,4 @@
-import { logger } from './diagnostics/logger.js';
+import { logger } from '../diagnostics/logger.js';
 const STORAGE_KEY = 'techcalc-preferences';
 
 const defaults = {
@@ -8,7 +8,6 @@ const defaults = {
 function unique(ids) {
   return [...new Set((ids || []).filter(Boolean))];
 }
-
 function readStoredPreferences() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -20,7 +19,6 @@ function readStoredPreferences() {
     return {};
   }
 }
-
 function writeStoredPreferences(next) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -35,7 +33,6 @@ preferences.mobileQuickAccess = unique(preferences.mobileQuickAccess).slice(0, 4
 export function loadPreferences() {
   return { ...preferences, mobileQuickAccess: [...preferences.mobileQuickAccess] };
 }
-
 export function savePreferences(prefs) {
   preferences = { ...preferences, ...prefs };
   preferences.mobileQuickAccess = unique(preferences.mobileQuickAccess).slice(0, 4);
