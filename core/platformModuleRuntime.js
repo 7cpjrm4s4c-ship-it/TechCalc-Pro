@@ -6,7 +6,7 @@ import { createSavedRecord, savedRecordReducer } from './savedRecordController.j
 // createSavedRecordActions( remains the central action-factory contract; Phase 17C.9
 // uses the Heizung/Kälte-compatible direct binding to avoid duplicate mobile events.
 import { canonicalGermanNumberInput } from './numbers.js';
-import { preserveScroll as keepScroll, preserveSavedRecordMutation, PlatformScrollManager } from './scrollManager.js';
+import { preserveScroll as keepScroll, preserveSavedRecordMutation, PlatformScrollManager } from './ux/scrollManager.js';
 import { PlatformFocusManager } from './ux/focusManager.js';
 import { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved, renderPlatformSaved } from './moduleRenderer.js';
 import { getRenderScheduler } from './renderScheduler.js';
