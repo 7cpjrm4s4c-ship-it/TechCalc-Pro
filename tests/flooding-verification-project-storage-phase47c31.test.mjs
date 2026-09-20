@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const storage = fs.readFileSync(new URL('../core/projectStorage.js', import.meta.url), 'utf8');
+const storage = fs.readFileSync(new URL('../core/storage/projectStorage.js', import.meta.url), 'utf8');
 const adapters = fs.readFileSync(new URL('../core/state/projectModuleStateAdapters.js', import.meta.url), 'utf8');
 
 test('Phase 47C.3.1 persists module states through the central adapter registry', () => {
