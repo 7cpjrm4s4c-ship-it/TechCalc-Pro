@@ -1,6 +1,6 @@
 export * from '../projectStorage.js';
 export * from '../projectStorageBase.js';
-export * from '../saveEditModeSync.js';
+export * from '../ux/saveEditModeSync.js';
 export * from './savedCalculationController.js';
 export * from '../savedRecordController.js';
 export * from '../savedRecords.js';
