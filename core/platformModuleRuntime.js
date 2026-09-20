@@ -1,6 +1,6 @@
 import { mountModule } from './mount.js';
 import { bindCommonInputs, bindNoClickScroll } from './renderer.js';
-import { bindModuleStateBinding } from './stateBinding.js';
+import { bindModuleStateBinding } from './state/stateBinding.js';
 import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from './events/index.js';
 import { createSavedRecord, savedRecordReducer } from './savedRecordController.js';
 // createSavedRecordActions( remains the central action-factory contract; Phase 17C.9
