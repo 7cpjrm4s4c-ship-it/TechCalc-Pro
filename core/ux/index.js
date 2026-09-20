@@ -5,6 +5,7 @@ export * from './feedbackController.js';
 export * from './layoutStabilityController.js';
 export * from './performanceController.js';
 export * from './releaseNotesController.js';
+export * from './saveEditModeSync.js';
 export * from './serviceWorkerController.js';
 export * from './settingsController.js';
 export * from './themeController.js';

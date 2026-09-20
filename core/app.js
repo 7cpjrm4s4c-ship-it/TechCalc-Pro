@@ -27,7 +27,7 @@ import { initializeReleaseNotesController } from './ux/releaseNotesController.js
 import { initializeFeedbackController } from './ux/feedbackController.js';
 import { initializeServiceWorkerController } from './ux/serviceWorkerController.js';
 import { initializePerformanceController, markPerformance, measurePerformance, startPerformanceSpan } from './ux/performanceController.js';
-import { initializeSaveEditModeSync } from './saveEditModeSync.js';
+import { initializeSaveEditModeSync } from './ux/saveEditModeSync.js';
 import { initializeLayoutStabilityController } from './ux/layoutStabilityController.js';
 const APP_VERSION = '1.6.1'; // generated from package.json
 initializeLayoutStabilityController();
