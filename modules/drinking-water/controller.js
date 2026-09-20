@@ -4,8 +4,7 @@ import { isSameId } from '../../core/savedRecords.js';
 import { safeReplaceContent } from '../../core/domUpdate.js';
 import { createDrinkingWaterViewModel } from './viewModel.js';
 import { renderInputCard, renderResultCard, draftConsumerList } from './view.js';
-import { runWithoutScrollJump } from '../../core/scrollManager.js';
-
+import { runWithoutScrollJump } from '../../core/ux/scrollManager.js';
 
 function commitVisibleFields(root) {
   if (!root?.querySelectorAll) return;
@@ -15,20 +14,17 @@ function commitVisibleFields(root) {
   });
   if (Object.keys(patch).length) state.set(patch, { action:'dw:commit-visible-fields', notify:false });
 }
-
 function syncSavedRecordsPatch(patch = {}, action = 'dw:saved-sync') {
   const next = { ...patch };
   if (Object.prototype.hasOwnProperty.call(next, 'savedUsageUnits')) writeUsageUnits(next.savedUsageUnits || []);
   if (Object.prototype.hasOwnProperty.call(next, 'savedSingleConsumers')) writeSingleConsumers(next.savedSingleConsumers || []);
   state.set(next, { action, notify:false });
 }
-
 export function normalizeDrinkingWaterSavedState(snapshot = {}) {
   const savedUsageUnits = Array.isArray(snapshot.savedUsageUnits) && snapshot.savedUsageUnits.length ? snapshot.savedUsageUnits : readUsageUnits();
   const savedSingleConsumers = Array.isArray(snapshot.savedSingleConsumers) && snapshot.savedSingleConsumers.length ? snapshot.savedSingleConsumers : readSingleConsumers();
   return { ...snapshot, savedUsageUnits, savedSingleConsumers };
 }
-
 export function hydrateDrinkingWaterSavedState() {
   const current = state.get();
   const patch = {};
@@ -36,7 +32,6 @@ export function hydrateDrinkingWaterSavedState() {
   if ((!Array.isArray(current.savedSingleConsumers) || !current.savedSingleConsumers.length) && readSingleConsumers().length) patch.savedSingleConsumers = readSingleConsumers();
   if (Object.keys(patch).length) state.set(patch, { action:'dw:migrate-saved-records', notify:false });
 }
-
 function normalizeSingleGroupForEdit(group) {
   if (!group) return null;
   if (Array.isArray(group.consumers)) return { ...group, consumers: group.consumers.map(c => ({ ...c })) };
@@ -63,9 +58,6 @@ function normalizeSingleGroupForEdit(group) {
   };
 }
 
-
-
-
 function commitWaterHeatingModeSegment(root, segment, event = null) {
   if (!segment || !root?.contains?.(segment)) return false;
   if (segment.dataset.segment !== 'waterHeatingMode') return false;
@@ -82,7 +74,6 @@ function commitWaterHeatingModeSegment(root, segment, event = null) {
     event?.stopImmediatePropagation?.();
     return true;
   }
-
   event?.preventDefault?.();
   event?.stopPropagation?.();
   event?.stopImmediatePropagation?.();
@@ -92,14 +83,12 @@ function commitWaterHeatingModeSegment(root, segment, event = null) {
     button.classList.toggle('is-active', selected);
     button.setAttribute('aria-selected', String(selected));
   });
-
   state.set({ waterHeatingMode: value }, { action:'platform:segment:waterHeatingMode', notify:false });
   refreshDrinkingWater(root);
   queueMicrotask?.(() => refreshDrinkingWater(root));
   setTimeout(() => refreshDrinkingWater(root), 0);
   return true;
 }
-
 function installWaterHeatingModeSegmentBridge(root) {
   if (!root || root.__tcDrinkingWaterWaterHeatingSegmentBound) return;
   root.__tcDrinkingWaterWaterHeatingSegmentBound = true;
@@ -111,7 +100,6 @@ function installWaterHeatingModeSegmentBridge(root) {
   root.addEventListener('pointerdown', direct, true);
   root.addEventListener('touchstart', direct, { capture:true, passive:false });
 }
-
 function releaseKeyboardNavigationLock(root, delay = 120) {
   if (typeof document === 'undefined') return;
   const release = () => {
@@ -122,7 +110,6 @@ function releaseKeyboardNavigationLock(root, delay = 120) {
   if (delay > 0) setTimeout(release, delay);
   else release();
 }
-
 function installNavigationPersistenceGuard(root) {
   if (!root || root.__tcDrinkingWaterNavPersistenceBound) return;
   root.__tcDrinkingWaterNavPersistenceBound = true;
@@ -132,7 +119,6 @@ function installNavigationPersistenceGuard(root) {
     releaseKeyboardNavigationLock(root, 240);
     releaseKeyboardNavigationLock(root, 520);
   };
-
   root.addEventListener('focusout', event => {
     if (!event.target?.closest?.('input[data-field], textarea[data-field]')) return;
     scheduleRelease();
@@ -147,7 +133,6 @@ function installNavigationPersistenceGuard(root) {
     if (!event.target?.closest?.('input[data-field], textarea[data-field]')) return;
     scheduleRelease();
   }, true);
-
   const viewport = typeof window !== 'undefined' ? window.visualViewport : null;
   if (viewport && !root.__tcDrinkingWaterVisualViewportGuardBound) {
     root.__tcDrinkingWaterVisualViewportGuardBound = true;
@@ -155,11 +140,9 @@ function installNavigationPersistenceGuard(root) {
     viewport.addEventListener('scroll', scheduleRelease, { passive: true });
   }
 }
-
 function preserveScrollPosition(callback) {
   return runWithoutScrollJump(callback, { frames: 2, delays: [0, 40, 100], skipDuringActiveTouch: true });
 }
-
 export function refreshDrinkingWater(root) {
   preserveScrollPosition(() => {
     const s = state.get();
@@ -172,11 +155,9 @@ export function refreshDrinkingWater(root) {
   releaseKeyboardNavigationLock(root, 0);
   releaseKeyboardNavigationLock(root, 180);
 }
-
 function draftKey(type) {
   return type === 'unit' ? 'unitDraftConsumers' : 'singleDraftConsumers';
 }
-
 function addDraftConsumer(type, root = null) {
   commitVisibleFields(root);
   const s = state.get();
@@ -186,14 +167,12 @@ function addDraftConsumer(type, root = null) {
   }
   state.set({ singleDraftConsumers: [...(s.singleDraftConsumers || []), createConsumer({ typeId:s.singleConsumerType, count:s.singleCount, permanent:String(s.singlePermanent)==='true' })] }, { action:'dw:draft-add', notify:false });
 }
-
 function removeDraftConsumer(type, index) {
   const key = draftKey(type);
   const next = [...(state.get()[key] || [])];
   next.splice(Number(index), 1);
   state.set({ [key]: next }, { action:'dw:draft-remove', notify:false });
 }
-
 function updateDraftCount(type, index, value) {
   const key = draftKey(type);
   const next = [...(state.get()[key] || [])];
@@ -201,20 +180,17 @@ function updateDraftCount(type, index, value) {
   if (next[i]) next[i] = { ...next[i], count: Math.max(0, Number(value || 0)) };
   state.set({ [key]: next }, { action:'dw:draft-count', notify:false });
 }
-
 function draftOrCurrentUnitConsumers(s) {
   const consumers = [...(s.unitDraftConsumers || [])];
   if (!consumers.length) consumers.push(createConsumer({ typeId:s.unitConsumerType, count:s.unitCount }));
   return consumers;
 }
-
 function draftOrCurrentSingleConsumers(s) {
   const permanent = String(s.singlePermanent) === 'true';
   const consumers = [...(s.singleDraftConsumers || [])];
   if (!consumers.length) consumers.push(createConsumer({ typeId:s.singleConsumerType, count:s.singleCount, permanent }));
   return consumers.map(c => ({ ...c, permanent }));
 }
-
 function saveUnit(root, update = false) {
   return runWithoutScrollJump(() => {
   commitVisibleFields(root);
@@ -232,7 +208,6 @@ function saveUnit(root, update = false) {
   refreshDrinkingWater(root);
   }, { frames: 2, delays: [0, 40, 100], skipDuringActiveTouch: true });
 }
-
 function saveSingle(root, update = false) {
   return runWithoutScrollJump(() => {
   commitVisibleFields(root);
@@ -250,7 +225,6 @@ function saveSingle(root, update = false) {
   refreshDrinkingWater(root);
   }, { frames: 2, delays: [0, 40, 100], skipDuringActiveTouch: true });
 }
-
 function deleteUnit(root, id) {
   return runWithoutScrollJump(() => {
   syncSavedRecordsPatch({ savedUsageUnits: normalizeDrinkingWaterSavedState(state.get()).savedUsageUnits.filter(item => !isSameId(item.id, id)) }, 'dw:unit-delete');
@@ -258,7 +232,6 @@ function deleteUnit(root, id) {
   refreshDrinkingWater(root);
   }, { frames: 2, delays: [0, 40, 100], skipDuringActiveTouch: true });
 }
-
 function deleteSingle(root, id) {
   return runWithoutScrollJump(() => {
   syncSavedRecordsPatch({ savedSingleConsumers: normalizeDrinkingWaterSavedState(state.get()).savedSingleConsumers.filter(item => !isSameId(item.id, id)) }, 'dw:single-delete');
@@ -266,7 +239,6 @@ function deleteSingle(root, id) {
   refreshDrinkingWater(root);
   }, { frames: 2, delays: [0, 40, 100], skipDuringActiveTouch: true });
 }
-
 function editUnit(root, id) {
   const current = state.get();
   if (isSameId(current.activeUnitId, id)) {
@@ -278,7 +250,6 @@ function editUnit(root, id) {
   state.set({ activeUnitId:unit.id, activeSingleId:null, unitName:unit.name, unitSimultaneityFactor:unit.simultaneityFactor || '', singleName:'', unitDraftConsumers:unit.consumers || [], singleDraftConsumers:[], uiUnitFormOpen:Boolean(current.uiUnitFormOpen), uiUnitSavedOpen:true }, { action:'dw:unit-edit', notify:false });
   refreshDrinkingWater(root);
 }
-
 function editSingle(root, id) {
   const current = state.get();
   if (isSameId(current.activeSingleId, id)) {
@@ -291,21 +262,18 @@ function editSingle(root, id) {
   state.set({ activeUnitId:null, activeSingleId:group.id, unitName:'', unitDraftConsumers:[], singleName:group.name, singleDraftConsumers:consumers, singlePermanent:String(consumers.some(c => c.permanent)), uiSingleFormOpen:Boolean(current.uiSingleFormOpen), uiSingleSavedOpen:true }, { action:'dw:single-edit', notify:false });
   refreshDrinkingWater(root);
 }
-
 function clearActiveEdit(root) {
   const current = state.get();
   if (!current.activeUnitId && !current.activeSingleId) return;
   state.set({ activeUnitId:null, activeSingleId:null, unitName:'', unitSimultaneityFactor:'', singleName:'', unitDraftConsumers:[], singleDraftConsumers:[] }, { action:'dw:clear-active', notify:false });
   refreshDrinkingWater(root);
 }
-
 function updateAccordionState(event) {
   const details = event.target.closest?.('[data-dw-accordion]');
   if (!details) return;
   const key = details.dataset.dwAccordion;
   queueMicrotask(() => state.set({ [key]: details.open }, { action:'dw:accordion', notify:false }));
 }
-
 export function bindDrinkingWaterActions(root) {
   hydrateDrinkingWaterSavedState();
   installNavigationPersistenceGuard(root);
@@ -331,7 +299,6 @@ export function bindDrinkingWaterActions(root) {
     }
     updateAccordionState(event);
   });
-
   root.addEventListener('toggle', updateAccordionState, true);
   root.addEventListener('pointerdown', event => {
     const draftAdd = event.target?.closest?.('[data-dw-draft-add]');
@@ -342,7 +309,6 @@ export function bindDrinkingWaterActions(root) {
     addDraftConsumer(draftAdd.dataset.dwDraftAdd, root);
     refreshDrinkingWater(root);
   }, true);
-
   root.addEventListener('touchstart', event => {
     const draftAdd = event.target?.closest?.('[data-dw-draft-add]');
     if (!draftAdd || !root.contains(draftAdd)) return;
@@ -352,16 +318,12 @@ export function bindDrinkingWaterActions(root) {
     addDraftConsumer(draftAdd.dataset.dwDraftAdd, root);
     refreshDrinkingWater(root);
   }, { capture:true, passive:false });
-
-
-
   root.addEventListener('click', event => {
     const target = event.target;
     const unitToggle = target.closest('[data-dw-toggle-unit]');
     if (unitToggle && root.contains(unitToggle)) { event.preventDefault(); event.stopPropagation(); const id = unitToggle.dataset.dwToggleUnit; state.set({ expandedUnitId: isSameId(state.get().expandedUnitId, id) ? null : id }, { action:'dw:unit-toggle', notify:false }); refreshDrinkingWater(root); return; }
     const singleToggle = target.closest('[data-dw-toggle-single]');
     if (singleToggle && root.contains(singleToggle)) { event.preventDefault(); event.stopPropagation(); const id = singleToggle.dataset.dwToggleSingle; state.set({ expandedSingleId: isSameId(state.get().expandedSingleId, id) ? null : id }, { action:'dw:single-toggle', notify:false }); refreshDrinkingWater(root); return; }
-
     const removeDraft = target.closest('[data-dw-remove-draft]');
     if (removeDraft && root.contains(removeDraft)) { event.preventDefault(); event.stopPropagation(); removeDraftConsumer(removeDraft.dataset.dwRemoveDraft, removeDraft.dataset.index); refreshDrinkingWater(root); return; }
     const draftAdd = target.closest('[data-dw-draft-add]');
@@ -390,7 +352,6 @@ export function bindDrinkingWaterActions(root) {
       }
       event.preventDefault(); event.stopPropagation(); state.set({ [segment.dataset.segment]: segment.dataset.value }, { action:'dw:segment', notify:false }); refreshDrinkingWater(root); return;
     }
-
     const ignored = target.closest('[data-dw-unit-edit], [data-dw-single-edit], [data-dw-unit-delete], [data-dw-single-delete], [data-dw-add-unit], [data-dw-update-unit], [data-dw-add-single], [data-dw-update-single], [data-dw-draft-add], [data-dw-remove-draft], [data-dw-draft-count], [data-line-toggle], details, summary, input, select, textarea, button, label, .segmented');
     if (!ignored) {
       clearActiveEdit(root);
