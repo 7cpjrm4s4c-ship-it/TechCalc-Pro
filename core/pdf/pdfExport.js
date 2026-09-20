@@ -1,5 +1,5 @@
 import { logger } from '../diagnostics/logger.js';
-import { getProjectMeta, setProjectMeta, downloadProjectFile, readProjectFile, applyProjectData, getOpenedFileName, saveSessionSnapshot } from '../projectStorage.js';
+import { getProjectMeta, setProjectMeta, downloadProjectFile, readProjectFile, applyProjectData, getOpenedFileName, saveSessionSnapshot } from '../storage/projectStorage.js';
 import { collectCurrentModule, pdfFileName } from './pdfDataMapping.js';
 import { GlobalPdfReport } from './pdfLayout.js';
 import { normalizeImageToJpeg, svgToJpeg, canvasToJpeg, createFallbackIconJpeg } from './pdfChartRender.js';
