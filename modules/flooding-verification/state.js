@@ -1,4 +1,4 @@
-import { createModuleState } from '../../core/state/index.js';
+import { createModuleState } from '../../core/state/state.js';
 
 export const FLOODING_VERIFICATION_SCHEMA_VERSION = 2;
 export const initialState = {

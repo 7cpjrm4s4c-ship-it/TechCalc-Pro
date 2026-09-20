@@ -1,4 +1,4 @@
-import { createModuleState } from '../../core/state/index.js';
+import { createModuleState } from '../../core/state/state.js';
 import { getDataVersions } from '../../core/data/index.js';
 
 export const EN_378_SAFETY_CHECK_SCHEMA_VERSION = 1;
