@@ -1,18 +1,16 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { detectRuntimeLayout } from './runtime-layout.mjs';
-
 const root = new URL('..', import.meta.url).pathname;
 const { coreDir, modulesDir } = detectRuntimeLayout(root);
 const runtimeRoots = [join(root, coreDir), join(root, modulesDir)];
 const CENTRAL_KEYBOARD_FILES = new Set([
   'core/events/eventPipeline.js',
   'core/ux/focusManager.js',
-  'core/stateBinding.js',
+  'core/state/stateBinding.js',
   'core/savedRecords.js',
   'core/ux/settingsController.js'
 ]);
-
 const ALLOWED_NON_KEYBOARD_KEY_PROPERTIES = new Set([
   // Dedupe keys, not KeyboardEvent.key usage.
   'modules/hx-diagram/controller.js',
@@ -35,7 +33,6 @@ function walk(dir) {
   }
   return out;
 }
-
 function rel(path) {
   return relative(root, path).replaceAll('\\', '/');
 }
@@ -50,7 +47,6 @@ for (const file of runtimeRoots.flatMap(walk)) {
   if (!isCentral && (BLOCKED_LISTENER_RE.test(src) || BLOCKED_HANDLER_PROP_RE.test(src))) {
     failures.push(`${fileRel}: local keydown/keypress/keyup listener is not allowed outside the central keyboard contract.`);
   }
-
   if (!isCentral && EVENT_KEY_RE.test(src)) {
     failures.push(`${fileRel}: KeyboardEvent event.key usage is not allowed outside the central keyboard contract.`);
   }
