@@ -1,7 +1,6 @@
 import { esc, inlineStats } from './renderer.js';
 import { markCommittedAction } from './formActions.js';
-import { preserveSavedRecordScroll, preserveSavedRecordMutation } from './scrollManager.js';
-
+import { preserveSavedRecordScroll, preserveSavedRecordMutation } from './ux/scrollManager.js';
 export function createRecordId(prefix = 'record') {
   try {
     if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') return globalThis.crypto.randomUUID();
@@ -11,12 +10,10 @@ export function createRecordId(prefix = 'record') {
 export function isSameId(a, b) {
   return String(a ?? '') === String(b ?? '');
 }
-
 export function replaceRecord(items, id, nextRecord) {
   const list = Array.isArray(items) ? items : [];
   return list.map(item => isSameId(item.id, id) ? nextRecord : item);
 }
-
 export function removeRecord(items, id) {
   return (Array.isArray(items) ? items : []).filter(item => !isSameId(item.id, id));
 }
@@ -49,7 +46,6 @@ export function renderSavedRecordList(items = [], {
     </article>`;
   }).join('')}</div>`;
 }
-
 function renderActionClass(disabled, { secondaryWhenDisabled = false } = {}) {
   const isDisabled = Boolean(disabled);
   const classes = ['action-button'];
@@ -57,12 +53,10 @@ function renderActionClass(disabled, { secondaryWhenDisabled = false } = {}) {
   classes.push(isDisabled ? 'is-disabled' : 'is-enabled');
   return classes.join(' ');
 }
-
 function renderDisabledAttributes(disabled) {
   const isDisabled = Boolean(disabled);
   return `aria-disabled="${isDisabled ? 'true' : 'false'}" data-enabled="${isDisabled ? 'false' : 'true'}"${isDisabled ? ' disabled' : ''}`;
 }
-
 export function renderSavedRecordPanel({
   title = 'Gespeicherte Einträge',
   nameFieldId = 'recordName',
@@ -95,7 +89,6 @@ function bindScopedOnce(root, key, eventName, listener, options) {
   root.__tcSavedRecordBindings.add(bindingKey);
   root.addEventListener(eventName, listener, options);
 }
-
 function closestAttr(target, attr, root) {
   const item = target?.closest?.(`[${attr}]`);
   return item && root.contains(item) ? item : null;
@@ -108,7 +101,6 @@ function shouldIgnoreLoad(event, toggleAttr, deleteAttr) {
     target?.closest?.('a[href], input, select, textarea, label')
   );
 }
-
 function activateLoad({ root, card, event, loadAttr, onLoad, preserveLoadScroll }) {
   const id = card.getAttribute(loadAttr);
   if (!id) return;
@@ -131,7 +123,6 @@ export function bindSavedRecordList(root, {
 } = {}) {
   if (!root) return;
   const key = `${loadAttr}|${toggleAttr}|${deleteAttr}`;
-
   const handleActivation = event => {
     const toggle = closestAttr(event.target, toggleAttr, root);
     if (toggle) {
@@ -153,7 +144,6 @@ export function bindSavedRecordList(root, {
       }, { anchor: card, event });
       return true;
     }
-
     const deleteButton = closestAttr(event.target, deleteAttr, root);
     if (deleteButton) {
       event.preventDefault();
@@ -163,7 +153,6 @@ export function bindSavedRecordList(root, {
       onDelete?.(deleteButton.getAttribute(deleteAttr), deleteButton, event);
       return true;
     }
-
     const card = closestAttr(event.target, loadAttr, root);
     if (!card || shouldIgnoreLoad(event, toggleAttr, deleteAttr)) return false;
     activateLoad({ root, card, event, loadAttr, onLoad, preserveLoadScroll });
@@ -173,7 +162,6 @@ export function bindSavedRecordList(root, {
   // Phase 42C: no pointerdown activation for saved records. The click and
   // keyboard paths below are the single activation contract. Early DOM mutation
   // during touch/pointer resolution was a legacy scroll-jump source.
-
   bindScopedOnce(root, key, 'click', event => {
     const candidate = event.target?.closest?.(`[${loadAttr}], [${toggleAttr}], [${deleteAttr}], [data-line-card], [data-saved-record-card]`);
     const id = candidate?.getAttribute?.(loadAttr) || candidate?.getAttribute?.(toggleAttr) || candidate?.getAttribute?.(deleteAttr) || candidate?.dataset?.savedRecordId || '';
@@ -187,7 +175,6 @@ export function bindSavedRecordList(root, {
     }
     handleActivation(event);
   }, true);
-
   bindScopedOnce(root, key, 'keydown', event => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     const card = closestAttr(event.target, loadAttr, root);
