@@ -1,6 +1,6 @@
 export * from './focusManager.js';
 export * from './preferences.js';
-export * from '../scrollManager.js';
+export * from './scrollManager.js';
 export * from './feedbackController.js';
 export * from './layoutStabilityController.js';
 export * from './performanceController.js';
