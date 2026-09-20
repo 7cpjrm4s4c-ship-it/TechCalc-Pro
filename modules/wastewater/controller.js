@@ -7,7 +7,7 @@ import { deleteCollectionItem, patchCollectionItem, upsertCollectionRecord, crea
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { commitAllFields } from '../../core/events/index.js';
-import { PlatformScrollManager } from '../../core/scrollManager.js';
+import { PlatformScrollManager } from '../../core/ux/scrollManager.js';
 const numericFields = new Set(['fixtureQuantity','fixtureCustomDu','kValue','fillRatio','slopeCmM','pipeLengthM','heightDifferenceM','bends90','continuousFlow','pumpFlow','rainFlow']);
 const normalizeNumeric = value => canonicalGermanNumberInput(value);
 const normalizedFixtureQuantity = value => Math.max(0, Math.round(normalizeQuantityInput(value, 1)) || 0);
@@ -41,7 +41,6 @@ function addFixture({ current = {}, root } = {}) {
 function patchFixtureQuantity({ id, value, current = {} } = {}) {
   return { fixtures: patchCollectionItem(current.fixtures || [], id, { quantity: String(normalizedFixtureQuantity(value)) }) };
 }
-
 function deleteFixture({ id, current = {} } = {}) {
   return { fixtures: deleteCollectionItem(current.fixtures || [], id) };
 }
@@ -58,7 +57,6 @@ export function hydrate(item = {}, current = {}) {
   const patch = hydrateStateRecord(item, { activeIdKey: 'activeCalculationId', nameKey: 'name' });
   return { ...patch, savedCalculations: current.savedCalculations || [] };
 }
-
 export function clear(current = {}) {
   return { ...initialState, savedCalculations: current.savedCalculations || [] };
 }
@@ -94,14 +92,12 @@ const FILL_RATIO_LABELS = Object.freeze({
   '0.7': 'h/di 0,7',
   '1.0': 'h/di 1,0'
 });
-
 function displayNumber(value, digits = 2) {
   if (value === '' || value === null || value === undefined) return '—';
   const number = typeof value === 'number' ? value : toNumber(value);
   if (!Number.isFinite(number)) return '—';
   return new Intl.NumberFormat('de-DE', { maximumFractionDigits: digits }).format(number);
 }
-
 function row(label, value, unit = '', digits = 2) {
   const normalized = typeof value === 'number' || /^-?\d+(?:[.,]\d+)?$/.test(String(value ?? '').trim())
     ? displayNumber(value, digits)
@@ -112,7 +108,6 @@ function row(label, value, unit = '', digits = 2) {
 function positiveRow(label, value, unit = '', digits = 2) {
   return toNumber(value) > 0 ? row(label, value, unit, digits) : null;
 }
-
 function lineTypeLabel(value) {
   return LINE_TYPE_LABELS[value] || value || '—';
 }
@@ -120,7 +115,6 @@ function usageTypeLabel(current = {}) {
   const usage = usageTypes.find(item => item.value === current.usageType);
   return usage?.label || (current.usageType === 'custom' ? 'Benutzerdefinierte Abflusskennzahl' : '—');
 }
-
 function fixtureSummary(item = {}) {
   return [
     `Anzahl ${displayNumber(item.qty, 0)} Stk.`,
@@ -268,7 +262,6 @@ const structuralFields = new Set([
   'fixtureType',
   'holdingType'
 ]);
-
 export function isDynamicWastewaterAction(meta = {}) {
   const action = String(meta.action || '');
   return action !== 'initial';
