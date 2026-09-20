@@ -1,11 +1,10 @@
-import { preserveViewport as preserveRendererViewport } from './renderer.js';
+import { preserveViewport as preserveRendererViewport } from '../renderer.js';
 
 export const SCROLL_STABILITY_PRESETS = Object.freeze({
   default: Object.freeze({ frames: 3, blurActive: false, delays: [0, 40, 100] }),
   action: Object.freeze({ frames: 3, blurActive: false, delays: [0, 40, 100] }),
   savedRecord: Object.freeze({ frames: 4, blurActive: false, delays: [0, 16, 40, 100] })
 });
-
 export function preserveScroll(action, preset = 'default', overrides = {}) {
   const base = SCROLL_STABILITY_PRESETS[preset] || SCROLL_STABILITY_PRESETS.default;
   return preserveRendererViewport(action, { ...base, ...overrides });
@@ -14,7 +13,6 @@ export function preserveScroll(action, preset = 'default', overrides = {}) {
 export function preserveActionScroll(action, overrides = {}) {
   return preserveScroll(action, 'action', overrides);
 }
-
 export function preserveSavedRecordScroll(action, overrides = {}) {
   // Dev.34: saved-record actions must not force window.scrollTo.
   // On iOS the delayed restore chain caused visible jumps after selection/delete.
@@ -26,12 +24,8 @@ export function preserveSavedRecordMutation(action, overrides = {}) {
   // Dev.34: no delayed restore chain for saved-record mutations.
   return action?.();
 }
-
-
-
 let touchScrollActive = false;
 let touchScrollListenersBound = false;
-
 function bindTouchScrollGuards() {
   if (touchScrollListenersBound || typeof window === 'undefined') return;
   touchScrollListenersBound = true;
@@ -42,7 +36,6 @@ function bindTouchScrollGuards() {
   window.addEventListener('touchend', release, { passive: true });
   window.addEventListener('touchcancel', release, { passive: true });
 }
-
 export function isTouchScrollActive() {
   bindTouchScrollGuards();
   return touchScrollActive;
@@ -53,7 +46,6 @@ function getDefaultScrollScope(scope = null) {
   if (typeof document === 'undefined') return null;
   return document.scrollingElement || document.documentElement;
 }
-
 function readScrollPosition(scope = null) {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     return { scope: 'none', x: 0, y: 0 };
@@ -72,7 +64,6 @@ function readScrollPosition(scope = null) {
     y: target.scrollTop || 0
   };
 }
-
 function writeScrollPosition(snapshot = {}, options = {}) {
   if (!snapshot || typeof window === 'undefined' || typeof document === 'undefined') return;
   const x = Math.max(0, Number(snapshot.x) || 0);
@@ -89,7 +80,6 @@ function writeScrollPosition(snapshot = {}, options = {}) {
   }
   if (typeof window.scrollTo === 'function') window.scrollTo({ left: x, top: y, behavior });
 }
-
 export function capturePosition(scope = null) {
   return readScrollPosition(scope);
 }
@@ -106,7 +96,6 @@ export function freeze(reason = 'platform-scroll-freeze') {
   activeFreezes.add(token);
   return token;
 }
-
 export function unfreeze(token, options = {}) {
   if (!token || !activeFreezes.has(token)) return false;
   activeFreezes.delete(token);
@@ -117,7 +106,6 @@ export function unfreeze(token, options = {}) {
 export function isScrollFrozen() {
   return activeFreezes.size > 0;
 }
-
 export function runWithoutScrollJump(action, options = {}) {
   bindTouchScrollGuards();
   const snapshot = options.snapshot || capturePosition(options.scope || null);
@@ -142,7 +130,6 @@ export function runWithoutScrollJump(action, options = {}) {
       if (remaining > 0) scheduleFrame(frame);
     }
   };
-
   const result = action?.();
   if (result && typeof result.then === 'function') {
     scheduleRestore();
@@ -159,7 +146,6 @@ export function preserveModuleSwitchScroll(action, overrides = {}) {
     ...overrides
   });
 }
-
 export const PlatformScrollManager = Object.freeze({
   capturePosition,
   restorePosition,
@@ -174,7 +160,6 @@ export const PlatformScrollManager = Object.freeze({
   preserveSavedRecordMutation,
   preserveModuleSwitchScroll
 });
-
 const GLOBAL_SAVED_ACTION_SELECTOR = [
   '[data-line-select]',
   '[data-line-delete]',
@@ -199,7 +184,6 @@ const GLOBAL_SAVED_ACTION_SELECTOR = [
   '[data-line-dynamic]',
   '[data-hc-dynamic]'
 ].join(',');
-
 function scheduleStableRestore(snapshot, options = {}) {
   if (!snapshot) return;
   const frames = Math.max(0, Number(options.frames ?? 4));
@@ -214,7 +198,6 @@ function scheduleStableRestore(snapshot, options = {}) {
   };
   if (remaining > 0) requestAnimationFrame?.(frame);
 }
-
 export function initializeGlobalSavedRecordScrollStability(root = document) {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
   const host = root || document;
