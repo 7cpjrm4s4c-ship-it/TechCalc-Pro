@@ -56,7 +56,6 @@ const guard = (id, requiredImports, options = {}) => ({
   requiredImports,
   allowedLegacyImports: options.allowedLegacyImports || []
 });
-
 const referenceModules = [
   guard('unit-converter', [
     required('unit-converter/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/numberService.js']),
@@ -177,7 +176,7 @@ const referenceModules = [
   ], { extraFiles: ['reportAdapter.js', 'savedRecords.js'], excludedFiles: ['controller.js', 'viewModel.js'] }),
   guard('en-378-safety-check', [
     required('en-378-safety-check/chargeLimitCalculation.js', ['../../core/data/index.js']),
-    required('en-378-safety-check/importController.js', ['../../core/centralStore.js']),
+    required('en-378-safety-check/importController.js', ['../../core/state/index.js']),
     required('en-378-safety-check/index.js', ['../../core/data/index.js', '../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('en-378-safety-check/logic.js', ['../../core/data/index.js']),
     required('en-378-safety-check/refrigerantCoverage.js', ['../../core/data/index.js']),
@@ -195,7 +194,6 @@ const referenceModules = [
     required('drinking-water/viewModel.js', ['../../core/numbers.js'])
   ], { extraFiles: ['dynamicRenderer.js'] })
 ];
-
 function readProjectFile(relativePath) {
   return fs.readFileSync(path.join(root, relativePath), 'utf8');
 }
@@ -204,7 +202,6 @@ function assertFileContains(relativePath, expectedToken, message) {
   const source = readProjectFile(relativePath);
   if (!source.includes(expectedToken)) throw new Error(message || `${relativePath} is missing ${expectedToken}`);
 }
-
 function importSpecifiers(source) {
   const specifiers = [];
   const importOrExportFrom = /(?:import|export)\s+(?:[\s\S]*?\s+from\s+)?['"]([^'"]+)['"]/g;
@@ -216,7 +213,6 @@ function importSpecifiers(source) {
 for (const relativePath of requiredFiles) {
   if (!fs.existsSync(path.join(root, relativePath))) throw new Error(`Missing framework kernel file: ${relativePath}`);
 }
-
 for (const legacyBoundary of ['js/platform', 'js/framework', 'js/data']) {
   if (fs.existsSync(path.join(root, legacyBoundary))) {
     throw new Error(`Legacy runtime boundary must remain removed: ${legacyBoundary}`);
@@ -226,7 +222,6 @@ for (const legacyBoundary of ['js/platform', 'js/framework', 'js/data']) {
 for (const coreArea of requiredCoreAreas) {
   if (!readProjectFile(coreFile('appCore.js')).includes(coreArea)) throw new Error(`Core area is not documented in appCore.js: ${coreArea}`);
 }
-
 for (const expectedExport of requiredCoreExports) {
   if (!readProjectFile(coreFile('index.js')).includes(expectedExport)) throw new Error(`Core entry point does not export ${expectedExport}`);
 }
@@ -234,11 +229,9 @@ for (const expectedExport of requiredCoreExports) {
 for (const expectedToken of ['defineDataCatalogEntry', 'createDataCatalog', 'dataCatalog', 'rainwater.areaTypes', 'pipes.systems', 'refrigerants.items']) {
   if (!readProjectFile(coreFile('data/catalog.js')).includes(expectedToken)) throw new Error(`Core data catalog contract is missing ${expectedToken}`);
 }
-
 for (const expectedSection of ['Core first', 'Core responsibility paths', 'Module import rule', 'Central data path', 'Reference module guard', 'Module responsibility', 'Static resources', 'Transition contract']) {
   if (!readProjectFile('docs/contracts/framework-kernel-contract.md').includes(expectedSection)) throw new Error(`Framework kernel contract is missing section: ${expectedSection}`);
 }
-
 for (const referenceModule of referenceModules) {
   const allowedLegacyImports = new Set(referenceModule.allowedLegacyImports || []);
   for (const relativePath of referenceModule.files) {
@@ -252,7 +245,6 @@ for (const referenceModule of referenceModules) {
       }
     }
   }
-
   assertFileContains(
     moduleFile(`${referenceModule.id}/config.js`),
     '../../core/contracts/index.js',

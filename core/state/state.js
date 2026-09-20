@@ -1,4 +1,4 @@
-import { createStore, registerModuleStore } from '../centralStore.js';
+import { createStore, registerModuleStore } from './centralStore.js';
 
 let anonymousStoreIndex = 0;
 
