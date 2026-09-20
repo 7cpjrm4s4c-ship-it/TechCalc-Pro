@@ -1,4 +1,4 @@
-import { createModuleState } from '../../core/state/index.js';
+import { createModuleState } from '../../core/state/state.js';
 export const initialState = {
   surfaceMode: 'roof',
   calculationType: 'roof',
