@@ -1,6 +1,6 @@
 import { createLineSectionController } from '../../core/runtime/index.js';
 import { registerCentralActions } from '../../core/events/index.js';
-import { preserveSavedRecordMutation } from '../../core/scrollManager.js';
+import { preserveSavedRecordMutation } from '../../core/ux/scrollManager.js';
 import { toggleNumericSign } from '../../core/renderer.js';
 import { state, normalizeSavedProcesses, clearLegacyPoints } from './state.js';
 import { calculate } from './logic.js';
@@ -8,7 +8,6 @@ import { buildHxProcessRecord, hxProcessStats } from './results.js';
 function clearGeneratedPath() {
   state.set({ activePath: [], points: [] }, { notify: false });
 }
-
 function commitFieldValue(rootEl, id, value, action = 'hx:field-commit') {
   if (!id) return;
   const input = rootEl?.querySelector?.(`[data-field="${id}"]`);
@@ -30,7 +29,6 @@ function commitVisibleFields(rootEl) {
   });
   if (Object.keys(patch).length) state.set(patch, { action: 'hx:commit-visible-fields', notify: false });
 }
-
 function sameId(a, b) {
   return String(a ?? '') === String(b ?? '');
 }
@@ -180,7 +178,6 @@ function handleHxClear(rootEl, clearButton, event) {
   clearDiagram(rootEl);
   return true;
 }
-
 function bindHxDelegation(rootEl) {
   if (!rootEl || rootEl.__tcHxDiagramActionsBound) return;
   rootEl.__tcHxDiagramActionsBound = true;
@@ -201,15 +198,11 @@ function bindHxDelegation(rootEl) {
     if (!field || !rootEl.contains(field)) return;
     clearGeneratedPath();
   }, true);
-
-
-
   rootEl.addEventListener('change', event => {
     const field = event.target?.closest?.('[data-field]');
     if (!field || !rootEl.contains(field)) return;
     clearGeneratedPath();
   }, true);
-
   rootEl.addEventListener('click', event => {
     const target = event.target;
     const processButton = target.closest?.('[data-segment="process"]');
@@ -233,7 +226,6 @@ function bindHxDelegation(rootEl) {
     }
     const signButton = target.closest?.('[data-hx-sign]');
     if (handleHxSignToggle(rootEl, signButton, event)) return;
-
     const clearButton = target.closest?.('[data-hx-clear]');
     if (handleHxClear(rootEl, clearButton, event)) return;
   }, true);
