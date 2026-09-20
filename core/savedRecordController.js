@@ -1,7 +1,6 @@
 import { bindSavedRecordList, createRecordId, isSameId, removeRecord, replaceRecord } from './savedRecords.js';
-import { preserveActionScroll, preserveSavedRecordScroll, preserveSavedRecordMutation } from './scrollManager.js';
+import { preserveActionScroll, preserveSavedRecordScroll, preserveSavedRecordMutation } from './ux/scrollManager.js';
 import { markCommittedAction } from './formActions.js';
-
 function bindScopedOnce(root, key, eventName, listener, options) {
   root.__tcSavedRecordControllerBindings = root.__tcSavedRecordControllerBindings || new Set();
   const bindingKey = `${key}:${eventName}`;
@@ -9,7 +8,6 @@ function bindScopedOnce(root, key, eventName, listener, options) {
   root.__tcSavedRecordControllerBindings.add(bindingKey);
   root.addEventListener(eventName, listener, options);
 }
-
 function closest(root, target, selector) {
   if (!root || !selector || !target?.closest) return null;
   const element = target.closest(selector);
@@ -19,7 +17,6 @@ function closest(root, target, selector) {
 function arrayValue(value) {
   return Array.isArray(value) ? value : [];
 }
-
 export function createSavedRecord({
   prefix = 'record',
   current = {},
@@ -37,7 +34,6 @@ export function createSavedRecord({
     updatedAt: now
   };
 }
-
 export function savedRecordReducer(state, {
   listKey,
   activeIdKey,
@@ -61,7 +57,6 @@ export function savedRecordReducer(state, {
       ...patch
     };
   }
-
   if (action === 'update') {
     return {
       ...current,
@@ -71,7 +66,6 @@ export function savedRecordReducer(state, {
       ...patch
     };
   }
-
   if (action === 'delete') {
     const wasActive = isSameId(current[activeIdKey], id);
     const wasExpanded = expandedIdKey ? isSameId(current[expandedIdKey], id) : false;
@@ -84,7 +78,6 @@ export function savedRecordReducer(state, {
       ...patch
     };
   }
-
   if (action === 'toggle-expanded') {
     if (!expandedIdKey) return current;
     return {
@@ -106,7 +99,6 @@ export function savedRecordReducer(state, {
 
   return current;
 }
-
 export function bindSavedRecordWorkflow(root, {
   state,
   calculate,
@@ -129,9 +121,7 @@ export function bindSavedRecordWorkflow(root, {
 } = {}) {
   if (!root || !state || typeof state.get !== 'function' || typeof state.set !== 'function') return;
   if (!listKey || !activeIdKey || !loadAttr || !deleteAttr) return;
-
   const key = `savedRecordWorkflow:${listKey}:${activeIdKey}:${saveSelector || ''}:${updateSelector || ''}:${loadAttr}:${deleteAttr}`;
-
   bindScopedOnce(root, key, 'click', event => {
     const saveButton = closest(root, event.target, saveSelector);
     if (saveButton) {
@@ -154,7 +144,6 @@ export function bindSavedRecordWorkflow(root, {
       preserveSaveScroll ? preserveActionScroll(run) : run();
       return;
     }
-
     const updateButton = closest(root, event.target, updateSelector);
     if (updateButton) {
       if (updateButton.disabled || updateButton.getAttribute?.('aria-disabled') === 'true') return;
@@ -175,7 +164,6 @@ export function bindSavedRecordWorkflow(root, {
       preserveActionScroll(run);
     }
   }, true);
-
   bindSavedRecordList(root, {
     loadAttr,
     toggleAttr,
@@ -205,7 +193,6 @@ export function bindSavedRecordWorkflow(root, {
       })));
     }
   });
-
   if (clearOnOutsideClick) {
     const clearKey = `${key}:outside-clear`;
     bindScopedOnce(root, clearKey, 'click', event => {
@@ -219,7 +206,6 @@ export function bindSavedRecordWorkflow(root, {
     });
   }
 }
-
 
 function recordIdFromElement(element, attrs = {}) {
   const loadAttr = attrs.loadAttr || 'data-saved-load';
@@ -239,7 +225,6 @@ function recordIdFromElement(element, attrs = {}) {
   }
   return id;
 }
-
 export function createSavedRecordActions({
   root,
   state,
@@ -264,7 +249,6 @@ export function createSavedRecordActions({
     if (!listKey || !activeIdKey) return null;
     return state.get() || {};
   };
-
   const save = () => {
     const current = requireContext();
     if (!current || current?.[activeIdKey]) return;
@@ -290,7 +274,6 @@ export function createSavedRecordActions({
     };
     preserveSaveScroll ? preserveActionScroll(run) : run();
   };
-
   const update = () => {
     const current = requireContext();
     if (!current || !current?.[activeIdKey]) return;
@@ -314,7 +297,6 @@ export function createSavedRecordActions({
     };
     preserveActionScroll(run);
   };
-
   const load = ({ element, event } = {}) => {
     const id = recordIdFromElement(element, attrs);
     if (!id) return;
@@ -339,7 +321,6 @@ export function createSavedRecordActions({
     const card = element?.closest?.('[data-line-card], [data-saved-record-card]') || element;
     preserveLoadScroll ? preserveSavedRecordScroll(apply, { anchor: card, event }) : apply();
   };
-
   const remove = ({ element, event } = {}) => {
     const id = recordIdFromElement(element, attrs);
     if (!id) return;
@@ -357,7 +338,6 @@ export function createSavedRecordActions({
       patch
     }), { action: 'saved-record:delete' }), { anchor, event });
   };
-
   const toggle = ({ element, event } = {}) => {
     const id = recordIdFromElement(element, attrs);
     if (!id) return;
@@ -372,6 +352,5 @@ export function createSavedRecordActions({
       id
     }), { action: 'saved-record:toggle' }), { anchor, event });
   };
-
   return { save, update, load, delete: remove, toggle };
 }
