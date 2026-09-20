@@ -1,12 +1,11 @@
 import { card, stack } from '../../core/renderer.js';
 import { registerCentralActions } from '../events/index.js';
-import { preserveSavedRecordMutation } from '../../core/scrollManager.js';
+import { preserveSavedRecordMutation } from '../../core/ux/scrollManager.js';
 import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
 
 function escapeAttribute(value) {
   return String(value ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 }
-
 export function createLineSectionController({
   state,
   listKey = 'lineSections',
@@ -30,13 +29,11 @@ export function createLineSectionController({
   debounceMs = 700
 } = {}) {
   let memory = [];
-
   const read = () => {
     const fromStore = state?.get?.()?.[listKey];
     if (Array.isArray(fromStore)) return [...fromStore];
     return Array.isArray(memory) ? [...memory] : [];
   };
-
   const write = items => {
     memory = Array.isArray(items) ? [...items] : [];
     try {
@@ -46,7 +43,6 @@ export function createLineSectionController({
       }
     } catch { /* keep import/export compatible */ }
   };
-
   const renderRows = snapshot => renderSavedRecordList(Array.isArray(snapshot?.[listKey]) ? snapshot[listKey] : read(), {
     activeId: snapshot?.[activeIdKey],
     expandedId: snapshot?.[expandedIdKey],
@@ -57,13 +53,11 @@ export function createLineSectionController({
     title,
     stats
   });
-
   const renderCard = (snapshot = state?.get?.() || {}) => card(cardTitle, stack([
     `<div class="field"><label for="${nameInputId}">${nameLabel}</label><div class="control"><input id="${nameInputId}" type="text" placeholder="${escapeAttribute(namePlaceholder)}" autocomplete="off" value="${escapeAttribute(snapshot?.[nameKey] || '')}"></div></div>`,
     `<div class="tc-save-actions"><button type="button" class="action-button" data-tc-action="line:save" data-line-save ${snapshot?.[activeIdKey] ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-tc-action="line:update" data-line-update ${snapshot?.[activeIdKey] ? '' : 'disabled'}>Aktualisieren</button></div>`,
     `<div ${dynamicDataAttr}="${dynamicAttr}" data-hc-dynamic="${dynamicAttr}">${renderRows(snapshot)}</div>`
   ].join('')), accent);
-
   const updateControls = (root, snapshot = state?.get?.() || {}) => {
     const nameInput = root?.querySelector?.(`#${nameInputId}`);
     if (nameInput && document.activeElement !== nameInput) nameInput.value = snapshot?.[nameKey] || '';
@@ -78,20 +72,17 @@ export function createLineSectionController({
       updateButton.setAttribute('aria-disabled', String(!snapshot?.[activeIdKey]));
     }
   };
-
   const findRowsHost = root => {
     if (!root?.querySelector) return null;
     return root.querySelector(`[${dynamicDataAttr}="${dynamicAttr}"] .saved-record-list`)
       || root.querySelector(`[${dynamicDataAttr}="${dynamicAttr}"] .empty-state`)
       || root.querySelector(`[${dynamicDataAttr}="${dynamicAttr}"]`);
   };
-
   const findSavedAnchor = root => {
     if (!root?.querySelector || typeof window === 'undefined') return null;
     const host = root.querySelector(`[${dynamicDataAttr}="${dynamicAttr}"]`);
     return host?.closest?.('.card') || host || null;
   };
-
   const preserveSavedAnchor = (root, mutation) => {
     const anchor = findSavedAnchor(root);
     if (!anchor?.getBoundingClientRect || typeof window === 'undefined') return mutation?.();
@@ -109,7 +100,6 @@ export function createLineSectionController({
     if (typeof requestAnimationFrame === 'function') requestAnimationFrame(correct);
     return result;
   };
-
   const updateRows = (root, snapshot = state?.get?.() || {}) => {
     const host = findRowsHost(root);
     if (!host) return false;
@@ -124,7 +114,6 @@ export function createLineSectionController({
     if (host.innerHTML !== next) host.innerHTML = next;
     return true;
   };
-
   const bind = root => {
     if (!root || !state) return;
     bindEditModeClear(root, { state, activeIdKey, nameKey });
@@ -137,7 +126,6 @@ export function createLineSectionController({
       });
       return preserveSavedRecordMutation(commit);
     };
-
     const shouldSkipDuplicateAction = action => {
       const key = '__tcLastLineSectionAction';
       const now = Date.now();
@@ -146,7 +134,6 @@ export function createLineSectionController({
       root[key] = { action, at: now };
       return false;
     };
-
     const saveCurrent = ({ root: actionRoot, element } = {}) => {
       if (element?.disabled || element?.getAttribute?.('aria-disabled') === 'true') return;
       if (state.get()?.[activeIdKey]) return;
@@ -160,7 +147,6 @@ export function createLineSectionController({
       if (!item) return;
       persist([item, ...items], { [activeIdKey]: null, [nameKey]: '', [expandedIdKey]: state.get()?.[expandedIdKey] }, 'line:save');
     };
-
     const updateCurrent = ({ root: actionRoot, element } = {}) => {
       if (element?.disabled || element?.getAttribute?.('aria-disabled') === 'true') return;
       if (!state.get()?.[activeIdKey]) return;
@@ -177,7 +163,6 @@ export function createLineSectionController({
       if (!item) return;
       persist(replaceRecord(items, id, item), { [activeIdKey]: id, [nameKey]: item.name, [expandedIdKey]: state.get()?.[expandedIdKey] }, 'line:update');
     };
-
     const load = id => {
       const item = read().find(entry => isSameId(entry.id, id));
       if (!item) return;
@@ -188,7 +173,6 @@ export function createLineSectionController({
       const hydrated = hydrateRecord?.({ item, currentState: state.get() }) || {};
       preserveSavedRecordMutation(() => preserveSavedAnchor(root, () => state.set({ ...hydrated, [expandedIdKey]: state.get()?.[expandedIdKey] }, { action: 'line:select' })));
     };
-
     const deleteLine = id => {
       const next = removeRecord(read(), id);
       const patch = isSameId(state.get()?.[activeIdKey], id)
@@ -196,7 +180,6 @@ export function createLineSectionController({
         : (isSameId(state.get()?.[expandedIdKey], id) ? { [expandedIdKey]: null } : {});
       persist(next, patch, 'line:delete');
     };
-
     const toggle = element => {
       const cardEl = element?.closest?.('[data-line-card]');
       if (!cardEl) return;
@@ -206,7 +189,6 @@ export function createLineSectionController({
       const willOpen = !isSameId(currentExpanded, id);
       preserveSavedRecordMutation(() => preserveSavedAnchor(root, () => state.set({ [expandedIdKey]: willOpen ? id : null }, { action: 'line:toggle' })));
     };
-
     registerCentralActions(root, {
       'line:save': saveCurrent,
       'line:update': updateCurrent,
@@ -215,7 +197,6 @@ export function createLineSectionController({
       'saved:toggle': ({ element }) => toggle(element)
     });
   };
-
   return { read, write, renderRows, renderCard, updateControls, updateRows, bind };
 }
 
