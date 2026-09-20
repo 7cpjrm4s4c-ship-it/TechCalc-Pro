@@ -1,5 +1,4 @@
-import { createModuleState } from '../../core/state.js';
-
+import { createModuleState } from '../../core/state/index.js';
 export const initialState = {
   surfaceMode: 'roof',
   calculationType: 'roof',
@@ -33,5 +32,4 @@ export const initialState = {
   expandedSurfaceResultId: null,
   surfaces: []
 };
-
 export const state = createModuleState(initialState);

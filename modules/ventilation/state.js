@@ -1,4 +1,4 @@
-import { createModuleState } from '../../core/state.js';
+import { createModuleState } from '../../core/state/index.js';
 
 export const state = createModuleState({
   mode: 'heating',
@@ -18,7 +18,6 @@ export const state = createModuleState({
   coolingPowerUnit: 'W',
   coolingVolumeFlowM3h: '',
   coolingDeltaT: '',
-
   activeVentLineSectionId: null,
   activeVentLineSectionName: '',
   expandedVentLineSectionId: null,

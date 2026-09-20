@@ -1,8 +1,7 @@
-import { createModuleState } from '../../core/state.js';
+import { createModuleState } from '../../core/state/index.js';
 import { getDataVersions } from '../../core/data/index.js';
 
 export const EN_378_SAFETY_CHECK_SCHEMA_VERSION = 1;
-
 export const initialState = Object.freeze({
   schemaVersion: EN_378_SAFETY_CHECK_SCHEMA_VERSION,
   savedAssessments: Object.freeze([]),
@@ -55,6 +54,5 @@ export const initialState = Object.freeze({
   additionalSafetyMeasures: '',
   dataVersions: getDataVersions()
 });
-
 export const state = createModuleState(initialState, { moduleId: 'en-378-safety-check' });
 export default state;

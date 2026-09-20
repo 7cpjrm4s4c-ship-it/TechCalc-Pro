@@ -1,5 +1,4 @@
-import { createModuleState } from '../../core/state.js';
-
+import { createModuleState } from '../../core/state/index.js';
 export const state = createModuleState({
   calculationMode: 'runtime',
   plantName: '',

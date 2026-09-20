@@ -1,5 +1,4 @@
-import { createModuleState } from '../../core/state.js';
-
+import { createModuleState } from '../../core/state/index.js';
 export const initialState = {
   name: '',
   activeCalculationId: null,
@@ -26,5 +25,4 @@ export const initialState = {
   fixtures: [],
   savedCalculations: []
 };
-
 export const state = createModuleState(initialState);

@@ -1,8 +1,7 @@
-import { createModuleState } from '../../core/state.js';
+import { createModuleState } from '../../core/state/index.js';
 import { getDataVersions } from '../../core/data/index.js';
 
 export const F_GASES_SCHEMA_VERSION = 5;
-
 export const initialState = Object.freeze({
   schemaVersion: F_GASES_SCHEMA_VERSION,
   systemName: '',
@@ -38,6 +37,5 @@ export const initialState = Object.freeze({
   savedSystemName: '',
   dataVersions: getDataVersions()
 });
-
 export const state = createModuleState(initialState, { moduleId: 'f-gases-check' });
 export default state;

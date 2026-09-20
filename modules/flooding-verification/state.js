@@ -1,7 +1,6 @@
-import { createModuleState } from '../../core/state.js';
+import { createModuleState } from '../../core/state/index.js';
 
 export const FLOODING_VERIFICATION_SCHEMA_VERSION = 2;
-
 export const initialState = {
   schemaVersion: FLOODING_VERIFICATION_SCHEMA_VERSION,
   featureEnabled: true,
@@ -60,5 +59,4 @@ export const initialState = {
   savedVerificationName: '',
   results: null
 };
-
 export const state = createModuleState(initialState);

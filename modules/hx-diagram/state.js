@@ -1,4 +1,4 @@
-import { createModuleState } from '../../core/state.js';
+import { createModuleState } from '../../core/state/index.js';
 
 function createId() {
   try {
@@ -10,7 +10,6 @@ function createId() {
 function loadProcesses() {
   return [];
 }
-
 export function normalizeSavedProcesses(snapshot = {}) {
   const saved = Array.isArray(snapshot.savedProcesses) ? snapshot.savedProcesses : [];
   const legacy = Array.isArray(snapshot.processes) ? snapshot.processes : [];
@@ -21,7 +20,6 @@ export function saveProcesses(processes) {
   const next = Array.isArray(processes) ? processes : [];
   state.set({ savedProcesses: next, processes: next }, { notify: false });
 }
-
 export function makeProcessRecord({ input, result, id = null, existing = null }) {
   const recordId = id || input.activeProcessId || existing?.id || createId();
   return {
@@ -47,7 +45,6 @@ export function makeProcessRecord({ input, result, id = null, existing = null })
     updatedAt: new Date().toISOString()
   };
 }
-
 export function clearLegacyPoints() { /* no persistent legacy data */ }
 
 export const state = createModuleState({
