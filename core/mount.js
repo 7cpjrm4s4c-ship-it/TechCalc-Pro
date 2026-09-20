@@ -1,6 +1,6 @@
 import { bindCommonInputs, bindNoClickScroll } from './renderer.js';
 import { createRenderCoordinator } from './renderCoordinator.js';
-import { bindModuleStateBinding } from './stateBinding.js';
+import { bindModuleStateBinding } from './state/stateBinding.js';
 
 export function mountModule(root, state, view, afterRender) {
   const mountToken = root?.dataset?.renderToken || '';

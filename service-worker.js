@@ -133,7 +133,6 @@ const ASSETS = [
   './core/state/index.js',
   './core/state/projectModuleStateAdapters.js',
   './core/state/stateBinding.js',
-  './core/stateBinding.js',
   './core/storage/index.js',
   './core/storage/savedCalculationController.js',
   './core/storage/unsavedWorkGuard.js',
