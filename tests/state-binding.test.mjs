@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { createStore } from '../core/centralStore.js';
+import { createStore } from '../core/state/index.js';
 
 const store = createStore({ mode: 'heating', mediumId: 'water', nested: { a: 1 } }, { moduleId: 'test' });
 let emitted = 0;
