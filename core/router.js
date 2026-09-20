@@ -1,5 +1,5 @@
 import { modules } from './registry.js';
-import { loadPreferences } from './preferences.js';
+import { loadPreferences } from './ux/preferences.js';
 
 const FALLBACK_ROUTE = 'heating-cooling';
 const HASH_PREFIX = '#/';
@@ -11,13 +11,11 @@ let navigationVersion = 0;
 function appRoot() {
   return typeof document !== 'undefined' ? document.getElementById('app') : null;
 }
-
 export function preferredStartRoute() {
   const preferred = loadPreferences().mobileQuickAccess || [];
   return preferred.find(id => modules.get(id))
     || (modules.get(FALLBACK_ROUTE) ? FALLBACK_ROUTE : modules.all()[0]?.id);
 }
-
 function resetScrollHosts() {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
   window.scrollTo(0, 0);
@@ -51,7 +49,6 @@ function isPendingRoute(id) {
   const root = appRoot();
   return Boolean(root && root.dataset?.pendingModuleId === id && root.hasAttribute('aria-busy'));
 }
-
 export function initRouter(onRoute) {
   renderCallback = typeof onRoute === 'function' ? onRoute : () => Promise.resolve(false);
   window.addEventListener('hashchange', handleRouteChange);
