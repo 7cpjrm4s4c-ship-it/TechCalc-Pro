@@ -10,15 +10,13 @@ globalThis.localStorage = {
 globalThis.sessionStorage = globalThis.localStorage;
 globalThis.document = { dispatchEvent() {} };
 globalThis.CustomEvent = class CustomEvent { constructor(type, init = {}) { this.type = type; this.detail = init.detail; } };
-
 const heatConfig = (await import('../modules/heat-recovery/config.js')).default;
 const mixedConfig = (await import('../modules/mixed-air/config.js')).default;
 const { calculate: calculateHeatRecovery } = await import('../modules/heat-recovery/logic.js');
 const { calculate: calculateMixedAir } = await import('../modules/mixed-air/logic.js');
 const { state: heatRecoveryState } = await import('../modules/heat-recovery/state.js');
 const { state: mixedAirState } = await import('../modules/mixed-air/state.js');
-const { applyProjectData, collectProjectData, resetAllSessionData } = await import('../core/projectStorage.js');
-
+const { applyProjectData, collectProjectData, resetAllSessionData } = await import('../core/storage/projectStorage.js');
 assert.equal(heatConfig.id, 'heat-recovery');
 assert.equal(heatConfig.title, 'Wärmerückgewinnung');
 assert.equal(mixedConfig.id, 'mixed-air');
@@ -27,7 +25,6 @@ assert.equal(mixedConfig.title, 'Mischluft');
 const appSource = readFileSync('core/app.js', 'utf8');
 assert.match(appSource, /mixedAirConfig/, 'mixed-air is registered for lazy loading');
 assert.match(appSource, /\.\.\/modules\/mixed-air\/index\.js/, 'mixed-air module path is registered');
-
 const heatResult = calculateHeatRecovery({
   mode: 'mixing',
   wrgVolumeFlowM3h: '2500',
@@ -39,7 +36,6 @@ const heatResult = calculateHeatRecovery({
   bypassPercent: '10'
 });
 assert.equal(heatResult.mode, 'wrg', 'heat-recovery calculation is fixed to WRG after split');
-
 const mixedResult = calculateMixedAir({
   mixingOutdoorVolumeFlowM3h: '8000',
   mixingOutdoorTemp: '-5',
@@ -50,7 +46,6 @@ const mixedResult = calculateMixedAir({
 });
 assert.equal(mixedResult.mode, 'mixing', 'mixed-air calculation is fixed to Mischluft');
 assert.ok(Number.isFinite(mixedResult.mixed.tempC), 'mixed-air returns a valid mixed temperature');
-
 resetAllSessionData();
 applyProjectData({
   app: 'TechCalc Pro',
@@ -78,11 +73,9 @@ applyProjectData({
     }
   }
 });
-
 assert.equal(heatRecoveryState.get().wrgVolumeFlowM3h, '2500', 'legacy WRG field remains in heat-recovery');
 assert.equal(heatRecoveryState.get().mixingOutdoorTemp, undefined, 'legacy Mischluft field is not kept in heat-recovery state');
 assert.equal(mixedAirState.get().mixingOutdoorTemp, '-8', 'legacy Mischluft field migrates to mixed-air');
-
 const project = collectProjectData();
 assert.ok(project.modules['heat-recovery'], 'project export contains heat-recovery');
 assert.ok(project.modules['mixed-air'], 'project export contains mixed-air');
