@@ -1,4 +1,4 @@
-export * from '../projectStorage.js';
+export * from './projectStorage.js';
 export * from '../projectStorageBase.js';
 export * from '../ux/saveEditModeSync.js';
 export * from './savedCalculationController.js';

@@ -1,11 +1,11 @@
-import * as base from './projectStorageBase.js';
+import * as base from '../projectStorageBase.js';
 import {
   appendProjectModuleStates,
   applyProjectModuleStates,
   resetProjectModuleStates
-} from './state/projectModuleStateAdapters.js';
+} from '../state/projectModuleStateAdapters.js';
 
-export * from './projectStorageBase.js';
+export * from '../projectStorageBase.js';
 
 const SESSION_SNAPSHOT_KEY = 'techcalc-session-snapshot';
 
