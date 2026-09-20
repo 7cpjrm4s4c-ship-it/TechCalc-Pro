@@ -110,7 +110,7 @@ const referenceModules = [
     required('buffer-storage/viewModel.js', ['../../core/numberService.js'])
   ]),
   guard('wastewater', [
-    required('wastewater/controller.js', ['../../core/numbers.js', '../../core/formActions.js', '../../core/storage/index.js', '../../core/events/index.js', '../../core/scrollManager.js']),
+    required('wastewater/controller.js', ['../../core/numbers.js', '../../core/formActions.js', '../../core/storage/index.js', '../../core/events/index.js', '../../core/ux/scrollManager.js']),
     required('wastewater/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('wastewater/results.js', ['../../core/numberService.js']),
     required('wastewater/schema.js', ['../../core/formSchema.js', '../../core/numberService.js']),
@@ -157,7 +157,7 @@ const referenceModules = [
     required('mixed-air/viewModel.js', ['../../core/numberService.js', './results.js'])
   ]),
   guard('hx-diagram', [
-    required('hx-diagram/controller.js', ['../../core/runtime/index.js', '../../core/events/index.js', '../../core/scrollManager.js', '../../core/renderer.js']),
+    required('hx-diagram/controller.js', ['../../core/runtime/index.js', '../../core/events/index.js', '../../core/ux/scrollManager.js', '../../core/renderer.js']),
     required('hx-diagram/formRenderer.js', ['../../core/renderer.js', '../../core/numberService.js']),
     required('hx-diagram/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('hx-diagram/logic.js', ['../../core/numberService.js']),
@@ -185,8 +185,8 @@ const referenceModules = [
     required('en-378-safety-check/state.js', ['../../core/data/index.js'])
   ], { extraFiles: ['alternativeRiskMeasures.js', 'chargeLimitCalculation.js', 'displayLabels.js', 'importController.js', 'installationSafetyRequirements.js', 'plannerGuidance.js', 'refrigerantCoverage.js', 'reportAdapter.js', 'savedRecords.js', 'snapshotImport.js', 'stateConsistency.js'], excludedFiles: ['controller.js', 'view.js', 'viewModel.js'] }),
   guard('drinking-water', [
-    required('drinking-water/controller.js', ['../../core/savedRecords.js', '../../core/domUpdate.js', '../../core/scrollManager.js']),
-    required('drinking-water/dynamicRenderer.js', ['../../core/scrollManager.js', '../../core/ux/focusManager.js']),
+    required('drinking-water/controller.js', ['../../core/savedRecords.js', '../../core/domUpdate.js', '../../core/ux/scrollManager.js']),
+    required('drinking-water/dynamicRenderer.js', ['../../core/ux/scrollManager.js', '../../core/ux/focusManager.js']),
     required('drinking-water/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('drinking-water/logic.js', ['../../core/numbers.js', '../../core/numberService.js']),
     required('drinking-water/results.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/numbers.js']),
