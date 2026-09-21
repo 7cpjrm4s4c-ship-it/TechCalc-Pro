@@ -1,0 +1,11 @@
+{
+  "name": "techcalc-blob-transformer",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-21",
+  "workers_dev": true,
+  "secrets": {
+    "required": [
+      "GITHUB_TOKEN"
+    ]
+  }
+}
