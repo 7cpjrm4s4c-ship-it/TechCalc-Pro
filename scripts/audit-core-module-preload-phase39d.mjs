@@ -13,7 +13,7 @@ const requiredPreloads = [
   './core/navigation.js',
   './core/moduleLifecycleAdapter.js',
   './core/moduleRuntime.js',
-  './core/projectStorage.js'
+  './core/storage/projectStorage.js'
 ];
 
 const indexHtml = fs.readFileSync(indexPath, 'utf8');
