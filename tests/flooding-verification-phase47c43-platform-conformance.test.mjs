@@ -8,7 +8,7 @@ const controller = read('modules/flooding-verification/controller.js');
 const index = read('modules/flooding-verification/index.js');
 const schema = read('modules/flooding-verification/schema.js');
 const logic = read('modules/flooding-verification/logic.js');
-const projectStorage = read('core/projectStorage.js');
+const projectStorage = read('core/storage/projectStorage.js');
 const projectAdapters = read('core/state/projectModuleStateAdapters.js');
 const rainwaterTables = read('modules/rainwater/tables.js');
 
