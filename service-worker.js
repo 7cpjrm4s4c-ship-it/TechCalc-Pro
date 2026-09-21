@@ -113,7 +113,6 @@ const ASSETS = [
   './core/pdf/reportTheme.js',
   './core/pdf/ventilationReportSections.js',
   './core/platformModuleRuntime.js',
-  './core/projectStorageBase.js',
   './core/registry.js',
   './core/renderCoordinator.js',
   './core/renderScheduler.js',
