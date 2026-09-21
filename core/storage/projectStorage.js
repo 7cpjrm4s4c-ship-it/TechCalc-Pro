@@ -4,10 +4,12 @@ import {
   applyProjectModuleStates,
   resetProjectModuleStates
 } from '../state/projectModuleStateAdapters.js';
+import {
+  saveSessionSnapshot as saveProjectSessionSnapshot,
+  restoreSessionSnapshot as restoreProjectSessionSnapshot
+} from './projectSessionSnapshot.js';
 
 export * from './projectStorageBase.js';
-
-const SESSION_SNAPSHOT_KEY = 'techcalc-session-snapshot';
 
 function clone(value) {
   if (typeof structuredClone === 'function') return structuredClone(value);
@@ -27,23 +29,11 @@ export function resetAllSessionData() {
   resetProjectModuleStates();
 }
 export function saveSessionSnapshot() {
-  try {
-    sessionStorage.setItem(SESSION_SNAPSHOT_KEY, JSON.stringify(collectProjectData()));
-    return true;
-  } catch {
-    return false;
-  }
+  return saveProjectSessionSnapshot(collectProjectData);
 }
 
 export function restoreSessionSnapshot(options = {}) {
-  try {
-    const raw = sessionStorage.getItem(SESSION_SNAPSHOT_KEY);
-    if (!raw) return false;
-    applyProjectData(JSON.parse(raw), options);
-    return true;
-  } catch {
-    return false;
-  }
+  return restoreProjectSessionSnapshot(applyProjectData, options);
 }
 function buildTcprojProjectBlob(data = {}) {
   const project = clone(data);

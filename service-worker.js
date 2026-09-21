@@ -132,6 +132,7 @@ const ASSETS = [
   './core/state/state.js',
   './core/state/stateBinding.js',
   './core/storage/index.js',
+  './core/storage/projectSessionSnapshot.js',
   './core/storage/projectStorage.js',
   './core/storage/projectStorageBase.js',
   './core/storage/savedCalculationController.js',
