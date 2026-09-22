@@ -1,16 +1,16 @@
-import { mountModule } from './mount.js';
-import { bindCommonInputs, bindNoClickScroll } from './renderer.js';
-import { bindModuleStateBinding } from './state/stateBinding.js';
-import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from './events/index.js';
-import { createSavedRecord, savedRecordReducer } from './savedRecordController.js';
+import { mountModule } from '../mount.js';
+import { bindCommonInputs, bindNoClickScroll } from '../renderer.js';
+import { bindModuleStateBinding } from '../state/stateBinding.js';
+import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../events/index.js';
+import { createSavedRecord, savedRecordReducer } from '../savedRecordController.js';
 // createSavedRecordActions( remains the central action-factory contract; Phase 17C.9
 // uses the Heizung/Kälte-compatible direct binding to avoid duplicate mobile events.
-import { canonicalGermanNumberInput } from './engineering/numbers.js';
-import { preserveScroll as keepScroll, preserveSavedRecordMutation, PlatformScrollManager } from './ux/scrollManager.js';
-import { PlatformFocusManager } from './ux/focusManager.js';
-import { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved, renderPlatformSaved } from './moduleRenderer.js';
-import { getRenderScheduler } from './renderScheduler.js';
-import { startPerformanceSpan } from './ux/performanceController.js';
+import { canonicalGermanNumberInput } from '../engineering/numbers.js';
+import { preserveScroll as keepScroll, preserveSavedRecordMutation, PlatformScrollManager } from '../ux/scrollManager.js';
+import { PlatformFocusManager } from '../ux/focusManager.js';
+import { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved, renderPlatformSaved } from '../moduleRenderer.js';
+import { getRenderScheduler } from '../renderScheduler.js';
+import { startPerformanceSpan } from '../ux/performanceController.js';
 
 const noop = () => {};
 const asFn = value => typeof value === 'function' ? value : noop;
