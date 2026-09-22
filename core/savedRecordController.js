@@ -1,6 +1,6 @@
 import { bindSavedRecordList, createRecordId, isSameId, removeRecord, replaceRecord } from './savedRecords.js';
 import { preserveActionScroll, preserveSavedRecordScroll, preserveSavedRecordMutation } from './ux/scrollManager.js';
-import { markCommittedAction } from './formActions.js';
+import { markCommittedAction } from './ui/formActions.js';
 function bindScopedOnce(root, key, eventName, listener, options) {
   root.__tcSavedRecordControllerBindings = root.__tcSavedRecordControllerBindings || new Set();
   const bindingKey = `${key}:${eventName}`;
