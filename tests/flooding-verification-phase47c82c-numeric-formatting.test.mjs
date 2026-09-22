@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
-import { ENGINEERING_NUMBER_FORMATS, formatEngineeringNumber } from '../core/numberService.js';
+import { ENGINEERING_NUMBER_FORMATS, formatEngineeringNumber } from '../core/engineering/numberService.js';
 import { results } from '../modules/flooding-verification/results.js';
 
 test('central engineering profiles format technical quantities consistently in German', () => {
