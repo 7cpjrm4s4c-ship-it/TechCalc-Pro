@@ -1,5 +1,5 @@
 import { esc, inlineStats } from './renderer.js';
-import { markCommittedAction } from './formActions.js';
+import { markCommittedAction } from './ui/formActions.js';
 import { preserveSavedRecordScroll, preserveSavedRecordMutation } from './ux/scrollManager.js';
 export function createRecordId(prefix = 'record') {
   try {
