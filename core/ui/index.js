@@ -10,6 +10,6 @@ export * from '../renderCoordinator.js';
 export * from '../renderScheduler.js';
 export * from '../renderer.js';
 export * from '../resultRenderer.js';
-export * from '../schemaRenderer.js';
+export * from './schemaRenderer.js';
 export * from '../typedDtoReportAdapter.js';
 export * from './uiSystem.js';
