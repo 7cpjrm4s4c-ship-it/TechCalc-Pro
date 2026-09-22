@@ -57,7 +57,7 @@ test('report adapter has no DOM, PDF drawing or duplicated calculation dependenc
 });
 
 test('platform and PDF mapper require registered typed report DTOs without legacy DOM fallback', () => {
-  const runtime = read('core/platformModuleRuntime.js');
+  const runtime = read('core/runtime/platformModuleRuntime.js');
   const mapper = read('core/pdf/pdfDataMapping.js');
   const moduleIndex = read('modules/flooding-verification/index.js');
   assert.match(runtime, /report,/);
