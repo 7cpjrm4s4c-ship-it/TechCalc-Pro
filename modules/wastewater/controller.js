@@ -1,5 +1,5 @@
 import { canonicalGermanNumberInput } from '../../core/engineering/numbers.js';
-import { readFieldValue, normalizeQuantityInput } from '../../core/formActions.js';
+import { readFieldValue, normalizeQuantityInput } from '../../core/ui/formActions.js';
 import { getFixture, toNumber } from './logic.js';
 import { usageTypes } from './tables.js';
 import { initialState } from './state.js';
