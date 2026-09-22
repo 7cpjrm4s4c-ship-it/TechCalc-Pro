@@ -1,4 +1,4 @@
-import { numberService } from './numberService.js';
+import { numberService } from './engineering/numberService.js';
 
 export function fieldSelector(key) {
   const safe = String(key || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
