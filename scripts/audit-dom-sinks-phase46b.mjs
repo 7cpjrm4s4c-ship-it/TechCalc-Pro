@@ -13,7 +13,7 @@ const allowedInnerHtmlFiles = new Set([
   coreFile('lineSectionController/index.js'),
   coreFile('moduleRuntime.js'),
   coreFile('navigation.js'),
-  coreFile('platformModuleRuntime.js'),
+  coreFile('runtime/platformModuleRuntime.js'),
   moduleFile('drinking-water/dynamicRenderer.js'),
   moduleFile('heat-recovery/dynamicRenderer.js'),
   moduleFile('hx-diagram/renderPipeline.js'),
