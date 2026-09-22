@@ -109,7 +109,7 @@ const referenceModules = [
     required('buffer-storage/viewModel.js', ['../../core/engineering/numberService.js'])
   ]),
   guard('wastewater', [
-    required('wastewater/controller.js', ['../../core/engineering/numbers.js', '../../core/formActions.js', '../../core/storage/index.js', '../../core/events/index.js', '../../core/ux/scrollManager.js']),
+    required('wastewater/controller.js', ['../../core/engineering/numbers.js', '../../core/ui/formActions.js', '../../core/storage/index.js', '../../core/events/index.js', '../../core/ux/scrollManager.js']),
     required('wastewater/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('wastewater/results.js', ['../../core/engineering/numberService.js']),
     required('wastewater/schema.js', ['../../core/formSchema.js', '../../core/engineering/numberService.js']),
