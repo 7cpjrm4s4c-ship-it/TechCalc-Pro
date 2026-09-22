@@ -1,6 +1,6 @@
 import config from './config.js';
 import { card, field, selectField, segmented, renderModuleShell, stack, grid, inlineStats, esc } from '../../core/renderer.js';
-import { fmt, fmtInput } from '../../core/numbers.js';
+import { fmt, fmtInput } from '../../core/engineering/numbers.js';
 import { createDrinkingWaterViewModel } from './viewModel.js';
 import { renderDrinkingWaterResultModel, consumerRows, unitStats, singleStats, consumerModeSuffix } from './results.js';
 import { isSameId } from '../../core/savedRecords.js';

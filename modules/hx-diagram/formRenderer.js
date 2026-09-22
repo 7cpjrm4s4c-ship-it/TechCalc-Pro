@@ -1,5 +1,5 @@
 import { card, field, stack, grid, signedTempField } from '../../core/renderer.js';
-import { formatNumber, parseNumber } from '../../core/numberService.js';
+import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
 import { renderProcessSelection, HX_DYNAMIC } from './renderPipeline.js';
 
 const fmtInput = (value, digits = 2) => {

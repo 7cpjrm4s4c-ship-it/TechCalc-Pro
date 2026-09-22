@@ -1,5 +1,5 @@
 import { field } from '../../core/renderer.js';
-import { formatNumber, parseNumber } from '../../core/numberService.js';
+import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
 import {
   activeCalculationState,
   activeMassFlowUnit,

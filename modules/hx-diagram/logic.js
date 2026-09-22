@@ -1,4 +1,4 @@
-import { parseNumber } from '../../core/numberService.js';
+import { parseNumber } from '../../core/engineering/numberService.js';
 
 const P_ATM_PA = 101325;
 const HUMIDIFICATION_EPSILON_KG_KG = 1e-7;

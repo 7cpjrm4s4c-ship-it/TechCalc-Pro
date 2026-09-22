@@ -1,5 +1,5 @@
 import { areaTypes, hydraulicTables, dnOrder, roofDrainTable } from './tables.js';
-import { numberService } from '../../core/numberService.js';
+import { numberService } from '../../core/engineering/numberService.js';
 
 export const toNumber = value => numberService.parse(value, { fallback: 0, locale: 'de-DE' });
 

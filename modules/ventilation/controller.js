@@ -1,5 +1,5 @@
 import { createLineSectionController, createVentilationDynamicRenderer } from '../../core/runtime/index.js';
-import { formatNumber, parseNumber } from '../../core/numberService.js';
+import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import {

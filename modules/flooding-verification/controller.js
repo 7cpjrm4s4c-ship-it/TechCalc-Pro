@@ -1,4 +1,4 @@
-import { canonicalGermanNumberInput } from '../../core/numbers.js';
+import { canonicalGermanNumberInput } from '../../core/engineering/numbers.js';
 import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../../core/events/index.js';
 import { createRecordId } from '../../core/storage/index.js';
 import { areaTypes, readRainwaterSurfaceSnapshot } from '../../core/data/rainwater.js';

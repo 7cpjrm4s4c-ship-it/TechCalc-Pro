@@ -1,4 +1,4 @@
-import { formatNumber } from '../../core/numberService.js';
+import { formatNumber } from '../../core/engineering/numberService.js';
 
 const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 

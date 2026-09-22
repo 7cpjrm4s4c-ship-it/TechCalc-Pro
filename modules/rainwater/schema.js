@@ -1,5 +1,5 @@
 import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
-import { formatNumber, toInputNumber } from '../../core/numberService.js';
+import { formatNumber, toInputNumber } from '../../core/engineering/numberService.js';
 import { toNumber } from './logic.js';
 import { areaTypes, roofDrainTable } from './tables.js';
 

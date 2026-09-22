@@ -1,4 +1,4 @@
-import { formatEngineeringNumber } from '../../core/numberService.js';
+import { formatEngineeringNumber } from '../../core/engineering/numberService.js';
 import { evaluateDwa117Applicability } from './retentionApplicability.js';
 import { buildRetentionDurationComparison } from './retentionDurationComparison.js';
 import { buildFloodingDiagnosticModel } from './diagnosticModel.js';

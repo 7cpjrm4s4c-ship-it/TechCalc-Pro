@@ -1,6 +1,6 @@
 import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
 import { MEDIA, pipeSystems } from '../../core/data/index.js';
-import { formatNumber } from '../../core/numberService.js';
+import { formatNumber } from '../../core/engineering/numberService.js';
 
 const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 

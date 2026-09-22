@@ -4,7 +4,7 @@ import { state } from './state.js';
 import { calculate } from './logic.js';
 import { createPlatformModule, createPressureHoldingDynamicRenderer } from '../../core/runtime/index.js';
 import { buildGenericModuleReportDto, createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
-import { formatNumber, parseNumber } from '../../core/numberService.js';
+import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
 import { bindPressureHoldingActions, buildPressureRecord, savedPlantsCard } from './controller.js';
 import { buildPressureHoldingResultModel } from './results.js';
 import { view } from './view.js';

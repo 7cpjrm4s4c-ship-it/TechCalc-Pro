@@ -1,4 +1,4 @@
-import { formatEngineeringNumber } from '../numberService.js';
+import { formatEngineeringNumber } from '../engineering/numberService.js';
 const array = value => Array.isArray(value) ? value : [];
 const object = value => value && typeof value === 'object' && !Array.isArray(value) ? value : {};
 const text = value => value == null || value === '' ? '—' : String(value);

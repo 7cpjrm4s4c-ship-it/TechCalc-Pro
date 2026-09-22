@@ -1,4 +1,4 @@
-import { formatNumber, parseNumber } from '../../core/numberService.js';
+import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
 import { MEDIA } from '../../core/data/index.js';
 
 const MODE_PREFIX = {

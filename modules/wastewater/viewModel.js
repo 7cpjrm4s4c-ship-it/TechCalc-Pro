@@ -1,4 +1,4 @@
-import { parseNumber, toInputNumber } from '../../core/numberService.js';
+import { parseNumber, toInputNumber } from '../../core/engineering/numberService.js';
 import { field, selectField, grid } from '../../core/renderer.js';
 import { fixtureTypes, usageTypes } from './tables.js';
 import { getFixture } from './logic.js';

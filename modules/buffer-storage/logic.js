@@ -1,4 +1,4 @@
-import { parseNumber } from '../../core/numberService.js';
+import { parseNumber } from '../../core/engineering/numberService.js';
 
 const FACTORS = {
   water: 14.32,

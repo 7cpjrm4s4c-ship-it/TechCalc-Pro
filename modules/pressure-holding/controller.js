@@ -1,7 +1,7 @@
 import { createLineSectionController } from '../../core/runtime/index.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
-import { formatNumber, parseNumber } from '../../core/numberService.js';
+import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
 
 const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 function num(value) {

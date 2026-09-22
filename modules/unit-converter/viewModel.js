@@ -1,7 +1,7 @@
 import { field, selectField, stack } from '../../core/renderer.js';
 import { renderResultModel } from '../../core/resultRenderer.js';
 import { unitCategories } from '../../core/data/index.js';
-import { formatNumber } from '../../core/numberService.js';
+import { formatNumber } from '../../core/engineering/numberService.js';
 import { calculate } from './logic.js';
 import { buildUnitConverterResultModel, normalizeUnitSelection } from './results.js';
 

@@ -1,4 +1,4 @@
-import { canonicalGermanNumberInput } from '../../core/numbers.js';
+import { canonicalGermanNumberInput } from '../../core/engineering/numbers.js';
 import { getAreaType } from './logic.js';
 import { roofDrainTable } from './tables.js';
 import { normalizeAreaType, defaultAreaTypeForMode } from './schema.js';

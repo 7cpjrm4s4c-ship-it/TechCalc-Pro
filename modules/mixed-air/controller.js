@@ -1,6 +1,6 @@
 import { createLineSectionController } from '../../core/runtime/index.js';
 import { toggleNumericSign } from '../../core/renderer.js';
-import { formatNumber } from '../../core/numberService.js';
+import { formatNumber } from '../../core/engineering/numberService.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 

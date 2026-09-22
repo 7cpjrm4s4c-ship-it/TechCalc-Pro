@@ -1,4 +1,4 @@
-import { canonicalGermanNumberInput } from '../../core/numbers.js';
+import { canonicalGermanNumberInput } from '../../core/engineering/numbers.js';
 import { readFieldValue, normalizeQuantityInput } from '../../core/formActions.js';
 import { getFixture, toNumber } from './logic.js';
 import { usageTypes } from './tables.js';

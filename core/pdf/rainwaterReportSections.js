@@ -1,4 +1,4 @@
-import { formatEngineeringNumber } from '../numberService.js';
+import { formatEngineeringNumber } from '../engineering/numberService.js';
 const a=v=>Array.isArray(v)?v:[];
 const t=v=>v==null||v===''?'—':String(v);
 const f=(v,k='generic')=>v==null||v===''?'—':formatEngineeringNumber(v,k);

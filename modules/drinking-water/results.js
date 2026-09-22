@@ -1,6 +1,6 @@
 import { inlineStats, esc } from '../../core/renderer.js';
 import { renderResultModel } from '../../core/resultRenderer.js';
-import { fmt } from '../../core/numbers.js';
+import { fmt } from '../../core/engineering/numbers.js';
 function hasStoredConsumers(r = {}) {
   return Boolean((r.usageUnits || []).length || (r.singleGroups || []).length || (r.rawSingles || []).length);
 }

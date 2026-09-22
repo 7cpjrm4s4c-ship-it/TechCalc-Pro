@@ -4,7 +4,7 @@ import { state } from './state.js';
 import { calculate } from './logic.js';
 import { createPlatformModule, createPipeSizingDynamicRenderer } from '../../core/runtime/index.js';
 import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
-import { formatNumber } from '../../core/numberService.js';
+import { formatNumber } from '../../core/engineering/numberService.js';
 import { bindPipeSizingActions, pipeSaveCard } from './controller.js';
 import { view } from './view.js';
 import { inputContent, resultContent } from './viewModel.js';

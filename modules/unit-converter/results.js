@@ -1,4 +1,4 @@
-import { formatNumber } from '../../core/numberService.js';
+import { formatNumber } from '../../core/engineering/numberService.js';
 import { unitCategories } from '../../core/data/index.js';
 import { calculate, unitsFor } from './logic.js';
 

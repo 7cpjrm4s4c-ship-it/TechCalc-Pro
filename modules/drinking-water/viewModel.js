@@ -1,5 +1,5 @@
 import { calculate, CONSUMERS, BUILDING_TYPES } from './logic.js';
-import { fmt } from '../../core/numbers.js';
+import { fmt } from '../../core/engineering/numbers.js';
 import { buildDrinkingWaterResultModel } from './results.js';
 
 export function consumerOptions() {

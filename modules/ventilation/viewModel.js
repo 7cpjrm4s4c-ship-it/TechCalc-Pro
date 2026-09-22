@@ -1,4 +1,4 @@
-import { formatNumber, parseNumber } from '../../core/numberService.js';
+import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
 
 const MODE_PREFIX = { heating: 'heating', cooling: 'cooling' };
 const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });

@@ -1,5 +1,5 @@
-import { num } from '../../core/numbers.js';
-import { parseNumber } from '../../core/numberService.js';
+import { num } from '../../core/engineering/numbers.js';
+import { parseNumber } from '../../core/engineering/numberService.js';
 export const CONSUMERS = [
   { id:'basin', label:'Waschtisch / Bidet', short:'Waschtisch / Bidet', vr:0.07, pmin:0.10, neGroup:'basin', hotWater:true },
   { id:'kitchenSink', label:'Küchenspüle', short:'Küchenspüle', vr:0.07, pmin:0.10, neGroup:'kitchenSink', hotWater:true },

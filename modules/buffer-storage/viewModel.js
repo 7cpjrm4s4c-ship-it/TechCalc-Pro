@@ -1,4 +1,4 @@
-import { formatNumber, parseNumber } from '../../core/numberService.js';
+import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
 import { calculate } from './logic.js';
 import { buildBufferStorageResultModel, mediumLabel, modeLabel } from './results.js';
 

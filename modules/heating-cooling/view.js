@@ -1,5 +1,5 @@
 import { MEDIA, pipeSystems } from '../../core/data/index.js';
-import { formatNumber, parseNumber } from '../../core/numberService.js';
+import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
 import { card, selectField, segmented, renderModuleShell, stack, grid } from '../../core/renderer.js';
 import { renderRecommendationCard, renderResultModel, renderResultTable } from '../../core/resultRenderer.js';
 import { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRows } from './results.js';

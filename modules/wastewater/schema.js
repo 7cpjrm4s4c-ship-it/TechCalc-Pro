@@ -1,5 +1,5 @@
 import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
-import { formatNumber } from '../../core/numberService.js';
+import { formatNumber } from '../../core/engineering/numberService.js';
 import { fixtureTypes, usageTypes } from './tables.js';
 import { getFixture } from './logic.js';
 
