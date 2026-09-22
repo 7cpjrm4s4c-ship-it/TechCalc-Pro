@@ -4,7 +4,7 @@ import schema from '../modules/rainwater/schema.js';
 import { surfaceRecordSnapshot, statePatchFromSurface } from '../modules/rainwater/controller.js';
 import { initialState } from '../modules/rainwater/state.js';
 import { calculate } from '../modules/rainwater/logic.js';
-import { renderSchemaForm } from '../core/schemaRenderer.js';
+import { renderSchemaForm } from '../core/ui/schemaRenderer.js';
 
 const controllerSource = readFileSync('modules/rainwater/controller.js', 'utf8');
 const logicSource = readFileSync('modules/rainwater/logic.js', 'utf8');
