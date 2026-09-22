@@ -58,80 +58,80 @@ const guard = (id, requiredImports, options = {}) => ({
 });
 const referenceModules = [
   guard('unit-converter', [
-    required('unit-converter/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/numberService.js']),
+    required('unit-converter/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/engineering/numberService.js']),
     required('unit-converter/logic.js', ['../../core/data/index.js']),
-    required('unit-converter/results.js', ['../../core/data/index.js', '../../core/numberService.js']),
+    required('unit-converter/results.js', ['../../core/data/index.js', '../../core/engineering/numberService.js']),
     required('unit-converter/schema.js', ['../../core/formSchema.js']),
     required('unit-converter/view.js', ['../../core/renderer.js']),
-    required('unit-converter/viewModel.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/data/index.js', '../../core/numberService.js'])
+    required('unit-converter/viewModel.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/data/index.js', '../../core/engineering/numberService.js'])
   ]),
   guard('pipe-sizing', [
-    required('pipe-sizing/controller.js', ['../../core/runtime/index.js', '../../core/numberService.js']),
-    required('pipe-sizing/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/numberService.js']),
+    required('pipe-sizing/controller.js', ['../../core/runtime/index.js', '../../core/engineering/numberService.js']),
+    required('pipe-sizing/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/engineering/numberService.js']),
     required('pipe-sizing/logic.js', ['../../core/data/index.js']),
-    required('pipe-sizing/results.js', ['../../core/numberService.js', '../../core/renderer.js']),
+    required('pipe-sizing/results.js', ['../../core/engineering/numberService.js', '../../core/renderer.js']),
     required('pipe-sizing/schema.js', ['../../core/formSchema.js']),
     required('pipe-sizing/view.js', ['../../core/renderer.js']),
     required('pipe-sizing/viewModel.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/data/index.js'])
   ]),
   guard('pressure-holding', [
-    required('pressure-holding/controller.js', ['../../core/runtime/index.js', '../../core/numberService.js']),
-    required('pressure-holding/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/numberService.js']),
-    required('pressure-holding/results.js', ['../../core/numberService.js']),
+    required('pressure-holding/controller.js', ['../../core/runtime/index.js', '../../core/engineering/numberService.js']),
+    required('pressure-holding/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/engineering/numberService.js']),
+    required('pressure-holding/results.js', ['../../core/engineering/numberService.js']),
     required('pressure-holding/schema.js', ['../../core/formSchema.js']),
     required('pressure-holding/view.js', ['../../core/renderer.js']),
-    required('pressure-holding/viewModel.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/numberService.js'])
+    required('pressure-holding/viewModel.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/engineering/numberService.js'])
   ]),
   guard('heating-cooling', [
-    required('heating-cooling/controller.js', ['../../core/numberService.js', '../../core/data/index.js']),
-    required('heating-cooling/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/numberService.js']),
+    required('heating-cooling/controller.js', ['../../core/engineering/numberService.js', '../../core/data/index.js']),
+    required('heating-cooling/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/engineering/numberService.js']),
     required('heating-cooling/logic.js', ['../../core/data/index.js']),
-    required('heating-cooling/results.js', ['../../core/numberService.js']),
-    required('heating-cooling/schema.js', ['../../core/formSchema.js', '../../core/data/index.js', '../../core/numberService.js']),
-    required('heating-cooling/view.js', ['../../core/data/index.js', '../../core/numberService.js', '../../core/renderer.js', '../../core/resultRenderer.js']),
-    required('heating-cooling/viewModel.js', ['../../core/renderer.js', '../../core/numberService.js'])
+    required('heating-cooling/results.js', ['../../core/engineering/numberService.js']),
+    required('heating-cooling/schema.js', ['../../core/formSchema.js', '../../core/data/index.js', '../../core/engineering/numberService.js']),
+    required('heating-cooling/view.js', ['../../core/data/index.js', '../../core/engineering/numberService.js', '../../core/renderer.js', '../../core/resultRenderer.js']),
+    required('heating-cooling/viewModel.js', ['../../core/renderer.js', '../../core/engineering/numberService.js'])
   ], { extraFiles: ['reportAdapter.js'] }),
   guard('ventilation', [
-    required('ventilation/controller.js', ['../../core/runtime/index.js', '../../core/numberService.js', '../../core/renderer.js']),
+    required('ventilation/controller.js', ['../../core/runtime/index.js', '../../core/engineering/numberService.js', '../../core/renderer.js']),
     required('ventilation/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('ventilation/logic.js', ['../../core/data/index.js']),
-    required('ventilation/results.js', ['../../core/numberService.js']),
+    required('ventilation/results.js', ['../../core/engineering/numberService.js']),
     required('ventilation/schema.js', ['../../core/formSchema.js']),
-    required('ventilation/view.js', ['../../core/renderer.js', '../../core/numberService.js', '../../core/resultRenderer.js']),
-    required('ventilation/viewModel.js', ['../../core/numberService.js'])
+    required('ventilation/view.js', ['../../core/renderer.js', '../../core/engineering/numberService.js', '../../core/resultRenderer.js']),
+    required('ventilation/viewModel.js', ['../../core/engineering/numberService.js'])
   ], { extraFiles: ['reportAdapter.js'] }),
   guard('buffer-storage', [
-    required('buffer-storage/controller.js', ['../../core/runtime/index.js', '../../core/numberService.js']),
+    required('buffer-storage/controller.js', ['../../core/runtime/index.js', '../../core/engineering/numberService.js']),
     required('buffer-storage/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
-    required('buffer-storage/results.js', ['../../core/numberService.js']),
+    required('buffer-storage/results.js', ['../../core/engineering/numberService.js']),
     required('buffer-storage/schema.js', ['../../core/formSchema.js']),
     required('buffer-storage/view.js', ['../../core/renderer.js', '../../core/runtime/index.js', '../../core/resultRenderer.js']),
-    required('buffer-storage/viewModel.js', ['../../core/numberService.js'])
+    required('buffer-storage/viewModel.js', ['../../core/engineering/numberService.js'])
   ]),
   guard('wastewater', [
-    required('wastewater/controller.js', ['../../core/numbers.js', '../../core/formActions.js', '../../core/storage/index.js', '../../core/events/index.js', '../../core/ux/scrollManager.js']),
+    required('wastewater/controller.js', ['../../core/engineering/numbers.js', '../../core/formActions.js', '../../core/storage/index.js', '../../core/events/index.js', '../../core/ux/scrollManager.js']),
     required('wastewater/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
-    required('wastewater/results.js', ['../../core/numberService.js']),
-    required('wastewater/schema.js', ['../../core/formSchema.js', '../../core/numberService.js']),
+    required('wastewater/results.js', ['../../core/engineering/numberService.js']),
+    required('wastewater/schema.js', ['../../core/formSchema.js', '../../core/engineering/numberService.js']),
     required('wastewater/view.js', ['../../core/renderer.js', '../../core/resultRenderer.js']),
-    required('wastewater/viewModel.js', ['../../core/numberService.js', '../../core/renderer.js'])
+    required('wastewater/viewModel.js', ['../../core/engineering/numberService.js', '../../core/renderer.js'])
   ]),
   guard('rainwater', [
-    required('rainwater/controller.js', ['../../core/numbers.js', '../../core/storage/index.js']),
+    required('rainwater/controller.js', ['../../core/engineering/numbers.js', '../../core/storage/index.js']),
     required('rainwater/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
-    required('rainwater/logic.js', ['../../core/numberService.js']),
-    required('rainwater/results.js', ['../../core/numberService.js']),
-    required('rainwater/schema.js', ['../../core/formSchema.js', '../../core/numberService.js']),
+    required('rainwater/logic.js', ['../../core/engineering/numberService.js']),
+    required('rainwater/results.js', ['../../core/engineering/numberService.js']),
+    required('rainwater/schema.js', ['../../core/formSchema.js', '../../core/engineering/numberService.js']),
     required('rainwater/tables.js', ['../../core/data/rainwater.js']),
     required('rainwater/view.js', ['../../core/renderer.js']),
     required('rainwater/viewModel.js', ['../../core/formSchema.js', '../../core/resultRenderer.js'])
   ], { extraFiles: ['tables.js'] }),
   guard('flooding-verification', [
-    required('flooding-verification/controller.js', ['../../core/numbers.js', '../../core/events/index.js', '../../core/storage/index.js', '../../core/data/rainwater.js']),
+    required('flooding-verification/controller.js', ['../../core/engineering/numbers.js', '../../core/events/index.js', '../../core/storage/index.js', '../../core/data/rainwater.js']),
     required('flooding-verification/dynamicRenderer.js', ['../../core/domUpdate.js']),
     required('flooding-verification/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('flooding-verification/logic.js', ['../../core/data/rainwater.js']),
-    required('flooding-verification/results.js', ['../../core/numberService.js']),
+    required('flooding-verification/results.js', ['../../core/engineering/numberService.js']),
     required('flooding-verification/schema.js', ['../../core/formSchema.js', '../../core/data/rainwater.js']),
     required('flooding-verification/view.js', ['../../core/renderer.js', '../../core/formSchema.js', '../../core/resultRenderer.js'])
   ], { excludedFiles: ['viewModel.js'] }),
@@ -143,25 +143,25 @@ const referenceModules = [
     required('heat-recovery/results.js', ['../../core/engineering/hvacAirResults.js']),
     required('heat-recovery/schema.js', ['../../core/formSchema.js']),
     required('heat-recovery/view.js', ['../../core/renderer.js', '../../core/resultRenderer.js']),
-    required('heat-recovery/viewModel.js', ['../../core/numberService.js'])
+    required('heat-recovery/viewModel.js', ['../../core/engineering/numberService.js'])
   ]),
   guard('mixed-air', [
-    required('mixed-air/controller.js', ['../../core/runtime/index.js', '../../core/renderer.js', '../../core/numberService.js']),
+    required('mixed-air/controller.js', ['../../core/runtime/index.js', '../../core/renderer.js', '../../core/engineering/numberService.js']),
     required('mixed-air/dynamicRenderer.js', ['../../core/renderer.js']),
     required('mixed-air/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('mixed-air/logic.js', ['../../core/engineering/hvacAir.js']),
     required('mixed-air/results.js', ['../../core/engineering/hvacAirResults.js']),
     required('mixed-air/schema.js', ['../../core/formSchema.js']),
     required('mixed-air/view.js', ['../../core/renderer.js', '../../core/resultRenderer.js']),
-    required('mixed-air/viewModel.js', ['../../core/numberService.js', './results.js'])
+    required('mixed-air/viewModel.js', ['../../core/engineering/numberService.js', './results.js'])
   ]),
   guard('hx-diagram', [
     required('hx-diagram/controller.js', ['../../core/runtime/index.js', '../../core/events/index.js', '../../core/ux/scrollManager.js', '../../core/renderer.js']),
-    required('hx-diagram/formRenderer.js', ['../../core/renderer.js', '../../core/numberService.js']),
+    required('hx-diagram/formRenderer.js', ['../../core/renderer.js', '../../core/engineering/numberService.js']),
     required('hx-diagram/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
-    required('hx-diagram/logic.js', ['../../core/numberService.js']),
-    required('hx-diagram/renderPipeline.js', ['../../core/renderer.js', '../../core/numberService.js', '../../core/ux/focusManager.js']),
-    required('hx-diagram/results.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/numberService.js']),
+    required('hx-diagram/logic.js', ['../../core/engineering/numberService.js']),
+    required('hx-diagram/renderPipeline.js', ['../../core/renderer.js', '../../core/engineering/numberService.js', '../../core/ux/focusManager.js']),
+    required('hx-diagram/results.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/engineering/numberService.js']),
     required('hx-diagram/schema.js', ['../../core/formSchema.js']),
     required('hx-diagram/view.js', ['../../core/renderer.js'])
   ], { extraFiles: ['diagramRenderer.js', 'formRenderer.js', 'renderPipeline.js'] }),
@@ -187,11 +187,11 @@ const referenceModules = [
     required('drinking-water/controller.js', ['../../core/savedRecords.js', '../../core/domUpdate.js', '../../core/ux/scrollManager.js']),
     required('drinking-water/dynamicRenderer.js', ['../../core/ux/scrollManager.js', '../../core/ux/focusManager.js']),
     required('drinking-water/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
-    required('drinking-water/logic.js', ['../../core/numbers.js', '../../core/numberService.js']),
-    required('drinking-water/results.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/numbers.js']),
+    required('drinking-water/logic.js', ['../../core/engineering/numbers.js', '../../core/engineering/numberService.js']),
+    required('drinking-water/results.js', ['../../core/renderer.js', '../../core/resultRenderer.js', '../../core/engineering/numbers.js']),
     required('drinking-water/schema.js', ['../../core/formSchema.js']),
-    required('drinking-water/view.js', ['../../core/renderer.js', '../../core/numbers.js', '../../core/savedRecords.js']),
-    required('drinking-water/viewModel.js', ['../../core/numbers.js'])
+    required('drinking-water/view.js', ['../../core/renderer.js', '../../core/engineering/numbers.js', '../../core/savedRecords.js']),
+    required('drinking-water/viewModel.js', ['../../core/engineering/numbers.js'])
   ], { extraFiles: ['dynamicRenderer.js'] })
 ];
 function readProjectFile(relativePath) {
