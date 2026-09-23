@@ -18,7 +18,7 @@ export {
   renderResultSchema as renderSchemaResults
 } from '../formSchema.js';
 
-import { renderModuleShell } from '../renderer.js';
+import { renderModuleShell } from '../ui/renderer.js';
 import { defineModuleDefinition } from './moduleDefinition.js';
 import { renderFormSchema, renderResultSchema } from '../formSchema.js';
 
