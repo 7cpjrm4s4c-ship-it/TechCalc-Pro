@@ -1,4 +1,4 @@
-import { card, stack } from '../../core/renderer.js';
+import { card, stack } from '../../core/ui/renderer.js';
 import { registerCentralActions } from '../events/index.js';
 import { preserveSavedRecordMutation } from '../../core/ux/scrollManager.js';
 import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
