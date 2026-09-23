@@ -1,7 +1,7 @@
 import { calculate } from './logic.js';
 import { createHeatRecoveryViewModel } from './viewModel.js';
 import { renderInputs, renderOutputs, renderSavedRecords } from './view.js';
-import { esc } from '../../core/renderer.js';
+import { esc } from '../../core/ui/renderer.js';
 import { rltDeviceController } from './controller.js';
 
 function setIslandInner(root, selector, html){

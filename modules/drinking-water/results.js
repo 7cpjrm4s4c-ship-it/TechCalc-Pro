@@ -1,4 +1,4 @@
-import { inlineStats, esc } from '../../core/renderer.js';
+import { inlineStats, esc } from '../../core/ui/renderer.js';
 import { renderResultModel } from '../../core/resultRenderer.js';
 import { fmt } from '../../core/engineering/numbers.js';
 function hasStoredConsumers(r = {}) {

@@ -1,7 +1,7 @@
 import { createLineSectionController } from '../../core/runtime/index.js';
 import { registerCentralActions } from '../../core/events/index.js';
 import { preserveSavedRecordMutation } from '../../core/ux/scrollManager.js';
-import { toggleNumericSign } from '../../core/renderer.js';
+import { toggleNumericSign } from '../../core/ui/renderer.js';
 import { state, normalizeSavedProcesses, clearLegacyPoints } from './state.js';
 import { calculate } from './logic.js';
 import { buildHxProcessRecord, hxProcessStats } from './results.js';

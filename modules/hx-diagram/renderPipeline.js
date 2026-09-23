@@ -3,7 +3,7 @@ import { createViewModel } from './viewModel.js';
 import { renderHxResultModel } from './results.js';
 import { chartCard } from './diagramRenderer.js';
 import { hxProcessCard, hxProcessController } from './controller.js';
-import { card, esc } from '../../core/renderer.js';
+import { card, esc } from '../../core/ui/renderer.js';
 import { parseNumber } from '../../core/engineering/numberService.js';
 import { preserveFocusDuring } from '../../core/ux/focusManager.js';
 export const HX_DYNAMIC = Object.freeze({

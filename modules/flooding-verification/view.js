@@ -1,4 +1,4 @@
-import { renderModuleShell } from '../../core/renderer.js';
+import { renderModuleShell } from '../../core/ui/renderer.js';
 import { renderFormSchema } from '../../core/formSchema.js';
 import { renderResultModel } from '../../core/resultRenderer.js';
 import { floodingSurfaceSchema, floodingCalculationSchema } from './schema.js';

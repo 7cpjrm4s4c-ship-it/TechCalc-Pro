@@ -1,4 +1,4 @@
-import { esc } from '../../core/renderer.js';
+import { esc } from '../../core/ui/renderer.js';
 import { renderResultModel } from '../../core/resultRenderer.js';
 import { parseNumber } from '../../core/engineering/numberService.js';
 const WATER_HEAT_CAPACITY_KJ_KGK = 4.19;

@@ -1,4 +1,4 @@
-import { card, field, stack, grid, signedTempField } from '../../core/renderer.js';
+import { card, field, stack, grid, signedTempField } from '../../core/ui/renderer.js';
 import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
 import { renderProcessSelection, HX_DYNAMIC } from './renderPipeline.js';
 

@@ -3,7 +3,7 @@ import schema from './schema.js';
 import { calculate } from './logic.js';
 import { buildFGasesResultModel } from './results.js';
 import { listRefrigerants } from '../../core/data/index.js';
-import { renderModuleShell } from '../../core/renderer.js';
+import { renderModuleShell } from '../../core/ui/renderer.js';
 import { renderFormSchema } from '../../core/formSchema.js';
 import { renderResultModel } from '../../core/resultRenderer.js';
 

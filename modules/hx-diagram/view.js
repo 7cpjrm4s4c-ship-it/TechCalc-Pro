@@ -2,7 +2,7 @@ import config from './config.js';
 import { createViewModel } from './viewModel.js';
 import { renderResults, renderDiagram, renderSavedProcesses, HX_DYNAMIC } from './renderPipeline.js';
 import { renderHxInputCard } from './formRenderer.js';
-import { renderModuleShell } from '../../core/renderer.js';
+import { renderModuleShell } from '../../core/ui/renderer.js';
 
 function renderHxLayout(vm) {
   return `<div class="tc-module-layout tc-module-layout--2 hx-layout">

@@ -1,5 +1,5 @@
 import { logger } from '../diagnostics/logger.js';
-import { esc as escapeHtml } from '../renderer.js';
+import { esc as escapeHtml } from '../ui/renderer.js';
 
 function normalizeReleaseVersion(value = '') {
   return String(value || '')

@@ -1,4 +1,4 @@
-import { esc, card } from '../renderer.js';
+import { esc, card } from './renderer.js';
 export const uiSystem = Object.freeze({
   version: '1.3.2-dev.2-phase3',
   prefix: 'tc-',
