@@ -1,4 +1,4 @@
-import { esc, inlineStats } from './renderer.js';
+import { esc, inlineStats } from './ui/renderer.js';
 import { markCommittedAction } from './ui/formActions.js';
 import { preserveSavedRecordScroll, preserveSavedRecordMutation } from './ux/scrollManager.js';
 export function createRecordId(prefix = 'record') {
