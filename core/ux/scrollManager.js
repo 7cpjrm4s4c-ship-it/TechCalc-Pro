@@ -1,4 +1,4 @@
-import { preserveViewport as preserveRendererViewport } from '../renderer.js';
+import { preserveViewport as preserveRendererViewport } from '../ui/renderer.js';
 
 export const SCROLL_STABILITY_PRESETS = Object.freeze({
   default: Object.freeze({ frames: 3, blurActive: false, delays: [0, 40, 100] }),
