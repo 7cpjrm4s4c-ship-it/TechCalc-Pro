@@ -56,4 +56,4 @@ export function readSchemaDefaults(schema = {}) {
 }
 
 
-export { renderSchemaField, renderSchemaForm as renderFormSchema, renderSchemaResults as renderResultSchema } from './schemaRenderer.js';
+export { renderSchemaField, renderSchemaForm as renderFormSchema, renderSchemaResults as renderResultSchema } from './ui/schemaRenderer.js';
