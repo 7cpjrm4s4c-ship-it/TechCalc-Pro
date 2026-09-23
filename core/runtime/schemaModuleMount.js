@@ -1,4 +1,4 @@
-import { renderModuleShell } from '../renderer.js';
+import { renderModuleShell } from '../ui/renderer.js';
 import { mountModule } from '../mount.js';
 import { createSchemaView } from '../ui/schemaRenderer.js';
 import { defineModuleDefinition } from '../contracts/index.js';
