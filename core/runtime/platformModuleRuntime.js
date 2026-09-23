@@ -1,5 +1,5 @@
 import { mountModule } from '../mount.js';
-import { bindCommonInputs, bindNoClickScroll } from '../renderer.js';
+import { bindCommonInputs, bindNoClickScroll } from '../ui/renderer.js';
 import { bindModuleStateBinding } from '../state/stateBinding.js';
 import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../events/index.js';
 import { createSavedRecord, savedRecordReducer } from '../savedRecordController.js';
