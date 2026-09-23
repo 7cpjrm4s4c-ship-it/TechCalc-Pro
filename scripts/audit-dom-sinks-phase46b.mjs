@@ -63,7 +63,7 @@ for (const file of files) {
 }
 
 const releaseNotes = fs.readFileSync(path.join(root, runtimeLayout.coreDir, 'ux/releaseNotesController.js'), 'utf8');
-if (!releaseNotes.includes("import { esc as escapeHtml } from '../renderer.js';")) {
+if (!releaseNotes.includes("import { esc as escapeHtml } from '../ui/renderer.js';")) {
   failures.push('releaseNotesController.js must use the shared HTML escaping helper.');
 }
 if (/host\.innerHTML\s*=\s*notes\.slice/.test(releaseNotes) || /notes\.slice\([^)]*\)\.map\([\s\S]{0,500}join\(''\)\s*;/.test(releaseNotes)) {
