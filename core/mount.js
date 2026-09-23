@@ -1,4 +1,4 @@
-import { bindCommonInputs, bindNoClickScroll } from './renderer.js';
+import { bindCommonInputs, bindNoClickScroll } from './ui/renderer.js';
 import { createRenderCoordinator } from './renderCoordinator.js';
 import { bindModuleStateBinding } from './state/stateBinding.js';
 
