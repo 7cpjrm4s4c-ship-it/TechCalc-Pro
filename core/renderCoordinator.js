@@ -1,6 +1,6 @@
 import { safeReplaceContent } from './domUpdate.js';
 import { createRenderScheduler } from './renderScheduler.js';
-import { snapshotViewport, restoreViewportStable, isMobileViewport } from './renderer.js';
+import { snapshotViewport, restoreViewportStable, isMobileViewport } from './ui/renderer.js';
 import { startPerformanceSpan } from './ux/performanceController.js';
 
 const FIELD_ACTION_RE = /^(field:input|field:change|field:blur|field:enter|input:confirm|surface:confirm|segment:select|binding:)/;
