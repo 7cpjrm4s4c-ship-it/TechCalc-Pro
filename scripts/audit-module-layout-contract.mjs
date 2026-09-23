@@ -5,7 +5,7 @@ const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'
 
 const indexHtml = read('index.html');
 const layoutCss = read('css/module-spacing-contract.css');
-const renderer = read('core/renderer.js');
+const renderer = read('core/ui/renderer.js');
 
 const moduleViews = [
   'core/moduleRenderer.js',
