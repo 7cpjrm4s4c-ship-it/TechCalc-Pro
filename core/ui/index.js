@@ -1,4 +1,4 @@
-export * from '../collectionRenderer.js';
+export * from './collectionRenderer.js';
 export * from '../domUpdate.js';
 export * from './dynamicRenderer.js';
 export * from './formActions.js';
@@ -8,7 +8,7 @@ export * from '../engineering/numberService.js';
 export * from '../engineering/numbers.js';
 export * from '../renderCoordinator.js';
 export * from '../renderScheduler.js';
-export * from '../renderer.js';
+export * from './renderer.js';
 export * from '../resultRenderer.js';
 export * from './schemaRenderer.js';
 export * from '../typedDtoReportAdapter.js';

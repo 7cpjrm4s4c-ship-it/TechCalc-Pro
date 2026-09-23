@@ -1,5 +1,5 @@
-import { esc, card, grid, resultRows, segmented, inlineStats } from '../renderer.js';
-import { renderCollection as renderPlatformCollection } from '../collectionRenderer.js';
+import { esc, card, grid, resultRows, segmented, inlineStats } from './renderer.js';
+import { renderCollection as renderPlatformCollection } from './collectionRenderer.js';
 import { numberService } from '../engineering/numberService.js';
 
 const FIELD_TYPES = Object.freeze({
