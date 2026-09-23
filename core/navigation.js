@@ -1,7 +1,7 @@
 import { modules } from './registry.js';
 import { currentRoute } from './router.js';
 import { loadPreferences, setMobileQuickAccess } from './ux/preferences.js';
-import { esc } from './renderer.js';
+import { esc } from './ui/renderer.js';
 
 const MOBILE_QUERY = '(max-width: 767px)';
 
