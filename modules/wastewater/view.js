@@ -1,4 +1,4 @@
-import { card, renderModuleShell, stack, esc } from '../../core/renderer.js';
+import { card, renderModuleShell, stack, esc } from '../../core/ui/renderer.js';
 import { renderResultModel } from '../../core/resultRenderer.js';
 import { results } from './results.js';
 import { createWastewaterViewModel } from './viewModel.js';

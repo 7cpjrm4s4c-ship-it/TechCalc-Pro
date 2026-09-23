@@ -2,7 +2,7 @@ import { calculate } from './logic.js';
 import { createMixedAirViewModel } from './viewModel.js';
 import { renderOutputs } from './view.js';
 import { mixedAirController, mixedAirSaveCard } from './controller.js';
-import { esc } from '../../core/renderer.js';
+import { esc } from '../../core/ui/renderer.js';
 
 function setIslandInner(root, selector, html){
   const island = root?.querySelector?.(selector);

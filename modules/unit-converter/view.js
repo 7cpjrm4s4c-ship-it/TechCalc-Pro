@@ -1,5 +1,5 @@
 import config from './config.js';
-import { card, renderModuleShell } from '../../core/renderer.js';
+import { card, renderModuleShell } from '../../core/ui/renderer.js';
 import { createUnitConverterViewModel } from './viewModel.js';
 
 export function view(s) {

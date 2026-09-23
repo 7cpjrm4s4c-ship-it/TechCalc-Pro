@@ -19,7 +19,7 @@ import {
   renderVentilationResult,
   temperatureFields
 } from './view.js';
-import { grid } from '../../core/renderer.js';
+import { grid } from '../../core/ui/renderer.js';
 
 function fmtInput(value, digits = 2) {
   if (value === '' || value === null || value === undefined) return '';

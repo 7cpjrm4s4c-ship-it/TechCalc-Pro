@@ -1,5 +1,5 @@
 import config from './config.js';
-import { card, renderModuleShell } from '../../core/renderer.js';
+import { card, renderModuleShell } from '../../core/ui/renderer.js';
 import { calculate } from './logic.js';
 import { createPipeSizingViewModel } from './viewModel.js';
 

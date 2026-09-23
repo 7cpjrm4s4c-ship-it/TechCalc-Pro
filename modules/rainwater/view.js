@@ -1,5 +1,5 @@
 import config from './config.js';
-import { renderModuleShell, stack } from '../../core/renderer.js';
+import { renderModuleShell, stack } from '../../core/ui/renderer.js';
 import { calculate } from './logic.js';
 import { createRainwaterViewModel } from './viewModel.js';
 
