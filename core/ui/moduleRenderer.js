@@ -1,7 +1,7 @@
 import { renderModuleShell } from './renderer.js';
 import { renderFormSchema } from '../formSchema.js';
 import { renderSavedRecordPanel, renderSavedRecordList } from '../savedRecords.js';
-import { renderResultModel } from './resultRenderer.js';
+import { renderResultModel } from '../resultRenderer.js';
 
 function renderSavedRecords(model = {}, accent = 'blue') {
   if (!model || model.enabled === false) return '';
