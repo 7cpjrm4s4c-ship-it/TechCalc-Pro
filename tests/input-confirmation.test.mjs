@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 
-const renderer = fs.readFileSync('core/renderer.js', 'utf8');
+const renderer = fs.readFileSync('core/ui/renderer.js', 'utf8');
 assert.match(renderer, /bindCentralEventPipeline\(root, state, \{ renderOnBlur: true \}\)/,
   'Common inputs must delegate confirmation behavior to the central event pipeline.');
 
