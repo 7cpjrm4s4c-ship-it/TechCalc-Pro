@@ -1,4 +1,4 @@
-import { currentRoute } from '../router.js';
+import { currentRoute } from '../navigation/router.js';
 import { sanitizeText, normalizeKey } from './pdfText.js';
 import { buildFloodingReportSections } from './floodingReportSections.js';
 import { buildRainwaterReportSections } from './rainwaterReportSections.js';
