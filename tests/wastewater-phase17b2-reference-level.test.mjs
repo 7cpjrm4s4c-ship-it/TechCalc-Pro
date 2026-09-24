@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import schema from '../modules/wastewater/schema.js';
 import wastewater from '../modules/wastewater/index.js';
-import { renderPlatformModuleView } from '../core/moduleRenderer.js';
+import { renderPlatformModuleView } from '../core/ui/moduleRenderer.js';
 
 const schemaSource = readFileSync(new URL('../modules/wastewater/schema.js', import.meta.url), 'utf8');
 const controllerSource = readFileSync(new URL('../modules/wastewater/controller.js', import.meta.url), 'utf8');
