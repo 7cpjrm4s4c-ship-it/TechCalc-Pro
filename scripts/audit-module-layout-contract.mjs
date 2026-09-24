@@ -8,7 +8,7 @@ const layoutCss = read('css/module-spacing-contract.css');
 const renderer = read('core/ui/renderer.js');
 
 const moduleViews = [
-  'core/moduleRenderer.js',
+  'core/ui/moduleRenderer.js',
   'modules/heating-cooling/view.js',
   'modules/ventilation/view.js',
   'modules/pipe-sizing/view.js',
