@@ -1,4 +1,4 @@
-import { restoreFocus as restorePlatformFocus } from './ux/focusManager.js';
+import { restoreFocus as restorePlatformFocus } from '../ux/focusManager.js';
 
 function stableKey(element) {
   return element?.id || element?.dataset?.field || element?.name || null;

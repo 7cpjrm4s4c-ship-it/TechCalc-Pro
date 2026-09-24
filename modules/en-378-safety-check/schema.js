@@ -1,4 +1,4 @@
-import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
+import { defineFormSchema, FIELD_TYPES } from '../../core/ui/formSchema.js';
 import { buildFGasesImportOptions, hasAnyFGasesSavedSystem, hasMultipleFGasesSavedSystems, IMPORT_ACTION } from './importController.js';
 
 const option = (value, label) => Object.freeze({ value, label });

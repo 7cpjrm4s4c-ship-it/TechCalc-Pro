@@ -1,4 +1,4 @@
-import { safeReplaceContent } from '../domUpdate.js';
+import { safeReplaceContent } from './domUpdate.js';
 import { createRenderScheduler } from './renderScheduler.js';
 import { snapshotViewport, restoreViewportStable, isMobileViewport } from './renderer.js';
 import { startPerformanceSpan } from '../ux/performanceController.js';

@@ -1,4 +1,4 @@
-import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
+import { defineFormSchema, FIELD_TYPES } from '../../core/ui/formSchema.js';
 import { areaTypes, dnOrder } from '../../core/data/rainwater.js';
 import { surchargeFactorFromRiskClass } from './retentionFactors.js';
 const KOSTRA_URL = 'https://www.openko.de';

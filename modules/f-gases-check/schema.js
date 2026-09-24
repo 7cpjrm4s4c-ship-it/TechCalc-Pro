@@ -1,4 +1,4 @@
-import { defineFormSchema, FIELD_TYPES } from '../../core/formSchema.js';
+import { defineFormSchema, FIELD_TYPES } from '../../core/ui/formSchema.js';
 
 const option = (value, label) => Object.freeze({ value, label });
 const yesNoUnknownOptions = Object.freeze([option('', 'Nicht angegeben'), option('yes', 'Ja'), option('no', 'Nein')]);
