@@ -1,5 +1,5 @@
 import { bindCommonInputs, bindNoClickScroll } from './ui/renderer.js';
-import { createRenderCoordinator } from './renderCoordinator.js';
+import { createRenderCoordinator } from './ui/renderCoordinator.js';
 import { bindModuleStateBinding } from './state/stateBinding.js';
 
 export function mountModule(root, state, view, afterRender) {

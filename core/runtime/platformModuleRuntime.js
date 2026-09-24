@@ -8,8 +8,8 @@ import { createSavedRecord, savedRecordReducer } from '../savedRecordController.
 import { canonicalGermanNumberInput } from '../engineering/numbers.js';
 import { preserveScroll as keepScroll, preserveSavedRecordMutation, PlatformScrollManager } from '../ux/scrollManager.js';
 import { PlatformFocusManager } from '../ux/focusManager.js';
-import { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved, renderPlatformSaved } from '../moduleRenderer.js';
-import { getRenderScheduler } from '../renderScheduler.js';
+import { renderPlatformModuleView, renderPlatformForm, renderPlatformResultsAndSaved, renderPlatformSaved } from '../ui/moduleRenderer.js';
+import { getRenderScheduler } from '../ui/renderScheduler.js';
 import { startPerformanceSpan } from '../ux/performanceController.js';
 
 const noop = () => {};
