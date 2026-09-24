@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 
 const polishCss = readFileSync(new URL('../css/components-polish.css', import.meta.url), 'utf8');
 const layoutCss = readFileSync(new URL('../css/module-spacing-contract.css', import.meta.url), 'utf8');
-const platformView = readFileSync(new URL('../core/moduleRenderer.js', import.meta.url), 'utf8');
+const platformView = readFileSync(new URL('../core/ui/moduleRenderer.js', import.meta.url), 'utf8');
 const hxView = readFileSync(new URL('../modules/hx-diagram/view.js', import.meta.url), 'utf8');
 const wrgView = readFileSync(new URL('../modules/heat-recovery/view.js', import.meta.url), 'utf8');
 const mixedAirView = readFileSync(new URL('../modules/mixed-air/view.js', import.meta.url), 'utf8');
