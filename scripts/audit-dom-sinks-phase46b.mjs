@@ -12,7 +12,7 @@ const allowedInnerHtmlFiles = new Set([
   coreFile('ui/dynamicRenderer.js'),
   coreFile('lineSectionController/index.js'),
   coreFile('moduleRuntime.js'),
-  coreFile('navigation.js'),
+  coreFile('navigation/index.js'),
   coreFile('runtime/platformModuleRuntime.js'),
   moduleFile('drinking-water/dynamicRenderer.js'),
   moduleFile('heat-recovery/dynamicRenderer.js'),
