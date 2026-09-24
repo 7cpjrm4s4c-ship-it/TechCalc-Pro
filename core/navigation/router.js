@@ -1,5 +1,5 @@
-import { modules } from './registry.js';
-import { loadPreferences } from './ux/preferences.js';
+import { modules } from '../registry.js';
+import { loadPreferences } from '../ux/preferences.js';
 
 const FALLBACK_ROUTE = 'heating-cooling';
 const HASH_PREFIX = '#/';

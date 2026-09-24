@@ -1,7 +1,7 @@
 import { logger } from './diagnostics/logger.js';
 import { modules } from './registry.js';
-import { initRouter, currentRoute, navigate } from './router.js';
-import { renderNavigation, renderQuickAccessSettings } from './navigation.js';
+import { initRouter, currentRoute, navigate } from './navigation/router.js';
+import { renderNavigation, renderQuickAccessSettings } from './navigation/index.js';
 import heatingCoolingConfig from '../modules/heating-cooling/config.js';
 import ventilationConfig from '../modules/ventilation/config.js';
 import pipeSizingConfig from '../modules/pipe-sizing/config.js';
