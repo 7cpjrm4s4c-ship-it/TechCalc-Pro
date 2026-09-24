@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import wastewater from '../modules/wastewater/index.js';
 import rainwater from '../modules/rainwater/index.js';
 import createRainwaterView from '../modules/rainwater/view.js';
-import { renderFormSchema } from '../core/formSchema.js';
+import { renderFormSchema } from '../core/ui/formSchema.js';
 
 const savedRecordsSource = readFileSync(new URL('../core/savedRecords.js', import.meta.url), 'utf8');
 const collectionRendererSource = readFileSync(new URL('../js/platform/collectionRenderer/index.js', import.meta.url), 'utf8');

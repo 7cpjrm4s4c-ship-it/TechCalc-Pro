@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { defineFormSchema, FIELD_TYPES, renderFormSchema, renderResultSchema } from '../core/formSchema.js';
+import { defineFormSchema, FIELD_TYPES, renderFormSchema, renderResultSchema } from '../core/ui/formSchema.js';
 import { createSchemaView } from '../core/ui/schemaRenderer.js';
 
 const schema = defineFormSchema({
