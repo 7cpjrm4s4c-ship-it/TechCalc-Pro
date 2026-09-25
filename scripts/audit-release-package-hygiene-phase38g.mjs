@@ -87,7 +87,7 @@ if (precacheCount < 100) {
   fail(`service worker generated ASSETS block looks unexpectedly small (${precacheCount} entries)`);
 }
 
-const releaseNotes = readFileSync(path.join(root, 'RELEASE_NOTES.md'), 'utf8');
+const releaseNotes = readFileSync(path.join(root, 'docs/release/RELEASE_NOTES.md'), 'utf8');
 if (!releaseNotes.includes(`Version ${packageJson.version}`)) {
   fail('release notes must include package version entry');
 }
