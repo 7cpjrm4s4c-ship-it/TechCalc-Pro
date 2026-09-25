@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { createModuleRuntime } from '../core/moduleRuntime.js';
+import { createModuleRuntime } from '../core/runtime/moduleRuntime.js';
 
 function createRoot() {
   return {
