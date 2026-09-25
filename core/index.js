@@ -1,4 +1,4 @@
-export * from './appCore.js';
+export * from './contracts/appCore.js';
 export * from './contracts/index.js';
 export * from './data/index.js';
 export * from './diagnostics/index.js';
