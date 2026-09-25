@@ -3,7 +3,7 @@ import schema from './schema.js';
 import { state } from './state.js';
 import { calculate, processLabel } from './logic.js';
 import { createPlatformModule } from '../../core/runtime/index.js';
-import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
+import { createTypedDtoReportAdapter } from '../../core/pdf/typedDtoReportAdapter.js';
 import { bindHxDiagramActions } from './controller.js';
 import { renderHxSvg } from './diagramRenderer.js';
 import { renderView } from './view.js';

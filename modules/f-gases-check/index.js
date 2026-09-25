@@ -7,7 +7,7 @@ import { buildFGasesReportDto } from './reportAdapter.js';
 import { buildFGasesSavedRecord, hydrateFGasesSavedRecord, buildFGasesSavedRecordsModel } from './savedRecords.js';
 import { formatRefrigerantLabel, listRefrigerants } from '../../core/data/index.js';
 import { createPlatformModule } from '../../core/runtime/index.js';
-import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
+import { createTypedDtoReportAdapter } from '../../core/pdf/typedDtoReportAdapter.js';
 const refrigerantOptions = Object.freeze([
   Object.freeze({ value: '', label: 'Bitte wählen' }),
   ...listRefrigerants().map(item => Object.freeze({ value: item.id, label: formatRefrigerantLabel(item) || item.id }))

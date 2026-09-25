@@ -3,7 +3,7 @@ import schema from './schema.js';
 import { state, initialState } from './state.js';
 import { calculate } from './logic.js';
 import { createLineSectionController, createPlatformModule, createWastewaterDynamicRenderer } from '../../core/runtime/index.js';
-import { createTypedDtoReportAdapter, buildGenericModuleReportDto } from '../../core/typedDtoReportAdapter.js';
+import { createTypedDtoReportAdapter, buildGenericModuleReportDto } from '../../core/pdf/typedDtoReportAdapter.js';
 import {
   bindWastewaterCollections,
   buildWastewaterRecord,

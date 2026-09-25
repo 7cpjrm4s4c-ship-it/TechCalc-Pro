@@ -4,7 +4,7 @@ import { collectCurrentModule, lineSectionItems } from '../core/pdf/pdfDataMappi
 
 const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const pdfDataMappingSource = read('core/pdf/pdfDataMapping.js');
-const typedDtoReportAdapterSource = read('core/typedDtoReportAdapter.js');
+const typedDtoReportAdapterSource = read('core/pdf/typedDtoReportAdapter.js');
 const serviceWorkerSource = read('service-worker.js');
 const appSource = read('core/app.js');
 
@@ -139,6 +139,6 @@ for (const moduleIndexPath of moduleIndexPaths) {
 assert.match(appSource, /flooding-verification/);
 assert.match(appSource, /rainwater/);
 assert.match(appSource, /f-gases-check/);
-assert.match(serviceWorkerSource, /\.\/core\/typedDtoReportAdapter\.js/, 'typed DTO adapter must be precached with runtime assets');
+assert.match(serviceWorkerSource, /\.\/core\/pdf\/typedDtoReportAdapter\.js/, 'typed DTO adapter must be precached with runtime assets');
 
 console.log('PDF report engine typed DTO unification 1.6.1 regression ok');

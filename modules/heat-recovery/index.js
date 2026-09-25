@@ -3,7 +3,7 @@ import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { createPlatformModule } from '../../core/runtime/index.js';
-import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
+import { createTypedDtoReportAdapter } from '../../core/pdf/typedDtoReportAdapter.js';
 import { bindHeatRecoveryActions } from './controller.js';
 import { buildHeatRecoveryResultModel } from './results.js';
 import { renderView } from './view.js';

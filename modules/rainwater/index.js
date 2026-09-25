@@ -6,7 +6,7 @@ import { results } from './results.js';
 import { buildRainwaterReportDto } from './reportAdapter.js';
 import controller, { buildRainwaterRecord, rainwaterSavedStats, rainwaterSavedSubtitle, statePatchFromSurface, bindRainwaterController } from './controller.js';
 import { createLineSectionController, createPlatformModule, createRainwaterDynamicRenderer } from '../../core/runtime/index.js';
-import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
+import { createTypedDtoReportAdapter } from '../../core/pdf/typedDtoReportAdapter.js';
 import { createRainwaterView } from './view.js';
 
 const typedReportAdapter = createTypedDtoReportAdapter({

@@ -3,7 +3,7 @@ import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { createPlatformModule } from '../../core/runtime/index.js';
-import { buildGenericModuleReportDto, createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
+import { buildGenericModuleReportDto, createTypedDtoReportAdapter } from '../../core/pdf/typedDtoReportAdapter.js';
 import { bindBufferStorageActions, buildBufferRecord } from './controller.js';
 import { buildBufferStorageResultModel } from './results.js';
 import { isDynamicBufferStorageAction, renderView, updateBufferStorageDynamic } from './view.js';

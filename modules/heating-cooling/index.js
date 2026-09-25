@@ -3,7 +3,7 @@ import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { createHeatingCoolingDynamicRenderer, createLineSectionController, createPlatformModule } from '../../core/runtime/index.js';
-import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
+import { createTypedDtoReportAdapter } from '../../core/pdf/typedDtoReportAdapter.js';
 import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
 import { createHeatingCoolingView } from './view.js';
 import { buildHeatingCoolingReportDto } from './reportAdapter.js';

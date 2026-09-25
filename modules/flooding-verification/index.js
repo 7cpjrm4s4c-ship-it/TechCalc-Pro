@@ -12,7 +12,7 @@ import controller, {
   bindFloodingController
 } from './controller.js';
 import { createLineSectionController, createPlatformModule } from '../../core/runtime/index.js';
-import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
+import { createTypedDtoReportAdapter } from '../../core/pdf/typedDtoReportAdapter.js';
 import { createFloodingVerificationView } from './view.js';
 import { createFloodingDynamicRenderer } from './dynamicRenderer.js';
 

@@ -3,7 +3,7 @@ import schema from './schema.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { createPlatformModule, createUnitConverterDynamicRenderer } from '../../core/runtime/index.js';
-import { createTypedDtoReportAdapter } from '../../core/typedDtoReportAdapter.js';
+import { createTypedDtoReportAdapter } from '../../core/pdf/typedDtoReportAdapter.js';
 import { formatNumber } from '../../core/engineering/numberService.js';
 import { normalizeUnitSelection, buildUnitConverterResultModel } from './results.js';
 import { conversionContent, resultContent } from './viewModel.js';
