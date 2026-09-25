@@ -26,7 +26,7 @@ const requiredFiles = [
 const appSource = read('core/app.js');
 const appLines = appSource.split(/\r?\n/).length;
 const packageJson = JSON.parse(read('package.json'));
-const releaseNotes = read('RELEASE_NOTES.md');
+const releaseNotes = read('docs/release/RELEASE_NOTES.md');
 const serviceWorker = read('service-worker.js');
 
 const shellControllers = shellControllerFiles
@@ -75,7 +75,7 @@ const checks = [
   { id: 'shell-controllers-precached', pass: shellControllers.every(item => item.exists && item.precached), detail: shellControllers },
   { id: 'debug-logs-removed', pass: debugHits.length === 0, detail: debugHits.slice(0, 20) },
   { id: 'consolidated-test-gates-present', pass: missingScripts.length === 0, detail: missingScripts },
-  { id: 'release-notes-current', pass: releaseNotes.includes(`Version ${packageJson.version}`) || releaseNotes.includes(packageJson.version), detail: 'RELEASE_NOTES.md contains package version entry' }
+  { id: 'release-notes-current', pass: releaseNotes.includes(`Version ${packageJson.version}`) || releaseNotes.includes(packageJson.version), detail: 'docs/release/RELEASE_NOTES.md contains package version entry' }
 ];
 
 const report = {
