@@ -20,11 +20,11 @@ const savedOptionalModules = new Set(['unit-converter']);
 const coreText = [
   'core/events/eventPipeline.js',
   'core/stateBinding.js',
-  'core/scrollManager.js',
+  'core/ux/scrollManager.js',
   'core/renderCoordinator.js',
   'core/projectStorage.js',
   'core/runtime/moduleRuntime.js',
-  'core/savedRecordController.js'
+  'core/storage/savedRecordController.js'
 ].map((file) => read(path.join(root, file))).join('\n');
 const central = {
   enterTab: /Enter/.test(coreText) && /Tab/.test(coreText),
