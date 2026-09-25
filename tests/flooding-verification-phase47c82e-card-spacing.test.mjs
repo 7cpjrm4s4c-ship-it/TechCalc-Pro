@@ -15,7 +15,7 @@ const pipeSizingView = readFileSync(new URL('../modules/pipe-sizing/view.js', im
 const drinkingWaterView = readFileSync(new URL('../modules/drinking-water/view.js', import.meta.url), 'utf8');
 const wastewaterView = readFileSync(new URL('../modules/wastewater/view.js', import.meta.url), 'utf8');
 const rainwaterView = readFileSync(new URL('../modules/rainwater/view.js', import.meta.url), 'utf8');
-const moduleRuntime = readFileSync(new URL('../core/moduleRuntime.js', import.meta.url), 'utf8');
+const moduleRuntime = readFileSync(new URL('../core/runtime/moduleRuntime.js', import.meta.url), 'utf8');
 
 const migratedViews = [
   platformView,
