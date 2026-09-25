@@ -1,6 +1,7 @@
 import { logger } from '../diagnostics/logger.js';
 import { hardResetModuleRoot } from './moduleLifecycleAdapter.js';
 import { applyModuleRootLayout } from '../contracts/moduleLayoutContract.js';
+import { safeReplaceContent } from '../ui/domUpdate.js';
 import { restoreFocus as restorePlatformFocus } from '../ux/focusManager.js';
 
 const DEFAULT_MOUNT_TIMEOUT_MS = 7000;
@@ -122,9 +123,9 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
     root.__tcLastHtml = '';
     const renderLoading = () => {
       if (!isCurrent(token) || !root.hasAttribute?.('aria-busy')) return;
-      root.innerHTML = typeof loadingView === 'function'
+      safeReplaceContent(root, typeof loadingView === 'function'
         ? loadingView(moduleId)
-        : '<div class="card tc-module-loading" role="status">Modul wird geladen...</div>';
+        : '<div class="card tc-module-loading" role="status">Modul wird geladen...</div>', { restoreFocus: false });
     };
     clearLoadingTimer();
     const delay = Number(loadingDelayMs);
@@ -161,7 +162,7 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
     if (!isCurrent(token)) return false;
     logger.error(`Modul konnte nicht geladen werden: ${moduleId}`, error, { module: 'module-runtime' });
     root.__tcLastHtml = '';
-    root.innerHTML = '<div class="module-error card">Modul konnte nicht geladen werden.</div>';
+    safeReplaceContent(root, '<div class="module-error card">Modul konnte nicht geladen werden.</div>', { restoreFocus: false });
     root.removeAttribute('aria-busy');
     delete root.dataset.pendingModuleId;
     return false;
