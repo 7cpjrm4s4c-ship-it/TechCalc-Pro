@@ -2,7 +2,7 @@ import config from './config.js';
 import { calculate } from './logic.js';
 import { card, field, grid, inlineStats, renderModuleShell, segmented, selectField, stack } from '../../core/ui/renderer.js';
 import { createBufferStorageDynamicRenderer } from '../../core/runtime/index.js';
-import { renderResultModel } from '../../core/resultRenderer.js';
+import { renderResultModel } from '../../core/ui/resultRenderer.js';
 import { createBufferStorageViewModel } from './viewModel.js';
 import { bufferSaveCard, bufferStorageSavedController } from './controller.js';
 

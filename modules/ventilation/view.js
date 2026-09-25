@@ -1,6 +1,6 @@
 import { card, field, segmented, renderModuleShell, stack, grid } from '../../core/ui/renderer.js';
 import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
-import { renderResultGroup, renderResultModel } from '../../core/resultRenderer.js';
+import { renderResultGroup, renderResultModel } from '../../core/ui/resultRenderer.js';
 import { airStatsRows, buildVentilationResultModel } from './results.js';
 import {
   activeCalculationState,

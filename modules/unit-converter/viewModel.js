@@ -1,5 +1,5 @@
 import { field, selectField, stack } from '../../core/ui/renderer.js';
-import { renderResultModel } from '../../core/resultRenderer.js';
+import { renderResultModel } from '../../core/ui/resultRenderer.js';
 import { unitCategories } from '../../core/data/index.js';
 import { formatNumber } from '../../core/engineering/numberService.js';
 import { calculate } from './logic.js';

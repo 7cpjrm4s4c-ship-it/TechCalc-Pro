@@ -1,5 +1,5 @@
 import { inlineStats, esc } from '../../core/ui/renderer.js';
-import { renderResultModel } from '../../core/resultRenderer.js';
+import { renderResultModel } from '../../core/ui/resultRenderer.js';
 import { fmt } from '../../core/engineering/numbers.js';
 function hasStoredConsumers(r = {}) {
   return Boolean((r.usageUnits || []).length || (r.singleGroups || []).length || (r.rawSingles || []).length);

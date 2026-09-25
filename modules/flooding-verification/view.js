@@ -1,6 +1,6 @@
 import { renderModuleShell } from '../../core/ui/renderer.js';
 import { renderFormSchema } from '../../core/ui/formSchema.js';
-import { renderResultModel } from '../../core/resultRenderer.js';
+import { renderResultModel } from '../../core/ui/resultRenderer.js';
 import { floodingSurfaceSchema, floodingCalculationSchema } from './schema.js';
 
 const displayValue = (current, derived, fallback = '') => {

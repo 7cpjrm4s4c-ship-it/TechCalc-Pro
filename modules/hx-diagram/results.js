@@ -1,5 +1,5 @@
 import { esc } from '../../core/ui/renderer.js';
-import { renderResultModel } from '../../core/resultRenderer.js';
+import { renderResultModel } from '../../core/ui/resultRenderer.js';
 import { parseNumber } from '../../core/engineering/numberService.js';
 const WATER_HEAT_CAPACITY_KJ_KGK = 4.19;
 const MIN_COIL_APPROACH_K = 3;

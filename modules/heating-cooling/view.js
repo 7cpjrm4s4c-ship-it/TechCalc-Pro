@@ -1,7 +1,7 @@
 import { MEDIA, pipeSystems } from '../../core/data/index.js';
 import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
 import { card, selectField, segmented, renderModuleShell, stack, grid } from '../../core/ui/renderer.js';
-import { renderRecommendationCard, renderResultModel, renderResultTable } from '../../core/resultRenderer.js';
+import { renderRecommendationCard, renderResultModel, renderResultTable } from '../../core/ui/resultRenderer.js';
 import { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRows } from './results.js';
 import { activeCalculationState, key } from './controller.js';
 import { inputFields } from './viewModel.js';

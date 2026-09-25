@@ -1,6 +1,6 @@
 import { field, selectField, segmented, stack, grid } from '../../core/ui/renderer.js';
 import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
-import { renderResultModel } from '../../core/resultRenderer.js';
+import { renderResultModel } from '../../core/ui/resultRenderer.js';
 import { buildPressureHoldingResultModel } from './results.js';
 import { savedPlantsCard } from './controller.js';
 

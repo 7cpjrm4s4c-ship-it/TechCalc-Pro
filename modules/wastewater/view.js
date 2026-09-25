@@ -1,5 +1,5 @@
 import { card, renderModuleShell, stack, esc } from '../../core/ui/renderer.js';
-import { renderResultModel } from '../../core/resultRenderer.js';
+import { renderResultModel } from '../../core/ui/resultRenderer.js';
 import { results } from './results.js';
 import { createWastewaterViewModel } from './viewModel.js';
 export function renderWastewaterFixtures(fixtures = []) {

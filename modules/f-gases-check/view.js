@@ -5,7 +5,7 @@ import { buildFGasesResultModel } from './results.js';
 import { listRefrigerants } from '../../core/data/index.js';
 import { renderModuleShell } from '../../core/ui/renderer.js';
 import { renderFormSchema } from '../../core/ui/formSchema.js';
-import { renderResultModel } from '../../core/resultRenderer.js';
+import { renderResultModel } from '../../core/ui/resultRenderer.js';
 
 function schemaWithRefrigerants() {
   const options = [{ value: '', label: 'Bitte wählen' }, ...listRefrigerants().map(item => ({ value: item.id, label: item.name || item.id }))];
