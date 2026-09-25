@@ -2,7 +2,7 @@ import { mountModule } from './mount.js';
 import { bindCommonInputs, bindNoClickScroll } from '../ui/renderer.js';
 import { bindModuleStateBinding } from '../state/stateBinding.js';
 import { registerCentralActions, commitAllFields, registerPipelineCommitHandler } from '../events/index.js';
-import { createSavedRecord, savedRecordReducer } from '../savedRecordController.js';
+import { createSavedRecord, savedRecordReducer } from '../storage/savedRecordController.js';
 // createSavedRecordActions( remains the central action-factory contract; Phase 17C.9
 // uses the Heizung/Kälte-compatible direct binding to avoid duplicate mobile events.
 import { canonicalGermanNumberInput } from '../engineering/numbers.js';
