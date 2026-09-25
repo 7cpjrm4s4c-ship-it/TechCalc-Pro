@@ -6,7 +6,7 @@ import { detectRuntimeLayout } from './runtime-layout.mjs';
 const root = process.cwd();
 const serviceWorkerPath = path.join(root, 'service-worker.js');
 const packageJsonPath = path.join(root, 'package.json');
-const releaseNotesPath = path.join(root, 'RELEASE_NOTES.md');
+const releaseNotesPath = path.join(root, 'docs/release/RELEASE_NOTES.md');
 const checkMode = process.argv.includes('--check');
 const runtimeLayout = detectRuntimeLayout(root);
 
@@ -16,7 +16,7 @@ const STATIC_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './RELEASE_NOTES.md'
+  './docs/release/RELEASE_NOTES.md'
 ];
 const GENERATED_DIRS = [
   { dir: 'css', extensions: new Set(['.css']) },
