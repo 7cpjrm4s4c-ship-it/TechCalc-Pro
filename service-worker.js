@@ -4,7 +4,6 @@ const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './RELEASE_NOTES.md',
   './css/components-app-status.css',
   './css/components-collections.css',
   './css/components-controls.css',
@@ -326,7 +325,8 @@ const ASSETS = [
   './assets/icons/icon-192.png',
   './assets/icons/icon-32.png',
   './assets/icons/icon-512.png',
-  './docs/legal/agb.html'
+  './docs/legal/agb.html',
+  './docs/release/RELEASE_NOTES.md'
 ];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
@@ -370,7 +370,7 @@ function isVersionCriticalAsset(requestUrl) {
     || requestUrl.pathname.endsWith('/core/app.js')
     || requestUrl.pathname.endsWith('/core/ux/releaseNotesController.js')
     || requestUrl.pathname.endsWith('/service-worker.js')
-    || requestUrl.pathname.endsWith('/RELEASE_NOTES.md')
+    || requestUrl.pathname.endsWith('/docs/release/RELEASE_NOTES.md')
     || requestUrl.pathname.endsWith('/manifest.json');
 }
 self.addEventListener('fetch', event => {
@@ -379,7 +379,7 @@ self.addEventListener('fetch', event => {
   const requestUrl = new URL(event.request.url);
   if (requestUrl.origin !== self.location.origin) return;
   const isNavigation = event.request.mode === 'navigate' || event.request.destination === 'document';
-  const isReleaseNotes = requestUrl.pathname.endsWith('/RELEASE_NOTES.md') || requestUrl.pathname.endsWith('RELEASE_NOTES.md');
+  const isReleaseNotes = requestUrl.pathname.endsWith('/docs/release/RELEASE_NOTES.md') || requestUrl.pathname.endsWith('docs/release/RELEASE_NOTES.md');
   const isServiceWorker = requestUrl.pathname.endsWith('/service-worker.js') || requestUrl.pathname.endsWith('service-worker.js');
   const isVersionCritical = isVersionCriticalAsset(requestUrl);
   if (isNavigation || isReleaseNotes || isServiceWorker || isVersionCritical) {
