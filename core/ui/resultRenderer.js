@@ -1,4 +1,4 @@
-import { card, resultRows, esc } from './ui/renderer.js';
+import { card, resultRows, esc } from './renderer.js';
 
 function list(value) {
   return Array.isArray(value) ? value.filter(Boolean) : (value ? [value] : []);
