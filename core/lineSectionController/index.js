@@ -1,7 +1,7 @@
 import { card, stack } from '../../core/ui/renderer.js';
 import { registerCentralActions } from '../events/index.js';
 import { preserveSavedRecordMutation } from '../../core/ux/scrollManager.js';
-import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../../core/savedRecords.js';
+import { createRecordId, isSameId, replaceRecord, removeRecord, renderSavedRecordList, bindEditModeClear } from '../storage/savedRecords.js';
 
 function escapeAttribute(value) {
   return String(value ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
