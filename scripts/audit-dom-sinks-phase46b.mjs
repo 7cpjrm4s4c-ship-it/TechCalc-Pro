@@ -8,7 +8,7 @@ const coreFile = relativePath => `${runtimeLayout.coreDir}/${relativePath}`;
 const moduleFile = relativePath => `${runtimeLayout.modulesDir}/${relativePath}`;
 
 const allowedInnerHtmlFiles = new Set([
-  coreFile('domUpdate.js'),
+  coreFile('ui/domUpdate.js'),
   coreFile('ui/dynamicRenderer.js'),
   coreFile('lineSectionController/index.js'),
   coreFile('moduleRuntime.js'),
