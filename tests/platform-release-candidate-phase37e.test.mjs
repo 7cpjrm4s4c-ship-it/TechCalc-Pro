@@ -8,7 +8,7 @@ assert.equal(audit.phase, '37E');
 assert.equal(audit.status, 'pass');
 assert.equal(audit.checks.every(check => check.pass), true, 'all Phase 37E checks must pass');
 
-const releaseNotes = readFileSync('RELEASE_NOTES.md', 'utf8');
+const releaseNotes = readFileSync('docs/release/RELEASE_NOTES.md', 'utf8');
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
 assert.match(releaseNotes, new RegExp(`Version ${pkg.version.replaceAll('.', '\\.')}`));
 if (!pkg.version.includes('-dev.') && !pkg.version.includes('-rc.')) assert.match(releaseNotes, /Final Release/);
