@@ -35,7 +35,7 @@ const requiredAssets = [
   './',
   './index.html',
   './manifest.json',
-  './RELEASE_NOTES.md',
+  './docs/release/RELEASE_NOTES.md',
   ...listFiles('css', file => file.endsWith('.css')),
   ...runtimeAssets,
   ...listFiles('assets/icons'),
