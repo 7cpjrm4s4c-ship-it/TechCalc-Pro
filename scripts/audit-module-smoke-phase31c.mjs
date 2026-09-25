@@ -23,7 +23,7 @@ const coreText = [
   'core/scrollManager.js',
   'core/renderCoordinator.js',
   'core/projectStorage.js',
-  'core/moduleRuntime.js',
+  'core/runtime/moduleRuntime.js',
   'core/savedRecordController.js'
 ].map((file) => read(path.join(root, file))).join('\n');
 const central = {
