@@ -3,7 +3,7 @@ import { card, field, selectField, segmented, renderModuleShell, stack, grid, in
 import { fmt, fmtInput } from '../../core/engineering/numbers.js';
 import { createDrinkingWaterViewModel } from './viewModel.js';
 import { renderDrinkingWaterResultModel, consumerRows, unitStats, singleStats, consumerModeSuffix } from './results.js';
-import { isSameId } from '../../core/savedRecords.js';
+import { isSameId } from '../../core/storage/savedRecords.js';
 export function draftConsumerList(items, type, waterHeatingMode = 'central') {
   if (!items?.length) return '<div class="empty-state empty-state--compact">Noch keine Verbraucher ausgewählt</div>';
   return `<div class="tc-consumer-list">${items.map((c, index) => `<div class="tc-consumer-row tc-collection-row tc-consumer-row--editable">

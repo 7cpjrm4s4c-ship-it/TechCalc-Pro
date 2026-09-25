@@ -184,13 +184,13 @@ const referenceModules = [
     required('en-378-safety-check/state.js', ['../../core/data/index.js'])
   ], { extraFiles: ['alternativeRiskMeasures.js', 'chargeLimitCalculation.js', 'displayLabels.js', 'importController.js', 'installationSafetyRequirements.js', 'plannerGuidance.js', 'refrigerantCoverage.js', 'reportAdapter.js', 'savedRecords.js', 'snapshotImport.js', 'stateConsistency.js'], excludedFiles: ['controller.js', 'view.js', 'viewModel.js'] }),
   guard('drinking-water', [
-    required('drinking-water/controller.js', ['../../core/savedRecords.js', '../../core/ui/domUpdate.js', '../../core/ux/scrollManager.js']),
+    required('drinking-water/controller.js', ['../../core/storage/savedRecords.js', '../../core/ui/domUpdate.js', '../../core/ux/scrollManager.js']),
     required('drinking-water/dynamicRenderer.js', ['../../core/ux/scrollManager.js', '../../core/ux/focusManager.js']),
     required('drinking-water/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
     required('drinking-water/logic.js', ['../../core/engineering/numbers.js', '../../core/engineering/numberService.js']),
     required('drinking-water/results.js', ['../../core/ui/renderer.js', '../../core/ui/resultRenderer.js', '../../core/engineering/numbers.js']),
     required('drinking-water/schema.js', ['../../core/ui/formSchema.js']),
-    required('drinking-water/view.js', ['../../core/ui/renderer.js', '../../core/engineering/numbers.js', '../../core/savedRecords.js']),
+    required('drinking-water/view.js', ['../../core/ui/renderer.js', '../../core/engineering/numbers.js', '../../core/storage/savedRecords.js']),
     required('drinking-water/viewModel.js', ['../../core/engineering/numbers.js'])
   ], { extraFiles: ['dynamicRenderer.js'] })
 ];

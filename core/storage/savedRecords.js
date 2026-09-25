@@ -1,6 +1,6 @@
-import { esc, inlineStats } from './ui/renderer.js';
-import { markCommittedAction } from './ui/formActions.js';
-import { preserveSavedRecordScroll, preserveSavedRecordMutation } from './ux/scrollManager.js';
+import { esc, inlineStats } from '../ui/renderer.js';
+import { markCommittedAction } from '../ui/formActions.js';
+import { preserveSavedRecordScroll, preserveSavedRecordMutation } from '../ux/scrollManager.js';
 export function createRecordId(prefix = 'record') {
   try {
     if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') return globalThis.crypto.randomUUID();
