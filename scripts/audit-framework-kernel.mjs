@@ -8,7 +8,7 @@ const coreFile = relativePath => `${runtimeLayout.coreDir}/${relativePath}`;
 const moduleFile = relativePath => `${runtimeLayout.modulesDir}/${relativePath}`;
 const requiredFiles = [
   coreFile('index.js'),
-  coreFile('appCore.js'),
+  coreFile('contracts/appCore.js'),
   coreFile('contracts/index.js'),
   coreFile('contracts/moduleContract.js'),
   coreFile('contracts/moduleDefinition.js'),
@@ -42,7 +42,7 @@ const requiredFiles = [
 ];
 const forbiddenReferenceModuleImports = ['../../platform/', '../../shared/', '../../utils/'];
 const requiredCoreAreas = ['contracts', 'data', 'diagnostics', 'events', 'pdf', 'runtime', 'state', 'storage', 'styles', 'ui', 'ux'];
-const requiredCoreExports = ['./appCore.js', './contracts/index.js', './data/index.js', './diagnostics/index.js', './events/index.js', './pdf/index.js', './runtime/index.js', './state/index.js', './storage/index.js', './styles/index.js', './ui/index.js', './ux/index.js'];
+const requiredCoreExports = ['./contracts/appCore.js', './contracts/index.js', './data/index.js', './diagnostics/index.js', './events/index.js', './pdf/index.js', './runtime/index.js', './state/index.js', './storage/index.js', './styles/index.js', './ui/index.js', './ux/index.js'];
 const required = (file, specifiers) => ({ file: moduleFile(file), specifiers });
 const moduleFiles = (moduleId, extraFiles = [], excludedFiles = []) => {
   const excluded = new Set(excludedFiles);
@@ -220,7 +220,7 @@ for (const legacyBoundary of ['js/platform', 'js/framework', 'js/data']) {
 }
 
 for (const coreArea of requiredCoreAreas) {
-  if (!readProjectFile(coreFile('appCore.js')).includes(coreArea)) throw new Error(`Core area is not documented in appCore.js: ${coreArea}`);
+  if (!readProjectFile(coreFile('contracts/appCore.js')).includes(coreArea)) throw new Error(`Core area is not documented in appCore.js: ${coreArea}`);
 }
 for (const expectedExport of requiredCoreExports) {
   if (!readProjectFile(coreFile('index.js')).includes(expectedExport)) throw new Error(`Core entry point does not export ${expectedExport}`);
