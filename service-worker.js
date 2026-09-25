@@ -4,6 +4,7 @@ const ASSETS = [
   './',
   './index.html',
   './manifest.json',
+  './docs/release/RELEASE_NOTES.md',
   './css/components-app-status.css',
   './css/components-collections.css',
   './css/components-controls.css',
@@ -325,8 +326,7 @@ const ASSETS = [
   './assets/icons/icon-192.png',
   './assets/icons/icon-32.png',
   './assets/icons/icon-512.png',
-  './docs/legal/agb.html',
-  './docs/release/RELEASE_NOTES.md'
+  './docs/legal/agb.html'
 ];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
