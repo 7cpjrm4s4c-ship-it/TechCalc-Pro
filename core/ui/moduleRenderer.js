@@ -1,6 +1,6 @@
 import { renderModuleShell } from './renderer.js';
 import { renderFormSchema } from './formSchema.js';
-import { renderSavedRecordPanel, renderSavedRecordList } from '../savedRecords.js';
+import { renderSavedRecordPanel, renderSavedRecordList } from '../storage/savedRecords.js';
 import { renderResultModel } from './resultRenderer.js';
 
 function renderSavedRecords(model = {}, accent = 'blue') {
