@@ -1,7 +1,7 @@
 import { state } from './state.js';
 import { calculate, createConsumer, createUsageUnit, createSingleGroup, readUsageUnits, writeUsageUnits, readSingleConsumers, writeSingleConsumers } from './logic.js';
 import { isSameId } from '../../core/savedRecords.js';
-import { safeReplaceContent } from '../../core/domUpdate.js';
+import { safeReplaceContent } from '../../core/ui/domUpdate.js';
 import { createDrinkingWaterViewModel } from './viewModel.js';
 import { renderInputCard, renderResultCard, draftConsumerList } from './view.js';
 import { runWithoutScrollJump } from '../../core/ux/scrollManager.js';

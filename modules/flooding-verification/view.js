@@ -1,5 +1,5 @@
 import { renderModuleShell } from '../../core/ui/renderer.js';
-import { renderFormSchema } from '../../core/formSchema.js';
+import { renderFormSchema } from '../../core/ui/formSchema.js';
 import { renderResultModel } from '../../core/resultRenderer.js';
 import { floodingSurfaceSchema, floodingCalculationSchema } from './schema.js';
 

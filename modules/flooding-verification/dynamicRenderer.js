@@ -1,4 +1,4 @@
-import { safeReplaceContent } from '../../core/domUpdate.js';
+import { safeReplaceContent } from '../../core/ui/domUpdate.js';
 
 function setIsland(root, selector, content) {
   const host = root?.querySelector?.(selector);

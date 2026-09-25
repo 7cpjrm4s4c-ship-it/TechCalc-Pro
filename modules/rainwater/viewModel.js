@@ -1,4 +1,4 @@
-import { renderFormSchema } from '../../core/formSchema.js';
+import { renderFormSchema } from '../../core/ui/formSchema.js';
 import { renderResultModel } from '../../core/resultRenderer.js';
 import schema from './schema.js';
 import { buildRainwaterResultModel } from './results.js';
