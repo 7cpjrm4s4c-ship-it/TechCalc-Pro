@@ -1,4 +1,4 @@
-import { bindSavedRecordWorkflow } from '../savedRecordController.js';
+import { bindSavedRecordWorkflow } from './savedRecordController.js';
 export function bindSavedCalculationActions(root, {
   state,
   calculate,

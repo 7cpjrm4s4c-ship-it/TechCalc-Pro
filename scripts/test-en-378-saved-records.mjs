@@ -7,7 +7,7 @@ import {
   hydrateEN378SavedRecord
 } from '../modules/en-378-safety-check/savedRecords.js';
 import { calculate } from '../modules/en-378-safety-check/logic.js';
-import { renderSavedRecordPanel } from '../core/savedRecords.js';
+import { renderSavedRecordPanel } from '../core/storage/savedRecords.js';
 const state = {
   importedSystemName: 'Wärmepumpe Dachzentrale',
   refrigerantId: 'R-32',
