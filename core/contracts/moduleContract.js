@@ -16,11 +16,11 @@ export {
   readSchemaDefaults,
   renderFormSchema as renderSchemaForm,
   renderResultSchema as renderSchemaResults
-} from '../formSchema.js';
+} from '../ui/formSchema.js';
 
 import { renderModuleShell } from '../ui/renderer.js';
 import { defineModuleDefinition } from './moduleDefinition.js';
-import { renderFormSchema, renderResultSchema } from '../formSchema.js';
+import { renderFormSchema, renderResultSchema } from '../ui/formSchema.js';
 
 export function normalizeModuleDefinition(definition = {}) {
   return defineModuleDefinition(definition);
