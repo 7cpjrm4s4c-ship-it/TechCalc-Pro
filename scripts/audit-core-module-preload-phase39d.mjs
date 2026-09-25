@@ -11,8 +11,8 @@ const requiredPreloads = [
   './core/navigation/router.js',
   './core/registry.js',
   './core/navigation/index.js',
-  './core/moduleLifecycleAdapter.js',
-  './core/moduleRuntime.js',
+  './core/runtime/moduleLifecycleAdapter.js',
+  './core/runtime/moduleRuntime.js',
   './core/storage/projectStorage.js'
 ];
 

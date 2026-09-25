@@ -1,4 +1,4 @@
-import { logger } from './diagnostics/logger.js';
+import { logger } from '../diagnostics/logger.js';
 const CLEANUP_KEYS = [
   '__tcCentralEventPipelineCleanup',
   '__tcRainwaterLookupHydrationCleanup',

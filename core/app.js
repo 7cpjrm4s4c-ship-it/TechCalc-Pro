@@ -18,8 +18,8 @@ import floodingVerificationConfig from '../modules/flooding-verification/config.
 import fGasesCheckConfig from '../modules/f-gases-check/config.js';
 import en378SafetyCheckConfig from '../modules/en-378-safety-check/config.js';
 import { restoreSessionSnapshot, saveSessionSnapshot } from './storage/projectStorage.js';
-import { createModuleLifecycleAdapter } from './moduleLifecycleAdapter.js';
-import { createModuleRuntime } from './moduleRuntime.js';
+import { createModuleLifecycleAdapter } from './runtime/moduleLifecycleAdapter.js';
+import { createModuleRuntime } from './runtime/moduleRuntime.js';
 import { trackGlobalEventListener } from './events/index.js';
 import { initializeThemeController } from './ux/themeController.js';
 import { initializeSettingsController } from './ux/settingsController.js';

@@ -1,7 +1,7 @@
-import { logger } from './diagnostics/logger.js';
+import { logger } from '../diagnostics/logger.js';
 import { hardResetModuleRoot } from './moduleLifecycleAdapter.js';
-import { applyModuleRootLayout } from './contracts/moduleLayoutContract.js';
-import { restoreFocus as restorePlatformFocus } from './ux/focusManager.js';
+import { applyModuleRootLayout } from '../contracts/moduleLayoutContract.js';
+import { restoreFocus as restorePlatformFocus } from '../ux/focusManager.js';
 
 const DEFAULT_MOUNT_TIMEOUT_MS = 7000;
 const DEFAULT_LOADING_DELAY_MS = 120;
