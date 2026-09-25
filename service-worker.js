@@ -106,7 +106,7 @@ const ASSETS = [
   './core/pdf/reportTheme.js',
   './core/pdf/ventilationReportSections.js',
   './core/registry.js',
-  './core/resultRenderer.js',
+  './core/ui/resultRenderer.js',
   './core/runtime/index.js',
   './core/runtime/moduleLifecycleAdapter.js',
   './core/runtime/moduleRuntime.js',
