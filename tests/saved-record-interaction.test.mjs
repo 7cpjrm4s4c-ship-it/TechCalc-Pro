@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 
 const renderer = readFileSync('core/ui/renderer.js', 'utf8');
-const savedRecords = readFileSync('core/savedRecords.js', 'utf8');
+const savedRecords = readFileSync('core/storage/savedRecords.js', 'utf8');
 const savedController = readFileSync('core/storage/savedCalculationController.js', 'utf8');
 const scrollManager = readFileSync('core/ux/scrollManager.js', 'utf8');
 
