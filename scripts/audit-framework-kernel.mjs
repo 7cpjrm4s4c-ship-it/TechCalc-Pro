@@ -58,7 +58,7 @@ const guard = (id, requiredImports, options = {}) => ({
 });
 const referenceModules = [
   guard('unit-converter', [
-    required('unit-converter/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/engineering/numberService.js']),
+    required('unit-converter/index.js', ['../../core/runtime/index.js', '../../core/pdf/typedDtoReportAdapter.js', '../../core/engineering/numberService.js']),
     required('unit-converter/logic.js', ['../../core/data/index.js']),
     required('unit-converter/results.js', ['../../core/data/index.js', '../../core/engineering/numberService.js']),
     required('unit-converter/schema.js', ['../../core/ui/formSchema.js']),
@@ -67,7 +67,7 @@ const referenceModules = [
   ]),
   guard('pipe-sizing', [
     required('pipe-sizing/controller.js', ['../../core/runtime/index.js', '../../core/engineering/numberService.js']),
-    required('pipe-sizing/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/engineering/numberService.js']),
+    required('pipe-sizing/index.js', ['../../core/runtime/index.js', '../../core/pdf/typedDtoReportAdapter.js', '../../core/engineering/numberService.js']),
     required('pipe-sizing/logic.js', ['../../core/data/index.js']),
     required('pipe-sizing/results.js', ['../../core/engineering/numberService.js', '../../core/ui/renderer.js']),
     required('pipe-sizing/schema.js', ['../../core/ui/formSchema.js']),
@@ -76,7 +76,7 @@ const referenceModules = [
   ]),
   guard('pressure-holding', [
     required('pressure-holding/controller.js', ['../../core/runtime/index.js', '../../core/engineering/numberService.js']),
-    required('pressure-holding/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/engineering/numberService.js']),
+    required('pressure-holding/index.js', ['../../core/runtime/index.js', '../../core/pdf/typedDtoReportAdapter.js', '../../core/engineering/numberService.js']),
     required('pressure-holding/results.js', ['../../core/engineering/numberService.js']),
     required('pressure-holding/schema.js', ['../../core/ui/formSchema.js']),
     required('pressure-holding/view.js', ['../../core/ui/renderer.js']),
@@ -84,7 +84,7 @@ const referenceModules = [
   ]),
   guard('heating-cooling', [
     required('heating-cooling/controller.js', ['../../core/engineering/numberService.js', '../../core/data/index.js']),
-    required('heating-cooling/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js', '../../core/engineering/numberService.js']),
+    required('heating-cooling/index.js', ['../../core/runtime/index.js', '../../core/pdf/typedDtoReportAdapter.js', '../../core/engineering/numberService.js']),
     required('heating-cooling/logic.js', ['../../core/data/index.js']),
     required('heating-cooling/results.js', ['../../core/engineering/numberService.js']),
     required('heating-cooling/schema.js', ['../../core/ui/formSchema.js', '../../core/data/index.js', '../../core/engineering/numberService.js']),
@@ -93,7 +93,7 @@ const referenceModules = [
   ], { extraFiles: ['reportAdapter.js'] }),
   guard('ventilation', [
     required('ventilation/controller.js', ['../../core/runtime/index.js', '../../core/engineering/numberService.js', '../../core/ui/renderer.js']),
-    required('ventilation/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('ventilation/index.js', ['../../core/runtime/index.js', '../../core/pdf/typedDtoReportAdapter.js']),
     required('ventilation/logic.js', ['../../core/data/index.js']),
     required('ventilation/results.js', ['../../core/engineering/numberService.js']),
     required('ventilation/schema.js', ['../../core/ui/formSchema.js']),
@@ -102,7 +102,7 @@ const referenceModules = [
   ], { extraFiles: ['reportAdapter.js'] }),
   guard('buffer-storage', [
     required('buffer-storage/controller.js', ['../../core/runtime/index.js', '../../core/engineering/numberService.js']),
-    required('buffer-storage/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('buffer-storage/index.js', ['../../core/runtime/index.js', '../../core/pdf/typedDtoReportAdapter.js']),
     required('buffer-storage/results.js', ['../../core/engineering/numberService.js']),
     required('buffer-storage/schema.js', ['../../core/ui/formSchema.js']),
     required('buffer-storage/view.js', ['../../core/ui/renderer.js', '../../core/runtime/index.js', '../../core/ui/resultRenderer.js']),
@@ -110,7 +110,7 @@ const referenceModules = [
   ]),
   guard('wastewater', [
     required('wastewater/controller.js', ['../../core/engineering/numbers.js', '../../core/ui/formActions.js', '../../core/storage/index.js', '../../core/events/index.js', '../../core/ux/scrollManager.js']),
-    required('wastewater/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('wastewater/index.js', ['../../core/runtime/index.js', '../../core/pdf/typedDtoReportAdapter.js']),
     required('wastewater/results.js', ['../../core/engineering/numberService.js']),
     required('wastewater/schema.js', ['../../core/ui/formSchema.js', '../../core/engineering/numberService.js']),
     required('wastewater/view.js', ['../../core/ui/renderer.js', '../../core/ui/resultRenderer.js']),
@@ -118,7 +118,7 @@ const referenceModules = [
   ]),
   guard('rainwater', [
     required('rainwater/controller.js', ['../../core/engineering/numbers.js', '../../core/storage/index.js']),
-    required('rainwater/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('rainwater/index.js', ['../../core/runtime/index.js', '../../core/pdf/typedDtoReportAdapter.js']),
     required('rainwater/logic.js', ['../../core/engineering/numberService.js']),
     required('rainwater/results.js', ['../../core/engineering/numberService.js']),
     required('rainwater/schema.js', ['../../core/ui/formSchema.js', '../../core/engineering/numberService.js']),
@@ -129,7 +129,7 @@ const referenceModules = [
   guard('flooding-verification', [
     required('flooding-verification/controller.js', ['../../core/engineering/numbers.js', '../../core/events/index.js', '../../core/storage/index.js', '../../core/data/rainwater.js']),
     required('flooding-verification/dynamicRenderer.js', ['../../core/ui/domUpdate.js']),
-    required('flooding-verification/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('flooding-verification/index.js', ['../../core/runtime/index.js', '../../core/pdf/typedDtoReportAdapter.js']),
     required('flooding-verification/logic.js', ['../../core/data/rainwater.js']),
     required('flooding-verification/results.js', ['../../core/engineering/numberService.js']),
     required('flooding-verification/schema.js', ['../../core/ui/formSchema.js', '../../core/data/rainwater.js']),
@@ -138,7 +138,7 @@ const referenceModules = [
   guard('heat-recovery', [
     required('heat-recovery/controller.js', ['../../core/runtime/index.js', '../../core/ui/renderer.js']),
     required('heat-recovery/dynamicRenderer.js', ['../../core/ui/renderer.js']),
-    required('heat-recovery/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('heat-recovery/index.js', ['../../core/runtime/index.js', '../../core/pdf/typedDtoReportAdapter.js']),
     required('heat-recovery/logic.js', ['../../core/engineering/hvacAir.js']),
     required('heat-recovery/results.js', ['../../core/engineering/hvacAirResults.js']),
     required('heat-recovery/schema.js', ['../../core/ui/formSchema.js']),
@@ -148,7 +148,7 @@ const referenceModules = [
   guard('mixed-air', [
     required('mixed-air/controller.js', ['../../core/runtime/index.js', '../../core/ui/renderer.js', '../../core/engineering/numberService.js']),
     required('mixed-air/dynamicRenderer.js', ['../../core/ui/renderer.js']),
-    required('mixed-air/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('mixed-air/index.js', ['../../core/runtime/index.js', '../../core/pdf/typedDtoReportAdapter.js']),
     required('mixed-air/logic.js', ['../../core/engineering/hvacAir.js']),
     required('mixed-air/results.js', ['../../core/engineering/hvacAirResults.js']),
     required('mixed-air/schema.js', ['../../core/ui/formSchema.js']),
@@ -158,7 +158,7 @@ const referenceModules = [
   guard('hx-diagram', [
     required('hx-diagram/controller.js', ['../../core/runtime/index.js', '../../core/events/index.js', '../../core/ux/scrollManager.js', '../../core/ui/renderer.js']),
     required('hx-diagram/formRenderer.js', ['../../core/ui/renderer.js', '../../core/engineering/numberService.js']),
-    required('hx-diagram/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('hx-diagram/index.js', ['../../core/runtime/index.js', '../../core/pdf/typedDtoReportAdapter.js']),
     required('hx-diagram/logic.js', ['../../core/engineering/numberService.js']),
     required('hx-diagram/renderPipeline.js', ['../../core/ui/renderer.js', '../../core/engineering/numberService.js', '../../core/ux/focusManager.js']),
     required('hx-diagram/results.js', ['../../core/ui/renderer.js', '../../core/ui/resultRenderer.js', '../../core/engineering/numberService.js']),
@@ -166,7 +166,7 @@ const referenceModules = [
     required('hx-diagram/view.js', ['../../core/ui/renderer.js'])
   ], { extraFiles: ['diagramRenderer.js', 'formRenderer.js', 'renderPipeline.js'] }),
   guard('f-gases-check', [
-    required('f-gases-check/index.js', ['../../core/data/index.js', '../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('f-gases-check/index.js', ['../../core/data/index.js', '../../core/runtime/index.js', '../../core/pdf/typedDtoReportAdapter.js']),
     required('f-gases-check/logic.js', ['../../core/data/index.js']),
     required('f-gases-check/reportAdapter.js', ['../../core/data/index.js']),
     required('f-gases-check/results.js', ['../../core/data/index.js']),
@@ -177,7 +177,7 @@ const referenceModules = [
   guard('en-378-safety-check', [
     required('en-378-safety-check/chargeLimitCalculation.js', ['../../core/data/index.js']),
     required('en-378-safety-check/importController.js', ['../../core/state/index.js']),
-    required('en-378-safety-check/index.js', ['../../core/data/index.js', '../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('en-378-safety-check/index.js', ['../../core/data/index.js', '../../core/runtime/index.js', '../../core/pdf/typedDtoReportAdapter.js']),
     required('en-378-safety-check/logic.js', ['../../core/data/index.js']),
     required('en-378-safety-check/refrigerantCoverage.js', ['../../core/data/index.js']),
     required('en-378-safety-check/schema.js', ['../../core/ui/formSchema.js']),
@@ -186,7 +186,7 @@ const referenceModules = [
   guard('drinking-water', [
     required('drinking-water/controller.js', ['../../core/storage/savedRecords.js', '../../core/ui/domUpdate.js', '../../core/ux/scrollManager.js']),
     required('drinking-water/dynamicRenderer.js', ['../../core/ux/scrollManager.js', '../../core/ux/focusManager.js']),
-    required('drinking-water/index.js', ['../../core/runtime/index.js', '../../core/typedDtoReportAdapter.js']),
+    required('drinking-water/index.js', ['../../core/runtime/index.js', '../../core/pdf/typedDtoReportAdapter.js']),
     required('drinking-water/logic.js', ['../../core/engineering/numbers.js', '../../core/engineering/numberService.js']),
     required('drinking-water/results.js', ['../../core/ui/renderer.js', '../../core/ui/resultRenderer.js', '../../core/engineering/numbers.js']),
     required('drinking-water/schema.js', ['../../core/ui/formSchema.js']),
