@@ -8,7 +8,7 @@ const CENTRAL_KEYBOARD_FILES = new Set([
   'core/events/eventPipeline.js',
   'core/ux/focusManager.js',
   'core/state/stateBinding.js',
-  'core/savedRecords.js',
+  'core/storage/savedRecords.js',
   'core/ux/settingsController.js'
 ]);
 const ALLOWED_NON_KEYBOARD_KEY_PROPERTIES = new Set([
