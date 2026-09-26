@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-1.6.1';
-const CACHE_REVISION = '1.6.1-version-1-6-1-pdf-export-vereinheitlichung';
+const CACHE_NAME = 'techcalc-pro-2.0.0';
+const CACHE_REVISION = '2.0.0-version-2-0-0-core-runtime-und-framework-kernel';
 const ASSETS = [
   './',
   './index.html',

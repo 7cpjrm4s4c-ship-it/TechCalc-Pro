@@ -1,14 +1,24 @@
-## Version 1.6.1 – PDF-Export-Vereinheitlichung
-
-### PR 25 – Vorbereitung Core-Runtime und Framework-Kernel
+## Version 2.0.0 – Core-Runtime und Framework-Kernel
+### Neu
 - Die Laufzeitstruktur ist auf die kanonischen Bereiche `core/` und `modules/` ausgerichtet.
 - Der Framework-Kernel-Vertrag dokumentiert Core als alleinige Quelle für app-weite Laufzeitverantwortungen.
 - Der zentrale Datenpfad ist über `core/data` festgelegt; frühere Kompatibilitätsgrenzen unter `js/` sind nicht mehr Teil der Zielarchitektur.
+- App-weite Verantwortlichkeiten wie Runtime, Verträge, Daten, Diagnostik, Events, Formulare, PDF, Rendering, State, Storage, Styles, UI und UX sind Core-Verantwortung.
+- Fachmodule bleiben auf Metadaten, Konfiguration, Zustand, Schema, Berechnungslogik, Ergebnismapping, Reportadapter, Saved-Record-Adapter und modulbezogene Controller- oder View-Logik begrenzt.
+
+### Verbesserungen
 - Import-, Precache-, Release-Readiness-, Package-Hygiene- und Integrationsprüfungen wurden auf die neue Runtime-Struktur ausgerichtet.
-- Der Playwright-GitHub-Actions-Workflow ist für die E2E-Gates wiederhergestellt.
+- Die Release Notes werden unter `docs/release/RELEASE_NOTES.md` geführt; die frühere Root-Ablage wurde aus der Runtime-Precache-Prüfung entfernt.
 - Die Netlify-NPM-Registry-Konfiguration ist explizit über `.npmrc` abgesichert.
+- Der Playwright-GitHub-Actions-Workflow ist für die E2E-Gates wiederhergestellt.
 - Der ausschließlich für Entwicklung vorgesehene Blob-Transformer-Worker besitzt einen eigenen Security Guard.
-- Es wurde kein Release-Versionssprung vorgenommen; `package.json`, Manifest, Service Worker und Release-Readiness bleiben bis zum expliziten Versionsabschluss auf `1.6.1`.
+
+### Qualität
+- Der Framework-Kernel wird durch `npm run audit:framework-kernel` geprüft.
+- Die vollständigen Gates bleiben über `npm test`, `npm run test:f-gases`, `npm run test:flooding` und `npm run test:integration` abgesichert.
+- Die Release-Version wurde auf `2.0.0` angehoben; `package.json`, Manifest, Service Worker und Release-Readiness sind darauf synchronisiert.
+
+## Version 1.6.1 – PDF-Export-Vereinheitlichung
 ### Verbesserungen
 - Der PDF-Export der Berechnungsmodule läuft über die zentrale Typed-DTO-PDF-Engine.
 - Heizung/Kälte und Lüftung dienen als Referenz für den einheitlichen Protokollaufbau der allgemeinen Berechnungsmodule.
