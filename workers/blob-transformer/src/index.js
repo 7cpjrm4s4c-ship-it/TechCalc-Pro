@@ -1,45 +1,59 @@
 const JsonContentType = 'application/json; charset=utf-8';
 const DefaultGitHubApiBaseUrl = 'https://api.github.com';
+const MaxRequestBodyBytes = 256 * 1024;
+const MaxInputBlobBytes = 1024 * 1024;
+const MaxPatchBytes = 256 * 1024;
+const MaxOperations = 25;
+const MaxOperationTextBytes = 64 * 1024;
+const MaxRegexPatternLength = 512;
+const AllowedCorsHeaders = 'Authorization, Content-Type';
+const AllowedCorsMethods = 'GET, POST, OPTIONS';
+const DefaultAllowedOrigins = [];
+
 
 export default {
   async fetch(request, env) {
-    if (request.method === 'OPTIONS') {
-      return createJsonResponse({ ok: true }, 204);
-    }
-
     const url = new URL(request.url);
     const path = normalizePath(url.pathname);
 
     try {
+      if (request.method === 'OPTIONS') {
+        return createCorsPreflightResponse(request, env);
+      }
+
       if (request.method === 'GET' && (path === '/' || path === '/health')) {
-        return createJsonResponse({ ok: true, service: 'techcalc-blob-transformer' });
+        return createJsonResponse({ ok: true, service: 'techcalc-blob-transformer' }, 200, request, env);
       }
 
       if (request.method !== 'POST') {
-        return createJsonResponse({ ok: false, error: 'Method not allowed.' }, 405);
+        return createJsonResponse({ ok: false, error: 'Method not allowed.' }, 405, request, env);
       }
+
+      enforceAllowedOrigin(request, env);
+      authenticateRequest(request, env);
+      enforceRequestSize(request);
 
       const payload = await readJson(request);
 
       if (path === '/transformBlob' || path === '/transform-blob' || hasOperations(payload)) {
         const result = await transformBlob(payload, env);
-        return createJsonResponse(result);
+        return createJsonResponse(result, 200, request, env);
       }
 
       if (path === '/patchBlob' || path === '/patch-blob' || hasPatch(payload)) {
         const result = await patchBlob(payload, env);
-        return createJsonResponse(result);
+        return createJsonResponse(result, 200, request, env);
       }
 
-      return createJsonResponse({ ok: false, error: 'Unknown operation.' }, 404);
+      return createJsonResponse({ ok: false, error: 'Unknown operation.' }, 404, request, env);
     } catch (error) {
-      return createErrorResponse(error);
+      return createErrorResponse(error, request, env);
     }
   },
 };
 
 async function transformBlob(payload, env) {
-  validateRepositoryInput(payload);
+  validateRepositoryInput(payload, env);
   validateTransformInput(payload);
 
   const githubClient = createGitHubClient(env);
@@ -76,7 +90,7 @@ async function transformBlob(payload, env) {
 }
 
 async function patchBlob(payload, env) {
-  validateRepositoryInput(payload);
+  validateRepositoryInput(payload, env);
   validatePatchInput(payload);
 
   const githubClient = createGitHubClient(env);
@@ -156,7 +170,14 @@ function replaceAllExact(content, search, replacement) {
 
 function replaceRegex(content, search, replacement, flags) {
   const normalizedFlags = normalizeRegexFlags(flags);
-  const regex = new RegExp(search, normalizedFlags);
+  let regex;
+
+  try {
+    regex = new RegExp(search, normalizedFlags);
+  } catch {
+    throw createHttpError(400, 'operation.search must be a valid regular expression.');
+  }
+
   const matches = content.match(regex)?.length || 0;
 
   return {
@@ -413,21 +434,35 @@ function encodeBase64(value) {
 }
 
 async function readJson(request) {
+  const body = await request.text();
+
+  validateByteLength(body, 'request body', MaxRequestBodyBytes);
+
   try {
-    return await request.json();
+    return JSON.parse(body);
   } catch {
     throw createHttpError(400, 'Request body must be valid JSON.');
   }
 }
 
-function validateRepositoryInput(payload) {
+function validateRepositoryInput(payload, env) {
   validateRequiredString(payload.owner, 'owner');
   validateRequiredString(payload.repo, 'repo');
   validateRequiredString(payload.file_sha, 'file_sha');
 
+  if (!/^[A-Za-z0-9_.-]{1,100}$/.test(payload.owner)) {
+    throw createHttpError(400, 'owner contains unsupported characters.');
+  }
+
+  if (!/^[A-Za-z0-9_.-]{1,100}$/.test(payload.repo)) {
+    throw createHttpError(400, 'repo contains unsupported characters.');
+  }
+
   if (!/^[a-f0-9]{40}$/i.test(payload.file_sha)) {
     throw createHttpError(400, 'file_sha must be a 40-character Git SHA.');
   }
+
+  enforceRepositoryAllowlist(payload.owner, payload.repo, env);
 }
 
 function validateTransformInput(payload) {
@@ -435,25 +470,42 @@ function validateTransformInput(payload) {
     throw createHttpError(400, 'operations must contain at least one operation.');
   }
 
+  if (payload.operations.length > MaxOperations) {
+    throw createHttpError(413, `operations must not contain more than ${MaxOperations} entries.`);
+  }
+
   for (const operation of payload.operations) {
     validateRequiredString(operation.type, 'operation.type');
     validateRequiredString(operation.search, 'operation.search');
+    validateByteLength(operation.search, 'operation.search', MaxOperationTextBytes);
 
     if (typeof operation.replace !== 'string') {
       throw createHttpError(400, 'operation.replace must be a string.');
     }
 
+    validateByteLength(operation.replace, 'operation.replace', MaxOperationTextBytes);
+
     if (operation.type !== 'replace' && operation.type !== 'replaceRegex') {
       throw createHttpError(400, `Unsupported operation type: ${operation.type}`);
+    }
+
+    if (operation.type === 'replaceRegex') {
+      validateSafeRegex(operation.search);
+      validateRegexFlags(operation.flags);
     }
   }
 }
 
 function validatePatchInput(payload) {
   validateRequiredString(payload.patch, 'patch');
+  validateByteLength(payload.patch, 'patch', MaxPatchBytes);
 }
 
 function validateInputBlob(inputBlob, payload) {
+  if (typeof inputBlob.size === 'number' && inputBlob.size > MaxInputBlobBytes) {
+    throw createHttpError(413, `Input blob exceeds the ${MaxInputBlobBytes} byte limit.`);
+  }
+
   if (payload.expected_sha && payload.expected_sha !== inputBlob.sha) {
     throw createHttpError(409, 'Input blob SHA does not match expected_sha.');
   }
@@ -466,6 +518,130 @@ function validateInputBlob(inputBlob, payload) {
 function validateRequiredString(value, fieldName) {
   if (typeof value !== 'string' || value.length === 0) {
     throw createHttpError(400, `${fieldName} is required.`);
+  }
+}
+
+function validateByteLength(value, fieldName, maxBytes) {
+  const byteLength = new TextEncoder().encode(value).length;
+
+  if (byteLength > maxBytes) {
+    throw createHttpError(413, `${fieldName} exceeds the ${maxBytes} byte limit.`);
+  }
+}
+
+function validateRegexFlags(flags) {
+  if (flags === undefined || flags === null) {
+    return;
+  }
+
+  if (typeof flags !== 'string' || !/^[dgimsuvy]*$/.test(flags)) {
+    throw createHttpError(400, 'operation.flags contains unsupported regular expression flags.');
+  }
+}
+
+function validateSafeRegex(pattern) {
+  validateByteLength(pattern, 'operation.search', MaxRegexPatternLength);
+
+  if (/\\[1-9]/.test(pattern)) {
+    throw createHttpError(400, 'operation.search must not use regular expression backreferences.');
+  }
+
+  if (/[?][<!=]/.test(pattern)) {
+    throw createHttpError(400, 'operation.search must not use lookbehind or lookahead assertions.');
+  }
+
+  if (/[+*?}][+*?{]/.test(pattern) || /\([^)]*[+*][^)]*\)[+*{]/.test(pattern)) {
+    throw createHttpError(400, 'operation.search contains a potentially unsafe nested quantifier.');
+  }
+}
+
+function parseCsvEnv(value) {
+  if (typeof value !== 'string') {
+    return [];
+  }
+
+  return value
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+function getAllowedOrigins(env) {
+  const configuredOrigins = parseCsvEnv(env.BLOB_TRANSFORMER_ALLOWED_ORIGINS);
+
+  if (configuredOrigins.length > 0) {
+    return configuredOrigins;
+  }
+
+  return DefaultAllowedOrigins;
+}
+
+function enforceAllowedOrigin(request, env) {
+  const origin = request.headers.get('Origin');
+
+  if (!origin) {
+    return;
+  }
+
+  const allowedOrigins = getAllowedOrigins(env);
+
+  if (!allowedOrigins.includes(origin)) {
+    throw createHttpError(403, 'Origin is not allowed.');
+  }
+}
+
+function enforceRequestSize(request) {
+  const contentLength = Number(request.headers.get('Content-Length'));
+
+  if (Number.isFinite(contentLength) && contentLength > MaxRequestBodyBytes) {
+    throw createHttpError(413, `Request body exceeds the ${MaxRequestBodyBytes} byte limit.`);
+  }
+}
+
+function authenticateRequest(request, env) {
+  const expectedToken = env.BLOB_TRANSFORMER_API_TOKEN || env.WORKER_API_TOKEN;
+
+  if (!expectedToken) {
+    throw createHttpError(500, 'BLOB_TRANSFORMER_API_TOKEN secret is not configured.');
+  }
+
+  const authorizationHeader = request.headers.get('Authorization') || '';
+  const submittedToken = authorizationHeader.startsWith('Bearer ')
+    ? authorizationHeader.slice('Bearer '.length).trim()
+    : '';
+
+  if (!submittedToken || !constantTimeEquals(submittedToken, expectedToken)) {
+    throw createHttpError(401, 'Unauthorized.');
+  }
+}
+
+function constantTimeEquals(left, right) {
+  const leftBytes = new TextEncoder().encode(left);
+  const rightBytes = new TextEncoder().encode(right);
+  const length = Math.max(leftBytes.length, rightBytes.length);
+  let difference = leftBytes.length ^ rightBytes.length;
+
+  for (let index = 0; index < length; index += 1) {
+    difference |= (leftBytes[index] || 0) ^ (rightBytes[index] || 0);
+  }
+
+  return difference === 0;
+}
+
+function enforceRepositoryAllowlist(owner, repo, env) {
+  const allowedRepositories = parseCsvEnv(env.BLOB_TRANSFORMER_ALLOWED_REPOSITORIES);
+
+  if (allowedRepositories.length === 0) {
+    throw createHttpError(500, 'BLOB_TRANSFORMER_ALLOWED_REPOSITORIES is not configured.');
+  }
+
+  const repository = `${owner}/${repo}`.toLowerCase();
+  const isAllowed = allowedRepositories
+    .map((entry) => entry.toLowerCase())
+    .includes(repository);
+
+  if (!isAllowed) {
+    throw createHttpError(403, 'Repository is not allowed.');
   }
 }
 
@@ -506,19 +682,48 @@ function createTransformationResponse(inputBlob, outputContent, metadata) {
   };
 }
 
-function createJsonResponse(payload, status = 200) {
-  return new Response(JSON.stringify(payload), {
-    status,
+function createCorsPreflightResponse(request, env) {
+  enforceAllowedOrigin(request, env);
+
+  return new Response(null, {
+    status: 204,
     headers: {
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Origin': '*',
-      'Content-Type': JsonContentType,
+      ...createCorsHeaders(request, env),
+      'Access-Control-Allow-Headers': AllowedCorsHeaders,
+      'Access-Control-Allow-Methods': AllowedCorsMethods,
+      'Access-Control-Max-Age': '600',
     },
   });
 }
 
-function createErrorResponse(error) {
+function createJsonResponse(payload, status = 200, request, env) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: {
+      ...createCorsHeaders(request, env),
+      'Content-Type': JsonContentType,
+      'X-Content-Type-Options': 'nosniff',
+    },
+  });
+}
+
+function createCorsHeaders(request, env) {
+  const origin = request?.headers?.get('Origin');
+  const allowedOrigins = getAllowedOrigins(env || {});
+
+  if (!origin || !allowedOrigins.includes(origin)) {
+    return {
+      Vary: 'Origin',
+    };
+  }
+
+  return {
+    'Access-Control-Allow-Origin': origin,
+    Vary: 'Origin',
+  };
+}
+
+function createErrorResponse(error, request, env) {
   const status = error.status || 500;
 
   return createJsonResponse(
@@ -528,6 +733,8 @@ function createErrorResponse(error) {
       error: error.message || 'Unexpected error.',
     },
     status,
+    request,
+    env,
   );
 }
 

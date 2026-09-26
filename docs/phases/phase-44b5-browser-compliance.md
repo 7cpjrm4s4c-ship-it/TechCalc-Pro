@@ -21,7 +21,7 @@ Security-Zielbild:
 
 ## Implementierung
 
-- `_headers`: CSP um `frame-src 'self' https://app.netlify.com` und `child-src 'self' https://app.netlify.com` ergänzt.
+- `_headers`: CSP um `frame-src 'none'` und `child-src 'none'` ergänzt.
 - `index.html`: kein `mobile-web-app-capable`; `apple-mobile-web-app-capable` bleibt vorhanden.
 - `scripts/audit-browser-compliance-phase44b5.mjs`: Browser-Compliance-Audit ergänzt.
 - `package.json`: Audit in `lint` eingebunden.
@@ -57,3 +57,9 @@ Phase 44B.5 ergänzt Gate 10 um den letzten Browser-Compliance-Schritt vor RC-Fr
 3. Implementierung – kleine, nachvollziehbare Änderungen.
 4. Regression – gezielte Tests gegen Referenzmodule.
 5. Dokumentation – Contracts, ADRs und Phasendokumente aktualisieren.
+
+
+## Security Header Hardening
+
+- `Cross-Origin-Opener-Policy: same-origin` und `Cross-Origin-Resource-Policy: same-origin` sind Teil des Browser-Compliance-Vertrags.
+- Externe Frame-Quellen sind nicht Bestandteil des aktuellen Laufzeitvertrags; CSP verwendet `frame-src 'none'` und `child-src 'none'`.
