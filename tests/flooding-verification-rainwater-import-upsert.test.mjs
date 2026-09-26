@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { state as rainwaterState } from '../js/modules/rainwater/state.js';
-import { importRainwater } from '../js/modules/flooding-verification/controller.js';
+import { state as rainwaterState } from '../modules/rainwater/state.js';
+import { importRainwater } from '../modules/flooding-verification/controller.js';
 
 const roof = (id, name, area = '100') => ({
   id,

@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 
-import { createFGasesSystemSnapshot } from '../js/shared/fGasesSystemSnapshot.js';
-import { state as fGasesState } from '../js/modules/f-gases-check/state.js';
-import { buildFGasesImportOptions, buildFGasesImportPatch, hasAnyFGasesSavedSystem, hasMultipleFGasesSavedSystems } from '../js/modules/en-378-safety-check/importController.js';
-import { calculate } from '../js/modules/en-378-safety-check/logic.js';
-import { buildEN378SafetyCheckResultModel } from '../js/modules/en-378-safety-check/results.js';
-import { fieldLabel, validationIssueLabel } from '../js/modules/en-378-safety-check/displayLabels.js';
+import { createFGasesSystemSnapshot } from '../core/data/fGasesSystemSnapshot.js';
+import { state as fGasesState } from '../modules/f-gases-check/state.js';
+import { buildFGasesImportOptions, buildFGasesImportPatch, hasAnyFGasesSavedSystem, hasMultipleFGasesSavedSystems } from '../modules/en-378-safety-check/importController.js';
+import { calculate } from '../modules/en-378-safety-check/logic.js';
+import { buildEN378SafetyCheckResultModel } from '../modules/en-378-safety-check/results.js';
+import { fieldLabel, validationIssueLabel } from '../modules/en-378-safety-check/displayLabels.js';
 
 fGasesState.set({
   savedSystems: [

@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const index = readFileSync('js/modules/pipe-sizing/index.js', 'utf8');
-const controller = readFileSync('js/modules/pipe-sizing/controller.js', 'utf8');
-const state = readFileSync('js/modules/pipe-sizing/state.js', 'utf8');
-const config = readFileSync('js/modules/pipe-sizing/config.js', 'utf8');
+const index = readFileSync('modules/pipe-sizing/index.js', 'utf8');
+const controller = readFileSync('modules/pipe-sizing/controller.js', 'utf8');
+const state = readFileSync('modules/pipe-sizing/state.js', 'utf8');
+const config = readFileSync('modules/pipe-sizing/config.js', 'utf8');
 
 assert.match(controller, /createLineSectionController/, 'pipe-sizing must use central saved-record controller');
 assert.match(controller, /renderCard\(s\)/, 'pipe-sizing must render a central saved-record card');

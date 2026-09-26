@@ -151,7 +151,7 @@ Bewertung fuer Phase 42: Regenwasser besitzt vermutlich weiterhin eine empfindli
 - `js/core/savedRecordController.js`
 - `js/core/savedRecords.js`
 - `js/platform/lineSectionController/index.js`
-- `js/core/eventPipeline.js`
+- `core/events/eventPipeline.js`
 - `js/core/scrollManager.js`
 - `js/core/renderer.js`
 - `js/core/focusManager.js`
@@ -233,4 +233,3 @@ Phase 36W.2I zeigt, dass Regenwasser lokale Precommit-Logik in Capture-Phase ben
 3. Welche Actions duerfen Ausgabeinseln rendern?
 4. Wie wird h,x als Diagramm-Outlier behandelt?
 5. Wie wird Scroll-Stabilitaet erreicht, ohne Eingaben oder Diagramme veralten zu lassen?
-

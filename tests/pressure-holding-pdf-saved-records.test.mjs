@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 
-import pressureHoldingModule from '../js/modules/pressure-holding/index.js';
-import { calculate } from '../js/modules/pressure-holding/logic.js';
-import { buildPressureRecord } from '../js/modules/pressure-holding/controller.js';
-import { reportSections } from '../js/core/pdf/pdfDataMapping.js';
+import pressureHoldingModule from '../modules/pressure-holding/index.js';
+import { calculate } from '../modules/pressure-holding/logic.js';
+import { buildPressureRecord } from '../modules/pressure-holding/controller.js';
+import { reportSections } from '../core/pdf/pdfDataMapping.js';
 
 const baseState = {
   plantName: 'Test Heizung',

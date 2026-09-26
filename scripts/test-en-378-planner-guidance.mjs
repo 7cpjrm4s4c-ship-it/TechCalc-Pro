@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 
-import { reportSections } from '../js/core/pdf/pdfDataMapping.js';
-import { calculate } from '../js/modules/en-378-safety-check/logic.js';
-import { buildEN378PlannerGuidance } from '../js/modules/en-378-safety-check/plannerGuidance.js';
-import { buildEN378SafetyCheckReportDto } from '../js/modules/en-378-safety-check/reportAdapter.js';
-import { buildEN378SafetyCheckResultModel } from '../js/modules/en-378-safety-check/results.js';
+import { reportSections } from '../core/pdf/pdfDataMapping.js';
+import { calculate } from '../modules/en-378-safety-check/logic.js';
+import { buildEN378PlannerGuidance } from '../modules/en-378-safety-check/plannerGuidance.js';
+import { buildEN378SafetyCheckReportDto } from '../modules/en-378-safety-check/reportAdapter.js';
+import { buildEN378SafetyCheckResultModel } from '../modules/en-378-safety-check/results.js';
 
 const state = {
   refrigerantId: 'R-32',

@@ -15,7 +15,7 @@ Gepruefte Codebereiche:
 - `js/core/savedRecords.js`
 - `js/platform/lineSectionController/index.js`
 - `js/platform/moduleRuntime/index.js`
-- `js/core/eventPipeline.js`
+- `core/events/eventPipeline.js`
 - `js/core/scrollManager.js`
 - `js/modules/hx-diagram/renderPipeline.js`
 - `js/modules/hx-diagram/controller.js`

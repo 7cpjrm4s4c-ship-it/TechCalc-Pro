@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import hxModule from '../js/modules/hx-diagram/index.js';
-import { reportSections } from '../js/core/pdf/pdfDataMapping.js';
-import { calculate } from '../js/modules/hx-diagram/logic.js';
-import { buildHxResultModel } from '../js/modules/hx-diagram/results.js';
+import hxModule from '../modules/hx-diagram/index.js';
+import { reportSections } from '../core/pdf/pdfDataMapping.js';
+import { calculate } from '../modules/hx-diagram/logic.js';
+import { buildHxResultModel } from '../modules/hx-diagram/results.js';
 
 function parseGermanNumber(value) {
   return Number(String(value).replace(/\./g, '').replace(',', '.'));
@@ -134,7 +134,7 @@ const hxModuleData = {
 assert.deepEqual(printableHxSections(hxModuleData).map(section => section.title), ['Test Sommer', 'Test Winter']);
 assert.deepEqual(printableHxSections(hxModuleData).map(section => section.chartIndex), [0, 1]);
 
-const pdfLayoutSource = readFileSync(new URL('../js/core/pdf/pdfLayout.js', import.meta.url), 'utf8');
+const pdfLayoutSource = readFileSync(new URL('../core/pdf/pdfLayout.js', import.meta.url), 'utf8');
 assert.match(pdfLayoutSource, /this\.standardSection\(section\);\s*this\.sectionChartBlock\(section, index\);/,
   'h,x PDF layout must render each saved record before its corresponding diagram');
 assert.match(pdfLayoutSource, /if \(index > 0\) \{\s*this\.addPage\(\);\s*this\.header\(project, moduleData, date\);\s*this\.projectData\(project\);\s*\}\s*this\.standardSection\(section\);\s*this\.sectionChartBlock\(section, index\);/,

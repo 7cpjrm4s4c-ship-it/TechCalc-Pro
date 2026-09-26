@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const source = fs.readFileSync('js/core/eventPipeline.js', 'utf8');
+const source = fs.readFileSync('core/events/eventPipeline.js', 'utf8');
 
 assert.match(
   source,

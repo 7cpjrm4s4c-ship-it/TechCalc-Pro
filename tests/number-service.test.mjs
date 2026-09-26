@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { numberService, parseNumber, formatNumber, toInputNumber } from '../js/core/numberService.js';
+import { numberService, parseNumber, formatNumber, toInputNumber } from '../core/engineering/numberService.js';
 
 const cases = [
   ['2.500', 2500],

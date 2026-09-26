@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const root = process.cwd();
-const mod = (...parts) => readFileSync(join(root, 'js/modules/hx-diagram', ...parts), 'utf8');
+const mod = (...parts) => readFileSync(join(root, 'modules/hx-diagram', ...parts), 'utf8');
 
 const config = mod('config.js');
 const index = mod('index.js');

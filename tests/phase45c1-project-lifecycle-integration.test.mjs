@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-
 const storage = new Map();
 globalThis.localStorage = {
   getItem: key => storage.get(key) || null,
@@ -10,16 +9,13 @@ globalThis.localStorage = {
 globalThis.sessionStorage = globalThis.localStorage;
 globalThis.document = { dispatchEvent() {}, activeElement: null };
 globalThis.CustomEvent = class CustomEvent { constructor(type, init = {}) { this.type = type; this.detail = init.detail; } };
-
-const { state: mixedAirState } = await import('../js/modules/mixed-air/state.js');
-const { calculate } = await import('../js/modules/mixed-air/logic.js');
-const { buildMixedAirRecord, hydrateMixedAirRecord, mixedAirSaveCard } = await import('../js/modules/mixed-air/controller.js');
-const { applyProjectData, collectProjectData, resetAllSessionData } = await import('../js/core/projectStorage.js');
-
-const mixedView = readFileSync('js/modules/mixed-air/view.js', 'utf8');
+const { state: mixedAirState } = await import('../modules/mixed-air/state.js');
+const { calculate } = await import('../modules/mixed-air/logic.js');
+const { buildMixedAirRecord, hydrateMixedAirRecord, mixedAirSaveCard } = await import('../modules/mixed-air/controller.js');
+const { applyProjectData, collectProjectData, resetAllSessionData } = await import('../core/storage/projectStorage.js');
+const mixedView = readFileSync('modules/mixed-air/view.js', 'utf8');
 assert.match(mixedView, /data-mixed-air-dynamic="saved-panel"/, 'mixed-air renders a save panel island');
 assert.match(mixedAirSaveCard(mixedAirState.get()), /Mischluft speichern/, 'mixed-air exposes the save dialog/card');
-
 const input = {
   mixingOutdoorVolumeFlowM3h: '8000',
   mixingOutdoorTemp: '-8',
@@ -34,7 +30,6 @@ assert.equal(record.inputState.mixingRecircTemp, '21');
 const hydrated = hydrateMixedAirRecord(record, { savedMixedAirStates: [record] });
 assert.equal(hydrated.activeMixedAirId, 'mixed-1');
 assert.equal(hydrated.mixingOutdoorTemp, '-8');
-
 resetAllSessionData();
 applyProjectData({
   app: 'TechCalc Pro',
@@ -61,11 +56,9 @@ applyProjectData({
     }
   }
 });
-
 assert.equal(mixedAirState.get().mixingOutdoorTemp, '-8', 'legacy wrg alias migrates input fields into mixed-air');
 assert.equal(mixedAirState.get().savedMixedAirStates.length, 1, 'legacy mixed-air saved records migrate into mixed-air');
 assert.equal(mixedAirState.get().savedMixedAirStates[0].name, 'Mischluft Bestand');
-
 const project = collectProjectData();
 assert.equal(project.modules['mixed-air'].state.mixingRecircTemp, '21', 'mixed-air input state is persisted');
 assert.equal(project.modules['mixed-air'].state.savedMixedAirStates.length, 1, 'mixed-air saved records are persisted');

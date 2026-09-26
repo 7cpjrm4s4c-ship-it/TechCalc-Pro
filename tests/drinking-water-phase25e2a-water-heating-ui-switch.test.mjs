@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import { createDrinkingWaterViewModel, waterHeatingUi } from '../js/modules/drinking-water/viewModel.js';
-import { renderInputCard, renderResultCard } from '../js/modules/drinking-water/view.js';
-import { createConsumer } from '../js/modules/drinking-water/logic.js';
+import { createDrinkingWaterViewModel, waterHeatingUi } from '../modules/drinking-water/viewModel.js';
+import { renderInputCard, renderResultCard } from '../modules/drinking-water/view.js';
+import { createConsumer } from '../modules/drinking-water/logic.js';
 
 const baseState = {
   buildingType: 'residential',

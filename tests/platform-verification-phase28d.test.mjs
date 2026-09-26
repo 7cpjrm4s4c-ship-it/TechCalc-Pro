@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { PlatformScrollManager } from '../js/core/scrollManager.js';
-import { PlatformFocusManager } from '../js/core/focusManager.js';
-import { createEventScope, getActiveEventListenerCount, snapshotEventListeners } from '../js/core/eventManager.js';
+import { PlatformScrollManager } from '../core/ux/scrollManager.js';
+import { PlatformFocusManager } from '../core/ux/focusManager.js';
+import { createEventScope, getActiveEventListenerCount, snapshotEventListeners } from '../core/events/index.js';
 
 const root = process.cwd();
 const requiredReports = [
@@ -54,7 +54,7 @@ assert.equal(scope.size, 1);
 scope.dispose();
 assert.equal(scope.size, 0);
 
-const runtimeSource = fs.readFileSync(path.join(root, 'js/core/moduleRuntime.js'), 'utf8');
+const runtimeSource = fs.readFileSync(path.join(root, 'core/moduleRuntime.js'), 'utf8');
 assert.match(runtimeSource, /preserveModuleSwitchScroll/);
 
 console.log('Phase 28D Platform Verification Test bestanden.');

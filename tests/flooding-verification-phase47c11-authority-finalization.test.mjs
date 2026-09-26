@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { applyAuthorityReportPolicy } from '../js/core/pdf/authorityReportPolicy.js';
+import { applyAuthorityReportPolicy } from '../core/pdf/authorityReportPolicy.js';
 
 const dto = {
   hydraulics: { dischargeMode: 'authority-discharge-limit' }

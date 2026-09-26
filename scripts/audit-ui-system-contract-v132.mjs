@@ -1,7 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { detectRuntimeLayout } from './runtime-layout.mjs';
 
 const root = process.cwd();
+const { modulesDir } = detectRuntimeLayout(root);
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const fail = message => {
   console.error(`UI system contract failed: ${message}`);
@@ -59,12 +61,12 @@ function walk(dir) {
     else if (entry.isFile() && entry.name.endsWith('.js')) jsFiles.push(rel);
   }
 }
-walk('js/modules');
+walk(modulesDir);
 for (const file of jsFiles) {
   const source = read(file);
   const inlineStyleMatches = [...source.matchAll(/style="([^"]*)"/g)];
   for (const match of inlineStyleMatches) {
-    if (file === 'js/modules/pipe-sizing/results.js' && /width:\$\{percent\}%/.test(match[1])) continue;
+    if (file === 'modules/pipe-sizing/results.js' && /width:\$\{percent\}%/.test(match[1])) continue;
     fail(`${file} contains inline style: ${match[0]}`);
   }
 }

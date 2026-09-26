@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const controller = fs.readFileSync(new URL('../js/modules/hx-diagram/controller.js', import.meta.url), 'utf8');
+const controller = fs.readFileSync(new URL('../modules/hx-diagram/controller.js', import.meta.url), 'utf8');
 const components = fs.readFileSync(new URL('../css/components.css', import.meta.url), 'utf8');
 
 assert.match(controller, /function handleHxSignToggle/, 'h,x sign toggle must have a dedicated hardened handler');

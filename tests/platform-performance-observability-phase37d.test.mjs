@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const files = {
-  app: readFileSync('js/core/app.js', 'utf8'),
+  app: readFileSync('core/app.js', 'utf8'),
   runtime: readFileSync('js/platform/moduleRuntime/index.js', 'utf8'),
-  renderCoordinator: readFileSync('js/core/renderCoordinator.js', 'utf8'),
+  renderCoordinator: readFileSync('core/renderCoordinator.js', 'utf8'),
   serviceWorkerController: readFileSync('js/platform/shell/serviceWorkerController.js', 'utf8'),
   performanceController: readFileSync('js/platform/shell/performanceController.js', 'utf8'),
   serviceWorker: readFileSync('service-worker.js', 'utf8')

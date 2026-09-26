@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import module from '../js/modules/ventilation/index.js';
-import config from '../js/modules/ventilation/config.js';
-import { state } from '../js/modules/ventilation/state.js';
+import module from '../modules/ventilation/index.js';
+import config from '../modules/ventilation/config.js';
+import { state } from '../modules/ventilation/state.js';
 
-const source = readFileSync(new URL('../js/modules/ventilation/index.js', import.meta.url), 'utf8');
-const stateSource = readFileSync(new URL('../js/modules/ventilation/state.js', import.meta.url), 'utf8');
+const source = readFileSync(new URL('../modules/ventilation/index.js', import.meta.url), 'utf8');
+const stateSource = readFileSync(new URL('../modules/ventilation/state.js', import.meta.url), 'utf8');
 
 assert.match(config.migrationStatus, /phase-19b1-platform-mount/, 'config records phase 19B.1');
 assert.equal(typeof module.mount, 'function', 'platform module exposes mount');

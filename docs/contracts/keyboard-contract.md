@@ -8,7 +8,7 @@ Tab-, Shift+Tab-, Enter- und Shift+Enter-Navigation werden zentral gesteuert. Ke
 
 ## Single Source of Truth
 
-- `js/core/eventPipeline.js`
+- `core/events/eventPipeline.js`
 - `js/core/focusManager.js`
 
 ## Regeln

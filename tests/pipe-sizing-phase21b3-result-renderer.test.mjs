@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const index = readFileSync('js/modules/pipe-sizing/index.js', 'utf8');
-const viewModel = readFileSync('js/modules/pipe-sizing/viewModel.js', 'utf8');
-const results = readFileSync('js/modules/pipe-sizing/results.js', 'utf8');
+const index = readFileSync('modules/pipe-sizing/index.js', 'utf8');
+const viewModel = readFileSync('modules/pipe-sizing/viewModel.js', 'utf8');
+const results = readFileSync('modules/pipe-sizing/results.js', 'utf8');
 
 assert.match(viewModel, /renderResultModel/, 'pipe-sizing must use the platform result renderer');
 assert.match(viewModel, /buildPipeSizingResultModel/, 'pipe-sizing must build a result model');

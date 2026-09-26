@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildFloodingDiagnosticModel } from '../js/modules/flooding-verification/diagnosticModel.js';
+import { buildFloodingDiagnosticModel } from '../modules/flooding-verification/diagnosticModel.js';
 
 test('complete calculation produces successful status', () => {
   const model = buildFloodingDiagnosticModel({

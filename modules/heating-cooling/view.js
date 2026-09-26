@@ -1,0 +1,85 @@
+import { MEDIA, pipeSystems } from '../../core/data/index.js';
+import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
+import { card, selectField, segmented, renderModuleShell, stack, grid } from '../../core/ui/renderer.js';
+import { renderRecommendationCard, renderResultModel, renderResultTable } from '../../core/ui/resultRenderer.js';
+import { buildHeatingCoolingResultModel, buildPipeRecommendationModel, mediumRows } from './results.js';
+import { activeCalculationState, key } from './controller.js';
+import { inputFields } from './viewModel.js';
+
+const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
+
+export function createHeatingCoolingView({ config, calculate, lineSectionController }) {
+  if (!config) throw new Error('createHeatingCoolingView requires config');
+  if (typeof calculate !== 'function') throw new Error('createHeatingCoolingView requires calculate');
+  if (!lineSectionController) throw new Error('createHeatingCoolingView requires lineSectionController');
+
+  function renderPipeRecommendation(s, r) {
+    return renderRecommendationCard({
+      ...buildPipeRecommendationModel(r),
+      controlsHtml: selectField({ id: 'pipeSystemId', label: 'Rohrmaterial', value: s.pipeSystemId, options: pipeSystems.map(p => ({ value: p.id, label: p.label })) })
+    });
+  }
+
+  function view(s) {
+    const active = activeCalculationState(s);
+    const r = calculate(active);
+    const accent = s.mode === 'cooling' ? 'cooling' : 'orange';
+    const modeLabel = s.mode === 'cooling' ? 'Kälte' : 'Heizung';
+
+    const mediumCard = card('Medium', stack([
+      selectField({ id: 'mediumId', label: 'Wärmeträger', value: s.mediumId, options: MEDIA.map(m => ({ value: m.id, label: m.label })) }),
+      `<div data-hc-dynamic="medium-stats">${renderResultTable(mediumRows(r.medium))}</div>`
+    ].join('')), 'blue', { compact: true });
+
+    const inputColumn = stack([
+      mediumCard,
+      card('Betriebsart', `<div data-hc-dynamic="mode-segment">${segmented('mode', [
+        { value: 'heating', label: '● Heizung' },
+        { value: 'cooling', label: '● Kälte' }
+      ], s.mode, { accent })}</div>`, accent, { compact: true }),
+      card(`${modeLabel} — Eingaben`, stack([
+        `<div data-hc-dynamic="target-segment">${segmented(key(s, 'CalcTarget'), [
+          { value: 'power', label: 'Q Leistung' },
+          { value: 'massFlow', label: 'ṁ Massenstrom' },
+          { value: 'deltaT', label: 'ΔT Temperatur' }
+        ], active.calcTarget, { accent })}</div>`,
+        `<div data-hc-dynamic="input-fields">${grid(inputFields(s, active).join(''), 2)}</div>`
+      ].join('')), accent),
+      `<div class="tc-module-section" data-hc-dynamic="result">${renderResultModel(buildHeatingCoolingResultModel(active, r, accent), accent)}</div>`,
+      `<div class="formula tc-module-section" data-hc-dynamic="formula">Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)</div>`
+    ].join(''));
+
+    const outputColumn = stack([
+      `<div class="tc-module-section" data-hc-dynamic="pipe-recommendation">${renderPipeRecommendation(s, r)}</div>`,
+      `<div class="tc-module-section">${lineSectionController.renderCard(s)}</div>`
+    ].join(''));
+
+    return renderModuleShell(config, `
+      <div class="tc-module-layout tc-module-layout--2">
+        <div class="tc-module-column">${inputColumn}</div>
+        <div class="tc-module-column">${outputColumn}</div>
+      </div>
+    `).replace('<section class="module-view"', `<section class="module-view" data-hc-mode="${accent}" data-process-accent="${accent}"`);
+  }
+
+  const dynamicRenderers = {
+    renderMediumStats: (_s, r) => renderResultTable(mediumRows(r.medium)),
+    renderModeSegment: (s, _r, active, accent) => segmented('mode', [
+      { value: 'heating', label: '● Heizung' },
+      { value: 'cooling', label: '● Kälte' }
+    ], s.mode, { accent }),
+    renderTargetSegment: (s, _r, active, accent) => segmented(key(s, 'CalcTarget'), [
+      { value: 'power', label: 'Q Leistung' },
+      { value: 'massFlow', label: 'ṁ Massenstrom' },
+      { value: 'deltaT', label: 'ΔT Temperatur' }
+    ], active.calcTarget, { accent }),
+    renderInputFields: (s, _r, active) => grid(inputFields(s, active).join(''), 2),
+    renderResult: (_s, r, active, accent) => renderResultModel(buildHeatingCoolingResultModel(active, r, accent), accent),
+    renderFormula: (_s, r) => `Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)`,
+    renderPipeRecommendation
+  };
+
+  return { view, renderPipeRecommendation, dynamicRenderers };
+}
+
+export default createHeatingCoolingView;

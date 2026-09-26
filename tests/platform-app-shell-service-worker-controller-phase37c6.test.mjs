@@ -3,11 +3,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const appSource = fs.readFileSync(path.join(root, 'js/core/app.js'), 'utf8');
-const controllerPath = path.join(root, 'js/platform/shell/serviceWorkerController.js');
+const appSource = fs.readFileSync(path.join(root, 'core/app.js'), 'utf8');
+const controllerPath = path.join(root, 'core/ux/serviceWorkerController.js');
 const controllerSource = fs.readFileSync(controllerPath, 'utf8');
 const serviceWorkerSource = fs.readFileSync(path.join(root, 'service-worker.js'), 'utf8');
-const serviceWorkerModulePath = ['..', 'platform', 'shell', 'serviceWorkerController.js'].join('/');
+const serviceWorkerModulePath = './ux/serviceWorkerController.js';
 const serviceWorkerImport = `import { initializeServiceWorkerController } from '${serviceWorkerModulePath}';`;
 
 assert.ok(fs.existsSync(controllerPath), 'serviceWorkerController.js must exist');
@@ -18,7 +18,7 @@ assert.ok(!appSource.includes('navigator.serviceWorker.register'), 'app.js must 
 assert.ok(controllerSource.includes('export function initializeServiceWorkerController'), 'service worker controller must export initializer');
 assert.ok(controllerSource.includes('let serviceWorkerControllerInitialized = false'), 'service worker controller must be idempotent');
 assert.ok(controllerSource.includes('TECHCALC_CACHE_UPDATED'), 'controller must handle cache update messages');
-assert.ok(serviceWorkerSource.includes("'./js/platform/shell/serviceWorkerController.js'"), 'service worker must precache service worker controller');
+assert.ok(serviceWorkerSource.includes("'./core/ux/serviceWorkerController.js'"), 'service worker must precache service worker controller');
 
 const appLines = appSource.split(/\r?\n/).length;
 assert.ok(appLines <= 310, `app.js should be reduced after service worker extraction; got ${appLines} lines`);
@@ -44,7 +44,7 @@ const sessionStorageRef = {
   setItem(key, value) { sessionValues.set(key, value); }
 };
 
-const controller = await import('../js/platform/shell/serviceWorkerController.js');
+const controller = await import('../core/ux/serviceWorkerController.js');
 const initialized = controller.initializeServiceWorkerController({
   appVersion: '1.3.0',
   navigatorRef,

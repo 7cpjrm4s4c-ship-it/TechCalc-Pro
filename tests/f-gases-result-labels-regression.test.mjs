@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import { calculate } from '../js/modules/f-gases-check/logic.js';
-import { buildFGasesResultModel } from '../js/modules/f-gases-check/results.js';
+import { calculate } from '../modules/f-gases-check/logic.js';
+import { buildFGasesResultModel } from '../modules/f-gases-check/results.js';
 
 const base = {
   applicationType: 'heat-pump', installationType: 'stationary', productCategory: 'self-contained-ac-heat-pump', constructionType: 'self-contained', ratedCapacityKw: '20',

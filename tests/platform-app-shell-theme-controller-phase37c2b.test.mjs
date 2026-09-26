@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const controller = readFileSync('js/modules/drinking-water/controller.js', 'utf8');
-const scrollManager = readFileSync('js/core/scrollManager.js', 'utf8');
+const controller = readFileSync('modules/drinking-water/controller.js', 'utf8');
+const scrollManager = readFileSync('core/scrollManager.js', 'utf8');
 
 assert.match(scrollManager, /let\s+touchScrollActive\s*=\s*false/, 'ScrollManager must track active mobile touch scrolling.');
 assert.match(scrollManager, /export function isTouchScrollActive\(\)/, 'ScrollManager must expose the touch-scroll activity state.');

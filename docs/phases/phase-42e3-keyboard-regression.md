@@ -12,7 +12,7 @@ Nach Phase 42E.1 und 42E.2 wird der zentrale Keyboard-/Focus-Vertrag dauerhaft g
 
 Zulässige zentrale Keyboard-Pfade:
 
-- `js/core/eventPipeline.js`
+- `core/events/eventPipeline.js`
 - `js/core/focusManager.js`
 - `js/core/stateBinding.js`
 - `js/core/savedRecords.js`

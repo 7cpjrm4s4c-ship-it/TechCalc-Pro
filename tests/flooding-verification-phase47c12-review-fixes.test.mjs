@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
-import { buildFloodingReportDto } from '../js/modules/flooding-verification/reportAdapter.js';
-import { buildAuthorityChartModel } from '../js/core/pdf/authorityCharts.js';
-import { applyAuthorityReportPolicy } from '../js/core/pdf/authorityReportPolicy.js';
-import { buildAuthorityCorporateData } from '../js/core/pdf/authorityCorporateBlock.js';
+import { buildFloodingReportDto } from '../modules/flooding-verification/reportAdapter.js';
+import { buildAuthorityChartModel } from '../core/pdf/authorityCharts.js';
+import { applyAuthorityReportPolicy } from '../core/pdf/authorityReportPolicy.js';
+import { buildAuthorityCorporateData } from '../core/pdf/authorityCorporateBlock.js';
 
 const dto = buildFloodingReportDto({
   state: {

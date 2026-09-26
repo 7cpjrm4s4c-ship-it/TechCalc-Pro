@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import wastewaterModule from '../js/modules/wastewater/index.js';
-import { calculate } from '../js/modules/wastewater/logic.js';
-import { buildWastewaterRecord } from '../js/modules/wastewater/controller.js';
-import { lineSectionItems, reportSections } from '../js/core/pdf/pdfDataMapping.js';
+import wastewaterModule from '../modules/wastewater/index.js';
+import { calculate } from '../modules/wastewater/logic.js';
+import { buildWastewaterRecord } from '../modules/wastewater/controller.js';
+import { lineSectionItems, reportSections } from '../core/pdf/pdfDataMapping.js';
 
 const state = {
   name: 'Test Strang 1',
@@ -87,7 +87,7 @@ assert.ok(rows.some(row => row[0] === 'Berechnungsansatz' && row[1].includes('Wu
 assert.ok(rows.some(row => row[0] === 'Ausgewählte Nennweite' && row[1] === 'DN 100'));
 assert.ok(!rows.some(row => ['Qtot', 'Qww', 'Sum Du', 'Line Type'].includes(row[0])));
 
-const pdfLayoutSource = readFileSync(new URL('../js/core/pdf/pdfLayout.js', import.meta.url), 'utf8');
+const pdfLayoutSource = readFileSync(new URL('../core/pdf/pdfLayout.js', import.meta.url), 'utf8');
 assert.match(
   pdfLayoutSource,
   /const fullBlockHeight = headerHeight \+ topPad \+ sumHeights\(rowHeights\) \+ bottomPad \+ 2;/,

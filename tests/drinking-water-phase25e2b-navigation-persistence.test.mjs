@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const controller = fs.readFileSync(new URL('../js/modules/drinking-water/controller.js', import.meta.url), 'utf8');
-const dynamicRenderer = fs.readFileSync(new URL('../js/modules/drinking-water/dynamicRenderer.js', import.meta.url), 'utf8');
+const controller = fs.readFileSync(new URL('../modules/drinking-water/controller.js', import.meta.url), 'utf8');
+const dynamicRenderer = fs.readFileSync(new URL('../modules/drinking-water/dynamicRenderer.js', import.meta.url), 'utf8');
 
 assert.ok(controller.includes('installNavigationPersistenceGuard'), 'controller must install a Trinkwasser navigation persistence guard');
 assert.ok(controller.includes('tc-keyboard-open'), 'controller must explicitly release the mobile keyboard navigation lock');

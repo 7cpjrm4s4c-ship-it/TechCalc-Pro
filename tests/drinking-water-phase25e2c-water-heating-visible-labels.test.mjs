@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
-import { createDrinkingWaterViewModel } from '../js/modules/drinking-water/viewModel.js';
-import { renderInputCard, renderResultCard } from '../js/modules/drinking-water/view.js';
-import { consumerRows } from '../js/modules/drinking-water/results.js';
-import { createConsumer } from '../js/modules/drinking-water/logic.js';
+import { createDrinkingWaterViewModel } from '../modules/drinking-water/viewModel.js';
+import { renderInputCard, renderResultCard } from '../modules/drinking-water/view.js';
+import { consumerRows } from '../modules/drinking-water/results.js';
+import { createConsumer } from '../modules/drinking-water/logic.js';
 
 const shower = createConsumer({ typeId: 'shower', count: '1' });
 const baseState = {

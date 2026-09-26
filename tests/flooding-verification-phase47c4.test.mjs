@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { floodingSurfaceSubtitle } from '../js/modules/flooding-verification/controller.js';
-import { calculate, lookupFullFlow, sizePipe } from '../js/modules/flooding-verification/logic.js';
+import { floodingSurfaceSubtitle } from '../modules/flooding-verification/controller.js';
+import { calculate, lookupFullFlow, sizePipe } from '../modules/flooding-verification/logic.js';
 
 test('Phase 47C.3.2 renders German surface labels with explicit separation', () => {
   const item = { id: 'a', name: 'Norddach', category: 'roof', areaType: 'tile-roof', area: '100', cs: '1,0' };

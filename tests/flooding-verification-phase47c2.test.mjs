@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { calculate, validateSurface } from '../js/modules/flooding-verification/logic.js';
+import { calculate, validateSurface } from '../modules/flooding-verification/logic.js';
 
 test('Phase 47C.2 validates surface boundaries', () => {
   assert.equal(validateSurface({ category: 'roof', area: '100', cs: '1,0', cm: '0,9' }).valid, true);

@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
-import { state } from '../js/modules/drinking-water/state.js';
-import { calculate, createConsumer, writeUsageUnits, writeSingleConsumers } from '../js/modules/drinking-water/logic.js';
-import { createDrinkingWaterViewModel } from '../js/modules/drinking-water/viewModel.js';
-import { renderView } from '../js/modules/drinking-water/view.js';
+import { state } from '../modules/drinking-water/state.js';
+import { calculate, createConsumer, writeUsageUnits, writeSingleConsumers } from '../modules/drinking-water/logic.js';
+import { createDrinkingWaterViewModel } from '../modules/drinking-water/viewModel.js';
+import { renderView } from '../modules/drinking-water/view.js';
 
 writeUsageUnits([]);
 writeSingleConsumers([]);

@@ -1,0 +1,25 @@
+import { createModuleState } from '../../core/state/index.js';
+export const state = createModuleState({
+  buildingType: 'residential',
+  waterHeatingMode: 'central',
+  unitName: '',
+  unitConsumerType: 'shower',
+  unitCount: '1',
+  unitSimultaneityFactor: '',
+  unitDraftConsumers: [],
+  singleName: '',
+  singleConsumerType: 'tapDn15',
+  singleCount: '1',
+  singlePermanent: 'false',
+  singleDraftConsumers: [],
+  savedUsageUnits: [],
+  savedSingleConsumers: [],
+  activeUnitId: null,
+  activeSingleId: null,
+  expandedUnitId: null,
+  expandedSingleId: null,
+  uiUnitFormOpen: false,
+  uiUnitSavedOpen: false,
+  uiSingleFormOpen: false,
+  uiSingleSavedOpen: false
+});

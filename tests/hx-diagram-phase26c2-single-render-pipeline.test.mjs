@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import config from '../js/modules/hx-diagram/config.js';
-import { createHxRenderModel, renderResults, renderDiagram, renderDynamicSections, renderProcessSelection, HX_DYNAMIC } from '../js/modules/hx-diagram/renderPipeline.js';
-import { isDynamicHxDiagramAction } from '../js/modules/hx-diagram/dynamicRenderer.js';
+import config from '../modules/hx-diagram/config.js';
+import { createHxRenderModel, renderResults, renderDiagram, renderDynamicSections, renderProcessSelection, HX_DYNAMIC } from '../modules/hx-diagram/renderPipeline.js';
+import { isDynamicHxDiagramAction } from '../modules/hx-diagram/dynamicRenderer.js';
 
-const base = 'js/modules/hx-diagram/';
+const base = 'modules/hx-diagram/';
 const view = fs.readFileSync(base + 'view.js', 'utf8');
 const dynamic = fs.readFileSync(base + 'dynamicRenderer.js', 'utf8');
 const pipeline = fs.readFileSync(base + 'renderPipeline.js', 'utf8');

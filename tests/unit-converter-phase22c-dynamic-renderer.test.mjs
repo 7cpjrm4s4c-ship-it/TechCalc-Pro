@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 
-const index = fs.readFileSync('js/modules/unit-converter/index.js', 'utf8');
-const view = fs.readFileSync('js/modules/unit-converter/view.js', 'utf8');
-const config = fs.readFileSync('js/modules/unit-converter/config.js', 'utf8');
+const index = fs.readFileSync('modules/unit-converter/index.js', 'utf8');
+const view = fs.readFileSync('modules/unit-converter/view.js', 'utf8');
+const config = fs.readFileSync('modules/unit-converter/config.js', 'utf8');
 const dynamic = fs.readFileSync('js/platform/dynamicRenderer/index.js', 'utf8');
 
 assert.match(index, /createUnitConverterDynamicRenderer/, 'unit converter must use the platform dynamic renderer');
@@ -17,5 +17,5 @@ assert.match(dynamic, /data-unit-dynamic=\"conversion\"/, 'dynamic renderer must
 assert.match(dynamic, /data-unit-dynamic=\"result\"/, 'dynamic renderer must update result island');
 assert.match(config, /phase-22c-dynamic-renderer/, 'migrationStatus must include phase-22c-dynamic-renderer');
 
-const module = await import('../js/modules/unit-converter/index.js');
+const module = await import('../modules/unit-converter/index.js');
 assert.equal(typeof module.default.mount, 'function', 'unit converter must remain mountable');

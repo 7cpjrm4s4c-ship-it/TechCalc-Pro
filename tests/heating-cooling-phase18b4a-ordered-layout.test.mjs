@@ -1,10 +1,10 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 
-const schemaSource = fs.readFileSync('js/modules/heating-cooling/schema.js', 'utf8');
-const moduleSource = fs.readFileSync('js/modules/heating-cooling/index.js', 'utf8');
-const viewSource = fs.readFileSync('js/modules/heating-cooling/view.js', 'utf8');
-const configSource = fs.readFileSync('js/modules/heating-cooling/config.js', 'utf8');
+const schemaSource = fs.readFileSync('modules/heating-cooling/schema.js', 'utf8');
+const moduleSource = fs.readFileSync('modules/heating-cooling/index.js', 'utf8');
+const viewSource = fs.readFileSync('modules/heating-cooling/view.js', 'utf8');
+const configSource = fs.readFileSync('modules/heating-cooling/config.js', 'utf8');
 
 assert.match(schemaSource, /layout:\s*\{[\s\S]*order:\s*\['medium', 'operatingMode', 'activeInputs', 'result', 'recommendation', 'lineSections'\]/, 'heating/cooling schema must declare the ordered card layout contract.');
 assert.match(schemaSource, /title:\s*'Medium'/, 'heating/cooling schema must expose Medium as its first logical card.');

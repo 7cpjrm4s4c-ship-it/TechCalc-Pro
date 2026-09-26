@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 
-import { calculate, deriveAccessCategory, validateAssessmentInput } from '../js/modules/en-378-safety-check/logic.js';
-import { buildEN378SafetyCheckReportDto } from '../js/modules/en-378-safety-check/reportAdapter.js';
-import { buildEN378SafetyCheckResultModel } from '../js/modules/en-378-safety-check/results.js';
+import { calculate, deriveAccessCategory, validateAssessmentInput } from '../modules/en-378-safety-check/logic.js';
+import { buildEN378SafetyCheckReportDto } from '../modules/en-378-safety-check/reportAdapter.js';
+import { buildEN378SafetyCheckResultModel } from '../modules/en-378-safety-check/results.js';
 
 const derivedAccessState = {
   refrigerantId: 'R-513A',

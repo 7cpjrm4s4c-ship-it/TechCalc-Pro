@@ -7,17 +7,17 @@ const packagePath = path.join(root, 'package.json');
 const integrationPath = path.join(root, 'scripts/test-integration.mjs');
 
 const requiredPreloads = [
-  './js/core/app.js',
-  './js/core/router.js',
-  './js/core/registry.js',
-  './js/core/navigation.js',
-  './js/core/moduleLifecycleAdapter.js',
-  './js/core/moduleRuntime.js',
-  './js/core/projectStorage.js'
+  './core/app.js',
+  './core/navigation/router.js',
+  './core/registry.js',
+  './core/navigation/index.js',
+  './core/runtime/moduleLifecycleAdapter.js',
+  './core/runtime/moduleRuntime.js',
+  './core/storage/projectStorage.js'
 ];
 
 const indexHtml = fs.readFileSync(indexPath, 'utf8');
-const moduleScript = '<script type="module" src="./js/core/app.js"></script>';
+const moduleScript = '<script type="module" src="./core/app.js"></script>';
 const scriptIndex = indexHtml.indexOf(moduleScript);
 if (scriptIndex === -1) {
   throw new Error('index.html must keep the app module script unchanged');

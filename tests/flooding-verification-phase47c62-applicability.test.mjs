@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { evaluateDwa117Applicability } from '../js/modules/flooding-verification/retentionApplicability.js';
+import { evaluateDwa117Applicability } from '../modules/flooding-verification/retentionApplicability.js';
 
 test('DWA-A 117 applicability is inactive outside authority limit mode', () => {
   const result = evaluateDwa117Applicability({ enabled: true, dischargeMode: 'manual-full-flow' });

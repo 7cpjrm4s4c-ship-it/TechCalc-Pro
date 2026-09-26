@@ -54,7 +54,7 @@ Vertrag:
 
 Zentrale Keyboard-Pfade:
 
-- `js/core/eventPipeline.js`
+- `core/events/eventPipeline.js`
 - `js/core/focusManager.js`
 - `js/core/stateBinding.js`
 - `js/core/savedRecords.js`

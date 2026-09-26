@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import { prepareAuthorityDocument } from '../js/core/pdf/authorityLargeDocument.js';
-import { authorityColumnModel } from '../js/core/pdf/authorityTableLayout.js';
-import { highlightToken } from '../js/core/pdf/authorityHighlightPolicy.js';
+import { prepareAuthorityDocument } from '../core/pdf/authorityLargeDocument.js';
+import { authorityColumnModel } from '../core/pdf/authorityTableLayout.js';
+import { highlightToken } from '../core/pdf/authorityHighlightPolicy.js';
 
 const rows = Array.from({ length: 620 }, (_, index) => [
   `Fläche ${index + 1}`,

@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const root = process.cwd();
 const reportPath = path.join(root, 'docs/audits/json/app-shell-decomposition-phase37c1.json');
-const appPath = path.join(root, 'js/core/app.js');
+const appPath = path.join(root, 'core/app.js');
 const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
 const appSource = fs.readFileSync(appPath, 'utf8');
 

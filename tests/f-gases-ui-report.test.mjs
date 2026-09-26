@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
-import { calculate } from '../js/modules/f-gases-check/logic.js';
-import { buildFGasesResultModel } from '../js/modules/f-gases-check/results.js';
-import { buildFGasesReportDto, F_GASES_REPORT_DTO_VERSION } from '../js/modules/f-gases-check/reportAdapter.js';
-import { buildFGasesSavedRecord, buildFGasesSavedRecordsModel } from '../js/modules/f-gases-check/savedRecords.js';
+import { calculate } from '../modules/f-gases-check/logic.js';
+import { buildFGasesResultModel } from '../modules/f-gases-check/results.js';
+import { buildFGasesReportDto, F_GASES_REPORT_DTO_VERSION } from '../modules/f-gases-check/reportAdapter.js';
+import { buildFGasesSavedRecord, buildFGasesSavedRecordsModel } from '../modules/f-gases-check/savedRecords.js';
 
 const state = {
   schemaVersion: 4,

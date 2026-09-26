@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const eventPipeline = readFileSync(new URL('../js/core/eventPipeline.js', import.meta.url), 'utf8');
+const eventPipeline = readFileSync(new URL('../core/events/eventPipeline.js', import.meta.url), 'utf8');
 const runtime = readFileSync(new URL('../js/platform/moduleRuntime/index.js', import.meta.url), 'utf8');
-const rainwater = readFileSync(new URL('../js/modules/rainwater/controller.js', import.meta.url), 'utf8');
-const wastewater = readFileSync(new URL('../js/modules/wastewater/controller.js', import.meta.url), 'utf8');
+const rainwater = readFileSync(new URL('../modules/rainwater/controller.js', import.meta.url), 'utf8');
+const wastewater = readFileSync(new URL('../modules/wastewater/controller.js', import.meta.url), 'utf8');
 
 assert.match(eventPipeline, /function resolveActionHandler/, 'Central event pipeline must own platform action resolution.');
 assert.doesNotMatch(eventPipeline, /startsWith\('saved:'\)/, 'SavedRecord actions must not use a special pipeline branch.');

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
 
-const resultsSource = readFileSync(new URL('../js/modules/flooding-verification/results.js', import.meta.url), 'utf8');
+const resultsSource = readFileSync(new URL('../modules/flooding-verification/results.js', import.meta.url), 'utf8');
 const responsiveCss = readFileSync(new URL('../css/modules-responsive.css', import.meta.url), 'utf8');
 
 test('result hierarchy keeps interpretation, key hydraulics, diagnosis and details in fixed order', () => {

@@ -1,9 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { detectRuntimeLayout } from './runtime-layout.mjs';
 
 const root = process.cwd();
-const modulesRoot = path.join(root, 'js/modules');
+const { modulesDir } = detectRuntimeLayout(root);
+const modulesRoot = path.join(root, modulesDir);
 const outDir = path.join(root, 'docs/audits/json');
 fs.mkdirSync(outDir, { recursive: true });
 
@@ -16,13 +18,13 @@ const expectedModules = fs.readdirSync(modulesRoot, { withFileTypes: true })
 
 const savedOptionalModules = new Set(['unit-converter']);
 const coreText = [
-  'js/core/eventPipeline.js',
-  'js/core/stateBinding.js',
-  'js/core/scrollManager.js',
-  'js/core/renderCoordinator.js',
-  'js/core/projectStorage.js',
-  'js/core/moduleRuntime.js',
-  'js/core/savedRecordController.js'
+  'core/events/eventPipeline.js',
+  'core/stateBinding.js',
+  'core/ux/scrollManager.js',
+  'core/renderCoordinator.js',
+  'core/projectStorage.js',
+  'core/runtime/moduleRuntime.js',
+  'core/storage/savedRecordController.js'
 ].map((file) => read(path.join(root, file))).join('\n');
 const central = {
   enterTab: /Enter/.test(coreText) && /Tab/.test(coreText),

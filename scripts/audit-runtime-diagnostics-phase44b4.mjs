@@ -1,7 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { detectRuntimeLayout } from './runtime-layout.mjs';
 
 const root = process.cwd();
+const runtimeLayout = detectRuntimeLayout(root);
 const rel = (p) => path.relative(root, p).replaceAll(path.sep, '/');
 const walk = (dir) => {
   const start = path.join(root, dir);
@@ -18,16 +20,17 @@ const walk = (dir) => {
   return out.sort();
 };
 
-const files = walk('js').map(rel);
+const files = runtimeLayout.runtimeDirs.flatMap(dir => walk(dir)).map(rel);
+const loggerRelativePath = `${runtimeLayout.coreDir}/diagnostics/logger.js`;
 const directConsole = [];
 for (const file of files) {
-  if (file === 'js/core/logger.js') continue;
+  if (file === loggerRelativePath) continue;
   const content = fs.readFileSync(path.join(root, file), 'utf8');
   const matches = [...content.matchAll(/\bconsole\s*(?:\.|\[)/g)];
   if (matches.length) directConsole.push({ file, count: matches.length });
 }
 
-const loggerPath = path.join(root, 'js/core/logger.js');
+const loggerPath = path.join(root, loggerRelativePath);
 const loggerContent = fs.readFileSync(loggerPath, 'utf8');
 const required = ['debug(message, details, meta)', 'info(message, details, meta)', 'warn(message, details, meta)', 'error(message, details, meta)', 'setLevel(level)'];
 const missing = required.filter((token) => !loggerContent.includes(token));

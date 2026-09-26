@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import { buildAuthorityExecutiveSummary } from '../js/core/pdf/authorityExecutiveSummary.js';
-import { installAuthorityCoverPage, renderAuthorityExecutiveSummary } from '../js/core/pdf/authorityPdfReport.js';
+import { buildAuthorityExecutiveSummary } from '../core/pdf/authorityExecutiveSummary.js';
+import { installAuthorityCoverPage, renderAuthorityExecutiveSummary } from '../core/pdf/authorityPdfReport.js';
 
 const moduleData = {
   id: 'flooding-verification',

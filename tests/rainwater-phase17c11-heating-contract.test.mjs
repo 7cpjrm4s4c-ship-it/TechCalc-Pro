@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import schema from '../js/modules/rainwater/schema.js';
-import { surfaceRecordSnapshot, statePatchFromSurface } from '../js/modules/rainwater/controller.js';
-import { initialState } from '../js/modules/rainwater/state.js';
-import { calculate } from '../js/modules/rainwater/logic.js';
-import { renderSchemaForm } from '../js/core/schemaRenderer.js';
+import schema from '../modules/rainwater/schema.js';
+import { surfaceRecordSnapshot, statePatchFromSurface } from '../modules/rainwater/controller.js';
+import { initialState } from '../modules/rainwater/state.js';
+import { calculate } from '../modules/rainwater/logic.js';
+import { renderSchemaForm } from '../core/ui/schemaRenderer.js';
 
-const controllerSource = readFileSync('js/modules/rainwater/controller.js', 'utf8');
-const logicSource = readFileSync('js/modules/rainwater/logic.js', 'utf8');
+const controllerSource = readFileSync('modules/rainwater/controller.js', 'utf8');
+const logicSource = readFileSync('modules/rainwater/logic.js', 'utf8');
 
 assert.match(controllerSource, /createStateSnapshot/, 'Rainwater must use the same state-snapshot saved-record contract as wastewater/heating style modules.');
 assert.match(controllerSource, /hydrateStateRecord/, 'Rainwater load must hydrate saved records through the platform saved-record model.');

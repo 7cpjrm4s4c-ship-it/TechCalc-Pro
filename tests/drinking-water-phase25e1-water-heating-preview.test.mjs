@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import { calculate, createConsumer, writeUsageUnits, writeSingleConsumers } from '../js/modules/drinking-water/logic.js';
-import { createDrinkingWaterViewModel } from '../js/modules/drinking-water/viewModel.js';
+import { calculate, createConsumer, writeUsageUnits, writeSingleConsumers } from '../modules/drinking-water/logic.js';
+import { createDrinkingWaterViewModel } from '../modules/drinking-water/viewModel.js';
 
 writeUsageUnits([]);
 writeSingleConsumers([]);

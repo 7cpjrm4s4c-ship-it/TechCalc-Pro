@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const indexSource = readFileSync('js/modules/ventilation/index.js', 'utf8');
-const viewSource = readFileSync('js/modules/ventilation/view.js', 'utf8');
+const indexSource = readFileSync('modules/ventilation/index.js', 'utf8');
+const viewSource = readFileSync('modules/ventilation/view.js', 'utf8');
 const source = `${indexSource}\n${viewSource}`;
 const dynamicRendererSource = readFileSync('js/platform/dynamicRenderer/index.js', 'utf8');
 const combinedSource = `${source}\n${dynamicRendererSource}`;

@@ -2,16 +2,14 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createPressureHoldingDynamicRenderer } from '../js/platform/dynamicRenderer/index.js';
-import pressureHoldingModule from '../js/modules/pressure-holding/index.js';
+import { createPressureHoldingDynamicRenderer } from '../core/ui/dynamicRenderer.js';
+import pressureHoldingModule from '../modules/pressure-holding/index.js';
 
 globalThis.document = { activeElement: null };
-
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const indexSource = fs.readFileSync(path.join(rootDir, 'js/modules/pressure-holding/index.js'), 'utf8');
-const viewSource = fs.readFileSync(path.join(rootDir, 'js/modules/pressure-holding/view.js'), 'utf8');
-const dynamicSource = fs.readFileSync(path.join(rootDir, 'js/platform/dynamicRenderer/index.js'), 'utf8');
-
+const indexSource = fs.readFileSync(path.join(rootDir, 'modules/pressure-holding/index.js'), 'utf8');
+const viewSource = fs.readFileSync(path.join(rootDir, 'modules/pressure-holding/view.js'), 'utf8');
+const dynamicSource = fs.readFileSync(path.join(rootDir, 'core/ui/dynamicRenderer.js'), 'utf8');
 assert.match(dynamicSource, /createPressureHoldingDynamicRenderer/);
 assert.match(indexSource, /createPressureHoldingDynamicRenderer/);
 assert.match(viewSource, /data-ph-dynamic="basis"/);
@@ -65,7 +63,6 @@ renderer.update(fakeRoot, {
 }, { action: 'initial', changed: [] });
 
 assert.deepEqual(rendered, ['basis', 'volume', 'pressure', 'holding', 'result']);
-
 rendered = [];
 renderer.update(fakeRoot, {
   systemType: 'heating',
@@ -84,7 +81,6 @@ assert.ok(rendered.includes('pressure'));
 assert.ok(rendered.includes('result'));
 
 console.log('pressure-holding-phase20c-dynamic-renderer ok');
-
 rendered = [];
 renderer.update(fakeRoot, {
   systemType: 'heating',

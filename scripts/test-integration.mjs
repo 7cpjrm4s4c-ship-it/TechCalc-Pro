@@ -30,6 +30,8 @@ const commands = [
   ['node', ['tests/platform-legal-agb-phase37f1.test.mjs']],
   ['node', ['tests/platform-precache-manifest-phase38a.test.mjs']],
   ['node', ['tests/platform-viewport-accessibility-phase38c.test.mjs']],
+  ['node', ['tests/platform-visible-version.test.mjs']],
+  ['node', ['tests/security-blob-transformer-worker.test.mjs']],
   ['node', ['scripts/audit-buffer-storage-remove-compare-phase38d9.mjs']],
   ['node', ['scripts/audit-buffer-storage-remove-compare-phase38d10.mjs']],
   ['node', ['scripts/audit-low-end-mobile-rendering-phase38e.mjs']],

@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const router = fs.readFileSync(new URL('../js/core/router.js', import.meta.url), 'utf8');
+const router = fs.readFileSync(new URL('../core/router.js', import.meta.url), 'utf8');
 const settings = fs.readFileSync(new URL('../js/platform/shell/settingsController.js', import.meta.url), 'utf8');
-const guard = fs.readFileSync(new URL('../js/core/unsavedWorkGuard.js', import.meta.url), 'utf8');
+const guard = fs.readFileSync(new URL('../core/unsavedWorkGuard.js', import.meta.url), 'utf8');
 
 assert.match(settings, /closeAllSubmenus\(\);[\s\S]*clearPersistedOpenSubmenu\(\);/, 'Beim Schließen des Hauptmenüs müssen alle Unterkarten geschlossen und der gespeicherte Offen-Zustand entfernt werden.');
 assert.match(router, /export function preferredStartRoute\(\)/, 'Die Startmodulermittlung muss zentral und testbar sein.');

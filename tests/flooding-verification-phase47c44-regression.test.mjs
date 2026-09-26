@@ -4,8 +4,8 @@ import fs from 'node:fs';
 import {
   buildFloodingSurfaceRecord,
   hydrateFloodingSurfaceRecord
-} from '../js/modules/flooding-verification/controller.js';
-import { deleteCollectionItem } from '../js/platform/collectionModel/index.js';
+} from '../modules/flooding-verification/controller.js';
+import { deleteCollectionItem } from '../core/collectionModel/index.js';
 
 const draft = {
   surfaces: [],
@@ -36,7 +36,7 @@ test('Phase 47C.4.4 hydrates the complete surface editor', () => {
 });
 
 test('Phase 47C.4.4 imports valid rainwater records with upsert and conflict handling', () => {
-  const source = fs.readFileSync(new URL('../js/modules/flooding-verification/controller.js', import.meta.url), 'utf8');
+  const source = fs.readFileSync(new URL('../modules/flooding-verification/controller.js', import.meta.url), 'utf8');
   assert.match(source, /readRainwaterSurfaceSnapshot\(\)\.filter\(item => number\(item\.area\) > 0\)/);
   assert.match(source, /createRecordId\('rain-snapshot'\)/);
   assert.match(source, /const replacements = new Map\(\)/);
@@ -45,8 +45,8 @@ test('Phase 47C.4.4 imports valid rainwater records with upsert and conflict han
 });
 
 test('Phase 47C.4.4 uses the central line-section saved-record adapter', () => {
-  const index = fs.readFileSync(new URL('../js/modules/flooding-verification/index.js', import.meta.url), 'utf8');
-  const schema = fs.readFileSync(new URL('../js/modules/flooding-verification/schema.js', import.meta.url), 'utf8');
+  const index = fs.readFileSync(new URL('../modules/flooding-verification/index.js', import.meta.url), 'utf8');
+  const schema = fs.readFileSync(new URL('../modules/flooding-verification/schema.js', import.meta.url), 'utf8');
   assert.match(index, /createLineSectionController/);
   assert.match(index, /cardTitle: 'Gespeicherte Flächen'/);
   assert.match(schema, /text: 'Flächen importieren'/);
@@ -54,7 +54,7 @@ test('Phase 47C.4.4 uses the central line-section saved-record adapter', () => {
 });
 
 test('Phase 47C.4.4 deduplicates collection actions independent of event type', () => {
-  const runtime = fs.readFileSync(new URL('../js/platform/moduleRuntime/index.js', import.meta.url), 'utf8');
+  const runtime = fs.readFileSync(new URL('../core/runtime/platformModuleRuntime.js', import.meta.url), 'utf8');
   assert.match(runtime, /const key = `\$\{action\}:\$\{element\.dataset\.collection \|\| ''\}:\$\{element\.dataset\.collectionId \|\| ''\}`/);
   assert.doesNotMatch(runtime, /const key = `[^`]*\$\{event\.type\}[^`]*`/);
 });

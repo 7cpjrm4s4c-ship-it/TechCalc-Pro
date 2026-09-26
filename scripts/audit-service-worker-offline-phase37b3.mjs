@@ -1,7 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { detectRuntimeLayout } from './runtime-layout.mjs';
 
 const root = process.cwd();
+const { runtimeDirs } = detectRuntimeLayout(root);
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const serviceWorker = read('service-worker.js');
 const packageJson = JSON.parse(read('package.json'));
@@ -27,14 +29,15 @@ const cachedAssets = assetMatch
   ? [...assetMatch[1].matchAll(/'([^']+)'/g)].map(match => match[1])
   : [];
 const cachedSet = new Set(cachedAssets);
+const runtimeAssets = runtimeDirs.flatMap(dir => listFiles(dir, file => file.endsWith('.js')));
 
 const requiredAssets = [
   './',
   './index.html',
   './manifest.json',
-  './RELEASE_NOTES.md',
+  './docs/release/RELEASE_NOTES.md',
   ...listFiles('css', file => file.endsWith('.css')),
-  ...listFiles('js', file => file.endsWith('.js')),
+  ...runtimeAssets,
   ...listFiles('assets/icons'),
   ...listFiles('docs/legal', file => file.endsWith('.html'))
 ].filter((item, index, array) => array.indexOf(item) === index).sort();
@@ -49,7 +52,7 @@ const staleAssets = cachedAssets.filter(asset => !requiredAssets.includes(asset)
 
 check('offline-precache:complete-runtime-surface', missingAssets.length === 0, 'service worker precaches every runtime JS/CSS/icon/shell asset', { missingAssets });
 check('offline-precache:no-stale-assets', staleAssets.length === 0, 'service worker asset manifest has no stale runtime entries', { staleAssets });
-check('offline-precache:all-js-modules', listFiles('js', file => file.endsWith('.js')).every(asset => cachedSet.has(asset)), 'all JavaScript modules are available after first install');
+check('offline-precache:all-js-modules', runtimeAssets.every(asset => cachedSet.has(asset)), 'all JavaScript modules are available after first install');
 check('offline-strategy:navigation-fallback', /event\.request\.mode === 'navigate'/.test(serviceWorker) && /caches\.match\('\.\/index\.html'\)/.test(serviceWorker), 'offline navigation falls back to cached shell');
 check('offline-strategy:cache-first-refresh', /cacheFirstWithRefresh/.test(serviceWorker) && /fetchFresh\(request\);/.test(serviceWorker), 'static assets use cache-first with background refresh');
 const expectedCacheName = `${packageJson.name}-${packageJson.version}`;
@@ -76,7 +79,7 @@ const report = {
     cached: cachedAssets.length,
     missing: missingAssets.length,
     stale: staleAssets.length,
-    jsModules: listFiles('js', file => file.endsWith('.js')).length
+    jsModules: runtimeAssets.length
   },
   checks
 };

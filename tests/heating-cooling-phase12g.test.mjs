@@ -1,10 +1,10 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 
-const moduleSource = fs.readFileSync('js/modules/heating-cooling/index.js', 'utf8');
-const viewSource = fs.readFileSync('js/modules/heating-cooling/view.js', 'utf8');
-const configSource = fs.readFileSync('js/modules/heating-cooling/config.js', 'utf8');
-const pipelineSource = fs.readFileSync('js/core/eventPipeline.js', 'utf8');
+const moduleSource = fs.readFileSync('modules/heating-cooling/index.js', 'utf8');
+const viewSource = fs.readFileSync('modules/heating-cooling/view.js', 'utf8');
+const configSource = fs.readFileSync('modules/heating-cooling/config.js', 'utf8');
+const pipelineSource = fs.readFileSync('core/events/eventPipeline.js', 'utf8');
 const dynamicRendererSource = fs.readFileSync('js/platform/dynamicRenderer/index.js', 'utf8');
 const lineSectionSource = fs.readFileSync('js/platform/lineSectionController/index.js', 'utf8');
 

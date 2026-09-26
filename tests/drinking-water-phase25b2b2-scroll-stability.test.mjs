@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const controller = fs.readFileSync(new URL('../js/modules/drinking-water/controller.js', import.meta.url), 'utf8');
+const controller = fs.readFileSync(new URL('../modules/drinking-water/controller.js', import.meta.url), 'utf8');
 
 assert(!controller.includes('function rerender'), 'controller must not expose full rerender helper');
 assert(!controller.includes('rerender(root)'), 'controller actions must not trigger full module rerender');

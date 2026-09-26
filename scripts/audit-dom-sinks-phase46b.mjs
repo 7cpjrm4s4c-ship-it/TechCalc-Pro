@@ -1,22 +1,24 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { detectRuntimeLayout } from './runtime-layout.mjs';
 
 const root = process.cwd();
-const runtimeDirs = ['js'];
+const runtimeLayout = detectRuntimeLayout(root);
+const coreFile = relativePath => `${runtimeLayout.coreDir}/${relativePath}`;
+const moduleFile = relativePath => `${runtimeLayout.modulesDir}/${relativePath}`;
 
 const allowedInnerHtmlFiles = new Set([
-  'js/core/domUpdate.js',
-  'js/core/moduleRuntime.js',
-  'js/core/navigation.js',
-  'js/modules/drinking-water/dynamicRenderer.js',
-  'js/modules/heat-recovery/dynamicRenderer.js',
-  'js/modules/hx-diagram/renderPipeline.js',
-  'js/modules/mixed-air/dynamicRenderer.js',
-  'js/platform/dynamicRenderer/index.js',
-  'js/platform/lineSectionController/index.js',
-  'js/platform/moduleRuntime/index.js',
-  'js/platform/shell/releaseNotesController.js',
-  'js/platform/shell/serviceWorkerController.js'
+  coreFile('ui/domUpdate.js'),
+  coreFile('ui/dynamicRenderer.js'),
+  coreFile('lineSectionController/index.js'),
+  coreFile('moduleRuntime.js'),
+  coreFile('navigation/index.js'),
+  coreFile('runtime/platformModuleRuntime.js'),
+  moduleFile('drinking-water/dynamicRenderer.js'),
+  moduleFile('heat-recovery/dynamicRenderer.js'),
+  moduleFile('hx-diagram/renderPipeline.js'),
+  moduleFile('mixed-air/dynamicRenderer.js'),
+  coreFile('ux/releaseNotesController.js')
 ]);
 
 const forbiddenSinkPatterns = [
@@ -41,7 +43,7 @@ function rel(file) {
   return path.relative(root, file).replaceAll(path.sep, '/');
 }
 
-const files = runtimeDirs.flatMap(dir => walk(path.join(root, dir)));
+const files = runtimeLayout.runtimeDirs.flatMap(dir => walk(path.join(root, dir)));
 const failures = [];
 const innerHtmlFiles = [];
 
@@ -60,8 +62,8 @@ for (const file of files) {
   }
 }
 
-const releaseNotes = fs.readFileSync(path.join(root, 'js/platform/shell/releaseNotesController.js'), 'utf8');
-if (!releaseNotes.includes("import { esc as escapeHtml } from '../../core/renderer.js';")) {
+const releaseNotes = fs.readFileSync(path.join(root, runtimeLayout.coreDir, 'ux/releaseNotesController.js'), 'utf8');
+if (!releaseNotes.includes("import { esc as escapeHtml } from '../ui/renderer.js';")) {
   failures.push('releaseNotesController.js must use the shared HTML escaping helper.');
 }
 if (/host\.innerHTML\s*=\s*notes\.slice/.test(releaseNotes) || /notes\.slice\([^)]*\)\.map\([\s\S]{0,500}join\(''\)\s*;/.test(releaseNotes)) {

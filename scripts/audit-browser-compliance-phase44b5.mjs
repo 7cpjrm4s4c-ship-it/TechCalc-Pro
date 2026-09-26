@@ -16,20 +16,34 @@ const requiredDirectives = [
   "default-src 'self'",
   "script-src 'self'",
   "style-src 'self' 'unsafe-inline'",
+  "style-src-elem 'self'",
   "img-src 'self' data: blob:",
   "connect-src 'self' https://formspree.io",
-  "frame-src 'self' https://app.netlify.com",
-  "child-src 'self' https://app.netlify.com",
+  "frame-src 'none'",
+  "child-src 'none'",
   "worker-src 'self'",
   "manifest-src 'self'",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self' https://formspree.io",
-  "frame-ancestors 'none'"
+  "frame-ancestors 'none'",
+  "upgrade-insecure-requests"
 ];
 
 for (const directive of requiredDirectives) {
   if (!cspLine.includes(directive)) fail(`Missing CSP directive: ${directive}`);
+}
+
+
+const requiredHeaders = [
+  'Cross-Origin-Opener-Policy: same-origin',
+  'Cross-Origin-Resource-Policy: same-origin',
+  'X-Content-Type-Options: nosniff',
+  'Referrer-Policy: no-referrer'
+];
+
+for (const header of requiredHeaders) {
+  if (!headers.includes(header)) fail(`Missing security header: ${header}`);
 }
 
 if (index.includes('name="mobile-web-app-capable"')) {

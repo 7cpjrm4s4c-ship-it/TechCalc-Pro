@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const renderer = readFileSync('js/core/renderer.js', 'utf8');
-const domUpdate = readFileSync('js/core/domUpdate.js', 'utf8');
+const renderer = readFileSync('core/renderer.js', 'utf8');
+const domUpdate = readFileSync('core/domUpdate.js', 'utf8');
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
 
 assert.match(renderer, /export function cssEscape\(/, 'renderer must define cssEscape for stable selector snapshots');

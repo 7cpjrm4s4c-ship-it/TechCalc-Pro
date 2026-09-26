@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const view = fs.readFileSync(new URL('../js/modules/drinking-water/view.js', import.meta.url), 'utf8');
-const results = fs.readFileSync(new URL('../js/modules/drinking-water/results.js', import.meta.url), 'utf8');
+const view = fs.readFileSync(new URL('../modules/drinking-water/view.js', import.meta.url), 'utf8');
+const results = fs.readFileSync(new URL('../modules/drinking-water/results.js', import.meta.url), 'utf8');
 const css = fs.readFileSync(new URL('../css/components.css', import.meta.url), 'utf8');
 
 assert(!view.includes('class="tc-accordion dw-accordion'), 'view must not use module-specific dw accordion spacing classes');

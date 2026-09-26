@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const controller = readFileSync('js/modules/pipe-sizing/controller.js', 'utf8');
-const index = readFileSync('js/modules/pipe-sizing/index.js', 'utf8');
-const config = readFileSync('js/modules/pipe-sizing/config.js', 'utf8');
+const controller = readFileSync('modules/pipe-sizing/controller.js', 'utf8');
+const index = readFileSync('modules/pipe-sizing/index.js', 'utf8');
+const config = readFileSync('modules/pipe-sizing/config.js', 'utf8');
 
 assert.match(controller, /createLineSectionController/, 'pipe-sizing must use the same saved-record controller path as stable line-section modules');
 assert.match(controller, /activeIdKey:\s*'activePipeId'/, 'active pipe id must be controlled by the saved-record controller');

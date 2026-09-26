@@ -1,0 +1,14 @@
+import { defineModuleConfig, MODULE_CAPABILITIES } from '../../core/contracts/index.js';
+
+export default defineModuleConfig({
+  id: 'pressure-holding',
+  title: 'Druckhaltung',
+  shortTitle: 'Druck',
+  group: 'HLK-Anlagen',
+  accent: 'blue',
+  order: 15,
+  defaultVisible: false,
+
+  capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS],
+  description: 'Auslegung von MAG und dynamischer Druckhaltung für Heiz- und Kühlwassersysteme nach Reflex-Berechnungsgrundlagen.'
+});

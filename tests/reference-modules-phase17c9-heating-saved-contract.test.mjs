@@ -2,11 +2,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const runtime = readFileSync('js/platform/moduleRuntime/index.js', 'utf8');
-const rainwaterController = readFileSync('js/modules/rainwater/controller.js', 'utf8');
-const wastewaterController = readFileSync('js/modules/wastewater/controller.js', 'utf8');
-const rainwaterResults = readFileSync('js/modules/rainwater/results.js', 'utf8');
-const rainwaterViewModel = readFileSync('js/modules/rainwater/viewModel.js', 'utf8');
-const wastewaterResults = readFileSync('js/modules/wastewater/results.js', 'utf8');
+const rainwaterController = readFileSync('modules/rainwater/controller.js', 'utf8');
+const wastewaterController = readFileSync('modules/wastewater/controller.js', 'utf8');
+const rainwaterResults = readFileSync('modules/rainwater/results.js', 'utf8');
+const rainwaterViewModel = readFileSync('modules/rainwater/viewModel.js', 'utf8');
+const wastewaterResults = readFileSync('modules/wastewater/results.js', 'utf8');
 const heating = readFileSync('js/platform/lineSectionController/index.js', 'utf8');
 
 assert.match(heating, /data-line-select/, 'baseline: Heizung/Kälte platform line-section controller uses line-section select attributes.');

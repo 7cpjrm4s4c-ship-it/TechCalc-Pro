@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
-import { calculate } from '../js/modules/f-gases-check/logic.js';
-import { buildFGasesReportDto } from '../js/modules/f-gases-check/reportAdapter.js';
-import { buildFGasesSavedRecord, hydrateFGasesSavedRecord, buildFGasesSavedRecordsModel } from '../js/modules/f-gases-check/savedRecords.js';
-import { buildFGasesReportSections } from '../js/core/pdf/fGasesReportSections.js';
-import { reportSections } from '../js/core/pdf/pdfDataMapping.js';
+import { calculate } from '../modules/f-gases-check/logic.js';
+import { buildFGasesReportDto } from '../modules/f-gases-check/reportAdapter.js';
+import { buildFGasesSavedRecord, hydrateFGasesSavedRecord, buildFGasesSavedRecordsModel } from '../modules/f-gases-check/savedRecords.js';
+import { buildFGasesReportSections } from '../core/pdf/fGasesReportSections.js';
+import { reportSections } from '../core/pdf/pdfDataMapping.js';
 
 const state = {
   schemaVersion: 4,

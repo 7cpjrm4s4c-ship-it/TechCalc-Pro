@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { surfaceTypeLabel } from '../js/core/pdf/authorityTables.js';
-import { areaTypes } from '../js/shared/rainwaterDomainTables.js';
+import { surfaceTypeLabel } from '../core/pdf/authorityTables.js';
+import { areaTypes } from '../core/data/rainwater.js';
 
 for (const areaType of areaTypes) {
   assert.equal(
@@ -17,7 +17,7 @@ assert.equal(surfaceTypeLabel('paving-permeable'), 'Wasserdurchlässige Pflaster
 assert.equal(surfaceTypeLabel('unknown-import-value'), 'Freie Fläche / eigener Abflussbeiwert');
 
 const pdfReportSource = await readFile(
-  new URL('../js/core/pdf/authorityPdfReport.js', import.meta.url),
+  new URL('../core/pdf/authorityPdfReport.js', import.meta.url),
   'utf8'
 );
 assert.match(pdfReportSource, /const EXECUTIVE_SUMMARY_TITLE = 'ZUSAMMENFASSUNG'/);

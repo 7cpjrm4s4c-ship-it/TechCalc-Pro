@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import wastewater from '../js/modules/wastewater/index.js';
-import schema from '../js/modules/wastewater/schema.js';
-import { calculate } from '../js/modules/wastewater/logic.js';
+import wastewater from '../modules/wastewater/index.js';
+import schema from '../modules/wastewater/schema.js';
+import { calculate } from '../modules/wastewater/logic.js';
 
-const indexSource = readFileSync(new URL('../js/modules/wastewater/index.js', import.meta.url), 'utf8');
+const indexSource = readFileSync(new URL('../modules/wastewater/index.js', import.meta.url), 'utf8');
 const moduleSources = ['index.js','schema.js','controller.js','results.js']
-  .map(file => readFileSync(new URL(`../js/modules/wastewater/${file}`, import.meta.url), 'utf8'))
+  .map(file => readFileSync(new URL(`../modules/wastewater/${file}`, import.meta.url), 'utf8'))
   .join('\n');
 
 assert.equal(typeof wastewater.mount, 'function');

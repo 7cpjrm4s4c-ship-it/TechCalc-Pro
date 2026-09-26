@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const appJs = readFileSync(new URL('../js/core/app.js', import.meta.url), 'utf8');
-const runtimeJs = readFileSync(new URL('../js/core/moduleRuntime.js', import.meta.url), 'utf8');
+const appJs = readFileSync(new URL('../core/app.js', import.meta.url), 'utf8');
+const runtimeJs = readFileSync(new URL('../core/runtime/moduleRuntime.js', import.meta.url), 'utf8');
 const source = appJs + runtimeJs;
 
 assert.match(source, /function (disposeCurrentModule|dispose)\(/, 'Central module cleanup must exist.');

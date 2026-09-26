@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const base = new URL('../js/modules/heat-recovery/', import.meta.url);
+const base = new URL('../modules/heat-recovery/', import.meta.url);
 const read = file => readFileSync(new URL(file, base), 'utf8');
 
 const config = read('config.js');
