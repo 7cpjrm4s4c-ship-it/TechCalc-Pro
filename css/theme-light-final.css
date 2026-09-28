@@ -878,10 +878,7 @@ body::after,
   overflow: hidden;
   border-style: solid !important;
   border-width: 1px !important;
-  outline: 1px solid transparent;
-  outline-offset: -1px;
-  background-clip: padding-box;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc-final-accent, var(--tc-active-accent, var(--accent-blue))) 18%, transparent) !important;
+  box-shadow: none !important;
 }
 :root[data-theme='light'] .card--accent-orange,
 :root[data-theme='light'] .result-card.card--accent-orange { border-color: color-mix(in srgb, var(--tc-accent-heating) 72%, var(--color-border)) !important; }
@@ -910,15 +907,13 @@ body::after,
 
 
 /* 1.3.2-dev.36 — Light card frame + scroll cleanup contract.
-   A faint inset line keeps the frame continuous when WebKit clips the outer edge. */
+   Keep the Dark theme's native border rendering; only its color changes here. */
 :root[data-theme='light'] .card,
 :root[data-theme='light'] .tc-card,
 :root[data-theme='light'] .result-card {
   --tc-card-frame-color: color-mix(in srgb, var(--tc-contract-accent, var(--tc-final-accent, var(--accent-blue))) 72%, var(--color-border));
   border: 1px solid var(--tc-card-frame-color) !important;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc-card-frame-color) 25%, transparent) !important;
-  background-clip: padding-box !important;
-  isolation: isolate;
+  box-shadow: none !important;
 }
 :root[data-theme='light'] .card--accent-orange { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-heating) 72%, var(--color-border)); }
 :root[data-theme='light'] .card--accent-cyan { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-air) 72%, var(--color-border)); }
@@ -926,13 +921,6 @@ body::after,
 :root[data-theme='light'] .card--accent-blue { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-pipe) 72%, var(--color-border)); }
 :root[data-theme='light'] .card--accent-green { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-water) 72%, var(--color-border)); }
 :root[data-theme='light'] .card--accent-purple { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-pressure) 72%, var(--color-border)); }
-:root[data-theme='light'] .card > .card__title,
-:root[data-theme='light'] .card > .card__body,
-:root[data-theme='light'] .tc-card > *,
-:root[data-theme='light'] .result-card > * {
-  position: relative;
-  z-index: 1;
-}
 
 /* Phase 43E.1 — Workspace outer frame cleanup.
    Module/workspace containers are layout primitives and must not render their own visual frame.
