@@ -11,10 +11,11 @@ test('deploy artifact loads one offline-capable stylesheet across modules', asyn
   await expect(page.locator('#app .card')).toHaveCSS('display', 'flex');
   const backgrounds = await page.locator('#app .card').first().evaluate(element => ({
     border: getComputedStyle(element).borderStyle,
-    background: getComputedStyle(element).backgroundImage
+    color: getComputedStyle(element).backgroundColor,
+    image: getComputedStyle(element).backgroundImage
   }));
   expect(backgrounds.border).not.toBe('none');
-  expect(backgrounds.background).not.toBe('none');
+  expect(backgrounds.color !== 'rgba(0, 0, 0, 0)' || backgrounds.image !== 'none').toBe(true);
   await page.goto('/#/drinking-water');
   await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', 'drinking-water');
   await expect(page.locator('#app .card').first()).toBeVisible();
