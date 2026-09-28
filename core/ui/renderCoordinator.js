@@ -66,7 +66,7 @@ export function createRenderCoordinator(root, options = {}) {
     const viewport = preserve ? snapshotViewport({ positionOnly: true }) : null;
     const previousMinHeight = root.style.minHeight;
     const previousOverflowAnchor = root.style.overflowAnchor;
-    const previousHeight = root.getBoundingClientRect?.().height || 0;
+    const previousHeight = preserve ? (root.getBoundingClientRect?.().height || 0) : 0;
     if (preserve && previousHeight > 0) {
       root.style.minHeight = `${Math.ceil(previousHeight)}px`;
       root.style.overflowAnchor = 'none';

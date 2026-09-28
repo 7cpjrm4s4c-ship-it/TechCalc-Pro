@@ -23,7 +23,7 @@ function updateSegment(root, name, value){
   root?.querySelectorAll?.(`[data-segment="${name}"]`)?.forEach(button => {
     const selected = String(button.dataset.value) === String(value);
     button.classList.toggle('is-active', selected);
-    button.setAttribute('aria-selected', String(selected));
+    button.setAttribute('aria-pressed', String(selected));
   });
 }
 

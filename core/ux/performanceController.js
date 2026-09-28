@@ -1,3 +1,4 @@
+import { performanceBudget } from '../diagnostics/performanceBudget.js';
 const DEFAULT_BUFFER_LIMIT = 120;
 let performanceControllerInitialized = false;
 let bufferLimit = DEFAULT_BUFFER_LIMIT;
@@ -46,7 +47,19 @@ export function measurePerformance(name, startMark, endMark, detail = {}) {
     const latest = measures?.[measures.length - 1];
     if (latest && Number.isFinite(latest.duration)) entry.duration = latest.duration;
   }
+  const budgets = {
+    'tc:module:mount': performanceBudget.maxModuleMountMs,
+    'tc:render:commit': performanceBudget.maxRouteRenderMs,
+    'tc:dynamic-render': performanceBudget.maxRouteRenderMs
+  };
+  if (budgets[label] !== undefined && entry.duration !== null) {
+    entry.budgetMs = budgets[label];
+    entry.withinBudget = entry.duration <= entry.budgetMs;
+  }
   pushEntry(entry);
+  globalThis.performance?.clearMarks?.(startMark);
+  globalThis.performance?.clearMarks?.(endMark);
+  globalThis.performance?.clearMeasures?.(label);
   return label;
 }
 

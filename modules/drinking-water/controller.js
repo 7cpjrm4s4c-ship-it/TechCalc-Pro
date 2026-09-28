@@ -67,7 +67,7 @@ function commitWaterHeatingModeSegment(root, segment, event = null) {
     root.querySelectorAll('[data-segment="waterHeatingMode"]').forEach(button => {
       const selected = String(button.dataset.value) === value;
       button.classList.toggle('is-active', selected);
-      button.setAttribute('aria-selected', String(selected));
+      button.setAttribute('aria-pressed', String(selected));
     });
     event?.preventDefault?.();
     event?.stopPropagation?.();
@@ -81,7 +81,7 @@ function commitWaterHeatingModeSegment(root, segment, event = null) {
   root.querySelectorAll('[data-segment="waterHeatingMode"]').forEach(button => {
     const selected = String(button.dataset.value) === value;
     button.classList.toggle('is-active', selected);
-    button.setAttribute('aria-selected', String(selected));
+    button.setAttribute('aria-pressed', String(selected));
   });
   state.set({ waterHeatingMode: value }, { action:'platform:segment:waterHeatingMode', notify:false });
   refreshDrinkingWater(root);

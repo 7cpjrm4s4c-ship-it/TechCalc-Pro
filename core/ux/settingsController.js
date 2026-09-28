@@ -171,9 +171,28 @@ export function initializeSettingsController({
       }
     });
   }
+  const backgroundState = new Map();
+  function setBackgroundInert(open) {
+    if (open) {
+      let current = settingsPanel;
+      while (current?.parentElement) {
+        for (const sibling of current.parentElement.children) {
+          if (sibling === current || backgroundState.has(sibling)) continue;
+          backgroundState.set(sibling, sibling.inert);
+          sibling.inert = true;
+        }
+        current = current.parentElement;
+        if (current === document.body) break;
+      }
+    } else {
+      for (const [element, wasInert] of backgroundState) element.inert = wasInert;
+      backgroundState.clear();
+    }
+  }
   function setSettingsOpen(open) {
     if (!settingsPanel || !settingsButton) return;
     if (open) {
+      if (isSettingsOpen()) return;
       restoreSettingsUiState();
       lastFocusedElement = document.activeElement;
       settingsPanel.hidden = false;
@@ -181,9 +200,11 @@ export function initializeSettingsController({
       settingsPanel.classList.add('is-open');
       settingsButton.setAttribute('aria-expanded', 'true');
       settingsPanel.setAttribute('aria-modal', 'true');
+      setBackgroundInert(true);
       lockPageScroll();
       ensurePdfExport();
       requestAnimationFrame(() => {
+        if (!isSettingsOpen()) return;
         const openSubmenu = settingsPanel.querySelector('.settings-submenu[open]');
         if (openSubmenu) scrollSubmenuIntoView(openSubmenu, 'start');
         else settingsBody?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -199,6 +220,7 @@ export function initializeSettingsController({
     settingsPanel.setAttribute('hidden', '');
     settingsButton.setAttribute('aria-expanded', 'false');
     settingsPanel.removeAttribute('aria-modal');
+    setBackgroundInert(false);
     unlockPageScroll();
     if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
       lastFocusedElement.focus({ preventScroll: true });
@@ -241,7 +263,23 @@ export function initializeSettingsController({
     setSettingsOpen(false);
   });
   trackGlobalEventListener(document, 'keydown', event => {
-    if (event.key === 'Escape') setSettingsOpen(false);
+    if (!isSettingsOpen()) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      setSettingsOpen(false);
+    }
+    if (event.key !== 'Tab') return;
+    const focusable = [...settingsPanel.querySelectorAll('button, a[href], input, select, textarea, summary, [tabindex]')]
+      .filter(element => element.tabIndex >= 0 && !element.disabled && !element.closest('[inert]') && element.getClientRects().length > 0);
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last?.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first?.focus();
+    }
   });
   trackGlobalEventListener(document, 'touchmove', event => {
     if (!isSettingsOpen()) return;

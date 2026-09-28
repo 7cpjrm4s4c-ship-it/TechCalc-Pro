@@ -54,3 +54,13 @@ Der Phase-46C-Audit ersetzt keine vollständige WCAG-Zertifizierung und keine br
 - `docs/contracts/theme-contract.md`
 - `docs/contracts/render-contract.md`
 - `scripts/audit-accessibility-phase46c.mjs`
+
+
+## Dynamische Regressionen nach Architekturreview
+
+`tests/e2e/accessibility-review.spec.mjs` prüft den Einstellungsdialog einschließlich
+Shift+Tab, Tab, Escape, inaktivem Hintergrund und Fokusrückgabe sowie die
+Tastaturaktivierung und Zustandsmeldung der zentralen Auswahlschalter.
+Die bestehende Playwright-CI führt diese Prüfungen in der Browsermatrix aus.
+Der statische Audit allein weist keine WCAG-Konformität nach. Manuelle Prüfungen
+mit Screenreader, Zoom und Kontrastkontrolle bleiben erforderlich.

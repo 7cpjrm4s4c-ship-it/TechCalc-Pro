@@ -338,7 +338,7 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     // the store notification and render scheduler run.
     root.querySelectorAll(`[data-segment="${field}"]`).forEach(button => {
       button.classList.toggle('is-active', String(button.dataset.value) === String(value));
-      button.setAttribute('aria-selected', String(String(button.dataset.value) === String(value)));
+      button.setAttribute('aria-pressed', String(String(button.dataset.value) === String(value)));
     });
     if (String(state.get?.()[field] ?? '') !== String(value ?? '')) {
       state.set({ [field]: value }, { action: 'segment:select' });

@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import { initializePerformanceController, startPerformanceSpan, getPerformanceSnapshot } from '../core/ux/performanceController.js';
+initializePerformanceController({ windowRef: null });
+const baseline = performance.getEntriesByType('mark').length;
+for (let i = 0; i < 300; i++) startPerformanceSpan('render:commit')();
+assert.equal(performance.getEntriesByType('mark').length, baseline);
+assert.equal(performance.getEntriesByName('tc:render:commit').length, 0);
+assert.equal(getPerformanceSnapshot().length, 120);
+const latest = getPerformanceSnapshot().at(-1);
+assert.equal(typeof latest.withinBudget, 'boolean');
+assert.equal(latest.withinBudget, latest.duration <= latest.budgetMs);
+console.log('Performance retention and budget regression passed.');

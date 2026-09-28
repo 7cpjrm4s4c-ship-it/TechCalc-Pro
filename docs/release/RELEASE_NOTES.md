@@ -1,3 +1,10 @@
+## Unveröffentlicht – Bedienbarkeit und Performance
+- Einstellungen als benannter modaler Dialog mit gesperrtem Hintergrund, zyklischer Tastaturführung und Fokusrückgabe.
+- Zentrale Auswahlschalter melden ihren gedrückten Zustand konsistent, auch nach dynamischen Aktualisierungen.
+- Abgeschlossene Performance-Spans bereinigen ihre nativen Browser-Einträge. Render- und Mount-Messungen enthalten Budget und Ergebnis.
+- Strukturelles Rendering liest die Elementhöhe nur bei notwendiger Scrollstabilisierung.
+- Neue Verhaltensprüfungen für Tastaturbedienung und die begrenzte Speicherung von Messdaten.
+
 ## Version 2.0.0 – Core-Runtime und Framework-Kernel
 ### Neu
 - Die Laufzeitstruktur ist auf die kanonischen Bereiche `core/` und `modules/` ausgerichtet.
