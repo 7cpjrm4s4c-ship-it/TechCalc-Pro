@@ -44,3 +44,14 @@ test('more modules announces its open state and resets after outside click', asy
   await expect(more).toHaveAttribute('aria-expanded', 'false');
   await expect(more).toHaveAttribute('aria-label', 'Weitere Module öffnen');
 });
+
+test('long F-Gases legal references remain available behind keyboard-operated disclosure', async ({ page }) => {
+  await page.goto('/#/f-gases-check');
+  const sources = page.locator('.tc-warning__sources').first();
+  await expect(sources).toBeVisible();
+  await expect(sources).not.toHaveAttribute('open', '');
+  await sources.locator('summary').focus();
+  await page.keyboard.press('Enter');
+  await expect(sources).toHaveAttribute('open', '');
+  await expect(sources.locator('p')).toContainText('Verordnung (EU) 2024/573');
+});

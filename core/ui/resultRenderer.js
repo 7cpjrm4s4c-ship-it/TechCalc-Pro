@@ -80,14 +80,21 @@ export function renderRecommendationCard({ title = 'Empfehlung', primary = null,
 }
 
 export function renderNoticeCard({ title = 'Hinweise', messages = [], accent = 'blue', prefix = 'Hinweis' } = {}) {
+  const noticeText = text => {
+    const value = String(text);
+    const sources = value.match(/ Rechtsgrundlagen?: /);
+    if (value.length < 300 || !sources) return `<strong>${esc(value)}</strong>`;
+    const index = sources.index;
+    return `<strong>${esc(value.slice(0, index))}</strong><details class="tc-warning__sources"><summary>Rechtsgrundlagen anzeigen</summary><p>${esc(value.slice(index + 1))}</p></details>`;
+  };
   const body = list(messages)
     .map(message => {
       if (typeof message === 'object') {
         const text = message.text || message.message || '';
         const label = message.prefix || prefix;
-        return text ? `<div class="tc-warning"><span>${esc(label)}: </span><strong>${esc(text)}</strong></div>` : '';
+        return text ? `<div class="tc-warning"><span>${esc(label)}: </span>${noticeText(text)}</div>` : '';
       }
-      return `<div class="tc-warning"><span>${esc(prefix)}: </span><strong>${esc(message)}</strong></div>`;
+      return `<div class="tc-warning"><span>${esc(prefix)}: </span>${noticeText(message)}</div>`;
     })
     .join('');
   return card(title, body, accent);
