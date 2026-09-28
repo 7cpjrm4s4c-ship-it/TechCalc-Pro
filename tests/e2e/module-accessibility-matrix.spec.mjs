@@ -76,3 +76,38 @@ test('theme switch exposes the active pressed button within a named group', asyn
   await expect(light).toHaveAttribute('aria-pressed', 'true');
   await expect(theme.getByRole('button', { name: 'Dark' })).toHaveAttribute('aria-pressed', 'false');
 });
+
+test('mobile light theme keeps selection labels whole and navigation opaque', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.locator('#settingsButton').click();
+  await page.locator('#settingsPanel summary').nth(3).click();
+  await page.getByRole('group', { name: 'Farbschema' }).getByRole('button', { name: 'Light' }).click();
+  await page.getByRole('dialog', { name: 'Einstellungen' }).getByRole('button', { name: 'Schließen' }).click();
+
+  const target = page.getByRole('group', { name: 'Berechnungsgröße' });
+  const massFlow = target.getByRole('button', { name: 'ṁ Massenstrom' });
+  const wordRects = await massFlow.evaluate(button => {
+    const text = button.firstChild;
+    const start = text.textContent.indexOf('Massenstrom');
+    const range = document.createRange();
+    range.setStart(text, start);
+    range.setEnd(text, start + 'Massenstrom'.length);
+    return range.getClientRects().length;
+  });
+  expect(wordRects).toBe(1);
+
+  const navStyle = await page.locator('.module-nav').evaluate(nav => {
+    const style = getComputedStyle(nav);
+    return { background: style.backgroundColor, blur: style.backdropFilter, webkitBlur: style.webkitBackdropFilter };
+  });
+  expect(navStyle.background).toMatch(/^rgb\(/);
+  expect(navStyle.blur).toBe('none');
+  expect(navStyle.webkitBlur).toBe('none');
+
+  await page.setViewportSize({ width: 320, height: 800 });
+  const first = await target.getByRole('button', { name: 'Q Leistung' }).evaluate(button => button.getBoundingClientRect().top);
+  const second = await massFlow.evaluate(button => button.getBoundingClientRect().top);
+  expect(second).toBeGreaterThan(first);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+});

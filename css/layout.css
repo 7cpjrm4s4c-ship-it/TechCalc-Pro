@@ -306,8 +306,10 @@
 
 @media (max-width: 767px) {
   :root[data-theme='light'] .module-nav {
-    background: color-mix(in srgb, var(--tc-light-bg-elevated) 96%, transparent) !important;
+    background: var(--tc-light-bg-elevated) !important;
     border: 1px solid var(--tc-shell-divider) !important;
     box-shadow: 0 10px 28px rgba(63,54,39,.16) !important;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }

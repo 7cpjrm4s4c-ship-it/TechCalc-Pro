@@ -382,4 +382,19 @@ pre,
   .release-note {
     border-radius: max(14px, calc(var(--tc-radius-card) - 2px));
   }
+
+  :root[data-theme='light'] .segmented button {
+    padding-inline: 4px;
+    font-size: 0.875rem;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+  }
+}
+
+@media (max-width: 380px) {
+  :root[data-theme='light'] .segmented:has(> button:nth-child(3)) {
+    grid-auto-flow: row;
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
