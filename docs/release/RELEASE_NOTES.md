@@ -7,6 +7,7 @@
 - CSS im Deploy-Artefakt in einer Datei zusammengeführt; Offline-Vorladen an das Bundle angepasst.
 - Der zentrale Store vergleicht bei Teilaktualisierungen nur betroffene Felder; reine Render-Abonnements erzeugen keinen ungenutzten Zustandssnapshot.
 - Dynamische Bedienelemente erhalten benannte Gruppen; Vorzeichenschalter werden per Tastatur erreicht und primäre Ergebnisse als Status gemeldet.
+- Die Theme-Auswahl ist entsprechend ihren gedrückten Schaltflächen als benannte Gruppe ausgezeichnet.
 - Browsermatrix für die Semantik aller 15 Module und den Umbruch bei 320 CSS-Pixeln erweitert.
 
 ## Version 2.0.0 – Core-Runtime und Framework-Kernel

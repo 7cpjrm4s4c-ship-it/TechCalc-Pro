@@ -28,7 +28,8 @@ Der Audit prüft statisch:
 
 - Sprachdeklaration und Viewport.
 - Fokusfähigen App-Hauptbereich.
-- ARIA-Basis für Navigation, Einstellungen, Theme-Auswahl und Statusmeldungen.
+- ARIA-Basis für Navigation, Einstellungen, Theme-Auswahl als benannte
+  Schaltflächengruppe und Statusmeldungen.
 - `alt`-Attribute für Bilder.
 - zugängliche Namen für statische Buttons.
 - Labels oder ARIA-Namen für statische Inputs.

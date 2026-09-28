@@ -63,3 +63,16 @@ test('narrow viewport retains the primary form without page-level horizontal scr
     expect(clippedControls, `${moduleId} has clipped input controls`).toEqual([]);
   }
 });
+
+test('theme switch exposes the active pressed button within a named group', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#settingsButton').click();
+  await page.locator('#settingsPanel summary').nth(3).click();
+  const theme = page.getByRole('group', { name: 'Farbschema' });
+  await expect(theme).toBeVisible();
+  const light = theme.getByRole('button', { name: 'Light' });
+  await light.focus();
+  await page.keyboard.press('Space');
+  await expect(light).toHaveAttribute('aria-pressed', 'true');
+  await expect(theme.getByRole('button', { name: 'Dark' })).toHaveAttribute('aria-pressed', 'false');
+});

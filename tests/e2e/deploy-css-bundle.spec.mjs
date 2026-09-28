@@ -8,7 +8,7 @@ test('deploy artifact loads one offline-capable stylesheet across modules', asyn
   const links = page.locator('link[rel="stylesheet"]');
   await expect(links).toHaveCount(1);
   await expect(links.first()).toHaveAttribute('href', './css/techcalc.bundle.css');
-  await expect(page.locator('#app .card')).toHaveCSS('display', 'flex');
+  await expect(page.locator('#app .card').first()).toHaveCSS('display', 'flex');
   const backgrounds = await page.locator('#app .card').first().evaluate(element => ({
     border: getComputedStyle(element).borderStyle,
     color: getComputedStyle(element).backgroundColor,
