@@ -1,6 +1,6 @@
 # TechCalc Pro Documentation Index
 
-Status: aktualisiert für Version 1.4.0 / Abschluss Phase 47
+Status: Version 2.0.0 auf `main`
 
 Dieser Index ist der zentrale Einstiegspunkt der Projektdokumentation. Die Dokumentation ist nach Verantwortlichkeit getrennt: Phasen dokumentieren Historie, ADRs dokumentieren Entscheidungen, Contracts dokumentieren Schnittstellen, das Quality Manual dokumentiert dauerhafte Qualitätsstandards und Audits dokumentieren konkrete Prüfevidenz.
 
@@ -18,7 +18,15 @@ Dieser Index ist der zentrale Einstiegspunkt der Projektdokumentation. Die Dokum
 - `docs/legal/` – rechtliche Dokumente.
 - `docs/security/` – sicherheitsbezogene Prüfstände.
 
-## Maßgebliche Referenzen für Phase 47 / Version 1.4.0
+## Maßgebliche Referenzen für Version 2.0.0
+
+- `docs/architecture/ADR-0021-root-runtime-layout.md` – geltende Laufzeitstruktur.
+- `docs/contracts/framework-kernel-contract.md` – Verantwortlichkeiten von Core und Fachmodulen.
+- `docs/releases/2.0.0.md` – Umfang der aktuellen Version.
+- `docs/release/RELEASE_NOTES.md` – fortlaufende Release Notes.
+- `docs/qm/` – verbindliche Qualitätsstandards und Release Gates.
+
+## Historische Referenzen für Phase 47 / Version 1.4.0
 
 - `docs/phases/phase-47-final-summary.md` – konsolidierter Abschlussbericht und finaler Freigabestatus.
 - `docs/phases/phase-47d-regression.md` – finale Regression, Browser-, Plattform- und Gate-Matrix.
@@ -53,7 +61,6 @@ Der Projekt-Root enthält nur runtime-, build- oder release-relevante Dateien. N
 
 ## Aktueller Entwicklungsstand
 
-- 1.4.0 / Phase 47: Überflutungs- und Rückhaltenachweis vollständig implementiert.
-- Phase 47D: Regression und Plattformfreigabe bestanden.
-- Enterprise-/QM-Status: **GO zum Merge**.
-- Post-Merge: Produktionsdeploy, Produktions-Smoke-Test, finales Versioning, Tag und GitHub Release gemäß Releaseprozess.
+- Version 2.0.0 ist auf `main` integriert; `package.json`, Manifest, Core-Version und Service Worker sind auf 2.0.0 ausgerichtet.
+- Die Laufzeitbereiche sind `core/`, `modules/`, `css/` und `assets/`. Der Core stellt die gemeinsamen Dienste für 15 Fachmodule bereit.
+- Die Umstrukturierung ändert keine Fachberechnungen. Release- und Produktionsfreigaben richten sich weiterhin nach den Quality Gates; aus der Repository-Version allein folgt kein nachgewiesener Produktionsdeploy.

@@ -1,5 +1,5 @@
 import { logger } from './diagnostics/logger.js';
-import { modules } from './registry.js';
+import { modules } from './runtime/registry.js';
 import { initRouter, currentRoute, navigate } from './navigation/router.js';
 import { renderNavigation, renderQuickAccessSettings } from './navigation/index.js';
 import heatingCoolingConfig from '../modules/heating-cooling/config.js';

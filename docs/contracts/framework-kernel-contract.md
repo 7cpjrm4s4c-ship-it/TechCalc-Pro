@@ -57,6 +57,7 @@ Scripts, tests, documentation, CI and deployment configuration remain outside th
 | PDF export | `core/pdf` |
 | Rendering | `core/rendering` |
 | Runtime and lifecycle | `core/runtime` |
+| Module registration | `core/runtime/registry.js` |
 | State | `core/state` |
 | Storage and saved records | `core/storage` |
 | Stylesheet manifests and contracts | `core/styles` |
@@ -65,7 +66,7 @@ Scripts, tests, documentation, CI and deployment configuration remain outside th
 | Physical stylesheets | `css` |
 | Static application resources | `assets` |
 
-`core/app.js`, `core/index.js` and `core/version.js` remain direct Core entry points. Other top-level Core files must be migrated into the responsibility paths in isolated, CI-backed steps after the outer directory move.
+`core/app.js`, `core/index.js` and `core/version.js` remain direct Core entry points. Module registration resides in `core/runtime/registry.js`; other Core implementation files remain in their responsibility paths.
 
 ## Module import rule
 
