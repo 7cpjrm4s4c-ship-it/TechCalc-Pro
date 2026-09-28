@@ -76,7 +76,7 @@ function renderSelect(def, state = {}) {
 }
 function renderSegment(def, state = {}) {
   const value = resolve(def.value, state, state?.[def.key] ?? def.default ?? '');
-  return `<div class="field field--segment tc-field" data-schema-field-wrapper="${esc(def.key)}"><label>${esc(fieldLabel(def, state))}</label>${segmented(def.key, fieldOptions(def, state), value, { accent: def.accent, action: def.action })}</div>`;
+  return `<div class="field field--segment tc-field" data-schema-field-wrapper="${esc(def.key)}"><label>${esc(fieldLabel(def, state))}</label>${segmented(def.key, fieldOptions(def, state), value, { accent: def.accent, action: def.action, label: fieldLabel(def, state) })}</div>`;
 }
 function renderReadonly(def, state = {}) {
   const value = typeof def.value === 'function' ? def.value(state) : fieldValue(def, state);

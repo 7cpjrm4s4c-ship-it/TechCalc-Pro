@@ -64,6 +64,13 @@ jobs:
       - name: Playwright-Tests ausführen
         run: npm run test:e2e
 
+      - name: Deploy-CSS im gebauten Artefakt prüfen
+        run: npx playwright test tests/e2e/deploy-css-bundle.spec.mjs --project=chromium-desktop --project=webkit-mobile
+        env:
+          STATIC_ROOT: dist
+          PLAYWRIGHT_PORT: "4175"
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4175
+
       - name: Kompakten Playwright-Fehlerbericht speichern
         if: ${{ failure() }}
         uses: actions/upload-artifact@v5

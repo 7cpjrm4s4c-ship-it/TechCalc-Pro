@@ -58,7 +58,7 @@ export function renderInputCard(vm) {
       segmented('waterHeatingMode', [
         { value:'central', label:'Zentrale Warmwasserbereitung' },
         { value:'decentral', label:'Dezentral' }
-      ], s.waterHeatingMode, { accent:vm.accent, action:'platform:segment:waterHeatingMode' }),
+      ], s.waterHeatingMode, { accent:vm.accent, action:'platform:segment:waterHeatingMode', label:'Warmwasserbereitung' }),
       inlineStats([
         { label:'Gleichzeitigkeitsformel', value:r.formulaText },
         { label:'NE-Ansatz', value:'2 größte Entnahmestellen oder GL je NE' },
@@ -89,7 +89,7 @@ export function renderInputCard(vm) {
       segmented('singlePermanent', [
         { value:'false', label:'Kurzzeitverbraucher' },
         { value:'true', label:'Dauerverbraucher > 15 min' }
-      ], String(s.singlePermanent), { accent:vm.accent }),
+      ], String(s.singlePermanent), { accent:vm.accent, label:'Verbrauchsart' }),
       '<button type="button" class="action-button" data-dw-draft-add="single">Verbraucher zur Gruppe hinzufügen</button>',
       `<div data-dw-single-draft>${draftConsumerList(s.singleDraftConsumers || [], 'single', s.waterHeatingMode)}</div>`,
       `<div class="tc-save-actions"><button type="button" class="action-button" data-dw-add-single ${s.activeSingleId ? 'disabled' : ''}>Speichern</button><button type="button" class="action-button" data-dw-update-single ${s.activeSingleId ? '' : 'disabled'}>Aktualisieren</button></div>`,

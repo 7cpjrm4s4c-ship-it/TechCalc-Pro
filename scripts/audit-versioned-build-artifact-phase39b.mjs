@@ -34,7 +34,7 @@ for (const dir of sourceForbiddenDirs) {
 }
 
 const minifier = readText('scripts/minify-static-assets.mjs');
-for (const required of ['build-info.json', 'generatedAt: new Date(0).toISOString()', 'artifact:', 'bundling: false']) {
+for (const required of ['build-info.json', 'generatedAt: new Date(0).toISOString()', 'artifact:', 'bundling: { javascript: false, css: true }']) {
   if (!minifier.includes(required)) fail(`minify-static-assets.mjs missing deterministic artifact contract: ${required}`);
 }
 
@@ -66,7 +66,18 @@ if (buildInfo.version !== pkg.version) fail('build-info.json version does not ma
 if (buildInfo.artifact !== `${pkg.name}-${pkg.version}`) fail('build-info.json artifact id must be name-version');
 if (buildInfo.buildPath !== 'dist/') fail('build-info.json buildPath must be dist/');
 if (buildInfo.generatedAt !== '1970-01-01T00:00:00.000Z') fail('build-info.json generatedAt must be deterministic');
-if (buildInfo.minification?.bundling !== false) fail('build-info.json must state that no bundling is used');
+if (buildInfo.minification?.bundling?.javascript !== false || buildInfo.minification?.bundling?.css !== true) {
+  fail('build-info.json must state CSS-only bundling');
+}
+const artifactIndex = readText('dist/index.html');
+const cssLinks = [...artifactIndex.matchAll(/<link rel="stylesheet" href="([^"]+)">/g)];
+if (cssLinks.length !== 1 || cssLinks[0][1] !== './css/techcalc.bundle.css') {
+  fail('dist/index.html must load only the consolidated CSS bundle');
+}
+const artifactWorker = readText('dist/service-worker.js');
+if (!artifactWorker.includes('./css/techcalc.bundle.css') || /'\.\/css\/(?!techcalc\.bundle\.css)[^']+\.css'/.test(artifactWorker)) {
+  fail('dist/service-worker.js must precache only the consolidated CSS bundle');
+}
 if (!Array.isArray(buildInfo.files) || buildInfo.files.length < 100) fail('build-info.json file manifest is unexpectedly small');
 
 for (const entry of buildInfo.files) {

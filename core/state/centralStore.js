@@ -11,35 +11,33 @@ function isEqualValue(a, b) {
   return false;
 }
 
-function shallowEqual(a = {}, b = {}) {
-  const aKeys = Object.keys(a);
-  const bKeys = Object.keys(b);
-  if (aKeys.length !== bKeys.length) return false;
-  return aKeys.every(key => isEqualValue(a[key], b[key]));
-}
-
 export function createStore(initialState = {}, options = {}) {
   let state = clone(initialState);
-  const listeners = new Set();
+  const listeners = new Map();
   const moduleId = options.moduleId || 'module';
   let revision = 0;
 
   const emit = meta => {
-    const snapshot = clone(state);
-    listeners.forEach(listener => listener(snapshot, { moduleId, revision, ...meta }));
+    if (!listeners.size) return;
+    const snapshot = [...listeners.values()].some(needsSnapshot => needsSnapshot) ? clone(state) : undefined;
+    listeners.forEach((needsSnapshot, listener) =>
+      listener(needsSnapshot ? snapshot : undefined, { moduleId, revision, ...meta }));
   };
 
   return {
     get: () => clone(state),
     getRevision: () => revision,
     set(patch = {}, meta = {}) {
-      const next = { ...state, ...clone(patch) };
-      if (shallowEqual(state, next)) {
+      const clonedPatch = clone(patch) ?? {};
+      // A patch cannot remove keys; only values supplied by the patch can change.
+      // Compare each supplied field once, even for large saved-record collections.
+      const changed = Object.keys(clonedPatch).filter(key =>
+        !Object.hasOwn(state, key) || !isEqualValue(state[key], clonedPatch[key]));
+      if (!changed.length) {
         if (meta.notify === true) emit({ action: meta.action || 'noop', changed: [] });
         return;
       }
-      const changed = Object.keys(next).filter(key => !isEqualValue(state[key], next[key]));
-      state = next;
+      state = { ...state, ...clonedPatch };
       revision += 1;
       if (meta.notify !== false) emit({ action: meta.action || 'patch', changed });
     },
@@ -57,8 +55,8 @@ export function createStore(initialState = {}, options = {}) {
       revision += 1;
       if (meta.notify !== false) emit({ action: meta.action || 'reset', changed: Object.keys(state) });
     },
-    subscribe(listener) {
-      listeners.add(listener);
+    subscribe(listener, { snapshot = true } = {}) {
+      listeners.set(listener, snapshot);
       return () => listeners.delete(listener);
     }
   };

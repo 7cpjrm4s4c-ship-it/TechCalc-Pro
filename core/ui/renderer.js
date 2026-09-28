@@ -34,7 +34,7 @@ export function signedTempField(id, label, value, signAttribute = 'data-sign') {
   return `<div class="field field--signed-temp">
     <label for="${esc(id)}">${esc(label)}</label>
     <div class="control control--with-sign">
-      <button type="button" tabindex="-1" class="sign-toggle" ${signAttribute}="${esc(id)}" aria-label="Vorzeichen umschalten">±</button>
+      <button type="button" class="sign-toggle" ${signAttribute}="${esc(id)}" aria-label="Vorzeichen für ${esc(label)} umschalten">±</button>
       <input id="${esc(id)}" data-field="${esc(id)}" type="text" inputmode="decimal" value="${esc(value ?? '')}" placeholder="0" autocomplete="off">
       <span class="unit">°C</span>
     </div>
@@ -73,7 +73,7 @@ export function selectField({ id, label, value, options, commit = 'immediate', l
 export function segmented(name, options, value, settings = {}) {
   const accent = settings.accent ? ` segmented--${esc(settings.accent)}` : '';
   const action = settings.action || 'segment';
-  return `<div class="segmented${accent}" role="group">${options.map(o => `<button type="button" data-tc-action="${esc(action)}" data-segment="${esc(name)}" data-value="${esc(o.value)}" aria-pressed="${o.value === value}" class="${o.value === value ? 'is-active' : ''}">${esc(o.label)}</button>`).join('')}</div>`;
+  return `<div class="segmented${accent}" role="group" aria-label="${esc(settings.label || name)}">${options.map(o => `<button type="button" data-tc-action="${esc(action)}" data-segment="${esc(name)}" data-value="${esc(o.value)}" aria-pressed="${o.value === value}" class="${o.value === value ? 'is-active' : ''}">${esc(o.label)}</button>`).join('')}</div>`;
 }
 
 export function inlineStats(items) {
@@ -81,7 +81,7 @@ export function inlineStats(items) {
 }
 
 export function mainResult(title, main, details = [], accent = 'blue') {
-  return card(title, `<div class="main-result"><span>${esc(main.label)}</span><strong>${esc(main.value ?? '—')}${main.unit ? ` <small>${esc(main.unit)}</small>` : ''}</strong></div>${inlineStats(details)}`, accent);
+  return card(title, `<div class="main-result" role="status" aria-atomic="true"><span>${esc(main.label)}</span><strong>${esc(main.value ?? '—')}${main.unit ? ` <small>${esc(main.unit)}</small>` : ''}</strong></div>${inlineStats(details)}`, accent);
 }
 
 export function resultRows(rows) {

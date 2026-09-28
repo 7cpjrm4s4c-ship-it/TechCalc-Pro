@@ -148,7 +148,7 @@
 }
 .brand__icon { width: 42px; height: 42px; border-radius: var(--radius-md); box-shadow: 0 0 18px rgba(53,229,255,.18); }
 .brand__text { display: grid; line-height: 1.05; }
-.brand__title { font-size: 21px; letter-spacing: .4px; background: var(--gradient-brand); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.brand__title { margin: 0; font-size: 21px; font-weight: 700; letter-spacing: .4px; background: var(--gradient-brand); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .brand__subtitle { margin-top: 4px; color: var(--color-muted); font-size: 12px; letter-spacing: 1.7px; text-transform: uppercase; }
 
 .icon-button {
@@ -260,4 +260,3 @@
 .settings-row__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--tc-gap); }
 .settings-actions { justify-content: flex-end; }
 .settings-actions--split { justify-content: space-between; }
-

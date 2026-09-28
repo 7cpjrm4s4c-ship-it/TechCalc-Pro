@@ -36,13 +36,13 @@ export function createHeatingCoolingView({ config, calculate, lineSectionControl
       card('Betriebsart', `<div data-hc-dynamic="mode-segment">${segmented('mode', [
         { value: 'heating', label: '● Heizung' },
         { value: 'cooling', label: '● Kälte' }
-      ], s.mode, { accent })}</div>`, accent, { compact: true }),
+      ], s.mode, { accent, label: 'Betriebsart' })}</div>`, accent, { compact: true }),
       card(`${modeLabel} — Eingaben`, stack([
         `<div data-hc-dynamic="target-segment">${segmented(key(s, 'CalcTarget'), [
           { value: 'power', label: 'Q Leistung' },
           { value: 'massFlow', label: 'ṁ Massenstrom' },
           { value: 'deltaT', label: 'ΔT Temperatur' }
-        ], active.calcTarget, { accent })}</div>`,
+        ], active.calcTarget, { accent, label: 'Berechnungsgröße' })}</div>`,
         `<div data-hc-dynamic="input-fields">${grid(inputFields(s, active).join(''), 2)}</div>`
       ].join('')), accent),
       `<div class="tc-module-section" data-hc-dynamic="result">${renderResultModel(buildHeatingCoolingResultModel(active, r, accent), accent)}</div>`,
@@ -67,12 +67,12 @@ export function createHeatingCoolingView({ config, calculate, lineSectionControl
     renderModeSegment: (s, _r, active, accent) => segmented('mode', [
       { value: 'heating', label: '● Heizung' },
       { value: 'cooling', label: '● Kälte' }
-    ], s.mode, { accent }),
+    ], s.mode, { accent, label: 'Betriebsart' }),
     renderTargetSegment: (s, _r, active, accent) => segmented(key(s, 'CalcTarget'), [
       { value: 'power', label: 'Q Leistung' },
       { value: 'massFlow', label: 'ṁ Massenstrom' },
       { value: 'deltaT', label: 'ΔT Temperatur' }
-    ], active.calcTarget, { accent }),
+    ], active.calcTarget, { accent, label: 'Berechnungsgröße' }),
     renderInputFields: (s, _r, active) => grid(inputFields(s, active).join(''), 2),
     renderResult: (_s, r, active, accent) => renderResultModel(buildHeatingCoolingResultModel(active, r, accent), accent),
     renderFormula: (_s, r) => `Q = ṁ × cₚ × ΔT · ρ = ${fmt(r.medium.density, 0)} kg/m³ · cₚ = ${fmt(r.medium.cpWhKgK, 3)} Wh/(kg·K)`,

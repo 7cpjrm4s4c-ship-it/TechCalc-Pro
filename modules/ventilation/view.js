@@ -70,7 +70,7 @@ export function renderModeSegment(s, accent) {
   return segmented('mode', [
     { value: 'heating', label: '● Heizleistung' },
     { value: 'cooling', label: '● Kühlleistung' }
-  ], s.mode, { accent });
+  ], s.mode, { accent, label: 'Betriebsart' });
 }
 
 export function renderTargetSegment(s, active, accent) {
@@ -78,7 +78,7 @@ export function renderTargetSegment(s, active, accent) {
     { value: 'power', label: 'Q Leistung' },
     { value: 'volumeFlow', label: 'V˙ Volumenstrom' },
     { value: 'deltaT', label: 'ΔT Temperatur' }
-  ], active.calcTarget, { accent });
+  ], active.calcTarget, { accent, label: 'Berechnungsgröße' });
 }
 
 export function renderVentilationResult(_s, r, active, accent) {

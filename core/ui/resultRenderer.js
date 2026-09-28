@@ -40,7 +40,7 @@ function renderPrimaryDetails(rows = []) {
 export function renderResultCard({ title = 'Ergebnis', primary = null, rows = [], accent = 'blue' } = {}) {
   const normalizedRows = normalizeResultRows(rows);
   if (primary) {
-    const body = `<div class="main-result"><span>${esc(primary.label || '')}</span><strong>${esc(primary.value ?? '—')}${primary.unit ? ` <small>${esc(primary.unit)}</small>` : ''}</strong></div>${renderPrimaryDetails(normalizedRows)}`;
+    const body = `<div class="main-result" role="status" aria-atomic="true"><span>${esc(primary.label || '')}</span><strong>${esc(primary.value ?? '—')}${primary.unit ? ` <small>${esc(primary.unit)}</small>` : ''}</strong></div>${renderPrimaryDetails(normalizedRows)}`;
     return card(title, body, accent);
   }
   return card(title, resultRows(normalizedRows), accent);
