@@ -385,7 +385,7 @@ pre,
 
   :root[data-theme='light'] .segmented button {
     padding-inline: 4px;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     overflow-wrap: normal;
     word-break: normal;
     hyphens: none;
@@ -396,5 +396,9 @@ pre,
   :root[data-theme='light'] .segmented:has(> button:nth-child(3)) {
     grid-auto-flow: row;
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  :root[data-theme='light'] .segmented:has(> button:nth-child(3)) button {
+    font-size: 0.875rem;
   }
 }
