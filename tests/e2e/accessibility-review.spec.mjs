@@ -31,3 +31,16 @@ test('segment selection exposes state after keyboard activation', async ({ page 
   await expect(page.getByRole('button', { name: '● Heizung', exact: true })).toHaveAttribute('aria-pressed', 'false');
   await expect(page.locator('#app [role="tablist"]')).toHaveCount(0);
 });
+
+test('more modules announces its open state and resets after outside click', async ({ page }) => {
+  await page.goto('/');
+  const more = page.locator('#primaryNav [data-overflow]');
+  await expect(more).toHaveText(/Mehr/);
+  await more.focus();
+  await page.keyboard.press('Enter');
+  await expect(more).toHaveAttribute('aria-expanded', 'true');
+  await expect(more).toHaveAttribute('aria-label', 'Weitere Module schließen');
+  await page.locator('.app-header .brand').click();
+  await expect(more).toHaveAttribute('aria-expanded', 'false');
+  await expect(more).toHaveAttribute('aria-label', 'Weitere Module öffnen');
+});
