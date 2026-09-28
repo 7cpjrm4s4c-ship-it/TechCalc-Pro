@@ -58,6 +58,9 @@ jobs:
           npm run build
           npm run precache:check
 
+      - name: Netlify-Artefakt prüfen
+        run: npm run audit:artifacts
+
       - name: Playwright-Tests ausführen
         run: npm run test:e2e
 

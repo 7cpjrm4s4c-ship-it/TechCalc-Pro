@@ -13,7 +13,7 @@ const COPY_ENTRIES = [
   '_headers',
   'index.html',
   'manifest.json',
-  'RELEASE_NOTES.md',
+  'docs/release/RELEASE_NOTES.md',
   'service-worker.js',
   'css',
   coreDir,

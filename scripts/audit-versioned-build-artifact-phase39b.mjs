@@ -48,6 +48,18 @@ for (const required of ['index.html', 'service-worker.js', 'manifest.json', 'bui
   if (!fs.existsSync(path.join(dist, required))) fail(`dist/ missing required deploy file: ${required}`);
 }
 
+const precacheBlock = readText('service-worker.js').match(/const ASSETS = \[([\s\S]*?)\];/);
+if (!precacheBlock) fail('service-worker.js does not define a precache list');
+const precacheAssets = [...precacheBlock[1].matchAll(/^\s*'\.\/([^']*)',?$/gm)]
+  .map(match => match[1]);
+if (precacheAssets.length < 100) fail('service-worker.js precache list is unexpectedly small');
+for (const asset of precacheAssets) {
+  const relativePath = asset || 'index.html';
+  if (!fs.existsSync(path.join(dist, relativePath))) {
+    fail(`dist/ missing service-worker precache asset: ${relativePath}`);
+  }
+}
+
 const buildInfo = readJson('dist/build-info.json');
 if (buildInfo.name !== pkg.name) fail('build-info.json name does not match package.json');
 if (buildInfo.version !== pkg.version) fail('build-info.json version does not match package.json');
@@ -80,6 +92,7 @@ const report = {
     'build:minified creates dist/',
     'dist/build-info.json pins package name and version',
     'dist/build-info.json contains sha256 file manifest',
+    'every service-worker precache asset exists in dist/',
     'Netlify publishes dist/'
   ]
 };
