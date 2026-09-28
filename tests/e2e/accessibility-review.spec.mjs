@@ -46,7 +46,10 @@ test('more modules announces its open state and resets after outside click', asy
 });
 
 test('long F-Gases legal references remain available behind keyboard-operated disclosure', async ({ page }) => {
-  await page.goto('/#/f-gases-check');
+  await page.goto('/');
+  await page.locator('[data-overflow]').click();
+  await page.locator('#overflowMenu [data-module-id="f-gases-check"]').click();
+  await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', 'f-gases-check');
   const sources = page.locator('.tc-warning__sources').first();
   await expect(sources).toBeVisible();
   await expect(sources).not.toHaveAttribute('open', '');
