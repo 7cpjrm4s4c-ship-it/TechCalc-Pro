@@ -155,8 +155,8 @@ function renderTab(module, activeId) {
 
 function renderOverflowButton(activeInOverflow, expanded) {
   return `
-    <button class="module-tab module-tab--overflow ${activeInOverflow ? 'is-overflow-active' : ''}" data-overflow type="button" aria-label="Weitere Module öffnen" aria-expanded="${expanded ? 'true' : 'false'}">
-      +
+    <button class="module-tab module-tab--overflow ${activeInOverflow ? 'is-overflow-active' : ''}" data-overflow type="button" aria-label="Weitere Module ${expanded ? 'schließen' : 'öffnen'}" aria-expanded="${expanded ? 'true' : 'false'}">
+      Mehr
     </button>
   `;
 }

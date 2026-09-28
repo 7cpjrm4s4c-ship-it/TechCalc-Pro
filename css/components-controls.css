@@ -58,7 +58,7 @@
 .tc-control input,
 .tc-control select { height: calc(var(--tc-control-height) - 2px); padding: 0 var(--tc-control-padding-x); }
 .control input::placeholder,
-.settings-form input::placeholder { color: var(--color-dim); opacity: 1; }
+.settings-form input::placeholder { color: var(--color-muted); opacity: 1; }
 .control input { flex: 1 1 auto; width: auto; }
 .unit { flex: 0 0 auto; padding: 0 var(--tc-control-padding-x); color: var(--color-muted); font-weight: 900; white-space: nowrap; }
 .unit-select,
@@ -216,9 +216,9 @@ select option:checked { background-color: #1f3347; color: #fff; }
   background: rgba(255,255,255,.035);
 }
 .inline-stat span,
-.tc-result-item span { color: var(--color-muted); font-size: 10px; line-height: 1.15; letter-spacing: 1.1px; text-transform: uppercase; font-weight: 900; }
+.tc-result-item span { color: var(--color-muted); font-size: 12px; line-height: 1.3; letter-spacing: .5px; text-transform: uppercase; font-weight: 900; }
 .inline-stat strong,
-.tc-result-item strong { color: var(--color-text); font-size: 13px; line-height: 1.2; font-weight: 900; white-space: normal; }
+.tc-result-item strong { color: var(--color-text); font-size: 14px; line-height: 1.4; font-weight: 900; white-space: normal; }
 .inline-stat small { font-size: .82em; }
 .main-result { display: grid; gap: 4px; padding: var(--tc-gap) 0; border-bottom: 1px solid rgba(255,255,255,.10); }
 .main-result span { color: var(--color-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1.4px; font-weight: 900; }

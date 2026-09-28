@@ -102,7 +102,6 @@
 .tc-warning,
 .ph-warning { display: grid; gap: 4px; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--tc-gap); background: rgba(255,255,255,.04); }
 .tc-warning span,
-.ph-warning span { color: var(--color-muted); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.ph-warning span { color: var(--color-muted); font-size: 12px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
 .tc-warning strong,
-.ph-warning strong { color: var(--color-text); font-size: 13px; line-height: 1.35; }
-
+.ph-warning strong { color: var(--color-text); font-size: 14px; line-height: 1.5; }
