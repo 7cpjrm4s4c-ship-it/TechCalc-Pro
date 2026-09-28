@@ -6,10 +6,6 @@
    The active segment fill now always derives from the same module accent as the border.
    Release notes and menu content use Light surfaces only. Text remains global dark/gray. */
 :root[data-theme='light'] {
-  --tc-active-accent: var(--accent-blue);
-  --tc-active-accent-soft: color-mix(in srgb, var(--tc-active-accent) 17%, #ffffff);
-  --tc-active-accent-hover: color-mix(in srgb, var(--tc-active-accent) 10%, #ffffff);
-  --tc-active-accent-border: color-mix(in srgb, var(--tc-active-accent) 72%, var(--color-border));
   --tc-light-release-bg: var(--color-surface);
   --tc-light-release-bg-soft: color-mix(in srgb, var(--tc-light-bg) 82%, #ffffff);
 }
@@ -39,33 +35,6 @@
   border-color: var(--tc-active-accent-border) !important;
   background: color-mix(in srgb, var(--color-surface-soft) 78%, #ffffff) !important;
   color: var(--color-text) !important;
-}
-
-:root[data-theme='light'] .segmented button,
-:root[data-theme='light'] .segment-button,
-:root[data-theme='light'] .tc-segment-button,
-:root[data-theme='light'] .theme-switch__option {
-  color: var(--color-text) !important;
-  -webkit-text-fill-color: var(--color-text) !important;
-}
-
-:root[data-theme='light'] .segmented button.is-active,
-:root[data-theme='light'] .segmented--orange button.is-active,
-:root[data-theme='light'] .segmented--cyan button.is-active,
-:root[data-theme='light'] .segmented--blue button.is-active,
-:root[data-theme='light'] .segmented--green button.is-active,
-:root[data-theme='light'] .segmented--purple button.is-active,
-:root[data-theme='light'] .segment-button.is-active,
-:root[data-theme='light'] .tc-segment-button.is-active,
-:root[data-theme='light'] .theme-switch__option.is-active,
-:root[data-theme='light'] .theme-switch__option[aria-pressed='true'] {
-  background: var(--tc-active-accent-soft) !important;
-  border-color: var(--tc-active-accent) !important;
-  color: var(--color-text) !important;
-  -webkit-text-fill-color: var(--color-text) !important;
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--tc-active-accent) 28%, transparent),
-    0 0 0 3px color-mix(in srgb, var(--tc-active-accent) 14%, transparent) !important;
 }
 
 :root[data-theme='light'] .segmented button:hover,
