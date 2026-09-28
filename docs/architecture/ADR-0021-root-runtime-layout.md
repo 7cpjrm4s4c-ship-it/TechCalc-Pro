@@ -72,13 +72,14 @@ modules
 
 Runtime consumers, audits, tests, deployment tooling and the service-worker precache switched atomically with the directory relocation. The empty `js` boundary is removed; a dedicated audit gate will protect it from recreation after the migration is verified in CI.
 
-The internal responsibility migrations represented in this branch so far are:
+The internal responsibility migrations completed in the repository include:
 
 - `core/diagnostics`
 - `core/events`
 - `core/contracts`
+- module registration in `core/runtime/registry.js`
 
-The remaining top-level Core implementations continue to migrate one responsibility family at a time.
+The discoverable Core entry points `core/app.js`, `core/index.js` and `core/version.js` remain at the root. Other Core implementations are grouped by responsibility.
 
 ## Consequences
 
@@ -113,6 +114,6 @@ The Core root becomes easier to navigate only after the later responsibility-bas
 - prepare import, audit and precache tooling for `core` and `modules`
 - move `js/core` and `js/modules` together
 - run all quality gates and complete visual verification
-- reorganize Core by responsibility in isolated blocks
+- keep Core implementations grouped by responsibility
 - forbid recreation of the removed `js` runtime boundary
-- prepare release 2.0.0 only after final release readiness
+- verify subsequent changes against release readiness and the applicable quality gates

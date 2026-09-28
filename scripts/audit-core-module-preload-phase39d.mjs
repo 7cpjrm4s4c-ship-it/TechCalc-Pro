@@ -9,7 +9,7 @@ const integrationPath = path.join(root, 'scripts/test-integration.mjs');
 const requiredPreloads = [
   './core/app.js',
   './core/navigation/router.js',
-  './core/registry.js',
+  './core/runtime/registry.js',
   './core/navigation/index.js',
   './core/runtime/moduleLifecycleAdapter.js',
   './core/runtime/moduleRuntime.js',

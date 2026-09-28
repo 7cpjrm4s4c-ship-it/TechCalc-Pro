@@ -1,4 +1,4 @@
-import { modules } from '../registry.js';
+import { modules } from '../runtime/registry.js';
 import { currentRoute } from './router.js';
 import { loadPreferences, setMobileQuickAccess } from '../ux/preferences.js';
 import { esc } from '../ui/renderer.js';

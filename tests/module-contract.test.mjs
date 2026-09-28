@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { modules } from '../core/registry.js';
+import { modules } from '../core/runtime/registry.js';
 
 const modulesDir = new URL('../modules/', import.meta.url).pathname;
 for (const name of readdirSync(modulesDir)) {

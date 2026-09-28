@@ -31,6 +31,7 @@ const requiredFiles = [
   coreFile('engineering/hvacAirResults.js'),
   coreFile('pdf/index.js'),
   coreFile('runtime/index.js'),
+  coreFile('runtime/registry.js'),
   coreFile('state/index.js'),
   coreFile('storage/index.js'),
   coreFile('styles/index.js'),
@@ -212,6 +213,15 @@ function importSpecifiers(source) {
 
 for (const relativePath of requiredFiles) {
   if (!fs.existsSync(path.join(root, relativePath))) throw new Error(`Missing framework kernel file: ${relativePath}`);
+}
+if (runtimeLayout.id === 'target') {
+  const allowedCoreRootFiles = new Set(['app.js', 'index.js', 'version.js']);
+  const unexpectedCoreRootFiles = fs.readdirSync(path.join(root, runtimeLayout.coreDir), { withFileTypes: true })
+    .filter(entry => entry.isFile() && !allowedCoreRootFiles.has(entry.name))
+    .map(entry => entry.name);
+  if (unexpectedCoreRootFiles.length) {
+    throw new Error(`Core root contains implementation files: ${unexpectedCoreRootFiles.join(', ')}`);
+  }
 }
 for (const legacyBoundary of ['js/platform', 'js/framework', 'js/data']) {
   if (fs.existsSync(path.join(root, legacyBoundary))) {

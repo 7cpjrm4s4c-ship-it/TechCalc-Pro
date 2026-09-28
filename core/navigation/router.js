@@ -1,4 +1,4 @@
-import { modules } from '../registry.js';
+import { modules } from '../runtime/registry.js';
 import { loadPreferences } from '../ux/preferences.js';
 
 const FALLBACK_ROUTE = 'heating-cooling';
