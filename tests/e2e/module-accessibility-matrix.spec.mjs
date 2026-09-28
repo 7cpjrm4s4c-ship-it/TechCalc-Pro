@@ -105,6 +105,18 @@ test('mobile light theme keeps selection labels whole and navigation opaque', as
   expect(navStyle.blur).toBe('none');
   if (navStyle.webkitBlur) expect(navStyle.webkitBlur).toBe('none');
 
+  const cardStyle = await page.locator('.card').filter({ has: page.locator('.card__title', { hasText: 'Betriebsart' }) }).first().evaluate(card => {
+    const style = getComputedStyle(card);
+    return {
+      widths: [style.borderTopWidth, style.borderRightWidth, style.borderBottomWidth, style.borderLeftWidth],
+      blur: style.backdropFilter,
+      webkitBlur: style.webkitBackdropFilter
+    };
+  });
+  expect(cardStyle.widths).toEqual(['1px', '1px', '1px', '1px']);
+  expect(cardStyle.blur).toBe('none');
+  if (cardStyle.webkitBlur) expect(cardStyle.webkitBlur).toBe('none');
+
   await page.setViewportSize({ width: 320, height: 800 });
   const first = await target.getByRole('button', { name: 'Q Leistung' }).evaluate(button => button.getBoundingClientRect().top);
   const second = await massFlow.evaluate(button => button.getBoundingClientRect().top);

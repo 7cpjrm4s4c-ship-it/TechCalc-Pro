@@ -914,6 +914,9 @@ body::after,
   --tc-card-frame-color: color-mix(in srgb, var(--tc-contract-accent, var(--tc-final-accent, var(--accent-blue))) 72%, var(--color-border));
   border: 1px solid var(--tc-card-frame-color) !important;
   box-shadow: none !important;
+  /* An opaque Light surface does not need the glass blur; WebKit composites it over the top border. */
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }
 :root[data-theme='light'] .card--accent-orange { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-heating) 72%, var(--color-border)); }
 :root[data-theme='light'] .card--accent-cyan { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-air) 72%, var(--color-border)); }
