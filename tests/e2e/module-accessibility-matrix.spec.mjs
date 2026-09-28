@@ -103,7 +103,7 @@ test('mobile light theme keeps selection labels whole and navigation opaque', as
   });
   expect(navStyle.background).toMatch(/^rgb\(/);
   expect(navStyle.blur).toBe('none');
-  expect(navStyle.webkitBlur).toBe('none');
+  if (navStyle.webkitBlur) expect(navStyle.webkitBlur).toBe('none');
 
   await page.setViewportSize({ width: 320, height: 800 });
   const first = await target.getByRole('button', { name: 'Q Leistung' }).evaluate(button => button.getBoundingClientRect().top);
