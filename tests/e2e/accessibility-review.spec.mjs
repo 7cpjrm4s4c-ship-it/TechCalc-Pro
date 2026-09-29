@@ -58,3 +58,33 @@ test('long F-Gases legal references remain available behind keyboard-operated di
   await expect(sources).toHaveAttribute('open', '');
   await expect(sources.locator('p')).toContainText('Verordnung (EU) 2024/573');
 });
+
+test('Tab leaves sign toggles, import actions and save buttons', async ({ page }) => {
+  const checkNextTab = async locator => {
+    await locator.focus();
+    await page.keyboard.press('Tab');
+    const focus = await page.evaluate(() => ({
+      visible: Boolean(document.activeElement?.getClientRects().length),
+      tag: document.activeElement?.tagName
+    }));
+    await expect(locator).not.toBeFocused();
+    expect(focus.visible, `Tab moved to invisible ${focus.tag}`).toBe(true);
+  };
+
+  for (const moduleId of ['heating-cooling', 'ventilation', 'mixed-air', 'flooding-verification']) {
+    await page.goto(`/#/${moduleId}`);
+    await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', moduleId);
+    const toggles = page.locator('#app .sign-toggle:visible');
+    if (await toggles.count()) {
+      await checkNextTab(toggles.first());
+    }
+  }
+
+  await page.goto('/#/flooding-verification');
+  const importButton = page.getByRole('button', { name: 'Flächen importieren' });
+  await checkNextTab(importButton);
+
+  await page.goto('/#/heating-cooling');
+  const saveButton = page.locator('#app button').filter({ hasText: /^Speichern$/ }).first();
+  await checkNextTab(saveButton);
+});

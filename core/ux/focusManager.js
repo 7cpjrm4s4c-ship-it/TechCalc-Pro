@@ -48,9 +48,11 @@ function closedDetailsAncestor(element) {
 
 function isPlatformFieldReachable(element) {
   if (!element || element.tabIndex < 0) return false;
-  if (isElementVisible(element)) return true;
+  // A control can have display:block while an ancestor is hidden by CSS.
+  // In that case focus() silently leaves document.activeElement unchanged.
+  if (element.getClientRects?.().length && isElementVisible(element)) return true;
   const details = closedDetailsAncestor(element);
-  if (!details) return false;
+  if (!details || !details.getClientRects?.().length) return false;
 
   // Allow fields hidden only because their parent details is closed.
   // Still reject explicitly hidden/aria-hidden elements or nested hidden wrappers.
@@ -81,7 +83,7 @@ export function safeFocus(element, options = {}) {
   if (options.select && typeof element.select === 'function' && element.tagName !== 'SELECT') {
     try { element.select(); } catch { /* ignore selection failures */ }
   }
-  return true;
+  return typeof document === 'undefined' || document.activeElement === element;
 }
 
 export function blurActiveElement(root = document) {
@@ -120,12 +122,18 @@ export function focusNext(root, current, options = {}) {
   const direction = options.direction === 'previous' ? -1 : 1;
   const nextIndex = index >= 0 ? index + direction : 0;
   const normalizedIndex = options.wrap === false ? nextIndex : (nextIndex + fields.length) % fields.length;
-  const next = fields[normalizedIndex];
-  if (!next) return false;
+  if (normalizedIndex < 0 || normalizedIndex >= fields.length) return false;
 
   const applyFocus = () => {
-    openClosedDetailsForField(next);
-    return safeFocus(next, { preventScroll: true, select: options.select !== false });
+    for (let step = 0; step < fields.length; step += 1) {
+      const candidateIndex = normalizedIndex + step * direction;
+      const indexToTry = options.wrap === false ? candidateIndex : (candidateIndex + fields.length) % fields.length;
+      const candidate = fields[indexToTry];
+      if (!candidate) break;
+      openClosedDetailsForField(candidate);
+      if (safeFocus(candidate, { preventScroll: true, select: options.select !== false })) return true;
+    }
+    return false;
   };
 
   if (options.defer === false) return applyFocus();
@@ -169,14 +177,16 @@ export function focusByTab(root, current, options = {}) {
   return focusNext(root, current, {
     direction: direction === 'previous' ? 'previous' : 'next',
     select: options.select !== false,
-    defer: options.defer
+    defer: false,
+    wrap: false
   });
 }
 
 export function handleTabNavigation(root, current, event, options = {}) {
   if (!shouldHandleTabNavigation(event)) return false;
-  if (options.preventDefault !== false) event?.preventDefault?.();
-  return focusByTab(root, current, { ...options, event });
+  const moved = focusByTab(root, current, { ...options, event });
+  if (moved && options.preventDefault !== false) event?.preventDefault?.();
+  return moved;
 }
 
 export function handlePlatformFieldNavigation(root, current, event, options = {}) {
