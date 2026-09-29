@@ -1,20 +1,24 @@
 import { modules } from '../runtime/registry.js';
 import { currentRoute } from './router.js';
-import { loadPreferences, setMobileQuickAccess } from '../ux/preferences.js';
+import { loadPreferences, setModuleOrder } from '../ux/preferences.js';
 import { esc } from '../ui/renderer.js';
 
 const MOBILE_QUERY = '(max-width: 767px)';
+
+export function orderedModuleIds(preferences, allModules) {
+  const available = allModules.map(module => module.id);
+  const preferred = preferences.moduleOrder?.length ? preferences.moduleOrder : preferences.mobileQuickAccess;
+  return [...new Set([...(preferred || []), ...available])].filter(id => available.includes(id));
+}
 
 export function renderNavigation(activeId = currentRoute()) {
   const nav = document.getElementById('primaryNav');
   const overflow = document.getElementById('overflowMenu');
   if (!nav || !overflow) return;
-  const allModules = modules.all();
-  const isMobile = matchMedia(MOBILE_QUERY).matches;
   const preferences = loadPreferences();
-  const visibleIds = isMobile
-    ? normalizeQuickAccess(preferences.mobileQuickAccess, allModules, 4)
-    : normalizeQuickAccess(preferences.mobileQuickAccess, allModules, Math.max(1, calcDesktopSlots() - 1));
+  const allModules = orderedModuleIds(preferences, modules.all()).map(id => modules.get(id));
+  const isMobile = matchMedia(MOBILE_QUERY).matches;
+  const visibleIds = allModules.slice(0, isMobile ? 4 : Math.max(1, calcDesktopSlots() - 1)).map(module => module.id);
   const visibleModules = visibleIds.map(id => modules.get(id)).filter(Boolean);
   const overflowModules = allModules.filter(module => !visibleIds.includes(module.id));
   const activeInOverflow = overflowModules.some(module => module.id === activeId);
@@ -31,53 +35,27 @@ export function renderQuickAccessSettings() {
   const host = document.getElementById('quickAccessSettings');
   if (!host) return;
 
-  const allModules = modules.all();
-  const selectedIds = normalizeQuickAccess(loadPreferences().mobileQuickAccess, allModules, 4);
+  const allModules = orderedModuleIds(loadPreferences(), modules.all()).map(id => modules.get(id));
   host.innerHTML = `
-    <div class="quick-access-list">
-      ${selectedIds.map((id, index) => renderQuickAccessRow(modules.get(id), index, selectedIds.length)).join('')}
-    </div>
-    <div class="quick-access-pool">
-      <strong>Weitere Module</strong>
-      ${allModules.map(module => renderQuickAccessToggle(module, selectedIds)).join('')}
+    <div class="module-order-list" role="list" aria-label="Reihenfolge aller Module">
+      ${allModules.map((module, index) => renderOrderCard(module, index, allModules.length)).join('')}
     </div>
   `;
-  host.querySelectorAll('[data-quick-remove]').forEach(button => {
+  host.querySelectorAll('[data-order-move]').forEach(button => {
     button.addEventListener('click', () => {
-      const next = selectedIds.filter(id => id !== button.dataset.quickRemove);
-      setMobileQuickAccess(fillToFour(next, allModules));
+      const id = button.closest('[data-order-id]').dataset.orderId;
+      const ids = allModules.map(module => module.id);
+      const index = ids.indexOf(id);
+      const target = index + (button.dataset.orderMove === 'up' ? -1 : 1);
+      if (target < 0 || target >= ids.length) return;
+      [ids[index], ids[target]] = [ids[target], ids[index]];
+      setModuleOrder(ids);
       rerenderNavigationSettings();
+      host.querySelector(`[data-order-id="${id}"] [data-order-move="${button.dataset.orderMove}"]`)?.focus();
+      announceOrder(id, target);
     });
   });
-
-  host.querySelectorAll('[data-quick-add]').forEach(input => {
-    input.addEventListener('change', () => {
-      const id = input.dataset.quickAdd;
-      let next;
-      if (input.checked) {
-        next = selectedIds.includes(id)
-          ? [...selectedIds]
-          : [...selectedIds.slice(0, 3), id];
-      } else {
-        next = selectedIds.filter(item => item !== id);
-      }
-
-      setMobileQuickAccess(fillToFour(next, allModules));
-      rerenderNavigationSettings();
-    });
-  });
-  host.querySelectorAll('[data-quick-move]').forEach(button => {
-    button.addEventListener('click', () => {
-      const index = Number(button.dataset.index);
-      const direction = button.dataset.quickMove === 'up' ? -1 : 1;
-      const target = index + direction;
-      if (target < 0 || target >= selectedIds.length) return;
-      const next = [...selectedIds];
-      [next[index], next[target]] = [next[target], next[index]];
-      setMobileQuickAccess(next);
-      rerenderNavigationSettings();
-    });
-  });
+  bindOrderDrag(host);
 }
 
 function bindPrimaryNav(nav, overflow) {
@@ -126,30 +104,15 @@ function renderOverflowMenu(overflow, overflowModules, activeId, visibleIds, isM
       event.preventDefault();
       event.stopPropagation();
       const id = button.dataset.setQuick;
-      const next = [...visibleIds.filter(item => item !== id)];
-      if (next.length >= 4) next[3] = id;
-      else next.push(id);
-      setMobileQuickAccess(normalizeQuickAccess(next, modules.all(), 4));
+      const all = orderedModuleIds(loadPreferences(), modules.all());
+      const next = [...all.filter(item => item !== id)];
+      next.splice(Math.min(3, next.length), 0, id);
+      setModuleOrder(next);
       overflow.hidden = true;
       renderNavigation(currentRoute());
       renderQuickAccessSettings();
     });
   });
-}
-function normalizeQuickAccess(preferredIds, allModules, limit = 4) {
-  const availableIds = allModules.map(module => module.id);
-  const selected = [...new Set((preferredIds ?? []).filter(id => availableIds.includes(id)))];
-
-  for (const id of availableIds) {
-    if (selected.length >= limit) break;
-    if (!selected.includes(id)) selected.push(id);
-  }
-
-  return selected.slice(0, limit);
-}
-
-function fillToFour(ids, allModules) {
-  return normalizeQuickAccess(ids, allModules, 4);
 }
 function renderTab(module, activeId) {
   return `
@@ -178,28 +141,106 @@ function renderOverflowItem(module, activeId, isMobile) {
   `;
 }
 
-function renderQuickAccessRow(module, index, length) {
+function renderOrderCard(module, index, length) {
   if (!module) return '';
   return `
-    <div class="settings-row" data-module-id="${esc(module.id)}">
-      <span>${esc(module.shortTitle)}</span>
-      <span class="settings-row__actions">
-        <button class="mini-button" type="button" data-quick-move="up" data-index="${index}" ${index === 0 ? 'disabled' : ''}>↑</button>
-        <button class="mini-button" type="button" data-quick-move="down" data-index="${index}" ${index === length - 1 ? 'disabled' : ''}>↓</button>
-        <button class="mini-button" type="button" data-quick-remove="${esc(module.id)}">Entfernen</button>
+    <div class="module-order-card" role="listitem" data-order-id="${esc(module.id)}" data-accent="${esc(module.accent)}">
+      <span class="module-order-grip" aria-hidden="true">⠿</span>
+      <span class="module-order-card__number">${String(index + 1).padStart(2, '0')}</span>
+      <span class="module-order-card__text"><strong>${esc(module.title)}</strong><small>${esc(module.group)}</small></span>
+      ${index < 4 ? '<span class="module-order-card__badge">Schnellzugriff</span>' : ''}
+      <span class="module-order-card__actions">
+        <button type="button" data-order-move="up" aria-label="${esc(module.title)} nach oben" ${index === 0 ? 'disabled' : ''}>↑</button>
+        <button type="button" data-order-move="down" aria-label="${esc(module.title)} nach unten" ${index === length - 1 ? 'disabled' : ''}>↓</button>
       </span>
     </div>
   `;
 }
 
-function renderQuickAccessToggle(module, selectedIds) {
-  const selected = selectedIds.includes(module.id);
-  return `
-    <label class="settings-check">
-      <input type="checkbox" data-quick-add="${esc(module.id)}" ${selected ? 'checked' : ''}>
-      <span>${esc(module.title)}</span>
-    </label>
-  `;
+function announceOrder(id, index) {
+  const status = document.getElementById('moduleOrderStatus');
+  const module = modules.get(id);
+  if (status && module) status.textContent = `${module.title} an Position ${index + 1}.`;
+}
+
+function bindOrderDrag(host) {
+  const list = host.querySelector('.module-order-list');
+  const scroller = host.closest('.settings-panel__body');
+  let drag = null;
+
+  function reorderAt(x, y) {
+    const target = document.elementFromPoint(x, y)?.closest('.module-order-card');
+    if (!target || target === drag.card || target.parentElement !== list) return;
+    const middle = target.getBoundingClientRect().top + target.offsetHeight / 2;
+    list.insertBefore(drag.card, y < middle ? target : target.nextSibling);
+  }
+
+  function scrollWhileDragging() {
+    if (!drag?.active || !scroller) return;
+    const bounds = scroller.getBoundingClientRect();
+    const edge = 48;
+    const speed = drag.y < bounds.top + edge ? -14 : drag.y > bounds.bottom - edge ? 14 : 0;
+    if (speed) {
+      scroller.scrollTop += speed;
+      reorderAt(drag.x, drag.y);
+    }
+    drag.frame = requestAnimationFrame(scrollWhileDragging);
+  }
+
+  host.addEventListener('pointerdown', event => {
+    const card = event.target.closest('.module-order-card');
+    if (!card || !list.contains(card) || event.target.closest('button')) return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    if (event.pointerType !== 'mouse' && !event.target.closest('.module-order-grip')) return;
+    const rect = card.getBoundingClientRect();
+    drag = { card, id: card.dataset.orderId, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY,
+      x: event.clientX, y: event.clientY, offsetY: event.clientY - rect.top, active: false, frame: 0, ghost: null };
+    host.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+
+  host.addEventListener('pointermove', event => {
+    if (!drag || event.pointerId !== drag.pointerId) return;
+    drag.x = event.clientX;
+    drag.y = event.clientY;
+    if (!drag.active) {
+      if (Math.hypot(drag.x - drag.startX, drag.y - drag.startY) < 5) return;
+      drag.active = true;
+      drag.card.classList.add('is-dragging');
+      drag.ghost = drag.card.cloneNode(true);
+      drag.ghost.removeAttribute('data-order-id');
+      drag.ghost.classList.remove('is-dragging');
+      drag.ghost.classList.add('module-order-ghost');
+      drag.ghost.setAttribute('aria-hidden', 'true');
+      drag.ghost.inert = true;
+      drag.ghost.style.width = `${drag.card.getBoundingClientRect().width}px`;
+      drag.ghost.style.left = `${drag.card.getBoundingClientRect().left}px`;
+      document.body.append(drag.ghost);
+      drag.frame = requestAnimationFrame(scrollWhileDragging);
+    }
+    drag.ghost.style.top = `${event.clientY - drag.offsetY}px`;
+    reorderAt(event.clientX, event.clientY);
+  });
+
+  function finish(event, save) {
+    if (!drag || event.pointerId !== drag.pointerId) return;
+    const { card, id, active, ghost, frame } = drag;
+    if (frame) cancelAnimationFrame(frame);
+    ghost?.remove();
+    card.classList.remove('is-dragging');
+    if (host.hasPointerCapture(event.pointerId)) host.releasePointerCapture(event.pointerId);
+    drag = null;
+    if (!active) return;
+    if (save) {
+      const ids = [...list.children].map(item => item.dataset.orderId);
+      setModuleOrder(ids);
+      rerenderNavigationSettings();
+      announceOrder(id, ids.indexOf(id));
+    } else renderQuickAccessSettings();
+  }
+
+  host.addEventListener('pointerup', event => finish(event, true));
+  host.addEventListener('pointercancel', event => finish(event, false));
 }
 
 function rerenderNavigationSettings() {
