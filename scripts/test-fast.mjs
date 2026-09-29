@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
 const commands = [
+  ['node', ['tests/performance-review.test.mjs']],
   ['node', ['scripts/check-js-imports.mjs']],
   ['node', ['tests/release-version-single-source.test.mjs']],
   ['node', ['tests/runtime-layout-contract.test.mjs']],

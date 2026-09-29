@@ -58,7 +58,7 @@ function setSegmentVisual(root, field, value) {
   root?.querySelectorAll?.(`[data-segment="${field}"]`)?.forEach(button => {
     const active = String(button.dataset.value) === String(value);
     button.classList.toggle('is-active', active);
-    button.setAttribute('aria-selected', String(active));
+    button.setAttribute('aria-pressed', String(active));
   });
 }
 function patchFieldDomValue(root, field, value) {
