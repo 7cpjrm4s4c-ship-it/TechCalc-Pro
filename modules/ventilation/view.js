@@ -49,14 +49,14 @@ export function derivedDeltaTField(s, active) {
 export function inputFields(s, active) {
   if (active.calcTarget === 'power') {
     return [
-      field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V˙', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) }),
+      field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) }),
       derivedDeltaTField(s, active)
     ];
   }
   if (active.calcTarget === 'volumeFlow') {
     return [powerField(s), derivedDeltaTField(s, active)];
   }
-  return [powerField(s), field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V˙', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) })];
+  return [powerField(s), field({ id: key(s, 'VolumeFlowM3h'), label: 'Volumenstrom V̇', unit: 'm³/h', value: fmtInput(active.volumeFlowM3h, 2) })];
 }
 
 export function temperatureFields(s, active) {
@@ -76,7 +76,7 @@ export function renderModeSegment(s, accent) {
 export function renderTargetSegment(s, active, accent) {
   return segmented(key(s, 'CalcTarget'), [
     { value: 'power', label: 'Q Leistung' },
-    { value: 'volumeFlow', label: 'V˙ Volumenstrom' },
+    { value: 'volumeFlow', label: 'V̇ Volumenstrom' },
     { value: 'deltaT', label: 'ΔT Temperatur' }
   ], active.calcTarget, { accent, label: 'Berechnungsgröße' });
 }

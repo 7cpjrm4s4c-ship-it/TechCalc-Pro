@@ -124,5 +124,5 @@ export function ventilationModeLabel(s = {}) {
 }
 
 export function ventilationFormulaText(r = {}) {
-  return `Q = V˙ × (ρ × cₚ / 3,6) × ΔT / 1000 · Wärmewert = ${fmt(r.factor, 3)} Wh/(m³·K)`;
+  return `Q = V̇ × (ρ × cₚ / 3,6) × ΔT / 1000 · Wärmewert = ${fmt(r.factor, 3)} Wh/(m³·K)`;
 }
