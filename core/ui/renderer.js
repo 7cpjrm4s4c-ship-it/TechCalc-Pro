@@ -57,7 +57,7 @@ export function card(title, body, accent = 'blue', options = {}) {
 
 export function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', inputmode = 'decimal', disabled = false, readonly = false, unitField = '', unitOptions = [] }) {
   const unitHtml = unitOptions.length
-    ? `<select class="unit unit-select" aria-label="Einheit" data-field="${esc(unitField)}" data-commit="immediate">${unitOptions.map(o => `<option value="${esc(o.value)}" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`
+    ? `<select class="unit unit-select" name="${esc(unitField)}" aria-label="Einheit" data-field="${esc(unitField)}" data-commit="immediate">${unitOptions.map(o => `<option value="${esc(o.value)}" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`
     : unit ? `<span class="unit">${esc(unit)}</span>` : '';
   return `<div class="field"><label for="${esc(id)}">${esc(label)}</label><div class="control"><input id="${esc(id)}" data-field="${esc(id)}" type="${esc(type)}" inputmode="${esc(inputmode)}" value="${esc(value ?? '')}" placeholder="${esc(placeholder)}" ${disabled ? 'disabled' : ''} ${readonly ? 'readonly aria-readonly="true"' : ''} autocomplete="off">${unitHtml}</div></div>`;
 }

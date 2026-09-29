@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import { defineFormSchema, FIELD_TYPES, renderFormSchema, renderResultSchema } from '../core/ui/formSchema.js';
 import { createSchemaView } from '../core/ui/schemaRenderer.js';
+import { field as renderField } from '../core/ui/renderer.js';
+
+const unitFieldHtml = renderField({ id: 'massFlow', label: 'Massenstrom', unit: 'kg/h', unitField: 'massFlowUnit', unitOptions: [{ value: 'kg/h', label: 'kg/h' }] });
+assert.match(unitFieldHtml, /<select class="unit unit-select" name="massFlowUnit"/, 'unit selectors need a stable form name');
 
 const schema = defineFormSchema({
   fields: [
