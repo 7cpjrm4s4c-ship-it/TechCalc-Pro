@@ -14,6 +14,8 @@ const schema = defineFormSchema({
 
 const html = renderFormSchema(schema, { mode: 'heating', flow: 25, system: 'b' }, { accent: 'cyan' });
 assert.match(html, /data-tc-action="segment"/, 'segments must use central event pipeline markers');
+assert.match(html, /<span class="tc-field__label">Betrieb<\/span><div class="segmented[^>]*role="group" aria-label="Betrieb"/, 'segment headings must not be orphaned form labels');
+assert.doesNotMatch(html, /<label>Betrieb<\/label>/, 'segment headings must not render unassociated labels');
 assert.match(html, /data-field="flow"/, 'number inputs must expose central data-field markers');
 assert.match(html, /data-field="system"/, 'selects must expose central data-field markers');
 assert.match(html, /data-lookup="true"/, 'selects must default to lookup hydration');
@@ -21,6 +23,7 @@ assert.doesNotMatch(html, /nur Kälte/, 'visibleWhen must hide fields that do no
 
 const coolingHtml = renderFormSchema(schema, { mode: 'cooling', flow: 25, system: 'b' });
 assert.match(coolingHtml, /nur Kälte/, 'visibleWhen must render matching readonly fields');
+assert.match(coolingHtml, /<span class="tc-field__label">Kältehinweis<\/span>/, 'readonly headings must not render unassociated labels');
 
 const results = renderResultSchema([
   { title: 'Ergebnis', rows: [{ key: 'power', label: 'Leistung', unit: 'kW' }, { stateKey: 'flow', label: 'Volumenstrom', unit: 'm³/h' }] }

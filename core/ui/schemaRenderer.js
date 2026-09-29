@@ -76,12 +76,12 @@ function renderSelect(def, state = {}) {
 }
 function renderSegment(def, state = {}) {
   const value = resolve(def.value, state, state?.[def.key] ?? def.default ?? '');
-  return `<div class="field field--segment tc-field" data-schema-field-wrapper="${esc(def.key)}"><label>${esc(fieldLabel(def, state))}</label>${segmented(def.key, fieldOptions(def, state), value, { accent: def.accent, action: def.action, label: fieldLabel(def, state) })}</div>`;
+  return `<div class="field field--segment tc-field" data-schema-field-wrapper="${esc(def.key)}"><span class="tc-field__label">${esc(fieldLabel(def, state))}</span>${segmented(def.key, fieldOptions(def, state), value, { accent: def.accent, action: def.action, label: fieldLabel(def, state) })}</div>`;
 }
 function renderReadonly(def, state = {}) {
   const value = typeof def.value === 'function' ? def.value(state) : fieldValue(def, state);
   const unit = fieldUnit(def, state);
-  return `<div class="field field--readonly tc-field" data-schema-field-wrapper="${esc(def.key)}"><label>${esc(fieldLabel(def, state))}</label><div class="control"><output data-schema-output="${esc(def.key)}">${esc(value || '—')}</output>${unit ? `<span class="unit">${esc(unit)}</span>` : ''}</div></div>`;
+  return `<div class="field field--readonly tc-field" data-schema-field-wrapper="${esc(def.key)}"><span class="tc-field__label">${esc(fieldLabel(def, state))}</span><div class="control"><output data-schema-output="${esc(def.key)}">${esc(value || '—')}</output>${unit ? `<span class="unit">${esc(unit)}</span>` : ''}</div></div>`;
 }
 function renderBoolean(def, state = {}) {
   const checked = Boolean(state?.[def.key] ?? def.default);
