@@ -204,7 +204,7 @@ function commitPlatformCollectionInput(root, input, notify = true) {
   return true;
 }
 function navigatePlatformField(root, current, event) {
-  if (!root || !current?.matches?.('[data-field], [data-platform-focus], input, textarea, select')) return false;
+  if (!root || !isPlatformNavigationElement(current)) return false;
   return handlePlatformFieldNavigation(root, current, event, { select: true, defer: false });
 }
 export function bindCentralEventPipeline(root, state, options = {}) {
@@ -304,7 +304,7 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     if (!isPlatformNavigationElement(el)) return;
     if (event.key === 'Enter' && el.matches?.('button, [data-tc-action], [data-action], [data-segment], [data-line-card], [data-saved-record-card]')) return;
     const action = event.key === 'Tab' ? 'field:tab' : 'field:enter';
-    event.preventDefault();
+    if (event.key === 'Enter') event.preventDefault();
     // Dev.31: central keyboard navigation is now field-class based, not only
     // data-field based. Drinking-water draft quantity inputs and legacy module
     // controls can therefore participate without owning local Tab/Enter code.

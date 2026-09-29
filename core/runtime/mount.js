@@ -25,7 +25,7 @@ export function mountModule(root, state, view, afterRender) {
     }
   });
 
-  const unsubscribe = state.subscribe((_, meta) => coordinator.render(meta));
+  const unsubscribe = state.subscribe((_, meta) => coordinator.render(meta), { snapshot: false });
   coordinator.flush({ action: 'initial' });
   return () => {
     if (typeof unsubscribe === 'function') unsubscribe();

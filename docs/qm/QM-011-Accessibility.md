@@ -28,7 +28,8 @@ Der Audit prüft statisch:
 
 - Sprachdeklaration und Viewport.
 - Fokusfähigen App-Hauptbereich.
-- ARIA-Basis für Navigation, Einstellungen, Theme-Auswahl und Statusmeldungen.
+- ARIA-Basis für Navigation, Einstellungen, Theme-Auswahl als benannte
+  Schaltflächengruppe und Statusmeldungen.
 - `alt`-Attribute für Bilder.
 - zugängliche Namen für statische Buttons.
 - Labels oder ARIA-Namen für statische Inputs.
@@ -64,3 +65,24 @@ Tastaturaktivierung und Zustandsmeldung der zentralen Auswahlschalter.
 Die bestehende Playwright-CI führt diese Prüfungen in der Browsermatrix aus.
 Der statische Audit allein weist keine WCAG-Konformität nach. Manuelle Prüfungen
 mit Screenreader, Zoom und Kontrastkontrolle bleiben erforderlich.
+
+
+## Erweiterte Browsermatrix
+
+`tests/e2e/module-accessibility-matrix.spec.mjs` besucht alle 15 Module und
+prüft sichtbare Bedienelemente auf Namen, Bildalternativen, doppelte IDs sowie
+ARIA-Verweise. Ein zusätzlicher Test prüft die Seitenbreite bei 320 CSS-Pixeln
+für repräsentative Module. Die zentrale Auswahl erhält einen benannten
+Gruppenkontext; wichtige Ergebniswerte werden als Statusmeldung ausgegeben.
+
+Diese technischen Prüfungen erfassen den Startzustand und ausgewählte
+Interaktionen. Sie ersetzen keine systematische WCAG-2.1-AA-Prüfung aller
+Eingabe-, Fehler-, Export- und gespeicherten Zustände. Vor einer
+Konformitätsaussage müssen die Module mit Tastatur, VoiceOver (macOS/iOS),
+NVDA (Windows), 200–400 % Zoom und den tatsächlich eingesetzten Themes
+manuell geprüft werden. Kontrast ist einschließlich Verlauf und Transparenz
+an den gerenderten Oberflächen zu messen.
+
+Normbezug: WCAG 2.1, insbesondere 1.4.3 Kontrast, 1.4.10 Umbruch,
+2.1.1 Tastatur, 4.1.2 Name/Rolle/Wert und 4.1.3 Statusmeldungen.
+Quelle: https://www.w3.org/TR/WCAG21/

@@ -29,7 +29,7 @@ if (!/<nav\s+[^>]*aria-label="Module"/i.test(html)) fail('primary module navigat
 if (!/id="settingsButton"[^>]*aria-label="Menü öffnen"[^>]*aria-expanded="false"/i.test(html)) fail('settings button must expose label and expanded state.');
 if (!/id="projectFileLabel"[^>]*aria-live="polite"/i.test(html)) fail('project file status must use aria-live="polite".');
 if (!/id="feedbackStatus"[^>]*aria-live="polite"/i.test(html)) fail('feedback status must use aria-live="polite".');
-if (!/id="themeMode"[^>]*role="radiogroup"[^>]*aria-label="Farbschema"/i.test(html)) fail('theme switch must be announced as a labeled radiogroup.');
+if (!/id="themeMode"[^>]*role="group"[^>]*aria-label="Farbschema"/i.test(html)) fail('theme switch must be announced as a named group of pressed buttons.');
 
 const imgTags = html.match(/<img\b[^>]*>/gi) || [];
 for (const tag of imgTags) {

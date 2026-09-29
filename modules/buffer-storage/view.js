@@ -62,7 +62,7 @@ export function renderView(s) {
   const vm = createBufferStorageViewModel(s);
   const inputColumn = stack([
     card('Berechnungsart', stack([
-      `<div class="buffer-mode-tabs">${segmented('calculationMode', vm.bufferModeOptions, vm.state.calculationMode, { accent: vm.accent })}</div>`,
+      `<div class="buffer-mode-tabs">${segmented('calculationMode', vm.bufferModeOptions, vm.state.calculationMode, { accent: vm.accent, label: 'Berechnungsart' })}</div>`,
       '<p class="tc-help ph-help">Die Auslegung kann die Mindestlaufzeit von Verdichtern, den Abtaubetrieb luftgekühlter Wärmepumpen oder eine definierte Kälte-/Wärmevorlage betrachten.</p>'
     ].join('')), vm.accent),
     card('Medium / Faktor', `<div data-buffer-dynamic="medium">${renderMediumContent(vm)}</div>`, vm.accent),

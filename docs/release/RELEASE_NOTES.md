@@ -1,9 +1,14 @@
-## Unveröffentlicht – Bedienbarkeit und Performance
+## Unveröffentlicht – Bedienbarkeit, Barrierefreiheit und Performance
 - Einstellungen als benannter modaler Dialog mit gesperrtem Hintergrund, zyklischer Tastaturführung und Fokusrückgabe.
 - Zentrale Auswahlschalter melden ihren gedrückten Zustand konsistent, auch nach dynamischen Aktualisierungen.
 - Abgeschlossene Performance-Spans bereinigen ihre nativen Browser-Einträge. Render- und Mount-Messungen enthalten Budget und Ergebnis.
 - Strukturelles Rendering liest die Elementhöhe nur bei notwendiger Scrollstabilisierung.
 - Neue Verhaltensprüfungen für Tastaturbedienung und die begrenzte Speicherung von Messdaten.
+- CSS im Deploy-Artefakt in einer Datei zusammengeführt; Offline-Vorladen an das Bundle angepasst.
+- Der zentrale Store vergleicht bei Teilaktualisierungen nur betroffene Felder; reine Render-Abonnements erzeugen keinen ungenutzten Zustandssnapshot.
+- Dynamische Bedienelemente erhalten benannte Gruppen; Vorzeichenschalter werden per Tastatur erreicht und primäre Ergebnisse als Status gemeldet.
+- Die Theme-Auswahl ist entsprechend ihren gedrückten Schaltflächen als benannte Gruppe ausgezeichnet.
+- Browsermatrix für die Semantik aller 15 Module und den Umbruch bei 320 CSS-Pixeln erweitert.
 
 ## Version 2.0.0 – Core-Runtime und Framework-Kernel
 ### Neu

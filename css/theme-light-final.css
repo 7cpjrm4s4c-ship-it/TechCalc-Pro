@@ -97,48 +97,9 @@
   background: var(--tc-final-accent-hover) !important;
 }
 
-:root[data-theme='light'] button[disabled],
-:root[data-theme='light'] button:disabled,
-:root[data-theme='light'] button[aria-disabled='true'],
-:root[data-theme='light'] button.is-disabled {
-  background: var(--tc-button-disabled-bg) !important;
-  border-color: var(--tc-button-disabled-border) !important;
-  color: var(--tc-button-disabled-text) !important;
-  -webkit-text-fill-color: var(--tc-button-disabled-text) !important;
-  box-shadow: none !important;
-  opacity: 1 !important;
-}
-
 /* 1.3.2-dev.19 — Light Theme accent inheritance regression guard.
    Loaded last: all Light active fills and card borders derive from the exact same module accent
    as their border. Also removes the decorative control/card shell around single add-action buttons. */
-:root[data-theme='light'] .module-view[data-module='heating-cooling'] { --tc-final-accent: var(--tc-accent-heating); --tc-active-accent: var(--tc-accent-heating); }
-:root[data-theme='light'] .module-view[data-module='ventilation'],
-:root[data-theme='light'] .module-view[data-module='heat-recovery'],
-:root[data-theme='light'] .module-view[data-module='hx-diagram'] { --tc-final-accent: var(--tc-accent-air); --tc-active-accent: var(--tc-accent-air); }
-:root[data-theme='light'] .module-view[data-module='buffer-storage'],
-:root[data-theme='light'] .module-view[data-module='pressure-holding'],
-:root[data-theme='light'] .module-view[data-module='pipe-sizing'] { --tc-final-accent: var(--tc-accent-pipe); --tc-active-accent: var(--tc-accent-pipe); }
-:root[data-theme='light'] .module-view[data-module='drinking-water'],
-:root[data-theme='light'] .module-view[data-module='rainwater'],
-:root[data-theme='light'] .module-view[data-module='wastewater'] { --tc-final-accent: var(--tc-accent-water); --tc-active-accent: var(--tc-accent-water); }
-
-:root[data-theme='light'] .card--accent-orange,
-:root[data-theme='light'] .segmented--orange,
-:root[data-theme='light'] [data-accent='orange'] { --tc-final-accent: var(--tc-accent-heating); --tc-active-accent: var(--tc-accent-heating); }
-:root[data-theme='light'] .card--accent-cyan,
-:root[data-theme='light'] .segmented--cyan,
-:root[data-theme='light'] [data-accent='cyan'] { --tc-final-accent: var(--tc-accent-air); --tc-active-accent: var(--tc-accent-air); }
-:root[data-theme='light'] .card--accent-blue,
-:root[data-theme='light'] .segmented--blue,
-:root[data-theme='light'] [data-accent='blue'] { --tc-final-accent: var(--tc-accent-pipe); --tc-active-accent: var(--tc-accent-pipe); }
-:root[data-theme='light'] .card--accent-green,
-:root[data-theme='light'] .segmented--green,
-:root[data-theme='light'] [data-accent='green'] { --tc-final-accent: var(--tc-accent-water); --tc-active-accent: var(--tc-accent-water); }
-:root[data-theme='light'] .card--accent-purple,
-:root[data-theme='light'] .segmented--purple,
-:root[data-theme='light'] [data-accent='purple'] { --tc-final-accent: var(--tc-accent-pressure); --tc-active-accent: var(--tc-accent-pressure); }
-
 :root[data-theme='light'] .card--accent-orange,
 :root[data-theme='light'] .card--accent-cyan,
 :root[data-theme='light'] .card--accent-blue,
@@ -235,17 +196,6 @@
 :root[data-theme='light'] [data-accent='green'],
 :root[data-theme='light'] [data-accent='purple'] {
   border-color: color-mix(in srgb, var(--tc-final-accent) 72%, var(--color-border)) !important;
-}
-
-:root[data-theme='light'] .field--action .control,
-:root[data-theme='light'] .field--action .tc-control,
-:root[data-theme='light'] .field:has(> .control > .action-button:only-child) > .control,
-:root[data-theme='light'] .field:has(> .tc-control > .action-button:only-child) > .tc-control {
-  min-height: auto !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
 }
 
 /* 1.3.2-dev.22 — Final UI Hardening contract.
@@ -928,10 +878,7 @@ body::after,
   overflow: hidden;
   border-style: solid !important;
   border-width: 1px !important;
-  outline: 1px solid transparent;
-  outline-offset: -1px;
-  background-clip: padding-box;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc-final-accent, var(--tc-active-accent, var(--accent-blue))) 18%, transparent) !important;
+  box-shadow: none !important;
 }
 :root[data-theme='light'] .card--accent-orange,
 :root[data-theme='light'] .result-card.card--accent-orange { border-color: color-mix(in srgb, var(--tc-accent-heating) 72%, var(--color-border)) !important; }
@@ -960,30 +907,23 @@ body::after,
 
 
 /* 1.3.2-dev.36 — Light card frame + scroll cleanup contract.
-   Use an inset frame so top/bottom borders remain visible even when neighboring
-   sections, sticky header/nav or background layers overlap the outer border. */
+   Keep the Dark theme's native border rendering; only its color changes here. */
 :root[data-theme='light'] .card,
 :root[data-theme='light'] .tc-card,
 :root[data-theme='light'] .result-card {
   --tc-card-frame-color: color-mix(in srgb, var(--tc-contract-accent, var(--tc-final-accent, var(--accent-blue))) 72%, var(--color-border));
   border: 1px solid var(--tc-card-frame-color) !important;
-  box-shadow: inset 0 0 0 1px var(--tc-card-frame-color) !important;
-  background-clip: padding-box !important;
-  isolation: isolate;
+  box-shadow: none !important;
+  /* An opaque Light surface does not need the glass blur; WebKit composites it over the top border. */
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }
 :root[data-theme='light'] .card--accent-orange { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-heating) 72%, var(--color-border)); }
-:root[data-theme='light'] .card--accent-cyan,
-:root[data-theme='light'] .card--accent-cooling { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-cooling, var(--tc-accent-air)) 72%, var(--color-border)); }
+:root[data-theme='light'] .card--accent-cyan { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-air) 72%, var(--color-border)); }
+:root[data-theme='light'] .card--accent-cooling { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-cooling, var(--tc-color-cooling)) 72%, var(--color-border)); }
 :root[data-theme='light'] .card--accent-blue { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-pipe) 72%, var(--color-border)); }
 :root[data-theme='light'] .card--accent-green { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-water) 72%, var(--color-border)); }
 :root[data-theme='light'] .card--accent-purple { --tc-card-frame-color: color-mix(in srgb, var(--tc-accent-pressure) 72%, var(--color-border)); }
-:root[data-theme='light'] .card > .card__title,
-:root[data-theme='light'] .card > .card__body,
-:root[data-theme='light'] .tc-card > *,
-:root[data-theme='light'] .result-card > * {
-  position: relative;
-  z-index: 1;
-}
 
 /* Phase 43E.1 — Workspace outer frame cleanup.
    Module/workspace containers are layout primitives and must not render their own visual frame.
@@ -1011,4 +951,3 @@ body::after,
   outline: 0 !important;
   box-shadow: none !important;
 }
-

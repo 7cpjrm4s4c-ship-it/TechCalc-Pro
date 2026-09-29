@@ -90,6 +90,7 @@ function bindPrimaryNav(nav, overflow) {
     const willOpen = overflow.hidden;
     overflow.hidden = !willOpen;
     event.currentTarget.setAttribute('aria-expanded', String(willOpen));
+    event.currentTarget.setAttribute('aria-label', `Weitere Module ${willOpen ? 'schließen' : 'öffnen'}`);
   });
   document.removeEventListener('click', closeOverflowOnOutsideClick);
   document.addEventListener('click', closeOverflowOnOutsideClick);
@@ -98,7 +99,12 @@ function bindPrimaryNav(nav, overflow) {
 function closeOverflowOnOutsideClick(event) {
   const overflow = document.getElementById('overflowMenu');
   if (!overflow || overflow.hidden) return;
-  if (!event.target.closest('.module-nav, #overflowMenu')) overflow.hidden = true;
+  if (!event.target.closest('.module-nav, #overflowMenu')) {
+    overflow.hidden = true;
+    const trigger = document.querySelector('#primaryNav [data-overflow]');
+    trigger?.setAttribute('aria-expanded', 'false');
+    trigger?.setAttribute('aria-label', 'Weitere Module öffnen');
+  }
 }
 function renderOverflowMenu(overflow, overflowModules, activeId, visibleIds, isMobile) {
   const content = overflowModules.length
@@ -155,8 +161,8 @@ function renderTab(module, activeId) {
 
 function renderOverflowButton(activeInOverflow, expanded) {
   return `
-    <button class="module-tab module-tab--overflow ${activeInOverflow ? 'is-overflow-active' : ''}" data-overflow type="button" aria-label="Weitere Module öffnen" aria-expanded="${expanded ? 'true' : 'false'}">
-      +
+    <button class="module-tab module-tab--overflow ${activeInOverflow ? 'is-overflow-active' : ''}" data-overflow type="button" aria-label="Weitere Module ${expanded ? 'schließen' : 'öffnen'}" aria-expanded="${expanded ? 'true' : 'false'}">
+      Mehr
     </button>
   `;
 }

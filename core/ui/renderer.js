@@ -19,6 +19,10 @@ export function esc(value) {
     .replaceAll("'", '&#039;');
 }
 
+function displayEngineeringLabel(label) {
+  return esc(label).replaceAll('V̇', '<span class="tc-flow-symbol"><span aria-hidden="true">V</span><span class="visually-hidden">V̇</span></span>');
+}
+
 export function pressureBadge(r) {
   if (!r?.rating) return '';
   return `<span class="traffic traffic--${esc(r.rating.key)}" aria-label="${esc(r.rating.label || '')}"></span>`;
@@ -34,7 +38,7 @@ export function signedTempField(id, label, value, signAttribute = 'data-sign') {
   return `<div class="field field--signed-temp">
     <label for="${esc(id)}">${esc(label)}</label>
     <div class="control control--with-sign">
-      <button type="button" tabindex="-1" class="sign-toggle" ${signAttribute}="${esc(id)}" aria-label="Vorzeichen umschalten">±</button>
+      <button type="button" class="sign-toggle" ${signAttribute}="${esc(id)}" aria-label="Vorzeichen für ${esc(label)} umschalten">±</button>
       <input id="${esc(id)}" data-field="${esc(id)}" type="text" inputmode="decimal" value="${esc(value ?? '')}" placeholder="0" autocomplete="off">
       <span class="unit">°C</span>
     </div>
@@ -57,9 +61,9 @@ export function card(title, body, accent = 'blue', options = {}) {
 
 export function field({ id, label, unit = '', value = '', placeholder = '0', type = 'text', inputmode = 'decimal', disabled = false, readonly = false, unitField = '', unitOptions = [] }) {
   const unitHtml = unitOptions.length
-    ? `<select class="unit unit-select" aria-label="Einheit" data-field="${esc(unitField)}" data-commit="immediate">${unitOptions.map(o => `<option value="${esc(o.value)}" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`
+    ? `<select class="unit unit-select" name="${esc(unitField)}" aria-label="Einheit" data-field="${esc(unitField)}" data-commit="immediate">${unitOptions.map(o => `<option value="${esc(o.value)}" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`
     : unit ? `<span class="unit">${esc(unit)}</span>` : '';
-  return `<div class="field"><label for="${esc(id)}">${esc(label)}</label><div class="control"><input id="${esc(id)}" data-field="${esc(id)}" type="${esc(type)}" inputmode="${esc(inputmode)}" value="${esc(value ?? '')}" placeholder="${esc(placeholder)}" ${disabled ? 'disabled' : ''} ${readonly ? 'readonly aria-readonly="true"' : ''} autocomplete="off">${unitHtml}</div></div>`;
+  return `<div class="field"><label for="${esc(id)}">${displayEngineeringLabel(label)}</label><div class="control"><input id="${esc(id)}" data-field="${esc(id)}" type="${esc(type)}" inputmode="${esc(inputmode)}" value="${esc(value ?? '')}" placeholder="${esc(placeholder)}" ${disabled ? 'disabled' : ''} ${readonly ? 'readonly aria-readonly="true"' : ''} autocomplete="off">${unitHtml}</div></div>`;
 }
 
 export function selectField({ id, label, value, options, commit = 'immediate', lookup = true, render = '' }) {
@@ -73,7 +77,8 @@ export function selectField({ id, label, value, options, commit = 'immediate', l
 export function segmented(name, options, value, settings = {}) {
   const accent = settings.accent ? ` segmented--${esc(settings.accent)}` : '';
   const action = settings.action || 'segment';
-  return `<div class="segmented${accent}" role="group">${options.map(o => `<button type="button" data-tc-action="${esc(action)}" data-segment="${esc(name)}" data-value="${esc(o.value)}" aria-pressed="${o.value === value}" class="${o.value === value ? 'is-active' : ''}">${esc(o.label)}</button>`).join('')}</div>`;
+  const displayLabel = label => displayEngineeringLabel(label).replace(/(Massen|Volumen)strom/g, '$1\u00adstrom');
+  return `<div class="segmented${accent}" role="group" aria-label="${esc(settings.label || name)}">${options.map(o => `<button type="button" data-tc-action="${esc(action)}" data-segment="${esc(name)}" data-value="${esc(o.value)}" aria-label="${esc(o.label)}" aria-pressed="${o.value === value}" class="${o.value === value ? 'is-active' : ''}">${displayLabel(o.label)}</button>`).join('')}</div>`;
 }
 
 export function inlineStats(items) {
@@ -81,7 +86,7 @@ export function inlineStats(items) {
 }
 
 export function mainResult(title, main, details = [], accent = 'blue') {
-  return card(title, `<div class="main-result"><span>${esc(main.label)}</span><strong>${esc(main.value ?? '—')}${main.unit ? ` <small>${esc(main.unit)}</small>` : ''}</strong></div>${inlineStats(details)}`, accent);
+  return card(title, `<div class="main-result" role="status" aria-atomic="true"><span>${esc(main.label)}</span><strong>${esc(main.value ?? '—')}${main.unit ? ` <small>${esc(main.unit)}</small>` : ''}</strong></div>${inlineStats(details)}`, accent);
 }
 
 export function resultRows(rows) {

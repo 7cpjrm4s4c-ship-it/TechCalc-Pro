@@ -1,5 +1,3 @@
-@import url('./module-spacing-contract.css');
-
 /* Phase 34C: Module exceptions only. Module-specific layout exceptions only.
    Global component geometry (cards, fields, controls, buttons, saved records, result rows)
    lives in components.css. This file may define only module-specific layouts, charts,
