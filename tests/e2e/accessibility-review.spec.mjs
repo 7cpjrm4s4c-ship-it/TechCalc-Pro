@@ -60,6 +60,18 @@ test('long F-Gases legal references remain available behind keyboard-operated di
 });
 
 test('Tab leaves sign toggles, import actions and save buttons', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', /.+/);
+  const gotoModule = async moduleId => {
+    const direct = page.locator(`.module-nav [data-module-id="${moduleId}"]`);
+    if (await direct.isVisible()) {
+      await direct.click();
+    } else {
+      await page.locator('#primaryNav [data-overflow]').click();
+      await page.locator(`#overflowMenu [data-module-id="${moduleId}"]`).click();
+    }
+    await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', moduleId);
+  };
   const checkNextTab = async (locator, key = 'Tab') => {
     await locator.focus();
     await page.keyboard.press(key);
@@ -72,22 +84,18 @@ test('Tab leaves sign toggles, import actions and save buttons', async ({ page }
   };
 
   for (const moduleId of ['heating-cooling', 'ventilation', 'mixed-air', 'flooding-verification']) {
-    await page.goto(`/#/${moduleId}`);
-    await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', moduleId);
+    await gotoModule(moduleId);
     const toggles = page.locator('#app .sign-toggle:visible');
     if (await toggles.count()) {
       await checkNextTab(toggles.first());
     }
   }
 
-  await page.goto('/#/flooding-verification');
-  await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', 'flooding-verification');
   const importButton = page.getByRole('button', { name: 'Flächen importieren' });
   await expect(importButton).toBeVisible();
   await checkNextTab(importButton);
 
-  await page.goto('/#/heating-cooling');
-  await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', 'heating-cooling');
+  await gotoModule('heating-cooling');
   const saveButton = page.locator('#app button').filter({ hasText: /^Speichern$/ }).first();
   await expect(saveButton).toBeVisible();
   // The save action can be the last focusable control in the module. Reverse
