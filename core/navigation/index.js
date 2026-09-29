@@ -4,6 +4,7 @@ import { loadPreferences, setModuleOrder } from '../ux/preferences.js';
 import { esc } from '../ui/renderer.js';
 
 const MOBILE_QUERY = '(max-width: 767px)';
+const orderDragBindings = new WeakMap();
 
 export function orderedModuleIds(preferences, allModules) {
   const available = allModules.map(module => module.id);
@@ -164,6 +165,8 @@ function announceOrder(id, index) {
 }
 
 function bindOrderDrag(host) {
+  orderDragBindings.get(host)?.();
+  const controller = new AbortController();
   const list = host.querySelector('.module-order-list');
   const scroller = host.closest('.settings-panel__body');
   let drag = null;
@@ -197,7 +200,7 @@ function bindOrderDrag(host) {
       x: event.clientX, y: event.clientY, offsetY: event.clientY - rect.top, active: false, frame: 0, ghost: null };
     host.setPointerCapture(event.pointerId);
     event.preventDefault();
-  });
+  }, { signal: controller.signal });
 
   host.addEventListener('pointermove', event => {
     if (!drag || event.pointerId !== drag.pointerId) return;
@@ -220,7 +223,7 @@ function bindOrderDrag(host) {
     }
     drag.ghost.style.top = `${event.clientY - drag.offsetY}px`;
     reorderAt(event.clientX, event.clientY);
-  });
+  }, { signal: controller.signal });
 
   function finish(event, save) {
     if (!drag || event.pointerId !== drag.pointerId) return;
@@ -239,8 +242,15 @@ function bindOrderDrag(host) {
     } else renderQuickAccessSettings();
   }
 
-  host.addEventListener('pointerup', event => finish(event, true));
-  host.addEventListener('pointercancel', event => finish(event, false));
+  host.addEventListener('pointerup', event => finish(event, true), { signal: controller.signal });
+  host.addEventListener('pointercancel', event => finish(event, false), { signal: controller.signal });
+  orderDragBindings.set(host, () => {
+    controller.abort();
+    if (drag?.frame) cancelAnimationFrame(drag.frame);
+    drag?.ghost?.remove();
+    drag?.card?.classList.remove('is-dragging');
+    drag = null;
+  });
 }
 
 function rerenderNavigationSettings() {
