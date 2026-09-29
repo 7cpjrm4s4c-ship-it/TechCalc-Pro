@@ -60,9 +60,9 @@ test('long F-Gases legal references remain available behind keyboard-operated di
 });
 
 test('Tab leaves sign toggles, import actions and save buttons', async ({ page }) => {
-  const checkNextTab = async locator => {
+  const checkNextTab = async (locator, key = 'Tab') => {
     await locator.focus();
-    await page.keyboard.press('Tab');
+    await page.keyboard.press(key);
     const focus = await page.evaluate(() => ({
       visible: Boolean(document.activeElement?.getClientRects().length),
       tag: document.activeElement?.tagName
@@ -81,10 +81,17 @@ test('Tab leaves sign toggles, import actions and save buttons', async ({ page }
   }
 
   await page.goto('/#/flooding-verification');
+  await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', 'flooding-verification');
   const importButton = page.getByRole('button', { name: 'Flächen importieren' });
+  await expect(importButton).toBeVisible();
   await checkNextTab(importButton);
 
   await page.goto('/#/heating-cooling');
+  await expect(page.locator('#app')).toHaveAttribute('data-active-module-id', 'heating-cooling');
   const saveButton = page.locator('#app button').filter({ hasText: /^Speichern$/ }).first();
-  await checkNextTab(saveButton);
+  await expect(saveButton).toBeVisible();
+  // The save action can be the last focusable control in the module. Reverse
+  // traversal verifies that it does not trap focus without depending on how
+  // the browser transfers forward focus into its own chrome at the page edge.
+  await checkNextTab(saveButton, 'Shift+Tab');
 });
