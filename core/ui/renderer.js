@@ -73,7 +73,8 @@ export function selectField({ id, label, value, options, commit = 'immediate', l
 export function segmented(name, options, value, settings = {}) {
   const accent = settings.accent ? ` segmented--${esc(settings.accent)}` : '';
   const action = settings.action || 'segment';
-  return `<div class="segmented${accent}" role="group" aria-label="${esc(settings.label || name)}">${options.map(o => `<button type="button" data-tc-action="${esc(action)}" data-segment="${esc(name)}" data-value="${esc(o.value)}" aria-pressed="${o.value === value}" class="${o.value === value ? 'is-active' : ''}">${esc(o.label)}</button>`).join('')}</div>`;
+  const displayLabel = label => esc(label).replace(/(Massen|Volumen)strom/g, '$1\u00adstrom');
+  return `<div class="segmented${accent}" role="group" aria-label="${esc(settings.label || name)}">${options.map(o => `<button type="button" data-tc-action="${esc(action)}" data-segment="${esc(name)}" data-value="${esc(o.value)}" aria-label="${esc(o.label)}" aria-pressed="${o.value === value}" class="${o.value === value ? 'is-active' : ''}">${displayLabel(o.label)}</button>`).join('')}</div>`;
 }
 
 export function inlineStats(items) {

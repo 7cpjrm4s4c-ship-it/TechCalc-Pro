@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import { defineFormSchema, FIELD_TYPES, renderFormSchema, renderResultSchema } from '../core/ui/formSchema.js';
 import { createSchemaView } from '../core/ui/schemaRenderer.js';
-import { field as renderField } from '../core/ui/renderer.js';
+import { field as renderField, segmented } from '../core/ui/renderer.js';
+
+const compoundChoices = segmented('target', [{ value: 'mass', label: 'ṁ Massenstrom' }, { value: 'volume', label: 'V˙ Volumenstrom' }], 'mass');
+assert.match(compoundChoices, /aria-label="ṁ Massenstrom"[^>]*>ṁ Massen\u00adstrom<\/button>/, 'mass flow keeps its spoken name and breaks before strom');
+assert.match(compoundChoices, /aria-label="V˙ Volumenstrom"[^>]*>V˙ Volumen\u00adstrom<\/button>/, 'volume flow keeps its spoken name and breaks before strom');
 
 const unitFieldHtml = renderField({ id: 'massFlow', label: 'Massenstrom', unit: 'kg/h', unitField: 'massFlowUnit', unitOptions: [{ value: 'kg/h', label: 'kg/h' }] });
 assert.match(unitFieldHtml, /<select class="unit unit-select" name="massFlowUnit"/, 'unit selectors need a stable form name');

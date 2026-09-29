@@ -31,6 +31,8 @@ body {
   line-height: var(--tc-line-height-body);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  -webkit-hyphens: auto;
+  hyphens: auto;
 }
 
 h1, h2, h3, h4,
@@ -50,8 +52,8 @@ h1, h2, h3, h4,
   text-wrap: balance;
   overflow-wrap: normal;
   word-break: normal;
-  -webkit-hyphens: none;
-  hyphens: none;
+  -webkit-hyphens: auto;
+  hyphens: auto;
 }
 
 p, ul, ol { margin-top: 0; }
@@ -345,13 +347,19 @@ textarea:focus-visible,
 input,
 textarea,
 select,
-button,
 code,
 pre,
 .unit {
   -webkit-hyphens: none;
   hyphens: none;
   word-break: normal;
+}
+
+button {
+  overflow-wrap: normal;
+  word-break: normal;
+  -webkit-hyphens: auto;
+  hyphens: auto;
 }
 
 @media (max-width: 767px) {
@@ -388,7 +396,8 @@ pre,
     font-size: 0.8125rem;
     overflow-wrap: normal;
     word-break: normal;
-    hyphens: none;
+    -webkit-hyphens: auto;
+    hyphens: auto;
   }
 }
 

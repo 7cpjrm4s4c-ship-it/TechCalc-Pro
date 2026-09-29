@@ -77,7 +77,7 @@ test('theme switch exposes the active pressed button within a named group', asyn
   await expect(theme.getByRole('button', { name: 'Dark' })).toHaveAttribute('aria-pressed', 'false');
 });
 
-test('mobile light theme keeps selection labels whole and navigation opaque', async ({ page }) => {
+test('mobile light theme uses German compound breaks and keeps navigation opaque', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await page.locator('#settingsButton').click();
@@ -87,15 +87,11 @@ test('mobile light theme keeps selection labels whole and navigation opaque', as
 
   const target = page.getByRole('group', { name: 'Berechnungsgröße' });
   const massFlow = target.getByRole('button', { name: 'ṁ Massenstrom' });
-  const wordRects = await massFlow.evaluate(button => {
-    const text = button.firstChild;
-    const start = text.textContent.indexOf('Massenstrom');
-    const range = document.createRange();
-    range.setStart(text, start);
-    range.setEnd(text, start + 'Massenstrom'.length);
-    return range.getClientRects().length;
+  const hyphenation = await massFlow.evaluate(button => {
+    const style = getComputedStyle(button);
+    return { label: button.getAttribute('aria-label'), text: button.textContent, hyphens: style.hyphens };
   });
-  expect(wordRects).toBe(1);
+  expect(hyphenation).toEqual({ label: 'ṁ Massenstrom', text: 'ṁ Massen\u00adstrom', hyphens: 'auto' });
 
   const navStyle = await page.locator('.module-nav').evaluate(nav => {
     const style = getComputedStyle(nav);
