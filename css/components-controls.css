@@ -15,6 +15,23 @@
   text-transform: uppercase;
   letter-spacing: 1.3px;
 }
+.tc-flow-symbol {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  letter-spacing: 0;
+}
+.tc-flow-symbol::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 0.13em;
+  height: 0.13em;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translateX(-50%);
+}
 .control,
 .tc-control {
   display: flex;

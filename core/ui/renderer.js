@@ -19,6 +19,10 @@ export function esc(value) {
     .replaceAll("'", '&#039;');
 }
 
+function displayEngineeringLabel(label) {
+  return esc(label).replaceAll('V̇', '<span class="tc-flow-symbol"><span aria-hidden="true">V</span><span class="visually-hidden">V̇</span></span>');
+}
+
 export function pressureBadge(r) {
   if (!r?.rating) return '';
   return `<span class="traffic traffic--${esc(r.rating.key)}" aria-label="${esc(r.rating.label || '')}"></span>`;
@@ -59,7 +63,7 @@ export function field({ id, label, unit = '', value = '', placeholder = '0', typ
   const unitHtml = unitOptions.length
     ? `<select class="unit unit-select" name="${esc(unitField)}" aria-label="Einheit" data-field="${esc(unitField)}" data-commit="immediate">${unitOptions.map(o => `<option value="${esc(o.value)}" ${o.value === unit ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`
     : unit ? `<span class="unit">${esc(unit)}</span>` : '';
-  return `<div class="field"><label for="${esc(id)}">${esc(label)}</label><div class="control"><input id="${esc(id)}" data-field="${esc(id)}" type="${esc(type)}" inputmode="${esc(inputmode)}" value="${esc(value ?? '')}" placeholder="${esc(placeholder)}" ${disabled ? 'disabled' : ''} ${readonly ? 'readonly aria-readonly="true"' : ''} autocomplete="off">${unitHtml}</div></div>`;
+  return `<div class="field"><label for="${esc(id)}">${displayEngineeringLabel(label)}</label><div class="control"><input id="${esc(id)}" data-field="${esc(id)}" type="${esc(type)}" inputmode="${esc(inputmode)}" value="${esc(value ?? '')}" placeholder="${esc(placeholder)}" ${disabled ? 'disabled' : ''} ${readonly ? 'readonly aria-readonly="true"' : ''} autocomplete="off">${unitHtml}</div></div>`;
 }
 
 export function selectField({ id, label, value, options, commit = 'immediate', lookup = true, render = '' }) {
@@ -73,7 +77,7 @@ export function selectField({ id, label, value, options, commit = 'immediate', l
 export function segmented(name, options, value, settings = {}) {
   const accent = settings.accent ? ` segmented--${esc(settings.accent)}` : '';
   const action = settings.action || 'segment';
-  const displayLabel = label => esc(label).replace(/(Massen|Volumen)strom/g, '$1\u00adstrom');
+  const displayLabel = label => displayEngineeringLabel(label).replace(/(Massen|Volumen)strom/g, '$1\u00adstrom');
   return `<div class="segmented${accent}" role="group" aria-label="${esc(settings.label || name)}">${options.map(o => `<button type="button" data-tc-action="${esc(action)}" data-segment="${esc(name)}" data-value="${esc(o.value)}" aria-label="${esc(o.label)}" aria-pressed="${o.value === value}" class="${o.value === value ? 'is-active' : ''}">${displayLabel(o.label)}</button>`).join('')}</div>`;
 }
 
