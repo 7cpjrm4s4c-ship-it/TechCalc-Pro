@@ -42,23 +42,21 @@ export function renderQuickAccessSettings() {
       ${allModules.map((module, index) => renderOrderCard(module, index)).join('')}
     </div>
   `;
-  host.querySelectorAll('.module-order-grip').forEach(button => {
-    button.addEventListener('keydown', event => {
-      if (!['ArrowUp', 'ArrowDown'].includes(event.key)) return;
-      event.preventDefault();
-      const id = button.closest('[data-order-id]').dataset.orderId;
-      const ids = allModules.map(module => module.id);
-      const index = ids.indexOf(id);
-      const target = index + (event.key === 'ArrowUp' ? -1 : 1);
-      if (target < 0 || target >= ids.length) return;
-      [ids[index], ids[target]] = [ids[target], ids[index]];
-      setModuleOrder(ids);
-      rerenderNavigationSettings();
-      host.querySelector(`[data-order-id="${id}"] .module-order-grip`)?.focus();
-      announceOrder(id, target);
-    });
-  });
   bindOrderDrag(host);
+}
+
+export function moveModuleOrder(id, direction) {
+  if (direction !== -1 && direction !== 1) return;
+  const ids = orderedModuleIds(loadPreferences(), modules.all());
+  const index = ids.indexOf(id);
+  const target = index + direction;
+  if (index < 0 || target < 0 || target >= ids.length) return;
+  [ids[index], ids[target]] = [ids[target], ids[index]];
+  setModuleOrder(ids);
+  rerenderNavigationSettings();
+  const host = document.getElementById('quickAccessSettings');
+  host?.querySelector(`[data-order-id="${id}"] .module-order-grip`)?.focus();
+  announceOrder(id, target);
 }
 
 function bindPrimaryNav(nav, overflow) {
