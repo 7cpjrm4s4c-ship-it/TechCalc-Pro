@@ -36,7 +36,7 @@
 .module-order-list { display: grid; gap: 8px; min-width: 0; overflow-anchor: none; }
 .module-order-card {
   display: grid;
-  grid-template-columns: 40px 28px minmax(0, 1fr) auto;
+  grid-template-columns: 28px minmax(0, 1fr) 40px;
   align-items: center;
   gap: 8px;
   min-height: 70px;
@@ -57,25 +57,20 @@
 .module-order-card[data-accent='purple'] { --module-order-accent: var(--accent-purple); }
 .module-order-card:hover { border-color: rgba(119, 190, 236, .65); box-shadow: 0 12px 26px rgba(0, 0, 0, .24); }
 .module-order-card.is-dragging { opacity: .28; border-style: dashed; }
-.module-order-grip { grid-row: 1 / span 2; display: grid; place-items: center; width: 40px; height: 44px; color: var(--color-muted); font-size: 23px; touch-action: none; cursor: grab; }
-.module-order-card__number { grid-row: 1 / span 2; color: var(--color-muted); font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; }
-.module-order-card__text { display: grid; gap: 3px; min-width: 0; }
+.module-order-grip { grid-column: 3; padding: 0; border: 0; background: transparent; grid-row: 1 / span 2; display: grid; place-items: center; width: 40px; height: 44px; color: var(--color-muted); font-size: 23px; touch-action: none; cursor: grab; }
+.module-order-card__number { grid-column: 1; grid-row: 1 / span 2; color: var(--color-muted); font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.module-order-card__text { grid-column: 2; grid-row: 1; display: grid; gap: 3px; min-width: 0; }
 .module-order-card__text strong { font-size: 14px; line-height: 1.2; overflow-wrap: break-word; hyphens: auto; }
 .module-order-card__text small { color: var(--color-muted); font-size: 11px; }
-.module-order-card__badge { grid-column: 3; color: var(--accent-cyan, #6acddd); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
-.module-order-card__actions { grid-column: 4; grid-row: 1 / span 2; display: flex; gap: 4px; }
-.module-order-card__actions button { width: 32px; height: 36px; border: 1px solid rgba(131, 168, 199, .35); border-radius: 10px; background: rgba(15, 27, 39, .6); color: var(--color-text); cursor: pointer; }
-.module-order-card__actions button:hover:not(:disabled), .module-order-card__actions button:focus-visible { border-color: var(--accent-blue); outline: 2px solid var(--accent-blue); outline-offset: 2px; }
-.module-order-card__actions button:disabled { opacity: .3; cursor: default; }
+.module-order-card__badge { grid-column: 2; grid-row: 2; color: var(--accent-cyan, #6acddd); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+.module-order-grip:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; border-radius: 10px; }
 .module-order-ghost { position: fixed; z-index: 1400; pointer-events: none; opacity: .96; box-shadow: 0 22px 48px rgba(0, 0, 0, .42); transform: scale(1.02); }
 :root[data-theme='light'] .module-order-card { color: #172536; border-color: rgba(49, 99, 134, .28); border-left-color: var(--module-order-accent, var(--accent-blue)); background: linear-gradient(125deg, #fff, #eef5fa); box-shadow: 0 8px 20px rgba(38, 70, 92, .12); }
-:root[data-theme='light'] .module-order-card__actions button { color: #172536; background: #f2f8fc; border-color: rgba(49, 99, 134, .32); }
 :root[data-theme='light'] .module-order-card__number,
 :root[data-theme='light'] .module-order-card__text small,
 :root[data-theme='light'] .module-order-grip { color: #4b6174; }
 @media (max-width: 420px) {
-  .module-order-card { grid-template-columns: 40px 24px minmax(0, 1fr) auto; gap: 6px; padding: 8px; }
-  .module-order-card__actions button { width: 30px; }
+  .module-order-card { grid-template-columns: 24px minmax(0, 1fr) 40px; gap: 6px; padding: 8px; }
 }
 .settings-form { display: grid; gap: var(--tc-gap); }
 .settings-form input[type="text"],

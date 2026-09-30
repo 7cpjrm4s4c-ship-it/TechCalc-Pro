@@ -39,20 +39,22 @@ export function renderQuickAccessSettings() {
   const allModules = orderedModuleIds(loadPreferences(), modules.all()).map(id => modules.get(id));
   host.innerHTML = `
     <div class="module-order-list" role="list" aria-label="Reihenfolge aller Module">
-      ${allModules.map((module, index) => renderOrderCard(module, index, allModules.length)).join('')}
+      ${allModules.map((module, index) => renderOrderCard(module, index)).join('')}
     </div>
   `;
-  host.querySelectorAll('[data-order-move]').forEach(button => {
-    button.addEventListener('click', () => {
+  host.querySelectorAll('.module-order-grip').forEach(button => {
+    button.addEventListener('keydown', event => {
+      if (!['ArrowUp', 'ArrowDown'].includes(event.key)) return;
+      event.preventDefault();
       const id = button.closest('[data-order-id]').dataset.orderId;
       const ids = allModules.map(module => module.id);
       const index = ids.indexOf(id);
-      const target = index + (button.dataset.orderMove === 'up' ? -1 : 1);
+      const target = index + (event.key === 'ArrowUp' ? -1 : 1);
       if (target < 0 || target >= ids.length) return;
       [ids[index], ids[target]] = [ids[target], ids[index]];
       setModuleOrder(ids);
       rerenderNavigationSettings();
-      host.querySelector(`[data-order-id="${id}"] [data-order-move="${button.dataset.orderMove}"]`)?.focus();
+      host.querySelector(`[data-order-id="${id}"] .module-order-grip`)?.focus();
       announceOrder(id, target);
     });
   });
@@ -142,18 +144,14 @@ function renderOverflowItem(module, activeId, isMobile) {
   `;
 }
 
-function renderOrderCard(module, index, length) {
+function renderOrderCard(module, index) {
   if (!module) return '';
   return `
     <div class="module-order-card" role="listitem" data-order-id="${esc(module.id)}" data-accent="${esc(module.accent)}">
-      <span class="module-order-grip" aria-hidden="true">⠿</span>
       <span class="module-order-card__number">${String(index + 1).padStart(2, '0')}</span>
       <span class="module-order-card__text"><strong>${esc(module.title)}</strong><small>${esc(module.group)}</small></span>
       ${index < 4 ? '<span class="module-order-card__badge">Schnellzugriff</span>' : ''}
-      <span class="module-order-card__actions">
-        <button type="button" data-order-move="up" aria-label="${esc(module.title)} nach oben" ${index === 0 ? 'disabled' : ''}>↑</button>
-        <button type="button" data-order-move="down" aria-label="${esc(module.title)} nach unten" ${index === length - 1 ? 'disabled' : ''}>↓</button>
-      </span>
+      <button type="button" class="module-order-grip" aria-label="${esc(module.title)} verschieben" aria-describedby="moduleOrderHelp"><span aria-hidden="true">⠿</span></button>
     </div>
   `;
 }
@@ -193,7 +191,7 @@ function bindOrderDrag(host) {
 
   host.addEventListener('pointerdown', event => {
     const card = event.target.closest('.module-order-card');
-    if (!card || !list.contains(card) || event.target.closest('button')) return;
+    if (!card || !list.contains(card) || (event.target.closest('button') && !event.target.closest('.module-order-grip'))) return;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     if (event.pointerType !== 'mouse' && !event.target.closest('.module-order-grip')) return;
     const rect = card.getBoundingClientRect();

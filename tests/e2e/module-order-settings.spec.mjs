@@ -29,10 +29,16 @@ test('mouse drag reorders all modules and persists the desktop navigation order'
   expect(persisted.moduleOrder).toHaveLength(15);
 });
 
-test('move buttons keep every module keyboard accessible and update quick accesses', async ({ page }) => {
+test('right-hand grips keep every module keyboard accessible and update quick accesses', async ({ page }) => {
   const cards = page.locator('#quickAccessSettings .module-order-card');
   const fifth = await cards.nth(4).getAttribute('data-order-id');
-  await cards.nth(4).getByRole('button', { name: /nach oben/ }).click();
+  const grip = cards.nth(4).getByRole('button', { name: /verschieben/ });
+  const cardBox = await cards.nth(4).boundingBox();
+  const gripBox = await grip.boundingBox();
+  expect(gripBox.x).toBeGreaterThan(cardBox.x + cardBox.width / 2);
+  await expect(page.locator('[data-order-move]')).toHaveCount(0);
+  await grip.focus();
+  await grip.press('ArrowUp');
   await expect(cards.nth(3)).toHaveAttribute('data-order-id', fifth);
   const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('techcalc-preferences')));
   expect(stored.mobileQuickAccess[3]).toBe(fifth);
