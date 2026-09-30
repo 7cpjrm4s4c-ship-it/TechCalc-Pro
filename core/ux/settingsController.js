@@ -1,3 +1,4 @@
+import { moveModuleOrder } from '../navigation/index.js';
 import { logger } from '../diagnostics/logger.js';
 import { trackGlobalEventListener } from '../events/index.js';
 import { initializeUnsavedWorkGuard } from '../storage/unsavedWorkGuard.js';
@@ -264,6 +265,12 @@ export function initializeSettingsController({
   });
   trackGlobalEventListener(document, 'keydown', event => {
     if (!isSettingsOpen()) return;
+    const orderGrip = event.target.closest?.('#quickAccessSettings .module-order-grip');
+    if (orderGrip && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+      event.preventDefault();
+      moveModuleOrder(orderGrip.closest('[data-order-id]').dataset.orderId, event.key === 'ArrowUp' ? -1 : 1);
+      return;
+    }
     if (event.key === 'Escape') {
       event.preventDefault();
       setSettingsOpen(false);

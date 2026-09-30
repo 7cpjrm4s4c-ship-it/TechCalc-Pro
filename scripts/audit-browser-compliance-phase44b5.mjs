@@ -46,8 +46,8 @@ for (const header of requiredHeaders) {
   if (!headers.includes(header)) fail(`Missing security header: ${header}`);
 }
 
-if (index.includes('name="mobile-web-app-capable"')) {
-  fail('Deprecated mobile-web-app-capable meta tag must not be present.');
+if (!index.includes('name="mobile-web-app-capable" content="yes"')) {
+  fail('Missing Chromium standalone compatibility meta tag mobile-web-app-capable.');
 }
 
 if (!index.includes('name="apple-mobile-web-app-capable" content="yes"')) {

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#121922" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="description" content="TechCalc Pro - modulare HLSK Quick Tools für Sanitär, Heizung, Lüftung und Klimatechnik.">
@@ -112,9 +113,10 @@
         <details class="settings-submenu">
           <summary>Moduleinstellungen</summary>
           <div class="settings-submenu__content">
-            <h3>Mobile Schnellzugriffe</h3>
-            <p>Wähle bis zu vier Module für die mobile Navigation. Reihenfolge wird gespeichert.</p>
+            <h3>Reihenfolge der Module</h3>
+            <p id="moduleOrderHelp">Ziehe die Karten am rechten Griff nach oben oder unten. Am Desktop kannst du auch die Karte mit gedrückter linker Maustaste verschieben. Mit der Tastatur kannst du den fokussierten Griff über die Pfeiltasten nach oben oder unten verschieben. Die ersten vier Module erscheinen als mobile Schnellzugriffe.</p>
             <div id="quickAccessSettings" class="settings-list"></div>
+            <p id="moduleOrderStatus" class="visually-hidden" role="status" aria-live="polite"></p>
           </div>
         </details>
         <details class="settings-submenu">

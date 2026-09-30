@@ -12,7 +12,8 @@ function appRoot() {
   return typeof document !== 'undefined' ? document.getElementById('app') : null;
 }
 export function preferredStartRoute() {
-  const preferred = loadPreferences().mobileQuickAccess || [];
+  const prefs = loadPreferences();
+  const preferred = prefs.moduleOrder.length ? prefs.moduleOrder : prefs.mobileQuickAccess;
   return preferred.find(id => modules.get(id))
     || (modules.get(FALLBACK_ROUTE) ? FALLBACK_ROUTE : modules.all()[0]?.id);
 }

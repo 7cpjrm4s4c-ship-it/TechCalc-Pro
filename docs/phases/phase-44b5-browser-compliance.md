@@ -5,7 +5,7 @@
 Die ausgeklappte Edge-/Chromium-Konsole zeigte keine JavaScript-Runtime-Fehler. Die roten Einträge stammten aus der Browser-Compliance-Ebene:
 
 - Netlify Preview/Toolbar wurde durch die CSP geblockt, weil `frame-src` nicht explizit gesetzt war und dadurch auf `default-src 'self'` zurückfiel.
-- Der frühere Chromium-Hinweis zum deprecated `mobile-web-app-capable` darf im App-Shell-HTML nicht wieder eingeführt werden.
+- Chromium fordert bei vorhandenem Apple-Standalone-Meta-Tag zusätzlich `mobile-web-app-capable` an. Beide Einträge bleiben als Kompatibilitätshinweise erhalten; das Manifest definiert den Standalone-Modus.
 
 ## Design Review
 
@@ -14,15 +14,15 @@ Referenz ist eine PWA-Konsole ohne ungeklärte JavaScript-Exceptions, TypeErrors
 Security-Zielbild:
 
 - restriktive Default-CSP bleibt erhalten,
-- Netlify Preview/Toolbar wird gezielt über `frame-src` und `child-src` erlaubt,
+- Netlify Preview/Toolbar wird durch `frame-src 'none'` und `child-src 'none'` blockiert; die Vorschauleiste wird bei Bedarf in Netlify deaktiviert,
 - `frame-ancestors 'none'` bleibt bestehen,
-- PWA-Standalone wird über Manifest und Apple-iOS-Meta-Tag gesteuert,
-- deprecated Chromium-Meta-Tags bleiben entfernt.
+- PWA-Standalone wird über das Manifest gesteuert; Apple- und Chromium-Meta-Tags ergänzen die Kompatibilität,
+- der Audit prüft die beiden Kompatibilitätshinweise sowie den Standalone-Modus im Manifest.
 
 ## Implementierung
 
 - `_headers`: CSP um `frame-src 'none'` und `child-src 'none'` ergänzt.
-- `index.html`: kein `mobile-web-app-capable`; `apple-mobile-web-app-capable` bleibt vorhanden.
+- `index.html`: `mobile-web-app-capable` und `apple-mobile-web-app-capable` sind jeweils mit `content="yes"` vorhanden.
 - `scripts/audit-browser-compliance-phase44b5.mjs`: Browser-Compliance-Audit ergänzt.
 - `package.json`: Audit in `lint` eingebunden.
 
