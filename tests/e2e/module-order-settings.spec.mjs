@@ -14,10 +14,13 @@ test('mouse drag reorders all modules and persists the desktop navigation order'
   await cards.nth(2).scrollIntoViewIfNeeded();
   const source = await cards.nth(0).boundingBox();
   const target = await cards.nth(2).boundingBox();
+  const scroller = page.locator('#settingsPanel .settings-panel__body');
+  const scrollBefore = await scroller.evaluate(element => element.scrollTop);
   await page.mouse.move(source.x + 45, source.y + source.height / 2);
   await page.mouse.down();
   await page.mouse.move(target.x + 45, target.y + target.height * .8, { steps: 8 });
   await page.mouse.up();
+  expect(await scroller.evaluate(element => element.scrollTop)).toBe(scrollBefore);
   await expect(cards.nth(2)).toHaveAttribute('data-order-id', first);
   await expect(cards.nth(1)).toHaveAttribute('data-order-id', third);
   await page.reload();

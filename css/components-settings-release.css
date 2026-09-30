@@ -33,7 +33,7 @@
 .settings-row,
 .settings-check,
 .settings-info-row { display: flex; align-items: center; justify-content: space-between; gap: var(--tc-gap); min-height: 48px; padding: var(--tc-gap); border: 1px solid rgba(255,255,255,.14); border-radius: var(--radius-md); background: linear-gradient(145deg, rgb(36,42,52), rgb(27,33,42)); }
-.module-order-list { display: grid; gap: 8px; min-width: 0; }
+.module-order-list { display: grid; gap: 8px; min-width: 0; overflow-anchor: none; }
 .module-order-card {
   display: grid;
   grid-template-columns: 40px 28px minmax(0, 1fr) auto;

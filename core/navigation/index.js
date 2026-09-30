@@ -182,7 +182,8 @@ function bindOrderDrag(host) {
     if (!drag?.active || !scroller) return;
     const bounds = scroller.getBoundingClientRect();
     const edge = 48;
-    const speed = drag.y < bounds.top + edge ? -14 : drag.y > bounds.bottom - edge ? 14 : 0;
+    const speed = drag.y < bounds.top + edge && drag.direction < 0 ? -14
+      : drag.y > bounds.bottom - edge && drag.direction > 0 ? 14 : 0;
     if (speed) {
       scroller.scrollTop += speed;
       reorderAt(drag.x, drag.y);
@@ -197,13 +198,14 @@ function bindOrderDrag(host) {
     if (event.pointerType !== 'mouse' && !event.target.closest('.module-order-grip')) return;
     const rect = card.getBoundingClientRect();
     drag = { card, id: card.dataset.orderId, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY,
-      x: event.clientX, y: event.clientY, offsetY: event.clientY - rect.top, active: false, frame: 0, ghost: null };
+      x: event.clientX, y: event.clientY, direction: 0, offsetY: event.clientY - rect.top, active: false, frame: 0, ghost: null };
     host.setPointerCapture(event.pointerId);
     event.preventDefault();
   }, { signal: controller.signal });
 
   host.addEventListener('pointermove', event => {
     if (!drag || event.pointerId !== drag.pointerId) return;
+    if (event.clientY !== drag.y) drag.direction = Math.sign(event.clientY - drag.y);
     drag.x = event.clientX;
     drag.y = event.clientY;
     if (!drag.active) {
