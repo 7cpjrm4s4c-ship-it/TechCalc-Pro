@@ -300,24 +300,7 @@ export function bindDrinkingWaterActions(root) {
     updateAccordionState(event);
   });
   root.addEventListener('toggle', updateAccordionState, true);
-  root.addEventListener('pointerdown', event => {
-    const draftAdd = event.target?.closest?.('[data-dw-draft-add]');
-    if (!draftAdd || !root.contains(draftAdd)) return;
-    event.preventDefault();
-    event.stopPropagation();
-    root.dataset.tcDwDraftAddAt = String(Date.now());
-    addDraftConsumer(draftAdd.dataset.dwDraftAdd, root);
-    refreshDrinkingWater(root);
-  }, true);
-  root.addEventListener('touchstart', event => {
-    const draftAdd = event.target?.closest?.('[data-dw-draft-add]');
-    if (!draftAdd || !root.contains(draftAdd)) return;
-    event.preventDefault();
-    event.stopPropagation();
-    root.dataset.tcDwDraftAddAt = String(Date.now());
-    addDraftConsumer(draftAdd.dataset.dwDraftAdd, root);
-    refreshDrinkingWater(root);
-  }, { capture:true, passive:false });
+  // Draft additions use native click activation so touch scrolling can win the gesture.
   root.addEventListener('click', event => {
     const target = event.target;
     const unitToggle = target.closest('[data-dw-toggle-unit]');
@@ -327,7 +310,7 @@ export function bindDrinkingWaterActions(root) {
     const removeDraft = target.closest('[data-dw-remove-draft]');
     if (removeDraft && root.contains(removeDraft)) { event.preventDefault(); event.stopPropagation(); removeDraftConsumer(removeDraft.dataset.dwRemoveDraft, removeDraft.dataset.index); refreshDrinkingWater(root); return; }
     const draftAdd = target.closest('[data-dw-draft-add]');
-    if (draftAdd && root.contains(draftAdd)) { event.preventDefault(); event.stopPropagation(); if (Date.now() - Number(root.dataset.tcDwDraftAddAt || 0) > 650) { addDraftConsumer(draftAdd.dataset.dwDraftAdd, root); refreshDrinkingWater(root); } return; }
+    if (draftAdd && root.contains(draftAdd)) { event.preventDefault(); event.stopPropagation(); addDraftConsumer(draftAdd.dataset.dwDraftAdd, root); refreshDrinkingWater(root); return; }
     const addUnit = target.closest('[data-dw-add-unit]');
     if (addUnit && root.contains(addUnit)) { event.preventDefault(); event.stopPropagation(); saveUnit(root, false); return; }
     const updateUnit = target.closest('[data-dw-update-unit]');

@@ -1,4 +1,5 @@
 ## Unveröffentlicht – Bedienbarkeit, Barrierefreiheit und Performance
+- Trinkwasser: Verbraucher werden erst durch bestätigte Klick-/Tap-Aktivierung hinzugefügt. Wischen ab den Hinzufügen-Buttons bleibt möglich; frühe Pointer-/Touchstart-Aktionen und die zeitbasierte Klicksperre entfallen.
 - Scrollrücksetzungen bei Modulwechseln zentralisiert; unveränderte Positionen lösen keine erneuten Scrollaufrufe aus. Veraltete Wiederherstellungen werden bei neuer Bedienung oder Modulwechsel abgebrochen.
 - Viewport-Ereignisse gebündelt; unveränderte CSS-Größen werden nicht erneut geschrieben und Hintergrundprüfungen beendet.
 - Einstellungen als benannter modaler Dialog mit gesperrtem Hintergrund, zyklischer Tastaturführung und Fokusrückgabe.

@@ -25,3 +25,13 @@ Der Viewport-Controller bündelt Ereignisse und schreibt CSS-Größen sowie die 
 Keine Fachberechnung, Persistenz, PDF-Ausgabe oder UI-Gestaltung geändert. Bestehende Core-Komponenten und Verträge bleiben maßgeblich. Die Release Notes und der Render-Vertrag sind aktualisiert. Versionsnummer 2.0.0 bleibt für diesen unveröffentlichten Vorschlag bestehen.
 
 Die testspezifischen Messungen belegen ausbleibende unnötige Schreibvorgänge; sie belegen keine Energieeinsparung auf einem Gerät. Diese ist mit einer neuen Safari-Aufnahme zu prüfen. Vor Merge sind CI und mobile Sichtprüfung erforderlich, insbesondere Modulwechsel, Datensatzauswahl, Fokus/Tastatur und Scrollen unmittelbar nach einer Aktion.
+
+## Nachprüfung: Trinkwasser-Hinzufügen
+
+Die mobile Sichtprüfung meldete ein Hinzufügen bereits beim Aufsetzen des Fingers auf „Verbraucher zur Nutzungseinheit hinzufügen“. Ursache waren die schon in der Basis vorhandenen modulweiten `pointerdown`-/`touchstart`-Handler für beide Draft-Hinzufügen-Buttons. Sie führten die Mutation sofort aus und verhinderten die native Scrollgeste mit `preventDefault()`.
+
+Diese Frühaktivierung wurde entfernt. Die vorhandene Click-Aktion übernimmt nun allein das Hinzufügen und liest weiterhin die sichtbaren Felder vor der Mutation ein. Die bisherige 650-ms-Klicksperre zur Unterdrückung der Doppelaktivierung entfällt ebenfalls. Andere Modulaktionen bleiben unverändert.
+
+Ein neuer Test im Standard-Gate prüft für Nutzungseinheiten und freie Gruppen: kein Hinzufügen/keine Scrollunterdrückung bei Kontakt, Bewegung, Abbruch oder Loslassen; genau ein Hinzufügen je bestätigter Aktivierung; Übernahme der sichtbaren Anzahl; wiederholte beabsichtigte Aktivierungen ohne Zeitsperre. Neue Playwright-Tests prüfen bestätigte native Taps mit vorher fokussiertem Eingabefeld sowie Tastaturaktivierung. Zusätzlich prüft Chromium mit Touchscreen eine native Wischgeste ab dem Button. Die lokale Browserprüfung bleibt wegen fehlender Programme offen; CI und erneute iPhone-Sichtprüfung beziehen sich auf den ergänzten Commit.
+
+Validierung der Trinkwasser-Ergänzung: Lint, Standardtests, Build, minifizierter Build, Versions-/Precache-Prüfung und diff --check bestanden. Die vollständige Integration bestand mit `TZ=Europe/Berlin`. Ein vorheriger Lauf scheiterte an einem unveränderten PDF-Test, der das lokale Datum einer festen UTC-Zeit erwartet; die Ausführungsumgebung stand inzwischen auf Asia/Shanghai. Am PDF-Code und dem Test wurde nichts geändert. Playwright erkennt alle neuen Testfälle; die tatsächliche Browserausführung erfolgt in CI.
