@@ -41,18 +41,20 @@ function actionButtons(actions, explicitSelectors, fallbackPattern) {
 
 function setButtonRole(button, role) {
   if (!button) return;
-  button.dataset.saveModeRole = role;
+  if (button.dataset.saveModeRole !== role) button.dataset.saveModeRole = role;
 }
 
 function setDisabled(button, disabled) {
   if (!button) return;
   const isDisabled = Boolean(disabled);
-  button.disabled = isDisabled;
-  button.toggleAttribute('disabled', isDisabled);
-  button.setAttribute('aria-disabled', String(isDisabled));
-  button.classList.toggle('is-disabled', isDisabled);
-  button.classList.toggle('is-enabled', !isDisabled);
-  button.dataset.enabled = String(!isDisabled);
+  if (button.disabled !== isDisabled) button.disabled = isDisabled;
+  if (button.hasAttribute('disabled') !== isDisabled) button.toggleAttribute('disabled', isDisabled);
+  if (button.getAttribute('aria-disabled') !== String(isDisabled)) {
+    button.setAttribute('aria-disabled', String(isDisabled));
+  }
+  if (button.classList.contains('is-disabled') !== isDisabled) button.classList.toggle('is-disabled', isDisabled);
+  if (button.classList.contains('is-enabled') !== !isDisabled) button.classList.toggle('is-enabled', !isDisabled);
+  if (button.dataset.enabled !== String(!isDisabled)) button.dataset.enabled = String(!isDisabled);
 }
 
 
@@ -61,7 +63,8 @@ export function syncSaveEditMode(root = document) {
   scope.querySelectorAll('.tc-save-actions').forEach(actions => {
     const panel = actions.closest('.tc-saved-record-panel, .card, .tc-card, section, article') || actions.parentElement;
     const active = hasActiveRecord(panel);
-    actions.dataset.editMode = active ? 'edit' : 'create';
+    const editMode = active ? 'edit' : 'create';
+    if (actions.dataset.editMode !== editMode) actions.dataset.editMode = editMode;
     const saveButtons = actionButtons(actions, SAVE_SELECTORS, /^Speichern$/i);
     const updateButtons = actionButtons(actions, UPDATE_SELECTORS, /^Aktualisieren$/i);
     saveButtons.forEach(button => { setButtonRole(button, 'save'); setDisabled(button, active); });
