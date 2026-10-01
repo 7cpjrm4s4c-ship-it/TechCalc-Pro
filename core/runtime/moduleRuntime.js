@@ -1,3 +1,4 @@
+import { resetModuleScroll } from '../ux/scrollManager.js';
 import { logger } from '../diagnostics/logger.js';
 import { hardResetModuleRoot } from './moduleLifecycleAdapter.js';
 import { applyModuleRootLayout } from '../contracts/moduleLayoutContract.js';
@@ -47,22 +48,6 @@ function withTimeout(promise, timeoutMs, message) {
     .finally(() => {
       if (timeoutId) globalThis.clearTimeout(timeoutId);
     });
-}
-function resetModuleScroll(root) {
-  if (typeof window === 'undefined' || typeof document === 'undefined') return;
-  const reset = target => {
-    if (!target) return;
-    if (typeof target.scrollTo === 'function') target.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    else {
-      target.scrollTop = 0;
-      target.scrollLeft = 0;
-    }
-  };
-  reset(window);
-  reset(document.scrollingElement);
-  reset(document.documentElement);
-  reset(document.body);
-  reset(root);
 }
 export function createModuleRuntime({ root, modules, renderNavigation, loadingView, loadingDelayMs = DEFAULT_LOADING_DELAY_MS } = {}) {
   if (!root) throw new Error('ModuleRuntime benötigt einen App-Root.');
@@ -154,7 +139,9 @@ export function createModuleRuntime({ root, modules, renderNavigation, loadingVi
     const scheduleFrame = typeof requestAnimationFrame === 'function'
       ? requestAnimationFrame
       : callback => globalThis.setTimeout(callback, 0);
-    scheduleFrame(() => resetModuleScroll(root));
+    scheduleFrame(() => {
+      if (isCurrent(token)) resetModuleScroll(root);
+    });
     return true;
   }
   async function failMount(moduleId, token, error) {

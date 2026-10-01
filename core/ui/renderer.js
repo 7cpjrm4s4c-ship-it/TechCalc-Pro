@@ -136,19 +136,78 @@ export function restoreViewport(snapshot) {
       }
     }
   }
-  window.scrollTo(snapshot.x || 0, snapshot.y || 0);
+  const x = snapshot.x || 0;
+  const y = snapshot.y || 0;
+  if (Math.abs((window.scrollX || 0) - x) > 1 || Math.abs((window.scrollY || 0) - y) > 1) {
+    window.scrollTo(x, y);
+  }
 }
 
-export function restoreViewportStable(snapshot, { frames = 3, delays = [40, 120] } = {}) {
+let activeViewportRestore = null;
+
+export function cancelViewportRestoration() {
+  activeViewportRestore?.cancel();
+}
+
+export function restoreViewportStable(snapshot, { frames = 3, delays = [40, 120], restore = () => restoreViewport(snapshot), keepAlive = false } = {}) {
   if (!snapshot) return;
-  let remaining = Math.max(1, frames);
-  const restoreFrame = () => {
-    restoreViewport(snapshot);
-    remaining -= 1;
-    if (remaining > 0) requestAnimationFrame(restoreFrame);
+  cancelViewportRestoration();
+  const requestFrame = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : callback => setTimeout(callback, 0);
+  const cancelFrame = typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : clearTimeout;
+  const frameIds = new Set();
+  const timers = new Set();
+  const listeners = [];
+  const job = {
+    cancelled: false,
+    release() { keepAlive = false; finish(); },
+    cancel() {
+      job.cancelled = true;
+      frameIds.forEach(id => cancelFrame(id));
+      timers.forEach(id => clearTimeout(id));
+      frameIds.clear();
+      timers.clear();
+      removeListeners();
+    }
   };
-  requestAnimationFrame(restoreFrame);
-  delays.forEach(delay => setTimeout(() => restoreViewport(snapshot), delay));
+  activeViewportRestore = job;
+  const removeListeners = () => {
+    listeners.splice(0).forEach(([target, type, handler]) => target.removeEventListener(type, handler, true));
+  };
+  // Pending async actions retain cancellation guards until their promise settles.
+  const finish = () => {
+    if (!keepAlive && !frameIds.size && !timers.size) removeListeners();
+  };
+  const listen = (target, type) => {
+    if (!target?.addEventListener) return;
+    const handler = () => job.cancel();
+    target.addEventListener(type, handler, { capture: true, passive: true });
+    listeners.push([target, type, handler]);
+  };
+  ['pointerdown', 'mousedown', 'touchstart', 'wheel', 'keydown'].forEach(type => listen(window, type));
+  listen(document, 'techcalc:module-before-unmount');
+  let remaining = Math.max(0, Number(frames) || 0);
+  const scheduleFrame = () => {
+    const id = requestFrame(() => {
+      frameIds.delete(id);
+      if (job.cancelled) return;
+      restore();
+      remaining -= 1;
+      if (remaining > 0) scheduleFrame();
+      finish();
+    });
+    frameIds.add(id);
+  };
+  if (remaining > 0) scheduleFrame();
+  delays.forEach(delay => {
+    const id = setTimeout(() => {
+      timers.delete(id);
+      if (!job.cancelled) restore();
+      finish();
+    }, delay);
+    timers.add(id);
+  });
+  finish();
+  return job;
 }
 
 function findViewportAnchor(target) {
