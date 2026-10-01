@@ -23,3 +23,10 @@ Das h,x-Modul besitzt gekoppelte Ausgabeinseln:
 - Diagramm
 
 Saved-Selection muss diese Outlets synchronisieren. h,x besitzt trotzdem keinen eigenen Save-/Selection-Vertrag.
+
+## Scrollstabilisierung
+
+- Modulwechsel setzen Dokument und verschachtelte Scrollcontainer über `core/ux/scrollManager.js` zurück. Die Modulruntime führt diese Rücksetzung vor und nach dem Mount sowie eine tokengeprüfte Nachkontrolle aus; der Router plant keine parallelen Rücksetzungen.
+- Scrollpositionen werden nur bei einer tatsächlichen Abweichung geschrieben. Die ankerbasierte Wiederherstellung toleriert einen CSS-Pixel.
+- Verzögerte Wiederherstellungen werden zentral gebündelt. Neue Wiederherstellungen, Bedienaktionen und `techcalc:module-before-unmount` brechen ältere Aufträge ab. Auch eine spätere Promise-Auflösung darf einen abgebrochenen Auftrag nicht erneut aktivieren.
+- Viewport-Synchronisierung bündelt Ereignisse, schreibt CSS-Größen nur bei Änderungen und beendet geplante Prüfungen im Hintergrund. Die Nachkontrollen für mobile Layout- und Tastaturänderungen bleiben erhalten.

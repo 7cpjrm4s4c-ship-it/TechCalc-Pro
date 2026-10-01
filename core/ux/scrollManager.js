@@ -1,4 +1,4 @@
-import { preserveViewport as preserveRendererViewport } from '../ui/renderer.js';
+import { preserveViewport as preserveRendererViewport, restoreViewportStable, cancelViewportRestoration } from '../ui/renderer.js';
 
 export const SCROLL_STABILITY_PRESETS = Object.freeze({
   default: Object.freeze({ frames: 3, blurActive: false, delays: [0, 40, 100] }),
@@ -70,6 +70,7 @@ function writeScrollPosition(snapshot = {}, options = {}) {
   const y = Math.max(0, Number(snapshot.y) || 0);
   const behavior = options.behavior || 'auto';
   if (snapshot.scope && snapshot.scope !== 'window' && snapshot.scope !== 'none') {
+    if (Math.abs((snapshot.scope.scrollLeft || 0) - x) <= 1 && Math.abs((snapshot.scope.scrollTop || 0) - y) <= 1) return;
     if (typeof snapshot.scope.scrollTo === 'function') {
       snapshot.scope.scrollTo({ left: x, top: y, behavior });
     } else {
@@ -78,6 +79,7 @@ function writeScrollPosition(snapshot = {}, options = {}) {
     }
     return;
   }
+  if (Math.abs((window.scrollX || 0) - x) <= 1 && Math.abs((window.scrollY || 0) - y) <= 1) return;
   if (typeof window.scrollTo === 'function') window.scrollTo({ left: x, top: y, behavior });
 }
 export function capturePosition(scope = null) {
@@ -86,6 +88,18 @@ export function capturePosition(scope = null) {
 
 export function restorePosition(snapshot, options = {}) {
   writeScrollPosition(snapshot, options);
+}
+
+export function resetModuleScroll(root) {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+  cancelViewportRestoration();
+  const targets = new Set([
+    document.scrollingElement, document.documentElement, document.body, root,
+    ...document.querySelectorAll('.app-main, [data-module-scroll], .module-view, .module-content')
+  ]);
+  targets.delete(null);
+  targets.delete(undefined);
+  targets.forEach(scope => restorePosition({ scope, x: 0, y: 0 }));
 }
 
 let freezeCounter = 0;
@@ -114,26 +128,23 @@ export function runWithoutScrollJump(action, options = {}) {
     if (skipDuringActiveTouch && isTouchScrollActive()) return;
     restorePosition(snapshot, options);
   };
-  const scheduleRestore = () => {
+  let restoreJob = null;
+  const scheduleRestore = (keepAlive = false) => {
     restore();
-    const delays = Array.isArray(options.delays) ? options.delays : [];
-    delays.forEach(delay => setTimeout(restore, delay));
-    if (options.frames) {
-      let remaining = Math.max(0, Number(options.frames) || 0);
-      const frame = () => {
-        restore();
-        remaining -= 1;
-        const scheduleFrame = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : callback => setTimeout(callback, 0);
-      if (remaining > 0) scheduleFrame(frame);
-      };
-      const scheduleFrame = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : callback => setTimeout(callback, 0);
-      if (remaining > 0) scheduleFrame(frame);
-    }
+    restoreJob = restoreViewportStable(snapshot, {
+      frames: options.frames || 0,
+      delays: Array.isArray(options.delays) ? options.delays : [],
+      restore,
+      keepAlive
+    });
   };
   const result = action?.();
   if (result && typeof result.then === 'function') {
-    scheduleRestore();
-    return result.finally(scheduleRestore);
+    scheduleRestore(true);
+    return result.finally(() => {
+      restoreJob?.release();
+      if (!restoreJob?.cancelled) scheduleRestore();
+    });
   }
   scheduleRestore();
   return result;
@@ -185,19 +196,13 @@ const GLOBAL_SAVED_ACTION_SELECTOR = [
   '[data-hc-dynamic]'
 ].join(',');
 function scheduleStableRestore(snapshot, options = {}) {
-  if (!snapshot) return;
-  const frames = Math.max(0, Number(options.frames ?? 4));
-  const delays = Array.isArray(options.delays) ? options.delays : [0, 16, 40, 100];
-  const restore = () => restorePosition(snapshot, { behavior: 'auto' });
-  delays.forEach(delay => setTimeout(restore, delay));
-  let remaining = frames;
-  const frame = () => {
-    restore();
-    remaining -= 1;
-    if (remaining > 0) requestAnimationFrame?.(frame);
-  };
-  if (remaining > 0) requestAnimationFrame?.(frame);
+  return restoreViewportStable(snapshot, {
+    frames: Math.max(0, Number(options.frames ?? 4)),
+    delays: Array.isArray(options.delays) ? options.delays : [0, 16, 40, 100],
+    restore: () => restorePosition(snapshot, { behavior: 'auto' })
+  });
 }
+
 export function initializeGlobalSavedRecordScrollStability(root = document) {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
   const host = root || document;

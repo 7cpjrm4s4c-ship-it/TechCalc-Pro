@@ -1,4 +1,6 @@
 ## Unveröffentlicht – Bedienbarkeit, Barrierefreiheit und Performance
+- Scrollrücksetzungen bei Modulwechseln zentralisiert; unveränderte Positionen lösen keine erneuten Scrollaufrufe aus. Veraltete Wiederherstellungen werden bei neuer Bedienung oder Modulwechsel abgebrochen.
+- Viewport-Ereignisse gebündelt; unveränderte CSS-Größen werden nicht erneut geschrieben und Hintergrundprüfungen beendet.
 - Einstellungen als benannter modaler Dialog mit gesperrtem Hintergrund, zyklischer Tastaturführung und Fokusrückgabe.
 - Zentrale Auswahlschalter melden ihren gedrückten Zustand konsistent, auch nach dynamischen Aktualisierungen.
 - Abgeschlossene Performance-Spans bereinigen ihre nativen Browser-Einträge. Render- und Mount-Messungen enthalten Budget und Ergebnis.

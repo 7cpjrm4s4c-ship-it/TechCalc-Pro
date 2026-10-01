@@ -17,30 +17,6 @@ export function preferredStartRoute() {
   return preferred.find(id => modules.get(id))
     || (modules.get(FALLBACK_ROUTE) ? FALLBACK_ROUTE : modules.all()[0]?.id);
 }
-function resetScrollHosts() {
-  if (typeof window === 'undefined' || typeof document === 'undefined') return;
-  window.scrollTo(0, 0);
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
-  const root = appRoot();
-  if (root) root.scrollTop = 0;
-  document.querySelectorAll('.app-main, [data-module-scroll], .module-view, .module-content').forEach(element => {
-    element.scrollTop = 0;
-    element.scrollLeft = 0;
-  });
-}
-
-function resetViewportAfterModuleChange(previousRouteId, nextRouteId) {
-  if (!nextRouteId || previousRouteId === nextRouteId || typeof window === 'undefined') return;
-  resetScrollHosts();
-  const repeat = () => {
-    resetScrollHosts();
-    window.requestAnimationFrame?.(resetScrollHosts);
-  };
-  if (typeof window.requestAnimationFrame === 'function') window.requestAnimationFrame(repeat);
-  else window.setTimeout(resetScrollHosts, 0);
-}
-
 function isMountedRoute(id) {
   const root = appRoot();
   return Boolean(root && root.dataset?.activeModuleId === id && !root.hasAttribute('aria-busy'));
@@ -91,12 +67,9 @@ export async function navigate(id, options = {}) {
     window.history.replaceState({ moduleId: id, version: navigationVersion }, '', `${window.location.pathname}${window.location.search}${targetHash}`);
   }
 
-  const previousRouteId = activeRouteId;
-  resetViewportAfterModuleChange(previousRouteId, id);
   const rendered = await Promise.resolve(renderCallback(id));
   if (rendered) {
     activeRouteId = id;
-    resetViewportAfterModuleChange(previousRouteId, id);
   }
   return rendered;
 }
@@ -130,12 +103,9 @@ function normalizeHashAndRender(routeId, options = {}) {
 
   if (isMountedRoute(routeId) || isPendingRoute(routeId)) return Promise.resolve(true);
 
-  const previousRouteId = activeRouteId;
-  resetViewportAfterModuleChange(previousRouteId, routeId);
   return Promise.resolve(renderCallback(routeId)).then(rendered => {
     if (rendered) {
       activeRouteId = routeId;
-      resetViewportAfterModuleChange(previousRouteId, routeId);
     }
     return rendered;
   });
@@ -146,12 +116,9 @@ function replaceHash(routeId) {
   window.history.replaceState({ moduleId: routeId, version: navigationVersion }, '', path);
   requestedRouteId = routeId;
   if (isMountedRoute(routeId) || isPendingRoute(routeId)) return Promise.resolve(true);
-  const previousRouteId = activeRouteId;
-  resetViewportAfterModuleChange(previousRouteId, routeId);
   return Promise.resolve(renderCallback(routeId)).then(rendered => {
     if (rendered) {
       activeRouteId = routeId;
-      resetViewportAfterModuleChange(previousRouteId, routeId);
     }
     return rendered;
   });

@@ -6,19 +6,33 @@ function setViewportVars() {
   const visualHeight = window.visualViewport?.height;
   const height = Math.max(0, Math.round(visualHeight || window.innerHeight || 0));
   const width = Math.max(0, Math.round(window.visualViewport?.width || window.innerWidth || 0));
-  if (height) root.style.setProperty('--tc-viewport-height', `${height}px`);
-  if (width) root.style.setProperty('--tc-viewport-width', `${width}px`);
-  root.classList.add('tc-layout-ready');
+  if (height && root.style.getPropertyValue('--tc-viewport-height') !== `${height}px`) root.style.setProperty('--tc-viewport-height', `${height}px`);
+  if (width && root.style.getPropertyValue('--tc-viewport-width') !== `${width}px`) root.style.setProperty('--tc-viewport-width', `${width}px`);
+  if (!root.classList.contains('tc-layout-ready')) root.classList.add('tc-layout-ready');
+}
+
+let viewportFrame = 0;
+let settleTimers = [];
+
+function cancelViewportSync() {
+  if (viewportFrame) cancelAnimationFrame(viewportFrame);
+  viewportFrame = 0;
+  settleTimers.forEach(clearTimeout);
+  settleTimers = [];
 }
 
 function scheduleViewportSync() {
-  setViewportVars();
-  requestAnimationFrame?.(() => {
+  if (viewportFrame || document.visibilityState === 'hidden') return;
+  settleTimers.forEach(clearTimeout);
+  settleTimers = [];
+  viewportFrame = requestAnimationFrame(() => {
     setViewportVars();
-    requestAnimationFrame?.(setViewportVars);
+    viewportFrame = requestAnimationFrame(() => {
+      viewportFrame = 0;
+      setViewportVars();
+    });
+    settleTimers = [setTimeout(setViewportVars, 80), setTimeout(setViewportVars, 260)];
   });
-  setTimeout(setViewportVars, 80);
-  setTimeout(setViewportVars, 260);
 }
 
 export function initializeLayoutStabilityController() {
@@ -36,5 +50,6 @@ export function initializeLayoutStabilityController() {
   window.visualViewport?.addEventListener?.('scroll', scheduleViewportSync, { passive: true });
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') scheduleViewportSync();
+    else cancelViewportSync();
   });
 }
