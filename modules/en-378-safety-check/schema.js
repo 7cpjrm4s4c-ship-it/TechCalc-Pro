@@ -39,6 +39,11 @@ const mountingTypeOptions = Object.freeze([
 const ventilationTypeOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('natural', 'Natürliche Lüftung'), option('mechanical', 'Mechanische Lüftung'), option('none', 'Keine gesicherte Lüftung')
 ]);
+const mechanicalVentilationModeOptions = Object.freeze([
+  option('', 'Nicht angegeben'),
+  option('continuous', 'Dauerbetrieb'),
+  option('detector-controlled', 'Detektorgesteuerter Betrieb')
+]);
 const yesNoOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('yes', 'Ja'), option('no', 'Nein')
 ]);
@@ -75,6 +80,7 @@ const schema = defineFormSchema({
     { key: 'hasGasWarningSystem', label: 'Gaswarnsystem vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions },
     { key: 'hasMachineryRoom', label: 'Maschinenraum vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions },
     { key: 'hasMechanicalVentilation', label: 'Mechanische Lüftung vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isMachineryRoom(state) || usesAlternativeRiskManagement(state) },
+    { key: 'mechanicalVentilationMode', label: 'Betriebsart der mechanischen Lüftung', type: FIELD_TYPES.SELECT, options: mechanicalVentilationModeOptions, visibleWhen: state => usesAlternativeRiskManagement(state) && state.hasMechanicalVentilation === 'yes' },
     { key: 'hasEmergencyVentilation', label: 'Mechanische Notlüftung vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isMachineryRoom },
     { key: 'hasEmergencyStopOutside', label: 'Not-Aus außen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isMachineryRoom },
     { key: 'hasEmergencyStopInside', label: 'Not-Aus innen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isMachineryRoom },
@@ -92,7 +98,7 @@ const schema = defineFormSchema({
     { title: 'Importierter Anlagenstand', fields: ['importedSystemName', 'importFGasesSystem', 'fGasesSnapshotId', 'importNotice', 'importStatusMessage', 'refrigerantId', 'chargeKg'], columns: 2, accent: 'blue' },
     { title: 'Raum und Aufstellung', fields: ['roomVolumeM3', 'floorAreaM2', 'installationLocation', 'installationClass', 'accessArea', 'accessCategoryInfo', 'accessCategory', 'usageType', 'applicationType', 'locationLevel'], columns: 2, accent: 'blue' },
     { title: 'Detailfragen zur Füllmengenbewertung', fields: ['occupantDensityBelowOnePer10m2', 'hasEmergencyExits', 'isPermanentlySealedSorptionSystem', 'usesAlternativeRiskManagement', 'alternativeRiskManagementInfo', 'isFactorySealed', 'mountingType'], columns: 2, accent: 'blue' },
-    { title: 'Lüftung und Sicherheitskomponenten', fields: ['ventilationType', 'limitInfo', 'hasGasWarningSystem', 'hasMachineryRoom', 'hasMechanicalVentilation', 'hasEmergencyVentilation', 'hasEmergencyStopOutside', 'hasEmergencyStopInside', 'hasEmergencyLighting', 'hasDetector', 'hasAlarm', 'hasIndependentAlarmPower', 'hasSafetyShutoffValves', 'hasVentilationOpenings', 'hasExplosionProtectedElectricalEquipment', 'isOutdoorPublicAccessible', 'additionalSafetyMeasures'], columns: 2, accent: 'blue' }
+    { title: 'Lüftung und Sicherheitskomponenten', fields: ['ventilationType', 'limitInfo', 'hasGasWarningSystem', 'hasMachineryRoom', 'hasMechanicalVentilation', 'mechanicalVentilationMode', 'hasEmergencyVentilation', 'hasEmergencyStopOutside', 'hasEmergencyStopInside', 'hasEmergencyLighting', 'hasDetector', 'hasAlarm', 'hasIndependentAlarmPower', 'hasSafetyShutoffValves', 'hasVentilationOpenings', 'hasExplosionProtectedElectricalEquipment', 'isOutdoorPublicAccessible', 'additionalSafetyMeasures'], columns: 2, accent: 'blue' }
   ]
 });
 
