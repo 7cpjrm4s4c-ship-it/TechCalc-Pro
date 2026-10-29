@@ -13,6 +13,7 @@ const FIELD_LABELS = Object.freeze({
   hasEmergencyStopInside: 'Not-Aus innen',
   hasEmergencyStopOutside: 'Not-Aus außen',
   hasMechanicalVentilation: 'mechanische Lüftung',
+  mechanicalVentilationMode: 'Betriebsart der mechanischen Lüftung',
   hasEmergencyVentilation: 'mechanische Notlüftung',
   hasDetector: 'Kältemitteldetektor',
   hasAlarm: 'Alarmierung',
@@ -118,7 +119,9 @@ const OPTION_LABELS = Object.freeze({
   ceiling: 'Deckenmontage',
   natural: 'natürliche Lüftung',
   mechanical: 'mechanische Lüftung',
-  none: 'keine gesicherte Lüftung'
+  none: 'keine gesicherte Lüftung',
+  continuous: 'Dauerbetrieb',
+  'detector-controlled': 'detektorgesteuerter Betrieb'
 });
 export function fieldLabel(key) {
   return FIELD_LABELS[key] || String(key || 'Angabe');
