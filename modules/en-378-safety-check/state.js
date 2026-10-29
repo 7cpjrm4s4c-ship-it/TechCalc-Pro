@@ -40,6 +40,7 @@ export const initialState = Object.freeze({
   hasGasWarningSystem: '',
   hasMachineryRoom: '',
   hasMechanicalVentilation: '',
+  mechanicalVentilationMode: '',
   hasEmergencyVentilation: '',
   hasEmergencyStopInside: '',
   hasEmergencyStopOutside: '',
