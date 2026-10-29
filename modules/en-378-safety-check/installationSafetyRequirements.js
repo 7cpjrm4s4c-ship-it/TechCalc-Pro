@@ -301,6 +301,25 @@ function buildAlternativePrecautionRequirements(state, safetyData, chargeLimitAs
     source: SOURCE.mechanicalVentilation,
     value: state.hasMechanicalVentilation
   }));
+  if (yes(state.hasMechanicalVentilation)) {
+    const modeAnswered = ['continuous', 'detector-controlled'].includes(state.mechanicalVentilationMode);
+    requirements.push(required({
+      id: 'mechanicalVentilationMode',
+      category: 'ventilation',
+      title: 'Betriebsart der mechanischen Lüftung festlegen',
+      requirement: 'Bei mechanischer Lüftung als alternative Vorkehrung nach Anhang C.3 muss festgelegt sein, ob die Lüftung dauerhaft betrieben oder durch einen Detektor eingeschaltet wird.',
+      measure: !modeAnswered
+        ? 'Betriebsart angeben: Dauerbetrieb oder detektorgesteuerter Betrieb.'
+        : state.mechanicalVentilationMode === 'continuous'
+          ? 'Dauerbetrieb planerisch festlegen und sicherstellen; die Lüftung muss während des erforderlichen Betriebs dauerhaft verfügbar sein.'
+          : 'Detektorgesteuerte Einschaltung planen; geeignete Detektion und deren Auslösung der Lüftung nachweisen.',
+      source: SOURCE.mechanicalVentilation,
+      priority: 'required',
+      status: !modeAnswered ? REQUIREMENT_STATUS.NOT_ASSESSED : REQUIREMENT_STATUS.PASSED,
+      missingInputs: modeAnswered ? [] : ['mechanicalVentilationMode'],
+      details: { mode: state.mechanicalVentilationMode || null }
+    }));
+  }
   requirements.push(checkBoolean({
     id: 'hasSafetyShutoffValves',
     category: 'safetyMeasures',
@@ -318,8 +337,21 @@ function buildDetectorRequirements(state, safetyData, chargeLimitAssessment) {
   const concentrationRisk = chargeLimitAssessment?.status === 'failed' || yes(state.hasGasWarningSystem);
   const flammable = isFlammable(safetyData?.flammabilityClass);
   const detectorPreset = calculateDetectorPreset({ safetyData });
+  const alternativeContinuousVentilation = yes(state.usesAlternativeRiskManagement)
+    && yes(state.hasMechanicalVentilation)
+    && state.mechanicalVentilationMode === 'continuous';
 
-  if (!concentrationRisk && !flammable && !isR717(safetyData)) return requirements;
+  // For the C.3 mechanical-ventilation alternative, continuous operation is a
+  // distinct protection mode and must not automatically trigger detector
+  // requirements solely because the refrigerant is flammable. Independent
+  // triggers (e.g. failed charge-limit assessment, gas warning system, R717)
+  // still retain their detector requirements.
+  if (
+    !concentrationRisk
+    && !yes(state.hasGasWarningSystem)
+    && (!flammable || alternativeContinuousVentilation)
+    && !isR717(safetyData)
+  ) return requirements;
 
   requirements.push(checkBoolean({
     id: 'hasDetector',
