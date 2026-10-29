@@ -1,4 +1,5 @@
 import { defineFormSchema, FIELD_TYPES } from '../../core/ui/formSchema.js';
+import { numberService } from '../../core/engineering/numberService.js';
 import { buildFGasesImportOptions, hasAnyFGasesSavedSystem, hasMultipleFGasesSavedSystems, IMPORT_ACTION } from './importController.js';
 
 const option = (value, label) => Object.freeze({ value, label });
@@ -66,7 +67,7 @@ const schema = defineFormSchema({
     { key: 'isPermanentlySealedSorptionSystem', label: 'Dauerhaft geschlossene Sorptionsanlage', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => (accessCategoryByAccessArea[state.accessArea] || state.accessCategory) === 'a' },
     { key: 'usesAlternativeRiskManagement', label: 'Alternative Vorkehrungen nach Anhang C.3 vorgesehen', type: FIELD_TYPES.SELECT, options: yesNoOptions },
     { key: 'alternativeRiskManagementInfo', label: 'Hinweis zu alternativen Vorkehrungen', type: FIELD_TYPES.NOTICE, text: 'Alternative Vorkehrungen nach Anhang C.3 werden nur bewertet, wenn dieser Pfad vorgesehen ist oder eine Grenzwertüberschreitung dies erfordert. Je nach Konzentration können eine oder zwei Maßnahmen erforderlich sein.', tone: 'compact', visibleWhen: usesAlternativeRiskManagement },
-    { key: 'floorAreaM2', label: 'Grundfläche des Aufstellraums', type: FIELD_TYPES.DECIMAL, unit: 'm²' },
+    { key: 'floorAreaM2', label: 'Grundfläche des Aufstellraums', type: FIELD_TYPES.DECIMAL, unit: 'm²', format: value => value === '' || value === null || value === undefined ? '' : numberService.format(value, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
     { key: 'isFactorySealed', label: 'Werkseitig dauerhaft geschlossen', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isHumanComfort },
     { key: 'mountingType', label: 'Montageart', type: FIELD_TYPES.SELECT, options: mountingTypeOptions, visibleWhen: needsMountingType },
     { key: 'ventilationType', label: 'Lüftung', type: FIELD_TYPES.SELECT, options: ventilationTypeOptions },
