@@ -48,6 +48,38 @@ assert.ok(machineryAssessment.requirements.some(item => item.id === 'machinery-r
 assert.ok(machineryAssessment.requirements.some(item => item.id === 'detector.flammable-classes'));
 assert.equal(machineryAssessment.status, 'passed');
 
+const alternativeContinuousState = {
+  ...machineryRoomState,
+  usesAlternativeRiskManagement: 'yes',
+  hasMechanicalVentilation: 'yes',
+  mechanicalVentilationMode: 'continuous',
+  hasGasWarningSystem: 'no',
+  hasDetector: 'no'
+};
+const continuousAssessment = assessInstallationSafetyRequirements(
+  alternativeContinuousState,
+  { ...machineryCharge, status: 'passed' }
+);
+assert.ok(!continuousAssessment.requirements.some(item => item.id === 'hasDetector'));
+assert.ok(!continuousAssessment.requirements.some(item => item.id === 'detector.flammable-classes'));
+assert.equal(
+  continuousAssessment.requirements.find(item => item.id === 'mechanicalVentilationMode')?.status,
+  'passed'
+);
+
+const alternativeUnspecifiedModeState = {
+  ...alternativeContinuousState,
+  mechanicalVentilationMode: ''
+};
+const unspecifiedModeAssessment = assessInstallationSafetyRequirements(
+  alternativeUnspecifiedModeState,
+  { ...machineryCharge, status: 'passed' }
+);
+assert.equal(
+  unspecifiedModeAssessment.requirements.find(item => item.id === 'mechanicalVentilationMode')?.status,
+  'not-assessed'
+);
+
 const missingMeasuresState = {
   ...machineryRoomState,
   hasMechanicalVentilation: 'no',
