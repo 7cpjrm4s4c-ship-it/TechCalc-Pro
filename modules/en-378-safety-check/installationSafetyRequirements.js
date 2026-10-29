@@ -116,9 +116,11 @@ function buildArrangementRequirements(state, safetyData) {
       category: 'location',
       title: 'Öffentlich zugängliche Außenaufstellung bewertet',
       requirement: 'Bei öffentlich zugänglicher Außenaufstellung müssen kältemitteltechnische Komponenten gegen Eingriff geschützt werden.',
-      measure: publicAccessIsYes
-        ? 'Nicht erfüllt: Schutzabdeckung oder vergleichbaren Eingriffsschutz für öffentlich zugängliche kältemitteltechnische Komponenten vorsehen.'
-        : 'Öffentliche Zugänglichkeit der Außenaufstellung ist verneint; aus diesem Prüfpunkt ist kein zusätzlicher Eingriffsschutz erforderlich.',
+      measure: !publicAccessAnswered
+        ? 'Eingabe erforderlich: Bitte angeben, ob die Außenaufstellung öffentlich zugänglich ist.'
+        : publicAccessIsYes
+          ? 'Schutzabdeckung oder vergleichbaren Eingriffsschutz für öffentlich zugängliche kältemitteltechnische Komponenten vorsehen.'
+          : 'Die Außenaufstellung ist nicht öffentlich zugänglich. Aus diesem Prüfpunkt ist kein zusätzlicher Eingriffsschutz erforderlich.',
       source: SOURCE.arrangement,
       priority: 'conditional',
       status: !publicAccessAnswered
