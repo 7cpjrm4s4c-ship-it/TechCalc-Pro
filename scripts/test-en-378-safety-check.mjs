@@ -70,6 +70,28 @@ assert.ok(calculation.plannerGuidance.groups.some(group =>
 ));
 const report = buildEN378SafetyCheckReportDto({ state: completeState, calculation, generatedAt: '2026-08-31T00:00:00.000Z' });
 
+// A1 refrigerant: generic outdoor-location and handover guidance may remain,
+// but must not create a false overall "measures required" status by themselves.
+const a1OutdoorState = {
+  ...completeState,
+  refrigerantId: 'R513A',
+  chargeKg: '5.1',
+  roomVolumeM3: '100',
+  installationLocation: 'outdoor',
+  isOutdoorPublicAccessible: 'no',
+  hasGasWarningSystem: 'no',
+  hasMachineryRoom: 'no',
+  hasDetector: 'no',
+  hasAlarm: 'no',
+  hasIndependentAlarmPower: 'no'
+};
+const a1OutdoorCalculation = calculate(a1OutdoorState);
+assert.equal(a1OutdoorCalculation.inputComplete, true);
+assert.equal(a1OutdoorCalculation.chargeLimitAssessment.status, 'passed');
+assert.equal(a1OutdoorCalculation.installationSafetyAssessment.status, 'passed');
+assert.equal(a1OutdoorCalculation.status, 'acceptable');
+
+
 assert.equal(report.metadata.dtoType, 'techcalc.en-378-safety-check.report');
 assert.equal(report.summary.status, 'measures-required');
 assert.equal(report.assessment.chargeLimit.status, 'passed');
