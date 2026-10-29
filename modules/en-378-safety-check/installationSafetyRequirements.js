@@ -108,29 +108,26 @@ function buildArrangementRequirements(state, safetyData) {
       measure: 'Aufstellort, Abstände, Öffnungen und Luftführung so planen, dass austretendes Kältemittel nicht in Gebäude oder gefährdete Bereiche gelangt.',
       source: SOURCE.arrangement
     }));
-    if (no(state.isOutdoorPublicAccessible)) {
-      requirements.push(required({
-        id: 'isOutdoorPublicAccessible',
-        category: 'location',
-        title: 'Öffentlich zugängliche Außenaufstellung bewertet',
-        requirement: 'Die Außenaufstellung ist laut Eingabe nicht öffentlich zugänglich; die bedingte Anforderung an Eingriffsschutz wegen öffentlicher Zugänglichkeit ist nicht anwendbar.',
-        measure: 'Keine Maßnahme aus diesem Prüfpunkt erforderlich.',
-        source: SOURCE.arrangement,
-        priority: 'conditional',
-        status: REQUIREMENT_STATUS.NOT_APPLICABLE
-      }));
-    } else {
-      requirements.push(checkBoolean({
-        id: 'isOutdoorPublicAccessible',
-        category: 'location',
-        title: 'Öffentlich zugängliche Außenaufstellung bewertet',
-        requirement: 'Öffentlich zugängliche kältemitteltechnische Komponenten im Freien müssen gegen Eingriff geschützt werden.',
-        measure: 'Falls öffentlich zugänglich: Schutzabdeckung oder vergleichbaren Eingriffsschutz vorsehen.',
-        source: SOURCE.arrangement,
-        value: state.isOutdoorPublicAccessible,
-        priority: 'conditional'
-      }));
-    }
+    const publicAccess = state.isOutdoorPublicAccessible;
+    const publicAccessAnswered = hasAnswer(publicAccess);
+    const publicAccessIsYes = yes(publicAccess);
+    requirements.push(required({
+      id: 'isOutdoorPublicAccessible',
+      category: 'location',
+      title: 'Öffentlich zugängliche Außenaufstellung bewertet',
+      requirement: 'Bei öffentlich zugänglicher Außenaufstellung müssen kältemitteltechnische Komponenten gegen Eingriff geschützt werden.',
+      measure: publicAccessIsYes
+        ? 'Nicht erfüllt: Schutzabdeckung oder vergleichbaren Eingriffsschutz für öffentlich zugängliche kältemitteltechnische Komponenten vorsehen.'
+        : 'Öffentliche Zugänglichkeit der Außenaufstellung ist verneint; aus diesem Prüfpunkt ist kein zusätzlicher Eingriffsschutz erforderlich.',
+      source: SOURCE.arrangement,
+      priority: 'conditional',
+      status: !publicAccessAnswered
+        ? REQUIREMENT_STATUS.NOT_ASSESSED
+        : publicAccessIsYes
+          ? REQUIREMENT_STATUS.FAILED
+          : REQUIREMENT_STATUS.PASSED,
+      missingInputs: publicAccessAnswered ? [] : ['isOutdoorPublicAccessible']
+    }));
   }
   if (state.installationLocation === 'occupied-space') {
     requirements.push(required({
