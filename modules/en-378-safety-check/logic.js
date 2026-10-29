@@ -99,6 +99,15 @@ function deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, 
   if (hasImportError) return 'import-rejected';
   if (!inputValidation.isValid) return 'incomplete';
   if (chargeLimitAssessment.status === 'failed' || installationSafetyAssessment.status === 'failed') return 'measures-required';
+
+  // A passed sub-assessment is not sufficient if the planner guidance still
+  // contains required technical measures (e.g. detector positioning/setpoint).
+  // Generic handover/documentation items remain guidance and do not change
+  // the technical headline by themselves.
+  const hasRequiredTechnicalMeasures = (installationSafetyAssessment.requirements || [])
+    .some(requirement => requirement.status === 'required' && requirement.category !== 'guidance');
+  if (hasRequiredTechnicalMeasures) return 'measures-required';
+
   if (chargeLimitAssessment.status === 'passed' && installationSafetyAssessment.status === 'passed') return 'acceptable';
   return 'ready-for-assessment';
 }
