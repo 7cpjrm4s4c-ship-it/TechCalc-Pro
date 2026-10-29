@@ -100,12 +100,21 @@ function deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, 
   if (!inputValidation.isValid) return 'incomplete';
   if (chargeLimitAssessment.status === 'failed' || installationSafetyAssessment.status === 'failed') return 'measures-required';
 
-  // A passed sub-assessment is not sufficient if the planner guidance still
-  // contains required technical measures (e.g. detector positioning/setpoint).
-  // Generic handover/documentation items remain guidance and do not change
-  // the technical headline by themselves.
+  // Only concrete, applicable safety-system requirements affect the overall
+  // headline. General installation-planning notes (e.g. refrigerant migration
+  // avoidance for outdoor units) remain in the planner guide but must not make
+  // an otherwise passed A1 assessment look like a failed assessment.
+  const statusRelevantCategories = new Set([
+    'detection',
+    'alarm',
+    'emergencyControl',
+    'ventilation',
+    'machineryRoom',
+    'safetyMeasures',
+    'electricalSafety'
+  ]);
   const hasRequiredTechnicalMeasures = (installationSafetyAssessment.requirements || [])
-    .some(requirement => requirement.status === 'required' && requirement.category !== 'guidance');
+    .some(requirement => requirement.status === 'required' && statusRelevantCategories.has(requirement.category));
   if (hasRequiredTechnicalMeasures) return 'measures-required';
 
   if (chargeLimitAssessment.status === 'passed' && installationSafetyAssessment.status === 'passed') return 'acceptable';
