@@ -127,7 +127,11 @@ export function assessStateConsistency(currentState = {}) {
   }
 
   return Object.freeze({
-    status: requirements.length ? STATE_CONSISTENCY_STATUS.FAILED : STATE_CONSISTENCY_STATUS.PASSED,
+    status: requirements.some(item => item.status === STATE_CONSISTENCY_STATUS.FAILED)
+      ? STATE_CONSISTENCY_STATUS.FAILED
+      : requirements.some(item => item.status === STATE_CONSISTENCY_STATUS.NOT_ASSESSED)
+        ? STATE_CONSISTENCY_STATUS.NOT_ASSESSED
+        : STATE_CONSISTENCY_STATUS.PASSED,
     requirements: Object.freeze(requirements),
     requiredMeasures: Object.freeze(unique(requirements.map(item => item.measure))),
     missingInputs: Object.freeze([])
