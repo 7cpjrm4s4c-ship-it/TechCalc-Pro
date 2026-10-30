@@ -27,6 +27,7 @@ export const initialState = Object.freeze({
   installationLocation: '',
   installationClass: '',
   splitClassIIComponentLocationConfirmed: '',
+  splitClassIIIComponentLocationConfirmed: '',
   accessArea: '',
   accessCategory: '',
   usageType: '',
