@@ -99,11 +99,33 @@ export function assessStateConsistency(currentState = {}) {
     }));
   }
 
-  if (installationClass === 'III' && !isMachineryRoom(currentState) && !isOutdoor(currentState)) {
+  if (installationClass === 'III' && ['split-system', 'multi-split'].includes(text(currentState.systemConfiguration))) {
+    const componentLocationConfirmed = text(currentState.splitClassIIIComponentLocationConfirmed);
+    if (componentLocationConfirmed === 'yes') {
+      // The indoor-unit room is assessed separately; class III is supported by
+      // an explicit confirmation about the location of all refrigerant-containing parts.
+    } else if (componentLocationConfirmed === 'no') {
+      requirements.push(consistencyRequirement({
+        id: 'state-consistency.class-iii-location',
+        title: 'Klasse III mit Komponentenstandort abgleichen',
+        requirement: 'Die erforderliche Anordnung aller kältemittelführenden Teile im Maschinenraum oder im Freien ist nicht bestätigt.',
+        measure: 'Anlagenkonzept prüfen und entweder die Komponentenstandorte korrigieren oder eine zutreffende Aufstellungsort-Klasse wählen.'
+      }));
+    } else {
+      requirements.push(consistencyRequirement({
+        id: 'state-consistency.class-iii-location',
+        title: 'Standort aller kältemittelführenden Teile bestätigen',
+        requirement: 'Bei Split- und Multi-Split-Anlagen lässt sich Klasse III nicht allein aus dem Raum der Inneneinheit beurteilen.',
+        measure: 'Bestätigen, ob alle kältemittelführenden Teile im Maschinenraum oder im Freien angeordnet sind.',
+        status: STATE_CONSISTENCY_STATUS.NOT_ASSESSED,
+        missingInputs: ['splitClassIIIComponentLocationConfirmed']
+      }));
+    }
+  } else if (installationClass === 'III' && !isMachineryRoom(currentState) && !isOutdoor(currentState)) {
     requirements.push(consistencyRequirement({
       id: 'state-consistency.class-iii-location',
       title: 'Klasse III mit Aufstellort abgleichen',
-      requirement: 'Klasse III setzt voraus, dass relevante Anlagenteile beziehungsweise der Verdichter im Maschinenraum oder im Freien angeordnet sind.',
+      requirement: 'Klasse III setzt voraus, dass alle kältemittelführenden Teile im Maschinenraum oder im Freien angeordnet sind.',
       measure: 'Aufstellort, Maschinenraum-Angabe oder Aufstellungsort-Klassifikation fachlich angleichen.'
     }));
   }
