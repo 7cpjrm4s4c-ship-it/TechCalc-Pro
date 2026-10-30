@@ -65,12 +65,18 @@ export function validateAssessmentInput(currentState = {}) {
   addRequiredTextIssue(issues, effectiveState, 'refrigerantId');
   addPositiveNumberIssue(issues, effectiveState, 'chargeKg');
   addPositiveNumberIssue(issues, effectiveState, 'roomVolumeM3');
-  addRequiredTextIssue(issues, effectiveState, 'installationLocation');
-  addRequiredTextIssue(issues, effectiveState, 'installationClass');
-  addRequiredTextIssue(issues, effectiveState, 'accessArea');
-  addRequiredTextIssue(issues, effectiveState, 'usageType');
-  addRequiredTextIssue(issues, effectiveState, 'applicationType');
-  addRequiredTextIssue(issues, effectiveState, 'locationLevel');
+  if (['split-system', 'multi-split'].includes(effectiveState.systemConfiguration)) {
+    addRequiredTextIssue(issues, currentState, 'indoorUnitLocation');
+  } else {
+    addRequiredTextIssue(issues, effectiveState, 'installationLocation');
+  }
+  if (hasValue(effectiveState.installationLocation)) {
+    addRequiredTextIssue(issues, effectiveState, 'installationClass');
+    addRequiredTextIssue(issues, effectiveState, 'accessArea');
+    addRequiredTextIssue(issues, effectiveState, 'usageType');
+    addRequiredTextIssue(issues, effectiveState, 'applicationType');
+    addRequiredTextIssue(issues, effectiveState, 'locationLevel');
+  }
   addRequiredTextIssue(issues, effectiveState, 'ventilationType');
   if (isHumanComfortApplication(effectiveState)) {
     addPositiveNumberIssue(issues, effectiveState, 'floorAreaM2');
