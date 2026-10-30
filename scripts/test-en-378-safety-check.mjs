@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 
 import { reportSections } from '../core/pdf/pdfDataMapping.js';
-import { calculate, validateAssessmentInput } from '../modules/en-378-safety-check/logic.js';
+import { calculate, deriveInstallationLocation, normalizeEN378AssessmentState, validateAssessmentInput } from '../modules/en-378-safety-check/logic.js';
 import { buildEN378SafetyCheckReportDto } from '../modules/en-378-safety-check/reportAdapter.js';
 import {
   buildEN378StateFromFGasesSnapshot,
@@ -34,6 +34,11 @@ assert.ok(rejected.importErrors.includes('snapshot:unsupported-type'));
 const incompleteValidation = validateAssessmentInput(imported);
 assert.equal(incompleteValidation.isValid, false);
 assert.ok(incompleteValidation.issues.includes('roomVolumeM3:required'));
+
+assert.equal(deriveInstallationLocation({ systemConfiguration: 'split-system', indoorUnitLocation: 'occupied-space', installationLocation: 'outdoor' }), 'occupied-space');
+assert.equal(deriveInstallationLocation({ systemConfiguration: 'split-system', indoorUnitLocation: '', installationLocation: 'outdoor' }), '');
+assert.equal(deriveInstallationLocation({ systemConfiguration: 'single-location', installationLocation: 'outdoor' }), 'outdoor');
+assert.equal(normalizeEN378AssessmentState({ systemConfiguration: 'split-system', indoorUnitLocation: 'technical-room', installationLocation: 'outdoor' }).installationLocation, 'technical-room');
 
 const completeState = {
   ...imported,
