@@ -105,6 +105,25 @@ const completeState = {
 const completeValidation = validateAssessmentInput(completeState);
 assert.equal(completeValidation.isValid, true);
 
+// Offene Plausibilitätsprüfungen müssen sich bis zum Gesamtergebnis fortsetzen
+// und dürfen bei ansonsten vollständigen Pflichtfeldern nicht als akzeptabel gelten.
+const splitClassIIOpenState = {
+  ...completeState,
+  systemConfiguration: 'split-system',
+  indoorUnitLocation: 'technical-room',
+  installationLocation: 'technical-room',
+  installationClass: 'II',
+  splitClassIIComponentLocationConfirmed: '',
+  isOutdoorPublicAccessible: 'no'
+};
+const splitClassIIOpenCalculation = calculate(splitClassIIOpenState);
+assert.equal(splitClassIIOpenCalculation.inputComplete, true);
+assert.equal(splitClassIIOpenCalculation.stateConsistencyAssessment.status, 'not-assessed');
+assert.notEqual(splitClassIIOpenCalculation.status, 'acceptable');
+assert.equal(splitClassIIOpenCalculation.status, 'ready-for-assessment');
+assert.ok(splitClassIIOpenCalculation.plannerGuidance.openPointCount > 0);
+assert.ok(splitClassIIOpenCalculation.plannerGuidance.missingInputs.includes('Standort von Verdichter und Druckbehältern'));
+
 const calculation = calculate(completeState);
 assert.equal(calculation.status, 'measures-required');
 assert.equal(calculation.inputComplete, true);
