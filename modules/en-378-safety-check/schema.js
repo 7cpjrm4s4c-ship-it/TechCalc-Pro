@@ -12,6 +12,22 @@ const needsMountingType = state => isHumanComfort(state) && state.isFactorySeale
 const needsExplosionEquipment = state => isMachineryRoom(state) && ['R-32', 'R32', 'HFKW-32', 'R-717', 'R717', 'R-290', 'R290'].includes(String(state.refrigerantId || ''));
 const needsLegacyAccessCategoryField = state => !accessCategoryByAccessArea[state.accessArea] && Boolean(state.accessCategory);
 
+const systemConfigurationOptions = Object.freeze([
+  option('', 'Bitte Anlagenart auswählen'),
+  option('single-location', 'Kälteanlage mit Komponenten an einem Aufstellort'),
+  option('split-system', 'Splitgerät mit Außen- und Inneneinheit'),
+  option('multi-split', 'Multi-Split-Anlage mit mehreren Inneneinheiten'),
+  option('other', 'Andere Anlagenkonfiguration')
+]);
+const indoorUnitLocationOptions = Object.freeze([
+  option('', 'Bitte Raum der Inneneinheit auswählen'),
+  option('occupied-space', 'Personen-Aufenthaltsbereich'),
+  option('technical-room', 'Technischer Raum, kein Maschinenraum'),
+  option('machinery-room', 'Maschinenraum'),
+  option('other', 'Anderer Innenbereich')
+]);
+const isSplitConfiguration = state => ['split-system', 'multi-split'].includes(state.systemConfiguration);
+
 const installationLocationOptions = Object.freeze([
   option('', 'Bitte Aufstellort auswählen'), option('occupied-space', 'Personen-Aufenthaltsbereich'), option('technical-room', 'Technischer Raum'), option('machinery-room', 'Maschinenraum'), option('outdoor', 'Im Freien (Außenaufstellung)')
 ]);
@@ -58,6 +74,9 @@ const schema = defineFormSchema({
     { key: 'importStatusMessage', label: 'Importstatus', type: FIELD_TYPES.TEXT, readonly: true, visibleWhen: state => Boolean(state.importStatusMessage) },
     { key: 'refrigerantId', label: 'Kältemittel', type: FIELD_TYPES.SELECT, options: [] },
     { key: 'chargeKg', label: 'Füllmenge', type: FIELD_TYPES.DECIMAL, unit: 'kg' },
+    { key: 'systemConfiguration', label: 'Anlagenkonfiguration', type: FIELD_TYPES.SELECT, options: systemConfigurationOptions },
+    { key: 'indoorUnitLocation', label: 'Aufstellbereich der Inneneinheit', type: FIELD_TYPES.SELECT, options: indoorUnitLocationOptions, visibleWhen: isSplitConfiguration },
+    { key: 'splitLocationInfo', label: 'Hinweis zur Aufstellortableitung', type: FIELD_TYPES.NOTICE, text: 'Bei Split- und Multi-Split-Anlagen wird der angegebene Bereich der Inneneinheit als maßgeblicher Innenbereich für die weitere Prüfung verwendet. Die Außenaufstellung bleibt für zusätzliche Anforderungen relevant. Eine normative Anlagenklassifikation wird daraus nicht automatisch abgeleitet.', tone: 'compact', visibleWhen: isSplitConfiguration },
     { key: 'roomVolumeM3', label: 'Raumvolumen des maßgeblichen Aufstellbereichs (EN 378-1, Anhang C)', type: FIELD_TYPES.DECIMAL, unit: 'm³', visibleWhen: state => Boolean(state.installationLocation) },
     { key: 'installationLocation', label: 'Aufstellort der Kälteanlage / kältemittelführenden Komponenten (EN 378-1, 4.3)', type: FIELD_TYPES.SELECT, options: installationLocationOptions },
     { key: 'installationClass', label: 'Klassifikation des Aufstellungsorts (EN 378-1)', type: FIELD_TYPES.SELECT, options: installationClassOptions, visibleWhen: state => Boolean(state.installationLocation) },
@@ -96,6 +115,7 @@ const schema = defineFormSchema({
   ],
   groups: [
     { title: 'Importierter Anlagenstand', fields: ['importedSystemName', 'importFGasesSystem', 'fGasesSnapshotId', 'importNotice', 'importStatusMessage', 'refrigerantId', 'chargeKg'], columns: 2, accent: 'blue' },
+    { title: 'Anlagenkonfiguration', fields: ['systemConfiguration', 'indoorUnitLocation', 'splitLocationInfo'], columns: 2, accent: 'blue' },
     { title: 'Anwendungsfall und Aufstellort – DIN EN 378-1, Abschnitt 4.3', fields: ['installationLocation', 'roomVolumeM3', 'floorAreaM2', 'installationClass', 'accessArea', 'accessCategoryInfo', 'accessCategory', 'usageType', 'applicationType', 'locationLevel'], columns: 2, accent: 'blue' },
     { title: 'Anwendungsabhängige Prüffragen – DIN EN 378-1, Anhang C', fields: ['occupantDensityBelowOnePer10m2', 'hasEmergencyExits', 'isPermanentlySealedSorptionSystem', 'usesAlternativeRiskManagement', 'alternativeRiskManagementInfo', 'isFactorySealed', 'mountingType'], columns: 2, accent: 'blue' },
     { title: 'Schutzmaßnahmen – DIN EN 378-3, Abschnitte 6.3, 7.3 und 9; DIN EN 378-1, Anhang C.3', fields: ['ventilationType', 'limitInfo', 'hasGasWarningSystem', 'hasMachineryRoom', 'hasMechanicalVentilation', 'mechanicalVentilationMode', 'hasEmergencyVentilation', 'hasEmergencyStopOutside', 'hasEmergencyStopInside', 'hasEmergencyLighting', 'hasDetector', 'hasAlarm', 'hasIndependentAlarmPower', 'hasSafetyShutoffValves', 'hasVentilationOpenings', 'hasExplosionProtectedElectricalEquipment', 'isOutdoorPublicAccessible', 'additionalSafetyMeasures'], columns: 2, accent: 'blue' }
