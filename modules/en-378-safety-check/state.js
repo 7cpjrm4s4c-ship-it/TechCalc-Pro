@@ -21,6 +21,8 @@ export const initialState = Object.freeze({
   importedSystemName: '',
   refrigerantId: '',
   chargeKg: '',
+  systemConfiguration: '',
+  indoorUnitLocation: '',
   roomVolumeM3: '',
   installationLocation: '',
   installationClass: '',
