@@ -64,6 +64,11 @@ const mechanicalVentilationModeOptions = Object.freeze([
   option('continuous', 'Dauerbetrieb'),
   option('detector-controlled', 'Detektorgesteuerter Betrieb')
 ]);
+const splitClassIIComponentLocationOptions = Object.freeze([
+  option('', 'Bitte Komponentenstandort bestätigen'),
+  option('yes', 'Ja – Verdichter und Druckbehälter im Maschinenraum oder im Freien'),
+  option('no', 'Nein – diese Anordnung liegt nicht vor')
+]);
 const yesNoOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('yes', 'Ja'), option('no', 'Nein')
 ]);
@@ -84,6 +89,7 @@ const schema = defineFormSchema({
     { key: 'roomVolumeM3', label: 'Raumvolumen des maßgeblichen Aufstellbereichs (EN 378-1, Anhang C)', type: FIELD_TYPES.DECIMAL, unit: 'm³', visibleWhen: state => Boolean(state.installationLocation) || (isSplitConfiguration(state) && Boolean(state.indoorUnitLocation)) },
     { key: 'installationLocation', label: 'Aufstellort der Kälteanlage / kältemittelführenden Komponenten (EN 378-1, 4.3)', type: FIELD_TYPES.SELECT, options: installationLocationOptions, visibleWhen: state => !isSplitConfiguration(state) },
     { key: 'installationClass', label: 'Klassifikation des Aufstellungsorts (EN 378-1)', type: FIELD_TYPES.SELECT, options: installationClassOptions, visibleWhen: state => Boolean(state.installationLocation) || (isSplitConfiguration(state) && Boolean(state.indoorUnitLocation)) },
+    { key: 'splitClassIIComponentLocationConfirmed', label: 'Standort von Verdichter und Druckbehältern', type: FIELD_TYPES.SELECT, options: splitClassIIComponentLocationOptions, visibleWhen: state => isSplitConfiguration(state) && state.installationClass === 'II' },
     { key: 'accessArea', label: 'Zugangsbereich (EN 378-1, Kategorie a/b/c)', type: FIELD_TYPES.SELECT, options: accessAreaOptions, visibleWhen: state => Boolean(state.installationLocation) || (isSplitConfiguration(state) && Boolean(state.indoorUnitLocation)) },
     { key: 'accessCategoryInfo', label: 'Hinweis zur Zugangskategorie', type: FIELD_TYPES.NOTICE, text: 'Die Kategorie des Zugangsbereichs wird aus dem gewählten Zugangsbereich abgeleitet und muss nicht zusätzlich ausgewählt werden.', tone: 'compact', visibleWhen: state => Boolean(state.accessArea) },
     { key: 'accessCategory', label: 'Kategorie des Zugangsbereichs', type: FIELD_TYPES.SELECT, options: accessCategoryOptions, visibleWhen: needsLegacyAccessCategoryField },
@@ -121,7 +127,7 @@ const schema = defineFormSchema({
   groups: [
     { title: 'Importierter Anlagenstand', fields: ['importedSystemName', 'importFGasesSystem', 'fGasesSnapshotId', 'importNotice', 'importStatusMessage', 'refrigerantId', 'chargeKg'], columns: 2, accent: 'blue' },
     { title: 'Anlagenkonfiguration', fields: ['systemConfiguration', 'indoorUnitLocation', 'splitLocationInfo'], columns: 2, accent: 'blue' },
-    { title: 'Anwendungsfall und Aufstellort – DIN EN 378-1, Abschnitt 4.3', fields: ['installationLocation', 'roomVolumeM3', 'floorAreaM2', 'installationClass', 'accessArea', 'accessCategoryInfo', 'accessCategory', 'usageType', 'applicationType', 'locationLevel'], columns: 2, accent: 'blue' },
+    { title: 'Anwendungsfall und Aufstellort – DIN EN 378-1, Abschnitt 4.3', fields: ['installationLocation', 'roomVolumeM3', 'floorAreaM2', 'installationClass', 'splitClassIIComponentLocationConfirmed', 'accessArea', 'accessCategoryInfo', 'accessCategory', 'usageType', 'applicationType', 'locationLevel'], columns: 2, accent: 'blue' },
     { title: 'Anwendungsabhängige Prüffragen – DIN EN 378-1, Anhang C', fields: ['occupantDensityBelowOnePer10m2', 'occupantDensityInfo', 'hasEmergencyExits', 'isPermanentlySealedSorptionSystem', 'usesAlternativeRiskManagement', 'alternativeRiskManagementInfo', 'isFactorySealed', 'mountingType'], columns: 2, accent: 'blue' },
     { title: 'Schutzmaßnahmen – DIN EN 378-3, Abschnitte 6.3, 7.3 und 9; DIN EN 378-1, Anhang C.3', fields: ['ventilationType', 'limitInfo', 'hasGasWarningSystem', 'hasMachineryRoom', 'hasMechanicalVentilation', 'mechanicalVentilationMode', 'hasEmergencyVentilation', 'hasEmergencyStopOutside', 'hasEmergencyStopInside', 'hasEmergencyLighting', 'hasDetector', 'hasAlarm', 'hasIndependentAlarmPower', 'hasSafetyShutoffValves', 'hasVentilationOpenings', 'hasExplosionProtectedElectricalEquipment', 'isOutdoorPublicAccessible', 'additionalSafetyMeasures'], columns: 2, accent: 'blue' }
   ]
