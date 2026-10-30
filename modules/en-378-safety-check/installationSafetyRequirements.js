@@ -99,7 +99,7 @@ export function calculateDetectorPreset({ safetyData } = {}) {
 function buildArrangementRequirements(state, safetyData) {
   const requirements = [];
   const flammable = isFlammable(safetyData?.flammabilityClass);
-  if (state.installationLocation === 'outdoor') {
+  if (state.installationLocation === 'outdoor' || ['split-system', 'multi-split'].includes(state.systemConfiguration)) {
     requirements.push(required({
       id: 'outdoor.prevent-refrigerant-entry',
       category: 'location',
