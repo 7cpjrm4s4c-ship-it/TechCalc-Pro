@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 
 import { reportSections } from '../core/pdf/pdfDataMapping.js';
 import { calculate, deriveInstallationLocation, normalizeEN378AssessmentState, validateAssessmentInput } from '../modules/en-378-safety-check/logic.js';
+import { assessStateConsistency } from '../modules/en-378-safety-check/stateConsistency.js';
 import { assessChargeLimit } from '../modules/en-378-safety-check/chargeLimitCalculation.js';
 import { buildEN378SafetyCheckReportDto } from '../modules/en-378-safety-check/reportAdapter.js';
 import {
@@ -42,6 +43,21 @@ assert.equal(deriveInstallationLocation({ systemConfiguration: 'split-system', i
 assert.equal(deriveInstallationLocation({ systemConfiguration: 'single-location', installationLocation: 'outdoor' }), 'outdoor');
 assert.equal(deriveInstallationLocation({ systemConfiguration: 'single-location', installationLocation: 'other' }), 'other');
 assert.equal(normalizeEN378AssessmentState({ systemConfiguration: 'split-system', indoorUnitLocation: 'technical-room', installationLocation: 'outdoor' }).installationLocation, 'technical-room');
+
+// Bei Split-Anlagen darf Klasse II nicht allein anhand des Innenraums als
+// nicht erfüllt bewertet werden. Ohne Komponentenstandort bleibt die Prüfung offen.
+const splitClassIIBase = {
+  systemConfiguration: 'split-system',
+  indoorUnitLocation: 'technical-room',
+  installationLocation: 'technical-room',
+  installationClass: 'II'
+};
+const splitClassIIUnconfirmed = assessStateConsistency(splitClassIIBase);
+assert.equal(splitClassIIUnconfirmed.status, 'not-assessed');
+assert.equal(splitClassIIUnconfirmed.requirements[0].status, 'not-assessed');
+assert.ok(splitClassIIUnconfirmed.requirements[0].missingInputs.includes('splitClassIIComponentLocationConfirmed'));
+assert.equal(assessStateConsistency({ ...splitClassIIBase, splitClassIIComponentLocationConfirmed: 'yes' }).status, 'passed');
+assert.equal(assessStateConsistency({ ...splitClassIIBase, splitClassIIComponentLocationConfirmed: 'no' }).status, 'failed');
 
 // Personendichte darf nicht stillschweigend als "Nein" interpretiert werden,
 // wenn sie den Grenzwert nach EN 378-1, Anhang C, Tabelle C.2 beeinflusst.
