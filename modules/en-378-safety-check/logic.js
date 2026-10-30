@@ -28,11 +28,24 @@ export function deriveAccessCategory(currentState = {}) {
   if (derived) return derived;
   return hasValue(currentState.accessCategory) ? String(currentState.accessCategory) : '';
 }
+export function deriveInstallationLocation(currentState = {}) {
+  // For split and multi-split systems, the indoor unit's actual room is the
+  // relevant interior area to assess. Do not infer a normative installation
+  // class or access category from this mapping.
+  if (['split-system', 'multi-split'].includes(currentState.systemConfiguration)) {
+    const indoorLocation = currentState.indoorUnitLocation;
+    if (['occupied-space', 'technical-room', 'machinery-room'].includes(indoorLocation)) return indoorLocation;
+    return '';
+  }
+  return hasValue(currentState.installationLocation) ? String(currentState.installationLocation) : '';
+}
 export function normalizeEN378AssessmentState(currentState = {}) {
+  const installationLocation = deriveInstallationLocation(currentState);
   return Object.freeze({
     ...currentState,
+    installationLocation,
     accessCategory: deriveAccessCategory(currentState),
-    hasMachineryRoom: currentState.installationLocation === 'machinery-room' ? 'yes' : currentState.hasMachineryRoom
+    hasMachineryRoom: installationLocation === 'machinery-room' ? 'yes' : currentState.hasMachineryRoom
   });
 }
 const addRequiredTextIssue = (issues, currentState, key) => {
