@@ -47,6 +47,24 @@ assert.equal(normalizeEN378AssessmentState({ systemConfiguration: 'split-system'
 
 // Bei Split-Anlagen darf Klasse II nicht allein anhand des Innenraums als
 // nicht erfüllt bewertet werden. Ohne Komponentenstandort bleibt die Prüfung offen.
+const splitMissingIndoorLocationValidation = validateAssessmentInput({
+  refrigerantId: 'R32',
+  chargeKg: '2.5',
+  roomVolumeM3: '50',
+  systemConfiguration: 'split-system',
+  indoorUnitLocation: '',
+  installationClass: '',
+  accessArea: '',
+  usageType: '',
+  applicationType: '',
+  locationLevel: '',
+  ventilationType: 'natural'
+});
+assert.ok(splitMissingIndoorLocationValidation.issues.includes('indoorUnitLocation:required'));
+assert.ok(!splitMissingIndoorLocationValidation.issues.includes('installationLocation:required'));
+assert.ok(!splitMissingIndoorLocationValidation.issues.includes('installationClass:required'));
+assert.ok(!splitMissingIndoorLocationValidation.issues.includes('accessArea:required'));
+
 const splitClassIIBase = {
   systemConfiguration: 'split-system',
   indoorUnitLocation: 'technical-room',
