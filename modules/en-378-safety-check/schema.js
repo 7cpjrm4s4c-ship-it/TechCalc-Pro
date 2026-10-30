@@ -29,7 +29,7 @@ const indoorUnitLocationOptions = Object.freeze([
 const isSplitConfiguration = state => ['split-system', 'multi-split'].includes(state.systemConfiguration);
 
 const installationLocationOptions = Object.freeze([
-  option('', 'Bitte Aufstellort auswählen'), option('occupied-space', 'Personen-Aufenthaltsbereich'), option('technical-room', 'Technischer Raum'), option('machinery-room', 'Maschinenraum'), option('outdoor', 'Im Freien (Außenaufstellung)')
+  option('', 'Bitte Aufstellort auswählen'), option('occupied-space', 'Personen-Aufenthaltsbereich'), option('technical-room', 'Technischer Raum'), option('machinery-room', 'Maschinenraum'), option('outdoor', 'Im Freien (Außenaufstellung)'), option('other', 'Anderer Aufstellort – gesondert prüfen')
 ]);
 const installationClassOptions = Object.freeze([
   option('', 'Nicht angegeben – Anlagenkonzept prüfen'),
