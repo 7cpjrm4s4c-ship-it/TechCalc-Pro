@@ -66,8 +66,11 @@ export function validateAssessmentInput(currentState = {}) {
   addPositiveNumberIssue(issues, effectiveState, 'chargeKg');
   addPositiveNumberIssue(issues, effectiveState, 'roomVolumeM3');
   addRequiredTextIssue(issues, effectiveState, 'installationLocation');
+  addRequiredTextIssue(issues, effectiveState, 'installationClass');
   addRequiredTextIssue(issues, effectiveState, 'accessArea');
   addRequiredTextIssue(issues, effectiveState, 'usageType');
+  addRequiredTextIssue(issues, effectiveState, 'applicationType');
+  addRequiredTextIssue(issues, effectiveState, 'locationLevel');
   addRequiredTextIssue(issues, effectiveState, 'ventilationType');
   if (isHumanComfortApplication(effectiveState)) {
     addPositiveNumberIssue(issues, effectiveState, 'floorAreaM2');
