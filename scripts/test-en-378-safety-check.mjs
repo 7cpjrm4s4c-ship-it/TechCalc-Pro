@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 
 import { reportSections } from '../core/pdf/pdfDataMapping.js';
 import { calculate, deriveInstallationLocation, normalizeEN378AssessmentState, validateAssessmentInput } from '../modules/en-378-safety-check/logic.js';
+import { assessChargeLimit } from '../modules/en-378-safety-check/chargeLimitCalculation.js';
 import { buildEN378SafetyCheckReportDto } from '../modules/en-378-safety-check/reportAdapter.js';
 import {
   buildEN378StateFromFGasesSnapshot,
@@ -39,6 +40,23 @@ assert.equal(deriveInstallationLocation({ systemConfiguration: 'split-system', i
 assert.equal(deriveInstallationLocation({ systemConfiguration: 'split-system', indoorUnitLocation: '', installationLocation: 'outdoor' }), '');
 assert.equal(deriveInstallationLocation({ systemConfiguration: 'single-location', installationLocation: 'outdoor' }), 'outdoor');
 assert.equal(normalizeEN378AssessmentState({ systemConfiguration: 'split-system', indoorUnitLocation: 'technical-room', installationLocation: 'outdoor' }).installationLocation, 'technical-room');
+
+// Personendichte darf nicht stillschweigend als "Nein" interpretiert werden,
+// wenn sie den Grenzwert nach EN 378-1, Anhang C, Tabelle C.2 beeinflusst.
+const densityMissingAssessment = assessChargeLimit({
+  refrigerantId: 'R32',
+  chargeKg: '2.5',
+  roomVolumeM3: '50',
+  installationClass: 'II',
+  accessCategory: 'c',
+  applicationType: 'other',
+  locationLevel: 'other',
+  occupantDensityBelowOnePer10m2: '',
+  usesAlternativeRiskManagement: 'no'
+});
+const densityDependentCheck = densityMissingAssessment.checks.find(check => check.id === 'charge-limit.flammability');
+assert.equal(densityDependentCheck.status, 'not-assessed');
+assert.ok(densityDependentCheck.missingInputs.includes('occupantDensityBelowOnePer10m2'));
 
 const completeState = {
   ...imported,
