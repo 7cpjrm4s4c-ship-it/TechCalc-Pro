@@ -96,6 +96,10 @@ export function calculateDetectorPreset({ safetyData } = {}) {
   return round(Math.min(...candidates), 5);
 }
 
+function hasOutdoorUnitOrInstallation(state = {}) {
+  return state.installationLocation === 'outdoor' || ['split-system', 'multi-split'].includes(state.systemConfiguration);
+}
+
 function buildArrangementRequirements(state, safetyData) {
   const requirements = [];
   const flammable = isFlammable(safetyData?.flammabilityClass);
@@ -152,7 +156,7 @@ function buildArrangementRequirements(state, safetyData) {
       priority: 'conditional'
     }));
   }
-  if (flammable && state.installationLocation === 'outdoor') {
+  if (flammable && hasOutdoorUnitOrInstallation(state)) {
     requirements.push(required({
       id: 'outdoor.ignition-sources',
       category: 'location',
@@ -472,7 +476,7 @@ function buildWarningAndInspectionRequirements(state, safetyData) {
       source: SOURCE.warnings
     }));
   }
-  if (state.installationLocation === 'outdoor' && ['3'].includes(safetyData?.flammabilityClass) && numberOrNull(state.chargeKg) > 10) {
+  if (hasOutdoorUnitOrInstallation(state) && ['3'].includes(safetyData?.flammabilityClass) && numberOrNull(state.chargeKg) > 10) {
     requirements.push(required({
       id: 'warning.outdoor-a3-b3-over-10kg',
       category: 'guidance',
