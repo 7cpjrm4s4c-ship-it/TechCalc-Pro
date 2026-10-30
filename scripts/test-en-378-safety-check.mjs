@@ -4,6 +4,7 @@ import { reportSections } from '../core/pdf/pdfDataMapping.js';
 import { calculate, deriveInstallationLocation, normalizeEN378AssessmentState, validateAssessmentInput } from '../modules/en-378-safety-check/logic.js';
 import { assessStateConsistency } from '../modules/en-378-safety-check/stateConsistency.js';
 import { assessChargeLimit } from '../modules/en-378-safety-check/chargeLimitCalculation.js';
+import { assessInstallationSafetyRequirements } from '../modules/en-378-safety-check/installationSafetyRequirements.js';
 import { buildEN378SafetyCheckReportDto } from '../modules/en-378-safety-check/reportAdapter.js';
 import {
   buildEN378StateFromFGasesSnapshot,
@@ -116,6 +117,25 @@ assert.ok(calculation.plannerGuidance.requiredMeasures.length > 0);
 assert.ok(calculation.plannerGuidance.groups.some(group =>
   group.id === 'detection' && group.items.some(item => item.status === 'required')
 ));
+const splitOutdoorState = {
+  ...completeState,
+  systemConfiguration: 'split-system',
+  indoorUnitLocation: 'technical-room',
+  installationLocation: 'technical-room',
+  installationClass: 'II',
+  splitClassIIComponentLocationConfirmed: 'yes',
+  refrigerantId: 'R32',
+  chargeKg: '2.5',
+  isOutdoorPublicAccessible: 'no'
+};
+const splitOutdoorCalculation = calculate(splitOutdoorState);
+const splitOutdoorSafety = assessInstallationSafetyRequirements(
+  splitOutdoorState,
+  splitOutdoorCalculation.chargeLimitAssessment
+);
+assert.ok(splitOutdoorSafety.requirements.some(item => item.id === 'outdoor.ignition-sources'),
+  'Brennbarkeitsbezogene Außenanforderungen müssen auch für Split-Außeneinheiten geprüft werden');
+
 const report = buildEN378SafetyCheckReportDto({ state: completeState, calculation, generatedAt: '2026-08-31T00:00:00.000Z' });
 
 // A1 refrigerant: generic outdoor-location and handover guidance may remain,
