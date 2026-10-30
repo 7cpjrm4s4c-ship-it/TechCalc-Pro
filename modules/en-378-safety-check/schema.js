@@ -32,7 +32,11 @@ const installationLocationOptions = Object.freeze([
   option('', 'Bitte Aufstellort auswählen'), option('occupied-space', 'Personen-Aufenthaltsbereich'), option('technical-room', 'Technischer Raum'), option('machinery-room', 'Maschinenraum'), option('outdoor', 'Im Freien (Außenaufstellung)')
 ]);
 const installationClassOptions = Object.freeze([
-  option('', 'Nicht angegeben'), option('I', 'Klasse I – belüftetes Gehäuse'), option('II', 'Klasse II – Maschinenraum oder im Freien'), option('III', 'Klasse III – Verdichter in Maschinenraum oder im Freien'), option('IV', 'Klasse IV – mechanische Geräte im Personen-Aufenthaltsbereich')
+  option('', 'Nicht angegeben – Anlagenkonzept prüfen'),
+  option('I', 'Klasse I – alle kältemittelführenden Teile im Personen-Aufenthaltsbereich'),
+  option('II', 'Klasse II – Verdichter und Druckbehälter im Maschinenraum oder im Freien'),
+  option('III', 'Klasse III – alle kältemittelführenden Teile im Maschinenraum oder im Freien'),
+  option('IV', 'Klasse IV – kältemittelführende Teile in einem belüfteten Gehäuse')
 ]);
 const accessAreaOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('general-access', 'Allgemeiner Zugang'), option('supervised-access', 'Beaufsichtigter Zugang'), option('authorized-access', 'Nur unterwiesene oder befugte Personen')
@@ -76,7 +80,7 @@ const schema = defineFormSchema({
     { key: 'chargeKg', label: 'Füllmenge', type: FIELD_TYPES.DECIMAL, unit: 'kg' },
     { key: 'systemConfiguration', label: 'Anlagenkonfiguration', type: FIELD_TYPES.SELECT, options: systemConfigurationOptions },
     { key: 'indoorUnitLocation', label: 'Aufstellbereich der Inneneinheit', type: FIELD_TYPES.SELECT, options: indoorUnitLocationOptions, visibleWhen: isSplitConfiguration },
-    { key: 'splitLocationInfo', label: 'Hinweis zur Aufstellortableitung', type: FIELD_TYPES.NOTICE, text: 'Bei Split- und Multi-Split-Anlagen wird der angegebene Bereich der Inneneinheit als maßgeblicher Innenbereich für die weitere Prüfung verwendet. Die Außenaufstellung bleibt für zusätzliche Anforderungen relevant. Eine normative Anlagenklassifikation wird daraus nicht automatisch abgeleitet.', tone: 'compact', visibleWhen: isSplitConfiguration },
+    { key: 'splitLocationInfo', label: 'Hinweis zur Aufstellortableitung', type: FIELD_TYPES.NOTICE, text: 'Bei Split- und Multi-Split-Anlagen wird der angegebene Bereich der Inneneinheit als maßgeblicher Innenbereich für die weitere Prüfung verwendet. Die Außenaufstellung bleibt für zusätzliche Anforderungen relevant. Die Aufstellungsort-Klasse I–IV hängt davon ab, wo sich die kältemittelführenden Teile befinden; sie wird aus der Raumwahl allein nicht zuverlässig abgeleitet und muss anhand des Anlagenkonzepts bestätigt werden.', tone: 'compact', visibleWhen: isSplitConfiguration },
     { key: 'roomVolumeM3', label: 'Raumvolumen des maßgeblichen Aufstellbereichs (EN 378-1, Anhang C)', type: FIELD_TYPES.DECIMAL, unit: 'm³', visibleWhen: state => Boolean(state.installationLocation) || (isSplitConfiguration(state) && Boolean(state.indoorUnitLocation)) },
     { key: 'installationLocation', label: 'Aufstellort der Kälteanlage / kältemittelführenden Komponenten (EN 378-1, 4.3)', type: FIELD_TYPES.SELECT, options: installationLocationOptions, visibleWhen: state => !isSplitConfiguration(state) },
     { key: 'installationClass', label: 'Klassifikation des Aufstellungsorts (EN 378-1)', type: FIELD_TYPES.SELECT, options: installationClassOptions, visibleWhen: state => Boolean(state.installationLocation) || (isSplitConfiguration(state) && Boolean(state.indoorUnitLocation)) },
