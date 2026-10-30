@@ -34,7 +34,7 @@ export function deriveInstallationLocation(currentState = {}) {
   // class or access category from this mapping.
   if (['split-system', 'multi-split'].includes(currentState.systemConfiguration)) {
     const indoorLocation = currentState.indoorUnitLocation;
-    if (['occupied-space', 'technical-room', 'machinery-room'].includes(indoorLocation)) return indoorLocation;
+    if (['occupied-space', 'technical-room', 'machinery-room', 'other'].includes(indoorLocation)) return indoorLocation;
     return '';
   }
   return hasValue(currentState.installationLocation) ? String(currentState.installationLocation) : '';
