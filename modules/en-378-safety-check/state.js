@@ -26,6 +26,7 @@ export const initialState = Object.freeze({
   roomVolumeM3: '',
   installationLocation: '',
   installationClass: '',
+  splitClassIIComponentLocationConfirmed: '',
   accessArea: '',
   accessCategory: '',
   usageType: '',
