@@ -58,6 +58,13 @@ assert.equal(splitClassIIUnconfirmed.requirements[0].status, 'not-assessed');
 assert.ok(splitClassIIUnconfirmed.requirements[0].missingInputs.includes('splitClassIIComponentLocationConfirmed'));
 assert.equal(assessStateConsistency({ ...splitClassIIBase, splitClassIIComponentLocationConfirmed: 'yes' }).status, 'passed');
 assert.equal(assessStateConsistency({ ...splitClassIIBase, splitClassIIComponentLocationConfirmed: 'no' }).status, 'failed');
+const splitClassIIIBase = { ...splitClassIIBase, installationClass: 'III' };
+const splitClassIIIUnconfirmed = assessStateConsistency(splitClassIIIBase);
+assert.equal(splitClassIIIUnconfirmed.status, 'not-assessed');
+assert.equal(splitClassIIIUnconfirmed.requirements[0].status, 'not-assessed');
+assert.ok(splitClassIIIUnconfirmed.requirements[0].missingInputs.includes('splitClassIIIComponentLocationConfirmed'));
+assert.equal(assessStateConsistency({ ...splitClassIIIBase, splitClassIIIComponentLocationConfirmed: 'yes' }).status, 'passed');
+assert.equal(assessStateConsistency({ ...splitClassIIIBase, splitClassIIIComponentLocationConfirmed: 'no' }).status, 'failed');
 
 // Personendichte darf nicht stillschweigend als "Nein" interpretiert werden,
 // wenn sie den Grenzwert nach EN 378-1, Anhang C, Tabelle C.2 beeinflusst.
