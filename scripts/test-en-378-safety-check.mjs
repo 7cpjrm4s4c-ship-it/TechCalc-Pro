@@ -38,7 +38,9 @@ assert.ok(incompleteValidation.issues.includes('roomVolumeM3:required'));
 
 assert.equal(deriveInstallationLocation({ systemConfiguration: 'split-system', indoorUnitLocation: 'occupied-space', installationLocation: 'outdoor' }), 'occupied-space');
 assert.equal(deriveInstallationLocation({ systemConfiguration: 'split-system', indoorUnitLocation: '', installationLocation: 'outdoor' }), '');
+assert.equal(deriveInstallationLocation({ systemConfiguration: 'split-system', indoorUnitLocation: 'other', installationLocation: 'outdoor' }), 'other');
 assert.equal(deriveInstallationLocation({ systemConfiguration: 'single-location', installationLocation: 'outdoor' }), 'outdoor');
+assert.equal(deriveInstallationLocation({ systemConfiguration: 'single-location', installationLocation: 'other' }), 'other');
 assert.equal(normalizeEN378AssessmentState({ systemConfiguration: 'split-system', indoorUnitLocation: 'technical-room', installationLocation: 'outdoor' }).installationLocation, 'technical-room');
 
 // Personendichte darf nicht stillschweigend als "Nein" interpretiert werden,
