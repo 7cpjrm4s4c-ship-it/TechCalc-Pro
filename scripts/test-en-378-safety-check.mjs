@@ -102,6 +102,53 @@ const densityDependentCheck = densityMissingAssessment.checks.find(check => chec
 assert.equal(densityDependentCheck.status, 'not-assessed');
 assert.ok(densityDependentCheck.missingInputs.includes('occupantDensityBelowOnePer10m2'));
 
+// Bedingte Antworten dürfen nur die tatsächlich anwendbare Tabellenvariante öffnen:
+ // Kategorie a erfordert eine explizite Sorptionsanlagen-Angabe; bei Kategorie c
+ // führt ein bestätigtes Fehlen von Notausgängen dagegen zum regulären 10-kg-Pfad.
+const sorptionMissingAssessment = assessChargeLimit({
+  refrigerantId: 'R717',
+  chargeKg: '2',
+  roomVolumeM3: '50',
+  installationClass: 'I',
+  accessCategory: 'a',
+  applicationType: 'other',
+  locationLevel: 'other',
+  isPermanentlySealedSorptionSystem: ''
+});
+const sorptionCheck = sorptionMissingAssessment.checks.find(check => check.id === 'charge-limit.toxicity');
+assert.equal(sorptionCheck.status, 'not-assessed');
+assert.ok(sorptionCheck.missingInputs.includes('isPermanentlySealedSorptionSystem'));
+
+const exitsMissingAssessment = assessChargeLimit({
+  refrigerantId: 'R717',
+  chargeKg: '8',
+  roomVolumeM3: '50',
+  installationClass: 'I',
+  accessCategory: 'c',
+  applicationType: 'other',
+  locationLevel: 'other',
+  occupantDensityBelowOnePer10m2: 'yes',
+  hasEmergencyExits: ''
+});
+assert.equal(exitsMissingAssessment.checks.find(check => check.id === 'charge-limit.toxicity').status, 'not-assessed');
+
+const noEmergencyExitsAssessment = assessChargeLimit({
+  refrigerantId: 'R717',
+  chargeKg: '8',
+  roomVolumeM3: '50',
+  installationClass: 'I',
+  accessCategory: 'c',
+  applicationType: 'other',
+  locationLevel: 'other',
+  occupantDensityBelowOnePer10m2: 'yes',
+  hasEmergencyExits: 'no',
+  usesAlternativeRiskManagement: 'no'
+});
+const noEmergencyExitsCheck = noEmergencyExitsAssessment.checks.find(check => check.id === 'charge-limit.toxicity');
+assert.equal(noEmergencyExitsCheck.status, 'passed');
+assert.equal(noEmergencyExitsCheck.maximumChargeKg, 10);
+assert.equal(noEmergencyExitsCheck.rule, 'fixed-limit-10kg');
+
 const completeState = {
   ...imported,
   roomVolumeM3: '50',
