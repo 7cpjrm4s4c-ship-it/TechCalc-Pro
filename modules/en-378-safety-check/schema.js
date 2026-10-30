@@ -13,7 +13,7 @@ const needsExplosionEquipment = state => isMachineryRoom(state) && ['R-32', 'R32
 const needsLegacyAccessCategoryField = state => !accessCategoryByAccessArea[state.accessArea] && Boolean(state.accessCategory);
 
 const installationLocationOptions = Object.freeze([
-  option('', 'Nicht angegeben'), option('occupied-space', 'Aufenthaltsbereich'), option('technical-room', 'Technischer Raum'), option('machinery-room', 'Maschinenraum'), option('outdoor', 'Außenaufstellung')
+  option('', 'Bitte Aufstellort auswählen'), option('occupied-space', 'Personen-Aufenthaltsbereich'), option('technical-room', 'Technischer Raum'), option('machinery-room', 'Maschinenraum'), option('outdoor', 'Im Freien (Außenaufstellung)')
 ]);
 const installationClassOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('I', 'Klasse I – belüftetes Gehäuse'), option('II', 'Klasse II – Maschinenraum oder im Freien'), option('III', 'Klasse III – Verdichter in Maschinenraum oder im Freien'), option('IV', 'Klasse IV – mechanische Geräte im Personen-Aufenthaltsbereich')
@@ -58,21 +58,21 @@ const schema = defineFormSchema({
     { key: 'importStatusMessage', label: 'Importstatus', type: FIELD_TYPES.TEXT, readonly: true, visibleWhen: state => Boolean(state.importStatusMessage) },
     { key: 'refrigerantId', label: 'Kältemittel', type: FIELD_TYPES.SELECT, options: [] },
     { key: 'chargeKg', label: 'Füllmenge', type: FIELD_TYPES.DECIMAL, unit: 'kg' },
-    { key: 'roomVolumeM3', label: 'Raumvolumen', type: FIELD_TYPES.DECIMAL, unit: 'm³' },
-    { key: 'installationLocation', label: 'Aufstellort', type: FIELD_TYPES.SELECT, options: installationLocationOptions },
-    { key: 'installationClass', label: 'Aufstellungsort-Klassifikation', type: FIELD_TYPES.SELECT, options: installationClassOptions },
-    { key: 'accessArea', label: 'Zugangsbereich', type: FIELD_TYPES.SELECT, options: accessAreaOptions },
+    { key: 'roomVolumeM3', label: 'Raumvolumen des maßgeblichen Aufstellbereichs (EN 378-1, Anhang C)', type: FIELD_TYPES.DECIMAL, unit: 'm³', visibleWhen: state => Boolean(state.installationLocation) },
+    { key: 'installationLocation', label: 'Aufstellort der Kälteanlage / kältemittelführenden Komponenten (EN 378-1, 4.3)', type: FIELD_TYPES.SELECT, options: installationLocationOptions },
+    { key: 'installationClass', label: 'Klassifikation des Aufstellungsorts (EN 378-1)', type: FIELD_TYPES.SELECT, options: installationClassOptions, visibleWhen: state => Boolean(state.installationLocation) },
+    { key: 'accessArea', label: 'Zugangsbereich (EN 378-1, Kategorie a/b/c)', type: FIELD_TYPES.SELECT, options: accessAreaOptions, visibleWhen: state => Boolean(state.installationLocation) },
     { key: 'accessCategoryInfo', label: 'Hinweis zur Zugangskategorie', type: FIELD_TYPES.NOTICE, text: 'Die Kategorie des Zugangsbereichs wird aus dem gewählten Zugangsbereich abgeleitet und muss nicht zusätzlich ausgewählt werden.', tone: 'compact', visibleWhen: state => Boolean(state.accessArea) },
     { key: 'accessCategory', label: 'Kategorie des Zugangsbereichs', type: FIELD_TYPES.SELECT, options: accessCategoryOptions, visibleWhen: needsLegacyAccessCategoryField },
-    { key: 'usageType', label: 'Nutzung', type: FIELD_TYPES.SELECT, options: usageTypeOptions },
-    { key: 'applicationType', label: 'Anwendungsart', type: FIELD_TYPES.SELECT, options: applicationTypeOptions },
-    { key: 'locationLevel', label: 'Geschoss oder Lage', type: FIELD_TYPES.SELECT, options: locationLevelOptions },
+    { key: 'usageType', label: 'Nutzung des Aufstellbereichs', type: FIELD_TYPES.SELECT, options: usageTypeOptions, visibleWhen: state => Boolean(state.installationLocation) },
+    { key: 'applicationType', label: 'Anwendung (menschlicher Komfort / andere Anwendung)', type: FIELD_TYPES.SELECT, options: applicationTypeOptions, visibleWhen: state => Boolean(state.installationLocation) },
+    { key: 'locationLevel', label: 'Geschoss oder Lage des Aufstellbereichs', type: FIELD_TYPES.SELECT, options: locationLevelOptions, visibleWhen: state => Boolean(state.installationLocation) },
     { key: 'occupantDensityBelowOnePer10m2', label: 'Personendichte kleiner als eine Person je 10 m²', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => ['b', 'c'].includes(accessCategoryByAccessArea[state.accessArea] || state.accessCategory) },
     { key: 'hasEmergencyExits', label: 'Notausgänge vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => (accessCategoryByAccessArea[state.accessArea] || state.accessCategory) === 'c' },
     { key: 'isPermanentlySealedSorptionSystem', label: 'Dauerhaft geschlossene Sorptionsanlage', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => (accessCategoryByAccessArea[state.accessArea] || state.accessCategory) === 'a' },
     { key: 'usesAlternativeRiskManagement', label: 'Alternative Vorkehrungen nach Anhang C.3 vorgesehen', type: FIELD_TYPES.SELECT, options: yesNoOptions },
     { key: 'alternativeRiskManagementInfo', label: 'Hinweis zu alternativen Vorkehrungen', type: FIELD_TYPES.NOTICE, text: 'Alternative Vorkehrungen nach Anhang C.3 werden nur bewertet, wenn dieser Pfad vorgesehen ist oder eine Grenzwertüberschreitung dies erfordert. Je nach Konzentration können eine oder zwei Maßnahmen erforderlich sein.', tone: 'compact', visibleWhen: usesAlternativeRiskManagement },
-    { key: 'floorAreaM2', label: 'Grundfläche des Aufstellraums', type: FIELD_TYPES.DECIMAL, unit: 'm²', format: value => value === '' || value === null || value === undefined ? '' : numberService.format(value, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
+    { key: 'floorAreaM2', label: 'Grundfläche des Aufstellraums', type: FIELD_TYPES.DECIMAL, unit: 'm²', visibleWhen: state => Boolean(state.installationLocation), format: value => value === '' || value === null || value === undefined ? '' : numberService.format(value, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
     { key: 'isFactorySealed', label: 'Werkseitig dauerhaft geschlossen', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isHumanComfort },
     { key: 'mountingType', label: 'Montageart', type: FIELD_TYPES.SELECT, options: mountingTypeOptions, visibleWhen: needsMountingType },
     { key: 'ventilationType', label: 'Lüftung', type: FIELD_TYPES.SELECT, options: ventilationTypeOptions },
@@ -96,9 +96,9 @@ const schema = defineFormSchema({
   ],
   groups: [
     { title: 'Importierter Anlagenstand', fields: ['importedSystemName', 'importFGasesSystem', 'fGasesSnapshotId', 'importNotice', 'importStatusMessage', 'refrigerantId', 'chargeKg'], columns: 2, accent: 'blue' },
-    { title: 'Raum und Aufstellung', fields: ['roomVolumeM3', 'floorAreaM2', 'installationLocation', 'installationClass', 'accessArea', 'accessCategoryInfo', 'accessCategory', 'usageType', 'applicationType', 'locationLevel'], columns: 2, accent: 'blue' },
-    { title: 'Detailfragen zur Füllmengenbewertung', fields: ['occupantDensityBelowOnePer10m2', 'hasEmergencyExits', 'isPermanentlySealedSorptionSystem', 'usesAlternativeRiskManagement', 'alternativeRiskManagementInfo', 'isFactorySealed', 'mountingType'], columns: 2, accent: 'blue' },
-    { title: 'Lüftung und Sicherheitskomponenten', fields: ['ventilationType', 'limitInfo', 'hasGasWarningSystem', 'hasMachineryRoom', 'hasMechanicalVentilation', 'mechanicalVentilationMode', 'hasEmergencyVentilation', 'hasEmergencyStopOutside', 'hasEmergencyStopInside', 'hasEmergencyLighting', 'hasDetector', 'hasAlarm', 'hasIndependentAlarmPower', 'hasSafetyShutoffValves', 'hasVentilationOpenings', 'hasExplosionProtectedElectricalEquipment', 'isOutdoorPublicAccessible', 'additionalSafetyMeasures'], columns: 2, accent: 'blue' }
+    { title: 'Anwendungsfall und Aufstellort – DIN EN 378-1, Abschnitt 4.3', fields: ['installationLocation', 'roomVolumeM3', 'floorAreaM2', 'installationClass', 'accessArea', 'accessCategoryInfo', 'accessCategory', 'usageType', 'applicationType', 'locationLevel'], columns: 2, accent: 'blue' },
+    { title: 'Anwendungsabhängige Prüffragen – DIN EN 378-1, Anhang C', fields: ['occupantDensityBelowOnePer10m2', 'hasEmergencyExits', 'isPermanentlySealedSorptionSystem', 'usesAlternativeRiskManagement', 'alternativeRiskManagementInfo', 'isFactorySealed', 'mountingType'], columns: 2, accent: 'blue' },
+    { title: 'Schutzmaßnahmen – DIN EN 378-3, Abschnitte 6.3, 7.3 und 9; DIN EN 378-1, Anhang C.3', fields: ['ventilationType', 'limitInfo', 'hasGasWarningSystem', 'hasMachineryRoom', 'hasMechanicalVentilation', 'mechanicalVentilationMode', 'hasEmergencyVentilation', 'hasEmergencyStopOutside', 'hasEmergencyStopInside', 'hasEmergencyLighting', 'hasDetector', 'hasAlarm', 'hasIndependentAlarmPower', 'hasSafetyShutoffValves', 'hasVentilationOpenings', 'hasExplosionProtectedElectricalEquipment', 'isOutdoorPublicAccessible', 'additionalSafetyMeasures'], columns: 2, accent: 'blue' }
   ]
 });
 
