@@ -197,6 +197,9 @@ function toxicityLimitByTableC1({ safetyData, chargeKg, roomVolumeM3, accessCate
     return noLimit('charge-limit.toxicity', 'chargeLimit', 'Tabelle C.1: keine Begrenzung der Füllmenge.', SOURCE_EN_378_1_C1);
   }
   if (accessCategory === 'a') {
+    if (!['yes', 'no'].includes(String(isPermanentlySealedSorptionSystem ?? ''))) {
+      return notAssessed('charge-limit.toxicity', 'chargeLimit', 'Für Zugangsbereich a muss geklärt werden, ob eine dauerhaft geschlossene Sorptionsanlage vorliegt.', SOURCE_EN_378_1_C1, ['isPermanentlySealedSorptionSystem']);
+    }
     if (yes(isPermanentlySealedSorptionSystem)) {
       return assessedLimit({ id: 'charge-limit.toxicity', category: 'chargeLimit', chargeKg, maximumChargeKg: Math.min(concentrationBasedLimit, 2.5), rule: 'sorption-system-toxicity-limit-and-2_5kg-cap', source: SOURCE_EN_378_1_C1 });
     }
@@ -227,8 +230,8 @@ function toxicityLimitByTableC1({ safetyData, chargeKg, roomVolumeM3, accessCate
     if (installationClass === 'I' && densityLow && yes(hasEmergencyExits)) {
       return assessedLimit({ id: 'charge-limit.toxicity', category: 'chargeLimit', chargeKg, maximumChargeKg: 50, rule: 'fixed-limit-50kg-with-emergency-exits', source: SOURCE_EN_378_1_C1 });
     }
-    if (installationClass === 'I' && densityLow && !yes(hasEmergencyExits)) {
-      return notAssessed('charge-limit.toxicity', 'chargeLimit', 'Für die 50-kg-Grenze müssen vorhandene Notausgänge bestätigt werden.', SOURCE_EN_378_1_C1, ['hasEmergencyExits']);
+    if (installationClass === 'I' && densityLow && !['yes', 'no'].includes(String(hasEmergencyExits ?? ''))) {
+      return notAssessed('charge-limit.toxicity', 'chargeLimit', 'Für die 50-kg-Grenze muss bestätigt werden, ob Notausgänge vorhanden sind.', SOURCE_EN_378_1_C1, ['hasEmergencyExits']);
     }
     if (installationClass === 'I') {
       return assessedLimit({ id: 'charge-limit.toxicity', category: 'chargeLimit', chargeKg, maximumChargeKg: 10, rule: 'fixed-limit-10kg', source: SOURCE_EN_378_1_C1 });
