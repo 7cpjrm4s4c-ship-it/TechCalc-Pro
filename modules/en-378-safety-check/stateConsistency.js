@@ -3,7 +3,8 @@ export const EN_378_STATE_CONSISTENCY_VERSION = 1;
 export const STATE_CONSISTENCY_STATUS = Object.freeze({
   PASSED: 'passed',
   FAILED: 'failed',
-  NOT_APPLICABLE: 'not-applicable'
+  NOT_APPLICABLE: 'not-applicable',
+  NOT_ASSESSED: 'not-assessed'
 });
 
 const SOURCE = Object.freeze({
@@ -26,7 +27,7 @@ function freezeRequirement(requirement) {
   });
 }
 
-function consistencyRequirement({ id, title, requirement, measure, status = STATE_CONSISTENCY_STATUS.FAILED }) {
+function consistencyRequirement({ id, title, requirement, measure, status = STATE_CONSISTENCY_STATUS.FAILED, missingInputs = [] }) {
   return freezeRequirement({
     id,
     category: 'guidance',
@@ -35,7 +36,8 @@ function consistencyRequirement({ id, title, requirement, measure, status = STAT
     measure,
     source: SOURCE,
     status,
-    priority: 'required'
+    missingInputs,
+    priority: status === STATE_CONSISTENCY_STATUS.NOT_ASSESSED ? 'conditional' : 'required'
   });
 }
 
@@ -66,7 +68,29 @@ export function assessStateConsistency(currentState = {}) {
     }));
   }
 
-  if (installationClass === 'II' && !isMachineryRoom(currentState) && !isOutdoor(currentState)) {
+  if (installationClass === 'II' && ['split-system', 'multi-split'].includes(text(currentState.systemConfiguration))) {
+    const componentLocationConfirmed = text(currentState.splitClassIIComponentLocationConfirmed);
+    if (componentLocationConfirmed === 'yes') {
+      // The indoor-unit room is assessed separately; class II is supported by
+      // an explicit confirmation about compressor/pressure-vessel location.
+    } else if (componentLocationConfirmed === 'no') {
+      requirements.push(consistencyRequirement({
+        id: 'state-consistency.class-ii-location',
+        title: 'Klasse II mit Komponentenstandort abgleichen',
+        requirement: 'Für die ausgewählte Klasse II ist die erforderliche Anordnung von Verdichter und Druckbehältern im Maschinenraum oder im Freien nicht bestätigt.',
+        measure: 'Anlagenkonzept prüfen und entweder die Komponentenstandorte korrigieren oder eine zutreffende Aufstellungsort-Klasse wählen.'
+      }));
+    } else {
+      requirements.push(consistencyRequirement({
+        id: 'state-consistency.class-ii-location',
+        title: 'Standort von Verdichter und Druckbehältern bestätigen',
+        requirement: 'Bei Split- und Multi-Split-Anlagen lässt sich die Klasse II nicht allein aus dem Raum der Inneneinheit beurteilen.',
+        measure: 'Bestätigen, ob Verdichter und Druckbehälter im Maschinenraum oder im Freien angeordnet sind.',
+        status: STATE_CONSISTENCY_STATUS.NOT_ASSESSED,
+        missingInputs: ['splitClassIIComponentLocationConfirmed']
+      }));
+    }
+  } else if (installationClass === 'II' && !isMachineryRoom(currentState) && !isOutdoor(currentState)) {
     requirements.push(consistencyRequirement({
       id: 'state-consistency.class-ii-location',
       title: 'Klasse II mit Aufstellort abgleichen',
