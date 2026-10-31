@@ -197,6 +197,9 @@ function toxicityLimitByTableC1({ safetyData, chargeKg, roomVolumeM3, accessCate
     return noLimit('charge-limit.toxicity', 'chargeLimit', 'Tabelle C.1: keine Begrenzung der Füllmenge.', SOURCE_EN_378_1_C1);
   }
   if (accessCategory === 'a') {
+    if (!['yes', 'no'].includes(String(isPermanentlySealedSorptionSystem ?? ''))) {
+      return notAssessed('charge-limit.toxicity', 'chargeLimit', 'Für Zugangsbereich a muss geklärt werden, ob eine dauerhaft geschlossene Sorptionsanlage vorliegt.', SOURCE_EN_378_1_C1, ['isPermanentlySealedSorptionSystem']);
+    }
     if (yes(isPermanentlySealedSorptionSystem)) {
       return assessedLimit({ id: 'charge-limit.toxicity', category: 'chargeLimit', chargeKg, maximumChargeKg: Math.min(concentrationBasedLimit, 2.5), rule: 'sorption-system-toxicity-limit-and-2_5kg-cap', source: SOURCE_EN_378_1_C1 });
     }
@@ -209,17 +212,26 @@ function toxicityLimitByTableC1({ safetyData, chargeKg, roomVolumeM3, accessCate
     if (installationClass === 'I') {
       return assessedLimit({ id: 'charge-limit.toxicity', category: 'chargeLimit', chargeKg, maximumChargeKg: 10, rule: 'fixed-limit-10kg', source: SOURCE_EN_378_1_C1 });
     }
+    if (installationClass === 'II' && !['yes', 'no'].includes(String(occupantDensityBelowOnePer10m2 ?? ''))) {
+      return notAssessed('charge-limit.toxicity', 'chargeLimit', 'Für diese Tabellenkombination muss geklärt werden, ob die Personendichte kleiner als eine Person je 10 m² ist.', SOURCE_EN_378_1_C1, ['occupantDensityBelowOnePer10m2']);
+    }
     if (installationClass === 'II' && densityLow) return noLimit('charge-limit.toxicity', 'chargeLimit', 'Tabelle C.1: keine Begrenzung der Füllmenge.', SOURCE_EN_378_1_C1);
     if (installationClass === 'II') {
       return assessedLimit({ id: 'charge-limit.toxicity', category: 'chargeLimit', chargeKg, maximumChargeKg: 25, rule: 'fixed-limit-25kg', source: SOURCE_EN_378_1_C1 });
     }
   }
   if (accessCategory === 'c') {
+    if (installationClass === 'I' && !['yes', 'no'].includes(String(occupantDensityBelowOnePer10m2 ?? ''))) {
+      return notAssessed('charge-limit.toxicity', 'chargeLimit', 'Für diese Tabellenkombination muss die Personendichte bestätigt werden, da sie die zulässige Füllmenge beeinflusst.', SOURCE_EN_378_1_C1, ['occupantDensityBelowOnePer10m2']);
+    }
+    if (installationClass === 'II' && !['yes', 'no'].includes(String(occupantDensityBelowOnePer10m2 ?? ''))) {
+      return notAssessed('charge-limit.toxicity', 'chargeLimit', 'Für diese Tabellenkombination muss geklärt werden, ob die Personendichte kleiner als eine Person je 10 m² ist.', SOURCE_EN_378_1_C1, ['occupantDensityBelowOnePer10m2']);
+    }
     if (installationClass === 'I' && densityLow && yes(hasEmergencyExits)) {
       return assessedLimit({ id: 'charge-limit.toxicity', category: 'chargeLimit', chargeKg, maximumChargeKg: 50, rule: 'fixed-limit-50kg-with-emergency-exits', source: SOURCE_EN_378_1_C1 });
     }
-    if (installationClass === 'I' && densityLow && !yes(hasEmergencyExits)) {
-      return notAssessed('charge-limit.toxicity', 'chargeLimit', 'Für die 50-kg-Grenze müssen vorhandene Notausgänge bestätigt werden.', SOURCE_EN_378_1_C1, ['hasEmergencyExits']);
+    if (installationClass === 'I' && densityLow && !['yes', 'no'].includes(String(hasEmergencyExits ?? ''))) {
+      return notAssessed('charge-limit.toxicity', 'chargeLimit', 'Für die 50-kg-Grenze muss bestätigt werden, ob Notausgänge vorhanden sind.', SOURCE_EN_378_1_C1, ['hasEmergencyExits']);
     }
     if (installationClass === 'I') {
       return assessedLimit({ id: 'charge-limit.toxicity', category: 'chargeLimit', chargeKg, maximumChargeKg: 10, rule: 'fixed-limit-10kg', source: SOURCE_EN_378_1_C1 });
@@ -269,6 +281,9 @@ function flammabilityLimitByTableC2(context) {
       return assessedLimit({ id: 'charge-limit.flammability', category: 'chargeLimit', chargeKg, maximumChargeKg: limitByMode({ c2Limit, c3Limit, usesAlternativeRiskManagement }), rule: 'comfort-application-c2-or-c3', source: SOURCE_EN_378_1_C2 });
     }
     if (volumeLimit == null) return notAssessed('charge-limit.flammability', 'chargeLimit', 'Raumvolumen fehlt.', SOURCE_EN_378_1_C2, ['roomVolumeM3']);
+    if (installationClass === 'II' && accessCategory === 'c' && !['yes', 'no'].includes(String(occupantDensityBelowOnePer10m2 ?? ''))) {
+      return notAssessed('charge-limit.flammability', 'chargeLimit', 'Für diese Tabellenkombination muss die Personendichte bestätigt werden, da sie die zulässige Füllmenge beeinflusst.', SOURCE_EN_378_1_C2, ['occupantDensityBelowOnePer10m2']);
+    }
     if (installationClass === 'II' && accessCategory === 'c' && yes(occupantDensityBelowOnePer10m2)) return noLimit('charge-limit.flammability', 'chargeLimit', 'Tabelle C.2: keine Begrenzung der Füllmenge.', SOURCE_EN_378_1_C2);
     const fixedCap = installationClass === 'II' && ['b', 'c'].includes(accessCategory) ? 25 : null;
     const c2Cap = fixedCap == null ? m2Kg * 1.5 : fixedCap;
@@ -278,6 +293,9 @@ function flammabilityLimitByTableC2(context) {
   if (flammabilityClass === '2') {
     if (installationClass === 'III') return noLimit('charge-limit.flammability', 'chargeLimit', 'Tabelle C.2: keine Begrenzung der Füllmenge.', SOURCE_EN_378_1_C2);
     if (volumeLimit == null) return notAssessed('charge-limit.flammability', 'chargeLimit', 'Raumvolumen fehlt.', SOURCE_EN_378_1_C2, ['roomVolumeM3']);
+    if (installationClass === 'II' && accessCategory === 'c' && !['yes', 'no'].includes(String(occupantDensityBelowOnePer10m2 ?? ''))) {
+      return notAssessed('charge-limit.flammability', 'chargeLimit', 'Für diese Tabellenkombination muss die Personendichte bestätigt werden, da sie die zulässige Füllmenge beeinflusst.', SOURCE_EN_378_1_C2, ['occupantDensityBelowOnePer10m2']);
+    }
     if (installationClass === 'II' && accessCategory === 'c' && yes(occupantDensityBelowOnePer10m2)) return noLimit('charge-limit.flammability', 'chargeLimit', 'Tabelle C.2: keine Begrenzung der Füllmenge.', SOURCE_EN_378_1_C2);
     const cap = installationClass === 'II' && ['b', 'c'].includes(accessCategory) ? 25 : m2Kg;
     return assessedLimit({ id: 'charge-limit.flammability', category: 'chargeLimit', chargeKg, maximumChargeKg: Math.min(volumeLimit, cap), rule: 'twenty-percent-lfl-room-volume', source: SOURCE_EN_378_1_C2 });

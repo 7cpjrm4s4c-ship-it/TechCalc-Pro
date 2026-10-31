@@ -28,11 +28,24 @@ export function deriveAccessCategory(currentState = {}) {
   if (derived) return derived;
   return hasValue(currentState.accessCategory) ? String(currentState.accessCategory) : '';
 }
+export function deriveInstallationLocation(currentState = {}) {
+  // For split and multi-split systems, the indoor unit's actual room is the
+  // relevant interior area to assess. Do not infer a normative installation
+  // class or access category from this mapping.
+  if (['split-system', 'multi-split'].includes(currentState.systemConfiguration)) {
+    const indoorLocation = currentState.indoorUnitLocation;
+    if (['occupied-space', 'technical-room', 'machinery-room', 'other'].includes(indoorLocation)) return indoorLocation;
+    return '';
+  }
+  return hasValue(currentState.installationLocation) ? String(currentState.installationLocation) : '';
+}
 export function normalizeEN378AssessmentState(currentState = {}) {
+  const installationLocation = deriveInstallationLocation(currentState);
   return Object.freeze({
     ...currentState,
+    installationLocation,
     accessCategory: deriveAccessCategory(currentState),
-    hasMachineryRoom: currentState.installationLocation === 'machinery-room' ? 'yes' : currentState.hasMachineryRoom
+    hasMachineryRoom: installationLocation === 'machinery-room' ? 'yes' : currentState.hasMachineryRoom
   });
 }
 const addRequiredTextIssue = (issues, currentState, key) => {
@@ -52,9 +65,18 @@ export function validateAssessmentInput(currentState = {}) {
   addRequiredTextIssue(issues, effectiveState, 'refrigerantId');
   addPositiveNumberIssue(issues, effectiveState, 'chargeKg');
   addPositiveNumberIssue(issues, effectiveState, 'roomVolumeM3');
-  addRequiredTextIssue(issues, effectiveState, 'installationLocation');
-  addRequiredTextIssue(issues, effectiveState, 'accessArea');
-  addRequiredTextIssue(issues, effectiveState, 'usageType');
+  if (['split-system', 'multi-split'].includes(effectiveState.systemConfiguration)) {
+    addRequiredTextIssue(issues, currentState, 'indoorUnitLocation');
+  } else {
+    addRequiredTextIssue(issues, effectiveState, 'installationLocation');
+  }
+  if (hasValue(effectiveState.installationLocation)) {
+    addRequiredTextIssue(issues, effectiveState, 'installationClass');
+    addRequiredTextIssue(issues, effectiveState, 'accessArea');
+    addRequiredTextIssue(issues, effectiveState, 'usageType');
+    addRequiredTextIssue(issues, effectiveState, 'applicationType');
+    addRequiredTextIssue(issues, effectiveState, 'locationLevel');
+  }
   addRequiredTextIssue(issues, effectiveState, 'ventilationType');
   if (isHumanComfortApplication(effectiveState)) {
     addPositiveNumberIssue(issues, effectiveState, 'floorAreaM2');
@@ -99,6 +121,24 @@ function deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, 
   if (hasImportError) return 'import-rejected';
   if (!inputValidation.isValid) return 'incomplete';
   if (chargeLimitAssessment.status === 'failed' || installationSafetyAssessment.status === 'failed') return 'measures-required';
+
+  // Only concrete, applicable safety-system requirements affect the overall
+  // headline. General installation-planning notes (e.g. refrigerant migration
+  // avoidance for outdoor units) remain in the planner guide but must not make
+  // an otherwise passed A1 assessment look like a failed assessment.
+  const statusRelevantCategories = new Set([
+    'detection',
+    'alarm',
+    'emergencyControl',
+    'ventilation',
+    'machineryRoom',
+    'safetyMeasures',
+    'electricalSafety'
+  ]);
+  const hasRequiredTechnicalMeasures = (installationSafetyAssessment.requirements || [])
+    .some(requirement => requirement.status === 'required' && statusRelevantCategories.has(requirement.category));
+  if (hasRequiredTechnicalMeasures) return 'measures-required';
+
   if (chargeLimitAssessment.status === 'passed' && installationSafetyAssessment.status === 'passed') return 'acceptable';
   return 'ready-for-assessment';
 }

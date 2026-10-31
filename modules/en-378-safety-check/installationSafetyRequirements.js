@@ -96,10 +96,14 @@ export function calculateDetectorPreset({ safetyData } = {}) {
   return round(Math.min(...candidates), 5);
 }
 
+function hasOutdoorUnitOrInstallation(state = {}) {
+  return state.installationLocation === 'outdoor' || ['split-system', 'multi-split'].includes(state.systemConfiguration);
+}
+
 function buildArrangementRequirements(state, safetyData) {
   const requirements = [];
   const flammable = isFlammable(safetyData?.flammabilityClass);
-  if (state.installationLocation === 'outdoor') {
+  if (state.installationLocation === 'outdoor' || ['split-system', 'multi-split'].includes(state.systemConfiguration)) {
     requirements.push(required({
       id: 'outdoor.prevent-refrigerant-entry',
       category: 'location',
@@ -108,15 +112,27 @@ function buildArrangementRequirements(state, safetyData) {
       measure: 'Aufstellort, Abstände, Öffnungen und Luftführung so planen, dass austretendes Kältemittel nicht in Gebäude oder gefährdete Bereiche gelangt.',
       source: SOURCE.arrangement
     }));
-    requirements.push(checkBoolean({
+    const publicAccess = state.isOutdoorPublicAccessible;
+    const publicAccessAnswered = hasAnswer(publicAccess);
+    const publicAccessIsYes = yes(publicAccess);
+    requirements.push(required({
       id: 'isOutdoorPublicAccessible',
       category: 'location',
       title: 'Öffentlich zugängliche Außenaufstellung bewertet',
-      requirement: 'Öffentlich zugängliche kältemitteltechnische Komponenten im Freien müssen gegen Eingriff geschützt werden.',
-      measure: 'Falls öffentlich zugänglich: Schutzabdeckung oder vergleichbaren Eingriffsschutz vorsehen.',
+      requirement: 'Bei öffentlich zugänglicher Außenaufstellung müssen kältemitteltechnische Komponenten gegen Eingriff geschützt werden.',
+      measure: !publicAccessAnswered
+        ? 'Eingabe erforderlich: Bitte angeben, ob die Außenaufstellung öffentlich zugänglich ist.'
+        : publicAccessIsYes
+          ? 'Schutzabdeckung oder vergleichbaren Eingriffsschutz für öffentlich zugängliche kältemitteltechnische Komponenten vorsehen.'
+          : 'Die Außenaufstellung ist nicht öffentlich zugänglich. Aus diesem Prüfpunkt ist kein zusätzlicher Eingriffsschutz erforderlich.',
       source: SOURCE.arrangement,
-      value: state.isOutdoorPublicAccessible,
-      priority: 'conditional'
+      priority: 'conditional',
+      status: !publicAccessAnswered
+        ? REQUIREMENT_STATUS.NOT_ASSESSED
+        : publicAccessIsYes
+          ? REQUIREMENT_STATUS.FAILED
+          : REQUIREMENT_STATUS.PASSED,
+      missingInputs: publicAccessAnswered ? [] : ['isOutdoorPublicAccessible']
     }));
   }
   if (state.installationLocation === 'occupied-space') {
@@ -140,7 +156,7 @@ function buildArrangementRequirements(state, safetyData) {
       priority: 'conditional'
     }));
   }
-  if (flammable && state.installationLocation === 'outdoor') {
+  if (flammable && hasOutdoorUnitOrInstallation(state)) {
     requirements.push(required({
       id: 'outdoor.ignition-sources',
       category: 'location',
@@ -212,15 +228,40 @@ function buildMachineryRoomRequirements(state, safetyData) {
     details: ventilation,
     missingInputs: ventilation.flowM3s == null ? ['chargeKg'] : []
   }));
-  requirements.push(checkBoolean({
-    id: 'hasEmergencyVentilation',
-    category: 'ventilation',
-    title: 'Mechanische Notlüftung vorhanden',
-    requirement: 'Wenn ein Gaswarnsystem erforderlich ist, muss die mechanische Notlüftung durch Detektor(en) aktiviert werden.',
-    measure: 'Notlüftung mit Detektoraktivierung und zwei voneinander unabhängigen Notsteuerungen vorsehen.',
-    source: SOURCE.machineryRoomVentilation,
-    value: state.hasEmergencyVentilation
-  }));
+  const gasWarningAnswer = state.hasGasWarningSystem;
+  const emergencyVentilationRequirement = yes(gasWarningAnswer)
+    ? checkBoolean({
+        id: 'hasEmergencyVentilation',
+        category: 'ventilation',
+        title: 'Mechanische Notlüftung vorhanden',
+        requirement: 'Wenn ein Gaswarnsystem erforderlich ist, muss die mechanische Notlüftung durch Detektor(en) aktiviert werden.',
+        measure: 'Notlüftung mit Detektoraktivierung und zwei voneinander unabhängigen Notsteuerungen vorsehen.',
+        source: SOURCE.machineryRoomVentilation,
+        value: state.hasEmergencyVentilation
+      })
+    : no(gasWarningAnswer)
+      ? required({
+          id: 'hasEmergencyVentilation',
+          category: 'ventilation',
+          title: 'Mechanische Notlüftung – Anwendbarkeit',
+          requirement: 'Die zusätzliche detektorgesteuerte Notlüftung wird anhand der Erforderlichkeit eines Gaswarnsystems bewertet.',
+          measure: 'Aus diesem Prüfpunkt wird keine zusätzliche detektorgesteuerte Notlüftung abgeleitet; die übrigen Maschinenraumlüftungsanforderungen bleiben bestehen.',
+          source: SOURCE.machineryRoomVentilation,
+          priority: 'conditional',
+          status: REQUIREMENT_STATUS.NOT_APPLICABLE
+        })
+      : required({
+          id: 'hasEmergencyVentilation',
+          category: 'ventilation',
+          title: 'Mechanische Notlüftung – Anwendbarkeit offen',
+          requirement: 'Vor Bewertung der detektorgesteuerten Notlüftung muss geklärt sein, ob ein Gaswarnsystem erforderlich ist.',
+          measure: 'Erforderlichkeit des Gaswarnsystems klären.',
+          source: SOURCE.machineryRoomVentilation,
+          priority: 'conditional',
+          status: REQUIREMENT_STATUS.NOT_ASSESSED,
+          missingInputs: ['hasGasWarningSystem']
+        });
+  requirements.push(emergencyVentilationRequirement);
   requirements.push(checkBoolean({
     id: 'hasEmergencyLighting',
     category: 'machineryRoom',
@@ -289,6 +330,25 @@ function buildAlternativePrecautionRequirements(state, safetyData, chargeLimitAs
     source: SOURCE.mechanicalVentilation,
     value: state.hasMechanicalVentilation
   }));
+  if (yes(state.hasMechanicalVentilation)) {
+    const modeAnswered = ['continuous', 'detector-controlled'].includes(state.mechanicalVentilationMode);
+    requirements.push(required({
+      id: 'mechanicalVentilationMode',
+      category: 'ventilation',
+      title: 'Betriebsart der mechanischen Lüftung festlegen',
+      requirement: 'Bei mechanischer Lüftung als alternative Vorkehrung nach Anhang C.3 muss festgelegt sein, ob die Lüftung dauerhaft betrieben oder durch einen Detektor eingeschaltet wird.',
+      measure: !modeAnswered
+        ? 'Betriebsart angeben: Dauerbetrieb oder detektorgesteuerter Betrieb.'
+        : state.mechanicalVentilationMode === 'continuous'
+          ? 'Dauerbetrieb planerisch festlegen und sicherstellen; die Lüftung muss während des erforderlichen Betriebs dauerhaft verfügbar sein.'
+          : 'Detektorgesteuerte Einschaltung planen; geeignete Detektion und deren Auslösung der Lüftung nachweisen.',
+      source: SOURCE.mechanicalVentilation,
+      priority: 'required',
+      status: !modeAnswered ? REQUIREMENT_STATUS.NOT_ASSESSED : REQUIREMENT_STATUS.PASSED,
+      missingInputs: modeAnswered ? [] : ['mechanicalVentilationMode'],
+      details: { mode: state.mechanicalVentilationMode || null }
+    }));
+  }
   requirements.push(checkBoolean({
     id: 'hasSafetyShutoffValves',
     category: 'safetyMeasures',
@@ -306,8 +366,21 @@ function buildDetectorRequirements(state, safetyData, chargeLimitAssessment) {
   const concentrationRisk = chargeLimitAssessment?.status === 'failed' || yes(state.hasGasWarningSystem);
   const flammable = isFlammable(safetyData?.flammabilityClass);
   const detectorPreset = calculateDetectorPreset({ safetyData });
+  const alternativeContinuousVentilation = yes(state.usesAlternativeRiskManagement)
+    && yes(state.hasMechanicalVentilation)
+    && state.mechanicalVentilationMode === 'continuous';
 
-  if (!concentrationRisk && !flammable && !isR717(safetyData)) return requirements;
+  // For the C.3 mechanical-ventilation alternative, continuous operation is a
+  // distinct protection mode and must not automatically trigger detector
+  // requirements solely because the refrigerant is flammable. Independent
+  // triggers (e.g. failed charge-limit assessment, gas warning system, R717)
+  // still retain their detector requirements.
+  if (
+    !concentrationRisk
+    && !yes(state.hasGasWarningSystem)
+    && (!flammable || alternativeContinuousVentilation)
+    && !isR717(safetyData)
+  ) return requirements;
 
   requirements.push(checkBoolean({
     id: 'hasDetector',
@@ -362,7 +435,26 @@ function buildDetectorRequirements(state, safetyData, chargeLimitAssessment) {
 
 function buildAlarmRequirements(state, safetyData, chargeLimitAssessment) {
   const requirements = [];
-  const alarmRequired = chargeLimitAssessment?.status === 'failed' || yes(state.hasGasWarningSystem) || yes(state.hasDetector) || isR717(safetyData);
+  const independentAlarmTrigger = chargeLimitAssessment?.status === 'failed' || yes(state.hasGasWarningSystem) || isR717(safetyData);
+  const detectorAnswerMissing = !hasAnswer(state.hasDetector);
+  const alarmRequired = independentAlarmTrigger || yes(state.hasDetector);
+
+  // A missing detector answer must not be interpreted as "no alarm required"
+  // when detector presence itself may activate the alarm requirement.
+  if (!alarmRequired && detectorAnswerMissing && !no(state.hasGasWarningSystem) && chargeLimitAssessment?.status !== 'passed' && !isR717(safetyData)) {
+    requirements.push(required({
+      id: 'alarm.applicability',
+      category: 'alarm',
+      title: 'Anwendbarkeit der Alarmierung offen',
+      requirement: 'Die Alarmierung kann erst abschließend bewertet werden, wenn die Erforderlichkeit eines Gaswarnsystems und das Vorhandensein eines Detektors geklärt sind.',
+      measure: 'Gaswarnsystem und Detektorstatus eindeutig angeben; anschließend Alarmierung und unabhängige Stromversorgung bewerten.',
+      source: SOURCE.alarms,
+      priority: 'conditional',
+      status: REQUIREMENT_STATUS.NOT_ASSESSED,
+      missingInputs: ['hasGasWarningSystem', 'hasDetector']
+    }));
+    return requirements;
+  }
   if (!alarmRequired) return requirements;
 
   requirements.push(checkBoolean({
@@ -428,7 +520,7 @@ function buildWarningAndInspectionRequirements(state, safetyData) {
       source: SOURCE.warnings
     }));
   }
-  if (state.installationLocation === 'outdoor' && ['3'].includes(safetyData?.flammabilityClass) && numberOrNull(state.chargeKg) > 10) {
+  if (hasOutdoorUnitOrInstallation(state) && ['3'].includes(safetyData?.flammabilityClass) && numberOrNull(state.chargeKg) > 10) {
     requirements.push(required({
       id: 'warning.outdoor-a3-b3-over-10kg',
       category: 'guidance',

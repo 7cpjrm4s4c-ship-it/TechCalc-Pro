@@ -1,21 +1,42 @@
 import { defineFormSchema, FIELD_TYPES } from '../../core/ui/formSchema.js';
+import { numberService } from '../../core/engineering/numberService.js';
 import { buildFGasesImportOptions, hasAnyFGasesSavedSystem, hasMultipleFGasesSavedSystems, IMPORT_ACTION } from './importController.js';
 
 const option = (value, label) => Object.freeze({ value, label });
 const accessCategoryByAccessArea = Object.freeze({ 'general-access': 'a', 'supervised-access': 'b', 'authorized-access': 'c' });
 const isMachineryRoom = state => state.installationLocation === 'machinery-room' || state.hasMachineryRoom === 'yes';
-const isOutdoor = state => state.installationLocation === 'outdoor';
+const isOutdoor = state => state.installationLocation === 'outdoor' || ['split-system', 'multi-split'].includes(state.systemConfiguration);
 const usesAlternativeRiskManagement = state => state.usesAlternativeRiskManagement === 'yes';
 const isHumanComfort = state => state.applicationType === 'human-comfort';
 const needsMountingType = state => isHumanComfort(state) && state.isFactorySealed === 'no';
 const needsExplosionEquipment = state => isMachineryRoom(state) && ['R-32', 'R32', 'HFKW-32', 'R-717', 'R717', 'R-290', 'R290'].includes(String(state.refrigerantId || ''));
 const needsLegacyAccessCategoryField = state => !accessCategoryByAccessArea[state.accessArea] && Boolean(state.accessCategory);
 
+const systemConfigurationOptions = Object.freeze([
+  option('', 'Bitte Anlagenart auswählen'),
+  option('single-location', 'Kälteanlage mit Komponenten an einem Aufstellort'),
+  option('split-system', 'Splitgerät mit Außen- und Inneneinheit'),
+  option('multi-split', 'Multi-Split-Anlage mit mehreren Inneneinheiten'),
+  option('other', 'Andere Anlagenkonfiguration')
+]);
+const indoorUnitLocationOptions = Object.freeze([
+  option('', 'Bitte Raum der Inneneinheit auswählen'),
+  option('occupied-space', 'Personen-Aufenthaltsbereich'),
+  option('technical-room', 'Technischer Raum, kein Maschinenraum'),
+  option('machinery-room', 'Maschinenraum'),
+  option('other', 'Anderer Innenbereich')
+]);
+const isSplitConfiguration = state => ['split-system', 'multi-split'].includes(state.systemConfiguration);
+
 const installationLocationOptions = Object.freeze([
-  option('', 'Nicht angegeben'), option('occupied-space', 'Aufenthaltsbereich'), option('technical-room', 'Technischer Raum'), option('machinery-room', 'Maschinenraum'), option('outdoor', 'Außenaufstellung')
+  option('', 'Bitte Aufstellort auswählen'), option('occupied-space', 'Personen-Aufenthaltsbereich'), option('technical-room', 'Technischer Raum'), option('machinery-room', 'Maschinenraum'), option('outdoor', 'Im Freien (Außenaufstellung)'), option('other', 'Anderer Aufstellort – gesondert prüfen')
 ]);
 const installationClassOptions = Object.freeze([
-  option('', 'Nicht angegeben'), option('I', 'Klasse I – belüftetes Gehäuse'), option('II', 'Klasse II – Maschinenraum oder im Freien'), option('III', 'Klasse III – Verdichter in Maschinenraum oder im Freien'), option('IV', 'Klasse IV – mechanische Geräte im Personen-Aufenthaltsbereich')
+  option('', 'Nicht angegeben – Anlagenkonzept prüfen'),
+  option('I', 'Klasse I – alle kältemittelführenden Teile im Personen-Aufenthaltsbereich'),
+  option('II', 'Klasse II – Verdichter und Druckbehälter im Maschinenraum oder im Freien'),
+  option('III', 'Klasse III – alle kältemittelführenden Teile im Maschinenraum oder im Freien'),
+  option('IV', 'Klasse IV – kältemittelführende Teile in einem belüfteten Gehäuse')
 ]);
 const accessAreaOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('general-access', 'Allgemeiner Zugang'), option('supervised-access', 'Beaufsichtigter Zugang'), option('authorized-access', 'Nur unterwiesene oder befugte Personen')
@@ -38,6 +59,21 @@ const mountingTypeOptions = Object.freeze([
 const ventilationTypeOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('natural', 'Natürliche Lüftung'), option('mechanical', 'Mechanische Lüftung'), option('none', 'Keine gesicherte Lüftung')
 ]);
+const mechanicalVentilationModeOptions = Object.freeze([
+  option('', 'Nicht angegeben'),
+  option('continuous', 'Dauerbetrieb'),
+  option('detector-controlled', 'Detektorgesteuerter Betrieb')
+]);
+const splitClassIIIComponentLocationOptions = Object.freeze([
+  option('', 'Bitte Komponentenstandort bestätigen'),
+  option('yes', 'Ja – alle kältemittelführenden Teile im Maschinenraum oder im Freien'),
+  option('no', 'Nein – diese Anordnung liegt nicht vor')
+]);
+const splitClassIIComponentLocationOptions = Object.freeze([
+  option('', 'Bitte Komponentenstandort bestätigen'),
+  option('yes', 'Ja – Verdichter und Druckbehälter im Maschinenraum oder im Freien'),
+  option('no', 'Nein – diese Anordnung liegt nicht vor')
+]);
 const yesNoOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('yes', 'Ja'), option('no', 'Nein')
 ]);
@@ -52,21 +88,27 @@ const schema = defineFormSchema({
     { key: 'importStatusMessage', label: 'Importstatus', type: FIELD_TYPES.TEXT, readonly: true, visibleWhen: state => Boolean(state.importStatusMessage) },
     { key: 'refrigerantId', label: 'Kältemittel', type: FIELD_TYPES.SELECT, options: [] },
     { key: 'chargeKg', label: 'Füllmenge', type: FIELD_TYPES.DECIMAL, unit: 'kg' },
-    { key: 'roomVolumeM3', label: 'Raumvolumen', type: FIELD_TYPES.DECIMAL, unit: 'm³' },
-    { key: 'installationLocation', label: 'Aufstellort', type: FIELD_TYPES.SELECT, options: installationLocationOptions },
-    { key: 'installationClass', label: 'Aufstellungsort-Klassifikation', type: FIELD_TYPES.SELECT, options: installationClassOptions },
-    { key: 'accessArea', label: 'Zugangsbereich', type: FIELD_TYPES.SELECT, options: accessAreaOptions },
+    { key: 'systemConfiguration', label: 'Anlagenkonfiguration', type: FIELD_TYPES.SELECT, options: systemConfigurationOptions },
+    { key: 'indoorUnitLocation', label: 'Aufstellbereich der Inneneinheit', type: FIELD_TYPES.SELECT, options: indoorUnitLocationOptions, visibleWhen: isSplitConfiguration },
+    { key: 'splitLocationInfo', label: 'Hinweis zur Aufstellortableitung', type: FIELD_TYPES.NOTICE, text: 'Bei Split- und Multi-Split-Anlagen wird der angegebene Bereich der Inneneinheit als maßgeblicher Innenbereich für die weitere Prüfung verwendet. Die Außenaufstellung bleibt für zusätzliche Anforderungen relevant. Die Aufstellungsort-Klasse I–IV hängt davon ab, wo sich die kältemittelführenden Teile befinden; sie wird aus der Raumwahl allein nicht zuverlässig abgeleitet und muss anhand des Anlagenkonzepts bestätigt werden.', tone: 'compact', visibleWhen: isSplitConfiguration },
+    { key: 'roomVolumeM3', label: 'Raumvolumen des maßgeblichen Aufstellbereichs (EN 378-1, Anhang C)', type: FIELD_TYPES.DECIMAL, unit: 'm³', visibleWhen: state => Boolean(state.installationLocation) || (isSplitConfiguration(state) && Boolean(state.indoorUnitLocation)) },
+    { key: 'installationLocation', label: 'Aufstellort der Kälteanlage / kältemittelführenden Komponenten (EN 378-1, 4.3)', type: FIELD_TYPES.SELECT, options: installationLocationOptions, visibleWhen: state => !isSplitConfiguration(state) },
+    { key: 'installationClass', label: 'Klassifikation des Aufstellungsorts (EN 378-1)', type: FIELD_TYPES.SELECT, options: installationClassOptions, visibleWhen: state => Boolean(state.installationLocation) || (isSplitConfiguration(state) && Boolean(state.indoorUnitLocation)) },
+    { key: 'splitClassIIComponentLocationConfirmed', label: 'Standort von Verdichter und Druckbehältern', type: FIELD_TYPES.SELECT, options: splitClassIIComponentLocationOptions, visibleWhen: state => isSplitConfiguration(state) && state.installationClass === 'II' },
+    { key: 'splitClassIIIComponentLocationConfirmed', label: 'Standort aller kältemittelführenden Teile', type: FIELD_TYPES.SELECT, options: splitClassIIIComponentLocationOptions, visibleWhen: state => isSplitConfiguration(state) && state.installationClass === 'III' },
+    { key: 'accessArea', label: 'Zugangsbereich (EN 378-1, Kategorie a/b/c)', type: FIELD_TYPES.SELECT, options: accessAreaOptions, visibleWhen: state => Boolean(state.installationLocation) || (isSplitConfiguration(state) && Boolean(state.indoorUnitLocation)) },
     { key: 'accessCategoryInfo', label: 'Hinweis zur Zugangskategorie', type: FIELD_TYPES.NOTICE, text: 'Die Kategorie des Zugangsbereichs wird aus dem gewählten Zugangsbereich abgeleitet und muss nicht zusätzlich ausgewählt werden.', tone: 'compact', visibleWhen: state => Boolean(state.accessArea) },
     { key: 'accessCategory', label: 'Kategorie des Zugangsbereichs', type: FIELD_TYPES.SELECT, options: accessCategoryOptions, visibleWhen: needsLegacyAccessCategoryField },
-    { key: 'usageType', label: 'Nutzung', type: FIELD_TYPES.SELECT, options: usageTypeOptions },
-    { key: 'applicationType', label: 'Anwendungsart', type: FIELD_TYPES.SELECT, options: applicationTypeOptions },
-    { key: 'locationLevel', label: 'Geschoss oder Lage', type: FIELD_TYPES.SELECT, options: locationLevelOptions },
+    { key: 'usageType', label: 'Nutzung des Aufstellbereichs', type: FIELD_TYPES.SELECT, options: usageTypeOptions, visibleWhen: state => Boolean(state.installationLocation) || (isSplitConfiguration(state) && Boolean(state.indoorUnitLocation)) },
+    { key: 'applicationType', label: 'Anwendung (menschlicher Komfort / andere Anwendung)', type: FIELD_TYPES.SELECT, options: applicationTypeOptions, visibleWhen: state => Boolean(state.installationLocation) || (isSplitConfiguration(state) && Boolean(state.indoorUnitLocation)) },
+    { key: 'locationLevel', label: 'Geschoss oder Lage des Aufstellbereichs', type: FIELD_TYPES.SELECT, options: locationLevelOptions, visibleWhen: state => Boolean(state.installationLocation) || (isSplitConfiguration(state) && Boolean(state.indoorUnitLocation)) },
     { key: 'occupantDensityBelowOnePer10m2', label: 'Personendichte kleiner als eine Person je 10 m²', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => ['b', 'c'].includes(accessCategoryByAccessArea[state.accessArea] || state.accessCategory) },
+    { key: 'occupantDensityInfo', label: 'Hinweis zur Personendichte', type: FIELD_TYPES.NOTICE, text: 'Diese Angabe kann abhängig von Kältemittel-Sicherheitsklasse, Aufstellungsort-Klasse und Anwendung den zulässigen Füllmengengrenzwert nach DIN EN 378-1, Anhang C, Tabelle C.1 oder C.2 beeinflussen. Ohne erforderliche Angabe bleibt die betroffene Teilprüfung offen. Die Antwort ersetzt keine eigenständige Prüfung weiterer Schutzmaßnahmen nach DIN EN 378-3.', tone: 'compact', visibleWhen: state => ['b', 'c'].includes(accessCategoryByAccessArea[state.accessArea] || state.accessCategory) },
     { key: 'hasEmergencyExits', label: 'Notausgänge vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => (accessCategoryByAccessArea[state.accessArea] || state.accessCategory) === 'c' },
     { key: 'isPermanentlySealedSorptionSystem', label: 'Dauerhaft geschlossene Sorptionsanlage', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => (accessCategoryByAccessArea[state.accessArea] || state.accessCategory) === 'a' },
     { key: 'usesAlternativeRiskManagement', label: 'Alternative Vorkehrungen nach Anhang C.3 vorgesehen', type: FIELD_TYPES.SELECT, options: yesNoOptions },
     { key: 'alternativeRiskManagementInfo', label: 'Hinweis zu alternativen Vorkehrungen', type: FIELD_TYPES.NOTICE, text: 'Alternative Vorkehrungen nach Anhang C.3 werden nur bewertet, wenn dieser Pfad vorgesehen ist oder eine Grenzwertüberschreitung dies erfordert. Je nach Konzentration können eine oder zwei Maßnahmen erforderlich sein.', tone: 'compact', visibleWhen: usesAlternativeRiskManagement },
-    { key: 'floorAreaM2', label: 'Raumfläche', type: FIELD_TYPES.DECIMAL, unit: 'm²', visibleWhen: isHumanComfort },
+    { key: 'floorAreaM2', label: 'Grundfläche des Aufstellraums', type: FIELD_TYPES.DECIMAL, unit: 'm²', visibleWhen: state => Boolean(state.installationLocation) || (isSplitConfiguration(state) && Boolean(state.indoorUnitLocation)), format: value => value === '' || value === null || value === undefined ? '' : numberService.format(value, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
     { key: 'isFactorySealed', label: 'Werkseitig dauerhaft geschlossen', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isHumanComfort },
     { key: 'mountingType', label: 'Montageart', type: FIELD_TYPES.SELECT, options: mountingTypeOptions, visibleWhen: needsMountingType },
     { key: 'ventilationType', label: 'Lüftung', type: FIELD_TYPES.SELECT, options: ventilationTypeOptions },
@@ -74,6 +116,7 @@ const schema = defineFormSchema({
     { key: 'hasGasWarningSystem', label: 'Gaswarnsystem vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions },
     { key: 'hasMachineryRoom', label: 'Maschinenraum vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions },
     { key: 'hasMechanicalVentilation', label: 'Mechanische Lüftung vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isMachineryRoom(state) || usesAlternativeRiskManagement(state) },
+    { key: 'mechanicalVentilationMode', label: 'Betriebsart der mechanischen Lüftung', type: FIELD_TYPES.SELECT, options: mechanicalVentilationModeOptions, visibleWhen: state => usesAlternativeRiskManagement(state) && state.hasMechanicalVentilation === 'yes' },
     { key: 'hasEmergencyVentilation', label: 'Mechanische Notlüftung vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isMachineryRoom },
     { key: 'hasEmergencyStopOutside', label: 'Not-Aus außen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isMachineryRoom },
     { key: 'hasEmergencyStopInside', label: 'Not-Aus innen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isMachineryRoom },
@@ -89,9 +132,10 @@ const schema = defineFormSchema({
   ],
   groups: [
     { title: 'Importierter Anlagenstand', fields: ['importedSystemName', 'importFGasesSystem', 'fGasesSnapshotId', 'importNotice', 'importStatusMessage', 'refrigerantId', 'chargeKg'], columns: 2, accent: 'blue' },
-    { title: 'Raum und Aufstellung', fields: ['roomVolumeM3', 'installationLocation', 'installationClass', 'accessArea', 'accessCategoryInfo', 'accessCategory', 'usageType', 'applicationType', 'locationLevel'], columns: 2, accent: 'blue' },
-    { title: 'Detailfragen zur Füllmengenbewertung', fields: ['occupantDensityBelowOnePer10m2', 'hasEmergencyExits', 'isPermanentlySealedSorptionSystem', 'usesAlternativeRiskManagement', 'alternativeRiskManagementInfo', 'floorAreaM2', 'isFactorySealed', 'mountingType'], columns: 2, accent: 'blue' },
-    { title: 'Lüftung und Sicherheitskomponenten', fields: ['ventilationType', 'limitInfo', 'hasGasWarningSystem', 'hasMachineryRoom', 'hasMechanicalVentilation', 'hasEmergencyVentilation', 'hasEmergencyStopOutside', 'hasEmergencyStopInside', 'hasEmergencyLighting', 'hasDetector', 'hasAlarm', 'hasIndependentAlarmPower', 'hasSafetyShutoffValves', 'hasVentilationOpenings', 'hasExplosionProtectedElectricalEquipment', 'isOutdoorPublicAccessible', 'additionalSafetyMeasures'], columns: 2, accent: 'blue' }
+    { title: 'Anlagenkonfiguration', fields: ['systemConfiguration', 'indoorUnitLocation', 'splitLocationInfo'], columns: 2, accent: 'blue' },
+    { title: 'Anwendungsfall und Aufstellort – DIN EN 378-1, Abschnitt 4.3', fields: ['installationLocation', 'roomVolumeM3', 'floorAreaM2', 'installationClass', 'splitClassIIComponentLocationConfirmed', 'splitClassIIIComponentLocationConfirmed', 'accessArea', 'accessCategoryInfo', 'accessCategory', 'usageType', 'applicationType', 'locationLevel'], columns: 2, accent: 'blue' },
+    { title: 'Anwendungsabhängige Prüffragen – DIN EN 378-1, Anhang C', fields: ['occupantDensityBelowOnePer10m2', 'occupantDensityInfo', 'hasEmergencyExits', 'isPermanentlySealedSorptionSystem', 'usesAlternativeRiskManagement', 'alternativeRiskManagementInfo', 'isFactorySealed', 'mountingType'], columns: 2, accent: 'blue' },
+    { title: 'Schutzmaßnahmen – DIN EN 378-3, Abschnitte 6.3, 7.3 und 9; DIN EN 378-1, Anhang C.3', fields: ['ventilationType', 'limitInfo', 'hasGasWarningSystem', 'hasMachineryRoom', 'hasMechanicalVentilation', 'mechanicalVentilationMode', 'hasEmergencyVentilation', 'hasEmergencyStopOutside', 'hasEmergencyStopInside', 'hasEmergencyLighting', 'hasDetector', 'hasAlarm', 'hasIndependentAlarmPower', 'hasSafetyShutoffValves', 'hasVentilationOpenings', 'hasExplosionProtectedElectricalEquipment', 'isOutdoorPublicAccessible', 'additionalSafetyMeasures'], columns: 2, accent: 'blue' }
   ]
 });
 

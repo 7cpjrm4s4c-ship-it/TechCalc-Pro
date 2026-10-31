@@ -1,18 +1,19 @@
 const FIELD_LABELS = Object.freeze({
   refrigerantId: 'Kältemittel',
   chargeKg: 'Füllmenge',
-  roomVolumeM3: 'Raumvolumen',
-  installationLocation: 'Aufstellort',
+  roomVolumeM3: 'Raumvolumen des maßgeblichen Aufstellbereichs (EN 378-1, Anhang C)',
+  installationLocation: 'Aufstellort der Kälteanlage / kältemittelführenden Komponenten (EN 378-1, 4.3)',
   installationClass: 'Aufstellungsort-Klassifikation',
-  accessArea: 'Zugangsbereich',
+  accessArea: 'Zugangsbereich (EN 378-1, Kategorie a/b/c)',
   accessCategory: 'Kategorie des Zugangsbereichs',
   usageType: 'Nutzung',
-  applicationType: 'Anwendungsart',
+  applicationType: 'Anwendung (menschlicher Komfort / andere Anwendung)',
   locationLevel: 'Geschoss oder Lage',
   ventilationType: 'Lüftung',
   hasEmergencyStopInside: 'Not-Aus innen',
   hasEmergencyStopOutside: 'Not-Aus außen',
   hasMechanicalVentilation: 'mechanische Lüftung',
+  mechanicalVentilationMode: 'Betriebsart der mechanischen Lüftung',
   hasEmergencyVentilation: 'mechanische Notlüftung',
   hasDetector: 'Kältemitteldetektor',
   hasAlarm: 'Alarmierung',
@@ -22,7 +23,7 @@ const FIELD_LABELS = Object.freeze({
   hasExplosionProtectedElectricalEquipment: 'geeignete elektrische Betriebsmittel',
   hasEmergencyLighting: 'Notbeleuchtung',
   isOutdoorPublicAccessible: 'öffentlich zugängliche Außenaufstellung',
-  floorAreaM2: 'Raumfläche',
+  floorAreaM2: 'Grundfläche des Aufstellraums',
   mountingType: 'Montageart',
   isFactorySealed: 'werkseitig dauerhaft geschlossen',
   hasGasWarningSystem: 'Gaswarnsystem',
@@ -118,7 +119,9 @@ const OPTION_LABELS = Object.freeze({
   ceiling: 'Deckenmontage',
   natural: 'natürliche Lüftung',
   mechanical: 'mechanische Lüftung',
-  none: 'keine gesicherte Lüftung'
+  none: 'keine gesicherte Lüftung',
+  continuous: 'Dauerbetrieb',
+  'detector-controlled': 'detektorgesteuerter Betrieb'
 });
 export function fieldLabel(key) {
   return FIELD_LABELS[key] || String(key || 'Angabe');
