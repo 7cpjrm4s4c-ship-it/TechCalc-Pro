@@ -220,6 +220,32 @@ const splitOutdoorSafety = assessInstallationSafetyRequirements(
 assert.ok(splitOutdoorSafety.requirements.some(item => item.id === 'outdoor.ignition-sources'),
   'Brennbarkeitsbezogene Außenanforderungen müssen auch für Split-Außeneinheiten geprüft werden');
 
+// Die detektorgesteuerte Notlüftung im Maschinenraum hängt von der
+// Erforderlichkeit eines Gaswarnsystems ab: Ja => prüfen, Nein => nicht
+// anwendbar, fehlende Antwort => Bewertung offen.
+const machineryRoomBase = {
+  ...completeState,
+  installationLocation: 'machinery-room',
+  hasMachineryRoom: 'yes',
+  hasGasWarningSystem: 'yes',
+  hasEmergencyVentilation: ''
+};
+const machineryRoomEmergencyVentilation = state =>
+  assessInstallationSafetyRequirements(state, {
+    ...calculation.chargeLimitAssessment,
+    refrigerantSafetyData: calculation.chargeLimitAssessment.refrigerantSafetyData
+  }).requirements.find(item => item.id === 'hasEmergencyVentilation');
+assert.equal(machineryRoomEmergencyVentilation(machineryRoomBase).status, 'not-assessed');
+assert.equal(machineryRoomEmergencyVentilation({
+  ...machineryRoomBase,
+  hasGasWarningSystem: 'no'
+}).status, 'not-applicable');
+assert.equal(machineryRoomEmergencyVentilation({
+  ...machineryRoomBase,
+  hasGasWarningSystem: '',
+  hasEmergencyVentilation: 'yes'
+}).status, 'not-assessed');
+
 const report = buildEN378SafetyCheckReportDto({ state: completeState, calculation, generatedAt: '2026-08-31T00:00:00.000Z' });
 
 // A1 refrigerant: generic outdoor-location and handover guidance may remain,
