@@ -246,6 +246,26 @@ assert.equal(machineryRoomEmergencyVentilation({
   hasEmergencyVentilation: 'yes'
 }).status, 'not-assessed');
 
+// Fehlender Detektorstatus darf die abhängige Alarmprüfung nicht stillschweigend ausblenden.
+const unresolvedAlarmDependency = assessInstallationSafetyRequirements({
+  ...completeState,
+  refrigerantId: 'R32',
+  hasGasWarningSystem: '',
+  hasDetector: ''
+}, calculation.chargeLimitAssessment);
+const unresolvedAlarmApplicability = unresolvedAlarmDependency.requirements.find(item => item.id === 'alarm.applicability');
+assert.equal(unresolvedAlarmApplicability.status, 'not-assessed');
+assert.ok(unresolvedAlarmApplicability.missingInputs.includes('hasDetector'));
+assert.ok(unresolvedAlarmApplicability.missingInputs.includes('hasGasWarningSystem'));
+
+const detectorConfirmedAbsent = assessInstallationSafetyRequirements({
+  ...completeState,
+  refrigerantId: 'R32',
+  hasGasWarningSystem: 'no',
+  hasDetector: 'no'
+}, calculation.chargeLimitAssessment);
+assert.ok(!detectorConfirmedAbsent.requirements.some(item => item.id === 'alarm.applicability'));
+
 const report = buildEN378SafetyCheckReportDto({ state: completeState, calculation, generatedAt: '2026-08-31T00:00:00.000Z' });
 
 // A1 refrigerant: generic outdoor-location and handover guidance may remain,
