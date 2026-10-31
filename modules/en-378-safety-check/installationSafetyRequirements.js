@@ -435,7 +435,26 @@ function buildDetectorRequirements(state, safetyData, chargeLimitAssessment) {
 
 function buildAlarmRequirements(state, safetyData, chargeLimitAssessment) {
   const requirements = [];
-  const alarmRequired = chargeLimitAssessment?.status === 'failed' || yes(state.hasGasWarningSystem) || yes(state.hasDetector) || isR717(safetyData);
+  const independentAlarmTrigger = chargeLimitAssessment?.status === 'failed' || yes(state.hasGasWarningSystem) || isR717(safetyData);
+  const detectorAnswerMissing = !hasAnswer(state.hasDetector);
+  const alarmRequired = independentAlarmTrigger || yes(state.hasDetector);
+
+  // A missing detector answer must not be interpreted as "no alarm required"
+  // when detector presence itself may activate the alarm requirement.
+  if (!alarmRequired && detectorAnswerMissing && !no(state.hasGasWarningSystem) && chargeLimitAssessment?.status !== 'passed' && !isR717(safetyData)) {
+    requirements.push(required({
+      id: 'alarm.applicability',
+      category: 'alarm',
+      title: 'Anwendbarkeit der Alarmierung offen',
+      requirement: 'Die Alarmierung kann erst abschließend bewertet werden, wenn die Erforderlichkeit eines Gaswarnsystems und das Vorhandensein eines Detektors geklärt sind.',
+      measure: 'Gaswarnsystem und Detektorstatus eindeutig angeben; anschließend Alarmierung und unabhängige Stromversorgung bewerten.',
+      source: SOURCE.alarms,
+      priority: 'conditional',
+      status: REQUIREMENT_STATUS.NOT_ASSESSED,
+      missingInputs: ['hasGasWarningSystem', 'hasDetector']
+    }));
+    return requirements;
+  }
   if (!alarmRequired) return requirements;
 
   requirements.push(checkBoolean({
