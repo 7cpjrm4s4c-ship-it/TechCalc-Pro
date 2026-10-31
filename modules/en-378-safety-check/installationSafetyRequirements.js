@@ -228,15 +228,40 @@ function buildMachineryRoomRequirements(state, safetyData) {
     details: ventilation,
     missingInputs: ventilation.flowM3s == null ? ['chargeKg'] : []
   }));
-  requirements.push(checkBoolean({
-    id: 'hasEmergencyVentilation',
-    category: 'ventilation',
-    title: 'Mechanische Notlüftung vorhanden',
-    requirement: 'Wenn ein Gaswarnsystem erforderlich ist, muss die mechanische Notlüftung durch Detektor(en) aktiviert werden.',
-    measure: 'Notlüftung mit Detektoraktivierung und zwei voneinander unabhängigen Notsteuerungen vorsehen.',
-    source: SOURCE.machineryRoomVentilation,
-    value: state.hasEmergencyVentilation
-  }));
+  const gasWarningAnswer = state.hasGasWarningSystem;
+  const emergencyVentilationRequirement = yes(gasWarningAnswer)
+    ? checkBoolean({
+        id: 'hasEmergencyVentilation',
+        category: 'ventilation',
+        title: 'Mechanische Notlüftung vorhanden',
+        requirement: 'Wenn ein Gaswarnsystem erforderlich ist, muss die mechanische Notlüftung durch Detektor(en) aktiviert werden.',
+        measure: 'Notlüftung mit Detektoraktivierung und zwei voneinander unabhängigen Notsteuerungen vorsehen.',
+        source: SOURCE.machineryRoomVentilation,
+        value: state.hasEmergencyVentilation
+      })
+    : no(gasWarningAnswer)
+      ? required({
+          id: 'hasEmergencyVentilation',
+          category: 'ventilation',
+          title: 'Mechanische Notlüftung – Anwendbarkeit',
+          requirement: 'Die zusätzliche detektorgesteuerte Notlüftung wird anhand der Erforderlichkeit eines Gaswarnsystems bewertet.',
+          measure: 'Aus diesem Prüfpunkt wird keine zusätzliche detektorgesteuerte Notlüftung abgeleitet; die übrigen Maschinenraumlüftungsanforderungen bleiben bestehen.',
+          source: SOURCE.machineryRoomVentilation,
+          priority: 'conditional',
+          status: REQUIREMENT_STATUS.NOT_APPLICABLE
+        })
+      : required({
+          id: 'hasEmergencyVentilation',
+          category: 'ventilation',
+          title: 'Mechanische Notlüftung – Anwendbarkeit offen',
+          requirement: 'Vor Bewertung der detektorgesteuerten Notlüftung muss geklärt sein, ob ein Gaswarnsystem erforderlich ist.',
+          measure: 'Erforderlichkeit des Gaswarnsystems klären.',
+          source: SOURCE.machineryRoomVentilation,
+          priority: 'conditional',
+          status: REQUIREMENT_STATUS.NOT_ASSESSED,
+          missingInputs: ['hasGasWarningSystem']
+        });
+  requirements.push(emergencyVentilationRequirement);
   requirements.push(checkBoolean({
     id: 'hasEmergencyLighting',
     category: 'machineryRoom',
