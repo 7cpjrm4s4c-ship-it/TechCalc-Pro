@@ -21,6 +21,9 @@ const state = {
   hasMachineryRoom: 'yes',
   hasMechanicalVentilation: 'yes',
   hasEmergencyVentilation: 'no',
+  machineryRoomLargestSystemChargeKg: '6',
+  hasEmergencyVentilationControlInside: 'no',
+  hasEmergencyVentilationControlOutside: 'yes',
   hasEmergencyStopOutside: 'no',
   hasEmergencyStopInside: '',
   hasEmergencyLighting: 'yes',
@@ -37,6 +40,12 @@ assert.equal(calculation.status, 'measures-required');
 assert.ok(calculation.plannerGuidance);
 assert.equal(calculation.plannerGuidance.status, 'measures-required');
 assert.ok(calculation.plannerGuidance.failedCount >= 3);
+const emergencyFlow = calculation.installationSafetyAssessment.requirements.find(item => item.id === 'machinery-room.emergency-ventilation-flow');
+assert.equal(emergencyFlow.source.sourceSection, '5.13.4');
+assert.equal(emergencyFlow.details.largestSystemChargeKg, 6);
+assert.equal(emergencyFlow.details.fifteenAirChangesPerHourM3h, 1200);
+assert.ok(calculation.installationSafetyAssessment.requirements.some(item => item.id === 'machinery-room.emergency-ventilation-control-inside' && item.status === 'failed'));
+assert.ok(calculation.installationSafetyAssessment.requirements.some(item => item.id === 'machinery-room.emergency-ventilation-control-outside' && item.status === 'passed'));
 assert.ok(calculation.plannerGuidance.openPointCount >= 1);
 assert.ok(calculation.plannerGuidance.requiredMeasures.some(measure => measure.includes('Externen Not-Aus')));
 assert.ok(calculation.plannerGuidance.groups.some(group => group.id === 'ventilation'));
