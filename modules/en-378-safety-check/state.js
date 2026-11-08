@@ -21,6 +21,7 @@ export const initialState = Object.freeze({
   importedSystemName: '',
   refrigerantId: '',
   chargeKg: '',
+  isOutdoorDefinitionConfirmed: '',
   outdoorSafeArrangement: '',
   outdoorPreventBuildingEntry: '',
   hasOutdoorProtectiveCover: '',
