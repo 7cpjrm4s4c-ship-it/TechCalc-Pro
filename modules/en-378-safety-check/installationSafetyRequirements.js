@@ -110,29 +110,9 @@ function buildArrangementRequirements(state, safetyData) {
     }
     requirements.push(checkBoolean({ id: 'outdoor.refrigerant-accumulation', category: 'location', title: 'Kältemittelansammlung möglich', requirement: 'Der Planer muss örtlich beurteilen, ob sich austretendes Kältemittel am Aufstellort ansammeln kann.', measure: 'Örtliche Situation planerisch beurteilen und Ja oder Nein dokumentieren. Diese Entscheidung wird nicht automatisch aus anderen Eingaben abgeleitet.', source: SOURCE.outdoorArrangement, value: state.outdoorRefrigerantAccumulationPossible }));
     if (yes(state.outdoorRefrigerantAccumulationPossible) && flammable) {
-      requirements.push(required({ id: 'outdoor.en378-2-6-2-14', category: 'location', title: 'Zusatzanforderung EN 378-2, 6.2.14', requirement: 'Bei möglicher Kältemittelansammlung und Sicherheitsklassen 2L, 2 oder 3 ist die eigenständige Zusatzanforderung nach EN 378-2:2016, 6.2.14 zu prüfen.', measure: 'Anwendbarkeit und Erfüllung der Zusatzanforderung EN 378-2:2016, 6.2.14 gesondert nachweisen.', source: Object.freeze({ sourcePart: 'EN 378-2:2016', sourceSection: '6.2.14' }) }));
+      requirements.push(checkBoolean({ id: 'outdoor.en378-2-6-2-14', category: 'location', title: 'Zusatzanforderung EN 378-2, 6.2.14 erfüllt', requirement: 'Bei möglicher Kältemittelansammlung und Sicherheitsklassen 2L, 2 oder 3 ist die eigenständige Zusatzanforderung nach EN 378-2:2016, 6.2.14 zu prüfen.', measure: 'Anwendbarkeit und Erfüllung der Zusatzanforderung EN 378-2:2016, 6.2.14 gesondert nachweisen.', source: Object.freeze({ sourcePart: 'EN 378-2:2016', sourceSection: '6.2.14' }), value: state.outdoorEN3782_6_2_14Confirmed }));
     }
     return requirements;
-  }
-  if (state.installationLocation === 'outdoor') {
-    requirements.push(required({
-      id: 'outdoor.prevent-refrigerant-entry',
-      category: 'location',
-      title: 'Austritt in Gebäudeöffnungen verhindern',
-      requirement: 'Bei Aufstellung im Freien darf austretendes Kältemittel nicht in Gebäude, Frischluftöffnungen, Türöffnungen, Bodenklappen oder ähnliche Öffnungen eindringen und keine Personen gefährden.',
-      measure: 'Aufstellort, Abstände, Öffnungen und Luftführung so planen, dass austretendes Kältemittel nicht in Gebäude oder gefährdete Bereiche gelangt.',
-      source: SOURCE.outdoorArrangement
-    }));
-    requirements.push(checkBoolean({
-      id: 'isOutdoorPublicAccessible',
-      category: 'location',
-      title: 'Öffentlich zugängliche Außenaufstellung bewertet',
-      requirement: 'Öffentlich zugängliche kältemitteltechnische Komponenten im Freien müssen gegen Eingriff geschützt werden.',
-      measure: 'Falls öffentlich zugänglich: Schutzabdeckung oder vergleichbaren Eingriffsschutz vorsehen.',
-      source: SOURCE.outdoorArrangement,
-      value: state.isOutdoorPublicAccessible,
-      priority: 'conditional'
-    }));
   }
   if (state.installationLocation === 'occupied-space') {
     requirements.push(required({
@@ -141,7 +121,7 @@ function buildArrangementRequirements(state, safetyData) {
       title: 'Personen-Aufenthaltsbereich nach Abschnitten 8 und 9 bewerten',
       requirement: 'Bei Aufstellung im Personen-Aufenthaltsbereich sind die Anforderungen an Alarmierung und Detektion zu berücksichtigen, sofern Warnung bei Leckage erforderlich ist.',
       measure: 'Detektion und Alarmierung nach EN 378-3 Abschnitt 8 und 9 in die Planung aufnehmen.',
-      source: SOURCE.outdoorArrangement
+      source: SOURCE.arrangement
     }));
   }
   if (state.installationLocation === 'technical-room' && !yes(state.hasMachineryRoom)) {
@@ -151,7 +131,7 @@ function buildArrangementRequirements(state, safetyData) {
       title: 'Raum ohne Personenaufenthalt gegenüber Aufenthaltsbereichen trennen',
       requirement: 'Räume ohne Personenaufenthalt müssen gegenüber Personen-Aufenthaltsbereichen abgeschlossen sein; bei Komponenten mit lösbaren Verbindungen sind Lüftungsanforderungen zu bewerten.',
       measure: 'Raumtrennung, Lüftung und Detektion für angrenzende Aufenthaltsbereiche prüfen.',
-      source: SOURCE.outdoorArrangement,
+      source: SOURCE.arrangement,
       priority: 'conditional'
     }));
   }
