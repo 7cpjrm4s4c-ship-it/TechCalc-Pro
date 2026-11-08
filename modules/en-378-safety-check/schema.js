@@ -1,10 +1,12 @@
 import { defineFormSchema, FIELD_TYPES } from '../../core/ui/formSchema.js';
+import { getEN378SafetyData } from '../../core/data/index.js';
 import { buildFGasesImportOptions, hasAnyFGasesSavedSystem, hasMultipleFGasesSavedSystems, IMPORT_ACTION } from './importController.js';
 
 const option = (value, label) => Object.freeze({ value, label });
 const accessCategoryByAccessArea = Object.freeze({ 'general-access': 'a', 'supervised-access': 'b', 'authorized-access': 'c' });
 const isMachineryRoom = state => state.installationLocation === 'machinery-room' || state.hasMachineryRoom === 'yes';
 const isOutdoor = state => state.installationLocation === 'outdoor';
+const needsOutdoorEN3782Confirmation = state => isOutdoor(state) && state.outdoorRefrigerantAccumulationPossible === 'yes' && ['2L', '2', '3'].includes(getEN378SafetyData(state.refrigerantId)?.flammabilityClass);
 const usesAlternativeRiskManagement = state => state.usesAlternativeRiskManagement === 'yes';
 const isHumanComfort = state => state.applicationType === 'human-comfort';
 const needsMountingType = state => isHumanComfort(state) && state.isFactorySealed === 'no';
@@ -91,7 +93,7 @@ const schema = defineFormSchema({
     { key: 'hasOutdoorProtectiveCover', label: 'Schutzabdeckung für kältetechnische Komponenten vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isOutdoor },
     { key: 'outdoorCoverVentilated', label: 'Schutzabdeckung ausreichend natürlich oder mechanisch belüftet', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isOutdoor(state) && state.hasOutdoorProtectiveCover === 'yes' },
     { key: 'outdoorRefrigerantAccumulationPossible', label: 'Kältemittelansammlung möglich', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isOutdoor },
-    { key: 'outdoorEN3782_6_2_14Confirmed', label: 'Zusatzanforderung EN 378-2, 6.2.14 erfüllt', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isOutdoor(state) && state.outdoorRefrigerantAccumulationPossible === 'yes' && ['2L', '2', '3'].includes(state.refrigerantSafetyClass) },
+    { key: 'outdoorEN3782_6_2_14Confirmed', label: 'Zusatzanforderung EN 378-2, 6.2.14 erfüllt', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: needsOutdoorEN3782Confirmation },
     { key: 'additionalSafetyMeasures', label: 'Weitere Sicherheitsmaßnahmen', type: FIELD_TYPES.TEXT }
   ],
   groups: [
