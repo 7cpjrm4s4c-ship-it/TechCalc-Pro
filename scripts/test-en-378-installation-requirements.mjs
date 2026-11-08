@@ -66,6 +66,9 @@ const r717State = {
 };
 const r717Calculation = calculate(r717State);
 assert.ok(r717Calculation.installationSafetyAssessment.requirements.some(item => item.id === 'detector.r717.thresholds'));
+assert.ok(!r717Calculation.installationSafetyAssessment.requirements.some(item => item.id === 'detector.flammable-classes'));
+const r717HighCharge = calculate({ ...r717State, chargeKg: '3001' });
+assert.ok(r717HighCharge.installationSafetyAssessment.requirements.some(item => item.id === 'alarm.r717.central-station'));
 
 const report = buildEN378SafetyCheckReportDto({
   state: machineryRoomState,
