@@ -101,6 +101,7 @@ function buildArrangementRequirements(state, safetyData) {
   const requirements = [];
   const flammable = isFlammable(safetyData?.flammabilityClass);
   if (state.installationLocation === 'outdoor') {
+    requirements.push(checkBoolean({ id: 'outdoor.definition-confirmed', category: 'location', title: 'Definition „im Freien“ bestätigt', requirement: 'Die bauliche Situation muss die normative Definition einer Aufstellung im Freien erfüllen.', measure: 'Erfüllung der Definition „im Freien“ anhand der baulichen Situation planerisch prüfen und bestätigen.', source: SOURCE.outdoorArrangement, value: state.isOutdoorDefinitionConfirmed }));
     requirements.push(checkBoolean({ id: 'outdoor.safe-arrangement', category: 'location', title: 'Sichere Anordnung der Außenaufstellung', requirement: 'Die Außenaufstellung muss so angeordnet sein, dass austretendes Kältemittel bei einer Leckage Personen und Sachwerte nicht gefährden kann.', measure: 'Aufstellort und mögliche Ausbreitungswege planerisch bewerten und eine sichere Anordnung nachweisen.', source: SOURCE.outdoorArrangement, value: state.outdoorSafeArrangement }));
     requirements.push(checkBoolean({ id: 'outdoor.prevent-refrigerant-entry', category: 'location', title: 'Eindringen in Gebäudeöffnungen verhindern', requirement: 'Austretendes Kältemittel darf nicht in Frischluftöffnungen, Türöffnungen, Bodenklappen oder ähnliche Gebäudeöffnungen eindringen können.', measure: 'Gebäudeöffnungen und Luftführung planerisch bewerten; Eindringen von Kältemittel sicher ausschließen.', source: SOURCE.outdoorArrangement, value: state.outdoorPreventBuildingEntry }));
     if (yes(state.hasOutdoorProtectiveCover)) {
@@ -108,8 +109,11 @@ function buildArrangementRequirements(state, safetyData) {
     } else if (!hasAnswer(state.hasOutdoorProtectiveCover)) {
       requirements.push(required({ id: 'hasOutdoorProtectiveCover', category: 'location', title: 'Vorhandensein einer Schutzabdeckung bewerten', requirement: 'Es ist festzustellen, ob eine Schutzabdeckung für die im Freien aufgestellten kältetechnischen Komponenten vorhanden ist.', measure: 'Vorhandensein einer Schutzabdeckung mit Ja oder Nein dokumentieren.', source: SOURCE.outdoorArrangement, status: REQUIREMENT_STATUS.NOT_ASSESSED, missingInputs: ['hasOutdoorProtectiveCover'] }));
     }
-    requirements.push(checkBoolean({ id: 'outdoor.refrigerant-accumulation', category: 'location', title: 'Kältemittelansammlung möglich', requirement: 'Der Planer muss örtlich beurteilen, ob sich austretendes Kältemittel am Aufstellort ansammeln kann.', measure: 'Örtliche Situation planerisch beurteilen und Ja oder Nein dokumentieren. Diese Entscheidung wird nicht automatisch aus anderen Eingaben abgeleitet.', source: SOURCE.outdoorArrangement, value: state.outdoorRefrigerantAccumulationPossible }));
-    if (yes(state.outdoorRefrigerantAccumulationPossible) && flammable) {
+    const baseRequirementsPassed = requirements.every(item => [REQUIREMENT_STATUS.PASSED, REQUIREMENT_STATUS.NOT_APPLICABLE].includes(item.status));
+    if (baseRequirementsPassed) {
+      requirements.push(checkBoolean({ id: 'outdoor.refrigerant-accumulation', category: 'location', title: 'Kältemittelansammlung möglich', requirement: 'Der Planer muss örtlich beurteilen, ob sich austretendes Kältemittel am Aufstellort ansammeln kann.', measure: 'Örtliche Situation planerisch beurteilen und Ja oder Nein dokumentieren. Diese Entscheidung wird nicht automatisch aus anderen Eingaben abgeleitet.', source: SOURCE.outdoorArrangement, value: state.outdoorRefrigerantAccumulationPossible }));
+    }
+    if (baseRequirementsPassed && yes(state.outdoorRefrigerantAccumulationPossible) && flammable) {
       requirements.push(checkBoolean({ id: 'outdoor.en378-2-6-2-14', category: 'location', title: 'Zusatzanforderung EN 378-2, 6.2.14 erfüllt', requirement: 'Bei möglicher Kältemittelansammlung und Sicherheitsklassen 2L, 2 oder 3 ist die eigenständige Zusatzanforderung nach EN 378-2:2016, 6.2.14 zu prüfen.', measure: 'Anwendbarkeit und Erfüllung der Zusatzanforderung EN 378-2:2016, 6.2.14 gesondert nachweisen.', source: Object.freeze({ sourcePart: 'EN 378-2:2016', sourceSection: '6.2.14' }), value: state.outdoorEN3782_6_2_14Confirmed }));
     }
     return requirements;
