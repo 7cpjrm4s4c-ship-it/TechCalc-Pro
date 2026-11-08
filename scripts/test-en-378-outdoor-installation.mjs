@@ -80,7 +80,7 @@ const ventilationAssessment = assessInstallationSafetyRequirements(ventilationSt
 assert.equal(ventilationAssessment.requirements.find(item => item.id === 'outdoor.ventilation-general')?.status, 'passed');
 assert.equal(ventilationAssessment.requirements.find(item => item.id === 'outdoor.ventilation-national-rules')?.status, 'passed');
 assert.equal(ventilationAssessment.requirements.find(item => item.id === 'outdoor.mechanical-ventilation-openings')?.status, 'failed');
-assert.equal(ventilationAssessment.requirements.find(item => item.id === 'outdoor.mechanical-ventilation-openings')?.source?.sourceSection, '5.13');
+assert.equal(ventilationAssessment.requirements.find(item => item.id === 'outdoor.mechanical-ventilation-openings')?.source?.sourceSection, '5.13.5');
 
 const noMechanicalVentilationState = {
   ...accumulationState,
