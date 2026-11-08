@@ -139,16 +139,7 @@ function buildArrangementRequirements(state, safetyData) {
       priority: 'conditional'
     }));
   }
-  if (flammable && state.installationLocation === 'outdoor' && yes(state.outdoorRefrigerantAccumulationPossible)) {
-    requirements.push(required({
-      id: 'outdoor.ignition-sources',
-      category: 'location',
-      title: 'Zündquellen bei brennbaren Kältemitteln vermeiden',
-      requirement: 'Für Kältemittel der Klassen 2L, 2 und 3 sind Anforderungen bezüglich Zündquellen zu berücksichtigen.',
-      measure: 'Zündquellen im relevanten Bereich vermeiden oder fachlich bewerten.',
-      source: SOURCE.outdoorArrangement
-    }));
-  }
+
   return requirements;
 }
 
