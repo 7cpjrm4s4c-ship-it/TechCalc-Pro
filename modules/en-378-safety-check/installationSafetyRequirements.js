@@ -157,7 +157,7 @@ function buildOutdoorVentilationRequirements(state) {
     title: 'Lüftungsführung bei möglicher Kältemittelansammlung',
     requirement: 'Die für den Außenaufstellort relevante Lüftungsführung ist unter Berücksichtigung der örtlichen Situation nach EN 378-3, 5.13.1 zu bewerten. Maschinenraumspezifische Einzelanforderungen werden nicht pauschal auf die Außenaufstellung übertragen.',
     measure: 'Lüftungsführung und mögliche Kältemittelausbreitung am Außenaufstellort planerisch prüfen und dokumentieren.',
-    source: SOURCE.machineryRoomVentilation,
+    source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.1' }),
     value: state.outdoorVentilationGeneralConfirmed
   }));
   requirements.push(checkBoolean({
@@ -166,7 +166,7 @@ function buildOutdoorVentilationRequirements(state) {
     title: 'Nationale Lüftungsvorschriften einhalten',
     requirement: 'Die Lüftung muss den nationalen Vorschriften entsprechen. Der vierfache Luftwechsel wird nicht pauschal auf Außenaufstellungen übertragen.',
     measure: 'Einhaltung der für den konkreten Außenaufstellort geltenden nationalen Lüftungsvorschriften prüfen und dokumentieren.',
-    source: SOURCE.machineryRoomVentilation,
+    source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.2' }),
     value: state.outdoorVentilationNationalRulesConfirmed
   }));
 
@@ -177,7 +177,7 @@ function buildOutdoorVentilationRequirements(state) {
       title: 'Mechanische Lüftung als vorhanden oder vorgesehen feststellen',
       requirement: 'Die Anwendbarkeit der Anforderungen an Öffnungen für mechanische Lüftung nach EN 378-3, 5.13.5 hängt davon ab, ob eine mechanische Lüftung vorhanden oder planerisch vorgesehen ist.',
       measure: 'Vorhandensein oder planerische Vorsehung einer mechanischen Lüftung mit Ja oder Nein festlegen.',
-      source: SOURCE.machineryRoomVentilation,
+      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.5' }),
       status: REQUIREMENT_STATUS.NOT_ASSESSED,
       missingInputs: ['hasMechanicalVentilation']
     }));
@@ -188,7 +188,7 @@ function buildOutdoorVentilationRequirements(state) {
       title: 'Öffnungen für mechanische Lüftung',
       requirement: 'Öffnungen für mechanische Lüftung müssen geeignet angeordnet und ausreichend dimensioniert sein; Zu- und Abluftführung müssen die sichere Ableitung des Kältemittels gewährleisten.',
       measure: 'Anordnung, Größe und Luftführung der mechanischen Lüftungsöffnungen prüfen und den erforderlichen Luftstrom nachweisen.',
-      source: SOURCE.machineryRoomVentilation,
+      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.5' }),
       value: state.outdoorMechanicalVentilationOpeningsConfirmed
     }));
   }
