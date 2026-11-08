@@ -522,7 +522,10 @@ export function assessInstallationSafetyRequirements(currentState = {}, chargeLi
 
   const isOutdoor = currentState.installationLocation === 'outdoor';
   const arrangementRequirements = buildArrangementRequirements(currentState, safetyData);
-  const arrangementPassed = arrangementRequirements.every(item =>
+  const arrangementPrerequisites = isOutdoor
+    ? arrangementRequirements.filter(item => ['outdoor.definition-confirmed', 'outdoor.safe-arrangement', 'outdoor.prevent-refrigerant-entry', 'outdoor.cover-ventilation', 'hasOutdoorProtectiveCover'].includes(item.id))
+    : arrangementRequirements;
+  const arrangementPassed = arrangementPrerequisites.every(item =>
     [REQUIREMENT_STATUS.PASSED, REQUIREMENT_STATUS.NOT_APPLICABLE].includes(item.status)
   );
   const accumulationPossible = yes(currentState.outdoorRefrigerantAccumulationPossible);
