@@ -9,6 +9,18 @@ const isOutdoor = state => state.installationLocation === 'outdoor';
 const outdoorBaseRequirementsPassed = state => state.isOutdoorDefinitionConfirmed === 'yes' && state.outdoorSafeArrangement === 'yes' && state.outdoorPreventBuildingEntry === 'yes' && (state.hasOutdoorProtectiveCover === 'no' || (state.hasOutdoorProtectiveCover === 'yes' && state.outdoorCoverVentilated === 'yes'));
 const needsOutdoorAccumulationAssessment = state => isOutdoor(state) && outdoorBaseRequirementsPassed(state);
 const needsOutdoorEN3782Confirmation = state => needsOutdoorAccumulationAssessment(state) && state.outdoorRefrigerantAccumulationPossible === 'yes' && ['2L', '2', '3'].includes(getEN378SafetyData(state.refrigerantId)?.flammabilityClass);
+const positiveNumber = value => {
+  const parsed = Number(String(value ?? '').replace(',', '.'));
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+};
+const requiresMachineryRoomGasDetection = state => {
+  if (!isMachineryRoom(state)) return false;
+  const safetyData = getEN378SafetyData(state.refrigerantId);
+  const charge = positiveNumber(state.chargeKg);
+  const volume = positiveNumber(state.roomVolumeM3);
+  const practicalLimit = positiveNumber(safetyData?.practicalLimitKgM3);
+  return charge != null && volume != null && practicalLimit != null && charge / volume > practicalLimit;
+};
 const usesAlternativeRiskManagement = state => state.usesAlternativeRiskManagement === 'yes';
 const isHumanComfort = state => state.applicationType === 'human-comfort';
 const needsMountingType = state => isHumanComfort(state) && state.isFactorySealed === 'no';
@@ -82,9 +94,9 @@ const schema = defineFormSchema({
     { key: 'outdoorVentilationGeneralConfirmed', label: 'Lüftungsführung nach EN 378-3, 5.13.1 geprüft', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isOutdoor(state) && state.outdoorRefrigerantAccumulationPossible === 'yes' },
     { key: 'outdoorVentilationNationalRulesConfirmed', label: 'Nationale Lüftungsvorschriften nach EN 378-3, 5.13.2 eingehalten', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isOutdoor(state) && state.outdoorRefrigerantAccumulationPossible === 'yes' },
     { key: 'outdoorMechanicalVentilationOpeningsConfirmed', label: 'Öffnungen für mechanische Lüftung nach EN 378-3, 5.13.5 geprüft', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isOutdoor(state) && state.outdoorRefrigerantAccumulationPossible === 'yes' && state.hasMechanicalVentilation === 'yes' },
-    { key: 'machineryRoomLargestSystemChargeKg', label: 'Füllmenge der größten Kälteanlage mit Anlagenteil im Maschinenraum', type: FIELD_TYPES.DECIMAL, unit: 'kg', visibleWhen: state => isMachineryRoom(state) && state.hasGasWarningSystem === 'yes' },
-    { key: 'hasEmergencyVentilation', label: 'Mechanische Notlüftung durch Detektoren aktiviert', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isMachineryRoom(state) && state.hasGasWarningSystem === 'yes' },
-    { key: 'hasEmergencyVentilationControlOutside', label: 'Unabhängige Notsteuerung der Notlüftung außen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isMachineryRoom(state) && state.hasGasWarningSystem === 'yes' },
+    { key: 'machineryRoomLargestSystemChargeKg', label: 'Füllmenge der größten Kälteanlage mit Anlagenteil im Maschinenraum', type: FIELD_TYPES.DECIMAL, unit: 'kg', visibleWhen: requiresMachineryRoomGasDetection },
+    { key: 'hasEmergencyVentilation', label: 'Mechanische Notlüftung durch Detektoren aktiviert', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: requiresMachineryRoomGasDetection },
+    { key: 'hasEmergencyVentilationControlOutside', label: 'Unabhängige Notsteuerung der Notlüftung außen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: requiresMachineryRoomGasDetection },
     { key: 'hasEmergencyVentilationControlInside', label: 'Unabhängige Notsteuerung der Notlüftung innen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isMachineryRoom(state) && state.hasGasWarningSystem === 'yes' },
     { key: 'hasEmergencyStopOutside', label: 'Not-Aus außen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isMachineryRoom },
     { key: 'hasEmergencyStopInside', label: 'Not-Aus innen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isMachineryRoom },
