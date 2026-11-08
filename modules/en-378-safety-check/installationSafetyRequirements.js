@@ -353,16 +353,6 @@ function buildDetectorRequirements(state, safetyData, chargeLimitAssessment) {
       details: Object.freeze({ preAlarmMgM3: 350, mainAlarmMgM3: 21200 })
     }));
   }
-  if (isR717(safetyData) && numberOrNull(state.chargeKg) > 3000) {
-    requirements.push(required({
-      id: 'alarm.r717.central-station',
-      category: 'alarm',
-      title: 'Zentrale Alarmstation und Einsatzbereitschaft bei R-717 über 3.000 kg',
-      requirement: 'Bei R-717-Füllmengen über 3.000 kg muss eine zentrale Alarmstation ständig besetzt sein; speziell ausgebildetes Personal muss innerhalb von 60 Minuten vor Ort sein können.',
-      measure: 'Ständig besetzte zentrale Alarmstation und Einsatzbereitschaft speziell ausgebildeten Personals mit einer Eintreffzeit von höchstens 60 Minuten organisatorisch sicherstellen.',
-      source: SOURCE.r717
-    }));
-  }
   return requirements;
 }
 
@@ -420,6 +410,16 @@ function buildAlarmRequirements(state, safetyData, chargeLimitAssessment) {
       requirement: 'Bei Aufstellbereichen der Kategorie a muss zusätzlich an einem überwachten Ort alarmiert werden.',
       measure: 'Alarmweiterleitung an überwachten Ort, z. B. ständig besetzten Arbeitsplatz, vorsehen.',
       source: SOURCE.alarms
+    }));
+  }
+  if (isR717(safetyData) && numberOrNull(state.chargeKg) > 3000) {
+    requirements.push(required({
+      id: 'alarm.r717.central-station',
+      category: 'alarm',
+      title: 'Zentrale Alarmstation und Einsatzbereitschaft bei R-717 über 3.000 kg',
+      requirement: 'Bei R-717-Füllmengen über 3.000 kg muss eine zentrale Alarmstation ständig besetzt sein; speziell ausgebildetes Personal muss innerhalb von 60 Minuten vor Ort sein können.',
+      measure: 'Ständig besetzte zentrale Alarmstation und Einsatzbereitschaft speziell ausgebildeten Personals mit einer Eintreffzeit von höchstens 60 Minuten organisatorisch sicherstellen.',
+      source: SOURCE.r717
     }));
   }
   return requirements;
