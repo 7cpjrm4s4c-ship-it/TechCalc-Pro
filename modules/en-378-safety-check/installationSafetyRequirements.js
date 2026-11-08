@@ -379,7 +379,9 @@ function buildDetectorRequirements(state, safetyData, chargeLimitAssessment) {
 
 function buildAlarmRequirements(state, safetyData, chargeLimitAssessment) {
   const requirements = [];
-  const alarmRequired = chargeLimitAssessment?.status === 'failed' || yes(state.hasGasWarningSystem) || yes(state.hasDetector) || isR717(safetyData);
+  const alarmRequired = state.installationLocation === 'outdoor'
+    ? yes(state.hasAlarm)
+    : chargeLimitAssessment?.status === 'failed' || yes(state.hasGasWarningSystem) || yes(state.hasDetector) || isR717(safetyData);
   if (!alarmRequired) return requirements;
 
   requirements.push(checkBoolean({
