@@ -297,9 +297,12 @@ function buildDetectorRequirements(state, safetyData, chargeLimitAssessment) {
   const practicalLimit = numberOrNull(safetyData?.practicalLimitKgM3);
   const concentrationRisk = concentration != null && practicalLimit != null && concentration > practicalLimit;
   const flammable = isFlammable(safetyData?.flammabilityClass);
+  const r717 = isR717(safetyData);
   const detectorPreset = calculateDetectorPreset({ safetyData });
 
-  if (!concentrationRisk && !flammable && !isR717(safetyData)) return requirements;
+  // EN 378-3:2016+A1:2020, 9.1 defines the detector trigger.
+  // Sections 9.3.2 and 9.3.3 refine detector behavior; they do not replace 9.1.
+  if (!concentrationRisk) return requirements;
 
   requirements.push(checkBoolean({
     id: 'hasDetector',
@@ -328,7 +331,7 @@ function buildDetectorRequirements(state, safetyData, chargeLimitAssessment) {
     details: Object.freeze({ detectorPresetKgM3: detectorPreset }),
     missingInputs: detectorPreset == null ? ['lflKgM3', 'atelOdlKgM3'] : []
   }));
-  if (flammable) {
+  if (flammable && !r717) {
     requirements.push(required({
       id: 'detector.flammable-classes',
       category: 'detection',
@@ -354,9 +357,10 @@ function buildDetectorRequirements(state, safetyData, chargeLimitAssessment) {
 
 function buildAlarmRequirements(state, safetyData, chargeLimitAssessment) {
   const requirements = [];
+  const detectorRequired = buildDetectorRequirements(state, safetyData, chargeLimitAssessment).length > 0;
   const alarmRequired = state.installationLocation === 'outdoor'
-    ? yes(state.hasAlarm)
-    : chargeLimitAssessment?.status === 'failed' || yes(state.hasGasWarningSystem) || yes(state.hasDetector) || isR717(safetyData);
+    ? detectorRequired || yes(state.hasAlarm)
+    : detectorRequired || yes(state.hasGasWarningSystem) || yes(state.hasDetector) || isR717(safetyData);
   if (!alarmRequired) return requirements;
 
   requirements.push(checkBoolean({
@@ -460,8 +464,8 @@ export function assessInstallationSafetyRequirements(currentState = {}, chargeLi
     ...buildArrangementRequirements(currentState, safetyData),
     ...(isOutdoor ? [] : buildMachineryRoomRequirements(currentState, safetyData)),
     ...(isOutdoor ? [] : buildAlternativePrecautionRequirements(currentState, safetyData, chargeLimitAssessment)),
-    ...(!isOutdoor || accumulationPossible ? buildDetectorRequirements(currentState, safetyData, chargeLimitAssessment) : []),
-    ...(!isOutdoor || accumulationPossible ? buildAlarmRequirements(currentState, safetyData, chargeLimitAssessment) : []),
+    ...(!isOutdoor || (requirements.every(item => [REQUIREMENT_STATUS.PASSED, REQUIREMENT_STATUS.NOT_APPLICABLE].includes(item.status)) && accumulationPossible) ? buildDetectorRequirements(currentState, safetyData, chargeLimitAssessment) : []),
+    ...(!isOutdoor || (requirements.every(item => [REQUIREMENT_STATUS.PASSED, REQUIREMENT_STATUS.NOT_APPLICABLE].includes(item.status)) && accumulationPossible) ? buildAlarmRequirements(currentState, safetyData, chargeLimitAssessment) : []),
     ...buildWarningAndInspectionRequirements(currentState, safetyData)
   ];
 
