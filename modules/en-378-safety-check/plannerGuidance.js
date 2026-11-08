@@ -67,13 +67,35 @@ function itemFromMissingInput(inputKey) {
 }
 
 function dedupeItems(items) {
-  const seen = new Set();
-  return array(items).filter(item => {
-    const key = `${item.title}|${item.status}|${item.measure}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+  const grouped = new Map();
+  const statusRank = { failed: 3, 'not-assessed': 2, required: 1, passed: 0 };
+  for (const item of array(items)) {
+    const key = text(item.measure).replace(/\\s+/g, ' ').toLocaleLowerCase('de-DE');
+    if (!key) continue;
+    const existing = grouped.get(key);
+    const sourceLabels = unique([...(existing?.sourceLabels || []), item.sourceLabel]);
+    const sources = [...(existing?.sources || []), item.source || {}].filter(source =>
+      sourceLabel(source) && !((existing?.sources || []).some(current => sourceLabel(current) === sourceLabel(source)))
+    );
+    if (!existing) {
+      grouped.set(key, { ...item, sourceLabels, sources, sourceLabel: sourceLabels.join('; ') });
+      continue;
+    }
+    const replaceStatus = (statusRank[item.status] || 0) > (statusRank[existing.status] || 0);
+    grouped.set(key, {
+      ...existing,
+      ...(replaceStatus ? { id: item.id, title: item.title, status: item.status, statusLabel: item.statusLabel, guidanceStatus: item.guidanceStatus, priority: item.priority, missingInputs: unique([...existing.missingInputs, ...item.missingInputs]) } : {}),
+      sourceLabels,
+      sources,
+      sourceLabel: sourceLabels.join('; ')
+    });
+  }
+  return [...grouped.values()].map(item => Object.freeze({
+    ...item,
+    sourceLabels: Object.freeze(item.sourceLabels),
+    sources: Object.freeze(item.sources),
+    missingInputs: Object.freeze(unique(item.missingInputs))
+  }));
 }
 
 function buildGroups(items) {
