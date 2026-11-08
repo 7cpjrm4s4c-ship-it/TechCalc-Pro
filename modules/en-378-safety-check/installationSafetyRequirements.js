@@ -195,11 +195,14 @@ function buildOutdoorVentilationRequirements(state) {
   return requirements;
 }
 
-function buildMachineryRoomRequirements(state, safetyData) {
+function buildMachineryRoomRequirements(state, safetyData, chargeLimitAssessment) {
   if (!yes(state.hasMachineryRoom) && state.installationLocation !== 'machinery-room') return [];
   const requirements = [];
   const flammable = isFlammable(safetyData?.flammabilityClass) || safetyData?.toxicityClass === 'B';
-  const ventilation = calculateMachineryRoomEmergencyVentilationFlow(state.chargeKg);
+  const detectorRequired = buildDetectorRequirements(state, safetyData, chargeLimitAssessment).length > 0;
+  const ventilationCharge = numberOrNull(state.machineryRoomLargestSystemChargeKg);
+  const ventilation = calculateMachineryRoomEmergencyVentilationFlow(ventilationCharge);
+  const fifteenAirChangesM3h = numberOrNull(state.roomVolumeM3) > 0 ? round(numberOrNull(state.roomVolumeM3) * 15, 1) : null;
 
   requirements.push(required({
     id: 'machinery-room.access-restricted',
@@ -244,25 +247,45 @@ function buildMachineryRoomRequirements(state, safetyData) {
     source: SOURCE.machineryRoomVentilation,
     value: state.hasMechanicalVentilation
   }));
-  requirements.push(required({
-    id: 'machinery-room.emergency-ventilation-flow',
-    category: 'ventilation',
-    title: 'Mechanische Notlüftung dimensionieren',
-    requirement: 'Der Luftstrom der mechanischen Notlüftung muss mindestens V = 0,014 × m^(2/3) betragen; 15 Luftwechsel je Stunde sind ausreichend.',
-    measure: `Mechanische Notlüftung mit mindestens ${ventilation.flowM3s ?? 'nicht bestimmbar'} m³/s bzw. ${ventilation.flowM3h ?? 'nicht bestimmbar'} m³/h für die größte Füllmenge im Maschinenraum auslegen.`,
-    source: SOURCE.machineryRoomVentilation,
-    details: ventilation,
-    missingInputs: ventilation.flowM3s == null ? ['chargeKg'] : []
-  }));
-  requirements.push(checkBoolean({
-    id: 'hasEmergencyVentilation',
-    category: 'ventilation',
-    title: 'Mechanische Notlüftung vorhanden',
-    requirement: 'Wenn ein Gaswarnsystem erforderlich ist, muss die mechanische Notlüftung durch Detektor(en) aktiviert werden.',
-    measure: 'Notlüftung mit Detektoraktivierung und zwei voneinander unabhängigen Notsteuerungen vorsehen.',
-    source: SOURCE.machineryRoomVentilation,
-    value: state.hasEmergencyVentilation
-  }));
+  if (detectorRequired) {
+    requirements.push(checkBoolean({
+      id: 'hasEmergencyVentilation',
+      category: 'ventilation',
+      title: 'Mechanische Notlüftung durch Detektoren aktiviert',
+      requirement: 'Ist im Maschinenraum ein Gasnachweissystem erforderlich, muss die mechanische Notlüftung durch einen oder mehrere im Maschinenraum vorhandene Detektoren aktiviert werden. Die Detektoren müssen Abschnitt 9 entsprechen.',
+      measure: 'Detektor(en) im Maschinenraum so in die Steuerung einbinden, dass sie die mechanische Notlüftung automatisch aktivieren.',
+      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.3' }),
+      value: state.hasEmergencyVentilation
+    }));
+    requirements.push(checkBoolean({
+      id: 'machinery-room.emergency-ventilation-control-outside',
+      category: 'emergencyControl',
+      title: 'Notsteuerung der mechanischen Notlüftung außen vorhanden',
+      requirement: 'Die mechanische Notlüftung muss mit einer Notsteuerung außerhalb des Maschinenraums ausgerüstet sein.',
+      measure: 'Unabhängige Notsteuerung der mechanischen Notlüftung außerhalb des Maschinenraums vorsehen.',
+      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.3' }),
+      value: state.hasEmergencyVentilationControlOutside
+    }));
+    requirements.push(checkBoolean({
+      id: 'machinery-room.emergency-ventilation-control-inside',
+      category: 'emergencyControl',
+      title: 'Notsteuerung der mechanischen Notlüftung innen vorhanden',
+      requirement: 'Die mechanische Notlüftung muss mit einer zweiten, von der äußeren Notsteuerung unabhängigen Notsteuerung innerhalb des Maschinenraums ausgerüstet sein.',
+      measure: 'Zweite, unabhängige Notsteuerung der mechanischen Notlüftung innerhalb des Maschinenraums vorsehen.',
+      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.3' }),
+      value: state.hasEmergencyVentilationControlInside
+    }));
+    requirements.push(required({
+      id: 'machinery-room.emergency-ventilation-flow',
+      category: 'ventilation',
+      title: 'Mechanische Notlüftung dimensionieren',
+      requirement: 'Der Luftstrom der mechanischen Notlüftung muss mindestens V = 0,014 × m^(2/3) betragen. Ein Luftwechsel von 15 h⁻¹ ist als ausreichende Auslegung angegeben.',
+      measure: `Für die größte Kälteanlage mit einem Teil im Maschinenraum mindestens ${ventilation.flowM3s ?? 'nicht bestimmbar'} m³/s bzw. ${ventilation.flowM3h ?? 'nicht bestimmbar'} m³/h nach Gleichung (1) nachweisen. 15 Luftwechsel je Stunde entsprechen bei dem eingegebenen Raumvolumen ${fifteenAirChangesM3h ?? 'nicht bestimmbar'} m³/h.`,
+      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.4' }),
+      details: Object.freeze({ ...ventilation, largestSystemChargeKg: ventilationCharge, fifteenAirChangesPerHourM3h: fifteenAirChangesM3h }),
+      missingInputs: ventilation.flowM3s == null ? ['machineryRoomLargestSystemChargeKg'] : []
+    }));
+  }
   requirements.push(checkBoolean({
     id: 'hasEmergencyLighting',
     category: 'machineryRoom',
@@ -532,7 +555,7 @@ export function assessInstallationSafetyRequirements(currentState = {}, chargeLi
   const outdoorFollowUpsApplicable = isOutdoor && arrangementPassed && accumulationPossible;
   const requirements = [
     ...arrangementRequirements,
-    ...(isOutdoor ? [] : buildMachineryRoomRequirements(currentState, safetyData)),
+    ...(isOutdoor ? [] : buildMachineryRoomRequirements(currentState, safetyData, chargeLimitAssessment)),
     ...(isOutdoor ? [] : buildAlternativePrecautionRequirements(currentState, safetyData, chargeLimitAssessment)),
     ...(outdoorFollowUpsApplicable ? buildDetectorRequirements(currentState, safetyData, chargeLimitAssessment) : (!isOutdoor ? buildDetectorRequirements(currentState, safetyData, chargeLimitAssessment) : [])),
     ...(outdoorFollowUpsApplicable ? buildAlarmRequirements(currentState, safetyData, chargeLimitAssessment) : (!isOutdoor ? buildAlarmRequirements(currentState, safetyData, chargeLimitAssessment) : [])),
