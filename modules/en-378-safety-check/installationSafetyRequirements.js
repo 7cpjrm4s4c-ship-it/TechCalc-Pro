@@ -318,7 +318,9 @@ function buildAlternativePrecautionRequirements(state, safetyData, chargeLimitAs
 
 function buildDetectorRequirements(state, safetyData, chargeLimitAssessment) {
   const requirements = [];
-  const concentrationRisk = chargeLimitAssessment?.status === 'failed' || yes(state.hasGasWarningSystem);
+  const concentration = numberOrNull(chargeLimitAssessment?.concentrationKgM3);
+  const practicalLimit = numberOrNull(safetyData?.practicalLimitKgM3);
+  const concentrationRisk = concentration != null && practicalLimit != null && concentration > practicalLimit;
   const flammable = isFlammable(safetyData?.flammabilityClass);
   const detectorPreset = calculateDetectorPreset({ safetyData });
 
@@ -475,12 +477,14 @@ export function assessInstallationSafetyRequirements(currentState = {}, chargeLi
     });
   }
 
+  const isOutdoor = currentState.installationLocation === 'outdoor';
+  const accumulationPossible = yes(currentState.outdoorRefrigerantAccumulationPossible);
   const requirements = [
     ...buildArrangementRequirements(currentState, safetyData),
-    ...buildMachineryRoomRequirements(currentState, safetyData),
-    ...buildAlternativePrecautionRequirements(currentState, safetyData, chargeLimitAssessment),
-    ...buildDetectorRequirements(currentState, safetyData, chargeLimitAssessment),
-    ...buildAlarmRequirements(currentState, safetyData, chargeLimitAssessment),
+    ...(isOutdoor ? [] : buildMachineryRoomRequirements(currentState, safetyData)),
+    ...(isOutdoor ? [] : buildAlternativePrecautionRequirements(currentState, safetyData, chargeLimitAssessment)),
+    ...(!isOutdoor || accumulationPossible ? buildDetectorRequirements(currentState, safetyData, chargeLimitAssessment) : []),
+    ...(!isOutdoor || accumulationPossible ? buildAlarmRequirements(currentState, safetyData, chargeLimitAssessment) : []),
     ...buildWarningAndInspectionRequirements(currentState, safetyData)
   ];
 
