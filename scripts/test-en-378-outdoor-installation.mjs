@@ -68,6 +68,40 @@ const blockedFollowUps = assessInstallationSafetyRequirements(accumulationWithFa
 assert.ok(!blockedFollowUps.requirements.some(item => item.id === 'outdoor.refrigerant-accumulation'));
 assert.ok(!blockedFollowUps.requirements.some(item => item.id.startsWith('detector.')));
 
+
+const ventilationState = {
+  ...accumulationState,
+  hasMechanicalVentilation: 'yes',
+  outdoorVentilationGeneralConfirmed: 'yes',
+  outdoorVentilationNationalRulesConfirmed: 'yes',
+  outdoorMechanicalVentilationOpeningsConfirmed: 'no'
+};
+const ventilationAssessment = assessInstallationSafetyRequirements(ventilationState, assessChargeLimit(ventilationState));
+assert.equal(ventilationAssessment.requirements.find(item => item.id === 'outdoor.ventilation-general')?.status, 'passed');
+assert.equal(ventilationAssessment.requirements.find(item => item.id === 'outdoor.ventilation-national-rules')?.status, 'passed');
+assert.equal(ventilationAssessment.requirements.find(item => item.id === 'outdoor.mechanical-ventilation-openings')?.status, 'failed');
+assert.equal(ventilationAssessment.requirements.find(item => item.id === 'outdoor.mechanical-ventilation-openings')?.source?.sourceSection, '5.13');
+
+const noMechanicalVentilationState = {
+  ...accumulationState,
+  hasMechanicalVentilation: 'no',
+  outdoorVentilationGeneralConfirmed: 'yes',
+  outdoorVentilationNationalRulesConfirmed: 'yes'
+};
+const noMechanicalVentilationAssessment = assessInstallationSafetyRequirements(noMechanicalVentilationState, assessChargeLimit(noMechanicalVentilationState));
+assert.equal(noMechanicalVentilationAssessment.requirements.find(item => item.id === 'outdoor.mechanical-ventilation-openings'), undefined);
+assert.equal(noMechanicalVentilationAssessment.requirements.find(item => item.id === 'outdoor.mechanical-ventilation-applicability'), undefined);
+
+const undeterminedMechanicalVentilationState = {
+  ...accumulationState,
+  hasMechanicalVentilation: '',
+  outdoorVentilationGeneralConfirmed: 'yes',
+  outdoorVentilationNationalRulesConfirmed: 'yes'
+};
+const undeterminedMechanicalVentilationAssessment = assessInstallationSafetyRequirements(undeterminedMechanicalVentilationState, assessChargeLimit(undeterminedMechanicalVentilationState));
+assert.equal(undeterminedMechanicalVentilationAssessment.requirements.find(item => item.id === 'outdoor.mechanical-ventilation-applicability')?.status, 'not-assessed');
+assert.equal(undeterminedMechanicalVentilationAssessment.requirements.find(item => item.id === 'outdoor.mechanical-ventilation-openings'), undefined);
+
 const calculation = calculate(base);
 assert.equal(calculation.effectiveState.chargeKg, '8');
 assert.ok(calculation.installationSafetyAssessment.requirements.some(item => item.id === 'outdoor.safe-arrangement'));
