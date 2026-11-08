@@ -27,7 +27,9 @@ const state = {
   hasDetector: 'yes',
   hasAlarm: 'no',
   hasIndependentAlarmPower: 'no',
-  hasExplosionProtectedElectricalEquipment: 'yes'
+  hasExplosionProtectedElectricalEquipment: 'yes',
+  outdoorVentilationGeneralConfirmed: 'yes',
+  outdoorMechanicalVentilationOpeningsConfirmed: 'no'
 };
 
 const calculation = calculate(state);
@@ -64,8 +66,8 @@ const report = buildEN378SafetyCheckReportDto({
 });
 assert.equal(report.summary.plannerGuidanceHeadline, calculation.plannerGuidance.headline);
 assert.equal(report.assessment.plannerGuidance.status, 'measures-required');
-assert.equal(report.input.outdoorVentilationGeneralConfirmed, '');
-assert.equal(report.input.outdoorMechanicalVentilationOpeningsConfirmed, '');
+assert.equal(report.input.outdoorVentilationGeneralConfirmed, 'yes');
+assert.equal(report.input.outdoorMechanicalVentilationOpeningsConfirmed, 'no');
 assert.ok(report.plannerGuidance.groups.length > 0);
 assert.doesNotThrow(() => JSON.stringify(report));
 
