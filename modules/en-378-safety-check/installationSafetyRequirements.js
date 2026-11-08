@@ -114,6 +114,9 @@ function buildArrangementRequirements(state, safetyData) {
     if (baseRequirementsPassed) {
       requirements.push(checkBoolean({ id: 'outdoor.refrigerant-accumulation', category: 'location', title: 'Kältemittelansammlung möglich', requirement: 'Der Planer muss örtlich beurteilen, ob sich austretendes Kältemittel am Aufstellort ansammeln kann.', measure: 'Örtliche Situation planerisch beurteilen und Ja oder Nein dokumentieren. Diese Entscheidung wird nicht automatisch aus anderen Eingaben abgeleitet.', source: SOURCE.outdoorArrangement, value: state.outdoorRefrigerantAccumulationPossible }));
     }
+    if (baseRequirementsPassed && yes(state.outdoorRefrigerantAccumulationPossible)) {
+      requirements.push(...buildOutdoorVentilationRequirements(state));
+    }
     if (baseRequirementsPassed && yes(state.outdoorRefrigerantAccumulationPossible) && flammable) {
       requirements.push(checkBoolean({ id: 'outdoor.en378-2-6-2-14', category: 'location', title: 'Zusatzanforderung EN 378-2, 6.2.14 erfüllt', requirement: 'Bei möglicher Kältemittelansammlung und Sicherheitsklassen 2L, 2 oder 3 ist die eigenständige Zusatzanforderung nach EN 378-2:2016, 6.2.14 zu prüfen.', measure: 'Anwendbarkeit und Erfüllung der Zusatzanforderung EN 378-2:2016, 6.2.14 gesondert nachweisen.', source: Object.freeze({ sourcePart: 'EN 378-2:2016', sourceSection: '6.2.14' }), value: state.outdoorEN3782_6_2_14Confirmed }));
     }
@@ -141,6 +144,54 @@ function buildArrangementRequirements(state, safetyData) {
     }));
   }
 
+  return requirements;
+}
+
+function buildOutdoorVentilationRequirements(state) {
+  const requirements = [];
+  if (state.installationLocation !== 'outdoor' || !yes(state.outdoorRefrigerantAccumulationPossible)) return requirements;
+
+  requirements.push(checkBoolean({
+    id: 'outdoor.ventilation-general',
+    category: 'ventilation',
+    title: 'Lüftungsführung bei möglicher Kältemittelansammlung',
+    requirement: 'Die für den Außenaufstellort relevante Lüftungsführung ist unter Berücksichtigung der örtlichen Situation nach EN 378-3, 5.13.1 zu bewerten. Maschinenraumspezifische Einzelanforderungen werden nicht pauschal auf die Außenaufstellung übertragen.',
+    measure: 'Lüftungsführung und mögliche Kältemittelausbreitung am Außenaufstellort planerisch prüfen und dokumentieren.',
+    source: SOURCE.machineryRoomVentilation,
+    value: state.outdoorVentilationGeneralConfirmed
+  }));
+  requirements.push(checkBoolean({
+    id: 'outdoor.ventilation-national-rules',
+    category: 'ventilation',
+    title: 'Nationale Lüftungsvorschriften einhalten',
+    requirement: 'Die Lüftung muss den nationalen Vorschriften entsprechen. Der vierfache Luftwechsel wird nicht pauschal auf Außenaufstellungen übertragen.',
+    measure: 'Einhaltung der für den konkreten Außenaufstellort geltenden nationalen Lüftungsvorschriften prüfen und dokumentieren.',
+    source: SOURCE.machineryRoomVentilation,
+    value: state.outdoorVentilationNationalRulesConfirmed
+  }));
+
+  if (!hasAnswer(state.hasMechanicalVentilation)) {
+    requirements.push(required({
+      id: 'outdoor.mechanical-ventilation-applicability',
+      category: 'ventilation',
+      title: 'Mechanische Lüftung als vorhanden oder vorgesehen feststellen',
+      requirement: 'Die Anwendbarkeit der Anforderungen an Öffnungen für mechanische Lüftung nach EN 378-3, 5.13.5 hängt davon ab, ob eine mechanische Lüftung vorhanden oder planerisch vorgesehen ist.',
+      measure: 'Vorhandensein oder planerische Vorsehung einer mechanischen Lüftung mit Ja oder Nein festlegen.',
+      source: SOURCE.machineryRoomVentilation,
+      status: REQUIREMENT_STATUS.NOT_ASSESSED,
+      missingInputs: ['hasMechanicalVentilation']
+    }));
+  } else if (yes(state.hasMechanicalVentilation)) {
+    requirements.push(checkBoolean({
+      id: 'outdoor.mechanical-ventilation-openings',
+      category: 'ventilation',
+      title: 'Öffnungen für mechanische Lüftung',
+      requirement: 'Öffnungen für mechanische Lüftung müssen geeignet angeordnet und ausreichend dimensioniert sein; Zu- und Abluftführung müssen die sichere Ableitung des Kältemittels gewährleisten.',
+      measure: 'Anordnung, Größe und Luftführung der mechanischen Lüftungsöffnungen prüfen und den erforderlichen Luftstrom nachweisen.',
+      source: SOURCE.machineryRoomVentilation,
+      value: state.outdoorMechanicalVentilationOpeningsConfirmed
+    }));
+  }
   return requirements;
 }
 
@@ -470,13 +521,18 @@ export function assessInstallationSafetyRequirements(currentState = {}, chargeLi
   }
 
   const isOutdoor = currentState.installationLocation === 'outdoor';
+  const arrangementRequirements = buildArrangementRequirements(currentState, safetyData);
+  const arrangementPassed = arrangementRequirements.every(item =>
+    [REQUIREMENT_STATUS.PASSED, REQUIREMENT_STATUS.NOT_APPLICABLE].includes(item.status)
+  );
   const accumulationPossible = yes(currentState.outdoorRefrigerantAccumulationPossible);
+  const outdoorFollowUpsApplicable = isOutdoor && arrangementPassed && accumulationPossible;
   const requirements = [
-    ...buildArrangementRequirements(currentState, safetyData),
+    ...arrangementRequirements,
     ...(isOutdoor ? [] : buildMachineryRoomRequirements(currentState, safetyData)),
     ...(isOutdoor ? [] : buildAlternativePrecautionRequirements(currentState, safetyData, chargeLimitAssessment)),
-    ...(!isOutdoor || (requirements.every(item => [REQUIREMENT_STATUS.PASSED, REQUIREMENT_STATUS.NOT_APPLICABLE].includes(item.status)) && accumulationPossible) ? buildDetectorRequirements(currentState, safetyData, chargeLimitAssessment) : []),
-    ...(!isOutdoor || (requirements.every(item => [REQUIREMENT_STATUS.PASSED, REQUIREMENT_STATUS.NOT_APPLICABLE].includes(item.status)) && accumulationPossible) ? buildAlarmRequirements(currentState, safetyData, chargeLimitAssessment) : []),
+    ...(outdoorFollowUpsApplicable ? buildDetectorRequirements(currentState, safetyData, chargeLimitAssessment) : (!isOutdoor ? buildDetectorRequirements(currentState, safetyData, chargeLimitAssessment) : [])),
+    ...(outdoorFollowUpsApplicable ? buildAlarmRequirements(currentState, safetyData, chargeLimitAssessment) : (!isOutdoor ? buildAlarmRequirements(currentState, safetyData, chargeLimitAssessment) : [])),
     ...buildWarningAndInspectionRequirements(currentState, safetyData)
   ];
 
