@@ -30,6 +30,7 @@ export const initialState = Object.freeze({
   outdoorEN3782_6_2_14Confirmed: '',
   outdoorVentilationGeneralConfirmed: '',
   outdoorVentilationNationalRulesConfirmed: '',
+  outdoorMechanicalVentilationOpeningsConfirmed: '',
   roomVolumeM3: '',
   installationLocation: '',
   installationClass: '',
