@@ -70,7 +70,7 @@ function dedupeItems(items) {
   const grouped = new Map();
   const statusRank = { failed: 3, 'not-assessed': 2, required: 1, passed: 0 };
   for (const item of array(items)) {
-    const key = text(item.measure).replace(/\\s+/g, ' ').toLocaleLowerCase('de-DE');
+    const key = text(item.measure).replace(/\s+/g, ' ').toLocaleLowerCase('de-DE');
     if (!key) continue;
     const existing = grouped.get(key);
     const sourceLabels = unique([...(existing?.sourceLabels || []), item.sourceLabel]);
