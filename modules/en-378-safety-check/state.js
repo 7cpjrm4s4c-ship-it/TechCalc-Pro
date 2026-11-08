@@ -26,6 +26,7 @@ export const initialState = Object.freeze({
   hasOutdoorProtectiveCover: '',
   outdoorCoverVentilated: '',
   outdoorRefrigerantAccumulationPossible: '',
+  outdoorEN3782_6_2_14Confirmed: '',
   roomVolumeM3: '',
   installationLocation: '',
   installationClass: '',
