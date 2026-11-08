@@ -28,6 +28,8 @@ export const initialState = Object.freeze({
   outdoorCoverVentilated: '',
   outdoorRefrigerantAccumulationPossible: '',
   outdoorEN3782_6_2_14Confirmed: '',
+  outdoorVentilationGeneralConfirmed: '',
+  outdoorVentilationNationalRulesConfirmed: '',
   roomVolumeM3: '',
   installationLocation: '',
   installationClass: '',
