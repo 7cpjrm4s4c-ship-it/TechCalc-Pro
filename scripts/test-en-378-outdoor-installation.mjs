@@ -17,7 +17,8 @@ const base = {
   outdoorSafeArrangement: 'yes',
   outdoorPreventBuildingEntry: 'yes',
   hasOutdoorProtectiveCover: 'no',
-  outdoorRefrigerantAccumulationPossible: 'no'
+  outdoorRefrigerantAccumulationPossible: 'no',
+  outdoorEN3782_6_2_14Confirmed: ''
 };
 const charge = assessChargeLimit(base);
 const assessment = assessInstallationSafetyRequirements(base, charge);
@@ -32,9 +33,11 @@ assert.equal(byId('outdoor.safe-arrangement')?.source?.sourceSection, '4.2');
 
 const accumulationState = {
   ...base,
-  outdoorRefrigerantAccumulationPossible: 'yes'
+  outdoorRefrigerantAccumulationPossible: 'yes',
+  outdoorEN3782_6_2_14Confirmed: 'yes'
 };
 const accumulationAssessment = assessInstallationSafetyRequirements(accumulationState, assessChargeLimit(accumulationState));
+assert.equal(accumulationAssessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14')?.status, 'passed');
 assert.equal(accumulationAssessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14')?.source?.sourceSection, '6.2.14');
 
 const coverState = {
