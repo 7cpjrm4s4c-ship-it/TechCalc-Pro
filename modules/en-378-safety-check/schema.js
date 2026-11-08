@@ -6,7 +6,9 @@ const option = (value, label) => Object.freeze({ value, label });
 const accessCategoryByAccessArea = Object.freeze({ 'general-access': 'a', 'supervised-access': 'b', 'authorized-access': 'c' });
 const isMachineryRoom = state => state.installationLocation === 'machinery-room' || state.hasMachineryRoom === 'yes';
 const isOutdoor = state => state.installationLocation === 'outdoor';
-const needsOutdoorEN3782Confirmation = state => isOutdoor(state) && state.outdoorRefrigerantAccumulationPossible === 'yes' && ['2L', '2', '3'].includes(getEN378SafetyData(state.refrigerantId)?.flammabilityClass);
+const outdoorBaseRequirementsPassed = state => state.isOutdoorDefinitionConfirmed === 'yes' && state.outdoorSafeArrangement === 'yes' && state.outdoorPreventBuildingEntry === 'yes' && (state.hasOutdoorProtectiveCover === 'no' || (state.hasOutdoorProtectiveCover === 'yes' && state.outdoorCoverVentilated === 'yes'));
+const needsOutdoorAccumulationAssessment = state => isOutdoor(state) && outdoorBaseRequirementsPassed(state);
+const needsOutdoorEN3782Confirmation = state => needsOutdoorAccumulationAssessment(state) && state.outdoorRefrigerantAccumulationPossible === 'yes' && ['2L', '2', '3'].includes(getEN378SafetyData(state.refrigerantId)?.flammabilityClass);
 const usesAlternativeRiskManagement = state => state.usesAlternativeRiskManagement === 'yes';
 const isHumanComfort = state => state.applicationType === 'human-comfort';
 const needsMountingType = state => isHumanComfort(state) && state.isFactorySealed === 'no';
@@ -88,11 +90,12 @@ const schema = defineFormSchema({
     { key: 'hasVentilationOpenings', label: 'Verdünnungsöffnungen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: usesAlternativeRiskManagement },
     { key: 'hasExplosionProtectedElectricalEquipment', label: 'Geeignete elektrische Betriebsmittel vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: needsExplosionEquipment },
     { key: 'isOutdoorPublicAccessible', label: 'Außenaufstellung öffentlich zugänglich', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isOutdoor },
+    { key: 'isOutdoorDefinitionConfirmed', label: 'Definition „im Freien“ durch Planer bestätigt', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isOutdoor },
     { key: 'outdoorSafeArrangement', label: 'Außenaufstellung schützt Personen und Sachwerte bei Leckage', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isOutdoor },
     { key: 'outdoorPreventBuildingEntry', label: 'Eindringen in Gebäude- und Frischluftöffnungen ausgeschlossen', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isOutdoor },
     { key: 'hasOutdoorProtectiveCover', label: 'Schutzabdeckung für kältetechnische Komponenten vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isOutdoor },
     { key: 'outdoorCoverVentilated', label: 'Schutzabdeckung ausreichend natürlich oder mechanisch belüftet', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isOutdoor(state) && state.hasOutdoorProtectiveCover === 'yes' },
-    { key: 'outdoorRefrigerantAccumulationPossible', label: 'Kältemittelansammlung möglich', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isOutdoor },
+    { key: 'outdoorRefrigerantAccumulationPossible', label: 'Kältemittelansammlung möglich', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: needsOutdoorAccumulationAssessment },
     { key: 'outdoorEN3782_6_2_14Confirmed', label: 'Zusatzanforderung EN 378-2, 6.2.14 erfüllt', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: needsOutdoorEN3782Confirmation },
     { key: 'additionalSafetyMeasures', label: 'Weitere Sicherheitsmaßnahmen', type: FIELD_TYPES.TEXT }
   ],
