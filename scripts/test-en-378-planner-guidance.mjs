@@ -64,6 +64,8 @@ const report = buildEN378SafetyCheckReportDto({
 });
 assert.equal(report.summary.plannerGuidanceHeadline, calculation.plannerGuidance.headline);
 assert.equal(report.assessment.plannerGuidance.status, 'measures-required');
+assert.equal(report.input.outdoorVentilationGeneralConfirmed, '');
+assert.equal(report.input.outdoorMechanicalVentilationOpeningsConfirmed, '');
 assert.ok(report.plannerGuidance.groups.length > 0);
 assert.doesNotThrow(() => JSON.stringify(report));
 
