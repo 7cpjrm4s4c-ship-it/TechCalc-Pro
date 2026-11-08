@@ -71,4 +71,24 @@ const sections = reportSections({ reportSource: 'typed-dto', reportDto: report }
 assert.ok(sections.some(section => section.title.includes('Planer-Leitfaden')));
 assert.ok(sections.some(section => section.rows.some(row => String(row[1]).includes('Externen Not-Aus'))));
 
+
+const duplicateMeasureGuidance = buildEN378PlannerGuidance({}, {
+  status: 'measures-required',
+  inputValidation: { issues: [] },
+  chargeLimitAssessment: { checks: [], missingInputs: [] },
+  installationSafetyAssessment: {
+    missingInputs: [],
+    requirements: [
+      { id: 'duplicate.measure.a', category: 'ventilation', title: 'Lüftungsmaßnahme A', status: 'failed', requirement: 'Prüfung A', measure: 'Mechanische Lüftung und Luftführung fachgerecht planen.', source: { sourcePart: 'EN 378-3', sourceSection: '5.13.1' } },
+      { id: 'duplicate.measure.b', category: 'ventilation', title: 'Lüftungsmaßnahme B', status: 'failed', requirement: 'Prüfung B', measure: 'Mechanische Lüftung und Luftführung fachgerecht planen.', source: { sourcePart: 'EN 378-3', sourceSection: '5.13.5' } }
+    ]
+  }
+});
+const consolidatedMeasures = duplicateMeasureGuidance.groups.flatMap(group => group.items);
+assert.equal(consolidatedMeasures.length, 1);
+assert.equal(duplicateMeasureGuidance.requiredMeasures.length, 1);
+assert.ok(consolidatedMeasures[0].sourceLabel.includes('5.13.1'));
+assert.ok(consolidatedMeasures[0].sourceLabel.includes('5.13.5'));
+assert.equal(consolidatedMeasures[0].sources.length, 2);
+
 console.log('EN 378 planner guidance tests passed.');
