@@ -113,8 +113,9 @@ Die vorhandene Kältemitteldatenbank einschließlich praktischer Grenzwerte und 
 - [x] Neuer Arbeitsbranch angelegt.
 - [x] Normpfad Außenaufstellung fachlich festgelegt.
 - [ ] Implementierungsspezifikation vollständig gegen den Bestandscode verifiziert.
-- [ ] Außenaufstellungslogik angepasst.
-- [ ] Regressionstests ergänzt und ausgeführt.
+- [x] Außenaufstellungslogik für die Grundanforderungen strukturiert.
+- [x] Erste Regressionstests ergänzt.
+- [ ] Bedingte Folgeprüfungen nach 5.13, Abschnitt 8 und Abschnitt 9 vollständig implementiert und ausgeführt.
 - [ ] Weitere Aufstellorte schrittweise fachlich festgelegt und umgesetzt.
 
 Bis zur abgeschlossenen fachlichen und technischen Prüfung erfolgen keine Änderungen an der produktiven Entscheidungslogik.
