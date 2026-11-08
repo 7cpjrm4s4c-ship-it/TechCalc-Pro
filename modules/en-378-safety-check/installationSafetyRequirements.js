@@ -10,6 +10,7 @@ export const REQUIREMENT_STATUS = Object.freeze({
 
 const SOURCE = Object.freeze({
   arrangement: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '4' }),
+  outdoorArrangement: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '4.2' }),
   machineryRoom: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5' }),
   machineryRoomVentilation: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13' }),
   alternativePrecautions: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '6' }),
@@ -100,14 +101,14 @@ function buildArrangementRequirements(state, safetyData) {
   const requirements = [];
   const flammable = isFlammable(safetyData?.flammabilityClass);
   if (state.installationLocation === 'outdoor') {
-    requirements.push(checkBoolean({ id: 'outdoor.safe-arrangement', category: 'location', title: 'Sichere Anordnung der Außenaufstellung', requirement: 'Die Außenaufstellung muss so angeordnet sein, dass austretendes Kältemittel bei einer Leckage Personen und Sachwerte nicht gefährden kann.', measure: 'Aufstellort und mögliche Ausbreitungswege planerisch bewerten und eine sichere Anordnung nachweisen.', source: SOURCE.arrangement, value: state.outdoorSafeArrangement }));
-    requirements.push(checkBoolean({ id: 'outdoor.prevent-refrigerant-entry', category: 'location', title: 'Eindringen in Gebäudeöffnungen verhindern', requirement: 'Austretendes Kältemittel darf nicht in Frischluftöffnungen, Türöffnungen, Bodenklappen oder ähnliche Gebäudeöffnungen eindringen können.', measure: 'Gebäudeöffnungen und Luftführung planerisch bewerten; Eindringen von Kältemittel sicher ausschließen.', source: SOURCE.arrangement, value: state.outdoorPreventBuildingEntry }));
+    requirements.push(checkBoolean({ id: 'outdoor.safe-arrangement', category: 'location', title: 'Sichere Anordnung der Außenaufstellung', requirement: 'Die Außenaufstellung muss so angeordnet sein, dass austretendes Kältemittel bei einer Leckage Personen und Sachwerte nicht gefährden kann.', measure: 'Aufstellort und mögliche Ausbreitungswege planerisch bewerten und eine sichere Anordnung nachweisen.', source: SOURCE.outdoorArrangement, value: state.outdoorSafeArrangement }));
+    requirements.push(checkBoolean({ id: 'outdoor.prevent-refrigerant-entry', category: 'location', title: 'Eindringen in Gebäudeöffnungen verhindern', requirement: 'Austretendes Kältemittel darf nicht in Frischluftöffnungen, Türöffnungen, Bodenklappen oder ähnliche Gebäudeöffnungen eindringen können.', measure: 'Gebäudeöffnungen und Luftführung planerisch bewerten; Eindringen von Kältemittel sicher ausschließen.', source: SOURCE.outdoorArrangement, value: state.outdoorPreventBuildingEntry }));
     if (yes(state.hasOutdoorProtectiveCover)) {
-      requirements.push(checkBoolean({ id: 'outdoor.cover-ventilation', category: 'location', title: 'Belüftung der Schutzabdeckung', requirement: 'Eine Schutzabdeckung für im Freien aufgestellte kältetechnische Komponenten muss eine natürliche oder mechanische Lüftung aufweisen.', measure: 'Ausreichende natürliche oder mechanische Belüftung der Schutzabdeckung sicherstellen.', source: SOURCE.arrangement, value: state.outdoorCoverVentilated }));
+      requirements.push(checkBoolean({ id: 'outdoor.cover-ventilation', category: 'location', title: 'Belüftung der Schutzabdeckung', requirement: 'Eine Schutzabdeckung für im Freien aufgestellte kältetechnische Komponenten muss eine natürliche oder mechanische Lüftung aufweisen.', measure: 'Ausreichende natürliche oder mechanische Belüftung der Schutzabdeckung sicherstellen.', source: SOURCE.outdoorArrangement, value: state.outdoorCoverVentilated }));
     } else if (!hasAnswer(state.hasOutdoorProtectiveCover)) {
-      requirements.push(required({ id: 'hasOutdoorProtectiveCover', category: 'location', title: 'Vorhandensein einer Schutzabdeckung bewerten', requirement: 'Es ist festzustellen, ob eine Schutzabdeckung für die im Freien aufgestellten kältetechnischen Komponenten vorhanden ist.', measure: 'Vorhandensein einer Schutzabdeckung mit Ja oder Nein dokumentieren.', source: SOURCE.arrangement, status: REQUIREMENT_STATUS.NOT_ASSESSED, missingInputs: ['hasOutdoorProtectiveCover'] }));
+      requirements.push(required({ id: 'hasOutdoorProtectiveCover', category: 'location', title: 'Vorhandensein einer Schutzabdeckung bewerten', requirement: 'Es ist festzustellen, ob eine Schutzabdeckung für die im Freien aufgestellten kältetechnischen Komponenten vorhanden ist.', measure: 'Vorhandensein einer Schutzabdeckung mit Ja oder Nein dokumentieren.', source: SOURCE.outdoorArrangement, status: REQUIREMENT_STATUS.NOT_ASSESSED, missingInputs: ['hasOutdoorProtectiveCover'] }));
     }
-    requirements.push(checkBoolean({ id: 'outdoor.refrigerant-accumulation', category: 'location', title: 'Kältemittelansammlung möglich', requirement: 'Der Planer muss örtlich beurteilen, ob sich austretendes Kältemittel am Aufstellort ansammeln kann.', measure: 'Örtliche Situation planerisch beurteilen und Ja oder Nein dokumentieren. Diese Entscheidung wird nicht automatisch aus anderen Eingaben abgeleitet.', source: SOURCE.arrangement, value: state.outdoorRefrigerantAccumulationPossible }));
+    requirements.push(checkBoolean({ id: 'outdoor.refrigerant-accumulation', category: 'location', title: 'Kältemittelansammlung möglich', requirement: 'Der Planer muss örtlich beurteilen, ob sich austretendes Kältemittel am Aufstellort ansammeln kann.', measure: 'Örtliche Situation planerisch beurteilen und Ja oder Nein dokumentieren. Diese Entscheidung wird nicht automatisch aus anderen Eingaben abgeleitet.', source: SOURCE.outdoorArrangement, value: state.outdoorRefrigerantAccumulationPossible }));
     if (yes(state.outdoorRefrigerantAccumulationPossible) && flammable) {
       requirements.push(required({ id: 'outdoor.en378-2-6-2-14', category: 'location', title: 'Zusatzanforderung EN 378-2, 6.2.14', requirement: 'Bei möglicher Kältemittelansammlung und Sicherheitsklassen 2L, 2 oder 3 ist die eigenständige Zusatzanforderung nach EN 378-2:2016, 6.2.14 zu prüfen.', measure: 'Anwendbarkeit und Erfüllung der Zusatzanforderung EN 378-2:2016, 6.2.14 gesondert nachweisen.', source: Object.freeze({ sourcePart: 'EN 378-2:2016', sourceSection: '6.2.14' }) }));
     }
@@ -120,7 +121,7 @@ function buildArrangementRequirements(state, safetyData) {
       title: 'Austritt in Gebäudeöffnungen verhindern',
       requirement: 'Bei Aufstellung im Freien darf austretendes Kältemittel nicht in Gebäude, Frischluftöffnungen, Türöffnungen, Bodenklappen oder ähnliche Öffnungen eindringen und keine Personen gefährden.',
       measure: 'Aufstellort, Abstände, Öffnungen und Luftführung so planen, dass austretendes Kältemittel nicht in Gebäude oder gefährdete Bereiche gelangt.',
-      source: SOURCE.arrangement
+      source: SOURCE.outdoorArrangement
     }));
     requirements.push(checkBoolean({
       id: 'isOutdoorPublicAccessible',
@@ -128,7 +129,7 @@ function buildArrangementRequirements(state, safetyData) {
       title: 'Öffentlich zugängliche Außenaufstellung bewertet',
       requirement: 'Öffentlich zugängliche kältemitteltechnische Komponenten im Freien müssen gegen Eingriff geschützt werden.',
       measure: 'Falls öffentlich zugänglich: Schutzabdeckung oder vergleichbaren Eingriffsschutz vorsehen.',
-      source: SOURCE.arrangement,
+      source: SOURCE.outdoorArrangement,
       value: state.isOutdoorPublicAccessible,
       priority: 'conditional'
     }));
@@ -140,7 +141,7 @@ function buildArrangementRequirements(state, safetyData) {
       title: 'Personen-Aufenthaltsbereich nach Abschnitten 8 und 9 bewerten',
       requirement: 'Bei Aufstellung im Personen-Aufenthaltsbereich sind die Anforderungen an Alarmierung und Detektion zu berücksichtigen, sofern Warnung bei Leckage erforderlich ist.',
       measure: 'Detektion und Alarmierung nach EN 378-3 Abschnitt 8 und 9 in die Planung aufnehmen.',
-      source: SOURCE.arrangement
+      source: SOURCE.outdoorArrangement
     }));
   }
   if (state.installationLocation === 'technical-room' && !yes(state.hasMachineryRoom)) {
@@ -150,7 +151,7 @@ function buildArrangementRequirements(state, safetyData) {
       title: 'Raum ohne Personenaufenthalt gegenüber Aufenthaltsbereichen trennen',
       requirement: 'Räume ohne Personenaufenthalt müssen gegenüber Personen-Aufenthaltsbereichen abgeschlossen sein; bei Komponenten mit lösbaren Verbindungen sind Lüftungsanforderungen zu bewerten.',
       measure: 'Raumtrennung, Lüftung und Detektion für angrenzende Aufenthaltsbereiche prüfen.',
-      source: SOURCE.arrangement,
+      source: SOURCE.outdoorArrangement,
       priority: 'conditional'
     }));
   }
@@ -161,7 +162,7 @@ function buildArrangementRequirements(state, safetyData) {
       title: 'Zündquellen bei brennbaren Kältemitteln vermeiden',
       requirement: 'Für Kältemittel der Klassen 2L, 2 und 3 sind Anforderungen bezüglich Zündquellen zu berücksichtigen.',
       measure: 'Zündquellen im relevanten Bereich vermeiden oder fachlich bewerten.',
-      source: SOURCE.arrangement
+      source: SOURCE.outdoorArrangement
     }));
   }
   return requirements;
