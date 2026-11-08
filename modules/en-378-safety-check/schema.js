@@ -51,7 +51,8 @@ const schema = defineFormSchema({
     { key: 'importNotice', label: 'Hinweis', type: FIELD_TYPES.NOTICE, text: 'Speichere zuerst im Modul F-Gase eine Anlage. Danach kann der Anlagenstand hier importiert werden.', tone: 'compact', visibleWhen: state => !hasAnyFGasesSavedSystem() },
     { key: 'importStatusMessage', label: 'Importstatus', type: FIELD_TYPES.TEXT, readonly: true, visibleWhen: state => Boolean(state.importStatusMessage) },
     { key: 'refrigerantId', label: 'Kältemittel', type: FIELD_TYPES.SELECT, options: [] },
-    { key: 'chargeKg', label: 'Füllmenge', type: FIELD_TYPES.DECIMAL, unit: 'kg' },
+    { key: 'chargeKg', label: 'Gesamte Kältemittelfüllmenge der Anlage', type: FIELD_TYPES.DECIMAL, unit: 'kg' },
+    { key: 'chargeScopeInfo', label: 'Hinweis zur Füllmenge', type: FIELD_TYPES.NOTICE, text: 'Gesamte Kältemittelfüllmenge der Anlage einschließlich aller kältemittelführenden Anlagenteile eingeben. Die Plausibilitätsprüfung der Füllmenge liegt in der Verantwortung des Planers.', tone: 'compact', visibleWhen: state => Boolean(state.installationLocation) },
     { key: 'roomVolumeM3', label: 'Raumvolumen', type: FIELD_TYPES.DECIMAL, unit: 'm³' },
     { key: 'installationLocation', label: 'Aufstellort', type: FIELD_TYPES.SELECT, options: installationLocationOptions },
     { key: 'installationClass', label: 'Aufstellungsort-Klassifikation', type: FIELD_TYPES.SELECT, options: installationClassOptions },
@@ -85,13 +86,18 @@ const schema = defineFormSchema({
     { key: 'hasVentilationOpenings', label: 'Verdünnungsöffnungen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: usesAlternativeRiskManagement },
     { key: 'hasExplosionProtectedElectricalEquipment', label: 'Geeignete elektrische Betriebsmittel vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: needsExplosionEquipment },
     { key: 'isOutdoorPublicAccessible', label: 'Außenaufstellung öffentlich zugänglich', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isOutdoor },
+    { key: 'outdoorSafeArrangement', label: 'Außenaufstellung schützt Personen und Sachwerte bei Leckage', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isOutdoor },
+    { key: 'outdoorPreventBuildingEntry', label: 'Eindringen in Gebäude- und Frischluftöffnungen ausgeschlossen', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isOutdoor },
+    { key: 'hasOutdoorProtectiveCover', label: 'Schutzabdeckung für kältetechnische Komponenten vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isOutdoor },
+    { key: 'outdoorCoverVentilated', label: 'Schutzabdeckung ausreichend natürlich oder mechanisch belüftet', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isOutdoor(state) && state.hasOutdoorProtectiveCover === 'yes' },
+    { key: 'outdoorRefrigerantAccumulationPossible', label: 'Kältemittelansammlung möglich', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isOutdoor },
     { key: 'additionalSafetyMeasures', label: 'Weitere Sicherheitsmaßnahmen', type: FIELD_TYPES.TEXT }
   ],
   groups: [
-    { title: 'Importierter Anlagenstand', fields: ['importedSystemName', 'importFGasesSystem', 'fGasesSnapshotId', 'importNotice', 'importStatusMessage', 'refrigerantId', 'chargeKg'], columns: 2, accent: 'blue' },
+    { title: 'Importierter Anlagenstand', fields: ['importedSystemName', 'importFGasesSystem', 'fGasesSnapshotId', 'importNotice', 'importStatusMessage', 'refrigerantId', 'chargeKg', 'chargeScopeInfo'], columns: 2, accent: 'blue' },
     { title: 'Raum und Aufstellung', fields: ['roomVolumeM3', 'installationLocation', 'installationClass', 'accessArea', 'accessCategoryInfo', 'accessCategory', 'usageType', 'applicationType', 'locationLevel'], columns: 2, accent: 'blue' },
     { title: 'Detailfragen zur Füllmengenbewertung', fields: ['occupantDensityBelowOnePer10m2', 'hasEmergencyExits', 'isPermanentlySealedSorptionSystem', 'usesAlternativeRiskManagement', 'alternativeRiskManagementInfo', 'floorAreaM2', 'isFactorySealed', 'mountingType'], columns: 2, accent: 'blue' },
-    { title: 'Lüftung und Sicherheitskomponenten', fields: ['ventilationType', 'limitInfo', 'hasGasWarningSystem', 'hasMachineryRoom', 'hasMechanicalVentilation', 'hasEmergencyVentilation', 'hasEmergencyStopOutside', 'hasEmergencyStopInside', 'hasEmergencyLighting', 'hasDetector', 'hasAlarm', 'hasIndependentAlarmPower', 'hasSafetyShutoffValves', 'hasVentilationOpenings', 'hasExplosionProtectedElectricalEquipment', 'isOutdoorPublicAccessible', 'additionalSafetyMeasures'], columns: 2, accent: 'blue' }
+    { title: 'Lüftung und Sicherheitskomponenten', fields: ['ventilationType', 'limitInfo', 'hasGasWarningSystem', 'hasMachineryRoom', 'hasMechanicalVentilation', 'hasEmergencyVentilation', 'hasEmergencyStopOutside', 'hasEmergencyStopInside', 'hasEmergencyLighting', 'hasDetector', 'hasAlarm', 'hasIndependentAlarmPower', 'hasSafetyShutoffValves', 'hasVentilationOpenings', 'hasExplosionProtectedElectricalEquipment', 'isOutdoorPublicAccessible', 'outdoorSafeArrangement', 'outdoorPreventBuildingEntry', 'hasOutdoorProtectiveCover', 'outdoorCoverVentilated', 'outdoorRefrigerantAccumulationPossible', 'additionalSafetyMeasures'], columns: 2, accent: 'blue' }
   ]
 });
 
