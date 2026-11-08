@@ -14,6 +14,7 @@ const base = {
   applicationType: 'other',
   locationLevel: 'other',
   ventilationType: 'natural',
+  isOutdoorDefinitionConfirmed: 'yes',
   outdoorSafeArrangement: 'yes',
   outdoorPreventBuildingEntry: 'yes',
   hasOutdoorProtectiveCover: 'no',
@@ -50,6 +51,7 @@ assert.equal(coverAssessment.requirements.find(item => item.id === 'outdoor.cove
 
 const openState = {
   ...base,
+  isOutdoorDefinitionConfirmed: '',
   outdoorSafeArrangement: '',
   outdoorPreventBuildingEntry: '',
   hasOutdoorProtectiveCover: '',
