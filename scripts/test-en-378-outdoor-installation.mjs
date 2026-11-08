@@ -59,7 +59,14 @@ const openState = {
 };
 const openAssessment = assessInstallationSafetyRequirements(openState, assessChargeLimit(openState));
 assert.equal(openAssessment.status, 'not-assessed');
-assert.ok(openAssessment.requirements.some(item => item.id === 'outdoor.refrigerant-accumulation' && item.status === 'not-assessed'));
+assert.ok(!openAssessment.requirements.some(item => item.id === 'outdoor.refrigerant-accumulation'));
+assert.ok(!openAssessment.requirements.some(item => item.id.startsWith('detector.')));
+assert.ok(!openAssessment.requirements.some(item => item.id.startsWith('alarm.')));
+
+const accumulationWithFailedPrerequisite = { ...base, outdoorPreventBuildingEntry: 'no', outdoorRefrigerantAccumulationPossible: 'yes' };
+const blockedFollowUps = assessInstallationSafetyRequirements(accumulationWithFailedPrerequisite, assessChargeLimit(accumulationWithFailedPrerequisite));
+assert.ok(!blockedFollowUps.requirements.some(item => item.id === 'outdoor.refrigerant-accumulation'));
+assert.ok(!blockedFollowUps.requirements.some(item => item.id.startsWith('detector.')));
 
 const calculation = calculate(base);
 assert.equal(calculation.effectiveState.chargeKg, '8');
