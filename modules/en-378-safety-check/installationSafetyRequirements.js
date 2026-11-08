@@ -35,6 +35,7 @@ const no = value => value === false || value === 'no';
 const hasAnswer = value => value === true || value === false || value === 'yes' || value === 'no';
 const round = (value, digits = 3) => Number.isFinite(value) ? Number(value.toFixed(digits)) : null;
 const isFlammable = flammabilityClass => ['2L', '2', '3'].includes(flammabilityClass);
+const isDetectorClass93_2 = safetyData => ['A2L', 'A2', 'B2L', 'B2', 'A3', 'B3'].includes(`${safetyData?.toxicityClass || ''}${safetyData?.flammabilityClass || ''}`);
 const isR717 = safetyData => safetyData?.standardNumber === '717' || safetyData?.refrigerantId === 'R-717';
 
 function freezeRequirement(requirement) {
@@ -296,7 +297,7 @@ function buildDetectorRequirements(state, safetyData, chargeLimitAssessment) {
   const concentration = numberOrNull(chargeLimitAssessment?.concentrationKgM3);
   const practicalLimit = numberOrNull(safetyData?.practicalLimitKgM3);
   const concentrationRisk = concentration != null && practicalLimit != null && concentration > practicalLimit;
-  const flammable = isFlammable(safetyData?.flammabilityClass);
+  const detectorClass93_2 = isDetectorClass93_2(safetyData);
   const r717 = isR717(safetyData);
   const detectorPreset = calculateDetectorPreset({ safetyData });
 
@@ -331,7 +332,7 @@ function buildDetectorRequirements(state, safetyData, chargeLimitAssessment) {
     details: Object.freeze({ detectorPresetKgM3: detectorPreset }),
     missingInputs: detectorPreset == null ? ['lflKgM3', 'atelOdlKgM3'] : []
   }));
-  if (flammable && !r717) {
+  if (detectorClass93_2 && !r717) {
     requirements.push(required({
       id: 'detector.flammable-classes',
       category: 'detection',
@@ -341,7 +342,7 @@ function buildDetectorRequirements(state, safetyData, chargeLimitAssessment) {
       source: SOURCE.detectors
     }));
   }
-  if (isR717(safetyData)) {
+  if (r717) {
     requirements.push(required({
       id: 'detector.r717.thresholds',
       category: 'detection',
@@ -350,6 +351,16 @@ function buildDetectorRequirements(state, safetyData, chargeLimitAssessment) {
       measure: 'R-717-Detektor auf Voralarm und Hauptalarm auslegen; bei Hauptalarm Anlage abschalten, Maschinenraum-Stromversorgung trennen und Lüftungsstrategie beachten.',
       source: SOURCE.r717,
       details: Object.freeze({ preAlarmMgM3: 350, mainAlarmMgM3: 21200 })
+    }));
+  }
+  if (isR717(safetyData) && numberOrNull(state.chargeKg) > 3000) {
+    requirements.push(required({
+      id: 'alarm.r717.central-station',
+      category: 'alarm',
+      title: 'Zentrale Alarmstation und Einsatzbereitschaft bei R-717 über 3.000 kg',
+      requirement: 'Bei R-717-Füllmengen über 3.000 kg muss eine zentrale Alarmstation ständig besetzt sein; speziell ausgebildetes Personal muss innerhalb von 60 Minuten vor Ort sein können.',
+      measure: 'Ständig besetzte zentrale Alarmstation und Einsatzbereitschaft speziell ausgebildeten Personals mit einer Eintreffzeit von höchstens 60 Minuten organisatorisch sicherstellen.',
+      source: SOURCE.r717
     }));
   }
   return requirements;
