@@ -27,6 +27,7 @@ const FIELD_LABELS = Object.freeze({
   hasOutdoorProtectiveCover: 'Schutzabdeckung vorhanden',
   outdoorCoverVentilated: 'Belüftung der Schutzabdeckung',
   outdoorRefrigerantAccumulationPossible: 'Kältemittelansammlung möglich',
+  outdoorEN3782_6_2_14Confirmed: 'Zusatzanforderung EN 378-2, 6.2.14',
   floorAreaM2: 'Raumfläche',
   mountingType: 'Montageart',
   isFactorySealed: 'werkseitig dauerhaft geschlossen',
