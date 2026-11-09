@@ -13,6 +13,7 @@ import { formatRefrigerantLabel, listRefrigerants } from '../../core/data/index.
 import { createPlatformModule } from '../../core/runtime/index.js';
 import { createTypedDtoReportAdapter } from '../../core/pdf/typedDtoReportAdapter.js';
 import { bindFGasesSnapshotImport } from './importController.js';
+import { normalizeEN378StateTransition } from './stateTransitions.js';
 export { buildEN378StateFromFGasesSnapshot, canImportFGasesSystemSnapshot } from './snapshotImport.js';
 
 const refrigerantOptions = Object.freeze([
@@ -28,10 +29,27 @@ const runtimeSchema = Object.freeze({
     ? Object.freeze({ ...field, options: refrigerantOptions })
     : field))
 });
+const transitionAwareState = Object.freeze({
+  get: () => state.get(),
+  getRevision: () => state.getRevision?.(),
+  set(patch = {}, meta = {}) {
+    return state.set(normalizeEN378StateTransition(state.get(), patch, meta), meta);
+  },
+  update(updater, meta = {}) {
+    const current = state.get();
+    const patch = typeof updater === 'function' ? updater(current) : updater;
+    return state.set(normalizeEN378StateTransition(current, patch || {}, meta), meta);
+  },
+  replace(next = {}, meta = {}) {
+    return state.replace(normalizeEN378StateTransition(state.get(), next, meta), meta);
+  },
+  reset: meta => state.reset(meta),
+  subscribe: (...args) => state.subscribe(...args)
+});
 const typedReportAdapter = createTypedDtoReportAdapter({
   config,
   schema: runtimeSchema,
-  state,
+  state: transitionAwareState,
   calculate,
   results: buildEN378SafetyCheckResultModel,
   buildReportDto: buildEN378SafetyCheckReportDto
@@ -60,7 +78,7 @@ const controller = Object.freeze({
 export default createPlatformModule({
   config,
   schema: runtimeSchema,
-  state,
+  state: transitionAwareState,
   initialState,
   calculate: typedReportAdapter.calculate,
   results: buildEN378SafetyCheckResultModel,

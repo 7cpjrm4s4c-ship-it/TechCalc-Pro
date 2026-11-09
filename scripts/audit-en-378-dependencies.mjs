@@ -33,13 +33,15 @@ const REQUIRED_RUNTIME_FILES = Object.freeze([
   'schema.js',
   'snapshotImport.js',
   'state.js',
-  'stateConsistency.js'
+  'stateConsistency.js',
+  'stateTransitions.js'
 ]);
 const REQUIRED_TESTS = Object.freeze([
   'test-en-378-safety-check.mjs',
   'test-en-378-charge-limit.mjs',
   'test-en-378-refrigerant-safety-data.mjs',
   'test-en-378-installation-requirements.mjs',
+  'test-en-378-outdoor-installation.mjs',
   'test-en-378-planner-guidance.mjs',
   'test-en-378-import-and-display.mjs',
   'test-en-378-refrigerant-coverage.mjs',

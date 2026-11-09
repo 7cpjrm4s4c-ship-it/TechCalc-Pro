@@ -21,13 +21,18 @@ const state = {
   hasMachineryRoom: 'yes',
   hasMechanicalVentilation: 'yes',
   hasEmergencyVentilation: 'no',
+  machineryRoomLargestSystemChargeKg: '6',
+  hasEmergencyVentilationControlInside: 'no',
+  hasEmergencyVentilationControlOutside: 'yes',
   hasEmergencyStopOutside: 'no',
   hasEmergencyStopInside: '',
   hasEmergencyLighting: 'yes',
   hasDetector: 'yes',
   hasAlarm: 'no',
   hasIndependentAlarmPower: 'no',
-  hasExplosionProtectedElectricalEquipment: 'yes'
+  hasExplosionProtectedElectricalEquipment: 'yes',
+  outdoorVentilationGeneralConfirmed: 'yes',
+  outdoorMechanicalVentilationOpeningsConfirmed: 'no'
 };
 
 const calculation = calculate(state);
@@ -35,6 +40,12 @@ assert.equal(calculation.status, 'measures-required');
 assert.ok(calculation.plannerGuidance);
 assert.equal(calculation.plannerGuidance.status, 'measures-required');
 assert.ok(calculation.plannerGuidance.failedCount >= 3);
+const emergencyFlow = calculation.installationSafetyAssessment.requirements.find(item => item.id === 'machinery-room.emergency-ventilation-flow');
+assert.equal(emergencyFlow.source.sourceSection, '5.13.4');
+assert.equal(emergencyFlow.details.largestSystemChargeKg, 6);
+assert.equal(emergencyFlow.details.fifteenAirChangesPerHourM3h, 1200);
+assert.ok(calculation.installationSafetyAssessment.requirements.some(item => item.id === 'machinery-room.emergency-ventilation-control-inside' && item.status === 'failed'));
+assert.ok(calculation.installationSafetyAssessment.requirements.some(item => item.id === 'machinery-room.emergency-ventilation-control-outside' && item.status === 'passed'));
 assert.ok(calculation.plannerGuidance.openPointCount >= 1);
 assert.ok(calculation.plannerGuidance.requiredMeasures.some(measure => measure.includes('Externen Not-Aus')));
 assert.ok(calculation.plannerGuidance.groups.some(group => group.id === 'ventilation'));
@@ -64,11 +75,69 @@ const report = buildEN378SafetyCheckReportDto({
 });
 assert.equal(report.summary.plannerGuidanceHeadline, calculation.plannerGuidance.headline);
 assert.equal(report.assessment.plannerGuidance.status, 'measures-required');
+assert.equal(report.input.outdoorVentilationGeneralConfirmed, 'yes');
+assert.equal(report.input.outdoorMechanicalVentilationOpeningsConfirmed, 'no');
 assert.ok(report.plannerGuidance.groups.length > 0);
 assert.doesNotThrow(() => JSON.stringify(report));
 
 const sections = reportSections({ reportSource: 'typed-dto', reportDto: report });
 assert.ok(sections.some(section => section.title.includes('Planer-Leitfaden')));
 assert.ok(sections.some(section => section.rows.some(row => String(row[1]).includes('Externen Not-Aus'))));
+
+
+const outdoorState = {
+  refrigerantId: 'R-32',
+  chargeKg: '8',
+  roomVolumeM3: '80',
+  installationLocation: 'outdoor',
+  installationClass: 'II',
+  accessArea: 'general-access',
+  usageType: 'industrial',
+  applicationType: 'other',
+  locationLevel: 'other',
+  isOutdoorDefinitionConfirmed: 'yes',
+  outdoorSafeArrangement: 'yes',
+  outdoorPreventBuildingEntry: 'yes',
+  hasOutdoorProtectiveCover: 'no',
+  outdoorRefrigerantAccumulationPossible: 'yes',
+  outdoorEN3782_6_2_14EN60335Applicable: 'no',
+  outdoorEN3782_6_2_14HazardousAreaConfirmed: 'yes',
+  outdoorEN3782_6_2_14HazardousAreaEvidenceReference: 'Gefährdungsbeurteilung-01',
+  outdoorEN3782_6_2_14ComponentAssessmentConfirmed: 'yes',
+  outdoorEN3782_6_2_14ComponentAssessmentEvidenceReference: 'Komponentenbewertung-01',
+  outdoorEN3782_6_2_14ProtectionConditionsConfirmed: 'yes',
+  outdoorEN3782_6_2_14ProtectionEvidenceReference: 'Schutzmaßnahmen-01',
+  outdoorEN3782_6_2_14AirflowProtectionUsed: 'no',
+  outdoorEN3782_6_2_14SurfaceTemperatureConfirmed: 'yes',
+  outdoorEN3782_6_2_14HazardousAreaExceedsEquipment: 'yes',
+  outdoorEN3782_6_2_14EquipmentDocumentationUpdated: 'no'
+};
+const outdoorCalculation = calculate(outdoorState);
+assert.ok(outdoorCalculation.plannerGuidance.groups.some(group => group.id === 'safetyMeasures'));
+assert.ok(outdoorCalculation.plannerGuidance.requiredMeasures.some(measure => measure.includes('Gerätedokumentation')));
+assert.ok(outdoorCalculation.plannerGuidance.requiredMeasures.some(measure => measure.includes('Geräteabmessungen')));
+const outdoorReport = buildEN378SafetyCheckReportDto({ state: outdoorState, calculation: outdoorCalculation });
+assert.equal(outdoorReport.input.outdoorEN3782_6_2_14HazardousAreaEvidenceReference, 'Gefährdungsbeurteilung-01');
+assert.equal(outdoorReport.input.outdoorEN3782_6_2_14ComponentAssessmentEvidenceReference, 'Komponentenbewertung-01');
+assert.ok(outdoorReport.assessment.installationSafety.requirements.some(item => item.id === 'outdoor.en378-2-6-2-14.documentation' && item.status === 'failed'));
+
+const duplicateMeasureGuidance = buildEN378PlannerGuidance({}, {
+  status: 'measures-required',
+  inputValidation: { issues: [] },
+  chargeLimitAssessment: { checks: [], missingInputs: [] },
+  installationSafetyAssessment: {
+    missingInputs: [],
+    requirements: [
+      { id: 'duplicate.measure.a', category: 'ventilation', title: 'Lüftungsmaßnahme A', status: 'failed', requirement: 'Prüfung A', measure: 'Mechanische Lüftung und Luftführung fachgerecht planen.', source: { sourcePart: 'EN 378-3', sourceSection: '5.13.1' } },
+      { id: 'duplicate.measure.b', category: 'ventilation', title: 'Lüftungsmaßnahme B', status: 'failed', requirement: 'Prüfung B', measure: 'Mechanische Lüftung und Luftführung fachgerecht planen.', source: { sourcePart: 'EN 378-3', sourceSection: '5.13.5' } }
+    ]
+  }
+});
+const consolidatedMeasures = duplicateMeasureGuidance.groups.flatMap(group => group.items);
+assert.equal(consolidatedMeasures.length, 1);
+assert.equal(duplicateMeasureGuidance.requiredMeasures.length, 1);
+assert.ok(consolidatedMeasures[0].sourceLabel.includes('5.13.1'));
+assert.ok(consolidatedMeasures[0].sourceLabel.includes('5.13.5'));
+assert.equal(consolidatedMeasures[0].sources.length, 2);
 
 console.log('EN 378 planner guidance tests passed.');

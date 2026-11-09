@@ -11,7 +11,7 @@ const GROUP_LABELS = Object.freeze({
 });
 
 const GROUP_ORDER = Object.freeze([
-  PLANNER_GUIDANCE_GROUPS.CHARGE_LIMIT, PLANNER_GUIDANCE_GROUPS.LOCATION, PLANNER_GUIDANCE_GROUPS.OCCUPANCY, PLANNER_GUIDANCE_GROUPS.VENTILATION, PLANNER_GUIDANCE_GROUPS.MACHINERY_ROOM, PLANNER_GUIDANCE_GROUPS.DETECTION, PLANNER_GUIDANCE_GROUPS.ALARM, PLANNER_GUIDANCE_GROUPS.EMERGENCY_CONTROL, PLANNER_GUIDANCE_GROUPS.SAFETY_MEASURES, PLANNER_GUIDANCE_GROUPS.GUIDANCE, PLANNER_GUIDANCE_GROUPS.OPEN_POINTS
+  PLANNER_GUIDANCE_GROUPS.OPEN_POINTS, PLANNER_GUIDANCE_GROUPS.CHARGE_LIMIT, PLANNER_GUIDANCE_GROUPS.LOCATION, PLANNER_GUIDANCE_GROUPS.OCCUPANCY, PLANNER_GUIDANCE_GROUPS.VENTILATION, PLANNER_GUIDANCE_GROUPS.MACHINERY_ROOM, PLANNER_GUIDANCE_GROUPS.DETECTION, PLANNER_GUIDANCE_GROUPS.ALARM, PLANNER_GUIDANCE_GROUPS.EMERGENCY_CONTROL, PLANNER_GUIDANCE_GROUPS.SAFETY_MEASURES, PLANNER_GUIDANCE_GROUPS.GUIDANCE
 ]);
 
 const array = value => Array.isArray(value) ? value : [];
@@ -67,13 +67,35 @@ function itemFromMissingInput(inputKey) {
 }
 
 function dedupeItems(items) {
-  const seen = new Set();
-  return array(items).filter(item => {
-    const key = `${item.title}|${item.status}|${item.measure}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+  const grouped = new Map();
+  const statusRank = { failed: 3, 'not-assessed': 2, required: 1, passed: 0 };
+  for (const item of array(items)) {
+    const key = `${item.category}::${text(item.measure).replace(/\s+/g, ' ').toLocaleLowerCase('de-DE')}`;
+    if (!key) continue;
+    const existing = grouped.get(key);
+    const sourceLabels = unique([...(existing?.sourceLabels || []), item.sourceLabel]);
+    const sources = [...(existing?.sources || []), item.source || {}].filter(source =>
+      sourceLabel(source) && !((existing?.sources || []).some(current => sourceLabel(current) === sourceLabel(source)))
+    );
+    if (!existing) {
+      grouped.set(key, { ...item, sourceLabels, sources, sourceLabel: sourceLabels.join('; ') });
+      continue;
+    }
+    const replaceStatus = (statusRank[item.status] || 0) > (statusRank[existing.status] || 0);
+    grouped.set(key, {
+      ...existing,
+      ...(replaceStatus ? { id: item.id, title: item.title, status: item.status, statusLabel: item.statusLabel, guidanceStatus: item.guidanceStatus, priority: item.priority, missingInputs: unique([...existing.missingInputs, ...item.missingInputs]) } : {}),
+      sourceLabels,
+      sources,
+      sourceLabel: sourceLabels.join('; ')
+    });
+  }
+  return [...grouped.values()].map(item => Object.freeze({
+    ...item,
+    sourceLabels: Object.freeze(item.sourceLabels),
+    sources: Object.freeze(item.sources),
+    missingInputs: Object.freeze(unique(item.missingInputs))
+  }));
 }
 
 function buildGroups(items) {
@@ -105,7 +127,8 @@ export function buildEN378PlannerGuidance(currentState = {}, assessment = {}) {
   const chargeChecks = array(assessment.chargeLimitAssessment?.checks);
   const installationRequirements = array(assessment.installationSafetyAssessment?.requirements);
   const missingInputs = unique([...inputIssueKeys, ...array(assessment.chargeLimitAssessment?.missingInputs), ...array(assessment.installationSafetyAssessment?.missingInputs)]);
-  const additionalMissingInputs = missingInputs.filter(key => !inputIssueKeys.includes(key));
+  const representedMissingInputs = unique([...chargeChecks.flatMap(check => array(check.missingInputs)), ...installationRequirements.flatMap(requirement => array(requirement.missingInputs))]);
+  const additionalMissingInputs = missingInputs.filter(key => !inputIssueKeys.includes(key) && !representedMissingInputs.includes(key));
 
   const actionItems = [
     ...chargeChecks.filter(check => ['failed', 'not-assessed'].includes(check.status)).map(itemFromChargeCheck),
@@ -132,7 +155,7 @@ export function buildEN378PlannerGuidance(currentState = {}, assessment = {}) {
     failedCount,
     openPointCount,
     missingInputs: Object.freeze(missingInputs.map(fieldLabel)),
-    groups: buildGroups(actionItems),
+    groups: buildGroups(actionItems.map(item => item.status === 'not-assessed' ? { ...item, category: PLANNER_GUIDANCE_GROUPS.OPEN_POINTS } : item)),
     confirmedItems: Object.freeze(dedupeItems(confirmedItems)),
     requiredMeasures: Object.freeze(unique(actionItems.map(item => item.measure)))
   });

@@ -198,17 +198,11 @@ function guidanceSection(dto) {
   return { title: '8. Planer-Leitfaden', rows, singleColumn: true };
 }
 
-function confirmedSection(dto) {
-  const guidance = object(dto.plannerGuidance || dto.assessment?.plannerGuidance);
-  const rows = array(guidance.confirmedItems).map(item => row(item.title, `${status(item.status)}: ${item.requirement || item.measure}`, item.sourceLabel || ''));
-  return { title: '9. Bestätigte Prüfpunkte', rows: rows.length ? rows : [row('Status', 'Keine bestätigten Prüfpunkte ausgewiesen.')], singleColumn: true };
-}
-
 function sourcesSection(dto) {
   const metadata = object(dto.metadata);
   const dataVersions = object(dto.dataVersions);
   return {
-    title: '10. Datenstand und Berichtserstellung',
+    title: '9. Datenstand und Berichtserstellung',
     rows: [
       row('Erzeugt am', formatDateOnly(metadata.generatedAt)),
       row('Berichtstyp', 'EN-378-Sicherheitsbericht'),
@@ -230,7 +224,6 @@ export function buildEN378ReportSections(dto = {}) {
     stateConsistencySection(dto),
     safetyComponentsSection(dto),
     guidanceSection(dto),
-    confirmedSection(dto),
     sourcesSection(dto)
   ].map(section => ({ ...section, isLineSection: false }));
 }
