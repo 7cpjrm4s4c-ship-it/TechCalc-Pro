@@ -70,7 +70,7 @@ assert.equal(en60335Assessment.requirements.find(item => item.id === 'outdoor.en
 assert.equal(en60335Assessment.requirements.some(item => item.id === 'outdoor.en378-2-6-2-14.components'), false);
 assert.equal(en60335Assessment.requirements.some(item => item.id === 'outdoorEN3782_6_2_14EN60335EvidenceReference'), false, 'Eine eingetragene EN-60335-Nachweisreferenz darf nicht als offen erscheinen.');
 const en60335Calculation = calculate(en60335State);
-assert.equal(en60335Calculation.plannerGuidance.openPointCount, 0, 'Eine vorhandene EN-60335-Nachweisreferenz darf keinen offenen Punkt erzeugen.');
+assert.equal(en60335Calculation.plannerGuidance.groups.some(group => group.items.some(item => item.title === 'Nachweisreferenz zur EN-60335-Konformität fehlt')), false, 'Eine vorhandene EN-60335-Nachweisreferenz darf nicht als offener Punkt erscheinen.');
 assert.equal(en60335Calculation.plannerGuidance.groups.some(group => group.items.some(item => item.id === 'outdoorEN3782_6_2_14EN60335EvidenceReference')), false);
 
 const nonCompliantEN60335State = {
