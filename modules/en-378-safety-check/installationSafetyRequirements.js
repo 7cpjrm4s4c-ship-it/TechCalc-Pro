@@ -168,6 +168,7 @@ function buildOutdoorEN3782Requirements(state, safetyData) {
     referenceKey: 'outdoorEN3782_6_2_14HazardousAreaEvidenceReference',
     referenceTitle: 'Dokumentreferenz der Gefahrenbereichsermittlung fehlt'
   });
+  if (!yes(state.outdoorEN3782_6_2_14HazardousAreaConfirmed) || !String(state.outdoorEN3782_6_2_14HazardousAreaEvidenceReference ?? '').trim()) return requirements;
   addEvidenceBackedCheck({
     id: 'outdoor.en378-2-6-2-14.components',
     title: 'Relevante Komponenten extern bewerten',
@@ -177,6 +178,7 @@ function buildOutdoorEN3782Requirements(state, safetyData) {
     referenceKey: 'outdoorEN3782_6_2_14ComponentAssessmentEvidenceReference',
     referenceTitle: 'Dokumentreferenz der Komponentenbewertung fehlt'
   });
+  if (!yes(state.outdoorEN3782_6_2_14ComponentAssessmentConfirmed) || !String(state.outdoorEN3782_6_2_14ComponentAssessmentEvidenceReference ?? '').trim()) return requirements;
   addEvidenceBackedCheck({
     id: 'outdoor.en378-2-6-2-14.protection',
     title: 'Normative Schutzbedingungen nachweisen',
@@ -186,6 +188,7 @@ function buildOutdoorEN3782Requirements(state, safetyData) {
     referenceKey: 'outdoorEN3782_6_2_14ProtectionEvidenceReference',
     referenceTitle: 'Dokumentreferenz der Schutzbedingungen fehlt'
   });
+  if (!yes(state.outdoorEN3782_6_2_14ProtectionConditionsConfirmed) || !String(state.outdoorEN3782_6_2_14ProtectionEvidenceReference ?? '').trim()) return requirements;
 
   requirements.push(checkBoolean({
     id: 'outdoor.en378-2-6-2-14.airflow-applicability',
