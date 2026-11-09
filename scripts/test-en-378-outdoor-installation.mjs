@@ -69,6 +69,9 @@ const en60335Assessment = assessInstallationSafetyRequirements(en60335State, ass
 assert.equal(en60335Assessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14.en60335')?.status, 'passed');
 assert.equal(en60335Assessment.requirements.some(item => item.id === 'outdoor.en378-2-6-2-14.components'), false);
 assert.equal(en60335Assessment.requirements.some(item => item.id === 'outdoorEN3782_6_2_14EN60335EvidenceReference'), false, 'Eine eingetragene EN-60335-Nachweisreferenz darf nicht als offen erscheinen.');
+const en60335Calculation = calculate(en60335State);
+assert.equal(en60335Calculation.plannerGuidance.openPointCount, 0, 'Eine vorhandene EN-60335-Nachweisreferenz darf keinen offenen Punkt erzeugen.');
+assert.equal(en60335Calculation.plannerGuidance.groups.some(group => group.items.some(item => item.id === 'outdoorEN3782_6_2_14EN60335EvidenceReference')), false);
 
 const nonCompliantEN60335State = {
   ...base,
@@ -119,11 +122,11 @@ assert.equal(openAssessment.status, 'not-assessed');
 assert.deepEqual(openAssessment.missingInputs, ['isOutdoorDefinitionConfirmed']);
 const openCalculation = calculate(openState);
 assert.equal(openCalculation.plannerGuidance.groups[0]?.id, 'openPoints');
-assert.ok(openCalculation.plannerGuidance.groups.some(group => group.id === 'location' && group.items.some(item => item.id === 'outdoor.definition-confirmed')));
+assert.ok(!openCalculation.plannerGuidance.groups.some(group => group.id === 'location' && group.items.some(item => item.id === 'outdoor.definition-confirmed')), 'Offene Prüfpunkte dürfen nicht zusätzlich in ihrer Fachgruppe erscheinen.');
 const openItems = openCalculation.plannerGuidance.groups.find(group => group.id === 'openPoints')?.items || [];
 assert.equal(openItems.filter(item => item.id === 'outdoor.definition-confirmed').length, 1);
 assert.equal(openItems.find(item => item.id === 'outdoor.definition-confirmed')?.title, 'Definition „im Freien“ bestätigt');
-assert.equal(openCalculation.plannerGuidance.groups.find(group => group.id === 'location')?.items.filter(item => item.id === 'outdoor.definition-confirmed').length, 1);
+assert.equal(openCalculation.plannerGuidance.groups.reduce((count, group) => count + group.items.filter(item => item.id === 'outdoor.definition-confirmed').length, 0), 1, 'Jeder offene Prüfpunkt darf im Planerleitfaden nur einmal erscheinen.');
 assert.ok(!openAssessment.requirements.some(item => item.id === 'outdoor.refrigerant-accumulation'));
 assert.ok(!openAssessment.requirements.some(item => item.id.startsWith('detector.')));
 assert.ok(!openAssessment.requirements.some(item => item.id.startsWith('alarm.')));
