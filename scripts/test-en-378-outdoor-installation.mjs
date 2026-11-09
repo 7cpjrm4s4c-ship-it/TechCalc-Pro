@@ -26,6 +26,7 @@ const byId = id => assessment.requirements.find(item => item.id === id);
 assert.equal(byId('outdoor.safe-arrangement')?.status, 'passed');
 assert.equal(byId('outdoor.prevent-refrigerant-entry')?.status, 'passed');
 assert.equal(byId('outdoor.refrigerant-accumulation')?.status, 'passed');
+assert.equal(byId('outdoor.refrigerant-accumulation')?.status, 'passed', 'Nein bedeutet: keine Ansammlung, kein nicht erfüllter Prüfpunkt');
 assert.equal(byId('outdoor.cover-ventilation'), undefined);
 assert.equal(byId('outdoor.en378-2-6-2-14'), undefined);
 assert.equal(byId('outdoor.ignition-sources'), undefined);
@@ -132,7 +133,7 @@ assert.ok(!blockedFollowUps.requirements.some(item => item.id.startsWith('detect
 
 const ventilationState = {
   ...accumulationState,
-  hasMechanicalVentilation: 'yes',
+  ventilationType: 'mechanical',
   outdoorVentilationGeneralConfirmed: 'yes',
   outdoorVentilationNationalRulesConfirmed: 'yes',
   outdoorMechanicalVentilationOpeningsConfirmed: 'no'
@@ -145,7 +146,7 @@ assert.equal(ventilationAssessment.requirements.find(item => item.id === 'outdoo
 
 const noMechanicalVentilationState = {
   ...accumulationState,
-  hasMechanicalVentilation: 'no',
+  ventilationType: 'natural',
   outdoorVentilationGeneralConfirmed: 'yes',
   outdoorVentilationNationalRulesConfirmed: 'yes'
 };
@@ -155,12 +156,12 @@ assert.equal(noMechanicalVentilationAssessment.requirements.find(item => item.id
 
 const undeterminedMechanicalVentilationState = {
   ...accumulationState,
-  hasMechanicalVentilation: '',
+  ventilationType: '',
   outdoorVentilationGeneralConfirmed: 'yes',
   outdoorVentilationNationalRulesConfirmed: 'yes'
 };
 const undeterminedMechanicalVentilationAssessment = assessInstallationSafetyRequirements(undeterminedMechanicalVentilationState, assessChargeLimit(undeterminedMechanicalVentilationState));
-assert.equal(undeterminedMechanicalVentilationAssessment.requirements.find(item => item.id === 'outdoor.mechanical-ventilation-applicability')?.status, 'not-assessed');
+assert.equal(undeterminedMechanicalVentilationAssessment.requirements.find(item => item.id === 'outdoor.mechanical-ventilation-applicability'), undefined);
 assert.equal(undeterminedMechanicalVentilationAssessment.requirements.find(item => item.id === 'outdoor.mechanical-ventilation-openings'), undefined);
 
 const calculation = calculate(base);
