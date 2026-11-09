@@ -51,7 +51,7 @@ function required({ id, category, title, requirement, measure, source, priority 
   return freezeRequirement({ id, category, title, requirement, measure, source, priority, status, missingInputs, details });
 }
 
-function checkBoolean({ id, category, title, requirement, measure, source, value, priority = 'required', missingInputs = [id] }) {
+function checkBoolean({ id, category, title, requirement, measure, source, value, priority = 'required', missingInputs = [id], noStatus = REQUIREMENT_STATUS.FAILED }) {
   if (!hasAnswer(value)) {
     return required({ id, category, title, requirement, measure, source, priority, status: REQUIREMENT_STATUS.NOT_ASSESSED, missingInputs });
   }
@@ -63,7 +63,7 @@ function checkBoolean({ id, category, title, requirement, measure, source, value
     measure,
     source,
     priority,
-    status: yes(value) ? REQUIREMENT_STATUS.PASSED : REQUIREMENT_STATUS.FAILED
+    status: yes(value) ? REQUIREMENT_STATUS.PASSED : noStatus
   });
 }
 
@@ -273,7 +273,7 @@ function buildArrangementRequirements(state, safetyData) {
     }
     const baseRequirementsPassed = requirements.every(item => [REQUIREMENT_STATUS.PASSED, REQUIREMENT_STATUS.NOT_APPLICABLE].includes(item.status));
     if (baseRequirementsPassed) {
-      requirements.push(checkBoolean({ id: 'outdoor.refrigerant-accumulation', category: 'location', title: 'Kältemittelansammlung möglich', requirement: 'Der Planer muss örtlich beurteilen, ob sich austretendes Kältemittel am Aufstellort ansammeln kann.', measure: 'Örtliche Situation planerisch beurteilen und Ja oder Nein dokumentieren. Diese Entscheidung wird nicht automatisch aus anderen Eingaben abgeleitet.', source: SOURCE.outdoorArrangement, value: state.outdoorRefrigerantAccumulationPossible }));
+      requirements.push(checkBoolean({ id: 'outdoor.refrigerant-accumulation', category: 'location', title: 'Kältemittelansammlung möglich', requirement: 'Der Planer muss örtlich beurteilen, ob sich austretendes Kältemittel am Aufstellort ansammeln kann.', measure: 'Örtliche Situation planerisch beurteilen und Ja oder Nein dokumentieren. Diese Entscheidung wird nicht automatisch aus anderen Eingaben abgeleitet.', source: SOURCE.outdoorArrangement, value: state.outdoorRefrigerantAccumulationPossible, noStatus: REQUIREMENT_STATUS.PASSED }));
     }
     if (baseRequirementsPassed && yes(state.outdoorRefrigerantAccumulationPossible)) {
       requirements.push(...buildOutdoorVentilationRequirements(state));
@@ -331,18 +331,7 @@ function buildOutdoorVentilationRequirements(state) {
     value: state.outdoorVentilationNationalRulesConfirmed
   }));
 
-  if (!hasAnswer(state.hasMechanicalVentilation)) {
-    requirements.push(required({
-      id: 'outdoor.mechanical-ventilation-applicability',
-      category: 'ventilation',
-      title: 'Mechanische Lüftung als vorhanden oder vorgesehen feststellen',
-      requirement: 'Die Anwendbarkeit der Anforderungen an Öffnungen für mechanische Lüftung nach EN 378-3, 5.13.5 hängt davon ab, ob eine mechanische Lüftung vorhanden oder planerisch vorgesehen ist.',
-      measure: 'Vorhandensein oder planerische Vorsehung einer mechanischen Lüftung mit Ja oder Nein festlegen.',
-      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.5' }),
-      status: REQUIREMENT_STATUS.NOT_ASSESSED,
-      missingInputs: ['hasMechanicalVentilation']
-    }));
-  } else if (yes(state.hasMechanicalVentilation)) {
+  if (state.ventilationType === 'mechanical') {
     requirements.push(checkBoolean({
       id: 'outdoor.mechanical-ventilation-openings',
       category: 'ventilation',
