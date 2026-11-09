@@ -3,7 +3,6 @@ import { assessChargeLimit } from '../modules/en-378-safety-check/chargeLimitCal
 import { assessInstallationSafetyRequirements } from '../modules/en-378-safety-check/installationSafetyRequirements.js';
 import { calculate } from '../modules/en-378-safety-check/logic.js';
 import { normalizeEN378StateTransition, EN378_EN60335_TRANSITION_FIELDS } from '../modules/en-378-safety-check/stateTransitions.js';
-import { normalizeEN378StateTransition, EN378_EN60335_TRANSITION_FIELDS } from '../modules/en-378-safety-check/stateTransitions.js';
 
 const base = {
   refrigerantId: 'R-32',
