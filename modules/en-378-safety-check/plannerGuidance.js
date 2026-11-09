@@ -155,7 +155,7 @@ export function buildEN378PlannerGuidance(currentState = {}, assessment = {}) {
     failedCount,
     openPointCount,
     missingInputs: Object.freeze(missingInputs.map(fieldLabel)),
-    groups: buildGroups([...actionItems, ...actionItems.filter(item => item.status === 'not-assessed').map(item => ({ ...item, category: PLANNER_GUIDANCE_GROUPS.OPEN_POINTS }))]),
+    groups: buildGroups(actionItems.map(item => item.status === 'not-assessed' ? { ...item, category: PLANNER_GUIDANCE_GROUPS.OPEN_POINTS } : item)),
     confirmedItems: Object.freeze(dedupeItems(confirmedItems)),
     requiredMeasures: Object.freeze(unique(actionItems.map(item => item.measure)))
   });
