@@ -66,6 +66,16 @@ const en60335Assessment = assessInstallationSafetyRequirements(en60335State, ass
 assert.equal(en60335Assessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14.en60335')?.status, 'passed');
 assert.equal(en60335Assessment.requirements.some(item => item.id === 'outdoor.en378-2-6-2-14.components'), false);
 
+const nonCompliantEN60335State = {
+  ...base,
+  outdoorRefrigerantAccumulationPossible: 'yes',
+  outdoorEN3782_6_2_14EN60335Applicable: 'yes',
+  outdoorEN3782_6_2_14EN60335Compliant: 'no'
+};
+const nonCompliantEN60335Assessment = assessInstallationSafetyRequirements(nonCompliantEN60335State, assessChargeLimit(nonCompliantEN60335State));
+assert.equal(nonCompliantEN60335Assessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14.en60335-compliance')?.status, 'not-applicable');
+assert.equal(nonCompliantEN60335Assessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14.hazardous-area')?.status, 'not-assessed');
+
 const airflowState = {
   ...accumulationState,
   outdoorEN3782_6_2_14AirflowProtectionUsed: 'yes',
