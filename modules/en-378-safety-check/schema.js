@@ -97,7 +97,7 @@ const schema = defineFormSchema({
     { key: 'machineryRoomLargestSystemChargeKg', label: 'Füllmenge der größten Kälteanlage mit Anlagenteil im Maschinenraum', type: FIELD_TYPES.DECIMAL, unit: 'kg', visibleWhen: requiresMachineryRoomGasDetection },
     { key: 'hasEmergencyVentilation', label: 'Mechanische Notlüftung durch Detektoren aktiviert', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: requiresMachineryRoomGasDetection },
     { key: 'hasEmergencyVentilationControlOutside', label: 'Unabhängige Notsteuerung der Notlüftung außen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: requiresMachineryRoomGasDetection },
-    { key: 'hasEmergencyVentilationControlInside', label: 'Unabhängige Notsteuerung der Notlüftung innen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isMachineryRoom(state) && state.hasGasWarningSystem === 'yes' },
+    { key: 'hasEmergencyVentilationControlInside', label: 'Unabhängige Notsteuerung der Notlüftung innen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: requiresMachineryRoomGasDetection },
     { key: 'hasEmergencyStopOutside', label: 'Not-Aus außen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isMachineryRoom },
     { key: 'hasEmergencyStopInside', label: 'Not-Aus innen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isMachineryRoom },
     { key: 'hasEmergencyLighting', label: 'Notbeleuchtung vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isMachineryRoom },
