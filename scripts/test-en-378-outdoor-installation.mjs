@@ -52,6 +52,7 @@ assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.hazardous-area')?.status, 
 assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.components')?.status, 'passed');
 assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.protection')?.status, 'passed');
 assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.surface-temperature')?.status, 'passed');
+assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.documentation-applicability')?.status, 'passed', 'Nein bedeutet: der entflammbare Bereich reicht nicht über das Gerät hinaus.');
 assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.documentation')?.status, undefined);
 assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.airflow-availability')?.status, undefined);
 assert.ok(accumulationAssessment.requirements.filter(item => item.source?.sourceSection === '6.2.14').length >= 5);
@@ -66,6 +67,7 @@ const en60335State = {
 const en60335Assessment = assessInstallationSafetyRequirements(en60335State, assessChargeLimit(en60335State));
 assert.equal(en60335Assessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14.en60335')?.status, 'passed');
 assert.equal(en60335Assessment.requirements.some(item => item.id === 'outdoor.en378-2-6-2-14.components'), false);
+assert.equal(en60335Assessment.requirements.some(item => item.id === 'outdoorEN3782_6_2_14EN60335EvidenceReference'), false, 'Eine eingetragene EN-60335-Nachweisreferenz darf nicht als offen erscheinen.');
 
 const nonCompliantEN60335State = {
   ...base,
