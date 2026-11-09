@@ -243,7 +243,8 @@ function buildOutdoorEN3782Requirements(state, safetyData) {
     requirement: 'Es ist festzustellen, ob der potenziell entflammbare Bereich über die Geräteabmessungen hinausgeht.',
     measure: 'Ausdehnung des extern ermittelten entflammbaren Bereichs mit den Geräteabmessungen vergleichen.',
     source,
-    value: state.outdoorEN3782_6_2_14HazardousAreaExceedsEquipment
+    value: state.outdoorEN3782_6_2_14HazardousAreaExceedsEquipment,
+    noStatus: REQUIREMENT_STATUS.PASSED
   }));
   if (yes(state.outdoorEN3782_6_2_14HazardousAreaExceedsEquipment)) {
     requirements.push(checkBoolean({
