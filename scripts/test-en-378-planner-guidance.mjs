@@ -85,6 +85,42 @@ assert.ok(sections.some(section => section.title.includes('Planer-Leitfaden')));
 assert.ok(sections.some(section => section.rows.some(row => String(row[1]).includes('Externen Not-Aus'))));
 
 
+const outdoorState = {
+  refrigerantId: 'R-32',
+  chargeKg: '8',
+  roomVolumeM3: '80',
+  installationLocation: 'outdoor',
+  installationClass: 'II',
+  accessArea: 'general-access',
+  usageType: 'industrial',
+  applicationType: 'other',
+  locationLevel: 'other',
+  isOutdoorDefinitionConfirmed: 'yes',
+  outdoorSafeArrangement: 'yes',
+  outdoorPreventBuildingEntry: 'yes',
+  hasOutdoorProtectiveCover: 'no',
+  outdoorRefrigerantAccumulationPossible: 'yes',
+  outdoorEN3782_6_2_14EN60335Applicable: 'no',
+  outdoorEN3782_6_2_14HazardousAreaConfirmed: 'yes',
+  outdoorEN3782_6_2_14HazardousAreaEvidenceReference: 'Gefährdungsbeurteilung-01',
+  outdoorEN3782_6_2_14ComponentAssessmentConfirmed: 'yes',
+  outdoorEN3782_6_2_14ComponentAssessmentEvidenceReference: 'Komponentenbewertung-01',
+  outdoorEN3782_6_2_14ProtectionConditionsConfirmed: 'yes',
+  outdoorEN3782_6_2_14ProtectionEvidenceReference: 'Schutzmaßnahmen-01',
+  outdoorEN3782_6_2_14AirflowProtectionUsed: 'no',
+  outdoorEN3782_6_2_14SurfaceTemperatureConfirmed: 'yes',
+  outdoorEN3782_6_2_14HazardousAreaExceedsEquipment: 'yes',
+  outdoorEN3782_6_2_14EquipmentDocumentationUpdated: 'no'
+};
+const outdoorCalculation = calculate(outdoorState);
+assert.ok(outdoorCalculation.plannerGuidance.groups.some(group => group.id === 'safetyMeasures'));
+assert.ok(outdoorCalculation.plannerGuidance.requiredMeasures.some(measure => measure.includes('Gerätedokumentation')));
+assert.ok(outdoorCalculation.plannerGuidance.requiredMeasures.some(measure => measure.includes('Geräteabmessungen')));
+const outdoorReport = buildEN378SafetyCheckReportDto({ state: outdoorState, calculation: outdoorCalculation });
+assert.equal(outdoorReport.input.outdoorEN3782_6_2_14HazardousAreaEvidenceReference, 'Gefährdungsbeurteilung-01');
+assert.equal(outdoorReport.input.outdoorEN3782_6_2_14ComponentAssessmentEvidenceReference, 'Komponentenbewertung-01');
+assert.ok(outdoorReport.assessment.installationSafety.requirements.some(item => item.id === 'outdoor.en378-2-6-2-14.documentation' && item.status === 'failed'));
+
 const duplicateMeasureGuidance = buildEN378PlannerGuidance({}, {
   status: 'measures-required',
   inputValidation: { issues: [] },
