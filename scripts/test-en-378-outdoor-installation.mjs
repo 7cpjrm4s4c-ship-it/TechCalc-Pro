@@ -112,6 +112,12 @@ const openState = {
 };
 const openAssessment = assessInstallationSafetyRequirements(openState, assessChargeLimit(openState));
 assert.equal(openAssessment.status, 'not-assessed');
+assert.deepEqual(openAssessment.missingInputs, ['isOutdoorDefinitionConfirmed']);
+const openCalculation = calculate(openState);
+assert.equal(openCalculation.plannerGuidance.groups[0]?.id, 'openPoints');
+assert.ok(openCalculation.plannerGuidance.groups.some(group => group.id === 'location' && group.items.some(item => item.id === 'outdoor.definition-confirmed')));
+const openItems = openCalculation.plannerGuidance.groups.find(group => group.id === 'openPoints')?.items || [];
+assert.equal(openItems.filter(item => item.missingInputs.includes('isOutdoorDefinitionConfirmed')).length, 0);
 assert.ok(!openAssessment.requirements.some(item => item.id === 'outdoor.refrigerant-accumulation'));
 assert.ok(!openAssessment.requirements.some(item => item.id.startsWith('detector.')));
 assert.ok(!openAssessment.requirements.some(item => item.id.startsWith('alarm.')));
