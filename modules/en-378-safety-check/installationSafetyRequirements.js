@@ -136,16 +136,18 @@ function buildOutdoorEN3782Requirements(state, safetyData) {
       status: hasAnswer(state.outdoorEN3782_6_2_14EN60335Compliant) ? (yes(state.outdoorEN3782_6_2_14EN60335Compliant) ? REQUIREMENT_STATUS.PASSED : REQUIREMENT_STATUS.NOT_APPLICABLE) : REQUIREMENT_STATUS.NOT_ASSESSED,
       missingInputs: hasAnswer(state.outdoorEN3782_6_2_14EN60335Compliant) ? [] : ['outdoorEN3782_6_2_14EN60335Compliant']
     }));
-    if (!yes(state.outdoorEN3782_6_2_14EN60335Compliant)) return requirements;
-    requirements.push(evidenceReferenceRequirement({
-      id: 'outdoorEN3782_6_2_14EN60335EvidenceReference',
-      title: 'Nachweisreferenz zur EN-60335-Konformität fehlt',
-      value: state.outdoorEN3782_6_2_14EN60335EvidenceReference,
-      source,
-      measure: 'Dokumentbezeichnung oder Dokumentnummer des EN-60335-Konformitätsnachweises erfassen.'
-    }));
-    if (!String(state.outdoorEN3782_6_2_14EN60335EvidenceReference ?? '').trim()) return requirements;
-    return requirements;
+    if (!hasAnswer(state.outdoorEN3782_6_2_14EN60335Compliant)) return requirements;
+    if (yes(state.outdoorEN3782_6_2_14EN60335Compliant)) {
+      requirements.push(evidenceReferenceRequirement({
+        id: 'outdoorEN3782_6_2_14EN60335EvidenceReference',
+        title: 'Nachweisreferenz zur EN-60335-Konformität fehlt',
+        value: state.outdoorEN3782_6_2_14EN60335EvidenceReference,
+        source,
+        measure: 'Dokumentbezeichnung oder Dokumentnummer des EN-60335-Konformitätsnachweises erfassen.'
+      }));
+      if (!String(state.outdoorEN3782_6_2_14EN60335EvidenceReference ?? '').trim()) return requirements;
+      return requirements;
+    }
   }
 
   const addEvidenceBackedCheck = ({ id, title, requirement, measure, value, referenceKey, referenceTitle }) => {
