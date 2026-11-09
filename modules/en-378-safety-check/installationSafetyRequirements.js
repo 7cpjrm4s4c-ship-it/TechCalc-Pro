@@ -98,6 +98,160 @@ export function calculateDetectorPreset({ safetyData } = {}) {
   return round(Math.min(...candidates), 5);
 }
 
+function evidenceReferenceRequirement({ id, title, value, source, measure }) {
+  if (String(value ?? '').trim()) return null;
+  return required({
+    id, category: 'safetyMeasures', title,
+    requirement: 'Der externe Nachweis muss eindeutig referenziert und für die Anlagenakte nachvollziehbar sein.',
+    measure, source, status: REQUIREMENT_STATUS.NOT_ASSESSED,
+    missingInputs: [id]
+  });
+}
+
+function buildOutdoorEN3782Requirements(state, safetyData) {
+  const source = Object.freeze({ sourcePart: 'EN 378-2:2016', sourceSection: '6.2.14' });
+  const requirements = [];
+  const applicability = state.outdoorEN3782_6_2_14EN60335Applicable;
+
+  requirements.push(checkBoolean({
+    id: 'outdoor.en378-2-6-2-14.en60335',
+    category: 'safetyMeasures',
+    title: 'Anwendbarkeit und Konformität der EN-60335-Normenreihe',
+    requirement: 'Anlagen im Anwendungsbereich der EN-60335-Normenreihe, die mit diesen Normen übereinstimmen, gelten als Erfüllung der Anforderungen dieses Abschnitts.',
+    measure: 'Anwendbarkeit der EN-60335-Normenreihe und gegebenenfalls deren Konformität anhand eines belastbaren Nachweises feststellen.',
+    source,
+    value: applicability
+  }));
+
+  if (!hasAnswer(applicability)) return requirements;
+  if (yes(applicability)) {
+    requirements.push(checkBoolean({
+      id: 'outdoor.en378-2-6-2-14.en60335-compliance',
+      category: 'safetyMeasures',
+      title: 'Konformität mit den anwendbaren EN-60335-Anforderungen',
+      requirement: 'Die Ausnahme greift nur, wenn die Anlage im Anwendungsbereich der EN-60335-Normenreihe liegt und mit den anwendbaren Normen übereinstimmt.',
+      measure: 'Konformität der Anlage mit den anwendbaren EN-60335-Anforderungen nachweisen.',
+      source,
+      value: state.outdoorEN3782_6_2_14EN60335Compliant
+    }));
+    if (!yes(state.outdoorEN3782_6_2_14EN60335Compliant)) return requirements;
+    requirements.push(evidenceReferenceRequirement({
+      id: 'outdoorEN3782_6_2_14EN60335EvidenceReference',
+      title: 'Nachweisreferenz zur EN-60335-Konformität fehlt',
+      value: state.outdoorEN3782_6_2_14EN60335EvidenceReference,
+      source,
+      measure: 'Dokumentbezeichnung oder Dokumentnummer des EN-60335-Konformitätsnachweises erfassen.'
+    }));
+    if (!String(state.outdoorEN3782_6_2_14EN60335EvidenceReference ?? '').trim()) return requirements;
+    return requirements;
+  }
+
+  const addEvidenceBackedCheck = ({ id, title, requirement, measure, value, referenceKey, referenceTitle }) => {
+    requirements.push(checkBoolean({ id, category: 'safetyMeasures', title, requirement, measure, source, value }));
+    if (yes(value)) {
+      const missingReference = evidenceReferenceRequirement({
+        id: referenceKey, title: referenceTitle, value: state[referenceKey], source,
+        measure: 'Dokumentbezeichnung oder Dokumentnummer des externen Nachweises erfassen.'
+      });
+      if (missingReference) requirements.push(missingReference);
+    }
+  };
+
+  addEvidenceBackedCheck({
+    id: 'outdoor.en378-2-6-2-14.hazardous-area',
+    title: 'Potenziell entflammbaren Bereich extern ermitteln',
+    requirement: 'Der potenziell entflammbare Bereich ist anhand eines geeigneten externen Verfahrens zu ermitteln. Die App führt diese Berechnung nicht selbst durch.',
+    measure: 'Potenziell entflammbaren Bereich extern ermitteln und die verwendete Beurteilung in der Anlagenakte referenzieren.',
+    value: state.outdoorEN3782_6_2_14HazardousAreaConfirmed,
+    referenceKey: 'outdoorEN3782_6_2_14HazardousAreaEvidenceReference',
+    referenceTitle: 'Dokumentreferenz der Gefahrenbereichsermittlung fehlt'
+  });
+  addEvidenceBackedCheck({
+    id: 'outdoor.en378-2-6-2-14.components',
+    title: 'Relevante Komponenten extern bewerten',
+    requirement: 'Für relevante Komponenten und Geräte ist extern zu beurteilen, ob sie innerhalb des potenziell entflammbaren Bereichs liegen oder durch mindestens eine der normativen Schutzbedingungen abgesichert sind. Steckverbindungen sowie im Normalbetrieb zu erwartende Öffnungen von Gehäusen sind dabei zu berücksichtigen.',
+    measure: 'Komponentenbewertung einschließlich relevanter Steckverbindungen und bestimmungsgemäß geöffneter Gehäuse extern durchführen und dokumentieren.',
+    value: state.outdoorEN3782_6_2_14ComponentAssessmentConfirmed,
+    referenceKey: 'outdoorEN3782_6_2_14ComponentAssessmentEvidenceReference',
+    referenceTitle: 'Dokumentreferenz der Komponentenbewertung fehlt'
+  });
+  addEvidenceBackedCheck({
+    id: 'outdoor.en378-2-6-2-14.protection',
+    title: 'Normative Schutzbedingungen nachweisen',
+    requirement: 'Für jede relevante Komponente muss mindestens eine der zutreffenden Schutzbedingungen nach EN 378-2, 6.2.14 erfüllt sein. Die Bewertung erfolgt extern; die App nimmt keine Einzelkomponentenprüfung vor.',
+    measure: 'Die je relevanter Komponente zutreffende Schutzbedingung extern nachweisen und den Nachweis referenzieren.',
+    value: state.outdoorEN3782_6_2_14ProtectionConditionsConfirmed,
+    referenceKey: 'outdoorEN3782_6_2_14ProtectionEvidenceReference',
+    referenceTitle: 'Dokumentreferenz der Schutzbedingungen fehlt'
+  });
+
+  requirements.push(checkBoolean({
+    id: 'outdoor.en378-2-6-2-14.airflow-applicability',
+    category: 'safetyMeasures',
+    title: 'Luftstromabhängigen Schutz als verwendet oder nicht verwendet festlegen',
+    requirement: 'Die zusätzlichen Anforderungen an dauerhafte Luftstromverfügbarkeit und Verriegelung gelten, wenn der Luftstrom als Schutzbedingung herangezogen wird.',
+    measure: 'Festlegen und dokumentieren, ob der Nachweis auf einem luftstromabhängigen Schutz beruht.',
+    source,
+    value: state.outdoorEN3782_6_2_14AirflowProtectionUsed
+  }));
+  if (yes(state.outdoorEN3782_6_2_14AirflowProtectionUsed)) {
+    requirements.push(checkBoolean({
+      id: 'outdoor.en378-2-6-2-14.airflow-availability',
+      category: 'safetyMeasures',
+      title: 'Dauerhafte Verfügbarkeit des erforderlichen Luftstroms',
+      requirement: 'Die Verfügbarkeit des erforderlichen Luftstroms muss über die Lebensdauer der Einrichtung sichergestellt sein.',
+      measure: 'Dauerhafte Verfügbarkeit des erforderlichen Luftstroms über die Gerätelebensdauer sicherstellen und nachweisen.',
+      source,
+      value: state.outdoorEN3782_6_2_14AirflowAvailabilityConfirmed
+    }));
+    requirements.push(checkBoolean({
+      id: 'outdoor.en378-2-6-2-14.airflow-interlock',
+      category: 'safetyMeasures',
+      title: 'Verriegelung bei unzureichendem Luftstrom',
+      requirement: 'Regeleinrichtungen müssen das Einschalten verhindern, wenn der erforderliche Luftstrom nicht erreicht wird.',
+      measure: 'Einschalten der betreffenden Komponenten bei unzureichendem Luftstrom durch eine geeignete Verriegelung verhindern.',
+      source,
+      value: state.outdoorEN3782_6_2_14AirflowInterlockConfirmed
+    }));
+  }
+
+  const surfaceTemperatureClasses = ['A2', 'A2L', 'B2L', 'A3', 'B2', 'B3'];
+  const refrigerantGroup = `${safetyData?.toxicityClass || ''}${safetyData?.flammabilityClass || ''}`;
+  if (surfaceTemperatureClasses.includes(refrigerantGroup)) {
+    requirements.push(checkBoolean({
+      id: 'outdoor.en378-2-6-2-14.surface-temperature',
+      category: 'safetyMeasures',
+      title: 'Oberflächentemperaturen begrenzen',
+      requirement: 'Für die Kältemittelgruppen A2, A2L, B2L, A3, B2 und B3 darf die Oberflächentemperatur die Selbstentzündungstemperatur des Kältemittels abzüglich 100 K nicht überschreiten.',
+      measure: 'Zulässige Oberflächentemperatur anhand der Selbstentzündungstemperatur nachweisen und einhalten.',
+      source,
+      value: state.outdoorEN3782_6_2_14SurfaceTemperatureConfirmed
+    }));
+  }
+
+  requirements.push(checkBoolean({
+    id: 'outdoor.en378-2-6-2-14.documentation-applicability',
+    category: 'safetyMeasures',
+    title: 'Ausdehnung des entflammbaren Bereichs gegenüber den Geräteabmessungen bewerten',
+    requirement: 'Es ist festzustellen, ob der potenziell entflammbare Bereich über die Geräteabmessungen hinausgeht.',
+    measure: 'Ausdehnung des extern ermittelten entflammbaren Bereichs mit den Geräteabmessungen vergleichen.',
+    source,
+    value: state.outdoorEN3782_6_2_14HazardousAreaExceedsEquipment
+  }));
+  if (yes(state.outdoorEN3782_6_2_14HazardousAreaExceedsEquipment)) {
+    requirements.push(checkBoolean({
+      id: 'outdoor.en378-2-6-2-14.documentation',
+      category: 'guidance',
+      title: 'Erweiterten entflammbaren Bereich in der Gerätedokumentation angeben',
+      requirement: 'Wenn der entflammbare Bereich über die Geräteabmessungen hinausgeht, muss dies in der Gerätedokumentation angegeben werden.',
+      measure: 'Ausdehnung des entflammbaren Bereichs in der Gerätedokumentation angeben.',
+      source,
+      value: state.outdoorEN3782_6_2_14EquipmentDocumentationUpdated
+    }));
+  }
+  return requirements;
+}
+
 function buildArrangementRequirements(state, safetyData) {
   const requirements = [];
   const flammable = isFlammable(safetyData?.flammabilityClass);
@@ -118,7 +272,7 @@ function buildArrangementRequirements(state, safetyData) {
       requirements.push(...buildOutdoorVentilationRequirements(state));
     }
     if (baseRequirementsPassed && yes(state.outdoorRefrigerantAccumulationPossible) && flammable) {
-      requirements.push(checkBoolean({ id: 'outdoor.en378-2-6-2-14', category: 'location', title: 'Zusatzanforderung EN 378-2, 6.2.14 erfüllt', requirement: 'Bei möglicher Kältemittelansammlung und Sicherheitsklassen 2L, 2 oder 3 ist die eigenständige Zusatzanforderung nach EN 378-2:2016, 6.2.14 zu prüfen.', measure: 'Anwendbarkeit und Erfüllung der Zusatzanforderung EN 378-2:2016, 6.2.14 gesondert nachweisen.', source: Object.freeze({ sourcePart: 'EN 378-2:2016', sourceSection: '6.2.14' }), value: state.outdoorEN3782_6_2_14Confirmed }));
+      requirements.push(...buildOutdoorEN3782Requirements(state, safetyData));
     }
     return requirements;
   }
