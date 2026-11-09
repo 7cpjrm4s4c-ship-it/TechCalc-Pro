@@ -191,6 +191,7 @@ const ASSETS = [
   './modules/en-378-safety-check/schema.js',
   './modules/en-378-safety-check/snapshotImport.js',
   './modules/en-378-safety-check/state.js',
+  './modules/en-378-safety-check/stateTransitions.js',
   './modules/en-378-safety-check/stateConsistency.js',
   './modules/f-gases-check/config.js',
   './modules/f-gases-check/index.js',
