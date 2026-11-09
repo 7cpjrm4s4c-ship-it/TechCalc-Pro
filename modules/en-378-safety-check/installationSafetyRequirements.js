@@ -51,9 +51,9 @@ function required({ id, category, title, requirement, measure, source, priority 
   return freezeRequirement({ id, category, title, requirement, measure, source, priority, status, missingInputs, details });
 }
 
-function checkBoolean({ id, category, title, requirement, measure, source, value, priority = 'required' }) {
+function checkBoolean({ id, category, title, requirement, measure, source, value, priority = 'required', missingInputs = [id] }) {
   if (!hasAnswer(value)) {
-    return required({ id, category, title, requirement, measure, source, priority, status: REQUIREMENT_STATUS.NOT_ASSESSED, missingInputs: [id] });
+    return required({ id, category, title, requirement, measure, source, priority, status: REQUIREMENT_STATUS.NOT_ASSESSED, missingInputs });
   }
   return required({
     id,
@@ -263,7 +263,7 @@ function buildArrangementRequirements(state, safetyData) {
   const requirements = [];
   const flammable = isFlammable(safetyData?.flammabilityClass);
   if (state.installationLocation === 'outdoor') {
-    requirements.push(checkBoolean({ id: 'outdoor.definition-confirmed', category: 'location', title: 'Definition „im Freien“ bestätigt', requirement: 'Die bauliche Situation muss die normative Definition einer Aufstellung im Freien erfüllen.', measure: 'Erfüllung der Definition „im Freien“ anhand der baulichen Situation planerisch prüfen und bestätigen.', source: SOURCE.outdoorArrangement, value: state.isOutdoorDefinitionConfirmed }));
+    requirements.push(checkBoolean({ id: 'outdoor.definition-confirmed', category: 'location', title: 'Definition „im Freien“ bestätigt', requirement: 'Die bauliche Situation muss die normative Definition einer Aufstellung im Freien erfüllen.', measure: 'Erfüllung der Definition „im Freien“ anhand der baulichen Situation planerisch prüfen und bestätigen.', source: SOURCE.outdoorArrangement, value: state.isOutdoorDefinitionConfirmed, missingInputs: ['isOutdoorDefinitionConfirmed'] }));
     requirements.push(checkBoolean({ id: 'outdoor.safe-arrangement', category: 'location', title: 'Sichere Anordnung der Außenaufstellung', requirement: 'Die Außenaufstellung muss so angeordnet sein, dass austretendes Kältemittel bei einer Leckage Personen und Sachwerte nicht gefährden kann.', measure: 'Aufstellort und mögliche Ausbreitungswege planerisch bewerten und eine sichere Anordnung nachweisen.', source: SOURCE.outdoorArrangement, value: state.outdoorSafeArrangement }));
     requirements.push(checkBoolean({ id: 'outdoor.prevent-refrigerant-entry', category: 'location', title: 'Eindringen in Gebäudeöffnungen verhindern', requirement: 'Austretendes Kältemittel darf nicht in Frischluftöffnungen, Türöffnungen, Bodenklappen oder ähnliche Gebäudeöffnungen eindringen können.', measure: 'Gebäudeöffnungen und Luftführung planerisch bewerten; Eindringen von Kältemittel sicher ausschließen.', source: SOURCE.outdoorArrangement, value: state.outdoorPreventBuildingEntry }));
     if (yes(state.hasOutdoorProtectiveCover)) {
