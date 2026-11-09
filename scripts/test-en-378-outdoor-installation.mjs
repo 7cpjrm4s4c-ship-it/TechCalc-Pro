@@ -209,7 +209,7 @@ const switchToNotApplicable = normalizeEN378StateTransition(
 );
 assert.equal(switchToNotApplicable.outdoorEN3782_6_2_14EN60335Compliant, '');
 assert.equal(switchToNotApplicable.outdoorEN3782_6_2_14EN60335EvidenceReference, '');
-for (const field of EN378_EN60335_TRANSITION_FIELDS.filter(field => !EN60335_SWITCH_FIELDS.includes(field))) {
+for (const field of EN378_EN60335_TRANSITION_FIELDS.filter(field => !['outdoorEN3782_6_2_14EN60335Compliant', 'outdoorEN3782_6_2_14EN60335EvidenceReference'].includes(field))) {
   assert.equal(switchToNotApplicable[field], '');
 }
 
