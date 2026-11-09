@@ -138,13 +138,14 @@ function buildOutdoorEN3782Requirements(state, safetyData) {
     }));
     if (!hasAnswer(state.outdoorEN3782_6_2_14EN60335Compliant)) return requirements;
     if (yes(state.outdoorEN3782_6_2_14EN60335Compliant)) {
-      requirements.push(evidenceReferenceRequirement({
+      const missingEvidence = evidenceReferenceRequirement({
         id: 'outdoorEN3782_6_2_14EN60335EvidenceReference',
         title: 'Nachweisreferenz zur EN-60335-Konformität fehlt',
         value: state.outdoorEN3782_6_2_14EN60335EvidenceReference,
         source,
         measure: 'Dokumentbezeichnung oder Dokumentnummer des EN-60335-Konformitätsnachweises erfassen.'
-      }));
+      });
+      if (missingEvidence) requirements.push(missingEvidence);
       if (!String(state.outdoorEN3782_6_2_14EN60335EvidenceReference ?? '').trim()) return requirements;
       return requirements;
     }
