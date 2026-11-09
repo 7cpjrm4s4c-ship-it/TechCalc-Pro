@@ -25,7 +25,7 @@ const FIELD_LABELS = Object.freeze({
   hasExplosionProtectedElectricalEquipment: 'geeignete elektrische Betriebsmittel',
   hasEmergencyLighting: 'Notbeleuchtung',
   isOutdoorPublicAccessible: 'öffentlich zugängliche Außenaufstellung',
-  isOutdoorDefinitionConfirmed: 'Definition „im Freien“',
+  isOutdoorDefinitionConfirmed: 'Bestätigung, dass der Aufstellort die Definition „im Freien“ nach EN 378-3, Abschnitt 4.2 erfüllt',
   outdoorSafeArrangement: 'sichere Anordnung der Außenaufstellung',
   outdoorPreventBuildingEntry: 'Eindringen in Gebäudeöffnungen verhindern',
   hasOutdoorProtectiveCover: 'Schutzabdeckung vorhanden',
