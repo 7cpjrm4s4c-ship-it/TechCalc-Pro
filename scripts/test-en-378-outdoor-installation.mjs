@@ -19,7 +19,6 @@ const base = {
   outdoorPreventBuildingEntry: 'yes',
   hasOutdoorProtectiveCover: 'no',
   outdoorRefrigerantAccumulationPossible: 'no',
-  outdoorEN3782_6_2_14Confirmed: ''
 };
 const charge = assessChargeLimit(base);
 const assessment = assessInstallationSafetyRequirements(base, charge);
@@ -35,11 +34,55 @@ assert.equal(byId('outdoor.safe-arrangement')?.source?.sourceSection, '4.2');
 const accumulationState = {
   ...base,
   outdoorRefrigerantAccumulationPossible: 'yes',
-  outdoorEN3782_6_2_14Confirmed: 'yes'
+  outdoorEN3782_6_2_14EN60335Applicable: 'no',
+  outdoorEN3782_6_2_14HazardousAreaConfirmed: 'yes',
+  outdoorEN3782_6_2_14HazardousAreaEvidenceReference: 'Gefährdungsbeurteilung-01',
+  outdoorEN3782_6_2_14ComponentAssessmentConfirmed: 'yes',
+  outdoorEN3782_6_2_14ComponentAssessmentEvidenceReference: 'Komponentenbewertung-01',
+  outdoorEN3782_6_2_14ProtectionConditionsConfirmed: 'yes',
+  outdoorEN3782_6_2_14ProtectionEvidenceReference: 'Schutzmaßnahmen-01',
+  outdoorEN3782_6_2_14AirflowProtectionUsed: 'no',
+  outdoorEN3782_6_2_14SurfaceTemperatureConfirmed: 'yes',
+  outdoorEN3782_6_2_14HazardousAreaExceedsEquipment: 'no'
 };
 const accumulationAssessment = assessInstallationSafetyRequirements(accumulationState, assessChargeLimit(accumulationState));
-assert.equal(accumulationAssessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14')?.status, 'passed');
-assert.equal(accumulationAssessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14')?.source?.sourceSection, '6.2.14');
+const byAccumulationId = id => accumulationAssessment.requirements.find(item => item.id === id);
+assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.hazardous-area')?.status, 'passed');
+assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.components')?.status, 'passed');
+assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.protection')?.status, 'passed');
+assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.surface-temperature')?.status, 'passed');
+assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.documentation')?.status, undefined);
+assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.airflow-availability')?.status, undefined);
+assert.ok(accumulationAssessment.requirements.filter(item => item.source?.sourceSection === '6.2.14').length >= 5);
+
+const en60335State = {
+  ...base,
+  outdoorRefrigerantAccumulationPossible: 'yes',
+  outdoorEN3782_6_2_14EN60335Applicable: 'yes',
+  outdoorEN3782_6_2_14EN60335Compliant: 'yes',
+  outdoorEN3782_6_2_14EN60335EvidenceReference: 'EN60335-Konformität-01'
+};
+const en60335Assessment = assessInstallationSafetyRequirements(en60335State, assessChargeLimit(en60335State));
+assert.equal(en60335Assessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14.en60335')?.status, 'passed');
+assert.equal(en60335Assessment.requirements.some(item => item.id === 'outdoor.en378-2-6-2-14.components'), false);
+
+const airflowState = {
+  ...accumulationState,
+  outdoorEN3782_6_2_14AirflowProtectionUsed: 'yes',
+  outdoorEN3782_6_2_14AirflowAvailabilityConfirmed: 'no',
+  outdoorEN3782_6_2_14AirflowInterlockConfirmed: 'yes'
+};
+const airflowAssessment = assessInstallationSafetyRequirements(airflowState, assessChargeLimit(airflowState));
+assert.equal(airflowAssessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14.airflow-availability')?.status, 'failed');
+assert.equal(airflowAssessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14.airflow-interlock')?.status, 'passed');
+
+const documentationState = {
+  ...accumulationState,
+  outdoorEN3782_6_2_14HazardousAreaExceedsEquipment: 'yes',
+  outdoorEN3782_6_2_14EquipmentDocumentationUpdated: 'no'
+};
+const documentationAssessment = assessInstallationSafetyRequirements(documentationState, assessChargeLimit(documentationState));
+assert.equal(documentationAssessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14.documentation')?.status, 'failed');
 
 const coverState = {
   ...base,
