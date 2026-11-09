@@ -11,7 +11,7 @@ const GROUP_LABELS = Object.freeze({
 });
 
 const GROUP_ORDER = Object.freeze([
-  PLANNER_GUIDANCE_GROUPS.CHARGE_LIMIT, PLANNER_GUIDANCE_GROUPS.LOCATION, PLANNER_GUIDANCE_GROUPS.OCCUPANCY, PLANNER_GUIDANCE_GROUPS.VENTILATION, PLANNER_GUIDANCE_GROUPS.MACHINERY_ROOM, PLANNER_GUIDANCE_GROUPS.DETECTION, PLANNER_GUIDANCE_GROUPS.ALARM, PLANNER_GUIDANCE_GROUPS.EMERGENCY_CONTROL, PLANNER_GUIDANCE_GROUPS.SAFETY_MEASURES, PLANNER_GUIDANCE_GROUPS.GUIDANCE, PLANNER_GUIDANCE_GROUPS.OPEN_POINTS
+  PLANNER_GUIDANCE_GROUPS.OPEN_POINTS, PLANNER_GUIDANCE_GROUPS.CHARGE_LIMIT, PLANNER_GUIDANCE_GROUPS.LOCATION, PLANNER_GUIDANCE_GROUPS.OCCUPANCY, PLANNER_GUIDANCE_GROUPS.VENTILATION, PLANNER_GUIDANCE_GROUPS.MACHINERY_ROOM, PLANNER_GUIDANCE_GROUPS.DETECTION, PLANNER_GUIDANCE_GROUPS.ALARM, PLANNER_GUIDANCE_GROUPS.EMERGENCY_CONTROL, PLANNER_GUIDANCE_GROUPS.SAFETY_MEASURES, PLANNER_GUIDANCE_GROUPS.GUIDANCE
 ]);
 
 const array = value => Array.isArray(value) ? value : [];
@@ -127,7 +127,8 @@ export function buildEN378PlannerGuidance(currentState = {}, assessment = {}) {
   const chargeChecks = array(assessment.chargeLimitAssessment?.checks);
   const installationRequirements = array(assessment.installationSafetyAssessment?.requirements);
   const missingInputs = unique([...inputIssueKeys, ...array(assessment.chargeLimitAssessment?.missingInputs), ...array(assessment.installationSafetyAssessment?.missingInputs)]);
-  const additionalMissingInputs = missingInputs.filter(key => !inputIssueKeys.includes(key));
+  const representedMissingInputs = unique([...chargeChecks.flatMap(check => array(check.missingInputs)), ...installationRequirements.flatMap(requirement => array(requirement.missingInputs))]);
+  const additionalMissingInputs = missingInputs.filter(key => !inputIssueKeys.includes(key) && !representedMissingInputs.includes(key));
 
   const actionItems = [
     ...chargeChecks.filter(check => ['failed', 'not-assessed'].includes(check.status)).map(itemFromChargeCheck),
