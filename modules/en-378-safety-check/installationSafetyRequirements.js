@@ -113,26 +113,28 @@ function buildOutdoorEN3782Requirements(state, safetyData) {
   const requirements = [];
   const applicability = state.outdoorEN3782_6_2_14EN60335Applicable;
 
-  requirements.push(checkBoolean({
+  requirements.push(required({
     id: 'outdoor.en378-2-6-2-14.en60335',
     category: 'safetyMeasures',
-    title: 'Anwendbarkeit und Konformität der EN-60335-Normenreihe',
+    title: 'Anwendbarkeit der EN-60335-Normenreihe feststellen',
     requirement: 'Anlagen im Anwendungsbereich der EN-60335-Normenreihe, die mit diesen Normen übereinstimmen, gelten als Erfüllung der Anforderungen dieses Abschnitts.',
-    measure: 'Anwendbarkeit der EN-60335-Normenreihe und gegebenenfalls deren Konformität anhand eines belastbaren Nachweises feststellen.',
+    measure: 'Anwendbarkeit der EN-60335-Normenreihe anhand des Anwendungsbereichs der Anlage feststellen.',
     source,
-    value: applicability
+    status: hasAnswer(applicability) ? (yes(applicability) ? REQUIREMENT_STATUS.PASSED : REQUIREMENT_STATUS.NOT_APPLICABLE) : REQUIREMENT_STATUS.NOT_ASSESSED,
+    missingInputs: hasAnswer(applicability) ? [] : ['outdoorEN3782_6_2_14EN60335Applicable']
   }));
 
   if (!hasAnswer(applicability)) return requirements;
   if (yes(applicability)) {
-    requirements.push(checkBoolean({
+    requirements.push(required({
       id: 'outdoor.en378-2-6-2-14.en60335-compliance',
       category: 'safetyMeasures',
-      title: 'Konformität mit den anwendbaren EN-60335-Anforderungen',
+      title: 'Konformität mit den anwendbaren EN-60335-Anforderungen feststellen',
       requirement: 'Die Ausnahme greift nur, wenn die Anlage im Anwendungsbereich der EN-60335-Normenreihe liegt und mit den anwendbaren Normen übereinstimmt.',
       measure: 'Konformität der Anlage mit den anwendbaren EN-60335-Anforderungen nachweisen.',
       source,
-      value: state.outdoorEN3782_6_2_14EN60335Compliant
+      status: hasAnswer(state.outdoorEN3782_6_2_14EN60335Compliant) ? (yes(state.outdoorEN3782_6_2_14EN60335Compliant) ? REQUIREMENT_STATUS.PASSED : REQUIREMENT_STATUS.NOT_APPLICABLE) : REQUIREMENT_STATUS.NOT_ASSESSED,
+      missingInputs: hasAnswer(state.outdoorEN3782_6_2_14EN60335Compliant) ? [] : ['outdoorEN3782_6_2_14EN60335Compliant']
     }));
     if (!yes(state.outdoorEN3782_6_2_14EN60335Compliant)) return requirements;
     requirements.push(evidenceReferenceRequirement({
