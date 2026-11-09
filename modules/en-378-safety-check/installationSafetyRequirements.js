@@ -182,8 +182,8 @@ function buildOutdoorEN3782Requirements(state, safetyData) {
   addEvidenceBackedCheck({
     id: 'outdoor.en378-2-6-2-14.protection',
     title: 'Normative Schutzbedingungen nachweisen',
-    requirement: 'Für jede relevante Komponente muss mindestens eine der zutreffenden Schutzbedingungen nach EN 378-2, 6.2.14 erfüllt sein. Die Bewertung erfolgt extern; die App nimmt keine Einzelkomponentenprüfung vor.',
-    measure: 'Die je relevanter Komponente zutreffende Schutzbedingung extern nachweisen und den Nachweis referenzieren.',
+    requirement: 'Für jede relevante Komponente muss mindestens eine zutreffende Schutzbedingung erfüllt sein: Lage außerhalb des potenziell entflammbaren Bereichs; ausreichender Luftstrom mit höchstens 50 % LFL an der Zündquelle; geeigneter Geräteschutz für Zone 2, 1 oder 0; oder eine maximal mögliche Funken-/Lichtbogenenergie, die das Kältemittel nicht entzünden kann. Die Bewertung erfolgt extern; die App nimmt keine Einzelkomponentenprüfung vor.',
+    measure: 'Für jede relevante Komponente mindestens eine der zutreffenden Schutzbedingungen – außerhalb des Bereichs, Luftstromschutz, geeigneter Geräteschutz oder Begrenzung der Zündenergie – extern nachweisen und den Nachweis referenzieren.',
     value: state.outdoorEN3782_6_2_14ProtectionConditionsConfirmed,
     referenceKey: 'outdoorEN3782_6_2_14ProtectionEvidenceReference',
     referenceTitle: 'Dokumentreferenz der Schutzbedingungen fehlt'
