@@ -119,3 +119,26 @@ Die vorhandene Kältemitteldatenbank einschließlich praktischer Grenzwerte und 
 - [ ] Weitere Aufstellorte schrittweise fachlich festgelegt und umgesetzt.
 
 Bis zur abgeschlossenen fachlichen und technischen Prüfung erfolgen keine Änderungen an der produktiven Entscheidungslogik.
+
+## Eigenständiger Prüfpfad: EN 378-2:2016, 6.2.14
+
+Der Prüfpfad wird bei Außenaufstellung nur aktiviert, wenn die Grundvoraussetzungen aus EN 378-3, 4.2 erfüllt sind, eine Kältemittelansammlung örtlich als möglich bewertet wurde und die Kältemittel-Sicherheitsklasse 2L, 2 oder 3 vorliegt.
+
+### EN-60335-Ausnahme
+
+Zunächst wird die Anwendbarkeit der EN-60335-Normenreihe festgestellt. Ist sie anwendbar, muss die Konformität mit den einschlägigen Anforderungen bestätigt und durch eine Dokumentreferenz belegt werden. Nur bei bestätigter Anwendbarkeit und Konformität gelten die Anforderungen aus 6.2.14 als erfüllt. Eine fehlende oder nicht bestätigte Konformität führt in den regulären Prüfpfad; sie wird nicht als eigenständiger Normverstoß bewertet.
+
+### Externe Nachweise
+
+Die App führt weder eine Gefahrenbereichsberechnung noch eine Einzelkomponentenbewertung durch. Der Planer muss externe Nachweise dokumentieren:
+- Ermittlung des potenziell entflammbaren Bereichs mit Dokumentbezeichnung oder Dokumentnummer.
+- Bewertung der relevanten Komponenten und Geräte mit Dokumentreferenz. Dabei sind Steckverbindungen sowie im Normalbetrieb zu erwartende geöffnete Gehäuse zu berücksichtigen.
+- Nachweis, dass für jede relevante Komponente mindestens eine zutreffende Schutzbedingung aus 6.2.14 erfüllt ist, ebenfalls mit Dokumentreferenz.
+
+### Bedingte Folgeanforderungen
+
+- Wird luftstromabhängiger Schutz verwendet, sind die dauerhafte Verfügbarkeit des erforderlichen Luftstroms und die Verriegelung gegen Einschalten bei unzureichendem Luftstrom gesondert zu bestätigen.
+- Für die Kältemittelgruppen A2, A2L, B2L, A3, B2 und B3 ist der Nachweis der Oberflächentemperaturgrenze zu führen.
+- Es ist zu bewerten, ob der entflammbare Bereich über die Geräteabmessungen hinausgeht. Nur wenn dies zutrifft, muss die erweiterte Bereichsausdehnung in der Gerätedokumentation angegeben werden.
+
+Die externe Dokumentreferenz wird in der Bewertung gespeichert und in den Bericht übernommen. Der Planerleitfaden gibt nur die tatsächlich ausgelösten Maßnahmen aus. Normative Einzelanforderungen und ihre Quellen bleiben im Bewertungsmodell nachvollziehbar.
