@@ -3,6 +3,7 @@ import { assessChargeLimit } from '../modules/en-378-safety-check/chargeLimitCal
 import { assessInstallationSafetyRequirements } from '../modules/en-378-safety-check/installationSafetyRequirements.js';
 import { calculate } from '../modules/en-378-safety-check/logic.js';
 import { normalizeEN378StateTransition, EN378_EN60335_TRANSITION_FIELDS } from '../modules/en-378-safety-check/stateTransitions.js';
+import { normalizeEN378StateTransition, EN378_EN60335_TRANSITION_FIELDS } from '../modules/en-378-safety-check/stateTransitions.js';
 
 const base = {
   refrigerantId: 'R-32',
@@ -171,8 +172,6 @@ const calculation = calculate(base);
 assert.equal(calculation.effectiveState.chargeKg, '8');
 assert.ok(calculation.installationSafetyAssessment.requirements.some(item => item.id === 'outdoor.safe-arrangement'));
 
-import { normalizeEN378StateTransition, EN378_EN60335_TRANSITION_FIELDS } from '../modules/en-378-safety-check/stateTransitions.js';
-
 const staleEN60335State = {
   outdoorEN3782_6_2_14EN60335Applicable: 'no',
   outdoorEN3782_6_2_14EN60335Compliant: 'no',
@@ -199,7 +198,7 @@ const switchToCompliant = normalizeEN378StateTransition(
   { outdoorEN3782_6_2_14EN60335Compliant: 'yes' },
   { action: 'field:change:immediate' }
 );
-for (const field of EN378_EN60335_TRANSITION_FIELDS.filter(field => !EN60335_SWITCH_FIELDS.includes(field))) {
+for (const field of EN378_EN60335_TRANSITION_FIELDS.filter(field => !['outdoorEN3782_6_2_14EN60335Compliant', 'outdoorEN3782_6_2_14EN60335EvidenceReference'].includes(field))) {
   assert.equal(switchToCompliant[field], '', `Wechsel auf EN 60335-konform = Ja muss ${field} zurücksetzen.`);
 }
 
