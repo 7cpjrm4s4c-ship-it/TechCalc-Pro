@@ -10,7 +10,7 @@ const outdoorBaseRequirementsPassed = state => state.isOutdoorDefinitionConfirme
 const needsOutdoorAccumulationAssessment = state => isOutdoor(state) && outdoorBaseRequirementsPassed(state);
 const needsOutdoorEN3782Confirmation = state => needsOutdoorAccumulationAssessment(state) && state.outdoorRefrigerantAccumulationPossible === 'yes' && ['2L', '2', '3'].includes(getEN378SafetyData(state.refrigerantId)?.flammabilityClass);
 const needsOutdoorEN3782StandardAssessment = state => needsOutdoorEN3782Confirmation(state) && (state.outdoorEN3782_6_2_14EN60335Applicable === 'no' || (state.outdoorEN3782_6_2_14EN60335Applicable === 'yes' && state.outdoorEN3782_6_2_14EN60335Compliant === 'no'));
-const needsOutdoorEN3782SurfaceTemperature = state => needsOutdoorEN3782StandardAssessment(state) && ['A2', 'A2L', 'B2L', 'A3', 'B2', 'B3'].includes(`${getEN378SafetyData(state.refrigerantId)?.toxicityClass || ''}${getEN378SafetyData(state.refrigerantId)?.flammabilityClass || ''}`);
+const needsOutdoorEN3782SurfaceTemperature = state => needsOutdoorEN3782StandardAssessment(state) && state.outdoorEN3782_6_2_14ComponentAssessmentConfirmed === 'yes' && Boolean(String(state.outdoorEN3782_6_2_14ComponentAssessmentEvidenceReference || '').trim()) && ['A2', 'A2L', 'B2L', 'A3', 'B2', 'B3'].includes(`${getEN378SafetyData(state.refrigerantId)?.toxicityClass || ''}${getEN378SafetyData(state.refrigerantId)?.flammabilityClass || ''}`);
 const positiveNumber = value => {
   const parsed = Number(String(value ?? '').replace(',', '.'));
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
