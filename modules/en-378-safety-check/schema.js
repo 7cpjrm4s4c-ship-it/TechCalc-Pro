@@ -9,7 +9,7 @@ const isOutdoor = state => state.installationLocation === 'outdoor';
 const outdoorBaseRequirementsPassed = state => state.isOutdoorDefinitionConfirmed === 'yes' && state.outdoorSafeArrangement === 'yes' && state.outdoorPreventBuildingEntry === 'yes' && (state.hasOutdoorProtectiveCover === 'no' || (state.hasOutdoorProtectiveCover === 'yes' && state.outdoorCoverVentilated === 'yes'));
 const needsOutdoorAccumulationAssessment = state => isOutdoor(state) && outdoorBaseRequirementsPassed(state);
 const needsOutdoorEN3782Confirmation = state => needsOutdoorAccumulationAssessment(state) && state.outdoorRefrigerantAccumulationPossible === 'yes' && ['2L', '2', '3'].includes(getEN378SafetyData(state.refrigerantId)?.flammabilityClass);
-const needsOutdoorEN3782StandardAssessment = state => needsOutdoorEN3782Confirmation(state) && !(state.outdoorEN3782_6_2_14EN60335Applicable === 'yes' && state.outdoorEN3782_6_2_14EN60335Compliant === 'yes');
+const needsOutdoorEN3782StandardAssessment = state => needsOutdoorEN3782Confirmation(state) && (state.outdoorEN3782_6_2_14EN60335Applicable === 'no' || (state.outdoorEN3782_6_2_14EN60335Applicable === 'yes' && state.outdoorEN3782_6_2_14EN60335Compliant === 'no'));
 const positiveNumber = value => {
   const parsed = Number(String(value ?? '').replace(',', '.'));
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
