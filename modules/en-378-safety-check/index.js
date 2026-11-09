@@ -49,7 +49,7 @@ const transitionAwareState = Object.freeze({
 const typedReportAdapter = createTypedDtoReportAdapter({
   config,
   schema: runtimeSchema,
-  state,
+  state: transitionAwareState,
   calculate,
   results: buildEN378SafetyCheckResultModel,
   buildReportDto: buildEN378SafetyCheckReportDto
@@ -78,7 +78,7 @@ const controller = Object.freeze({
 export default createPlatformModule({
   config,
   schema: runtimeSchema,
-  state,
+  state: transitionAwareState,
   initialState,
   calculate: typedReportAdapter.calculate,
   results: buildEN378SafetyCheckResultModel,
