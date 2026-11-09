@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { assessChargeLimit } from '../modules/en-378-safety-check/chargeLimitCalculation.js';
 import { assessInstallationSafetyRequirements } from '../modules/en-378-safety-check/installationSafetyRequirements.js';
 import { calculate } from '../modules/en-378-safety-check/logic.js';
+import { normalizeEN378StateTransition, EN378_EN60335_TRANSITION_FIELDS } from '../modules/en-378-safety-check/stateTransitions.js';
 
 const base = {
   refrigerantId: 'R-32',
@@ -169,4 +170,62 @@ assert.equal(undeterminedMechanicalVentilationAssessment.requirements.find(item 
 const calculation = calculate(base);
 assert.equal(calculation.effectiveState.chargeKg, '8');
 assert.ok(calculation.installationSafetyAssessment.requirements.some(item => item.id === 'outdoor.safe-arrangement'));
+
+import { normalizeEN378StateTransition, EN378_EN60335_TRANSITION_FIELDS } from '../modules/en-378-safety-check/stateTransitions.js';
+
+const staleEN60335State = {
+  outdoorEN3782_6_2_14EN60335Applicable: 'no',
+  outdoorEN3782_6_2_14EN60335Compliant: 'no',
+  outdoorEN3782_6_2_14EN60335EvidenceReference: 'alte-konformitaet.pdf',
+  ...Object.fromEntries(EN378_EN60335_TRANSITION_FIELDS.map(field => [field, 'yes']))
+};
+const switchToApplicable = normalizeEN378StateTransition(
+  staleEN60335State,
+  { outdoorEN3782_6_2_14EN60335Applicable: 'yes' },
+  { action: 'field:input:select' }
+);
+assert.equal(switchToApplicable.outdoorEN3782_6_2_14EN60335Applicable, 'yes');
+for (const field of EN378_EN60335_TRANSITION_FIELDS) {
+  assert.equal(switchToApplicable[field], '', `Wechsel auf EN 60335 = Ja muss ${field} zurücksetzen.`);
+}
+
+const staleCompliantState = {
+  ...staleEN60335State,
+  outdoorEN3782_6_2_14EN60335Applicable: 'yes',
+  outdoorEN3782_6_2_14EN60335Compliant: 'no'
+};
+const switchToCompliant = normalizeEN378StateTransition(
+  staleCompliantState,
+  { outdoorEN3782_6_2_14EN60335Compliant: 'yes' },
+  { action: 'field:change:immediate' }
+);
+for (const field of EN378_EN60335_TRANSITION_FIELDS.filter(field => !EN60335_SWITCH_FIELDS.includes(field))) {
+  assert.equal(switchToCompliant[field], '', `Wechsel auf EN 60335-konform = Ja muss ${field} zurücksetzen.`);
+}
+
+const switchToNotApplicable = normalizeEN378StateTransition(
+  staleCompliantState,
+  { outdoorEN3782_6_2_14EN60335Applicable: 'no' },
+  { action: 'field:input:select' }
+);
+assert.equal(switchToNotApplicable.outdoorEN3782_6_2_14EN60335Compliant, '');
+assert.equal(switchToNotApplicable.outdoorEN3782_6_2_14EN60335EvidenceReference, '');
+for (const field of EN378_EN60335_TRANSITION_FIELDS.filter(field => !EN60335_SWITCH_FIELDS.includes(field))) {
+  assert.equal(switchToNotApplicable[field], '');
+}
+
+const hydratedEN60335State = normalizeEN378StateTransition(
+  {},
+  { ...staleEN60335State },
+  { action: 'line:select' }
+);
+assert.deepEqual(hydratedEN60335State, staleEN60335State, 'Gespeicherte Datensätze müssen ohne interaktive Bereinigung geladen werden.');
+
+const unrelatedCommit = normalizeEN378StateTransition(
+  staleEN60335State,
+  { chargeKg: '9' },
+  { action: 'field:input:select' }
+);
+assert.deepEqual(unrelatedCommit, { chargeKg: '9' }, 'Unabhängige Eingaben dürfen keine EN-60335-Felder verändern.');
+
 console.log('EN 378 outdoor installation section 4.2 tests passed.');
