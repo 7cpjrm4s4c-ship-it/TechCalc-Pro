@@ -70,7 +70,7 @@ function dedupeItems(items) {
   const grouped = new Map();
   const statusRank = { failed: 3, 'not-assessed': 2, required: 1, passed: 0 };
   for (const item of array(items)) {
-    const key = text(item.measure).replace(/\s+/g, ' ').toLocaleLowerCase('de-DE');
+    const key = `${item.category}::${text(item.measure).replace(/\s+/g, ' ').toLocaleLowerCase('de-DE')}`;
     if (!key) continue;
     const existing = grouped.get(key);
     const sourceLabels = unique([...(existing?.sourceLabels || []), item.sourceLabel]);
@@ -155,7 +155,7 @@ export function buildEN378PlannerGuidance(currentState = {}, assessment = {}) {
     failedCount,
     openPointCount,
     missingInputs: Object.freeze(missingInputs.map(fieldLabel)),
-    groups: buildGroups(actionItems),
+    groups: buildGroups([...actionItems, ...actionItems.filter(item => item.status === 'not-assessed').map(item => ({ ...item, category: PLANNER_GUIDANCE_GROUPS.OPEN_POINTS }))]),
     confirmedItems: Object.freeze(dedupeItems(confirmedItems)),
     requiredMeasures: Object.freeze(unique(actionItems.map(item => item.measure)))
   });
