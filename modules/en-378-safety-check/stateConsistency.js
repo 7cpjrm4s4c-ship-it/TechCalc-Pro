@@ -70,7 +70,7 @@ export function assessStateConsistency(currentState = {}) {
     requirements.push(consistencyRequirement({
       id: 'state-consistency.class-ii-location',
       title: 'Klasse II mit Aufstellort abgleichen',
-      requirement: 'Klasse II beschreibt eine Aufstellung im Maschinenraum oder im Freien.',
+      requirement: 'Klasse II beschreibt Verdichter im Maschinenraum oder im Freien.',
       measure: 'Aufstellort auf Maschinenraum oder Außenaufstellung ändern oder eine andere Aufstellungsort-Klassifikation wählen.'
     }));
   }
@@ -79,7 +79,7 @@ export function assessStateConsistency(currentState = {}) {
     requirements.push(consistencyRequirement({
       id: 'state-consistency.class-iii-location',
       title: 'Klasse III mit Aufstellort abgleichen',
-      requirement: 'Klasse III setzt voraus, dass relevante Anlagenteile beziehungsweise der Verdichter im Maschinenraum oder im Freien angeordnet sind.',
+      requirement: 'Klasse III setzt voraus, dass alle kältemittelführenden Teile im Maschinenraum oder im Freien angeordnet sind.',
       measure: 'Aufstellort, Maschinenraum-Angabe oder Aufstellungsort-Klassifikation fachlich angleichen.'
     }));
   }
@@ -88,8 +88,8 @@ export function assessStateConsistency(currentState = {}) {
     requirements.push(consistencyRequirement({
       id: 'state-consistency.class-iv-location',
       title: 'Klasse IV mit Personen-Aufenthaltsbereich abgleichen',
-      requirement: 'Klasse IV beschreibt mechanische Geräte im Personen-Aufenthaltsbereich.',
-      measure: 'Aufstellort auf Personen-Aufenthaltsbereich ändern oder eine passende Aufstellungsort-Klassifikation wählen.'
+      requirement: 'Klasse IV beschreibt ein belüftetes Gehäuse.',
+      measure: 'Aufstellort auf einen passenden Aufstellort ändern oder eine passende Aufstellungsort-Klassifikation wählen.'
     }));
   }
 

@@ -33,7 +33,7 @@ const installationLocationOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('occupied-space', 'Aufenthaltsbereich'), option('technical-room', 'Technischer Raum'), option('machinery-room', 'Maschinenraum'), option('outdoor', 'Außenaufstellung')
 ]);
 const installationClassOptions = Object.freeze([
-  option('', 'Nicht angegeben'), option('I', 'Klasse I – belüftetes Gehäuse'), option('II', 'Klasse II – Maschinenraum oder im Freien'), option('III', 'Klasse III – Verdichter in Maschinenraum oder im Freien'), option('IV', 'Klasse IV – mechanische Geräte im Personen-Aufenthaltsbereich')
+  option('', 'Nicht angegeben'), option('I', 'Klasse I – Mechanische Geräte im Personen-Aufenthaltsbereich'), option('II', 'Klasse II – Verdichter im Maschinenraum oder im Freien'), option('III', 'Klasse III – Maschinenraum oder im Freien'), option('IV', 'Klasse IV – Belüftetes Gehäuse')
 ]);
 const accessAreaOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('general-access', 'Allgemeiner Zugang'), option('supervised-access', 'Beaufsichtigter Zugang'), option('authorized-access', 'Nur unterwiesene oder befugte Personen')
