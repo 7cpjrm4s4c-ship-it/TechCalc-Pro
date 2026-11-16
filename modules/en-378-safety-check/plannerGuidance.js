@@ -1,4 +1,5 @@
 import { checkLabel, fieldLabel, statusLabel } from './displayLabels.js';
+import { HINWEIS_A, HINWEIS_B, MACHINERY_ROOM_NOTICE } from './machineryRoomRiskAnalysis.js';
 
 export const EN_378_PLANNER_GUIDANCE_VERSION = 1;
 
@@ -126,6 +127,7 @@ export function buildEN378PlannerGuidance(currentState = {}, assessment = {}) {
   const inputIssueKeys = unique(inputIssues.map(issue => text(issue).split(':')[0]));
   const chargeChecks = array(assessment.chargeLimitAssessment?.checks);
   const installationRequirements = array(assessment.installationSafetyAssessment?.requirements);
+  const machineryRoomRiskAnalysis = assessment.machineryRoomRiskAnalysis || {};
   const missingInputs = unique([...inputIssueKeys, ...array(assessment.chargeLimitAssessment?.missingInputs), ...array(assessment.installationSafetyAssessment?.missingInputs)]);
   const representedMissingInputs = unique([...chargeChecks.flatMap(check => array(check.missingInputs)), ...installationRequirements.flatMap(requirement => array(requirement.missingInputs))]);
   const additionalMissingInputs = missingInputs.filter(key => !inputIssueKeys.includes(key) && !representedMissingInputs.includes(key));
@@ -145,6 +147,15 @@ export function buildEN378PlannerGuidance(currentState = {}, assessment = {}) {
   const actionCount = actionItems.filter(item => item.status !== 'not-assessed').length;
   const status = text(assessment.status || currentState.status || 'not-assessed');
 
+  // Add machinery room risk analysis hint texts
+  const notices = [];
+  if (machineryRoomRiskAnalysis.isApplicable) {
+    if (machineryRoomRiskAnalysis.hintText) {
+      notices.push(machineryRoomRiskAnalysis.hintText);
+    }
+    notices.push(MACHINERY_ROOM_NOTICE);
+  }
+
   return Object.freeze({
     version: EN_378_PLANNER_GUIDANCE_VERSION,
     status,
@@ -157,7 +168,8 @@ export function buildEN378PlannerGuidance(currentState = {}, assessment = {}) {
     missingInputs: Object.freeze(missingInputs.map(fieldLabel)),
     groups: buildGroups(actionItems.map(item => item.status === 'not-assessed' ? { ...item, category: PLANNER_GUIDANCE_GROUPS.OPEN_POINTS } : item)),
     confirmedItems: Object.freeze(dedupeItems(confirmedItems)),
-    requiredMeasures: Object.freeze(unique(actionItems.map(item => item.measure)))
+    requiredMeasures: Object.freeze(unique(actionItems.map(item => item.measure))),
+    notices: Object.freeze(notices)
   });
 }
 

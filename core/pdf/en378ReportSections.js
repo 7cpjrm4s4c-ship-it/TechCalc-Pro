@@ -51,7 +51,8 @@ const OPTIONS = Object.freeze({
   mechanical: 'mechanische Lüftung',
   none: 'keine gesicherte Lüftung',
   yes: 'ja',
-  no: 'nein'
+  no: 'nein',
+  present: 'Risikoanalyse liegt vor'
 });
 
 const CHECKS = Object.freeze({
@@ -123,6 +124,10 @@ function importedSystemSection(dto) {
       row('Nutzung', label(input.usageType)),
       row('Anwendungsart', label(input.applicationType)),
       row('Geschoss oder Lage', label(input.locationLevel)),
+      row('Kellergeschoss', input.isBasementLocation ? label(input.isBasementLocation) : '—'),
+      row('Risikoanalyse Maschinenraum', input.installationLocation === 'machinery-room' ? label(input.machineryRoomRiskAnalysisStatus) : '—'),
+      row('Ergebnis der Risikoanalyse', input.installationLocation === 'machinery-room' ? label(input.machineryRoomRiskAnalysisResult) : '—'),
+      row('Bemerkungen zur Risikoanalyse', input.installationLocation === 'machinery-room' && input.machineryRoomRiskAnalysisNotes ? input.machineryRoomRiskAnalysisNotes : '—'),
       row('Lüftung', label(input.ventilationType))
     ]
   };

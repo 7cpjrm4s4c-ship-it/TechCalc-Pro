@@ -1,7 +1,7 @@
 import { createModuleState } from '../../core/state/state.js';
 import { getDataVersions } from '../../core/data/index.js';
 
-export const EN_378_SAFETY_CHECK_SCHEMA_VERSION = 1;
+export const EN_378_SAFETY_CHECK_SCHEMA_VERSION = 2;
 export const initialState = Object.freeze({
   schemaVersion: EN_378_SAFETY_CHECK_SCHEMA_VERSION,
   savedAssessments: Object.freeze([]),
@@ -79,6 +79,10 @@ export const initialState = Object.freeze({
   hasExplosionProtectedElectricalEquipment: '',
   isOutdoorPublicAccessible: '',
   additionalSafetyMeasures: '',
+  machineryRoomRiskAnalysisStatus: '',
+  machineryRoomRiskAnalysisResult: '',
+  machineryRoomRiskAnalysisNotes: '',
+  isBasementLocation: '',
   dataVersions: getDataVersions()
 });
 export const state = createModuleState(initialState, { moduleId: 'en-378-safety-check' });

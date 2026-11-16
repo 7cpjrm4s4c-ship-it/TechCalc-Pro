@@ -8,6 +8,13 @@ import {
 } from './alternativeRiskMeasures.js';
 import { assessStateConsistency, mergeStateConsistencyAssessment } from './stateConsistency.js';
 import { buildEN378PlannerGuidance } from './plannerGuidance.js';
+import {
+  assessMachineryRoomRiskAnalysis,
+  assessBelowGradeDetectorAlarm,
+  HINWEIS_A,
+  HINWEIS_B,
+  MACHINERY_ROOM_NOTICE
+} from './machineryRoomRiskAnalysis.js';
 const ACCESS_CATEGORY_BY_ACCESS_AREA = Object.freeze({
   'general-access': 'a',
   'supervised-access': 'b',
@@ -118,12 +125,25 @@ export function calculate(currentState = {}) {
   const alternativeInstallationSafetyAssessment = mergeAlternativeRiskMeasuresAssessment(baseInstallationSafetyAssessment, alternativeRiskMeasuresAssessment);
   const stateConsistencyAssessment = assessStateConsistency(effectiveState);
   const installationSafetyAssessment = mergeStateConsistencyAssessment(alternativeInstallationSafetyAssessment, stateConsistencyAssessment);
-  const status = deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, installationSafetyAssessment });
+  
+  // Machinery Room Risk Analysis per EN 378-3, 4.3
+  const machineryRoomRiskAnalysis = assessMachineryRoomRiskAnalysis(effectiveState);
+  const belowGradeDetectorAlarm = assessBelowGradeDetectorAlarm(effectiveState);
+  
+  // Merge below-grade check into installation safety assessment if applicable
+  const installationSafetyWithMachineryRoom = mergeMachineryRoomChecks(
+    installationSafetyAssessment,
+    machineryRoomRiskAnalysis,
+    belowGradeDetectorAlarm
+  );
+  
+  const status = deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, installationSafetyAssessment: installationSafetyWithMachineryRoom });
   const plannerGuidance = buildEN378PlannerGuidance(effectiveState, {
     status,
     inputValidation,
     chargeLimitAssessment,
-    installationSafetyAssessment
+    installationSafetyAssessment: installationSafetyWithMachineryRoom,
+    machineryRoomRiskAnalysis
   });
   return Object.freeze({
     status,
@@ -140,11 +160,44 @@ export function calculate(currentState = {}) {
     rawChargeLimitAssessment,
     alternativeRiskMeasuresAssessment,
     stateConsistencyAssessment,
-    installationSafetyAssessment,
+    installationSafetyAssessment: installationSafetyWithMachineryRoom,
+    machineryRoomRiskAnalysis,
+    belowGradeDetectorAlarm,
     plannerGuidance,
     requiredMeasures: Object.freeze(plannerGuidance.requiredMeasures || []),
     notices: Object.freeze([]),
     dataVersions: effectiveState.dataVersions || getDataVersions()
+  });
+}
+
+/**
+ * Merge machinery room specific checks into installation safety assessment
+ */
+function mergeMachineryRoomChecks(installationSafetyAssessment = {}, machineryRoomRiskAnalysis = {}, belowGradeDetectorAlarm = null) {
+  const requirements = [...(installationSafetyAssessment.requirements || [])];
+  
+  // Add below-grade detector alarm check if applicable and not already present
+  if (belowGradeDetectorAlarm && !requirements.some(r => r.id === belowGradeDetectorAlarm.id)) {
+    requirements.push(Object.freeze({ ...belowGradeDetectorAlarm }));
+  }
+  
+  // Recalculate status
+  const failed = requirements.filter(item => item.status === 'failed');
+  const notAssessed = requirements.filter(item => item.status === 'not-assessed');
+  const requiredMeasures = requirements
+    .filter(item => ['required', 'failed', 'not-assessed'].includes(item.status))
+    .map(item => item.measure)
+    .filter(Boolean);
+  const missingInputs = [...new Set(notAssessed.flatMap(item => item.missingInputs || []))];
+  
+  const status = failed.length ? 'failed' : notAssessed.length ? 'not-assessed' : installationSafetyAssessment.status || 'passed';
+  
+  return Object.freeze({
+    ...installationSafetyAssessment,
+    status,
+    requirements: Object.freeze(requirements),
+    requiredMeasures: Object.freeze([...new Set(requiredMeasures)]),
+    missingInputs: Object.freeze(missingInputs)
   });
 }
 export default calculate;

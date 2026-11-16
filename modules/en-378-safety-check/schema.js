@@ -59,6 +59,12 @@ const ventilationTypeOptions = Object.freeze([
 const yesNoOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('yes', 'Ja'), option('no', 'Nein')
 ]);
+const riskAnalysisStatusOptions = Object.freeze([
+  option('', 'Nicht angegeben'), option('present', 'Risikoanalyse liegt vor')
+]);
+const riskAnalysisResultOptions = Object.freeze([
+  option('', 'offen'), option('yes', 'Maschinenraum erforderlich'), option('no', 'nicht erforderlich')
+]);
 
 const schema = defineFormSchema({
   version: 1,
@@ -74,12 +80,16 @@ const schema = defineFormSchema({
     { key: 'roomVolumeM3', label: 'Raumvolumen', type: FIELD_TYPES.DECIMAL, unit: 'm³' },
     { key: 'installationLocation', label: 'Aufstellort', type: FIELD_TYPES.SELECT, options: installationLocationOptions },
     { key: 'installationClass', label: 'Aufstellungsort-Klassifikation', type: FIELD_TYPES.SELECT, options: installationClassOptions },
+    { key: 'machineryRoomRiskAnalysisStatus', label: 'Risikoanalyse Maschinenraum', type: FIELD_TYPES.SELECT, options: riskAnalysisStatusOptions, visibleWhen: state => state.installationLocation === 'machinery-room' },
+    { key: 'machineryRoomRiskAnalysisResult', label: 'Ergebnis der Risikoanalyse', type: FIELD_TYPES.SELECT, options: riskAnalysisResultOptions, visibleWhen: state => state.installationLocation === 'machinery-room' },
+    { key: 'machineryRoomRiskAnalysisNotes', label: 'Bemerkungen zur Risikoanalyse', type: FIELD_TYPES.TEXTAREA, visibleWhen: state => state.installationLocation === 'machinery-room' },
     { key: 'accessArea', label: 'Zugangsbereich', type: FIELD_TYPES.SELECT, options: accessAreaOptions },
     { key: 'accessCategoryInfo', label: 'Hinweis zur Zugangskategorie', type: FIELD_TYPES.NOTICE, text: 'Die Kategorie des Zugangsbereichs wird aus dem gewählten Zugangsbereich abgeleitet und muss nicht zusätzlich ausgewählt werden.', tone: 'compact', visibleWhen: state => Boolean(state.accessArea) },
     { key: 'accessCategory', label: 'Kategorie des Zugangsbereichs', type: FIELD_TYPES.SELECT, options: accessCategoryOptions, visibleWhen: needsLegacyAccessCategoryField },
     { key: 'usageType', label: 'Nutzung', type: FIELD_TYPES.SELECT, options: usageTypeOptions },
     { key: 'applicationType', label: 'Anwendungsart', type: FIELD_TYPES.SELECT, options: applicationTypeOptions },
     { key: 'locationLevel', label: 'Geschoss oder Lage', type: FIELD_TYPES.SELECT, options: locationLevelOptions },
+    { key: 'isBasementLocation', label: 'Kellergeschoss', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => state.locationLevel === 'upper-no-emergency-exit-or-basement' },
     { key: 'occupantDensityBelowOnePer10m2', label: 'Personendichte kleiner als eine Person je 10 m²', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => ['b', 'c'].includes(accessCategoryByAccessArea[state.accessArea] || state.accessCategory) },
     { key: 'hasEmergencyExits', label: 'Notausgänge vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => (accessCategoryByAccessArea[state.accessArea] || state.accessCategory) === 'c' },
     { key: 'isPermanentlySealedSorptionSystem', label: 'Dauerhaft geschlossene Sorptionsanlage', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => (accessCategoryByAccessArea[state.accessArea] || state.accessCategory) === 'a' },
@@ -135,7 +145,7 @@ const schema = defineFormSchema({
   ],
   groups: [
     { title: 'Importierter Anlagenstand', fields: ['importedSystemName', 'importFGasesSystem', 'fGasesSnapshotId', 'importNotice', 'importStatusMessage', 'refrigerantId', 'chargeKg', 'chargeScopeInfo'], columns: 2, accent: 'blue' },
-    { title: 'Raum und Aufstellung', fields: ['roomVolumeM3', 'installationLocation', 'installationClass', 'accessArea', 'accessCategoryInfo', 'accessCategory', 'usageType', 'applicationType', 'locationLevel'], columns: 2, accent: 'blue' },
+    { title: 'Raum und Aufstellung', fields: ['roomVolumeM3', 'installationLocation', 'installationClass', 'accessArea', 'accessCategoryInfo', 'accessCategory', 'usageType', 'applicationType', 'locationLevel', 'isBasementLocation', 'machineryRoomRiskAnalysisStatus', 'machineryRoomRiskAnalysisResult', 'machineryRoomRiskAnalysisNotes'], columns: 2, accent: 'blue' },
     { title: 'Detailfragen zur Füllmengenbewertung', fields: ['occupantDensityBelowOnePer10m2', 'hasEmergencyExits', 'isPermanentlySealedSorptionSystem', 'usesAlternativeRiskManagement', 'alternativeRiskManagementInfo', 'floorAreaM2', 'isFactorySealed', 'mountingType'], columns: 2, accent: 'blue' },
     { title: 'Lüftung und Sicherheitskomponenten', fields: ['ventilationType', 'limitInfo', 'hasGasWarningSystem', 'hasMachineryRoom', 'machineryRoomLargestSystemChargeKg', 'hasEmergencyVentilation', 'hasEmergencyVentilationControlOutside', 'hasEmergencyVentilationControlInside', 'hasEmergencyStopOutside', 'hasEmergencyStopInside', 'hasEmergencyLighting', 'hasDetector', 'hasAlarm', 'hasIndependentAlarmPower', 'hasSafetyShutoffValves', 'hasVentilationOpenings', 'hasExplosionProtectedElectricalEquipment', 'isOutdoorPublicAccessible', 'isOutdoorDefinitionConfirmed', 'outdoorSafeArrangement', 'outdoorPreventBuildingEntry', 'hasOutdoorProtectiveCover', 'outdoorCoverVentilated', 'outdoorRefrigerantAccumulationPossible', 'outdoorVentilationGeneralConfirmed', 'outdoorVentilationNationalRulesConfirmed', 'outdoorMechanicalVentilationOpeningsConfirmed', 'additionalSafetyMeasures'], columns: 2, accent: 'blue' },
     { title: 'EN 378-2, 6.2.14 – Brand- und Explosionsschutz', fields: ['outdoorEN3782_6_2_14EN60335Applicable', 'outdoorEN3782_6_2_14EN60335Compliant', 'outdoorEN3782_6_2_14EN60335EvidenceReference', 'outdoorEN3782_6_2_14HazardousAreaConfirmed', 'outdoorEN3782_6_2_14HazardousAreaEvidenceReference', 'outdoorEN3782_6_2_14ComponentAssessmentConfirmed', 'outdoorEN3782_6_2_14ComponentAssessmentEvidenceReference', 'outdoorEN3782_6_2_14ProtectionConditionsConfirmed', 'outdoorEN3782_6_2_14ProtectionEvidenceReference', 'outdoorEN3782_6_2_14AirflowProtectionUsed', 'outdoorEN3782_6_2_14AirflowAvailabilityConfirmed', 'outdoorEN3782_6_2_14AirflowInterlockConfirmed', 'outdoorEN3782_6_2_14SurfaceTemperatureConfirmed', 'outdoorEN3782_6_2_14HazardousAreaExceedsEquipment', 'outdoorEN3782_6_2_14EquipmentDocumentationUpdated'], columns: 2, accent: 'blue' },
