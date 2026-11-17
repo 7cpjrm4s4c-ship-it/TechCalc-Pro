@@ -113,7 +113,7 @@ export function normalizeEN378StateTransition(currentState = {}, incomingPatch =
   }
 
   // 6. Auslöser-Felder ändern: Status bleibt 'present', Result auf '' setzen, Notes bleiben, 5.1-5.14 Felder leeren
-  const triggerFields = ['refrigerantId', 'chargeKg', 'accessArea', 'locationLevel'];
+  const triggerFields = ['refrigerantId', 'chargeKg', 'accessArea', 'locationLevel', 'isBasementLocation'];
   for (const field of triggerFields) {
     if (Object.hasOwn(patch, field) &&
         patch[field] !== currentState[field] &&

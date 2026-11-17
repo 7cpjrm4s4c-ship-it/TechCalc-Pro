@@ -67,7 +67,7 @@ const riskAnalysisResultOptions = Object.freeze([
 ]);
 
 const schema = defineFormSchema({
-  version: 1,
+  version: 2,
   fields: [
     { key: 'importedSystemName', label: 'Importierte Anlage', type: FIELD_TYPES.TEXT, readonly: true },
     { key: 'importFGasesSystem', label: 'Anlage importieren', type: FIELD_TYPES.ACTION, action: IMPORT_ACTION, variant: 'primary', disabled: state => !hasAnyFGasesSavedSystem(), visibleWhen: hasAnyFGasesSavedSystem },

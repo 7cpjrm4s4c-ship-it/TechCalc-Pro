@@ -128,7 +128,11 @@ export function calculate(currentState = {}) {
   
   // Machinery Room Risk Analysis per EN 378-3, 4.3
   const machineryRoomRiskAnalysis = assessMachineryRoomRiskAnalysis(effectiveState);
-  const belowGradeDetectorAlarm = assessBelowGradeDetectorAlarm(effectiveState);
+  // Only assess below-grade check if in machinery room AND result is 'yes'
+  const belowGradeDetectorAlarm = (effectiveState.installationLocation === 'machinery-room' &&
+    effectiveState.machineryRoomRiskAnalysisResult === 'yes')
+    ? assessBelowGradeDetectorAlarm(effectiveState)
+    : null;
   
   // Merge below-grade check into installation safety assessment if applicable
   const installationSafetyWithMachineryRoom = mergeMachineryRoomChecks(
@@ -176,15 +180,27 @@ export function calculate(currentState = {}) {
 function mergeMachineryRoomChecks(installationSafetyAssessment = {}, machineryRoomRiskAnalysis = {}, belowGradeDetectorAlarm = null) {
   const requirements = [...(installationSafetyAssessment.requirements || [])];
   
+  // Only include machinery room checks (category 'machineryRoom') if result is 'yes'
+  // This implements spec section 3: 5.1-5.14 only activated when result is 'yes'
+  const isMachineryRoomResultYes = machineryRoomRiskAnalysis.result === 'yes';
+  
+  // Filter out machinery room requirements if result is not 'yes'
+  const filteredRequirements = requirements.filter(req => {
+    if (req.category === 'machineryRoom' && !isMachineryRoomResultYes) {
+      return false; // Exclude machinery room checks when result is not 'yes'
+    }
+    return true;
+  });
+  
   // Add below-grade detector alarm check if applicable and not already present
-  if (belowGradeDetectorAlarm && !requirements.some(r => r.id === belowGradeDetectorAlarm.id)) {
-    requirements.push(Object.freeze({ ...belowGradeDetectorAlarm }));
+  if (belowGradeDetectorAlarm && !filteredRequirements.some(r => r.id === belowGradeDetectorAlarm.id)) {
+    filteredRequirements.push(Object.freeze({ ...belowGradeDetectorAlarm }));
   }
   
   // Recalculate status
-  const failed = requirements.filter(item => item.status === 'failed');
-  const notAssessed = requirements.filter(item => item.status === 'not-assessed');
-  const requiredMeasures = requirements
+  const failed = filteredRequirements.filter(item => item.status === 'failed');
+  const notAssessed = filteredRequirements.filter(item => item.status === 'not-assessed');
+  const requiredMeasures = filteredRequirements
     .filter(item => ['required', 'failed', 'not-assessed'].includes(item.status))
     .map(item => item.measure)
     .filter(Boolean);
@@ -195,7 +211,7 @@ function mergeMachineryRoomChecks(installationSafetyAssessment = {}, machineryRo
   return Object.freeze({
     ...installationSafetyAssessment,
     status,
-    requirements: Object.freeze(requirements),
+    requirements: Object.freeze(filteredRequirements),
     requiredMeasures: Object.freeze([...new Set(requiredMeasures)]),
     missingInputs: Object.freeze(missingInputs)
   });

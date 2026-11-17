@@ -1,7 +1,27 @@
 import assert from 'node:assert/strict';
 
 import { normalizeEN378StateTransition } from '../modules/en-378-safety-check/stateTransitions.js';
+import { calculate } from '../modules/en-378-safety-check/logic.js';
 import { MACHINERY_ROOM_5_1_TO_5_14_FIELDS } from '../modules/en-378-safety-check/machineryRoomRiskAnalysis.js';
+
+// Base state for machinery room calculations
+const baseMachineryRoomState = {
+  refrigerantId: 'R-32',
+  chargeKg: '8',
+  roomVolumeM3: '80',
+  installationLocation: 'machinery-room',
+  installationClass: 'III',
+  accessArea: 'authorized-access',
+  usageType: 'industrial',
+  applicationType: 'other',
+  locationLevel: 'other',
+  ventilationType: 'mechanical',
+  hasMachineryRoom: 'yes',
+  machineryRoomRiskAnalysisStatus: '',
+  machineryRoomRiskAnalysisResult: '',
+  machineryRoomRiskAnalysisNotes: '',
+  isBasementLocation: ''
+};
 
 const baseState = {
   refrigerantId: 'R-32',
@@ -166,5 +186,72 @@ console.log('Test 10: Keine Änderungen bei nicht-Field-Selection-Commit...');
 const test10 = normalizeEN378StateTransition(baseState, { machineryRoomRiskAnalysisStatus: 'present' }, { action: 'hydration' });
 assert.equal(test10.machineryRoomRiskAnalysisStatus, 'present', 'Should return patch unchanged on non-field-selection action');
 console.log('✓ Test 10 passed');
+
+
+// Test 11: isBasementLocation ändern - Result auf empty setzen, Notes bleiben, 5.1-5.14 Felder leeren
+console.log('Test 11: isBasementLocation ändern - Result auf empty, Notes bleiben, 5.1-5.14 Felder leeren...');
+const test11Current = {
+  ...baseState,
+  machineryRoomRiskAnalysisStatus: 'present',
+  machineryRoomRiskAnalysisResult: 'yes',
+  machineryRoomRiskAnalysisNotes: 'Testnotiz',
+  isBasementLocation: 'no',
+  machineryRoomLargestSystemChargeKg: '8'
+};
+const test11 = normalizeEN378StateTransition(test11Current, { isBasementLocation: 'yes' }, { action: 'field:input:select' });
+assert.equal(test11.machineryRoomRiskAnalysisResult, '');
+// Notes should remain (not in patch)
+assert.equal(test11.machineryRoomRiskAnalysisNotes, undefined, 'Notes should not be in patch');
+for (const field of MACHINERY_ROOM_5_1_TO_5_14_FIELDS) {
+  assert.equal(test11[field], '', `Field ${field} should be reset`);
+}
+console.log('✓ Test 11 passed');
+
+
+// Test 12: Check erscheint nicht bei installationLocation 'outdoor'
+console.log('Test 12: Check erscheint nicht bei installationLocation outdoor...');
+const test12 = calculate({
+  ...baseMachineryRoomState,
+  installationLocation: 'outdoor',
+  locationLevel: 'underground',
+  machineryRoomRiskAnalysisStatus: 'present',
+  machineryRoomRiskAnalysisResult: 'yes'
+});
+assert.equal(test12.belowGradeDetectorAlarm, null, 'Check should not appear for outdoor location');
+console.log('✓ Test 12 passed');
+
+// Test 13: Check erscheint nicht bei installationLocation 'occupied-space'
+console.log('Test 13: Check erscheint nicht bei installationLocation occupied-space...');
+const test13 = calculate({
+  ...baseMachineryRoomState,
+  installationLocation: 'occupied-space',
+  locationLevel: 'underground',
+  machineryRoomRiskAnalysisStatus: 'present',
+  machineryRoomRiskAnalysisResult: 'yes'
+});
+assert.equal(test13.belowGradeDetectorAlarm, null, 'Check should not appear for occupied-space location');
+console.log('✓ Test 13 passed');
+
+// Test 14: Check erscheint nicht bei offenem Ergebnis (Status '')
+console.log('Test 14: Check erscheint nicht bei offenem Ergebnis (Status empty)...');
+const test14 = calculate({
+  ...baseMachineryRoomState,
+  locationLevel: 'underground',
+  machineryRoomRiskAnalysisStatus: '',
+  machineryRoomRiskAnalysisResult: ''
+});
+assert.equal(test14.belowGradeDetectorAlarm, null, 'Check should not appear when status is empty');
+console.log('✓ Test 14 passed');
+
+// Test 15: Check erscheint nicht bei offenem Ergebnis (Result '')
+console.log('Test 15: Check erscheint nicht bei offenem Ergebnis (Result empty)...');
+const test15 = calculate({
+  ...baseMachineryRoomState,
+  locationLevel: 'underground',
+  machineryRoomRiskAnalysisStatus: 'present',
+  machineryRoomRiskAnalysisResult: ''
+});
+assert.equal(test15.belowGradeDetectorAlarm, null, 'Check should not appear when result is empty');
+console.log('✓ Test 15 passed');
 
 console.log('\n✅ Alle Machinery Room Transition Tests bestanden!');
