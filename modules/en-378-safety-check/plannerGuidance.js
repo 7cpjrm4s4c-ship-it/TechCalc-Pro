@@ -75,8 +75,9 @@ function dedupeItems(items) {
     if (!key) continue;
     const existing = grouped.get(key);
     const sourceLabels = unique([...(existing?.sourceLabels || []), item.sourceLabel]);
-    const sources = [...(existing?.sources || []), item.source || {}].filter(source =>
-      sourceLabel(source) && !((existing?.sources || []).some(current => sourceLabel(current) === sourceLabel(source)))
+    const allSources = [...(existing?.sources || []), item.source || {}].filter(source => sourceLabel(source));
+    const sources = allSources.filter((source, index, self) =>
+      index === self.findIndex(s => sourceLabel(s) === sourceLabel(source))
     );
     if (!existing) {
       grouped.set(key, { ...item, sourceLabels, sources, sourceLabel: sourceLabels.join('; ') });
@@ -155,6 +156,42 @@ export function buildEN378PlannerGuidance(currentState = {}, assessment = {}) {
     }
     notices.push(MACHINERY_ROOM_NOTICE);
   }
+  
+  // Add informative notice group for EN 378-3, 5.2 to 5.12 for machinery rooms
+  const isMachineryRoomWithRiskAnalysis = currentState.installationLocation === 'machinery-room' && currentState.machineryRoomRiskAnalysisResult === 'yes';
+  const en378Sections5_2To5_12 = Object.freeze([
+    { id: 'en378-3-5.2', title: 'EN 378-3, 5.2 – K\u00e4ltemittelaustritt verhindern', requirement: 'K\u00e4ltemittel darf nicht in benachbarte R\u00e4ume, Treppen, H\u00f6fe, G\u00e4nge oder Entw\u00e4sserung gelangen; keine Luftf\u00fchrung in Aufenthaltsbereiche.' },
+    { id: 'en378-3-5.3', title: 'EN 378-3, 5.3 – Verbrennungsluft und Verdichterluft', requirement: 'Verbrennungsluft und Verdichterluft von au\u00dfen leitungsgef\u00fchrt beziehen.' },
+    { id: 'en378-3-5.4', title: 'EN 378-3, 5.4 – Offene Flammen', requirement: 'Keine offenen Flammen au\u00dfer bei \u00fcberwachter Konzentration und Bel\u00fclftung; nie unbeaufsichtigt.' },
+    { id: 'en378-3-5.5', title: 'EN 378-3, 5.5 – Lagerung', requirement: 'Keine Lagerung au\u00dfer Werkzeuge, Ersatzteile, Verdichter\u00f6l.' },
+    { id: 'en378-3-5.6', title: 'EN 378-3, 5.6 – Not-Fernabschaltung', requirement: 'Not-Fernabschaltung au\u00dferhalb in T\u00fcrn\u00e4he und innen (EN ISO 13850, EN 60204-1).' },
+    { id: 'en378-3-5.7', title: 'EN 378-3, 5.7 – Au\u00dfen\u00f6ffnungen', requirement: 'Au\u00dfen\u00f6ffnungen mindestens 2 m von Flucht- und Rettungstreppen und Geb\u00e4ude\u00f6ffnungen.' },
+    { id: 'en378-3-5.8', title: 'EN 378-3, 5.8 – Rohrleitungen und Kan\u00e4le', requirement: 'Rohrleitungen und Kan\u00e4le mit gleichwertiger Feuerbest\u00e4ndigkeit abdichten.' },
+    { id: 'en378-3-5.9', title: 'EN 378-3, 5.9 – Allgemeinbeleuchtung', requirement: 'Allgemeinbeleuchtung f\u00fcr sicheren Betrieb; R-717: IPX4.' },
+    { id: 'en378-3-5.10', title: 'EN 378-3, 5.10 – Notbeleuchtung', requirement: 'Fest angebrachte oder tragbare Notbeleuchtung.' },
+    { id: 'en378-3-5.11', title: 'EN 378-3, 5.11 – Ma\u00dfe und Zug\u00e4nglichkeit', requirement: 'Ma\u00dfe und Zug\u00e4nglichkeit f\u00fcr Wartung; 2,1 m Durchgangsh\u00f6he.' },
+    { id: 'en378-3-5.12', title: 'EN 378-3, 5.12 – T\u00fcrren, W\u00e4nde, Decke', requirement: 'Nach au\u00dfen \u00f6ffnende, selbstschlie\u00dfende Anti-Panik-T\u00fcrren, 1 h Feuerbest\u00e4ndigkeit, dichte W\u00e4nde/Boden/Decke, Notausgang ins Freie.' }
+  ]);
+  
+  // Create informative items for the machinery room notice group
+  const informativeItems = isMachineryRoomWithRiskAnalysis 
+    ? en378Sections5_2To5_12.map(section => Object.freeze({
+        id: section.id,
+        category: PLANNER_GUIDANCE_GROUPS.GUIDANCE,
+        title: section.title,
+        status: 'information',
+        statusLabel: 'Information',
+        guidanceStatus: 'information',
+        requirement: section.requirement,
+        measure: 'Vom Planer bei der Maschinenraumplanung zu ber\u00fccksichtigen.',
+        source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: section.id.split('-')[2] }),
+        sourceLabel: `EN 378-3 ${section.id.split('-')[2]}`,
+        priority: 'information',
+        missingInputs: Object.freeze([]),
+        details: Object.freeze({})
+      }))
+    : [];
+
 
   return Object.freeze({
     version: EN_378_PLANNER_GUIDANCE_VERSION,
@@ -166,7 +203,7 @@ export function buildEN378PlannerGuidance(currentState = {}, assessment = {}) {
     failedCount,
     openPointCount,
     missingInputs: Object.freeze(missingInputs.map(fieldLabel)),
-    groups: buildGroups(actionItems.map(item => item.status === 'not-assessed' ? { ...item, category: PLANNER_GUIDANCE_GROUPS.OPEN_POINTS } : item)),
+    groups: buildGroups([...actionItems.map(item => item.status === 'not-assessed' ? { ...item, category: PLANNER_GUIDANCE_GROUPS.OPEN_POINTS } : item), ...informativeItems]),
     confirmedItems: Object.freeze(dedupeItems(confirmedItems)),
     requiredMeasures: Object.freeze(unique(actionItems.map(item => item.measure))),
     notices: Object.freeze(notices)

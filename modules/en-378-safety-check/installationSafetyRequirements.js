@@ -67,13 +67,6 @@ function checkBoolean({ id, category, title, requirement, measure, source, value
   });
 }
 
-export function calculateMachineryRoomEmergencyVentilationFlow(chargeKg) {
-  const charge = numberOrNull(chargeKg);
-  if (charge == null || charge <= 0) return Object.freeze({ flowM3s: null, flowM3h: null });
-  const flowM3s = 0.014 * (charge ** (2 / 3));
-  return Object.freeze({ flowM3s: round(flowM3s, 4), flowM3h: round(flowM3s * 3600, 1) });
-}
-
 export function calculateDilutionOpeningArea({ chargeKg, roomVolumeM3, qlmvKgM3 } = {}) {
   const charge = numberOrNull(chargeKg);
   const volume = numberOrNull(roomVolumeM3);
@@ -237,15 +230,15 @@ function buildOutdoorEN3782Requirements(state, safetyData) {
     }));
   }
 
-  requirements.push(checkBoolean({
+  requirements.push(required({
     id: 'outdoor.en378-2-6-2-14.documentation-applicability',
     category: 'safetyMeasures',
     title: 'Ausdehnung des entflammbaren Bereichs gegenüber den Geräteabmessungen bewerten',
     requirement: 'Es ist festzustellen, ob der potenziell entflammbare Bereich über die Geräteabmessungen hinausgeht.',
     measure: 'Ausdehnung des extern ermittelten entflammbaren Bereichs mit den Geräteabmessungen vergleichen.',
     source,
-    value: state.outdoorEN3782_6_2_14HazardousAreaExceedsEquipment,
-    noStatus: REQUIREMENT_STATUS.PASSED
+    status: REQUIREMENT_STATUS.REQUIRED,
+    missingInputs: ['outdoorEN3782_6_2_14HazardousAreaExceedsEquipment']
   }));
   if (yes(state.outdoorEN3782_6_2_14HazardousAreaExceedsEquipment)) {
     requirements.push(checkBoolean({
@@ -295,14 +288,14 @@ function buildArrangementRequirements(state, safetyData) {
       source: SOURCE.arrangement
     }));
   }
-  if (state.installationLocation === 'machinery-room' && state.machineryRoomRiskAnalysisResult === 'yes') {
+  if (state.installationLocation === 'technical-room') {
     requirements.push(required({
       id: 'non-occupied-room.isolated',
       category: 'location',
       title: 'Raum ohne Personenaufenthalt gegenüber Aufenthaltsbereichen trennen',
       requirement: 'Räume ohne Personenaufenthalt müssen gegenüber Personen-Aufenthaltsbereichen abgeschlossen sein; bei Komponenten mit lösbaren Verbindungen sind Lüftungsanforderungen zu bewerten.',
       measure: 'Raumtrennung, Lüftung und Detektion für angrenzende Aufenthaltsbereiche prüfen.',
-      source: SOURCE.arrangement,
+      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '4.5' }),
       priority: 'conditional'
     }));
   }
@@ -375,31 +368,15 @@ function buildMachineryRoomRequirements(state, safetyData, chargeLimitAssessment
     source: SOURCE.machineryRoom
   }));
   requirements.push(required({
-    id: 'machinery-room.no-refrigerant-migration',
+    id: 'machinery-room.separated',
     category: 'machineryRoom',
-    title: 'Kältemittelaustritt in angrenzende Bereiche verhindern',
-    requirement: 'Kältemittel darf nicht in benachbarte Räume, Treppenräume, Höfe, Gänge oder Entwässerungssysteme gelangen; Abluft darf nicht in Personen-Aufenthaltsbereiche geführt werden.',
-    measure: 'Abluftführung und Raumabdichtung so planen, dass kein Kältemittel in gefährdete Bereiche gelangt.',
-    source: SOURCE.machineryRoom
+    title: 'Raumtrennung des Maschinenraums',
+    requirement: 'Der Maschinenraum muss durch Wände, Boden und Decke mit mindestens 1 Stunde Feuerbeständigkeit von anderen Bereichen getrennt sein.',
+    measure: 'Raumtrennung des Maschinenraums mit 1 h Feuerbeständigkeit nach EN 1363-14 planen und nachweisen.',
+    source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.12.3' })
   }));
-  requirements.push(checkBoolean({
-    id: 'hasEmergencyStopOutside',
-    category: 'emergencyControl',
-    title: 'Not-Aus außen vorhanden',
-    requirement: 'Außerhalb des Maschinenraums und in Türnähe muss ein Fernschalter zum Abschalten der Anlage vorhanden sein.',
-    measure: 'Externen Not-Aus-Schalter in Türnähe vorsehen.',
-    source: SOURCE.machineryRoom,
-    value: state.hasEmergencyStopOutside
-  }));
-  requirements.push(checkBoolean({
-    id: 'hasEmergencyStopInside',
-    category: 'emergencyControl',
-    title: 'Not-Aus innen vorhanden',
-    requirement: 'Ein vergleichbarer Schalter muss innen an geeigneter Stelle vorhanden sein.',
-    measure: 'Internen Not-Aus-Schalter an geeigneter Stelle vorsehen.',
-    source: SOURCE.machineryRoom,
-    value: state.hasEmergencyStopInside
-  }));
+
+
   // 5.13.2: Ventilation requirements based on occupancy
   const machineryRoomOccupied = yes(state.machineryRoomOccupied);
   requirements.push(checkBoolean({
@@ -417,7 +394,7 @@ function buildMachineryRoomRequirements(state, safetyData, chargeLimitAssessment
   }));
   
   // If ventilation cannot achieve required rate for occupied machinery room, alarm and shutdown required
-  if (machineryRoomOccupied && yes(state.hasMechanicalVentilation)) {
+  if (machineryRoomOccupied && state.machineryRoomRequiredAirChangeAchievable === 'no') {
     requirements.push(required({
       id: 'machinery-room.ventilation-rate-alarm',
       category: 'ventilation',
@@ -481,15 +458,7 @@ function buildMachineryRoomRequirements(state, safetyData, chargeLimitAssessment
       value: state.hasEmergencyVentilation
     }));
   }
-  requirements.push(checkBoolean({
-    id: 'hasEmergencyLighting',
-    category: 'machineryRoom',
-    title: 'Notbeleuchtung vorhanden',
-    requirement: 'Für Maschinenräume ist eine fest angebrachte oder tragbare Notbeleuchtung vorzusehen.',
-    measure: 'Notbeleuchtung für sicheren Betrieb und Notfallzugang vorsehen.',
-    source: SOURCE.machineryRoom,
-    value: state.hasEmergencyLighting
-  }));
+
   if (flammable) {
     requirements.push(required({
       id: 'machinery-room.hazardous-area-classification',

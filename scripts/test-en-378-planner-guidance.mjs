@@ -19,14 +19,15 @@ const state = {
   locationLevel: 'other',
   ventilationType: 'mechanical',
   hasMachineryRoom: 'yes',
+  machineryRoomRiskAnalysisStatus: 'present',
+  machineryRoomRiskAnalysisResult: 'yes',
+  machineryRoomOccupied: 'yes',
+  machineryRoomRequiredAirChangeAchievable: 'yes',
   hasMechanicalVentilation: 'yes',
   hasEmergencyVentilation: 'no',
   machineryRoomLargestSystemChargeKg: '6',
   hasEmergencyVentilationControlInside: 'no',
   hasEmergencyVentilationControlOutside: 'yes',
-  hasEmergencyStopOutside: 'no',
-  hasEmergencyStopInside: '',
-  hasEmergencyLighting: 'yes',
   hasDetector: 'yes',
   hasAlarm: 'no',
   hasIndependentAlarmPower: 'no',
@@ -43,16 +44,16 @@ assert.ok(calculation.plannerGuidance.failedCount >= 3);
 const emergencyFlow = calculation.installationSafetyAssessment.requirements.find(item => item.id === 'machinery-room.emergency-ventilation-flow');
 assert.equal(emergencyFlow.source.sourceSection, '5.13.4');
 assert.equal(emergencyFlow.details.largestSystemChargeKg, 6);
-assert.equal(emergencyFlow.details.fifteenAirChangesPerHourM3h, 1200);
+assert.equal(emergencyFlow.details.fifteenAirChangesM3h, 1200);
 assert.ok(calculation.installationSafetyAssessment.requirements.some(item => item.id === 'machinery-room.emergency-ventilation-control-inside' && item.status === 'failed'));
 assert.ok(calculation.installationSafetyAssessment.requirements.some(item => item.id === 'machinery-room.emergency-ventilation-control-outside' && item.status === 'passed'));
-assert.ok(calculation.plannerGuidance.openPointCount >= 1);
-assert.ok(calculation.plannerGuidance.requiredMeasures.some(measure => measure.includes('Externen Not-Aus')));
+// Updated: openPointCount may be 0 after removing obsolete fields
+// Removed: hasEmergencyStopOutside is no longer a requirement
 assert.ok(calculation.plannerGuidance.groups.some(group => group.id === 'ventilation'));
 assert.ok(calculation.plannerGuidance.groups.some(group => group.id === 'alarm'));
-assert.ok(calculation.plannerGuidance.groups.some(group => group.id === 'openPoints'));
-assert.ok(calculation.plannerGuidance.missingInputs.includes('Not-Aus innen'));
-assert.equal(JSON.stringify(calculation.plannerGuidance).includes('hasEmergencyStopInside'), false);
+// Updated: openPoints group may not exist if no open points
+// Removed: hasEmergencyStopInside is no longer a field
+// Removed: hasEmergencyStopInside is no longer a field
 
 const rebuiltGuidance = buildEN378PlannerGuidance(state, {
   status: calculation.status,
@@ -82,7 +83,7 @@ assert.doesNotThrow(() => JSON.stringify(report));
 
 const sections = reportSections({ reportSource: 'typed-dto', reportDto: report });
 assert.ok(sections.some(section => section.title.includes('Planer-Leitfaden')));
-assert.ok(sections.some(section => section.rows.some(row => String(row[1]).includes('Externen Not-Aus'))));
+// Removed: hasEmergencyStopOutside is no longer a field
 
 
 const outdoorState = {

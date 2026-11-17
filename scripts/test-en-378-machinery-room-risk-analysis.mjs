@@ -159,12 +159,11 @@ console.log('✓ Test 11 passed (visibility tested in schema)');
 console.log('Test 12: MACHINERY_ROOM_5_1_TO_5_14_FIELDS...');
 const expectedFields = [
   'machineryRoomLargestSystemChargeKg',
+  'machineryRoomOccupied',
+  'machineryRoomRequiredAirChangeAchievable',
   'hasEmergencyVentilation',
   'hasEmergencyVentilationControlInside',
   'hasEmergencyVentilationControlOutside',
-  'hasEmergencyStopInside',
-  'hasEmergencyStopOutside',
-  'hasEmergencyLighting',
   'hasDetector',
   'hasAlarm',
   'hasIndependentAlarmPower',
