@@ -295,7 +295,7 @@ function buildArrangementRequirements(state, safetyData) {
       source: SOURCE.arrangement
     }));
   }
-  if (state.installationLocation === 'technical-room' && !yes(state.hasMachineryRoom)) {
+  if (state.installationLocation === 'machinery-room' && state.machineryRoomRiskAnalysisResult === 'yes') {
     requirements.push(required({
       id: 'non-occupied-room.isolated',
       category: 'location',
@@ -353,11 +353,18 @@ function buildMachineryRoomRequirements(state, safetyData, chargeLimitAssessment
   // Per spec: docs/contracts/en378/machinery-room-risk-analysis.md, section 3
   if (state.installationLocation !== 'machinery-room' || state.machineryRoomRiskAnalysisResult !== 'yes') return [];
   const requirements = [];
-  const flammable = isFlammable(safetyData?.flammabilityClass) || safetyData?.toxicityClass === 'B';
+  const flammable = isFlammable(safetyData?.flammabilityClass);
   const detectorRequired = buildDetectorRequirements(state, safetyData, chargeLimitAssessment).length > 0;
   const ventilationCharge = numberOrNull(state.machineryRoomLargestSystemChargeKg);
-  const ventilation = calculateMachineryRoomEmergencyVentilationFlow(ventilationCharge);
-  const fifteenAirChangesM3h = numberOrNull(state.roomVolumeM3) > 0 ? round(numberOrNull(state.roomVolumeM3) * 15, 1) : null;
+  const roomVolume = numberOrNull(state.roomVolumeM3);
+  const ventilationFlowM3s = ventilationCharge != null && ventilationCharge > 0 ? 0.014 * (ventilationCharge ** (2 / 3)) : null;
+  const ventilationFlowM3h = ventilationFlowM3s != null ? round(ventilationFlowM3s * 3600, 1) : null;
+  const fifteenAirChangesM3h = roomVolume != null && roomVolume > 0 ? round(roomVolume * 15, 1) : null;
+  const governingFlowM3h = ventilationFlowM3h != null && fifteenAirChangesM3h != null ? Math.min(ventilationFlowM3h, fifteenAirChangesM3h) : null;
+  const isGoverningFormula = governingFlowM3h != null && ventilationFlowM3h != null && fifteenAirChangesM3h != null ? governingFlowM3h === ventilationFlowM3h : null;
+  const missingVentilationInputs = [];
+  if (ventilationFlowM3h == null && ventilationCharge == null) missingVentilationInputs.push('machineryRoomLargestSystemChargeKg');
+  if (fifteenAirChangesM3h == null && roomVolume == null) missingVentilationInputs.push('roomVolumeM3');
 
   requirements.push(required({
     id: 'machinery-room.access-restricted',
@@ -393,15 +400,76 @@ function buildMachineryRoomRequirements(state, safetyData, chargeLimitAssessment
     source: SOURCE.machineryRoom,
     value: state.hasEmergencyStopInside
   }));
+  // 5.13.2: Ventilation requirements based on occupancy
+  const machineryRoomOccupied = yes(state.machineryRoomOccupied);
   requirements.push(checkBoolean({
     id: 'hasMachineryRoomVentilation',
     category: 'ventilation',
     title: 'Maschinenraumlüftung vorhanden',
-    requirement: 'Maschinenräume müssen ausreichend belüftet werden; bei Personenaufenthalt ist mindestens vierfacher Luftwechsel je Stunde erforderlich.',
-    measure: 'Normale Maschinenraumlüftung und Luftführung planen.',
+    requirement: machineryRoomOccupied
+      ? 'Maschinenräume mit Personenaufenthalt müssen mindestens vierfachen Luftwechsel je Stunde aufweisen.'
+      : 'Maschinenräume ohne Personenaufenthalt: Lüftungstechnische Bewertung nach nationalen Vorschriften genügt.',
+    measure: machineryRoomOccupied
+      ? 'Normale Maschinenraumlüftung mit mindestens vierfachem Luftwechsel je Stunde planen.'
+      : 'Normale Maschinenraumlüftung und Luftführung nach nationalen Vorschriften planen.',
     source: SOURCE.machineryRoomVentilation,
     value: state.hasMechanicalVentilation
   }));
+  
+  // If ventilation cannot achieve required rate for occupied machinery room, alarm and shutdown required
+  if (machineryRoomOccupied && yes(state.hasMechanicalVentilation)) {
+    requirements.push(required({
+      id: 'machinery-room.ventilation-rate-alarm',
+      category: 'ventilation',
+      title: 'Alarm bei unzureichendem Luftwechsel',
+      requirement: 'Kann die erforderliche Luftwechselrate nicht erreicht werden, müssen ein akustischer und/oder visueller Alarm ausgelöst und, sofern zutreffend, die elektrische Stromversorgung abgeschaltet werden.',
+      measure: 'Alarmierung und Stromabschaltung bei unzureichender Lüftung vorsehen.',
+      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.2' })
+    }));
+  }
+  // 5.13.3: Emergency ventilation controls - always required for machinery rooms, independent of gas detection
+  requirements.push(checkBoolean({
+    id: 'machinery-room.emergency-ventilation-control-outside',
+    category: 'emergencyControl',
+    title: 'Notsteuerung der mechanischen Notlüftung außen vorhanden',
+    requirement: 'Die mechanische Notlüftung muss mit einer Notsteuerung außerhalb des Maschinenraums ausgestattet sein.',
+    measure: 'Unabhängige Notsteuerung der mechanischen Notlüftung außerhalb des Maschinenraums vorsehen.',
+    source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.3' }),
+    value: state.hasEmergencyVentilationControlOutside
+  }));
+  requirements.push(checkBoolean({
+    id: 'machinery-room.emergency-ventilation-control-inside',
+    category: 'emergencyControl',
+    title: 'Notsteuerung der mechanischen Notlüftung innen vorhanden',
+    requirement: 'Die mechanische Notlüftung muss mit einer zweiten, von der äußeren Notsteuerung unabhängigen Notsteuerung innerhalb des Maschinenraums ausgestattet sein.',
+    measure: 'Zweite, unabhängige Notsteuerung der mechanischen Notlüftung innerhalb des Maschinenraums vorsehen.',
+    source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.3' }),
+    value: state.hasEmergencyVentilationControlInside
+  }));
+  
+  // 5.13.4: Emergency ventilation flow dimensioning - always required for machinery rooms
+  const governingFlowLabel = governingFlowM3h != null && isGoverningFormula !== null
+    ? (isGoverningFormula ? 'Gleichung (1)' : '15 Luftwechsel/h')
+    : null;
+  requirements.push(required({
+    id: 'machinery-room.emergency-ventilation-flow',
+    category: 'ventilation',
+    title: 'Mechanische Notlüftung dimensionieren',
+    requirement: 'Der Luftstrom der mechanischen Notlüftung muss mindestens V = 0,014 × m^(2/3) betragen. 15 Luftwechsel/h sind als ausreichend angegeben. Maßgeblich ist der kleinere Wert.',
+    measure: `Für die größte Kälteanlage: V_Formel = ${ventilationFlowM3h ?? 'nicht bestimmbar'} m³/h (Gleichung (1)), V_15 = ${fifteenAirChangesM3h ?? 'nicht bestimmbar'} m³/h (15 Luftwechsel/h). Maßgeblicher Wert: ${governingFlowM3h ?? 'nicht bestimmbar'} m³/h (${governingFlowLabel ?? 'nicht bestimmbar'}).`,
+    source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.4' }),
+    details: Object.freeze({
+      ventilationFlowM3s: round(ventilationFlowM3s, 4),
+      ventilationFlowM3h,
+      fifteenAirChangesM3h,
+      governingFlowM3h,
+      isGoverningFormula,
+      largestSystemChargeKg: ventilationCharge
+    }),
+    missingInputs: missingVentilationInputs
+  }));
+  
+  // 5.13.3: Detector-activated emergency ventilation - only when gas detection is required
   if (detectorRequired) {
     requirements.push(checkBoolean({
       id: 'hasEmergencyVentilation',
@@ -411,34 +479,6 @@ function buildMachineryRoomRequirements(state, safetyData, chargeLimitAssessment
       measure: 'Detektor(en) im Maschinenraum so in die Steuerung einbinden, dass sie die mechanische Notlüftung automatisch aktivieren.',
       source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.3' }),
       value: state.hasEmergencyVentilation
-    }));
-    requirements.push(checkBoolean({
-      id: 'machinery-room.emergency-ventilation-control-outside',
-      category: 'emergencyControl',
-      title: 'Notsteuerung der mechanischen Notlüftung außen vorhanden',
-      requirement: 'Die mechanische Notlüftung muss mit einer Notsteuerung außerhalb des Maschinenraums ausgerüstet sein.',
-      measure: 'Unabhängige Notsteuerung der mechanischen Notlüftung außerhalb des Maschinenraums vorsehen.',
-      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.3' }),
-      value: state.hasEmergencyVentilationControlOutside
-    }));
-    requirements.push(checkBoolean({
-      id: 'machinery-room.emergency-ventilation-control-inside',
-      category: 'emergencyControl',
-      title: 'Notsteuerung der mechanischen Notlüftung innen vorhanden',
-      requirement: 'Die mechanische Notlüftung muss mit einer zweiten, von der äußeren Notsteuerung unabhängigen Notsteuerung innerhalb des Maschinenraums ausgerüstet sein.',
-      measure: 'Zweite, unabhängige Notsteuerung der mechanischen Notlüftung innerhalb des Maschinenraums vorsehen.',
-      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.3' }),
-      value: state.hasEmergencyVentilationControlInside
-    }));
-    requirements.push(required({
-      id: 'machinery-room.emergency-ventilation-flow',
-      category: 'ventilation',
-      title: 'Mechanische Notlüftung dimensionieren',
-      requirement: 'Der Luftstrom der mechanischen Notlüftung muss mindestens V = 0,014 × m^(2/3) betragen. Ein Luftwechsel von 15 h⁻¹ ist als ausreichende Auslegung angegeben.',
-      measure: `Für die größte Kälteanlage mit einem Teil im Maschinenraum mindestens ${ventilation.flowM3s ?? 'nicht bestimmbar'} m³/s bzw. ${ventilation.flowM3h ?? 'nicht bestimmbar'} m³/h nach Gleichung (1) nachweisen. 15 Luftwechsel je Stunde entsprechen bei dem eingegebenen Raumvolumen ${fifteenAirChangesM3h ?? 'nicht bestimmbar'} m³/h.`,
-      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.4' }),
-      details: Object.freeze({ ...ventilation, largestSystemChargeKg: ventilationCharge, fifteenAirChangesPerHourM3h: fifteenAirChangesM3h }),
-      missingInputs: ventilation.flowM3s == null ? ['machineryRoomLargestSystemChargeKg'] : []
     }));
   }
   requirements.push(checkBoolean({
@@ -611,7 +651,7 @@ function buildAlarmRequirements(state, safetyData, chargeLimitAssessment) {
     source: SOURCE.alarms,
     value: state.hasIndependentAlarmPower
   }));
-  if (yes(state.hasMachineryRoom) || state.installationLocation === 'machinery-room') {
+  if (state.installationLocation === 'machinery-room' && state.machineryRoomRiskAnalysisResult === 'yes') {
     requirements.push(required({
       id: 'alarm.machinery-room-inside-outside',
       category: 'alarm',
@@ -656,7 +696,7 @@ function buildAlarmRequirements(state, safetyData, chargeLimitAssessment) {
 
 function buildWarningAndInspectionRequirements(state, safetyData) {
   const requirements = [];
-  if (yes(state.hasMachineryRoom) || state.installationLocation === 'machinery-room') {
+  if (state.installationLocation === 'machinery-room' && state.machineryRoomRiskAnalysisResult === 'yes') {
     requirements.push(required({
       id: 'warning.machinery-room-entrance',
       category: 'guidance',
