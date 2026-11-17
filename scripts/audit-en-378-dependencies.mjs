@@ -25,6 +25,7 @@ const REQUIRED_RUNTIME_FILES = Object.freeze([
   'index.js',
   'installationSafetyRequirements.js',
   'logic.js',
+  'machineryRoomRiskAnalysis.js',
   'plannerGuidance.js',
   'refrigerantCoverage.js',
   'reportAdapter.js',
