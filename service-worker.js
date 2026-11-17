@@ -183,6 +183,7 @@ const ASSETS = [
   './modules/en-378-safety-check/index.js',
   './modules/en-378-safety-check/installationSafetyRequirements.js',
   './modules/en-378-safety-check/logic.js',
+  './modules/en-378-safety-check/machineryRoomRiskAnalysis.js',
   './modules/en-378-safety-check/plannerGuidance.js',
   './modules/en-378-safety-check/refrigerantCoverage.js',
   './modules/en-378-safety-check/reportAdapter.js',
