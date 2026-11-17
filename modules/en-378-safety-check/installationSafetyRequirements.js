@@ -348,7 +348,10 @@ function buildOutdoorVentilationRequirements(state) {
 }
 
 function buildMachineryRoomRequirements(state, safetyData, chargeLimitAssessment) {
-  if (!yes(state.hasMachineryRoom) && state.installationLocation !== 'machinery-room') return [];
+  // Only generate machinery room requirements from EN 378-3, Section 5 when
+  // installationLocation is 'machinery-room' AND machineryRoomRiskAnalysisResult is 'yes'
+  // Per spec: docs/contracts/en378/machinery-room-risk-analysis.md, section 3
+  if (state.installationLocation !== 'machinery-room' || state.machineryRoomRiskAnalysisResult !== 'yes') return [];
   const requirements = [];
   const flammable = isFlammable(safetyData?.flammabilityClass) || safetyData?.toxicityClass === 'B';
   const detectorRequired = buildDetectorRequirements(state, safetyData, chargeLimitAssessment).length > 0;
