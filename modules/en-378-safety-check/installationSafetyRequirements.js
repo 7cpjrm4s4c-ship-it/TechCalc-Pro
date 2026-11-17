@@ -478,6 +478,130 @@ function buildMachineryRoomRequirements(state, safetyData, chargeLimitAssessment
       value: state.hasExplosionProtectedElectricalEquipment
     }));
   }
+
+  // 5.14: Additional requirements for flammable refrigerants (A2L, A2, A3, B2L, B2, B3)
+  if (flammable) {
+    // 5.14.2.2: Emergency fan suitability
+    requirements.push(checkBoolean({
+      id: 'machinery-room.emergency-fan-suitable',
+      category: 'ventilation',
+      title: 'Notentlüftungsventilator geeignet',
+      requirement: 'Notentlüftungsventilator entweder mit Motor außerhalb des Luftstroms oder nach EN 378-2:2016, 6.2.14, für gefährdete Bereiche klassifiziert. Keine Druckbeaufschlagung der Entlüftungsleitungen; keine Funkenbildung bei Kontakt zwischen Ventilator und Leitungswerkstoff.',
+      measure: 'Notentlüftungsventilator nach EN 378-2:2016, 6.2.14 auswählen. Austrittsöffnung nach nationalen Vorschriften unversperrt und gegen Unrat geschützt ausführen. Ablauf mit Auffangvorrichtung und Inspektionszugang am Boden steigender Außenleitungen vorsehen. Bei kommunizierenden Türen mit nicht erkennbarem Kältemittel: Aktivierung der Notlüftung bei Türöffnung über 60 s.',
+      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.14.2.2' }),
+      value: state.machineryRoomEmergencyFanSuitable
+    }));
+
+    // 5.14.4: Maximum surface temperature
+    const autoIgnitionTemp = numberOrNull(safetyData?.autoIgnitionTemperatureC);
+    if (autoIgnitionTemp != null && autoIgnitionTemp > 0) {
+      const eightyPercent = round(autoIgnitionTemp * 0.8, 1);
+      const minus100K = round(autoIgnitionTemp - 100, 1);
+      const maxSurfaceTemp = Math.max(eightyPercent, minus100K);
+      requirements.push(required({
+        id: 'machinery-room.max-surface-temperature',
+        category: 'machineryRoom',
+        title: 'Maximale Oberflächentemperatur einhalten',
+        requirement: 'Die maximale Oberflächentemperatur von Betriebsmitteln im Maschinenraum muss höchstens 80 % der Selbstentzündungstemperatur oder 100 K darunter betragen, je nachdem, welcher Wert höher ist.',
+        measure: `Maximale Oberflächentemperatur: ${maxSurfaceTemp} °C (maßgebend: ${eightyPercent >= minus100K ? '80 % der Selbstentzündungstemperatur' : '100 K unter der Selbstentzündungstemperatur'}). Selbstentzündungstemperatur: ${autoIgnitionTemp} °C.`,
+        source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.14.4' }),
+        details: Object.freeze({
+          autoIgnitionTemperatureC: autoIgnitionTemp,
+          eightyPercentOfAutoIgnition: eightyPercent,
+          minus100K: minus100K,
+          maxSurfaceTemperatureC: maxSurfaceTemp
+        })
+      }));
+    } else {
+      requirements.push(required({
+        id: 'machinery-room.max-surface-temperature',
+        category: 'machineryRoom',
+        title: 'Maximale Oberflächentemperatur einhalten',
+        requirement: 'Die maximale Oberflächentemperatur von Betriebsmitteln im Maschinenraum muss höchstens 80 % der Selbstentzündungstemperatur oder 100 K darunter betragen, je nachdem, welcher Wert höher ist.',
+        measure: 'Maximale Oberflächentemperatur kann nicht bestimmt werden, da die Selbstentzündungstemperatur des Kältemittels nicht bekannt ist.',
+        source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.14.4' }),
+        status: REQUIREMENT_STATUS.NOT_ASSESSED,
+        missingInputs: ['autoIgnitionTemperatureC']
+      }));
+    }
+  }
+
+  // 5.14.3: R-717 specific requirements
+  if (isR717(safetyData)) {
+    // 5.14.3.1: Containment system
+    requirements.push(checkBoolean({
+      id: 'machinery-room.r717-containment',
+      category: 'machineryRoom',
+      title: 'Auffangsystem für R-717',
+      requirement: 'Auffangsystem gegen Eintrag in Oberflächenwasser; Boden so beschaffen, dass kein flüssiges R-717 auslaufen kann; Ablauf in der Regel verschlossen.',
+      measure: 'Auffangsystem für R-717 planen und nachweisen. Boden abdichten und Ablauf verschließen.',
+      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.14.3.1' }),
+      value: state.machineryRoomR717ContainmentProvided
+    }));
+
+    // 5.14.3.2: Eye wash (always required for R-717)
+    requirements.push(checkBoolean({
+      id: 'machinery-room.r717-eye-wash',
+      category: 'machineryRoom',
+      title: 'Augenspülung für R-717',
+      requirement: 'Augenspülung leicht zugänglich bei allen R-717-Anlagen.',
+      measure: 'Augenspülung in der Nähe der Anlage installieren und leicht zugänglich anordnen.',
+      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.14.3.2' }),
+      value: state.machineryRoomR717EyeWashProvided
+    }));
+
+    // 5.14.3.2: Emergency shower (required for charge > 1000 kg)
+    const chargeKg = numberOrNull(state.chargeKg);
+    if (chargeKg != null && chargeKg > 1000) {
+      requirements.push(checkBoolean({
+        id: 'machinery-room.r717-emergency-shower',
+        category: 'machineryRoom',
+        title: 'Notdusche für R-717',
+        requirement: 'Bei Füllmenge über 1000 kg: Notdusche mit mindestens 1 l/s, 25 bis 30 °C, außerhalb des Notausgangs.',
+        measure: 'Notdusche mit mindestens 1 l/s Durchfluss, Wassertemperatur 25 bis 30 °C, außerhalb des Notausgangs installieren.',
+        source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.14.3.2' }),
+        value: state.machineryRoomR717EmergencyShowerProvided
+      }));
+    }
+
+    // 5.14.3.3: Sprinkler system
+    if (yes(state.machineryRoomR717SprinklerInstalled)) {
+      requirements.push(checkBoolean({
+        id: 'machinery-room.r717-sprinkler-conditions',
+        category: 'machineryRoom',
+        title: 'Sprinkleranlage-Bedingungen für R-717',
+        requirement: 'Sprinkleranlagen: einzelauslösung ab 141 °C (EN 12845), keine manuelle Umgehung der Auslösung.',
+        measure: 'Sprinkleranlage nach EN 12845 installieren. Einzelauslösung bei 141 °C oder höher sicherstellen. Keine manuelle Umgehung der Auslösung vorsehen.',
+        source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.14.3.3' }),
+        value: state.machineryRoomR717SprinklerConditionsConfirmed
+      }));
+    }
+
+    // 5.14.3.4: Door to emergency exit (calculated condition)
+    // Check if charge exceeds practical limit for room volume
+    const roomVolume = numberOrNull(state.roomVolumeM3);
+    const lfl = numberOrNull(safetyData?.lflKgM3);
+    if (roomVolume != null && roomVolume > 0 && lfl != null && lfl > 0 && chargeKg != null && chargeKg > 0) {
+      const practicalLimit = 26 * lfl * roomVolume; // m2 calculation from EN 378-1, Annex C
+      if (chargeKg > practicalLimit) {
+        requirements.push(required({
+          id: 'machinery-room.r717-door-to-emergency-exit',
+          category: 'machineryRoom',
+          title: 'Tür zu Notausgang ins Freie',
+          requirement: 'Liegt die Gesamtfüllmenge über dem praktischen Grenzwert für das Raumvolumen, ist eine Tür direkt oder über Vorraum mit selbstschließenden Türen zu einem Notausgang ins Freie erforderlich.',
+          measure: `Tür direkt oder über Vorraum mit selbstschließenden dichten Türen zu einem Notausgang ins Freie vorsehen. Praktischer Grenzwert: ${round(practicalLimit, 1)} kg, aktuelle Füllmenge: ${chargeKg} kg.`,
+          source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.14.3.4' }),
+          details: Object.freeze({
+            practicalLimitKg: round(practicalLimit, 1),
+            chargeKg,
+            lflKgM3: lfl,
+            roomVolumeM3: roomVolume
+          })
+        }));
+      }
+    }
+  }
+
   return requirements;
 }
 
