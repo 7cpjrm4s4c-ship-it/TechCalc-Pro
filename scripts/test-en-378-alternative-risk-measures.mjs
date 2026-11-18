@@ -40,7 +40,7 @@ const alternativeAssessment = assessAlternativeRiskMeasures(baseState, rawCharge
 assert.equal(alternativeAssessment.requiredMeasureCount, 1);
 assert.equal(alternativeAssessment.selectedMeasureCount, 2);
 assert.equal(alternativeAssessment.status, 'passed');
-assert.ok(alternativeAssessment.requirements.some(item => item.title === 'mechanische Lüftung als alternative Vorkehrung'));
+assert.ok(alternativeAssessment.requirements.some(item => item.title === 'Mechanische Lüftung als alternative Vorkehrung'));
 
 const calculation = calculate(baseState);
 assert.equal(calculation.alternativeRiskMeasuresAssessment.status, 'passed');

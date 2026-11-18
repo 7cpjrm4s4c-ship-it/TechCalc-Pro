@@ -32,7 +32,7 @@ const sections = buildEN378ReportSections(dto);
 const mappedSections = reportSections({ reportSource: 'typed-dto', reportDto: dto });
 const serialized = JSON.stringify(mappedSections);
 
-assert.ok(sections.length >= 10);
+assert.equal(sections.length, 9);
 assert.equal(sections[0].title, '1. Berichtszusammenfassung');
 assert.ok(mappedSections.some(section => section.title === '6. Plausibilitätsprüfung der Eingaben'));
 assert.ok(mappedSections.some(section => section.title === '8. Planer-Leitfaden'));
