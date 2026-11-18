@@ -5,6 +5,7 @@ import { buildFGasesImportOptions, hasAnyFGasesSavedSystem, hasMultipleFGasesSav
 const option = (value, label) => Object.freeze({ value, label });
 const accessCategoryByAccessArea = Object.freeze({ 'general-access': 'a', 'supervised-access': 'b', 'authorized-access': 'c' });
 const isMachineryRoom = state => state.installationLocation === 'machinery-room';
+const yes = value => value === true || value === 'yes';
 const isMachineryRoomRiskAnalysisYes = state => state.installationLocation === 'machinery-room' && state.machineryRoomRiskAnalysisResult === 'yes';
 const isOutdoor = state => state.installationLocation === 'outdoor';
 const outdoorBaseRequirementsPassed = state => state.isOutdoorDefinitionConfirmed === 'yes' && state.outdoorSafeArrangement === 'yes' && state.outdoorPreventBuildingEntry === 'yes' && (state.hasOutdoorProtectiveCover === 'no' || (state.hasOutdoorProtectiveCover === 'yes' && state.outdoorCoverVentilated === 'yes'));
