@@ -53,7 +53,7 @@ assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.hazardous-area')?.status, 
 assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.components')?.status, 'passed');
 assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.protection')?.status, 'passed');
 assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.surface-temperature')?.status, 'passed');
-assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.documentation-applicability')?.status, 'required', 'Vorbestehender Fehler: documentation-applicability Status ist required statt passed');
+assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.documentation-applicability')?.status, 'passed', 'Nein bedeutet: der entflammbare Bereich reicht nicht über das Gerät hinaus.');
 assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.documentation')?.status, undefined);
 assert.equal(byAccumulationId('outdoor.en378-2-6-2-14.airflow-availability')?.status, undefined);
 assert.ok(accumulationAssessment.requirements.filter(item => item.source?.sourceSection === '6.2.14').length >= 5);
@@ -119,8 +119,7 @@ const openState = {
 };
 const openAssessment = assessInstallationSafetyRequirements(openState, assessChargeLimit(openState));
 assert.equal(openAssessment.status, 'not-assessed');
-// Vorbestehender Fehler: missingInputs enthält zusätzliche Felder, die nicht nur isOutdoorDefinitionConfirmed sind
-// assert.deepEqual(openAssessment.missingInputs, ['isOutdoorDefinitionConfirmed']);
+assert.deepEqual(openAssessment.missingInputs, ['isOutdoorDefinitionConfirmed']);
 const openCalculation = calculate(openState);
 assert.equal(openCalculation.plannerGuidance.groups[0]?.id, 'openPoints');
 assert.ok(!openCalculation.plannerGuidance.groups.some(group => group.id === 'location' && group.items.some(item => item.id === 'outdoor.definition-confirmed')), 'Offene Prüfpunkte dürfen nicht zusätzlich in ihrer Fachgruppe erscheinen.');
