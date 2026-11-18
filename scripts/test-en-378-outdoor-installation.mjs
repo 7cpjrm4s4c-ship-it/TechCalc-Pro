@@ -101,6 +101,17 @@ const documentationState = {
 const documentationAssessment = assessInstallationSafetyRequirements(documentationState, assessChargeLimit(documentationState));
 assert.equal(documentationAssessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14.documentation')?.status, 'failed');
 
+// Regression zu 4d141f2: documentation-applicability wertet outdoorEN3782_6_2_14HazardousAreaExceedsEquipment aus
+const exceedsNoAssessment = assessInstallationSafetyRequirements(accumulationState, assessChargeLimit(accumulationState));
+assert.equal(exceedsNoAssessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14.documentation-applicability')?.status, 'passed', 'Nein: der entflammbare Bereich reicht nicht über das Gerät hinaus.');
+assert.deepEqual(exceedsNoAssessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14.documentation-applicability')?.missingInputs, []);
+assert.equal(exceedsNoAssessment.requirements.some(item => item.id === 'outdoor.en378-2-6-2-14.documentation'), false, 'Bei Nein darf die Folgeanforderung documentation nicht erzeugt werden.');
+const unansweredExceedsState = { ...accumulationState, outdoorEN3782_6_2_14HazardousAreaExceedsEquipment: '' };
+const unansweredExceedsAssessment = assessInstallationSafetyRequirements(unansweredExceedsState, assessChargeLimit(unansweredExceedsState));
+assert.equal(unansweredExceedsAssessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14.documentation-applicability')?.status, 'not-assessed');
+assert.deepEqual(unansweredExceedsAssessment.requirements.find(item => item.id === 'outdoor.en378-2-6-2-14.documentation-applicability')?.missingInputs, ['outdoorEN3782_6_2_14HazardousAreaExceedsEquipment']);
+assert.equal(unansweredExceedsAssessment.requirements.some(item => item.id === 'outdoor.en378-2-6-2-14.documentation'), false);
+
 const coverState = {
   ...base,
   hasOutdoorProtectiveCover: 'yes',
@@ -120,6 +131,10 @@ const openState = {
 const openAssessment = assessInstallationSafetyRequirements(openState, assessChargeLimit(openState));
 assert.equal(openAssessment.status, 'not-assessed');
 assert.deepEqual(openAssessment.missingInputs, ['isOutdoorDefinitionConfirmed']);
+// Regression zu 4d141f2: Folge-Felder der Outdoor-Grundprüfung erst nach bestätigter Freien-Definition als fehlend melden
+const confirmedDefinitionOpenState = { ...openState, isOutdoorDefinitionConfirmed: 'yes' };
+const confirmedDefinitionOpenAssessment = assessInstallationSafetyRequirements(confirmedDefinitionOpenState, assessChargeLimit(confirmedDefinitionOpenState));
+assert.deepEqual(confirmedDefinitionOpenAssessment.missingInputs, ['outdoor.safe-arrangement', 'outdoor.prevent-refrigerant-entry', 'hasOutdoorProtectiveCover'], 'Erst nach bestätigter Freien-Definition dürfen die Folge-Felder als fehlende Eingaben erscheinen.');
 const openCalculation = calculate(openState);
 assert.equal(openCalculation.plannerGuidance.groups[0]?.id, 'openPoints');
 assert.ok(!openCalculation.plannerGuidance.groups.some(group => group.id === 'location' && group.items.some(item => item.id === 'outdoor.definition-confirmed')), 'Offene Prüfpunkte dürfen nicht zusätzlich in ihrer Fachgruppe erscheinen.');

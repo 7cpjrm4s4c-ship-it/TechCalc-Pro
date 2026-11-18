@@ -230,6 +230,7 @@ function buildOutdoorEN3782Requirements(state, safetyData) {
     }));
   }
 
+  const exceedsEquipment = state.outdoorEN3782_6_2_14HazardousAreaExceedsEquipment;
   requirements.push(required({
     id: 'outdoor.en378-2-6-2-14.documentation-applicability',
     category: 'safetyMeasures',
@@ -237,8 +238,10 @@ function buildOutdoorEN3782Requirements(state, safetyData) {
     requirement: 'Es ist festzustellen, ob der potenziell entflammbare Bereich über die Geräteabmessungen hinausgeht.',
     measure: 'Ausdehnung des extern ermittelten entflammbaren Bereichs mit den Geräteabmessungen vergleichen.',
     source,
-    status: REQUIREMENT_STATUS.REQUIRED,
-    missingInputs: ['outdoorEN3782_6_2_14HazardousAreaExceedsEquipment']
+    status: !hasAnswer(exceedsEquipment)
+      ? REQUIREMENT_STATUS.NOT_ASSESSED
+      : yes(exceedsEquipment) ? REQUIREMENT_STATUS.REQUIRED : REQUIREMENT_STATUS.PASSED,
+    missingInputs: hasAnswer(exceedsEquipment) ? [] : ['outdoorEN3782_6_2_14HazardousAreaExceedsEquipment']
   }));
   if (yes(state.outdoorEN3782_6_2_14HazardousAreaExceedsEquipment)) {
     requirements.push(checkBoolean({
@@ -259,12 +262,14 @@ function buildArrangementRequirements(state, safetyData) {
   const flammable = isFlammable(safetyData?.flammabilityClass);
   if (state.installationLocation === 'outdoor') {
     requirements.push(checkBoolean({ id: 'outdoor.definition-confirmed', category: 'location', title: 'Definition „im Freien“ bestätigt', requirement: 'Die bauliche Situation muss die normative Definition einer Aufstellung im Freien erfüllen.', measure: 'Erfüllung der Definition „im Freien“ anhand der baulichen Situation planerisch prüfen und bestätigen.', source: SOURCE.outdoorArrangement, value: state.isOutdoorDefinitionConfirmed, missingInputs: ['isOutdoorDefinitionConfirmed'] }));
-    requirements.push(checkBoolean({ id: 'outdoor.safe-arrangement', category: 'location', title: 'Sichere Anordnung der Außenaufstellung', requirement: 'Die Außenaufstellung muss so angeordnet sein, dass austretendes Kältemittel bei einer Leckage Personen und Sachwerte nicht gefährden kann.', measure: 'Aufstellort und mögliche Ausbreitungswege planerisch bewerten und eine sichere Anordnung nachweisen.', source: SOURCE.outdoorArrangement, value: state.outdoorSafeArrangement }));
-    requirements.push(checkBoolean({ id: 'outdoor.prevent-refrigerant-entry', category: 'location', title: 'Eindringen in Gebäudeöffnungen verhindern', requirement: 'Austretendes Kältemittel darf nicht in Frischluftöffnungen, Türöffnungen, Bodenklappen oder ähnliche Gebäudeöffnungen eindringen können.', measure: 'Gebäudeöffnungen und Luftführung planerisch bewerten; Eindringen von Kältemittel sicher ausschließen.', source: SOURCE.outdoorArrangement, value: state.outdoorPreventBuildingEntry }));
-    if (yes(state.hasOutdoorProtectiveCover)) {
-      requirements.push(checkBoolean({ id: 'outdoor.cover-ventilation', category: 'location', title: 'Belüftung der Schutzabdeckung', requirement: 'Eine Schutzabdeckung für im Freien aufgestellte kältetechnische Komponenten muss eine natürliche oder mechanische Lüftung aufweisen.', measure: 'Ausreichende natürliche oder mechanische Belüftung der Schutzabdeckung sicherstellen.', source: SOURCE.outdoorArrangement, value: state.outdoorCoverVentilated }));
-    } else if (!hasAnswer(state.hasOutdoorProtectiveCover)) {
-      requirements.push(required({ id: 'hasOutdoorProtectiveCover', category: 'location', title: 'Vorhandensein einer Schutzabdeckung bewerten', requirement: 'Es ist festzustellen, ob eine Schutzabdeckung für die im Freien aufgestellten kältetechnischen Komponenten vorhanden ist.', measure: 'Vorhandensein einer Schutzabdeckung mit Ja oder Nein dokumentieren.', source: SOURCE.outdoorArrangement, status: REQUIREMENT_STATUS.NOT_ASSESSED, missingInputs: ['hasOutdoorProtectiveCover'] }));
+    if (yes(state.isOutdoorDefinitionConfirmed)) {
+      requirements.push(checkBoolean({ id: 'outdoor.safe-arrangement', category: 'location', title: 'Sichere Anordnung der Außenaufstellung', requirement: 'Die Außenaufstellung muss so angeordnet sein, dass austretendes Kältemittel bei einer Leckage Personen und Sachwerte nicht gefährden kann.', measure: 'Aufstellort und mögliche Ausbreitungswege planerisch bewerten und eine sichere Anordnung nachweisen.', source: SOURCE.outdoorArrangement, value: state.outdoorSafeArrangement }));
+      requirements.push(checkBoolean({ id: 'outdoor.prevent-refrigerant-entry', category: 'location', title: 'Eindringen in Gebäudeöffnungen verhindern', requirement: 'Austretendes Kältemittel darf nicht in Frischluftöffnungen, Türöffnungen, Bodenklappen oder ähnliche Gebäudeöffnungen eindringen können.', measure: 'Gebäudeöffnungen und Luftführung planerisch bewerten; Eindringen von Kältemittel sicher ausschließen.', source: SOURCE.outdoorArrangement, value: state.outdoorPreventBuildingEntry }));
+      if (yes(state.hasOutdoorProtectiveCover)) {
+        requirements.push(checkBoolean({ id: 'outdoor.cover-ventilation', category: 'location', title: 'Belüftung der Schutzabdeckung', requirement: 'Eine Schutzabdeckung für im Freien aufgestellte kältetechnische Komponenten muss eine natürliche oder mechanische Lüftung aufweisen.', measure: 'Ausreichende natürliche oder mechanische Belüftung der Schutzabdeckung sicherstellen.', source: SOURCE.outdoorArrangement, value: state.outdoorCoverVentilated }));
+      } else if (!hasAnswer(state.hasOutdoorProtectiveCover)) {
+        requirements.push(required({ id: 'hasOutdoorProtectiveCover', category: 'location', title: 'Vorhandensein einer Schutzabdeckung bewerten', requirement: 'Es ist festzustellen, ob eine Schutzabdeckung für die im Freien aufgestellten kältetechnischen Komponenten vorhanden ist.', measure: 'Vorhandensein einer Schutzabdeckung mit Ja oder Nein dokumentieren.', source: SOURCE.outdoorArrangement, status: REQUIREMENT_STATUS.NOT_ASSESSED, missingInputs: ['hasOutdoorProtectiveCover'] }));
+      }
     }
     const baseRequirementsPassed = requirements.every(item => [REQUIREMENT_STATUS.PASSED, REQUIREMENT_STATUS.NOT_APPLICABLE].includes(item.status));
     if (baseRequirementsPassed) {
