@@ -40,7 +40,7 @@ function consistencyRequirement({ id, title, requirement, measure, status = STAT
 }
 
 function isMachineryRoom(state = {}) {
-  return text(state.installationLocation) === 'machinery-room' || yes(state.hasMachineryRoom);
+  return text(state.installationLocation) === 'machinery-room';
 }
 
 function isOutdoor(state = {}) {

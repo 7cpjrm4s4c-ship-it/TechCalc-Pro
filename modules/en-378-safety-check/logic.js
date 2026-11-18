@@ -39,7 +39,6 @@ export function normalizeEN378AssessmentState(currentState = {}) {
   return Object.freeze({
     ...currentState,
     accessCategory: deriveAccessCategory(currentState),
-    hasMachineryRoom: currentState.installationLocation === 'machinery-room' ? 'yes' : currentState.hasMachineryRoom
   });
 }
 const addRequiredTextIssue = (issues, currentState, key) => {

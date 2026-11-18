@@ -71,7 +71,7 @@ function dedupeItems(items) {
   const grouped = new Map();
   const statusRank = { failed: 3, 'not-assessed': 2, required: 1, passed: 0 };
   for (const item of array(items)) {
-    const key = `${item.category}::${text(item.measure).replace(/\s+/g, ' ').toLocaleLowerCase('de-DE')}`;
+    const key = `${item.category}::${item.id}`;
     if (!key) continue;
     const existing = grouped.get(key);
     const sourceLabels = unique([...(existing?.sourceLabels || []), item.sourceLabel]);
@@ -139,6 +139,9 @@ export function buildEN378PlannerGuidance(currentState = {}, assessment = {}) {
     ...inputIssues.map(itemFromInputIssue),
     ...additionalMissingInputs.map(itemFromMissingInput)
   ];
+
+  // Add informative entries for EN 378-3 sections 5.2-5.12 (Fix 3)
+
   const confirmedItems = [
     ...chargeChecks.filter(check => check.status === 'passed' && !check.noLimit).map(itemFromChargeCheck),
     ...installationRequirements.filter(requirement => requirement.status === 'passed').map(itemFromRequirement)

@@ -135,10 +135,62 @@ const duplicateMeasureGuidance = buildEN378PlannerGuidance({}, {
   }
 });
 const consolidatedMeasures = duplicateMeasureGuidance.groups.flatMap(group => group.items);
-assert.equal(consolidatedMeasures.length, 1);
+assert.equal(consolidatedMeasures.length, 2);
 assert.equal(duplicateMeasureGuidance.requiredMeasures.length, 1);
 assert.ok(consolidatedMeasures[0].sourceLabel.includes('5.13.1'));
-assert.ok(consolidatedMeasures[0].sourceLabel.includes('5.13.5'));
-assert.equal(consolidatedMeasures[0].sources.length, 2);
+assert.ok(consolidatedMeasures[1].sourceLabel.includes('5.13.5'));
+assert.equal(consolidatedMeasures[0].sources.length, 1);
+
+
+// Test for Fix 3: All 11 informative entries 5.2-5.12 should appear individually
+const machineryRoomGuidance = buildEN378PlannerGuidance({
+  installationLocation: 'machinery-room',
+  machineryRoomRiskAnalysisStatus: 'present',
+  machineryRoomRiskAnalysisResult: 'yes'
+}, {
+  status: 'passed',
+  inputValidation: { issues: [] },
+  chargeLimitAssessment: { checks: [], missingInputs: [] },
+  installationSafetyAssessment: {
+    missingInputs: [],
+    requirements: []
+  }
+});
+const guidanceGroup = machineryRoomGuidance.groups.find(g => g.title.includes('Übergabe und Dokumentation'));
+assert.ok(guidanceGroup, 'Guidance group "Übergabe und Dokumentation" should exist');
+const informativeItems = guidanceGroup?.items || [];
+// Check that all 11 informative entries are present
+assert.equal(informativeItems.length, 11, 'All 11 informative entries 5.2-5.12 should appear individually');
+const informativeIds = informativeItems.map(item => item.id);
+assert.ok(informativeIds.includes('en378-3-5.2'), '5.2 should be present');
+assert.ok(informativeIds.includes('en378-3-5.3'), '5.3 should be present');
+assert.ok(informativeIds.includes('en378-3-5.4'), '5.4 should be present');
+assert.ok(informativeIds.includes('en378-3-5.5'), '5.5 should be present');
+assert.ok(informativeIds.includes('en378-3-5.6'), '5.6 should be present');
+assert.ok(informativeIds.includes('en378-3-5.7'), '5.7 should be present');
+assert.ok(informativeIds.includes('en378-3-5.8'), '5.8 should be present');
+assert.ok(informativeIds.includes('en378-3-5.9'), '5.9 should be present');
+assert.ok(informativeIds.includes('en378-3-5.10'), '5.10 should be present');
+assert.ok(informativeIds.includes('en378-3-5.11'), '5.11 should be present');
+assert.ok(informativeIds.includes('en378-3-5.12'), '5.12 should be present');
+// Each should have its own source
+assert.ok(informativeItems.every(item => item.sourceLabel && item.sourceLabel.includes('EN 378-3')), 'Each item should have its own source');
+
+// Test for Fix 4a: Ventilation output in results
+const resultModelWithVentilation = buildEN378SafetyCheckResultModel(state, calculation);
+const ventilationGroup = resultModelWithVentilation.groups.find(g => g.title === 'Lüftungsauslegung Maschinenraum');
+assert.ok(ventilationGroup, 'Ventilation output group should exist');
+const ventilationRows = ventilationGroup.rows || [];
+assert.ok(ventilationRows.length > 0, 'Ventilation output group should have rows');
+// Check for specific rows
+const hasFormulaRow = ventilationRows.some(r => r.label.includes('Gleichung (1)'));
+const has15AirChangesRow = ventilationRows.some(r => r.label.includes('15 Luftwechseln/h'));
+const hasGoverningRow = ventilationRows.some(r => r.label.includes('Maßgeblicher Wert'));
+const has4xVentilationRow = ventilationRows.some(r => r.label.includes('4-facher Luftwechsel'));
+assert.ok(hasFormulaRow, 'Should have Gleichung (1) row');
+assert.ok(has15AirChangesRow, 'Should have 15 Luftwechseln/h row');
+assert.ok(hasGoverningRow, 'Should have Maßgeblicher Wert row');
+assert.ok(has4xVentilationRow, 'Should have 4-facher Luftwechsel row');
+
 
 console.log('EN 378 planner guidance tests passed.');

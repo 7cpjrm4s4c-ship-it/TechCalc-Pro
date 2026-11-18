@@ -187,8 +187,58 @@ function stateConsistencySection(dto) {
 
 function safetyComponentsSection(dto) {
   const installationSafety = object(dto.assessment?.installationSafety);
+  const input = object(dto.input);
   const rows = [row('Bewertung', status(installationSafety.status))];
   array(installationSafety.requirements).forEach(item => rows.push(row(item.title || checkLabel(item.id), `${status(item.status)}: ${item.measure || item.requirement || 'prüfen'}`, sourceLabel(item.source))));
+
+  // Add ventilation output for machinery room (Fix 4b)
+  if (input.installationLocation === 'machinery-room' && input.machineryRoomRiskAnalysisResult === 'yes') {
+    const numberOrNull = value => {
+      if (value === '' || value == null) return null;
+      const parsed = Number(String(value).replace(',', '.'));
+      return Number.isFinite(parsed) ? parsed : null;
+    };
+    const round = (value, digits = 1) => Number.isFinite(value) ? Number(value.toFixed(digits)) : null;
+
+    const chargeKg = numberOrNull(input.machineryRoomLargestSystemChargeKg);
+    const roomVolume = numberOrNull(input.roomVolumeM3);
+    const occupied = input.machineryRoomOccupied === 'yes';
+
+    // Add ventilation rows
+    if (chargeKg != null && chargeKg > 0) {
+      const vFormelM3s = 0.014 * (chargeKg ** (2 / 3));
+      const vFormelM3h = round(vFormelM3s * 3600, 1);
+      rows.push(row('Luftvolumenstrom Notlüftung nach Gleichung (1)', `${formatEngineeringNumber(vFormelM3s, 'flow')} m\u00b3/s / ${formatEngineeringNumber(vFormelM3h, 'flow')} m\u00b3/h`, 'EN 378-3, 5.13.4'));
+    } else {
+      rows.push(row('Luftvolumenstrom Notlüftung nach Gleichung (1)', 'nicht bestimmbar (Fehlende Angabe: Füllmenge)', 'EN 378-3, 5.13.4'));
+    }
+
+    if (roomVolume != null && roomVolume > 0) {
+      const v15 = round(roomVolume * 15, 1);
+      rows.push(row('Luftvolumenstrom Notlüftung nach 15 Luftwechseln/h', `${formatEngineeringNumber(v15, 'flow')} m\u00b3/h`, 'EN 378-3, 5.13.4'));
+    } else {
+      rows.push(row('Luftvolumenstrom Notlüftung nach 15 Luftwechseln/h', 'nicht bestimmbar (Fehlende Angabe: Raumvolumen)', 'EN 378-3, 5.13.4'));
+    }
+
+    if (chargeKg != null && chargeKg > 0 && roomVolume != null && roomVolume > 0) {
+      const vFormelM3s = 0.014 * (chargeKg ** (2 / 3));
+      const vFormelM3h = round(vFormelM3s * 3600, 1);
+      const v15 = round(roomVolume * 15, 1);
+      const governing = Math.min(vFormelM3h, v15);
+      const isFormulaGoverning = governing === vFormelM3h;
+      rows.push(row('Maßgeblicher Wert', `${formatEngineeringNumber(governing, 'flow')} m\u00b3/h (${isFormulaGoverning ? 'Gleichung (1)' : '15 Luftwechsel/h'})`, 'EN 378-3, 5.13.4'));
+    } else {
+      rows.push(row('Maßgeblicher Wert', 'nicht bestimmbar (Fehlende Angaben)', 'EN 378-3, 5.13.4'));
+    }
+
+    if (occupied && roomVolume != null && roomVolume > 0) {
+      const v4 = round(roomVolume * 4, 1);
+      rows.push(row('Luftvolumenstrom mechanische Lüftung (4-facher Luftwechsel)', `${formatEngineeringNumber(v4, 'flow')} m\u00b3/h`, 'EN 378-3, 5.13.2'));
+    } else if (occupied) {
+      rows.push(row('Luftvolumenstrom mechanische Lüftung (4-facher Luftwechsel)', 'nicht bestimmbar (Fehlende Angabe: Raumvolumen)', 'EN 378-3, 5.13.2'));
+    }
+  }
+
   return { title: '7. Sicherheitskomponenten nach EN 378-3', rows, singleColumn: true };
 }
 

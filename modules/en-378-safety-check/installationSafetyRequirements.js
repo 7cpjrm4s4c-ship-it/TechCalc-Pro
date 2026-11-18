@@ -390,7 +390,7 @@ function buildMachineryRoomRequirements(state, safetyData, chargeLimitAssessment
       ? 'Normale Maschinenraumlüftung mit mindestens vierfachem Luftwechsel je Stunde planen.'
       : 'Normale Maschinenraumlüftung und Luftführung nach nationalen Vorschriften planen.',
     source: SOURCE.machineryRoomVentilation,
-    value: state.hasMechanicalVentilation
+    value: state.ventilationType === 'mechanical'
   }));
   
   // If ventilation cannot achieve required rate for occupied machinery room, alarm and shutdown required

@@ -85,6 +85,80 @@ const plannerGuidanceSummaryRows = calculation => {
   ];
 };
 
+const ventilationOutputRows = calculation => {
+  const state = calculation.effectiveState || {};
+  // Only show when machinery room gate is fulfilled
+  if (state.installationLocation !== 'machinery-room' || state.machineryRoomRiskAnalysisResult !== 'yes') {
+    return [];
+  }
+  
+  const numberOrNull = value => {
+    if (value === '' || value == null) return null;
+    const parsed = Number(String(value).replace(',', '.'));
+    return Number.isFinite(parsed) ? parsed : null;
+  };
+  const round = (value, digits = 3) => Number.isFinite(value) ? Number(value.toFixed(digits)) : null;
+  
+  const chargeKg = numberOrNull(state.machineryRoomLargestSystemChargeKg);
+  const roomVolume = numberOrNull(state.roomVolumeM3);
+  const occupied = state.machineryRoomOccupied === 'yes';
+  
+  const rows = [];
+  
+  // V_formel = 0.014 * m^(2/3)
+  if (chargeKg != null && chargeKg > 0) {
+    const vFormelM3s = 0.014 * (chargeKg ** (2 / 3));
+    const vFormelM3h = round(vFormelM3s * 3600, 1);
+    rows.push({ label: 'Luftvolumenstrom Notlüftung nach Gleichung (1)', value: formatNumber(vFormelM3s, 4), unit: 'm³/s' });
+    rows.push({ label: 'Luftvolumenstrom Notlüftung nach Gleichung (1)', value: formatNumber(vFormelM3h, 1), unit: 'm³/h' });
+  } else {
+    rows.push({ label: 'Luftvolumenstrom Notlüftung nach Gleichung (1)', value: 'nicht bestimmbar', unit: 'Fehlende Angabe: Füllmenge' });
+  }
+  
+  // V_15 = roomVolume * 15
+  if (roomVolume != null && roomVolume > 0) {
+    const v15 = round(roomVolume * 15, 1);
+    rows.push({ label: 'Luftvolumenstrom Notlüftung nach 15 Luftwechseln/h', value: formatNumber(v15, 1), unit: 'm³/h' });
+  } else {
+    rows.push({ label: 'Luftvolumenstrom Notlüftung nach 15 Luftwechseln/h', value: 'nicht bestimmbar', unit: 'Fehlende Angabe: Raumvolumen' });
+  }
+  
+  // Governing value
+  if (chargeKg != null && chargeKg > 0 && roomVolume != null && roomVolume > 0) {
+    const vFormelM3s = 0.014 * (chargeKg ** (2 / 3));
+    const vFormelM3h = round(vFormelM3s * 3600, 1);
+    const v15 = round(roomVolume * 15, 1);
+    const governing = Math.min(vFormelM3h, v15);
+    const isFormulaGoverning = governing === vFormelM3h;
+    rows.push({ label: 'Maßgeblicher Wert', value: formatNumber(governing, 1), unit: `m³/h (${isFormulaGoverning ? 'Gleichung (1)' : '15 Luftwechsel/h'})` });
+  } else {
+    rows.push({ label: 'Maßgeblicher Wert', value: 'nicht bestimmbar', unit: 'Fehlende Angaben' });
+  }
+  
+  // 4× ventilation for occupied machinery room
+  if (occupied && roomVolume != null && roomVolume > 0) {
+    const v4 = round(roomVolume * 4, 1);
+    rows.push({ label: 'Luftvolumenstrom mechanische Lüftung (4-facher Luftwechsel)', value: formatNumber(v4, 1), unit: 'm³/h' });
+  } else if (occupied) {
+    rows.push({ label: 'Luftvolumenstrom mechanische Lüftung (4-facher Luftwechsel)', value: 'nicht bestimmbar', unit: 'Fehlende Angabe: Raumvolumen' });
+  }
+  
+  return rows;
+};
+
+const installationSafetyRows = calculation => {
+  const assessment = calculation.installationSafetyAssessment || {};
+  if (!assessment.requirements?.length) return [];
+  return [
+    { label: 'Bewertung', value: statusLabel(assessment.status) },
+    ...assessment.requirements.map(requirement => ({
+      label: requirement.title || checkLabel(requirement.id),
+      value: `${statusLabel(requirement.status)}: ${requirement.measure || requirement.requirement || 'prüfen'}`,
+      unit: requirement.source?.sourceSection || ''
+    }))
+  ];
+};
+
 const plannerGuidanceGroups = calculation => {
   const guidance = calculation.plannerGuidance || {};
   const groups = [{ title: 'Planer-Leitfaden – Zusammenfassung', rows: plannerGuidanceSummaryRows(calculation) }];
@@ -130,6 +204,8 @@ export function buildEN378SafetyCheckResultModel(currentState = {}, calculation 
       { title: 'Füllmengenbewertung nach EN 378-1 Anhang C', rows: chargeLimitRows(calculation) },
       { title: 'Alternative Vorkehrungen nach EN 378-1 C.3', rows: alternativeRiskRows(calculation) },
       { title: 'Plausibilitätsprüfung der Eingaben', rows: consistencyRows(calculation) },
+      { title: 'Lüftungsauslegung Maschinenraum', rows: ventilationOutputRows(calculation) },
+      { title: 'Sicherheitskomponenten nach EN 378-3', rows: installationSafetyRows(calculation) },
       {
         title: 'Aufstellung',
         rows: [

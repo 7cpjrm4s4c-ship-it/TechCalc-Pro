@@ -35,7 +35,6 @@ const machineryRoomState = normalizeEN378AssessmentState({
   installationClass: 'II',
   accessArea: 'authorized-access'
 });
-assert.equal(machineryRoomState.hasMachineryRoom, 'yes');
 const machineryRoomConsistency = assessStateConsistency(machineryRoomState);
 assert.equal(machineryRoomConsistency.status, 'passed');
 
