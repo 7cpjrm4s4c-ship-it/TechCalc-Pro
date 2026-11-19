@@ -259,10 +259,16 @@ function safetyComponentsSection(dto) {
 
 function guidanceSection(dto) {
   const guidance = object(dto.plannerGuidance || dto.assessment?.plannerGuidance);
+  // Planner acknowledgement ("berücksichtigt (Planer)") is a pure note and is
+  // kept clearly separate from the normative status ("erfüllt").
+  const acknowledged = object(dto.checklistAcknowledged);
   const rows = [];
   array(guidance.groups).forEach(group => {
     rows.push(row(group.title || 'Leitfaden', ''));
-    array(group.items).forEach(item => rows.push(row(item.title, `${status(item.status)}: ${item.measure || item.requirement}`, item.sourceLabel || '')));
+    array(group.items).forEach(item => {
+      const ack = acknowledged[item.id] ? ' – berücksichtigt (Planer)' : '';
+      rows.push(row(item.title, `${status(item.status)}: ${item.measure || item.requirement}${ack}`, item.sourceLabel || ''));
+    });
   });
   if (!rows.length) rows.push(row('Planer-Leitfaden', guidance.summary || 'Keine zusätzlichen Maßnahmen ermittelt.'));
   return { title: '8. Planer-Leitfaden', rows, singleColumn: true };

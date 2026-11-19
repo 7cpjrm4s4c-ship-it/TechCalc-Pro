@@ -68,4 +68,24 @@ assert.ok(inconsistentSerialized.includes('Klasse II mit Aufstellort abgleichen'
 assert.ok(inconsistentSerialized.includes('Aufstellort auf Maschinenraum oder Außenaufstellung ändern'));
 assert.equal(inconsistentSerialized.includes('state-consistency'), false);
 
+// Planer-Checkliste: abgehakte erforderliche Punkte erscheinen im PDF als
+// Kennzeichen "berücksichtigt (Planer)" - getrennt vom normativen Status.
+const acknowledgedState = {
+  ...state,
+  en378ChecklistAcknowledged: { 'handover.site-inspection': '2026-11-19T10:00:00.000Z' }
+};
+const acknowledgedCalculation = calculate(acknowledgedState);
+const acknowledgedDto = buildEN378SafetyCheckReportDto({ state: acknowledgedState, calculation: acknowledgedCalculation, generatedAt: '2026-09-01T00:00:00.000Z' });
+const acknowledgedSections = reportSections({ reportSource: 'typed-dto', reportDto: acknowledgedDto });
+const guidanceSection = acknowledgedSections.find(section => section.title === '8. Planer-Leitfaden');
+assert.ok(
+  guidanceSection.rows.some(r => String(r[1]).includes('berücksichtigt (Planer)')),
+  'Abgehakte Punkte müssen im PDF-Abschnitt 8 als "berücksichtigt (Planer)" gekennzeichnet sein.'
+);
+assert.ok(
+  guidanceSection.rows.some(r => String(r[1]).includes('berücksichtigt (Planer)') && String(r[1]).includes('erforderlich:')),
+  'Das Kennzeichen sitzt am erforderlichen Punkt und nicht am normativen Status "erfüllt".'
+);
+assert.ok(!JSON.stringify(acknowledgedSections).includes('berücksichtigt (Planer) – erfüllt'), 'Kennzeichen und normativer Status bleiben getrennt.');
+
 console.log('EN 378 PDF section tests passed.');

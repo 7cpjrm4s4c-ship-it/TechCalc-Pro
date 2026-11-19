@@ -1,4 +1,5 @@
 import { checkLabel, optionLabel, statusLabel, validationIssueLabel } from './displayLabels.js';
+import { esc } from '../../core/ui/renderer.js';
 import { getPlannerGuidanceStatusLabel } from './plannerGuidance.js';
 
 const formatNumber = (value, digits = 2) => {
@@ -163,27 +164,57 @@ const ventilationOutputRows = calculation => {
   return rows;
 };
 
-// Status-oriented compact overview: open points first, then failures, then passed.
-// Required planning measures stay in their category groups below and are not
-// repeated here in full text. The former "Sicherheitskomponenten" card is
+// Required planner points in a deterministic order; shared by the checklist
+// rendering here and the toggle action in index.js (index -> requirement id).
+export const collectRequiredGuidanceItems = calculation => {
+  const guidance = calculation?.plannerGuidance || {};
+  return (guidance.groups || []).flatMap(group => group.items || []).filter(item => item.status === 'required');
+};
+
+// Checklist row: pure planner note ("berücksichtigt"), never a normative status.
+// The toggle commits via data-checklist-index; the acknowledged map lives in
+// state.en378ChecklistAcknowledged (requirement id -> timestamp) and persists
+// with the project/session storage. Raw requirement ids stay out of the DOM.
+const checklistItemHtml = (item, index, acknowledged) => {
+  const title = item.title || checkLabel(item.id);
+  const section = sourceSectionOf(item);
+  const checked = Boolean(acknowledged?.[item.id]);
+  const meta = `${getPlannerGuidanceStatusLabel(item.status)}: ${truncate(item.measure || item.requirement || 'prüfen')}${section ? ` · ${section}` : ''}`;
+  return `<label class="tc-checklist-item${checked ? ' is-acknowledged' : ''}">`
+    + `<input type="checkbox" data-tc-action="en378:checklist:toggle" data-checklist-index="${index}"${checked ? ' checked' : ''} aria-label="${esc(title)} abhaken">`
+    + `<span class="tc-checklist-item__title">${esc(title)}</span>`
+    + `<span class="tc-checklist-item__meta">${esc(meta)}</span>`
+    + (checked ? '<span class="tc-checklist-item__ack">berücksichtigt</span>' : '')
+    + '</label>';
+};
+
+const checklistGroupHtml = (calculation, acknowledged) =>
+  collectRequiredGuidanceItems(calculation)
+    .map((item, index) => checklistItemHtml(item, index, acknowledged))
+    .join('');
+
+// Status-oriented compact overview: open points first, then failures, then the
+// required checklist, then passed. The former "Sicherheitskomponenten" card is
 // integrated into the planner guidance via these groups.
-const statusOverviewGroups = calculation => {
+const statusOverviewGroups = (calculation, displayState) => {
   const guidance = calculation.plannerGuidance || {};
   const actionItems = (guidance.groups || []).flatMap(group => group.items || []);
   const openItems = actionItems.filter(item => item.status === 'not-assessed');
   const failedItems = actionItems.filter(item => item.status === 'failed');
   const passedItems = guidance.confirmedItems || [];
+  const acknowledged = displayState?.en378ChecklistAcknowledged || {};
   return [
     { title: 'Offen', rows: openItems.map(item => compactItemRow(item)) },
     { title: 'Nicht erfüllt', rows: failedItems.map(item => compactItemRow(item)) },
+    { title: 'Erforderlich', html: checklistGroupHtml(calculation, acknowledged) },
     { title: 'Erfüllt', rows: passedItems.map(item => compactItemRow(item)) }
   ];
 };
 
-const plannerGuidanceGroups = calculation => {
+const plannerGuidanceGroups = (calculation, displayState) => {
   const guidance = calculation.plannerGuidance || {};
   const groups = [{ title: 'Planer-Leitfaden – Zusammenfassung', rows: plannerGuidanceSummaryRows(calculation) }];
-  groups.push({ title: 'Planer-Leitfaden – Statusübersicht', groups: statusOverviewGroups(calculation) });
+  groups.push({ title: 'Planer-Leitfaden – Statusübersicht', groups: statusOverviewGroups(calculation, displayState) });
   for (const group of guidance.groups || []) {
     if (group.id === 'openPoints') continue; // open points are shown in the "Offen" status group
     const rows = (group.items || []).map(item => compactItemRow(item));
@@ -226,7 +257,7 @@ export function buildEN378SafetyCheckResultModel(currentState = {}, calculation 
           { label: 'Lüftung', value: optionLabel(displayState.ventilationType) }
         ]
       },
-      ...plannerGuidanceGroups(calculation),
+      ...plannerGuidanceGroups(calculation, displayState),
       { title: 'Technische Validierung', rows: issueRows(calculation) }
     ].filter(group => (Array.isArray(group.rows) && group.rows.length > 0) || (Array.isArray(group.groups) && group.groups.length > 0)),
     notices: calculation.notices || []

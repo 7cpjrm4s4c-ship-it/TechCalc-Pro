@@ -8,6 +8,7 @@ export const initialState = Object.freeze({
   activeSavedAssessmentId: '',
   expandedSavedAssessmentId: '',
   savedAssessmentName: '',
+  en378ChecklistAcknowledged: Object.freeze({}),
   importedSnapshot: null,
   importedSnapshotId: '',
   importedSnapshotVersion: '',

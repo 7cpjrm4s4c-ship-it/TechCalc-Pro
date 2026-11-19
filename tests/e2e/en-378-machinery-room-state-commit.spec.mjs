@@ -18,6 +18,32 @@ const STEPS = [
   { field: 'hasIndependentAlarmPower', value: 'yes', kind: 'select' }
 ];
 
+const FULL_INPUT_SET = [
+
+      { field: 'refrigerantId', value: 'HFKW-32', kind: 'select' },
+      { field: 'chargeKg', value: '5', kind: 'input' },
+      { field: 'roomVolumeM3', value: '79', kind: 'input' },
+      { field: 'installationLocation', value: 'machinery-room', kind: 'select' },
+      { field: 'installationClass', value: 'III', kind: 'select' },
+      { field: 'accessArea', value: 'authorized-access', kind: 'select' },
+      { field: 'usageType', value: 'industrial', kind: 'select' },
+      { field: 'applicationType', value: 'other', kind: 'select' },
+      { field: 'locationLevel', value: 'other', kind: 'select' },
+      { field: 'ventilationType', value: 'mechanical', kind: 'select' },
+      { field: 'machineryRoomRiskAnalysisStatus', value: 'present', kind: 'select' },
+      { field: 'machineryRoomRiskAnalysisResult', value: 'yes', kind: 'select' },
+      { field: 'machineryRoomOccupied', value: 'no', kind: 'select' },
+      { field: 'machineryRoomLargestSystemChargeKg', value: '5', kind: 'input' },
+      { field: 'hasEmergencyVentilation', value: 'yes', kind: 'select' },
+      { field: 'hasEmergencyVentilationControlOutside', value: 'yes', kind: 'select' },
+      { field: 'hasEmergencyVentilationControlInside', value: 'yes', kind: 'select' },
+      { field: 'hasDetector', value: 'yes', kind: 'select' },
+      { field: 'hasAlarm', value: 'yes', kind: 'select' },
+      { field: 'hasIndependentAlarmPower', value: 'yes', kind: 'select' },
+      { field: 'hasExplosionProtectedElectricalEquipment', value: 'yes', kind: 'select' },
+      { field: 'machineryRoomEmergencyFanSuitable', value: 'yes', kind: 'select' }
+    ];
+
 const MACHINERY_ROOM_FIELDS = [
   'machineryRoomOccupied',
   'machineryRoomLargestSystemChargeKg',
@@ -105,31 +131,7 @@ test.describe('EN 378 machinery-room inputs commit to module state', () => {
     page.on('pageerror', error => pageErrors.push(error.message));
     await openModule(page);
 
-    const fullInputSet = [
-      { field: 'refrigerantId', value: 'HFKW-32', kind: 'select' },
-      { field: 'chargeKg', value: '5', kind: 'input' },
-      { field: 'roomVolumeM3', value: '79', kind: 'input' },
-      { field: 'installationLocation', value: 'machinery-room', kind: 'select' },
-      { field: 'installationClass', value: 'III', kind: 'select' },
-      { field: 'accessArea', value: 'authorized-access', kind: 'select' },
-      { field: 'usageType', value: 'industrial', kind: 'select' },
-      { field: 'applicationType', value: 'other', kind: 'select' },
-      { field: 'locationLevel', value: 'other', kind: 'select' },
-      { field: 'ventilationType', value: 'mechanical', kind: 'select' },
-      { field: 'machineryRoomRiskAnalysisStatus', value: 'present', kind: 'select' },
-      { field: 'machineryRoomRiskAnalysisResult', value: 'yes', kind: 'select' },
-      { field: 'machineryRoomOccupied', value: 'no', kind: 'select' },
-      { field: 'machineryRoomLargestSystemChargeKg', value: '5', kind: 'input' },
-      { field: 'hasEmergencyVentilation', value: 'yes', kind: 'select' },
-      { field: 'hasEmergencyVentilationControlOutside', value: 'yes', kind: 'select' },
-      { field: 'hasEmergencyVentilationControlInside', value: 'yes', kind: 'select' },
-      { field: 'hasDetector', value: 'yes', kind: 'select' },
-      { field: 'hasAlarm', value: 'yes', kind: 'select' },
-      { field: 'hasIndependentAlarmPower', value: 'yes', kind: 'select' },
-      { field: 'hasExplosionProtectedElectricalEquipment', value: 'yes', kind: 'select' },
-      { field: 'machineryRoomEmergencyFanSuitable', value: 'yes', kind: 'select' }
-    ];
-    for (const step of fullInputSet) {
+    for (const step of FULL_INPUT_SET) {
       await commitStep(page, step);
     }
 
@@ -153,6 +155,75 @@ test.describe('EN 378 machinery-room inputs commit to module state', () => {
     const resultColumn = page.locator('#app [data-platform-dynamic="result-saved"]');
     await expect(resultColumn.locator('.card__title').filter({ hasText: /Sicherheitskomponenten/ })).toHaveCount(0);
     await expect(resultColumn.locator('.card__title').filter({ hasText: /^Planer-Leitfaden – Statusübersicht$/ })).toHaveCount(1);
+
+    expect(pageErrors).toEqual([]);
+  });
+
+  test('acceptable overall status, planner checklist acknowledgement persists across reload and appears in the PDF report', async ({ page }) => {
+    const pageErrors = [];
+    page.on('pageerror', error => pageErrors.push(error.message));
+    await openModule(page);
+
+    for (const step of FULL_INPUT_SET) {
+      await commitStep(page, step);
+    }
+
+    // Gesamtbefund: "Anforderungen nach aktuellem Prüfstand erfüllt" (Status acceptable).
+    const overallStatus = page.locator('#app .main-result strong');
+    await expect(overallStatus).toHaveText('Anforderungen nach aktuellem Prüfstand erfüllt');
+
+    // Gruppe "Erforderlich" mit abhakbaren Punkten ist vorhanden.
+    const checklistCard = page.locator('#app .card').filter({
+      has: page.locator(':scope > h2.card__title').filter({ hasText: /^Erforderlich$/ })
+    });
+    const checkbox = checklistCard.locator('input[type="checkbox"][data-checklist-index]').first();
+    await expect(checkbox).toBeVisible();
+    await expect(checkbox).not.toBeChecked();
+
+    // Abhaken: reine Planer-Notiz, Gesamtbefund und normativer Status bleiben unverändert.
+    await checkbox.dispatchEvent('click');
+    await expect(checkbox).toBeChecked();
+    await expect(checklistCard.locator('.tc-checklist-item.is-acknowledged')).toHaveCount(1);
+    await expect(checklistCard.locator('.tc-checklist-item__ack')).toHaveText('berücksichtigt');
+    await expect(overallStatus).toHaveText('Anforderungen nach aktuellem Prüfstand erfüllt');
+    let state = await readModuleState(page);
+    expect(Object.keys(state.en378ChecklistAcknowledged || {})).toHaveLength(1);
+
+    // Abwahl (Wiederherstellung) ist möglich.
+    await checkbox.dispatchEvent('click');
+    await expect(checkbox).not.toBeChecked();
+    state = await readModuleState(page);
+    expect(Object.keys(state.en378ChecklistAcknowledged || {})).toHaveLength(0);
+    await expect(overallStatus).toHaveText('Anforderungen nach aktuellem Prüfstand erfüllt');
+
+    // Erneut abhaken für den Persistenz-/PDF-Teil.
+    await checkbox.dispatchEvent('click');
+    await expect(checkbox).toBeChecked();
+
+    // PDF-Bericht enthält das Kennzeichen "berücksichtigt (Planer)".
+    const pdfJson = await page.evaluate(async () => {
+      const { getModuleStore } = await import('/core/state/index.js');
+      const { calculate } = await import('/modules/en-378-safety-check/logic.js');
+      const { buildEN378SafetyCheckReportDto } = await import('/modules/en-378-safety-check/reportAdapter.js');
+      const { buildEN378ReportSections } = await import('/core/pdf/en378ReportSections.js');
+      const moduleState = getModuleStore('en-378-safety-check').get();
+      const calculation = calculate(moduleState);
+      const dto = buildEN378SafetyCheckReportDto({ state: moduleState, calculation, generatedAt: '2026-11-19T00:00:00.000Z' });
+      return JSON.stringify(buildEN378ReportSections(dto));
+    });
+    expect(pdfJson).toContain('berücksichtigt (Planer)');
+
+    // Reload: Abhakzustand und Gesamtbefund bleiben erhalten.
+    await page.reload();
+    await openModule(page);
+    await expect(page.locator('#app .main-result strong')).toHaveText('Anforderungen nach aktuellem Prüfstand erfüllt');
+    const restoredState = await readModuleState(page);
+    expect(Object.keys(restoredState.en378ChecklistAcknowledged || {})).toHaveLength(1);
+    const restoredCheckbox = page.locator('#app .card').filter({
+      has: page.locator(':scope > h2.card__title').filter({ hasText: /^Erforderlich$/ })
+    }).locator('input[type="checkbox"][data-checklist-index]').first();
+    await expect(restoredCheckbox).toBeChecked();
+    await expect(page.locator('#app .tc-checklist-item.is-acknowledged')).toHaveCount(1);
 
     expect(pageErrors).toEqual([]);
   });

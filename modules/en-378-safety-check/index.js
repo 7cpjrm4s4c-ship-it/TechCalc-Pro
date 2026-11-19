@@ -14,6 +14,8 @@ import { createPlatformModule } from '../../core/runtime/index.js';
 import { createTypedDtoReportAdapter } from '../../core/pdf/typedDtoReportAdapter.js';
 import { bindFGasesSnapshotImport } from './importController.js';
 import { normalizeEN378StateTransition } from './stateTransitions.js';
+import { registerCentralActions } from '../../core/events/index.js';
+import { collectRequiredGuidanceItems } from './results.js';
 export { buildEN378StateFromFGasesSnapshot, canImportFGasesSystemSnapshot } from './snapshotImport.js';
 
 const refrigerantOptions = Object.freeze([
@@ -55,8 +57,28 @@ const typedReportAdapter = createTypedDtoReportAdapter({
   buildReportDto: buildEN378SafetyCheckReportDto
 });
 
+const CHECKLIST_TOGGLE_ACTION = 'en378:checklist:toggle';
+
+// Pure planner note: toggling never changes the normative status or the overall
+// result. The acknowledged map (requirement id -> timestamp) is persisted in the
+// module state (en378ChecklistAcknowledged) and therefore in the project/session.
+function toggleChecklistItem(element) {
+  const index = Number(element?.dataset?.checklistIndex);
+  if (!Number.isInteger(index) || index < 0) return;
+  const items = collectRequiredGuidanceItems(calculate(transitionAwareState.get()));
+  const item = items[index];
+  if (!item) return;
+  const acknowledged = { ...(transitionAwareState.get().en378ChecklistAcknowledged || {}) };
+  if (acknowledged[item.id]) delete acknowledged[item.id];
+  else acknowledged[item.id] = new Date().toISOString();
+  transitionAwareState.set({ en378ChecklistAcknowledged: acknowledged }, { action: CHECKLIST_TOGGLE_ACTION, notify: true });
+}
+
 function bind(root) {
   bindFGasesSnapshotImport(root, state);
+  registerCentralActions(root, {
+    [CHECKLIST_TOGGLE_ACTION]: ({ element }) => toggleChecklistItem(element)
+  });
 }
 const controller = Object.freeze({
   savedRecords: Object.freeze({

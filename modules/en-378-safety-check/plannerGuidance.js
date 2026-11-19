@@ -108,6 +108,7 @@ function buildGroups(items) {
 function headlineForStatus(status, actionCount, openPointCount) {
   if (status === 'import-rejected') return 'Der importierte Anlagenstand kann nicht bewertet werden.';
   if (status === 'incomplete') return 'Für den Leitfaden fehlen noch Pflichtangaben.';
+  if (status === 'acceptable') return 'Anforderungen nach aktuellem Prüfstand erfüllt - Planer-Leitfaden als Checkliste abarbeiten.';
   if (status === 'measures-required') return 'Für den gewählten Aufstellort sind Maßnahmen oder Anpassungen erforderlich.';
   if (openPointCount > 0) return 'Der Leitfaden enthält noch offene Prüfpunkte.';
   if (actionCount > 0) return 'Die erforderlichen Planungsmaßnahmen sind ausgewiesen.';
@@ -117,6 +118,7 @@ function headlineForStatus(status, actionCount, openPointCount) {
 function summaryForStatus(status, actionCount, failedCount, openPointCount) {
   if (status === 'import-rejected') return 'Der F-Gase-Anlagenstand wurde technisch abgelehnt. Die EN-378-Bewertung muss mit einem gültigen Anlagenstand neu gestartet werden.';
   if (status === 'incomplete') return 'Ergänze die fehlenden Angaben, damit Füllmenge, Aufstellort und Sicherheitskomponenten bewertet werden können.';
+  if (status === 'acceptable') return `Anforderungen nach aktuellem Prüfstand erfüllt. ${actionCount} erforderliche Punkte sind im Planer-Leitfaden als Checkliste abzuarbeiten.`;
   if (failedCount > 0) return `${failedCount} Prüfpunkte sind nicht erfüllt. Die aufgeführten Maßnahmen sind vor Freigabe des Aufstellkonzepts zu klären.`;
   if (openPointCount > 0) return `${openPointCount} Angaben oder Prüfpunkte sind noch offen. Die übrigen Anforderungen können bereits als Planungsleitfaden verwendet werden.`;
   if (actionCount > 0) return `${actionCount} Anforderungen sind als Planungs- oder Dokumentationsmaßnahmen zu berücksichtigen.`;

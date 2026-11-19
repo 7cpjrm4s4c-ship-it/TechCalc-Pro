@@ -104,6 +104,7 @@ export function buildEN378SafetyCheckReportDto({
       notices: clone(calculation.notices || [])
     },
     plannerGuidance: clone(calculation.plannerGuidance || {}),
+    checklistAcknowledged: clone(reportState.en378ChecklistAcknowledged || {}),
     resultGroups: clone(reportResultModel.groups || []),
     notices: clone(reportResultModel.notices || []),
     dataVersions: clone(calculation.dataVersions || state.dataVersions || {})
