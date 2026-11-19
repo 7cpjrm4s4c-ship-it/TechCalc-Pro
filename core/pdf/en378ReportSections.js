@@ -114,7 +114,7 @@ function importedSystemSection(dto) {
     rows: [
       row('Importierte Anlage', input.importedSystemName),
       row('Importstatus', input.importStatusMessage),
-      row('Kältemittel', input.refrigerantId),
+      row('Kältemittel', input.refrigerantLabel || input.refrigerantId),
       num('Füllmenge', input.chargeKg, 'generic', 'kg'),
       num('Raumvolumen', input.roomVolumeM3, 'generic', 'm³'),
       row('Aufstellort', label(input.installationLocation)),
@@ -135,9 +135,11 @@ function importedSystemSection(dto) {
 
 function refrigerantSafetySection(dto) {
   const safetyData = object(dto.assessment?.chargeLimit?.refrigerantSafetyData);
+  const input = object(dto.input);
   return {
     title: '3. Kältemittel-Sicherheitsdaten',
     rows: [
+      row('Kältemittel', input.refrigerantLabel || input.refrigerantId),
       row('Sicherheitsklasse', safetyData.safetyClass),
       row('Toxizitätsklasse', safetyData.toxicityClass),
       row('Brennbarkeitsklasse', safetyData.flammabilityClass),
@@ -185,26 +187,12 @@ function stateConsistencySection(dto) {
   return { title: '6. Plausibilitätsprüfung der Eingaben', rows, singleColumn: true };
 }
 
-// Section 7 keeps the detailed requirement texts (documentation purpose) but
-// groups them by status like the app's compact status overview: open points
-// first, then failures, required measures, then passed.
-const SAFETY_STATUS_GROUPS = Object.freeze([
-  ['Offen', 'not-assessed'],
-  ['Nicht erfüllt', 'failed'],
-  ['Erforderliche Maßnahmen', 'required'],
-  ['Erfüllt', 'passed']
-]);
-
+// Section 7 carries the overall assessment and the machinery-room ventilation
+// design values only; all requirement points live exclusively in section 8.
 function safetyComponentsSection(dto) {
   const installationSafety = object(dto.assessment?.installationSafety);
   const input = object(dto.input);
   const rows = [row('Bewertung', status(installationSafety.status))];
-  for (const [groupTitle, groupStatus] of SAFETY_STATUS_GROUPS) {
-    const items = array(installationSafety.requirements).filter(item => item.status === groupStatus);
-    if (!items.length) continue;
-    rows.push(row(groupTitle, ''));
-    items.forEach(item => rows.push(row(item.title || checkLabel(item.id), `${status(item.status)}: ${item.measure || item.requirement || 'prüfen'}`, sourceLabel(item.source))));
-  }
 
   // Add ventilation output for machinery room (Fix 4b)
   if (input.installationLocation === 'machinery-room' && input.machineryRoomRiskAnalysisResult === 'yes') {
@@ -254,7 +242,7 @@ function safetyComponentsSection(dto) {
     }
   }
 
-  return { title: '7. Sicherheitskomponenten nach EN 378-3', rows, singleColumn: true };
+  return { title: '7. Sicherheitsbewertung und Lüftungsauslegung Maschinenraum', rows, singleColumn: true };
 }
 
 function guidanceSection(dto) {
@@ -270,6 +258,11 @@ function guidanceSection(dto) {
       rows.push(row(item.title, `${status(item.status)}: ${item.measure || item.requirement}${ack}`, item.sourceLabel || ''));
     });
   });
+  const confirmedItems = array(guidance.confirmedItems);
+  if (confirmedItems.length) {
+    rows.push(row('Erfüllt', ''));
+    confirmedItems.forEach(item => rows.push(row(item.title, `${status(item.status)}: ${item.measure || item.requirement || ''}`, item.sourceLabel || '')));
+  }
   if (!rows.length) rows.push(row('Planer-Leitfaden', guidance.summary || 'Keine zusätzlichen Maßnahmen ermittelt.'));
   return { title: '8. Planer-Leitfaden', rows, singleColumn: true };
 }

@@ -1,10 +1,19 @@
 import config from './config.js';
 import { buildEN378SafetyCheckResultModel } from './results.js';
 import { EN_378_SAFETY_CHECK_SCHEMA_VERSION } from './state.js';
+import { getEN378SafetyData, getRefrigerant } from '../../core/data/index.js';
 
 export const EN_378_SAFETY_CHECK_REPORT_DTO_VERSION = 1;
 
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
+// Display form "R" + standardNumber (R32, R717, R290, R1234yf); aliases such as
+// R-32 / HFKW-32 resolve through the existing catalog lookup.
+const refrigerantLabel = refrigerantId => {
+  if (!refrigerantId) return '';
+  const safetyData = getEN378SafetyData(refrigerantId);
+  if (safetyData?.standardNumber) return `R${safetyData.standardNumber}`;
+  return getRefrigerant(refrigerantId)?.name || String(refrigerantId);
+};
 export function buildEN378SafetyCheckReportDto({
   state = {},
   calculation = {},
@@ -29,6 +38,7 @@ export function buildEN378SafetyCheckReportDto({
       importStatus: state.importStatus || '',
       importStatusMessage: state.importStatusMessage || '',
       refrigerantId: reportState.refrigerantId || '',
+      refrigerantLabel: refrigerantLabel(reportState.refrigerantId),
       chargeKg: calculation.chargeKg ?? null,
       roomVolumeM3: calculation.roomVolumeM3 ?? null,
       installationLocation: reportState.installationLocation || '',
@@ -38,6 +48,7 @@ export function buildEN378SafetyCheckReportDto({
       usageType: reportState.usageType || '',
       applicationType: reportState.applicationType || '',
       locationLevel: reportState.locationLevel || '',
+      isBasementLocation: reportState.isBasementLocation || '',
       occupantDensityBelowOnePer10m2: reportState.occupantDensityBelowOnePer10m2 || '',
       hasEmergencyExits: reportState.hasEmergencyExits || '',
       isPermanentlySealedSorptionSystem: reportState.isPermanentlySealedSorptionSystem || '',
@@ -72,6 +83,12 @@ export function buildEN378SafetyCheckReportDto({
       outdoorVentilationNationalRulesConfirmed: reportState.outdoorVentilationNationalRulesConfirmed || '',
       outdoorMechanicalVentilationOpeningsConfirmed: reportState.outdoorMechanicalVentilationOpeningsConfirmed || '',
       hasEmergencyVentilation: reportState.hasEmergencyVentilation || '',
+      machineryRoomRiskAnalysisStatus: reportState.machineryRoomRiskAnalysisStatus || '',
+      machineryRoomRiskAnalysisResult: reportState.machineryRoomRiskAnalysisResult || '',
+      machineryRoomRiskAnalysisNotes: reportState.machineryRoomRiskAnalysisNotes || '',
+      machineryRoomOccupied: reportState.machineryRoomOccupied || '',
+      machineryRoomRequiredAirChangeAchievable: reportState.machineryRoomRequiredAirChangeAchievable || '',
+      machineryRoomEmergencyFanSuitable: reportState.machineryRoomEmergencyFanSuitable || '',
       machineryRoomLargestSystemChargeKg: reportState.machineryRoomLargestSystemChargeKg || '',
       hasEmergencyVentilationControlInside: reportState.hasEmergencyVentilationControlInside || '',
       hasEmergencyVentilationControlOutside: reportState.hasEmergencyVentilationControlOutside || '',
