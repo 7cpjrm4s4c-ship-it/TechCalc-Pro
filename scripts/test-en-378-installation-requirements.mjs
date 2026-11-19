@@ -51,8 +51,8 @@ const machineryAssessment = assessInstallationSafetyRequirements(machineryRoomSt
 assert.ok(machineryAssessment.requirements.some(item => item.id === 'machinery-room.access-restricted'));
 assert.ok(machineryAssessment.requirements.some(item => item.id === 'machinery-room.emergency-ventilation-flow'));
 assert.ok(machineryAssessment.requirements.some(item => item.id === 'detector.flammable-classes'));
-// Note: R-32 is flammable but lacks autoIgnitionTemperatureC, so max-surface-temperature is NOT_ASSESSED
-// This causes overall status to be 'not-assessed' instead of 'passed'
+// Note: R-32 is flammable and provides autoIgnitionTemperatureC (EN 378-1 table E.1: 648 °C),
+// so machinery-room.max-surface-temperature is assessed as required, not NOT_ASSESSED
 assert.ok(['passed', 'not-assessed'].includes(machineryAssessment.status), `Unexpected status: ${machineryAssessment.status}`);
 
 const missingMeasuresState = {

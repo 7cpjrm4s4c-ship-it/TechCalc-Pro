@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 
 import { calculate } from '../modules/en-378-safety-check/logic.js';
+import { assessChargeLimit } from '../modules/en-378-safety-check/chargeLimitCalculation.js';
+import { assessInstallationSafetyRequirements } from '../modules/en-378-safety-check/installationSafetyRequirements.js';
 import { MACHINERY_ROOM_5_1_TO_5_14_FIELDS, HINWEIS_A, HINWEIS_B, MACHINERY_ROOM_NOTICE } from '../modules/en-378-safety-check/machineryRoomRiskAnalysis.js';
 
 // Test base state for machinery room
@@ -173,5 +175,27 @@ const expectedFields = [
 ];
 assert.deepEqual(MACHINERY_ROOM_5_1_TO_5_14_FIELDS, expectedFields);
 console.log('✓ Test 12 passed');
+
+// Test 13: EN 378-3, 5.14.4 - max-surface-temperature uses autoIgnitionTemperatureC (EN 378-1 table E.1)
+console.log('Test 13: 5.14.4 Oberflächentemperatur mit Selbstentzündungstemperatur aus Tabelle E.1...');
+const surfaceTempState = {
+  ...baseMachineryRoomState,
+  machineryRoomRiskAnalysisStatus: 'present',
+  machineryRoomRiskAnalysisResult: 'yes'
+};
+const surfaceTempAssessment = assessInstallationSafetyRequirements(surfaceTempState, assessChargeLimit(surfaceTempState));
+const surfaceTempRequirement = surfaceTempAssessment.requirements.find(item => item.id === 'machinery-room.max-surface-temperature');
+assert.ok(surfaceTempRequirement, '5.14.4-Anforderung muss erzeugt werden (R-32 ist brennbar)');
+assert.equal(surfaceTempRequirement.status, 'required', 'R-32 liefert autoIgnitionTemperatureC = 648, daher required statt not-assessed');
+assert.equal(surfaceTempRequirement.details.autoIgnitionTemperatureC, 648);
+assert.equal(surfaceTempRequirement.details.eightyPercentOfAutoIgnition, 518.4);
+assert.equal(surfaceTempRequirement.details.minus100K, 548);
+assert.equal(surfaceTempRequirement.details.maxSurfaceTemperatureC, 548, 'max(0.8 x 648, 648 - 100) = 548 °C');
+assert.ok(surfaceTempRequirement.measure.includes('548'), 'Maßnahme muss 548 °C ausweisen');
+assert.ok(!surfaceTempAssessment.missingInputs.includes('autoIgnitionTemperatureC'), 'autoIgnitionTemperatureC darf nicht als offener Punkt gemeldet werden');
+const surfaceTempCalculation = calculate(surfaceTempState);
+const surfaceTempOpenPoints = surfaceTempCalculation.plannerGuidance.groups.find(group => group.id === 'openPoints')?.items || [];
+assert.ok(!surfaceTempOpenPoints.some(item => item.id === 'machinery-room.max-surface-temperature'), 'max-surface-temperature darf nicht in den offenen Punkten auftauchen');
+console.log('✓ Test 13 passed');
 
 console.log('\n✅ Alle Machinery Room Risk Analysis Tests bestanden!');
