@@ -198,4 +198,44 @@ const surfaceTempOpenPoints = surfaceTempCalculation.plannerGuidance.groups.find
 assert.ok(!surfaceTempOpenPoints.some(item => item.id === 'machinery-room.max-surface-temperature'), 'max-surface-temperature darf nicht in den offenen Punkten auftauchen');
 console.log('✓ Test 13 passed');
 
+
+// Test 14: EN 378-3, 5.13.2 - normale Maschinenraumlüftung; 4-facher Luftwechsel nur bei Personenaufenthalt
+console.log('Test 14: 5.13.2 normale Maschinenraumlüftung (4-facher Luftwechsel nur bei Personenaufenthalt)...');
+const normalVentilationBase = {
+  ...baseMachineryRoomState,
+  roomVolumeM3: '80',
+  machineryRoomRiskAnalysisStatus: 'present',
+  machineryRoomRiskAnalysisResult: 'yes'
+};
+const findNormalVentilation = state =>
+  assessInstallationSafetyRequirements(state, assessChargeLimit(state)).requirements
+    .find(item => item.id === 'machinery-room.normal-ventilation');
+
+const occupiedYes = findNormalVentilation({ ...normalVentilationBase, machineryRoomOccupied: 'yes' });
+assert.ok(occupiedYes, 'Leitfadenpunkt muss bei Maschinenraum mit Risikoanalyse-Ergebnis "yes" erzeugt werden');
+assert.equal(occupiedYes.category, 'ventilation');
+assert.equal(occupiedYes.status, 'required');
+assert.equal(occupiedYes.source.sourcePart, 'EN 378-3');
+assert.equal(occupiedYes.source.sourceSection, '5.13.2');
+assert.ok(occupiedYes.requirement.includes('viermaliger Luftaustausch'), 'Anforderungstext muss EN 378-3, 5.13.2 zitieren');
+assert.ok(
+  occupiedYes.measure.includes('Erforderliche Luftmenge für die mechanische Lüftung: 4-facher Luftwechsel, 320 m³/h (EN 378-3, 5.13.2).'),
+  `Maßnahme muss 4 x 80 = 320 m³/h ausweisen, war: ${occupiedYes.measure}`
+);
+
+const occupiedNo = findNormalVentilation({ ...normalVentilationBase, machineryRoomOccupied: 'no' });
+assert.ok(occupiedNo, 'Leitfadenpunkt muss auch ohne Personenaufenthalt vorhanden sein');
+assert.equal(occupiedNo.status, 'required');
+assert.equal(occupiedNo.source.sourceSection, '5.13.2');
+assert.ok(
+  occupiedNo.measure.includes('Lüftung für übliche Betriebsbedingungen nach nationalen Vorschriften auslegen; der 4-fache Luftwechsel ist nur bei Personenaufenthalt erforderlich (EN 378-3, 5.13.2).'),
+  `Maßnahme muss nationalen Vorschriften ohne 4-fachen Luftwechsel ausweisen, war: ${occupiedNo.measure}`
+);
+
+const occupiedEmpty = findNormalVentilation({ ...normalVentilationBase, machineryRoomOccupied: '' });
+assert.ok(occupiedEmpty, 'Leitfadenpunkt muss auch bei leerem Personenaufenthalt vorhanden sein');
+assert.equal(occupiedEmpty.status, 'not-assessed');
+assert.deepEqual([...occupiedEmpty.missingInputs], ['machineryRoomOccupied']);
+console.log('✓ Test 14 passed');
+
 console.log('\n✅ Alle Machinery Room Risk Analysis Tests bestanden!');

@@ -397,6 +397,35 @@ function buildMachineryRoomRequirements(state, safetyData, chargeLimitAssessment
     source: SOURCE.machineryRoomVentilation,
     value: state.ventilationType === 'mechanical'
   }));
+
+  // 5.13.2: Normale Maschinenraumlüftung - nationale Vorschriften; bei Personenaufenthalt mindestens viermaliger Luftaustausch je Stunde
+  const normalVentilationSource = Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.13.2' });
+  const fourAirChangesM3h = roomVolume != null && roomVolume > 0 ? round(roomVolume * 4, 1) : null;
+  const normalVentilationBase = {
+    id: 'machinery-room.normal-ventilation',
+    category: 'ventilation',
+    title: 'Normale Maschinenraumlüftung',
+    requirement: 'Die Lüftung muss nationalen Vorschriften entsprechen, wobei bei einem Maschinenraum mit Personenaufenthalt mindestens ein viermaliger Luftaustausch je Stunde erfolgen muss.',
+    source: normalVentilationSource
+  };
+  if (!hasAnswer(state.machineryRoomOccupied)) {
+    requirements.push(required({
+      ...normalVentilationBase,
+      measure: 'Personenaufenthalt im Maschinenraum klären, um die Lüftungsanforderung bewerten zu können.',
+      status: REQUIREMENT_STATUS.NOT_ASSESSED,
+      missingInputs: ['machineryRoomOccupied']
+    }));
+  } else if (yes(state.machineryRoomOccupied)) {
+    requirements.push(required({
+      ...normalVentilationBase,
+      measure: `Erforderliche Luftmenge für die mechanische Lüftung: 4-facher Luftwechsel, ${fourAirChangesM3h ?? 'nicht bestimmbar'} m³/h (EN 378-3, 5.13.2).`
+    }));
+  } else {
+    requirements.push(required({
+      ...normalVentilationBase,
+      measure: 'Lüftung für übliche Betriebsbedingungen nach nationalen Vorschriften auslegen; der 4-fache Luftwechsel ist nur bei Personenaufenthalt erforderlich (EN 378-3, 5.13.2).'
+    }));
+  }
   
   // If ventilation cannot achieve required rate for occupied machinery room, alarm and shutdown required
   if (machineryRoomOccupied && state.machineryRoomRequiredAirChangeAchievable === 'no') {
