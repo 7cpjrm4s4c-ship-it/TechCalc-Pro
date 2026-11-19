@@ -185,11 +185,26 @@ function stateConsistencySection(dto) {
   return { title: '6. Plausibilitätsprüfung der Eingaben', rows, singleColumn: true };
 }
 
+// Section 7 keeps the detailed requirement texts (documentation purpose) but
+// groups them by status like the app's compact status overview: open points
+// first, then failures, required measures, then passed.
+const SAFETY_STATUS_GROUPS = Object.freeze([
+  ['Offen', 'not-assessed'],
+  ['Nicht erfüllt', 'failed'],
+  ['Erforderliche Maßnahmen', 'required'],
+  ['Erfüllt', 'passed']
+]);
+
 function safetyComponentsSection(dto) {
   const installationSafety = object(dto.assessment?.installationSafety);
   const input = object(dto.input);
   const rows = [row('Bewertung', status(installationSafety.status))];
-  array(installationSafety.requirements).forEach(item => rows.push(row(item.title || checkLabel(item.id), `${status(item.status)}: ${item.measure || item.requirement || 'prüfen'}`, sourceLabel(item.source))));
+  for (const [groupTitle, groupStatus] of SAFETY_STATUS_GROUPS) {
+    const items = array(installationSafety.requirements).filter(item => item.status === groupStatus);
+    if (!items.length) continue;
+    rows.push(row(groupTitle, ''));
+    items.forEach(item => rows.push(row(item.title || checkLabel(item.id), `${status(item.status)}: ${item.measure || item.requirement || 'prüfen'}`, sourceLabel(item.source))));
+  }
 
   // Add ventilation output for machinery room (Fix 4b)
   if (input.installationLocation === 'machinery-room' && input.machineryRoomRiskAnalysisResult === 'yes') {

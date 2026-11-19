@@ -99,4 +99,61 @@ test.describe('EN 378 machinery-room inputs commit to module state', () => {
 
     expect(pageErrors, 'no uncaught page errors during the flow').toEqual([]);
   });
+
+  test('result summary shows compact status groups Erfüllt/Offen/Nicht erfüllt without a separate safety components card', async ({ page }) => {
+    const pageErrors = [];
+    page.on('pageerror', error => pageErrors.push(error.message));
+    await openModule(page);
+
+    const fullInputSet = [
+      { field: 'refrigerantId', value: 'HFKW-32', kind: 'select' },
+      { field: 'chargeKg', value: '5', kind: 'input' },
+      { field: 'roomVolumeM3', value: '79', kind: 'input' },
+      { field: 'installationLocation', value: 'machinery-room', kind: 'select' },
+      { field: 'installationClass', value: 'III', kind: 'select' },
+      { field: 'accessArea', value: 'authorized-access', kind: 'select' },
+      { field: 'usageType', value: 'industrial', kind: 'select' },
+      { field: 'applicationType', value: 'other', kind: 'select' },
+      { field: 'locationLevel', value: 'other', kind: 'select' },
+      { field: 'ventilationType', value: 'mechanical', kind: 'select' },
+      { field: 'machineryRoomRiskAnalysisStatus', value: 'present', kind: 'select' },
+      { field: 'machineryRoomRiskAnalysisResult', value: 'yes', kind: 'select' },
+      { field: 'machineryRoomOccupied', value: 'no', kind: 'select' },
+      { field: 'machineryRoomLargestSystemChargeKg', value: '5', kind: 'input' },
+      { field: 'hasEmergencyVentilation', value: 'yes', kind: 'select' },
+      { field: 'hasEmergencyVentilationControlOutside', value: 'yes', kind: 'select' },
+      { field: 'hasEmergencyVentilationControlInside', value: 'yes', kind: 'select' },
+      { field: 'hasDetector', value: 'yes', kind: 'select' },
+      { field: 'hasAlarm', value: 'yes', kind: 'select' },
+      { field: 'hasIndependentAlarmPower', value: 'yes', kind: 'select' },
+      { field: 'hasExplosionProtectedElectricalEquipment', value: 'yes', kind: 'select' },
+      { field: 'machineryRoomEmergencyFanSuitable', value: 'yes', kind: 'select' }
+    ];
+    for (const step of fullInputSet) {
+      await commitStep(page, step);
+    }
+
+    const heading = title => page.locator('h2.card__title').filter({ hasText: new RegExp(`^${title}$`) });
+    await expect(page.locator('#app').locator(heading('Offen'))).toHaveCount(1);
+    await expect(page.locator('#app').locator(heading('Nicht erfüllt'))).toHaveCount(1);
+    await expect(page.locator('#app').locator(heading('Erfüllt'))).toHaveCount(1);
+
+    // Innermost status card whose own heading is the group title.
+    const statusCard = title => page.locator('#app .card').filter({
+      has: page.locator(':scope > h2.card__title').filter({ hasText: new RegExp(`^${title}$`) })
+    });
+
+    // Open points group exists but is empty for the fully answered input set.
+    await expect(statusCard('Offen').locator('.result-row')).toHaveCount(0);
+
+    // Passed points are listed compactly in the "Erfüllt" group.
+    await expect(statusCard('Erfüllt').locator('.result-row').first()).toBeVisible();
+
+    // The former standalone "Sicherheitskomponenten" result card is gone; its points live in the planner guidance.
+    const resultColumn = page.locator('#app [data-platform-dynamic="result-saved"]');
+    await expect(resultColumn.locator('.card__title').filter({ hasText: /Sicherheitskomponenten/ })).toHaveCount(0);
+    await expect(resultColumn.locator('.card__title').filter({ hasText: /^Planer-Leitfaden – Statusübersicht$/ })).toHaveCount(1);
+
+    expect(pageErrors).toEqual([]);
+  });
 });

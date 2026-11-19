@@ -6,6 +6,31 @@ const formatNumber = (value, digits = 2) => {
   return new Intl.NumberFormat('de-DE', { maximumFractionDigits: digits, minimumFractionDigits: 0 }).format(value);
 };
 
+const truncate = (value, max = 140) => {
+  const text = String(value ?? '').trim();
+  if (!text) return '–';
+  return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
+};
+
+const sourceSectionOf = item => item?.source?.sourceSection || '';
+
+// Compact display row: title, short status, shortened statement, norm reference.
+// The full requirement text stays in the data model and is only shortened here.
+const compactItemRow = item => {
+  const title = item.title || checkLabel(item.id);
+  const section = sourceSectionOf(item);
+  const statement = item.status === 'passed'
+    ? `${title} erfüllt alle Anforderungen${section ? ` nach ${section}` : ''}`
+    : truncate(item.measure || item.requirement || 'prüfen');
+  return {
+    label: title,
+    value: `${getPlannerGuidanceStatusLabel(item.status)}: ${statement}`,
+    unit: section
+  };
+};
+
+const compactRequirementRow = requirement => compactItemRow(requirement);
+
 const issueRows = calculation => (calculation.inputValidation?.issues || []).map(issue => ({
   label: 'Technische Validierung',
   value: validationIssueLabel(issue)
@@ -40,11 +65,7 @@ const alternativeRiskRows = calculation => {
     rows.push({ label: 'Gewählte Maßnahmen', value: details.selectedMeasures.join(', ') });
   }
   for (const requirement of assessment.requirements || []) {
-    rows.push({
-      label: requirement.title || checkLabel(requirement.id),
-      value: `${statusLabel(requirement.status)}: ${requirement.measure || requirement.requirement || 'prüfen'}`,
-      unit: requirement.source?.sourceSection || ''
-    });
+    rows.push(compactRequirementRow(requirement));
   }
   return rows;
 };
@@ -54,11 +75,7 @@ const consistencyRows = calculation => {
   if (!assessment.requirements?.length) return [];
   return [
     { label: 'Bewertung', value: statusLabel(assessment.status) },
-    ...assessment.requirements.map(requirement => ({
-      label: requirement.title || checkLabel(requirement.id),
-      value: `${statusLabel(requirement.status)}: ${requirement.measure || requirement.requirement || 'prüfen'}`,
-      unit: requirement.source?.sourceSection || ''
-    }))
+    ...assessment.requirements.map(requirement => compactRequirementRow(requirement))
   ];
 };
 
@@ -146,41 +163,32 @@ const ventilationOutputRows = calculation => {
   return rows;
 };
 
-const installationSafetyRows = calculation => {
-  const assessment = calculation.installationSafetyAssessment || {};
-  if (!assessment.requirements?.length) return [];
+// Status-oriented compact overview: open points first, then failures, then passed.
+// Required planning measures stay in their category groups below and are not
+// repeated here in full text. The former "Sicherheitskomponenten" card is
+// integrated into the planner guidance via these groups.
+const statusOverviewGroups = calculation => {
+  const guidance = calculation.plannerGuidance || {};
+  const actionItems = (guidance.groups || []).flatMap(group => group.items || []);
+  const openItems = actionItems.filter(item => item.status === 'not-assessed');
+  const failedItems = actionItems.filter(item => item.status === 'failed');
+  const passedItems = guidance.confirmedItems || [];
   return [
-    { label: 'Bewertung', value: statusLabel(assessment.status) },
-    ...assessment.requirements.map(requirement => ({
-      label: requirement.title || checkLabel(requirement.id),
-      value: `${statusLabel(requirement.status)}: ${requirement.measure || requirement.requirement || 'prüfen'}`,
-      unit: requirement.source?.sourceSection || ''
-    }))
+    { title: 'Offen', rows: openItems.map(item => compactItemRow(item)) },
+    { title: 'Nicht erfüllt', rows: failedItems.map(item => compactItemRow(item)) },
+    { title: 'Erfüllt', rows: passedItems.map(item => compactItemRow(item)) }
   ];
 };
 
 const plannerGuidanceGroups = calculation => {
   const guidance = calculation.plannerGuidance || {};
   const groups = [{ title: 'Planer-Leitfaden – Zusammenfassung', rows: plannerGuidanceSummaryRows(calculation) }];
+  groups.push({ title: 'Planer-Leitfaden – Statusübersicht', groups: statusOverviewGroups(calculation) });
   for (const group of guidance.groups || []) {
-    groups.push({
-      title: `Planer-Leitfaden – ${group.title}`,
-      rows: (group.items || []).map(item => ({
-        label: item.title || checkLabel(item.id),
-        value: `${getPlannerGuidanceStatusLabel(item.status)}: ${item.measure || item.requirement || 'prüfen'}`,
-        unit: item.sourceLabel || ''
-      }))
-    });
-  }
-  if (guidance.confirmedItems?.length) {
-    groups.push({
-      title: 'Planer-Leitfaden – Bestätigte Prüfpunkte',
-      rows: guidance.confirmedItems.map(item => ({
-        label: item.title || checkLabel(item.id),
-        value: `${getPlannerGuidanceStatusLabel(item.status)}: ${item.requirement || item.measure || 'bestätigt'}`,
-        unit: item.sourceLabel || ''
-      }))
-    });
+    if (group.id === 'openPoints') continue; // open points are shown in the "Offen" status group
+    const rows = (group.items || []).map(item => compactItemRow(item));
+    if (!rows.length) continue;
+    groups.push({ title: `Planer-Leitfaden – ${group.title}`, rows });
   }
   return groups;
 };
@@ -205,7 +213,6 @@ export function buildEN378SafetyCheckResultModel(currentState = {}, calculation 
       { title: 'Alternative Vorkehrungen nach EN 378-1 C.3', rows: alternativeRiskRows(calculation) },
       { title: 'Plausibilitätsprüfung der Eingaben', rows: consistencyRows(calculation) },
       { title: 'Lüftungsauslegung Maschinenraum', rows: ventilationOutputRows(calculation) },
-      { title: 'Sicherheitskomponenten nach EN 378-3', rows: installationSafetyRows(calculation) },
       {
         title: 'Aufstellung',
         rows: [
@@ -221,7 +228,7 @@ export function buildEN378SafetyCheckResultModel(currentState = {}, calculation 
       },
       ...plannerGuidanceGroups(calculation),
       { title: 'Technische Validierung', rows: issueRows(calculation) }
-    ].filter(group => Array.isArray(group.rows) && group.rows.length > 0),
+    ].filter(group => (Array.isArray(group.rows) && group.rows.length > 0) || (Array.isArray(group.groups) && group.groups.length > 0)),
     notices: calculation.notices || []
   };
 }

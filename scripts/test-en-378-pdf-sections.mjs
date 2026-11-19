@@ -33,6 +33,12 @@ const mappedSections = reportSections({ reportSource: 'typed-dto', reportDto: dt
 const serialized = JSON.stringify(mappedSections);
 
 assert.equal(sections.length, 9);
+const safetySection = sections.find(section => section.title === '7. Sicherheitskomponenten nach EN 378-3');
+assert.ok(safetySection, 'Abschnitt 7 existiert');
+assert.ok(
+  safetySection.rows.some(row => ['Offen', 'Nicht erfüllt', 'Erforderliche Maßnahmen', 'Erfüllt'].includes(row[0])),
+  'Abschnitt 7 gruppiert die Prüfpunkte nach Status (Kopfzeilen Offen/Nicht erfüllt/Erforderliche Maßnahmen/Erfüllt).'
+);
 assert.equal(sections[0].title, '1. Berichtszusammenfassung');
 assert.ok(mappedSections.some(section => section.title === '6. Plausibilitätsprüfung der Eingaben'));
 assert.ok(mappedSections.some(section => section.title === '8. Planer-Leitfaden'));
