@@ -156,6 +156,27 @@ test.describe('EN 378 machinery-room inputs commit to module state', () => {
     await expect(resultColumn.locator('.card__title').filter({ hasText: /Sicherheitskomponenten/ })).toHaveCount(0);
     await expect(resultColumn.locator('.card__title').filter({ hasText: /^Planer-Leitfaden – Statusübersicht$/ })).toHaveCount(1);
 
+    // Kein Punkt-Titel darf im Ergebnisbereich doppelt erscheinen: Erfüllte Punkte
+    // stehen ausschließlich in der Statusübersichtsgruppe "Erfüllt".
+    const allRowLabels = await resultColumn.locator('.result-row > span').allTextContents();
+    const fulfilledLabels = await statusCard('Erfüllt').locator('.result-row > span').allTextContents();
+    expect(fulfilledLabels.length).toBeGreaterThan(0);
+    for (const label of fulfilledLabels) {
+      expect(allRowLabels.filter(text => text === label), `Punkt-Titel nur einmal gerendert: ${label}`).toHaveLength(1);
+    }
+
+    // Jede erfüllte Zeile führt die Normfundstelle genau einmal - in der Quellspalte,
+    // nicht zusätzlich im Satz.
+    const fulfilledRows = statusCard('Erfüllt').locator('.result-row');
+    const fulfilledRowCount = await fulfilledRows.count();
+    expect(fulfilledRowCount).toBeGreaterThan(0);
+    for (let i = 0; i < fulfilledRowCount; i += 1) {
+      const row = fulfilledRows.nth(i);
+      const unit = (await row.locator('small').textContent() || '').trim();
+      const valueText = await row.locator('strong').evaluate(el => [...el.childNodes].filter(node => node.nodeType === 3).map(node => node.textContent).join(''));
+      if (unit) expect(valueText.includes(unit), `Fundstelle ${unit} nur in der Quellspalte, nicht im Satz`).toBe(false);
+    }
+
     expect(pageErrors).toEqual([]);
   });
 

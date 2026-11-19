@@ -21,7 +21,7 @@ const compactItemRow = item => {
   const title = item.title || checkLabel(item.id);
   const section = sourceSectionOf(item);
   const statement = item.status === 'passed'
-    ? `${title} erfüllt alle Anforderungen${section ? ` nach ${section}` : ''}`
+    ? `${title} erfüllt alle Anforderungen`
     : truncate(item.measure || item.requirement || 'prüfen');
   return {
     label: title,
@@ -217,7 +217,7 @@ const plannerGuidanceGroups = (calculation, displayState) => {
   groups.push({ title: 'Planer-Leitfaden – Statusübersicht', groups: statusOverviewGroups(calculation, displayState) });
   for (const group of guidance.groups || []) {
     if (group.id === 'openPoints') continue; // open points are shown in the "Offen" status group
-    const rows = (group.items || []).map(item => compactItemRow(item));
+    const rows = (group.items || []).filter(item => item.status !== 'passed').map(item => compactItemRow(item));
     if (!rows.length) continue;
     groups.push({ title: `Planer-Leitfaden – ${group.title}`, rows });
   }
