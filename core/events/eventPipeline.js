@@ -220,6 +220,24 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   const cleanup = [];
   let hasDeferredInput = false;
   let pendingRaf = 0;
+  // Keyboard-vs-pointer marker for select commits: arrow-key changes on a focused
+  // select keep focus across the notify render (desktop Tab/Enter navigation),
+  // while touch/pointer commits blur the control so mobile browsers do not
+  // re-open the native picker dialog after every selection. The marker lives in
+  // this binding lifecycle, is cleared on pointer interaction with a select and
+  // expires, so stale state never survives across interactions.
+  const SELECT_KEYBOARD_KEYS = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' ', 'Spacebar']);
+  let selectKeyboardInteractionAt = 0;
+  const markSelectKeyboardInteraction = () => { selectKeyboardInteractionAt = Date.now(); };
+  const clearSelectKeyboardInteraction = () => { selectKeyboardInteractionAt = 0; };
+  const isSelectKeyboardInteraction = () => {
+    if (!selectKeyboardInteractionAt) return false;
+    if (Date.now() - selectKeyboardInteractionAt > 1000) {
+      selectKeyboardInteractionAt = 0;
+      return false;
+    }
+    return true;
+  };
   const notifyCommit = payload => {
     if (typeof options.onCommit === 'function') options.onCommit(payload);
   };
@@ -248,9 +266,16 @@ export function bindCentralEventPipeline(root, state, options = {}) {
       const deferRender = el.dataset.render === 'defer';
       const commit = () => commitElementField(state, el, { action: 'field:input:select', notify: !deferRender, root });
       // Arrow-key changes on a focused select fire input already; keep focus on the
-      // same control across the notify render instead of losing it.
-      if (!deferRender) preserveFocusDuring(root, commit, { skipSelect: false });
-      else commit();
+      // same control across the notify render instead of losing it. Touch/pointer
+      // commits commit directly and blur the select: a programmatic focus on a
+      // select re-opens the native picker dialog on iOS/Android.
+      if (!deferRender) {
+        if (isSelectKeyboardInteraction()) preserveFocusDuring(root, commit, { skipSelect: false });
+        else {
+          commit();
+          el.blur();
+        }
+      } else commit();
       hasDeferredInput = false;
       notifyCommit({ action: 'field:input:select', element: el });
       return;
@@ -269,8 +294,14 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     // Arrow-key changes on a focused select fire change already; keep focus on the
     // re-rendered control (preserveFocusDuring re-focuses it, safeReplaceContent
     // restores it as the previously active select) instead of blurring it.
-    if (el.matches('select') && shouldNotify) preserveFocusDuring(root, commit, { skipSelect: false });
-    else commit();
+    // Touch/pointer commits blur the select so the native picker does not re-open.
+    if (el.matches('select') && shouldNotify) {
+      if (isSelectKeyboardInteraction()) preserveFocusDuring(root, commit, { skipSelect: false });
+      else {
+        commit();
+        el.blur();
+      }
+    } else commit();
     if (el.matches('select')) {
       // Select controls do not open the software keyboard on mobile Safari.
       // Keep the global module navigation visible after picker-based commits.
@@ -481,6 +512,15 @@ export function bindCentralEventPipeline(root, state, options = {}) {
   add(root, 'change', onChange, true);
   add(root, 'blur', onBlur, true);
   add(root, 'keydown', onKeydown, true);
+  add(root, 'keydown', event => {
+    if (!SELECT_KEYBOARD_KEYS.has(event.key)) return;
+    if (event.target?.closest?.('select[data-field]') && root.contains(event.target)) markSelectKeyboardInteraction();
+  }, true);
+  const onSelectPointerStart = event => {
+    if (event.target?.closest?.('select[data-field]')) clearSelectKeyboardInteraction();
+  };
+  add(root, 'pointerdown', onSelectPointerStart, true);
+  add(root, 'touchstart', onSelectPointerStart, true);
   add(root, 'pointerup', onPointerSegment, true);
   add(root, 'touchstart', event => {
     beginTouchGesture(root, event);
