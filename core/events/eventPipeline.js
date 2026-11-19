@@ -246,7 +246,11 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     if (!el || !root.contains(el)) return;
     if (el.matches('select')) {
       const deferRender = el.dataset.render === 'defer';
-      commitElementField(state, el, { action: 'field:input:select', notify: !deferRender, root });
+      const commit = () => commitElementField(state, el, { action: 'field:input:select', notify: !deferRender, root });
+      // Arrow-key changes on a focused select fire input already; keep focus on the
+      // same control across the notify render instead of losing it.
+      if (!deferRender) preserveFocusDuring(root, commit, { skipSelect: false });
+      else commit();
       hasDeferredInput = false;
       notifyCommit({ action: 'field:input:select', element: el });
       return;
@@ -261,9 +265,13 @@ export function bindCentralEventPipeline(root, state, options = {}) {
     const deferRender = el.dataset.commit === 'defer' || el.dataset.render === 'defer';
     const immediateCommit = el.matches('select') || el.dataset.commit === 'immediate' || el.dataset.lookup === 'true';
     const shouldNotify = immediateCommit && !deferRender;
-    commitElementField(state, el, { action: immediateCommit ? 'field:change:immediate' : 'field:change', notify: shouldNotify, root });
+    const commit = () => commitElementField(state, el, { action: immediateCommit ? 'field:change:immediate' : 'field:change', notify: shouldNotify, root });
+    // Arrow-key changes on a focused select fire change already; keep focus on the
+    // re-rendered control (preserveFocusDuring re-focuses it, safeReplaceContent
+    // restores it as the previously active select) instead of blurring it.
+    if (el.matches('select') && shouldNotify) preserveFocusDuring(root, commit, { skipSelect: false });
+    else commit();
     if (el.matches('select')) {
-      try { el.blur(); } catch { /* native select may not allow blur in all runtimes */ }
       // Select controls do not open the software keyboard on mobile Safari.
       // Keep the global module navigation visible after picker-based commits.
       if (document?.body) document.body.classList.remove('tc-keyboard-open');
