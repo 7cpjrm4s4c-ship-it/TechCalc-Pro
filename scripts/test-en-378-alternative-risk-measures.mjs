@@ -99,4 +99,30 @@ const c31Violation = calculate({ ...baseState, refrigerantId: 'R-290' });
 const c31Failed = c31Violation.installationSafetyAssessment.requirements.find(item => item.id === 'alternative-precautions.c3-1-refrigerant-class');
 assert.equal(c31Failed.status, 'failed', 'R-290 (A3) verletzt die C.3.1-Kältemittelbedingung');
 
+// EN 378-3 Abschnitte 8 und 9: Maßnahme "Alarmierung" nur PASSED, wenn Auslösehardware
+// (Gaswarnsystem oder Detektor) UND unabhängige Stromversorgung vorhanden sind.
+const alarmPassed = alternativeAssessment.requirements.find(item => item.id === 'alternative-precautions.alarm');
+assert.ok(alarmPassed, 'Alarmierungs-Maßnahme muss bewertet werden');
+assert.equal(alarmPassed.status, 'passed', 'Gaswarnsystem + Detektor + unabhängige Stromversorgung -> PASSED');
+assert.deepEqual(alarmPassed.missingInputs, []);
+
+const alarmNoTriggerState = { ...baseState, hasGasWarningSystem: 'no', hasDetector: 'no', hasAlarm: 'yes', hasIndependentAlarmPower: 'yes' };
+const alarmNoTrigger = assessAlternativeRiskMeasures(alarmNoTriggerState, assessChargeLimit(alarmNoTriggerState));
+const alarmFailed = alarmNoTrigger.requirements.find(item => item.id === 'alternative-precautions.alarm');
+assert.ok(alarmFailed);
+assert.equal(alarmFailed.status, 'failed', 'Alarm ohne Gaswarnanlage und ohne Detektor darf nicht PASSED sein');
+assert.deepEqual([...alarmFailed.missingInputs].sort(), ['hasDetector', 'hasGasWarningSystem']);
+
+const alarmNoTriggerNoPowerState = { ...alarmNoTriggerState, hasIndependentAlarmPower: 'no' };
+const alarmNoTriggerNoPower = assessAlternativeRiskMeasures(alarmNoTriggerNoPowerState, assessChargeLimit(alarmNoTriggerNoPowerState));
+const alarmFailed2 = alarmNoTriggerNoPower.requirements.find(item => item.id === 'alternative-precautions.alarm');
+assert.equal(alarmFailed2.status, 'failed');
+assert.deepEqual([...alarmFailed2.missingInputs].sort(), ['hasDetector', 'hasGasWarningSystem', 'hasIndependentAlarmPower']);
+
+const alarmDetectorOnlyState = { ...baseState, hasGasWarningSystem: 'no', hasDetector: 'yes', hasAlarm: 'yes', hasIndependentAlarmPower: 'yes' };
+const alarmDetectorOnly = assessAlternativeRiskMeasures(alarmDetectorOnlyState, assessChargeLimit(alarmDetectorOnlyState));
+const alarmPassed2 = alarmDetectorOnly.requirements.find(item => item.id === 'alternative-precautions.alarm');
+assert.equal(alarmPassed2.status, 'passed', 'Detektor allein genügt als Auslösehardware');
+assert.deepEqual(alarmPassed2.missingInputs, []);
+
 console.log('EN 378 alternative risk measure tests passed.');

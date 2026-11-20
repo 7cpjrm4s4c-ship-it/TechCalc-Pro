@@ -118,4 +118,18 @@ assert.equal(comfortAbove.rule, 'comfort-application-c2-or-c3');
 assert.equal(comfortAbove.details.exceeded, true);
 assert.equal(comfortAbove.details.equationApplies, true, 'R-32: M = 52 g/mol > 42 g/mol');
 
+// EN 378-3 Abschnitte 8 und 9: hasAlarm/hasIndependentAlarmPower sind nur schaltbar, wenn
+// eine Auslösehardware (Gaswarnsystem oder Detektor) vorhanden ist; sonst deaktiviert.
+const hasAlarmField = schema.fields.find(field => field.key === 'hasAlarm');
+const hasAlarmPowerField = schema.fields.find(field => field.key === 'hasIndependentAlarmPower');
+assert.equal(typeof hasAlarmField.disabled, 'function');
+assert.equal(typeof hasAlarmPowerField.disabled, 'function');
+assert.equal(hasAlarmField.disabled({ hasGasWarningSystem: 'no', hasDetector: 'no' }), true, 'ohne Auslösehardware deaktiviert');
+assert.equal(hasAlarmField.disabled({ hasGasWarningSystem: 'yes', hasDetector: 'no' }), false);
+assert.equal(hasAlarmField.disabled({ hasGasWarningSystem: 'no', hasDetector: 'yes' }), false);
+assert.equal(hasAlarmField.disabled({ hasGasWarningSystem: '', hasDetector: '' }), true, 'unbeantwortet gilt als keine Auslösehardware');
+assert.equal(hasAlarmPowerField.disabled({ hasGasWarningSystem: 'no', hasDetector: 'no' }), true);
+assert.equal(hasAlarmPowerField.disabled({ hasGasWarningSystem: 'yes' }), false);
+assert.equal(hasAlarmPowerField.disabled({ hasDetector: 'yes' }), false);
+
 console.log('EN 378 contextual input tests passed.');

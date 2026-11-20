@@ -108,6 +108,18 @@ export function assessStateConsistency(currentState = {}) {
     }));
   }
 
+  // EN 378-3 Abschnitte 8 und 9: Alarmierung ohne Gaswarnanlage und ohne Detektor ist
+  // unplausibel - ohne Auslösehardware kann der Alarm nicht ausgelöst werden.
+  if ((yes(currentState.hasAlarm) || yes(currentState.hasIndependentAlarmPower)) &&
+      text(currentState.hasGasWarningSystem) === 'no' && text(currentState.hasDetector) === 'no') {
+    requirements.push(consistencyRequirement({
+      id: 'state-consistency.alarm-without-trigger-hardware',
+      title: 'Alarmierung ohne Gaswarnanlage und ohne Detektor',
+      requirement: 'Eine Alarmierung nach EN 378-3 Abschnitt 8 muss durch ein Gaswarnsystem (Detektor nach Abschnitt 9) ausgelöst werden; ohne Gaswarnanlage und ohne Detektor ist keine Auslösehardware vorhanden.',
+      measure: 'Gaswarnanlage oder Kältemitteldetektor vorsehen oder Alarmierung und unabhängige Alarmstromversorgung auf „Nein“ setzen.'
+    }));
+  }
+
   return Object.freeze({
     status: requirements.length ? STATE_CONSISTENCY_STATUS.FAILED : STATE_CONSISTENCY_STATUS.PASSED,
     requirements: Object.freeze(requirements),

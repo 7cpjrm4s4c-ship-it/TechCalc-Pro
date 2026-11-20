@@ -168,17 +168,25 @@ function selectedMeasureRequirements({ measures, details, state }) {
     }));
   }
   if (measures.some(item => item.field === 'hasAlarm' && item.selected)) {
+    // EN 378-3 Abschnitte 8 und 9: Der Alarm muss durch ein Gaswarnsystem (Detektor nach
+    // Abschnitt 9) ausgelöst werden; ohne Auslösehardware darf die Maßnahme nicht PASSED sein.
+    const alarmTriggerHardware = yes(state.hasGasWarningSystem) || yes(state.hasDetector);
+    const alarmPower = yes(state.hasIndependentAlarmPower);
+    const alarmMissing = [
+      ...(alarmTriggerHardware ? [] : ['hasGasWarningSystem', 'hasDetector']),
+      ...(alarmPower ? [] : ['hasIndependentAlarmPower'])
+    ];
     requirements.push(buildRequirement({
       id: 'alternative-precautions.alarm',
       category: 'alarm',
       title: 'Alarmierung als alternative Vorkehrung',
-      requirement: 'Bei Nutzung der Alarmierung als Sicherheitsmaßnahme muss das Alarmsystem Personen warnen und befugte Personen alarmieren. Die Stromversorgung des Alarmsystems muss von der mechanischen Lüftung und der Kälteanlage unabhängig sein.',
-      measure: yes(state.hasIndependentAlarmPower)
-        ? 'Alarmierung mit unabhängiger Stromversorgung dokumentieren.'
-        : 'Alarmierung mit unabhängiger Stromversorgung oder geeigneter Zusatzstromversorgung ausstatten.',
+      requirement: 'Bei Nutzung der Alarmierung als Sicherheitsmaßnahme muss das Alarmsystem Personen warnen und befugte Personen alarmieren; es muss durch ein Gaswarnsystem bzw. einen Detektor nach EN 378-3 Abschnitt 9 ausgelöst werden. Die Stromversorgung des Alarmsystems muss von der mechanischen Lüftung und der Kälteanlage unabhängig sein.',
+      measure: alarmTriggerHardware && alarmPower
+        ? 'Alarmierung mit Auslösehardware (Gaswarnanlage oder Detektor) und unabhängiger Stromversorgung dokumentieren.'
+        : 'Gaswarnanlage oder Kältemitteldetektor als Auslösehardware und unabhängige Stromversorgung des Alarmsystems vorsehen.',
       source: SOURCE.alarms,
-      status: yes(state.hasIndependentAlarmPower) ? ALTERNATIVE_RISK_MEASURE_STATUS.PASSED : ALTERNATIVE_RISK_MEASURE_STATUS.FAILED,
-      missingInputs: yes(state.hasIndependentAlarmPower) ? [] : ['hasIndependentAlarmPower'],
+      status: alarmTriggerHardware && alarmPower ? ALTERNATIVE_RISK_MEASURE_STATUS.PASSED : ALTERNATIVE_RISK_MEASURE_STATUS.FAILED,
+      missingInputs: alarmMissing,
       details
     }));
   }

@@ -123,6 +123,7 @@ const CHECK_LABELS = Object.freeze({
   'occupied-space.gas-warning-details': 'Detailfragen zum Gaswarnsystem beantworten',
   'detector.response-time': 'Detektor-Ansprechzeit festlegen',
   'alarm.limited-mobility': 'Alarm bei eingeschränkter Bewegungsfähigkeit nicht als einzige Maßnahme',
+  'alarm.trigger-hardware': 'Auslösehardware (Gaswarnanlage oder Detektor) für die Alarmierung',
   'alternative-precautions.c3-1-refrigerant-class': 'C.3.1: Nur Kältemittel A1 oder A2L zulässig',
   'alternative-precautions.c3-1-charge-cap': 'C.3.1: Füllmengen-Deckel einhalten',
   'alternative-precautions.c3-1-installation-class': 'C.3.1: Aufstellungsort-Klassifikation prüfen',

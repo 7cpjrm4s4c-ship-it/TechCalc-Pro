@@ -67,4 +67,39 @@ assert.ok(classIvOutdoor.requirements.some(item => item.id === 'state-consistenc
 const classIvOccupied = assessStateConsistency({ ...baseState, installationLocation: 'occupied-space', installationClass: 'IV' });
 assert.equal(classIvOccupied.status, 'passed', 'Klasse IV im Personen-Aufenthaltsbereich bleibt zulässig');
 
+// EN 378-3 Abschnitte 8 und 9: Alarmierung ohne Gaswarnanlage und ohne Detektor ist ein
+// Konflikt (keine Auslösehardware vorhanden) und darf nicht zur Gesamtbewertung "acceptable" führen.
+const alarmNoHardwareState = {
+  ...baseState,
+  installationLocation: 'occupied-space',
+  installationClass: 'I',
+  hasGasWarningSystem: 'no',
+  hasDetector: 'no',
+  hasAlarm: 'yes',
+  hasIndependentAlarmPower: 'yes'
+};
+const alarmNoHardware = assessStateConsistency(alarmNoHardwareState);
+assert.equal(alarmNoHardware.status, 'failed');
+assert.ok(alarmNoHardware.requirements.some(item => item.id === 'state-consistency.alarm-without-trigger-hardware'));
+
+const alarmNoHardwareCalc = calculate(alarmNoHardwareState);
+assert.equal(alarmNoHardwareCalc.stateConsistencyAssessment.status, 'failed');
+assert.notEqual(alarmNoHardwareCalc.status, 'acceptable', 'Gesamtbewertung darf bei Alarm ohne Auslösehardware nicht "acceptable" sein');
+const triggerHardware = alarmNoHardwareCalc.installationSafetyAssessment.requirements.find(item => item.id === 'alarm.trigger-hardware');
+assert.ok(triggerHardware, 'Alarmblock muss Auslösehardware-Prüfung enthalten');
+assert.equal(triggerHardware.status, 'failed');
+assert.equal(triggerHardware.source.sourcePart, 'EN 378-3');
+assert.equal(triggerHardware.source.sourceSection, '8 und 9');
+assert.deepEqual([...triggerHardware.missingInputs].sort(), ['hasDetector', 'hasGasWarningSystem']);
+
+// Positivfall: Detektor als Auslösehardware -> konsistent, kein Konflikt
+const alarmWithDetector = assessStateConsistency({ ...alarmNoHardwareState, hasDetector: 'yes' });
+assert.equal(alarmWithDetector.status, 'passed');
+const alarmWithGasWarning = assessStateConsistency({ ...alarmNoHardwareState, hasGasWarningSystem: 'yes' });
+assert.equal(alarmWithGasWarning.status, 'passed');
+// Nur unabhängige Alarmstromversorgung ohne Auslösehardware -> ebenfalls Konflikt
+const powerOnly = assessStateConsistency({ ...alarmNoHardwareState, hasAlarm: 'no', hasIndependentAlarmPower: 'yes' });
+assert.equal(powerOnly.status, 'failed');
+assert.ok(powerOnly.requirements.some(item => item.id === 'state-consistency.alarm-without-trigger-hardware'));
+
 console.log('EN 378 state consistency tests passed.');

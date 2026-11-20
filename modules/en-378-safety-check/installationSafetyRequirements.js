@@ -839,7 +839,7 @@ function buildAlarmRequirements(state, safetyData, chargeLimitAssessment) {
   const detectorRequired = buildDetectorRequirements(state, safetyData, chargeLimitAssessment).length > 0;
   const alarmRequired = state.installationLocation === 'outdoor'
     ? detectorRequired || yes(state.hasAlarm)
-    : detectorRequired || yes(state.hasGasWarningSystem) || yes(state.hasDetector) || isR717(safetyData);
+    : detectorRequired || yes(state.hasGasWarningSystem) || yes(state.hasDetector) || yes(state.hasAlarm) || isR717(safetyData);
   if (!alarmRequired) return requirements;
 
   requirements.push(checkBoolean({
@@ -860,6 +860,21 @@ function buildAlarmRequirements(state, safetyData, chargeLimitAssessment) {
     source: SOURCE.alarms,
     value: state.hasIndependentAlarmPower
   }));
+  // EN 378-3 Abschnitte 8 und 9: Ein Alarm muss durch ein Gaswarnsystem (Detektor nach
+  // Abschnitt 9) ausgelöst werden. Ohne Gaswarnanlage und ohne Detektor ist keine
+  // Auslösehardware vorhanden - die Angabe "Alarmierung vorhanden" allein ist unplausibel.
+  if (yes(state.hasAlarm) && !yes(state.hasGasWarningSystem) && !yes(state.hasDetector)) {
+    requirements.push(required({
+      id: 'alarm.trigger-hardware',
+      category: 'alarm',
+      title: 'Auslösehardware für die Alarmierung vorhanden',
+      requirement: 'Ein Alarm nach EN 378-3 Abschnitt 8 muss durch ein Gaswarnsystem mit Detektor nach Abschnitt 9 ausgelöst werden. Ohne Gaswarnanlage und ohne Detektor ist keine Auslösehardware vorhanden.',
+      measure: 'Gaswarnanlage oder Kältemitteldetektor vorsehen, der den Alarm auslöst, oder die Alarmierung auf „Nein“ setzen.',
+      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '8 und 9' }),
+      status: REQUIREMENT_STATUS.FAILED,
+      missingInputs: ['hasGasWarningSystem', 'hasDetector']
+    }));
+  }
   if (state.installationLocation === 'machinery-room' && state.machineryRoomRiskAnalysisResult === 'yes') {
     requirements.push(required({
       id: 'alarm.machinery-room-inside-outside',
