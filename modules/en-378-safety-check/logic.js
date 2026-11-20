@@ -15,7 +15,7 @@ import {
   HINWEIS_B,
   MACHINERY_ROOM_NOTICE
 } from './machineryRoomRiskAnalysis.js';
-const ACCESS_CATEGORY_BY_ACCESS_AREA = Object.freeze({
+export const ACCESS_CATEGORY_BY_ACCESS_AREA = Object.freeze({
   'general-access': 'a',
   'supervised-access': 'b',
   'authorized-access': 'c'

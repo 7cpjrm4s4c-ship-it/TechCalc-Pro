@@ -51,6 +51,10 @@ function isOccupiedSpace(state = {}) {
   return text(state.installationLocation) === 'occupied-space';
 }
 
+function isVentilatedEnclosure(state = {}) {
+  return text(state.installationLocation) === 'ventilated-enclosure';
+}
+
 export function assessStateConsistency(currentState = {}) {
   const requirements = [];
   const installationClass = text(currentState.installationClass);
@@ -84,12 +88,14 @@ export function assessStateConsistency(currentState = {}) {
     }));
   }
 
-  if (installationClass === 'IV' && !isOccupiedSpace(currentState)) {
+  // Klasse IV (belüftetes Gehäuse) ist nur im Personen-Aufenthaltsbereich zulässig;
+  // der Aufstellort "belüftetes Gehäuse" ist die explizite Angabe dieser Kombination.
+  if (installationClass === 'IV' && !isOccupiedSpace(currentState) && !isVentilatedEnclosure(currentState)) {
     requirements.push(consistencyRequirement({
       id: 'state-consistency.class-iv-location',
       title: 'Klasse IV mit Personen-Aufenthaltsbereich abgleichen',
-      requirement: 'Klasse IV beschreibt ein belüftetes Gehäuse.',
-      measure: 'Aufstellort auf einen passenden Aufstellort ändern oder eine passende Aufstellungsort-Klassifikation wählen.'
+      requirement: 'Klasse IV beschreibt ein belüftetes Gehäuse im Personen-Aufenthaltsbereich.',
+      measure: 'Aufstellort auf Personen-Aufenthaltsbereich oder belüftetes Gehäuse ändern oder eine passende Aufstellungsort-Klassifikation wählen.'
     }));
   }
 

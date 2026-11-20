@@ -28,6 +28,7 @@ const OPTIONS = Object.freeze({
   'technical-room': 'technischer Raum',
   'machinery-room': 'Maschinenraum',
   outdoor: 'Außenaufstellung',
+  'ventilated-enclosure': 'Belüftetes Gehäuse',
   I: 'Klasse I – Mechanische Geräte im Personen-Aufenthaltsbereich',
   II: 'Klasse II – Verdichter im Maschinenraum oder im Freien',
   III: 'Klasse III – Maschinenraum oder im Freien',

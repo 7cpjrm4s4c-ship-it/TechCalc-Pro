@@ -1,9 +1,10 @@
 import { defineFormSchema, FIELD_TYPES } from '../../core/ui/formSchema.js';
 import { getEN378SafetyData } from '../../core/data/index.js';
 import { buildFGasesImportOptions, hasAnyFGasesSavedSystem, hasMultipleFGasesSavedSystems, IMPORT_ACTION } from './importController.js';
+import { ACCESS_CATEGORY_BY_ACCESS_AREA } from './logic.js';
 
 const option = (value, label) => Object.freeze({ value, label });
-const accessCategoryByAccessArea = Object.freeze({ 'general-access': 'a', 'supervised-access': 'b', 'authorized-access': 'c' });
+const accessCategoryByAccessArea = ACCESS_CATEGORY_BY_ACCESS_AREA;
 const isMachineryRoom = state => state.installationLocation === 'machinery-room';
 const yes = value => value === true || value === 'yes';
 const isMachineryRoomRiskAnalysisYes = state => state.installationLocation === 'machinery-room' && state.machineryRoomRiskAnalysisResult === 'yes';
@@ -33,8 +34,15 @@ const needsExplosionEquipment = state => isMachineryRoom(state) && ['R-32', 'R32
 const needsLegacyAccessCategoryField = state => !accessCategoryByAccessArea[state.accessArea] && Boolean(state.accessCategory);
 
 const installationLocationOptions = Object.freeze([
-  option('', 'Nicht angegeben'), option('occupied-space', 'Aufenthaltsbereich'), option('technical-room', 'Technischer Raum'), option('machinery-room', 'Maschinenraum'), option('outdoor', 'Außenaufstellung')
+  option('', 'Nicht angegeben'), option('occupied-space', 'Aufenthaltsbereich'), option('technical-room', 'Technischer Raum'), option('machinery-room', 'Maschinenraum'), option('outdoor', 'Außenaufstellung'), option('ventilated-enclosure', 'Belüftetes Gehäuse')
 ]);
+// Normativ zulässige Kombinationen aus Aufstellort und Aufstellungsort-Klasse
+// (EN 378-1, Abschnitt 5): Klasse I nur bei kältemittelführenden Teilen im
+// Personen-Aufenthaltsbereich; Klasse II nur bei Verdichtern und Druckbehältern
+// im Maschinenraum oder im Freien; Klasse III nur bei vollständiger Aufstellung
+// in Maschinenraum oder im Freien; Klasse IV nur im belüfteten Gehäuse im
+// Personen-Aufenthaltsbereich. Die Plausibilitätsprüfung (stateConsistency.js)
+// wertet II, III und IV gegen den Aufstellort aus.
 const installationClassOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('I', 'Klasse I – Mechanische Geräte im Personen-Aufenthaltsbereich'), option('II', 'Klasse II – Verdichter im Maschinenraum oder im Freien'), option('III', 'Klasse III – Maschinenraum oder im Freien'), option('IV', 'Klasse IV – Belüftetes Gehäuse')
 ]);
@@ -92,6 +100,7 @@ const schema = defineFormSchema({
     { key: 'usageType', label: 'Nutzung', type: FIELD_TYPES.SELECT, options: usageTypeOptions },
     { key: 'applicationType', label: 'Anwendungsart', type: FIELD_TYPES.SELECT, options: applicationTypeOptions },
     { key: 'locationLevel', label: 'Geschoss oder Lage', type: FIELD_TYPES.SELECT, options: locationLevelOptions },
+    // Die gesonderte Kellergeschoss-Abfrage ist beabsichtigt: Für den Maschinenraum-Pfad (EN 378-3, 4.3) ist die Unterscheidung unterirdischer Geschosse normativ erforderlich und darf nicht aus der Geschosslage allein abgeleitet werden.
     { key: 'isBasementLocation', label: 'Kellergeschoss', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => state.locationLevel === 'upper-no-emergency-exit-or-basement' },
     { key: 'occupantDensityBelowOnePer10m2', label: 'Personendichte kleiner als eine Person je 10 m²', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => ['b', 'c'].includes(accessCategoryByAccessArea[state.accessArea] || state.accessCategory) },
     { key: 'hasEmergencyExits', label: 'Notausgänge vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => (accessCategoryByAccessArea[state.accessArea] || state.accessCategory) === 'c' },
@@ -101,9 +110,11 @@ const schema = defineFormSchema({
     { key: 'floorAreaM2', label: 'Raumfläche', type: FIELD_TYPES.DECIMAL, unit: 'm²', visibleWhen: isHumanComfort },
     { key: 'isFactorySealed', label: 'Werkseitig dauerhaft geschlossen', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isHumanComfort },
     { key: 'mountingType', label: 'Montageart', type: FIELD_TYPES.SELECT, options: mountingTypeOptions, visibleWhen: needsMountingType },
+    // ventilationType und hasMechanicalVentilation bleiben beide bestehen, da sie normativ Verschiedenes aussagen: ventilationType wird im Außenpfad (EN 378-3, 5.13.5) und im Maschinenraumpfad (4.3) benötigt; hasMechanicalVentilation gehört ausschließlich zur Sicherheitsmaßnahme mechanische Lüftung der alternativen Vorkehrungen (EN 378-3, 6.3.3, C.3-Pfad). Widersprüche (ventilationType 'none' bei hasMechanicalVentilation 'yes') wertet die Plausibilitätsprüfung als Konflikt aus.
     { key: 'ventilationType', label: 'Lüftung', type: FIELD_TYPES.SELECT, options: ventilationTypeOptions },
     { key: 'limitInfo', label: 'Hinweis zu Grenzwerten', type: FIELD_TYPES.NOTICE, text: 'RCL ist der Kältemittel-Konzentrationsgrenzwert. QLMV beschreibt den Grenzwert für Mindestlüftung. QLAV beschreibt den Grenzwert für zusätzliche Lüftung. Diese Werte werden nur angezeigt, wenn sie für die Bewertung benötigt werden.', tone: 'compact', visibleWhen: usesAlternativeRiskManagement },
-    { key: 'hasGasWarningSystem', label: 'Gaswarnsystem vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions },{ key: 'machineryRoomOccupied', label: 'Personenaufenthalt im Maschinenraum möglich', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isMachineryRoomRiskAnalysisYes },
+    { key: 'hasGasWarningSystem', label: 'Gaswarnsystem vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions },
+    { key: 'machineryRoomOccupied', label: 'Personenaufenthalt im Maschinenraum möglich', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isMachineryRoomRiskAnalysisYes },
     { key: 'machineryRoomRequiredAirChangeAchievable', label: 'Erforderlicher vierfacher Luftwechsel erreichbar', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isMachineryRoomRiskAnalysisYes(state) && yes(state.machineryRoomOccupied) },
     { key: 'machineryRoomEmergencyFanSuitable', label: 'Notentlüftungsventilator geeignet', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isMachineryRoomRiskAnalysisYes(state) && isFlammable(state) },
     { key: 'machineryRoomR717ContainmentProvided', label: 'Auffangsystem für R-717 vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isMachineryRoomRiskAnalysisYes(state) && state.refrigerantId === 'R-717' },

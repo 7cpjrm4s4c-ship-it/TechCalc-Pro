@@ -67,19 +67,8 @@ function checkBoolean({ id, category, title, requirement, measure, source, value
   });
 }
 
-export function calculateDilutionOpeningArea({ chargeKg, roomVolumeM3, qlmvKgM3 } = {}) {
-  const charge = numberOrNull(chargeKg);
-  const volume = numberOrNull(roomVolumeM3);
-  const qlmv = numberOrNull(qlmvKgM3);
-  if (charge == null || charge <= 0 || volume == null || volume <= 0 || qlmv == null || qlmv <= 0) return null;
-  return round((0.0032 * charge) / (qlmv * volume), 5);
-}
-
-export function calculateAlternativeMechanicalVentilationFlow({ rclKgM3 } = {}) {
-  const rcl = numberOrNull(rclKgM3);
-  if (rcl == null || rcl <= 0) return null;
-  return round(10 / rcl, 1);
-}
+import { calculateDilutionOpeningArea, calculateAlternativeMechanicalVentilationFlow } from './ventilationMeasures.js';
+export { calculateDilutionOpeningArea, calculateAlternativeMechanicalVentilationFlow } from './ventilationMeasures.js';
 
 export function calculateDetectorPreset({ safetyData } = {}) {
   const lfl = numberOrNull(safetyData?.lflKgM3);
@@ -292,6 +281,25 @@ function buildArrangementRequirements(state, safetyData) {
       measure: 'Detektion und Alarmierung nach EN 378-3 Abschnitt 8 und 9 in die Planung aufnehmen.',
       source: SOURCE.arrangement
     }));
+    // Ableitung Gaswarnsystem (EN 378-3, Abschnitte 8 und 9): Bei hasGasWarningSystem 'yes'
+    // müssen die Detailfragen zu Detektor und Alarm beantwortet sein, bevor der Leitfaden
+    // als belastbar gilt. Bei 'no' bleiben die normativen Detektorprüfungen nach Abschnitt 9
+    // unverändert über den Konzentrationsträger (praktischer Grenzwert) ausgelöst.
+    if (yes(state.hasGasWarningSystem)) {
+      const missingGasWarningDetails = ['hasDetector', 'hasAlarm'].filter(field => !hasAnswer(state[field]));
+      if (missingGasWarningDetails.length) {
+        requirements.push(required({
+          id: 'occupied-space.gas-warning-details',
+          category: 'detection',
+          title: 'Detailfragen zum Gaswarnsystem beantworten',
+          requirement: 'Ist ein Gaswarnsystem vorhanden, müssen die Detailfragen zu Detektor und Alarmierung beantwortet sein, bevor der Leitfaden als belastbar gilt.',
+          measure: 'Detailfragen zu Detektor und Alarmierung beantworten.',
+          source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '8 / 9' }),
+          status: REQUIREMENT_STATUS.NOT_ASSESSED,
+          missingInputs: missingGasWarningDetails
+        }));
+      }
+    }
   }
   if (state.installationLocation === 'technical-room') {
     requirements.push(required({

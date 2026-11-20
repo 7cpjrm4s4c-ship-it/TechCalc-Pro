@@ -35,7 +35,8 @@ const REQUIRED_RUNTIME_FILES = Object.freeze([
   'snapshotImport.js',
   'state.js',
   'stateConsistency.js',
-  'stateTransitions.js'
+  'stateTransitions.js',
+  'ventilationMeasures.js'
 ]);
 const REQUIRED_TESTS = Object.freeze([
   'test-en-378-safety-check.mjs',

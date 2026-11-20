@@ -59,19 +59,8 @@ function buildRequirement({
   return freezeRequirement({ id, category, title, requirement, measure, source, status, priority, missingInputs, details });
 }
 
-export function calculateDilutionOpeningArea({ chargeKg, roomVolumeM3, qlmvKgM3 } = {}) {
-  const charge = numberOrNull(chargeKg);
-  const volume = numberOrNull(roomVolumeM3);
-  const qlmv = numberOrNull(qlmvKgM3);
-  if (charge == null || charge <= 0 || volume == null || volume <= 0 || qlmv == null || qlmv <= 0) return null;
-  return round((0.0032 * charge) / (qlmv * volume), 5);
-}
-
-export function calculateSimplifiedMechanicalVentilationFlow({ rclKgM3 } = {}) {
-  const rcl = numberOrNull(rclKgM3);
-  if (rcl == null || rcl <= 0) return null;
-  return round(10 / rcl, 1);
-}
+import { calculateDilutionOpeningArea, calculateAlternativeMechanicalVentilationFlow as calculateSimplifiedMechanicalVentilationFlow } from './ventilationMeasures.js';
+export { calculateDilutionOpeningArea, calculateSimplifiedMechanicalVentilationFlow } from './ventilationMeasures.js';
 
 function getC3Check(chargeLimitAssessment = {}) {
   return (chargeLimitAssessment.checks || []).find(check => check.id === 'charge-limit.alternative-risk-management') || null;
