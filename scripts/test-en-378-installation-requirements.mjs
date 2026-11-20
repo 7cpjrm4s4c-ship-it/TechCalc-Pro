@@ -291,25 +291,22 @@ const r717SprinklerAssessment = assessInstallationSafetyRequirements(r717Sprinkl
 assert.ok(r717SprinklerAssessment.requirements.some(item => item.id === 'machinery-room.r717-sprinkler-conditions'), '5.14.3.3 sprinkler conditions should appear when sprinkler is installed');
 console.log('\u2713 Test: R-717 sprinkler conditions requirement');
 
-// Test for 5.14.3.4: Door to emergency exit when charge exceeds practical limit
-// For R-717, we need to calculate: practicalLimit = 26 * LFL * roomVolume
-// R-717 LFL is approximately 0.042 kg/m3 (from EN 378 data)
-// With roomVolumeM3 = 80: practicalLimit = 26 * 0.042 * 80 = 87.36 kg
-// So with chargeKg = 100, it should exceed the limit
+// Test for 5.14.3.4: Door to emergency exit when charge exceeds the practical limit for the
+// room volume. Trigger per EN 378-3 5.14.3.4: charge > practicalLimit (EN 378-1 Annex E,
+// table E.1; R-717: 0.00035 kg/m3) x roomVolume. With roomVolumeM3 = 80 the threshold is
+// 0.028 kg, so chargeKg = 100 kg clearly exceeds it. (The former 26 * LFL * roomVolume
+// threshold was the m2 cap from EN 378-1 table C.2 and is not applicable here.)
 const r717HighDensityState = {
   ...r717SprinklerState,
   chargeKg: '100',
   roomVolumeM3: '80' // Small room
 };
 const r717HighDensityCalculation = calculate(r717HighDensityState);
-const hasDoorRequirement = r717HighDensityCalculation.installationSafetyAssessment.requirements.some(item => item.id === 'machinery-room.r717-door-to-emergency-exit');
-// Note: This test depends on the actual LFL value for R-717 in the data
-// If LFL is not available or calculation doesn't trigger, we skip the assertion
-if (hasDoorRequirement) {
-  console.log('\u2713 Test: 5.14.3.4 door to emergency exit requirement appears when charge exceeds practical limit');
-} else {
-  console.log('\u2713 Test: 5.14.3.4 door requirement not triggered (LFL data may not be available)');
-}
+const doorRequirement = r717HighDensityCalculation.installationSafetyAssessment.requirements.find(item => item.id === 'machinery-room.r717-door-to-emergency-exit');
+assert.ok(doorRequirement, '5.14.3.4 door to emergency exit must appear when charge exceeds practical limit x room volume');
+assert.equal(doorRequirement.source.sourceSection, '5.14.3.4');
+assert.equal(doorRequirement.details.practicalLimitKg, 0.028);
+console.log('\u2713 Test: 5.14.3.4 door to emergency exit requirement appears when charge exceeds practical limit x room volume');
 
 // Test that 5.14 requirements do NOT appear when risk analysis result is not 'yes'
 const riskAnalysisOpenState = {

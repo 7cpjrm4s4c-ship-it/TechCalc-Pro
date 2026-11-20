@@ -620,23 +620,25 @@ function buildMachineryRoomRequirements(state, safetyData, chargeLimitAssessment
     }
 
     // 5.14.3.4: Door to emergency exit (calculated condition)
-    // Check if charge exceeds practical limit for room volume
+    // Auslöser nach EN 378-3 5.14.3.4: Füllmenge > praktischer Grenzwert (kg/m³, EN 378-1 Anhang E,
+    // Tabelle E.1) × Raumvolumen V. Nicht m2 = 26 m³ × LFL (EN 378-1 Tabelle C.2) verwenden -
+    // m2 ist der brennbarkeitsbezogene Deckel und für diese Prüfung nicht maßgeblich.
     const roomVolume = numberOrNull(state.roomVolumeM3);
-    const lfl = numberOrNull(safetyData?.lflKgM3);
-    if (roomVolume != null && roomVolume > 0 && lfl != null && lfl > 0 && chargeKg != null && chargeKg > 0) {
-      const practicalLimit = 26 * lfl * roomVolume; // m2 calculation from EN 378-1, Annex C
-      if (chargeKg > practicalLimit) {
+    const practicalLimitKgM3 = numberOrNull(safetyData?.practicalLimitKgM3);
+    if (roomVolume != null && roomVolume > 0 && practicalLimitKgM3 != null && practicalLimitKgM3 > 0 && chargeKg != null && chargeKg > 0) {
+      const doorThresholdKg = practicalLimitKgM3 * roomVolume;
+      if (chargeKg > doorThresholdKg) {
         requirements.push(required({
           id: 'machinery-room.r717-door-to-emergency-exit',
           category: 'machineryRoom',
           title: 'Tür zu Notausgang ins Freie',
-          requirement: 'Liegt die Gesamtfüllmenge über dem praktischen Grenzwert für das Raumvolumen, ist eine Tür direkt oder über Vorraum mit selbstschließenden Türen zu einem Notausgang ins Freie erforderlich.',
-          measure: `Tür direkt oder über Vorraum mit selbstschließenden dichten Türen zu einem Notausgang ins Freie vorsehen. Praktischer Grenzwert: ${round(practicalLimit, 1)} kg, aktuelle Füllmenge: ${chargeKg} kg.`,
+          requirement: 'Liegt die Gesamtfüllmenge über dem praktischen Grenzwert für den Rauminhalt (praktischer Grenzwert kg/m³ × Raumvolumen m³), ist eine Tür direkt oder über einen speziell vorgesehenen Vorraum mit selbstschließenden dichten Türen zu einem Notausgang ins Freie erforderlich (EN 378-3 5.14.3.4).',
+          measure: `Tür direkt oder über Vorraum mit selbstschließenden dichten Türen zu einem Notausgang ins Freie vorsehen. Auslöser EN 378-3 5.14.3.4: Füllmenge ${chargeKg} kg > praktischer Grenzwert ${practicalLimitKgM3} kg/m³ × Raumvolumen ${roomVolume} m³ = ${round(doorThresholdKg, 4)} kg.`,
           source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '5.14.3.4' }),
           details: Object.freeze({
-            practicalLimitKg: round(practicalLimit, 1),
+            practicalLimitKg: round(doorThresholdKg, 4),
+            practicalLimitKgM3,
             chargeKg,
-            lflKgM3: lfl,
             roomVolumeM3: roomVolume
           })
         }));
