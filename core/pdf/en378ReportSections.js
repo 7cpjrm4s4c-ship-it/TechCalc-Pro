@@ -129,7 +129,10 @@ function importedSystemSection(dto) {
       row('Risikoanalyse Maschinenraum', input.installationLocation === 'machinery-room' ? label(input.machineryRoomRiskAnalysisStatus) : '—'),
       row('Ergebnis der Risikoanalyse', input.installationLocation === 'machinery-room' ? label(input.machineryRoomRiskAnalysisResult) : '—'),
       row('Bemerkungen zur Risikoanalyse', input.installationLocation === 'machinery-room' && input.machineryRoomRiskAnalysisNotes ? input.machineryRoomRiskAnalysisNotes : '—'),
-      row('Lüftung', label(input.ventilationType))
+      row('Lüftung', label(input.ventilationType)),
+      ...(input.installationLocation === 'occupied-space' || input.installationLocation === 'ventilated-enclosure'
+        ? [row('Hinweis zur Bestimmung des Raumvolumens', 'Nach EN 378-1, Abschnitt 7: kleinster umschlossener Personen-Aufenthaltsbereich, Zusammenfassung verbundener Räume, Zuluftabschläge bei A1. Die App leitet das Raumvolumen V nicht selbst ab.')]
+        : [])
     ]
   };
 }

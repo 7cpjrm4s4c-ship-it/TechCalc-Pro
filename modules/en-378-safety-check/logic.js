@@ -168,7 +168,11 @@ export function calculate(currentState = {}) {
     belowGradeDetectorAlarm,
     plannerGuidance,
     requiredMeasures: Object.freeze(plannerGuidance.requiredMeasures || []),
-    notices: Object.freeze([]),
+    notices: Object.freeze([
+      ...(effectiveState.installationLocation === 'occupied-space' || effectiveState.installationLocation === 'ventilated-enclosure'
+        ? ['Das Raumvolumen ist nach EN 378-1, Abschnitt 7 zu bestimmen (kleinster umschlossener Personen-Aufenthaltsbereich, Zusammenfassung verbundener Räume, Zuluftabschläge bei A1). Die App leitet das Raumvolumen V nicht selbst ab.']
+        : [])
+    ]),
     dataVersions: effectiveState.dataVersions || getDataVersions()
   });
 }

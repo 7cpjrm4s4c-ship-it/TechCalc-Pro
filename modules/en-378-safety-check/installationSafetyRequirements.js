@@ -666,6 +666,66 @@ function buildAlternativePrecautionRequirements(state, safetyData, chargeLimitAs
     measure: 'Anwendbarkeit der alternativen Vorkehrungen projektspezifisch bestätigen.',
     source: SOURCE.alternativePrecautions
   }));
+
+  // C.3.1-Vorprüfungen als eigene Punkte mit Quellenangabe EN 378-1 C.3.1 (nicht stillschweigend).
+  const SOURCE_C31 = Object.freeze({ sourcePart: 'EN 378-1', sourceSection: 'C.3.1' });
+  const safetyClass = safetyData?.safetyClass || '';
+  requirements.push(required({
+    id: 'alternative-precautions.c3-1-refrigerant-class',
+    category: 'safetyMeasures',
+    title: 'C.3.1: Nur Kältemittel A1 oder A2L zulässig',
+    requirement: 'Alternative Vorkehrungen nach C.3 dürfen nur für Kältemittel der Sicherheitsklassen A1 oder A2L angewendet werden.',
+    measure: `Sicherheitsklasse ${safetyClass || 'unbekannt'} prüfen; bei anderen Klassen ist der C.3-Pfad nicht anwendbar.`,
+    source: SOURCE_C31,
+    status: ['A1', 'A2L'].includes(safetyClass) ? REQUIREMENT_STATUS.PASSED : REQUIREMENT_STATUS.FAILED
+  }));
+  const c31Lfl = numberOrNull(safetyData?.lflKgM3);
+  const c31Charge = numberOrNull(state.chargeKg);
+  const c31M3 = c31Lfl != null && c31Lfl > 0 ? 130 * c31Lfl : null;
+  const c31CapKg = safetyClass === 'A2L' && c31M3 != null ? 1.5 * c31M3 : 150;
+  requirements.push(required({
+    id: 'alternative-precautions.c3-1-charge-cap',
+    category: 'safetyMeasures',
+    title: 'C.3.1: Füllmengen-Deckel einhalten',
+    requirement: `Nach C.3.1 darf die Füllmenge höchstens 150 kg (A1) beziehungsweise 1,5 × m3 (A2L) betragen.`,
+    measure: `Füllmenge ${c31Charge ?? 'unbekannt'} kg gegen die C.3.1-Grenze von ${round(c31CapKg, 2)} kg prüfen.`,
+    source: SOURCE_C31,
+    status: c31Charge != null && c31Charge <= c31CapKg ? REQUIREMENT_STATUS.PASSED : REQUIREMENT_STATUS.FAILED,
+    details: Object.freeze({ maximumChargeKg: round(c31CapKg, 2), chargeKg: c31Charge })
+  }));
+  const c31Class = String(state.installationClass || '');
+  const c31Location = String(state.installationLocation || '');
+  // C.3.1 verlangt Klasse II; im App-Modell steht dafür Klasse II bzw. ein Personen-Aufenthaltsbereich/belüftetes Gehäuse (Klasse I/IV).
+  const c31ClassOk = c31Class === 'II' || ((c31Location === 'occupied-space' || c31Location === 'ventilated-enclosure') && (c31Class === 'I' || c31Class === 'IV'));
+  requirements.push(required({
+    id: 'alternative-precautions.c3-1-installation-class',
+    category: 'safetyMeasures',
+    title: 'C.3.1: Aufstellungsort-Klassifikation prüfen',
+    requirement: 'Nach C.3.1 muss der Aufstellort der Klasse II entsprechen; im Personen-Aufenthaltsbereich ist das belüftete Gehäuse (Klasse IV) bzw. Klasse I mit entsprechender Aufstellung gemeint.',
+    measure: `Klasse ${c31Class || 'unbekannt'} am Aufstellort ${c31Location || 'unbekannt'} gegen C.3.1 abgleichen.`,
+    source: SOURCE_C31,
+    status: !c31Class ? REQUIREMENT_STATUS.REQUIRED : c31ClassOk ? REQUIREMENT_STATUS.PASSED : REQUIREMENT_STATUS.FAILED,
+    details: Object.freeze({ installationClass: c31Class, installationLocation: c31Location })
+  }));
+  const c31FieldChecks = [
+    { field: 'c3FactoryBuiltConnections', id: 'alternative-precautions.c3-1-factory-connections', title: 'C.3.1: Fabrikmäßig zusammengebaute Verbindungsstücke', requirement: 'Alle Verzweigungen müssen aus fabrikmäßig zusammengebauten Verbindungsstücken bestehen.' },
+    { field: 'c3NoValvesOrConsumerConnections', id: 'alternative-precautions.c3-1-valves-occupied-space', title: 'C.3.1: Keine Ventile oder Verbraucheranschlüsse im Personen-Aufenthaltsbereich', requirement: 'Im Personen-Aufenthaltsbereich dürfen außerhalb der fabrikmäßigen Einheiten keine Ventile oder Verbraucheranschlüsse vorhanden sein.' },
+    { field: 'c3PipingProtected', id: 'alternative-precautions.c3-1-piping-protected', title: 'C.3.1: Rohrleitungen gegen Beschädigung geschützt', requirement: 'Rohrleitungen müssen gegen Beschädigung geschützt sein.' },
+    { field: 'c3DoorsNotTightClosing', id: 'alternative-precautions.c3-1-doors-not-tight', title: 'C.3.1: Türen schließen nicht dicht', requirement: 'Türen dürfen nicht dicht schließen.' }
+  ];
+  for (const item of c31FieldChecks) {
+    const value = state[item.field];
+    requirements.push(required({
+      id: item.id,
+      category: 'safetyMeasures',
+      title: item.title,
+      requirement: item.requirement,
+      measure: 'Vorbedingung nach EN 378-1 C.3.1 projektbezogen bestätigen.',
+      source: SOURCE_C31,
+      status: no(value) ? REQUIREMENT_STATUS.FAILED : REQUIREMENT_STATUS.REQUIRED,
+      missingInputs: hasAnswer(value) ? [] : [item.field]
+    }));
+  }
   requirements.push(checkBoolean({
     id: 'hasVentilationOpenings',
     category: 'ventilation',
@@ -736,6 +796,18 @@ function buildDetectorRequirements(state, safetyData, chargeLimitAssessment) {
     details: Object.freeze({ detectorPresetKgM3: detectorPreset }),
     missingInputs: detectorPreset == null ? ['lflKgM3', 'atelOdlKgM3'] : []
   }));
+  // EN 378-3, Abschnitt 9: Ansprechzeit höchstens 30 s beim 1,6-fachen des Voreinstellwerts
+  if (state.installationLocation === 'occupied-space') {
+    requirements.push(required({
+      id: 'detector.response-time',
+      category: 'detection',
+      title: 'Detektor-Ansprechzeit festlegen',
+      requirement: 'Die Ansprechzeit des Detektors darf beim 1,6-fachen des Voreinstellwerts höchstens 30 s betragen.',
+      measure: `Ansprechzeit ≤ 30 s bei ${detectorPreset != null ? round(detectorPreset * 1.6, 5) : 'nicht bestimmbar'} kg/m³ (1,6-facher Voreinstellwert) nachweisen.`,
+      source: SOURCE.detectors,
+      details: Object.freeze({ responseTimeMaxS: 30, testConcentrationKgM3: detectorPreset != null ? round(detectorPreset * 1.6, 5) : null })
+    }));
+  }
   if (detectorClass93_2 && !r717) {
     requirements.push(required({
       id: 'detector.flammable-classes',
@@ -751,10 +823,10 @@ function buildDetectorRequirements(state, safetyData, chargeLimitAssessment) {
       id: 'detector.r717.thresholds',
       category: 'detection',
       title: 'R-717-Detektorschwellen berücksichtigen',
-      requirement: 'Für R-717 sind Voralarm bei 350 mg/m³ und Hauptalarm bei 21 200 mg/m³ zu berücksichtigen.',
-      measure: 'R-717-Detektor auf Voralarm und Hauptalarm auslegen; bei Hauptalarm Anlage abschalten, Maschinenraum-Stromversorgung trennen und Lüftungsstrategie beachten.',
+      requirement: 'Für R-717 gelten die Schwellen Voralarm 500×10⁻⁶ (≈ 350 mg/m³) und Hauptalarm 30 000×10⁻⁶ (≈ 21 200 mg/m³).',
+      measure: 'R-717-Detektor auf Voralarm (500×10⁻⁶) und Hauptalarm (30 000×10⁻⁶) auslegen; bei Hauptalarm Anlage abschalten und Stromversorgung trennen, bei Voralarm Alarm und Lüftung auslösen.',
       source: SOURCE.r717,
-      details: Object.freeze({ preAlarmMgM3: 350, mainAlarmMgM3: 21200 })
+      details: Object.freeze({ preAlarmPpm: 500, mainAlarmPpm: 30000, preAlarmMgM3: 350, mainAlarmMgM3: 21200 })
     }));
   }
   return requirements;
@@ -801,8 +873,16 @@ function buildAlarmRequirements(state, safetyData, chargeLimitAssessment) {
       id: 'alarm.occupied-space',
       category: 'alarm',
       title: 'Alarm im Personen-Aufenthaltsbereich',
-      requirement: 'Bei Personen-Aufenthaltsbereichen muss das Alarmsystem mindestens innerhalb des Personen-Aufenthaltsbereichs warnen.',
-      measure: 'Alarm im betroffenen Personen-Aufenthaltsbereich vorsehen.',
+      requirement: 'Bei Personen-Aufenthaltsbereichen muss das Alarmsystem mindestens innerhalb des Personen-Aufenthaltsbereichs hörbar und sichtbar warnen.',
+      measure: 'Hör- und sichtbaren Alarm im betroffenen Personen-Aufenthaltsbereich vorsehen.',
+      source: SOURCE.alarms
+    }));
+    requirements.push(required({
+      id: 'alarm.limited-mobility',
+      category: 'alarm',
+      title: 'Alarm bei eingeschränkter Bewegungsfähigkeit nicht als einzige Maßnahme',
+      requirement: 'Sind Personen mit eingeschränkter Bewegungsfähigkeit im Personen-Aufenthaltsbereich, darf der Alarm nicht die einzige Maßnahme sein.',
+      measure: 'Bei eingeschränkter Bewegungsfähigkeit zusätzliche Maßnahmen (z. B. Detektion mit Abschaltung, zusätzliche Lüftung) planen.',
       source: SOURCE.alarms
     }));
   }
