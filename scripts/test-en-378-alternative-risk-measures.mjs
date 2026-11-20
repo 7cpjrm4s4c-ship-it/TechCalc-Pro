@@ -79,4 +79,24 @@ assert.equal(deepestResolved.alternativeRiskMeasuresAssessment.requiredMeasureCo
 assert.equal(deepestResolved.alternativeRiskMeasuresAssessment.status, 'passed');
 assert.equal(deepestResolved.chargeLimitAssessment.status, 'passed');
 
+// C.3.1-Vorprüfungen als eigene Punkte mit Quellenangabe EN 378-1 C.3.1 (nicht stillschweigend)
+const c31Requirements = calculation.installationSafetyAssessment.requirements.filter(item => item.id.startsWith('alternative-precautions.c3-1'));
+assert.ok(c31Requirements.length >= 7, 'C.3.1-Vorprüfungen müssen als eigene Punkte ausgewiesen sein');
+assert.ok(c31Requirements.every(item => item.source?.sourcePart === 'EN 378-1' && item.source?.sourceSection === 'C.3.1'));
+const c31Class = c31Requirements.find(item => item.id === 'alternative-precautions.c3-1-refrigerant-class');
+assert.equal(c31Class.status, 'passed', 'R-32 ist A2L -> C.3.1-Kältemittelbedingung erfüllt');
+const c31Cap = c31Requirements.find(item => item.id === 'alternative-precautions.c3-1-charge-cap');
+assert.equal(c31Cap.status, 'passed', '8 kg ≤ 1,5 × m3 (A2L)');
+assert.equal(c31Cap.details.maximumChargeKg, 59.86, '1,5 × m3 = 1,5 × 130 × 0,307 = 59,865 kg (gerundet 59,86)');
+const c31Location = c31Requirements.find(item => item.id === 'alternative-precautions.c3-1-installation-class');
+assert.equal(c31Location.status, 'passed', 'Klasse I im Personen-Aufenthaltsbereich ist für C.3 zulässig');
+for (const field of ['c3FactoryBuiltConnections', 'c3NoValvesOrConsumerConnections', 'c3PipingProtected', 'c3DoorsNotTightClosing']) {
+  const item = c31Requirements.find(entry => entry.missingInputs.includes(field));
+  assert.ok(item, `C.3.1-Feld ${field} muss als eigener Punkt mit missingInputs ausgewiesen sein`);
+  assert.equal(item.status, 'required');
+}
+const c31Violation = calculate({ ...baseState, refrigerantId: 'R-290' });
+const c31Failed = c31Violation.installationSafetyAssessment.requirements.find(item => item.id === 'alternative-precautions.c3-1-refrigerant-class');
+assert.equal(c31Failed.status, 'failed', 'R-290 (A3) verletzt die C.3.1-Kältemittelbedingung');
+
 console.log('EN 378 alternative risk measure tests passed.');

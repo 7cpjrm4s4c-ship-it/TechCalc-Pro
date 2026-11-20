@@ -58,4 +58,13 @@ const ventilationContradiction = calculate({
 assert.equal(ventilationContradiction.stateConsistencyAssessment.status, 'failed');
 assert.ok(ventilationContradiction.requiredMeasures.some(measure => measure.includes('Lüftungsart und Angabe zur mechanischen Lüftung')));
 
+// Klasse IV (belüftetes Gehäuse) ist nur im Personen-Aufenthaltsbereich bzw. als Aufstellort "belüftetes Gehäuse" zulässig
+const classIvEnclosure = assessStateConsistency({ ...baseState, installationLocation: 'ventilated-enclosure', installationClass: 'IV' });
+assert.equal(classIvEnclosure.status, 'passed', 'Klasse IV mit Aufstellort belüftetes Gehäuse ist konsistent');
+const classIvOutdoor = assessStateConsistency({ ...baseState, installationLocation: 'outdoor', installationClass: 'IV' });
+assert.equal(classIvOutdoor.status, 'failed');
+assert.ok(classIvOutdoor.requirements.some(item => item.id === 'state-consistency.class-iv-location'));
+const classIvOccupied = assessStateConsistency({ ...baseState, installationLocation: 'occupied-space', installationClass: 'IV' });
+assert.equal(classIvOccupied.status, 'passed', 'Klasse IV im Personen-Aufenthaltsbereich bleibt zulässig');
+
 console.log('EN 378 state consistency tests passed.');
