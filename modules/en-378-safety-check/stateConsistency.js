@@ -130,6 +130,17 @@ export function assessStateConsistency(currentState = {}) {
     }));
   }
 
+  // EN 378-1, 5.3 a): Aufstellort "belüftetes Gehäuse" erfordert Klasse IV (alle
+  // kältemittelführenden Teile im belüfteten Gehäuse, das EN 378-2 und EN 378-3 erfüllt).
+  if (isVentilatedEnclosure(currentState) && installationClass && installationClass !== 'IV') {
+    requirements.push(consistencyRequirement({
+      id: 'state-consistency.class-iv-required',
+      title: 'Klasse IV für belüftetes Gehäuse erforderlich',
+      requirement: 'Klasse IV (belüftetes Gehäuse) setzt voraus, dass sich alle kältemittelführenden Teile in einem belüfteten Gehäuse befinden, das die Anforderungen nach EN 378-2 und EN 378-3 erfüllt (EN 378-1, 5.3 a).',
+      measure: 'Aufstellungsort-Klassifikation auf Klasse IV setzen oder einen anderen Aufstellort wählen.'
+    }));
+  }
+
   // Klasse IV (belüftetes Gehäuse) ist nur im Personen-Aufenthaltsbereich zulässig;
   // der Aufstellort "belüftetes Gehäuse" ist die explizite Angabe dieser Kombination.
   if (installationClass === 'IV' && !isOccupiedSpace(currentState) && !isVentilatedEnclosure(currentState)) {

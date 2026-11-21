@@ -206,7 +206,7 @@ function c3Details(limits, concentration, firstThreshold, firstThresholdLabel) {
     firstThresholdLabel: firstThresholdLabel || ''
   });
 }
-function toxicityLimitByTableC1({ safetyData, chargeKg, roomVolumeM3, accessCategory, installationClass, locationLevel, occupantDensityBelowOnePer10m2, hasEmergencyExits, isPermanentlySealedSorptionSystem }) {
+function toxicityLimitByTableC1({ safetyData, chargeKg, roomVolumeM3, accessCategory, installationClass, locationLevel, occupantDensityBelowOnePer10m2, hasEmergencyExits, isPermanentlySealedSorptionSystem, ventilatedEnclosureToxicityLocationClass, ...rest }) {
   const toxicityClass = safetyData?.toxicityClass;
   const concentrationLimit = getToxicityConcentrationLimit(safetyData);
   if (!['A', 'B'].includes(toxicityClass)) {
@@ -219,7 +219,14 @@ function toxicityLimitByTableC1({ safetyData, chargeKg, roomVolumeM3, accessCate
     return notAssessed('charge-limit.toxicity', 'chargeLimit', 'Aufstellungsort-Klassifikation fehlt.', SOURCE_EN_378_1_C1, ['installationClass']);
   }
   if (installationClass === 'IV') {
-    return notAssessed('charge-limit.toxicity', 'chargeLimit', 'Toxizitätsanforderungen bei Klasse IV sind abhängig vom Ort des belüfteten Gehäuses zu bewerten.', SOURCE_EN_378_1_C1, ['ventilatedEnclosureLocation']);
+    // EN 378-1, Tabelle C.1, Spalte IV (EN 378-3, 4.6): Die toxizitätsbezogene Füllmenge ist
+    // in Abhängigkeit vom Ort des belüfteten Gehäuses nach Aufstellungsort I, II oder III zu
+    // beurteilen; die Zuordnung trifft der Planer (ventilatedEnclosureToxicityLocationClass).
+    const enclosureLocationClass = ['I', 'II', 'III'].includes(ventilatedEnclosureToxicityLocationClass) ? ventilatedEnclosureToxicityLocationClass : null;
+    if (enclosureLocationClass == null) {
+      return notAssessed('charge-limit.toxicity', 'chargeLimit', 'Für Klasse IV ist der Ort des belüfteten Gehäuses nach Aufstellungsort I, II oder III planerisch zuzuordnen (EN 378-1, Tabelle C.1, Spalte IV).', SOURCE_EN_378_1_C1, ['ventilatedEnclosureToxicityLocationClass']);
+    }
+    return toxicityLimitByTableC1({ ...rest, safetyData, chargeKg, roomVolumeM3, accessCategory, installationClass: enclosureLocationClass, locationLevel, occupantDensityBelowOnePer10m2, hasEmergencyExits, isPermanentlySealedSorptionSystem, ventilatedEnclosureToxicityLocationClass });
   }
   if (installationClass === 'III' || (toxicityClass === 'A' && installationClass === 'II')) {
     return noLimit('charge-limit.toxicity', 'chargeLimit', 'Tabelle C.1: keine Begrenzung der Füllmenge.', SOURCE_EN_378_1_C1);
@@ -293,8 +300,10 @@ function flammabilityLimitByTableC2(context) {
   const volumeLimit = roomVolumeM3 != null && roomVolumeM3 > 0 ? 0.2 * lfl * roomVolumeM3 : null;
 
   if (installationClass === 'IV') {
+    // EN 378-1, Tabelle C.2, Spalte IV (EN 378-3, 4.6): 2L höchstens m3 × 1,5; Klassen 2 und 3
+    // höchstens m3; m3 = 130 m³ × LFL.
     const multiplier = flammabilityClass === '2L' ? 1.5 : 1;
-    return assessedLimit({ id: 'charge-limit.flammability', category: 'chargeLimit', chargeKg, maximumChargeKg: m3Kg * multiplier, rule: `limit-m3-times-${multiplier}`, source: SOURCE_EN_378_1_C2 });
+    return assessedLimit({ id: 'charge-limit.flammability', category: 'chargeLimit', chargeKg, maximumChargeKg: round(m3Kg * multiplier, 6), rule: `limit-m3-times-${multiplier}`, source: SOURCE_EN_378_1_C2, details: Object.freeze({ m3Kg: round(m3Kg, 6), multiplier, lflKgM3: lfl }) });
   }
   if (flammabilityClass === '2L' && installationClass === 'III') {
     return noLimit('charge-limit.flammability', 'chargeLimit', 'Tabelle C.2: keine Begrenzung der Füllmenge.', SOURCE_EN_378_1_C2);

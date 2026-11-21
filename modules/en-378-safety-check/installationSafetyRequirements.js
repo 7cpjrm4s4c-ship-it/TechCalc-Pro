@@ -515,6 +515,94 @@ function buildTechnicalRoomRequirements(state, safetyData, chargeLimitAssessment
   return requirements;
 }
 
+// EN 378-3:2020-12, Abschnitt 4.6: belüftetes Gehäuse im Personen-Aufenthaltsbereich
+// (Aufstellungsort-Klasse IV nach EN 378-1, 5.3 a). M1: Lüftungskanal nach
+// Herstellerfestlegungen (i. V. m. EN 378-2, 6.2.15). M2: Raumvolumen mindestens das
+// 10-Fache des Gehäusevolumens. M3: ausreichende Frischluftversorgung. M4: Belüftung des
+// Gehäuses führt ins Freie. Die Füllmengengrenzen der Tabellen C.1/C.2, Spalte IV, werden
+// in chargeLimitCalculation.js bewertet (M6/M7).
+function buildVentilatedEnclosureRequirements(state, safetyData, chargeLimitAssessment) {
+  const requirements = [];
+  const SOURCE_46 = Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '4.6' });
+
+  // M1 (4.6, Satz 1 i. V. m. EN 378-2, 6.2.15): Lüftungskanal nach Herstellerfestlegungen
+  requirements.push(checkBoolean({
+    id: 'ventilated-enclosure.duct-per-manufacturer',
+    category: 'ventilatedEnclosure',
+    title: 'Lüftungskanal nach Herstellerfestlegungen ausgeführt',
+    requirement: 'Ein belüftetes Gehäuse, das eine Kälteanlage enthält, muss mit einem Lüftungskanal nach den Festlegungen des Herstellers versehen sein; der Lüftungskanal muss den Anforderungen des Herstellers entsprechen (EN 378-3, 4.6 i. V. m. EN 378-2, 6.2.15).',
+    measure: 'Lüftungskanal nach Herstellerangaben ausführen und die Anforderungen des Herstellers an den Kanal nachweisen.',
+    source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '4.6 i. V. m. EN 378-2, 6.2.15' }),
+    value: state.ventilatedEnclosureDuctPerManufacturerInstructions,
+    missingInputs: ['ventilatedEnclosureDuctPerManufacturerInstructions']
+  }));
+
+  // M2 (4.6, Satz 2): V_Raum >= 10 x V_Gehäuse (feste normative Konstante 10)
+  const roomVolume = numberOrNull(state.roomVolumeM3);
+  const enclosureVolume = numberOrNull(state.enclosureVolumeM3);
+  const ratioComplete = roomVolume != null && roomVolume > 0 && enclosureVolume != null && enclosureVolume > 0;
+  const ratioOk = ratioComplete && roomVolume >= 10 * enclosureVolume;
+  requirements.push(required({
+    id: 'ventilated-enclosure.room-volume-ratio',
+    category: 'ventilatedEnclosure',
+    title: 'Raumvolumen mindestens das 10-Fache des Gehäusevolumens',
+    requirement: 'Der Raum, in dem das belüftete Gehäuse aufgestellt wird, muss ein Volumen von mindestens dem 10-Fachen des Gehäusevolumens aufweisen (EN 378-3, 4.6).',
+    measure: ratioComplete
+      ? `V_Raum ${roomVolume} m³ ${ratioOk ? '≥' : '<'} 10 × V_Gehäuse ${enclosureVolume} m³ = ${round(10 * enclosureVolume, 3)} m³.`
+      : 'Gehäusevolumen und Raumvolumen angeben; Verhältnis V_Raum ≥ 10 × V_Gehäuse nachweisen.',
+    source: SOURCE_46,
+    status: ratioComplete ? (ratioOk ? REQUIREMENT_STATUS.PASSED : REQUIREMENT_STATUS.FAILED) : REQUIREMENT_STATUS.NOT_ASSESSED,
+    missingInputs: ratioComplete ? [] : [
+      ...(enclosureVolume == null || enclosureVolume <= 0 ? ['enclosureVolumeM3'] : []),
+      ...(roomVolume == null || roomVolume <= 0 ? ['roomVolumeM3'] : [])
+    ],
+    details: Object.freeze({
+      factor: 10,
+      roomVolumeM3: roomVolume,
+      enclosureVolumeM3: enclosureVolume,
+      requiredRoomVolumeM3: enclosureVolume != null && enclosureVolume > 0 ? round(10 * enclosureVolume, 3) : null
+    })
+  }));
+
+  // M3 (4.6, Satz 2): ausreichende Frischluftversorgung, verbrauchte Luft wird vollständig ersetzt
+  requirements.push(checkBoolean({
+    id: 'ventilated-enclosure.fresh-air-sufficient',
+    category: 'ventilatedEnclosure',
+    title: 'Ausreichende Frischluftversorgung des Raums',
+    requirement: 'Der Raum, in dem das belüftete Gehäuse aufgestellt wird, muss mit ausreichend Frischluft versorgt werden, um verbrauchte Luft vollständig zu ersetzen (EN 378-3, 4.6).',
+    measure: 'Frischluftversorgung des Aufstellraums so auslegen, dass verbrauchte Luft vollständig ersetzt wird.',
+    source: SOURCE_46,
+    value: state.ventilatedEnclosureFreshAirSufficient,
+    missingInputs: ['ventilatedEnclosureFreshAirSufficient']
+  }));
+
+  // M4 (4.6, Satz 3): Belüftung des Gehäuses führt ins Freie
+  requirements.push(checkBoolean({
+    id: 'ventilated-enclosure.duct-to-outdoor',
+    category: 'ventilatedEnclosure',
+    title: 'Belüftung des Gehäuses führt ins Freie',
+    requirement: 'Die Belüftung des Gehäuses muss ins Freie führen (EN 378-3, 4.6).',
+    measure: 'Lüftungskanal ins Freie führen und gegen Witterungseinflüsse sichern.',
+    source: SOURCE_46,
+    value: state.ventilatedEnclosureDuctToOutdoor,
+    missingInputs: ['ventilatedEnclosureDuctToOutdoor']
+  }));
+
+  // Hinweis: Gehäuseeigenschaften nach EN 378-2 (Druckfestigkeit, Konstruktion) prüft die App nicht
+  requirements.push(required({
+    id: 'ventilated-enclosure.en378-2-hint',
+    category: 'ventilatedEnclosure',
+    title: 'Gehäuseeigenschaften nach EN 378-2 über Herstellerangaben nachweisen',
+    requirement: 'Sicherheitseigenschaften des Gehäuses selbst (z. B. Druckfestigkeit, Konstruktionsanforderungen nach EN 378-2, 6.2.15) werden von der App nicht geprüft; sie sind über die Herstellerangaben nachzuweisen.',
+    measure: 'Herstellerunterlagen zum Gehäuse nach EN 378-2, 6.2.15 dokumentieren bzw. beilegen.',
+    source: Object.freeze({ sourcePart: 'EN 378-2', sourceSection: '6.2.15' }),
+    status: REQUIREMENT_STATUS.NOT_APPLICABLE,
+    priority: 'information'
+  }));
+
+  return requirements;
+}
+
 function buildOutdoorVentilationRequirements(state) {
   const requirements = [];
   if (state.installationLocation !== 'outdoor' || !yes(state.outdoorRefrigerantAccumulationPossible)) return requirements;
@@ -1189,6 +1277,7 @@ export function assessInstallationSafetyRequirements(currentState = {}, chargeLi
   const requirements = [
     ...arrangementRequirements,
     ...(currentState.installationLocation === 'technical-room' ? buildTechnicalRoomRequirements(currentState, safetyData, chargeLimitAssessment) : []),
+    ...(currentState.installationLocation === 'ventilated-enclosure' ? buildVentilatedEnclosureRequirements(currentState, safetyData, chargeLimitAssessment) : []),
     ...(isOutdoor ? [] : buildMachineryRoomRequirements(currentState, safetyData, chargeLimitAssessment)),
     ...(isOutdoor ? [] : buildAlternativePrecautionRequirements(currentState, safetyData, chargeLimitAssessment)),
     ...(outdoorFollowUpsApplicable ? buildDetectorRequirements(currentState, safetyData, chargeLimitAssessment) : (!isOutdoor ? buildDetectorRequirements(currentState, safetyData, chargeLimitAssessment) : [])),

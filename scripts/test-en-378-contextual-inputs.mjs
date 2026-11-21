@@ -203,4 +203,20 @@ assert.equal(fieldByKey('machineryRoomOccupied').visibleWhen({ installationLocat
 assert.equal(fieldByKey('machineryRoomOccupied').visibleWhen({ installationLocation: 'occupied-space' }), false, '4.4 bleibt unverändert');
 assert.equal(fieldByKey('machineryRoomRiskAnalysisStatus').visibleWhen(m2SchemaState), false, 'Risikoanalyse-Gate bleibt 4.3 vorbehalten');
 
+// EN 378-3, 4.6: Felder zum belüfteten Gehäuse nur bei Aufstellort "ventilated-enclosure" sichtbar
+const ve = key => schema.fields.find(field => field.key === key);
+const veState = { installationLocation: 'ventilated-enclosure', refrigerantId: 'R-32' };
+for (const key of ['enclosureVolumeM3', 'ventilatedEnclosureDuctPerManufacturerInstructions', 'ventilatedEnclosureFreshAirSufficient', 'ventilatedEnclosureDuctToOutdoor', 'ventilatedEnclosureToxicityLocationClass']) {
+  assert.equal(ve(key).visibleWhen(veState), true, `${key} nur im belüfteten Gehäuse sichtbar`);
+  assert.equal(ve(key).visibleWhen({ installationLocation: 'occupied-space' }), false);
+  assert.equal(ve(key).visibleWhen({ installationLocation: 'machinery-room' }), false);
+  assert.equal(ve(key).visibleWhen({ installationLocation: 'technical-room' }), false);
+}
+// toxizitätsbezogene Ortszuordnung nur bei Kältemittel mit Toxizitätsdaten
+assert.equal(ve('ventilatedEnclosureToxicityLocationClass').visibleWhen({ ...veState, refrigerantId: 'R-32' }), true);
+assert.equal(ve('ventilatedEnclosureToxicityLocationClass').visibleWhen({ ...veState, refrigerantId: '' }), false, 'ohne Kältemittel keine Toxizitätszuordnung');
+// Option mit neuem Label vorhanden
+const locationField2 = schema.fields.find(field => field.key === 'installationLocation');
+assert.ok(locationField2.options.some(option => option.value === 'ventilated-enclosure' && option.label.includes('Personen-Aufenthaltsbereich')), 'Label "Belüftetes Gehäuse (Personen-Aufenthaltsbereich)"');
+
 console.log('EN 378 contextual input tests passed.');

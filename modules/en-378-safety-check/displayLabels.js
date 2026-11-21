@@ -77,7 +77,12 @@ const FIELD_LABELS = Object.freeze({
   technicalRoomComponentsHaveDetachableJoints: 'Komponenten mit lösbaren Verbindungen',
   technicalRoomAdverseConditions: 'ungünstige Bedingungen',
   technicalRoomExhaustHoodFlowRateM3s: 'Luftwechselrate je Abzugshaube',
-  technicalRoomVentilationActivatesDetector: 'detektorbetätigte Lüftungsaktivierung'
+  technicalRoomVentilationActivatesDetector: 'detektorbetätigte Lüftungsaktivierung',
+  enclosureVolumeM3: 'Volumen des belüfteten Gehäuses',
+  ventilatedEnclosureDuctPerManufacturerInstructions: 'Lüftungskanal nach Herstellerfestlegungen',
+  ventilatedEnclosureFreshAirSufficient: 'ausreichende Frischluftversorgung',
+  ventilatedEnclosureDuctToOutdoor: 'Belüftung ins Freie',
+  ventilatedEnclosureToxicityLocationClass: 'Ort des belüfteten Gehäuses (I/II/III)'
 });
 const STATUS_LABELS = Object.freeze({
   acceptable: 'Anforderungen nach aktuellem Prüfstand erfüllt',
@@ -146,6 +151,11 @@ const CHECK_LABELS = Object.freeze({
   'technical-room.concentration-limit': 'Konzentration gegenüber praktischem Grenzwert (EN 378-1 Anhang C)',
   'technical-room.exhaust-hood-flow-rate': 'Abzugshaube - Luftwechselrate je Ventilator/Abzugshaube',
   'technical-room.detector-activated-ventilation': 'Detektorbetätigte Aktivierung der Lüftung',
+  'ventilated-enclosure.duct-per-manufacturer': 'Lüftungskanal nach Herstellerfestlegungen (EN 378-2, 6.2.15)',
+  'ventilated-enclosure.room-volume-ratio': 'Raumvolumen ≥ 10 × Gehäusevolumen (EN 378-3, 4.6)',
+  'ventilated-enclosure.fresh-air-sufficient': 'Ausreichende Frischluftversorgung (EN 378-3, 4.6)',
+  'ventilated-enclosure.duct-to-outdoor': 'Belüftung des Gehäuses ins Freie (EN 378-3, 4.6)',
+  'ventilated-enclosure.en378-2-hint': 'Gehäuseeigenschaften nach EN 378-2, 6.2.15 über Herstellerangaben nachweisen',
   'machinery-room.access-restricted': 'Zugang auf befugte Personen beschränken',
   'machinery-room.no-refrigerant-migration': 'Kältemittelaustritt in angrenzende Bereiche verhindern',
   'machinery-room.emergency-ventilation-flow': 'mechanische Notlüftung dimensionieren',
@@ -172,7 +182,7 @@ const OPTION_LABELS = Object.freeze({
   'technical-room': 'technischer Raum',
   'machinery-room': 'Maschinenraum',
   outdoor: 'Außenaufstellung',
-  'ventilated-enclosure': 'Belüftetes Gehäuse',
+  'ventilated-enclosure': 'Belüftetes Gehäuse (Personen-Aufenthaltsbereich)',
   none: 'keine ungünstigen Bedingungen',
   vibrations: 'starke Schwingungen',
   'corrosive-atmosphere': 'korrosive Atmosphäre',

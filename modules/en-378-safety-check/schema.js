@@ -10,6 +10,9 @@ const yes = value => value === true || value === 'yes';
 const isMachineryRoomRiskAnalysisYes = state => state.installationLocation === 'machinery-room' && state.machineryRoomRiskAnalysisResult === 'yes';
 const isOutdoor = state => state.installationLocation === 'outdoor';
 const isTechnicalRoom = state => state.installationLocation === 'technical-room';
+const isVentilatedEnclosure = state => state.installationLocation === 'ventilated-enclosure';
+// EN 378-1, Tabelle C.1, Spalte IV: toxizitätsbezogene Prüfung nur bei Kältemitteln mit Toxizitätsdaten relevant
+const needsEnclosureToxicityClass = state => isVentilatedEnclosure(state) && ['A', 'B'].includes(getEN378SafetyData(state.refrigerantId)?.toxicityClass || '');
 // EN 378-3, 4.5: abgeschlossener Raum ohne Personenaufenthalt (4.5 Abs. 2/3)
 const technicalRoomSeparated = state => isTechnicalRoom(state) && state.technicalRoomSeparatedFromOccupiedSpaces === 'yes';
 // 4.5 Abs. 2 (M2): Verdichter/Druckbehälter im abgeschlossenen Raum -> Behandlung wie Maschinenraum nach Abschnitt 5
@@ -44,7 +47,7 @@ const needsExplosionEquipment = state => isMachineryRoom(state) && ['R-32', 'R32
 const needsLegacyAccessCategoryField = state => !accessCategoryByAccessArea[state.accessArea] && Boolean(state.accessCategory);
 
 const installationLocationOptions = Object.freeze([
-  option('', 'Nicht angegeben'), option('occupied-space', 'Aufenthaltsbereich'), option('technical-room', 'Technischer Raum'), option('machinery-room', 'Maschinenraum'), option('outdoor', 'Außenaufstellung'), option('ventilated-enclosure', 'Belüftetes Gehäuse')
+  option('', 'Nicht angegeben'), option('occupied-space', 'Aufenthaltsbereich'), option('technical-room', 'Technischer Raum'), option('machinery-room', 'Maschinenraum'), option('outdoor', 'Außenaufstellung'), option('ventilated-enclosure', 'Belüftetes Gehäuse (Personen-Aufenthaltsbereich)')
 ]);
 // Normativ zulässige Kombinationen aus Aufstellort und Aufstellungsort-Klasse
 // (EN 378-1, Abschnitt 5): Klasse I nur bei kältemittelführenden Teilen im
@@ -79,6 +82,9 @@ const ventilationTypeOptions = Object.freeze([
 ]);
 const yesNoOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('yes', 'Ja'), option('no', 'Nein')
+]);
+const enclosureToxicityLocationOptions = Object.freeze([
+  option('', 'Nicht angegeben'), option('I', 'Aufstellungsort I'), option('II', 'Aufstellungsort II'), option('III', 'Aufstellungsort III')
 ]);
 const technicalRoomAdverseConditionsOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('none', 'Keine ungünstigen Bedingungen'), option('vibrations', 'Starke Schwingungen'), option('corrosive-atmosphere', 'Korrosive Atmosphäre'), option('vibrations-and-corrosive', 'Starke Schwingungen und korrosive Atmosphäre')
@@ -189,11 +195,19 @@ const schema = defineFormSchema({
     { key: 'technicalRoomComponentsHaveDetachableJoints', label: 'Komponenten mit lösbaren Verbindungen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => technicalRoomSeparated(state) && state.technicalRoomContainsCompressorOrPressureVessel !== 'yes' },
     { key: 'technicalRoomAdverseConditions', label: 'Ungünstige Bedingungen (EN 378-3, 4.5, Anmerkung 1)', type: FIELD_TYPES.SELECT, options: technicalRoomAdverseConditionsOptions, visibleWhen: needsTechnicalRoomHoodDetails },
     { key: 'technicalRoomExhaustHoodFlowRateM3s', label: 'Luftwechselrate je Abzugshaube', type: FIELD_TYPES.DECIMAL, unit: 'm³/s', visibleWhen: needsTechnicalRoomHoodDetails },
-    { key: 'technicalRoomVentilationActivatesDetector', label: 'Lüftung wird durch Kältemittel-Detektor aktiviert', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: needsTechnicalRoomHoodDetails }
+    { key: 'technicalRoomVentilationActivatesDetector', label: 'Lüftung wird durch Kältemittel-Detektor aktiviert', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: needsTechnicalRoomHoodDetails },
+    // EN 378-3, Abschnitt 4.6: belüftetes Gehäuse im Personen-Aufenthaltsbereich (Klasse IV, EN 378-1, 5.3 a)
+    { key: 'enclosureVolumeM3', label: 'Volumen des belüfteten Gehäuses', type: FIELD_TYPES.DECIMAL, unit: 'm³', visibleWhen: isVentilatedEnclosure },
+    { key: 'ventilatedEnclosureDuctPerManufacturerInstructions', label: 'Lüftungskanal nach Herstellerfestlegungen ausgeführt', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isVentilatedEnclosure },
+    { key: 'ventilatedEnclosureFreshAirSufficient', label: 'Raum ausreichend mit Frischluft versorgt', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isVentilatedEnclosure },
+    { key: 'ventilatedEnclosureDuctToOutdoor', label: 'Belüftung des Gehäuses führt ins Freie', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isVentilatedEnclosure },
+    { key: 'ventilatedEnclosureToxicityClassInfo', label: 'Hinweis zur toxizitätsbezogenen Füllmenge', type: FIELD_TYPES.NOTICE, text: 'Nach EN 378-1, Tabelle C.1, Spalte IV, wird die toxizitätsbezogene Füllmenge in Abhängigkeit vom Ort des belüfteten Gehäuses nach Aufstellungsort I, II oder III beurteilt; die Auswahl trifft der Planer.', tone: 'compact', visibleWhen: isVentilatedEnclosure },
+    { key: 'ventilatedEnclosureToxicityLocationClass', label: 'Ort des belüfteten Gehäuses (Aufstellungsort I/II/III für Tabelle C.1, Spalte IV)', type: FIELD_TYPES.SELECT, options: enclosureToxicityLocationOptions, visibleWhen: needsEnclosureToxicityClass }
   ],
   groups: [
     { title: 'Importierter Anlagenstand', fields: ['importedSystemName', 'importFGasesSystem', 'fGasesSnapshotId', 'importNotice', 'importStatusMessage', 'refrigerantId', 'chargeKg', 'chargeScopeInfo'], columns: 2, accent: 'blue' },
     { title: 'Raum und Aufstellung', fields: ['roomVolumeM3', 'installationLocation', 'installationClass', 'classIiCompressorsOutsideOrMachineryRoom', 'accessArea', 'accessCategoryInfo', 'accessCategory', 'usageType', 'applicationType', 'locationLevel', 'isBasementLocation', 'machineryRoomRiskAnalysisStatus', 'machineryRoomRiskAnalysisResult', 'machineryRoomRiskAnalysisNotes'], columns: 2, accent: 'blue' },
+    { title: 'Belüftetes Gehäuse (EN 378-3, 4.6)', fields: ['enclosureVolumeM3', 'ventilatedEnclosureDuctPerManufacturerInstructions', 'ventilatedEnclosureFreshAirSufficient', 'ventilatedEnclosureDuctToOutdoor', 'ventilatedEnclosureToxicityClassInfo', 'ventilatedEnclosureToxicityLocationClass'], columns: 2, accent: 'blue' },
     { title: 'Raum ohne Personenaufenthalt (EN 378-3, 4.5)', fields: ['technicalRoomSeparatedFromOccupiedSpaces', 'technicalRoomNotSeparatedNotice', 'technicalRoomContainsCompressorOrPressureVessel', 'technicalRoomComponentsHaveDetachableJoints', 'technicalRoomAdverseConditions', 'technicalRoomExhaustHoodFlowRateM3s', 'technicalRoomVentilationActivatesDetector'], columns: 2, accent: 'blue' },
     { title: 'Detailfragen zur Füllmengenbewertung', fields: ['occupantDensityBelowOnePer10m2', 'hasEmergencyExits', 'isPermanentlySealedSorptionSystem', 'usesAlternativeRiskManagement', 'alternativeRiskManagementInfo', 'floorAreaM2', 'isFactorySealed', 'mountingType', 'c3FactoryBuiltConnections', 'c3NoValvesOrConsumerConnections', 'c3PipingProtected', 'c3DoorsNotTightClosing'], columns: 2, accent: 'blue' },
     { title: 'Lüftung und Sicherheitskomponenten', fields: ['ventilationType', 'limitInfo', 'hasGasWarningSystem', 'machineryRoomOccupied', 'machineryRoomRequiredAirChangeAchievable', 'machineryRoomLargestSystemChargeKg', 'hasEmergencyVentilation', 'hasEmergencyVentilationControlOutside', 'hasEmergencyVentilationControlInside', 'hasDetector', 'hasAlarm', 'hasIndependentAlarmPower', 'hasSafetyShutoffValves', 'hasVentilationOpenings', 'hasExplosionProtectedElectricalEquipment', 'machineryRoomEmergencyFanSuitable', 'machineryRoomR717ContainmentProvided', 'machineryRoomR717EyeWashProvided', 'machineryRoomR717EmergencyShowerProvided', 'machineryRoomR717SprinklerInstalled', 'machineryRoomR717SprinklerConditionsConfirmed', 'isOutdoorPublicAccessible', 'isOutdoorDefinitionConfirmed', 'outdoorSafeArrangement', 'outdoorPreventBuildingEntry', 'hasOutdoorProtectiveCover', 'outdoorCoverVentilated', 'outdoorRefrigerantAccumulationPossible', 'outdoorVentilationGeneralConfirmed', 'outdoorVentilationNationalRulesConfirmed', 'outdoorMechanicalVentilationOpeningsConfirmed', 'additionalSafetyMeasures'], columns: 2, accent: 'blue' },

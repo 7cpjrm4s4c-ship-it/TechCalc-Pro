@@ -214,4 +214,13 @@ const classIIEnclosure = assessStateConsistency({ ...baseState, installationLoca
 assert.equal(classIIEnclosure.status, 'failed', 'Fall D: belüftetes Gehäuse + Klasse II bleibt Konflikt');
 assert.ok(classIIEnclosure.requirements.some(item => item.id === 'state-consistency.class-ii-location'));
 
+// EN 378-1, 5.3 a: Aufstellort "belüftetes Gehäuse" erfordert Klasse IV; andere Klasse -> Konflikt
+const classIvRequired = assessStateConsistency({ ...baseState, installationLocation: 'ventilated-enclosure', installationClass: 'I' });
+assert.equal(classIvRequired.status, 'failed');
+const ivConflict = classIvRequired.requirements.find(item => item.id === 'state-consistency.class-iv-required');
+assert.ok(ivConflict, 'class-iv-required muss erscheinen');
+assert.match(ivConflict.requirement, /5\.3 a/);
+const classIvEnclosureOk = assessStateConsistency({ ...baseState, installationLocation: 'ventilated-enclosure', installationClass: 'IV' });
+assert.equal(classIvEnclosureOk.status, 'passed', 'belüftetes Gehäuse + Klasse IV bleibt konsistent');
+
 console.log('EN 378 state consistency tests passed.');
