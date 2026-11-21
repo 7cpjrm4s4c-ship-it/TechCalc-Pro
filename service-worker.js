@@ -369,6 +369,9 @@ async function cacheFirstWithRefresh(request) {
   return caches.match('./index.html');
 }
 function isVersionCriticalAsset(requestUrl) {
+  // Modul-Laufzeitcode (inkl. Formular-Schemata) wird netzwerk-first ausgeliefert, damit nach
+  // einem Deploy sofort der aktuelle Stand (z. B. PR-Zweig) greift; offline greift der Cache.
+  if (requestUrl.pathname.includes('/modules/')) return true;
   return requestUrl.pathname.endsWith('/index.html')
     || requestUrl.pathname.endsWith('/core/app.js')
     || requestUrl.pathname.endsWith('/core/ux/releaseNotesController.js')

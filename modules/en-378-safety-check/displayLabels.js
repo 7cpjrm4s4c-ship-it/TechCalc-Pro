@@ -82,7 +82,7 @@ const FIELD_LABELS = Object.freeze({
   ventilatedEnclosureDuctPerManufacturerInstructions: 'Lüftungskanal nach Herstellerfestlegungen',
   ventilatedEnclosureFreshAirSufficient: 'ausreichende Frischluftversorgung',
   ventilatedEnclosureDuctToOutdoor: 'Belüftung ins Freie',
-  ventilatedEnclosureToxicityLocationClass: 'Ort des belüfteten Gehäuses (I/II/III)'
+  ventilatedEnclosureToxicityLocationClass: 'Ort des belüfteten Gehäuses (Aufstellungsort I/II/III für Tabelle C.1, Spalte IV)'
 });
 const STATUS_LABELS = Object.freeze({
   acceptable: 'Anforderungen nach aktuellem Prüfstand erfüllt',

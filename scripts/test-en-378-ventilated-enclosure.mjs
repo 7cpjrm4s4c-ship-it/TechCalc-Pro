@@ -1,9 +1,14 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 
 import { assessChargeLimit } from '../modules/en-378-safety-check/chargeLimitCalculation.js';
 import { assessInstallationSafetyRequirements } from '../modules/en-378-safety-check/installationSafetyRequirements.js';
 import { calculate } from '../modules/en-378-safety-check/logic.js';
 import { assessStateConsistency } from '../modules/en-378-safety-check/stateConsistency.js';
+import schema from '../modules/en-378-safety-check/schema.js';
+import { initialState } from '../modules/en-378-safety-check/state.js';
+import { buildEN378SafetyCheckResultModel } from '../modules/en-378-safety-check/results.js';
+import { renderSchemaForm } from '../core/ui/schemaRenderer.js';
 
 // EN 378-3:2020-12, Abschnitt 4.6: belüftetes Gehäuse im Personen-Aufenthaltsbereich
 // (Aufstellungsort-Klasse IV nach EN 378-1, 5.3 a). Anforderungsmatrix M1 bis M7.
@@ -123,5 +128,74 @@ assert.equal(fullCalc.chargeLimitAssessment.status, 'passed');
 assert.equal(fullCalc.installationSafetyAssessment.status, 'passed');
 assert.equal(fullCalc.status, 'acceptable');
 console.log('✓ Test: vollständig beantwortetes belüftetes Gehäuse -> Gesamtbewertung acceptable');
+
+// --- Gemeldeter Fall (UI-Reproduktion): HFKW-32, belüftetes Gehäuse, Klasse IV, 85 m³ ---
+// Render-Test: alle sechs Felder der Gruppe "Belüftetes Gehäuse (EN 378-3, 4.6)" müssen im
+// Formular-Markup erscheinen, inkl. select für ventilatedEnclosureToxicityLocationClass.
+const reportedState = {
+  ...initialState,
+  refrigerantId: 'HFKW-32',
+  chargeKg: '5',
+  roomVolumeM3: '85',
+  installationLocation: 'ventilated-enclosure',
+  installationClass: 'IV',
+  accessArea: 'authorized-access',
+  usageType: 'industrial',
+  applicationType: 'other',
+  locationLevel: 'other',
+  ventilationType: 'mechanical'
+};
+const renderedHtml = renderSchemaForm(schema, reportedState, { result: {} });
+assert.ok(renderedHtml.includes('Belüftetes Gehäuse (EN 378-3, 4.6)'), 'Gruppenkarte muss rendern');
+for (const key of ['enclosureVolumeM3', 'ventilatedEnclosureDuctPerManufacturerInstructions', 'ventilatedEnclosureFreshAirSufficient', 'ventilatedEnclosureDuctToOutdoor', 'ventilatedEnclosureToxicityClassInfo', 'ventilatedEnclosureToxicityLocationClass']) {
+  assert.ok(renderedHtml.includes(`data-schema-field="${key}"`) || renderedHtml.includes(`data-schema-notice="${key}"`), `Feld ${key} muss im Markup erscheinen`);
+}
+assert.ok(renderedHtml.includes('data-schema-field="ventilatedEnclosureToxicityLocationClass"'), 'select für Ort des Gehäuses muss gerendert sein');
+// Sichtbarkeits-Fallback: auch ohne Toxizitätsdaten bei Klasse IV sichtbar (nie unerreichbar)
+const toxicityField = schema.fields.find(field => field.key === 'ventilatedEnclosureToxicityLocationClass');
+assert.equal(toxicityField.visibleWhen({ ...reportedState, refrigerantId: '' }), true, 'Fallback: Klasse IV im belüfteten Gehäuse -> Feld sichtbar auch ohne Kältemitteldaten');
+// Gegenprobe: andere Aufstellorte rendern die Gruppe nicht
+for (const location of ['occupied-space', 'technical-room', 'machinery-room', 'outdoor']) {
+  const otherHtml = renderSchemaForm(schema, { ...reportedState, installationLocation: location }, { result: {} });
+  assert.ok(!otherHtml.includes('data-schema-field="ventilatedEnclosureToxicityLocationClass"'), `Gegenprobe ${location}: Feld darf nicht erscheinen`);
+}
+// Service Worker: Modul-Code ist version-kritisch (netzwerk-first), damit die App den PR-Stand ausliefert
+const serviceWorkerSource = fs.readFileSync(new URL('../service-worker.js', import.meta.url), 'utf8');
+assert.ok(/requestUrl\.pathname\.includes\('\/modules\/'\)/.test(serviceWorkerSource), 'service-worker.js: /modules/ muss version-kritisch (netzwerk-first) sein');
+console.log('✓ Test: Render-Test gemeldeter Fall (alle 6 Felder inkl. select), Gegenprobe andere Aufstellorte, SW network-first für /modules/');
+
+// --- Guidance-Test: offener Punkt nennt das fehlende Feld namentlich ---
+const openCalc = calculate(reportedState);
+const toxOpenCheck = openCalc.chargeLimitAssessment.checks.find(check => check.id === 'charge-limit.toxicity');
+assert.equal(toxOpenCheck.status, 'not-assessed');
+assert.deepEqual(toxOpenCheck.missingInputs, ['ventilatedEnclosureToxicityLocationClass']);
+const FIELD_LABEL = 'Ort des belüfteten Gehäuses (Aufstellungsort I/II/III für Tabelle C.1, Spalte IV)';
+assert.ok(openCalc.plannerGuidance.missingInputs.includes(FIELD_LABEL), 'plannerGuidance.missingInputs muss das Feld namentlich (deutsch) nennen');
+const openItem = openCalc.plannerGuidance.groups.flatMap(group => group.items).find(item => item.id === 'charge-limit.toxicity');
+assert.ok(openItem.measure.includes(FIELD_LABEL), 'Maßnahme des offenen Punkts muss das fehlende Feld namentlich nennen');
+const openResultModel = buildEN378SafetyCheckResultModel(reportedState, openCalc);
+const openSerialized = JSON.stringify(openResultModel);
+assert.ok(openSerialized.includes(`Fehlend: ${FIELD_LABEL}`), 'Ergebnisanzeige (Offen-Gruppe) muss "Fehlend: <Feldlabel>" ausgeben');
+console.log('✓ Test: offener Punkt "toxizitätsbezogene Füllmenge" nennt "Ort des belüfteten Gehäuses (I/II/III)" als fehlende Angabe');
+
+// --- End-to-End-Konsistenz: Feld mit "III" beantwortet -> kein NOT_ASSESSED mehr, Abschluss erfolgreich ---
+const resolvedState = {
+  ...reportedState,
+  locationLevel: 'deepest-underground',
+  occupantDensityBelowOnePer10m2: 'yes',
+  hasEmergencyExits: 'yes',
+  enclosureVolumeM3: '8',
+  ventilatedEnclosureDuctPerManufacturerInstructions: 'yes',
+  ventilatedEnclosureFreshAirSufficient: 'yes',
+  ventilatedEnclosureDuctToOutdoor: 'yes',
+  ventilatedEnclosureToxicityLocationClass: 'III'
+};
+const resolvedCalc = calculate(resolvedState);
+const toxResolved = resolvedCalc.chargeLimitAssessment.checks.find(check => check.id === 'charge-limit.toxicity');
+assert.notEqual(toxResolved.status, 'not-assessed', 'nach Beantwortung mit III darf die toxizitätsbezogene Prüfung nicht mehr offen sein');
+assert.equal(toxResolved.noLimit, true, 'Zuordnung III (deepest underground, Kategorie c) -> Tabelle C.1: keine Begrenzung');
+assert.equal(resolvedCalc.status, 'acceptable', 'Gesamtbewertung schließt nach Beantwortung erfolgreich ab');
+assert.equal(JSON.stringify(buildEN378SafetyCheckResultModel(resolvedState, resolvedCalc)).includes('Fehlend:'), false, 'keine "Fehlend"-Markierung mehr im Ergebnis');
+console.log('✓ Test: End-to-End-Konsistenz - nach Antwort "III" kein offener toxizitätsbezogener Punkt mehr, Gesamtbewertung acceptable');
 
 console.log('EN 378 ventilated enclosure (EN 378-3, 4.6) tests passed.');

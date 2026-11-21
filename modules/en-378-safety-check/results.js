@@ -23,9 +23,13 @@ const compactItemRow = item => {
   const statement = item.status === 'passed'
     ? `${title} erfüllt alle Anforderungen`
     : truncate(item.measure || item.requirement || 'prüfen');
+  // Konsistenzregel: Fordert eine Prüfung eine Eingabe (missingInputs), wird diese namentlich
+  // mit ihrer deutschen Bezeichnung ausgegeben (missingInputs liegen bereits als Labels vor).
+  const missing = Array.isArray(item.missingInputs) ? item.missingInputs.filter(Boolean) : [];
+  const missingText = item.status !== 'passed' && missing.length ? ` Fehlend: ${missing.join(', ')}.` : '';
   return {
     label: title,
-    value: `${getPlannerGuidanceStatusLabel(item.status)}: ${statement}`,
+    value: `${getPlannerGuidanceStatusLabel(item.status)}: ${statement}${missingText}`,
     unit: section
   };
 };

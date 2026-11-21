@@ -12,7 +12,10 @@ const isOutdoor = state => state.installationLocation === 'outdoor';
 const isTechnicalRoom = state => state.installationLocation === 'technical-room';
 const isVentilatedEnclosure = state => state.installationLocation === 'ventilated-enclosure';
 // EN 378-1, Tabelle C.1, Spalte IV: toxizitätsbezogene Prüfung nur bei Kältemitteln mit Toxizitätsdaten relevant
-const needsEnclosureToxicityClass = state => isVentilatedEnclosure(state) && ['A', 'B'].includes(getEN378SafetyData(state.refrigerantId)?.toxicityClass || '');
+// Toxizitätsbezogene Ortszuordnung (Tabelle C.1, Spalte IV) ist bei Kältemitteln mit
+// Toxizitätsklasse A/B relevant; zusätzlich immer bei Klasse IV, weil der Klasse-IV-Zweig
+// der Füllmengenprüfung die Angabe erwartet (nie unerreichbar lassen).
+const needsEnclosureToxicityClass = state => isVentilatedEnclosure(state) && (state.installationClass === 'IV' || ['A', 'B'].includes(getEN378SafetyData(state.refrigerantId)?.toxicityClass || ''));
 // EN 378-3, 4.5: abgeschlossener Raum ohne Personenaufenthalt (4.5 Abs. 2/3)
 const technicalRoomSeparated = state => isTechnicalRoom(state) && state.technicalRoomSeparatedFromOccupiedSpaces === 'yes';
 // 4.5 Abs. 2 (M2): Verdichter/Druckbehälter im abgeschlossenen Raum -> Behandlung wie Maschinenraum nach Abschnitt 5

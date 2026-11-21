@@ -50,7 +50,10 @@ function itemFromRequirement(requirement = {}) { return freezeItem({ ...requirem
 
 function itemFromChargeCheck(check = {}) {
   const requirement = array(check.requirements).join(' ') || check.reason || 'Füllmengenprüfung nach EN 378-1 Anhang C berücksichtigen.';
-  const measure = array(check.measures).join(' ') || (check.status === 'failed' ? 'Füllmenge, Raumvolumen, Aufstellort oder Schutzmaßnahmen anpassen.' : '') || (check.status === 'not-assessed' ? 'Fehlende Angaben ergänzen und Füllmengenbewertung erneut durchführen.' : '') || 'Prüfergebnis dokumentieren.';
+  const missingLabels = array(check.missingInputs).map(fieldLabel).filter(Boolean);
+  const measure = array(check.measures).join(' ') || (check.status === 'failed' ? 'Füllmenge, Raumvolumen, Aufstellort oder Schutzmaßnahmen anpassen.' : '') || (check.status === 'not-assessed'
+    ? (missingLabels.length ? `Fehlende Angaben ergänzen: ${missingLabels.join(', ')} - Füllmengenbewertung erneut durchführen.` : 'Fehlende Angaben ergänzen und Füllmengenbewertung erneut durchführen.')
+    : '') || 'Prüfergebnis dokumentieren.';
   return freezeItem({
     id: check.id, category: check.category === 'safetyMeasures' ? PLANNER_GUIDANCE_GROUPS.SAFETY_MEASURES : PLANNER_GUIDANCE_GROUPS.CHARGE_LIMIT, title: checkLabel(check.id), status: check.status, requirement, measure, source: check.source, missingInputs: check.missingInputs, details: { maximumChargeKg: check.maximumChargeKg ?? null, concentrationKgM3: check.concentrationKgM3 ?? null, rule: check.rule || '', noLimit: Boolean(check.noLimit) }
   });
