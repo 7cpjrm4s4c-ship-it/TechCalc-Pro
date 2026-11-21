@@ -12,6 +12,7 @@ const SOURCE = Object.freeze({
 });
 
 const yes = value => value === true || value === 'yes';
+const hasAnswer = value => value === true || value === false || value === 'yes' || value === 'no';
 const text = value => String(value ?? '').trim();
 const unique = values => [...new Set((values || []).filter(Boolean))];
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
@@ -40,7 +41,7 @@ function consistencyRequirement({ id, title, requirement, measure, status = STAT
 }
 
 function isMachineryRoom(state = {}) {
-  return text(state.installationLocation) === 'machinery-room' || yes(state.hasMachineryRoom);
+  return text(state.installationLocation) === 'machinery-room';
 }
 
 function isOutdoor(state = {}) {
@@ -49,6 +50,10 @@ function isOutdoor(state = {}) {
 
 function isOccupiedSpace(state = {}) {
   return text(state.installationLocation) === 'occupied-space';
+}
+
+function isVentilatedEnclosure(state = {}) {
+  return text(state.installationLocation) === 'ventilated-enclosure';
 }
 
 export function assessStateConsistency(currentState = {}) {
@@ -70,7 +75,7 @@ export function assessStateConsistency(currentState = {}) {
     requirements.push(consistencyRequirement({
       id: 'state-consistency.class-ii-location',
       title: 'Klasse II mit Aufstellort abgleichen',
-      requirement: 'Klasse II beschreibt eine Aufstellung im Maschinenraum oder im Freien.',
+      requirement: 'Klasse II beschreibt Verdichter im Maschinenraum oder im Freien.',
       measure: 'Aufstellort auf Maschinenraum oder Außenaufstellung ändern oder eine andere Aufstellungsort-Klassifikation wählen.'
     }));
   }
@@ -79,17 +84,19 @@ export function assessStateConsistency(currentState = {}) {
     requirements.push(consistencyRequirement({
       id: 'state-consistency.class-iii-location',
       title: 'Klasse III mit Aufstellort abgleichen',
-      requirement: 'Klasse III setzt voraus, dass relevante Anlagenteile beziehungsweise der Verdichter im Maschinenraum oder im Freien angeordnet sind.',
+      requirement: 'Klasse III setzt voraus, dass alle kältemittelführenden Teile im Maschinenraum oder im Freien angeordnet sind.',
       measure: 'Aufstellort, Maschinenraum-Angabe oder Aufstellungsort-Klassifikation fachlich angleichen.'
     }));
   }
 
-  if (installationClass === 'IV' && !isOccupiedSpace(currentState)) {
+  // Klasse IV (belüftetes Gehäuse) ist nur im Personen-Aufenthaltsbereich zulässig;
+  // der Aufstellort "belüftetes Gehäuse" ist die explizite Angabe dieser Kombination.
+  if (installationClass === 'IV' && !isOccupiedSpace(currentState) && !isVentilatedEnclosure(currentState)) {
     requirements.push(consistencyRequirement({
       id: 'state-consistency.class-iv-location',
       title: 'Klasse IV mit Personen-Aufenthaltsbereich abgleichen',
-      requirement: 'Klasse IV beschreibt mechanische Geräte im Personen-Aufenthaltsbereich.',
-      measure: 'Aufstellort auf Personen-Aufenthaltsbereich ändern oder eine passende Aufstellungsort-Klassifikation wählen.'
+      requirement: 'Klasse IV beschreibt ein belüftetes Gehäuse im Personen-Aufenthaltsbereich.',
+      measure: 'Aufstellort auf Personen-Aufenthaltsbereich oder belüftetes Gehäuse ändern oder eine passende Aufstellungsort-Klassifikation wählen.'
     }));
   }
 
@@ -99,6 +106,40 @@ export function assessStateConsistency(currentState = {}) {
       title: 'Lüftungsangaben angleichen',
       requirement: 'Die Angabe keine gesicherte Lüftung widerspricht einer gleichzeitig bestätigten mechanischen Lüftung.',
       measure: 'Lüftungsart und Angabe zur mechanischen Lüftung fachlich konsistent auswählen.'
+    }));
+  }
+
+  // EN 378-3, 4.5 (M1): Ist der technische Raum nicht abgeschlossen, werden die Komponenten
+  // wie im Personen-Aufenthaltsbereich (4.4) behandelt; ausgefüllte 4.5-Detailfelder sind in
+  // diesem Umleitungsfall nicht relevant und ein Konflikt.
+  if (text(currentState.installationLocation) === 'technical-room' &&
+      text(currentState.technicalRoomSeparatedFromOccupiedSpaces) === 'no') {
+    const answeredDetails = [
+      hasAnswer(currentState.technicalRoomContainsCompressorOrPressureVessel),
+      hasAnswer(currentState.technicalRoomComponentsHaveDetachableJoints),
+      hasAnswer(currentState.technicalRoomVentilationActivatesDetector),
+      Boolean(text(currentState.technicalRoomExhaustHoodFlowRateM3s)),
+      ['vibrations', 'corrosive-atmosphere', 'vibrations-and-corrosive'].includes(text(currentState.technicalRoomAdverseConditions))
+    ];
+    if (answeredDetails.some(Boolean)) {
+      requirements.push(consistencyRequirement({
+        id: 'state-consistency.technical-room-details-in-redirect',
+        title: '4.5-Detailangaben im Umleitungsfall 4.4',
+        requirement: 'Ist der Raum nicht gegenüber Personen-Aufenthaltsbereichen abgeschlossen, erfolgt die Bewertung nach EN 378-3 Abschnitt 4.4; Detailangaben zu Abzugshaube, Verdichter/Druckbehälter oder lösbaren Verbindungen sind dann nicht relevant.',
+        measure: 'Detailfelder zum technischen Raum (4.5) nur ausfüllen, wenn der Raum abgeschlossen ist, oder den Raumabschluss auf „Ja“ setzen.'
+      }));
+    }
+  }
+
+  // EN 378-3 Abschnitte 8 und 9: Alarmierung ohne Gaswarnanlage und ohne Detektor ist
+  // unplausibel - ohne Auslösehardware kann der Alarm nicht ausgelöst werden.
+  if ((yes(currentState.hasAlarm) || yes(currentState.hasIndependentAlarmPower)) &&
+      text(currentState.hasGasWarningSystem) === 'no' && text(currentState.hasDetector) === 'no') {
+    requirements.push(consistencyRequirement({
+      id: 'state-consistency.alarm-without-trigger-hardware',
+      title: 'Alarmierung ohne Gaswarnanlage und ohne Detektor',
+      requirement: 'Eine Alarmierung nach EN 378-3 Abschnitt 8 muss durch ein Gaswarnsystem (Detektor nach Abschnitt 9) ausgelöst werden; ohne Gaswarnanlage und ohne Detektor ist keine Auslösehardware vorhanden.',
+      measure: 'Gaswarnanlage oder Kältemitteldetektor vorsehen oder Alarmierung und unabhängige Alarmstromversorgung auf „Nein“ setzen.'
     }));
   }
 

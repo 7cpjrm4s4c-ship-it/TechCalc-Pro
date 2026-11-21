@@ -49,8 +49,10 @@ export function buildEN378SavedRecord(current = {}, result = {}, existing = null
 
 export function hydrateEN378SavedRecord(item = {}) {
   const inputState = clone(item.inputState) || {};
+  // Remove obsolete fields from saved records (migration for commit refactor(en378))
+  const { hasEmergencyStopOutside, hasEmergencyStopInside, hasEmergencyLighting, hasMachineryRoom, ...cleanState } = inputState;
   return {
-    ...inputState,
+    ...cleanState,
     savedAssessmentName: item.name || item.title || ''
   };
 }

@@ -70,7 +70,10 @@ const r513aCalculation = calculate({
   applicationType: 'other',
   locationLevel: 'other',
   ventilationType: 'mechanical',
-  usesAlternativeRiskManagement: 'no'
+  usesAlternativeRiskManagement: 'no',
+  technicalRoomSeparatedFromOccupiedSpaces: 'yes',
+  technicalRoomContainsCompressorOrPressureVessel: 'no',
+  technicalRoomComponentsHaveDetachableJoints: 'no'
 });
 assert.equal(r513aCalculation.status, 'acceptable');
 assert.equal(r513aCalculation.plannerGuidance.missingInputs.includes('Grenzwert QLMV für Mindestlüftung'), false);

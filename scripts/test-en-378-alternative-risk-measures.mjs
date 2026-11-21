@@ -40,7 +40,7 @@ const alternativeAssessment = assessAlternativeRiskMeasures(baseState, rawCharge
 assert.equal(alternativeAssessment.requiredMeasureCount, 1);
 assert.equal(alternativeAssessment.selectedMeasureCount, 2);
 assert.equal(alternativeAssessment.status, 'passed');
-assert.ok(alternativeAssessment.requirements.some(item => item.title === 'mechanische Lüftung als alternative Vorkehrung'));
+assert.ok(alternativeAssessment.requirements.some(item => item.title === 'Mechanische Lüftung als alternative Vorkehrung'));
 
 const calculation = calculate(baseState);
 assert.equal(calculation.alternativeRiskMeasuresAssessment.status, 'passed');
@@ -78,5 +78,51 @@ const deepestResolved = calculate({
 assert.equal(deepestResolved.alternativeRiskMeasuresAssessment.requiredMeasureCount, 2);
 assert.equal(deepestResolved.alternativeRiskMeasuresAssessment.status, 'passed');
 assert.equal(deepestResolved.chargeLimitAssessment.status, 'passed');
+
+// C.3.1-Vorprüfungen als eigene Punkte mit Quellenangabe EN 378-1 C.3.1 (nicht stillschweigend)
+const c31Requirements = calculation.installationSafetyAssessment.requirements.filter(item => item.id.startsWith('alternative-precautions.c3-1'));
+assert.ok(c31Requirements.length >= 7, 'C.3.1-Vorprüfungen müssen als eigene Punkte ausgewiesen sein');
+assert.ok(c31Requirements.every(item => item.source?.sourcePart === 'EN 378-1' && item.source?.sourceSection === 'C.3.1'));
+const c31Class = c31Requirements.find(item => item.id === 'alternative-precautions.c3-1-refrigerant-class');
+assert.equal(c31Class.status, 'passed', 'R-32 ist A2L -> C.3.1-Kältemittelbedingung erfüllt');
+const c31Cap = c31Requirements.find(item => item.id === 'alternative-precautions.c3-1-charge-cap');
+assert.equal(c31Cap.status, 'passed', '8 kg ≤ 1,5 × m3 (A2L)');
+assert.equal(c31Cap.details.maximumChargeKg, 59.86, '1,5 × m3 = 1,5 × 130 × 0,307 = 59,865 kg (gerundet 59,86)');
+const c31Location = c31Requirements.find(item => item.id === 'alternative-precautions.c3-1-installation-class');
+assert.equal(c31Location.status, 'passed', 'Klasse I im Personen-Aufenthaltsbereich ist für C.3 zulässig');
+for (const field of ['c3FactoryBuiltConnections', 'c3NoValvesOrConsumerConnections', 'c3PipingProtected', 'c3DoorsNotTightClosing']) {
+  const item = c31Requirements.find(entry => entry.missingInputs.includes(field));
+  assert.ok(item, `C.3.1-Feld ${field} muss als eigener Punkt mit missingInputs ausgewiesen sein`);
+  assert.equal(item.status, 'required');
+}
+const c31Violation = calculate({ ...baseState, refrigerantId: 'R-290' });
+const c31Failed = c31Violation.installationSafetyAssessment.requirements.find(item => item.id === 'alternative-precautions.c3-1-refrigerant-class');
+assert.equal(c31Failed.status, 'failed', 'R-290 (A3) verletzt die C.3.1-Kältemittelbedingung');
+
+// EN 378-3 Abschnitte 8 und 9: Maßnahme "Alarmierung" nur PASSED, wenn Auslösehardware
+// (Gaswarnsystem oder Detektor) UND unabhängige Stromversorgung vorhanden sind.
+const alarmPassed = alternativeAssessment.requirements.find(item => item.id === 'alternative-precautions.alarm');
+assert.ok(alarmPassed, 'Alarmierungs-Maßnahme muss bewertet werden');
+assert.equal(alarmPassed.status, 'passed', 'Gaswarnsystem + Detektor + unabhängige Stromversorgung -> PASSED');
+assert.deepEqual(alarmPassed.missingInputs, []);
+
+const alarmNoTriggerState = { ...baseState, hasGasWarningSystem: 'no', hasDetector: 'no', hasAlarm: 'yes', hasIndependentAlarmPower: 'yes' };
+const alarmNoTrigger = assessAlternativeRiskMeasures(alarmNoTriggerState, assessChargeLimit(alarmNoTriggerState));
+const alarmFailed = alarmNoTrigger.requirements.find(item => item.id === 'alternative-precautions.alarm');
+assert.ok(alarmFailed);
+assert.equal(alarmFailed.status, 'failed', 'Alarm ohne Gaswarnanlage und ohne Detektor darf nicht PASSED sein');
+assert.deepEqual([...alarmFailed.missingInputs].sort(), ['hasDetector', 'hasGasWarningSystem']);
+
+const alarmNoTriggerNoPowerState = { ...alarmNoTriggerState, hasIndependentAlarmPower: 'no' };
+const alarmNoTriggerNoPower = assessAlternativeRiskMeasures(alarmNoTriggerNoPowerState, assessChargeLimit(alarmNoTriggerNoPowerState));
+const alarmFailed2 = alarmNoTriggerNoPower.requirements.find(item => item.id === 'alternative-precautions.alarm');
+assert.equal(alarmFailed2.status, 'failed');
+assert.deepEqual([...alarmFailed2.missingInputs].sort(), ['hasDetector', 'hasGasWarningSystem', 'hasIndependentAlarmPower']);
+
+const alarmDetectorOnlyState = { ...baseState, hasGasWarningSystem: 'no', hasDetector: 'yes', hasAlarm: 'yes', hasIndependentAlarmPower: 'yes' };
+const alarmDetectorOnly = assessAlternativeRiskMeasures(alarmDetectorOnlyState, assessChargeLimit(alarmDetectorOnlyState));
+const alarmPassed2 = alarmDetectorOnly.requirements.find(item => item.id === 'alternative-precautions.alarm');
+assert.equal(alarmPassed2.status, 'passed', 'Detektor allein genügt als Auslösehardware');
+assert.deepEqual(alarmPassed2.missingInputs, []);
 
 console.log('EN 378 alternative risk measure tests passed.');
