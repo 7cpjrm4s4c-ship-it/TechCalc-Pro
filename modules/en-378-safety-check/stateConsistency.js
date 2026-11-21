@@ -48,6 +48,10 @@ function isOutdoor(state = {}) {
   return text(state.installationLocation) === 'outdoor';
 }
 
+function isTechnicalRoom(state = {}) {
+  return text(state.installationLocation) === 'technical-room';
+}
+
 function isOccupiedSpace(state = {}) {
   return text(state.installationLocation) === 'occupied-space';
 }
@@ -71,12 +75,18 @@ export function assessStateConsistency(currentState = {}) {
     }));
   }
 
-  if (installationClass === 'II' && !isMachineryRoom(currentState) && !isOutdoor(currentState)) {
+  // Klasse II richtet sich nach dem Standort der Verdichter und Druckbehälter (EN 378-1,
+  // 5.3 c): Maschinenraum oder im Freien. Ein abgeschlossener Raum ohne Personenaufenthalt
+  // mit Verdichter/Druckbehälter wird nach EN 378-3, 4.5 wie ein Maschinenraum behandelt -
+  // daher ist Klasse II auch für den Aufstellort "Technischer Raum" zulässig (z. B.
+  // Split-Anlage mit Verdichter/Außengerät im Freien und Innengerät in einem Raum
+  // ohne Personenaufenthalt).
+  if (installationClass === 'II' && !isMachineryRoom(currentState) && !isOutdoor(currentState) && !isTechnicalRoom(currentState)) {
     requirements.push(consistencyRequirement({
       id: 'state-consistency.class-ii-location',
       title: 'Klasse II mit Aufstellort abgleichen',
-      requirement: 'Klasse II beschreibt Verdichter im Maschinenraum oder im Freien.',
-      measure: 'Aufstellort auf Maschinenraum oder Außenaufstellung ändern oder eine andere Aufstellungsort-Klassifikation wählen.'
+      requirement: 'Klasse II beschreibt Verdichter und Druckbehälter im Maschinenraum oder im Freien (EN 378-1, 5.3 c); ein abgeschlossener Raum ohne Personenaufenthalt mit Verdichter oder Druckbehälter gilt nach EN 378-3, 4.5 als Maschinenraum.',
+      measure: 'Aufstellort auf Maschinenraum oder Außenaufstellung ändern oder eine andere Aufstellungsort-Klassifikation wählen; bei Verdichter/Druckbehälter im abgeschlossenen Raum ohne Personenaufenthalt ist der Aufstellort nach EN 378-3, 4.5 wie ein Maschinenraum zu behandeln (EN 378-1, 5.3 c).'
     }));
   }
 

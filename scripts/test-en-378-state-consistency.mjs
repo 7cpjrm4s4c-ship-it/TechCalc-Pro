@@ -131,4 +131,27 @@ const separatedOk = assessStateConsistency({
 });
 assert.equal(separatedOk.status, 'passed', 'abgeschlossener Raum mit 4.5-Details ist konsistent');
 
+// Klasse II ist auch für den Aufstellort "Technischer Raum" zulässig (EN 378-1, 5.3 c;
+// EN 378-3, 4.5): z. B. Split-Anlage mit Verdichter/Außengerät im Freien und Innengerät
+// in einem Raum ohne Personenaufenthalt.
+const classIITechnicalRoom = assessStateConsistency({
+  ...baseState,
+  installationLocation: 'technical-room',
+  installationClass: 'II',
+  technicalRoomSeparatedFromOccupiedSpaces: 'yes',
+  technicalRoomContainsCompressorOrPressureVessel: 'no'
+});
+assert.equal(classIITechnicalRoom.status, 'passed', 'Klasse II + Technischer Raum ist konsistent');
+assert.ok(!classIITechnicalRoom.requirements.some(item => item.id === 'state-consistency.class-ii-location'));
+// Gegenprobe: Klasse II im Personen-Aufenthaltsbereich bleibt ein Konflikt (mit Verweis auf 4.5 / 5.3 c)
+const classIIOccupied = assessStateConsistency({ ...baseState, installationLocation: 'occupied-space', installationClass: 'II' });
+assert.equal(classIIOccupied.status, 'failed');
+const classIIConflict = classIIOccupied.requirements.find(item => item.id === 'state-consistency.class-ii-location');
+assert.ok(classIIConflict);
+assert.match(classIIConflict.measure, /EN 378-3, 4\.5/);
+assert.match(classIIConflict.measure, /EN 378-1, 5\.3 c/);
+// Maschinenraum/Außen bleiben unverändert zulässig für Klasse II
+assert.equal(assessStateConsistency({ ...baseState, installationLocation: 'machinery-room', installationClass: 'II', accessArea: 'authorized-access' }).status, 'passed');
+assert.equal(assessStateConsistency({ ...baseState, installationLocation: 'outdoor', installationClass: 'II' }).status, 'passed');
+
 console.log('EN 378 state consistency tests passed.');

@@ -157,4 +157,28 @@ assert.equal(m5noLfl.status, 'not-assessed');
 assert.ok(m5noLfl.missingInputs.includes('lflKgM3'), 'M7/M5: fehlende LFL-Daten als missingInputs');
 console.log('✓ Test: M7 Konzentration vs. praktischer Grenzwert; fehlende Kältemitteldaten -> NOT_ASSESSED');
 
+// --- Gemeldeter Fall (Klasse-II-Plausibilität): Split-Anlage mit Innengerät im Raum ohne
+// Personenaufenthalt und Verdichter (Außengerät) im Freien -> Klasse II ist zulässig
+// (EN 378-1, 5.3 c; EN 378-3, 4.5), kein Konflikt 'state-consistency.class-ii-location'.
+const splitSystemState = {
+  ...baseState,
+  installationClass: 'II',
+  technicalRoomSeparatedFromOccupiedSpaces: 'yes',
+  technicalRoomContainsCompressorOrPressureVessel: 'no', // Verdichter befindet sich im Außengerät (im Freien)
+  technicalRoomComponentsHaveDetachableJoints: 'no'
+};
+const splitConsistency = assessStateConsistency(splitSystemState);
+assert.equal(splitConsistency.status, 'passed', 'Klasse II + Technischer Raum darf kein Konflikt sein');
+assert.ok(!splitConsistency.requirements.some(item => item.id === 'state-consistency.class-ii-location'));
+const splitCalc = calculate(splitSystemState);
+assert.ok(!splitCalc.stateConsistencyAssessment.requirements.some(item => item.id === 'state-consistency.class-ii-location'), 'kein class-ii-location im Gesamtergebnis');
+assert.ok(!splitCalc.requiredMeasures.some(measure => measure.includes('Klasse II')), 'Gesamtbewertung enthält keinen Klasse-II-Konflikt');
+// Gegenprobe: Klasse II im Personen-Aufenthaltsbereich bleibt ein Konflikt
+const occupiedClass2 = assessStateConsistency({ ...baseState, installationLocation: 'occupied-space', installationClass: 'II' });
+assert.equal(occupiedClass2.status, 'failed');
+assert.ok(occupiedClass2.requirements.some(item => item.id === 'state-consistency.class-ii-location'));
+assert.match(occupiedClass2.requirements.find(item => item.id === 'state-consistency.class-ii-location').measure, /4\.5/);
+assert.match(occupiedClass2.requirements.find(item => item.id === 'state-consistency.class-ii-location').measure, /5\.3 c/);
+console.log('✓ Test: Split-Anlage (Klasse II, Verdichter außen, Innengerät im technischen Raum) ohne class-ii-location-Konflikt');
+
 console.log('EN 378 technical room (EN 378-3, 4.5) tests passed.');
