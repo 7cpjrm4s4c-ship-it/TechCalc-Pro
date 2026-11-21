@@ -27,16 +27,17 @@ function freezeRequirement(requirement) {
   });
 }
 
-function consistencyRequirement({ id, title, requirement, measure, status = STATE_CONSISTENCY_STATUS.FAILED }) {
+function consistencyRequirement({ id, title, requirement, measure, status = STATE_CONSISTENCY_STATUS.FAILED, missingInputs = [], source = SOURCE }) {
   return freezeRequirement({
     id,
     category: 'guidance',
     title,
     requirement,
     measure,
-    source: SOURCE,
+    source,
     status,
-    priority: 'required'
+    priority: 'required',
+    missingInputs
   });
 }
 
@@ -80,14 +81,44 @@ export function assessStateConsistency(currentState = {}) {
   // mit Verdichter/Druckbehälter wird nach EN 378-3, 4.5 wie ein Maschinenraum behandelt -
   // daher ist Klasse II auch für den Aufstellort "Technischer Raum" zulässig (z. B.
   // Split-Anlage mit Verdichter/Außengerät im Freien und Innengerät in einem Raum
-  // ohne Personenaufenthalt).
+  // ohne Personenaufenthalt). Ebenso ist Klasse II im Personen-Aufenthaltsbereich nach
+  // EN 378-1, 5.3 c und 5.3 d zulässig, sofern alle Verdichter und Druckbehälter im
+  // Maschinenraum oder im Freien stehen (Rohrschlangen/Rohrleitungen mit Ventilen dürfen
+  // sich im Personen-Aufenthaltsbereich befinden) - das wird über das Feld
+  // classIiCompressorsOutsideOrMachineryRoom bestätigt.
+  const SOURCE_CLASS_II = Object.freeze({ sourcePart: 'EN 378-1', sourceSection: '5.3 c und 5.3 d' });
   if (installationClass === 'II' && !isMachineryRoom(currentState) && !isOutdoor(currentState) && !isTechnicalRoom(currentState)) {
-    requirements.push(consistencyRequirement({
-      id: 'state-consistency.class-ii-location',
-      title: 'Klasse II mit Aufstellort abgleichen',
-      requirement: 'Klasse II beschreibt Verdichter und Druckbehälter im Maschinenraum oder im Freien (EN 378-1, 5.3 c); ein abgeschlossener Raum ohne Personenaufenthalt mit Verdichter oder Druckbehälter gilt nach EN 378-3, 4.5 als Maschinenraum.',
-      measure: 'Aufstellort auf Maschinenraum oder Außenaufstellung ändern oder eine andere Aufstellungsort-Klassifikation wählen; bei Verdichter/Druckbehälter im abgeschlossenen Raum ohne Personenaufenthalt ist der Aufstellort nach EN 378-3, 4.5 wie ein Maschinenraum zu behandeln (EN 378-1, 5.3 c).'
-    }));
+    if (isOccupiedSpace(currentState)) {
+      const classIiConfirmed = currentState.classIiCompressorsOutsideOrMachineryRoom;
+      if (yes(classIiConfirmed)) {
+        // Voraussetzung bestätigt (EN 378-1, 5.3 c/d): Klasse II im Personen-Aufenthaltsbereich zulässig, kein Konflikt.
+      } else if (hasAnswer(classIiConfirmed)) {
+        requirements.push(consistencyRequirement({
+          id: 'state-consistency.class-ii-location',
+          title: 'Klasse II mit Aufstellort abgleichen',
+          requirement: 'Klasse II setzt voraus, dass sich alle Verdichter und Druckbehälter im Maschinenraum oder im Freien befinden (EN 378-1, 5.3 c und 5.3 d). Andernfalls ist die Aufstellungsort-Klassifikation zu korrigieren (in der Regel Klasse I).',
+          measure: 'Aufstellort auf Maschinenraum oder Außenaufstellung ändern oder eine andere Aufstellungsort-Klassifikation wählen; Voraussetzung für Klasse II im Personen-Aufenthaltsbereich prüfen (EN 378-1, 5.3 c und 5.3 d).',
+          source: SOURCE_CLASS_II
+        }));
+      } else {
+        requirements.push(consistencyRequirement({
+          id: 'state-consistency.class-ii-location',
+          title: 'Klasse II mit Aufstellort abgleichen',
+          requirement: 'Klasse II im Personen-Aufenthaltsbereich setzt voraus, dass sich alle Verdichter und Druckbehälter im Maschinenraum oder im Freien befinden (EN 378-1, 5.3 c und 5.3 d); Rohrschlangen und Rohrleitungen mit Ventilen dürfen sich im Personen-Aufenthaltsbereich befinden.',
+          measure: 'Bestätigen, dass alle Verdichter und Druckbehälter im Maschinenraum oder im Freien angeordnet sind (EN 378-1, 5.3 c und 5.3 d).',
+          status: 'not-assessed',
+          missingInputs: ['classIiCompressorsOutsideOrMachineryRoom'],
+          source: SOURCE_CLASS_II
+        }));
+      }
+    } else {
+      requirements.push(consistencyRequirement({
+        id: 'state-consistency.class-ii-location',
+        title: 'Klasse II mit Aufstellort abgleichen',
+        requirement: 'Klasse II beschreibt Verdichter und Druckbehälter im Maschinenraum oder im Freien (EN 378-1, 5.3 c); ein abgeschlossener Raum ohne Personenaufenthalt mit Verdichter oder Druckbehälter gilt nach EN 378-3, 4.5 als Maschinenraum.',
+        measure: 'Aufstellort auf Maschinenraum oder Außenaufstellung ändern oder eine andere Aufstellungsort-Klassifikation wählen; bei Verdichter/Druckbehälter im abgeschlossenen Raum ohne Personenaufenthalt ist der Aufstellort nach EN 378-3, 4.5 wie ein Maschinenraum zu behandeln (EN 378-1, 5.3 c).'
+      }));
+    }
   }
 
   if (installationClass === 'III' && !isMachineryRoom(currentState) && !isOutdoor(currentState)) {
@@ -154,7 +185,9 @@ export function assessStateConsistency(currentState = {}) {
   }
 
   return Object.freeze({
-    status: requirements.length ? STATE_CONSISTENCY_STATUS.FAILED : STATE_CONSISTENCY_STATUS.PASSED,
+    status: requirements.some(item => item.status === STATE_CONSISTENCY_STATUS.FAILED)
+      ? STATE_CONSISTENCY_STATUS.FAILED
+      : requirements.some(item => item.status === 'not-assessed') ? 'not-assessed' : STATE_CONSISTENCY_STATUS.PASSED,
     requirements: Object.freeze(requirements),
     requiredMeasures: Object.freeze(unique(requirements.map(item => item.measure))),
     missingInputs: Object.freeze([])

@@ -81,6 +81,7 @@ export const initialState = Object.freeze({
   hasEmergencyVentilationControlOutside: '',
   hasDetector: '',
   hasAlarm: '',
+  classIiCompressorsOutsideOrMachineryRoom: '',
   technicalRoomSeparatedFromOccupiedSpaces: '',
   technicalRoomContainsCompressorOrPressureVessel: '',
   technicalRoomComponentsHaveDetachableJoints: '',

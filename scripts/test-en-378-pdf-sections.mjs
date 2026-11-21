@@ -67,6 +67,7 @@ const inconsistentState = {
   ...state,
   installationLocation: 'occupied-space',
   installationClass: 'II',
+  classIiCompressorsOutsideOrMachineryRoom: 'no',
   accessArea: 'general-access'
 };
 const inconsistentCalculation = calculate(inconsistentState);

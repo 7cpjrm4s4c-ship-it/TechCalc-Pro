@@ -71,6 +71,7 @@ const FIELD_LABELS = Object.freeze({
   lflKgM3: 'untere Explosionsgrenze LFL',
   atelOdlKgM3: 'ATEL- oder ODL-Grenzwert',
   practicalLimitKgM3: 'praktischer Grenzwert',
+  classIiCompressorsOutsideOrMachineryRoom: 'Alle Verdichter und Druckbehälter befinden sich im Maschinenraum oder im Freien',
   technicalRoomSeparatedFromOccupiedSpaces: 'Raumabschluss gegenüber Personen-Aufenthaltsbereichen',
   technicalRoomContainsCompressorOrPressureVessel: 'Verdichter oder Druckbehälter im Raum',
   technicalRoomComponentsHaveDetachableJoints: 'Komponenten mit lösbaren Verbindungen',

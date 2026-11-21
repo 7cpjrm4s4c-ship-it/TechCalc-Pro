@@ -10,6 +10,7 @@ const baseState = {
   roomVolumeM3: '6000',
   installationLocation: 'occupied-space',
   installationClass: 'II',
+  classIiCompressorsOutsideOrMachineryRoom: 'no',
   accessArea: 'general-access',
   usageType: 'industrial',
   applicationType: 'other',
@@ -148,10 +149,69 @@ const classIIOccupied = assessStateConsistency({ ...baseState, installationLocat
 assert.equal(classIIOccupied.status, 'failed');
 const classIIConflict = classIIOccupied.requirements.find(item => item.id === 'state-consistency.class-ii-location');
 assert.ok(classIIConflict);
-assert.match(classIIConflict.measure, /EN 378-3, 4\.5/);
-assert.match(classIIConflict.measure, /EN 378-1, 5\.3 c/);
+assert.match(classIIConflict.requirement, /5\.3 c und 5\.3 d/);
+assert.match(classIIConflict.measure, /EN 378-1, 5\.3 c und 5\.3 d/);
 // Maschinenraum/Außen bleiben unverändert zulässig für Klasse II
 assert.equal(assessStateConsistency({ ...baseState, installationLocation: 'machinery-room', installationClass: 'II', accessArea: 'authorized-access' }).status, 'passed');
 assert.equal(assessStateConsistency({ ...baseState, installationLocation: 'outdoor', installationClass: 'II' }).status, 'passed');
+
+// EN 378-1, 5.3 c und 5.3 d: Klasse II im Personen-Aufenthaltsbereich ist zulässig, wenn alle
+// Verdichter und Druckbehälter im Maschinenraum oder im Freien stehen (bestätigt über
+// classIiCompressorsOutsideOrMachineryRoom).
+// Fall A: Voraussetzung bestätigt ('yes') -> kein class-ii-location-Konflikt
+const classIIOccupiedConfirmed = assessStateConsistency({
+  ...baseState,
+  installationLocation: 'occupied-space',
+  installationClass: 'II',
+  classIiCompressorsOutsideOrMachineryRoom: 'yes'
+});
+assert.equal(classIIOccupiedConfirmed.status, 'passed', 'Fall A: Klasse II + Aufenthaltsbereich mit bestätigter Voraussetzung ist konsistent');
+assert.ok(!classIIOccupiedConfirmed.requirements.some(item => item.id === 'state-consistency.class-ii-location'));
+const classIIOccupiedConfirmedCalc = calculate({
+  ...baseState,
+  installationLocation: 'occupied-space',
+  installationClass: 'II',
+  classIiCompressorsOutsideOrMachineryRoom: 'yes'
+});
+assert.ok(!classIIOccupiedConfirmedCalc.stateConsistencyAssessment.requirements.some(item => item.id === 'state-consistency.class-ii-location'), 'Fall A: kein class-ii-location im Gesamtergebnis');
+assert.ok(!classIIOccupiedConfirmedCalc.requiredMeasures.some(measure => measure.includes('Klasse II')), 'Fall A: Gesamtbewertung ohne Klasse-II-Konflikt');
+// Fall B: 'no' -> FAILED mit neuem Meldungstext (EN 378-1, 5.3 c und 5.3 d)
+const classIIOccupiedDenied = assessStateConsistency({
+  ...baseState,
+  installationLocation: 'occupied-space',
+  installationClass: 'II',
+  classIiCompressorsOutsideOrMachineryRoom: 'no'
+});
+assert.equal(classIIOccupiedDenied.status, 'failed');
+const denied = classIIOccupiedDenied.requirements.find(item => item.id === 'state-consistency.class-ii-location');
+assert.ok(denied);
+assert.match(denied.requirement, /Klasse II setzt voraus, dass sich alle Verdichter und Druckbehälter im Maschinenraum oder im Freien befinden/);
+assert.match(denied.requirement, /in der Regel Klasse I/);
+assert.equal(denied.source.sourcePart, 'EN 378-1');
+assert.equal(denied.source.sourceSection, '5.3 c und 5.3 d');
+// Fall C: keine Angabe -> NOT_ASSESSED mit missingInputs; Gesamtbewertung nicht PASSED/acceptable
+const classIIOccupiedOpen = assessStateConsistency({
+  ...baseState,
+  installationLocation: 'occupied-space',
+  installationClass: 'II',
+  classIiCompressorsOutsideOrMachineryRoom: ''
+});
+assert.equal(classIIOccupiedOpen.status, 'not-assessed', 'Fall C: unbeantwortete Voraussetzung -> not-assessed');
+const openItem = classIIOccupiedOpen.requirements.find(item => item.id === 'state-consistency.class-ii-location');
+assert.ok(openItem);
+assert.equal(openItem.status, 'not-assessed');
+assert.deepEqual(openItem.missingInputs, ['classIiCompressorsOutsideOrMachineryRoom']);
+const classIIOccupiedOpenCalc = calculate({
+  ...baseState,
+  installationLocation: 'occupied-space',
+  installationClass: 'II',
+  classIiCompressorsOutsideOrMachineryRoom: ''
+});
+assert.notEqual(classIIOccupiedOpenCalc.status, 'acceptable', 'Fall C: Gesamtbewertung darf nicht PASSED/acceptable lauten');
+assert.notEqual(classIIOccupiedOpenCalc.stateConsistencyAssessment.status, 'passed');
+// Fall D: andere Aufstellorte ohne Voraussetzung bleiben unverändert (pauschaler Konflikt)
+const classIIEnclosure = assessStateConsistency({ ...baseState, installationLocation: 'ventilated-enclosure', installationClass: 'II', classIiCompressorsOutsideOrMachineryRoom: '' });
+assert.equal(classIIEnclosure.status, 'failed', 'Fall D: belüftetes Gehäuse + Klasse II bleibt Konflikt');
+assert.ok(classIIEnclosure.requirements.some(item => item.id === 'state-consistency.class-ii-location'));
 
 console.log('EN 378 state consistency tests passed.');

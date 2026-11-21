@@ -173,12 +173,16 @@ assert.ok(!splitConsistency.requirements.some(item => item.id === 'state-consist
 const splitCalc = calculate(splitSystemState);
 assert.ok(!splitCalc.stateConsistencyAssessment.requirements.some(item => item.id === 'state-consistency.class-ii-location'), 'kein class-ii-location im Gesamtergebnis');
 assert.ok(!splitCalc.requiredMeasures.some(measure => measure.includes('Klasse II')), 'Gesamtbewertung enthält keinen Klasse-II-Konflikt');
-// Gegenprobe: Klasse II im Personen-Aufenthaltsbereich bleibt ein Konflikt
-const occupiedClass2 = assessStateConsistency({ ...baseState, installationLocation: 'occupied-space', installationClass: 'II' });
+// Gegenprobe: Klasse II im Personen-Aufenthaltsbereich mit Voraussetzung 'no' bleibt ein Konflikt
+// (EN 378-1, 5.3 c/d); ohne Angabe -> not-assessed.
+const occupiedClass2 = assessStateConsistency({ ...baseState, installationLocation: 'occupied-space', installationClass: 'II', classIiCompressorsOutsideOrMachineryRoom: 'no' });
 assert.equal(occupiedClass2.status, 'failed');
-assert.ok(occupiedClass2.requirements.some(item => item.id === 'state-consistency.class-ii-location'));
-assert.match(occupiedClass2.requirements.find(item => item.id === 'state-consistency.class-ii-location').measure, /4\.5/);
-assert.match(occupiedClass2.requirements.find(item => item.id === 'state-consistency.class-ii-location').measure, /5\.3 c/);
+const occupiedClass2Item = occupiedClass2.requirements.find(item => item.id === 'state-consistency.class-ii-location');
+assert.ok(occupiedClass2Item);
+assert.match(occupiedClass2Item.requirement, /5\.3 c und 5\.3 d/);
+const occupiedClass2Open = assessStateConsistency({ ...baseState, installationLocation: 'occupied-space', installationClass: 'II' });
+assert.equal(occupiedClass2Open.status, 'not-assessed', 'Klasse II im Aufenthaltsbereich ohne Angabe der Voraussetzung -> not-assessed');
+assert.deepEqual(occupiedClass2Open.requirements.find(item => item.id === 'state-consistency.class-ii-location').missingInputs, ['classIiCompressorsOutsideOrMachineryRoom']);
 console.log('✓ Test: Split-Anlage (Klasse II, Verdichter außen, Innengerät im technischen Raum) ohne class-ii-location-Konflikt');
 
 console.log('EN 378 technical room (EN 378-3, 4.5) tests passed.');
