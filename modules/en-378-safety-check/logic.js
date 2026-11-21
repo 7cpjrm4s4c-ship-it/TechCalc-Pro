@@ -62,6 +62,9 @@ export function validateAssessmentInput(currentState = {}) {
   addRequiredTextIssue(issues, effectiveState, 'accessArea');
   addRequiredTextIssue(issues, effectiveState, 'usageType');
   addRequiredTextIssue(issues, effectiveState, 'ventilationType');
+  if (effectiveState.installationLocation === 'technical-room') {
+    addRequiredTextIssue(issues, effectiveState, 'technicalRoomSeparatedFromOccupiedSpaces');
+  }
   if (isHumanComfortApplication(effectiveState)) {
     addPositiveNumberIssue(issues, effectiveState, 'floorAreaM2');
     addRequiredTextIssue(issues, effectiveState, 'isFactorySealed');
@@ -171,6 +174,9 @@ export function calculate(currentState = {}) {
     notices: Object.freeze([
       ...(effectiveState.installationLocation === 'occupied-space' || effectiveState.installationLocation === 'ventilated-enclosure'
         ? ['Das Raumvolumen ist nach EN 378-1, Abschnitt 7 zu bestimmen (kleinster umschlossener Personen-Aufenthaltsbereich, Zusammenfassung verbundener Räume, Zuluftabschläge bei A1). Die App leitet das Raumvolumen V nicht selbst ab.']
+        : []),
+      ...(effectiveState.installationLocation === 'technical-room' && effectiveState.technicalRoomSeparatedFromOccupiedSpaces === 'no'
+        ? ['Der Raum ist nicht gegenüber Personen-Aufenthaltsbereichen abgeschlossen: Die Bewertung erfolgt nach EN 378-3, Abschnitt 4.4 (Personen-Aufenthaltsbereich) i. V. m. 4.5.']
         : [])
     ]),
     dataVersions: effectiveState.dataVersions || getDataVersions()

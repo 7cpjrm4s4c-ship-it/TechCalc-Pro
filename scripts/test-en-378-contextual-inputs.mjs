@@ -18,7 +18,10 @@ const derivedAccessState = {
   applicationType: 'other',
   locationLevel: 'other',
   ventilationType: 'mechanical',
-  usesAlternativeRiskManagement: 'no'
+  usesAlternativeRiskManagement: 'no',
+  technicalRoomSeparatedFromOccupiedSpaces: 'yes',
+  technicalRoomContainsCompressorOrPressureVessel: 'no',
+  technicalRoomComponentsHaveDetachableJoints: 'no'
 };
 
 assert.equal(deriveAccessCategory(derivedAccessState), 'c');
@@ -172,5 +175,32 @@ assert.ok(triggerAssessment.requirements.some(item => item.id === 'hasDetector' 
 assert.ok(triggerAssessment.requirements.some(item => item.id === 'hasAlarm' && item.status === 'failed'), "'Nein' bei der Alarmierung muss im selben Lauf FAILED ergeben");
 assert.ok(triggerAssessment.requirements.some(item => item.id === 'hasIndependentAlarmPower' && item.status === 'failed'), "'Nein' bei der Alarmstromversorgung muss im selben Lauf FAILED ergeben");
 assert.equal(triggerAssessment.status, 'failed', "'Nein'-Angaben bei Auslöser dürfen nicht PASSED ergeben");
+
+// EN 378-3, 4.5: neue technical-room-Felder nur bei Aufstellort "Technischer Raum" sichtbar;
+// Abzugshauben-Details nur bei abgeschlossen + kein Verdichter/Druckbehälter + lösbare Verbindungen.
+const fieldByKey = key => schema.fields.find(field => field.key === key);
+const trSeparated = fieldByKey('technicalRoomSeparatedFromOccupiedSpaces');
+const trCompressor = fieldByKey('technicalRoomContainsCompressorOrPressureVessel');
+const trDetachable = fieldByKey('technicalRoomComponentsHaveDetachableJoints');
+const trFlow = fieldByKey('technicalRoomExhaustHoodFlowRateM3s');
+const trAdverse = fieldByKey('technicalRoomAdverseConditions');
+const trDetector = fieldByKey('technicalRoomVentilationActivatesDetector');
+assert.equal(trSeparated.visibleWhen({ installationLocation: 'technical-room' }), true);
+assert.equal(trSeparated.visibleWhen({ installationLocation: 'occupied-space' }), false, '4.5-Feld nur im technischen Raum sichtbar');
+assert.equal(trSeparated.visibleWhen({ installationLocation: 'machinery-room' }), false);
+assert.equal(trCompressor.visibleWhen({ installationLocation: 'technical-room', technicalRoomSeparatedFromOccupiedSpaces: 'yes' }), true);
+assert.equal(trCompressor.visibleWhen({ installationLocation: 'technical-room', technicalRoomSeparatedFromOccupiedSpaces: 'no' }), false, 'bei Umleitung 4.4 keine 4.5-Details');
+const hoodVisible = { installationLocation: 'technical-room', technicalRoomSeparatedFromOccupiedSpaces: 'yes', technicalRoomContainsCompressorOrPressureVessel: 'no', technicalRoomComponentsHaveDetachableJoints: 'yes' };
+assert.equal(trFlow.visibleWhen(hoodVisible), true);
+assert.equal(trAdverse.visibleWhen(hoodVisible), true);
+assert.equal(trDetector.visibleWhen(hoodVisible), true);
+assert.equal(trFlow.visibleWhen({ ...hoodVisible, technicalRoomComponentsHaveDetachableJoints: 'no' }), false, 'ohne lösbare Verbindungen keine Abzugshauben-Details');
+assert.equal(trFlow.visibleWhen({ ...hoodVisible, technicalRoomContainsCompressorOrPressureVessel: 'yes' }), false, 'M2-Fall: keine Abzugshauben-Details');
+// M2-Fall: Abschnitt-5-Felder auch im technischen Raum sichtbar (ohne Änderung der 4.3-Ketten)
+const m2SchemaState = { installationLocation: 'technical-room', technicalRoomSeparatedFromOccupiedSpaces: 'yes', technicalRoomContainsCompressorOrPressureVessel: 'yes' };
+assert.equal(fieldByKey('machineryRoomOccupied').visibleWhen(m2SchemaState), true, 'M2: Abschnitt-5-Felder im technischen Raum sichtbar');
+assert.equal(fieldByKey('machineryRoomOccupied').visibleWhen({ installationLocation: 'machinery-room', machineryRoomRiskAnalysisResult: 'yes' }), true, '4.3 bleibt unverändert');
+assert.equal(fieldByKey('machineryRoomOccupied').visibleWhen({ installationLocation: 'occupied-space' }), false, '4.4 bleibt unverändert');
+assert.equal(fieldByKey('machineryRoomRiskAnalysisStatus').visibleWhen(m2SchemaState), false, 'Risikoanalyse-Gate bleibt 4.3 vorbehalten');
 
 console.log('EN 378 contextual input tests passed.');

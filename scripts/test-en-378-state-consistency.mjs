@@ -102,4 +102,33 @@ const powerOnly = assessStateConsistency({ ...alarmNoHardwareState, hasAlarm: 'n
 assert.equal(powerOnly.status, 'failed');
 assert.ok(powerOnly.requirements.some(item => item.id === 'state-consistency.alarm-without-trigger-hardware'));
 
+// EN 378-3, 4.5 (M1): nicht abgeschlossener technischer Raum + ausgefüllte 4.5-Detailfelder -> Konflikt
+const redirectConflict = assessStateConsistency({
+  ...baseState,
+  installationLocation: 'technical-room',
+  installationClass: 'I',
+  technicalRoomSeparatedFromOccupiedSpaces: 'no',
+  technicalRoomContainsCompressorOrPressureVessel: 'yes',
+  technicalRoomExhaustHoodFlowRateM3s: '0.2'
+});
+assert.equal(redirectConflict.status, 'failed');
+assert.ok(redirectConflict.requirements.some(item => item.id === 'state-consistency.technical-room-details-in-redirect'));
+const redirectClean = assessStateConsistency({
+  ...baseState,
+  installationLocation: 'technical-room',
+  installationClass: 'I',
+  technicalRoomSeparatedFromOccupiedSpaces: 'no'
+});
+assert.equal(redirectClean.status, 'passed', 'Umleitungsfall 4.4 ohne Detailfelder ist konsistent');
+const separatedOk = assessStateConsistency({
+  ...baseState,
+  installationLocation: 'technical-room',
+  installationClass: 'I',
+  technicalRoomSeparatedFromOccupiedSpaces: 'yes',
+  technicalRoomContainsCompressorOrPressureVessel: 'no',
+  technicalRoomComponentsHaveDetachableJoints: 'yes',
+  technicalRoomExhaustHoodFlowRateM3s: '0.2'
+});
+assert.equal(separatedOk.status, 'passed', 'abgeschlossener Raum mit 4.5-Details ist konsistent');
+
 console.log('EN 378 state consistency tests passed.');

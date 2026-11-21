@@ -321,15 +321,194 @@ function buildArrangementRequirements(state, safetyData, chargeLimitAssessment) 
       }
     }
   }
-  if (state.installationLocation === 'technical-room') {
+  return requirements;
+}
+
+// EN 378-3:2020-12, Abschnitt 4.5: Raum ohne Personenaufenthalt, der nicht als Maschinenraum
+// ausgewiesen ist (installationLocation 'technical-room').
+// M1 (4.5 Abs. 1): Umleitung auf den Pfad 4.4 bei nicht abgeschlossenem Raum.
+// M2 (4.5 Abs. 2): Verdichter/Druckbehälter im abgeschlossenen Raum -> Behandlung wie
+// Maschinenraum nach Abschnitt 5, unmittelbar ohne Risikoanalyse-Gate (4.3).
+// M3/M4 (4.5 Abs. 3 i. V. m. 5.13, Anmerkung 1): Abzugshaube neben der Komponente mit
+// Luftwechselrate > 0,05 m³/s je Ventilator (bzw. > 0,5 m³/s bei ungünstigen Bedingungen).
+// M5 (4.5 Abs. 4 i. V. m. Abschnitt 9): Detektoren aktivieren die Lüftung bei kleinerem Wert
+// aus 50 % ATEL/ODL und 25 % LFL (bei charakteristischem Geruch unterhalb ATEL/ODL, z. B.
+// R-717, nur 25 % LFL). M7 (EN 378-1 Anhang C als Bindeglied zu 5.13): Konzentration vs.
+// praktischer Grenzwert. M6: Detektor-/Alarmprüfungen nach Abschnitt 9 bzw. 8 laufen über die
+// bestehenden Ketten (buildDetectorRequirements/buildAlarmRequirements) mit.
+function buildTechnicalRoomRequirements(state, safetyData, chargeLimitAssessment) {
+  const requirements = [];
+  const SOURCE_45 = Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '4.5' });
+  const separated = state.technicalRoomSeparatedFromOccupiedSpaces;
+
+  if (!hasAnswer(separated)) {
     requirements.push(required({
-      id: 'non-occupied-room.isolated',
-      category: 'location',
-      title: 'Raum ohne Personenaufenthalt gegenüber Aufenthaltsbereichen trennen',
-      requirement: 'Räume ohne Personenaufenthalt müssen gegenüber Personen-Aufenthaltsbereichen abgeschlossen sein; bei Komponenten mit lösbaren Verbindungen sind Lüftungsanforderungen zu bewerten.',
-      measure: 'Raumtrennung, Lüftung und Detektion für angrenzende Aufenthaltsbereiche prüfen.',
-      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '4.5' }),
-      priority: 'conditional'
+      id: 'technical-room.separated-from-occupied-spaces',
+      category: 'technicalRoom',
+      title: 'Raumabschluss gegenüber Personen-Aufenthaltsbereichen klären',
+      requirement: 'Es ist anzugeben, ob der Raum ohne Personenaufenthalt gegenüber jeglichem Personen-Aufenthaltsbereich abgeschlossen ist (EN 378-3, 4.5).',
+      measure: 'Raumabschluss gegenüber Personen-Aufenthaltsbereichen mit Ja oder Nein angeben.',
+      source: SOURCE_45,
+      status: REQUIREMENT_STATUS.NOT_ASSESSED,
+      missingInputs: ['technicalRoomSeparatedFromOccupiedSpaces']
+    }));
+    return requirements;
+  }
+
+  if (!yes(separated)) {
+    // M1: nicht abgeschlossen -> Komponenten als im Personen-Aufenthaltsbereich befindlich
+    // anzusehen; Bewertung nach Abschnitt 4.4 (die 4.4-Ketten laufen in derselben Bewertung mit).
+    requirements.push(required({
+      id: 'technical-room.treated-as-occupied-space',
+      category: 'technicalRoom',
+      title: 'Nicht abgeschlossener Raum - Behandlung wie Personen-Aufenthaltsbereich',
+      requirement: 'Kann der Bereich nicht gegenüber jeglichem Personen-Aufenthaltsbereich abgeschlossen werden, sind die kältetechnischen Komponenten als im Personen-Aufenthaltsbereich befindlich anzusehen; es gelten die Anforderungen nach EN 378-3 Abschnitt 4.4.',
+      measure: 'Bewertung nach EN 378-3 Abschnitt 4.4 durchführen: Füllmengengrenzen nach EN 378-1 Anhang C sowie die Abschnitte 6, 8 und 9 anwenden.',
+      source: SOURCE_45
+    }));
+    return requirements;
+  }
+
+  // Raum abgeschlossen (4.5 Abs. 2/3)
+  const compressor = state.technicalRoomContainsCompressorOrPressureVessel;
+  if (!hasAnswer(compressor)) {
+    requirements.push(required({
+      id: 'technical-room.compressor-or-pressure-vessel',
+      category: 'technicalRoom',
+      title: 'Verdichter oder Druckbehälter im Raum klären',
+      requirement: 'Es ist anzugeben, ob sich Verdichter oder Druckbehälter in dem abgeschlossenen Raum ohne Personenaufenthalt befinden (EN 378-3, 4.5 Abs. 2).',
+      measure: 'Vorhandensein von Verdichtern oder Druckbehältern mit Ja oder Nein angeben.',
+      source: SOURCE_45,
+      status: REQUIREMENT_STATUS.NOT_ASSESSED,
+      missingInputs: ['technicalRoomContainsCompressorOrPressureVessel']
+    }));
+    return requirements;
+  }
+
+  if (yes(compressor)) {
+    // M2: Aufstellungsort wie Maschinenraum nach Abschnitt 5 behandeln - unmittelbar, ohne
+    // Risikoanalyse-Gate; Abschnitt-5-Quellen werden zusätzlich als "4.5 i. V. m. ..." geführt.
+    requirements.push(required({
+      id: 'technical-room.machinery-room-treatment',
+      category: 'technicalRoom',
+      title: 'Verdichter/Druckbehälter im abgeschlossenen Raum - Maschinenraum-Behandlung nach Abschnitt 5',
+      requirement: 'Befinden sich Verdichter oder Druckbehälter in einem Raum ohne Personenaufenthalt, der gegenüber jeglichem Personen-Aufenthaltsbereich abgeschlossen ist, muss der Aufstellungsort als Maschinenraum nach EN 378-3 Abschnitt 5 behandelt werden (4.5 Abs. 2, unmittelbar ohne Risikoanalyse nach 4.3).',
+      measure: 'Anforderungen nach EN 378-3 Abschnitt 5 (5.1 bis 5.14) auf den Aufstellort anwenden.',
+      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '4.5 i. V. m. Abschnitt 5' })
+    }));
+    for (const item of machineryRoomSectionFiveRequirements(state, safetyData, chargeLimitAssessment)) {
+      const section = String(item.source?.sourceSection || '');
+      const remapped = item.source?.sourcePart === 'EN 378-3' && section.startsWith('5')
+        ? Object.freeze({ sourcePart: 'EN 378-3', sourceSection: `4.5 i. V. m. ${section}` })
+        : item.source;
+      requirements.push(freezeRequirement({ ...item, source: remapped }));
+    }
+    return requirements;
+  }
+
+  // 4.5 Abs. 3: andere Komponenten mit lösbaren Verbindungen im abgeschlossenen Raum
+  const detachable = state.technicalRoomComponentsHaveDetachableJoints;
+  if (!hasAnswer(detachable)) {
+    requirements.push(required({
+      id: 'technical-room.detachable-joints',
+      category: 'technicalRoom',
+      title: 'Lösbare Verbindungen im Raum klären',
+      requirement: 'Es ist anzugeben, ob sich Komponenten mit lösbaren Verbindungen in dem abgeschlossenen Raum ohne Personenaufenthalt befinden (EN 378-3, 4.5 Abs. 3).',
+      measure: 'Vorhandensein lösbarer Verbindungen mit Ja oder Nein angeben.',
+      source: SOURCE_45,
+      status: REQUIREMENT_STATUS.NOT_ASSESSED,
+      missingInputs: ['technicalRoomComponentsHaveDetachableJoints']
+    }));
+  }
+
+  // M7: Konzentration (Füllmenge/Raumvolumen) vs. praktischer Grenzwert (EN 378-1 Anhang C)
+  // als Bindeglied zu EN 378-3, 5.13 (ob mechanische Lüftung/Gasnachweis erforderlich sind).
+  const chargeKg = numberOrNull(state.chargeKg);
+  const roomVolume = numberOrNull(state.roomVolumeM3);
+  const concentration = chargeKg != null && roomVolume != null && roomVolume > 0 ? chargeKg / roomVolume : null;
+  const practicalLimit = numberOrNull(safetyData?.practicalLimitKgM3);
+  if (!safetyData || practicalLimit == null) {
+    requirements.push(required({
+      id: 'technical-room.concentration-limit',
+      category: 'technicalRoom',
+      title: 'Konzentration gegenüber praktischem Grenzwert bewerten',
+      requirement: 'Ob mechanische Lüftung und Gasnachweis nach EN 378-3, 5.13 erforderlich sind, richtet sich unter anderem nach der Konzentration gegenüber dem praktischen Grenzwert nach EN 378-1, Anhang C.',
+      measure: 'Kältemitteldaten sowie Angaben zu Füllmenge und Raumvolumen vervollständigen.',
+      source: Object.freeze({ sourcePart: 'EN 378-1', sourceSection: 'Anhang C i. V. m. EN 378-3, 5.13' }),
+      status: REQUIREMENT_STATUS.NOT_ASSESSED,
+      missingInputs: ['refrigerantId']
+    }));
+  } else {
+    const exceeds = concentration != null && concentration > practicalLimit;
+    requirements.push(required({
+      id: 'technical-room.concentration-limit',
+      category: 'technicalRoom',
+      title: 'Konzentration gegenüber praktischem Grenzwert',
+      requirement: 'Die Konzentration (Füllmenge/Raumvolumen) ist dem praktischen Grenzwert nach EN 378-1, Anhang C, gegenüberzustellen; sie bestimmt mit, ob mechanische Lüftung und Gasnachweis nach EN 378-3, 5.13 erforderlich sind.',
+      measure: exceeds
+        ? `Konzentration ${round(concentration, 5)} kg/m³ übersteigt den praktischen Grenzwert ${practicalLimit} kg/m³: mechanische Lüftung und Gasnachweis nach EN 378-3, 5.13 erforderlich.`
+        : `Konzentration ${round(concentration, 5)} kg/m³ liegt unterhalb des praktischen Grenzwerts ${practicalLimit} kg/m³.`,
+      source: Object.freeze({ sourcePart: 'EN 378-1', sourceSection: 'Anhang C i. V. m. EN 378-3, 5.13' }),
+      status: exceeds ? REQUIREMENT_STATUS.REQUIRED : REQUIREMENT_STATUS.PASSED,
+      details: Object.freeze({ concentrationKgM3: concentration != null ? round(concentration, 6) : null, practicalLimitKgM3: practicalLimit })
+    }));
+  }
+
+  if (yes(detachable)) {
+    // M3/M4 (4.5 Abs. 3 i. V. m. 5.13, Anmerkung 1): Abzugshaube neben der Komponente.
+    // Strikte Ungleichung: PASSED nur bei Wert > Schwelle; Wert <= Schwelle ist FAILED.
+    const adverseValue = String(state.technicalRoomAdverseConditions || '').trim();
+    const adverse = Boolean(adverseValue) && adverseValue !== 'none';
+    const threshold = adverse ? 0.5 : 0.05;
+    const flow = numberOrNull(state.technicalRoomExhaustHoodFlowRateM3s);
+    const flowStatus = flow == null ? REQUIREMENT_STATUS.NOT_ASSESSED : (flow > threshold ? REQUIREMENT_STATUS.PASSED : REQUIREMENT_STATUS.FAILED);
+    requirements.push(required({
+      id: 'technical-room.exhaust-hood-flow-rate',
+      category: 'technicalRoom',
+      title: adverse ? 'Abzugshaube bei ungünstigen Bedingungen - Luftwechselrate über 0,5 m³/s je Abzugshaube' : 'Abzugshaube neben der Komponente - Luftwechselrate über 0,05 m³/s je Ventilator',
+      requirement: adverse
+        ? 'Bei ungünstigen Bedingungen (z. B. starke Schwingungen oder korrosive Atmosphäre) muss die Luftwechselrate der Abzugshaube mehr als 0,5 m³/s je Abzugshaube betragen (EN 378-3, 4.5 Abs. 3 mit Anmerkung 1).'
+        : 'Die mechanische Lüftung erfolgt durch eine neben der Komponente angeordnete Abzugshaube; die Luftwechselrate muss mehr als 0,05 m³/s je Ventilator betragen (EN 378-3, 4.5 Abs. 3 i. V. m. 5.13). Die Rate von 0,05 m³/s gilt als ausreichend für die Lüftung eines Volumens von 18 m³.',
+      measure: flow == null
+        ? `Luftwechselrate der Abzugshaube angeben (Schwelle: mehr als ${threshold} m³/s).`
+        : `Luftwechselrate ${flow} m³/s ${flow > threshold ? 'übersteigt' : 'erreicht nicht'} die Schwelle von mehr als ${threshold} m³/s.`,
+      source: SOURCE_45,
+      status: flowStatus,
+      missingInputs: flow == null ? ['technicalRoomExhaustHoodFlowRateM3s'] : [],
+      details: Object.freeze({ thresholdM3s: threshold, adverseConditions: adverseValue || 'none', flowRateM3s: flow })
+    }));
+
+    // M5 (4.5 Abs. 4 i. V. m. Abschnitt 9): Kältemittel-Detektoren aktivieren die Lüftung.
+    // Auslöseschwelle: kleinerer Wert aus 50 % ATEL/ODL und 25 % LFL; bei Kältemitteln mit
+    // charakteristischem Geruch unterhalb ATEL/ODL (z. B. R-717) nur 25 % LFL.
+    // Gilt nur für den 4.5-Pfad; die Detektorschwellen der Pfade 4.2/4.3 bleiben unberührt.
+    const lfl = numberOrNull(safetyData?.lflKgM3);
+    const atel = numberOrNull(safetyData?.atelOdlKgM3);
+    const odorDetectable = isR717(safetyData);
+    const dataMissing = [];
+    if (lfl == null) dataMissing.push('lflKgM3');
+    if (!odorDetectable && atel == null) dataMissing.push('atelOdlKgM3');
+    const activationThreshold = odorDetectable
+      ? (lfl != null ? round(0.25 * lfl, 6) : null)
+      : (lfl != null && atel != null ? round(Math.min(0.5 * atel, 0.25 * lfl), 6) : null);
+    const activationAnswer = state.technicalRoomVentilationActivatesDetector;
+    const activationStatus = !hasAnswer(activationAnswer) || dataMissing.length
+      ? REQUIREMENT_STATUS.NOT_ASSESSED
+      : (yes(activationAnswer) ? REQUIREMENT_STATUS.PASSED : REQUIREMENT_STATUS.FAILED);
+    requirements.push(required({
+      id: 'technical-room.detector-activated-ventilation',
+      category: 'technicalRoom',
+      title: 'Detektorbetätigte Aktivierung der Lüftung',
+      requirement: odorDetectable
+        ? 'Ist eine mechanische Lüftung erforderlich, müssen Kältemittel-Detektoren die Lüftung aktivieren; bei Kältemitteln mit charakteristischem Geruch unterhalb des ATEL/ODL (z. B. R-717) gilt die Schwelle 25 % der LFL (EN 378-3, 4.5 Abs. 4 i. V. m. Abschnitt 9).'
+        : 'Ist eine mechanische Lüftung erforderlich, müssen Kältemittel-Detektoren die Lüftung bei 50 % des ATEL/ODL oder 25 % der LFL aktivieren, je nachdem, welcher Wert geringer ist (EN 378-3, 4.5 Abs. 4 i. V. m. Abschnitt 9).',
+      measure: activationThreshold != null
+        ? `Detektorbetätigte Lüftungsaktivierung vorsehen; Auslöseschwelle: ${activationThreshold} kg/m³ (${odorDetectable ? '25 % LFL' : 'Minimum aus 50 % ATEL/ODL und 25 % LFL'}).`
+        : 'Detektorbetätigte Lüftungsaktivierung vorsehen; Auslöseschwelle ist aus den Kältemitteldaten nicht bestimmbar.',
+      source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '4.5 i. V. m. Abschnitt 9' }),
+      status: activationStatus,
+      missingInputs: [...(hasAnswer(activationAnswer) ? [] : ['technicalRoomVentilationActivatesDetector']), ...dataMissing],
+      details: Object.freeze({ activationThresholdKgM3: activationThreshold, odorCharacteristicRefrigerant: odorDetectable })
     }));
   }
 
@@ -373,11 +552,10 @@ function buildOutdoorVentilationRequirements(state) {
   return requirements;
 }
 
-function buildMachineryRoomRequirements(state, safetyData, chargeLimitAssessment) {
-  // Only generate machinery room requirements from EN 378-3, Section 5 when
-  // installationLocation is 'machinery-room' AND machineryRoomRiskAnalysisResult is 'yes'
-  // Per spec: docs/contracts/en378/machinery-room-risk-analysis.md, section 3
-  if (state.installationLocation !== 'machinery-room' || state.machineryRoomRiskAnalysisResult !== 'yes') return [];
+// Gemeinsame Prüflogik EN 378-3 Abschnitt 5 (5.1 bis 5.14). Wird vom Pfad 4.3 (mit
+// Risikoanalyse-Gate, siehe buildMachineryRoomRequirements) und vom Fall M2 des Pfads 4.5
+// (technical-room mit Verdichter/Druckbehälter, ohne Risikoanalyse-Gate) verwendet.
+function machineryRoomSectionFiveRequirements(state, safetyData, chargeLimitAssessment) {
   const requirements = [];
   const flammable = isFlammable(safetyData?.flammabilityClass);
   const detectorRequired = buildDetectorRequirements(state, safetyData, chargeLimitAssessment).length > 0;
@@ -667,6 +845,14 @@ function buildMachineryRoomRequirements(state, safetyData, chargeLimitAssessment
   }
 
   return requirements;
+}
+
+function buildMachineryRoomRequirements(state, safetyData, chargeLimitAssessment) {
+  // Only generate machinery room requirements from EN 378-3, Section 5 when
+  // installationLocation is 'machinery-room' AND machineryRoomRiskAnalysisResult is 'yes'
+  // Per spec: docs/contracts/en378/machinery-room-risk-analysis.md, section 3
+  if (state.installationLocation !== 'machinery-room' || state.machineryRoomRiskAnalysisResult !== 'yes') return [];
+  return machineryRoomSectionFiveRequirements(state, safetyData, chargeLimitAssessment);
 }
 
 function buildAlternativePrecautionRequirements(state, safetyData, chargeLimitAssessment) {
@@ -1002,6 +1188,7 @@ export function assessInstallationSafetyRequirements(currentState = {}, chargeLi
   const outdoorFollowUpsApplicable = isOutdoor && arrangementPassed && accumulationPossible;
   const requirements = [
     ...arrangementRequirements,
+    ...(currentState.installationLocation === 'technical-room' ? buildTechnicalRoomRequirements(currentState, safetyData, chargeLimitAssessment) : []),
     ...(isOutdoor ? [] : buildMachineryRoomRequirements(currentState, safetyData, chargeLimitAssessment)),
     ...(isOutdoor ? [] : buildAlternativePrecautionRequirements(currentState, safetyData, chargeLimitAssessment)),
     ...(outdoorFollowUpsApplicable ? buildDetectorRequirements(currentState, safetyData, chargeLimitAssessment) : (!isOutdoor ? buildDetectorRequirements(currentState, safetyData, chargeLimitAssessment) : [])),

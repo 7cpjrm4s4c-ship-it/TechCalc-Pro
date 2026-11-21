@@ -4,15 +4,15 @@ import { HINWEIS_A, HINWEIS_B, MACHINERY_ROOM_NOTICE } from './machineryRoomRisk
 export const EN_378_PLANNER_GUIDANCE_VERSION = 1;
 
 export const PLANNER_GUIDANCE_GROUPS = Object.freeze({
-  CHARGE_LIMIT: 'chargeLimit', LOCATION: 'location', OCCUPANCY: 'occupancy', VENTILATION: 'ventilation', MACHINERY_ROOM: 'machineryRoom', DETECTION: 'detection', ALARM: 'alarm', EMERGENCY_CONTROL: 'emergencyControl', SAFETY_MEASURES: 'safetyMeasures', GUIDANCE: 'guidance', OPEN_POINTS: 'openPoints'
+  CHARGE_LIMIT: 'chargeLimit', LOCATION: 'location', TECHNICAL_ROOM: 'technicalRoom', OCCUPANCY: 'occupancy', VENTILATION: 'ventilation', MACHINERY_ROOM: 'machineryRoom', DETECTION: 'detection', ALARM: 'alarm', EMERGENCY_CONTROL: 'emergencyControl', SAFETY_MEASURES: 'safetyMeasures', GUIDANCE: 'guidance', OPEN_POINTS: 'openPoints'
 });
 
 const GROUP_LABELS = Object.freeze({
-  chargeLimit: 'Füllmenge und Konzentration', location: 'Aufstellort', occupancy: 'Nutzung und Zugang', ventilation: 'Lüftung', machineryRoom: 'Maschinenraum', detection: 'Detektion', alarm: 'Alarmierung', emergencyControl: 'Abschaltung und Notfunktionen', safetyMeasures: 'Schutzmaßnahmen', guidance: 'Übergabe und Dokumentation', openPoints: 'Offene Angaben'
+  chargeLimit: 'Füllmenge und Konzentration', location: 'Aufstellort', technicalRoom: 'Raum ohne Personenaufenthalt nach EN 378-3, 4.5', occupancy: 'Nutzung und Zugang', ventilation: 'Lüftung', machineryRoom: 'Maschinenraum', detection: 'Detektion', alarm: 'Alarmierung', emergencyControl: 'Abschaltung und Notfunktionen', safetyMeasures: 'Schutzmaßnahmen', guidance: 'Übergabe und Dokumentation', openPoints: 'Offene Angaben'
 });
 
 const GROUP_ORDER = Object.freeze([
-  PLANNER_GUIDANCE_GROUPS.OPEN_POINTS, PLANNER_GUIDANCE_GROUPS.CHARGE_LIMIT, PLANNER_GUIDANCE_GROUPS.LOCATION, PLANNER_GUIDANCE_GROUPS.OCCUPANCY, PLANNER_GUIDANCE_GROUPS.VENTILATION, PLANNER_GUIDANCE_GROUPS.MACHINERY_ROOM, PLANNER_GUIDANCE_GROUPS.DETECTION, PLANNER_GUIDANCE_GROUPS.ALARM, PLANNER_GUIDANCE_GROUPS.EMERGENCY_CONTROL, PLANNER_GUIDANCE_GROUPS.SAFETY_MEASURES, PLANNER_GUIDANCE_GROUPS.GUIDANCE
+  PLANNER_GUIDANCE_GROUPS.OPEN_POINTS, PLANNER_GUIDANCE_GROUPS.CHARGE_LIMIT, PLANNER_GUIDANCE_GROUPS.LOCATION, PLANNER_GUIDANCE_GROUPS.TECHNICAL_ROOM, PLANNER_GUIDANCE_GROUPS.OCCUPANCY, PLANNER_GUIDANCE_GROUPS.VENTILATION, PLANNER_GUIDANCE_GROUPS.MACHINERY_ROOM, PLANNER_GUIDANCE_GROUPS.DETECTION, PLANNER_GUIDANCE_GROUPS.ALARM, PLANNER_GUIDANCE_GROUPS.EMERGENCY_CONTROL, PLANNER_GUIDANCE_GROUPS.SAFETY_MEASURES, PLANNER_GUIDANCE_GROUPS.GUIDANCE
 ]);
 
 const array = value => Array.isArray(value) ? value : [];

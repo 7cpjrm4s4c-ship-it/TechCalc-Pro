@@ -12,6 +12,7 @@ const SOURCE = Object.freeze({
 });
 
 const yes = value => value === true || value === 'yes';
+const hasAnswer = value => value === true || value === false || value === 'yes' || value === 'no';
 const text = value => String(value ?? '').trim();
 const unique = values => [...new Set((values || []).filter(Boolean))];
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
@@ -106,6 +107,28 @@ export function assessStateConsistency(currentState = {}) {
       requirement: 'Die Angabe keine gesicherte Lüftung widerspricht einer gleichzeitig bestätigten mechanischen Lüftung.',
       measure: 'Lüftungsart und Angabe zur mechanischen Lüftung fachlich konsistent auswählen.'
     }));
+  }
+
+  // EN 378-3, 4.5 (M1): Ist der technische Raum nicht abgeschlossen, werden die Komponenten
+  // wie im Personen-Aufenthaltsbereich (4.4) behandelt; ausgefüllte 4.5-Detailfelder sind in
+  // diesem Umleitungsfall nicht relevant und ein Konflikt.
+  if (text(currentState.installationLocation) === 'technical-room' &&
+      text(currentState.technicalRoomSeparatedFromOccupiedSpaces) === 'no') {
+    const answeredDetails = [
+      hasAnswer(currentState.technicalRoomContainsCompressorOrPressureVessel),
+      hasAnswer(currentState.technicalRoomComponentsHaveDetachableJoints),
+      hasAnswer(currentState.technicalRoomVentilationActivatesDetector),
+      Boolean(text(currentState.technicalRoomExhaustHoodFlowRateM3s)),
+      ['vibrations', 'corrosive-atmosphere', 'vibrations-and-corrosive'].includes(text(currentState.technicalRoomAdverseConditions))
+    ];
+    if (answeredDetails.some(Boolean)) {
+      requirements.push(consistencyRequirement({
+        id: 'state-consistency.technical-room-details-in-redirect',
+        title: '4.5-Detailangaben im Umleitungsfall 4.4',
+        requirement: 'Ist der Raum nicht gegenüber Personen-Aufenthaltsbereichen abgeschlossen, erfolgt die Bewertung nach EN 378-3 Abschnitt 4.4; Detailangaben zu Abzugshaube, Verdichter/Druckbehälter oder lösbaren Verbindungen sind dann nicht relevant.',
+        measure: 'Detailfelder zum technischen Raum (4.5) nur ausfüllen, wenn der Raum abgeschlossen ist, oder den Raumabschluss auf „Ja“ setzen.'
+      }));
+    }
   }
 
   // EN 378-3 Abschnitte 8 und 9: Alarmierung ohne Gaswarnanlage und ohne Detektor ist

@@ -9,6 +9,15 @@ const isMachineryRoom = state => state.installationLocation === 'machinery-room'
 const yes = value => value === true || value === 'yes';
 const isMachineryRoomRiskAnalysisYes = state => state.installationLocation === 'machinery-room' && state.machineryRoomRiskAnalysisResult === 'yes';
 const isOutdoor = state => state.installationLocation === 'outdoor';
+const isTechnicalRoom = state => state.installationLocation === 'technical-room';
+// EN 378-3, 4.5: abgeschlossener Raum ohne Personenaufenthalt (4.5 Abs. 2/3)
+const technicalRoomSeparated = state => isTechnicalRoom(state) && state.technicalRoomSeparatedFromOccupiedSpaces === 'yes';
+// 4.5 Abs. 2 (M2): Verdichter/Druckbehälter im abgeschlossenen Raum -> Behandlung wie Maschinenraum nach Abschnitt 5
+const technicalRoomMachineryRoomCase = state => technicalRoomSeparated(state) && state.technicalRoomContainsCompressorOrPressureVessel === 'yes';
+// Abschnitt-5-Felder werden im Pfad 4.3 (Risikoanalyse Ergebnis "ja") ODER im Fall M2 (4.5) angezeigt
+const showsSectionFiveFields = state => isMachineryRoomRiskAnalysisYes(state) || technicalRoomMachineryRoomCase(state);
+// 4.5 Abs. 3 (M3-M5): abgeschlossen, keine Verdichter/Druckbehälter, lösbare Verbindungen
+const needsTechnicalRoomHoodDetails = state => technicalRoomSeparated(state) && state.technicalRoomContainsCompressorOrPressureVessel === 'no' && state.technicalRoomComponentsHaveDetachableJoints === 'yes';
 const outdoorBaseRequirementsPassed = state => state.isOutdoorDefinitionConfirmed === 'yes' && state.outdoorSafeArrangement === 'yes' && state.outdoorPreventBuildingEntry === 'yes' && (state.hasOutdoorProtectiveCover === 'no' || (state.hasOutdoorProtectiveCover === 'yes' && state.outdoorCoverVentilated === 'yes'));
 const needsOutdoorAccumulationAssessment = state => isOutdoor(state) && outdoorBaseRequirementsPassed(state);
 const needsOutdoorEN3782Confirmation = state => needsOutdoorAccumulationAssessment(state) && state.outdoorRefrigerantAccumulationPossible === 'yes' && ['2L', '2', '3'].includes(getEN378SafetyData(state.refrigerantId)?.flammabilityClass);
@@ -20,7 +29,7 @@ const positiveNumber = value => {
 };
 const isFlammable = state => ['2L', '2', '3'].includes(getEN378SafetyData(state.refrigerantId)?.flammabilityClass);
 const requiresMachineryRoomGasDetection = state => {
-  if (!isMachineryRoom(state)) return false;
+  if (!isMachineryRoom(state) && !technicalRoomMachineryRoomCase(state)) return false;
   const safetyData = getEN378SafetyData(state.refrigerantId);
   const charge = positiveNumber(state.chargeKg);
   const volume = positiveNumber(state.roomVolumeM3);
@@ -71,6 +80,9 @@ const ventilationTypeOptions = Object.freeze([
 const yesNoOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('yes', 'Ja'), option('no', 'Nein')
 ]);
+const technicalRoomAdverseConditionsOptions = Object.freeze([
+  option('', 'Nicht angegeben'), option('none', 'Keine ungünstigen Bedingungen'), option('vibrations', 'Starke Schwingungen'), option('corrosive-atmosphere', 'Korrosive Atmosphäre'), option('vibrations-and-corrosive', 'Starke Schwingungen und korrosive Atmosphäre')
+]);
 const riskAnalysisStatusOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('present', 'Risikoanalyse liegt vor')
 ]);
@@ -119,22 +131,22 @@ const schema = defineFormSchema({
     { key: 'ventilationType', label: 'Lüftung', type: FIELD_TYPES.SELECT, options: ventilationTypeOptions },
     { key: 'limitInfo', label: 'Hinweis zu Grenzwerten', type: FIELD_TYPES.NOTICE, text: 'RCL ist der Kältemittel-Konzentrationsgrenzwert. QLMV beschreibt den Grenzwert für Mindestlüftung. QLAV beschreibt den Grenzwert für zusätzliche Lüftung. Diese Werte werden nur angezeigt, wenn sie für die Bewertung benötigt werden.', tone: 'compact', visibleWhen: usesAlternativeRiskManagement },
     { key: 'hasGasWarningSystem', label: 'Gaswarnsystem vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions },
-    { key: 'machineryRoomOccupied', label: 'Personenaufenthalt im Maschinenraum möglich', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isMachineryRoomRiskAnalysisYes },
-    { key: 'machineryRoomRequiredAirChangeAchievable', label: 'Erforderlicher vierfacher Luftwechsel erreichbar', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isMachineryRoomRiskAnalysisYes(state) && yes(state.machineryRoomOccupied) },
-    { key: 'machineryRoomEmergencyFanSuitable', label: 'Notentlüftungsventilator geeignet', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isMachineryRoomRiskAnalysisYes(state) && isFlammable(state) },
-    { key: 'machineryRoomR717ContainmentProvided', label: 'Auffangsystem für R-717 vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isMachineryRoomRiskAnalysisYes(state) && state.refrigerantId === 'R-717' },
-    { key: 'machineryRoomR717EyeWashProvided', label: 'Augenspülung vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isMachineryRoomRiskAnalysisYes(state) && state.refrigerantId === 'R-717' },
-    { key: 'machineryRoomR717EmergencyShowerProvided', label: 'Notdusche vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isMachineryRoomRiskAnalysisYes(state) && state.refrigerantId === 'R-717' && positiveNumber(state.chargeKg) > 1000 },
-    { key: 'machineryRoomR717SprinklerInstalled', label: 'Sprinkleranlage installiert', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isMachineryRoomRiskAnalysisYes(state) && state.refrigerantId === 'R-717' },
-    { key: 'machineryRoomR717SprinklerConditionsConfirmed', label: 'Sprinkler-Bedingungen erfüllt', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isMachineryRoomRiskAnalysisYes(state) && state.refrigerantId === 'R-717' && state.machineryRoomR717SprinklerInstalled === 'yes' },
+    { key: 'machineryRoomOccupied', label: 'Personenaufenthalt im Maschinenraum möglich', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: showsSectionFiveFields },
+    { key: 'machineryRoomRequiredAirChangeAchievable', label: 'Erforderlicher vierfacher Luftwechsel erreichbar', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => showsSectionFiveFields(state) && yes(state.machineryRoomOccupied) },
+    { key: 'machineryRoomEmergencyFanSuitable', label: 'Notentlüftungsventilator geeignet', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => showsSectionFiveFields(state) && isFlammable(state) },
+    { key: 'machineryRoomR717ContainmentProvided', label: 'Auffangsystem für R-717 vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => showsSectionFiveFields(state) && state.refrigerantId === 'R-717' },
+    { key: 'machineryRoomR717EyeWashProvided', label: 'Augenspülung vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => showsSectionFiveFields(state) && state.refrigerantId === 'R-717' },
+    { key: 'machineryRoomR717EmergencyShowerProvided', label: 'Notdusche vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => showsSectionFiveFields(state) && state.refrigerantId === 'R-717' && positiveNumber(state.chargeKg) > 1000 },
+    { key: 'machineryRoomR717SprinklerInstalled', label: 'Sprinkleranlage installiert', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => showsSectionFiveFields(state) && state.refrigerantId === 'R-717' },
+    { key: 'machineryRoomR717SprinklerConditionsConfirmed', label: 'Sprinkler-Bedingungen erfüllt', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => showsSectionFiveFields(state) && state.refrigerantId === 'R-717' && state.machineryRoomR717SprinklerInstalled === 'yes' },
     { key: 'hasMechanicalVentilation', label: 'Mechanische Lüftung vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: usesAlternativeRiskManagement },
     { key: 'outdoorVentilationGeneralConfirmed', label: 'Lüftungsführung nach EN 378-3, 5.13.1 geprüft', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isOutdoor(state) && state.outdoorRefrigerantAccumulationPossible === 'yes' },
     { key: 'outdoorVentilationNationalRulesConfirmed', label: 'Nationale Lüftungsvorschriften nach EN 378-3, 5.13.2 eingehalten', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isOutdoor(state) && state.outdoorRefrigerantAccumulationPossible === 'yes' },
     { key: 'outdoorMechanicalVentilationOpeningsConfirmed', label: 'Öffnungen für mechanische Lüftung nach EN 378-3, 5.13.5 geprüft', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => isOutdoor(state) && state.outdoorRefrigerantAccumulationPossible === 'yes' && state.ventilationType === 'mechanical' },
-    { key: 'machineryRoomLargestSystemChargeKg', label: 'Füllmenge der größten Kälteanlage mit Anlagenteil im Maschinenraum', type: FIELD_TYPES.DECIMAL, unit: 'kg', visibleWhen: isMachineryRoomRiskAnalysisYes },
+    { key: 'machineryRoomLargestSystemChargeKg', label: 'Füllmenge der größten Kälteanlage mit Anlagenteil im Maschinenraum', type: FIELD_TYPES.DECIMAL, unit: 'kg', visibleWhen: showsSectionFiveFields },
     { key: 'hasEmergencyVentilation', label: 'Mechanische Notlüftung durch Detektoren aktiviert', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: requiresMachineryRoomGasDetection },
-    { key: 'hasEmergencyVentilationControlOutside', label: 'Unabhängige Notsteuerung der Notlüftung außen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isMachineryRoomRiskAnalysisYes },
-    { key: 'hasEmergencyVentilationControlInside', label: 'Unabhängige Notsteuerung der Notlüftung innen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isMachineryRoomRiskAnalysisYes },
+    { key: 'hasEmergencyVentilationControlOutside', label: 'Unabhängige Notsteuerung der Notlüftung außen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: showsSectionFiveFields },
+    { key: 'hasEmergencyVentilationControlInside', label: 'Unabhängige Notsteuerung der Notlüftung innen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: showsSectionFiveFields },
 
 
 
@@ -168,11 +180,20 @@ const schema = defineFormSchema({
     { key: 'outdoorEN3782_6_2_14SurfaceTemperatureConfirmed', label: 'Zulässige Oberflächentemperaturen extern nachgewiesen', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: needsOutdoorEN3782SurfaceTemperature },
     { key: 'outdoorEN3782_6_2_14HazardousAreaExceedsEquipment', label: 'Entflammbarer Bereich reicht über Geräteabmessungen hinaus', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => needsOutdoorEN3782StandardAssessment(state) && state.outdoorEN3782_6_2_14ProtectionConditionsConfirmed === 'yes' && Boolean(String(state.outdoorEN3782_6_2_14ProtectionEvidenceReference || '').trim()) },
     { key: 'outdoorEN3782_6_2_14EquipmentDocumentationUpdated', label: 'Erweiterter entflammbarer Bereich in Gerätedokumentation angegeben', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => needsOutdoorEN3782StandardAssessment(state) && state.outdoorEN3782_6_2_14ProtectionConditionsConfirmed === 'yes' && Boolean(String(state.outdoorEN3782_6_2_14ProtectionEvidenceReference || '').trim()) && state.outdoorEN3782_6_2_14HazardousAreaExceedsEquipment === 'yes' },
-    { key: 'additionalSafetyMeasures', label: 'Weitere Sicherheitsmaßnahmen', type: FIELD_TYPES.TEXT }
+    { key: 'additionalSafetyMeasures', label: 'Weitere Sicherheitsmaßnahmen', type: FIELD_TYPES.TEXT },
+    // EN 378-3, Abschnitt 4.5: Raum ohne Personenaufenthalt (nicht als Maschinenraum ausgewiesen)
+    { key: 'technicalRoomSeparatedFromOccupiedSpaces', label: 'Raum gegenüber Personen-Aufenthaltsbereichen abgeschlossen', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isTechnicalRoom },
+    { key: 'technicalRoomNotSeparatedNotice', label: 'Hinweis zur Umleitung auf Abschnitt 4.4', type: FIELD_TYPES.NOTICE, text: 'Der Raum ist nicht gegenüber jeglichem Personen-Aufenthaltsbereich abgeschlossen: Die kältetechnischen Komponenten sind als im Personen-Aufenthaltsbereich befindlich anzusehen; die Bewertung erfolgt nach EN 378-3 Abschnitt 4.4.', tone: 'compact', visibleWhen: state => isTechnicalRoom(state) && state.technicalRoomSeparatedFromOccupiedSpaces === 'no' },
+    { key: 'technicalRoomContainsCompressorOrPressureVessel', label: 'Verdichter oder Druckbehälter im Raum vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => technicalRoomSeparated(state) },
+    { key: 'technicalRoomComponentsHaveDetachableJoints', label: 'Komponenten mit lösbaren Verbindungen vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => technicalRoomSeparated(state) && state.technicalRoomContainsCompressorOrPressureVessel !== 'yes' },
+    { key: 'technicalRoomAdverseConditions', label: 'Ungünstige Bedingungen (EN 378-3, 4.5, Anmerkung 1)', type: FIELD_TYPES.SELECT, options: technicalRoomAdverseConditionsOptions, visibleWhen: needsTechnicalRoomHoodDetails },
+    { key: 'technicalRoomExhaustHoodFlowRateM3s', label: 'Luftwechselrate je Abzugshaube', type: FIELD_TYPES.DECIMAL, unit: 'm³/s', visibleWhen: needsTechnicalRoomHoodDetails },
+    { key: 'technicalRoomVentilationActivatesDetector', label: 'Lüftung wird durch Kältemittel-Detektor aktiviert', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: needsTechnicalRoomHoodDetails }
   ],
   groups: [
     { title: 'Importierter Anlagenstand', fields: ['importedSystemName', 'importFGasesSystem', 'fGasesSnapshotId', 'importNotice', 'importStatusMessage', 'refrigerantId', 'chargeKg', 'chargeScopeInfo'], columns: 2, accent: 'blue' },
     { title: 'Raum und Aufstellung', fields: ['roomVolumeM3', 'installationLocation', 'installationClass', 'accessArea', 'accessCategoryInfo', 'accessCategory', 'usageType', 'applicationType', 'locationLevel', 'isBasementLocation', 'machineryRoomRiskAnalysisStatus', 'machineryRoomRiskAnalysisResult', 'machineryRoomRiskAnalysisNotes'], columns: 2, accent: 'blue' },
+    { title: 'Raum ohne Personenaufenthalt (EN 378-3, 4.5)', fields: ['technicalRoomSeparatedFromOccupiedSpaces', 'technicalRoomNotSeparatedNotice', 'technicalRoomContainsCompressorOrPressureVessel', 'technicalRoomComponentsHaveDetachableJoints', 'technicalRoomAdverseConditions', 'technicalRoomExhaustHoodFlowRateM3s', 'technicalRoomVentilationActivatesDetector'], columns: 2, accent: 'blue' },
     { title: 'Detailfragen zur Füllmengenbewertung', fields: ['occupantDensityBelowOnePer10m2', 'hasEmergencyExits', 'isPermanentlySealedSorptionSystem', 'usesAlternativeRiskManagement', 'alternativeRiskManagementInfo', 'floorAreaM2', 'isFactorySealed', 'mountingType', 'c3FactoryBuiltConnections', 'c3NoValvesOrConsumerConnections', 'c3PipingProtected', 'c3DoorsNotTightClosing'], columns: 2, accent: 'blue' },
     { title: 'Lüftung und Sicherheitskomponenten', fields: ['ventilationType', 'limitInfo', 'hasGasWarningSystem', 'machineryRoomOccupied', 'machineryRoomRequiredAirChangeAchievable', 'machineryRoomLargestSystemChargeKg', 'hasEmergencyVentilation', 'hasEmergencyVentilationControlOutside', 'hasEmergencyVentilationControlInside', 'hasDetector', 'hasAlarm', 'hasIndependentAlarmPower', 'hasSafetyShutoffValves', 'hasVentilationOpenings', 'hasExplosionProtectedElectricalEquipment', 'machineryRoomEmergencyFanSuitable', 'machineryRoomR717ContainmentProvided', 'machineryRoomR717EyeWashProvided', 'machineryRoomR717EmergencyShowerProvided', 'machineryRoomR717SprinklerInstalled', 'machineryRoomR717SprinklerConditionsConfirmed', 'isOutdoorPublicAccessible', 'isOutdoorDefinitionConfirmed', 'outdoorSafeArrangement', 'outdoorPreventBuildingEntry', 'hasOutdoorProtectiveCover', 'outdoorCoverVentilated', 'outdoorRefrigerantAccumulationPossible', 'outdoorVentilationGeneralConfirmed', 'outdoorVentilationNationalRulesConfirmed', 'outdoorMechanicalVentilationOpeningsConfirmed', 'additionalSafetyMeasures'], columns: 2, accent: 'blue' },
     { title: 'EN 378-2, 6.2.14 – Brand- und Explosionsschutz', fields: ['outdoorEN3782_6_2_14EN60335Applicable', 'outdoorEN3782_6_2_14EN60335Compliant', 'outdoorEN3782_6_2_14EN60335EvidenceReference', 'outdoorEN3782_6_2_14HazardousAreaConfirmed', 'outdoorEN3782_6_2_14HazardousAreaEvidenceReference', 'outdoorEN3782_6_2_14ComponentAssessmentConfirmed', 'outdoorEN3782_6_2_14ComponentAssessmentEvidenceReference', 'outdoorEN3782_6_2_14ProtectionConditionsConfirmed', 'outdoorEN3782_6_2_14ProtectionEvidenceReference', 'outdoorEN3782_6_2_14AirflowProtectionUsed', 'outdoorEN3782_6_2_14AirflowAvailabilityConfirmed', 'outdoorEN3782_6_2_14AirflowInterlockConfirmed', 'outdoorEN3782_6_2_14SurfaceTemperatureConfirmed', 'outdoorEN3782_6_2_14HazardousAreaExceedsEquipment', 'outdoorEN3782_6_2_14EquipmentDocumentationUpdated'], columns: 2, accent: 'blue' },
