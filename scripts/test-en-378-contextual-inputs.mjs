@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { calculate, deriveAccessCategory, validateAssessmentInput, ACCESS_CATEGORY_BY_ACCESS_AREA } from '../modules/en-378-safety-check/logic.js';
 import schema from '../modules/en-378-safety-check/schema.js';
 import { assessChargeLimit, calculateC21Trigger } from '../modules/en-378-safety-check/chargeLimitCalculation.js';
+import { assessInstallationSafetyRequirements } from '../modules/en-378-safety-check/installationSafetyRequirements.js';
 import { buildEN378SafetyCheckReportDto } from '../modules/en-378-safety-check/reportAdapter.js';
 import { buildEN378SafetyCheckResultModel } from '../modules/en-378-safety-check/results.js';
 
@@ -131,5 +132,45 @@ assert.equal(hasAlarmField.disabled({ hasGasWarningSystem: '', hasDetector: '' }
 assert.equal(hasAlarmPowerField.disabled({ hasGasWarningSystem: 'no', hasDetector: 'no' }), true);
 assert.equal(hasAlarmPowerField.disabled({ hasGasWarningSystem: 'yes' }), false);
 assert.equal(hasAlarmPowerField.disabled({ hasDetector: 'yes' }), false);
+
+// EN 378-3 4.4 i. V. m. EN 378-1 Anhang C / 9.1: Der Eintrag zu Detektion/Alarmierung
+// (occupied-space.sections-8-9) darf nur mit Status required erscheinen, wenn ein normativer
+// Auslöser vorliegt (Konzentration über praktischem Grenzwert oder Gaswarnanlage). Ohne Auslöser
+// muss er informativ (not-applicable) sein und der Wortlaut "erforderlich" darf nicht erscheinen.
+const occupiedNoTrigger = {
+  refrigerantId: 'R-32',
+  chargeKg: '5',
+  roomVolumeM3: '100',
+  installationLocation: 'occupied-space',
+  installationClass: 'I',
+  accessArea: 'general-access',
+  usageType: 'commercial',
+  applicationType: 'other',
+  locationLevel: 'other',
+  ventilationType: 'mechanical',
+  hasGasWarningSystem: 'no',
+  hasDetector: 'no',
+  hasAlarm: 'no',
+  hasIndependentAlarmPower: 'no'
+};
+// R-32: 5 kg / 100 m³ = 0,05 kg/m³ < praktischer Grenzwert 0,061 kg/m³ -> kein Auslöser
+const noTriggerAssessment = assessInstallationSafetyRequirements(occupiedNoTrigger, assessChargeLimit(occupiedNoTrigger));
+const sections89Info = noTriggerAssessment.requirements.find(item => item.id === 'occupied-space.sections-8-9');
+assert.ok(sections89Info, 'Eintrag zu Abschnitten 8/9 muss vorhanden sein');
+assert.equal(sections89Info.status, 'not-applicable', 'ohne Auslöser darf der Eintrag nicht required sein');
+assert.ok(!/erforderlich/i.test(`${sections89Info.title} ${sections89Info.requirement} ${sections89Info.measure}`), 'Wortlaut "erforderlich" darf ohne Auslöser nicht erscheinen');
+assert.equal(sections89Info.source.sourceSection, '4.4 i. V. m. EN 378-1 Anhang C');
+assert.equal(noTriggerAssessment.status, 'passed', 'gemeldeter Fall (R-32, 5 kg, 100 m³, alle Nein): PASSED ohne "erforderlich: Detektion und Alarmierung"');
+
+// Gegenprobe: Konzentration über praktischem Grenzwert -> Auslöser -> required; die "Nein"-Angaben
+// müssen im selben Lauf zu FAILED führen (nicht PASSED).
+const occupiedTrigger = { ...occupiedNoTrigger, chargeKg: '8' }; // 8 kg / 100 m³ = 0,08 kg/m³ > 0,061 kg/m³
+const triggerAssessment = assessInstallationSafetyRequirements(occupiedTrigger, assessChargeLimit(occupiedTrigger));
+const sections89Req = triggerAssessment.requirements.find(item => item.id === 'occupied-space.sections-8-9');
+assert.equal(sections89Req.status, 'required', 'mit Auslöser (Konzentration > praktischer Grenzwert) muss der Eintrag required sein');
+assert.ok(triggerAssessment.requirements.some(item => item.id === 'hasDetector' && item.status === 'failed'), "'Nein' beim Detektor muss im selben Lauf FAILED ergeben");
+assert.ok(triggerAssessment.requirements.some(item => item.id === 'hasAlarm' && item.status === 'failed'), "'Nein' bei der Alarmierung muss im selben Lauf FAILED ergeben");
+assert.ok(triggerAssessment.requirements.some(item => item.id === 'hasIndependentAlarmPower' && item.status === 'failed'), "'Nein' bei der Alarmstromversorgung muss im selben Lauf FAILED ergeben");
+assert.equal(triggerAssessment.status, 'failed', "'Nein'-Angaben bei Auslöser dürfen nicht PASSED ergeben");
 
 console.log('EN 378 contextual input tests passed.');

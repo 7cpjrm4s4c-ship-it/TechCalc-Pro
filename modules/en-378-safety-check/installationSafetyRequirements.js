@@ -246,7 +246,7 @@ function buildOutdoorEN3782Requirements(state, safetyData) {
   return requirements;
 }
 
-function buildArrangementRequirements(state, safetyData) {
+function buildArrangementRequirements(state, safetyData, chargeLimitAssessment) {
   const requirements = [];
   const flammable = isFlammable(safetyData?.flammabilityClass);
   if (state.installationLocation === 'outdoor') {
@@ -273,14 +273,34 @@ function buildArrangementRequirements(state, safetyData) {
     return requirements;
   }
   if (state.installationLocation === 'occupied-space') {
-    requirements.push(required({
-      id: 'occupied-space.sections-8-9',
-      category: 'location',
-      title: 'Personen-Aufenthaltsbereich nach Abschnitten 8 und 9 bewerten',
-      requirement: 'Bei Aufstellung im Personen-Aufenthaltsbereich sind die Anforderungen an Alarmierung und Detektion zu berücksichtigen, sofern Warnung bei Leckage erforderlich ist.',
-      measure: 'Detektion und Alarmierung nach EN 378-3 Abschnitt 8 und 9 in die Planung aufnehmen.',
-      source: SOURCE.arrangement
-    }));
+    // Normativer Auslöser für Detektion/Alarmierung (EN 378-3, 9.1: Konzentration kann den
+    // praktischen Grenzwert überschreiten; oder Gaswarnanlage vorhanden). Nur bei Auslöser
+    // erscheint der Eintrag mit Status required; ohne Auslöser informativ (not-applicable,
+    // EN 378-3 4.4 i. V. m. EN 378-1 Anhang C) - dann darf der Wortlaut "erforderlich" nicht erscheinen.
+    const detectionAlarmTriggered =
+      buildDetectorRequirements(state, safetyData, chargeLimitAssessment).length > 0 ||
+      buildAlarmRequirements(state, safetyData, chargeLimitAssessment).length > 0;
+    if (detectionAlarmTriggered) {
+      requirements.push(required({
+        id: 'occupied-space.sections-8-9',
+        category: 'location',
+        title: 'Personen-Aufenthaltsbereich nach Abschnitten 8 und 9 bewerten',
+        requirement: 'Bei Aufstellung im Personen-Aufenthaltsbereich sind die Anforderungen an Alarmierung und Detektion zu berücksichtigen, sofern Warnung bei Leckage erforderlich ist.',
+        measure: 'Detektion und Alarmierung nach EN 378-3 Abschnitt 8 und 9 in die Planung aufnehmen.',
+        source: SOURCE.arrangement
+      }));
+    } else {
+      requirements.push(required({
+        id: 'occupied-space.sections-8-9',
+        category: 'location',
+        title: 'Detektion und Alarmierung im Personen-Aufenthaltsbereich',
+        requirement: 'Für diese Konstellation (Füllmengengrenzen nach EN 378-1 Anhang C eingehalten und Konzentration unterhalb des praktischen Grenzwerts) ist nach EN 378-3 Abschnitt 4.4 in Verbindung mit EN 378-1 Anhang C keine Detektion und keine Alarmierung nach EN 378-3 Abschnitt 8 und 9 notwendig.',
+        measure: 'Keine Maßnahme zu Detektion oder Alarmierung in die Planung aufnehmen.',
+        source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: '4.4 i. V. m. EN 378-1 Anhang C' }),
+        status: REQUIREMENT_STATUS.NOT_APPLICABLE,
+        priority: 'information'
+      }));
+    }
     // Ableitung Gaswarnsystem (EN 378-3, Abschnitte 8 und 9): Bei hasGasWarningSystem 'yes'
     // müssen die Detailfragen zu Detektor und Alarm beantwortet sein, bevor der Leitfaden
     // als belastbar gilt. Bei 'no' bleiben die normativen Detektorprüfungen nach Abschnitt 9
@@ -971,7 +991,7 @@ export function assessInstallationSafetyRequirements(currentState = {}, chargeLi
   }
 
   const isOutdoor = currentState.installationLocation === 'outdoor';
-  const arrangementRequirements = buildArrangementRequirements(currentState, safetyData);
+  const arrangementRequirements = buildArrangementRequirements(currentState, safetyData, chargeLimitAssessment);
   const arrangementPrerequisites = isOutdoor
     ? arrangementRequirements.filter(item => ['outdoor.definition-confirmed', 'outdoor.safe-arrangement', 'outdoor.prevent-refrigerant-entry', 'outdoor.cover-ventilation', 'hasOutdoorProtectiveCover'].includes(item.id))
     : arrangementRequirements;
