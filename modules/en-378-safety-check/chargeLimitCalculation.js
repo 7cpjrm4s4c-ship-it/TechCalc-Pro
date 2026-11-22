@@ -11,6 +11,7 @@ export const CHARGE_LIMIT_STATUS = Object.freeze({
 const SOURCE_EN_378_1_C1 = Object.freeze({ sourcePart: 'EN 378-1', sourceSection: 'C.1 / Tabelle C.1' });
 const SOURCE_EN_378_1_C2 = Object.freeze({ sourcePart: 'EN 378-1', sourceSection: 'C.1 / Tabelle C.2' });
 const SOURCE_EN_378_1_C3 = Object.freeze({ sourcePart: 'EN 378-1', sourceSection: 'C.3 / Tabellen C.3 und C.4' });
+const SOURCE_EN_378_1_C31_EN_378_3_61 = Object.freeze({ sourcePart: 'EN 378-1 / EN 378-3', sourceSection: 'C.3.1 / 6.1' });
 const SOURCE_EN_378_1_C21 = Object.freeze({ sourcePart: 'EN 378-1', sourceSection: 'C.2.1 / Gleichungen (C.1) und (C.2)' });
 const SOURCE_EN_378_1_C22 = Object.freeze({ sourcePart: 'EN 378-1', sourceSection: 'C.2.2 / Gleichungen (C.3) bis (C.5)' });
 const numberOrNull = value => {
@@ -110,6 +111,50 @@ export function calculateFlammabilityMassLimits(lflKgM3) {
     m1Kg: 4 * lfl,
     m2Kg: 26 * lfl,
     m3Kg: 130 * lfl
+  });
+}
+// C.3 richtet sich an Personen-Aufenthaltsbereiche (EN 378-3, 6.1 i. V. m. EN 378-1, C.3):
+// die Aufstellorte 'occupied-space' und 'ventilated-enclosure'.
+export const C3_ELIGIBLE_LOCATIONS = Object.freeze(['occupied-space', 'ventilated-enclosure']);
+export function isC3EligibleLocation(installationLocation) {
+  return C3_ELIGIBLE_LOCATIONS.includes(installationLocation);
+}
+// EN 378-1, C.3.1 (i. V. m. EN 378-3, 6.1): Alternative Vorkehrungen nach C.3 sind nur
+// vorgesehen für Kältemittel der Sicherheitsklassen A1 oder A2L und eine Füllmenge von
+// höchstens 150 kg (A1) bzw. 1,5 × m3 (A2L, m3 = 130 m³ × LFL). Diese Funktion ist die
+// einzige Quelle der Wahrheit für die C.3-Anwendbarkeit: Schema-Sichtbarkeit/Freigabe
+// (schema.js), die C.3.1-Vorprüfungen (installationSafetyRequirements.js) und die
+// C.3-Bewertung (assessChargeLimit) dürfen die Prüfung nicht dupliziert implementieren.
+// applicable/usable: true = anwendbar, false = normativ nicht vorgesehen, null = anhand
+// der vorliegenden Angaben nicht bestimmbar.
+export function assessC3Applicability(state = {}) {
+  const safetyData = state.refrigerantId ? getEN378SafetyData(state.refrigerantId) : null;
+  const safetyClass = safetyData?.safetyClass || '';
+  const lfl = numberOrNull(safetyData?.lflKgM3);
+  const charge = numberOrNull(state.chargeKg);
+  const m3Kg = lfl != null && lfl > 0 ? 130 * lfl : null;
+  const refrigerantClassOk = safetyClass ? ['A1', 'A2L'].includes(safetyClass) : null;
+  const chargeCapKg = safetyClass === 'A1' ? 150 : safetyClass === 'A2L' && m3Kg != null ? 1.5 * m3Kg : null;
+  const chargeWithinCap = chargeCapKg == null || charge == null ? null : charge <= chargeCapKg;
+  const locationOk = isC3EligibleLocation(state.installationLocation);
+  const reasons = [];
+  if (!locationOk) reasons.push('Aufstellort ist kein Personen-Aufenthaltsbereich');
+  if (refrigerantClassOk === false) reasons.push(`Kältemittel der Sicherheitsklasse ${safetyClass} ist nicht A1 oder A2L`);
+  if (chargeWithinCap === false) reasons.push(`Füllmenge ${charge} kg übersteigt die C.3.1-Obergrenze von ${round(chargeCapKg, 2)} kg`);
+  const classAndCap = [refrigerantClassOk, chargeWithinCap];
+  const applicable = classAndCap.every(flag => flag === true) ? true : classAndCap.some(flag => flag === false) ? false : null;
+  const usable = locationOk && applicable !== false;
+  return Object.freeze({
+    usable,
+    applicable,
+    locationOk,
+    refrigerantClassOk,
+    chargeWithinCap,
+    chargeCapKg,
+    m3Kg,
+    chargeKg: charge,
+    safetyClass,
+    reasons: Object.freeze(reasons)
   });
 }
 // C.2.1-Auslöseschwelle: m1 = 4 m³ × LFL; die Gleichungen (C.1)/(C.2) sind nur anzuwenden,
@@ -397,10 +442,21 @@ export function assessAlternativeRiskManagementC3({ safetyData, chargeKg, roomVo
   }
   return freezeResult({ id: 'charge-limit.alternative-risk-management', category: 'safetyMeasures', status: CHARGE_LIMIT_STATUS.FAILED, source: SOURCE_EN_378_1_C3, concentrationKgM3: concentration, rule: 'concentration-above-qlav', requirements: ['Konzentration überschreitet QLAV; alternative Vorkehrungen reichen in diesem Pfad nicht aus.'], measures: ['Aufstellkonzept, Füllmenge oder Raumvolumen fachlich ändern.'], details });
 }
-function shouldIncludeC3Assessment(currentState, toxicity, flammability) {
+// C.3-Bewertung nur, wenn C.3 normativ anwendbar ist (EN 378-1, C.3.1; EN 378-3, 6.1):
+// Eine Grenzwertüberschreitung nach C.1/C.2 allein begründet die C.3-Bewertung nicht.
+function shouldIncludeC3Assessment(currentState, toxicity, flammability, c3Usable) {
+  if (!c3Usable) return false;
   return yes(currentState.usesAlternativeRiskManagement)
     || toxicity.status === CHARGE_LIMIT_STATUS.FAILED
     || flammability.status === CHARGE_LIMIT_STATUS.FAILED;
+}
+function c3NotApplicableCheck(reasons) {
+  return notApplicable(
+    'charge-limit.alternative-risk-management',
+    'safetyMeasures',
+    `Alternative Vorkehrungen nach Anhang C.3 sind für diese Anlage normativ nicht vorgesehen (${reasons.join('; ')}). Eine gespeicherte Auswahl wird ignoriert; maßgeblich ist die Füllmengenbewertung nach C.1/C.2.`,
+    SOURCE_EN_378_1_C31_EN_378_3_61
+  );
 }
 export function assessChargeLimit(currentState = {}) {
   const chargeKg = numberOrNull(currentState.chargeKg);
@@ -426,12 +482,24 @@ export function assessChargeLimit(currentState = {}) {
       missingInputs: Object.freeze(['chargeKg', 'roomVolumeM3'])
     });
   }
-  const context = { ...currentState, safetyData, chargeKg, roomVolumeM3 };
+  // C.3-Anwendbarkeit (EN 378-1, C.3.1; EN 378-3, 6.1): Eine gespeicherte Auswahl 'Ja' wird
+  // ignoriert, wenn C.3 normativ nicht vorgesehen ist; dann ist die C.1/C.2-Bewertung maßgeblich.
+  const c3Applicability = assessC3Applicability(currentState);
+  const c3Requested = yes(currentState.usesAlternativeRiskManagement);
+  const context = {
+    ...currentState,
+    safetyData,
+    chargeKg,
+    roomVolumeM3,
+    usesAlternativeRiskManagement: c3Requested && !c3Applicability.usable ? 'no' : currentState.usesAlternativeRiskManagement
+  };
   const toxicity = toxicityLimitByTableC1(context);
   const flammability = flammabilityLimitByTableC2(context);
-  const checks = shouldIncludeC3Assessment(currentState, toxicity, flammability)
-    ? [toxicity, flammability, assessAlternativeRiskManagementC3(context)]
-    : [toxicity, flammability];
+  const checks = c3Requested && !c3Applicability.usable
+    ? [toxicity, flammability, c3NotApplicableCheck(c3Applicability.reasons)]
+    : shouldIncludeC3Assessment(currentState, toxicity, flammability, c3Applicability.usable)
+      ? [toxicity, flammability, assessAlternativeRiskManagementC3(context)]
+      : [toxicity, flammability];
   const assessedLimits = checks
     .filter(check => check.status !== CHARGE_LIMIT_STATUS.NOT_ASSESSED && check.status !== CHARGE_LIMIT_STATUS.NOT_APPLICABLE && !check.noLimit)
     .map(check => check.maximumChargeKg)

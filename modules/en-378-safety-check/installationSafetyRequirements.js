@@ -68,6 +68,7 @@ function checkBoolean({ id, category, title, requirement, measure, source, value
 }
 
 import { calculateDilutionOpeningArea, calculateAlternativeMechanicalVentilationFlow } from './ventilationMeasures.js';
+import { assessC3Applicability } from './chargeLimitCalculation.js';
 export { calculateDilutionOpeningArea, calculateAlternativeMechanicalVentilationFlow } from './ventilationMeasures.js';
 
 export function calculateDetectorPreset({ safetyData } = {}) {
@@ -945,7 +946,11 @@ function buildMachineryRoomRequirements(state, safetyData, chargeLimitAssessment
 
 function buildAlternativePrecautionRequirements(state, safetyData, chargeLimitAssessment) {
   const requirements = [];
-  const usesAlternative = yes(state.usesAlternativeRiskManagement) || (chargeLimitAssessment?.checks || []).some(check => check.id === 'charge-limit.alternative-risk-management' && check.status === 'failed');
+  // C.3 nur, wenn normativ anwendbar (EN 378-1, C.3.1; EN 378-3, 6.1) - eine Quelle der
+  // Wahrheit: assessC3Applicability (chargeLimitCalculation.js), nicht dupliziert.
+  const c3Applicability = assessC3Applicability(state);
+  const usesAlternative = (yes(state.usesAlternativeRiskManagement) && c3Applicability.usable)
+    || (chargeLimitAssessment?.checks || []).some(check => check.id === 'charge-limit.alternative-risk-management' && check.status === 'failed');
   if (!usesAlternative) return requirements;
 
   const c3Check = (chargeLimitAssessment?.checks || []).find(check => check.id === 'charge-limit.alternative-risk-management');
@@ -973,21 +978,21 @@ function buildAlternativePrecautionRequirements(state, safetyData, chargeLimitAs
     requirement: 'Alternative Vorkehrungen nach C.3 dürfen nur für Kältemittel der Sicherheitsklassen A1 oder A2L angewendet werden.',
     measure: `Sicherheitsklasse ${safetyClass || 'unbekannt'} prüfen; bei anderen Klassen ist der C.3-Pfad nicht anwendbar.`,
     source: SOURCE_C31,
-    status: ['A1', 'A2L'].includes(safetyClass) ? REQUIREMENT_STATUS.PASSED : REQUIREMENT_STATUS.FAILED
+    status: c3Applicability.refrigerantClassOk === true ? REQUIREMENT_STATUS.PASSED : c3Applicability.refrigerantClassOk === false ? REQUIREMENT_STATUS.FAILED : REQUIREMENT_STATUS.REQUIRED,
+    missingInputs: c3Applicability.refrigerantClassOk == null ? ['refrigerantId'] : []
   }));
-  const c31Lfl = numberOrNull(safetyData?.lflKgM3);
-  const c31Charge = numberOrNull(state.chargeKg);
-  const c31M3 = c31Lfl != null && c31Lfl > 0 ? 130 * c31Lfl : null;
-  const c31CapKg = safetyClass === 'A2L' && c31M3 != null ? 1.5 * c31M3 : 150;
+  const c31Charge = c3Applicability.chargeKg;
+  const c31CapKg = c3Applicability.chargeCapKg;
   requirements.push(required({
     id: 'alternative-precautions.c3-1-charge-cap',
     category: 'safetyMeasures',
     title: 'C.3.1: Füllmengen-Deckel einhalten',
     requirement: `Nach C.3.1 darf die Füllmenge höchstens 150 kg (A1) beziehungsweise 1,5 × m3 (A2L) betragen.`,
-    measure: `Füllmenge ${c31Charge ?? 'unbekannt'} kg gegen die C.3.1-Grenze von ${round(c31CapKg, 2)} kg prüfen.`,
+    measure: `Füllmenge ${c31Charge ?? 'unbekannt'} kg gegen die C.3.1-Grenze von ${c31CapKg != null ? round(c31CapKg, 2) : 'unbestimmt'} kg prüfen.`,
     source: SOURCE_C31,
-    status: c31Charge != null && c31Charge <= c31CapKg ? REQUIREMENT_STATUS.PASSED : REQUIREMENT_STATUS.FAILED,
-    details: Object.freeze({ maximumChargeKg: round(c31CapKg, 2), chargeKg: c31Charge })
+    status: c3Applicability.chargeWithinCap === true ? REQUIREMENT_STATUS.PASSED : c3Applicability.chargeWithinCap === false ? REQUIREMENT_STATUS.FAILED : REQUIREMENT_STATUS.REQUIRED,
+    missingInputs: c3Applicability.chargeWithinCap == null ? (c31Charge == null ? ['chargeKg'] : ['lflKgM3']) : [],
+    details: Object.freeze({ maximumChargeKg: c31CapKg != null ? round(c31CapKg, 2) : null, chargeKg: c31Charge })
   }));
   const c31Class = String(state.installationClass || '');
   const c31Location = String(state.installationLocation || '');

@@ -53,6 +53,7 @@ export function buildEN378SafetyCheckReportDto({
       hasEmergencyExits: reportState.hasEmergencyExits || '',
       isPermanentlySealedSorptionSystem: reportState.isPermanentlySealedSorptionSystem || '',
       usesAlternativeRiskManagement: reportState.usesAlternativeRiskManagement || '',
+      ventilatedEnclosureToxicityLocationClass: reportState.ventilatedEnclosureToxicityLocationClass || '',
       floorAreaM2: reportState.floorAreaM2 || '',
       mountingType: reportState.mountingType || '',
       isFactorySealed: reportState.isFactorySealed || '',

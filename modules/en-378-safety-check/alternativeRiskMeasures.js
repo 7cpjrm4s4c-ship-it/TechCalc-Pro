@@ -228,6 +228,28 @@ export function assessAlternativeRiskMeasures(currentState = {}, chargeLimitAsse
       details: Object.freeze({})
     });
   }
+  // C.3 normativ nicht anwendbar (EN 378-1, C.3.1; EN 378-3, 6.1): Die C.3-Bewertung darf in
+  // diesem Fall keine Maßnahmen fordern; eine gespeicherte Auswahl wird ignoriert und die
+  // Füllmengenbewertung nach C.1/C.2 ist maßgeblich.
+  if (c3Check.status === 'not-applicable') {
+    return Object.freeze({
+      status: ALTERNATIVE_RISK_MEASURE_STATUS.NOT_APPLICABLE,
+      requiredMeasureCount: 0,
+      selectedMeasureCount: 0,
+      maximumChargeKg: null,
+      requirements: Object.freeze([buildRequirement({
+        id: 'alternative-precautions.c3-applicability',
+        title: 'C.3-Anwendbarkeit (EN 378-1, C.3.1; EN 378-3, 6.1)',
+        requirement: c3Check.reason || 'Alternative Vorkehrungen nach Anhang C.3 sind für diese Anlage normativ nicht vorgesehen.',
+        measure: 'Keine C.3-Maßnahmen erforderlich; die Füllmengenbewertung nach C.1/C.2 ist maßgeblich.',
+        source: c3Check.source || SOURCE.c3,
+        status: ALTERNATIVE_RISK_MEASURE_STATUS.NOT_APPLICABLE
+      })]),
+      requiredMeasures: Object.freeze([]),
+      missingInputs: Object.freeze([]),
+      details: Object.freeze({})
+    });
+  }
   if (c3Check.status === 'not-assessed') {
     const missingInputs = c3Check.missingInputs || [];
     return Object.freeze({

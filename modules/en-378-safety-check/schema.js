@@ -2,6 +2,7 @@ import { defineFormSchema, FIELD_TYPES } from '../../core/ui/formSchema.js';
 import { getEN378SafetyData } from '../../core/data/index.js';
 import { buildFGasesImportOptions, hasAnyFGasesSavedSystem, hasMultipleFGasesSavedSystems, IMPORT_ACTION } from './importController.js';
 import { ACCESS_CATEGORY_BY_ACCESS_AREA } from './logic.js';
+import { assessC3Applicability } from './chargeLimitCalculation.js';
 
 const option = (value, label) => Object.freeze({ value, label });
 const accessCategoryByAccessArea = ACCESS_CATEGORY_BY_ACCESS_AREA;
@@ -44,6 +45,11 @@ const requiresMachineryRoomGasDetection = state => {
 };
 const usesAlternativeRiskManagement = state => state.usesAlternativeRiskManagement === 'yes';
 const needsC3DetailQuestions = state => usesAlternativeRiskManagement(state) && (state.installationLocation === 'occupied-space' || state.installationLocation === 'ventilated-enclosure');
+// EN 378-1, C.3.1 i. V. m. EN 378-3, 6.1: C.3 richtet sich an Personen-Aufenthaltsbereiche;
+// die Auswahl ist nur dort sichtbar und nur schaltbar, wenn C.3 normativ anwendbar ist
+// (einzige Quelle der Wahrheit: assessC3Applicability in chargeLimitCalculation.js).
+const c3LocationEligible = state => state.installationLocation === 'occupied-space' || state.installationLocation === 'ventilated-enclosure';
+const c3NotApplicable = state => assessC3Applicability(state).usable === false;
 const isHumanComfort = state => state.applicationType === 'human-comfort';
 const needsMountingType = state => isHumanComfort(state) && state.isFactorySealed === 'no';
 const needsExplosionEquipment = state => isMachineryRoom(state) && ['R-32', 'R32', 'HFKW-32', 'R-717', 'R717', 'R-290', 'R290'].includes(String(state.refrigerantId || ''));
@@ -86,8 +92,15 @@ const ventilationTypeOptions = Object.freeze([
 const yesNoOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('yes', 'Ja'), option('no', 'Nein')
 ]);
+// EN 378-1, 5.3: Die Optionen benennen vollständig, welche bauliche Situation hinter
+// Aufstellungsort I, II und III steht (5.3 d / 5.3 c / 5.3 b) - konsistent mit
+// installationClassOptions, aber als eigene Klartexte, damit sie nicht mit den
+// Klassifikationsbezeichnungen der Aufstellungsort-Klassifikation kollidieren.
 const enclosureToxicityLocationOptions = Object.freeze([
-  option('', 'Nicht angegeben'), option('I', 'Aufstellungsort I'), option('II', 'Aufstellungsort II'), option('III', 'Aufstellungsort III')
+  option('', 'Nicht angegeben'),
+  option('I', 'Aufstellungsort I – Mechanische Geräte im Personen-Aufenthaltsbereich'),
+  option('II', 'Aufstellungsort II – Verdichter im Maschinenraum oder im Freien'),
+  option('III', 'Aufstellungsort III – Maschinenraum oder im Freien')
 ]);
 const technicalRoomAdverseConditionsOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('none', 'Keine ungünstigen Bedingungen'), option('vibrations', 'Starke Schwingungen'), option('corrosive-atmosphere', 'Korrosive Atmosphäre'), option('vibrations-and-corrosive', 'Starke Schwingungen und korrosive Atmosphäre')
@@ -128,8 +141,10 @@ const schema = defineFormSchema({
     { key: 'occupantDensityBelowOnePer10m2', label: 'Personendichte kleiner als eine Person je 10 m²', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => ['b', 'c'].includes(accessCategoryByAccessArea[state.accessArea] || state.accessCategory) },
     { key: 'hasEmergencyExits', label: 'Notausgänge vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => (accessCategoryByAccessArea[state.accessArea] || state.accessCategory) === 'c' },
     { key: 'isPermanentlySealedSorptionSystem', label: 'Dauerhaft geschlossene Sorptionsanlage', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => (accessCategoryByAccessArea[state.accessArea] || state.accessCategory) === 'a' },
-    { key: 'usesAlternativeRiskManagement', label: 'Alternative Vorkehrungen nach Anhang C.3 vorgesehen', type: FIELD_TYPES.SELECT, options: yesNoOptions },
-    { key: 'alternativeRiskManagementInfo', label: 'Hinweis zu alternativen Vorkehrungen', type: FIELD_TYPES.NOTICE, text: 'Alternative Vorkehrungen nach Anhang C.3 werden nur bewertet, wenn dieser Pfad vorgesehen ist oder eine Grenzwertüberschreitung dies erfordert. Je nach Konzentration können eine oder zwei Maßnahmen erforderlich sein.', tone: 'compact', visibleWhen: usesAlternativeRiskManagement },
+    { key: 'usesAlternativeRiskManagement', label: 'Alternative Vorkehrungen nach Anhang C.3 vorgesehen', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: c3LocationEligible, disabled: c3NotApplicable },
+    { key: 'alternativeRiskManagementInfo', label: 'Hinweis zu alternativen Vorkehrungen', type: FIELD_TYPES.NOTICE, tone: 'compact', visibleWhen: c3LocationEligible, text: state => c3NotApplicable(state)
+      ? 'Alternative Vorkehrungen nach Anhang C.3 sind für dieses Kältemittel oder diese Füllmenge normativ nicht vorgesehen (EN 378-1, C.3.1; EN 378-3, 6.1). Die Auswahl ist deaktiviert; maßgeblich ist die Füllmengenbewertung nach C.1/C.2.'
+      : 'Alternative Vorkehrungen nach Anhang C.3 werden nur bewertet, wenn dieser Pfad nach EN 378-1, C.3.1, vorgesehen ist (Kältemittel A1 oder A2L, Füllmenge höchstens 150 kg bzw. 1,5 × m3). Je nach Konzentration können eine oder zwei Maßnahmen erforderlich sein.' },
     { key: 'floorAreaM2', label: 'Raumfläche', type: FIELD_TYPES.DECIMAL, unit: 'm²', visibleWhen: isHumanComfort },
     { key: 'isFactorySealed', label: 'Werkseitig dauerhaft geschlossen', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isHumanComfort },
     { key: 'c3FactoryBuiltConnections', label: 'Alle Verzweigungen aus fabrikmäßig zusammengebauten Verbindungsstücken', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: needsC3DetailQuestions },
@@ -204,7 +219,7 @@ const schema = defineFormSchema({
     { key: 'ventilatedEnclosureDuctPerManufacturerInstructions', label: 'Lüftungskanal nach Herstellerfestlegungen ausgeführt', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isVentilatedEnclosure },
     { key: 'ventilatedEnclosureFreshAirSufficient', label: 'Raum ausreichend mit Frischluft versorgt', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isVentilatedEnclosure },
     { key: 'ventilatedEnclosureDuctToOutdoor', label: 'Belüftung des Gehäuses führt ins Freie', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: isVentilatedEnclosure },
-    { key: 'ventilatedEnclosureToxicityClassInfo', label: 'Hinweis zur toxizitätsbezogenen Füllmenge', type: FIELD_TYPES.NOTICE, text: 'Nach EN 378-1, Tabelle C.1, Spalte IV, wird die toxizitätsbezogene Füllmenge in Abhängigkeit vom Ort des belüfteten Gehäuses nach Aufstellungsort I, II oder III beurteilt; die Auswahl trifft der Planer.', tone: 'compact', visibleWhen: isVentilatedEnclosure },
+    { key: 'ventilatedEnclosureToxicityClassInfo', label: 'Hinweis zur toxizitätsbezogenen Füllmenge', type: FIELD_TYPES.NOTICE, text: 'Nach EN 378-1, Tabelle C.1, Spalte IV, wird die toxizitätsbezogene Füllmenge in Abhängigkeit vom Ort des belüfteten Gehäuses nach Aufstellungsort I, II oder III beurteilt; die Auswahl trifft der Planer. Die Auswahl bestimmt, nach welcher Aufstellungsort-Klasse die toxizitätsbezogene Füllmenge des Gehäuses zu beurteilen ist: Aufstellungsort I = mechanische Geräte im Personen-Aufenthaltsbereich (EN 378-1, 5.3 d), Aufstellungsort II = Verdichter im Maschinenraum oder im Freien (EN 378-1, 5.3 c), Aufstellungsort III = vollständige Aufstellung in Maschinenraum oder im Freien (EN 378-1, 5.3 b).', tone: 'compact', visibleWhen: isVentilatedEnclosure },
     { key: 'ventilatedEnclosureToxicityLocationClass', label: 'Ort des belüfteten Gehäuses (Aufstellungsort I/II/III für Tabelle C.1, Spalte IV)', type: FIELD_TYPES.SELECT, options: enclosureToxicityLocationOptions, visibleWhen: needsEnclosureToxicityClass }
   ],
   groups: [

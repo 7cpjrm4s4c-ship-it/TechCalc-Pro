@@ -143,6 +143,7 @@ const CHECK_LABELS = Object.freeze({
   'alternative-precautions.c3-1-valves-occupied-space': 'C.3.1: Keine Ventile oder Verbraucheranschlüsse im Personen-Aufenthaltsbereich',
   'alternative-precautions.c3-1-piping-protected': 'C.3.1: Rohrleitungen gegen Beschädigung geschützt',
   'alternative-precautions.c3-1-doors-not-tight': 'C.3.1: Türen schließen nicht dicht',
+  'alternative-precautions.c3-applicability': 'C.3-Anwendbarkeit (EN 378-1, C.3.1; EN 378-3, 6.1)',
   'technical-room.separated-from-occupied-spaces': 'Raumabschluss gegenüber Personen-Aufenthaltsbereichen klären',
   'technical-room.treated-as-occupied-space': 'Nicht abgeschlossener Raum - Bewertung wie Personen-Aufenthaltsbereich (4.4)',
   'technical-room.compressor-or-pressure-vessel': 'Verdichter oder Druckbehälter im Raum klären',
@@ -214,6 +215,14 @@ const OPTION_LABELS = Object.freeze({
   mechanical: 'mechanische Lüftung',
   none: 'keine gesicherte Lüftung'
 });
+// Eigene Klartexte für den Ort des belüfteten Gehäuses (EN 378-1, Tabelle C.1, Spalte IV):
+// Die Werte I/II/III kollidieren in OPTION_LABELS mit den Klassifikationsbezeichnungen der
+// Aufstellungsort-Klassifikation, daher feldspezifische Zuordnung (EN 378-1, 5.3 d/c/b).
+const ENCLOSURE_TOXICITY_LOCATION_LABELS = Object.freeze({
+  I: 'Aufstellungsort I – Mechanische Geräte im Personen-Aufenthaltsbereich',
+  II: 'Aufstellungsort II – Verdichter im Maschinenraum oder im Freien',
+  III: 'Aufstellungsort III – Maschinenraum oder im Freien'
+});
 export function fieldLabel(key) {
   return FIELD_LABELS[key] || String(key || 'Angabe');
 }
@@ -229,6 +238,9 @@ export function checkLabel(id) {
 export function optionLabel(value) {
   return OPTION_LABELS[value] || String(value || 'nicht angegeben');
 }
+export function enclosureToxicityLocationLabel(value) {
+  return ENCLOSURE_TOXICITY_LOCATION_LABELS[value] || optionLabel(value);
+}
 export function validationIssueLabel(issue) {
   const [key, code] = String(issue || '').split(':');
   const label = fieldLabel(key);
@@ -237,4 +249,4 @@ export function validationIssueLabel(issue) {
   return `${label} prüfen.`;
 }
 
-export default Object.freeze({ fieldLabel, statusLabel, checkLabel, optionLabel, validationIssueLabel });
+export default Object.freeze({ fieldLabel, statusLabel, checkLabel, optionLabel, enclosureToxicityLocationLabel, validationIssueLabel });

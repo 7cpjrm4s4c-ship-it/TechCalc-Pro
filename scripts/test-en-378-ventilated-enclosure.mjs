@@ -198,4 +198,23 @@ assert.equal(resolvedCalc.status, 'acceptable', 'Gesamtbewertung schließt nach 
 assert.equal(JSON.stringify(buildEN378SafetyCheckResultModel(resolvedState, resolvedCalc)).includes('Fehlend:'), false, 'keine "Fehlend"-Markierung mehr im Ergebnis');
 console.log('✓ Test: End-to-End-Konsistenz - nach Antwort "III" kein offener toxizitätsbezogener Punkt mehr, Gesamtbewertung acceptable');
 
+// --- Klarstellung der Auswahl "Ort des belüfteten Gehäuses" (EN 378-1, 5.3 / Tab. C.1, Spalte IV) ---
+// Optionen vollständig ausgeschrieben (5.3 d / 5.3 c / 5.3 b), konsistent mit den
+// Klassifikationsbezeichnungen, aber als eigene Klartexte ohne Kollision.
+const locField = schema.fields.find(field => field.key === 'ventilatedEnclosureToxicityLocationClass');
+const optionByValue = value => locField.options.find(option => option.value === value);
+assert.equal(optionByValue('I').label, 'Aufstellungsort I – Mechanische Geräte im Personen-Aufenthaltsbereich');
+assert.equal(optionByValue('II').label, 'Aufstellungsort II – Verdichter im Maschinenraum oder im Freien');
+assert.equal(optionByValue('III').label, 'Aufstellungsort III – Maschinenraum oder im Freien');
+const classField = schema.fields.find(field => field.key === 'installationClass');
+assert.ok(classField.options.find(option => option.value === 'I').label.startsWith('Klasse I'), 'Aufstellungsort-Klassifikation behält ihre eigenen Bezeichnungen (keine Kollision)');
+const veInfoField = schema.fields.find(field => field.key === 'ventilatedEnclosureToxicityClassInfo');
+assert.ok(veInfoField.text.includes('5.3 d') && veInfoField.text.includes('5.3 c') && veInfoField.text.includes('5.3 b'), 'NOTICE nennt die Klartexte der Aufstellungsorte I/II/III mit Quellen (EN 378-1, 5.3)');
+assert.ok(veInfoField.text.includes('Tabelle C.1, Spalte IV'), 'NOTICE behält die Quellenangabe Tabelle C.1, Spalte IV');
+const renderedOptions = renderSchemaForm(schema, reportedState, { result: {} });
+for (const label of ['Aufstellungsort I – Mechanische Geräte im Personen-Aufenthaltsbereich', 'Aufstellungsort II – Verdichter im Maschinenraum oder im Freien', 'Aufstellungsort III – Maschinenraum oder im Freien']) {
+  assert.ok(renderedOptions.includes(label), `Render enthält den Optionsklartext "${label}"`);
+}
+console.log('✓ Test: Optionen "Ort des belüfteten Gehäuses" vollständig ausgeschrieben (EN 378-1, 5.3), NOTICE mit Klartext, Render-Check');
+
 console.log('EN 378 ventilated enclosure (EN 378-3, 4.6) tests passed.');

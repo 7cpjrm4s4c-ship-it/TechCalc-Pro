@@ -56,6 +56,15 @@ const OPTIONS = Object.freeze({
   present: 'Risikoanalyse liegt vor'
 });
 
+// Feldspezifische Klartexte für den Ort des belüfteten Gehäuses (EN 378-1, Tabelle C.1,
+// Spalte IV): Die Werte I/II/III kollidieren in OPTIONS mit den Klassifikationsbezeichnungen
+// der Aufstellungsort-Klassifikation (Klasse I/II/III), daher eigene Zuordnung (EN 378-1, 5.3).
+const ENCLOSURE_LOCATION_OPTIONS = Object.freeze({
+  I: 'Aufstellungsort I – Mechanische Geräte im Personen-Aufenthaltsbereich',
+  II: 'Aufstellungsort II – Verdichter im Maschinenraum oder im Freien',
+  III: 'Aufstellungsort III – Maschinenraum oder im Freien'
+});
+
 const CHECKS = Object.freeze({
   'charge-limit.refrigerant-data': 'Kältemitteldaten nach EN 378 prüfen',
   'charge-limit.input': 'Füllmenge und Raumvolumen prüfen',
@@ -81,6 +90,7 @@ const FIELDS = Object.freeze({
 
 function status(value) { return STATUS[value] || text(value); }
 function label(value) { return OPTIONS[value] || text(value); }
+function enclosureLocationLabel(value) { return ENCLOSURE_LOCATION_OPTIONS[value] || label(value); }
 function checkLabel(value) { return CHECKS[value] || FIELDS[value] || text(value); }
 function formatDateOnly(value) {
   const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -90,6 +100,12 @@ function sourceLabel(source = {}) {
   return [source.sourcePart || '', source.sourceSection || ''].filter(Boolean).join(' ');
 }
 
+// Prüfregel: Jede Aussage (Gesamtstatus, Kennzahlen, Einzelpunkte) darf im Bericht genau
+// einmal in vollem Umfang erscheinen. Abschnitt 1 enthält daher nur die fünf Kernzeilen;
+// Leitfaden-Überschrift (guidance.headline) und -Zusammenfassung (guidance.summary) bleiben
+// dem Planer-Leitfaden in Abschnitt 8 vorbehalten. Die fachbezogenen Statuszeilen in den
+// Abschnitten 4 bis 7 bleiben erhalten, da sie die Status der Teilbewertungen (Füllmenge,
+// alternative Vorkehrungen, Plausibilität, Sicherheit) und nicht des Gesamtergebnisses sind.
 function summarySection(dto) {
   const summary = object(dto.summary);
   const guidance = object(dto.plannerGuidance || dto.assessment?.plannerGuidance);
@@ -97,8 +113,6 @@ function summarySection(dto) {
     title: '1. Berichtszusammenfassung',
     rows: [
       row('Bewertung', status(summary.status)),
-      row('Leitfaden', guidance.headline || summary.plannerGuidanceHeadline),
-      row('Zusammenfassung', guidance.summary),
       row('Eingaben vollständig', summary.inputComplete ? 'ja' : 'nein'),
       num('Maßnahmen oder Planungspunkte', guidance.actionCount, 'integer'),
       num('Nicht erfüllte Punkte', guidance.failedCount, 'integer'),
@@ -120,6 +134,9 @@ function importedSystemSection(dto) {
       num('Raumvolumen', input.roomVolumeM3, 'generic', 'm³'),
       row('Aufstellort', label(input.installationLocation)),
       row('Aufstellungsort-Klassifikation', label(input.installationClass)),
+      ...(input.installationLocation === 'ventilated-enclosure'
+        ? [row('Ort des belüfteten Gehäuses', enclosureLocationLabel(input.ventilatedEnclosureToxicityLocationClass))]
+        : []),
       row('Zugangsbereich', label(input.accessArea)),
       row('Kategorie des Zugangsbereichs', label(input.accessCategory)),
       row('Nutzung', label(input.usageType)),

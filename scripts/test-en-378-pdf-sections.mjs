@@ -174,4 +174,59 @@ for (const label of ventilationLabels) {
   assert.ok(!section8Labels.has(label), `Lüftungsauslegung "${label}" steht nur in Abschnitt 7, nicht in Abschnitt 8`);
 }
 
+// --- Abschnitt 1: genau die fünf Kernzeilen; Leitfaden/Zusammenfassung nur in Abschnitt 8 ---
+// Prüfregel: Jede Aussage darf im Bericht genau einmal in vollem Umfang erscheinen.
+const summarySection = sections[0];
+assert.equal(summarySection.title, '1. Berichtszusammenfassung');
+assert.deepEqual(
+  summarySection.rows.map(row => row[0]),
+  ['Bewertung', 'Eingaben vollständig', 'Maßnahmen oder Planungspunkte', 'Nicht erfüllte Punkte', 'Offene Prüfpunkte'],
+  'Abschnitt 1 enthält genau die fünf Kernzeilen (keine Dopplung von Leitfaden/Zusammenfassung)'
+);
+const guidanceDto = dto.plannerGuidance || dto.assessment?.plannerGuidance || {};
+const summarySectionJson = JSON.stringify(summarySection);
+if (guidanceDto.headline) assert.ok(!summarySectionJson.includes(guidanceDto.headline), 'guidance.headline erscheint nicht mehr in Abschnitt 1');
+if (guidanceDto.summary) assert.ok(!summarySectionJson.includes(guidanceDto.summary), 'guidance.summary erscheint nicht mehr in Abschnitt 1');
+const guidanceSectionRaw = sections.find(section => section.title === '8. Planer-Leitfaden');
+assert.ok(guidanceSectionRaw && guidanceSectionRaw.rows.length > 0, 'Abschnitt 8 (Planer-Leitfaden) bleibt vollständig erhalten');
+assert.ok(!summarySectionJson.includes('Leitfaden:') && !summarySection.rows.some(row => row[0] === 'Leitfaden' || row[0] === 'Zusammenfassung'), 'Zeilen "Leitfaden" und "Zusammenfassung" entfernt');
+console.log('✓ Test: Abschnitt 1 gekürzt auf genau fünf Zeilen; headline/summary nur in Abschnitt 8');
+
+// --- Abschnitt 2: Zeile "Ort des belüfteten Gehäuses" mit ausgeschriebenem Klartext (EN 378-1, 5.3 / Tab. C.1, Spalte IV) ---
+const veState = {
+  refrigerantId: 'HFKW-32',
+  chargeKg: '5',
+  roomVolumeM3: '85',
+  installationLocation: 'ventilated-enclosure',
+  installationClass: 'IV',
+  accessArea: 'authorized-access',
+  usageType: 'commercial',
+  applicationType: 'other',
+  locationLevel: 'deepest-underground',
+  occupantDensityBelowOnePer10m2: 'yes',
+  hasEmergencyExits: 'yes',
+  ventilationType: 'mechanical',
+  enclosureVolumeM3: '8',
+  ventilatedEnclosureDuctPerManufacturerInstructions: 'yes',
+  ventilatedEnclosureFreshAirSufficient: 'yes',
+  ventilatedEnclosureDuctToOutdoor: 'yes',
+  ventilatedEnclosureToxicityLocationClass: 'III'
+};
+const veCalculation = calculate(veState);
+const veDto = buildEN378SafetyCheckReportDto({ state: veState, calculation: veCalculation, generatedAt: '2026-11-21T00:00:00.000Z' });
+assert.equal(veDto.input.ventilatedEnclosureToxicityLocationClass, 'III', 'Feld wird in das Report-DTO übernommen');
+const veSectionsRaw = buildEN378ReportSections(veDto);
+const veInputSectionRaw = veSectionsRaw.find(section => section.title === '2. Importierter Anlagenstand und Eingaben');
+const veRow = veInputSectionRaw.rows.find(row => row[0] === 'Ort des belüfteten Gehäuses');
+assert.ok(veRow, 'Abschnitt 2 enthält die Zeile "Ort des belüfteten Gehäuses"');
+assert.ok(String(veRow[1]).includes('Aufstellungsort III – Maschinenraum oder im Freien'), 'ausgeschriebener Klartext statt nur "III"');
+assert.ok(!String(veRow[1]).includes('Klasse III'), 'kein Kollisionstext der Aufstellungsort-Klassifikation in der Zeile');
+const veMapped = reportSections({ reportSource: 'typed-dto', reportDto: veDto });
+const veMappedInput = veMapped.find(section => section.title === '2. Importierter Anlagenstand und Eingaben');
+assert.ok(veMappedInput.rows.some(row => row[0] === 'Ort des belüfteten Gehäuses' && String(row[1]).includes('Aufstellungsort III')), 'auch nach PDF-Normalisierung vorhanden');
+// Gegenprobe: ohne belüftetes Gehäuse keine solche Zeile
+const occInputSection = sections.find(section => section.title === '2. Importierter Anlagenstand und Eingaben');
+assert.ok(!occInputSection.rows.some(row => row[0] === 'Ort des belüfteten Gehäuses'), 'Aufstellort Personen-Aufenthaltsbereich: keine Zeile "Ort des belüfteten Gehäuses"');
+console.log('✓ Test: PDF-Abschnitt 2 mit Zeile "Ort des belüfteten Gehäuses" im Klartext (EN 378-1, 5.3), ohne Kollision mit Klassenbezeichnungen');
+
 console.log('EN 378 PDF section tests passed.');
