@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-2.0.0';
-const CACHE_REVISION = '2.0.0-unveroeffentlicht-bedienbarkeit-barrierefreiheit-und-performance';
+const CACHE_NAME = 'techcalc-pro-2.1.0';
+const CACHE_REVISION = '2.1.0-unveroeffentlicht-bedienbarkeit-barrierefreiheit-und-performance';
 const ASSETS = [
   './',
   './index.html',
@@ -183,6 +183,7 @@ const ASSETS = [
   './modules/en-378-safety-check/index.js',
   './modules/en-378-safety-check/installationSafetyRequirements.js',
   './modules/en-378-safety-check/logic.js',
+  './modules/en-378-safety-check/machineryRoomRiskAnalysis.js',
   './modules/en-378-safety-check/plannerGuidance.js',
   './modules/en-378-safety-check/refrigerantCoverage.js',
   './modules/en-378-safety-check/reportAdapter.js',
@@ -192,6 +193,8 @@ const ASSETS = [
   './modules/en-378-safety-check/snapshotImport.js',
   './modules/en-378-safety-check/state.js',
   './modules/en-378-safety-check/stateConsistency.js',
+  './modules/en-378-safety-check/stateTransitions.js',
+  './modules/en-378-safety-check/ventilationMeasures.js',
   './modules/f-gases-check/config.js',
   './modules/f-gases-check/index.js',
   './modules/f-gases-check/logic.js',
@@ -366,6 +369,9 @@ async function cacheFirstWithRefresh(request) {
   return caches.match('./index.html');
 }
 function isVersionCriticalAsset(requestUrl) {
+  // Modul-Laufzeitcode (inkl. Formular-Schemata) wird netzwerk-first ausgeliefert, damit nach
+  // einem Deploy sofort der aktuelle Stand (z. B. PR-Zweig) greift; offline greift der Cache.
+  if (requestUrl.pathname.includes('/modules/')) return true;
   return requestUrl.pathname.endsWith('/index.html')
     || requestUrl.pathname.endsWith('/core/app.js')
     || requestUrl.pathname.endsWith('/core/ux/releaseNotesController.js')

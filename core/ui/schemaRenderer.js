@@ -70,7 +70,7 @@ function renderSelect(def, state = {}) {
     'data-commit': def.commit || 'immediate',
     'data-lookup': def.lookup === false ? null : 'true',
     'data-render': def.render || null,
-    disabled: def.disabled === true
+    disabled: resolve(def.disabled, state, false) === true
   });
   return `<div class="field tc-field" data-schema-field-wrapper="${esc(def.key)}"><label for="${esc(def.key)}">${esc(fieldLabel(def, state))}</label><div class="control"><select id="${esc(def.key)}"${extra}>${options}</select></div></div>`;
 }

@@ -1,17 +1,18 @@
 import { checkLabel, fieldLabel, statusLabel } from './displayLabels.js';
+import { HINWEIS_A, HINWEIS_B, MACHINERY_ROOM_NOTICE } from './machineryRoomRiskAnalysis.js';
 
 export const EN_378_PLANNER_GUIDANCE_VERSION = 1;
 
 export const PLANNER_GUIDANCE_GROUPS = Object.freeze({
-  CHARGE_LIMIT: 'chargeLimit', LOCATION: 'location', OCCUPANCY: 'occupancy', VENTILATION: 'ventilation', MACHINERY_ROOM: 'machineryRoom', DETECTION: 'detection', ALARM: 'alarm', EMERGENCY_CONTROL: 'emergencyControl', SAFETY_MEASURES: 'safetyMeasures', GUIDANCE: 'guidance', OPEN_POINTS: 'openPoints'
+  CHARGE_LIMIT: 'chargeLimit', LOCATION: 'location', TECHNICAL_ROOM: 'technicalRoom', VENTILATED_ENCLOSURE: 'ventilatedEnclosure', OCCUPANCY: 'occupancy', VENTILATION: 'ventilation', MACHINERY_ROOM: 'machineryRoom', DETECTION: 'detection', ALARM: 'alarm', EMERGENCY_CONTROL: 'emergencyControl', SAFETY_MEASURES: 'safetyMeasures', GUIDANCE: 'guidance', OPEN_POINTS: 'openPoints'
 });
 
 const GROUP_LABELS = Object.freeze({
-  chargeLimit: 'Füllmenge und Konzentration', location: 'Aufstellort', occupancy: 'Nutzung und Zugang', ventilation: 'Lüftung', machineryRoom: 'Maschinenraum', detection: 'Detektion', alarm: 'Alarmierung', emergencyControl: 'Abschaltung und Notfunktionen', safetyMeasures: 'Schutzmaßnahmen', guidance: 'Übergabe und Dokumentation', openPoints: 'Offene Angaben'
+  chargeLimit: 'Füllmenge und Konzentration', location: 'Aufstellort', technicalRoom: 'Raum ohne Personenaufenthalt nach EN 378-3, 4.5', ventilatedEnclosure: 'Belüftetes Gehäuse nach EN 378-3, 4.6', occupancy: 'Nutzung und Zugang', ventilation: 'Lüftung', machineryRoom: 'Maschinenraum', detection: 'Detektion', alarm: 'Alarmierung', emergencyControl: 'Abschaltung und Notfunktionen', safetyMeasures: 'Schutzmaßnahmen', guidance: 'Übergabe und Dokumentation', openPoints: 'Offene Angaben'
 });
 
 const GROUP_ORDER = Object.freeze([
-  PLANNER_GUIDANCE_GROUPS.CHARGE_LIMIT, PLANNER_GUIDANCE_GROUPS.LOCATION, PLANNER_GUIDANCE_GROUPS.OCCUPANCY, PLANNER_GUIDANCE_GROUPS.VENTILATION, PLANNER_GUIDANCE_GROUPS.MACHINERY_ROOM, PLANNER_GUIDANCE_GROUPS.DETECTION, PLANNER_GUIDANCE_GROUPS.ALARM, PLANNER_GUIDANCE_GROUPS.EMERGENCY_CONTROL, PLANNER_GUIDANCE_GROUPS.SAFETY_MEASURES, PLANNER_GUIDANCE_GROUPS.GUIDANCE, PLANNER_GUIDANCE_GROUPS.OPEN_POINTS
+  PLANNER_GUIDANCE_GROUPS.OPEN_POINTS, PLANNER_GUIDANCE_GROUPS.CHARGE_LIMIT, PLANNER_GUIDANCE_GROUPS.LOCATION, PLANNER_GUIDANCE_GROUPS.TECHNICAL_ROOM, PLANNER_GUIDANCE_GROUPS.VENTILATED_ENCLOSURE, PLANNER_GUIDANCE_GROUPS.OCCUPANCY, PLANNER_GUIDANCE_GROUPS.VENTILATION, PLANNER_GUIDANCE_GROUPS.MACHINERY_ROOM, PLANNER_GUIDANCE_GROUPS.DETECTION, PLANNER_GUIDANCE_GROUPS.ALARM, PLANNER_GUIDANCE_GROUPS.EMERGENCY_CONTROL, PLANNER_GUIDANCE_GROUPS.SAFETY_MEASURES, PLANNER_GUIDANCE_GROUPS.GUIDANCE
 ]);
 
 const array = value => Array.isArray(value) ? value : [];
@@ -49,7 +50,10 @@ function itemFromRequirement(requirement = {}) { return freezeItem({ ...requirem
 
 function itemFromChargeCheck(check = {}) {
   const requirement = array(check.requirements).join(' ') || check.reason || 'Füllmengenprüfung nach EN 378-1 Anhang C berücksichtigen.';
-  const measure = array(check.measures).join(' ') || (check.status === 'failed' ? 'Füllmenge, Raumvolumen, Aufstellort oder Schutzmaßnahmen anpassen.' : '') || (check.status === 'not-assessed' ? 'Fehlende Angaben ergänzen und Füllmengenbewertung erneut durchführen.' : '') || 'Prüfergebnis dokumentieren.';
+  const missingLabels = array(check.missingInputs).map(fieldLabel).filter(Boolean);
+  const measure = array(check.measures).join(' ') || (check.status === 'failed' ? 'Füllmenge, Raumvolumen, Aufstellort oder Schutzmaßnahmen anpassen.' : '') || (check.status === 'not-assessed'
+    ? (missingLabels.length ? `Fehlende Angaben ergänzen: ${missingLabels.join(', ')} - Füllmengenbewertung erneut durchführen.` : 'Fehlende Angaben ergänzen und Füllmengenbewertung erneut durchführen.')
+    : '') || 'Prüfergebnis dokumentieren.';
   return freezeItem({
     id: check.id, category: check.category === 'safetyMeasures' ? PLANNER_GUIDANCE_GROUPS.SAFETY_MEASURES : PLANNER_GUIDANCE_GROUPS.CHARGE_LIMIT, title: checkLabel(check.id), status: check.status, requirement, measure, source: check.source, missingInputs: check.missingInputs, details: { maximumChargeKg: check.maximumChargeKg ?? null, concentrationKgM3: check.concentrationKgM3 ?? null, rule: check.rule || '', noLimit: Boolean(check.noLimit) }
   });
@@ -67,13 +71,36 @@ function itemFromMissingInput(inputKey) {
 }
 
 function dedupeItems(items) {
-  const seen = new Set();
-  return array(items).filter(item => {
-    const key = `${item.title}|${item.status}|${item.measure}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+  const grouped = new Map();
+  const statusRank = { failed: 3, 'not-assessed': 2, required: 1, passed: 0 };
+  for (const item of array(items)) {
+    const key = `${item.category}::${item.id}`;
+    if (!key) continue;
+    const existing = grouped.get(key);
+    const sourceLabels = unique([...(existing?.sourceLabels || []), item.sourceLabel]);
+    const allSources = [...(existing?.sources || []), item.source || {}].filter(source => sourceLabel(source));
+    const sources = allSources.filter((source, index, self) =>
+      index === self.findIndex(s => sourceLabel(s) === sourceLabel(source))
+    );
+    if (!existing) {
+      grouped.set(key, { ...item, sourceLabels, sources, sourceLabel: sourceLabels.join('; ') });
+      continue;
+    }
+    const replaceStatus = (statusRank[item.status] || 0) > (statusRank[existing.status] || 0);
+    grouped.set(key, {
+      ...existing,
+      ...(replaceStatus ? { id: item.id, title: item.title, status: item.status, statusLabel: item.statusLabel, guidanceStatus: item.guidanceStatus, priority: item.priority, missingInputs: unique([...existing.missingInputs, ...item.missingInputs]) } : {}),
+      sourceLabels,
+      sources,
+      sourceLabel: sourceLabels.join('; ')
+    });
+  }
+  return [...grouped.values()].map(item => Object.freeze({
+    ...item,
+    sourceLabels: Object.freeze(item.sourceLabels),
+    sources: Object.freeze(item.sources),
+    missingInputs: Object.freeze(unique(item.missingInputs))
+  }));
 }
 
 function buildGroups(items) {
@@ -84,6 +111,7 @@ function buildGroups(items) {
 function headlineForStatus(status, actionCount, openPointCount) {
   if (status === 'import-rejected') return 'Der importierte Anlagenstand kann nicht bewertet werden.';
   if (status === 'incomplete') return 'Für den Leitfaden fehlen noch Pflichtangaben.';
+  if (status === 'acceptable') return 'Anforderungen nach aktuellem Prüfstand erfüllt - Planer-Leitfaden als Checkliste abarbeiten.';
   if (status === 'measures-required') return 'Für den gewählten Aufstellort sind Maßnahmen oder Anpassungen erforderlich.';
   if (openPointCount > 0) return 'Der Leitfaden enthält noch offene Prüfpunkte.';
   if (actionCount > 0) return 'Die erforderlichen Planungsmaßnahmen sind ausgewiesen.';
@@ -93,6 +121,7 @@ function headlineForStatus(status, actionCount, openPointCount) {
 function summaryForStatus(status, actionCount, failedCount, openPointCount) {
   if (status === 'import-rejected') return 'Der F-Gase-Anlagenstand wurde technisch abgelehnt. Die EN-378-Bewertung muss mit einem gültigen Anlagenstand neu gestartet werden.';
   if (status === 'incomplete') return 'Ergänze die fehlenden Angaben, damit Füllmenge, Aufstellort und Sicherheitskomponenten bewertet werden können.';
+  if (status === 'acceptable') return `Anforderungen nach aktuellem Prüfstand erfüllt. ${actionCount} erforderliche Punkte sind im Planer-Leitfaden als Checkliste abzuarbeiten.`;
   if (failedCount > 0) return `${failedCount} Prüfpunkte sind nicht erfüllt. Die aufgeführten Maßnahmen sind vor Freigabe des Aufstellkonzepts zu klären.`;
   if (openPointCount > 0) return `${openPointCount} Angaben oder Prüfpunkte sind noch offen. Die übrigen Anforderungen können bereits als Planungsleitfaden verwendet werden.`;
   if (actionCount > 0) return `${actionCount} Anforderungen sind als Planungs- oder Dokumentationsmaßnahmen zu berücksichtigen.`;
@@ -104,8 +133,10 @@ export function buildEN378PlannerGuidance(currentState = {}, assessment = {}) {
   const inputIssueKeys = unique(inputIssues.map(issue => text(issue).split(':')[0]));
   const chargeChecks = array(assessment.chargeLimitAssessment?.checks);
   const installationRequirements = array(assessment.installationSafetyAssessment?.requirements);
+  const machineryRoomRiskAnalysis = assessment.machineryRoomRiskAnalysis || {};
   const missingInputs = unique([...inputIssueKeys, ...array(assessment.chargeLimitAssessment?.missingInputs), ...array(assessment.installationSafetyAssessment?.missingInputs)]);
-  const additionalMissingInputs = missingInputs.filter(key => !inputIssueKeys.includes(key));
+  const representedMissingInputs = unique([...chargeChecks.flatMap(check => array(check.missingInputs)), ...installationRequirements.flatMap(requirement => array(requirement.missingInputs))]);
+  const additionalMissingInputs = missingInputs.filter(key => !inputIssueKeys.includes(key) && !representedMissingInputs.includes(key));
 
   const actionItems = [
     ...chargeChecks.filter(check => ['failed', 'not-assessed'].includes(check.status)).map(itemFromChargeCheck),
@@ -113,6 +144,9 @@ export function buildEN378PlannerGuidance(currentState = {}, assessment = {}) {
     ...inputIssues.map(itemFromInputIssue),
     ...additionalMissingInputs.map(itemFromMissingInput)
   ];
+
+  // Add informative entries for EN 378-3 sections 5.2-5.12 (Fix 3)
+
   const confirmedItems = [
     ...chargeChecks.filter(check => check.status === 'passed' && !check.noLimit).map(itemFromChargeCheck),
     ...installationRequirements.filter(requirement => requirement.status === 'passed').map(itemFromRequirement)
@@ -121,6 +155,51 @@ export function buildEN378PlannerGuidance(currentState = {}, assessment = {}) {
   const openPointCount = actionItems.filter(item => item.status === 'not-assessed').length;
   const actionCount = actionItems.filter(item => item.status !== 'not-assessed').length;
   const status = text(assessment.status || currentState.status || 'not-assessed');
+
+  // Add machinery room risk analysis hint texts
+  const notices = [];
+  if (machineryRoomRiskAnalysis.isApplicable) {
+    if (machineryRoomRiskAnalysis.hintText) {
+      notices.push(machineryRoomRiskAnalysis.hintText);
+    }
+    notices.push(MACHINERY_ROOM_NOTICE);
+  }
+  
+  // Add informative notice group for EN 378-3, 5.2 to 5.12 for machinery rooms
+  const isMachineryRoomWithRiskAnalysis = currentState.installationLocation === 'machinery-room' && currentState.machineryRoomRiskAnalysisResult === 'yes';
+  const en378Sections5_2To5_12 = Object.freeze([
+    { id: 'en378-3-5.2', title: 'EN 378-3, 5.2 – K\u00e4ltemittelaustritt verhindern', requirement: 'K\u00e4ltemittel darf nicht in benachbarte R\u00e4ume, Treppen, H\u00f6fe, G\u00e4nge oder Entw\u00e4sserung gelangen; keine Luftf\u00fchrung in Aufenthaltsbereiche.' },
+    { id: 'en378-3-5.3', title: 'EN 378-3, 5.3 – Verbrennungsluft und Verdichterluft', requirement: 'Verbrennungsluft und Verdichterluft von au\u00dfen leitungsgef\u00fchrt beziehen.' },
+    { id: 'en378-3-5.4', title: 'EN 378-3, 5.4 – Offene Flammen', requirement: 'Keine offenen Flammen au\u00dfer bei \u00fcberwachter Konzentration und Bel\u00fclftung; nie unbeaufsichtigt.' },
+    { id: 'en378-3-5.5', title: 'EN 378-3, 5.5 – Lagerung', requirement: 'Keine Lagerung au\u00dfer Werkzeuge, Ersatzteile, Verdichter\u00f6l.' },
+    { id: 'en378-3-5.6', title: 'EN 378-3, 5.6 – Not-Fernabschaltung', requirement: 'Not-Fernabschaltung au\u00dferhalb in T\u00fcrn\u00e4he und innen (EN ISO 13850, EN 60204-1).' },
+    { id: 'en378-3-5.7', title: 'EN 378-3, 5.7 – Au\u00dfen\u00f6ffnungen', requirement: 'Au\u00dfen\u00f6ffnungen mindestens 2 m von Flucht- und Rettungstreppen und Geb\u00e4ude\u00f6ffnungen.' },
+    { id: 'en378-3-5.8', title: 'EN 378-3, 5.8 – Rohrleitungen und Kan\u00e4le', requirement: 'Rohrleitungen und Kan\u00e4le mit gleichwertiger Feuerbest\u00e4ndigkeit abdichten.' },
+    { id: 'en378-3-5.9', title: 'EN 378-3, 5.9 – Allgemeinbeleuchtung', requirement: 'Allgemeinbeleuchtung f\u00fcr sicheren Betrieb; R-717: IPX4.' },
+    { id: 'en378-3-5.10', title: 'EN 378-3, 5.10 – Notbeleuchtung', requirement: 'Fest angebrachte oder tragbare Notbeleuchtung.' },
+    { id: 'en378-3-5.11', title: 'EN 378-3, 5.11 – Ma\u00dfe und Zug\u00e4nglichkeit', requirement: 'Ma\u00dfe und Zug\u00e4nglichkeit f\u00fcr Wartung; 2,1 m Durchgangsh\u00f6he.' },
+    { id: 'en378-3-5.12', title: 'EN 378-3, 5.12 – T\u00fcrren, W\u00e4nde, Decke', requirement: 'Nach au\u00dfen \u00f6ffnende, selbstschlie\u00dfende Anti-Panik-T\u00fcrren, 1 h Feuerbest\u00e4ndigkeit, dichte W\u00e4nde/Boden/Decke, Notausgang ins Freie.' }
+  ]);
+  
+  // Create informative items for the machinery room notice group
+  const informativeItems = isMachineryRoomWithRiskAnalysis 
+    ? en378Sections5_2To5_12.map(section => Object.freeze({
+        id: section.id,
+        category: PLANNER_GUIDANCE_GROUPS.GUIDANCE,
+        title: section.title,
+        status: 'information',
+        statusLabel: 'Information',
+        guidanceStatus: 'information',
+        requirement: section.requirement,
+        measure: 'Vom Planer bei der Maschinenraumplanung zu ber\u00fccksichtigen.',
+        source: Object.freeze({ sourcePart: 'EN 378-3', sourceSection: section.id.split('-')[2] }),
+        sourceLabel: `EN 378-3 ${section.id.split('-')[2]}`,
+        priority: 'information',
+        missingInputs: Object.freeze([]),
+        details: Object.freeze({})
+      }))
+    : [];
+
 
   return Object.freeze({
     version: EN_378_PLANNER_GUIDANCE_VERSION,
@@ -132,9 +211,10 @@ export function buildEN378PlannerGuidance(currentState = {}, assessment = {}) {
     failedCount,
     openPointCount,
     missingInputs: Object.freeze(missingInputs.map(fieldLabel)),
-    groups: buildGroups(actionItems),
+    groups: buildGroups([...actionItems.map(item => item.status === 'not-assessed' ? { ...item, category: PLANNER_GUIDANCE_GROUPS.OPEN_POINTS } : item), ...informativeItems]),
     confirmedItems: Object.freeze(dedupeItems(confirmedItems)),
-    requiredMeasures: Object.freeze(unique(actionItems.map(item => item.measure)))
+    requiredMeasures: Object.freeze(unique(actionItems.map(item => item.measure))),
+    notices: Object.freeze(notices)
   });
 }
 

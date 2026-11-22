@@ -59,19 +59,8 @@ function buildRequirement({
   return freezeRequirement({ id, category, title, requirement, measure, source, status, priority, missingInputs, details });
 }
 
-export function calculateDilutionOpeningArea({ chargeKg, roomVolumeM3, qlmvKgM3 } = {}) {
-  const charge = numberOrNull(chargeKg);
-  const volume = numberOrNull(roomVolumeM3);
-  const qlmv = numberOrNull(qlmvKgM3);
-  if (charge == null || charge <= 0 || volume == null || volume <= 0 || qlmv == null || qlmv <= 0) return null;
-  return round((0.0032 * charge) / (qlmv * volume), 5);
-}
-
-export function calculateSimplifiedMechanicalVentilationFlow({ rclKgM3 } = {}) {
-  const rcl = numberOrNull(rclKgM3);
-  if (rcl == null || rcl <= 0) return null;
-  return round(10 / rcl, 1);
-}
+import { calculateDilutionOpeningArea, calculateAlternativeMechanicalVentilationFlow } from './ventilationMeasures.js';
+export { calculateDilutionOpeningArea, calculateAlternativeMechanicalVentilationFlow } from './ventilationMeasures.js';
 
 function getC3Check(chargeLimitAssessment = {}) {
   return (chargeLimitAssessment.checks || []).find(check => check.id === 'charge-limit.alternative-risk-management') || null;
@@ -179,17 +168,25 @@ function selectedMeasureRequirements({ measures, details, state }) {
     }));
   }
   if (measures.some(item => item.field === 'hasAlarm' && item.selected)) {
+    // EN 378-3 Abschnitte 8 und 9: Der Alarm muss durch ein Gaswarnsystem (Detektor nach
+    // Abschnitt 9) ausgelöst werden; ohne Auslösehardware darf die Maßnahme nicht PASSED sein.
+    const alarmTriggerHardware = yes(state.hasGasWarningSystem) || yes(state.hasDetector);
+    const alarmPower = yes(state.hasIndependentAlarmPower);
+    const alarmMissing = [
+      ...(alarmTriggerHardware ? [] : ['hasGasWarningSystem', 'hasDetector']),
+      ...(alarmPower ? [] : ['hasIndependentAlarmPower'])
+    ];
     requirements.push(buildRequirement({
       id: 'alternative-precautions.alarm',
       category: 'alarm',
       title: 'Alarmierung als alternative Vorkehrung',
-      requirement: 'Bei Nutzung der Alarmierung als Sicherheitsmaßnahme muss das Alarmsystem Personen warnen und befugte Personen alarmieren. Die Stromversorgung des Alarmsystems muss von der mechanischen Lüftung und der Kälteanlage unabhängig sein.',
-      measure: yes(state.hasIndependentAlarmPower)
-        ? 'Alarmierung mit unabhängiger Stromversorgung dokumentieren.'
-        : 'Alarmierung mit unabhängiger Stromversorgung oder geeigneter Zusatzstromversorgung ausstatten.',
+      requirement: 'Bei Nutzung der Alarmierung als Sicherheitsmaßnahme muss das Alarmsystem Personen warnen und befugte Personen alarmieren; es muss durch ein Gaswarnsystem bzw. einen Detektor nach EN 378-3 Abschnitt 9 ausgelöst werden. Die Stromversorgung des Alarmsystems muss von der mechanischen Lüftung und der Kälteanlage unabhängig sein.',
+      measure: alarmTriggerHardware && alarmPower
+        ? 'Alarmierung mit Auslösehardware (Gaswarnanlage oder Detektor) und unabhängiger Stromversorgung dokumentieren.'
+        : 'Gaswarnanlage oder Kältemitteldetektor als Auslösehardware und unabhängige Stromversorgung des Alarmsystems vorsehen.',
       source: SOURCE.alarms,
-      status: yes(state.hasIndependentAlarmPower) ? ALTERNATIVE_RISK_MEASURE_STATUS.PASSED : ALTERNATIVE_RISK_MEASURE_STATUS.FAILED,
-      missingInputs: yes(state.hasIndependentAlarmPower) ? [] : ['hasIndependentAlarmPower'],
+      status: alarmTriggerHardware && alarmPower ? ALTERNATIVE_RISK_MEASURE_STATUS.PASSED : ALTERNATIVE_RISK_MEASURE_STATUS.FAILED,
+      missingInputs: alarmMissing,
       details
     }));
   }
@@ -228,6 +225,28 @@ export function assessAlternativeRiskMeasures(currentState = {}, chargeLimitAsse
       })]),
       requiredMeasures: Object.freeze([]),
       missingInputs: Object.freeze(['chargeKg', 'roomVolumeM3']),
+      details: Object.freeze({})
+    });
+  }
+  // C.3 normativ nicht anwendbar (EN 378-1, C.3.1; EN 378-3, 6.1): Die C.3-Bewertung darf in
+  // diesem Fall keine Maßnahmen fordern; eine gespeicherte Auswahl wird ignoriert und die
+  // Füllmengenbewertung nach C.1/C.2 ist maßgeblich.
+  if (c3Check.status === 'not-applicable') {
+    return Object.freeze({
+      status: ALTERNATIVE_RISK_MEASURE_STATUS.NOT_APPLICABLE,
+      requiredMeasureCount: 0,
+      selectedMeasureCount: 0,
+      maximumChargeKg: null,
+      requirements: Object.freeze([buildRequirement({
+        id: 'alternative-precautions.c3-applicability',
+        title: 'C.3-Anwendbarkeit (EN 378-1, C.3.1; EN 378-3, 6.1)',
+        requirement: c3Check.reason || 'Alternative Vorkehrungen nach Anhang C.3 sind für diese Anlage normativ nicht vorgesehen.',
+        measure: 'Keine C.3-Maßnahmen erforderlich; die Füllmengenbewertung nach C.1/C.2 ist maßgeblich.',
+        source: c3Check.source || SOURCE.c3,
+        status: ALTERNATIVE_RISK_MEASURE_STATUS.NOT_APPLICABLE
+      })]),
+      requiredMeasures: Object.freeze([]),
+      missingInputs: Object.freeze([]),
       details: Object.freeze({})
     });
   }
@@ -289,7 +308,7 @@ export function assessAlternativeRiskMeasures(currentState = {}, chargeLimitAsse
       roomVolumeM3: currentState.roomVolumeM3,
       qlmvKgM3: c3Check.details?.qlmvKgM3
     }),
-    mechanicalVentilationFlowM3h: calculateSimplifiedMechanicalVentilationFlow({
+    mechanicalVentilationFlowM3h: calculateAlternativeMechanicalVentilationFlow({
       rclKgM3: c3Check.details?.rclKgM3
     }),
     selectedMeasures: Object.freeze(selected.map(item => item.title))

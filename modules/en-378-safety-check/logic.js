@@ -8,7 +8,14 @@ import {
 } from './alternativeRiskMeasures.js';
 import { assessStateConsistency, mergeStateConsistencyAssessment } from './stateConsistency.js';
 import { buildEN378PlannerGuidance } from './plannerGuidance.js';
-const ACCESS_CATEGORY_BY_ACCESS_AREA = Object.freeze({
+import {
+  assessMachineryRoomRiskAnalysis,
+  assessBelowGradeDetectorAlarm,
+  HINWEIS_A,
+  HINWEIS_B,
+  MACHINERY_ROOM_NOTICE
+} from './machineryRoomRiskAnalysis.js';
+export const ACCESS_CATEGORY_BY_ACCESS_AREA = Object.freeze({
   'general-access': 'a',
   'supervised-access': 'b',
   'authorized-access': 'c'
@@ -32,7 +39,6 @@ export function normalizeEN378AssessmentState(currentState = {}) {
   return Object.freeze({
     ...currentState,
     accessCategory: deriveAccessCategory(currentState),
-    hasMachineryRoom: currentState.installationLocation === 'machinery-room' ? 'yes' : currentState.hasMachineryRoom
   });
 }
 const addRequiredTextIssue = (issues, currentState, key) => {
@@ -56,6 +62,9 @@ export function validateAssessmentInput(currentState = {}) {
   addRequiredTextIssue(issues, effectiveState, 'accessArea');
   addRequiredTextIssue(issues, effectiveState, 'usageType');
   addRequiredTextIssue(issues, effectiveState, 'ventilationType');
+  if (effectiveState.installationLocation === 'technical-room') {
+    addRequiredTextIssue(issues, effectiveState, 'technicalRoomSeparatedFromOccupiedSpaces');
+  }
   if (isHumanComfortApplication(effectiveState)) {
     addPositiveNumberIssue(issues, effectiveState, 'floorAreaM2');
     addRequiredTextIssue(issues, effectiveState, 'isFactorySealed');
@@ -118,12 +127,29 @@ export function calculate(currentState = {}) {
   const alternativeInstallationSafetyAssessment = mergeAlternativeRiskMeasuresAssessment(baseInstallationSafetyAssessment, alternativeRiskMeasuresAssessment);
   const stateConsistencyAssessment = assessStateConsistency(effectiveState);
   const installationSafetyAssessment = mergeStateConsistencyAssessment(alternativeInstallationSafetyAssessment, stateConsistencyAssessment);
-  const status = deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, installationSafetyAssessment });
+  
+  // Machinery Room Risk Analysis per EN 378-3, 4.3
+  const machineryRoomRiskAnalysis = assessMachineryRoomRiskAnalysis(effectiveState);
+  // Only assess below-grade check if in machinery room AND result is 'yes'
+  const belowGradeDetectorAlarm = (effectiveState.installationLocation === 'machinery-room' &&
+    effectiveState.machineryRoomRiskAnalysisResult === 'yes')
+    ? assessBelowGradeDetectorAlarm(effectiveState)
+    : null;
+  
+  // Merge below-grade check into installation safety assessment if applicable
+  const installationSafetyWithMachineryRoom = mergeMachineryRoomChecks(
+    installationSafetyAssessment,
+    machineryRoomRiskAnalysis,
+    belowGradeDetectorAlarm
+  );
+  
+  const status = deriveStatus({ hasImportError, inputValidation, chargeLimitAssessment, installationSafetyAssessment: installationSafetyWithMachineryRoom });
   const plannerGuidance = buildEN378PlannerGuidance(effectiveState, {
     status,
     inputValidation,
     chargeLimitAssessment,
-    installationSafetyAssessment
+    installationSafetyAssessment: installationSafetyWithMachineryRoom,
+    machineryRoomRiskAnalysis
   });
   return Object.freeze({
     status,
@@ -140,11 +166,63 @@ export function calculate(currentState = {}) {
     rawChargeLimitAssessment,
     alternativeRiskMeasuresAssessment,
     stateConsistencyAssessment,
-    installationSafetyAssessment,
+    installationSafetyAssessment: installationSafetyWithMachineryRoom,
+    machineryRoomRiskAnalysis,
+    belowGradeDetectorAlarm,
     plannerGuidance,
     requiredMeasures: Object.freeze(plannerGuidance.requiredMeasures || []),
-    notices: Object.freeze([]),
+    notices: Object.freeze([
+      ...(effectiveState.installationLocation === 'occupied-space' || effectiveState.installationLocation === 'ventilated-enclosure'
+        ? ['Das Raumvolumen ist nach EN 378-1, Abschnitt 7 zu bestimmen (kleinster umschlossener Personen-Aufenthaltsbereich, Zusammenfassung verbundener Räume, Zuluftabschläge bei A1). Die App leitet das Raumvolumen V nicht selbst ab.']
+        : []),
+      ...(effectiveState.installationLocation === 'technical-room' && effectiveState.technicalRoomSeparatedFromOccupiedSpaces === 'no'
+        ? ['Der Raum ist nicht gegenüber Personen-Aufenthaltsbereichen abgeschlossen: Die Bewertung erfolgt nach EN 378-3, Abschnitt 4.4 (Personen-Aufenthaltsbereich) i. V. m. 4.5.']
+        : [])
+    ]),
     dataVersions: effectiveState.dataVersions || getDataVersions()
+  });
+}
+
+/**
+ * Merge machinery room specific checks into installation safety assessment
+ */
+function mergeMachineryRoomChecks(installationSafetyAssessment = {}, machineryRoomRiskAnalysis = {}, belowGradeDetectorAlarm = null) {
+  const requirements = [...(installationSafetyAssessment.requirements || [])];
+  
+  // Only include machinery room checks (category 'machineryRoom') if result is 'yes'
+  // This implements spec section 3: 5.1-5.14 only activated when result is 'yes'
+  const isMachineryRoomResultYes = machineryRoomRiskAnalysis.result === 'yes';
+  
+  // Filter out machinery room requirements if result is not 'yes'
+  const filteredRequirements = requirements.filter(req => {
+    if (req.category === 'machineryRoom' && !isMachineryRoomResultYes) {
+      return false; // Exclude machinery room checks when result is not 'yes'
+    }
+    return true;
+  });
+  
+  // Add below-grade detector alarm check if applicable and not already present
+  if (belowGradeDetectorAlarm && !filteredRequirements.some(r => r.id === belowGradeDetectorAlarm.id)) {
+    filteredRequirements.push(Object.freeze({ ...belowGradeDetectorAlarm }));
+  }
+  
+  // Recalculate status
+  const failed = filteredRequirements.filter(item => item.status === 'failed');
+  const notAssessed = filteredRequirements.filter(item => item.status === 'not-assessed');
+  const requiredMeasures = filteredRequirements
+    .filter(item => ['required', 'failed', 'not-assessed'].includes(item.status))
+    .map(item => item.measure)
+    .filter(Boolean);
+  const missingInputs = [...new Set(notAssessed.flatMap(item => item.missingInputs || []))];
+  
+  const status = failed.length ? 'failed' : notAssessed.length ? 'not-assessed' : installationSafetyAssessment.status || 'passed';
+  
+  return Object.freeze({
+    ...installationSafetyAssessment,
+    status,
+    requirements: Object.freeze(filteredRequirements),
+    requiredMeasures: Object.freeze([...new Set(requiredMeasures)]),
+    missingInputs: Object.freeze(missingInputs)
   });
 }
 export default calculate;

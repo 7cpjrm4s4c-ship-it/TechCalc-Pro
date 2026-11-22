@@ -13,6 +13,21 @@
 - Die Theme-Auswahl ist entsprechend ihren gedrückten Schaltflächen als benannte Gruppe ausgezeichnet.
 - Browsermatrix für die Semantik aller 15 Module und den Umbruch bei 320 CSS-Pixeln erweitert.
 
+## Version 2.1.0 – Aufstellungsorte nach EN 378-3
+### Neu
+- Vollständige Abdeckung aller Aufstellungsorte nach EN 378-3, Abschnitte 4.2 bis 4.6, mit eigenen Prüfpfaden, Eingabefeldern und Statusausgaben: im Freien (4.2), Maschinenraum (4.3), Personen-Aufenthaltsbereich (4.4), technischer Raum (4.5) und belüftetes Gehäuse (4.6). Die Pfade 4.2 und 4.3 sind Bestandteil dieses Releases einschließlich ihrer überarbeiteten, maschinenraumspezifischen Prüfungen.
+- Prüfpfad für den technischen Raum nach EN 378-3, 4.5: abgeschlossene Räume mit Verdichter oder Druckbehälter werden wie Maschinenräume behandelt; Raumabschluss, Raumtrennung von Aufenthaltsbereichen und Verdichter-/Druckbehälterangaben sind Bestandteil der Bewertung.
+- Prüfpfad für belüftete Gehäuse nach EN 378-3, 4.6 einschließlich Gehäusevolumen, Lüftungskanal nach Herstellerangaben (EN 378-2, 6.2.15), Frischluftversorgung, Belüftung ins Freie und Ort des Gehäuses für die toxizitätsbezogene Füllmenge nach Tabelle C.1, Spalte IV.
+- Türprüfung für Maschinenräume mit R-717 nach EN 378-3, 5.14.3.4 ergänzt (Auslöser: Füllmenge über praktischem Grenzwert × Raumvolumen).
+### Verbesserungen
+- Alternative Vorkehrungen nach EN 378-1, Anhang C: die C.3-Variante wird nur freigeschaltet, wenn die C.3.1-Bedingungen erfüllt sind (Kältemittel A1 oder A2L, Füllmenge höchstens 150 kg bzw. 1,5 × m3); nicht anwendbare Varianten werden mit Klartext als „nicht anwendbar“ ausgewiesen statt stillschweigend ignoriert.
+- Konsistenzprüfung der Aufstellungsort-Klassen: Klasse II ist im Personen-Aufenthaltsbereich unter den normativen Bedingungen (EN 378-1, 5.3 c und 5.3 d) und Klasse III im technischen Raum mit Maschinenraum-Behandlung nach EN 378-3, 4.5 zulässig; die Konsistenzprüfungen stellen dies ohne Scheinkonflikte fest.
+- UI- und PDF-Ausgaben bereinigt: Bezeichnungen der Aufstellort-Optionen in deutschem Klartext, gekürzter PDF-Zusammenfassungsblock, fehlende Eingaben werden mit Klartext statt Schlüsseln gemeldet.
+- Zustandsübergänge beim Wechsel von Aufstellort, Kältemittel, Klasse und Füllmenge bereinigt: feldgruppenspezifische Rücksetzungen für alle Aufstellorte, keine veralteten Bestätigungen im Zustand; Altstrukturen und nicht mehr genutzte Hilfsfunktionen entfernt.
+### Qualität
+- Regressionstests für die Prüfpfade 4.4, 4.5 und 4.6, die Türprüfung, Zustandsübergänge, Konsistenzprüfungen und PDF-Abschnitte ergänzt.
+- Release-Gates `npm run lint`, `npm test`, `npm run test:en378`, `npm run audit:en378`, `npm run version:check`, `npm run precache:check` und `npm run audit:release-readiness` sind grün.
+
 ## Version 2.0.0 – Core-Runtime und Framework-Kernel
 ### Neu
 - Die Laufzeitstruktur ist auf die kanonischen Bereiche `core/` und `modules/` ausgerichtet.

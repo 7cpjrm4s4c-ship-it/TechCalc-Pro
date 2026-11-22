@@ -28,7 +28,11 @@ const state = {
   savedAssessments: [],
   activeSavedAssessmentId: '',
   expandedSavedAssessmentId: '',
-  savedAssessmentName: ''
+  savedAssessmentName: '',
+  outdoorEN3782_6_2_14HazardousAreaConfirmed: 'yes',
+  outdoorEN3782_6_2_14HazardousAreaEvidenceReference: 'Gefährdungsbeurteilung-01',
+  outdoorEN3782_6_2_14ComponentAssessmentConfirmed: 'yes',
+  outdoorEN3782_6_2_14ComponentAssessmentEvidenceReference: 'Komponentenbewertung-01'
 };
 const result = calculate(state);
 const record = buildEN378SavedRecord(state, result);
@@ -46,6 +50,8 @@ const hydrated = hydrateEN378SavedRecord({ id: 'saved-1', name: record.name, inp
 assert.equal(hydrated.savedAssessmentName, 'Wärmepumpe Dachzentrale');
 assert.equal(hydrated.refrigerantId, 'R-32');
 assert.equal(hydrated.chargeKg, '2.5');
+assert.equal(hydrated.outdoorEN3782_6_2_14HazardousAreaEvidenceReference, 'Gefährdungsbeurteilung-01');
+assert.equal(hydrated.outdoorEN3782_6_2_14ComponentAssessmentEvidenceReference, 'Komponentenbewertung-01');
 const model = buildEN378SavedRecordsModel({
   savedAssessmentName: 'Bewertung 1',
   activeSavedAssessmentId: 'saved-1',

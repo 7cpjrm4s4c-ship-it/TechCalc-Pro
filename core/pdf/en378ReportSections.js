@@ -28,10 +28,11 @@ const OPTIONS = Object.freeze({
   'technical-room': 'technischer Raum',
   'machinery-room': 'Maschinenraum',
   outdoor: 'Außenaufstellung',
-  I: 'Klasse I – belüftetes Gehäuse',
-  II: 'Klasse II – Maschinenraum oder im Freien',
-  III: 'Klasse III – Verdichter in Maschinenraum oder im Freien',
-  IV: 'Klasse IV – mechanische Geräte im Personen-Aufenthaltsbereich',
+  'ventilated-enclosure': 'Belüftetes Gehäuse',
+  I: 'Klasse I – Mechanische Geräte im Personen-Aufenthaltsbereich',
+  II: 'Klasse II – Verdichter im Maschinenraum oder im Freien',
+  III: 'Klasse III – Maschinenraum oder im Freien',
+  IV: 'Klasse IV – Belüftetes Gehäuse',
   'general-access': 'allgemeiner Zugangsbereich',
   'supervised-access': 'überwachter Zugangsbereich',
   'authorized-access': 'Zugang nur für befugte Personen',
@@ -51,7 +52,17 @@ const OPTIONS = Object.freeze({
   mechanical: 'mechanische Lüftung',
   none: 'keine gesicherte Lüftung',
   yes: 'ja',
-  no: 'nein'
+  no: 'nein',
+  present: 'Risikoanalyse liegt vor'
+});
+
+// Feldspezifische Klartexte für den Ort des belüfteten Gehäuses (EN 378-1, Tabelle C.1,
+// Spalte IV): Die Werte I/II/III kollidieren in OPTIONS mit den Klassifikationsbezeichnungen
+// der Aufstellungsort-Klassifikation (Klasse I/II/III), daher eigene Zuordnung (EN 378-1, 5.3).
+const ENCLOSURE_LOCATION_OPTIONS = Object.freeze({
+  I: 'Aufstellungsort I – Mechanische Geräte im Personen-Aufenthaltsbereich',
+  II: 'Aufstellungsort II – Verdichter im Maschinenraum oder im Freien',
+  III: 'Aufstellungsort III – Maschinenraum oder im Freien'
 });
 
 const CHECKS = Object.freeze({
@@ -79,6 +90,7 @@ const FIELDS = Object.freeze({
 
 function status(value) { return STATUS[value] || text(value); }
 function label(value) { return OPTIONS[value] || text(value); }
+function enclosureLocationLabel(value) { return ENCLOSURE_LOCATION_OPTIONS[value] || label(value); }
 function checkLabel(value) { return CHECKS[value] || FIELDS[value] || text(value); }
 function formatDateOnly(value) {
   const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -88,6 +100,12 @@ function sourceLabel(source = {}) {
   return [source.sourcePart || '', source.sourceSection || ''].filter(Boolean).join(' ');
 }
 
+// Prüfregel: Jede Aussage (Gesamtstatus, Kennzahlen, Einzelpunkte) darf im Bericht genau
+// einmal in vollem Umfang erscheinen. Abschnitt 1 enthält daher nur die fünf Kernzeilen;
+// Leitfaden-Überschrift (guidance.headline) und -Zusammenfassung (guidance.summary) bleiben
+// dem Planer-Leitfaden in Abschnitt 8 vorbehalten. Die fachbezogenen Statuszeilen in den
+// Abschnitten 4 bis 7 bleiben erhalten, da sie die Status der Teilbewertungen (Füllmenge,
+// alternative Vorkehrungen, Plausibilität, Sicherheit) und nicht des Gesamtergebnisses sind.
 function summarySection(dto) {
   const summary = object(dto.summary);
   const guidance = object(dto.plannerGuidance || dto.assessment?.plannerGuidance);
@@ -95,8 +113,6 @@ function summarySection(dto) {
     title: '1. Berichtszusammenfassung',
     rows: [
       row('Bewertung', status(summary.status)),
-      row('Leitfaden', guidance.headline || summary.plannerGuidanceHeadline),
-      row('Zusammenfassung', guidance.summary),
       row('Eingaben vollständig', summary.inputComplete ? 'ja' : 'nein'),
       num('Maßnahmen oder Planungspunkte', guidance.actionCount, 'integer'),
       num('Nicht erfüllte Punkte', guidance.failedCount, 'integer'),
@@ -113,26 +129,38 @@ function importedSystemSection(dto) {
     rows: [
       row('Importierte Anlage', input.importedSystemName),
       row('Importstatus', input.importStatusMessage),
-      row('Kältemittel', input.refrigerantId),
+      row('Kältemittel', input.refrigerantLabel || input.refrigerantId),
       num('Füllmenge', input.chargeKg, 'generic', 'kg'),
       num('Raumvolumen', input.roomVolumeM3, 'generic', 'm³'),
       row('Aufstellort', label(input.installationLocation)),
       row('Aufstellungsort-Klassifikation', label(input.installationClass)),
+      ...(input.installationLocation === 'ventilated-enclosure'
+        ? [row('Ort des belüfteten Gehäuses', enclosureLocationLabel(input.ventilatedEnclosureToxicityLocationClass))]
+        : []),
       row('Zugangsbereich', label(input.accessArea)),
       row('Kategorie des Zugangsbereichs', label(input.accessCategory)),
       row('Nutzung', label(input.usageType)),
       row('Anwendungsart', label(input.applicationType)),
       row('Geschoss oder Lage', label(input.locationLevel)),
-      row('Lüftung', label(input.ventilationType))
+      row('Kellergeschoss', input.isBasementLocation ? label(input.isBasementLocation) : '—'),
+      row('Risikoanalyse Maschinenraum', input.installationLocation === 'machinery-room' ? label(input.machineryRoomRiskAnalysisStatus) : '—'),
+      row('Ergebnis der Risikoanalyse', input.installationLocation === 'machinery-room' ? label(input.machineryRoomRiskAnalysisResult) : '—'),
+      row('Bemerkungen zur Risikoanalyse', input.installationLocation === 'machinery-room' && input.machineryRoomRiskAnalysisNotes ? input.machineryRoomRiskAnalysisNotes : '—'),
+      row('Lüftung', label(input.ventilationType)),
+      ...(input.installationLocation === 'occupied-space' || input.installationLocation === 'ventilated-enclosure'
+        ? [row('Hinweis zur Bestimmung des Raumvolumens', 'Nach EN 378-1, Abschnitt 7: kleinster umschlossener Personen-Aufenthaltsbereich, Zusammenfassung verbundener Räume, Zuluftabschläge bei A1. Die App leitet das Raumvolumen V nicht selbst ab.')]
+        : [])
     ]
   };
 }
 
 function refrigerantSafetySection(dto) {
   const safetyData = object(dto.assessment?.chargeLimit?.refrigerantSafetyData);
+  const input = object(dto.input);
   return {
     title: '3. Kältemittel-Sicherheitsdaten',
     rows: [
+      row('Kältemittel', input.refrigerantLabel || input.refrigerantId),
       row('Sicherheitsklasse', safetyData.safetyClass),
       row('Toxizitätsklasse', safetyData.toxicityClass),
       row('Brennbarkeitsklasse', safetyData.flammabilityClass),
@@ -180,35 +208,91 @@ function stateConsistencySection(dto) {
   return { title: '6. Plausibilitätsprüfung der Eingaben', rows, singleColumn: true };
 }
 
+// Section 7 carries the overall assessment and the machinery-room ventilation
+// design values only; all requirement points live exclusively in section 8.
 function safetyComponentsSection(dto) {
   const installationSafety = object(dto.assessment?.installationSafety);
+  const input = object(dto.input);
   const rows = [row('Bewertung', status(installationSafety.status))];
-  array(installationSafety.requirements).forEach(item => rows.push(row(item.title || checkLabel(item.id), `${status(item.status)}: ${item.measure || item.requirement || 'prüfen'}`, sourceLabel(item.source))));
-  return { title: '7. Sicherheitskomponenten nach EN 378-3', rows, singleColumn: true };
+
+  // Add ventilation output for machinery room (Fix 4b)
+  if (input.installationLocation === 'machinery-room' && input.machineryRoomRiskAnalysisResult === 'yes') {
+    const numberOrNull = value => {
+      if (value === '' || value == null) return null;
+      const parsed = Number(String(value).replace(',', '.'));
+      return Number.isFinite(parsed) ? parsed : null;
+    };
+    const round = (value, digits = 1) => Number.isFinite(value) ? Number(value.toFixed(digits)) : null;
+
+    const chargeKg = numberOrNull(input.machineryRoomLargestSystemChargeKg);
+    const roomVolume = numberOrNull(input.roomVolumeM3);
+    const occupied = input.machineryRoomOccupied === 'yes';
+
+    // Add ventilation rows
+    if (chargeKg != null && chargeKg > 0) {
+      const vFormelM3s = 0.014 * (chargeKg ** (2 / 3));
+      const vFormelM3h = round(vFormelM3s * 3600, 1);
+      rows.push(row('Luftvolumenstrom Notlüftung nach Gleichung (1)', `${formatEngineeringNumber(vFormelM3s, 'flow')} m\u00b3/s / ${formatEngineeringNumber(vFormelM3h, 'flow')} m\u00b3/h`, 'EN 378-3, 5.13.4'));
+    } else {
+      rows.push(row('Luftvolumenstrom Notlüftung nach Gleichung (1)', 'nicht bestimmbar (Fehlende Angabe: Füllmenge)', 'EN 378-3, 5.13.4'));
+    }
+
+    if (roomVolume != null && roomVolume > 0) {
+      const v15 = round(roomVolume * 15, 1);
+      rows.push(row('Luftvolumenstrom Notlüftung nach 15 Luftwechseln/h', `${formatEngineeringNumber(v15, 'flow')} m\u00b3/h`, 'EN 378-3, 5.13.4'));
+    } else {
+      rows.push(row('Luftvolumenstrom Notlüftung nach 15 Luftwechseln/h', 'nicht bestimmbar (Fehlende Angabe: Raumvolumen)', 'EN 378-3, 5.13.4'));
+    }
+
+    if (chargeKg != null && chargeKg > 0 && roomVolume != null && roomVolume > 0) {
+      const vFormelM3s = 0.014 * (chargeKg ** (2 / 3));
+      const vFormelM3h = round(vFormelM3s * 3600, 1);
+      const v15 = round(roomVolume * 15, 1);
+      const governing = Math.min(vFormelM3h, v15);
+      const isFormulaGoverning = governing === vFormelM3h;
+      rows.push(row('Maßgeblicher Wert', `${formatEngineeringNumber(governing, 'flow')} m\u00b3/h (${isFormulaGoverning ? 'Gleichung (1)' : '15 Luftwechsel/h'})`, 'EN 378-3, 5.13.4'));
+    } else {
+      rows.push(row('Maßgeblicher Wert', 'nicht bestimmbar (Fehlende Angaben)', 'EN 378-3, 5.13.4'));
+    }
+
+    if (occupied && roomVolume != null && roomVolume > 0) {
+      const v4 = round(roomVolume * 4, 1);
+      rows.push(row('Luftvolumenstrom mechanische Lüftung (4-facher Luftwechsel)', `${formatEngineeringNumber(v4, 'flow')} m\u00b3/h`, 'EN 378-3, 5.13.2'));
+    } else if (occupied) {
+      rows.push(row('Luftvolumenstrom mechanische Lüftung (4-facher Luftwechsel)', 'nicht bestimmbar (Fehlende Angabe: Raumvolumen)', 'EN 378-3, 5.13.2'));
+    }
+  }
+
+  return { title: '7. Sicherheitsbewertung und Lüftungsauslegung Maschinenraum', rows, singleColumn: true };
 }
 
 function guidanceSection(dto) {
   const guidance = object(dto.plannerGuidance || dto.assessment?.plannerGuidance);
+  // Planner acknowledgement ("berücksichtigt (Planer)") is a pure note and is
+  // kept clearly separate from the normative status ("erfüllt").
+  const acknowledged = object(dto.checklistAcknowledged);
   const rows = [];
   array(guidance.groups).forEach(group => {
     rows.push(row(group.title || 'Leitfaden', ''));
-    array(group.items).forEach(item => rows.push(row(item.title, `${status(item.status)}: ${item.measure || item.requirement}`, item.sourceLabel || '')));
+    array(group.items).forEach(item => {
+      const ack = acknowledged[item.id] ? ' – berücksichtigt (Planer)' : '';
+      rows.push(row(item.title, `${status(item.status)}: ${item.measure || item.requirement}${ack}`, item.sourceLabel || ''));
+    });
   });
+  const confirmedItems = array(guidance.confirmedItems);
+  if (confirmedItems.length) {
+    rows.push(row('Erfüllt', ''));
+    confirmedItems.forEach(item => rows.push(row(item.title, `${status(item.status)}: ${item.measure || item.requirement || ''}`, item.sourceLabel || '')));
+  }
   if (!rows.length) rows.push(row('Planer-Leitfaden', guidance.summary || 'Keine zusätzlichen Maßnahmen ermittelt.'));
   return { title: '8. Planer-Leitfaden', rows, singleColumn: true };
-}
-
-function confirmedSection(dto) {
-  const guidance = object(dto.plannerGuidance || dto.assessment?.plannerGuidance);
-  const rows = array(guidance.confirmedItems).map(item => row(item.title, `${status(item.status)}: ${item.requirement || item.measure}`, item.sourceLabel || ''));
-  return { title: '9. Bestätigte Prüfpunkte', rows: rows.length ? rows : [row('Status', 'Keine bestätigten Prüfpunkte ausgewiesen.')], singleColumn: true };
 }
 
 function sourcesSection(dto) {
   const metadata = object(dto.metadata);
   const dataVersions = object(dto.dataVersions);
   return {
-    title: '10. Datenstand und Berichtserstellung',
+    title: '9. Datenstand und Berichtserstellung',
     rows: [
       row('Erzeugt am', formatDateOnly(metadata.generatedAt)),
       row('Berichtstyp', 'EN-378-Sicherheitsbericht'),
@@ -230,7 +314,6 @@ export function buildEN378ReportSections(dto = {}) {
     stateConsistencySection(dto),
     safetyComponentsSection(dto),
     guidanceSection(dto),
-    confirmedSection(dto),
     sourcesSection(dto)
   ].map(section => ({ ...section, isLineSection: false }));
 }

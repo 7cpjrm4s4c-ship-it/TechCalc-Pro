@@ -254,3 +254,15 @@ select option:checked { background-color: #1f3347; color: #fff; }
 .traffic--yellow { background: #ffd34d; color: #ffd34d; }
 .traffic--red { background: #ff4b4b; color: #ff4b4b; }
 .traffic--none { background: var(--color-dim); color: var(--color-dim); }
+
+/* EN 378 planner checklist: acknowledgement is a pure planner note, visually
+   separate from the normative status. Acknowledged rows stay visible, greyed and
+   struck through, so the checklist remains complete. */
+.tc-checklist-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-top: 1px solid rgba(255,255,255,.08); cursor: pointer; }
+.tc-checklist-item:first-child { border-top: 0; }
+.tc-checklist-item input[type="checkbox"] { margin-top: 2px; accent-color: #35aaff; flex: none; }
+.tc-checklist-item__title { font-weight: 800; font-size: 13px; line-height: 1.35; color: var(--color-text); }
+.tc-checklist-item__meta { display: block; margin-top: 2px; color: var(--color-muted); font-size: 12px; font-weight: 600; line-height: 1.35; }
+.tc-checklist-item__ack { margin-left: auto; flex: none; align-self: center; border-radius: var(--tc-radius-pill); padding: 2px 8px; background: rgba(38,215,111,.12); border: 1px solid rgba(38,215,111,.30); color: #7ce6a8; font-size: 11px; font-weight: 900; }
+.tc-checklist-item.is-acknowledged .tc-checklist-item__title { color: var(--color-muted); text-decoration: line-through; }
+.tc-checklist-item.is-acknowledged .tc-checklist-item__meta { color: var(--color-dim); }
