@@ -18,7 +18,7 @@ export function createFGasesSystemSnapshot(state = {}, { generatedAt = new Date(
       placedOnMarketDate: state.placedOnMarketDate || '', commissioningDate: state.commissioningDate || state.installedAtSiteDate || '',
       stockAssessmentDate: state.stockAssessmentDate || state.assessmentDate || '', plannedActivity: state.plannedActivity || '',
       refrigerantOrigin: state.refrigerantOrigin || '', preChargedStatus: state.preChargedStatus || '', leakDetectionSystemStatus: state.leakDetectionSystemStatus || '',
-      hermeticallySealedStatus: state.hermeticallySealedStatus || '', hermeticallySealedLabelStatus: state.hermeticallySealedLabelStatus || '', coolingBelowMinus50Status: state.coolingBelowMinus50Status || '',
+      hermeticallySealedStatus: state.hermeticallySealedStatus || '', hermeticallySealedLabelStatus: state.hermeticallySealedLabelStatus || '', installedInResidentialBuilding: state.installedInResidentialBuilding || '', coolingBelowMinus50Status: state.coolingBelowMinus50Status || '',
       siteSafetyRestrictionStatus: state.siteSafetyRestrictionStatus || '', nationalSafetyStandardRestrictionStatus: state.nationalSafetyStandardRestrictionStatus || '', cascadePrimaryCircuitStatus: state.cascadePrimaryCircuitStatus || '',
       specificRefrigerantLossPercent: numberOrNull(state.specificRefrigerantLossPercent), personCertificationStatus: state.personCertificationStatus || '', companyCertificationStatus: state.companyCertificationStatus || ''
     }

@@ -37,6 +37,7 @@ const INPUT_FIELD_LABELS = Object.freeze({
   leakDetectionSystemStatus: 'Leckage-Erkennungssystem vorhanden',
   hermeticallySealedStatus: 'Hermetisch geschlossene Einrichtung nach Art. 3 Nr. 9 VO (EU) 2024/573',
   hermeticallySealedLabelStatus: 'Als hermetisch geschlossene Einrichtung gekennzeichnet',
+  installedInResidentialBuilding: 'In Wohngebäude installiert',
   coolingBelowMinus50Status: 'Kühlung von Erzeugnissen unter −50 °C',
   siteSafetyRestrictionStatus: 'Standortbezogene Sicherheitsanforderung verhindert niedrigeres GWP',
   nationalSafetyStandardRestrictionStatus: 'Nationale Sicherheitsnorm verhindert Alternative',
@@ -136,11 +137,20 @@ function serviceScenarioLabel(details = {}) {
 
 function leakCheckLabel(leak = {}) {
   if (leak.status === 'required') return leak.intervalMonths ? `Dichtheitskontrolle erforderlich – Prüfintervall ${leak.intervalMonths} Monate` : 'Dichtheitskontrolle erforderlich';
-  if (leak.status === 'exception-applies') return 'Dichtheitskontrolle nicht erforderlich – gesetzliche Ausnahme';
+  if (leak.status === 'exception-applies') return leak.exceptionBasis === 'art-5-1-unterabsatz-3'
+    ? 'Dichtheitskontrolle nicht erforderlich – Ausnahme Art. 5 Abs. 1 Unterabsatz 3 VO (EU) 2024/573 (Wohngebäude, < 3 kg)'
+    : 'Dichtheitskontrolle nicht erforderlich – gesetzliche Ausnahme';
   if (leak.status === 'not-required') return 'Dichtheitskontrolle nicht erforderlich';
   if (leak.status === 'not-applicable') return 'Dichtheitskontrolle nicht im gesetzlichen Anwendungsbereich';
   if (leak.status === 'incomplete') return 'Bewertung der Dichtheitskontrolle unvollständig';
   return 'Dichtheitskontrolle nicht bewertet';
+}
+
+function leakExceptionBasisLabel(leak = {}) {
+  if (leak.exceptionBasis === 'art-5-1-unterabsatz-3') return 'Art. 5 Abs. 1 Unterabsatz 3 VO (EU) 2024/573 – hermetisch geschlossen, gekennzeichnet, < 3 kg, Wohngebäude';
+  if (leak.exceptionBasis === 'art-5-1-unterabsatz-2') return 'Art. 5 Abs. 1 Unterabsatz 2 VO (EU) 2024/573 – hermetisch geschlossen, gekennzeichnet, < 10 t CO₂-Äq.';
+  if (leak.exceptionBasis === 'art-5-1-unterabsatz-5') return 'Art. 5 Abs. 1 Unterabsatz 5 VO (EU) 2024/573 – hermetisch geschlossen, gekennzeichnet, < 2 kg (Anhang II Gruppe 1)';
+  return null;
 }
 
 function originLabel(value) {
@@ -188,7 +198,16 @@ function obligationRows(items = [], state = {}) {
         { label: 'Rechtsgrundlage Kältemittelverlust', value: '§ 2 Abs. 1 ChemKlimaschutzV' }
       ];
     }
-    if (item.type === 'access-to-detachable-connections') return [{ label: 'Zugang zu lösbaren Verbindungen', value: 'sicherzustellen, soweit technisch möglich und zumutbar' }];
+    if (item.type === 'access-to-detachable-connections') {
+      if (item.status === 'exception-applies' && item.exceptionReason === 'hermetically-sealed-and-labelled') {
+        return [
+          { label: 'Zugang zu lösbaren Verbindungen', value: '§ 2 Abs. 2 nicht anwendbar' },
+          { label: 'Begründung', value: 'Hermetisch geschlossene und entsprechend gekennzeichnete Einrichtung – Ausnahme nach § 2 Abs. 3 ChemKlimaschutzV' },
+          { label: 'Rechtsgrundlage Zugang zu lösbaren Verbindungen', value: '§ 2 Abs. 3 ChemKlimaschutzV' }
+        ];
+      }
+      return [{ label: 'Zugang zu lösbaren Verbindungen', value: 'sicherzustellen, soweit technisch möglich und zumutbar' }];
+    }
     if (item.type === 'contractor-certification') return [{ label: 'Beauftragtes Unternehmen', value: 'Zertifizierung/Sachkunde prüfen' }];
     if (item.type === 'certified-person-for-leak-check') return [{ label: 'Dichtheitskontrolle', value: 'durch sachkundige Person' }];
     if (item.type === 'certified-person-for-recovery') return [{ label: 'Rückgewinnung', value: 'durch sachkundige Person' }];
@@ -237,6 +256,12 @@ function collectInputIssues(state = {}, result = {}) {
   inspectUnresolved(result.placingOnMarketRegulationEvaluation, 'placedOnMarketDate');
   inspectUnresolved(result.regulationEvaluation, state.plannedActivity === 'installation' ? 'commissioningDate' : 'stockAssessmentDate');
   inspectUnresolved(result.lifecycleRegulationEvaluation, state.plannedActivity === 'installation' ? 'commissioningDate' : 'stockAssessmentDate');
+  // Art. 5 Abs. 1 Unterabsatz 3 VO (EU) 2024/573: fehlende Angabe „In Wohngebäude
+  // installiert“ wird als Klartext-Hinweis ausgegeben, wenn sie für die abschließende
+  // Bewertung der Wohngebäude-Ausnahme erforderlich ist.
+  // 'unknown' ist zwar beantwortet, für die Wohngebäude-Ausnahme (Art. 5 Abs. 1
+  // Unterabsatz 3) aber nicht ausreichend – der Klartext-Hinweis erscheint trotzdem.
+  for (const field of result.leakCheckDetails?.missingInputs || []) add(field, 'EU-FGAS:Art.5(1)');
   const lossDuty = (result.operatorDutyDetails?.obligations || []).find(item => item.type === 'specific-refrigerant-loss');
   if (lossDuty?.status === 'applies' && !hasValue(state.specificRefrigerantLossPercent)) add('specificRefrigerantLossPercent', 'DE-CHEMKLIMA:§2(1)');
   if (lossDuty?.status === 'incomplete') {
@@ -337,7 +362,8 @@ export function buildFGasesResultModel(state = {}, result = {}) {
           { label: 'Bewertung', value: leakCheckLabel(leak) },
           { label: 'Erforderlich', value: boolLabel(leak.required) },
           { label: 'Prüfintervall', value: leak.intervalMonths ?? '—', unit: leak.intervalMonths ? 'Monate' : '' },
-          { label: 'Leckage-Erkennungssystem verpflichtend', value: boolLabel(leak.leakDetectionRequired) }
+          { label: 'Leckage-Erkennungssystem verpflichtend', value: boolLabel(leak.leakDetectionRequired) },
+          ...(leakExceptionBasisLabel(leak) ? [{ label: 'Rechtsgrundlage Ausnahme', value: leakExceptionBasisLabel(leak) }] : [])
         ]
       },
       {
