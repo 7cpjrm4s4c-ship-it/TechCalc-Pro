@@ -223,4 +223,49 @@ assert.match(ivConflict.requirement, /5\.3 a/);
 const classIvEnclosureOk = assessStateConsistency({ ...baseState, installationLocation: 'ventilated-enclosure', installationClass: 'IV' });
 assert.equal(classIvEnclosureOk.status, 'passed', 'belüftetes Gehäuse + Klasse IV bleibt konsistent');
 
+// EN 378-3, 4.5 (Abs. 2, M2) i. V. m. EN 378-1, 5.3 b: Ein abgeschlossener Raum ohne
+// Personenaufenthalt mit Verdichter oder Druckbehälter wird wie ein Maschinenraum behandelt;
+// Klasse III (vollständige Aufstellung in Maschinenraum oder im Freien) ist dann zulässig
+// (analog zur Klasse-II-Korrektur, Commit 6454c3f).
+const classIIITechnicalRoomM2 = assessStateConsistency({
+  ...baseState,
+  installationLocation: 'technical-room',
+  installationClass: 'III',
+  technicalRoomSeparatedFromOccupiedSpaces: 'yes',
+  technicalRoomContainsCompressorOrPressureVessel: 'yes'
+});
+assert.equal(classIIITechnicalRoomM2.status, 'passed', 'Klasse III + abgeschlossener technischer Raum mit Verdichter/Druckbehälter: konsistent (EN 378-3, 4.5; EN 378-1, 5.3 b)');
+assert.ok(!classIIITechnicalRoomM2.requirements.some(item => item.id === 'state-consistency.class-iii-location'), 'kein class-iii-location-Konflikt im M2-Fall');
+// technischer Raum ohne Maschinenraum-Behandlung (kein Verdichter/Druckbehälter) -> weiterhin Konflikt
+const classIIITechnicalRoomNoCompressor = assessStateConsistency({
+  ...baseState,
+  installationLocation: 'technical-room',
+  installationClass: 'III',
+  technicalRoomSeparatedFromOccupiedSpaces: 'yes',
+  technicalRoomContainsCompressorOrPressureVessel: 'no'
+});
+assert.equal(classIIITechnicalRoomNoCompressor.status, 'failed', 'technischer Raum ohne Verdichter/Druckbehälter: Klasse III bleibt Konflikt');
+const classIIIConflict = classIIITechnicalRoomNoCompressor.requirements.find(item => item.id === 'state-consistency.class-iii-location');
+assert.ok(classIIIConflict);
+assert.equal(classIIIConflict.source.sourcePart, 'EN 378-1 / EN 378-3');
+assert.equal(classIIIConflict.source.sourceSection, '5.3 b / 4.5');
+// Gegenprobe: Personen-Aufenthaltsbereich mit Klasse III bleibt Konflikt
+const classIIIOccupied = assessStateConsistency({ ...baseState, installationLocation: 'occupied-space', installationClass: 'III' });
+assert.equal(classIIIOccupied.status, 'failed');
+assert.ok(classIIIOccupied.requirements.some(item => item.id === 'state-consistency.class-iii-location'), 'Gegenprobe: occupied-space + Klasse III weiterhin Konflikt');
+// Maschinenraum und Außenaufstellung mit Klasse III bleiben unverändert zulässig
+assert.equal(assessStateConsistency({ ...baseState, installationLocation: 'machinery-room', installationClass: 'III', accessArea: 'authorized-access' }).status, 'passed');
+assert.equal(assessStateConsistency({ ...baseState, installationLocation: 'outdoor', installationClass: 'III' }).status, 'passed');
+// machinery-room-access kollidiert nicht mit technical-room (greift nur beim Aufstellort Maschinenraum)
+const trAccess = assessStateConsistency({
+  ...baseState,
+  installationLocation: 'technical-room',
+  installationClass: 'III',
+  accessArea: 'general-access',
+  technicalRoomSeparatedFromOccupiedSpaces: 'yes',
+  technicalRoomContainsCompressorOrPressureVessel: 'yes'
+});
+assert.ok(!trAccess.requirements.some(item => item.id === 'state-consistency.machinery-room-access'), 'machinery-room-access legt den technischen Raum nicht auf authorized-access fest');
+assert.equal(trAccess.status, 'passed');
+
 console.log('EN 378 state consistency tests passed.');

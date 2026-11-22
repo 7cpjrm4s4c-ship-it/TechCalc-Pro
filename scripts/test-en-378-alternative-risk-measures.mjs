@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   assessAlternativeRiskMeasures,
   calculateDilutionOpeningArea,
-  calculateSimplifiedMechanicalVentilationFlow
+  calculateAlternativeMechanicalVentilationFlow
 } from '../modules/en-378-safety-check/alternativeRiskMeasures.js';
 import { assessChargeLimit, assessC3Applicability } from '../modules/en-378-safety-check/chargeLimitCalculation.js';
 import { calculate } from '../modules/en-378-safety-check/logic.js';
@@ -35,7 +35,7 @@ const baseState = {
 };
 
 assert.equal(calculateDilutionOpeningArea({ chargeKg: 8, roomVolumeM3: 80, qlmvKgM3: 0.063 }), 0.00508);
-assert.equal(calculateSimplifiedMechanicalVentilationFlow({ rclKgM3: 0.061 }), 163.9);
+assert.equal(calculateAlternativeMechanicalVentilationFlow({ rclKgM3: 0.061 }), 163.9);
 
 const rawChargeLimit = assessChargeLimit(baseState);
 const alternativeAssessment = assessAlternativeRiskMeasures(baseState, rawChargeLimit);

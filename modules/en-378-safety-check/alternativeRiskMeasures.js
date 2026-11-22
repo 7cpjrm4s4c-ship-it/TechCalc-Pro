@@ -59,8 +59,8 @@ function buildRequirement({
   return freezeRequirement({ id, category, title, requirement, measure, source, status, priority, missingInputs, details });
 }
 
-import { calculateDilutionOpeningArea, calculateAlternativeMechanicalVentilationFlow as calculateSimplifiedMechanicalVentilationFlow } from './ventilationMeasures.js';
-export { calculateDilutionOpeningArea, calculateSimplifiedMechanicalVentilationFlow } from './ventilationMeasures.js';
+import { calculateDilutionOpeningArea, calculateAlternativeMechanicalVentilationFlow } from './ventilationMeasures.js';
+export { calculateDilutionOpeningArea, calculateAlternativeMechanicalVentilationFlow } from './ventilationMeasures.js';
 
 function getC3Check(chargeLimitAssessment = {}) {
   return (chargeLimitAssessment.checks || []).find(check => check.id === 'charge-limit.alternative-risk-management') || null;
@@ -308,7 +308,7 @@ export function assessAlternativeRiskMeasures(currentState = {}, chargeLimitAsse
       roomVolumeM3: currentState.roomVolumeM3,
       qlmvKgM3: c3Check.details?.qlmvKgM3
     }),
-    mechanicalVentilationFlowM3h: calculateSimplifiedMechanicalVentilationFlow({
+    mechanicalVentilationFlowM3h: calculateAlternativeMechanicalVentilationFlow({
       rclKgM3: c3Check.details?.rclKgM3
     }),
     selectedMeasures: Object.freeze(selected.map(item => item.title))

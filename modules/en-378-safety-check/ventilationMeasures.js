@@ -20,10 +20,7 @@ export function calculateAlternativeMechanicalVentilationFlow({ rclKgM3 } = {}) 
   return round(10 / rcl, 1);
 }
 
-export const calculateSimplifiedMechanicalVentilationFlow = calculateAlternativeMechanicalVentilationFlow;
-
 export default Object.freeze({
   calculateDilutionOpeningArea,
-  calculateAlternativeMechanicalVentilationFlow,
-  calculateSimplifiedMechanicalVentilationFlow
+  calculateAlternativeMechanicalVentilationFlow
 });

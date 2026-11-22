@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 
-import { normalizeEN378StateTransition } from '../modules/en-378-safety-check/stateTransitions.js';
+import { normalizeEN378StateTransition, TECHNICAL_ROOM_TRANSITION_FIELDS, VENTILATED_ENCLOSURE_TRANSITION_FIELDS } from '../modules/en-378-safety-check/stateTransitions.js';
 import { calculate } from '../modules/en-378-safety-check/logic.js';
 import { MACHINERY_ROOM_5_1_TO_5_14_FIELDS } from '../modules/en-378-safety-check/machineryRoomRiskAnalysis.js';
 
@@ -253,5 +253,71 @@ const test15 = calculate({
 });
 assert.equal(test15.belowGradeDetectorAlarm, null, 'Check should not appear when result is empty');
 console.log('✓ Test 15 passed');
+
+// Test 16: Aufstellort weg von 'technical-room' - alle 4.5-Felder zurücksetzen (EN 378-3, 4.5)
+console.log('Test 16: installationLocation weg von technical-room - alle 4.5-Felder zurücksetzen...');
+const trState = {
+  ...baseState,
+  installationLocation: 'technical-room',
+  installationClass: 'II',
+  technicalRoomSeparatedFromOccupiedSpaces: 'yes',
+  technicalRoomContainsCompressorOrPressureVessel: 'no',
+  technicalRoomComponentsHaveDetachableJoints: 'yes',
+  technicalRoomAdverseConditions: 'vibrations',
+  technicalRoomExhaustHoodFlowRateM3s: '0.6',
+  technicalRoomVentilationActivatesDetector: 'yes'
+};
+const leaveTr = normalizeEN378StateTransition(trState, { installationLocation: 'occupied-space' }, { action: 'field:input:select' });
+assert.equal(leaveTr.installationLocation, 'occupied-space');
+for (const field of TECHNICAL_ROOM_TRANSITION_FIELDS) {
+  assert.equal(leaveTr[field], '', `4.5-Feld ${field} muss beim Verlassen des technischen Raums zurückgesetzt werden`);
+}
+console.log('✓ Test 16 passed');
+
+// Test 17: Aufstellort weg von 'ventilated-enclosure' - alle 4.6-Felder zurücksetzen (EN 378-3, 4.6)
+console.log('Test 17: installationLocation weg von ventilated-enclosure - alle 4.6-Felder zurücksetzen...');
+const veState = {
+  ...baseState,
+  installationLocation: 'ventilated-enclosure',
+  installationClass: 'IV',
+  enclosureVolumeM3: '8',
+  ventilatedEnclosureDuctPerManufacturerInstructions: 'yes',
+  ventilatedEnclosureFreshAirSufficient: 'yes',
+  ventilatedEnclosureDuctToOutdoor: 'yes',
+  ventilatedEnclosureToxicityLocationClass: 'III'
+};
+const leaveVe = normalizeEN378StateTransition(veState, { installationLocation: 'occupied-space' }, { action: 'field:input:select' });
+for (const field of VENTILATED_ENCLOSURE_TRANSITION_FIELDS) {
+  assert.equal(leaveVe[field], '', `4.6-Feld ${field} muss beim Verlassen des belüfteten Gehäuses zurückgesetzt werden`);
+}
+console.log('✓ Test 17 passed');
+
+// Test 18: Gegenprobe - anderer Feldwechsel innerhalb desselben Aufstellorts verändert keine 4.5-Felder
+console.log('Test 18: Gegenprobe - Wechsel innerhalb desselben Aufstellorts verändert keine 4.5-Felder...');
+const stayTr = normalizeEN378StateTransition(trState, { usageType: 'commercial' }, { action: 'field:input:select' });
+assert.equal(stayTr.usageType, 'commercial');
+for (const field of TECHNICAL_ROOM_TRANSITION_FIELDS) {
+  assert.equal(stayTr[field], undefined, `4.5-Feld ${field} darf bei anderem Feldwechsel nicht angerührt werden`);
+}
+console.log('✓ Test 18 passed');
+
+// Test 19: classIiCompressorsOutsideOrMachineryRoom wird bei Wechsel von refrigerantId / installationClass / installationLocation zurückgesetzt
+console.log('Test 19: Klasse-II-Bestätigung wird bei Auslöser-Wechsel zurückgesetzt...');
+const classIiState = { ...baseState, installationLocation: 'occupied-space', installationClass: 'II', classIiCompressorsOutsideOrMachineryRoom: 'yes' };
+assert.equal(normalizeEN378StateTransition(classIiState, { refrigerantId: 'R-717' }, { action: 'field:input:select' }).classIiCompressorsOutsideOrMachineryRoom, '', 'Wechsel refrigerantId setzt Bestätigung zurück');
+assert.equal(normalizeEN378StateTransition(classIiState, { installationClass: 'I' }, { action: 'field:input:select' }).classIiCompressorsOutsideOrMachineryRoom, '', 'Wechsel installationClass setzt Bestätigung zurück');
+assert.equal(normalizeEN378StateTransition(classIiState, { installationLocation: 'machinery-room' }, { action: 'field:input:select' }).classIiCompressorsOutsideOrMachineryRoom, '', 'Wechsel installationLocation setzt Bestätigung zurück');
+// ohne gespeicherte Bestätigung bleibt das Patch unverändert (keine leeren Zusatzschlüssel)
+assert.equal(normalizeEN378StateTransition({ ...baseState, installationLocation: 'occupied-space', installationClass: 'II' }, { installationClass: 'I' }, { action: 'field:input:select' }).classIiCompressorsOutsideOrMachineryRoom, undefined);
+console.log('✓ Test 19 passed');
+
+// Test 20: usesAlternativeRiskManagement wird bei Wechsel von refrigerantId / chargeKg zurückgesetzt (EN 378-1, C.3.1)
+console.log('Test 20: gespeicherte C.3-Auswahl wird bei Kältemittel-/Füllmengenwechsel zurückgesetzt...');
+const c3State = { ...baseState, installationLocation: 'occupied-space', usesAlternativeRiskManagement: 'yes' };
+assert.equal(normalizeEN378StateTransition(c3State, { chargeKg: '9' }, { action: 'field:input:select' }).usesAlternativeRiskManagement, '', 'Wechsel chargeKg setzt C.3-Auswahl zurück');
+assert.equal(normalizeEN378StateTransition(c3State, { refrigerantId: 'R-134a' }, { action: 'field:input:select' }).usesAlternativeRiskManagement, '', 'Wechsel refrigerantId setzt C.3-Auswahl zurück');
+// ohne gespeicherte Auswahl bleibt das Patch unverändert
+assert.equal(normalizeEN378StateTransition({ ...baseState }, { chargeKg: '9' }, { action: 'field:input:select' }).usesAlternativeRiskManagement, undefined);
+console.log('✓ Test 20 passed');
 
 console.log('\n✅ Alle Machinery Room Transition Tests bestanden!');

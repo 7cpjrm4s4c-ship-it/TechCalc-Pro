@@ -5,7 +5,8 @@ import { ACCESS_CATEGORY_BY_ACCESS_AREA } from './logic.js';
 import { assessC3Applicability } from './chargeLimitCalculation.js';
 
 const option = (value, label) => Object.freeze({ value, label });
-const accessCategoryByAccessArea = ACCESS_CATEGORY_BY_ACCESS_AREA;
+// ACCESS_CATEGORY_BY_ACCESS_AREA wird zentral in logic.js definiert und hier importiert
+// (eine Definition, keine Dublette).
 const isMachineryRoom = state => state.installationLocation === 'machinery-room';
 const yes = value => value === true || value === 'yes';
 const isMachineryRoomRiskAnalysisYes = state => state.installationLocation === 'machinery-room' && state.machineryRoomRiskAnalysisResult === 'yes';
@@ -53,7 +54,7 @@ const c3NotApplicable = state => assessC3Applicability(state).usable === false;
 const isHumanComfort = state => state.applicationType === 'human-comfort';
 const needsMountingType = state => isHumanComfort(state) && state.isFactorySealed === 'no';
 const needsExplosionEquipment = state => isMachineryRoom(state) && ['R-32', 'R32', 'HFKW-32', 'R-717', 'R717', 'R-290', 'R290'].includes(String(state.refrigerantId || ''));
-const needsLegacyAccessCategoryField = state => !accessCategoryByAccessArea[state.accessArea] && Boolean(state.accessCategory);
+const needsLegacyAccessCategoryField = state => !ACCESS_CATEGORY_BY_ACCESS_AREA[state.accessArea] && Boolean(state.accessCategory);
 
 const installationLocationOptions = Object.freeze([
   option('', 'Nicht angegeben'), option('occupied-space', 'Aufenthaltsbereich'), option('technical-room', 'Technischer Raum'), option('machinery-room', 'Maschinenraum'), option('outdoor', 'Außenaufstellung'), option('ventilated-enclosure', 'Belüftetes Gehäuse (Personen-Aufenthaltsbereich)')
@@ -138,9 +139,9 @@ const schema = defineFormSchema({
     { key: 'locationLevel', label: 'Geschoss oder Lage', type: FIELD_TYPES.SELECT, options: locationLevelOptions },
     // Die gesonderte Kellergeschoss-Abfrage ist beabsichtigt: Für den Maschinenraum-Pfad (EN 378-3, 4.3) ist die Unterscheidung unterirdischer Geschosse normativ erforderlich und darf nicht aus der Geschosslage allein abgeleitet werden.
     { key: 'isBasementLocation', label: 'Kellergeschoss', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => state.locationLevel === 'upper-no-emergency-exit-or-basement' },
-    { key: 'occupantDensityBelowOnePer10m2', label: 'Personendichte kleiner als eine Person je 10 m²', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => ['b', 'c'].includes(accessCategoryByAccessArea[state.accessArea] || state.accessCategory) },
-    { key: 'hasEmergencyExits', label: 'Notausgänge vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => (accessCategoryByAccessArea[state.accessArea] || state.accessCategory) === 'c' },
-    { key: 'isPermanentlySealedSorptionSystem', label: 'Dauerhaft geschlossene Sorptionsanlage', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => (accessCategoryByAccessArea[state.accessArea] || state.accessCategory) === 'a' },
+    { key: 'occupantDensityBelowOnePer10m2', label: 'Personendichte kleiner als eine Person je 10 m²', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => ['b', 'c'].includes(ACCESS_CATEGORY_BY_ACCESS_AREA[state.accessArea] || state.accessCategory) },
+    { key: 'hasEmergencyExits', label: 'Notausgänge vorhanden', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => (ACCESS_CATEGORY_BY_ACCESS_AREA[state.accessArea] || state.accessCategory) === 'c' },
+    { key: 'isPermanentlySealedSorptionSystem', label: 'Dauerhaft geschlossene Sorptionsanlage', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: state => (ACCESS_CATEGORY_BY_ACCESS_AREA[state.accessArea] || state.accessCategory) === 'a' },
     { key: 'usesAlternativeRiskManagement', label: 'Alternative Vorkehrungen nach Anhang C.3 vorgesehen', type: FIELD_TYPES.SELECT, options: yesNoOptions, visibleWhen: c3LocationEligible, disabled: c3NotApplicable },
     { key: 'alternativeRiskManagementInfo', label: 'Hinweis zu alternativen Vorkehrungen', type: FIELD_TYPES.NOTICE, tone: 'compact', visibleWhen: c3LocationEligible, text: state => c3NotApplicable(state)
       ? 'Alternative Vorkehrungen nach Anhang C.3 sind für dieses Kältemittel oder diese Füllmenge normativ nicht vorgesehen (EN 378-1, C.3.1; EN 378-3, 6.1). Die Auswahl ist deaktiviert; maßgeblich ist die Füllmengenbewertung nach C.1/C.2.'

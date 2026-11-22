@@ -121,12 +121,23 @@ export function assessStateConsistency(currentState = {}) {
     }
   }
 
-  if (installationClass === 'III' && !isMachineryRoom(currentState) && !isOutdoor(currentState)) {
+  // EN 378-3, 4.5 (Abs. 2, M2): Ein abgeschlossener Raum ohne Personenaufenthalt mit
+  // Verdichter oder Druckbehälter wird wie ein Maschinenraum behandelt. Daher ist
+  // Klasse III (vollständige Aufstellung in Maschinenraum oder im Freien, EN 378-1,
+  // 5.3 b) auch für den Aufstellort "Technischer Raum" zulässig, wenn der Raumabschluss
+  // bestätigt ist und Verdichter/Druckbehälter vorhanden sind (analog zur
+  // Klasse-II-Korrektur in Commit 6454c3f).
+  const SOURCE_CLASS_III = Object.freeze({ sourcePart: 'EN 378-1 / EN 378-3', sourceSection: '5.3 b / 4.5' });
+  const technicalRoomMachineryRoomCase = isTechnicalRoom(currentState)
+    && text(currentState.technicalRoomSeparatedFromOccupiedSpaces) === 'yes'
+    && text(currentState.technicalRoomContainsCompressorOrPressureVessel) === 'yes';
+  if (installationClass === 'III' && !isMachineryRoom(currentState) && !isOutdoor(currentState) && !technicalRoomMachineryRoomCase) {
     requirements.push(consistencyRequirement({
       id: 'state-consistency.class-iii-location',
       title: 'Klasse III mit Aufstellort abgleichen',
-      requirement: 'Klasse III setzt voraus, dass alle kältemittelführenden Teile im Maschinenraum oder im Freien angeordnet sind.',
-      measure: 'Aufstellort, Maschinenraum-Angabe oder Aufstellungsort-Klassifikation fachlich angleichen.'
+      requirement: 'Klasse III setzt voraus, dass alle kältemittelführenden Teile im Maschinenraum oder im Freien angeordnet sind (EN 378-1, 5.3 b). Ein abgeschlossener Raum ohne Personenaufenthalt mit Verdichter oder Druckbehälter gilt nach EN 378-3, 4.5, als Maschinenraum.',
+      measure: 'Aufstellort, Maschinenraum-Angabe oder Aufstellungsort-Klassifikation fachlich angleichen.',
+      source: SOURCE_CLASS_III
     }));
   }
 
