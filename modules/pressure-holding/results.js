@@ -17,9 +17,18 @@ export function pressureHoldingPrimary(s = {}, r = {}) {
   };
 }
 export function pressureHoldingDetailRows(s = {}, r = {}) {
+  const isMag = s.holdingType === 'mag';
+  // MAG: Aufteilung auf mehrere gleiche Gefäße ≤ 1000 l (Reflex Planungshandbuch „Planen Berechnen Ausrüsten“)
+  const selectionRows = isMag && r.vesselCount > 0
+    ? [
+        { label: 'Anzahl MAG', value: fmt(r.vesselCount, 0) },
+        { label: 'Nennvolumen je Gefäß', value: fmt(r.vesselVolumeL, 0), unit: 'Liter' },
+        { label: 'Gesamt-Nennvolumen der Auswahl', value: fmt(r.totalSelectedVolumeL, 0), unit: 'Liter' }
+      ]
+    : [{ label: 'Nächstes Normvolumen', value: r.selectedVolume > 0 ? fmt(r.selectedStandardVolume, 0) : '—', unit: 'Liter' }];
   return [
-    { label: s.holdingType === 'dynamic' ? 'Station / Gefäß' : 'Auswahl MAG', value: r.productLabel },
-    { label: 'Nächstes Normvolumen', value: r.selectedVolume > 0 ? fmt(r.selectedStandardVolume, 0) : '—', unit: 'Liter' },
+    { label: isMag ? 'Auswahl MAG' : 'Station / Gefäß', value: r.productLabel },
+    ...selectionRows,
     { label: 'Mindestbetriebsdruck p₀', value: fmt(r.p0, 2), unit: 'bar' },
     { label: 'Anfangsdruck pₐ min.', value: fmt(r.paMin, 2), unit: 'bar' },
     { label: 'Enddruck pₑ', value: fmt(r.pe, 2), unit: 'bar' }
@@ -42,8 +51,11 @@ export function pressureHoldingFormulaRows(s = {}) {
     { label: 'Volumen', value: 'Ve = VA × n / 100 · VV = max(0,5 % × VA; 3 l)' },
     s.holdingType === 'mag'
       ? { label: 'MAG-Nennvolumen', value: `Vn = (Ve + VV${s.includeServitec === 'true' ? ' + 5 l' : ''}) × (pe + 1) / (pe − p₀)` }
-      : { label: 'Dynamische Druckhaltung', value: 'Vn ≥ 1,1 × (Ve + VV) · pe ≥ p₀ + 0,3 bar + AD' }
-  ];
+      : { label: 'Dynamische Druckhaltung', value: 'Vn ≥ 1,1 × (Ve + VV) · pe ≥ p₀ + 0,3 bar + AD' },
+    s.holdingType === 'mag'
+      ? { label: 'MAG-Aufteilung', value: 'n = min { n ≥ 1 : nextReflexN(Vn/n) ≤ 1000 l } · je Gefäß nextReflexN(Vn/n) ≤ 1000 l (Reflex N)' }
+      : null
+  ].filter(Boolean);
 }
 export function buildPressureHoldingResultModel(s = {}, r = {}, accent = 'blue') {
   return {

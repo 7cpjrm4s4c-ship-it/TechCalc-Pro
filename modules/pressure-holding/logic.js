@@ -1,4 +1,17 @@
-import { parseNumber } from '../../core/engineering/numberService.js';
+// Druckhaltung – Berechnungslogik
+// Quellenbasis: Reflex Planungs- und Berechnungshandbuch „Planen Berechnen Ausrüsten“ (Reflex Winkelmann GmbH)
+//   · MAG-Nennvolumen: Vn = (Ve + VV [+ 5 l Servitec]) × (pe + 1) / (pe − p0)
+//   · Aufteilung großer MAG-Nennvolumina auf mehrere gleiche Gefäße ≤ 1000 l (Reflex N):
+//     n = min { n ≥ 1 : nextReflexN(Vn / n) ≤ 1000 }, je Gefäß nextReflexN(Vn / n)
+//   · Empfehlung Sicherheitsventil: pSV ≥ p0 + 1,5 bar (pSV ≤ 5 bar) bzw. pSV ≥ p0 + 2,0 bar (pSV > 5 bar)
+//
+// Bewusst nicht umgesetzte Punkte (Dokumentation, keine Implementierung):
+//   1. Anfangsdruck-Kontrolle nach Gefäßwahl (pa ≥ p0 + 0,25…0,3 bar, sonst nächstgrößeres Nennvolumen):
+//      Die Formel ist im hinterlegten Handbuch nicht eindeutig extrahierbar.
+//   2. Ausgabe des Fülldrucks pF (dasselbe Ergebnis).
+//   3. Für Anlagen mit VA ≤ 15 l schreibt das Reflex-Formblatt alternativ VV = 0,2 · VA vor;
+//      das Modul verwendet durchgängig VV = max(3 l; 0,005 · VA) und liegt damit auf der sicheren Seite.
+import { parseNumber, formatNumber } from '../../core/engineering/numberService.js';
 
 const WATER = [
   [0,0,0,1000],[10,0,0,1000],[20,0.13,0,998],[30,0.37,0,996],[40,0.72,0,992],[50,1.15,0,988],[60,1.66,0,983],[70,2.24,0,978],[80,2.88,0,972],[90,3.58,0,965],[100,4.34,0.01,958],[105,4.74,0.43,955],[110,5.15,0.98,951],[120,6.03,1.70,943],[130,6.96,2.61,935],[140,7.96,3.76,926],[150,9.03,5.18,917],[160,10.20,6.30,907]
@@ -22,10 +35,32 @@ function interp(table, t, col){
 }
 function round(v, d=2){ return Number.isFinite(v) ? Math.round(v * 10**d) / 10**d : 0; }
 function nextVolume(v){ return STANDARD_VOLUMES.find(x => x >= v) || Math.ceil(v / 500) * 500; }
-function reflexNLabel(volume){
-  if(!volume || volume <= 0) return '—';
-  const n = REFLEX_N_VOLUMES.find(x => x >= volume);
-  return n ? `Reflex N ${n}` : `Reflex G/SL ${nextVolume(volume)}`;
+const REFLEX_N_MAX = REFLEX_N_VOLUMES[REFLEX_N_VOLUMES.length - 1]; // 1000 l – größtes Einzelgefäß bei der MAG-Aufteilung
+function barText(v){ return formatNumber(v, { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
+// Kleinste Reflex-N-Größe ≥ v (undefined, wenn v über 1000 l liegt).
+export function nextReflexN(v){
+  const value = num(v);
+  if(!Number.isFinite(value) || value <= 0) return undefined;
+  return REFLEX_N_VOLUMES.find(x => x >= value);
+}
+// MAG-Aufteilung auf mehrere gleiche Gefäße ≤ 1000 l (Reflex Planungshandbuch „Planen Berechnen Ausrüsten“):
+// n = min { n ≥ 1 : nextReflexN(Vn / n) ≤ 1000 }, je Gefäß vesselVolumeL = nextReflexN(Vn / n).
+// Äquivalent zu n = max(1, ceil(Vn / 1000)), da Vn/n genau dann ≤ 1000 ist, wenn n ≥ Vn/1000.
+export function splitMagVessels(vnMag){
+  const vn = num(vnMag);
+  if(!Number.isFinite(vn) || vn <= 0) return { count: 0, vesselVolumeL: 0, totalVolumeL: 0 };
+  for(let n = 1; n <= Math.ceil(vn / REFLEX_N_MAX) + 1; n++){
+    const size = nextReflexN(vn / n);
+    if(size !== undefined && size <= REFLEX_N_MAX){
+      return { count: n, vesselVolumeL: size, totalVolumeL: n * size };
+    }
+  }
+  const count = Math.max(1, Math.ceil(vn / REFLEX_N_MAX));
+  return { count, vesselVolumeL: REFLEX_N_MAX, totalVolumeL: count * REFLEX_N_MAX };
+}
+function magProductLabel(split){
+  if(!split || split.count <= 0 || split.vesselVolumeL <= 0) return '—';
+  return split.count > 1 ? `${split.count} × Reflex N ${split.vesselVolumeL}` : `Reflex N ${split.vesselVolumeL}`;
 }
 function dynamicLabel(type, volume){
   const v = nextVolume(volume);
@@ -69,7 +104,18 @@ export function calculate(s){
   if(s.holdingType === 'mag' && denominator <= 0) warnings.push('MAG-Nennvolumen kann erst berechnet werden, wenn pe > p0 ist. Sicherheitsventil größer wählen oder statischen Druck prüfen.');
   if(s.holdingType === 'dynamic' && pe < peDynamicMin) warnings.push('Enddruck pe liegt unter p0 + 0,3 bar + Arbeitsbereich AD. Sicherheitsventil/Station prüfen.');
   if(num(s.tMaxC) > 70) warnings.push('Bei dauerhafter Temperatur > 70 °C am MAG/Vordruckgefäß Vorschaltgefäß prüfen.');
-  const standard = selected > 0 ? nextVolume(selected) : 0;
-  const productLabel = s.holdingType === 'dynamic' ? dynamicLabel(s.dynamicType, selected) : reflexNLabel(selected);
-  return { nMax, nMin, expansionPct, vaporPressure, staticPressure, pumpPressure, systemVolume, p0, p0Raw, psv, asv, pe, ve, vv, servitecAdd, factor, vnMag, ad, paMin, peDynamicMin, vnDynamic, selectedVolume: selected, selectedStandardVolume: standard, productLabel, warnings };
+  if(s.holdingType === 'mag' && psv > 0){
+    // Reflex Planungshandbuch „Planen Berechnen Ausrüsten“: pSV ≥ p0 + 1,5 bar (pSV ≤ 5 bar) bzw. pSV ≥ p0 + 2,0 bar (pSV > 5 bar)
+    const margin = psv <= 5 ? 1.5 : 2.0;
+    const recommended = p0 + margin;
+    if(psv < recommended){
+      warnings.push(`Empfehlung Sicherheitsventil (Reflex Planungshandbuch „Planen Berechnen Ausrüsten“): pSV ≥ p0 + ${barText(margin)} bar – mindestens ${barText(recommended)} bar; eingestellt ${barText(psv)} bar.`);
+    }
+  }
+  const magSplit = s.holdingType === 'mag' ? splitMagVessels(vnMag) : null;
+  const standard = s.holdingType === 'dynamic'
+    ? (selected > 0 ? nextVolume(selected) : 0)
+    : (magSplit && magSplit.vesselVolumeL > 0 ? magSplit.vesselVolumeL : 0);
+  const productLabel = s.holdingType === 'dynamic' ? dynamicLabel(s.dynamicType, selected) : magProductLabel(magSplit);
+  return { nMax, nMin, expansionPct, vaporPressure, staticPressure, pumpPressure, systemVolume, p0, p0Raw, psv, asv, pe, ve, vv, servitecAdd, factor, vnMag, ad, paMin, peDynamicMin, vnDynamic, selectedVolume: selected, selectedStandardVolume: standard, vesselCount: magSplit ? magSplit.count : 0, vesselVolumeL: magSplit ? magSplit.vesselVolumeL : 0, totalSelectedVolumeL: magSplit ? magSplit.totalVolumeL : 0, productLabel, warnings };
 }
