@@ -130,7 +130,7 @@ function syncDisplayedVersion(appVersion, notes = []) {
 }
 let releaseNotesControllerInitialized = false;
 export function initializeReleaseNotesController({
-  appVersion = '2.0.0',
+  appVersion = '2.1.0',
   releaseNotesUrl = './docs/release/RELEASE_NOTES.md',
   versionHost = document.querySelector('[data-app-version-current]'),
   fallback = document.getElementById('releaseNotesFallback'),
@@ -143,7 +143,7 @@ export function initializeReleaseNotesController({
   return loadReleaseNotes({ appVersion, releaseNotesUrl, fallback, host, fetchImpl });
 }
 export async function loadReleaseNotes({
-  appVersion = '2.0.0',
+  appVersion = '2.1.0',
   releaseNotesUrl = './docs/release/RELEASE_NOTES.md',
   fallback = document.getElementById('releaseNotesFallback'),
   host = document.getElementById('releaseNotesDynamic'),

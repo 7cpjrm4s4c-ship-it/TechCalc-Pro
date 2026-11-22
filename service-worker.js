@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-2.0.0';
-const CACHE_REVISION = '2.0.0-unveroeffentlicht-bedienbarkeit-barrierefreiheit-und-performance';
+const CACHE_NAME = 'techcalc-pro-2.1.0';
+const CACHE_REVISION = '2.1.0-unveroeffentlicht-bedienbarkeit-barrierefreiheit-und-performance';
 const ASSETS = [
   './',
   './index.html',
