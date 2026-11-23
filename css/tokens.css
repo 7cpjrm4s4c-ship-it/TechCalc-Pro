@@ -36,6 +36,10 @@
   --tc-card-padding: 10px;
   --tc-control-height: 50px;
   --tc-control-padding-x: 10px;
+  /* Central select arrow (dark theme default, matches --color-text #eef4fb so the arrow
+     keeps the same contrast as the control text). Light theme overrides this icon. */
+  --tc-select-arrow-size: 12px 8px;
+  --tc-select-arrow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23eef4fb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   --tc-radius-base: 14px;
   --tc-radius-card: 18px;
   --tc-radius-pill: 999px;

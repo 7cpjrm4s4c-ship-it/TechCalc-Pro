@@ -55,7 +55,10 @@
 .tc-add-row input,
 .tc-add-row select,
 .dw-add-row input,
-.dw-add-row select { min-height: 44px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: rgba(255,255,255,.06); padding: 0 var(--tc-control-padding-x); }
+/* Keeps the central select sizing contract (components-controls.css): this rule re-sets
+   the background/padding shorthand, so the arrow image and right padding are re-asserted
+   as longhands after it. */
+.dw-add-row select { min-height: 44px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: rgba(255,255,255,.06); padding: 0 var(--tc-control-padding-x); appearance: none; -webkit-appearance: none; background-image: var(--tc-select-arrow-icon); background-repeat: no-repeat; background-position: right var(--tc-control-padding-x) center; background-size: var(--tc-select-arrow-size); padding-right: calc(var(--tc-control-padding-x) + 18px); color-scheme: dark; }
 .tc-quantity-field,
 .mini-edit-field { display: grid; gap: 4px; width: 112px; min-width: 112px; max-width: 112px; align-self: center; }
 .tc-quantity-field input,

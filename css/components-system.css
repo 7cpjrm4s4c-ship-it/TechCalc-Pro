@@ -111,6 +111,25 @@
   box-shadow: var(--tc-control-shadow) !important;
 }
 
+/* Light theme: dark select arrow (matches --tc-light-text #17202c) and light native popup.
+   background-image is re-asserted with !important because the light blocks above set the
+   background shorthand, which would otherwise reset the arrow image from the central
+   select sizing contract. .project-select-card select keeps its own card arrow. */
+:root[data-theme='light'] {
+  --tc-select-arrow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2317202c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+:root[data-theme='light'] .control select,
+:root[data-theme='light'] .tc-control select,
+:root[data-theme='light'] .settings-form select,
+:root[data-theme='light'] .tc-add-row select,
+:root[data-theme='light'] .dw-add-row select {
+  background-image: var(--tc-select-arrow-icon) !important;
+  background-repeat: no-repeat !important;
+  background-position: right var(--tc-control-padding-x) center !important;
+  background-size: var(--tc-select-arrow-size) !important;
+  color-scheme: light !important;
+}
+
 :root[data-theme='light'] .unit,
 :root[data-theme='light'] .unit-select,
 :root[data-theme='light'] .control .unit-select {
