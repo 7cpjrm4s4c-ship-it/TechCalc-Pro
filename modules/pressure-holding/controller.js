@@ -58,6 +58,35 @@ function pressureResultRows(currentState = {}, result = {}) {
     { label: 'Schließdruckdifferenz', value: result.asv, unit: 'bar', digits: 2 },
     { label: 'Volumenfaktor', value: result.factor, digits: 2 }
   ];
+  
+  // Zubehör-Ergebnisse hinzufügen
+  const acc = result.accessories || {};
+  
+  // Servitec
+  if (acc.servitec && acc.servitec.type) {
+    rows.push({ label: 'Servitec-Typ', value: acc.servitec.label || acc.servitec.type });
+  }
+  
+  // Nachspeisung
+  if (acc.fillSystem && acc.fillSystem.system) {
+    rows.push({ label: 'Nachspeisesystem', value: acc.fillSystem.label });
+    rows.push({ label: 'Nachspeisemenge', value: acc.fillSystem.feedFlowLh, unit: 'l/h', digits: 0 });
+  }
+  
+  // Wasseraufbereitung
+  if (acc.waterTreatment && acc.waterTreatment.method) {
+    rows.push({ label: 'Wasseraufbereitung', value: acc.waterTreatment.method === 'softening' ? 'Enthärtung' : 'Entsalzung' });
+    if (acc.waterTreatment.patronCount > 0) {
+      rows.push({ label: 'Patronenzahl', value: acc.waterTreatment.patronCount, digits: 0 });
+    }
+  }
+  
+  // Sicherheitsventil
+  if (acc.safetyValve && acc.safetyValve.connection) {
+    rows.push({ label: 'SV-Anschluss', value: acc.safetyValve.connectionLabel || acc.safetyValve.connection });
+    rows.push({ label: 'Abblaseleistung', value: acc.safetyValve.flowRateLh, unit: 'l/h', digits: 0 });
+  }
+  
   return rows
     .filter(row => row.value !== undefined && row.value !== null && row.value !== '')
     .map(row => [
@@ -72,6 +101,7 @@ export function buildPressureRecord(currentState = {}, result = {}, items = [], 
   delete copy.activePlantId;
   delete copy.expandedPlantId;
   const systemVolume = num(result.systemVolume) || num(currentState.systemVolumeL);
+  const acc = result.accessories || {};
   return {
     id,
     name: name || currentState.plantName?.trim() || existing?.name || `${currentState.holdingType === 'dynamic' ? (currentState.dynamicType === 'variomat' ? 'Variomat' : 'Reflexomat') : 'MAG'} ${items.length + 1}`,
@@ -97,18 +127,52 @@ export function buildPressureRecord(currentState = {}, result = {}, items = [], 
       ve: result.ve,
       vv: result.vv,
       asv: result.asv,
-      factor: result.factor
+      factor: result.factor,
+      accessories: {
+        servitec: acc.servitec ? { type: acc.servitec.type, label: acc.servitec.label } : null,
+        fillSystem: acc.fillSystem ? { system: acc.fillSystem.system, label: acc.fillSystem.label, feedFlowLh: acc.fillSystem.feedFlowLh } : null,
+        waterTreatment: acc.waterTreatment ? { method: acc.waterTreatment.method, patronCount: acc.waterTreatment.patronCount } : null,
+        safetyValve: acc.safetyValve ? { connection: acc.safetyValve.connection, connectionLabel: acc.safetyValve.connectionLabel, flowRateLh: acc.safetyValve.flowRateLh } : null
+      }
     },
     rows: pressureResultRows(currentState, result)
   };
 }
 export function hydratePressureRecord(item = {}, current = {}){
-  return item?.state ? {
-    ...item.state,
+  // Migration: includeServitec -> useServitec
+  const state = item?.state ? { ...item.state } : {};
+  
+  // Wenn useServitec nicht gesetzt ist, aber includeServitec gesetzt war, migriere
+  if (state.useServitec === undefined && state.includeServitec !== undefined) {
+    state.useServitec = state.includeServitec;
+  }
+  
+  // Default für useServitec auf 'true' setzen, wenn nicht vorhanden
+  if (state.useServitec === undefined) {
+    state.useServitec = 'true';
+  }
+  
+  // Default für servitecType auf 'auto' setzen
+  if (state.servitecType === undefined) {
+    state.servitecType = 'auto';
+  }
+  
+  // Default für feedType auf 'manual' setzen
+  if (state.feedType === undefined) {
+    state.feedType = 'manual';
+  }
+  
+  // Default für waterTreatmentMethod auf 'softening' setzen
+  if (state.waterTreatmentMethod === undefined) {
+    state.waterTreatmentMethod = 'softening';
+  }
+  
+  return state ? {
+    ...state,
     savedPlants: current.savedPlants || [],
     activePlantId: item.id,
     expandedPlantId: current.expandedPlantId || null,
-    plantName: item.name || item.state?.plantName || ''
+    plantName: item.name || state.plantName || ''
   } : {};
 }
 export const pressureHoldingSavedController = createLineSectionController({
