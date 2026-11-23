@@ -122,6 +122,7 @@ async function measureLayout(page) {
       documentOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       bodyOverflow: document.body.scrollWidth - document.body.clientWidth,
       appOverflow: root.scrollWidth - root.clientWidth,
+      stackViolations,
       selectSizeViolations
     };
   });
