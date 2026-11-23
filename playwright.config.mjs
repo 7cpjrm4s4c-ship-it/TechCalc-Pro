@@ -37,6 +37,13 @@ export default defineConfig({
     { name: 'chromium-tablet', use: { ...devices['Galaxy Tab S4'] } },
     { name: 'chromium-mobile', use: { ...devices['Pixel 7'] } },
     { name: 'webkit-tablet', use: { ...devices['iPad Pro 11'] } },
-    { name: 'webkit-mobile', use: { ...devices['iPhone 13'] } }
+    { name: 'webkit-mobile', use: { ...devices['iPhone 13'] } },
+    // Windows-/Edge-Lauf für den Layout-Vertrag (nur aktiv, wenn das Projekt explizit
+    // angefordert wird, z. B. im windows-latest-CI-Job via PLAYWRIGHT_INCLUDE_MSEDGE=1):
+    // Der msedge-Kanal ist auf Linux-Runnern nicht installierbar, daher darf das Projekt
+    // nicht default-mäßig in `playwright test` (alle Projekte) landen.
+    ...(process.env.PLAYWRIGHT_INCLUDE_MSEDGE === '1'
+      ? [{ name: 'msedge-desktop', use: { ...devices['Desktop Chrome'], channel: 'msedge' } }]
+      : [])
   ]
 });

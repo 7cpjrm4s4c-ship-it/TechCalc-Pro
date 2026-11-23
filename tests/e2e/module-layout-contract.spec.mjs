@@ -102,6 +102,45 @@ async function measureLayout(page) {
       }
     });
 
+    // Field-box telemetry + contract: measure the whole field container (label + control),
+    // not only the select element. Windows font rasterization (Segoe UI) can wrap an
+    // uppercase 12 px label into two lines where macOS keeps one; without a common label
+    // min-height the control shell then starts at a different y per row and the fields
+    // read as "differently sized". Within one grid row (same y group, tolerance 4 px) the
+    // field-container heights must not differ by more than 2 px.
+    const fieldBoxes = [];
+    const fieldBoxViolations = [];
+    root.querySelectorAll('.tc-fields').forEach(grid => {
+      const fields = [...grid.querySelectorAll('[data-schema-field-wrapper]')]
+        .map(wrapper => {
+          const select = wrapper.querySelector('select:not(.unit-select)');
+          if (!select || select.getBoundingClientRect().height <= 0) return null;
+          const sb = select.getBoundingClientRect();
+          const fb = wrapper.getBoundingClientRect();
+          return {
+            id: select.id || wrapper.getAttribute('data-schema-field-wrapper') || '',
+            select: { x: sb.x, y: sb.y, width: sb.width, height: sb.height },
+            field: { x: fb.x, y: fb.y, width: fb.width, height: fb.height }
+          };
+        })
+        .filter(Boolean);
+      fieldBoxes.push({ grid: grid.className, fields });
+      const rowGroups = new Map();
+      for (const entry of fields) {
+        const existingKey = [...rowGroups.keys()].find(y => Math.abs(y - entry.field.y) <= 4);
+        const groupKey = existingKey === undefined ? entry.field.y : existingKey;
+        if (!rowGroups.has(groupKey)) rowGroups.set(groupKey, []);
+        rowGroups.get(groupKey).push(entry);
+      }
+      for (const [rowY, entries] of rowGroups) {
+        if (entries.length < 2) continue;
+        const heights = entries.map(entry => entry.field.height);
+        if (Math.max(...heights) - Math.min(...heights) > 2) {
+          fieldBoxViolations.push({ grid: grid.className, rowY, heights, fields: entries.map(entry => entry.id) });
+        }
+      }
+    });
+
     return {
       viewportWidth,
       expectedGap,
@@ -123,12 +162,14 @@ async function measureLayout(page) {
       bodyOverflow: document.body.scrollWidth - document.body.clientWidth,
       appOverflow: root.scrollWidth - root.clientWidth,
       stackViolations,
-      selectSizeViolations
+      selectSizeViolations,
+      fieldBoxes,
+      fieldBoxViolations
     };
   });
 }
 
-function assertLayout(measurement, context) {
+function assertLayout(measurement, context, enforceFieldBoxes = false) {
   expect(measurement.viewExists, context).toBe(true);
   expect(measurement.rootExists, context).toBe(true);
   expect(measurement.layoutExists, context).toBe(true);
@@ -158,6 +199,9 @@ function assertLayout(measurement, context) {
   expect(measurement.appOverflow, context).toBeLessThanOrEqual(1);
   expect(measurement.stackViolations, context).toEqual([]);
   expect(measurement.selectSizeViolations, context).toEqual([]);
+  // Field-box height contract is enforced on chromium-desktop first; the Windows/Edge
+  // run (msedge-desktop) reports the measured values before this becomes a hard gate there.
+  if (enforceFieldBoxes) expect(measurement.fieldBoxViolations, context).toEqual([]);
 }
 
 test.beforeEach(async ({ page }) => {
@@ -172,14 +216,37 @@ test('hält Layoutbreite, Spalten und Abstände in allen Modulen stabil', async 
   for (const moduleId of moduleIds) {
     await openModule(page, moduleId);
 
+    const enforceFieldBoxes = testInfo.project.name === 'chromium-desktop';
     const before = await measureLayout(page);
-    assertLayout(before, `${testInfo.project.name}/${moduleId}/initial\n${JSON.stringify(before, null, 2)}`);
+    assertLayout(before, `${testInfo.project.name}/${moduleId}/initial\n${JSON.stringify(before, null, 2)}`, enforceFieldBoxes);
+
+    if (moduleId === 'f-gases-check') {
+      // Dedicated telemetry for the reported fields of the "Regelrelevante Eigenschaften"
+      // card (data only, no assertion): field-container and control rects for the named
+      // fields plus a neighbour, so the Windows/Edge run can be compared numerically.
+      const fieldReport = await page.evaluate(() => {
+        const ids = ['leakDetectionSystemStatus', 'coolingBelowMinus50Status', 'specificRefrigerantLossPercent', 'hermeticallySealedStatus'];
+        return ids.map(id => {
+          const wrapper = document.querySelector(`[data-schema-field-wrapper="${id}"]`);
+          const control = wrapper?.querySelector('select, input');
+          const cb = control?.getBoundingClientRect();
+          const fb = wrapper?.getBoundingClientRect();
+          return {
+            id,
+            field: fb ? { x: Math.round(fb.x * 10) / 10, y: Math.round(fb.y * 10) / 10, width: Math.round(fb.width * 10) / 10, height: Math.round(fb.height * 10) / 10 } : null,
+            control: cb ? { x: Math.round(cb.x * 10) / 10, y: Math.round(cb.y * 10) / 10, width: Math.round(cb.width * 10) / 10, height: Math.round(cb.height * 10) / 10 } : null
+          };
+        });
+      });
+      console.log(`f-gases-check regulatory grid field boxes: ${JSON.stringify(fieldReport)}`);
+      testInfo.annotations.push({ type: 'f-gases-field-boxes', description: JSON.stringify(fieldReport) });
+    }
 
     const changed = await mutateFirstEditableControl(page);
     if (!changed) continue;
 
     const after = await measureLayout(page);
-    assertLayout(after, `${testInfo.project.name}/${moduleId}/after-change\n${JSON.stringify(after, null, 2)}`);
+    assertLayout(after, `${testInfo.project.name}/${moduleId}/after-change\n${JSON.stringify(after, null, 2)}`, enforceFieldBoxes);
     expect(Math.abs(after.viewWidth - before.viewWidth), moduleId).toBeLessThanOrEqual(2);
     expect(Math.abs(after.layoutWidth - before.layoutWidth), moduleId).toBeLessThanOrEqual(2);
   }
