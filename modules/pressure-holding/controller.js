@@ -14,27 +14,38 @@ function integerReportText(value) {
 }
 function savedPlantStats(item = {}){
   const res = item.result || {};
+  const normVolume = res.totalSelectedVolumeL || res.selectedStandardVolume;
   return [
     { label:'Station / Gefäß', value:res.productLabel || '—' },
-    { label:'Normvolumen', value:res.selectedStandardVolume ? fmt(res.selectedStandardVolume,0) : '—', unit:res.selectedStandardVolume ? 'Liter' : '' },
+    { label:'Normvolumen', value:normVolume ? fmt(normVolume,0) : '—', unit:normVolume ? 'Liter' : '' },
     { label:'Mindestbetriebsdruck p₀', value:res.p0 !== undefined ? fmt(res.p0,2) : '—', unit:res.p0 !== undefined ? 'bar' : '' },
     { label:'Enddruck pₑ', value:res.pe !== undefined ? fmt(res.pe,2) : '—', unit:res.pe !== undefined ? 'bar' : '' }
   ];
 }
 function savedPlantSubtitle(item = {}){
   const res = item.result || {};
+  const normVolume = res.totalSelectedVolumeL || res.selectedStandardVolume;
   return [
     res.productLabel,
-    res.selectedStandardVolume ? `${fmt(res.selectedStandardVolume,0)} l` : '',
+    normVolume ? `${fmt(normVolume,0)} l` : '',
     res.systemVolume ? `VA ${fmt(res.systemVolume,0)} l` : ''
   ].filter(Boolean).join(' · ');
 }
 function pressureResultRows(currentState = {}, result = {}) {
   const systemVolume = num(result.systemVolume) || num(currentState.systemVolumeL);
+  // MAG: Aufteilung auf mehrere gleiche Gefäße ≤ 1000 l statt Einzel-Standardvolumen
+  const isMagSplit = currentState.holdingType === 'mag' && num(result.vesselCount) > 0;
+  const selectionRows = isMagSplit
+    ? [
+        { label: 'Anzahl MAG', value: integerReportText(result.vesselCount) },
+        { label: 'Nennvolumen je Gefäß', value: integerReportText(result.vesselVolumeL), unit: 'l' },
+        { label: 'Gesamt-Nennvolumen der Auswahl', value: integerReportText(result.totalSelectedVolumeL), unit: 'l' }
+      ]
+    : [{ label: 'Standardvolumen', value: integerReportText(result.selectedStandardVolume), unit: 'l' }];
   const rows = [
     { label: 'Produkt', value: result.productLabel },
     { label: 'Ausgewähltes Volumen', value: result.selectedVolume, unit: 'l', digits: 2 },
-    { label: 'Standardvolumen', value: integerReportText(result.selectedStandardVolume), unit: 'l' },
+    ...selectionRows,
     { label: 'Anlagenvolumen', value: integerReportText(systemVolume), unit: 'l' },
     { label: 'Vordruck', value: result.p0, unit: 'bar', digits: 2 },
     { label: 'Mindestdruck', value: result.paMin, unit: 'bar', digits: 2 },
@@ -71,6 +82,11 @@ export function buildPressureRecord(currentState = {}, result = {}, items = [], 
       productLabel: result.productLabel,
       selectedVolume: result.selectedVolume,
       selectedStandardVolume: result.selectedStandardVolume,
+      ...(currentState.holdingType === 'mag' ? {
+        vesselCount: result.vesselCount,
+        vesselVolumeL: result.vesselVolumeL,
+        totalSelectedVolumeL: result.totalSelectedVolumeL
+      } : {}),
       p0: result.p0,
       paMin: result.paMin,
       pe: result.pe,
