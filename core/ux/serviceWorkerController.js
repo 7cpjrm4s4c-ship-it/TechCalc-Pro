@@ -116,7 +116,11 @@ export function initializeServiceWorkerController(options = {}) {
   windowRef.addEventListener?.('load', () => {
     const finishRegistration = startPerformanceSpan('service-worker:register', { registerUrl });
     navigatorRef.serviceWorker
-      .register(registerUrl)
+      // updateViaCache: 'none' — der Service-Worker-Skript selbst darf nie aus dem
+      // Browser-HTTP-Cache kommen, sonst aktualisiert sich der Worker nur nach
+      // mehreren Ladezyklen. (Die ?v=<APP_VERSION>-Query an der Script-URL allein
+      // reicht nicht, weil Update-Checks den HTTP-Cache respektieren dürfen.)
+      .register(registerUrl, { updateViaCache: 'none' })
       .then(async registration => {
         finishRegistration({ status: 'ok' });
         watchRegistration(registration, windowRef, documentRef);

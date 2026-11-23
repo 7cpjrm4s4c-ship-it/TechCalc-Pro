@@ -4,6 +4,7 @@ import { initializeServiceWorkerController } from '../core/ux/serviceWorkerContr
 const listeners = new Map();
 const controllerListeners = new Map();
 let registeredUrl = '';
+let registeredOptions = null;
 let postedMessage = null;
 let reloaded = false;
 
@@ -61,7 +62,7 @@ const navigatorRef = {
   serviceWorker: {
     controller: {},
     addEventListener(type, handler) { add(controllerListeners, type, handler); },
-    register(url) { registeredUrl = url; return Promise.resolve(registration); }
+    register(url, options) { registeredUrl = url; registeredOptions = options; return Promise.resolve(registration); }
   }
 };
 
@@ -77,6 +78,7 @@ await Promise.resolve();
 await Promise.resolve();
 
 assert.match(registeredUrl, /service-worker\.js\?v=test/);
+assert.deepEqual(registeredOptions, { updateViaCache: 'none' }, 'service worker script must bypass the HTTP cache on update checks');
 assert.ok(body.appended, 'update banner should be appended when a waiting worker exists');
 assert.equal(body.appended.hidden, false);
 assert.ok(!body.appended.innerHTML.includes('tc-update-banner__dismiss'), 'update banner must not be dismissible before installation');
