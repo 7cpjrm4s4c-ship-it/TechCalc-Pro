@@ -83,6 +83,25 @@ async function measureLayout(page) {
     const viewLeftInset = viewRect && appRect ? viewRect.left - appRect.left : 0;
     const viewRightInset = viewRect && appRect ? appRect.right - viewRect.right : 0;
 
+    // Central select sizing contract: within one field grid every visible select
+    // matches its siblings in width and height and fills its control shell.
+    const selectSizeViolations = [];
+    root.querySelectorAll('.tc-fields').forEach(grid => {
+      const selects = [...grid.querySelectorAll('select')].filter(element => element.getBoundingClientRect().height > 0 && !element.classList.contains('unit-select'));
+      if (selects.length < 2) return;
+      const reference = selects[0].getBoundingClientRect();
+      for (const element of selects.slice(1)) {
+        const box = element.getBoundingClientRect();
+        const fieldId = element.id || element.getAttribute('data-schema-field') || '';
+        if (Math.abs(box.height - reference.height) > tolerance) {
+          selectSizeViolations.push({ grid: grid.className, field: fieldId, height: box.height, referenceHeight: reference.height });
+        }
+        if (Math.abs(box.width - reference.width) > tolerance * 2) {
+          selectSizeViolations.push({ grid: grid.className, field: fieldId, width: box.width, referenceWidth: reference.width });
+        }
+      }
+    });
+
     return {
       viewportWidth,
       expectedGap,
@@ -103,7 +122,7 @@ async function measureLayout(page) {
       documentOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       bodyOverflow: document.body.scrollWidth - document.body.clientWidth,
       appOverflow: root.scrollWidth - root.clientWidth,
-      stackViolations
+      selectSizeViolations
     };
   });
 }
@@ -137,6 +156,7 @@ function assertLayout(measurement, context) {
   expect(measurement.bodyOverflow, context).toBeLessThanOrEqual(1);
   expect(measurement.appOverflow, context).toBeLessThanOrEqual(1);
   expect(measurement.stackViolations, context).toEqual([]);
+  expect(measurement.selectSizeViolations, context).toEqual([]);
 }
 
 test.beforeEach(async ({ page }) => {

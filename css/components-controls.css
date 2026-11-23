@@ -74,6 +74,23 @@
 .control select,
 .tc-control input,
 .tc-control select { height: calc(var(--tc-control-height) - 2px); padding: 0 var(--tc-control-padding-x); }
+/* Select sizing contract (central): every select inside a form control shares one
+   geometry and fills its field, so selection fields never render at different sizes
+   across modules, grids or themes. Unit selects (fixed 76 px) keep their own contract. */
+.control select,
+.tc-control select,
+.settings-form select,
+.tc-add-row select,
+.dw-add-row select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: calc(var(--tc-control-height) - 2px);
+  min-height: calc(var(--tc-control-height) - 2px);
+  box-sizing: border-box;
+  padding: 0 var(--tc-control-padding-x);
+  text-overflow: ellipsis;
+}
 .control input::placeholder,
 .settings-form input::placeholder { color: var(--color-muted); opacity: 1; }
 .control input { flex: 1 1 auto; width: auto; }

@@ -141,4 +141,11 @@ const fg63NotHermetic = calculate({ ...highGwpCase, hermeticallySealedStatus: 'n
 const fg63NotHermeticDuty = fg63NotHermetic.operatorDutyDetails.obligations.find(item => item.id === 'FG-063');
 assert.equal(fg63NotHermeticDuty.status, 'required-if-technically-possible-and-reasonable', 'nicht hermetisch: Pflicht bleibt bestehen');
 
+// PDF-Kältemittelbezeichnung: Anzeigenamen „R32“ statt Katalog-ID „HFKW-32“ (wie im EN-378-Modul).
+const r32State = { ...base, refrigerantId: 'HFKW-32', chargeKg: '5' };
+const r32Result = calculate(r32State);
+const r32Dto = buildFGasesReportDto({ state: r32State, calculation: r32Result, generatedAt: '2029-06-01T12:00:00.000Z' });
+const r32Rows = buildFGasesReportSections(r32Dto).find(section => section.title === '3. Kältemittel und CO₂-Äquivalent').rows;
+assert.ok(r32Rows.some(r => r[0] === 'Kältemittel' && r[1] === 'R32'), `Kältemittelzeile im PDF muss R32 lauten, enthält: ${JSON.stringify(r32Rows)}`);
+
 console.log('F-Gases hermetic exception regression passed.');

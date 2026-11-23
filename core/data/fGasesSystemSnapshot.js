@@ -1,4 +1,4 @@
-import { getDataVersions } from './refrigerants.js';
+import { getDataVersions, getRefrigerant, formatRefrigerantLabel } from './refrigerants.js';
 
 export const F_GASES_SYSTEM_SNAPSHOT_VERSION = 5;
 const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
@@ -14,7 +14,8 @@ export function createFGasesSystemSnapshot(state = {}, { generatedAt = new Date(
     system: {
       systemName: state.systemName || '', applicationType: state.applicationType || '', installationType: state.installationType || '',
       mobileEquipmentType: state.mobileEquipmentType || '', productCategory: state.productCategory || '', constructionType: state.constructionType || '', splitType: state.splitType || '',
-      performanceRange: state.performanceRange || '', ratedCapacityKw: numberOrNull(state.ratedCapacityKw), refrigerantId: state.refrigerantId || '', chargeKg: numberOrNull(state.chargeKg),
+      performanceRange: state.performanceRange || '', ratedCapacityKw: numberOrNull(state.ratedCapacityKw), refrigerantId: state.refrigerantId || '',
+      refrigerantLabel: formatRefrigerantLabel(getRefrigerant(state.refrigerantId) || {}) || state.refrigerantId || '', chargeKg: numberOrNull(state.chargeKg),
       placedOnMarketDate: state.placedOnMarketDate || '', commissioningDate: state.commissioningDate || state.installedAtSiteDate || '',
       stockAssessmentDate: state.stockAssessmentDate || state.assessmentDate || '', plannedActivity: state.plannedActivity || '',
       refrigerantOrigin: state.refrigerantOrigin || '', preChargedStatus: state.preChargedStatus || '', leakDetectionSystemStatus: state.leakDetectionSystemStatus || '',
