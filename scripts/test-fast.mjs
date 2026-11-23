@@ -29,7 +29,8 @@ const commands = [
   ['node', ['tests/pdf-report-engine-unification-1.6.1.test.mjs']],
   ['node', ['tests/phase45c-modulsplitting-implementation.test.mjs']],
   ['node', ['tests/phase45c1-project-lifecycle-integration.test.mjs']],
-  ['node', ['tests/phase45c2-legacy-saved-records-migration.test.mjs']]
+  ['node', ['tests/phase45c2-legacy-saved-records-migration.test.mjs']],
+  ['node', ['tests/pressure-holding-reflex-accessories.test.mjs']]
 ];
 for (const [cmd, args] of commands) {
   console.log(`> ${cmd} ${args.join(' ')}`);
