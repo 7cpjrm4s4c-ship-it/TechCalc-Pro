@@ -10,5 +10,5 @@ export default defineModuleConfig({
   defaultVisible: false,
 
   capabilities: [MODULE_CAPABILITIES.CENTRAL_NUMBER_SERVICE, MODULE_CAPABILITIES.FORM_SCHEMA, MODULE_CAPABILITIES.CENTRAL_SAVED_RECORDS],
-  description: 'Auslegung von MAG und dynamischer Druckhaltung für Heiz- und Kühlwassersysteme nach Reflex-Berechnungsgrundlagen.'
+  description: 'Auslegung von MAG und dynamischer Druckhaltung sowie Reflex Zubehör (Nachspeisung, Wasseraufbereitung, Entgasung, Sicherheitsventil) nach Reflex-Berechnungsgrundlagen.'
 });
