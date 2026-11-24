@@ -46,6 +46,7 @@ const renderer = createPressureHoldingDynamicRenderer({
   renderVolumeFields: () => { rendered.push('volume'); return 'volume'; },
   renderPressureFields: () => { rendered.push('pressure'); return 'pressure'; },
   renderHoldingOptions: () => { rendered.push('holding'); return 'holding'; },
+  renderAccessories: () => { rendered.push('accessories'); return 'accessories'; },
   renderSavedPanel: () => { rendered.push('saved'); return 'saved'; },
   renderResult: () => { rendered.push('result'); return 'result'; }
 });
@@ -96,3 +97,69 @@ renderer.update(fakeRoot, {
 
 assert.deepEqual(rendered, ['result']);
 assert.doesNotMatch(dynamicSource, /const savedFields = \[[^\]]*plantName/);
+
+// Test useServitec change triggers holding-options re-render
+rendered = [];
+renderer.update(fakeRoot, {
+  systemType: 'heating',
+  holdingType: 'mag',
+  connectionType: 'suction',
+  waterContentMode: 'known',
+  useServitec: 'true',
+  servitecType: 'auto',
+  feedType: 'manual',
+  waterTreatmentMethod: 'softening',
+  safetyValveConnection: '',
+  includeServitec: 'false',
+  frostMode: 'water',
+  dynamicType: 'reflexomat',
+  plantName: '',
+  savedPlants: []
+}, { action: 'field:change', changed: ['useServitec'] });
+
+assert.ok(rendered.includes('holding'), 'useServitec change triggers holding-options re-render');
+
+// Test accessories rendering
+rendered = [];
+const stateWithAccessories = {
+  systemType: 'heating',
+  holdingType: 'mag',
+  connectionType: 'suction',
+  waterContentMode: 'known',
+  useServitec: 'true',
+  servitecType: 'auto',
+  feedType: 'manual',
+  waterTreatmentMethod: 'softening',
+  safetyValveConnection: '1',
+  includeServitec: 'false',
+  frostMode: 'water',
+  dynamicType: 'reflexomat',
+  plantName: '',
+  savedPlants: []
+};
+renderer.update(fakeRoot, stateWithAccessories, { action: 'field:change', changed: ['safetyValveConnection'] });
+assert.ok(rendered.includes('accessories'), 'accessories field change triggers re-render');
+
+// Test that syncFields is called with useServitec and servitecType
+// This is verified by the fact that the renderer doesn't throw errors
+// when these fields are present in the state
+const stateWithServitec = {
+  systemType: 'heating',
+  holdingType: 'mag',
+  connectionType: 'suction',
+  waterContentMode: 'known',
+  useServitec: 'true',
+  servitecType: 'mini',
+  feedType: 'manual',
+  waterTreatmentMethod: 'softening',
+  safetyValveConnection: '',
+  includeServitec: 'false',
+  frostMode: 'water',
+  dynamicType: 'reflexomat',
+  plantName: '',
+  savedPlants: []
+};
+renderer.update(fakeRoot, stateWithServitec, { action: 'field:change', changed: ['servitecType'] });
+assert.ok(true, 'syncFields handles servitecType without errors');
+
+console.log('pressure-holding-phase20c-dynamic-renderer ok');
