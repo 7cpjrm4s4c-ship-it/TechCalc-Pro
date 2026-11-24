@@ -2,6 +2,8 @@ import config from './config.js';
 import { card, renderModuleShell, stack } from '../../core/ui/renderer.js';
 import { calculate } from './logic.js';
 import { createPressureHoldingViewModel } from './viewModel.js';
+import { field, selectField, segmented, grid } from '../../core/ui/renderer.js';
+import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
 
 export function view(s){
   const r = calculate(s);
@@ -18,10 +20,6 @@ export function view(s){
 
   return renderModuleShell(config, `<div class="tc-module-layout tc-module-layout--2"><div class="tc-module-column">${inputColumn}</div><div class="tc-module-column"><div class="tc-module-section" data-ph-dynamic="result">${vm.resultHtml}</div></div></div>`);
 }
-
-// Zubehör-Felder direkt in der view.js für die Insel
-import { field, selectField, segmented, grid } from '../../core/ui/renderer.js';
-import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
 
 const opts = (items) => items.map(([value,label]) => ({ value, label }));
 function fmtInput(value, digits = 2) {
@@ -107,4 +105,5 @@ function renderAccessoriesFields(s) {
   ].join(''));
 }
 
+export { renderAccessoriesFields };
 export default view;

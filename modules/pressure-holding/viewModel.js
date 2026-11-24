@@ -63,26 +63,7 @@ export function pressureFieldsContent(s){
 
 export function holdingOptionsContent(s){
   if (s.holdingType === 'mag') {
-    const servitecFields = [
-      segmented('useServitec', opts([['true','Ja'],['false','Nein']]), s.useServitec || 'true', { accent:'blue', label:'Servitec verwenden' }),
-      s.useServitec === 'true' ? selectField({ 
-        id:'servitecType', 
-        label:'Servitec-Typ', 
-        value:s.servitecType || 'auto',
-        options:opts([
-          ['auto','Automatik'],
-          ['mini','Servitec Mini'],
-          ['s','Servitec S'],
-          ['35','Servitec 35'],
-          ['60','Servitec 60'],
-          ['75','Servitec 75'],
-          ['95','Servitec 95'],
-          ['120t','Servitec 120 T']
-        ])
-      }) : ''
-    ].filter(Boolean);
-    
-    return `${grid(servitecFields.join(''), 2)}<p class="tc-help">Servitec steht für Entgasung/Nachspeisung. Bei Einsatz von Reflex Servitec Entgasungssystemen ist das Volumen des Entgasungsrohres bei der Größenbestimmung zu berücksichtigen (5 l Zuschlag).</p>`;
+    return `<p class="tc-help">MAG statisch: Membran-Druckausdehnungsgefäß mit Gaspolster. ${(s.includeServitec === 'true' || s.useServitec === 'true') ? 'Mit Servitec wird nach Reflex-Formblatt ein Zusatzvolumen von 5 l berücksichtigt.' : 'Ohne Servitec wird nur Ausdehnungsvolumen und Wasservorlage angesetzt.'}</p>`;
   }
   return `${selectField({ id:'dynamicType', label:'Druckhaltestation', value:s.dynamicType, options:opts([['reflexomat','Reflexomat · kompressorgesteuert · AD 0,2 bar'],['variomat','Variomat · pumpengesteuert · AD 0,4 bar']]) })}<p class="tc-help">Die Auswahl bestimmt Arbeitsbereich AD und die Ergebnisbezeichnung der Station.</p>`;
 }

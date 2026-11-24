@@ -296,8 +296,8 @@ export function createPressureHoldingDynamicRenderer(options = {}) {
 
   const structuralVolumeFields = ['waterContentMode'];
   const structuralPressureFields = ['connectionType'];
-  const structuralHoldingFields = ['holdingType'];
-  const structuralAccessoriesFields = ['useServitec', 'feedType', 'waterTreatmentMethod', 'safetyValveConnection'];
+  const structuralHoldingFields = ['holdingType', 'useServitec'];
+  const structuralAccessoriesFields = ['feedType', 'waterTreatmentMethod', 'safetyValveConnection'];
   const savedFields = ['savedPlants', 'activePlantId', 'expandedPlantId'];
 
   function syncFields(root, s = {}) {
@@ -338,9 +338,9 @@ export function createPressureHoldingDynamicRenderer(options = {}) {
     const savedStructural = /^(saved:|pressure:)/.test(action) || hasAnyChanged(changed, savedFields);
     const volumeStructural = appStructural || hasAnyChanged(changed, structuralVolumeFields) || previous.waterContentMode !== s.waterContentMode;
     const pressureStructural = appStructural || hasAnyChanged(changed, structuralPressureFields) || previous.connectionType !== s.connectionType;
-    const holdingStructural = appStructural || hasAnyChanged(changed, structuralHoldingFields) || previous.holdingType !== s.holdingType;
+    const holdingStructural = appStructural || hasAnyChanged(changed, structuralHoldingFields) || previous.holdingType !== s.holdingType || previous.useServitec !== s.useServitec;
     const accessoriesStructural = appStructural || hasAnyChanged(changed, structuralAccessoriesFields) || 
-      previous.useServitec !== s.useServitec || previous.feedType !== s.feedType || 
+      previous.feedType !== s.feedType || 
       previous.waterTreatmentMethod !== s.waterTreatmentMethod || previous.safetyValveConnection !== s.safetyValveConnection;
     const basisStructural = appStructural || holdingStructural || pressureStructural || hasAnyChanged(changed, ['systemType']);
 

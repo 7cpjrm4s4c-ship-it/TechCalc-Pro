@@ -7,7 +7,7 @@ import { buildGenericModuleReportDto, createTypedDtoReportAdapter } from '../../
 import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
 import { bindPressureHoldingActions, buildPressureRecord, savedPlantsCard } from './controller.js';
 import { buildPressureHoldingResultModel } from './results.js';
-import { view } from './view.js';
+import { view, renderAccessoriesFields } from './view.js';
 import {
   basisContent,
   volumeFieldsContent,
@@ -64,6 +64,7 @@ const pressureHoldingDynamicRenderer = createPressureHoldingDynamicRenderer({
   renderVolumeFields: volumeFieldsContent,
   renderPressureFields: pressureFieldsContent,
   renderHoldingOptions: holdingOptionsContent,
+  renderAccessories: renderAccessoriesFields,
   renderSavedPanel: savedPlantsCard,
   renderResult: resultContent
 });
