@@ -378,7 +378,8 @@ export function calculateDesalination({ systemVolumeL, waterHardness, capacity }
 // ============================================================================
 
 // Abblaseleistungstabelle nach Handbuch S. 69
-// Format: { [anschlussgröße]: { [pSV in bar]: abblaseleistung in m³/h } }
+// Format: { [anschlussgr\u00f6\u00dfe]: { [pSV in bar]: abblaseleistung in l/h } }
+// Format: { [anschlussgr\u00f6\u00dfe]: { [pSV in bar]: abblaseleistung in l/h } }
 export const SAFETY_VALVE_FLOW_TABLE = {
   '05': { '4.0': 1800, '4.5': 2000, '5.0': 2200, '5.5': 2400, '6.0': 2600 },
   '075': { '4.0': 2800, '4.5': 3100, '5.0': 3400, '5.5': 3700, '6.0': 4000 },
@@ -454,7 +455,7 @@ export function recommendSafetyValveConnection(totalPowerKw, systemVolumeL) {
     const currentIndex = connections.indexOf(connection);
     for (let i = currentIndex + 1; i < connections.length; i++) {
       const nextConn = connections[i];
-      const nextFlow = SAFETY_VALVE_FLOW_TABLE[nextConn]['5.0'] * 1000; // Umrechnung von m³/h in l/h
+      const nextFlow = SAFETY_VALVE_FLOW_TABLE[nextConn]['5.0']; // Wert bereits in l/h (Handbuch S. 69)
       if (nextFlow >= requiredFlow) {
         connection = nextConn;
         flowRate = nextFlow;

@@ -30,15 +30,25 @@ function fmtInput(value, digits = 2) {
 }
 
 function renderAccessoriesFields(s) {
-  // Entgasung
-  const degasationFields = [
-    segmented('useServitec', opts([['true','Ja'],['false','Nein']]), s.useServitec || 'true', { accent:'blue', label:'Servitec verwenden' })
-  ].filter(Boolean);
-
-  // Nachspeisung
-  const feedFields = [
+  // Switches: Servitec, Nachspeisung, Wasseraufbereitung (in derselben Zeile mit gleicher Höhe)
+  const switchFields = [
+    segmented('useServitec', opts([['true','Ja'],['false','Nein']]), s.useServitec || 'true', { accent:'blue', label:'Servitec verwenden' }),
     segmented('feedType', opts([['manual','Manuell'],['auto','Automatisch']]), s.feedType || 'manual', { accent:'blue', label:'Nachspeisung' }),
+    selectField({ 
+      id:'waterTreatmentMethod', 
+      label:'Wasseraufbereitung', 
+      value:s.waterTreatmentMethod || 'softening',
+      options:opts([
+        ['softening','Enthärtung'],
+        ['desalination','Entsalzung']
+      ])
+    })
+  ];
+
+  // Nachspeisung Eingabefelder
+  const feedInputFields = [
     field({ id:'feedPressureBar', label:'Fließdruck vor Nachspeisung', value:fmtInput(s.feedPressureBar,2), unit:'bar' }),
+    field({ id:'feedLineLengthM', label:'Länge Nachspeiseleitung', value:fmtInput(s.feedLineLengthM,2), unit:'m' }),
     selectField({ 
       id:'systemSeparation', 
       label:'Systemtrennung', 
@@ -47,29 +57,19 @@ function renderAccessoriesFields(s) {
         ['systemSeparator','DVGW-geprüfter Systemtrenner'],
         ['networkSeparator','Netztrennbehälter']
       ])
-    }),
-    field({ id:'feedLineLengthM', label:'Länge Nachspeiseleitung', value:fmtInput(s.feedLineLengthM,2), unit:'m' })
+    })
   ];
 
-  // Wasseraufbereitung
-  const waterTreatmentFields = [
-    selectField({ 
-      id:'waterTreatmentMethod', 
-      label:'Verfahren', 
-      value:s.waterTreatmentMethod || 'softening',
-      options:opts([
-        ['softening','Enthärtung'],
-        ['desalination','Entsalzung']
-      ])
-    }),
+  // Wasseraufbereitung Eingabefelder
+  const waterTreatmentInputFields = [
     field({ id:'regionalWaterHardness', label:'regionale Gesamtwasserhärte GHst', value:fmtInput(s.regionalWaterHardness,1), unit:'°dH' })
   ];
 
   return stack([
-    `<h4>Entgasung</h4>${grid(degasationFields.join(''), 2)}`,
-    `<h4>Nachspeisung</h4>${grid(feedFields.join(''), 2)}`,
-    `<h4>Wasseraufbereitung</h4>${grid(waterTreatmentFields.join(''), 2)}`,
-
+    `<h4>Zubehör</h4>`,
+    grid(switchFields.join(''), 3),
+    `<h4>Nachspeisung Details</h4>${grid(feedInputFields.join(''), 2)}`,
+    `<h4>Wasseraufbereitung Details</h4>${grid(waterTreatmentInputFields.join(''), 2)}`
   ].join(''));
 }
 

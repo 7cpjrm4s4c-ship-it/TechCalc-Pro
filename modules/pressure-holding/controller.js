@@ -138,9 +138,29 @@ export function hydratePressureRecord(item = {}, current = {}){
     state.feedType = 'manual';
   }
   
+  // Default für feedPressureBar auf leeren String setzen
+  if (state.feedPressureBar === undefined) {
+    state.feedPressureBar = '';
+  }
+  
+  // Default für systemSeparation auf 'systemSeparator' setzen
+  if (state.systemSeparation === undefined) {
+    state.systemSeparation = 'systemSeparator';
+  }
+  
+  // Default für feedLineLengthM auf leeren String setzen
+  if (state.feedLineLengthM === undefined) {
+    state.feedLineLengthM = '';
+  }
+  
   // Default für waterTreatmentMethod auf 'softening' setzen
   if (state.waterTreatmentMethod === undefined) {
     state.waterTreatmentMethod = 'softening';
+  }
+  
+  // Default für regionalWaterHardness auf leeren String setzen
+  if (state.regionalWaterHardness === undefined) {
+    state.regionalWaterHardness = '';
   }
   
   return state ? {
