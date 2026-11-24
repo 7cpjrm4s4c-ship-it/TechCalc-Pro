@@ -63,7 +63,6 @@ export function pressureFieldsContent(s){
 
 export function holdingOptionsContent(s){
   if (s.holdingType === 'mag') {
-    // Neue Servitec-Optionen
     const servitecFields = [
       segmented('useServitec', opts([['true','Ja'],['false','Nein']]), s.useServitec || 'true', { accent:'blue', label:'Servitec verwenden' }),
       s.useServitec === 'true' ? selectField({ 
