@@ -67,7 +67,9 @@ function hasDesignation(rows = []) {
 
 function isSavedOrRecordSection(section = {}) {
   const titleKey = normalizeKey(section.title || '');
-  return /gespeicherte|saved|leitungsabschnitt|rohrauslegung|pufferspeicher|druckhaltung|mischluft|waermerueckgewinnung|wrg|trinkwasser|schmutzwasser|h x prozess|hx prozess/.test(titleKey);
+  // Match saved record sections: titles containing pipe/line/saved keywords, or specific patterns
+  // For pressure-holding split records, match titles containing "druckhaltung" or " zubehoer" (with space before)
+  return /gespeicherte|saved|leitungsabschnitt|rohrauslegung|pufferspeicher|druckhaltung| zubehoer|mischluft|waermerueckgewinnung|wrg|trinkwasser|schmutzwasser|h x prozess|hx prozess/.test(titleKey);
 }
 
 function isMetadataSection(section = {}) {

@@ -509,11 +509,46 @@ function isLineSectionRecordKey(key = '') {
 function savedRecordSections(snapshot = {}) {
   return Object.entries(object(snapshot)).flatMap(([key, value]) => {
     if (!/^saved[A-Z].*s$/.test(key) || !Array.isArray(value) || !value.length) return [];
-    return value.map((record, index) => ({
-      title: savedRecordBaseTitle(key),
-      rows: savedRecordRows(record, index, key),
-      isLineSection: isLineSectionRecordKey(key)
-    })).filter(section => section.rows.length);
+    return value.flatMap((record, index) => {
+      const allRows = savedRecordRows(record, index, key);
+      
+      // Special handling for pressure-holding module: split into Druckhaltung and Zubeh\u00f6r sections
+      if (key === 'savedPlants' && Array.isArray(record.rows)) {
+        // Find the index where Zubeh\u00f6r rows start (first row with label containing Zubeh\u00f6r-related terms)
+        const zubehorStartIndex = allRows.findIndex(row => {
+          const label = row[0] || '';
+          return /Servitec|Nachspeisung|Wasseraufbereitung|Sicherheitsventil/i.test(label);
+        });
+        
+        if (zubehorStartIndex > 0) {
+          // Split rows into Druckhaltung and Zubeh\u00f6r
+          const druckhaltungRows = allRows.slice(0, zubehorStartIndex);
+          const zubehorRows = allRows.slice(zubehorStartIndex);
+          
+          const recordTitle = savedRecordBaseTitle(key) || 'Anlage';
+          const recordName = valueToText(record.name ?? record.title ?? record.label ?? '') || `${recordTitle} ${index + 1}`;
+          
+          return [
+            {
+              title: `${recordName} – Druckhaltung`,
+              rows: druckhaltungRows,
+              isLineSection: isLineSectionRecordKey(key)
+            },
+            {
+              title: `${recordName} – Zubeh\u00f6r`,
+              rows: zubehorRows,
+              isLineSection: isLineSectionRecordKey(key)
+            }
+          ].filter(section => section.rows.length);
+        }
+      }
+      
+      return [{
+        title: savedRecordBaseTitle(key),
+        rows: allRows,
+        isLineSection: isLineSectionRecordKey(key)
+      }];
+    }).filter(section => section.rows.length);
   });
 }
 

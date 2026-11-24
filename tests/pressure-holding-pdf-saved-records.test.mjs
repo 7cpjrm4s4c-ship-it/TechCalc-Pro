@@ -56,13 +56,18 @@ const sections = reportSections({
   reportDto: dto,
   reportSource: 'typed-dto'
 });
-const savedSection = sections.find(section => section.isLineSection && section.title === 'Anlage');
-assert.ok(savedSection, 'saved pressure records must be exported as line-section style report blocks');
-const rows = savedSection.rows;
+// After Review-Runde 2 req 4: each saved record is split into Druckhaltung and Zubeh\u00f6r sections
+const druckhaltungSection = sections.find(section => section.isLineSection && section.title.includes('Druckhaltung'));
+assert.ok(druckhaltungSection, 'saved pressure records must have Druckhaltung section');
+const rows = druckhaltungSection.rows;
 assert.ok(rows.some(row => row[0] === 'Anlagenvolumen' && row[1] === '16.000' && row[2] === 'l'));
 assert.ok(rows.some(row => row[0] === 'Standardvolumen' && row[1] === expectedStandardPdf && row[2] === 'l'));
 assert.ok(rows.some(row => row[0] === 'Ausdehnungskoeffizient'));
 assert.ok(rows.some(row => row[0] === 'Verdampfungsdruck'));
 assert.ok(rows.some(row => row[0] === 'Verwendeter statischer Druck'));
+
+// Check that Zubeh\u00f6r section also exists
+const zubehorSection = sections.find(section => section.isLineSection && section.title.includes('Zubeh\u00f6r'));
+assert.ok(zubehorSection, 'saved pressure records must have Zubeh\u00f6r section');
 
 console.log('pressure-holding saved-record PDF values and intermediate results ok');
