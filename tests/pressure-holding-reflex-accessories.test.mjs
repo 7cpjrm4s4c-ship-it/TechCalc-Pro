@@ -353,3 +353,14 @@ assert.ok(record.result.accessories.waterTreatment, 'WaterTreatment im Record');
 assert.ok(record.result.accessories.safetyValve, 'SafetyValve im Record');
 
 console.log('pressure-holding Reflex Zubehör (alle Arbeitspakete 1-4) ok');
+
+// Prüfung des Patronen-Hinweistexts im Ergebnis-Modell
+const waterTreatmentGroup = model.groups
+  .find(g => g.title === 'Zubehör')?.groups
+  .find(g => g.title.includes('Wasseraufbereitung'));
+if (waterTreatmentGroup) {
+  const patronNote = waterTreatmentGroup.rows.find(row => row.label === 'Hinweis' && row.isNote);
+  assert.ok(patronNote, 'Patronen-Hinweistext vorhanden');
+  assert.ok(patronNote.value.includes('Erstbefüllung'), 'Hinweistext enthält Erstbefüllung');
+  assert.ok(patronNote.value.includes('Patronenvorrat'), 'Hinweistext enthält Patronenvorrat');
+}

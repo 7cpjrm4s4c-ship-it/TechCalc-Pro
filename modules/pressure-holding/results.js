@@ -149,6 +149,7 @@ export function waterTreatmentAccessoryRows(s = {}, r = {}) {
     
     if (acc.patronCount > 0) {
       rows.push({ label: 'erforderliche Patronenzahl n', value: fmt(acc.patronCount, 0) });
+      rows.push({ label: 'Hinweis', value: 'Die berechnete Patronenzahl gilt für die vollständige Erstbefüllung der Anlage inklusive Nachspeise-Reserve (VN). Im Regelbetrieb ist nur der deutlich geringere Ergänzungswasserbedarf über die Patrone zu führen; die Anzahl bezeichnet den Patronenvorrat, nicht die gleichzeitig eingebauten Patronen.', isNote: true });
     }
     
     if (acc.restFeedVolumeL !== undefined) {
