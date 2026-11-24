@@ -13,16 +13,6 @@ export const pressureHoldingSchema = defineFormSchema({
     { key: 'staticHeightM', label: 'Statische Höhe', type: FIELD_TYPES.DECIMAL, unit: 'm' },
     { key: 'safetyValveBar', label: 'Sicherheitsventil', type: FIELD_TYPES.DECIMAL, unit: 'bar' },
     { key: 'useServitec', label: 'Servitec verwenden', type: FIELD_TYPES.SEGMENT, options: [{ value: 'true', label: 'Ja' }, { value: 'false', label: 'Nein' }], default: 'true' },
-    { key: 'servitecType', label: 'Servitec-Typ', type: FIELD_TYPES.SELECT, options: [
-      { value: 'auto', label: 'Automatik' },
-      { value: 'mini', label: 'Servitec Mini' },
-      { value: 's', label: 'Servitec S' },
-      { value: '35', label: 'Servitec 35' },
-      { value: '60', label: 'Servitec 60' },
-      { value: '75', label: 'Servitec 75' },
-      { value: '95', label: 'Servitec 95' },
-      { value: '120t', label: 'Servitec 120 T' }
-    ] },
     { key: 'feedType', label: 'Nachspeisung', type: FIELD_TYPES.SEGMENT, options: [{ value: 'manual', label: 'Manuell' }, { value: 'auto', label: 'Automatisch' }] },
     { key: 'feedPressureBar', label: 'Fließdruck vor Nachspeisung', type: FIELD_TYPES.DECIMAL, unit: 'bar' },
     { key: 'systemSeparation', label: 'Systemtrennung', type: FIELD_TYPES.SELECT, options: [
@@ -40,7 +30,7 @@ export const pressureHoldingSchema = defineFormSchema({
     { title: 'Projekt', fields: ['plantName', 'systemType', 'holdingType'], columns: 2 },
     { title: 'Anlage', fields: ['heatPowerKw', 'systemVolumeL', 'specificWaterContent', 'tMaxC', 'tMinC'], columns: 2 },
     { title: 'Druckniveau', fields: ['staticHeightM', 'safetyValveBar'], columns: 2 },
-    { title: 'Entgasung', fields: ['useServitec', 'servitecType'], columns: 2 },
+    { title: 'Entgasung', fields: ['useServitec'], columns: 2 },
     { title: 'Nachspeisung', fields: ['feedType', 'feedPressureBar', 'systemSeparation', 'feedLineLengthM'], columns: 2 },
     { title: 'Wasseraufbereitung', fields: ['waterTreatmentMethod', 'regionalWaterHardness'], columns: 2 },
 

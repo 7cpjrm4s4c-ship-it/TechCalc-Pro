@@ -133,11 +133,6 @@ export function hydratePressureRecord(item = {}, current = {}){
     state.useServitec = 'true';
   }
   
-  // Default für servitecType auf 'auto' setzen
-  if (state.servitecType === undefined) {
-    state.servitecType = 'auto';
-  }
-  
   // Default für feedType auf 'manual' setzen
   if (state.feedType === undefined) {
     state.feedType = 'manual';

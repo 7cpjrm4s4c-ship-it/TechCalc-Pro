@@ -297,7 +297,7 @@ export function createPressureHoldingDynamicRenderer(options = {}) {
   const structuralVolumeFields = ['waterContentMode'];
   const structuralPressureFields = ['connectionType'];
   const structuralHoldingFields = ['holdingType', 'useServitec'];
-  const structuralAccessoriesFields = ['feedType', 'waterTreatmentMethod', 'safetyValveConnection'];
+  const structuralAccessoriesFields = ['feedType', 'waterTreatmentMethod'];
   const savedFields = ['savedPlants', 'activePlantId', 'expandedPlantId'];
 
   function syncFields(root, s = {}) {
@@ -307,9 +307,7 @@ export function createPressureHoldingDynamicRenderer(options = {}) {
     updateSegment(root, 'useServitec', s.useServitec);
     updateSegment(root, 'feedType', s.feedType);
     updateSegment(root, 'waterTreatmentMethod', s.waterTreatmentMethod);
-    setSelectValue(root, 'servitecType', s.servitecType);
     setSelectValue(root, 'systemSeparation', s.systemSeparation);
-    setSelectValue(root, 'safetyValveConnection', s.safetyValveConnection);
     setSelectValue(root, 'waterContentMode', s.waterContentMode);
     setSelectValue(root, 'frostMode', s.frostMode);
     setSelectValue(root, 'dynamicType', s.dynamicType);
@@ -341,7 +339,7 @@ export function createPressureHoldingDynamicRenderer(options = {}) {
     const holdingStructural = appStructural || hasAnyChanged(changed, structuralHoldingFields) || previous.holdingType !== s.holdingType || previous.useServitec !== s.useServitec;
     const accessoriesStructural = appStructural || hasAnyChanged(changed, structuralAccessoriesFields) || 
       previous.feedType !== s.feedType || 
-      previous.waterTreatmentMethod !== s.waterTreatmentMethod || previous.safetyValveConnection !== s.safetyValveConnection;
+      previous.waterTreatmentMethod !== s.waterTreatmentMethod;
     const basisStructural = appStructural || holdingStructural || pressureStructural || hasAnyChanged(changed, ['systemType']);
 
     if (basisStructural && typeof renderBasis === 'function') setIslandInner(root, '[data-ph-dynamic="basis"]', renderBasis(s, r, 'purple'));
@@ -361,7 +359,6 @@ export function createPressureHoldingDynamicRenderer(options = {}) {
       useServitec: s.useServitec,
       feedType: s.feedType,
       waterTreatmentMethod: s.waterTreatmentMethod,
-      safetyValveConnection: s.safetyValveConnection,
       activePlantId: s.activePlantId,
       expandedPlantId: s.expandedPlantId
     };

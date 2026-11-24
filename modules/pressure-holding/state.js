@@ -23,7 +23,6 @@ export const state = createModuleState({
   expandedPlantId: null,
   savedPlants: [],
   useServitec: 'true',
-  servitecType: 'auto',
   feedType: 'manual',
   feedPressureBar: '',
   systemSeparation: 'systemSeparator',

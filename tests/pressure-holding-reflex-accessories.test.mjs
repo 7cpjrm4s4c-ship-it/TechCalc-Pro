@@ -343,7 +343,7 @@ const item = { state: { includeServitec: 'true' } };
 const current = {};
 const hydrated = hydratePressureRecord(item, current);
 assert.equal(hydrated.useServitec, 'true', 'Migration in hydratePressureRecord');
-assert.equal(hydrated.servitecType, 'auto', 'Default servitecType');
+
 assert.equal(hydrated.feedType, 'manual', 'Default feedType');
 assert.equal(hydrated.waterTreatmentMethod, 'softening', 'Default waterTreatmentMethod');
 

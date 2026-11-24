@@ -32,22 +32,7 @@ function fmtInput(value, digits = 2) {
 function renderAccessoriesFields(s) {
   // Entgasung
   const degasationFields = [
-    segmented('useServitec', opts([['true','Ja'],['false','Nein']]), s.useServitec || 'true', { accent:'blue', label:'Servitec verwenden' }),
-    s.useServitec === 'true' ? selectField({ 
-      id:'servitecType', 
-      label:'Servitec-Typ', 
-      value:s.servitecType || 'auto',
-      options:opts([
-        ['auto','Automatik'],
-        ['mini','Servitec Mini'],
-        ['s','Servitec S'],
-        ['35','Servitec 35'],
-        ['60','Servitec 60'],
-        ['75','Servitec 75'],
-        ['95','Servitec 95'],
-        ['120t','Servitec 120 T']
-      ])
-    }) : ''
+    segmented('useServitec', opts([['true','Ja'],['false','Nein']]), s.useServitec || 'true', { accent:'blue', label:'Servitec verwenden' })
   ].filter(Boolean);
 
   // Nachspeisung
