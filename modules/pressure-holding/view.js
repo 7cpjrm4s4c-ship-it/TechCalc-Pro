@@ -80,28 +80,11 @@ function renderAccessoriesFields(s) {
     field({ id:'regionalWaterHardness', label:'regionale Gesamtwasserhärte GHst', value:fmtInput(s.regionalWaterHardness,1), unit:'°dH' })
   ];
 
-  // Sicherheitsventil
-  const safetyValveFields = [
-    selectField({ 
-      id:'safetyValveConnection', 
-      label:'Sicherheitsventil-Anschluss', 
-      value:s.safetyValveConnection || '',
-      options:opts([
-        ['05','G ½"'],
-        ['075','G ¾"'],
-        ['1','G 1"'],
-        ['125','G 1¼"'],
-        ['15','G 1½"'],
-        ['2','G 2"']
-      ])
-    })
-  ];
-
   return stack([
     `<h4>Entgasung</h4>${grid(degasationFields.join(''), 2)}`,
     `<h4>Nachspeisung</h4>${grid(feedFields.join(''), 2)}`,
     `<h4>Wasseraufbereitung</h4>${grid(waterTreatmentFields.join(''), 2)}`,
-    `<h4>Sicherheitsventil</h4>${grid(safetyValveFields.join(''), 2)}`
+
   ].join(''));
 }
 

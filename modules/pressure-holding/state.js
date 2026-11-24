@@ -29,6 +29,5 @@ export const state = createModuleState({
   systemSeparation: 'systemSeparator',
   feedLineLengthM: '',
   waterTreatmentMethod: 'softening',
-  regionalWaterHardness: '',
-  safetyValveConnection: ''
+  regionalWaterHardness: ''
 });

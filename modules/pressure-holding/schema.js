@@ -34,15 +34,7 @@ export const pressureHoldingSchema = defineFormSchema({
       { value: 'softening', label: 'Enthärtung' },
       { value: 'desalination', label: 'Entsalzung' }
     ] },
-    { key: 'regionalWaterHardness', label: 'regionale Gesamtwasserhärte GHst', type: FIELD_TYPES.DECIMAL, unit: '°dH' },
-    { key: 'safetyValveConnection', label: 'Sicherheitsventil-Anschluss', type: FIELD_TYPES.SELECT, options: [
-      { value: '05', label: 'G ½"' },
-      { value: '075', label: 'G ¾"' },
-      { value: '1', label: 'G 1"' },
-      { value: '125', label: 'G 1¼"' },
-      { value: '15', label: 'G 1½"' },
-      { value: '2', label: 'G 2"' }
-    ] }
+    { key: 'regionalWaterHardness', label: 'regionale Gesamtwasserhärte GHst', type: FIELD_TYPES.DECIMAL, unit: '°dH' }
   ],
   groups: [
     { title: 'Projekt', fields: ['plantName', 'systemType', 'holdingType'], columns: 2 },
@@ -51,7 +43,7 @@ export const pressureHoldingSchema = defineFormSchema({
     { title: 'Entgasung', fields: ['useServitec', 'servitecType'], columns: 2 },
     { title: 'Nachspeisung', fields: ['feedType', 'feedPressureBar', 'systemSeparation', 'feedLineLengthM'], columns: 2 },
     { title: 'Wasseraufbereitung', fields: ['waterTreatmentMethod', 'regionalWaterHardness'], columns: 2 },
-    { title: 'Sicherheitsventil', fields: ['safetyValveConnection'], columns: 2 }
+
   ]
 });
 
