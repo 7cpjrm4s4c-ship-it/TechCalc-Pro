@@ -431,6 +431,13 @@ function rowsFromCard(card = {}) {
 }
 
 function sectionFromCard(card = {}, index = 0) {
+  // Handle groups with nested subgroups (e.g., Zubeh\u00f6r with Entgasung, Nachspeisung, etc.)
+  if (card.groups && Array.isArray(card.groups)) {
+    return {
+      title: card.title || card.label || `Ergebnis ${index + 1}`,
+      rows: card.groups.flatMap(group => rowsFromCard(group))
+    };
+  }
   return {
     title: card.title || card.label || `Ergebnis ${index + 1}`,
     rows: rowsFromCard(card)
@@ -440,7 +447,15 @@ function sectionFromCard(card = {}, index = 0) {
 function resultModelSections(resultModel) {
   if (!resultModel) return [];
   if (Array.isArray(resultModel.sections)) return resultModel.sections.map(sectionFromCard);
-  if (Array.isArray(resultModel.groups)) return resultModel.groups.map(sectionFromCard);
+  if (Array.isArray(resultModel.groups)) {
+    return resultModel.groups.flatMap(group => {
+      // Handle nested groups (e.g., Zubeh\u00f6r with subgroups)
+      if (group.groups && Array.isArray(group.groups)) {
+        return [sectionFromCard(group), ...group.groups.map(sectionFromCard)];
+      }
+      return [sectionFromCard(group)];
+    });
+  }
   if (Array.isArray(resultModel.cards)) return resultModel.cards.map(sectionFromCard);
   if (resultModel.primary) return [sectionFromCard(resultModel.primary)];
   return [{ title: 'Ergebnis', rows: rowsFromObject(resultModel) }].filter(section => section.rows.length);

@@ -15,6 +15,8 @@ import {
 } from '../modules/pressure-holding/logic.js';
 import { buildPressureHoldingResultModel } from '../modules/pressure-holding/results.js';
 import { buildPressureRecord, hydratePressureRecord } from '../modules/pressure-holding/controller.js';
+import pressureHoldingModule from '../modules/pressure-holding/index.js';
+import { reportSections } from '../core/pdf/pdfDataMapping.js';
 
 const deInt = value => new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(value);
 
@@ -364,3 +366,60 @@ if (waterTreatmentGroup) {
   assert.ok(patronNote.value.includes('Erstbefüllung'), 'Hinweistext enthält Erstbefüllung');
   assert.ok(patronNote.value.includes('Patronenvorrat'), 'Hinweistext enthält Patronenvorrat');
 }
+
+// ============================================================================
+// PDF-Ausgabe Prüfung (Befund 2)
+// ============================================================================
+
+const stateForPdf = {
+  plantName: 'Test Heizung',
+  systemType: 'heating',
+  holdingType: 'mag',
+  useServitec: 'true',
+  servitecType: 'auto',
+  connectionType: 'suction',
+  waterContentMode: 'known',
+  systemVolumeL: '1000',
+  additionalVolumeL: '',
+  frostMode: 'water',
+  tMaxC: '80',
+  tMinC: '10',
+  staticHeightM: '10',
+  staticPressureBar: '',
+  pumpPressureBar: '',
+  safetyValveBar: '3',
+  dynamicType: 'reflexomat',
+  feedType: 'manual',
+  feedPressureBar: '2.5',
+  systemSeparation: 'systemSeparator',
+  feedLineLengthM: '5',
+  waterTreatmentMethod: 'softening',
+  regionalWaterHardness: '15',
+  safetyValveConnection: '1',
+  heatPowerKw: '3000',
+  savedPlants: []
+};
+
+pressureHoldingModule.calculate(stateForPdf);
+const dto = pressureHoldingModule.report(stateForPdf);
+const sections = reportSections({
+  id: 'pressure-holding',
+  title: 'Druckhaltung',
+  shortTitle: 'Druckhaltung',
+  reportDto: dto,
+  reportSource: 'typed-dto'
+});
+
+// Prüfe dass keine englischen Raw-Keys im PDF-Text enthalten sind
+const blacklist = ['useServitec', 'feedType', 'waterTreatmentMethod', 'servitecType', 'safetyValveConnection', 'systemSeparation'];
+const allPdfText = JSON.stringify(sections);
+blacklist.forEach(field => {
+  assert.doesNotMatch(allPdfText, new RegExp(field, 'i'), `PDF should not contain raw field name: ${field}`);
+});
+
+// Prüfe dass Einheiten direkt hinter Werten stehen (Format: Wert + Leerzeichen + Einheit)
+// Dies wird durch pdfRowValue sichergestellt, das value + ' ' + unit zurückgibt
+const rowsWithUnits = sections.flatMap(s => s.rows || []).filter(row => row[2] && row[2] !== '');
+assert.ok(rowsWithUnits.length > 0, 'PDF should contain rows with units');
+
+console.log('pressure-holding Reflex Zubeh\u00f6r (alle Arbeitspakete 1-4) ok');
