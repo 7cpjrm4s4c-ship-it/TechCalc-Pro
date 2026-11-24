@@ -106,10 +106,8 @@ renderer.update(fakeRoot, {
   connectionType: 'suction',
   waterContentMode: 'known',
   useServitec: 'true',
-  servitecType: 'auto',
   feedType: 'manual',
   waterTreatmentMethod: 'softening',
-  safetyValveConnection: '',
   includeServitec: 'false',
   frostMode: 'water',
   dynamicType: 'reflexomat',
@@ -127,39 +125,33 @@ const stateWithAccessories = {
   connectionType: 'suction',
   waterContentMode: 'known',
   useServitec: 'true',
-  servitecType: 'auto',
   feedType: 'manual',
   waterTreatmentMethod: 'softening',
-  safetyValveConnection: '1',
   includeServitec: 'false',
   frostMode: 'water',
   dynamicType: 'reflexomat',
   plantName: '',
   savedPlants: []
 };
-renderer.update(fakeRoot, stateWithAccessories, { action: 'field:change', changed: ['safetyValveConnection'] });
+renderer.update(fakeRoot, stateWithAccessories, { action: 'field:change', changed: ['feedType'] });
 assert.ok(rendered.includes('accessories'), 'accessories field change triggers re-render');
 
-// Test that syncFields is called with useServitec and servitecType
-// This is verified by the fact that the renderer doesn't throw errors
-// when these fields are present in the state
+// Test that syncFields handles useServitec and feedType without errors
 const stateWithServitec = {
   systemType: 'heating',
   holdingType: 'mag',
   connectionType: 'suction',
   waterContentMode: 'known',
   useServitec: 'true',
-  servitecType: 'mini',
   feedType: 'manual',
   waterTreatmentMethod: 'softening',
-  safetyValveConnection: '',
   includeServitec: 'false',
   frostMode: 'water',
   dynamicType: 'reflexomat',
   plantName: '',
   savedPlants: []
 };
-renderer.update(fakeRoot, stateWithServitec, { action: 'field:change', changed: ['servitecType'] });
-assert.ok(true, 'syncFields handles servitecType without errors');
+renderer.update(fakeRoot, stateWithServitec, { action: 'field:change', changed: ['feedType'] });
+assert.ok(true, 'syncFields handles feedType without errors');
 
 console.log('pressure-holding-phase20c-dynamic-renderer ok');

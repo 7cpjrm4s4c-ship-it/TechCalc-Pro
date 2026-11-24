@@ -243,7 +243,6 @@ const fullState = {
   systemType: 'heating',
   holdingType: 'mag',
   useServitec: 'true',
-  servitecType: 'auto',
   connectionType: 'suction',
   waterContentMode: 'known',
   systemVolumeL: '500',
@@ -376,7 +375,6 @@ const stateForPdf = {
   systemType: 'heating',
   holdingType: 'mag',
   useServitec: 'true',
-  servitecType: 'auto',
   connectionType: 'suction',
   waterContentMode: 'known',
   systemVolumeL: '1000',
@@ -411,7 +409,7 @@ const sections = reportSections({
 });
 
 // Prüfe dass keine englischen Raw-Keys im PDF-Text enthalten sind
-const blacklist = ['useServitec', 'feedType', 'waterTreatmentMethod', 'servitecType', 'safetyValveConnection', 'systemSeparation'];
+const blacklist = ['useServitec', 'feedType', 'waterTreatmentMethod', 'systemSeparation'];
 const allPdfText = JSON.stringify(sections);
 blacklist.forEach(field => {
   assert.doesNotMatch(allPdfText, new RegExp(field, 'i'), `PDF should not contain raw field name: ${field}`);
@@ -429,7 +427,7 @@ zubehorSections.forEach(section => {
     // Jede Zeile sollte ein Array mit mindestens 3 Elementen sein: [label, value, unit]
     assert.ok(Array.isArray(row) && row.length >= 3, 'Jede Zubehör-Zeile sollte [label, value, unit] Format haben');
     // Label sollte nicht leer sein und kein englischer Raw-Key
-    assert.ok(row[0] && typeof row[0] === 'string' && !row[0].match(/^(useServitec|feedType|waterTreatmentMethod|servitecType|safetyValveConnection|systemSeparation|feedPressureBar|feedLineLengthM|regionalWaterHardness)$/), 'Label sollte deutsch und nicht leer sein');
+    assert.ok(row[0] && typeof row[0] === 'string' && !row[0].match(/^(useServitec|feedType|waterTreatmentMethod|systemSeparation|feedPressureBar|feedLineLengthM|regionalWaterHardness)$/), 'Label sollte deutsch und nicht leer sein');
     // Value sollte nicht undefined/null sein
     assert.ok(row[1] !== undefined && row[1] !== null, 'Wert sollte nicht null/undefined sein');
     // Unit kann leer sein, aber sollte ein String sein
