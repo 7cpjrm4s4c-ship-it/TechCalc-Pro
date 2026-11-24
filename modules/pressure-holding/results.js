@@ -266,12 +266,14 @@ export function buildPressureHoldingResultModel(s = {}, r = {}, accent = 'blue')
   // Kombiniere alle Gruppen
   const allGroups = [...existingGroups];
   
-  // Füge Zubehör-Abschnitt nur hinzu, wenn mindestens ein Zubehör aktiv ist
+  // Flache Gruppen statt verschachtelter Struktur (Befund 2)
   if (accessoriesGroups.length > 0) {
-    allGroups.push({
-      title: 'Zubehör',
-      groups: accessoriesGroups,
-      accent
+    accessoriesGroups.forEach(group => {
+      // Präfix "Zubehör – " zu jedem Untergruppen-Titel
+      allGroups.push({
+        ...group,
+        title: `Zubehör – ${group.title}`
+      });
     });
   }
 

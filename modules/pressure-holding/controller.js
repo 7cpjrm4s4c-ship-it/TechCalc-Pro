@@ -2,6 +2,12 @@ import { createLineSectionController } from '../../core/runtime/index.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
+import {
+  servitecAccessoryRows,
+  fillSystemAccessoryRows,
+  waterTreatmentAccessoryRows,
+  safetyValveAccessoryRows
+} from './results.js';
 
 const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 function num(value) {
@@ -59,33 +65,7 @@ function pressureResultRows(currentState = {}, result = {}) {
     { label: 'Volumenfaktor', value: result.factor, digits: 2 }
   ];
   
-  // Zubehör-Ergebnisse hinzufügen
-  const acc = result.accessories || {};
-  
-  // Servitec
-  if (acc.servitec && acc.servitec.type) {
-    rows.push({ label: 'Servitec-Typ', value: acc.servitec.label || acc.servitec.type });
-  }
-  
-  // Nachspeisung
-  if (acc.fillSystem && acc.fillSystem.system) {
-    rows.push({ label: 'Nachspeisesystem', value: acc.fillSystem.label });
-    rows.push({ label: 'Nachspeisemenge', value: acc.fillSystem.feedFlowLh, unit: 'l/h', digits: 0 });
-  }
-  
-  // Wasseraufbereitung
-  if (acc.waterTreatment && acc.waterTreatment.method) {
-    rows.push({ label: 'Wasseraufbereitung', value: acc.waterTreatment.method === 'softening' ? 'Enthärtung' : 'Entsalzung' });
-    if (acc.waterTreatment.patronCount > 0) {
-      rows.push({ label: 'Patronenzahl', value: acc.waterTreatment.patronCount, digits: 0 });
-    }
-  }
-  
-  // Sicherheitsventil
-  if (acc.safetyValve && acc.safetyValve.connection) {
-    rows.push({ label: 'SV-Anschluss', value: acc.safetyValve.connectionLabel || acc.safetyValve.connection });
-    rows.push({ label: 'Abblaseleistung', value: acc.safetyValve.flowRateLh, unit: 'l/h', digits: 0 });
-  }
+
   
   return rows
     .filter(row => row.value !== undefined && row.value !== null && row.value !== '')
@@ -127,15 +107,16 @@ export function buildPressureRecord(currentState = {}, result = {}, items = [], 
       ve: result.ve,
       vv: result.vv,
       asv: result.asv,
-      factor: result.factor,
-      accessories: {
-        servitec: acc.servitec ? { type: acc.servitec.type, label: acc.servitec.label } : null,
-        fillSystem: acc.fillSystem ? { system: acc.fillSystem.system, label: acc.fillSystem.label, feedFlowLh: acc.fillSystem.feedFlowLh } : null,
-        waterTreatment: acc.waterTreatment ? { method: acc.waterTreatment.method, patronCount: acc.waterTreatment.patronCount } : null,
-        safetyValve: acc.safetyValve ? { connection: acc.safetyValve.connection, connectionLabel: acc.safetyValve.connectionLabel, flowRateLh: acc.safetyValve.flowRateLh } : null
-      }
+      factor: result.factor
     },
-    rows: pressureResultRows(currentState, result)
+    rows: [
+      ...pressureResultRows(currentState, result),
+      // Zubehör-Zeilen aus deutschen Zeilenfunktionen (Befund 2)
+      ...servitecAccessoryRows(currentState, result).map(row => [row.label, row.value, row.unit || '']),
+      ...fillSystemAccessoryRows(currentState, result).map(row => [row.label, row.value, row.unit || '']),
+      ...waterTreatmentAccessoryRows(currentState, result).map(row => [row.label, row.value, row.unit || '']),
+      ...safetyValveAccessoryRows(currentState, result).map(row => [row.label, row.value, row.unit || ''])
+    ].filter(row => row[1] !== undefined && row[1] !== null && row[1] !== '')
   };
 }
 export function hydratePressureRecord(item = {}, current = {}){

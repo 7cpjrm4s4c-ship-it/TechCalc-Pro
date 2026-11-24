@@ -267,14 +267,15 @@ const fullState = {
 const fullResult = calculate(fullState);
 const model = buildPressureHoldingResultModel(fullState, fullResult, 'purple');
 
-// Prüfe dass Zubehör-Abschnitt vorhanden ist
-assert.ok(model.groups.some(g => g.title === 'Zubehör'), 'Zubehör-Abschnitt im Ergebnis-Modell');
+// Prüfe dass Zubehör-Abschnitt als flache Gruppen vorhanden ist (Befund 2)
+const zubehorGroups = model.groups.filter(g => g.title.startsWith('Zubehör – '));
+assert.ok(zubehorGroups.length > 0, 'Zubehör-Gruppen im Ergebnis-Modell');
 
-// Prüfe dass Untergruppen vorhanden sind
-const zubehorGroup = model.groups.find(g => g.title === 'Zubehör');
-assert.ok(zubehorGroup, 'Zubehör-Gruppe gefunden');
-assert.ok(zubehorGroup.groups, 'Untergruppen vorhanden');
-assert.ok(zubehorGroup.groups.length > 0, 'Mindestens eine Zubehör-Untergruppe');
+// Prüfe dass die Zubehör-Gruppen Rows haben
+zubehorGroups.forEach(group => {
+  assert.ok(group.rows, 'Gruppe hat Rows');
+  assert.ok(group.rows.length > 0, 'Gruppe hat mindestens eine Row');
+});
 
 // ============================================================================
 // Migration und Regression
@@ -348,18 +349,17 @@ assert.equal(hydrated.waterTreatmentMethod, 'softening', 'Default waterTreatment
 
 // buildPressureRecord mit Zubehör
 const record = buildPressureRecord(fullState, fullResult, [], 'test-1', 'Testanlage');
-assert.ok(record.result.accessories, 'Accessories im Record');
-assert.ok(record.result.accessories.servitec, 'Servitec im Record');
-assert.ok(record.result.accessories.fillSystem, 'FillSystem im Record');
-assert.ok(record.result.accessories.waterTreatment, 'WaterTreatment im Record');
-assert.ok(record.result.accessories.safetyValve, 'SafetyValve im Record');
-
+assert.ok(!record.result.accessories, 'Accessories-Objekt entfernt (Befund 2)');
+// Prüfung, dass Zubehör-Zeilen in record.rows enthalten sind
+const accessoryLabels = record.rows.map(row => row[0]);
+assert.ok(accessoryLabels.some(label => label.includes('Servitec')), 'Servitec-Zeile in rows');
+assert.ok(accessoryLabels.some(label => label.toLowerCase().includes('nachspeise')), 'Nachspeisung-Zeile in rows');
+assert.ok(accessoryLabels.some(label => label.toLowerCase().includes('wasseraufbereitung') || label.toLowerCase().includes('patronenzahl')), 'Wasseraufbereitung-Zeile in rows');
+assert.ok(accessoryLabels.some(label => label.toLowerCase().includes('sicherheitsventil') || label.toLowerCase().includes('anschlussgröße')), 'Sicherheitsventil-Zeile in rows');
 console.log('pressure-holding Reflex Zubehör (alle Arbeitspakete 1-4) ok');
 
 // Prüfung des Patronen-Hinweistexts im Ergebnis-Modell
-const waterTreatmentGroup = model.groups
-  .find(g => g.title === 'Zubehör')?.groups
-  .find(g => g.title.includes('Wasseraufbereitung'));
+const waterTreatmentGroup = model.groups.find(g => g.title.includes('Wasseraufbereitung'));
 if (waterTreatmentGroup) {
   const patronNote = waterTreatmentGroup.rows.find(row => row.label === 'Hinweis' && row.isNote);
   assert.ok(patronNote, 'Patronen-Hinweistext vorhanden');
@@ -417,9 +417,44 @@ blacklist.forEach(field => {
   assert.doesNotMatch(allPdfText, new RegExp(field, 'i'), `PDF should not contain raw field name: ${field}`);
 });
 
-// Prüfe dass Einheiten direkt hinter Werten stehen (Format: Wert + Leerzeichen + Einheit)
+// Prüfung dass Einheiten direkt hinter Werten stehen (Format: Wert + Leerzeichen + Einheit)
 // Dies wird durch pdfRowValue sichergestellt, das value + ' ' + unit zurückgibt
 const rowsWithUnits = sections.flatMap(s => s.rows || []).filter(row => row[2] && row[2] !== '');
 assert.ok(rowsWithUnits.length > 0, 'PDF should contain rows with units');
 
-console.log('pressure-holding Reflex Zubeh\u00f6r (alle Arbeitspakete 1-4) ok');
+// (a) Prüfung, dass jede Zubehör-Zeile das Format [deutschesLabel, formatierterWert, einheit] hat
+const zubehorSections = sections.filter(s => s.title && s.title.includes('Zubehör'));
+zubehorSections.forEach(section => {
+  (section.rows || []).forEach(row => {
+    // Jede Zeile sollte ein Array mit mindestens 3 Elementen sein: [label, value, unit]
+    assert.ok(Array.isArray(row) && row.length >= 3, 'Jede Zubehör-Zeile sollte [label, value, unit] Format haben');
+    // Label sollte nicht leer sein und kein englischer Raw-Key
+    assert.ok(row[0] && typeof row[0] === 'string' && !row[0].match(/^(useServitec|feedType|waterTreatmentMethod|servitecType|safetyValveConnection|systemSeparation|feedPressureBar|feedLineLengthM|regionalWaterHardness)$/), 'Label sollte deutsch und nicht leer sein');
+    // Value sollte nicht undefined/null sein
+    assert.ok(row[1] !== undefined && row[1] !== null, 'Wert sollte nicht null/undefined sein');
+    // Unit kann leer sein, aber sollte ein String sein
+    assert.ok(typeof row[2] === 'string', 'Einheit sollte ein String sein');
+  });
+});
+
+// (c) Prüfung der Reihenfolge der Sections im Report-DTO
+// Im PDF: Eingaben, Zwischenergebnisse, Formeln, dann Zubehör in fester Reihenfolge
+const sectionTitles = sections.map(s => s.title || '').filter(t => t !== '');
+const intermediateIndex = sectionTitles.findIndex(t => t.includes('Zwischenergebnisse'));
+const formulaIndex = sectionTitles.findIndex(t => t.includes('Formeln'));
+const zubehorEntgasungIndex = sectionTitles.findIndex(t => t.includes('Zubehör') && t.includes('Entgasung'));
+const zubehorNachspeisungIndex = sectionTitles.findIndex(t => t.includes('Zubehör') && t.includes('Nachspeisung'));
+const zubehorWasserIndex = sectionTitles.findIndex(t => t.includes('Zubehör') && t.includes('Wasseraufbereitung'));
+const zubehorSicherheitIndex = sectionTitles.findIndex(t => t.includes('Zubehör') && t.includes('Sicherheitsventil'));
+
+// Prüfung der Reihenfolge
+assert.ok(intermediateIndex >= 0, 'Zwischenergebnisse sollte vorhanden sein');
+assert.ok(formulaIndex >= 0, 'Formeln sollte vorhanden sein');
+if (zubehorEntgasungIndex >= 0) {
+  assert.ok(zubehorEntgasungIndex > formulaIndex, 'Zubehör Entgasung sollte nach Formeln kommen');
+  assert.ok(zubehorNachspeisungIndex > zubehorEntgasungIndex, 'Zubehör Nachspeisung sollte nach Entgasung kommen');
+  assert.ok(zubehorWasserIndex > zubehorNachspeisungIndex, 'Zubehör Wasseraufbereitung sollte nach Nachspeisung kommen');
+  assert.ok(zubehorSicherheitIndex > zubehorWasserIndex, 'Zubehör Sicherheitsventil sollte nach Wasseraufbereitung kommen');
+}
+
+console.log('pressure-holding Reflex Zubehör (alle Arbeitspakete 1-4) ok');('pressure-holding Reflex Zubeh\u00f6r (alle Arbeitspakete 1-4) ok');
