@@ -524,34 +524,67 @@ function savedRecordSections(snapshot = {}) {
     return value.flatMap((record, index) => {
       const allRows = savedRecordRows(record, index, key);
       
-      // Special handling for pressure-holding module: split into Druckhaltung and Zubeh\u00f6r sections
+      // Special handling for pressure-holding module: split into Druckhaltung and accessory blocks
       if (key === 'savedPlants' && Array.isArray(record.rows)) {
-        // Find the index where Zubeh\u00f6r rows start (first row with label containing Zubeh\u00f6r-related terms)
-        const zubehorStartIndex = allRows.findIndex(row => {
+        // Find the index where accessories start (first row with label containing accessory terms)
+        const accessoryStartIndex = allRows.findIndex(row => {
           const label = row[0] || '';
-          return /Servitec|Nachspeisung|Wasseraufbereitung|Sicherheitsventil/i.test(label);
+          return /Servitec Typ|Nachspeisesystem|Verfahrens|Anschlussgr[ö\u00f6]\u00dfe|Sicherheitsventil/i.test(label);
         });
         
-        if (zubehorStartIndex > 0) {
-          // Split rows into Druckhaltung and Zubeh\u00f6r
-          const druckhaltungRows = allRows.slice(0, zubehorStartIndex);
-          const zubehorRows = allRows.slice(zubehorStartIndex);
+        if (accessoryStartIndex > 0) {
+          // Split rows into Druckhaltung and accessories
+          const druckhaltungRows = allRows.slice(0, accessoryStartIndex);
+          const accessoryRows = allRows.slice(accessoryStartIndex);
           
           const recordTitle = savedRecordBaseTitle(key) || 'Anlage';
           const recordName = valueToText(record.name ?? record.title ?? record.label ?? '') || `${recordTitle} ${index + 1}`;
           
-          return [
+          // Group accessory rows by accessory type
+          const servitecRows = accessoryRows.filter(row => /Servitec Typ|Betrachtetes Anlagenvolumen/i.test(row[0] || ''));
+          const fillSystemRows = accessoryRows.filter(row => /Nachspeisesystem|Kvs Wert|Nachspeisemenge|Pumpe max|Fließdruck|Druckdifferenz|Länge|Systemtrennung/i.test(row[0] || ''));
+          const waterTreatmentRows = accessoryRows.filter(row => /Verfahren|Gesamtwasserhärte|Füll und Ergänzungswassermenge|Erforderliche Patronenzahl|Restnachspeisemenge/i.test(row[0] || ''));
+          const safetyValveRows = accessoryRows.filter(row => /Empfohlene Anschlussgröße|Abblaseleistung|Sicherheitsventil p SV|Enddruck pe|Schließdruckdifferenz ASV|Reserve/i.test(row[0] || ''));
+          
+          const sections = [
             {
               title: `${recordName} – Druckhaltung`,
               rows: druckhaltungRows,
-              isLineSection: isLineSectionRecordKey(key)
-            },
-            {
-              title: `${recordName} – Zubeh\u00f6r`,
-              rows: zubehorRows,
-              isLineSection: isLineSectionRecordKey(key)
+              isLineSection: true
             }
-          ].filter(section => section.rows.length);
+          ];
+          
+          // Add accessory blocks in fixed order
+          if (servitecRows.length) {
+            sections.push({
+              title: `${recordName} – Entgasung (Servitec)`,
+              rows: servitecRows,
+              isLineSection: true
+            });
+          }
+          if (fillSystemRows.length) {
+            sections.push({
+              title: `${recordName} – Nachspeisung`,
+              rows: fillSystemRows,
+              isLineSection: true
+            });
+          }
+          if (waterTreatmentRows.length) {
+            sections.push({
+              title: `${recordName} – Wasseraufbereitung (Fillsoft)`,
+              rows: waterTreatmentRows,
+              isLineSection: true
+            });
+          }
+          if (safetyValveRows.length) {
+            sections.push({
+              title: `${recordName} – Sicherheitsventil`,
+              rows: safetyValveRows,
+              isLineSection: true
+            });
+          }
+          
+          return sections.filter(section => section.rows.length);
         }
       }
       

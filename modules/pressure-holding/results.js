@@ -81,9 +81,8 @@ export function servitecAccessoryRows(s = {}, r = {}) {
     if (acc.note) {
       rows.push({ label: 'Hinweis', value: acc.note, isNote: true });
     }
-  } else {
-    rows.push({ label: 'Servitec', value: 'Nicht aktiviert' });
   }
+  // No placeholder for inactive Servitec - remove completely as per Delta-Prompt
 
   return rows;
 }
@@ -124,9 +123,8 @@ export function fillSystemAccessoryRows(s = {}, r = {}) {
     if (acc.systemSeparation) {
       rows.push({ label: 'Systemtrennung', value: acc.systemSeparation === 'systemSeparator' ? 'DVGW-geprüfter Systemtrenner' : 'Netztrennbehälter' });
     }
-  } else {
-    rows.push({ label: 'Nachspeisung', value: 'Nicht konfiguriert' });
   }
+  // No placeholder for inactive fill system - remove completely as per Delta-Prompt
 
   return rows;
 }
@@ -165,9 +163,8 @@ export function waterTreatmentAccessoryRows(s = {}, r = {}) {
     if (acc.warnings && acc.warnings.length > 0) {
       acc.warnings.forEach(w => rows.push({ label: 'Hinweis', value: w, isNote: true }));
     }
-  } else {
-    rows.push({ label: 'Wasseraufbereitung', value: 'Nicht konfiguriert' });
   }
+  // No placeholder for inactive water treatment - remove completely as per Delta-Prompt
 
   return rows;
 }
@@ -196,7 +193,8 @@ export function safetyValveAccessoryRows(s = {}, r = {}) {
       }
     }
   } else {
-    rows.push({ label: 'Sicherheitsventil', value: 'Nicht konfiguriert' });
+    // No placeholder for inactive safety valve - remove completely as per Delta-Prompt
+    return rows;
   }
 
   // Pflichthinweis

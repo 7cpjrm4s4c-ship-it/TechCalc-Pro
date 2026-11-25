@@ -56,7 +56,7 @@ const sections = reportSections({
   reportDto: dto,
   reportSource: 'typed-dto'
 });
-// After Review-Runde 2 req 4: each saved record is split into Druckhaltung and Zubeh\u00f6r sections
+// After Review-Runde 2 req 4: each saved record is split into Druckhaltung and accessory blocks
 const druckhaltungSection = sections.find(section => section.isLineSection && section.title.includes('Druckhaltung'));
 assert.ok(druckhaltungSection, 'saved pressure records must have Druckhaltung section');
 const rows = druckhaltungSection.rows;
@@ -66,8 +66,27 @@ assert.ok(rows.some(row => row[0] === 'Ausdehnungskoeffizient'));
 assert.ok(rows.some(row => row[0] === 'Verdampfungsdruck'));
 assert.ok(rows.some(row => row[0] === 'Verwendeter statischer Druck'));
 
-// Check that Zubeh\u00f6r section also exists
-const zubehorSection = sections.find(section => section.isLineSection && section.title.includes('Zubeh\u00f6r'));
-assert.ok(zubehorSection, 'saved pressure records must have Zubeh\u00f6r section');
+// After Workshop-Ergebnis: PDF-Blockstruktur - each accessory is a separate block
+// Check that accessory blocks exist (Entgasung, Nachspeisung, Wasseraufbereitung, Sicherheitsventil)
+const entgasungSection = sections.find(section => section.isLineSection && section.title.includes('Entgasung'));
+const nachspeisungSection = sections.find(section => section.isLineSection && section.title.includes('Nachspeisung'));
+const wasseraufbereitungSection = sections.find(section => section.isLineSection && section.title.includes('Wasseraufbereitung'));
+const sicherheitsventilSection = sections.find(section => section.isLineSection && section.title.includes('Sicherheitsventil'));
+
+// At least one accessory block should exist (Sicherheitsventil is always present)
+assert.ok(sicherheitsventilSection, 'saved pressure records must have Sicherheitsventil section');
+
+// Verify that the accessory blocks are in the correct order after Druckhaltung
+const druckhaltungIndex = sections.findIndex(s => s.isLineSection && s.title.includes('Druckhaltung'));
+const entgasungIndex = sections.findIndex(s => s.isLineSection && s.title.includes('Entgasung'));
+const nachspeisungIndex = sections.findIndex(s => s.isLineSection && s.title.includes('Nachspeisung'));
+const wasseraufbereitungIndex = sections.findIndex(s => s.isLineSection && s.title.includes('Wasseraufbereitung'));
+const sicherheitsventilIndex = sections.findIndex(s => s.isLineSection && s.title.includes('Sicherheitsventil'));
+
+// All accessory blocks should come after Druckhaltung
+if (entgasungIndex >= 0) assert.ok(entgasungIndex > druckhaltungIndex, 'Entgasung block should come after Druckhaltung');
+if (nachspeisungIndex >= 0) assert.ok(nachspeisungIndex > druckhaltungIndex, 'Nachspeisung block should come after Druckhaltung');
+if (wasseraufbereitungIndex >= 0) assert.ok(wasseraufbereitungIndex > druckhaltungIndex, 'Wasseraufbereitung block should come after Druckhaltung');
+assert.ok(sicherheitsventilIndex > druckhaltungIndex, 'Sicherheitsventil block should come after Druckhaltung');
 
 console.log('pressure-holding saved-record PDF values and intermediate results ok');
