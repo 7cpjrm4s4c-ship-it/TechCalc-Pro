@@ -16,6 +16,7 @@ const commands = [
   ['node', ['tests/hx-negative-humidification.test.mjs']],
   ['node', ['tests/hx-enthalpy-power.test.mjs']],
   ['node', ['tests/pressure-holding-pdf-saved-records.test.mjs']],
+  ['node', ['tests/ventilation-cooling-volume-flow-pdf.test.mjs']],
   ['node', ['tests/pressure-holding-mag-split.test.mjs']],
   ['node', ['tests/buffer-storage-pdf-saved-records.test.mjs']],
   ['node', ['tests/wastewater-pdf-saved-records.test.mjs']],

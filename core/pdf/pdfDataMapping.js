@@ -228,7 +228,7 @@ function parseGermanNumber(value = '') {
   if (!isPlainNumericText(clean)) return null;
   const normalized = clean.includes(',')
     ? clean.replace(/\./g, '').replace(',', '.')
-    : clean;
+    : (/^[-+]?\d{1,3}(?:\.\d{3})+$/.test(clean) ? clean.replace(/\./g, '') : clean);
   const number = Number(normalized);
   return Number.isFinite(number) ? number : null;
 }

@@ -1,4 +1,5 @@
 import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
+import { airDensity, ventilation } from '../../core/data/index.js';
 
 const MODE_PREFIX = { heating: 'heating', cooling: 'cooling' };
 const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
@@ -7,10 +8,49 @@ export function prefixFor(s = {}) { return MODE_PREFIX[s.mode] || 'heating'; }
 export function key(s = {}, name) { return `${prefixFor(s)}${name}`; }
 export function activeValue(s = {}, name) { return s[key(s, name)]; }
 
+function volumeFlowFromResult(r = {}) {
+  if (r.volumeFlowM3h) return r.volumeFlowM3h;
+  if (r.massFlowKgh && r.rho) return r.massFlowKgh / r.rho;
+  return null;
+}
+
+export function resolveLineSectionVolumeFlowM3h(item = {}) {
+  const direct = parseDisplayNumber(item.volumeFlowM3h);
+  if (direct) return direct;
+
+  const input = item.inputState || item.state || {};
+  const mode = input.mode || item.uiState?.mode || item.mode || 'heating';
+  const prefix = MODE_PREFIX[mode] || 'heating';
+  const active = {
+    mode,
+    calcTarget: input.calcTarget || input[`${prefix}CalcTarget`] || 'power',
+    powerW: input.powerW || input[`${prefix}PowerW`] || '',
+    powerUnit: input.powerUnit || input[`${prefix}PowerUnit`] || 'W',
+    volumeFlowM3h: input.volumeFlowM3h || input[`${prefix}VolumeFlowM3h`] || '',
+    supplyTemp: input.supplyTemp || input[`${prefix}SupplyTemp`] || '',
+    roomTemp: input.roomTemp || input[`${prefix}RoomTemp`] || ''
+  };
+  active.deltaT = input.deltaT ?? input[`${prefix}DeltaT`] ?? derivedDeltaT(active);
+
+  const recalculated = ventilation(active);
+  const fromInputState = volumeFlowFromResult(recalculated);
+  if (fromInputState) return String(fromInputState);
+
+  const supplyTemp = parseNumber(active.supplyTemp || item.supplyTemp, { fallback: NaN });
+  const rho = Number.isFinite(supplyTemp) ? airDensity(supplyTemp) : (recalculated.rho || airDensity(20));
+  const massFlow = parseDisplayNumber(item.massFlowKgh);
+  if (massFlow && rho) return String(massFlow / rho);
+  const powerKw = parseDisplayNumber(item.powerKw);
+  const deltaT = parseDisplayNumber(item.deltaT) || parseNumber(active.deltaT, { fallback: 0 });
+  if (powerKw && deltaT && rho) return String((powerKw * 1000) / ((rho * 1.005 / 3.6) * deltaT));
+  return '';
+}
+
 export function ventilationLineSectionStats(item = {}) {
+  const volumeFlow = resolveLineSectionVolumeFlowM3h(item);
   return [
     { label: 'Leistung', value: item.powerKw || '—', unit: item.powerKw && item.powerKw !== '—' ? 'kW' : '' },
-    { label: 'Volumenstrom', value: item.volumeFlowM3h || '—', unit: item.volumeFlowM3h && item.volumeFlowM3h !== '—' ? 'm³/h' : '' },
+    { label: 'Volumenstrom', value: volumeFlow ? fmt(volumeFlow) : '—', unit: volumeFlow ? 'm³/h' : '' },
     { label: 'Massenstrom', value: item.massFlowKgh || '—', unit: item.massFlowKgh && item.massFlowKgh !== '—' ? 'kg/h' : '' },
     { label: 'Temperaturdifferenz', value: item.deltaT || '—', unit: item.deltaT && item.deltaT !== '—' ? 'K' : '' },
     { label: 'Zuluft', value: item.supplyTemp || '—', unit: item.supplyTemp && item.supplyTemp !== '—' ? '°C' : '' },
@@ -24,7 +64,7 @@ export function buildVentilationLineSectionRecord(currentState, r, active, modeL
     id,
     name: name || currentState.activeVentLineSectionName || existing?.name || `Abschnitt ${items.length + 1}`,
     powerKw: fmt(r.powerKw),
-    volumeFlowM3h: fmt(r.volumeFlowM3h),
+    volumeFlowM3h: fmt(volumeFlowFromResult(r)),
     massFlowKgh: fmt(r.massFlowKgh),
     deltaT: fmt(r.deltaT),
     supplyTemp: fmt(active.supplyTemp),
@@ -78,7 +118,7 @@ export function savedVentilationPatch(item, currentState) {
     [`${prefix}CalcTarget`]: calcTarget,
     [`${prefix}PowerW`]: restoredPower,
     [`${prefix}PowerUnit`]: restoredPowerUnit,
-    [`${prefix}VolumeFlowM3h`]: firstFilled(input.volumeFlowM3h, input[`${prefix}VolumeFlowM3h`], parseDisplayNumber(item.volumeFlowM3h)),
+    [`${prefix}VolumeFlowM3h`]: firstFilled(input.volumeFlowM3h, input[`${prefix}VolumeFlowM3h`], parseDisplayNumber(item.volumeFlowM3h), resolveLineSectionVolumeFlowM3h(item)),
     [`${prefix}SupplyTemp`]: firstFilled(input.supplyTemp, input[`${prefix}SupplyTemp`], parseDisplayNumber(item.supplyTemp)),
     [`${prefix}RoomTemp`]: firstFilled(input.roomTemp, input[`${prefix}RoomTemp`], parseDisplayNumber(item.roomTemp)),
     activeVentLineSectionId: item.id,
