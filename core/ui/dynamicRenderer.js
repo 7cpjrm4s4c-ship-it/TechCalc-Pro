@@ -285,6 +285,7 @@ export function createPressureHoldingDynamicRenderer(options = {}) {
     renderVolumeFields,
     renderPressureFields,
     renderHoldingOptions,
+    renderAccessories,
     renderSavedPanel,
     renderResult,
     lineSectionController
@@ -295,14 +296,18 @@ export function createPressureHoldingDynamicRenderer(options = {}) {
 
   const structuralVolumeFields = ['waterContentMode'];
   const structuralPressureFields = ['connectionType'];
-  const structuralHoldingFields = ['holdingType'];
+  const structuralHoldingFields = ['holdingType', 'useServitec'];
+  const structuralAccessoriesFields = ['feedType', 'waterTreatmentMethod'];
   const savedFields = ['savedPlants', 'activePlantId', 'expandedPlantId'];
 
   function syncFields(root, s = {}) {
     updateSegment(root, 'systemType', s.systemType);
     updateSegment(root, 'holdingType', s.holdingType);
     updateSegment(root, 'connectionType', s.connectionType);
-    updateSegment(root, 'includeServitec', s.includeServitec);
+    updateSegment(root, 'useServitec', s.useServitec);
+    updateSegment(root, 'feedType', s.feedType);
+    updateSegment(root, 'waterTreatmentMethod', s.waterTreatmentMethod);
+    setSelectValue(root, 'systemSeparation', s.systemSeparation);
     setSelectValue(root, 'waterContentMode', s.waterContentMode);
     setSelectValue(root, 'frostMode', s.frostMode);
     setSelectValue(root, 'dynamicType', s.dynamicType);
@@ -317,6 +322,9 @@ export function createPressureHoldingDynamicRenderer(options = {}) {
     setInputValue(root, 'staticPressureBar', fmtInput?.(s.staticPressureBar, 2) ?? s.staticPressureBar);
     setInputValue(root, 'pumpPressureBar', fmtInput?.(s.pumpPressureBar, 2) ?? s.pumpPressureBar);
     setInputValue(root, 'safetyValveBar', fmtInput?.(s.safetyValveBar, 2) ?? s.safetyValveBar);
+    setInputValue(root, 'feedPressureBar', fmtInput?.(s.feedPressureBar, 2) ?? s.feedPressureBar);
+    setInputValue(root, 'feedLineLengthM', fmtInput?.(s.feedLineLengthM, 2) ?? s.feedLineLengthM);
+    setInputValue(root, 'regionalWaterHardness', fmtInput?.(s.regionalWaterHardness, 1) ?? s.regionalWaterHardness);
   }
 
   function update(root, s = {}, meta = {}) {
@@ -328,13 +336,17 @@ export function createPressureHoldingDynamicRenderer(options = {}) {
     const savedStructural = /^(saved:|pressure:)/.test(action) || hasAnyChanged(changed, savedFields);
     const volumeStructural = appStructural || hasAnyChanged(changed, structuralVolumeFields) || previous.waterContentMode !== s.waterContentMode;
     const pressureStructural = appStructural || hasAnyChanged(changed, structuralPressureFields) || previous.connectionType !== s.connectionType;
-    const holdingStructural = appStructural || hasAnyChanged(changed, structuralHoldingFields) || previous.holdingType !== s.holdingType;
+    const holdingStructural = appStructural || hasAnyChanged(changed, structuralHoldingFields) || previous.holdingType !== s.holdingType || previous.useServitec !== s.useServitec;
+    const accessoriesStructural = appStructural || hasAnyChanged(changed, structuralAccessoriesFields) || 
+      previous.feedType !== s.feedType || 
+      previous.waterTreatmentMethod !== s.waterTreatmentMethod;
     const basisStructural = appStructural || holdingStructural || pressureStructural || hasAnyChanged(changed, ['systemType']);
 
     if (basisStructural && typeof renderBasis === 'function') setIslandInner(root, '[data-ph-dynamic="basis"]', renderBasis(s, r, 'purple'));
     if (volumeStructural && typeof renderVolumeFields === 'function') setIslandInner(root, '[data-ph-dynamic="volume-fields"]', renderVolumeFields(s, r, 'purple'));
     if (pressureStructural && typeof renderPressureFields === 'function') setIslandInner(root, '[data-ph-dynamic="pressure-fields"]', renderPressureFields(s, r, 'purple'));
     if (holdingStructural && typeof renderHoldingOptions === 'function') setIslandInner(root, '[data-ph-dynamic="holding-options"]', renderHoldingOptions(s, r, 'purple'));
+    if (accessoriesStructural && typeof renderAccessories === 'function') setIslandInner(root, '[data-ph-dynamic="accessories"]', renderAccessories(s, r, 'purple'));
     if (savedStructural && typeof renderSavedPanel === 'function') setIslandInner(root, '[data-ph-dynamic="saved-records"]', renderSavedPanel(s, r, 'purple'));
 
     syncFields(root, s);
@@ -344,6 +356,9 @@ export function createPressureHoldingDynamicRenderer(options = {}) {
       waterContentMode: s.waterContentMode,
       connectionType: s.connectionType,
       holdingType: s.holdingType,
+      useServitec: s.useServitec,
+      feedType: s.feedType,
+      waterTreatmentMethod: s.waterTreatmentMethod,
       activePlantId: s.activePlantId,
       expandedPlantId: s.expandedPlantId
     };

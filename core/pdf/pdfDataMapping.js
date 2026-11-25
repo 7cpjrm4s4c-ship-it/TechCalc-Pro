@@ -226,6 +226,19 @@ function isPlainNumericText(value = '') {
 function parseGermanNumber(value = '') {
   const clean = sanitizeText(value).replace(/\s/g, '');
   if (!isPlainNumericText(clean)) return null;
+  
+  // Check if this is a German formatted number with thousands separator (dot)
+  // Pattern: digits.digits (where the part after dot has exactly 3 digits, and there's no comma)
+  // Examples: "16.000", "8.500", "10.600"
+  const thousandsPattern = /^([-+]?\d+)\.(\d{3})($|[^\d])/;
+  if (thousandsPattern.test(clean) && !clean.includes(',')) {
+    // Remove all dots (thousands separators)
+    const normalized = clean.replace(/\./g, '');
+    const number = Number(normalized);
+    return Number.isFinite(number) ? number : null;
+  }
+  
+  // Standard parsing: if comma exists, dots are thousands separators; otherwise dots are decimal
   const normalized = clean.includes(',')
     ? clean.replace(/\./g, '').replace(',', '.')
     : clean;
@@ -301,7 +314,7 @@ export function isLineSectionTitle(title = '') {
   return /leitungsabschnitt|rohrauslegung|speicher|puffer|druckhaltung|mischluft|wärmerückgewinnung|waermerueckgewinnung|trinkwasser|schmutzwasser|gespeicherte|h,x-prozess|hx-prozess/i.test(sanitizeText(title));
 }
 
-export function lineSectionItems(rows = []) {
+export function lineSectionItems(rows = [], sectionTitle = '', notes = [], isNotesBlock = false) {
   const items = [];
   let current = [];
   let title = '';
@@ -309,8 +322,18 @@ export function lineSectionItems(rows = []) {
   const pushCurrent = () => {
     if (!hasRows(current)) return;
     const index = items.length + 1;
-    const cleanTitle = sanitizeText(title) || `Leitungsabschnitt ${index}`;
-    items.push({ title: cleanTitle, rows: current });
+    // Use sectionTitle if provided, otherwise fall back to designation row or default
+    const cleanTitle = sanitizeText(sectionTitle) || sanitizeText(title) || `Leitungsabschnitt ${index}`;
+    const item = { title: cleanTitle, rows: current };
+    // Add notes if provided (Auftrag A - Runde 7: Hinweise als vollbreiter Abschluss)
+    if (notes && notes.length > 0) {
+      item.notes = notes;
+    }
+    // Pass through isNotesBlock flag (Auftrag A - Runde 9)
+    if (isNotesBlock) {
+      item.isNotesBlock = true;
+    }
+    items.push(item);
     current = [];
     title = '';
   };
@@ -328,7 +351,7 @@ export function lineSectionItems(rows = []) {
     if (label || value || unit) current.push([label, value, unit]);
   });
   pushCurrent();
-  if (!items.length && hasRows(rows)) items.push({ title: 'Leitungsabschnitt 1', rows });
+  if (!items.length && hasRows(rows)) items.push({ title: sectionTitle || 'Leitungsabschnitt 1', rows, notes, isNotesBlock });
   return items;
 }
 function normalizePdfRows(rows = [], title = '') {

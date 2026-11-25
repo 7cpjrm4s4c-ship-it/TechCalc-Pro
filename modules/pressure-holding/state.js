@@ -21,5 +21,12 @@ export const state = createModuleState({
   plantName: '',
   activePlantId: null,
   expandedPlantId: null,
-  savedPlants: []
+  savedPlants: [],
+  useServitec: 'true',
+  feedType: 'manual',
+  feedPressureBar: '',
+  systemSeparation: 'systemSeparator',
+  feedLineLengthM: '',
+  waterTreatmentMethod: 'softening',
+  regionalWaterHardness: ''
 });

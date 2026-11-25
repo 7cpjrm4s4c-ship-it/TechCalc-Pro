@@ -129,7 +129,13 @@ const VALUE_LABELS = Object.freeze({
   large: 'Groß',
   red: 'rot',
   green: 'grün',
-  yellow: 'gelb'
+  yellow: 'gelb',
+  manual: 'Manuell',
+  auto: 'Automatisch',
+  softening: 'Enthärtung',
+  desalination: 'Entsalzung',
+  systemSeparator: 'DVGW-geprüfter Systemtrenner',
+  networkSeparator: 'Netztrennbehälter'
 });
 
 const UNITS_BY_KEY = Object.freeze({
@@ -258,11 +264,27 @@ function formatNumber(value, fractionDigits = 2) {
 }
 
 function shouldParseNumericString(value = '') {
+  // NEVER re-parse already formatted strings to avoid double-formatting
+  // German formatted numbers use dot as thousands separator (e.g., "8.500" = 8500) or comma as decimal separator (e.g., "12,8")
+  // If we parse these, we get wrong values (8.5 from "8.500", NaN from "12,8") which then format incorrectly
+  // Only parse strings that are clearly unformatted (no formatting characters)
   const text = String(value).trim();
-  if (!/^-?\d+(?:\.\d+)?$/.test(text)) return false;
-  const fraction = text.split('.')[1] || '';
-  if (!fraction) return false;
-  return !(fraction.length === 3 && /^0+$/.test(fraction));
+  
+  // Reject any string that contains a dot followed by exactly 3 digits (German thousands separator)
+  // Examples: "8.500", "10.600", "16.000" - these are already formatted
+  if (/\.\d{3}(\D|$)/.test(text)) return false;
+  
+  // Reject strings with multiple dots
+  if ((text.match(/\./g) || []).length > 1) return false;
+  
+  // Reject strings with comma - these are already formatted German numbers (e.g., "12,8", "16,000")
+  // JavaScript Number() doesn't understand comma as decimal separator
+  if (text.includes(',')) return false;
+  
+  // Only parse plain integer numbers without any formatting
+  // Accept: "123", "-5", "0"
+  // Reject: "123.456" (thousands), "12,8" (decimal), "123,5" (decimal)
+  return /^-?\d+$/.test(text);
 }
 
 function formatScalar(value) {
@@ -399,6 +421,13 @@ function rowsFromCard(card = {}) {
 }
 
 function sectionFromCard(card = {}, index = 0) {
+  // Handle groups with nested subgroups (e.g., Zubeh\u00f6r with Entgasung, Nachspeisung, etc.)
+  if (card.groups && Array.isArray(card.groups)) {
+    return {
+      title: card.title || card.label || `Ergebnis ${index + 1}`,
+      rows: card.groups.flatMap(group => rowsFromCard(group))
+    };
+  }
   return {
     title: card.title || card.label || `Ergebnis ${index + 1}`,
     rows: rowsFromCard(card)
@@ -408,7 +437,15 @@ function sectionFromCard(card = {}, index = 0) {
 function resultModelSections(resultModel) {
   if (!resultModel) return [];
   if (Array.isArray(resultModel.sections)) return resultModel.sections.map(sectionFromCard);
-  if (Array.isArray(resultModel.groups)) return resultModel.groups.map(sectionFromCard);
+  if (Array.isArray(resultModel.groups)) {
+    return resultModel.groups.flatMap(group => {
+      // Handle nested groups (e.g., Zubeh\u00f6r with subgroups)
+      if (group.groups && Array.isArray(group.groups)) {
+        return [sectionFromCard(group), ...group.groups.map(sectionFromCard)];
+      }
+      return [sectionFromCard(group)];
+    });
+  }
   if (Array.isArray(resultModel.cards)) return resultModel.cards.map(sectionFromCard);
   if (resultModel.primary) return [sectionFromCard(resultModel.primary)];
   return [{ title: 'Ergebnis', rows: rowsFromObject(resultModel) }].filter(section => section.rows.length);
@@ -488,12 +525,91 @@ function isLineSectionRecordKey(key = '') {
 function savedRecordSections(snapshot = {}) {
   return Object.entries(object(snapshot)).flatMap(([key, value]) => {
     if (!/^saved[A-Z].*s$/.test(key) || !Array.isArray(value) || !value.length) return [];
-    return value.map((record, index) => ({
-      title: savedRecordBaseTitle(key),
-      rows: savedRecordRows(record, index, key),
-      isLineSection: isLineSectionRecordKey(key)
-    })).filter(section => section.rows.length);
-  });
+    return value.flatMap((record, index) => {
+      const allRows = savedRecordRows(record, index, key);
+      
+      // Special handling for pressure-holding module: use structured accessory blocks
+      // (Auftrag A, C, D - Runde 6: structured data instead of regex filtering)
+      if (key === 'savedPlants' && Array.isArray(record.rows) && record.result?.accessoryBlocks) {
+        // Find the index where accessories start (first row with label containing accessory terms)
+        const accessoryStartIndex = allRows.findIndex(row => {
+          const label = row[0] || '';
+          return /Servitec Typ|Nachspeisesystem|Verfahrens|Anschlussgr[\u00f6\u00d6\u00f6\\u00f6]\u00dfe|Sicherheitsventil/i.test(label);
+        });
+        
+        if (accessoryStartIndex > 0) {
+          // Split rows into Druckhaltung and accessories
+          const druckhaltungRows = allRows.slice(0, accessoryStartIndex);
+          
+          const recordTitle = savedRecordBaseTitle(key) || 'Anlage';
+          const recordName = valueToText(record.name ?? record.title ?? record.label ?? '') || `${recordTitle} ${index + 1}`;
+          
+          const sections = [
+            {
+              title: `${recordName} – Druckhaltung`,
+              rows: druckhaltungRows,
+              isLineSection: true
+            }
+          ];
+          
+          // Collect all notes from accessory blocks for separate "Hinweise" block (Auftrag A - Runde 8)
+          const allNotes = [];
+          const accessoryBlocks = record.result.accessoryBlocks || [];
+          
+          // Fixed order: Spr\u00fchrohrentgaser, Nachspeiseeinrichtung, Wasseraufbereitung, Sicherheitsventil
+          const fixedOrder = ['Spr\u00fchrohrentgaser', 'Nachspeiseeinrichtung', 'Wasseraufbereitung', 'Sicherheitsventil'];
+          
+          fixedOrder.forEach(title => {
+            const block = accessoryBlocks.find(b => b.title === title);
+            if (block && block.fieldPairs && block.fieldPairs.length > 0) {
+              // Convert fieldPairs to rows format for compatibility
+              const rows = block.fieldPairs.map(fp => [fp.label, fp.value, fp.unit || '']);
+              sections.push({
+                title,
+                rows,
+                isLineSection: true
+              });
+              
+              // Collect notes with block name prefix (Auftrag A - Runde 8)
+              if (block.notes && block.notes.length > 0) {
+                block.notes.forEach(note => {
+                  allNotes.push(`${title}: ${note}`);
+                });
+              }
+            }
+          });
+          
+          // Add separate "Hinweise" block if there are any notes (Auftrag A - Runde 9)
+          // Each note is a row with 2 cells: [blockName, noteText]
+          // Block name in first cell (1 column), note text in second cell (3 columns)
+          if (allNotes.length > 0) {
+            sections.push({
+              title: 'Hinweise',
+              rows: allNotes.map(note => {
+                // Split note at first colon to separate block name from note text
+                const colonIndex = note.indexOf(': ');
+                if (colonIndex > 0) {
+                  return [note.substring(0, colonIndex), note.substring(colonIndex + 2)];
+                }
+                return [note, ''];
+              }),
+              isLineSection: true,
+              // Mark as notes block for special rendering (Auftrag A - Runde 9)
+              isNotesBlock: true
+            });
+          }
+          
+          return sections.filter(section => section.rows.length);
+        }
+      }
+      
+      return [{
+        title: savedRecordBaseTitle(key),
+        rows: allRows,
+        isLineSection: isLineSectionRecordKey(key)
+      }];
+    }).filter(section => section.rows.length);
+  })
 }
 
 export function buildGenericModuleReportDto({

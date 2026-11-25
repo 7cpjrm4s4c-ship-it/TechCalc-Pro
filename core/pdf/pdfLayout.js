@@ -348,9 +348,119 @@ export class GlobalPdfReport {
     }
   }
 
+  notesBlock(item) {
+    // Special rendering for Hinweise block with 1:3 column ratio (Auftrag A - Runde 9)
+    // Each note is one row with 2 cells: label (1 column) and text (3 columns)
+    const m = PDF_THEME.margin;
+    const w = PDF_PAGE.width - m * 2;
+    const innerX = m + 5;
+    const innerW = w - 10;
+    
+    // For notes block, use 1:3 column ratio
+    // Label column: 1/4 of width, Value column: 3/4 of width
+    const labelW = innerW * 0.25;
+    const valueW = innerW * 0.75;
+    const valueX = innerX + labelW;
+    
+    // Each note is its own row (no pairing)
+    const rows = item.rows || [];
+    if (!rows.length) return;
+    
+    // Calculate row heights
+    const rowHeights = rows.map(row => {
+      const labelLines = splitPdfText(row?.[0] || '', labelW - 4, 6.2, 'F2').length;
+      const valueLines = splitPdfText(row?.[1] || '', valueW - 4, 6.35, 'F1').length;
+      return Math.max(PDF_THEME.table.rowMinHeight, 
+        Math.max(labelLines, valueLines) * Math.max(6.2, 6.35) * 1.22 + 
+        PDF_THEME.table.rowPaddingTop + 
+        PDF_THEME.table.rowPaddingBottom);
+    });
+    
+    const headerHeight = 18;
+    const topPad = 4.5;
+    const bottomPad = 5.5;
+    const fullBlockHeight = headerHeight + topPad + sumHeights(rowHeights) + bottomPad + 2;
+    
+    if (fitsOnEmptyContentPage(this, fullBlockHeight) && this.cursorY + fullBlockHeight > this.contentBottom()) {
+      this.addPage();
+    }
+    
+    let index = 0;
+    let continued = false;
+    while (index < rows.length) {
+      const maxBodyHeight = Math.max(38, this.contentBottom() - this.cursorY - headerHeight - topPad - bottomPad - 8);
+      let segmentHeight = 0;
+      let endIndex = index;
+      while (endIndex < rows.length && (segmentHeight + rowHeights[endIndex] <= maxBodyHeight || endIndex === index)) {
+        segmentHeight += rowHeights[endIndex];
+        endIndex += 1;
+      }
+      const blockHeight = headerHeight + topPad + segmentHeight + bottomPad;
+      if (this.ensureSpace(blockHeight + 2) && fitsOnEmptyContentPage(this, blockHeight + 2)) continue;
+      
+      const y0 = this.cursorY;
+      const bodyTop = y0 + headerHeight + topPad;
+      
+      // Draw block background and border
+      this.rect(m, y0, w, blockHeight, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.55 });
+      this.rect(m, y0, w, headerHeight, { fill: PDF_THEME.soft, stroke: PDF_THEME.line, width: 0.45 });
+      
+      // Draw title
+      const title = continued ? `${item.title || 'Abschnitt'} (Fortsetzung)` : (item.title || 'Abschnitt');
+      this.text(title, m + 5, y0 + 11.2, { size: 7.8, font: 'F2', maxWidth: w - 10 });
+      
+      // Draw rows
+      let rowY = bodyTop;
+      for (let rowIndex = index; rowIndex < endIndex; rowIndex += 1) {
+        const row = rows[rowIndex];
+        const h = rowHeights[rowIndex];
+        
+        // Draw row separator line
+        this.line(innerX, rowY + h - 2.1, innerX + innerW, rowY + h - 2.1, PDF_THEME.rowLine, 0.32);
+        
+        // Draw label (first cell, 1 column width)
+        const label = row?.[0] || '';
+        const labelLines = splitPdfText(label, labelW - 4, 6.2, 'F2').length;
+        const labelBlockH = Math.max(6.2, labelLines * 6.2 * 1.15);
+        const labelBaseline = rowY + Math.max(PDF_THEME.table.rowPaddingTop + 6.2, (h - labelBlockH) / 2 + 6.2);
+        this.text(label, innerX, labelBaseline, {
+          size: 6.2,
+          font: 'F2',
+          color: PDF_THEME.table.labelColor,
+          maxWidth: labelW - 4,
+          lineHeight: 1.15
+        });
+        
+        // Draw value (second cell, 3 column width)
+        const value = row?.[1] || '';
+        const valueLines = splitPdfText(value, valueW - 4, 6.35, 'F1').length;
+        const valueBlockH = Math.max(6.35, valueLines * 6.35 * 1.18);
+        const valueBaseline = rowY + Math.max(PDF_THEME.table.rowPaddingTop + 6.35, (h - valueBlockH) / 2 + 6.35);
+        this.text(value, valueX, valueBaseline, {
+          size: 6.35,
+          font: 'F1',
+          color: PDF_THEME.table.valueColor,
+          maxWidth: valueW - 4,
+          lineHeight: 1.18
+        });
+        
+        rowY += h;
+      }
+      
+      this.cursorY += blockHeight + 6;
+      index = endIndex;
+      continued = true;
+    }
+  }
+
   lineBlock(item, groupTitle = '') {
     if (isFullWidthListBlock(item)) {
       this.fullWidthLineBlock(item);
+      return;
+    }
+    // Special rendering for Hinweise block (Auftrag A - Runde 9)
+    if (item.isNotesBlock) {
+      this.notesBlock(item);
       return;
     }
     const pairs = pairedRowsForPdf(item.rows);
@@ -537,10 +647,7 @@ export class GlobalPdfReport {
         this.sectionChartBlock(section, index);
       });
     } else if (lineSections.length) {
-      const lineGroupTitle = 'LEITUNGSABSCHNITTE';
-      this.ensureSpace(sectionTitleHeight(lineGroupTitle) + 44);
-      this.sectionTitle(lineGroupTitle);
-      lineSections.forEach(section => lineSectionItems(section.rows).forEach(item => this.lineBlock(item, lineGroupTitle)));
+      lineSections.forEach(section => lineSectionItems(section.rows, section.title, [], section.isNotesBlock).forEach(item => this.lineBlock(item, section.title)));
     } else {
       sections.forEach(section => this.standardSection(section));
     }

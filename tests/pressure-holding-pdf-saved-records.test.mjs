@@ -56,13 +56,97 @@ const sections = reportSections({
   reportDto: dto,
   reportSource: 'typed-dto'
 });
-const savedSection = sections.find(section => section.isLineSection && section.title === 'Anlage');
-assert.ok(savedSection, 'saved pressure records must be exported as line-section style report blocks');
-const rows = savedSection.rows;
+// After Review-Runde 2 req 4: each saved record is split into Druckhaltung and accessory blocks
+const druckhaltungSection = sections.find(section => section.isLineSection && section.title.includes('Druckhaltung'));
+assert.ok(druckhaltungSection, 'saved pressure records must have Druckhaltung section');
+const rows = druckhaltungSection.rows;
 assert.ok(rows.some(row => row[0] === 'Anlagenvolumen' && row[1] === '16.000' && row[2] === 'l'));
 assert.ok(rows.some(row => row[0] === 'Standardvolumen' && row[1] === expectedStandardPdf && row[2] === 'l'));
 assert.ok(rows.some(row => row[0] === 'Ausdehnungskoeffizient'));
 assert.ok(rows.some(row => row[0] === 'Verdampfungsdruck'));
 assert.ok(rows.some(row => row[0] === 'Verwendeter statischer Druck'));
+
+// After Workshop-Ergebnis: PDF-Blockstruktur - each accessory is a separate block
+// Check that accessory blocks exist (Entgasung, Nachspeisung, Wasseraufbereitung, Sicherheitsventil)
+const entgasungSection = sections.find(section => section.isLineSection && section.title.includes('Entgasung'));
+const nachspeisungSection = sections.find(section => section.isLineSection && section.title.includes('Nachspeisung'));
+const wasseraufbereitungSection = sections.find(section => section.isLineSection && section.title.includes('Wasseraufbereitung'));
+const sicherheitsventilSection = sections.find(section => section.isLineSection && section.title.includes('Sicherheitsventil'));
+
+// At least one accessory block should exist (Sicherheitsventil is always present)
+assert.ok(sicherheitsventilSection, 'saved pressure records must have Sicherheitsventil section');
+
+// Verify that the accessory blocks are in the correct order after Druckhaltung
+const druckhaltungIndex = sections.findIndex(s => s.isLineSection && s.title.includes('Druckhaltung'));
+const entgasungIndex = sections.findIndex(s => s.isLineSection && s.title.includes('Entgasung'));
+const nachspeisungIndex = sections.findIndex(s => s.isLineSection && s.title.includes('Nachspeisung'));
+const wasseraufbereitungIndex = sections.findIndex(s => s.isLineSection && s.title.includes('Wasseraufbereitung'));
+const sicherheitsventilIndex = sections.findIndex(s => s.isLineSection && s.title.includes('Sicherheitsventil'));
+
+// All accessory blocks should come after Druckhaltung
+if (entgasungIndex >= 0) assert.ok(entgasungIndex > druckhaltungIndex, 'Entgasung block should come after Druckhaltung');
+if (nachspeisungIndex >= 0) assert.ok(nachspeisungIndex > druckhaltungIndex, 'Nachspeisung block should come after Druckhaltung');
+if (wasseraufbereitungIndex >= 0) assert.ok(wasseraufbereitungIndex > druckhaltungIndex, 'Wasseraufbereitung block should come after Druckhaltung');
+assert.ok(sicherheitsventilIndex > druckhaltungIndex, 'Sicherheitsventil block should come after Druckhaltung');
+
+console.log('pressure-holding saved-record PDF values and intermediate results ok');
+
+// ============================================================================
+// Runde 9: Hinweise block 2-column table format tests
+// ============================================================================
+
+// Test that Hinweise block uses 2-column format
+const stateR9 = {
+  plantName: 'Test R9',
+  systemType: 'heating',
+  holdingType: 'mag',
+  useServitec: 'true',
+  connectionType: 'suction',
+  waterContentMode: 'known',
+  systemVolumeL: '500',
+  additionalVolumeL: '',
+  frostMode: 'water',
+  tMaxC: '50',
+  tMinC: '10',
+  staticHeightM: '10',
+  staticPressureBar: '',
+  pumpPressureBar: '',
+  safetyValveBar: '3',
+  dynamicType: 'reflexomat',
+  feedType: 'auto',
+  feedPressureBar: '3.0',
+  systemSeparation: 'systemSeparator',
+  feedLineLengthM: '15',
+  waterTreatmentMethod: 'softening',
+  regionalWaterHardness: '15',
+  heatPowerKw: '3000'
+};
+
+const resultR9 = calculate(stateR9);
+const recordR9 = buildPressureRecord(stateR9, resultR9, [], 'test-r9', 'Test R9');
+pressureHoldingModule.calculate(stateR9);
+const dtoR9 = pressureHoldingModule.report({ ...stateR9, savedPlants: [recordR9] });
+const sectionsR9 = reportSections({
+  id: 'pressure-holding',
+  title: 'Druckhaltung',
+  shortTitle: 'Druckhaltung',
+  reportDto: dtoR9,
+  reportSource: 'typed-dto'
+});
+
+const hinweiseR9 = sectionsR9.find(s => s.isLineSection && s.title === 'Hinweise');
+assert.ok(hinweiseR9, 'Hinweise section exists (Runde 9)');
+
+if (hinweiseR9) {
+  const rows = hinweiseR9.rows || [];
+  assert.ok(rows.length > 0, 'Hinweise has rows (Runde 9)');
+  
+  // Each row should have at least 2 cells (label and value)
+  rows.forEach(row => {
+    assert.ok(row.length >= 2, 'Each Hinweise row must have at least 2 cells (Runde 9)');
+    assert.ok(row[0], 'Label cell must not be empty (Runde 9)');
+    assert.ok(row[1], 'Value cell must not be empty (Runde 9)');
+  });
+}
 
 console.log('pressure-holding saved-record PDF values and intermediate results ok');

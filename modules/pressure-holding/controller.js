@@ -2,6 +2,12 @@ import { createLineSectionController } from '../../core/runtime/index.js';
 import { state } from './state.js';
 import { calculate } from './logic.js';
 import { formatNumber, parseNumber } from '../../core/engineering/numberService.js';
+import {
+  servitecAccessoryRows,
+  fillSystemAccessoryRows,
+  waterTreatmentAccessoryRows,
+  safetyValveAccessoryRows
+} from './results.js';
 
 const fmt = (value, digits = 2) => formatNumber(value, { maximumFractionDigits: digits });
 function num(value) {
@@ -58,11 +64,14 @@ function pressureResultRows(currentState = {}, result = {}) {
     { label: 'Schließdruckdifferenz', value: result.asv, unit: 'bar', digits: 2 },
     { label: 'Volumenfaktor', value: result.factor, digits: 2 }
   ];
+  
+
+  
   return rows
     .filter(row => row.value !== undefined && row.value !== null && row.value !== '')
     .map(row => [
       row.label,
-      typeof row.value === 'number' ? fmt(row.value, row.digits ?? 2) : String(row.value),
+      typeof row.value === 'number' ? row.value : row.value,
       row.unit || ''
     ]);
 }
@@ -72,6 +81,76 @@ export function buildPressureRecord(currentState = {}, result = {}, items = [], 
   delete copy.activePlantId;
   delete copy.expandedPlantId;
   const systemVolume = num(result.systemVolume) || num(currentState.systemVolumeL);
+  const acc = result.accessories || {};
+  
+  // Store structured accessory blocks for PDF generation (Auftrag A, C, D - Runde 6)
+  // This allows PDF adapter to use structured data instead of regex filtering
+  const accessoryBlocks = [];
+  
+  // Sprührohrentgaser block
+  const servitecRows = servitecAccessoryRows(currentState, result);
+  if (servitecRows.length > 0) {
+    accessoryBlocks.push({
+      type: 'accessoryBlock',
+      title: 'Sprührohrentgaser',
+      // Separate field pairs from notes (Auftrag A - Runde 7)
+      fieldPairs: servitecRows.filter(row => !row.isNote && !row.isWarning).map(row => ({
+        label: row.label,
+        value: row.value,
+        unit: row.unit || ''
+      })),
+      notes: servitecRows.filter(row => row.isNote || row.isWarning).map(row => row.value)
+    });
+  }
+  
+  // Nachspeiseeinrichtung block
+  const fillSystemRows = fillSystemAccessoryRows(currentState, result);
+  if (fillSystemRows.length > 0) {
+    accessoryBlocks.push({
+      type: 'accessoryBlock',
+      title: 'Nachspeiseeinrichtung',
+      // Separate field pairs from notes (Auftrag A - Runde 7)
+      fieldPairs: fillSystemRows.filter(row => !row.isNote && !row.isWarning).map(row => ({
+        label: row.label,
+        value: row.value,
+        unit: row.unit || ''
+      })),
+      notes: fillSystemRows.filter(row => row.isNote || row.isWarning).map(row => row.value)
+    });
+  }
+  
+  // Wasseraufbereitung block
+  const waterTreatmentRows = waterTreatmentAccessoryRows(currentState, result);
+  if (waterTreatmentRows.length > 0) {
+    accessoryBlocks.push({
+      type: 'accessoryBlock',
+      title: 'Wasseraufbereitung',
+      // Separate field pairs from notes (Auftrag A - Runde 7)
+      fieldPairs: waterTreatmentRows.filter(row => !row.isNote && !row.isWarning).map(row => ({
+        label: row.label,
+        value: row.value,
+        unit: row.unit || ''
+      })),
+      notes: waterTreatmentRows.filter(row => row.isNote || row.isWarning).map(row => row.value)
+    });
+  }
+  
+  // Sicherheitsventil block
+  const safetyValveRows = safetyValveAccessoryRows(currentState, result);
+  if (safetyValveRows.length > 0) {
+    accessoryBlocks.push({
+      type: 'accessoryBlock',
+      title: 'Sicherheitsventil',
+      // Separate field pairs from notes (Auftrag A - Runde 7)
+      fieldPairs: safetyValveRows.filter(row => !row.isNote && !row.isWarning).map(row => ({
+        label: row.label,
+        value: row.value,
+        unit: row.unit || ''
+      })),
+      notes: safetyValveRows.filter(row => row.isNote || row.isWarning).map(row => row.value)
+    });
+  }
+  
   return {
     id,
     name: name || currentState.plantName?.trim() || existing?.name || `${currentState.holdingType === 'dynamic' ? (currentState.dynamicType === 'variomat' ? 'Variomat' : 'Reflexomat') : 'MAG'} ${items.length + 1}`,
@@ -97,18 +176,71 @@ export function buildPressureRecord(currentState = {}, result = {}, items = [], 
       ve: result.ve,
       vv: result.vv,
       asv: result.asv,
-      factor: result.factor
+      factor: result.factor,
+      // Store accessory blocks in result for PDF adapter access
+      accessoryBlocks
     },
-    rows: pressureResultRows(currentState, result)
+    rows: [
+      ...pressureResultRows(currentState, result),
+      // Zubehör-Zeilen aus deutschen Zeilenfunktionen (Befund 2)
+      // Filter out note/warning rows - they are stored separately in accessoryBlocks (Auftrag A - Runde 7)
+      ...servitecRows.filter(row => !row.isNote && !row.isWarning).map(row => [row.label, row.value, row.unit || '']),
+      ...fillSystemRows.filter(row => !row.isNote && !row.isWarning).map(row => [row.label, row.value, row.unit || '']),
+      ...waterTreatmentRows.filter(row => !row.isNote && !row.isWarning).map(row => [row.label, row.value, row.unit || '']),
+      ...safetyValveRows.filter(row => !row.isNote && !row.isWarning).map(row => [row.label, row.value, row.unit || ''])
+    ].filter(row => row[1] !== undefined && row[1] !== null && row[1] !== '')
   };
 }
 export function hydratePressureRecord(item = {}, current = {}){
-  return item?.state ? {
-    ...item.state,
+  // Migration: includeServitec -> useServitec
+  const state = item?.state ? { ...item.state } : {};
+  
+  // Wenn useServitec nicht gesetzt ist, aber includeServitec gesetzt war, migriere
+  if (state.useServitec === undefined && state.includeServitec !== undefined) {
+    state.useServitec = state.includeServitec;
+  }
+  
+  // Default für useServitec auf 'true' setzen, wenn nicht vorhanden
+  if (state.useServitec === undefined) {
+    state.useServitec = 'true';
+  }
+  
+  // Default für feedType auf 'manual' setzen
+  if (state.feedType === undefined) {
+    state.feedType = 'manual';
+  }
+  
+  // Default für feedPressureBar auf leeren String setzen
+  if (state.feedPressureBar === undefined) {
+    state.feedPressureBar = '';
+  }
+  
+  // Default für systemSeparation auf 'systemSeparator' setzen
+  if (state.systemSeparation === undefined) {
+    state.systemSeparation = 'systemSeparator';
+  }
+  
+  // Default für feedLineLengthM auf leeren String setzen
+  if (state.feedLineLengthM === undefined) {
+    state.feedLineLengthM = '';
+  }
+  
+  // Default für waterTreatmentMethod auf 'softening' setzen
+  if (state.waterTreatmentMethod === undefined) {
+    state.waterTreatmentMethod = 'softening';
+  }
+  
+  // Default für regionalWaterHardness auf leeren String setzen
+  if (state.regionalWaterHardness === undefined) {
+    state.regionalWaterHardness = '';
+  }
+  
+  return state ? {
+    ...state,
     savedPlants: current.savedPlants || [],
     activePlantId: item.id,
     expandedPlantId: current.expandedPlantId || null,
-    plantName: item.name || item.state?.plantName || ''
+    plantName: item.name || state.plantName || ''
   } : {};
 }
 export const pressureHoldingSavedController = createLineSectionController({
