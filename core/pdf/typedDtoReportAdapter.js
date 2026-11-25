@@ -528,27 +528,21 @@ function savedRecordSections(snapshot = {}) {
     return value.flatMap((record, index) => {
       const allRows = savedRecordRows(record, index, key);
       
-      // Special handling for pressure-holding module: split into Druckhaltung and accessory blocks
-      if (key === 'savedPlants' && Array.isArray(record.rows)) {
+      // Special handling for pressure-holding module: use structured accessory blocks
+      // (Auftrag A, C, D - Runde 6: structured data instead of regex filtering)
+      if (key === 'savedPlants' && Array.isArray(record.rows) && record.result?.accessoryBlocks) {
         // Find the index where accessories start (first row with label containing accessory terms)
         const accessoryStartIndex = allRows.findIndex(row => {
           const label = row[0] || '';
-          return /Servitec Typ|Nachspeisesystem|Verfahrens|Anschlussgr[ö\u00f6]\u00dfe|Sicherheitsventil/i.test(label);
+          return /Servitec Typ|Nachspeisesystem|Verfahrens|Anschlussgr[\u00f6\u00d6\u00f6\\u00f6]\u00dfe|Sicherheitsventil/i.test(label);
         });
         
         if (accessoryStartIndex > 0) {
           // Split rows into Druckhaltung and accessories
           const druckhaltungRows = allRows.slice(0, accessoryStartIndex);
-          const accessoryRows = allRows.slice(accessoryStartIndex);
           
           const recordTitle = savedRecordBaseTitle(key) || 'Anlage';
           const recordName = valueToText(record.name ?? record.title ?? record.label ?? '') || `${recordTitle} ${index + 1}`;
-          
-          // Group accessory rows by accessory type
-          const servitecRows = accessoryRows.filter(row => /Servitec Typ|Betrachtetes Anlagenvolumen/i.test(row[0] || ''));
-          const fillSystemRows = accessoryRows.filter(row => /Nachspeisesystem|Kvs Wert|Nachspeisemenge|Pumpe max|Fließdruck|Druckdifferenz|Länge|Systemtrennung/i.test(row[0] || ''));
-          const waterTreatmentRows = accessoryRows.filter(row => /Verfahren|Gesamtwasserhärte|Füll und Ergänzungswassermenge|Erforderliche Patronenzahl|Restnachspeisemenge/i.test(row[0] || ''));
-          const safetyValveRows = accessoryRows.filter(row => /Empfohlene Anschlussgröße|Abblaseleistung|Sicherheitsventil p SV|Enddruck pe|Schließdruckdifferenz ASV|Reserve/i.test(row[0] || ''));
           
           const sections = [
             {
@@ -558,35 +552,27 @@ function savedRecordSections(snapshot = {}) {
             }
           ];
           
-          // Add accessory blocks in fixed order
-          if (servitecRows.length) {
-            sections.push({
-              title: `${recordName} – Entgasung (Servitec)`,
-              rows: servitecRows,
-              isLineSection: true
-            });
-          }
-          if (fillSystemRows.length) {
-            sections.push({
-              title: `${recordName} – Nachspeisung`,
-              rows: fillSystemRows,
-              isLineSection: true
-            });
-          }
-          if (waterTreatmentRows.length) {
-            sections.push({
-              title: `${recordName} – Wasseraufbereitung (Fillsoft)`,
-              rows: waterTreatmentRows,
-              isLineSection: true
-            });
-          }
-          if (safetyValveRows.length) {
-            sections.push({
-              title: `${recordName} – Sicherheitsventil`,
-              rows: safetyValveRows,
-              isLineSection: true
-            });
-          }
+          // Add accessory blocks from structured data in fixed order (Auftrag A - Runde 6)
+          // Use simple titles without record name prefix
+          const accessoryBlocks = record.result.accessoryBlocks || [];
+          
+          // Fixed order: Spr\u00fchrohrentgaser, Nachspeiseeinrichtung, Wasseraufbereitung, Sicherheitsventil
+          const fixedOrder = ['Spr\u00fchrohrentgaser', 'Nachspeiseeinrichtung', 'Wasseraufbereitung', 'Sicherheitsventil'];
+          
+          fixedOrder.forEach(title => {
+            const block = accessoryBlocks.find(b => b.title === title);
+            if (block && block.fieldPairs && block.fieldPairs.length > 0) {
+              // Convert fieldPairs to rows format for compatibility
+              const rows = block.fieldPairs.map(fp => [fp.label, fp.value, fp.unit || '']);
+              sections.push({
+                title,
+                rows,
+                isLineSection: true,
+                // Store notes for later rendering
+                accessoryNotes: block.notes
+              });
+            }
+          });
           
           return sections.filter(section => section.rows.length);
         }
@@ -598,7 +584,7 @@ function savedRecordSections(snapshot = {}) {
         isLineSection: isLineSectionRecordKey(key)
       }];
     }).filter(section => section.rows.length);
-  });
+  })
 }
 
 export function buildGenericModuleReportDto({

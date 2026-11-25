@@ -82,6 +82,71 @@ export function buildPressureRecord(currentState = {}, result = {}, items = [], 
   delete copy.expandedPlantId;
   const systemVolume = num(result.systemVolume) || num(currentState.systemVolumeL);
   const acc = result.accessories || {};
+  
+  // Store structured accessory blocks for PDF generation (Auftrag A, C, D - Runde 6)
+  // This allows PDF adapter to use structured data instead of regex filtering
+  const accessoryBlocks = [];
+  
+  // Sprührohrentgaser block
+  const servitecRows = servitecAccessoryRows(currentState, result);
+  if (servitecRows.length > 0) {
+    accessoryBlocks.push({
+      type: 'accessoryBlock',
+      title: 'Sprührohrentgaser',
+      fieldPairs: servitecRows.map(row => ({
+        label: row.label,
+        value: row.value,
+        unit: row.unit || ''
+      })),
+      notes: servitecRows.filter(row => row.isNote).map(row => row.value)
+    });
+  }
+  
+  // Nachspeiseeinrichtung block
+  const fillSystemRows = fillSystemAccessoryRows(currentState, result);
+  if (fillSystemRows.length > 0) {
+    accessoryBlocks.push({
+      type: 'accessoryBlock',
+      title: 'Nachspeiseeinrichtung',
+      fieldPairs: fillSystemRows.map(row => ({
+        label: row.label,
+        value: row.value,
+        unit: row.unit || ''
+      })),
+      notes: fillSystemRows.filter(row => row.isNote || row.isWarning).map(row => row.value)
+    });
+  }
+  
+  // Wasseraufbereitung block
+  const waterTreatmentRows = waterTreatmentAccessoryRows(currentState, result);
+  if (waterTreatmentRows.length > 0) {
+    accessoryBlocks.push({
+      type: 'accessoryBlock',
+      title: 'Wasseraufbereitung',
+      fieldPairs: waterTreatmentRows.map(row => ({
+        label: row.label,
+        value: row.value,
+        unit: row.unit || ''
+      })),
+      notes: waterTreatmentRows.filter(row => row.isNote || row.isWarning).map(row => row.value)
+    });
+  }
+  
+  // Sicherheitsventil block
+  const safetyValveRows = safetyValveAccessoryRows(currentState, result);
+  if (safetyValveRows.length > 0) {
+    accessoryBlocks.push({
+      type: 'accessoryBlock',
+      title: 'Sicherheitsventil',
+      fieldPairs: safetyValveRows.map(row => ({
+        label: row.label,
+        value: row.value,
+        unit: row.unit || ''
+      })),
+      notes: safetyValveRows.filter(row => row.isNote || row.isWarning).map(row => row.value)
+    });
+  }
+  
   return {
     id,
     name: name || currentState.plantName?.trim() || existing?.name || `${currentState.holdingType === 'dynamic' ? (currentState.dynamicType === 'variomat' ? 'Variomat' : 'Reflexomat') : 'MAG'} ${items.length + 1}`,
@@ -107,15 +172,17 @@ export function buildPressureRecord(currentState = {}, result = {}, items = [], 
       ve: result.ve,
       vv: result.vv,
       asv: result.asv,
-      factor: result.factor
+      factor: result.factor,
+      // Store accessory blocks in result for PDF adapter access
+      accessoryBlocks
     },
     rows: [
       ...pressureResultRows(currentState, result),
       // Zubehör-Zeilen aus deutschen Zeilenfunktionen (Befund 2)
-      ...servitecAccessoryRows(currentState, result).map(row => [row.label, row.value, row.unit || '']),
-      ...fillSystemAccessoryRows(currentState, result).map(row => [row.label, row.value, row.unit || '']),
-      ...waterTreatmentAccessoryRows(currentState, result).map(row => [row.label, row.value, row.unit || '']),
-      ...safetyValveAccessoryRows(currentState, result).map(row => [row.label, row.value, row.unit || ''])
+      ...servitecRows.map(row => [row.label, row.value, row.unit || '']),
+      ...fillSystemRows.map(row => [row.label, row.value, row.unit || '']),
+      ...waterTreatmentRows.map(row => [row.label, row.value, row.unit || '']),
+      ...safetyValveRows.map(row => [row.label, row.value, row.unit || ''])
     ].filter(row => row[1] !== undefined && row[1] !== null && row[1] !== '')
   };
 }

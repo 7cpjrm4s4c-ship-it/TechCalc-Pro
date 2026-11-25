@@ -537,10 +537,7 @@ export class GlobalPdfReport {
         this.sectionChartBlock(section, index);
       });
     } else if (lineSections.length) {
-      const lineGroupTitle = 'LEITUNGSABSCHNITTE';
-      this.ensureSpace(sectionTitleHeight(lineGroupTitle) + 44);
-      this.sectionTitle(lineGroupTitle);
-      lineSections.forEach(section => lineSectionItems(section.rows).forEach(item => this.lineBlock(item, lineGroupTitle)));
+      lineSections.forEach(section => lineSectionItems(section.rows, section.title).forEach(item => this.lineBlock(item, section.title)));
     } else {
       sections.forEach(section => this.standardSection(section));
     }

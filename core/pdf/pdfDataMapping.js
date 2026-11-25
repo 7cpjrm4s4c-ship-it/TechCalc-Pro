@@ -314,7 +314,7 @@ export function isLineSectionTitle(title = '') {
   return /leitungsabschnitt|rohrauslegung|speicher|puffer|druckhaltung|mischluft|wärmerückgewinnung|waermerueckgewinnung|trinkwasser|schmutzwasser|gespeicherte|h,x-prozess|hx-prozess/i.test(sanitizeText(title));
 }
 
-export function lineSectionItems(rows = []) {
+export function lineSectionItems(rows = [], sectionTitle = '') {
   const items = [];
   let current = [];
   let title = '';
@@ -322,7 +322,8 @@ export function lineSectionItems(rows = []) {
   const pushCurrent = () => {
     if (!hasRows(current)) return;
     const index = items.length + 1;
-    const cleanTitle = sanitizeText(title) || `Leitungsabschnitt ${index}`;
+    // Use sectionTitle if provided, otherwise fall back to designation row or default
+    const cleanTitle = sanitizeText(sectionTitle) || sanitizeText(title) || `Leitungsabschnitt ${index}`;
     items.push({ title: cleanTitle, rows: current });
     current = [];
     title = '';
@@ -341,7 +342,7 @@ export function lineSectionItems(rows = []) {
     if (label || value || unit) current.push([label, value, unit]);
   });
   pushCurrent();
-  if (!items.length && hasRows(rows)) items.push({ title: 'Leitungsabschnitt 1', rows });
+  if (!items.length && hasRows(rows)) items.push({ title: sectionTitle || 'Leitungsabschnitt 1', rows });
   return items;
 }
 function normalizePdfRows(rows = [], title = '') {
