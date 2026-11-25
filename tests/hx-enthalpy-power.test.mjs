@@ -135,10 +135,12 @@ assert.deepEqual(printableHxSections(hxModuleData).map(section => section.title)
 assert.deepEqual(printableHxSections(hxModuleData).map(section => section.chartIndex), [0, 1]);
 
 const pdfLayoutSource = readFileSync(new URL('../core/pdf/pdfLayout.js', import.meta.url), 'utf8');
-assert.match(pdfLayoutSource, /this\.standardSection\(section\);\s*this\.sectionChartBlock\(section, index\);/,
+assert.match(pdfLayoutSource, /this\.renderSection\(section\);\s*this\.sectionChartBlock\(section, index\);/,
   'h,x PDF layout must render each saved record before its corresponding diagram');
-assert.match(pdfLayoutSource, /if \(index > 0\) \{\s*this\.addPage\(\);\s*this\.header\(project, moduleData, date\);\s*this\.projectData\(project\);\s*\}\s*this\.standardSection\(section\);\s*this\.sectionChartBlock\(section, index\);/,
+assert.match(pdfLayoutSource, /printableSections\.forEach\(\(section, index\) => \{\s*\/\/[^\n]*\n\s*\/\/[^\n]*\n\s*\/\/[^\n]*\n\s*if \(index > 0\) this\.addPage\(\);\s*this\.renderSection\(section\);\s*this\.sectionChartBlock\(section, index\);\s*\}\);/,
   'h,x PDF layout must start each saved process on its own report page');
+assert.doesNotMatch(pdfLayoutSource, /this\.addPage\(\);\s*this\.header\(project, moduleData, date\);/,
+  'continuation pages must use the unified continuation band instead of repeating the full page header');
 assert.doesNotMatch(pdfLayoutSource, /if \(isHxDiagram\) \{\s*this\.chartBlock\(\);\s*sections\.forEach\(section => this\.standardSection\(section\)\);/,
   'h,x PDF layout must not render one combined diagram block before all saved records');
 

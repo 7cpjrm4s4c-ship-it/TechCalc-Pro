@@ -9,21 +9,6 @@ function cleanRows(rows = []) {
     .filter(row => row.some(cell => sanitizeText(cell)));
 }
 
-function pairedRowsForPdf(rows = []) {
-  const rowsClean = cleanRows(rows);
-  const preferredOrder = [
-    'leistung', 'massenstrom', 'volumenstrom', 'temperaturdifferenz', 'waermetraeger',
-    'rohrdimension', 'rohrabmessung', 'werkstoff', 'geschwindigkeit', 'druckverlust'
-  ];
-  const rank = row => {
-    const key = normalizeKey(row?.[0] || '');
-    const index = preferredOrder.indexOf(key);
-    return index === -1 ? preferredOrder.length + rowsClean.indexOf(row) : index;
-  };
-  const ordered = [...rowsClean].sort((a, b) => rank(a) - rank(b));
-  return pairSequentialRows(ordered);
-}
-
 function pairSequentialRows(rows = []) {
   const leftCount = Math.ceil(rows.length / 2);
   const left = rows.slice(0, leftCount);
@@ -46,6 +31,27 @@ function isHxMetaSection(section = {}) {
 
 function isFullWidthListBlock(item = {}) {
   return normalizeKey(item?.title || '').includes('zusammenstellung einrichtungsgegenstaende');
+}
+
+function dedupeSectionTitles(sections = []) {
+  // Rule-based disambiguation for repeated section titles (e.g. multiple
+  // "Trinkwasser" or "Berechnung" blocks). identical titles get an explicit
+  // "(i/n)" suffix so every table is addressable. Unique titles stay as-is.
+  const counts = new Map();
+  sections.forEach(section => {
+    const key = normalizeKey(section?.title || '');
+    counts.set(key, (counts.get(key) || 0) + 1);
+  });
+  const seen = new Map();
+  return sections.map(section => {
+    const key = normalizeKey(section?.title || '');
+    const total = counts.get(key) || 1;
+    if (total < 2) return section;
+    const index = (seen.get(key) || 0) + 1;
+    seen.set(key, index);
+    const title = sanitizeText(section?.title || '');
+    return { ...section, title: `${title} (${index}/${total})` };
+  });
 }
 
 function tableColumns(x, width) {
@@ -201,10 +207,35 @@ export class GlobalPdfReport {
     this.chartImages.forEach((image, index) => this.imageResources.push({ name: `ImChart${index + 1}`, image }));
     if (images.chartImage) this.imageResources.push({ name: 'ImChart', image: images.chartImage });
     this.pages = [];
+    this.reportContext = null;
     this.addPage();
   }
 
-  addPage() { this.page = []; this.pages.push(this.page); this.cursorY = PDF_THEME.margin; }
+  addPage() {
+    this.page = [];
+    this.pages.push(this.page);
+    this.cursorY = PDF_THEME.margin;
+    // Unified continuation band on every follow-up content page, for every
+    // module. The full project meta block stays on the first page only.
+    if (this.pages.length > 1) {
+      this.continuationHeader();
+    }
+  }
+
+  continuationHeader() {
+    const { project, moduleData, date } = this.reportContext || {};
+    const m = PDF_THEME.margin;
+    const right = PDF_PAGE.width - m;
+    const reportHeading = sanitizeText(moduleData?.reportDto?.metadata?.reportHeading || moduleData?.reportHeading || 'Berechnungsprotokoll');
+    if (project?.showTechCalcBranding !== false) {
+      if (this.images.appIcon) this.drawImage('ImAppIcon', m, this.cursorY + 0.5, 9, 9);
+      this.text('TechCalc Pro', m + 11.5, this.cursorY + 7.6, { size: 7, font: 'F2' });
+    }
+    this.text(`${reportHeading} · ${moduleData?.title || moduleData?.shortTitle || 'Modul'} · ${date || ''}`.replace(/\s·\s*$/, ''), right, this.cursorY + 7.6, { size: 6.3, font: 'F1', color: PDF_THEME.muted, align: 'right', maxWidth: 300 });
+    this.cursorY += 11.5;
+    this.line(m, this.cursorY, right, this.cursorY, PDF_THEME.line, 0.5);
+    this.cursorY += 5;
+  }
 
   cmd(command) { this.page.push(command); }
 
@@ -453,61 +484,6 @@ export class GlobalPdfReport {
     }
   }
 
-  lineBlock(item, groupTitle = '') {
-    if (isFullWidthListBlock(item)) {
-      this.fullWidthLineBlock(item);
-      return;
-    }
-    // Special rendering for Hinweise block (Auftrag A - Runde 9)
-    if (item.isNotesBlock) {
-      this.notesBlock(item);
-      return;
-    }
-    const pairs = pairedRowsForPdf(item.rows);
-    if (!pairs.length) return;
-    const m = PDF_THEME.margin;
-    const w = PDF_PAGE.width - m * 2;
-    const innerX = m + 5;
-    const innerW = w - 10;
-    const columns = tableColumns(innerX, innerW);
-    const rowHeights = pairs.map(pair => pairRowHeight(pair, columns, { labelSize: 6.2, valueSize: 6.35 }));
-    const headerHeight = 18;
-    const topPad = 4.5;
-    const bottomPad = 5.5;
-    const fullBlockHeight = headerHeight + topPad + sumHeights(rowHeights) + bottomPad + 2;
-    if (fitsOnEmptyContentPage(this, fullBlockHeight) && this.cursorY + fullBlockHeight > this.contentBottom()) {
-      this.addPage();
-    }
-    let index = 0;
-    let continued = false;
-    while (index < pairs.length) {
-      const maxBodyHeight = Math.max(38, this.contentBottom() - this.cursorY - headerHeight - topPad - bottomPad - 8);
-      let segmentHeight = 0;
-      let endIndex = index;
-      while (endIndex < pairs.length && (segmentHeight + rowHeights[endIndex] <= maxBodyHeight || endIndex === index)) {
-        segmentHeight += rowHeights[endIndex];
-        endIndex += 1;
-      }
-      const blockHeight = headerHeight + topPad + segmentHeight + bottomPad;
-      if (this.ensureSpace(blockHeight + 2) && fitsOnEmptyContentPage(this, blockHeight + 2)) continue;
-      const y0 = this.cursorY;
-      const bodyTop = y0 + headerHeight + topPad;
-      this.rect(m, y0, w, blockHeight, { fill: [255, 255, 255], stroke: PDF_THEME.line, width: 0.55 });
-      this.rect(m, y0, w, headerHeight, { fill: PDF_THEME.soft, stroke: PDF_THEME.line, width: 0.45 });
-      const title = continued ? `${item.title || 'Abschnitt'} (Fortsetzung)` : (item.title || 'Abschnitt');
-      this.text(title, m + 5, y0 + 11.2, { size: 7.8, font: 'F2', maxWidth: w - 10 });
-      let rowY = bodyTop;
-      for (let rowIndex = index; rowIndex < endIndex; rowIndex += 1) {
-        const h = rowHeights[rowIndex];
-        this.line(innerX, rowY + h - 2.1, innerX + innerW, rowY + h - 2.1, PDF_THEME.rowLine, 0.32);
-        drawPairedRow(this, pairs[rowIndex], innerX, rowY, innerW, h, { labelSize: 6.2, valueSize: 6.35 });
-        rowY += h;
-      }
-      this.cursorY += blockHeight + 6;
-      index = endIndex;
-      continued = true;
-    }
-  }
 
   standardSection(section) {
     const rows = section.rows.filter(row => row.some(cell => sanitizeText(cell)));
@@ -629,32 +605,49 @@ export class GlobalPdfReport {
 
   build(project, moduleData) {
     const date = new Date().toLocaleDateString('de-DE');
+    this.reportContext = { project, moduleData, date };
     this.header(project, moduleData, date);
     this.projectData(project);
-    const sections = reportSections(moduleData);
-    const lineSections = sections.filter(section => section.isLineSection);
+    const sections = dedupeSectionTitles(reportSections(moduleData));
     const isHxDiagram = /hx|h,x/i.test(`${moduleData.id || ''} ${moduleData.title || ''}`);
     if (isHxDiagram) {
       const hxSections = sections.filter(section => !isHxMetaSection(section));
       const printableSections = hxSections.length ? hxSections : sections;
       printableSections.forEach((section, index) => {
-        if (index > 0) {
-          this.addPage();
-          this.header(project, moduleData, date);
-          this.projectData(project);
-        }
-        this.standardSection(section);
+        // Each saved process keeps its own page; continuation pages use the
+        // unified continuation band instead of repeating the full header and
+        // project meta block.
+        if (index > 0) this.addPage();
+        this.renderSection(section);
         this.sectionChartBlock(section, index);
       });
-    } else if (lineSections.length) {
-      lineSections.forEach(section => lineSectionItems(section.rows, section.title, [], section.isNotesBlock).forEach(item => this.lineBlock(item, section.title)));
     } else {
-      sections.forEach(section => this.standardSection(section));
+      sections.forEach(section => this.renderSection(section));
+      this.chartBlock();
     }
-    if (!isHxDiagram) this.chartBlock();
     this.corporateBlock(project, moduleData);
     this.footer();
     return this.output();
+  }
+
+  renderSection(section = {}) {
+    // One unified section style for every module: standard sections render
+    // through standardSection. Only content-specific block types (Hinweise
+    // as 1:3 notes rows, full-width fixture lists) keep their dedicated
+    // central renderers. This replaces the previous lineBlock path so that
+    // pipe-sizing, pressure-holding and all other modules share one look.
+    const items = lineSectionItems(section.rows, section.title, [], section.isNotesBlock);
+    items.forEach(item => {
+      if (isFullWidthListBlock(item)) {
+        this.fullWidthLineBlock(item);
+        return;
+      }
+      if (item.isNotesBlock) {
+        this.notesBlock(item);
+        return;
+      }
+      this.standardSection({ ...section, title: item.title || section.title, rows: item.rows });
+    });
   }
 
   output() {

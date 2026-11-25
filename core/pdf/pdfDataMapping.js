@@ -16,7 +16,10 @@ function reportIdentity(id = '', reportDto = {}) {
 }
 
 function isSpecialReportHeadingModule(id = '', reportDto = {}) {
-  return /flooding-verification|hx|h,x/i.test(reportIdentity(id, reportDto));
+  // Only authority-level reports (flooding-verification) keep their own
+  // document heading. Every calculation module, including h,x-Diagramm,
+  // shares the unified "Berechnungsprotokoll" heading.
+  return /flooding-verification/i.test(reportIdentity(id, reportDto));
 }
 
 function specialReportHeading(id = '', reportDto = {}) {

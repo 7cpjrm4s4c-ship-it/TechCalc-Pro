@@ -43,4 +43,4 @@ export const PDF_GRID = {
   valueRightRatio: 0.23
 };
 
-export const REPORT_TEMPLATE_VERSION = 'global-report-template-9-rc11-1-pdf-table-dedupe';
+export const REPORT_TEMPLATE_VERSION = 'global-report-template-10-unified-module-output';
