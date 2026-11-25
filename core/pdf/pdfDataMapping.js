@@ -241,7 +241,7 @@ function parseGermanNumber(value = '') {
   // Standard parsing: if comma exists, dots are thousands separators; otherwise dots are decimal
   const normalized = clean.includes(',')
     ? clean.replace(/\./g, '').replace(',', '.')
-    : clean;
+    : (/^[-+]?\d{1,3}(?:\.\d{3})+$/.test(clean) ? clean.replace(/\./g, '') : clean);
   const number = Number(normalized);
   return Number.isFinite(number) ? number : null;
 }
