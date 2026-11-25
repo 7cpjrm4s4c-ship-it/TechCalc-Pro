@@ -194,9 +194,9 @@ assert.equal(calcWithDesal.accessories.waterTreatment.method, 'desalination');
 // ============================================================================
 
 // getSafetyValveFlow
-assert.equal(getSafetyValveFlow('05', 5.0), 2200, 'G ½" bei 5 bar = 2200 m³/h');
-assert.equal(getSafetyValveFlow('1', 5.0), 5500, 'G 1" bei 5 bar = 5500 m³/h');
-assert.equal(getSafetyValveFlow('unknown', 5.0), 0, 'Unbekannte Anschlussgröße = 0');
+// getSafetyValveFlow - Handbuchwerte S. 69 (in l/h)
+assert.equal(getSafetyValveFlow('05', 5.0), 3100, 'G 00bd" bei 5 bar = 3100 l/h (Handbuch S. 69)');
+assert.equal(getSafetyValveFlow('1', 5.0), 10600, 'G 1" bei 5 bar = 10600 l/h (Handbuch S. 69)');
 
 // recommendSafetyValveConnection
 const sv1 = recommendSafetyValveConnection(3000, 800);

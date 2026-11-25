@@ -378,15 +378,17 @@ export function calculateDesalination({ systemVolumeL, waterHardness, capacity }
 // ============================================================================
 
 // Abblaseleistungstabelle nach Handbuch S. 69
-// Format: { [anschlussgr\u00f6\u00dfe]: { [pSV in bar]: abblaseleistung in l/h } }
-// Format: { [anschlussgr\u00f6\u00dfe]: { [pSV in bar]: abblaseleistung in l/h } }
+// Abblaseleistungstabelle nach Reflex-Handbuch "Planen Berechnen Ausr\u00fcrsten", S. 69
+// Werte in l/h f\u00fcr pSV-Stufen 4,0 / 4,5 / 5,0 / 5,5 / 6,0 bar
+// Quelle: Handbuchtabelle (urspr\u00fnglich in m\u00b3/h, hier umgerechnet in l/h)
+// Hinweis: Aktuelle Werte beim Hersteller erfragen
 export const SAFETY_VALVE_FLOW_TABLE = {
-  '05': { '4.0': 1800, '4.5': 2000, '5.0': 2200, '5.5': 2400, '6.0': 2600 },
-  '075': { '4.0': 2800, '4.5': 3100, '5.0': 3400, '5.5': 3700, '6.0': 4000 },
-  '1': { '4.0': 4500, '4.5': 5000, '5.0': 5500, '5.5': 6000, '6.0': 6500 },
-  '125': { '4.0': 7000, '4.5': 7800, '5.0': 8600, '5.5': 9400, '6.0': 10200 },
-  '15': { '4.0': 10000, '4.5': 11200, '5.0': 12400, '5.5': 13600, '6.0': 14800 },
-  '2': { '4.0': 18000, '4.5': 20000, '5.0': 22000, '5.5': 24000, '6.0': 26000 }
+  '05': { '4.0': 2800, '4.5': 3000, '5.0': 3100, '5.5': 3300, '6.0': 3400 },
+  '075': { '4.0': 3000, '4.5': 3200, '5.0': 3400, '5.5': 3600, '6.0': 3700 },
+  '1': { '4.0': 9500, '4.5': 10100, '5.0': 10600, '5.5': 11100, '6.0': 11600 },
+  '125': { '4.0': 14300, '4.5': 15100, '5.0': 16000, '5.5': 16100, '6.0': 17500 },
+  '15': { '4.0': 19200, '4.5': 20400, '5.0': 21500, '5.5': 22500, '6.0': 41200 },
+  '2': { '4.0': 27700, '4.5': 29300, '5.0': 30900, '5.5': 32400, '6.0': 50900 }
 };
 
 // Connection label mapping
@@ -403,7 +405,7 @@ export const CONNECTION_LABELS = {
  * Gibt die Abblaseleistung für eine gegebene Anschlussgröße und pSV zurück.
  * @param {string} connection - Anschlussgröße ('05', '075', '1', '125', '15', '2')
  * @param {number} psvBar - Sicherheitsventil-Ansprechdruck in bar
- * @returns {number} Abblaseleistung in m³/h
+ * @returns {number} Abblaseleistung in l/h (Quelle: Reflex-Handbuch S. 69)
  */
 export function getSafetyValveFlow(connection, psvBar) {
   const conn = SAFETY_VALVE_FLOW_TABLE[connection];
@@ -414,48 +416,63 @@ export function getSafetyValveFlow(connection, psvBar) {
 }
 
 /**
- * Empfiehlt die Sicherheitsventil-Anschlussgröße basierend auf der Gesamtwärmeleistung.
- * Regelbasis nach Handbuch S. 69:
+ * Empfiehlt die Sicherheitsventil-Anschlussgröße basierend auf dem Gefäßevolumen der Druckhaltestation.
+ * Regelbasis nach Reflex-Handbuch "Planen Berechnen Ausrürsten", S. 69:
  * - abzuführender Volumenstrom: 1 l/(h·kW)
- * - speziell für Reflex-Druckhaltestationen bei 5 bar Abblasdruck:
- *   Behälter bis 1000 l (Ø 740) → G ½ (3100 kW = 3100 l/h)
- *   ab 1000 l (Ø 1000) → G 1 (10600 kW = 10600 l/h)
+ * - speziell für Reflex-Druckhaltestationen:
+ *   Behälter bis 1000 Liter (Ø 740 mm) → G ½ (3100 l/h bei pSV 5,0 bar)
+ *   ab 1000 Liter (Ø 1000 mm) → G 1 (10600 l/h bei pSV 5,0 bar)
+ * - Grenzfall exakt 1000 Liter: G 1 wählen (konservative Auslegung)
+ * - Die im Handbuch bestehende Grenzwertüberschneidung ("bis" und "ab" 1000 Liter) ist als Quellenkommentar dokumentiert.
+ * - Die Auswahl verwendet die Spalte des tatsächlich gewählten pSV, nicht pauschal 5,0 bar.
  *
  * @param {number} totalPowerKw - Gesamtwärmeleistung in kW
- * @param {number} systemVolumeL - Anlagenvolumen in Litern
- * @returns {Object} { connection: string, flowRate: number, warnings: string[] }
+ * @param {number} vesselVolumeL - Gefäßevolumen der Druckhaltestation in Litern
+ * @param {number} psvBar - Sicherheitsventil-Ansprechdruck in bar (Default: 5.0)
+ * @returns {Object} { connection: string, flowRateLh: number, requiredFlowLh: number, warnings: string[] }
  */
-export function recommendSafetyValveConnection(totalPowerKw, systemVolumeL) {
+export function recommendSafetyValveConnection(totalPowerKw, vesselVolumeL, psvBar = 5.0) {
   const power = num(totalPowerKw);
-  const volume = num(systemVolumeL);
+  const vesselVolume = num(vesselVolumeL);
+  const psv = num(psvBar) || 5.0;
   const warnings = [];
   
   // Erforderlicher Volumenstrom: 1 l/(h·kW)
   const requiredFlow = power * 1; // in l/h
   
-  let connection = '05';
-  let flowRate = 3100; // G ½ bei 5 bar
+  // Regelbasis für Reflex-Druckhaltestationen nach Gefäßvolumen
+  // Grenzwert: exakt 1000 Liter -> G 1 (konservative Auslegung)
+  let connection = vesselVolume < 1000 ? '05' : '1';
   
-  // Regelbasis für Reflex-Druckhaltestationen
-  if (volume <= 1000) {
-    connection = '05';
-    flowRate = 3100; // 3100 kW = 3100 l/h
-  } else {
-    connection = '1';
-    flowRate = 10600; // 10600 kW = 10600 l/h
+  // Hole die Abblaseleistung aus der Tabelle für den tatsächlich gewählten pSV
+  // Falls pSV nicht in der Tabelle, verwende den nächsthöheren verfügbaren pSV
+  const psvKey = String(psv.toFixed(1));
+  const connTable = SAFETY_VALVE_FLOW_TABLE[connection] || {};
+  const availablePsvKeys = Object.keys(connTable).sort((a, b) => Number(a) - Number(b));
+  
+  // Finde den ersten pSV-Wert >= angeforderter pSV
+  let flowRate = 0;
+  for (const key of availablePsvKeys) {
+    if (Number(key) >= psv) {
+      flowRate = connTable[key];
+      break;
+    }
+  }
+  // Falls kein pSV >= angeforderter pSV, nimm den höchsten verfügbaren
+  if (flowRate === 0 && availablePsvKeys.length > 0) {
+    flowRate = connTable[availablePsvKeys[availablePsvKeys.length - 1]];
   }
   
   // Prüfe ob Abblaseleistung ausreicht
-  const actualFlow = flowRate; // in l/h (bei 5 bar)
-  if (requiredFlow > actualFlow) {
-    warnings.push(`Abblaseleistung von ${CONNECTION_LABELS[connection]} (${actualFlow} l/h bei 5 bar) liegt unter dem erforderlichen Volumenstrom von ${Math.round(requiredFlow)} l/h.`);
+  if (flowRate < requiredFlow) {
+    warnings.push(`Abblaseleistung von ${CONNECTION_LABELS[connection]} (${flowRate} l/h bei pSV ${psv} bar) liegt unter dem erforderlichen Volumenstrom von ${Math.round(requiredFlow)} l/h.`);
     
     // Finde die nächste größere Anschlussgröße
     const connections = ['05', '075', '1', '125', '15', '2'];
     const currentIndex = connections.indexOf(connection);
     for (let i = currentIndex + 1; i < connections.length; i++) {
       const nextConn = connections[i];
-      const nextFlow = SAFETY_VALVE_FLOW_TABLE[nextConn]['5.0']; // Wert bereits in l/h (Handbuch S. 69)
+      const nextFlow = SAFETY_VALVE_FLOW_TABLE[nextConn]?.[psvKey] || 0;
       if (nextFlow >= requiredFlow) {
         connection = nextConn;
         flowRate = nextFlow;
@@ -494,7 +511,6 @@ function nextVolume(v) { return STANDARD_VOLUMES.find(x => x >= v) || Math.ceil(
 const REFLEX_N_MAX = REFLEX_N_VOLUMES[REFLEX_N_VOLUMES.length - 1];
 function barText(v) { return formatNumber(v, { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
 
-// Kleinste Reflex-N-Größe ≥ v (undefined, wenn v über 1000 l liegt).
 export function nextReflexN(v) {
   const value = num(v);
   if (!Number.isFinite(value) || value <= 0) return undefined;
@@ -621,7 +637,6 @@ export function calculate(s) {
 
   // Sicherheitsventil-Größenempfehlung
   const totalPowerKw = num(s.heatPowerKw) || 0;
-  const svRecommendation = recommendSafetyValveConnection(totalPowerKw, systemVolume);
 
   // pSV-Empfehlung bleibt unverändert
   if (s.holdingType === 'mag' && psv > 0) {
@@ -636,6 +651,7 @@ export function calculate(s) {
   const standard = s.holdingType === 'dynamic'
     ? (selected > 0 ? nextVolume(selected) : 0)
     : (magSplit && magSplit.vesselVolumeL > 0 ? magSplit.vesselVolumeL : 0);
+  const svRecommendation = recommendSafetyValveConnection(totalPowerKw, standard, psv);
   const productLabel = s.holdingType === 'dynamic' ? dynamicLabel(s.dynamicType, selected) : magProductLabel(magSplit);
 
   // Kombiniere alle Warnungen
