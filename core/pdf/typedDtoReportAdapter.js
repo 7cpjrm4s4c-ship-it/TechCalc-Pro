@@ -265,8 +265,8 @@ function formatNumber(value, fractionDigits = 2) {
 
 function shouldParseNumericString(value = '') {
   // NEVER re-parse already formatted strings to avoid double-formatting
-  // German formatted numbers use dot as thousands separator (e.g., "8.500" = 8500)
-  // If we parse these, we get 8.5 which then formats to "8,5" - WRONG!
+  // German formatted numbers use dot as thousands separator (e.g., "8.500" = 8500) or comma as decimal separator (e.g., "12,8")
+  // If we parse these, we get wrong values (8.5 from "8.500", NaN from "12,8") which then format incorrectly
   // Only parse strings that are clearly unformatted (no formatting characters)
   const text = String(value).trim();
   
@@ -277,10 +277,14 @@ function shouldParseNumericString(value = '') {
   // Reject strings with multiple dots
   if ((text.match(/\./g) || []).length > 1) return false;
   
-  // Only parse plain numbers: integers or decimals with comma
-  // Accept: "123", "123,5", "-5"
-  // Reject: "123.456" (thousands), "123.456,789" (invalid)
-  return /^-?\d+(,\d+)?$/.test(text);
+  // Reject strings with comma - these are already formatted German numbers (e.g., "12,8", "16,000")
+  // JavaScript Number() doesn't understand comma as decimal separator
+  if (text.includes(',')) return false;
+  
+  // Only parse plain integer numbers without any formatting
+  // Accept: "123", "-5", "0"
+  // Reject: "123.456" (thousands), "12,8" (decimal), "123,5" (decimal)
+  return /^-?\d+$/.test(text);
 }
 
 function formatScalar(value) {

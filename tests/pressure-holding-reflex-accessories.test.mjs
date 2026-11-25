@@ -35,8 +35,8 @@ assert.equal(selectServitec({ systemVolumeL: 30000, medium: 'glycol20', tMaxC: 6
 const peWarn = selectServitec({ systemVolumeL: 500, medium: 'water', tMaxC: 50, peBar: 0.1 });
 assert.ok(peWarn.warnings.some(w => w.includes('außerhalb aller Servitec-Arbeitsdruckbereiche')), 'Warnung bei pe außerhalb Druckbereich');
 
-const tempWarn = selectServitec({ systemVolumeL: 500, medium: 'water', tMaxC: 80, peBar: 1.5 });
-assert.ok(tempWarn.warnings.some(w => w.includes('übersteigt die Servitec-Typgrenzte von 70°C')), 'Warnung bei Temperatur > 70°C');
+const tempWarn = selectServitec({ systemVolumeL: 500, medium: 'water', tMaxC: 95, peBar: 1.5 });
+assert.ok(tempWarn.warnings.some(w => w.includes('Kein passender Servitec-Typ gefunden')), 'Warnung bei Temperatur > 90°C (kein Typ für 95°C)');
 
 const volWarn = selectServitec({ systemVolumeL: 300000, medium: 'water', tMaxC: 60, peBar: 2.0 });
 assert.ok(volWarn.warnings.some(w => w.includes('übersteigt die maximalen Tabellenwerte')), 'Warnung bei Volumen über Tabellenwert');
