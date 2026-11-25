@@ -314,7 +314,7 @@ export function isLineSectionTitle(title = '') {
   return /leitungsabschnitt|rohrauslegung|speicher|puffer|druckhaltung|mischluft|wärmerückgewinnung|waermerueckgewinnung|trinkwasser|schmutzwasser|gespeicherte|h,x-prozess|hx-prozess/i.test(sanitizeText(title));
 }
 
-export function lineSectionItems(rows = [], sectionTitle = '') {
+export function lineSectionItems(rows = [], sectionTitle = '', notes = []) {
   const items = [];
   let current = [];
   let title = '';
@@ -324,7 +324,12 @@ export function lineSectionItems(rows = [], sectionTitle = '') {
     const index = items.length + 1;
     // Use sectionTitle if provided, otherwise fall back to designation row or default
     const cleanTitle = sanitizeText(sectionTitle) || sanitizeText(title) || `Leitungsabschnitt ${index}`;
-    items.push({ title: cleanTitle, rows: current });
+    const item = { title: cleanTitle, rows: current };
+    // Add notes if provided (Auftrag A - Runde 7: Hinweise als vollbreiter Abschluss)
+    if (notes && notes.length > 0) {
+      item.notes = notes;
+    }
+    items.push(item);
     current = [];
     title = '';
   };
@@ -342,7 +347,7 @@ export function lineSectionItems(rows = [], sectionTitle = '') {
     if (label || value || unit) current.push([label, value, unit]);
   });
   pushCurrent();
-  if (!items.length && hasRows(rows)) items.push({ title: sectionTitle || 'Leitungsabschnitt 1', rows });
+  if (!items.length && hasRows(rows)) items.push({ title: sectionTitle || 'Leitungsabschnitt 1', rows, notes });
   return items;
 }
 function normalizePdfRows(rows = [], title = '') {

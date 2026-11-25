@@ -568,8 +568,8 @@ function savedRecordSections(snapshot = {}) {
                 title,
                 rows,
                 isLineSection: true,
-                // Store notes for later rendering
-                accessoryNotes: block.notes
+                // Store notes separately for full-width rendering (Auftrag A - Runde 7)
+                notes: block.notes && block.notes.length > 0 ? block.notes : []
               });
             }
           });

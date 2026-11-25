@@ -93,12 +93,13 @@ export function buildPressureRecord(currentState = {}, result = {}, items = [], 
     accessoryBlocks.push({
       type: 'accessoryBlock',
       title: 'Sprührohrentgaser',
-      fieldPairs: servitecRows.map(row => ({
+      // Separate field pairs from notes (Auftrag A - Runde 7)
+      fieldPairs: servitecRows.filter(row => !row.isNote && !row.isWarning).map(row => ({
         label: row.label,
         value: row.value,
         unit: row.unit || ''
       })),
-      notes: servitecRows.filter(row => row.isNote).map(row => row.value)
+      notes: servitecRows.filter(row => row.isNote || row.isWarning).map(row => row.value)
     });
   }
   
@@ -108,7 +109,8 @@ export function buildPressureRecord(currentState = {}, result = {}, items = [], 
     accessoryBlocks.push({
       type: 'accessoryBlock',
       title: 'Nachspeiseeinrichtung',
-      fieldPairs: fillSystemRows.map(row => ({
+      // Separate field pairs from notes (Auftrag A - Runde 7)
+      fieldPairs: fillSystemRows.filter(row => !row.isNote && !row.isWarning).map(row => ({
         label: row.label,
         value: row.value,
         unit: row.unit || ''
@@ -123,7 +125,8 @@ export function buildPressureRecord(currentState = {}, result = {}, items = [], 
     accessoryBlocks.push({
       type: 'accessoryBlock',
       title: 'Wasseraufbereitung',
-      fieldPairs: waterTreatmentRows.map(row => ({
+      // Separate field pairs from notes (Auftrag A - Runde 7)
+      fieldPairs: waterTreatmentRows.filter(row => !row.isNote && !row.isWarning).map(row => ({
         label: row.label,
         value: row.value,
         unit: row.unit || ''
@@ -138,7 +141,8 @@ export function buildPressureRecord(currentState = {}, result = {}, items = [], 
     accessoryBlocks.push({
       type: 'accessoryBlock',
       title: 'Sicherheitsventil',
-      fieldPairs: safetyValveRows.map(row => ({
+      // Separate field pairs from notes (Auftrag A - Runde 7)
+      fieldPairs: safetyValveRows.filter(row => !row.isNote && !row.isWarning).map(row => ({
         label: row.label,
         value: row.value,
         unit: row.unit || ''
@@ -179,10 +183,11 @@ export function buildPressureRecord(currentState = {}, result = {}, items = [], 
     rows: [
       ...pressureResultRows(currentState, result),
       // Zubehör-Zeilen aus deutschen Zeilenfunktionen (Befund 2)
-      ...servitecRows.map(row => [row.label, row.value, row.unit || '']),
-      ...fillSystemRows.map(row => [row.label, row.value, row.unit || '']),
-      ...waterTreatmentRows.map(row => [row.label, row.value, row.unit || '']),
-      ...safetyValveRows.map(row => [row.label, row.value, row.unit || ''])
+      // Filter out note/warning rows - they are stored separately in accessoryBlocks (Auftrag A - Runde 7)
+      ...servitecRows.filter(row => !row.isNote && !row.isWarning).map(row => [row.label, row.value, row.unit || '']),
+      ...fillSystemRows.filter(row => !row.isNote && !row.isWarning).map(row => [row.label, row.value, row.unit || '']),
+      ...waterTreatmentRows.filter(row => !row.isNote && !row.isWarning).map(row => [row.label, row.value, row.unit || '']),
+      ...safetyValveRows.filter(row => !row.isNote && !row.isWarning).map(row => [row.label, row.value, row.unit || ''])
     ].filter(row => row[1] !== undefined && row[1] !== null && row[1] !== '')
   };
 }
