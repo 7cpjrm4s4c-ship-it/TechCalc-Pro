@@ -552,8 +552,8 @@ function savedRecordSections(snapshot = {}) {
             }
           ];
           
-          // Add accessory blocks from structured data in fixed order (Auftrag A - Runde 6)
-          // Use simple titles without record name prefix
+          // Collect all notes from accessory blocks for separate "Hinweise" block (Auftrag A - Runde 8)
+          const allNotes = [];
           const accessoryBlocks = record.result.accessoryBlocks || [];
           
           // Fixed order: Spr\u00fchrohrentgaser, Nachspeiseeinrichtung, Wasseraufbereitung, Sicherheitsventil
@@ -567,12 +567,26 @@ function savedRecordSections(snapshot = {}) {
               sections.push({
                 title,
                 rows,
-                isLineSection: true,
-                // Store notes separately for full-width rendering (Auftrag A - Runde 7)
-                notes: block.notes && block.notes.length > 0 ? block.notes : []
+                isLineSection: true
               });
+              
+              // Collect notes with block name prefix (Auftrag A - Runde 8)
+              if (block.notes && block.notes.length > 0) {
+                block.notes.forEach(note => {
+                  allNotes.push(`${title}: ${note}`);
+                });
+              }
             }
           });
+          
+          // Add separate "Hinweise" block if there are any notes (Auftrag A - Runde 8)
+          if (allNotes.length > 0) {
+            sections.push({
+              title: 'Hinweise',
+              rows: allNotes.map(note => ['', note, '']),
+              isLineSection: true
+            });
+          }
           
           return sections.filter(section => section.rows.length);
         }
