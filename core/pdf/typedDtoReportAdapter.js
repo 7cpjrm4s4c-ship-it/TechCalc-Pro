@@ -579,12 +579,23 @@ function savedRecordSections(snapshot = {}) {
             }
           });
           
-          // Add separate "Hinweise" block if there are any notes (Auftrag A - Runde 8)
+          // Add separate "Hinweise" block if there are any notes (Auftrag A - Runde 9)
+          // Each note is a row with 2 cells: [blockName, noteText]
+          // Block name in first cell (1 column), note text in second cell (3 columns)
           if (allNotes.length > 0) {
             sections.push({
               title: 'Hinweise',
-              rows: allNotes.map(note => ['', note, '']),
-              isLineSection: true
+              rows: allNotes.map(note => {
+                // Split note at first colon to separate block name from note text
+                const colonIndex = note.indexOf(': ');
+                if (colonIndex > 0) {
+                  return [note.substring(0, colonIndex), note.substring(colonIndex + 2)];
+                }
+                return [note, ''];
+              }),
+              isLineSection: true,
+              // Mark as notes block for special rendering (Auftrag A - Runde 9)
+              isNotesBlock: true
             });
           }
           
