@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { airDensity, ventilation } from '../core/data/index.js';
+import { parseNumber } from '../core/engineering/numberService.js';
 import {
   activeCalculationState,
   buildVentilationLineSectionRecord,
@@ -162,5 +163,86 @@ assert.equal(emptyStats.find(row => row.label === 'Volumenstrom').value, '—', 
 const emptyDto = buildVentilationReportDto({ state: coolingState, activeState: coolingActive, calculation: coolingResult, lineSections: [emptyRecord] });
 const emptyGroup = emptyDto.resultGroups.find(group => group.isLineSection);
 assert.ok(emptyGroup.rows.some(row => row.label === 'Volumenstrom' && row.value === '—'), 'PDF DTO keeps the volume flow row as em dash instead of dropping it');
+const emptyPdfRows = reportSections({ id: 'ventilation', title: 'Lüftung', shortTitle: 'Lüftung', reportSource: 'typed-dto', reportDto: emptyDto }).flatMap(section => section.rows);
+assert.ok(emptyPdfRows.some(row => row[0] === 'Volumenstrom'), 'final PDF rows keep the volume flow row even without any derivable value');
+assert.equal(emptyPdfRows.filter(row => row[0] === 'Volumenstrom').length, 1, 'the volume flow row is not removed by the PDF row filters');
+
+// Nacharbeit C.1: Kälte-Abschnitt mit Leistungseingabe 216,65 kW (calcTarget volumeFlow), Zuluft 18 °C, Raum 26 °C
+const coolingPowerState = {
+  mode: 'cooling',
+  coolingCalcTarget: 'volumeFlow',
+  coolingPowerW: '216.65',
+  coolingPowerUnit: 'kW',
+  coolingVolumeFlowM3h: '',
+  coolingSupplyTemp: '18',
+  coolingRoomTemp: '26',
+  coolingDeltaT: ''
+};
+const coolingPowerActive = activeCalculationState(coolingPowerState);
+const coolingPowerResult = ventilation(coolingPowerActive);
+assert.ok(Math.abs(coolingPowerResult.volumeFlowM3h - 80000) < 1, 'cooling power input is back-calculated to about 80.000 m³/h');
+assert.ok(Math.abs(coolingPowerResult.massFlowKgh - 97008) < 1, 'mass flow follows the back-calculated volume flow');
+const coolingPowerRecord = buildVentilationLineSectionRecord(
+  coolingPowerState,
+  coolingPowerResult,
+  coolingPowerActive,
+  'Kälte',
+  [],
+  'vent-cool-power-input',
+  'Kühlung'
+);
+assert.ok(coolingPowerRecord.volumeFlowM3h && coolingPowerRecord.volumeFlowM3h !== '—', 'saved cooling record with power input contains the volume flow');
+assert.ok(Math.abs(parseNumber(coolingPowerRecord.volumeFlowM3h, { fallback: NaN }) - 80000) < 1, 'saved volume flow is about 80.000 m³/h');
+
+// Nacharbeit A/C.2: historischer Datensatz mit leerem volumeFlowM3h – Rekonstruktion beim Report-Aufbau
+const legacyCoolingRecord = {
+  id: 'vent-legacy-cooling',
+  name: 'Kühlung',
+  powerKw: '216,65',
+  volumeFlowM3h: '',
+  massFlowKgh: '97.008,41',
+  deltaT: '8',
+  supplyTemp: '18',
+  roomTemp: '26',
+  modeLabel: 'Kälte',
+  inputState: { mode: 'cooling', calcTarget: 'volumeFlow', powerW: '216.65', powerUnit: 'kW', volumeFlowM3h: '', supplyTemp: '18', roomTemp: '26', deltaT: 8 },
+  uiState: { mode: 'cooling' }
+};
+const legacyDtoAll = buildVentilationReportDto({
+  state: coolingPowerState,
+  activeState: coolingPowerActive,
+  calculation: coolingPowerResult,
+  lineSections: [legacyCoolingRecord, heatingRecord]
+});
+const legacyGroupAll = legacyDtoAll.resultGroups.find(group => group.isLineSection);
+const legacyLabels = legacyGroupAll.rows.map(row => row.label);
+assert.deepEqual(legacyLabels.slice(0, EXPECTED_LABELS.length), EXPECTED_LABELS, 'legacy cooling block keeps the full row structure');
+assert.deepEqual(legacyLabels.slice(EXPECTED_LABELS.length), EXPECTED_LABELS, 'heating block keeps the identical row structure');
+const legacyAllVolumeRow = legacyGroupAll.rows.find(row => row.label === 'Volumenstrom');
+assert.ok(legacyAllVolumeRow.value && legacyAllVolumeRow.value !== '—', 'legacy cooling record gets a reconstructed volume flow value');
+assert.ok(Math.abs(parseNumber(legacyAllVolumeRow.value, { fallback: NaN }) - 80000) < 1, 'reconstructed volume flow is about 80.000 m³/h');
+assert.equal(legacyAllVolumeRow.unit, 'm³/h', 'reconstructed volume flow row keeps the unit m³/h');
+const legacyPdfRows = reportSections({ id: 'ventilation', title: 'Lüftung', shortTitle: 'Lüftung', reportSource: 'typed-dto', reportDto: legacyDtoAll }).flatMap(section => section.rows);
+const legacyPdfVolumeRows = legacyPdfRows.filter(row => row[0] === 'Volumenstrom');
+assert.equal(legacyPdfVolumeRows.length, 2, 'both PDF blocks contain the volume flow row, none is swallowed');
+assert.ok(legacyPdfVolumeRows.some(row => Math.abs(parseNumber(row[1], { fallback: NaN }) - 80000) < 1 && row[2] === 'm³/h'), 'PDF renders the reconstructed cooling volume flow as 80.000 m³/h');
+
+// Nacharbeit C.3: Zeilenfilter – keine Zeile wird wegen fehlenden Werten aus dem Report entfernt
+const mixedDto = buildVentilationReportDto({
+  state: coolingState,
+  activeState: coolingActive,
+  calculation: coolingResult,
+  lineSections: [legacyCoolingRecord, emptyRecord, heatingRecord]
+});
+const mixedRows = mixedDto.resultGroups.find(group => group.isLineSection).rows;
+const blocks = [];
+for (const row of mixedRows) {
+  if (row.label === 'Bezeichnung') blocks.push([]);
+  if (blocks.length) blocks[blocks.length - 1].push(row.label);
+}
+assert.equal(blocks.length, 3, 'three saved sections produce three blocks');
+for (const block of blocks) {
+  assert.deepEqual(block, EXPECTED_LABELS, 'every block contains all row types, regardless of missing values');
+}
 
 console.log('ventilation cooling volume flow PDF regression ok');
