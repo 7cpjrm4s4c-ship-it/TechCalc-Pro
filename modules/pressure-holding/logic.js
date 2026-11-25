@@ -56,46 +56,46 @@ const SERVITEC_TYPES = {
     label: 'Servitec 35',
     maxVolumeWater: 220000,
     maxVolumeGlycol: 0,
-    maxTemp: 70,
+    maxTemp: 90,
     pressureRangeMin: 0.5,
     pressureRangeMax: 2.5,
-    note: ''
+    note: 'T-Variante, bis 90 °C'
   },
   '60': {
     label: 'Servitec 60',
     maxVolumeWater: 220000,
     maxVolumeGlycol: 0,
-    maxTemp: 70,
+    maxTemp: 90,
     pressureRangeMin: 0.5,
     pressureRangeMax: 4.5,
-    note: ''
+    note: 'T-Variante, bis 90 °C'
   },
   '75': {
     label: 'Servitec 75',
     maxVolumeWater: 220000,
     maxVolumeGlycol: 50000,
-    maxTemp: 70,
+    maxTemp: 90,
     pressureRangeMin: 1.3,
     pressureRangeMax: 5.4,
-    note: ''
+    note: 'T-Variante, bis 90 °C; Glykol-Betrieb bis 50 m³'
   },
   '95': {
     label: 'Servitec 95',
     maxVolumeWater: 220000,
     maxVolumeGlycol: 50000,
-    maxTemp: 70,
+    maxTemp: 90,
     pressureRangeMin: 1.3,
     pressureRangeMax: 7.2,
-    note: ''
+    note: 'T-Variante, bis 90 °C; Glykol-Betrieb bis 50 m³'
   },
   '120t': {
     label: 'Servitec 120 T',
     maxVolumeWater: 220000,
     maxVolumeGlycol: 0,
-    maxTemp: 70,
+    maxTemp: 90,
     pressureRangeMin: 1.3,
     pressureRangeMax: 9.0,
-    note: 'Nur für Wasser'
+    note: 'Nur für Wasser, T-Variante, bis 90 °C'
   }
 };
 
@@ -135,10 +135,6 @@ export function selectServitec({ systemVolumeL, medium, tMaxC, peBar }) {
     warnings.push(`Enddruck pe = ${barText(pe)} bar liegt außerhalb aller Servitec-Arbeitsdruckbereiche (${barText(minPressure)}-${barText(maxPressure)} bar).`);
   }
 
-  // Prüfe Temperatur
-  if (temp > 70) {
-    warnings.push(`Maximale Temperatur tMax = ${temp}°C übersteigt die Servitec-Typgrenzte von 70°C. Sonderanlage auf Anfrage, Temperaturen bis 90°C.`);
-  }
 
   // Sortiere Typen nach Größe (Mini -> S -> 35 -> 60 -> 75 -> 95 -> 120t)
   const typeOrder = ['mini', 's', '35', '60', '75', '95', '120t'];
@@ -195,7 +191,7 @@ export function selectServitec({ systemVolumeL, medium, tMaxC, peBar }) {
     type: selectedType,
     label: selectedLabel,
     warnings,
-    note: 'Arbeitsdruck muss mindestens so hoch wie der mögliche Enddruck am hydraulischen Einbindpunkt sein; empfohlen ist der Betrieb auf der Anlagenseite bei Temperaturen ≤ 70°C.'
+    note: 'Arbeitsdruck muss mindestens so hoch wie der mögliche Enddruck am hydraulischen Einbindpunkt sein; empfohlen ist der Betrieb auf der Anlagenseite bei Temperaturen ≤ 90°C.'
   };
 }
 

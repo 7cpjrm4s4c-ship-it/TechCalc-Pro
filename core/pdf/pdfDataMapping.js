@@ -226,6 +226,19 @@ function isPlainNumericText(value = '') {
 function parseGermanNumber(value = '') {
   const clean = sanitizeText(value).replace(/\s/g, '');
   if (!isPlainNumericText(clean)) return null;
+  
+  // Check if this is a German formatted number with thousands separator (dot)
+  // Pattern: digits.digits (where the part after dot has exactly 3 digits, and there's no comma)
+  // Examples: "16.000", "8.500", "10.600"
+  const thousandsPattern = /^([-+]?\d+)\.(\d{3})($|[^\d])/;
+  if (thousandsPattern.test(clean) && !clean.includes(',')) {
+    // Remove all dots (thousands separators)
+    const normalized = clean.replace(/\./g, '');
+    const number = Number(normalized);
+    return Number.isFinite(number) ? number : null;
+  }
+  
+  // Standard parsing: if comma exists, dots are thousands separators; otherwise dots are decimal
   const normalized = clean.includes(',')
     ? clean.replace(/\./g, '').replace(',', '.')
     : clean;

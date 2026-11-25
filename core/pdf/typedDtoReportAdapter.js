@@ -264,18 +264,23 @@ function formatNumber(value, fractionDigits = 2) {
 }
 
 function shouldParseNumericString(value = '') {
-  // NEVER re-parse already formatted German numbers (with thousands separator dot)
-  // to avoid double-formatting: "8.500" -> 8.5 -> "8,5" instead of "8.500"
-  // Only parse plain numeric strings without any formatting
+  // NEVER re-parse already formatted strings to avoid double-formatting
+  // German formatted numbers use dot as thousands separator (e.g., "8.500" = 8500)
+  // If we parse these, we get 8.5 which then formats to "8,5" - WRONG!
+  // Only parse strings that are clearly unformatted (no formatting characters)
   const text = String(value).trim();
-  if (!/^-?\d+(?:\.\d+)?$/.test(text)) return false;
-  const fraction = text.split('.')[1] || '';
-  if (!fraction) return false;
-  // If there's a dot, only accept it as decimal separator if the fractional part
-  // is NOT exactly 3 digits (which would indicate a German thousands separator)
-  // e.g., "8.500" has 3 digits after dot -> thousands separator -> don't parse
-  // e.g., "8.5" has 1 digit after dot -> decimal separator -> parse
-  return fraction.length !== 3;
+  
+  // Reject any string that contains a dot followed by exactly 3 digits (German thousands separator)
+  // Examples: "8.500", "10.600", "16.000" - these are already formatted
+  if (/\.\d{3}(\D|$)/.test(text)) return false;
+  
+  // Reject strings with multiple dots
+  if ((text.match(/\./g) || []).length > 1) return false;
+  
+  // Only parse plain numbers: integers or decimals with comma
+  // Accept: "123", "123,5", "-5"
+  // Reject: "123.456" (thousands), "123.456,789" (invalid)
+  return /^-?\d+(,\d+)?$/.test(text);
 }
 
 function formatScalar(value) {

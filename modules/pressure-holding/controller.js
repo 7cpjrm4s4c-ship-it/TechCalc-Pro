@@ -71,7 +71,7 @@ function pressureResultRows(currentState = {}, result = {}) {
     .filter(row => row.value !== undefined && row.value !== null && row.value !== '')
     .map(row => [
       row.label,
-      typeof row.value === 'number' ? fmt(row.value, row.digits ?? 2) : String(row.value),
+      typeof row.value === 'number' ? row.value : row.value,
       row.unit || ''
     ]);
 }
