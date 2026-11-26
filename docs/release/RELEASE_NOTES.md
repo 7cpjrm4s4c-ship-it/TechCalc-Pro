@@ -34,25 +34,17 @@
 - Einheitlicher Dokumenttitel "Berechnungsprotokoll" für alle Rechenmodule inklusive h,x-Diagramm; nur autoritative Berichte (Überflutungsnachweis, F-Gase-Informationsblatt, EN-378-Sicherheitsdatenblatt) behalten ihren Sondertitel.
 - Einheitlicher Fortsetzungsbalken (Marke, Berichtstitel, Trennlinie) auf jeder Folgeseite; der volle Projekt-Metadatenblock erscheint nur auf Seite 1.
 - Einheitlicher Abschnittsstil (standardSection) für alle regulären Abschnitte; der lineBlock-Stil ist entfernt. Hinweise-Blöcke (1:3-Layout) und vollbreite Zusammenstellungen behalten ihre dedizierten zentralen Renderer.
-- Identisch wiederholte Abschnittstitel erhalten zentral einen Suffix (i/n).
-- Report-Template-Version: `global-report-template-10-unified-module-output`.
-- **Phase 49 – Review-Nacharbeiten:**
-  - Abschnitt "Berichtszusammenfassung" entfernt; Fallback bei fehlenden Ergebnisabschnitten: einzelner Abschnitt mit Berichtstitel (ohne Nummerierung) und Status "Keine Ergebnisdaten verfügbar".
-  - Abschnitt "Eingaben" entfernt (generic pipeline).
-  - Ergebnisabschnitte tragen den Namen der gespeicherten Berechnung; "Leitungsabschnitt"/"Gespeicherte Leitungsabschnitte" als Titel entfernt. Fallbacks: Record-Name → "System, DN n" → "Rohrauslegung i" / "Berechnung (i/n)".
-  - Fix: `cropCanvasToContent()` warf wegen `eight - 1` (undefiniert) eine `ReferenceError`; Korrektur: `height - 1`; Chart-Indizes bleiben an `section.chartIndex` ausgerichtet (`ImChart1`, `ImChart2`).
-  - Report-Template auf `global-report-template-11-review-fixes` erhöht.
-  - **Review-Runde 2:**
-    - h,x: `buildHxReportPayload()` erzeugt je gespeichertem Prozess einen zusätzlichen Abschnitt "Erhitzer, Kühler und Befeuchter" aus `equipmentSizing()`.
-    - Druckhaltung Hinweise: Breitenschätzung korrigiert (echte Helvetica-AFM-Glyphenbreiten in `core/pdf/pdfText.js`).
-    - Regenwasser: "Hinweise / Prüfhinweise" wird als `isNotesBlock: true` (1:3-Stil) statt `fullWidthRows` gerendert.
-    - Überflutung: `addPage({ continuation: false })` unterdrückt den Fortsetzungsbalken auf Vorspannseiten (Deckblatt, Inhaltsverzeichnis, erste Protokollseite).
-  - **Review-Runde 3:**
-    - Regenwasser: "Hinweise / Prüfhinweise" trägt kein Nummernpräfix mehr.
-    - Titel-Dedupe: `dedupeSectionTitles()` entfernt – wiederholte Abschnittstitel erscheinen unverändert ohne `(i/n)`-Suffix; `(Fortsetzung)`-Suffix bei Seitenumbrüchen bleibt unberührt.
+- Identisch wiederholte Abschnittstitel bleiben unverändert ohne `(i/n)`-Suffix; `(Fortsetzung)`-Suffix bei Seitenumbrüchen bleibt erhalten.
+- Abschnitt "Berichtszusammenfassung" entfernt; Fallback bei fehlenden Ergebnisabschnitten: einzelner Abschnitt mit Berichtstitel (ohne Nummerierung) und Status "Keine Ergebnisdaten verfügbar".
+- Abschnitt "Eingaben" entfernt (generic pipeline).
+- Ergebnisabschnitte tragen den Namen der gespeicherten Berechnung; "Leitungsabschnitt"/"Gespeicherte Leitungsabschnitte" als Titel entfernt. Fallbacks: Record-Name → "System, DN n" → "Rohrauslegung i" / "Berechnung (i/n)".
+- Fix: `cropCanvasToContent()` Korrektur von `eight - 1` zu `height - 1`; Chart-Indizes bleiben an `section.chartIndex` ausgerichtet (`ImChart1`, `ImChart2`).
+- h,x-Prozesse erhalten Abschnitt "Erhitzer, Kühler und Befeuchter" aus `equipmentSizing()`; Druckhaltung Hinweise: Breitenschätzung korrigiert (echte Helvetica-AFM-Glyphenbreiten); Regenwasser: "Hinweise / Prüfhinweise" als `isNotesBlock: true` (1:3-Stil); Überflutung: Fortsetzungsbalken auf Vorspannseiten unterdrückt.
+- Regenwasser "Hinweise / Prüfhinweise" trägt kein Nummernpräfix mehr; Titel-Dedupe entfernt – wiederholte Abschnittstitel erscheinen unverändert.
+- Report-Template-Version: `global-report-template-11-review-fixes`.
 - PDF-Contract auf **2.3.0** gehoben (Regel 13 ersetzt durch "Identische Abschnittstitel bleiben unverändert"); neue Regel 14.
-- Neue Regressionstests: `tests/pdf-unified-output-regression.test.mjs`, `tests/pdf-phase49-review-fixes.test.mjs`, `tests/pdf-phase49-review-round2.test.mjs`.
-- Dokumentation: `docs/contracts/pdf-contract.md` auf 2.3.0 erweitert, `docs/phases/phase-48-pdf-unified-module-output.md`, `docs/phases/phase-49-pdf-export-review-nacharbeiten.md`.
+- Neue Regressionstests: `tests/pdf-unified-output-regression.test.mjs`, `tests/pdf-review-fixes.test.mjs`, `tests/pdf-review-round2.test.mjs`.
+- Dokumentation: `docs/contracts/pdf-contract.md` auf 2.3.0 erweitert.
 
 ### Qualität
 - Alle Release-Gates grün: `npm run lint`, `npm test`, `npm run test:en378`, `npm run test:f-gases`, `npm run test:integration`, `npm run version:check`, `npm run precache:check`, `npm run audit:release-readiness`.
