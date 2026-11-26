@@ -46,7 +46,7 @@ function segmentRole(process, index, pathLength) {
   return 'heater';
 }
 
-function equipmentSizing(state = {}, path = [], process = '') {
+export function equipmentSizing(state = {}, path = [], process = '') {
   const volumeM3h = validNumber(state.airVolumeM3h);
   const start = path[0];
   if (!(volumeM3h > 0) || !start) return { rows: [], messages: [] };

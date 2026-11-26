@@ -125,9 +125,12 @@ export function installAuthorityCoverPage(GlobalPdfReport) {
   GlobalPdfReport.prototype.build = function buildWithAuthorityCover(project, moduleData) {
     if (!isFloodingAuthorityReport(moduleData)) return originalBuild.call(this, project, moduleData);
     renderAuthorityCoverPage(this, project, moduleData);
-    this.addPage();
+    // Front-matter pages (table of contents, first protocol page) carry the
+    // large header only; the compact continuation band starts with the first
+    // real follow-up page of the protocol.
+    this.addPage({ continuation: false });
     const tocPageIndex = this.pages.length - 1;
-    this.addPage();
+    this.addPage({ continuation: false });
 
     const tocEntries = [];
     const originalProjectData = this.projectData;

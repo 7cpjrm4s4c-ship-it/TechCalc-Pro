@@ -163,7 +163,10 @@ const hxDto = hxModule.report({
   ]
 });
 assert.equal(hxDto.charts.length, 2, 'each saved h,x process exposes its own chart SVG');
-assert.deepEqual(hxDto.sections.map(section => section.chartIndex), [0, 1]);
+assert.deepEqual(hxDto.sections.map(section => section.chartIndex), [0, undefined, 1, undefined]);
+assert.deepEqual(hxDto.sections.map(section => section.title),
+  ['Test Sommer', 'Erhitzer, Kühler und Befeuchter', 'Test Winter', 'Erhitzer, Kühler und Befeuchter'],
+  'B1: each saved h,x process gets an equipment section after its state points');
 
 function fakeChartImage(seed) {
   const binary = Buffer.from(`ffd8ffe000${seed}ffd9`, 'hex');

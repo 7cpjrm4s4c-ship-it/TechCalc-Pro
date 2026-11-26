@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import hxModule from '../modules/hx-diagram/index.js';
 import { reportSections } from '../core/pdf/pdfDataMapping.js';
 import { calculate } from '../modules/hx-diagram/logic.js';
-import { buildHxResultModel } from '../modules/hx-diagram/results.js';
+import { buildHxResultModel, equipmentSizing } from '../modules/hx-diagram/results.js';
 
 function parseGermanNumber(value) {
   return Number(String(value).replace(/\./g, '').replace(',', '.'));
@@ -121,8 +121,21 @@ const winterRecord = savedHxRecord('Test Winter', {
 const hxReportDto = hxModule.report({ savedProcesses: [summerRecord, winterRecord] });
 assert.equal(hxReportDto.charts.length, 2, 'each saved h,x process must expose its own chart');
 assert.equal(hxReportDto.chartSvg, hxReportDto.charts[0].svg, 'single-chart fallback remains the first saved process chart');
-assert.deepEqual(hxReportDto.sections.map(section => section.title), ['Test Sommer', 'Test Winter']);
-assert.deepEqual(hxReportDto.sections.map(section => section.chartIndex), [0, 1]);
+assert.deepEqual(hxReportDto.sections.map(section => section.title),
+  ['Test Sommer', 'Erhitzer, Kühler und Befeuchter', 'Test Winter', 'Erhitzer, Kühler und Befeuchter'],
+  'each saved process must add an equipment section after its state points');
+assert.deepEqual(hxReportDto.sections.map(section => section.chartIndex), [0, undefined, 1, undefined]);
+assert.deepEqual(hxReportDto.sections.map(section => section.recordIndex), [0, 0, 1, 1],
+  'all sections of one record share its recordIndex so they stay on one page');
+const summerEquipment = hxReportDto.sections[1];
+assert.ok(summerEquipment.rows.some(row => row[0] === 'Kühlerleistung' && row[1] !== '—'),
+  'equipment section carries the cooler power row');
+assert.ok(summerEquipment.rows.some(row => row[0] === 'Befeuchterleistung'),
+  'equipment section carries the humidifier row');
+const expectedSizing = equipmentSizing(summerRecord.input, summerRecord.path, summerRecord.process);
+assert.deepEqual(summerEquipment.rows.map(row => row.join('|')),
+  expectedSizing.rows.map(row => [row.label, row.value, row.unit || ''].join('|')),
+  'PDF equipment rows must come from the same equipmentSizing source as the UI card');
 assert.match(hxReportDto.charts[0].svg, /<svg/);
 assert.match(hxReportDto.charts[1].svg, /<svg/);
 assert.notEqual(hxReportDto.charts[0].svg, hxReportDto.charts[1].svg, 'saved process charts must remain record-specific');
@@ -134,13 +147,14 @@ const hxModuleData = {
   reportDto: hxReportDto,
   reportSource: 'typed-dto'
 };
-assert.deepEqual(printableHxSections(hxModuleData).map(section => section.title), ['Test Sommer', 'Test Winter']);
-assert.deepEqual(printableHxSections(hxModuleData).map(section => section.chartIndex), [0, 1]);
+assert.deepEqual(printableHxSections(hxModuleData).map(section => section.title),
+  ['Test Sommer', 'Erhitzer, Kühler und Befeuchter', 'Test Winter', 'Erhitzer, Kühler und Befeuchter']);
+assert.deepEqual(printableHxSections(hxModuleData).map(section => section.chartIndex), [0, undefined, 1, undefined]);
 
 const pdfLayoutSource = readFileSync(new URL('../core/pdf/pdfLayout.js', import.meta.url), 'utf8');
 assert.match(pdfLayoutSource, /this\.renderSection\(section\);\s*this\.sectionChartBlock\(section, index\);/,
   'h,x PDF layout must render each saved record before its corresponding diagram');
-assert.match(pdfLayoutSource, /sections\.forEach\(\(section, index\) => \{\s*(?:\/\/[^\n]*\n\s*)+if \(index > 0\) this\.addPage\(\);\s*this\.renderSection\(section\);\s*this\.sectionChartBlock\(section, index\);\s*\}\);/,
+assert.match(pdfLayoutSource, /sections\.forEach\(\(section, index\) => \{[\s\S]{0,500}?if \(index > 0 && recordKey !== previousKey\) this\.addPage\(\);\s*this\.renderSection\(section\);\s*this\.sectionChartBlock\(section, index\);\s*\}\);/,
   'h,x PDF layout must start each saved process on its own report page');
 assert.doesNotMatch(pdfLayoutSource, /this\.addPage\(\);\s*this\.header\(project, moduleData, date\);/,
   'continuation pages must use the unified continuation band instead of repeating the full page header');

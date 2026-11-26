@@ -43,7 +43,7 @@ export function buildRainwaterReportSections(dto={}){
    rows:a(dto.warnings).map(x=>['',t(x),'']),
    isLineSection:false,
    forcePageBreak:true,
-   fullWidthRows:true
+   isNotesBlock:true
  });
  return sections;
 }

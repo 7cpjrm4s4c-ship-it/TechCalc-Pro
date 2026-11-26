@@ -210,13 +210,16 @@ export class GlobalPdfReport {
     this.addPage();
   }
 
-  addPage() {
+  addPage({ continuation = true } = {}) {
     this.page = [];
     this.pages.push(this.page);
     this.cursorY = PDF_THEME.margin;
     // Unified continuation band on every follow-up content page, for every
     // module. The full project meta block stays on the first page only.
-    if (this.pages.length > 1) {
+    // Front-matter pages of the authority engine (cover, table of contents,
+    // first protocol page) pass continuation: false so the band starts only
+    // with the first real follow-up page of the protocol.
+    if (this.pages.length > 1 && continuation) {
       this.continuationHeader();
     }
   }
@@ -611,10 +614,13 @@ export class GlobalPdfReport {
     const isHxDiagram = /hx|h,x/i.test(`${moduleData.id || ''} ${moduleData.title || ''}`);
     if (isHxDiagram) {
       sections.forEach((section, index) => {
-        // Each saved process keeps its own page; continuation pages use the
+        // Each saved process keeps its own page: all sections sharing the
+        // same recordIndex stay on one page. Continuation pages use the
         // unified continuation band instead of repeating the full header and
         // project meta block.
-        if (index > 0) this.addPage();
+        const recordKey = section.recordIndex ?? index;
+        const previousKey = index > 0 ? (sections[index - 1].recordIndex ?? index - 1) : null;
+        if (index > 0 && recordKey !== previousKey) this.addPage();
         this.renderSection(section);
         this.sectionChartBlock(section, index);
       });

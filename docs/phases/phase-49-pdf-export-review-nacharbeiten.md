@@ -59,3 +59,33 @@ Abnahme: `tests/pdf-phase49-review-fixes.test.mjs` erzeugt den PDF-Byte-Strom f�
 - Neu: `tests/pdf-phase49-review-fixes.test.mjs` (A1–A4, inkl. h,x-PDF-Byte-Strom mit `ImChart1`/`ImChart2` und Diagrammtiteln); in `scripts/test-fast.mjs` registriert.
 - Angepasst: `tests/pdf-unified-output-regression.test.mjs` (Template 11, A1/A2/A3-Asserts), `tests/hx-enthalpy-power.test.mjs` (h,x-Abschnitte ohne Meta-Filter, Layout-Quellcode-Asserts), `tests/rc11-pdf-pixel-perfect.test.mjs` (Template-Version), `tests/buffer-storage-pdf-saved-records.test.mjs` und `tests/wastewater-pdf-saved-records.test.mjs` (Abschnittstitel = Record-Name), `scripts/test-heating-cooling-report.mjs` (keine `1. Berichtszusammenfassung`, Sammelabschnitt `Gespeicherte Berechnungen`, Record-Namen als Blöcke).
 - Gegrannt: `audit-test-contracts`, `scripts/test-fast.mjs`, Integration-Gate (`scripts/test-integration.mjs`).
+
+## Review-Runde 2 (26.11.2026, Modul-PDFs hx, Druckhaltung, Regenwasser, Überflutung)
+
+### B1 – h,x-PDF enthielt die Card „Erhitzer, Kühler und Befeuchter" nicht
+
+- `modules/hx-diagram/results.js`: `equipmentSizing()` exportiert (bisher nur UI-intern). Es bleibt die einzige Quelle für die Geräteleistungen.
+- `modules/hx-diagram/index.js` `buildHxReportPayload()`: Je gespeichertem Record wird ein zusätzlicher Abschnitt `Erhitzer, Kühler und Befeuchter` erzeugt; die Zeilen stammen direkt aus `equipmentSizing(recordInput, recordPath, process)` desselben Record-Kontexts (keine zweite Berechnungslogik, keine Kopie). Beide Abschnitte eines Records tragen `recordIndex`, damit sie auf einer Seite bleiben.
+- `core/pdf/pdfLayout.js` h,x-Pfad: Seitenwechsel nur bei Wechsel von `recordIndex` – jeder gespeicherte Prozess bleibt auf einer eigenen Seite (Zustandspunkte, ggf. Diagramm, Geräte-Abschnitt).
+
+### B2 – Hinweise-Block: langer Wasseraufbereitungstext lief aus dem Feld
+
+Ursache: `estimateTextWidth()` in `core/pdf/pdfText.js` schätzte Kleinbuchstaben pauschal mit 0.50 em, real messen PDF-Viewer (Base-14 Helvetica, keine eingebettete Schrift) z. B. `a`/`e`/`n` mit 0.556 em. Dadurch glaubte `splitPdfText()`, dass eine Zeile in das Wertfeld passe, obwohl sie real ca. 10 % breiter war, und lief über die rechte Feldkante hinaus.
+
+Korrektur: `estimateTextWidth()` verwendet die tatsächlichen Helvetica-AFM-Glyphenbreiten (units/1000). Damit stimmen geschätzte und reale Breite überein; der ~298-stellige Wasseraufbereitungs-Hinweis wird in ≤ 3 Zeilen innerhalb von `valueW` umbrochen, kürzere Hinweise bleiben einzeilig, Zeilenhöhe und Seitenumbruch des Blocks richten sich an der tatsächlichen Zeilenzahl aus (unverändertes `notesBlock`-Layout).
+
+### B3 – Regenwasser „Hinweise / Prüfhinweise" im einheitlichen Hinweise-Stil
+
+- `core/pdf/rainwaterReportSections.js`: Der Warnungen-Abschnitt wird nicht mehr mit `fullWidthRows: true` erzeugt, sondern als `isNotesBlock: true` mit Zeilen `[Label, Text, '']` (Label leer, da kein kurzer Prüfbegriff vorliegt). Damit rendert er zentral über `notesBlock()` im selben 1:3-Kastenstil wie die Druckhaltung.
+
+### B4 – Überflutungsnachweis: Fortsetzungsbalken erst ab Seite 4
+
+Ursache: `installAuthorityCoverPage()` erzeugte Inhaltsverzeichnis (Seite 2) und erste Protokollseite (Seite 3) per `addPage()`; `addPage()` zeichnet ab der zweiten Seite den Fortsetzungsbalken – Seite 2 und 3 erhielten so zusätzlich zur großen Kopfzeile fälschlich den Balken.
+
+Korrektur zentral: `addPage({ continuation })` in `core/pdf/pdfLayout.js` – mit `continuation: false` wird der Balken unterdrückt. Die Authority-Engine nutzt die Option für ihre beiden Vorspann-`addPage()`-Aufrufe (`core/pdf/authorityPdfReport.js`). Seiten 1–3 tragen ausschließlich die großen Kopfzeilen; ab Seite 4 erscheint der Balken auf jeder Folgeseite; der PROJEKT-Block bleibt exakt einmal auf Seite 3.
+
+### Tests Runde 2
+
+- Neu: `tests/pdf-phase49-review-round2.test.mjs` (B1: Equipment-Abschnitt je Prozess mit exakt den `equipmentSizing()`-Zeilen im PDF-Textlayer; B2: realer Wasseraufbereitungstext ≤ 3 Zeilen, jede Zeile innerhalb `valueW`, kurze Hinweise einzeilig; B3: `isNotesBlock` statt `fullWidthRows`, Rendering über `notesBlock()`; B4: Flooding-Fixture mit 5 Seiten – Balken nicht auf Seiten 1–3, ab Seite 4 überall, PROJEKT genau einmal auf Seite 3); in `scripts/test-fast.mjs` registriert.
+- Angepasst: `tests/hx-enthalpy-power.test.mjs` und `tests/pdf-phase49-review-fixes.test.mjs` (Equipment-Abschnitte, `recordIndex`, Layout-Quellcode-Asserts).
+- Gegrannt: `audit-test-contracts`, `scripts/test-fast.mjs`, Integration-Gate, Flooding-Phase-47C-Gate (51 Dateien), EN-378-PDF-Tests.
