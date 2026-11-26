@@ -71,7 +71,6 @@ function renderAccessoriesFields(s) {
   ];
 
   return stack([
-    `<h4>Entgasung</h4>`,
     grid(switchFields.join(''), 3),
     `<h4>Nachspeisung Details</h4>${grid(feedInputFields.join(''), 2)}`,
     `<h4>Wasseraufbereitung Details</h4>${grid(waterTreatmentInputFields.join(''), 2)}`
