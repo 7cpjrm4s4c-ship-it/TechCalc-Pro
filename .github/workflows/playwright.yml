@@ -90,3 +90,32 @@ jobs:
             test-results/
           retention-days: 30
           if-no-files-found: warn
+
+  # Schlanker Windows-/Edge-Lauf: nur der Layout-Vertrag (module-layout-contract),
+  # damit Windows-Font-Rasterung (Segoe UI) + Edge/Chromium messtechnisch geprueft wird.
+  # Kein zweiter Build, keine Unit-Suiten, keine Release-Gates; der Ubuntu-Job bleibt unveraendert.
+  playwright-windows-edge:
+    name: Playwright Windows Edge (Layout-Vertrag)
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v6
+
+      - name: Node.js installieren
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Abhängigkeiten installieren
+        run: npm ci
+
+      - name: Edge-Kanal bereitstellen
+        run: npx playwright install msedge
+
+      - name: Layout-Vertrag unter Windows/Edge
+        run: npx playwright test tests/e2e/module-layout-contract.spec.mjs --project=msedge-desktop
+        env:
+          PLAYWRIGHT_INCLUDE_MSEDGE: "1"

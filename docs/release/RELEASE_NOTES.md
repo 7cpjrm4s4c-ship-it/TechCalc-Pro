@@ -13,6 +13,9 @@
 - Die Theme-Auswahl ist entsprechend ihren gedrückten Schaltflächen als benannte Gruppe ausgezeichnet.
 - Browsermatrix für die Semantik aller 15 Module und den Umbruch bei 320 CSS-Pixeln erweitert.
 
+## Version 2.1.1 – Service-Worker-Cache-Versionierung für einheitliches Select-Rendering
+- Version 2.1.1 hebt den Service-Worker-Cache an (`CACHE_NAME = 'techcalc-pro-2.1.1'`), damit bereits geladene Clients (z. B. Edge/Chrome unter Windows 11) die aktualisierten Stylesheets erhalten; Stylesheets (.css) werden netzwerk-first mit Cache-Fallback ausgeliefert, die Service-Worker-Registrierung erfolgt mit `updateViaCache: 'none'`.
+
 ## Version 2.1.0 – Aufstellungsorte nach EN 378-3
 ### Neu
 - Vollständige Abdeckung aller Aufstellungsorte nach EN 378-3, Abschnitte 4.2 bis 4.6, mit eigenen Prüfpfaden, Eingabefeldern und Statusausgaben: im Freien (4.2), Maschinenraum (4.3), Personen-Aufenthaltsbereich (4.4), technischer Raum (4.5) und belüftetes Gehäuse (4.6). Die Pfade 4.2 und 4.3 sind Bestandteil dieses Releases einschließlich ihrer überarbeiteten, maschinenraumspezifischen Prüfungen.

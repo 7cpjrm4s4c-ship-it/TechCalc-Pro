@@ -24,6 +24,7 @@ export const initialState = Object.freeze({
   leakDetectionSystemStatus: '',
   hermeticallySealedStatus: '',
   hermeticallySealedLabelStatus: '',
+  installedInResidentialBuilding: '',
   coolingBelowMinus50Status: '',
   siteSafetyRestrictionStatus: '',
   nationalSafetyStandardRestrictionStatus: '',

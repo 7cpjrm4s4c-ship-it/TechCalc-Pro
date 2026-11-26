@@ -3,6 +3,9 @@ import { defineFormSchema, FIELD_TYPES } from '../../core/ui/formSchema.js';
 const option = (value, label) => Object.freeze({ value, label });
 const yesNoUnknownOptions = Object.freeze([option('', 'Nicht angegeben'), option('yes', 'Ja'), option('no', 'Nein')]);
 const hermeticProofOptions = Object.freeze([option('', 'Nicht angegeben'), option('yes', 'Nachgewiesen'), option('no', 'Nicht nachgewiesen')]);
+// Art. 5 Abs. 1 Unterabsatz 3 VO (EU) 2024/573: Wohngebäude-Ausnahme für hermetisch
+// geschlossene, gekennzeichnete Einrichtungen unter 3 kg (Anhang I).
+const residentialBuildingOptions = Object.freeze([option('', 'Nicht angegeben'), option('yes', 'Ja'), option('no', 'Nein'), option('unknown', 'Unbekannt')]);
 const applicationTypeOptions = Object.freeze([option('refrigeration', 'Kälteanlage'), option('air-conditioning', 'Klimaanlage'), option('heat-pump', 'Wärmepumpe')]);
 const installationTypeOptions = Object.freeze([option('stationary', 'Ortsfest'), option('mobile', 'Mobil')]);
 const mobileEquipmentTypeOptions = Object.freeze([
@@ -66,6 +69,7 @@ const schema = defineFormSchema({
     { key: 'leakDetectionSystemStatus', label: 'Leckage-Erkennungssystem vorhanden', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
     { key: 'hermeticallySealedStatus', label: 'Hermetisch geschlossene Einrichtung nach Art. 3 Nr. 9 VO (EU) 2024/573', type: FIELD_TYPES.SELECT, options: hermeticProofOptions },
     { key: 'hermeticallySealedLabelStatus', label: 'Als hermetisch geschlossene Einrichtung gekennzeichnet', type: FIELD_TYPES.SELECT, options: hermeticProofOptions },
+    { key: 'installedInResidentialBuilding', label: 'In Wohngebäude installiert (Art. 5 Abs. 1 Unterabsatz 3 VO (EU) 2024/573)', type: FIELD_TYPES.SELECT, options: residentialBuildingOptions, visibleWhen: { installationType: 'stationary', hermeticallySealedStatus: 'yes', hermeticallySealedLabelStatus: 'yes' } },
     { key: 'coolingBelowMinus50Status', label: 'Kühlung von Erzeugnissen unter −50 °C', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
     { key: 'siteSafetyRestrictionStatus', label: 'Standortbezogene Sicherheitsanforderung verhindert niedrigeres GWP', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
     { key: 'nationalSafetyStandardRestrictionStatus', label: 'Nationale Sicherheitsnorm verhindert Alternative', type: FIELD_TYPES.SELECT, options: yesNoUnknownOptions },
@@ -78,7 +82,7 @@ const schema = defineFormSchema({
     { title: 'Anlage', fields: ['systemName', 'applicationType', 'installationType', 'mobileEquipmentType', 'productCategory', 'constructionType', 'splitType', 'performanceRange', 'performanceRangeInfo', 'ratedCapacityKw'], columns: 2, accent: 'blue' },
     { title: 'Kältemittel', fields: ['refrigerantId', 'chargeKg'], columns: 2, accent: 'blue' },
     { title: 'Zeitliche Bewertungsgrundlage und Tätigkeit', fields: ['placedOnMarketDate', 'commissioningDate', 'stockAssessmentDate', 'plannedActivity', 'refrigerantOrigin', 'preChargedStatus'], columns: 2, accent: 'blue' },
-    { title: 'Regelrelevante Eigenschaften', fields: ['leakDetectionSystemStatus', 'hermeticallySealedStatus', 'hermeticallySealedLabelStatus', 'coolingBelowMinus50Status', 'siteSafetyRestrictionStatus', 'nationalSafetyStandardRestrictionStatus', 'cascadePrimaryCircuitStatus', 'specificRefrigerantLossPercent'], columns: 2, accent: 'blue' },
+    { title: 'Regelrelevante Eigenschaften', fields: ['leakDetectionSystemStatus', 'hermeticallySealedStatus', 'hermeticallySealedLabelStatus', 'installedInResidentialBuilding', 'coolingBelowMinus50Status', 'siteSafetyRestrictionStatus', 'nationalSafetyStandardRestrictionStatus', 'cascadePrimaryCircuitStatus', 'specificRefrigerantLossPercent'], columns: 2, accent: 'blue' },
     { title: 'Zertifizierung', fields: ['personCertificationStatus', 'companyCertificationStatus'], columns: 2, accent: 'blue' }
   ]
 });

@@ -380,3 +380,20 @@
     backdrop-filter: none;
   }
 }
+
+/* Central select sizing contract (light): the background shorthand above
+   (background: var(--tc-light-field) !important) resets background-image, so the
+   arrow image is re-asserted here after it. The light icon token
+   (--tc-select-arrow-icon) and color-scheme live in components-system.css.
+   .unit-select, #pdfShowTechCalcBranding and .project-select-card select keep
+   their own contracts. */
+:root[data-theme='light'] .control select,
+:root[data-theme='light'] .tc-control select,
+:root[data-theme='light'] .settings-form select,
+:root[data-theme='light'] .tc-add-row select,
+:root[data-theme='light'] .dw-add-row select {
+  background-image: var(--tc-select-arrow-icon) !important;
+  background-repeat: no-repeat !important;
+  background-position: right var(--tc-control-padding-x) center !important;
+  background-size: var(--tc-select-arrow-size) !important;
+}

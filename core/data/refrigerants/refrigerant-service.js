@@ -174,15 +174,29 @@ function deriveLeakCheck(context) {
   const thresholdReached = (isAnnexI && co2 >= 5) || (isAnnexII && kg >= 1);
   if (!thresholdReached) return Object.freeze({ required: false, intervalMonths: null, leakDetectionRequired: false, status: 'not-required' });
   const hermetic = context.hermeticallySealedStatus === 'yes' && context.hermeticallySealedLabelStatus === 'yes';
-  const hermeticExempt = hermetic && ((isAnnexI && co2 < 10) || (isAnnexII && kg < 2));
-  if (hermeticExempt) return Object.freeze({ required: false, intervalMonths: null, leakDetectionRequired: false, status: 'exception-applies' });
+  // Art. 5 Abs. 1 Unterabsatz 2: hermetisch geschlossene, gekennzeichnete Einrichtungen
+  // unter 10 t CO2-Äquivalent (Anhang I) bzw. unter 2 kg (Anhang II Gruppe 1).
+  const thresholdExempt = hermetic && ((isAnnexI && co2 < 10) || (isAnnexII && kg < 2));
+  // Art. 5 Abs. 1 Unterabsatz 3 VO (EU) 2024/573: hermetisch geschlossene, als solche
+  // gekennzeichnete Einrichtungen mit weniger als 3 kg fluoriertem Treibhausgas in
+  // Wohngebäuden sind ebenfalls ausgenommen. Gilt nur für Anhang-I-Gase und nur für
+  // ortsfeste Anlagen, unabhängig von der 10-t-Schwelle. Bei 'unknown'/leer greift die
+  // Ausnahme nicht (konservative Auslegung); die Angabe wird als fehlend ausgewiesen.
+  const residentialCandidate = isAnnexI && hermetic && context.installationType === 'stationary' && kg != null && kg < 3;
+  const residentialExempt = residentialCandidate && context.installedInResidentialBuilding === 'yes';
+  const missingInputs = (!thresholdExempt && residentialCandidate && context.installedInResidentialBuilding !== 'yes' && context.installedInResidentialBuilding !== 'no')
+    ? ['installedInResidentialBuilding']
+    : [];
+  const hermeticExempt = thresholdExempt || residentialExempt;
+  const exceptionBasis = isAnnexII && thresholdExempt ? 'art-5-1-unterabsatz-5' : thresholdExempt ? 'art-5-1-unterabsatz-2' : residentialExempt ? 'art-5-1-unterabsatz-3' : null;
+  if (hermeticExempt) return Object.freeze({ required: false, intervalMonths: null, leakDetectionRequired: false, status: 'exception-applies', exceptionBasis, missingInputs: Object.freeze([]) });
   const intervals = [];
   if (isAnnexI) intervals.push(co2 >= 500 ? 3 : co2 >= 50 ? 6 : 12);
   if (isAnnexII) intervals.push(kg >= 100 ? 3 : kg >= 10 ? 6 : 12);
   let intervalMonths = Math.min(...intervals);
   if (context.leakDetectionSystemStatus === 'yes') intervalMonths *= 2;
   const leakDetectionRequired = context.installationType === 'stationary' && ((isAnnexI && co2 >= 500) || (isAnnexII && kg >= 100));
-  return Object.freeze({ required: true, intervalMonths, leakDetectionRequired, status: 'required' });
+  return Object.freeze({ required: true, intervalMonths, leakDetectionRequired, status: 'required', exceptionBasis: null, missingInputs: Object.freeze(missingInputs) });
 }
 
 function deriveApplicableAnnexIvBan(context) {
@@ -247,6 +261,8 @@ export function createRegulatoryContext(snapshot = {}) {
   withBan.leakCheckIntervalMonths = leakCheck.intervalMonths;
   withBan.leakDetectionRequired = leakCheck.leakDetectionRequired;
   withBan.leakCheckStatus = leakCheck.status;
+  withBan.leakCheckExceptionBasis = leakCheck.exceptionBasis || null;
+  withBan.leakCheckMissingInputs = leakCheck.missingInputs || [];
   return Object.freeze(withBan);
 }
 

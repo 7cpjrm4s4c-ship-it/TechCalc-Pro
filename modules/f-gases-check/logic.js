@@ -1,3 +1,12 @@
+// F-Gase-Check – zentrale Berechnungslogik.
+// Dokumentierte Näherungen des Prüfmodells:
+// 1. Für die Stufen der Verlustbegrenzung nach § 2 Abs. 1 ChemKlimaschutzV wird das
+//    Datum der erstmaligen Inbetriebnahme (commissioningDate / installedAtSiteDate) als
+//    Näherung für die Errichtung am Aufstellungsort verwendet.
+// 2. Die Kältemittelpalette umfasst die hinterlegten Kernkältemittel des
+//    Anwendungsspektrums (aktuell 31 Einträge in core/data/refrigerants/refrigerants.js);
+//    Kältemittel außerhalb dieser Liste sind nicht prüfbar und werden als solche
+//    gekennzeichnet (Status "nicht bewertet").
 import { createRegulatoryContext, evaluateRegulations, getDataStatus, getDataVersions, getGwp, getRefrigerant, listRegulations } from '../../core/data/index.js';
 const LIFECYCLE_ACTIVITIES = Object.freeze(['installation', 'maintenance', 'repair', 'leak-check', 'recovery', 'decommissioning']);
 const SERVICE_ORIGINS = Object.freeze(['new', 'reclaimed', 'recycled']);
@@ -95,7 +104,7 @@ function germanyLossLimit(context) {
   if (commissioned > Date.parse('2005-06-30T00:00:00Z')) return { status: 'applies', maximumPercent: [6, 4, 2][band] };
   return { status: 'applies', maximumPercent: [8, 6, 4][band] };
 }
-function aggregateLeakCheck(context) { return { status: context.leakCheckStatus, required: context.leakCheckRequired, intervalMonths: context.leakCheckIntervalMonths, leakDetectionRequired: context.leakDetectionRequired }; }
+function aggregateLeakCheck(context) { return { status: context.leakCheckStatus, required: context.leakCheckRequired, intervalMonths: context.leakCheckIntervalMonths, leakDetectionRequired: context.leakDetectionRequired, exceptionBasis: context.leakCheckExceptionBasis || null, missingInputs: Object.freeze([...(context.leakCheckMissingInputs || [])]) }; }
 function aggregateDocumentation(context, evaluations) {
   const obligations = [];
   if (context.leakCheckRequired === true) obligations.push({ id: 'FG-020', type: 'leak-check-records', retentionYears: 5 });
@@ -119,7 +128,16 @@ function aggregateOperatorDuties(snapshot, context, evaluations) {
       else if (actual > lossLimit.maximumPercent) nonCompliant = true;
     } else if (lossLimit.status === 'incomplete') incomplete = true;
   }
-  if (context.installationType === 'stationary' && ['refrigeration', 'air-conditioning', 'heat-pump'].includes(context.applicationType) && (context.gasScope.includes('annex-i') || context.gasScope.includes('annex-ii-group-1'))) obligations.push({ id: 'FG-063', type: 'access-to-detachable-connections', status: 'required-if-technically-possible-and-reasonable' });
+  // FG-063 (§ 2 Abs. 2 ChemKlimaschutzV): dieselbe Hermetik-Ausnahme wie FG-060
+  // (§ 2 Abs. 3 ChemKlimaschutzV nimmt hermetisch geschlossene, als solche gekennzeichnete
+  // Einrichtungen von § 2 Abs. 1 und 2 aus). Ohne bestätigte Kennzeichnung bleibt die
+  // Pflicht mit dem bestehenden Status bestehen.
+  const fg063Scope = context.installationType === 'stationary' && ['refrigeration', 'air-conditioning', 'heat-pump'].includes(context.applicationType) && (context.gasScope.includes('annex-i') || context.gasScope.includes('annex-ii-group-1'));
+  if (fg063Scope && context.hermeticallySealedStatus === 'yes' && context.hermeticallySealedLabelStatus === 'yes') {
+    obligations.push({ id: 'FG-063', type: 'access-to-detachable-connections', status: 'exception-applies', legalSource: 'DE-CHEMKLIMA:§2(3)', exceptionReason: 'hermetically-sealed-and-labelled' });
+  } else if (fg063Scope) {
+    obligations.push({ id: 'FG-063', type: 'access-to-detachable-connections', status: 'required-if-technically-possible-and-reasonable' });
+  }
   const matchedIds = new Set(evaluations.filter(entry => entry.status === 'matched').map(entry => entry.rule.id));
   if (matchedIds.has('FG-052')) obligations.push({ id: 'FG-052', type: 'contractor-certification' });
   if (matchedIds.has('FG-053')) obligations.push({ id: 'FG-053', type: 'certified-person-for-leak-check' });

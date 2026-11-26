@@ -9,8 +9,20 @@
 .module-content { grid-column: span 12; }
 .module-content > * { margin-block: 0; }
 
-/* F-Gases: align the two controls in the final row of the regulatory-properties grid. */
+/* F-Gases: equalize label heights across ALL rows of the "Regelrelevante Eigenschaften"
+   regulatory grid (was previously only the final row). Windows font rasterization
+   (Segoe UI) can wrap an uppercase 12 px label into two lines where macOS keeps one
+   line; without a common label min-height the control shell then starts at a different
+   y position per row and the fields read as "differently sized". min-height 2.5em with
+   flex-end keeps every label fully readable (no truncation, no white-space: nowrap). */
 @media (min-width: 721px) {
+  .module-view[data-module="f-gases-check"] [data-schema-field-wrapper="leakDetectionSystemStatus"] > label,
+  .module-view[data-module="f-gases-check"] [data-schema-field-wrapper="hermeticallySealedStatus"] > label,
+  .module-view[data-module="f-gases-check"] [data-schema-field-wrapper="hermeticallySealedLabelStatus"] > label,
+  .module-view[data-module="f-gases-check"] [data-schema-field-wrapper="installedInResidentialBuilding"] > label,
+  .module-view[data-module="f-gases-check"] [data-schema-field-wrapper="coolingBelowMinus50Status"] > label,
+  .module-view[data-module="f-gases-check"] [data-schema-field-wrapper="siteSafetyRestrictionStatus"] > label,
+  .module-view[data-module="f-gases-check"] [data-schema-field-wrapper="nationalSafetyStandardRestrictionStatus"] > label,
   .module-view[data-module="f-gases-check"] [data-schema-field-wrapper="cascadePrimaryCircuitStatus"] > label,
   .module-view[data-module="f-gases-check"] [data-schema-field-wrapper="specificRefrigerantLossPercent"] > label {
     min-height: 2.5em;

@@ -74,6 +74,38 @@
 .control select,
 .tc-control input,
 .tc-control select { height: calc(var(--tc-control-height) - 2px); padding: 0 var(--tc-control-padding-x); }
+/* Select sizing contract (central): every select inside a form control shares one
+   geometry and fills its field, so selection fields never render at different sizes
+   across modules, grids or themes. Unit selects (fixed 76 px) keep their own contract.
+   The native select decoration is removed (appearance: none): Chromium on Windows draws
+   the OS dropdown arrow with its own width/vertical metrics, which made selects in the
+   same grid render at different sizes (Safari/Firefox on macOS were already uniform).
+   One inline SVG arrow (theme token --tc-select-arrow-icon, text color for contrast)
+   renders identically on every platform; the popup itself stays native.
+   .unit-select (76 px), #pdfShowTechCalcBranding (iOS switch) and .project-select-card
+   select (own card contract) are intentionally not covered here. */
+.control select,
+.tc-control select,
+.settings-form select,
+.tc-add-row select,
+.dw-add-row select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: calc(var(--tc-control-height) - 2px);
+  min-height: calc(var(--tc-control-height) - 2px);
+  box-sizing: border-box;
+  padding: 0 var(--tc-control-padding-x);
+  text-overflow: ellipsis;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: var(--tc-select-arrow-icon);
+  background-repeat: no-repeat;
+  background-position: right var(--tc-control-padding-x) center;
+  background-size: var(--tc-select-arrow-size);
+  padding-right: calc(var(--tc-control-padding-x) + 18px);
+  color-scheme: dark;
+}
 .control input::placeholder,
 .settings-form input::placeholder { color: var(--color-muted); opacity: 1; }
 .control input { flex: 1 1 auto; width: auto; }

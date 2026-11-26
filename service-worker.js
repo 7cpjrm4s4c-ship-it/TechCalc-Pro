@@ -1,5 +1,5 @@
-const CACHE_NAME = 'techcalc-pro-2.1.0';
-const CACHE_REVISION = '2.1.0-unveroeffentlicht-bedienbarkeit-barrierefreiheit-und-performance';
+const CACHE_NAME = 'techcalc-pro-2.1.1';
+const CACHE_REVISION = '2.1.1-unveroeffentlicht-bedienbarkeit-barrierefreiheit-und-performance';
 const ASSETS = [
   './',
   './index.html',
@@ -369,9 +369,14 @@ async function cacheFirstWithRefresh(request) {
   return caches.match('./index.html');
 }
 function isVersionCriticalAsset(requestUrl) {
-  // Modul-Laufzeitcode (inkl. Formular-Schemata) wird netzwerk-first ausgeliefert, damit nach
-  // einem Deploy sofort der aktuelle Stand (z. B. PR-Zweig) greift; offline greift der Cache.
+  // Modul-Laufzeitcode (inkl. Formular-Schemata) und Stylesheets werden netzwerk-first
+  // ausgeliefert, damit nach einem Deploy sofort der aktuelle Stand (z. B. PR-Zweig)
+  // greift; offline greift der Cache-Fallback. Begründung für .css: CSS-Verträge
+  // (z. B. Select-Geometrie, Themes) sind layoutbestimmend — ein veraltetes Stylesheet
+  // darf nicht länger als einen Ladezyklus überdauern (cache-first mit Hintergrund-
+  // refresh würde den Altbestand erst beim übernächsten Laden aktualisieren).
   if (requestUrl.pathname.includes('/modules/')) return true;
+  if (requestUrl.pathname.endsWith('.css')) return true;
   return requestUrl.pathname.endsWith('/index.html')
     || requestUrl.pathname.endsWith('/core/app.js')
     || requestUrl.pathname.endsWith('/core/ux/releaseNotesController.js')
