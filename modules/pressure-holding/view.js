@@ -24,7 +24,8 @@ export function view(s){
 const opts = (items) => items.map(([value,label]) => ({ value, label }));
 // Sichtbares Label über dem Segment-Umschalter (segmented() setzt label nur als aria-label)
 function segmentedWithLabel(name, options, value, label) {
-  return `<div class="field"><label>` + label + `</label><div class="control">` + segmented(name, options, value, { accent: "blue", label }) + `</div></div>`;
+  // Keine .control-Huelle: segmented bringt eigenen Rahmen/Hintergrund und fuellt sonst nicht die Spaltenbreite
+  return `<div class="field"><label>` + label + `</label>` + segmented(name, options, value, { accent: "blue", label }) + `</div>`;
 }
 
 function fmtInput(value, digits = 2) {
