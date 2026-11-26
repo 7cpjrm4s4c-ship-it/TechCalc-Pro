@@ -13,8 +13,52 @@
 - Die Theme-Auswahl ist entsprechend ihren gedrückten Schaltflächen als benannte Gruppe ausgezeichnet.
 - Browsermatrix für die Semantik aller 15 Module und den Umbruch bei 320 CSS-Pixeln erweitert.
 
-## Version 2.1.1 – Service-Worker-Cache-Versionierung für einheitliches Select-Rendering
+## Version 2.1.1 – Service-Worker-Cache-Versionierung, Druckhaltungserweiterungen und PDF-Vereinheitlichung
 - Version 2.1.1 hebt den Service-Worker-Cache an (`CACHE_NAME = 'techcalc-pro-2.1.1'`), damit bereits geladene Clients (z. B. Edge/Chrome unter Windows 11) die aktualisierten Stylesheets erhalten; Stylesheets (.css) werden netzwerk-first mit Cache-Fallback ausgeliefert, die Service-Worker-Registrierung erfolgt mit `updateViaCache: 'none'`.
+
+### Druckhaltung (pressure-holding)
+- **MAG-Aufteilung (PR #36):** Große MAG-Nennvolumina werden nicht mehr als einzelnes großes Gefäß ausgegeben, sondern auf mehrere gleich große Gefäße ≤ 1000 l aufgeteilt: `n = min { n ≥ 1 : nextReflexN(Vn/n) ≤ 1000 }`, je Gefäß `nextReflexN(Vn/n)` aus der Reflex-N-Reihe. Beispiele: 2400 l → 3 × 800 l, 1200 l → 2 × 600 l, 900 l → 1 × 1000 l, 1050 l → 2 × 600 l. Der bisherige Reflex G/SL-Fallback (1500–5000 l) entfällt für normale MAG vollständig; die dynamische Druckhaltung (Reflexomat/Variomat) bleibt unberührt. Neue Ergebnisgrößen: `vesselCount`, `vesselVolumeL`, `totalSelectedVolumeL`; `productLabel` = "n × Reflex N <v>". Primärergebnis bleibt das rechnerisch erforderliche Nennvolumen `vnMag` (unverändert).
+- **pSV-Plausibilitätshinweis (PR #36):** Nur bei `holdingType = 'mag'` Warnung (kein Fehler), wenn `pSV` die Reflex-Empfehlung unterschreitet: `pSV ≥ p0 + 1,5 bar` (pSV ≤ 5 bar) bzw. `pSV ≥ p0 + 2,0 bar` (pSV > 5 bar), mit Klartext inkl. empfohlenem Mindestwert und Quellenangabe.
+- **Reflex Zubehör (PR #37):** Erweiterung um Reflex Zubehör nach dem Reflex-Planungshandbuch "Planen Berechnen Ausrüsten":
+  - **Servitec-Entgasung (S. 57-61):** Feldgruppe "Entgasung" mit SEGMENT "Servitec verwenden" und SELECT "Servitec-Typ"; Funktion `selectServitec({ systemVolumeL, medium, tMaxC, peBar })` mit Typen: Mini (≤1000 l Wasser, ≤60°C, 0,5-2,5 bar), S (≤6000 l Wasser / ≤4000 l Glykol, ≤70°C, 0,5-4,5 bar), 35/60/75/95/120 T (bis 220000 l); Warnungen bei pe außerhalb Arbeitsdruckbereich, tMax über Typgrenze, Volumen über Tabellenwert.
+  - **Nachspeisung Fillset/Fillcontrol (S. 44-45):** Feldgruppe "Nachspeisung" mit SEGMENT "Nachspeisung", DECIMAL "Fließdruck", SELECT "Systemtrennung", DECIMAL "Leitungslänge"; Produktdaten: Fillset Compact/Fillset/Fillset Impuls (kvs 1,5), Fillcontrol Plus (kvs 1,4), Fillcontrol Plus Compact (kvs 0,4), Fillcontrol Auto Compact (kvs 0,18, Pumpe 8,5 bar), Fillcontrol Auto (kvs 0,18, Pumpe 5,5 bar); Prüffungen: Fließdruck ≥ p0 + 1,3 bar, Leitungslänge < 10 m → Wasserschlagdämpfer, ≥ 10 m → kleines Refix-Ausdehnungsgefäß (2 l).
+  - **Fillsoft Wasseraufbereitung (S. 51-55):** Feldgruppe "Wasseraufbereitung" mit SELECT "Verfahren" und DECIMAL "GHst"; Enthärtung: KW Fillsoft I = 3000 l·°dH, Fillsoft II = 6000 l·°dH; Formeln: Vf = KW / GHst, n = ceil(VA · GHst / KW), VN = n · KW / GHst - VA; Entsalzung mit Pflicht-Hinweis zur begrenzten Kapazitätsberechnung.
+  - **Sicherheitsventil-Größenempfehlung (S. 68-69):** Abblaseleistungstabelle als Datenstruktur; Größenempfehlung: 1 l/(h·kW), speziell für Reflex-Druckhaltestationen bei 5 bar: ≤ 1000 l → G ½ (3100 l/h), > 1000 l → G 1 (10600 l/h); Warnung bei unzureichender Abblaseleistung.
+  - Migration: `includeServitec` → `useServitec` mit Default 'true' für bestehende Nutzer; neue Default-Werte für `servitecType` ('auto'), `feedType` ('manual'), `waterTreatmentMethod` ('softening').
+- **PDF-Erweiterungen für Druckhaltung:** Neue Abschnitte für Zubehör in PDF-Export; deutsche Labels/Einheiten für MAG-Aufteilung und pSV-Hinweise.
+
+### Lüftung (ventilation)
+- **Volumenstrom-Zeile für Kälte-Abschnitte (PR #38):** Behebt den fachlichen Ausgabefehler im PDF-Export: Gespeicherte Kälte-Leitungsabschnitte werden mit derselben Zeilenstruktur wie Heiz-Abschnitte ausgegeben, inklusive "Volumenstrom" mit korrektem Wert. Neuer Export-Resolver `resolveLineSectionVolumeFlowM3h` rekonstruiert den Volumenstrom beim Aufbau der Report-Zeilen aus den gespeicherten Eingabedaten (`inputState` via `ventilation()`), alternativ aus Massenstrom/Luftdichte bei Zulufttemperatur oder aus Leistung/Wärmewert/ΔT der gespeicherten Rechnung. Speichern (`buildVentilationLineSectionRecord`) und Laden (`savedVentilationPatch`) stellen den Volumenstrom modusunabhängig wieder her; `ventilationLineSectionStats` gibt alle 7 Zeilentypen immer aus – ein fehlender Wert erscheint als "—", keine Zeile wird stillschweigend entfernt (Verschluck-Verbot). `parseGermanNumber` in `core/pdf/pdfDataMapping.js` normalisiert deutsche Tausenderpunkte korrekt ("80.000 m³/h" wird nicht mehr als "80 m³/h" ausgegeben).
+
+### PDF-Vereinheitlichung (PR #39)
+- Einheitlicher Dokumenttitel "Berechnungsprotokoll" für alle Rechenmodule inklusive h,x-Diagramm; nur autoritative Berichte (Überflutungsnachweis, F-Gase-Informationsblatt, EN-378-Sicherheitsdatenblatt) behalten ihren Sondertitel.
+- Einheitlicher Fortsetzungsbalken (Marke, Berichtstitel, Trennlinie) auf jeder Folgeseite; der volle Projekt-Metadatenblock erscheint nur auf Seite 1.
+- Einheitlicher Abschnittsstil (standardSection) für alle regulären Abschnitte; der lineBlock-Stil ist entfernt. Hinweise-Blöcke (1:3-Layout) und vollbreite Zusammenstellungen behalten ihre dedizierten zentralen Renderer.
+- Identisch wiederholte Abschnittstitel erhalten zentral einen Suffix (i/n).
+- Report-Template-Version: `global-report-template-10-unified-module-output`.
+- **Phase 49 – Review-Nacharbeiten:**
+  - Abschnitt "Berichtszusammenfassung" entfernt; Fallback bei fehlenden Ergebnisabschnitten: einzelner Abschnitt mit Berichtstitel (ohne Nummerierung) und Status "Keine Ergebnisdaten verfügbar".
+  - Abschnitt "Eingaben" entfernt (generic pipeline).
+  - Ergebnisabschnitte tragen den Namen der gespeicherten Berechnung; "Leitungsabschnitt"/"Gespeicherte Leitungsabschnitte" als Titel entfernt. Fallbacks: Record-Name → "System, DN n" → "Rohrauslegung i" / "Berechnung (i/n)".
+  - Fix: `cropCanvasToContent()` warf wegen `eight - 1` (undefiniert) eine `ReferenceError`; Korrektur: `height - 1`; Chart-Indizes bleiben an `section.chartIndex` ausgerichtet (`ImChart1`, `ImChart2`).
+  - Report-Template auf `global-report-template-11-review-fixes` erhöht.
+  - **Review-Runde 2:**
+    - h,x: `buildHxReportPayload()` erzeugt je gespeichertem Prozess einen zusätzlichen Abschnitt "Erhitzer, Kühler und Befeuchter" aus `equipmentSizing()`.
+    - Druckhaltung Hinweise: Breitenschätzung korrigiert (echte Helvetica-AFM-Glyphenbreiten in `core/pdf/pdfText.js`).
+    - Regenwasser: "Hinweise / Prüfhinweise" wird als `isNotesBlock: true` (1:3-Stil) statt `fullWidthRows` gerendert.
+    - Überflutung: `addPage({ continuation: false })` unterdrückt den Fortsetzungsbalken auf Vorspannseiten (Deckblatt, Inhaltsverzeichnis, erste Protokollseite).
+  - **Review-Runde 3:**
+    - Regenwasser: "Hinweise / Prüfhinweise" trägt kein Nummernpräfix mehr.
+    - Titel-Dedupe: `dedupeSectionTitles()` entfernt – wiederholte Abschnittstitel erscheinen unverändert ohne `(i/n)`-Suffix; `(Fortsetzung)`-Suffix bei Seitenumbrüchen bleibt unberührt.
+- PDF-Contract auf **2.3.0** gehoben (Regel 13 ersetzt durch "Identische Abschnittstitel bleiben unverändert"); neue Regel 14.
+- Neue Regressionstests: `tests/pdf-unified-output-regression.test.mjs`, `tests/pdf-phase49-review-fixes.test.mjs`, `tests/pdf-phase49-review-round2.test.mjs`.
+- Dokumentation: `docs/contracts/pdf-contract.md` auf 2.3.0 erweitert, `docs/phases/phase-48-pdf-unified-module-output.md`, `docs/phases/phase-49-pdf-export-review-nacharbeiten.md`.
+
+### Qualität
+- Alle Release-Gates grün: `npm run lint`, `npm test`, `npm run test:en378`, `npm run test:f-gases`, `npm run test:integration`, `npm run version:check`, `npm run precache:check`, `npm run audit:release-readiness`.
+- Playwright E2E lokal: alle Tests passed (45-46 passed, 2 skipped).
+- Neue Unit-Tests: `pressure-holding-mag-split.test.mjs`, `pressure-holding-reflex-accessories.test.mjs`, `ventilation-cooling-volume-flow-pdf.test.mjs`.
+- PDF-spezifische Regressionstests für alle betroffenen Module erweitert.
 
 ## Version 2.1.0 – Aufstellungsorte nach EN 378-3
 ### Neu
