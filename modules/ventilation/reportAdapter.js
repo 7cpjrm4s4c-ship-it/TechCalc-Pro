@@ -27,7 +27,7 @@ const sectionFromCard = card => ({
 });
 
 const lineSectionRows = lineSections => array(lineSections).flatMap((item, index) => [
-  { label: 'Bezeichnung', value: item?.name || `Leitungsabschnitt ${index + 1}` },
+  { label: 'Bezeichnung', value: item?.name || `Berechnung ${index + 1}` },
   ...ventilationLineSectionStats(item)
 ]);
 
@@ -58,7 +58,7 @@ export function buildVentilationReportDto({
 
   if (savedLineRows.length) {
     resultGroups.push({
-      title: 'Gespeicherte Leitungsabschnitte',
+      title: 'Gespeicherte Berechnungen',
       rows: savedLineRows,
       isLineSection: true
     });

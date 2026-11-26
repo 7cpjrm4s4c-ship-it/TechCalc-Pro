@@ -2,17 +2,19 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { GlobalPdfReport } from '../core/pdf/pdfLayout.js';
 import { REPORT_TEMPLATE_VERSION } from '../core/pdf/reportTheme.js';
-import { collectCurrentModule } from '../core/pdf/pdfDataMapping.js';
+import { collectCurrentModule, lineSectionItems, reportSections } from '../core/pdf/pdfDataMapping.js';
 
-// Unified PDF output across all modules (global-report-template-10):
+// Unified PDF output across all modules (global-report-template-11):
 // 1. One document heading for every calculation module, including h,x-Diagramm.
 // 2. One unified section style per section type; lineBlock styling is retired.
 // 3. Identical repeated section titles are disambiguated with an (i/n) suffix.
 // 4. Follow-up pages carry the compact continuation band; the full project
 //    meta block is only rendered on the first page.
+// 5. Review fixes (Phase 49): no Berichtszusammenfassung/Eingaben sections in
+//    generic module PDFs; result sections carry the saved record's name.
 
 const pdfLayoutSource = readFileSync(new URL('../core/pdf/pdfLayout.js', import.meta.url), 'utf8');
-assert.equal(REPORT_TEMPLATE_VERSION, 'global-report-template-10-unified-module-output');
+assert.equal(REPORT_TEMPLATE_VERSION, 'global-report-template-11-review-fixes');
 
 assert.match(pdfLayoutSource, /function dedupeSectionTitles/, 'renderer must disambiguate repeated section titles centrally');
 assert.match(pdfLayoutSource, /this\.reportContext = \{ project, moduleData, date \};/, 'build must hand the report context to the continuation header');
@@ -63,6 +65,34 @@ assert.ok(text.includes('Trinkwasser (1/2)'), 'first of two identical section ti
 assert.ok(text.includes('Trinkwasser (2/2)'), 'second of two identical section titles must be suffixed (2/2)');
 assert.ok(text.includes('PROJEKT'), 'project meta block rendered on first page');
 assert.equal(report.pages.length, 1, 'small fixtures fit on one page');
+
+// Phase 49 review fixes: no meta/input sections, no generic line-section titles.
+const genericTitles = reportSections(moduleData).map(section => section.title);
+assert.ok(genericTitles.length > 0, 'fixture sections must survive the generic pipeline');
+assert.ok(genericTitles.every(title => !/^(?:\d+\.\s*)?(berichtszusammenfassung|eingaben)$/i.test(title)),
+  'generic module PDFs must not contain Berichtszusammenfassung or Eingaben sections');
+assert.ok(!/berichtszusammenfassung/i.test(text), 'no Berichtszusammenfassung title in the PDF text layer');
+const designationBlocks = reportSections(moduleData).flatMap(section => lineSectionItems(section.rows, section.title));
+assert.ok(designationBlocks.every(block => !/leitungsabschnitt/i.test(block.title)),
+  'no Leitungsabschnitt block titles in generic module PDFs');
+const neutralBlocks = lineSectionItems([['Leistung', '10', 'kW']]);
+assert.equal(neutralBlocks[0].title, 'Berechnung 1', 'fallback block title must be neutral, never Leitungsabschnitt');
+
+// Empty module result: single section titled with the report heading.
+const emptySections = reportSections({
+  id: 'drinking-water',
+  title: 'Trinkwasserberechnung',
+  shortTitle: 'Trinkwasser',
+  reportSource: 'typed-dto',
+  reportDto: {
+    metadata: { moduleId: 'drinking-water', moduleTitle: 'Trinkwasserberechnung', reportHeading: 'Berechnungsprotokoll' },
+    sections: []
+  }
+});
+assert.equal(emptySections.length, 1, 'empty module result must produce exactly one fallback section');
+assert.equal(emptySections[0].title, 'Berechnungsprotokoll', 'fallback section carries the report title without numbering');
+assert.ok(emptySections[0].rows.some(row => /Keine Ergebnisdaten verfügbar/.test(row[1])),
+  'fallback section states that no result data is available');
 
 // Continuation band: a long fixture forces a second page; the continuation
 // page must carry the compact band while the full PROJEKT meta block must not
@@ -141,4 +171,4 @@ notesReport.renderSection({
 });
 assert.ok(pdfText(notesReport).includes('Sprührohrentgaser'), 'notes blocks must keep rendering their rows');
 
-console.log('unified PDF output regression (template 10) ok');
+console.log('unified PDF output regression (template 11) ok');

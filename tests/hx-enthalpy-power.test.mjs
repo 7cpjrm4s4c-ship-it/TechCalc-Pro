@@ -89,7 +89,10 @@ function savedHxRecord(name, input) {
   };
 }
 function printableHxSections(moduleData) {
-  return reportSections(moduleData).filter(section => !/^(?:\d+\.\s*)?(Berichtszusammenfassung|Eingaben)$/.test(section.title));
+  const sections = reportSections(moduleData);
+  assert.ok(sections.every(section => !/^(?:\d+\.\s*)?(berichtszusammenfassung|eingaben)$/i.test(section.title)),
+    'h,x PDF sections must not contain Berichtszusammenfassung or Eingaben meta sections');
+  return sections;
 }
 const summerRecord = savedHxRecord('Test Sommer', {
   tempC: 32,
@@ -137,7 +140,7 @@ assert.deepEqual(printableHxSections(hxModuleData).map(section => section.chartI
 const pdfLayoutSource = readFileSync(new URL('../core/pdf/pdfLayout.js', import.meta.url), 'utf8');
 assert.match(pdfLayoutSource, /this\.renderSection\(section\);\s*this\.sectionChartBlock\(section, index\);/,
   'h,x PDF layout must render each saved record before its corresponding diagram');
-assert.match(pdfLayoutSource, /printableSections\.forEach\(\(section, index\) => \{\s*\/\/[^\n]*\n\s*\/\/[^\n]*\n\s*\/\/[^\n]*\n\s*if \(index > 0\) this\.addPage\(\);\s*this\.renderSection\(section\);\s*this\.sectionChartBlock\(section, index\);\s*\}\);/,
+assert.match(pdfLayoutSource, /sections\.forEach\(\(section, index\) => \{\s*(?:\/\/[^\n]*\n\s*)+if \(index > 0\) this\.addPage\(\);\s*this\.renderSection\(section\);\s*this\.sectionChartBlock\(section, index\);\s*\}\);/,
   'h,x PDF layout must start each saved process on its own report page');
 assert.doesNotMatch(pdfLayoutSource, /this\.addPage\(\);\s*this\.header\(project, moduleData, date\);/,
   'continuation pages must use the unified continuation band instead of repeating the full page header');

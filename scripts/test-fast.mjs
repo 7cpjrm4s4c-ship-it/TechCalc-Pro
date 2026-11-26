@@ -29,6 +29,7 @@ const commands = [
   ['node', ['tests/pdf-branding-opt-out.test.mjs']],
   ['node', ['tests/pdf-report-engine-unification-1.6.1.test.mjs']],
   ['node', ['tests/pdf-unified-output-regression.test.mjs']],
+  ['node', ['tests/pdf-phase49-review-fixes.test.mjs']],
   ['node', ['tests/phase45c-modulsplitting-implementation.test.mjs']],
   ['node', ['tests/phase45c1-project-lifecycle-integration.test.mjs']],
   ['node', ['tests/phase45c2-legacy-saved-records-migration.test.mjs']],

@@ -33,7 +33,7 @@ const sectionFromCard = card => ({
 
 const lineSectionRows = lineSections => (Array.isArray(lineSections) ? lineSections : [])
   .flatMap((item, index) => [
-    { label: 'Bezeichnung', value: item?.name || `Leitungsabschnitt ${index + 1}` },
+    { label: 'Bezeichnung', value: item?.name || `Berechnung ${index + 1}` },
     ...lineSectionStats(item)
   ]);
 
@@ -68,7 +68,7 @@ export function buildHeatingCoolingReportDto({
 
   if (savedLineRows.length) {
     resultGroups.push({
-      title: 'Gespeicherte Leitungsabschnitte',
+      title: 'Gespeicherte Berechnungen',
       rows: savedLineRows,
       isLineSection: true
     });

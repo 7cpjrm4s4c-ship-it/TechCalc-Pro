@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 
-import { reportSections } from '../core/pdf/pdfDataMapping.js';
+import { lineSectionItems, reportSections } from '../core/pdf/pdfDataMapping.js';
 import { calculate } from '../modules/heating-cooling/logic.js';
 import { buildHeatingCoolingReportDto } from '../modules/heating-cooling/reportAdapter.js';
 
@@ -51,12 +51,19 @@ assert.equal(report.metadata.dtoType, 'techcalc.heating-cooling.report');
 assert.equal(report.metadata.moduleId, 'heating-cooling');
 assert.equal(report.summary.calcTarget, 'power');
 assert.equal(report.summary.lineSectionCount, 1);
-assert.ok(report.resultGroups.some(group => group.title === 'Gespeicherte Leitungsabschnitte'));
+assert.ok(report.resultGroups.some(group => group.title === 'Gespeicherte Berechnungen'));
 assert.doesNotThrow(() => JSON.stringify(report));
 
 const sections = reportSections({ reportSource: 'typed-dto', reportDto: report });
-assert.ok(sections.length >= 3);
-assert.equal(sections[0].title, '1. Berichtszusammenfassung');
-assert.ok(sections.some(section => section.title.includes('Gespeicherte Leitungsabschnitte')));
+assert.ok(sections.length >= 1);
+assert.ok(sections.every(section => !/^(?:\d+\.\s*)?(berichtszusammenfassung|eingaben)$/i.test(section.title)),
+  'generic module PDFs must not contain Berichtszusammenfassung or Eingaben sections');
+assert.ok(sections.every(section => !/leitungsabschnitt/i.test(section.title)),
+  'no Leitungsabschnitt section titles may remain');
+const savedSection = sections.find(section => section.isLineSection && section.title === 'Gespeicherte Berechnungen');
+assert.ok(savedSection, 'saved line sections keep their collective section');
+const savedBlocks = lineSectionItems(savedSection.rows, savedSection.title);
+assert.deepEqual(savedBlocks.map(block => block.title), ['Testabschnitt'],
+  'each saved record must appear under its stored name');
 
 console.log('Heating/cooling report DTO tests passed.');

@@ -39,7 +39,7 @@ function cropCanvasToContent(sourceCanvas, { padding = 18, threshold = 246 } = {
   minX = Math.max(0, minX - padding);
   minY = Math.max(0, minY - padding);
   maxX = Math.min(width - 1, maxX + padding);
-  maxY = Math.min(eight - 1, maxY + padding);
+  maxY = Math.min(height - 1, maxY + padding);
   let cropW = Math.max(1, maxX - minX + 1);
   let cropH = Math.max(1, maxY - minY + 1);
   const maxAspect = 1.9;

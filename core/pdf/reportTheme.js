@@ -43,4 +43,4 @@ export const PDF_GRID = {
   valueRightRatio: 0.23
 };
 
-export const REPORT_TEMPLATE_VERSION = 'global-report-template-10-unified-module-output';
+export const REPORT_TEMPLATE_VERSION = 'global-report-template-11-review-fixes';

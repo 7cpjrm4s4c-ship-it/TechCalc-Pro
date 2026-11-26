@@ -24,11 +24,6 @@ function pdfValueForRow(row = []) {
   return pdfRowValue(row).replace(/ - /g, ' x ');
 }
 
-function isHxMetaSection(section = {}) {
-  const key = normalizeKey(section?.title || '');
-  return /^(?:\d+\s*)?(berichtszusammenfassung|eingaben)$/.test(key);
-}
-
 function isFullWidthListBlock(item = {}) {
   return normalizeKey(item?.title || '').includes('zusammenstellung einrichtungsgegenstaende');
 }
@@ -200,11 +195,15 @@ function drawPairedRow(report, pair, x, y, width, rowHeight, { labelSize = PDF_T
 export class GlobalPdfReport {
   constructor(images = {}) {
     this.images = images;
-    this.chartImages = Array.isArray(images.chartImages) ? images.chartImages.filter(Boolean) : [];
+    // Keep chart slots aligned with section.chartIndex: failed rasterizations
+    // stay null instead of shifting later charts onto the wrong ImChart name.
+    this.chartImages = Array.isArray(images.chartImages) ? images.chartImages.slice() : [];
     this.imageResources = [];
     if (images.appIcon) this.imageResources.push({ name: 'ImAppIcon', image: images.appIcon });
     if (images.companyLogo) this.imageResources.push({ name: 'ImCompanyLogo', image: images.companyLogo });
-    this.chartImages.forEach((image, index) => this.imageResources.push({ name: `ImChart${index + 1}`, image }));
+    this.chartImages.forEach((image, index) => {
+      if (image) this.imageResources.push({ name: `ImChart${index + 1}`, image });
+    });
     if (images.chartImage) this.imageResources.push({ name: 'ImChart', image: images.chartImage });
     this.pages = [];
     this.reportContext = null;
@@ -611,9 +610,7 @@ export class GlobalPdfReport {
     const sections = dedupeSectionTitles(reportSections(moduleData));
     const isHxDiagram = /hx|h,x/i.test(`${moduleData.id || ''} ${moduleData.title || ''}`);
     if (isHxDiagram) {
-      const hxSections = sections.filter(section => !isHxMetaSection(section));
-      const printableSections = hxSections.length ? hxSections : sections;
-      printableSections.forEach((section, index) => {
+      sections.forEach((section, index) => {
         // Each saved process keeps its own page; continuation pages use the
         // unified continuation band instead of repeating the full header and
         // project meta block.

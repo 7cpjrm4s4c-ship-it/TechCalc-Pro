@@ -20,7 +20,7 @@ export function buildVentilationReportSections(reportDto = {}) {
   const lineSectionGroups = array(reportDto.resultGroups)
     .filter(group => group?.isLineSection)
     .map(group => ({
-      title: 'Leitungsabschnitte',
+      title: group?.title || 'Gespeicherte Berechnungen',
       rows: normalizeRows(group.rows),
       isLineSection: true
     }))
