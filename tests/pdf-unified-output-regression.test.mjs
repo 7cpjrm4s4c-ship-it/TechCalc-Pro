@@ -7,7 +7,7 @@ import { collectCurrentModule, lineSectionItems, reportSections } from '../core/
 // Unified PDF output across all modules (global-report-template-11):
 // 1. One document heading for every calculation module, including h,x-Diagramm.
 // 2. One unified section style per section type; lineBlock styling is retired.
-// 3. Identical repeated section titles are disambiguated with an (i/n) suffix.
+// 3. Identical repeated section titles are rendered unchanged (no (i/n) suffix, Phase 49 round 3).
 // 4. Follow-up pages carry the compact continuation band; the full project
 //    meta block is only rendered on the first page.
 // 5. Review fixes (Phase 49): no Berichtszusammenfassung/Eingaben sections in
@@ -16,7 +16,7 @@ import { collectCurrentModule, lineSectionItems, reportSections } from '../core/
 const pdfLayoutSource = readFileSync(new URL('../core/pdf/pdfLayout.js', import.meta.url), 'utf8');
 assert.equal(REPORT_TEMPLATE_VERSION, 'global-report-template-11-review-fixes');
 
-assert.match(pdfLayoutSource, /function dedupeSectionTitles/, 'renderer must disambiguate repeated section titles centrally');
+assert.doesNotMatch(pdfLayoutSource, /function dedupeSectionTitles/, 'the (i/n) dedupe renderer must be removed (Phase 49 round 3)');
 assert.match(pdfLayoutSource, /this\.reportContext = \{ project, moduleData, date \};/, 'build must hand the report context to the continuation header');
 assert.doesNotMatch(pdfLayoutSource, /\n  lineBlock\(/, 'the retired lineBlock renderer must not return');
 assert.match(pdfLayoutSource, /this\.standardSection\(\{ \.\.\.section, title: item\.title \|\| section\.title, rows: item\.rows \}\);/,
@@ -61,8 +61,9 @@ const report = new GlobalPdfReport({});
 report.build(project, moduleData);
 const text = pdfText(report);
 
-assert.ok(text.includes('Trinkwasser (1/2)'), 'first of two identical section titles must be suffixed (1/2)');
-assert.ok(text.includes('Trinkwasser (2/2)'), 'second of two identical section titles must be suffixed (2/2)');
+const trinkwasserTitles = text.split('\n').filter(line => line === 'Trinkwasser');
+assert.equal(trinkwasserTitles.length, 2, 'two identical section titles must both appear unchanged');
+assert.ok(!/\(\d+\/\d+\)/.test(text), 'no (i/n) dedupe suffix may remain in the text layer');
 assert.ok(text.includes('PROJEKT'), 'project meta block rendered on first page');
 assert.equal(report.pages.length, 1, 'small fixtures fit on one page');
 

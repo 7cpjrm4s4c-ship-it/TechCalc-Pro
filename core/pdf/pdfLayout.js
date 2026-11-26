@@ -28,27 +28,6 @@ function isFullWidthListBlock(item = {}) {
   return normalizeKey(item?.title || '').includes('zusammenstellung einrichtungsgegenstaende');
 }
 
-function dedupeSectionTitles(sections = []) {
-  // Rule-based disambiguation for repeated section titles (e.g. multiple
-  // "Trinkwasser" or "Berechnung" blocks). identical titles get an explicit
-  // "(i/n)" suffix so every table is addressable. Unique titles stay as-is.
-  const counts = new Map();
-  sections.forEach(section => {
-    const key = normalizeKey(section?.title || '');
-    counts.set(key, (counts.get(key) || 0) + 1);
-  });
-  const seen = new Map();
-  return sections.map(section => {
-    const key = normalizeKey(section?.title || '');
-    const total = counts.get(key) || 1;
-    if (total < 2) return section;
-    const index = (seen.get(key) || 0) + 1;
-    seen.set(key, index);
-    const title = sanitizeText(section?.title || '');
-    return { ...section, title: `${title} (${index}/${total})` };
-  });
-}
-
 function tableColumns(x, width) {
   // One immutable four-column grid for every report section:
   // label | value | label | value. Labels are left-aligned, values use
@@ -610,7 +589,8 @@ export class GlobalPdfReport {
     this.reportContext = { project, moduleData, date };
     this.header(project, moduleData, date);
     this.projectData(project);
-    const sections = dedupeSectionTitles(reportSections(moduleData));
+    // Repeated section titles are rendered unchanged (no (i/n) suffix).
+    const sections = reportSections(moduleData);
     const isHxDiagram = /hx|h,x/i.test(`${moduleData.id || ''} ${moduleData.title || ''}`);
     if (isHxDiagram) {
       sections.forEach((section, index) => {

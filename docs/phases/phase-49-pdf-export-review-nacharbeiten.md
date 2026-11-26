@@ -89,3 +89,21 @@ Korrektur zentral: `addPage({ continuation })` in `core/pdf/pdfLayout.js` – mi
 - Neu: `tests/pdf-phase49-review-round2.test.mjs` (B1: Equipment-Abschnitt je Prozess mit exakt den `equipmentSizing()`-Zeilen im PDF-Textlayer; B2: realer Wasseraufbereitungstext ≤ 3 Zeilen, jede Zeile innerhalb `valueW`, kurze Hinweise einzeilig; B3: `isNotesBlock` statt `fullWidthRows`, Rendering über `notesBlock()`; B4: Flooding-Fixture mit 5 Seiten – Balken nicht auf Seiten 1–3, ab Seite 4 überall, PROJEKT genau einmal auf Seite 3); in `scripts/test-fast.mjs` registriert.
 - Angepasst: `tests/hx-enthalpy-power.test.mjs` und `tests/pdf-phase49-review-fixes.test.mjs` (Equipment-Abschnitte, `recordIndex`, Layout-Quellcode-Asserts).
 - Gegrannt: `audit-test-contracts`, `scripts/test-fast.mjs`, Integration-Gate, Flooding-Phase-47C-Gate (51 Dateien), EN-378-PDF-Tests.
+
+## Review-Runde 3 (26.11.2026, Modul-PDFs Regenwasser und Druckhaltung)
+
+### C1 – Regenwasser: Nummerierung des Hinweise-Blocks entfernt
+
+- `core/pdf/rainwaterReportSections.js`: Der Warnungen-Abschnitt heißt nicht mehr `${sections.length+1}. Hinweise / Prüfhinweise`, sondern schlicht `Hinweise / Prüfhinweise` – unabhängig von der Anzahl der Flächenabschnitte, die ihre unveränderte Nummerierung behalten.
+- Kontrolle generische Pipeline: Es wurden keine weiteren generischen Abschnittserzeuger mit Lücken-Nummerierung gefunden. Die durchgehende Nummerierung in `modules/drinking-water/index.js` (`sectionNumber++`) sowie der nummerierte Aufbau von EN 378 und Überflutungsnachweis bleiben unangetastet; der Fallback `Abschnitt ${index+1}` in `genericReportSections.js` ist konstruktionsbedingt lückenlos und bleibt.
+
+### C2 – Titel-Dedupe `(i/n)` vollständig entfernt
+
+- `core/pdf/pdfLayout.js`: `dedupeSectionTitles()` entfernt; `build()` reicht die Abschnittstitel aus `reportSections()` unverändert durch. Wiederholte Titel (z. B. `Sprührohrentgaser`, `Hinweise`, zwei gleiche Record-Namen) erscheinen ohne Suffix. Das Fortsetzungs-Suffix `(Fortsetzung)` bei Seitenumbrüchen bleibt davon unberührt.
+- `docs/contracts/pdf-contract.md` auf Version 2.3.0 gehoben; Regel 13 ersetzt durch „Identische Abschnittstitel innerhalb eines Dokuments bleiben unverändert“. Report-Template bleibt `global-report-template-11-review-fixes`.
+- Tests: `tests/pdf-unified-output-regression.test.mjs` assertet jetzt doppeltes, unverändertes Auftreten identischer Titel und das Fehlen jeglicher `(i/n)`-Suffixe; `tests/pdf-phase49-review-round2.test.mjs` ergänzt C1 (exakter Titel ohne Präfix) und C2 (Equipment-Titel exakt, ohne Suffix).
+
+### Tests Runde 3
+
+- Angepasst: `tests/pdf-unified-output-regression.test.mjs`, `tests/pdf-phase49-review-round2.test.mjs`.
+- Gegrannt: `audit-test-contracts`, `scripts/test-fast.mjs`, Integration-Gate, Flooding-47C-Gate, alle pdf-bezogenen Modultests (Drinking-Water, Wastewater, Buffer-Storage, Pressure-Holding, Ventilation, F-Gases, h,x, rc11).

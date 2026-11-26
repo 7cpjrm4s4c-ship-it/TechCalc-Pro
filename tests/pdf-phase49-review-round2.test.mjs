@@ -90,8 +90,8 @@ const hxModuleData = {
 const hxReport = new GlobalPdfReport({ chartImages: [fakeChartImage('01'), fakeChartImage('02')] });
 const hxPdf = await hxReport.build(project, hxModuleData).text();
 const hxCommands = pdfTextCommands(hxPdf);
-assert.equal(hxCommands.filter(cmd => cmd.text.startsWith('Erhitzer, Kühler und Befeuchter')).length, 2,
-  'B1: equipment section title appears once per saved process in the PDF text layer');
+assert.equal(hxCommands.filter(cmd => cmd.text === 'Erhitzer, Kühler und Befeuchter').length, 2,
+  'B1/C2: equipment section title appears once per saved process, unchanged and without (i/n) suffix');
 assert.ok(hxCommands.some(cmd => cmd.text === 'Kühlerleistung'), 'B1: equipment rows appear in the PDF text layer');
 assert.ok(hxCommands.some(cmd => cmd.text.includes('Test Sommer - h,x-Diagramm')), 'B1: diagram title still present');
 
@@ -141,7 +141,7 @@ const rainDto = {
 const rainSections = buildRainwaterReportSections(rainDto);
 assert.equal(rainSections.length, 1, 'only the warnings section is produced for the fixture');
 const rainNotes = rainSections[0];
-assert.match(rainNotes.title, /Hinweise \/ Prüfhinweise/);
+assert.equal(rainNotes.title, 'Hinweise / Prüfhinweise', 'C1: rainwater notes block carries no numbering prefix');
 assert.equal(rainNotes.isNotesBlock, true, 'B3: rainwater warnings must be flagged as notes block');
 assert.ok(!rainNotes.fullWidthRows, 'B3: fullWidthRows must no longer be set for the warnings section');
 assert.deepEqual(rainNotes.rows[0].slice(0, 2), ['', 'Herstellerwert ohne Anstauhöhe prüfen.'],
