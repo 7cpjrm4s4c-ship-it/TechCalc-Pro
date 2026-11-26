@@ -22,6 +22,11 @@ export function view(s){
 }
 
 const opts = (items) => items.map(([value,label]) => ({ value, label }));
+// Sichtbares Label über dem Segment-Umschalter (segmented() setzt label nur als aria-label)
+function segmentedWithLabel(name, options, value, label) {
+  return `<div class="field"><label>` + label + `</label><div class="control">` + segmented(name, options, value, { accent: "blue", label }) + `</div></div>`;
+}
+
 function fmtInput(value, digits = 2) {
   if (value === '' || value === null || value === undefined) return '';
   const parsed = parseNumber(value, { fallback: 0 });
@@ -32,8 +37,8 @@ function fmtInput(value, digits = 2) {
 function renderAccessoriesFields(s) {
   // Switches: Servitec, Nachspeisung, Wasseraufbereitung (in derselben Zeile mit gleicher Höhe)
   const switchFields = [
-    segmented('useServitec', opts([['true','Ja'],['false','Nein']]), s.useServitec || 'true', { accent:'blue', label:'Servitec verwenden' }),
-    segmented('feedType', opts([['manual','Manuell'],['auto','Automatisch']]), s.feedType || 'manual', { accent:'blue', label:'Nachspeisung' }),
+    segmentedWithLabel('useServitec', opts([['true','Ja'],['false','Nein']]), s.useServitec || 'true', 'Servitec verwenden'),
+    segmentedWithLabel('feedType', opts([['manual','Manuell'],['auto','Automatisch']]), s.feedType || 'manual', 'Nachspeisung'),
     selectField({ 
       id:'waterTreatmentMethod', 
       label:'Wasseraufbereitung', 
@@ -66,7 +71,7 @@ function renderAccessoriesFields(s) {
   ];
 
   return stack([
-    `<h4>Zubehör</h4>`,
+    `<h4>Entgasung</h4>`,
     grid(switchFields.join(''), 3),
     `<h4>Nachspeisung Details</h4>${grid(feedInputFields.join(''), 2)}`,
     `<h4>Wasseraufbereitung Details</h4>${grid(waterTreatmentInputFields.join(''), 2)}`
