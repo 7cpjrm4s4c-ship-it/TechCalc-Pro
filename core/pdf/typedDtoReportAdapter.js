@@ -319,44 +319,6 @@ function valueToText(value) {
   return formatScalar(value);
 }
 
-function optionLabel(field = {}, value) {
-  const option = array(field.options).find(item => String(item?.value ?? item) === String(value));
-  if (!option || typeof option !== 'object') return valueToText(value);
-  return valueToText(option.label ?? option.text ?? option.value ?? value);
-}
-
-function isFieldVisible(field = {}, snapshot = {}) {
-  if (typeof field.visibleWhen === 'function') {
-    try { return field.visibleWhen(snapshot); } catch { return false; }
-  }
-  if (typeof field.when === 'function') {
-    try { return field.when(snapshot); } catch { return false; }
-  }
-  return true;
-}
-
-function readFieldValue(field = {}, snapshot = {}) {
-  const key = field.name || field.id || field.key;
-  if (!key) return undefined;
-  if (typeof field.read === 'function') {
-    try { return field.read(snapshot); } catch { return undefined; }
-  }
-  if (field.type === 'stats' && typeof field.items === 'function') return field.items(snapshot);
-  return snapshot[key];
-}
-
-function schemaInputRows(schema = {}, snapshot = {}) {
-  return array(schema.fields)
-    .filter(field => isFieldVisible(field, snapshot))
-    .map(field => {
-      const fieldKey = field.name || field.id || field.key;
-      const value = readFieldValue(field, snapshot);
-      const text = optionLabel(field, value);
-      return [field.label || field.title || labelFromKey(fieldKey), text || EMPTY_VALUE, normalizeUnit(field.unit || unitFromKey(fieldKey))];
-    })
-    .filter(row => row.some(hasDisplayValue));
-}
-
 function normalizeRow(row = []) {
   if (Array.isArray(row)) {
     const label = row[0] ?? '';
@@ -468,7 +430,7 @@ function calculationSections(calculation, calculationCached) {
 
 function savedRecordBaseTitle(key = '') {
   const normalized = normalizeLookupKey(key);
-  if (normalized === 'savedPipes') return 'Leitungsabschnitt';
+  if (normalized === 'savedPipes') return 'Rohrauslegung';
   if (normalized === 'savedBuffers') return 'Pufferspeicher';
   if (normalized === 'savedPlants') return 'Anlage';
   if (normalized === 'savedCalculations') return 'Berechnung';
@@ -481,7 +443,7 @@ function savedRecordBaseTitle(key = '') {
     .replace(/\bPlants\b/i, 'Anlagen')
     .replace(/\bCalculations\b/i, 'Berechnungen')
     .replace(/\bProcesses\b/i, 'Prozesse')
-    .replace(/\bLine Sections\b/i, 'Leitungsabschnitte')
+    .replace(/\bLine Sections\b/i, 'Rohrstränge')
     .replace(/\bRecords\b/i, 'Records')
     .trim();
 }
@@ -604,7 +566,7 @@ function savedRecordSections(snapshot = {}) {
       }
       
       return [{
-        title: savedRecordBaseTitle(key),
+        title: savedRecordTitle(record, index, key),
         rows: allRows,
         isLineSection: isLineSectionRecordKey(key)
       }];
@@ -621,14 +583,8 @@ export function buildGenericModuleReportDto({
   generatedAt = new Date().toISOString(),
   calculationCached = false
 } = {}) {
-  const inputRows = schemaInputRows(schema, state);
-  const inputSection = {
-    title: 'Eingaben',
-    rows: inputRows.length ? inputRows : [['Eingaben', 'Keine Eingaben im Modul-Schema verfügbar', '']]
-  };
   const resultSections = resultModelSections(resultModel);
   const sections = [
-    inputSection,
     ...(resultSections.length ? resultSections : calculationSections(calculation, calculationCached)),
     ...savedRecordSections(state)
   ];

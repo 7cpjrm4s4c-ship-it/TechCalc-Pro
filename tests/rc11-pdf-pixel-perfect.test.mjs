@@ -56,7 +56,7 @@ const project = {
   approvedBy: 'SVP Engineering'
 };
 
-assert.equal(REPORT_TEMPLATE_VERSION, 'global-report-template-9-rc11-1-pdf-table-dedupe');
+assert.equal(REPORT_TEMPLATE_VERSION, 'global-report-template-11-review-fixes');
 assert.equal(sanitizeText('m³/h ± Δp → ±K-Wert Ø 18 × 1,0'), 'm³/h +/- Deltap -> +/-K-Wert DN 18 × 1,0');
 const unbreakableToken = 'A'.repeat(180);
 assert.deepEqual(

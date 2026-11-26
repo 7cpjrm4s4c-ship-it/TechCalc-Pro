@@ -38,8 +38,8 @@ const sections = reportSections({
   reportDto: dto,
   reportSource: 'typed-dto'
 });
-const savedSection = sections.find(section => section.isLineSection && section.title === 'Pufferspeicher');
-assert.ok(savedSection, 'gespeicherte Pufferspeicher-Records müssen als Leitungsabschnitt-artige PDF-Blöcke exportiert werden');
+const savedSection = sections.find(section => section.isLineSection && section.title === 'Test Abtau');
+assert.ok(savedSection, 'gespeicherter Pufferspeicher-Record muss unter seinem gespeicherten Namen als PDF-Abschnitt exportiert werden');
 const rows = savedSection.rows;
 assert.ok(rows.some(row => row[0] === 'Puffervolumen Abtauung' && row[1] === '8.234' && row[2] === 'l'));
 assert.ok(rows.some(row => row[0] === 'Erforderliches Pufferspeichervolumen' && row[1] === '8.234' && row[2] === 'l'));

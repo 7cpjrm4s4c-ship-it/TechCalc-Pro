@@ -39,11 +39,11 @@ export function buildRainwaterReportSections(dto={}){
  if(dto.metadata?.dtoType!=='techcalc.rainwater.report') return [];
  const sections=a(dto.surfaces).map(surfaceSection);
  if(a(dto.warnings).length) sections.push({
-   title:`${sections.length+1}. Hinweise / Prüfhinweise`,
+   title:'Hinweise / Prüfhinweise',
    rows:a(dto.warnings).map(x=>['',t(x),'']),
    isLineSection:false,
    forcePageBreak:true,
-   fullWidthRows:true
+   isNotesBlock:true
  });
  return sections;
 }

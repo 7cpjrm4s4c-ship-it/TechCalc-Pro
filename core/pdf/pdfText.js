@@ -80,25 +80,35 @@ export function pdfNumber(value) {
   if (!Number.isFinite(number)) return '0';
   return number.toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
 }
+// Glyph widths of the PDF base-14 font Helvetica (AFM, units per 1000 em).
+// The renderer embeds no font, so viewers measure text with exactly these
+// widths; the estimate must match them, otherwise wrapped lines overflow
+// their field in the real document.
+const HELVETICA_WIDTHS = {
+  ' ': 278, '!': 278, '"': 355, '#': 556, '$': 556, '%': 889, '&': 667, "'": 191,
+  '(': 333, ')': 333, '*': 389, '+': 584, ',': 278, '-': 333, '.': 278, '/': 278,
+  '0': 556, '1': 556, '2': 556, '3': 556, '4': 556, '5': 556, '6': 556, '7': 556, '8': 556, '9': 556,
+  ':': 278, ';': 278, '<': 584, '=': 584, '>': 584, '?': 556, '@': 1015,
+  'A': 667, 'B': 667, 'C': 722, 'D': 722, 'E': 667, 'F': 611, 'G': 778, 'H': 722,
+  'I': 278, 'J': 500, 'K': 667, 'L': 556, 'M': 833, 'N': 722, 'O': 778, 'P': 667,
+  'Q': 778, 'R': 722, 'S': 667, 'T': 611, 'U': 722, 'V': 667, 'W': 944, 'X': 667,
+  'Y': 667, 'Z': 611,
+  '[': 278, '\\': 278, ']': 278, '^': 469, '_': 556, '`': 333,
+  'a': 556, 'b': 556, 'c': 500, 'd': 556, 'e': 556, 'f': 278, 'g': 556, 'h': 556,
+  'i': 222, 'j': 222, 'k': 500, 'l': 222, 'm': 833, 'n': 556, 'o': 556, 'p': 556,
+  'q': 556, 'r': 333, 's': 500, 't': 278, 'u': 556, 'v': 500, 'w': 722, 'x': 500,
+  'y': 500, 'z': 500,
+  '{': 334, '|': 260, '}': 334, '~': 584,
+  '\u00b0': 400, '\u00b7': 278, '\u00d7': 584, '\u00b2': 333, '\u00b3': 333, '\u00b5': 556,
+  '\u00e4': 556, '\u00f6': 556, '\u00fc': 556, '\u00c4': 667, '\u00d6': 778, '\u00dc': 722, '\u00df': 500
+};
 export function estimateTextWidth(text, size = 8, font = 'F1') {
   if (font === 'F3' || font === 'F4') return sanitizeText(text).length * size * 0.6;
-  const widths = {
-    ' ': 0.28, '.': 0.28, ',': 0.28, ':': 0.28, ';': 0.28, '-': 0.33, '/': 0.28,
-    '(': 0.33, ')': 0.33, '[': 0.33, ']': 0.33, '+': 0.58, '=': 0.58,
-    '·': 0.28, '×': 0.58, '²': 0.40, '³': 0.40, 'ₛ': 0.30,
-    '0': 0.56, '1': 0.56, '2': 0.56, '3': 0.56, '4': 0.56,
-    '5': 0.56, '6': 0.56, '7': 0.56, '8': 0.56, '9': 0.56,
-    'i': 0.22, 'j': 0.22, 'l': 0.22, 'I': 0.28, 't': 0.28, 'f': 0.30, 'r': 0.33,
-    'm': 0.83, 'w': 0.72, 'M': 0.83, 'W': 0.94,
-    'A': 0.67, 'B': 0.67, 'C': 0.72, 'D': 0.72, 'E': 0.67, 'F': 0.61, 'G': 0.78,
-    'H': 0.72, 'J': 0.50, 'K': 0.67, 'L': 0.56, 'N': 0.72, 'O': 0.78, 'P': 0.67,
-    'Q': 0.78, 'R': 0.72, 'S': 0.67, 'T': 0.61, 'U': 0.72, 'V': 0.67, 'X': 0.67,
-    'Y': 0.67, 'Z': 0.61
-  };
   let total = 0;
-  for (const ch of sanitizeText(text)) total += widths[ch] ?? (/[a-zäöüß]/.test(ch) ? 0.50 : 0.56);
-  return total * size;
+  for (const ch of sanitizeText(text)) total += HELVETICA_WIDTHS[ch] ?? 556;
+  return (total / 1000) * size;
 }
+
 function splitAtSemanticSeparators(token) {
   const clean = sanitizeText(token);
   if (!clean) return [''];

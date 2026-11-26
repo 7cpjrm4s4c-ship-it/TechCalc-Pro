@@ -318,9 +318,11 @@ function initProjectSettings() {
 async function chartImagesForReport(moduleData = {}) {
   const charts = Array.isArray(moduleData.reportDto?.charts) ? moduleData.reportDto.charts : [];
   const images = [];
-  for (const chart of charts) {
-    const image = await svgToJpeg(chart?.svg, { maxWidth: 1300, maxHeight: 820, quality: 0.9 });
-    if (image) images.push(image);
+  for (const [index, chart] of charts.entries()) {
+    // Keep the array index aligned with section.chartIndex even when a chart
+    // fails to rasterize; the layout skips null slots but never shifts names.
+    images[index] = await svgToJpeg(chart?.svg, { maxWidth: 1300, maxHeight: 820, quality: 0.9 });
+    if (!images[index]) logger.warn('PDF-Diagramm konnte nicht gerastert werden.', { module: 'pdf-chart', chartIndex: index });
   }
   return images;
 }

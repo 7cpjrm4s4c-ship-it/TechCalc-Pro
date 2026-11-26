@@ -16,7 +16,10 @@ function reportIdentity(id = '', reportDto = {}) {
 }
 
 function isSpecialReportHeadingModule(id = '', reportDto = {}) {
-  return /flooding-verification|hx|h,x/i.test(reportIdentity(id, reportDto));
+  // Only authority-level reports (flooding-verification) keep their own
+  // document heading. Every calculation module, including h,x-Diagramm,
+  // shares the unified "Berechnungsprotokoll" heading.
+  return /flooding-verification/i.test(reportIdentity(id, reportDto));
 }
 
 function specialReportHeading(id = '', reportDto = {}) {
@@ -322,8 +325,10 @@ export function lineSectionItems(rows = [], sectionTitle = '', notes = [], isNot
   const pushCurrent = () => {
     if (!hasRows(current)) return;
     const index = items.length + 1;
-    // Use sectionTitle if provided, otherwise fall back to designation row or default
-    const cleanTitle = sanitizeText(sectionTitle) || sanitizeText(title) || `Leitungsabschnitt ${index}`;
+    // The designation row (record name) wins; the section title is only a
+    // fallback, and the final fallback is a neutral title, never a generic
+    // line-section label.
+    const cleanTitle = sanitizeText(title) || sanitizeText(sectionTitle) || `Berechnung ${index}`;
     const item = { title: cleanTitle, rows: current };
     // Add notes if provided (Auftrag A - Runde 7: Hinweise als vollbreiter Abschluss)
     if (notes && notes.length > 0) {
@@ -351,7 +356,7 @@ export function lineSectionItems(rows = [], sectionTitle = '', notes = [], isNot
     if (label || value || unit) current.push([label, value, unit]);
   });
   pushCurrent();
-  if (!items.length && hasRows(rows)) items.push({ title: sectionTitle || 'Leitungsabschnitt 1', rows, notes, isNotesBlock });
+  if (!items.length && hasRows(rows)) items.push({ title: sanitizeText(title) || sanitizeText(sectionTitle) || 'Berechnung 1', rows, notes, isNotesBlock });
   return items;
 }
 function normalizePdfRows(rows = [], title = '') {

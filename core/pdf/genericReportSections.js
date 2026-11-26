@@ -53,7 +53,6 @@ function providedSections(reportDto = {}) {
   const groups = resultGroupSections(reportDto).filter(section => sectionRows(section).length);
   if (groups.length) return groups;
   const sections = [];
-  if (reportDto.input && typeof reportDto.input === 'object') sections.push({ title: 'Eingaben', rows: rowsFromObject(reportDto.input) });
   if (reportDto.outputs && typeof reportDto.outputs === 'object') sections.push({ title: 'Berechnungsergebnisse', rows: rowsFromObject(reportDto.outputs) });
   return sections;
 }
@@ -74,7 +73,7 @@ function isSavedOrRecordSection(section = {}) {
 
 function isMetadataSection(section = {}) {
   const titleKey = normalizeKey(section.title || '');
-  return /berichtszusammenfassung|datenversionen|datenstand und berichtserstellung/.test(titleKey);
+  return /^(?:\d+\s+)?(?:berichtszusammenfassung|eingaben)$/.test(titleKey) || /datenversionen|datenstand und berichtserstellung/.test(titleKey);
 }
 
 function cleanRows(rows = []) {
@@ -105,30 +104,14 @@ function toSection(section = {}, index = 0, forceLine = false) {
   };
 }
 
-function reportSummarySection(reportDto = {}) {
+function emptyResultSection(reportDto = {}) {
   const metadata = reportDto.metadata || {};
-  return {
-    title: '1. Berichtszusammenfassung',
-    rows: [
-      ['Bericht', metadata.reportHeading || 'Berechnungsprotokoll', ''],
-      ['Modul', metadata.moduleTitle || '-', ''],
-      ['Berichtsquelle', 'TechCalc Pro', '']
-    ],
+  const title = metadata.reportHeading || reportDto.summary?.title || metadata.moduleTitle || 'Bericht';
+  return [{
+    title: sanitizeText(title),
+    rows: [['Status', 'Keine Ergebnisdaten verfügbar', '']],
     isLineSection: false
-  };
-}
-
-function inputSection(reportDto = {}) {
-  const rows = reportDto.input && typeof reportDto.input === 'object' ? rowsFromObject(reportDto.input) : [];
-  return {
-    title: '2. Eingaben',
-    rows,
-    isLineSection: false
-  };
-}
-
-function fallbackSummary(reportDto = {}) {
-  return [reportSummarySection(reportDto)];
+  }];
 }
 
 export function buildGenericReportSections(reportDto = {}) {
@@ -141,10 +124,7 @@ export function buildGenericReportSections(reportDto = {}) {
     .map((section, index) => toSection(section, index, !keepAllSections && Boolean(recordSections.length)))
     .filter(section => section.rows.length);
 
-  if (!sections.length) return fallbackSummary(reportDto);
+  if (!sections.length) return emptyResultSection(reportDto);
 
-  const prefixedSections = [reportSummarySection(reportDto)];
-  const inputs = toSection(inputSection(reportDto), 1, false);
-  if (inputs.rows.length) prefixedSections.push(inputs);
-  return [...prefixedSections, ...sections];
+  return sections;
 }

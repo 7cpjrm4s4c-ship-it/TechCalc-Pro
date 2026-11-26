@@ -52,8 +52,8 @@ const sections = reportSections({
   reportDto: dto,
   reportSource: 'typed-dto'
 });
-const section = sections.find(item => item.isLineSection && item.title === 'Berechnung');
-assert.ok(section, 'gespeicherter Schmutzwasser-Record muss als eigener PDF-Abschnitt exportiert werden');
+const section = sections.find(item => item.isLineSection && item.title === 'Test Strang 1');
+assert.ok(section, 'gespeicherter Schmutzwasser-Record muss unter seinem gespeicherten Namen als eigener PDF-Abschnitt exportiert werden');
 
 const rows = section.rows;
 const blocks = lineSectionItems(rows);

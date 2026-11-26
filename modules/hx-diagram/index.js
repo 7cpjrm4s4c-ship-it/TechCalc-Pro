@@ -6,6 +6,7 @@ import { createPlatformModule } from '../../core/runtime/index.js';
 import { createTypedDtoReportAdapter } from '../../core/pdf/typedDtoReportAdapter.js';
 import { bindHxDiagramActions } from './controller.js';
 import { renderHxSvg } from './diagramRenderer.js';
+import { equipmentSizing } from './results.js';
 import { renderView } from './view.js';
 import { isDynamicHxDiagramAction, updateHxDiagramDynamic } from './dynamicRenderer.js';
 
@@ -102,14 +103,23 @@ function chartSvgForHxRecord(record = {}, calculation = {}) {
   const path = recordPath(record, calculation);
   return path.length ? renderHxSvg(path) : '';
 }
+function equipmentRowsForHxRecord(record = {}, snapshot = {}, calculation = {}) {
+  const input = recordInput(record, snapshot);
+  const path = recordPath(record, calculation);
+  const process = record.process || input.process || calculation.effectiveProcess || '';
+  const sizing = equipmentSizing(input, path, process);
+  return sizing.rows.map(row => [row.label, row.value, row.unit || '']);
+}
 function buildHxReportPayload(records = [], snapshot = {}, calculation = {}) {
   const charts = [];
-  const sections = records.map((record, index) => {
+  const sections = [];
+  records.forEach((record, index) => {
     const title = hxProcessName(record, index);
     const svg = chartSvgForHxRecord(record, calculation);
     const section = {
       title,
       isLineSection: false,
+      recordIndex: index,
       rows: rowsForHxRecord(record, index, snapshot, calculation)
     };
     if (svg) {
@@ -117,7 +127,16 @@ function buildHxReportPayload(records = [], snapshot = {}, calculation = {}) {
       section.chartTitle = `${title} – h,x-Diagramm`;
       charts.push({ title, svg });
     }
-    return section;
+    sections.push(section);
+    const equipmentRows = equipmentRowsForHxRecord(record, snapshot, calculation);
+    if (equipmentRows.length) {
+      sections.push({
+        title: 'Erhitzer, Kühler und Befeuchter',
+        isLineSection: false,
+        recordIndex: index,
+        rows: equipmentRows
+      });
+    }
   });
   return { charts, sections };
 }
